@@ -4,7 +4,6 @@ import { MetricCard, VisualizationPanel } from '../../components/dashboard/Dashb
 import { CategoryBarChart } from '../../components/dashboard/DashboardCharts';
 import { GraphicIconBadge } from '../../components/graphics/CdlGraphicKit';
 import StateSourceNotice from '../../components/StateSourceNotice';
-import useProfileNavigate from '../../hooks/useProfileNavigate';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import {
   PLATFORM_SYSTEM_PACKS,
@@ -59,7 +58,6 @@ const PLATFORM_ACTIONS = [
 
 export default function PlatformSystemPage({ pack }: { pack?: string }) {
   const location = useLocation();
-  const { profileNavigate } = useProfileNavigate();
   const { patientId = 'demo-patient' } = useParams();
   const capability = getPlatformSystemCapabilityByPath(location.pathname);
   const hubPack = pack || inferHubPack(location.pathname) || capability?.pack || null;
@@ -142,9 +140,6 @@ export default function PlatformSystemPage({ pack }: { pack?: string }) {
               {action.label}
             </Link>
           ))}
-          <button type="button" onClick={() => profileNavigate('/tools')}>
-            Open tools
-          </button>
           {capability ? (
             <button type="button" onClick={runDemoContract}>
               Run demo contract
