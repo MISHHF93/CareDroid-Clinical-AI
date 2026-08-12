@@ -14,6 +14,7 @@ import { useUserIdentity } from '../../contexts/UserIdentityContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { PlatformAssetsApi } from '../../services/platformAssetsApi';
 import { ProductCatalogApi } from '../../services/productCatalogApi';
+import logger from '../../utils/logger';
 import {
   buildWorkspaceSetupFromRegistry,
   getCanonicalWorkspaceRegistry,
@@ -198,14 +199,16 @@ export function OrganizationSettings() {
   const [status, setStatus] = useState('');
 
   useEffect(() => {
-    PlatformAssetsApi.listPacks()
-      .then(() => {})
-      .catch(() => {});
+    PlatformAssetsApi.listPacks().catch((error) => {
+      logger.warn('[OrganizationPages] Failed to warm asset packs cache', error);
+    });
     PlatformAssetsApi.getContext()
       .then((ctx) => {
         if (ctx.roleProfile?.id) setSelectedRoleProfile(ctx.roleProfile.id);
       })
-      .catch(() => {});
+      .catch((error) => {
+        logger.warn('[OrganizationPages] Failed to load platform context; role profile pre-selection skipped', error);
+      });
     PlatformAssetsApi.listRoleProfiles()
       .then(setRoleProfiles)
       .catch(() => setRoleProfiles([]));
