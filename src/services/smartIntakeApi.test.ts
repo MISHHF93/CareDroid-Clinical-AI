@@ -61,4 +61,35 @@ describe('SmartIntakeApi', () => {
       'The API did not return a valid response. Check backend availability or the request mock.',
     );
   });
+
+  // Regression: the backend's real failure mode when Mongo isn't configured
+  // (the documented default, ENABLE_MONGOOSE_EMERGENCY_OS unset) is a 503 from
+  // assertMongoReady() -- this used to fall outside the 401/404/501 fallback
+  // list, so any role that reached SmartIntake got a hard thrown Error instead
+  // of the local-demo degradation the code otherwise appears designed to provide.
+  it('falls back to a local demo session on a 503 (Mongo not configured), instead of throwing', async () => {
+    isBackendCapabilityEnabled.mockReturnValue(true);
+    apiFetch.mockResolvedValue({
+      ok: false,
+      status: 503,
+      text: async () => JSON.stringify({ message: 'Smart Intake requires MongoDB' }),
+    });
+
+    const result = await SmartIntakeApi.createSession('RN');
+
+    expect(result).toMatchObject({ ok: true, localDemo: true });
+  });
+
+  it('falls back to a local demo session on a 503 for a GET (verifyField/audit-style) request too', async () => {
+    isBackendCapabilityEnabled.mockReturnValue(true);
+    apiFetch.mockResolvedValue({
+      ok: false,
+      status: 503,
+      text: async () => JSON.stringify({ message: 'Smart Intake requires MongoDB' }),
+    });
+
+    const result = await SmartIntakeApi.fetchAuditLog('session-1');
+
+    expect(result).toMatchObject({ ok: true, localDemo: true, degraded: true });
+  });
 });

@@ -69,8 +69,17 @@ async function postJson(path, body): Promise<Record<string, any>> {
   assertValidApiResponse(response);
   const payload = await parseApiResponse(response);
   if (!response?.ok) {
-    // Prefer local demo over hard failure for desk continuity
-    if (response.status === 401 || response.status === 404 || response.status === 501) {
+    // Prefer local demo over hard failure for desk continuity. 503 is included
+    // alongside 401/404/501 because that's the actual status the backend returns
+    // (assertMongoReady()) whenever ENABLE_MONGOOSE_EMERGENCY_OS isn't set --
+    // the documented default -- so without it, any role that reaches SmartIntake
+    // got a hard thrown Error instead of this graceful local-demo fallback.
+    if (
+      response.status === 401 ||
+      response.status === 404 ||
+      response.status === 501 ||
+      response.status === 503
+    ) {
       if (String(path).includes('/sessions') && !String(path).includes('/sessions/')) {
         return demoSessionResult(body?.staff);
       }
@@ -93,7 +102,7 @@ async function getJson(path): Promise<Record<string, any>> {
   assertValidApiResponse(response);
   const payload = await parseApiResponse(response);
   if (!response?.ok) {
-    if (response.status === 401 || response.status === 404) {
+    if (response.status === 401 || response.status === 404 || response.status === 503) {
       return demoOk({
         sessionId: SMART_INTAKE_DEMO.sessionId,
         auditLog: SMART_INTAKE_DEMO.auditLog,
