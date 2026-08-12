@@ -66,6 +66,7 @@ export type HospitalCommandCenterSnapshot = Readonly<{
   bottlenecks: readonly HospitalCommandBottleneck[];
   aiRecommendations: readonly HospitalCommandAiRecommendation[];
   unresolvedAlerts: readonly HospitalCommandAlertItem[];
+  unresolvedAlertCount: number;
   threeMinuteCompliance: Readonly<{
     breaches: number;
     activeTraces: number;
@@ -513,6 +514,11 @@ export function buildHospitalCommandCenterSnapshot(input: {
         }),
       ),
     ),
+    // unresolvedAlerts above is capped at 8 for card rendering -- this is the
+    // real total, so anything computing a COUNT (not a list of cards) reads
+    // this instead of unresolvedAlerts.length, which silently undercounts
+    // past 8 (e.g. showed "8" here while the status line's own count said "9").
+    unresolvedAlertCount: unresolvedClinical.length,
     threeMinuteCompliance: Object.freeze({
       breaches: journey.metrics.threeMinuteBreaches,
       activeTraces: journey.metrics.activeJourneyTraces,

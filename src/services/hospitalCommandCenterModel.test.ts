@@ -180,6 +180,26 @@ describe('hospitalCommandCenterModel', () => {
     expect(snapshot.metrics.find((metric) => metric.id === 'ai-recommendations')?.value).toBe(2);
   });
 
+  it('reports the true unresolved-alert count even past the 8-card display cap', () => {
+    // unresolvedAlerts (the card list) is deliberately capped at 8 for rendering.
+    // unresolvedAlertCount must stay the real total, or the status line ("N
+    // unresolved critical alerts") and the "Unresolved alerts" card header
+    // silently disagree once there are more than 8 -- HEAL-114.
+    const alerts = Array.from({ length: 9 }, (_, i) => ({
+      id: `a${i}`,
+      severity: 'Critical',
+      message: `Critical issue ${i}`,
+      acknowledged: false,
+      dismissed: false,
+    })) as never[];
+
+    const snapshot = buildHospitalCommandCenterSnapshot({ alerts });
+
+    expect(snapshot.unresolvedAlerts.length).toBe(8);
+    expect(snapshot.unresolvedAlertCount).toBe(9);
+    expect(snapshot.statusLine).toContain('9 unresolved critical alerts');
+  });
+
   it('filters metrics by role priority order', () => {
     const snapshot = buildHospitalCommandCenterSnapshot();
     const triageIds = resolveHospitalCommandMetricsForRole(EMERGENCY_ROLE_IDS.triageNurse);

@@ -189,8 +189,8 @@ export default function HospitalCommandCenter() {
         attention:
           snapshot.threeMinuteCompliance.breaches > 0
             ? `${snapshot.threeMinuteCompliance.breaches} three-minute breach${snapshot.threeMinuteCompliance.breaches === 1 ? '' : 'es'}`
-            : snapshot.unresolvedAlerts.length
-              ? `${snapshot.unresolvedAlerts.length} unresolved critical alert${snapshot.unresolvedAlerts.length === 1 ? '' : 's'}`
+            : snapshot.unresolvedAlertCount
+              ? `${snapshot.unresolvedAlertCount} unresolved critical alert${snapshot.unresolvedAlertCount === 1 ? '' : 's'}`
               : 'No P0 compliance signals',
         owner: snapshot.ownerRole,
         nextAction: snapshot.nextAction,
@@ -427,10 +427,10 @@ export default function HospitalCommandCenter() {
             <div className="emergency-route-section-card__header">
               <strong>Unresolved alerts</strong>
               <span className="emergency-route-journey-card__count">
-                {snapshot.unresolvedAlerts.length}
+                {snapshot.unresolvedAlertCount}
               </span>
             </div>
-            {snapshot.unresolvedAlerts.length === 0 ? (
+            {snapshot.unresolvedAlertCount === 0 ? (
               <p className="emergency-route-section-card__lead">All critical alerts acknowledged.</p>
             ) : (
               <ul className="hospital-command-center__panel-list">
