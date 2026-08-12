@@ -10,16 +10,9 @@ import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermission
 import { createSmartIntakePatient } from '../services/emergencyOsApi';
 import { ERROR_RECOVERY_COPY, formatApiRecoveryMessage } from '../config/errorRecoveryModel';
 import { routeComplaint } from '../engine/complaintRouter';
-import {
-  DUPLICATE_HIGH_CONFIDENCE_THRESHOLD,
-  findDuplicateCandidates,
-  type PatientDuplicateCandidate,
-} from '../utils/patientDuplicateDetection';
-import DuplicateReviewAlert from './verification/DuplicateReviewAlert';
 import { registerNewArrival } from '../services/arrivalControlLayer';
 import { completeIntakeHandoff } from '../services/receptionHandoff';
 import { confirmCareDroidAction } from '../services/careDroidInteractionFeedback';
-import { routeQuickIntakeThroughOrchestrator } from '../services/receptionIntakeOrchestrator';
 import useProfileNavigate from '../hooks/useProfileNavigate';
 import { notifyWorkflowHandoffComplete } from '../services/workflowNavigationFeedback';
 import { buildPatientArrivalRecord, syncPatientFromArrival } from '../services/patientArrivalModel';
@@ -30,33 +23,25 @@ import {
 import { recognizeComplaint } from '../data/clinicalTerminology/recognizeComplaint';
 import { recordTerminologyGap } from '../services/terminologyGapQueue';
 
-type QuickIntakeVariant = 'whiteboard' | 'reception';
-
 type QuickIntakeProps = {
   onClose: () => void;
   onAdded: (patient: Patient) => void;
-  onOpenVerification?: (patientId?: string) => void;
-  onProvisionalIntake?: () => void;
-  variant?: QuickIntakeVariant;
 };
 
+// This modal is only ever mounted as the "Central Node Intake" widget for clinical staff away
+// from the registration desk (pages/emergency/index.tsx's whiteboard mission button/Header's
+// "New Patient" action) -- it previously supported a second "reception" variant with its own
+// copy/duplicate-detection UI/submit path, but no caller ever passed that variant (confirmed by
+// grepping every <QuickIntake usage in the repo), making that entire branch dead code. Removed
+// during the patient-onboarding-consolidation audit; Reception's own full intake now lives in
+// UnifiedIntakePanel.tsx via receptionIntakeOrchestrator.ts.
 const QUICK_INTAKE_COPY = {
-  whiteboard: {
-    title: 'Central Node Intake',
-    submit: 'Send to Central Node',
-    submitting: 'Sending...',
-    priorityPrefix: 'Central CTAS',
-    showCentralBanner: true,
-    closeLabel: 'Close quick intake',
-  },
-  reception: {
-    title: 'Register with symptoms',
-    submit: 'Register & send to nurse',
-    submitting: 'Registering...',
-    priorityPrefix: 'Urgency',
-    showCentralBanner: false,
-    closeLabel: 'Close registration form',
-  },
+  title: 'Central Node Intake',
+  submit: 'Send to Central Node',
+  submitting: 'Sending...',
+  priorityPrefix: 'Central CTAS',
+  showCentralBanner: true,
+  closeLabel: 'Close quick intake',
 } as const;
 
 type ComplaintCategory =
@@ -179,18 +164,11 @@ function buildVitals(form: {
   };
 }
 
-export default function QuickIntake({
-  onClose,
-  onAdded,
-  onOpenVerification,
-  onProvisionalIntake,
-  variant = 'whiteboard',
-}: QuickIntakeProps) {
-  const copy = QUICK_INTAKE_COPY[variant];
+export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
+  const copy = QUICK_INTAKE_COPY;
   const { profileNavigate } = useProfileNavigate();
   const emergencyRole = useEmergencyRolePermissions();
   const addPatient = useEmergencyStore((state) => state.addPatient);
-  const patients = useEmergencyStore((state) => state.patients);
   const centralControlSettings = useEmergencyStore(
     (state) => state.emergencySettings.centralControl,
   );
@@ -207,30 +185,10 @@ export default function QuickIntake({
   const [showPriorityPicker, setShowPriorityPicker] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
-  const [duplicateAcknowledged, setDuplicateAcknowledged] = useState(false);
   const [protocolSuggestions, setProtocolSuggestions] = useState<string[]>([]);
   const createPatientPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.createPatient);
   const canCreatePatient = createPatientPresentation.enabled;
 
-  const duplicateCandidates = useMemo<PatientDuplicateCandidate[]>(() => {
-    if (variant !== 'reception') return [];
-    if (!firstName.trim() && !lastName.trim() && !dob) return [];
-    return findDuplicateCandidates(patients, {
-      firstName: firstName.trim(),
-      lastName: lastName.trim(),
-      dateOfBirth: dob || undefined,
-      sex,
-      mrn,
-    });
-  }, [variant, patients, firstName, lastName, dob, sex, mrn]);
-
-  const highConfidenceDuplicate = duplicateCandidates.find(
-    (candidate) => candidate.matchScore >= DUPLICATE_HIGH_CONFIDENCE_THRESHOLD,
-  );
-
-  useEffect(() => {
-    setDuplicateAcknowledged(false);
-  }, [firstName, lastName, dob, sex]);
   const centralControl = useMemo(
     () =>
       getCentralControlPolicy({
@@ -328,64 +286,6 @@ export default function QuickIntake({
       setSubmitError(`${emergencyRole.roleLabel} cannot submit central intake inputs.`);
       return;
     }
-    if (variant === 'reception' && highConfidenceDuplicate && !duplicateAcknowledged) {
-      setSubmitError(
-        `Possible duplicate: ${highConfidenceDuplicate.displayName} (${highConfidenceDuplicate.matchScore}%). Open the existing chart or acknowledge before creating a new record.`,
-      );
-      return;
-    }
-    const isReceptionIntake = variant === 'reception';
-    const receptionSafetyFlags: import('../types/emergency').QuickSafetyFlag[] =
-      priority === Priority.P1 || priority === Priority.P2
-        ? [PatientFlag.HighRisk as import('../types/emergency').QuickSafetyFlag]
-        : [];
-    if (isReceptionIntake) {
-      setSubmitting(true);
-      setSubmitError('');
-      try {
-        const routeResult = await routeQuickIntakeThroughOrchestrator(
-          {
-            firstName: firstName.trim() || 'Unknown',
-            lastName: lastName.trim() || 'Patient',
-            dob: dob || undefined,
-            healthCard: mrn,
-            phone: '',
-            complaint: complaint.trim() || complaintCategory || 'Unspecified complaint',
-            arrivalMode: 'walk-in',
-            quickSafetyFlags: receptionSafetyFlags,
-            quickNotes: '',
-          },
-          {
-            actorName: emergencyRole.roleLabel || 'Reception',
-            actorStaffId: emergencyRole.canonicalProfile?.employeeId || emergencyRole.canonicalProfile?.id,
-          },
-        );
-        registerNewArrival(
-          {
-            patients: useEmergencyStore.getState().patients,
-            updatePatient: useEmergencyStore.getState().updatePatient,
-            dispatchWebSocketEvent: useEmergencyStore.getState().dispatchWebSocketEvent,
-          },
-          routeResult.patientId,
-          { source: 'quick-intake-reception' },
-        );
-        notifyWorkflowHandoffComplete({
-          patientName: `${routeResult.patient.firstName} ${routeResult.patient.lastName}`.trim(),
-          nextRoute: routeResult.nextRoute,
-          onNavigate: profileNavigate,
-        });
-        onAdded(routeResult.patient);
-        profileNavigate(routeResult.nextRoute);
-        onClose();
-      } catch (error: any) {
-        setSubmitError(
-          `${formatApiRecoveryMessage(error, 'intake form')} ${ERROR_RECOVERY_COPY.handoffPending}`,
-        );
-      } finally {
-        setSubmitting(false);
-      }
-      return;
-    }
 
     const now = new Date().toISOString();
     const completeVitals: Vitals[] = Object.values(vitals).some((value) => value !== undefined)
@@ -397,12 +297,12 @@ export default function QuickIntake({
       {
         chiefComplaint: complaint.trim() || complaintCategory || 'Unspecified complaint',
         complaintCategory: complaintCategory || 'Other',
-        state: isReceptionIntake ? PatientState.Registration : PatientState.Triage,
-        triagePending: isReceptionIntake ? true : undefined,
+        state: PatientState.Triage,
+        triagePending: undefined,
       },
     );
     const complaintText = complaint.trim() || complaintCategory || 'Unspecified complaint';
-    const intakeState = isReceptionIntake ? PatientState.Registration : PatientState.Triage;
+    const intakeState = PatientState.Triage;
     const arrival = buildPatientArrivalRecord({
       arrivalMode: 'walk-in',
       arrivalTimestamp: now,
@@ -410,14 +310,12 @@ export default function QuickIntake({
       state: intakeState,
       triageAcuity: {
         code: priority,
-        status: isReceptionIntake ? 'unassigned' : 'confirmed',
-        assignedAt: isReceptionIntake ? null : now,
+        status: 'confirmed',
+        assignedAt: now,
       },
-      queueDestination:
-        complaintPatch.queueDestination ||
-        (isReceptionIntake ? 'verification' : 'triage-queue'),
-      triagePending: isReceptionIntake ? (complaintPatch.triagePending ?? true) : true,
-      waitingRoomStatus: isReceptionIntake ? 'registered' : 'waiting-for-triage',
+      queueDestination: complaintPatch.queueDestination || 'triage-queue',
+      triagePending: true,
+      waitingRoomStatus: 'waiting-for-triage',
     });
 
     const patient = syncPatientFromArrival(
@@ -430,7 +328,7 @@ export default function QuickIntake({
         age,
         sex,
         state: intakeState,
-        triageTime: isReceptionIntake ? undefined : now,
+        triageTime: now,
         complaintCategory: complaintCategory || 'Other',
         vitals: completeVitals,
         flags: safetyFlags,
@@ -460,13 +358,9 @@ export default function QuickIntake({
     setSubmitError('');
 
     try {
-      // Reception's own duplicate gate above (highConfidenceDuplicate + duplicateAcknowledged)
-      // already resolved before this point for the reception variant; other variants are
-      // staff-operated forms too, not an unattested caller — trust this internal call site.
       const response = await createSmartIntakePatient(patient, { confirmDuplicateOverride: true });
       const persistedPatient = response?.data?.patient || patient;
       addPatient(persistedPatient);
-      const handoffSource = isReceptionIntake ? 'reception-quick-intake' : 'quick-intake';
       registerNewArrival(
         {
           patients: useEmergencyStore.getState().patients,
@@ -474,11 +368,11 @@ export default function QuickIntake({
           dispatchWebSocketEvent: useEmergencyStore.getState().dispatchWebSocketEvent,
         },
         persistedPatient.id,
-        { source: handoffSource },
+        { source: 'quick-intake' },
       );
       const handoff = completeIntakeHandoff(useEmergencyStore.getState(), {
         patientId: persistedPatient.id,
-        source: handoffSource,
+        source: 'quick-intake',
         actorName: emergencyRole.roleLabel || 'Intake',
       });
       notifyWorkflowHandoffComplete({
@@ -491,7 +385,6 @@ export default function QuickIntake({
       onClose();
     } catch (error: any) {
       addPatient(patient);
-      const handoffSource = isReceptionIntake ? 'reception-quick-intake' : 'quick-intake';
       registerNewArrival(
         {
           patients: useEmergencyStore.getState().patients,
@@ -499,11 +392,11 @@ export default function QuickIntake({
           dispatchWebSocketEvent: useEmergencyStore.getState().dispatchWebSocketEvent,
         },
         patient.id,
-        { source: handoffSource },
+        { source: 'quick-intake' },
       );
       const handoff = completeIntakeHandoff(useEmergencyStore.getState(), {
         patientId: patient.id,
-        source: handoffSource,
+        source: 'quick-intake',
         actorName: emergencyRole.roleLabel || 'Intake',
       });
       notifyWorkflowHandoffComplete({
@@ -541,7 +434,7 @@ export default function QuickIntake({
       role="dialog"
       aria-modal="true"
       aria-labelledby="quick-intake-title"
-      
+
     >
       <style>
         {`
@@ -615,9 +508,7 @@ export default function QuickIntake({
               {copy.title}
             </h2>
             <div className="qi-subtitle">
-              {variant === 'reception'
-                ? 'Fast registration for front desk — patient enters triage queue after submit.'
-                : `Unified input and escalation for ${centralControl.inputProfile.label}`}
+              {`Unified input and escalation for ${centralControl.inputProfile.label}`}
             </div>
           </div>
           <button
@@ -632,19 +523,6 @@ export default function QuickIntake({
 
         <div className="quick-intake-grid qi-grid">
           <section className="u-flex-col-gap-12">
-            {variant === 'reception' && duplicateCandidates.length ? (
-              <DuplicateReviewAlert
-                candidates={duplicateCandidates}
-                acknowledged={duplicateAcknowledged}
-                onAcknowledge={() => {
-                  setDuplicateAcknowledged(true);
-                  setSubmitError('');
-                }}
-                onOpenPatient={(patientId: string) => onOpenVerification?.(patientId)}
-                onOpenVerification={(patientId: string) => onOpenVerification?.(patientId)}
-                onProvisionalIntake={onProvisionalIntake}
-              />
-            ) : null}
             {copy.showCentralBanner ? (
             <div aria-label="Central node input mode" className="qi-central-banner">
               {centralControl.label} receives this as {centralControl.inputProfile.label}.
@@ -653,7 +531,7 @@ export default function QuickIntake({
             ) : null}
             <div
               className="quick-intake-category-grid u-grid-2"
-              
+
             >
               {CATEGORY_BUTTONS.map((category) => {
                 const active = complaintCategory === category.label;
