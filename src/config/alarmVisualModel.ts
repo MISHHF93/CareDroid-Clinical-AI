@@ -16,6 +16,18 @@
  * - Chrome context KPIs (ChromeStatusChips / AlarmKpiChip)
  * - OperationalStrip metrics
  * - MetricChip / MetricCard / StatusWidget / StatCard
+ *
+ * KNOWN DUPLICATE, NOT YET RECONCILED (found 2026-08-12, repo-wide export-collision audit):
+ * `src/alarm/types.ts` independently defines its OWN `resolveAlarmSeverity`/`AlarmSeverity`
+ * with a different 7-level scale (critical/urgent/warning/info/ok/neutral/ai vs. this file's
+ * 5-level critical/warning/info/ok/neutral) -- most concretely, the tone `'high'` maps to
+ * `'critical'` HERE but to `'urgent'` THERE. Both files are live, both are imported by 15+
+ * real components split roughly evenly between them (PatientCard, ChromeStatusChips,
+ * CareDroidPrimitives, AlarmDock, AlarmBanner, AlarmKpi, OperationalStrip, and more). The same
+ * tone string can render a different clinical-urgency treatment purely depending on which file
+ * a given component happens to import from. This needs a deliberate consolidation decision
+ * (which 5-vs-7-level scale wins, and migrating every call site) -- do not merge unilaterally;
+ * flagged in docs/architecture/CARE_DROID_MASTER_BACKLOG.md for a dedicated round.
  */
 
 export type AlarmSeverity = 'critical' | 'warning' | 'info' | 'ok' | 'neutral';

@@ -1,6 +1,16 @@
 /**
  * Unified CareDroid alarm contract — single severity + surface vocabulary
  * for dock, banner, rail, toast, KPI, and inline alerts.
+ *
+ * KNOWN DUPLICATE, NOT YET RECONCILED (found 2026-08-12, repo-wide export-collision audit):
+ * `src/config/alarmVisualModel.ts` independently defines its OWN `resolveAlarmSeverity`/
+ * `AlarmSeverity` with a different 5-level scale (critical/warning/info/ok/neutral, no
+ * urgent/ai tier) -- most concretely, the tone `'high'` maps to `'urgent'` HERE but to
+ * `'critical'` THERE. Both files are live, both imported by 15+ real components split
+ * roughly evenly between them. The same tone string can render a different clinical-urgency
+ * treatment purely depending on which file a given component happens to import from. Needs a
+ * deliberate consolidation decision -- do not merge unilaterally; flagged in
+ * docs/architecture/CARE_DROID_MASTER_BACKLOG.md for a dedicated round.
  */
 
 export const ALARM_SEVERITIES = [
