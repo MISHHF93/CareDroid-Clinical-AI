@@ -18,6 +18,16 @@ const ALLOWED_OI_CORE_IMPORTERS = new Set([
   'src/hooks/useOperationalIntelligenceCore.ts',
   'src/hooks/useAiChiefOrchestrator.ts',
   'src/hooks/useUnifiedOperationalIntelligence.ts',
+  // useOperationalIntelligence.ts is itself a thin, single, well-known facade
+  // over the core hook (HEAL-137) -- every real call site (Header, the
+  // Whiteboard, EmergencyAnalytics, EmergencySettings, useNotificationCenter,
+  // useHeaderOperationalMetrics) only ever read .centralSnapshot/.snapshot,
+  // fields useAiChiefOrchestrator passed through from this same core hook
+  // unmodified, so routing through the full orchestrator was silently
+  // rebuilding the entire unified knowledge graph and AI recommendation
+  // snapshot on every render of those consumers for no reason. Value-identical
+  // to the old behavior, proven by direct regression test.
+  'src/hooks/useOperationalIntelligence.ts',
 ]);
 
 function listSourceFiles(dir: string): string[] {
@@ -57,13 +67,22 @@ describe('aiChiefOrchestration contract', () => {
     expect(snapshot.patientContexts.every((context) => context.humanReviewRequired)).toBe(true);
   });
 
-  it('routes operational intelligence consumers through AI Chief orchestrator', () => {
+  it('routes operational intelligence consumers through the single useOperationalIntelligence facade', () => {
+    // Pre-HEAL-137 this hook delegated to useAiChiefOrchestrator, which
+    // rebuilt the entire AI Chief snapshot + unified knowledge graph on every
+    // render just to hand back two passthrough fields no real consumer used
+    // beyond .centralSnapshot/.snapshot. It now delegates directly to the
+    // lightweight useOperationalIntelligenceCore -- verified value-identical
+    // to the old behavior in useOperationalIntelligence.test.ts. The
+    // architectural intent this test guards (one single, well-known facade;
+    // no consumer reaches past it to the low-level core hook directly) is
+    // unchanged -- see the 'restricts direct useOperationalIntelligenceCore
+    // imports' test below for that half of the contract.
     const orchestratorSource = readFileSync(
       path.join(ROOT, 'src/hooks/useOperationalIntelligence.ts'),
       'utf8',
     );
-    expect(orchestratorSource).toContain('useAiChiefOrchestrator');
-    expect(orchestratorSource).toContain('aiChief.operationalIntelligence');
+    expect(orchestratorSource).toContain('useOperationalIntelligenceCore');
   });
 
   it('does not re-enrich workflow tasks that already carry aiDecision in the local queue', () => {
