@@ -479,15 +479,6 @@ export const evaluateHybridDigitalTwinScenario = (payload: any = {}) =>
     body: JSON.stringify(payload),
   });
 
-export const createEmergencyPatient = (patient, options: { confirmDuplicateOverride?: boolean } = {}) =>
-  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.patients, {
-    method: 'POST',
-    body: JSON.stringify({
-      ...serializePatientForBackendApi(patient),
-      confirmDuplicateOverride: options.confirmDuplicateOverride,
-    }),
-  });
-
 export const createSmartIntakePatient = (patient, options: { confirmDuplicateOverride?: boolean } = {}) =>
   requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.intake, {
     method: 'POST',
@@ -568,7 +559,6 @@ export default Object.freeze({
   simulateHybridDigitalTwin,
   fetchHybridDigitalTwinState,
   evaluateHybridDigitalTwinScenario,
-  createEmergencyPatient,
   createSmartIntakePatient,
   runSmartIntakeVerticalSlice,
 });

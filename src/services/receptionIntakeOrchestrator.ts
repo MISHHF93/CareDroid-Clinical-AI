@@ -25,7 +25,7 @@ import { buildPatientArrivalRecord, syncPatientFromArrival } from './patientArri
 import { serializePatientForBackendApi } from './patientArrivalBackendSync';
 import { completeReceptionHandoff } from './receptionHandoff';
 import { buildClientTriageAssist } from './triageAssist';
-import { createEmergencyPatient, createSmartIntakePatient } from './emergencyOsApi';
+import { createSmartIntakePatient } from './emergencyOsApi';
 import { detectHighRiskComplaintFlags } from './highRiskComplaintFlags';
 import {
   findDuplicateCandidates,
@@ -685,9 +685,7 @@ export async function syncReceptionPatientToBackend(
   backendPatientId?: string;
   error?: string;
 }> {
-  const canSyncSmartIntake = isBackendCapabilityEnabled('emergencySmartIntake');
-  const canSyncPatients = isBackendCapabilityEnabled('emergencyPatients');
-  if (!canSyncSmartIntake && !canSyncPatients) {
+  if (!isBackendCapabilityEnabled('emergencySmartIntake')) {
     return { status: 'skipped' };
   }
 
@@ -698,9 +696,13 @@ export async function syncReceptionPatientToBackend(
     // this is a trusted internal caller, not the unchecked-API-client case the
     // backend's own duplicate gate exists to catch.
     const syncOptions = { confirmDuplicateOverride: true };
-    const response = canSyncSmartIntake
-      ? await createSmartIntakePatient(payload, syncOptions)
-      : await createEmergencyPatient(payload, syncOptions);
+    // Used to branch to createEmergencyPatient() (POST /emergency/patients) when
+    // emergencySmartIntake was disabled but emergencyPatients was enabled -- both
+    // capabilities are hardcoded REAL in backendApiCapabilities.ts with no runtime
+    // override, so that branch was provably unreachable, and /emergency/patients
+    // is a literal duplicate of this route on the backend (same guard, same DTO,
+    // same downstream createFromIntake() call) with no unique behavior to keep.
+    const response = await createSmartIntakePatient(payload, syncOptions);
     const remotePatient =
       response?.data?.patient ||
       response?.patient ||

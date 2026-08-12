@@ -4,7 +4,6 @@ import { useEmergencyStore } from '../store/emergencyStore';
 import { PatientFlag, PatientState, Priority } from '../types/emergency';
 
 const createSmartIntakePatient = vi.fn();
-const createEmergencyPatient = vi.fn();
 const capabilityEnabled = vi.fn((_capability?: string) => true);
 
 vi.mock('../config/backendApiCapabilities', () => ({
@@ -16,7 +15,6 @@ vi.mock('./emergencyOsApi', async (importOriginal) => {
   return {
     ...actual,
     createSmartIntakePatient: (...args: unknown[]) => createSmartIntakePatient(...args),
-    createEmergencyPatient: (...args: unknown[]) => createEmergencyPatient(...args),
   };
 });
 
@@ -84,10 +82,6 @@ describe('receptionIntakeOrchestrator', () => {
       module: 'Smart Intake',
       data: { patient: { id: patient?.id || 'backend-patient-1' } },
     }));
-    createEmergencyPatient.mockResolvedValue({
-      module: 'Patients',
-      data: { patient: { id: 'backend-patient-2' } },
-    });
   });
 
   it('routes walk-in chest pain as a critical reception arrival with a 3-minute timer', async () => {
@@ -185,7 +179,6 @@ describe('receptionIntakeOrchestrator', () => {
     });
     expect(result.backendSyncStatus).toBe('skipped');
     expect(createSmartIntakePatient).not.toHaveBeenCalled();
-    expect(createEmergencyPatient).not.toHaveBeenCalled();
   });
 
   it('syncReceptionPatientToBackend returns synced on successful create envelope', async () => {
