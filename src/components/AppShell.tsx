@@ -402,12 +402,19 @@ function AppShellFrame({ children }: AppShellProps) {
     screenCapabilities.isWallKiosk &&
     !screenCapabilities.isPublicDisplay &&
     isEmergencyBoardRoute;
+  // Patient-facing self check-in kiosk -- was rendering with the full internal
+  // staff console (Sidebar nav, Critical Alerts count, Copilot, Settings, live
+  // header pills) with no kiosk-mode suppression at all, since isEmergencyBoardRoute
+  // only covers the whiteboard route. A screen where patients enter their own
+  // name/DOB should not expose internal clinical navigation or live alert counts.
+  const isSelfArrivalKiosk = location.pathname === CANONICAL_ROUTES.emergencySelfArrival;
   const useWallKioskChrome =
     screenCapabilities.useMinimalAppChrome &&
     isEmergencyBoardRoute &&
     !isPublicWaitingKiosk &&
     !isReadOnlyWhiteboardKiosk;
-  const useKioskShell = useWallKioskChrome || isPublicWaitingKiosk || isReadOnlyWhiteboardKiosk;
+  const useKioskShell =
+    useWallKioskChrome || isPublicWaitingKiosk || isReadOnlyWhiteboardKiosk || isSelfArrivalKiosk;
   const startupStartedRef = useRef(false);
   const receptionRouteInitialMountRef = useRef(true);
   const previousSimulationModeRef = useRef<boolean | null>(null);
@@ -1047,6 +1054,7 @@ function AppShellFrame({ children }: AppShellProps) {
         screenDensityShellClassName(screenCapabilities.screenMode),
         isPublicWaitingKiosk ? 'emergency-app-shell--public-waiting-kiosk' : '',
         isReadOnlyWhiteboardKiosk ? 'emergency-app-shell--read-only-whiteboard-kiosk' : '',
+        isSelfArrivalKiosk ? 'emergency-app-shell--self-arrival-kiosk' : '',
         copilotOpen && canUseCopilot && !useKioskShell ? 'emergency-app-shell--copilot-open' : '',
         isReceptionSimpleDensity ? 'emergency-app-shell--reception-density' : '',
       ]
@@ -1069,7 +1077,7 @@ function AppShellFrame({ children }: AppShellProps) {
               <strong>{screenCapabilities.label}</strong>
               <span className="emergency-wall-kiosk-header__safety">{EMERGENCY_OS_BRANDING.safetyLine}</span>
             </header>
-          ) : isPublicWaitingKiosk || isReadOnlyWhiteboardKiosk ? null : (
+          ) : isPublicWaitingKiosk || isReadOnlyWhiteboardKiosk || isSelfArrivalKiosk ? null : (
             <>
               <Header />
               {/* Reception simple-fast density: one route tab only — avoid stacking journey + session bars */}
