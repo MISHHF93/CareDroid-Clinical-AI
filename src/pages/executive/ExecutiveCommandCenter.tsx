@@ -21,8 +21,11 @@ import { fetchUnifiedPlatformHealth } from '../../services/unifiedServiceRegistr
 import { fetchEmergencySurgeStatus } from '../../services/surgeApi';
 import './ExecutiveCommandCenter.css';
 
+// v === 0 is a real, reachable value (emergencyAnalyticsApi's average() returns 0, not NaN,
+// when there are no rows yet) -- only null/undefined mean "no data," matching the nullish-only
+// guard the sibling "Patients seen" card already uses a few lines below.
 const min = (v: number | undefined | null) =>
-  v == null || v === 0 ? '—' : `${v} min`;
+  v == null ? '—' : `${v} min`;
 
 const directionLabel: Record<string, string> = { up: '↑', down: '↓', flat: '—' };
 
