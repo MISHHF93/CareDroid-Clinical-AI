@@ -293,7 +293,7 @@ function sourceSnapshotFindings(sourceSnapshot: any = {}) {
         surface: UX_SURFACE_TYPES.DIALOGS,
         severity: 'medium',
         title: 'Quick Command still offsets above a removed bottom nav',
-        evidence: 'CommandPalette.css references --app-bottom-nav-height.',
+        evidence: 'CommandPalette.tsx still references --app-bottom-nav-height.',
         recommendation: 'Anchor compact command UI to safe-area bottom spacing instead.',
       })
     );

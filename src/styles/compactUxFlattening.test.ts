@@ -60,14 +60,18 @@ describe('compact UX/UI flattening contracts', () => {
     expect(css).not.toMatch(/transform:\s*translateY\(-4px\)/);
   });
 
-  it('keeps quick command compact against the mobile safe-area bottom', () => {
-    // The quick-command UI is now CommandPalette.tsx / CommandPalette.css;
-    // QuickCommandLauncher.css is dead CSS left over from before it was
-    // renamed/merged (no QuickCommandLauncher.tsx exists to import it).
-    const quickCommand = read('components/CommandPalette.css');
-    expect(quickCommand).toContain('padding-bottom: max(10px, env(safe-area-inset-bottom, 0px))');
-    expect(quickCommand).not.toContain('var(--app-bottom-nav-height, 56px)');
-    expect(quickCommand).toContain('border-radius: var(--radius-md)');
-    expect(quickCommand).toContain('min-height: 44px');
+  it('keeps quick command touch targets accessible', () => {
+    // The quick-command UI is CommandPalette.tsx, which renders entirely via
+    // inline styles -- CommandPalette.css and QuickCommandLauncher.css were
+    // both dead CSS left over from an earlier bottom-docked launcher design
+    // (no component imports either), deleted alongside this test's fix. The
+    // current design is a centered modal (backdrop uses alignItems:
+    // 'flex-start' + paddingTop, not a viewport-bottom dock), so the old
+    // safe-area-inset-bottom assertion no longer maps to anything real; the
+    // touch-target-size contract it was also guarding still applies and is
+    // checked directly against the live styles object below.
+    const commandPalette = read('components/CommandPalette.tsx');
+    expect(commandPalette).toMatch(/resultItem:\s*\{[\s\S]*minHeight:\s*54/);
+    expect(commandPalette).toMatch(/inputRow:\s*\{[\s\S]*minHeight:\s*48/);
   });
 });

@@ -20,7 +20,11 @@ function currentSourceSnapshot() {
   return {
     appShellJsx: read('components/AppShell.tsx'),
     appShellCss: read('components/app-shell.css'),
-    quickCommandCss: read('components/CommandPalette.css'),
+    // CommandPalette.tsx renders entirely via inline styles -- there is no
+    // CommandPalette.css any more (it was dead CSS from an earlier
+    // bottom-docked launcher design, deleted alongside this fix), so the
+    // obsolete-bottom-nav-offset check below reads the real component source.
+    quickCommandCss: read('components/CommandPalette.tsx'),
     drawerJsx: read('components/ui/Drawer.tsx'),
   };
 }

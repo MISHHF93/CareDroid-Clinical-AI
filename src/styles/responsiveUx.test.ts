@@ -20,10 +20,11 @@ const copilotPanelCss = readFileSync(
   join(__dirname, '../components/styles/CopilotPanel-part-01.css'),
   'utf8',
 );
-const quickCommandCss = readFileSync(
-  join(__dirname, '../components/CommandPalette.css'),
-  'utf8'
-);
+// CommandPalette.tsx renders entirely via inline styles (no CommandPalette.css
+// exists any more -- it was dead CSS from before the quick-command UI was
+// rewritten, deleted alongside this test's fix), so its scrollable-results
+// contract is checked against the component source directly, below.
+const commandPaletteSource = readFileSync(join(__dirname, '../components/CommandPalette.tsx'), 'utf8');
 const drawerCss = readFileSync(join(__dirname, '../components/ui/Drawer.css'), 'utf8');
 const buttonCss = readFileSync(join(__dirname, '../components/ui/button.css'), 'utf8');
 const dashboardVisualizationsCss = readFileSync(
@@ -109,7 +110,7 @@ describe('responsive-ux.css — global normalization', () => {
   });
 
   it('keeps overlay bodies locally scrollable without becoming page scroll owners', () => {
-    expect(quickCommandCss).toMatch(/\.command-palette__body\s*\{[\s\S]*overflow-y:\s*auto/);
+    expect(commandPaletteSource).toMatch(/results:\s*\{[\s\S]*overflowY:\s*'auto'/);
     expect(mobileFirstRecoveryCss).toMatch(/\.quick-command-results[\s\S]*overscroll-behavior:\s*contain/);
     expect(drawerCss).toMatch(/\.drawer-body\s*\{[\s\S]*overflow-y:\s*auto/);
     expect(drawerCss).toMatch(/\.drawer-body\s*\{[\s\S]*overflow-x:\s*clip/);
