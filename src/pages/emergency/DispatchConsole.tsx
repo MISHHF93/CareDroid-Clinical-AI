@@ -695,22 +695,6 @@ export default function DispatchConsole() {
           {showForm ? 'Cancel' : '+ Log Call'}
         </button>
       }
-      operationalSummaryExtra={
-        criticalPending > 0 ? (
-          <div
-            className="dispatch-console__banner dc-alert-soft"
-            role="status"
-          >
-            <div className="u-flex-center u-gap-8">
-              <span className="fj-critical-banner__icon">⚡</span>
-              <strong className="dc-title-14-critical">
-                {criticalPending} Echo/Delta call{criticalPending > 1 ? 's' : ''} awaiting dispatch
-              </strong>
-            </div>
-            <span className="dc-muted-12">Dispatch unit on call card below</span>
-          </div>
-        ) : null
-      }
       primaryActions={
       <div className="dispatch-console__summary-row">
         <SummaryCard label="Active Calls" value={summary.total} />
