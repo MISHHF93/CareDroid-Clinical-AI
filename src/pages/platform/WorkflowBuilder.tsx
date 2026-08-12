@@ -22,6 +22,15 @@ export function WorkflowBuilderPage() {
   const priorityChart = useMemo(() => buildWorkflowPriorityChart(), []);
   const actionCount = COMMAND_CENTER_WORKFLOW_ACTIONS.length;
   const journeyCount = WORKFLOW_MINING_JOURNEYS.length;
+  // Was hardcoded to "5m" -- happened to match today's true average (rounds to 5) but wasn't
+  // actually computed from defaultDeadlineMinutes, so it would silently go stale the next time
+  // that config changed. Filters out null (some actions have no SLA deadline).
+  const avgDeadlineMinutes = useMemo(() => {
+    const values = COMMAND_CENTER_WORKFLOW_ACTIONS.map((action) => action.defaultDeadlineMinutes).filter(
+      (minutes): minutes is number => minutes != null,
+    );
+    return values.length ? Math.round(values.reduce((sum, minutes) => sum + minutes, 0) / values.length) : null;
+  }, []);
 
   return (
     <main className="workflow-builder-page" aria-label="Workflows">
@@ -51,7 +60,12 @@ export function WorkflowBuilderPage() {
         <MetricCard label="Actions" value={String(actionCount)} hint="Command-center workflows" tone="neutral" />
         <MetricCard label="Journeys" value={String(journeyCount)} hint="Mining templates" tone="neutral" />
         <MetricCard label="Critical" value={String(COMMAND_CENTER_WORKFLOW_ACTIONS.filter((a) => a.tone === 'critical').length)} hint="Priority actions" tone="critical" />
-        <MetricCard label="Avg deadline" value="5m" hint="Default SLA window" tone="warning" />
+        <MetricCard
+          label="Avg deadline"
+          value={avgDeadlineMinutes != null ? `${avgDeadlineMinutes}m` : '—'}
+          hint="Default SLA window"
+          tone="warning"
+        />
       </div>
 
       <div className="workflow-builder-page__charts">
