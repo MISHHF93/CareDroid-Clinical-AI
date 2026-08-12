@@ -405,7 +405,13 @@ export default function EmergencyWhiteboard() {
   const wearableAlertCount = wearableSignal?.data?.alerts?.length || 0;
   const virtualVisitCandidateCount = vvtSignal?.data?.candidates?.length || 0;
   const bragSignal = findUpgradeSignal(upgradeFlowSignals, 'brag_forecast_10h');
-  const capacity = whiteboardPayload?.capacity || storeCapacity;
+  // storeCapacity (live Zustand state) must win over whiteboardPayload.capacity -- the payload
+  // is fetched once on mount and only re-fetched on specific user actions (never on a timer or
+  // live capacity update), while the command-layer grid a few hundred lines below reads
+  // storeCapacity directly via useCareDroidCentralNode. Preferring the payload here meant the
+  // Whiteboard's own "Capacity"/"Reassess Due" tiles could silently freeze at the fetch-time
+  // value while the command-layer grid kept updating live, on the same screen.
+  const capacity = storeCapacity || whiteboardPayload?.capacity;
   const [activeFilter, setActiveFilter] = useState<FilterId>('All');
   const [showIntake, setShowIntake] = useState(false);
   const [emsOffloadPanelOpen, setEmsOffloadPanelOpen] = useState(false);

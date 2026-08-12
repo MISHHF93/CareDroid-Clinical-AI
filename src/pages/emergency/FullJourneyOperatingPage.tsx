@@ -553,7 +553,17 @@ function EdReadinessView() {
         <MetricChip label="Ready" value={summary.readyCount} />
         <MetricChip label="Pending" value={summary.pendingCount} warn />
         <MetricChip label="Overdue" value={summary.overdueCount} warn />
-        <MetricChip label="Inbound EMS" value={cadSummary.enRouteUnits + cadSummary.transportingUnits} warn />
+        {/* Deliberately NOT labeled "Inbound EMS" -- the always-visible MetricGrid a few lines
+            above this view already uses that exact label for metrics.inboundEms (the ED's own
+            real emsArrivals record count). This chip is sourced from cadIntegrationService's
+            in-memory CAD unit registry (7 hardcoded demo units, unrelated to ED patient
+            records) -- both chips could render simultaneously on the ed-readiness tab with
+            different numbers under an identical label. */}
+        <MetricChip
+          label="CAD units inbound"
+          value={cadSummary.enRouteUnits + cadSummary.transportingUnits}
+          warn
+        />
         <MetricChip label="Active prehospital" value={activeAssessments.length} />
       </div>
 
