@@ -39,7 +39,7 @@ export type OperationsLiveFeeds = Readonly<{
   } | null;
   clinicalAlerts?: {
     ok?: boolean;
-    data?: { alerts?: readonly { status?: string }[] };
+    data?: { alerts?: readonly { status?: string; severity?: string }[] };
   } | null;
 }>;
 
@@ -78,9 +78,14 @@ export function buildLiveSurfaceMetrics(
       ).length;
       const timeline = feeds.medicalIot?.snapshot?.connectivityTimeline || [];
       const latest = timeline[timeline.length - 1];
+      // online/stale are always well-defined numbers (filter().length is never null/undefined),
+      // including a legitimate 0 -- only fall back to the timeline snapshot when there's no
+      // device-level data at all, not whenever the live count happens to be zero (the `||`
+      // version misread "all devices legitimately offline" as "no data" and substituted an
+      // unrelated timeline number -- worst exactly when the real answer matters most).
       return [
-        metric('Connected devices', online || latest?.online || devices.length),
-        metric('Stale signals', stale || latest?.offline),
+        metric('Connected devices', devices.length ? online : (latest?.online ?? devices.length)),
+        metric('Stale signals', devices.length ? stale : (latest?.offline ?? 0)),
         metric('Active alerts', feeds.medicalIot?.snapshot?.alerts?.length ?? 0),
       ];
     }
@@ -103,7 +108,9 @@ export function buildLiveSurfaceMetrics(
     case 'notifications': {
       const alerts = feeds.clinicalAlerts?.ok ? feeds.clinicalAlerts.data?.alerts || [] : [];
       const unread = alerts.filter((alert) => alert.status === 'unacknowledged').length;
-      const critical = alerts.filter((alert) => alert.status === 'unacknowledged').length;
+      const critical = alerts.filter(
+        (alert) => alert.severity === 'critical' && alert.status !== 'dismissed',
+      ).length;
       return [
         metric('Unread alerts', unread || alerts.length),
         metric('Open signals', alerts.length),

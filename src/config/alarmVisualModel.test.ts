@@ -19,6 +19,14 @@ describe('alarmVisualModel', () => {
     expect(resolveAlarmSeverity(undefined)).toBe('neutral');
   });
 
+  it('recognizes the full-word "information" tone, not just "info" (metric-card audit regression)', () => {
+    // SaasHealthCenter.tsx and OperationalDiagnosticsPanel.tsx pass tone="information" to
+    // MetricCard -- only the abbreviation "info" was recognized here, so those cards silently
+    // rendered as plain neutral/gray instead of the intended info-blue styling.
+    expect(resolveAlarmSeverity('information')).toBe('info');
+    expect(resolveAlarmSeverity('Information')).toBe('info');
+  });
+
   it('ranks critical above warning', () => {
     expect(compareAlarmSeverity('critical', 'warning')).toBeLessThan(0);
     expect(isAlarmingSeverity('critical')).toBe(true);

@@ -66,7 +66,7 @@ export function resolveAlarmSeverity(tone: AlarmToneInput): AlarmSeverity {
   ) {
     return 'warning';
   }
-  if (t === 'info' || t === 'notice' || t === 'blue') return 'info';
+  if (t === 'info' || t === 'information' || t === 'notice' || t === 'blue') return 'info';
   if (
     t === 'success' ||
     t === 'stable' ||
