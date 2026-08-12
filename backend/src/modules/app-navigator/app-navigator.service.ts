@@ -1,6 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import catalogData from './data/catalog.json';
 import { callAI } from '../../../../lib/ai/serverClient';
+import { Permission } from '../auth/enums/permission.enum';
+import { hasPermission } from '../auth/config/role-permissions.config';
+import { UserRole } from '../users/entities/user.entity';
 
 /**
  * Ported from navigator/ (a formerly-standalone, merged-in repo) as part of
@@ -186,6 +189,41 @@ function scoreDocument(
   return { score, matchedTerms: [...new Set(matchedTerms)] };
 }
 
+/**
+ * catalog.json's requiredPermissions strings (e.g. "settings:read") are a separate, ad-hoc
+ * vocabulary from the backend's own Permission enum and were never actually checked against
+ * the caller -- any authenticated role could search for and receive the path/component/
+ * description of admin-only surfaces (e.g. /admin -> AdminOperationsShell), even though the
+ * destination route itself is correctly role-gated by CareDroidRouteGuard on the frontend.
+ *
+ * Only "settings:read" and "audit:read" are mapped: cross-checking every catalog record
+ * against its own workflowOwner field shows both are used consistently for IT-administrator/
+ * hospital-administrator/quality-safety-officer-only pages (Settings, Admin, Medical IoT,
+ * Surveillance, Integrations, Audit), which the backend's UserRole.ADMIN is the only role that
+ * covers. "analytics:read" and "staff:read" are deliberately left UNmapped even though
+ * VIEW_ANALYTICS/VIEW_USERS exist -- the catalog applies those same two tags to genuinely
+ * charge-nurse-owned pages too (Flow & Capacity, Pulse, Staff, Shift, all workflowOwner
+ * "Charge nurse"/"ED operations"), and UserRole.NURSE holds neither permission (the same
+ * pre-existing VIEW_ANALYTICS/VIEW_OBSERVABILITY gap this campaign already found and
+ * deliberately did not widen in HEAL-100/101), so mapping them would have hidden a charge
+ * nurse's own tools from search -- caught by a regression test expecting an unrelated
+ * "ambulances"/capacity query to be unaffected by role, which failed until these two were
+ * dropped. Every other tag (patient:read, ai:read, labs:read, etc.) stays unfiltered too --
+ * those already correspond to things effectively every clinical role holds.
+ */
+const CATALOG_PERMISSION_MAP: Readonly<Record<string, Permission>> = Object.freeze({
+  'settings:read': Permission.CONFIGURE_SYSTEM,
+  'audit:read': Permission.VIEW_AUDIT_LOGS,
+});
+
+function isVisibleToRole(document: NavigatorDocument, role: UserRole | undefined): boolean {
+  if (!role) return true;
+  return document.requiredPermissions.every((tag) => {
+    const permission = CATALOG_PERMISSION_MAP[tag];
+    return !permission || hasPermission(role, permission);
+  });
+}
+
 function retrieve(index: readonly NavigatorDocument[], query: string, limit = 5): NavigatorHit[] {
   const terms = expandQuery(query);
   if (!terms.length) return [];
@@ -269,9 +307,10 @@ export class AppNavigatorService {
     return { generatedAt: this.catalog.generatedAt, records: this.index };
   }
 
-  async query(rawQuery: string): Promise<NavigatorQueryResult> {
+  async query(rawQuery: string, role?: UserRole): Promise<NavigatorQueryResult> {
     const query = String(rawQuery || '').trim();
-    const hits = retrieve(this.index, query);
+    const visibleIndex = role ? this.index.filter((document) => isVisibleToRole(document, role)) : this.index;
+    const hits = retrieve(visibleIndex, query);
     const deterministic = fallbackAnswer(query, hits);
     let answer = deterministic;
     let source: 'catalog' | 'groq' = 'catalog';

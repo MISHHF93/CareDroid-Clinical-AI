@@ -1,5 +1,6 @@
 import { AppNavigatorService } from './app-navigator.service';
 import { resetAllProviderCircuits } from '../../../../lib/ai/providers/transportSafety';
+import { UserRole } from '../users/entities/user.entity';
 
 describe('AppNavigatorService', () => {
   let service: AppNavigatorService;
@@ -99,5 +100,40 @@ describe('AppNavigatorService', () => {
     expect(result.providerError).toContain('AI_KILL_SWITCH');
     expect(result.answer).toContain(result.destinations[0].label);
     expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
+  /**
+   * Regression for a real information-disclosure gap found by a repository-
+   * wide App Navigator audit (2026-08-12): catalog.json records carry a
+   * requiredPermissions tag specifically to gate results like Settings, but
+   * query() never checked it against the caller, so any signed-in role
+   * (including registration_clerk/paramedic) could search "settings" and
+   * get back the exact path/component/description of admin-only surfaces
+   * that ARE correctly role-gated at the route level (CareDroidRouteGuard).
+   */
+  describe('query() permission filtering', () => {
+    it('hides an admin-scoped result (settings:read) from a role without CONFIGURE_SYSTEM', async () => {
+      const result = await service.query('platform configuration settings', UserRole.NURSE);
+      expect(result.destinations.some((hit) => hit.path === '/emergency/settings')).toBe(false);
+    });
+
+    it('keeps an admin-scoped result visible to a role that holds the matching permission', async () => {
+      const result = await service.query('platform configuration settings', UserRole.ADMIN);
+      expect(result.destinations.some((hit) => hit.path === '/emergency/settings')).toBe(true);
+    });
+
+    it('does not filter results whose requiredPermissions tag has no known mapping (e.g. patient:read)', async () => {
+      const withRole = await service.query('where do I manage ambulances?', UserRole.NURSE);
+      const withoutRole = await service.query('where do I manage ambulances?');
+      expect(withRole.destinations.map((hit) => hit.path)).toEqual(
+        withoutRole.destinations.map((hit) => hit.path),
+      );
+      expect(withRole.destinations.length).toBeGreaterThan(0);
+    });
+
+    it('does not filter at all when no role is supplied (preserves prior behavior for untyped callers)', async () => {
+      const result = await service.query('platform configuration settings');
+      expect(result.destinations.some((hit) => hit.path === '/emergency/settings')).toBe(true);
+    });
   });
 });

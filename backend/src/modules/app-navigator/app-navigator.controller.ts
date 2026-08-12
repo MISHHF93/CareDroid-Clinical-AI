@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -10,7 +10,12 @@ import { NavigatorQueryDto } from './dto/navigator-query.dto';
  * consolidation) so "where do I find X?" workflow lookup is a real, linked
  * feature of the one product, not a disconnected companion on its own port.
  * Contains no patient data and is not a clinical decision-support system —
- * a plain JWT check is enough, no permission gate beyond being signed in.
+ * a plain JWT check is enough for most of the catalog. `query()` additionally
+ * passes the caller's role through so `AppNavigatorService` can hide the
+ * handful of admin/manager-scoped results (settings, audit, staff, analytics
+ * pages) from roles that don't hold the corresponding Permission — those
+ * pages are genuinely permission-gated at the route level, and the search
+ * results were leaking their existence/description to any signed-in role.
  */
 @ApiTags('app-navigator')
 @ApiBearerAuth()
@@ -35,7 +40,7 @@ export class AppNavigatorController {
   @UseGuards(ThrottlerGuard)
   @Throttle({ default: { limit: 30, ttl: 60000 } })
   @ApiOperation({ summary: 'Ask a workflow question, get grounded route matches' })
-  async query(@Body() body: NavigatorQueryDto) {
-    return this.navigatorService.query(body.query);
+  async query(@Req() req: any, @Body() body: NavigatorQueryDto) {
+    return this.navigatorService.query(body.query, req.user?.role);
   }
 }

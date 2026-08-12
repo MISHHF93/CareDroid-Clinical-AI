@@ -39,9 +39,16 @@ describe('AppNavigatorController', () => {
     expect(controller.catalog()).toEqual(service.getCatalog());
   });
 
-  it('query() forwards the DTO query string to the service', async () => {
-    const result = await controller.query({ query: 'where do I manage ambulances?' });
-    expect(service.query).toHaveBeenCalledWith('where do I manage ambulances?');
+  it('query() forwards the DTO query string and caller role to the service', async () => {
+    const req = { user: { role: 'nurse' } };
+    const result = await controller.query(req, { query: 'where do I manage ambulances?' });
+    expect(service.query).toHaveBeenCalledWith('where do I manage ambulances?', 'nurse');
+    expect(result).toEqual(await service.query.mock.results[0].value);
+  });
+
+  it('query() tolerates a request with no resolved user (passes undefined role through)', async () => {
+    const result = await controller.query({}, { query: 'where do I manage ambulances?' });
+    expect(service.query).toHaveBeenCalledWith('where do I manage ambulances?', undefined);
     expect(result).toEqual(await service.query.mock.results[0].value);
   });
 });
