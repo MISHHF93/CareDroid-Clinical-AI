@@ -1,7 +1,12 @@
 export const SUBSCRIPTION_TIERS = Object.freeze({
   FREE: 'free',
+  TRIAL: 'trial',
+  STARTER: 'starter',
   PROFESSIONAL: 'professional',
+  ACADEMIC: 'academic',
   INSTITUTIONAL: 'institutional',
+  ENTERPRISE: 'enterprise',
+  GOVERNMENT: 'government',
 });
 
 export const ENTITLEMENT_CATEGORIES = Object.freeze({
@@ -141,10 +146,22 @@ export const ENTITLEMENT_REGISTRY = Object.freeze([
   },
 ]);
 
+// Must mirror backend/src/config/entitlements.config.ts's SUBSCRIPTION_TIER_RANK exactly --
+// this used to only recognize 3 of the backend's 8 real SubscriptionTier values (missing
+// trial/starter/academic/enterprise/government entirely). subscriptionMeetsRequirement() falls
+// back to rank -1 for any unrecognized tier, so a real enterprise/government/trial/starter/
+// academic subscription context flowing through here (context.subscriptionPlan/
+// tenant.subscriptionPlan/subscription.tier -- all real, live values, not frontend-only) was
+// silently treated as below Free tier and denied entitlements it should have had.
 export const SUBSCRIPTION_TIER_RANK = Object.freeze({
   [SUBSCRIPTION_TIERS.FREE]: 0,
+  [SUBSCRIPTION_TIERS.TRIAL]: 0,
+  [SUBSCRIPTION_TIERS.STARTER]: 0,
   [SUBSCRIPTION_TIERS.PROFESSIONAL]: 1,
+  [SUBSCRIPTION_TIERS.ACADEMIC]: 1,
   [SUBSCRIPTION_TIERS.INSTITUTIONAL]: 2,
+  [SUBSCRIPTION_TIERS.ENTERPRISE]: 2,
+  [SUBSCRIPTION_TIERS.GOVERNMENT]: 2,
 });
 
 export function getEntitlementRuleForAsset(assetId) {

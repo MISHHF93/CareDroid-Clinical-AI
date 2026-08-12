@@ -33,4 +33,17 @@ describe('entitlements.config', () => {
     expect(subscriptionMeetsRequirement('institutional', 'professional' as any)).toBe(true);
     expect(subscriptionMeetsRequirement('free', 'professional' as any)).toBe(false);
   });
+
+  it('recognizes every real backend SubscriptionTier value, not just the 3 originally covered here', () => {
+    // Regression: this frontend copy used to only define free/professional/institutional, so a
+    // real 'enterprise'/'government'/'trial'/'starter'/'academic' subscription context (all real
+    // backend SubscriptionTier values -- see backend/src/modules/subscriptions/entities/
+    // subscription.entity.ts) fell back to rank -1 and was silently denied entitlements it
+    // should have had.
+    expect(subscriptionMeetsRequirement('enterprise', 'professional' as any)).toBe(true);
+    expect(subscriptionMeetsRequirement('government', 'institutional' as any)).toBe(true);
+    expect(subscriptionMeetsRequirement('academic', 'professional' as any)).toBe(true);
+    expect(subscriptionMeetsRequirement('trial', 'professional' as any)).toBe(false);
+    expect(subscriptionMeetsRequirement('starter', 'professional' as any)).toBe(false);
+  });
 });
