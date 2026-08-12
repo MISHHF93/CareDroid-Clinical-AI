@@ -955,6 +955,22 @@ function createId(prefix: string): string {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
+// HEAL-101: GET /api/emergency/analytics requires VIEW_ANALYTICS, a permission
+// only ADMIN holds (confirmed in role-permissions.config.ts) -- PHYSICIAN/NURSE
+// never have it. QueueIntelligencePanel calls loadEmergencyAnalytics({ force: true })
+// from an effect keyed on live queue data, which changes on nearly every realtime
+// tick, so every non-admin session repeated this doomed request continuously.
+// loadEmergencyAnalytics already degrades gracefully per-call (falls back to
+// buildLocalEmergencyAnalytics), so this flag only stops the wasted repeat network
+// traffic, matching the same session-level back-off HEAL-100 added for
+// operational-intelligence.
+let analyticsPermissionDenied = false;
+// De-dupes concurrent calls (e.g. QueueIntelligencePanel's effect can fire twice in
+// quick succession while queue data is still settling during initial hydration,
+// before the first call has resolved and set analyticsPermissionDenied above) so a
+// 2nd overlapping call joins the in-flight request instead of firing its own.
+let analyticsLoadInFlight: Promise<EmergencyAnalyticsState> | null = null;
+
 const nowIso = () => new Date().toISOString();
 
 const isObject = (value: unknown): value is Record<string, unknown> =>
@@ -6035,6 +6051,16 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
       }),
 
     loadEmergencyAnalytics: async () => {
+      if (analyticsPermissionDenied) {
+        const deniedState = get();
+        return deniedState.emergencyAnalytics;
+      }
+      // QueueIntelligencePanel's effect can fire more than once in quick succession
+      // while queue data is still settling during initial hydration -- join the
+      // already-in-flight request instead of firing a duplicate one.
+      if (analyticsLoadInFlight) {
+        return analyticsLoadInFlight;
+      }
       set((state) => ({
         emergencyAnalytics: {
           ...state.emergencyAnalytics,
@@ -6043,34 +6069,43 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         },
       }));
       const state = get();
-      try {
-        const envelope = await fetchEmergencyAnalytics();
-        const backendData = (envelope?.data || envelope || {}) as Record<string, unknown>;
-        const nextState: EmergencyAnalyticsState = {
-          status: 'ready',
-          source: 'backend',
-          loadedAt: new Date().toISOString(),
-          message: envelope?.remainingGaps?.length
-            ? envelope.remainingGaps.join(' ')
-            : 'Using CareDroid backend analytics.',
-          data: buildBackendEmergencyAnalytics(state, backendData),
-        };
-        set({ emergencyAnalytics: nextState });
-        return nextState;
-      } catch (error: any) {
-        const nextState: EmergencyAnalyticsState = {
-          status: 'ready',
-          source: 'client-fallback',
-          loadedAt: new Date().toISOString(),
-          message:
-            error instanceof Error
-              ? `Backend analytics unavailable: ${error.message}`
-              : 'Using local CareDroid operational state.',
-          data: buildLocalEmergencyAnalytics(state),
-        };
-        set({ emergencyAnalytics: nextState });
-        return nextState;
-      }
+      const runRequest = async (): Promise<EmergencyAnalyticsState> => {
+        try {
+          const envelope = await fetchEmergencyAnalytics();
+          const backendData = (envelope?.data || envelope || {}) as Record<string, unknown>;
+          const nextState: EmergencyAnalyticsState = {
+            status: 'ready',
+            source: 'backend',
+            loadedAt: new Date().toISOString(),
+            message: envelope?.remainingGaps?.length
+              ? envelope.remainingGaps.join(' ')
+              : 'Using CareDroid backend analytics.',
+            data: buildBackendEmergencyAnalytics(state, backendData),
+          };
+          set({ emergencyAnalytics: nextState });
+          return nextState;
+        } catch (error: any) {
+          if (error?.status === 403) {
+            analyticsPermissionDenied = true;
+          }
+          const nextState: EmergencyAnalyticsState = {
+            status: 'ready',
+            source: 'client-fallback',
+            loadedAt: new Date().toISOString(),
+            message:
+              error instanceof Error
+                ? `Backend analytics unavailable: ${error.message}`
+                : 'Using local CareDroid operational state.',
+            data: buildLocalEmergencyAnalytics(state),
+          };
+          set({ emergencyAnalytics: nextState });
+          return nextState;
+        } finally {
+          analyticsLoadInFlight = null;
+        }
+      };
+      analyticsLoadInFlight = runRequest();
+      return analyticsLoadInFlight;
     },
 
     hydrateFromApi: (payload) =>
