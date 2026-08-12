@@ -26,11 +26,11 @@ export const DEMO_LIVE_STATE_DESCRIPTIONS = Object.freeze({
   [DEMO_LIVE_STATES.DEMO]: 'Uses deterministic sample data or demo backend contracts.',
   [DEMO_LIVE_STATES.MOCK]: 'Uses synthetic placeholder records or coordinate mocks.',
   [DEMO_LIVE_STATES.SIMULATED]: 'Runs a scenario or model without real-world side effects.',
-  [DEMO_LIVE_STATES.BACKEND_UNAVAILABLE]: 'Falls back because the backend capability is unavailable.',
-  [DEMO_LIVE_STATES.UNSUPPORTED]: 'No live backend route or write action is currently supported.',
-  [DEMO_LIVE_STATES.LOCAL_ONLY]: 'Runs only in browser state and does not persist to a backend.',
+  [DEMO_LIVE_STATES.BACKEND_UNAVAILABLE]: "The server for this feature isn't reachable right now, so this is a temporary fallback.",
+  [DEMO_LIVE_STATES.UNSUPPORTED]: 'This action is not yet connected to a live system.',
+  [DEMO_LIVE_STATES.LOCAL_ONLY]: 'Stays in this browser only and is not saved to a server.',
   [DEMO_LIVE_STATES.SESSION_ENGINE]:
-    'Driven by in-browser timers/engines; not multi-user durable state unless an API snapshot overwrites it.',
+    "Calculated live in this browser tab. Won't reflect other users' screens unless synced from the server.",
 });
 
 export function getDemoLiveStateLabel(state) {

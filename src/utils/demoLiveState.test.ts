@@ -17,6 +17,6 @@ describe('demoLiveState', () => {
 
   it('falls back unknown states to unsupported', () => {
     expect(getDemoLiveStateLabel('missing-state')).toBe('Unsupported');
-    expect(getDemoLiveStateDescription('missing-state')).toMatch(/No live backend route/i);
+    expect(getDemoLiveStateDescription('missing-state')).toMatch(/not yet connected to a live system/i);
   });
 });

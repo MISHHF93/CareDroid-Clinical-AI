@@ -397,8 +397,11 @@ export function InteractiveAIWorkspace({
             data-testid="interactive-realtime-status"
           >
             {realtime
-              ? `${realtime.status} · ${realtime.mode}${realtime.isStale ? ' · stale' : ''}`
-              : 'realtime idle'}
+              ? // Plain-English connection health -- realtime.mode ('sse'/'polling') is a
+                // transport implementation detail with no clinical relevance, so it's
+                // deliberately not shown; only whether updates are live and current matter.
+                `${realtime.status === 'connected' ? 'Live' : 'Reconnecting…'}${realtime.isStale ? ' · may be outdated' : ''}`
+              : 'Not connected'}
           </div>
         </div>
       </header>
