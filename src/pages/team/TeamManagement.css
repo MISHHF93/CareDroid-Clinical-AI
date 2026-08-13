@@ -20,7 +20,11 @@
   gap: var(--space-6);
 }
 
-.team-header-content h1 {
+/* HEAL-186: was an <h1>, demoted to a <p> (see TeamManagement.tsx) so this page no longer
+   duplicates AppShell's real shell-level <h1> for this route -- same visual size/weight,
+   just not a heading element. Higher specificity than `.team-header-content p` below so the
+   title keeps its own look instead of picking up the muted subtitle style. */
+.team-header-content p.team-header-content__title-text {
   font-size: var(--font-32, 32px);
   font-weight: 700;
   color: var(--text-color);

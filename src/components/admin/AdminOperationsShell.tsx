@@ -24,7 +24,14 @@ export default function AdminOperationsShell() {
     <div className="admin-ops-shell">
       <header className="admin-ops-shell__header">
         <p className="admin-ops-shell__eyebrow">Platform admin</p>
-        <h1 className="admin-ops-shell__title">Operations console</h1>
+        {/* HEAL-186: was an <h1>, demoted to a <p> -- this shell wraps every admin route (team,
+            staff workflows, tenant settings, system health, ...) and always showed this same
+            static text, duplicating (and for routes with a real registered title, like
+            SystemHealth post-HEAL-185, actively disagreeing with) AppShell's real shell-level
+            <h1> for whichever specific route is active. Each child route owns its own real
+            title via useRouteChromeRegistration; this is section-level wayfinding text, not a
+            page heading. */}
+        <p className="admin-ops-shell__title">Operations console</p>
         <p className="admin-ops-shell__subtitle">
           Role assignments, workflow previews, team invites, and tenant policies.
           {isAdmin ? null : ' Demo mode — changes stay local during the build phase.'}

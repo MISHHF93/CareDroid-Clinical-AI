@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import './TeamManagement.css';
 import { apiFetch, apiFetchJson, getStoredAccessToken } from '../../services/apiClient';
 import {
@@ -7,6 +7,7 @@ import {
 } from '../../config/backendApiCapabilities';
 import { makeDisabledCapabilityResponse } from '../../services/disabledBackendMocks';
 import { reportApiError } from '../../services/apiErrorHandling';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 
 /**
  * TeamManagement Page Component
@@ -29,6 +30,18 @@ export const TeamManagement = () => {
   useEffect(() => {
     fetchUsers();
   }, []);
+
+  // HEAL-186: this page rendered its own <h1>Team Management</h1> while AppShell's
+  // ShellRouteTab ALSO renders a real shell-level <h1> for this route -- the same duplicate
+  // heading a11y bug fixed platform-wide for CareDroidPage-based pages in HEAL-185, just via a
+  // hand-rolled header instead. Registers the real title with the shell chrome and demotes its
+  // own heading to a plain-text <p> (mirroring PlatformGovernanceWorkspace's proven HEAL-169
+  // pattern) rather than migrating this whole page onto CareDroidPage in the same pass.
+  const routeChrome = useMemo(
+    () => ({ title: 'Team Management', subtitle: 'Manage team members, roles, and permissions' }),
+    [],
+  );
+  useRouteChromeRegistration(routeChrome);
 
   const teamApiEnabled = isBackendCapabilityEnabled('teamManagement');
 
@@ -220,7 +233,7 @@ export const TeamManagement = () => {
     <div className="team-management">
       <div className="team-header">
         <div className="team-header-content">
-          <h1>Team Management</h1>
+          <p className="team-header-content__title-text">Team Management</p>
           <p>Manage team members, roles, and permissions</p>
         </div>
         <button type="button"
