@@ -32,6 +32,7 @@
     "migration:run": "typeorm-ts-node-commonjs -d src/data-source.ts migration:run",
     "migration:revert": "typeorm-ts-node-commonjs -d src/data-source.ts migration:revert",
     "ingest": "ts-node scripts/ingest-documents.ts",
+    "db:purge-stale-fixture-patients": "ts-node scripts/purge-stale-fixture-patients.ts",
     "nlu:prepare-data": "ts-node ml-services/nlu/scripts/prepareData.ts",
     "nlu:train": "ts-node ml-services/nlu/scripts/train.ts",
     "nlu:evaluate": "ts-node ml-services/nlu/scripts/evaluate.ts",
