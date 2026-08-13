@@ -114,7 +114,7 @@ The FSM backbone (`src/engine/journeyEngine.ts` `VALID_TRANSITIONS`) + step mode
 | MB-W55 | Workflow automation engine (triggers/refresh) | `FULLY_WIRED` | `unifiedWorkflowAutomationEngine` + tests |
 | MB-W56 | Workflow step-model `nextStepIds` vs FSM drift (triage→assessment) | `CONFIRMED` latent — zero consumers today; fix when first consumer appears | HEAL-052 follow-up (b) |
 | MB-W57 | Route-chrome header actions (workflow entry buttons) survive navigation | `VALIDATED` | **HEAL-053** |
-| MB-W58 | Full-journey E2E coverage in one test path | `PARTIALLY_WIRED` — pilotWalkthrough covers it but is env-flaky; split per-stage | HEAL-053 follow-up (a); MB-J1 |
+| MB-W58 | Full-journey E2E coverage in one test path | `SUPERSEDED` (2026-08-13) — MB-J1 already did exactly the "split per-stage" fix this row calls for (HEAL-064): `pilotWalkthrough.test.tsx` is 5 independent per-stage tests, each its own fresh render. Ran it directly to re-confirm rather than trust the row: 5/5 green, ~44s, no flake this run. This row was just never marked closed once MB-J1 (its own listed Ref) closed the underlying issue | HEAL-053 follow-up (a); MB-J1 (HEAL-064) |
 
 ## C. RBAC & the 8 profiles
 
