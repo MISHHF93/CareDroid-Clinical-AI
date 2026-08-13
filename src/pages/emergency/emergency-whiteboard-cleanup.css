@@ -842,6 +842,34 @@
   padding: 14px;
 }
 
+/* HEAL-160: was .ed-whiteboard__empty (EmergencyWhiteboard-part-02.css) --
+   renamed into the live naming convention as part of removing an entire
+   dead old-Whiteboard CSS system (see EmergencyWhiteboard-part-0{1,2,3}.css
+   deletion). Its own `display: grid; place-items: center;` directly
+   conflicted with .emergency-whiteboard-page__empty-grid's `display: flex`
+   above -- both applied to the same element -- so only the unique text
+   treatment is kept here; centering now comes from the one rule above. */
+.emergency-whiteboard-page__empty-state {
+  color: var(--color-text-muted);
+  font-size: clamp(32px, 5vw, 64px);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  text-align: center;
+  animation: emergency-whiteboard-empty-state-enter var(--motion-transition-slow) both;
+}
+
+@keyframes emergency-whiteboard-empty-state-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .emergency-whiteboard-page__display-banner {
   align-items: center;
   background: color-mix(in srgb, #374151 14%, var(--color-surface, var(--app-surface-1, #ffffff)));

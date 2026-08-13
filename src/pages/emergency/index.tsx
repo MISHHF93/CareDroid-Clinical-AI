@@ -137,7 +137,6 @@ import useFeature from '../../hooks/useFeature';
 import { useNativeAiBackendSync } from '../../hooks/useNativeAiBackendSync';
 import { useNativeAiPeriodicRefresh } from '../../hooks/useNativeAiPeriodicRefresh';
 import { normalizeWhiteboardPatient } from '../../services/patientArrivalBackendSync';
-import '../../components/EmergencyWhiteboard.css';
 import './emergency-whiteboard-cleanup.css';
 
 type FilterId = 'All' | 'Waiting' | 'Assessment' | 'High Risk' | 'EMS' | 'Boarding' | 'Reassess';
@@ -2755,7 +2754,7 @@ export default function EmergencyWhiteboard() {
         />
         </>
       ) : whiteboardDensity.surfaces.patientGrid.visible ? (
-        <div className="ed-whiteboard__empty emergency-whiteboard-page__empty-grid">
+        <div className="emergency-whiteboard-page__empty-grid emergency-whiteboard-page__empty-state">
           <OperationalEmptyState
             size="panel"
             icon="◎"
