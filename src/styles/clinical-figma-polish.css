@@ -226,48 +226,16 @@
    4. ROLE OPERATIONAL SUMMARY STRIP — Whiteboard overview cards
    ───────────────────────────────────────────────────────────────── */
 
-.role-operational-summary__card {
-  padding: 14px 16px;
-  border-radius: 13px;
-  box-shadow:
-    0 1px 3px rgba(15, 23, 42, 0.04),
-    0 3px 10px rgba(15, 23, 42, 0.07);
-  transition:
-    box-shadow 140ms ease,
-    transform 140ms ease;
-}
-
-.role-operational-summary__card:hover {
-  box-shadow:
-    0 2px 6px rgba(15, 23, 42, 0.06),
-    0 8px 22px rgba(15, 23, 42, 0.1);
-  transform: translateY(-1px);
-}
-
-/* Tone: left accent rail */
-.role-operational-summary__card--critical {
-  border-left: 3px solid var(--semantic-critical, #b91c1c);
-}
-
-.role-operational-summary__card--warning {
-  border-left: 3px solid var(--semantic-attention, #b45309);
-}
-
-.role-operational-summary__card--healthy {
-  border-left: 3px solid var(--semantic-healthy, #15803d);
-}
-
-.role-operational-summary__title {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.01em;
-  margin-bottom: 8px;
-}
-
-.role-operational-summary__lines li {
-  font-size: 12px;
-  line-height: 1.55;
-}
+/* HEAL-166 (MB-E17): removed. RoleOperationalSummaryStrip.css (single
+   consumer: the Whiteboard) already defines every one of these selectors
+   with a genuinely different, more complete design -- a border-color +
+   tinted-background tone treatment for --critical/--warning/--healthy,
+   vs. this file's simpler left-accent-rail approach -- and, being part of
+   the Whiteboard's lazy route chunk, already wins the live cascade (this
+   file loads globally, earlier). Padding/border-radius/box-shadow/title
+   font-size also all differed by literal value from the component's own
+   token-based ones. All of it was shadowed, contributing nothing to the
+   actual render. */
 
 /* ─────────────────────────────────────────────────────────────────
    5. OPERATIONAL STRIP — EMS stat bar metrics
