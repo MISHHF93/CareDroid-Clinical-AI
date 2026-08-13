@@ -374,21 +374,15 @@
    7. CRITICAL ALERT BANNER
    ───────────────────────────────────────────────────────────────── */
 
-.critical-alert-banner {
-  border-radius: 10px;
-  font-size: 13.5px;
-  gap: 12px;
-}
-
-.critical-alert-banner--critical {
-  background: color-mix(in srgb, #ef4444 8%, var(--app-surface-1, #fff));
-  border: 1.5px solid color-mix(in srgb, #ef4444 32%, transparent);
-}
-
-.critical-alert-banner--high {
-  background: color-mix(in srgb, #f59e0b 8%, var(--app-surface-1, #fff));
-  border: 1.5px solid color-mix(in srgb, #f59e0b 28%, transparent);
-}
+/* HEAL-163 (MB-E17): CriticalAlertBanner.tsx (single consumer: the
+   Whiteboard) never applies `.critical-alert-banner--critical`/`--high` --
+   it renders `data-severity="critical"|"urgent"` and CriticalAlertBanner.css
+   styles via that attribute selector, not a BEM modifier class. Those 2
+   rules matched nothing, ever. The base rule's border-radius/font-size/gap
+   also just duplicated CriticalAlertBanner.css's token-based values
+   (already the one actually winning, since this file loads globally while
+   the component's own CSS loads with the Whiteboard's lazy chunk, later) --
+   removed rather than left as misleading dead weight. */
 
 .critical-alert-banner__link {
   padding: 5px 14px;
