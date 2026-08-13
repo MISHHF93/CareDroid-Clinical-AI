@@ -321,6 +321,27 @@ export function receptionAiIntakeAssistTruthLabel(): AiTruthLabelInfo {
   };
 }
 
+/**
+ * src/data/clinicalTerminology/recognizeComplaint.ts computes a chief-
+ * complaint match confidence from fixed literal weights per match method
+ * (0.95 exact, 0.85 substring, 0.75 abbreviation, 0.92 high-risk-flag,
+ * 0.4/0.35 fuzzy/Levenshtein fallback), bucketed into HIGH/MEDIUM/LOW/NO_MATCH
+ * via confidenceTierForScore(). Zero model call, zero native-ai import,
+ * anywhere in the file -- it's synonym-table lookup plus bounded string-edit-
+ * distance fuzzy matching. Same shape as resourceActivationTruthLabel() and
+ * receptionAiIntakeAssistTruthLabel() above: the "(medium/low confidence)"
+ * framing reads as measured NLU certainty to reception/triage staff, but the
+ * tier is deterministic string matching, not a trained model's output.
+ */
+export function recognizeComplaintTruthLabel(): AiTruthLabelInfo {
+  return {
+    state: 'Manual',
+    sourceContext:
+      'Complaint recognition — synonym/abbreviation/fuzzy string matching, not a trained model',
+    reviewRequired: true,
+  };
+}
+
 export type AiTruthLabelProps = AiTruthLabelInfo & {
   compact?: boolean;
   className?: string;

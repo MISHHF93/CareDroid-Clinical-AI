@@ -14,7 +14,11 @@ import {
   type ReceptionRouteResult,
   type UnifiedIntakePhase,
 } from '../../services/receptionIntakeOrchestrator';
-import { AiTruthLabel, receptionAiIntakeAssistTruthLabel } from '../ai/AiTruthLabel';
+import {
+  AiTruthLabel,
+  receptionAiIntakeAssistTruthLabel,
+  recognizeComplaintTruthLabel,
+} from '../ai/AiTruthLabel';
 import { RECEPTION_COPY } from './receptionCopy';
 import ReceptionDocumentCapture from './ReceptionDocumentCapture';
 import { recognizeComplaint } from '../../data/clinicalTerminology/recognizeComplaint';
@@ -316,7 +320,8 @@ export default function UnifiedIntakePanel({
                       {complaintRecognition.confidenceTier !== 'HIGH_CONFIDENCE'
                         ? ` (${complaintRecognition.confidenceTier === 'MEDIUM_CONFIDENCE' ? 'medium' : 'low'} confidence — confirm before routing)`
                         : ''}
-                      {' · original wording is kept as entered'}
+                      {' · original wording is kept as entered '}
+                      <AiTruthLabel {...recognizeComplaintTruthLabel()} compact />
                     </>
                   )}
                 </p>

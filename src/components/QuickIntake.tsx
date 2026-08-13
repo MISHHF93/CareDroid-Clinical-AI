@@ -22,6 +22,7 @@ import {
 } from '../services/highRiskComplaintFlags';
 import { recognizeComplaint } from '../data/clinicalTerminology/recognizeComplaint';
 import { recordTerminologyGap } from '../services/terminologyGapQueue';
+import { AiTruthLabel, recognizeComplaintTruthLabel } from './ai/AiTruthLabel';
 
 type QuickIntakeProps = {
   onClose: () => void;
@@ -586,6 +587,8 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
                       {complaintRecognition.confidenceTier !== 'HIGH_CONFIDENCE'
                         ? ` (${complaintRecognition.confidenceTier === 'MEDIUM_CONFIDENCE' ? 'medium' : 'low'} confidence)`
                         : ''}
+                      {' '}
+                      <AiTruthLabel {...recognizeComplaintTruthLabel()} compact />
                     </>
                   )}
                 </p>
