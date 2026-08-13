@@ -24,6 +24,8 @@
   display: grid;
   gap: var(--cdl-panel-gap, var(--app-layout-panel-gap, 12px));
   padding: 0;
+  height: 100%;
+  min-height: 0;
   background: var(--app-bg);
   color: var(--reception-command-ink);
 }
@@ -1072,73 +1074,25 @@
   max-width: none;
 }
 
-.reception-front-door > .emergency-route-page__content > .cdl-operational-page {
-  width: 100%;
-  min-width: 0;
-}
-
-.reception-front-door
-  > .emergency-route-page__content
-  > .cdl-operational-page
-  > [data-cdl-zone='primary-actions'] {
-  grid-auto-flow: row;
-  justify-content: stretch;
-  width: 100%;
-}
+/* HEAL-158: removed a ~70-line dead responsive grid-zone system here
+   ([data-cdl-zone='...'] selectors nested under
+   .reception-front-door > .emergency-route-page__content > .cdl-operational-page)
+   -- that DOM structure is the shared EmergencyRoutePage/CareDroidPage zone
+   template (see emergencyRouteShared.tsx / CareDroidPrimitives.tsx), which
+   this page stopped rendering once it moved to its own ReceptionPageLayout
+   component. ReceptionPageLayout.css's own `.reception-page-layout__body:has
+   (.reception-page-layout__sidebar)` rule is the real, live desktop
+   2-column split today; this file's copy was pure leftover, unreachable in
+   the current DOM. */
 
 .reception-command-stepper-shell__graphic {
   display: none;
-}
-
-/* ── Standard desktop (1280–2559px): 2-column ── */
-@media (min-width: 1280px) and (max-width: 2559px) {
-  .reception-front-door > .emergency-route-page__content > .cdl-operational-page {
-    grid-template-columns: minmax(0, 1fr) minmax(310px, 360px);
-    align-items: start;
-  }
-
-  .reception-front-door
-    > .emergency-route-page__content
-    > .cdl-operational-page
-    > [data-cdl-zone='operational-summary'],
-  .reception-front-door
-    > .emergency-route-page__content
-    > .cdl-operational-page
-    > [data-cdl-zone='primary-actions'] {
-    grid-column: 1 / -1;
-  }
-
-  .reception-front-door
-    > .emergency-route-page__content
-    > .cdl-operational-page
-    > [data-cdl-zone='active-work'] {
-    grid-column: 1;
-    grid-row: 3;
-  }
-
-  .reception-front-door
-    > .emergency-route-page__content
-    > .cdl-operational-page
-    > [data-cdl-zone='supporting-context'] {
-    grid-column: 2;
-    grid-row: 3;
-    position: sticky;
-    top: 12px;
-    align-self: start;
-  }
 }
 
 /* ── Ultrawide (2560px+): 3-column handled by clinical-ultrawide-layer.css ──
    The ultrawide layer sets grid-template-columns with capped rail width.
    We only need to ensure the rail doesn't get too wide internally. */
 @media (min-width: 2560px) {
-  .reception-front-door
-    > .emergency-route-page__content
-    > .cdl-operational-page
-    > [data-cdl-zone='primary-actions'] {
-    grid-column: 1 / -1;
-  }
-
   .reception-operational-rail {
     max-width: var(--cd-uw-rail-max, 380px);
   }
