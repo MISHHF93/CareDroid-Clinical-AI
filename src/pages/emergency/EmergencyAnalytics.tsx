@@ -74,7 +74,11 @@ function signalMeta(signal) {
   if (!signal) return 'Review required';
   const confidence =
     typeof signal.confidence === 'number' ? `${Math.round(signal.confidence * 100)}% confidence` : 'confidence pending';
-  return `${signal.safety?.status || 'review_required'} | ${confidence}`;
+  // Matches PatientDetailPanel.tsx's formatSignalMeta() for the same
+  // upgradeHarness signal shape -- that page discloses provenance.provider,
+  // this one was silently dropping it despite reading identical signal data.
+  const provider = signal.provenance?.provider || signal.provenance?.generatedBy || 'deterministic provider';
+  return `${signal.safety?.status || 'review_required'} | ${confidence} | ${provider}`;
 }
 
 export default function EmergencyAnalytics() {
