@@ -59,13 +59,17 @@ function buildLocalSuggestions(workloads) {
   return suggestions.slice(0, 3);
 }
 
+// Returns { suggestions, source } rather than a bare array so callers can
+// honestly disclose when the AI response was empty/malformed and this fell
+// back to the local rule-based heuristic instead of silently presenting the
+// fallback as if it were a real AI answer.
 function parseSuggestionResponse(text, localSuggestions) {
-  if (!text) return localSuggestions;
+  if (!text) return { suggestions: localSuggestions, source: 'local' as const };
   try {
     const parsed = JSON.parse(text);
     const items = Array.isArray(parsed) ? parsed : parsed.suggestions;
-    if (!Array.isArray(items)) return localSuggestions;
-    return items
+    if (!Array.isArray(items)) return { suggestions: localSuggestions, source: 'local' as const };
+    const suggestions = items
       .map((item, index) => {
         const fallback = localSuggestions[index];
         return {
@@ -81,11 +85,15 @@ function parseSuggestionResponse(text, localSuggestions) {
       })
       .filter((item) => item.patientId && item.toStaffId)
       .slice(0, 3);
+    return { suggestions, source: 'ai' as const };
   } catch (_error: any) {
-    return localSuggestions.map((suggestion, index) => ({
-      ...suggestion,
-      reason: index === 0 ? text : suggestion.reason,
-    }));
+    return {
+      suggestions: localSuggestions.map((suggestion, index) => ({
+        ...suggestion,
+        reason: index === 0 ? text : suggestion.reason,
+      })),
+      source: 'local' as const,
+    };
   }
 }
 
@@ -107,6 +115,7 @@ export default function WorkloadBalancePanel({
 
   const [aiStatus, setAiStatus] = useState('idle');
   const [aiSuggestions, setAiSuggestions] = useState<any[]>([]);
+  const [suggestionsSource, setSuggestionsSource] = useState<'ai' | 'local' | null>(null);
   const localSuggestions = useMemo(() => buildLocalSuggestions(workloads), [workloads]);
   const teamAverage = rebalanceSuggestion?.teamAverage ?? 0;
 
@@ -196,10 +205,13 @@ export default function WorkloadBalancePanel({
         typeof response.content === 'string' && response.content.trim()
           ? response.content
           : JSON.stringify(response.data || {});
-      setAiSuggestions(parseSuggestionResponse(text, localSuggestions));
+      const parsed = parseSuggestionResponse(text, localSuggestions);
+      setAiSuggestions(parsed.suggestions);
+      setSuggestionsSource(parsed.source);
       setAiStatus('ready');
     } catch (_error: any) {
       setAiSuggestions(localSuggestions);
+      setSuggestionsSource('local');
       setAiStatus('error');
     }
   };
@@ -228,9 +240,20 @@ export default function WorkloadBalancePanel({
           </section>
         ) : null}
 
+        {aiStatus === 'error' ? (
+          <p className="workload-balance-panel__ai-error" role="status">
+            AI rebalance suggestions are unavailable right now — showing rule-based suggestions
+            computed from current patient counts instead.
+          </p>
+        ) : null}
+
         {aiSuggestions.length ? (
           <section className="workload-balance-panel__suggestions" aria-label="Rebalance suggestions">
-            <h3>AI suggestions - requires review</h3>
+            <h3>
+              {suggestionsSource === 'ai'
+                ? 'AI suggestions - requires review'
+                : 'Rule-based suggestions - requires review'}
+            </h3>
             {aiSuggestions.map((suggestion) => (
               <article key={suggestion.id}>
                 <div>
