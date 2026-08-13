@@ -48,7 +48,7 @@
 }
 
 .consent-section-required {
-  border-left: 4px solid var(--error);
+  border-left: 4px solid var(--error-color, #ff4a4a);
 }
 
 .consent-section-optional {
@@ -69,7 +69,7 @@
 }
 
 .consent-section-header h2 {
-  font-size: var(--font-22);
+  font-size: var(--font-22, 22px);
   font-weight: 600;
   color: var(--text-color);
   margin: 0;
@@ -85,7 +85,7 @@
 
 .consent-badge-required {
   background: rgba(255, 107, 107, 0.15);
-  color: var(--error);
+  color: var(--error-color, #ff4a4a);
   border: 1px solid rgba(255, 107, 107, 0.3);
 }
 
@@ -222,7 +222,7 @@
   background: rgba(255, 107, 107, 0.1);
   border: 1px solid rgba(255, 107, 107, 0.3);
   border-radius: var(--radius-md);
-  color: var(--error);
+  color: var(--error-color, #ff4a4a);
   font-size: var(--font-14);
   text-align: center;
 }

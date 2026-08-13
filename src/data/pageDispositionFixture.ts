@@ -8,9 +8,14 @@ import {
 // as a confirmed-orphan stylesheet (zero real importers anywhere) -- these
 // counts are pinned to the real, live import.meta.glob scan below, not a
 // fixed target, so its removal correctly drops both totals by 1.
-export const PAGE_INVENTORY_EXPECTED_TOTAL = 240;
+// HEAL-152: src/pages/ConsentFlow.css (distinct from the real, live
+// src/pages/legal/ConsentFlow.css) was a second confirmed-orphan stylesheet
+// -- zero importers anywhere; every var(--error-color) fallback it defined
+// was already dead since nothing loaded it. Deleted, dropping both totals
+// by 1 again.
+export const PAGE_INVENTORY_EXPECTED_TOTAL = 239;
 export const PAGE_SOURCE_EXPECTED_TOTAL = 149;
-export const PAGE_STYLE_EXPECTED_TOTAL = 91;
+export const PAGE_STYLE_EXPECTED_TOTAL = 90;
 export const PAGE_TOOLS_INVENTORY_EXPECTED_TOTAL = 58;
 export const PAGE_TOOLS_SOURCE_EXPECTED_TOTAL = 48;
 

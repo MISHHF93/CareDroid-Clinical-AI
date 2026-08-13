@@ -117,7 +117,7 @@
 }
 
 .legal-warning strong {
-  color: var(--error);
+  color: var(--error-color, #ff4a4a);
 }
 
 /* Contact Info Boxes */
@@ -211,7 +211,7 @@
   }
 
   .legal-section h2 {
-    font-size: var(--font-22);
+    font-size: var(--font-22, 22px);
   }
 
   .legal-section h3 {

@@ -139,7 +139,7 @@
 }
 
 .drawer-title {
-  font-size: var(--font-22);
+  font-size: var(--font-22, 22px);
   font-weight: 600;
   color: var(--app-text-primary);
   margin: 0;

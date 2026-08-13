@@ -46,7 +46,7 @@
 }
 
 .empty-state-title {
-  font-size: var(--font-22);
+  font-size: var(--font-22, 22px);
   font-weight: 600;
   color: var(--text-color);
   margin: 0 0 var(--space-2) 0;

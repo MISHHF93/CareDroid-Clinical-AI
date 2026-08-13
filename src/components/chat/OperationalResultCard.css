@@ -154,7 +154,7 @@
   border: 1px solid var(--app-panel-border);
   border-radius: 999px;
   padding: 7px 12px;
-  background: var(--app-button-bg);
+  background: var(--app-button-bg, var(--app-surface-muted, #eef4f7));
   color: var(--app-fg);
   font-weight: 700;
   cursor: pointer;

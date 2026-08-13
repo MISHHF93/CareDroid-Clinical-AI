@@ -21,7 +21,7 @@
 }
 
 .team-header-content h1 {
-  font-size: var(--font-32);
+  font-size: var(--font-32, 32px);
   font-weight: 700;
   color: var(--text-color);
   margin: 0 0 var(--space-2) 0;
