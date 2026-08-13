@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { scoreRange, NEWS2_ITEMS } from './news2';
+import { scoreRange, NEWS2_ITEMS, news2Response } from './news2';
 import {
   scoreRespiratoryRate,
   scoreSpo2Scale1,
@@ -8,6 +8,7 @@ import {
   scorePulse,
   scoreConsciousness,
   scoreTemperature,
+  interpretNews2Risk,
 } from './news2Calculator';
 
 /**
@@ -77,5 +78,47 @@ describe('NEWS2 cross-implementation equivalence (utils/news2.ts vs utils/news2C
 
     expect(scoreConsciousness(false)).toBe(alertScore);
     expect(scoreConsciousness(true)).toBe(confusedScore);
+  });
+
+  // HEAL-184: this equivalence file never covered response-band agreement, only per-parameter
+  // point scoring -- news2.ts's news2Response() and news2Calculator.ts's interpretNews2Risk()
+  // are two independently-written escalation-banding functions. Both correctly treat a single
+  // parameter scoring 3 ("single red") as a Warning-level escalation even when the aggregate
+  // total is below 5 (news2.ts folds it into the same 'Medium'/'Warning' band as aggregate 5-6;
+  // news2Calculator.ts gives it a distinct 'low_medium_red' label but the same 'warning'
+  // severity) -- so this locks the safety-relevant invariant (both escalate at the same
+  // severity) without forcing the 2 UIs' differently-detailed label text to match, which is a
+  // deliberate granularity difference (the standalone calculator's longer interpretation text
+  // explicitly says single-red "does not automatically equal the same response as aggregate
+  // >=5, but must not be ignored" -- a nuance the simpler whiteboard badge doesn't need).
+  it('agrees on escalation severity for a single-red parameter even when the aggregate is below 5', () => {
+    const total = 3; // single item at 3, nothing else contributing
+    const fromWhiteboard = news2Response(total, true);
+    const fromCalculator = interpretNews2Risk(total, { respiratoryRate: 3 });
+
+    expect(fromWhiteboard.alertSeverity).toBe('Warning');
+    expect(fromCalculator.severity).toBe('warning');
+    expect(fromCalculator.hasRed).toBe(true);
+  });
+
+  it('agrees that a low aggregate with no single-red stays low/normal severity on both sides', () => {
+    const total = 2;
+    const fromWhiteboard = news2Response(total, false);
+    const fromCalculator = interpretNews2Risk(total, { respiratoryRate: 1, pulse: 1 });
+
+    expect(fromWhiteboard.band).toBe('Low');
+    expect(fromWhiteboard.alertSeverity).toBeUndefined();
+    expect(fromCalculator.severity).toBe('normal');
+    expect(fromCalculator.hasRed).toBe(false);
+  });
+
+  it('agrees that an aggregate of 7+ is always the highest-severity band on both sides', () => {
+    const total = 8;
+    const fromWhiteboard = news2Response(total, false);
+    const fromCalculator = interpretNews2Risk(total, { respiratoryRate: 3, pulse: 3 });
+
+    expect(fromWhiteboard.band).toBe('High');
+    expect(fromWhiteboard.alertSeverity).toBe('Critical');
+    expect(fromCalculator.severity).toBe('critical');
   });
 });
