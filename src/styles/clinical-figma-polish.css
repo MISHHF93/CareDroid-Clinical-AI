@@ -20,12 +20,17 @@
 
 /* Individual card */
 .cdl-situation-graphic-card {
-  padding: 14px 16px;
-  border-radius: 13px;
+  /* HEAL-168 (MB-E17): padding/border-radius/box-shadow aligned to
+     CdlGraphicKit.css's own token values (12px 14px / var(--cdl-clinical-
+     radius, 12px) / var(--cdl-clinical-shadow-rest)) -- this primitive is
+     consumed across many different pages/chunks with no single
+     predictable cascade winner, same reasoning as .patient-card (HEAL-161).
+     The --information/--warning/--critical !important backgrounds below
+     are left untouched -- deliberately marked as intentional. */
+  padding: 12px 14px;
+  border-radius: var(--cdl-clinical-radius, 12px);
   border: 1px solid var(--cdl-clinical-border, var(--medical-border, #e2e8f0));
-  box-shadow:
-    0 1px 2px rgba(15, 23, 42, 0.04),
-    0 3px 10px rgba(15, 23, 42, 0.07);
+  box-shadow: var(--cdl-clinical-shadow-rest);
   transition:
     box-shadow 140ms ease,
     transform 140ms ease;
