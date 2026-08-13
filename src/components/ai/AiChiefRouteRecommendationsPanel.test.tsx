@@ -8,34 +8,39 @@ const mockEscalate = vi.fn();
 const mockSelectPatient = vi.fn();
 const mockProfileNavigate = vi.fn();
 
-vi.mock('../../hooks/useAiChiefOrchestrator', () => ({
-  default: () => ({
-    snapshot: {
-      recommendations: [
-        {
-          id: 'rec-1',
-          domain: 'patient_prioritization',
-          action: 'Assign physician to P1 patient',
-          rationale: 'Priority 1 patient awaiting assessment.',
-          reasonCodes: ['p1-wait'],
-          confidence: 0.9,
-          route: '/emergency/whiteboard',
-          patientId: 'patient-1',
-          ownerRole: 'Charge nurse',
-          priority: 'P0',
-          tone: 'critical',
-          humanReviewRequired: true,
-          advisoryOnly: true,
-          modelOrRuleId: 'ai-chief-v1',
-        },
-      ],
-      metrics: {
-        activePatients: 1,
-        p1p2Patients: 1,
+const defaultOrchestratorReturn = {
+  snapshot: {
+    recommendations: [
+      {
+        id: 'rec-1',
+        domain: 'patient_prioritization',
+        action: 'Assign physician to P1 patient',
+        rationale: 'Priority 1 patient awaiting assessment.',
+        reasonCodes: ['p1-wait'],
+        confidence: 0.9,
+        route: '/emergency/whiteboard',
+        patientId: 'patient-1',
+        ownerRole: 'Charge nurse',
+        priority: 'P0',
+        tone: 'critical',
+        humanReviewRequired: true,
+        advisoryOnly: true,
+        modelOrRuleId: 'ai-chief-v1',
       },
-      generatedAt: '2026-07-03T12:00:00.000Z',
+    ],
+    metrics: {
+      activePatients: 1,
+      p1p2Patients: 1,
     },
-  }),
+    generatedAt: '2026-07-03T12:00:00.000Z',
+  },
+  refreshError: null as string | null,
+};
+
+const mockUseAiChiefOrchestrator = vi.fn(() => defaultOrchestratorReturn);
+
+vi.mock('../../hooks/useAiChiefOrchestrator', () => ({
+  default: () => mockUseAiChiefOrchestrator(),
 }));
 
 vi.mock('../../hooks/useProfileNavigate', () => ({
@@ -121,5 +126,44 @@ describe('AiChiefRouteRecommendationsPanel', () => {
     expect(mockProfileNavigate).toHaveBeenCalledWith('/emergency/whiteboard');
     expect(showActionSuccess).toHaveBeenCalled();
     expect(screen.getByText(/accepted — clinician review still required/i)).toBeInTheDocument();
+  });
+
+  it('HEAL-175: discloses a failed refresh instead of claiming department signals are stable', () => {
+    mockUseAiChiefOrchestrator.mockReturnValueOnce({
+      snapshot: {
+        recommendations: [],
+        metrics: { activePatients: 1, p1p2Patients: 1 },
+        generatedAt: '2026-07-03T12:00:00.000Z',
+      },
+      refreshError: 'Unable to refresh unified operational intelligence.',
+    });
+
+    render(
+      <MemoryRouter>
+        <AiChiefRouteRecommendationsPanel />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole('alert')).toHaveTextContent(/last refresh failed/i);
+    expect(screen.queryByText(/department signals appear stable/i)).not.toBeInTheDocument();
+  });
+
+  it('shows the calm "signals appear stable" message when there are genuinely no recommendations and no refresh error', () => {
+    mockUseAiChiefOrchestrator.mockReturnValueOnce({
+      snapshot: {
+        recommendations: [],
+        metrics: { activePatients: 1, p1p2Patients: 1 },
+        generatedAt: '2026-07-03T12:00:00.000Z',
+      },
+      refreshError: null,
+    });
+
+    render(
+      <MemoryRouter>
+        <AiChiefRouteRecommendationsPanel />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText(/department signals appear stable/i)).toBeInTheDocument();
   });
 });

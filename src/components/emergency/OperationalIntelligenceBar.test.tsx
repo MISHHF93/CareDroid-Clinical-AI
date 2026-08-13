@@ -115,6 +115,22 @@ describe('OperationalIntelligenceBar', () => {
     expect(screen.getByText('Open workflow')).toBeInTheDocument();
   });
 
+  it('HEAL-175: discloses a failed background refresh instead of always claiming "live feed"', () => {
+    aiChiefMock.mockReturnValue(baseAiChief());
+    unifiedMock.mockReturnValue({
+      ...buildUnified(),
+      // A failed refresh re-serves the last-known snapshot under its existing
+      // 'backend' source (not 'degraded') -- refreshError is the only signal.
+      source: 'backend',
+      refreshError: 'Unable to refresh unified operational intelligence.',
+    });
+
+    renderBar();
+
+    expect(screen.getByText('refresh failed — showing last known data')).toBeInTheDocument();
+    expect(screen.queryByText('live feed')).not.toBeInTheDocument();
+  });
+
   it('renders nothing when the AI Chief surface is hidden for this role/route', () => {
     showAiChiefBar = false;
     aiChiefMock.mockReturnValue(baseAiChief());

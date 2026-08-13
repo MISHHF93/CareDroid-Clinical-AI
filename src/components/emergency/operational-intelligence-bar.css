@@ -48,6 +48,12 @@
   letter-spacing: 0.03em;
 }
 
+.operational-intelligence-bar__source--error {
+  background: color-mix(in srgb, var(--status-warning, #d97706) 18%, transparent);
+  color: var(--status-warning, #d97706);
+  font-weight: 600;
+}
+
 .operational-intelligence-bar__signals {
   display: flex;
   flex-wrap: wrap;

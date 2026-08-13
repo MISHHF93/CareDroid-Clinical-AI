@@ -31,7 +31,7 @@ type AiChiefRouteRecommendationsPanelProps = Readonly<{
 export function AiChiefRouteRecommendationsPanel({
   limit = RECOMMENDATION_LIMIT,
 }: AiChiefRouteRecommendationsPanelProps) {
-  const { snapshot } = useAiChiefOrchestrator({ realtime: true });
+  const { snapshot, refreshError } = useAiChiefOrchestrator({ realtime: true });
   const { profileNavigate } = useProfileNavigate();
   const patients = useEmergencyStore((state) => state.patients);
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
@@ -101,7 +101,12 @@ export function AiChiefRouteRecommendationsPanel({
   );
 
   if (allRecommendations.length === 0) {
-    return (
+    return refreshError ? (
+      <div className="emergency-route-card emergency-route-muted" role="alert">
+        AI Chief recommendations unavailable — last refresh failed ({refreshError}). Not a
+        confirmation that department signals are stable.
+      </div>
+    ) : (
       <div className="emergency-route-card emergency-route-muted" role="status">
         No high-priority AI Chief recommendations at this time. Department signals appear stable.
       </div>

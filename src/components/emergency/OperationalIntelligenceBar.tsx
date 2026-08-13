@@ -26,6 +26,12 @@ function OperationalIntelligenceBar() {
 
   const criticalDomainCount = Math.max(aiChief.criticalDomainCount, unified.criticalDomainCount);
   const watchDomainCount = Math.max(aiChief.watchDomainCount, unified.watchDomainCount);
+  // A failed background refresh re-serves the last-known snapshot under its
+  // existing source label (see unifiedOperationalIntelligenceEngine.ts's catch
+  // block) rather than flipping to 'degraded', so `source === 'degraded'` alone
+  // silently misses "last refresh failed, this data may be stale" -- surface
+  // refreshError explicitly instead of trusting source alone.
+  const refreshError = unified.refreshError || aiChief.refreshError || null;
   const tone =
     criticalDomainCount > 0 || aiChief.snapshot.metrics.unacknowledgedCriticalAlerts > 0
       ? 'critical'
@@ -53,8 +59,15 @@ function OperationalIntelligenceBar() {
               ? `${watchDomainCount} domain${watchDomainCount === 1 ? '' : 's'} on watch`
               : 'All domains stable'}
         </span>
-        <span className="operational-intelligence-bar__source">
-          {unified.source === 'degraded' ? 'degraded feed' : 'live feed'}
+        <span
+          className={`operational-intelligence-bar__source${refreshError ? ' operational-intelligence-bar__source--error' : ''}`}
+          title={refreshError || undefined}
+        >
+          {refreshError
+            ? 'refresh failed — showing last known data'
+            : unified.source === 'degraded'
+              ? 'degraded feed'
+              : 'live feed'}
         </span>
       </div>
 
