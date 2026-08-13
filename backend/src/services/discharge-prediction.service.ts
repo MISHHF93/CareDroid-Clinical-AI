@@ -18,6 +18,8 @@ export interface DischargeReadiness {
     name: string;
     met: boolean;
     confidence: number;
+    /** False when this criterion has no backing clinical data yet and was never actually checked. */
+    assessed: boolean;
   }[];
   estimatedDischargeTime: Date;
   recommendedAction: 'discharge_now' | 'monitor' | 'prepare_paperwork' | 'not_ready';
@@ -38,22 +40,54 @@ export class DischargePredictionService {
   private async scoreDischargeReadiness(patient: IPatient): Promise<DischargeReadiness> {
     const patientId = String(patient._id);
     const criteria = [
-      { name: 'Vital signs stable', met: await this.checkStableVitals(patient), confidence: 0.85 },
-      { name: 'Pain controlled', met: await this.checkPainControl(patient), confidence: 0.7 },
-      { name: 'Able to ambulate', met: await this.checkMobility(patient), confidence: 0.75 },
-      { name: 'Tolerating oral intake', met: await this.checkOralIntake(patient), confidence: 0.8 },
+      {
+        name: 'Vital signs stable',
+        met: await this.checkStableVitals(patient),
+        confidence: 0.85,
+        assessed: true,
+      },
+      {
+        name: 'Pain controlled',
+        met: await this.checkPainControl(patient),
+        confidence: 0,
+        assessed: false,
+      },
+      {
+        name: 'Able to ambulate',
+        met: await this.checkMobility(patient),
+        confidence: 0,
+        assessed: false,
+      },
+      {
+        name: 'Tolerating oral intake',
+        met: await this.checkOralIntake(patient),
+        confidence: 0,
+        assessed: false,
+      },
       {
         name: 'Discharge criteria documented',
         met: await this.checkDischargeCriteria(patient),
         confidence: 0.9,
+        assessed: true,
       },
-      { name: 'Follow-up arranged', met: await this.checkFollowup(patient), confidence: 0.85 },
+      {
+        name: 'Follow-up arranged',
+        met: await this.checkFollowup(patient),
+        confidence: 0.85,
+        assessed: true,
+      },
       {
         name: 'Medications reconciled',
         met: await this.checkMedicationReconciliation(patient),
-        confidence: 0.95,
+        confidence: 0,
+        assessed: false,
       },
-      { name: 'Transport arranged', met: await this.checkTransport(patient), confidence: 0.6 },
+      {
+        name: 'Transport arranged',
+        met: await this.checkTransport(patient),
+        confidence: 0,
+        assessed: false,
+      },
     ];
 
     const readinessScore = Math.round(
@@ -78,7 +112,9 @@ export class DischargePredictionService {
 
     const barriersToDischarge = criteria
       .filter((criterion) => !criterion.met)
-      .map((criterion) => criterion.name);
+      .map((criterion) =>
+        criterion.assessed ? criterion.name : `${criterion.name} (not yet clinically assessed)`,
+      );
 
     patient.dischargeReadinessScore = readinessScore;
     patient.modifiedAt = new Date();
@@ -91,6 +127,7 @@ export class DischargePredictionService {
         name: criterion.name,
         met: criterion.met,
         confidence: criterion.confidence,
+        assessed: criterion.assessed,
       })),
       estimatedDischargeTime,
       recommendedAction,
@@ -100,6 +137,11 @@ export class DischargePredictionService {
 
   /**
    * Consultant-led midday reverse triage sweep for discharge candidates.
+   *
+   * HEAL-178: this now correctly returns no candidates until pain/mobility/oral-intake/
+   * medication-reconciliation/transport get a real clinician-entered assessment field --
+   * see scoreDischargeReadiness's checkPainControl comment. That's the safe direction for a
+   * gap in the underlying data (silence, not a false recommendation).
    */
   async identifySameDayDischarges(): Promise<IPatient[]> {
     const now = new Date();
@@ -145,16 +187,32 @@ export class DischargePredictionService {
     return hrOk && bpOk && o2Ok && tempOk;
   }
 
+  // HEAL-178: checkPainControl/checkMobility/checkOralIntake/checkMedicationReconciliation/
+  // checkTransport previously hardcoded `return true` with a confident-looking 0.6-0.95
+  // "confidence" attached, so calculateDischargeReadiness silently claimed 5 of 8 readiness
+  // domains were clinician-confirmed ready when none of them had ever actually been checked --
+  // no mobility/oral-intake/transport/medication-reconciliation field exists anywhere on the
+  // patient model, and the discharge-prediction UI has zero live callers yet
+  // (src/data/frontendApiCallsInventory.ts), so nothing downstream was validating this. Treating
+  // an unassessed criterion as "not yet ready" (met: false, confidence: 0, assessed: false) is
+  // the safe default for a discharge-readiness score -- unlike guessing "ready", it can't
+  // green-light a patient nobody actually evaluated. `vitals.painScore` IS real data that could
+  // back checkPainControl, but auto-deriving "controlled" from a bare numeric cutoff (e.g. <=3/10)
+  // is a clinical-policy call, not a code-correctness fix, so it's deliberately left unassessed
+  // alongside the other 4 rather than guessed. A real fix wires these to actual
+  // clinician-entered assessment fields once product defines them; until then this correctly
+  // caps readinessScore below the discharge_now/prepare_paperwork/monitor thresholds (max ~33
+  // from vitals + documented-criteria + follow-up alone) instead of a fabricated high score.
   private async checkPainControl(_patient: IPatient): Promise<boolean> {
-    return true;
+    return false;
   }
 
   private async checkMobility(_patient: IPatient): Promise<boolean> {
-    return true;
+    return false;
   }
 
   private async checkOralIntake(_patient: IPatient): Promise<boolean> {
-    return true;
+    return false;
   }
 
   private async checkDischargeCriteria(patient: IPatient): Promise<boolean> {
@@ -167,11 +225,11 @@ export class DischargePredictionService {
   }
 
   private async checkMedicationReconciliation(_patient: IPatient): Promise<boolean> {
-    return true;
+    return false;
   }
 
   private async checkTransport(_patient: IPatient): Promise<boolean> {
-    return true;
+    return false;
   }
 
   private parseBP(bp: string): { systolic: number; diastolic: number } {
