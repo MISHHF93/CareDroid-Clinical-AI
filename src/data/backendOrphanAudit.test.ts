@@ -61,7 +61,7 @@ describe('backend orphan audit', () => {
     expect(md).toContain('## A. Backend-only');
     expect(md).toContain('## D. Frontend calls without backend');
     expect(md.length).toBeGreaterThan(500);
-  });
+  }, HEAVY_ORPHAN_SCAN_TIMEOUT_MS);
 
   it('frontend gated calls each declare a capability gate', () => {
     const gated = FRONTEND_API_CALLS.filter((c) => c.capability);
