@@ -24,6 +24,77 @@ describe('resourceActivation', () => {
     expect(activations.some((entry) => entry.type === 'stemi')).toBe(true);
   });
 
+  // HEAL-179: trauma-level-1-vs-2 previously only read complaint text (severity / "unstable"
+  // keywords), ignoring arrival.vitals even though the sibling respiratory-failure branch
+  // already reads vitals.spo2 for its own trigger.
+  it('escalates trauma to level-1 from real hypotensive vitals, not just complaint text', () => {
+    const activations = deriveResourceActivations({
+      id: 'ems-3',
+      unitId: 'u3',
+      unitName: 'Medic 3',
+      crewNames: [],
+      patientAge: 34,
+      patientSex: 'Male',
+      chiefComplaint: 'MVC with chest trauma',
+      eta: 6,
+      severity: 'High',
+      dispatchTime: new Date().toISOString(),
+      estimatedArrivalTime: new Date().toISOString(),
+      notes: '',
+      status: 'Inbound',
+      priority: Priority.P1,
+      vitals: { sbp: 78, recordedAt: new Date().toISOString() },
+    });
+    const trauma = activations.find((entry) => entry.type === 'trauma-level-1');
+    expect(trauma).toBeDefined();
+    expect(trauma?.rationale.some((line) => line.includes('Hypotensive'))).toBe(true);
+  });
+
+  it('escalates trauma to level-1 from a severe-head-injury GCS, not just complaint text', () => {
+    const activations = deriveResourceActivations({
+      id: 'ems-4',
+      unitId: 'u4',
+      unitName: 'Medic 4',
+      crewNames: [],
+      patientAge: 29,
+      patientSex: 'Female',
+      chiefComplaint: 'Fall from ladder',
+      eta: 6,
+      severity: 'High',
+      dispatchTime: new Date().toISOString(),
+      estimatedArrivalTime: new Date().toISOString(),
+      notes: '',
+      status: 'Inbound',
+      priority: Priority.P1,
+      vitals: { gcs: 6, recordedAt: new Date().toISOString() },
+    });
+    const trauma = activations.find((entry) => entry.type === 'trauma-level-1');
+    expect(trauma).toBeDefined();
+    expect(trauma?.rationale.some((line) => line.includes('head injury'))).toBe(true);
+  });
+
+  it('stays at trauma level-2 with normal vitals and no destabilizing keywords', () => {
+    const activations = deriveResourceActivations({
+      id: 'ems-5',
+      unitId: 'u5',
+      unitName: 'Medic 5',
+      crewNames: [],
+      patientAge: 45,
+      patientSex: 'Male',
+      chiefComplaint: 'MVC, minor injuries',
+      eta: 10,
+      severity: 'Moderate',
+      dispatchTime: new Date().toISOString(),
+      estimatedArrivalTime: new Date().toISOString(),
+      notes: '',
+      status: 'Inbound',
+      priority: Priority.P2,
+      vitals: { sbp: 118, gcs: 15, recordedAt: new Date().toISOString() },
+    });
+    expect(activations.some((entry) => entry.type === 'trauma-level-2')).toBe(true);
+    expect(activations.some((entry) => entry.type === 'trauma-level-1')).toBe(false);
+  });
+
   it('recommends stroke alert for stroke code checklist', () => {
     const activations = deriveResourceActivations({
       id: 'ems-2',

@@ -67,16 +67,36 @@ export function deriveResourceActivations(
   }
 
   if (arrival.criticalChecklist?.type === 'trauma' || /\b(trauma|mvc|gsw|penetrating|fall from)\b/i.test(complaint)) {
+    // HEAL-179: this branch previously only looked at complaint text (arrival.severity /
+    // "unstable"|"hemorrhage"|"airway" keywords) to pick level-1 vs level-2, even though the
+    // sibling respiratory-failure branch above already reads real arrival.vitals.spo2 for its
+    // own trigger -- pre-arrival vitals were sitting right there, unused, for the one decision
+    // (trauma activation level) where they matter most. SBP<90 and GCS<=8 aren't invented
+    // cutoffs: SBP<90 already means "not stable" in checkStableVitals-style logic elsewhere in
+    // this codebase, and GCS<=8 ("protect the airway") is the standard, near-universal ATLS
+    // trauma-team-activation threshold -- unlike a discharge pain-control cutoff, this isn't a
+    // soft/contested policy call.
+    const sbp = arrival.vitals?.sbp != null ? Number(arrival.vitals.sbp) : null;
+    const gcs = arrival.vitals?.gcs != null ? Number(arrival.vitals.gcs) : null;
+    const hemodynamicallyUnstable = sbp != null && Number.isFinite(sbp) && sbp < 90;
+    const severeHeadInjury = gcs != null && Number.isFinite(gcs) && gcs <= 8;
+    const vitalsCorroborate = hemodynamicallyUnstable || severeHeadInjury;
     const level =
-      arrival.severity === 'Critical' || /\b(unstable|hemorrhage|airway)\b/i.test(complaint)
+      arrival.severity === 'Critical' ||
+      /\b(unstable|hemorrhage|airway)\b/i.test(complaint) ||
+      vitalsCorroborate
         ? 'trauma-level-1'
         : 'trauma-level-2';
+    const baseConfidence = arrival.criticalChecklist?.type === 'trauma' ? 0.9 : 0.78;
+    const rationale = [`Trauma mechanism: ${arrival.mechanismOfInjury || 'documented in complaint'}`];
+    if (hemodynamicallyUnstable) rationale.push(`Hypotensive on arrival (SBP ${sbp} mmHg)`);
+    if (severeHeadInjury) rationale.push(`Severe head injury on arrival (GCS ${gcs})`);
     pushActivation(activations, seen, {
       type: level,
       label: ACTIVATION_LABELS[level],
       priority: level === 'trauma-level-1' ? 'immediate' : 'urgent',
-      confidence: arrival.criticalChecklist?.type === 'trauma' ? 0.9 : 0.78,
-      rationale: [`Trauma mechanism: ${arrival.mechanismOfInjury || 'documented in complaint'}`],
+      confidence: vitalsCorroborate ? Math.min(0.97, baseConfidence + 0.08) : baseConfidence,
+      rationale,
     });
   }
 
