@@ -1068,6 +1068,19 @@ export default function FullJourneyOperatingPage({ view = 'journey' }: FullJourn
   const alerts = useEmergencyStore((state) => state.alerts);
   const capacity = useEmergencyStore((state) => state.capacity);
 
+  // HEAL-182: readiness.overdueCount (feeds StickyActionBanner, mounted on all 5 views) is
+  // time-based (expectedArrivalAt < now), but this page has no timer of its own -- snapshot only
+  // recomputes when the Zustand store selectors above change, so a plan can flip from
+  // on-time to overdue with zero store mutation and sit stale here indefinitely, while the
+  // ed-readiness view's own EdReadinessView already refreshes the identical getReadinessSummary()
+  // every 5s (see its own setInterval below). Mirrors that same established pattern so the
+  // cross-view banner doesn't fall behind the single-view display of the same count.
+  const [, forceRefreshTick] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => forceRefreshTick((tick) => tick + 1), 5000);
+    return () => clearInterval(id);
+  }, []);
+
   const snapshot = buildFullEmergencyCareJourneySnapshot({
     patients,
     staff,
