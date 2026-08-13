@@ -14,7 +14,12 @@ export default function EmsOffloadAggregateStrip({
   onOpenTracker,
   className = '',
   alwaysShowWhenActive = true,
+  now = undefined as number | undefined,
 }) {
+  // HEAL-183: without `now`, offloadDelaysCount/offloadDurationLabel only recompute when
+  // emsArrivals/patients/etc. change -- an inbound unit can cross the offload-delay threshold
+  // purely from time passing and this strip would never notice until an unrelated mutation
+  // forced a re-render.
   const snapshot = useMemo(
     () =>
       buildEmsOffloadVisibilitySnapshot(emsArrivals, {
@@ -22,8 +27,9 @@ export default function EmsOffloadAggregateStrip({
         staff,
         rooms,
         offloadTargetMinutes,
+        now: now ? new Date(now) : undefined,
       }),
-    [emsArrivals, offloadTargetMinutes, patients, rooms, staff],
+    [emsArrivals, now, offloadTargetMinutes, patients, rooms, staff],
   );
 
   if (!alwaysShowWhenActive && !snapshot.offloadDelaysCount) {

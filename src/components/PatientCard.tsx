@@ -101,6 +101,17 @@ type PatientCardProps = {
   privacyPolicy?: EmergencyDisplayPrivacyPolicy;
   densityVariant?: PatientCardDensityVariant;
   onKeyboardFocus?: () => void;
+  /**
+   * HEAL-183: waitingMinutes/reassessmentTimer/queueTiming below are memoized on `[patient]` (or
+   * similar), but their underlying builders compare a stored timestamp against wall-clock "now"
+   * -- once a patient's flags/object reference stop changing (e.g. already flagged
+   * ReassessmentDue, so the 60s reassessment engine tick is a no-op and never replaces this
+   * patient's object reference again), those memos freeze forever even though the real elapsed
+   * time keeps growing. This card is `memo()`-wrapped, so passing a periodically-changing `now`
+   * (the parent whiteboard's existing clockTick) is what actually forces a fresh render.
+   * Optional and defaulted so callers that don't have a clockTick keep prior behavior.
+   */
+  now?: number;
 };
 
 type LegacyVitals = NonNullable<Patient['vitals'][number]> & {
@@ -357,7 +368,9 @@ function PatientCard({
   privacyPolicy: privacyPolicyProp,
   densityVariant: densityVariantProp,
   onKeyboardFocus,
+  now: nowProp,
 }: PatientCardProps) {
+  const now = nowProp ?? Date.now();
   const emergencyRole = useEmergencyRolePermissions();
   const screenDensity = useScreenDensityMode();
   const patientCardSurfaces = usePractitionerSurfaceVisibility().patientCard;
@@ -446,8 +459,8 @@ function PatientCard({
   const patientSex = formatPrivacySafeDemographic(patient.sex, privacyPolicy);
   const arrival = useMemo(() => normalizePatientArrival(patient), [patient]);
   const operationalMeta = useMemo(
-    () => buildWhiteboardCardOperationalMeta(patient, staff),
-    [patient, staff],
+    () => buildWhiteboardCardOperationalMeta(patient, staff, now),
+    [now, patient, staff],
   );
   const displayPriority = triageAcuityToPriority(arrival.triageAcuity);
   const patientComplaint = formatPrivacySafeComplaint(arrival.chiefComplaint, privacyPolicy);
@@ -546,12 +559,14 @@ function PatientCard({
   });
   const reassessmentTimer = useMemo(
     () =>
-      patient.state === PatientState.Waiting ? selectReassessmentTimerForPatient(patient) : null,
-    [patient],
+      patient.state === PatientState.Waiting
+        ? selectReassessmentTimerForPatient(patient, { now: new Date(now) })
+        : null,
+    [now, patient],
   );
   const queueTiming = useMemo(
-    () => resolvePatientQueueTiming(patient, { settings: emergencySettings }),
-    [emergencySettings, patient],
+    () => resolvePatientQueueTiming(patient, { settings: emergencySettings, now: new Date(now) }),
+    [emergencySettings, now, patient],
   );
   const cardStyle = {
     '--patient-priority-color': priorityColors[displayPriority],
@@ -1035,7 +1050,12 @@ function PatientCard({
 
       {queueTiming?.isOnline ? (
         <div className="patient-card__queue-timing" aria-label="Queue timing">
-          <PatientQueueTimingBadge patient={patient} settings={emergencySettings} showScenario />
+          <PatientQueueTimingBadge
+            patient={patient}
+            settings={emergencySettings}
+            now={new Date(now)}
+            showScenario
+          />
         </div>
       ) : null}
 

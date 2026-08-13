@@ -29,6 +29,10 @@ export type WhiteboardViewProps = {
   layout?: PatientCardLayout;
   gridPadding?: number;
   boardTitle?: string;
+  /** HEAL-183: threaded down to PatientCard so its time-based memos (reassessment timer, queue
+   * timing, wait minutes) refresh on the parent whiteboard's existing clock tick instead of
+   * freezing once a patient's flags/object reference stop changing. */
+  now?: number;
 };
 
 function WhiteboardView({
@@ -41,6 +45,7 @@ function WhiteboardView({
   layout = 'row',
   gridPadding = 4,
   boardTitle = 'Emergency Department Whiteboard',
+  now,
 }: WhiteboardViewProps) {
   const [filters, setFilters] = useState<WhiteboardViewFilters>(DEFAULT_WHITEBOARD_VIEW_FILTERS);
 
@@ -199,6 +204,7 @@ function WhiteboardView({
                 layout={layout}
                 workflowProfile={workflowProfile}
                 readOnlyDisplay={readOnlyDisplay}
+                now={now}
               />
             ))
           ) : (

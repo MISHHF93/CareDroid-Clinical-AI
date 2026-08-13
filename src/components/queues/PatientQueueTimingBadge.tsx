@@ -5,7 +5,7 @@ import './PatientQueueTimingBadge.css';
 export default function PatientQueueTimingBadge({
   patient,
   settings = (undefined as any),
-  now = undefined,
+  now = undefined as Date | undefined,
   layout = 'inline',
   showScenario = false,
   showOnlineDot = true,

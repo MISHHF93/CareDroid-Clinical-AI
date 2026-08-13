@@ -14,15 +14,21 @@ export default function WaitingRoomSafetyEscalationStrip({
   onSelectPatient,
   className = '',
   alwaysShowWhenActive = true,
+  now = undefined as number | undefined,
 }) {
+  // HEAL-183: without `now`, overdueReassessmentCount/longSinceContactCount only recompute when
+  // `patients`/`workflowLogs`/etc. change -- a patient can cross an overdue/stale threshold
+  // purely from time passing and this strip would never notice until an unrelated mutation
+  // forced a re-render.
   const context = useMemo(
     () => ({
       workflowLogs,
       staff,
       alerts,
       communicationOverdueMinutes,
+      now: now ? new Date(now) : undefined,
     }),
-    [alerts, communicationOverdueMinutes, staff, workflowLogs],
+    [alerts, communicationOverdueMinutes, now, staff, workflowLogs],
   );
 
   const snapshot = useMemo(

@@ -14,6 +14,10 @@ type TriageBreachStripProps = {
   onSelectPatient?: (patientId: string) => void;
   className?: string;
   alwaysShowWhenActive?: boolean;
+  /** HEAL-183: without this, breachedCount/breachRiskCount only recompute when `patients`
+   * changes -- a patient can cross the breach threshold purely from time passing and this strip
+   * would never notice until some unrelated patient mutation forced a re-render. */
+  now?: number;
 };
 
 export default function TriageBreachStrip({
@@ -22,8 +26,12 @@ export default function TriageBreachStrip({
   onSelectPatient,
   className = '',
   alwaysShowWhenActive = true,
+  now,
 }: TriageBreachStripProps) {
-  const context = useMemo(() => ({ settings: settings || undefined }), [settings]);
+  const context = useMemo(
+    () => ({ settings: settings || undefined, now: now ? new Date(now) : undefined }),
+    [now, settings],
+  );
 
   const visibility = useMemo(
     () => buildTriageBreachVisibilitySnapshot(patients, context),

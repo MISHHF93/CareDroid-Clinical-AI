@@ -13,8 +13,16 @@ export default function ProviderWaitBreachStrip({
   onSelectPatient,
   className = '',
   alwaysShowWhenActive = true,
+  now = undefined as number | undefined,
 }) {
-  const context = useMemo(() => ({ settings: settings || undefined }), [settings]);
+  // HEAL-183: without `now` in context, breachedCount/approachingThresholdCount only recompute
+  // when `patients` changes -- a patient can cross the provider-wait breach threshold purely
+  // from time passing and this strip would never notice until an unrelated mutation forced a
+  // re-render.
+  const context = useMemo(
+    () => ({ settings: settings || undefined, now: now ? new Date(now) : undefined }),
+    [now, settings],
+  );
 
   const visibility = useMemo(
     () => buildProviderWaitVisibilitySnapshot(patients, context),

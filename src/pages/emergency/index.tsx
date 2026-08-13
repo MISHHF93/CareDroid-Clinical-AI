@@ -2056,6 +2056,7 @@ export default function EmergencyWhiteboard() {
           patients={patients}
           staff={staff}
           rooms={rooms}
+          now={clockTick}
           offloadTargetMinutes={
             Number(emergencySettings?.thresholds?.emsOffloadTargetMinutes ?? 15) || 15
           }
@@ -2228,6 +2229,7 @@ export default function EmergencyWhiteboard() {
           settings={emergencySettings}
           onSelectPatient={handleWaitingRoomSafetySelect}
           className="emergency-whiteboard-page__provider-wait-breach"
+          now={clockTick}
         />
       ) : null}
 
@@ -2241,6 +2243,7 @@ export default function EmergencyWhiteboard() {
               settings={emergencySettings}
               onSelectPatient={handleWaitingRoomSafetySelect}
               className="emergency-whiteboard-page__triage-breach-strip"
+              now={clockTick}
             />
           ) : null}
           {!display.isDisplayMode ? (
@@ -2301,6 +2304,7 @@ export default function EmergencyWhiteboard() {
             activeQueueFilter={activeQueueFilter}
             displayMode={display.isDisplayMode}
             readOnly={display.isDisplayMode || !canClassifyFitToWait}
+            now={clockTick}
             variant={
               charge.isChargeNurseScreen || triage.isTriageScreen ? 'focused' : 'full'
             }
@@ -2751,6 +2755,7 @@ export default function EmergencyWhiteboard() {
           readOnlyDisplay={display.isDisplayMode}
           layout="row"
           gridPadding={screenDensity.whiteboard.gridGap + 4}
+          now={clockTick}
         />
         </>
       ) : whiteboardDensity.surfaces.patientGrid.visible ? (

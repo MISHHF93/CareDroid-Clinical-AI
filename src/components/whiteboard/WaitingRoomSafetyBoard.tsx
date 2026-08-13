@@ -65,10 +65,24 @@ export default function WaitingRoomSafetyBoard({
   onOpenReassessment,
   onClassifyFitToWait,
   className = '',
+  now = undefined as number | undefined,
 }) {
+  // HEAL-183: without `now`, every time-based row field (reassessmentOverdue, waitingDuration,
+  // vitalsAge, communicationRecency) and the header's overdueReassessment/staleVitals summary
+  // counts only recompute when `patients` changes -- a row can cross a breach threshold purely
+  // from time passing and this board would never notice until an unrelated patient mutation
+  // forced a re-render.
   const board = useMemo(
-    () => buildWaitingRoomSafetyBoard(patients, { staff, referrals, emsArrivals, settings, workflowLogs }),
-    [patients, referrals, staff, emsArrivals, settings, workflowLogs],
+    () =>
+      buildWaitingRoomSafetyBoard(patients, {
+        staff,
+        referrals,
+        emsArrivals,
+        settings,
+        workflowLogs,
+        now: now ? new Date(now) : undefined,
+      }),
+    [emsArrivals, now, patients, referrals, settings, staff, workflowLogs],
   );
 
   const patientById = useMemo(
@@ -166,6 +180,7 @@ export default function WaitingRoomSafetyBoard({
         alerts={alerts}
         onSelectPatient={onSelectPatient}
         className="waiting-room-safety-board__escalation-strip"
+        now={now}
       />
       <WaitingRoomStatusMessagingStrip
         patients={patients}
