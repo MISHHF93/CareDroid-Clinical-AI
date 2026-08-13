@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import PlatformGovernanceWorkspace from './PlatformGovernanceWorkspace';
+import { RouteChromeProvider } from '../../contexts/RouteChromeContext';
 
 vi.mock('./PlatformGovernanceWorkspace.css', () => ({}));
 
@@ -15,11 +16,13 @@ vi.mock('../../services/platformGovernanceApi', () => ({
 
 function renderRoute(path) {
   render(
-    <MemoryRouter initialEntries={[path]}>
-      <Routes>
-        <Route path={path} element={<PlatformGovernanceWorkspace />} />
-      </Routes>
-    </MemoryRouter>,
+    <RouteChromeProvider>
+      <MemoryRouter initialEntries={[path]}>
+        <Routes>
+          <Route path={path} element={<PlatformGovernanceWorkspace />} />
+        </Routes>
+      </MemoryRouter>
+    </RouteChromeProvider>,
   );
 }
 
@@ -44,9 +47,7 @@ describe('PlatformGovernanceWorkspace governance/security dashboards', () => {
 
     renderRoute('/ai-governance');
 
-    expect(
-      await screen.findByRole('heading', { level: 1, name: /ai governance center/i }),
-    ).toBeVisible();
+    expect(await screen.findByText(/ai governance center/i)).toBeVisible();
     expect(screen.getByRole('heading', { name: /dashboard panels/i })).toBeVisible();
     expect(screen.getAllByText(/approval Workflow/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/risk Classification/i).length).toBeGreaterThan(0);
@@ -72,9 +73,7 @@ describe('PlatformGovernanceWorkspace governance/security dashboards', () => {
 
     renderRoute('/security');
 
-    expect(
-      await screen.findByRole('heading', { level: 1, name: /llm security dashboard/i }),
-    ).toBeVisible();
+    expect(await screen.findByText(/llm security dashboard/i)).toBeVisible();
     expect(screen.getAllByText(/prompt Injection/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/phi Protection/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/minimize_or_redact/i).length).toBeGreaterThan(0);

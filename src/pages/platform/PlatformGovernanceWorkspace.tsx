@@ -4,6 +4,7 @@ import { MetricCard, VisualizationPanel } from '../../components/dashboard/Dashb
 import { CategoryBarChart } from '../../components/dashboard/DashboardCharts';
 import { GraphicIconBadge } from '../../components/graphics/CdlGraphicKit';
 import StateSourceNotice from '../../components/StateSourceNotice';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import {
   buildPlatformGovernanceSurfaceView,
@@ -63,6 +64,23 @@ export default function PlatformGovernanceWorkspace() {
   );
   const panelChart = useMemo(() => buildGovernancePanelChart(view.panels), [view.panels]);
 
+  // The shell chrome (ShellRouteTab, AppShell.tsx) renders the page's real <h1>.
+  // Registering this page's own title/subtitle keeps that shell heading in sync
+  // with the richer, route-specific copy below instead of the shorter console
+  // registry label (GOVERNANCE_WORKSPACE_ROUTES) it falls back to otherwise --
+  // HEAL-169: those two texts silently diverged for every governance route, and
+  // for 5 of 8 (whichever route's registry label happened to already match the
+  // in-page title case-insensitively) produced two ambiguous <h1> elements with
+  // the same accessible name, which is what made those 5 routes' tests hang.
+  const routeChrome = useMemo(
+    () => ({
+      title: view.copy.title || capability?.name,
+      subtitle: view.copy.summary || capability?.summary,
+    }),
+    [view.copy.title, view.copy.summary, capability?.name, capability?.summary],
+  );
+  useRouteChromeRegistration(routeChrome);
+
   return (
     <main className="governance-workspace-page" aria-label={view.copy.title}>
       <header className="governance-workspace-page__header">
@@ -72,7 +90,9 @@ export default function PlatformGovernanceWorkspace() {
             <p className="governance-workspace-page__eyebrow">
               {capability?.criticality || 'P0'} platform governance
             </p>
-            <h1>{view.copy.title || capability?.name}</h1>
+            <p className="governance-workspace-page__title-heading">
+              {view.copy.title || capability?.name}
+            </p>
             <p>{view.copy.summary || capability?.summary}</p>
           </div>
         </div>
