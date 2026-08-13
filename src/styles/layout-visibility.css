@@ -157,7 +157,8 @@ body {
 .artifacts-table-wrap,
 .governance-registry-table,
 .team-table-wrapper,
-.ops-demo-table {
+.ops-demo-table,
+.waiting-room-safety-board__table-wrap {
   overflow-x: auto;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
@@ -173,7 +174,8 @@ body {
 .artifacts-table-wrap,
 .governance-registry-table,
 .team-table-wrapper,
-.ops-demo-table {
+.ops-demo-table,
+.waiting-room-safety-board__table-wrap {
   overscroll-behavior-x: contain;
 }
 
