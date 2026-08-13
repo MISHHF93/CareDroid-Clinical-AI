@@ -593,26 +593,11 @@
    ───────────────────────────────────────────────────────────────── */
 
 /* ── 15A. Alarm dock action buttons ──────────────────────────────
-   Pure-white buttons on a tinted critical/warning dock surface
-   read as unpressable ghosts. Give them a slate-tinted fill and
-   stronger border so they pop against the dock background.       */
-
-.operational-alarm-dock__actions button {
-  background: var(--medical-slate-50, #f8fafc);
-  border-color: var(--cdl-clinical-border, #cbd5e1);
-  border-width: 1.5px;
-  color: var(--medical-ink, #111827);
-}
-
-/* Ghost "All alerts" link — fully transparent = invisible.
-   Promote to a readable ink tone with a visible underline weight. */
-.operational-alarm-dock__ghost {
-  background: transparent !important;
-  border-color: transparent !important;
-  color: var(--medical-ink-muted, #6b7280) !important;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
+   HEAL-164 (MB-E17): removed. .operational-alarm-dock__actions/__ghost
+   match nothing in the current codebase -- the live dock component is
+   src/alarm/AlarmDock.tsx, which uses an entirely different class
+   convention (no "operational-alarm-dock" prefix anywhere). Leftover
+   from an earlier, since-rebuilt alarm dock. */
 
 /* ── 15B. Journey progress rail — upcoming step rings ────────────
    The default #cbd5e1 border on upcoming markers is too pale.
@@ -632,86 +617,23 @@
   color: #475569;
 }
 
-/* ── 15C. Reception toolbar action buttons ───────────────────────
-   Pure white surfaces — color comes from border and icon only. */
-
-.reception-desk-toolbar__action {
-  background: #ffffff !important;
-  border-color: #e2e8f0 !important;
-  border-width: 1px !important;
-  color: var(--medical-ink, #111827) !important;
-  box-shadow: none !important;
-}
-
-.reception-desk-toolbar__action:hover:not(:disabled) {
-  background: #f8fafc !important;
-  border-color: #cbd5e1 !important;
-  box-shadow: none !important;
-}
-
-/* Primary "Register" button — white background, blue border accent */
-.reception-desk-toolbar__action--primary {
-  background: #ffffff !important;
-  border-color: rgba(100, 116, 139, 0.5) !important;
-  color: #475569 !important;
-}
-
-.reception-desk-toolbar__action--primary:hover:not(:disabled) {
-  background: #f8fafc !important;
-  border-color: #64748b !important;
-}
-
-/* Escalate button — white background, red border accent */
-.reception-desk-toolbar__action--escalate {
-  background: #ffffff !important;
-  border-color: rgba(239, 68, 68, 0.45) !important;
-  color: #b91c1c !important;
-}
-
-/* ── 15D. Reception toolbar queue count tabs ─────────────────────
-   Same pale-surface + light-blue-border problem as 15C.
-   Inactive queue tabs need visible body; active tab keeps blue.  */
-
-.reception-desk-toolbar__queue-tab {
-  background: #ffffff !important;
-  border-color: #e2e8f0 !important;
-  border-width: 1px !important;
-  color: #374151 !important;
-  box-shadow: none !important;
-}
-
-.reception-desk-toolbar__queue-tab:hover:not(.reception-desk-toolbar__action--active) {
-  background: var(--medical-slate-100, #f1f5f9) !important;
-  border-color: #64748b !important;
-}
-
-.reception-desk-toolbar__action--active.reception-desk-toolbar__queue-tab,
-.reception-desk-toolbar__queue-tab.reception-desk-toolbar__action--active {
-  background: #ffffff !important;
-  border-color: #374151 !important;
-  color: var(--cd-brand-text, #475569) !important;
-  box-shadow: inset 0 0 0 1px #374151;
-}
+/* ── 15C/15D. Reception toolbar action buttons + queue count tabs ─
+   HEAL-164 (MB-E17): removed. .reception-desk-toolbar__* matches nothing
+   in the current codebase -- confirmed via repo-wide grep, zero .tsx
+   renders of the class anywhere. Leftover from a Reception toolbar
+   design that predates ReceptionHeader.tsx (see HEAL-159's
+   .reception-command-header finding for the same shape, a different
+   layer of the same historical Reception-header churn). */
 
 /* ── 15E. Unified intake phase nav (Registration tabs) ───────────
-   White surfaces with clear active/inactive split. */
-
-.unified-intake-phase-nav__btn {
-  background: #ffffff !important;
-  border-color: #e2e8f0 !important;
-  border-width: 1px !important;
-  color: #374151 !important;
-  box-shadow: none !important;
-  font-weight: 600;
-}
-
-.unified-intake-phase-nav__btn.is-active {
-  background: #ffffff !important;
-  border-color: rgba(100, 116, 139, 0.5) !important;
-  color: #475569 !important;
-  box-shadow: none !important;
-  font-weight: 700;
-}
+   HEAL-164 (MB-E17): removed. Unlike the shadowed HEAL-150/158/159/160/
+   161/163 cases, this one was genuinely winning live: UnifiedIntakePanel.css's
+   own .unified-intake-phase-nav__btn rule has no !important, so this
+   file's !important-forced hardcoded #ffffff/#e2e8f0/#374151/#475569 (zero
+   dark-mode fallback) always overrode it regardless of load order --
+   flattening the tab bar to plain white/gray and discarding the active
+   tab's real elevation shadow (var(--cdl-elev-1)) that
+   UnifiedIntakePanel.css already provides via CDL tokens. */
 
 /* ── 15F. Quick complaint chips ──────────────────────────────────
    HEAL-150 (MB-E3): removed. This file's own header claims it "loads
@@ -726,11 +648,6 @@
    token fallback) had a future refactor ever let it win. */
 
 /* ── 15G. Reception work-queue tabs (inactive state) ─────────────
-   White surfaces for all queue tabs. */
-
-.reception-work-queues__tab:not(.reception-work-queues__tab--active) {
-  background: #ffffff;
-  border-color: #94a3b8;
-  border-width: 1.5px;
-  color: #374151;
-}
+   HEAL-164 (MB-E17): removed. .reception-work-queues__tab matches
+   nothing in the current codebase -- same historical-leftover shape as
+   15A/15C/15D above. */
