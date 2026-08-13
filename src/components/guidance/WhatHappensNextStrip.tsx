@@ -12,10 +12,15 @@ export default function WhatHappensNextStrip({
   referrals = [] as any[],
   staff = [] as any[],
   className = '',
+  now = undefined as number | undefined,
 }) {
+  // HEAL-183: without `now`, the reassessment-due bucket count only recomputes when
+  // `patients`/`referrals`/`staff` change -- a patient can enter that bucket purely from time
+  // passing and this strip would never notice until an unrelated mutation forced a re-render.
+  const nowDate = useMemo(() => (now ? new Date(now) : undefined), [now]);
   const counts = useMemo(
-    () => summarizeWhatHappensNextBoard(patients, { referrals, staff }),
-    [patients, referrals, staff],
+    () => summarizeWhatHappensNextBoard(patients, { referrals, staff, now: nowDate }),
+    [nowDate, patients, referrals, staff],
   );
 
   const visible = WHAT_HAPPENS_NEXT_STEPS.filter((step) => counts[step.id] > 0);
@@ -39,7 +44,7 @@ export default function WhatHappensNextStrip({
         {visible.map((step) => {
           const samplePatient = patients.find(
             (patient) =>
-              resolveWhatHappensNext(patient, { referrals, staff })?.stepId === step.id,
+              resolveWhatHappensNext(patient, { referrals, staff, now: nowDate })?.stepId === step.id,
           );
           return (
             <div key={step.id} className="what-next-strip__count">

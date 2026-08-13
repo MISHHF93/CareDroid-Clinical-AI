@@ -47,6 +47,12 @@ vi.mock('../services/emsOffloadVisibilityModel', () => ({
   hasEmsOffloadVisibilityActivity: vi.fn(() => false),
 }));
 
+vi.mock('../services/whatHappensNextGuidance', () => ({
+  WHAT_HAPPENS_NEXT_STEPS: [],
+  resolveWhatHappensNext: vi.fn(() => null),
+  summarizeWhatHappensNextBoard: vi.fn(() => ({})),
+}));
+
 const patients = [{ id: 'p1' }] as never;
 
 describe('Whiteboard strip components thread now into their builders (HEAL-183)', () => {
@@ -131,6 +137,22 @@ describe('Whiteboard strip components thread now into their builders (HEAL-183)'
     const firstNow = mock.mock.calls.at(-1)?.[1]?.now;
 
     rerender(<EmsOffloadAggregateStrip emsArrivals={patients} now={2000} />);
+    const secondNow = mock.mock.calls.at(-1)?.[1]?.now;
+
+    expect(firstNow).toBeInstanceOf(Date);
+    expect((secondNow as Date).getTime()).not.toBe((firstNow as Date).getTime());
+  });
+
+  it('WhatHappensNextStrip re-invokes its builder with an updated now on rerender', async () => {
+    const { summarizeWhatHappensNextBoard } = await import('../services/whatHappensNextGuidance');
+    const WhatHappensNextStrip = (await import('./guidance/WhatHappensNextStrip')).default;
+    const mock = vi.mocked(summarizeWhatHappensNextBoard);
+    mock.mockClear();
+
+    const { rerender } = render(<WhatHappensNextStrip patients={patients} now={1000} />);
+    const firstNow = mock.mock.calls.at(-1)?.[1]?.now;
+
+    rerender(<WhatHappensNextStrip patients={patients} now={2000} />);
     const secondNow = mock.mock.calls.at(-1)?.[1]?.now;
 
     expect(firstNow).toBeInstanceOf(Date);

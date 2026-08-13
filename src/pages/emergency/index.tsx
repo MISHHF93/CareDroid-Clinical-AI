@@ -2252,6 +2252,7 @@ export default function EmergencyWhiteboard() {
               referrals={referrals}
               staff={staff}
               className="emergency-whiteboard-page__what-next-strip"
+              now={clockTick}
             />
           ) : null}
           {surfaces.whiteboard.showAlertRails &&
