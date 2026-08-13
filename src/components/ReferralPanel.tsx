@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { CheckCircle2, Clock3, FilePlus2, Search, Send, XCircle } from 'lucide-react';
 import { PatientState } from '../types/emergency';
@@ -324,6 +324,7 @@ export default function ReferralPanel() {
   const [formError, setFormError] = useState('');
   const [backendStatus, setBackendStatus] = useState('');
   const [backendPending, setBackendPending] = useState(false);
+  const submitReferralInFlightRef = useRef(false);
   const referralPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.manageReferral);
   const transferPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.manageTransfer);
   const canManageReferral = referralPresentation.enabled;
@@ -434,6 +435,8 @@ export default function ReferralPanel() {
       setFormError('Add a reason and clinical summary before saving.');
       return;
     }
+    if (submitReferralInFlightRef.current) return;
+    submitReferralInFlightRef.current = true;
 
     const payload = {
       patientId: selectedPatient.id,
@@ -469,7 +472,10 @@ export default function ReferralPanel() {
       .catch(() => {
         setBackendStatus('Referral saved for this shift. Live sync is pending.');
       })
-      .finally(() => setBackendPending(false));
+      .finally(() => {
+        setBackendPending(false);
+        submitReferralInFlightRef.current = false;
+      });
     resetForm();
     setFormOpen(false);
   };
