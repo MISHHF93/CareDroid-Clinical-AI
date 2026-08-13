@@ -18,7 +18,7 @@
     "dev:fullstack": "node scripts/dev-stack.mjs",
     "dev:lan": "vite --strictPort --host",
     "clean": "node scripts/clean.mjs",
-    "tree": "tree --dirs-first > tree.txt",
+    "tree": "node scripts/tree-scan.mjs",
     "validate:assets": "node scripts/validate-assets.mjs",
     "build": "npm run validate:assets && vite build",
     "build:frontend": "npm run build",
