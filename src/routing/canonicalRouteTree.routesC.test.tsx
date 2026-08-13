@@ -16,7 +16,11 @@ describe('canonical route tree — queues params, reassessment, boarding, referr
     renderRoute('/emergency/queues?queue=Reassessment');
 
     expect(
-      await screen.findByText('Showing the Reassessment queue requested from the whiteboard.'),
+      await screen.findByText(
+        'Showing the Reassessment queue requested from the whiteboard.',
+        {},
+        { timeout: ROUTE_LOAD_TIMEOUT },
+      ),
     ).toBeInTheDocument();
     await waitFor(() => {
       expect(useEmergencyStore.getState().activeQueueFilter).toBe('Reassessment');

@@ -843,6 +843,13 @@ describe('Route pages smoke — non-empty render', () => {
         await waitFor(() => {
           expect(screen.getByRole('heading', { name: /fleet summary/i })).toBeInTheDocument();
         });
+      } else if (match === 'heading-text') {
+        // These pages (PlatformGovernanceWorkspace) register their title into the
+        // shell chrome (useRouteChromeRegistration) rather than rendering their own
+        // <h1> -- correct in the real app (ShellRouteTab provides the one real h1),
+        // but this harness renders the page alone with no ShellRouteTab ancestor, so
+        // there is no heading-role element to find here. Text-match instead (HEAL-169).
+        expect(await screen.findByText(heading)).toBeInTheDocument();
       } else {
         expect(await screen.findByRole('heading', { level: 1, name: heading })).toBeInTheDocument();
       }
@@ -883,6 +890,10 @@ describe('Route pages smoke — accessibility (axe, WCAG 2.1 A/AA)', () => {
         await waitFor(() => {
           expect(screen.getByRole('heading', { name: /fleet summary/i })).toBeInTheDocument();
         });
+      } else if (match === 'heading-text') {
+        // See the matching comment in the "renders primary content" describe block above:
+        // these pages delegate their <h1> to ShellRouteTab, which isn't mounted here.
+        await screen.findByText(heading);
       } else {
         await screen.findByRole('heading', { level: 1, name: heading });
       }
@@ -970,6 +981,13 @@ describe('Route pages smoke — compact viewport (no crash)', () => {
         await waitFor(() => {
           expect(screen.getByRole('heading', { name: /fleet summary/i })).toBeInTheDocument();
         });
+      } else if (match === 'heading-text') {
+        // These pages (PlatformGovernanceWorkspace) register their title into the
+        // shell chrome (useRouteChromeRegistration) rather than rendering their own
+        // <h1> -- correct in the real app (ShellRouteTab provides the one real h1),
+        // but this harness renders the page alone with no ShellRouteTab ancestor, so
+        // there is no heading-role element to find here. Text-match instead (HEAL-169).
+        expect(await screen.findByText(heading)).toBeInTheDocument();
       } else {
         expect(await screen.findByRole('heading', { level: 1, name: heading })).toBeInTheDocument();
       }
