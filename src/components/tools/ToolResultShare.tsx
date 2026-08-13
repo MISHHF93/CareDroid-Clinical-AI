@@ -101,8 +101,10 @@ const ToolResultShare = ({ toolName, toolId, results, onClose }) => {
         exportedAt: new Date().toLocaleString(),
       };
 
+      let downloaded: { filename?: string; mimeType?: string } | undefined;
+
       if (selectedFormat === 'json') {
-        exportService.downloadFile(
+        downloaded = exportService.downloadFile(
           JSON.stringify(exportData, null, 2),
           `${filename}.json`,
           'application/json',
@@ -114,16 +116,24 @@ const ToolResultShare = ({ toolName, toolId, results, onClose }) => {
           : Object.entries(results).map(([key, value]) => ({ key, value }));
 
         const csv = exportService.convertToCSV(csvData);
-        exportService.downloadFile(csv, `${filename}.csv`, 'text/csv');
+        downloaded = exportService.downloadFile(csv, `${filename}.csv`, 'text/csv');
       } else if (selectedFormat === 'pdf') {
-        await exportService.exportToPDF(exportData, `${filename}.pdf`, {
+        downloaded = await exportService.exportToPDF(exportData, `${filename}.pdf`, {
           title: `${toolName} Results`,
           includeCharts: true,
         });
       }
 
+      // exportToPDF() silently falls back to a JSON download when the backend
+      // exportsPdf capability is disabled -- report what was actually
+      // downloaded (from the real filename/mimeType it returns), not what the
+      // user selected, so "exported as PDF" is never shown for a JSON file.
+      const actualFormat = downloaded?.filename?.split('.').pop()?.toUpperCase() || selectedFormat.toUpperCase();
       setFeedback({
-        text: `Results exported as ${selectedFormat.toUpperCase()}.`,
+        text:
+          actualFormat === selectedFormat.toUpperCase()
+            ? `Results exported as ${actualFormat}.`
+            : `PDF export isn't available yet -- downloaded as ${actualFormat} instead.`,
         variant: 'success',
       });
       setTimeout(() => {
