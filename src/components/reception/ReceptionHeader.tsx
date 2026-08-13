@@ -120,18 +120,21 @@ export function ReceptionHeaderActionButton({
   primary = false,
   icon,
   title,
+  disabled = false,
 }: {
   children: ReactNode;
   onClick: () => void;
   primary?: boolean;
   icon?: ReactNode;
   title?: string;
+  disabled?: boolean;
 }) {
   return (
     <button
       type="button"
       className={`reception-header__action-btn${primary ? ' reception-header__action-btn--primary' : ''}`}
       onClick={onClick}
+      disabled={disabled}
       title={title}
       aria-label={typeof children === 'string' ? children : title}
     >

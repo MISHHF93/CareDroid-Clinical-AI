@@ -72,4 +72,24 @@ describe('Reception front door wiring', () => {
     expect(appSource).toContain('getReceptionEmbeddedIntakePath');
     expect(appSource).toContain('<ReceptionWorkspace />');
   });
+
+  it('HEAL-162: guards the crash/unknown pathway against duplicate-patient double-submit', () => {
+    // completeProvisionalIntake() creates a patient record synchronously, before
+    // any await -- a plain double-click on the un-guarded button used to create
+    // two duplicate unknown-patient records. The guard must be a ref (checked and
+    // set before the synchronous create call), not just the submitting state,
+    // since React state updates aren't reflected in the same synchronous
+    // execution that reads them.
+    expect(receptionSource).toContain('provisionalUnknownInFlightRef');
+    expect(receptionSource).toMatch(
+      /if \(provisionalUnknownInFlightRef\.current\) return;\s*\n\s*provisionalUnknownInFlightRef\.current = true;/,
+    );
+    expect(receptionSource).toContain('disabled={provisionalUnknownSubmitting}');
+    const headerSource = readFileSync(
+      join(__dirname, '../../components/reception/ReceptionHeader.tsx'),
+      'utf8',
+    );
+    expect(headerSource).toContain('disabled = false');
+    expect(headerSource).toContain('disabled={disabled}');
+  });
 });

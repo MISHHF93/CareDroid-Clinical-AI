@@ -254,6 +254,8 @@ export default function ReceptionWorkspace() {
   const [aiAssist, setAiAssist] = useState<ReceptionAiIntakeAssist | null>(null);
   const [result, setResult] = useState<ReceptionRouteResult | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [provisionalUnknownSubmitting, setProvisionalUnknownSubmitting] = useState(false);
+  const provisionalUnknownInFlightRef = useRef(false);
   const [now, setNow] = useState(() => Date.now());
   const [activeQueueTab, setActiveQueueTab] = useState<QueueTabId>(() =>
     mapQueueParamToTab(pinnedQueueTab || 'pretriage'),
@@ -715,25 +717,38 @@ export default function ReceptionWorkspace() {
 
   const handleProvisionalUnknown = async () => {
     if (!canCreatePatient) return;
-    const provisional = completeProvisionalIntake(useEmergencyStore.getState(), 'unknown', {
-      actorName: currentUserName,
-    });
-    setShowChooser(false);
-    selectPatient(provisional.patient.id);
-    focusQueueTab('verification');
-    setResult(null);
-    const sync = await syncReceptionPatientToBackend(provisional.patient);
-    if (sync.status === 'failed') {
-      showActionError(
-        'Unknown patient registered locally — backend sync pending',
-        sync.error || 'Local workflow saved. Backend sync is pending.',
-      );
-    } else {
-      showActionSuccess(
-        `${RECEPTION_COPY.chooser.unknown} — ${RECEPTION_COPY.workspace.sentToTriage}${
-          sync.status === 'synced' ? ' Backend record saved.' : ''
-        }`,
-      );
+    // Synchronous ref guard, not just the submitting state: completeProvisionalIntake
+    // below creates a patient record synchronously (no await before it), so a plain
+    // double-click -- the realistic usage pattern for a "crash pathway" button under
+    // time pressure -- would otherwise reliably create two duplicate unknown-patient
+    // records before React re-renders to disable the button.
+    if (provisionalUnknownInFlightRef.current) return;
+    provisionalUnknownInFlightRef.current = true;
+    setProvisionalUnknownSubmitting(true);
+    try {
+      const provisional = completeProvisionalIntake(useEmergencyStore.getState(), 'unknown', {
+        actorName: currentUserName,
+      });
+      setShowChooser(false);
+      selectPatient(provisional.patient.id);
+      focusQueueTab('verification');
+      setResult(null);
+      const sync = await syncReceptionPatientToBackend(provisional.patient);
+      if (sync.status === 'failed') {
+        showActionError(
+          'Unknown patient registered locally — backend sync pending',
+          sync.error || 'Local workflow saved. Backend sync is pending.',
+        );
+      } else {
+        showActionSuccess(
+          `${RECEPTION_COPY.chooser.unknown} — ${RECEPTION_COPY.workspace.sentToTriage}${
+            sync.status === 'synced' ? ' Backend record saved.' : ''
+          }`,
+        );
+      }
+    } finally {
+      provisionalUnknownInFlightRef.current = false;
+      setProvisionalUnknownSubmitting(false);
     }
   };
 
@@ -900,6 +915,7 @@ export default function ReceptionWorkspace() {
                 {(criticalNeeded || liveRedFlags.length >= 2) && canCreatePatient ? (
                   <ReceptionHeaderActionButton
                     onClick={() => void handleProvisionalUnknown()}
+                    disabled={provisionalUnknownSubmitting}
                     title="Crash / unknown pathway — send to nurse without full identity"
                   >
                     Send unknown / crash
