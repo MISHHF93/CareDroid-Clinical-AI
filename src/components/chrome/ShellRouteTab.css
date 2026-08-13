@@ -24,6 +24,37 @@
   flex: 1 1 auto;
 }
 
+.app-chrome-context__breadcrumbs {
+  min-width: 0;
+}
+
+.app-chrome-context__breadcrumbs ol {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  color: var(--app-text-muted, #64748b);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-chrome-context__breadcrumbs li {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-chrome-context__breadcrumbs li:last-child {
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+}
+
 .app-chrome-context__h1 {
   margin: 0;
   color: var(--app-text-primary, #111827);
@@ -72,6 +103,12 @@
     gap: 8px;
     min-height: 0;
     padding-block: 10px;
+  }
+
+  /* Compact width is tight enough already for title + subtitle; drop the breadcrumb trail
+     rather than wrap it onto its own line. */
+  .app-chrome-context__breadcrumbs {
+    display: none;
   }
 
   .app-chrome-context__h1,
