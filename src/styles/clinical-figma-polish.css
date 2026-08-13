@@ -142,13 +142,11 @@
    3. DEPARTMENT STAFF BAR — Team cards
    ───────────────────────────────────────────────────────────────── */
 
-.department-staff-bar {
-  padding: 14px 16px;
-  border-radius: 14px;
-  box-shadow:
-    0 1px 3px rgba(15, 23, 42, 0.04),
-    0 4px 14px rgba(15, 23, 42, 0.07);
-}
+/* HEAL-167 (MB-E17): removed. DepartmentStaffBar.css already defines
+   .department-staff-bar (padding 12px 14px, border-radius 12px, a real
+   1px border, no box-shadow) and wins the live cascade -- both consumers
+   (CommandDashboard.tsx, WhiteboardView.tsx) are part of the same
+   emergency-route lazy chunk this file loads before. */
 
 .department-staff-bar__card {
   width: 220px;
