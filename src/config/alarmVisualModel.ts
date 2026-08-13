@@ -9,7 +9,8 @@
  * 4. Table/list rows: `alarm-row` + `data-alarm` via alarmRowClassNames
  * 5. Inline markers: `alarm-dot` + severity modifier via alarmDotClassNames
  *
- * Severity ladder: critical > warning > info > ok > neutral
+ * Severity ladder: critical > urgent > warning > info > ok > neutral (+ ai, a source tag not
+ * a severity level -- see note below)
  * Visual system CSS: `src/styles/alarm-system.css` (imported in main.tsx)
  *
  * Surfaces already wired:
@@ -17,23 +18,40 @@
  * - OperationalStrip metrics
  * - MetricChip / MetricCard / StatusWidget / StatCard
  *
- * KNOWN DUPLICATE, NOT YET RECONCILED (found 2026-08-12, repo-wide export-collision audit):
- * `src/alarm/types.ts` independently defines its OWN `resolveAlarmSeverity`/`AlarmSeverity`
- * with a different 7-level scale (critical/urgent/warning/info/ok/neutral/ai vs. this file's
- * 5-level critical/warning/info/ok/neutral) -- most concretely, the tone `'high'` maps to
- * `'critical'` HERE but to `'urgent'` THERE. Both files are live, both are imported by 15+
- * real components split roughly evenly between them (PatientCard, ChromeStatusChips,
- * CareDroidPrimitives, AlarmDock, AlarmBanner, AlarmKpi, OperationalStrip, and more). The same
- * tone string can render a different clinical-urgency treatment purely depending on which file
- * a given component happens to import from. This needs a deliberate consolidation decision
- * (which 5-vs-7-level scale wins, and migrating every call site) -- do not merge unilaterally;
- * flagged in docs/architecture/CARE_DROID_MASTER_BACKLOG.md for a dedicated round.
+ * HEAL-177 (2026-08-13) — RECONCILED with `src/alarm/types.ts`. Until this round the two
+ * files independently defined `resolveAlarmSeverity`/`AlarmSeverity` with disagreeing scales
+ * (this file's 5-level critical/warning/info/ok/neutral vs. that file's 7-level
+ * critical/urgent/warning/info/ok/neutral/ai) -- most concretely, the tone `'high'` mapped to
+ * `'critical'` HERE but `'urgent'` THERE, so the same alert rendered a different
+ * clinical-urgency treatment purely depending on which file a component imported from. User
+ * chose the 7-level scale as the platform standard (`urgent` sits between `warning` and
+ * `critical`, giving clinicians a visual distinction "needs prompt attention" is missing when
+ * folded into "needs attention right now"). This file's `AlarmSeverity`/`resolveAlarmSeverity`
+ * now match `src/alarm/types.ts` for every tone both files recognize -- confirmed by fixing 2
+ * real disagreements, not just adding the new tiers: `'high'` now correctly resolves to
+ * `urgent` (was `critical`), and `'live'`/`'operational'` now resolve to `info` (was `ok` --
+ * "a computation is actively running on live data" is not the same claim as "this metric is
+ * healthy/stable", matching `src/alarm/types.ts`'s own treatment). This file keeps its own
+ * broader tone-synonym vocabulary (`red`/`severe`/`elevated`/`orange`/`yellow`/`amber`/
+ * `green`/`good`/`ready`/`online`/`active`/`blue`) since upstream callers here use a wider
+ * variety of tone strings than `alarm/types.ts`'s callers do -- only the SEVERITY each maps to
+ * needed to agree, not the full synonym list.
+ *
+ * `ai` is carried over as a 7th value for full type parity with `alarm/types.ts`, but it is
+ * NOT a severity level -- it marks an alert as recommendation-sourced (deliberately excluded
+ * from `isAlarmingSeverity`/`SEVERITY_RANK`'s ladder ordering, styled in a distinct color so it
+ * never reads as more/less urgent than the real critical/urgent/warning tiers). Splitting `ai`
+ * out into a separate non-severity `source` field on `AlarmItem`/callers is a further, larger
+ * refactor of `src/alarm/types.ts` itself (its own existing consumers assume `ai` is a valid
+ * `AlarmSeverity`) -- correctly deferred rather than attempted in the same round as fixing the
+ * dangerous critical-vs-urgent disagreement.
  */
 
-export type AlarmSeverity = 'critical' | 'warning' | 'info' | 'ok' | 'neutral';
+export type AlarmSeverity = 'critical' | 'urgent' | 'warning' | 'info' | 'ok' | 'neutral' | 'ai';
 
 export type AlarmToneInput =
   | 'critical'
+  | 'urgent'
   | 'warning'
   | 'watch'
   | 'info'
@@ -42,30 +60,31 @@ export type AlarmToneInput =
   | 'neutral'
   | 'danger'
   | 'error'
+  | 'ai'
   | string
   | null
   | undefined;
 
 const SEVERITY_RANK: Record<AlarmSeverity, number> = {
-  critical: 4,
+  critical: 5,
+  urgent: 4,
   warning: 3,
   info: 2,
   ok: 1,
   neutral: 0,
+  // 'ai' is a source tag, not a rung on the urgency ladder -- ranked alongside 'info' so it
+  // never outranks a real severity in a sorted list, but isn't literally 0/neutral either.
+  ai: 2,
 };
 
 /** Normalize any metric/list tone into a platform alarm severity. */
 export function resolveAlarmSeverity(tone: AlarmToneInput): AlarmSeverity {
   const t = String(tone || 'neutral').toLowerCase().trim();
-  if (
-    t === 'critical' ||
-    t === 'danger' ||
-    t === 'error' ||
-    t === 'high' ||
-    t === 'red' ||
-    t === 'severe'
-  ) {
+  if (t === 'critical' || t === 'danger' || t === 'error' || t === 'red' || t === 'severe') {
     return 'critical';
+  }
+  if (t === 'urgent' || t === 'high') {
+    return 'urgent';
   }
   if (
     t === 'warning' ||
@@ -78,7 +97,19 @@ export function resolveAlarmSeverity(tone: AlarmToneInput): AlarmSeverity {
   ) {
     return 'warning';
   }
-  if (t === 'info' || t === 'information' || t === 'notice' || t === 'blue') return 'info';
+  if (
+    t === 'info' ||
+    t === 'information' ||
+    t === 'notice' ||
+    t === 'blue' ||
+    t === 'live' ||
+    t === 'operational'
+  ) {
+    return 'info';
+  }
+  if (t === 'ai' || t === 'ai_assistance' || t === 'copilot' || t === 'recommendation') {
+    return 'ai';
+  }
   if (
     t === 'success' ||
     t === 'stable' ||
@@ -86,7 +117,6 @@ export function resolveAlarmSeverity(tone: AlarmToneInput): AlarmSeverity {
     t === 'healthy' ||
     t === 'green' ||
     t === 'good' ||
-    t === 'live' ||
     t === 'ready' ||
     t === 'online' ||
     t === 'active'
@@ -97,7 +127,7 @@ export function resolveAlarmSeverity(tone: AlarmToneInput): AlarmSeverity {
 }
 
 export function isAlarmingSeverity(severity: AlarmSeverity): boolean {
-  return severity === 'critical' || severity === 'warning';
+  return severity === 'critical' || severity === 'urgent' || severity === 'warning';
 }
 
 export function compareAlarmSeverity(a: AlarmSeverity, b: AlarmSeverity): number {
@@ -107,15 +137,18 @@ export function compareAlarmSeverity(a: AlarmSeverity, b: AlarmSeverity): number
 /** Human phrase for screen readers. */
 export function alarmSeverityAriaLabel(severity: AlarmSeverity): string {
   if (severity === 'critical') return 'Critical alarm';
+  if (severity === 'urgent') return 'Urgent';
   if (severity === 'warning') return 'Warning';
   if (severity === 'info') return 'Information';
   if (severity === 'ok') return 'Stable';
+  if (severity === 'ai') return 'AI recommendation';
   return '';
 }
 
-/** Compact badge text for critical/warning only. */
+/** Compact badge text for critical/urgent/warning only. */
 export function alarmSeverityBadge(severity: AlarmSeverity): string | null {
   if (severity === 'critical') return 'CRIT';
+  if (severity === 'urgent') return 'URGENT';
   if (severity === 'warning') return 'WARN';
   return null;
 }

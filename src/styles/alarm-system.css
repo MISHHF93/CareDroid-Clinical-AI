@@ -10,6 +10,21 @@
   --alarm-critical-border: color-mix(in srgb, #dc2626 55%, #e2e8f0);
   --alarm-critical-text: #991b1b;
 
+  /* Reused verbatim from src/styles/cdl-v2/color.css's already-designed
+     --cdl-urgent-*/--cdl-ai-* tokens (HEAL-177 alarm-severity consolidation)
+     rather than inventing new colors -- keeps this file's palette visually
+     consistent with the canonical src/alarm/types.ts system it now agrees
+     with semantically. */
+  --alarm-urgent: #c2410c;
+  --alarm-urgent-bg: color-mix(in srgb, #ea580c 12%, #ffffff);
+  --alarm-urgent-border: color-mix(in srgb, #ea580c 50%, #e2e8f0);
+  --alarm-urgent-text: #9a3412;
+
+  --alarm-ai: #7c3aed;
+  --alarm-ai-bg: color-mix(in srgb, #8b5cf6 10%, #ffffff);
+  --alarm-ai-border: color-mix(in srgb, #7c3aed 40%, #e2e8f0);
+  --alarm-ai-text: #5b21b6;
+
   /* Badge uses solid warning as bg + white text — #d97706 only hits 3.19:1
      (WCAG AA needs 4.5:1 for 9px badge type). Darken to amber-700. */
   --alarm-warning: #b45309;
@@ -143,6 +158,55 @@
 .alarm-kpi[data-alarm='critical'] .alarm-kpi__badge {
   background: var(--alarm-critical);
   color: #ffffff;
+}
+
+/* Urgent — between warning and critical; alert-worthy but not the pulsing top tier */
+.alarm-kpi--urgent,
+.alarm-kpi[data-alarm='urgent'] {
+  border-color: var(--alarm-urgent-border);
+  background: var(--alarm-urgent-bg);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--alarm-urgent) 16%, transparent);
+}
+
+.alarm-kpi--urgent::before,
+.alarm-kpi[data-alarm='urgent']::before {
+  background: var(--alarm-urgent);
+  width: 4px;
+}
+
+.alarm-kpi--urgent .alarm-kpi__value,
+.alarm-kpi[data-alarm='urgent'] .alarm-kpi__value {
+  color: var(--alarm-urgent-text);
+}
+
+.alarm-kpi--urgent .alarm-kpi__label,
+.alarm-kpi[data-alarm='urgent'] .alarm-kpi__label {
+  color: var(--alarm-urgent-text);
+  font-weight: 700;
+}
+
+.alarm-kpi--urgent .alarm-kpi__badge,
+.alarm-kpi[data-alarm='urgent'] .alarm-kpi__badge {
+  background: var(--alarm-urgent);
+  color: #ffffff;
+}
+
+/* AI — recommendation-sourced, not a severity level; visually distinct (purple) so it never
+   reads as more/less clinically urgent than the critical/urgent/warning ladder. */
+.alarm-kpi--ai,
+.alarm-kpi[data-alarm='ai'] {
+  border-color: var(--alarm-ai-border);
+  background: var(--alarm-ai-bg);
+}
+
+.alarm-kpi--ai::before,
+.alarm-kpi[data-alarm='ai']::before {
+  background: var(--alarm-ai);
+}
+
+.alarm-kpi--ai .alarm-kpi__value,
+.alarm-kpi[data-alarm='ai'] .alarm-kpi__value {
+  color: var(--alarm-ai-text);
 }
 
 /* Warning */
@@ -279,10 +343,22 @@
   box-shadow: inset 3px 0 0 var(--alarm-critical);
 }
 
+.alarm-row--urgent,
+.alarm-row[data-alarm='urgent'] {
+  background: color-mix(in srgb, var(--alarm-urgent) 7%, transparent);
+  box-shadow: inset 3px 0 0 var(--alarm-urgent);
+}
+
 .alarm-row--warning,
 .alarm-row[data-alarm='warning'] {
   background: color-mix(in srgb, var(--alarm-warning) 8%, transparent);
   box-shadow: inset 3px 0 0 var(--alarm-warning);
+}
+
+.alarm-row--ai,
+.alarm-row[data-alarm='ai'] {
+  background: color-mix(in srgb, var(--alarm-ai) 6%, transparent);
+  box-shadow: inset 3px 0 0 var(--alarm-ai);
 }
 
 .alarm-row--info,
@@ -306,6 +382,11 @@
   animation: alarm-dot-pulse 1.4s ease-in-out infinite;
 }
 
+.alarm-dot--urgent {
+  background: var(--alarm-urgent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--alarm-urgent) 24%, transparent);
+}
+
 .alarm-dot--warning {
   background: var(--alarm-warning);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--alarm-warning) 22%, transparent);
@@ -317,6 +398,10 @@
 
 .alarm-dot--ok {
   background: var(--alarm-ok);
+}
+
+.alarm-dot--ai {
+  background: var(--alarm-ai);
 }
 
 @keyframes alarm-dot-pulse {
@@ -356,6 +441,22 @@
   color: var(--alarm-critical-text) !important;
 }
 
+.alarm-surface--urgent,
+.alarm-surface[data-alarm='urgent'] {
+  border-color: var(--alarm-urgent-border) !important;
+  background: var(--alarm-urgent-bg) !important;
+  box-shadow: inset 4px 0 0 var(--alarm-urgent);
+}
+
+.alarm-surface--urgent .cd-metric-card__value,
+.alarm-surface--urgent .cd-status-widget strong,
+.alarm-surface--urgent .cd-stat-card__value,
+.alarm-surface[data-alarm='urgent'] .cd-metric-card__value,
+.alarm-surface[data-alarm='urgent'] .cd-status-widget strong,
+.alarm-surface[data-alarm='urgent'] .cd-stat-card__value {
+  color: var(--alarm-urgent-text) !important;
+}
+
 .alarm-surface--warning,
 .alarm-surface[data-alarm='warning'] {
   border-color: var(--alarm-warning-border) !important;
@@ -370,6 +471,22 @@
 .alarm-surface[data-alarm='warning'] .cd-status-widget strong,
 .alarm-surface[data-alarm='warning'] .cd-stat-card__value {
   color: var(--alarm-warning-text) !important;
+}
+
+.alarm-surface--ai,
+.alarm-surface[data-alarm='ai'] {
+  border-color: var(--alarm-ai-border) !important;
+  background: var(--alarm-ai-bg) !important;
+  box-shadow: inset 3px 0 0 var(--alarm-ai);
+}
+
+.alarm-surface--ai .cd-metric-card__value,
+.alarm-surface--ai .cd-status-widget strong,
+.alarm-surface--ai .cd-stat-card__value,
+.alarm-surface[data-alarm='ai'] .cd-metric-card__value,
+.alarm-surface[data-alarm='ai'] .cd-status-widget strong,
+.alarm-surface[data-alarm='ai'] .cd-stat-card__value {
+  color: var(--alarm-ai-text) !important;
 }
 
 .alarm-surface--info,
@@ -409,6 +526,10 @@
 /* Badge alarming (danger/warning) */
 .alarm-badge--critical {
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--alarm-critical) 35%, transparent);
+}
+
+.alarm-badge--urgent {
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--alarm-urgent) 32%, transparent);
 }
 
 .alarm-badge--warning {

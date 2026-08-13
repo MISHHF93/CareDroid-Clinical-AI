@@ -2,15 +2,20 @@
  * Unified CareDroid alarm contract — single severity + surface vocabulary
  * for dock, banner, rail, toast, KPI, and inline alerts.
  *
- * KNOWN DUPLICATE, NOT YET RECONCILED (found 2026-08-12, repo-wide export-collision audit):
- * `src/config/alarmVisualModel.ts` independently defines its OWN `resolveAlarmSeverity`/
- * `AlarmSeverity` with a different 5-level scale (critical/warning/info/ok/neutral, no
- * urgent/ai tier) -- most concretely, the tone `'high'` maps to `'urgent'` HERE but to
- * `'critical'` THERE. Both files are live, both imported by 15+ real components split
- * roughly evenly between them. The same tone string can render a different clinical-urgency
- * treatment purely depending on which file a given component happens to import from. Needs a
- * deliberate consolidation decision -- do not merge unilaterally; flagged in
- * docs/architecture/CARE_DROID_MASTER_BACKLOG.md for a dedicated round.
+ * HEAL-177 (2026-08-13): `src/config/alarmVisualModel.ts` (the chrome/KPI-strip/metric-card
+ * alarm system) independently defined its own `resolveAlarmSeverity`/`AlarmSeverity` with a
+ * disagreeing 5-level scale until this round -- most concretely, the tone `'high'` mapped to
+ * `'critical'` there but `'urgent'` here, so the same alert rendered a different
+ * clinical-urgency treatment depending on which file a component imported from. That file's
+ * severity resolution now matches this one for every tone both recognize (its own broader
+ * tone-synonym vocabulary is unchanged, only the resulting severity had to agree) and its CSS
+ * (`src/styles/alarm-system.css`) now has real `urgent`/`ai` tiers reusing this design
+ * system's own already-approved `--cdl-urgent-*`/`--cdl-ai-*` color tokens. Still open, lower
+ * risk, correctly deferred: `ai` here is carried as a 7th `AlarmSeverity` value even though
+ * it's really a source tag (recommendation-sourced), not a severity level -- splitting it into
+ * a separate non-severity field on `AlarmItem` and this file's own consumers is a further,
+ * larger refactor of this canonical file, not attempted in the same round as fixing the
+ * critical-vs-urgent disagreement.
  */
 
 export const ALARM_SEVERITIES = [
