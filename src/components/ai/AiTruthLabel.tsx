@@ -297,6 +297,30 @@ export function resourceActivationTruthLabel(): AiTruthLabelInfo {
   };
 }
 
+/**
+ * src/services/receptionIntakeOrchestrator.ts's runReceptionAiIntakeAssist()
+ * (rendered as the "Desk assist" / "reception-command-ai" panel in
+ * UnifiedIntakePanel.tsx) computes a "Confidence NN%" figure from a fixed
+ * arithmetic formula -- `0.72 + redFlags.length * 0.04` (capped at 0.94), or
+ * a flat 0.42 when AI is marked unavailable -- purely off the COUNT of
+ * keyword-matched red flags from detectReceptionRedFlags(). Zero model call,
+ * zero native-ai import, anywhere in the function. Same shape as
+ * resourceActivationTruthLabel() above: the bare "Confidence NN%" framing
+ * reads as measured predictive certainty to reception staff, but the number
+ * is deterministic arithmetic on a rule-match count, not a trained model's
+ * output. The panel's existing safetyNotice field already discloses SCOPE
+ * ("decision support only, cannot assign final triage level") but never
+ * discloses that the confidence number itself is fabricated, not measured.
+ */
+export function receptionAiIntakeAssistTruthLabel(): AiTruthLabelInfo {
+  return {
+    state: 'Manual',
+    sourceContext:
+      'Reception desk assist — red-flag-count arithmetic, not a trained model or measured probability',
+    reviewRequired: true,
+  };
+}
+
 export type AiTruthLabelProps = AiTruthLabelInfo & {
   compact?: boolean;
   className?: string;

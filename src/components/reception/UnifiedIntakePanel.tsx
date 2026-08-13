@@ -14,6 +14,7 @@ import {
   type ReceptionRouteResult,
   type UnifiedIntakePhase,
 } from '../../services/receptionIntakeOrchestrator';
+import { AiTruthLabel, receptionAiIntakeAssistTruthLabel } from '../ai/AiTruthLabel';
 import { RECEPTION_COPY } from './receptionCopy';
 import ReceptionDocumentCapture from './ReceptionDocumentCapture';
 import { recognizeComplaint } from '../../data/clinicalTerminology/recognizeComplaint';
@@ -694,6 +695,7 @@ export default function UnifiedIntakePanel({
 
           {aiAssist ? (
             <div className="reception-command-ai">
+              <AiTruthLabel {...receptionAiIntakeAssistTruthLabel()} compact />
               <div className={`reception-command-ai__urgency reception-command-ai__urgency--${aiAssist.urgencySuggestion}`}>
                 <strong>{aiAssist.urgencySuggestion}</strong>
                 <span>Confidence {Math.round(aiAssist.confidence * 100)}%</span>
