@@ -90,7 +90,7 @@ export function OrganizationDashboard() {
           <Link to="/settings/organization">
             <Button variant="secondary">Organization settings</Button>
           </Link>
-          <Link to="/organization/settings">
+          <Link to={CANONICAL_ROUTES.tenantAdmin}>
             <Button variant="secondary">Tenant engine</Button>
           </Link>
           <Link to="/asset-packs">
