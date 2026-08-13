@@ -1,6 +1,12 @@
 /**
  * @deprecated Legacy MD/RN/PA/Tech permission helpers — use `config/emergencyRolePermissions` or `useSecurityAccess`.
- * Retained for registry documentation only; no production imports.
+ * HEAL-165: "no production imports" was false -- `emergencyRoleForStaff` is
+ * a real, live dependency of `utils/staffManagement.ts` (consumed by
+ * EmsCriticalArrivalPrep.tsx and RoleOperationalSummaryStrip.tsx), confirmed
+ * via repo-wide grep 2026-08-12. Do not delete this file. The other 4
+ * exports (`emergencyRoleForUser`, `emergencyPermissionsForUser`,
+ * `canUseEmergencyAction`, `PERMISSIONS_BY_ROLE`) genuinely have zero
+ * importers and match the original claim.
  */
 import {
   hasEmergencyActionPermission,
