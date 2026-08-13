@@ -49,48 +49,14 @@
   margin-top: var(--cdl-panel-gap, var(--app-layout-panel-gap, 12px));
 }
 
-.reception-command-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 12px 14px;
-  border: 1px solid var(--reception-command-border);
-  border-radius: 8px;
-  background: var(--reception-command-panel);
-  box-shadow: var(--app-elevation-card);
-}
-
-.reception-command-header h1 {
-  margin: 0;
-  font-size: 18px;
-  line-height: 1.2;
-}
-
-.reception-command-header__eyebrow {
-  margin: 0 0 4px;
-  color: var(--reception-command-primary);
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0;
-  text-transform: uppercase;
-}
-
-.reception-command-header__meta,
-.reception-command-header__metrics {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
-}
-
-.reception-command-header__meta {
-  margin-top: 10px;
-  color: var(--reception-command-muted);
-  font-size: 13px;
-}
-
-.reception-command-badge,
+/* HEAL-159: removed .reception-command-header and its __eyebrow/__meta/
+   __metrics descendants, .reception-command-badge, .reception-command-help,
+   and .reception-command-metric--critical -- zero live renders of any of
+   them anywhere in src/**/*.tsx. This was the OLD reception header, before
+   ReceptionHeader.tsx + ReceptionWorkspace.new-header.css replaced it (the
+   "new-header" filename is the tell). .reception-command-chip and
+   .reception-command-chip--critical below are real (ReceptionOperationalRail.tsx,
+   UnifiedIntakePanel.tsx) and were kept. */
 .reception-command-chip {
   display: inline-flex;
   align-items: center;
@@ -112,39 +78,6 @@
     var(--reception-command-critical) 8%,
     var(--reception-command-panel)
   );
-  color: var(--reception-command-critical);
-}
-
-.reception-command-header__metrics {
-  justify-content: flex-end;
-}
-
-.reception-command-header__metrics > div,
-.reception-command-help {
-  min-width: 84px;
-  min-height: 46px;
-  border: 1px solid var(--reception-command-border);
-  border-radius: 8px;
-  background: var(--reception-command-inset);
-  padding: 6px 8px;
-}
-
-.reception-command-header__metrics strong {
-  display: block;
-  font-size: 17px;
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
-}
-
-.reception-command-header__metrics span {
-  display: block;
-  margin-top: 4px;
-  color: var(--reception-command-muted);
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.reception-command-metric--critical strong {
   color: var(--reception-command-critical);
 }
 
@@ -726,8 +659,6 @@
     padding-bottom: 156px;
   }
 
-  .reception-command-header,
-  .reception-command-header__metrics,
   .reception-command-actionbar {
     display: grid;
     grid-template-columns: 1fr;
