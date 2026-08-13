@@ -23,6 +23,58 @@ describe('preArrivalActivationRules', () => {
     expect(alert?.title).toBe('Trauma Team Activation');
   });
 
+  // HEAL-180: chest-pain/stroke pre-arrivals with unstable signs but no trauma mechanism used to
+  // be unconditionally labeled "Trauma Team Activation" and page the trauma team lead instead of
+  // cardiology/stroke.
+  it('routes a hypotensive chest-pain pre-arrival to cardiac-alert, not trauma-team', () => {
+    const input = {
+      ...emptyPreArrivalFormInput(),
+      framework: 'sbar' as const,
+      sbar: {
+        situation: 'Severe chest pain',
+        background: '',
+        assessment: 'Tachycardic, hypotensive',
+        recommendation: '',
+      },
+    };
+    const alert = evaluatePreArrivalFormActivation(input);
+    expect(alert?.type).toBe('cardiac-alert');
+    expect(alert?.title).toBe('Cardiac Alert');
+    expect(alert?.chargeNurseAction).toContain('cardiology');
+  });
+
+  it('routes an altered stroke pre-arrival to stroke-team, not trauma-team', () => {
+    const input = {
+      ...emptyPreArrivalFormInput(),
+      framework: 'sbar' as const,
+      sbar: {
+        situation: 'Possible stroke',
+        background: '',
+        assessment: 'Altered, GCS 13',
+        recommendation: '',
+      },
+    };
+    const alert = evaluatePreArrivalFormActivation(input);
+    expect(alert?.type).toBe('stroke-team');
+    expect(alert?.title).toBe('Stroke Team Activation');
+    expect(alert?.chargeNurseAction).toContain('stroke team');
+  });
+
+  it('still routes to trauma-team when a real trauma mechanism is present, even with a chest-pain complaint', () => {
+    const input = {
+      ...emptyPreArrivalFormInput(),
+      framework: 'mist' as const,
+      mist: {
+        mechanism: 'Car accident',
+        injuries: 'Chest pain',
+        signs: 'Tachycardic, low BP',
+        treatments: 'IV fluids',
+      },
+    };
+    const alert = evaluatePreArrivalFormActivation(input);
+    expect(alert?.type).toBe('trauma-team');
+  });
+
   it('does not activate when mechanism and signs are benign', () => {
     const input = {
       ...emptyPreArrivalFormInput(),

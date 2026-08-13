@@ -118,11 +118,33 @@ export function evaluatePreArrivalActivationRules(
 
   if (!traumaTeamEligible) return null;
 
+  // HEAL-180: this branch fires for any of the 4 criticalComplaint keywords ('chest pain',
+  // 'stroke', 'unresponsive', 'major trauma') paired with unstable signs -- including when
+  // traumaMechanism never matched at all -- yet the alert used to be unconditionally labeled
+  // "Trauma Team Activation" and told the charge nurse to notify the trauma team lead. A
+  // hypotensive chest-pain or altered-mental-status stroke pre-arrival with no trauma mechanism
+  // would page the wrong team. PreArrivalActivationType already had 'stroke-team'/'cardiac-alert'
+  // defined but nothing ever produced them. When a real trauma mechanism matched, this still
+  // stays trauma-team regardless of which complaint keyword also happened to match (a car
+  // accident with chest trauma is still a trauma-team case).
   const now = options.now || new Date();
+  let type: PreArrivalActivationType = 'trauma-team';
+  let title = 'Trauma Team Activation';
+  let chargeNurseAction = 'Review bed capacity and notify trauma team lead for pending bed assignment.';
+  if (!traumaMechanism && criticalComplaint === 'chest pain') {
+    type = 'cardiac-alert';
+    title = 'Cardiac Alert';
+    chargeNurseAction = 'Notify cardiology/cath lab on-call and prepare a monitored bed.';
+  } else if (!traumaMechanism && criticalComplaint === 'stroke') {
+    type = 'stroke-team';
+    title = 'Stroke Team Activation';
+    chargeNurseAction = 'Notify stroke team and prepare for an expedited CT.';
+  }
+
   return {
     id: `pre-arrival-activation-${options.emsArrivalId || now.getTime()}`,
-    type: 'trauma-team',
-    title: 'Trauma Team Activation',
+    type,
+    title,
     summary: [
       traumaMechanism ? `Mechanism: ${context.mechanism || traumaMechanism}` : null,
       unstableSigns ? `Signs: ${context.signs || context.assessment || unstableSigns}` : null,
@@ -130,7 +152,7 @@ export function evaluatePreArrivalActivationRules(
     ]
       .filter(Boolean)
       .join(' · '),
-    chargeNurseAction: 'Review bed capacity and notify trauma team lead for pending bed assignment.',
+    chargeNurseAction,
     severity: 'critical',
     matchedRules,
     emsArrivalId: options.emsArrivalId,
