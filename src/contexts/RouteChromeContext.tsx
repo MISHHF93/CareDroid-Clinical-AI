@@ -64,16 +64,38 @@ export function useRouteChrome() {
  * effects in the same commit, so a navigation clear can never land after the
  * incoming route's registration and silently erase it — which is exactly what
  * happened (timing-dependent) when both ran as passive effects.
+ *
+ * HEAL-185: unlike useRouteChrome() (which intentionally throws for callers like
+ * ShellRouteTab, where a missing provider is a real AppShell wiring bug worth catching hard),
+ * this hook uses useContext directly and no-ops without a provider. It's now called from
+ * CareDroidPage -- a leaf component rendered standalone across ~355 existing unit tests that
+ * predate this hook's use here and don't wrap in RouteChromeProvider. The real app always
+ * mounts the provider once at AppShell's root, so production registration is unaffected; this
+ * only changes behavior for isolated test renders, which correctly get the pre-HEAL-185
+ * (registration-free) behavior instead of crashing.
+ *
+ * Deliberately depends on the individual `setChrome`/`clearChrome` callbacks (stable --
+ * RouteChromeProvider wraps them in useCallback with empty deps), NOT the whole `context`
+ * object -- `context` itself gets a new reference every time setChrome runs (RouteChromeProvider
+ * memoizes it on its own `chrome` state), and this effect calls setChrome, so depending on
+ * `context` directly created a genuine infinite render loop (setChrome -> new context ->
+ * effect deps changed -> effect reruns -> setChrome -> ...), caught via a real
+ * "JavaScript heap out of memory" crash while writing this hook's own test.
  */
-export function useRouteChromeRegistration(chrome: RouteChromeState | null | undefined) {
-  const { setChrome, clearChrome } = useRouteChrome();
+export function useRouteChromeRegistration(chrome: RouteChromeState | null | undefined): boolean {
+  const context = useContext(RouteChromeContext);
+  const setChrome = context?.setChrome;
+  const clearChrome = context?.clearChrome;
 
   useEffect(() => {
+    if (!setChrome || !clearChrome) return undefined;
     if (!chrome) {
       clearChrome();
       return undefined;
     }
     setChrome(chrome);
     return () => clearChrome();
-  }, [chrome, clearChrome, setChrome]);
+  }, [chrome, setChrome, clearChrome]);
+
+  return Boolean(context);
 }

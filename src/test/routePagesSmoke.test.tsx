@@ -820,6 +820,26 @@ function renderRoute(path, Page) {
   );
 }
 
+/**
+ * For 'heading-text' routes: these pages register their title into the shell chrome
+ * (useRouteChromeRegistration) rather than rendering their own <h1> -- correct in the real app
+ * (ShellRouteTab provides the one real h1), but this harness renders the page alone with no
+ * ShellRouteTab ancestor. CareDroidPage-based pages (HEAL-185) always render a real, always-present
+ * plain-text copy of the title (data-testid="cd-page-title-text", not a heading) precisely so the
+ * title is never absent here -- prefer that unambiguous testid when present. A few pages
+ * (protocols, patient-summary-ai, ai-explainability, clinical-audit) also happen to repeat the
+ * exact title text as a content section heading, which makes a bare findByText ambiguous.
+ * PlatformGovernanceWorkspace-style pages (HEAL-169) don't have the testid, so fall back to text.
+ */
+async function findHeadingTextMatch(heading) {
+  const byTestId = screen.queryByTestId('cd-page-title-text');
+  if (byTestId) {
+    expect(byTestId).toHaveTextContent(heading);
+    return byTestId;
+  }
+  return screen.findByText(heading);
+}
+
 describe('Route pages smoke — non-empty render', () => {
   beforeEach(async () => {
     vi.clearAllMocks();
@@ -844,12 +864,7 @@ describe('Route pages smoke — non-empty render', () => {
           expect(screen.getByRole('heading', { name: /fleet summary/i })).toBeInTheDocument();
         });
       } else if (match === 'heading-text') {
-        // These pages (PlatformGovernanceWorkspace) register their title into the
-        // shell chrome (useRouteChromeRegistration) rather than rendering their own
-        // <h1> -- correct in the real app (ShellRouteTab provides the one real h1),
-        // but this harness renders the page alone with no ShellRouteTab ancestor, so
-        // there is no heading-role element to find here. Text-match instead (HEAL-169).
-        expect(await screen.findByText(heading)).toBeInTheDocument();
+        await findHeadingTextMatch(heading);
       } else {
         expect(await screen.findByRole('heading', { level: 1, name: heading })).toBeInTheDocument();
       }
@@ -891,9 +906,7 @@ describe('Route pages smoke — accessibility (axe, WCAG 2.1 A/AA)', () => {
           expect(screen.getByRole('heading', { name: /fleet summary/i })).toBeInTheDocument();
         });
       } else if (match === 'heading-text') {
-        // See the matching comment in the "renders primary content" describe block above:
-        // these pages delegate their <h1> to ShellRouteTab, which isn't mounted here.
-        await screen.findByText(heading);
+        await findHeadingTextMatch(heading);
       } else {
         await screen.findByRole('heading', { level: 1, name: heading });
       }
@@ -943,6 +956,8 @@ describe('Route pages smoke — light and dark theme render', () => {
           await waitFor(() => {
             expect(screen.getByRole('heading', { name: /fleet summary/i })).toBeInTheDocument();
           });
+        } else if (route.match === 'heading-text') {
+          await findHeadingTextMatch(route.heading);
         } else {
           expect(
             await screen.findByRole('heading', { level: 1, name: route.heading })
@@ -982,12 +997,7 @@ describe('Route pages smoke — compact viewport (no crash)', () => {
           expect(screen.getByRole('heading', { name: /fleet summary/i })).toBeInTheDocument();
         });
       } else if (match === 'heading-text') {
-        // These pages (PlatformGovernanceWorkspace) register their title into the
-        // shell chrome (useRouteChromeRegistration) rather than rendering their own
-        // <h1> -- correct in the real app (ShellRouteTab provides the one real h1),
-        // but this harness renders the page alone with no ShellRouteTab ancestor, so
-        // there is no heading-role element to find here. Text-match instead (HEAL-169).
-        expect(await screen.findByText(heading)).toBeInTheDocument();
+        await findHeadingTextMatch(heading);
       } else {
         expect(await screen.findByRole('heading', { level: 1, name: heading })).toBeInTheDocument();
       }
@@ -1023,6 +1033,8 @@ describe('Route pages smoke — requested responsive matrix', () => {
           await waitFor(() => {
             expect(screen.getByRole('heading', { name: /fleet summary/i })).toBeInTheDocument();
           });
+        } else if (route.match === 'heading-text') {
+          await findHeadingTextMatch(route.heading);
         } else {
           expect(
             await screen.findByRole('heading', { level: 1, name: route.heading })

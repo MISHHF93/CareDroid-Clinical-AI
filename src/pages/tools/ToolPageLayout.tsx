@@ -250,6 +250,7 @@ const ToolPageLayout = ({
       description={surfaces.tools.showPageMetaBadges ? tool.description : undefined}
       leadingIcon={<NavIcon icon={getToolIcon(tool.id)} size={28} />}
       actions={headerActions}
+      registerRouteChrome={!embedded}
     >
       {!embedded && surfaces.tools.showPageBreadcrumbs ? (
         <div className="tool-breadcrumb">

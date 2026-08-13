@@ -18,14 +18,19 @@ export const CORE_ROUTE_SMOKE = Object.freeze([
   {
     id: 'executive',
     path: '/executive',
-    match: 'heading',
+    // CareDroidPage-based (HEAL-185): registers its title into the shell chrome instead of
+    // rendering its own <h1>.
+    match: 'heading-text',
     heading: /executive command center/i,
   },
   { id: 'discover', path: '/discover', match: 'heading', heading: /discover caredroid capabilities/i },
   { id: 'workflows', path: '/workflows', match: 'heading', heading: /^workflows$/i },
   { id: 'operations', path: '/operations', match: 'heading', heading: /default operations/i },
-  { id: 'tools-overview', path: '/tools', match: 'heading', heading: /careDroid tool console/i },
-  { id: 'protocols', path: '/protocols', match: 'heading', heading: /protocol and clinical pathway library/i },
+  // CareDroidPage-based (HEAL-185): these register their title into the shell chrome instead of
+  // rendering their own <h1> -- match on text, not heading role (mirrors PlatformGovernanceWorkspace's
+  // established 'heading-text' pattern from HEAL-169).
+  { id: 'tools-overview', path: '/tools', match: 'heading-text', heading: /careDroid tool console/i },
+  { id: 'protocols', path: '/protocols', match: 'heading-text', heading: /protocol and clinical pathway library/i },
   { id: 'research', path: '/research', match: 'heading', heading: /research and evidence hub/i },
   { id: 'documentation', path: '/documentation', match: 'heading', heading: /clinical documentation assistant/i },
   { id: 'knowledge-graph', path: '/knowledge-graph', match: 'heading', heading: /clinical knowledge graph/i },
@@ -67,66 +72,66 @@ export const CORE_ROUTE_SMOKE = Object.freeze([
   {
     id: 'calculators-library-filter',
     path: '/tools/calculators',
-    match: 'heading',
+    match: 'heading-text',
     heading: /careDroid tool console/i,
   },
   {
     id: 'ambient-scribe',
     path: '/tools/ambient-scribe',
-    match: 'heading',
+    match: 'heading-text',
     heading: /ambient clinical scribe/i,
   },
   {
     id: 'calculator-recommender-ai',
     path: '/tools/calculator-recommender',
-    match: 'heading',
+    match: 'heading-text',
     heading: /calculator recommendation ai/i,
   },
   {
     id: 'guideline-rag',
     path: '/tools/guideline-rag',
-    match: 'heading',
+    match: 'heading-text',
     heading: /guideline retrieval \+ evidence engine/i,
   },
   {
     id: 'differential-ai',
     path: '/tools/differential-ai',
-    match: 'heading',
+    match: 'heading-text',
     heading: /differential diagnosis assistant/i,
   },
   {
     id: 'timeline-ai',
     path: '/tools/timeline-ai',
-    match: 'heading',
+    match: 'heading-text',
     heading: /patient timeline ai/i,
   },
   {
     id: 'patient-summary-ai',
     path: '/tools/patient-summary-ai',
-    match: 'heading',
+    match: 'heading-text',
     heading: /patient summary ai/i,
   },
   {
     id: 'order-set-ai',
     path: '/tools/order-set-ai',
-    match: 'heading',
+    match: 'heading-text',
     heading: /intelligent order set assistant/i,
   },
   {
     id: 'ai-explainability',
     path: '/tools/ai-explainability',
-    match: 'heading',
+    match: 'heading-text',
     heading: /ai explainability/i,
   },
   {
     id: 'clinical-audit',
     path: '/tools/clinical-audit',
-    match: 'heading',
+    match: 'heading-text',
     heading: /clinical audit/i,
   },
   { id: 'artifacts', path: '/artifacts', match: 'heading', heading: /caredroid artifacts/i },
   { id: 'memory', path: '/memory', match: 'heading', heading: /memory dashboard/i },
-  { id: 'training', path: '/training', match: 'heading', heading: /ai operations dashboard/i },
+  { id: 'training', path: '/training', match: 'heading-text', heading: /ai operations dashboard/i },
   { id: 'analytics', path: '/analytics', match: 'heading', heading: /platform analytics/i },
   {
     id: 'knowledge-hub',
@@ -265,7 +270,7 @@ export const CORE_ROUTE_SMOKE = Object.freeze([
   {
     id: 'saas-health-enterprise',
     path: '/saas-health',
-    match: 'heading',
+    match: 'heading-text',
     heading: /saas health center/i,
   },
   {

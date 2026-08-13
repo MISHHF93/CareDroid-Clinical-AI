@@ -1,6 +1,7 @@
-import React, { HTMLAttributes, LabelHTMLAttributes, TableHTMLAttributes } from 'react';
+import React, { HTMLAttributes, LabelHTMLAttributes, TableHTMLAttributes, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { CDL_PAGE_ZONES, type CdlPageZoneId } from '../../config/designSystem';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import {
   alarmKpiClassNames,
   alarmSeverityAriaLabel,
@@ -757,6 +758,23 @@ interface OperationalPageTemplateProps extends HTMLAttributes<HTMLDivElement> {
 interface CareDroidPageProps extends HeaderProps, Omit<HTMLAttributes<HTMLElement>, 'title'> {
   zones?: OperationalPageZones;
   showZoneLabels?: boolean;
+  /**
+   * HEAL-185: when true (default), this instance IS the routed page — it registers its
+   * title/subtitle/actions with the shell's single RouteChrome slot (AppShell's ShellRouteTab)
+   * and suppresses its own visible header, so there's exactly one real <h1> per page instead of
+   * 2 (this component's own PageHeader h1 AND ShellRouteTab's shell-level h1 — the same app-wide
+   * a11y bug HEAL-169 already fixed for the 8 PlatformGovernanceWorkspace routes, confirmed via
+   * a fresh audit to still be live on ~36 other pages that route through this component,
+   * directly or via ToolPageLayout.tsx). Set to false ONLY when this instance is embedded as a
+   * sub-component inside another page that is ITSELF the real routed page (verified exhaustively
+   * for every current consumer: ToolPageLayout.tsx passes `!embedded`) -- registering from a
+   * nested instance would clobber the real page's shell title, and unmounting would wipe it via
+   * clearChrome() with no automatic re-registration (RouteChromeReset only fires on pathname
+   * change, and these embeds are query-param-driven). When false, keeps rendering its own
+   * visible header instead of suppressing it, since there's no shell-chrome slot available to
+   * carry the title in that context.
+   */
+  registerRouteChrome?: boolean;
 }
 
 /**
@@ -769,19 +787,70 @@ export function CareDroidPage({
   className = '',
   headerClassName = '',
   contentClassName = '',
+  registerRouteChrome = true,
+  eyebrow,
+  title,
+  titleId,
+  description,
+  subtitle,
+  actions,
+  leadingIcon,
+  suppressHeader: _suppressHeaderIgnored,
   ...shellProps
 }: CareDroidPageProps) {
+  const routeChrome = useMemo(
+    () => (registerRouteChrome ? { title, subtitle: description ?? subtitle, actions } : null),
+    [actions, description, registerRouteChrome, subtitle, title],
+  );
+  // HEAL-185: suppressing the visible header must depend on registration actually SUCCEEDING
+  // (a real RouteChromeProvider being present), not just on the caller requesting it -- outside
+  // a provider (isolated unit tests that predate this hook's use here) useRouteChromeRegistration
+  // silently no-ops, and blindly suppressing anyway would drop the title/actions from the render
+  // tree entirely with nowhere for them to go.
+  const chromeRegistered = useRouteChromeRegistration(routeChrome);
+  const suppressHeader = registerRouteChrome && chromeRegistered;
+  // PageShell's own suppressHeader branch renders a visually-hidden (sr-only) <h1> when given a
+  // `title` -- fine in isolation, but once the shell's REAL h1 (ShellRouteTab) is ALSO carrying
+  // this exact title, that leaves 2 real elements in the accessibility tree with the identical
+  // heading role/name (screen readers would announce "Integration Hub, heading" twice
+  // navigating by headings, and getByRole('heading', {name...}) queries fail on the ambiguity --
+  // caught by canonicalRouteTree.redirects.test.tsx). So `title` is withheld from PageShell here
+  // to suppress that duplicate heading. But dropping the title from the DOM entirely also isn't
+  // safe: it relies on SOME OTHER component actually rendering ShellRouteTab wherever this page
+  // mounts, which doesn't hold for every test harness that provides RouteChromeProvider without
+  // also mounting the shell (caught by routePagesSmoke.test.tsx -- registration "succeeded" by
+  // this hook's own definition, but nothing consumed it, so the title vanished from the render
+  // tree altogether). PlatformGovernanceWorkspace (HEAL-169) already solved exactly this: keep a
+  // real, always-rendered plain-text copy of the title (a <p>, not a heading) regardless of
+  // whether registration/shell-rendering actually happens elsewhere -- mirrored below.
+  const pageShellTitle = suppressHeader ? undefined : title;
+
   return (
-    <PageShell
-      {...shellProps}
-      className={['cd-page-shell', className].filter(Boolean).join(' ')}
-      headerClassName={['cdl-zone cdl-zone--identity', headerClassName].filter(Boolean).join(' ')}
-      contentClassName={['cd-page-shell__content', contentClassName].filter(Boolean).join(' ')}
-    >
-      <OperationalPageTemplate zones={zones} showZoneLabels={showZoneLabels}>
-        {children}
-      </OperationalPageTemplate>
-    </PageShell>
+    <>
+      {suppressHeader && title ? (
+        <p className="sr-only cd-page-shell__title-text" data-testid="cd-page-title-text">
+          {title}
+        </p>
+      ) : null}
+      <PageShell
+        {...shellProps}
+        eyebrow={eyebrow}
+        title={pageShellTitle}
+        titleId={suppressHeader ? undefined : titleId}
+        description={description}
+        subtitle={subtitle}
+        actions={actions}
+        leadingIcon={leadingIcon}
+        suppressHeader={suppressHeader}
+        className={['cd-page-shell', className].filter(Boolean).join(' ')}
+        headerClassName={['cdl-zone cdl-zone--identity', headerClassName].filter(Boolean).join(' ')}
+        contentClassName={['cd-page-shell__content', contentClassName].filter(Boolean).join(' ')}
+      >
+        <OperationalPageTemplate zones={zones} showZoneLabels={showZoneLabels}>
+          {children}
+        </OperationalPageTemplate>
+      </PageShell>
+    </>
   );
 }
 
