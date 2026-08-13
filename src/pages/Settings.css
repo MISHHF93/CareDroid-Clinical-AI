@@ -1,19 +1,17 @@
+/* HEAL-149: display/justify-content/align-items removed -- they fought
+   cdl-unified-application.css's ".settings-page, .platform-settings-page"
+   grid rule (same selector, same specificity, this file loses the cascade
+   since it's a lazy route chunk that loads after the global design-system
+   entry) and assumed a single ".card" direct child that no longer exists;
+   CareDroidPage's real render tree puts PageHeader + .cd-page-shell__content
+   as siblings here, which the grid rule stacks correctly. The ".card" child
+   rule below is dead for the same reason and was removed with it. */
 .settings-page {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
   width: 100%;
   min-width: 0;
   max-width: 100%;
   padding: var(--app-desktop-page-padding, 48px);
   overflow-x: clip;
-  box-sizing: border-box;
-}
-
-.settings-page > .card {
-  width: min(100%, 52rem);
-  min-width: 0;
   box-sizing: border-box;
 }
 
