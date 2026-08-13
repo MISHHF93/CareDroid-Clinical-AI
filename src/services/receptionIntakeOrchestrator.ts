@@ -401,7 +401,27 @@ export function runReceptionAiIntakeAssist(
     urgencySuggestion,
     suggestedPriority,
     nextAction,
-    confidence: options.aiUnavailable ? 0.42 : Math.min(0.94, 0.72 + redFlags.length * 0.04),
+    // HEAL-176: the old formula (0.72 + redFlags.length * 0.04) ignored every
+    // OTHER field this same function already computes -- a completely blank
+    // draft (no complaint, no vitals-adjacent signals) still showed 72%, and
+    // the only thing that ever moved the number was a match against the
+    // fixed ~18-term HIGH_RISK_TERMS/canonical list, in flat +4-point steps.
+    // User-reported: this reads as a real AI confidence score but barely
+    // varies across different real intakes and stays high even with almost
+    // no information captured. Now also factors in missingCriticalFields
+    // (already computed above, previously unused here) -- more captured
+    // safety-relevant fields raises confidence, more gaps lowers it, on top
+    // of the existing red-flag-match signal. Still pure arithmetic on
+    // already-collected form data, not a trained model or measured
+    // probability -- see receptionAiIntakeAssistTruthLabel() in
+    // AiTruthLabel.tsx, unaffected by this change since it never claimed
+    // otherwise.
+    confidence: options.aiUnavailable
+      ? 0.42
+      : Math.max(
+          0.35,
+          Math.min(0.94, 0.6 + redFlags.length * 0.08 - Math.min(0.24, missingCriticalFields.length * 0.04)),
+        ),
     safetyNotice: options.aiUnavailable
       ? 'Desk assist is unavailable. Manual intake fallback is active; clinical staff must review.'
       : mode === 'standard'

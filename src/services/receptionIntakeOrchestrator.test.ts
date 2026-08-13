@@ -158,6 +158,79 @@ describe('receptionIntakeOrchestrator', () => {
     expect(useEmergencyStore.getState().patients).toHaveLength(1);
   });
 
+  describe('runReceptionAiIntakeAssist confidence (HEAL-176)', () => {
+    // Previously a flat `0.72 + redFlags.length * 0.04`: a completely blank
+    // intake showed the same 72% floor as a fully-documented one, and the
+    // number barely moved since it ignored every other field this function
+    // already computes. Now also factors in missingCriticalFields so an
+    // intake with real gaps reads lower, and a complete one reads higher,
+    // independent of red-flag matches.
+    it('gives a low confidence to a near-empty draft with several missing critical fields', () => {
+      const assist = runReceptionAiIntakeAssist(
+        baseDraft({
+          chiefComplaint: '',
+          consciousnessStatus: 'unknown',
+          breathingStatus: 'unknown',
+          visibleDistress: 'unknown',
+          painLevel: '',
+          estimatedAge: '',
+          dob: '',
+        }),
+      );
+
+      expect(assist.missingCriticalFields.length).toBeGreaterThan(0);
+      expect(assist.confidence).toBeLessThan(0.6);
+      expect(assist.confidence).toBeGreaterThanOrEqual(0.35);
+    });
+
+    it('gives a moderate confidence to a fully-documented but low-risk draft', () => {
+      // baseDraft() has a non-empty complaint, no unknown/empty safety fields,
+      // and zero red-flag matches -- standard mode, zero missing fields.
+      const assist = runReceptionAiIntakeAssist(baseDraft());
+
+      expect(assist.missingCriticalFields).toHaveLength(0);
+      expect(assist.redFlags).toHaveLength(0);
+      expect(assist.confidence).toBeCloseTo(0.6, 5);
+    });
+
+    it('raises confidence for each matched red flag, independent of the completeness penalty', () => {
+      const noFlags = runReceptionAiIntakeAssist(baseDraft());
+      const oneFlag = runReceptionAiIntakeAssist(
+        baseDraft({ chiefComplaint: 'Chest pain radiating to left arm', redFlagSymptoms: ['Chest pain'] }),
+      );
+
+      expect(oneFlag.redFlags.length).toBeGreaterThanOrEqual(1);
+      expect(oneFlag.confidence).toBeGreaterThan(noFlags.confidence);
+    });
+
+    it('never exceeds 0.94 or drops below 0.35, and reports the 0.42 manual-fallback value unmodified when AI is unavailable', () => {
+      const heavy = runReceptionAiIntakeAssist(
+        baseDraft({
+          chiefComplaint: 'Unconscious, not breathing, seizure, severe bleeding',
+          consciousnessStatus: 'unresponsive',
+          breathingStatus: 'not-breathing',
+        }),
+      );
+      expect(heavy.confidence).toBeLessThanOrEqual(0.94);
+
+      const empty = runReceptionAiIntakeAssist(
+        baseDraft({
+          chiefComplaint: '',
+          consciousnessStatus: 'unknown',
+          breathingStatus: 'unknown',
+          visibleDistress: 'unknown',
+          painLevel: '',
+          estimatedAge: '',
+          dob: '',
+        }),
+      );
+      expect(empty.confidence).toBeGreaterThanOrEqual(0.35);
+
+      const unavailable = runReceptionAiIntakeAssist(baseDraft(), { aiUnavailable: true });
+      expect(unavailable.confidence).toBe(0.42);
+    });
+  });
+
   it('still routes locally when backend create fails and reports sync failure', async () => {
     createSmartIntakePatient.mockRejectedValueOnce(new Error('Network down'));
     const result = await createPatientAndRouteFromReception(baseDraft(), {
