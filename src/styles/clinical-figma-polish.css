@@ -716,22 +716,16 @@
 }
 
 /* ── 15F. Quick complaint chips ──────────────────────────────────
-   White surfaces with clear selected state. */
-
-.reception-quick-complaints__chip {
-  background: #ffffff !important;
-  border-color: #e2e8f0 !important;
-  border-width: 1px !important;
-  color: #374151 !important;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
-}
-
-.reception-quick-complaints__chip.is-active,
-.reception-quick-complaints__chip:hover {
-  background: #f8fafc !important;
-  border-color: rgba(100, 116, 139, 0.5) !important;
-  color: #475569 !important;
-}
+   HEAL-150 (MB-E3): removed. This file's own header claims it "loads
+   last so all rules are authoritative," but .reception-quick-complaints__chip
+   is only ever rendered by UnifiedIntakePanel.tsx, which is bundled into
+   the lazily-loaded Reception route chunk -- that chunk's own
+   UnifiedIntakePanel.css injects into the document strictly after this
+   file (loaded eagerly at main.tsx's global entry), so at equal
+   !important specificity UnifiedIntakePanel.css's token-based rule was
+   the one actually winning, not this hardcoded-hex one. This rule was
+   dead weight that would also have been a dark-mode regression (no
+   token fallback) had a future refactor ever let it win. */
 
 /* ── 15G. Reception work-queue tabs (inactive state) ─────────────
    White surfaces for all queue tabs. */

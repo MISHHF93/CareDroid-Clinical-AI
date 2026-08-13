@@ -1045,28 +1045,13 @@
   margin-bottom: 10px;
 }
 
-.reception-quick-complaints__chip {
-  background: var(--reception-command-inset);
-  border: 1px solid var(--reception-command-border);
-  border-radius: 999px;
-  color: var(--reception-command-ink);
-  cursor: pointer;
-  font: inherit;
-  font-size: 12px;
-  font-weight: 600;
-  min-height: 30px;
-  padding: 0 12px;
-}
-
-.reception-quick-complaints__chip.is-active,
-.reception-quick-complaints__chip:hover {
-  border-color: color-mix(
-    in srgb,
-    var(--reception-command-primary) 40%,
-    var(--reception-command-border)
-  );
-  background: color-mix(in srgb, var(--reception-command-primary) 10%, #ffffff);
-}
+/* HEAL-150 (MB-E3): the .reception-quick-complaints__chip rules that used
+   to live here were removed -- ReceptionWorkspace.tsx no longer renders its
+   own quick-complaint chips directly, it delegates entirely to
+   UnifiedIntakePanel, which owns the class today (see
+   UnifiedIntakePanel.css). These rules had zero `!important` and zero
+   matching element left in this file's own component, so they could never
+   win or ever apply -- pure dead weight. */
 
 @media (max-width: 1180px) {
   .reception-front-door__body {
