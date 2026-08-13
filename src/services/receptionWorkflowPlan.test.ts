@@ -14,7 +14,6 @@ describe('reception architecture plan execution', () => {
   it('wires duplicate prevention across reception surfaces', () => {
     const reception = read('pages/emergency/ReceptionWorkspace.tsx');
     const smartIntake = read('pages/emergency/SmartIntake.tsx');
-    const quickIntake = read('components/QuickIntake.tsx');
     const verification = read('components/verification/PatientVerificationExperience.tsx');
 
     expect(read('components/reception/UnifiedIntakePanel.tsx')).toContain('Unknown allowed');
@@ -23,7 +22,15 @@ describe('reception architecture plan execution', () => {
     expect(smartIntake).toContain('PatientVerificationExperience');
     expect(smartIntake).toContain('mergeDuplicateCandidates');
     expect(smartIntake).toContain('findDuplicateCandidates');
-    expect(quickIntake).toContain('DuplicateReviewAlert');
+    // QuickIntake.tsx's own reception-variant duplicate-review UI (backed by
+    // DuplicateReviewAlert) was removed in HEAL-131 as dead code -- the
+    // component was rendered exactly once app-wide, always as the
+    // "whiteboard" variant, so that branch (and the DuplicateReviewAlert
+    // component it rendered) was provably unreachable. DuplicateReviewAlert
+    // itself was deleted outright in HEAL-142 after confirming duplicate
+    // review for Reception genuinely lives in ReceptionDuplicateConfirm here
+    // instead, not in QuickIntake.
+    expect(reception).toContain('ReceptionDuplicateConfirm');
     expect(verification).toContain('DuplicateCandidatePanel');
     expect(verification).toContain('IdentityFieldReview');
     expect(verification).toContain('ProvisionalIdentityPanel');
