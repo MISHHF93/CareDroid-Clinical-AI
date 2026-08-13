@@ -5,6 +5,7 @@ import {
   normalizeAiTransparencySnapshot,
 } from '../../services/aiTransparencyModel';
 import { COPILOT_RISK_LAYERS } from '@lib/native-ai';
+import { AiTruthLabel, fromNativeAiSourceState } from '../ai/AiTruthLabel';
 import '../native-ai/native-ai-dashboard-theme.css';
 import './AiTransparencyDashboard.css';
 
@@ -67,6 +68,13 @@ export default function AiTransparencyDashboard({
                 {(trace.specialistDomains ?? []).join(', ') || 'General'} ·{' '}
                 {Math.round((trace.confidence ?? 0) * 100)}%
               </span>
+              <AiTruthLabel
+                {...fromNativeAiSourceState(trace.sourceState, {
+                  sourceContext: `Panel-of-experts routing engine ${trace.routerModelVersion}`,
+                  reviewRequired: true,
+                })}
+                compact
+              />
               {!compact ? (
                 <small>{(trace.keySignals ?? []).join(' · ') || 'No signals recorded'}</small>
               ) : null}
