@@ -113,7 +113,7 @@ const CATALOG: readonly PromptNavigationIntent[] = Object.freeze([
     riskLevel: 'low',
     requiredPermission: 'view_operations',
     requiresApproval: false,
-    path: CANONICAL_ROUTES.emergencySmartIntake,
+    path: CANONICAL_ROUTES.emergencyIntake,
     keywords: ['smart intake', 'intake page', 'standalone intake'],
   },
   {

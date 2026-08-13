@@ -68,6 +68,24 @@ describe('canonical configuration contract', () => {
     expect(routeHealthSource).not.toContain('parseStringArrayConstant');
   });
 
+  it('never gives two CANONICAL_ROUTES keys the same URL (HEAL-144)', () => {
+    // Found live: emergencyWorkspace/emergencyOperations (0 real usages each)
+    // and emergencySmartIntake (1 usage) duplicated emergencyWhiteboard,
+    // emergencyQueues, and emergencyIntake respectively -- dead/near-dead
+    // aliases for the same business concept under a second name, not a
+    // routing bug (both names always agreed on the URL), but exactly the
+    // kind of "multiple names for the same page" drift that misleads anyone
+    // reading the registry as the source of truth for canonical page identity.
+    const valuesByKey = new Map<string, string[]>();
+    for (const [key, value] of Object.entries(CANONICAL_ROUTES)) {
+      const owners = valuesByKey.get(value) || [];
+      owners.push(key);
+      valuesByKey.set(value, owners);
+    }
+    const duplicated = [...valuesByKey.entries()].filter(([, keys]) => keys.length > 1);
+    expect(duplicated).toEqual([]);
+  });
+
   it('keeps canonical route records as the source for generated protected aliases', () => {
     const routeIds = ROUTE_RECORDS.map((route) => route.id);
 
