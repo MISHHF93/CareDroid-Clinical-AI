@@ -44,7 +44,7 @@
   padding: 8px 10px;
   border: 1px solid var(--reception-border, var(--medical-border, #e2e8f0));
   border-radius: var(--reception-radius-md, 9px);
-  background: #ffffff;
+  background: var(--reception-surface-card, var(--medical-surface-card, #ffffff));
   color: var(--medical-ink, #111827);
   cursor: pointer;
   text-align: left;
@@ -52,7 +52,7 @@
 
 .reception-escalation-quick-actions__button:hover:not(:disabled) {
   border-color: var(--app-border-subtle, #cbd5e1);
-  background: #f8fafc;
+  background: var(--medical-surface-muted, #f8fafc);
 }
 
 .reception-escalation-quick-actions__button--critical {
