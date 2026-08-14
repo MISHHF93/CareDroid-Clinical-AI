@@ -150,8 +150,9 @@ export const ROLE_PERMISSION_PRESETS: Record<SaasUserRole, string[]> = Object.fr
 export function normalizeSaasRole(role?: string | null): SaasUserRole {
   if (role && (SAAS_USER_ROLES as readonly string[]).includes(role)) return role as SaasUserRole;
   if (role === 'physician') return 'emergency-physician';
-  if (role === 'admin') return 'hospital-administrator';
+  if (role === 'admin' || role === 'administrator') return 'hospital-administrator';
   if (role === 'nurse') return 'nurse';
+  if (role === 'medical-student' || role === 'medical_student') return 'student';
   if (
     role === 'registration_clerk' ||
     role === 'registration-clerk' ||

@@ -167,7 +167,7 @@ export function OrganizationDashboard() {
 }
 
 export function OrganizationSettings() {
-  const { organization, refreshPlatformContext } = useUserIdentity();
+  const { organization, refreshPlatformContext, refreshIdentity } = useUserIdentity();
   const {
     branding,
     integrations,
@@ -282,7 +282,11 @@ export function OrganizationSettings() {
     if (!selectedRoleProfile) return;
     try {
       await PlatformAssetsApi.setRoleProfile(selectedRoleProfile);
-      await refreshPlatformContext();
+      // refreshIdentity re-fetches the operational profile (saasProfile.role,
+      // effectiveProfile, accessSummary) that drives nav/route access, not just
+      // platformContext.roleProfile -- without it, switching profiles here left
+      // the user's visible nav/permissions stale until a full page reload.
+      await refreshIdentity();
       setStatus('Role profile updated.');
     } catch (error: any) {
       setStatus(error.message);

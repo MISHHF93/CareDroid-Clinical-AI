@@ -15,6 +15,22 @@ describe('normalizeSaasRole', () => {
     expect(normalizeSaasRole('vet')).toBe('veterinarian');
   });
 
+  it('maps the 8-row role_profiles catalog ids that spell differently than SAAS_USER_ROLES (HEAL-198)', () => {
+    // SEED_ROLE_PROFILES (platform-asset-seed.data.ts) seeds a `role_profiles`
+    // id 'administrator' and 'medical-student', which PATCH platform/me/role-profile
+    // and tenant-provisioning.service.ts's defaultRoleProfileId() both persist
+    // straight into user.profile.roleProfileId. Before this alias existed,
+    // normalizeSaasRole('administrator') fell through every branch to the
+    // DEFAULT_SAAS_PROFILE.role fallback ('student'), silently downgrading a
+    // hospital administrator to a student-level saasRole (losing MANAGE_USERS/
+    // VIEW_AUDIT_LOGS/VIEW_GOVERNANCE and landing on the generic student
+    // catalog entry instead of their real command-center workspace).
+    // 'medical-student' happened to already resolve to the same fallback
+    // ('student'), so it was correct only by coincidence.
+    expect(normalizeSaasRole('administrator')).toBe('hospital-administrator');
+    expect(normalizeSaasRole('medical-student')).toBe('student');
+  });
+
   it('falls back to the safe DEFAULT_SAAS_PROFILE.role for unrecognized input', () => {
     expect(normalizeSaasRole('totally-unrecognized-xyz')).toBe(DEFAULT_SAAS_PROFILE.role);
     expect(normalizeSaasRole('')).toBe(DEFAULT_SAAS_PROFILE.role);

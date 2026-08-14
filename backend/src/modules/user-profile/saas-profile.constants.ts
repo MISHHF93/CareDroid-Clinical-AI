@@ -173,8 +173,9 @@ export function normalizeSaasRole(role?: string | null): SaasUserRole {
     return normalized as SaasUserRole;
   }
   if (normalized === 'physician') return 'emergency-physician';
-  if (normalized === 'admin') return 'hospital-administrator';
+  if (normalized === 'admin' || normalized === 'administrator') return 'hospital-administrator';
   if (normalized === 'nurse') return 'nurse';
+  if (normalized === 'medical-student' || normalized === 'medical_student') return 'student';
   if (
     normalized === 'registration_clerk' ||
     normalized === 'registration-clerk' ||
