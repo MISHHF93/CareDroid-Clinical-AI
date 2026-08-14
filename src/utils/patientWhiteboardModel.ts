@@ -1,5 +1,6 @@
 import { PatientState, type Patient, type Staff } from '../types/emergency';
 import { patientFriendlyStateLabel } from './patientFriendlyTerminology';
+import { resolveAssignedCareTeamNames, waitMinutes } from './patientWhiteboardSharedModel';
 
 export type PatientWhiteboardSnapshot = {
   patientFirstName: string;
@@ -11,12 +12,6 @@ export type PatientWhiteboardSnapshot = {
   reassuranceLine: string;
   updatedAt: string;
 };
-
-function waitMinutes(arrivalTime: string): number {
-  const parsed = new Date(arrivalTime).getTime();
-  if (!Number.isFinite(parsed)) return 0;
-  return Math.max(0, Math.round((Date.now() - parsed) / 60000));
-}
 
 function formatWaitTime(minutes: number): string {
   if (minutes <= 5) return 'A short wait';
@@ -60,25 +55,12 @@ function resolveDischargeInstructions(patient: Patient): string[] {
   ];
 }
 
-function careTeamMembers(patient: Patient, staff: Staff[]): string[] {
-  const names: string[] = [];
-  if (patient.assignedStaffId) {
-    const nurse = staff.find((entry) => entry.id === patient.assignedStaffId);
-    if (nurse?.name) names.push(nurse.name);
-  }
-  if (patient.assignedPhysicianId) {
-    const doctor = staff.find((entry) => entry.id === patient.assignedPhysicianId);
-    if (doctor?.name && !names.includes(doctor.name)) names.push(doctor.name);
-  }
-  return names;
-}
-
 export function buildPatientWhiteboardSnapshot(
   patient: Patient,
   staff: Staff[] = [],
 ): PatientWhiteboardSnapshot {
   const wait = waitMinutes(patient.triageTime || patient.arrivalTime);
-  const team = careTeamMembers(patient, staff);
+  const team = resolveAssignedCareTeamNames(patient, staff);
 
   return {
     patientFirstName: patient.firstName || 'friend',

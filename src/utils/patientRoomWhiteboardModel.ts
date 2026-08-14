@@ -3,6 +3,7 @@ import { selectReassessmentTimerForPatient } from '../engine/reassessmentTimerEn
 import { PatientFlag, PatientState, type Patient, type Staff } from '../types/emergency';
 import { deriveWhiteboardOperationalEvents } from './whiteboardOperationalEvents';
 import { patientFriendlyStateLabel, toPatientFriendlyTerm } from './patientFriendlyTerminology';
+import { resolveAssignedCareTeamNames, waitMinutes } from './patientWhiteboardSharedModel';
 
 export type PatientRoomWhiteboardSnapshot = {
   patientName: string;
@@ -15,22 +16,8 @@ export type PatientRoomWhiteboardSnapshot = {
   updatedAt: string;
 };
 
-function waitMinutes(arrivalTime: string): number {
-  const parsed = new Date(arrivalTime).getTime();
-  if (!Number.isFinite(parsed)) return 0;
-  return Math.max(0, Math.round((Date.now() - parsed) / 60000));
-}
-
 function careTeamNames(patient: Patient, staff: Staff[]): string[] {
-  const names: string[] = [];
-  if (patient.assignedStaffId) {
-    const assigned = staff.find((entry) => entry.id === patient.assignedStaffId);
-    if (assigned?.name) names.push(assigned.name);
-  }
-  if (patient.assignedPhysicianId) {
-    const physician = staff.find((entry) => entry.id === patient.assignedPhysicianId);
-    if (physician?.name && !names.includes(physician.name)) names.push(physician.name);
-  }
+  const names = resolveAssignedCareTeamNames(patient, staff);
   return names.length ? names : ['Your emergency care team'];
 }
 
