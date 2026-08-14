@@ -1050,6 +1050,29 @@ export default function PatientDetailPanel() {
           </div>
         ) : null}
 
+        {/* HEAL-189: EMS crew handoff notes and the receiving clinician's closing notes were
+            captured (AmbulanceHandoffChecklist.handoffNotes / HandoffCloseRecord.notes) but never
+            surfaced anywhere on the patient's own chart -- only visible by navigating back to the
+            EMS pipeline/handoff screens the receiving team had already left. */}
+        {selectedPatient.emsArrival?.ambulanceHandoffChecklist?.handoffNotes ||
+        selectedPatient.emsArrival?.handoffClose?.notes ? (
+          <div className="patient-detail-panel__ems-handoff-notes">
+            <strong>EMS handoff notes:</strong>
+            {selectedPatient.emsArrival.ambulanceHandoffChecklist?.handoffNotes ? (
+              <p>{selectedPatient.emsArrival.ambulanceHandoffChecklist.handoffNotes}</p>
+            ) : null}
+            {selectedPatient.emsArrival.handoffClose?.notes ? (
+              <p>
+                Receiving clinician
+                {selectedPatient.emsArrival.handoffClose.closedByStaffName
+                  ? ` (${selectedPatient.emsArrival.handoffClose.closedByStaffName})`
+                  : ''}
+                : {selectedPatient.emsArrival.handoffClose.notes}
+              </p>
+            ) : null}
+          </div>
+        ) : null}
+
         <WhatHappensNextPanel
           patient={selectedPatient}
           referrals={referrals}
@@ -1062,6 +1085,67 @@ export default function PatientDetailPanel() {
         </div>
 
         <PatientCardCopilot patient={selectedPatient} />
+
+        {/* HEAL-191: previously rendered far below (after Journey Timeline, Patient Timeline,
+            Data Quality, Waiting Room Communication, Operational History, and Discussion Panel) --
+            a clinician using the AI triage-assist tool immediately below had to scroll past 6
+            unrelated sections to see the vitals that decision should be grounded in. Moved up next
+            to the triage-acuity decision UI itself; same section, same data, same controls --
+            position only, nothing duplicated or removed. */}
+        <section className="patient-detail-panel__section">
+          <div className="patient-detail-panel__section-header">
+            <h3 className="patient-detail-panel__section-title patient-detail-panel__section-title--flush">Latest Vitals</h3>
+            {vitalsPresentation.visible ? (
+            <FieldButton disabled={!canWriteVitals} onClick={() => setShowVitalsForm((open) => !open)}>Add Vitals</FieldButton>
+            ) : null}
+          </div>
+
+          <div className="patient-detail-vitals-grid">
+            {latestVitalEntries.map(({ label, value, trend }) => (
+              <div key={label} className="patient-detail-vital-tile">
+                <div className="patient-detail-vital-tile__label">{label}</div>
+                <div
+                  className="patient-detail-vital-tile__value"
+                  style={{
+                    color: vitalTone(String(label), typeof value === 'number' ? value : undefined),
+                  }}
+                >
+                  <span>{value ?? '--'}</span>
+                  {trend ? (
+                    <span
+                      aria-label={trend.label}
+                      title={trend.label}
+                      className="patient-detail-vital-tile__trend"
+                      style={{ color: trend.color }}
+                    >
+                      {trend.symbol}
+                    </span>
+                  ) : null}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <VitalsHistoryChart vitals={vitalsHistory} />
+
+          {showVitalsForm && canWriteVitals ? (
+            <form onSubmit={submitVitals} className="patient-detail-vitals-form">
+              {Object.keys(emptyVitalsForm).map((key) => (
+                <input
+                  key={key}
+                  aria-label={key.toUpperCase()}
+                  placeholder={key.toUpperCase()}
+                  value={vitalsForm[key as keyof VitalsForm]}
+                  onChange={(event) => setVitalsForm((form) => ({ ...form, [key]: event.target.value }))}
+                  className="patient-detail-vitals-form__input"
+                />
+              ))}
+              <button type="submit" className="patient-detail-panel__field-btn patient-detail-panel__field-btn--primary patient-detail-vitals-form__submit">
+                Save Vitals
+              </button>
+            </form>
+          ) : null}
+        </section>
 
         {selectedPatient.state === PatientState.Triage ? (
           <div className="patient-detail-panel__header-slot">
@@ -1254,61 +1338,6 @@ export default function PatientDetailPanel() {
 
       <section className="patient-detail-panel__section">
         <PatientDiscussionPanel patientId={selectedPatient.id} />
-      </section>
-
-      <section className="patient-detail-panel__section">
-        <div className="patient-detail-panel__section-header">
-          <h3 className="patient-detail-panel__section-title patient-detail-panel__section-title--flush">Latest Vitals</h3>
-          {vitalsPresentation.visible ? (
-          <FieldButton disabled={!canWriteVitals} onClick={() => setShowVitalsForm((open) => !open)}>Add Vitals</FieldButton>
-          ) : null}
-        </div>
-
-        <div className="patient-detail-vitals-grid">
-          {latestVitalEntries.map(({ label, value, trend }) => (
-            <div key={label} className="patient-detail-vital-tile">
-              <div className="patient-detail-vital-tile__label">{label}</div>
-              <div
-                className="patient-detail-vital-tile__value"
-                style={{
-                  color: vitalTone(String(label), typeof value === 'number' ? value : undefined),
-                }}
-              >
-                <span>{value ?? '--'}</span>
-                {trend ? (
-                  <span
-                    aria-label={trend.label}
-                    title={trend.label}
-                    className="patient-detail-vital-tile__trend"
-                    style={{ color: trend.color }}
-                  >
-                    {trend.symbol}
-                  </span>
-                ) : null}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <VitalsHistoryChart vitals={vitalsHistory} />
-
-        {showVitalsForm && canWriteVitals ? (
-          <form onSubmit={submitVitals} className="patient-detail-vitals-form">
-            {Object.keys(emptyVitalsForm).map((key) => (
-              <input
-                key={key}
-                aria-label={key.toUpperCase()}
-                placeholder={key.toUpperCase()}
-                value={vitalsForm[key as keyof VitalsForm]}
-                onChange={(event) => setVitalsForm((form) => ({ ...form, [key]: event.target.value }))}
-                className="patient-detail-vitals-form__input"
-              />
-            ))}
-            <button type="submit" className="patient-detail-panel__field-btn patient-detail-panel__field-btn--primary patient-detail-vitals-form__submit">
-              Save Vitals
-            </button>
-          </form>
-        ) : null}
       </section>
 
       {upgradeFlowCards.length ? (

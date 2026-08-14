@@ -180,6 +180,11 @@ export function buildHandoffContext({
       flags: patient.flags,
       latestVitals: patient.vitals[0] ?? patient.currentVitals ?? null,
       activeReferrals: referrals.filter((referral) => referral.patientId === patient.id),
+      // HEAL-190: the AI previously only ever saw structured fields (state/priority/flags) for
+      // high-risk patients, never the actual nursing narrative behind them -- a real oncoming
+      // nurse needs the "why", not just the "what." Same recent-notes-only shape already trusted
+      // for AI context in patientJourneyAiDecisionService.ts (last 3, text-or-body).
+      recentNotes: (patient.notes ?? []).slice(-3).map((note) => note.text || note.body).filter(Boolean),
     })),
     pendingActions: [
       ...referrals.filter((referral) => referral.status === 'Sent'),

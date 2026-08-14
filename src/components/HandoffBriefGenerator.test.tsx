@@ -203,6 +203,56 @@ describe('HandoffBriefGenerator', () => {
     expect(context.bottleneck).toMatch(/Orange capacity pressure/i);
   });
 
+  it('includes the last 3 recent notes for each high-risk patient (HEAL-190)', () => {
+    const notedPatients: Patient[] = [
+      makePatient({
+        id: 'p-high-notes',
+        mrn: 'ED-HIGH-NOTES',
+        firstName: 'Avery',
+        lastName: 'Stone',
+        priority: Priority.P2,
+        flags: [PatientFlag.HighRisk],
+        notes: [
+          { id: 'n1', body: 'First note.', createdAt: '2026-06-13T15:01:00.000Z' },
+          { id: 'n2', body: 'Second note.', createdAt: '2026-06-13T15:02:00.000Z' },
+          { id: 'n3', text: 'Third note (uses text field).', createdAt: '2026-06-13T15:03:00.000Z' },
+          { id: 'n4', body: 'Fourth and most recent note.', createdAt: '2026-06-13T15:04:00.000Z' },
+        ],
+      }),
+    ];
+
+    const context = buildHandoffContext({
+      shift,
+      staff,
+      patients: notedPatients,
+      referrals: [],
+      emsUnits,
+      capacity,
+      now: new Date('2026-06-13T16:00:00.000Z'),
+    });
+
+    expect(context.highRiskPatients).toHaveLength(1);
+    expect(context.highRiskPatients[0].recentNotes).toEqual([
+      'Second note.',
+      'Third note (uses text field).',
+      'Fourth and most recent note.',
+    ]);
+  });
+
+  it('gives high-risk patients an empty recentNotes array when they have no notes', () => {
+    const context = buildHandoffContext({
+      shift,
+      staff,
+      patients,
+      referrals,
+      emsUnits,
+      capacity,
+      now: new Date('2026-06-13T16:00:00.000Z'),
+    });
+
+    expect(context.highRiskPatients.every((patient) => patient.recentNotes.length === 0)).toBe(true);
+  });
+
   it('counts characters and words for generated or edited text', () => {
     expect(countBriefText('One two\nthree.')).toEqual({ characters: 14, words: 3 });
     expect(countBriefText('   ')).toEqual({ characters: 3, words: 0 });

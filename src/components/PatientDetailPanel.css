@@ -122,6 +122,21 @@
   color: var(--ed-text-secondary);
 }
 
+.patient-detail-panel__ems-handoff-notes {
+  margin-top: var(--ed-space-3);
+  padding: var(--ed-space-2) var(--ed-space-3);
+  border-radius: var(--ed-radius-md);
+  font-size: var(--ed-type-body);
+  line-height: 1.4;
+  background: var(--component-inner-row-bg, #f1f5f9);
+  border: 1px solid var(--ed-border-subtle);
+  color: var(--ed-text-secondary);
+}
+
+.patient-detail-panel__ems-handoff-notes p {
+  margin: var(--ed-space-1) 0 0;
+}
+
 .patient-detail-panel__orchestration-cluster {
   display: flex;
   flex-direction: column;
