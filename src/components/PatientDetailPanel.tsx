@@ -875,7 +875,17 @@ export default function PatientDetailPanel() {
     return () => document.removeEventListener('open-patient-discharge', openDischargeConfirmation);
   }, [canDischarge, confirmDischargePatient, selectedPatientId]);
 
-  if (!selectedPatient) return null;
+  // HEAL-206: this panel is mounted unconditionally in AppShell.tsx for
+  // every non-kiosk, non-registration route (including /settings, /admin,
+  // /audit) and renders as soon as selectedPatientId is set in the shared
+  // store -- usePhiViewAudit above only logs a phi-access-denied event, it
+  // never blocks rendering. A role that can reach selectedPatientId through
+  // any surface (the command palette / header search fixes above close the
+  // ones found so far) would otherwise see a full patient chart -- vitals,
+  // notes, flags -- with zero gate. Mirrors Header.tsx's canOpenPatients.
+  if (!selectedPatient || !emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyPatients)) {
+    return null;
+  }
 
   const currentStateIndex = patientStateOrder.indexOf(selectedPatient.state);
   const patientVitals: Vitals[] = Array.isArray(selectedPatient.vitals) ? selectedPatient.vitals : [];

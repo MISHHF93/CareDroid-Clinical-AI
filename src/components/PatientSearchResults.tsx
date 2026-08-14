@@ -24,14 +24,18 @@ type PatientSearchResultsProps = {
   backendVerifiedPatientIds?: Set<string>;
   canCreatePatient?: boolean;
   /**
-   * Gates the "Patients" match section (name, MRN, DOB, phone, health card,
-   * chief complaint via formatPatientSearchHint) -- this global header search
-   * previously rendered full patient PHI for every role with no permission
-   * check at all, including roles explicitly documented as having none (e.g.
-   * it_admin: "deliberately excludes... all clinical/PHI-bearing routes").
-   * Defaults to false (fail closed) since this component has exactly one
-   * caller (Header.tsx) and PHI visibility must be an explicit opt-in, not
-   * an accidentally-inherited default.
+   * Gates the "Patients" section (name, MRN, DOB, phone, health card, chief
+   * complaint via formatPatientSearchHint) AND the Encounters/Referrals/EMS/
+   * Queue operational sections (HEAL-206: their hits embed the same
+   * patient-identifying fields -- unifiedOperationalSearch.ts's
+   * searchEncounterHits/searchReferralHits/searchEmsHits/searchQueueHits all
+   * interpolate patient name/MRN/chief complaint into label/hint). This
+   * global header search previously rendered full patient PHI for every
+   * role with no permission check at all, including roles explicitly
+   * documented as having none (e.g. it_admin: "deliberately excludes... all
+   * clinical/PHI-bearing routes"). Defaults to false (fail closed) since
+   * this component has exactly one caller (Header.tsx) and PHI visibility
+   * must be an explicit opt-in, not an accidentally-inherited default.
    */
   canViewPatients?: boolean;
   isReceptionRoute?: boolean;
@@ -102,11 +106,12 @@ export default function PatientSearchResults({
 }: PatientSearchResultsProps) {
   const trimmedQuery = query.trim();
   const visiblePatientResults = canViewPatients ? results : [];
+  const visibleOperationalGroups = canViewPatients ? operationalGroups : undefined;
   const supplementalCount =
-    (operationalGroups?.encounter.length || 0) +
-    (operationalGroups?.referral.length || 0) +
-    (operationalGroups?.ems.length || 0) +
-    (operationalGroups?.queue.length || 0);
+    (visibleOperationalGroups?.encounter.length || 0) +
+    (visibleOperationalGroups?.referral.length || 0) +
+    (visibleOperationalGroups?.ems.length || 0) +
+    (visibleOperationalGroups?.queue.length || 0);
   const hasAnyResults = visiblePatientResults.length > 0 || supplementalCount > 0;
 
   return (
@@ -166,22 +171,22 @@ export default function PatientSearchResults({
 
       <OperationalEntitySection
         title="Encounters"
-        hits={operationalGroups?.encounter || []}
+        hits={visibleOperationalGroups?.encounter || []}
         onOpenOperationalHit={onOpenOperationalHit}
       />
       <OperationalEntitySection
         title="Referrals"
-        hits={operationalGroups?.referral || []}
+        hits={visibleOperationalGroups?.referral || []}
         onOpenOperationalHit={onOpenOperationalHit}
       />
       <OperationalEntitySection
         title="EMS cases"
-        hits={operationalGroups?.ems || []}
+        hits={visibleOperationalGroups?.ems || []}
         onOpenOperationalHit={onOpenOperationalHit}
       />
       <OperationalEntitySection
         title="Queue items"
-        hits={operationalGroups?.queue || []}
+        hits={visibleOperationalGroups?.queue || []}
         onOpenOperationalHit={onOpenOperationalHit}
       />
 

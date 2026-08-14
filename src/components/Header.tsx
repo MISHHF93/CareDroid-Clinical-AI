@@ -171,19 +171,24 @@ export function Header() {
     [canOpenPatients, patientLookupQuery, patients],
   );
 
-  const operationalSearchGroups = useMemo(
-    () =>
-      groupOperationalSearchHits(
-        searchOperationalEntities({
-          query: patientLookupQuery,
-          patients,
-          referrals,
-          emsArrivals,
-          queues,
-        }),
-      ),
-    [emsArrivals, patientLookupQuery, patients, queues, referrals],
-  );
+  const operationalSearchGroups = useMemo(() => {
+    // HEAL-206: encounter/referral/EMS/queue hits embed patient name, MRN,
+    // and chief complaint (unifiedOperationalSearch.ts) -- the same PHI
+    // class HEAL-203 gated for the "Patients" section, but this section was
+    // still being computed and rendered unconditionally.
+    if (!canOpenPatients) {
+      return { patient: [], encounter: [], referral: [], ems: [], queue: [] };
+    }
+    return groupOperationalSearchHits(
+      searchOperationalEntities({
+        query: patientLookupQuery,
+        patients,
+        referrals,
+        emsArrivals,
+        queues,
+      }),
+    );
+  }, [canOpenPatients, emsArrivals, patientLookupQuery, patients, queues, referrals]);
 
   const firstOperationalHit = useMemo(() => {
     const ordered = [

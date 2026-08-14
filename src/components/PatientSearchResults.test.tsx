@@ -64,4 +64,40 @@ describe('PatientSearchResults PHI gate', () => {
     // showing nothing.
     expect(screen.getByText(/no operational matches/i)).toBeInTheDocument();
   });
+
+  it('hides Encounters/Referrals/EMS/Queue hits (also PHI-bearing) when canViewPatients is false (HEAL-206)', () => {
+    const operationalGroups = {
+      patient: [],
+      encounter: [
+        {
+          id: 'enc-1',
+          entityType: 'encounter' as const,
+          label: 'ENC-1',
+          hint: 'Riley Thompson · Assessment · Chest pain',
+        },
+      ],
+      referral: [],
+      ems: [],
+      queue: [
+        {
+          id: 'queue-1',
+          entityType: 'queue' as const,
+          label: 'Waiting · Riley Thompson',
+          hint: 'ED-42 · P2 · Chest pain',
+        },
+      ],
+    };
+
+    renderResults({ operationalGroups });
+    expect(screen.queryByText('ENC-1')).toBeNull();
+    expect(screen.queryByText(/Riley Thompson/)).toBeNull();
+    expect(screen.queryByRole('heading', { name: 'Encounters' })).toBeNull();
+    expect(screen.queryByRole('heading', { name: 'Queue items' })).toBeNull();
+    expect(screen.getByText(/no operational matches/i)).toBeInTheDocument();
+
+    renderResults({ operationalGroups, canViewPatients: true });
+    expect(screen.getByText('ENC-1')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Encounters' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Queue items' })).toBeInTheDocument();
+  });
 });

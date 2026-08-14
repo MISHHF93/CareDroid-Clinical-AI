@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   buildCommandResults,
+  computeGatedPaletteSearchResults,
   createAiAssistCommands,
   isCommandVisibleForEmergencyRole,
   matchAndRankCommands,
@@ -208,6 +209,70 @@ describe('CommandPalette helpers', () => {
         readOnlyRole,
       ),
     ).toBe(false);
+  });
+
+  it('gates patient and operational search results behind canOpenPatients (HEAL-206)', () => {
+    // CommandPalette is mounted for every non-kiosk role and opened by a
+    // global `/` keydown shortcut with no route/permission check of its
+    // own (AppShell.tsx) -- unlike patientResults' previous unconditional
+    // call, this must not leak patient name/MRN/chief complaint (or the
+    // same fields embedded in encounter/referral/EMS/queue hits) to a role
+    // with no patient access, e.g. it_admin.
+    const noPatientAccessRole = {
+      role: 'it_admin',
+      can: () => false,
+      presentAction: () => ({
+        state: 'hidden' as const,
+        visible: false,
+        enabled: false,
+        readOnly: true,
+        permission: null,
+      }),
+      canAccessRoute: () => false,
+      nearestRoute: () => CANONICAL_ROUTES.emergencySettings,
+    };
+
+    const denied = computeGatedPaletteSearchResults({
+      canOpenPatients: false,
+      patients: [patient],
+      query: 'avery',
+      navigate: vi.fn() as unknown as Parameters<typeof computeGatedPaletteSearchResults>[0]['navigate'],
+      referrals: [],
+      emsArrivals: [],
+      queues: [],
+      emergencyRole: noPatientAccessRole,
+      saasRole: 'student',
+    });
+    expect(denied.patientResults).toEqual([]);
+    expect(denied.operationalResults).toEqual([]);
+
+    const allowAllRole = {
+      role: EMERGENCY_ROLE_ID.chargeNurse,
+      can: () => true,
+      presentAction: () => ({
+        state: 'allowed' as const,
+        visible: true,
+        enabled: true,
+        readOnly: false,
+        permission: null,
+      }),
+      canAccessRoute: () => true,
+      nearestRoute: () => CANONICAL_ROUTES.emergencyWhiteboard,
+    };
+
+    const allowed = computeGatedPaletteSearchResults({
+      canOpenPatients: true,
+      patients: [patient],
+      query: 'avery',
+      navigate: vi.fn() as unknown as Parameters<typeof computeGatedPaletteSearchResults>[0]['navigate'],
+      referrals: [],
+      emsArrivals: [],
+      queues: [],
+      emergencyRole: allowAllRole,
+      saasRole: 'nurse',
+    });
+    expect(allowed.patientResults).toHaveLength(1);
+    expect(allowed.patientResults[0]?.label).toContain('Avery Stone');
   });
 });
 

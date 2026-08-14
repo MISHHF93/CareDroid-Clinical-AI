@@ -295,6 +295,56 @@ export function searchOperationalEntitiesForPalette(
     }));
 }
 
+/**
+ * HEAL-206: single, testable gate for both PHI-bearing result sets computed
+ * inside CommandPalette's render. The palette is mounted for every
+ * non-kiosk role (AppShell.tsx) and opened by a global `/` keydown shortcut
+ * with no route/permission check of its own -- unlike patientResults'
+ * previous unconditional call, and operationalResults' previous gate
+ * (shouldLimitOperationalSearchForClerk) which only ever narrows results for
+ * registration_clerk, not roles with zero patient access at all (e.g.
+ * it_admin). searchPatientsByName's label/description embed patient name,
+ * chief complaint, and MRN; searchOperationalEntitiesForPalette's
+ * encounter/referral/EMS/queue hits embed the same fields via
+ * unifiedOperationalSearch.ts.
+ */
+export function computeGatedPaletteSearchResults({
+  canOpenPatients,
+  patients,
+  query,
+  navigate,
+  referrals,
+  emsArrivals,
+  queues,
+  emergencyRole,
+  saasRole,
+}: {
+  canOpenPatients: boolean;
+  patients: Patient[];
+  query: string;
+  navigate: NavigateFunction;
+  referrals: import('../types/emergency').Referral[];
+  emsArrivals: import('../types/emergency').EMSArrival[];
+  queues: import('../types/emergency').QueueSummary[];
+  emergencyRole: EmergencyCommandPermissions;
+  saasRole?: string;
+}): { patientResults: PatientResult[]; operationalResults: OperationalEntityResult[] } {
+  const patientResults = canOpenPatients ? searchPatientsByName(patients, query) : [];
+  const operationalResults =
+    !canOpenPatients || shouldLimitOperationalSearchForClerk(emergencyRole.role)
+      ? []
+      : searchOperationalEntitiesForPalette(navigate, {
+          patients,
+          referrals,
+          emsArrivals,
+          queues,
+          query,
+          emergencyRole,
+          saasRole,
+        });
+  return { patientResults, operationalResults };
+}
+
 export function searchPatientsByName(
   patients: Patient[],
   query: string,
@@ -810,6 +860,12 @@ export default function CommandPalette({ open, onClose, onExecute }: CommandPale
   const navigate = useNavigate();
   const emergencyRole = useEmergencyRolePermissions();
   const { saasRole } = useEffectiveUserProfile();
+  // HEAL-206: mirrors Header.tsx's canOpenPatients gate (HEAL-203). The
+  // palette is mounted for every non-kiosk role (AppShell.tsx) and opened by
+  // a global `/` keydown shortcut with no route/permission check of its own,
+  // so patient/operational search hits below must be filtered here rather
+  // than relying on the palette only being reachable by clinical roles.
+  const canOpenPatients = emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyPatients);
   const patients = useEmergencyStore((state) => state.patients);
   const referrals = useEmergencyStore((state) => state.referrals);
   const emsArrivals = useEmergencyStore((state) => state.emsArrivals);
@@ -844,23 +900,34 @@ export default function CommandPalette({ open, onClose, onExecute }: CommandPale
   );
 
   const computedResults = useMemo(() => {
-    const patientResults = searchPatientsByName(patients, query);
-    const operationalResults = shouldLimitOperationalSearchForClerk(emergencyRole.role)
-      ? []
-      : searchOperationalEntitiesForPalette(navigate, {
-          patients,
-          referrals,
-          emsArrivals,
-          queues,
-          query,
-          emergencyRole,
-          saasRole,
-        });
+    const { patientResults, operationalResults } = computeGatedPaletteSearchResults({
+      canOpenPatients,
+      patients,
+      query,
+      navigate,
+      referrals,
+      emsArrivals,
+      queues,
+      emergencyRole,
+      saasRole,
+    });
     const commandResults = buildCommandResults(commands, query, recentCommandIds);
     return normalizeSearch(query)
       ? [...patientResults, ...operationalResults, ...commandResults]
       : commandResults;
-  }, [commands, emsArrivals, emergencyRole, navigate, patients, queues, query, recentCommandIds, referrals, saasRole]);
+  }, [
+    canOpenPatients,
+    commands,
+    emsArrivals,
+    emergencyRole,
+    navigate,
+    patients,
+    queues,
+    query,
+    recentCommandIds,
+    referrals,
+    saasRole,
+  ]);
 
   useEffect(() => {
     setResults(computedResults);
