@@ -3759,6 +3759,16 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
 
     assignRoom: (patientId, roomId) =>
       set((state) => {
+        // HEAL-193: the room a patient is displaced FROM already gets cleared (below), but a
+        // room the assignee is moving INTO, if already occupied by a different patient, silently
+        // takes over that room record while the DISPLACED patient's own patient.roomId was never
+        // cleared to match -- both patients ended up with roomId === the same room, producing two
+        // whiteboard cards visibly claiming the same bed. Rooms already implement "last assignment
+        // wins, previous occupant is bumped" (the room record itself gets overwritten below); this
+        // just makes the patient side of that same transition consistent with it.
+        const displacedPatientId = state.rooms.find(
+          (room) => room.id === roomId && room.patientId && room.patientId !== patientId,
+        )?.patientId;
         const rooms = state.rooms.map((room) => {
           if (room.patientId === patientId) {
             return { ...room, patientId: undefined, status: 'Available' as const };
@@ -3770,28 +3780,32 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
 
           return room;
         });
-        const patients = state.patients.map((patient) =>
-          patient.id === patientId
-            ? {
-                ...patient,
-                roomId,
-                timeline: [
-                  ...patient.timeline,
-                  createPatientTimelineEvent(
-                    patient,
-                    'RoomAssignment',
-                    `Assigned room ${roomId}.`,
-                    {
-                      metadata: {
-                        fromRoomId: patient.roomId || null,
-                        toRoomId: roomId,
-                      },
+        const patients = state.patients.map((patient) => {
+          if (patient.id === patientId) {
+            return {
+              ...patient,
+              roomId,
+              timeline: [
+                ...patient.timeline,
+                createPatientTimelineEvent(
+                  patient,
+                  'RoomAssignment',
+                  `Assigned room ${roomId}.`,
+                  {
+                    metadata: {
+                      fromRoomId: patient.roomId || null,
+                      toRoomId: roomId,
                     },
-                  ),
-                ],
-              }
-            : patient,
-        );
+                  },
+                ),
+              ],
+            };
+          }
+          if (patient.id === displacedPatientId) {
+            return { ...patient, roomId: undefined };
+          }
+          return patient;
+        });
 
         const assignedPatient = patients.find((patient) => patient.id === patientId);
         const fromRoomId = state.patients.find((patient) => patient.id === patientId)?.roomId || null;

@@ -89,4 +89,13 @@ describe('Emergency Whiteboard navigation wiring', () => {
     expect(whiteboardSource).toContain('EMPTY_STATE_COPY.whiteboard');
     expect(whiteboardSource).toContain('Clear filters');
   });
+
+  it('wires the workload-balance panel to a real staff-reassignment trigger for charge nurses (HEAL-194)', () => {
+    expect(whiteboardSource).toContain('<WorkloadBalancePanel');
+    expect(whiteboardSource).toContain('buildWorkloadBalanceEntries');
+    expect(whiteboardSource).toContain('buildWorkloadRebalanceSuggestion');
+    expect(whiteboardSource).toContain('canReassignWorkload');
+    expect(whiteboardSource).toContain('onAssignStaff={assignStaff}');
+    expect(whiteboardSource).toContain("label={workloadRebalanceSuggestion ? `Balance Workload");
+  });
 });

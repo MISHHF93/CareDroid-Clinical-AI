@@ -64,3 +64,27 @@ export function normalizeWhiteboardPatient(patient: Patient): Patient {
     flags: patientFlags(withArrival),
   };
 }
+
+/**
+ * Merges the whiteboard's one-shot fetched payload with live store patients, preferring the
+ * live store record for any patient ID present in both (HEAL-192). The payload is fetched once
+ * on mount and only re-fetched on specific user actions, never on a timer or live update -- every
+ * other charge-nurse-facing surface on the same screen reads live store state directly, so
+ * preferring a frozen payload record here would let a patient's own board card silently stop
+ * reflecting later flag/priority/room/state changes while the rest of the screen kept updating.
+ * Payload-only records (not yet reflected in the store) are still included, appended after the
+ * live ones, so nothing present at load time disappears before the store catches up.
+ */
+export function mergeWhiteboardPatients(
+  storePatients: Patient[],
+  payloadPatients: Patient[] | undefined,
+): Patient[] {
+  if (!payloadPatients?.length) return storePatients.map(normalizeWhiteboardPatient);
+  const storeIds = new Set(storePatients.map((patient) => patient.id));
+  return [
+    ...storePatients.map(normalizeWhiteboardPatient),
+    ...payloadPatients
+      .filter((patient) => !storeIds.has(patient.id))
+      .map(normalizeWhiteboardPatient),
+  ];
+}

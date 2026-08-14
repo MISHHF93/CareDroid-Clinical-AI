@@ -224,3 +224,87 @@ export function buildDepartmentStaffBarSnapshot(input: {
     entries,
   };
 }
+
+export type WorkloadBalanceStaffEntry = Readonly<{
+  id: string;
+  displayName: string;
+  initials: string;
+  roleLabel: string;
+  assignedCount: number;
+  assignedPatients: readonly Patient[];
+  workloadTone: 'red' | 'blue' | 'green';
+  workloadPercent: number;
+}>;
+
+export type WorkloadRebalanceSuggestion = Readonly<{
+  name: string;
+  assignedCount: number;
+  teamAverage: number;
+}>;
+
+function initialsFor(name: string): string {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((part) => part[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
+}
+
+/**
+ * Builds the per-staff workload entries WorkloadBalancePanel needs (HEAL-194) -- reuses this
+ * file's own on-duty-staff resolution and active-patient-assignment logic (the same rules
+ * DepartmentStaffBar already relies on) rather than re-deriving "which patients count against a
+ * staff member's load" a second, possibly-diverging way. workloadTone/workloadPercent reuse the
+ * exact average-relative formula DepartmentPulse's own staff bar chart already uses
+ * (overloaded: count > average*2, underloaded: count < average/2) instead of inventing a new one.
+ */
+export function buildWorkloadBalanceEntries(input: {
+  staff: Staff[];
+  patients: Patient[];
+  activeShift?: ActiveShift | null;
+}): WorkloadBalanceStaffEntry[] {
+  const onDutyStaff = resolveOnDutyStaff(input.staff, input.activeShift);
+  const withCounts = onDutyStaff.map((member) => {
+    const assignedPatients = activePatientsForStaff(member, input.patients);
+    const displayName = staffDisplayName(member);
+    return {
+      id: member.id,
+      displayName,
+      initials: initialsFor(displayName),
+      roleLabel: staffTitle(member),
+      assignedCount: assignedPatients.length,
+      assignedPatients,
+    };
+  });
+
+  const average = withCounts.length
+    ? withCounts.reduce((sum, entry) => sum + entry.assignedCount, 0) / withCounts.length
+    : 0;
+
+  return withCounts.map((entry) => {
+    const overloaded = average > 0 && entry.assignedCount > average * 2;
+    const underloaded = average > 0 && entry.assignedCount < average / 2;
+    return {
+      ...entry,
+      workloadTone: overloaded ? 'red' : underloaded ? 'green' : 'blue',
+      workloadPercent: Math.min(100, Math.round((entry.assignedCount / Math.max(1, average * 2 || 4)) * 100)),
+    };
+  });
+}
+
+/** Names the single most-overloaded on-duty staff member relative to team average, or null if no one is above average. */
+export function buildWorkloadRebalanceSuggestion(
+  entries: readonly WorkloadBalanceStaffEntry[],
+): WorkloadRebalanceSuggestion | null {
+  if (!entries.length) return null;
+  const teamAverage = entries.reduce((sum, entry) => sum + entry.assignedCount, 0) / entries.length;
+  const mostOverloaded = [...entries].sort((a, b) => b.assignedCount - a.assignedCount)[0];
+  if (!mostOverloaded || mostOverloaded.assignedCount <= teamAverage) return null;
+  return {
+    name: mostOverloaded.displayName,
+    assignedCount: mostOverloaded.assignedCount,
+    teamAverage: Math.round(teamAverage * 10) / 10,
+  };
+}

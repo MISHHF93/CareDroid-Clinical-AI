@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { PatientState, Priority, type Patient } from '../types/emergency';
+import { PatientFlag, PatientState, Priority, type Patient } from '../types/emergency';
 import {
   ensurePatientArrivalBlock,
   hydratePatientFromBackendApi,
+  mergeWhiteboardPatients,
   patientArrivalContractViolations,
   serializePatientForBackendApi,
 } from './patientArrivalBackendSync';
@@ -89,5 +90,40 @@ describe('patientArrivalBackendSync', () => {
 
     expect(patient.arrival?.arrivalMode).toBe('referral');
     expect(patientArrivalContractViolations(patient)).toEqual([]);
+  });
+
+  describe('mergeWhiteboardPatients (HEAL-192)', () => {
+    it('prefers the live store record over the frozen payload record for the same patient ID', () => {
+      const payloadPatients = [legacyPatient({ id: 'p1', priority: Priority.P3, flags: [] })];
+      const storePatients = [
+        legacyPatient({ id: 'p1', priority: Priority.P1, flags: [PatientFlag.HighRisk] }),
+      ];
+
+      const merged = mergeWhiteboardPatients(storePatients, payloadPatients);
+
+      expect(merged).toHaveLength(1);
+      expect(merged[0].priority).toBe(Priority.P1);
+      expect(merged[0].flags).toEqual([PatientFlag.HighRisk]);
+    });
+
+    it('still includes a payload-only patient not yet reflected in the store', () => {
+      const payloadPatients = [
+        legacyPatient({ id: 'p1' }),
+        legacyPatient({ id: 'p2', firstName: 'Payload', lastName: 'Only' }),
+      ];
+      const storePatients = [legacyPatient({ id: 'p1' })];
+
+      const merged = mergeWhiteboardPatients(storePatients, payloadPatients);
+
+      expect(merged.map((patient) => patient.id).sort()).toEqual(['p1', 'p2']);
+    });
+
+    it('falls back to store patients alone when there is no payload yet', () => {
+      const storePatients = [legacyPatient({ id: 'p1' }), legacyPatient({ id: 'p2' })];
+
+      const merged = mergeWhiteboardPatients(storePatients, undefined);
+
+      expect(merged.map((patient) => patient.id)).toEqual(['p1', 'p2']);
+    });
   });
 });

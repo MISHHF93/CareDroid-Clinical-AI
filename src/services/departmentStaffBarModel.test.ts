@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { PatientState, Priority, type ActiveShift, type Patient, type Room, type Staff } from '../types/emergency';
-import { buildDepartmentStaffBarSnapshot } from './departmentStaffBarModel';
+import {
+  buildDepartmentStaffBarSnapshot,
+  buildWorkloadBalanceEntries,
+  buildWorkloadRebalanceSuggestion,
+} from './departmentStaffBarModel';
 
 const rooms: Room[] = [
   { id: 'r-resus', name: 'Resus 1', type: 'Resus', status: 'Occupied', patientId: 'p1' },
@@ -121,5 +125,52 @@ describe('departmentStaffBarModel', () => {
     });
 
     expect(snapshot.onDutyCount).toBe(4);
+  });
+});
+
+describe('buildWorkloadBalanceEntries (HEAL-194)', () => {
+  it('builds one entry per on-duty staff member with real assigned-patient counts, excluding off-shift staff', () => {
+    const entries = buildWorkloadBalanceEntries({ staff, patients, activeShift });
+
+    expect(entries).toHaveLength(4);
+    expect(entries.some((entry) => entry.id === 's-off')).toBe(false);
+
+    const physician = entries.find((entry) => entry.id === 's-md');
+    expect(physician?.displayName).toBe('Dr. Priya Nair');
+    expect(physician?.roleLabel).toBe('Attending Physician');
+    expect(physician?.assignedCount).toBe(1);
+    expect(physician?.assignedPatients.map((patient) => patient.id)).toEqual(['p1']);
+    expect(physician?.initials).toBe('DP');
+  });
+
+  it('marks a staff member with zero patients as underloaded relative to the team', () => {
+    const entries = buildWorkloadBalanceEntries({ staff, patients, activeShift });
+
+    const charge = entries.find((entry) => entry.id === 's-charge');
+    expect(charge?.assignedCount).toBe(0);
+    expect(charge?.workloadTone).toBe('green');
+  });
+});
+
+describe('buildWorkloadRebalanceSuggestion (HEAL-194)', () => {
+  it('names the most-overloaded on-duty staff member relative to team average', () => {
+    const entries = buildWorkloadBalanceEntries({ staff, patients, activeShift });
+    const suggestion = buildWorkloadRebalanceSuggestion(entries);
+
+    expect(suggestion).not.toBeNull();
+    expect(suggestion?.assignedCount).toBeGreaterThan(suggestion?.teamAverage ?? Infinity);
+  });
+
+  it('returns null when no one is above the team average (evenly distributed load)', () => {
+    const evenEntries = [
+      { id: 's-a', displayName: 'A', initials: 'A', roleLabel: 'RN', assignedCount: 2, assignedPatients: [], workloadTone: 'blue' as const, workloadPercent: 50 },
+      { id: 's-b', displayName: 'B', initials: 'B', roleLabel: 'RN', assignedCount: 2, assignedPatients: [], workloadTone: 'blue' as const, workloadPercent: 50 },
+    ];
+
+    expect(buildWorkloadRebalanceSuggestion(evenEntries)).toBeNull();
+  });
+
+  it('returns null when there are no on-duty staff at all', () => {
+    expect(buildWorkloadRebalanceSuggestion([])).toBeNull();
   });
 });

@@ -48,6 +48,7 @@ import { EMPTY_STATE_COPY } from '../../config/emptyStateCopy';
 import CapacityCrisisMode from '../../components/CapacityCrisisMode';
 import QueueIntelligencePanel from '../../components/QueueIntelligencePanel';
 import ChargeNurseOperationalStrip from '../../components/whiteboard/ChargeNurseOperationalStrip';
+import WorkloadBalancePanel from '../../components/WorkloadBalancePanel';
 import PhysicianOperationalStrip from '../../components/whiteboard/PhysicianOperationalStrip';
 import RoleOperationalSummaryStrip from '../../components/whiteboard/RoleOperationalSummaryStrip';
 import OperationalHandoffDomainBar from '../../components/whiteboard/OperationalHandoffDomainBar';
@@ -136,7 +137,8 @@ import NativeAiCommandSuitePanel from '../../components/native-ai/NativeAiComman
 import useFeature from '../../hooks/useFeature';
 import { useNativeAiBackendSync } from '../../hooks/useNativeAiBackendSync';
 import { useNativeAiPeriodicRefresh } from '../../hooks/useNativeAiPeriodicRefresh';
-import { normalizeWhiteboardPatient } from '../../services/patientArrivalBackendSync';
+import { mergeWhiteboardPatients } from '../../services/patientArrivalBackendSync';
+import { buildWorkloadBalanceEntries, buildWorkloadRebalanceSuggestion } from '../../services/departmentStaffBarModel';
 import './emergency-whiteboard-cleanup.css';
 
 type FilterId = 'All' | 'Waiting' | 'Assessment' | 'High Risk' | 'EMS' | 'Boarding' | 'Reassess';
@@ -337,6 +339,7 @@ export default function EmergencyWhiteboard() {
   const emsIncomingPatients = useEmergencyStore((state) => state.emsIncomingPatients);
   const staff = useEmergencyStore((state) => state.staff);
   const activeShift = useEmergencyStore((state) => state.activeShift);
+  const assignStaff = useEmergencyStore((state) => state.assignStaff);
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
   const selectedPatientId = useEmergencyStore((state) => state.selectedPatientId);
   const setQueueFilter = useEmergencyStore((state) => state.setQueueFilter);
@@ -385,17 +388,12 @@ export default function EmergencyWhiteboard() {
   const whiteboardGeneratedAt = (
     whiteboard.data as { generatedAt?: string } | null
   )?.generatedAt;
-  const patients = useMemo(() => {
-    const payloadPatients = whiteboardPayload?.patients;
-    if (!payloadPatients?.length) return storePatients.map(normalizeWhiteboardPatient);
-    const payloadIds = new Set(payloadPatients.map((patient) => patient.id));
-    return [
-      ...payloadPatients.map(normalizeWhiteboardPatient),
-      ...storePatients
-        .filter((patient) => !payloadIds.has(patient.id))
-        .map(normalizeWhiteboardPatient),
-    ];
-  }, [storePatients, whiteboardPayload?.patients]);
+  // HEAL-192: sibling of the HEAL-128 capacity fix a few lines below -- see
+  // mergeWhiteboardPatients' own doc comment for the full mechanism.
+  const patients = useMemo(
+    () => mergeWhiteboardPatients(storePatients, whiteboardPayload?.patients),
+    [storePatients, whiteboardPayload?.patients],
+  );
   const upgradeFlowSignals = (
     upgradePatientFlow.data as { data?: { signals?: UpgradeHarnessSignal[] } } | null
   )?.data?.signals || [];
@@ -411,10 +409,24 @@ export default function EmergencyWhiteboard() {
   // Whiteboard's own "Capacity"/"Reassess Due" tiles could silently freeze at the fetch-time
   // value while the command-layer grid kept updating live, on the same screen.
   const capacity = storeCapacity || whiteboardPayload?.capacity;
+  // HEAL-194: WorkloadBalancePanel (staff-assignment rebalancing) was fully built and permission-
+  // gated (EMERGENCY_ACTIONS.reassignWorkload) but never rendered anywhere -- a charge nurse had
+  // no way to reach it and could only reassign patients one at a time via each patient's own
+  // detail drawer. Reuses departmentStaffBarModel's existing on-duty/active-patient resolution
+  // rather than re-deriving "who's on shift, what counts as their active load" a second way.
+  const workloadBalanceEntries = useMemo(
+    () => buildWorkloadBalanceEntries({ staff, patients: storePatients, activeShift }),
+    [staff, storePatients, activeShift],
+  );
+  const workloadRebalanceSuggestion = useMemo(
+    () => buildWorkloadRebalanceSuggestion(workloadBalanceEntries),
+    [workloadBalanceEntries],
+  );
   const [activeFilter, setActiveFilter] = useState<FilterId>('All');
   const [showIntake, setShowIntake] = useState(false);
   const [emsOffloadPanelOpen, setEmsOffloadPanelOpen] = useState(false);
   const [queuePanelCollapsed, setQueuePanelCollapsed] = useState(false);
+  const [workloadPanelOpen, setWorkloadPanelOpen] = useState(false);
 
   const [clockTick, setClockTick] = useState(() => Date.now());
   const createPatientPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.createPatient);
@@ -422,9 +434,11 @@ export default function EmergencyWhiteboard() {
   const convertEmsPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.convertEmsArrival);
   const manageReferralPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.manageReferral);
   const whiteboardMutationPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.transitionPatient);
+  const reassignWorkloadPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.reassignWorkload);
   const canCreatePatient = createPatientPresentation.enabled;
   const canPrepareBay = prepareBayPresentation.enabled;
   const canConvertEmsArrival = convertEmsPresentation.enabled;
+  const canReassignWorkload = reassignWorkloadPresentation.visible;
   const canManageReferral = manageReferralPresentation.enabled;
   const canReviewTriage = triage.canAssignAcuity;
   const canClassifyFitToWait = triage.canClassifyFitToWait;
@@ -2375,6 +2389,15 @@ export default function EmergencyWhiteboard() {
               title={canManageReferral ? 'Open existing referral form' : 'Referral workflow unavailable for this role'}
             />
             ) : null}
+            {canReassignWorkload ? (
+            <MissionButton
+              label={workloadRebalanceSuggestion ? `Balance Workload (${workloadRebalanceSuggestion.name} overloaded)` : 'Balance Workload'}
+              onClick={() => setWorkloadPanelOpen(true)}
+              disabled={!workloadBalanceEntries.length}
+              title={workloadBalanceEntries.length ? 'Review and rebalance on-duty staff patient assignments' : 'No on-duty staff to balance yet'}
+              tone={workloadRebalanceSuggestion ? 'warning' : 'default'}
+            />
+            ) : null}
           </div>
         </div>
 
@@ -2651,6 +2674,21 @@ export default function EmergencyWhiteboard() {
       canUseCentralIntake &&
       !(isReceptionFirstUxEnabled() && prefersReceptionForPatientCreate(emergencyRole.role)) ? (
         <QuickIntake onClose={closeIntake} onAdded={handlePatientAdded} />
+      ) : null}
+
+      {canReassignWorkload ? (
+        <WorkloadBalancePanel
+          open={workloadPanelOpen}
+          activeShift={activeShift}
+          workloads={workloadBalanceEntries}
+          rebalanceSuggestion={workloadRebalanceSuggestion}
+          currentStaffProfile={{
+            id: activeShift?.chargeStaffId || 'charge-nurse',
+            displayName: emergencyRole.roleLabel,
+          }}
+          onClose={() => setWorkloadPanelOpen(false)}
+          onAssignStaff={assignStaff}
+        />
       ) : null}
 
       {whiteboardDensity.surfaces.queueIntelligence.visible &&

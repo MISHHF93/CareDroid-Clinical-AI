@@ -479,6 +479,71 @@ describe('emergencyStore staff reassignment', () => {
   });
 });
 
+describe('emergencyStore room assignment (HEAL-193)', () => {
+  function seedRoomAssignmentFixtures() {
+    seedPt005WalkthroughFixtures();
+    useEmergencyStore.setState((state) => ({
+      ...state,
+      rooms: [
+        ...state.rooms.filter((room) => !['heal193-target', 'heal193-empty'].includes(room.id)),
+        { id: 'heal193-target', name: 'HEAL-193 Target Room', type: 'Treatment', status: 'Occupied', patientId: 'heal193-occupant' },
+        { id: 'heal193-empty', name: 'HEAL-193 Empty Room', type: 'Treatment', status: 'Available' },
+      ],
+      patients: [
+        ...state.patients.filter((patient) => patient.id !== 'heal193-occupant'),
+        {
+          id: 'heal193-occupant',
+          mrn: 'ED-HEAL193',
+          firstName: 'Prior',
+          lastName: 'Occupant',
+          dob: '1980-01-01',
+          age: 46,
+          sex: 'F',
+          arrivalTime: new Date(Date.now() - 40 * 60_000).toISOString(),
+          chiefComplaint: 'Observation',
+          complaintCategory: 'General',
+          state: PatientState.Treatment,
+          priority: Priority.P3,
+          vitals: [],
+          roomId: 'heal193-target',
+          flags: [],
+          timeline: [],
+          notes: [],
+        },
+      ],
+    }) as any);
+  }
+
+  it('clears the displaced patient\'s own roomId when assigned into an already-occupied room', () => {
+    seedRoomAssignmentFixtures();
+    const patientId = 'pt-005';
+
+    useEmergencyStore.getState().assignRoom(patientId, 'heal193-target');
+
+    const state = useEmergencyStore.getState();
+    const movedPatient = state.patients.find((p) => p.id === patientId);
+    const displacedPatient = state.patients.find((p) => p.id === 'heal193-occupant');
+    const targetRoom = state.rooms.find((r) => r.id === 'heal193-target');
+
+    expect(movedPatient?.roomId).toBe('heal193-target');
+    expect(targetRoom?.patientId).toBe(patientId);
+    // The bug: without the fix, displacedPatient.roomId would still read 'heal193-target' too --
+    // 2 patients both claiming the same room on their own records, even though the room itself
+    // only lists one.
+    expect(displacedPatient?.roomId).toBeUndefined();
+  });
+
+  it('does not touch any other patient when the target room was already empty', () => {
+    seedRoomAssignmentFixtures();
+
+    useEmergencyStore.getState().assignRoom('pt-005', 'heal193-empty');
+
+    const state = useEmergencyStore.getState();
+    expect(state.patients.find((p) => p.id === 'pt-005')?.roomId).toBe('heal193-empty');
+    expect(state.patients.find((p) => p.id === 'heal193-occupant')?.roomId).toBe('heal193-target');
+  });
+});
+
 describe('emergencyStore fast referrals', () => {
   it('sends referral from patient record and raises immediate receiving-service alert', () => {
     seedPt005WalkthroughFixtures();
