@@ -308,11 +308,21 @@ export function enrichDemoIdentityFallback(
   if (!isDemoPersonaUser(user)) return fallback;
 
   const profile = (user?.profile as DemoUserRecord) || {};
+  // HEAL-195: role, unlike displayName/specialty/department (deliberately static -- "one identity
+  // across every lane", per this file's own header comment), tracks WHICH lane the persona is
+  // currently viewing, not a fixed attribute of the person -- the same distinction account.role
+  // (a few lines below, in this same function) already correctly makes. Hardcoding this to the
+  // persona's default froze saasProfile.role (and everything useEffectiveUserProfile derives from
+  // it -- profileCopy, accessSummary, personaTitle) to "emergency-physician" regardless of which
+  // of the 8 ED role views was actually switched to, producing visibly self-contradicting profile
+  // labels (e.g. Profile.tsx showing "ED physician..." next to a "Reception job profile" card for
+  // the same session). fallback.saasProfile.role (UserIdentityContext.tsx's buildFallbackProfile)
+  // already computes the correct, dynamic value from user.role -- this just stops clobbering it.
   const saasProfile = {
     ...(fallback.saasProfile as DemoUserRecord),
     displayName: DEMO_PERSONA.displayName,
     email: DEMO_PERSONA.email,
-    role: DEMO_PERSONA.saasRole,
+    role: (fallback.saasProfile as DemoUserRecord)?.role || DEMO_PERSONA.saasRole,
     specialty: DEMO_PERSONA.specialty,
     department: DEMO_PERSONA.department,
     organizationType: 'hospital',

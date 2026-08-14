@@ -71,6 +71,53 @@ describe('demoPersonaModel', () => {
     expect((masked.account as { displayName?: string }).displayName).toBe('Dr. Cara George');
   });
 
+  it('keeps saasProfile.role in sync with the switched ED role view (HEAL-195)', () => {
+    // Regression: saasProfile.role was hardcoded to DEMO_PERSONA.saasRole ('emergency-physician')
+    // for every demo session regardless of which of the 8 ED role views was switched to, while
+    // account.role (computed 2 lines below, in the same function) correctly tracked it -- so
+    // useEffectiveUserProfile()'s profileCopy/accessSummary/personaTitle stayed frozen to
+    // "physician" everywhere, producing visibly self-contradicting profile labels (e.g. Profile.tsx
+    // showing "ED physician..." next to a "Reception job profile" card for the same session).
+    const demoUser = hydrateStoredDemoUser({
+      id: 'open-access-user',
+      authMode: 'open-access',
+      role: EMERGENCY_ROLE_IDS.registrationClerk,
+    });
+    const fallback = {
+      saasProfile: { role: 'registration-clerk' },
+      account: {},
+    };
+
+    const enriched = enrichDemoIdentityFallback(demoUser, fallback);
+
+    expect((enriched.saasProfile as { role?: string }).role).toBe('registration-clerk');
+    expect((enriched.account as { role?: string }).role).toBe(EMERGENCY_ROLE_IDS.registrationClerk);
+  });
+
+  it('falls back to the persona default saasRole when the caller has no role of its own yet', () => {
+    const demoUser = hydrateStoredDemoUser({ id: 'open-access-user', authMode: 'open-access' });
+    const fallback = { saasProfile: {}, account: {} };
+
+    const enriched = enrichDemoIdentityFallback(demoUser, fallback);
+
+    expect((enriched.saasProfile as { role?: string }).role).toBe(DEMO_PERSONA.saasRole);
+  });
+
+  it('still masks displayName/specialty/department to the static persona identity regardless of role', () => {
+    const demoUser = hydrateStoredDemoUser({
+      id: 'open-access-user',
+      authMode: 'open-access',
+      role: EMERGENCY_ROLE_IDS.registrationClerk,
+    });
+    const fallback = { saasProfile: { role: 'registration-clerk', specialty: 'Reception' }, account: {} };
+
+    const enriched = enrichDemoIdentityFallback(demoUser, fallback);
+
+    expect((enriched.saasProfile as { displayName?: string }).displayName).toBe('Dr. Cara George');
+    expect((enriched.saasProfile as { specialty?: string }).specialty).toBe(DEMO_PERSONA.specialty);
+    expect((enriched.saasProfile as { department?: string }).department).toBe(DEMO_PERSONA.department);
+  });
+
   it('leaves a real, non-demo user profile untouched', () => {
     const realUser = { id: 'user-1', role: 'physician' };
     const realProfile = {
