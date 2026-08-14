@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "source": "CareDroid CANONICAL_ROUTE_MAP",
-  "sourceCommit": "737df0fc7f8d74562a2159e787eaf0647149b584",
-  "generatedAt": "2026-08-06T22:53:24.598Z",
+  "sourceCommit": "b104119e8597c600a2afeb6f9bdaf71083559d8f",
+  "generatedAt": "2026-08-14T16:53:15.059Z",
   "records": [
     {
       "id": "command-center",
@@ -64,7 +64,7 @@
       "navigationGroup": "Emergency",
       "breadcrumbs": [
         "Emergency",
-        "Calls"
+        "Dispatch"
       ],
       "aliases": [
         "/emergency/calls"
@@ -119,7 +119,7 @@
       "navigationGroup": "Emergency",
       "breadcrumbs": [
         "Emergency",
-        "Readiness"
+        "ED Readiness"
       ],
       "aliases": [
         "/emergency/readiness"
@@ -192,7 +192,7 @@
       "navigationGroup": "Patients",
       "breadcrumbs": [
         "Patients",
-        "Queue"
+        "Queues"
       ],
       "aliases": [
         "/queue"
@@ -207,7 +207,7 @@
       "label": "Triage",
       "description": "Triage nurse entry point focused on pretriage and acuity workflow.",
       "path": "/triage",
-      "component": "TriageWorkspaceRoute",
+      "component": "QueueRoute",
       "navigationGroup": "Clinical",
       "breadcrumbs": [
         "Clinical",
@@ -222,7 +222,7 @@
     },
     {
       "id": "reassessment",
-      "label": "Reassess",
+      "label": "Reassessment",
       "description": "Reassessment timers and overdue clinical review.",
       "path": "/emergency/reassessment",
       "component": "ReassessmentRoute",
@@ -247,7 +247,7 @@
       "navigationGroup": "Emergency",
       "breadcrumbs": [
         "Emergency",
-        "Alerts"
+        "Critical Alerts"
       ],
       "aliases": [
         "/alerts"
@@ -428,14 +428,14 @@
     },
     {
       "id": "pulse",
-      "label": "Pulse",
+      "label": "Department Pulse",
       "description": "Live ED pulse and status summary.",
       "path": "/emergency/pulse",
       "component": "EmergencyDepartmentPulse",
       "navigationGroup": "Intelligence",
       "breadcrumbs": [
         "Intelligence",
-        "Pulse"
+        "Department Pulse"
       ],
       "aliases": [],
       "workflowOwner": "ED operations",
@@ -459,6 +459,21 @@
       "requiredPermissions": [
         "staff:read"
       ]
+    },
+    {
+      "id": "onboarding",
+      "label": "Organization onboarding",
+      "description": "Create a new CareDroid organization (name, slug, type). Staff, queues, thresholds, alerts, and roles are configured afterward from Tenant admin and Emergency settings.",
+      "path": "/onboarding",
+      "component": "OrganizationOnboarding",
+      "navigationGroup": "Organization",
+      "breadcrumbs": [
+        "Organization",
+        "Onboarding"
+      ],
+      "aliases": [],
+      "workflowOwner": "Site admin",
+      "requiredPermissions": []
     },
     {
       "id": "settings",
