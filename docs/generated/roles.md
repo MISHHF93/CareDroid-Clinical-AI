@@ -52,7 +52,7 @@ Emergency role: physician
 Emergency role: registration_clerk
 
 - **Source:** `emergencyRolePermissions.ts`
-- **Permissions:** `patient.create`, `patient.demographics.edit`, `encounter.create`, `intake.verify`, `ems.convertArrival`, `reception.escalate`, `screen.registration`
+- **Permissions:** `patient.create`, `patient.demographics.edit`, `encounter.create`, `intake.verify`, `ems.convertArrival`, `reception.escalate`, `copilot.use`, `screen.registration`
 
 ### EMS User
 

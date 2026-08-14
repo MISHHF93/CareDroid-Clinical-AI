@@ -102,6 +102,7 @@ import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermission
 import TrackMindRouteGuard from '../components/TrackMindRouteGuard';
 import ProfileRouteGuard from '../components/ProfileRouteGuard';
 import {
+  getEmergencyRoleDefinition,
   getEmergencyRoleHomeRoute,
   getReceptionEmbeddedIntakePath,
 } from '../config/emergencyRolePermissions';
@@ -144,29 +145,126 @@ function LazyRoute({ children, label }) {
 // ── Auth / identity helpers ──────────────────────────────────────────────────
 
 function AuthPathsRedirect() {
-  return <Navigate to={resolveAppStartupRoute()} replace />;
+  // HEAL-207: see resolveEmergencyDefaultRedirectDestination's header --
+  // same reception-first-bypasses-role-access bug as AppStartupRedirect/
+  // EmergencyDefaultRedirect, just reached via a legacy /auth-style alias.
+  const emergencyRole = useEmergencyRolePermissions();
+  const destination = resolveEmergencyDefaultRedirectDestination({
+    receptionFirstDestination: resolveAppStartupRoute(),
+    // canonicalAccess.ts's canAccessRoute() is deliberately broader (it also
+    // grants admin-flagged roles wide route access for API/data-permission
+    // purposes) and returns true for it_admin+Reception even though
+    // EMERGENCY_ROLE_DEFINITIONS.itAdmin.routes -- the same list that
+    // correctly drives it_admin's visible nav (settings/admin/audit/
+    // collaboration/help only, confirmed live) -- excludes it. Check the nav-
+    // authoritative list directly so this redirect agrees with what the role
+    // can actually navigate to, not the broader permission surface.
+    canAccessReception: getEmergencyRoleDefinition(emergencyRole.role).routes.includes(
+      CANONICAL_ROUTES.emergencyReception,
+    ),
+    landingRoute: emergencyRole.landingRoute,
+    defaultRoute: emergencyRole.defaultRoute,
+  });
+  return <Navigate to={destination} replace />;
 }
 
 function AppStartupRedirect() {
   const { saasProfile } = useUserIdentity();
-  const destination = resolveAppStartupRoute({
-    saasRole: saasProfile?.role || saasProfile?.saasRole,
+  const emergencyRole = useEmergencyRolePermissions();
+  // HEAL-207: this is the actual `/` route handler (not EmergencyDefaultRedirect,
+  // which only handles /emergency, /dashboard, /home, /app, /mobile, and the
+  // catch-all) -- it previously called resolveAppStartupRoute() with no
+  // role-awareness at all, so RECEPTION_FIRST_UX's unconditional Reception
+  // default reached every role unfiltered on the app's actual front door.
+  const destination = resolveEmergencyDefaultRedirectDestination({
+    receptionFirstDestination: resolveAppStartupRoute({
+      saasRole: saasProfile?.role || saasProfile?.saasRole,
+    }),
+    // canonicalAccess.ts's canAccessRoute() is deliberately broader (it also
+    // grants admin-flagged roles wide route access for API/data-permission
+    // purposes) and returns true for it_admin+Reception even though
+    // EMERGENCY_ROLE_DEFINITIONS.itAdmin.routes -- the same list that
+    // correctly drives it_admin's visible nav (settings/admin/audit/
+    // collaboration/help only, confirmed live) -- excludes it. Check the nav-
+    // authoritative list directly so this redirect agrees with what the role
+    // can actually navigate to, not the broader permission surface.
+    canAccessReception: getEmergencyRoleDefinition(emergencyRole.role).routes.includes(
+      CANONICAL_ROUTES.emergencyReception,
+    ),
+    landingRoute: emergencyRole.landingRoute,
+    defaultRoute: emergencyRole.defaultRoute,
+    demoDefaultLandingRoute: resolveDemoDefaultLandingRoute(),
+    edApplicationHomeRoute: getEdApplicationHomeRoute(),
   });
   return <Navigate to={destination} replace />;
+}
+
+/**
+ * HEAL-207: RECEPTION_FIRST_UX (receptionFirstUx.config.ts) unconditionally
+ * sends every fresh session to /emergency/reception, regardless of role --
+ * but roles whose own permission model excludes Reception entirely (e.g.
+ * it_admin's EMERGENCY_ROLE_DEFINITIONS.routes: [settings, integrations,
+ * audit, ...], explicitly documented "no patient clinical data") landed
+ * there anyway, with nothing downstream correcting it. Only honor the
+ * reception-first default for roles that can actually access Reception;
+ * otherwise fall through to the role's own correct landing route
+ * (landingRoute, the USER_PROFILE_ROUTE_DEFAULTS-derived table this exact
+ * redirect used to bypass for every non-reception role).
+ */
+export function resolveEmergencyDefaultRedirectDestination({
+  receptionFirstDestination,
+  canAccessReception,
+  landingRoute,
+  defaultRoute,
+  demoDefaultLandingRoute,
+  edApplicationHomeRoute,
+}: {
+  receptionFirstDestination?: string | null;
+  canAccessReception: boolean;
+  landingRoute?: string | null;
+  defaultRoute?: string | null;
+  demoDefaultLandingRoute?: string | null;
+  edApplicationHomeRoute?: string | null;
+}): string {
+  const canUseReceptionFirstDefault =
+    receptionFirstDestination !== CANONICAL_ROUTES.emergencyReception || canAccessReception;
+
+  return (
+    (canUseReceptionFirstDefault ? receptionFirstDestination : null) ||
+    landingRoute ||
+    defaultRoute ||
+    demoDefaultLandingRoute ||
+    edApplicationHomeRoute ||
+    CANONICAL_ROUTES.emergencyWhiteboard
+  );
 }
 
 function EmergencyDefaultRedirect() {
   const { saasProfile } = useUserIdentity();
   const emergencyRole = useEmergencyRolePermissions();
 
-  const destination =
-    resolveAppStartupRoute({
-      saasRole: saasProfile?.role || saasProfile?.saasRole,
-    }) ||
-    emergencyRole.landingRoute ||
-    emergencyRole.defaultRoute ||
-    resolveDemoDefaultLandingRoute() ||
-    getEdApplicationHomeRoute();
+  const receptionFirstDestination = resolveAppStartupRoute({
+    saasRole: saasProfile?.role || saasProfile?.saasRole,
+  });
+
+  const destination = resolveEmergencyDefaultRedirectDestination({
+    receptionFirstDestination,
+    // canonicalAccess.ts's canAccessRoute() is deliberately broader (it also
+    // grants admin-flagged roles wide route access for API/data-permission
+    // purposes) and returns true for it_admin+Reception even though
+    // EMERGENCY_ROLE_DEFINITIONS.itAdmin.routes -- the same list that
+    // correctly drives it_admin's visible nav (settings/admin/audit/
+    // collaboration/help only, confirmed live) -- excludes it. Check the nav-
+    // authoritative list directly so this redirect agrees with what the role
+    // can actually navigate to, not the broader permission surface.
+    canAccessReception: getEmergencyRoleDefinition(emergencyRole.role).routes.includes(
+      CANONICAL_ROUTES.emergencyReception,
+    ),
+    landingRoute: emergencyRole.landingRoute,
+    defaultRoute: emergencyRole.defaultRoute,
+    demoDefaultLandingRoute: resolveDemoDefaultLandingRoute(),
+    edApplicationHomeRoute: getEdApplicationHomeRoute(),
+  });
 
   return <Navigate to={destination} replace />;
 }
