@@ -113,6 +113,14 @@ function createNote(body: string, metadata: Record<string, string>): Note {
   };
 }
 
+/** Splits a free-text "Penicillin, Sulfa drugs" style answer into discrete entries. */
+function splitFreeTextList(text: string | undefined): string[] {
+  return String(text || '')
+    .split(/[,;]/)
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+}
+
 function buildAllergyNote(form: SelfCheckinFormData): Note {
   if (form.noKnownAllergies) {
     return createNote('No known drug allergies reported at self check-in.', {
@@ -187,6 +195,12 @@ export function buildSelfCheckinPatient(
       complaintCategory: 'Self-arrival',
       vitals: [],
       flags: [],
+      // HEAL-188: previously only in buildAllergyNote's prose text -- invisible to every
+      // downstream surface that reads the structured Patient.allergies field instead of notes.
+      // Patient-reported at a kiosk, so still requiresStaffConfirmation (buildAllergyNote's own
+      // note metadata already says so) -- staff confirmation is a triage/nursing verification
+      // step, not a reason to hide the reported allergy from the chart entirely in the meantime.
+      allergies: !form.noKnownAllergies ? splitFreeTextList(form.allergyDetails) : [],
       notes: [buildAllergyNote(form)],
       timeline: [],
       phone: form.phone.trim() || undefined,

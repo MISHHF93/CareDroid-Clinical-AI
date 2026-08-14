@@ -516,6 +516,14 @@ function buildReceptionIntakeNote(
   };
 }
 
+/** Splits a free-text "Penicillin, Sulfa drugs" style answer into discrete entries. */
+function splitFreeTextList(text: string | undefined): string[] {
+  return String(text || '')
+    .split(/[,;]/)
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+}
+
 function buildReceptionPatient(
   draft: ReceptionIntakeDraft,
   aiAssist: ReceptionAiIntakeAssist,
@@ -570,6 +578,16 @@ function buildReceptionPatient(
       priority,
       vitals: [],
       flags,
+      // HEAL-188: previously only ever folded into buildReceptionIntakeNote's prose paragraph
+      // below -- every downstream surface (PatientDetailPanel, AI decision context in
+      // patientJourneyAiDecisionService.ts) reads the structured Patient.allergies/medications
+      // fields, not notes text, so a reception-documented allergy was invisible to every other
+      // clinician who didn't happen to open and read this specific note. Only populated when
+      // the intake actually reported something (allergiesKnown/medicationsKnown === 'yes'),
+      // not on 'no'/'unknown', so an empty array still means "nothing reported yet" the same as
+      // it always has.
+      allergies: draft.allergiesKnown === 'yes' ? splitFreeTextList(draft.allergies) : [],
+      medications: draft.medicationsKnown === 'yes' ? splitFreeTextList(draft.medications) : [],
       notes: [buildReceptionIntakeNote(draft, aiAssist, options.actorName, now)],
       timeline: [],
       phone: String(draft.contactCallback || '').trim() || undefined,

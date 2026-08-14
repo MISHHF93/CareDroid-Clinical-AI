@@ -44,6 +44,19 @@ describe('selfCheckinService', () => {
     expect(patientArrivalContractViolations(result.patient)).toEqual([]);
   });
 
+  it('populates the structured allergies field from free text (HEAL-188)', () => {
+    const result = buildSelfCheckinPatient({
+      ...createEmptySelfCheckinForm(),
+      firstName: 'Alex',
+      lastName: 'Kim',
+      complaint: 'Chest pain',
+      noKnownAllergies: false,
+      allergyDetails: 'Penicillin, Latex ; Shellfish',
+    });
+
+    expect(result.patient.allergies).toEqual(['Penicillin', 'Latex', 'Shellfish']);
+  });
+
   it('records no-known-allergies when selected', () => {
     const result = buildSelfCheckinPatient({
       ...createEmptySelfCheckinForm(),
@@ -55,6 +68,7 @@ describe('selfCheckinService', () => {
     });
 
     expect(result.patient.notes[0]?.body).toMatch(/no known drug allergies/i);
+    expect(result.patient.allergies).toEqual([]);
   });
 
   it('returns unavailable provincial lookup placeholder', async () => {

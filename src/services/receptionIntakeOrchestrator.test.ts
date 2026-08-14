@@ -145,6 +145,51 @@ describe('receptionIntakeOrchestrator', () => {
     expect(result.criticalAlertId).toBeTruthy();
   });
 
+  describe('structured allergies/medications population (HEAL-188)', () => {
+    it('splits reported allergies and medications into arrays when known', async () => {
+      const result = await createPatientAndRouteFromReception(
+        baseDraft({
+          allergiesKnown: 'yes',
+          allergies: 'Penicillin, Latex ; Shellfish',
+          medicationsKnown: 'yes',
+          medications: 'Metformin, Lisinopril',
+        }),
+        { actorName: 'Reception Clerk', now: '2026-08-12T12:00:00.000Z' },
+      );
+
+      const patient = useEmergencyStore.getState().patients.find((entry) => entry.id === result.patientId);
+      expect(patient?.allergies).toEqual(['Penicillin', 'Latex', 'Shellfish']);
+      expect(patient?.medications).toEqual(['Metformin', 'Lisinopril']);
+    });
+
+    it('leaves allergies/medications empty when status is "no" even if free text is stray', async () => {
+      const result = await createPatientAndRouteFromReception(
+        baseDraft({
+          allergiesKnown: 'no',
+          allergies: 'should not appear',
+          medicationsKnown: 'no',
+          medications: 'should not appear either',
+        }),
+        { actorName: 'Reception Clerk', now: '2026-08-12T12:05:00.000Z' },
+      );
+
+      const patient = useEmergencyStore.getState().patients.find((entry) => entry.id === result.patientId);
+      expect(patient?.allergies).toEqual([]);
+      expect(patient?.medications).toEqual([]);
+    });
+
+    it('leaves allergies/medications empty when status is left unknown', async () => {
+      const result = await createPatientAndRouteFromReception(baseDraft(), {
+        actorName: 'Reception Clerk',
+        now: '2026-08-12T12:10:00.000Z',
+      });
+
+      const patient = useEmergencyStore.getState().patients.find((entry) => entry.id === result.patientId);
+      expect(patient?.allergies).toEqual([]);
+      expect(patient?.medications).toEqual([]);
+    });
+  });
+
   it('keeps manual routing available when AI is unavailable', async () => {
     const assist = runReceptionAiIntakeAssist(baseDraft(), { aiUnavailable: true });
     expect(assist.manualFallback).toBe(true);

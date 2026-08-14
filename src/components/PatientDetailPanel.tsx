@@ -1034,6 +1034,22 @@ export default function PatientDetailPanel() {
           />
         </div>
 
+        {/* HEAL-188: allergies/medications previously existed only as free text inside the
+            reception/self-arrival intake note, invisible to any other role opening this same
+            chart -- now reads the structured fields those intake paths populate. Placed right
+            under the header badges (before any other section) since a missed allergy is a
+            direct patient-safety risk, not just a documentation gap. */}
+        {selectedPatient.allergies?.length ? (
+          <div className="patient-detail-panel__allergy-banner" role="alert">
+            <strong>Allergies:</strong> {selectedPatient.allergies.join(', ')}
+          </div>
+        ) : null}
+        {selectedPatient.medications?.length ? (
+          <div className="patient-detail-panel__medications-banner">
+            <strong>Current medications:</strong> {selectedPatient.medications.join(', ')}
+          </div>
+        ) : null}
+
         <WhatHappensNextPanel
           patient={selectedPatient}
           referrals={referrals}

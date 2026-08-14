@@ -101,6 +101,27 @@
   flex-wrap: wrap;
 }
 
+.patient-detail-panel__allergy-banner,
+.patient-detail-panel__medications-banner {
+  margin-top: var(--ed-space-3);
+  padding: var(--ed-space-2) var(--ed-space-3);
+  border-radius: var(--ed-radius-md);
+  font-size: var(--ed-type-body);
+  line-height: 1.4;
+}
+
+.patient-detail-panel__allergy-banner {
+  background: var(--semantic-critical-bg, #fef2f2);
+  border: 1px solid var(--semantic-critical-border, #912018);
+  color: var(--app-danger, #991b1b);
+}
+
+.patient-detail-panel__medications-banner {
+  background: var(--component-inner-row-bg, #f1f5f9);
+  border: 1px solid var(--ed-border-subtle);
+  color: var(--ed-text-secondary);
+}
+
 .patient-detail-panel__orchestration-cluster {
   display: flex;
   flex-direction: column;
