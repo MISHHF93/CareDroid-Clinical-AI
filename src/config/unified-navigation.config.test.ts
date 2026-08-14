@@ -125,7 +125,7 @@ const REQUESTED_ITEMS = [
   },
   {
     id: 'reassessment',
-    label: 'Reassess',
+    label: 'Reassessment',
     icon: 'reassessment',
     route: '/emergency/reassessment',
     featureGate: null,
@@ -216,7 +216,7 @@ const REQUESTED_ITEMS = [
   },
   {
     id: 'pulse',
-    label: 'Pulse',
+    label: 'Department Pulse',
     icon: 'activity',
     route: '/emergency/pulse',
     featureGate: null,

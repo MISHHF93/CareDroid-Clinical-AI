@@ -442,7 +442,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
             'alert',
             `${globalUnreadCount} unread alert${globalUnreadCount === 1 ? '' : 's'}`,
           )}
-          <span className="sidebar-nav-item__label">Alerts</span>
+          <span className="sidebar-nav-item__label">{label}</span>
         </button>
       );
     }

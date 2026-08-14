@@ -29,6 +29,6 @@ describe('SidebarChromeControls', () => {
     expect(screen.queryByText('CareDroid Copilot')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /^Chat$/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('group', { name: /Copilot panels/i })).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Guide/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Help/i })).toBeInTheDocument();
   });
 });

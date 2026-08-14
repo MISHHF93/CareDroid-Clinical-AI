@@ -5,7 +5,7 @@ import { dispatchOpenHelpHub } from '../../contexts/HelpHubContext';
 import './SidebarChromeControls.css';
 
 /**
- * Sidebar session utilities for staff: Guide (single entry) + Retry when API is down.
+ * Sidebar session utilities for staff: Help (single entry) + Retry when API is down.
  * No static Dev/demo labels in clinical UX.
  */
 export default function SidebarChromeControls() {
@@ -24,10 +24,10 @@ export default function SidebarChromeControls() {
             type="button"
             className="sidebar-chrome-control"
             onClick={() => dispatchOpenHelpHub({ tab: 'page' })}
-            title="Open process guide (?)"
+            title="Open Help Center (?)"
           >
             <IconHelpCircle size={16} stroke={2} className="sidebar-chrome-control__icon" aria-hidden />
-            <span className="sidebar-chrome-control__label">Guide</span>
+            <span className="sidebar-chrome-control__label">Help</span>
           </button>
 
           {showApiDegraded ? (

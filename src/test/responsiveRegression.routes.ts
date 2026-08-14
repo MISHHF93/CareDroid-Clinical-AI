@@ -66,7 +66,7 @@ export const CORE_ROUTE_SMOKE = Object.freeze([
     id: 'clinical-alerts',
     path: '/clinical/alerts',
     match: 'heading',
-    heading: /^clinical alerts$/i,
+    heading: /^critical alerts$/i,
   },
 
   {

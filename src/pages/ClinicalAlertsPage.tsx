@@ -172,7 +172,7 @@ const ClinicalAlertsPage = () => {
     <EmergencyRoutePage
       surfaceClassName="clinical-alerts-page"
       eyebrow="Clinical Operations"
-      title="Clinical Alerts"
+      title="Critical Alerts"
       description="Review, acknowledge, and resolve operational and clinical alerts — one lifecycle, role-aware delivery."
       situationBrief={{
         status: `${displayAlerts.length} active alert${displayAlerts.length === 1 ? '' : 's'}`,

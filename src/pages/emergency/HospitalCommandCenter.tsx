@@ -182,7 +182,7 @@ export default function HospitalCommandCenter() {
     <EmergencyRoutePage
       surfaceClassName="hospital-command-center"
       eyebrow="Hospital Command Center"
-      title="Real-Time ED Operations"
+      title="Hospital Command Center"
       description={`One operational picture for ${roleLabel} — actionable metrics only, no historical reporting widgets.`}
       situationBrief={{
         status: snapshot.statusLine,

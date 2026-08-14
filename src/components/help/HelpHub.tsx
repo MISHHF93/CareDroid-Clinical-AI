@@ -66,7 +66,7 @@ export default function HelpHub({ variant = 'drawer' }: HelpHubProps) {
     >
       <header className="help-hub__header">
         <div className="help-hub__header-main">
-          <p className="help-hub__eyebrow">CareDroid Guide</p>
+          <p className="help-hub__eyebrow">CareDroid Help</p>
           <h2 id="help-hub-title" className="help-hub__title">
             Process & procedures
           </h2>

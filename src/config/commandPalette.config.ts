@@ -71,7 +71,7 @@ const ROUTE_COMMAND_METADATA_BY_NAV_ID = Object.freeze({
     keywords: ['shift', 'shift summary', 'handoff', 'brief', 'handover'],
   },
   help: {
-    label: 'Open Guide',
+    label: 'Open Help Center',
     hint: '?',
     keywords: ['guide', 'help', 'manual', 'procedure', 'training'],
   },
@@ -129,7 +129,12 @@ export const EMERGENCY_OS_ROUTE_COMMANDS = Object.freeze(
 export const EMERGENCY_OS_HELP_COMMANDS = Object.freeze([
   {
     id: 'open-guide',
-    label: 'Open CareDroid Guide',
+    // Distinct from the 'help' nav-id command below ("Open Help Center", which
+    // navigates to the full /emergency/help page) -- this one opens the quick
+    // help panel/overlay (OPEN_HELP), matching the sidebar quick-launcher
+    // button's own "Help" label (SidebarChromeControls.tsx) rather than
+    // duplicating the page command's exact text in palette search results.
+    label: 'Open Help',
     hint: '?',
     keywords: ['help', 'guide', 'manual', 'procedure', 'process', 'how to', 'training', 'walkthrough'],
     build: () => ({ type: 'OPEN_HELP', tab: 'page' }),

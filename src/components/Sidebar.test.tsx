@@ -45,7 +45,7 @@ describe('Sidebar unified navigation rendering', () => {
       ['Patients', '/emergency/patients'],
       ['EMS', '/emergency/ems'],
       ['Queues', '/emergency/queues'],
-      ['Reassess', '/emergency/reassessment'],
+      ['Reassessment', '/emergency/reassessment'],
       ['Flow & Capacity', '/emergency/capacity'],
       ['Referrals', '/emergency/referrals'],
       ['Medical Tools', '/emergency/tools'],
@@ -123,7 +123,7 @@ describe('Sidebar unified navigation rendering', () => {
       ['Patients', 'emergency-patients'],
       ['EMS', 'ambulance'],
       ['Queues', 'queues'],
-      ['Reassess', 'reassessment'],
+      ['Reassessment', 'reassessment'],
       ['Flow & Capacity', 'capacity'],
       ['Referrals', 'referrals'],
       ['Medical Tools', 'clinical-tools'],
@@ -177,7 +177,7 @@ describe('Sidebar unified navigation rendering', () => {
       );
 
       expect(
-        within(desktopNav.getByRole('link', { name: 'Reassess' })).getByLabelText(
+        within(desktopNav.getByRole('link', { name: 'Reassessment' })).getByLabelText(
           '2 active alerts',
         ),
       ).toBeTruthy();
