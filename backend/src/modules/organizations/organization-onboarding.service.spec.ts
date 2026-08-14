@@ -4,7 +4,7 @@ import { OrganizationType } from '../platform-assets/enums/platform-asset.enums'
 import { PlatformAssetsService } from '../platform-assets/platform-assets.service';
 import { CommercialPlan } from '../product-catalog/entities/commercial-plan.entity';
 import { Product } from '../product-catalog/entities/product.entity';
-import { User } from '../users/entities/user.entity';
+import { User, UserRole } from '../users/entities/user.entity';
 import { UserProfile } from '../users/entities/user-profile.entity';
 import { Organization } from '../workspaces/entities/organization.entity';
 import { WorkspacesService } from '../workspaces/workspaces.service';
@@ -176,5 +176,45 @@ describe('OrganizationOnboardingService', () => {
         }),
       }),
     );
+  });
+
+  it('ignores a self-assigned defaultRoleProfileId from a user without role-assignment permission (HEAL-200 regression guard)', async () => {
+    // Reproduces the exact escalation path HEAL-196 closed on the dedicated
+    // PATCH platform/me/role-profile and PATCH /profile/me endpoints, found
+    // here as a third, ungated call site: any authenticated user (no role
+    // set at all, i.e. below even UserRole.STUDENT's privileges) could
+    // previously onboard a throwaway org with defaultRoleProfileId:
+    // 'administrator' and silently escalate their own GLOBAL roleProfileId
+    // -- which AuthorizationGuard reads for every request platform-wide, not
+    // just within the new org -- to hospital-administrator-level access
+    // (READ_PHI, VIEW_AUDIT_LOGS, MANAGE_USERS, VIEW_GOVERNANCE).
+    const unprivilegedUser = { id: 'user-1' } as User;
+
+    const result = await service.completeOnboarding(unprivilegedUser, {
+      name: 'Shadow Org',
+      slug: 'shadow-org',
+      organizationType: OrganizationType.HOSPITAL,
+      defaultRoleProfileId: 'administrator',
+    } as any);
+
+    expect(platformAssetsService.updateUserRoleProfile).not.toHaveBeenCalled();
+    expect(result.tenantProfile.roleProfileId).toBeNull();
+  });
+
+  it('applies defaultRoleProfileId when the onboarding user has role-assignment permission', async () => {
+    const adminUser = { id: 'admin-1', role: UserRole.ADMIN } as User;
+
+    const result = await service.completeOnboarding(adminUser, {
+      name: 'Legit Org',
+      slug: 'legit-org',
+      organizationType: OrganizationType.HOSPITAL,
+      defaultRoleProfileId: 'administrator',
+    } as any);
+
+    expect(platformAssetsService.updateUserRoleProfile).toHaveBeenCalledWith(
+      'admin-1',
+      'administrator',
+    );
+    expect(result.tenantProfile.roleProfileId).toBe('administrator');
   });
 });

@@ -1,7 +1,9 @@
 import { BadRequestException, Injectable, Logger, Optional } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
-import { User } from '../users/entities/user.entity';
+import { hasPermission } from '../auth/config/role-permissions.config';
+import { Permission } from '../auth/enums/permission.enum';
+import { User, UserRole } from '../users/entities/user.entity';
 import { UserProfile } from '../users/entities/user-profile.entity';
 import { Organization } from '../workspaces/entities/organization.entity';
 import { WorkspacesService } from '../workspaces/workspaces.service';
@@ -39,6 +41,32 @@ export class OrganizationOnboardingService {
     const existing = await this.organizationRepository.findOne({ where: { slug: dto.slug } });
     if (existing) {
       throw new BadRequestException(`Organization slug already exists: ${dto.slug}`);
+    }
+
+    // dto.defaultRoleProfileId ends up in profile.roleProfileId -- the SAME
+    // global, non-org-scoped column AuthorizationGuard reads for every
+    // permission check platform-wide (hasSaasProfilePermission), not just
+    // within the organization being created here. Any authenticated user
+    // (including UserRole.STUDENT) could otherwise onboard a throwaway org
+    // with defaultRoleProfileId: 'administrator' and silently grant their own
+    // account READ_PHI/VIEW_AUDIT_LOGS/MANAGE_USERS/VIEW_GOVERNANCE with no
+    // admin involvement -- the same class of bug already gated on the
+    // dedicated PATCH platform/me/role-profile and PATCH /profile/me
+    // endpoints. Mirror that same canAssignRole gate here; unlike those
+    // dedicated endpoints, silently drop the field rather than throwing, so
+    // an unprivileged user's onboarding wizard still completes (they still
+    // get a role-appropriate default via TenantProvisioningService's own
+    // fallback).
+    const canAssignRole =
+      user.role != null &&
+      (user.role === UserRole.ADMIN ||
+        hasPermission(user.role, Permission.MANAGE_ROLES) ||
+        hasPermission(user.role, Permission.MANAGE_USERS));
+    const authorizedDefaultRoleProfileId = canAssignRole ? dto.defaultRoleProfileId : undefined;
+    if (dto.defaultRoleProfileId && !canAssignRole) {
+      this.logger.warn(
+        `[OrganizationOnboarding] Ignored defaultRoleProfileId '${dto.defaultRoleProfileId}' requested by user ${user.id} -- role profile assignment requires MANAGE_ROLES/MANAGE_USERS or ADMIN.`,
+      );
     }
 
     const packIds = await this.resolvePackIds(dto);
@@ -93,8 +121,8 @@ export class OrganizationOnboardingService {
       }
     }
 
-    if (dto.defaultRoleProfileId) {
-      await this.platformAssetsService.updateUserRoleProfile(user.id, dto.defaultRoleProfileId);
+    if (authorizedDefaultRoleProfileId) {
+      await this.platformAssetsService.updateUserRoleProfile(user.id, authorizedDefaultRoleProfileId);
     }
 
     const profile = await this.profileRepository.findOne({ where: { userId: user.id } });
@@ -132,7 +160,7 @@ export class OrganizationOnboardingService {
           packIds,
           enabledProductIds,
           integrationSlugs: dto.integrationSlugs,
-          defaultRoleProfileId: dto.defaultRoleProfileId,
+          defaultRoleProfileId: authorizedDefaultRoleProfileId,
           complianceMode,
           branding,
         })
@@ -152,7 +180,7 @@ export class OrganizationOnboardingService {
       departments: dto.departments || [],
       workspaceDefaults: dto.workspaceSetups || [],
       workspaces,
-      roleProfileId: dto.defaultRoleProfileId || null,
+      roleProfileId: authorizedDefaultRoleProfileId || null,
       roleAssignments: dto.roleAssignments || [],
       productIds: enabledProductIds,
       installedPackIds,
