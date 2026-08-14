@@ -1,5 +1,6 @@
-import { NotFoundException } from '@nestjs/common';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { PlatformAssetsController } from './platform-assets.controller';
+import { UserRole } from '../users/entities/user.entity';
 
 describe('PlatformAssetsController entitlement visibility', () => {
   function buildController() {
@@ -62,5 +63,56 @@ describe('PlatformAssetsController entitlement visibility', () => {
     await expect(
       controller.getAsset({ user: { id: 'user-1' } }, 'locked-ai'),
     ).rejects.toBeInstanceOf(NotFoundException);
+  });
+});
+
+describe('PlatformAssetsController.setRoleProfile authorization', () => {
+  function buildController() {
+    const platformAssetsService = { updateUserRoleProfile: jest.fn().mockResolvedValue({ roleProfileId: 'emergency-physician' }) };
+    const controller = new PlatformAssetsController(
+      {} as any,
+      platformAssetsService as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+    );
+    return { controller, platformAssetsService };
+  }
+
+  it('rejects role-profile self-assignment for a user with no role-management permission', async () => {
+    const { controller, platformAssetsService } = buildController();
+
+    // roleProfileId drives real READ_PHI/WRITE_PHI/EXPORT_PHI grants via
+    // hasSaasProfilePermission in AuthorizationGuard -- a STUDENT account
+    // (no clinical PHI access by role) must not be able to grant itself
+    // 'emergency-physician' just by calling this endpoint.
+    await expect(
+      controller.setRoleProfile(
+        { user: { id: 'user-1', role: UserRole.STUDENT } },
+        'emergency-physician',
+      ),
+    ).rejects.toBeInstanceOf(ForbiddenException);
+    expect(platformAssetsService.updateUserRoleProfile).not.toHaveBeenCalled();
+  });
+
+  it('allows role-profile assignment for an admin', async () => {
+    const { controller, platformAssetsService } = buildController();
+
+    const result = await controller.setRoleProfile(
+      { user: { id: 'user-1', role: UserRole.ADMIN } },
+      'emergency-physician',
+    );
+
+    expect(platformAssetsService.updateUserRoleProfile).toHaveBeenCalledWith(
+      'user-1',
+      'emergency-physician',
+    );
+    expect(result).toEqual({ roleProfileId: 'emergency-physician' });
   });
 });

@@ -11,6 +11,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
+import { hasPermission } from '../auth/config/role-permissions.config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import {
@@ -65,6 +66,19 @@ export class PlatformAssetsController {
   @Patch('me/role-profile')
   @ApiOperation({ summary: 'Set current user role profile' })
   async setRoleProfile(@Req() req: any, @Body('roleProfileId') roleProfileId: string) {
+    // roleProfileId drives real AuthorizationGuard permission grants
+    // (hasSaasProfilePermission, e.g. READ_PHI/WRITE_PHI/EXPORT_PHI for
+    // 'emergency-physician') -- self-assignment must be gated the same way
+    // UserProfileController.update() gates dto.role, or any authenticated
+    // account (including UserRole.STUDENT) could grant itself full PHI
+    // access with no admin involvement.
+    const canAssignRole =
+      req.user?.role === UserRole.ADMIN ||
+      hasPermission(req.user?.role, Permission.MANAGE_ROLES) ||
+      hasPermission(req.user?.role, Permission.MANAGE_USERS);
+    if (!canAssignRole) {
+      throw new ForbiddenException('Role profile assignment is managed by your organization administrator.');
+    }
     return this.platformAssetsService.updateUserRoleProfile(req.user.id, roleProfileId);
   }
 
