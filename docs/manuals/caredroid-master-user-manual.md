@@ -77,7 +77,7 @@ Every workflow in CareDroid is designed to ensure that within 3 minutes of a cri
 
 ## 2. User Roles and Responsibilities
 
-CareDroid recognizes 15 user roles across the emergency department and hospital network. Each role controls what the user sees in navigation, what actions they can take, what alerts they receive, and which AI features they can access.
+CareDroid recognizes 23 user roles across the emergency department and hospital network. Each role controls what the user sees in navigation, what actions they can take, what alerts they receive, and which AI features they can access.
 
 ### Clinical Roles
 
@@ -106,6 +106,16 @@ Diagnoses, treats, documents, orders, disposes, and clinically reviews AI Chief 
 **Landing page:** `/emergency/whiteboard`  
 **Scope:** All clinical decisions. Full AI Chief access including override authority.
 
+#### Attending Physician (`attending_physician`)
+Senior physician role with the same full clinical decision authority as Emergency Physician.  
+**Landing page:** `/emergency/whiteboard`  
+**Scope:** All clinical decisions. Same permission tier as Emergency Physician (shared `physician` role mapping).
+
+#### Resident Physician (`resident_physician`)
+Physician-in-training role with the same clinical decision authority as Emergency Physician.  
+**Landing page:** `/emergency/whiteboard`  
+**Scope:** All clinical decisions. Same permission tier as Emergency Physician (shared `physician` role mapping).
+
 #### Specialist (`specialist`)
 Receives consult requests, reviews case summaries, documents specialist recommendations, and sends handoff confirmation.  
 **Landing page:** `/emergency/patients`  
@@ -117,6 +127,26 @@ Manages EMS pre-arrival patient data, converts EMS units to registered patients 
 **Scope:** EMS module. Pre-arrival data entry. Handoff to reception.
 
 ### Operational Roles
+
+#### Dispatcher (`dispatcher`)
+Emergency call taker and CAD dispatch operator. Receives 911 calls, performs telephone triage, assigns EMS units, and notifies the ED of inbound critical patients.  
+**Landing page:** `/emergency/dispatch`  
+**Scope:** Dispatch module. Operational data-minimization tier — no direct clinical patient access.
+
+#### EMS Coordinator (`ems_coordinator`)
+EMS operations coordinator who manages unit deployment, prehospital data relay, pre-arrival notifications, and ED readiness handoffs.  
+**Landing page:** `/emergency/ems`  
+**Scope:** EMS coordination. Operational data-minimization tier — no direct clinical patient access.
+
+#### Social Worker (`social_worker`)
+Read-only clinical role supporting discharge planning and patient-support coordination.  
+**Landing page:** `/emergency/patients`  
+**Scope:** Read-only. Clinical data-minimization tier — sees patient context, no write access.
+
+#### Security Officer (`security_officer`)
+Read-only role for physical-security and incident awareness via department alerts.  
+**Landing page:** `/emergency/alerts`  
+**Scope:** Read-only. Metadata-only data-minimization tier — no clinical patient content.
 
 #### Patient Flow Coordinator (`patient_flow_coordinator`)
 Coordinates beds across departments, manages transfers, resolves bottlenecks, owns the capacity dashboard.  
@@ -139,6 +169,16 @@ Reviews medication risk alerts, medication order alerts, and drug interaction no
 **Scope:** Pharmacy-sourced alerts. Medication workflow only.
 
 ### Administrative Roles
+
+#### Site Super Admin (`super_admin`)
+Full platform administration with no data-minimization restriction — the highest-privilege role in the system.  
+**Landing page:** `/emergency/settings`  
+**Scope:** Unrestricted admin access across every module.
+
+#### ED Director (`ed_director`)
+Combines physician-level clinical authority with department management oversight.  
+**Landing page:** `/emergency/whiteboard`  
+**Scope:** Clinical and administrative. Same operational permissions as ED Manager plus physician-level clinical access.
 
 #### Hospital Administrator (`hospital_admin`)
 Reviews operational reports, sets hospital-level settings, monitors aggregate performance.  

@@ -31,6 +31,24 @@ describe('normalizeSaasRole', () => {
     expect(normalizeSaasRole('medical-student')).toBe('student');
   });
 
+  it('is case- and whitespace-insensitive (HEAL-203, mirrors the backend copy\'s Cycle 220 regression)', () => {
+    // This frontend mirror never received the backend's own case/whitespace
+    // fix -- every comparison here was a strict `===` against a lowercase
+    // literal, so a differently-cased role from profileRouteLaunch.ts's
+    // context?.roleProfile?.id / context?.user?.role (session/API-sourced,
+    // client-controlled) silently fell through to 'student' on the frontend
+    // even where the backend would have resolved it correctly -- a real
+    // frontend/backend behavioral split, not just a hypothetical one.
+    expect(normalizeSaasRole('ADMIN')).toBe('hospital-administrator');
+    expect(normalizeSaasRole('Admin')).toBe('hospital-administrator');
+    expect(normalizeSaasRole('  admin  ')).toBe('hospital-administrator');
+    expect(normalizeSaasRole('Administrator')).toBe('hospital-administrator');
+    expect(normalizeSaasRole('PHYSICIAN')).toBe('emergency-physician');
+    expect(normalizeSaasRole('Registration_Clerk')).toBe('registration-clerk');
+    expect(normalizeSaasRole('HOSPITAL-ADMINISTRATOR')).toBe('hospital-administrator');
+    expect(normalizeSaasRole('Emergency-Physician')).toBe('emergency-physician');
+  });
+
   it('falls back to the safe DEFAULT_SAAS_PROFILE.role for unrecognized input', () => {
     expect(normalizeSaasRole('totally-unrecognized-xyz')).toBe(DEFAULT_SAAS_PROFILE.role);
     expect(normalizeSaasRole('')).toBe(DEFAULT_SAAS_PROFILE.role);
