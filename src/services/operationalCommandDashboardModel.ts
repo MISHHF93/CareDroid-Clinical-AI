@@ -386,7 +386,10 @@ export function buildOperationalCommandDashboardSnapshot(input: {
     unifiedMetrics?.capacityScore ??
     capacity?.occupancyPercent ??
     (maxCapacity > 0 ? Math.round(((capacity?.currentOccupancy ?? occupiedRooms) / maxCapacity) * 100) : null);
-  const doctorsOnDuty = countAvailableStaff(staff, ['MD', 'Attending', 'Resident', 'PA']);
+  // Keep in sync with hospitalCommandCenterModel.ts's DOCTOR_ROLES -- Consultant was
+  // missing here, so the same staff roster showed a lower doctor count (and could hit
+  // a false "critical" coverage tone) on this dashboard than on the Command Center one.
+  const doctorsOnDuty = countAvailableStaff(staff, ['MD', 'Attending', 'Resident', 'PA', 'Consultant']);
   const nursesAvailable = countAvailableStaff(staff, ['RN', 'Nurse', 'TriageNurse', 'ChargeNurse', 'Charge']);
   const criticalCount = criticalPatientCount(patients, capacity);
   const admissionsToday =

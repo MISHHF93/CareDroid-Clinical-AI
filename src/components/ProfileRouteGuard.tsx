@@ -66,6 +66,7 @@ export default function ProfileRouteGuard({ children }) {
 
   if (!isRouteAllowedInCompiledProfile(pathname, compiled)) {
     const destination =
+      emergencyRole.landingRoute ||
       resolvePlatformLanding({
         authMode,
         saasRole,
@@ -91,11 +92,13 @@ export default function ProfileRouteGuard({ children }) {
       entitledPacks.size &&
       !packIntersection.some((pack) => entitledPacks.has(pack))
     ) {
-      const destination = resolvePlatformLanding({
-        authMode,
-        saasRole,
-        onboardingStatus: saasProfile?.onboardingStatus,
-      });
+      const destination =
+        emergencyRole.landingRoute ||
+        resolvePlatformLanding({
+          authMode,
+          saasRole,
+          onboardingStatus: saasProfile?.onboardingStatus,
+        });
       return <Navigate to={destination} replace state={{ entitlementDenied: true }} />;
     }
   }

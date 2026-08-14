@@ -16,7 +16,7 @@ The product is delivered as a full-stack web application:
 - **AI layer:** Multi-model router with RAG, NLU intent classification, and tool orchestration
 - **Primary surface:** `/emergency/*` route tree, all within a single AppShell layout
 
-The platform supports **19 hospital roles**, **13 core ED pages**, **242 registered tools**, **219 AI intent profiles**, **92 calculator forms**, and a **50+ backend module** architecture.
+The platform supports **23 hospital roles**, **13 core ED pages**, **242 registered tools**, **219 AI intent profiles**, **92 calculator forms**, and a **50+ backend module** architecture.
 
 ---
 
@@ -71,7 +71,7 @@ All core ED pages live under `/emergency/*`:
 
 ### 1.4 Permission Model
 
-Roles are defined in `src/lib/users/userTypes.ts` (19 roles) and route-guarded via `EmergencyRouteGuard` in the router. Permission checks use `useEmergencyRolePermissions()` hook backed by `src/config/emergencyRolePermissions.ts`.
+Roles are defined in `src/lib/users/userTypes.ts` (23 roles) and route-guarded via `EmergencyRouteGuard` in the router. Permission checks use `useEmergencyRolePermissions()` hook backed by `src/config/emergencyRolePermissions.ts`.
 
 Role matrix (summary):
 
@@ -459,7 +459,7 @@ Prompt injection detection and AI output safety guardrails.
 3. **Workflow documentation missing**: No end-to-end workflow document
 4. **Service catalog missing**: No structured service reference
 5. **AI documentation missing**: No AI intent/safety/fallback documentation
-6. **In-app playbooks incomplete**: ~7 of 19 roles have no playbook in `userManual.config.ts`
+6. **In-app playbooks incomplete**: several of the 23 roles have no playbook in `userManual.config.ts` (was reported as "~7 of 19" when this doc was written; the role count itself was stale -- re-audit before trusting the specific number)
 7. **3-minute response UI exists but not prominent**: The loop is implemented but not visible enough to reinforce the mission
 8. **Self-arrival / patient room display undocumented**: `SelfArrivalCheckIn` and `PatientRoomDisplay` pages have no help topics
 

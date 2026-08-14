@@ -54,7 +54,9 @@ export const PILOT_CUSTOMER_VISIBLE_NAV_ITEM_IDS: readonly string[] = CANONICAL_
 /** Receptionist-first pilot: front-desk roles see a minimal nav shell. */
 export const PROFILE_SCOPED_PILOT_NAV_IDS: Readonly<Record<string, readonly string[]>> =
   Object.freeze({
-    'registration-clerk': Object.freeze(['reception', 'patients', 'pulse', 'shift', 'copilot', 'help']),
+    'registration-clerk': Object.freeze([
+      'reception', 'patients', 'pulse', 'shift', 'alerts', 'copilot', 'collaboration', 'help',
+    ]),
     student: Object.freeze(['tools', 'platform', 'pulse']),
     steward: Object.freeze(['platform']),
     'racetrack-admin': Object.freeze(['platform']),

@@ -29,6 +29,12 @@ export function resolveProfileRouteLaunchAccess(path, options: any = {}) {
   );
   const profile = resolveUserProfileFromSaasRole(saasRole);
   const pathname = normalizePath(path);
+  // saasRole is often coarser than the actual hospital role (e.g. 'nurse' is shared by
+  // charge/triage/registered nurse and social worker) and can resolve to the wrong
+  // person's home page. When the caller already has a specific, correctly-resolved
+  // emergency-role landing route (every real navigateProfileAware call site threads
+  // this through via useProfileNavigate/AppShell), prefer it over the saasRole guess.
+  const preferredLandingRoute = options.emergencyRole?.landingRoute || options.landingRoute || null;
 
   if (
     context?.organization?.organizationType &&
@@ -49,6 +55,7 @@ export function resolveProfileRouteLaunchAccess(path, options: any = {}) {
       allowed: false,
       reason: 'profile-route-denied',
       redirectTo:
+        preferredLandingRoute ||
         resolvePlatformLanding({ saasRole }) ||
         profile.navigationRoutes[0] ||
         CANONICAL_ROUTES.emergencyReception,
@@ -66,7 +73,7 @@ export function resolveProfileRouteLaunchAccess(path, options: any = {}) {
       return {
         allowed: false,
         reason: 'entitlement-pack-denied',
-        redirectTo: resolvePlatformLanding({ saasRole }),
+        redirectTo: preferredLandingRoute || resolvePlatformLanding({ saasRole }),
       };
     }
   }

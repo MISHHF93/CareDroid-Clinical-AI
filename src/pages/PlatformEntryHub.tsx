@@ -4,10 +4,7 @@ import { PageShell } from '../components/ui/CareDroidPrimitives';
 import { getPublicWaitingDisplayPath } from '../config/publicWaitingScreenModel';
 import { countPageRebuildByStatus } from '../config/pageRebuildRegistry';
 import { PAGE_REBUILD_STATUS } from '../config/pageUxContract';
-import {
-  resolveAdminHomeRoute,
-  resolveClinicalHomeRoute,
-} from '../config/platformEntryModel';
+import { resolveAdminHomeRoute } from '../config/platformEntryModel';
 import {
   DEMO_PERSONA,
   getDemoPersonaHeadline,
@@ -15,18 +12,16 @@ import {
 import { listEdWorkflowAzSteps } from '../config/edWorkflowIntegrationModel';
 import useEdWorkflowIntegration from '../hooks/useEdWorkflowIntegration';
 import useProfileSwitcherVisibility from '../hooks/useProfileSwitcherVisibility';
-import { useUserIdentity } from '../contexts/UserIdentityContext';
 import ProfileRoleSwitcher from '../components/account/ProfileRoleSwitcher';
 import { usePractitionerSurfaceVisibility } from '../contexts/PractitionerVisibilityContext';
 import './PlatformEntryHub.css';
 
 export default function PlatformEntryHub() {
   const surfaces = usePractitionerSurfaceVisibility();
-  const { saasProfile } = useUserIdentity();
   const showProfileSwitcher = useProfileSwitcherVisibility();
   const edContext = useEdWorkflowIntegration();
   const workflowSteps = listEdWorkflowAzSteps();
-  const clinicalHome = resolveClinicalHomeRoute(saasProfile?.role);
+  const clinicalHome = edContext.landingRoute;
   const adminHome = resolveAdminHomeRoute();
   const waitingRoomPath = getPublicWaitingDisplayPath();
   const rebuildCounts = countPageRebuildByStatus();

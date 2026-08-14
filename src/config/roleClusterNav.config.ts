@@ -136,8 +136,11 @@ export const HOSPITAL_ROLE_NAV_IDS: Readonly<Record<string, readonly string[]>> 
   ]),
 
   // ── Cluster G: IT & Platform ───────────────────────────────────────────────
+  // 'medical-iot' intentionally excluded: its route has showInNav:false (reached via
+  // Admin Ops Home instead), so curating it here would list a sidebar entry that can
+  // never actually render (NAVIGATION_ITEMS filters out showInNav:false routes).
   it_admin: Object.freeze([
-    'settings', 'admin', 'medical-iot', 'audit', 'reports', 'alerts', 'collaboration', 'help',
+    'settings', 'admin', 'audit', 'reports', 'alerts', 'collaboration', 'help',
   ]),
   super_admin: CANONICAL_PILOT_VISIBLE_NAV_IDS,
 
@@ -156,8 +159,17 @@ export const HOSPITAL_ROLE_NAV_IDS: Readonly<Record<string, readonly string[]>> 
 // Backward compat: callers that pass old 11-role emergency IDs still resolve correctly.
 
 const EMERGENCY_TO_HOSPITAL_ROLE: Readonly<Record<string, string>> = Object.freeze({
-  admin:              'hospital_admin',
-  ed_manager:         'ed_director',
+  // 'admin' and 'ed_manager' must match src/lib/users/canonicalAccess.ts's
+  // ALIAS_TO_HOSPITAL_ROLE (the authoritative, twice-bug-fixed resolver) --
+  // super_admin declares 'admin' as an explicit alias, and 'ed_manager' falls
+  // to hospital_admin via catalog order. This map previously disagreed with
+  // both that resolver AND emergencyRolePermissions.ts's own 'ed_manager'
+  // defaultRoute (/emergency/analytics, i.e. hospital_admin's home, not
+  // ed_director's whiteboard) -- the same legacy string resolved to a
+  // different hospital role, and thus a different home page, depending on
+  // which of the two resolvers a caller happened to go through.
+  admin:              'super_admin',
+  ed_manager:         'hospital_admin',
   charge_nurse:       'charge_nurse',
   triage_nurse:       'triage_nurse',
   registered_nurse:   'registered_nurse',

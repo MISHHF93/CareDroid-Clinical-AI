@@ -682,12 +682,17 @@ export const USER_PROFILE_ROUTE_DEFAULTS = Object.freeze({
   lab_technician: CANONICAL_ROUTES.emergencyDiagnostics,
   radiology_technician: CANONICAL_ROUTES.emergencyDiagnostics,
   patient_flow_coordinator: CANONICAL_ROUTES.emergencyQueues,
+  social_worker: CANONICAL_ROUTES.emergencyPatients,
+  security_officer: CANONICAL_ROUTES.emergencyAlerts,
   hospital_admin: CANONICAL_ROUTES.emergencyAnalytics,
   it_admin: CANONICAL_ROUTES.emergencySettings,
   quality_safety_officer: CANONICAL_ROUTES.emergencyReports,
   demo_observer: CANONICAL_ROUTES.emergencyWhiteboard,
   ed_director: CANONICAL_ROUTES.emergencyWhiteboard,
-  super_admin: CANONICAL_ROUTES.emergencyWhiteboard,
+  // Matches HOSPITAL_ROLE_HOME_ROUTES.super_admin (roleClusterNav.config.ts) and
+  // it_admin's own settings/governance home -- Site Admin lands on System Governance,
+  // not the generic ED whiteboard (the 2 tables previously disagreed here).
+  super_admin: CANONICAL_ROUTES.emergencySettings,
   admin: CANONICAL_ROUTES.emergencySettings,
   ed_manager: CANONICAL_ROUTES.emergencyAnalytics,
   physician: CANONICAL_ROUTES.emergencyWhiteboard,
@@ -992,7 +997,8 @@ export const CANONICAL_ROUTE_MAP = Object.freeze([
     path: CANONICAL_ROUTES.triage,
     label: 'Triage',
     description: 'Triage nurse entry point focused on pretriage and acuity workflow.',
-    pageComponent: 'TriageWorkspaceRoute',
+    pageComponent: 'QueueRoute',
+    redirectTo: TRIAGE_PRETRIAGE_ROUTE,
     requiredPermissions: [P.PATIENT_READ, P.TRIAGE_READ],
     allowedRoles: ['super_admin', 'ed_director', 'charge_nurse', 'triage_nurse', 'registered_nurse'],
     emergencyRoles: ['admin', 'ed_manager', 'charge_nurse', 'triage_nurse'],
@@ -2391,18 +2397,17 @@ export const ROUTE_RECORDS = Object.freeze([
     notes:
       'Platform governance registry for owner, steward, approver, risk, evidence, version, audit, and review schedules.',
   }),
-  // Future module
   Object.freeze({
     id: 'aiGovernance',
     path: CANONICAL_ROUTES.aiGovernance,
-    componentKey: 'AIGovernanceDashboard',
+    componentKey: 'PlatformGovernanceWorkspace',
     layout: 'app',
     auth: 'required',
-    status: 'future',
+    status: 'active',
     aliases: [],
     navGroup: 'advanced',
     notes:
-      'Enterprise AI governance dashboard for AI service inventory, safety rules, compliance reporting, prompt validation, and human-review posture.',
+      'AI governance surface (AI service inventory, safety rules, compliance reporting, prompt validation, human-review posture) served by the shared PlatformGovernanceWorkspace shell.',
   }),
   Object.freeze({
     id: 'dependencyGraph',

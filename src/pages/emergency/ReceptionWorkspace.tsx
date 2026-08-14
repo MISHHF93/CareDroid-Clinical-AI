@@ -667,9 +667,11 @@ export default function ReceptionWorkspace() {
 
       // Keep registration clerks on the reception desk after create — their route
       // matrix often omits triage queues / whiteboard. Navigation is optional.
-      const clerkStaysOnDesk =
-        emergencyRole.role === 'registration_clerk' ||
-        emergencyRole.role === 'emergency_receptionist';
+      // 'emergency_receptionist' is a normalizeEmergencyRole() INPUT alias for
+      // registration_clerk (config/emergencyRolePermissions.ts ROLE_ALIASES), never
+      // an OUTPUT of it -- emergencyRole.role can only be a canonical EmergencyRole
+      // id, so that second comparison could never match.
+      const clerkStaysOnDesk = emergencyRole.role === 'registration_clerk';
       notifyWorkflowHandoffComplete({
         patientName: patientDisplayName(routeResult.patient),
         description:
