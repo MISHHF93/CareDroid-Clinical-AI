@@ -139,9 +139,19 @@ export const HOSPITAL_ROLE_NAV_IDS: Readonly<Record<string, readonly string[]>> 
   // 'medical-iot' intentionally excluded: its route has showInNav:false (reached via
   // Admin Ops Home instead), so curating it here would list a sidebar entry that can
   // never actually render (NAVIGATION_ITEMS filters out showInNav:false routes).
-  it_admin: Object.freeze([
-    'settings', 'admin', 'audit', 'reports', 'alerts', 'collaboration', 'help',
-  ]),
+  // 'reports' (emergencyReports) and 'alerts' (emergencyAlerts, clinical
+  // alert escalation) were previously curated here but aren't in
+  // EMERGENCY_ROLE_DEFINITIONS.itAdmin.routes (emergencyRolePermissions.ts) --
+  // that role's own comment is explicit: "deliberately excludes patient
+  // whiteboard, EMS, intake, reception, and all other clinical/PHI-bearing
+  // routes (data minimization: metadata only)". Removed so the sidebar
+  // doesn't offer a link the role's own route allowlist would reject. This
+  // drift was masked until now by a separate bug (it_admin had no self-alias
+  // in normalizeEmergencyRole's ROLE_ALIASES, so it silently resolved to
+  // read_only_viewer everywhere getVisibleNavigation/canAccessEmergencyRoute
+  // are keyed off that normalizer -- both sides of the comparison were
+  // wrong in the same way, so it never surfaced as a mismatch).
+  it_admin: Object.freeze(['settings', 'admin', 'audit', 'collaboration', 'help']),
   super_admin: CANONICAL_PILOT_VISIBLE_NAV_IDS,
 
   // ── Cluster H: Demo / Observer ─────────────────────────────────────────────

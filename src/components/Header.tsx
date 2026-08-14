@@ -126,8 +126,18 @@ export function Header() {
       }),
     [centralControlSettings, emergencyRole],
   );
-  const canSubmitCentralIntake =
-    canCreatePatient || (centralControl.enabled && !emergencyRole.readOnly);
+  // Previously also allowed any non-read-only role to see "New Patient" whenever
+  // central control governance was on (`centralControl.enabled && !emergencyRole.readOnly`)
+  // -- centralControl.enabled is an org-wide toggle unrelated to the CURRENT role's
+  // own granted actions, so this fallback enabled the button (and its click handler
+  // navigated straight into the real SmartIntake creation flow, not a lighter
+  // "submit for review" pathway) for any role lacking EMERGENCY_ACTIONS.createPatient
+  // but also lacking an explicit readOnly:true flag -- confirmed reachable for
+  // ed_manager today, and would have newly affected it_admin once its own missing
+  // ROLE_ALIASES self-entry (see normalizeEmergencyRole) was fixed. The role's own
+  // declared createPatient action is the single source of truth used everywhere
+  // else in this permission system; rely on that alone here too.
+  const canSubmitCentralIntake = canCreatePatient;
   const syncMode = websocket.mode || centralSnapshot.sync.mode || 'polling';
   const syncAge = formatSyncAge(websocket.lastEventAt || centralSnapshot.sync.lastSyncedAt);
   const syncStale =
@@ -149,10 +159,16 @@ export function Header() {
 
   const patientLookupResults = useMemo(
     () =>
-      rankPatientsBySearch(patients, patientLookupQuery, MAX_HEADER_PATIENT_RESULTS).map(
-        (result) => result,
-      ),
-    [patientLookupQuery, patients],
+      // Gated at the source, not just at render: the Enter-key shortcut below
+      // acts on patientLookupResults[0] directly, so filtering only inside
+      // PatientSearchResults' render would still let a role with no patient
+      // access navigate straight to a matching patient via the keyboard.
+      canOpenPatients
+        ? rankPatientsBySearch(patients, patientLookupQuery, MAX_HEADER_PATIENT_RESULTS).map(
+            (result) => result,
+          )
+        : [],
+    [canOpenPatients, patientLookupQuery, patients],
   );
 
   const operationalSearchGroups = useMemo(
@@ -491,6 +507,7 @@ export function Header() {
                       operationalGroups={operationalSearchGroups}
                       backendVerifiedPatientIds={backendVerifiedPatientIds}
                       canCreatePatient={canCreatePatient}
+                      canViewPatients={canOpenPatients}
                       isReceptionRoute={isReceptionRoute}
                       onFindPatient={selectLookupPatient}
                       onStartIntake={(patientId) =>

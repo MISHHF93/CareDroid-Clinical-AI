@@ -23,6 +23,17 @@ type PatientSearchResultsProps = {
   operationalGroups?: OperationalSearchGroups;
   backendVerifiedPatientIds?: Set<string>;
   canCreatePatient?: boolean;
+  /**
+   * Gates the "Patients" match section (name, MRN, DOB, phone, health card,
+   * chief complaint via formatPatientSearchHint) -- this global header search
+   * previously rendered full patient PHI for every role with no permission
+   * check at all, including roles explicitly documented as having none (e.g.
+   * it_admin: "deliberately excludes... all clinical/PHI-bearing routes").
+   * Defaults to false (fail closed) since this component has exactly one
+   * caller (Header.tsx) and PHI visibility must be an explicit opt-in, not
+   * an accidentally-inherited default.
+   */
+  canViewPatients?: boolean;
   isReceptionRoute?: boolean;
   onFindPatient: (patientId: string) => void;
   onStartIntake: (patientId: string) => void;
@@ -79,6 +90,7 @@ export default function PatientSearchResults({
   operationalGroups,
   backendVerifiedPatientIds = new Set(),
   canCreatePatient = false,
+  canViewPatients = false,
   isReceptionRoute = false,
   onFindPatient,
   onStartIntake,
@@ -89,12 +101,13 @@ export default function PatientSearchResults({
   onStartNewIntake,
 }: PatientSearchResultsProps) {
   const trimmedQuery = query.trim();
+  const visiblePatientResults = canViewPatients ? results : [];
   const supplementalCount =
     (operationalGroups?.encounter.length || 0) +
     (operationalGroups?.referral.length || 0) +
     (operationalGroups?.ems.length || 0) +
     (operationalGroups?.queue.length || 0);
-  const hasAnyResults = results.length > 0 || supplementalCount > 0;
+  const hasAnyResults = visiblePatientResults.length > 0 || supplementalCount > 0;
 
   return (
     <div className="patient-search-results" role="listbox" aria-label="Operational search results">
@@ -103,11 +116,11 @@ export default function PatientSearchResults({
         <span>Patient · Encounter · Referral · EMS · Queue</span>
       </header>
 
-      {results.length ? (
+      {visiblePatientResults.length ? (
         <section className="patient-search-results__section">
           <h3 className="patient-search-results__section-title">Patients</h3>
           <ul className="patient-search-results__list">
-            {results.map(({ patient, matchKind }) => (
+            {visiblePatientResults.map(({ patient, matchKind }) => (
               <li key={patient.id} className="patient-search-results__item">
                 <button
                   type="button"

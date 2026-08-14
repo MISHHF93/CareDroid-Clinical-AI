@@ -100,6 +100,52 @@ describe('CareDroid role-based views', () => {
     expect(normalizeEmergencyRole('')).toBe(EMERGENCY_ROLE_IDS.readOnlyViewer);
   });
 
+  it('round-trips it_admin through normalizeEmergencyRole instead of falling to read_only_viewer (HEAL-203)', () => {
+    // it_admin had no self-alias in ROLE_ALIASES -- every OTHER canonical
+    // EMERGENCY_ROLE_IDS value round-trips through its own normalizer, but
+    // 'it_admin' silently fell through to the readOnlyViewer fail-closed
+    // default (Cycle 219's own safe-default mechanism, working exactly as
+    // designed, just on the wrong input). Consequence: getEmergencyRoleDefinition
+    // ('it_admin') returned read_only_viewer's routes/actions/label instead
+    // of IT Admin's own -- IT Admin lost access to Settings/Integrations/
+    // Audit/Admin Ops (their actual job) while gaining the whiteboard route
+    // their own role definition explicitly excludes ("deliberately excludes
+    // patient whiteboard... data minimization: metadata only").
+    expect(normalizeEmergencyRole('it_admin')).toBe(EMERGENCY_ROLE_IDS.itAdmin);
+    expect(normalizeEmergencyRole('IT Admin')).toBe(EMERGENCY_ROLE_IDS.itAdmin);
+    expect(normalizeEmergencyRole('it-admin')).toBe(EMERGENCY_ROLE_IDS.itAdmin);
+
+    const definition = getEmergencyRoleDefinition(EMERGENCY_ROLE_IDS.itAdmin);
+    expect(definition.label).toBe('IT Admin');
+    expect(definition.routes).toContain(CANONICAL_ROUTES.emergencySettings);
+    expect(definition.routes).not.toContain(CANONICAL_ROUTES.emergencyWhiteboard);
+    expect(isEmergencyReadOnlyRole(EMERGENCY_ROLE_IDS.itAdmin)).toBe(false);
+    expect(
+      hasEmergencyActionPermission(EMERGENCY_ROLE_IDS.itAdmin, EMERGENCY_ACTIONS.createPatient),
+    ).toBe(false);
+  });
+
+  it('ed_manager and it_admin both lack createPatient, so Header cannot fall back to a role-blind "not read-only" check (HEAL-203)', () => {
+    // Header.tsx's "New Patient" button used to be enabled by
+    // `canCreatePatient || (centralControl.enabled && !emergencyRole.readOnly)`
+    // -- centralControl.enabled is an org-wide toggle unrelated to the
+    // current role, so any role that (a) lacks EMERGENCY_ACTIONS.createPatient
+    // in its own definition but (b) also lacks an explicit readOnly:true flag
+    // got an enabled button that navigated straight into the real patient-
+    // creation flow. ed_manager is the clearest live case: it has no
+    // readOnly flag and its own actions list has no createPatient. Pin both
+    // here so Header.tsx's fix (now `canSubmitCentralIntake = canCreatePatient`)
+    // can't silently regress back to the org-wide fallback.
+    expect(
+      hasEmergencyActionPermission(EMERGENCY_ROLE_IDS.edManager, EMERGENCY_ACTIONS.createPatient),
+    ).toBe(false);
+    expect(isEmergencyReadOnlyRole(EMERGENCY_ROLE_IDS.edManager)).toBe(false);
+    expect(
+      hasEmergencyActionPermission(EMERGENCY_ROLE_IDS.itAdmin, EMERGENCY_ACTIONS.createPatient),
+    ).toBe(false);
+    expect(isEmergencyReadOnlyRole(EMERGENCY_ROLE_IDS.itAdmin)).toBe(false);
+  });
+
   it('exposes default screen modes from the role-screen matrix', () => {
     expect(getDefaultScreenModeForRole(EMERGENCY_ROLE_IDS.triageNurse)).toBe('TRIAGE_SCREEN');
     expect(getDefaultScreenModeForRole(EMERGENCY_ROLE_IDS.registrationClerk)).toBe(
