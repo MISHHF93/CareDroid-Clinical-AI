@@ -63,6 +63,26 @@ describe('assetAccess', () => {
     expect(resolveAssetAccessState(tool, null, 'admin').accessState).toBe(ASSET_ACCESS_STATES.ALLOWED);
   });
 
+  it('admin-only tools recognize a differently-cased or padded admin saasRole (HEAL-205)', () => {
+    // ADMIN_SAAS_ROLES.has() previously did a raw exact-match check against
+    // saasRole values that can come straight from session/API-sourced
+    // platform context (context.roleProfile.id / context.user.roleProfileId
+    // via resolveSaasRoleFromContext), with no case/whitespace normalization
+    // -- the same bug class HEAL-204 fixed in normalizeSaasRole. A real
+    // hospital-administrator whose persisted role string was cased
+    // differently than the hardcoded Set literals lost access to
+    // audit-logs/system-config/team-management.
+    setPlatformEntitlementContext(null);
+    const tool = { id: 'system-config', lifecycleState: 'active' };
+    expect(resolveAssetAccessState(tool, null, 'ADMIN').accessState).toBe(ASSET_ACCESS_STATES.ALLOWED);
+    expect(resolveAssetAccessState(tool, null, '  admin  ').accessState).toBe(
+      ASSET_ACCESS_STATES.ALLOWED
+    );
+    expect(resolveAssetAccessState(tool, null, 'Hospital-Administrator').accessState).toBe(
+      ASSET_ACCESS_STATES.ALLOWED
+    );
+  });
+
   it('applies canonical asset lifecycle states within organization context', () => {
     const organizationContext = { organization: { id: 'org-1' } };
 

@@ -164,7 +164,7 @@ export function resolveAssetAccessState(tool, context = getPlatformEntitlementCo
   }
 
   if (ADMIN_ONLY_TOOLS.has(assetId)) {
-    if (!ADMIN_SAAS_ROLES.has(saasRole)) {
+    if (!ADMIN_SAAS_ROLES.has(String(saasRole || '').trim().toLowerCase())) {
       return { accessState: ASSET_ACCESS_STATES.ADMIN_ONLY, reasons: ['admin-only'] };
     }
   }
