@@ -89,12 +89,20 @@
   }
 }
 
+/* HEAL-216: values below now match layout-engine.css's --app-layout-content-max
+   at the same breakpoints exactly (HEAL-210 raised those from 2100/2400/2260
+   to 1960/2260/2980/3320, but this file's own separate --app-visual-page-max
+   -- a second, independent max-width system with its own direct consumers
+   below, e.g. .emergency-settings/.emergency-analytics/.cd-page-shell -- was
+   never updated to match). Confirmed the same "doesn't expand to full
+   screen" bug HEAL-210 fixed was still live for any page using one of this
+   file's own page-shell classes instead of .app-shell-main-content. */
 @media (min-width: 2200px) {
   :root {
     --app-readable-body-size: 17px;
     --app-readable-title-size: 38px;
     --app-readable-heading-size: 28px;
-    --app-visual-page-max: min(100%, 1880px);
+    --app-visual-page-max: min(100%, 1960px);
     --app-visual-page-gutter: 40px;
     --app-visual-section-gap: 30px;
   }
@@ -102,7 +110,7 @@
 
 @media (min-width: 2560px) {
   :root {
-    --app-visual-page-max: min(100%, 2100px);
+    --app-visual-page-max: min(100%, 2260px);
     --app-visual-grid-min: minmax(min(100%, 300px), 1fr);
     --app-visual-section-gap: 28px;
   }
@@ -110,10 +118,16 @@
 
 @media (min-width: 3440px) {
   :root {
-    --app-visual-page-max: min(100%, 2400px);
+    --app-visual-page-max: min(100%, 2980px);
     --app-visual-grid-min: minmax(min(100%, 320px), 1fr);
     --app-readable-title-size: 36px;
     --app-readable-heading-size: 26px;
+  }
+}
+
+@media (min-width: 3840px) {
+  :root {
+    --app-visual-page-max: min(100%, 3320px);
   }
 }
 

@@ -5,7 +5,13 @@
  */
 
 :root {
-  --app-visual-page-max: var(--app-fluid-container-max-wide);
+  /* HEAL-216: --app-visual-page-max is NOT set here -- this file imports
+     before visual-responsive-standards.css (design-system.css), which
+     redeclares the same bare :root custom property, so this line was
+     always immediately shadowed and --app-fluid-container-max-wide's
+     value (a pre-ultrawide-era 1400/1536px cap, design-tokens.css) never
+     actually applied. visual-responsive-standards.css is the real,
+     effective owner of this token's breakpoint values. */
   --app-visual-page-gap: var(--compact-page-gap, var(--app-fluid-section-gap));
   --app-visual-panel-gap: var(--compact-panel-gap, var(--app-space-md));
   --app-visual-header-padding: var(--compact-panel-padding, var(--app-card-padding-standard));
