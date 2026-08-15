@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import CommandDashboard from './CommandDashboard';
 import {
   PatientState,
@@ -76,14 +77,16 @@ const capacity: CapacitySnapshot = {
 describe('CommandDashboard', () => {
   it('renders live operational metrics and zone occupancy from whiteboard state', () => {
     render(
-      <CommandDashboard
-        patients={patients}
-        rooms={rooms}
-        staff={staff}
-        activeShift={activeShift}
-        capacity={capacity}
-        now={new Date('2026-06-24T10:00:00.000Z').getTime()}
-      />,
+      <MemoryRouter>
+        <CommandDashboard
+          patients={patients}
+          rooms={rooms}
+          staff={staff}
+          activeShift={activeShift}
+          capacity={capacity}
+          now={new Date('2026-06-24T10:00:00.000Z').getTime()}
+        />
+      </MemoryRouter>,
     );
 
     expect(
@@ -110,34 +113,36 @@ describe('CommandDashboard', () => {
 
   it('shows AI decision support as clinician-owned recommendations', () => {
     render(
-      <CommandDashboard
-        patients={patients}
-        rooms={rooms}
-        staff={staff}
-        activeShift={activeShift}
-        capacity={capacity}
-        now={new Date('2026-06-24T10:00:00.000Z').getTime()}
-        snapshot={{
-          metrics: [],
-          zoneOccupancy: [],
-          bottleneckLabel: 'Department flow within green thresholds',
-          summaryLine: '1 waiting',
-          updatedAt: '2026-06-24T10:00:00.000Z',
-          chargeNurseAlerts: [],
-          resourceActivations: [],
-          pendingBedAssignments: [
-            {
-              patientId: 'p1',
-              patientLabel: 'Sam Lee',
-              probabilityPercent: 82,
-              admitScore: 8,
-              action: 'Notify charge nurse and bed management.',
-            },
-          ],
-          prolongedStayAlerts: [],
-          orientationPredictions: [],
-        }}
-      />,
+      <MemoryRouter>
+        <CommandDashboard
+          patients={patients}
+          rooms={rooms}
+          staff={staff}
+          activeShift={activeShift}
+          capacity={capacity}
+          now={new Date('2026-06-24T10:00:00.000Z').getTime()}
+          snapshot={{
+            metrics: [],
+            zoneOccupancy: [],
+            bottleneckLabel: 'Department flow within green thresholds',
+            summaryLine: '1 waiting',
+            updatedAt: '2026-06-24T10:00:00.000Z',
+            chargeNurseAlerts: [],
+            resourceActivations: [],
+            pendingBedAssignments: [
+              {
+                patientId: 'p1',
+                patientLabel: 'Sam Lee',
+                probabilityPercent: 82,
+                admitScore: 8,
+                action: 'Notify charge nurse and bed management.',
+              },
+            ],
+            prolongedStayAlerts: [],
+            orientationPredictions: [],
+          }}
+        />
+      </MemoryRouter>,
     );
 
     expect(screen.getByRole('region', { name: /ai decision support recommendations/i })).toBeInTheDocument();

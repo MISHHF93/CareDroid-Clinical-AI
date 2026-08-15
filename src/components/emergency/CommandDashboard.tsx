@@ -17,6 +17,8 @@ import {
 import { BottleneckCommandPanel } from '../bottlenecks/BottleneckPanels';
 import type { BottleneckRegistrySnapshot } from '../../services/bottleneckRegistry';
 import { getUnifiedServiceHealthSnapshot } from '../../services/unifiedServiceRegistry';
+import { useEmergencyRolePermissions } from '../../hooks/useEmergencyRolePermissions';
+import { CANONICAL_ROUTES } from '../../config/routes.config';
 import ResponseComplianceCard, { type ComplianceAlert } from './ResponseComplianceCard';
 import { getAllActiveTimers } from '../../engine/threeMinuteTimerEngine';
 import './CommandDashboard.css';
@@ -184,6 +186,8 @@ export default function CommandDashboard({
   now,
   className = '',
 }: CommandDashboardProps) {
+  const emergencyRole = useEmergencyRolePermissions();
+  const canViewPatients = emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyPatients);
   const snapshot = useMemo(
     () =>
       snapshotProp ||
@@ -272,7 +276,7 @@ export default function CommandDashboard({
         {snapshot.bottleneckLabel}
       </p>
 
-      <BottleneckCommandPanel registry={bottleneckRegistry} />
+      <BottleneckCommandPanel registry={bottleneckRegistry} canViewPatients={canViewPatients} />
 
       {snapshot.chargeNurseAlerts.length ? (
         <section className="command-dashboard__alerts" aria-label="Charge nurse predictive alerts">

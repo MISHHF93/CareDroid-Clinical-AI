@@ -393,7 +393,11 @@ export default function EmergencyAnalytics() {
           </div>
           <ThreeMinuteRiskIndicator registry={bottleneckRegistry} />
         </header>
-        <BottleneckList events={activeBottlenecks} limit={4} />
+        <BottleneckList
+          events={activeBottlenecks}
+          limit={4}
+          canViewPatients={emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyPatients)}
+        />
       </section>
       </>
       ) : null}

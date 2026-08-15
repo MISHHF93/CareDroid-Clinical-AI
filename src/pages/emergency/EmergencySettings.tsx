@@ -49,6 +49,7 @@ import { INTEGRATION_STATUS } from '../../config/integrationStatusModel';
 import OperationalHistoryPanel from '../../components/audit/OperationalHistoryPanel';
 import DeviceContextPanel from '../../components/emergency/DeviceContextPanel';
 import useOperationalIntelligence from '../../hooks/useOperationalIntelligence';
+import { useEmergencyRolePermissions } from '../../hooks/useEmergencyRolePermissions';
 import { showActionError, showActionSuccess } from '../../services/careDroidInteractionFeedback';
 import {
   BottleneckList,
@@ -314,6 +315,14 @@ export default function EmergencySettings() {
   const resetThresholds = useEmergencyStore((state) => state.resetThresholds);
   const operationalIntelligence = useOperationalIntelligence({ screenMode: 'COMMAND_CENTER_SCREEN' });
   const bottleneckRegistry = operationalIntelligence.centralSnapshot.bottleneckRegistry;
+  const emergencyRole = useEmergencyRolePermissions();
+  // HEAL-209: Settings is it_admin's own default landing page, and
+  // it_admin's EMERGENCY_ROLE_DEFINITIONS explicitly excludes every patient
+  // route ("no patient clinical data") -- but the Service Bottleneck Rules
+  // panel below renders patient-flow bottleneck titles that embed real
+  // patient names (continuousPatientFlowEngine.ts), unconditionally, for
+  // any role that lands on this page.
+  const canViewPatients = emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyPatients);
 
   const [draft, setDraft] = useState(() => mergeSettings(storeSettings));
   const [loading, setLoading] = useState(true);
@@ -1703,7 +1712,11 @@ export default function EmergencySettings() {
           </div>
           <div>
             <h3>Fallback rules in effect</h3>
-            <BottleneckList events={bottleneckRegistry.activeBottlenecks} limit={4} />
+            <BottleneckList
+              events={bottleneckRegistry.activeBottlenecks}
+              limit={4}
+              canViewPatients={canViewPatients}
+            />
           </div>
         </div>
       </Section>
