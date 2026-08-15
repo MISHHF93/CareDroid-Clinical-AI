@@ -269,12 +269,26 @@ export function Sidebar({ navigationItems }: SidebarProps) {
     );
   };
 
-  const openDockedCopilot = useCallback(() => {
-    setCopilotOpen(true);
+  // HEAL-211: this nav item renders with aria-pressed={copilotOpen} and
+  // active-state styling -- both signal a real toggle button per WAI-ARIA
+  // authoring practices, and clicking it while open visually looks like it
+  // should close the panel. It didn't: this unconditionally called
+  // setCopilotOpen(true), so a second click while already open was a
+  // silent no-op, and the panel (plus the shrunk main-content width behind
+  // it) had no way to close from this entry point -- confirmed live via a
+  // 2-click reproduction. toggleCopilot (already destructured above, the
+  // same store action the mobile-fallback nav button already correctly
+  // uses) also maintains the 'ed:copilot-dismissed' sessionStorage flag
+  // AppShell.tsx's auto-open effect depends on, which a bare
+  // setCopilotOpen(false) would have skipped.
+  const toggleDockedCopilot = useCallback(() => {
     if (location.pathname === CANONICAL_ROUTES.emergencyCopilot) {
+      setCopilotOpen(true);
       navigate(`${CANONICAL_ROUTES.emergencyWhiteboard}${location.search}`);
+      return;
     }
-  }, [location.pathname, location.search, navigate, setCopilotOpen]);
+    toggleCopilot();
+  }, [location.pathname, location.search, navigate, setCopilotOpen, toggleCopilot]);
 
   const desktopNavLink = (item: SidebarNavItem) => {
     const IconComponent = ICONS[item.icon] || IconLayoutDashboard;
@@ -300,7 +314,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
           ]
             .filter(Boolean)
             .join(' ')}
-          onClick={openDockedCopilot}
+          onClick={toggleDockedCopilot}
           aria-label={copilotChrome.shortName}
           {...((copilotOpen) ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
           title={canUseCopilot ? copilotChrome.openTitle : copilotChrome.unavailableTitle}
@@ -400,7 +414,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
           className={['sidebar-item', active ? 'sidebar-item--active' : ''].filter(Boolean).join(' ')}
           onClick={() => {
             setMoreOpen(false);
-            openDockedCopilot();
+            toggleDockedCopilot();
           }}
           aria-label={copilotChrome.shortName}
           {...((copilotOpen) ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}

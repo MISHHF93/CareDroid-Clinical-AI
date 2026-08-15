@@ -4,7 +4,7 @@ vi.mock('./sidebar/SidebarChromeControls', () => ({
   default: () => null,
 }));
 
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { UserProvider } from '../contexts/UserContext';
 import { getVisibleNavigation } from '../config/unified-navigation.config';
@@ -218,6 +218,33 @@ describe('Sidebar unified navigation rendering', () => {
         flags: previousFlags,
         overrides: previousOverrides,
       });
+    }
+  });
+
+  it('toggles the docked Copilot panel closed on a second click (HEAL-211)', () => {
+    // The desktop nav item renders aria-pressed={copilotOpen} and active-state
+    // styling -- both signal a real toggle per WAI-ARIA authoring practices --
+    // but its onClick previously always called setCopilotOpen(true)
+    // unconditionally, so a second click while already open was a silent
+    // no-op and the panel had no way to close from this entry point.
+    const previousCopilotOpen = useEmergencyStore.getState().copilotOpen;
+    useEmergencyStore.setState({ copilotOpen: false });
+
+    try {
+      renderSidebar('charge_nurse');
+      const desktopNav = within(
+        screen.getByRole('navigation', { name: 'Emergency desktop navigation' }),
+      );
+      const copilotButton = desktopNav.getByRole('button', { name: 'Copilot' });
+
+      expect(copilotButton.getAttribute('aria-pressed')).toBe('false');
+      fireEvent.click(copilotButton);
+      expect(useEmergencyStore.getState().copilotOpen).toBe(true);
+
+      fireEvent.click(copilotButton);
+      expect(useEmergencyStore.getState().copilotOpen).toBe(false);
+    } finally {
+      useEmergencyStore.setState({ copilotOpen: previousCopilotOpen });
     }
   });
 });

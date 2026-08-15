@@ -52,6 +52,6 @@ describe('platform shell dimension contract', () => {
   it('exposes copilot session controls in sidebar chrome', () => {
     expect(sidebarSource).toContain('SidebarChromeControls');
     expect(sidebarSource).toContain("item.id === 'copilot'");
-    expect(sidebarSource).toContain('openDockedCopilot');
+    expect(sidebarSource).toContain('toggleDockedCopilot');
   });
 });
