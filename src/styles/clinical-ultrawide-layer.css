@@ -6,10 +6,6 @@
 
 /* —— Shared CCDL ultrawide layout tokens —— */
 :root {
-  /* Max content width: caps line length for readability */
-  --cd-uw-max-content: 1800px;
-  --cd-uw-max-wide: 2000px;
-  --cd-uw-max-4k: 2200px;
   /* Side panel cap: prevents rails from overpowering primary workspace */
   --cd-uw-rail-max: 380px;
   --cd-uw-rail-min: 320px;
@@ -17,8 +13,16 @@
 
 @media (min-width: 2560px) {
   :root {
-    --app-layout-content-max: min(100%, var(--cd-uw-max-content));
-    --app-visual-page-max: min(100%, var(--cd-uw-max-content));
+    /* HEAL-210: --app-layout-content-max/--app-visual-page-max are NOT set
+       here -- layout-engine.css is their single owner (its own header
+       comment: "Page-specific CSS must not reintroduce ... competing
+       max-widths"). This file previously reassigned both at this exact
+       breakpoint with more conservative values (1800px vs. layout-engine's
+       2260px) and, being @import-ed after layout-engine.css in
+       design-system.css, silently won the cascade -- confirmed live: pages
+       capped to ~70% of a 2560px viewport instead of layout-engine's
+       intended ~88%, and a user-reported "doesn't expand to full screen"
+       bug traced to this exact conflict at even wider viewports. */
     --app-layout-page-gutter-inline: clamp(32px, 2.4vw, 48px);
     --app-grid-card-min: 17rem;
     --app-visual-grid-min: minmax(min(100%, 300px), 1fr);
@@ -132,8 +136,8 @@
 
 @media (min-width: 3440px) {
   :root {
-    --app-layout-content-max: min(100%, var(--cd-uw-max-wide));
-    --app-visual-page-max: min(100%, var(--cd-uw-max-wide));
+    /* HEAL-210: see the 2560px block's comment -- content-max lives in
+       layout-engine.css only. */
     --app-grid-card-min: 18rem;
     --ed-whiteboard-card-min-ultrawide: 340px;
     --app-ultrawide-metric-columns: 5;
@@ -164,8 +168,8 @@
 
 @media (min-width: 3840px) {
   :root {
-    --app-layout-content-max: min(100%, var(--cd-uw-max-4k));
-    --app-visual-page-max: min(100%, var(--cd-uw-max-4k));
+    /* HEAL-210: see the 2560px block's comment -- content-max lives in
+       layout-engine.css only. */
     --app-ultrawide-metric-columns: 6;
     --cd-uw-rail-max: 420px;
   }

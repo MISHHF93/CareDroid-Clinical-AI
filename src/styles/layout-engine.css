@@ -43,22 +43,36 @@
 
 @media (min-width: 2200px) {
   :root {
-    --app-layout-content-max: min(100%, 1880px);
+    --app-layout-content-max: min(100%, 1960px);
     --app-layout-page-gutter-inline: clamp(28px, 2.2vw, 40px);
   }
 }
 
+/* HEAL-210: raised from 2100/2400px (and 3840px added, previously missing --
+   it inherited the 3440px value). Content previously capped at ~55-70%
+   of the viewport at these sizes, leaving a large dead zone on wide
+   desktop and ultrawide monitors (user-reported: "doesn't expand to full
+   screen"). Targets ~86-90% utilization instead of near-edge-to-edge, so
+   dense operational grids/forms still keep a readable structure rather
+   than stretching raw content full-bleed. */
 @media (min-width: 2560px) {
   :root {
-    --app-layout-content-max: min(100%, 2100px);
+    --app-layout-content-max: min(100%, 2260px);
     --app-layout-page-gutter-inline: clamp(32px, 2.4vw, 48px);
   }
 }
 
 @media (min-width: 3440px) {
   :root {
-    --app-layout-content-max: min(100%, 2400px);
+    --app-layout-content-max: min(100%, 2980px);
     --app-layout-page-gutter-inline: clamp(36px, 2.6vw, 56px);
+  }
+}
+
+@media (min-width: 3840px) {
+  :root {
+    --app-layout-content-max: min(100%, 3320px);
+    --app-layout-page-gutter-inline: clamp(40px, 2.8vw, 64px);
   }
 }
 
