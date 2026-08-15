@@ -260,12 +260,30 @@ function governedRuleLabel(ruleGroup) {
   }[ruleGroup] || ruleGroup.replace(/-/g, ' ');
 }
 
-function patientAuditLabel(patientId, patients) {
+export function patientAuditLabel(patientId, patients, canViewPatients = true) {
   if (!patientId) return 'Department';
+  if (!canViewPatients) return 'Patient record (restricted)';
   const patientList = Array.isArray(patients) ? patients : [];
   const patient = patientList.find((candidate) => candidate.id === patientId);
   if (!patient) return 'Patient record';
   return `${patient.firstName} ${patient.lastName} (${patient.mrn})`;
+}
+
+// HEAL-215: log.title/log.summary are free text and routinely embed a real
+// patient name (e.g. receptionIntakeOrchestrator.ts's intake/triage-flag
+// summaries, triageAssistSignOff.ts's accept/dismiss summaries). This page
+// is it_admin's own default landing page (its EMERGENCY_ROLE_DEFINITIONS
+// explicitly excludes every patient route -- see the canViewPatients
+// comment below), so those names reached it_admin with zero redaction.
+// Mirrors the same fail-closed pattern as redactBottleneckContentForRole
+// (HEAL-209) and redactAlertForRole (HEAL-215's notification-center half).
+export function redactAuditLogForRole(log, canViewPatients) {
+  if (canViewPatients || !log.patientId) return log;
+  return {
+    ...log,
+    title: 'Patient action',
+    summary: 'Details restricted for this role.',
+  };
 }
 
 function auditDetailSummary(details: any = {}) {
@@ -553,6 +571,11 @@ export default function EmergencySettings() {
       (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
     );
   }, [backendWorkflowLogs, workflowLogs]);
+  const visibleAuditLogs = useMemo(
+    () =>
+      canViewPatients ? auditLogs : auditLogs.map((log) => redactAuditLogForRole(log, canViewPatients)),
+    [auditLogs, canViewPatients],
+  );
   const storeAuditLogs = useMemo(() => {
     const byId = new Map();
     (Array.isArray(auditLog) ? auditLog : []).forEach((log) => {
@@ -1176,28 +1199,28 @@ export default function EmergencySettings() {
             {auditError}. Showing local workflow logs.
           </p>
         ) : null}
-        {!auditLogs.length && auditStatus !== 'loading' ? (
+        {!visibleAuditLogs.length && auditStatus !== 'loading' ? (
           <p className="emergency-settings__audit-state">No workflow action logs recorded yet.</p>
         ) : null}
-        {auditLogs.length ? (
+        {visibleAuditLogs.length ? (
           <OperationalHistoryPanel
-            logs={auditLogs}
+            logs={visibleAuditLogs}
             title="Operational history by domain"
             description="Patient actions, queue moves, reassessments, and referrals from workflow audit data."
             limit={12}
           />
         ) : null}
-        {auditLogs.length ? (
+        {visibleAuditLogs.length ? (
           <details className="emergency-settings__audit-details">
             <summary>Raw workflow log entries</summary>
             <div className="emergency-settings__audit-list" aria-label="Workflow action audit logs">
-            {auditLogs.slice(0, 12).map((log) => (
+            {visibleAuditLogs.slice(0, 12).map((log) => (
               <article key={log.id}>
                 <div>
                   <strong>{log.title || log.type}</strong>
                   <p>{log.summary}</p>
                   <small>
-                    {log.source} · {patientAuditLabel(log.patientId, patients)}
+                    {log.source} · {patientAuditLabel(log.patientId, patients, canViewPatients)}
                   </small>
                 </div>
                 <div>
@@ -1272,7 +1295,7 @@ export default function EmergencySettings() {
                   {new Date(log.timestamp).toLocaleString()}
                 </time>
                 <span role="cell">{log.action}</span>
-                <span role="cell">{patientAuditLabel(log.patientId, patients)}</span>
+                <span role="cell">{patientAuditLabel(log.patientId, patients, canViewPatients)}</span>
                 <span role="cell">{log.staffId || 'system'}</span>
                 <span role="cell">{auditDetailSummary(log.details)}</span>
               </div>

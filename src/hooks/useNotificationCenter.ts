@@ -43,6 +43,7 @@ import useScreenModeCapabilities from './useScreenModeCapabilities';
 import {
   alertRoute,
   normalizeAlertKey,
+  redactAlertForRole,
   routePermissionPath,
   type NotificationCenterAction,
 } from '../utils/notificationCenterUtils';
@@ -278,22 +279,28 @@ export function useNotificationCenter() {
     [notificationAlerts],
   );
 
+  const canViewPatients = emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyPatients);
+
   const visibleNotificationAlerts = useMemo(() => {
     const base = sortAlertsByClassification(
       showInformationalAlerts ? alertTriage.all : alertTriage.visible,
     );
-    if (!screenCapabilities.isRegistrationScreen) return base;
-    return base.filter((alert) => {
-      const haystack = `${alert.type || ''} ${alert.title || ''} ${alert.message || ''}`.toLowerCase();
-      if (
-        getAlertClassificationTier(alert) === 'critical' &&
-        !/ems|ambulance|pre-arrival|inbound/.test(haystack)
-      ) {
-        return false;
-      }
-      return true;
-    });
-  }, [alertTriage, screenCapabilities.isRegistrationScreen, showInformationalAlerts]);
+    const registrationFiltered = !screenCapabilities.isRegistrationScreen
+      ? base
+      : base.filter((alert) => {
+          const haystack = `${alert.type || ''} ${alert.title || ''} ${alert.message || ''}`.toLowerCase();
+          if (
+            getAlertClassificationTier(alert) === 'critical' &&
+            !/ems|ambulance|pre-arrival|inbound/.test(haystack)
+          ) {
+            return false;
+          }
+          return true;
+        });
+    return canViewPatients
+      ? registrationFiltered
+      : registrationFiltered.map((alert) => redactAlertForRole(alert, canViewPatients));
+  }, [alertTriage, canViewPatients, screenCapabilities.isRegistrationScreen, showInformationalAlerts]);
 
   const unreadAlertCount = useMemo(
     () => visibleNotificationAlerts.filter((alert) => isAlertActionable(alert)).length,
@@ -437,6 +444,7 @@ export function useNotificationCenter() {
     refreshError,
     unreadAlertCount,
     visibleNotificationAlerts,
+    canViewPatients,
     alertTriage,
     alertsSurfaceMetrics,
     groupedOperationalAlerts,

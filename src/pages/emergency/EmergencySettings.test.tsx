@@ -1,7 +1,11 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import EmergencySettings, { auditLogToCsv } from './EmergencySettings';
+import EmergencySettings, {
+  auditLogToCsv,
+  patientAuditLabel,
+  redactAuditLogForRole,
+} from './EmergencySettings';
 import {
   fetchEmergencyOsSettings,
   fetchOrganizationEmergencyOsSettings,
@@ -385,5 +389,55 @@ describe('EmergencySettings', () => {
     ).toContain(
       '"Time","Action","Patient","Staff","Details"\n"2026-06-13T13:00:00.000Z","addVitals","p1","s1","{""news2"":4}"',
     );
+  });
+});
+
+describe('patientAuditLabel (HEAL-215)', () => {
+  const patients = [{ id: 'patient-1', firstName: 'Sarah', lastName: 'Okafor', mrn: 'MRN-9001' }];
+
+  it('returns the real name and MRN when the role can view patients', () => {
+    expect(patientAuditLabel('patient-1', patients, true)).toBe('Sarah Okafor (MRN-9001)');
+  });
+
+  it('defaults to allowing patient visibility when canViewPatients is omitted (back-compat)', () => {
+    expect(patientAuditLabel('patient-1', patients)).toBe('Sarah Okafor (MRN-9001)');
+  });
+
+  it('returns a generic restricted label instead of the real name when the role cannot view patients', () => {
+    const label = patientAuditLabel('patient-1', patients, false);
+    expect(label).toBe('Patient record (restricted)');
+    expect(label).not.toContain('Sarah');
+    expect(label).not.toContain('MRN-9001');
+  });
+
+  it('returns "Department" for entries with no patientId regardless of role', () => {
+    expect(patientAuditLabel(null, patients, false)).toBe('Department');
+  });
+});
+
+describe('redactAuditLogForRole (HEAL-215)', () => {
+  const log = {
+    id: 'workflow-audit-test',
+    type: 'patient_created',
+    title: 'Patient created',
+    summary: 'Created patient Sarah Okafor at reception.',
+    patientId: 'patient-1',
+    timestamp: '2026-06-13T13:00:00.000Z',
+  };
+
+  it('replaces title and summary when the role cannot view patients and the log is patient-linked', () => {
+    const redacted = redactAuditLogForRole(log, false);
+    expect(redacted.title).toBe('Patient action');
+    expect(redacted.summary).toBe('Details restricted for this role.');
+    expect(redacted.summary).not.toContain('Sarah Okafor');
+  });
+
+  it('leaves the log untouched when the role can view patients', () => {
+    expect(redactAuditLogForRole(log, true)).toBe(log);
+  });
+
+  it('leaves non-patient-linked logs untouched even when the role cannot view patients', () => {
+    const departmentLog = { ...log, patientId: undefined };
+    expect(redactAuditLogForRole(departmentLog, false)).toBe(departmentLog);
   });
 });

@@ -14,6 +14,7 @@ export default function SidebarNotificationPanel() {
     closePanel,
     unreadAlertCount,
     visibleNotificationAlerts,
+    canViewPatients,
     alertTriage,
     showInformationalAlerts,
     setShowInformationalAlerts,
@@ -111,7 +112,7 @@ export default function SidebarNotificationPanel() {
           <ul className="nc-panel__list">
             {visibleNotificationAlerts.map((alert) => {
               const primaryAction = openAlertRoute(alert, closePanel);
-              const patientLabel = alertPatientLabel(alert, patientById);
+              const patientLabel = alertPatientLabel(alert, patientById, canViewPatients);
               const severity = alertSeverityTone(alert);
 
               return (
