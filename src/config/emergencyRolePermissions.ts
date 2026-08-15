@@ -501,6 +501,24 @@ const ROLE_ALIASES = Object.freeze({
   administrator: EMERGENCY_ROLE_IDS.admin,
   'site admin': EMERGENCY_ROLE_IDS.admin,
   site_admin: EMERGENCY_ROLE_IDS.admin,
+  // HEAL-208: the 8 aliases below (super_admin/hospital_admin/ed_director/
+  // emergency_physician/attending_physician/resident_physician/specialist/
+  // patient_flow_coordinator) close a gap where these real HospitalRole
+  // values (src/lib/users/userTypes.ts) had no ROLE_ALIASES entry at all, so
+  // normalizeEmergencyRole() silently failed every one of them closed to
+  // EMERGENCY_ROLE_IDS.readOnlyViewer -- confirmed live for 2 of the 14
+  // roles missing an entry (HEAL-207's live walk: hospital_admin and
+  // security_officer both landed on the generic read-only whiteboard
+  // instead of their real dashboards). Sourced directly from
+  // CANONICAL_ROLE_CATALOG (src/lib/users/canonicalAccess.ts), the same
+  // already-authored, already-reviewed per-role emergencyRoleId mapping
+  // this codebase already uses elsewhere -- not invented here. The other 6
+  // of the 14 (lab_technician, pharmacist, social_worker, security_officer,
+  // quality_safety_officer, demo_observer) are deliberately absent: that
+  // catalog already maps all 6 to 'read_only_viewer' too, so their current
+  // fail-closed behavior is already correct, not a gap.
+  super_admin: EMERGENCY_ROLE_IDS.admin,
+  'super admin': EMERGENCY_ROLE_IDS.admin,
   it_admin: EMERGENCY_ROLE_IDS.itAdmin,
   'it admin': EMERGENCY_ROLE_IDS.itAdmin,
   itadmin: EMERGENCY_ROLE_IDS.itAdmin,
@@ -511,6 +529,16 @@ const ROLE_ALIASES = Object.freeze({
   manager: EMERGENCY_ROLE_IDS.edManager,
   director: EMERGENCY_ROLE_IDS.edManager,
   'department manager': EMERGENCY_ROLE_IDS.edManager,
+  hospital_admin: EMERGENCY_ROLE_IDS.edManager,
+  'hospital admin': EMERGENCY_ROLE_IDS.edManager,
+  'hospital administrator': EMERGENCY_ROLE_IDS.edManager,
+  ed_director: EMERGENCY_ROLE_IDS.edManager,
+  'ed director': EMERGENCY_ROLE_IDS.edManager,
+  'medical director': EMERGENCY_ROLE_IDS.edManager,
+  patient_flow_coordinator: EMERGENCY_ROLE_IDS.edManager,
+  'patient flow coordinator': EMERGENCY_ROLE_IDS.edManager,
+  'flow coordinator': EMERGENCY_ROLE_IDS.edManager,
+  'bed manager': EMERGENCY_ROLE_IDS.edManager,
   charge: EMERGENCY_ROLE_IDS.chargeNurse,
   'charge nurse': EMERGENCY_ROLE_IDS.chargeNurse,
   charge_nurse: EMERGENCY_ROLE_IDS.chargeNurse,
@@ -529,6 +557,17 @@ const ROLE_ALIASES = Object.freeze({
   pa: EMERGENCY_ROLE_IDS.physician,
   'nurse practitioner': EMERGENCY_ROLE_IDS.physician,
   'physician assistant': EMERGENCY_ROLE_IDS.physician,
+  emergency_physician: EMERGENCY_ROLE_IDS.physician,
+  'emergency physician': EMERGENCY_ROLE_IDS.physician,
+  attending_physician: EMERGENCY_ROLE_IDS.physician,
+  attending: EMERGENCY_ROLE_IDS.physician,
+  'attending physician': EMERGENCY_ROLE_IDS.physician,
+  resident_physician: EMERGENCY_ROLE_IDS.physician,
+  resident: EMERGENCY_ROLE_IDS.physician,
+  'resident physician': EMERGENCY_ROLE_IDS.physician,
+  specialist: EMERGENCY_ROLE_IDS.physician,
+  consultant: EMERGENCY_ROLE_IDS.physician,
+  'specialist physician': EMERGENCY_ROLE_IDS.physician,
   'registration clerk': EMERGENCY_ROLE_IDS.registrationClerk,
   registration_clerk: EMERGENCY_ROLE_IDS.registrationClerk,
   emergency_receptionist: EMERGENCY_ROLE_IDS.registrationClerk,

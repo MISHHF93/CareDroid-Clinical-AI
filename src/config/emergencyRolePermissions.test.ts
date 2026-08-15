@@ -91,13 +91,48 @@ describe('CareDroid role-based views', () => {
     // resolveHospitalRole(), which already fails safely to demo_observer
     // (emergencyRoleId 'read_only_viewer') for the identical situation.
     // demoPersonaModel.ts's applyDemoRoleView() calls this function directly,
-    // so seeding an unrecognized role (e.g. a hospitalRole-vocabulary string
-    // like 'super_admin' that isn't itself a valid EMERGENCY_ROLE_IDS value)
-    // used to silently grant physician-level access instead of the safe
-    // default either system resolves an unknown role to elsewhere.
-    expect(normalizeEmergencyRole('super_admin')).toBe(EMERGENCY_ROLE_IDS.readOnlyViewer);
+    // so seeding a genuinely unrecognized role used to silently grant
+    // physician-level access instead of the safe default either system
+    // resolves an unknown role to elsewhere.
     expect(normalizeEmergencyRole('totally-unrecognized-xyz')).toBe(EMERGENCY_ROLE_IDS.readOnlyViewer);
     expect(normalizeEmergencyRole('')).toBe(EMERGENCY_ROLE_IDS.readOnlyViewer);
+  });
+
+  it('round-trips 8 more real HospitalRole values through normalizeEmergencyRole instead of falling to read_only_viewer (HEAL-208)', () => {
+    // super_admin/hospital_admin/ed_director/emergency_physician/
+    // attending_physician/resident_physician/specialist/
+    // patient_flow_coordinator all had no ROLE_ALIASES entry -- same gap
+    // class as HEAL-203's it_admin fix, just for 8 more of the 23 real
+    // HospitalRole values (src/lib/users/userTypes.ts). Live-tested via
+    // HEAL-207's Playwright walk: hospital_admin landed on the generic
+    // read-only whiteboard instead of its real analytics dashboard.
+    // Mappings sourced directly from CANONICAL_ROLE_CATALOG
+    // (src/lib/users/canonicalAccess.ts), the same already-authored
+    // per-role emergencyRoleId table this codebase already uses elsewhere.
+    expect(normalizeEmergencyRole('super_admin')).toBe(EMERGENCY_ROLE_IDS.admin);
+    expect(normalizeEmergencyRole('hospital_admin')).toBe(EMERGENCY_ROLE_IDS.edManager);
+    expect(normalizeEmergencyRole('ed_director')).toBe(EMERGENCY_ROLE_IDS.edManager);
+    expect(normalizeEmergencyRole('emergency_physician')).toBe(EMERGENCY_ROLE_IDS.physician);
+    expect(normalizeEmergencyRole('attending_physician')).toBe(EMERGENCY_ROLE_IDS.physician);
+    expect(normalizeEmergencyRole('resident_physician')).toBe(EMERGENCY_ROLE_IDS.physician);
+    expect(normalizeEmergencyRole('specialist')).toBe(EMERGENCY_ROLE_IDS.physician);
+    expect(normalizeEmergencyRole('patient_flow_coordinator')).toBe(EMERGENCY_ROLE_IDS.edManager);
+  });
+
+  it('still fails closed to readOnlyViewer for the 6 HospitalRole values CANONICAL_ROLE_CATALOG itself maps there (HEAL-208)', () => {
+    // lab_technician, pharmacist, social_worker, security_officer,
+    // quality_safety_officer, and demo_observer are NOT missing aliases --
+    // CANONICAL_ROLE_CATALOG (canonicalAccess.ts) already deliberately maps
+    // all 6 to emergencyRoleId 'read_only_viewer', so their current
+    // fail-closed-via-the-catch-all behavior is already correct, not a gap.
+    // Pinned here so a future round doesn't "fix" these 6 into ROLE_ALIASES
+    // without re-checking that source of truth first.
+    expect(normalizeEmergencyRole('lab_technician')).toBe(EMERGENCY_ROLE_IDS.readOnlyViewer);
+    expect(normalizeEmergencyRole('pharmacist')).toBe(EMERGENCY_ROLE_IDS.readOnlyViewer);
+    expect(normalizeEmergencyRole('social_worker')).toBe(EMERGENCY_ROLE_IDS.readOnlyViewer);
+    expect(normalizeEmergencyRole('security_officer')).toBe(EMERGENCY_ROLE_IDS.readOnlyViewer);
+    expect(normalizeEmergencyRole('quality_safety_officer')).toBe(EMERGENCY_ROLE_IDS.readOnlyViewer);
+    expect(normalizeEmergencyRole('demo_observer')).toBe(EMERGENCY_ROLE_IDS.readOnlyViewer);
   });
 
   it('round-trips it_admin through normalizeEmergencyRole instead of falling to read_only_viewer (HEAL-203)', () => {
