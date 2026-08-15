@@ -1,6 +1,11 @@
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { alertPatientLabel, redactAlertForRole } from './notificationCenterUtils';
 import type { Alert, Patient } from '../types/emergency';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 function makeAlert(overrides: Partial<Alert> = {}): Alert {
   return {
@@ -81,5 +86,24 @@ describe('alertPatientLabel (HEAL-215)', () => {
     const patientById = new Map<string, Patient>();
     expect(alertPatientLabel(alert, patientById, false)).toBeNull();
     expect(alertPatientLabel(alert, patientById, true)).toBeNull();
+  });
+});
+
+describe('useNotificationCenter intelligenceAlerts mapping carries patientId (HEAL-217)', () => {
+  it('copies patientId from the source OperationalAlert, not just category/reasonCodes', () => {
+    // OperationalAlert (operationalIntelligence.types.ts) declares
+    // patientId?: string right alongside category/reasonCodes -- without
+    // this field, redactAlertForRole (HEAL-215) can never redact a name
+    // embedded in one of these alerts' title/message, since it bails out
+    // whenever alert.patientId is falsy.
+    const hookSource = readFileSync(
+      join(__dirname, '../hooks/useNotificationCenter.ts'),
+      'utf8',
+    );
+    const mappingBlock = hookSource.slice(
+      hookSource.indexOf('const intelligenceAlerts = useMemo'),
+      hookSource.indexOf('[intelligenceSnapshot.alerts]'),
+    );
+    expect(mappingBlock).toContain('patientId: alert.patientId');
   });
 });

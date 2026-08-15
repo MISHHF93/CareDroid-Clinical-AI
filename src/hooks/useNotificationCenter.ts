@@ -219,6 +219,16 @@ export function useNotificationCenter() {
         severity: alert.severity,
         title: alert.title,
         message: alert.message,
+        // HEAL-217: OperationalAlert declares patientId?: string right next
+        // to category/reasonCodes (both copied below), but this mapping
+        // dropped it -- meaning redactAlertForRole (HEAL-215) can't tell
+        // this alert is patient-linked and would skip redacting a name
+        // embedded in title/message. This source is a hardcoded-empty
+        // fallback today (careDroidOperationalIntelligence.ts's baseline
+        // snapshot always returns alerts: []), so not currently
+        // exploitable, but the field should carry through regardless of
+        // whether the array happens to be empty right now.
+        patientId: alert.patientId,
         createdAt: alert.createdAt,
         dismissed: alert.dismissed,
         source: alert.source,
