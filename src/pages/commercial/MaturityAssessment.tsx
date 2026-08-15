@@ -31,6 +31,7 @@ export function MaturityAssessmentPage() {
   });
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [sourceState, setSourceState] = useState<
     typeof DEMO_LIVE_STATES.DEMO | typeof DEMO_LIVE_STATES.BACKEND_UNAVAILABLE
   >(DEMO_LIVE_STATES.DEMO);
@@ -66,10 +67,21 @@ export function MaturityAssessmentPage() {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    // HEAL-218: rapid double-click fired submitMaturityAssessment twice --
+    // the form only unmounts once `submitted` flips true, but that state
+    // update doesn't flush in time to block a second click that lands
+    // before the first request settles. Every other form's handleSubmit in
+    // this codebase already guards this (ConsentFlow.tsx/
+    // ReceptionEscalationPanel.tsx's isSubmitting/submitting checks); this
+    // one was the only one missing it.
+    if (submitting) return;
+    setSubmitting(true);
     try {
       await ProductCatalogApi.submitMaturityAssessment(answers);
     } catch {
       // Local demo assessment still renders from questionnaire answers.
+    } finally {
+      setSubmitting(false);
     }
     setSubmitted(true);
   };
@@ -128,8 +140,8 @@ export function MaturityAssessmentPage() {
               </select>
             </div>
           ))}
-          <button type="submit" className="commercial-page__submit">
-            Calculate readiness score
+          <button type="submit" className="commercial-page__submit" disabled={submitting}>
+            {submitting ? 'Calculating…' : 'Calculate readiness score'}
           </button>
         </form>
       ) : (
