@@ -87,6 +87,22 @@ describe('medical theme full-scale audit', () => {
     }
   });
 
+  it('covers --medical-canvas in the dark block, matching its --medical-surface-page sibling (HEAL-212)', () => {
+    // --medical-canvas was declared once, on bare :root, at its light value
+    // (#f6f9fc), with no html[data-theme='dark'] override anywhere in the
+    // codebase -- every sibling surface token in this same dark block
+    // (--medical-white, --medical-surface-page, etc.) gets redefined here,
+    // this one was silently missed. .emergency-app-shell's own background
+    // resolves through --ml-surface-page -> --medical-canvas, so the whole
+    // app shell's background stayed stuck at the light canvas color in
+    // dark mode while sidebar/cards/text all correctly switched -- caught
+    // live via a dark-mode screenshot, page titles were nearly illegible
+    // (light text on the still-light shell background).
+    const colorLayer = tokenFiles[0]; // medical-color-layer.css
+    const darkBlock = colorLayer.slice(colorLayer.indexOf("html[data-theme='dark']"));
+    expect(darkBlock).toContain('--medical-canvas:');
+  });
+
   it('maps emergency and native-ai text to medical ink, not white fallbacks', () => {
     const emergencyTokens = tokenFiles[3];
     const surfaceNorm = tokenFiles[6]; // surface-normalization.css

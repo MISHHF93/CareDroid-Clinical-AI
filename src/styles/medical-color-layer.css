@@ -134,6 +134,20 @@ html[data-theme='dark'] {
   --medical-sky-700: #0284c7;
 
   --medical-white: #0f172a;
+  /* HEAL-212: --medical-canvas never had a dark-mode override anywhere in
+     the codebase (confirmed via a repo-wide search -- it's only ever
+     declared once, on bare :root, at its light value #f6f9fc). Every other
+     sibling surface token (--medical-white, --medical-surface-page, etc.)
+     gets redefined in this exact block; this one was silently missed.
+     .emergency-app-shell's own background (app-shell.css) resolves through
+     --ml-surface-page, which falls back through --medical-canvas -- so the
+     whole app shell's background stayed stuck at the light canvas color in
+     dark mode while every other surface (sidebar, cards, text) correctly
+     switched, making page titles rendered in light-mode-appropriate text
+     colors nearly illegible against it. Matches --medical-surface-page's
+     own dark value below, since canvas and page-surface are the same base
+     background in this palette. */
+  --medical-canvas: #0f172a;
   --medical-ink: #f1f5f9;
   --medical-ink-muted: #94a3b8;
   --medical-ink-subtle: #64748b;

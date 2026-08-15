@@ -3,10 +3,15 @@
    `label` only ever affects rendered text, never the styling. */
 
 .route-loading-fallback {
+  /* HEAL-212: was hardcoded #475569/#f8fafc with no theme-aware token at
+     all, so this Suspense fallback (shown briefly while a lazy route
+     chunk loads) flashed a plain white box in dark mode -- the same
+     missing-dark-override pattern as --medical-canvas, just via literal
+     hex values instead of a CSS variable this time. */
   padding: 24px;
   min-height: 40vh;
-  color: #475569;
-  background: #f8fafc;
+  color: var(--medical-ink-muted, #475569);
+  background: var(--medical-canvas, #f8fafc);
   font-family: system-ui, sans-serif;
   font-size: 16px;
 }
