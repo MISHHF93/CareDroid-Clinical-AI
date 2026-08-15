@@ -30,3 +30,29 @@
   background: color-mix(in srgb, #10b981 12%, transparent);
   border-color: color-mix(in srgb, #10b981 30%, transparent);
 }
+
+/* HEAL-214: these 3 variants had zero dark-mode awareness -- the
+   light-mode text colors are dark, WCAG-AA-tuned-for-white shades
+   (e.g. --admit's #b45309), which drop to ~2.3:1 contrast (fails the
+   4.5:1 minimum) once the color-mix backgrounds blend with a dark
+   card surface instead of a light one. Rendered via PatientCard.tsx,
+   so this hits every patient card's post-ED orientation badge.
+   Dark values reuse the app's own dark-mode warning/success accents
+   and --medical-ink-muted's existing dark value, not new colors. */
+html[data-theme='dark'] .post-ed-orientation-badge--admit {
+  color: var(--app-warning, #fbbf24);
+  background: color-mix(in srgb, var(--app-warning, #fbbf24) 18%, transparent);
+  border-color: color-mix(in srgb, var(--app-warning, #fbbf24) 40%, transparent);
+}
+
+html[data-theme='dark'] .post-ed-orientation-badge--edou {
+  color: var(--medical-ink-muted, #94a3b8);
+  background: color-mix(in srgb, var(--medical-ink-muted, #94a3b8) 16%, transparent);
+  border-color: color-mix(in srgb, var(--medical-ink-muted, #94a3b8) 36%, transparent);
+}
+
+html[data-theme='dark'] .post-ed-orientation-badge--discharge {
+  color: var(--app-success, #4ade80);
+  background: color-mix(in srgb, var(--app-success, #4ade80) 18%, transparent);
+  border-color: color-mix(in srgb, var(--app-success, #4ade80) 40%, transparent);
+}

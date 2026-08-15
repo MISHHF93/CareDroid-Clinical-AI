@@ -103,6 +103,38 @@ describe('medical theme full-scale audit', () => {
     expect(darkBlock).toContain('--medical-canvas:');
   });
 
+  it('operational-command-bar-focus.css uses the theme-aware focus-ring token, not a static gray (HEAL-214)', () => {
+    // Was a hardcoded outline: 2px solid #374151 on 4 command-bar button
+    // classes -- the app's own focus-ring token (--app-focus-ring-aa) is
+    // #374151 in light mode too, so this only diverged visibly once dark
+    // mode flips the token to #38bdf8; these 4 controls kept the dull gray
+    // regardless of theme. Verified live via a real :focus-visible probe.
+    const focusCss = readFileSync(
+      join(srcRoot, 'styles/operational-command-bar-focus.css'),
+      'utf8',
+    );
+    expect(focusCss).toContain('var(--app-focus-ring-aa, #374151)');
+  });
+
+  it('PostEdOrientationBadge.css has dark-mode overrides for all 3 status variants (HEAL-214)', () => {
+    // Light-mode text colors (#b45309/#475569/#047857) are WCAG-AA-tuned
+    // for a near-white background; once the color-mix background blends
+    // with a dark card surface instead, measured contrast drops to ~2.3:1
+    // (needs 4.5:1) -- a real accessibility failure, not cosmetic. Rendered
+    // via PatientCard.tsx, so this reaches every patient card.
+    const badgeCss = readFileSync(
+      join(srcRoot, 'components/predictive/PostEdOrientationBadge.css'),
+      'utf8',
+    );
+    const darkBlock = badgeCss.slice(badgeCss.indexOf("html[data-theme='dark']"));
+    expect(darkBlock).toContain('.post-ed-orientation-badge--admit');
+    expect(darkBlock).toContain('var(--app-warning, #fbbf24)');
+    expect(darkBlock).toContain('.post-ed-orientation-badge--edou');
+    expect(darkBlock).toContain('var(--medical-ink-muted, #94a3b8)');
+    expect(darkBlock).toContain('.post-ed-orientation-badge--discharge');
+    expect(darkBlock).toContain('var(--app-success, #4ade80)');
+  });
+
   it('maps emergency and native-ai text to medical ink, not white fallbacks', () => {
     const emergencyTokens = tokenFiles[3];
     const surfaceNorm = tokenFiles[6]; // surface-normalization.css
