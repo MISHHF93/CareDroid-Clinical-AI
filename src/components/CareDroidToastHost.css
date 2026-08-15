@@ -2,12 +2,20 @@
   --width: min(360px, calc(100vw - 24px));
 }
 
+/* HEAL-213: every color below was a raw hex literal (behind !important, to
+   override the sonner toast library's own inline styles) with zero
+   var(--...) reference in this file at all -- same missing-theme-awareness
+   pattern as RouteLoadingFallback.css/AccessDeniedPanel.css. Unlike those
+   two, this is the GLOBAL toast host mounted for every role on every page
+   (success/error/info notifications), so a hardcoded white popup would
+   flash on essentially every user action in dark mode, not just rare
+   transitions or RBAC denials. */
 .caredroid-toast {
-  border: 1px solid #d1d5db !important;
+  border: 1px solid var(--medical-border, #d1d5db) !important;
   border-radius: 10px !important;
-  background: #ffffff !important;
+  background: var(--medical-card-bg, #ffffff) !important;
   box-shadow: 0 8px 24px rgba(15, 23, 42, 0.1) !important;
-  color: #111827 !important;
+  color: var(--medical-card-fg, #111827) !important;
   font-size: 13px !important;
 }
 
@@ -16,6 +24,6 @@
 }
 
 .caredroid-toast__description {
-  color: #4b5563 !important;
+  color: var(--medical-ink-muted, #4b5563) !important;
   font-size: 12px !important;
 }

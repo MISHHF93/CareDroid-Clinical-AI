@@ -3,26 +3,33 @@
    were fully static: roleLabel/title/message/fallbackPath only ever affect
    rendered content, never the styling itself. Zero inline styles left. */
 
+/* HEAL-213: every color below was a raw hex literal with zero var(--...)
+   reference anywhere in this file -- same "no theme-awareness at all"
+   pattern as RouteLoadingFallback.css (HEAL-212), just on a page users
+   see whenever RBAC denies them a route (this session hardened a lot of
+   RBAC this way -- it_admin hitting a clinical route, etc.), not only a
+   brief loading flash. Now uses the same theme-aware medical-* tokens the
+   rest of the app relies on. */
 .adp-page {
   min-height: 100%;
   display: grid;
   place-items: center;
   padding: 24px;
-  background: #f8fafc;
+  background: var(--medical-canvas, #f8fafc);
 }
 
 .adp-card {
   max-width: 560px;
-  border: 1px solid #7f1d1d;
+  border: 1px solid var(--medical-danger-border, #7f1d1d);
   border-radius: 16px;
-  background: #ffffff;
-  color: #111827;
+  background: var(--medical-white, #ffffff);
+  color: var(--medical-ink, #111827);
   padding: 24px;
   box-shadow: none;
 }
 
 .adp-eyebrow {
-  color: #b91c1c;
+  color: var(--medical-danger-fg, #b91c1c);
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -35,7 +42,7 @@
 }
 
 .adp-message {
-  color: #475569;
+  color: var(--medical-ink-muted, #475569);
   line-height: 1.5;
 }
 
@@ -43,7 +50,7 @@
   display: inline-flex;
   margin-top: 10px;
   border-radius: 10px;
-  background: #0ea5e9;
+  background: var(--medical-accent, #0ea5e9);
   color: #ffffff;
   padding: 10px 13px;
   text-decoration: none;
