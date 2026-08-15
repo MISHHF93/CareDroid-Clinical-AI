@@ -352,11 +352,23 @@ export const useOfflineStatus = () => {
         return;
       }
 
+      // HEAL-219: 'authToken' is never written anywhere in this codebase
+      // (it's AUTH_CONFIG.legacyTokenStorageKey, a fallback key that
+      // predates the current 'caredroid_access_token' primary key) -- this
+      // always resolved to a literal "Bearer null". Worse, apiFetch's own
+      // buildRequestHeaders() only auto-attaches the real, correctly-
+      // sourced token when the caller hasn't already supplied an
+      // Authorization header, so this broken one silently blocked the
+      // correct one from ever being attached. Every other manual
+      // Authorization header in the codebase (TeamManagement.tsx,
+      // NotificationService.ts) sources it via getStoredAccessToken() or
+      // AUTH_CONFIG.tokenStorageKey; simplest fix here is to not set it at
+      // all and let apiFetch's own correct auto-attach handle it, matching
+      // how the large majority of apiFetch call sites already work.
       const response = await apiFetch('/api/sync', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
         },
         body: JSON.stringify({ timestamp: localStorage.getItem('lastSyncTime') || 0 }),
       });
