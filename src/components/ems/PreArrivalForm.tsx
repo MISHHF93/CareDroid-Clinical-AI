@@ -25,6 +25,27 @@ type PreArrivalFormProps = {
   className?: string;
 };
 
+// HEAL-279: this form is permanently mounted (not a modal) with no draft
+// persistence and no unsaved-changes warning anywhere in the app -- a
+// nurse who types MIST/SBAR trauma notes while waiting on an inbound
+// unit, then navigates away before hitting "Post to whiteboard", loses
+// every typed field with zero warning. ReceptionWorkspace.tsx already
+// autosaves its own intake draft to sessionStorage
+// (caredroid:reception-draft), proving the pattern exists; it just
+// wasn't applied here. Auto-saves on every change (rather than requiring
+// an explicit "Save Draft" click, since the bug is specifically about a
+// nurse who never clicks any save action before navigating away).
+const PRE_ARRIVAL_DRAFT_KEY = 'caredroid:pre-arrival-draft';
+
+function readPreArrivalDraft(): Partial<PreArrivalFormInput> | null {
+  try {
+    const raw = window.sessionStorage?.getItem(PRE_ARRIVAL_DRAFT_KEY);
+    return raw ? (JSON.parse(raw) as Partial<PreArrivalFormInput>) : null;
+  } catch {
+    return null;
+  }
+}
+
 const SEVERITY_OPTIONS: EMSSeverity[] = ['Critical', 'High', 'Moderate', 'Low'];
 const SEX_OPTIONS: Sex[] = ['Unknown', 'Male', 'Female', 'Other'];
 
@@ -96,6 +117,7 @@ export default function PreArrivalForm({
   const [form, setForm] = useState<PreArrivalFormInput>(() => ({
     ...emptyPreArrivalFormInput(),
     notificationSource,
+    ...readPreArrivalDraft(),
   }));
   const [submitError, setSubmitError] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -108,8 +130,21 @@ export default function PreArrivalForm({
     sbar: form.sbar,
   });
 
+  const saveDraft = (next: PreArrivalFormInput) => {
+    try {
+      window.sessionStorage?.setItem(PRE_ARRIVAL_DRAFT_KEY, JSON.stringify(next));
+    } catch {
+      // Best-effort only; losing the autosave itself is not worse than
+      // the pre-existing no-persistence behavior.
+    }
+  };
+
   const patchForm = (patch: Partial<PreArrivalFormInput>) => {
-    setForm((current) => ({ ...current, ...patch }));
+    setForm((current) => {
+      const next = { ...current, ...patch };
+      saveDraft(next);
+      return next;
+    });
     setSubmitError('');
   };
 
@@ -137,6 +172,11 @@ export default function PreArrivalForm({
         ...emptyPreArrivalFormInput(),
         notificationSource,
       });
+      try {
+        window.sessionStorage?.removeItem(PRE_ARRIVAL_DRAFT_KEY);
+      } catch {
+        // Non-fatal -- the form itself already reset above.
+      }
       onSubmitted?.(result);
     } catch (error: any) {
       setSubmitError(error instanceof Error ? error.message : 'Could not post pre-arrival');
