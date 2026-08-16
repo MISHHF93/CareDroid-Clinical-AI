@@ -297,6 +297,34 @@ describe('AIService', () => {
     });
   });
 
+  describe('runCareDroidAINode error audit trail (HEAL-240)', () => {
+    it('logs a QueryStatus.ERROR audit row and rethrows when the node workflow fails, matching sibling AI methods', async () => {
+      const userId = 'user-1';
+      const failure = new Error('careDroidAI node workflow exploded');
+      jest.spyOn(service as any, 'classifyStructuredNodeInput').mockRejectedValue(failure);
+      mockAiQueryRepository.save.mockClear();
+
+      await expect(
+        service.runCareDroidAINode(
+          userId,
+          {
+            intent: 'triage_recommendation',
+            input: { symptoms: ['chest pain'] },
+            context: { userRole: 'triage_nurse' },
+          },
+          {},
+        ),
+      ).rejects.toThrow('careDroidAI node workflow exploded');
+
+      expect(mockAiQueryRepository.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          status: 'error',
+          feature: 'careDroidAI_node',
+        }),
+      );
+    });
+  });
+
   describe('getUsage', () => {
     it('should return usage stats for a user', async () => {
       const userId = '1';

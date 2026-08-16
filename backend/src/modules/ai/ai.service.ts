@@ -488,52 +488,80 @@ export class AIService {
 
   async runCareDroidAINode(userId: string, request: CareDroidAIRequest, context?: any) {
     const startTime = Date.now();
-    const unifiedClassification = await this.classifyStructuredNodeInput(userId, request);
-    const mergedRequest = {
-      ...request,
-      context: {
-        ...(request.context || {}),
-        ...(context || {}),
-        ...(unifiedClassification ? { unifiedClassification } : {}),
-      },
-    };
-    const response = await runCareDroidAI(mergedRequest);
-    const latencyMs = Date.now() - startTime;
     const intent = request.intent as CareDroidAIIntent;
-
-    await this.logQuery({
-      userId,
-      prompt: `careDroidAI:${intent}`,
-      response: response.status,
-      status: response.status === 'success' ? QueryStatus.SUCCESS : QueryStatus.ERROR,
-      model: 'careDroidAI-node-v1',
-      promptTokens: 0,
-      completionTokens: 0,
-      totalTokens: 0,
-      cost: 0,
-      latencyMs,
-      feature: 'careDroidAI_node',
-      intentClassified: intent,
-      metadata: {
-        tenant: mergedRequest.context?.tenant,
-        sourceScreen: mergedRequest.context?.sourceScreen,
-        userRole: mergedRequest.context?.userRole || mergedRequest.context?.tenant?.role,
-        confidence: response.confidence,
-        unifiedClassification,
-        warningCount: response.warnings.length,
-        nextActionCount: response.nextActions.length,
-        aiCommercialization: {
-          agentId: 'careDroidAI',
-          assetId: mergedRequest.context?.assetId || 'agent-clinical',
-          modelClass: 'standard',
-          modelVersion: 'careDroidAI-node-v1',
-          requiresHumanReview: response.requiresClinicianReview,
-          estimatedCost: 0,
+    try {
+      const unifiedClassification = await this.classifyStructuredNodeInput(userId, request);
+      const mergedRequest = {
+        ...request,
+        context: {
+          ...(request.context || {}),
+          ...(context || {}),
+          ...(unifiedClassification ? { unifiedClassification } : {}),
         },
-      },
-    });
+      };
+      const response = await runCareDroidAI(mergedRequest);
+      const latencyMs = Date.now() - startTime;
 
-    return response;
+      await this.logQuery({
+        userId,
+        prompt: `careDroidAI:${intent}`,
+        response: response.status,
+        status: response.status === 'success' ? QueryStatus.SUCCESS : QueryStatus.ERROR,
+        model: 'careDroidAI-node-v1',
+        promptTokens: 0,
+        completionTokens: 0,
+        totalTokens: 0,
+        cost: 0,
+        latencyMs,
+        feature: 'careDroidAI_node',
+        intentClassified: intent,
+        metadata: {
+          tenant: mergedRequest.context?.tenant,
+          sourceScreen: mergedRequest.context?.sourceScreen,
+          userRole: mergedRequest.context?.userRole || mergedRequest.context?.tenant?.role,
+          confidence: response.confidence,
+          unifiedClassification,
+          warningCount: response.warnings.length,
+          nextActionCount: response.nextActions.length,
+          aiCommercialization: {
+            agentId: 'careDroidAI',
+            assetId: mergedRequest.context?.assetId || 'agent-clinical',
+            modelClass: 'standard',
+            modelVersion: 'careDroidAI-node-v1',
+            requiresHumanReview: response.requiresClinicianReview,
+            estimatedCost: 0,
+          },
+        },
+      });
+
+      return response;
+    } catch (error) {
+      // HEAL-240: every sibling AI-invocation method in this class
+      // (invokeLLM, generateStructuredJSON) wraps its call in try/catch and
+      // writes a QueryStatus.ERROR audit row before rethrowing -- this node
+      // entrypoint had no try/catch at all, so a classifier or model
+      // failure here left zero trace in the AI query log, unlike every
+      // other AI code path in the app.
+      const latencyMs = Date.now() - startTime;
+      await this.logQuery({
+        userId,
+        prompt: `careDroidAI:${intent}`,
+        response: null,
+        status: QueryStatus.ERROR,
+        model: 'careDroidAI-node-v1',
+        promptTokens: 0,
+        completionTokens: 0,
+        totalTokens: 0,
+        cost: 0,
+        latencyMs,
+        feature: 'careDroidAI_node',
+        intentClassified: intent,
+        metadata: {
+          error: this.formatSafeError(error),
+        },
+      });
+      throw error;
+    }
   }
 
   private async classifyStructuredNodeInput(
