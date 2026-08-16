@@ -104,4 +104,35 @@ describe('NotificationPreferences', () => {
     await waitFor(() => expect(NotificationService.removeDevice).toHaveBeenCalledWith('device-1'));
     expect(screen.queryByText(/Chrome on Windows/i)).not.toBeInTheDocument();
   });
+
+  it('HEAL-263: dismisses the remove-device confirm dialog on Escape', async () => {
+    render(<NotificationPreferences />);
+
+    const removeButton = await screen.findByRole('button', { name: /remove device/i });
+    fireEvent.click(removeButton);
+    expect(screen.getByRole('dialog', { name: /remove notification device/i })).toBeInTheDocument();
+
+    fireEvent.keyDown(document, { key: 'Escape' });
+
+    await waitFor(() =>
+      expect(screen.queryByRole('dialog', { name: /remove notification device/i })).not.toBeInTheDocument(),
+    );
+    expect(NotificationService.removeDevice).not.toHaveBeenCalled();
+  });
+
+  it('HEAL-263: dismisses the remove-device confirm dialog on backdrop click', async () => {
+    render(<NotificationPreferences />);
+
+    const removeButton = await screen.findByRole('button', { name: /remove device/i });
+    fireEvent.click(removeButton);
+    const dialog = screen.getByRole('dialog', { name: /remove notification device/i });
+    expect(dialog).toBeInTheDocument();
+
+    fireEvent.click(dialog.parentElement as HTMLElement);
+
+    await waitFor(() =>
+      expect(screen.queryByRole('dialog', { name: /remove notification device/i })).not.toBeInTheDocument(),
+    );
+    expect(NotificationService.removeDevice).not.toHaveBeenCalled();
+  });
 });

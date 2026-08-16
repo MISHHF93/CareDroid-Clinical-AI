@@ -103,6 +103,20 @@ function NotificationPreferences() {
   const [confirmDevice, setConfirmDevice] = useState<any>(null);
   const [status, setStatus] = useState({ type: '', message: '' });
 
+  // HEAL-263: this custom confirm dialog (used instead of the shared
+  // ConfirmDialogProvider) had a backdrop with role="presentation" but no
+  // onClick, and no Escape handler -- unlike the shared confirm dialog,
+  // keyboard/mouse users could only dismiss it via the two buttons
+  // themselves.
+  useEffect(() => {
+    if (!confirmDevice) return undefined;
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setConfirmDevice(null);
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [confirmDevice]);
+
   const unreadLabel = useMemo(
     () => `${unreadCount} unread notification${unreadCount === 1 ? '' : 's'}`,
     [unreadCount]
@@ -420,8 +434,18 @@ function NotificationPreferences() {
       </div>
 
       {confirmDevice && (
-        <div className="notification-confirm-backdrop" role="presentation">
-          <div className="notification-confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="remove-device-title">
+        <div
+          className="notification-confirm-backdrop"
+          role="presentation"
+          onClick={() => setConfirmDevice(null)}
+        >
+          <div
+            className="notification-confirm-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="remove-device-title"
+            onClick={(event) => event.stopPropagation()}
+          >
             <h3 id="remove-device-title">Remove notification device?</h3>
             <p>
               This stops push notifications from being sent to{' '}
