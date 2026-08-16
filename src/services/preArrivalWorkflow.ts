@@ -93,6 +93,17 @@ export function applyPreArrivalCheckIn(
       }
     : patient.emsArrival;
 
+  // HEAL-277: syncPatientFromArrival (the canonical helper) always keeps
+  // the sibling top-level arrivalTime equal to arrival.arrivalTimestamp --
+  // this function updated only the latter when a real EMS arrival time
+  // came in at check-in, leaving arrivalTime stuck at the original
+  // placeholder/ETA-based value. WhoNextPanel and ReassessmentDrawer read
+  // patient.arrivalTime directly (unlike the main whiteboard, which reads
+  // arrival.arrivalTimestamp first) -- the two would then compute
+  // different wait times, and a different Who's Next urgency score, for
+  // the same patient on the same screen.
+  const nextArrivalTimestamp = arrival?.arrivedAt || patient.arrival?.arrivalTimestamp;
+
   return {
     ...patient,
     firstName: nextFirst,
@@ -102,10 +113,11 @@ export function applyPreArrivalCheckIn(
     phone: patch.phone || patient.phone,
     emsArrival: arrival,
     registrationStatus: 'complete',
+    arrivalTime: nextArrivalTimestamp || patient.arrivalTime,
     arrival: patient.arrival
       ? {
           ...patient.arrival,
-          arrivalTimestamp: arrival?.arrivedAt || patient.arrival.arrivalTimestamp,
+          arrivalTimestamp: nextArrivalTimestamp || patient.arrival.arrivalTimestamp,
           registrationStatus: 'complete',
         }
       : patient.arrival,

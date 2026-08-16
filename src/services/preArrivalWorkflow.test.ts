@@ -46,4 +46,25 @@ describe('preArrivalWorkflow', () => {
     expect(updated.emsArrival?.status).toBe('Arrived');
     expect(isPreArrivalPlaceholder(updated)).toBe(false);
   });
+
+  it('HEAL-277: keeps the top-level arrivalTime synced with arrival.arrivalTimestamp on check-in, matching syncPatientFromArrival', () => {
+    // WhoNextPanel/ReassessmentDrawer read patient.arrivalTime directly;
+    // the main whiteboard reads arrival.arrivalTimestamp first. If the
+    // real EMS arrival time only updated one of the two, the same patient
+    // would show two different wait times on the same screen.
+    const patient = buildPreArrivalPlaceholderPatient(sampleArrival);
+    const placeholderTimestamp = patient.arrivalTime;
+
+    const updated = applyPreArrivalCheckIn(
+      patient,
+      { firstName: 'Alex', lastName: 'Morgan' },
+      '2026-08-16T14:22:00.000Z',
+    );
+
+    expect(updated.emsArrival?.arrivedAt).toBe('2026-08-16T14:22:00.000Z');
+    expect(updated.arrival?.arrivalTimestamp).toBe('2026-08-16T14:22:00.000Z');
+    expect(updated.arrivalTime).toBe('2026-08-16T14:22:00.000Z');
+    expect(updated.arrivalTime).not.toBe(placeholderTimestamp);
+    expect(updated.arrivalTime).toBe(updated.arrival?.arrivalTimestamp);
+  });
 });
