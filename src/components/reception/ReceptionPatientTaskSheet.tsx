@@ -72,12 +72,22 @@ export default function ReceptionPatientTaskSheet({
   }, [onClose]);
 
   return (
-    <div
-      className="reception-task-sheet"
-      role="dialog"
-      aria-label={`Patient tasks: ${displayName}`}
-      aria-modal="true"
-    >
+    <>
+      {/* HEAL-280: this side sheet has the same shape (position: fixed,
+          anchored to one edge) as CriticalChecklist's panel, which gets a
+          backdrop for click-to-dismiss (HEAL-261). This one had none. */}
+      <button
+        type="button"
+        className="reception-task-sheet__backdrop"
+        aria-label="Close patient tasks backdrop"
+        onClick={onClose}
+      />
+      <div
+        className="reception-task-sheet"
+        role="dialog"
+        aria-label={`Patient tasks: ${displayName}`}
+        aria-modal="true"
+      >
       <header className="reception-task-sheet__header">
         <div className="reception-task-sheet__identity">
           <strong>{displayName}</strong>
@@ -172,6 +182,7 @@ export default function ReceptionPatientTaskSheet({
           Open full record
         </button>
       </footer>
-    </div>
+      </div>
+    </>
   );
 }

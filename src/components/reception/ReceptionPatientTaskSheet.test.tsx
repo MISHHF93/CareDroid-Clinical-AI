@@ -123,4 +123,13 @@ describe('ReceptionPatientTaskSheet', () => {
 
     expect(onClose).toHaveBeenCalledTimes(1);
   });
+
+  it('HEAL-280: closes on backdrop click, matching CriticalChecklist\'s same-shape panel', () => {
+    const onClose = vi.fn();
+    render(<ReceptionPatientTaskSheet patient={basePatient()} {...defaultProps} onClose={onClose} />);
+
+    fireEvent.click(screen.getByLabelText('Close patient tasks backdrop'));
+
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
 });

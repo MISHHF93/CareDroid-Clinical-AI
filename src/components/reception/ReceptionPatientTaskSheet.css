@@ -1,3 +1,12 @@
+.reception-task-sheet__backdrop {
+  position: fixed;
+  inset: 0;
+  border: 0;
+  background: rgba(3, 7, 18, 0.4);
+  cursor: pointer;
+  z-index: 29;
+}
+
 .reception-task-sheet {
   position: fixed;
   right: 0;
