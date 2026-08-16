@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
@@ -134,5 +134,70 @@ describe('CriticalChecklist', () => {
       itemText: 'Prepare ECG machine and cardiac monitor',
     });
     expect(screen.queryByText('1/5 items checked')).not.toBeNull();
+  });
+
+  it('HEAL-261: closes on Escape', async () => {
+    const user = userEvent.setup();
+    const checklist = findChecklistById('stemi') || CHECKLISTS[0];
+    const onClose = vi.fn();
+
+    render(
+      <CriticalChecklist patient={basePatient} checklist={checklist} open onClose={onClose} currentStaffId="s1" />,
+    );
+
+    await user.keyboard('{Escape}');
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('HEAL-261: closes on backdrop click', async () => {
+    const user = userEvent.setup();
+    const checklist = findChecklistById('stemi') || CHECKLISTS[0];
+    const onClose = vi.fn();
+
+    render(
+      <CriticalChecklist patient={basePatient} checklist={checklist} open onClose={onClose} currentStaffId="s1" />,
+    );
+
+    await user.click(screen.getByLabelText('Close checklist backdrop'));
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('HEAL-262: checked and unchecked rows each pin an explicit, contrast-matched text color instead of inheriting a theme variable', () => {
+    const checklist = findChecklistById('stemi') || CHECKLISTS[0];
+    const patient: Patient = {
+      ...basePatient,
+      notes: [
+        {
+          id: 'note-existing-check',
+          text: buildChecklistCompletionNote({
+            checklistId: checklist.id,
+            itemId: 'activate-cath-lab',
+            checkedBy: 's1',
+            checkedAt: '2026-06-13T12:05:00.000Z',
+            itemText: 'Activate cath lab (if applicable)',
+          }),
+        },
+      ],
+    };
+
+    render(
+      <CriticalChecklist patient={patient} checklist={checklist} open onClose={() => undefined} currentStaffId="s1" />,
+    );
+
+    const checkedText = screen.getByText('Activate cath lab (if applicable)');
+    expect(checkedText).toHaveStyle({ color: '#f0fdf4' });
+
+    const uncheckedText = screen.getByText('Prepare ECG machine and cardiac monitor');
+    expect(uncheckedText).toHaveStyle({ color: '#111827' });
+  });
+
+  it('HEAL-261: moves focus into the dialog on open', () => {
+    const checklist = findChecklistById('stemi') || CHECKLISTS[0];
+
+    render(
+      <CriticalChecklist patient={basePatient} checklist={checklist} open onClose={() => undefined} currentStaffId="s1" />,
+    );
+
+    expect(screen.getByRole('dialog')).toHaveFocus();
   });
 });

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import './CriticalChecklist.css';
 import {
   CHECKLISTS,
@@ -94,6 +94,14 @@ function ChecklistRow({
       className="checklist-row"
       style={{
         background: checked ? '#102316' : '#ffffff',
+        // HEAL-262: the row text (.checklist-row__text) inherits color
+        // from --medical-ink, a theme variable -- in light theme it's a
+        // dark navy (near-unreadable on this row's own near-black checked
+        // background); in dark theme it flips to near-white (near-
+        // unreadable on this row's own hardcoded white unchecked
+        // background). Pinning an explicit, contrast-matched text color
+        // per state here breaks that dependency regardless of app theme.
+        color: checked ? '#f0fdf4' : '#111827',
         border: `1px solid ${checked ? '#166534' : item.critical ? '#7F1D1D' : '#e0f2fe'}`,
       }}
     >
@@ -117,10 +125,19 @@ function ChecklistRow({
           {item.critical ? (
             <span aria-label="Critical item" className="checklist-row__critical-dot" />
           ) : null}
-          <span className="checklist-row__text">{item.text}</span>
+          {/* HEAL-262: .checklist-row__text has its own `color:
+              var(--medical-ink)` CSS rule, which would otherwise override
+              the label's inherited color above -- set explicitly here too
+              so the fix actually reaches the text, not just the parent. */}
+          <span className="checklist-row__text" style={{ color: checked ? '#f0fdf4' : '#111827' }}>
+            {item.text}
+          </span>
         </span>
         {completion ? (
-          <small className="checklist-row__completion-note">
+          <small
+            className="checklist-row__completion-note"
+            style={{ color: checked ? '#bbf7d0' : undefined }}
+          >
             Completed by {completion.checkedBy} at {formatTime(completion.checkedAt)}
           </small>
         ) : null}
@@ -148,6 +165,35 @@ export default function CriticalChecklist({
     setSelectedChecklistId(checklist?.id || '');
     setOptimisticCompletions([]);
   }, [checklist?.id, patient.id, open]);
+
+  const dialogRef = useRef<HTMLElement>(null);
+
+  // HEAL-261: this dialog had role="dialog"/aria-modal="true" but none of
+  // the focus/keyboard handling other dialogs in this codebase implement
+  // (see ReassessmentDrawer.tsx's HEAL-221 fix for the same gap, and
+  // ConfirmDialogProvider.tsx/CommandPalette.tsx for the same pattern
+  // done correctly): no Escape-to-close, no focus moved in on open, no
+  // focus restored on close, no backdrop click-to-dismiss. This is
+  // auto-opened by PatientDetailPanel for stroke-code flags and critical
+  // EMS arrivals -- the single highest-acuity modal in the app -- yet was
+  // the one dialog a keyboard user couldn't dismiss without finding the
+  // small "X" with a mouse.
+  useEffect(() => {
+    if (!open) return undefined;
+
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    dialogRef.current?.focus();
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose();
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      previouslyFocused?.focus();
+    };
+  }, [onClose, open]);
 
   const noteCompletions = useMemo(
     () => parseChecklistCompletionsFromNotes(patient.notes || []),
@@ -202,12 +248,21 @@ export default function CriticalChecklist({
   };
 
   return (
-    <aside
-      role="dialog"
-      aria-modal="true"
-      aria-label={activeChecklist?.name || 'Critical checklist'}
-      className="critical-checklist-panel"
-    >
+    <>
+      <button
+        type="button"
+        className="critical-checklist-panel__backdrop"
+        aria-label="Close checklist backdrop"
+        onClick={onClose}
+      />
+      <aside
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label={activeChecklist?.name || 'Critical checklist'}
+        className="critical-checklist-panel"
+        tabIndex={-1}
+      >
       <header className="critical-checklist-panel__header">
         <div className="critical-checklist-panel__header-row">
           <div>
@@ -287,7 +342,8 @@ export default function CriticalChecklist({
           </>
         )}
       </div>
-    </aside>
+      </aside>
+    </>
   );
 }
 

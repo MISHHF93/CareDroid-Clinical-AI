@@ -69,6 +69,15 @@
   margin-top: 5px;
 }
 
+.critical-checklist-panel__backdrop {
+  position: fixed;
+  inset: 0;
+  border: 0;
+  background: rgba(3, 7, 18, 0.5);
+  cursor: pointer;
+  z-index: 179;
+}
+
 .critical-checklist-panel {
   background: #ffffff;
   border-left: 1px solid #e0f2fe;
