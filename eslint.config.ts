@@ -99,7 +99,7 @@ const config: Linter.Config[] = [
   },
   {
     files: ['**/*.{js,jsx,mjs,cjs,ts,tsx}'],
-    rules: { 'no-redeclare': 'off', 'no-unused-vars': 'off' },
+    rules: { 'no-redeclare': 'off' },
   },
 ];
 
