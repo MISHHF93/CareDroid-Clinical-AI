@@ -502,9 +502,22 @@ function VitalsHistoryChart({ vitals }: { vitals: Vitals[] }) {
 }
 
 function parseVitals(form: VitalsForm, recordedBy: string): Vitals {
+  // HEAL-230: addVitals() auto-triggers a silent NEWS2 score (see
+  // NEWS2.test.tsx's "runs silent NEWS2 scoring on addVitals" test), which
+  // -- like NEWS2.tsx's own manual entry fields, fixed in HEAL-229 -- falls
+  // back to a "normal" score of 0 for any value outside every defined
+  // band. This form's plain-text inputs had no numeric guard at all, so a
+  // sign-flip typo (e.g. "-5" for RR) landed in the patient's actual
+  // vitals record AND silently suppressed the automatic
+  // reassessment-due/critical-alert check a genuinely severe vital should
+  // trigger. None of these 8 fields can be legitimately negative; clamp
+  // to 0 (the worst-scoring end of every NEWS2 band) rather than
+  // rejecting to undefined, which would hit the exact same
+  // silently-scores-as-normal fallback via a missing value instead.
   const numeric = (value: string): number | undefined => {
     const parsed = Number(value);
-    return Number.isFinite(parsed) ? parsed : undefined;
+    if (!Number.isFinite(parsed)) return undefined;
+    return Math.max(0, parsed);
   };
 
   return {
@@ -1171,9 +1184,32 @@ export default function PatientDetailPanel() {
           <FieldButton
             className="patient-detail-panel__field-btn--push-end"
             title={canTransition ? 'Move to the next patient state' : `${emergencyRole.roleLabel} cannot move patient state`}
-            onClick={() => {
+            onClick={async () => {
               const nextState = getDefaultNextPatientState(selectedPatient);
               if (!nextState || !canTransition) return;
+
+              // HEAL-228: this generic "advance" button silently discharges
+              // the patient whenever nextState resolves to
+              // PatientState.Discharge (getDefaultNextPatientState returns
+              // Discharge for most Disposition-state patients) -- the exact
+              // same underlying transition this component's own explicit
+              // Discharge button (confirmDischargePatient, below) requires a
+              // danger-tone confirmation for, but this button's label never
+              // even says "Discharge", just "Move to next step". Only gate
+              // the discharge case; every other transition this button
+              // handles keeps its existing no-confirmation behavior.
+              if (nextState === PatientState.Discharge) {
+                const patientLabel =
+                  `${selectedPatient.firstName} ${selectedPatient.lastName}`.trim() || selectedPatient.mrn;
+                const confirmed = await confirmCareDroidAction({
+                  title: 'Discharge patient?',
+                  message: `${patientLabel} will be marked discharged.`,
+                  confirmLabel: 'Confirm discharge',
+                  tone: 'danger',
+                });
+                if (!confirmed) return;
+              }
+
               advancePatientJourneyState(selectedPatient.id, nextState, {
                 actorId: actorStaffId,
                 note:
