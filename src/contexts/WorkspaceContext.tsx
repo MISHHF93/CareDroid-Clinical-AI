@@ -227,11 +227,28 @@ export const WorkspaceProvider = ({ children }) => {
     return validatedContext;
   }, [user?.role]);
 
+  // HEAL-234: refreshWorkspaceContext's own async body (2 sequential
+  // awaits: apiFetch then parseApiResponse, before applyBackendContext
+  // sets workspaces/activeWorkspaceId/workspaceContext) had no staleness
+  // guard. switchWorkspace (below) calls this after its own POST to
+  // /api/workspaces/active resolves -- switching workspace A then quickly
+  // re-switching to workspace B can let A's slower GET
+  // /api/workspaces/context response land after B's, and
+  // applyBackendContext's setActiveWorkspaceId/setWorkspaceContext would
+  // silently revert the UI back to workspace A's data even though the
+  // user is now on B. This is the sole call site of applyBackendContext,
+  // so guarding here protects both callers (switchWorkspace and the
+  // mount/auth-change effect below) uniformly.
+  const refreshTokenRef = useRef(0);
+
   const refreshWorkspaceContext = useCallback(async () => {
+    const token = ++refreshTokenRef.current;
     if (isUserLoading) return null;
     if (!isAuthenticated && !authToken) {
-      setWorkspaceContext(null);
-      setError('');
+      if (refreshTokenRef.current === token) {
+        setWorkspaceContext(null);
+        setError('');
+      }
       return null;
     }
     setIsLoading(true);
@@ -241,16 +258,18 @@ export const WorkspaceProvider = ({ children }) => {
       if (!response.ok) {
         throw new Error(data?.message || getApiErrorMessage(null, response));
       }
+      if (refreshTokenRef.current !== token) return null;
       setError('');
       return applyBackendContext(data);
     } catch (contextError: any) {
+      if (refreshTokenRef.current !== token) return null;
       const message = contextError?.message || 'Workspace context unavailable.';
       logger.warn('Workspace context unavailable; using local fallback', { message });
       setWorkspaceContext(null);
       setError(message);
       return null;
     } finally {
-      setIsLoading(false);
+      if (refreshTokenRef.current === token) setIsLoading(false);
     }
   }, [applyBackendContext, authToken, isAuthenticated, isUserLoading]);
 

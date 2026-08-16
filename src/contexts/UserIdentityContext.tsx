@@ -1061,10 +1061,25 @@ export const UserIdentityProvider = ({ children }: { children: React.ReactNode }
     }
   }, [activeWorkspace?.type, activeWorkspaceId, setActiveWorkspaceId]);
 
+  // HEAL-235: two sequential awaits (UserIdentityApi.switchWorkspace then
+  // refreshTenantContext), with setOperationalProfile firing after only
+  // the first, unconditionally. Called in parallel with
+  // WorkspaceContext.tsx's own switchWorkspace (HEAL-234's fix) via
+  // Promise.all in ProfileWorkspaces.tsx -- switching workspace A then
+  // quickly re-switching to B can let A's slower response resolve after
+  // B's, silently reverting operationalProfile.workspace (the source
+  // activeWorkspace/workspaceState reads everywhere in the app) back to
+  // A even though the user is now on B.
+  const switchWorkspaceTokenRef = useRef(0);
+
   const switchWorkspace = useCallback(
     async (workspaceId: string): Promise<ApiResult<WorkspaceState | null>> => {
       if (!workspaceId) return { ok: false, data: null, message: 'Workspace is required.' };
+      const token = ++switchWorkspaceTokenRef.current;
       const result = await UserIdentityApi.switchWorkspace(workspaceId);
+      if (switchWorkspaceTokenRef.current !== token) {
+        return { ok: false, data: null, message: 'Superseded by a newer workspace switch.' };
+      }
       if (!result.ok) {
         setError(result.message);
         return { ok: false, data: null, message: result.message };
@@ -1078,7 +1093,7 @@ export const UserIdentityProvider = ({ children }: { children: React.ReactNode }
         workspace: normalized.workspace,
       }));
       await refreshTenantContext();
-      setError('');
+      if (switchWorkspaceTokenRef.current === token) setError('');
       return { ok: true, data: (normalized.workspace ?? null) as WorkspaceState | null, message: '' };
     },
     [fallbackProfile, normalizeProfile, refreshTenantContext],

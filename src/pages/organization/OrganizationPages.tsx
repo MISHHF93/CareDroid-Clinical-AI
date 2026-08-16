@@ -1,6 +1,6 @@
 import { MEDICAL_THEME } from '../../config/medicalTheme.constants';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Card from '../../components/ui/card';
 import Button from '../../components/ui/button';
@@ -451,17 +451,30 @@ export function PackMarketplace() {
   const [status, setStatus] = useState('');
   const [expandedPackId, setExpandedPackId] = useState('');
 
+  // HEAL-236: no staleness guard on load()'s 2 sequential awaited calls.
+  // load() re-fires on organization?.organizationType changes AND again
+  // after togglePack (below) -- switching org context right as a pack
+  // toggle's own load() is still in flight (or two rapid org switches)
+  // can let a slower/older call's listMarketplacePacks response land
+  // after a newer one, overwriting `packs`/`packProductMap` -- the
+  // "currently selected organization's marketplace" -- with the wrong
+  // organization's pack list.
+  const loadTokenRef = useRef(0);
+
   const load = useCallback(async () => {
+    const token = ++loadTokenRef.current;
     const rows = await PlatformAssetsApi.listMarketplacePacks({
       organizationId: organization?.id,
       organizationType: organization?.organizationType,
     });
+    if (loadTokenRef.current !== token) return;
     setPacks(rows);
     try {
       const map = await ProductCatalogApi.getPackProductMap();
+      if (loadTokenRef.current !== token) return;
       setPackProductMap(map || {});
     } catch {
-      setPackProductMap({});
+      if (loadTokenRef.current === token) setPackProductMap({});
     }
   }, [organization?.organizationType]);
 

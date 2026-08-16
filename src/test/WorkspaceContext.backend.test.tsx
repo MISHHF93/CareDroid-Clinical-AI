@@ -199,6 +199,65 @@ describe('WorkspaceContext backend context', () => {
     );
   });
 
+  it('HEAL-234: a slower refreshWorkspaceContext() call does not overwrite a faster, more recently-started one', async () => {
+    function deferred<T>() {
+      let resolve!: (value: T) => void;
+      const promise = new Promise<T>((r) => {
+        resolve = r;
+      });
+      return { promise, resolve };
+    }
+
+    const jsonResponse = (body: unknown) =>
+      new Response(JSON.stringify(body), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      });
+
+    const contextFor = (workspaceKey: string) => ({
+      workspace: buildIcuWorkspace({ workspaceKey, type: workspaceKey, id: `workspace-${workspaceKey}` }),
+      workspaceState: {
+        workspaces: [buildIcuWorkspace({ workspaceKey, type: workspaceKey, id: `workspace-${workspaceKey}` })],
+        memberships: [],
+        activeWorkspaceId: `workspace-${workspaceKey}`,
+        recentWorkspaceIds: [],
+      },
+      effectivePermissions: [],
+      visibleAssetIds: [],
+      entitledPackIds: [],
+      assetAccessDecisions: {},
+      recommendations: [],
+      workspaceTypes: [workspaceKey],
+    });
+
+    // Initial mount load.
+    mocks.apiFetch.mockResolvedValueOnce(jsonResponse(contextFor('icu')));
+    const wrapper = ({ children }) => <WorkspaceProvider>{children}</WorkspaceProvider>;
+    const { result } = renderHook(() => useWorkspace(), { wrapper });
+    await waitFor(() => expect(result.current.activeWorkspaceId).toBe('icu'));
+
+    // Call A (started first) stays pending on deferredA; call B (started
+    // second, resolves immediately) must win regardless of resolution
+    // order -- before HEAL-234, whichever GET /api/workspaces/context
+    // response happened to land last would win, network-order not
+    // call-order.
+    const deferredA = deferred<Response>();
+    mocks.apiFetch.mockImplementationOnce(() => deferredA.promise);
+    const refreshA = result.current.refreshWorkspaceContext();
+
+    mocks.apiFetch.mockResolvedValueOnce(jsonResponse(contextFor('emergency')));
+    const refreshB = result.current.refreshWorkspaceContext();
+    await refreshB;
+    await waitFor(() => expect(result.current.activeWorkspaceId).toBe('emergency'));
+
+    // A's slower response now resolves, after B has already landed.
+    deferredA.resolve(jsonResponse(contextFor('radiology')));
+    await refreshA;
+    await new Promise((r) => setTimeout(r, 20));
+
+    expect(result.current.activeWorkspaceId).toBe('emergency');
+  });
+
   it('logs a contract violation (rather than silently disagreeing) when the backend response is missing required canonical fields', async () => {
     // A malformed/incomplete response -- missing workspaceProfile, routePath,
     // description, branding, settings entirely. Regression guard for the
