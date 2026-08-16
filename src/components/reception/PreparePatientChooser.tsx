@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { FileScan, UserPlus, UserRoundX, UserSearch, X } from 'lucide-react';
 import { RECEPTION_COPY } from './receptionCopy';
 import './PreparePatientChooser.css';
@@ -12,9 +13,27 @@ export default function PreparePatientChooser({
 }) {
   const copy = RECEPTION_COPY.chooser;
 
+  // HEAL-270: this dialog's outer element IS its own dimmed full-screen
+  // scrim (see PreparePatientChooser.css -- position: fixed, inset: 0,
+  // background rgba(...)), visually identical to a dismissable modal, but
+  // had no onClick and no Escape handler -- only the small X button
+  // worked. Same fix shape as HEAL-261/263.
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [onClose]);
+
   return (
-    <div className="reception-prepare" role="dialog" aria-labelledby="prepare-patient-title">
-      <div className="reception-prepare__panel">
+    <div
+      className="reception-prepare"
+      role="dialog"
+      aria-labelledby="prepare-patient-title"
+      onClick={onClose}
+    >
+      <div className="reception-prepare__panel" onClick={(event) => event.stopPropagation()}>
         <header className="reception-prepare__header">
           <div>
             <p className="reception-prepare__eyebrow">{copy.eyebrow}</p>

@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { ClipboardList, X } from 'lucide-react';
 import type { Patient } from '../../types/emergency';
 import './ReceptionShiftClearance.css';
@@ -30,6 +31,20 @@ export default function ReceptionShiftClearance({
   onOpenPatient,
   onRecordShiftNote,
 }: ReceptionShiftClearanceProps) {
+  // HEAL-270: same fake-backdrop bug as PreparePatientChooser -- this
+  // outer element is its own dimmed full-screen scrim
+  // (ReceptionShiftClearance.css: position: fixed, inset: 0, background
+  // rgba(...)), visually a dismissable modal, but had no onClick and no
+  // Escape handler.
+  useEffect(() => {
+    if (!open) return undefined;
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [onClose, open]);
+
   if (!open) return null;
 
   const total = emsCount + verificationCount + pretriageCount;
@@ -41,8 +56,9 @@ export default function ReceptionShiftClearance({
       role="dialog"
       aria-modal="true"
       aria-labelledby="reception-shift-clearance-title"
+      onClick={onClose}
     >
-      <div className="reception-shift-clearance__panel">
+      <div className="reception-shift-clearance__panel" onClick={(event) => event.stopPropagation()}>
         <header className="reception-shift-clearance__header">
           <div>
             <p className="reception-shift-clearance__eyebrow">
