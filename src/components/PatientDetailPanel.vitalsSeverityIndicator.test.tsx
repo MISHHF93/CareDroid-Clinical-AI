@@ -104,3 +104,11 @@ describe('PatientDetailPanel vitals severity indicator (HEAL-260)', () => {
     expect(screen.queryByText('⚠ Abnormal')).not.toBeInTheDocument();
   });
 });
+
+describe('PatientDetailPanel flag-selector accessible label (HEAL-268)', () => {
+  it('gives the "flag to add" select an accessible name', async () => {
+    renderWithPatient(makePatient());
+
+    expect(await screen.findByLabelText('Flag to add')).toBeInTheDocument();
+  });
+});

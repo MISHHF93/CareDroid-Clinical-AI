@@ -115,6 +115,7 @@ export default function AmbulanceHandoffChecklistPanel({
                 onChange={(event) =>
                   applyPatch({ identityStatus: event.target.value })
                 }
+                aria-label="Patient identity"
               >
                 {identityOptions.map(([value, label]) => (
                   <option key={value} value={value}>
@@ -138,6 +139,7 @@ export default function AmbulanceHandoffChecklistPanel({
                 onChange={(event) =>
                   applyPatch({ complaintSummary: event.target.value })
                 }
+                aria-label="Complaint summary"
               />
             ) : (
               checklist.complaintSummary
@@ -251,6 +253,7 @@ export default function AmbulanceHandoffChecklistPanel({
                       AMBULANCE_HANDOFF_DESTINATION_LABELS[event.target.value],
                   })
                 }
+                aria-label="Patient destination"
               >
                 {destinationOptions.map(([value, label]) => (
                   <option key={value} value={value}>

@@ -1471,6 +1471,7 @@ export default function PatientDetailPanel() {
             onChange={(event) => setFlagToAdd(event.target.value as PatientFlag)}
             disabled={!canManageFlags}
             className="patient-detail-panel__select"
+            aria-label="Flag to add"
           >
             {Object.values(PatientFlag).map((flag) => (
               <option key={flag} value={flag}>{flag}</option>
@@ -1532,6 +1533,7 @@ export default function PatientDetailPanel() {
               }}
               disabled={!canAssignStaff}
               className="patient-detail-panel__select patient-detail-panel__select--full"
+              aria-label="Assign staff"
             >
               <option value="">Choose staff</option>
               {staff.map((member) => (
@@ -1549,6 +1551,7 @@ export default function PatientDetailPanel() {
               }}
               disabled={!canAssignRoom}
               className="patient-detail-panel__select patient-detail-panel__select--full"
+              aria-label="Assign room"
             >
               <option value="">Choose room</option>
               {rooms.map((room: Room) => (

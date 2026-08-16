@@ -511,6 +511,7 @@ function CallCard({
           value={call.callPriority}
           onChange={(e) => onPriorityChange(call.id, e.target.value as CallPriority)}
           className="dc-field-input dc-select-sm"
+          aria-label="Call priority"
         >
           {(Object.keys(CALL_PRIORITY_LABELS) as CallPriority[]).map((p) => (
             <option key={p} value={p}>{CALL_PRIORITY_LABELS[p]}</option>
@@ -521,6 +522,7 @@ function CallCard({
           value={call.status}
           onChange={(e) => onStatusChange(call.id, e.target.value as EmergencyCall['status'])}
           className="dc-field-input dc-select-sm"
+          aria-label="Call status"
         >
           <option value="received">Received</option>
           <option value="triaged">Triaged</option>
