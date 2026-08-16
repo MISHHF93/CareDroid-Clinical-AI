@@ -334,6 +334,17 @@ const BASE_BACKEND_ROUTE_EXPOSURE_POLICY = Object.freeze({
   'GET /api/ai/usage': { strategy: 'deferred', reason: 'Usage meter UI' },
 
   'GET /api/metrics': { strategy: 'backend-only', reason: 'Prometheus scrape' },
+
+  'GET /api/emergency/staff': {
+    strategy: 'deferred',
+    reason:
+      'HEAL-282 (roadmap G1): real staff directory read, added alongside real email/onDuty columns. No admin UI to browse/assign on-duty status exists yet -- an operator sets it via the PATCH endpoint below directly. Deferred, not gated: the data model and route are real, only the UI is pending.',
+  },
+  'PATCH /api/emergency/staff/:staffId/duty-status': {
+    strategy: 'deferred',
+    reason:
+      'HEAL-282 (roadmap G1): marks a staff member on/off duty so waiting-room-safety escalation can route to a real on-duty charge nurse instead of only a static distribution list. Same deferred-UI status as GET /api/emergency/staff above.',
+  },
 });
 
 export const BACKEND_ROUTE_EXPOSURE_POLICY = Object.freeze({
