@@ -1,4 +1,4 @@
-import { IconHelpCircle, IconRefresh } from '@tabler/icons-react';
+import { HelpCircle, RefreshCw } from 'lucide-react';
 import { useSystemConfig } from '../../contexts/SystemConfigContext';
 import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
 import { dispatchOpenHelpHub } from '../../contexts/HelpHubContext';
@@ -26,7 +26,7 @@ export default function SidebarChromeControls() {
             onClick={() => dispatchOpenHelpHub({ tab: 'page' })}
             title="Open Help Center (?)"
           >
-            <IconHelpCircle size={16} stroke={2} className="sidebar-chrome-control__icon" aria-hidden />
+            <HelpCircle size={16} strokeWidth={2} className="sidebar-chrome-control__icon" aria-hidden />
             <span className="sidebar-chrome-control__label">Help</span>
           </button>
 
@@ -36,7 +36,7 @@ export default function SidebarChromeControls() {
               className="sidebar-chrome-control sidebar-chrome-control--meta"
               onClick={() => void refresh()}
             >
-              <IconRefresh size={16} stroke={2} className="sidebar-chrome-control__icon" aria-hidden />
+              <RefreshCw size={16} strokeWidth={2} className="sidebar-chrome-control__icon" aria-hidden />
               <span className="sidebar-chrome-control__label">Retry connection</span>
             </button>
           ) : null}

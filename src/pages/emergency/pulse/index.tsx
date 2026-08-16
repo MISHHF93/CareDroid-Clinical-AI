@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
-  IconAlertTriangle,
-  IconAmbulance,
-  IconGauge,
-  IconRefresh,
-  IconUsers,
-} from '@tabler/icons-react';
+  AlertTriangle,
+  Ambulance,
+  Gauge,
+  RefreshCw,
+  Users,
+} from 'lucide-react';
 import {
   hasPatientFlag,
   selectQueueBottleneckAlert,
@@ -503,35 +503,35 @@ export default function DepartmentPulse() {
     {
       label: 'Active patients',
       value: activePatients.length,
-      icon: IconUsers,
+      icon: Users,
       tone: countTone(activePatients.length, 16, 28),
       route: CANONICAL_ROUTES.emergencyPatients,
     },
     {
       label: 'Capacity score',
       value: capacity.score,
-      icon: IconGauge,
+      icon: Gauge,
       tone: capacityTone(capacity),
       route: CANONICAL_ROUTES.emergencyCapacity,
     },
     {
       label: 'High risk',
       value: highRiskCount,
-      icon: IconAlertTriangle,
+      icon: AlertTriangle,
       tone: countTone(highRiskCount, 2, 5),
       route: CANONICAL_ROUTES.emergencyPatients,
     },
     {
       label: 'Reassessment due',
       value: reassessmentCount,
-      icon: IconRefresh,
+      icon: RefreshCw,
       tone: countTone(reassessmentCount, 2, 5),
       route: CANONICAL_ROUTES.emergencyReassessment,
     },
     {
       label: 'EMS inbound',
       value: inboundEms.length,
-      icon: IconAmbulance,
+      icon: Ambulance,
       tone: countTone(inboundEms.length, 1, 3),
       route: CANONICAL_ROUTES.emergencyEms,
     },

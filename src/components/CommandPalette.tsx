@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { useNavigate, type NavigateFunction } from 'react-router-dom';
-import { IconSearch } from '@tabler/icons-react';
+import { Search } from 'lucide-react';
 import { useEmergencyStore } from '../store/emergencyStore';
 import {
   EMERGENCY_ACTIONS,
@@ -996,7 +996,7 @@ export default function CommandPalette({ open, onClose, onExecute }: CommandPale
         onMouseDown={(event) => event.stopPropagation()}
       >
         <div style={styles.inputRow}>
-          <IconSearch size={18} stroke={2} aria-hidden style={styles.searchIcon} />
+          <Search size={18} strokeWidth={2} aria-hidden style={styles.searchIcon} />
           <input
             ref={inputRef}
             value={query}

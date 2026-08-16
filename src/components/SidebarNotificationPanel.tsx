@@ -1,4 +1,4 @@
-import { IconBell, IconX } from '@tabler/icons-react';
+import { Bell, X } from 'lucide-react';
 import { useNotificationShell } from '../contexts/NotificationShellContext';
 import {
   alertPatientLabel,
@@ -46,7 +46,7 @@ export default function SidebarNotificationPanel() {
       >
         <header className="nc-panel__header">
           <div className="nc-panel__title-block">
-            <IconBell size={18} stroke={2} aria-hidden />
+            <Bell size={18} strokeWidth={2} aria-hidden />
             <div>
               <h2 id="notification-center-title">Alerts</h2>
               <p>
@@ -80,7 +80,7 @@ export default function SidebarNotificationPanel() {
               onClick={closePanel}
               aria-label="Close alerts"
             >
-              <IconX size={16} stroke={2} />
+              <X size={16} strokeWidth={2} />
             </button>
           </div>
         </header>

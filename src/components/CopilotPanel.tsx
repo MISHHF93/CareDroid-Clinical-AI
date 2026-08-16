@@ -2,7 +2,7 @@ import './CopilotPanel.css';
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { IconSend } from '@tabler/icons-react';
+import { Send } from 'lucide-react';
 import { PatientFlag, PatientState, Priority, type Alert, type Patient } from '../types/emergency';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { useEDCopilot } from '../hooks/useEmergencyOs';
@@ -1328,7 +1328,7 @@ export function CopilotPanel() {
           aria-label={copilotChrome.sendAriaLabel}
           disabled={loading || (!input.trim() && attachments.length === 0)}
         >
-          <IconSend size={17} stroke={2.2} />
+          <Send size={17} strokeWidth={2.2} />
         </button>
       </form>
     </>

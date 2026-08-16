@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import { IconSearch } from '@tabler/icons-react';
+import { Search } from 'lucide-react';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import {
@@ -469,7 +469,7 @@ export function Header() {
             ref={lookupWrapperRef}
             className={`caredroid-header__lookup${isReceptionRoute ? ' caredroid-header__lookup--emphasis' : ''}`}
           >
-            <IconSearch size={15} stroke={2} aria-hidden />
+            <Search size={15} strokeWidth={2} aria-hidden />
             <input
               ref={patientLookupInputRef}
               type="search"
@@ -538,7 +538,7 @@ export function Header() {
               aria-label="Open command palette"
               title="Search patients, encounters, referrals, EMS, and queues"
             >
-              <IconSearch size={18} stroke={2} />
+              <Search size={18} strokeWidth={2} />
             </button>
           ) : null}
 

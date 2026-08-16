@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { IconChevronDown } from '@tabler/icons-react';
+import { ChevronDown } from 'lucide-react';
 import { useUser } from '../../contexts/UserContext';
 import { useUserIdentity } from '../../contexts/UserIdentityContext';
 import { useSimulationMode } from '../../contexts/SimulationModeContext';
@@ -271,7 +271,7 @@ export default function UserAccountMenu() {
           <span className="account-menu__name">{displayName}</span>
           <span className="account-menu__meta">{accountMeta}</span>
         </span>
-        <IconChevronDown size={14} className="account-menu__chevron" aria-hidden="true" />
+        <ChevronDown size={14} className="account-menu__chevron" aria-hidden="true" />
       </button>
       {panel}
     </div>

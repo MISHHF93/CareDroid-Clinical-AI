@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { IconActivity, IconX } from '@tabler/icons-react';
+import { Activity, X } from 'lucide-react';
 import useAiChiefOrchestrator from '../../hooks/useAiChiefOrchestrator';
 import useThreeMinuteMission from '../../hooks/useThreeMinuteMission';
 import useUnifiedWorkflowAutomation from '../../hooks/useUnifiedWorkflowAutomation';
@@ -65,7 +65,7 @@ export default function OperationsCenterMenu() {
 
   const triggerInner = (
     <>
-      <IconActivity size={18} stroke={2} aria-hidden="true" />
+      <Activity size={18} strokeWidth={2} aria-hidden="true" />
       {badgeCount > 0 ? <span className="operations-center-menu__badge">{badgeCount}</span> : null}
     </>
   );
@@ -119,7 +119,7 @@ export default function OperationsCenterMenu() {
               onClick={() => setOpen(false)}
               aria-label="Close operations center"
             >
-              <IconX size={16} stroke={2} />
+              <X size={16} strokeWidth={2} />
             </button>
           </header>
 
