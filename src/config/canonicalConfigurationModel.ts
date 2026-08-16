@@ -706,15 +706,6 @@ export const CANONICAL_CONFIGURATION_REGISTRY: readonly CanonicalConfigurationEn
     layer: 'registry',
     consumers: ['StaffWorkloadPanel', 'roleClusterNav.config'],
   }),
-  Object.freeze({
-    id: 'layouts-app-shell-shim',
-    domain: 'layout',
-    path: 'src/layouts/AppShell.tsx',
-    purpose: 'Thin re-export shim — implementation lives in src/components/AppShell.tsx.',
-    layer: 'compat',
-    supersedes: ['src/components/AppShell.tsx'],
-    consumers: [],
-  }),
 ]);
 
 /** Environment variables and their canonical parser modules. */

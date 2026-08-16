@@ -117,16 +117,16 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
     id: 'layouts',
     title: 'Layouts',
     canonical: '`src/components/AppShell.tsx` (active CareDroid app chrome)',
-    secondary: '`src/layouts/AppShell.tsx` (thin re-export shim — implementation in `src/components/AppShell.tsx`)',
+    secondary: null,
     duplicates: [
       {
         name: 'Shell variants',
-        instances: ['src/components/AppShell.tsx', 'src/layouts/AppShell.tsx'],
+        instances: ['src/components/AppShell.tsx'],
         overlap: null,
-        risk: 'Legacy shell is not mounted but retained for tests/manual migration review.',
-        action: 'legacy',
+        risk: null,
+        action: 'done',
         recommendation:
-          'Canonical shell: src/components/AppShell.tsx; do not wire src/layout/AppShell.jsx back into runtime.',
+          'Done (HEAL-257): deleted the dead `src/layouts/AppShell.tsx` re-export shim -- zero real imports anywhere in the repo (confirmed by grep), only referenced by this and 2 other registry entries and one now-updated comment. Canonical shell remains src/components/AppShell.tsx.',
       },
       {
         name: 'Ops demo layout class',
@@ -614,7 +614,7 @@ export function formatDuplicateSystemAuditMarkdown(report = buildDuplicateSystem
     '|--------|------------------|---------------------|',
     '| Routes | `src/config/routes.config.ts` | router.tsx (invent new paths), TOOL_LAUNCH_PATHS |',
     '| Router mount | `src/app/router.tsx` | — |',
-    '| Layouts | `src/components/AppShell.tsx` | `src/layouts/AppShell.tsx` (shim), page-level shells |',
+    '| Layouts | `src/components/AppShell.tsx` | page-level shells |',
     '| AppShell rail | `src/components/AppShell.tsx` + `NAVIGATION_ITEMS` | Inline nav arrays |',
     '| Navigation | `src/config/unified-navigation.config.ts` | `navigation.config.js`, `primaryNavigation.js` (shims/projections only) |',
     '| Tool inventory | `src/data/toolInventory.js` | Ad-hoc tool lists in pages |',

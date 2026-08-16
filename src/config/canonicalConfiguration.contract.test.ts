@@ -64,9 +64,6 @@ describe('canonical configuration contract', () => {
     expect(getCanonicalConfigurationEntry('legacy-role-permissions-utils')?.supersedes).toContain(
       'src/config/emergencyPermissionRegistry.ts',
     );
-    expect(getCanonicalConfigurationEntry('layouts-app-shell-shim')?.supersedes).toContain(
-      'src/components/AppShell.tsx',
-    );
   });
 
   it('documents environment variables with parser module attribution', () => {
@@ -104,7 +101,6 @@ describe('canonical configuration contract', () => {
         'navigation-compat',
         'primary-navigation-compat',
         'legacy-role-permissions-utils',
-        'layouts-app-shell-shim',
       ]),
     );
   });

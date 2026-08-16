@@ -10,9 +10,10 @@
  * command-palette wiring.
  *
  * This file exists so future code has one canonical, named import path
- * (`src/shell`) rather than reaching into `src/components` directly — see
- * `src/layouts/AppShell.tsx` for the same pattern already established
- * elsewhere in this codebase. It intentionally does not reimplement or wrap
+ * (`src/shell`) rather than reaching into `src/components` directly. (A
+ * sibling re-export shim, `src/layouts/AppShell.tsx`, followed the same
+ * pattern but was deleted under HEAL-257 -- zero real imports anywhere in
+ * the repo.) It intentionally does not reimplement or wrap
  * any behavior: an earlier version of this file was a disconnected,
  * placeholder-only mock (hardcoded "connected" health dot, no-op click
  * handlers, decorative-only search/notifications) that duplicated — with far

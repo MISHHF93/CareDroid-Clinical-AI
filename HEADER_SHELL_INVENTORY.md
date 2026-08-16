@@ -805,7 +805,7 @@ type SidebarNavItem = {
 5. **App shells** - components/AppShell.tsx and layouts/AppShell.tsx
 
 ### Potentially Obsolete
-1. `src/layouts/AppShell.tsx` - Duplicate of components/AppShell.tsx
+1. ~~`src/layouts/AppShell.tsx` - Duplicate of components/AppShell.tsx~~ — deleted (HEAL-257), had zero real imports
 2. `src/layouts/DisplayShell.tsx` - May be replaced by shell variants
 3. `src/layouts/EntryShell.tsx` - May be replaced by shell variants
 4. `src/components/ui/PageHeader.tsx` - May be replaced by PageCommandBar

@@ -267,12 +267,6 @@ export const EMERGENCY_ARCHITECTURE_REGISTRY: readonly EmergencyArchitectureArti
     note: 'Legacy MD/RN boolean flags',
   },
   {
-    id: 'layout-app-shell',
-    path: 'src/layouts/AppShell.tsx',
-    classification: EMERGENCY_ARCHITECTURE_CLASSIFICATION.LEGACY,
-    canonical: 'src/components/AppShell.tsx',
-  },
-  {
     id: 'reassessment-timer-engine',
     path: 'src/engine/reassessmentTimerEngine.ts',
     classification: EMERGENCY_ARCHITECTURE_CLASSIFICATION.ACTIVE_SCREEN_LOGIC,

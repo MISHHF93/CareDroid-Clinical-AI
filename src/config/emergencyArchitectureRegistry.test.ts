@@ -17,6 +17,6 @@ describe('emergencyArchitectureRegistry', () => {
     const duplicates = listArchitectureArtifacts(EMERGENCY_ARCHITECTURE_CLASSIFICATION.DUPLICATE);
     expect(duplicates.some((entry) => entry.id === 'utils-emergency-role-permissions')).toBe(true);
     const legacy = listArchitectureArtifacts(EMERGENCY_ARCHITECTURE_CLASSIFICATION.LEGACY);
-    expect(legacy.some((entry) => entry.id === 'layout-app-shell')).toBe(true);
+    expect(legacy.some((entry) => entry.id === 'waiting-room-intelligence-service')).toBe(true);
   });
 });
