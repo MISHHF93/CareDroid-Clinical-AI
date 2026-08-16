@@ -90,6 +90,12 @@ export class ReassessmentService {
       if (bp) {
         const [systolic] = bp.split('/').map(Number);
         if (systolic < 90) patient.alerts.push('Hypotension <90 - reassessment completed');
+        // HEAL-254: same gap already found and fixed elsewhere in this
+        // codebase (vitalsAlertPipeline.ts HEAL-237, deterioration-
+        // prediction-v3.service.ts HEAL-253) -- a hypertensive-emergency
+        // reading previously triggered no reassessment alert at all,
+        // however extreme.
+        if (systolic > 200) patient.alerts.push('Hypertensive crisis >200 - reassessment completed');
       }
     }
 
