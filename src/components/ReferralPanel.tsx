@@ -166,7 +166,7 @@ function acknowledgementMinutes(referral) {
   return Math.round((end - start) / 60000);
 }
 
-function ReferralRow({ referral, patient, now, note, onNoteChange, onStatusChange, onSelectPatient, canUpdateWorkflow }) {
+function ReferralRow({ referral, patient, now, note, onNoteChange, onStatusChange, onSelectPatient, canUpdateWorkflow, statusChangePending }) {
   const elapsed = formatElapsed(elapsedMinutes(referral.requestedAt, now));
   const needsResponseNote = referral.status === 'Sent';
 
@@ -229,7 +229,7 @@ function ReferralRow({ referral, patient, now, note, onNoteChange, onStatusChang
           ) : null}
 
           {referral.status === 'Draft' ? (
-            <button type="button" onClick={() => onStatusChange(referral.id, 'Sent')}>
+            <button type="button" onClick={() => onStatusChange(referral.id, 'Sent')} disabled={statusChangePending}>
               <Send size={14} aria-hidden />
               Send
             </button>
@@ -237,7 +237,11 @@ function ReferralRow({ referral, patient, now, note, onNoteChange, onStatusChang
 
           {referral.status === 'Sent' ? (
             <>
-              <button type="button" onClick={() => onStatusChange(referral.id, 'Acknowledged', note)}>
+              <button
+                type="button"
+                onClick={() => onStatusChange(referral.id, 'Acknowledged', note)}
+                disabled={statusChangePending}
+              >
                 <CheckCircle2 size={14} aria-hidden />
                 Acknowledge
               </button>
@@ -245,7 +249,7 @@ function ReferralRow({ referral, patient, now, note, onNoteChange, onStatusChang
                 type="button"
                 className="referral-row__decline"
                 onClick={() => onStatusChange(referral.id, 'Declined', note)}
-                disabled={!note.trim()}
+                disabled={statusChangePending || !note.trim()}
               >
                 <XCircle size={14} aria-hidden />
                 Decline
@@ -254,7 +258,7 @@ function ReferralRow({ referral, patient, now, note, onNoteChange, onStatusChang
           ) : null}
 
           {referral.status === 'Acknowledged' ? (
-            <button type="button" onClick={() => onStatusChange(referral.id, 'Accepted')}>
+            <button type="button" onClick={() => onStatusChange(referral.id, 'Accepted')} disabled={statusChangePending}>
               <CheckCircle2 size={14} aria-hidden />
               Accept
             </button>
@@ -263,12 +267,20 @@ function ReferralRow({ referral, patient, now, note, onNoteChange, onStatusChang
           {referral.status === 'Accepted' ? (
             <>
               {referral.workflow === 'Transfer' ? (
-                <button type="button" onClick={() => onStatusChange(referral.id, 'TransportArranged')}>
+                <button
+                  type="button"
+                  onClick={() => onStatusChange(referral.id, 'TransportArranged')}
+                  disabled={statusChangePending}
+                >
                   Arrange Transport
                 </button>
               ) : null}
               {referral.workflow !== 'Transfer' ? (
-                <button type="button" onClick={() => onStatusChange(referral.id, 'Completed')}>
+                <button
+                  type="button"
+                  onClick={() => onStatusChange(referral.id, 'Completed')}
+                  disabled={statusChangePending}
+                >
                   <CheckCircle2 size={14} aria-hidden />
                   Complete
                 </button>
@@ -277,20 +289,32 @@ function ReferralRow({ referral, patient, now, note, onNoteChange, onStatusChang
           ) : null}
 
           {referral.status === 'TransferRequested' ? (
-            <button type="button" onClick={() => onStatusChange(referral.id, 'Accepted')}>
+            <button
+              type="button"
+              onClick={() => onStatusChange(referral.id, 'Accepted')}
+              disabled={statusChangePending}
+            >
               <CheckCircle2 size={14} aria-hidden />
               Accept Transfer
             </button>
           ) : null}
 
           {referral.status === 'TransportArranged' ? (
-            <button type="button" onClick={() => onStatusChange(referral.id, 'PatientDeparted')}>
+            <button
+              type="button"
+              onClick={() => onStatusChange(referral.id, 'PatientDeparted')}
+              disabled={statusChangePending}
+            >
               Patient Departed
             </button>
           ) : null}
 
           {referral.status === 'PatientDeparted' ? (
-            <button type="button" onClick={() => onStatusChange(referral.id, 'Completed')}>
+            <button
+              type="button"
+              onClick={() => onStatusChange(referral.id, 'Completed')}
+              disabled={statusChangePending}
+            >
               <CheckCircle2 size={14} aria-hidden />
               Complete
             </button>
@@ -325,6 +349,7 @@ export default function ReferralPanel() {
   const [backendStatus, setBackendStatus] = useState('');
   const [backendPending, setBackendPending] = useState(false);
   const submitReferralInFlightRef = useRef(false);
+  const statusChangeInFlightRef = useRef(false);
   const referralPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.manageReferral);
   const transferPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.manageTransfer);
   const canManageReferral = referralPresentation.enabled;
@@ -481,10 +506,21 @@ export default function ReferralPanel() {
   };
 
   const handleStatusChange = (referralId, status, responseNote = '') => {
+    // HEAL-265: submitReferral (above) guards against a double-click firing
+    // its network call twice with both a synchronous ref check (avoiding
+    // the gap before React re-renders the disabled state) and a
+    // backendPending-derived `disabled` prop on its own buttons. This
+    // sibling handler -- which every ReferralRow status-change button
+    // (Accept Transfer, Complete, Arrange Transport, etc.) calls -- had
+    // neither: a double-click or double-tap could fire the transfer/
+    // referral status sync twice with zero protection.
+    if (statusChangeInFlightRef.current) return;
+    statusChangeInFlightRef.current = true;
     const referral = referrals.find((item) => item.id === referralId);
     const isTransfer = referral?.workflow === 'Transfer' || ['TransferRequested', 'TransportArranged', 'PatientDeparted'].includes(status);
     if ((isTransfer && !canManageTransfer) || (!isTransfer && !canManageReferral)) {
       setBackendStatus(`${emergencyRole.roleLabel} cannot update this workflow.`);
+      statusChangeInFlightRef.current = false;
       return;
     }
     updateReferralStatus(referralId, status, responseNote);
@@ -511,7 +547,10 @@ export default function ReferralPanel() {
           `${isTransfer ? 'Transfer' : 'Referral'} updated for this shift. Live sync is pending.`
         );
       })
-      .finally(() => setBackendPending(false));
+      .finally(() => {
+        setBackendPending(false);
+        statusChangeInFlightRef.current = false;
+      });
     setResponseNotes((current) => ({ ...current, [referralId]: '' }));
   };
 
@@ -822,6 +861,7 @@ export default function ReferralPanel() {
                   onStatusChange={handleStatusChange}
                   onSelectPatient={handleSelectPatient}
                   canUpdateWorkflow={canUpdateWorkflow}
+                  statusChangePending={backendPending}
                 />
               ))}
             </div>
@@ -848,6 +888,7 @@ export default function ReferralPanel() {
                     onStatusChange={handleStatusChange}
                     onSelectPatient={handleSelectPatient}
                     canUpdateWorkflow={canUpdateWorkflow}
+                    statusChangePending={backendPending}
                   />
                 ))
               ) : (

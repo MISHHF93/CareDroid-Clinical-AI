@@ -36,4 +36,29 @@ describe('ReferralPanel double-submit guard', () => {
     expect(referralPanelSource).toContain("onClick={() => submitReferral('TransferRequested')} disabled={backendPending");
     expect(referralPanelSource).toContain("onClick={() => submitReferral('Sent')} disabled={backendPending");
   });
+
+  it('HEAL-265: guards handleStatusChange (Accept Transfer, Complete, Arrange Transport, etc.) the same way submitReferral is guarded', () => {
+    // handleStatusChange backs every ReferralRow status-change button --
+    // unlike submitReferral (HEAL-171 above), it had neither a synchronous
+    // ref guard nor its backendPending state threaded down to disable the
+    // buttons, so a double-click could fire updateEmergencyTransferWorkflow
+    // twice with zero protection.
+    expect(referralPanelSource).toContain('statusChangeInFlightRef');
+    expect(referralPanelSource).toMatch(
+      /if \(statusChangeInFlightRef\.current\) return;\s*\n\s*statusChangeInFlightRef\.current = true;/,
+    );
+    const guardIndex = referralPanelSource.indexOf('statusChangeInFlightRef.current = true;');
+    const updateCallIndex = referralPanelSource.indexOf('updateReferralStatus(referralId, status, responseNote);');
+    expect(guardIndex).toBeGreaterThan(-1);
+    expect(updateCallIndex).toBeGreaterThan(guardIndex);
+    expect(referralPanelSource).toMatch(
+      /\.finally\(\(\) => \{\s*\n\s*setBackendPending\(false\);\s*\n\s*statusChangeInFlightRef\.current = false;/,
+    );
+    // statusChangePending must reach ReferralRow and gate every status-change button.
+    expect(referralPanelSource).toContain('statusChangePending={backendPending}');
+    const statusChangeButtonCount = (
+      referralPanelSource.match(/onClick=\{\(\) => onStatusChange\(referral\.id, [^)]+\)\}\s*(?:\n\s*)?disabled=\{statusChangePending/g) || []
+    ).length;
+    expect(statusChangeButtonCount).toBeGreaterThanOrEqual(8);
+  });
 });
