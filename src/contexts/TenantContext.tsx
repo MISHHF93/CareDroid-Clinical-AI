@@ -92,8 +92,20 @@ export function TenantContextProvider({ children }) {
     return null;
   }, []);
 
+  // HEAL-244: this callback is re-invoked (via the effect below) whenever
+  // authToken/isAuthenticated/user changes -- which can happen twice in
+  // quick succession during login or an identity refresh. With no
+  // staleness guard, a slower in-flight call whose /api/tenant/context
+  // response happened to land after a newer call's could overwrite the
+  // correct organization/workspace context with a stale one -- a
+  // cross-tenant data-isolation risk in this multi-tenant hospital app,
+  // not just cosmetic staleness. Same fix shape as WorkspaceContext's
+  // refreshWorkspaceContext (HEAL-234).
+  const refreshTokenRef = useRef(0);
+
   const refreshTenantContext = useCallback(async () => {
     if (isUserLoading) return null;
+    const token = ++refreshTokenRef.current;
 
     if (!isAuthenticated && !authToken) {
       setError('');
@@ -117,9 +129,11 @@ export function TenantContextProvider({ children }) {
         throw new Error('Tenant context required. Select an organization/workspace or retry.');
       }
 
+      if (token !== refreshTokenRef.current) return null;
       setError('');
       return applyTenantContext(resolvedContext);
     } catch (tenantError: any) {
+      if (token !== refreshTokenRef.current) return null;
       const message = tenantError?.message || 'Tenant context unavailable.';
       const devTenantContext = readDevTenantContext();
       if (devTenantContext && hasRequiredTenantContext(devTenantContext)) {
@@ -138,7 +152,7 @@ export function TenantContextProvider({ children }) {
       applyTenantContext(null);
       return null;
     } finally {
-      setIsLoading(false);
+      if (token === refreshTokenRef.current) setIsLoading(false);
     }
   }, [
     applyTenantContext,

@@ -51,6 +51,12 @@ function Probe() {
   );
 }
 
+function RefreshProbe({ onReady }: { onReady: (refresh: () => Promise<any>) => void }) {
+  const { branding, refreshOrganizationEngine } = useOrganizationContext();
+  onReady(refreshOrganizationEngine);
+  return <output data-testid="org-engine">{branding?.displayName}</output>;
+}
+
 describe('OrganizationContextProvider', () => {
   beforeEach(() => {
     mocks.identityState.refreshPlatformContext.mockReset();
@@ -105,5 +111,60 @@ describe('OrganizationContextProvider', () => {
       });
     });
     expect(mocks.identityState.refreshPlatformContext).toHaveBeenCalled();
+  });
+
+  it('HEAL-245: a slower refreshOrganizationEngine() call does not overwrite a faster, more recently-started one', async () => {
+    function deferred<T>() {
+      let resolve!: (value: T) => void;
+      const promise = new Promise<T>((r) => {
+        resolve = r;
+      });
+      return { promise, resolve };
+    }
+
+    const engineFor = (displayName: string) => ({
+      organization: { id: 'org-1', name: displayName },
+      branding: { displayName },
+      subscription: { tier: 'enterprise', status: 'active' },
+      integrations: [],
+    });
+
+    mocks.getOrganizationEngine.mockResolvedValue(engineFor('Initial Org'));
+
+    let refresh: (() => Promise<any>) | null = null;
+    render(
+      <OrganizationContextProvider>
+        <RefreshProbe onReady={(fn) => { refresh = fn; }} />
+      </OrganizationContextProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('org-engine')).toHaveTextContent('Initial Org');
+    });
+
+    // Call A (started first, for the org the user is LEAVING) stays pending
+    // on deferredA; call B (started second, for the org the user is
+    // switching TO) resolves immediately. Before HEAL-245, whichever
+    // response landed last would win -- meaning a slow response for the
+    // PREVIOUS organization could overwrite the new one's branding/engine
+    // data (and would have pushed the previous org's emergencyOs settings
+    // into the shared clinical store).
+    const deferredA = deferred<any>();
+    mocks.getOrganizationEngine.mockImplementationOnce(() => deferredA.promise);
+    const refreshA = refresh!();
+
+    mocks.getOrganizationEngine.mockResolvedValueOnce(engineFor('New Org'));
+    const refreshB = refresh!();
+    await refreshB;
+    await waitFor(() => {
+      expect(screen.getByTestId('org-engine')).toHaveTextContent('New Org');
+    });
+
+    // A's slower response now resolves, after B has already landed.
+    deferredA.resolve(engineFor('Initial Org'));
+    await refreshA;
+    await new Promise((r) => setTimeout(r, 20));
+
+    expect(screen.getByTestId('org-engine')).toHaveTextContent('New Org');
   });
 });

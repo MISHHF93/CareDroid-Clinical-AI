@@ -48,7 +48,18 @@ export function OrganizationContextProvider({ children }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // HEAL-245: same race as TenantContext's refreshTenantContext (HEAL-244).
+  // This callback is re-triggered whenever organization?.id changes (a user
+  // switching organizations); with no staleness guard, a slower in-flight
+  // call for the PREVIOUS organization could resolve after a newer call for
+  // the new one and overwrite it -- and critically, also push the previous
+  // organization's emergencyOs settings into the live, shared
+  // useEmergencyStore, leaking one organization's clinical settings into
+  // another's session.
+  const refreshTokenRef = useRef(0);
+
   const refreshOrganizationEngine = useCallback(async () => {
+    const token = ++refreshTokenRef.current;
     if (!isAuthenticated && !authToken) {
       setOrganizationEngine(null);
       setError('');
@@ -60,6 +71,7 @@ export function OrganizationContextProvider({ children }) {
       const engine = organization?.id
         ? await PlatformAssetsApi.getOrganizationEngine(organization.id)
         : await PlatformAssetsApi.getCurrentOrganizationEngine();
+      if (token !== refreshTokenRef.current) return null;
       const normalized = engine?.engine || engine;
       setOrganizationEngine(normalized || null);
       const emergencyOs = normalized?.settings?.emergencyOs;
@@ -69,13 +81,14 @@ export function OrganizationContextProvider({ children }) {
       setError('');
       return normalized || null;
     } catch (engineError: any) {
+      if (token !== refreshTokenRef.current) return null;
       const message = engineError?.message || 'Organization engine unavailable.';
       logger.warn('Organization engine unavailable', { message });
       setOrganizationEngine(null);
       setError(message);
       return null;
     } finally {
-      setIsLoading(false);
+      if (token === refreshTokenRef.current) setIsLoading(false);
     }
   }, [authToken, isAuthenticated, organization?.id]);
 
