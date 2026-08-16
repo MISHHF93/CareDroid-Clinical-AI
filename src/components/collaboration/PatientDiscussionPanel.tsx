@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Text, Button } from '../primitives';
 import MessageList from './MessageList';
 import MessageComposer from './MessageComposer';
@@ -29,19 +29,32 @@ export function PatientDiscussionPanel({ patientId }: PatientDiscussionPanelProp
   const [channelId, setChannelId] = useState<string | null>(null);
   const [messages, setMessages] = useState<CollaborationMessage[]>([]);
   const [loading, setLoading] = useState(true);
+  // HEAL-220: no staleness guard meant switching patients rapidly (click
+  // Patient A, then Patient B before A's 2 sequential awaited calls
+  // settle) could let A's slower response resolve AFTER B's and overwrite
+  // channelId/messages while the panel's patientId prop was already B --
+  // patient A's discussion thread rendering under patient B's chart. This
+  // panel is mounted globally in PatientDetailPanel and re-fires load()
+  // (via the patientId dependency) on every whiteboard patient switch, so
+  // this was reachable through ordinary fast clicking, not just deliberate
+  // devtools throttling.
+  const loadTokenRef = useRef(0);
 
   const load = useCallback(async () => {
     if (!patientId) return;
+    const token = ++loadTokenRef.current;
     setLoading(true);
     const threadResult = await collaborationApi.fetchPatientThread(patientId);
+    if (loadTokenRef.current !== token) return;
     if (threadResult.ok && threadResult.data?.id) {
       setChannelId(threadResult.data.id);
       const messagesResult = await collaborationApi.fetchMessages(threadResult.data.id, { limit: 50 });
+      if (loadTokenRef.current !== token) return;
       if (messagesResult.ok && Array.isArray(messagesResult.data)) {
         setMessages(messagesResult.data);
       }
     }
-    setLoading(false);
+    if (loadTokenRef.current === token) setLoading(false);
   }, [patientId]);
 
   useEffect(() => {
