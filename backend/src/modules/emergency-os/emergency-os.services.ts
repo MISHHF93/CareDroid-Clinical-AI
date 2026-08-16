@@ -2078,6 +2078,8 @@ export class QueueIntelligenceService {
 
 @Injectable()
 export class ReceptionWorkspaceService {
+  private readonly logger = new Logger(ReceptionWorkspaceService.name);
+
   constructor(
     private readonly patientService: EmergencyPatientService,
     private readonly emsIntakeService: EMSIntakeService,
@@ -2272,8 +2274,17 @@ export class ReceptionWorkspaceService {
             flags: [...flags, 'Escalated'],
           } as any);
         }
-      } catch {
-        // patient may not exist on board yet
+      } catch (error) {
+        // HEAL-255: the alert/workflow-log/realtime broadcast above already
+        // fired, so the escalation itself isn't lost -- but a failure here
+        // means the patient board silently won't show the "Escalated"
+        // visual indicator, with no trace of why. Logged rather than
+        // discarded, matching this file's own convention elsewhere
+        // (escalatePatient / HEAL-250's reception escalation sync).
+        this.logger.warn(
+          `Failed to set Escalated flag for patient ${patientId} after reception escalation`,
+          error instanceof Error ? error.message : String(error),
+        );
       }
     }
 
