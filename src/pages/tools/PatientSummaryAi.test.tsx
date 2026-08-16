@@ -136,4 +136,61 @@ describe('PatientSummaryAi', () => {
     expect(screen.getAllByText(/CKD/i).length).toBeGreaterThan(0);
     expect(screen.getByRole('heading', { name: /risk factors/i })).toBeInTheDocument();
   });
+
+  it('does not produce a React duplicate-key warning when the AI extraction repeats the same problem/medication/risk-factor label (HEAL-225)', async () => {
+    // AI-extracted labels/names are free text, not a dev-authored enum --
+    // the same problem or drug name can plausibly be extracted twice with
+    // different evidence/context/rationale (e.g. pulled from two
+    // different parts of the note). A single-field key collides in that
+    // case; these 3 lists were brought in line with the compound-key
+    // pattern already used by their recentLabs/alerts siblings in this
+    // same file.
+    vi.mocked(generatePatientSummaryAi).mockResolvedValue({
+      ok: true,
+      data: {
+        runId: 'summary-run-2',
+        status: 'summary_generated',
+        activeProblems: [
+          { label: 'Hypertension', evidence: ['From vitals section.'], priority: 'medium' },
+          { label: 'Hypertension', evidence: ['From history section.'], priority: 'high' },
+        ],
+        medications: [
+          { name: 'Metoprolol', context: 'Morning dose, cardiology note.', reviewFlags: [] },
+          { name: 'Metoprolol', context: 'Evening dose, discharge note.', reviewFlags: [] },
+        ],
+        recentLabs: [],
+        alerts: [],
+        riskFactors: [
+          { label: 'Smoking', rationale: 'Documented in social history.' },
+          { label: 'Smoking', rationale: 'Documented in intake questionnaire.' },
+        ],
+        explainability: {
+          method: 'Structured extraction from submitted chart text.',
+          inputsUsed: ['patientContext'],
+          limitations: [],
+        },
+        safety: { warnings: [] },
+      },
+    });
+
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    renderPage();
+    fireEvent.click(screen.getByRole('button', { name: /generate patient summary/i }));
+
+    await screen.findByText(/From vitals section\./i);
+
+    expect(screen.getByText(/From history section\./i)).toBeInTheDocument();
+    expect(screen.getByText(/Morning dose, cardiology note\./i)).toBeInTheDocument();
+    expect(screen.getByText(/Evening dose, discharge note\./i)).toBeInTheDocument();
+    expect(screen.getByText(/Documented in social history\./i)).toBeInTheDocument();
+    expect(screen.getByText(/Documented in intake questionnaire\./i)).toBeInTheDocument();
+
+    const keyWarnings = consoleErrorSpy.mock.calls.filter((call) =>
+      String(call[0]).includes('Encountered two children with the same key'),
+    );
+    expect(keyWarnings).toHaveLength(0);
+
+    consoleErrorSpy.mockRestore();
+  });
 });

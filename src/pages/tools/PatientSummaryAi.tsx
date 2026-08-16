@@ -192,11 +192,20 @@ export default function PatientSummaryAi({ embedded = false, onCloseEmbedded }: 
               </div>
             ) : result ? (
               <div className="diagnosis-results-body">
+                {/* HEAL-225: activeProblems/medications/riskFactors were keyed on a
+                    single free-text AI-extracted field (label/name), unlike their
+                    sibling recentLabs/alerts lists in this same file, which already
+                    use a 2-field compound key -- extracted text plausibly repeats
+                    (e.g. the same problem or drug name pulled from two different
+                    parts of a note), and a duplicate key means React can misattach
+                    the wrong evidence/context/rationale text on a re-render (e.g.
+                    regenerating the summary). Brought these 3 in line with the
+                    established compound-key pattern already used here. */}
                 <SummarySection title="Active Problems" emptyText="No active problems extracted.">
                   {result.activeProblems?.length ? (
                     <ul>
                       {result.activeProblems.map((problem) => (
-                        <li key={problem.label}>
+                        <li key={`${problem.label}-${problem.priority}`}>
                           <strong>{problem.label}</strong> ({problem.priority}) - {problem.evidence.join(' ')}
                         </li>
                       ))}
@@ -208,7 +217,7 @@ export default function PatientSummaryAi({ embedded = false, onCloseEmbedded }: 
                   {result.medications?.length ? (
                     <ul>
                       {result.medications.map((medication) => (
-                        <li key={medication.name}>
+                        <li key={`${medication.name}-${medication.context}`}>
                           <strong>{medication.name}</strong>: {medication.context}{' '}
                           {medication.reviewFlags.join(' ')}
                         </li>
@@ -245,7 +254,7 @@ export default function PatientSummaryAi({ embedded = false, onCloseEmbedded }: 
                   {result.riskFactors?.length ? (
                     <ul>
                       {result.riskFactors.map((riskFactor) => (
-                        <li key={riskFactor.label}>
+                        <li key={`${riskFactor.label}-${riskFactor.rationale}`}>
                           <strong>{riskFactor.label}</strong>: {riskFactor.rationale}
                         </li>
                       ))}
