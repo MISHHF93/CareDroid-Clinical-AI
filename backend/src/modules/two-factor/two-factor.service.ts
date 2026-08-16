@@ -146,18 +146,38 @@ export class TwoFactorService {
       return true;
     }
 
-    // Try backup codes
+    // Try backup codes. HEAL-231: this used to read `twoFactor` (fetched
+    // above, before this point), bcrypt-compare against its in-memory
+    // backupCodes, splice, then save -- a classic check-then-act race.
+    // Two concurrent requests presenting the SAME single-use backup code
+    // each fetch their own copy of the row, both find the code still
+    // present and both bcrypt.compare succeeds, so both return true
+    // *before* either request's removal is persisted -- a single-use
+    // backup code could authenticate more than once. Wrapping the
+    // read-check-remove-save sequence in a transaction with a
+    // pessimistic write lock on the row forces the second concurrent
+    // request to block until the first commits, then re-read the
+    // already-updated row, so it correctly fails the bcrypt check against
+    // a code that's genuinely gone.
     if (twoFactor.backupCodes && twoFactor.backupCodes.length > 0) {
-      for (let i = 0; i < twoFactor.backupCodes.length; i++) {
-        const isValidBackup = await bcrypt.compare(token, twoFactor.backupCodes[i]);
-        if (isValidBackup) {
-          // Remove used backup code
-          twoFactor.backupCodes.splice(i, 1);
-          twoFactor.lastUsedAt = new Date();
-          await this.twoFactorRepository.save(twoFactor);
-          return true;
+      return this.twoFactorRepository.manager.transaction(async (manager) => {
+        const locked = await manager.findOne(TwoFactor, {
+          where: { userId },
+          lock: { mode: 'pessimistic_write' },
+        });
+        if (!locked?.backupCodes?.length) return false;
+
+        for (let i = 0; i < locked.backupCodes.length; i++) {
+          const isValidBackup = await bcrypt.compare(token, locked.backupCodes[i]);
+          if (isValidBackup) {
+            locked.backupCodes.splice(i, 1);
+            locked.lastUsedAt = new Date();
+            await manager.save(locked);
+            return true;
+          }
         }
-      }
+        return false;
+      });
     }
 
     return false;

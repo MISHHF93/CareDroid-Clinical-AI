@@ -32,11 +32,19 @@ describe('TwoFactorService', () => {
     lastUsedAt: new Date(),
   };
 
+  const mockEntityManager = {
+    findOne: jest.fn(),
+    save: jest.fn(),
+  };
+
   const mockTwoFactorRepository = {
     create: jest.fn(),
     save: jest.fn(),
     findOne: jest.fn(),
     remove: jest.fn(),
+    manager: {
+      transaction: jest.fn(async (callback) => callback(mockEntityManager)),
+    },
   };
 
   const mockUserRepository = {
@@ -72,6 +80,9 @@ describe('TwoFactorService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockTwoFactorRepository.manager.transaction.mockImplementation(async (callback) =>
+      callback(mockEntityManager),
+    );
   });
 
   it('should be defined', () => {
@@ -190,6 +201,10 @@ describe('TwoFactorService', () => {
       };
 
       mockTwoFactorRepository.findOne.mockResolvedValue(twoFactorWithBackup);
+      mockEntityManager.findOne.mockResolvedValue({
+        ...mockTwoFactor,
+        backupCodes: ['hashed_backup1', 'hashed_backup2'],
+      });
       (speakeasy.totp.verify as jest.Mock).mockReturnValue(false);
       (bcrypt.compare as jest.Mock).mockImplementation((plain, hash) => {
         return Promise.resolve(hash === 'hashed_backup1' && plain === backupCode);
@@ -198,6 +213,64 @@ describe('TwoFactorService', () => {
       const result = await service.verifyToken(userId, backupCode);
 
       expect(result).toBe(true);
+      expect(mockEntityManager.save).toHaveBeenCalledWith(
+        expect.objectContaining({ backupCodes: ['hashed_backup2'] }),
+      );
+    });
+
+    it('HEAL-231: two truly concurrent verifications of the same backup code -- only one succeeds', async () => {
+      // Must actually overlap the two calls (Promise.all, not sequential
+      // awaits) to exercise the race at all -- two sequential calls would
+      // "pass" even against the original buggy code, since the first
+      // call's save always completes before the second even starts.
+      //
+      // manager.transaction is modeled as a serializing queue: each call
+      // waits for the PREVIOUS transaction's callback to finish before its
+      // own starts, exactly the ordering guarantee a real DB pessimistic
+      // write lock provides. That guarantee itself is TypeORM/Postgres's
+      // job, not something to reimplement here -- this test verifies the
+      // application logic is correct GIVEN that guarantee: the backup-code
+      // check re-reads via the transactional manager (not the outer,
+      // pre-transaction `twoFactor` snapshot), so the second-to-acquire
+      // transaction sees the code already removed.
+      const userId = '1';
+      const backupCode = 'backup123';
+      let currentBackupCodes = ['hashed_backup1', 'hashed_backup2'];
+
+      let transactionQueue = Promise.resolve();
+      mockTwoFactorRepository.manager.transaction.mockImplementation((callback) => {
+        const result = transactionQueue.then(() => callback(mockEntityManager));
+        transactionQueue = result.then(
+          () => undefined,
+          () => undefined,
+        );
+        return result;
+      });
+
+      mockTwoFactorRepository.findOne.mockImplementation(async () => ({
+        ...mockTwoFactor,
+        backupCodes: currentBackupCodes,
+      }));
+      mockEntityManager.findOne.mockImplementation(async () => ({
+        ...mockTwoFactor,
+        backupCodes: currentBackupCodes,
+      }));
+      mockEntityManager.save.mockImplementation(async (entity) => {
+        currentBackupCodes = entity.backupCodes;
+        return entity;
+      });
+      (speakeasy.totp.verify as jest.Mock).mockReturnValue(false);
+      (bcrypt.compare as jest.Mock).mockImplementation((plain, hash) =>
+        Promise.resolve(hash === 'hashed_backup1' && plain === backupCode),
+      );
+
+      const [first, second] = await Promise.all([
+        service.verifyToken(userId, backupCode),
+        service.verifyToken(userId, backupCode),
+      ]);
+
+      expect([first, second].filter(Boolean)).toHaveLength(1);
+      expect(currentBackupCodes).toEqual(['hashed_backup2']);
     });
 
     it('should return false for invalid token', async () => {
