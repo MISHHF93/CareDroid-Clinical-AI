@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import HospitalMapInsights from '../../components/operations/HospitalMapInsights';
 import { GraphicIconBadge } from '../../components/graphics/CdlGraphicKit';
 import '../HospitalMapDashboard.css';
@@ -110,8 +110,19 @@ export default function HospitalMapDashboard() {
   const [mapResult, setMapResult] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [last, setLast] = useState<Date | null>(null);
+  // HEAL-278: load() fires 4 concurrent fetches and is triggered both by a
+  // 60s setInterval and a manual "Refresh" button (only disabled while
+  // loading, not guarded against overlapping calls). If the auto-poll
+  // fires while a manual refresh is still in flight and the older call
+  // resolves last -- normal network jitter -- its response overwrites the
+  // newer one, showing stale bed/capacity counts until the next cycle
+  // happens to correct it. Same useRef token-counter fix already applied
+  // to useOperationsHubLiveFeeds.ts (HEAL-248), which documents this exact
+  // hazard.
+  const loadTokenRef = useRef(0);
 
   async function load() {
+    const token = ++loadTokenRef.current;
     setLoading(true);
     try {
       const [capResult, histResult, surgeResult, hospitalMapResult] = await Promise.all([
@@ -120,6 +131,7 @@ export default function HospitalMapDashboard() {
         fetchEmergencySurgeStatus(),
         fetchHospitalMapSnapshot(),
       ]);
+      if (token !== loadTokenRef.current) return;
 
       setCapacity(
         (capResult as any).ok && (capResult as any).data ? (capResult as any).data : DEMO_CAPACITY,
@@ -129,7 +141,7 @@ export default function HospitalMapDashboard() {
       setMapResult(hospitalMapResult);
       setLast(new Date());
     } finally {
-      setLoading(false);
+      if (token === loadTokenRef.current) setLoading(false);
     }
   }
 
