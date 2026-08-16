@@ -123,3 +123,43 @@ describe('PatientDetailPanel vitals-entry numeric validation (HEAL-230)', () => 
     expect(latest.hr).toBe(82);
   });
 });
+
+describe('PatientDetailPanel vitals-entry ceiling validation (HEAL-242)', () => {
+  it('clamps an out-of-scale SpO2 entry to 100 instead of storing it as-is', async () => {
+    // HEAL-230's floor-only clamp let "500" through unchanged, where it
+    // would read as a far-better-than-100% reading in NEWS2 scoring.
+    renderWithPatient(makePatient());
+
+    fireEvent.click(await screen.findByRole('button', { name: /add vitals/i }));
+    fireEvent.change(screen.getByLabelText('SPO2'), { target: { value: '500' } });
+    fireEvent.click(screen.getByRole('button', { name: /save vitals/i }));
+
+    const stored = useEmergencyStore.getState().patients[0].vitals;
+    const latest = stored[stored.length - 1];
+    expect(latest.spo2).toBe(100);
+  });
+
+  it('clamps an out-of-scale GCS entry to 15', async () => {
+    renderWithPatient(makePatient());
+
+    fireEvent.click(await screen.findByRole('button', { name: /add vitals/i }));
+    fireEvent.change(screen.getByLabelText('GCS'), { target: { value: '99' } });
+    fireEvent.click(screen.getByRole('button', { name: /save vitals/i }));
+
+    const stored = useEmergencyStore.getState().patients[0].vitals;
+    const latest = stored[stored.length - 1];
+    expect(latest.gcs).toBe(15);
+  });
+
+  it('clamps an out-of-scale pain entry to 10', async () => {
+    renderWithPatient(makePatient());
+
+    fireEvent.click(await screen.findByRole('button', { name: /add vitals/i }));
+    fireEvent.change(screen.getByLabelText('PAIN'), { target: { value: '50' } });
+    fireEvent.click(screen.getByRole('button', { name: /save vitals/i }));
+
+    const stored = useEmergencyStore.getState().patients[0].vitals;
+    const latest = stored[stored.length - 1];
+    expect(latest.pain).toBe(10);
+  });
+});

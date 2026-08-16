@@ -514,21 +514,29 @@ function parseVitals(form: VitalsForm, recordedBy: string): Vitals {
   // to 0 (the worst-scoring end of every NEWS2 band) rather than
   // rejecting to undefined, which would hit the exact same
   // silently-scores-as-normal fallback via a missing value instead.
-  const numeric = (value: string): number | undefined => {
+  const numeric = (value: string, max?: number): number | undefined => {
     const parsed = Number(value);
     if (!Number.isFinite(parsed)) return undefined;
-    return Math.max(0, parsed);
+    const floored = Math.max(0, parsed);
+    return typeof max === 'number' ? Math.min(max, floored) : floored;
   };
 
   return {
     hr: numeric(form.hr),
     sbp: numeric(form.sbp),
     dbp: numeric(form.dbp),
-    spo2: numeric(form.spo2),
+    // HEAL-242: the floor-only clamp above (HEAL-230) still let an
+    // out-of-scale HIGH entry through unclamped -- e.g. SpO2 "500" or GCS
+    // "99" -- which then reads as the BEST possible band in NEWS2/triage
+    // scoring (>=96% SpO2, GCS 15) instead of being flagged as the
+    // obvious entry error it is. SpO2 (%) and GCS have hard, physically
+    // absolute ceilings; pain matches the 0-10 scale used everywhere else
+    // in this app (triageEngine.ts, UnifiedIntakePanel.tsx).
+    spo2: numeric(form.spo2, 100),
     temp: numeric(form.temp),
     rr: numeric(form.rr),
-    gcs: numeric(form.gcs),
-    pain: numeric(form.pain),
+    gcs: numeric(form.gcs, 15),
+    pain: numeric(form.pain, 10),
     recordedAt: new Date().toISOString(),
     recordedBy,
   };
