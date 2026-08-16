@@ -149,6 +149,22 @@ describe('NEWS2 calculator and auto scoring', () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
+  it('clamps an out-of-range typed value instead of silently scoring it as normal (HEAL-229)', () => {
+    // scoreRange() falls back to a "normal" score of 0 for any value
+    // outside every defined band -- before HEAL-229, typing a sign-flip
+    // typo like "-5" for respiration rate produced 0/20 (Low risk)
+    // instead of the worst-band score a genuinely out-of-range vital
+    // should produce.
+    seedPatient();
+    render(<NEWS2 patientId={patient.id} onClose={vi.fn()} />);
+
+    fireEvent.change(screen.getByLabelText('Respiration Rate (/min)'), { target: { value: '-5' } });
+
+    expect(screen.getByLabelText('Respiration Rate (/min)')).toHaveProperty('value', '0');
+    // Clamped to the floor of the 0-8 band (score 3), not silently 0/20.
+    expect(screen.getByText('3/20')).toBeTruthy();
+  });
+
   it('runs silent NEWS2 scoring on addVitals and flags high scores automatically', () => {
     seedPatient();
     useEmergencyStore.getState().addVitals(patient.id, {

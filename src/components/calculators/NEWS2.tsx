@@ -91,10 +91,25 @@ export default function NEWS2({ patientId, onClose }: NEWS2Props) {
   }, [addFlag, patient, patientId, response, score.hasSingleRed, score.total]);
 
   const updateNumber = (id: keyof NEWS2Values, rawValue: string) => {
-    setValues((previous) => ({
-      ...previous,
-      [id]: rawValue === '' ? undefined : Number(rawValue),
-    }));
+    setValues((previous) => {
+      if (rawValue === '') return { ...previous, [id]: undefined };
+      const parsed = Number(rawValue);
+      if (Number.isNaN(parsed)) return previous;
+      // HEAL-229: the min/max input attributes are advisory only -- a
+      // typed value outside every item's defined range still reached
+      // scoreRange(), which falls back to a "normal" score of 0 for
+      // anything unmatched. Clamp to the item's own range bounds so an
+      // out-of-band entry (most plausibly a sign-flip typo on a negative
+      // vital) scores as the worst matching band instead of silently
+      // looking healthy.
+      const item = NEWS2_ITEMS.find((candidate) => candidate.id === id);
+      const bounds = item && 'ranges' in item ? item.ranges : undefined;
+      const min = bounds?.[0]?.min;
+      const max = bounds?.[bounds.length - 1]?.max;
+      const clamped =
+        min !== undefined && max !== undefined ? Math.min(Math.max(parsed, min), max) : parsed;
+      return { ...previous, [id]: clamped };
+    });
     setSavedMessage('');
   };
 
@@ -190,6 +205,18 @@ export default function NEWS2({ patientId, onClose }: NEWS2Props) {
                   {item.input === 'number' ? (
                     <input
                       type="number"
+                      // HEAL-229: had no min/max, and scoreRange() falls back
+                      // to 0 ("normal") for any value outside every defined
+                      // band -- a mistyped negative respiration rate/HR/SBP
+                      // etc. silently scored as normal instead of the high
+                      // score (or outright rejection) an out-of-range vital
+                      // should produce, capable of masking a real
+                      // deterioration signal from the >=5 reassessment-flag
+                      // threshold. Bounds come directly from this item's own
+                      // ranges (already the single source of truth for
+                      // scoring), not new numbers.
+                      min={item.ranges[0]?.min}
+                      max={item.ranges[item.ranges.length - 1]?.max}
                       value={inputValue(values[item.id])}
                       aria-label={item.label}
                       onChange={(event) => updateNumber(item.id, event.target.value)}
