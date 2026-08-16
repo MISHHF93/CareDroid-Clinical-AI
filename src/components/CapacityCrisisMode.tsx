@@ -4,6 +4,7 @@ import {
   type CapacityCrisisState,
 } from '../engine/capacityEngine';
 import { dispatchAlert } from '../engine/alertEngine';
+import { confirmCareDroidAction } from '../services/careDroidInteractionFeedback';
 import { invokeUnifiedAiRequest } from '../services/careDroidUnifiedAiNode';
 import { useEmergencyStore } from '../store/emergencyStore';
 import {
@@ -193,7 +194,24 @@ export default function CapacityCrisisMode({
     setActionMessage(`Admitting team contact documented at ${time}.`);
   };
 
-  const completeDischarge = (patientId: string) => {
+  // HEAL-226: discharged directly on click with zero confirmation, unlike
+  // this exact same discharge transition's other 2 entry points
+  // (PatientDetailPanel.tsx's confirmDischargePatient, reached from both
+  // its own Discharge button and PatientCard.tsx's open-patient-discharge
+  // event), which both require an explicit danger-tone confirmation
+  // first. This drawer is reached by charge nurses during an active
+  // capacity crisis -- exactly when rapid clicking through a dense
+  // patient list is most likely -- so it was the one discharge path with
+  // the least protection against an accidental click.
+  const completeDischarge = async (patientId: string, patientName: string) => {
+    const confirmed = await confirmCareDroidAction({
+      title: 'Discharge patient?',
+      message: `${patientName} will be marked discharged.`,
+      confirmLabel: 'Confirm discharge',
+      tone: 'danger',
+    });
+    if (!confirmed) return;
+
     movePatientToState(patientId, PatientState.Discharge, {
       staffId: activeShift.chargeStaffId,
       note: 'Capacity crisis action panel: discharge completed.',
@@ -339,7 +357,7 @@ export default function CapacityCrisisMode({
                       <span>
                         {item.name} | in Disposition since {formatClockTime(item.sinceTime)}
                       </span>
-                      <button type="button" onClick={() => completeDischarge(item.patient.id)}>
+                      <button type="button" onClick={() => void completeDischarge(item.patient.id, item.name)}>
                         Complete Discharge
                       </button>
                     </article>
