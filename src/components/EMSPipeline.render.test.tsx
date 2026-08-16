@@ -135,4 +135,54 @@ describe('EMSPipeline render', () => {
     );
     expect(getByText('No inbound EMS units in the active CareDroid state.')).toBeInTheDocument();
   });
+
+  it('HEAL-276: excludes an arrival already converted to a patient from "Awaiting Handoff", matching EMSPressureScore', () => {
+    // convertEMSArrivalToPatient() assigns patientId but leaves
+    // status: 'Handoff' -- this arrival has already become a live patient
+    // (bed assigned, in the ED), so it should not show as a phantom
+    // "still waiting" ambulance.
+    useEmergencyStore.setState(
+      {
+        ...originalState,
+        patients: [],
+        emsArrivals: [
+          {
+            id: 'ems-already-converted',
+            unitId: 'Medic 9',
+            unitName: 'Medic 9',
+            status: 'Handoff',
+            severity: 'Moderate',
+            eta: 0,
+            dispatchTime: new Date().toISOString(),
+            estimatedArrivalTime: new Date().toISOString(),
+            arrivedAt: new Date().toISOString(),
+            patientId: 'patient-already-converted',
+            chiefComplaint: 'Abdominal pain',
+          } as any,
+        ],
+        staff: [],
+        rooms: [],
+        alerts: [],
+        capacity: originalState.capacity,
+        emergencySettings: originalState.emergencySettings,
+      },
+      true,
+    );
+
+    const { getByText } = render(
+      <MemoryRouter initialEntries={['/emergency/ems']}>
+        <RouteChromeProvider>
+          <PractitionerVisibilityProvider>
+            <HelpHubProvider>
+              <EMSPipeline />
+            </HelpHubProvider>
+          </PractitionerVisibilityProvider>
+        </RouteChromeProvider>
+      </MemoryRouter>,
+    );
+
+    const heading = getByText('Awaiting Handoff');
+    const countBadge = heading.parentElement?.querySelector('span');
+    expect(countBadge?.textContent).toBe('0');
+  });
 });

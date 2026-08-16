@@ -492,13 +492,21 @@ export default function EMSPipeline() {
     }
   };
 
+  // HEAL-276: EMSPressureScore (rendered directly above this section on
+  // the same page, from the same emsArrivals array) excludes arrivals
+  // that already have a patientId set -- convertEMSArrivalToPatient()
+  // assigns patientId but leaves status as 'Handoff' (not 'Complete'), so
+  // an arrival already converted to a live patient (bed assigned, patient
+  // in the ED) would otherwise still count here as a phantom "still
+  // waiting" ambulance, disagreeing with the widget right above it.
   const incoming = activeArrivals
-    .filter((arrival) => arrival.status === 'Inbound' && minutesRemaining(arrival, now) > 0)
+    .filter((arrival) => arrival.status === 'Inbound' && minutesRemaining(arrival, now) > 0 && !arrival.patientId)
     .sort((a, b) => minutesRemaining(a, now) - minutesRemaining(b, now));
   const awaitingHandoff = activeArrivals
     .filter(
       (arrival) =>
-        arrival.status === 'Arrived' || arrival.status === 'Handoff' || minutesRemaining(arrival, now) <= 0
+        !arrival.patientId &&
+        (arrival.status === 'Arrived' || arrival.status === 'Handoff' || minutesRemaining(arrival, now) <= 0)
     )
     .sort((a, b) => minutesRemaining(a, now) - minutesRemaining(b, now));
   const offloadSamples = emsArrivals
