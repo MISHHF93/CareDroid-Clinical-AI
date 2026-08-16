@@ -746,7 +746,10 @@ function PatientCard({
         </div>
 
         <div className="patient-card__row-cell patient-card__row-cell--identity">
-          <strong>{patientName}</strong>
+          {/* HEAL-259: this field is CSS-truncated (overflow/ellipsis) with
+              no other way to recover the full name -- unlike the complaint
+              field below, which already gets a title tooltip. */}
+          <strong title={patientName}>{patientName}</strong>
           <span>{patientMrn}</span>
         </div>
 
@@ -927,7 +930,7 @@ function PatientCard({
 
       <div className="patient-card__identity">
         <div className="patient-card__identity-main">
-          <strong>{patientName}</strong>
+          <strong title={patientName}>{patientName}</strong>
           <span>{patientMrn}</span>
           <span className="patient-card__arrival-mode">{arrivalModeLabel(arrival.arrivalMode)}</span>
         </div>

@@ -97,6 +97,22 @@ describe('PatientCard core whiteboard row', () => {
     expect(window.location.pathname).toBe('/emergency/patient-room');
     expect(window.location.search).toBe('?patientId=wb-patient-1');
   });
+
+  it('HEAL-259: gives the (CSS-truncated) patient name a title tooltip in both row and card layout', () => {
+    const { rerender } = render(
+      <MemoryRouter>
+        <PatientCard patient={patientWithArrival()} layout="row" />
+      </MemoryRouter>,
+    );
+    expect(screen.getByText('Jordan Lee')).toHaveAttribute('title', 'Jordan Lee');
+
+    rerender(
+      <MemoryRouter>
+        <PatientCard patient={patientWithArrival()} layout="card" />
+      </MemoryRouter>,
+    );
+    expect(screen.getByText('Jordan Lee')).toHaveAttribute('title', 'Jordan Lee');
+  });
 });
 
 describe('PatientCard complaint recognition (2026-08-08)', () => {
