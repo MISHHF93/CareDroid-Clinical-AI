@@ -57,6 +57,16 @@ export class DeteriorationPredictionV3Service {
       score += 0.18;
       contributingSignals.push('hypotension');
     }
+    // HEAL-253: matches the symmetric HR check above (both ends checked),
+    // and the same SBP-ceiling gap already found and fixed twice elsewhere
+    // in this codebase (vitalsAlertPipeline.ts HEAL-237, triageEngine.ts's
+    // p2-sbp-emergent rule) -- a hypertensive-emergency reading or a
+    // fat-finger typo (e.g. "1800" for "180") previously contributed zero
+    // deterioration-risk signal, however extreme.
+    if (vitals.sbp !== undefined && vitals.sbp > 200) {
+      score += 0.18;
+      contributingSignals.push('hypertensive-crisis');
+    }
     if (vitals.spo2 !== undefined && vitals.spo2 < 92) {
       score += 0.16;
       contributingSignals.push('hypoxia');
