@@ -259,7 +259,6 @@ export const UserProvider = ({ children }) => {
     // re-publish store updates on every tick — a self-sustaining render storm that could
     // starve a freshly-mounting lazy route's Suspense boundary from ever committing
     // (MB-P0-4 / HEAL-082: /emergency/patients permanently stuck on "Loading patients...").
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [user, authToken, isAuthenticated, isRealSession, authMode, isDevAuthBypass, isLoading, securityContext],
   );
 
