@@ -336,7 +336,39 @@
   margin-top: 3px;
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 5px;
+}
+
+/* HEAL-260: color is not the only signal for an abnormal/critical vital --
+   bold weight plus a text badge (below) carry the same information for a
+   colorblind reader. */
+.patient-detail-vital-tile__value--critical,
+.patient-detail-vital-tile__value--warning {
+  font-weight: 700;
+}
+
+.patient-detail-vital-tile__severity {
+  font-family: var(--ed-font-body, system-ui, sans-serif);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  padding: 1px 6px;
+  border-radius: 999px;
+  line-height: 1.4;
+}
+
+.patient-detail-vital-tile__severity--critical {
+  color: #7f1d1d;
+  background: #fee2e2;
+  border: 1px solid #EF4444;
+}
+
+.patient-detail-vital-tile__severity--warning {
+  color: #78350f;
+  background: #fef3c7;
+  border: 1px solid #F59E0B;
 }
 
 .patient-detail-vital-tile__trend {

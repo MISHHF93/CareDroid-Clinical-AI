@@ -283,6 +283,23 @@ function vitalTone(label: string, value?: number): string {
   return MEDICAL_THEME.ink;
 }
 
+// HEAL-260: vitalTone() above returns a color and nothing else -- every
+// caller applies it as the ONLY visual signal (inline `color`), so a
+// clinician with red-green color blindness cannot tell a critical SpO2
+// from a borderline SBP from a normal value at a glance. This mirrors
+// vitalTone()'s own thresholds into a text/weight signal that doesn't
+// depend on color perception.
+function vitalSeverity(label: string, value?: number): 'critical' | 'warning' | null {
+  if (value === undefined) return null;
+  if (label === 'SpO2' && value < 94) return 'critical';
+  if (label === 'HR' && (value > 120 || value < 50)) return 'critical';
+  if (label === 'SBP' && (value > 180 || value < 90)) return 'warning';
+  if (label === 'Temp' && (value >= 38 || value < 36)) return 'warning';
+  if (label === 'RR' && (value > 24 || value < 10)) return 'warning';
+  if (label === 'GCS' && value < 15) return 'warning';
+  return null;
+}
+
 function trendArrow(label: string, current?: number, previous?: number): VitalTrend | null {
   if (current === undefined || previous === undefined) return null;
   const diff = current - previous;
@@ -1132,29 +1149,42 @@ export default function PatientDetailPanel() {
           </div>
 
           <div className="patient-detail-vitals-grid">
-            {latestVitalEntries.map(({ label, value, trend }) => (
-              <div key={label} className="patient-detail-vital-tile">
-                <div className="patient-detail-vital-tile__label">{label}</div>
-                <div
-                  className="patient-detail-vital-tile__value"
-                  style={{
-                    color: vitalTone(String(label), typeof value === 'number' ? value : undefined),
-                  }}
-                >
-                  <span>{value ?? '--'}</span>
-                  {trend ? (
-                    <span
-                      aria-label={trend.label}
-                      title={trend.label}
-                      className="patient-detail-vital-tile__trend"
-                      style={{ color: trend.color }}
-                    >
-                      {trend.symbol}
-                    </span>
-                  ) : null}
+            {latestVitalEntries.map(({ label, value, trend }) => {
+              const numericValue = typeof value === 'number' ? value : undefined;
+              const severity = vitalSeverity(String(label), numericValue);
+              return (
+                <div key={label} className="patient-detail-vital-tile">
+                  <div className="patient-detail-vital-tile__label">{label}</div>
+                  <div
+                    className={`patient-detail-vital-tile__value${severity ? ` patient-detail-vital-tile__value--${severity}` : ''}`}
+                    style={{
+                      color: vitalTone(String(label), numericValue),
+                    }}
+                  >
+                    <span>{value ?? '--'}</span>
+                    {severity ? (
+                      <span
+                        className={`patient-detail-vital-tile__severity patient-detail-vital-tile__severity--${severity}`}
+                        aria-label={severity}
+                        title={severity === 'critical' ? 'Critical value' : 'Abnormal value'}
+                      >
+                        {severity === 'critical' ? '⚠ Critical' : '⚠ Abnormal'}
+                      </span>
+                    ) : null}
+                    {trend ? (
+                      <span
+                        aria-label={trend.label}
+                        title={trend.label}
+                        className="patient-detail-vital-tile__trend"
+                        style={{ color: trend.color }}
+                      >
+                        {trend.symbol}
+                      </span>
+                    ) : null}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           <VitalsHistoryChart vitals={vitalsHistory} />
