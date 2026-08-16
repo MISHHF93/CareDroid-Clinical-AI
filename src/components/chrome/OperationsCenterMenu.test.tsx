@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom/vitest';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import OperationsCenterMenu from './OperationsCenterMenu';
@@ -117,6 +117,18 @@ describe('OperationsCenterMenu', () => {
     expect(screen.getByRole('dialog', { name: 'Operations center' })).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: 'Close operations center' }));
+    expect(screen.queryByRole('dialog', { name: 'Operations center' })).not.toBeInTheDocument();
+  });
+
+  it('HEAL-272: closes the panel on Escape, not just click-outside/close-button', async () => {
+    const user = userEvent.setup();
+    renderMenu();
+
+    await user.click(screen.getByRole('button', { name: 'Operations center, all clear' }));
+    expect(screen.getByRole('dialog', { name: 'Operations center' })).toBeInTheDocument();
+
+    fireEvent.keyDown(document, { key: 'Escape' });
+
     expect(screen.queryByRole('dialog', { name: 'Operations center' })).not.toBeInTheDocument();
   });
 

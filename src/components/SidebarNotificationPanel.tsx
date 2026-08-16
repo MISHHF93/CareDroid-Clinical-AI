@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Bell, X } from 'lucide-react';
 import { useNotificationShell } from '../contexts/NotificationShellContext';
 import {
@@ -27,6 +28,19 @@ export default function SidebarNotificationPanel() {
     refreshError,
     productLabel,
   } = useNotificationShell();
+
+  // HEAL-271: this panel's backdrop already closes on click (nc-backdrop
+  // above), but had no Escape-key handler -- a clinician reviewing the
+  // critical-alerts panel could only dismiss it by clicking exactly on the
+  // dimmed edge.
+  useEffect(() => {
+    if (!panelOpen) return undefined;
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') closePanel();
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [closePanel, panelOpen]);
 
   if (!panelOpen) return null;
 

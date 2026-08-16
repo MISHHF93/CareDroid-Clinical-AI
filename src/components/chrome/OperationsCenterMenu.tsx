@@ -40,6 +40,18 @@ export default function OperationsCenterMenu() {
     return () => document.removeEventListener('mousedown', handlePointerDown);
   }, []);
 
+  // HEAL-272: click-outside already closes this menu (above), but there
+  // was no Escape-key handler for the AI Chief / 3-minute-mission /
+  // workflow-automation panel.
+  useEffect(() => {
+    if (!open) return undefined;
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setOpen(false);
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [open]);
+
   useEffect(() => {
     setOpen(false);
   }, [pathname]);

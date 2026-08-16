@@ -66,4 +66,14 @@ describe('SidebarNotificationPanel', () => {
     expect(within(dialog).getByRole('heading', { name: /^alerts$/i })).toBeInTheDocument();
     expect(within(dialog).getByText('Admission overload')).toBeInTheDocument();
   });
+
+  it('HEAL-271: closes on Escape, not just backdrop click', () => {
+    renderPanel();
+    fireEvent.click(screen.getByRole('button', { name: 'Open' }));
+    expect(screen.getByRole('dialog', { name: /alerts/i })).toBeInTheDocument();
+
+    fireEvent.keyDown(document, { key: 'Escape' });
+
+    expect(screen.queryByRole('dialog', { name: /alerts/i })).not.toBeInTheDocument();
+  });
 });
