@@ -439,7 +439,24 @@ export default function UnifiedIntakePanel({
                 min="0"
                 max="10"
                 value={draft.painLevel}
-                onChange={(event) => onDraftChange({ painLevel: event.target.value })}
+                onChange={(event) => {
+                  // HEAL-238: min/max are advisory on a native number input
+                  // and don't block keyboard entry -- a sign-flip typo
+                  // (e.g. "-8" for severe 8/10 pain) reached
+                  // receptionIntakeOrchestrator.ts's single-sided
+                  // `Number(draft.painLevel) >= 8`/`>= 7` checks unclamped,
+                  // failing both, so "Severe pain" was never flagged and
+                  // the chest-pain P1 escalation never fired -- silently
+                  // routing a patient reporting severe pain as P2/P3.
+                  const raw = event.target.value;
+                  if (raw === '') {
+                    onDraftChange({ painLevel: '' });
+                    return;
+                  }
+                  const parsed = Number(raw);
+                  if (Number.isNaN(parsed)) return;
+                  onDraftChange({ painLevel: String(Math.min(10, Math.max(0, parsed))) });
+                }}
                 placeholder="0-10"
               />
             </label>

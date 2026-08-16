@@ -14,6 +14,19 @@ describe('vitalsAlertPipeline', () => {
     );
   });
 
+  it('flags an extremely high SBP as critical, not silently unflagged (HEAL-237)', () => {
+    // Symmetric to the existing HR critical check (< 40 || > 150) -- SBP's
+    // critical branch previously only covered the low end, so a
+    // hypertensive-emergency reading or a fat-finger typo (e.g. "1800"
+    // for "180") produced zero alert no matter how extreme.
+    expect(evaluateVitalsAlerts({ bpSystolic: 220 })).toEqual(
+      expect.arrayContaining([expect.objectContaining({ severity: 'critical', vital: 'SBP' })])
+    );
+    expect(evaluateVitalsAlerts({ bpSystolic: 1800 })).toEqual(
+      expect.arrayContaining([expect.objectContaining({ severity: 'critical', vital: 'SBP' })])
+    );
+  });
+
   it('detects GCS drops of two or more points', () => {
     expect(evaluateVitalsAlerts({ gcs: 12 }, { gcs: 15 })).toEqual(
       expect.arrayContaining([

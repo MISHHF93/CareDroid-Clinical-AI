@@ -36,7 +36,12 @@ export function evaluateVitalsAlerts(nextVitals: any = {}, previousVitals: any =
   }
 
   if (isNumber(sbp)) {
-    if (sbp < 80) {
+    // HEAL-237: only the low end (< 80) triggered a critical alert -- the
+    // symmetric HR check above covers both extremes (< 40 || > 150), but
+    // this branch had no equivalent for a hypertensive-emergency reading
+    // or a fat-finger typo (e.g. "1800" for "180"): any sbp > 200 fell
+    // through both branches with zero alert, however extreme.
+    if (sbp < 80 || sbp > 200) {
       alerts.push(alertFor({ severity: 'critical', vital: 'SBP', value: sbp, unit: 'mmHg', reason: `SBP ${sbp}` }));
     } else if ((sbp >= 80 && sbp <= 90) || (sbp >= 180 && sbp <= 200)) {
       alerts.push(alertFor({ severity: 'warning', vital: 'SBP', value: sbp, unit: 'mmHg', reason: `SBP ${sbp}` }));

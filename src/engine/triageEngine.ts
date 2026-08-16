@@ -193,7 +193,13 @@ export class TriageSuggestionEngine {
     if (typeof hr === 'number' && hr >= 110 && hr < 130) {
       return rule(Priority.P3, 'medium', `P3 suggested - HR ${formatValue(hr)}`, 'p3-hr-110-130');
     }
-    if (typeof pain === 'number' && pain >= 6 && pain <= 8) {
+    // HEAL-239: pain 9-10 (the most severe end of the scale) fell through
+    // every rule to the P4/P5 default -- a fully valid "10/10 worst pain"
+    // entry, no typo required, was triaged as routine/non-urgent unless
+    // some unrelated complaint-text rule happened to also match. Widened
+    // to include the top of the scale rather than inventing a new P1/P2
+    // pain-specific tier this engine doesn't otherwise have.
+    if (typeof pain === 'number' && pain >= 6 && pain <= 10) {
       return rule(Priority.P3, 'medium', `P3 suggested - pain ${formatValue(pain)}/10`, 'p3-moderate-pain');
     }
     if (p3ComplaintMatch) {
