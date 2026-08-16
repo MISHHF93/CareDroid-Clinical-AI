@@ -101,6 +101,66 @@ describe('OcrIntakeService', () => {
     expect(applied.auditLog.some((entry) => entry.action === 'applied_to_intake')).toBe(true);
   });
 
+  it('HEAL-246: records a document-artifact-extraction failure in the audit log, not just silently', async () => {
+    const documentArtifactService = buildDocumentArtifactService(['patient-1']);
+    jest.spyOn(documentArtifactService, 'extract').mockImplementation(() => {
+      throw new Error('artifact extraction exploded');
+    });
+    const service = new OcrIntakeService(documentArtifactService);
+    const job = await service.createJob({
+      filename: 'health-card.jpg',
+      rawText: 'First name: Jordan\nLast name: Rivera\nDate of birth: 1990-04-12',
+      patientId: 'patient-1',
+      actor: 'staff-1',
+    });
+    service.reviewField(job.id, 'firstName', { decision: 'accepted', actor: 'staff-1' });
+    service.reviewField(job.id, 'lastName', { decision: 'accepted', actor: 'staff-1' });
+
+    const applied = await service.applyToIntake(job.id, 'staff-1');
+
+    expect(applied.appliedToIntake).toBe(true);
+    expect(
+      applied.auditLog.some(
+        (entry) =>
+          entry.action === 'applied_to_intake' &&
+          entry.details?.action === 'document_artifact_extraction_failed',
+      ),
+    ).toBe(true);
+  });
+
+  it('HEAL-246: records a patient-demographics-update failure in the audit log, not just a warning', async () => {
+    const fakePatientService = {
+      getPatient: () => ({ id: 'patient-1', firstName: 'Old', lastName: 'Name' }),
+      updatePatient: () => {
+        throw new Error('patient update exploded');
+      },
+    } as unknown as EmergencyPatientService;
+    const service = new OcrIntakeService(buildDocumentArtifactService(['patient-1']), fakePatientService);
+    const job = await service.createJob({
+      filename: 'health-card.jpg',
+      rawText: 'First name: Jordan\nLast name: Rivera\nDate of birth: 1990-04-12',
+      patientId: 'patient-1',
+      actor: 'staff-1',
+    });
+    service.reviewField(job.id, 'firstName', { decision: 'accepted', actor: 'staff-1' });
+    service.reviewField(job.id, 'lastName', { decision: 'accepted', actor: 'staff-1' });
+
+    const applied = await service.applyToIntake(job.id, 'staff-1');
+
+    expect(applied.appliedToIntake).toBe(true);
+    expect(applied.patientUpdated).toBe(false);
+    expect(applied.warnings?.some((warning) => warning.includes('board update was skipped'))).toBe(
+      true,
+    );
+    expect(
+      applied.auditLog.some(
+        (entry) =>
+          entry.action === 'applied_to_intake' &&
+          entry.details?.action === 'patient_demographics_update_failed',
+      ),
+    ).toBe(true);
+  });
+
   it('rejects apply when no fields have been accepted or edited', async () => {
     const service = new OcrIntakeService(buildDocumentArtifactService());
     const job = await service.createJob({

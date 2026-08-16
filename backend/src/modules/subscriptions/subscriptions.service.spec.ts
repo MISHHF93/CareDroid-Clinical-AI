@@ -206,6 +206,25 @@ describe('SubscriptionsService', () => {
       });
     });
 
+    it('HEAL-247: records an audit log entry, matching createCheckoutSession\'s audit trail', async () => {
+      const userId = '1';
+      mockSubscriptionRepository.findOne.mockResolvedValue(mockSubscription);
+      mockStripe.billingPortal.sessions.create.mockResolvedValue({
+        id: 'bps_test123',
+        url: 'https://billing.stripe.com/session/test123',
+      });
+
+      await service.createCustomerPortalSession(userId, 'https://app.example.com/billing');
+
+      expect(mockAuditService.log).toHaveBeenCalledWith(
+        expect.objectContaining({
+          userId,
+          resource: 'billing_portal_session',
+          metadata: expect.objectContaining({ sessionId: 'bps_test123' }),
+        }),
+      );
+    });
+
     it('should throw error when user has no stripe customer ID', async () => {
       const userId = '1';
 

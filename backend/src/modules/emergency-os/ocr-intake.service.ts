@@ -342,12 +342,23 @@ export class OcrIntakeService implements OnModuleDestroy {
             }),
           );
         }
-      } catch {
+      } catch (error) {
         // Patient update is best-effort when the board id is missing or stale.
         job.warnings = [
           ...(job.warnings || []),
           'OCR applied to intake draft, but patient board update was skipped.',
         ];
+        // HEAL-246: every other state-changing step in this method (and
+        // job_failed in createJob) records into job.auditLog -- this catch
+        // only recorded a user-facing warning, so a failed demographics
+        // sync left zero trace in the job's structured audit history.
+        job.auditLog.push(
+          this.audit('applied_to_intake', actorName, {
+            action: 'patient_demographics_update_failed',
+            patientId: job.patientId,
+            error: error instanceof Error ? error.message : 'Patient update failed',
+          }),
+        );
       }
     }
 
@@ -374,8 +385,18 @@ export class OcrIntakeService implements OnModuleDestroy {
           confidence: job.overallConfidence,
           sourceState: 'extracted',
         });
-      } catch {
+      } catch (error) {
         // Document artifact enrichment is best-effort; the OCR job itself remains applied.
+        // HEAL-246: this catch was completely empty -- a failed extraction
+        // left no warning and no audit entry anywhere, unlike every other
+        // failure path in this class.
+        job.auditLog.push(
+          this.audit('applied_to_intake', actorName, {
+            action: 'document_artifact_extraction_failed',
+            patientId: job.patientId,
+            error: error instanceof Error ? error.message : 'Document artifact extraction failed',
+          }),
+        );
       }
     }
 

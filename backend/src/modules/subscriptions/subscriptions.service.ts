@@ -140,6 +140,20 @@ export class SubscriptionsService {
       return_url: returnUrl || this.configService.get<string>('stripe.successUrl'),
     });
 
+    // HEAL-247: createCheckoutSession (above) writes an audit log entry for
+    // every billing session it creates -- this sibling method created the
+    // equivalent Stripe billing-portal session (which lets a customer
+    // change payment methods or cancel their subscription) with no audit
+    // trail at all.
+    await this.auditService.log({
+      userId,
+      action: AuditAction.SUBSCRIPTION_CHANGE,
+      resource: 'billing_portal_session',
+      ipAddress: '0.0.0.0',
+      userAgent: 'system',
+      metadata: { sessionId: session.id },
+    });
+
     return { url: session.url };
   }
 
