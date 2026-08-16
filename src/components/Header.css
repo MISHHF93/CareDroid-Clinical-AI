@@ -103,6 +103,39 @@
   overflow: hidden;
 }
 
+/* HEAL-275: the operational-status pills, "New Patient" action, and
+   central-node badge each mount/unmount entirely depending on screen mode
+   (Reception hides them since it shows the same info inline in its own
+   page body) -- a CSS transition can't animate an element that isn't in
+   the DOM yet, but a brief fade/slide-in on mount at least softens their
+   sudden appearance instead of them popping in instantly. */
+@keyframes caredroid-header-widget-in {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.caredroid-header__central-status,
+.caredroid-header__central-node,
+.caredroid-header__primary-actions,
+.operations-center-menu {
+  animation: caredroid-header-widget-in 200ms ease both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .caredroid-header__central-status,
+  .caredroid-header__central-node,
+  .caredroid-header__primary-actions,
+  .operations-center-menu {
+    animation: none;
+  }
+}
+
 .caredroid-header--pilot-metrics .caredroid-header__center {
   justify-content: center;
   gap: 8px;
@@ -306,6 +339,17 @@
   border-radius: 9px;
   background: var(--app-surface-1, #ffffff);
   color: var(--medical-text-muted, var(--cdl-ink-muted, #334155));
+  /* HEAL-275: the header is one persistent component across route changes
+     (React Router doesn't remount it), and this bar's width/height/color
+     jump abruptly between screen modes (e.g. Reception's emphasized
+     variant vs. every other page) with no transition -- part of what
+     reads as the header "changing shape" when navigating. This doesn't
+     change WHAT shows per screen mode, just smooths the same change. */
+  transition:
+    width 180ms ease,
+    height 180ms ease,
+    border-color 180ms ease,
+    background-color 180ms ease;
 }
 
 .caredroid-header__lookup--emphasis {
