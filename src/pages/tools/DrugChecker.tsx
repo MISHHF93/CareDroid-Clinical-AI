@@ -1,5 +1,5 @@
 import { MEDICAL_THEME } from '../../config/medicalTheme.constants';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useUser } from '../../contexts/UserContext';
 import analyticsService from '../../services/analyticsService';
 import offlineService from '../../services/offlineService';
@@ -46,6 +46,17 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded }: any = {}) => {
   const { user } = useUser();
   const { warning } = useNotificationActions();
   const [medications, setMedications] = useState(['']);
+  // HEAL-222: rows were keyed on array index. Values still rendered
+  // correctly (controlled inputs sync to the `medications` array on every
+  // render), but React reuses/reassigns each row's DOM node by index --
+  // removing a medication from the middle of the list shifts every
+  // later row's identity down one slot, silently moving keyboard focus
+  // off whatever row the clinician was actively editing. A stable
+  // per-row id generated once at creation (not derived from content, so
+  // duplicate/empty entries stay distinct) keeps each row's DOM node,
+  // and therefore focus, correctly attached to the same logical entry.
+  const nextMedicationIdRef = useRef(1);
+  const [medicationIds, setMedicationIds] = useState(() => [`med-${nextMedicationIdRef.current++}`]);
   const [results, setResults] = useState<any>(null);
   const [isChecking, setIsChecking] = useState(false);
   const [error, setError] = useState<any>(null);
@@ -73,11 +84,19 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded }: any = {}) => {
 
   const handleAddMedication = () => {
     setMedications([...medications, '']);
+    setMedicationIds([...medicationIds, `med-${nextMedicationIdRef.current++}`]);
   };
 
   const handleRemoveMedication = (index) => {
     const updated = medications.filter((_, i) => i !== index);
-    setMedications(updated.length > 0 ? updated : ['']);
+    const updatedIds = medicationIds.filter((_, i) => i !== index);
+    if (updated.length > 0) {
+      setMedications(updated);
+      setMedicationIds(updatedIds);
+    } else {
+      setMedications(['']);
+      setMedicationIds([`med-${nextMedicationIdRef.current++}`]);
+    }
   };
 
   const handleMedicationChange = (index, value) => {
@@ -170,7 +189,7 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded }: any = {}) => {
 
           <div className="medications-list">
             {medications.map((med, index) => (
-              <div key={index} className="medication-input-row">
+              <div key={medicationIds[index] ?? index} className="medication-input-row">
                 <span className="medication-number">{index + 1}</span>
                 <input
                   type="text"
