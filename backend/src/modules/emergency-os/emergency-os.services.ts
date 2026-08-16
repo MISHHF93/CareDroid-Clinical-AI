@@ -623,6 +623,7 @@ const COLLABORATION_NOTABLE_WORKFLOW_TYPES = new Set<WorkflowActionType>([
 
 @Injectable()
 export class WorkflowActionLogService implements OnModuleInit {
+  private readonly logger = new Logger(WorkflowActionLogService.name);
   private readonly logs: WorkflowActionLog[] = [];
 
   constructor(
@@ -670,7 +671,17 @@ export class WorkflowActionLogService implements OnModuleInit {
         timestamp: log.timestamp,
         payload: JSON.stringify(log),
       })
-      .catch(() => undefined);
+      .catch((error) => {
+        // HEAL-252: this is the durable half of the ED workflow action log
+        // (escalations, state transitions) that onModuleInit rehydrates
+        // from on restart -- a dropped write here left a gap in that
+        // durable record with zero trace anywhere it happened. Same gap as
+        // AiActionProposalService's persist()/appendAuditEntry (HEAL-251).
+        this.logger.error(
+          `Failed to persist workflow action log ${log.id} (${log.type})`,
+          error instanceof Error ? error.stack : String(error),
+        );
+      });
   }
 
   record(input: WorkflowActionInput): WorkflowActionLog {

@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import { WorkflowActionLogService } from './emergency-os.services';
 import { WorkflowActionLogEntry } from './entities/workflow-action-log-entry.entity';
 
@@ -101,6 +102,22 @@ describe('WorkflowActionLogService — durability', () => {
 
     expect(log.type).toBe('clinician_assigned');
     expect(service.listLogs()).toHaveLength(1);
+  });
+
+  it('HEAL-252: a journal write failure is actually logged, not silently discarded', async () => {
+    const errorSpy = jest.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);
+    const journal = createJournalMock();
+    journal.save.mockRejectedValue(new Error('db down'));
+    const service = new WorkflowActionLogService(undefined, undefined, journal as any);
+
+    service.record({ type: 'clinician_assigned', summary: 'Assigned', patientId: 'p-1' });
+    await flushAsync();
+
+    expect(errorSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Failed to persist workflow action log'),
+      expect.anything(),
+    );
+    errorSpy.mockRestore();
   });
 
   it('a journal unavailable at rehydration time does not crash startup', async () => {
