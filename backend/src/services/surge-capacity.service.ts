@@ -117,10 +117,34 @@ export class SurgeCapacityService extends EventEmitter {
       throw new Error('No active surge event. Activate surge mode first.');
     }
 
+    // HEAL-232: previously read surgeEvent.actualPatientCount once into
+    // memory, computed each patientNumber locally, then overwrote the
+    // *whole* surge_events document with a full $set at the end. Two
+    // concurrent batch intakes for the same surgeEventId (the realistic
+    // scenario this endpoint exists for -- multiple EMS crews/intake
+    // staff submitting during an active MCI) read the same starting
+    // count, so both assigned DUPLICATE mciPatientNumber values to
+    // different patients, and whichever request's full-document $set
+    // landed last silently clobbered the other's actualPatientCount
+    // increment (and any other concurrent field change) -- a lost
+    // update. findOneAndUpdate's $inc is atomic at the DB level, so each
+    // concurrent request reserves a disjoint number range no matter how
+    // requests interleave.
+    const reserved = await getMongoDb()
+      .collection('surge_events')
+      .findOneAndUpdate(
+        { id: surgeEventId },
+        { $inc: { actualPatientCount: patients.length } },
+        { returnDocument: 'before' },
+      );
+    const startingPatientCount =
+      (reserved as { actualPatientCount?: number } | null)?.actualPatientCount ??
+      surgeEvent.actualPatientCount;
+
     const createdPatients: BatchEMSPatient[] = [];
 
     for (const patient of patients) {
-      const patientNumber = surgeEvent.actualPatientCount + createdPatients.length + 1;
+      const patientNumber = startingPatientCount + createdPatients.length + 1;
       const newPatient = await Patient.create({
         name: `MCI-${surgeEventId}-${patient.temporaryId}`,
         age: patient.age || 'Unknown',
@@ -152,9 +176,10 @@ export class SurgeCapacityService extends EventEmitter {
       });
     }
 
-    surgeEvent.actualPatientCount += createdPatients.length;
-    await this.updateSurgeEvent(surgeEvent);
-
+    // actualPatientCount was already incremented atomically above; a
+    // trailing full-document $set here would overwrite it with the
+    // stale pre-increment value captured in the outer `surgeEvent`
+    // snapshot, undoing the atomic reservation.
     this.emit('batch_ems_intake', {
       surgeEventId,
       patientCount: createdPatients.length,

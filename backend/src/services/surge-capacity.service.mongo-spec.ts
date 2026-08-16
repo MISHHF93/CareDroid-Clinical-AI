@@ -170,6 +170,54 @@ describe('SurgeCapacityService (real MongoDB via mongodb-memory-server)', () => 
         .findOne({ id: event.id })) as unknown as SurgeEvent;
       expect(updatedEvent.actualPatientCount).toBe(2);
     });
+
+    it('HEAL-232: two concurrent batches for the same surge event never assign duplicate mciPatientNumber values, and the final count reflects both batches', async () => {
+      // Real MongoDB, real concurrency: fire both batchEMSIntake calls
+      // without awaiting either first, so their internal read/increment/
+      // write steps genuinely interleave. Before HEAL-232, both batches
+      // read the same starting actualPatientCount (computed in JS memory)
+      // and both ended with a full-document $set -- duplicate patient
+      // numbers across the two batches, and whichever $set landed last
+      // silently discarded the other batch's count increment.
+      const event = await service.activateSurgeMode({
+        type: 'mci',
+        estimatedPatientCount: 20,
+        actualPatientCount: 0,
+        resourceStatus,
+      });
+
+      const buildBatch = (prefix: string, count: number) =>
+        Array.from({ length: count }, (_, i) => ({
+          temporaryId: `${prefix}${i}`,
+          chiefComplaint: 'MCI triage',
+          triageColor: 'YELLOW' as const,
+          etaMinutes: 10,
+          mechanismOfInjury: 'Structural collapse',
+        }));
+
+      const [batchA, batchB] = await Promise.all([
+        service.batchEMSIntake(buildBatch('a', 4), event.id),
+        service.batchEMSIntake(buildBatch('b', 3), event.id),
+      ]);
+
+      expect(batchA).toHaveLength(4);
+      expect(batchB).toHaveLength(3);
+
+      const allPatients = await UnifiedPatient.find({ mciBatchId: event.id }).lean();
+      expect(allPatients).toHaveLength(7);
+
+      const patientNumbers = allPatients
+        .map((p) => p.mciPatientNumber ?? -1)
+        .sort((a, b) => a - b);
+      const uniqueNumbers = new Set(patientNumbers);
+      expect(uniqueNumbers.size).toBe(7);
+      expect(patientNumbers).toEqual([1, 2, 3, 4, 5, 6, 7]);
+
+      const updatedEvent = (await mongoose.connection
+        .db!.collection('surge_events')
+        .findOne({ id: event.id })) as unknown as SurgeEvent;
+      expect(updatedEvent.actualPatientCount).toBe(7);
+    });
   });
 
   describe('assessResourceBottlenecks', () => {

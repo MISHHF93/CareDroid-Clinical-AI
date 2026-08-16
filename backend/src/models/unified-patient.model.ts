@@ -644,8 +644,20 @@ const LegacyVitalsSchema = new Schema(
 
 export const UnifiedPatientSchema = new Schema<IUnifiedPatient>(
   {
-    mrn: { type: String, default: null },
-    phn: { type: String, default: null },
+    // HEAL-233: was `default: null`, which made Mongoose write an
+    // explicit `mrn: null` (and `phn: null`) onto every document that
+    // didn't specify one. idx_unified_patients_mrn/-phn below are sparse
+    // unique indexes -- sparse only excludes documents where the field is
+    // genuinely ABSENT, not present-with-value-null, so every "no MRN
+    // yet" patient collided on the same indexed null value. This broke
+    // the very scenario MCI batch intake exists for: multiple
+    // unidentified patients (arriving as literal "John/Jane Doe" before
+    // ID is established) created in the same batch -- the second such
+    // patient's insert failed with an E11000 duplicate key error.
+    // Omitting the field when not provided lets the sparse index work as
+    // intended.
+    mrn: { type: String },
+    phn: { type: String },
     name: { type: String, required: true },
     age: { type: String, default: 'Unknown' },
     gender: { type: String, default: 'unknown' },
