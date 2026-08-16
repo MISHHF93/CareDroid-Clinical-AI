@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { MEDICAL_THEME } from '../../config/medicalTheme.constants';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { saveCalculatorResult } from './calculatorSave';
+import { pediatricDoseCrossCheckWarning } from '../../data/pediatricDoseCrossCheck';
 import './mobileCalculator.css';
 import './PediatricDrugCalc.css';
 
@@ -20,7 +21,7 @@ interface Drug {
   critical?: boolean;
 }
 
-const DRUGS: Drug[] = [
+export const PEDIATRIC_DRUG_CALC_DRUGS: Drug[] = [
   { name: 'Epinephrine IV (arrest)', category: 'Resus', dosePerKg: 0.01, unit: 'mg', max: 1, critical: true },
   { name: 'Epinephrine IM (anaphylaxis)', category: 'Resus', dosePerKg: 0.01, unit: 'mg', max: 0.5, critical: true },
   { name: 'Atropine', category: 'Resus', dosePerKg: 0.02, unit: 'mg', min: 0.1, max: 0.5, critical: true },
@@ -76,7 +77,7 @@ export default function PediatricDrugCalc({ patientId, onClose }: PediatricDrugC
 
   const saveToPatient = () => {
     if (!patient || weight === null) return;
-    const rows = DRUGS.map((drug) => ({
+    const rows = PEDIATRIC_DRUG_CALC_DRUGS.map((drug) => ({
       drug: drug.name,
       category: drug.category,
       dosePerKg: dosePerKgLabel(drug),
@@ -251,7 +252,9 @@ export default function PediatricDrugCalc({ patientId, onClose }: PediatricDrugC
                   </tr>
                 </thead>
                 <tbody>
-                  {DRUGS.map((drug) => (
+                  {PEDIATRIC_DRUG_CALC_DRUGS.map((drug) => {
+                    const crossCheckWarning = pediatricDoseCrossCheckWarning(drug.name);
+                    return (
                     <tr
                       key={drug.name}
                       className={drug.critical ? 'pdc-drug-row pdc-drug-row--critical' : 'pdc-drug-row'}
@@ -259,6 +262,16 @@ export default function PediatricDrugCalc({ patientId, onClose }: PediatricDrugC
                       <td className="u-pad-10-border-b">
                         <strong>{drug.name}</strong>
                         <div className="pdc-drug-category">{drug.category}</div>
+                        {crossCheckWarning ? (
+                          <div
+                            className="pdc-cross-check-warning"
+                            role="alert"
+                            data-print-hide="true"
+                            title={`Pediatric Dose Safety Checker tool lists ${crossCheckWarning.checkerName} at ${crossCheckWarning.checkerDose} instead. ${crossCheckWarning.note} Verify against institutional protocol before administering.`}
+                          >
+                            ⚠ Conflicts with other in-app reference ({crossCheckWarning.checkerDose}) — verify before administering
+                          </div>
+                        ) : null}
                       </td>
                       <td className="pdc-muted-cell">
                         {dosePerKgLabel(drug)}
@@ -279,7 +292,8 @@ export default function PediatricDrugCalc({ patientId, onClose }: PediatricDrugC
                       </td>
                       <td className="pdc-muted-cell">{drug.unit}</td>
                     </tr>
-                  ))}
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

@@ -1582,3 +1582,16 @@ ul.calc-breakdown-list .calc-breakdown-item {
 .pediatric-drug-reference-table__row--moderate {
   border-left-color: var(--info, var(--status-info, #94a3b8));
 }
+
+.pediatric-drug-reference-table__cross-check-warning {
+  margin-top: 4px;
+  padding: 3px 6px;
+  border: 1px solid var(--warning);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--warning) 16%, transparent);
+  color: var(--warning);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.3;
+  max-width: 260px;
+}

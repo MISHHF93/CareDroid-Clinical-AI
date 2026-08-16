@@ -11,6 +11,7 @@ import {
   computePediatricBpPercentile,
   computePregnancyDueDate,
 } from '../../utils/pediatricsObgynCalculators';
+import { pediatricDoseCheckerCrossCheckWarning } from '../../data/pediatricDoseCrossCheck';
 
 function DecisionSupportNotice({ children, dosingPlaceholder = false }) {
   return (
@@ -221,7 +222,7 @@ const yesNoOptions = [
   { value: 'no', label: 'No' },
 ];
 
-const PEDIATRIC_EMERGENCY_DRUGS = Object.freeze([
+export const PEDIATRIC_EMERGENCY_DRUGS = Object.freeze([
   {
     name: 'Adrenaline / Epinephrine',
     indication: 'Cardiac arrest IV/IO',
@@ -479,7 +480,9 @@ function PediatricEmergencyDrugCalculator({ onResultChange, patientContext = nul
                 <span role="columnheader">Calculated</span>
                 <span role="columnheader">Risk</span>
               </div>
-              {result.rows.map((row) => (
+              {result.rows.map((row) => {
+                const crossCheckWarning = pediatricDoseCheckerCrossCheckWarning(row.name);
+                return (
                 <div
                   key={row.name}
                   role="row"
@@ -488,12 +491,22 @@ function PediatricEmergencyDrugCalculator({ onResultChange, patientContext = nul
                   <span role="cell">
                     <strong>{row.name}</strong>
                     <small>{row.indication}</small>
+                    {crossCheckWarning ? (
+                      <div
+                        className="pediatric-drug-reference-table__cross-check-warning"
+                        role="alert"
+                        title={`Pediatric Drug Calculator (patient-chart modal) lists ${crossCheckWarning.calcName} at ${crossCheckWarning.calcDose} instead. ${crossCheckWarning.note} Verify against institutional protocol before administering.`}
+                      >
+                        ⚠ Conflicts with other in-app reference ({crossCheckWarning.calcDose}) — verify before administering
+                      </div>
+                    ) : null}
                   </span>
                   <span role="cell">{row.doseText}</span>
                   <span role="cell">{row.calculatedDose}</span>
                   <span role="cell">{row.risk}</span>
                 </div>
-              ))}
+                );
+              })}
             </div>
           </>
         ) : (
