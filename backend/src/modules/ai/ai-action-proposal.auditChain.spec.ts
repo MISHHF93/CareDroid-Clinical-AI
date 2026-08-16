@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import { AiActionProposalService } from './ai-action-proposal.service';
 import { AIActionProposalRecord } from './entities/ai-action-proposal-record.entity';
 import { AIActionProposalAuditEntry } from './entities/ai-action-proposal-audit-entry.entity';
@@ -240,6 +241,23 @@ describe('AiActionProposalService — hash-chain audit', () => {
     // The in-memory trail is still correct even though every durable write failed.
     expect(service.getAuditTrail(created.proposalId)).toHaveLength(2);
     expect(service.verifyAuditChain(created.proposalId)).toEqual({ valid: true, entryCount: 2 });
+  });
+
+  it('HEAL-251: a failed audit-log write is actually logged, not silently discarded', async () => {
+    const errorSpy = jest.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);
+    const journal = createJournalMock();
+    const auditLog = createAuditLogMock();
+    auditLog.save.mockRejectedValue(new Error('db down'));
+    const service = new AiActionProposalService(journal as any, auditLog as any);
+
+    service.create(createInput);
+    await flushAsync();
+
+    expect(errorSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Failed to persist audit entry'),
+      expect.anything(),
+    );
+    errorSpy.mockRestore();
   });
 
   it('an unknown proposal has an empty trail and a trivially valid (empty) chain', () => {

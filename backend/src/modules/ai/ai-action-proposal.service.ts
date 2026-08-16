@@ -10,7 +10,7 @@
  * explicitly in-memory-only.
  */
 
-import { Injectable, BadRequestException, NotFoundException, Optional } from '@nestjs/common';
+import { Injectable, BadRequestException, Logger, NotFoundException, Optional } from '@nestjs/common';
 import { OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -122,6 +122,7 @@ const ALLOWED: Record<AiActionProposalState, AiActionProposalState[]> = {
 
 @Injectable()
 export class AiActionProposalService implements OnModuleInit {
+  private readonly logger = new Logger(AiActionProposalService.name);
   private readonly store = new Map<string, ServerAiActionProposal>();
   /** Ordered audit trail per proposal — the in-process read model for the hash chain. */
   private readonly auditTrails = new Map<string, AiActionProposalAuditEntryView[]>();
@@ -232,7 +233,17 @@ export class AiActionProposalService implements OnModuleInit {
         previousHash,
         entryHash,
       } as AIActionProposalAuditEntry)
-      .catch(() => undefined);
+      .catch((error) => {
+        // HEAL-251: this write-through is the durable half of the hash
+        // chain -- verifyAuditChain() re-derives trust from this table
+        // after a restart. A silently dropped write here left a gap the
+        // in-process auditTrails map wouldn't reveal until the next
+        // restart or cross-instance read.
+        this.logger.error(
+          `Failed to persist audit entry for proposal ${proposalId} (sequence ${sequenceIndex})`,
+          error instanceof Error ? error.stack : String(error),
+        );
+      });
   }
 
   /** Full ordered audit trail for a proposal (empty array if none/unknown). */
@@ -289,7 +300,16 @@ export class AiActionProposalService implements OnModuleInit {
         updatedAt: proposal.updatedAt,
         payload: JSON.stringify(proposal),
       })
-      .catch(() => undefined);
+      .catch((error) => {
+        // HEAL-251: this docstring has always claimed a journal failure is
+        // logged here -- the catch body did nothing. A dropped write meant
+        // this AI action proposal wouldn't survive a process restart, with
+        // no trace anywhere that it happened.
+        this.logger.error(
+          `Failed to persist AI action proposal ${proposal.proposalId} (state ${proposal.state})`,
+          error instanceof Error ? error.stack : String(error),
+        );
+      });
   }
 
   create(input: {

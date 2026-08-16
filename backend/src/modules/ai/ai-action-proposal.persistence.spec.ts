@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import { AiActionProposalService } from './ai-action-proposal.service';
 import { AIActionProposalRecord } from './entities/ai-action-proposal-record.entity';
 
@@ -81,6 +82,22 @@ describe('AiActionProposalService — durable journal (IX16)', () => {
     expect(created.state).toBe('proposed');
     expect(approved.state).toBe('approved');
     expect(service.get(created.proposalId).state).toBe('approved');
+  });
+
+  it('HEAL-251: a failed journal write is actually logged, not silently discarded', async () => {
+    const errorSpy = jest.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);
+    const journal = createJournalMock();
+    journal.save.mockRejectedValue(new Error('db down'));
+    const service = new AiActionProposalService(journal as any);
+
+    service.create(createInput);
+    await flushAsync();
+
+    expect(errorSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Failed to persist AI action proposal'),
+      expect.anything(),
+    );
+    errorSpy.mockRestore();
   });
 
   it('corrupt journal rows are skipped at hydration, not fatal', async () => {
