@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { FolderOpen, ShieldAlert, UserCheck, X, ArrowRight } from 'lucide-react';
 import type { Patient } from '../../types/emergency';
 import './ReceptionPatientTaskSheet.css';
@@ -55,6 +56,20 @@ export default function ReceptionPatientTaskSheet({
     interpreterNeeded ||
     intakeMeta?.interpreterNeeded ||
     '';
+
+  // HEAL-273: this dialog had no local Escape handling at all -- it only
+  // closed on Escape because ReceptionWorkspace.tsx special-cases
+  // patientDetailOpen in one global page-level keydown handler. Reused
+  // anywhere else (or if that one page-level branch is ever dropped),
+  // it silently loses all keyboard dismissal. Self-contained, matching
+  // every other dialog fixed this batch (HEAL-261/263/270/271/272).
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [onClose]);
 
   return (
     <div

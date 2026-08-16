@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ReceptionPatientTaskSheet from './ReceptionPatientTaskSheet';
 import { PatientFlag, PatientState, Priority, type Patient } from '../../types/emergency';
@@ -113,5 +113,14 @@ describe('ReceptionPatientTaskSheet', () => {
 
     await user.click(screen.getByText('Open full record'));
     expect(props.onOpenFullRecord).toHaveBeenCalledTimes(1);
+  });
+
+  it('HEAL-273: closes on Escape via its own handler, not just a host-page keydown special-case', () => {
+    const onClose = vi.fn();
+    render(<ReceptionPatientTaskSheet patient={basePatient()} {...defaultProps} onClose={onClose} />);
+
+    fireEvent.keyDown(document, { key: 'Escape' });
+
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 });
