@@ -406,8 +406,17 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
         onNavigate: profileNavigate,
       });
       onAdded(patient);
-      profileNavigate(handoff.nextRoute);
-      onClose();
+      // HEAL-256: this branch used to call profileNavigate(...) then
+      // onClose() before setSubmitError() -- onClose() sets showIntake=false
+      // in the parent, which conditionally unmounts this component. Since
+      // React batches state updates within the same synchronous
+      // continuation, the parent's unmount and this component's own
+      // submitError update land in the SAME render pass, so the error
+      // banner (role="alert" below) never actually painted: the modal just
+      // silently vanished as if the intake had fully succeeded, even
+      // though the message text explicitly says the backend handoff is
+      // still pending. Staying mounted (no navigate, no close) is what
+      // lets the user actually see that message and decide what to do.
       setSubmitError(
         `${formatApiRecoveryMessage(error, 'intake form')} ${ERROR_RECOVERY_COPY.handoffPending}`,
       );
