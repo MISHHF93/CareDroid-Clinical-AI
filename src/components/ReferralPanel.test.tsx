@@ -61,4 +61,14 @@ describe('ReferralPanel double-submit guard', () => {
     ).length;
     expect(statusChangeButtonCount).toBeGreaterThanOrEqual(8);
   });
+
+  it('HEAL-274: the referral-fetch error banner has a retry affordance wired to referralsModule.refresh()', () => {
+    // Previously a bare <p role="alert"> with no way to re-trigger a
+    // failed/slow referral fetch short of a full page reload -- unlike the
+    // whiteboard page's onRetry/retryLabel="Refresh board" pattern.
+    expect(referralPanelSource).toContain('ToolApiErrorBanner');
+    expect(referralPanelSource).toMatch(
+      /onRetry=\{\(\) => void referralsModule\.refresh\(\)\}/,
+    );
+  });
 });

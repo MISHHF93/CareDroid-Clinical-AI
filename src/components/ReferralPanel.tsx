@@ -16,6 +16,7 @@ import { summarizeReferralAwareness } from './whiteboard/referralAwarenessModel'
 import { OPERATIONAL_AUDIT_DOMAIN } from '../config/operationalAuditModel';
 import OperationalHistoryPanel from './audit/OperationalHistoryPanel';
 import EdDataSourceBanner from './emergency/EdDataSourceBanner';
+import ToolApiErrorBanner from './ToolApiErrorBanner';
 import { EmergencyRoutePage } from '../pages/emergency/emergencyRouteShared';
 import './ReferralPanel.css';
 
@@ -653,9 +654,15 @@ export default function ReferralPanel() {
         </p>
       ) : null}
       {referralsModule.error ? (
-        <p className="referral-panel__backend-status" role="alert">
-          {referralsModule.error.replace(/\.+\s*$/, '')}. Showing the last local referral queue; confirm live referral status before external handoff.
-        </p>
+        // HEAL-274: this banner previously had no retry affordance at all --
+        // unlike the whiteboard page's onRetry/retryLabel="Refresh board"
+        // pattern (index.tsx), a slow/failed referral fetch left staff with
+        // no way to re-trigger it short of a full page reload.
+        <ToolApiErrorBanner
+          message={`${referralsModule.error.replace(/\.+\s*$/, '')}. Showing the last local referral queue; confirm live referral status before external handoff.`}
+          onRetry={() => void referralsModule.refresh()}
+          retryLabel="Retry referral sync"
+        />
       ) : null}
       <div className="referral-panel__metrics" aria-label="Referral metrics">
         <div>
