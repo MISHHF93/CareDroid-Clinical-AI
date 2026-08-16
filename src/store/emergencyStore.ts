@@ -4363,6 +4363,13 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
 
       // Durable multi-station path: POST Nest reception escalation (alert + DB write-through).
       if (isBackendCapabilityEnabled('emergencyReceptionEscalation')) {
+        // HEAL-250: escalatePatient (immediately above) logs a sync failure
+        // via logger.warn so it's at least visible/debuggable -- this
+        // escalation swallowed the same kind of failure completely
+        // silently. The local alert/UI already reports success before this
+        // POST resolves, so a dropped failure here meant the escalation
+        // could fail to durably persist or reach other stations with zero
+        // trace anywhere.
         void postReceptionEscalation({
           reasonId: submission.record.reasonId,
           reasonLabel: submission.record.reasonLabel,
@@ -4372,7 +4379,9 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
           actorStaffId: submission.record.actorStaffId,
           severity: submission.alert.severity,
           notifyTargets: submission.record.notifyTargets,
-        }).catch(() => undefined);
+        }).catch((error) => {
+          logger.warn('[emergencyStore] Failed to sync reception escalation to backend', error);
+        });
       }
 
       return submission.record;
