@@ -78,6 +78,7 @@ import {
   EscalatePatientDto,
   PatchEmsArrivalStatusDto,
   PostWaitingRoomEscalationNotifyDto,
+  UpdateStaffDutyStatusDto,
   PostReceptionEscalationDto,
   PostReceptionHandoffDto,
   PostTriageAssistDto,
@@ -632,6 +633,26 @@ export class EmergencyOsController {
   @Post('waiting-room-safety/escalation-notify')
   postWaitingRoomEscalationNotify(@Body() body: PostWaitingRoomEscalationNotifyDto) {
     return this.reassessmentService.notifyWaitingRoomEscalation(body);
+  }
+
+  /** Real staff directory, including on-duty status -- see roadmap item G1. */
+  @RequirePermission(Permission.VIEW_OPERATIONS)
+  @Get('staff')
+  getStaff() {
+    return this.reassessmentService.listStaff();
+  }
+
+  /** Mark a staff member on/off duty (and optionally set their email) so
+   * waiting-room-safety escalation can route to a real on-duty charge nurse
+   * instead of only a static distribution list -- see roadmap item G1 and
+   * ReassessmentService.updateStaffDutyStatus's own doc comment. */
+  @RequirePermission(Permission.MANAGE_INCIDENTS)
+  @Patch('staff/:staffId/duty-status')
+  patchStaffDutyStatus(
+    @Param('staffId') staffId: string,
+    @Body() body: UpdateStaffDutyStatusDto,
+  ) {
+    return this.reassessmentService.updateStaffDutyStatus(staffId, body);
   }
 
   @RequirePermission(Permission.READ_PHI)

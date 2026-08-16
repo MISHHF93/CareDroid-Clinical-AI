@@ -5,6 +5,7 @@ import {
   NotFoundException,
   Optional,
   OnModuleInit,
+  ServiceUnavailableException,
 } from '@nestjs/common';
 // OnModuleInit used by EmergencyPatientService board rehydrate
 import { InjectRepository } from '@nestjs/typeorm';
@@ -61,6 +62,7 @@ import { Alert } from './entities/alert.entity';
 import { Referral as ReferralEntity } from './entities/referral.entity';
 import { EmsArrivalStatus } from './entities/ems-arrival-status.entity';
 import { EmergencyOsSettingsEntity } from './entities/emergency-os-settings.entity';
+import { Staff } from './entities/staff.entity';
 import { EmailService } from '../email/email.service';
 import { getEnvironmentConfig } from '../../config/environment.config';
 import { WorkflowActionLogEntry } from './entities/workflow-action-log-entry.entity';
@@ -2325,6 +2327,9 @@ export class ReassessmentService {
 
   constructor(
     private readonly patientService: EmergencyPatientService,
+    @Optional()
+    @InjectRepository(Staff)
+    private readonly staffRepository?: Repository<Staff>,
     @Optional() private readonly emailService?: EmailService,
   ) {}
 
@@ -2341,15 +2346,69 @@ export class ReassessmentService {
     });
   }
 
+  /** Real staff directory read -- see getOnDutyChargeNurseEmails's doc comment for why this exists. */
+  async listStaff(): Promise<Staff[]> {
+    if (!this.staffRepository) return [];
+    return this.staffRepository.find({ order: { name: 'ASC' } });
+  }
+
+  /**
+   * Closes the persistence half of scorecard roadmap item G1 ("there is no real
+   * 'who is on shift right now' data anywhere to route to"). Admin/charge-nurse-
+   * manager action: mark a staff row on/off duty and optionally set/update its
+   * email. Deliberately does not touch `active` or `role` -- this is scoped to
+   * duty status only, not full staff-record management.
+   */
+  async updateStaffDutyStatus(
+    staffId: string,
+    input: { onDuty: boolean; email?: string | null },
+  ): Promise<Staff> {
+    if (!this.staffRepository) {
+      throw new ServiceUnavailableException('Staff duty-status persistence is not available.');
+    }
+    const staff = await this.staffRepository.findOne({ where: { id: staffId } });
+    if (!staff) {
+      throw new NotFoundException(`Staff member "${staffId}" not found`);
+    }
+    staff.onDuty = input.onDuty;
+    if (input.email !== undefined) {
+      staff.email = input.email;
+    }
+    return this.staffRepository.save(staff);
+  }
+
+  /**
+   * The dynamic half of G1's routing gap: real on-duty charge nurses with a real
+   * email on file, read from the `staff` table at notification time -- not a
+   * hardcoded demo literal, not a fixture snapshot frozen at boot. Empty until an
+   * admin actually marks someone on duty via updateStaffDutyStatus, which is
+   * honest (no fabricated destination) rather than a silent full solution: this
+   * still doesn't know who is SCHEDULED for a future shift, only who is marked on
+   * duty right now. Falls back to empty (not an error) when no repository is
+   * available, so notifyWaitingRoomEscalation degrades to exactly its pre-G1
+   * static-list-only behavior rather than failing the whole notification.
+   */
+  private async getOnDutyChargeNurseEmails(): Promise<string[]> {
+    if (!this.staffRepository) return [];
+    const onDutyChargeNurses = await this.staffRepository.find({
+      where: { role: 'Charge', active: true, onDuty: true },
+    });
+    return onDutyChargeNurses
+      .map((staff) => staff.email)
+      .filter((email): email is string => Boolean(email));
+  }
+
   /**
    * Real out-of-band notification for the waiting-room-safety escalation transition
    * (src/services/alertLifecycleOrchestrator.ts's real, live 3-minute auto-escalation --
    * NOT the Mongoose reassessment.scheduler.ts cron, which never runs by default since
    * it only starts inside registerEmergencyMongooseRuntime(), gated behind
    * ENABLE_MONGOOSE_EMERGENCY_OS=false). Extends the already-real in-app escalation past
-   * the browser tab via email to the same INCIDENT_ESCALATION_EMAILS distribution list
-   * incident-reporting.service.ts already reads but never actually sends to -- reuses
-   * the existing, parsed config rather than inventing a new env var.
+   * the browser tab via email to whichever on-duty charge nurses have a real email on
+   * file (getOnDutyChargeNurseEmails, G1) UNIONED with the static INCIDENT_ESCALATION_EMAILS
+   * distribution list incident-reporting.service.ts already reads but never actually sends
+   * to -- the static list stays as a deliberate fallback for deployments that haven't
+   * populated on-duty data yet, not replaced outright.
    */
   async notifyWaitingRoomEscalation(input: {
     patientId?: string;
@@ -2357,10 +2416,13 @@ export class ReassessmentService {
     title: string;
     message: string;
   }): Promise<EmergencyModuleEnvelope<Record<string, unknown>>> {
-    const recipients = getEnvironmentConfig().notifications.incidentEscalationEmails;
+    const staticRecipients = getEnvironmentConfig().notifications.incidentEscalationEmails;
+    const onDutyRecipients = await this.getOnDutyChargeNurseEmails();
+    const recipients = Array.from(new Set([...onDutyRecipients, ...staticRecipients]));
+
     if (!recipients.length) {
       this.logger.warn(
-        'No INCIDENT_ESCALATION_EMAILS configured -- waiting-room escalation notification not sent.',
+        'No on-duty charge nurse email and no INCIDENT_ESCALATION_EMAILS configured -- waiting-room escalation notification not sent.',
       );
       return envelope('Waiting Room Escalation Notification', {
         ok: true,
@@ -2396,6 +2458,7 @@ export class ReassessmentService {
       sent: sentCount > 0,
       recipientCount: recipients.length,
       sentCount,
+      onDutyRecipientCount: onDutyRecipients.length,
       alertId: input.alertId,
       patientId: input.patientId,
     });

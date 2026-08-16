@@ -4,6 +4,7 @@ import {
   IsArray,
   IsBoolean,
   IsDefined,
+  IsEmail,
   IsIn,
   IsNotEmpty,
   IsNumber,
@@ -152,6 +153,12 @@ export class PostWaitingRoomEscalationNotifyDto {
   @IsOptional() @IsString() @MaxLength(96) alertId?: string;
   @IsDefined() @IsString() @MaxLength(200) title: string;
   @IsDefined() @IsString() @MaxLength(2000) message: string;
+}
+
+/** See ReassessmentService.updateStaffDutyStatus -- roadmap item G1. */
+export class UpdateStaffDutyStatusDto {
+  @IsDefined() @IsBoolean() onDuty: boolean;
+  @IsOptional() @IsEmail() email?: string;
 }
 
 /**
