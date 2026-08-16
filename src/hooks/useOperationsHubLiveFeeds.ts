@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { fetchClinicalAlerts } from '../services/clinicalAlertsApi';
 import { fetchEmergencyCapacityDashboard } from '../services/emergencyAnalyticsApi';
 import { fetchFleetCommandSnapshot } from '../services/fleetTelemetryService';
@@ -22,8 +22,16 @@ export function useOperationsHubLiveFeeds({
   const [liveFeeds, setLiveFeeds] = useState<OperationsLiveFeeds>({});
   const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
 
+  // HEAL-248: refresh() can be invoked again (interval tick or a manual
+  // "refresh now" call) while a previous call is still awaiting its
+  // Promise.all -- under network jitter a slower, older call's response
+  // could land after a newer call's and overwrite fresher operations-hub
+  // tiles (including clinicalAlerts) with stale data.
+  const refreshTokenRef = useRef(0);
+
   const refresh = useCallback(async () => {
     if (!enabled) return;
+    const token = ++refreshTokenRef.current;
     setLoading(true);
     try {
       const [
@@ -48,6 +56,7 @@ export function useOperationsHubLiveFeeds({
         }),
         fetchClinicalAlerts(),
       ]);
+      if (token !== refreshTokenRef.current) return;
 
       setLiveFeeds({
         capacity: (capacityResult as { ok?: boolean; data?: unknown }).ok
@@ -61,7 +70,7 @@ export function useOperationsHubLiveFeeds({
       });
       setLastRefreshed(new Date());
     } finally {
-      setLoading(false);
+      if (token === refreshTokenRef.current) setLoading(false);
     }
   }, [enabled, source]);
 

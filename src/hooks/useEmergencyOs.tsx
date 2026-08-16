@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { buildEmergencyScenarioModuleEnvelope } from '../data/edScenarioFixtures';
 import {
@@ -264,7 +264,21 @@ function useEmergencyModule(fetcher, scenarioModule: any = undefined) {
     [activeScenarioId, scenarioModule]
   );
 
+  // HEAL-249: refresh() is exposed to callers and invoked repeatedly and
+  // concurrently in production (a 15s poll interval, plus multiple manual
+  // retry/refresh call sites), and hydrateFromApi() writes straight into
+  // the GLOBAL emergencyStore (patients, capacity, alerts, staff, rooms,
+  // emsArrivals, referrals, workflowLogs, emergencySettings). The mount
+  // effect below already guarded against ITS OWN re-runs with a local
+  // `cancelled` flag, but that did nothing to stop a manual refresh() call
+  // and the mount effect's fetch from racing each other -- whichever
+  // response landed last would re-hydrate the whole ED whiteboard, even if
+  // it was the older, now-stale one. One shared token now guards every
+  // write from either path.
+  const requestTokenRef = useRef(0);
+
   const refresh = useCallback(async () => {
+    const token = ++requestTokenRef.current;
     setLoading(true);
     setError('');
     if (scenarioEnvelope) {
@@ -279,6 +293,7 @@ function useEmergencyModule(fetcher, scenarioModule: any = undefined) {
     }
     try {
       const envelope = await fetcher();
+      if (token !== requestTokenRef.current) return null;
       const normalizedEnvelope = normalizeEmergencyEnvelope(envelope);
       setData(normalizedEnvelope);
       const hydrationPayload = pickHydrationPayload(normalizedEnvelope);
@@ -287,16 +302,17 @@ function useEmergencyModule(fetcher, scenarioModule: any = undefined) {
       }
       return normalizedEnvelope;
     } catch (loadError: any) {
+      if (token !== requestTokenRef.current) return null;
       const message = loadError?.message || 'Unable to load CareDroid data.';
       setError(message);
       return null;
     } finally {
-      setLoading(false);
+      if (token === requestTokenRef.current) setLoading(false);
     }
   }, [fetcher, hydrateFromApi, scenarioEnvelope]);
 
   useEffect(() => {
-    let cancelled = false;
+    const token = ++requestTokenRef.current;
     setLoading(true);
     setError('');
     if (scenarioEnvelope) {
@@ -307,13 +323,11 @@ function useEmergencyModule(fetcher, scenarioModule: any = undefined) {
         hydrateFromApi(hydrationPayload);
       }
       setLoading(false);
-      return () => {
-        cancelled = true;
-      };
+      return undefined;
     }
     fetcher()
       .then((envelope) => {
-        if (cancelled) return;
+        if (token !== requestTokenRef.current) return;
         const normalizedEnvelope = normalizeEmergencyEnvelope(envelope);
         setData(normalizedEnvelope);
         const hydrationPayload = pickHydrationPayload(normalizedEnvelope);
@@ -322,16 +336,14 @@ function useEmergencyModule(fetcher, scenarioModule: any = undefined) {
         }
       })
       .catch((loadError) => {
-        if (!cancelled) {
+        if (token === requestTokenRef.current) {
           setError(loadError?.message || 'Unable to load CareDroid data.');
         }
       })
       .finally(() => {
-        if (!cancelled) setLoading(false);
+        if (token === requestTokenRef.current) setLoading(false);
       });
-    return () => {
-      cancelled = true;
-    };
+    return undefined;
   }, [fetcher, hydrateFromApi, scenarioEnvelope]);
 
   const isEmpty = useMemo(() => {
