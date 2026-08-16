@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Patient } from '../types/emergency';
 import { buildClinicalAcuityLeaderboard } from '../services/nativeAiCore';
 import {
@@ -66,8 +66,16 @@ export function useNativeAiDashboardData(
     setAcuityEntries(localAcuity);
   }, [localAcuity]);
 
+  // HEAL-243: refresh() is re-triggered by the effect below whenever
+  // `patients` gets a new array reference (a normal, frequent occurrence on
+  // a live ED whiteboard). With no staleness guard, an older in-flight call
+  // whose network requests happen to resolve after a newer call's could
+  // overwrite fresh acuity/registry/drift state with stale data.
+  const refreshTokenRef = useRef(0);
+
   const refresh = useCallback(async () => {
     if (!enabled) return;
+    const token = ++refreshTokenRef.current;
 
     setAcuitySource('loading');
     setRegistrySource('loading');
@@ -75,12 +83,14 @@ export function useNativeAiDashboardData(
     setConnectionError('');
 
     await ensureDevBackendSession();
+    if (token !== refreshTokenRef.current) return;
 
     const results = await Promise.allSettled([
       fetchClinicalAcuityLeaderboard(patients),
       fetchNativeAiRegistry(),
       fetchNativeAiDriftEnvelope(),
     ]);
+    if (token !== refreshTokenRef.current) return;
 
     const [acuityResult, registryResult, driftResult] = results;
 
