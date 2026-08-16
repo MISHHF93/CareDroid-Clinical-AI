@@ -6,6 +6,7 @@ import { EMERGENCY_OS_BRANDING } from '../../config/emergencyOsBranding.config';
 import useEdRouteDataContext from '../../hooks/useEdRouteDataContext';
 import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
 import { useEmergencyStore } from '../../store/emergencyStore';
+import { confirmCareDroidAction } from '../../services/careDroidInteractionFeedback';
 import {
   useBoardingStatus,
   useCapacityStatus,
@@ -490,7 +491,20 @@ export function QueueRoute() {
                             <button
                               type="button"
                               title={`Wait: ${patientWait}m — breaches ${target}m target. Click to escalate.`}
-                              onClick={() => {
+                              onClick={async () => {
+                                // HEAL-227: fired escalatePatient() directly on
+                                // click with zero confirmation, unlike this
+                                // same store action's other real call site
+                                // (AiChiefRouteRecommendationsPanel.tsx's
+                                // handleAccept), which requires an explicit
+                                // confirmCareDroidAction step first.
+                                const confirmed = await confirmCareDroidAction({
+                                  title: 'Escalate patient?',
+                                  message: `${displayPatientName(patient)} has breached the ${target}m wait target and will be escalated.`,
+                                  confirmLabel: 'Escalate patient',
+                                  tone: 'danger',
+                                });
+                                if (!confirmed) return;
                                 escalatePatient(patient.id, { staffId: 'charge-nurse-current', staffName: 'Charge Nurse' });
                                 setEscalatedIds((prev) => new Set([...prev, patient.id]));
                               }}
