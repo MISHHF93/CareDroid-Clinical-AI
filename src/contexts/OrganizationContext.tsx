@@ -106,19 +106,35 @@ export function OrganizationContextProvider({ children }) {
     refreshOrganizationEngineRef.current();
   }, [authToken, isAuthenticated, organization?.id]);
 
+  // Same staleness race as refreshOrganizationEngine above, but on the write
+  // path: OrganizationPages.tsx's "Save organization" button had no
+  // double-submit guard, so a rapid double-click fires two overlapping
+  // updateOrganizationSettings() calls. Without a token guard here, whichever
+  // response lands last wins -- a slower first click's (stale) response could
+  // overwrite a faster second click's (current) response, silently reverting
+  // organizationEngine to the earlier submitted values.
+  const saveSettingsTokenRef = useRef(0);
+
   const saveOrganizationSettings = useCallback(
     async (updates) => {
       const organizationId = organizationEngine?.organization?.id || organization?.id;
       if (!organizationId) {
         return { ok: false, message: 'Create an organization before saving settings.' };
       }
+      const token = ++saveSettingsTokenRef.current;
       try {
         const nextEngine = await PlatformAssetsApi.updateOrganizationSettings(organizationId, updates);
+        if (saveSettingsTokenRef.current !== token) {
+          return { ok: false, message: 'Superseded by a newer save.' };
+        }
         setOrganizationEngine(nextEngine);
         await refreshPlatformContext();
         setError('');
         return { ok: true, data: nextEngine };
       } catch (settingsError: any) {
+        if (saveSettingsTokenRef.current !== token) {
+          return { ok: false, message: 'Superseded by a newer save.' };
+        }
         const message = settingsError?.message || 'Organization settings update failed.';
         setError(message);
         return { ok: false, message };

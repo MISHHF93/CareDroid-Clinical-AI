@@ -81,6 +81,12 @@ function RefreshProbe({ onReady }: { onReady: (refresh: () => Promise<any>) => v
   return <output data-testid="platform-org">{(organization as any)?.id || 'none'}</output>;
 }
 
+function IdentityRefreshProbe({ onReady }: { onReady: (refresh: () => Promise<any>) => void }) {
+  const { saasProfile, refreshIdentity } = useUserIdentity();
+  onReady(refreshIdentity);
+  return <output data-testid="identity-role">{(saasProfile as any)?.role || 'none'}</output>;
+}
+
 function contextFor(id: string) {
   return {
     organization: { id, name: id },
@@ -88,6 +94,25 @@ function contextFor(id: string) {
     entitledAssetIds: [`${id}-asset`],
     entitledPackIds: [`${id}-pack`],
   };
+}
+
+function profileFor(role: string) {
+  return {
+    ok: true,
+    data: {
+      userId: 'user-1',
+      workspace: { workspaces: [], activeWorkspaceId: 'emergency' },
+      saasProfile: { role },
+    },
+  };
+}
+
+function deferred<T>() {
+  let resolve!: (value: T) => void;
+  const promise = new Promise<T>((r) => {
+    resolve = r;
+  });
+  return { promise, resolve };
 }
 
 describe('UserIdentityProvider', () => {
@@ -122,14 +147,6 @@ describe('UserIdentityProvider', () => {
       expect(screen.getByTestId('platform-org')).toHaveTextContent('org-initial');
     });
 
-    function deferred<T>() {
-      let resolve!: (value: T) => void;
-      const promise = new Promise<T>((r) => {
-        resolve = r;
-      });
-      return { promise, resolve };
-    }
-
     // Call A (started first) stays pending on deferredA; call B (started second)
     // resolves immediately.
     const deferredA = deferred<any>();
@@ -149,5 +166,44 @@ describe('UserIdentityProvider', () => {
     await new Promise((r) => setTimeout(r, 20));
 
     expect(screen.getByTestId('platform-org')).toHaveTextContent('org-new');
+  });
+
+  // Regression coverage: refreshIdentity() is invoked concurrently from
+  // several independent triggers (the identity-bootstrap effect, and manual
+  // callers such as OrganizationPages.tsx's saveRoleProfile). Before this
+  // fix, whichever fetchOperationalProfile() response landed LAST won, even
+  // if it was the STALER of two overlapping calls -- switching a role
+  // profile could silently "revert" to the pre-switch role with no error.
+  it('a slower refreshIdentity() call does not overwrite a faster, more recently-started one', async () => {
+    mocks.fetchOperationalProfile.mockResolvedValue(profileFor('student'));
+
+    let refresh: (() => Promise<any>) | null = null;
+    render(
+      <UserIdentityProvider>
+        <IdentityRefreshProbe onReady={(fn) => { refresh = fn; }} />
+      </UserIdentityProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('identity-role')).toHaveTextContent('student');
+    });
+
+    const deferredA = deferred<any>();
+    mocks.fetchOperationalProfile.mockImplementationOnce(() => deferredA.promise);
+    const refreshA = refresh!();
+
+    mocks.fetchOperationalProfile.mockResolvedValueOnce(profileFor('physician'));
+    const refreshB = refresh!();
+    await refreshB;
+    await waitFor(() => {
+      expect(screen.getByTestId('identity-role')).toHaveTextContent('physician');
+    });
+
+    // A's slower response now resolves, after B has already landed.
+    deferredA.resolve(profileFor('student'));
+    await refreshA;
+    await new Promise((r) => setTimeout(r, 20));
+
+    expect(screen.getByTestId('identity-role')).toHaveTextContent('physician');
   });
 });

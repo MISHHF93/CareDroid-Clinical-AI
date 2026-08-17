@@ -971,13 +971,27 @@ export const UserIdentityProvider = ({ children }: { children: React.ReactNode }
     return result;
   }, [authToken, isAuthenticated]);
 
+  // Called concurrently from several independent triggers (the identity-
+  // bootstrap effect below, and manual callers such as OrganizationPages.tsx's
+  // saveRoleProfile) -- same shape as refreshPlatformContext's staleness race
+  // just above, but this function itself had no token guard. A slower,
+  // in-flight refreshIdentity() (e.g. bootstrap re-running on an auth-state
+  // change) could resolve AFTER a faster, more recent one (e.g. a role-profile
+  // switch) and silently overwrite operationalProfile -- including
+  // saasProfile.role/accessSummary, which drives nav/route access -- back to
+  // the stale value with no visible error.
+  const refreshIdentityTokenRef = useRef(0);
+
   const refreshIdentity = useCallback(async () => {
+    const token = ++refreshIdentityTokenRef.current;
     if (!isAuthenticated && !authToken) {
-      setOperationalProfile(null);
-      setPlatformContext(null);
-      setPlatformEntitlementContext(null);
-      setMemoryFabricContext(LOCAL_MEMORY_FABRIC_CONTEXT);
-      setError('');
+      if (refreshIdentityTokenRef.current === token) {
+        setOperationalProfile(null);
+        setPlatformContext(null);
+        setPlatformEntitlementContext(null);
+        setMemoryFabricContext(LOCAL_MEMORY_FABRIC_CONTEXT);
+        setError('');
+      }
       return null;
     }
     setIsLoading(true);
@@ -986,6 +1000,7 @@ export const UserIdentityProvider = ({ children }: { children: React.ReactNode }
       refreshPlatformContext(),
       refreshMemoryFabricContext(),
     ]);
+    if (refreshIdentityTokenRef.current !== token) return null;
     setIsLoading(false);
     if (!result.ok) {
       logger.warn('Operational profile backend unavailable; using local identity fallback', {

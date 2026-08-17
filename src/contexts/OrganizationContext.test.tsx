@@ -57,6 +57,12 @@ function RefreshProbe({ onReady }: { onReady: (refresh: () => Promise<any>) => v
   return <output data-testid="org-engine">{branding?.displayName}</output>;
 }
 
+function SaveSettingsProbe({ onReady }: { onReady: (save: (updates: any) => Promise<any>) => void }) {
+  const { branding, saveOrganizationSettings } = useOrganizationContext();
+  onReady(saveOrganizationSettings);
+  return <output data-testid="org-branding">{branding?.displayName}</output>;
+}
+
 describe('OrganizationContextProvider', () => {
   beforeEach(() => {
     mocks.identityState.refreshPlatformContext.mockReset();
@@ -166,5 +172,57 @@ describe('OrganizationContextProvider', () => {
     await new Promise((r) => setTimeout(r, 20));
 
     expect(screen.getByTestId('org-engine')).toHaveTextContent('New Org');
+  });
+
+  it('HEAL-296: a slower saveOrganizationSettings() call does not overwrite a faster, more recently-started one', async () => {
+    function deferred<T>() {
+      let resolve!: (value: T) => void;
+      const promise = new Promise<T>((r) => {
+        resolve = r;
+      });
+      return { promise, resolve };
+    }
+
+    const engineWithBranding = (displayName: string) => ({
+      organization: { id: 'org-1', name: 'CareDroid Hospital' },
+      branding: { displayName },
+      subscription: { tier: 'enterprise', status: 'active' },
+      integrations: [],
+    });
+
+    mocks.getOrganizationEngine.mockResolvedValue(engineWithBranding('CareDroid Health'));
+
+    let save: ((updates: any) => Promise<any>) | null = null;
+    render(
+      <OrganizationContextProvider>
+        <SaveSettingsProbe onReady={(fn) => { save = fn; }} />
+      </OrganizationContextProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('org-branding')).toHaveTextContent('CareDroid Health');
+    });
+
+    // Save A (a slower first click) stays pending on deferredA; save B (a
+    // faster, more recent second click) resolves immediately. Before
+    // HEAL-296, whichever response landed last would win regardless of
+    // which was actually started more recently.
+    const deferredA = deferred<any>();
+    mocks.updateOrganizationSettings.mockImplementationOnce(() => deferredA.promise);
+    const saveA = save!({ branding: { displayName: 'Stale Name' } });
+
+    mocks.updateOrganizationSettings.mockResolvedValueOnce(engineWithBranding('Fresh Name'));
+    const saveB = save!({ branding: { displayName: 'Fresh Name' } });
+    await saveB;
+    await waitFor(() => {
+      expect(screen.getByTestId('org-branding')).toHaveTextContent('Fresh Name');
+    });
+
+    // A's slower response now resolves, after B has already landed.
+    deferredA.resolve(engineWithBranding('Stale Name'));
+    await saveA;
+    await new Promise((r) => setTimeout(r, 20));
+
+    expect(screen.getByTestId('org-branding')).toHaveTextContent('Fresh Name');
   });
 });
