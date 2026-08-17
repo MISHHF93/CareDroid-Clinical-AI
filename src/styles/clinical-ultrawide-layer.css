@@ -132,6 +132,24 @@
   .reception-operational-rail {
     gap: var(--space-3, 12px);
   }
+
+  /* HEAL-315: the primary intake column above (`[data-cdl-zone='active-work']`)
+     is correctly fluid (minmax(0, 1fr)) -- but 3 elements inside it
+     (ReceptionWorkspace.css's segmented control, form grid, and queue rows)
+     each hard-cap their own max-width at 900px regardless of the fluid
+     column's real available width, leaving ~30%+ of a 2560px+ viewport
+     unused. This is a dense operational dashboard, not a reading-width page,
+     so that space reads as unused capacity rather than intentional design --
+     confirmed live via Playwright at 2560px (usable width stopped at
+     x≈1740, growing worse at 3440px). Raise the cap; keep it well short of
+     the rail-inclusive full width so form fields and queue rows don't
+     stretch into uncomfortably sparse single-row layouts.
+  */
+  .reception-command-segmented,
+  .reception-command-form-grid,
+  .reception-command-queue-row {
+    max-width: 1300px;
+  }
 }
 
 @media (min-width: 3440px) {
@@ -155,6 +173,14 @@
 
   .emergency-app-shell .app-shell-main-content .hospital-command-center__actions {
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  }
+
+  /* HEAL-315: see the 2560px block's comment. Rail grows to 400px at this
+     tier, so the fluid intake column gets even more headroom. */
+  .reception-command-segmented,
+  .reception-command-form-grid,
+  .reception-command-queue-row {
+    max-width: 1500px;
   }
 
   .emergency-whiteboard-page__command-layer-grid {

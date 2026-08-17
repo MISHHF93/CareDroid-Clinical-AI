@@ -30,6 +30,24 @@ describe('clinical ultrawide layer', () => {
     expect(ultrawideCss).toContain('.hospital-command-center__actions');
   });
 
+  it('HEAL-315: relaxes Reception command-panel widths beyond ReceptionWorkspace.css\'s 900px cap on ultrawide', () => {
+    // ReceptionWorkspace.css caps these 3 selectors at 900px unconditionally
+    // -- with the fluid primary intake column above correctly using
+    // minmax(0, 1fr), that 900px cap (not the column) was the real ceiling,
+    // leaving ~30%+ of a 2560px+ viewport unused. Guards against silently
+    // losing this override on a future edit.
+    const targets = [
+      '.reception-command-segmented',
+      '.reception-command-form-grid',
+      '.reception-command-queue-row',
+    ];
+    for (const selector of targets) {
+      expect(ultrawideCss).toContain(selector);
+    }
+    expect(ultrawideCss).toContain('max-width: 1300px');
+    expect(ultrawideCss).toContain('max-width: 1500px');
+  });
+
   it('extends layout-engine large breakpoints through 2200px', () => {
     expect(layoutEngineCss).toContain('@media (min-width: 2200px)');
     expect(layoutEngineCss).toContain('--app-layout-content-max');
