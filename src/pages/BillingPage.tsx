@@ -21,6 +21,8 @@ export default function BillingPage() {
   const [billing, setBilling] = useState<any>(null);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [portalLoading, setPortalLoading] = useState(false);
+  const [checkoutLoadingTier, setCheckoutLoadingTier] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -42,19 +44,31 @@ export default function BillingPage() {
   }, []);
 
   const openPortal = async () => {
+    if (portalLoading) return;
+    setPortalLoading(true);
     const result = await createCustomerPortalSession({ returnUrl: window.location.href });
-    if (result.ok && result.data?.url) window.location.assign(result.data.url);
-    else setError(result.message);
+    if (result.ok && result.data?.url) {
+      window.location.assign(result.data.url);
+    } else {
+      setError(result.message);
+      setPortalLoading(false);
+    }
   };
 
   const startCheckout = async (tier) => {
+    if (checkoutLoadingTier) return;
+    setCheckoutLoadingTier(tier);
     const result = await createCheckoutSession({
       tier,
       successUrl: window.location.href,
       cancelUrl: window.location.href,
     });
-    if (result.ok && result.data?.url) window.location.assign(result.data.url);
-    else setError(result.message);
+    if (result.ok && result.data?.url) {
+      window.location.assign(result.data.url);
+    } else {
+      setError(result.message);
+      setCheckoutLoadingTier(null);
+    }
   };
 
   if (isLoading) {
@@ -89,7 +103,7 @@ export default function BillingPage() {
             </div>
           </div>
           <div className="commercial-actions">
-            <Button variant="secondary" onClick={openPortal}>
+            <Button variant="secondary" onClick={openPortal} loading={portalLoading}>
               Open billing portal
             </Button>
           </div>
@@ -120,7 +134,12 @@ export default function BillingPage() {
                   <li key={feature}>{feature}</li>
                 ))}
               </ul>
-              <Button variant="primary" onClick={() => startCheckout(plan.id)}>
+              <Button
+                variant="primary"
+                onClick={() => startCheckout(plan.id)}
+                loading={checkoutLoadingTier === plan.id}
+                disabled={checkoutLoadingTier !== null && checkoutLoadingTier !== plan.id}
+              >
                 Select {plan.name}
               </Button>
             </Card>
