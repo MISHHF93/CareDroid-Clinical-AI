@@ -148,7 +148,30 @@ export const SAAS_PROFILE_API_PERMISSIONS: Record<SaasUserRole, Permission[]> = 
   ],
 };
 
+/**
+ * A user with no roleProfileId at all isn't using the SaaS-persona system --
+ * they should carry ZERO permissions from it, not a silent 'student' default.
+ * normalizeSaasRole's fallback to DEFAULT_SAAS_PROFILE.role ('student') is a
+ * deliberate, tested contract (Cycle 220) for a *provided-but-unrecognized*
+ * profile string (e.g. wrong casing) -- it was never meant to apply when no
+ * profile was provided in the first place. AuthorizationGuard.hasRolePermission
+ * ORs hasSaasProfilePermission's result with the user's base UserRole
+ * permissions unconditionally, so routing null through the same fallback
+ * silently upgraded even UserRole.READ_ONLY_VIEWER -- built specifically to
+ * grant nothing beyond READ_PHI -- with 'student'-tier clinical-tool access
+ * (USE_CALCULATORS/USE_DRUG_CHECKER/USE_LAB_INTERPRETER/USE_PROTOCOLS/
+ * USE_AI_CHAT) whenever roleProfileId was unset, which is the common case.
+ * Every other base UserRole (STUDENT, NURSE, PHYSICIAN, ADMIN) already grants
+ * these same permissions directly, so this changes nothing for them.
+ *
+ * Deliberately NOT applied to resolveSaasProfileAllowedPacks below -- that
+ * function drives CONTENT/feature-pack entitlement display (platform-assets
+ * .service.ts / platform-context.service.ts), a different, non-security
+ * concern where defaulting an unassigned profile to the 'core-platform' pack
+ * is a reasonable content default, not a permission grant.
+ */
 export function resolveSaasProfilePermissions(roleProfileId?: string | null): Permission[] {
+  if (roleProfileId === null || roleProfileId === undefined) return [];
   const saasRole = normalizeSaasRole(roleProfileId);
   return SAAS_PROFILE_API_PERMISSIONS[saasRole] || SAAS_PROFILE_API_PERMISSIONS.student;
 }
