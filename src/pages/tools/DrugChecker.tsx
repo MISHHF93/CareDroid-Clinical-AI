@@ -57,6 +57,14 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded }: any = {}) => {
   // and therefore focus, correctly attached to the same logical entry.
   const nextMedicationIdRef = useRef(1);
   const [medicationIds, setMedicationIds] = useState(() => [`med-${nextMedicationIdRef.current++}`]);
+  // HEAL-309: allergies previously had nowhere to go in this tool at all -- the
+  // checker only ever compared medications against each other, never against
+  // what the patient is actually allergic to. Mirrors the medications list's
+  // stable-id pattern (see HEAL-222 above) so row identity/focus behaves the
+  // same way here too.
+  const nextAllergyIdRef = useRef(1);
+  const [allergies, setAllergies] = useState(['']);
+  const [allergyIds, setAllergyIds] = useState(() => [`allergy-${nextAllergyIdRef.current++}`]);
   const [results, setResults] = useState<any>(null);
   const [isChecking, setIsChecking] = useState(false);
   const [error, setError] = useState<any>(null);
@@ -74,12 +82,14 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded }: any = {}) => {
   };
 
   const activeMeds = useMemo(() => medications.map((m) => m.trim()).filter(Boolean), [medications]);
+  const activeAllergies = useMemo(() => allergies.map((a) => a.trim()).filter(Boolean), [allergies]);
   const preflightParameters = useMemo(
     () => ({
       medications: activeMeds,
+      allergies: activeAllergies,
       severityFilter: 'all',
     }),
-    [activeMeds]
+    [activeMeds, activeAllergies]
   );
 
   const handleAddMedication = () => {
@@ -105,6 +115,29 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded }: any = {}) => {
     setMedications(updated);
   };
 
+  const handleAddAllergy = () => {
+    setAllergies([...allergies, '']);
+    setAllergyIds([...allergyIds, `allergy-${nextAllergyIdRef.current++}`]);
+  };
+
+  const handleRemoveAllergy = (index) => {
+    const updated = allergies.filter((_, i) => i !== index);
+    const updatedIds = allergyIds.filter((_, i) => i !== index);
+    if (updated.length > 0) {
+      setAllergies(updated);
+      setAllergyIds(updatedIds);
+    } else {
+      setAllergies(['']);
+      setAllergyIds([`allergy-${nextAllergyIdRef.current++}`]);
+    }
+  };
+
+  const handleAllergyChange = (index, value) => {
+    const updated = [...allergies];
+    updated[index] = value;
+    setAllergies(updated);
+  };
+
   const handleCheck = async () => {
     if (!preflightReady || activeMeds.length < 2) {
       warning('Add more medications', 'Enter at least 2 medications to check for interactions.');
@@ -119,6 +152,7 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded }: any = {}) => {
     try {
       const execution = await executeClinicalTool('drug-interactions', {
         medications: activeMeds,
+        allergies: activeAllergies,
         severityFilter: 'all',
       });
 
@@ -211,6 +245,48 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded }: any = {}) => {
             ))}
           </div>
 
+          <div className="input-actions">
+            <button type="button" className="btn-add-med" onClick={handleAddMedication}>
+              + Add Another Medication
+            </button>
+          </div>
+
+          <h2>Patient Allergies (optional)</h2>
+          <p className="section-subtitle">
+            Add any documented drug allergies so the checker can flag a medication that
+            cross-reacts with them, not just interactions between the medications themselves
+          </p>
+
+          <div className="medications-list">
+            {allergies.map((allergy, index) => (
+              <div key={allergyIds[index] ?? index} className="medication-input-row">
+                <span className="medication-number">{index + 1}</span>
+                <input
+                  type="text"
+                  className="medication-input"
+                  placeholder="Enter allergy (e.g., Penicillin)"
+                  value={allergy}
+                  onChange={(e) => handleAllergyChange(index, e.target.value)}
+                />
+                {allergies.length > 1 && (
+                  <button type="button"
+                    className="btn-remove-med"
+                    onClick={() => handleRemoveAllergy(index)}
+                    title="Remove allergy"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+
+          <div className="input-actions">
+            <button type="button" className="btn-add-med" onClick={handleAddAllergy}>
+              + Add Another Allergy
+            </button>
+          </div>
+
           <ToolPreflightStatus
             toolId="drug-interactions"
             parameters={preflightParameters}
@@ -224,11 +300,8 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded }: any = {}) => {
           />
 
           <div className="input-actions">
-            <button type="button" className="btn-add-med" onClick={handleAddMedication}>
-              + Add Another Medication
-            </button>
-            <button type="button" 
-              className="btn-check-interactions" 
+            <button type="button"
+              className="btn-check-interactions"
               onClick={handleCheck}
               disabled={isChecking || !preflightReady}
             >

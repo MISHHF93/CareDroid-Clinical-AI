@@ -47,6 +47,22 @@ const MEDICATION_ALIASES: Record<string, string[]> = {
   enalapril: ['acei'],
   ramipril: ['acei'],
   benazepril: ['acei'],
+  // HEAL-309: beta-lactam cross-reactivity class, used for allergy checking below.
+  amoxicillin: ['penicillin'],
+  ampicillin: ['penicillin'],
+  piperacillin: ['penicillin'],
+  augmentin: ['penicillin'],
+  'amoxicillin-clavulanate': ['penicillin'],
+  nafcillin: ['penicillin'],
+  oxacillin: ['penicillin'],
+  dicloxacillin: ['penicillin'],
+  // HEAL-309: sulfonamide cross-reactivity class, used for allergy checking below.
+  sulfamethoxazole: ['sulfa'],
+  bactrim: ['sulfa'],
+  'co-trimoxazole': ['sulfa'],
+  'trimethoprim-sulfamethoxazole': ['sulfa'],
+  sulfasalazine: ['sulfa'],
+  sulfadiazine: ['sulfa'],
 };
 
 const KNOWN_INTERACTION_PAIRS: Record<string, DrugInteraction> = {
@@ -149,6 +165,13 @@ export class DrugCheckerService implements ClinicalToolService {
         description: 'List of medication names (generic or brand)',
       },
       {
+        name: 'allergies',
+        type: 'array',
+        required: false,
+        description:
+          "List of the patient's documented allergy substances (e.g., 'Penicillin', 'Sulfa drugs', 'Aspirin')",
+      },
+      {
         name: 'severityFilter',
         type: 'string',
         required: false,
@@ -188,6 +211,18 @@ export class DrugCheckerService implements ClinicalToolService {
       }
     }
 
+    if (parameters.allergies !== undefined) {
+      if (!Array.isArray(parameters.allergies)) {
+        errors.push('allergies must be an array');
+      } else if (
+        parameters.allergies.some(
+          (allergy: unknown) => typeof allergy !== 'string' || !allergy.trim(),
+        )
+      ) {
+        errors.push('allergies must contain only non-empty strings');
+      }
+    }
+
     return {
       valid: errors.length === 0,
       errors,
@@ -210,7 +245,17 @@ export class DrugCheckerService implements ClinicalToolService {
     }
 
     const medications = (parameters.medications as string[]).map((medication) => medication.trim());
+    const allergies = ((parameters.allergies as string[] | undefined) || [])
+      .map((allergy) => allergy.trim())
+      .filter(Boolean);
     const severityFilter = parameters.severityFilter || 'all';
+
+    // HEAL-309: cross-check the medication list against the patient's documented
+    // allergies first. This tool previously only ever compared medications against
+    // each other -- it had no allergies parameter at all, so a patient with a
+    // documented penicillin allergy being ordered amoxicillin (or sulfa/Bactrim,
+    // etc.) produced zero warning from the only medication-safety tool in the app.
+    const allergyFindings = this.checkAllergyContraindications(medications, allergies);
 
     // Check for known high-risk interactions first (rule-based)
     const knownInteractions = this.checkKnownInteractions(medications);
@@ -225,8 +270,9 @@ export class DrugCheckerService implements ClinicalToolService {
       );
     }
 
-    // Merge results
-    const allInteractions = [...knownInteractions, ...aiInteractions];
+    // Merge results -- allergy contraindications lead since they're the
+    // highest-confidence, rule-based, patient-specific findings.
+    const allInteractions = [...allergyFindings, ...knownInteractions, ...aiInteractions];
 
     // Filter by severity
     const filteredInteractions =
@@ -251,7 +297,9 @@ export class DrugCheckerService implements ClinicalToolService {
       success: true,
       data: {
         medicationsChecked: medications,
+        allergiesChecked: allergies,
         totalInteractions: filteredInteractions.length,
+        allergyContraindicationCount: allergyFindings.length,
         interactionsBySeverity: {
           contraindicated: groupedBySeverity.contraindicated.length,
           major: groupedBySeverity.major.length,
@@ -274,6 +322,40 @@ export class DrugCheckerService implements ClinicalToolService {
         'Educational decision support only. Does not recommend specific doses or starting, stopping, or switching medications. Verify with clinical pharmacology resources and qualified clinician judgment.',
       timestamp: new Date(),
     };
+  }
+
+  // HEAL-309: reuses the same alias-normalization the drug-drug checker relies on
+  // (e.g. amoxicillin/ampicillin -> "penicillin", sulfamethoxazole/Bactrim -> "sulfa")
+  // so a documented allergy to a drug CLASS ("Penicillin", "Sulfa drugs") correctly
+  // catches every member of that class, not just an exact name match.
+  private checkAllergyContraindications(
+    medications: string[],
+    allergies: string[],
+  ): DrugInteraction[] {
+    const findings: DrugInteraction[] = [];
+
+    for (const medication of medications) {
+      const medicationTokens = this.normalizeMedicationAliases(medication);
+      for (const allergySubstance of allergies) {
+        const allergyTokens = this.normalizeMedicationAliases(allergySubstance);
+        const sharedToken = medicationTokens.find((token) => allergyTokens.includes(token));
+        if (!sharedToken) continue;
+
+        findings.push({
+          drug1: medication,
+          drug2: `Documented allergy: ${allergySubstance}`,
+          severity: 'contraindicated',
+          description: `Patient has a documented allergy to ${allergySubstance}, which cross-reacts with ${medication}.`,
+          mechanism: `${medication} and the patient's documented "${allergySubstance}" allergy share the same "${sharedToken}" drug class / cross-reactivity group.`,
+          clinicalSignificance:
+            'Risk of allergic or hypersensitivity reaction, up to and including anaphylaxis.',
+          management: `Do not administer ${medication} without allergist consultation or confirmed tolerance. Select an alternative agent outside the ${sharedToken} class.`,
+          recommendation: `Do not administer ${medication} without allergist consultation or confirmed tolerance. Select an alternative agent outside the ${sharedToken} class.`,
+        });
+      }
+    }
+
+    return findings;
   }
 
   private checkKnownInteractions(medications: string[]): DrugInteraction[] {
@@ -393,6 +475,7 @@ Respond in JSON format as an array of interactions.`;
   getExample(): Record<string, any> {
     return {
       medications: ['Warfarin', 'Aspirin', 'Metoprolol', 'Lisinopril', 'Atorvastatin'],
+      allergies: ['Penicillin'],
       severityFilter: 'all',
     };
   }
