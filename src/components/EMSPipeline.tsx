@@ -182,9 +182,9 @@ function EMSArrivalRow({
         <div className="ems-pipeline__complaint-title">
           <strong>{arrival.chiefComplaint}</strong>
           <span
-            className={`ems-pipeline__severity ems-pipeline__severity--${arrival.severity.toLowerCase()}`}
+            className={`ems-pipeline__severity ems-pipeline__severity--${(arrival.severity || 'Moderate').toLowerCase()}`}
           >
-            {arrival.severity}
+            {arrival.severity || 'Moderate'}
           </span>
           {showHandoffChecklist ? (
             <AmbulanceHandoffChecklistBadge

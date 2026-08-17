@@ -185,4 +185,56 @@ describe('EMSPipeline render', () => {
     const countBadge = heading.parentElement?.querySelector('span');
     expect(countBadge?.textContent).toBe('0');
   });
+
+  it('HEAL-321: renders without throwing when an arrival has no severity (real backend/CAD feed gap)', () => {
+    // EMSArrival.severity is typed as required, but the normalizer that
+    // builds arrivals from raw backend/CAD data (extractEmsIncomingPatients
+    // in emergencyStore.ts) spread whatever the feed sent with no
+    // validation -- a real arrival missing this field crashed the whole
+    // route via arrival.severity.toLowerCase(). This test exercises the
+    // render directly (the store-level normalizer fix has its own
+    // coverage) so a future regression at either layer still gets caught.
+    useEmergencyStore.setState(
+      {
+        ...originalState,
+        patients: [],
+        emsArrivals: [
+          {
+            id: 'ems-missing-severity',
+            unitId: 'Medic 4',
+            unitName: 'Medic 4',
+            status: 'Inbound',
+            eta: 6,
+            dispatchTime: new Date().toISOString(),
+            estimatedArrivalTime: new Date().toISOString(),
+            chiefComplaint: 'Chest pain',
+          } as any,
+        ],
+        staff: [],
+        rooms: [],
+        alerts: [],
+        capacity: originalState.capacity,
+        emergencySettings: originalState.emergencySettings,
+      },
+      true,
+    );
+
+    let error: unknown;
+    try {
+      render(
+        <MemoryRouter initialEntries={['/emergency/ems']}>
+          <RouteChromeProvider>
+            <PractitionerVisibilityProvider>
+              <HelpHubProvider>
+                <EMSPipeline />
+              </HelpHubProvider>
+            </PractitionerVisibilityProvider>
+          </RouteChromeProvider>
+        </MemoryRouter>,
+      );
+    } catch (e) {
+      error = e;
+    }
+    expect(error).toBeUndefined();
+  });
 });

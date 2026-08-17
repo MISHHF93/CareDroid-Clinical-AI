@@ -1229,10 +1229,25 @@ const normalizeBoardingMetrics = (raw: unknown): EmergencyBoardingMetrics => {
   };
 };
 
-const normalizeEmsIncomingPatient = (value: unknown, index = 0): EmsIncomingPatient => ({
-  ...asRecord(value),
-  id: stableId('ems', value, index),
-});
+const VALID_EMS_SEVERITIES = new Set(['Low', 'Moderate', 'High', 'Critical']);
+
+// HEAL-321: this normalizer spreads whatever the backend/CAD feed sends,
+// then a later call site casts the result straight to EMSArrival[] (a type
+// that declares `severity` required) with no runtime check -- when a real
+// record omitted it, EMSPipeline.tsx's `arrival.severity.toLowerCase()`
+// crashed the whole route to an error boundary (confirmed live, with the
+// app's own crash-reporter looping 400s then a 429 on repeat visits).
+// Defaulting here keeps every consumer's `EMSArrival.severity` contract
+// honest at the one place raw, unvalidated data enters the store.
+const normalizeEmsIncomingPatient = (value: unknown, index = 0): EmsIncomingPatient => {
+  const record = asRecord(value);
+  const severity = stringFrom(record.severity);
+  return {
+    ...record,
+    id: stableId('ems', value, index),
+    severity: severity && VALID_EMS_SEVERITIES.has(severity) ? (severity as EMSArrival['severity']) : 'Moderate',
+  };
+};
 
 const extractEmsIncomingPatients = (raw: unknown): EmsIncomingPatient[] => {
   const data = unwrapData(raw);
