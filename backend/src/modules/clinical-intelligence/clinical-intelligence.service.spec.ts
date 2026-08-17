@@ -385,9 +385,17 @@ describe('ClinicalIntelligenceService', () => {
       expect.arrayContaining([expect.objectContaining({ id: 'sepsis-pathway' })]),
     );
     expect(result.explainability.matchedSignals).toEqual(
+      expect.arrayContaining(['Sepsis / infection pathway signal']),
+    );
+    // HEAL-312: the old single "Renal/allergy constraint signal" gave zero indication
+    // of which concern (or both) actually fired, or what text triggered it. Now the two
+    // concerns are split and each carries the actual matched excerpt.
+    expect(result.explainability.matchedSignals).toEqual(
+      expect.arrayContaining([expect.stringMatching(/^Documented allergy signal: ".*allerg.*"$/)]),
+    );
+    expect(result.explainability.matchedSignals).toEqual(
       expect.arrayContaining([
-        'Sepsis / infection pathway signal',
-        'Renal/allergy constraint signal',
+        expect.stringMatching(/^Renal function constraint signal: ".*(ckd|renal).*"$/),
       ]),
     );
     expect(result.safety).toMatchObject({
@@ -397,6 +405,28 @@ describe('ClinicalIntelligenceService', () => {
     expect(result.safety.blockedActions).toEqual(
       expect.arrayContaining(['place_orders', 'sign_orders']),
     );
+  });
+
+  it('HEAL-312: order bundle review checklists name the specific allergy/renal text detected in THIS patient\'s context, not identical boilerplate for every patient', async () => {
+    const service = createService();
+
+    const withAllergy = await service.generateOrderSetAi('user-11a', {
+      clinicalScenario: 'Suspected sepsis with hypotension, fever, elevated lactate.',
+      diagnosis: 'Sepsis',
+      patientContext: 'Documented penicillin allergy.',
+    });
+    const withoutConstraint = await service.generateOrderSetAi('user-11b', {
+      clinicalScenario: 'Suspected sepsis with hypotension, fever, elevated lactate.',
+      diagnosis: 'Sepsis',
+    });
+
+    const allergyChecklist = withAllergy.orderBundles[0].reviewChecklist;
+    const plainChecklist = withoutConstraint.orderBundles[0].reviewChecklist;
+
+    expect(allergyChecklist.some((item) => item.includes('penicillin'))).toBe(true);
+    // The two patients must not receive an identical checklist -- before HEAL-312 they
+    // always did, since the constraint flag never changed any returned content.
+    expect(allergyChecklist).not.toEqual(plainChecklist);
   });
 
   it('audits order-set-ai PHI access without storing raw scenario text', async () => {

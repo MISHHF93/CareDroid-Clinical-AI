@@ -1343,33 +1343,78 @@ function buildToolChain(logs: SanitizedExecutionLogDto[]): string[] {
   return uniqueStrings(logs.map((log) => `${log.capabilityId} -> ${log.status} -> ${log.action}`));
 }
 
-function matchOrderSetSignals(text: string): string[] {
-  const signals = [
-    {
-      label: 'Sepsis / infection pathway signal',
-      keywords: ['sepsis', 'lactate', 'hypotension', 'fever', 'infection'],
-    },
-    {
-      label: 'Acute coronary syndrome pathway signal',
-      keywords: ['chest pain', 'acs', 'troponin', 'stemi', 'nstemi'],
-    },
-    {
-      label: 'Stroke pathway signal',
-      keywords: ['stroke', 'aphasia', 'weakness', 'facial droop', 'last known well'],
-    },
-    {
-      label: 'COPD / respiratory pathway signal',
-      keywords: ['copd', 'wheezing', 'hypoxia', 'oxygen', 'dyspnea'],
-    },
-    {
-      label: 'Renal/allergy constraint signal',
-      keywords: ['ckd', 'renal', 'creatinine', 'allergy', 'dose'],
-    },
-  ];
+const ORDER_SET_PATHWAY_SIGNALS = [
+  {
+    label: 'Sepsis / infection pathway signal',
+    keywords: ['sepsis', 'lactate', 'hypotension', 'fever', 'infection'],
+  },
+  {
+    label: 'Acute coronary syndrome pathway signal',
+    keywords: ['chest pain', 'acs', 'troponin', 'stemi', 'nstemi'],
+  },
+  {
+    label: 'Stroke pathway signal',
+    keywords: ['stroke', 'aphasia', 'weakness', 'facial droop', 'last known well'],
+  },
+  {
+    label: 'COPD / respiratory pathway signal',
+    keywords: ['copd', 'wheezing', 'hypoxia', 'oxygen', 'dyspnea'],
+  },
+];
 
-  return signals
-    .filter((signal) => signal.keywords.some((keyword) => text.includes(keyword)))
-    .map((signal) => signal.label);
+// HEAL-312: previously one "Renal/allergy constraint signal" conflated two clinically
+// distinct concerns (allergy vs. renal function) into a single opaque label, and never
+// surfaced WHAT was actually matched -- a clinician saw the identical flag whether the
+// submitted context said "penicillin allergy" or "creatinine 4.1", with no way to tell
+// which one (or both) fired without re-reading their own input, and the flag had zero
+// effect on the returned bundle content either way. Split into two correctly-labeled
+// signals, each carrying the actual matched excerpt from the submitted text.
+const ORDER_SET_CONSTRAINT_SIGNAL_RULES = [
+  { label: 'Documented allergy signal', keywords: ['allergy', 'allergic', 'anaphylaxis'] },
+  {
+    label: 'Renal function constraint signal',
+    keywords: ['ckd', 'renal', 'creatinine', 'egfr', 'dialysis'],
+  },
+];
+
+type OrderSetConstraintSignal = { label: string; excerpt: string };
+
+function extractConstraintSignalExcerpt(text: string, keywords: string[]): string | null {
+  for (const keyword of keywords) {
+    const index = text.indexOf(keyword);
+    if (index === -1) continue;
+    const start = Math.max(0, index - 12);
+    const end = Math.min(text.length, index + keyword.length + 12);
+    const excerpt = text.slice(start, end).trim();
+    return `${start > 0 ? '…' : ''}${excerpt}${end < text.length ? '…' : ''}`;
+  }
+  return null;
+}
+
+function extractOrderSetConstraintSignals(text: string): OrderSetConstraintSignal[] {
+  return ORDER_SET_CONSTRAINT_SIGNAL_RULES.map((rule) => {
+    const excerpt = extractConstraintSignalExcerpt(text, rule.keywords);
+    return excerpt ? { label: rule.label, excerpt } : null;
+  }).filter((signal): signal is OrderSetConstraintSignal => signal !== null);
+}
+
+function matchOrderSetSignals(text: string): string[] {
+  const matchedPathwaySignals = ORDER_SET_PATHWAY_SIGNALS.filter((signal) =>
+    signal.keywords.some((keyword) => text.includes(keyword)),
+  ).map((signal) => signal.label);
+
+  const constraintSignals = extractOrderSetConstraintSignals(text).map(
+    (signal) => `${signal.label}: "${signal.excerpt}"`,
+  );
+
+  return [...matchedPathwaySignals, ...constraintSignals];
+}
+
+function buildOrderSetConstraintChecklistItem(text: string): string | null {
+  const signals = extractOrderSetConstraintSignals(text);
+  if (!signals.length) return null;
+  const detail = signals.map((signal) => `${signal.label} ("${signal.excerpt}")`).join('; ');
+  return `Submitted context flagged: ${detail} -- verify against every suggested order in this bundle before selection.`;
 }
 
 function buildOrderSetBundles(text: string): OrderSetAiResponseDto['orderBundles'] {
@@ -1542,10 +1587,17 @@ function buildOrderSetBundles(text: string): OrderSetAiResponseDto['orderBundles
           },
         ];
 
+  const constraintChecklistItem = buildOrderSetConstraintChecklistItem(text);
+
   return matched
     .concat(fallback)
     .slice(0, 3)
-    .map(({ keywords: _keywords, ...bundle }) => bundle);
+    .map(({ keywords: _keywords, reviewChecklist, ...bundle }) => ({
+      ...bundle,
+      reviewChecklist: constraintChecklistItem
+        ? [...reviewChecklist, constraintChecklistItem]
+        : reviewChecklist,
+    }));
 }
 
 function buildProtocolPathways(text: string): OrderSetAiResponseDto['protocolPathways'] {
