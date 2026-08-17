@@ -772,7 +772,7 @@ export function AppRoutes() {
         <Route
           path={CANONICAL_ROUTES.emergencyEdReadiness}
           element={
-            <CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyEms}>
+            <CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyEdReadiness}>
               <LazyRoute label="Loading ED readiness...">
                 <FullJourneyOperatingPage view="ed-readiness" />
               </LazyRoute>
@@ -782,7 +782,7 @@ export function AppRoutes() {
         <Route
           path={CANONICAL_ROUTES.emergencyDiagnostics}
           element={
-            <CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyTools}>
+            <CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyDiagnostics}>
               <LazyRoute label="Loading diagnostics...">
                 <FullJourneyOperatingPage view="diagnostics" />
               </LazyRoute>
@@ -792,7 +792,7 @@ export function AppRoutes() {
         <Route
           path={CANONICAL_ROUTES.emergencyHandoffs}
           element={
-            <CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyShift}>
+            <CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyHandoffs}>
               <LazyRoute label="Loading handoffs...">
                 <FullJourneyOperatingPage view="handoffs" />
               </LazyRoute>
@@ -802,7 +802,7 @@ export function AppRoutes() {
         <Route
           path={CANONICAL_ROUTES.emergencyReports}
           element={
-            <CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyAnalytics}>
+            <CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyReports}>
               <LazyRoute label="Loading reports...">
                 <FullJourneyOperatingPage view="reports" />
               </LazyRoute>
