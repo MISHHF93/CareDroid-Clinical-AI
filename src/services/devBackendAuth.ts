@@ -4,6 +4,7 @@ import { API_ROUTES } from '../config/api.config';
 import { BACKEND_PROBE_TIMEOUT_MS, DEV_SESSION_FETCH_TIMEOUT_MS } from '../config/startupTimeouts';
 import { setTenantContext } from './tenantContextStore';
 import { isJwtExpired } from '../utils/jwt';
+import { isDemoPersonaUser } from '../config/demoPersonaModel';
 
 async function readJsonBody(response, fallback: any = {}) {
   try {
@@ -52,20 +53,48 @@ function readStoredToken() {
   return localStorage.getItem(AUTH_TOKEN_KEY) || '';
 }
 
+function readStoredUserProfile() {
+  if (typeof localStorage === 'undefined') return null;
+  const raw = localStorage.getItem(USER_PROFILE_KEY);
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
 function persistDevSession(payload) {
   if (typeof localStorage === 'undefined' || !payload) return;
   if (payload.accessToken) {
     localStorage.setItem(AUTH_TOKEN_KEY, payload.accessToken);
   }
   if (payload.user) {
-    localStorage.setItem(
-      USER_PROFILE_KEY,
-      JSON.stringify({
-        ...payload.user,
-        authMode: 'local-dev-demo',
-        isDevAuthBypass: true,
-      }),
-    );
+    // HEAL-319: this fetch (resolveDevBackendSession -> the fetch below) has no
+    // cancellation and can resolve well after the caller stopped waiting for it --
+    // UserContext.tsx's own bootstrap effect races it against a 4500ms timeout and
+    // moves on regardless, while this fetch's own worst-case latency (backend probe +
+    // dev-session fetch timeouts) can exceed 5000ms. When that happens, this write used
+    // to fire AFTER a clinician had already switched their demo role via
+    // ProfileRoleSwitcher -- and this backend dev-session payload's `user` shape
+    // (id/email/role/profile/subscription, no demo-persona markers) fails
+    // isDemoPersonaUser(), so the next read of storage fell through to
+    // buildOpenAccessDemoUser() with no argument, silently resetting the role to the
+    // hardcoded default (charge_nurse) -- confirmed live and via direct trace of
+    // hydrateStoredDemoUser()/isDemoPersonaUser(). Only the accessToken (already
+    // persisted above) is actually needed from a late-resolving fetch in demo mode;
+    // don't let it clobber an already-active, correctly-role-switched demo persona.
+    const existingProfile = readStoredUserProfile();
+    if (!isDemoPersonaUser(existingProfile)) {
+      localStorage.setItem(
+        USER_PROFILE_KEY,
+        JSON.stringify({
+          ...payload.user,
+          authMode: 'local-dev-demo',
+          isDevAuthBypass: true,
+        }),
+      );
+    }
   }
   if (payload.tenantContext) {
     localStorage.setItem(DEV_TENANT_CONTEXT_KEY, JSON.stringify(payload.tenantContext));
