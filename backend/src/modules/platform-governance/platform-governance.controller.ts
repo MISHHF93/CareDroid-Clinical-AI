@@ -73,14 +73,14 @@ export class PlatformGovernanceController {
 
   @Post('review/items')
   @HttpCode(HttpStatus.OK)
-  @Permissions(Permission.VIEW_AUDIT_LOGS)
+  @Permissions(Permission.REVIEW_GOVERNANCE)
   createReviewItem(@Body() body: CreateReviewItemDto) {
     return this.platformGovernanceService.createReviewItem({ ...body });
   }
 
   @Post('review/items/:itemId/decision')
   @HttpCode(HttpStatus.OK)
-  @Permissions(Permission.VIEW_AUDIT_LOGS)
+  @Permissions(Permission.REVIEW_GOVERNANCE)
   decideReviewItem(@Param('itemId') itemId: string, @Body() body: GovernanceDecisionDto) {
     return this.platformGovernanceService.decideReviewItem(itemId, { ...body });
   }
