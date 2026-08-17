@@ -1,6 +1,6 @@
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import OfflineProvider from './OfflineProvider';
+import OfflineProvider, { useOfflineMode } from './OfflineProvider';
 
 vi.mock('../config/featureFlags.config', () => ({
   FEATURE_FLAGS: {
@@ -82,6 +82,12 @@ vi.mock('../components/offline/OfflineSupport', async (importOriginal) => {
   };
 });
 
+function RefreshProbe({ onReady }: { onReady: (refresh: () => Promise<any>) => void }) {
+  const { catalogSummary, refreshOfflineCatalogs } = useOfflineMode();
+  onReady(refreshOfflineCatalogs);
+  return <output data-testid="total-items">{catalogSummary.totalItems}</output>;
+}
+
 function setNavigatorOnline(value) {
   Object.defineProperty(window.navigator, 'onLine', {
     configurable: true,
@@ -135,5 +141,54 @@ describe('OfflineProvider', () => {
       expect(offlineService.cacheOfflineCatalogs).toHaveBeenCalled();
       expect(syncService.forceSyncNow).toHaveBeenCalled();
     });
+  });
+
+  // Regression coverage (HEAL-303): refreshOfflineCatalogs() is called both
+  // directly from the mount effect's initializeOfflineMode() and indirectly
+  // via syncWhenOnline() (triggered by the browser 'online' event, at any
+  // time). Before this fix, whichever offlineService.cacheOfflineCatalogs()
+  // response landed LAST won, even if it was the STALER of two overlapping
+  // calls.
+  it('a slower refreshOfflineCatalogs() call does not overwrite a faster, more recently-started one', async () => {
+    const offlineService = (await import('../services/offlineService')).default;
+
+    function deferred<T>() {
+      let resolve!: (value: T) => void;
+      const promise = new Promise<T>((r) => {
+        resolve = r;
+      });
+      return { promise, resolve };
+    }
+
+    let refresh: (() => Promise<any>) | null = null;
+    render(
+      <OfflineProvider>
+        <RefreshProbe onReady={(fn) => { refresh = fn; }} />
+      </OfflineProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('total-items')).toHaveTextContent('369');
+    });
+
+    // Call A (started first) stays pending on deferredA; call B (started
+    // second) resolves immediately.
+    const deferredA = deferred<any>();
+    vi.mocked(offlineService.cacheOfflineCatalogs).mockImplementationOnce(() => deferredA.promise);
+    const refreshA = refresh!();
+
+    vi.mocked(offlineService.cacheOfflineCatalogs).mockResolvedValueOnce({ ...freshSummary, totalItems: 999 });
+    const refreshB = refresh!();
+    await refreshB;
+    await waitFor(() => {
+      expect(screen.getByTestId('total-items')).toHaveTextContent('999');
+    });
+
+    // A's slower response now resolves, after B has already landed.
+    deferredA.resolve({ ...freshSummary, totalItems: 111 });
+    await refreshA;
+    await new Promise((r) => setTimeout(r, 20));
+
+    expect(screen.getByTestId('total-items')).toHaveTextContent('999');
   });
 });

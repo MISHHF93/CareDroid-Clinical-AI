@@ -40,13 +40,24 @@ export const OfflineProvider = ({ children }) => {
   const syncInFlightRef = useRef(false);
   const syncServiceRef = useRef<any>(null);
 
+  // HEAL-303: called both directly from the mount effect's initializeOfflineMode()
+  // (below) and indirectly via syncWhenOnline() (which the 'online' browser event
+  // can trigger at any time). syncInFlightRef only guards against two syncWhenOnline()
+  // calls overlapping each other, not against the mount effect's direct call
+  // overlapping a syncWhenOnline()-triggered one -- with no guard here, a slower call
+  // could resolve after a faster one and silently revert catalogSummary/lastSyncAt to
+  // stale values.
+  const refreshCatalogsTokenRef = useRef(0);
+
   const refreshOfflineCatalogs = useCallback(async () => {
+    const token = ++refreshCatalogsTokenRef.current;
     if (!offlineModeEnabled) {
-      setCatalogSummary(DISABLED_OFFLINE_SUMMARY);
+      if (refreshCatalogsTokenRef.current === token) setCatalogSummary(DISABLED_OFFLINE_SUMMARY);
       return DISABLED_OFFLINE_SUMMARY;
     }
 
     const summary = await offlineService.cacheOfflineCatalogs();
+    if (refreshCatalogsTokenRef.current !== token) return summary;
     setCatalogSummary(summary);
     setLastSyncAt(summary.lastCachedAt || new Date().toISOString());
     return summary;
