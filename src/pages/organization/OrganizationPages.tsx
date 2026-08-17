@@ -178,6 +178,9 @@ export function OrganizationSettings() {
   } = useOrganizationContext();
   const [roleProfiles, setRoleProfiles] = useState<any[]>([]);
   const [selectedRoleProfile, setSelectedRoleProfile] = useState('');
+  const [creatingOrganization, setCreatingOrganization] = useState(false);
+  const [savingOrganization, setSavingOrganization] = useState(false);
+  const [savingRoleProfile, setSavingRoleProfile] = useState(false);
   const [form, setForm] = useState({
     name: '',
     organizationType: 'hospital',
@@ -230,6 +233,8 @@ export function OrganizationSettings() {
   }, [branding, organization, subscription]);
 
   const createOrganization = async () => {
+    if (creatingOrganization) return;
+    setCreatingOrganization(true);
     setStatus('Creating…');
     try {
       const slug = form.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -252,11 +257,14 @@ export function OrganizationSettings() {
       setStatus('Organization created.');
     } catch (error: any) {
       setStatus(error.message);
+    } finally {
+      setCreatingOrganization(false);
     }
   };
 
   const saveOrganization = async () => {
-    if (!organization?.id) return;
+    if (!organization?.id || savingOrganization) return;
+    setSavingOrganization(true);
     setStatus('Saving…');
     try {
       const result = await saveOrganizationSettings({
@@ -275,11 +283,14 @@ export function OrganizationSettings() {
       setStatus('Saved.');
     } catch (error: any) {
       setStatus(error.message);
+    } finally {
+      setSavingOrganization(false);
     }
   };
 
   const saveRoleProfile = async () => {
-    if (!selectedRoleProfile) return;
+    if (!selectedRoleProfile || savingRoleProfile) return;
+    setSavingRoleProfile(true);
     try {
       await PlatformAssetsApi.setRoleProfile(selectedRoleProfile);
       // refreshIdentity re-fetches the operational profile (saasProfile.role,
@@ -290,6 +301,8 @@ export function OrganizationSettings() {
       setStatus('Role profile updated.');
     } catch (error: any) {
       setStatus(error.message);
+    } finally {
+      setSavingRoleProfile(false);
     }
   };
 
@@ -326,7 +339,7 @@ export function OrganizationSettings() {
               ))}
             </select>
           </label>
-          <Button onClick={createOrganization}>Create organization</Button>
+          <Button onClick={createOrganization} loading={creatingOrganization}>Create organization</Button>
         </Card>
       ) : (
         <Card className="org-card">
@@ -389,7 +402,7 @@ export function OrganizationSettings() {
               <option value="government">Government</option>
             </select>
           </label>
-          <Button onClick={saveOrganization}>Save organization</Button>
+          <Button onClick={saveOrganization} loading={savingOrganization}>Save organization</Button>
         </Card>
       )}
 
@@ -427,7 +440,7 @@ export function OrganizationSettings() {
             </option>
           ))}
         </select>
-        <Button onClick={saveRoleProfile}>Save role profile</Button>
+        <Button onClick={saveRoleProfile} loading={savingRoleProfile}>Save role profile</Button>
       </Card>
 
       {status && <p className="org-status">{status}</p>}
@@ -450,6 +463,7 @@ export function PackMarketplace() {
   const [packProductMap, setPackProductMap] = useState<any>({});
   const [status, setStatus] = useState('');
   const [expandedPackId, setExpandedPackId] = useState('');
+  const [togglingPackId, setTogglingPackId] = useState('');
 
   // HEAL-236: no staleness guard on load()'s 2 sequential awaited calls.
   // load() re-fires on organization?.organizationType changes AND again
@@ -524,6 +538,8 @@ export function PackMarketplace() {
       setStatus('Create an organization first.');
       return;
     }
+    if (togglingPackId) return;
+    setTogglingPackId(packId);
     setStatus(enabled ? 'Disabling…' : 'Enabling…');
     try {
       if (enabled) {
@@ -536,6 +552,8 @@ export function PackMarketplace() {
       setStatus('Pack updated.');
     } catch (error: any) {
       setStatus(error.message);
+    } finally {
+      setTogglingPackId('');
     }
   };
 
@@ -666,7 +684,11 @@ export function PackMarketplace() {
                   ))}
                 </div>
               )}
-              <Button disabled={!organization?.id} onClick={() => togglePack(pack.id, installed)}>
+              <Button
+                disabled={!organization?.id || (Boolean(togglingPackId) && togglingPackId !== pack.id)}
+                loading={togglingPackId === pack.id}
+                onClick={() => togglePack(pack.id, installed)}
+              >
                 {installed ? 'Disable pack' : 'Enable pack'}
               </Button>
             </Card>
