@@ -106,17 +106,24 @@
   background: color-mix(in srgb, var(--medical-accent, #64748b) 70%, #6366f1);
 }
 
-/* Tinted backgrounds — use !important to win over any cascade-order issues */
+/* Tinted backgrounds — use !important to win over any cascade-order issues.
+   HEAL-317: previously mixed into a hardcoded #fff with no dark-theme override, so these
+   "Happening Now"/"Needs Attention" cards on Hospital Command Center stayed ~94-95% pure
+   white in dark mode while their own text read theme-aware (light-colored) tokens --
+   confirmed live (elementFromPoint + dark-theme toggle). --app-surface-2 is the same
+   per-theme "raised card surface" token used for the analogous fix in
+   OperationalHandoffDomainBar.css (theme-tokens.css: #ffffff light / #334155 dark) --
+   mixing into it instead of a literal keeps the same tint intent in both themes. */
 .cdl-situation-graphic-card--information {
-  background: color-mix(in srgb, var(--status-info, #64748b) 5%, #fff) !important;
+  background: color-mix(in srgb, var(--status-info, #64748b) 5%, var(--app-surface-2, #fff)) !important;
 }
 
 .cdl-situation-graphic-card--warning {
-  background: color-mix(in srgb, var(--status-warning, #f59e0b) 6%, #fff) !important;
+  background: color-mix(in srgb, var(--status-warning, #f59e0b) 6%, var(--app-surface-2, #fff)) !important;
 }
 
 .cdl-situation-graphic-card--critical {
-  background: color-mix(in srgb, var(--status-critical, #ef4444) 6%, #fff) !important;
+  background: color-mix(in srgb, var(--status-critical, #ef4444) 6%, var(--app-surface-2, #fff)) !important;
 }
 
 /* ─────────────────────────────────────────────────────────────────

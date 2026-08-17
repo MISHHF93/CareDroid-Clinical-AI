@@ -162,6 +162,39 @@ describe('medical theme full-scale audit', () => {
     expect(cssBundle).not.toMatch(/#2563eb\b/i);
   });
 
+  it('OperationalHandoffDomainBar.css cards use a theme-aware surface token, not a hardcoded near-white rgba (HEAL-317)', () => {
+    // .operational-handoff-domain-bar__domain's background was a hardcoded
+    // rgba(255,255,255,0.94) with no dark-theme override, while its own
+    // __metric strong text reads var(--color-text-primary, var(--medical-ink,
+    // ...)) -- which correctly turns light-colored in dark mode -- leaving
+    // light text on a still-near-white card, confirmed live via
+    // elementFromPoint at the card's real screen coordinates plus a
+    // dark-theme toggle.
+    const domainBarCss = readFileSync(
+      join(srcRoot, 'components/whiteboard/OperationalHandoffDomainBar.css'),
+      'utf8',
+    );
+    expect(domainBarCss).toContain('var(--app-surface-2, rgba(255, 255, 255, 0.94))');
+    expect(domainBarCss).not.toMatch(
+      /\.operational-handoff-domain-bar__domain\s*\{[^}]*background:\s*rgba\(255,\s*255,\s*255,\s*0\.94\);/,
+    );
+  });
+
+  it('cdl-situation-graphic-card tinted backgrounds mix into a theme-aware surface, not a hardcoded #fff (HEAL-317)', () => {
+    // The "Happening Now"/"Needs Attention" cards on Hospital Command Center
+    // mixed 5-6% of a status color into a literal #fff regardless of theme
+    // -- same illegibility pattern as the domain-bar fix above, confirmed
+    // live the same way.
+    const figmaPolishCss = readFileSync(join(srcRoot, 'styles/clinical-figma-polish.css'), 'utf8');
+    for (const variant of ['information', 'warning', 'critical']) {
+      const ruleMatch = figmaPolishCss.match(
+        new RegExp(`\\.cdl-situation-graphic-card--${variant}\\s*\\{[^}]*\\}`),
+      );
+      expect(ruleMatch).not.toBeNull();
+      expect(ruleMatch![0]).toContain('var(--app-surface-2, #fff)');
+    }
+  });
+
   it('avoids white-on-light card text fallbacks in product card CSS', () => {
     const cardCss = globSync('src/**/*.{css}', {
       cwd: join(srcRoot, '..'),

@@ -18,7 +18,14 @@
   gap: 6px;
   min-width: 0;
   padding: 8px 10px 10px;
-  background: rgba(255, 255, 255, 0.94);
+  /* HEAL-317: was a hardcoded near-white rgba() with no dark-theme override, while this
+     card's own text (the __metric strong rule below) reads var(--color-text-primary,
+     var(--medical-ink, ...)), which correctly turns light-colored in dark mode for the
+     rest of the app -- leaving light text on a still-near-white card here specifically.
+     Confirmed live (elementFromPoint + dark-theme toggle). --app-surface-2 is the same
+     "raised card surface" token already used elsewhere in this design system and
+     resolves per-theme (theme-tokens.css: #ffffff light / #334155 dark). */
+  background: var(--app-surface-2, rgba(255, 255, 255, 0.94));
   border-right: 1px solid rgba(31, 41, 55, 0.86);
 }
 
