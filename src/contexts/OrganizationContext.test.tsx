@@ -66,6 +66,16 @@ function SettingsCheckedProbe() {
   );
 }
 
+function SettingsCheckedRefreshProbe({ onReady }: { onReady: (refresh: () => Promise<any>) => void }) {
+  const { isLoading, hasCheckedOrganizationSettings, refreshOrganizationEngine } = useOrganizationContext();
+  onReady(refreshOrganizationEngine);
+  return (
+    <output data-testid="settings-status">
+      {isLoading ? 'loading' : 'idle'}:{hasCheckedOrganizationSettings ? 'checked' : 'unchecked'}
+    </output>
+  );
+}
+
 function SaveSettingsProbe({ onReady }: { onReady: (save: (updates: any) => Promise<any>) => void }) {
   const { branding, saveOrganizationSettings } = useOrganizationContext();
   onReady(saveOrganizationSettings);
@@ -288,6 +298,64 @@ describe('OrganizationContextProvider', () => {
 
       mocks.userState.isAuthenticated = true;
       mocks.userState.authToken = 'token-1';
+    });
+  });
+
+  describe('HEAL-322: hasCheckedOrganizationSettings resets on a fresh check', () => {
+    it('goes back to unchecked while a second refreshOrganizationEngine() call is in flight, not just on first mount', async () => {
+      function deferred<T>() {
+        let resolve!: (value: T) => void;
+        const promise = new Promise<T>((r) => {
+          resolve = r;
+        });
+        return { promise, resolve };
+      }
+
+      mocks.getOrganizationEngine.mockResolvedValueOnce({
+        organization: { id: 'org-1', name: 'CareDroid Hospital' },
+        branding: { displayName: 'CareDroid Health' },
+        subscription: { tier: 'enterprise', status: 'active' },
+        integrations: [],
+      });
+
+      let refresh: (() => Promise<any>) | null = null;
+      render(
+        <OrganizationContextProvider>
+          <SettingsCheckedRefreshProbe onReady={(fn) => { refresh = fn; }} />
+        </OrganizationContextProvider>,
+      );
+
+      // Initial mount's own fetch settles -- checked, as HEAL-314 already covers.
+      await waitFor(() => {
+        expect(screen.getByTestId('settings-status')).toHaveTextContent('idle:checked');
+      });
+
+      // Simulates a demo persona switch re-triggering the org-settings fetch
+      // (the provider itself stays mounted across a switch -- no full page
+      // reload). Before HEAL-322, hasCheckedOrganizationSettings stayed
+      // stale-true for this entire second fetch, so a consumer gating a
+      // redirect decision on it (emergency/index.tsx's HEAL-314 check) could
+      // act on the PREVIOUS session's settings value while this one was
+      // still in flight.
+      const gate = deferred<any>();
+      mocks.getOrganizationEngine.mockImplementationOnce(() => gate.promise);
+      const secondRefresh = refresh!();
+
+      await waitFor(() => {
+        expect(screen.getByTestId('settings-status')).toHaveTextContent('loading:unchecked');
+      });
+
+      gate.resolve({
+        organization: { id: 'org-1', name: 'CareDroid Hospital' },
+        branding: { displayName: 'CareDroid Health' },
+        subscription: { tier: 'enterprise', status: 'active' },
+        integrations: [],
+      });
+      await secondRefresh;
+
+      await waitFor(() => {
+        expect(screen.getByTestId('settings-status')).toHaveTextContent('idle:checked');
+      });
     });
   });
 });

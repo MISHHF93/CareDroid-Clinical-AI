@@ -82,6 +82,19 @@ export function OrganizationContextProvider({ children }) {
     }
 
     setIsLoading(true);
+    // HEAL-322: hasCheckedOrganizationSettings previously only ever moved
+    // false -> true and never back -- fine for the very first load, but on
+    // a demo persona switch (a new authToken/organization?.id without a
+    // full remount, so this state persists) it stayed stale-true from the
+    // PREVIOUS persona's completed fetch for the entire duration of this
+    // new one. emergency/index.tsx's HEAL-314 redirect gate reads it as
+    // "the real commandCenterMode value is in and safe to act on," so a
+    // charge_nurse/ed_manager/admin switch during that stale-true window
+    // could still get bounced to Command Center off a value that hasn't
+    // actually been re-verified for the new session yet -- and since the
+    // resulting <Navigate> actually changes the URL, that one bad render
+    // sticks even after the real fetch resolves moments later.
+    setHasCheckedOrganizationSettings(false);
     try {
       const engine = organization?.id
         ? await PlatformAssetsApi.getOrganizationEngine(organization.id)
