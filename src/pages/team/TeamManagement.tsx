@@ -25,6 +25,7 @@ export const TeamManagement = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
+  const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
 
   // Fetch users on mount
   useEffect(() => {
@@ -167,11 +168,13 @@ export const TeamManagement = () => {
 
   const handleDeleteUser = async (userId) => {
     if (!requireTeamApi()) return;
+    if (deletingUserId) return;
 
     if (!confirm('Are you sure you want to remove this user from the team?')) {
       return;
     }
 
+    setDeletingUserId(userId);
     try {
       const response = await apiFetch(`/api/team/users/${userId}`, {
         method: 'DELETE',
@@ -193,6 +196,8 @@ export const TeamManagement = () => {
         error: err,
         endpoint: `/api/team/users/${userId}`,
       });
+    } finally {
+      setDeletingUserId(null);
     }
   };
 
@@ -278,7 +283,7 @@ export const TeamManagement = () => {
           onSort={handleSort}
           onEdit={handleEditUser}
           onDelete={handleDeleteUser}
-          actionsDisabled={!teamApiEnabled}
+          actionsDisabled={!teamApiEnabled || Boolean(deletingUserId)}
         />
       ) : (
         <div className="team-empty">
