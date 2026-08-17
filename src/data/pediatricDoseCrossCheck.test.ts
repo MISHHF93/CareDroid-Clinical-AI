@@ -10,17 +10,24 @@ import {
 } from './pediatricDoseCrossCheck';
 
 /**
- * Both known-discrepancy drugs use a flat per-kg dose (not a range), so calc(kg)/kg parses
- * cleanly. Evaluated at kg=10 rather than kg=1: some entries (e.g. Atropine) apply a minimum-
+ * Evaluated at kg=10 rather than kg=1: some entries (e.g. Atropine) apply a minimum-
  * dose floor that only kicks in below a certain weight, which would corrupt a kg=1 sample.
+ * Anchored to the START of the rendered text (`^[\d.]+(?:-[\d.]+)?`), not a bare `/[\d.]+/`
+ * scan of the whole string -- some unit labels embed incidental digits (e.g. "D10W"),
+ * which a whole-string scan would misparse as part of the dose. Most entries render a
+ * single leading number (a flat per-kg dose); range-valued entries (e.g. "Fluid bolus":
+ * "10-20 mL/kg" -> "100-200 mL" at kg=10) render two, and the upper bound is the one that
+ * actually matters for a real cross-calculator disagreement -- a checker range whose LOW
+ * end happens to match the other table's flat dose is not "in agreement" if its own HIGH
+ * end is double that dose with no stated cap.
  */
 function checkerPerKgDose(name: string): number {
   const drug = PEDIATRIC_EMERGENCY_DRUGS.find((entry) => entry.name === name);
   if (!drug) throw new Error(`Pediatric Dose Safety Checker table has no entry named "${name}"`);
   const text = drug.calc(10);
-  const match = text.match(/[\d.]+/);
+  const match = text.match(/^([\d.]+)(?:-([\d.]+))?/);
   if (!match) throw new Error(`Could not parse a numeric per-kg dose out of "${text}" for "${name}"`);
-  return Number(match[0]) / 10;
+  return Number(match[2] ?? match[1]) / 10;
 }
 
 function calcPerKgDose(name: string): number {
@@ -67,9 +74,15 @@ describe('pediatricDoseCrossCheck', () => {
     expect(checkerPerKgDose('Glucose')).toBe(5);
   });
 
+  it('NS bolus (sepsis) / Fluid bolus genuinely differs between the two tables (10 mL/kg capped at 500 mL vs up to 20 mL/kg uncapped)', () => {
+    expect(calcPerKgDose('NS bolus (sepsis)')).toBe(10);
+    expect(checkerPerKgDose('Fluid bolus')).toBe(20);
+  });
+
   it('pediatricDoseCrossCheckWarning flags known-discrepant drugs and clears drugs that agree', () => {
     expect(pediatricDoseCrossCheckWarning('Rocuronium')?.id).toBe('rocuronium');
     expect(pediatricDoseCrossCheckWarning('Dextrose 10%')?.id).toBe('dextrose-d10w');
+    expect(pediatricDoseCrossCheckWarning('NS bolus (sepsis)')?.id).toBe('ns-bolus-sepsis');
     expect(pediatricDoseCrossCheckWarning('Amiodarone')).toBeNull();
     expect(pediatricDoseCrossCheckWarning('Some drug not on either table')).toBeNull();
   });
@@ -77,6 +90,7 @@ describe('pediatricDoseCrossCheck', () => {
   it('pediatricDoseCheckerCrossCheckWarning flags known-discrepant drugs and clears drugs that agree', () => {
     expect(pediatricDoseCheckerCrossCheckWarning('Rocuronium')?.id).toBe('rocuronium');
     expect(pediatricDoseCheckerCrossCheckWarning('Glucose')?.id).toBe('dextrose-d10w');
+    expect(pediatricDoseCheckerCrossCheckWarning('Fluid bolus')?.id).toBe('ns-bolus-sepsis');
     expect(pediatricDoseCheckerCrossCheckWarning('Amiodarone')).toBeNull();
   });
 

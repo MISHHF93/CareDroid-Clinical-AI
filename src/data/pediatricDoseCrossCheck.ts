@@ -57,6 +57,14 @@ export const KNOWN_PEDIATRIC_DOSE_DISCREPANCIES: readonly PediatricDoseDiscrepan
     checkerDose: '5 mL/kg',
     note: '2.5x difference in D10W volume for hypoglycemia between this app’s two pediatric drug references.',
   },
+  {
+    id: 'ns-bolus-sepsis',
+    calcName: 'NS bolus (sepsis)',
+    calcDose: '10 mL/kg, capped at 500 mL total',
+    checkerName: 'Fluid bolus',
+    checkerDose: '10-20 mL/kg, no stated cap',
+    note: 'Up to 2.4x difference in shock/sepsis fluid-bolus volume (and disagreement on whether an upper safety cap exists) between this app’s two pediatric drug references.',
+  },
 ]);
 
 /**
@@ -68,11 +76,13 @@ export const KNOWN_PEDIATRIC_DOSE_DISCREPANCIES: readonly PediatricDoseDiscrepan
 export const CALC_NAME_TO_ID: Readonly<Record<string, string>> = Object.freeze({
   Rocuronium: 'rocuronium',
   'Dextrose 10%': 'dextrose-d10w',
+  'NS bolus (sepsis)': 'ns-bolus-sepsis',
 });
 
 export const CHECKER_NAME_TO_ID: Readonly<Record<string, string>> = Object.freeze({
   Rocuronium: 'rocuronium',
   Glucose: 'dextrose-d10w',
+  'Fluid bolus': 'ns-bolus-sepsis',
 });
 
 /** For PediatricDrugCalc.tsx: is this row one of the known cross-calculator discrepancies? */
