@@ -14,6 +14,14 @@ type OrgContextValue = {
   integrations: any[];
   supportedOrganizationTypes: any[];
   isLoading: boolean;
+  // HEAL-314: distinct from isLoading (which is only true DURING an in-flight
+  // fetch, and starts false before the mount effect has even fired). This
+  // tracks whether the org's real settings (specifically
+  // emergencyOs.commandCenterMode, which several roles' Whiteboard-vs-
+  // Command-Center routing decision depends on) have been checked at least
+  // once for the current session -- false for the unauthenticated case too,
+  // where no fetch will ever run. See emergency/index.tsx's HEAL-314 usage.
+  hasCheckedOrganizationSettings: boolean;
   error: string;
   refreshOrganizationEngine: (...args: any[]) => any;
   saveOrganizationSettings: (...args: any[]) => any;
@@ -28,6 +36,7 @@ const OrganizationContext = createContext<OrgContextValue>({
   integrations: [],
   supportedOrganizationTypes: [],
   isLoading: false,
+  hasCheckedOrganizationSettings: false,
   error: '',
   refreshOrganizationEngine: () => {},
   saveOrganizationSettings: () => {},
@@ -46,6 +55,7 @@ export function OrganizationContextProvider({ children }) {
   const { organization, platformContext, refreshPlatformContext } = useUserIdentity();
   const [organizationEngine, setOrganizationEngine] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [hasCheckedOrganizationSettings, setHasCheckedOrganizationSettings] = useState(false);
   const [error, setError] = useState('');
 
   // HEAL-245: same race as TenantContext's refreshTenantContext (HEAL-244).
@@ -63,6 +73,11 @@ export function OrganizationContextProvider({ children }) {
     if (!isAuthenticated && !authToken) {
       setOrganizationEngine(null);
       setError('');
+      // No fetch will run for an unauthenticated session -- there's nothing
+      // left to "check," so callers gating on hasCheckedOrganizationSettings
+      // (rather than isLoading, which never becomes true on this branch)
+      // shouldn't be stuck waiting forever.
+      setHasCheckedOrganizationSettings(true);
       return null;
     }
 
@@ -88,7 +103,10 @@ export function OrganizationContextProvider({ children }) {
       setError(message);
       return null;
     } finally {
-      if (token === refreshTokenRef.current) setIsLoading(false);
+      if (token === refreshTokenRef.current) {
+        setIsLoading(false);
+        setHasCheckedOrganizationSettings(true);
+      }
     }
   }, [authToken, isAuthenticated, organization?.id]);
 
@@ -154,6 +172,7 @@ export function OrganizationContextProvider({ children }) {
       integrations: organizationEngine?.integrations || [],
       supportedOrganizationTypes: organizationEngine?.supportedOrganizationTypes || [],
       isLoading,
+      hasCheckedOrganizationSettings,
       error,
       refreshOrganizationEngine,
       saveOrganizationSettings,
@@ -161,6 +180,7 @@ export function OrganizationContextProvider({ children }) {
     [
       error,
       fallbackBranding,
+      hasCheckedOrganizationSettings,
       isLoading,
       organization,
       organizationEngine,

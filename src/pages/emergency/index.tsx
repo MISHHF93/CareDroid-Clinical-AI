@@ -35,6 +35,7 @@ import usePhysicianScreen from '../../hooks/usePhysicianScreen';
 import usePublicWaitingScreen from '../../hooks/usePublicWaitingScreen';
 import useReadOnlyWhiteboardScreen from '../../hooks/useReadOnlyWhiteboardScreen';
 import useCommandCenterScreen from '../../hooks/useCommandCenterScreen';
+import { useOrganizationContext } from '../../contexts/OrganizationContext';
 
 import QuickIntake from '../../components/QuickIntake';
 import WhoNextPanel from '../../components/WhoNextPanel';
@@ -326,6 +327,7 @@ export default function EmergencyWhiteboard() {
   const publicWaiting = usePublicWaitingScreen();
   const readOnlyWhiteboard = useReadOnlyWhiteboardScreen();
   const commandCenter = useCommandCenterScreen();
+  const { hasCheckedOrganizationSettings } = useOrganizationContext();
   const { enabled: clinicalAcuityDashboardEnabled } = useFeature('clinical_acuity_dashboard');
   const { enabled: aiTransparencyDashboardEnabled } = useFeature('ai_transparency_dashboard');
   const storePatients = useEmergencyStore((state) => state.patients);
@@ -1495,7 +1497,14 @@ export default function EmergencyWhiteboard() {
     );
   }
 
-  if (commandCenter.isCommandCenterScreen) {
+  // HEAL-314: emergencyRoleScreenMatrix's commandCenterMode gate defaults to
+  // `true` in the store (DEFAULT_EMERGENCY_SETTINGS) until the organization's
+  // real settings load and (usually) override it -- redirecting on that
+  // default before the real value has been checked meant a charge nurse /
+  // ED manager / admin loading or refreshing this page could get bounced to
+  // Command Center non-deterministically, purely based on how the settings
+  // fetch and this render happened to race. Wait for a real answer first.
+  if (commandCenter.isCommandCenterScreen && hasCheckedOrganizationSettings) {
     return <Navigate to={CANONICAL_ROUTES.emergencyCommandCenter} replace />;
   }
 

@@ -57,6 +57,15 @@ function RefreshProbe({ onReady }: { onReady: (refresh: () => Promise<any>) => v
   return <output data-testid="org-engine">{branding?.displayName}</output>;
 }
 
+function SettingsCheckedProbe() {
+  const { isLoading, hasCheckedOrganizationSettings } = useOrganizationContext();
+  return (
+    <output data-testid="settings-status">
+      {isLoading ? 'loading' : 'idle'}:{hasCheckedOrganizationSettings ? 'checked' : 'unchecked'}
+    </output>
+  );
+}
+
 function SaveSettingsProbe({ onReady }: { onReady: (save: (updates: any) => Promise<any>) => void }) {
   const { branding, saveOrganizationSettings } = useOrganizationContext();
   onReady(saveOrganizationSettings);
@@ -224,5 +233,61 @@ describe('OrganizationContextProvider', () => {
     await new Promise((r) => setTimeout(r, 20));
 
     expect(screen.getByTestId('org-branding')).toHaveTextContent('Fresh Name');
+  });
+
+  describe('HEAL-314: hasCheckedOrganizationSettings', () => {
+    it('resolves to checked once the initial engine fetch settles, distinct from isLoading', async () => {
+      function deferred<T>() {
+        let resolve!: (value: T) => void;
+        const promise = new Promise<T>((r) => {
+          resolve = r;
+        });
+        return { promise, resolve };
+      }
+      const gate = deferred<any>();
+      mocks.getOrganizationEngine.mockImplementationOnce(() => gate.promise);
+
+      render(
+        <OrganizationContextProvider>
+          <SettingsCheckedProbe />
+        </OrganizationContextProvider>,
+      );
+
+      // While the fetch is in flight: loading, and not yet checked -- a
+      // consumer gating a decision on "do we know the real settings yet"
+      // must NOT treat isLoading:false-before-the-effect-fires as an answer.
+      await waitFor(() => {
+        expect(screen.getByTestId('settings-status')).toHaveTextContent('loading:unchecked');
+      });
+
+      gate.resolve({
+        organization: { id: 'org-1', name: 'CareDroid Hospital' },
+        branding: { displayName: 'CareDroid Health' },
+        subscription: { tier: 'enterprise', status: 'active' },
+        integrations: [],
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId('settings-status')).toHaveTextContent('idle:checked');
+      });
+    });
+
+    it('resolves to checked immediately for an unauthenticated session, which never enters isLoading at all', async () => {
+      mocks.userState.isAuthenticated = false;
+      mocks.userState.authToken = '';
+
+      render(
+        <OrganizationContextProvider>
+          <SettingsCheckedProbe />
+        </OrganizationContextProvider>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId('settings-status')).toHaveTextContent('idle:checked');
+      });
+
+      mocks.userState.isAuthenticated = true;
+      mocks.userState.authToken = 'token-1';
+    });
   });
 });
