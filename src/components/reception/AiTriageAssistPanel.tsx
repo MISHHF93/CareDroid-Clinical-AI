@@ -17,6 +17,7 @@ import {
   AiTruthLabel,
   NATIVE_AI_TRIAGE_RATIONALE_MARKER,
   nativeAiTriageBridgeTruthLabel,
+  triageAssistSuggestionTruthLabel,
 } from '../ai/AiTruthLabel';
 import { RECEPTION_COPY } from './receptionCopy';
 import './AiTriageAssistPanel.css';
@@ -133,6 +134,8 @@ export default function AiTriageAssistPanel({
         </div>
         <span className="ai-triage-assist__confidence">{assist.confidence} confidence</span>
       </header>
+
+      <AiTruthLabel {...triageAssistSuggestionTruthLabel()} compact />
 
       <div className="ai-triage-assist__overrides">
         <label>

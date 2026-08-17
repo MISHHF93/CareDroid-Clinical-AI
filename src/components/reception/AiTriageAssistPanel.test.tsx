@@ -64,12 +64,21 @@ describe('AiTriageAssistPanel', () => {
 
     render(<AiTriageAssistPanel patient={patient} />);
 
-    const label = screen.getByTestId('ai-truth-label-chip');
-    expect(label).toHaveTextContent('Manual');
-    expect(label.getAttribute('title')).toMatch(/native-ai expert-system/i);
+    // The base rule-based-suggestion label (HEAL-288) always renders too, so
+    // when native-AI rationale is ALSO present, both labels appear together --
+    // find the specific native-AI-bridge one by its own distinct title text.
+    const labels = screen.getAllByTestId('ai-truth-label-chip');
+    expect(labels.length).toBe(2);
+    const nativeAiLabel = labels.find((el) => /native-ai expert-system/i.test(el.getAttribute('title') || ''));
+    expect(nativeAiLabel).toBeDefined();
+    expect(nativeAiLabel).toHaveTextContent('Manual');
   });
 
-  it('shows no truth label when the assist was never touched by the native-AI bridge', () => {
+  // Regression coverage (HEAL-288): the confidence badge always renders, sourced
+  // from the base rules engine at minimum, but previously had zero truth-label
+  // disclosure of its own unless the SEPARATE, optional native-AI bridge also
+  // contributed rationale -- a plain rule-based suggestion read as unlabeled.
+  it('labels the base rule-based suggestion even when the native-AI bridge never contributed', () => {
     const patient = basePatient({
       triageAssist: {
         suggestedPriority: Priority.P3,
@@ -90,6 +99,8 @@ describe('AiTriageAssistPanel', () => {
     render(<AiTriageAssistPanel patient={patient} />);
 
     expect(screen.getByTestId('ai-triage-assist-panel')).toBeInTheDocument();
-    expect(screen.queryByTestId('ai-truth-label-chip')).not.toBeInTheDocument();
+    const label = screen.getByTestId('ai-truth-label-chip');
+    expect(label).toHaveTextContent('Manual');
+    expect(label.getAttribute('title')).toMatch(/rule-based triage suggestion/i);
   });
 });

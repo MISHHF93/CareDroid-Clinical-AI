@@ -238,6 +238,23 @@ export function nativeAiTriageBridgeTruthLabel(): AiTruthLabelInfo {
 }
 
 /**
+ * AiTriageAssistPanel's confidence badge ("high"/"medium"/"low" confidence) always
+ * renders, sourced from buildTriageAssistEnvelope's base rules engine
+ * (suggestTriagePriority) whether or not the optional native-AI enrichment layer
+ * also contributed (see hasNativeAiRationale in that file -- a SEPARATE, conditional
+ * label). Found unlabeled: a confidence badge with no truth-label anywhere near it
+ * reads as a probabilistic/model-derived confidence score to a reader, when it is
+ * always deterministic rule output at minimum.
+ */
+export function triageAssistSuggestionTruthLabel(): AiTruthLabelInfo {
+  return {
+    state: 'Manual',
+    sourceContext: 'Rule-based triage suggestion (priority/streaming-lane heuristics), not a trained model.',
+    reviewRequired: true,
+  };
+}
+
+/**
  * Bridges the canonical AI Core Node provenance contract
  * (lib/ai/provenanceContract.ts's AIResponseSourceCategory, 2026-08-08) to
  * this file's Live/Manual/Stale/Demo display vocabulary. Any surface that
