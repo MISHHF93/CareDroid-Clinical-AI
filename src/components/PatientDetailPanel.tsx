@@ -1081,7 +1081,21 @@ export default function PatientDetailPanel() {
             emsArrivals={emsArrivals}
           />
         </div>
+      </header>
 
+      {/* HEAL-316: everything from here down through the action row (allergy/medication
+          banners, EMS handoff notes, What Happens Next, saved-scores/recommended-tools
+          strip, the Copilot panel, Latest Vitals, AI triage assist, Open Checklist / Move
+          to next step) used to render INSIDE the sticky `<header>` above -- accumulated
+          there across several unrelated HEAL rounds (HEAL-188/189/191 comments below all
+          predate this fix) that each added a new section without anyone noticing the
+          closing `</header>` tag never moved to match. `.patient-detail-panel__header` is
+          `position: sticky; z-index: 2`, so once scrolled, this whole ~800px block stayed
+          pinned on top of -- not above -- the real body content beneath it: confirmed live
+          via `elementFromPoint` at the "Submit Note" button's own coordinates, which
+          resolved to a Copilot quick-action button instead. A clinician's note click could
+          silently hit the wrong control. Moving this content out from under the header
+          fixes the overlap; nothing below was reordered, duplicated, or removed. */}
         {/* HEAL-188: allergies/medications previously existed only as free text inside the
             reception/self-arrival intake note, invisible to any other role opening this same
             chart -- now reads the structured fields those intake paths populate. Placed right
@@ -1269,7 +1283,6 @@ export default function PatientDetailPanel() {
           </FieldButton>
           ) : null}
         </div>
-      </header>
 
       <section className="patient-detail-panel__section">
         <h3 className="patient-detail-panel__section-title">Journey Timeline</h3>
@@ -1581,8 +1594,18 @@ export default function PatientDetailPanel() {
         </div>
       </section>
 
+      {/* HEAL-316: WhoNextPanel used to render INSIDE the sticky footer below it
+          (`.patient-detail-panel__footer` is `position: sticky; bottom: 0`). Its own
+          content height varies (guidance text, or an empty state), so the sticky footer's
+          total height varied with it -- once "stuck," it could cover the bottom of
+          whatever section was currently scrolled into view above it, including the Notes
+          section's own Submit Note button (confirmed live via `elementFromPoint`, same
+          verification method as the header fix above). Moved to normal (non-sticky) flow;
+          only the compact, bounded-height action-button row stays sticky, matching a
+          standard "sticky action bar" pattern instead of an unbounded one. */}
+      <WhoNextPanel />
+
       <div className="patient-detail-panel__footer">
-        <WhoNextPanel />
         <div className="patient-detail-panel__footer-actions">
           {assignStaffPresentation.visible ? (
           <FieldButton disabled={!canAssignStaff} onClick={() => setActionMode(actionMode === 'staff' ? null : 'staff')}>Assign Staff</FieldButton>
