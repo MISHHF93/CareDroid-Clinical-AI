@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import ToolPageLayout from './ToolPageLayout';
+import ApiStateBanner from '../../components/ApiStateBanner';
 import { sendClinicalChatMessage } from '../../services/clinicalChatService';
 
 const DiagnosisAssistant = ({ embedded = false, onCloseEmbedded }: any = {}) => {
@@ -139,6 +140,7 @@ const DiagnosisAssistant = ({ embedded = false, onCloseEmbedded }: any = {}) => 
 
         <div className="diagnosis-panel diagnosis-panel--scroll">
           <h2 className="tool-panel-title">Differential Diagnosis</h2>
+          <ApiStateBanner error={error} onRetry={symptoms.trim() ? handleGenerate : undefined} />
 
           {loading ? (
             <div className="tool-loading-state" aria-busy="true">
@@ -146,10 +148,6 @@ const DiagnosisAssistant = ({ embedded = false, onCloseEmbedded }: any = {}) => 
               <p className="tool-loading-state__message">
                 Analyzing symptoms and generating differential diagnosis...
               </p>
-            </div>
-          ) : error ? (
-            <div className="diagnosis-error-box">
-              <strong>Error:</strong> {error}
             </div>
           ) : results ? (
             <div className="diagnosis-results-body">{results}</div>
