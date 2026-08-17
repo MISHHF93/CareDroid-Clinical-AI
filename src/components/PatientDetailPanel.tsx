@@ -633,6 +633,7 @@ export default function PatientDetailPanel() {
   const [suggestedScores, setSuggestedScores] = useState<string[]>([]);
   const swipeStartYRef = useRef<number | null>(null);
   const [swipeOffset, setSwipeOffset] = useState(0);
+  const panelRef = useRef<HTMLElement | null>(null);
   const { profileNavigate } = useProfileNavigate();
   const patientWorkflow = usePatientWorkflow(selectedPatientId);
   const upgradePatientFlow = useUpgradeHarnessPatientFlow(
@@ -813,6 +814,59 @@ export default function PatientDetailPanel() {
     const route = routeComplaint(selectedPatient.chiefComplaint);
     setSuggestedScores(route && !hasRunScores(selectedPatient, route.scoreIds) ? route.scoreIds : []);
   }, [selectedPatient]);
+
+  // HEAL-318: this panel had zero focus management -- opening it never moved focus
+  // in, closing it never restored focus, and Tab/Shift+Tab could walk keyboard
+  // focus straight out of the panel onto whatever patient card/control happened
+  // to sit behind it (confirmed live: Shift+Tab from the close button landed on a
+  // patient card, not inside the panel). The sibling surfaces/Drawer.tsx and
+  // surfaces/Modal.tsx primitives already capture+restore focus on open/close for
+  // their own dialogs but don't cycle Tab within them either -- this goes one step
+  // further and actually contains Tab/Shift+Tab inside the panel while open, since
+  // that's the specific gap reported here.
+  useEffect(() => {
+    if (!selectedPatientId) return undefined;
+
+    const panel = panelRef.current;
+    if (!panel) return undefined;
+
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    const focusableSelector =
+      'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+    const getFocusable = () => Array.from(panel.querySelectorAll<HTMLElement>(focusableSelector));
+
+    const initialFocusTarget = panel.querySelector<HTMLElement>('.patient-detail-panel__close-btn');
+    (initialFocusTarget || panel).focus();
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Tab') return;
+      const focusable = getFocusable();
+      if (!focusable.length) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement as HTMLElement | null;
+
+      if (event.shiftKey) {
+        if (active === first || !panel.contains(active)) {
+          event.preventDefault();
+          last.focus();
+        }
+      } else if (active === last || !panel.contains(active)) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    panel.addEventListener('keydown', handleKeyDown);
+    return () => {
+      panel.removeEventListener('keydown', handleKeyDown);
+      if (previouslyFocused && document.body.contains(previouslyFocused)) {
+        previouslyFocused.focus();
+      }
+    };
+  }, [selectedPatientId]);
 
   useEffect(() => {
     if (!selectedPatient) {
@@ -1026,6 +1080,8 @@ export default function PatientDetailPanel() {
   return (
     <aside
       className="patient-detail-panel"
+      ref={panelRef}
+      tabIndex={-1}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
