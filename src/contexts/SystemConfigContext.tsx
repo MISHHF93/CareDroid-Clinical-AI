@@ -49,17 +49,30 @@ export function SystemConfigProvider({ children }) {
   const [error, setError] = useState<any>(null);
   const [configDegraded, setConfigDegraded] = useState(false);
 
+  // HEAL-302: refresh (this function) is wired to an identical "Retry
+  // connection" onClick in 2 independently-mounted components that render
+  // simultaneously whenever configDegraded is true (SessionChromeBar and
+  // SidebarChromeControls), plus the auth-change effect below that re-fires
+  // it automatically. With no staleness guard, a slower in-flight call
+  // (e.g. the auth-triggered effect) could resolve AFTER a faster, more
+  // recent one (e.g. a manual retry click) and silently revert
+  // configDegraded/systemConfig/aiUsage back to stale/error values.
+  const loadSystemConfigTokenRef = useRef(0);
+
   const loadSystemConfig = useCallback(async () => {
+    const token = ++loadSystemConfigTokenRef.current;
     if (isUserLoading) return;
 
     if (!isAuthenticated) {
-      setSystemConfig(DEFAULT_SYSTEM_CONFIG);
-      setAiUsage(DEFAULT_AI_USAGE);
-      setAvailableTools([]);
-      setSubscription(DEFAULT_SUBSCRIPTION);
-      setConfigDegraded(false);
-      setError(null);
-      setLoading(false);
+      if (loadSystemConfigTokenRef.current === token) {
+        setSystemConfig(DEFAULT_SYSTEM_CONFIG);
+        setAiUsage(DEFAULT_AI_USAGE);
+        setAvailableTools([]);
+        setSubscription(DEFAULT_SUBSCRIPTION);
+        setConfigDegraded(false);
+        setError(null);
+        setLoading(false);
+      }
       return;
     }
 
@@ -80,6 +93,8 @@ export function SystemConfigProvider({ children }) {
         ]),
         timeoutPromise,
       ])) as any[];
+
+      if (loadSystemConfigTokenRef.current !== token) return;
 
       const config = stripMeta(configRaw);
       const usage = stripMeta(usageRaw);
@@ -105,11 +120,12 @@ export function SystemConfigProvider({ children }) {
       setAvailableTools(tools.value?.tools ?? tools.value ?? []);
       setSubscription(sub.value || DEFAULT_SUBSCRIPTION);
     } catch (err: any) {
+      if (loadSystemConfigTokenRef.current !== token) return;
       logger.warn('Failed to load system config (using defaults)', { message: err.message });
       setError(err.message);
       setConfigDegraded(true);
     } finally {
-      setLoading(false);
+      if (loadSystemConfigTokenRef.current === token) setLoading(false);
     }
   }, [isAuthenticated, isUserLoading]);
 

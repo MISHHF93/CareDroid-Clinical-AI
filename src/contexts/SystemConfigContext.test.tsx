@@ -40,6 +40,12 @@ function renderProvider() {
   );
 }
 
+function RefreshProbe({ onReady }: { onReady: (refresh: () => Promise<any>) => void }) {
+  const { aiUsage, refresh } = useSystemConfig();
+  onReady(refresh);
+  return <output data-testid="remaining">{aiUsage.remaining}</output>;
+}
+
 describe('SystemConfigProvider API polling', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -87,5 +93,59 @@ describe('SystemConfigProvider API polling', () => {
     expect(setIntervalSpy).not.toHaveBeenCalledWith(expect.any(Function), 5 * 60 * 1000);
 
     setIntervalSpy.mockRestore();
+  });
+
+  // Regression coverage (HEAL-302): refresh() (loadSystemConfig) is wired to
+  // an identical "Retry connection" onClick in 2 independently-mounted
+  // components (SessionChromeBar, SidebarChromeControls) that render
+  // simultaneously whenever configDegraded is true, plus an auth-change
+  // effect that also calls it automatically. Before this fix, whichever
+  // response landed LAST won, even if it was the STALER of two overlapping
+  // calls.
+  it('a slower refresh() call does not overwrite a faster, more recently-started one', async () => {
+    mockUserState.isAuthenticated = true;
+    vi.mocked(configService.getSystemConfig).mockResolvedValue({ rag: { enabled: false } });
+    vi.mocked(configService.getAvailableTools).mockResolvedValue({ tools: [] });
+    vi.mocked(configService.getCurrentSubscription).mockResolvedValue({ tier: 'free', status: 'active' });
+    vi.mocked(configService.getAIRemainingQueries).mockResolvedValue({ remaining: 5 });
+
+    function deferred<T>() {
+      let resolve!: (value: T) => void;
+      const promise = new Promise<T>((r) => {
+        resolve = r;
+      });
+      return { promise, resolve };
+    }
+
+    let refresh: (() => Promise<any>) | null = null;
+    render(
+      <SystemConfigProvider>
+        <RefreshProbe onReady={(fn) => { refresh = fn; }} />
+      </SystemConfigProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('remaining')).toHaveTextContent('5');
+    });
+
+    // Call A (started first) stays pending on deferredA; call B (started
+    // second) resolves immediately.
+    const deferredA = deferred<any>();
+    vi.mocked(configService.getAIRemainingQueries).mockImplementationOnce(() => deferredA.promise);
+    const refreshA = refresh!();
+
+    vi.mocked(configService.getAIRemainingQueries).mockResolvedValueOnce({ remaining: 222 });
+    const refreshB = refresh!();
+    await refreshB;
+    await waitFor(() => {
+      expect(screen.getByTestId('remaining')).toHaveTextContent('222');
+    });
+
+    // A's slower response now resolves, after B has already landed.
+    deferredA.resolve({ remaining: 111 });
+    await refreshA;
+    await new Promise((r) => setTimeout(r, 20));
+
+    expect(screen.getByTestId('remaining')).toHaveTextContent('222');
   });
 });
