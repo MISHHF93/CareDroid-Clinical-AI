@@ -4441,6 +4441,15 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
           if (nextOpen) sessionStorage.removeItem('ed:copilot-dismissed');
           else sessionStorage.setItem('ed:copilot-dismissed', '1');
         }
+        // Opening Copilot closes every other overlay panel (notification
+        // center, command palette, reassessment drawer, intake modal) via
+        // the shared 'close-all-panels' event -- these were previously
+        // uncoordinated, so opening Copilot on top of an already-open
+        // notification panel left both visible/interactive at once, with
+        // the notification panel blocking clicks on the page underneath.
+        if (nextOpen && typeof document !== 'undefined') {
+          document.dispatchEvent(new Event('close-all-panels'));
+        }
         return { copilotOpen: nextOpen };
       }),
 
@@ -4449,6 +4458,9 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
       if (typeof sessionStorage !== 'undefined') {
         if (nextOpen) sessionStorage.removeItem('ed:copilot-dismissed');
         else sessionStorage.setItem('ed:copilot-dismissed', '1');
+      }
+      if (nextOpen && typeof document !== 'undefined') {
+        document.dispatchEvent(new Event('close-all-panels'));
       }
       set({ copilotOpen: nextOpen });
     },

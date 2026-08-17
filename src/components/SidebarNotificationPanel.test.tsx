@@ -1,8 +1,9 @@
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { UserProvider } from '../contexts/UserContext';
 import { NotificationShellProvider } from '../contexts/NotificationShellContext';
+import { useEmergencyStore } from '../store/emergencyStore';
 import SidebarNotificationPanel from './SidebarNotificationPanel';
 
 vi.mock('../hooks/useNotificationCenter', () => ({
@@ -75,5 +76,40 @@ describe('SidebarNotificationPanel', () => {
     fireEvent.keyDown(document, { key: 'Escape' });
 
     expect(screen.queryByRole('dialog', { name: /alerts/i })).not.toBeInTheDocument();
+  });
+
+  describe('HEAL-313: mutual exclusivity with Copilot', () => {
+    afterEach(() => {
+      useEmergencyStore.getState().setCopilotOpen(false);
+    });
+
+    it('opening the notification panel closes an already-open Copilot', () => {
+      useEmergencyStore.getState().setCopilotOpen(true);
+      expect(useEmergencyStore.getState().copilotOpen).toBe(true);
+
+      renderPanel();
+      fireEvent.click(screen.getByRole('button', { name: 'Open' }));
+
+      expect(screen.getByRole('dialog', { name: /alerts/i })).toBeInTheDocument();
+      // Before HEAL-313, Copilot's open state (in the Zustand store) and this
+      // panel's open state (in NotificationShellContext) were completely
+      // uncoordinated -- opening one never affected the other, so both could
+      // be open and interactive at once, with this panel's backdrop/content
+      // blocking clicks on the page underneath.
+      expect(useEmergencyStore.getState().copilotOpen).toBe(false);
+    });
+
+    it('opening Copilot while the notification panel is open closes the panel', () => {
+      renderPanel();
+      fireEvent.click(screen.getByRole('button', { name: 'Open' }));
+      expect(screen.getByRole('dialog', { name: /alerts/i })).toBeInTheDocument();
+
+      act(() => {
+        useEmergencyStore.getState().setCopilotOpen(true);
+      });
+
+      expect(screen.queryByRole('dialog', { name: /alerts/i })).not.toBeInTheDocument();
+      expect(useEmergencyStore.getState().copilotOpen).toBe(true);
+    });
   });
 });

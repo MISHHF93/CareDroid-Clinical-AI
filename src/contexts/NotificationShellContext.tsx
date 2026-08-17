@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from 'react';
 import { useNotificationCenter } from '../hooks/useNotificationCenter';
+import { useEmergencyStore } from '../store/emergencyStore';
 
 type NotificationShellContextValue = ReturnType<typeof useNotificationCenter> & {
   panelOpen: boolean;
@@ -24,12 +25,35 @@ export function NotificationShellProvider({ children }: { children: ReactNode })
   const [panelOpen, setPanelOpen] = useState(false);
   const [pulseActive, setPulseActive] = useState(false);
 
-  const openPanel = useCallback(() => setPanelOpen(true), []);
+  // Opening the notification panel closes Copilot -- these two overlays were
+  // previously uncoordinated (Copilot's open state lives in the Zustand
+  // emergency store, this panel's lives here), so opening one on top of the
+  // other left both visible/interactive at once, with this panel blocking
+  // clicks on the page underneath.
+  const closeCopilot = useCallback(() => {
+    if (useEmergencyStore.getState().copilotOpen) {
+      useEmergencyStore.getState().setCopilotOpen(false);
+    }
+  }, []);
+
+  const openPanel = useCallback(() => {
+    closeCopilot();
+    setPanelOpen(true);
+  }, [closeCopilot]);
   const closePanel = useCallback(() => setPanelOpen(false), []);
-  const togglePanel = useCallback(() => setPanelOpen((open) => !open), []);
+  const togglePanel = useCallback(() => {
+    setPanelOpen((open) => {
+      const next = !open;
+      if (next) closeCopilot();
+      return next;
+    });
+  }, [closeCopilot]);
 
   useEffect(() => {
-    const open = () => setPanelOpen(true);
+    const open = () => {
+      closeCopilot();
+      setPanelOpen(true);
+    };
     const close = () => setPanelOpen(false);
     let pulseTimer: number | undefined;
     const pulse = () => {
@@ -49,7 +73,7 @@ export function NotificationShellProvider({ children }: { children: ReactNode })
       document.removeEventListener('close-all-panels', close);
       document.removeEventListener('notification-center-pulse', pulse);
     };
-  }, []);
+  }, [closeCopilot]);
 
   const value = useMemo(
     () => ({
