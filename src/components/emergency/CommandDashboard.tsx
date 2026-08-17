@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import type { ActiveShift, CapacitySnapshot, Patient, Room, Staff } from '../../types/emergency';
 import DepartmentStaffBar from '../whiteboard/DepartmentStaffBar';
 import { AIRecommendationCard } from '../ai';
+import { AiTruthLabel, type AiTruthLabelInfo } from '../ai/AiTruthLabel';
 import type { EmergencyBoardingMetrics } from '../../store/emergencyStore';
 import {
   buildOperationalCommandDashboardSnapshot,
@@ -37,6 +38,24 @@ export type CommandDashboardProps = {
   bottleneckRegistry?: BottleneckRegistrySnapshot;
   now?: number;
   className?: string;
+};
+
+/**
+ * The 3 sections below (Prolonged ED stay risk / Post-ED orientation / Pending bed
+ * assignment) render the SAME snapshot arrays AiDecisionSupportQueue already shows
+ * above them, correctly wrapped in AIRecommendationCard with a real
+ * buildAiResponseProvenance({responseSource: 'DETERMINISTIC_RULE'}) label -- but
+ * AiDecisionSupportQueue caps its combined list at the top 5 (.slice(0, 5)), so
+ * these full, uncapped lists carry real information the capped queue doesn't show
+ * and can't simply be deleted as pure duplicates. They had zero disclosure of their
+ * own, and the orientation section's own heading claimed "(ML)" despite this exact
+ * file's own comment above confirming these are logistic-formula heuristics, not
+ * trained models. Same truth-label content the AI queue already uses for this data.
+ */
+const COMMAND_DASHBOARD_PREDICTION_TRUTH_LABEL: AiTruthLabelInfo = {
+  state: 'Manual',
+  sourceContext: 'Deterministic logistic-formula heuristic over live snapshot data, not a trained model.',
+  reviewRequired: true,
 };
 
 function toneLabel(tone: OperationalDashboardMetric['tone'] | ZoneBedOccupancy['tone']): string {
@@ -297,6 +316,7 @@ export default function CommandDashboard({
       {snapshot.prolongedStayAlerts?.length ? (
         <section className="command-dashboard__pending-beds" aria-label="Prolonged stay risk alerts">
           <h3>Prolonged ED stay risk</h3>
+          <AiTruthLabel {...COMMAND_DASHBOARD_PREDICTION_TRUTH_LABEL} compact />
           <ul>
             {snapshot.prolongedStayAlerts.map((alert) => (
               <li key={alert.patientId}>
@@ -313,7 +333,8 @@ export default function CommandDashboard({
 
       {snapshot.orientationPredictions?.length ? (
         <section className="command-dashboard__activations" aria-label="Post-ED orientation predictions">
-          <h3>Post-ED orientation (ML)</h3>
+          <h3>Post-ED orientation</h3>
+          <AiTruthLabel {...COMMAND_DASHBOARD_PREDICTION_TRUTH_LABEL} compact />
           <ul>
             {snapshot.orientationPredictions.map((prediction) => (
               <li key={prediction.patientId}>
@@ -330,6 +351,7 @@ export default function CommandDashboard({
       {snapshot.pendingBedAssignments.length ? (
         <section className="command-dashboard__pending-beds" aria-label="Pending bed assignments">
           <h3>Pending bed assignment</h3>
+          <AiTruthLabel {...COMMAND_DASHBOARD_PREDICTION_TRUTH_LABEL} compact />
           <ul>
             {snapshot.pendingBedAssignments.map((assignment) => (
               <li key={assignment.patientId}>

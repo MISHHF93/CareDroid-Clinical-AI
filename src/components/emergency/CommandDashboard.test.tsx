@@ -151,4 +151,68 @@ describe('CommandDashboard', () => {
     expect(screen.getByRole('button', { name: /modify/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /dismiss/i })).toBeInTheDocument();
   });
+
+  // Regression coverage: the full, uncapped prediction lists below the top-5 AI
+  // decision queue used to render with zero truthfulness disclosure -- and the
+  // orientation section's own heading falsely claimed "(ML)" despite being the
+  // same deterministic-rule computation the AI queue right above it correctly
+  // labels. Both are real, user-visible AI-truthfulness defects.
+  it('labels the prolonged-stay, orientation, and pending-bed sections as deterministic (Manual), not silently or falsely as ML', () => {
+    render(
+      <MemoryRouter>
+        <CommandDashboard
+          patients={patients}
+          rooms={rooms}
+          staff={staff}
+          activeShift={activeShift}
+          capacity={capacity}
+          now={new Date('2026-06-24T10:00:00.000Z').getTime()}
+          snapshot={{
+            metrics: [],
+            zoneOccupancy: [],
+            bottleneckLabel: 'Department flow within green thresholds',
+            summaryLine: '1 waiting',
+            updatedAt: '2026-06-24T10:00:00.000Z',
+            chargeNurseAlerts: [],
+            resourceActivations: [],
+            pendingBedAssignments: [
+              {
+                patientId: 'p1',
+                patientLabel: 'Sam Lee',
+                probabilityPercent: 82,
+                admitScore: 8,
+                action: 'Notify charge nurse and bed management.',
+              },
+            ],
+            prolongedStayAlerts: [
+              {
+                patientId: 'p1',
+                patientLabel: 'Sam Lee',
+                probabilityPercent: 60,
+                predictedHours: 6,
+                action: 'Review disposition plan.',
+              },
+            ],
+            orientationPredictions: [
+              {
+                patientId: 'p1',
+                patientLabel: 'Sam Lee',
+                orientation: 'ward',
+                probabilityPercent: 70,
+              },
+            ],
+          }}
+        />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole('heading', { name: 'Prolonged ED stay risk' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Post-ED orientation' })).toBeInTheDocument();
+    expect(screen.queryByText(/Post-ED orientation \(ML\)/i)).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Pending bed assignment' })).toBeInTheDocument();
+
+    // AiTruthLabel's compact badge renders the state label text ("Manual") --
+    // one for each of the 3 sections, plus the AI decision queue's own card above.
+    expect(screen.getAllByText('Manual').length).toBeGreaterThanOrEqual(3);
+  });
 });
