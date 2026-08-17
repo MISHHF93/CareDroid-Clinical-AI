@@ -48,6 +48,28 @@ export class SentinelInboundService {
     return this.inboundRepo.findOne({ where: { id } });
   }
 
+  private async applyInboundUpdate(
+    row: SentinelInboundPatientEntity,
+    mapped: ReturnType<typeof mapNemsisLikePayload>,
+    input: UpsertInboundInput,
+    vitals: SentinelInboundPatientEntity['vitals'],
+    missingFields: readonly string[],
+  ): Promise<SentinelInboundPatientEntity> {
+    row.chiefComplaint = mapped.chiefComplaint;
+    row.patientAge = mapped.patientAge;
+    row.patientSex = mapped.patientSex;
+    row.priority = mapped.priority;
+    row.vitals = vitals;
+    row.times = { ...mapped.times };
+    row.narrative = mapped.narrative;
+    row.etaPointMin = input.etaPointMin ?? row.etaPointMin;
+    row.etaLowMin = input.etaLowMin ?? row.etaLowMin;
+    row.etaHighMin = input.etaHighMin ?? row.etaHighMin;
+    row.nemsisMappedFields = [...mapped.nemsisMappedFields];
+    row.missingFields = [...missingFields];
+    return this.inboundRepo.save(row);
+  }
+
   async upsertFromCadOrNemsis(input: UpsertInboundInput): Promise<{
     inbound: SentinelInboundPatientEntity;
     validation: ReturnType<typeof validateNemsisCore>;
@@ -81,43 +103,56 @@ export class SentinelInboundService {
 
     let inbound: SentinelInboundPatientEntity;
     if (existing) {
-      existing.chiefComplaint = mapped.chiefComplaint;
-      existing.patientAge = mapped.patientAge;
-      existing.patientSex = mapped.patientSex;
-      existing.priority = mapped.priority;
-      existing.vitals = vitals;
-      existing.times = { ...mapped.times };
-      existing.narrative = mapped.narrative;
-      existing.etaPointMin = input.etaPointMin ?? existing.etaPointMin;
-      existing.etaLowMin = input.etaLowMin ?? existing.etaLowMin;
-      existing.etaHighMin = input.etaHighMin ?? existing.etaHighMin;
-      existing.nemsisMappedFields = [...mapped.nemsisMappedFields];
-      existing.missingFields = [...missingFields];
-      inbound = await this.inboundRepo.save(existing);
+      inbound = await this.applyInboundUpdate(existing, mapped, input, vitals, missingFields);
     } else {
-      inbound = await this.inboundRepo.save(
-        this.inboundRepo.create({
-          id: createId('sinb'),
-          unitId,
-          status: 'en_route',
-          patientLabel: `Inbound ${mapped.unitLabel}`,
-          patientAge: mapped.patientAge,
-          patientSex: mapped.patientSex,
-          chiefComplaint: mapped.chiefComplaint,
-          priority: mapped.priority,
-          vitals,
-          times: { ...mapped.times },
-          narrative: mapped.narrative,
-          etaPointMin: input.etaPointMin ?? null,
-          etaLowMin: input.etaLowMin ?? null,
-          etaHighMin: input.etaHighMin ?? null,
-          edPatientId: null,
-          nemsisMappedFields: [...mapped.nemsisMappedFields],
-          missingFields: [...missingFields],
-          organizationId: input.organizationId ?? null,
-          metadata: { unmappedKeys: mapped.unmappedKeys },
-        }),
-      );
+      // HEAL-311: a concurrent request for the same unit (duplicate/retried CAD or NEMSIS
+      // webhook delivery, or a genuine double-submit) can reach this branch in the gap
+      // between our findOne() above and this insert -- both would previously read "no
+      // existing row" and both insert, leaving two PHI rows for one real patient. `orIgnore`
+      // relies on the unique index on unitId (see the entity's HEAL-311 comment) to make the
+      // losing insert a silent no-op at the database level rather than a raised exception,
+      // which sidesteps having to depend on exactly how/when a given driver surfaces a
+      // constraint-violation rejection. Either way we then read back whichever row is
+      // actually in the database and apply THIS request's data on top of it, so the loser's
+      // data is folded in as an update instead of silently dropped.
+      const candidate = this.inboundRepo.create({
+        id: createId('sinb'),
+        unitId,
+        status: 'en_route',
+        patientLabel: `Inbound ${mapped.unitLabel}`,
+        patientAge: mapped.patientAge,
+        patientSex: mapped.patientSex,
+        chiefComplaint: mapped.chiefComplaint,
+        priority: mapped.priority,
+        vitals,
+        times: { ...mapped.times },
+        narrative: mapped.narrative,
+        etaPointMin: input.etaPointMin ?? null,
+        etaLowMin: input.etaLowMin ?? null,
+        etaHighMin: input.etaHighMin ?? null,
+        edPatientId: null,
+        nemsisMappedFields: [...mapped.nemsisMappedFields],
+        missingFields: [...missingFields],
+        organizationId: input.organizationId ?? null,
+        metadata: { unmappedKeys: mapped.unmappedKeys },
+      });
+
+      await this.inboundRepo
+        .createQueryBuilder()
+        .insert()
+        .into(SentinelInboundPatientEntity)
+        .values(candidate as any)
+        .orIgnore()
+        .execute();
+
+      const row = await this.inboundRepo.findOne({ where: { unitId } });
+      if (!row) {
+        throw new Error(`Failed to create or find inbound patient row for unit ${unitId}`);
+      }
+      inbound =
+        row.id === candidate.id
+          ? row
+          : await this.applyInboundUpdate(row, mapped, input, vitals, missingFields);
     }
 
     const fhirBundle = mapInboundToFhirBundle(mapped, {

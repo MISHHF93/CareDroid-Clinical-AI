@@ -3,6 +3,13 @@ import { Column, CreateDateColumn, Entity, Index, PrimaryColumn, UpdateDateColum
 @Entity('sentinel_inbound_patients')
 @Index(['unitId', 'status'])
 @Index(['organizationId', 'status'])
+// HEAL-311: status never transitions away from 'en_route' anywhere in this codebase (the
+// historical per-run lifecycle lives in SentinelEmsEpisodeEntity instead) -- this table is
+// a current-snapshot row per unit, continuously updated in place. A unique index on unitId
+// enforces that invariant at the DB level so two concurrent CAD/NEMSIS webhook deliveries
+// for the same unit (a duplicate/retried delivery, or a genuine double-submit) can no longer
+// race past the service's read-then-write check and create two PHI rows for one real patient.
+@Index(['unitId'], { unique: true })
 export class SentinelInboundPatientEntity {
   @PrimaryColumn({ type: 'varchar', length: 120 })
   id: string;
