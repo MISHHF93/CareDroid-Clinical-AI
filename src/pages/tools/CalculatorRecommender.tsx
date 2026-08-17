@@ -7,6 +7,7 @@ import {
   recommendCalculators,
 } from '../../services/calculatorRecommendationService';
 import ToolPageLayout from './ToolPageLayout';
+import { AiTruthLabel } from '../../components/ai/AiTruthLabel';
 
 const TOOL_CONFIG = {
   id: 'calculator-recommender-ai',
@@ -24,6 +25,13 @@ export default function CalculatorRecommender({ embedded = false, onCloseEmbedde
   const [symptoms, setSymptoms] = useState('');
   const [clinicalKeywords, setClinicalKeywords] = useState('');
   const [result, setResult] = useState<any>(null);
+  // recommendCalculators() (the "Suggest tools" button) is confirmed keyword-table
+  // matching against a hardcoded rule list -- no model call. "Start chat workflow"
+  // can ALSO populate `result` (see handleChatWorkflow below) via a real chat/AI
+  // service call. Both write the same `result` state, so a single static label
+  // would be wrong for whichever path didn't produce the current result -- track
+  // which one actually did.
+  const [resultSource, setResultSource] = useState<'deterministic' | 'chat' | null>(null);
   const [chatLoading, setChatLoading] = useState(false);
   const [chatResult, setChatResult] = useState<any>(null);
   const [error, setError] = useState<any>(null);
@@ -38,6 +46,7 @@ export default function CalculatorRecommender({ embedded = false, onCloseEmbedde
     setError(null);
     setChatResult(null);
     setResult(recommendCalculators(input));
+    setResultSource('deterministic');
   };
 
   const handleChatWorkflow = async () => {
@@ -65,6 +74,7 @@ export default function CalculatorRecommender({ embedded = false, onCloseEmbedde
             matchedContexts: response.data.toolResult.result.matchedContexts || [],
             safety: response.data.toolResult.result.safety || { warnings: [] },
           });
+          setResultSource('chat');
         }
       } else {
         setError(response.data?.message || 'Unable to start calculator recommendation chat workflow.');
@@ -81,6 +91,7 @@ export default function CalculatorRecommender({ embedded = false, onCloseEmbedde
     setSymptoms('');
     setClinicalKeywords('');
     setResult(null);
+    setResultSource(null);
     setChatResult(null);
     setError(null);
   };
@@ -162,6 +173,14 @@ export default function CalculatorRecommender({ embedded = false, onCloseEmbedde
               </div>
             ) : result?.recommendations?.length ? (
               <div className="diagnosis-results-body">
+                {resultSource === 'deterministic' ? (
+                  <AiTruthLabel
+                    state="Manual"
+                    sourceContext="Keyword/rule matching against a fixed calculator list -- no model call."
+                    reviewRequired
+                    compact
+                  />
+                ) : null}
                 {result.matchedContexts?.length ? (
                   <div className="simple-tool-result-panel">
                     <strong>Matched context:</strong>{' '}

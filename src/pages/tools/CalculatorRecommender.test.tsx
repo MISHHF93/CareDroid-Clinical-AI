@@ -75,6 +75,33 @@ describe('CalculatorRecommender', () => {
     expect(screen.getByRole('heading', { name: /ascvd/i })).toBeInTheDocument();
   });
 
+  // Regression coverage: this tool is named "Calculator Recommendation AI", but the
+  // primary "Suggest tools" path is confirmed keyword-table matching (no model call).
+  // A prior audit found zero disclosure of that anywhere in the results. Since the
+  // "Start chat workflow" button can populate the SAME result state via a real chat
+  // service call, the label must only appear for the deterministic path.
+  it('labels "Suggest tools" results as Manual (rule-based), not silently AI-branded', () => {
+    renderPage();
+
+    fireEvent.change(screen.getByLabelText(/chief complaint/i), { target: { value: 'Chest pain' } });
+    fireEvent.click(screen.getByRole('button', { name: /suggest tools/i }));
+
+    expect(screen.getByRole('heading', { name: /heart score/i })).toBeInTheDocument();
+    const chips = screen.getAllByTestId('ai-truth-label-chip').map((el) => el.textContent);
+    expect(chips).toContain('Manual');
+  });
+
+  it('does not show the deterministic "Manual" label for chat-workflow-sourced results (a separate, pre-existing page-level label already discloses the chat path)', async () => {
+    renderPage();
+
+    fireEvent.change(screen.getByLabelText(/chief complaint/i), { target: { value: 'Chest pain' } });
+    fireEvent.click(screen.getByRole('button', { name: /start chat workflow/i }));
+
+    expect(await screen.findByRole('heading', { name: /heart score/i })).toBeInTheDocument();
+    const chips = screen.getAllByTestId('ai-truth-label-chip').map((el) => el.textContent);
+    expect(chips).not.toContain('Manual');
+  });
+
   it('starts chat workflow with calculator-recommender-ai tool and feature hints', async () => {
     renderPage();
 
