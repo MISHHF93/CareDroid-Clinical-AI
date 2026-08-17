@@ -920,21 +920,38 @@ export const UserIdentityProvider = ({ children }: { children: React.ReactNode }
     } as OperationalProfile;
   }, []);
 
+  // Called concurrently from several independent triggers on Admin/Organization
+  // pages (the identity-bootstrap effect, a manual "Refresh platform context"
+  // button, createOrganization/saveOrganization, togglePack, onboarding submit) --
+  // unlike the sibling switchWorkspace below (given a staleness-token guard
+  // specifically for this reason), this had none, so a slower, in-flight response
+  // (e.g. bootstrap's own refreshIdentity()) could resolve AFTER a faster, more
+  // recent one (e.g. a pack toggle) and silently overwrite it with stale
+  // entitledPackIds/entitledAssetIds -- a just-enabled pack could appear to
+  // "revert" itself with no error and no visible cause.
+  const refreshPlatformContextTokenRef = useRef(0);
+
   const refreshPlatformContext = useCallback(async () => {
+    const token = ++refreshPlatformContextTokenRef.current;
     if (!isAuthenticated && !authToken) {
-      setPlatformContext(null);
-      setPlatformEntitlementContext(null);
+      if (refreshPlatformContextTokenRef.current === token) {
+        setPlatformContext(null);
+        setPlatformEntitlementContext(null);
+      }
       return null;
     }
     try {
       const ctx = await PlatformAssetsApi.getContext();
+      if (refreshPlatformContextTokenRef.current !== token) return null;
       setPlatformContext(ctx);
       setPlatformEntitlementContext(ctx);
       return ctx;
     } catch (platformError: any) {
       logger.warn('Platform context unavailable', { message: platformError?.message });
-      setPlatformContext(null);
-      setPlatformEntitlementContext(null);
+      if (refreshPlatformContextTokenRef.current === token) {
+        setPlatformContext(null);
+        setPlatformEntitlementContext(null);
+      }
       return null;
     }
   }, [authToken, isAuthenticated]);
