@@ -4,6 +4,8 @@ import { AuthGuard } from '@nestjs/passport';
 import { AnyPermission } from '../auth/decorators/permissions.decorator';
 import { Permission } from '../auth/enums/permission.enum';
 import { AuthorizationGuard } from '../auth/guards/authorization.guard';
+import { TenantContext } from '../tenant-context/tenant-context.decorator';
+import type { TenantContext as TenantContextValue } from '../tenant-context/tenant-context.types';
 import { normalizeWebhookPayload } from './adapters/cad-avl.adapter';
 import { SentinelAlarmService } from './sentinel-alarm.service';
 import { SentinelInboundService } from './sentinel-inbound.service';
@@ -72,15 +74,16 @@ export class SentinelController {
   @Get('command-snapshot')
   @AnyPermission(Permission.VIEW_SENTINEL_COMMAND, Permission.READ_PHI, Permission.VIEW_OPERATIONS)
   @ApiOperation({ summary: 'Command center snapshot: units, ETAs, inbound, open alarms' })
-  async commandSnapshot() {
+  async commandSnapshot(@TenantContext() tenantContext?: TenantContextValue) {
+    const organizationId = tenantContext?.organizationId;
     const [units, fences, episodes, inboundPatients, openAlarms, recommendations] =
       await Promise.all([
-        this.tracking.listUnits(),
+        this.tracking.listUnits(organizationId),
         this.tracking.listGeofences(),
-        this.tracking.listEpisodes(),
-        this.inbound.listInbound(),
-        this.alarms.listOpen(),
-        this.inbound.listRecommendations(),
+        this.tracking.listEpisodes(organizationId),
+        this.inbound.listInbound(organizationId),
+        this.alarms.listOpen(organizationId),
+        this.inbound.listRecommendations(organizationId),
       ]);
 
     const unitsWithEta = await Promise.all(
@@ -137,15 +140,22 @@ export class SentinelController {
     Permission.MANAGE_SENTINEL_UNITS,
     Permission.READ_PHI,
   )
-  async listUnits() {
-    return envelope(await this.tracking.listUnits(), 'Sentinel units');
+  async listUnits(@TenantContext() tenantContext?: TenantContextValue) {
+    return envelope(await this.tracking.listUnits(tenantContext?.organizationId), 'Sentinel units');
   }
 
   @Get('units/:unitId/positions')
   @AnyPermission(Permission.VIEW_SENTINEL_COMMAND, Permission.MANAGE_SENTINEL_UNITS)
-  async unitPositions(@Param('unitId') unitId: string, @Query('limit') limit?: string) {
+  async unitPositions(
+    @Param('unitId') unitId: string,
+    @Query('limit') limit?: string,
+    @TenantContext() tenantContext?: TenantContextValue,
+  ) {
     const n = limit ? Math.min(200, Math.max(1, Number(limit) || 50)) : 50;
-    return envelope(await this.tracking.listPositions(unitId, n), 'Unit positions');
+    return envelope(
+      await this.tracking.listPositions(unitId, tenantContext?.organizationId, n),
+      'Unit positions',
+    );
   }
 
   @Get('geofences')
@@ -161,10 +171,11 @@ export class SentinelController {
     Permission.MANAGE_SENTINEL_UNITS,
   )
   @ApiOperation({ summary: 'Vendor-agnostic CAD/AVL webhook ingest' })
-  async ingestCad(@Body() body: IngestCadDto) {
+  async ingestCad(@Body() body: IngestCadDto, @TenantContext() tenantContext?: TenantContextValue) {
+    const organizationId = tenantContext?.organizationId;
     const events = normalizeWebhookPayload((body as Record<string, unknown>) || {});
     this.tracking.getWebhookAdapter().enqueue(events);
-    const result = await this.tracking.ingestCadEvents(events);
+    const result = await this.tracking.ingestCadEvents(events, organizationId);
 
     // If payload includes clinical fields, upsert inbound patient
     const clinicalKeys = [
@@ -193,6 +204,7 @@ export class SentinelController {
       const upserted = await this.inbound.upsertFromCadOrNemsis({
         payload: payload as Record<string, unknown>,
         unitId: unitExternalId || undefined,
+        organizationId,
       });
       inbound = {
         id: upserted.inbound.id,
@@ -207,15 +219,18 @@ export class SentinelController {
   @Post('poll')
   @AnyPermission(Permission.MANAGE_SENTINEL_UNITS, Permission.INGEST_SENTINEL_CAD)
   @ApiOperation({ summary: 'Force adapter poll (mock/fleet/webhook queues)' })
-  async forcePoll() {
+  async forcePoll(@TenantContext() tenantContext?: TenantContextValue) {
     await this.tracking.pollAdapters();
-    return envelope(await this.tracking.listUnits(), 'Adapters polled');
+    return envelope(await this.tracking.listUnits(tenantContext?.organizationId), 'Adapters polled');
   }
 
   @Get('inbound')
   @AnyPermission(Permission.VIEW_SENTINEL_COMMAND, Permission.READ_PHI)
-  async listInbound() {
-    return envelope(await this.inbound.listInbound(), 'Inbound pre-arrival patients');
+  async listInbound(@TenantContext() tenantContext?: TenantContextValue) {
+    return envelope(
+      await this.inbound.listInbound(tenantContext?.organizationId),
+      'Inbound pre-arrival patients',
+    );
   }
 
   @Post('inbound')
@@ -224,11 +239,17 @@ export class SentinelController {
     Permission.WRITE_PHI,
     Permission.INGEST_SENTINEL_CAD,
   )
-  async upsertInbound(@Body() body: UpsertInboundDto) {
+  async upsertInbound(
+    @Body() body: UpsertInboundDto,
+    @TenantContext() tenantContext?: TenantContextValue,
+  ) {
+    // organizationId is derived from the caller's own trusted tenant context, not from the
+    // request body -- body.organizationId was previously trusted as-is, letting a caller
+    // attribute an inbound patient record to an arbitrary organization.
     const result = await this.inbound.upsertFromCadOrNemsis({
       payload: (body as Record<string, unknown>) || {},
       unitId: body.unitId != null ? String(body.unitId) : undefined,
-      organizationId: body.organizationId != null ? String(body.organizationId) : null,
+      organizationId: tenantContext?.organizationId ?? null,
       etaPointMin: body.etaPointMin != null ? Number(body.etaPointMin) : null,
       etaLowMin: body.etaLowMin != null ? Number(body.etaLowMin) : null,
       etaHighMin: body.etaHighMin != null ? Number(body.etaHighMin) : null,
@@ -263,13 +284,18 @@ export class SentinelController {
     Permission.VIEW_SENTINEL_COMMAND,
     Permission.READ_PHI,
   )
-  async listAlarms() {
-    return envelope(await this.alarms.listOpen(), 'Open Sentinel alarms');
+  async listAlarms(@TenantContext() tenantContext?: TenantContextValue) {
+    return envelope(await this.alarms.listOpen(tenantContext?.organizationId), 'Open Sentinel alarms');
   }
 
   @Post('alarms')
   @AnyPermission(Permission.ACK_SENTINEL_ALARMS, Permission.MANAGE_SENTINEL_UNITS)
-  async raiseAlarm(@Body() body: RaiseAlarmDto) {
+  async raiseAlarm(
+    @Body() body: RaiseAlarmDto,
+    @TenantContext() tenantContext?: TenantContextValue,
+  ) {
+    // organizationId is derived from the caller's own trusted tenant context, not from the
+    // request body -- see RaiseAlarmDto's HEAL-308 comment.
     const result = await this.alarms.raise({
       source: body.source,
       category: body.category,
@@ -279,7 +305,7 @@ export class SentinelController {
       urgency: body.urgency,
       title: body.title,
       message: body.message,
-      organizationId: body.organizationId,
+      organizationId: tenantContext?.organizationId ?? null,
       metadata: body.metadata,
       actorId: body.actorId,
     });
@@ -345,8 +371,11 @@ export class SentinelController {
 
   @Get('ai/recommendations')
   @AnyPermission(Permission.REVIEW_SENTINEL_AI, Permission.VIEW_SENTINEL_COMMAND)
-  async listAi() {
-    return envelope(await this.inbound.listRecommendations(), 'AI recommendations');
+  async listAi(@TenantContext() tenantContext?: TenantContextValue) {
+    return envelope(
+      await this.inbound.listRecommendations(tenantContext?.organizationId),
+      'AI recommendations',
+    );
   }
 
   @Post('ai/recommendations/:id/review')
@@ -367,11 +396,11 @@ export class SentinelController {
     Permission.VIEW_ANALYTICS,
     Permission.VIEW_SENTINEL_COMMAND,
   )
-  async analytics() {
+  async analytics(@TenantContext() tenantContext?: TenantContextValue) {
     const [alarmPerf, inboundAnalytics, episodes, outboxHealth] = await Promise.all([
       this.alarms.performanceSnapshot(),
       this.inbound.analyticsSnapshot(),
-      this.tracking.listEpisodes(),
+      this.tracking.listEpisodes(tenantContext?.organizationId),
       this.outbox.getHealth(),
     ]);
 

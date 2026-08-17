@@ -1,4 +1,4 @@
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsNumber, IsOptional } from 'class-validator';
 import { NemsisClinicalFieldsDto } from './nemsis-clinical-fields.dto';
 
 /**
@@ -6,13 +6,14 @@ import { NemsisClinicalFieldsDto } from './nemsis-clinical-fields.dto';
  * -> mapNemsisLikePayload(), which reads the same bounded KNOWN_ALIASES set
  * as IngestCadDto (see NemsisClinicalFieldsDto for the full rationale). The
  * fields below are the additional convenience fields this controller reads
- * directly (unitId/organizationId/eta*) rather than forwarding as payload.
+ * directly (unitId/eta*) rather than forwarding as payload.
+ *
+ * HEAL-308: organizationId deliberately does NOT appear here. It's now
+ * derived server-side from the caller's own @TenantContext() in the
+ * controller -- accepting it from the request body let a caller attribute
+ * an inbound patient record to an arbitrary organization.
  */
 export class UpsertInboundDto extends NemsisClinicalFieldsDto {
-  @IsOptional()
-  @IsString()
-  organizationId?: string;
-
   @IsOptional()
   @IsNumber()
   etaPointMin?: number;

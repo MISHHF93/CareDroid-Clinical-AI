@@ -33,8 +33,12 @@ export class SentinelInboundService {
     private readonly outbox: SentinelOutboxService,
   ) {}
 
-  async listInbound(): Promise<SentinelInboundPatientEntity[]> {
+  // HEAL-308: had zero organizationId filtering despite the entity already carrying the
+  // (indexed) column -- see sentinel-tracking.service.ts's HEAL-308 comment for the full
+  // rationale. Inbound pre-arrival patients are real PHI (chief complaint, vitals, name).
+  async listInbound(organizationId?: string): Promise<SentinelInboundPatientEntity[]> {
     return this.inboundRepo.find({
+      where: organizationId ? { organizationId } : {},
       order: { updatedAt: 'DESC' },
       take: 100,
     });
@@ -270,8 +274,26 @@ export class SentinelInboundService {
     return this.aiRepo.save(row);
   }
 
-  async listRecommendations(): Promise<SentinelAiRecommendationEntity[]> {
-    return this.aiRepo.find({ order: { generatedAt: 'DESC' }, take: 100 });
+  // SentinelAiRecommendationEntity has no organizationId column of its own -- it links to
+  // an inbound patient (or other entity) via linkedEntityId. Scope by joining through the
+  // caller's own org-filtered inbound patients rather than trusting an unscoped find().
+  async listRecommendations(organizationId?: string): Promise<SentinelAiRecommendationEntity[]> {
+    if (!organizationId) {
+      return this.aiRepo.find({ order: { generatedAt: 'DESC' }, take: 100 });
+    }
+    const ownInbound = await this.inboundRepo.find({
+      where: { organizationId },
+      select: ['id'],
+    });
+    const ownInboundIds = new Set(ownInbound.map((row) => row.id));
+    const rows = await this.aiRepo.find({ order: { generatedAt: 'DESC' }, take: 200 });
+    return rows
+      .filter(
+        (row) =>
+          row.linkedEntityType !== 'inbound_patient' ||
+          (row.linkedEntityId != null && ownInboundIds.has(row.linkedEntityId)),
+      )
+      .slice(0, 100);
   }
 
   async analyticsSnapshot(): Promise<{

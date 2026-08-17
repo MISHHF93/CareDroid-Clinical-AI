@@ -117,11 +117,35 @@ export class SentinelTrackingService implements OnModuleInit {
     };
   }
 
-  async listUnits(): Promise<SentinelUnitEntity[]> {
-    return this.unitRepo.find({ order: { updatedAt: 'DESC' }, take: 200 });
+  // HEAL-308: this whole file's read methods had zero organizationId filtering despite
+  // SentinelUnitEntity/SentinelEpisodeEntity already having the column (indexed, even --
+  // `@Index(['organizationId', 'status'])`) and TenantContextModule already populating
+  // req.tenantContext.organizationId globally on every authenticated request. Any
+  // authenticated user with the right permission level could see every hospital
+  // organization's live ambulance positions/ETAs sharing this deployment -- not a
+  // wrong-role gap, a wrong-tenant one. Geofences deliberately stay unfiltered: they're
+  // tied to a single global hospital lat/lng in sentinel.config.ts, not per-organization
+  // data, so filtering them by org would just make them invisible to everyone.
+  async listUnits(organizationId?: string): Promise<SentinelUnitEntity[]> {
+    return this.unitRepo.find({
+      where: organizationId ? { organizationId } : {},
+      order: { updatedAt: 'DESC' },
+      take: 200,
+    });
   }
 
-  async listPositions(unitId: string, limit = 50): Promise<SentinelPositionEntity[]> {
+  async listPositions(
+    unitId: string,
+    organizationId?: string,
+    limit = 50,
+  ): Promise<SentinelPositionEntity[]> {
+    // SentinelPositionEntity has no organizationId of its own (keyed by unitId only) --
+    // verify the requested unit belongs to the caller's org before returning ANY of its
+    // positions, otherwise this route alone would leak live GPS tracks for any unit id
+    // even after listUnits() above is correctly filtered.
+    if (organizationId && !(await this.unitBelongsToOrganization(unitId, organizationId))) {
+      return [];
+    }
     return this.positionRepo.find({
       where: { unitId },
       order: { receivedAt: 'DESC' },
@@ -129,7 +153,10 @@ export class SentinelTrackingService implements OnModuleInit {
     });
   }
 
-  async latestEta(unitId: string): Promise<SentinelEtaEntity | null> {
+  async latestEta(unitId: string, organizationId?: string): Promise<SentinelEtaEntity | null> {
+    if (organizationId && !(await this.unitBelongsToOrganization(unitId, organizationId))) {
+      return null;
+    }
     const rows = await this.etaRepo.find({
       where: { unitId },
       order: { calculatedAt: 'DESC' },
@@ -138,22 +165,32 @@ export class SentinelTrackingService implements OnModuleInit {
     return rows[0] ?? null;
   }
 
+  private async unitBelongsToOrganization(unitId: string, organizationId: string): Promise<boolean> {
+    const unit = await this.unitRepo.findOne({ where: { id: unitId } });
+    return Boolean(unit) && unit!.organizationId === organizationId;
+  }
+
   async listGeofences(): Promise<SentinelGeofenceEntity[]> {
     return this.fenceRepo.find({ where: { active: true } });
   }
 
-  async listEpisodes(): Promise<SentinelEpisodeEntity[]> {
-    return this.episodeRepo.find({ order: { updatedAt: 'DESC' }, take: 100 });
+  async listEpisodes(organizationId?: string): Promise<SentinelEpisodeEntity[]> {
+    return this.episodeRepo.find({
+      where: organizationId ? { organizationId } : {},
+      order: { updatedAt: 'DESC' },
+      take: 100,
+    });
   }
 
   async ingestCadEvents(
     events: readonly CadAvlEvent[],
+    organizationId?: string,
   ): Promise<{ accepted: number; rejected: number }> {
     let accepted = 0;
     let rejected = 0;
     for (const event of events) {
       try {
-        await this.applyCadEvent(event);
+        await this.applyCadEvent(event, organizationId);
         accepted += 1;
       } catch (error) {
         rejected += 1;
@@ -183,7 +220,7 @@ export class SentinelTrackingService implements OnModuleInit {
     }
   }
 
-  private async applyCadEvent(event: CadAvlEvent): Promise<void> {
+  private async applyCadEvent(event: CadAvlEvent, organizationId?: string): Promise<void> {
     // Idempotent cursor: skip duplicate source event ids
     if (event.eventId) {
       const cursorId = `${event.vendorId}:${event.unitExternalId}`;
@@ -218,7 +255,7 @@ export class SentinelTrackingService implements OnModuleInit {
       );
     }
 
-    const unit = await this.upsertUnit(event);
+    const unit = await this.upsertUnit(event, organizationId);
 
     if (event.kind === 'position' && event.latitude != null && event.longitude != null) {
       const pos = this.positionRepo.create({
@@ -281,7 +318,7 @@ export class SentinelTrackingService implements OnModuleInit {
     }
   }
 
-  private async upsertUnit(event: CadAvlEvent): Promise<SentinelUnitEntity> {
+  private async upsertUnit(event: CadAvlEvent, organizationId?: string): Promise<SentinelUnitEntity> {
     let unit = await this.unitRepo.findOne({
       where: { externalId: event.unitExternalId, vendorId: event.vendorId },
     });
@@ -300,7 +337,7 @@ export class SentinelTrackingService implements OnModuleInit {
         speedKmh: event.speedKmh ?? null,
         lastSeenAt: event.occurredAt,
         lastEventSeq: event.sequence ?? 0,
-        organizationId: null,
+        organizationId: organizationId ?? null,
         workspaceId: null,
         metadata: event.raw ? { ...event.raw } : null,
       });

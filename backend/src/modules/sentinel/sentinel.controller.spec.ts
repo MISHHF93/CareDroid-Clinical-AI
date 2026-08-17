@@ -234,6 +234,81 @@ describe('SentinelController', () => {
     });
   });
 
+  // Regression coverage (HEAL-308): these routes previously called every read method with
+  // zero organizationId, so any authenticated user with the right permission level could see
+  // every hospital organization's live ambulance units/inbound patients/alarms/AI
+  // recommendations sharing this deployment. Proves the caller's own @TenantContext() is
+  // actually threaded through to each underlying service call, not just accepted and dropped.
+  describe('tenant scoping (HEAL-308)', () => {
+    const tenantContext = { organizationId: 'org-a' } as any;
+
+    it('listUnits passes organizationId through to tracking.listUnits', async () => {
+      await controller.listUnits(tenantContext);
+      expect(tracking.listUnits).toHaveBeenCalledWith('org-a');
+    });
+
+    it('listInbound passes organizationId through to inbound.listInbound', async () => {
+      await controller.listInbound(tenantContext);
+      expect(inbound.listInbound).toHaveBeenCalledWith('org-a');
+    });
+
+    it('listAlarms passes organizationId through to alarms.listOpen', async () => {
+      await controller.listAlarms(tenantContext);
+      expect(alarms.listOpen).toHaveBeenCalledWith('org-a');
+    });
+
+    it('listAi passes organizationId through to inbound.listRecommendations', async () => {
+      await controller.listAi(tenantContext);
+      expect(inbound.listRecommendations).toHaveBeenCalledWith('org-a');
+    });
+
+    it('commandSnapshot passes organizationId through to every underlying read call', async () => {
+      await controller.commandSnapshot(tenantContext);
+      expect(tracking.listUnits).toHaveBeenCalledWith('org-a');
+      expect(tracking.listEpisodes).toHaveBeenCalledWith('org-a');
+      expect(inbound.listInbound).toHaveBeenCalledWith('org-a');
+      expect(alarms.listOpen).toHaveBeenCalledWith('org-a');
+      expect(inbound.listRecommendations).toHaveBeenCalledWith('org-a');
+    });
+
+    it('analytics passes organizationId through to tracking.listEpisodes', async () => {
+      await controller.analytics(tenantContext);
+      expect(tracking.listEpisodes).toHaveBeenCalledWith('org-a');
+    });
+
+    it('ingestCad derives organizationId from tenant context and threads it into both the CAD events and any clinical upsert', async () => {
+      await controller.ingestCad(
+        { unitId: 'M1', lat: 1, lng: 2, chiefComplaint: 'Chest pain' },
+        tenantContext,
+      );
+      expect(tracking.ingestCadEvents).toHaveBeenCalledWith(expect.any(Array), 'org-a');
+      expect(inbound.upsertFromCadOrNemsis).toHaveBeenCalledWith(
+        expect.objectContaining({ organizationId: 'org-a' }),
+      );
+    });
+
+    it('upsertInbound derives organizationId from tenant context, not the request body', async () => {
+      await controller.upsertInbound(
+        { unitId: 'M1', organizationId: 'attacker-supplied-org' } as any,
+        tenantContext,
+      );
+      expect(inbound.upsertFromCadOrNemsis).toHaveBeenCalledWith(
+        expect.objectContaining({ organizationId: 'org-a' }),
+      );
+    });
+
+    it('every listed route falls back to no filter (undefined) when there is no tenant context', async () => {
+      await controller.listUnits();
+      await controller.listInbound();
+      await controller.listAlarms();
+      await controller.listAi();
+      expect(tracking.listUnits).toHaveBeenCalledWith(undefined);
+      expect(inbound.listInbound).toHaveBeenCalledWith(undefined);
+      expect(alarms.listOpen).toHaveBeenCalledWith(undefined);
+      expect(inbound.listRecommendations).toHaveBeenCalledWith(undefined);
+    });
+  });
+
   describe('unitPositions', () => {
     it.each([
       [undefined, 50],
@@ -245,7 +320,12 @@ describe('SentinelController', () => {
       ['1', 1],
     ])('clamps limit=%p to %p', async (input, expected) => {
       await controller.unitPositions('unit-1', input as string | undefined);
-      expect(tracking.listPositions).toHaveBeenCalledWith('unit-1', expected);
+      expect(tracking.listPositions).toHaveBeenCalledWith('unit-1', undefined, expected);
+    });
+
+    it('threads the caller organizationId through to listPositions', async () => {
+      await controller.unitPositions('unit-1', '10', { organizationId: 'org-a' } as any);
+      expect(tracking.listPositions).toHaveBeenCalledWith('unit-1', 'org-a', 10);
     });
   });
 
@@ -405,8 +485,38 @@ describe('SentinelController', () => {
 
       const result = await controller.raiseAlarm(body);
 
-      expect(alarms.raise).toHaveBeenCalledWith(body);
+      expect(alarms.raise).toHaveBeenCalledWith({
+        ...body,
+        organizationId: null,
+        metadata: undefined,
+        actorId: undefined,
+      });
       expect(result.message).toBe('Alarm raised');
+    });
+
+    it('derives organizationId from the caller tenant context, not from the request body', async () => {
+      alarms.raise.mockResolvedValue({ id: 'a1', suppressed: false });
+
+      await controller.raiseAlarm(
+        {
+          source: 's',
+          category: 'c',
+          ruleId: 'r',
+          subjectId: 'p',
+          severity: 'critical' as const,
+          urgency: 'immediate' as const,
+          title: 't',
+          message: 'm',
+          // A malicious/misconfigured caller supplying their own organizationId in the
+          // body must NOT be trusted -- the real HEAL-308 fix.
+          organizationId: 'attacker-supplied-org',
+        } as any,
+        { organizationId: 'real-tenant-org' } as any,
+      );
+
+      expect(alarms.raise).toHaveBeenCalledWith(
+        expect.objectContaining({ organizationId: 'real-tenant-org' }),
+      );
     });
 
     it('reports the suppressed message when the service dedupes/fatigues the alarm', async () => {

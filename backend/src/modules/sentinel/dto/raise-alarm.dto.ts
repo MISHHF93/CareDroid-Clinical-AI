@@ -31,14 +31,11 @@ export class RaiseAlarmDto {
   @MaxLength(2000)
   message: string;
 
-  // Accepted by SentinelAlarmService.raise() (RaiseAlarmInput) but not
-  // previously wired through the controller at all -- included here since
-  // this DTO is the documented contract for what this route accepts.
-  @IsOptional()
-  @IsString()
-  @MaxLength(200)
-  organizationId?: string;
-
+  // HEAL-308: organizationId deliberately does NOT appear here. It's now
+  // derived server-side from the caller's own @TenantContext() in the
+  // controller -- accepting it from the request body let a caller attribute
+  // an alarm to an arbitrary organization (or omit it to make the alarm
+  // invisible to every org's filtered view).
   @IsOptional()
   @IsObject()
   metadata?: Record<string, unknown>;
