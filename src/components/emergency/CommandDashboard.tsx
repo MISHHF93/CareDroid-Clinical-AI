@@ -58,6 +58,22 @@ const COMMAND_DASHBOARD_PREDICTION_TRUTH_LABEL: AiTruthLabelInfo = {
   reviewRequired: true,
 };
 
+// HEAL-300: canViewPatients (computed below, from the same fail-closed
+// route-permission check used platform-wide -- see BottleneckPanels.tsx's
+// HEAL-209 comment) was correctly threaded to BottleneckCommandPanel, but
+// snapshot.chargeNurseAlerts/prolongedStayAlerts/orientationPredictions/
+// pendingBedAssignments (operationalCommandDashboardModel.ts) all bake real,
+// unredacted patient names into `patientLabel` fields with no privacy
+// parameter -- and AiDecisionSupportQueue re-embeds those same names into
+// its recommendation/rationale text. A role without patient access (e.g.
+// it_admin) saw the bottleneck panel correctly redacted but five other
+// patient-name-bearing sections on the same dashboard screen.
+const REDACTED_PATIENT_LABEL = 'Patient';
+
+function redactPatientLabel(label: string, canViewPatients: boolean): string {
+  return canViewPatients ? label : REDACTED_PATIENT_LABEL;
+}
+
 function toneLabel(tone: OperationalDashboardMetric['tone'] | ZoneBedOccupancy['tone']): string {
   if (tone === 'red') return 'Red';
   if (tone === 'amber') return 'Amber';
@@ -107,25 +123,31 @@ function ZoneOccupancyRow({ zone }: { zone: ZoneBedOccupancy }) {
   );
 }
 
-function AiDecisionSupportQueue({ snapshot }: { snapshot: OperationalCommandDashboardSnapshot }) {
+function AiDecisionSupportQueue({
+  snapshot,
+  canViewPatients,
+}: {
+  snapshot: OperationalCommandDashboardSnapshot;
+  canViewPatients: boolean;
+}) {
   const recommendations = [
     ...snapshot.pendingBedAssignments.map((assignment) => ({
       id: `bed-${assignment.patientId}`,
-      recommendation: `Start bed coordination for ${assignment.patientLabel}`,
+      recommendation: `Start bed coordination for ${redactPatientLabel(assignment.patientLabel, canViewPatients)}`,
       confidence: assignment.probabilityPercent,
       rationale: `Admission probability ${assignment.probabilityPercent}% with admit score ${assignment.admitScore}/10.`,
       action: assignment.action,
     })),
     ...snapshot.prolongedStayAlerts.map((alert) => ({
       id: `stay-${alert.patientId}`,
-      recommendation: `Escalate prolonged-stay risk for ${alert.patientLabel}`,
+      recommendation: `Escalate prolonged-stay risk for ${redactPatientLabel(alert.patientLabel, canViewPatients)}`,
       confidence: alert.probabilityPercent,
       rationale: `Projected ED stay ${alert.predictedHours}h with ${alert.probabilityPercent}% risk.`,
       action: alert.action,
     })),
     ...snapshot.orientationPredictions.map((prediction) => ({
       id: `orientation-${prediction.patientId}`,
-      recommendation: `Prepare ${prediction.orientation} pathway for ${prediction.patientLabel}`,
+      recommendation: `Prepare ${prediction.orientation} pathway for ${redactPatientLabel(prediction.patientLabel, canViewPatients)}`,
       confidence: prediction.probabilityPercent,
       rationale: `Native AI predicts ${prediction.orientation} as the most likely post-ED orientation.`,
       action: 'Review with responsible clinician before changing disposition or bed workflow.',
@@ -303,15 +325,24 @@ export default function CommandDashboard({
             <h3>Charge nurse alerts</h3>
             <span>Based on admission probability and pre-arrival rules</span>
           </div>
-          <ul className="command-dashboard__alert-list">
-            {snapshot.chargeNurseAlerts.map((alert) => (
-              <li key={alert}>{alert}</li>
-            ))}
-          </ul>
+          {canViewPatients ? (
+            <ul className="command-dashboard__alert-list">
+              {snapshot.chargeNurseAlerts.map((alert) => (
+                <li key={alert}>{alert}</li>
+              ))}
+            </ul>
+          ) : (
+            // These strings have patient names baked in (operationalCommandDashboardModel.ts)
+            // and can't be safely string-parsed for a name the way a structured
+            // `patientLabel` field can -- fail closed, same as HEAL-209.
+            <p className="command-dashboard__redacted-notice">
+              Patient-specific details are hidden for this role. A role with patient access can view specifics.
+            </p>
+          )}
         </section>
       ) : null}
 
-      <AiDecisionSupportQueue snapshot={snapshot} />
+      <AiDecisionSupportQueue snapshot={snapshot} canViewPatients={canViewPatients} />
 
       {snapshot.prolongedStayAlerts?.length ? (
         <section className="command-dashboard__pending-beds" aria-label="Prolonged stay risk alerts">
@@ -320,7 +351,7 @@ export default function CommandDashboard({
           <ul>
             {snapshot.prolongedStayAlerts.map((alert) => (
               <li key={alert.patientId}>
-                <strong>{alert.patientLabel}</strong>
+                <strong>{redactPatientLabel(alert.patientLabel, canViewPatients)}</strong>
                 <span>
                   Risk {alert.probabilityPercent}% · projected {alert.predictedHours}h
                 </span>
@@ -338,7 +369,7 @@ export default function CommandDashboard({
           <ul>
             {snapshot.orientationPredictions.map((prediction) => (
               <li key={prediction.patientId}>
-                <strong>{prediction.patientLabel}</strong>
+                <strong>{redactPatientLabel(prediction.patientLabel, canViewPatients)}</strong>
                 <span>
                   {prediction.orientation.toUpperCase()} · {prediction.probabilityPercent}%
                 </span>
@@ -355,7 +386,7 @@ export default function CommandDashboard({
           <ul>
             {snapshot.pendingBedAssignments.map((assignment) => (
               <li key={assignment.patientId}>
-                <strong>{assignment.patientLabel}</strong>
+                <strong>{redactPatientLabel(assignment.patientLabel, canViewPatients)}</strong>
                 <span>
                   Admit score {assignment.admitScore}/10 ({assignment.probabilityPercent}%)
                 </span>

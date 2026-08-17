@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import CommandDashboard from './CommandDashboard';
@@ -11,6 +11,13 @@ import {
   type Room,
   type Staff,
 } from '../../types/emergency';
+
+let mockCanViewPatients = true;
+vi.mock('../../hooks/useEmergencyRolePermissions', () => ({
+  useEmergencyRolePermissions: () => ({
+    canAccessRoute: () => mockCanViewPatients,
+  }),
+}));
 
 const rooms: Room[] = [
   { id: 'r1', name: 'Resus 1', type: 'Resus', status: 'Occupied', patientId: 'p1' },
@@ -75,6 +82,10 @@ const capacity: CapacitySnapshot = {
 };
 
 describe('CommandDashboard', () => {
+  beforeEach(() => {
+    mockCanViewPatients = true;
+  });
+
   it('renders live operational metrics and zone occupancy from whiteboard state', () => {
     render(
       <MemoryRouter>
@@ -214,5 +225,66 @@ describe('CommandDashboard', () => {
     // AiTruthLabel's compact badge renders the state label text ("Manual") --
     // one for each of the 3 sections, plus the AI decision queue's own card above.
     expect(screen.getAllByText('Manual').length).toBeGreaterThanOrEqual(3);
+  });
+
+  // Regression coverage (HEAL-300): canViewPatients was correctly threaded to
+  // BottleneckCommandPanel only -- 5 other sections on this same dashboard
+  // (charge nurse alerts, AI decision support, prolonged-stay, orientation,
+  // pending-bed-assignment) all embedded real patient names with no gate at
+  // all, so a role without patient access (e.g. it_admin) still saw them.
+  it('redacts patient names from every section when the role cannot view patients', () => {
+    mockCanViewPatients = false;
+
+    render(
+      <MemoryRouter>
+        <CommandDashboard
+          patients={patients}
+          rooms={rooms}
+          staff={staff}
+          activeShift={activeShift}
+          capacity={capacity}
+          now={new Date('2026-06-24T10:00:00.000Z').getTime()}
+          snapshot={{
+            metrics: [],
+            zoneOccupancy: [],
+            bottleneckLabel: 'Department flow within green thresholds',
+            summaryLine: '1 waiting',
+            updatedAt: '2026-06-24T10:00:00.000Z',
+            chargeNurseAlerts: ['Sam Lee: admission probability 82% — pending bed assignment'],
+            resourceActivations: [],
+            pendingBedAssignments: [
+              {
+                patientId: 'p1',
+                patientLabel: 'Sam Lee',
+                probabilityPercent: 82,
+                admitScore: 8,
+                action: 'Notify charge nurse and bed management.',
+              },
+            ],
+            prolongedStayAlerts: [
+              {
+                patientId: 'p1',
+                patientLabel: 'Sam Lee',
+                probabilityPercent: 60,
+                predictedHours: 6,
+                action: 'Review disposition plan.',
+              },
+            ],
+            orientationPredictions: [
+              {
+                patientId: 'p1',
+                patientLabel: 'Sam Lee',
+                orientation: 'ward',
+                probabilityPercent: 70,
+              },
+            ],
+          }}
+        />
+      </MemoryRouter>,
+    );
+
+    expect(screen.queryByText(/Sam Lee/)).not.toBeInTheDocument();
+    expect(screen.getByText(/Patient-specific details are hidden for this role/)).toBeInTheDocument();
+    expect(screen.getAllByText('Patient').length).toBeGreaterThanOrEqual(3);
   });
 });
