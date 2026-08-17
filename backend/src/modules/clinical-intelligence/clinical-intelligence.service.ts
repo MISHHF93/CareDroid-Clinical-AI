@@ -577,13 +577,23 @@ export class ClinicalIntelligenceService {
   async getClinicalAuditExecutionLogs(
     userId: string,
     dto: ClinicalAuditQueryDto,
-    requestMeta: { ipAddress?: string; userAgent?: string } = {},
+    requestMeta: { ipAddress?: string; userAgent?: string; organizationId?: string } = {},
   ): Promise<ClinicalAuditResponseDto> {
     const runId = randomUUID();
     const limit = clampLogLimit(dto.limit, 50);
     const action =
       dto.action === AuditAction.PHI_ACCESS ? AuditAction.PHI_ACCESS : AuditAction.AI_QUERY;
-    const auditLogs = await this.auditService.findByAction(action, limit);
+    // HEAL-310: this call previously omitted organizationId entirely (unlike its sibling
+    // getAiExplainabilityTrace, which scopes by userId, and unlike AuditController.getLogs,
+    // which passes req.tenantContext?.organizationId into this exact same findByAction call).
+    // Any authenticated caller with VIEW_AUDIT_LOGS -- a permission granted to the PHYSICIAN
+    // role for "own patients only" -- got every organization's PHI-access/AI-query audit
+    // trail on the platform, not just their own.
+    const auditLogs = await this.auditService.findByAction(
+      action,
+      limit,
+      requestMeta.organizationId,
+    );
     const executionLogs = auditLogs
       .filter((log) => !log.resource || log.resource.startsWith('clinical-intelligence/'))
       .slice(0, limit)

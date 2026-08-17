@@ -187,6 +187,10 @@ export class ClinicalIntelligenceController {
       {
         ipAddress: req.ip || req.connection?.remoteAddress,
         userAgent: req.headers?.['user-agent'],
+        // HEAL-310: without this, every organization's clinical AI audit trail was
+        // visible to any caller with VIEW_AUDIT_LOGS -- see AuditController.getLogs()
+        // for the identical, already-correct pattern this mirrors.
+        organizationId: req.tenantContext?.organizationId,
       },
     );
   }

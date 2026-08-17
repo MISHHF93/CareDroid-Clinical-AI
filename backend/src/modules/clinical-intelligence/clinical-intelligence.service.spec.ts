@@ -537,4 +537,31 @@ describe('ClinicalIntelligenceService', () => {
       expect.arrayContaining(['differential-ai -> ranked_differential_generated -> ai_query']),
     );
   });
+
+  it('HEAL-310: scopes clinical-audit execution logs to the caller\'s own organization', async () => {
+    const service = createService();
+    auditService.findByAction.mockResolvedValue([]);
+
+    await service.getClinicalAuditExecutionLogs(
+      'physician-1',
+      { action: 'ai_query', limit: '25' },
+      { organizationId: 'org-a' },
+    );
+
+    // Before HEAL-310, findByAction was called with only (action, limit) -- no
+    // organizationId -- which returned every organization's PHI-access/AI-query
+    // audit trail to any caller with VIEW_AUDIT_LOGS (a permission granted to the
+    // PHYSICIAN role for "own patients only"). This asserts the org filter is
+    // actually threaded through to the query, not just accepted and dropped.
+    expect(auditService.findByAction).toHaveBeenCalledWith(AuditAction.AI_QUERY, 25, 'org-a');
+  });
+
+  it('HEAL-310: still queries all-organization logs when no tenant context is available (back-compat)', async () => {
+    const service = createService();
+    auditService.findByAction.mockResolvedValue([]);
+
+    await service.getClinicalAuditExecutionLogs('physician-1', { action: 'ai_query', limit: '25' });
+
+    expect(auditService.findByAction).toHaveBeenCalledWith(AuditAction.AI_QUERY, 25, undefined);
+  });
 });
