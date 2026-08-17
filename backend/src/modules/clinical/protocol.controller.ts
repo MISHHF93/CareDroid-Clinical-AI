@@ -15,11 +15,14 @@ import { Permission } from '../auth/enums/permission.enum';
 // auto-import or a search for "ProtocolController" can land on the wrong file -- no disclosing
 // comment existed before this one. See docs/architecture/CARE_DROID_MASTER_BACKLOG.md.
 @ApiTags('protocols')
+@ApiBearerAuth()
+@UseGuards(AuthGuard('jwt'), AuthorizationGuard)
 @Controller('protocols')
 export class ProtocolController {
   constructor(private readonly protocolService: ProtocolService) {}
 
   @Get()
+  @RequirePermission(Permission.READ_PHI)
   @ApiOperation({ summary: 'Get all protocols with search/filter' })
   @ApiResponse({ status: 200, description: 'Protocols retrieved successfully' })
   async findAll(@Query() searchDto: SearchProtocolDto) {
@@ -27,6 +30,7 @@ export class ProtocolController {
   }
 
   @Get('categories')
+  @RequirePermission(Permission.READ_PHI)
   @ApiOperation({ summary: 'Get all protocol categories' })
   @ApiResponse({ status: 200, description: 'Categories retrieved' })
   async getCategories() {
@@ -34,6 +38,7 @@ export class ProtocolController {
   }
 
   @Get(':id')
+  @RequirePermission(Permission.READ_PHI)
   @ApiOperation({ summary: 'Get protocol by ID' })
   @ApiResponse({ status: 200, description: 'Protocol found' })
   async findOne(@Param('id') id: string) {
@@ -41,9 +46,7 @@ export class ProtocolController {
   }
 
   @Post()
-  @UseGuards(AuthGuard('jwt'), AuthorizationGuard)
   @RequirePermission(Permission.WRITE_PHI)
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Create new protocol (admin only)' })
   @ApiResponse({ status: 201, description: 'Protocol created' })
   async create(@Body() createProtocolDto: CreateProtocolDto) {
@@ -51,9 +54,7 @@ export class ProtocolController {
   }
 
   @Put(':id')
-  @UseGuards(AuthGuard('jwt'), AuthorizationGuard)
   @RequirePermission(Permission.WRITE_PHI)
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update protocol (admin only)' })
   @ApiResponse({ status: 200, description: 'Protocol updated' })
   async update(@Param('id') id: string, @Body() updateProtocolDto: UpdateProtocolDto) {
@@ -61,9 +62,7 @@ export class ProtocolController {
   }
 
   @Delete(':id')
-  @UseGuards(AuthGuard('jwt'), AuthorizationGuard)
   @RequirePermission(Permission.DELETE_PHI)
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete protocol (admin only)' })
   @ApiResponse({ status: 200, description: 'Protocol deleted' })
   async remove(@Param('id') id: string) {

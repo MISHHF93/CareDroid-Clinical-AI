@@ -8,11 +8,14 @@ import { RequirePermission } from '../auth/decorators/permissions.decorator';
 import { Permission } from '../auth/enums/permission.enum';
 
 @ApiTags('drugs')
+@ApiBearerAuth()
+@UseGuards(AuthGuard('jwt'), AuthorizationGuard)
 @Controller('drugs')
 export class DrugController {
   constructor(private readonly drugService: DrugService) {}
 
   @Get()
+  @RequirePermission(Permission.READ_PHI)
   @ApiOperation({ summary: 'Get all drugs with search/filter' })
   @ApiResponse({ status: 200, description: 'Drugs retrieved successfully' })
   async findAll(@Query() searchDto: SearchDrugDto) {
@@ -20,6 +23,7 @@ export class DrugController {
   }
 
   @Get('categories')
+  @RequirePermission(Permission.READ_PHI)
   @ApiOperation({ summary: 'Get all drug categories' })
   @ApiResponse({ status: 200, description: 'Categories retrieved' })
   async getCategories() {
@@ -27,6 +31,7 @@ export class DrugController {
   }
 
   @Get(':id')
+  @RequirePermission(Permission.READ_PHI)
   @ApiOperation({ summary: 'Get drug by ID' })
   @ApiResponse({ status: 200, description: 'Drug found' })
   async findOne(@Param('id') id: string) {
@@ -34,9 +39,7 @@ export class DrugController {
   }
 
   @Post()
-  @UseGuards(AuthGuard('jwt'), AuthorizationGuard)
   @RequirePermission(Permission.WRITE_PHI)
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Create new drug (admin only)' })
   @ApiResponse({ status: 201, description: 'Drug created' })
   async create(@Body() createDrugDto: CreateDrugDto) {
@@ -44,9 +47,7 @@ export class DrugController {
   }
 
   @Put(':id')
-  @UseGuards(AuthGuard('jwt'), AuthorizationGuard)
   @RequirePermission(Permission.WRITE_PHI)
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update drug (admin only)' })
   @ApiResponse({ status: 200, description: 'Drug updated' })
   async update(@Param('id') id: string, @Body() updateDrugDto: UpdateDrugDto) {
@@ -54,9 +55,7 @@ export class DrugController {
   }
 
   @Delete(':id')
-  @UseGuards(AuthGuard('jwt'), AuthorizationGuard)
   @RequirePermission(Permission.DELETE_PHI)
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete drug (admin only)' })
   @ApiResponse({ status: 200, description: 'Drug deleted' })
   async remove(@Param('id') id: string) {
