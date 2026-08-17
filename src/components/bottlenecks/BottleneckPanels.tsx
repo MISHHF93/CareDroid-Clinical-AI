@@ -4,6 +4,7 @@ import type {
   BottleneckSeverity,
   ServiceHealth,
 } from '../../services/bottleneckRegistry';
+import { AiTruthLabel, bottleneckRootCauseSummaryTruthLabel } from '../ai/AiTruthLabel';
 import './BottleneckPanels.css';
 
 function severityLabel(severity: BottleneckSeverity): string {
@@ -205,6 +206,7 @@ export function RootCauseSummaryPanel({
         <span>AI Chief</span>
         <h3>Root Cause Summary</h3>
       </header>
+      <AiTruthLabel {...bottleneckRootCauseSummaryTruthLabel()} compact />
       <p>{summary}</p>
       <FallbackActionCard event={primary} />
     </section>

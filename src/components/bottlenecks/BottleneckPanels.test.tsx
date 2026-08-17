@@ -127,4 +127,15 @@ describe('RootCauseSummaryPanel PHI gate (HEAL-209)', () => {
     render(<RootCauseSummaryPanel registry={registryWith([technicalEvent()])} />);
     expect(screen.getByText(/Central node sync degraded/)).toBeInTheDocument();
   });
+
+  // Regression coverage: the "AI Chief / Root Cause Summary" header implies
+  // model-generated analysis, but the summary is a deterministic string-join
+  // of the top 3 active bottleneck titles (bottleneckRegistry.ts) with zero
+  // truth-label disclosure.
+  it('labels the root cause summary as Manual (deterministic aggregation), not silently AI-branded', () => {
+    render(<RootCauseSummaryPanel registry={registryWith([technicalEvent()])} />);
+    const label = screen.getByTestId('ai-truth-label-chip');
+    expect(label).toHaveTextContent('Manual');
+    expect(label.getAttribute('title')).toMatch(/bottleneck aggregation/i);
+  });
 });

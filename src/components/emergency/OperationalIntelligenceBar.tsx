@@ -5,6 +5,7 @@ import useAiChiefOrchestrator from '../../hooks/useAiChiefOrchestrator';
 import useUnifiedOperationalIntelligence from '../../hooks/useUnifiedOperationalIntelligence';
 import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
+import { AiTruthLabel, operationalIntelligenceAiChiefTruthLabel } from '../ai/AiTruthLabel';
 import './operational-intelligence-bar.css';
 
 /**
@@ -52,6 +53,7 @@ function OperationalIntelligenceBar() {
       <div className="operational-intelligence-bar__identity">
         <BrainCircuit size={16} aria-hidden="true" />
         <strong>AI Chief</strong>
+        <AiTruthLabel {...operationalIntelligenceAiChiefTruthLabel()} compact />
         <span className="operational-intelligence-bar__domains">
           {criticalDomainCount > 0
             ? `${criticalDomainCount} critical domain${criticalDomainCount === 1 ? '' : 's'}`

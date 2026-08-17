@@ -359,6 +359,60 @@ export function recognizeComplaintTruthLabel(): AiTruthLabelInfo {
   };
 }
 
+/**
+ * ReceptionDuplicateConfirm.tsx shows a "matchScore%" figure (e.g. "87% —
+ * possible_duplicate_review") when a new registration looks like it might
+ * already have a chart. src/utils/patientDuplicateDetection.ts's
+ * scorePatientDuplicate() computes this via plain weighted field-comparison
+ * arithmetic (fixed point additions per matched field: MRN, DOB, name,
+ * phone, etc.) -- zero model call, zero native-ai import. Same shape as
+ * resourceActivationTruthLabel()/receptionAiIntakeAssistTruthLabel() above:
+ * a bare "NN%" framing reads as measured probabilistic confidence to
+ * reception staff, but it's a deterministic weighted-sum score.
+ */
+export function patientDuplicateMatchTruthLabel(): AiTruthLabelInfo {
+  return {
+    state: 'Manual',
+    sourceContext:
+      'Duplicate-chart match score -- weighted field-comparison arithmetic, not a trained model',
+    reviewRequired: true,
+  };
+}
+
+/**
+ * BottleneckPanels.tsx's RootCauseSummaryPanel renders a "AI Chief / Root
+ * Cause Summary" header, but the summary text itself
+ * (bottleneckRegistry.ts's buildBottleneckRegistrySnapshot()) is a plain
+ * string-join of the top 3 active bottleneck titles -- zero model call. Same
+ * AI_CONFIGURATION_MAP.md finding as every other helper in this file: the
+ * "AI Chief" identity framing reads as model-generated analysis, but the
+ * summary is deterministic list aggregation.
+ */
+export function bottleneckRootCauseSummaryTruthLabel(): AiTruthLabelInfo {
+  return {
+    state: 'Manual',
+    sourceContext: 'AI Chief root cause summary -- top-3 active-bottleneck aggregation, not a trained model',
+    reviewRequired: true,
+  };
+}
+
+/**
+ * OperationalIntelligenceBar.tsx renders an "AI Chief" identity chip plus
+ * Risk/Suggest/Insight text sourced from useAiChiefOrchestrator (AI Chief's
+ * rule-based recommendation/risk engine, same source classified Manual by
+ * fromAiChiefRecommendation above) and useUnifiedOperationalIntelligence's
+ * fallback insight (deterministic threshold/rule scoring, same source
+ * classified Manual by hospitalCommandCenterRecommendationsTruthLabel
+ * above) -- but the bar itself carried no truth-label disclosure at all.
+ */
+export function operationalIntelligenceAiChiefTruthLabel(): AiTruthLabelInfo {
+  return {
+    state: 'Manual',
+    sourceContext: 'AI Chief operational risk/recommendation engine -- rule-based, not a trained model',
+    reviewRequired: true,
+  };
+}
+
 export type AiTruthLabelProps = AiTruthLabelInfo & {
   compact?: boolean;
   className?: string;

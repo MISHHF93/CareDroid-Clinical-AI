@@ -131,6 +131,21 @@ describe('OperationalIntelligenceBar', () => {
     expect(screen.queryByText('live feed')).not.toBeInTheDocument();
   });
 
+  // Regression coverage: the "AI Chief" identity chip plus Risk/Suggest text
+  // both read as model-generated analysis, but every source behind them
+  // (AI Chief's recommendation engine, the unified hook's fallback insight)
+  // is deterministic rule/threshold scoring with zero truth-label disclosure.
+  it('labels the AI Chief bar as Manual (rule-based), not silently AI-branded', () => {
+    aiChiefMock.mockReturnValue(baseAiChief());
+    unifiedMock.mockReturnValue(buildUnified());
+
+    renderBar();
+
+    const label = screen.getByTestId('ai-truth-label-chip');
+    expect(label).toHaveTextContent('Manual');
+    expect(label.getAttribute('title')).toMatch(/rule-based/i);
+  });
+
   it('renders nothing when the AI Chief surface is hidden for this role/route', () => {
     showAiChiefBar = false;
     aiChiefMock.mockReturnValue(baseAiChief());

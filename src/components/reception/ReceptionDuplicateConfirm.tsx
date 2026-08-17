@@ -1,4 +1,5 @@
 import type { PatientDuplicateCandidate } from '../../utils/patientDuplicateDetection';
+import { AiTruthLabel, patientDuplicateMatchTruthLabel } from '../ai/AiTruthLabel';
 import './ReceptionDuplicateConfirm.css';
 
 export type ReceptionDuplicateConfirmProps = {
@@ -31,6 +32,7 @@ export default function ReceptionDuplicateConfirm({
             A chart looks like a match ({top.matchScore}% — {top.recommendedAction.replace(/_/g, ' ')}
             ). Confirm with the patient before creating a new record.
           </p>
+          <AiTruthLabel {...patientDuplicateMatchTruthLabel()} compact />
         </header>
         <ul className="reception-dupe-confirm__list">
           {candidates.slice(0, 4).map((candidate) => (
