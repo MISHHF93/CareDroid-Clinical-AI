@@ -343,6 +343,18 @@ export default function EmergencySettings() {
   const canViewPatients = emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyPatients);
 
   const [draft, setDraft] = useState(() => mergeSettings(storeSettings));
+  // HEAL-301: saveGroup (below) backs 15 independent Save buttons, each
+  // gated only against its OWN group id (disabled={savingGroup === 'x'}),
+  // so two different groups can be saved concurrently. saveGroup used to
+  // close over `draft` at call time and merge onto that stale snapshot once
+  // its await resolved -- if group A's save resolved after group B's, A's
+  // stale pre-B draft would silently overwrite B's just-saved settings, with
+  // no error shown. Mirrors resetAllThresholds' own functional setDraft
+  // pattern just below, which already avoided this.
+  const draftRef = useRef(draft);
+  useEffect(() => {
+    draftRef.current = draft;
+  }, [draft]);
   const [loading, setLoading] = useState(true);
   const [savingGroup, setSavingGroup] = useState('');
   const [auditStatus, setAuditStatus] = useState('loading');
@@ -781,7 +793,7 @@ export default function EmergencySettings() {
 
     const result = await saveOrganizationEmergencyOsSettings(patch);
     if (result.ok) {
-      const nextSettings = mergeSettings(draft, payloadFromEnvelope(result));
+      const nextSettings = mergeSettings(draftRef.current, payloadFromEnvelope(result));
       setDraft(nextSettings);
       saveEmergencySettings?.(normalizePatchForStore(nextSettings));
       setError('');

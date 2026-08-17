@@ -375,6 +375,77 @@ describe('EmergencySettings', () => {
     );
   });
 
+  // Regression coverage (HEAL-301): saveGroup backs 15 independent Save
+  // buttons, each gated only against its OWN group id -- two different
+  // groups can be saved concurrently. saveGroup used to merge the server
+  // response onto `draft` captured at call time; if a slower save (started
+  // first) resolved AFTER a faster save (started second, for a DIFFERENT
+  // group), the slower one's stale pre-second-save draft would silently
+  // overwrite the second group's just-saved settings.
+  it('a slower "Save Capacity" does not overwrite a faster, more recent "Save Notifications"', async () => {
+    function deferred<T>() {
+      let resolve!: (value: T) => void;
+      const promise = new Promise<T>((r) => {
+        resolve = r;
+      });
+      return { promise, resolve };
+    }
+
+    const deferredCapacity = deferred<any>();
+    vi.mocked(saveOrganizationEmergencyOsSettings).mockImplementationOnce(() => deferredCapacity.promise);
+
+    render(
+      <MemoryRouter>
+        <EmergencySettings />
+      </MemoryRouter>,
+    );
+
+    await screen.findByRole('heading', { name: 'CareDroid Settings' });
+
+    // Capacity save starts first and stays pending.
+    fireEvent.change(screen.getByLabelText('Capacity orange %'), { target: { value: '76' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Save Capacity' }));
+
+    // Notifications save starts second and resolves immediately (uses the
+    // default mock implementation from beforeEach, which resolves right away).
+    fireEvent.click(screen.getByLabelText('Email notifications'));
+    fireEvent.click(screen.getByRole('button', { name: 'Save Notifications' }));
+
+    await waitFor(() => {
+      expect(saveEmergencySettings).toHaveBeenCalledWith(
+        expect.objectContaining({
+          notificationSettings: expect.objectContaining({ emailEnabled: true }),
+        }),
+      );
+    });
+
+    // Capacity's slower response now resolves, after notifications' save has
+    // already landed. Deliberately does NOT spread ...mockSettings here --
+    // a real PATCH response for the capacity endpoint only reflects
+    // capacity-related fields, not a stale snapshot of every other group.
+    deferredCapacity.resolve({
+      ok: true,
+      data: { data: { capacityThresholds: { ...mockSettings.capacityThresholds, warningPercent: 76 } } },
+      message: '',
+    });
+
+    await waitFor(() => {
+      expect(saveEmergencySettings).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          capacityThresholds: expect.objectContaining({ warningPercent: 76 }),
+        }),
+      );
+    });
+
+    // The merge that just landed for "capacity" must still carry the email-
+    // notifications change saved by "notifications" moments earlier, not revert it.
+    expect(saveEmergencySettings).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        notificationSettings: expect.objectContaining({ emailEnabled: true }),
+      }),
+    );
+  });
+
   it('serializes store action audit logs to CSV', () => {
     expect(
       auditLogToCsv([
