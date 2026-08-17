@@ -7,7 +7,11 @@ import {
   FEATURE_FLAG_REGISTRY,
   FEATURE_FLAG_CATEGORIES,
 } from '../config/featureFlags.config';
-import { CAREDROID_SUITES, type MaturityLabel } from '../../lib/features/suiteRegistry';
+import {
+  CAREDROID_SUITES,
+  FEATURE_SUITE_ASSIGNMENTS,
+  type MaturityLabel,
+} from '../../lib/features/suiteRegistry';
 import { FEATURE_REGISTRY, type Feature } from '../../lib/features/featureRegistry';
 import { isSimulationModeActive } from './simulationModeService';
 
@@ -76,11 +80,38 @@ function enhancementEntry(
   };
 }
 
+/**
+ * Honest-disclosure ordering, least- to most-mature: a suite whose real
+ * per-feature assignments are a mix of 'live' and something less mature should
+ * report the LEAST mature label present, not the most flattering one -- this is
+ * a transparency panel, and erring toward under-claiming is the safe direction
+ * for a surface whose whole purpose is to not overstate what's real.
+ */
+const MATURITY_RANK: Record<MaturityLabel, number> = { planned: 0, demo: 1, preview: 2, live: 3 };
+
+export function worstMaturity(maturities: readonly MaturityLabel[]): MaturityLabel | undefined {
+  return maturities.reduce<MaturityLabel | undefined>(
+    (worst, current) =>
+      worst === undefined || MATURITY_RANK[current] < MATURITY_RANK[worst] ? current : worst,
+    undefined,
+  );
+}
+
 function suiteEntry(
   suite: (typeof CAREDROID_SUITES)[number],
   simulationActive: boolean,
 ): PlatformFeatureTransparencyEntry {
-  const assignmentMaturity = FEATURE_REGISTRY.find((feature) => feature.suiteId === suite.id)?.maturity;
+  // FEATURE_SUITE_ASSIGNMENTS (suiteRegistry.ts) is the real, per-feature-detailed
+  // maturity registry for this suite -- 87 hand-tracked assignments across 11
+  // suites. This used to instead look up FEATURE_REGISTRY (a DIFFERENT, parallel
+  // registry in featureRegistry.ts) and take whichever single feature happened to
+  // be the first one .find()-matched by suiteId, using that one arbitrary
+  // feature's maturity to represent the entire suite -- silently wrong whenever a
+  // suite's features didn't all share the same maturity (most of them don't).
+  const suiteAssignments = Object.values(FEATURE_SUITE_ASSIGNMENTS).filter(
+    (assignment) => assignment.suiteId === suite.id,
+  );
+  const assignmentMaturity = worstMaturity(suiteAssignments.map((assignment) => assignment.maturity));
   const baseStatus = assignmentMaturity
     ? SUITE_MATURITY_TO_TRANSPARENCY[assignmentMaturity]
     : 'partial';
