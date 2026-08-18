@@ -108,6 +108,23 @@ export class UserProfileService {
         'Workspace access is managed by your organization administrator.',
       );
     }
+    // HEAL-333: organizationId had the exact same self-escalation exposure
+    // as role/permissions/allowedWorkspaces above (same bug class HEAL-196
+    // already fixed for platform/me/role-profile's roleProfileId field) but
+    // was missed here -- any authenticated user, any role, could PATCH
+    // /profile/me { organizationId } and have it persisted with zero
+    // OrganizationMembership check. JwtStrategy reloads the profile fresh
+    // on every request, so the spoofed value takes effect immediately, and
+    // chat.controller.ts/clinical-intelligence.controller.ts both read
+    // req.user.profile.organizationId directly (bypassing
+    // TenantContextService's membership-verified resolution) to scope RAG
+    // retrieval -- letting any user read another organization's privately-
+    // ingested guideline/knowledge documents they were never a member of.
+    if (dto.organizationId !== undefined && !options.canAssignRole) {
+      throw new BadRequestException(
+        'Organization assignment is managed by your organization administrator.',
+      );
+    }
     const user = await this.loadUser(userId);
     const profile = await this.getOrCreateUserProfile(user);
     const currentRole = normalizeSaasRole(profile.roleProfileId || user.role);
