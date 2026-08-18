@@ -1,5 +1,7 @@
 import { GovernanceController } from './governance.controller';
 
+const mockReq = (organizationId = 'org-test') => ({ tenantContext: { organizationId } }) as any;
+
 describe('GovernanceController', () => {
   const buildController = (governanceOverrides: Record<string, any> = {}) => {
     const platformSystemsService = {
@@ -49,7 +51,7 @@ describe('GovernanceController', () => {
   it('routes privacy requests through the durable governance service', async () => {
     const { controller, platformGovernanceService } = buildController();
 
-    await expect(controller.getPrivacyRequests()).resolves.toEqual([{ id: 'privacy-1' }]);
+    await expect(controller.getPrivacyRequests(mockReq())).resolves.toEqual([{ id: 'privacy-1' }]);
 
     expect(platformGovernanceService.listPrivacyRequests).toHaveBeenCalled();
   });
@@ -130,7 +132,7 @@ describe('GovernanceController', () => {
   it('records audit timeline views but returns the audit timeline contract', async () => {
     const { controller, platformGovernanceService, platformSystemsService } = buildController();
 
-    await expect(controller.getAuditRunTimeline('run-1')).resolves.toEqual({
+    await expect(controller.getAuditRunTimeline('run-1', mockReq())).resolves.toEqual({
       runId: 'run-1',
       timeline: [],
     });
@@ -150,7 +152,7 @@ describe('GovernanceController', () => {
     });
 
     await expect(
-      controller.reviewPrivacyRequest('missing', { decision: 'reject' }),
+      controller.reviewPrivacyRequest('missing', { decision: 'reject' }, mockReq()),
     ).resolves.toEqual(expect.objectContaining({ capabilityId: 'privacy-center', id: 'missing' }));
 
     expect(platformSystemsService.demo).toHaveBeenCalledWith(

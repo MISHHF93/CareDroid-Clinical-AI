@@ -386,9 +386,20 @@ export class PlatformConsentRecord {
 @Entity('platform_privacy_requests')
 @Index(['patientId', 'status'])
 @Index(['requestType', 'createdAt'])
+@Index(['organizationId'])
 export class PlatformPrivacyRequest {
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  /**
+   * Nullable: existing rows predate this column with no reliable org signal
+   * to backfill from. A null row is treated as legacy/unscoped -- visible to
+   * every org's reads until reconciled, never assigned to a different org's
+   * own row. Matches the pattern already established for PlatformReviewItem/
+   * PlatformConsentRecord (see getConsent()'s IsNull()-OR read shape).
+   */
+  @Column({ type: 'uuid', nullable: true })
+  organizationId: string;
 
   @Column({ type: 'varchar', length: 96 })
   patientId: string;
@@ -425,9 +436,14 @@ export class PlatformPrivacyRequest {
 @Index(['correlationId'])
 @Index(['capabilityId', 'createdAt'])
 @Index(['eventType', 'status'])
+@Index(['organizationId'])
 export class PlatformObservabilityEvent {
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  /** See PlatformPrivacyRequest.organizationId for the nullable/legacy-row rationale. */
+  @Column({ type: 'uuid', nullable: true })
+  organizationId: string;
 
   @Column({ type: 'varchar', length: 96, nullable: true })
   correlationId: string;

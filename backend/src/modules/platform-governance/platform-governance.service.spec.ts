@@ -376,4 +376,107 @@ describe('PlatformGovernanceService', () => {
       );
     });
   });
+
+  describe('HEAL-347: tenant isolation on privacy requests and the PHI-access observability log', () => {
+    // PlatformPrivacyRequest/PlatformObservabilityEvent never got the
+    // organizationId column HEAL-338 already used for review items/consent
+    // -- any MANAGE_PRIVACY holder could read/decide another org's
+    // data-export/delete request, or read the PHI-access audit trail itself
+    // (getPrivacyAccessLog/recentObservability) platform-wide, across 4
+    // separate controllers (platform-governance, platform-systems/governance,
+    // privacy-center, ehr-audit/llm-security/observability's shared
+    // recentObservability() call).
+    it('stamps organizationId on createPrivacyRequest', async () => {
+      const { service, repositories } = buildService({ privacyRequests: [] });
+
+      await service.createPrivacyRequest('patient-1', 'export', {}, 'org-a');
+      expect(repositories.privacyRequests.create).toHaveBeenCalledWith(
+        expect.objectContaining({ patientId: 'patient-1', organizationId: 'org-a' }),
+      );
+    });
+
+    it('scopes listPrivacyRequests to the caller\'s organization (own-org OR legacy/null rows)', async () => {
+      const { service, repositories } = buildService({ privacyRequests: [] });
+
+      await service.listPrivacyRequests(undefined, 'org-a');
+      expect(repositories.privacyRequests.find).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: [{ organizationId: 'org-a' }, { organizationId: expect.anything() }],
+        }),
+      );
+
+      await service.listPrivacyRequests('patient-1', 'org-a');
+      expect(repositories.privacyRequests.find).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: [
+            { patientId: 'patient-1', organizationId: 'org-a' },
+            { patientId: 'patient-1', organizationId: expect.anything() },
+          ],
+        }),
+      );
+    });
+
+    it('does not let reviewPrivacyRequest act on another organization\'s privacy request', async () => {
+      const { service } = buildService({
+        privacyRequests: [{ id: 'req-1', organizationId: 'org-a', patientId: 'patient-1' }],
+      });
+
+      await expect(
+        service.reviewPrivacyRequest('req-1', { decision: 'approve' }, 'org-b'),
+      ).resolves.toBeNull();
+      await expect(
+        service.reviewPrivacyRequest('req-1', { decision: 'approve' }, 'org-a'),
+      ).resolves.toEqual(
+        expect.objectContaining({ id: 'req-1', status: PlatformGovernanceStatus.RESOLVED }),
+      );
+    });
+
+    it('scopes getPrivacyAccessLog and recentObservability to the caller\'s organization', async () => {
+      const { service, repositories } = buildService({ observabilityEvents: [] });
+
+      await service.getPrivacyAccessLog('patient-1', 'org-a');
+      expect(repositories.observabilityEvents.find).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: [{ organizationId: 'org-a' }, { organizationId: expect.anything() }],
+        }),
+      );
+
+      await service.recentObservability('org-a');
+      expect(repositories.observabilityEvents.find).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: [{ organizationId: 'org-a' }, { organizationId: expect.anything() }],
+        }),
+      );
+    });
+
+    it('stamps organizationId on recordObservabilityEvent when supplied', async () => {
+      const { service, repositories } = buildService({ observabilityEvents: [] });
+
+      await service.recordObservabilityEvent({
+        organizationId: 'org-a',
+        capabilityId: 'audit-trail-spine',
+        eventType: 'audit.integrity.checked',
+      });
+      expect(repositories.observabilityEvents.create).toHaveBeenCalledWith(
+        expect.objectContaining({ organizationId: 'org-a' }),
+      );
+    });
+
+    it('omitting organizationId preserves unfiltered behavior for callers with no tenant context (e.g. system bootstrap)', async () => {
+      const { service, repositories } = buildService({
+        privacyRequests: [],
+        observabilityEvents: [],
+      });
+
+      await service.listPrivacyRequests();
+      expect(repositories.privacyRequests.find).toHaveBeenCalledWith(
+        expect.objectContaining({ where: {} }),
+      );
+
+      await service.recentObservability();
+      expect(repositories.observabilityEvents.find).toHaveBeenCalledWith(
+        expect.objectContaining({ where: {} }),
+      );
+    });
+  });
 });

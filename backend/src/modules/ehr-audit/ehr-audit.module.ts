@@ -1,4 +1,4 @@
-import { Controller, Get, Injectable, Module, UseGuards } from '@nestjs/common';
+import { Controller, Get, Injectable, Module, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Permissions } from '../auth/decorators/permissions.decorator';
 import { Permission } from '../auth/enums/permission.enum';
@@ -9,8 +9,8 @@ import { PlatformGovernanceModule, PlatformGovernanceService } from '../platform
 export class AuditTrailService {
   constructor(private readonly platformGovernance: PlatformGovernanceService) {}
 
-  async getSummary() {
-    const observability = await this.platformGovernance.recentObservability();
+  async getSummary(organizationId?: string) {
+    const observability = await this.platformGovernance.recentObservability(organizationId);
     return {
       trackedEvents: [
         'tool_launches',
@@ -33,8 +33,8 @@ export class EhrAuditController {
 
   @Get('summary')
   @Permissions(Permission.VIEW_AUDIT_LOGS)
-  getSummary() {
-    return this.auditTrail.getSummary();
+  getSummary(@Req() req: any) {
+    return this.auditTrail.getSummary(req.tenantContext?.organizationId);
   }
 }
 

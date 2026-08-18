@@ -123,8 +123,14 @@ export class PlatformGovernanceController {
     @Param('patientId') patientId: string,
     @Param('requestType') requestType: string,
     @Body() body: PrivacyRequestDto,
+    @Req() req: any,
   ) {
-    return this.platformGovernanceService.createPrivacyRequest(patientId, requestType, { ...body });
+    return this.platformGovernanceService.createPrivacyRequest(
+      patientId,
+      requestType,
+      { ...body },
+      req.tenantContext?.organizationId,
+    );
   }
 
   @Get('source-provenance/:sourceId')
@@ -160,7 +166,7 @@ export class PlatformGovernanceController {
 
   @Get('observability')
   @Permissions(Permission.VIEW_ANALYTICS)
-  getObservability() {
-    return this.platformGovernanceService.recentObservability();
+  getObservability(@Req() req: any) {
+    return this.platformGovernanceService.recentObservability(req.tenantContext?.organizationId);
   }
 }

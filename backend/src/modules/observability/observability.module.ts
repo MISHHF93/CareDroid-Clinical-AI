@@ -1,4 +1,4 @@
-import { Controller, Get, Injectable, Module, OnModuleInit, UseGuards } from '@nestjs/common';
+import { Controller, Get, Injectable, Module, OnModuleInit, Req, UseGuards } from '@nestjs/common';
 import { registerPlatformTelemetrySink } from '../../common/observability/platform-telemetry-sink';
 import { PlatformTelemetryController } from './platform-telemetry.controller';
 import { PlatformTelemetryService } from './platform-telemetry.service';
@@ -20,9 +20,9 @@ export class ObservabilityService implements OnModuleInit {
     registerPlatformTelemetrySink(this.platformTelemetry);
   }
 
-  async getSystemHealth() {
+  async getSystemHealth(organizationId?: string) {
     const config = getEnvironmentConfig();
-    const observability = await this.platformGovernance.recentObservability();
+    const observability = await this.platformGovernance.recentObservability(organizationId);
     return {
       frontendVersion: process.env.FRONTEND_VERSION || process.env.npm_package_version || 'local',
       backendVersion: process.env.BACKEND_VERSION || config.deployment.version || 'local',
@@ -35,8 +35,8 @@ export class ObservabilityService implements OnModuleInit {
     };
   }
 
-  async getSaasHealthCenter() {
-    const systemHealth = await this.getSystemHealth();
+  async getSaasHealthCenter(organizationId?: string) {
+    const systemHealth = await this.getSystemHealth(organizationId);
     const observability = (systemHealth.observability || {}) as {
       status?: string;
       health?: Record<string, string>;
@@ -223,8 +223,8 @@ export class ObservabilityController {
 
   @Get()
   @Permissions(Permission.VIEW_OPERATIONS, Permission.VIEW_OBSERVABILITY)
-  getSystemHealth() {
-    return this.observability.getSystemHealth();
+  getSystemHealth(@Req() req: any) {
+    return this.observability.getSystemHealth(req.tenantContext?.organizationId);
   }
 }
 
@@ -235,8 +235,8 @@ export class SaasHealthController {
 
   @Get()
   @Permissions(Permission.VIEW_OPERATIONS, Permission.VIEW_OBSERVABILITY)
-  getSaasHealthCenter() {
-    return this.observability.getSaasHealthCenter();
+  getSaasHealthCenter(@Req() req: any) {
+    return this.observability.getSaasHealthCenter(req.tenantContext?.organizationId);
   }
 }
 

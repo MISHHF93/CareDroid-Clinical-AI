@@ -519,6 +519,7 @@ export class PlatformGovernanceService {
     try {
       return await this.observabilityEvents.save(
         this.observabilityEvents.create({
+          organizationId: input.organizationId,
           correlationId: input.correlationId,
           capabilityId: input.capabilityId || 'unknown',
           eventType: input.eventType || 'platform.event',
@@ -681,13 +682,25 @@ export class PlatformGovernanceService {
     };
   }
 
+  // Closes the 2nd half of the platform-governance tenant-scoping gap
+  // (HEAL-338 fixed review-items/consent, which already had organizationId;
+  // PlatformPrivacyRequest/PlatformObservabilityEvent never did). Any
+  // MANAGE_PRIVACY holder could previously read/decide another org's
+  // data-export/delete request, or read the PHI-ACCESS AUDIT TRAIL ITSELF
+  // platform-wide via getPrivacyAccessLog/recentObservability -- the most
+  // severe part of this gap, since that log is the record of who touched
+  // PHI. Same own-org-OR-null read shape as getConsent(); reviewPrivacyRequest
+  // returns null on a cross-org id, same as getReviewItem (no existence leak,
+  // caller-side handling unchanged).
   async createPrivacyRequest(
     patientId: string,
     requestType: string,
     body: Record<string, any> = {},
+    organizationId?: string,
   ) {
     const request = await this.privacyRequests.save(
       this.privacyRequests.create({
+        organizationId,
         patientId,
         requestType,
         status: PlatformGovernanceStatus.NEEDS_REVIEW,
@@ -705,17 +718,30 @@ export class PlatformGovernanceService {
     return request;
   }
 
-  async listPrivacyRequests(patientId?: string) {
+  async listPrivacyRequests(patientId?: string, organizationId?: string) {
+    const patientClause = patientId ? { patientId } : {};
     return this.privacyRequests.find({
-      where: patientId ? { patientId } : {},
+      where: organizationId
+        ? [
+            { ...patientClause, organizationId },
+            { ...patientClause, organizationId: IsNull() },
+          ]
+        : patientClause,
       order: { createdAt: 'DESC' },
       take: 50,
     });
   }
 
-  async reviewPrivacyRequest(requestId: string, decision: Record<string, any>) {
+  async reviewPrivacyRequest(
+    requestId: string,
+    decision: Record<string, any>,
+    organizationId?: string,
+  ) {
     const request = await this.privacyRequests.findOne({ where: { id: requestId } });
     if (!request) return null;
+    if (organizationId && request.organizationId && request.organizationId !== organizationId) {
+      return null;
+    }
     request.status =
       decision.decision === 'approve'
         ? PlatformGovernanceStatus.RESOLVED
@@ -732,8 +758,9 @@ export class PlatformGovernanceService {
     return saved;
   }
 
-  async getPrivacyAccessLog(patientId?: string) {
+  async getPrivacyAccessLog(patientId?: string, organizationId?: string) {
     const events = await this.observabilityEvents.find({
+      where: organizationId ? [{ organizationId }, { organizationId: IsNull() }] : {},
       order: { createdAt: 'DESC' },
       take: 50,
     });
@@ -872,8 +899,12 @@ export class PlatformGovernanceService {
     };
   }
 
-  async recentObservability() {
-    const events = await this.observabilityEvents.find({ order: { createdAt: 'DESC' }, take: 50 });
+  async recentObservability(organizationId?: string) {
+    const events = await this.observabilityEvents.find({
+      where: organizationId ? [{ organizationId }, { organizationId: IsNull() }] : {},
+      order: { createdAt: 'DESC' },
+      take: 50,
+    });
     return {
       status: 'synthetic_ready',
       events,

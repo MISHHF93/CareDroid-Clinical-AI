@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Injectable, Module, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Injectable, Module, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Permissions } from '../auth/decorators/permissions.decorator';
 import { Permission } from '../auth/enums/permission.enum';
@@ -9,21 +9,28 @@ import { PlatformGovernanceModule, PlatformGovernanceService } from '../platform
 export class PrivacyService {
   constructor(private readonly platformGovernance: PlatformGovernanceService) {}
 
-  async getSummary() {
+  // Was the most exposed of the 3 controllers sharing these unscoped
+  // service methods (see PlatformPrivacyRequest/PlatformObservabilityEvent's
+  // organizationId doc comments): zero @Req() at all, gated only by
+  // VIEW_PRIVACY_CENTER/REQUEST_DATA_EXPORT -- any holder of those got every
+  // org's export/delete requests AND the full PHI-access audit log via a
+  // single GET /privacy/summary.
+  async getSummary(organizationId?: string) {
     return {
-      consentManagement: await this.platformGovernance.getConsent('demo-patient'),
+      consentManagement: await this.platformGovernance.getConsent('demo-patient', organizationId),
       retentionPolicy: { status: 'configured_by_policy', defaultMode: 'minimum_necessary' },
-      exportData: await this.platformGovernance.listPrivacyRequests(),
-      deleteData: await this.platformGovernance.listPrivacyRequests(),
-      auditAccess: await this.platformGovernance.getPrivacyAccessLog(),
+      exportData: await this.platformGovernance.listPrivacyRequests(undefined, organizationId),
+      deleteData: await this.platformGovernance.listPrivacyRequests(undefined, organizationId),
+      auditAccess: await this.platformGovernance.getPrivacyAccessLog(undefined, organizationId),
     };
   }
 
-  createRequest(body: Record<string, any>) {
+  createRequest(body: Record<string, any>, organizationId?: string) {
     return this.platformGovernance.createPrivacyRequest(
       String(body.patientId || 'demo-patient'),
       String(body.requestType || 'export'),
       body,
+      organizationId,
     );
   }
 }
@@ -35,14 +42,14 @@ export class PrivacyCenterController {
 
   @Get('summary')
   @Permissions(Permission.VIEW_PRIVACY_CENTER)
-  getSummary() {
-    return this.privacy.getSummary();
+  getSummary(@Req() req: any) {
+    return this.privacy.getSummary(req.tenantContext?.organizationId);
   }
 
   @Post('requests')
   @Permissions(Permission.REQUEST_DATA_EXPORT)
-  createRequest(@Body() body: Record<string, unknown>) {
-    return this.privacy.createRequest(body);
+  createRequest(@Body() body: Record<string, unknown>, @Req() req: any) {
+    return this.privacy.createRequest(body, req.tenantContext?.organizationId);
   }
 }
 

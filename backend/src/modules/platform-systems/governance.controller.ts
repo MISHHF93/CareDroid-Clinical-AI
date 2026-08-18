@@ -332,18 +332,24 @@ export class GovernanceController {
 
   @Get('privacy/access-log')
   @Permissions(Permission.MANAGE_PRIVACY)
-  async getPrivacyAccessLog() {
+  async getPrivacyAccessLog(@Req() req: any) {
     if (this.platformGovernanceService) {
-      return this.platformGovernanceService.getPrivacyAccessLog();
+      return this.platformGovernanceService.getPrivacyAccessLog(
+        undefined,
+        req.tenantContext?.organizationId,
+      );
     }
     return this.platformSystemsService.demo('privacy-center');
   }
 
   @Get('privacy/patient/:patientId/access-log')
   @Permissions(Permission.MANAGE_PRIVACY, Permission.READ_PHI)
-  async getPatientPrivacyAccessLog(@Param('patientId') patientId: string) {
+  async getPatientPrivacyAccessLog(@Param('patientId') patientId: string, @Req() req: any) {
     if (this.platformGovernanceService) {
-      return this.platformGovernanceService.getPrivacyAccessLog(patientId);
+      return this.platformGovernanceService.getPrivacyAccessLog(
+        patientId,
+        req.tenantContext?.organizationId,
+      );
     }
     return this.platformSystemsService.demo('privacy-center', patientId);
   }
@@ -351,12 +357,13 @@ export class GovernanceController {
   @Post('privacy/export')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.MANAGE_PRIVACY)
-  async requestPrivacyExport(@Body() body: PrivacyRequestDto) {
+  async requestPrivacyExport(@Body() body: PrivacyRequestDto, @Req() req: any) {
     if (this.platformGovernanceService) {
       return this.platformGovernanceService.createPrivacyRequest(
         String(body.patientId || 'demo-patient'),
         'export',
         body,
+        req.tenantContext?.organizationId,
       );
     }
     return this.platformSystemsService.demo('privacy-center', 'privacy-export', { ...body });
@@ -365,12 +372,13 @@ export class GovernanceController {
   @Post('privacy/delete-request')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.MANAGE_PRIVACY)
-  async requestPrivacyDelete(@Body() body: PrivacyRequestDto) {
+  async requestPrivacyDelete(@Body() body: PrivacyRequestDto, @Req() req: any) {
     if (this.platformGovernanceService) {
       return this.platformGovernanceService.createPrivacyRequest(
         String(body.patientId || 'demo-patient'),
         'delete',
         body,
+        req.tenantContext?.organizationId,
       );
     }
     return this.platformSystemsService.demo('privacy-center', 'privacy-delete-request', {
@@ -380,9 +388,12 @@ export class GovernanceController {
 
   @Get('privacy/requests')
   @Permissions(Permission.MANAGE_PRIVACY)
-  async getPrivacyRequests() {
+  async getPrivacyRequests(@Req() req: any) {
     if (this.platformGovernanceService) {
-      return this.platformGovernanceService.listPrivacyRequests();
+      return this.platformGovernanceService.listPrivacyRequests(
+        undefined,
+        req.tenantContext?.organizationId,
+      );
     }
     return this.platformSystemsService.demo('privacy-center', 'privacy-requests');
   }
@@ -393,11 +404,14 @@ export class GovernanceController {
   async reviewPrivacyRequest(
     @Param('requestId') requestId: string,
     @Body() body: GovernanceDecisionDto,
+    @Req() req: any,
   ) {
     if (this.platformGovernanceService) {
-      const result = await this.platformGovernanceService.reviewPrivacyRequest(requestId, {
-        ...body,
-      });
+      const result = await this.platformGovernanceService.reviewPrivacyRequest(
+        requestId,
+        { ...body },
+        req.tenantContext?.organizationId,
+      );
       if (result) return result;
     }
     return this.platformSystemsService.demo('privacy-center', requestId, { ...body });
@@ -662,9 +676,10 @@ export class GovernanceController {
 
   @Get('audit/runs/:runId')
   @Permissions(Permission.VIEW_AUDIT_LOGS)
-  async getAuditRunTimeline(@Param('runId') runId: string) {
+  async getAuditRunTimeline(@Param('runId') runId: string, @Req() req: any) {
     if (this.platformGovernanceService) {
       await this.platformGovernanceService.recordObservabilityEvent({
+        organizationId: req.tenantContext?.organizationId,
         correlationId: runId,
         capabilityId: 'ai-run-audit-timeline',
         eventType: 'audit.ai_run.timeline_viewed',
@@ -676,18 +691,22 @@ export class GovernanceController {
 
   @Get('audit/patients/:patientId/access')
   @Permissions(Permission.VIEW_AUDIT_LOGS, Permission.READ_PHI)
-  async getPatientAuditAccess(@Param('patientId') patientId: string) {
+  async getPatientAuditAccess(@Param('patientId') patientId: string, @Req() req: any) {
     if (this.platformGovernanceService) {
-      return this.platformGovernanceService.getPrivacyAccessLog(patientId);
+      return this.platformGovernanceService.getPrivacyAccessLog(
+        patientId,
+        req.tenantContext?.organizationId,
+      );
     }
     return this.platformSystemsService.demo('audit-trail-spine', patientId);
   }
 
   @Get('audit/integrity/status')
   @Permissions(Permission.VERIFY_AUDIT_INTEGRITY)
-  async getAuditIntegrityStatus() {
+  async getAuditIntegrityStatus(@Req() req: any) {
     if (this.platformGovernanceService) {
       await this.platformGovernanceService.recordObservabilityEvent({
+        organizationId: req.tenantContext?.organizationId,
         capabilityId: 'audit-trail-spine',
         eventType: 'audit.integrity.checked',
         status: 'checked',
@@ -712,24 +731,24 @@ export class GovernanceController {
 
   @Get('operations/health')
   @Permissions(Permission.VIEW_ANALYTICS)
-  async getOperationsHealth() {
+  async getOperationsHealth(@Req() req: any) {
     if (this.platformGovernanceService) {
-      return this.platformGovernanceService.recentObservability();
+      return this.platformGovernanceService.recentObservability(req.tenantContext?.organizationId);
     }
     return this.platformSystemsService.getOperationsHealth();
   }
 
   @Get('operations/service-health')
   @Permissions(Permission.VIEW_ANALYTICS)
-  async getServiceHealth() {
-    return this.getOperationsHealth();
+  async getServiceHealth(@Req() req: any) {
+    return this.getOperationsHealth(req);
   }
 
   @Get('operations/observability/summary')
   @Permissions(Permission.VIEW_ANALYTICS)
-  async getObservabilitySummary() {
+  async getObservabilitySummary(@Req() req: any) {
     if (this.platformGovernanceService) {
-      return this.platformGovernanceService.recentObservability();
+      return this.platformGovernanceService.recentObservability(req.tenantContext?.organizationId);
     }
     return this.platformSystemsService.getObservabilitySummary();
   }
