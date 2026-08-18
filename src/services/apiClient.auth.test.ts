@@ -34,6 +34,8 @@ import {
   apiFetchJson,
   buildStreamUrl,
   getStoredAccessToken,
+  isDevSession401RetryEligible,
+  isRefreshedDevSessionUsable,
 } from './apiClient';
 import { clearTenantContext, setTenantContext } from './tenantContextStore';
 
@@ -160,6 +162,45 @@ describe('apiFetch auth header', () => {
 
     expect(response.status).toBe(401);
     expect(fetch).not.toHaveBeenCalled();
+  });
+});
+
+describe('isDevSession401RetryEligible (HEAL-341)', () => {
+  it('is eligible for a 401 on a protected API path not yet retried', () => {
+    expect(isDevSession401RetryEligible(401, '/api/emergency/whiteboard', false)).toBe(true);
+  });
+
+  it('is not eligible for a non-401 status', () => {
+    expect(isDevSession401RetryEligible(200, '/api/emergency/whiteboard', false)).toBe(false);
+    expect(isDevSession401RetryEligible(403, '/api/emergency/whiteboard', false)).toBe(false);
+  });
+
+  it('is not eligible once already retried once, to prevent a retry loop', () => {
+    expect(isDevSession401RetryEligible(401, '/api/emergency/whiteboard', true)).toBe(false);
+  });
+
+  it('is not eligible for a public API path', () => {
+    expect(isDevSession401RetryEligible(401, '/api/auth/dev-session', false)).toBe(false);
+  });
+
+  it('is not eligible for a non-API path', () => {
+    expect(isDevSession401RetryEligible(401, '/some/other/path', false)).toBe(false);
+  });
+});
+
+describe('isRefreshedDevSessionUsable (HEAL-341)', () => {
+  it('treats a freshly-fetched dev session as usable', () => {
+    expect(isRefreshedDevSessionUsable('dev-session')).toBe(true);
+  });
+
+  it('treats an already-valid cached JWT as usable', () => {
+    expect(isRefreshedDevSessionUsable('cached-jwt')).toBe(true);
+  });
+
+  it('does not treat a fallback/offline bypass as usable -- retrying would just reproduce the 401', () => {
+    expect(isRefreshedDevSessionUsable('fallback-bypass')).toBe(false);
+    expect(isRefreshedDevSessionUsable('local-demo-bypass')).toBe(false);
+    expect(isRefreshedDevSessionUsable(undefined)).toBe(false);
   });
 });
 

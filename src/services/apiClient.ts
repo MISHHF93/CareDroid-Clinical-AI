@@ -339,11 +339,12 @@ const mergeAbortSignals = (timeoutMs, userSignal) => {
   };
 };
 
-export const apiFetch = async (path, options: any = {}) => {
+const performApiFetch = async (path, options: any = {}) => {
   const {
     timeoutMs = DEFAULT_API_TIMEOUT_MS,
     signal: userSignal,
     headers: optionHeaders,
+    __devSessionRetried,
     ...fetchOptions
   } = options;
   const requestMethod = String(fetchOptions.method || 'GET').toUpperCase();
@@ -415,6 +416,51 @@ export const apiFetch = async (path, options: any = {}) => {
   } finally {
     cleanup();
   }
+};
+
+// HEAL-341: bootstrapDevSessionIfNeeded() only re-fetches a dev session when
+// the CLIENT-side token looks unusable (missing/malformed/JWT-expired) --
+// it has no way to detect a token the backend itself has invalidated (e.g.
+// a dev-stack backend restart, which invalidates in-memory sessions without
+// changing the token's own expiry). Every hook that calls apiFetch/
+// apiFetchJson directly on mount had no retry of its own, so that single
+// stale-but-not-expired token produced a burst of simultaneous, silent,
+// unretried 401s across every in-flight page-mount fetch (observed live:
+// 8-34 at once), leaving pages stuck on "Loading..." indefinitely. Force a
+// fresh dev session once on a protected-path 401 and retry the same
+// request once, instead of requiring each of the 15+ call sites to
+// implement their own recovery.
+// Extracted as pure, exported predicates (rather than inlined) so the
+// retry decision can be unit-tested directly -- isDev itself resolves to
+// false under Vitest (see this file's own isDev comment) specifically so
+// existing apiFetch tests exercise the real fetch path, which would
+// otherwise make this branch unreachable in tests.
+export const isDevSession401RetryEligible = (status, apiPath, alreadyRetried) =>
+  status === 401 && !alreadyRetried && apiPath.startsWith('/api/') && !isPublicApiPath(apiPath);
+
+export const isRefreshedDevSessionUsable = (source) =>
+  source === 'dev-session' || source === 'cached-jwt';
+
+export const apiFetch = async (path, options: any = {}) => {
+  const response = await performApiFetch(path, options);
+  if (
+    !isDev ||
+    !isDevSession401RetryEligible(response.status, normalizeApiPath(path), options.__devSessionRetried)
+  ) {
+    return response;
+  }
+  try {
+    const { ensureDevBackendSession } = await import('./devBackendAuth');
+    const refreshed = await ensureDevBackendSession({ force: true });
+    if (!isRefreshedDevSessionUsable(refreshed?.source)) {
+      // Genuinely offline/unavailable, not just a stale session -- retrying
+      // would just reproduce the same failure.
+      return response;
+    }
+  } catch {
+    return response;
+  }
+  return performApiFetch(path, { ...options, __devSessionRetried: true });
 };
 
 export class ApiResponseError extends Error {
