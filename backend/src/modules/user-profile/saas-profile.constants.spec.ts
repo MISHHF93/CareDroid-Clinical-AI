@@ -31,6 +31,20 @@ describe('normalizeSaasRole', () => {
     expect(normalizeSaasRole('medical-student')).toBe('student');
   });
 
+  it('maps EMERGENCY_ROLE_IDS hospital roles that had no alias at all (HEAL-323)', () => {
+    // Mirrors the frontend fix in saasProfileConstants.test.ts -- these 9
+    // fell through to DEFAULT_SAAS_PROFILE.role ('student') before.
+    expect(normalizeSaasRole('it_admin')).toBe('platform-admin');
+    expect(normalizeSaasRole('ed_manager')).toBe('hospital-administrator');
+    expect(normalizeSaasRole('charge_nurse')).toBe('nurse');
+    expect(normalizeSaasRole('triage_nurse')).toBe('nurse');
+    expect(normalizeSaasRole('ems_user')).toBe('fleet-operator');
+    expect(normalizeSaasRole('dispatcher')).toBe('fleet-operator');
+    expect(normalizeSaasRole('ems_coordinator')).toBe('fleet-operator');
+    expect(normalizeSaasRole('read_only_viewer')).toBe('student');
+    expect(normalizeSaasRole('public_display')).toBe('student');
+  });
+
   it('falls back to the safe DEFAULT_SAAS_PROFILE.role for unrecognized input', () => {
     expect(normalizeSaasRole('totally-unrecognized-xyz')).toBe(DEFAULT_SAAS_PROFILE.role);
     expect(normalizeSaasRole('')).toBe(DEFAULT_SAAS_PROFILE.role);

@@ -175,6 +175,23 @@ export function normalizeSaasRole(role?: string | null): SaasUserRole {
   ) {
     return 'registration-clerk';
   }
+  // HEAL-323: these 9 EMERGENCY_ROLE_IDS values (emergencyRolePermissions.ts)
+  // had no alias here at all -- normalizeSaasRole() fell through every one
+  // of them to DEFAULT_SAAS_PROFILE.role ('student'), silently downgrading
+  // e.g. a charge nurse's effectiveProfile/accessSummary/navigationRoutes
+  // to the generic student profile. Mirrors the same HEAL-208 remediation
+  // this file already applied to emergencyRolePermissions.ts's own
+  // ROLE_ALIASES for a near-identical gap.
+  if (normalized === 'it_admin') return 'platform-admin';
+  if (normalized === 'ed_manager') return 'hospital-administrator';
+  if (normalized === 'charge_nurse' || normalized === 'triage_nurse') return 'nurse';
+  if (
+    normalized === 'ems_user' ||
+    normalized === 'dispatcher' ||
+    normalized === 'ems_coordinator'
+  )
+    return 'fleet-operator';
+  if (normalized === 'read_only_viewer' || normalized === 'public_display') return 'student';
   if (normalized === 'platform_super_admin' || normalized === 'platform-admin')
     return 'platform-admin';
   if (normalized === 'organization_admin' || normalized === 'racetrack_admin')
