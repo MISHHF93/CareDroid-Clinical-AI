@@ -7,11 +7,19 @@ import { UsageMeteringService } from './usage-metering.service';
 
 describe('UsageMeteringService', () => {
   let service: UsageMeteringService;
+  const insertQueryBuilder = {
+    insert: jest.fn().mockReturnThis(),
+    into: jest.fn().mockReturnThis(),
+    values: jest.fn().mockReturnThis(),
+    orIgnore: jest.fn().mockReturnThis(),
+    execute: jest.fn().mockResolvedValue(undefined),
+  };
   const usageEventRepository = {
     create: jest.fn((entity) => entity),
     save: jest.fn((entity) => Promise.resolve({ id: 'usage-1', ...entity })),
     find: jest.fn(),
     findOne: jest.fn(),
+    createQueryBuilder: jest.fn(() => insertQueryBuilder),
   };
 
   beforeEach(async () => {

@@ -119,12 +119,6 @@ export class UsageMeteringService {
     const unit = input.unit || this.defaultUnitFor(input.eventType);
     const metadata = input.metadata || {};
     const idempotencyKey = this.optionalString(input.idempotencyKey);
-    if (idempotencyKey) {
-      const existing = await this.usageEventRepository.findOne({
-        where: { organizationId: input.organizationId, idempotencyKey },
-      });
-      if (existing) return existing;
-    }
     const meterId = this.resolveMeterId(input.eventType, input.meterId, metadata);
     const source = this.resolveSource(input.source, metadata);
 
@@ -151,7 +145,34 @@ export class UsageMeteringService {
       },
     });
 
-    return this.usageEventRepository.save(usageEvent);
+    if (!idempotencyKey) {
+      return this.usageEventRepository.save(usageEvent);
+    }
+
+    // HEAL-330: findOne-then-conditionally-save had a TOCTOU race -- two
+    // concurrent requests with the same idempotency key (a retried webhook
+    // delivery, or a genuine double-submit) could both pass the findOne
+    // check before either committed, and the loser's .save() would throw an
+    // uncaught unique-constraint QueryFailedError (500) instead of
+    // transparently returning the winner's row, defeating the entire point
+    // of idempotency. Mirrors HEAL-311's sentinel-inbound fix: insert-or-
+    // ignore relies on the entity's own unique index on
+    // (organizationId, idempotencyKey) to make the losing insert a silent
+    // no-op at the database level, then reads back whichever row actually
+    // won -- no dependency on how/when a given driver surfaces a
+    // constraint-violation rejection.
+    await this.usageEventRepository
+      .createQueryBuilder()
+      .insert()
+      .into(UsageEvent)
+      .values(usageEvent as any)
+      .orIgnore()
+      .execute();
+
+    const row = await this.usageEventRepository.findOne({
+      where: { organizationId: input.organizationId, idempotencyKey },
+    });
+    return row || usageEvent;
   }
 
   async recordFromTenantContext(
