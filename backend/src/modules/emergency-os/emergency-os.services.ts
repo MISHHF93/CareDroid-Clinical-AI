@@ -1654,8 +1654,8 @@ export class EmergencyWhiteboardService {
 export class PatientJourneyService {
   constructor(private readonly patientService: EmergencyPatientService) {}
 
-  getJourney() {
-    const patients = this.patientService.listPatients();
+  getJourney(organizationId?: string) {
+    const patients = this.patientService.listPatients(organizationId);
     return envelope('Patient Journey Engine', {
       events: patients.flatMap((patient) =>
         patient.timeline.map((event) => ({
@@ -2913,8 +2913,8 @@ export class EDCopilotService {
 export class EmergencyAnalyticsService {
   constructor(private readonly patientService: EmergencyPatientService) {}
 
-  getAnalytics() {
-    const patients = this.patientService.listPatients();
+  getAnalytics(organizationId?: string) {
+    const patients = this.patientService.listPatients(organizationId);
     const activePatients = patients.filter((patient) => patient.state !== 'Discharge');
     const waits = activePatients.map((patient) => minutesSince(patient.arrivalTime));
     const averageWaitMinutes = waits.length

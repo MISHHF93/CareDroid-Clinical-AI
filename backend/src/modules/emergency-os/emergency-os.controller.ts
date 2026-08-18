@@ -285,8 +285,8 @@ export class EmergencyOsController {
 
   @RequirePermission(Permission.READ_PHI)
   @Get('journey')
-  getJourney() {
-    return this.journeyService.getJourney();
+  getJourney(@TenantContext() tenantContext?: TenantContextValue) {
+    return this.journeyService.getJourney(tenantContext?.organizationId);
   }
 
   @RequirePermission(Permission.READ_PHI)
@@ -1013,8 +1013,8 @@ export class EmergencyOsController {
 
   @RequirePermission(Permission.VIEW_ANALYTICS)
   @Get('analytics')
-  getAnalytics() {
-    return this.analyticsService.getAnalytics();
+  getAnalytics(@TenantContext() tenantContext?: TenantContextValue) {
+    return this.analyticsService.getAnalytics(tenantContext?.organizationId);
   }
 
   @RequirePermission(Permission.READ_PHI)

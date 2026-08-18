@@ -4,6 +4,8 @@ import {
   BoardingService,
   ReassessmentService,
   QueueIntelligenceService,
+  PatientJourneyService,
+  EmergencyAnalyticsService,
 } from './emergency-os.services';
 
 function makeService() {
@@ -239,5 +241,44 @@ describe('QueueIntelligenceService — organization tenant scoping (HEAL-347.4 f
     const unscopedTriage = unscoped.queues.find((queue) => queue.label === 'Triage');
     expect(unscopedTriage?.patients.some((p) => p.id === patientA.id)).toBe(true);
     expect(unscopedTriage?.patients.some((p) => p.id === patientB.id)).toBe(true);
+  });
+});
+
+describe('PatientJourneyService and EmergencyAnalyticsService — organization tenant scoping (HEAL-347.4 follow-up)', () => {
+  function makeServices() {
+    const workflowLogService = { record: jest.fn() } as unknown as { record: jest.Mock };
+    const patientService = new EmergencyPatientService(workflowLogService as any);
+    return {
+      patientService,
+      journey: new PatientJourneyService(patientService),
+      analytics: new EmergencyAnalyticsService(patientService),
+    };
+  }
+
+  it('PatientJourneyService.getJourney(organizationId) scopes timeline events to the caller\'s org', () => {
+    const { patientService, journey } = makeServices();
+    const patientA = patientService.createPatient({ firstName: 'Own', lastName: 'Org' } as any, 'org-a');
+    const patientB = patientService.createPatient({ firstName: 'Other', lastName: 'Org' } as any, 'org-b');
+
+    const scoped = journey.getJourney('org-a').data;
+    expect(scoped.events.some((event) => event.patientId === patientA.id)).toBe(true);
+    expect(scoped.events.some((event) => event.patientId === patientB.id)).toBe(false);
+
+    const unscoped = journey.getJourney().data;
+    expect(unscoped.events.some((event) => event.patientId === patientA.id)).toBe(true);
+    expect(unscoped.events.some((event) => event.patientId === patientB.id)).toBe(true);
+  });
+
+  it('EmergencyAnalyticsService.getAnalytics(organizationId) scopes the active census to the caller\'s org', () => {
+    const { patientService, analytics } = makeServices();
+    const before = analytics.getAnalytics().data.activeCensus;
+    patientService.createPatient({ firstName: 'Own', lastName: 'Org' } as any, 'org-a');
+    patientService.createPatient({ firstName: 'Other', lastName: 'Org' } as any, 'org-b');
+
+    const scoped = analytics.getAnalytics('org-a').data;
+    // Legacy/unscoped fixture patients remain visible under any org's filter,
+    // but a different real org's patient must not inflate this org's census.
+    expect(scoped.activeCensus).toBeLessThan(analytics.getAnalytics().data.activeCensus);
+    expect(scoped.activeCensus).toBeGreaterThanOrEqual(before);
   });
 });
