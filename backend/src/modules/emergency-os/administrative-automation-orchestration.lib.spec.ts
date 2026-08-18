@@ -150,7 +150,12 @@ describe('administrative-automation-orchestration.lib', () => {
       workflowLogService as any,
     );
 
-    expect(patientService.assignStaffToPatient).toHaveBeenCalledWith('p1', 's2', 'charge-nurse');
+    expect(patientService.assignStaffToPatient).toHaveBeenCalledWith(
+      'p1',
+      's2',
+      'charge-nurse',
+      undefined,
+    );
     expect(patientService.addPatientNote).toHaveBeenCalled();
   });
 });

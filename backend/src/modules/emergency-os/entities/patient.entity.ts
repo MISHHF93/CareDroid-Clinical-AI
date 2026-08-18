@@ -3,9 +3,21 @@ import { Column, CreateDateColumn, Entity, Index, PrimaryColumn, UpdateDateColum
 @Entity('patients')
 @Index(['state'])
 @Index(['priority'])
+@Index(['organizationId'])
 export class Patient {
   @PrimaryColumn({ type: 'varchar', length: 120 })
   id: string;
+
+  /**
+   * Nullable because existing rows predate this column and have no reliable
+   * signal to backfill from (see project memory: no org-linked room/staff
+   * assignment exists for any pre-migration patient). Null is treated as a
+   * legacy/unscoped row -- visible to every org's reads until reconciled,
+   * never assigned to a DIFFERENT org's own row. New patients always get a
+   * real value from the creating request's tenant context.
+   */
+  @Column({ type: 'varchar', length: 120, nullable: true })
+  organizationId?: string;
 
   @Column({ type: 'varchar', length: 64 })
   mrn: string;

@@ -154,6 +154,8 @@ export interface PatientArrivalRecord {
 
 export interface EmergencyPatient {
   id: string;
+  /** Absent on legacy/pre-migration rows -- see patient.entity.ts's doc comment. */
+  organizationId?: string;
   mrn: string;
   firstName: string;
   lastName: string;
@@ -213,6 +215,7 @@ export interface EmergencyAlert {
   title: string;
   message: string;
   patientId?: string;
+  organizationId?: string;
   createdAt: string;
   dismissed: boolean;
 }

@@ -846,6 +846,7 @@ function executeBackendApprovedTask(
   task: AdministrativeAutomationTask,
   patientService: EmergencyPatientService,
   actorStaffId: string,
+  organizationId?: string,
 ): { ok: boolean; detail: string } {
   switch (task.category) {
     case 'patient_routing': {
@@ -873,7 +874,7 @@ function executeBackendApprovedTask(
       if (!patientId || !staffId) {
         return { ok: false, detail: 'Staff assignment requires patient and proposed staff.' };
       }
-      patientService.assignStaffToPatient(patientId, staffId, actorStaffId);
+      patientService.assignStaffToPatient(patientId, staffId, actorStaffId, organizationId);
       return {
         ok: true,
         detail: `Assigned staff ${task.proposedPayload.proposedStaffName || staffId}.`,
@@ -916,7 +917,7 @@ function executeBackendApprovedTask(
     case 'queue_prioritization':
     case 'escalation_workflow': {
       if (task.category === 'escalation_workflow' && task.patientId) {
-        patientService.escalatePatient(task.patientId, actorStaffId);
+        patientService.escalatePatient(task.patientId, actorStaffId, organizationId);
       }
       if (task.category === 'escalation_workflow' && !task.patientId) {
         patientService.dispatchOperationalAlert({
@@ -980,6 +981,7 @@ export function reviewBackendAdministrativeAutomationWithExecution(
       { ...current, proposedAction: modifiedAction || current.proposedAction },
       patientService,
       input.actorStaffId,
+      tenant?.organizationId,
     );
     if (execution.ok) finalStatus = 'executed';
   }

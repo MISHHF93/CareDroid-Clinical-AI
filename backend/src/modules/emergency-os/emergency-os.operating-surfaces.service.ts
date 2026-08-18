@@ -59,8 +59,8 @@ export class EmergencyOperatingSurfacesService {
     private readonly workflowOrchestrationService: WorkflowOrchestrationService,
   ) {}
 
-  private baseContext() {
-    const patients = this.patientService.listPatients();
+  private baseContext(organizationId?: string) {
+    const patients = this.patientService.listPatients(organizationId);
     const alerts = this.patientService.listAlerts() as unknown as EmergencyAlert[];
     const capacity = this.patientService.computeCapacity();
     const emsPayload = this.emsIntakeService.getEMSIntake().data as {
@@ -86,7 +86,7 @@ export class EmergencyOperatingSurfacesService {
   }
 
   async getSurface(surfaceId: OperatingSurfaceId, tenant?: TenantContext) {
-    const context = this.baseContext();
+    const context = this.baseContext(tenant?.organizationId);
 
     switch (surfaceId) {
       case 'dispatch':

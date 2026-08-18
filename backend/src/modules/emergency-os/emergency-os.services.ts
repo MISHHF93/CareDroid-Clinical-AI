@@ -870,6 +870,7 @@ export class EmergencyPatientService implements OnModuleInit {
     const now = new Date().toISOString();
     return ensurePatientArrivalBlock({
       id: entity.id,
+      organizationId: entity.organizationId,
       mrn: entity.mrn,
       firstName: entity.firstName,
       lastName: entity.lastName,
@@ -942,6 +943,7 @@ export class EmergencyPatientService implements OnModuleInit {
               title: row.title,
               message: row.message,
               patientId: row.patientId,
+              organizationId: row.organizationId,
               createdAt: row.dispatchedAt || new Date().toISOString(),
               dismissed: Boolean(row.dismissed),
             }));
@@ -1017,6 +1019,7 @@ export class EmergencyPatientService implements OnModuleInit {
     const piiFieldsEncrypted = Boolean(this.encryptionService);
     const entity = this.patientRepository.create({
       id: patient.id,
+      organizationId: patient.organizationId,
       mrn: patient.mrn,
       mrnEncrypted: this.encryptionService?.encryptToBuffer(patient.mrn),
       firstName: patient.firstName,
@@ -1066,6 +1069,7 @@ export class EmergencyPatientService implements OnModuleInit {
     if (!this.alertRepository) return;
     const entity = this.alertRepository.create({
       id: alert.id,
+      organizationId: alert.organizationId,
       severity: alert.severity,
       title: alert.title,
       message: alert.message,
@@ -1097,8 +1101,30 @@ export class EmergencyPatientService implements OnModuleInit {
     }
   }
 
-  listPatients(): EmergencyPatient[] {
-    return clone(this.patients);
+  /**
+   * Tenant-scoping gate for id-keyed patient reads/mutations (see project
+   * memory "Emergency-OS Tenant Scoping Gap"). `organizationId` is optional
+   * on every caller of this service -- omitting it (internal/background
+   * callers that don't yet thread a tenant context) preserves today's
+   * unfiltered behavior exactly, so this is additive, not a breaking change,
+   * for the ~40 same-file/internal call sites not yet migrated to pass one.
+   * A patient with no `organizationId` of its own (every pre-migration row,
+   * since no backfill signal exists) is treated as legacy/unscoped and stays
+   * visible to every org until reconciled -- mirrors the same OR-with-null
+   * pattern HEAL-338 established for `getConsent`. Never crosses a patient
+   * INTO a different org's view once both sides have a real value.
+   */
+  private isVisibleToOrganization(patient: EmergencyPatient, organizationId?: string): boolean {
+    if (!organizationId) return true;
+    if (!patient.organizationId) return true;
+    return patient.organizationId === organizationId;
+  }
+
+  listPatients(organizationId?: string): EmergencyPatient[] {
+    const visible = organizationId
+      ? this.patients.filter((patient) => this.isVisibleToOrganization(patient, organizationId))
+      : this.patients;
+    return clone(visible);
   }
 
   listRooms(): EmergencyRoom[] {
@@ -1113,12 +1139,21 @@ export class EmergencyPatientService implements OnModuleInit {
     return clone(this.alerts);
   }
 
-  getPatient(patientId: string): EmergencyPatient | undefined {
-    return clone(this.patients.find((patient) => patient.id === patientId));
+  getPatient(patientId: string, organizationId?: string): EmergencyPatient | undefined {
+    const patient = this.patients.find((candidate) => candidate.id === patientId);
+    if (patient && !this.isVisibleToOrganization(patient, organizationId)) return undefined;
+    return clone(patient);
   }
 
-  updatePatient(patientId: string, patch: Partial<EmergencyPatient>): EmergencyPatient {
-    const index = this.patients.findIndex((patient) => patient.id === patientId);
+  updatePatient(
+    patientId: string,
+    patch: Partial<EmergencyPatient>,
+    organizationId?: string,
+  ): EmergencyPatient {
+    const index = this.patients.findIndex(
+      (patient) =>
+        patient.id === patientId && this.isVisibleToOrganization(patient, organizationId),
+    );
     if (index === -1) throw new Error(`Emergency patient ${patientId} not found`);
     const current = this.patients[index];
     const normalizedPatch: Partial<EmergencyPatient> = { ...patch };
@@ -1144,7 +1179,7 @@ export class EmergencyPatientService implements OnModuleInit {
     return updated;
   }
 
-  createPatient(input: Partial<EmergencyPatient>): EmergencyPatient {
+  createPatient(input: Partial<EmergencyPatient>, organizationId?: string): EmergencyPatient {
     // Idempotency guard: real frontend callers (receptionIntakeOrchestrator.ts,
     // QuickIntake.tsx, emergencyStore.ts's fire-and-forget backend sync) send the
     // client-generated id they already created locally, and the sync call is never
@@ -1158,7 +1193,12 @@ export class EmergencyPatientService implements OnModuleInit {
     if (input.id) {
       const existing = this.patients.find((patient) => patient.id === input.id);
       if (existing) {
-        return clone(existing);
+        if (this.isVisibleToOrganization(existing, organizationId)) {
+          return clone(existing);
+        }
+        // id collides with a different org's patient -- never silently
+        // shadow-create a second row under the same id.
+        throw new Error(`Emergency patient id ${input.id} is already in use`);
       }
     }
     const now = new Date().toISOString();
@@ -1175,6 +1215,10 @@ export class EmergencyPatientService implements OnModuleInit {
       // that only a handful of fields ever made it onto.
       ...normalized,
       id: normalized.id || createId('patient'),
+      // Server-resolved tenant context always wins over anything present on
+      // `input` -- matches the "never let a client-suppliable field override
+      // the authoritative server value" precedent (HEAL-325/327/328/329/333).
+      organizationId: organizationId ?? normalized.organizationId,
       mrn: normalized.mrn || `ED-${Math.floor(100000 + Math.random() * 900000)}`,
       firstName: normalized.firstName || 'Unknown',
       lastName: normalized.lastName || 'Patient',
@@ -1324,8 +1368,12 @@ export class EmergencyPatientService implements OnModuleInit {
     patientId: string,
     staffId: string,
     actorStaffId = 'workflow-orchestrator',
+    organizationId?: string,
   ): EmergencyPatient {
-    const index = this.patients.findIndex((patient) => patient.id === patientId);
+    const index = this.patients.findIndex(
+      (patient) =>
+        patient.id === patientId && this.isVisibleToOrganization(patient, organizationId),
+    );
     if (index === -1) throw new Error(`Emergency patient ${patientId} not found`);
     const patient = this.patients[index];
     this.patients[index] = {
@@ -1396,6 +1444,7 @@ export class EmergencyPatientService implements OnModuleInit {
     patientId?: string;
     source?: string;
     metadata?: Record<string, unknown>;
+    organizationId?: string;
   }): EmergencyAlert {
     const alert: EmergencyAlert = {
       id: createId('alert'),
@@ -1403,6 +1452,7 @@ export class EmergencyPatientService implements OnModuleInit {
       title: input.title,
       message: input.message,
       patientId: input.patientId,
+      organizationId: input.organizationId,
       createdAt: new Date().toISOString(),
       dismissed: false,
     };
@@ -1422,8 +1472,15 @@ export class EmergencyPatientService implements OnModuleInit {
     return clone(alert);
   }
 
-  escalatePatient(patientId: string, actorStaffId: string): EmergencyPatient {
-    const index = this.patients.findIndex((patient) => patient.id === patientId);
+  escalatePatient(
+    patientId: string,
+    actorStaffId: string,
+    organizationId?: string,
+  ): EmergencyPatient {
+    const index = this.patients.findIndex(
+      (patient) =>
+        patient.id === patientId && this.isVisibleToOrganization(patient, organizationId),
+    );
     if (index === -1) throw new Error(`Emergency patient ${patientId} not found`);
     const patient = this.patients[index];
     // 'Escalated' is not a recognized frontend PatientFlag (see src/types/
@@ -1445,6 +1502,7 @@ export class EmergencyPatientService implements OnModuleInit {
       patientId,
       source: 'workflow-orchestrator',
       metadata: { actorStaffId },
+      organizationId: patient.organizationId ?? organizationId,
     });
     this.workflowLogService.record({
       type: 'patient_escalated',

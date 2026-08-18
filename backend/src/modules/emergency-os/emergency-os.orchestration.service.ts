@@ -45,9 +45,10 @@ export class PatientOrchestrationService {
   buildPatientOrchestration(
     patientId: string,
     role: EmergencyRoleId = 'physician',
+    organizationId?: string,
   ): PatientCardOrchestrationContext {
     const patient = this.patientService
-      .listPatients()
+      .listPatients(organizationId)
       .find((candidate) => candidate.id === patientId);
     if (!patient) {
       throw new Error(`Emergency patient ${patientId} not found`);
@@ -65,15 +66,16 @@ export class PatientOrchestrationService {
   async buildTriageAssist(
     patientId: string,
     handoffContext: TriageAssistHandoffContext = {},
+    organizationId?: string,
   ): Promise<TriageAssistEnvelope> {
     const patient = this.patientService
-      .listPatients()
+      .listPatients(organizationId)
       .find((candidate) => candidate.id === patientId);
     if (!patient) {
       throw new Error(`Emergency patient ${patientId} not found`);
     }
 
-    const operationalContext = this.buildOperationalContext();
+    const operationalContext = this.buildOperationalContext(organizationId);
     const patientInput = patientInputFromEmergencyRecord({
       complaintCategory: handoffContext.complaintCategory || patient.complaintCategory,
       chiefComplaint: handoffContext.arrivalReason || patient.chiefComplaint,
@@ -105,8 +107,8 @@ export class PatientOrchestrationService {
     return envelope;
   }
 
-  private buildOperationalContext() {
-    const patients = this.patientService.listPatients();
+  private buildOperationalContext(organizationId?: string) {
+    const patients = this.patientService.listPatients(organizationId);
     const oiEnvelope = this.operationalIntelligenceService.getSnapshotEnvelope();
     const capacityBand =
       (oiEnvelope?.data as { scores?: Array<{ id?: string; band?: string }> })?.scores?.find(

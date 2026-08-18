@@ -202,6 +202,7 @@ export class EmergencyOsController {
   patchPatient(
     @Param('patientId') patientId: string,
     @Body() body: PatchEmergencyPatientDto,
+    @TenantContext() tenantContext?: TenantContextValue,
   ) {
     // staffId/note are accepted for future audit-trail use but are not
     // EmergencyPatient fields -- only forward the real patient field(s).
@@ -214,7 +215,7 @@ export class EmergencyOsController {
     if (body.vitals) patch.vitals = body.vitals as import('./emergency-os.types').EmergencyVitals[];
     if (body.flags) patch.flags = body.flags as string[];
     try {
-      return this.patientService.updatePatient(patientId, patch);
+      return this.patientService.updatePatient(patientId, patch, tenantContext?.organizationId);
     } catch (error) {
       // updatePatient throws a plain Error for an unknown id (shared with 2
       // other internal callers, left untouched) -- translate it to a real
@@ -238,12 +239,14 @@ export class EmergencyOsController {
   assignPatientStaff(
     @Param('patientId') patientId: string,
     @Body() body: AssignPatientStaffDto,
+    @TenantContext() tenantContext?: TenantContextValue,
   ) {
     try {
       return this.patientService.assignStaffToPatient(
         patientId,
         body.staffId,
         body.actorStaffId,
+        tenantContext?.organizationId,
       );
     } catch (error) {
       if (error instanceof Error && /not found/i.test(error.message)) {
@@ -264,9 +267,14 @@ export class EmergencyOsController {
   escalatePatient(
     @Param('patientId') patientId: string,
     @Body() body: EscalatePatientDto,
+    @TenantContext() tenantContext?: TenantContextValue,
   ) {
     try {
-      return this.patientService.escalatePatient(patientId, body.actorStaffId);
+      return this.patientService.escalatePatient(
+        patientId,
+        body.actorStaffId,
+        tenantContext?.organizationId,
+      );
     } catch (error) {
       if (error instanceof Error && /not found/i.test(error.message)) {
         throw new NotFoundException(error.message);
@@ -447,7 +455,11 @@ export class EmergencyOsController {
     const role = (
       allowedRoles.has(String(roleQuery || '')) ? roleQuery : 'physician'
     ) as import('../../../../lib/patient-orchestration').EmergencyRoleId;
-    const orchestration = this.orchestrationService.buildPatientOrchestration(patientId, role);
+    const orchestration = this.orchestrationService.buildPatientOrchestration(
+      patientId,
+      role,
+      tenantContext?.organizationId,
+    );
     return {
       module: 'Patient Card Orchestration',
       generatedAt: orchestration.generatedAt,
@@ -776,7 +788,11 @@ export class EmergencyOsController {
     const query = String(dto?.query || '');
     const context = (dto?.context || {}) as Record<string, unknown>;
     const explicitPatientId = typeof context.patientId === 'string' ? context.patientId : undefined;
-    const edCopilotContext = this.buildEdCopilotOperationalContext(query, explicitPatientId);
+    const edCopilotContext = this.buildEdCopilotOperationalContext(
+      query,
+      explicitPatientId,
+      tenantContext?.organizationId,
+    );
     const patientId = explicitPatientId || edCopilotContext.selectedPatientId;
     const chatResponse = await this.chatService.processMessage(
       query,
@@ -872,6 +888,7 @@ export class EmergencyOsController {
   private buildEdCopilotOperationalContext(
     query: string,
     explicitPatientId?: string,
+    organizationId?: string,
   ): {
     patients: Array<Record<string, unknown>>;
     patientCount: number;
@@ -880,7 +897,7 @@ export class EmergencyOsController {
     selectedPatientId?: string;
     patientArtifactContext?: Record<string, unknown>;
   } {
-    const patients = this.patientService.listPatients();
+    const patients = this.patientService.listPatients(organizationId);
     const capacity = this.patientService.computeCapacity();
 
     const mappedPatients = patients.map((patient) => ({

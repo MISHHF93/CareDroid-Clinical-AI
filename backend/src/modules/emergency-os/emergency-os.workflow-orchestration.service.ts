@@ -51,8 +51,8 @@ export class WorkflowOrchestrationService {
     @Optional() private readonly operationalIntelligenceService?: OperationalIntelligenceService,
   ) {}
 
-  private operationalContext() {
-    const patients = this.patientService.listPatients() as unknown as Patient[];
+  private operationalContext(organizationId?: string) {
+    const patients = this.patientService.listPatients(organizationId) as unknown as Patient[];
     const referrals =
       (this.referralService.getReferrals().data.referrals as unknown as Referral[]) || [];
     const staff = this.patientService.listStaff() as unknown as Staff[];
@@ -132,7 +132,7 @@ export class WorkflowOrchestrationService {
   ): Promise<AdministrativeAutomationSnapshot> {
     const entitlementContext = await this.resolveEntitlementContext(tenant);
     return buildBackendEnrichedAdministrativeAutomationSnapshot({
-      ...this.operationalContext(),
+      ...this.operationalContext(tenant?.organizationId),
       existingTasks,
       entitlementContext,
       tenant,

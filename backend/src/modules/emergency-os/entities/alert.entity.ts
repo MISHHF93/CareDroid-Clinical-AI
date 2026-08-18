@@ -2,9 +2,14 @@ import { Column, CreateDateColumn, Entity, Index, PrimaryColumn, UpdateDateColum
 
 @Entity('alerts')
 @Index(['patientId'])
+@Index(['organizationId'])
 export class Alert {
   @PrimaryColumn({ type: 'varchar', length: 120 })
   id: string;
+
+  /** See patient.entity.ts's `organizationId` doc comment for the nullable/legacy-row rationale. */
+  @Column({ type: 'varchar', length: 120, nullable: true })
+  organizationId?: string;
 
   @Column({ type: 'varchar', length: 16 })
   severity: string;
