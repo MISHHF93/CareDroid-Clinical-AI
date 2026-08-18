@@ -85,4 +85,21 @@ describe('EmergencyAIController userId/tenantId spoofing (HEAL-327)', () => {
     expect(userIdArg).toBe('fallback-user-id');
     expect(workspaceContextArg.aiRequest.tenantId).toBe('fallback-org');
   });
+
+  it('forwards the authenticated organizationId to processMessage so emergency escalation can attribute the incident channel to the real org (HEAL-340)', async () => {
+    const { controller, processMessage } = buildController();
+
+    await controller.sendCopilotMessage(
+      {
+        message: 'hello',
+        purpose: 'test',
+        sourceModule: 'test',
+      } as any,
+      req,
+    );
+
+    expect(processMessage).toHaveBeenCalledTimes(1);
+    const organizationIdArg = processMessage.mock.calls[0][10];
+    expect(organizationIdArg).toBe('real-org');
+  });
 });

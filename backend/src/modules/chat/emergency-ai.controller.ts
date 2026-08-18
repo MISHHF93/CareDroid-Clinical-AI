@@ -224,6 +224,11 @@ export class EmergencyAIController {
       workspaceContext,
       dto.memoryContext,
       dto.messages,
+      // HEAL-340: was omitted entirely, so an emergency detected on this
+      // route always fell through to emergency-escalation.service.ts's
+      // 'default-organization' fallback for its incident-channel creation.
+      // Same trusted tenantId source already used above for the HEAL-327 fix.
+      req?.user?.tenantId,
     );
 
     return {

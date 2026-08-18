@@ -1,6 +1,6 @@
 import { Injectable, Logger, Optional } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { createHash, randomUUID } from 'crypto';
 import {
   PlatformClinicalReleaseGate,
@@ -560,9 +560,16 @@ export class PlatformGovernanceService {
     return item;
   }
 
-  async decideReviewItem(itemId: string, decision: Record<string, any>) {
+  // HEAL-338: was unscoped -- VIEW_REVIEW_QUEUE/REVIEW_CLINICAL_AI are held by
+  // PHYSICIAN (org-scoped role, never platform-wide), so any physician could
+  // approve/reject another hospital's AI clinical-safety review item by id.
+  // NotFoundException-equivalent (return null, matching the existing
+  // not-found contract) on a cross-org id mirrors a genuinely missing item.
+  async decideReviewItem(itemId: string, decision: Record<string, any>, organizationId?: string) {
     const item = await this.reviewItems.findOne({ where: { id: itemId } });
-    if (!item) return null;
+    if (!item || (organizationId && item.organizationId && item.organizationId !== organizationId)) {
+      return null;
+    }
     item.status =
       decision.decision === 'approve'
         ? PlatformGovernanceStatus.RESOLVED
@@ -578,8 +585,14 @@ export class PlatformGovernanceService {
     return saved;
   }
 
-  async listReviewItems() {
-    const items = await this.reviewItems.find({ order: { createdAt: 'DESC' }, take: 50 });
+  // HEAL-338: was unscoped -- any user with VIEW_REVIEW_QUEUE (PHYSICIAN)
+  // could list every organization's clinical-AI safety review queue.
+  async listReviewItems(organizationId?: string) {
+    const items = await this.reviewItems.find({
+      where: organizationId ? { organizationId } : undefined,
+      order: { createdAt: 'DESC' },
+      take: 50,
+    });
     return items.length
       ? items
       : [
@@ -594,25 +607,43 @@ export class PlatformGovernanceService {
         ];
   }
 
-  async getReviewItem(itemId: string) {
-    return this.reviewItems.findOne({ where: { id: itemId } });
+  async getReviewItem(itemId: string, organizationId?: string) {
+    const item = await this.reviewItems.findOne({ where: { id: itemId } });
+    if (!item || (organizationId && item.organizationId && item.organizationId !== organizationId)) {
+      return null;
+    }
+    return item;
   }
 
-  async listPatientReviewItems(patientId: string) {
+  async listPatientReviewItems(patientId: string, organizationId?: string) {
     return this.reviewItems.find({
-      where: { patientId },
+      where: organizationId ? { patientId, organizationId } : { patientId },
       order: { createdAt: 'DESC' },
       take: 50,
     });
   }
 
-  async upsertConsent(patientId: string, scope: string, body: Record<string, any> = {}) {
-    const existing = await this.consentRecords.findOne({ where: { patientId, scope } });
+  // HEAL-338: neither method previously threaded organizationId at all,
+  // despite PlatformConsentRecord already carrying the column -- any user
+  // with MANAGE_CONSENT could read or overwrite another organization's
+  // patient consent status by patientId. getConsent additionally matches
+  // legacy (pre-fix) organizationId-null rows so consent recorded before
+  // this fix doesn't silently vanish from its own org's view.
+  async upsertConsent(
+    patientId: string,
+    scope: string,
+    body: Record<string, any> = {},
+    organizationId?: string,
+  ) {
+    const existing = await this.consentRecords.findOne({
+      where: organizationId ? { patientId, scope, organizationId } : { patientId, scope },
+    });
     const record =
       existing ||
       this.consentRecords.create({
         patientId,
         scope,
+        organizationId: organizationId || undefined,
       });
     record.status = body.status || PlatformGovernanceStatus.ACTIVE;
     record.grantedAt = record.grantedAt || new Date();
@@ -631,9 +662,14 @@ export class PlatformGovernanceService {
     return saved;
   }
 
-  async getConsent(patientId: string) {
+  async getConsent(patientId: string, organizationId?: string) {
     const records = await this.consentRecords.find({
-      where: { patientId },
+      where: organizationId
+        ? [
+            { patientId, organizationId },
+            { patientId, organizationId: IsNull() },
+          ]
+        : { patientId },
       order: { updatedAt: 'DESC' },
     });
     return {

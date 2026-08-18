@@ -44,8 +44,19 @@ export class SentinelInboundService {
     });
   }
 
-  async getInbound(id: string): Promise<SentinelInboundPatientEntity | null> {
-    return this.inboundRepo.findOne({ where: { id } });
+  // HEAL-339: same gap as the already-fixed listInbound/HEAL-308 above --
+  // this single-record read had zero organizationId filtering, letting any
+  // authenticated user with sentinel access read another hospital's
+  // pre-arrival PHI (chief complaint, vitals, name) by id.
+  async getInbound(
+    id: string,
+    organizationId?: string,
+  ): Promise<SentinelInboundPatientEntity | null> {
+    const row = await this.inboundRepo.findOne({ where: { id } });
+    if (!row || (organizationId && row.organizationId && row.organizationId !== organizationId)) {
+      return null;
+    }
+    return row;
   }
 
   private async applyInboundUpdate(
@@ -183,8 +194,9 @@ export class SentinelInboundService {
   async producePrepRecommendation(
     inboundId: string,
     options: { preferAi?: boolean } = {},
+    organizationId?: string,
   ): Promise<SentinelAiRecommendationEntity> {
-    const inbound = await this.getInbound(inboundId);
+    const inbound = await this.getInbound(inboundId, organizationId);
     if (!inbound) {
       throw new Error(`Inbound patient ${inboundId} not found`);
     }
@@ -296,13 +308,31 @@ export class SentinelInboundService {
     return row;
   }
 
+  // HEAL-339: was unscoped -- REVIEW_SENTINEL_AI is org-scoped, so any
+  // reviewer could accept/reject/modify another hospital's AI prep
+  // recommendation by id. Same join-through-linked-inbound-patient scoping
+  // as listRecommendations above, since this entity has no organizationId
+  // column of its own.
   async reviewRecommendation(
     id: string,
     status: 'accepted' | 'rejected' | 'modified',
     reviewerId: string,
+    organizationId?: string,
   ): Promise<SentinelAiRecommendationEntity> {
     const row = await this.aiRepo.findOne({ where: { id } });
     if (!row) throw new Error(`Recommendation ${id} not found`);
+    if (organizationId && row.linkedEntityType === 'inbound_patient' && row.linkedEntityId) {
+      const linkedInbound = await this.inboundRepo.findOne({
+        where: { id: row.linkedEntityId },
+      });
+      if (
+        linkedInbound &&
+        linkedInbound.organizationId &&
+        linkedInbound.organizationId !== organizationId
+      ) {
+        throw new Error(`Recommendation ${id} not found`);
+      }
+    }
     row.humanReviewStatus = status;
     row.reviewedBy = reviewerId;
     row.reviewedAt = new Date().toISOString();

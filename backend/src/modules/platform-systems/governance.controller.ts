@@ -8,6 +8,7 @@ import {
   Param,
   Post,
   Put,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
@@ -281,9 +282,9 @@ export class GovernanceController {
 
   @Get('consent/:patientId')
   @Permissions(Permission.MANAGE_CONSENT)
-  async getConsent(@Param('patientId') patientId: string) {
+  async getConsent(@Param('patientId') patientId: string, @Req() req: any) {
     if (this.platformGovernanceService) {
-      return this.platformGovernanceService.getConsent(patientId);
+      return this.platformGovernanceService.getConsent(patientId, req.tenantContext?.organizationId);
     }
     return this.platformSystemsService.demo('consent-manager', patientId);
   }
@@ -291,12 +292,17 @@ export class GovernanceController {
   @Post('consent/:patientId')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.MANAGE_CONSENT)
-  async updateConsent(@Param('patientId') patientId: string, @Body() body: ConsentActionDto) {
+  async updateConsent(
+    @Param('patientId') patientId: string,
+    @Body() body: ConsentActionDto,
+    @Req() req: any,
+  ) {
     if (this.platformGovernanceService) {
       return this.platformGovernanceService.upsertConsent(
         patientId,
         String(body.scope || 'clinical_ai'),
         body,
+        req.tenantContext?.organizationId,
       );
     }
     return this.platformSystemsService.demo('consent-manager', patientId, { ...body });
@@ -305,7 +311,11 @@ export class GovernanceController {
   @Post('consent/:patientId/revoke')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.MANAGE_CONSENT)
-  async revokeConsent(@Param('patientId') patientId: string, @Body() body: ConsentActionDto) {
+  async revokeConsent(
+    @Param('patientId') patientId: string,
+    @Body() body: ConsentActionDto,
+    @Req() req: any,
+  ) {
     if (this.platformGovernanceService) {
       return this.platformGovernanceService.upsertConsent(
         patientId,
@@ -314,6 +324,7 @@ export class GovernanceController {
           ...body,
           status: 'revoked',
         },
+        req.tenantContext?.organizationId,
       );
     }
     return this.platformSystemsService.demo('consent-manager', patientId, { ...body });
@@ -562,9 +573,9 @@ export class GovernanceController {
 
   @Get('review/items')
   @Permissions(Permission.VIEW_AUDIT_LOGS)
-  async getReviewItems() {
+  async getReviewItems(@Req() req: any) {
     if (this.platformGovernanceService) {
-      return this.platformGovernanceService.listReviewItems();
+      return this.platformGovernanceService.listReviewItems(req.tenantContext?.organizationId);
     }
     return this.platformSystemsService.getReviewItems();
   }
@@ -581,9 +592,12 @@ export class GovernanceController {
 
   @Get('review/items/:itemId')
   @Permissions(Permission.VIEW_AUDIT_LOGS)
-  async getReviewItem(@Param('itemId') itemId: string) {
+  async getReviewItem(@Param('itemId') itemId: string, @Req() req: any) {
     if (this.platformGovernanceService) {
-      const item = await this.platformGovernanceService.getReviewItem(itemId);
+      const item = await this.platformGovernanceService.getReviewItem(
+        itemId,
+        req.tenantContext?.organizationId,
+      );
       if (item) return item;
     }
     return this.platformSystemsService.demo('human-review-queue', itemId);
@@ -599,9 +613,17 @@ export class GovernanceController {
   @Post('review/items/:itemId/decision')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.VIEW_AUDIT_LOGS)
-  async decideReviewItem(@Param('itemId') itemId: string, @Body() body: GovernanceDecisionDto) {
+  async decideReviewItem(
+    @Param('itemId') itemId: string,
+    @Body() body: GovernanceDecisionDto,
+    @Req() req: any,
+  ) {
     if (this.platformGovernanceService) {
-      const result = await this.platformGovernanceService.decideReviewItem(itemId, { ...body });
+      const result = await this.platformGovernanceService.decideReviewItem(
+        itemId,
+        { ...body },
+        req.tenantContext?.organizationId,
+      );
       if (result) return result;
     }
     return this.platformSystemsService.demo('human-review-queue', itemId, { ...body });
@@ -616,9 +638,12 @@ export class GovernanceController {
 
   @Get('patients/:patientId/review-items')
   @Permissions(Permission.READ_PHI, Permission.VIEW_AUDIT_LOGS)
-  async getPatientReviewItems(@Param('patientId') patientId: string) {
+  async getPatientReviewItems(@Param('patientId') patientId: string, @Req() req: any) {
     if (this.platformGovernanceService) {
-      return this.platformGovernanceService.listPatientReviewItems(patientId);
+      return this.platformGovernanceService.listPatientReviewItems(
+        patientId,
+        req.tenantContext?.organizationId,
+      );
     }
     return this.platformSystemsService.demo('human-review-queue', patientId);
   }

@@ -122,13 +122,24 @@ export class SentinelAlarmService {
     return { alarm, suppressed: false, reason: null };
   }
 
+  // HEAL-339: was unscoped -- ACK_SENTINEL_ALARMS/VIEW_SENTINEL_COMMAND are
+  // held by NURSE (org-scoped), so any nurse could acknowledge/escalate/
+  // resolve/dismiss another hospital's live EMS alarm by id. organizationId
+  // is optional so runEscalationSweep()'s own internal cross-org system
+  // sweep (below) is unaffected -- only the HTTP-facing caller is scoped.
   async transition(
     alarmId: string,
     to: SentinelAlarmStatus,
     actor: { actorId?: string | null; actorRole?: string | null; reason?: string | null },
+    organizationId?: string,
   ): Promise<SentinelAlarmEntity> {
     const alarm = await this.alarmRepo.findOne({ where: { id: alarmId } });
-    if (!alarm) throw new NotFoundException(`Alarm ${alarmId} not found`);
+    if (
+      !alarm ||
+      (organizationId && alarm.organizationId && alarm.organizationId !== organizationId)
+    ) {
+      throw new NotFoundException(`Alarm ${alarmId} not found`);
+    }
 
     const from = alarm.status as SentinelAlarmStatus;
     if (!isAlarmTransitionAllowed(from, to)) {
@@ -213,7 +224,16 @@ export class SentinelAlarmService {
     return count;
   }
 
-  async listEvents(alarmId: string): Promise<SentinelAlarmEventEntity[]> {
+  // HEAL-339: alarmId alone was enough to read another organization's alarm
+  // audit trail. The event entity itself has no organizationId, so verify
+  // ownership via the parent alarm first.
+  async listEvents(alarmId: string, organizationId?: string): Promise<SentinelAlarmEventEntity[]> {
+    if (organizationId) {
+      const alarm = await this.alarmRepo.findOne({ where: { id: alarmId } });
+      if (!alarm || (alarm.organizationId && alarm.organizationId !== organizationId)) {
+        throw new NotFoundException(`Alarm ${alarmId} not found`);
+      }
+    }
     return this.eventRepo.find({
       where: { alarmId },
       order: { occurredAt: 'ASC' },

@@ -329,6 +329,13 @@ export class ChatService {
         keywords: classification.emergencyKeywords.map((k) => k.keyword),
         context: {
           userId: userId || 'anonymous',
+          // HEAL-340: was omitted despite being available on this method's own
+          // organizationId param -- emergency-escalation.service.ts's
+          // createIncidentChannel() then fell back to the literal
+          // 'default-organization', funneling every reporting hospital's
+          // real 911-adjacent escalations into one shared, org-less incident
+          // channel bucket instead of their own organization's channel.
+          organizationId,
           conversationId,
           message,
           timestamp: new Date(),

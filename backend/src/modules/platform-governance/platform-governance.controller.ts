@@ -67,8 +67,8 @@ export class PlatformGovernanceController {
 
   @Get('review/items')
   @Permissions(Permission.VIEW_AUDIT_LOGS)
-  getReviewItems() {
-    return this.platformGovernanceService.listReviewItems();
+  getReviewItems(@Req() req: any) {
+    return this.platformGovernanceService.listReviewItems(req.tenantContext?.organizationId);
   }
 
   @Post('review/items')
@@ -81,14 +81,22 @@ export class PlatformGovernanceController {
   @Post('review/items/:itemId/decision')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.REVIEW_GOVERNANCE)
-  decideReviewItem(@Param('itemId') itemId: string, @Body() body: GovernanceDecisionDto) {
-    return this.platformGovernanceService.decideReviewItem(itemId, { ...body });
+  decideReviewItem(
+    @Param('itemId') itemId: string,
+    @Body() body: GovernanceDecisionDto,
+    @Req() req: any,
+  ) {
+    return this.platformGovernanceService.decideReviewItem(
+      itemId,
+      { ...body },
+      req.tenantContext?.organizationId,
+    );
   }
 
   @Get('consent/:patientId')
   @Permissions(Permission.MANAGE_CONSENT)
-  getConsent(@Param('patientId') patientId: string) {
-    return this.platformGovernanceService.getConsent(patientId);
+  getConsent(@Param('patientId') patientId: string, @Req() req: any) {
+    return this.platformGovernanceService.getConsent(patientId, req.tenantContext?.organizationId);
   }
 
   @Post('consent/:patientId/:scope')
@@ -98,8 +106,14 @@ export class PlatformGovernanceController {
     @Param('patientId') patientId: string,
     @Param('scope') scope: string,
     @Body() body: ConsentActionDto,
+    @Req() req: any,
   ) {
-    return this.platformGovernanceService.upsertConsent(patientId, scope, { ...body });
+    return this.platformGovernanceService.upsertConsent(
+      patientId,
+      scope,
+      { ...body },
+      req.tenantContext?.organizationId,
+    );
   }
 
   @Post('privacy/:patientId/:requestType')

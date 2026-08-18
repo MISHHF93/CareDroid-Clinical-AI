@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Injectable, Module, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Injectable,
+  Module,
+  Param,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Permissions } from '../auth/decorators/permissions.decorator';
 import { Permission } from '../auth/enums/permission.enum';
@@ -9,12 +19,12 @@ import { PlatformGovernanceModule, PlatformGovernanceService } from '../platform
 export class ReviewQueueService {
   constructor(private readonly platformGovernance: PlatformGovernanceService) {}
 
-  list() {
-    return this.platformGovernance.listReviewItems();
+  list(organizationId?: string) {
+    return this.platformGovernance.listReviewItems(organizationId);
   }
 
-  decide(itemId: string, decision: Record<string, unknown>) {
-    return this.platformGovernance.decideReviewItem(itemId, decision);
+  decide(itemId: string, decision: Record<string, unknown>, organizationId?: string) {
+    return this.platformGovernance.decideReviewItem(itemId, decision, organizationId);
   }
 }
 
@@ -25,8 +35,11 @@ export class HumanReviewController {
 
   @Get('items')
   @Permissions(Permission.VIEW_REVIEW_QUEUE)
-  async listItems() {
-    const items = await this.reviewQueue.list();
+  async listItems(@Req() req: any) {
+    // HEAL-338: was unscoped -- PHYSICIAN (an org-scoped role) could list
+    // and (via the decision route below) approve/reject every organization's
+    // clinical-AI safety review queue.
+    const items = await this.reviewQueue.list(req.tenantContext?.organizationId);
     return {
       status: 'review_required',
       panels: {
@@ -43,8 +56,8 @@ export class HumanReviewController {
 
   @Post('items/:itemId/decision')
   @Permissions(Permission.REVIEW_CLINICAL_AI)
-  decide(@Param('itemId') itemId: string, @Body() body: Record<string, unknown>) {
-    return this.reviewQueue.decide(itemId, body);
+  decide(@Param('itemId') itemId: string, @Body() body: Record<string, unknown>, @Req() req: any) {
+    return this.reviewQueue.decide(itemId, body, req.tenantContext?.organizationId);
   }
 }
 

@@ -24,6 +24,7 @@ export interface IntegrationHubIngestRequest extends IntegrationEvent {
 
 export interface IntegrationHubRequestMeta {
   userId?: string;
+  organizationId?: string;
   ipAddress?: string;
   userAgent?: string;
 }
@@ -64,6 +65,15 @@ export class IntegrationHubService {
 
   async ingest(input: IntegrationHubIngestRequest, meta: IntegrationHubRequestMeta = {}) {
     const event = this.normalizeRequest(input);
+    // HEAL-337: the caller's own resolved tenant always wins over a
+    // client-supplied event.organizationId (an ADMIN-tier, org-scoped
+    // permission gates this route -- MANAGE_INTEGRATIONS is never
+    // platform-wide -- so an admin must only ever be able to ingest/attribute
+    // integration events to their own organization, never fabricate one for
+    // a different hospital).
+    if (meta.organizationId) {
+      event.organizationId = meta.organizationId;
+    }
     const idempotencyKey = this.resolveIdempotencyKey(input, event);
 
     if (idempotencyKey) {
@@ -132,8 +142,9 @@ export class IntegrationHubService {
     }
   }
 
-  async listRecent(limit?: number) {
+  async listRecent(limit?: number, organizationId?: string) {
     const events = await this.eventRepository.find({
+      where: organizationId ? { organizationId } : undefined,
       order: { receivedAt: 'DESC' },
       take: clampLimit(limit),
     });
@@ -143,9 +154,14 @@ export class IntegrationHubService {
     };
   }
 
-  async getTrace(id: string) {
+  // HEAL-337: was an unscoped findOne({where:{id}}) -- any admin could walk
+  // event ids and read another hospital's real FHIR/HL7/lab/medication
+  // payload. NotFoundException on a cross-org id mirrors a genuinely missing
+  // id (no existence leak), matching AiActionProposalService's
+  // assertProposalOrganization pattern (HEAL-325).
+  async getTrace(id: string, organizationId?: string) {
     const rawRecord = await this.eventRepository.findOne({ where: { id } });
-    if (!rawRecord) {
+    if (!rawRecord || (organizationId && rawRecord.organizationId && rawRecord.organizationId !== organizationId)) {
       throw new NotFoundException(`Integration event ${id} was not found`);
     }
     return this.serializeEventTrace(rawRecord);

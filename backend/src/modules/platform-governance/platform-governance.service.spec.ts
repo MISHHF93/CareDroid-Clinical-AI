@@ -315,4 +315,65 @@ describe('PlatformGovernanceService', () => {
     expect(service.syntheticFhirBundle().connectorType).toBe('fhir');
     expect(service.syntheticHl7Message().connectorType).toBe('hl7');
   });
+
+  describe('HEAL-338: tenant isolation on review items and consent', () => {
+    it('does not let decideReviewItem act on another organization\'s review item', async () => {
+      const { service } = buildService({
+        reviewItems: [{ id: 'item-1', organizationId: 'org-a', capabilityId: 'clinical-governance' }],
+      });
+
+      await expect(
+        service.decideReviewItem('item-1', { decision: 'approve' }, 'org-b'),
+      ).resolves.toBeNull();
+      await expect(
+        service.decideReviewItem('item-1', { decision: 'approve' }, 'org-a'),
+      ).resolves.toEqual(
+        expect.objectContaining({ id: 'item-1', status: PlatformGovernanceStatus.RESOLVED }),
+      );
+    });
+
+    it('does not let getReviewItem read another organization\'s review item', async () => {
+      const { service } = buildService({
+        reviewItems: [{ id: 'item-1', organizationId: 'org-a', capabilityId: 'clinical-governance' }],
+      });
+
+      await expect(service.getReviewItem('item-1', 'org-b')).resolves.toBeNull();
+      await expect(service.getReviewItem('item-1', 'org-a')).resolves.toEqual(
+        expect.objectContaining({ id: 'item-1' }),
+      );
+    });
+
+    it('scopes listReviewItems and listPatientReviewItems queries to the caller\'s organization', async () => {
+      const { service, repositories } = buildService({ reviewItems: [] });
+
+      await service.listReviewItems('org-a');
+      expect(repositories.reviewItems.find).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { organizationId: 'org-a' } }),
+      );
+
+      await service.listPatientReviewItems('patient-1', 'org-a');
+      expect(repositories.reviewItems.find).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { patientId: 'patient-1', organizationId: 'org-a' } }),
+      );
+    });
+
+    it('scopes getConsent and upsertConsent to the caller\'s organization', async () => {
+      const { service, repositories } = buildService({ consentRecords: [] });
+
+      await service.upsertConsent('patient-1', 'clinical_ai', { status: 'active' }, 'org-a');
+      expect(repositories.consentRecords.create).toHaveBeenCalledWith(
+        expect.objectContaining({ patientId: 'patient-1', organizationId: 'org-a' }),
+      );
+
+      await service.getConsent('patient-1', 'org-a');
+      expect(repositories.consentRecords.find).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: [
+            { patientId: 'patient-1', organizationId: 'org-a' },
+            { patientId: 'patient-1', organizationId: expect.anything() },
+          ],
+        }),
+      );
+    });
+  });
 });

@@ -209,4 +209,45 @@ describe('IntegrationHubService', () => {
       }),
     });
   });
+
+  describe('HEAL-337: tenant isolation', () => {
+    it('ignores a client-supplied organizationId and attributes the event to the caller\'s own tenant', async () => {
+      const result = await service.ingest(
+        {
+          family: 'fhir',
+          eventType: 'Observation',
+          sourceSystem: 'ehr-sandbox',
+          organizationId: 'attacker-org',
+          payload: { resourceType: 'Observation', status: 'final', code: {} },
+        },
+        { userId: 'user-1', organizationId: 'real-org' },
+      );
+
+      expect(result.event.organizationId).toBe('real-org');
+    });
+
+    it('404s getTrace for an event belonging to a different organization instead of leaking it', async () => {
+      eventRepository.findOne.mockResolvedValue({
+        id: 'raw-1',
+        organizationId: 'org-a',
+        normalizedEventId: null,
+        rawEvent: {},
+        processingStatus: IntegrationEventProcessingStatus.ROUTED,
+        receivedAt: new Date(),
+        createdAt: new Date(),
+      });
+
+      await expect(service.getTrace('raw-1', 'org-b')).rejects.toThrow('raw-1');
+      // Same-org access still works.
+      await expect(service.getTrace('raw-1', 'org-a')).resolves.toBeTruthy();
+    });
+
+    it('scopes listRecent to the caller\'s organization when provided', async () => {
+      eventRepository.find.mockResolvedValue([]);
+      await service.listRecent(25, 'org-a');
+      expect(eventRepository.find).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { organizationId: 'org-a' } }),
+      );
+    });
+  });
 });

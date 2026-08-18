@@ -219,7 +219,7 @@ describe('SentinelController', () => {
     it('alarmEvents delegates with the alarm id and envelopes the result', async () => {
       alarms.listEvents.mockResolvedValue([{ id: 'e1' }]);
       const result = await controller.alarmEvents('alarm-9');
-      expect(alarms.listEvents).toHaveBeenCalledWith('alarm-9');
+      expect(alarms.listEvents).toHaveBeenCalledWith('alarm-9', undefined);
       expect(result).toEqual(
         expect.objectContaining({ data: [{ id: 'e1' }], message: 'Alarm audit trail' }),
       );
@@ -449,23 +449,29 @@ describe('SentinelController', () => {
   describe('prepRecommendation', () => {
     it('defaults preferAi to true when the body omits it', async () => {
       await controller.prepRecommendation('inbound-1', {});
-      expect(inbound.producePrepRecommendation).toHaveBeenCalledWith('inbound-1', {
-        preferAi: true,
-      });
+      expect(inbound.producePrepRecommendation).toHaveBeenCalledWith(
+        'inbound-1',
+        { preferAi: true },
+        undefined,
+      );
     });
 
     it('respects an explicit preferAi: false', async () => {
       await controller.prepRecommendation('inbound-1', { preferAi: false });
-      expect(inbound.producePrepRecommendation).toHaveBeenCalledWith('inbound-1', {
-        preferAi: false,
-      });
+      expect(inbound.producePrepRecommendation).toHaveBeenCalledWith(
+        'inbound-1',
+        { preferAi: false },
+        undefined,
+      );
     });
 
     it('treats an explicit preferAi: true the same as the default', async () => {
       await controller.prepRecommendation('inbound-1', { preferAi: true });
-      expect(inbound.producePrepRecommendation).toHaveBeenCalledWith('inbound-1', {
-        preferAi: true,
-      });
+      expect(inbound.producePrepRecommendation).toHaveBeenCalledWith(
+        'inbound-1',
+        { preferAi: true },
+        undefined,
+      );
     });
   });
 
@@ -556,7 +562,12 @@ describe('SentinelController', () => {
       ['expired', 'expired'],
     ])('maps short verb "%s" to canonical status "%s"', async (verb, canonical) => {
       await controller.alarmAction('alarm-1', verb, req as any, {});
-      expect(alarms.transition).toHaveBeenCalledWith('alarm-1', canonical, expect.any(Object));
+      expect(alarms.transition).toHaveBeenCalledWith(
+        'alarm-1',
+        canonical,
+        expect.any(Object),
+        undefined,
+      );
     });
 
     it('rejects an unknown action without calling transition', async () => {
@@ -572,6 +583,7 @@ describe('SentinelController', () => {
         'alarm-1',
         'acknowledged',
         expect.objectContaining({ actorId: 'legacy-id' }),
+        undefined,
       );
 
       await controller.alarmAction('alarm-1', 'ack', {} as any, {});
@@ -579,6 +591,7 @@ describe('SentinelController', () => {
         'alarm-1',
         'acknowledged',
         expect.objectContaining({ actorId: 'unknown' }),
+        undefined,
       );
     });
 
@@ -588,6 +601,7 @@ describe('SentinelController', () => {
         'alarm-1',
         'acknowledged',
         expect.objectContaining({ reason: 'false alarm', actorRole: 'physician' }),
+        undefined,
       );
 
       await controller.alarmAction('alarm-1', 'ack', req as any, {});
@@ -595,6 +609,17 @@ describe('SentinelController', () => {
         'alarm-1',
         'acknowledged',
         expect.objectContaining({ reason: null }),
+        undefined,
+      );
+    });
+
+    it('forwards the caller\'s tenant context organizationId so a cross-org alarm id 404s instead of being actioned (HEAL-339)', async () => {
+      await controller.alarmAction('alarm-1', 'ack', req as any, {}, { organizationId: 'org-a' } as any);
+      expect(alarms.transition).toHaveBeenCalledWith(
+        'alarm-1',
+        'acknowledged',
+        expect.any(Object),
+        'org-a',
       );
     });
   });
@@ -602,17 +627,32 @@ describe('SentinelController', () => {
   describe('reviewAi', () => {
     it('extracts reviewerId from req.user.id and forwards the review status', async () => {
       await controller.reviewAi('rec-1', { status: 'accepted' }, { user: { id: 'user-1' } } as any);
-      expect(inbound.reviewRecommendation).toHaveBeenCalledWith('rec-1', 'accepted', 'user-1');
+      expect(inbound.reviewRecommendation).toHaveBeenCalledWith(
+        'rec-1',
+        'accepted',
+        'user-1',
+        undefined,
+      );
     });
 
     it('falls back to userId then "unknown" when id is absent', async () => {
       await controller.reviewAi('rec-1', { status: 'rejected' }, {
         user: { userId: 'legacy-id' },
       } as any);
-      expect(inbound.reviewRecommendation).toHaveBeenCalledWith('rec-1', 'rejected', 'legacy-id');
+      expect(inbound.reviewRecommendation).toHaveBeenCalledWith(
+        'rec-1',
+        'rejected',
+        'legacy-id',
+        undefined,
+      );
 
       await controller.reviewAi('rec-1', { status: 'modified' }, {} as any);
-      expect(inbound.reviewRecommendation).toHaveBeenCalledWith('rec-1', 'modified', 'unknown');
+      expect(inbound.reviewRecommendation).toHaveBeenCalledWith(
+        'rec-1',
+        'modified',
+        'unknown',
+        undefined,
+      );
     });
 
     it('reports the applied status in the envelope message', async () => {

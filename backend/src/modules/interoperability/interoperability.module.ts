@@ -113,6 +113,7 @@ export class InteroperabilityController {
   ingestEvent(@Body() body: IntegrationHubIngestRequest, @Req() req: any) {
     return this.integrationHub.ingest(body, {
       userId: req.user?.id || req.user?.userId,
+      organizationId: req.tenantContext?.organizationId,
       ipAddress: req.ip || req.connection?.remoteAddress,
       userAgent: String(req.headers?.['user-agent'] || 'unknown'),
     });
@@ -120,14 +121,17 @@ export class InteroperabilityController {
 
   @Get('events')
   @Permissions(Permission.VIEW_INTEGRATIONS)
-  listEvents(@Query('limit') limit?: string) {
-    return this.integrationHub.listRecent(limit ? Number(limit) : undefined);
+  listEvents(@Query('limit') limit?: string, @Req() req?: any) {
+    return this.integrationHub.listRecent(
+      limit ? Number(limit) : undefined,
+      req?.tenantContext?.organizationId,
+    );
   }
 
   @Get('events/:id')
   @Permissions(Permission.VIEW_INTEGRATIONS)
-  getEventTrace(@Param('id') id: string) {
-    return this.integrationHub.getTrace(id);
+  getEventTrace(@Param('id') id: string, @Req() req: any) {
+    return this.integrationHub.getTrace(id, req.tenantContext?.organizationId);
   }
 }
 

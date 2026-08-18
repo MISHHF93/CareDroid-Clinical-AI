@@ -271,10 +271,16 @@ export class SentinelController {
     Permission.USE_AI_CHAT,
     Permission.VIEW_SENTINEL_COMMAND,
   )
-  async prepRecommendation(@Param('id') id: string, @Body() body: PrepRecommendationDto) {
-    const rec = await this.inbound.producePrepRecommendation(id, {
-      preferAi: body?.preferAi !== false,
-    });
+  async prepRecommendation(
+    @Param('id') id: string,
+    @Body() body: PrepRecommendationDto,
+    @TenantContext() tenantContext?: TenantContextValue,
+  ) {
+    const rec = await this.inbound.producePrepRecommendation(
+      id,
+      { preferAi: body?.preferAi !== false },
+      tenantContext?.organizationId,
+    );
     return envelope(rec, 'Human-reviewable prep recommendation generated');
   }
 
@@ -322,6 +328,7 @@ export class SentinelController {
     @Param('action') action: string,
     @Req() req: { user?: { id?: string; userId?: string; role?: string } },
     @Body() body: AlarmActionDto,
+    @TenantContext() tenantContext?: TenantContextValue,
   ) {
     const allowed = new Set([
       'acknowledged',
@@ -355,18 +362,26 @@ export class SentinelController {
       };
     }
     const actorId = req.user?.id || req.user?.userId || 'unknown';
-    const alarm = await this.alarms.transition(id, to, {
-      actorId,
-      actorRole: req.user?.role || null,
-      reason: body?.reason || null,
-    });
+    const alarm = await this.alarms.transition(
+      id,
+      to,
+      {
+        actorId,
+        actorRole: req.user?.role || null,
+        reason: body?.reason || null,
+      },
+      tenantContext?.organizationId,
+    );
     return envelope(alarm, `Alarm ${to}`);
   }
 
   @Get('alarms/:id/events')
   @AnyPermission(Permission.ACK_SENTINEL_ALARMS, Permission.VIEW_AUDIT_LOGS)
-  async alarmEvents(@Param('id') id: string) {
-    return envelope(await this.alarms.listEvents(id), 'Alarm audit trail');
+  async alarmEvents(@Param('id') id: string, @TenantContext() tenantContext?: TenantContextValue) {
+    return envelope(
+      await this.alarms.listEvents(id, tenantContext?.organizationId),
+      'Alarm audit trail',
+    );
   }
 
   @Get('ai/recommendations')
@@ -384,9 +399,15 @@ export class SentinelController {
     @Param('id') id: string,
     @Body() body: ReviewAiDto,
     @Req() req: { user?: { id?: string; userId?: string } },
+    @TenantContext() tenantContext?: TenantContextValue,
   ) {
     const reviewerId = req.user?.id || req.user?.userId || 'unknown';
-    const row = await this.inbound.reviewRecommendation(id, body.status, reviewerId);
+    const row = await this.inbound.reviewRecommendation(
+      id,
+      body.status,
+      reviewerId,
+      tenantContext?.organizationId,
+    );
     return envelope(row, `Recommendation ${body.status}`);
   }
 
