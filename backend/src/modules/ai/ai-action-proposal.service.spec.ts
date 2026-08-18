@@ -1,4 +1,4 @@
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { AiActionProposalService } from './ai-action-proposal.service';
 
 describe('AiActionProposalService', () => {
@@ -80,5 +80,60 @@ describe('AiActionProposalService', () => {
       previewSummary: 'p',
     });
     expect(service.list({ organizationId: 'org-a' })).toHaveLength(1);
+  });
+
+  describe('HEAL-325: cross-tenant proposal access', () => {
+    // get()/approve()/reject()/execute()/rollback (transition()) previously
+    // took only a proposalId, with no organizationId check against the
+    // caller -- unlike list(), which correctly filters. Any authenticated
+    // user holding USE_AI_CHAT could read or transition another
+    // organization's pending clinical-AI action proposal by guessing/
+    // obtaining its UUID.
+    function createOrgAProposal() {
+      return service.create({
+        organizationId: 'org-a',
+        originatingRequestId: 'req-tenant',
+        correlationId: 'corr-tenant',
+        toolName: 'prepare_triage_handoff_draft',
+        expectedEffect: 'Draft handoff',
+        previewSummary: 'Draft only',
+        riskLevel: 'moderate',
+        dataWillChange: ['draft'],
+        rollbackCapable: true,
+        reversibleWindowMs: 60_000,
+      });
+    }
+
+    it('get() rejects a caller from a different organization', () => {
+      const p = createOrgAProposal();
+      expect(() => service.get(p.proposalId, 'org-b')).toThrow(NotFoundException);
+      expect(service.get(p.proposalId, 'org-a').proposalId).toBe(p.proposalId);
+    });
+
+    it('approve()/reject()/execute() all reject a cross-organization caller', () => {
+      const p = createOrgAProposal();
+      expect(() => service.approve(p.proposalId, 'attacker', 'org-b')).toThrow(NotFoundException);
+      expect(() => service.reject(p.proposalId, 'no', 'org-b')).toThrow(NotFoundException);
+      expect(() => service.execute(p.proposalId, {}, 'org-b')).toThrow(NotFoundException);
+      // The proposal must be untouched -- still 'proposed', not silently
+      // approved/executed by the rejected cross-org calls above.
+      expect(service.get(p.proposalId, 'org-a').state).toBe('proposed');
+    });
+
+    it('rollback (transition to rolled_back) rejects a cross-organization caller', () => {
+      const p = createOrgAProposal();
+      service.approve(p.proposalId, 'user-1', 'org-a');
+      service.execute(p.proposalId, { written: false }, 'org-a');
+      expect(() => service.transition(p.proposalId, 'rolled_back', undefined, 'org-b')).toThrow(
+        NotFoundException,
+      );
+      expect(service.get(p.proposalId, 'org-a').state).toBe('completed');
+    });
+
+    it('stays accessible with no organizationId filter (backward compatible, matches list()\'s permissive-when-unset semantics)', () => {
+      const p = createOrgAProposal();
+      expect(service.get(p.proposalId).proposalId).toBe(p.proposalId);
+      expect(service.approve(p.proposalId, 'user-1').state).toBe('approved');
+    });
   });
 });

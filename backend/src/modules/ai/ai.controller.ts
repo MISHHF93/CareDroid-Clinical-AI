@@ -194,8 +194,8 @@ export class AIController {
   @Get('proposals/:proposalId')
   @WorkspaceScoped({ permissions: [Permission.USE_AI_CHAT] })
   @ApiOperation({ summary: 'Get one AI action proposal' })
-  async getProposal(@Param('proposalId') proposalId: string) {
-    return this.actionProposals.get(proposalId);
+  async getProposal(@Req() req: any, @Param('proposalId') proposalId: string) {
+    return this.actionProposals.get(proposalId, req.tenantContext?.organizationId);
   }
 
   @Get('proposals/:proposalId/audit')
@@ -204,9 +204,10 @@ export class AIController {
     summary:
       'Hash-chained transition audit trail for one AI action proposal, with tamper verification',
   })
-  async getProposalAudit(@Param('proposalId') proposalId: string) {
-    // 404s the same way getProposal does if the proposal itself doesn't exist.
-    this.actionProposals.get(proposalId);
+  async getProposalAudit(@Req() req: any, @Param('proposalId') proposalId: string) {
+    // 404s the same way getProposal does if the proposal itself doesn't exist
+    // or belongs to a different organization (HEAL-325).
+    this.actionProposals.get(proposalId, req.tenantContext?.organizationId);
     return {
       trail: this.actionProposals.getAuditTrail(proposalId),
       verification: this.actionProposals.verifyAuditChain(proposalId),
@@ -217,19 +218,21 @@ export class AIController {
   @WorkspaceScoped({ permissions: [Permission.USE_AI_CHAT] })
   @ApiOperation({ summary: 'Approve an AI action proposal' })
   async approveProposal(@Req() req: any, @Param('proposalId') proposalId: string) {
-    return this.actionProposals.approve(proposalId, req.user?.id);
+    return this.actionProposals.approve(proposalId, req.user?.id, req.tenantContext?.organizationId);
   }
 
   @Post('proposals/:proposalId/reject')
   @WorkspaceScoped({ permissions: [Permission.USE_AI_CHAT] })
   @ApiOperation({ summary: 'Reject an AI action proposal' })
   async rejectProposal(
+    @Req() req: any,
     @Param('proposalId') proposalId: string,
     @Body() body: RejectAiActionProposalDto,
   ) {
     return this.actionProposals.reject(
       proposalId,
       String(body.reason || body.rejectionReason || 'Rejected by user'),
+      req.tenantContext?.organizationId,
     );
   }
 
@@ -240,6 +243,7 @@ export class AIController {
       'Execute an approved AI action proposal (records draft outcome; no silent chart writes)',
   })
   async executeProposal(
+    @Req() req: any,
     @Param('proposalId') proposalId: string,
     @Body() body: ExecuteAiActionProposalDto,
   ) {
@@ -248,14 +252,20 @@ export class AIController {
       body.result && typeof body.result === 'object'
         ? (body.result as Record<string, unknown>)
         : undefined,
+      req.tenantContext?.organizationId,
     );
   }
 
   @Post('proposals/:proposalId/rollback')
   @WorkspaceScoped({ permissions: [Permission.USE_AI_CHAT] })
   @ApiOperation({ summary: 'Rollback a completed reversible proposal within the window' })
-  async rollbackProposal(@Param('proposalId') proposalId: string) {
-    return this.actionProposals.transition(proposalId, 'rolled_back');
+  async rollbackProposal(@Req() req: any, @Param('proposalId') proposalId: string) {
+    return this.actionProposals.transition(
+      proposalId,
+      'rolled_back',
+      undefined,
+      req.tenantContext?.organizationId,
+    );
   }
 
   @Get('usage')

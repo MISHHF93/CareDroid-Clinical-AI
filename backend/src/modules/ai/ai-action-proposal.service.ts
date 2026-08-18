@@ -408,9 +408,33 @@ export class AiActionProposalService implements OnModuleInit {
       .map((p) => this.clone(p));
   }
 
-  get(proposalId: string): ServerAiActionProposal {
+  // HEAL-325: get()/transition() (and every method built on them --
+  // approve/reject/execute/rollback/getAuditTrail) took only a proposalId,
+  // with no organizationId check against the caller's own tenant context --
+  // unlike list(), which correctly filters. proposalId is a random UUID with
+  // no other access control in front of it, so any authenticated user
+  // holding USE_AI_CHAT (most clinical roles) could read, approve, reject,
+  // or execute another organization's pending clinical-AI action proposal --
+  // the exact "no silent chart writes" gate this API's own docstring
+  // describes as a safety boundary. Mirrors list()'s existing permissive-
+  // when-unset semantics (a proposal with no organizationId, e.g. from
+  // before tenant-scoping existed, stays visible to everyone) but rejects a
+  // genuine mismatch. NotFoundException (not Forbidden) matches the
+  // existing "proposal not found" error for a missing id, so a cross-org
+  // caller can't distinguish "doesn't exist" from "exists in another org".
+  private assertProposalOrganization(
+    proposal: ServerAiActionProposal,
+    organizationId?: string,
+  ): void {
+    if (organizationId && proposal.organizationId && proposal.organizationId !== organizationId) {
+      throw new NotFoundException(`Proposal ${proposal.proposalId} not found`);
+    }
+  }
+
+  get(proposalId: string, organizationId?: string): ServerAiActionProposal {
     const p = this.store.get(proposalId);
     if (!p) throw new NotFoundException(`Proposal ${proposalId} not found`);
+    this.assertProposalOrganization(p, organizationId);
     this.expireIfNeeded(p);
     return this.clone(p);
   }
@@ -429,9 +453,11 @@ export class AiActionProposalService implements OnModuleInit {
         | 'ownerRole'
       >
     >,
+    organizationId?: string,
   ): ServerAiActionProposal {
     const current = this.store.get(proposalId);
     if (!current) throw new NotFoundException(`Proposal ${proposalId} not found`);
+    this.assertProposalOrganization(current, organizationId);
     this.expireIfNeeded(current);
     if (current.state === to) return this.clone(current);
     if (!ALLOWED[current.state]?.includes(to)) {
@@ -472,29 +498,38 @@ export class AiActionProposalService implements OnModuleInit {
     return this.clone(next);
   }
 
-  approve(proposalId: string, actorUserId?: string): ServerAiActionProposal {
-    return this.transition(proposalId, 'approved', { ownerUserId: actorUserId });
+  approve(proposalId: string, actorUserId?: string, organizationId?: string): ServerAiActionProposal {
+    return this.transition(proposalId, 'approved', { ownerUserId: actorUserId }, organizationId);
   }
 
-  reject(proposalId: string, reason: string): ServerAiActionProposal {
-    return this.transition(proposalId, 'rejected', { rejectionReason: reason });
+  reject(proposalId: string, reason: string, organizationId?: string): ServerAiActionProposal {
+    return this.transition(proposalId, 'rejected', { rejectionReason: reason }, organizationId);
   }
 
-  execute(proposalId: string, result?: Record<string, unknown>): ServerAiActionProposal {
-    const current = this.get(proposalId);
+  execute(
+    proposalId: string,
+    result?: Record<string, unknown>,
+    organizationId?: string,
+  ): ServerAiActionProposal {
+    const current = this.get(proposalId, organizationId);
     if (current.requiresApproval && current.state !== 'approved') {
       throw new BadRequestException('Human approval required before execution');
     }
     if (current.state === 'proposed' && !current.requiresApproval) {
-      this.transition(proposalId, 'approved');
+      this.transition(proposalId, 'approved', undefined, organizationId);
     }
-    this.transition(proposalId, 'executing');
-    return this.transition(proposalId, 'completed', {
-      executionResult: result || {
-        ok: true,
-        note: 'Server recorded draft execution — no chart write performed.',
+    this.transition(proposalId, 'executing', undefined, organizationId);
+    return this.transition(
+      proposalId,
+      'completed',
+      {
+        executionResult: result || {
+          ok: true,
+          note: 'Server recorded draft execution — no chart write performed.',
+        },
       },
-    });
+      organizationId,
+    );
   }
 
   clearForTests(): void {
