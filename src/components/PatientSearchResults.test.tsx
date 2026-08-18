@@ -101,3 +101,30 @@ describe('PatientSearchResults PHI gate', () => {
     expect(screen.getByRole('heading', { name: 'Queue items' })).toBeInTheDocument();
   });
 });
+
+describe('PatientSearchResults footer query display (HEAL-342)', () => {
+  it('truncates a very long, unbroken query in the "Register new patient" footer button', () => {
+    const longQuery = 'a'.repeat(300);
+    renderResults({
+      query: longQuery,
+      results: [],
+      canCreatePatient: true,
+      onStartNewIntake: noop,
+    });
+
+    const button = screen.getByText(/no match for/i).closest('button')!;
+    expect(button.textContent).not.toContain(longQuery);
+    expect(button.textContent!.length).toBeLessThan(longQuery.length);
+  });
+
+  it('shows a short query in full', () => {
+    renderResults({
+      query: 'zzq-no-match',
+      results: [],
+      canCreatePatient: true,
+      onStartNewIntake: noop,
+    });
+
+    expect(screen.getByText(/zzq-no-match/)).toBeInTheDocument();
+  });
+});

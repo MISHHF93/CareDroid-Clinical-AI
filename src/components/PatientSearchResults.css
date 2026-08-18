@@ -134,6 +134,10 @@
   font-weight: 700;
   text-align: left;
   padding: 8px 10px;
+  /* HEAL-342: an unbroken long query (no spaces) has no natural wrap point
+     and overflowed the panel's right edge instead of wrapping. */
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .patient-search-results__footer-primary {

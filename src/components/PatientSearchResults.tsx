@@ -9,6 +9,19 @@ import { EMPTY_STATE_COPY } from '../config/emptyStateCopy';
 import { RECEPTION_COPY } from './reception/receptionCopy';
 import './PatientSearchResults.css';
 
+// HEAL-342: the raw query was rendered here in full -- an unbroken long
+// paste (e.g. 300 characters, no spaces) has no natural wrap point, so it
+// overflowed the results panel and clipped mid-character at its right edge
+// instead of wrapping or truncating. This footer button's own purpose (using
+// the query as a name for a new patient) has no legitimate use for a query
+// this long anyway.
+const MAX_DISPLAYED_QUERY_LENGTH = 60;
+
+function truncateQueryForDisplay(value: string): string {
+  if (value.length <= MAX_DISPLAYED_QUERY_LENGTH) return value;
+  return `${value.slice(0, MAX_DISPLAYED_QUERY_LENGTH)}…`;
+}
+
 type OperationalSearchGroups = {
   patient: OperationalSearchHit[];
   encounter: OperationalSearchHit[];
@@ -232,7 +245,9 @@ export default function PatientSearchResults({
             onClick={onStartNewIntake}
           >
             {RECEPTION_COPY.searchResults.newPatient}
-            {trimmedQuery ? ` · ${RECEPTION_COPY.searchResults.noMatch} "${trimmedQuery}"` : ''}
+            {trimmedQuery
+              ? ` · ${RECEPTION_COPY.searchResults.noMatch} "${truncateQueryForDisplay(trimmedQuery)}"`
+              : ''}
           </button>
         ) : null}
       </footer>
