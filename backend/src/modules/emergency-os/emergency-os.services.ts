@@ -1102,22 +1102,28 @@ export class EmergencyPatientService implements OnModuleInit {
   }
 
   /**
-   * Tenant-scoping gate for id-keyed patient reads/mutations (see project
-   * memory "Emergency-OS Tenant Scoping Gap"). `organizationId` is optional
-   * on every caller of this service -- omitting it (internal/background
-   * callers that don't yet thread a tenant context) preserves today's
-   * unfiltered behavior exactly, so this is additive, not a breaking change,
-   * for the ~40 same-file/internal call sites not yet migrated to pass one.
-   * A patient with no `organizationId` of its own (every pre-migration row,
-   * since no backfill signal exists) is treated as legacy/unscoped and stays
-   * visible to every org until reconciled -- mirrors the same OR-with-null
-   * pattern HEAL-338 established for `getConsent`. Never crosses a patient
-   * INTO a different org's view once both sides have a real value.
+   * Tenant-scoping gate for id-keyed patient/alert reads/mutations (see
+   * project memory "Emergency-OS Tenant Scoping Gap"). `organizationId` is
+   * optional on every caller of this service -- omitting it (internal/
+   * background callers that don't yet thread a tenant context) preserves
+   * today's unfiltered behavior exactly, so this is additive, not a
+   * breaking change, for the ~40 same-file/internal call sites not yet
+   * migrated to pass one. A record with no `organizationId` of its own
+   * (every pre-migration row, since no backfill signal exists) is treated
+   * as legacy/unscoped and stays visible to every org until reconciled --
+   * mirrors the same OR-with-null pattern HEAL-338 established for
+   * `getConsent`. Never crosses a record INTO a different org's view once
+   * both sides have a real value. Structurally typed (not EmergencyPatient-
+   * specific) so the same gate covers EmergencyAlert too -- both entities
+   * got a real organizationId column in the same HEAL-343 migration.
    */
-  private isVisibleToOrganization(patient: EmergencyPatient, organizationId?: string): boolean {
+  private isVisibleToOrganization(
+    record: { organizationId?: string },
+    organizationId?: string,
+  ): boolean {
     if (!organizationId) return true;
-    if (!patient.organizationId) return true;
-    return patient.organizationId === organizationId;
+    if (!record.organizationId) return true;
+    return record.organizationId === organizationId;
   }
 
   listPatients(organizationId?: string): EmergencyPatient[] {
@@ -1135,8 +1141,11 @@ export class EmergencyPatientService implements OnModuleInit {
     return clone(this.staff);
   }
 
-  listAlerts(): EmergencyAlert[] {
-    return clone(this.alerts);
+  listAlerts(organizationId?: string): EmergencyAlert[] {
+    const visible = organizationId
+      ? this.alerts.filter((alert) => this.isVisibleToOrganization(alert, organizationId))
+      : this.alerts;
+    return clone(visible);
   }
 
   getPatient(patientId: string, organizationId?: string): EmergencyPatient | undefined {
@@ -1617,12 +1626,25 @@ export class EmergencyPatientService implements OnModuleInit {
 export class EmergencyWhiteboardService {
   constructor(private readonly patientService: EmergencyPatientService) {}
 
-  getWhiteboard() {
+  // HEAL-347.4: the whiteboard is the single most-viewed clinical screen and
+  // was the largest still-open piece of the emergency-os tenant-scoping gap
+  // (see project memory) -- patients/alerts now filter to the caller's own
+  // org (or legacy/unscoped rows) when organizationId is supplied.
+  // computeCapacity() is deliberately left unscoped here: it shares a single
+  // process-wide lastCapacityScore + realtime-broadcast side effect across
+  // every caller (see its own comment on a prior real infinite-recursion
+  // bug), and comparing scores computed from different orgs' filtered
+  // patient sets across calls risks spurious "capacity changed" broadcasts --
+  // a real fix needs its own dedicated, carefully-tested pass, not a
+  // same-round add-on. rooms/staff stay unscoped too: neither is DB-backed
+  // (confirmed in HEAL-343 -- no @InjectRepository(Staff|Room) exists),
+  // so there's no real per-tenant data there to leak.
+  getWhiteboard(organizationId?: string) {
     return envelope('Emergency Whiteboard', {
-      patients: this.patientService.listPatients(),
+      patients: this.patientService.listPatients(organizationId),
       rooms: this.patientService.listRooms(),
       staff: this.patientService.listStaff(),
-      alerts: this.patientService.listAlerts(),
+      alerts: this.patientService.listAlerts(organizationId),
       capacity: this.patientService.computeCapacity(),
     });
   }

@@ -1,4 +1,4 @@
-import { EmergencyPatientService } from './emergency-os.services';
+import { EmergencyPatientService, EmergencyWhiteboardService } from './emergency-os.services';
 
 function makeService() {
   const workflowLogService = { record: jest.fn() } as unknown as { record: jest.Mock };
@@ -105,5 +105,54 @@ describe('EmergencyPatientService — organization tenant scoping (Emergency-OS 
       service.createPatient({ id: 'shared-id', firstName: 'Impersonator' } as any, 'org-b'),
     ).toThrow(/already in use/i);
     expect(service.getPatient(existing.id, 'org-a')?.firstName).toBe('Original');
+  });
+
+  it('listAlerts(organizationId) includes own-org and legacy/unscoped alerts, excludes a different org', () => {
+    const { service } = makeService();
+    const patientA = service.createPatient({ firstName: 'Own', lastName: 'Org' } as any, 'org-a');
+    const patientB = service.createPatient({ firstName: 'Other', lastName: 'Org' } as any, 'org-b');
+    service.escalatePatient(patientA.id, 'actor', 'org-a');
+    service.escalatePatient(patientB.id, 'actor', 'org-b');
+
+    const scoped = service.listAlerts('org-a');
+    expect(scoped.some((alert) => alert.patientId === patientA.id)).toBe(true);
+    expect(scoped.some((alert) => alert.patientId === patientB.id)).toBe(false);
+
+    // Unfiltered call preserves existing internal-caller behavior.
+    const unscoped = service.listAlerts();
+    expect(unscoped.some((alert) => alert.patientId === patientA.id)).toBe(true);
+    expect(unscoped.some((alert) => alert.patientId === patientB.id)).toBe(true);
+  });
+});
+
+describe('EmergencyWhiteboardService — the whiteboard, the single most-viewed clinical screen', () => {
+  function makeWhiteboard() {
+    const workflowLogService = { record: jest.fn() } as unknown as { record: jest.Mock };
+    const patientService = new EmergencyPatientService(workflowLogService as any);
+    return { patientService, whiteboard: new EmergencyWhiteboardService(patientService) };
+  }
+
+  it('getWhiteboard(organizationId) scopes patients and alerts to the caller\'s org (own-org or legacy/unscoped)', () => {
+    const { patientService, whiteboard } = makeWhiteboard();
+    const patientA = patientService.createPatient({ firstName: 'Own', lastName: 'Org' } as any, 'org-a');
+    const patientB = patientService.createPatient({ firstName: 'Other', lastName: 'Org' } as any, 'org-b');
+    patientService.escalatePatient(patientA.id, 'actor', 'org-a');
+    patientService.escalatePatient(patientB.id, 'actor', 'org-b');
+
+    const scoped = whiteboard.getWhiteboard('org-a').data;
+    expect(scoped.patients.some((p) => p.id === patientA.id)).toBe(true);
+    expect(scoped.patients.some((p) => p.id === patientB.id)).toBe(false);
+    expect(scoped.alerts.some((a) => a.patientId === patientA.id)).toBe(true);
+    expect(scoped.alerts.some((a) => a.patientId === patientB.id)).toBe(false);
+  });
+
+  it('getWhiteboard() with no organizationId stays unfiltered (preserves existing internal-caller behavior)', () => {
+    const { patientService, whiteboard } = makeWhiteboard();
+    patientService.createPatient({ firstName: 'Org', lastName: 'A' } as any, 'org-a');
+    patientService.createPatient({ firstName: 'Org', lastName: 'B' } as any, 'org-b');
+
+    const unscoped = whiteboard.getWhiteboard().data;
+    expect(unscoped.patients.some((p) => p.firstName === 'Org' && p.lastName === 'A')).toBe(true);
+    expect(unscoped.patients.some((p) => p.firstName === 'Org' && p.lastName === 'B')).toBe(true);
   });
 });

@@ -144,8 +144,8 @@ export class EmergencyOsController {
 
   @RequirePermission(Permission.READ_PHI)
   @Get('whiteboard')
-  getWhiteboard() {
-    return this.whiteboardService.getWhiteboard();
+  getWhiteboard(@TenantContext() tenantContext?: TenantContextValue) {
+    return this.whiteboardService.getWhiteboard(tenantContext?.organizationId);
   }
 
   @RequirePermission(Permission.READ_PHI)
