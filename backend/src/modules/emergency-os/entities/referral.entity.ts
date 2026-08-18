@@ -40,6 +40,9 @@ export class Referral {
   @Column({ type: 'varchar', length: 64, nullable: true })
   statusUpdatedAt?: string;
 
+  @Column({ type: 'varchar', length: 120, nullable: true })
+  organizationId?: string;
+
   @CreateDateColumn()
   createdAt: Date;
 

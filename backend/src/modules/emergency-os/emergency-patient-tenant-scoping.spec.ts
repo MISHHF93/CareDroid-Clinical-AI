@@ -6,6 +6,7 @@ import {
   QueueIntelligenceService,
   PatientJourneyService,
   EmergencyAnalyticsService,
+  ReferralService,
 } from './emergency-os.services';
 
 function makeService() {
@@ -280,5 +281,51 @@ describe('PatientJourneyService and EmergencyAnalyticsService — organization t
     // but a different real org's patient must not inflate this org's census.
     expect(scoped.activeCensus).toBeLessThan(analytics.getAnalytics().data.activeCensus);
     expect(scoped.activeCensus).toBeGreaterThanOrEqual(before);
+  });
+});
+
+describe('ReferralService — organization tenant scoping (HEAL-347.5 follow-up, real persisted referrals)', () => {
+  function makeReferralService() {
+    const workflowLogService = { record: jest.fn() } as unknown as { record: jest.Mock };
+    const patientService = new EmergencyPatientService(workflowLogService as any);
+    return { patientService, referrals: new ReferralService(patientService) };
+  }
+
+  it('createReferral stamps the caller-resolved organizationId, overriding anything on the input body', () => {
+    const { referrals } = makeReferralService();
+    const result = referrals.createReferral(
+      { patientId: 'patient-1', reason: 'Cardiology consult', organizationId: 'org-spoofed' },
+      'org-a',
+    );
+    expect((result.data.referral as { organizationId?: string }).organizationId).toBe('org-a');
+  });
+
+  it('getReferrals(organizationId) includes own-org and legacy/unscoped created referrals, excludes a different org', () => {
+    const { referrals } = makeReferralService();
+    referrals.createReferral({ patientId: 'patient-a', reason: 'Own org referral' }, 'org-a');
+    referrals.createReferral({ patientId: 'patient-b', reason: 'Other org referral' }, 'org-b');
+
+    const scoped = referrals.getReferrals('org-a').data.referrals as Array<{ reason: string }>;
+    expect(scoped.some((referral) => referral.reason === 'Own org referral')).toBe(true);
+    expect(scoped.some((referral) => referral.reason === 'Other org referral')).toBe(false);
+
+    const unscoped = referrals.getReferrals().data.referrals as Array<{ reason: string }>;
+    expect(unscoped.some((referral) => referral.reason === 'Own org referral')).toBe(true);
+    expect(unscoped.some((referral) => referral.reason === 'Other org referral')).toBe(true);
+  });
+
+  it('updateReferralStatus rejects a cross-org id with the same not-found error shape as a missing id (no existence leak)', () => {
+    const { referrals } = makeReferralService();
+    const created = referrals.createReferral({ patientId: 'patient-a', reason: 'Own org referral' }, 'org-a');
+    const referralId = (created.data.referral as { id: string }).id;
+
+    expect(() => referrals.updateReferralStatus(referralId, 'Accepted', 'org-b')).toThrow(
+      /not found/i,
+    );
+    expect(() => referrals.updateReferralStatus('genuinely-missing-id', 'Accepted', 'org-b')).toThrow(
+      /not found/i,
+    );
+    const result = referrals.updateReferralStatus(referralId, 'Accepted', 'org-a');
+    expect((result.data.referral as { status: string }).status).toBe('Accepted');
   });
 });

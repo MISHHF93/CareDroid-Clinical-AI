@@ -717,14 +717,17 @@ export class EmergencyOsController {
 
   @RequirePermission(Permission.READ_PHI)
   @Get('referrals')
-  getReferrals() {
-    return this.referralService.getReferrals();
+  getReferrals(@TenantContext() tenantContext?: TenantContextValue) {
+    return this.referralService.getReferrals(tenantContext?.organizationId);
   }
 
   @RequirePermission(Permission.WRITE_PHI)
   @Post('referrals')
-  createReferral(@Body() dto: CreateReferralDto) {
-    return this.referralService.createReferral({ ...dto });
+  createReferral(
+    @Body() dto: CreateReferralDto,
+    @TenantContext() tenantContext?: TenantContextValue,
+  ) {
+    return this.referralService.createReferral({ ...dto }, tenantContext?.organizationId);
   }
 
   /** ReferralPanel.tsx's updateEmergencyTransferWorkflow() has called this
@@ -735,8 +738,12 @@ export class EmergencyOsController {
    * caller's URL exactly, not the sibling GET/POST referrals routes' prefix. */
   @RequirePermission(Permission.WRITE_PHI)
   @Patch('transfers/:id/status')
-  updateTransferStatus(@Param('id') id: string, @Body() dto: UpdateReferralStatusDto) {
-    return this.referralService.updateReferralStatus(id, dto.status);
+  updateTransferStatus(
+    @Param('id') id: string,
+    @Body() dto: UpdateReferralStatusDto,
+    @TenantContext() tenantContext?: TenantContextValue,
+  ) {
+    return this.referralService.updateReferralStatus(id, dto.status, tenantContext?.organizationId);
   }
 
   @RequirePermission(Permission.READ_PHI)

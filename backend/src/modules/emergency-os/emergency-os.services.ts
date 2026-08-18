@@ -2654,6 +2654,7 @@ export class ReferralService implements OnModuleInit {
       requestedAt: entity.requestedAt,
       statusUpdatedAt: entity.statusUpdatedAt,
       createdAt: entity.requestedAt,
+      organizationId: entity.organizationId,
     };
   }
 
@@ -2672,18 +2673,35 @@ export class ReferralService implements OnModuleInit {
       workflow: String(referral.workflow || ''),
       requestedAt: String(referral.requestedAt || ''),
       statusUpdatedAt: referral.statusUpdatedAt ? String(referral.statusUpdatedAt) : undefined,
+      organizationId: referral.organizationId ? String(referral.organizationId) : undefined,
     });
     this.referralRepository.save(entity).catch((error) => {
       this.logger.warn(`Failed to persist referral ${entity.id} to database: ${error}`);
     });
   }
 
-  getReferrals() {
+  // Same own-org-or-legacy rule as EmergencyPatientService.isVisibleToOrganization
+  // (see project memory "Emergency-OS Tenant Scoping Gap"): a referral with no
+  // organizationId (every pre-migration row) stays visible to every org until
+  // reconciled; a referral with a REAL org never becomes visible to a different org.
+  private isReferralVisibleToOrganization(
+    referral: { organizationId?: unknown },
+    organizationId?: string,
+  ): boolean {
+    if (!organizationId) return true;
+    if (!referral.organizationId) return true;
+    return referral.organizationId === organizationId;
+  }
+
+  getReferrals(organizationId?: string) {
     const patients = this.patientService
-      .listPatients()
+      .listPatients(organizationId)
       .filter(
         (patient) => patient.state === 'Disposition' || isBoarding(patient) || isHighRisk(patient),
       );
+    const createdReferrals = this.createdReferrals.filter((referral) =>
+      this.isReferralVisibleToOrganization(referral, organizationId),
+    );
     return envelope('Referral Intelligence', {
       referrals: [
         ...patients.map((patient, index) => ({
@@ -2702,12 +2720,12 @@ export class ReferralService implements OnModuleInit {
             : 'review-needed',
           elapsedMinutes: minutesSince(patient.arrivalTime),
         })),
-        ...this.createdReferrals,
+        ...createdReferrals,
       ],
     });
   }
 
-  createReferral(input: Record<string, unknown>) {
+  createReferral(input: Record<string, unknown>, organizationId?: string) {
     const patientId = String(input.patientId || '');
     const patient = this.patientService
       .listPatients()
@@ -2727,6 +2745,10 @@ export class ReferralService implements OnModuleInit {
       workflow: String(input.workflow || 'Referral'),
       requestedAt: String(input.requestedAt || now),
       createdAt: now,
+      // Server-resolved tenant context always wins over anything present on
+      // `input` -- same "never let a client-suppliable field override the
+      // authoritative server value" precedent as patient/alert creation.
+      organizationId: organizationId ?? (input.organizationId ? String(input.organizationId) : undefined),
     };
 
     this.createdReferrals.push(referral);
@@ -2742,16 +2764,19 @@ export class ReferralService implements OnModuleInit {
 
     return envelope('Referral Created', {
       referral,
-      referrals: this.getReferrals().data.referrals,
+      referrals: this.getReferrals(organizationId).data.referrals,
     });
   }
 
   /** Backs PATCH /emergency/transfers/:id/status -- only real, created
    * referrals (this.createdReferrals) can be updated; the synthetic
-   * patient-derived rows in getReferrals() aren't real records to mutate. */
-  updateReferralStatus(referralId: string, status: string) {
+   * patient-derived rows in getReferrals() aren't real records to mutate.
+   * Cross-org access throws the exact same not-found error shape as a
+   * genuinely-missing id -- no existence leak, same pattern as
+   * EmergencyPatientService's mutation methods. */
+  updateReferralStatus(referralId: string, status: string, organizationId?: string) {
     const referral = this.createdReferrals.find((entry) => entry.id === referralId);
-    if (!referral) {
+    if (!referral || !this.isReferralVisibleToOrganization(referral, organizationId)) {
       throw new NotFoundException(`Referral ${referralId} not found`);
     }
     referral.status = status;
@@ -2762,7 +2787,7 @@ export class ReferralService implements OnModuleInit {
 
     return envelope('Referral Status Updated', {
       referral,
-      referrals: this.getReferrals().data.referrals,
+      referrals: this.getReferrals(organizationId).data.referrals,
     });
   }
 }
