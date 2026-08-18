@@ -6437,6 +6437,19 @@ function minutesSince(value?: string | null): number {
   return Math.max(0, Math.round((Date.now() - timestamp) / 60000));
 }
 
+// HEAL-326: no consumer of arrivalTime-derived wait minutes anywhere in this
+// file had a staleness ceiling -- a patient left in PatientState.Waiting for
+// weeks (an abandoned/orphaned demo record, or a real record that should
+// have transitioned but didn't) computed a "Longest Wait" header KPI of
+// hundreds of hours, confirmed live. Real EDs escalate/transfer/discharge
+// long before this; a value this large is a data anomaly, not a genuine
+// "worst current case" signal, and displaying it as the department's
+// headline wait metric reads as broken rather than informative. 24h is
+// generously above even the most extreme genuine CTAS P5 critical/LWBS
+// threshold (which would already have fired hours earlier), so it's a safe
+// ceiling for "still plausibly a real, current wait," not an arbitrary one.
+const PLAUSIBLE_MAX_WAIT_MINUTES = 24 * 60;
+
 function formatWaitMinutes(minutes: number): string {
   if (minutes < 60) return `${minutes}m`;
   const hours = Math.floor(minutes / 60);
@@ -6462,12 +6475,14 @@ export const selectEmergencyOperationalSummary = (
   const waitingPatients = state.patients.filter((patient) => patient.state === PatientState.Waiting);
   const longestWaitMinutes =
     state.capacity.longestWaitMinutes ??
-    waitingPatients.reduce(
-      (max, patient) => Math.max(max, minutesSince(patient.arrivalTime)),
-      0,
-    );
+    waitingPatients.reduce((max, patient) => {
+      const minutes = minutesSince(patient.arrivalTime);
+      return minutes <= PLAUSIBLE_MAX_WAIT_MINUTES ? Math.max(max, minutes) : max;
+    }, 0);
   const activePatients = selectActivePatients(state);
-  const activeWaitMinutes = activePatients.map((patient) => minutesSince(patient.arrivalTime));
+  const activeWaitMinutes = activePatients
+    .map((patient) => minutesSince(patient.arrivalTime))
+    .filter((minutes) => minutes <= PLAUSIBLE_MAX_WAIT_MINUTES);
   const averageWaitMinutes = activeWaitMinutes.length
     ? Math.round(activeWaitMinutes.reduce((sum, wait) => sum + wait, 0) / activeWaitMinutes.length)
     : 0;
