@@ -15,6 +15,38 @@ export type BoardingSignals = {
 const boardedCache = new Map<string, { fetchedAt: number; signals: BoardingSignals }>();
 const CACHE_TTL_MS = 60_000;
 
+// Every PatientCard on the Whiteboard independently mounts a useEffect that
+// calls fetchBoardingSignalsForPatient (PatientCard.tsx) -- with the cache
+// above keyed per-PATIENT, a fresh page load or a cache-TTL rollover hits
+// every card's cache miss at once, and each one independently called
+// BoardingApi.fetchBoardedPatients() against the SAME shared-list endpoint.
+// Confirmed live: with the dev board's ~70 patients, this produced ~70
+// near-simultaneous identical GET /api/emergency/boarding/boarded requests
+// every ~60s, correlating with an app-wide slowdown (a warm Whiteboard
+// reload measured going from ~1-2s to 12.3s later in the same session).
+// Sharing one in-flight request/result across every concurrent caller
+// closes the fan-out at its source; the per-patient cache above still
+// avoids recomputing the DERIVED signal on every render.
+let sharedBoardedListPromise: ReturnType<typeof BoardingApi.fetchBoardedPatients> | null = null;
+let sharedBoardedListCachedAt = 0;
+let sharedBoardedListCache: Awaited<ReturnType<typeof BoardingApi.fetchBoardedPatients>> | null = null;
+
+async function getSharedBoardedList() {
+  const now = Date.now();
+  if (sharedBoardedListCache && now - sharedBoardedListCachedAt < CACHE_TTL_MS) {
+    return sharedBoardedListCache;
+  }
+  if (!sharedBoardedListPromise) {
+    sharedBoardedListPromise = BoardingApi.fetchBoardedPatients().then((result) => {
+      sharedBoardedListCache = result;
+      sharedBoardedListCachedAt = Date.now();
+      sharedBoardedListPromise = null;
+      return result;
+    });
+  }
+  return sharedBoardedListPromise;
+}
+
 function signalsFromPatient(patient: Patient): BoardingSignals {
   // Previously checked a `boardingStatus` field that doesn't exist on the
   // live Patient type (only reachable via an unsafe cast) and missed both
@@ -42,7 +74,7 @@ export async function fetchBoardingSignalsForPatient(
   }
 
   const localFallback = signalsFromPatient(patient);
-  const boardedResult = await BoardingApi.fetchBoardedPatients();
+  const boardedResult = await getSharedBoardedList();
 
   if (!boardedResult.ok || !Array.isArray(boardedResult.data)) {
     boardedCache.set(patient.id, { fetchedAt: Date.now(), signals: localFallback });
@@ -70,4 +102,7 @@ export async function fetchBoardingSignalsForPatient(
 
 export function clearBoardingSignalsCache(): void {
   boardedCache.clear();
+  sharedBoardedListCache = null;
+  sharedBoardedListCachedAt = 0;
+  sharedBoardedListPromise = null;
 }
