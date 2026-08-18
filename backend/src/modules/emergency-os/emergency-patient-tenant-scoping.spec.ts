@@ -1,4 +1,9 @@
-import { EmergencyPatientService, EmergencyWhiteboardService } from './emergency-os.services';
+import {
+  EmergencyPatientService,
+  EmergencyWhiteboardService,
+  BoardingService,
+  ReassessmentService,
+} from './emergency-os.services';
 
 function makeService() {
   const workflowLogService = { record: jest.fn() } as unknown as { record: jest.Mock };
@@ -154,5 +159,57 @@ describe('EmergencyWhiteboardService — the whiteboard, the single most-viewed 
     const unscoped = whiteboard.getWhiteboard().data;
     expect(unscoped.patients.some((p) => p.firstName === 'Org' && p.lastName === 'A')).toBe(true);
     expect(unscoped.patients.some((p) => p.firstName === 'Org' && p.lastName === 'B')).toBe(true);
+  });
+});
+
+describe('BoardingService and ReassessmentService — organization tenant scoping (HEAL-347.4 follow-up)', () => {
+  function makeServices() {
+    const workflowLogService = { record: jest.fn() } as unknown as { record: jest.Mock };
+    const patientService = new EmergencyPatientService(workflowLogService as any);
+    return {
+      patientService,
+      boarding: new BoardingService(patientService),
+      reassessment: new ReassessmentService(patientService),
+    };
+  }
+
+  it('BoardingService.getBoarding(organizationId) scopes boarding patients to the caller\'s org', () => {
+    const { patientService, boarding } = makeServices();
+    const patientA = patientService.createPatient(
+      { firstName: 'Own', lastName: 'Org', flags: ['PendingAdmission'] } as any,
+      'org-a',
+    );
+    const patientB = patientService.createPatient(
+      { firstName: 'Other', lastName: 'Org', flags: ['PendingAdmission'] } as any,
+      'org-b',
+    );
+
+    const scoped = boarding.getBoarding('org-a').data;
+    expect(scoped.patients.some((p) => p.id === patientA.id)).toBe(true);
+    expect(scoped.patients.some((p) => p.id === patientB.id)).toBe(false);
+
+    const unscoped = boarding.getBoarding().data;
+    expect(unscoped.patients.some((p) => p.id === patientA.id)).toBe(true);
+    expect(unscoped.patients.some((p) => p.id === patientB.id)).toBe(true);
+  });
+
+  it('ReassessmentService.getReassessmentQueue(organizationId) scopes overdue patients to the caller\'s org', () => {
+    const { patientService, reassessment } = makeServices();
+    const patientA = patientService.createPatient(
+      { firstName: 'Own', lastName: 'Org', flags: ['ReassessmentDue'] } as any,
+      'org-a',
+    );
+    const patientB = patientService.createPatient(
+      { firstName: 'Other', lastName: 'Org', flags: ['ReassessmentDue'] } as any,
+      'org-b',
+    );
+
+    const scoped = reassessment.getReassessmentQueue('org-a').data;
+    expect(scoped.patients.some((p) => p.id === patientA.id)).toBe(true);
+    expect(scoped.patients.some((p) => p.id === patientB.id)).toBe(false);
+
+    const unscoped = reassessment.getReassessmentQueue().data;
+    expect(unscoped.patients.some((p) => p.id === patientA.id)).toBe(true);
+    expect(unscoped.patients.some((p) => p.id === patientB.id)).toBe(true);
   });
 });

@@ -2413,9 +2413,9 @@ export class ReassessmentService {
     @Optional() private readonly emailService?: EmailService,
   ) {}
 
-  getReassessmentQueue() {
+  getReassessmentQueue(organizationId?: string) {
     const patients = this.patientService
-      .listPatients()
+      .listPatients(organizationId)
       .filter((patient) => patient.flags.includes('ReassessmentDue'));
     return envelope('Reassessment Engine', {
       patients,
@@ -2588,8 +2588,8 @@ export class CapacityService {
 export class BoardingService {
   constructor(private readonly patientService: EmergencyPatientService) {}
 
-  getBoarding() {
-    const patients = this.patientService.listPatients().filter(isBoarding);
+  getBoarding(organizationId?: string) {
+    const patients = this.patientService.listPatients(organizationId).filter(isBoarding);
     return envelope('Boarding Intelligence', {
       patients,
       longestBoardingMinutes: patients.reduce(

@@ -634,8 +634,8 @@ export class EmergencyOsController {
 
   @RequirePermission(Permission.READ_PHI)
   @Get('reassessment')
-  getReassessment() {
-    return this.reassessmentService.getReassessmentQueue();
+  getReassessment(@TenantContext() tenantContext?: TenantContextValue) {
+    return this.reassessmentService.getReassessmentQueue(tenantContext?.organizationId);
   }
 
   /** Real out-of-band notification for the waiting-room-safety escalation transition --
@@ -711,8 +711,8 @@ export class EmergencyOsController {
 
   @RequirePermission(Permission.READ_PHI)
   @Get('boarding')
-  getBoarding() {
-    return this.boardingService.getBoarding();
+  getBoarding(@TenantContext() tenantContext?: TenantContextValue) {
+    return this.boardingService.getBoarding(tenantContext?.organizationId);
   }
 
   @RequirePermission(Permission.READ_PHI)
