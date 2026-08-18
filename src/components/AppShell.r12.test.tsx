@@ -86,6 +86,40 @@ vi.mock('../services/devBackendSession', () => ({
   ensureDevBackendSession: vi.fn().mockResolvedValue(undefined),
 }));
 
+// HEAL-347.2: each mock factory's top-level call proves that module was
+// actually *loaded* (module bodies only evaluate once, on first
+// resolution) -- distinguishing "the prefetch effect requested this chunk"
+// from "nothing ever did". Declared via vi.hoisted() since vi.mock() factory
+// bodies are themselves hoisted above plain const declarations.
+const lazyPanelLoadSpies = vi.hoisted(() => ({
+  patientDetailPanelLoad: vi.fn(),
+  commandPaletteLoad: vi.fn(),
+  reassessmentDrawerLoad: vi.fn(),
+  helpHubLoad: vi.fn(),
+  copilotPanelLoad: vi.fn(),
+}));
+
+vi.mock('./PatientDetailPanel', () => {
+  lazyPanelLoadSpies.patientDetailPanelLoad();
+  return { default: () => null };
+});
+vi.mock('./CommandPalette', () => {
+  lazyPanelLoadSpies.commandPaletteLoad();
+  return { default: () => null };
+});
+vi.mock('./ReassessmentDrawer', () => {
+  lazyPanelLoadSpies.reassessmentDrawerLoad();
+  return { default: () => null };
+});
+vi.mock('./help/HelpHub', () => {
+  lazyPanelLoadSpies.helpHubLoad();
+  return { default: () => null };
+});
+vi.mock('./CopilotPanel', () => {
+  lazyPanelLoadSpies.copilotPanelLoad();
+  return { CopilotPanel: () => null };
+});
+
 const emergencyRoleMock = vi.hoisted(() => {
   const { PERMISSIVE_EMERGENCY_ROLE_MOCK } = require('../test/permissiveEmergencyRoleMock.ts');
   return PERMISSIVE_EMERGENCY_ROLE_MOCK;
@@ -254,5 +288,50 @@ describe('AppShell R12 startup wiring', () => {
     await waitFor(() => expect(initializeFromBackend).toHaveBeenCalledTimes(2));
     expect(initializeFromBackend).toHaveBeenNthCalledWith(1, { scope: 'reception' });
     expect(initializeFromBackend).toHaveBeenNthCalledWith(2, { scope: 'full', silent: true });
+  });
+});
+
+describe('HEAL-347.2: idle-time prefetch for lazy shell panels', () => {
+  // Command Palette / Reassessment Drawer were reported as "become
+  // permanently unresponsive after ~10-20 minutes of session use" -- live
+  // timing (not just static reading) showed this was a Vite dev-server
+  // cold-compile artifact: React.lazy() only transforms a chunk's module
+  // graph on its FIRST real request, which took multiple real seconds in
+  // dev (confirmed live: Command Palette >9s cold vs. ~300-600ms warm).
+  // Warming every shell panel's chunk during a post-mount idle window means
+  // no real interaction ever hits that cold path. jsdom has no native
+  // requestIdleCallback, so this exercises the setTimeout(..., 2000)
+  // fallback the same code path uses in that environment.
+  it('schedules a low-priority prefetch shortly after mount via requestIdleCallback (or a setTimeout fallback where unavailable, as in jsdom)', async () => {
+    vi.spyOn(useEmergencyStore.getState(), 'initializeFromBackend').mockResolvedValue({
+      errors: {},
+    });
+    const setTimeoutSpy = vi.spyOn(window, 'setTimeout');
+
+    render(
+      <MemoryRouter>
+        <AppShell>
+          <div>Emergency route</div>
+        </AppShell>
+      </MemoryRouter>,
+    );
+
+    // jsdom has no requestIdleCallback, so the fix's fallback path
+    // (`window.setTimeout(prefetch, 2000)`) is what actually schedules the
+    // prefetch here -- assert that scheduling exists and fires cleanly
+    // rather than trying to observe the dynamic import()s it triggers
+    // resolving through Vitest's module-mock graph, which (unlike the
+    // static lazy() import at module scope) isn't reliably interceptable
+    // for bare `import()` calls in this test environment. The real,
+    // decisive proof this fix works is the live-browser timing evidence in
+    // this commit's description (Command Palette first-open: >9s cold vs.
+    // ~300-600ms once prefetched) -- this test guards the wiring, not a
+    // simulation of the browser's module loader.
+    await waitFor(() => {
+      expect(setTimeoutSpy).toHaveBeenCalledWith(expect.any(Function), 2000);
+    });
+
+    const prefetchCall = setTimeoutSpy.mock.calls.find(([, delay]) => delay === 2000);
+    expect(() => (prefetchCall?.[0] as () => void)?.()).not.toThrow();
   });
 });

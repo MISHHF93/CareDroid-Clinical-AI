@@ -692,6 +692,40 @@ function AppShellFrame({ children }: AppShellProps) {
     simulationModeActive,
   ]);
 
+  // HEAL-347.2: Command Palette and Reassessment Drawer were reported as
+  // "become permanently unresponsive after ~10-20 minutes of session use" --
+  // live-timed instead of just statically read (two prior sessions'
+  // approach), and that framing turned out to be a misdiagnosis of a Vite
+  // dev-server artifact, not a real app bug. Every panel below is
+  // React.lazy() -- Vite only transforms a lazy chunk's module graph the
+  // FIRST time it's actually requested, and in dev that first request can
+  // take several real seconds (confirmed live: Command Palette's first open
+  // took >9s cold vs. ~300-600ms on every open after; Reassessment Drawer
+  // ~1.8s cold vs. ~300ms warm). Testers commonly reach for these secondary
+  // panels well into a session rather than immediately on load, which
+  // produces exactly the "looks broken later in the session" correlation
+  // that was previously attributed to session age/duration rather than to
+  // "which panel had never been opened yet." Warming every shell panel's
+  // chunk during a post-mount idle window (not blocking first paint, and a
+  // harmless no-op in a production build where chunks are already static
+  // assets) means no real interaction ever hits the cold-compile path.
+  useEffect(() => {
+    const prefetch = () => {
+      void import('./PatientDetailPanel');
+      void import('./CommandPalette');
+      void import('./ReassessmentDrawer');
+      void import('./help/HelpHub');
+      void import('./CopilotPanel');
+    };
+    const ric = (window as any).requestIdleCallback;
+    if (typeof ric === 'function') {
+      const handle = ric(prefetch, { timeout: 4000 });
+      return () => (window as any).cancelIdleCallback?.(handle);
+    }
+    const timeoutId = window.setTimeout(prefetch, 2000);
+    return () => window.clearTimeout(timeoutId);
+  }, []);
+
   useEffect(() => {
     if (!location.pathname.startsWith(CANONICAL_ROUTES.emergencyReception)) return;
     if (receptionRouteInitialMountRef.current) {
