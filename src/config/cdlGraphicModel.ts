@@ -97,7 +97,11 @@ export const EMS_PHASE_GRAPHIC_ORDER = Object.freeze([
 ] as const);
 
 export function resolveEmsPhaseProgress(status: string): number {
-  const normalized = status.toLowerCase();
+  // Defensive guard (mirrors HEAL-321's EMSArrival.severity fix): `status`
+  // is typed required, but real EMS/CAD-fed records have reached this
+  // function without one -- degrade to the earliest phase instead of
+  // crashing the whole /emergency/ems route to an error boundary.
+  const normalized = (status || '').toLowerCase();
   if (normalized.includes('complete') || normalized === 'handoff complete') return 100;
   if (normalized.includes('handoff') || normalized === 'arrived') return 80;
   if (normalized.includes('scene')) return 55;

@@ -35,6 +35,27 @@
     align-items: center;
   }
 
+  /* HEAL-324 (fully extended, HEAL-343-round): originally just
+     .emergency-whiteboard-page/.hospital-command-center as an !important
+     override, with the rest of this selector list left as a plain
+     (non-!important) rule below assumed to already be working. Re-verified
+     live this round (Playwright at 3440px) and found the WHOLE list was
+     losing the cascade, not just those two -- `.reception-workspace`
+     (Reception's own Arrival Dashboard, one of the most-used screens) was
+     still hard-capped to ~1700px, and `.cd-page-shell`/`.emergency-route-page`
+     (the shared EmergencyRoutePage template most role pages -- including EMS
+     Coordination, whose OWN `.ems-pipeline` class is nested several levels
+     inside that template, never a direct child of .app-shell-main-content
+     itself) were too. The competing rule is app-shell.css's generic
+     ultrawide readability cap (`.emergency-app-shell.ml-app-shell
+     .app-shell-main-content > *` at min-width:1920px, `max-width: min(100%,
+     100rem)`) -- equal selector specificity to a plain (non-!important) rule
+     here, and it wins the cascade by being declared later in app-shell.css.
+     Folded the two blocks into one: every entry needs !important equally,
+     since none of them were actually safe without it -- confirmed live for
+     reception-workspace, cd-page-shell/emergency-route-page (via EMS),
+     dispatch-console; emergency-whiteboard-page/hospital-command-center
+     already had it from the original HEAL-324 pass. */
   .emergency-app-shell
     .app-shell-main-content
     > :is(
@@ -46,26 +67,9 @@
       .reception-workspace,
       .dispatch-console
     ) {
-    width: 100%;
-    max-width: var(--app-layout-content-max);
-    margin-inline: auto;
-  }
-
-  /* HEAL-324: confirmed live (Playwright at 3440px) that
-     .emergency-whiteboard-page and .hospital-command-center were still
-     rendering at a hardcoded ~1700px regardless of the ~2980-3320px their
-     shared parent (.app-shell-main-content) already correctly grows to at
-     this tier -- roughly 40-50% of a 3440px screen left as unused flat
-     space, with --app-layout-content-max/--app-visual-page-max both
-     confirmed (via getComputedStyle on the element and every ancestor) to
-     already resolve correctly. The competing rule wasn't isolated within
-     this pass's time budget; !important here guarantees these two pages
-     fill their already-correctly-sized parent regardless of what it is,
-     matching the width every OTHER page in the selector list above
-     already gets. */
-  .emergency-app-shell .app-shell-main-content > .emergency-whiteboard-page,
-  .emergency-app-shell .app-shell-main-content > .hospital-command-center {
+    width: 100% !important;
     max-width: var(--app-layout-content-max) !important;
+    margin-inline: auto !important;
   }
 
   .emergency-app-shell

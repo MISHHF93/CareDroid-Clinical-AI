@@ -237,4 +237,117 @@ describe('EMSPipeline render', () => {
     }
     expect(error).toBeUndefined();
   });
+
+  it('renders without throwing when an arrival has no status (same gap shape as HEAL-321, found in EmsUnitTrackGraphic)', () => {
+    // EMSArrival.status is typed as required, but reaches this render path
+    // from several loosely-typed sources (the realtime normalizer, and the
+    // `any`-cast demo-scenario builder's SEED_EMS_UNITS/scenario fallback
+    // chain in setActiveScenario) with no runtime validation. A missing
+    // status crashed EmsUnitTrackGraphic's resolveEmsPhaseProgress
+    // (status.toLowerCase()) in cdlGraphicModel.ts, taking down the whole
+    // /emergency/ems route -- confirmed live via Playwright at 3440px.
+    useEmergencyStore.setState(
+      {
+        ...originalState,
+        patients: [],
+        emsArrivals: [
+          {
+            id: 'ems-missing-status',
+            unitId: 'Medic 7',
+            unitName: 'Medic 7',
+            severity: 'High',
+            eta: 4,
+            dispatchTime: new Date().toISOString(),
+            estimatedArrivalTime: new Date().toISOString(),
+            chiefComplaint: 'Shortness of breath',
+          } as any,
+        ],
+        staff: [],
+        rooms: [],
+        alerts: [],
+        capacity: originalState.capacity,
+        emergencySettings: originalState.emergencySettings,
+      },
+      true,
+    );
+
+    let error: unknown;
+    try {
+      render(
+        <MemoryRouter initialEntries={['/emergency/ems']}>
+          <RouteChromeProvider>
+            <PractitionerVisibilityProvider>
+              <HelpHubProvider>
+                <EMSPipeline />
+              </HelpHubProvider>
+            </PractitionerVisibilityProvider>
+          </RouteChromeProvider>
+        </MemoryRouter>,
+      );
+    } catch (e) {
+      error = e;
+    }
+    expect(error).toBeUndefined();
+  });
+
+  it('renders without throwing when arrival.notes is an object instead of a string (2nd latent bug found behind the HEAL-321-shaped status crash)', () => {
+    // mechanismOfInjury/notes are both typed as plain strings on EMSArrival,
+    // but this exact page previously crashed with "Objects are not valid as
+    // a React child" once the status crash above was fixed and rendering
+    // reached this row for real -- a note/log-shaped object had reached
+    // `arrival.notes` instead of text. Confirmed live; the render now
+    // coerces via safeArrivalText() instead of assuming the field is a
+    // string.
+    useEmergencyStore.setState(
+      {
+        ...originalState,
+        patients: [],
+        emsArrivals: [
+          {
+            id: 'ems-object-notes',
+            unitId: 'Medic 3',
+            unitName: 'Medic 3',
+            status: 'Inbound',
+            severity: 'Moderate',
+            eta: 5,
+            dispatchTime: new Date().toISOString(),
+            estimatedArrivalTime: new Date().toISOString(),
+            chiefComplaint: 'Fall injury',
+            notes: {
+              id: 'note-1',
+              type: 'operational',
+              body: 'Crew reports patient combative on scene.',
+              authorId: 'staff-9',
+              createdAt: new Date().toISOString(),
+              metadata: {},
+            },
+          } as any,
+        ],
+        staff: [],
+        rooms: [],
+        alerts: [],
+        capacity: originalState.capacity,
+        emergencySettings: originalState.emergencySettings,
+      },
+      true,
+    );
+
+    let error: unknown;
+    try {
+      render(
+        <MemoryRouter initialEntries={['/emergency/ems']}>
+          <RouteChromeProvider>
+            <PractitionerVisibilityProvider>
+              <HelpHubProvider>
+                <EMSPipeline />
+              </HelpHubProvider>
+            </PractitionerVisibilityProvider>
+          </RouteChromeProvider>
+        </MemoryRouter>,
+      );
+    } catch (e) {
+      error = e;
+    }
+    expect(error).toBeUndefined();
+  });
 });

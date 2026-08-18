@@ -103,6 +103,16 @@ function vitalsStrip(vitals) {
   ];
 }
 
+// EMSArrival.mechanismOfInjury/notes are typed as plain strings, but this
+// component has been reached (twice now, independently) with a real,
+// non-string value on one of these fields -- e.g. a note/log-shaped object
+// instead of text. Same defensive-guard precedent as
+// resolveEmsPhaseProgress's `status` guard below: coerce instead of
+// crashing the whole route to an error boundary on a malformed field.
+function safeArrivalText(value) {
+  return typeof value === 'string' ? value : undefined;
+}
+
 function crewLabel(arrival) {
   return arrival.crewNames?.length ? arrival.crewNames.join(' / ') : 'Crew pending';
 }
@@ -195,7 +205,7 @@ function EMSArrivalRow({
             />
           ) : null}
         </div>
-        <span>{arrival.mechanismOfInjury || arrival.notes}</span>
+        <span>{safeArrivalText(arrival.mechanismOfInjury) || safeArrivalText(arrival.notes)}</span>
       </div>
 
       <time

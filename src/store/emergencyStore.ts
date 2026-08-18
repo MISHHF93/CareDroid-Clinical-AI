@@ -1230,6 +1230,16 @@ const normalizeBoardingMetrics = (raw: unknown): EmergencyBoardingMetrics => {
 };
 
 const VALID_EMS_SEVERITIES = new Set(['Low', 'Moderate', 'High', 'Critical']);
+// Same shape of gap as `severity` below, found in the same normalizer while
+// re-verifying HEAL-321's fix: `status` is ALSO typed required on EMSArrival
+// (see types/emergency.ts) but was never validated/defaulted here, so a raw
+// record missing it reached EmsUnitTrackGraphic's `status.toLowerCase()`
+// (CdlGraphicKit.tsx -> cdlGraphicModel.ts's resolveEmsPhaseProgress) and
+// crashed /emergency/ems to the same error boundary HEAL-321 already fixed
+// once for the sibling field. 'Inbound' is the earliest real phase in
+// EMSArrivalStatus -- the conservative default for an arrival CareDroid has
+// no confirmed phase for yet.
+const VALID_EMS_ARRIVAL_STATUSES = new Set(['Inbound', 'Arrived', 'Handoff', 'Complete', 'Cancelled']);
 
 // HEAL-321: this normalizer spreads whatever the backend/CAD feed sends,
 // then a later call site casts the result straight to EMSArrival[] (a type
@@ -1242,10 +1252,13 @@ const VALID_EMS_SEVERITIES = new Set(['Low', 'Moderate', 'High', 'Critical']);
 const normalizeEmsIncomingPatient = (value: unknown, index = 0): EmsIncomingPatient => {
   const record = asRecord(value);
   const severity = stringFrom(record.severity);
+  const status = stringFrom(record.status);
   return {
     ...record,
     id: stableId('ems', value, index),
     severity: severity && VALID_EMS_SEVERITIES.has(severity) ? (severity as EMSArrival['severity']) : 'Moderate',
+    status:
+      status && VALID_EMS_ARRIVAL_STATUSES.has(status) ? (status as EMSArrival['status']) : 'Inbound',
   };
 };
 
