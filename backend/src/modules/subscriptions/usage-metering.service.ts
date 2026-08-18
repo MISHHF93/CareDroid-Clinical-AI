@@ -159,11 +159,20 @@ export class UsageMeteringService {
     eventType: UsageEventType,
     details: Partial<RecordUsageInput> = {},
   ) {
+    // HEAL-329: workspaceId (and userId/userRole for defense-in-depth) here
+    // previously preferred the caller-supplied `details` value over the
+    // resolved tenantContext -- subscriptions.service.ts's recordUsageEvent()
+    // forwards a raw client request-body field into `details.workspaceId`
+    // unchecked, letting a caller attribute a usage/billing metering event to
+    // a workspace in a DIFFERENT organization than the one TenantIsolationGuard
+    // actually verified them against. The one other caller of this method
+    // (usage-metering.interceptor.ts) never passes these fields, so
+    // preferring tenantContext doesn't change its behavior at all.
     return this.recordUsage({
       organizationId: tenantContext?.organizationId,
-      workspaceId: details.workspaceId ?? tenantContext?.workspaceId,
-      userId: details.userId ?? tenantContext?.userId,
-      userRole: details.userRole ?? tenantContext?.role,
+      workspaceId: tenantContext?.workspaceId ?? details.workspaceId,
+      userId: tenantContext?.userId ?? details.userId,
+      userRole: tenantContext?.role ?? details.userRole,
       subscriptionPlan: details.subscriptionPlan ?? tenantContext?.subscriptionPlan,
       eventType,
       assetId: details.assetId,

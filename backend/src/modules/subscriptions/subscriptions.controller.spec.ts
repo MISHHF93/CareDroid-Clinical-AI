@@ -130,5 +130,19 @@ describe('SubscriptionsController', () => {
         expect(policy).toEqual(expect.objectContaining({ admin: 'organization', permissions }));
       },
     );
+
+    // HEAL-329: recordUsageEvent carries @TenantScoped() (not
+    // @OrganizationScoped(), so it has no admin/permissions policy to check
+    // the same way as the routes above) but was missing TenantIsolationGuard
+    // entirely -- the same "inert metadata" gap the routes above already
+    // guard against, just on a route with a simpler policy shape.
+    it('recordUsageEvent re-applies TenantIsolationGuard so its @TenantScoped() policy is enforced', () => {
+      const handler = SubscriptionsController.prototype.recordUsageEvent;
+      const guards = Reflect.getMetadata(GUARDS_METADATA, handler) || [];
+      expect(guards).toContain(TenantIsolationGuard);
+
+      const policy = Reflect.getMetadata(TENANT_SCOPE_KEY, handler);
+      expect(policy).toEqual(expect.objectContaining({ level: 'tenant' }));
+    });
   });
 });

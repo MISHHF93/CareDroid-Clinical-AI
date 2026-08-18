@@ -76,6 +76,38 @@ describe('UsageMeteringService', () => {
     expect(usageEventRepository.save).not.toHaveBeenCalled();
   });
 
+  it('HEAL-329: recordFromTenantContext prefers the resolved tenantContext.workspaceId over a caller-supplied override', async () => {
+    // subscriptions.service.ts's recordUsageEvent() forwards a raw client
+    // request-body field into `details.workspaceId` unchecked -- before this
+    // fix, that let a caller attribute a usage/billing metering event to a
+    // workspace in a different organization than TenantIsolationGuard
+    // actually verified them against.
+    await service.recordFromTenantContext(
+      {
+        organizationId: 'real-org',
+        workspaceId: 'real-workspace',
+        userId: 'real-user',
+        role: 'physician',
+      } as any,
+      UsageEventType.CALCULATOR_LAUNCH,
+      {
+        workspaceId: 'attacker-claimed-workspace',
+        userId: 'attacker-claimed-user',
+        userRole: 'admin',
+        assetId: 'qsofa',
+      },
+    );
+
+    expect(usageEventRepository.save).toHaveBeenCalledWith(
+      expect.objectContaining({
+        organizationId: 'real-org',
+        workspaceId: 'real-workspace',
+        userId: 'real-user',
+        userRole: 'physician',
+      }),
+    );
+  });
+
   it('aggregates usage by event type, workspace, asset, role, and active users', async () => {
     usageEventRepository.find.mockResolvedValue([
       {

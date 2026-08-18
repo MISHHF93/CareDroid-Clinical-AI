@@ -175,7 +175,15 @@ export class SubscriptionsController {
   }
 
   @Post('usage/events')
-  @UseGuards(AuthGuard('jwt'))
+  // HEAL-329: every other tenant-scoped route on this controller pairs
+  // AuthGuard('jwt') with TenantIsolationGuard locally -- this one didn't.
+  // The global TenantIsolationGuard instance (tenant-context.module.ts)
+  // runs before route-level guards and before AuthGuard('jwt') sets
+  // req.user, so it short-circuits via `if (!request.user) return true`
+  // and never actually enforces anything unless re-declared here, same as
+  // the sibling routes above already do. Without it, @TenantScoped() was
+  // inert metadata with nothing reading it.
+  @UseGuards(AuthGuard('jwt'), TenantIsolationGuard)
   @TenantScoped()
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Record a frontend-visible usage event such as a tool launch' })
