@@ -46,13 +46,22 @@ export class EdCopilotNestParityController {
 
     const context = (body.context || {}) as Record<string, unknown>;
     const patientId = typeof context.patientId === 'string' ? context.patientId : undefined;
+    // HEAL-334: userId already correctly used the authenticated
+    // request?.user?.id, but userRole used the client-supplied body.user_role
+    // directly -- unlike the canonical sibling path (chat.controller.ts's
+    // sendMessage), which always uses req.user.role. Traced downstream: this
+    // value only feeds intentClassifier.classify() as an NLU hint today, so
+    // no confirmed permission bypass, but a spoofed role could still steer
+    // intent classification toward a tool path with independently weaker
+    // assumptions -- matched the safe, authenticated-first pattern used
+    // everywhere else in this module for consistency.
     const chatResponse = await this.chatService.processMessage(
       body.query,
       undefined,
       'ed-copilot',
       undefined,
       request?.user?.id,
-      body.user_role,
+      request?.user?.role || body.user_role,
       undefined,
       { edCopilot: { enabled: true, ...context, patientId } },
     );

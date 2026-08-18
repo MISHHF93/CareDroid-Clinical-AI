@@ -60,4 +60,21 @@ describe('EdCopilotNestParityController', () => {
     expect(result.requiresClinicianReview).toBe(true);
     expect(result.provenance).toMatchObject({ responseSource: 'DETERMINISTIC_RULE' });
   });
+
+  it('HEAL-334: uses the authenticated req.user.role, not a client-supplied body.user_role, when both are present', async () => {
+    const chatService = {
+      processMessage: jest.fn().mockResolvedValue({ text: 'ok', metadata: {} }),
+    };
+    const controller = new EdCopilotNestParityController(chatService as any);
+
+    await controller.query(
+      { query: 'Who waited longest?', user_role: 'attacker-claimed-admin' },
+      { user: { id: 'real-user', role: 'charge_nurse' } },
+    );
+
+    const [, , , , calledUserId, calledUserRole] = chatService.processMessage.mock.calls[0];
+    expect(calledUserId).toBe('real-user');
+    expect(calledUserRole).toBe('charge_nurse');
+    expect(calledUserRole).not.toBe('attacker-claimed-admin');
+  });
 });
