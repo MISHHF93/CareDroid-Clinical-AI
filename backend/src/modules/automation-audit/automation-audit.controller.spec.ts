@@ -20,7 +20,6 @@ describe('AutomationAuditController', () => {
     await expect(
       controller.listEvents(
         { tenantContext: { organizationId: 'context-tenant' } },
-        'payload-tenant',
         AutomationAuditStatus.BLOCKED,
         '25',
       ),
@@ -32,6 +31,23 @@ describe('AutomationAuditController', () => {
 
     expect(service.listEvents).toHaveBeenCalledWith({
       tenantId: 'context-tenant',
+      status: AutomationAuditStatus.BLOCKED,
+      limit: 25,
+    });
+  });
+
+  it('HEAL-332: never falls back to a client-supplied tenantId, even if req.tenantContext has no resolved organizationId', async () => {
+    // TenantContextService.resolveForRequest always throws before reaching
+    // this controller if it can't resolve a real org for an authenticated
+    // request -- but if that invariant is ever weakened, this proves the
+    // route no longer has a query-param escape hatch to read another
+    // tenant's automation audit events.
+    const { controller, service } = buildController();
+
+    await controller.listEvents({ tenantContext: {} }, AutomationAuditStatus.BLOCKED, '25');
+
+    expect(service.listEvents).toHaveBeenCalledWith({
+      tenantId: undefined,
       status: AutomationAuditStatus.BLOCKED,
       limit: 25,
     });

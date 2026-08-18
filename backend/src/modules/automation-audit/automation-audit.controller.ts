@@ -12,13 +12,20 @@ export class AutomationAuditController {
   @Get()
   async listEvents(
     @Req() req: any,
-    @Query('tenantId') tenantId?: string,
     @Query('status') status?: AutomationAuditStatus,
     @Query('limit') limit?: string,
   ) {
-    const scopedTenantId = req.tenantContext?.organizationId || tenantId;
+    // HEAL-332: this previously fell back to a client-supplied `tenantId`
+    // query param whenever req.tenantContext?.organizationId was falsy.
+    // TenantContextService.resolveForRequest always throws before reaching
+    // any controller if it can't resolve a real org for an authenticated
+    // request, so this fallback is dead today -- but it's exactly the kind
+    // of latent anti-pattern that becomes a live cross-org audit-log read
+    // the moment that invariant changes (e.g. this route ever joins the
+    // tenant-bootstrap allowlist). Removed entirely rather than left as a
+    // documented risk, since nothing legitimately depends on it.
     const events = await this.automationAuditService.listEvents({
-      tenantId: scopedTenantId,
+      tenantId: req.tenantContext?.organizationId,
       status,
       limit: limit ? Number(limit) : undefined,
     });
