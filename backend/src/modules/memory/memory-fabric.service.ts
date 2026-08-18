@@ -255,7 +255,13 @@ export class MemoryFabricService {
       scope: input.dto.scope,
       signalType: input.dto.signalType,
       organizationId: tenant.organizationId,
-      workspaceId: input.dto.workspaceId || tenant.workspaceId,
+      // HEAL-335: prefer the resolved tenant.workspaceId over the raw
+      // client-supplied dto.workspaceId (POST /memory/fabric/signals passes
+      // the request body straight through) -- organizationId here was
+      // already correctly server-derived with no client override at all,
+      // but workspaceId let a caller misattribute a memory signal to a
+      // different workspace within their own organization.
+      workspaceId: tenant.workspaceId || input.dto.workspaceId,
       role: tenant.role || input.user?.role,
       assetId: input.dto.assetId,
       workflowId: input.dto.workflowId,
@@ -267,7 +273,7 @@ export class MemoryFabricService {
       input.dto.signalType,
       ...(input.dto.tags || []),
     ];
-    const workspaceId = input.dto.workspaceId || tenant.workspaceId || undefined;
+    const workspaceId = tenant.workspaceId || input.dto.workspaceId || undefined;
 
     const memory =
       input.dto.signalType === MemoryFabricSignalType.AI_CONTEXT
