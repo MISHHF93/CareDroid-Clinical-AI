@@ -177,7 +177,21 @@ export class EmergencyAIController {
     requestType: string,
   ) {
     await assertEntitlementLaunchFromRequest(this.entitlementService, req, 'agent-clinical');
-    const userId = dto.userId || req?.user?.id || 'anonymous';
+    // HEAL-327: dto.userId/dto.tenantId are optional, client-settable DTO
+    // fields that previously took PRIORITY over the authenticated
+    // req.user.id/req.user.tenantId. userId flows into
+    // chatService.processMessage -> buildAssistantMemoryContext(userId),
+    // which fetches short/long/clinical memory keyed only by that id with no
+    // ownership check -- clinicalMemoryService.getClinicalContext() returns
+    // real PHI-adjacent findings/summaries tied to a patientId. Any
+    // authenticated caller holding USE_AI_CHAT (STUDENT included, explicitly
+    // documented elsewhere as "cannot access real PHI") could pull another
+    // user's clinical memory into their own AI response context by simply
+    // setting userId in the request body. The sibling, canonical self-service
+    // route (MemoryController) always uses req.user.id and never accepts a
+    // client-supplied override -- this brings these 4 routes in line with
+    // that established-safe pattern instead of trusting client input.
+    const userId = req?.user?.id || dto.userId || 'anonymous';
     const userRole = req?.user?.role || null;
     const clientAiRequest =
       dto.workspaceContext?.aiRequest && typeof dto.workspaceContext.aiRequest === 'object'
@@ -188,7 +202,9 @@ export class EmergencyAIController {
       aiRequest: {
         ...clientAiRequest,
         userId,
-        tenantId: dto.tenantId || req?.user?.tenantId || 'default-tenant',
+        // Same precedence fix as userId above (HEAL-327) -- the real
+        // authenticated tenant wins over a client-supplied override.
+        tenantId: req?.user?.tenantId || dto.tenantId || 'default-tenant',
         patientId: dto.patientId,
         encounterId: dto.encounterId,
         purpose: dto.purpose,
