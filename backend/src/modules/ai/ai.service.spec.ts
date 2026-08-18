@@ -238,6 +238,38 @@ describe('AIService', () => {
       expect(result.safety.requiresHumanReview).toBe(true);
       expect(result.model.model).toBe('careDroidAI-node-v1');
     });
+
+    it('HEAL-328: the resolved tenantContext/authenticated userId win over a client-supplied organizationId/userId/role in the audit context, not the reverse', async () => {
+      jest.spyOn(service as any, 'classifyStructuredNodeInput').mockResolvedValue(null);
+      const nodeSpy = jest.spyOn(service, 'runCareDroidAINode');
+
+      await service.runUnifiedAiQuery(
+        'real-authenticated-user',
+        {
+          role: 'admin',
+          permissions: ['use_ai_chat'],
+          channel: 'reception',
+          task: 'detect_missing_information',
+          query: 'What is missing before triage handoff?',
+          responseFormat: 'structured',
+          // Client-supplied values an attacker could set to poison the AI
+          // audit trail's attribution -- before HEAL-328 these won.
+          organizationId: 'attacker-claimed-org',
+          userId: 'attacker-claimed-user',
+        },
+        { organizationId: 'real-org', role: 'receptionist' },
+      );
+
+      expect(nodeSpy).toHaveBeenCalled();
+      const [calledUserId, calledRequest] = nodeSpy.mock.calls[0];
+      const calledContext = calledRequest.context as Record<string, any>;
+      expect(calledUserId).toBe('real-authenticated-user');
+      expect(calledContext).toBeDefined();
+      expect(calledContext.organizationId).toBe('real-org');
+      expect(calledContext.tenant.organizationId).toBe('real-org');
+      expect(calledContext.tenant.userId).toBe('real-authenticated-user');
+      expect(calledContext.userRole).toBe('receptionist');
+    });
   });
 
   describe('human-review creation from high-risk AI output (AI7)', () => {

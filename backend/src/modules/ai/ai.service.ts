@@ -766,18 +766,30 @@ export class AIService {
     const requestId = String(body.requestId || randomUUID());
     const correlationId = String(body.correlationId || randomUUID());
 
+    // HEAL-328: organizationId/userId/role below previously preferred the
+    // client-supplied body.* value over the server-resolved tenantContext/
+    // authenticated userId param -- unlike the sibling /ai/query, /ai/structured,
+    // and /ai/node routes, which use withTenantContext() (tenant always wins).
+    // These values flow into logCareDroidAIEvent, which writes them into the
+    // AI audit log -- a caller could falsify who/what-org an AI request is
+    // attributed to in the compliance audit trail. No downstream data-fetch
+    // or authorization decision in this path was found to key off these
+    // fields (confirmed by trace), so this is an audit-integrity fix, not a
+    // data-access one. Server-resolved values now always win; the client
+    // body is only used as a fallback when no tenant/user context resolved
+    // at all.
     const candidate = {
       requestId,
       correlationId,
-      organizationId: String(body.organizationId || tenantContext?.organizationId || 'unknown-org'),
-      workspaceId: body.workspaceId
-        ? String(body.workspaceId)
-        : tenantContext?.workspaceId
-          ? String(tenantContext.workspaceId)
+      organizationId: String(tenantContext?.organizationId || body.organizationId || 'unknown-org'),
+      workspaceId: tenantContext?.workspaceId
+        ? String(tenantContext.workspaceId)
+        : body.workspaceId
+          ? String(body.workspaceId)
           : undefined,
       facilityId: body.facilityId ? String(body.facilityId) : undefined,
-      userId: String(body.userId || userId),
-      role: String(body.role || tenantContext?.role || 'unknown'),
+      userId: String(userId || body.userId),
+      role: String(tenantContext?.role || body.role || 'unknown'),
       permissions: Array.isArray(body.permissions) ? body.permissions.map(String) : ['use_ai_chat'],
       channel: body.channel,
       task: body.task,
