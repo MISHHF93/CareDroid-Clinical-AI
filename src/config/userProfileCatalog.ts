@@ -235,12 +235,25 @@ export function resolveEffectiveEmergencyRole(
   if (profileId && mapping[profileId]) {
     return normalizeEmergencyRole(mapping[profileId]);
   }
+  // HEAL-336: a user's own role is checked before the catalog's generic
+  // saasRole -> emergencyRoleId default. The catalog maps each broad
+  // saasRole to a single representative emergency role (e.g. 'nurse' ->
+  // 'triage_nurse'), so once HEAL-323 taught normalizeSaasRole() the
+  // charge_nurse/triage_nurse aliases (both now correctly resolving to the
+  // 'nurse' saasRole tier for permissions/copy purposes), that generic
+  // mapping started winning here too -- silently collapsing a charge nurse's
+  // already-specific, already-valid 'charge_nurse' role into 'triage_nurse'
+  // for role-based UI/routing (confirmed live: RouteScreenMode resolved
+  // 'triage_nurse' for a charge_nurse demo user). A user's own specific role
+  // is always at least as precise as the catalog's generic bucket, so it
+  // must win; the catalog default is only for users with no specific
+  // emergency role of their own to fall back on.
+  if (user?.role) {
+    const normalizedUserRole = normalizeEmergencyRole(user.role);
+    if (Object.values(EMERGENCY_ROLE_IDS).includes(normalizedUserRole)) return normalizedUserRole;
+  }
   if (catalog?.emergencyRoleId) {
     return normalizeEmergencyRole(catalog.emergencyRoleId);
-  }
-  if (user?.role) {
-    const normalized = normalizeEmergencyRole(user.role);
-    if (Object.values(EMERGENCY_ROLE_IDS).includes(normalized)) return normalized;
   }
   return null;
 }
