@@ -48,6 +48,22 @@ describe('clinical ultrawide layer', () => {
     expect(ultrawideCss).toContain('max-width: 1500px');
   });
 
+  it('HEAL-324: forces Whiteboard/Command Center to fill their already-correctly-sized parent on ultrawide, overriding whatever else was capping them to ~1700px', () => {
+    // Confirmed live (Playwright at 3440px): .emergency-whiteboard-page and
+    // .hospital-command-center rendered at ~1700px width even though
+    // --app-layout-content-max/--app-visual-page-max both already resolved
+    // correctly (~2980-3320px) at every ancestor including the element
+    // itself -- a competing rule elsewhere was winning. Guards against
+    // silently losing this !important override on a future edit.
+    expect(ultrawideCss).toContain(
+      '.emergency-app-shell .app-shell-main-content > .emergency-whiteboard-page,',
+    );
+    expect(ultrawideCss).toContain(
+      '.emergency-app-shell .app-shell-main-content > .hospital-command-center {',
+    );
+    expect(ultrawideCss).toContain('max-width: var(--app-layout-content-max) !important;');
+  });
+
   it('extends layout-engine large breakpoints through 2200px', () => {
     expect(layoutEngineCss).toContain('@media (min-width: 2200px)');
     expect(layoutEngineCss).toContain('--app-layout-content-max');

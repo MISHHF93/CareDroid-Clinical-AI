@@ -51,6 +51,23 @@
     margin-inline: auto;
   }
 
+  /* HEAL-324: confirmed live (Playwright at 3440px) that
+     .emergency-whiteboard-page and .hospital-command-center were still
+     rendering at a hardcoded ~1700px regardless of the ~2980-3320px their
+     shared parent (.app-shell-main-content) already correctly grows to at
+     this tier -- roughly 40-50% of a 3440px screen left as unused flat
+     space, with --app-layout-content-max/--app-visual-page-max both
+     confirmed (via getComputedStyle on the element and every ancestor) to
+     already resolve correctly. The competing rule wasn't isolated within
+     this pass's time budget; !important here guarantees these two pages
+     fill their already-correctly-sized parent regardless of what it is,
+     matching the width every OTHER page in the selector list above
+     already gets. */
+  .emergency-app-shell .app-shell-main-content > .emergency-whiteboard-page,
+  .emergency-app-shell .app-shell-main-content > .hospital-command-center {
+    max-width: var(--app-layout-content-max) !important;
+  }
+
   .emergency-app-shell
     .app-shell-main-content
     :is(
