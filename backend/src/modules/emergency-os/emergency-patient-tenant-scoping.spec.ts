@@ -3,6 +3,7 @@ import {
   EmergencyWhiteboardService,
   BoardingService,
   ReassessmentService,
+  QueueIntelligenceService,
 } from './emergency-os.services';
 
 function makeService() {
@@ -211,5 +212,32 @@ describe('BoardingService and ReassessmentService — organization tenant scopin
     const unscoped = reassessment.getReassessmentQueue().data;
     expect(unscoped.patients.some((p) => p.id === patientA.id)).toBe(true);
     expect(unscoped.patients.some((p) => p.id === patientB.id)).toBe(true);
+  });
+});
+
+describe('QueueIntelligenceService — organization tenant scoping (HEAL-347.4 follow-up)', () => {
+  it('getQueues(organizationId) scopes each queue\'s patients to the caller\'s org', () => {
+    const workflowLogService = { record: jest.fn() } as unknown as { record: jest.Mock };
+    const patientService = new EmergencyPatientService(workflowLogService as any);
+    const queueService = new QueueIntelligenceService(patientService);
+
+    const patientA = patientService.createPatient(
+      { firstName: 'Own', lastName: 'Org', state: 'Triage' } as any,
+      'org-a',
+    );
+    const patientB = patientService.createPatient(
+      { firstName: 'Other', lastName: 'Org', state: 'Triage' } as any,
+      'org-b',
+    );
+
+    const scoped = queueService.getQueues('org-a').data;
+    const scopedTriage = scoped.queues.find((queue) => queue.label === 'Triage');
+    expect(scopedTriage?.patients.some((p) => p.id === patientA.id)).toBe(true);
+    expect(scopedTriage?.patients.some((p) => p.id === patientB.id)).toBe(false);
+
+    const unscoped = queueService.getQueues().data;
+    const unscopedTriage = unscoped.queues.find((queue) => queue.label === 'Triage');
+    expect(unscopedTriage?.patients.some((p) => p.id === patientA.id)).toBe(true);
+    expect(unscopedTriage?.patients.some((p) => p.id === patientB.id)).toBe(true);
   });
 });

@@ -2116,8 +2116,8 @@ export class SmartIntakeService {
 export class QueueIntelligenceService {
   constructor(private readonly patientService: EmergencyPatientService) {}
 
-  getQueues() {
-    const patients = this.patientService.listPatients();
+  getQueues(organizationId?: string) {
+    const patients = this.patientService.listPatients(organizationId);
     const queueDefinitions = [
       ['Waiting', (patient: EmergencyPatient) => patient.state === 'Waiting', 30],
       ['Triage', (patient: EmergencyPatient) => patient.state === 'Triage', 10],

@@ -628,8 +628,8 @@ export class EmergencyOsController {
 
   @RequirePermission(Permission.READ_PHI)
   @Get('queues')
-  getQueues() {
-    return this.queueService.getQueues();
+  getQueues(@TenantContext() tenantContext?: TenantContextValue) {
+    return this.queueService.getQueues(tenantContext?.organizationId);
   }
 
   @RequirePermission(Permission.READ_PHI)
