@@ -639,6 +639,71 @@ describe('AuditService', () => {
         expect(result.tamperedLogs[0]).toContain('Log ID');
       }
     });
+
+    // HEAL-347.23: the hash chain is deliberately global across every
+    // organization, so the tamper-check math must still walk every log --
+    // but the caller-facing result must not hand one hospital's admin
+    // another hospital's tampered log ids or the platform-wide log count.
+    it('scopes totalLogs/tamperedLogs/isValid to the caller organization when one is provided, without changing the underlying chain math', async () => {
+      const timestamp1 = new Date('2023-01-01T10:00:00Z');
+      const timestamp2 = new Date('2023-01-01T10:01:00Z');
+
+      const hash1 = (service as any).calculateHash({
+        userId: '1',
+        action: AuditAction.LOGIN,
+        resource: 'auth',
+        ipAddress: '192.168.1.1',
+        timestamp: timestamp1,
+        previousHash: '0',
+        metadata: {},
+      });
+
+      const logs = [
+        {
+          id: 'org-a-1',
+          organizationId: 'org-a',
+          userId: '1',
+          action: AuditAction.LOGIN,
+          resource: 'auth',
+          ipAddress: '192.168.1.1',
+          timestamp: timestamp1,
+          hash: hash1, // real, untampered
+          previousHash: '0',
+          metadata: {},
+        },
+        {
+          id: 'org-b-1',
+          organizationId: 'org-b',
+          userId: '2',
+          action: AuditAction.LOGOUT,
+          resource: 'auth',
+          ipAddress: '192.168.1.2',
+          timestamp: timestamp2,
+          hash: 'wrong_hash', // Tampered -- belongs to org-b, not org-a
+          previousHash: hash1,
+          metadata: {},
+        },
+      ];
+
+      mockAuditRepository.find.mockResolvedValue(logs);
+
+      const globalResult = await service.verifyIntegrity();
+      expect(globalResult.isValid).toBe(false);
+      expect(globalResult.totalLogs).toBe(2);
+      expect(globalResult.tamperedLogs.length).toBe(1);
+      expect(globalResult.tamperedLogs[0]).toContain('org-b-1');
+
+      const orgAResult = await service.verifyIntegrity('org-a');
+      expect(orgAResult.totalLogs).toBe(1);
+      expect(orgAResult.tamperedLogs).toEqual([]);
+      expect(orgAResult.isValid).toBe(true);
+
+      const orgBResult = await service.verifyIntegrity('org-b');
+      expect(orgBResult.totalLogs).toBe(1);
+      expect(orgBResult.tamperedLogs.length).toBe(1);
+      expect(orgBResult.tamperedLogs[0]).toContain('org-b-1');
+      expect(orgBResult.isValid).toBe(false);
+    });
   });
 
   describe('findByAction', () => {

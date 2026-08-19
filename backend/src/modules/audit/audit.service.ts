@@ -99,8 +99,24 @@ export class AuditService {
   /**
    * Verify the integrity of the entire audit log chain
    * Returns true if all hashes match correctly, false if tampering detected
+   *
+   * HEAL-347.23: the chain is deliberately GLOBAL, not per-organization --
+   * log() (above) chains every new entry off the single most recent log
+   * across ALL orgs, regardless of which org wrote it. That makes the chain
+   * harder to selectively tamper with, but it also means the tamper-check
+   * math can only be computed correctly over the full, unfiltered log set --
+   * filtering the *query* by organizationId would break the hash comparison
+   * (each entry's previousHash refers to whatever log, from any org, was
+   * written immediately before it). So this still walks every log to get a
+   * correct isValid/integrityVerified result, but when a caller passes
+   * `organizationId` (every real caller now does -- see the controller),
+   * the RETURNED totalLogs/tamperedLogs are filtered down to just that
+   * org's own logs. Before this, GET /audit/verify-integrity (gated by the
+   * ordinary per-hospital ADMIN-held VERIFY_AUDIT_INTEGRITY permission, not
+   * a platform-only role) returned every org's tampered log ids and the
+   * platform-wide total log count to any hospital's local admin.
    */
-  async verifyIntegrity(): Promise<{
+  async verifyIntegrity(organizationId?: string): Promise<{
     isValid: boolean;
     totalLogs: number;
     tamperedLogs: string[];
@@ -119,7 +135,7 @@ export class AuditService {
       };
     }
 
-    const tamperedLogs: string[] = [];
+    const tamperedEntries: { logId: string; organizationId: string | null; message: string }[] = [];
     let previousHash = '0'; // Genesis block
 
     for (let i = 0; i < allLogs.length; i++) {
@@ -138,25 +154,32 @@ export class AuditService {
 
       // Verify hash matches
       if (log.hash !== expectedHash) {
-        tamperedLogs.push(
-          `Log ID ${log.id}: Hash mismatch (expected ${expectedHash}, got ${log.hash})`,
-        );
+        tamperedEntries.push({
+          logId: log.id,
+          organizationId: log.organizationId ?? null,
+          message: `Log ID ${log.id}: Hash mismatch (expected ${expectedHash}, got ${log.hash})`,
+        });
       }
 
       // Verify chain is intact
       if (log.previousHash !== previousHash) {
-        tamperedLogs.push(
-          `Log ID ${log.id}: Chain broken (expected previousHash ${previousHash}, got ${log.previousHash})`,
-        );
+        tamperedEntries.push({
+          logId: log.id,
+          organizationId: log.organizationId ?? null,
+          message: `Log ID ${log.id}: Chain broken (expected previousHash ${previousHash}, got ${log.previousHash})`,
+        });
       }
 
       previousHash = log.hash;
     }
 
-    const isValid = tamperedLogs.length === 0;
+    const chainIsValid = tamperedEntries.length === 0;
 
-    // Update integrityVerified flag for all logs
-    if (isValid) {
+    // Update integrityVerified flag for all logs -- this DB write is a
+    // genuine whole-chain maintenance operation, unrelated to what this
+    // call returns to its caller, so it stays scoped to the real global
+    // result regardless of the organizationId filter below.
+    if (chainIsValid) {
       await this.auditRepository
         .createQueryBuilder()
         .update(AuditLog)
@@ -171,13 +194,23 @@ export class AuditService {
         .execute();
     }
 
+    const scopedTotalLogs = organizationId
+      ? allLogs.filter((log) => log.organizationId === organizationId).length
+      : allLogs.length;
+    const scopedTamperedLogs = (
+      organizationId
+        ? tamperedEntries.filter((entry) => entry.organizationId === organizationId)
+        : tamperedEntries
+    ).map((entry) => entry.message);
+    const scopedIsValid = scopedTamperedLogs.length === 0;
+
     return {
-      isValid,
-      totalLogs: allLogs.length,
-      tamperedLogs,
-      message: isValid
+      isValid: scopedIsValid,
+      totalLogs: scopedTotalLogs,
+      tamperedLogs: scopedTamperedLogs,
+      message: scopedIsValid
         ? 'All audit logs verified successfully'
-        : `Tampering detected in ${tamperedLogs.length} logs`,
+        : `Tampering detected in ${scopedTamperedLogs.length} logs`,
     };
   }
 

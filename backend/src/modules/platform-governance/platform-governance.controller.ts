@@ -74,8 +74,18 @@ export class PlatformGovernanceController {
   @Post('review/items')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.REVIEW_GOVERNANCE)
-  createReviewItem(@Body() body: CreateReviewItemDto) {
-    return this.platformGovernanceService.createReviewItem({ ...body });
+  createReviewItem(@Body() body: CreateReviewItemDto, @Req() req: any) {
+    // HEAL-347.22: every sibling route on this controller (getReviewItems,
+    // decideReviewItem) derives organizationId from req.tenantContext -- this
+    // one instead trusted CreateReviewItemDto's own optional, client-settable
+    // organizationId field verbatim into the saved entity. Any REVIEW_GOVERNANCE
+    // holder could stamp a governance/clinical-AI-safety review item with
+    // another org's id (polluting that org's compliance queue) or omit it
+    // entirely (item becomes invisible to listReviewItems' org-scoped read).
+    return this.platformGovernanceService.createReviewItem({
+      ...body,
+      organizationId: req.tenantContext?.organizationId,
+    });
   }
 
   @Post('review/items/:itemId/decision')

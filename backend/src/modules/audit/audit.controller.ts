@@ -194,9 +194,13 @@ export class AuditController {
    */
   @Get('verify-integrity')
   @RequirePermission(Permission.VERIFY_AUDIT_INTEGRITY)
-  async verifyIntegrity() {
+  async verifyIntegrity(@Req() req: any) {
     try {
-      const result = await this.auditService.verifyIntegrity();
+      // HEAL-347.23: VERIFY_AUDIT_INTEGRITY is granted to the ordinary
+      // per-hospital ADMIN role, not a platform-only one -- without this
+      // scope, any hospital's local admin got every other hospital's
+      // tampered-log ids and the platform-wide total log count back.
+      const result = await this.auditService.verifyIntegrity(req.tenantContext?.organizationId);
 
       this.logger.log(`Integrity verification complete: ${result.isValid ? 'VALID' : 'TAMPERED'}`);
 
@@ -278,7 +282,9 @@ export class AuditController {
           logsByUser,
           phiAccessCount,
           securityEventCount,
-          integrityStatus: (await this.auditService.verifyIntegrity()).isValid
+          integrityStatus: (
+            await this.auditService.verifyIntegrity(req.tenantContext?.organizationId)
+          ).isValid
             ? 'VERIFIED'
             : 'TAMPERED',
         },
