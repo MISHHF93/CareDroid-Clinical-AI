@@ -125,6 +125,24 @@ export function readDevTenantContext() {
 type DevBackendSessionResult = Awaited<ReturnType<typeof resolveDevBackendSession>>;
 
 let inFlightDevSession: Promise<DevBackendSessionResult> | null = null;
+// HEAL-347.42: forced callers used to unconditionally null out
+// inFlightDevSession before starting their own fetch, defeating the
+// dedup this whole mechanism exists for the instant more than one forced
+// call landed close together -- e.g. several components independently
+// hitting a protected route with the stale bypass token on mount, each
+// one's apiClient.ts 401-retry calling ensureDevBackendSession({force:
+// true}) at nearly the same moment. Each call reset the guard the
+// previous one had just set, so every one of them fired its own real
+// POST /api/auth/dev-session -- confirmed live via network trace: 15+
+// concurrent POSTs to that route on a single login, taking 7+ seconds to
+// resolve. That route is also documented (see resolveDevBackendSession's
+// own HEAL-347.27 comment) to degrade under concurrent load, so this
+// wasn't just wasteful -- it was actively making its own problem worse.
+// Track forced in-flight requests separately so concurrent forced
+// callers join the SAME fetch instead of each starting a new one; an
+// unforced caller that arrives while a forced fetch is already running
+// joins it too, since it's guaranteed to produce a fresh result.
+let inFlightForcedSession: Promise<DevBackendSessionResult> | null = null;
 
 async function resolveDevBackendSession({
   force = false,
@@ -228,7 +246,17 @@ export async function ensureDevBackendSession({
   timeoutMs?: number;
 } = {}) {
   if (force) {
-    inFlightDevSession = null;
+    if (!inFlightForcedSession) {
+      inFlightForcedSession = resolveDevBackendSession({ force, timeoutMs }).finally(() => {
+        inFlightForcedSession = null;
+      });
+      inFlightDevSession = inFlightForcedSession;
+    }
+    return inFlightForcedSession;
+  }
+
+  if (inFlightForcedSession) {
+    return inFlightForcedSession;
   }
 
   if (!inFlightDevSession) {
