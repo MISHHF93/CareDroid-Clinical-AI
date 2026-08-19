@@ -179,7 +179,7 @@ export class EmergencyAIController {
     await assertEntitlementLaunchFromRequest(this.entitlementService, req, 'agent-clinical');
     // HEAL-327: dto.userId/dto.tenantId are optional, client-settable DTO
     // fields that previously took PRIORITY over the authenticated
-    // req.user.id/req.user.tenantId. userId flows into
+    // req.user.id/req.user.profile.organizationId. userId flows into
     // chatService.processMessage -> buildAssistantMemoryContext(userId),
     // which fetches short/long/clinical memory keyed only by that id with no
     // ownership check -- clinicalMemoryService.getClinicalContext() returns
@@ -202,9 +202,22 @@ export class EmergencyAIController {
       aiRequest: {
         ...clientAiRequest,
         userId,
-        // Same precedence fix as userId above (HEAL-327) -- the real
-        // authenticated tenant wins over a client-supplied override.
-        tenantId: req?.user?.tenantId || dto.tenantId || 'default-tenant',
+        // HEAL-347.34: HEAL-327's own fix read req.user.tenantId, a field
+        // the User entity has never had (JwtStrategy.validate() returns the
+        // plain TypeORM User -- id/email/role/profile/subscription, no
+        // tenantId). It was always undefined, so this line always fell
+        // through to the client-supplied dto.tenantId (the exact spoofing
+        // HEAL-327's own comment describes preventing) or the shared
+        // 'default-tenant' literal -- confirmed by reading rag.service.ts's
+        // buildRetrievalFilter(), which explicitly leaves retrieval
+        // UNSCOPED across every organization when organizationId is
+        // undefined ("callers without tenant context ... preserving
+        // unscoped retrieval"), and by the existing regression spec's own
+        // mock, which hand-adds a tenantId field to req.user that the real
+        // JwtStrategy never produces. Real org lives on the profile
+        // relation (JwtStrategy always loads it) -- same source the
+        // sibling chat.controller.ts already uses correctly.
+        tenantId: req?.user?.profile?.organizationId || dto.tenantId || 'default-tenant',
         patientId: dto.patientId,
         encounterId: dto.encounterId,
         purpose: dto.purpose,
@@ -224,11 +237,12 @@ export class EmergencyAIController {
       workspaceContext,
       dto.memoryContext,
       dto.messages,
-      // HEAL-340: was omitted entirely, so an emergency detected on this
-      // route always fell through to emergency-escalation.service.ts's
-      // 'default-organization' fallback for its incident-channel creation.
-      // Same trusted tenantId source already used above for the HEAL-327 fix.
-      req?.user?.tenantId,
+      // HEAL-340's own fix (like HEAL-327's above) read req.user.tenantId --
+      // always undefined, see the HEAL-347.34 comment above for the full
+      // trace. Every hospital's real emergency-escalation incident channel
+      // was collapsing into one shared 'default-organization'-tagged
+      // Collaboration Hub channel instead of the reporting hospital's own.
+      req?.user?.profile?.organizationId,
     );
 
     return {

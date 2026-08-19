@@ -2,14 +2,30 @@ import { EmergencyAIController } from './emergency-ai.controller';
 
 /**
  * HEAL-327: dto.userId/dto.tenantId (optional, client-settable DTO fields)
- * previously took PRIORITY over the authenticated req.user.id/tenantId.
- * userId flows into ChatService.processMessage -> buildAssistantMemoryContext,
- * which fetches short/long/clinical memory keyed only by that id with no
- * ownership check -- so any authenticated caller holding USE_AI_CHAT could
- * pull another user's clinical memory into their own AI response by simply
- * setting userId in the request body. This proves the fix at the actual
- * call boundary (what userId/tenantId reach ChatService), not just via
- * static source-text matching.
+ * previously took PRIORITY over the authenticated
+ * req.user.id/req.user.profile.organizationId. userId flows into
+ * ChatService.processMessage -> buildAssistantMemoryContext, which fetches
+ * short/long/clinical memory keyed only by that id with no ownership check
+ * -- so any authenticated caller holding USE_AI_CHAT could pull another
+ * user's clinical memory into their own AI response by simply setting
+ * userId in the request body. This proves the fix at the actual call
+ * boundary (what userId/tenantId reach ChatService), not just via static
+ * source-text matching.
+ *
+ * HEAL-347.34: this file's own req.user mock used to hand-add a `tenantId`
+ * field directly on req.user -- but JwtStrategy.validate() returns the
+ * plain TypeORM User entity (id/email/role/profile/subscription), which
+ * has NO tenantId property at all, so that shape can never occur on a real
+ * request. The org actually lives on the profile relation JwtStrategy
+ * always loads (`relations: ['profile', 'subscription']`). Because this
+ * mock didn't match reality, these tests were passing while the real code
+ * (emergency-ai.controller.ts's req?.user?.tenantId) was silently always
+ * undefined in production -- confirmed live: rag.service.ts's
+ * buildRetrievalFilter() leaves retrieval UNSCOPED across every
+ * organization whenever organizationId is undefined, and
+ * emergency-escalation.service.ts collapsed every hospital's incident
+ * channel into one shared 'default-organization' channel. Fixed the mock
+ * to match JwtStrategy's real return shape.
  */
 describe('EmergencyAIController userId/tenantId spoofing (HEAL-327)', () => {
   function buildController() {
@@ -27,7 +43,11 @@ describe('EmergencyAIController userId/tenantId spoofing (HEAL-327)', () => {
   }
 
   const req = {
-    user: { id: 'real-authenticated-user', role: 'physician', tenantId: 'real-org' },
+    user: {
+      id: 'real-authenticated-user',
+      role: 'physician',
+      profile: { organizationId: 'real-org' },
+    },
   };
 
   it('uses the authenticated req.user.id, not an attacker-supplied dto.userId', async () => {
@@ -49,7 +69,7 @@ describe('EmergencyAIController userId/tenantId spoofing (HEAL-327)', () => {
     expect(userIdArg).not.toBe('victim-user-id');
   });
 
-  it('uses the authenticated req.user.tenantId, not an attacker-supplied dto.tenantId', async () => {
+  it('uses the authenticated req.user.profile.organizationId, not an attacker-supplied dto.tenantId', async () => {
     const { controller, processMessage } = buildController();
 
     await controller.sendCopilotMessage(
