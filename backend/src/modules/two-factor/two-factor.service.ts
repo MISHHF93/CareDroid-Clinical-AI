@@ -9,6 +9,7 @@ import { Repository } from 'typeorm';
 import * as speakeasy from 'speakeasy';
 import * as QRCode from 'qrcode';
 import * as bcrypt from 'bcrypt';
+import { randomInt } from 'crypto';
 import { TwoFactor } from './entities/two-factor.entity';
 import { User } from '../users/entities/user.entity';
 import { AuditService } from '../audit/audit.service';
@@ -192,11 +193,24 @@ export class TwoFactorService {
     };
   }
 
+  private static readonly BACKUP_CODE_ALPHABET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+  // HEAL-347.28: Math.random() is V8's non-cryptographic xorshift128+ PRNG --
+  // its internal state is recoverable from a handful of observed outputs
+  // (published state-recovery attacks exist), making future backup codes
+  // predictable rather than requiring the intended ~8-character keyspace
+  // brute force. These codes are a real second authentication factor
+  // (bcrypt-hashed and single-use verified in verifyToken below), so they
+  // need the same CSPRNG this backend already uses for other credential-
+  // grade tokens (auth.service.ts's randomBytes-based verification/reset
+  // tokens) -- crypto.randomInt() per character instead.
   private generateBackupCodes(count: number): string[] {
     const codes: string[] = [];
     for (let i = 0; i < count; i++) {
-      // Generate 8-character alphanumeric code
-      const code = Math.random().toString(36).substring(2, 10).toUpperCase();
+      let code = '';
+      for (let j = 0; j < 8; j++) {
+        code += TwoFactorService.BACKUP_CODE_ALPHABET[randomInt(TwoFactorService.BACKUP_CODE_ALPHABET.length)];
+      }
       codes.push(code);
     }
     return codes;

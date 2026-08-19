@@ -425,4 +425,24 @@ describe('TwoFactorService', () => {
       });
     });
   });
+
+  // HEAL-347.28: backup codes are a real second authentication factor
+  // (bcrypt-hashed, single-use verified) that previously came from
+  // Math.random() -- V8's non-cryptographic PRNG, whose state is
+  // recoverable from a handful of observed outputs. This doesn't prove
+  // cryptographic strength directly (that's crypto.randomInt's own
+  // guarantee), but it pins the output contract other tests mock past:
+  // 8-char uppercase alphanumeric, and no collisions across a batch large
+  // enough that Math.random()-or-worse would be likely to repeat.
+  describe('generateBackupCodes', () => {
+    it('produces 8-character uppercase alphanumeric codes with no collisions across a large batch', () => {
+      const codes: string[] = (service as any).generateBackupCodes(500);
+
+      expect(codes).toHaveLength(500);
+      for (const code of codes) {
+        expect(code).toMatch(/^[0-9A-Z]{8}$/);
+      }
+      expect(new Set(codes).size).toBe(500);
+    });
+  });
 });
