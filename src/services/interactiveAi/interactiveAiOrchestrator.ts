@@ -114,7 +114,10 @@ export async function runInteractiveAssist(
       patientId: input.patientId,
     },
     requested: input.contextItems || [],
-    userPermissions: input.permissions || ['use_ai_chat', 'view_phi', 'view_operations'],
+    // HEAL-347.37: a caller that omits `permissions` gets base chat only, not
+    // PHI/operations visibility — the previous permissive default silently
+    // granted view_phi to every caller that forgot to pass real permissions.
+    userPermissions: input.permissions || ['use_ai_chat'],
   });
 
   if (input.signal?.aborted) {

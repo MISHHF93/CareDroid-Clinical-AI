@@ -50,6 +50,8 @@ import { resolveUnifiedChannelFromRole } from '../../services/unifiedAiEnvelope'
 import { AccountableRecommendationCard } from '../ai/AccountableRecommendationCard';
 import type { AccountableRecommendation } from '../../contracts/accountableAi';
 import { InteractionInbox } from './InteractionInbox';
+import { useSecurityAccess } from '../../hooks/useSecurityAccess';
+import { Permission } from '../../config/backendPermissionCatalog';
 import './interactiveAi.css';
 
 export type InteractiveAIWorkspaceProps = {
@@ -75,9 +77,26 @@ export function InteractiveAIWorkspace({
   purpose = 'interactive_workspace',
   title,
   seedTriggers = [],
-  permissions = ['use_ai_chat', 'view_phi', 'view_operations'],
+  permissions: permissionsProp,
 }: InteractiveAIWorkspaceProps) {
   const channel = channelProp || resolveUnifiedChannelFromRole(role, 'api');
+  const security = useSecurityAccess();
+  // HEAL-347.37: this used to default to a hardcoded, always-permissive
+  // ['use_ai_chat', 'view_phi', 'view_operations'] array. No real caller
+  // (Reception/Triage/EMS panels) ever overrode it, so contextAssembler's
+  // view_phi gate always passed regardless of the signed-in user's actual
+  // role or permissions -- every role saw confirmed_patient_fact/ocr_extraction
+  // PHI context items. Deriving from useSecurityAccess() (the same
+  // real, role-derived engine that gates routes/mutations elsewhere) makes
+  // this reflect the signed-in user instead of a fiction.
+  const permissions = useMemo(() => {
+    if (permissionsProp) return permissionsProp;
+    const derived: string[] = [];
+    if (security.can(Permission.USE_AI_CHAT)) derived.push('use_ai_chat');
+    if (security.canAccessPhi('view')) derived.push('view_phi');
+    if (security.can(Permission.VIEW_OPERATIONS)) derived.push('view_operations');
+    return derived;
+  }, [permissionsProp, security]);
   const navigate = useNavigate();
   const location = useLocation();
   const [input, setInput] = useState('');
