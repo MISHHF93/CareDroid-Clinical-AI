@@ -31,6 +31,22 @@
  * SINGLE shell for patient cards — do not re-declare full chrome later in this file.
  * Visual frame comes from .cdl-card (border, elev, data-severity, data-acuity rail).
  */
+/* responsive-ux.css's global `[role="button"]` reset centers text for small
+   clickable buttons/pills; this card also carries role="button" (it's
+   keyboard-clickable) so it inherits that centering too via `:is()`, whose
+   specificity is that of its most-specific argument (`a.btn`, a type+class
+   compound) even when the element only matches through a lower-specificity
+   one (`[role="button"]`) -- so a plain `.patient-card { text-align: left }`
+   loses the tie. Match it with an ancestor-scoped class instead, which
+   outweighs `:is()`'s inflated specificity outright. Centering is invisible
+   on narrow multi-column grids (name text nearly fills the column) but
+   leaves an obvious blank gap before the name whenever the card renders
+   full-width -- e.g. a single-patient boarding grid. */
+:is(.app-shell, .emergency-app-shell) .patient-card.cdl-card,
+:is(.app-shell, .emergency-app-shell) .patient-card {
+  text-align: left;
+}
+
 .patient-card.cdl-card,
 .patient-card {
   --patient-priority-color: var(--cdl-brand-500);

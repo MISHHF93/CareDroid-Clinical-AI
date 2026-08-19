@@ -743,6 +743,12 @@ function AppShellFrame({ children }: AppShellProps) {
       void import('../pages/emergency/EmergencyAnalytics');
       void import('../pages/emergency/EmergencySettings');
       void import('../pages/collaboration/CollaborationHub');
+      // Hospital Command Center is the 2nd item in the COMMAND sidebar
+      // section (right below Whiteboard) -- one of the most likely first
+      // clicks after login, and it was missing from this list, so it hit
+      // the same cold-compile stall as the routes above (live-timed: 12s+
+      // stuck on "Loading Hospital Command Center..." on first request).
+      void import('../pages/emergency/HospitalCommandCenter');
       // Warms PatientsRoute/QueueRoute/ReassessmentRoute/BoardingRoute/
       // CapacityRoute/CopilotRoute in one request -- see HEAL-347.10 above.
       void import('../pages/emergency/emergencyRoutePages');
