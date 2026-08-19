@@ -195,6 +195,28 @@ describe('medical theme full-scale audit', () => {
     }
   });
 
+  it('MEDICAL_THEME wraps its surface/ink values in theme-aware var(--app-*) tokens, not bare hex (HEAL-347.11)', () => {
+    // config/medicalTheme.constants.ts backs 24 components' inline JS styles
+    // (CommandPalette, PatientDetailPanel, QuickIntake, WhoNextPanel, several
+    // calculators/dashboards) -- unlike CSS classes, inline styles never
+    // picked up html[data-theme='dark']'s overrides at all, so this whole
+    // module was a plain hardcoded light palette regardless of theme.
+    // Confirmed live: CommandPalette rendered as a stark white modal over an
+    // otherwise fully dark UI. Same bug class this file already guards
+    // against in CSS (HEAL-212/214/317), just never checked here.
+    const medicalThemeConstants = tokenFiles[10];
+    for (const token of [
+      'surfacePage: \'var(--app-bg,',
+      'surfaceCard: \'var(--app-panel-bg,',
+      'surfaceMuted: \'var(--app-surface-muted,',
+      'ink: \'var(--app-fg,',
+      'inkMuted: \'var(--app-fg-muted,',
+      'accent: \'var(--app-accent,',
+    ]) {
+      expect(medicalThemeConstants).toContain(token);
+    }
+  });
+
   it('avoids white-on-light card text fallbacks in product card CSS', () => {
     const cardCss = globSync('src/**/*.{css}', {
       cwd: join(srcRoot, '..'),
