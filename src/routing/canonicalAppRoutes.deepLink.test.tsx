@@ -59,7 +59,7 @@ describe('canonical App routes deep links', () => {
     expect(screen.queryByText('Access denied')).toBeNull();
   }, ROUTE_LOAD_TIMEOUT);
 
-  it.each(['/auth-callback', '/account/login', '/welcome', '/create-account'])(
+  it.each(['/auth-callback', '/welcome'])(
     'redirects %s away from the legacy auth surface',
     async (path) => {
       render(<AppRouteHarness initialPath={path} />);
@@ -70,6 +70,25 @@ describe('canonical App routes deep links', () => {
         },
         { timeout: ROUTE_LOAD_TIMEOUT },
       );
+    },
+    ROUTE_LOAD_TIMEOUT,
+  );
+
+  it.each(['/account/login', '/create-account'])(
+    'mounts the real sign-in page at %s instead of redirecting away (HEAL-347.12)',
+    async (path) => {
+      // Before HEAL-347.12 every auth-style alias, including these two,
+      // bounced straight to the demo landing hub. They now mount AuthPage
+      // in place, so the location correctly stays put.
+      render(<AppRouteHarness initialPath={path} />);
+
+      await waitFor(
+        () => {
+          expect(document.querySelector('.auth-page')).toBeTruthy();
+        },
+        { timeout: ROUTE_LOAD_TIMEOUT },
+      );
+      expect(screen.getByTestId('location').textContent).toBe(path);
     },
     ROUTE_LOAD_TIMEOUT,
   );

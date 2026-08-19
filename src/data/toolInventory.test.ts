@@ -83,7 +83,10 @@ describe('canonical tool inventory', () => {
       expect(tool.category, tool.id).toMatch(
         /Diagnostic|Calculator|Reference|Fleet|IoT|Hospital Operations|AI System|Education & Simulation|Laboratory|Visualization|Other/
       );
-      expect(tool.color, tool.id).toMatch(/^#/);
+      // HEAL-347.11: MEDICAL_THEME values are now theme-aware
+      // (`var(--app-token, #hex)`) so inline-styled consumers pick up dark
+      // mode; a plain hex is still valid for entries with no matching token.
+      expect(tool.color, tool.id).toMatch(/^#|^var\(--app-[\w-]+,\s*#[0-9a-fA-F]{3,8}\)$/);
       expect(Array.isArray(tool.features), tool.id).toBe(true);
       expect(tool.canonicalInventoryId, tool.id).toBe(tool.id);
     }

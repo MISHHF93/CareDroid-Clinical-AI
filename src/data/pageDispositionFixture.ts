@@ -13,9 +13,14 @@ import {
 // -- zero importers anywhere; every var(--error-color) fallback it defined
 // was already dead since nothing loaded it. Deleted, dropping both totals
 // by 1 again.
-export const PAGE_INVENTORY_EXPECTED_TOTAL = 239;
-export const PAGE_SOURCE_EXPECTED_TOTAL = 149;
-export const PAGE_STYLE_EXPECTED_TOTAL = 90;
+// HEAL-347.12: src/pages/auth/AuthPage.tsx + AuthPage.css are new, real
+// files (the app's first actual login/register page, replacing a stubbed
+// "Auth UI removed" redirect) -- DIRECTORY_OWNER_RULES.auth already routes
+// them to the 'auth' module with zero gaps, so only the pinned totals move,
+// +1 source file and +1 style file.
+export const PAGE_INVENTORY_EXPECTED_TOTAL = 241;
+export const PAGE_SOURCE_EXPECTED_TOTAL = 150;
+export const PAGE_STYLE_EXPECTED_TOTAL = 91;
 export const PAGE_TOOLS_INVENTORY_EXPECTED_TOTAL = 58;
 export const PAGE_TOOLS_SOURCE_EXPECTED_TOTAL = 48;
 
