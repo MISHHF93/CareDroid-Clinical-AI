@@ -202,13 +202,27 @@ export class PlatformAssetsService {
       const entitlement = await this.entitlementRepository.save(existing);
       return { ...entitlement, dependencies: dependencyState };
     }
-    const entitlement = await this.entitlementRepository.save(
-      this.entitlementRepository.create({
-        organizationId,
-        packId,
-        status: EntitlementStatus.ENABLED,
-      }),
-    );
+
+    // HEAL-347.30: findOne-then-create had a TOCTOU gap -- two concurrent
+    // installs of the same pack (a double-click on "Apply solution", or
+    // reconcileOrganizationCommercialPlan's pack loop racing a manual
+    // install) could both read "no existing row" and both attempt
+    // .create()+.save(); the loser hit an uncaught QueryFailedError (500)
+    // from the (organizationId, packId) unique index instead of the
+    // idempotent "already enabled" result. orIgnore()+read-back is the same
+    // pattern already established for this exact race shape elsewhere in
+    // this codebase (sentinel-inbound.service.ts's HEAL-311 fix).
+    await this.entitlementRepository
+      .createQueryBuilder()
+      .insert()
+      .into(OrganizationEntitlement)
+      .values({ organizationId, packId, status: EntitlementStatus.ENABLED })
+      .orIgnore()
+      .execute();
+
+    const entitlement = await this.entitlementRepository.findOneOrFail({
+      where: { organizationId, packId },
+    });
     return { ...entitlement, dependencies: dependencyState };
   }
 
