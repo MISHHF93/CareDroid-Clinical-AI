@@ -172,10 +172,23 @@ export const UserProvider = ({ children }) => {
     };
   }, []);
 
+  // HEAL-347.39: this used to force `authMode: 'open-access'` on every
+  // setUser() call, a leftover from the pre-login "Auth UI removed" era
+  // (commit ce80849c) when the whole app was open-access-only. Once real
+  // login/dev-bypass sessions and RequireRealSession's route gate existed
+  // (HEAL-347.12/347.14/347.16), this stale override meant ANY setUser()
+  // call -- most visibly the demo profile switcher's switchDemoRole(), but
+  // also useCareDroidUser's role-switch path -- silently downgraded a real
+  // 'real'/'explicit-dev-bypass' session to 'open-access', which
+  // RequireRealSession then rejects, bouncing the user straight back to
+  // /login. Live-reproduced: clicking any of the 8 profile-switcher chips
+  // sent every session to /login instead of the intended landing route.
+  // hydrateStoredDemoUser() already derives the correct authMode for
+  // nextUser (passing 'real'/dev-session modes through untouched) -- trust it.
   const setUser = (newUser) => {
     const nextUser = newUser ? hydrateStoredDemoUser(newUser) : OPEN_ACCESS_USER;
-    setUserState({ ...nextUser, authMode: 'open-access' });
-    persistSession({ ...nextUser, authMode: 'open-access' }, authToken);
+    setUserState(nextUser);
+    persistSession(nextUser, authToken);
   };
 
   const setAuthToken = (nextToken = OPEN_ACCESS_TOKEN) => {
