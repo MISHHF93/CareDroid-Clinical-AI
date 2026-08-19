@@ -9,7 +9,17 @@ import { Column, CreateDateColumn, Entity, Index, PrimaryColumn, UpdateDateColum
 // enforces that invariant at the DB level so two concurrent CAD/NEMSIS webhook deliveries
 // for the same unit (a duplicate/retried delivery, or a genuine double-submit) can no longer
 // race past the service's read-then-write check and create two PHI rows for one real patient.
-@Index(['unitId'], { unique: true })
+// HEAL-347.26: unitId alone was GLOBAL, not namespaced per organization -- two hospitals
+// whose CAD/NEMSIS payloads use a colliding unitId silently overwrote each other's
+// pre-arrival PHI. See migration 1772703100000. Two partial unique indexes, not one plain
+// composite one: SQL treats every NULL as distinct from every other NULL in a unique
+// constraint, so a plain (organizationId, unitId) index would silently stop enforcing
+// HEAL-311's same-unit race guarantee whenever organizationId is null (no tenant context) --
+// confirmed live, the HEAL-311 regression spec started allowing 2 rows again with a plain
+// composite index. The org-scoped index below covers real callers; this second one keeps
+// the original unitId-only guarantee for the null-organizationId case specifically.
+@Index(['organizationId', 'unitId'], { unique: true, where: '"organizationId" IS NOT NULL' })
+@Index(['unitId'], { unique: true, where: '"organizationId" IS NULL' })
 export class SentinelInboundPatientEntity {
   @PrimaryColumn({ type: 'varchar', length: 120 })
   id: string;

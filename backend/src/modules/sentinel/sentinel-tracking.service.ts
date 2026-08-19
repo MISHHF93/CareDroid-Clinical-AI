@@ -1,7 +1,7 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { calculateEta } from '../../../../lib/sentinel/etaEngine';
 import {
   buildApproachBox,
@@ -319,8 +319,16 @@ export class SentinelTrackingService implements OnModuleInit {
   }
 
   private async upsertUnit(event: CadAvlEvent, organizationId?: string): Promise<SentinelUnitEntity> {
+    // HEAL-347.26: was unscoped by organizationId -- externalId/vendorId
+    // aren't namespaced per hospital (vendorId is a fixed per-adapter
+    // constant), so two orgs whose CAD systems label a unit the same way
+    // resolved to the same row and overwrote each other's live GPS/status.
     let unit = await this.unitRepo.findOne({
-      where: { externalId: event.unitExternalId, vendorId: event.vendorId },
+      where: {
+        externalId: event.unitExternalId,
+        vendorId: event.vendorId,
+        organizationId: organizationId ?? IsNull(),
+      },
     });
     if (!unit) {
       unit = this.unitRepo.create({

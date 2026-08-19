@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import {
   detectMissingPreArrivalFields,
   buildRulesOnlyPrepChecklist,
@@ -101,8 +101,13 @@ export class SentinelInboundService {
         (mapped.vitals.heartRate != null ? `HR ${mapped.vitals.heartRate}` : null),
     });
 
+    // HEAL-347.26: was unscoped by organizationId -- unitId is a raw,
+    // caller-supplied CAD/NEMSIS identifier, not namespaced per hospital,
+    // so two orgs with a colliding unitId silently overwrote each other's
+    // pre-arrival PHI (chief complaint, vitals, narrative) through this
+    // same lookup.
     const existing = await this.inboundRepo.findOne({
-      where: { unitId, status: 'en_route' },
+      where: { unitId, status: 'en_route', organizationId: input.organizationId ?? IsNull() },
     });
 
     const vitals = {
@@ -156,7 +161,9 @@ export class SentinelInboundService {
         .orIgnore()
         .execute();
 
-      const row = await this.inboundRepo.findOne({ where: { unitId } });
+      const row = await this.inboundRepo.findOne({
+        where: { unitId, organizationId: input.organizationId ?? IsNull() },
+      });
       if (!row) {
         throw new Error(`Failed to create or find inbound patient row for unit ${unitId}`);
       }

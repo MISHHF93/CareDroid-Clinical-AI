@@ -105,3 +105,117 @@ describe('SentinelTrackingService tenant scoping (HEAL-308)', () => {
     expect(positions.map((p) => p.id)).toEqual(['pos-b']);
   });
 });
+
+/**
+ * HEAL-347.26: upsertUnit()'s findOne was keyed on (externalId, vendorId)
+ * alone -- neither is namespaced per hospital (vendorId is a fixed
+ * per-adapter constant like 'webhook-cad' shared by every tenant hitting
+ * that adapter), so two organizations whose CAD systems label a unit the
+ * same way ("Unit-12") resolved to the SAME row: the second org's live
+ * GPS/status updates silently overwrote the first org's unit.
+ */
+describe('SentinelTrackingService cross-organization unit identity (HEAL-347.26)', () => {
+  let module: TestingModule;
+  let service: SentinelTrackingService;
+  let unitRepo: any;
+
+  beforeAll(async () => {
+    module = await Test.createTestingModule({
+      imports: [
+        TypeOrmModule.forRoot({
+          type: 'sqlite',
+          database: ':memory:',
+          entities: [
+            SentinelUnitEntity,
+            SentinelPositionEntity,
+            SentinelEtaEntity,
+            SentinelGeofenceEntity,
+            SentinelGeofenceEventEntity,
+            SentinelEpisodeEntity,
+            SentinelIntegrationCursorEntity,
+          ],
+          synchronize: true,
+          logging: false,
+        }),
+        TypeOrmModule.forFeature([
+          SentinelUnitEntity,
+          SentinelPositionEntity,
+          SentinelEtaEntity,
+          SentinelGeofenceEntity,
+          SentinelGeofenceEventEntity,
+          SentinelEpisodeEntity,
+          SentinelIntegrationCursorEntity,
+        ]),
+      ],
+      providers: [
+        SentinelTrackingService,
+        { provide: SentinelAlarmService, useValue: { raise: jest.fn() } },
+        { provide: SentinelOutboxService, useValue: { enqueue: jest.fn() } },
+      ],
+    }).compile();
+
+    service = module.get(SentinelTrackingService);
+    unitRepo = module.get(getRepositoryToken(SentinelUnitEntity));
+  });
+
+  afterAll(async () => {
+    await module.close();
+  });
+
+  it('creates separate unit rows for two organizations whose CAD systems use the same externalId/vendorId, instead of one org overwriting the other\'s live position', async () => {
+    await service.ingestCadEvents(
+      [
+        {
+          kind: 'position',
+          eventId: 'evt-a-1',
+          vendorId: 'webhook-cad',
+          unitExternalId: 'Unit-12',
+          occurredAt: '2026-01-01T00:00:00.000Z',
+          latitude: 10,
+          longitude: 10,
+        },
+      ],
+      'org-a',
+    );
+    await service.ingestCadEvents(
+      [
+        {
+          kind: 'position',
+          eventId: 'evt-b-1',
+          vendorId: 'webhook-cad',
+          unitExternalId: 'Unit-12',
+          occurredAt: '2026-01-01T00:00:05.000Z',
+          latitude: 90,
+          longitude: 90,
+        },
+      ],
+      'org-b',
+    );
+
+    const units = await unitRepo.find({ where: { externalId: 'Unit-12' } });
+    expect(units).toHaveLength(2);
+
+    const unitA = units.find((u: any) => u.organizationId === 'org-a');
+    const unitB = units.find((u: any) => u.organizationId === 'org-b');
+    expect(unitA.latitude).toBe(10);
+    expect(unitB.latitude).toBe(90);
+
+    // A follow-up event for org A must update org A's unit, not org B's.
+    await service.ingestCadEvents(
+      [
+        {
+          kind: 'position',
+          eventId: 'evt-a-2',
+          vendorId: 'webhook-cad',
+          unitExternalId: 'Unit-12',
+          occurredAt: '2026-01-01T00:00:10.000Z',
+          latitude: 20,
+          longitude: 20,
+        },
+      ],
+      'org-a',
+    );
+    const unitBAfter = await unitRepo.findOne({ where: { id: unitB.id } });
+    expect(unitBAfter.latitude).toBe(90);
+  });
+});

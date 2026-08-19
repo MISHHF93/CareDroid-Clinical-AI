@@ -2,7 +2,9 @@ import { Column, CreateDateColumn, Entity, Index, PrimaryColumn, UpdateDateColum
 
 @Entity('sentinel_units')
 @Index(['organizationId', 'status'])
-@Index(['externalId', 'vendorId'], { unique: true })
+// HEAL-347.26: was a GLOBAL unique index on (externalId, vendorId) alone --
+// see migration 1772703000000 for the cross-tenant corruption this caused.
+@Index(['organizationId', 'externalId', 'vendorId'], { unique: true })
 export class SentinelUnitEntity {
   @PrimaryColumn({ type: 'varchar', length: 120 })
   id: string;
