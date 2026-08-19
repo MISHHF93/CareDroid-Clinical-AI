@@ -5,10 +5,18 @@ import {
   ManyToOne,
   CreateDateColumn,
   UpdateDateColumn,
+  Index,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 
+// HEAL-347.33: was a plain FK with no uniqueness enforcement at all --
+// NotificationPreferenceService's findOne-then-create-if-missing sequence
+// (getPreferences/updatePreferences) had nothing stopping two concurrent
+// calls from both inserting a row for the same user; a later findOne()
+// then arbitrarily returns whichever duplicate the database happens to
+// return first, silently losing a user's own opt-out/quiet-hours choice.
 @Entity('notification_preferences')
+@Index(['user'], { unique: true })
 export class NotificationPreference {
   @PrimaryGeneratedColumn('uuid')
   id: string;

@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { randomUUID } from 'crypto';
 import { IsBoolean, IsOptional, IsString } from 'class-validator';
 import { NotificationPreference } from '../entities/notification-preference.entity';
 import { User } from '../../users/entities/user.entity';
@@ -92,9 +93,20 @@ export class NotificationPreferenceService {
 
   /**
    * Create default notification preferences
+   *
+   * HEAL-347.33: getPreferences()/updatePreferences() both call this after
+   * a findOne() comes back empty -- a plain TOCTOU. Two concurrent calls
+   * for the same user could both reach here and both insert a row; the
+   * loser used to succeed silently, leaving two rows for one user and no
+   * guarantee which one a later findOne() would return. orIgnore() relies
+   * on the (user) unique index (see the entity's HEAL-347.33 comment) to
+   * make the losing insert a no-op; the read-back then returns whichever
+   * row actually won. Same pattern as sentinel-inbound.service.ts's
+   * HEAL-311 fix.
    */
   private async createDefaultPreferences(userId: string): Promise<NotificationPreference> {
-    const preferences = this.preferenceRepository.create({
+    const candidate = this.preferenceRepository.create({
+      id: randomUUID(),
       user: { id: userId } as User,
       emergencyAlerts: true,
       medicationReminders: true,
@@ -109,7 +121,18 @@ export class NotificationPreferenceService {
       quietHoursEnabled: false,
     });
 
-    return await this.preferenceRepository.save(preferences);
+    await this.preferenceRepository
+      .createQueryBuilder()
+      .insert()
+      .into(NotificationPreference)
+      .values(candidate as any)
+      .orIgnore()
+      .execute();
+
+    return this.preferenceRepository.findOneOrFail({
+      where: { user: { id: userId } },
+      relations: ['user'],
+    });
   }
 
   /**
