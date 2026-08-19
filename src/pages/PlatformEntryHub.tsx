@@ -118,6 +118,9 @@ export default function PlatformEntryHub() {
           {' · '}
           <Link to={CANONICAL_ROUTES.organization}>Organization</Link>
         </p>
+        <p className="platform-entry__meta">
+          Have a real CareDroid account? <Link to={CANONICAL_ROUTES.login}>Log in</Link>
+        </p>
       </section>
     </PageShell>
   );

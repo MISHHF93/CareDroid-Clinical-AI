@@ -19,7 +19,15 @@ const USER_PROFILE_KEY = AUTH_CONFIG.userProfileStorageKey;
 const DEV_TENANT_CONTEXT_KEY = 'caredroid.devTenantContext.v1';
 const BYPASS_TOKEN = appConfig.dev.bearerToken || 'dev-bypass-token';
 
-const isDev =
+/** Exported so other dev-only affordances (e.g. AuthPage.tsx's bypass button,
+ * router.tsx's RequireRealSession gate) can share this exact check instead of
+ * re-deriving their own -- three independent layers all need to agree on
+ * "is this actually a local dev environment" for a bypass to stay safely
+ * inert in a real deployment: this frontend check, RequireRealSession's own
+ * gate condition, and (the one that matters most, since a browser-side check
+ * can always be tampered with) createDevSession()'s own server-side
+ * isLocalDevelopment/ENABLE_DEV_AUTH_BYPASS gate in auth.service.ts. */
+export const isDev =
   typeof window !== 'undefined' &&
   (window.location.hostname === 'localhost' ||
     window.location.hostname === '127.0.0.1' ||
@@ -166,7 +174,12 @@ async function resolveDevBackendSession({
     }
 
     persistDevSession(payload);
-    return { token: payload.accessToken, source: 'dev-session', tenantContext: payload.tenantContext || null };
+    return {
+      token: payload.accessToken,
+      source: 'dev-session',
+      tenantContext: payload.tenantContext || null,
+      user: payload.user || null,
+    };
   } catch (error: any) {
     const message =
       error?.name === 'AbortError'

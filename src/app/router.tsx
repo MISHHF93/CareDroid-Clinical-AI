@@ -1,4 +1,4 @@
-import { Suspense } from 'react';
+import { Suspense, type ReactNode } from 'react';
 import { lazyWithRetry } from '../utils/lazyWithRetry';
 import './RouteLoadingFallback.css';
 import {
@@ -12,6 +12,10 @@ import {
   useSearchParams,
 } from 'react-router-dom';
 import { UserIdentityProvider, useUserIdentity } from '../contexts/UserIdentityContext';
+import { useUser } from '../contexts/UserContext';
+import { buildAuthUrl } from '../auth/authSession';
+import { requireRealAuthGate } from '../config/authGate.config';
+import { isDev } from '../services/devBackendAuth';
 import ErrorBoundary from '../components/ErrorBoundary';
 import RouteErrorBoundary from '../components/RouteErrorBoundary';
 import PilotExtensionRouteGuard from '../components/PilotExtensionRouteGuard';
@@ -31,6 +35,7 @@ const lazyNamed = (loader, exportName) =>
 
 // ── Platform entry hub ───────────────────────────────────────────────────────
 const PlatformEntryHub = lazyRoute(() => import('../pages/PlatformEntryHub'));
+const AuthPage = lazyRoute(() => import('../pages/auth/AuthPage'));
 
 // ── Display / wall mode ──────────────────────────────────────────────────────
 const WhiteboardDisplayRoute = lazyRoute(() => import('../features/whiteboard/WhiteboardDisplayRoute'));
@@ -585,15 +590,57 @@ function AdminSectionBoundary() {
 
 // ── Root layout (AppShell wraps all standard ED routes) ──────────────────────
 
+/** HEAL-347.13: without this, ANY visitor reached the full operational app --
+ * UserContext.tsx always falls back to an anonymous open-access identity when
+ * no real session exists, so there was never an actual point where an
+ * unauthenticated visitor was turned away. Gated by requireRealAuthGate
+ * (config/authGate.config.ts) rather than being unconditional, so a single
+ * env flag can still opt out for local iteration.
+ *
+ * HEAL-347.14/347.16: also accepts a dev-bypass session (AuthPage.tsx's
+ * explicit "Bypass sign-in (local dev only)" button) -- but ONLY when isDev
+ * is true, matching the same three-layer safety this app's existing
+ * dev-session mechanism already relies on (see devBackendAuth.ts's isDev
+ * export doc comment). A tampered/forced client-side isDev check alone still
+ * can't reach a real session this way in a real deployment, since the
+ * backend's own /auth/dev-session endpoint independently refuses to issue a
+ * token outside local development or an explicit ENABLE_DEV_AUTH_BYPASS
+ * opt-in.
+ *
+ * This deliberately checks 'explicit-dev-bypass', NOT 'local-dev-demo' --
+ * UserContext.tsx's OWN background bootstrap effect already establishes a
+ * 'local-dev-demo' session automatically on every app mount in dev mode
+ * (that's what's always let a developer skip logging in locally, unrelated
+ * to this gate), so trusting that value here would make the gate pass for
+ * literally every dev-mode visitor within a couple seconds regardless of
+ * whether they ever clicked the bypass button -- confirmed live, caught
+ * before commit. 'explicit-dev-bypass' is a marker AuthPage.tsx's button
+ * handler stamps itself, which the ambient bootstrap never sets. */
+function RequireRealSession({ children }: { children: ReactNode }) {
+  const location = useLocation();
+  const { authMode, isLoading } = useUser();
+
+  if (!requireRealAuthGate) return <>{children}</>;
+  if (isLoading) return <RouteLoadingFallback label="Loading CareDroid..." />;
+  const isDevBypassSession = isDev && authMode === 'explicit-dev-bypass';
+  if (authMode !== 'real' && !isDevBypassSession) {
+    const returnUrl = `${location.pathname}${location.search}`;
+    return <Navigate to={buildAuthUrl({ returnUrl })} replace />;
+  }
+  return <>{children}</>;
+}
+
 function RootLayout() {
   return (
-    <AppShell>
-      <ProfileRouteGuard>
-        <PilotExtensionRouteGuard>
-          <Outlet />
-        </PilotExtensionRouteGuard>
-      </ProfileRouteGuard>
-    </AppShell>
+    <RequireRealSession>
+      <AppShell>
+        <ProfileRouteGuard>
+          <PilotExtensionRouteGuard>
+            <Outlet />
+          </PilotExtensionRouteGuard>
+        </ProfileRouteGuard>
+      </AppShell>
+    </RequireRealSession>
   );
 }
 
@@ -614,8 +661,6 @@ export function AppRoutes() {
     CANONICAL_ROUTES.welcome,
     '/two-factor-setup',
     '/biometric-setup',
-    ...signInAliases,
-    ...AUTH_SIGNUP_PATH_ALIASES,
   ];
 
   return (
@@ -623,7 +668,26 @@ export function AppRoutes() {
       {/* Root */}
       <Route path="/" element={<AppStartupRedirect />} />
 
-      {/* Auth — redirect to demo landing, no auth shell needed */}
+      {/* HEAL-347.12: real login/register pages -- these used to be part of
+          legacyAuthPaths, bouncing straight to the demo landing hub. */}
+      {signInAliases.map((path) => (
+        <Route
+          key={`auth-login-${path}`}
+          path={path}
+          element={<LazyRoute label="Loading sign in..."><AuthPage initialMode="login" /></LazyRoute>}
+        />
+      ))}
+      {AUTH_SIGNUP_PATH_ALIASES.map((path) => (
+        <Route
+          key={`auth-signup-${path}`}
+          path={path}
+          element={<LazyRoute label="Loading sign up..."><AuthPage initialMode="signup" /></LazyRoute>}
+        />
+      ))}
+
+      {/* Remaining auth-family flows (forgot/reset password, email verify, magic
+          link, OAuth callback, invite, 2FA/biometric setup) still redirect to the
+          demo landing hub -- not yet built as real standalone pages. */}
       {legacyAuthPaths.map((path) => (
         <Route key={`legacy-auth-${path}`} path={path} element={<AuthPathsRedirect />} />
       ))}

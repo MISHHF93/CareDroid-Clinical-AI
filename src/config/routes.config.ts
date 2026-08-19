@@ -13,6 +13,8 @@ export const CANONICAL_ROUTES = Object.freeze({
   authInvite: '/auth/invite',
   resetPassword: '/reset-password',
   verifyEmail: '/verify-email',
+  login: '/login',
+  register: '/register',
   platformStart: '/start',
   adminOperations: '/admin',
   adminEdStaff: '/admin/staff-workflows',

@@ -31,6 +31,9 @@ export const API_ROUTES = Object.freeze({
   auth: Object.freeze({
     profile: '/api/auth/me',
     devSession: '/api/auth/dev-session',
+    login: '/api/auth/login',
+    register: '/api/auth/register',
+    verifyTwoFactor: '/api/auth/verify-2fa',
   }),
   users: Object.freeze({
     profile: '/api/users/profile',

@@ -293,7 +293,31 @@ export function applyDemoRoleView(
 }
 
 export function hydrateStoredDemoUser(stored: DemoUserRecord | null | undefined): DemoUserRecord {
-  if (!stored || !isDemoPersonaUser(stored)) return buildOpenAccessDemoUser();
+  if (!stored) return buildOpenAccessDemoUser();
+  // HEAL-347.12: a real, backend-authenticated login (authMode: 'real', stamped
+  // by realAuthApi.ts on a successful /auth/login or /auth/register) is NOT a
+  // demo persona and must never be routed through demo-role hydration below --
+  // this function used to unconditionally discard anything that failed
+  // isDemoPersonaUser() and replace it with the anonymous open-access demo
+  // user, meaning a real logged-in user's stored profile was silently
+  // overwritten by the demo identity on every read. Pass it through untouched.
+  if (stored.authMode === 'real') return stored;
+  // HEAL-347.14: same gap, pre-existing and independent of the above --
+  // devBackendAuth.ts's persistDevSession() has always stamped
+  // authMode: 'local-dev-demo' on a real backend dev-session user
+  // (id/email/role/profile/subscription, no OPEN_ACCESS_USER_ID or
+  // demoPersona marker), which isDemoPersonaUser() below has never
+  // recognized -- meaning a dev-session identity was silently downgraded
+  // back to the generic open-access persona on the very next read after any
+  // page reload. Found while wiring AuthPage.tsx's explicit dev-bypass
+  // button, which specifically needs this identity to survive a reload.
+  if (stored.authMode === 'local-dev-demo' || stored.authMode === 'dev-demo') return stored;
+  // HEAL-347.16: AuthPage.tsx's explicit "Bypass sign-in" button stamps this
+  // distinct marker (not 'local-dev-demo', which the app's own ambient
+  // background bootstrap ALSO sets for every dev-mode page load regardless
+  // of user intent) -- must survive a reload the same way.
+  if (stored.authMode === 'explicit-dev-bypass') return stored;
+  if (!isDemoPersonaUser(stored)) return buildOpenAccessDemoUser();
   const role =
     (stored.role as string | undefined) ||
     ((stored.profile as DemoUserRecord | undefined)?.roleProfileId as string | undefined) ||

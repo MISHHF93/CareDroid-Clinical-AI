@@ -21,7 +21,7 @@ const nonEdRedirectPaths = new Set(
 );
 
 describe('canonical route/auth architecture', () => {
-  it('redirects legacy auth paths into the demo landing flow', () => {
+  it('redirects the still-unbuilt legacy auth flows into the demo landing flow (login/register mount a real page instead, see routing/authRouteFlow.test.tsx)', () => {
     expect(appSource).toContain('function AuthPathsRedirect()');
     expect(appSource).toContain('legacyAuthPaths');
     expect(appSource).not.toContain('function AuthRoute()');

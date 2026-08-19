@@ -43,6 +43,59 @@ describe('demoPersonaModel', () => {
     expect(hydrated.role).toBe(EMERGENCY_ROLE_IDS.triageNurse);
   });
 
+  it('passes a real, backend-authenticated user through unchanged instead of discarding it as open-access (HEAL-347.12)', () => {
+    // Before this fix, hydrateStoredDemoUser() unconditionally replaced anything
+    // that failed isDemoPersonaUser() with buildOpenAccessDemoUser() -- meaning a
+    // real logged-in user's stored profile was silently overwritten by the
+    // anonymous demo identity on every single read of localStorage.
+    const realUser = {
+      id: 'a1b2c3d4-real-uuid',
+      email: 'nurse@hospital.org',
+      role: 'nurse',
+      authMode: 'real',
+    };
+    const hydrated = hydrateStoredDemoUser(realUser);
+    expect(hydrated).toBe(realUser);
+    expect(hydrated.id).toBe('a1b2c3d4-real-uuid');
+    expect(hydrated.fullName).not.toBe('Dr. Cara George');
+  });
+
+  it('passes a dev-session bypass identity through unchanged across a reload instead of downgrading it to the generic open-access persona (HEAL-347.14)', () => {
+    // Pre-existing gap, independent of HEAL-347.12: devBackendAuth.ts's
+    // persistDevSession() has always stamped authMode: 'local-dev-demo' on a
+    // real backend dev-session user, but isDemoPersonaUser() never recognized
+    // that marker (only 'open-access'/'platform-access') -- so the identity
+    // was silently discarded back to Dr. Cara George on the very next read.
+    const devSessionUser = {
+      id: 'dev-user-uuid',
+      email: 'dev@caredroid.local',
+      role: 'physician',
+      authMode: 'local-dev-demo',
+      isDevAuthBypass: true,
+    };
+    const hydrated = hydrateStoredDemoUser(devSessionUser);
+    expect(hydrated).toBe(devSessionUser);
+    expect(hydrated.id).toBe('dev-user-uuid');
+  });
+
+  it('passes an explicit-dev-bypass identity through unchanged across a reload (HEAL-347.16)', () => {
+    // AuthPage.tsx's "Bypass sign-in" button stamps this distinct marker
+    // (not 'local-dev-demo', which the app's own ambient background
+    // bootstrap ALSO sets on every dev-mode page load regardless of user
+    // intent -- trusting that value for the gate's dev-bypass exception
+    // would make it pass for every dev-mode visitor within seconds).
+    const bypassUser = {
+      id: 'dev-user-uuid',
+      email: 'dev@caredroid.local',
+      role: 'physician',
+      authMode: 'explicit-dev-bypass',
+      isDevAuthBypass: true,
+    };
+    const hydrated = hydrateStoredDemoUser(bypassUser);
+    expect(hydrated).toBe(bypassUser);
+    expect(hydrated.id).toBe('dev-user-uuid');
+  });
+
   it('resolves landing routes for curated demo roles', () => {
     expect(resolveDemoDefaultLandingRoute()).toBeTruthy();
     expect(resolveDemoRoleLandingRoute(EMERGENCY_ROLE_IDS.registrationClerk)).toContain(
