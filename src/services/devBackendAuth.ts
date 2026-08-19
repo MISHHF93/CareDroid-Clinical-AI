@@ -162,9 +162,27 @@ async function resolveDevBackendSession({
     // Raw fetch avoids a circular import with apiClient (which bootstraps this session).
     const controller = new AbortController();
     const timeoutId = window.setTimeout(() => controller.abort(), timeoutMs);
+    // HEAL-347.27: this POST previously had no body and no Content-Length --
+    // confirmed live (curl direct to the backend port, curl through the Vite
+    // proxy, and a real in-page fetch() all reproduced it identically) that a
+    // bodyless POST here never completes: the backend hangs the request
+    // indefinitely instead of returning near-instantly the way the exact same
+    // route responds to a request that carries even a trivial 2-byte body.
+    // Every dev-bypass login click -- and every unforced ambient bootstrap
+    // call on mount -- went through this exact bodyless path, so each one
+    // silently leaked a held-open request (very likely a checked-out DB pool
+    // connection that's never released back). Enough of those and the whole
+    // backend degrades for every consumer, not just this call: unrelated
+    // routes -- including plain health checks -- start queueing behind the
+    // exhausted pool and eventually return 503 rather than actually
+    // recovering, since the leaked connections don't free themselves without
+    // a restart. Sending an explicit empty JSON body sidesteps whatever
+    // no-body edge case triggers the hang, matching the request shape that
+    // was always observed to complete quickly.
     const response = await fetch(API_ROUTES.auth.devSession, {
       method: 'POST',
-      headers: { Accept: 'application/json' },
+      headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+      body: '{}',
       signal: controller.signal,
     });
     window.clearTimeout(timeoutId);

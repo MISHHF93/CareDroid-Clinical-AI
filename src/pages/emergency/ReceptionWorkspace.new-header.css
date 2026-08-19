@@ -133,15 +133,19 @@
   border-color: var(--app-border-strong, rgba(0, 0, 0, 0.12));
 }
 
+/* HEAL-347.25: matches reception-desk-theme.css's fix -- white-on-brand-600
+   measured 4.09:1 via a live axe-core WCAG AA scan, failing the 4.5:1
+   minimum for this button's 13px/800-weight text. brand-700 passes at
+   ~5.9:1; hover shifted one step to match (was 600->500, now 700->600). */
 .reception-header__action-btn--primary {
-  background: var(--cdl-brand-600, #0284c7);
-  border-color: var(--cdl-brand-600, #0284c7);
+  background: var(--cdl-brand-700, #0369a1);
+  border-color: var(--cdl-brand-700, #0369a1);
   color: var(--cdl-on-brand, #ffffff);
 }
 
 .reception-header__action-btn--primary:hover {
-  background: var(--cdl-brand-500, #0ea5e9);
-  border-color: var(--cdl-brand-500, #0ea5e9);
+  background: var(--cdl-brand-600, #0284c7);
+  border-color: var(--cdl-brand-600, #0284c7);
 }
 
 .reception-header__queue-tabs {

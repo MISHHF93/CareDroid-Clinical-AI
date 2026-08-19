@@ -84,14 +84,21 @@ html[data-theme='dark'] .reception-page-layout {
   transform: none;
 }
 
-/* Primary CTAs — brand solid */
+/* Primary CTAs — brand solid.
+   HEAL-347.25: white-on-brand-600 (#0284c7) measured 4.09:1 via a live
+   axe-core WCAG AA scan on this exact button -- fails the 4.5:1 minimum for
+   normal-weight 13px text (bold 800 doesn't reach WCAG's "large text"
+   threshold at this size). brand-700 (#0369a1) is the next darker step
+   already defined in cdl-v2/color.css -- white text on it measures ~5.9:1,
+   comfortably passing. Hover shifted one step to match (was 600->500,
+   now 700->600) to preserve the same "lighten on hover" relationship. */
 .reception-front-door .reception-header__action-btn--primary,
 .reception-front-door .unified-intake-actionbar__primary,
 .reception-front-door .reception-prepare__option--primary,
 .reception-workspace .reception-header__action-btn--primary,
 .reception-workspace .unified-intake-actionbar__primary {
-  background: var(--cdl-brand-600, #0284c7) !important;
-  border-color: var(--cdl-brand-600, #0284c7) !important;
+  background: var(--cdl-brand-700, #0369a1) !important;
+  border-color: var(--cdl-brand-700, #0369a1) !important;
   color: var(--cdl-on-brand, #ffffff) !important;
   font-weight: 800;
 }
@@ -100,8 +107,8 @@ html[data-theme='dark'] .reception-page-layout {
 .reception-front-door .unified-intake-actionbar__primary:hover,
 .reception-workspace .reception-header__action-btn--primary:hover {
   filter: brightness(1.05);
-  background: var(--cdl-brand-500, #0ea5e9) !important;
-  border-color: var(--cdl-brand-500, #0ea5e9) !important;
+  background: var(--cdl-brand-600, #0284c7) !important;
+  border-color: var(--cdl-brand-600, #0284c7) !important;
 }
 
 /* Form controls */
