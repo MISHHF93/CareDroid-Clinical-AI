@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { LessThan, Repository } from 'typeorm';
 import { EncryptionService } from './encryption.service';
 import { EncryptionKey } from './entities/encryption-key.entity';
 
@@ -260,10 +260,17 @@ export class KeyRotationService {
       const cutoffDate = new Date();
       cutoffDate.setDate(cutoffDate.getDate() - olderThanDays);
 
+      // HEAL-347.35: plain `createdAt: cutoffDate` is an EQUALITY match in
+      // TypeORM's where clause, not "older than" -- this could only ever
+      // match a key whose createdAt happens to equal the freshly-computed
+      // cutoff Date object to the millisecond, so this ~7-year HIPAA
+      // key-retention deletion-scheduling control silently never fired for
+      // any real key, no matter how old. LessThan is the actual "older
+      // than the cutoff" comparison.
       const keysToDelete = await this.keyRepository.find({
         where: {
           isActive: false,
-          createdAt: cutoffDate,
+          createdAt: LessThan(cutoffDate),
         },
       });
 
