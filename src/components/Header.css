@@ -399,6 +399,16 @@
   font: inherit;
   font-size: 12px;
   padding: 0 9px 0 7px;
+  /* HEAL-347.51: the real placeholder ("Search patient, encounter,
+     referral, EMS, queue...") is longer than this box's 220px cap can show
+     at 12px, and a plain <input> has no overflow handling by default -- it
+     was hard-clipping mid-word ("...encoun") instead of truncating
+     cleanly. text-overflow:ellipsis works on both placeholder and typed
+     value text in every browser this app targets once overflow/white-space
+     are set explicitly. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* position:fixed + portaled to document.body — the header clips its own

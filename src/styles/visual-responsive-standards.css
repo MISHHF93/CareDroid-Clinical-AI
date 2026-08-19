@@ -279,6 +279,17 @@
   text-wrap: pretty;
 }
 
+/* HEAL-347.51 (2026-08-19): excluded .caredroid-header__primary-actions.
+   Same wildcard-collision shape as the badge exclusion below, on the
+   [class*='actions'] arm this time: Header.css deliberately sets this
+   element to display:none under @media(max-width:768px) to free up room
+   in the cramped mobile actions row (search + notifications + profile
+   already have to fit), but this unscoped, non-media rule's display:flex
+   has equal selector specificity and loads later, silently winning and
+   keeping the "New Patient" button visible on mobile anyway -- confirmed
+   live via computed-style + cascade inspection at a 768px viewport, not
+   guessed. .caredroid-header__actions (the always-visible outer wrapper)
+   is unaffected and still gets the flex-wrap/gap treatment as intended. */
 :is(.app-shell, .emergency-app-shell)
   :is(
     [class*='actions'],
@@ -288,14 +299,29 @@
     .cd-action-row,
     .help-hub__tabs,
     .emergency-route-chip-row
-  ) {
+  ):not(.caredroid-header__primary-actions) {
   display: flex;
   flex-wrap: wrap;
   gap: var(--app-visual-control-gap);
 }
 
+/* HEAL-347.51 (2026-08-19): excluded .alarm-kpi__badge. The [class*='badge']
+   wildcard here is meant for standalone, generally-tappable app badges/pills,
+   but its substring match also caught alarm-system.css's small (14px)
+   inline severity marker -- a sub-element nested inside an already-compact
+   44px header/EMS/whiteboard KPI chip (.operational-strip__metric), not a
+   tap target of its own. Forcing it to a 28px min-height stretched the
+   whole label row taller, so a chip carrying a WARN/CRIT badge (e.g. the
+   header's "Waiting" chip, 54.6px) rendered visibly taller than its
+   badge-less sibling (e.g. "Breached", 44px) sitting right next to it in
+   the same rail -- confirmed live via computed-style + cascade inspection,
+   not guessed. alarm-system.css already has its own complete, deliberate
+   sizing for this badge across every .alarm-kpi consumer app-wide, not
+   just the header. */
 :is(.app-shell, .emergency-app-shell)
-  :is([class*='badge'], [class*='chip'], [class*='pill'], [class*='tag'], .cd-metric-chip) {
+  :is([class*='badge'], [class*='chip'], [class*='pill'], [class*='tag'], .cd-metric-chip):not(
+    .alarm-kpi__badge
+  ) {
   min-height: 28px;
   align-items: center;
   white-space: normal;
