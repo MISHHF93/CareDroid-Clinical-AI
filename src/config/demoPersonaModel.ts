@@ -325,11 +325,28 @@ export function hydrateStoredDemoUser(stored: DemoUserRecord | null | undefined)
   return applyDemoRoleView(stored, role);
 }
 
+// HEAL-347.41: this masking previously gated on isDemoPersonaUser(user) alone,
+// which is false for an 'explicit-dev-bypass' session (the actual session type
+// the "Bypass sign-in" button + /start profile-role-switcher produce) -- so
+// none of the below ever applied to it. UserIdentityContext's operationalProfile
+// (an async GET /api/profile/me fetch, resolving ~1-2s after mount/login) then
+// overwrote the identity with the raw backend dev-session account's literal
+// name/role ("Dev Clinician" / physician's "Provider lane") the instant it
+// resolved -- even after switchDemoRole() had already correctly switched the
+// LOCAL role, since that fetch has no way to know about a purely client-side
+// role override. Live-reproduced: clicking a profile-switcher chip showed the
+// correct persona/role for ~1s, then visibly reverted once the fetch landed.
+// Same bug shape this file's own HEAL-098/114/195 comments already describe --
+// just for a session type they didn't cover. Any session capable of reaching
+// the demo/dev role-switcher needs this masking, not only the open-access one.
+const DEV_SESSION_AUTH_MODES = new Set(['explicit-dev-bypass', 'local-dev-demo', 'dev-demo']);
+
 export function enrichDemoIdentityFallback(
   user: DemoUserRecord | null | undefined,
   fallback: DemoUserRecord,
 ): DemoUserRecord {
-  if (!isDemoPersonaUser(user)) return fallback;
+  const isDevSession = DEV_SESSION_AUTH_MODES.has(String(user?.authMode || ''));
+  if (!isDemoPersonaUser(user) && !isDevSession) return fallback;
 
   const profile = (user?.profile as DemoUserRecord) || {};
   // HEAL-195: role, unlike displayName/specialty/department (deliberately static -- "one identity
@@ -342,11 +359,20 @@ export function enrichDemoIdentityFallback(
   // labels (e.g. Profile.tsx showing "ED physician..." next to a "Reception job profile" card for
   // the same session). fallback.saasProfile.role (UserIdentityContext.tsx's buildFallbackProfile)
   // already computes the correct, dynamic value from user.role -- this just stops clobbering it.
+  //
+  // HEAL-347.41: that assumption breaks once `fallback` is UserIdentityContext's
+  // operationalProfile rather than its synchronous fallbackProfile -- switchDemoRole()
+  // updates `user` instantly but never touches operationalProfile (a one-time GET
+  // /api/profile/me snapshot, only re-fetched on auth-state change), so once that
+  // fetch has resolved even once, `fallback.saasProfile.role` is a stale snapshot of
+  // whatever role was active when the fetch fired, not the live one. profile.saasRole
+  // is set directly on `user` by switchDemoRole()'s own object construction, so it's
+  // always as fresh as the switch itself -- prefer it over the possibly-stale fallback.
   const saasProfile = {
     ...(fallback.saasProfile as DemoUserRecord),
     displayName: DEMO_PERSONA.displayName,
     email: DEMO_PERSONA.email,
-    role: (fallback.saasProfile as DemoUserRecord)?.role || DEMO_PERSONA.saasRole,
+    role: (profile.saasRole as string) || (fallback.saasProfile as DemoUserRecord)?.role || DEMO_PERSONA.saasRole,
     specialty: DEMO_PERSONA.specialty,
     department: DEMO_PERSONA.department,
     organizationType: 'hospital',

@@ -23,7 +23,7 @@ export type EffectiveUserProfileState = {
 };
 
 export function useEffectiveUserProfile(): EffectiveUserProfileState {
-  const { saasProfile, operationalProfile: _operationalProfile } = useUserIdentity();
+  const { saasProfile, account, operationalProfile: _operationalProfile } = useUserIdentity();
   const operationalProfile = _operationalProfile as {
     effectiveProfile?: ResolvedUserProfile | null;
     accessSummary?: UserProfileAccessSummary | null;
@@ -55,7 +55,20 @@ export function useEffectiveUserProfile(): EffectiveUserProfileState {
     // raw value when it's a real emergency role id -- exactly the same
     // "prefer the dynamic value, don't round-trip it" fix HEAL-195 already
     // applied one layer up.
-    const rawEmergencyRoleId = KNOWN_EMERGENCY_ROLE_IDS.has(saasRole) ? saasRole : null;
+    //
+    // HEAL-347.41: saasRole itself is often the SAAS-role string (dash-cased,
+    // e.g. 'registration-clerk' for the registration_clerk emergency role --
+    // see canonicalAccess.ts's role catalog), which never matches
+    // KNOWN_EMERGENCY_ROLE_IDS (underscore-cased) at all, so this check silently
+    // failed for most of the 8 curated demo roles and fell straight through to
+    // the possibly-stale accessSummary.emergencyRole below. account.role is set
+    // directly from the live UserContext user.role (via
+    // enrichDemoIdentityFallback's masking) and is always in the correct
+    // emergency-role-id format -- check it too, and prefer it, since it's the
+    // more reliable of the two.
+    const rawEmergencyRoleId =
+      (account?.role && KNOWN_EMERGENCY_ROLE_IDS.has(account.role) ? account.role : null) ||
+      (KNOWN_EMERGENCY_ROLE_IDS.has(saasRole) ? saasRole : null);
 
     const profileCopy = resolveUserProfileCopy({
       saasRole: effectiveProfile.saasRole,
@@ -70,7 +83,7 @@ export function useEffectiveUserProfile(): EffectiveUserProfileState {
       profileCopy,
       canPersonalizeTools: true,
     };
-  }, [operationalProfile?.accessSummary, operationalProfile?.effectiveProfile, saasProfile?.role]);
+  }, [account?.role, operationalProfile?.accessSummary, operationalProfile?.effectiveProfile, saasProfile?.role]);
 }
 
 export default useEffectiveUserProfile;

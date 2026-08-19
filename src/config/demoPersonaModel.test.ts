@@ -124,6 +124,39 @@ describe('demoPersonaModel', () => {
     expect((masked.account as { displayName?: string }).displayName).toBe('Dr. Cara George');
   });
 
+  it('masks a raw backend-fetched profile back onto the Cara persona for an explicit-dev-bypass session too (HEAL-347.41)', () => {
+    // Regression for the identity flip found live via the /start profile-role-switcher:
+    // an 'explicit-dev-bypass' session (the actual session type "Bypass sign-in" +
+    // the demo role-switcher chips produce) isn't isDemoPersonaUser(), so this masking
+    // never applied to it -- UserIdentityContext's async GET /api/profile/me fetch
+    // could then overwrite a freshly-switched persona/role with the raw backend
+    // dev-session account's own name ("Dev Clinician") and role once it resolved,
+    // ~1-2s after the switch, with no user action.
+    const devBypassUser = {
+      id: 'dev-user-uuid',
+      email: 'dev@caredroid.local',
+      role: EMERGENCY_ROLE_IDS.registrationClerk,
+      authMode: 'explicit-dev-bypass',
+      isDevAuthBypass: true,
+      // switchDemoRole() sets profile.saasRole directly on `user` as part of the
+      // same synchronous update that changes `role` -- this is what should win.
+      profile: { roleProfileId: EMERGENCY_ROLE_IDS.registrationClerk, saasRole: 'registration-clerk' },
+    };
+    // Simulates operationalProfile: a stale snapshot fetched BEFORE the switch,
+    // still reflecting the backend dev-session account's original role/name.
+    const staleOperationalProfile = {
+      saasProfile: { displayName: 'Dev Clinician', role: 'emergency-physician' },
+      account: { displayName: 'Dev Clinician', role: 'physician' },
+    };
+    const masked = enrichDemoIdentityFallback(devBypassUser, staleOperationalProfile);
+    expect((masked.saasProfile as { displayName?: string }).displayName).toBe('Dr. Cara George');
+    expect((masked.account as { displayName?: string }).displayName).toBe('Dr. Cara George');
+    // The role must reflect the freshly-switched registration_clerk view, not the
+    // stale emergency-physician role still sitting in operationalProfile.saasProfile.
+    expect((masked.saasProfile as { role?: string }).role).toBe('registration-clerk');
+    expect((masked.account as { role?: string }).role).toBe(EMERGENCY_ROLE_IDS.registrationClerk);
+  });
+
   it('keeps saasProfile.role in sync with the switched ED role view (HEAL-195)', () => {
     // Regression: saasProfile.role was hardcoded to DEMO_PERSONA.saasRole ('emergency-physician')
     // for every demo session regardless of which of the 8 ED role views was switched to, while

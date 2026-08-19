@@ -427,7 +427,16 @@ describe('pilot walkthrough', () => {
       await user.type(screen.getByPlaceholderText('Clinical reason for referral'), 'Pilot cardiology referral');
       await user.click(screen.getByRole('button', { name: /Send Referral/i }));
       await waitFor(() => expect(referralForPatient(createdPatient.id)?.status).toBe('Sent'));
-      expect(await screen.findByText('Pilot cardiology referral')).toBeInTheDocument();
+      // Same load-headroom class as PILOT_ROUTE_LOAD_TIMEOUT above: the sent
+      // referral's reason text re-renders into the awareness widget on the
+      // next commit after the store update, which under CPU contention
+      // (parallel suites, post-full-run settling) has been observed to
+      // exceed findByText's default 1000ms wait even though the referral
+      // itself sent successfully (the preceding waitFor already confirms
+      // that). Give it the same explicit headroom as the rest of this file.
+      expect(
+        await screen.findByText('Pilot cardiology referral', {}, { timeout: PILOT_ROUTE_LOAD_TIMEOUT }),
+      ).toBeInTheDocument();
     },
   );
 
