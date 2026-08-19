@@ -279,6 +279,15 @@ function isReferralPending(referral: Referral): boolean {
   return !['Closed', 'Completed', 'Declined', 'PatientDeparted'].includes(referral.status);
 }
 
+// HEAL-347.38: department-level status (capacity, queue, EMS, sync/system)
+// vs. one specific patient's alert -- the latter already surfaces on that
+// patient's own card/detail panel and belongs there, not in the ambient
+// header/status-chip badge that's visible on every page regardless of which
+// patient (if any) is on screen.
+function isDepartmentLevelAlert(alert: Alert): boolean {
+  return !alert.patientId;
+}
+
 function activePatients(source: CareDroidCentralNodeSource): Patient[] {
   return source.patients.filter((patient) => patient.state !== PatientState.Discharge);
 }
@@ -771,7 +780,9 @@ function applyBackendCentralNodePayload(
       longestWait: finiteNumber(payload.longestWait, snapshot.currentDepartmentStatus.longestWait),
       averageWait: finiteNumber(payload.averageWait, snapshot.currentDepartmentStatus.averageWait),
       capacityBand: String(capacityStatus.band),
-      activeAlerts: operationalAlerts.filter((alert) => !alert.dismissed).length,
+      activeAlerts: operationalAlerts.filter(
+        (alert) => !alert.dismissed && isDepartmentLevelAlert(alert),
+      ).length,
     },
     queueHealth: normalizeBackendQueueMetrics(payload.queueMetrics, snapshot.queueHealth),
     emsPressure: {
@@ -815,6 +826,13 @@ export function buildCareDroidCentralNodeSnapshot(
   const waiting = active.filter((patient) => patient.state === PatientState.Waiting);
   const waits = active.map((patient) => minutesSince(patient.arrivalTime));
   const activeAlerts = source.alerts.filter((alert) => !alert.dismissed);
+  // HEAL-347.38: `activeAlerts` above stays the full undismissed list --
+  // it's also what feeds snapshot.operationalAlerts (notification center,
+  // copilot context, bottleneck detection all need patient-specific alerts
+  // too, e.g. bottleneckRegistry's "unacknowledged critical alert tied to a
+  // patient" detection reads alert.patientId off this same list). Only the
+  // department-level KPI count below should exclude patient-specific alerts.
+  const departmentAlerts = activeAlerts.filter(isDepartmentLevelAlert);
   const emsInbound =
     source.emsArrivals.filter((arrival) => arrival.status === 'Inbound').length +
     source.emsIncomingPatients.length +
@@ -855,7 +873,7 @@ export function buildCareDroidCentralNodeSnapshot(
       longestWait: waits.reduce((max, wait) => Math.max(max, wait), 0),
       averageWait: waits.length ? Math.round(waits.reduce((sum, wait) => sum + wait, 0) / waits.length) : 0,
       capacityBand: source.capacity.band,
-      activeAlerts: activeAlerts.length,
+      activeAlerts: departmentAlerts.length,
     },
     activePatientFlow: {
       patients: active.map((patient) => toPatientReference(patient, source.referrals)),

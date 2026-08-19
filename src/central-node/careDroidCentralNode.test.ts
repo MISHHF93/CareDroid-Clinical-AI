@@ -136,13 +136,59 @@ describe('CareDroidCentralNode contract', () => {
     expect(snapshot.currentDepartmentStatus).toMatchObject({
       activePatients: 1,
       waitingPatients: 1,
-      activeAlerts: 1,
+      // HEAL-347.38: the fixture's only alert is tied to patient-1234, so it
+      // no longer counts toward the department-level KPI (see dedicated test
+      // below) -- it still appears in snapshot.operationalAlerts, unchanged.
+      activeAlerts: 0,
     });
+    expect(snapshot.operationalAlerts).toHaveLength(1);
     expect(snapshot.operationalSummary.metrics.map((metric) => metric.key)).toEqual(
       expect.arrayContaining(['capacityScore', 'emsInbound', 'reassessmentsDue']),
     );
     expect(snapshot.queueHealth.map((queue) => queue.id)).toEqual(
       expect.arrayContaining(['referral', 'discharge', 'reassessment']),
+    );
+  });
+
+  it('HEAL-347.38: excludes patient-specific alerts from the department-level activeAlerts KPI, but keeps them in operationalAlerts and bottleneckRegistry', () => {
+    const snapshot = buildCareDroidCentralNodeSnapshot(
+      source({
+        alerts: [
+          {
+            id: 'alert-patient-specific',
+            type: 'Reassessment',
+            severity: 'Critical',
+            title: 'Avery Stone needs reassessment',
+            message: 'Patient-specific alert',
+            patientId: 'patient-1234',
+            createdAt: now.toISOString(),
+            dismissed: false,
+          },
+          {
+            id: 'alert-department-wide',
+            type: 'CAPACITY_CRISIS',
+            severity: 'Critical',
+            title: 'Department at capacity',
+            message: 'No patientId -- department-wide',
+            createdAt: now.toISOString(),
+            dismissed: false,
+          },
+        ],
+      }),
+      {
+        role: 'charge_nurse',
+        roleLabel: 'Charge Nurse',
+        readOnly: false,
+        allowedRoutes: ['/emergency/whiteboard'],
+      },
+    );
+
+    // Only the department-wide alert counts toward the ambient header/whiteboard KPI.
+    expect(snapshot.currentDepartmentStatus.activeAlerts).toBe(1);
+    // Both alerts remain visible to consumers that need the full picture
+    // (notification center via the raw store, bottleneck detection, copilot context).
+    expect(snapshot.operationalAlerts.map((alert) => alert.id)).toEqual(
+      expect.arrayContaining(['alert-patient-specific', 'alert-department-wide']),
     );
   });
 
