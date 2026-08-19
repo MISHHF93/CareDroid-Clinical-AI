@@ -15,8 +15,9 @@
 
 .auth-page__brand {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
-  gap: 8px;
+  gap: 4px 8px;
   margin-bottom: 24px;
   color: var(--app-fg, #111827);
 }

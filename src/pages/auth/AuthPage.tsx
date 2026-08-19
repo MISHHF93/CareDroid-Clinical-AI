@@ -176,7 +176,7 @@ export default function AuthPage({ initialMode = 'login' }: { initialMode?: Mode
       <div className="auth-page__card" style={{ background: MEDICAL_THEME.surfaceCard, boxShadow: MEDICAL_THEME.shadowModal }}>
         <div className="auth-page__brand">
           <strong>CareDroid</strong>
-          <span>{CAREDROID_PRODUCT.name}</span>
+          <span>{CAREDROID_PRODUCT.tagline}</span>
         </div>
 
         {twoFactor ? (
