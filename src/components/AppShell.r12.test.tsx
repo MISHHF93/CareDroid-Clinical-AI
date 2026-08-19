@@ -335,7 +335,7 @@ describe('HEAL-347.2: idle-time prefetch for lazy shell panels', () => {
     expect(() => (prefetchCall?.[0] as () => void)?.()).not.toThrow();
   });
 
-  // HEAL-347.43: this batch used to fire all 13 entries' import()s
+  // HEAL-347.43: this batch used to fire all entries' import()s
   // synchronously in the same tick -- every one a concurrent request
   // racing the CURRENT route's own (higher-priority, blocking) chunk fetch
   // for the dev server's limited concurrent-transform capacity. Landing
@@ -400,11 +400,44 @@ describe('HEAL-347.2: idle-time prefetch for lazy shell panels', () => {
     const prefetchCall = setTimeoutSpy.mock.calls.find(([, delay]) => delay === 2000);
     (prefetchCall?.[0] as () => void)?.();
 
-    // 3 route entries are eligible for skipping (Reception/Analytics/
-    // Settings); with /emergency/analytics active, exactly one fewer
-    // staggered timer should be scheduled than the base "no active match"
-    // batch this describe block's other test observes.
+    // 4 route entries are eligible for skipping (Reception/Analytics/
+    // Settings/Tools console, added HEAL-347.48); with /emergency/analytics
+    // active, exactly one fewer staggered timer should be scheduled than the
+    // base "no active match" batch this describe block's other test
+    // observes.
     const staggeredCount = setTimeoutSpy.mock.calls.length - callCountBefore;
-    expect(staggeredCount).toBe(12);
+    expect(staggeredCount).toBe(13);
+  });
+
+  // Regression for a live-reproduced bug (HEAL-347.48): /tools/calculators
+  // (and every other /tools/* console page) had no entry in this prefetch
+  // batch at all, so its first navigation paid the full cold-compile cost
+  // (13.5-25s stuck on "Loading tool console..."). Same skip-when-active
+  // treatment as the 3 existing route entries -- landing directly on a
+  // /tools/* page shouldn't also fire a redundant prefetch of its own chunk.
+  it('does not schedule a prefetch entry for the tools console chunk when already on a /tools/* route', async () => {
+    vi.spyOn(useEmergencyStore.getState(), 'initializeFromBackend').mockResolvedValue({
+      errors: {},
+    });
+    const setTimeoutSpy = vi.spyOn(window, 'setTimeout');
+
+    render(
+      <MemoryRouter initialEntries={['/tools/calculators']}>
+        <AppShell>
+          <div>Tools route</div>
+        </AppShell>
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(setTimeoutSpy).toHaveBeenCalledWith(expect.any(Function), 2000);
+    });
+
+    const callCountBefore = setTimeoutSpy.mock.calls.length;
+    const prefetchCall = setTimeoutSpy.mock.calls.find(([, delay]) => delay === 2000);
+    (prefetchCall?.[0] as () => void)?.();
+
+    const staggeredCount = setTimeoutSpy.mock.calls.length - callCountBefore;
+    expect(staggeredCount).toBe(13);
   });
 });

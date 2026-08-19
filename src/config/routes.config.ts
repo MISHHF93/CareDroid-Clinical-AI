@@ -464,6 +464,12 @@ export const IN_SHELL_ROUTE_REDIRECTS = Object.freeze(
     [AUDIT_ROUTE_ALIASES[0], CANONICAL_ROUTES.audit],
     ['/ai/evaluation', CANONICAL_ROUTES.aiEvaluation],
     ['/team', `${CANONICAL_ROUTES.adminOperations}/team`],
+    // HEAL-347.48: CANONICAL_ROUTES.marketplace ('/marketplace') was
+    // referenced by a nav-menu entry and the route-metadata catalog but had
+    // no matching <Route> anywhere -- the real Plugin marketplace page only
+    // ever mounted at CANONICAL_ROUTES.plugins ('/plugins'). Live-confirmed
+    // dead nav link, redirecting to the role's landing route for every role.
+    [CANONICAL_ROUTES.marketplace, CANONICAL_ROUTES.plugins],
   ].map(([path, to]) =>
     Object.freeze({
       path,
@@ -1370,6 +1376,33 @@ export const CANONICAL_ROUTE_MAP = Object.freeze([
     emergencySafe: false,
     readOnlyAllowed: true,
     breadcrumbs: ['Operations', 'Medical IoT'],
+    helpTopicId: 'settings',
+    workflowOwner: 'IT administrator',
+  }),
+  // HEAL-347.48: 'devices' (Device Fleet Management, a fully-built 162-line
+  // page -- src/pages/operations/DeviceFleetManagement.tsx) had NO entry at
+  // all in this catalog, unlike its siblings above (fleet/hospital-map/
+  // medical-iot). getRouteByPath('/devices') returned null, so
+  // canRouteRecordIncludeProfile always returned false regardless of role --
+  // live-confirmed super_admin and hospital_admin both got silently bounced
+  // away while it_admin (via a separate, uncoordinated access path) could
+  // still reach it. Mirrors medical-iot's allowedRoles exactly, since both
+  // pages cover the same biomedical/IT-operations audience.
+  route({
+    id: 'devices',
+    path: CANONICAL_ROUTES.devices,
+    label: 'Device Fleet',
+    description: 'Biomedical device fleet inventory, maintenance, and lifecycle tracking.',
+    pageComponent: 'DeviceFleetManagement',
+    requiredPermissions: [P.SETTINGS_READ],
+    allowedRoles: ['super_admin', 'hospital_admin', 'it_admin', 'ed_director'],
+    navigationGroup: 'Operations',
+    showInNav: false,
+    priority: 150,
+    icon: 'activity',
+    emergencySafe: false,
+    readOnlyAllowed: true,
+    breadcrumbs: ['Operations', 'Device Fleet'],
     helpTopicId: 'settings',
     workflowOwner: 'IT administrator',
   }),

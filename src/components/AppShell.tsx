@@ -779,6 +779,15 @@ function AppShellFrame({ children }: AppShellProps) {
       // Warms PatientsRoute/QueueRoute/ReassessmentRoute/BoardingRoute/
       // CapacityRoute/CopilotRoute in one request -- see HEAL-347.10 above.
       { load: () => import('../pages/emergency/emergencyRoutePages') },
+      // HEAL-347.48: /tools/calculators (and every other /tools/* console
+      // page -- ToolsFilteredConsole handles all of them) hit the same
+      // cold-compile stall as the routes above -- live-timed at 13.5-25s
+      // stuck on "Loading tool console..." on first navigation, since this
+      // list previously covered zero pages outside the ED workspace.
+      {
+        load: () => import('../pages/tools/ToolsFilteredConsole'),
+        skip: () => location.pathname.startsWith('/tools'),
+      },
     ];
     const targets = entries.filter((entry) => !entry.skip?.());
     let cancelled = false;

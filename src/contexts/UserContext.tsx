@@ -153,6 +153,32 @@ export const UserProvider = ({ children }) => {
       ]);
       if (cancelled) return;
 
+      // HEAL-347.46: this effect's own USER_BOOTSTRAP_MAX_MS timeout is a
+      // fixed wall-clock deadline with zero awareness of what else may be
+      // resolving concurrently. On the /login page specifically, this same
+      // effect runs on mount (before the user does anything) at the same
+      // time AuthPage.tsx's "Bypass sign-in" click independently clears
+      // storage and calls ensureDevBackendSession({ force: true }) itself.
+      // If the backend is slow enough that this effect's own race times out
+      // before either fetch resolves, the code below used to unconditionally
+      // write readStoredUser() || userRef.current || OPEN_ACCESS_USER --
+      // frequently OPEN_ACCESS_USER, since the click handler had already
+      // cleared storage -- landing AFTER the click's own writes and
+      // silently reverting the session back to the anonymous demo persona.
+      // Live-confirmed via direct localStorage inspection across repeated
+      // bypass-click runs (roughly 50% fail rate under a slow/degraded
+      // backend). Re-checking storage for an already-valid JWT here means
+      // whichever session actually landed in storage wins, instead of this
+      // effect's own possibly-stale fallback overwriting it.
+      const storedToken = resolveSessionToken();
+      if (looksLikeJwt(storedToken)) {
+        const latestStoredUser = readStoredUser() || userRef.current || OPEN_ACCESS_USER;
+        setAuthTokenState(storedToken);
+        setUserState(latestStoredUser);
+        setIsLoading(false);
+        return;
+      }
+
       const nextToken = resolveSessionToken(session?.token);
       const storedUser = readStoredUser() || userRef.current || OPEN_ACCESS_USER;
       setAuthTokenState(nextToken);

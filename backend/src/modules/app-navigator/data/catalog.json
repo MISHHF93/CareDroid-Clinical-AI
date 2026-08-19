@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "source": "CareDroid CANONICAL_ROUTE_MAP",
-  "sourceCommit": "b104119e8597c600a2afeb6f9bdaf71083559d8f",
-  "generatedAt": "2026-08-14T16:53:15.059Z",
+  "sourceCommit": "8a89e09c749e7ecf9274a0246d85bda919237bce",
+  "generatedAt": "2026-08-19T21:32:11.675Z",
   "records": [
     {
       "id": "command-center",
@@ -601,6 +601,23 @@
       "breadcrumbs": [
         "Operations",
         "Medical IoT"
+      ],
+      "aliases": [],
+      "workflowOwner": "IT administrator",
+      "requiredPermissions": [
+        "settings:read"
+      ]
+    },
+    {
+      "id": "devices",
+      "label": "Device Fleet",
+      "description": "Biomedical device fleet inventory, maintenance, and lifecycle tracking.",
+      "path": "/devices",
+      "component": "DeviceFleetManagement",
+      "navigationGroup": "Operations",
+      "breadcrumbs": [
+        "Operations",
+        "Device Fleet"
       ],
       "aliases": [],
       "workflowOwner": "IT administrator",

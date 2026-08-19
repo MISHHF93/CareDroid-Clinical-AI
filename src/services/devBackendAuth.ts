@@ -246,12 +246,38 @@ export async function ensureDevBackendSession({
   timeoutMs?: number;
 } = {}) {
   if (force) {
-    if (!inFlightForcedSession) {
-      inFlightForcedSession = resolveDevBackendSession({ force, timeoutMs }).finally(() => {
+    if (inFlightForcedSession) {
+      return inFlightForcedSession;
+    }
+    // HEAL-347.46: an unforced caller (e.g. UserContext.tsx's ambient
+    // bootstrap effect, which runs on every mount including the /login page
+    // itself) may already have a fetch running by the time a forced caller
+    // (e.g. AuthPage.tsx's explicit bypass click) arrives. On a fresh
+    // session neither call has a usable cached token to short-circuit on,
+    // so the unforced fetch already in flight is fetching the exact same
+    // fresh session a forced call would -- join it instead of firing a
+    // second concurrent POST /api/auth/dev-session. Without this, HEAL-347.42
+    // only covered forced-joins-forced and unforced-joins-forced; this
+    // reverse ordering still slipped through as 2-3 concurrent POSTs,
+    // confirmed live to be enough on its own to trip the backend's DB-pool
+    // exhaustion under concurrent load on this route (see
+    // resolveDevBackendSession's HEAL-347.27 comment).
+    if (inFlightDevSession) {
+      // Derive a separate promise (rather than aliasing the same reference)
+      // so this call gets its own `.finally()` cleanup for
+      // inFlightForcedSession -- the unforced promise's own cleanup only
+      // ever nulls inFlightDevSession, so aliasing directly would leave
+      // inFlightForcedSession permanently pointing at a stale, already-
+      // resolved promise once this fetch settles.
+      inFlightForcedSession = inFlightDevSession.finally(() => {
         inFlightForcedSession = null;
       });
-      inFlightDevSession = inFlightForcedSession;
+      return inFlightForcedSession;
     }
+    inFlightForcedSession = resolveDevBackendSession({ force, timeoutMs }).finally(() => {
+      inFlightForcedSession = null;
+    });
+    inFlightDevSession = inFlightForcedSession;
     return inFlightForcedSession;
   }
 

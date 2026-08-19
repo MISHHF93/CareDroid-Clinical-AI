@@ -220,6 +220,22 @@ describe('canonical CareDroid access', () => {
     expect(canAccessRoute(chargeNurse, `${CANONICAL_ROUTES.adminOperations}/tenant`)).toBe(true);
   });
 
+  // Regression for a live-reproduced bug (HEAL-347.48): 'devices' had no
+  // CANONICAL_ROUTE_MAP entry at all -- unlike its siblings 'fleet',
+  // 'hospital-map', and 'medical-iot' just above it, which all carry
+  // allowedRoles. getRouteByPath('/devices') returned null, so
+  // canRouteRecordIncludeProfile always returned false regardless of role.
+  // Live-confirmed super_admin and hospital_admin both got silently bounced
+  // to an unrelated page while it_admin (via a separate access path) could
+  // still reach the same, fully-built Device Fleet Management page.
+  it('hospital_admin and it_admin can access /devices (HEAL-347.48)', () => {
+    const hospitalAdmin = compileCareDroidAccessProfile(getDemoUserById('demo-jordan-miles')!); // hospital_admin
+    const itAdmin = compileCareDroidAccessProfile(getDemoUserById('demo-riley-thompson')!); // it_admin
+
+    expect(canAccessRoute(hospitalAdmin, CANONICAL_ROUTES.devices)).toBe(true);
+    expect(canAccessRoute(itAdmin, CANONICAL_ROUTES.devices)).toBe(true);
+  });
+
   it('registration clerk cannot review AI, own clinical alerts, or perform clinical actions', () => {
     const clerk = compileCareDroidAccessProfile(getDemoUserById('demo-grace-kim')!);
 

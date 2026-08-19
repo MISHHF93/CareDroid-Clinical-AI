@@ -71,4 +71,81 @@ describe('userProfileCatalog', () => {
     expect(isRouteAllowedForProfile(profile, '/profile/workspaces')).toBe(true);
     expect(isRouteAllowedForProfile(profile, '/profile/activity')).toBe(true);
   });
+
+  // Regression for a live-reproduced bug (HEAL-347.47): /protocols and /lab
+  // are standalone top-level pages (toolsConsoleRoutes.ts's
+  // TOOLS_SHORTCUT_PAGE_ROUTES), not nested under /tools/ the way
+  // /tools/calculators and friends are, so router.tsx's ToolsRedirect never
+  // folds them into /emergency/tools. Neither appeared anywhere in
+  // PERMISSION_ROUTE_MAP, so ProfileRouteGuard silently bounced every role
+  // -- including physician, whose real JWT permissions include
+  // USE_PROTOCOLS -- back to their landing route on direct navigation.
+  // Confirmed live via Playwright: /protocols consistently redirected to
+  // /emergency/whiteboard for a freshly bypassed physician session.
+  it('grants a clinical tool-using role access to the standalone /protocols and /lab pages', () => {
+    const profile = resolveUserProfileFromSaasRole('emergency-physician');
+    expect(isRouteAllowedForProfile(profile, CANONICAL_ROUTES.protocols)).toBe(true);
+    expect(isRouteAllowedForProfile(profile, '/lab')).toBe(true);
+  });
+
+  it('does not grant /protocols to a non-clinical role without VIEW_TOOLS', () => {
+    const profile = resolveUserProfileFromSaasRole('registration-clerk');
+    expect(isRouteAllowedForProfile(profile, CANONICAL_ROUTES.protocols)).toBe(false);
+  });
+
+  // Regression for a live-reproduced bug (HEAL-347.48): a sweep found 14
+  // fully-built platform pages with zero PERMISSION_ROUTE_MAP coverage --
+  // same bug class as HEAL-347.47's /protocols//lab gap, ~7x larger. Every
+  // role was silently bounced to its landing route on direct navigation.
+  it('grants platform-admin access to 12 of the 14 previously-unreachable platform pages via its own VIEW_TOOLS/VIEW_OPERATIONS/VIEW_GOVERNANCE/CONFIGURE_SYSTEM presets (HEAL-347.48)', () => {
+    const profile = resolveUserProfileFromSaasRole('platform-admin');
+    const routes = [
+      CANONICAL_ROUTES.knowledgeHub,
+      CANONICAL_ROUTES.discover,
+      CANONICAL_ROUTES.workflows,
+      CANONICAL_ROUTES.workflowMining,
+      CANONICAL_ROUTES.featureFlags,
+      CANONICAL_ROUTES.dependencyMap,
+      CANONICAL_ROUTES.dependencyGraph,
+      CANONICAL_ROUTES.dataLineage,
+      CANONICAL_ROUTES.selfDiagnostics,
+      CANONICAL_ROUTES.assetPacks,
+      CANONICAL_ROUTES.humanReview,
+      CANONICAL_ROUTES.security,
+    ];
+    routes.forEach((route) => {
+      expect(isRouteAllowedForProfile(profile, route), route).toBe(true);
+    });
+  });
+
+  // expansion-opportunities/product-intelligence went into the VIEW_ANALYTICS
+  // bucket (business-intelligence pages), which platform-admin's own preset
+  // list doesn't carry -- hospital-administrator and executive-leadership do.
+  it('grants a role with VIEW_ANALYTICS access to /expansion-opportunities and /product-intelligence (HEAL-347.48)', () => {
+    const profile = resolveUserProfileFromSaasRole('hospital-administrator');
+    expect(isRouteAllowedForProfile(profile, CANONICAL_ROUTES.expansionOpportunities)).toBe(true);
+    expect(isRouteAllowedForProfile(profile, CANONICAL_ROUTES.productIntelligence)).toBe(true);
+  });
+
+  // Regression for a live-reproduced bug (HEAL-347.48): CANONICAL_ROUTES.marketplace
+  // ('/marketplace') has no real page of its own -- it's a redirect-only
+  // alias to /plugins (routes.config.ts's IN_SHELL_ROUTE_REDIRECTS). But
+  // ProfileRouteGuard wraps that redirect route too, so without a
+  // PERMISSION_ROUTE_MAP entry the guard bounced every role away before the
+  // redirect ever fired -- a dead nav link for everyone.
+  it('grants a tool-using role access to the /marketplace redirect alias', () => {
+    const profile = resolveUserProfileFromSaasRole('emergency-physician');
+    expect(isRouteAllowedForProfile(profile, CANONICAL_ROUTES.marketplace)).toBe(true);
+  });
+
+  // Regression for a live-reproduced bug (HEAL-347.48): /vehicle is a
+  // legacy-alias path with a correct, purpose-built PilotExtensionRouteGuard
+  // redirect to /emergency/ems, but ProfileRouteGuard (which wraps that
+  // guard and evaluates first) bounced a fleet-capable role to its own
+  // generic landing route before the specific redirect ever got a chance to
+  // run -- live-confirmed inconsistent per-role behavior on the same URL.
+  it('grants a fleet-capable role access to the /vehicle legacy-alias path', () => {
+    const profile = resolveUserProfileFromSaasRole('fleet-operator');
+    expect(isRouteAllowedForProfile(profile, '/vehicle')).toBe(true);
+  });
 });

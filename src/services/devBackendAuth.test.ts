@@ -170,4 +170,41 @@ describe('devBackendAuth ensureDevBackendSession concurrency (HEAL-347.42)', () 
     expect(forced.token).toBe('header.payload.signature');
     expect(unforced.token).toBe('header.payload.signature');
   });
+
+  it('joins an in-progress UNFORCED fetch instead of starting a separate forced one (HEAL-347.46)', async () => {
+    // Regression for the reverse ordering of the case above: UserContext.tsx's
+    // ambient bootstrap effect calls ensureDevBackendSession() (unforced) on
+    // every mount, including the /login page itself, before the user has
+    // done anything. If the user then clicks "Bypass sign-in"
+    // (AuthPage.tsx's handleDevBypass, which always calls
+    // ensureDevBackendSession({ force: true })) while that ambient fetch is
+    // still in flight, the old code only ever checked
+    // `inFlightForcedSession` on the forced path -- finding it null (only
+    // `inFlightDevSession` was set, by the unforced caller), it started a
+    // SECOND, fully independent POST /api/auth/dev-session rather than
+    // joining the one already running. Live-observed as 2-3 concurrent
+    // dev-session POSTs surviving HEAL-347.42's fix, which in turn kept
+    // triggering the backend's known DB-pool exhaustion under concurrent
+    // load on this route (see resolveDevBackendSession's HEAL-347.27
+    // comment) -- confirmed live: the backend went completely unresponsive
+    // to health checks after a run of dev-bypass login attempts.
+    let fetchCallCount = 0;
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => {
+        fetchCallCount += 1;
+        await new Promise((resolve) => setTimeout(resolve, 20));
+        return { ok: true, json: async () => backendDevSessionResponse() };
+      }),
+    );
+
+    const { ensureDevBackendSession } = await import('./devBackendAuth');
+    const unforcedPromise = ensureDevBackendSession();
+    const forcedPromise = ensureDevBackendSession({ force: true });
+    const [unforced, forced] = await Promise.all([unforcedPromise, forcedPromise]);
+
+    expect(fetchCallCount).toBe(1);
+    expect(unforced.token).toBe('header.payload.signature');
+    expect(forced.token).toBe('header.payload.signature');
+  });
 });

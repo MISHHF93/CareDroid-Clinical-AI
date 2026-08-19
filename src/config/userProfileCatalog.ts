@@ -93,7 +93,35 @@ function getBaseProfileRoutes(entry?: UserProfileCatalogEntry): string[] {
 
 const PERMISSION_ROUTE_MAP: Record<string, string[]> = Object.freeze({
   USE_ASSISTANT: [CANONICAL_ROUTES.assistant, CANONICAL_ROUTES.emergencyCopilot],
-  VIEW_TOOLS: [CANONICAL_ROUTES.tools, CANONICAL_ROUTES.emergencyTools],
+  // HEAL-347.47: /protocols and /lab are standalone top-level pages
+  // (toolsConsoleRoutes.ts's TOOLS_SHORTCUT_PAGE_ROUTES) -- unlike
+  // /tools/calculators and friends, they're NOT under the /tools/ prefix
+  // that router.tsx's ToolsRedirect folds into /emergency/tools, so neither
+  // was reachable through any other entry in this map. ProfileRouteGuard
+  // silently bounced every role (including physician, whose real JWT
+  // permissions include USE_PROTOCOLS) straight back to their landing
+  // route on direct navigation -- live-reproduced via Playwright, 3/3
+  // repeat attempts. VIEW_TOOLS is the permission preset every
+  // clinical/tool-using role already carries (emergency-physician,
+  // icu-physician, cardiologist, nurse, pharmacist, lab-technician,
+  // biomedical-engineer), so both belong in its route bucket rather than a
+  // separate permission key the ROLE_PERMISSION_PRESETS vocabulary doesn't
+  // otherwise use.
+  VIEW_TOOLS: [
+    CANONICAL_ROUTES.tools,
+    CANONICAL_ROUTES.emergencyTools,
+    CANONICAL_ROUTES.protocols,
+    '/lab',
+    CANONICAL_ROUTES.knowledgeHub,
+    CANONICAL_ROUTES.assetPacks,
+    // /marketplace is a redirect-only alias to /plugins (routes.config.ts's
+    // IN_SHELL_ROUTE_REDIRECTS) -- ProfileRouteGuard wraps that redirect
+    // route too, so without an entry here the redirect itself never fires
+    // (bounced before it can run), same failure mode as the /vehicle
+    // three-competing-redirect-systems bug found in the same sweep.
+    CANONICAL_ROUTES.marketplace,
+    CANONICAL_ROUTES.plugins,
+  ],
   VIEW_EMERGENCY: [CANONICAL_ROUTES.emergencyWhiteboard],
   VIEW_EMERGENCY_RECEPTION: [
     CANONICAL_ROUTES.emergencyReception,
@@ -102,13 +130,49 @@ const PERMISSION_ROUTE_MAP: Record<string, string[]> = Object.freeze({
     CANONICAL_ROUTES.emergencyPulse,
     CANONICAL_ROUTES.emergencyShift,
   ],
-  VIEW_OPERATIONS: [CANONICAL_ROUTES.operations, CANONICAL_ROUTES.integrationHub],
-  VIEW_FLEET: [CANONICAL_ROUTES.fleetCommand, CANONICAL_ROUTES.fleetMap],
+  // HEAL-347.48: a live sweep found 14 fully-built platform pages with zero
+  // PERMISSION_ROUTE_MAP coverage at all -- same bug class as HEAL-347.47's
+  // /protocols//lab gap, ~7x larger. Confirmed live with 2 roles/mechanisms
+  // (dev-bypass physician; platform-admin, which correctly reaches
+  // /governance-registry via VIEW_GOVERNANCE, proving the guard itself
+  // works and this is purely a missing-data gap). Grouped into the existing
+  // buckets by what each page actually does, using the SAME
+  // ROLE_PERMISSION_PRESETS vocabulary (saasProfileConstants.ts) already in
+  // use, rather than introducing new permission keys nothing emits.
+  VIEW_OPERATIONS: [
+    CANONICAL_ROUTES.operations,
+    CANONICAL_ROUTES.integrationHub,
+    CANONICAL_ROUTES.workflows,
+    CANONICAL_ROUTES.workflowMining,
+    CANONICAL_ROUTES.discover,
+  ],
+  // /vehicle is a legacy-alias path -- PilotExtensionRouteGuard (see
+  // edApplication.config.ts's ED_EXTENSION_ROUTE_REDIRECTS) already has the
+  // correct, purpose-built rule folding it into /emergency/ems, but
+  // ProfileRouteGuard wraps that guard and evaluates first, so any role
+  // this map didn't cover for '/vehicle' got bounced to its OWN generic
+  // landing route before PilotExtensionRouteGuard's redirect ever ran.
+  // Live-confirmed: same URL landed a physician on /emergency/whiteboard
+  // (wrong) and an ems_coordinator on /emergency/ems (correct) -- role-
+  // dependent silent inconsistency with zero access-denied messaging.
+  // Granting it alongside the real fleet routes lets the specific,
+  // already-correct redirect fire consistently for fleet/EMS-capable roles.
+  VIEW_FLEET: [CANONICAL_ROUTES.fleetCommand, CANONICAL_ROUTES.fleetMap, '/vehicle'],
   VIEW_MEDICAL_IOT: [CANONICAL_ROUTES.medicalIot, CANONICAL_ROUTES.devices],
   VIEW_DEVICES: [CANONICAL_ROUTES.devices, CANONICAL_ROUTES.hospitalMap],
-  VIEW_GOVERNANCE: [CANONICAL_ROUTES.governanceRegistry, CANONICAL_ROUTES.aiGovernance],
+  VIEW_GOVERNANCE: [
+    CANONICAL_ROUTES.governanceRegistry,
+    CANONICAL_ROUTES.aiGovernance,
+    CANONICAL_ROUTES.humanReview,
+    CANONICAL_ROUTES.security,
+  ],
   VIEW_AUDIT_LOGS: [CANONICAL_ROUTES.audit, CANONICAL_ROUTES.automationAudit],
-  VIEW_ANALYTICS: [CANONICAL_ROUTES.emergencyAnalytics, CANONICAL_ROUTES.executive],
+  VIEW_ANALYTICS: [
+    CANONICAL_ROUTES.emergencyAnalytics,
+    CANONICAL_ROUTES.executive,
+    CANONICAL_ROUTES.expansionOpportunities,
+    CANONICAL_ROUTES.productIntelligence,
+  ],
   VIEW_SURVEILLANCE: [CANONICAL_ROUTES.surveillanceNexus],
   VIEW_TRACKMIND: [CANONICAL_ROUTES.trackMindWorkspace],
   VIEW_TRACKMIND_MATURITY: [CANONICAL_ROUTES.trackMindMaturity],
@@ -130,7 +194,14 @@ const PERMISSION_ROUTE_MAP: Record<string, string[]> = Object.freeze({
   MANAGE_RACEDAY_OPERATIONS: [CANONICAL_ROUTES.trackMindWorkspace, CANONICAL_ROUTES.operations],
   MANAGE_PLATFORM_TENANTS: [CANONICAL_ROUTES.platformAdmin, CANONICAL_ROUTES.tenantAdmin],
   MANAGE_ORGANIZATION: [CANONICAL_ROUTES.tenantAdmin, CANONICAL_ROUTES.adminOperations],
-  CONFIGURE_SYSTEM: [CANONICAL_ROUTES.platformAdmin],
+  CONFIGURE_SYSTEM: [
+    CANONICAL_ROUTES.platformAdmin,
+    CANONICAL_ROUTES.featureFlags,
+    CANONICAL_ROUTES.dependencyMap,
+    CANONICAL_ROUTES.dependencyGraph,
+    CANONICAL_ROUTES.dataLineage,
+    CANONICAL_ROUTES.selfDiagnostics,
+  ],
 });
 
 function enrichCatalogEntry(entry: UserProfileCatalogEntry): UserProfileCatalogEntry {
