@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { randomUUID } from 'crypto';
 import { SavedPromptDto } from './dto/saved-prompt.dto';
 import { UpdatePersonalizationDto } from './dto/update-personalization.dto';
 import { SavedPrompt } from './entities/saved-prompt.entity';
@@ -115,19 +116,38 @@ export class PersonalizationService {
     return recentPrompt;
   }
 
+  // HEAL-347.36: two concurrent first-time calls for the same new user
+  // (e.g. a double-submit, or getForUser racing a savePrompt) both read
+  // "no preference yet" and both attempted create()+save(); the
+  // @Index(['userId'], { unique: true }) already on this entity stopped
+  // the duplication, but the loser surfaced as a raw, uncaught
+  // unique-constraint 500 instead of the idempotent existing-row result.
+  // orIgnore()+read-back, same pattern as this session's other TOCTOU
+  // fixes -- the id is pre-assigned via randomUUID() (matching
+  // artifacts.service.ts's convention) so the query builder insert doesn't
+  // depend on the database populating a @PrimaryGeneratedColumn('uuid').
   private async getOrCreatePreference(userId: string) {
-    let preference = await this.aiPreferenceRepository.findOne({ where: { userId } });
-    if (!preference) {
-      preference = this.aiPreferenceRepository.create({
-        userId,
-        preferredBehavior: 'clinical_copilot',
-        recentPrompts: [],
-        suggestedTools: ['calculators', 'drug-check', 'lab-interp'],
-        recommendedWorkflows: DEFAULT_RECOMMENDATIONS,
-      });
-      preference = await this.aiPreferenceRepository.save(preference);
-    }
-    return preference;
+    const existing = await this.aiPreferenceRepository.findOne({ where: { userId } });
+    if (existing) return existing;
+
+    const candidate = this.aiPreferenceRepository.create({
+      id: randomUUID(),
+      userId,
+      preferredBehavior: 'clinical_copilot',
+      recentPrompts: [],
+      suggestedTools: ['calculators', 'drug-check', 'lab-interp'],
+      recommendedWorkflows: DEFAULT_RECOMMENDATIONS,
+    });
+
+    await this.aiPreferenceRepository
+      .createQueryBuilder()
+      .insert()
+      .into(UserAiPreference)
+      .values(candidate as any)
+      .orIgnore()
+      .execute();
+
+    return this.aiPreferenceRepository.findOneOrFail({ where: { userId } });
   }
 
   private serializePrompt(prompt: SavedPrompt) {

@@ -9,8 +9,10 @@ describe('PersonalizationService', () => {
   let service: PersonalizationService;
   let aiPreferenceRepo: {
     findOne: jest.Mock;
+    findOneOrFail: jest.Mock;
     create: jest.Mock;
     save: jest.Mock;
+    createQueryBuilder: jest.Mock;
   };
   let savedPromptRepo: {
     find: jest.Mock;
@@ -21,10 +23,30 @@ describe('PersonalizationService', () => {
   };
 
   beforeEach(async () => {
+    // HEAL-347.36: getOrCreatePreference() now inserts via
+    // createQueryBuilder().insert()...orIgnore().execute() and reads the
+    // winner back with findOneOrFail() instead of create()+save(), to
+    // close a same-user race. values() captures its argument so
+    // findOneOrFail() can echo it back, mirroring the same mock shape
+    // already established for this pattern elsewhere (integration-hub,
+    // notification-preference specs).
+    let pendingInsertValues: any = null;
+    const insertQueryBuilder: any = {
+      insert: jest.fn().mockReturnThis(),
+      into: jest.fn().mockReturnThis(),
+      values: jest.fn((values: any) => {
+        pendingInsertValues = values;
+        return insertQueryBuilder;
+      }),
+      orIgnore: jest.fn().mockReturnThis(),
+      execute: jest.fn().mockResolvedValue(undefined),
+    };
     aiPreferenceRepo = {
       findOne: jest.fn(),
+      findOneOrFail: jest.fn(async () => pendingInsertValues),
       create: jest.fn((partial) => ({ ...partial })),
       save: jest.fn(async (entity) => entity),
+      createQueryBuilder: jest.fn(() => insertQueryBuilder),
     };
     savedPromptRepo = {
       find: jest.fn(async () => []),
@@ -63,7 +85,7 @@ describe('PersonalizationService', () => {
           suggestedTools: ['calculators', 'drug-check', 'lab-interp'],
         }),
       );
-      expect(aiPreferenceRepo.save).toHaveBeenCalled();
+      expect(aiPreferenceRepo.createQueryBuilder).toHaveBeenCalled();
       expect(result.preferredBehavior).toBe('clinical_copilot');
       expect(result.suggestedTools).toEqual(['calculators', 'drug-check', 'lab-interp']);
       expect(result.recommendedWorkflows.map((w: any) => w.id)).toEqual([
