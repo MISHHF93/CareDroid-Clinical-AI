@@ -182,7 +182,23 @@ export const BACKEND_API_CAPABILITY_STATUS = Object.freeze({
    * flag -- no fixture data.
    */
   emergencyReassessment: BACKEND_CAPABILITY_STATUS.REAL,
-  emergencySurge: BACKEND_CAPABILITY_STATUS.DISABLED,
+  /**
+   * HEAL-347.40: SurgeController (backend/src/modules/surge/surge.controller.ts)
+   * is a real, live route backed by SurgeCapacityService -- not a stub -- but
+   * this flag stayed DISABLED, so surgeApi.ts's guardedJson() short-circuited
+   * every surge call (status/activate/deactivate/bottlenecks/batch-ems-intake)
+   * to a hardcoded null before ever reaching the network, regardless of
+   * backend health. Confirmed live: ExecutiveCommandCenter's "Surge active"
+   * badge was permanently null with no error shown. The controller does
+   * additionally require a live Mongoose/MongoDB connection
+   * (assertMongoReady() -- confirmed via live curl, returns a real 503
+   * DEPENDENCY_UNAVAILABLE with an actionable message when Mongo isn't
+   * configured) -- but that's a legitimate degraded-service response the
+   * frontend's guardedJson already surfaces via data?.error, the same way
+   * any other REAL capability's transient failure is handled. Silently
+   * discarding it before the request even fires was strictly worse.
+   */
+  emergencySurge: BACKEND_CAPABILITY_STATUS.REAL,
   /** POST /api/emergency/intake createFromIntake is a real board mutator. */
   emergencySmartIntake: BACKEND_CAPABILITY_STATUS.REAL,
   emergencySmartIntakeIdentitySession: BACKEND_CAPABILITY_STATUS.DISABLED,
