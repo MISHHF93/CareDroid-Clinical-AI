@@ -257,64 +257,25 @@
     0 4px 12px rgba(15, 23, 42, 0.06);
 }
 
-/* Individual metric tile — more defined surface */
-.operational-strip__metric,
-.operational-strip__action {
-  border-radius: 10px;
-  background: color-mix(
-    in srgb,
-    var(--app-surface-muted, #f1f5f9) 32%,
-    var(--app-surface-1, #ffffff)
-  );
-  border: 1px solid var(--medical-border, #e2e8f0);
-  transition:
-    background 100ms ease,
-    border-color 100ms ease;
-}
-
-.operational-strip__metric:hover,
-.operational-strip__action:hover {
-  background: color-mix(
-    in srgb,
-    var(--app-surface-muted, #f1f5f9) 56%,
-    var(--app-surface-1, #ffffff)
-  );
-  border-color: var(--cdl-clinical-border, var(--medical-border, #cbd5e1));
-}
-
-/* Value — larger, bolder */
-.operational-strip__metric strong,
-.operational-strip__action strong {
-  font-size: 15px;
-  font-weight: 700;
-}
-
-/* Label — refined micro-type */
-.operational-strip__metric span,
-.operational-strip__action span {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  color: var(--medical-ink-muted, #6b7280);
-}
-
-/* Dense variant (the inline EMS strip) */
-.operational-strip--dense .operational-strip__metric,
-.operational-strip--dense .operational-strip__action {
-  border-radius: 8px;
-  background: color-mix(
-    in srgb,
-    var(--app-surface-muted, #f1f5f9) 28%,
-    var(--app-surface-1, #ffffff)
-  );
-  border: 1px solid var(--medical-border, #e2e8f0);
-}
-
-.operational-strip--dense .operational-strip__metric strong,
-.operational-strip--dense .operational-strip__action strong {
-  font-size: 13.5px;
-  font-weight: 700;
-}
+/* HEAL-347.50 (2026-08-19): removed the .operational-strip__metric /
+   .operational-strip__action base+hover+strong+span+dense rules that used
+   to live here, same reasoning as section 4 above. OperationalStrip.css
+   (the component's own stylesheet) already defines a complete, genuinely
+   richer treatment for these exact selectors -- tone-colored strong text,
+   per-accent-theme backgrounds (reassessment/referral/ems/shift-handoff),
+   a --command variant, disabled/--clear state, and real focus-visible --
+   that this file's version didn't have at all. Both blocks matched on
+   selector specificity (a bare single class), so which one actually
+   rendered depended on Vite's chunk-load order between this file (global,
+   imported via design-system.css) and OperationalStrip.css (a per-
+   component side-effect import) -- a genuine, unpredictable collision, not
+   a deliberate override. Confirmed by literal value mismatches this file's
+   own values wouldn't be able to explain if they were meant to be an
+   authoritative upgrade over the component's (e.g. dense-variant strong
+   text was 13.5px here vs. the component's own tuned 13px). This is the
+   actual header/whiteboard/EMS/charge-nurse/physician KPI rail (8 real
+   call sites) -- letting the component's own complete design win
+   deterministically, rather than by source-order luck, is the fix. */
 
 /* ─────────────────────────────────────────────────────────────────
    6. SIDEBAR NAVIGATION

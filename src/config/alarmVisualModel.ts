@@ -4,7 +4,7 @@
  * CONTRACT (use everywhere KPIs / lists / badges show risk):
  *
  * 1. Resolve severity: `resolveAlarmSeverity(tone)`
- * 2. Chips / strip metrics: `alarm-kpi` + `data-alarm` via AlarmKpiChip or alarmKpiClassNames
+ * 2. Chips / strip metrics: `alarm-kpi` + `data-alarm` via alarmKpiClassNames
  * 3. Cards / widgets: `alarm-surface` + `data-alarm` via alarmSurfaceClassNames
  * 4. Table/list rows: `alarm-row` + `data-alarm` via alarmRowClassNames
  * 5. Inline markers: `alarm-dot` + severity modifier via alarmDotClassNames
@@ -14,9 +14,14 @@
  * Visual system CSS: `src/styles/alarm-system.css` (imported in main.tsx)
  *
  * Surfaces already wired:
- * - Chrome context KPIs (ChromeStatusChips / AlarmKpiChip)
- * - OperationalStrip metrics
- * - MetricChip / MetricCard / StatusWidget / StatCard
+ * - OperationalStrip metrics (the live header/EMS/whiteboard chip rail)
+ * - AlarmKpi (src/alarm/) -- patient-module metric rail
+ * - MetricChip / MetricCard / StatusWidget
+ *
+ * ChromeStatusChips and AlarmKpiChip (src/components/chrome/) were deleted
+ * 2026-08-19 as confirmed dead code -- zero real call sites, superseded by
+ * OperationalStrip/AlarmKpi above. StatCard (src/components/data-display/)
+ * was deleted the same round for the same reason.
  *
  * HEAL-177 (2026-08-13) — RECONCILED with `src/alarm/types.ts`. Until this round the two
  * files independently defined `resolveAlarmSeverity`/`AlarmSeverity` with disagreeing scales

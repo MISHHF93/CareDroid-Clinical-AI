@@ -81,7 +81,7 @@ migrate on their own schedule, not as a side effect of this cycle.
 | `DashboardCard` | exists, **zero real production usage** | `src/components/ui/CareDroidPrimitives.tsx` — defined but not actually imported by any page/feature component today (only its own definition file) |
 | `AIRecommendationCard` | exists, real usage | `src/components/ai/AIRecommendationCard.tsx` (aliased as `AIChiefRecommendationCard`) — 2 production call sites |
 | `ActionCard` | exists, different name, **zero real production usage** | `ActionProposalCard` — `src/components/ai/ActionProposalCard.tsx` (test-only today) |
-| `StatCard` | exists, **zero real production usage** | `src/components/data-display/StatCard.tsx` — note `src/pages/emergency/index.tsx` defines and uses its own unrelated local `StatCard` function under the same name, which is not this component |
+| `StatCard` | **deleted** (2026-08-19, confirmed zero real importers) | `src/pages/emergency/index.tsx` and `src/pages/emergency/pulse/index.tsx` each define their own unrelated local `StatCard`-shaped tile under the same name, which was never this component |
 | `Card` (base) | **deleted, was fully dead** | `src/components/surfaces/Card.tsx` (`.cd-card`) had zero real importers — removed 2026-08-06. The real base primitive in active use is the previously-undocumented `src/components/ui/card.tsx` (`.card`/`.card-compact`), separate again from `cdl-v2/cards.css` (`.cdl-card`) — three names for card-shaped surfaces, not two |
 | `AlertCard` | **deleted** (Cycle 146, confirmed zero importers) | use `src/alarm/{AlarmBanner,AlarmKpi,AlarmRail}` — the real, live equivalent |
 | `ClinicianCard` | **does not exist** | no live call site yet — see roadmap |

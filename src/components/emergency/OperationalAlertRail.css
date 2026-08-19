@@ -1,5 +1,4 @@
-/* Non-chrome OperationalAlertRail host (whiteboard / other strips).
- * Chrome KPIs use ChromeStatusChips — not this file. */
+/* Non-chrome OperationalAlertRail host (whiteboard / other strips). */
 
 .operational-alert-rail {
   display: flex;
