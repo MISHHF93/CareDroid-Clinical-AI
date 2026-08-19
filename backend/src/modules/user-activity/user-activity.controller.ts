@@ -14,6 +14,15 @@ export class UserActivityController {
   @Post()
   @ApiOperation({ summary: 'Record safe current-user activity metadata' })
   async record(@Req() req: any, @Body() dto: RecordUserActivityDto) {
+    // HEAL-347.31: dto.workspaceId is client-supplied and was trusted
+    // verbatim -- any authenticated user (of ANY workspace) could POST an
+    // arbitrary other workspace's UUID and have a fabricated entry appear
+    // in that workspace's real members' activity feed, since GET
+    // /activity/workspaces/:workspaceId (below) only checks membership on
+    // read, not on write. Same check the sibling read route already has.
+    if (dto.workspaceId) {
+      await this.activityService.assertWorkspaceMember(req.user.id, dto.workspaceId);
+    }
     return this.activityService.record(req.user.id, dto);
   }
 
