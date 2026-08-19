@@ -778,7 +778,32 @@ function AppShellFrame({ children }: AppShellProps) {
       { load: () => import('../pages/emergency/HospitalCommandCenter') },
       // Warms PatientsRoute/QueueRoute/ReassessmentRoute/BoardingRoute/
       // CapacityRoute/CopilotRoute in one request -- see HEAL-347.10 above.
-      { load: () => import('../pages/emergency/emergencyRoutePages') },
+      // HEAL-347.52: unlike every other entry above whose target route can
+      // duplicate the CURRENT navigation's own fetch, this one never had a
+      // skip check at all -- landing directly on any of its six served
+      // routes (the realistic case for a bookmarked/refreshed/deep-linked
+      // URL, not just a click-through from another page) made this effect
+      // redundantly re-fetch the exact chunk the router was already
+      // fetching with priority, live-timed via network trace to leave
+      // /emergency/queues stuck past 20s with 40-60 concurrent pending
+      // requests (many of them unrelated chunks from OTHER entries in this
+      // same list, all competing for the dev server's limited transform
+      // capacity at once) -- the identical failure mode HEAL-347.43
+      // documented and fixed for Reception/Analytics/Settings, just missed
+      // on this one entry.
+      {
+        load: () => import('../pages/emergency/emergencyRoutePages'),
+        skip: () =>
+          [
+            CANONICAL_ROUTES.emergencyPatients,
+            CANONICAL_ROUTES.emergencyQueues,
+            CANONICAL_ROUTES.emergencyReassessment,
+            CANONICAL_ROUTES.emergencyBoarding,
+            CANONICAL_ROUTES.emergencyCapacity,
+            CANONICAL_ROUTES.emergencyCopilot,
+            CANONICAL_ROUTES.triage,
+          ].some((path) => location.pathname.startsWith(path)),
+      },
       // HEAL-347.48: /tools/calculators (and every other /tools/* console
       // page -- ToolsFilteredConsole handles all of them) hit the same
       // cold-compile stall as the routes above -- live-timed at 13.5-25s

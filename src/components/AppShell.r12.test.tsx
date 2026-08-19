@@ -440,4 +440,38 @@ describe('HEAL-347.2: idle-time prefetch for lazy shell panels', () => {
     const staggeredCount = setTimeoutSpy.mock.calls.length - callCountBefore;
     expect(staggeredCount).toBe(13);
   });
+
+  // Regression for a live-reproduced bug (HEAL-347.52): unlike every other
+  // route-page entry in this batch (Reception/Analytics/Settings/Tools
+  // console), the emergencyRoutePages entry -- which serves SIX routes
+  // (Patients/Queues/Reassessment/Boarding/Capacity/Copilot) -- had no skip
+  // check at all, so landing directly on any of those six duplicated the
+  // router's own priority fetch of the exact same chunk. Live-timed via
+  // network trace: left /emergency/queues stuck past 20s with 40-60
+  // concurrent pending requests, never resolving.
+  it('does not schedule a prefetch entry for the shared emergencyRoutePages chunk when already on one of its six routes', async () => {
+    vi.spyOn(useEmergencyStore.getState(), 'initializeFromBackend').mockResolvedValue({
+      errors: {},
+    });
+    const setTimeoutSpy = vi.spyOn(window, 'setTimeout');
+
+    render(
+      <MemoryRouter initialEntries={['/emergency/queues']}>
+        <AppShell>
+          <div>Queues route</div>
+        </AppShell>
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(setTimeoutSpy).toHaveBeenCalledWith(expect.any(Function), 2000);
+    });
+
+    const callCountBefore = setTimeoutSpy.mock.calls.length;
+    const prefetchCall = setTimeoutSpy.mock.calls.find(([, delay]) => delay === 2000);
+    (prefetchCall?.[0] as () => void)?.();
+
+    const staggeredCount = setTimeoutSpy.mock.calls.length - callCountBefore;
+    expect(staggeredCount).toBe(13);
+  });
 });
