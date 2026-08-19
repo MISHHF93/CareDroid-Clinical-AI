@@ -89,7 +89,21 @@ describe('SmartIntakeController', () => {
 
   it('match() delegates to the service', async () => {
     await controller.match('s1', { staff: 'a' });
-    expect(service.match).toHaveBeenCalledWith('s1', 'a');
+    expect(service.match).toHaveBeenCalledWith('s1', 'a', undefined);
+  });
+
+  // Regression for HEAL-347.49: match()/createPatient()/continueUnknown()/
+  // reconcileUnknown() all reach the Mongoose UnifiedPatient model with zero
+  // organizationId before this fix -- proves the tenant context now threads
+  // through to the service instead of being silently dropped.
+  it('match() forwards the resolved tenant organizationId to the service', async () => {
+    await controller.match(
+      's1',
+      { staff: 'a' },
+      undefined,
+      { organizationId: 'org-1' } as never,
+    );
+    expect(service.match).toHaveBeenCalledWith('s1', 'a', 'org-1');
   });
 
   it('verifyField() throws BadRequestException when field or decision is missing', async () => {
@@ -121,12 +135,26 @@ describe('SmartIntakeController', () => {
 
   it('createPatient() delegates to the service', async () => {
     await controller.createPatient('s1', { staff: 'a' });
-    expect(service.createPatient).toHaveBeenCalledWith('s1', 'a');
+    expect(service.createPatient).toHaveBeenCalledWith('s1', 'a', undefined);
+  });
+
+  it('createPatient() forwards the resolved tenant organizationId to the service', async () => {
+    await controller.createPatient('s1', { staff: 'a' }, undefined, {
+      organizationId: 'org-1',
+    } as never);
+    expect(service.createPatient).toHaveBeenCalledWith('s1', 'a', 'org-1');
   });
 
   it('continueUnknown() defaults the label to Unknown Patient', async () => {
     await controller.continueUnknown('s1', { staff: 'a' });
-    expect(service.continueUnknown).toHaveBeenCalledWith('s1', 'Unknown Patient', 'a');
+    expect(service.continueUnknown).toHaveBeenCalledWith('s1', 'Unknown Patient', 'a', undefined);
+  });
+
+  it('continueUnknown() forwards the resolved tenant organizationId to the service', async () => {
+    await controller.continueUnknown('s1', { staff: 'a' }, undefined, {
+      organizationId: 'org-1',
+    } as never);
+    expect(service.continueUnknown).toHaveBeenCalledWith('s1', 'Unknown Patient', 'a', 'org-1');
   });
 
   it('reconcileUnknown() throws BadRequestException when patientId is missing', async () => {
@@ -137,7 +165,14 @@ describe('SmartIntakeController', () => {
 
   it('reconcileUnknown() delegates to the service', async () => {
     await controller.reconcileUnknown('s1', { patientId: 'p1', staff: 'a' });
-    expect(service.reconcileUnknown).toHaveBeenCalledWith('s1', 'p1', 'a');
+    expect(service.reconcileUnknown).toHaveBeenCalledWith('s1', 'p1', 'a', undefined);
+  });
+
+  it('reconcileUnknown() forwards the resolved tenant organizationId to the service', async () => {
+    await controller.reconcileUnknown('s1', { patientId: 'p1', staff: 'a' }, undefined, {
+      organizationId: 'org-1',
+    } as never);
+    expect(service.reconcileUnknown).toHaveBeenCalledWith('s1', 'p1', 'a', 'org-1');
   });
 
   it('biometricConsent() delegates to the service', async () => {

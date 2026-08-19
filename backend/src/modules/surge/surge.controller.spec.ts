@@ -90,8 +90,25 @@ describe('SurgeController', () => {
       surgeEventId: 'surge-1',
     } as any);
 
-    expect(service.batchEMSIntake).toHaveBeenCalledWith(patients, 'surge-1');
+    expect(service.batchEMSIntake).toHaveBeenCalledWith(patients, 'surge-1', undefined);
     expect(result).toEqual({ success: true, patients });
+  });
+
+  // Regression for HEAL-347.49: batchEmsIntake() is the highest-priority
+  // instance of the Mongoose Patient model's tenant-scoping gap -- a live,
+  // frontend-reachable MCI batch-intake write with zero organizationId
+  // before this fix. Proves the resolved tenant context now reaches the
+  // service instead of being silently dropped.
+  it('batchEmsIntake() forwards the resolved tenant organizationId to the service', async () => {
+    const patients = [{ temporaryId: 't1' }];
+    service.batchEMSIntake.mockResolvedValueOnce(patients);
+
+    await controller.batchEmsIntake(
+      { patients, surgeEventId: 'surge-1' } as any,
+      { organizationId: 'org-1' } as any,
+    );
+
+    expect(service.batchEMSIntake).toHaveBeenCalledWith(patients, 'surge-1', 'org-1');
   });
 
   it('bottlenecks() returns the service result directly (unwrapped)', async () => {

@@ -171,6 +171,46 @@ describe('SurgeCapacityService (real MongoDB via mongodb-memory-server)', () => 
       expect(updatedEvent.actualPatientCount).toBe(2);
     });
 
+    it('HEAL-347.49: stamps the caller-resolved organizationId onto every created patient, and omits it (leaving it null) when no tenant context is given', async () => {
+      const event = await service.activateSurgeMode({
+        type: 'mci',
+        estimatedPatientCount: 5,
+        actualPatientCount: 0,
+        resourceStatus,
+      });
+
+      const [scoped] = await service.batchEMSIntake(
+        [
+          {
+            temporaryId: 't-scoped',
+            chiefComplaint: 'Blunt trauma',
+            triageColor: 'RED',
+            etaMinutes: 5,
+            mechanismOfInjury: 'MVC',
+          },
+        ],
+        event.id,
+        'org-a',
+      );
+      const [unscoped] = await service.batchEMSIntake(
+        [
+          {
+            temporaryId: 't-unscoped',
+            chiefComplaint: 'Laceration',
+            triageColor: 'GREEN',
+            etaMinutes: 15,
+            mechanismOfInjury: 'Fall',
+          },
+        ],
+        event.id,
+      );
+
+      const scopedPatient = await UnifiedPatient.findById(scoped.patientId).lean();
+      const unscopedPatient = await UnifiedPatient.findById(unscoped.patientId).lean();
+      expect(scopedPatient!.organizationId).toBe('org-a');
+      expect(unscopedPatient!.organizationId ?? null).toBeNull();
+    });
+
     it('HEAL-232: two concurrent batches for the same surge event never assign duplicate mciPatientNumber values, and the final count reflects both batches', async () => {
       // Real MongoDB, real concurrency: fire both batchEMSIntake calls
       // without awaiting either first, so their internal read/increment/

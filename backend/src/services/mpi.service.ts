@@ -20,7 +20,10 @@ function splitName(name = '') {
 }
 
 export class MPIService {
-  async findCandidates(demographics: ExtractedDemographics): Promise<PatientMatchCandidate[]> {
+  async findCandidates(
+    demographics: ExtractedDemographics,
+    organizationId?: string,
+  ): Promise<PatientMatchCandidate[]> {
     const query: Record<string, unknown>[] = [];
     const identifiers = [
       ['mrn', demographics.mrn],
@@ -42,9 +45,26 @@ export class MPIService {
       });
     }
 
+    // HEAL-347.49: without this, candidate matching searched EVERY
+    // organization's patients -- a staff member at Hospital A could be
+    // shown (and could then link an intake session to) Hospital B's real
+    // patient record. Own-org-or-legacy-null, same filter shape as the
+    // TypeORM side (HEAL-343) -- omitted organizationId preserves the
+    // prior unfiltered behavior for callers that don't have tenant context
+    // yet, rather than silently returning zero candidates.
+    const orgFilter = organizationId
+      ? { $or: [{ organizationId }, { organizationId: null }] }
+      : null;
+    const demographicFilter = query.length ? { $or: query } : null;
+    const filter = orgFilter
+      ? demographicFilter
+        ? { $and: [demographicFilter, orgFilter] }
+        : orgFilter
+      : (demographicFilter ?? {});
+
     const patients = query.length
-      ? await Patient.find({ $or: query }).limit(25)
-      : await Patient.find().limit(50);
+      ? await Patient.find(filter).limit(25)
+      : await Patient.find(filter).limit(50);
     return patients
       .map((patient) => this.scorePatient(patient, demographics))
       .filter((candidate) => candidate.matchScore > 0)

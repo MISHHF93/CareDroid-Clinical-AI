@@ -214,6 +214,7 @@ export interface IMergeTracking {
 }
 
 export interface IUnifiedPatient extends Document {
+  organizationId?: string | null;
   mrn?: string | null;
   phn?: string | null;
   name: string;
@@ -644,6 +645,12 @@ const LegacyVitalsSchema = new Schema(
 
 export const UnifiedPatientSchema = new Schema<IUnifiedPatient>(
   {
+    // HEAL-347.49: nullable/no-backfill, same convention as the TypeORM
+    // Patient entity's organizationId (HEAL-343) -- own-org-or-legacy-null
+    // filtering at the query layer, not a required column, so every
+    // existing document and every caller that doesn't pass one keeps
+    // working unchanged.
+    organizationId: { type: String, default: null },
     // HEAL-233: was `default: null`, which made Mongoose write an
     // explicit `mrn: null` (and `phn: null`) onto every document that
     // didn't specify one. idx_unified_patients_mrn/-phn below are sparse
@@ -987,6 +994,7 @@ UnifiedPatientSchema.index(
   { 'identifiers.type': 1, 'identifiers.value': 1 },
   { name: 'idx_unified_patients_identifier' },
 );
+UnifiedPatientSchema.index({ organizationId: 1 }, { name: 'idx_unified_patients_organization_id' });
 
 export const UnifiedPatient =
   (models.UnifiedPatient as Model<IUnifiedPatient> | undefined) ||

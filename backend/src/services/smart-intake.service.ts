@@ -160,11 +160,11 @@ export class SmartIntakeService {
     return this.output(session);
   }
 
-  async match(sessionId: string, actor: string) {
+  async match(sessionId: string, actor: string, organizationId?: string) {
     const session = await this.getSession(sessionId);
     session.status = 'matching';
     const demographics = this.demographicsFromEvidence(session);
-    const candidates = await this.matcher.findCandidates(demographics);
+    const candidates = await this.matcher.findCandidates(demographics, organizationId);
     session.matchCandidates = candidates;
     session.duplicateWarning = candidates.some((candidate) => candidate.matchScore >= 85);
     session.auditLog.push(
@@ -223,7 +223,7 @@ export class SmartIntakeService {
     return this.output(session);
   }
 
-  async createPatient(sessionId: string, actor: string) {
+  async createPatient(sessionId: string, actor: string, organizationId?: string) {
     const session = await this.getSession(sessionId);
     this.assertCriticalFieldsReviewed(session);
     if (session.duplicateWarning) {
@@ -239,6 +239,7 @@ export class SmartIntakeService {
       session.verifiedSnapshot as Record<string, any>,
     );
     const patient = new Patient({
+      organizationId: organizationId ?? null,
       name: `${snapshot.firstName || 'New'} ${snapshot.lastName || 'Patient'}`.trim(),
       age: snapshot.age || 'Unknown',
       chief_complaint: snapshot.chiefComplaint || 'Smart Intake',
@@ -268,10 +269,12 @@ export class SmartIntakeService {
     sessionId: string,
     label: 'Unknown Male' | 'Unknown Female' | 'Unknown Patient',
     actor: string,
+    organizationId?: string,
   ) {
     const session = await this.getSession(sessionId);
     const temporaryEncounterId = id('UNK-ENC');
     const patient = new Patient({
+      organizationId: organizationId ?? null,
       name: label,
       age: 'Unknown',
       chief_complaint: String(fieldValue(session, 'chiefComplaint') || 'Unknown complaint'),
@@ -307,12 +310,23 @@ export class SmartIntakeService {
     return this.output(session);
   }
 
-  async reconcileUnknown(sessionId: string, patientId: string, actor: string) {
+  async reconcileUnknown(
+    sessionId: string,
+    patientId: string,
+    actor: string,
+    organizationId?: string,
+  ) {
     const session = await this.getSession(sessionId);
     const unknown = session.linkedPatientId
       ? await Patient.findById(session.linkedPatientId)
       : null;
-    if (!unknown) throw new Error('Unknown patient record not found for reconciliation');
+    // Same own-org-or-legacy-null check and no-existence-leak error shape
+    // as the TypeORM side's cross-org guards (HEAL-343) -- a patient that
+    // exists but belongs to a different organization reports identically
+    // to one that doesn't exist at all.
+    if (!unknown || (organizationId && unknown.organizationId && unknown.organizationId !== organizationId)) {
+      throw new Error('Unknown patient record not found for reconciliation');
+    }
     unknown.identity_reconciled = true;
     unknown.alerts.push(`Unknown patient reconciled to ${patientId} by ${actor}`);
     await unknown.save();

@@ -111,6 +111,7 @@ export class SurgeCapacityService extends EventEmitter {
   async batchEMSIntake(
     patients: BatchEMSPatient[],
     surgeEventId: string,
+    organizationId?: string,
   ): Promise<BatchEMSPatient[]> {
     const surgeEvent = await this.getSurgeEvent(surgeEventId);
     if (!surgeEvent || surgeEvent.status !== 'activated') {
@@ -146,6 +147,12 @@ export class SurgeCapacityService extends EventEmitter {
     for (const patient of patients) {
       const patientNumber = startingPatientCount + createdPatients.length + 1;
       const newPatient = await Patient.create({
+        // HEAL-347.49: the highest-priority instance of the Mongoose Patient
+        // model's tenant-scoping gap -- this is a LIVE, frontend-reachable
+        // MCI batch-intake write path (surgeApi.ts -> SurgeController ->
+        // here) with zero organizationId anywhere before this fix. Same
+        // nullable/optional-param convention as the TypeORM side (HEAL-343).
+        organizationId: organizationId ?? null,
         name: `MCI-${surgeEventId}-${patient.temporaryId}`,
         age: patient.age || 'Unknown',
         sex: patient.sex || null,

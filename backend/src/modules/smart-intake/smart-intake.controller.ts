@@ -18,6 +18,8 @@ import mongoose from 'mongoose';
 import { AuthorizationGuard } from '../auth/guards/authorization.guard';
 import { RequirePermission } from '../auth/decorators/permissions.decorator';
 import { Permission } from '../auth/enums/permission.enum';
+import { TenantContext } from '../tenant-context/tenant-context.decorator';
+import type { TenantContext as TenantContextValue } from '../tenant-context/tenant-context.types';
 import { SmartIntakeService } from '../../services/smart-intake.service';
 import type { VerificationDecision } from '../../models/SmartIntake';
 import {
@@ -186,10 +188,15 @@ export class SmartIntakeController {
     @Param('id') id: string,
     @Body() body: SmartIntakeMatchDto,
     @Headers('x-caredroid-user-id') caredroidUserId?: string,
+    @TenantContext() tenantContext?: TenantContextValue,
   ) {
     assertMongoReady();
     try {
-      return await this.smartIntakeService.match(id, this.actor(body, caredroidUserId));
+      return await this.smartIntakeService.match(
+        id,
+        this.actor(body, caredroidUserId),
+        tenantContext?.organizationId,
+      );
     } catch (error) {
       rethrowAsHttpException(error);
     }
@@ -253,10 +260,15 @@ export class SmartIntakeController {
     @Param('id') id: string,
     @Body() body: SmartIntakeCreatePatientDto,
     @Headers('x-caredroid-user-id') caredroidUserId?: string,
+    @TenantContext() tenantContext?: TenantContextValue,
   ) {
     assertMongoReady();
     try {
-      return await this.smartIntakeService.createPatient(id, this.actor(body, caredroidUserId));
+      return await this.smartIntakeService.createPatient(
+        id,
+        this.actor(body, caredroidUserId),
+        tenantContext?.organizationId,
+      );
     } catch (error) {
       rethrowAsHttpException(error);
     }
@@ -270,6 +282,7 @@ export class SmartIntakeController {
     @Param('id') id: string,
     @Body() body: SmartIntakeContinueUnknownDto,
     @Headers('x-caredroid-user-id') caredroidUserId?: string,
+    @TenantContext() tenantContext?: TenantContextValue,
   ) {
     assertMongoReady();
     try {
@@ -277,6 +290,7 @@ export class SmartIntakeController {
         id,
         (body.label as never) || 'Unknown Patient',
         this.actor(body, caredroidUserId),
+        tenantContext?.organizationId,
       );
     } catch (error) {
       rethrowAsHttpException(error);
@@ -291,6 +305,7 @@ export class SmartIntakeController {
     @Param('id') id: string,
     @Body() body: SmartIntakeReconcileUnknownDto,
     @Headers('x-caredroid-user-id') caredroidUserId?: string,
+    @TenantContext() tenantContext?: TenantContextValue,
   ) {
     assertMongoReady();
     if (!body.patientId) {
@@ -301,6 +316,7 @@ export class SmartIntakeController {
         id,
         body.patientId,
         this.actor(body, caredroidUserId),
+        tenantContext?.organizationId,
       );
     } catch (error) {
       rethrowAsHttpException(error);

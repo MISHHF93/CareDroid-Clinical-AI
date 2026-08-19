@@ -13,6 +13,8 @@ import mongoose from 'mongoose';
 import { AuthorizationGuard } from '../auth/guards/authorization.guard';
 import { RequirePermission } from '../auth/decorators/permissions.decorator';
 import { Permission } from '../auth/enums/permission.enum';
+import { TenantContext } from '../tenant-context/tenant-context.decorator';
+import type { TenantContext as TenantContextValue } from '../tenant-context/tenant-context.types';
 import { SurgeCapacityService } from '../../services/surge-capacity.service';
 import { ActivateSurgeDto } from './dto/activate-surge.dto';
 import { BatchEmsIntakeDto } from './dto/batch-ems-intake.dto';
@@ -58,11 +60,15 @@ export class SurgeController {
   @Post('batch-ems-intake')
   @RequirePermission(Permission.INGEST_SURGE_PATIENTS)
   @ApiOperation({ summary: 'Batch-create patient records from EMS mass-casualty intake' })
-  async batchEmsIntake(@Body() body: BatchEmsIntakeDto) {
+  async batchEmsIntake(
+    @Body() body: BatchEmsIntakeDto,
+    @TenantContext() tenantContext?: TenantContextValue,
+  ) {
     assertMongoReady();
     const patients = await this.surgeCapacityService.batchEMSIntake(
       body.patients,
       body.surgeEventId,
+      tenantContext?.organizationId,
     );
     return { success: true, patients };
   }
