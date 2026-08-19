@@ -34,10 +34,20 @@ export class ReassessmentService {
     return new Date(Date.now() + minutesDue * 60000);
   }
 
-  async getPatientsNeedingReassessment(): Promise<IPatient[]> {
+  // HEAL-347.54: this class is the non-canonical duplicate (see the class
+  // doc comment above), but its GET /emergency/reassessment/due controller
+  // route is still live and mounted, gated only by READ_PHI -- not by
+  // tenant. Before this fix it returned every organization's overdue
+  // patients to any authenticated user holding that one permission,
+  // regardless of which hospital they belonged to -- the same class of gap
+  // HEAL-343/347.4-8 already closed on the canonical TypeORM path, and that
+  // HEAL-347.49 just closed on this model's OTHER live write path
+  // (surge-capacity's batchEMSIntake). Same own-org-or-legacy-null
+  // convention as HEAL-347.49/mpi.service.ts: omitting organizationId keeps
+  // every existing internal caller (the cron below included) unchanged.
+  async getPatientsNeedingReassessment(organizationId?: string | null): Promise<IPatient[]> {
     const now = new Date();
-    return Patient.find({
-      current_state: { $nin: ['DISCHARGE', 'ADMISSION'] },
+    const dueClause = {
       $or: [
         { next_reassessment_due: { $lte: now } },
         {
@@ -45,7 +55,22 @@ export class ReassessmentService {
           last_reassessment: { $lt: new Date(now.getTime() - 30 * 60000) },
         },
       ],
-    });
+    };
+    // A sibling `$or` key here would silently overwrite dueClause's own
+    // `$or` (later key wins in a JS object literal) -- combine the two
+    // independent $or clauses via $and instead of spreading them into one
+    // object. Mongoose's generated FilterQuery type can't cleanly infer
+    // through this nested $and/$or shape (isn't exported the same way
+    // across mongoose versions either) -- cast at the one call site rather
+    // than fighting the generic; the shape itself is covered by the
+    // dedicated query-shape test in reassessment.service.spec.ts.
+    const orgClause = organizationId
+      ? { $or: [{ organizationId }, { organizationId: null }] }
+      : null;
+    return Patient.find({
+      current_state: { $nin: ['DISCHARGE', 'ADMISSION'] },
+      $and: orgClause ? [dueClause, orgClause] : [dueClause],
+    } as Record<string, unknown>);
   }
 
   async reassessPatient(

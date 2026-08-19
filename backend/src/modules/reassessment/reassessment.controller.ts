@@ -15,6 +15,8 @@ import mongoose from 'mongoose';
 import { AuthorizationGuard } from '../auth/guards/authorization.guard';
 import { RequirePermission } from '../auth/decorators/permissions.decorator';
 import { Permission } from '../auth/enums/permission.enum';
+import { TenantContext } from '../tenant-context/tenant-context.decorator';
+import type { TenantContext as TenantContextValue } from '../tenant-context/tenant-context.types';
 import { ReassessmentService } from '../../services/reassessment.service';
 import { DismissReassessmentDto, ReassessPatientDto } from './dto/reassessment-actions.dto';
 
@@ -46,9 +48,11 @@ export class ReassessmentController {
   @Get('due')
   @RequirePermission(Permission.READ_PHI)
   @ApiOperation({ summary: 'List patients currently due for reassessment' })
-  async due() {
+  async due(@TenantContext() tenantContext?: TenantContextValue) {
     assertMongoReady();
-    const patients = await this.reassessmentService.getPatientsNeedingReassessment();
+    const patients = await this.reassessmentService.getPatientsNeedingReassessment(
+      tenantContext?.organizationId,
+    );
     return { count: patients.length, patients };
   }
 

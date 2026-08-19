@@ -45,6 +45,18 @@ describe('ReassessmentController', () => {
     expect(service.getPatientsNeedingReassessment).not.toHaveBeenCalled();
   });
 
+  // Regression for HEAL-347.54: this endpoint is the Mongoose Patient
+  // model's non-canonical duplicate reassessment queue, but it's still
+  // live and mounted, gated only by READ_PHI -- not by tenant. Before this
+  // fix it returned every organization's overdue patients to any
+  // authenticated user holding that one permission. Proves the resolved
+  // tenant context now reaches the service instead of being silently
+  // dropped, same pattern as HEAL-347.49's batchEmsIntake regression test.
+  it('due() forwards the resolved tenant organizationId to the service', async () => {
+    await controller.due({ organizationId: 'org-1' } as any);
+    expect(service.getPatientsNeedingReassessment).toHaveBeenCalledWith('org-1');
+  });
+
   it('reassess() delegates to the service with normalized args', async () => {
     const result = await controller.reassess('p1', {
       new_dps_score: 2,
