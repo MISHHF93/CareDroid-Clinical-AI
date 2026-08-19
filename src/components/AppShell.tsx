@@ -709,6 +709,20 @@ function AppShellFrame({ children }: AppShellProps) {
   // chunk during a post-mount idle window (not blocking first paint, and a
   // harmless no-op in a production build where chunks are already static
   // assets) means no real interaction ever hits the cold-compile path.
+  //
+  // HEAL-347.9: the SAME mechanism also hits route-level React.lazy() pages,
+  // not just these shell overlay panels -- live-timed a live-browser recon
+  // session and found /emergency/referrals took 6.7s to render on its first
+  // client-side navigation vs. ~530ms on every navigation after (the exact
+  // same cold-vs-warm signature as Command Palette above), plus the same
+  // pattern on the Triage-queue redirect (5.3s) and Handoffs (4.3s cold).
+  // Whiteboard/Patients/Hospital Map/Queues/Reassessment don't need their
+  // own prefetch entry -- they all resolve to the SAME chunk as the
+  // post-login landing page (`pages/emergency/index.tsx`), which is already
+  // warm by the time a user could navigate anywhere else. The remaining
+  // sidebar-reachable pages with their OWN distinct lazy chunk are added
+  // here; ReferralPanel is the one directly confirmed live, the rest share
+  // the identical React.lazy()-in-dev mechanism so the same fix applies.
   useEffect(() => {
     const prefetch = () => {
       void import('./PatientDetailPanel');
@@ -716,6 +730,12 @@ function AppShellFrame({ children }: AppShellProps) {
       void import('./ReassessmentDrawer');
       void import('./help/HelpHub');
       void import('./CopilotPanel');
+      void import('./ReferralPanel');
+      void import('../pages/emergency/ReceptionWorkspace');
+      void import('../pages/emergency/FullJourneyOperatingPage');
+      void import('../pages/emergency/EmergencyAnalytics');
+      void import('../pages/emergency/EmergencySettings');
+      void import('../pages/collaboration/CollaborationHub');
     };
     const ric = (window as any).requestIdleCallback;
     if (typeof ric === 'function') {
