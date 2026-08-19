@@ -53,6 +53,37 @@ describe('IntegrationHubService', () => {
     }));
     normalizedRepository.findOne.mockResolvedValue(null);
 
+    // HEAL-347.32: ingest()'s idempotency-safe path now inserts via
+    // createQueryBuilder().insert()...orIgnore().execute() and reads the
+    // winner back with findOneOrFail() instead of a plain save(). The
+    // candidate already carries a real (randomUUID()) id by the time
+    // values() is called, so this mock just needs to store and echo it
+    // back -- no id-assignment logic needed here, unlike the save() mock
+    // above (which backs the DB-generated-id path for entities that don't
+    // pre-assign one).
+    let pendingInsertValues: any = null;
+    const insertQueryBuilder: any = {
+      insert: jest.fn().mockReturnThis(),
+      into: jest.fn().mockReturnThis(),
+      values: jest.fn((values: any) => {
+        pendingInsertValues = {
+          ...values,
+          createdAt: new Date('2026-06-12T10:00:00.000Z'),
+          updatedAt: new Date('2026-06-12T10:00:00.000Z'),
+        };
+        return insertQueryBuilder;
+      }),
+      orIgnore: jest.fn().mockReturnThis(),
+      execute: jest.fn().mockResolvedValue(undefined),
+    };
+    (eventRepository as any).createQueryBuilder = jest.fn(() => insertQueryBuilder);
+    (eventRepository as any).findOneOrFail = jest.fn(async () => {
+      if (!pendingInsertValues) {
+        throw new Error('EntityNotFoundError: no row inserted');
+      }
+      return pendingInsertValues;
+    });
+
     service = new IntegrationHubService(
       sourceRepository as any,
       eventRepository as any,
@@ -102,7 +133,10 @@ describe('IntegrationHubService', () => {
     expect(auditService.log).toHaveBeenCalledWith(
       expect.objectContaining({
         userId: 'user-1',
-        resource: 'integration:event:raw-1',
+        // HEAL-347.32: the raw record's id is now a real randomUUID()
+        // (pre-assigned so the orIgnore()+read-back race check can compare
+        // it against the winning row), not the old raw-N mock counter.
+        resource: expect.stringMatching(/^integration:event:[0-9a-f-]{36}$/),
         phiAccessed: true,
       }),
     );

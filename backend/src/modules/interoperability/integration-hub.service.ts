@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IsNull, Repository } from 'typeorm';
+import { randomUUID } from 'crypto';
 import { AuditAction } from '../audit/entities/audit-log.entity';
 import { AuditService } from '../audit/audit.service';
 import { IntegrationAutomationRouter } from './integration-automation-router.service';
@@ -76,14 +77,16 @@ export class IntegrationHubService {
     }
     const idempotencyKey = this.resolveIdempotencyKey(input, event);
 
-    if (idempotencyKey) {
-      const existing = await this.eventRepository.findOne({
-        where: {
+    const idempotencyWhere = idempotencyKey
+      ? {
           idempotencyKey,
           organizationId: event.organizationId || IsNull(),
           sourceSystem: event.sourceSystem || 'unknown-source',
-        },
-      });
+        }
+      : null;
+
+    if (idempotencyWhere) {
+      const existing = await this.eventRepository.findOne({ where: idempotencyWhere });
       if (existing) {
         return this.serializeEventTrace(existing, true);
       }
@@ -91,24 +94,60 @@ export class IntegrationHubService {
 
     const source = await this.findOrCreateSource(event);
     const receivedAt = dateFrom(event.receivedAt);
-    const rawRecord = await this.eventRepository.save(
-      this.eventRepository.create({
-        sourceId: source.id,
-        organizationId: event.organizationId || null,
-        workspaceId: event.workspaceId || null,
-        sourceSystem: event.sourceSystem || source.sourceSystem,
-        family: event.family,
-        eventType: event.eventType,
-        vendor: event.vendor || null,
-        idempotencyKey: idempotencyKey || null,
-        processingStatus: IntegrationEventProcessingStatus.RECEIVED,
-        rawEvent: { ...event, receivedAt: receivedAt.toISOString() },
-        routeResult: null,
-        normalizedEventId: null,
-        error: null,
-        receivedAt,
-      }),
-    );
+    const candidate = this.eventRepository.create({
+      // HEAL-347.32: id is @PrimaryGeneratedColumn('uuid') -- normally left
+      // for the database to assign on insert, but the orIgnore() path below
+      // needs to compare "the row I tried to insert" against "the row
+      // orIgnore()+read-back actually returned" to tell a genuine insert
+      // apart from a losing race, and an entity has no id to compare before
+      // it round-trips through a real insert. Pre-assigning one here (same
+      // convention as artifacts.service.ts et al.) makes that comparison
+      // possible; TypeORM inserts the explicit value as-is instead of
+      // generating its own when one is already set.
+      id: randomUUID(),
+      sourceId: source.id,
+      organizationId: event.organizationId || null,
+      workspaceId: event.workspaceId || null,
+      sourceSystem: event.sourceSystem || source.sourceSystem,
+      family: event.family,
+      eventType: event.eventType,
+      vendor: event.vendor || null,
+      idempotencyKey: idempotencyKey || null,
+      processingStatus: IntegrationEventProcessingStatus.RECEIVED,
+      rawEvent: { ...event, receivedAt: receivedAt.toISOString() },
+      routeResult: null,
+      normalizedEventId: null,
+      error: null,
+      receivedAt,
+    });
+
+    let rawRecord: IntegrationEventRecordEntity;
+    if (idempotencyWhere) {
+      // HEAL-347.32: the findOne() above only closes the race in the common
+      // case -- two near-simultaneous retried deliveries of the same event
+      // could both read "not found" and both reach here. orIgnore() relies
+      // on the (organizationId, sourceSystem, idempotencyKey) partial unique
+      // index (see the entity's HEAL-347.32 comment) to make the losing
+      // insert a silent no-op at the database level; the read-back then
+      // finds whichever row actually won, so the loser returns that
+      // existing record's trace instead of double-processing/double-routing
+      // the same clinical event. Same pattern as sentinel-inbound.service.ts's
+      // HEAL-311 fix.
+      await this.eventRepository
+        .createQueryBuilder()
+        .insert()
+        .into(IntegrationEventRecordEntity)
+        .values(candidate as any)
+        .orIgnore()
+        .execute();
+      const winner = await this.eventRepository.findOneOrFail({ where: idempotencyWhere });
+      if (winner.id !== candidate.id) {
+        return this.serializeEventTrace(winner, true);
+      }
+      rawRecord = winner;
+    } else {
+      rawRecord = await this.eventRepository.save(candidate);
+    }
 
     try {
       const routeResult = this.router.routeIntegrationEvent({

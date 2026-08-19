@@ -74,6 +74,27 @@ export class IntegrationSourceEntity {
 @Index(['organizationId', 'workspaceId', 'receivedAt'])
 @Index(['sourceId', 'receivedAt'])
 @Index(['idempotencyKey'])
+// HEAL-347.32: the plain index above only speeds up lookups -- it never
+// enforced uniqueness, so ingest()'s findOne-then-save idempotency check
+// (integration-hub.service.ts) was a pure application-level TOCTOU: two
+// near-simultaneous retried deliveries of the same event (routine for
+// flaky integration engines) could both read "not found" and both insert,
+// double-firing the automation router for one real clinical event. Two
+// partial unique indexes, not one plain composite one, mirroring the
+// service's own query shape exactly: idempotencyKey is optional (the
+// service skips the whole dedup check when absent, via `if (idempotencyKey)`)
+// and organizationId is nullable -- SQL treats every NULL as distinct from
+// every other NULL in a unique constraint, so a naive index would silently
+// stop deduplicating whenever either is null. Same pattern as
+// sentinel-inbound-patient.entity.ts's HEAL-347.26 fix.
+@Index(['organizationId', 'sourceSystem', 'idempotencyKey'], {
+  unique: true,
+  where: '"organizationId" IS NOT NULL AND "idempotencyKey" IS NOT NULL',
+})
+@Index(['sourceSystem', 'idempotencyKey'], {
+  unique: true,
+  where: '"organizationId" IS NULL AND "idempotencyKey" IS NOT NULL',
+})
 export class IntegrationEventRecordEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
