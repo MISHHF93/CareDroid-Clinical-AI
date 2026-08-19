@@ -10,12 +10,29 @@
   max-width: 420px;
 }
 
+/* HEAL-347.45: matches the same "left accent bar + card depth" language
+ * already established for the header/whiteboard KPI chips (cdl-v2/alarm.css,
+ * OperationalStrip.css) rather than leaving this as a separate, plainer
+ * bordered-box style -- these cards sit directly above/below those chips on
+ * the same page and previously looked like a different, unrelated system. */
 .role-operational-summary__card {
-  padding: var(--app-space-md, 12px) var(--app-space-lg, 16px);
+  position: relative;
+  padding: var(--app-space-md, 12px) var(--app-space-lg, 16px) var(--app-space-md, 12px) 18px;
   border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: var(--app-radius-md, 10px);
   background: var(--medical-surface-card, #ffffff);
-  box-shadow: var(--app-elevation-subtle, none);
+  box-shadow: var(--app-elevation-subtle, 0 1px 2px rgba(15, 23, 42, 0.06));
+  overflow: hidden;
+}
+
+.role-operational-summary__card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--medical-border, #e0f2fe);
 }
 
 .role-operational-summary__card--critical {
@@ -23,19 +40,31 @@
   background: var(--semantic-critical-bg, #fef2f2);
 }
 
+.role-operational-summary__card--critical::before {
+  background: var(--semantic-critical, #b91c1c);
+}
+
 .role-operational-summary__card--warning {
   border-color: var(--semantic-attention, #b45309);
   background: var(--semantic-attention-bg, #fffbeb);
+}
+
+.role-operational-summary__card--warning::before {
+  background: var(--semantic-attention, #b45309);
 }
 
 .role-operational-summary__card--healthy {
   border-color: color-mix(in srgb, var(--semantic-healthy, #15803d) 35%, var(--medical-border));
 }
 
+.role-operational-summary__card--healthy::before {
+  background: var(--semantic-healthy, #15803d);
+}
+
 .role-operational-summary__title {
   margin: 0 0 var(--app-space-sm, 8px);
   font-size: var(--app-type-small, 0.8125rem);
-  font-weight: 600;
+  font-weight: 700;
   line-height: var(--type-small-line-height, 1.45);
   color: var(--medical-ink, #111827);
   letter-spacing: 0.01em;
@@ -46,7 +75,7 @@
   padding: 0;
   list-style: none;
   display: grid;
-  gap: 4px;
+  gap: 5px;
 }
 
 .role-operational-summary__lines li {

@@ -77,41 +77,58 @@
   );
 }
 
+/* HEAL-347.45: these tiles had no border/shadow of their own -- just a flat
+ * background tint sitting directly against their neighbors inside the grid's
+ * 6px gap, which read as an undifferentiated grey block rather than a set of
+ * individually legible metric cards. Same "each metric is its own small
+ * card" treatment as the header's redesigned KPI chips (HEAL-347's header
+ * polish pass), scaled for this component's denser in-page grid contexts.
+ * Interactive tiles (real <button>s, see OperationalStrip.tsx) also had zero
+ * hover/focus-visible feedback despite being clickable -- added below. */
 .operational-strip__metric,
 .operational-strip__action {
   display: grid;
   align-content: center;
-  gap: 2px;
+  gap: 3px;
   min-width: 0;
-  min-height: 40px;
-  border: 0;
-  border-right: 0;
+  min-height: 44px;
+  border: 1px solid
+    var(--cdl-clinical-border, var(--color-border-subtle, var(--medical-border, #e0f2fe)));
   border-radius: var(--cdl-clinical-radius-sm, 10px);
-  background: color-mix(
-    in srgb,
-    var(--app-surface-muted, #f1f5f9) 38%,
-    var(--app-surface-1, #ffffff)
-  );
+  background: var(--app-surface-1, #ffffff);
   color: var(--color-text-secondary, #9ca3af);
-  padding: 4px 10px;
+  padding: 6px 12px;
   text-align: left;
   font: inherit;
   text-decoration: none;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
 }
 
 .operational-strip--command .operational-strip__metric,
 .operational-strip--command .operational-strip__action {
-  min-height: 48px;
-  padding: 6px 12px;
+  min-height: 50px;
+  padding: 8px 12px;
 }
 
 .operational-strip__metric:last-child,
 .operational-strip__action:last-child {
-  border-right: 0;
+  border-right: 1px solid
+    var(--cdl-clinical-border, var(--color-border-subtle, var(--medical-border, #e0f2fe)));
 }
 
 .operational-strip__metric {
   cursor: pointer;
+}
+
+.operational-strip__metric:not(:disabled):hover {
+  border-color: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 45%, transparent);
+  box-shadow: var(--cdl-clinical-shadow-hover, 0 2px 8px rgba(15, 23, 42, 0.08));
+  transform: translateY(-1px);
+}
+
+.operational-strip__metric:not(:disabled):focus-visible {
+  outline: 2px solid var(--app-accent-interactive, #0ea5e9);
+  outline-offset: 1px;
 }
 
 .operational-strip__metric:disabled,
