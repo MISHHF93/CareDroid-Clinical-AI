@@ -716,13 +716,20 @@ function AppShellFrame({ children }: AppShellProps) {
   // client-side navigation vs. ~530ms on every navigation after (the exact
   // same cold-vs-warm signature as Command Palette above), plus the same
   // pattern on the Triage-queue redirect (5.3s) and Handoffs (4.3s cold).
-  // Whiteboard/Patients/Hospital Map/Queues/Reassessment don't need their
-  // own prefetch entry -- they all resolve to the SAME chunk as the
-  // post-login landing page (`pages/emergency/index.tsx`), which is already
-  // warm by the time a user could navigate anywhere else. The remaining
-  // sidebar-reachable pages with their OWN distinct lazy chunk are added
-  // here; ReferralPanel is the one directly confirmed live, the rest share
-  // the identical React.lazy()-in-dev mechanism so the same fix applies.
+  // Whiteboard doesn't need its own entry -- it's the post-login landing
+  // page, already warm by the time a user could navigate anywhere else.
+  //
+  // HEAL-347.10: the original HEAL-347.9 pass wrongly assumed Patients/
+  // Queues/Reassessment shared Whiteboard's chunk (`pages/emergency/index.tsx`)
+  // -- a fresh, unconfounded live test (isolated first-visit, no prior
+  // navigation warming anything) showed Patients was ALSO cold. Reading
+  // router.tsx found the real shape: `PatientsRoute`/`QueueRoute`/
+  // `ReassessmentRoute`/`BoardingRoute`/`CapacityRoute`/`CopilotRoute` are
+  // all `lazyNamed(() => import('pages/emergency/emergencyRoutePages'), ...)`
+  // -- SIX named exports from ONE shared chunk, entirely separate from
+  // Whiteboard's own chunk and missed by the original grep (which only
+  // matched the `lazyRoute(() => import(...))` helper, not `lazyNamed`).
+  // One prefetch of that module warms all six views at once.
   useEffect(() => {
     const prefetch = () => {
       void import('./PatientDetailPanel');
@@ -736,6 +743,9 @@ function AppShellFrame({ children }: AppShellProps) {
       void import('../pages/emergency/EmergencyAnalytics');
       void import('../pages/emergency/EmergencySettings');
       void import('../pages/collaboration/CollaborationHub');
+      // Warms PatientsRoute/QueueRoute/ReassessmentRoute/BoardingRoute/
+      // CapacityRoute/CopilotRoute in one request -- see HEAL-347.10 above.
+      void import('../pages/emergency/emergencyRoutePages');
     };
     const ric = (window as any).requestIdleCallback;
     if (typeof ric === 'function') {
