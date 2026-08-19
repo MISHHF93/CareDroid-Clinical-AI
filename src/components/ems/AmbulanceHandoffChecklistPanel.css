@@ -169,6 +169,12 @@
   gap: 0.35rem;
 }
 
+/* HEAL-347.21: this flag used a pale, dark-mode-tuned text color (#fecaca)
+   as its only, unscoped rule -- unreadable against the light card
+   background (--app-surface-1/#ffffff) it renders on in light mode, the
+   app's default theme. Same bug class as HEAL-214/HEAL-347.19. Base rule
+   now reuses this codebase's own dark, WCAG-tuned critical-text shade; the
+   original pale value moves to a dark-mode override where it belongs. */
 .amb-handoff-checklist__flag {
   display: inline-flex;
   align-items: center;
@@ -176,6 +182,10 @@
   padding: 0.15rem 0.5rem;
   font-size: 0.72rem;
   background: rgba(239, 68, 68, 0.15);
+  color: var(--medical-status-critical-text, #b91c1c);
+}
+
+html[data-theme='dark'] .amb-handoff-checklist__flag {
   color: #fecaca;
 }
 

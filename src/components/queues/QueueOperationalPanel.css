@@ -56,10 +56,18 @@
   color: var(--medical-status-warning-text, #b45309);
 }
 
+/* HEAL-347.21: --chip--critical and --tag--critical used a pale,
+   dark-mode-tuned text color (#fecaca) as their only, unscoped rule --
+   unreadable against the white/light card backgrounds they composite
+   against (--medical-card-bg) in light mode, the app's default theme;
+   the sibling --warning variants already got this right. Same bug class
+   as HEAL-214/HEAL-347.19. Base rules now reuse this codebase's own dark,
+   WCAG-tuned critical-text shade; the original pale value moves to
+   dark-mode overrides below where it belongs. */
 .queue-operational-panel__chip--critical {
   border-color: color-mix(in srgb, var(--status-danger, #ef4444) 45%, transparent);
   background: color-mix(in srgb, var(--status-danger, #ef4444) 12%, transparent);
-  color: #fecaca;
+  color: var(--medical-status-critical-text, #b91c1c);
 }
 
 .queue-operational-panel__list {
@@ -123,9 +131,14 @@
 }
 
 .queue-audit-badge__tag--critical {
-  color: #fecaca;
+  color: var(--medical-status-critical-text, #b91c1c);
   border: 1px solid color-mix(in srgb, var(--status-danger, #ef4444) 40%, transparent);
   background: color-mix(in srgb, var(--status-danger, #ef4444) 12%, transparent);
+}
+
+html[data-theme='dark'] .queue-operational-panel__chip--critical,
+html[data-theme='dark'] .queue-audit-badge__tag--critical {
+  color: #fecaca;
 }
 
 @media (max-width: 900px) {

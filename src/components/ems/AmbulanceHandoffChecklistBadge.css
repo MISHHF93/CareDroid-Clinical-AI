@@ -25,7 +25,7 @@
 
 .amb-handoff-badge[data-tone='complete'] {
   border-color: #22c55e;
-  color: #bbf7d0;
+  color: #047857;
   background: rgba(34, 197, 94, 0.12);
 }
 
@@ -37,11 +37,29 @@
 
 .amb-handoff-badge[data-tone='progress'] {
   border-color: #374151;
-  color: #bae6fd;
+  color: #075985;
   background: rgba(148, 163, 184, 0.12);
 }
 
 .amb-handoff-badge[data-tone='pending'] {
   border-color: #64748b;
   color: var(--medical-text-muted, #6b7280);
+}
+
+/* HEAL-347.19: 'complete'/'progress' used pale, dark-mode-tuned text colors
+   (#bbf7d0/#bae6fd) as their only, unscoped rule -- unreadable on the pale
+   tinted backgrounds above in light mode (the app's default theme). Same
+   bug class as HEAL-214 (PostEdOrientationBadge.css), just the opposite
+   direction: here the dark-mode-appropriate colors were the base rule with
+   no light-mode-appropriate replacement, instead of missing a dark-mode
+   override. Base rule above now uses the same dark, WCAG-tuned shades this
+   codebase already established for these exact semantics (--alarm-ok-text
+   / --alarm-info-text in alarm-system.css); the original pale values move
+   here, scoped to dark mode where they actually belong. */
+html[data-theme='dark'] .amb-handoff-badge[data-tone='complete'] {
+  color: #bbf7d0;
+}
+
+html[data-theme='dark'] .amb-handoff-badge[data-tone='progress'] {
+  color: #bae6fd;
 }

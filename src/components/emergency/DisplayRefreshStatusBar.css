@@ -20,7 +20,17 @@
   font-weight: 700;
 }
 
+/* HEAL-347.21: this override used a pale, dark-mode-tuned text color
+   (#fecaca) as its only, unscoped rule -- unreadable against this bar's
+   light page background (see PublicWaitingDisplay.css) in light mode, the
+   app's default theme. Same bug class as HEAL-214/HEAL-347.19. Base rule
+   now reuses this codebase's own dark, WCAG-tuned critical-text shade; the
+   original pale value moves to a dark-mode override where it belongs. */
 .display-refresh-status--error .display-refresh-status__warning {
+  color: var(--medical-status-critical-text, #b91c1c);
+}
+
+html[data-theme='dark'] .display-refresh-status--error .display-refresh-status__warning {
   color: #fecaca;
 }
 

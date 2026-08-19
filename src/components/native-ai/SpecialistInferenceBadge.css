@@ -16,15 +16,27 @@
   letter-spacing: 0.03em;
   font-size: 0.65rem;
   color: var(--color-text-muted, #64748b);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
 }
 
 .specialist-inference-badge__value {
   font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
 }
 
 .specialist-inference-badge__meta {
   color: var(--color-text-muted, #64748b);
   font-size: 0.65rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
 }
 
 .specialist-inference-badge--compact {

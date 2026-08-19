@@ -21,10 +21,12 @@
 .patient-journey-badge__phase {
   font-weight: 700;
   color: var(--cdl-ink, var(--ed-text-primary, #0f172a));
+  white-space: nowrap;
 }
 
 .patient-journey-badge__stage {
   color: var(--cdl-ink-muted, var(--ed-text-meta, #334155));
+  white-space: nowrap;
 }
 
 .patient-journey-badge--compact .patient-journey-badge__phase {

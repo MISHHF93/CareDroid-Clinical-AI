@@ -19,12 +19,15 @@
   text-transform: uppercase;
   letter-spacing: 0.03em;
   color: var(--color-accent, #374151);
+  white-space: nowrap;
 }
 
 .native-ai-routing-badge__value {
   color: var(--medical-card-fg, #111827);
+  white-space: nowrap;
 }
 
 .native-ai-routing-badge__meta {
   color: var(--color-text-muted, #64748b);
+  white-space: nowrap;
 }

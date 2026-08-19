@@ -1,26 +1,19 @@
-.cd-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  max-width: 100%;
-  min-height: 24px;
-  padding: 3px 8px;
-  border: 1px solid var(--app-border);
-  border-radius: 999px;
-  background: var(--app-surface-muted);
-  color: var(--app-text-secondary);
-  font-size: var(--font-12);
-  font-weight: 700;
-  line-height: 1.2;
-  letter-spacing: 0.02em;
-  overflow-wrap: anywhere;
-}
-
-.cd-badge--sm {
-  min-height: 20px;
-  padding: 2px 8px;
-  font-size: var(--font-11);
-}
+/* HEAL-347.20: this file used to redefine the base `.cd-badge` rule and the
+   `--sm`/`--info`/`--success`/`--warning`/`--danger` modifiers that
+   `../primitives/Badge.css` ALSO defines under the same class names. Badge.tsx
+   (this file's own component, documented there as "delegates to
+   primitives/Badge") imports both stylesheets unconditionally and always
+   renders through PrimitiveBadge's `cd-badge cd-badge--{tone} cd-badge--{size}`
+   className -- so every badge got both rule sets applied to the same element,
+   with the winner decided by which stylesheet's bundle chunk happened to load
+   last (not a deliberate design), including opposite text-wrap behavior
+   (this file's `overflow-wrap: anywhere` vs the primitive's `white-space:
+   nowrap`). Both token layers (--app-* here, --cd-* in the primitive) are
+   bridged to the same underlying semantic colors (design-system-bridge.css),
+   so the primitive's version is kept as the single source of truth for base
+   layout + the 4 shared tones; this file now only adds what the primitive
+   doesn't cover at all (--lg, --compact, --accent -- see primitives/Badge.tsx,
+   which has no CSS rule for `compact` and no 'accent' tone in its own file). */
 
 .cd-badge--lg {
   min-height: 30px;
@@ -46,28 +39,4 @@
     var(--app-border)
   );
   color: var(--app-accent-action, var(--app-accent-interactive));
-}
-
-.cd-badge--success {
-  background: color-mix(in srgb, var(--app-success) 10%, var(--app-surface));
-  border-color: color-mix(in srgb, var(--app-success) 30%, var(--app-border));
-  color: var(--app-success);
-}
-
-.cd-badge--warning {
-  background: color-mix(in srgb, var(--app-warning) 12%, var(--app-surface));
-  border-color: color-mix(in srgb, var(--app-warning) 32%, var(--app-border));
-  color: var(--app-warning);
-}
-
-.cd-badge--danger {
-  background: color-mix(in srgb, var(--app-danger) 10%, var(--app-surface));
-  border-color: color-mix(in srgb, var(--app-danger) 32%, var(--app-border));
-  color: var(--app-danger);
-}
-
-.cd-badge--info {
-  background: color-mix(in srgb, var(--app-info) 10%, var(--app-surface));
-  border-color: color-mix(in srgb, var(--app-info) 30%, var(--app-border));
-  color: var(--app-info);
 }

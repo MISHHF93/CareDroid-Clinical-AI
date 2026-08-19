@@ -51,9 +51,21 @@
   border-color: #0ea5e9;
 }
 
+/* HEAL-347.21: this button used a pale, dark-mode-tuned text color
+   (#fde68a) as its only, unscoped rule -- unreadable against its light
+   amber-tinted background (color-mix toward #f0f9ff, near-white) in
+   light mode, the app's default theme; every other button in this file
+   uses a dark text color on its light background. Same bug class as
+   HEAL-214/HEAL-347.19. Base rule now reuses this codebase's own dark,
+   WCAG-tuned warning-text shade; the original pale value moves to a
+   dark-mode override where it belongs. */
 .wnp-btn--reassess {
   background: color-mix(in srgb, #f59e0b 18%, #f0f9ff);
   border-color: #f59e0b;
+  color: var(--medical-status-warning-text, #b45309);
+}
+
+html[data-theme='dark'] .wnp-btn--reassess {
   color: #fde68a;
 }
 

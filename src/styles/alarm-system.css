@@ -111,6 +111,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
   min-width: 14px;
   height: 14px;
   padding: 0 4px;
@@ -120,6 +121,7 @@
   letter-spacing: 0.02em;
   text-transform: uppercase;
   line-height: 1;
+  white-space: nowrap;
 }
 
 .alarm-kpi__badge--inline {

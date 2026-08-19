@@ -110,10 +110,18 @@
   font-weight: 600;
 }
 
+/* HEAL-347.21: --chip--red/--chip--green used pale, dark-mode-tuned text
+   colors (#fecaca/#bbf7d0) as their only, unscoped rule -- unreadable
+   against these chips' light-composited backgrounds (dark tint colors at
+   35% opacity, over the page's light backdrop) in light mode, the app's
+   default theme; the sibling --chip--yellow already got this right. Same
+   bug class as HEAL-214/HEAL-347.19. Base rules now use this codebase's
+   own dark, WCAG-tuned shades; the original pale values move to dark-mode
+   overrides below where they belong. */
 .patient-orchestration__chip--red {
   border-color: rgba(248, 113, 113, 0.45);
   background: rgba(127, 29, 29, 0.35);
-  color: #fecaca;
+  color: var(--medical-status-critical-text, #b91c1c);
 }
 
 .patient-orchestration__chip--yellow {
@@ -125,6 +133,14 @@
 .patient-orchestration__chip--green {
   border-color: rgba(74, 222, 128, 0.45);
   background: rgba(20, 83, 45, 0.35);
+  color: var(--medical-status-success-text, #15803d);
+}
+
+html[data-theme='dark'] .patient-orchestration__chip--red {
+  color: #fecaca;
+}
+
+html[data-theme='dark'] .patient-orchestration__chip--green {
   color: #bbf7d0;
 }
 

@@ -832,7 +832,7 @@ export default function EmergencySettings() {
       description={
         surfaces.settings.showNestedSubtitles
           ? `Modules, thresholds, displays, and operational preferences. ${EMERGENCY_OS_BRANDING.safetyShort}`
-          : EMERGENCY_OS_BRANDING.safetyShort
+          : undefined
       }
       actions={
         <strong className="emergency-settings__module-count">

@@ -6,6 +6,63 @@
   overflow: hidden;
 }
 
+/* HEAL-347.18: CopilotPanelLoader.tsx (the placeholder shown while the real,
+   heavier CopilotPanel.tsx + CopilotPanel-part-01.css lazy-loads) only ever
+   imports this file, not that one -- so `.ed-copilot-panel__header`/
+   `__identity`/`__live-dot`, all defined only in CopilotPanel-part-01.css,
+   had zero matching rules during the loading state. The title span and the
+   "Loading…" badge <strong> are both inline by default with no rule to
+   separate them, so they rendered as one run-together word
+   ("CareDroid CopilotLoading…") -- confirmed live. Minimal layout-only
+   subset (no --copilot-* color variables, which the loader doesn't define
+   either) so the placeholder stays lightweight and doesn't defeat the
+   point of code-splitting the real panel's full stylesheet. */
+.ed-copilot-panel__header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 9px;
+  min-height: 58px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--copilot-border, #e0f2fe);
+}
+
+.ed-copilot-panel__live-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--status-success, #22c55e);
+}
+
+.ed-copilot-panel__identity {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.ed-copilot-panel__identity span {
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 850;
+  letter-spacing: -0.01em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ed-copilot-panel__identity strong {
+  width: fit-content;
+  border-radius: 999px;
+  background: color-mix(in srgb, #d97706 12%, transparent);
+  color: #92400e;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  padding: 4px 6px;
+  text-transform: uppercase;
+}
+
 .ed-copilot-shell--chat-only .ed-copilot-shell__body {
   border-top: 0;
 }

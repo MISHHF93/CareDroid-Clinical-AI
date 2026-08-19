@@ -212,8 +212,15 @@
   box-shadow: var(--cdl-clinical-shadow-rest, var(--app-elevation-card));
 }
 
+/* HEAL-347.21: --accent-referral/--accent-ems eyebrows used pale,
+   dark-mode-tuned text colors (#ddd6fe/#bae6fd) as their only, unscoped
+   rule -- unreadable against these backgrounds, which mix toward
+   --medical-surface-card/#ffffff (white) in light mode, the app's default
+   theme. Same bug class as HEAL-214/HEAL-347.19. Base rules now use dark,
+   WCAG-tuned shades for these semantics; the original pale values move to
+   dark-mode overrides below where they belong. */
 .operational-strip--accent-referral .operational-strip__eyebrow {
-  color: #ddd6fe;
+  color: #5b21b6;
   background: color-mix(
     in srgb,
     var(--color-accent, #a78bfa) 16%,
@@ -239,7 +246,7 @@
 }
 
 .operational-strip--accent-ems .operational-strip__eyebrow {
-  color: #bae6fd;
+  color: var(--medical-status-info-text, #475569);
   background: color-mix(
     in srgb,
     var(--color-secondary, #94a3b8) 16%,
@@ -253,6 +260,14 @@
     var(--color-secondary, #94a3b8) 8%,
     var(--medical-surface-card, #ffffff)
   );
+}
+
+html[data-theme='dark'] .operational-strip--accent-referral .operational-strip__eyebrow {
+  color: #ddd6fe;
+}
+
+html[data-theme='dark'] .operational-strip--accent-ems .operational-strip__eyebrow {
+  color: #bae6fd;
 }
 
 .operational-strip--accent-shift-handoff {

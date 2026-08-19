@@ -88,6 +88,13 @@
   margin-top: 4px;
 }
 
+/* HEAL-347.21: this action button used a pale, dark-mode-tuned text color
+   (#bae6fd) as its only, unscoped rule -- unreadable against this panel's
+   near-white background (color-mix toward --app-surface-1/#ffffff) in
+   light mode, the app's default theme; the sibling __status already got
+   this right. Same bug class as HEAL-214/HEAL-347.19. Base rule now
+   reuses this codebase's own dark, WCAG-tuned info-text shade; the
+   original pale value moves to a dark-mode override where it belongs. */
 .operational-empty-state__action {
   border: 1px solid
     color-mix(in srgb, var(--status-info, var(--cdl-ink-subtle, #475569)) 40%, transparent);
@@ -97,11 +104,15 @@
     var(--status-info, var(--cdl-ink-subtle, #475569)) 12%,
     transparent
   );
-  color: #bae6fd;
+  color: var(--medical-status-info-text, #475569);
   font-size: 12px;
   font-weight: 700;
   padding: 6px 10px;
   cursor: pointer;
+}
+
+html[data-theme='dark'] .operational-empty-state__action {
+  color: #bae6fd;
 }
 
 .operational-empty-state__action:hover {

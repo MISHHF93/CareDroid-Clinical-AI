@@ -102,7 +102,7 @@
   border: 1px solid rgba(248, 113, 113, 0.35);
   border-radius: 999px;
   background: rgba(127, 29, 29, 0.34);
-  color: #fecaca;
+  color: var(--medical-status-critical-text, #b91c1c);
   font-size: 12px;
   font-weight: 800;
   white-space: nowrap;
@@ -270,19 +270,42 @@
 .reassessment-drawer__priority--red,
 .reassessment-drawer__flag-icon--red {
   background: rgba(220, 38, 38, 0.2);
-  color: #fecaca;
+  color: var(--medical-status-critical-text, #b91c1c);
 }
 
 .reassessment-drawer__priority--orange,
 .reassessment-drawer__flag-icon--orange {
   background: rgba(249, 115, 22, 0.2);
-  color: #fed7aa;
+  color: var(--medical-status-high-text, #c2410c);
 }
 
 .reassessment-drawer__priority--yellow,
 .reassessment-drawer__flag-icon--yellow {
   background: rgba(234, 179, 8, 0.18);
   color: #fef08a;
+}
+
+/* HEAL-347.21: __count and --priority/--flag-icon --red/--orange all used
+   pale, dark-mode-tuned text colors (#fecaca/#fed7aa) as their only,
+   unscoped rule -- unreadable against this drawer's light backgrounds
+   (--medical-surface-page/--medical-surface-card, both white/near-white)
+   in light mode, the app's default theme; the --red/--orange text
+   elsewhere in this file (flag-label, wait) already got this right. Same
+   bug class as HEAL-214/HEAL-347.19. Base rules above now reuse this
+   file's own already-established dark, WCAG-tuned shades for these
+   semantics; the original pale values move to dark-mode overrides here. */
+html[data-theme='dark'] .reassessment-drawer__count {
+  color: #fecaca;
+}
+
+html[data-theme='dark'] .reassessment-drawer__priority--red,
+html[data-theme='dark'] .reassessment-drawer__flag-icon--red {
+  color: #fecaca;
+}
+
+html[data-theme='dark'] .reassessment-drawer__priority--orange,
+html[data-theme='dark'] .reassessment-drawer__flag-icon--orange {
+  color: #fed7aa;
 }
 
 .reassessment-drawer__main,

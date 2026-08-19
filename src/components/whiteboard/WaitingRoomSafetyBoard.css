@@ -179,11 +179,23 @@
   color: var(--medical-status-critical-text, #b91c1c);
 }
 
+/* HEAL-347.21: this badge used a pale, dark-mode-tuned text color
+   (#fecaca) as its only, unscoped rule -- unreadable against the board's
+   light card background (--color-card/--app-surface-2, white) in light
+   mode, the app's default theme; the sibling __badge/__flag critical
+   variants already got this right. Same bug class as
+   HEAL-214/HEAL-347.19. Base rule now reuses this file's own
+   already-established dark, WCAG-tuned critical-text shade; the original
+   pale value moves to a dark-mode override where it belongs. */
 .waiting-room-safety-board__overdue-badge {
   border: 0;
   background: rgba(239, 68, 68, 0.18);
-  color: #fecaca;
+  color: var(--medical-status-critical-text, #b91c1c);
   cursor: pointer;
+}
+
+html[data-theme='dark'] .waiting-room-safety-board__overdue-badge {
+  color: #fecaca;
 }
 
 .waiting-room-safety-board__overdue-badge:disabled {
