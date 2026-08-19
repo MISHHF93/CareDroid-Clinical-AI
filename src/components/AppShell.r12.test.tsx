@@ -334,4 +334,77 @@ describe('HEAL-347.2: idle-time prefetch for lazy shell panels', () => {
     const prefetchCall = setTimeoutSpy.mock.calls.find(([, delay]) => delay === 2000);
     expect(() => (prefetchCall?.[0] as () => void)?.()).not.toThrow();
   });
+
+  // HEAL-347.43: this batch used to fire all 13 entries' import()s
+  // synchronously in the same tick -- every one a concurrent request
+  // racing the CURRENT route's own (higher-priority, blocking) chunk fetch
+  // for the dev server's limited concurrent-transform capacity. Landing
+  // directly on /emergency/analytics (one of this batch's own targets, and
+  // this codebase's own documented heaviest fresh-mount route) produced
+  // 100+ concurrent/aborted requests live and left the page stuck on
+  // "Loading analytics..." indefinitely. Fixed by staggering each entry on
+  // its own setTimeout and skipping whichever entry matches the route the
+  // user is already on. Same "guard the wiring, not the module loader"
+  // philosophy as the test above.
+  it('stages the prefetch batch across separate timers instead of firing every import() in one tick', async () => {
+    vi.spyOn(useEmergencyStore.getState(), 'initializeFromBackend').mockResolvedValue({
+      errors: {},
+    });
+    const setTimeoutSpy = vi.spyOn(window, 'setTimeout');
+
+    render(
+      <MemoryRouter>
+        <AppShell>
+          <div>Emergency route</div>
+        </AppShell>
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(setTimeoutSpy).toHaveBeenCalledWith(expect.any(Function), 2000);
+    });
+
+    const callCountBefore = setTimeoutSpy.mock.calls.length;
+    const prefetchCall = setTimeoutSpy.mock.calls.find(([, delay]) => delay === 2000);
+    (prefetchCall?.[0] as () => void)?.();
+
+    const staggeredDelays = setTimeoutSpy.mock.calls
+      .slice(callCountBefore)
+      .map(([, delay]) => delay);
+    // Every entry gets its own timer at a distinct, increasing delay
+    // (0, 120, 240, ...) rather than one shared synchronous burst.
+    expect(staggeredDelays.length).toBeGreaterThan(1);
+    expect(new Set(staggeredDelays).size).toBe(staggeredDelays.length);
+    expect(Math.max(...(staggeredDelays as number[]))).toBeGreaterThan(0);
+  });
+
+  it('does not schedule a prefetch entry for the route chunk already active on mount', async () => {
+    vi.spyOn(useEmergencyStore.getState(), 'initializeFromBackend').mockResolvedValue({
+      errors: {},
+    });
+    const setTimeoutSpy = vi.spyOn(window, 'setTimeout');
+
+    render(
+      <MemoryRouter initialEntries={['/emergency/analytics']}>
+        <AppShell>
+          <div>Emergency route</div>
+        </AppShell>
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(setTimeoutSpy).toHaveBeenCalledWith(expect.any(Function), 2000);
+    });
+
+    const callCountBefore = setTimeoutSpy.mock.calls.length;
+    const prefetchCall = setTimeoutSpy.mock.calls.find(([, delay]) => delay === 2000);
+    (prefetchCall?.[0] as () => void)?.();
+
+    // 3 route entries are eligible for skipping (Reception/Analytics/
+    // Settings); with /emergency/analytics active, exactly one fewer
+    // staggered timer should be scheduled than the base "no active match"
+    // batch this describe block's other test observes.
+    const staggeredCount = setTimeoutSpy.mock.calls.length - callCountBefore;
+    expect(staggeredCount).toBe(12);
+  });
 });

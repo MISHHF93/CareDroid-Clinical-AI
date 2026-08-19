@@ -730,36 +730,84 @@ function AppShellFrame({ children }: AppShellProps) {
   // Whiteboard's own chunk and missed by the original grep (which only
   // matched the `lazyRoute(() => import(...))` helper, not `lazyNamed`).
   // One prefetch of that module warms all six views at once.
+  //
+  // HEAL-347.43: all 13 of these fired in the same tick, every one a
+  // concurrent dynamic-import request racing the CURRENT route's own
+  // (higher-priority, blocking) chunk fetch for the dev server's limited
+  // concurrent-transform capacity -- live-timed via network trace: landing
+  // directly on /emergency/analytics (one of this list's own targets, and
+  // documented above as this suite's heaviest fresh-mount route) produced
+  // 100+ concurrent/aborted requests and left the page stuck on "Loading
+  // analytics..." indefinitely, i.e. this prefetch batch was fighting the
+  // very navigation a user was actively waiting on. Skip whichever entry
+  // matches the route the user is ALREADY on -- the router is already
+  // fetching that chunk with priority, so prefetching it too is pure
+  // redundant load -- and stagger the rest instead of firing all at once,
+  // so they don't stampede the dev server's transform queue together.
   useEffect(() => {
-    const prefetch = () => {
-      void import('./PatientDetailPanel');
-      void import('./CommandPalette');
-      void import('./ReassessmentDrawer');
-      void import('./help/HelpHub');
-      void import('./CopilotPanel');
-      void import('./ReferralPanel');
-      void import('../pages/emergency/ReceptionWorkspace');
-      void import('../pages/emergency/FullJourneyOperatingPage');
-      void import('../pages/emergency/EmergencyAnalytics');
-      void import('../pages/emergency/EmergencySettings');
-      void import('../pages/collaboration/CollaborationHub');
+    // Each entry is its own statically-analyzable `import('literal/path')`
+    // thunk (required for Vite to code-split it at all) paired with an
+    // optional skip test; only the route-page entries need one, since only
+    // they can duplicate a fetch the router itself is already making.
+    const entries: Array<{ load: () => Promise<unknown>; skip?: () => boolean }> = [
+      { load: () => import('./PatientDetailPanel') },
+      { load: () => import('./CommandPalette') },
+      { load: () => import('./ReassessmentDrawer') },
+      { load: () => import('./help/HelpHub') },
+      { load: () => import('./CopilotPanel') },
+      { load: () => import('./ReferralPanel') },
+      {
+        load: () => import('../pages/emergency/ReceptionWorkspace'),
+        skip: () => location.pathname.startsWith(CANONICAL_ROUTES.emergencyReception),
+      },
+      { load: () => import('../pages/emergency/FullJourneyOperatingPage') },
+      {
+        load: () => import('../pages/emergency/EmergencyAnalytics'),
+        skip: () => location.pathname.startsWith(CANONICAL_ROUTES.emergencyAnalytics),
+      },
+      {
+        load: () => import('../pages/emergency/EmergencySettings'),
+        skip: () => location.pathname.startsWith(CANONICAL_ROUTES.emergencySettings),
+      },
+      { load: () => import('../pages/collaboration/CollaborationHub') },
       // Hospital Command Center is the 2nd item in the COMMAND sidebar
       // section (right below Whiteboard) -- one of the most likely first
       // clicks after login, and it was missing from this list, so it hit
       // the same cold-compile stall as the routes above (live-timed: 12s+
       // stuck on "Loading Hospital Command Center..." on first request).
-      void import('../pages/emergency/HospitalCommandCenter');
+      { load: () => import('../pages/emergency/HospitalCommandCenter') },
       // Warms PatientsRoute/QueueRoute/ReassessmentRoute/BoardingRoute/
       // CapacityRoute/CopilotRoute in one request -- see HEAL-347.10 above.
-      void import('../pages/emergency/emergencyRoutePages');
+      { load: () => import('../pages/emergency/emergencyRoutePages') },
+    ];
+    const targets = entries.filter((entry) => !entry.skip?.());
+    let cancelled = false;
+    const timeouts: number[] = [];
+    const prefetch = () => {
+      targets.forEach((entry, index) => {
+        timeouts.push(
+          window.setTimeout(() => {
+            if (!cancelled) void entry.load();
+          }, index * 120),
+        );
+      });
     };
     const ric = (window as any).requestIdleCallback;
     if (typeof ric === 'function') {
       const handle = ric(prefetch, { timeout: 4000 });
-      return () => (window as any).cancelIdleCallback?.(handle);
+      return () => {
+        cancelled = true;
+        timeouts.forEach((id) => window.clearTimeout(id));
+        (window as any).cancelIdleCallback?.(handle);
+      };
     }
     const timeoutId = window.setTimeout(prefetch, 2000);
-    return () => window.clearTimeout(timeoutId);
+    return () => {
+      cancelled = true;
+      timeouts.forEach((id) => window.clearTimeout(id));
+      window.clearTimeout(timeoutId);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally mount-only (see HEAL-347.2/347.9/347.10 above); location is read once to decide the initial skip-list, not tracked reactively.
   }, []);
 
   useEffect(() => {
