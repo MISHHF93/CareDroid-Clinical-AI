@@ -4,26 +4,45 @@
  * Surfaces: .cdl-alarm-kpi | .cdl-alarm-row | .cdl-alarm-banner | .cdl-alarm-rail | .cdl-alarm-dock
  */
 
-/* ── KPI chip ── */
+/* ── KPI chip ──
+ * Redesigned for legibility and a calmer, more considered feel: more
+ * breathing room, a token-driven type scale (no more one-off magic
+ * numbers like 10.5px/650), and a softer elevation/hover treatment. */
 .cdl-alarm-kpi {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
-  gap: 2px;
+  gap: 3px;
   flex: 0 0 auto;
-  min-width: 68px;
-  max-width: 128px;
-  min-height: 38px;
-  padding: 5px 10px 5px 12px;
+  min-width: 86px;
+  max-width: 168px;
+  min-height: 46px;
+  padding: var(--cdl-space-2) var(--cdl-space-3) var(--cdl-space-2) 15px;
   border: 1px solid var(--cdl-neutral-border);
-  border-radius: var(--cdl-radius-md);
+  border-radius: var(--cdl-radius-lg);
   background: var(--cdl-neutral-bg);
   box-sizing: border-box;
   list-style: none;
   overflow: hidden;
   box-shadow: var(--cdl-elev-1);
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+button.cdl-alarm-kpi {
+  cursor: pointer;
+  text-align: left;
+}
+
+button.cdl-alarm-kpi:hover {
+  box-shadow: var(--cdl-elev-2);
+  transform: translateY(-1px);
+}
+
+button.cdl-alarm-kpi:focus-visible {
+  outline: 2px solid var(--cdl-info);
+  outline-offset: 1px;
 }
 
 .cdl-alarm-kpi::before {
@@ -34,15 +53,15 @@
   bottom: 0;
   width: 3px;
   background: transparent;
-  border-radius: var(--cdl-radius-md) 0 0 var(--cdl-radius-md);
+  border-radius: var(--cdl-radius-lg) 0 0 var(--cdl-radius-lg);
 }
 
 .cdl-alarm-kpi__value {
   color: var(--cdl-ink);
   font-family: var(--cdl-font-mono);
-  font-size: var(--cdl-text-sm);
+  font-size: var(--cdl-text-md);
   font-weight: var(--cdl-font-bold);
-  line-height: 1.15;
+  line-height: 1.2;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -52,10 +71,12 @@
 .cdl-alarm-kpi__label {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   color: var(--cdl-ink-muted);
-  font-size: 10.5px;
-  font-weight: 650;
+  font-size: var(--cdl-text-xs);
+  font-weight: var(--cdl-font-semibold);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
   line-height: 1.2;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -65,15 +86,16 @@
 
 .cdl-alarm-kpi__badge {
   display: inline-flex;
+  flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  min-width: 14px;
-  height: 14px;
-  padding: 0 4px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 6px;
   border-radius: var(--cdl-radius-full);
-  font-size: 9px;
+  font-size: 9.5px;
   font-weight: 800;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
   line-height: 1;
   color: var(--cdl-ink-inverse);
@@ -222,9 +244,27 @@
 }
 
 .cdl-alarm-kpi--sm {
-  min-width: 58px;
-  min-height: 32px;
-  padding: 3px 8px 3px 10px;
+  min-width: 76px;
+  max-width: 136px;
+  min-height: 38px;
+  gap: 2px;
+  padding: 6px 10px 6px 13px;
+}
+
+.cdl-alarm-kpi--sm .cdl-alarm-kpi__value {
+  font-size: var(--cdl-text-sm);
+}
+
+.cdl-alarm-kpi--sm .cdl-alarm-kpi__label {
+  font-size: 9.5px;
+  letter-spacing: 0.015em;
+}
+
+.cdl-alarm-kpi--sm .cdl-alarm-kpi__badge {
+  min-width: 14px;
+  height: 14px;
+  padding: 0 5px;
+  font-size: 8.5px;
 }
 
 .cdl-alarm-kpi-rail {

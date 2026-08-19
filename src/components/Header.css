@@ -218,7 +218,7 @@
 
 .caredroid-header__central-status {
   align-items: center;
-  height: 32px;
+  height: 40px;
   min-width: 0;
   overflow: hidden;
 }
@@ -227,20 +227,43 @@
   align-items: center;
   display: flex;
   flex-wrap: nowrap;
-  height: 32px;
+  gap: 6px;
+  height: 40px;
   max-width: 100%;
   overflow: hidden;
 }
 
+/* Redesigned for a calmer, more legible header chip: the previous 24px
+ * min-height/2px 7px padding left the value and label crammed onto a
+ * single cramped line with no room for a badge (e.g. "CRIT") to sit
+ * cleanly next to a longer value like "3h 38m". Matches the spacing/
+ * radius language used everywhere else in the header (search box,
+ * palette trigger) rather than a bespoke, tighter one-off. */
 .caredroid-header__central-status .operational-strip__metric {
-  align-items: baseline;
+  align-items: flex-start;
   display: inline-flex;
   flex: 0 1 auto;
-  gap: 4px;
-  max-width: 128px;
-  min-height: 24px;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  max-width: 152px;
+  min-height: 36px;
   min-width: 0;
-  padding: 2px 7px;
+  border-radius: 8px;
+  padding: 4px 10px;
+}
+
+.caredroid-header__central-status .operational-strip__metric strong {
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+.caredroid-header__central-status .operational-strip__metric span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 9.5px;
+  line-height: 1.2;
 }
 
 .caredroid-header__central-status .operational-strip__metric strong,
