@@ -271,6 +271,18 @@ export default defineConfig(({ mode }) => {
         'react',
         'react-dom',
         'react-router-dom',
+        // HEAL-347.44: recharts wasn't pre-bundled here, so Vite's dev server
+        // only discovered it "late" -- the first time any route that
+        // actually renders a chart (EmergencyAnalyticsCharts.tsx, etc.) was
+        // visited. That triggers Vite's dependency re-optimization pass
+        // mid-navigation: it invalidates and reloads the in-flight module
+        // graph, aborting whatever else was still loading. Live-reproduced:
+        // /emergency/analytics (this app's own heaviest fresh-mount route)
+        // got stuck on "Loading analytics..." indefinitely, with 100+
+        // concurrent/aborted requests in the network trace, on every attempt
+        // regardless of how long the prior page had already settled.
+        // Pre-bundling it eagerly avoids the late-discovery reload entirely.
+        'recharts',
         path.resolve(process.cwd(), './lib/native-ai/index.ts'),
         path.resolve(process.cwd(), './lib/patient-orchestration/index.ts'),
       ],
