@@ -1,4 +1,4 @@
-import {
+﻿import {
   ConflictException,
   Injectable,
   Logger,
@@ -1623,8 +1623,201 @@ export class EmergencyPatientService implements OnModuleInit {
 }
 
 @Injectable()
+export class ReferralService implements OnModuleInit {
+  private readonly logger = new Logger(ReferralService.name);
+
+  constructor(
+    private readonly patientService: EmergencyPatientService,
+    @Optional()
+    @InjectRepository(ReferralEntity)
+    private readonly referralRepository?: Repository<ReferralEntity>,
+    @Optional() private readonly realtimeService?: EmergencyRealtimeService,
+  ) {}
+
+  private readonly createdReferrals: Array<Record<string, unknown>> = [];
+
+  /** Load durable referrals from TypeORM so a created referral survives process restart. */
+  async onModuleInit(): Promise<void> {
+    if (!this.referralRepository) return;
+    try {
+      const rows = await this.referralRepository.find();
+      for (const row of rows) {
+        if (this.createdReferrals.some((existing) => existing.id === row.id)) continue;
+        this.createdReferrals.push(this.mapEntityToReferral(row));
+      }
+    } catch (error) {
+      this.logger.warn(`Failed to rehydrate referrals from database: ${error}`);
+    }
+  }
+
+  private mapEntityToReferral(entity: ReferralEntity): Record<string, unknown> {
+    // Re-derived fresh from the live patient list rather than stored on the entity --
+    // a persisted snapshot would go stale the moment the patient's own record changes
+    // (state, flags, etc.), the same reasoning getReferrals()'s synthetic rows already
+    // use for patient-derived referrals.
+    const patient = this.patientService
+      .listPatients()
+      .find((candidate) => candidate.id === entity.patientId);
+    return {
+      id: entity.id,
+      patientId: entity.patientId,
+      patient,
+      requestingStaffId: entity.requestingStaffId,
+      targetDepartment: entity.targetDepartment,
+      specialty: entity.specialty,
+      urgency: entity.urgency,
+      reason: entity.reason,
+      clinicalSummary: entity.clinicalSummary,
+      status: entity.status,
+      workflow: entity.workflow,
+      requestedAt: entity.requestedAt,
+      statusUpdatedAt: entity.statusUpdatedAt,
+      createdAt: entity.requestedAt,
+      organizationId: entity.organizationId,
+    };
+  }
+
+  private persistReferralToDatabase(referral: Record<string, unknown>): void {
+    if (!this.referralRepository) return;
+    const entity = this.referralRepository.create({
+      id: String(referral.id),
+      patientId: String(referral.patientId || ''),
+      requestingStaffId: String(referral.requestingStaffId || ''),
+      targetDepartment: String(referral.targetDepartment || ''),
+      specialty: String(referral.specialty || ''),
+      urgency: String(referral.urgency || ''),
+      reason: String(referral.reason || ''),
+      clinicalSummary: String(referral.clinicalSummary || ''),
+      status: String(referral.status || ''),
+      workflow: String(referral.workflow || ''),
+      requestedAt: String(referral.requestedAt || ''),
+      statusUpdatedAt: referral.statusUpdatedAt ? String(referral.statusUpdatedAt) : undefined,
+      organizationId: referral.organizationId ? String(referral.organizationId) : undefined,
+    });
+    this.referralRepository.save(entity).catch((error) => {
+      this.logger.warn(`Failed to persist referral ${entity.id} to database: ${error}`);
+    });
+  }
+
+  // Same own-org-or-legacy rule as EmergencyPatientService.isVisibleToOrganization
+  // (see project memory "Emergency-OS Tenant Scoping Gap"): a referral with no
+  // organizationId (every pre-migration row) stays visible to every org until
+  // reconciled; a referral with a REAL org never becomes visible to a different org.
+  private isReferralVisibleToOrganization(
+    referral: { organizationId?: unknown },
+    organizationId?: string,
+  ): boolean {
+    if (!organizationId) return true;
+    if (!referral.organizationId) return true;
+    return referral.organizationId === organizationId;
+  }
+
+  getReferrals(organizationId?: string) {
+    const patients = this.patientService
+      .listPatients(organizationId)
+      .filter(
+        (patient) => patient.state === 'Disposition' || isBoarding(patient) || isHighRisk(patient),
+      );
+    const createdReferrals = this.createdReferrals.filter((referral) =>
+      this.isReferralVisibleToOrganization(referral, organizationId),
+    );
+    return envelope('Referral Intelligence', {
+      referrals: [
+        ...patients.map((patient, index) => ({
+          id: `ref-${patient.id}`,
+          patient,
+          specialty:
+            patient.complaintCategory === 'Cardiac'
+              ? 'Cardiology'
+              : patient.complaintCategory === 'Mental Health'
+                ? 'Psychiatry'
+                : index % 2
+                  ? 'Internal Medicine'
+                  : 'Surgery',
+          status: patient.flags.includes('PendingAdmission')
+            ? 'accepted-waiting-bed'
+            : 'review-needed',
+          elapsedMinutes: minutesSince(patient.arrivalTime),
+        })),
+        ...createdReferrals,
+      ],
+    });
+  }
+
+  createReferral(input: Record<string, unknown>, organizationId?: string) {
+    const patientId = String(input.patientId || '');
+    const patient = this.patientService
+      .listPatients()
+      .find((candidate) => candidate.id === patientId);
+    const now = new Date().toISOString();
+    const referral = {
+      id: String(input.id || `ref-${patientId || 'patient'}-${Date.now()}`),
+      patientId,
+      patient,
+      requestingStaffId: String(input.requestingStaffId || 'system-referrals'),
+      targetDepartment: String(input.targetDepartment || 'Other'),
+      specialty: String(input.targetDepartment || input.specialty || 'Other'),
+      urgency: String(input.urgency || 'Routine'),
+      reason: String(input.reason || 'Referral requested from CareDroid.'),
+      clinicalSummary: String(input.clinicalSummary || input.reason || 'Clinical summary pending.'),
+      status: String(input.status || 'Sent'),
+      workflow: String(input.workflow || 'Referral'),
+      requestedAt: String(input.requestedAt || now),
+      createdAt: now,
+      // Server-resolved tenant context always wins over anything present on
+      // `input` -- same "never let a client-suppliable field override the
+      // authoritative server value" precedent as patient/alert creation.
+      organizationId:
+        organizationId ?? (input.organizationId ? String(input.organizationId) : undefined),
+    };
+
+    this.createdReferrals.push(referral);
+    this.persistReferralToDatabase(referral);
+    // ReferralService had no realtime wiring at all before this -- neither
+    // creation nor status changes ever reached another tab/user, only
+    // whichever tab made the call (and only via that tab's own
+    // self-dispatched local event, not a real backend broadcast). Matches
+    // the same event-type vocabulary the frontend's local-only
+    // createReferral action already uses for its workflow-log entry.
+    this.realtimeService?.publish({ type: 'referral_created', payload: { referral } });
+    this.realtimeService?.publishBoardMutations();
+
+    return envelope('Referral Created', {
+      referral,
+      referrals: this.getReferrals(organizationId).data.referrals,
+    });
+  }
+
+  /** Backs PATCH /emergency/transfers/:id/status -- only real, created
+   * referrals (this.createdReferrals) can be updated; the synthetic
+   * patient-derived rows in getReferrals() aren't real records to mutate.
+   * Cross-org access throws the exact same not-found error shape as a
+   * genuinely-missing id -- no existence leak, same pattern as
+   * EmergencyPatientService's mutation methods. */
+  updateReferralStatus(referralId: string, status: string, organizationId?: string) {
+    const referral = this.createdReferrals.find((entry) => entry.id === referralId);
+    if (!referral || !this.isReferralVisibleToOrganization(referral, organizationId)) {
+      throw new NotFoundException(`Referral ${referralId} not found`);
+    }
+    referral.status = status;
+    referral.statusUpdatedAt = new Date().toISOString();
+    this.persistReferralToDatabase(referral);
+    this.realtimeService?.publish({ type: 'referral_status_changed', payload: { referral } });
+    this.realtimeService?.publishBoardMutations();
+
+    return envelope('Referral Status Updated', {
+      referral,
+      referrals: this.getReferrals(organizationId).data.referrals,
+    });
+  }
+}
+
+@Injectable()
 export class EmergencyWhiteboardService {
-  constructor(private readonly patientService: EmergencyPatientService) {}
+  constructor(
+    private readonly patientService: EmergencyPatientService,
+    private readonly referralService: ReferralService,
+  ) {}
 
   // HEAL-347.4: the whiteboard is the single most-viewed clinical screen and
   // was the largest still-open piece of the emergency-os tenant-scoping gap
@@ -1660,24 +1853,33 @@ export class EmergencyWhiteboardService {
    * actually reads, confirmed by tracing the full call chain -- never the identifier
    * fields (mrn/firstName/lastName/dob/chiefComplaint/notes/vitals/etc).
    *
-   * Deliberately scoped to patients + capacity only for this first pass.
-   * referrals/emsArrivals are optional inputs to buildPublicWaitingDisplaySnapshot
-   * with safe empty-array fallbacks, so omitting them here doesn't break anything --
-   * it only leaves the secondary EMS-crowding sub-panel in its default "no impact"
-   * state. Wiring those in needs the same careful field-by-field trace this did
-   * (both carry chiefComplaint/notes/vitals-shaped fields of their own) and is left
-   * as a follow-up rather than rushed under the same pass.
+   * Deliberately scoped to patients + capacity + referrals for this pass.
+   * emsArrivals still omitted: EMSIntakeService.getEMSIntake() takes no
+   * organizationId at all (a separate, pre-existing tenant-scoping gap --
+   * see its own definition), and this endpoint must never be the first place
+   * that leaks a cross-tenant aggregate rather than fixing that properly.
+   * Both are optional inputs to buildPublicWaitingDisplaySnapshot with safe
+   * empty-array fallbacks, so omitting emsArrivals here doesn't break
+   * anything -- it only leaves the secondary EMS-crowding sub-panel in its
+   * default "no impact" state.
    *
-   * Also deliberately omits the nested `arrival`/`referral`/`triageAssist` records --
-   * PatientArrivalRecord carries its own chiefComplaint field, and the flat
-   * top-level fields kept here are the documented fallback path when `arrival` is
-   * absent (see PatientArrivalRecord's own "preferred source" comment), so omitting
-   * the nested block doesn't break classification, it just uses the older
+   * referrals are reduced to {patientId, status} -- confirmed via the same
+   * call-chain trace that only those two fields ever affect the aggregation
+   * output (service/targetDepartment are read into a discarded internal
+   * string, never surfaced).
+   *
+   * Also deliberately omits the nested `arrival`/`referral`/`triageAssist`
+   * records on Patient itself -- PatientArrivalRecord carries its own
+   * chiefComplaint field, and the flat top-level fields kept here are the
+   * documented fallback path when `arrival` is absent (see
+   * PatientArrivalRecord's own "preferred source" comment), so omitting the
+   * nested block doesn't break classification, it just uses the older
    * flat-field path instead.
    */
   getPublicWaitingSnapshot(organizationId?: string) {
     const patients = this.patientService.listPatients(organizationId);
     const capacity = this.patientService.computeCapacity();
+    const referrals = this.referralService.getReferrals(organizationId).data.referrals;
     return envelope('Public Waiting Display', {
       patients: patients.map((patient) => ({
         id: patient.id,
@@ -1695,6 +1897,13 @@ export class EmergencyWhiteboardService {
         hasHighRiskComplaintFlag: Boolean(patient.highRiskComplaintFlags?.length),
       })),
       capacity,
+      referrals: (referrals as Array<{ id?: string; patientId?: string; status?: string }>).map(
+        (referral) => ({
+          id: referral.id,
+          patientId: referral.patientId,
+          status: referral.status,
+        }),
+      ),
     });
   }
 }
@@ -2648,196 +2857,6 @@ export class BoardingService {
       escalation: patients.length
         ? 'Notify inpatient flow lead for pending admissions.'
         : 'No active boarding escalation.',
-    });
-  }
-}
-
-@Injectable()
-export class ReferralService implements OnModuleInit {
-  private readonly logger = new Logger(ReferralService.name);
-
-  constructor(
-    private readonly patientService: EmergencyPatientService,
-    @Optional()
-    @InjectRepository(ReferralEntity)
-    private readonly referralRepository?: Repository<ReferralEntity>,
-    @Optional() private readonly realtimeService?: EmergencyRealtimeService,
-  ) {}
-
-  private readonly createdReferrals: Array<Record<string, unknown>> = [];
-
-  /** Load durable referrals from TypeORM so a created referral survives process restart. */
-  async onModuleInit(): Promise<void> {
-    if (!this.referralRepository) return;
-    try {
-      const rows = await this.referralRepository.find();
-      for (const row of rows) {
-        if (this.createdReferrals.some((existing) => existing.id === row.id)) continue;
-        this.createdReferrals.push(this.mapEntityToReferral(row));
-      }
-    } catch (error) {
-      this.logger.warn(`Failed to rehydrate referrals from database: ${error}`);
-    }
-  }
-
-  private mapEntityToReferral(entity: ReferralEntity): Record<string, unknown> {
-    // Re-derived fresh from the live patient list rather than stored on the entity --
-    // a persisted snapshot would go stale the moment the patient's own record changes
-    // (state, flags, etc.), the same reasoning getReferrals()'s synthetic rows already
-    // use for patient-derived referrals.
-    const patient = this.patientService
-      .listPatients()
-      .find((candidate) => candidate.id === entity.patientId);
-    return {
-      id: entity.id,
-      patientId: entity.patientId,
-      patient,
-      requestingStaffId: entity.requestingStaffId,
-      targetDepartment: entity.targetDepartment,
-      specialty: entity.specialty,
-      urgency: entity.urgency,
-      reason: entity.reason,
-      clinicalSummary: entity.clinicalSummary,
-      status: entity.status,
-      workflow: entity.workflow,
-      requestedAt: entity.requestedAt,
-      statusUpdatedAt: entity.statusUpdatedAt,
-      createdAt: entity.requestedAt,
-      organizationId: entity.organizationId,
-    };
-  }
-
-  private persistReferralToDatabase(referral: Record<string, unknown>): void {
-    if (!this.referralRepository) return;
-    const entity = this.referralRepository.create({
-      id: String(referral.id),
-      patientId: String(referral.patientId || ''),
-      requestingStaffId: String(referral.requestingStaffId || ''),
-      targetDepartment: String(referral.targetDepartment || ''),
-      specialty: String(referral.specialty || ''),
-      urgency: String(referral.urgency || ''),
-      reason: String(referral.reason || ''),
-      clinicalSummary: String(referral.clinicalSummary || ''),
-      status: String(referral.status || ''),
-      workflow: String(referral.workflow || ''),
-      requestedAt: String(referral.requestedAt || ''),
-      statusUpdatedAt: referral.statusUpdatedAt ? String(referral.statusUpdatedAt) : undefined,
-      organizationId: referral.organizationId ? String(referral.organizationId) : undefined,
-    });
-    this.referralRepository.save(entity).catch((error) => {
-      this.logger.warn(`Failed to persist referral ${entity.id} to database: ${error}`);
-    });
-  }
-
-  // Same own-org-or-legacy rule as EmergencyPatientService.isVisibleToOrganization
-  // (see project memory "Emergency-OS Tenant Scoping Gap"): a referral with no
-  // organizationId (every pre-migration row) stays visible to every org until
-  // reconciled; a referral with a REAL org never becomes visible to a different org.
-  private isReferralVisibleToOrganization(
-    referral: { organizationId?: unknown },
-    organizationId?: string,
-  ): boolean {
-    if (!organizationId) return true;
-    if (!referral.organizationId) return true;
-    return referral.organizationId === organizationId;
-  }
-
-  getReferrals(organizationId?: string) {
-    const patients = this.patientService
-      .listPatients(organizationId)
-      .filter(
-        (patient) => patient.state === 'Disposition' || isBoarding(patient) || isHighRisk(patient),
-      );
-    const createdReferrals = this.createdReferrals.filter((referral) =>
-      this.isReferralVisibleToOrganization(referral, organizationId),
-    );
-    return envelope('Referral Intelligence', {
-      referrals: [
-        ...patients.map((patient, index) => ({
-          id: `ref-${patient.id}`,
-          patient,
-          specialty:
-            patient.complaintCategory === 'Cardiac'
-              ? 'Cardiology'
-              : patient.complaintCategory === 'Mental Health'
-                ? 'Psychiatry'
-                : index % 2
-                  ? 'Internal Medicine'
-                  : 'Surgery',
-          status: patient.flags.includes('PendingAdmission')
-            ? 'accepted-waiting-bed'
-            : 'review-needed',
-          elapsedMinutes: minutesSince(patient.arrivalTime),
-        })),
-        ...createdReferrals,
-      ],
-    });
-  }
-
-  createReferral(input: Record<string, unknown>, organizationId?: string) {
-    const patientId = String(input.patientId || '');
-    const patient = this.patientService
-      .listPatients()
-      .find((candidate) => candidate.id === patientId);
-    const now = new Date().toISOString();
-    const referral = {
-      id: String(input.id || `ref-${patientId || 'patient'}-${Date.now()}`),
-      patientId,
-      patient,
-      requestingStaffId: String(input.requestingStaffId || 'system-referrals'),
-      targetDepartment: String(input.targetDepartment || 'Other'),
-      specialty: String(input.targetDepartment || input.specialty || 'Other'),
-      urgency: String(input.urgency || 'Routine'),
-      reason: String(input.reason || 'Referral requested from CareDroid.'),
-      clinicalSummary: String(input.clinicalSummary || input.reason || 'Clinical summary pending.'),
-      status: String(input.status || 'Sent'),
-      workflow: String(input.workflow || 'Referral'),
-      requestedAt: String(input.requestedAt || now),
-      createdAt: now,
-      // Server-resolved tenant context always wins over anything present on
-      // `input` -- same "never let a client-suppliable field override the
-      // authoritative server value" precedent as patient/alert creation.
-      organizationId:
-        organizationId ?? (input.organizationId ? String(input.organizationId) : undefined),
-    };
-
-    this.createdReferrals.push(referral);
-    this.persistReferralToDatabase(referral);
-    // ReferralService had no realtime wiring at all before this -- neither
-    // creation nor status changes ever reached another tab/user, only
-    // whichever tab made the call (and only via that tab's own
-    // self-dispatched local event, not a real backend broadcast). Matches
-    // the same event-type vocabulary the frontend's local-only
-    // createReferral action already uses for its workflow-log entry.
-    this.realtimeService?.publish({ type: 'referral_created', payload: { referral } });
-    this.realtimeService?.publishBoardMutations();
-
-    return envelope('Referral Created', {
-      referral,
-      referrals: this.getReferrals(organizationId).data.referrals,
-    });
-  }
-
-  /** Backs PATCH /emergency/transfers/:id/status -- only real, created
-   * referrals (this.createdReferrals) can be updated; the synthetic
-   * patient-derived rows in getReferrals() aren't real records to mutate.
-   * Cross-org access throws the exact same not-found error shape as a
-   * genuinely-missing id -- no existence leak, same pattern as
-   * EmergencyPatientService's mutation methods. */
-  updateReferralStatus(referralId: string, status: string, organizationId?: string) {
-    const referral = this.createdReferrals.find((entry) => entry.id === referralId);
-    if (!referral || !this.isReferralVisibleToOrganization(referral, organizationId)) {
-      throw new NotFoundException(`Referral ${referralId} not found`);
-    }
-    referral.status = status;
-    referral.statusUpdatedAt = new Date().toISOString();
-    this.persistReferralToDatabase(referral);
-    this.realtimeService?.publish({ type: 'referral_status_changed', payload: { referral } });
-    this.realtimeService?.publishBoardMutations();
-
-    return envelope('Referral Status Updated', {
-      referral,
-      referrals: this.getReferrals(organizationId).data.referrals,
     });
   }
 }

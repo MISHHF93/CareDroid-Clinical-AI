@@ -7,7 +7,7 @@ import { CARE_DROID_SCREEN_MODES } from '../../config/careDroidScreenModes';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { fetchPublicWaitingSnapshot } from '../../services/emergencyOsApi';
 import useDisplayAutoRefresh, { useStableDisplaySnapshot } from '../../hooks/useDisplayAutoRefresh';
-import type { CapacitySnapshot, Patient } from '../../types/emergency';
+import type { CapacitySnapshot, Patient, Referral } from '../../types/emergency';
 
 /**
  * Overhead / waiting-room display route — public-safe by default.
@@ -23,9 +23,11 @@ import type { CapacitySnapshot, Patient } from '../../types/emergency';
  * only" comment -- could never populate that store and this display simply
  * never showed real data. Fetches its own local snapshot from the new
  * aggregate-only GET /emergency/public-waiting-snapshot endpoint instead
- * (Permission.VIEW_PUBLIC_DISPLAY), which strips every patient down to a
- * server-side allowlist of non-identifying fields before it ever leaves the
- * backend -- see emergency-os.services.ts's getPublicWaitingSnapshot.
+ * (Permission.VIEW_PUBLIC_DISPLAY), which strips every patient/referral down
+ * to a server-side allowlist of non-identifying fields before it ever leaves
+ * the backend -- see emergency-os.services.ts's getPublicWaitingSnapshot.
+ * emsArrivals still omitted (see that method's own comment: the underlying
+ * EMS service isn't tenant-scoped yet, a separate pre-existing gap).
  */
 export default function WhiteboardDisplayRoute() {
   const [searchParams] = useSearchParams();
@@ -33,6 +35,7 @@ export default function WhiteboardDisplayRoute() {
 
   const [patients, setPatients] = useState<Patient[]>([]);
   const [capacity, setCapacity] = useState<CapacitySnapshot | undefined>(undefined);
+  const [referrals, setReferrals] = useState<Referral[]>([]);
   const emergencySettings = useEmergencyStore((state) => state.emergencySettings);
 
   const publicWaitingSnapshot = useMemo(
@@ -40,21 +43,27 @@ export default function WhiteboardDisplayRoute() {
       buildPublicWaitingDisplaySnapshot({
         patients,
         capacity,
+        referrals,
         showEmsCrowdingImpact: false,
         offloadTargetMinutes:
           Number(emergencySettings?.thresholds?.emsOffloadTargetMinutes ?? 15) || 15,
         updatedAt: capacity?.updatedAt || new Date().toISOString(),
       }),
-    [capacity, emergencySettings?.thresholds?.emsOffloadTargetMinutes, patients],
+    [capacity, emergencySettings?.thresholds?.emsOffloadTargetMinutes, patients, referrals],
   );
 
   const stableSnapshot = useStableDisplaySnapshot(publicWaitingSnapshot);
 
   const onRefresh = useCallback(async () => {
     const result = await fetchPublicWaitingSnapshot();
-    const data = (result as { data?: { patients?: Patient[]; capacity?: CapacitySnapshot } })?.data;
+    const data = (
+      result as {
+        data?: { patients?: Patient[]; capacity?: CapacitySnapshot; referrals?: Referral[] };
+      }
+    )?.data;
     setPatients(Array.isArray(data?.patients) ? (data!.patients as Patient[]) : []);
     setCapacity(data?.capacity);
+    setReferrals(Array.isArray(data?.referrals) ? (data!.referrals as Referral[]) : []);
   }, []);
 
   const refreshStatus = useDisplayAutoRefresh({

@@ -8,6 +8,7 @@ import {
   EmergencyPatientService,
   EmergencySettingsService,
   EmergencyWhiteboardService,
+  ReferralService,
   WorkflowActionLogService,
 } from './emergency-os.services';
 
@@ -21,6 +22,7 @@ describe('EmergencyRealtimeController', () => {
       providers: [
         EmergencyRealtimeService,
         EmergencyWhiteboardService,
+        ReferralService,
         WorkflowActionLogService,
         EmergencyPatientService,
         EmergencySettingsService,

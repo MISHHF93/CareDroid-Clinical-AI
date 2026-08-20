@@ -136,7 +136,12 @@ describe('EmergencyWhiteboardService — the whiteboard, the single most-viewed 
   function makeWhiteboard() {
     const workflowLogService = { record: jest.fn() } as unknown as { record: jest.Mock };
     const patientService = new EmergencyPatientService(workflowLogService as any);
-    return { patientService, whiteboard: new EmergencyWhiteboardService(patientService) };
+    const referralService = new ReferralService(patientService);
+    return {
+      patientService,
+      referralService,
+      whiteboard: new EmergencyWhiteboardService(patientService, referralService),
+    };
   }
 
   it("getWhiteboard(organizationId) scopes patients and alerts to the caller's org (own-org or legacy/unscoped)", () => {
@@ -193,12 +198,33 @@ describe('EmergencyWhiteboardService — the whiteboard, the single most-viewed 
         sex: 'F',
         chiefComplaint: 'Chest pain radiating to left arm',
         complaintCategory: 'Cardiac',
-        vitals: [{ hr: 110, sbp: 140, dbp: 90, spo2: 95, temp: 37.1, recordedAt: new Date().toISOString() }],
-        notes: [{ id: 'n1', text: 'Patient reports worsening symptoms', authorId: 'staff-1', timestamp: new Date().toISOString() }],
+        vitals: [
+          {
+            hr: 110,
+            sbp: 140,
+            dbp: 90,
+            spo2: 95,
+            temp: 37.1,
+            recordedAt: new Date().toISOString(),
+          },
+        ],
+        notes: [
+          {
+            id: 'n1',
+            text: 'Patient reports worsening symptoms',
+            authorId: 'staff-1',
+            timestamp: new Date().toISOString(),
+          },
+        ],
         assignedStaffId: 'staff-1',
         roomId: 'room-3',
         highRiskComplaintFlags: [
-          { id: 'f1', label: 'Possible ACS from chest pain complaint text', detectedAt: new Date().toISOString(), source: 'complaint-text' },
+          {
+            id: 'f1',
+            label: 'Possible ACS from chest pain complaint text',
+            detectedAt: new Date().toISOString(),
+            source: 'complaint-text',
+          },
         ],
         arrival: {
           arrivalMode: 'ambulance',
@@ -218,11 +244,33 @@ describe('EmergencyWhiteboardService — the whiteboard, the single most-viewed 
     // read-but-structurally-discarded (so it must never leak even though it's
     // never load-bearing for the aggregation output either).
     const FORBIDDEN_KEYS = [
-      'firstName', 'lastName', 'name', 'mrn', 'dob', 'age', 'sex',
-      'chiefComplaint', 'complaintCategory', 'vitals', 'notes', 'timeline',
-      'assignedStaffId', 'roomId', 'assignedPhysicianId', 'arrival', 'referral',
-      'triageAssist', 'highRiskComplaintFlags', 'symptoms', 'allergies',
-      'medications', 'phone', 'mobilePhone', 'healthCardNumber', 'healthCard', 'phn',
+      'firstName',
+      'lastName',
+      'name',
+      'mrn',
+      'dob',
+      'age',
+      'sex',
+      'chiefComplaint',
+      'complaintCategory',
+      'vitals',
+      'notes',
+      'timeline',
+      'assignedStaffId',
+      'roomId',
+      'assignedPhysicianId',
+      'arrival',
+      'referral',
+      'triageAssist',
+      'highRiskComplaintFlags',
+      'symptoms',
+      'allergies',
+      'medications',
+      'phone',
+      'mobilePhone',
+      'healthCardNumber',
+      'healthCard',
+      'phn',
     ];
 
     it('never includes any PHI/identifier field on a real, fully-populated patient', () => {
@@ -265,7 +313,9 @@ describe('EmergencyWhiteboardService — the whiteboard, the single most-viewed 
       // overrides through verbatim -- assert the snapshot faithfully reflects
       // whatever createPatient actually produced, not a specific literal.
       expect(patient.flags).toEqual(created.flags);
-      expect(patient.hasHighRiskComplaintFlag).toBe(Boolean(created.highRiskComplaintFlags?.length));
+      expect(patient.hasHighRiskComplaintFlag).toBe(
+        Boolean(created.highRiskComplaintFlags?.length),
+      );
     });
 
     it("scopes to organization the same way getWhiteboard does (own-org and legacy/unscoped, never a different org's)", () => {
@@ -282,6 +332,44 @@ describe('EmergencyWhiteboardService — the whiteboard, the single most-viewed 
       const { whiteboard } = makeWhiteboard();
       const result = whiteboard.getPublicWaitingSnapshot('org-a').data;
       expect(result.capacity).toBeDefined();
+    });
+
+    it('strips referrals to {id, patientId, status} only -- never the free-text reason/clinicalSummary/targetDepartment', () => {
+      const { patientService, referralService, whiteboard } = makeWhiteboard();
+      const patient = patientService.createPatient(makeRichPatient(), 'org-a');
+      referralService.createReferral(
+        {
+          patientId: patient.id,
+          targetDepartment: 'Cardiology',
+          reason: 'Suspected ACS, chest pain radiating to left arm',
+          clinicalSummary: 'Real patient clinical detail that must never leave this endpoint',
+          status: 'Sent',
+        },
+        'org-a',
+      );
+
+      const result = whiteboard.getPublicWaitingSnapshot('org-a').data;
+      const referral = result.referrals.find((r) => r.patientId === patient.id);
+      expect(referral).toBeDefined();
+      expect(referral!.status).toBe('Sent');
+      expect(Object.keys(referral!).sort()).toEqual(['id', 'patientId', 'status']);
+
+      const serialized = JSON.stringify(result.referrals);
+      expect(serialized).not.toContain('Cardiology');
+      expect(serialized).not.toContain('ACS');
+      expect(serialized).not.toContain('clinical detail');
+    });
+
+    it("referrals scope to organization the same way patients do (own-org and legacy/unscoped, never a different org's)", () => {
+      const { patientService, referralService, whiteboard } = makeWhiteboard();
+      const patientA = patientService.createPatient(makeRichPatient({ lastName: 'A' }), 'org-a');
+      const patientB = patientService.createPatient(makeRichPatient({ lastName: 'B' }), 'org-b');
+      referralService.createReferral({ patientId: patientA.id, status: 'Sent' }, 'org-a');
+      referralService.createReferral({ patientId: patientB.id, status: 'Sent' }, 'org-b');
+
+      const scoped = whiteboard.getPublicWaitingSnapshot('org-a').data;
+      expect(scoped.referrals.some((r) => r.patientId === patientA.id)).toBe(true);
+      expect(scoped.referrals.some((r) => r.patientId === patientB.id)).toBe(false);
     });
   });
 });
