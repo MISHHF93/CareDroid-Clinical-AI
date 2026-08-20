@@ -39,6 +39,26 @@
   color: var(--color-text-secondary, #5b6472);
 }
 
+/* HEAL-347.55: this form silently disabled every field/button with no
+   visible explanation when the current role can't submit a pre-arrival
+   handoff -- a physician (this role model's default demo session) would
+   see an entirely locked form with zero indication of why, reading as
+   "broken" rather than "not this role's task." Matches the established
+   "X unavailable for this role" title-tooltip phrasing already used on
+   individual buttons elsewhere in this file's parent (EMSPipeline.tsx),
+   but as a persistent banner since this locks a whole multi-field form,
+   not one button a tooltip can adequately cover. */
+.pre-arrival-intake__role-notice {
+  margin: 0;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--status-warning, #f59e0b);
+  border-radius: var(--cdl-clinical-radius, 8px);
+  background: color-mix(in srgb, var(--status-warning, #f59e0b) 10%, var(--app-surface-1, #ffffff));
+  color: var(--color-text-primary, #1f2933);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
 .pre-arrival-intake__completion {
   font-size: 0.78rem;
   font-weight: 700;

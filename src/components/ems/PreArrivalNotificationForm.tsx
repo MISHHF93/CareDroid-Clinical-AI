@@ -8,7 +8,7 @@ import {
 } from '../../services/preArrivalNotification';
 import './PreArrivalNotificationForm.css';
 
-function Field({ label, value, onChange, disabled, rows = 2 }) {
+function Field({ label, value, onChange, disabled, rows = 2, disabledReason }) {
   return (
     <label className="pre-arrival-form__field">
       <span>{label}</span>
@@ -16,6 +16,7 @@ function Field({ label, value, onChange, disabled, rows = 2 }) {
         rows={rows}
         value={value}
         disabled={disabled}
+        title={disabled ? disabledReason : undefined}
         onChange={(event) => onChange(event.target.value)}
       />
     </label>
@@ -25,6 +26,7 @@ function Field({ label, value, onChange, disabled, rows = 2 }) {
 export default function PreArrivalNotificationForm({
   notification,
   canEdit = true,
+  disabledReason = 'Editing unavailable for this role',
   actorName = 'Staff',
   onUpdate,
   className = '',
@@ -74,7 +76,6 @@ export default function PreArrivalNotificationForm({
             role="tab"
             {...((framework === id) ? { 'aria-selected': 'true' as const } : { 'aria-selected': 'false' as const })}
             className={framework === id ? 'is-active' : ''}
-            disabled={!canEdit}
             onClick={() => switchFramework(id)}
           >
             {id.toUpperCase()}
@@ -82,6 +83,12 @@ export default function PreArrivalNotificationForm({
         ))}
       </div>
       <p className="pre-arrival-form__framework-label">{PRE_ARRIVAL_FRAMEWORK_LABELS[framework]}</p>
+      {!canEdit ? (
+        <p className="pre-arrival-form__role-notice" role="status">
+          {disabledReason} — fields below are read-only, but you can still switch tabs to view
+          either framework.
+        </p>
+      ) : null}
 
       {framework === 'mist' ? (
         <div className="pre-arrival-form__grid">
@@ -89,24 +96,28 @@ export default function PreArrivalNotificationForm({
             label="Mechanism"
             value={resolved.mist?.mechanism || ''}
             disabled={!canEdit}
+            disabledReason={disabledReason}
             onChange={(value) => applyPatch({ mist: { ...resolved.mist, mechanism: value } })}
           />
           <Field
             label="Injuries"
             value={resolved.mist?.injuries || ''}
             disabled={!canEdit}
+            disabledReason={disabledReason}
             onChange={(value) => applyPatch({ mist: { ...resolved.mist, injuries: value } })}
           />
           <Field
             label="Signs"
             value={resolved.mist?.signs || ''}
             disabled={!canEdit}
+            disabledReason={disabledReason}
             onChange={(value) => applyPatch({ mist: { ...resolved.mist, signs: value } })}
           />
           <Field
             label="Treatments"
             value={resolved.mist?.treatments || ''}
             disabled={!canEdit}
+            disabledReason={disabledReason}
             onChange={(value) => applyPatch({ mist: { ...resolved.mist, treatments: value } })}
           />
         </div>
@@ -116,24 +127,28 @@ export default function PreArrivalNotificationForm({
             label="Situation"
             value={resolved.sbar?.situation || ''}
             disabled={!canEdit}
+            disabledReason={disabledReason}
             onChange={(value) => applyPatch({ sbar: { ...resolved.sbar, situation: value } })}
           />
           <Field
             label="Background"
             value={resolved.sbar?.background || ''}
             disabled={!canEdit}
+            disabledReason={disabledReason}
             onChange={(value) => applyPatch({ sbar: { ...resolved.sbar, background: value } })}
           />
           <Field
             label="Assessment"
             value={resolved.sbar?.assessment || ''}
             disabled={!canEdit}
+            disabledReason={disabledReason}
             onChange={(value) => applyPatch({ sbar: { ...resolved.sbar, assessment: value } })}
           />
           <Field
             label="Recommendation"
             value={resolved.sbar?.recommendation || ''}
             disabled={!canEdit}
+            disabledReason={disabledReason}
             onChange={(value) => applyPatch({ sbar: { ...resolved.sbar, recommendation: value } })}
           />
         </div>

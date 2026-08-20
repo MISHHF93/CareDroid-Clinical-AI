@@ -73,30 +73,31 @@ export function PatientsRoute() {
   const visibleJourneyStates = Object.entries(journeyStateCounts)
     .filter(([, count]) => Number(count) > 0)
     .slice(0, 6);
+  const highRiskFilterActive = searchParams.get('riskFilter') === 'high';
   const visiblePatients = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
-    if (!normalizedQuery) {
-      return requestedPatient
+    const base = normalizedQuery
+      ? patients.filter((patient) =>
+          [
+            patient.firstName,
+            patient.lastName,
+            patient.name,
+            patient.mrn,
+            patient.chiefComplaint,
+            patient.complaint,
+            patient.state,
+            patient.priority,
+          ]
+            .filter(Boolean)
+            .join(' ')
+            .toLowerCase()
+            .includes(normalizedQuery),
+        )
+      : requestedPatient
         ? [requestedPatient, ...patients.filter((patient) => patient.id !== requestedPatient.id)]
         : patients;
-    }
-    return patients.filter((patient) =>
-      [
-        patient.firstName,
-        patient.lastName,
-        patient.name,
-        patient.mrn,
-        patient.chiefComplaint,
-        patient.complaint,
-        patient.state,
-        patient.priority,
-      ]
-        .filter(Boolean)
-        .join(' ')
-        .toLowerCase()
-        .includes(normalizedQuery),
-    );
-  }, [patients, query, requestedPatient]);
+    return highRiskFilterActive ? base.filter(isHighRisk) : base;
+  }, [patients, query, requestedPatient, highRiskFilterActive]);
 
   useEffect(() => {
     if (!patientIdParam || !requestedPatient?.id) return;
@@ -159,8 +160,47 @@ export function PatientsRoute() {
           severity="critical"
           title={`${highRiskCount} high-risk patient${highRiskCount === 1 ? '' : 's'} on the board`}
           message="Open a patient card to review flags, assignment, and next clinical action. AI suggestions require human review."
-          actions={[{ id: 'review', label: 'Review list', variant: 'primary' }]}
+          actions={[
+            {
+              id: 'review',
+              label: highRiskFilterActive ? 'Showing high-risk only' : 'Review list',
+              variant: 'primary',
+              disabled: highRiskFilterActive,
+            },
+          ]}
+          onAction={(actionId) => {
+            // HEAL-347.56: this action was declared with a label but no
+            // onAction handler anywhere -- AlarmBanner's own onClick calls
+            // onAction?.(action.id), a silent no-op when the caller omits
+            // it, live-confirmed via network+DOM-change tracing (zero API
+            // calls, zero DOM change on click). Reuses the same isHighRisk
+            // predicate already computing highRiskCount above, and the same
+            // URL-search-param pattern the existing text search (`q`) uses,
+            // so the filter survives a refresh/share like the search does.
+            if (actionId !== 'review') return;
+            const nextParams = new URLSearchParams(searchParams);
+            nextParams.set('riskFilter', 'high');
+            setSearchParams(nextParams, { replace: true });
+          }}
         />
+      ) : null}
+      {highRiskFilterActive ? (
+        <div role="status" className="emergency-route-card emergency-route-filter-banner">
+          <span className="emergency-route-filter-banner__label">
+            Showing {visiblePatients.length} high-risk patient{visiblePatients.length === 1 ? '' : 's'} only.
+          </span>
+          <button
+            type="button"
+            className="emergency-route-filter-banner__btn"
+            onClick={() => {
+              const nextParams = new URLSearchParams(searchParams);
+              nextParams.delete('riskFilter');
+              setSearchParams(nextParams, { replace: true });
+            }}
+          >
+            Clear filter
+          </button>
+        </div>
       ) : null}
       <div className="cdl-alarm-kpi-rail emergency-route-metric-kpi-rail" aria-label="Department patient metrics">
         <AlarmKpi severity="info" value={patients.length} label="Total patients" />

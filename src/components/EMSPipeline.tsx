@@ -322,6 +322,7 @@ function EMSArrivalRow({
             notification={arrival.preArrivalNotification}
             actorName={actorName}
             canEdit={canCompleteHandoff}
+            disabledReason="Handoff completion unavailable for this role"
             onUpdate={(notification) => onUpdatePreArrivalNotification?.(arrival.id, notification)}
           />
         </div>

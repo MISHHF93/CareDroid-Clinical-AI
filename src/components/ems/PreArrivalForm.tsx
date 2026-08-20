@@ -203,6 +203,13 @@ export default function PreArrivalForm({
         <span className="pre-arrival-intake__completion">{completion}% complete</span>
       </header>
 
+      {!canSubmit ? (
+        <p className="pre-arrival-intake__role-notice" role="status">
+          Pre-arrival submission unavailable for this role — every field below is locked. Ask a
+          charge nurse, EMS coordinator, or bay-prep staff to enter this handoff.
+        </p>
+      ) : null}
+
       <div className="pre-arrival-intake__dispatch">
         <TextField
           label="Unit"
