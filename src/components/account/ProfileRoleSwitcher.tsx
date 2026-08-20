@@ -30,7 +30,11 @@ export default function ProfileRoleSwitcher({
   const groupName = 'caredroid-workflow-profile';
 
   const handleSwitch = (emergencyRoleId: string) => {
-    switchDemoRole(emergencyRoleId);
+    // Navigate immediately (client-side role state is applied synchronously
+    // inside switchDemoRole before its own await) so the switch still feels
+    // instant; the backend session sync continues in the background and
+    // only needs to land before the new screen's data requests fire.
+    void switchDemoRole(emergencyRoleId);
     profileNavigate(resolveDemoRoleLandingRoute(emergencyRoleId));
     onSwitch?.(emergencyRoleId);
   };

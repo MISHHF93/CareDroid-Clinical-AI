@@ -39,6 +39,29 @@ export const NEST_ROLE_DEFAULT_EMERGENCY_ROLE: Record<UserRole, EmergencyRoleCla
   [UserRole.READ_ONLY_VIEWER]: 'read_only_viewer',
 };
 
+/**
+ * Inverse of NEST_ROLE_DEFAULT_EMERGENCY_ROLE: which Nest UserRole (and
+ * therefore which `permissions` claim set, since buildAccessTokenClaims
+ * derives permissions from `role` alone) a demo persona switch should carry.
+ * Mirrors src/config/emergencyNestPermissionMap.ts's EMERGENCY_TO_NEST_ROLE_MAP
+ * `nestUserRole` assignments -- kept as an independent backend copy since the
+ * frontend module isn't importable from this build.
+ */
+export const EMERGENCY_ROLE_TO_USER_ROLE: Record<EmergencyRoleClaimId, UserRole> = {
+  admin: UserRole.ADMIN,
+  it_admin: UserRole.ADMIN,
+  ed_manager: UserRole.ADMIN,
+  charge_nurse: UserRole.NURSE,
+  triage_nurse: UserRole.NURSE,
+  physician: UserRole.PHYSICIAN,
+  registration_clerk: UserRole.NURSE,
+  ems_user: UserRole.NURSE,
+  dispatcher: UserRole.NURSE,
+  ems_coordinator: UserRole.NURSE,
+  read_only_viewer: UserRole.STUDENT,
+  public_display: UserRole.STUDENT,
+};
+
 export type CareDroidAccessTokenClaims = {
   sub: string;
   email: string;

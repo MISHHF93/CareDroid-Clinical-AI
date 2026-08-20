@@ -147,9 +147,11 @@ let inFlightForcedSession: Promise<DevBackendSessionResult> | null = null;
 async function resolveDevBackendSession({
   force = false,
   timeoutMs = DEV_SESSION_FETCH_TIMEOUT_MS,
+  roleProfileId,
 }: {
   force?: boolean;
   timeoutMs?: number;
+  roleProfileId?: string;
 } = {}) {
   if (!isDev) return { token: readStoredToken(), source: 'production' };
 
@@ -200,7 +202,7 @@ async function resolveDevBackendSession({
     const response = await fetch(API_ROUTES.auth.devSession, {
       method: 'POST',
       headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-      body: '{}',
+      body: roleProfileId ? JSON.stringify({ roleProfileId }) : '{}',
       signal: controller.signal,
     });
     window.clearTimeout(timeoutId);
@@ -241,11 +243,20 @@ async function resolveDevBackendSession({
 export async function ensureDevBackendSession({
   force = false,
   timeoutMs = DEV_SESSION_FETCH_TIMEOUT_MS,
+  roleProfileId,
 }: {
   force?: boolean;
   timeoutMs?: number;
+  roleProfileId?: string;
 } = {}) {
   if (force) {
+    // A persona switch (roleProfileId set) must always hit the network to
+    // sync the backend's role -- never join an in-flight fetch that was
+    // kicked off for a different (or no) persona, since that fetch's
+    // request body has already been sent with the old roleProfileId.
+    if (roleProfileId) {
+      return resolveDevBackendSession({ force, timeoutMs, roleProfileId });
+    }
     if (inFlightForcedSession) {
       return inFlightForcedSession;
     }

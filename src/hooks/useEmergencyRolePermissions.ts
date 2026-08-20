@@ -35,6 +35,7 @@ import {
   checkEmergencyPermission,
 } from '../services/securityAccessService';
 import { getDemoUserById, getDefaultDemoUser } from '../lib/users/demoUsers';
+import { ensureDevBackendSession, isDev } from '../services/devBackendAuth';
 
 export function useEmergencyRolePermissions() {
   const { user, setUser } = useUser();
@@ -197,7 +198,7 @@ export function useEmergencyRolePermissions() {
           ...permissionContext,
           ...context,
         }).readOnly,
-      switchDemoRole: (nextRole) => {
+      switchDemoRole: async (nextRole) => {
         const normalizedRole = normalizeEmergencyRole(nextRole);
         const nextMapping = getCanonicalRoleMapping(nextRole);
         const nextProfile = normalizeCareDroidProfile({
@@ -243,6 +244,25 @@ export function useEmergencyRolePermissions() {
               },
             };
         setUser(nextUser);
+        // switchDemoRole only ever updated this client-side profile -- the
+        // real backend JWT stayed pinned to whatever UserRole the dev-bypass
+        // session was originally issued with (always UserRole.PHYSICIAN, see
+        // auth.service.ts's createDevSession), so every persona actually hit
+        // the API under fixed physician permissions regardless of which role
+        // was selected here. Confirmed live: ed_manager 403'd on GET
+        // /emergency/analytics and POST /operational-intelligence/evaluate,
+        // both gated on permissions physician's fixed set lacks, silently
+        // masked by a frontend "local analytics fallback". Sync the backend
+        // session to match before any of the new persona's screens fire real
+        // requests; dev-only (isDev), and errors here must never block the
+        // (already-applied) client-side role switch.
+        if (isDev) {
+          try {
+            await ensureDevBackendSession({ force: true, roleProfileId: normalizedRole });
+          } catch {
+            // best-effort: FE role state above is already updated regardless
+          }
+        }
       },
     }),
     [compiledProfile, deviceContext.definition?.label, deviceContext.deviceContextId, deviceContext.isKiosk, emergencySettings, landingRoute, permissionContext, permissionsOverrides, role, roleDefinition, roleSubject, securityContext, setUser, user],

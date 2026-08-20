@@ -16,7 +16,7 @@ import { ConfigService } from '@nestjs/config';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
-import { IsEmail, IsString } from 'class-validator';
+import { IsEmail, IsString, IsOptional } from 'class-validator';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -27,6 +27,12 @@ import { SkipTenantIsolation } from '../tenant-context/tenant-scope.decorator';
 // Tighter than the app-wide default (100 req/min) — credential-guessing
 // endpoints get a stricter ceiling than general API traffic.
 const BRUTE_FORCE_GUARD_LIMIT = { default: { limit: 10, ttl: 60000 } };
+
+class DevSessionDto {
+  @IsOptional()
+  @IsString()
+  roleProfileId?: string;
+}
 
 class VerifyTwoFactorLoginDto {
   @IsString()
@@ -97,7 +103,7 @@ export class AuthController {
   @Post('dev-session')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Development only: explicit local/demo UI access' })
-  async devSession(@Req() req: Request) {
+  async devSession(@Req() req: Request, @Body() body: DevSessionDto) {
     const nodeEnv = process.env.NODE_ENV || 'development';
     const productionDemoAuthEnabled =
       String(process.env.ALLOW_DEMO_AUTH_IN_PRODUCTION || '').toLowerCase() === 'true';
@@ -107,7 +113,7 @@ export class AuthController {
 
     const ipAddress = req.ip || '0.0.0.0';
     const userAgent = req.headers['user-agent'] || 'unknown';
-    return this.authService.createDevSession(ipAddress, userAgent);
+    return this.authService.createDevSession(ipAddress, userAgent, body?.roleProfileId);
   }
 
   @Post('verify-2fa')

@@ -40,7 +40,7 @@ import { AuditAction } from '../audit/entities/audit-log.entity';
 import { TwoFactorService } from '../two-factor/two-factor.service';
 import { EmailService } from '../email/email.service';
 import { EncryptionService } from '../encryption/encryption.service';
-import { buildAccessTokenClaims } from './config/jwt-claims.util';
+import { buildAccessTokenClaims, EMERGENCY_ROLE_TO_USER_ROLE } from './config/jwt-claims.util';
 
 @Injectable()
 export class AuthService {
@@ -301,7 +301,7 @@ export class AuthService {
   /**
    * Development-only: issue a real JWT for explicit local/demo UI access.
    */
-  async createDevSession(ipAddress: string, userAgent: string) {
+  async createDevSession(ipAddress: string, userAgent: string, roleProfileId?: string) {
     const authConfig = this.configService.get<any>('auth') || {};
     const serverConfig = this.configService.get<any>('server') || {};
     const explicitDevBypassEnabled = [
@@ -393,6 +393,33 @@ export class AuthService {
 
     if (!user) {
       throw new InternalServerErrorException('Failed to bootstrap dev session user');
+    }
+
+    // The FE demo role switcher (ProfileRoleSwitcher/switchDemoRole) only ever
+    // updated client-side state -- it never told the backend which persona
+    // was selected. Every emergency-role persona (ed_manager, admin,
+    // read_only_viewer, ...) was therefore always authenticated as this
+    // singleton dev user's fixed UserRole.PHYSICIAN, since generateTokens ->
+    // buildAccessTokenClaims derives the `permissions` claim from `role`
+    // alone. Confirmed live: switching to ed_manager and loading
+    // /emergency/analytics still 403'd on GET /emergency/analytics and POST
+    // /operational-intelligence/evaluate, both gated on Permission.VIEW_ANALYTICS
+    // / VIEW_OBSERVABILITY which PHYSICIAN's fixed permission set lacks --
+    // the frontend silently fell back to a "local analytics fallback" demo
+    // dataset instead of surfacing the failure. When the caller now passes
+    // the selected persona's id, sync this dev user's role/profile to match
+    // before issuing tokens so the JWT's permissions actually reflect the
+    // persona the UI claims to be using.
+    const normalizedRoleProfileId = String(roleProfileId || '').trim().toLowerCase();
+    const targetUserRole = EMERGENCY_ROLE_TO_USER_ROLE[normalizedRoleProfileId];
+    if (targetUserRole) {
+      if (user.role !== targetUserRole) {
+        user.role = targetUserRole;
+      }
+      if (user.profile && user.profile.roleProfileId !== normalizedRoleProfileId) {
+        user.profile.roleProfileId = normalizedRoleProfileId;
+        await this.profileRepository.save(user.profile);
+      }
     }
 
     user.lastLoginAt = new Date();
