@@ -69,6 +69,18 @@
   box-shadow: var(--cdl-clinical-shadow-rest);
 }
 
+/* Previously zeroed border-right/border-bottom/border-color with
+   !important here, unconditionally -- same bug as the sibling rule in
+   clinical-operational-flow.css (see its comment for the live-confirmed
+   symptom: an L-shaped 2-of-4-sides border reads as no border at all).
+   .operational-handoff-domain-bar__metric has its own real (dark, clearly
+   visible) 1px border declared in OperationalHandoffDomainBar.css that
+   this was silently erasing; the other three selectors here
+   (charge-nurse-operational-strip__metric, reception-operational-strip__metric,
+   operational-alert-rail__chip) have no component actually rendering them
+   (grepped every .tsx/.ts for the class names -- zero matches beyond
+   unrelated id strings in queueAuditModel.ts's audit registry), so removing
+   the override is a no-op for those and a real fix for the one that's live. */
 .emergency-app-shell
   :is(
     .charge-nurse-operational-strip__metric,
@@ -79,9 +91,6 @@
     .operational-handoff-domain-bar__eyebrow,
     .operational-alert-rail__chip
   ) {
-  border-right: 0 !important;
-  border-bottom: 0 !important;
-  border-color: transparent !important;
   border-radius: var(--cdl-clinical-radius-sm);
   background: color-mix(
     in srgb,

@@ -22,6 +22,19 @@
   box-shadow: var(--cdl-clinical-shadow-rest);
 }
 
+/* Previously zeroed border-right/border-bottom with !important here,
+   unconditionally, on every metric pill -- leaving only the top+left edges
+   of OperationalStrip.css's own 1px full border (that file's stated intent,
+   per its HEAL-347.45 comment, is "each metric is its own small card").
+   Confirmed live via computed style: border-width came back "1px 0px 0px
+   1px", an L-shaped partial border indistinguishable from "no border" at
+   this weight/color -- exactly the "ugly, no borders" symptom reported live.
+   This rule's own comment block frames it as flattening pills into shared
+   segments of the strip's outer border, but nothing here (or in the outer
+   .operational-strip--compact rule above) actually removes the component's
+   per-pill border declaration -- it only strips 2 of its 4 sides, which
+   reads as broken rather than intentionally flat. Dropping the override
+   restores the component's own complete, already-correct per-pill border. */
 .emergency-app-shell
   :is(
     .operational-strip__eyebrow,
@@ -30,8 +43,6 @@
     .charge-nurse-operational-strip__metric,
     .reception-operational-strip__metric
   ) {
-  border-right: 0 !important;
-  border-bottom: 0 !important;
   border-radius: var(--cdl-clinical-radius-sm);
   background: color-mix(
     in srgb,
