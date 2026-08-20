@@ -84,7 +84,18 @@
  * card" treatment as the header's redesigned KPI chips (HEAL-347's header
  * polish pass), scaled for this component's denser in-page grid contexts.
  * Interactive tiles (real <button>s, see OperationalStrip.tsx) also had zero
- * hover/focus-visible feedback despite being clickable -- added below. */
+ * hover/focus-visible feedback despite being clickable -- added below.
+ *
+ * (A `:last-child { border-right: 1px solid <neutral> }` rule used to sit
+ * below this block, added back when clinical-operational-flow.css/
+ * clinical-page-sweep.css's now-removed !important rules stripped every
+ * metric's border-right/border-bottom -- it existed only to give the very
+ * last pill in a row a closing right edge. Now that every pill keeps its
+ * own complete border again (HEAL-347.58), that rule was redundant AND
+ * actively wrong: its neutral border-right color silently overwrote
+ * whatever severity tone (e.g. --alarm-critical-border) a variant like
+ * .alarm-kpi--critical had set for that side, producing a two-tone edge
+ * on whichever pill happened to render last in the row. Removed.) */
 .operational-strip__metric,
 .operational-strip__action {
   display: grid;
@@ -108,12 +119,6 @@
 .operational-strip--command .operational-strip__action {
   min-height: 50px;
   padding: 8px 12px;
-}
-
-.operational-strip__metric:last-child,
-.operational-strip__action:last-child {
-  border-right: 1px solid
-    var(--cdl-clinical-border, var(--color-border-subtle, var(--medical-border, #e0f2fe)));
 }
 
 .operational-strip__metric {
