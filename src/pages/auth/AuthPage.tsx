@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { CAREDROID_PRODUCT } from '../../config/caredroidProduct.config';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
@@ -41,6 +41,20 @@ export default function AuthPage({ initialMode = 'login' }: { initialMode?: Mode
   const [pending, setPending] = useState(false);
   const [twoFactor, setTwoFactor] = useState<{ userId: string; challengeToken: string } | null>(null);
   const [twoFactorCode, setTwoFactorCode] = useState('');
+
+  // Programmatic focus instead of the autoFocus prop -- same "ready to type
+  // immediately" UX, but scoped to exactly when each field actually appears
+  // (jsx-a11y/no-autofocus: the prop fires focus unconditionally on every
+  // mount with no way to make it context-aware, which is the real complaint).
+  const twoFactorInputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (twoFactor) twoFactorInputRef.current?.focus();
+  }, [twoFactor]);
+
+  const emailInputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (!twoFactor) emailInputRef.current?.focus();
+  }, [twoFactor, mode]);
 
   const handleLogin = async () => {
     const result = await loginWithPassword(email.trim(), password);
@@ -211,6 +225,7 @@ export default function AuthPage({ initialMode = 'login' }: { initialMode?: Mode
             <label className="auth-page__field">
               <span>Verification code</span>
               <input
+                ref={twoFactorInputRef}
                 type="text"
                 inputMode="numeric"
                 autoComplete="one-time-code"
@@ -218,7 +233,6 @@ export default function AuthPage({ initialMode = 'login' }: { initialMode?: Mode
                 onChange={(event) => setTwoFactorCode(event.target.value)}
                 placeholder="123456"
                 required
-                autoFocus
               />
             </label>
           ) : (
@@ -239,13 +253,13 @@ export default function AuthPage({ initialMode = 'login' }: { initialMode?: Mode
               <label className="auth-page__field">
                 <span>Email</span>
                 <input
+                  ref={emailInputRef}
                   type="email"
                   autoComplete="email"
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
                   placeholder="you@hospital.org"
                   required
-                  autoFocus
                 />
               </label>
               <label className="auth-page__field">

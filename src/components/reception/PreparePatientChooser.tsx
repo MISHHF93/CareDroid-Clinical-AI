@@ -27,13 +27,20 @@ export default function PreparePatientChooser({
   }, [onClose]);
 
   return (
+    // Click-to-dismiss on the scrim is a mouse-only convenience layered on top
+    // of two real keyboard-accessible paths: the Escape handler above and the
+    // close button below. The scrim itself isn't meant to be its own focusable
+    // control, so it doesn't need a redundant onKeyDown of its own.
+    // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events
     <div
       className="reception-prepare"
       role="dialog"
       aria-labelledby="prepare-patient-title"
-      onClick={onClose}
+      onClick={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
     >
-      <div className="reception-prepare__panel" onClick={(event) => event.stopPropagation()}>
+      <div className="reception-prepare__panel">
         <header className="reception-prepare__header">
           <div>
             <p className="reception-prepare__eyebrow">{copy.eyebrow}</p>

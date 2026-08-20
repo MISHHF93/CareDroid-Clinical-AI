@@ -51,14 +51,21 @@ export default function ReceptionShiftClearance({
   const clear = total === 0;
 
   return (
+    // Click-to-dismiss on the scrim is a mouse-only convenience layered on top
+    // of two real keyboard-accessible paths: the Escape handler above and the
+    // close button below. The scrim itself isn't meant to be its own focusable
+    // control, so it doesn't need a redundant onKeyDown of its own.
+    // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events
     <div
       className="reception-shift-clearance"
       role="dialog"
       aria-modal="true"
       aria-labelledby="reception-shift-clearance-title"
-      onClick={onClose}
+      onClick={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
     >
-      <div className="reception-shift-clearance__panel" onClick={(event) => event.stopPropagation()}>
+      <div className="reception-shift-clearance__panel">
         <header className="reception-shift-clearance__header">
           <div>
             <p className="reception-shift-clearance__eyebrow">

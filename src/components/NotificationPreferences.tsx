@@ -437,14 +437,15 @@ function NotificationPreferences() {
         <div
           className="notification-confirm-backdrop"
           role="presentation"
-          onClick={() => setConfirmDevice(null)}
+          onClick={(event) => {
+            if (event.target === event.currentTarget) setConfirmDevice(null);
+          }}
         >
           <div
             className="notification-confirm-dialog"
             role="dialog"
             aria-modal="true"
             aria-labelledby="remove-device-title"
-            onClick={(event) => event.stopPropagation()}
           >
             <h3 id="remove-device-title">Remove notification device?</h3>
             <p>
