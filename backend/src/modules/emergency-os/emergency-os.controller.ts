@@ -482,14 +482,17 @@ export class EmergencyOsController {
 
   @RequirePermission(Permission.READ_PHI)
   @Get('ems')
-  getEMS() {
-    return this.emsIntakeService.getEMSIntake();
+  getEMS(@TenantContext() tenantContext?: TenantContextValue) {
+    return this.emsIntakeService.getEMSIntake(tenantContext?.organizationId);
   }
 
   @RequirePermission(Permission.WRITE_PHI)
   @Post('ems/handoff')
-  postEmsHandoff(@Body() body: PostEmsHandoffDto) {
-    return this.emsIntakeService.completeHandoff(body);
+  postEmsHandoff(
+    @Body() body: PostEmsHandoffDto,
+    @TenantContext() tenantContext?: TenantContextValue,
+  ) {
+    return this.emsIntakeService.completeHandoff(body, tenantContext?.organizationId);
   }
 
   /** Durable EMS arrival status transitions (arrived / handoff-started) -- see
@@ -499,8 +502,13 @@ export class EmergencyOsController {
   patchEmsArrivalStatus(
     @Param('arrivalId') arrivalId: string,
     @Body() body: PatchEmsArrivalStatusDto,
+    @TenantContext() tenantContext?: TenantContextValue,
   ) {
-    return this.emsIntakeService.updateArrivalStatus(arrivalId, { ...body });
+    return this.emsIntakeService.updateArrivalStatus(
+      arrivalId,
+      { ...body },
+      tenantContext?.organizationId,
+    );
   }
 
   @RequirePermission(Permission.READ_PHI)

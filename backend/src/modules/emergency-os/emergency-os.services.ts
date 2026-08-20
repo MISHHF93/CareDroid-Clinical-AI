@@ -2003,15 +2003,40 @@ export class EMSIntakeService implements OnModuleInit {
    * earlier "arrived" timestamp -- mirrors how normalizeEmsArrivalOffloadPatch already
    * merges on the frontend.
    */
+  /**
+   * HEAL-347.69: this.arrivalStatusById is one process-wide Map with no
+   * organizationId partition of its own (EmsArrivalStatus, its DB-backed
+   * mirror, has no organizationId column either -- confirmed by reading the
+   * entity). Every other write-path in this file scopes through the owning
+   * Patient record instead of needing its own tenant column (see
+   * ReferralService.isReferralVisibleToOrganization's comment for the same
+   * pattern), so this does the same: when the arrival's patientId (existing
+   * or freshly patched in) resolves to a real patient, that patient's own
+   * organizationId is the authority -- a cross-org id gets the same
+   * not-found rejection every other mutation method in this file already
+   * uses, no existence leak. An arrival with no patientId at all (a bare
+   * EMS-side record never linked to a patient) has no patient to check
+   * against and is intentionally left unscoped -- there's no PHI to leak
+   * without a patient attached, and inventing a scope for that edge case
+   * belongs in its own pass, not bundled into this fix.
+   */
   updateArrivalStatus(
     arrivalId: string,
     patch: Record<string, unknown>,
+    organizationId?: string,
   ): EmergencyModuleEnvelope<Record<string, unknown>> {
     const id = String(arrivalId || '').trim();
     if (!id) {
       return envelope('EMS Arrival Status', { ok: false, error: 'arrivalId is required' });
     }
     const existing = this.arrivalStatusById.get(id) || {};
+    const candidatePatientId = String(patch.patientId ?? existing.patientId ?? '').trim();
+    if (organizationId && candidatePatientId) {
+      const patient = this.patientService.getPatient(candidatePatientId, organizationId);
+      if (!patient) {
+        throw new NotFoundException(`EMS arrival ${id} not found`);
+      }
+    }
     const merged: Record<string, unknown> = {
       ...existing,
       ...Object.fromEntries(Object.entries(patch).filter(([, value]) => value != null)),
@@ -2032,9 +2057,9 @@ export class EMSIntakeService implements OnModuleInit {
     return envelope('EMS Arrival Status', { ok: true, arrivalId: id, ...merged });
   }
 
-  getEMSIntake() {
+  getEMSIntake(organizationId?: string) {
     const patients = this.patientService
-      .listPatients()
+      .listPatients(organizationId)
       .filter(
         (patient) =>
           patient.flags.includes('EMSArrival') ||
@@ -2071,19 +2096,22 @@ export class EMSIntakeService implements OnModuleInit {
    * Local whiteboard status remains the frontend source of truth for unit tracking;
    * this endpoint makes completion survive refresh / multi-workstation use.
    */
-  completeHandoff(input: {
-    arrivalId?: string;
-    patientId?: string;
-    actorName?: string;
-    unitId?: string;
-    unitName?: string;
-    chiefComplaint?: string;
-    handoffAcceptedAt?: string;
-    handoffStartedAt?: string;
-    arrivedAt?: string;
-    checklist?: Record<string, unknown>;
-    notes?: string;
-  }) {
+  completeHandoff(
+    input: {
+      arrivalId?: string;
+      patientId?: string;
+      actorName?: string;
+      unitId?: string;
+      unitName?: string;
+      chiefComplaint?: string;
+      handoffAcceptedAt?: string;
+      handoffStartedAt?: string;
+      arrivedAt?: string;
+      checklist?: Record<string, unknown>;
+      notes?: string;
+    },
+    organizationId?: string,
+  ) {
     const arrivalId = String(input.arrivalId || '').trim();
     if (!arrivalId) {
       return envelope('EMS Handoff', { ok: false, error: 'arrivalId is required' });
@@ -2091,8 +2119,12 @@ export class EMSIntakeService implements OnModuleInit {
 
     const timestamp = input.handoffAcceptedAt || new Date().toISOString();
     const patientId = input.patientId ? String(input.patientId).trim() : '';
+    // Org-scoped lookup, same "not found" shape as every other cross-org
+    // access attempt in this file -- a patientId belonging to a different
+    // organization simply resolves to no patient, rather than silently
+    // recording a note/handoff against a hospital that isn't the caller's.
     const patient = patientId
-      ? this.patientService.listPatients().find((entry) => entry.id === patientId)
+      ? this.patientService.getPatient(patientId, organizationId)
       : undefined;
 
     if (patientId && patient) {
@@ -2114,15 +2146,19 @@ export class EMSIntakeService implements OnModuleInit {
       });
     }
 
-    this.updateArrivalStatus(arrivalId, {
-      status: 'Complete',
-      patientId: patientId || undefined,
-      unitId: input.unitId,
-      unitName: input.unitName,
-      arrivedAt: input.arrivedAt,
-      handoffStartedAt: input.handoffStartedAt,
-      handoffCompletedAt: timestamp,
-    });
+    this.updateArrivalStatus(
+      arrivalId,
+      {
+        status: 'Complete',
+        patientId: patientId || undefined,
+        unitId: input.unitId,
+        unitName: input.unitName,
+        arrivedAt: input.arrivedAt,
+        handoffStartedAt: input.handoffStartedAt,
+        handoffCompletedAt: timestamp,
+      },
+      organizationId,
+    );
 
     const log = this.workflowLogService.record({
       type: patientId && patient ? 'ems_converted_to_patient' : 'journey_state_changed',

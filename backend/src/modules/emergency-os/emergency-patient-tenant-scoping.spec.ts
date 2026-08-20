@@ -7,6 +7,7 @@ import {
   PatientJourneyService,
   EmergencyAnalyticsService,
   ReferralService,
+  EMSIntakeService,
 } from './emergency-os.services';
 
 function makeService() {
@@ -544,5 +545,97 @@ describe('ReferralService — organization tenant scoping (HEAL-347.5 follow-up,
     ).toThrow(/not found/i);
     const result = referrals.updateReferralStatus(referralId, 'Accepted', 'org-a');
     expect((result.data.referral as { status: string }).status).toBe('Accepted');
+  });
+});
+
+describe('EMSIntakeService — organization tenant scoping (HEAL-347.69)', () => {
+  // updateArrivalStatus/completeHandoff/getEMSIntake previously took no
+  // organizationId at all, unlike every sibling service in this file --
+  // any authenticated caller could read another hospital's EMS intake feed,
+  // or PATCH/complete another hospital's ambulance arrival by id/patientId.
+  function makeEmsIntakeService() {
+    // completeHandoff reads .id off record()'s return value (a real
+    // WorkflowActionLog in production) -- give the mock the same shape.
+    const workflowLogService = {
+      record: jest.fn((entry) => ({ id: 'log-1', ...entry })),
+    } as unknown as { record: jest.Mock };
+    const patientService = new EmergencyPatientService(workflowLogService as any);
+    const emsIntake = new EMSIntakeService(patientService, workflowLogService as any);
+    return { patientService, workflowLogService, emsIntake };
+  }
+
+  function makeEmsPatient(patientService: EmergencyPatientService, organizationId: string) {
+    return patientService.createPatient(
+      { firstName: 'EMS', lastName: 'Arrival', flags: ['EMSArrival'] } as any,
+      organizationId,
+    );
+  }
+
+  it("getEMSIntake(organizationId) scopes inbound EMS arrivals to the caller's org", () => {
+    const { patientService, emsIntake } = makeEmsIntakeService();
+    const patientA = makeEmsPatient(patientService, 'org-a');
+    const patientB = makeEmsPatient(patientService, 'org-b');
+
+    const scoped = emsIntake.getEMSIntake('org-a').data as {
+      arrivals: Array<{ patient: { id: string } }>;
+    };
+    expect(scoped.arrivals.some((row) => row.patient.id === patientA.id)).toBe(true);
+    expect(scoped.arrivals.some((row) => row.patient.id === patientB.id)).toBe(false);
+
+    const unscoped = emsIntake.getEMSIntake().data as {
+      arrivals: Array<{ patient: { id: string } }>;
+    };
+    expect(unscoped.arrivals.some((row) => row.patient.id === patientA.id)).toBe(true);
+    expect(unscoped.arrivals.some((row) => row.patient.id === patientB.id)).toBe(true);
+  });
+
+  it('updateArrivalStatus rejects a cross-org patientId, and succeeds for the owning org', () => {
+    const { patientService, emsIntake } = makeEmsIntakeService();
+    const patient = makeEmsPatient(patientService, 'org-a');
+    const arrivalId = `ems-arrival-${patient.id}`;
+
+    expect(() =>
+      emsIntake.updateArrivalStatus(
+        arrivalId,
+        { patientId: patient.id, status: 'Arrived' },
+        'org-b',
+      ),
+    ).toThrow(/not found/i);
+
+    const result = emsIntake.updateArrivalStatus(
+      arrivalId,
+      { patientId: patient.id, status: 'Arrived' },
+      'org-a',
+    ).data as { ok: boolean; status?: string };
+    expect(result.ok).toBe(true);
+    expect(result.status).toBe('Arrived');
+  });
+
+  it('completeHandoff rejects a cross-org patientId outright (no note, no arrival mutation) and succeeds for the owning org', () => {
+    const { patientService, workflowLogService, emsIntake } = makeEmsIntakeService();
+    const patient = makeEmsPatient(patientService, 'org-a');
+    const arrivalId = `ems-arrival-${patient.id}`;
+    workflowLogService.record.mockClear();
+
+    // The note-recording step is itself org-scoped (patientId resolves to no
+    // patient), but completeHandoff still forwards the raw patientId into its
+    // internal updateArrivalStatus() call -- which independently re-validates
+    // and rejects the whole handoff for a cross-org patientId, same as a
+    // direct updateArrivalStatus call would.
+    expect(() =>
+      emsIntake.completeHandoff({ arrivalId, patientId: patient.id, unitName: 'Medic 7' }, 'org-b'),
+    ).toThrow(/not found/i);
+    expect(
+      workflowLogService.record.mock.calls.some((call) => call[0]?.type === 'patient_note_added'),
+    ).toBe(false);
+
+    const ownOrgResult = emsIntake.completeHandoff(
+      { arrivalId, patientId: patient.id, unitName: 'Medic 7' },
+      'org-a',
+    ).data as { ok: boolean };
+    expect(ownOrgResult.ok).toBe(true);
+    expect(
+      workflowLogService.record.mock.calls.some((call) => call[0]?.type === 'patient_note_added'),
+    ).toBe(true);
   });
 });
