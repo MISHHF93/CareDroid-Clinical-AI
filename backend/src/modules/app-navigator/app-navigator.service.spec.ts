@@ -123,11 +123,23 @@ describe('AppNavigatorService', () => {
     });
 
     it('does not filter results whose requiredPermissions tag has no known mapping (e.g. patient:read)', async () => {
+      // This query used to match only /emergency/capacity (requiredPermissions:
+      // ["patient:read"], an unmapped tag -- the actual thing under test) and
+      // relied on that being the query's only hit to assert blanket equality
+      // between the role-filtered and unfiltered result sets. Since HEAL-347.46-48
+      // wired /devices into the route registry with a real requiredPermissions:
+      // ["settings:read"] tag (the same one /emergency/settings uses, which the
+      // sibling test above already proves gets correctly filtered for NURSE),
+      // this query now also matches /devices -- and NURSE correctly no longer
+      // sees it, since device fleet management is IT-admin territory
+      // (catalog.json's own workflowOwner: "IT administrator"). Assert both
+      // behaviors explicitly instead of blanket-comparing the two result sets.
       const withRole = await service.query('where do I manage ambulances?', UserRole.NURSE);
       const withoutRole = await service.query('where do I manage ambulances?');
-      expect(withRole.destinations.map((hit) => hit.path)).toEqual(
-        withoutRole.destinations.map((hit) => hit.path),
-      );
+      expect(withRole.destinations.some((hit) => hit.path === '/emergency/capacity')).toBe(true);
+      expect(withoutRole.destinations.some((hit) => hit.path === '/emergency/capacity')).toBe(true);
+      expect(withRole.destinations.some((hit) => hit.path === '/devices')).toBe(false);
+      expect(withoutRole.destinations.some((hit) => hit.path === '/devices')).toBe(true);
       expect(withRole.destinations.length).toBeGreaterThan(0);
     });
 
