@@ -51,14 +51,19 @@ export class WorkflowOrchestrationService {
     @Optional() private readonly operationalIntelligenceService?: OperationalIntelligenceService,
   ) {}
 
+  // HEAL-347.70: same gap as EmergencyOperatingSurfacesService.baseContext --
+  // organizationId was already threaded in and used for listPatients(), but
+  // referrals/alerts/emsArrivals ignored it and called their org-scoped-
+  // capable siblings with zero args.
   private operationalContext(organizationId?: string) {
     const patients = this.patientService.listPatients(organizationId) as unknown as Patient[];
     const referrals =
-      (this.referralService.getReferrals().data.referrals as unknown as Referral[]) || [];
+      (this.referralService.getReferrals(organizationId).data.referrals as unknown as Referral[]) ||
+      [];
     const staff = this.patientService.listStaff() as unknown as Staff[];
     const capacity = this.patientService.computeCapacity();
-    const alerts = this.patientService.listAlerts() as unknown as Alert[];
-    const emsPayload = this.emsIntakeService.getEMSIntake().data as unknown as {
+    const alerts = this.patientService.listAlerts(organizationId) as unknown as Alert[];
+    const emsPayload = this.emsIntakeService.getEMSIntake(organizationId).data as unknown as {
       emsArrivals?: EMSArrival[];
     };
     const emsArrivals = (emsPayload.emsArrivals || []) as EMSArrival[];

@@ -59,17 +59,29 @@ export class EmergencyOperatingSurfacesService {
     private readonly workflowOrchestrationService: WorkflowOrchestrationService,
   ) {}
 
+  // HEAL-347.70: organizationId was already threaded in from getSurface()'s
+  // caller and used for listPatients() -- but every other read here ignored
+  // it and called its org-scoped-capable sibling with zero args, leaking
+  // every other hospital's alerts/EMS/queues/analytics/referrals into all
+  // 10 named operating surfaces below. workflowLogs is the one exception,
+  // left deliberately unscoped: WorkflowActionLog.tenantId is only ever set
+  // from `metadata.tenantId`, which no real call site in this codebase ever
+  // populates (grep-confirmed) -- every real log is stamped the literal
+  // string 'default-tenant', the same phantom-field shape as HEAL-347.34.
+  // Scoping listLogs() properly needs its own pass (stamp real org ids at
+  // every record() call site, or scope via patientId like ReferralService
+  // does), not a one-line argument thread.
   private baseContext(organizationId?: string) {
     const patients = this.patientService.listPatients(organizationId);
-    const alerts = this.patientService.listAlerts() as unknown as EmergencyAlert[];
+    const alerts = this.patientService.listAlerts(organizationId) as unknown as EmergencyAlert[];
     const capacity = this.patientService.computeCapacity();
-    const emsPayload = this.emsIntakeService.getEMSIntake().data as {
+    const emsPayload = this.emsIntakeService.getEMSIntake(organizationId).data as {
       emsArrivals?: EmsArrivalLike[];
     };
     const emsArrivals = emsPayload.emsArrivals || [];
-    const queues = this.queueService.getQueues().data as { queues?: unknown[] };
-    const analytics = this.analyticsService.getAnalytics().data;
-    const referrals = this.referralService.getReferrals().data.referrals || [];
+    const queues = this.queueService.getQueues(organizationId).data as { queues?: unknown[] };
+    const analytics = this.analyticsService.getAnalytics(organizationId).data;
+    const referrals = this.referralService.getReferrals(organizationId).data.referrals || [];
     const workflowLogs = this.workflowLogService.listLogs() as unknown as WorkflowActionLog[];
     return {
       patients,
