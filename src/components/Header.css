@@ -236,9 +236,19 @@
 /* Redesigned for a calmer, more legible header chip: the previous 24px
  * min-height/2px 7px padding left the value and label crammed onto a
  * single cramped line with no room for a badge (e.g. "CRIT") to sit
- * cleanly next to a longer value like "3h 38m". Matches the spacing/
- * radius language used everywhere else in the header (search box,
- * palette trigger) rather than a bespoke, tighter one-off. */
+ * cleanly next to a longer value like "3h 38m".
+ *
+ * Radius: this used to claim to match "the spacing/radius language used
+ * everywhere else in the header (search box, palette trigger)" at 8px, but
+ * that premise no longer holds -- the header's own status-style chips
+ * (account-menu trigger, notifications trigger, the "CRIT"/count badges)
+ * are all fully-rounded pills (border-radius: 999px, UserAccountMenu.css /
+ * OperationsCenterMenu.css), not 8px. Confirmed live + reported directly:
+ * these metric chips sitting at 8px next to pill-shaped siblings in the
+ * same header row read as visually inconsistent ("the shaping of every
+ * parameter pill... not put together"). These chips are themselves status
+ * indicators, same family as the badges, so match that pill language
+ * instead of the input-field radius. */
 .caredroid-header__central-status .operational-strip__metric {
   align-items: flex-start;
   display: inline-flex;
@@ -249,8 +259,8 @@
   max-width: 152px;
   min-height: 36px;
   min-width: 0;
-  border-radius: 8px;
-  padding: 4px 10px;
+  border-radius: 999px;
+  padding: 4px 12px;
 }
 
 .caredroid-header__central-status .operational-strip__metric strong {
