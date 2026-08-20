@@ -841,7 +841,11 @@ function AppShellFrame({ children }: AppShellProps) {
       timeouts.forEach((id) => window.clearTimeout(id));
       window.clearTimeout(timeoutId);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally mount-only (see HEAL-347.2/347.9/347.10 above); location is read once to decide the initial skip-list, not tracked reactively.
+    // Intentionally mount-only (see HEAL-347.2/347.9/347.10 above); location is read once to
+    // decide the initial skip-list, not tracked reactively. (This used to carry a suppression
+    // comment for the React hooks deps-array lint rule, but that plugin was never actually
+    // installed in this repo, so ESLint 9's flat config treated the comment itself as an error:
+    // a disable directive for a rule it can't find. Dropped -- there's nothing to suppress.)
   }, []);
 
   useEffect(() => {
