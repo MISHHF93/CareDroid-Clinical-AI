@@ -1,45 +1,61 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Navigate, useSearchParams } from 'react-router-dom';
 import PublicWaitingDisplay from '../../components/whiteboard/PublicWaitingDisplay';
 import { buildPublicWaitingDisplaySnapshot } from '../../components/whiteboard/publicWaitingDisplayModel';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { CARE_DROID_SCREEN_MODES } from '../../config/careDroidScreenModes';
 import { useEmergencyStore } from '../../store/emergencyStore';
+import { fetchPublicWaitingSnapshot } from '../../services/emergencyOsApi';
 import useDisplayAutoRefresh, { useStableDisplaySnapshot } from '../../hooks/useDisplayAutoRefresh';
+import type { CapacitySnapshot, Patient } from '../../types/emergency';
 
 /**
  * Overhead / waiting-room display route — public-safe by default.
  * ?view=operational redirects to staff read-only whiteboard (AppShell), not a duplicate dashboard.
+ *
+ * HEAL-347.67: this used to read `patients`/`capacity`/`referrals`/`emsArrivals`
+ * straight off the shared emergencyStore, which only ever gets populated by
+ * READ_PHI-gated calls (initializeFromBackend -> GET /emergency/whiteboard).
+ * public_display's role deliberately does NOT hold READ_PHI (see
+ * role-permissions.config.ts), so a genuinely fresh public_display session --
+ * the real deployment model for this route: an unauthenticated wall-mounted
+ * screen, per DisplayShell.tsx's own "no sidebar, no copilot, PHI-safe layouts
+ * only" comment -- could never populate that store and this display simply
+ * never showed real data. Fetches its own local snapshot from the new
+ * aggregate-only GET /emergency/public-waiting-snapshot endpoint instead
+ * (Permission.VIEW_PUBLIC_DISPLAY), which strips every patient down to a
+ * server-side allowlist of non-identifying fields before it ever leaves the
+ * backend -- see emergency-os.services.ts's getPublicWaitingSnapshot.
  */
 export default function WhiteboardDisplayRoute() {
   const [searchParams] = useSearchParams();
   const view = searchParams.get('view') || 'waiting-room';
 
-  const patients = useEmergencyStore((state) => state.patients);
-  const capacity = useEmergencyStore((state) => state.capacity);
-  const referrals = useEmergencyStore((state) => state.referrals);
-  const emsArrivals = useEmergencyStore((state) => state.emsArrivals);
+  const [patients, setPatients] = useState<Patient[]>([]);
+  const [capacity, setCapacity] = useState<CapacitySnapshot | undefined>(undefined);
   const emergencySettings = useEmergencyStore((state) => state.emergencySettings);
-  const initializeFromBackend = useEmergencyStore((state) => state.initializeFromBackend);
 
   const publicWaitingSnapshot = useMemo(
     () =>
       buildPublicWaitingDisplaySnapshot({
         patients,
         capacity,
-        referrals,
-        emsArrivals,
         showEmsCrowdingImpact: false,
         offloadTargetMinutes:
           Number(emergencySettings?.thresholds?.emsOffloadTargetMinutes ?? 15) || 15,
         updatedAt: capacity?.updatedAt || new Date().toISOString(),
       }),
-    [capacity, emsArrivals, emergencySettings?.thresholds?.emsOffloadTargetMinutes, patients, referrals],
+    [capacity, emergencySettings?.thresholds?.emsOffloadTargetMinutes, patients],
   );
 
   const stableSnapshot = useStableDisplaySnapshot(publicWaitingSnapshot);
 
-  const onRefresh = useCallback(async () => initializeFromBackend(), [initializeFromBackend]);
+  const onRefresh = useCallback(async () => {
+    const result = await fetchPublicWaitingSnapshot();
+    const data = (result as { data?: { patients?: Patient[]; capacity?: CapacitySnapshot } })?.data;
+    setPatients(Array.isArray(data?.patients) ? (data!.patients as Patient[]) : []);
+    setCapacity(data?.capacity);
+  }, []);
 
   const refreshStatus = useDisplayAutoRefresh({
     enabled: view !== 'operational',

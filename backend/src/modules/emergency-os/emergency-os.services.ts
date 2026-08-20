@@ -1648,6 +1648,55 @@ export class EmergencyWhiteboardService {
       capacity: this.patientService.computeCapacity(),
     });
   }
+
+  /**
+   * Aggregate-only, no-identifier feed for the public waiting-room kiosk
+   * (Permission.VIEW_PUBLIC_DISPLAY, not READ_PHI -- see role-permissions.config.ts).
+   * The frontend's buildPublicWaitingDisplaySnapshot (publicWaitingDisplayModel.ts)
+   * already does all the real aggregation (wait-range math, crowd level, care-stage
+   * counts) and is well-tested; duplicating that logic here would just create a
+   * second place for the two to drift. Instead this strips each patient down to an
+   * explicit allowlist of the exact fields that function (and everything it calls)
+   * actually reads, confirmed by tracing the full call chain -- never the identifier
+   * fields (mrn/firstName/lastName/dob/chiefComplaint/notes/vitals/etc).
+   *
+   * Deliberately scoped to patients + capacity only for this first pass.
+   * referrals/emsArrivals are optional inputs to buildPublicWaitingDisplaySnapshot
+   * with safe empty-array fallbacks, so omitting them here doesn't break anything --
+   * it only leaves the secondary EMS-crowding sub-panel in its default "no impact"
+   * state. Wiring those in needs the same careful field-by-field trace this did
+   * (both carry chiefComplaint/notes/vitals-shaped fields of their own) and is left
+   * as a follow-up rather than rushed under the same pass.
+   *
+   * Also deliberately omits the nested `arrival`/`referral`/`triageAssist` records --
+   * PatientArrivalRecord carries its own chiefComplaint field, and the flat
+   * top-level fields kept here are the documented fallback path when `arrival` is
+   * absent (see PatientArrivalRecord's own "preferred source" comment), so omitting
+   * the nested block doesn't break classification, it just uses the older
+   * flat-field path instead.
+   */
+  getPublicWaitingSnapshot(organizationId?: string) {
+    const patients = this.patientService.listPatients(organizationId);
+    const capacity = this.patientService.computeCapacity();
+    return envelope('Public Waiting Display', {
+      patients: patients.map((patient) => ({
+        id: patient.id,
+        state: patient.state,
+        arrivalTime: patient.arrivalTime,
+        triageTime: patient.triageTime,
+        registrationStatus: patient.registrationStatus,
+        firstContactAt: patient.firstContactAt,
+        queueDestination: patient.queueDestination,
+        triagePending: patient.triagePending,
+        flags: Array.isArray(patient.flags) ? patient.flags : [],
+        source: (patient as { source?: string }).source,
+        arrivalMode: patient.arrivalMode,
+        priority: patient.priority,
+        hasHighRiskComplaintFlag: Boolean(patient.highRiskComplaintFlags?.length),
+      })),
+      capacity,
+    });
+  }
 }
 
 @Injectable()

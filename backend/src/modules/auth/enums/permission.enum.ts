@@ -79,6 +79,8 @@ export enum Permission {
   VIEW_OPERATIONS = 'VIEW_OPERATIONS',
   VIEW_OBSERVABILITY = 'VIEW_OBSERVABILITY',
   MANAGE_INCIDENTS = 'MANAGE_INCIDENTS',
+  /** Aggregate-only, no-identifier wall/waiting-room display data -- deliberately NOT READ_PHI. */
+  VIEW_PUBLIC_DISPLAY = 'VIEW_PUBLIC_DISPLAY',
 
   // TrackMind Nexus / Racetrack Operations
   VIEW_TRACKMIND = 'VIEW_TRACKMIND',
@@ -437,6 +439,12 @@ export const PermissionMetadata: Record<
     description: 'Create, update, and resolve operations incidents',
     category: 'Operations',
     riskLevel: 'critical',
+  },
+  [Permission.VIEW_PUBLIC_DISPLAY]: {
+    description:
+      'View aggregate-only, no-identifier waiting-room display data (wait times, crowd level, care-stage counts)',
+    category: 'Operations',
+    riskLevel: 'low',
   },
 
   [Permission.VIEW_TRACKMIND]: {

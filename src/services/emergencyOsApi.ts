@@ -17,6 +17,7 @@ export const EMERGENCY_OS_API_ENDPOINTS = Object.freeze({
   operationalIntelligenceAlerts: '/api/emergency/operational-intelligence/alerts',
   operationalIntelligenceEvaluate: '/api/emergency/operational-intelligence/evaluate',
   whiteboard: '/api/emergency/whiteboard',
+  publicWaitingSnapshot: '/api/emergency/public-waiting-snapshot',
   patients: '/api/emergency/patients',
   patientDocumentArtifacts: '/api/emergency/patients',
   journey: '/api/emergency/journey',
@@ -182,6 +183,11 @@ async function requestEmergencyJson(path, options: any = {}) {
 
 export const fetchEmergencyWhiteboard = () =>
   requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.whiteboard);
+/** Aggregate-only, no-identifier feed for the public waiting-room kiosk
+ * (Permission.VIEW_PUBLIC_DISPLAY, not READ_PHI) -- see
+ * WhiteboardDisplayRoute.tsx and backend emergency-os.controller.ts. */
+export const fetchPublicWaitingSnapshot = () =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.publicWaitingSnapshot);
 export const fetchCareDroidCentralNodeSnapshot = () =>
   requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.centralNodeSnapshot);
 export const fetchOperationalIntelligenceSnapshot = () =>

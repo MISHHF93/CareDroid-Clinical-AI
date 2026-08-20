@@ -148,6 +148,12 @@ export class EmergencyOsController {
     return this.whiteboardService.getWhiteboard(tenantContext?.organizationId);
   }
 
+  @RequirePermission(Permission.VIEW_PUBLIC_DISPLAY)
+  @Get('public-waiting-snapshot')
+  getPublicWaitingSnapshot(@TenantContext() tenantContext?: TenantContextValue) {
+    return this.whiteboardService.getPublicWaitingSnapshot(tenantContext?.organizationId);
+  }
+
   @RequirePermission(Permission.READ_PHI)
   @Get('central-node/snapshot')
   getCentralNodeSnapshot() {

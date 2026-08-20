@@ -168,6 +168,122 @@ describe('EmergencyWhiteboardService — the whiteboard, the single most-viewed 
     expect(unscoped.patients.some((p) => p.firstName === 'Org' && p.lastName === 'A')).toBe(true);
     expect(unscoped.patients.some((p) => p.firstName === 'Org' && p.lastName === 'B')).toBe(true);
   });
+
+  // HEAL-347.67: the public waiting-room kiosk (Permission.VIEW_PUBLIC_DISPLAY,
+  // deliberately not READ_PHI -- see role-permissions.config.ts) previously had
+  // no PHI-safe backend data source at all; its only path to any data was the
+  // frontend's shared store, which requires READ_PHI to populate, so a
+  // genuinely fresh public_display session (the real deployment model -- an
+  // unauthenticated wall-mounted screen, per DisplayShell.tsx's own "no
+  // sidebar, no copilot, PHI-safe layouts only" comment) could never see real
+  // data. getPublicWaitingSnapshot is the fix: every identifier field a real
+  // patient carries (mrn/firstName/lastName/dob/age/sex/chiefComplaint/
+  // complaintCategory/vitals/notes/timeline/assignedStaffId/roomId/
+  // highRiskComplaintFlags' own .label text/arrival.chiefComplaint) must never
+  // appear on its output, on pain of being the exact PHI leak this permission
+  // split exists to prevent.
+  describe('getPublicWaitingSnapshot — public kiosk aggregate feed (HEAL-347.67)', () => {
+    function makeRichPatient(overrides: Record<string, unknown> = {}) {
+      return {
+        firstName: 'Real',
+        lastName: 'Patient',
+        mrn: 'ED-999999',
+        dob: '1980-01-01',
+        age: 45,
+        sex: 'F',
+        chiefComplaint: 'Chest pain radiating to left arm',
+        complaintCategory: 'Cardiac',
+        vitals: [{ hr: 110, sbp: 140, dbp: 90, spo2: 95, temp: 37.1, recordedAt: new Date().toISOString() }],
+        notes: [{ id: 'n1', text: 'Patient reports worsening symptoms', authorId: 'staff-1', timestamp: new Date().toISOString() }],
+        assignedStaffId: 'staff-1',
+        roomId: 'room-3',
+        highRiskComplaintFlags: [
+          { id: 'f1', label: 'Possible ACS from chest pain complaint text', detectedAt: new Date().toISOString(), source: 'complaint-text' },
+        ],
+        arrival: {
+          arrivalMode: 'ambulance',
+          arrivalTimestamp: new Date().toISOString(),
+          chiefComplaint: 'Chest pain radiating to left arm',
+          triageAcuity: { code: 'ESI-2', system: 'ESI', level: 2, status: 'confirmed' },
+          waitingRoomStatus: 'waiting',
+          registrationStatus: 'complete',
+          queueDestination: 'triage',
+          triagePending: true,
+        },
+        ...overrides,
+      } as any;
+    }
+
+    // Every real identifier field, plus every field the trace confirmed is
+    // read-but-structurally-discarded (so it must never leak even though it's
+    // never load-bearing for the aggregation output either).
+    const FORBIDDEN_KEYS = [
+      'firstName', 'lastName', 'name', 'mrn', 'dob', 'age', 'sex',
+      'chiefComplaint', 'complaintCategory', 'vitals', 'notes', 'timeline',
+      'assignedStaffId', 'roomId', 'assignedPhysicianId', 'arrival', 'referral',
+      'triageAssist', 'highRiskComplaintFlags', 'symptoms', 'allergies',
+      'medications', 'phone', 'mobilePhone', 'healthCardNumber', 'healthCard', 'phn',
+    ];
+
+    it('never includes any PHI/identifier field on a real, fully-populated patient', () => {
+      const { patientService, whiteboard } = makeWhiteboard();
+      patientService.createPatient(makeRichPatient(), 'org-a');
+
+      const result = whiteboard.getPublicWaitingSnapshot('org-a').data;
+      expect(result.patients.length).toBeGreaterThan(0);
+      for (const patient of result.patients) {
+        const keys = Object.keys(patient);
+        for (const forbidden of FORBIDDEN_KEYS) {
+          expect(keys).not.toContain(forbidden);
+        }
+        // Serialize the whole record and confirm none of the actual PHI
+        // *values* leaked through under some other key name either.
+        const serialized = JSON.stringify(patient);
+        expect(serialized).not.toContain('Real');
+        expect(serialized).not.toContain('Patient');
+        expect(serialized).not.toContain('ED-999999');
+        expect(serialized).not.toContain('Chest pain');
+        expect(serialized).not.toContain('Possible ACS');
+      }
+    });
+
+    it('still carries the fields the public aggregation actually needs (state, timestamps, flags)', () => {
+      const { patientService, whiteboard } = makeWhiteboard();
+      const created = patientService.createPatient(makeRichPatient(), 'org-a');
+
+      // listPatients('org-a') also includes legacy/unscoped fixture-seeded
+      // demo patients (see the tenant-scoping describe block above) -- find
+      // the one this test actually created rather than assuming it's first.
+      const patient = whiteboard
+        .getPublicWaitingSnapshot('org-a')
+        .data.patients.find((p) => p.id === created.id)!;
+      expect(patient).toBeDefined();
+      expect(patient.state).toBeDefined();
+      expect(patient.arrivalTime).toBeDefined();
+      // createPatient derives/merges flags and highRiskComplaintFlags itself
+      // (e.g. its own complaint-text detection) rather than passing input
+      // overrides through verbatim -- assert the snapshot faithfully reflects
+      // whatever createPatient actually produced, not a specific literal.
+      expect(patient.flags).toEqual(created.flags);
+      expect(patient.hasHighRiskComplaintFlag).toBe(Boolean(created.highRiskComplaintFlags?.length));
+    });
+
+    it("scopes to organization the same way getWhiteboard does (own-org and legacy/unscoped, never a different org's)", () => {
+      const { patientService, whiteboard } = makeWhiteboard();
+      const patientA = patientService.createPatient(makeRichPatient({ lastName: 'A' }), 'org-a');
+      const patientB = patientService.createPatient(makeRichPatient({ lastName: 'B' }), 'org-b');
+
+      const scoped = whiteboard.getPublicWaitingSnapshot('org-a').data;
+      expect(scoped.patients.some((p) => p.id === patientA.id)).toBe(true);
+      expect(scoped.patients.some((p) => p.id === patientB.id)).toBe(false);
+    });
+
+    it('includes capacity for the crowd-level/wait-range math', () => {
+      const { whiteboard } = makeWhiteboard();
+      const result = whiteboard.getPublicWaitingSnapshot('org-a').data;
+      expect(result.capacity).toBeDefined();
+    });
+  });
 });
 
 describe('BoardingService and ReassessmentService — organization tenant scoping (HEAL-347.4 follow-up)', () => {

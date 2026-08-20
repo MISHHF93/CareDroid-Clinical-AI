@@ -27,6 +27,12 @@ export const RolePermissions: Record<UserRole, Permission[]> = {
     Permission.USE_LAB_INTERPRETER,
     Permission.USE_PROTOCOLS,
     Permission.USE_AI_CHAT,
+    // The public_display emergency-role persona (a wall-mounted waiting-room
+    // kiosk) also maps to this backend UserRole (see
+    // EMERGENCY_ROLE_TO_USER_ROLE in jwt-claims.util.ts) -- it's the only
+    // other consumer of STUDENT. Aggregate-only, no-identifier display data;
+    // deliberately not READ_PHI.
+    Permission.VIEW_PUBLIC_DISPLAY,
   ],
 
   /**
