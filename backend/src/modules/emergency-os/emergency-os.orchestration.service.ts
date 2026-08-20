@@ -99,10 +99,14 @@ export class PatientOrchestrationService {
       }
     }
 
-    this.patientService.patchPatient(patientId, {
-      triageAssist: envelope,
-      triageAssistGeneratedAt: envelope.generatedAt,
-    });
+    this.patientService.patchPatient(
+      patientId,
+      {
+        triageAssist: envelope,
+        triageAssistGeneratedAt: envelope.generatedAt,
+      },
+      organizationId,
+    );
 
     return envelope;
   }

@@ -513,25 +513,38 @@ export class EmergencyOsController {
 
   @RequirePermission(Permission.READ_PHI)
   @Get('reception/snapshot')
-  getReceptionSnapshot() {
-    return this.receptionWorkspaceService.getSnapshot();
+  getReceptionSnapshot(@TenantContext() tenantContext?: TenantContextValue) {
+    return this.receptionWorkspaceService.getSnapshot(tenantContext?.organizationId);
   }
 
   @RequirePermission(Permission.WRITE_PHI)
   @Post('reception/escalation')
-  postReceptionEscalation(@Body() body: PostReceptionEscalationDto) {
-    return this.receptionWorkspaceService.raiseEscalation(body || {});
+  postReceptionEscalation(
+    @Body() body: PostReceptionEscalationDto,
+    @TenantContext() tenantContext?: TenantContextValue,
+  ) {
+    return this.receptionWorkspaceService.raiseEscalation(
+      body || {},
+      tenantContext?.organizationId,
+    );
   }
 
   @RequirePermission(Permission.WRITE_PHI)
   @Post('reception/handoff')
-  async postReceptionHandoff(@Body() body: PostReceptionHandoffDto) {
+  async postReceptionHandoff(
+    @Body() body: PostReceptionHandoffDto,
+    @TenantContext() tenantContext?: TenantContextValue,
+  ) {
     let triageAssist = body.triageAssist as Awaited<
       ReturnType<PatientOrchestrationService['buildTriageAssist']>
     > | null;
     if (!triageAssist && body.patientId) {
       try {
-        triageAssist = await this.orchestrationService.buildTriageAssist(body.patientId, body);
+        triageAssist = await this.orchestrationService.buildTriageAssist(
+          body.patientId,
+          body,
+          tenantContext?.organizationId,
+        );
       } catch (error) {
         // D9: keep deliberate fallback, but surface the degradation for ops.
         this.logger.warn(
@@ -542,11 +555,14 @@ export class EmergencyOsController {
         triageAssist = null;
       }
     }
-    return this.receptionWorkspaceService.completeHandoff({
-      ...body,
-      triageAssist: triageAssist || undefined,
-      triageAssistGeneratedAt: triageAssist?.generatedAt,
-    });
+    return this.receptionWorkspaceService.completeHandoff(
+      {
+        ...body,
+        triageAssist: triageAssist || undefined,
+        triageAssistGeneratedAt: triageAssist?.generatedAt,
+      },
+      tenantContext?.organizationId,
+    );
   }
 
   @RequirePermission(Permission.WRITE_PHI)

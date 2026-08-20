@@ -1291,8 +1291,12 @@ export class EmergencyPatientService implements OnModuleInit {
       timestamp?: string;
       flags?: string[];
     } = {},
+    organizationId?: string,
   ): EmergencyPatient {
-    const index = this.patients.findIndex((patient) => patient.id === patientId);
+    const index = this.patients.findIndex(
+      (patient) =>
+        patient.id === patientId && this.isVisibleToOrganization(patient, organizationId),
+    );
     if (index === -1) throw new Error(`Emergency patient ${patientId} not found`);
 
     const patient = this.patients[index];
@@ -1361,8 +1365,12 @@ export class EmergencyPatientService implements OnModuleInit {
   patchPatient(
     patientId: string,
     patch: Partial<Pick<EmergencyPatient, 'triageAssist' | 'triageAssistGeneratedAt' | 'priority'>>,
+    organizationId?: string,
   ): EmergencyPatient {
-    const index = this.patients.findIndex((patient) => patient.id === patientId);
+    const index = this.patients.findIndex(
+      (patient) =>
+        patient.id === patientId && this.isVisibleToOrganization(patient, organizationId),
+    );
     if (index === -1) throw new Error(`Emergency patient ${patientId} not found`);
     this.patients[index] = {
       ...this.patients[index],
@@ -2464,14 +2472,15 @@ export class ReceptionWorkspaceService {
     @Optional() private readonly realtimeService?: EmergencyRealtimeService,
   ) {}
 
-  getSnapshot() {
-    const patients = this.patientService.listPatients();
-    const emsData = this.emsIntakeService.getEMSIntake().data as {
+  getSnapshot(organizationId?: string) {
+    const patients = this.patientService.listPatients(organizationId);
+    const emsData = this.emsIntakeService.getEMSIntake(organizationId).data as {
       emsArrivals?: ReturnType<typeof buildInboundEmsRecord>[];
       availableResusRooms?: number;
     };
     const inboundEms = emsData.emsArrivals || [];
-    const queues = (this.queueService.getQueues().data as { queues?: unknown[] }).queues || [];
+    const queues =
+      (this.queueService.getQueues(organizationId).data as { queues?: unknown[] }).queues || [];
 
     const metrics = {
       recentArrivals: patients.filter((patient) => minutesSince(patient.arrivalTime) <= 30).length,
@@ -2495,26 +2504,34 @@ export class ReceptionWorkspaceService {
     });
   }
 
-  completeHandoff(input: {
-    patientId?: string;
-    source?: string;
-    actorName?: string;
-    encounterId?: string | null;
-    arrivalReason?: string;
-    complaintCategory?: string;
-    verificationSummary?: string;
-    triageAssist?: import('../../../../lib/patient-orchestration').TriageAssistEnvelope;
-    triageAssistGeneratedAt?: string;
-  }) {
+  completeHandoff(
+    input: {
+      patientId?: string;
+      source?: string;
+      actorName?: string;
+      encounterId?: string | null;
+      arrivalReason?: string;
+      complaintCategory?: string;
+      verificationSummary?: string;
+      triageAssist?: import('../../../../lib/patient-orchestration').TriageAssistEnvelope;
+      triageAssistGeneratedAt?: string;
+    },
+    organizationId?: string,
+  ) {
     const patientId = String(input.patientId || '').trim();
     if (!patientId) {
       return envelope('Reception Handoff', { ok: false, error: 'patientId is required' });
     }
 
-    const patient = this.patientService.movePatientToState(patientId, 'Triage', {
-      staffId: 'reception-handoff',
-      note: `Reception handoff to triage queue (${input.source || 'reception'}).`,
-    });
+    const patient = this.patientService.movePatientToState(
+      patientId,
+      'Triage',
+      {
+        staffId: 'reception-handoff',
+        note: `Reception handoff to triage queue (${input.source || 'reception'}).`,
+      },
+      organizationId,
+    );
 
     this.workflowLogService.record({
       type: 'journey_state_changed',
@@ -2532,17 +2549,22 @@ export class ReceptionWorkspaceService {
     });
 
     if (input.triageAssist) {
-      this.patientService.patchPatient(patientId, {
-        triageAssist: input.triageAssist,
-        triageAssistGeneratedAt: input.triageAssistGeneratedAt || input.triageAssist.generatedAt,
-      });
+      this.patientService.patchPatient(
+        patientId,
+        {
+          triageAssist: input.triageAssist,
+          triageAssistGeneratedAt: input.triageAssistGeneratedAt || input.triageAssist.generatedAt,
+        },
+        organizationId,
+      );
     }
 
     return envelope('Reception Handoff', {
       ok: true,
       patientId,
       patient:
-        this.patientService.listPatients().find((entry) => entry.id === patientId) || patient,
+        this.patientService.listPatients(organizationId).find((entry) => entry.id === patientId) ||
+        patient,
       triageAssist: input.triageAssist || patient.triageAssist || null,
       triageAssistGeneratedAt:
         input.triageAssistGeneratedAt ||
@@ -2558,16 +2580,19 @@ export class ReceptionWorkspaceService {
   /**
    * Durable reception escalation for multi-station EDs: alert + workflow log + realtime fan-out.
    */
-  raiseEscalation(input: {
-    reasonId?: string;
-    reasonLabel?: string;
-    patientId?: string;
-    detail?: string;
-    actorName?: string;
-    actorStaffId?: string;
-    severity?: 'Info' | 'Warning' | 'Critical';
-    notifyTargets?: Array<'triage' | 'charge'>;
-  }) {
+  raiseEscalation(
+    input: {
+      reasonId?: string;
+      reasonLabel?: string;
+      patientId?: string;
+      detail?: string;
+      actorName?: string;
+      actorStaffId?: string;
+      severity?: 'Info' | 'Warning' | 'Critical';
+      notifyTargets?: Array<'triage' | 'charge'>;
+    },
+    organizationId?: string,
+  ) {
     const reasonId = String(input.reasonId || 'urgent-triage-attention').trim();
     const reasonLabel = String(input.reasonLabel || reasonId).trim();
     const severity = input.severity || 'Critical';
@@ -2578,7 +2603,12 @@ export class ReceptionWorkspaceService {
       target === 'triage' ? 'triage_nurse' : 'charge_nurse',
     );
     const patientId = input.patientId ? String(input.patientId).trim() : undefined;
-    const patient = patientId ? this.patientService.getPatient(patientId) : undefined;
+    // Org-scoped lookup: a cross-org patientId resolves to no patient, same
+    // as every other cross-org access attempt in this file -- the label
+    // falls back to the raw id rather than exposing another org's name.
+    const patient = patientId
+      ? this.patientService.getPatient(patientId, organizationId)
+      : undefined;
     const patientLabel = patient
       ? `${patient.firstName} ${patient.lastName}`.trim()
       : patientId || 'No patient linked';
@@ -2599,6 +2629,10 @@ export class ReceptionWorkspaceService {
       message,
       patientId,
       source: 'reception-escalation-workflow',
+      // Previously omitted entirely -- every reception escalation alert was
+      // created legacy/unscoped (organizationId: undefined), visible to
+      // every org forever, regardless of which hospital raised it.
+      organizationId,
       metadata: {
         receptionEscalationReason: reasonId,
         receptionEscalationTargets: notifyTargets.join(','),
@@ -2646,9 +2680,13 @@ export class ReceptionWorkspaceService {
       try {
         const flags = patient.flags || [];
         if (!flags.includes('Escalated')) {
-          this.patientService.updatePatient(patientId, {
-            flags: [...flags, 'Escalated'],
-          } as any);
+          this.patientService.updatePatient(
+            patientId,
+            {
+              flags: [...flags, 'Escalated'],
+            } as any,
+            organizationId,
+          );
         }
       } catch (error) {
         // HEAL-255: the alert/workflow-log/realtime broadcast above already

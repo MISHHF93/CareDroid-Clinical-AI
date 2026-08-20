@@ -8,6 +8,7 @@ import {
   EmergencyAnalyticsService,
   ReferralService,
   EMSIntakeService,
+  ReceptionWorkspaceService,
 } from './emergency-os.services';
 
 function makeService() {
@@ -637,5 +638,125 @@ describe('EMSIntakeService — organization tenant scoping (HEAL-347.69)', () =>
     expect(
       workflowLogService.record.mock.calls.some((call) => call[0]?.type === 'patient_note_added'),
     ).toBe(true);
+  });
+});
+
+describe('EmergencyPatientService.movePatientToState / patchPatient — organization tenant scoping (HEAL-347.71)', () => {
+  // Unlike updatePatient/assignStaffToPatient/escalatePatient, these two
+  // mutation methods had NO organizationId parameter at all -- any caller
+  // could move or patch a different hospital's patient by id. Found while
+  // fixing ReceptionWorkspaceService, which calls both internally.
+  it('movePatientToState rejects a cross-org id with the same not-found error shape as a missing id, and succeeds for the owning org', () => {
+    const { service } = makeService();
+    const patient = service.createPatient({ firstName: 'Cross', lastName: 'Org' } as any, 'org-a');
+
+    expect(() => service.movePatientToState(patient.id, 'Triage', {}, 'org-b')).toThrow(
+      /not found/i,
+    );
+    expect(service.movePatientToState(patient.id, 'Triage', {}, 'org-a').state).toBe('Triage');
+  });
+
+  it('patchPatient rejects a cross-org id and succeeds for the owning org', () => {
+    const { service } = makeService();
+    const patient = service.createPatient({ firstName: 'Cross', lastName: 'Org' } as any, 'org-a');
+
+    expect(() => service.patchPatient(patient.id, { priority: 'P1' }, 'org-b')).toThrow(
+      /not found/i,
+    );
+    expect(service.patchPatient(patient.id, { priority: 'P1' }, 'org-a').priority).toBe('P1');
+  });
+});
+
+describe('ReceptionWorkspaceService — organization tenant scoping (HEAL-347.71)', () => {
+  function makeReceptionWorkspace() {
+    const workflowLogService = {
+      record: jest.fn(() => ({ id: 'log-1' })),
+    } as unknown as { record: jest.Mock };
+    const patientService = new EmergencyPatientService(workflowLogService as any);
+    const emsIntakeService = new EMSIntakeService(patientService, workflowLogService as any);
+    const queueService = new QueueIntelligenceService(patientService);
+    const reception = new ReceptionWorkspaceService(
+      patientService,
+      emsIntakeService,
+      queueService,
+      workflowLogService as any,
+    );
+    return { patientService, workflowLogService, reception };
+  }
+
+  it("getSnapshot(organizationId) scopes patient-derived metrics to the caller's org", () => {
+    const { patientService, reception } = makeReceptionWorkspace();
+    // awaitingVerificationPatients is a `.slice(0, 12)` off the full
+    // filtered list -- legacy/unscoped fixture-seeded patients can already
+    // fill that window, so assert on the un-sliced metrics count's
+    // before/after delta instead (same technique used elsewhere in this
+    // file for exactly this reason).
+    const before = (
+      reception.getSnapshot('org-a').data as { metrics: { awaitingVerification: number } }
+    ).metrics.awaitingVerification;
+
+    patientService.createPatient(
+      { firstName: 'Own', lastName: 'Org', state: 'Registration' } as any,
+      'org-a',
+    );
+    patientService.createPatient(
+      { firstName: 'Other', lastName: 'Org', state: 'Registration' } as any,
+      'org-b',
+    );
+
+    const after = (
+      reception.getSnapshot('org-a').data as { metrics: { awaitingVerification: number } }
+    ).metrics.awaitingVerification;
+
+    // Only org-a's own new Registration patient should count -- if scoping
+    // were broken, org-b's patient would inflate this delta to 2.
+    expect(after - before).toBe(1);
+  });
+
+  it('completeHandoff rejects a cross-org patientId with the same not-found shape as a missing id, and succeeds for the owning org', () => {
+    const { patientService, reception } = makeReceptionWorkspace();
+    const patient = patientService.createPatient(
+      { firstName: 'Own', lastName: 'Org', state: 'Registration' } as any,
+      'org-a',
+    );
+
+    expect(() => reception.completeHandoff({ patientId: patient.id }, 'org-b')).toThrow(
+      /not found/i,
+    );
+
+    const result = reception.completeHandoff({ patientId: patient.id }, 'org-a').data as {
+      ok: boolean;
+      patient?: { state?: string };
+    };
+    expect(result.ok).toBe(true);
+    expect(result.patient?.state).toBe('Triage');
+  });
+
+  it("raiseEscalation stamps the alert with the caller's own organizationId and falls back to the raw id (not a different org's patient name) for a cross-org patientId", () => {
+    const { patientService, reception } = makeReceptionWorkspace();
+    const patientA = patientService.createPatient(
+      { firstName: 'Own', lastName: 'Org' } as any,
+      'org-a',
+    );
+    const patientB = patientService.createPatient(
+      { firstName: 'ShouldNotLeak', lastName: 'OrgB' } as any,
+      'org-b',
+    );
+
+    const ownOrgResult = reception.raiseEscalation(
+      { patientId: patientA.id, reasonId: 'urgent-triage-attention' },
+      'org-a',
+    ).data as { alert: { organizationId?: string }; record: { patientLabel?: string } };
+    expect(ownOrgResult.record.patientLabel).toBe('Own Org');
+    expect(ownOrgResult.alert.organizationId).toBe('org-a');
+
+    const crossOrgResult = reception.raiseEscalation(
+      { patientId: patientB.id, reasonId: 'urgent-triage-attention' },
+      'org-a',
+    ).data as { record: { patientLabel?: string } };
+    // Cross-org patientId resolves to no patient -- falls back to the raw
+    // id, never org-b's real patient name.
+    expect(crossOrgResult.record.patientLabel).toBe(patientB.id);
+    expect(crossOrgResult.record.patientLabel).not.toContain('ShouldNotLeak');
   });
 });

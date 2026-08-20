@@ -856,10 +856,15 @@ function executeBackendApprovedTask(
       if (target !== PatientState.Triage && target !== PatientState.Waiting) {
         return { ok: false, detail: 'Unsupported routing target.' };
       }
-      patientService.movePatientToState(patientId, target as never, {
-        staffId: actorStaffId,
-        note: `Approved administrative automation: ${task.title}`,
-      });
+      patientService.movePatientToState(
+        patientId,
+        target as never,
+        {
+          staffId: actorStaffId,
+          note: `Approved administrative automation: ${task.title}`,
+        },
+        organizationId,
+      );
       return {
         ok: true,
         detail:
