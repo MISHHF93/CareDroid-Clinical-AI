@@ -93,9 +93,14 @@
   overflow: visible !important;
 }
 
+/* Same bug class as the header/page metric-pill fix (HEAL-347.58): this
+   unconditionally stripped the right edge of the full 1px border that
+   emergency-whiteboard-cleanup.css's --emphasized.--tone-critical.--interactive
+   combination declares for "High risk"-style stat tiles, leaving a
+   3-of-4-sides partial border. Confirmed live via computed style:
+   border-width "1px 0px 1px 1px" on the whiteboard's "High risk" tile. */
 .emergency-whiteboard-page__stat {
   min-width: 0 !important;
-  border-right: 0 !important;
 }
 
 .emergency-whiteboard-page__mission {
