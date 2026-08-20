@@ -58,7 +58,7 @@ export const EMERGENCY_ROLE_TO_USER_ROLE: Record<EmergencyRoleClaimId, UserRole>
   ems_user: UserRole.NURSE,
   dispatcher: UserRole.NURSE,
   ems_coordinator: UserRole.NURSE,
-  read_only_viewer: UserRole.STUDENT,
+  read_only_viewer: UserRole.READ_ONLY_VIEWER,
   public_display: UserRole.STUDENT,
 };
 

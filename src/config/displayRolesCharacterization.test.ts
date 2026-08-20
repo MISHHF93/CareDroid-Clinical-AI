@@ -48,11 +48,20 @@ describe('Read-only viewer characterization', () => {
     }
   });
 
-  it('Nest map is student container without PHI write', () => {
+  it('Nest map is the dedicated read-only-viewer container with PHI read, never write', () => {
+    // Was mapped to NEST_USER_ROLE.student (backend RolePermissions[STUDENT]
+    // grants zero PHI access at all), which meant this role's whole reason
+    // to exist -- viewing the whiteboard/patient census as a hallway monitor
+    // or auditor, per UserRole.READ_ONLY_VIEWER's own backend doc comment --
+    // 403'd on every real request. Confirmed live: a dev session synced to
+    // this persona got 403 on whiteboard/boarding/queues/reassessment/
+    // referrals/reception-snapshot, all of it silently swallowed by the
+    // realtime stream's own error handling. Backend has a dedicated
+    // UserRole.READ_ONLY_VIEWER with exactly [READ_PHI] -- use that.
     const m = resolveNestMappingForEmergencyRole(role);
-    expect(m.nestUserRole).toBe('student');
+    expect(m.nestUserRole).toBe('read_only_viewer');
+    expect(m.nestPermissions).toContain(NEST_PERMISSION.READ_PHI);
     expect(m.nestPermissions).not.toContain(NEST_PERMISSION.WRITE_PHI);
-    expect(m.nestPermissions).not.toContain(NEST_PERMISSION.READ_PHI);
   });
 });
 

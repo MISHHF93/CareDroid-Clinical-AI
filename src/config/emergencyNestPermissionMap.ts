@@ -17,6 +17,7 @@ export const NEST_USER_ROLE = Object.freeze({
   nurse: 'nurse',
   student: 'student',
   admin: 'admin',
+  readOnlyViewer: 'read_only_viewer',
 } as const);
 
 export type NestUserRole = (typeof NEST_USER_ROLE)[keyof typeof NEST_USER_ROLE];
@@ -214,11 +215,21 @@ export const EMERGENCY_TO_NEST_ROLE_MAP: Record<EmergencyRoleId, EmergencyNestRo
     intent: 'EMS coordinator — bay, handoff, analytics',
   }),
   [EMERGENCY_ROLE_ID.readOnlyViewer]: Object.freeze({
-    nestUserRole: NEST_USER_ROLE.student,
-    nestPermissions: Object.freeze([
-      NEST_PERMISSION.VIEW_ANALYTICS,
-      // No PHI write; read may be limited to non-PHI aggregates in enforcement layer
-    ] as NestPermission[]),
+    // Was NEST_USER_ROLE.student -- backend UserRole.STUDENT has zero PHI
+    // grants (RolePermissions[STUDENT] is calculator/tool access only), so
+    // every whiteboard/patient-census read this role exists to make (see
+    // this role's own backend doc comment: "Can view PHI... for hallway
+    // monitors, observers, or auditors") 403'd. Confirmed live: fresh dev
+    // session synced to this persona got 403 on every one of
+    // whiteboard/boarding/queues/reassessment/referrals/reception-snapshot.
+    // Backend has a dedicated UserRole.READ_ONLY_VIEWER with exactly
+    // [READ_PHI] -- use that instead.
+    nestUserRole: NEST_USER_ROLE.readOnlyViewer,
+    // Backend RolePermissions[UserRole.READ_ONLY_VIEWER] grants exactly
+    // [READ_PHI] -- listing anything else here would claim access the real
+    // token doesn't have, the same FE/BE mismatch this whole map exists to
+    // prevent.
+    nestPermissions: Object.freeze([NEST_PERMISSION.READ_PHI] as NestPermission[]),
     intent: 'Read-only operational display — no PHI mutation',
   }),
   [EMERGENCY_ROLE_ID.publicDisplay]: Object.freeze({
