@@ -23,10 +23,7 @@ describe('AuthorizationGuard wrong-role systematic check -- EmsController', () =
   });
 
   it('a minimal-privilege user (READ_PHI only) is rejected by every route requiring more than READ_PHI', async () => {
-    const results = await assertOnlySoleGrantedPermissionPasses(
-      EmsController,
-      Permission.READ_PHI,
-    );
+    const results = await assertOnlySoleGrantedPermissionPasses(EmsController, Permission.READ_PHI);
     const failures = results.filter((r) => !r.ok);
     expect(failures).toEqual([]);
   });

@@ -218,7 +218,11 @@ export class AIController {
   @WorkspaceScoped({ permissions: [Permission.USE_AI_CHAT] })
   @ApiOperation({ summary: 'Approve an AI action proposal' })
   async approveProposal(@Req() req: any, @Param('proposalId') proposalId: string) {
-    return this.actionProposals.approve(proposalId, req.user?.id, req.tenantContext?.organizationId);
+    return this.actionProposals.approve(
+      proposalId,
+      req.user?.id,
+      req.tenantContext?.organizationId,
+    );
   }
 
   @Post('proposals/:proposalId/reject')

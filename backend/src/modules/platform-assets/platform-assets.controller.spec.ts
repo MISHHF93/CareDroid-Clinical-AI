@@ -68,7 +68,9 @@ describe('PlatformAssetsController entitlement visibility', () => {
 
 describe('PlatformAssetsController.setRoleProfile authorization', () => {
   function buildController() {
-    const platformAssetsService = { updateUserRoleProfile: jest.fn().mockResolvedValue({ roleProfileId: 'emergency-physician' }) };
+    const platformAssetsService = {
+      updateUserRoleProfile: jest.fn().mockResolvedValue({ roleProfileId: 'emergency-physician' }),
+    };
     const controller = new PlatformAssetsController(
       {} as any,
       platformAssetsService as any,

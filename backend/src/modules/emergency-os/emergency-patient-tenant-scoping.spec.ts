@@ -56,7 +56,7 @@ describe('EmergencyPatientService — organization tenant scoping (Emergency-OS 
     expect(unscoped.some((p) => p.firstName === 'Org' && p.lastName === 'B')).toBe(true);
   });
 
-  it('getPatient hides a different org\'s patient and returns undefined, same as a genuinely missing id', () => {
+  it("getPatient hides a different org's patient and returns undefined, same as a genuinely missing id", () => {
     const { service } = makeService();
     const patient = service.createPatient({ firstName: 'Cross', lastName: 'Org' } as any, 'org-a');
 
@@ -72,9 +72,9 @@ describe('EmergencyPatientService — organization tenant scoping (Emergency-OS 
     expect(() => service.updatePatient(patient.id, { priority: 'P1' }, 'org-b')).toThrow(
       /not found/i,
     );
-    expect(() => service.updatePatient('genuinely-missing-id', { priority: 'P1' }, 'org-b')).toThrow(
-      /not found/i,
-    );
+    expect(() =>
+      service.updatePatient('genuinely-missing-id', { priority: 'P1' }, 'org-b'),
+    ).toThrow(/not found/i);
     expect(service.updatePatient(patient.id, { priority: 'P1' }, 'org-a').priority).toBe('P1');
   });
 
@@ -82,28 +82,26 @@ describe('EmergencyPatientService — organization tenant scoping (Emergency-OS 
     const { service } = makeService();
     const patient = service.createPatient({ firstName: 'Cross', lastName: 'Org' } as any, 'org-a');
 
-    expect(() =>
-      service.assignStaffToPatient(patient.id, 'staff-1', 'actor', 'org-b'),
-    ).toThrow(/not found/i);
+    expect(() => service.assignStaffToPatient(patient.id, 'staff-1', 'actor', 'org-b')).toThrow(
+      /not found/i,
+    );
     expect(
       service.assignStaffToPatient(patient.id, 'staff-1', 'actor', 'org-a').assignedStaffId,
     ).toBe('staff-1');
   });
 
-  it('escalatePatient rejects a cross-org id, and the resulting alert inherits the patient\'s own organizationId', () => {
+  it("escalatePatient rejects a cross-org id, and the resulting alert inherits the patient's own organizationId", () => {
     const { service } = makeService();
     const patient = service.createPatient({ firstName: 'Cross', lastName: 'Org' } as any, 'org-a');
 
     expect(() => service.escalatePatient(patient.id, 'actor', 'org-b')).toThrow(/not found/i);
 
     service.escalatePatient(patient.id, 'actor', 'org-a');
-    const alert = service
-      .listAlerts()
-      .find((candidate) => candidate.patientId === patient.id);
+    const alert = service.listAlerts().find((candidate) => candidate.patientId === patient.id);
     expect(alert?.organizationId).toBe('org-a');
   });
 
-  it('createPatient refuses to shadow-create a second row when a client-supplied id collides with a different org\'s patient', () => {
+  it("createPatient refuses to shadow-create a second row when a client-supplied id collides with a different org's patient", () => {
     const { service } = makeService();
     const existing = service.createPatient(
       { id: 'shared-id', firstName: 'Original' } as any,
@@ -141,10 +139,16 @@ describe('EmergencyWhiteboardService — the whiteboard, the single most-viewed 
     return { patientService, whiteboard: new EmergencyWhiteboardService(patientService) };
   }
 
-  it('getWhiteboard(organizationId) scopes patients and alerts to the caller\'s org (own-org or legacy/unscoped)', () => {
+  it("getWhiteboard(organizationId) scopes patients and alerts to the caller's org (own-org or legacy/unscoped)", () => {
     const { patientService, whiteboard } = makeWhiteboard();
-    const patientA = patientService.createPatient({ firstName: 'Own', lastName: 'Org' } as any, 'org-a');
-    const patientB = patientService.createPatient({ firstName: 'Other', lastName: 'Org' } as any, 'org-b');
+    const patientA = patientService.createPatient(
+      { firstName: 'Own', lastName: 'Org' } as any,
+      'org-a',
+    );
+    const patientB = patientService.createPatient(
+      { firstName: 'Other', lastName: 'Org' } as any,
+      'org-b',
+    );
     patientService.escalatePatient(patientA.id, 'actor', 'org-a');
     patientService.escalatePatient(patientB.id, 'actor', 'org-b');
 
@@ -177,7 +181,7 @@ describe('BoardingService and ReassessmentService — organization tenant scopin
     };
   }
 
-  it('BoardingService.getBoarding(organizationId) scopes boarding patients to the caller\'s org', () => {
+  it("BoardingService.getBoarding(organizationId) scopes boarding patients to the caller's org", () => {
     const { patientService, boarding } = makeServices();
     const patientA = patientService.createPatient(
       { firstName: 'Own', lastName: 'Org', flags: ['PendingAdmission'] } as any,
@@ -197,7 +201,7 @@ describe('BoardingService and ReassessmentService — organization tenant scopin
     expect(unscoped.patients.some((p) => p.id === patientB.id)).toBe(true);
   });
 
-  it('ReassessmentService.getReassessmentQueue(organizationId) scopes overdue patients to the caller\'s org', () => {
+  it("ReassessmentService.getReassessmentQueue(organizationId) scopes overdue patients to the caller's org", () => {
     const { patientService, reassessment } = makeServices();
     const patientA = patientService.createPatient(
       { firstName: 'Own', lastName: 'Org', flags: ['ReassessmentDue'] } as any,
@@ -219,7 +223,7 @@ describe('BoardingService and ReassessmentService — organization tenant scopin
 });
 
 describe('QueueIntelligenceService — organization tenant scoping (HEAL-347.4 follow-up)', () => {
-  it('getQueues(organizationId) scopes each queue\'s patients to the caller\'s org', () => {
+  it("getQueues(organizationId) scopes each queue's patients to the caller's org", () => {
     const workflowLogService = { record: jest.fn() } as unknown as { record: jest.Mock };
     const patientService = new EmergencyPatientService(workflowLogService as any);
     const queueService = new QueueIntelligenceService(patientService);
@@ -256,10 +260,16 @@ describe('PatientJourneyService and EmergencyAnalyticsService — organization t
     };
   }
 
-  it('PatientJourneyService.getJourney(organizationId) scopes timeline events to the caller\'s org', () => {
+  it("PatientJourneyService.getJourney(organizationId) scopes timeline events to the caller's org", () => {
     const { patientService, journey } = makeServices();
-    const patientA = patientService.createPatient({ firstName: 'Own', lastName: 'Org' } as any, 'org-a');
-    const patientB = patientService.createPatient({ firstName: 'Other', lastName: 'Org' } as any, 'org-b');
+    const patientA = patientService.createPatient(
+      { firstName: 'Own', lastName: 'Org' } as any,
+      'org-a',
+    );
+    const patientB = patientService.createPatient(
+      { firstName: 'Other', lastName: 'Org' } as any,
+      'org-b',
+    );
 
     const scoped = journey.getJourney('org-a').data;
     expect(scoped.events.some((event) => event.patientId === patientA.id)).toBe(true);
@@ -270,7 +280,7 @@ describe('PatientJourneyService and EmergencyAnalyticsService — organization t
     expect(unscoped.events.some((event) => event.patientId === patientB.id)).toBe(true);
   });
 
-  it('EmergencyAnalyticsService.getAnalytics(organizationId) scopes the active census to the caller\'s org', () => {
+  it("EmergencyAnalyticsService.getAnalytics(organizationId) scopes the active census to the caller's org", () => {
     const { patientService, analytics } = makeServices();
     const before = analytics.getAnalytics().data.activeCensus;
     patientService.createPatient({ firstName: 'Own', lastName: 'Org' } as any, 'org-a');
@@ -316,15 +326,18 @@ describe('ReferralService — organization tenant scoping (HEAL-347.5 follow-up,
 
   it('updateReferralStatus rejects a cross-org id with the same not-found error shape as a missing id (no existence leak)', () => {
     const { referrals } = makeReferralService();
-    const created = referrals.createReferral({ patientId: 'patient-a', reason: 'Own org referral' }, 'org-a');
+    const created = referrals.createReferral(
+      { patientId: 'patient-a', reason: 'Own org referral' },
+      'org-a',
+    );
     const referralId = (created.data.referral as { id: string }).id;
 
     expect(() => referrals.updateReferralStatus(referralId, 'Accepted', 'org-b')).toThrow(
       /not found/i,
     );
-    expect(() => referrals.updateReferralStatus('genuinely-missing-id', 'Accepted', 'org-b')).toThrow(
-      /not found/i,
-    );
+    expect(() =>
+      referrals.updateReferralStatus('genuinely-missing-id', 'Accepted', 'org-b'),
+    ).toThrow(/not found/i);
     const result = referrals.updateReferralStatus(referralId, 'Accepted', 'org-a');
     expect((result.data.referral as { status: string }).status).toBe('Accepted');
   });

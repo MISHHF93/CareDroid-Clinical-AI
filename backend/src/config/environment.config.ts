@@ -474,11 +474,7 @@ export function validateEnvironmentConfig(
   // AuthService.createDevSession's own runtime rule); a lone dev-bypass flag in
   // production is a misconfiguration that would otherwise only surface as a
   // runtime 403 surprise.
-  if (
-    isProduction &&
-    config.auth.enableDevAuthBypass &&
-    !config.auth.allowDemoAuthInProduction
-  ) {
+  if (isProduction && config.auth.enableDevAuthBypass && !config.auth.allowDemoAuthInProduction) {
     errors.push(
       'ENABLE_DEV_AUTH_BYPASS=true in production also requires ALLOW_DEMO_AUTH_IN_PRODUCTION=true (hosted demo) — otherwise remove the bypass flag',
     );

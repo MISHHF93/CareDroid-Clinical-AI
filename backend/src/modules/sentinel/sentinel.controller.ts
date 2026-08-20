@@ -221,7 +221,10 @@ export class SentinelController {
   @ApiOperation({ summary: 'Force adapter poll (mock/fleet/webhook queues)' })
   async forcePoll(@TenantContext() tenantContext?: TenantContextValue) {
     await this.tracking.pollAdapters();
-    return envelope(await this.tracking.listUnits(tenantContext?.organizationId), 'Adapters polled');
+    return envelope(
+      await this.tracking.listUnits(tenantContext?.organizationId),
+      'Adapters polled',
+    );
   }
 
   @Get('inbound')
@@ -291,7 +294,10 @@ export class SentinelController {
     Permission.READ_PHI,
   )
   async listAlarms(@TenantContext() tenantContext?: TenantContextValue) {
-    return envelope(await this.alarms.listOpen(tenantContext?.organizationId), 'Open Sentinel alarms');
+    return envelope(
+      await this.alarms.listOpen(tenantContext?.organizationId),
+      'Open Sentinel alarms',
+    );
   }
 
   @Post('alarms')

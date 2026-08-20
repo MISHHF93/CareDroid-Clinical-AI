@@ -209,7 +209,10 @@ export class TwoFactorService {
     for (let i = 0; i < count; i++) {
       let code = '';
       for (let j = 0; j < 8; j++) {
-        code += TwoFactorService.BACKUP_CODE_ALPHABET[randomInt(TwoFactorService.BACKUP_CODE_ALPHABET.length)];
+        code +=
+          TwoFactorService.BACKUP_CODE_ALPHABET[
+            randomInt(TwoFactorService.BACKUP_CODE_ALPHABET.length)
+          ];
       }
       codes.push(code);
     }

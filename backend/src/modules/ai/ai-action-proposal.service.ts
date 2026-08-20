@@ -10,7 +10,13 @@
  * explicitly in-memory-only.
  */
 
-import { Injectable, BadRequestException, Logger, NotFoundException, Optional } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  Logger,
+  NotFoundException,
+  Optional,
+} from '@nestjs/common';
 import { OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -498,7 +504,11 @@ export class AiActionProposalService implements OnModuleInit {
     return this.clone(next);
   }
 
-  approve(proposalId: string, actorUserId?: string, organizationId?: string): ServerAiActionProposal {
+  approve(
+    proposalId: string,
+    actorUserId?: string,
+    organizationId?: string,
+  ): ServerAiActionProposal {
     return this.transition(proposalId, 'approved', { ownerUserId: actorUserId }, organizationId);
   }
 

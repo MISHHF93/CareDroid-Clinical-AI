@@ -77,7 +77,9 @@ export class PlatformAssetsController {
       hasPermission(req.user?.role, Permission.MANAGE_ROLES) ||
       hasPermission(req.user?.role, Permission.MANAGE_USERS);
     if (!canAssignRole) {
-      throw new ForbiddenException('Role profile assignment is managed by your organization administrator.');
+      throw new ForbiddenException(
+        'Role profile assignment is managed by your organization administrator.',
+      );
     }
     return this.platformAssetsService.updateUserRoleProfile(req.user.id, roleProfileId);
   }

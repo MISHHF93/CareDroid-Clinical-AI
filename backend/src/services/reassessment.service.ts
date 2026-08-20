@@ -120,7 +120,8 @@ export class ReassessmentService {
         // prediction-v3.service.ts HEAL-253) -- a hypertensive-emergency
         // reading previously triggered no reassessment alert at all,
         // however extreme.
-        if (systolic > 200) patient.alerts.push('Hypertensive crisis >200 - reassessment completed');
+        if (systolic > 200)
+          patient.alerts.push('Hypertensive crisis >200 - reassessment completed');
       }
     }
 

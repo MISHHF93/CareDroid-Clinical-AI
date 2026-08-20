@@ -16,9 +16,7 @@ import { MigrationInterface, QueryRunner, TableIndex } from 'typeorm';
  * closes) are deduped first, keeping the most recently updated row per unit,
  * so the unique index can actually be created.
  */
-export class AddSentinelInboundPatientUniqueUnitIndex1772702600000
-  implements MigrationInterface
-{
+export class AddSentinelInboundPatientUniqueUnitIndex1772702600000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
       DELETE FROM sentinel_inbound_patients

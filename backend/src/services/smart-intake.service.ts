@@ -324,7 +324,10 @@ export class SmartIntakeService {
     // as the TypeORM side's cross-org guards (HEAL-343) -- a patient that
     // exists but belongs to a different organization reports identically
     // to one that doesn't exist at all.
-    if (!unknown || (organizationId && unknown.organizationId && unknown.organizationId !== organizationId)) {
+    if (
+      !unknown ||
+      (organizationId && unknown.organizationId && unknown.organizationId !== organizationId)
+    ) {
       throw new Error('Unknown patient record not found for reconciliation');
     }
     unknown.identity_reconciled = true;

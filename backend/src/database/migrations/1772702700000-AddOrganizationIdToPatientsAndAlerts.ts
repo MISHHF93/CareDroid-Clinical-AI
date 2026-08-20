@@ -17,7 +17,12 @@ export class AddOrganizationIdToPatientsAndAlerts1772702700000 implements Migrat
     for (const table of this.tables) {
       await queryRunner.addColumn(
         table,
-        new TableColumn({ name: 'organizationId', type: 'varchar', length: '120', isNullable: true }),
+        new TableColumn({
+          name: 'organizationId',
+          type: 'varchar',
+          length: '120',
+          isNullable: true,
+        }),
       );
       await queryRunner.createIndex(
         table,

@@ -245,7 +245,7 @@ describe('IntegrationHubService', () => {
   });
 
   describe('HEAL-337: tenant isolation', () => {
-    it('ignores a client-supplied organizationId and attributes the event to the caller\'s own tenant', async () => {
+    it("ignores a client-supplied organizationId and attributes the event to the caller's own tenant", async () => {
       const result = await service.ingest(
         {
           family: 'fhir',
@@ -276,7 +276,7 @@ describe('IntegrationHubService', () => {
       await expect(service.getTrace('raw-1', 'org-a')).resolves.toBeTruthy();
     });
 
-    it('scopes listRecent to the caller\'s organization when provided', async () => {
+    it("scopes listRecent to the caller's organization when provided", async () => {
       eventRepository.find.mockResolvedValue([]);
       await service.listRecent(25, 'org-a');
       expect(eventRepository.find).toHaveBeenCalledWith(

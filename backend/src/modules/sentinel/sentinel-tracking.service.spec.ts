@@ -63,13 +63,47 @@ describe('SentinelTrackingService tenant scoping (HEAL-308)', () => {
     const positionRepo = module.get(getRepositoryToken(SentinelPositionEntity));
 
     await unitRepo.save([
-      unitRepo.create({ id: 'unit-org-a', externalId: 'M1', vendorId: 'mock', label: 'Medic 1', organizationId: 'org-a' }),
-      unitRepo.create({ id: 'unit-org-b', externalId: 'M2', vendorId: 'mock', label: 'Medic 2', organizationId: 'org-b' }),
-      unitRepo.create({ id: 'unit-unassigned', externalId: 'M3', vendorId: 'mock', label: 'Medic 3', organizationId: null }),
+      unitRepo.create({
+        id: 'unit-org-a',
+        externalId: 'M1',
+        vendorId: 'mock',
+        label: 'Medic 1',
+        organizationId: 'org-a',
+      }),
+      unitRepo.create({
+        id: 'unit-org-b',
+        externalId: 'M2',
+        vendorId: 'mock',
+        label: 'Medic 2',
+        organizationId: 'org-b',
+      }),
+      unitRepo.create({
+        id: 'unit-unassigned',
+        externalId: 'M3',
+        vendorId: 'mock',
+        label: 'Medic 3',
+        organizationId: null,
+      }),
     ]);
     await positionRepo.save([
-      positionRepo.create({ id: 'pos-a', unitId: 'unit-org-a', latitude: 1, longitude: 1, source: 'mock', receivedAt: '2026-01-01T00:00:00.000Z', eventSeq: 1 }),
-      positionRepo.create({ id: 'pos-b', unitId: 'unit-org-b', latitude: 2, longitude: 2, source: 'mock', receivedAt: '2026-01-01T00:00:00.000Z', eventSeq: 1 }),
+      positionRepo.create({
+        id: 'pos-a',
+        unitId: 'unit-org-a',
+        latitude: 1,
+        longitude: 1,
+        source: 'mock',
+        receivedAt: '2026-01-01T00:00:00.000Z',
+        eventSeq: 1,
+      }),
+      positionRepo.create({
+        id: 'pos-b',
+        unitId: 'unit-org-b',
+        latitude: 2,
+        longitude: 2,
+        source: 'mock',
+        receivedAt: '2026-01-01T00:00:00.000Z',
+        eventSeq: 1,
+      }),
     ]);
   });
 
@@ -77,12 +111,12 @@ describe('SentinelTrackingService tenant scoping (HEAL-308)', () => {
     await module.close();
   });
 
-  it('listUnits() with no organizationId returns every organization\'s units (back-compat / system callers)', async () => {
+  it("listUnits() with no organizationId returns every organization's units (back-compat / system callers)", async () => {
     const units = await service.listUnits();
     expect(units.map((u) => u.id).sort()).toEqual(['unit-org-a', 'unit-org-b', 'unit-unassigned']);
   });
 
-  it('listUnits(organizationId) excludes every other organization\'s units', async () => {
+  it("listUnits(organizationId) excludes every other organization's units", async () => {
     const units = await service.listUnits('org-a');
     expect(units.map((u) => u.id)).toEqual(['unit-org-a']);
 
@@ -90,7 +124,7 @@ describe('SentinelTrackingService tenant scoping (HEAL-308)', () => {
     expect(otherUnits.map((u) => u.id)).toEqual(['unit-org-b']);
   });
 
-  it('listPositions(unitId, organizationId) returns the unit\'s positions when it belongs to that organization', async () => {
+  it("listPositions(unitId, organizationId) returns the unit's positions when it belongs to that organization", async () => {
     const positions = await service.listPositions('unit-org-a', 'org-a');
     expect(positions.map((p) => p.id)).toEqual(['pos-a']);
   });
@@ -162,7 +196,7 @@ describe('SentinelTrackingService cross-organization unit identity (HEAL-347.26)
     await module.close();
   });
 
-  it('creates separate unit rows for two organizations whose CAD systems use the same externalId/vendorId, instead of one org overwriting the other\'s live position', async () => {
+  it("creates separate unit rows for two organizations whose CAD systems use the same externalId/vendorId, instead of one org overwriting the other's live position", async () => {
     await service.ingestCadEvents(
       [
         {

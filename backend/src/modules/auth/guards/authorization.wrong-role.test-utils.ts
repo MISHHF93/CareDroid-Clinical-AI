@@ -1,7 +1,11 @@
 import { Reflector } from '@nestjs/core';
 import { ForbiddenException } from '@nestjs/common';
 import { AuthorizationGuard } from './authorization.guard';
-import { PERMISSIONS_KEY, ANY_PERMISSIONS_KEY, IS_PUBLIC_KEY } from '../decorators/permissions.decorator';
+import {
+  PERMISSIONS_KEY,
+  ANY_PERMISSIONS_KEY,
+  IS_PUBLIC_KEY,
+} from '../decorators/permissions.decorator';
 import { Permission } from '../enums/permission.enum';
 
 /**
@@ -14,7 +18,9 @@ import { Permission } from '../enums/permission.enum';
  */
 
 const auditLog = jest.fn().mockResolvedValue(undefined);
-export const testAuthorizationGuard = new AuthorizationGuard(new Reflector(), { log: auditLog } as any);
+export const testAuthorizationGuard = new AuthorizationGuard(new Reflector(), {
+  log: auditLog,
+} as any);
 
 const reflector = new Reflector();
 
@@ -29,8 +35,14 @@ export function getControllerRouteHandlers(
 
 export function routeMetadata(handler: Function, controllerClass: Function) {
   const isPublic = reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [handler, controllerClass]);
-  const required = reflector.getAllAndOverride<Permission[]>(PERMISSIONS_KEY, [handler, controllerClass]);
-  const anyOf = reflector.getAllAndOverride<Permission[]>(ANY_PERMISSIONS_KEY, [handler, controllerClass]);
+  const required = reflector.getAllAndOverride<Permission[]>(PERMISSIONS_KEY, [
+    handler,
+    controllerClass,
+  ]);
+  const anyOf = reflector.getAllAndOverride<Permission[]>(ANY_PERMISSIONS_KEY, [
+    handler,
+    controllerClass,
+  ]);
   return { isPublic, required: required || [], anyOf: anyOf || [] };
 }
 
@@ -101,7 +113,11 @@ export async function assertOnlySoleGrantedPermissionPasses(
       if (!shouldPass && error instanceof ForbiddenException) {
         results.push({ name, ok: true, detail: 'correctly rejected' });
       } else if (shouldPass) {
-        results.push({ name, ok: false, detail: `expected grant but was rejected: ${(error as Error).message}` });
+        results.push({
+          name,
+          ok: false,
+          detail: `expected grant but was rejected: ${(error as Error).message}`,
+        });
       } else {
         results.push({ name, ok: false, detail: `unexpected error type: ${error}` });
       }

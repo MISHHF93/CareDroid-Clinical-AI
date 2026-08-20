@@ -410,7 +410,9 @@ export class AuthService {
     // the selected persona's id, sync this dev user's role/profile to match
     // before issuing tokens so the JWT's permissions actually reflect the
     // persona the UI claims to be using.
-    const normalizedRoleProfileId = String(roleProfileId || '').trim().toLowerCase();
+    const normalizedRoleProfileId = String(roleProfileId || '')
+      .trim()
+      .toLowerCase();
     const targetUserRole = EMERGENCY_ROLE_TO_USER_ROLE[normalizedRoleProfileId];
     if (targetUserRole) {
       if (user.role !== targetUserRole) {

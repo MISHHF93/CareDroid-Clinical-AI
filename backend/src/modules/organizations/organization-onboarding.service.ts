@@ -122,7 +122,10 @@ export class OrganizationOnboardingService {
     }
 
     if (authorizedDefaultRoleProfileId) {
-      await this.platformAssetsService.updateUserRoleProfile(user.id, authorizedDefaultRoleProfileId);
+      await this.platformAssetsService.updateUserRoleProfile(
+        user.id,
+        authorizedDefaultRoleProfileId,
+      );
     }
 
     const profile = await this.profileRepository.findOne({ where: { userId: user.id } });

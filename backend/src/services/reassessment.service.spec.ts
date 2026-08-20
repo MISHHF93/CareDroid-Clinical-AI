@@ -34,7 +34,7 @@ describe('ReassessmentService.getPatientsNeedingReassessment tenant scoping (HEA
     jest.restoreAllMocks();
   });
 
-  it('scopes the query to the caller\'s own organization (or legacy null) when organizationId is provided', async () => {
+  it("scopes the query to the caller's own organization (or legacy null) when organizationId is provided", async () => {
     const findSpy = jest.spyOn(Patient, 'find').mockResolvedValue([] as any);
 
     await service.getPatientsNeedingReassessment('org-1');
@@ -91,7 +91,9 @@ describe('ReassessmentService.reassessPatient abnormal-vitals alerts (HEAL-254)'
     const result = await service.reassessPatient('patient-1', null, 'note', {}, 'nurse-1');
 
     expect(result.alerts.some((alert: string) => alert.includes('Hypotension'))).toBe(true);
-    expect(result.alerts.some((alert: string) => alert.includes('Hypertensive crisis'))).toBe(false);
+    expect(result.alerts.some((alert: string) => alert.includes('Hypertensive crisis'))).toBe(
+      false,
+    );
   });
 
   it('does not flag a normal BP reading as either extreme', async () => {
@@ -101,6 +103,8 @@ describe('ReassessmentService.reassessPatient abnormal-vitals alerts (HEAL-254)'
     const result = await service.reassessPatient('patient-1', null, 'note', {}, 'nurse-1');
 
     expect(result.alerts.some((alert: string) => alert.includes('Hypotension'))).toBe(false);
-    expect(result.alerts.some((alert: string) => alert.includes('Hypertensive crisis'))).toBe(false);
+    expect(result.alerts.some((alert: string) => alert.includes('Hypertensive crisis'))).toBe(
+      false,
+    );
   });
 });

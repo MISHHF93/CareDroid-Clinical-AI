@@ -12,7 +12,9 @@ import { UsageMeteringInterceptor } from './usage-metering.interceptor';
  * trace and, depending on process policy, a standing crash risk.
  */
 describe('UsageMeteringInterceptor', () => {
-  function buildContext(overrides: Partial<{ path: string; organizationId: string | undefined }> = {}) {
+  function buildContext(
+    overrides: Partial<{ path: string; organizationId: string | undefined }> = {},
+  ) {
     const request = {
       originalUrl: overrides.path ?? '/api/emergency/whiteboard',
       method: 'GET',
@@ -36,7 +38,9 @@ describe('UsageMeteringInterceptor', () => {
       recordFromTenantContext: jest.fn().mockRejectedValue(new Error('connection reset')),
     };
     const interceptor = new UsageMeteringInterceptor(usageMeteringService as any);
-    const loggerWarnSpy = jest.spyOn((interceptor as any).logger, 'warn').mockImplementation(() => undefined);
+    const loggerWarnSpy = jest
+      .spyOn((interceptor as any).logger, 'warn')
+      .mockImplementation(() => undefined);
 
     const context = buildContext();
     const next = { handle: () => of('ok') };
@@ -49,9 +53,7 @@ describe('UsageMeteringInterceptor', () => {
     await new Promise((resolve) => setImmediate(resolve));
 
     expect(usageMeteringService.recordFromTenantContext).toHaveBeenCalled();
-    expect(loggerWarnSpy).toHaveBeenCalledWith(
-      expect.stringContaining('connection reset'),
-    );
+    expect(loggerWarnSpy).toHaveBeenCalledWith(expect.stringContaining('connection reset'));
   });
 
   it('does not call recordFromTenantContext for a skipped path', async () => {

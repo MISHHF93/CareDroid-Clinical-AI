@@ -22,11 +22,14 @@ describe('UserActivityController', () => {
       const { controller, service } = buildController(assertWorkspaceMember);
 
       await expect(
-        controller.record({ user: { id: 'user-1' } }, {
-          category: 'navigation' as any,
-          label: 'viewed page',
-          workspaceId: 'workspace-b',
-        }),
+        controller.record(
+          { user: { id: 'user-1' } },
+          {
+            category: 'navigation' as any,
+            label: 'viewed page',
+            workspaceId: 'workspace-b',
+          },
+        ),
       ).rejects.toBeInstanceOf(ForbiddenException);
       expect(assertWorkspaceMember).toHaveBeenCalledWith('user-1', 'workspace-b');
       expect(service.record).not.toHaveBeenCalled();
@@ -36,7 +39,11 @@ describe('UserActivityController', () => {
       const assertWorkspaceMember = jest.fn(async () => ({ status: 'active' }));
       const { controller, service } = buildController(assertWorkspaceMember);
 
-      const dto = { category: 'navigation' as any, label: 'viewed page', workspaceId: 'workspace-a' };
+      const dto = {
+        category: 'navigation' as any,
+        label: 'viewed page',
+        workspaceId: 'workspace-a',
+      };
       await expect(controller.record({ user: { id: 'user-1' } }, dto)).resolves.toEqual({
         id: 'activity-new',
       });

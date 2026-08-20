@@ -309,7 +309,9 @@ export class AppNavigatorService {
 
   async query(rawQuery: string, role?: UserRole): Promise<NavigatorQueryResult> {
     const query = String(rawQuery || '').trim();
-    const visibleIndex = role ? this.index.filter((document) => isVisibleToRole(document, role)) : this.index;
+    const visibleIndex = role
+      ? this.index.filter((document) => isVisibleToRole(document, role))
+      : this.index;
     const hits = retrieve(visibleIndex, query);
     const deterministic = fallbackAnswer(query, hits);
     let answer = deterministic;

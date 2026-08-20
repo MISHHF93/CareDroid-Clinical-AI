@@ -200,7 +200,10 @@ export class IntegrationHubService {
   // assertProposalOrganization pattern (HEAL-325).
   async getTrace(id: string, organizationId?: string) {
     const rawRecord = await this.eventRepository.findOne({ where: { id } });
-    if (!rawRecord || (organizationId && rawRecord.organizationId && rawRecord.organizationId !== organizationId)) {
+    if (
+      !rawRecord ||
+      (organizationId && rawRecord.organizationId && rawRecord.organizationId !== organizationId)
+    ) {
       throw new NotFoundException(`Integration event ${id} was not found`);
     }
     return this.serializeEventTrace(rawRecord);

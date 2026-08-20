@@ -1,7 +1,11 @@
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
-import { EmergencyPatientService, ReassessmentService, WorkflowActionLogService } from './emergency-os.services';
+import {
+  EmergencyPatientService,
+  ReassessmentService,
+  WorkflowActionLogService,
+} from './emergency-os.services';
 import { Staff } from './entities/staff.entity';
 
 // Regression coverage for roadmap item G1: before this, no staff row anywhere in the
@@ -24,7 +28,9 @@ function buildModule(repository: Record<string, jest.Mock>): Promise<TestingModu
 
 describe('ReassessmentService.listStaff', () => {
   it('returns the real staff directory ordered by name', async () => {
-    const rows = [{ id: 's1', name: 'Priya Nair', role: 'MD', active: true, onDuty: false, email: null }];
+    const rows = [
+      { id: 's1', name: 'Priya Nair', role: 'MD', active: true, onDuty: false, email: null },
+    ];
     const repository = { find: jest.fn().mockResolvedValue(rows) };
     const module = await buildModule(repository);
 
@@ -55,7 +61,10 @@ describe('ReassessmentService.updateStaffDutyStatus', () => {
     const module = await buildModule(repository);
 
     const service = module.get<ReassessmentService>(ReassessmentService);
-    const result = await service.updateStaffDutyStatus('s3', { onDuty: true, email: 'owen.clarke@example.com' });
+    const result = await service.updateStaffDutyStatus('s3', {
+      onDuty: true,
+      email: 'owen.clarke@example.com',
+    });
 
     expect(repository.findOne).toHaveBeenCalledWith({ where: { id: 's3' } });
     expect(repository.save).toHaveBeenCalledWith(

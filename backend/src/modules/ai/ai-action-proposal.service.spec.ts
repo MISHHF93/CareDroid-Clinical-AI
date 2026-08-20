@@ -130,7 +130,7 @@ describe('AiActionProposalService', () => {
       expect(service.get(p.proposalId, 'org-a').state).toBe('completed');
     });
 
-    it('stays accessible with no organizationId filter (backward compatible, matches list()\'s permissive-when-unset semantics)', () => {
+    it("stays accessible with no organizationId filter (backward compatible, matches list()'s permissive-when-unset semantics)", () => {
       const p = createOrgAProposal();
       expect(service.get(p.proposalId).proposalId).toBe(p.proposalId);
       expect(service.approve(p.proposalId, 'user-1').state).toBe('approved');

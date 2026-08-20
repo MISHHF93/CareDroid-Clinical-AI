@@ -613,8 +613,10 @@ describe('SentinelController', () => {
       );
     });
 
-    it('forwards the caller\'s tenant context organizationId so a cross-org alarm id 404s instead of being actioned (HEAL-339)', async () => {
-      await controller.alarmAction('alarm-1', 'ack', req as any, {}, { organizationId: 'org-a' } as any);
+    it("forwards the caller's tenant context organizationId so a cross-org alarm id 404s instead of being actioned (HEAL-339)", async () => {
+      await controller.alarmAction('alarm-1', 'ack', req as any, {}, {
+        organizationId: 'org-a',
+      } as any);
       expect(alarms.transition).toHaveBeenCalledWith(
         'alarm-1',
         'acknowledged',

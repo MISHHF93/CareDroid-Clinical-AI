@@ -317,9 +317,11 @@ describe('PlatformGovernanceService', () => {
   });
 
   describe('HEAL-338: tenant isolation on review items and consent', () => {
-    it('does not let decideReviewItem act on another organization\'s review item', async () => {
+    it("does not let decideReviewItem act on another organization's review item", async () => {
       const { service } = buildService({
-        reviewItems: [{ id: 'item-1', organizationId: 'org-a', capabilityId: 'clinical-governance' }],
+        reviewItems: [
+          { id: 'item-1', organizationId: 'org-a', capabilityId: 'clinical-governance' },
+        ],
       });
 
       await expect(
@@ -332,9 +334,11 @@ describe('PlatformGovernanceService', () => {
       );
     });
 
-    it('does not let getReviewItem read another organization\'s review item', async () => {
+    it("does not let getReviewItem read another organization's review item", async () => {
       const { service } = buildService({
-        reviewItems: [{ id: 'item-1', organizationId: 'org-a', capabilityId: 'clinical-governance' }],
+        reviewItems: [
+          { id: 'item-1', organizationId: 'org-a', capabilityId: 'clinical-governance' },
+        ],
       });
 
       await expect(service.getReviewItem('item-1', 'org-b')).resolves.toBeNull();
@@ -343,7 +347,7 @@ describe('PlatformGovernanceService', () => {
       );
     });
 
-    it('scopes listReviewItems and listPatientReviewItems queries to the caller\'s organization', async () => {
+    it("scopes listReviewItems and listPatientReviewItems queries to the caller's organization", async () => {
       const { service, repositories } = buildService({ reviewItems: [] });
 
       await service.listReviewItems('org-a');
@@ -357,7 +361,7 @@ describe('PlatformGovernanceService', () => {
       );
     });
 
-    it('scopes getConsent and upsertConsent to the caller\'s organization', async () => {
+    it("scopes getConsent and upsertConsent to the caller's organization", async () => {
       const { service, repositories } = buildService({ consentRecords: [] });
 
       await service.upsertConsent('patient-1', 'clinical_ai', { status: 'active' }, 'org-a');
@@ -395,7 +399,7 @@ describe('PlatformGovernanceService', () => {
       );
     });
 
-    it('scopes listPrivacyRequests to the caller\'s organization (own-org OR legacy/null rows)', async () => {
+    it("scopes listPrivacyRequests to the caller's organization (own-org OR legacy/null rows)", async () => {
       const { service, repositories } = buildService({ privacyRequests: [] });
 
       await service.listPrivacyRequests(undefined, 'org-a');
@@ -416,7 +420,7 @@ describe('PlatformGovernanceService', () => {
       );
     });
 
-    it('does not let reviewPrivacyRequest act on another organization\'s privacy request', async () => {
+    it("does not let reviewPrivacyRequest act on another organization's privacy request", async () => {
       const { service } = buildService({
         privacyRequests: [{ id: 'req-1', organizationId: 'org-a', patientId: 'patient-1' }],
       });
@@ -431,7 +435,7 @@ describe('PlatformGovernanceService', () => {
       );
     });
 
-    it('scopes getPrivacyAccessLog and recentObservability to the caller\'s organization', async () => {
+    it("scopes getPrivacyAccessLog and recentObservability to the caller's organization", async () => {
       const { service, repositories } = buildService({ observabilityEvents: [] });
 
       await service.getPrivacyAccessLog('patient-1', 'org-a');

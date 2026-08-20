@@ -246,9 +246,7 @@ describe('SurgeCapacityService (real MongoDB via mongodb-memory-server)', () => 
       const allPatients = await UnifiedPatient.find({ mciBatchId: event.id }).lean();
       expect(allPatients).toHaveLength(7);
 
-      const patientNumbers = allPatients
-        .map((p) => p.mciPatientNumber ?? -1)
-        .sort((a, b) => a - b);
+      const patientNumbers = allPatients.map((p) => p.mciPatientNumber ?? -1).sort((a, b) => a - b);
       const uniqueNumbers = new Set(patientNumbers);
       expect(uniqueNumbers.size).toBe(7);
       expect(patientNumbers).toEqual([1, 2, 3, 4, 5, 6, 7]);

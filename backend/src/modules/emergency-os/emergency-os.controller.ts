@@ -660,10 +660,7 @@ export class EmergencyOsController {
    * ReassessmentService.updateStaffDutyStatus's own doc comment. */
   @RequirePermission(Permission.MANAGE_INCIDENTS)
   @Patch('staff/:staffId/duty-status')
-  patchStaffDutyStatus(
-    @Param('staffId') staffId: string,
-    @Body() body: UpdateStaffDutyStatusDto,
-  ) {
+  patchStaffDutyStatus(@Param('staffId') staffId: string, @Body() body: UpdateStaffDutyStatusDto) {
     return this.reassessmentService.updateStaffDutyStatus(staffId, body);
   }
 

@@ -135,7 +135,10 @@ describe('OcrIntakeService', () => {
         throw new Error('patient update exploded');
       },
     } as unknown as EmergencyPatientService;
-    const service = new OcrIntakeService(buildDocumentArtifactService(['patient-1']), fakePatientService);
+    const service = new OcrIntakeService(
+      buildDocumentArtifactService(['patient-1']),
+      fakePatientService,
+    );
     const job = await service.createJob({
       filename: 'health-card.jpg',
       rawText: 'First name: Jordan\nLast name: Rivera\nDate of birth: 1990-04-12',

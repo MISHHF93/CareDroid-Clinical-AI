@@ -20,7 +20,10 @@ function buildPatientServiceMock(overrides: Partial<Record<string, unknown>> = {
     updatePatient: jest.fn(() => {
       throw new Error('patient evicted from board mid-request');
     }),
-    dispatchOperationalAlert: jest.fn(() => ({ id: 'alert-1', createdAt: new Date().toISOString() })),
+    dispatchOperationalAlert: jest.fn(() => ({
+      id: 'alert-1',
+      createdAt: new Date().toISOString(),
+    })),
     ...overrides,
   };
 }

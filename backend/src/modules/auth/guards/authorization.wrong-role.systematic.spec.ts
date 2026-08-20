@@ -43,7 +43,10 @@ describe('AuthorizationGuard wrong-role systematic check -- EmergencyOsControlle
   });
 
   it('READ_ONLY_VIEWER (READ_PHI only) is rejected by every route requiring more than READ_PHI', async () => {
-    const results = await assertOnlySoleGrantedPermissionPasses(EmergencyOsController, Permission.READ_PHI);
+    const results = await assertOnlySoleGrantedPermissionPasses(
+      EmergencyOsController,
+      Permission.READ_PHI,
+    );
     const failures = results.filter((r) => !r.ok);
     // Jest's toEqual([]) already prints the full diff on mismatch, including
     // every failing route's name + detail -- no separate message argument needed.

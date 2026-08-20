@@ -27,9 +27,7 @@ const NULL_ORG_INDEX_NAME = 'IDX_integration_event_records_source_idempotency_un
  * are deduped first, keeping the most recently updated row, so the unique
  * indexes can actually be created.
  */
-export class AddIntegrationEventIdempotencyUniqueIndex1772703200000
-  implements MigrationInterface
-{
+export class AddIntegrationEventIdempotencyUniqueIndex1772703200000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
       DELETE FROM integration_event_records

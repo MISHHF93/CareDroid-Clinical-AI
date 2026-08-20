@@ -97,12 +97,7 @@ describe('SmartIntakeController', () => {
   // organizationId before this fix -- proves the tenant context now threads
   // through to the service instead of being silently dropped.
   it('match() forwards the resolved tenant organizationId to the service', async () => {
-    await controller.match(
-      's1',
-      { staff: 'a' },
-      undefined,
-      { organizationId: 'org-1' } as never,
-    );
+    await controller.match('s1', { staff: 'a' }, undefined, { organizationId: 'org-1' } as never);
     expect(service.match).toHaveBeenCalledWith('s1', 'a', 'org-1');
   });
 

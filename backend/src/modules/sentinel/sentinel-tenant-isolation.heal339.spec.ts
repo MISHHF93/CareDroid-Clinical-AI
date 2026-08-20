@@ -94,7 +94,7 @@ describe('Sentinel tenant isolation (HEAL-339)', () => {
     expect(acked.status).toBe('acknowledged');
   });
 
-  it('does not let a different organization read an alarm\'s audit trail', async () => {
+  it("does not let a different organization read an alarm's audit trail", async () => {
     const { alarm } = await alarmService.raise({
       source: 'test',
       category: 'ems',
@@ -111,9 +111,7 @@ describe('Sentinel tenant isolation (HEAL-339)', () => {
     await expect(alarmService.listEvents(alarm.id, 'org-b')).rejects.toThrow(
       `Alarm ${alarm.id} not found`,
     );
-    await expect(alarmService.listEvents(alarm.id, 'org-a')).resolves.toEqual(
-      expect.any(Array),
-    );
+    await expect(alarmService.listEvents(alarm.id, 'org-a')).resolves.toEqual(expect.any(Array));
   });
 
   it('does not let a different organization read an inbound pre-arrival patient by id', async () => {
@@ -133,7 +131,7 @@ describe('Sentinel tenant isolation (HEAL-339)', () => {
     );
   });
 
-  it('does not let a different organization review an AI prep recommendation linked to another org\'s inbound patient', async () => {
+  it("does not let a different organization review an AI prep recommendation linked to another org's inbound patient", async () => {
     const inbound = await inboundRepo.save(
       inboundRepo.create({
         id: 'inbound-heal339-ai',

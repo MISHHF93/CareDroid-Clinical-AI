@@ -284,7 +284,10 @@ export class GovernanceController {
   @Permissions(Permission.MANAGE_CONSENT)
   async getConsent(@Param('patientId') patientId: string, @Req() req: any) {
     if (this.platformGovernanceService) {
-      return this.platformGovernanceService.getConsent(patientId, req.tenantContext?.organizationId);
+      return this.platformGovernanceService.getConsent(
+        patientId,
+        req.tenantContext?.organizationId,
+      );
     }
     return this.platformSystemsService.demo('consent-manager', patientId);
   }

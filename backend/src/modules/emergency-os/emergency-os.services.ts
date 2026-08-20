@@ -2748,7 +2748,8 @@ export class ReferralService implements OnModuleInit {
       // Server-resolved tenant context always wins over anything present on
       // `input` -- same "never let a client-suppliable field override the
       // authoritative server value" precedent as patient/alert creation.
-      organizationId: organizationId ?? (input.organizationId ? String(input.organizationId) : undefined),
+      organizationId:
+        organizationId ?? (input.organizationId ? String(input.organizationId) : undefined),
     };
 
     this.createdReferrals.push(referral);

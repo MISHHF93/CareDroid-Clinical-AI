@@ -165,7 +165,10 @@ export class SentinelTrackingService implements OnModuleInit {
     return rows[0] ?? null;
   }
 
-  private async unitBelongsToOrganization(unitId: string, organizationId: string): Promise<boolean> {
+  private async unitBelongsToOrganization(
+    unitId: string,
+    organizationId: string,
+  ): Promise<boolean> {
     const unit = await this.unitRepo.findOne({ where: { id: unitId } });
     return Boolean(unit) && unit!.organizationId === organizationId;
   }
@@ -318,7 +321,10 @@ export class SentinelTrackingService implements OnModuleInit {
     }
   }
 
-  private async upsertUnit(event: CadAvlEvent, organizationId?: string): Promise<SentinelUnitEntity> {
+  private async upsertUnit(
+    event: CadAvlEvent,
+    organizationId?: string,
+  ): Promise<SentinelUnitEntity> {
     // HEAL-347.26: was unscoped by organizationId -- externalId/vendorId
     // aren't namespaced per hospital (vendorId is a fixed per-adapter
     // constant), so two orgs whose CAD systems label a unit the same way

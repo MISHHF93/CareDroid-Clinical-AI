@@ -23,9 +23,7 @@ const INDEX_NAME = 'IDX_notification_preferences_userId_unique';
  * migration closes), are deduped first, keeping the most recently updated
  * row per user, so the unique index can actually be created.
  */
-export class AddNotificationPreferenceUserUniqueIndex1772703300000
-  implements MigrationInterface
-{
+export class AddNotificationPreferenceUserUniqueIndex1772703300000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
       DELETE FROM notification_preferences

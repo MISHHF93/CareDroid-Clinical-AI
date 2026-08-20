@@ -28,9 +28,7 @@ const NEW_INDEX_NAME = 'IDX_sentinel_units_organizationId_externalId_vendorId_un
  * rather than guessed, so this doesn't break if that name differs across
  * environments.
  */
-export class ScopeSentinelUnitUniqueIndexByOrganization1772703000000
-  implements MigrationInterface
-{
+export class ScopeSentinelUnitUniqueIndexByOrganization1772703000000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     const table = await queryRunner.getTable('sentinel_units');
     const oldIndex = table?.indices.find(

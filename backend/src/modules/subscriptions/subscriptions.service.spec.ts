@@ -206,7 +206,7 @@ describe('SubscriptionsService', () => {
       });
     });
 
-    it('HEAL-247: records an audit log entry, matching createCheckoutSession\'s audit trail', async () => {
+    it("HEAL-247: records an audit log entry, matching createCheckoutSession's audit trail", async () => {
       const userId = '1';
       mockSubscriptionRepository.findOne.mockResolvedValue(mockSubscription);
       mockStripe.billingPortal.sessions.create.mockResolvedValue({

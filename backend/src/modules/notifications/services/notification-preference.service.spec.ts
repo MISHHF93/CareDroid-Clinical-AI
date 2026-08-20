@@ -27,7 +27,12 @@ describe('NotificationPreferenceService', () => {
       createQueryBuilder: jest.fn(() => insertQueryBuilder),
     };
     const service = new NotificationPreferenceService(preferenceRepository as any);
-    return { service, preferenceRepository, insertQueryBuilder, getPending: () => pendingInsertValues };
+    return {
+      service,
+      preferenceRepository,
+      insertQueryBuilder,
+      getPending: () => pendingInsertValues,
+    };
   }
 
   it('creates and returns default preferences when a user has none yet', async () => {

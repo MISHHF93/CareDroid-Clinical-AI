@@ -568,7 +568,10 @@ export class PlatformGovernanceService {
   // not-found contract) on a cross-org id mirrors a genuinely missing item.
   async decideReviewItem(itemId: string, decision: Record<string, any>, organizationId?: string) {
     const item = await this.reviewItems.findOne({ where: { id: itemId } });
-    if (!item || (organizationId && item.organizationId && item.organizationId !== organizationId)) {
+    if (
+      !item ||
+      (organizationId && item.organizationId && item.organizationId !== organizationId)
+    ) {
       return null;
     }
     item.status =
@@ -610,7 +613,10 @@ export class PlatformGovernanceService {
 
   async getReviewItem(itemId: string, organizationId?: string) {
     const item = await this.reviewItems.findOne({ where: { id: itemId } });
-    if (!item || (organizationId && item.organizationId && item.organizationId !== organizationId)) {
+    if (
+      !item ||
+      (organizationId && item.organizationId && item.organizationId !== organizationId)
+    ) {
       return null;
     }
     return item;

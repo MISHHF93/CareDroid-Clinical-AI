@@ -141,7 +141,14 @@ describe('ReassessmentService.notifyWaitingRoomEscalation', () => {
     delete process.env.INCIDENT_ESCALATION_EMAILS;
     const sendEmail = jest.fn().mockResolvedValue(true);
     const staffRepository = staffRepositoryMock([
-      { id: 's3', name: 'Owen Clarke', role: 'Charge', active: true, onDuty: true, email: 'owen.clarke@example.com' },
+      {
+        id: 's3',
+        name: 'Owen Clarke',
+        role: 'Charge',
+        active: true,
+        onDuty: true,
+        email: 'owen.clarke@example.com',
+      },
     ]);
 
     const module: TestingModule = await Test.createTestingModule({
@@ -172,7 +179,14 @@ describe('ReassessmentService.notifyWaitingRoomEscalation', () => {
     process.env.INCIDENT_ESCALATION_EMAILS = 'owen.clarke@example.com,triage-lead@example.com';
     const sendEmail = jest.fn().mockResolvedValue(true);
     const staffRepository = staffRepositoryMock([
-      { id: 's3', name: 'Owen Clarke', role: 'Charge', active: true, onDuty: true, email: 'owen.clarke@example.com' },
+      {
+        id: 's3',
+        name: 'Owen Clarke',
+        role: 'Charge',
+        active: true,
+        onDuty: true,
+        email: 'owen.clarke@example.com',
+      },
     ]);
 
     const module: TestingModule = await Test.createTestingModule({

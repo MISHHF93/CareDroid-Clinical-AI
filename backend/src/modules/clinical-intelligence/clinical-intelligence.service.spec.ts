@@ -407,7 +407,7 @@ describe('ClinicalIntelligenceService', () => {
     );
   });
 
-  it('HEAL-312: order bundle review checklists name the specific allergy/renal text detected in THIS patient\'s context, not identical boilerplate for every patient', async () => {
+  it("HEAL-312: order bundle review checklists name the specific allergy/renal text detected in THIS patient's context, not identical boilerplate for every patient", async () => {
     const service = createService();
 
     const withAllergy = await service.generateOrderSetAi('user-11a', {
@@ -568,7 +568,7 @@ describe('ClinicalIntelligenceService', () => {
     );
   });
 
-  it('HEAL-310: scopes clinical-audit execution logs to the caller\'s own organization', async () => {
+  it("HEAL-310: scopes clinical-audit execution logs to the caller's own organization", async () => {
     const service = createService();
     auditService.findByAction.mockResolvedValue([]);
 

@@ -49,6 +49,8 @@ describe('saas-profile-rbac.config', () => {
     // A genuinely-provided-but-unrecognized profile string still falls back to
     // 'student' (Cycle 220's own deliberate, tested contract) -- only the
     // "no profile at all" case changed.
-    expect(hasSaasProfilePermission('totally-unrecognized-xyz', Permission.USE_CALCULATORS)).toBe(true);
+    expect(hasSaasProfilePermission('totally-unrecognized-xyz', Permission.USE_CALCULATORS)).toBe(
+      true,
+    );
   });
 });

@@ -54,7 +54,11 @@ describe('SentinelInboundService concurrent upsert (HEAL-311)', () => {
         unitId,
       }),
       service.upsertFromCadOrNemsis({
-        payload: { unitId, chiefComplaint: 'chest pain, now diaphoretic', vitals: { heartRate: 130 } },
+        payload: {
+          unitId,
+          chiefComplaint: 'chest pain, now diaphoretic',
+          vitals: { heartRate: 130 },
+        },
         unitId,
       }),
     ]);

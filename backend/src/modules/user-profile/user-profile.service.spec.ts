@@ -78,13 +78,9 @@ describe('UserProfileService.updateOperationalProfile organizationId escalation 
     const { service } = buildService({ userId: 'user-1', organizationId: 'org-own' });
 
     await expect(
-      service.updateOperationalProfile(
-        'user-1',
-        { role: 'admin' } as any,
-        '127.0.0.1',
-        'jest',
-        { canAssignRole: false },
-      ),
+      service.updateOperationalProfile('user-1', { role: 'admin' } as any, '127.0.0.1', 'jest', {
+        canAssignRole: false,
+      }),
     ).rejects.toThrow('Role assignment is managed by your organization administrator.');
   });
 
