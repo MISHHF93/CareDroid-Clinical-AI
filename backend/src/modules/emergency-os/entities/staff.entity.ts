@@ -5,6 +5,11 @@ export class Staff {
   @PrimaryColumn({ type: 'varchar', length: 120 })
   id: string;
 
+  /** See Patient.organizationId for the nullable/legacy-row rationale --
+   * same pattern, seeded/fixture staff rows predate this column. */
+  @Column({ type: 'uuid', nullable: true })
+  organizationId: string | null;
+
   @Column({ type: 'varchar', length: 120 })
   name: string;
 

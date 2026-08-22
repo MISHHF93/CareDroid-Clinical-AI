@@ -46,6 +46,7 @@ describe('ReassessmentService.updateStaffDutyStatus', () => {
   it('marks a staff member on duty and persists the change', async () => {
     const staffRow: Staff = {
       id: 's3',
+      organizationId: null,
       name: 'Owen Clarke',
       role: 'Charge',
       active: true,
@@ -77,6 +78,7 @@ describe('ReassessmentService.updateStaffDutyStatus', () => {
   it('can mark a staff member off duty without touching a previously-set email', async () => {
     const staffRow: Staff = {
       id: 's3',
+      organizationId: null,
       name: 'Owen Clarke',
       role: 'Charge',
       active: true,
@@ -107,5 +109,64 @@ describe('ReassessmentService.updateStaffDutyStatus', () => {
       NotFoundException,
     );
     expect(repository.save).not.toHaveBeenCalled();
+  });
+});
+
+describe('ReassessmentService staff organization tenant scoping (BOLA audit)', () => {
+  // GET /emergency/staff + PATCH /emergency/staff/:staffId/duty-status had
+  // zero organization scoping at all -- a caller in one org could list
+  // every hospital's staff directory, then PATCH a staff record
+  // belonging to a DIFFERENT org (setting onDuty: true and overwriting
+  // email with an attacker-controlled address).
+  it('listStaff(organizationId) includes own-org and legacy/null-org rows, excludes a different org', async () => {
+    const rows = [
+      { id: 's-a', organizationId: 'org-a', name: 'Own Org', role: 'MD', active: true, onDuty: false, email: null },
+    ];
+    const repository = { find: jest.fn().mockResolvedValue(rows) };
+    const module = await buildModule(repository);
+    const service = module.get<ReassessmentService>(ReassessmentService);
+
+    await service.listStaff('org-a');
+    expect(repository.find).toHaveBeenCalledWith({
+      where: [{ organizationId: 'org-a' }, { organizationId: expect.anything() }],
+      order: { name: 'ASC' },
+    });
+  });
+
+  it('updateStaffDutyStatus rejects a cross-org staffId with the same not-found error shape as a missing id, and succeeds for the owning org', async () => {
+    const staffRow: Staff = {
+      id: 's-b',
+      organizationId: 'org-b',
+      name: 'Other Org Nurse',
+      role: 'Charge',
+      active: true,
+      email: null,
+      onDuty: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    const repository = {
+      findOne: jest.fn((query: any) => {
+        const where = Array.isArray(query.where) ? query.where : [query.where];
+        const matches = where.some((clause: any) => {
+          if (clause.id !== 's-b') return false;
+          if (clause.organizationId === undefined) return true;
+          if (clause.organizationId === 'org-b') return true;
+          return false;
+        });
+        return Promise.resolve(matches ? staffRow : null);
+      }),
+      save: jest.fn((row: any) => Promise.resolve(row)),
+    };
+    const module = await buildModule(repository);
+    const service = module.get<ReassessmentService>(ReassessmentService);
+
+    await expect(
+      service.updateStaffDutyStatus('s-b', { onDuty: true, email: 'attacker@example.com' }, 'org-a'),
+    ).rejects.toThrow(NotFoundException);
+    expect(repository.save).not.toHaveBeenCalled();
+
+    const result = await service.updateStaffDutyStatus('s-b', { onDuty: true }, 'org-b');
+    expect(result.onDuty).toBe(true);
   });
 });

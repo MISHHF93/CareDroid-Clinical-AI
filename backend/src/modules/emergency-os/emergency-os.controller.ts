@@ -765,15 +765,21 @@ export class EmergencyOsController {
    * exists and which mechanism it actually extends. */
   @RequirePermission(Permission.WRITE_PHI)
   @Post('waiting-room-safety/escalation-notify')
-  postWaitingRoomEscalationNotify(@Body() body: PostWaitingRoomEscalationNotifyDto) {
-    return this.reassessmentService.notifyWaitingRoomEscalation(body);
+  postWaitingRoomEscalationNotify(
+    @Body() body: PostWaitingRoomEscalationNotifyDto,
+    @TenantContext() tenantContext?: TenantContextValue,
+  ) {
+    return this.reassessmentService.notifyWaitingRoomEscalation(
+      body,
+      tenantContext?.organizationId,
+    );
   }
 
   /** Real staff directory, including on-duty status -- see roadmap item G1. */
   @RequirePermission(Permission.VIEW_OPERATIONS)
   @Get('staff')
-  getStaff() {
-    return this.reassessmentService.listStaff();
+  getStaff(@TenantContext() tenantContext?: TenantContextValue) {
+    return this.reassessmentService.listStaff(tenantContext?.organizationId);
   }
 
   /** Mark a staff member on/off duty (and optionally set their email) so
@@ -782,8 +788,16 @@ export class EmergencyOsController {
    * ReassessmentService.updateStaffDutyStatus's own doc comment. */
   @RequirePermission(Permission.MANAGE_INCIDENTS)
   @Patch('staff/:staffId/duty-status')
-  patchStaffDutyStatus(@Param('staffId') staffId: string, @Body() body: UpdateStaffDutyStatusDto) {
-    return this.reassessmentService.updateStaffDutyStatus(staffId, body);
+  patchStaffDutyStatus(
+    @Param('staffId') staffId: string,
+    @Body() body: UpdateStaffDutyStatusDto,
+    @TenantContext() tenantContext?: TenantContextValue,
+  ) {
+    return this.reassessmentService.updateStaffDutyStatus(
+      staffId,
+      body,
+      tenantContext?.organizationId,
+    );
   }
 
   @RequirePermission(Permission.READ_PHI)

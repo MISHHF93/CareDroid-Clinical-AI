@@ -10,6 +10,7 @@
 // OnModuleInit used by EmergencyPatientService board rehydrate
 import { InjectRepository } from '@nestjs/typeorm';
 import type { Repository } from 'typeorm';
+import { IsNull } from 'typeorm';
 import {
   calculateEmergencyOsCapacity,
   isEmergencyOsBoarding,
@@ -2827,10 +2828,20 @@ export class ReassessmentService {
     });
   }
 
+  // HEAL follow-up (BOLA audit): had zero organization scoping -- any
+  // caller holding VIEW_OPERATIONS got every hospital's full staff
+  // directory. Same own-org-OR-legacy/null-org-rows idiom as every other
+  // migration in this series: seeded/fixture staff rows predate the
+  // organizationId column and stay visible to everyone.
   /** Real staff directory read -- see getOnDutyChargeNurseEmails's doc comment for why this exists. */
-  async listStaff(): Promise<Staff[]> {
+  async listStaff(organizationId?: string): Promise<Staff[]> {
     if (!this.staffRepository) return [];
-    return this.staffRepository.find({ order: { name: 'ASC' } });
+    return this.staffRepository.find({
+      where: organizationId
+        ? [{ organizationId }, { organizationId: IsNull() }]
+        : undefined,
+      order: { name: 'ASC' },
+    });
   }
 
   /**
@@ -2840,14 +2851,27 @@ export class ReassessmentService {
    * email. Deliberately does not touch `active` or `role` -- this is scoped to
    * duty status only, not full staff-record management.
    */
+  // HEAL follow-up (BOLA audit): had zero organization scoping at all --
+  // a caller holding MANAGE_INCIDENTS could PATCH any hospital's staff
+  // record, setting onDuty: true and overwriting email with an
+  // attacker-controlled address. notifyWaitingRoomEscalation() then
+  // sends that address a real escalating patient's patientId and
+  // clinical message -- cross-tenant PHI exfiltration via the escalation
+  // pathway. Same "not found" shape as every other cross-org access
+  // attempt in this codebase (own-org or legacy/null-org row only).
   async updateStaffDutyStatus(
     staffId: string,
     input: { onDuty: boolean; email?: string | null },
+    organizationId?: string,
   ): Promise<Staff> {
     if (!this.staffRepository) {
       throw new ServiceUnavailableException('Staff duty-status persistence is not available.');
     }
-    const staff = await this.staffRepository.findOne({ where: { id: staffId } });
+    const staff = await this.staffRepository.findOne({
+      where: organizationId
+        ? [{ id: staffId, organizationId }, { id: staffId, organizationId: IsNull() }]
+        : { id: staffId },
+    });
     if (!staff) {
       throw new NotFoundException(`Staff member "${staffId}" not found`);
     }
@@ -2869,10 +2893,18 @@ export class ReassessmentService {
    * available, so notifyWaitingRoomEscalation degrades to exactly its pre-G1
    * static-list-only behavior rather than failing the whole notification.
    */
-  private async getOnDutyChargeNurseEmails(): Promise<string[]> {
+  private async getOnDutyChargeNurseEmails(organizationId?: string): Promise<string[]> {
     if (!this.staffRepository) return [];
+    // HEAL follow-up (BOLA audit): was unscoped -- a charge nurse marked
+    // on-duty in a DIFFERENT org would be emailed another hospital's
+    // escalating patientId and clinical message.
     const onDutyChargeNurses = await this.staffRepository.find({
-      where: { role: 'Charge', active: true, onDuty: true },
+      where: organizationId
+        ? [
+            { role: 'Charge', active: true, onDuty: true, organizationId },
+            { role: 'Charge', active: true, onDuty: true, organizationId: IsNull() },
+          ]
+        : { role: 'Charge', active: true, onDuty: true },
     });
     return onDutyChargeNurses
       .map((staff) => staff.email)
@@ -2891,14 +2923,17 @@ export class ReassessmentService {
    * to -- the static list stays as a deliberate fallback for deployments that haven't
    * populated on-duty data yet, not replaced outright.
    */
-  async notifyWaitingRoomEscalation(input: {
-    patientId?: string;
-    alertId?: string;
-    title: string;
-    message: string;
-  }): Promise<EmergencyModuleEnvelope<Record<string, unknown>>> {
+  async notifyWaitingRoomEscalation(
+    input: {
+      patientId?: string;
+      alertId?: string;
+      title: string;
+      message: string;
+    },
+    organizationId?: string,
+  ): Promise<EmergencyModuleEnvelope<Record<string, unknown>>> {
     const staticRecipients = getEnvironmentConfig().notifications.incidentEscalationEmails;
-    const onDutyRecipients = await this.getOnDutyChargeNurseEmails();
+    const onDutyRecipients = await this.getOnDutyChargeNurseEmails(organizationId);
     const recipients = Array.from(new Set([...onDutyRecipients, ...staticRecipients]));
 
     if (!recipients.length) {
