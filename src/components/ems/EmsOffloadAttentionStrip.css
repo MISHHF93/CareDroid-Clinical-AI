@@ -156,7 +156,7 @@
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 6px;
-  color: var(--medical-text-disabled, #d1d5db);
+  color: var(--medical-text-subtle, #9ca3af);
   font-size: 11px;
 }
 

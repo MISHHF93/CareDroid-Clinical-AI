@@ -11,13 +11,25 @@
   align-items: center;
 }
 
+/* HEAL follow-up to HEAL-347.21: that fix gave --chip--red/--chip--green
+   theme-aware text colors but missed this base rule (used by every
+   secondary/neutral recommendation chip -- "Pediatric dosing", "Stroke
+   protocol", "NIHSS", "HEART Score", "C-SSRS", etc. -- and by
+   .patient-orchestration__more's "Open tool catalog" link below) and
+   .patient-orchestration__chip--primary's warning-text variable already
+   handled this correctly by using a CSS var. #374151 is a dark slate gray:
+   readable on light mode's near-white card background, all but invisible on
+   dark mode's near-black one. var(--medical-text-muted) resolves to the
+   equivalent shade in light mode (#334155) and a light slate (#cbd5e1) in
+   dark mode. Confirmed live via Playwright on the patient detail panel's
+   "Recommended for this case" strip in both themes. */
 .patient-orchestration__chip {
   display: inline-flex;
   align-items: center;
   gap: 4px;
   border: 1px solid rgba(59, 130, 246, 0.35);
   background: rgba(37, 99, 235, 0.12);
-  color: #374151;
+  color: var(--medical-text-muted, #374151);
   border-radius: 999px;
   padding: 4px 10px;
   font-size: 11px;
@@ -48,7 +60,7 @@
 .patient-orchestration__more {
   border: none;
   background: transparent;
-  color: #374151;
+  color: var(--medical-text-muted, #374151);
   font-size: 11px;
   font-weight: 600;
   cursor: pointer;

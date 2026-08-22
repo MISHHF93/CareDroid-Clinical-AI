@@ -191,10 +191,18 @@
   background: color-mix(in srgb, var(--status-warning, #f59e0b) 6%, var(--app-surface-1, #ffffff));
 }
 
+/* HEAL follow-up: color was a hardcoded #111827 (near-black) while the
+   background legitimately inverts to a dark navy via --app-surface-1 in
+   dark theme -- left this button's "Open tracker" label all but invisible
+   (near-black text on a near-black background). Confirmed live via
+   Playwright: computed color rgb(17,24,39) on effective background
+   rgb(32,43,61). var(--medical-text-heading) resolves to the same #111827
+   in light mode (identical fallback, no light-mode change) and inverts to
+   a near-white in dark mode. */
 .emergency-app-shell .ems-offload-attention-strip__open {
   border-color: color-mix(in srgb, #374151 28%, transparent);
   background: color-mix(in srgb, #374151 8%, var(--app-surface-1, #ffffff));
-  color: #111827;
+  color: var(--medical-text-heading, #111827);
 }
 
 .emergency-app-shell .ems-pressure--gauge {
