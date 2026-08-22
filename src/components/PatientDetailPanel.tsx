@@ -664,6 +664,28 @@ export default function PatientDetailPanel() {
     source: 'PatientDetailPanel',
     staffId: emergencyRole.canonicalProfile?.id,
   });
+
+  // This panel is a single global instance (mounted once in AppShell, not
+  // remounted per patient) rendered as a non-blocking 480px side drawer --
+  // the Whiteboard behind it stays fully visible and clickable. Nothing
+  // previously reset this form/note/flag/action-mode state when
+  // selectedPatientId changed, so a clinician could start a vitals entry or
+  // note for Patient A, click a different patient's card on the visible
+  // Whiteboard (or any other selectPatient() call -- search, command
+  // palette, reassessment drawer), and submit -- addVitals/addNote/addFlag
+  // all read selectedPatient.id live at click time, so A's typed values
+  // would post against B's chart with no error or warning. Closing/clearing
+  // on every real patient switch is the safe default: an unsubmitted draft
+  // must not silently survive attribution to a different patient, even at
+  // the cost of losing in-progress typing if the clinician switches away
+  // and back.
+  useEffect(() => {
+    setShowVitalsForm(false);
+    setVitalsForm(emptyVitalsForm);
+    setFlagToAdd(PatientFlag.ReassessmentDue);
+    setNoteText('');
+    setActionMode(null);
+  }, [selectedPatient?.id]);
   const openCalculatorHub = useCallback((calculatorId: string) => {
     if (!selectedPatientId) return;
     const params = new URLSearchParams({
