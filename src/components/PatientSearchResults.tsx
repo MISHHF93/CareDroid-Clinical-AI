@@ -1,6 +1,11 @@
+import { useMemo } from 'react';
 import type { Patient } from '../types/emergency';
 import type { PatientSearchMatchKind, PatientSearchResult } from '../utils/patientSearch';
-import { formatPatientSearchHint, getPatientDisplayName } from '../utils/patientSearch';
+import {
+  findSameNamePatientIds,
+  formatPatientSearchHint,
+  getPatientDisplayName,
+} from '../utils/patientSearch';
 import type { OperationalSearchHit } from '../services/unifiedOperationalSearch';
 import { formatOperationalSearchEntityLabel } from '../services/unifiedOperationalSearch';
 import { getPatientEncounterId } from '../services/patientSearchActions';
@@ -119,6 +124,10 @@ export default function PatientSearchResults({
 }: PatientSearchResultsProps) {
   const trimmedQuery = query.trim();
   const visiblePatientResults = canViewPatients ? results : [];
+  const sameNamePatientIds = useMemo(
+    () => findSameNamePatientIds(visiblePatientResults),
+    [visiblePatientResults],
+  );
   const visibleOperationalGroups = canViewPatients ? operationalGroups : undefined;
   const supplementalCount =
     (visibleOperationalGroups?.encounter.length || 0) +
@@ -153,6 +162,16 @@ export default function PatientSearchResults({
                     {formatPatientSearchHint(patient, matchKind as PatientSearchMatchKind)}
                     {backendVerifiedPatientIds.has(patient.id) ? ' · Backend verified' : ''}
                   </span>
+                  {sameNamePatientIds.has(patient.id) ? (
+                    // SAFER guidance: flag exactly the colliding rows rather
+                    // than a single banner, so the warning stays attached to
+                    // the moment of selection -- not another confirmation
+                    // modal, just forcing the MRN/DOB already in the hint
+                    // line above to actually get noticed.
+                    <span className="patient-search-results__same-name-warning" role="note">
+                      ⚠ Another result has the same name — check MRN/DOB
+                    </span>
+                  ) : null}
                 </button>
                 <div className="patient-search-results__actions" aria-label="Patient actions">
                   {canCreatePatient ? (

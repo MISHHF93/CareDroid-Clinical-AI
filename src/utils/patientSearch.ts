@@ -266,6 +266,36 @@ export function filterPatientsBySearch<T extends PatientSearchSource>(
   );
 }
 
+/**
+ * SAFER patient-identification guidance: the moment a clinician chooses
+ * between multiple search results is exactly where a same-name mix-up risk
+ * is highest -- two different patients named "John Smith" with different
+ * MRNs otherwise look identical at a glance in a results list, even though
+ * formatPatientSearchHint already puts MRN/DOB in the row's secondary text
+ * (nothing forces the reader to actually compare them). Returns the set of
+ * patient ids that share a normalized display name with at least one OTHER
+ * result in the same list, so the UI can flag exactly those rows.
+ */
+export function findSameNamePatientIds<T extends PatientSearchSource>(
+  results: Array<{ patient: T }>,
+): Set<string> {
+  const byName = new Map<string, string[]>();
+  for (const { patient } of results) {
+    if (!patient.id) continue;
+    const key = normalizeText(getPatientDisplayName(patient));
+    if (!key) continue;
+    const ids = byName.get(key) ?? [];
+    ids.push(patient.id);
+    byName.set(key, ids);
+  }
+
+  const collidingIds = new Set<string>();
+  for (const ids of byName.values()) {
+    if (ids.length > 1) ids.forEach((id) => collidingIds.add(id));
+  }
+  return collidingIds;
+}
+
 export function formatPatientSearchHint(
   patient: PatientSearchSource,
   matchKind?: PatientSearchMatchKind,

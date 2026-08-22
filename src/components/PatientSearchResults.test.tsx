@@ -128,3 +128,66 @@ describe('PatientSearchResults footer query display (HEAL-342)', () => {
     expect(screen.getByText(/zzq-no-match/)).toBeInTheDocument();
   });
 });
+
+describe('PatientSearchResults same-name warning (SAFER patient-identification)', () => {
+  it('flags two results with the same display name so a same-name mix-up cannot go unnoticed', () => {
+    const results: PatientSearchResult<Patient>[] = [
+      { patient: patient({ id: 'p1', mrn: 'ED-1', firstName: 'John', lastName: 'Smith' }), score: 1, matchKind: 'exact-name' },
+      { patient: patient({ id: 'p2', mrn: 'ED-2', firstName: 'John', lastName: 'Smith' }), score: 1, matchKind: 'exact-name' },
+    ];
+    render(
+      <PatientSearchResults
+        query="John Smith"
+        results={results}
+        canViewPatients
+        onFindPatient={noop}
+        onStartIntake={noop}
+        onViewEncounter={noop}
+        onCreateEncounter={noop}
+      />,
+    );
+
+    const warnings = screen.getAllByText(/same name.*check MRN\/DOB/i);
+    expect(warnings).toHaveLength(2);
+  });
+
+  it('does not warn when no two results share the same name', () => {
+    const results: PatientSearchResult<Patient>[] = [
+      { patient: patient({ id: 'p1', firstName: 'John', lastName: 'Smith' }), score: 1, matchKind: 'exact-name' },
+      { patient: patient({ id: 'p2', firstName: 'Jane', lastName: 'Doe' }), score: 1, matchKind: 'exact-name' },
+    ];
+    render(
+      <PatientSearchResults
+        query="John"
+        results={results}
+        canViewPatients
+        onFindPatient={noop}
+        onStartIntake={noop}
+        onViewEncounter={noop}
+        onCreateEncounter={noop}
+      />,
+    );
+
+    expect(screen.queryByText(/same name.*check MRN\/DOB/i)).toBeNull();
+  });
+
+  it('is case/whitespace-insensitive (still catches "John Smith" vs " john   smith ")', () => {
+    const results: PatientSearchResult<Patient>[] = [
+      { patient: patient({ id: 'p1', firstName: 'John', lastName: 'Smith' }), score: 1, matchKind: 'exact-name' },
+      { patient: patient({ id: 'p2', firstName: '  john', lastName: 'smith  ' }), score: 1, matchKind: 'exact-name' },
+    ];
+    render(
+      <PatientSearchResults
+        query="John Smith"
+        results={results}
+        canViewPatients
+        onFindPatient={noop}
+        onStartIntake={noop}
+        onViewEncounter={noop}
+        onCreateEncounter={noop}
+      />,
+    );
+
+    expect(screen.getAllByText(/same name.*check MRN\/DOB/i)).toHaveLength(2);
+  });
+});
