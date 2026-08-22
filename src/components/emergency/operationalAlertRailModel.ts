@@ -178,19 +178,17 @@ export function buildOperationalAlertMetrics({
   ];
 
   if (intelligenceSnapshot?.enabled) {
+    const modeLabel = intelligenceSnapshot.mode.replace(/_/g, ' ');
     metrics.push({
       id: 'operational-intelligence',
       label: 'Intel',
-      value: [
-        intelligenceSnapshot.mode.replace(/_/g, ' '),
-        intelligenceSnapshot.dataFreshness.visible
-          ? intelligenceSnapshot.dataFreshness.status
-          : null,
-      ]
-        .filter(Boolean)
-        .join(' · '),
+      // Was `${mode} · ${freshness}` (e.g. "rule based · stale") -- multi-word
+      // and could run long, the same cramped-pill mismatch as the Sync pill's
+      // "POLLING stale" bug. Freshness alone is the short, sibling-matching
+      // value; mode moves into the hover tooltip instead.
+      value: intelligenceSnapshot.dataFreshness.visible ? intelligenceSnapshot.dataFreshness.status : modeLabel,
       tone: intelligenceTone(intelligenceSnapshot),
-      hint: intelligenceSnapshot.disclaimers.operational,
+      hint: [`Mode: ${modeLabel}`, intelligenceSnapshot.disclaimers.operational].filter(Boolean).join('. '),
       priority: 5,
     });
   }

@@ -144,9 +144,10 @@ export function Header() {
     websocket.status === 'connected'
       ? false
       : centralSnapshot.sync.stale || websocket.status === 'reconnecting';
-  const syncLabel = syncStale
-    ? `${syncMode.toUpperCase()} stale`
-    : `${syncMode.toUpperCase()} ${syncAge}`;
+  // Compact header pill value -- every sibling status pill ("Waiting WARN 2")
+  // has a short value; the mode prefix here was redundant once the chip is
+  // already labeled "Sync" and the full mode detail lives in syncTitle below.
+  const syncLabel = syncStale ? 'Stale' : syncAge;
   const syncTitle = [
     `Status: ${websocket.status || centralSnapshot.sync.status}`,
     `Mode: ${syncMode}`,

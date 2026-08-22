@@ -79,9 +79,12 @@ button.cdl-alarm-kpi:focus-visible {
   text-transform: uppercase;
   line-height: 1.2;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   max-width: 100%;
+  /* text-overflow/white-space moved to .alarm-kpi__label-text (shared with
+     alarm-system.css) -- ellipsis doesn't reliably apply to a flex container,
+     so a long label used to hard-clip mid-word with no "..." at all.
+     min-width: 0 lets this flex item actually shrink. */
+  min-width: 0;
 }
 
 .cdl-alarm-kpi__badge {

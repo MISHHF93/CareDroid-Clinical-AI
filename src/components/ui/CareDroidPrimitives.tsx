@@ -331,7 +331,7 @@ export function MetricChip({
       ) : null}
       {label ? (
         <span className="cd-metric-chip__label alarm-kpi__label">
-          {label}
+          <span className="alarm-kpi__label-text">{label}</span>
           {badge ? <span className="alarm-kpi__badge">{badge}</span> : null}
         </span>
       ) : null}

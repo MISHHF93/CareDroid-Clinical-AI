@@ -96,7 +96,7 @@ export default function OperationalStrip({
           >
             <strong className="alarm-kpi__value">{metric.value}</strong>
             <span className="alarm-kpi__label">
-              {metric.label}
+              <span className="alarm-kpi__label-text">{metric.label}</span>
               {severity === 'critical' ? (
                 <span className="alarm-kpi__badge">CRIT</span>
               ) : severity === 'warning' ? (

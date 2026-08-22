@@ -203,7 +203,10 @@ export function PatientsRoute() {
         </div>
       ) : null}
       <div className="cdl-alarm-kpi-rail emergency-route-metric-kpi-rail" aria-label="Department patient metrics">
-        <AlarmKpi severity="info" value={patients.length} label="Total patients" />
+        {/* "Total patients" used to hard-clip to "TOTAL PATIENT" in this narrow
+            chip (no room even with the label-truncation fix); shortened to
+            match sibling label lengths ("High risk", "Waiting") instead. */}
+        <AlarmKpi severity="info" value={patients.length} label="Patients" />
         <AlarmKpi
           severity={highRiskCount > 0 ? 'critical' : 'ok'}
           value={highRiskCount}

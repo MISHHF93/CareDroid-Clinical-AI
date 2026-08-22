@@ -55,7 +55,7 @@ export function AlarmKpi({
       <button type="button" {...shared}>
         <span className="cdl-alarm-kpi__value alarm-kpi__value">{value}</span>
         <span className="cdl-alarm-kpi__label alarm-kpi__label">
-          {label}
+          <span className="alarm-kpi__label-text">{label}</span>
           {badge != null && badge !== false ? (
             <span className="cdl-alarm-kpi__badge alarm-kpi__badge alarm-kpi__badge--inline">
               {badge}
@@ -70,7 +70,7 @@ export function AlarmKpi({
     <Comp {...shared}>
       <span className="cdl-alarm-kpi__value alarm-kpi__value">{value}</span>
       <span className="cdl-alarm-kpi__label alarm-kpi__label">
-        {label}
+        <span className="alarm-kpi__label-text">{label}</span>
         {badge != null && badge !== false ? (
           <span className="cdl-alarm-kpi__badge alarm-kpi__badge alarm-kpi__badge--inline">{badge}</span>
         ) : null}

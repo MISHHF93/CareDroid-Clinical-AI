@@ -102,9 +102,20 @@
   font-weight: 650;
   line-height: 1.2;
   overflow: hidden;
+  max-width: 100%;
+  /* text-overflow/white-space moved to .alarm-kpi__label-text below --
+     text-overflow: ellipsis silently no-ops on a flex container (this one),
+     so a long label (e.g. "Total patients") hard-clipped mid-word with no
+     "..." at all. min-width: 0 lets this flex item actually shrink instead
+     of forcing overflow on its parent. */
+  min-width: 0;
+}
+
+.alarm-kpi__label-text {
+  overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 100%;
+  min-width: 0;
 }
 
 .alarm-kpi__badge {
