@@ -13,8 +13,12 @@ const repoRoot = join(__dirname, '../..');
 const docsDir = join(repoRoot, 'docs');
 const EMERGENCY_OS_APP_ROUTE_RANGE = Object.freeze({ min: 30, max: 320 });
 
+// Each of the 3 tests below re-runs the same corpus-wide scan; 180s was
+// enough at some point but each now measures ~300s as the scanned corpus
+// (routes/pages/backend modules) has grown -- bumped with headroom rather
+// than tuned to the exact current runtime.
 describe('orphanDetectionAudit report', () => {
-  it('builds orphan findings across categories', { timeout: 180_000 }, () => {
+  it('builds orphan findings across categories', { timeout: 480_000 }, () => {
     const report = buildOrphanDetectionReport();
     expect(report.summary.total).toBeGreaterThan(0);
     // CareDroid intentionally retired the broad platform route surface; this
@@ -29,13 +33,13 @@ describe('orphanDetectionAudit report', () => {
     expect(hasOrphanTaxonomy).toBe(true);
   });
 
-  it('scans real .tsx/.ts page, component, and service files, not just legacy .jsx/.js (Cycle 153 — was scanning zero files)', { timeout: 180_000 }, () => {
+  it('scans real .tsx/.ts page, component, and service files, not just legacy .jsx/.js (Cycle 153 — was scanning zero files)', { timeout: 480_000 }, () => {
     const report = buildOrphanDetectionReport();
     const allIds = report.all.map((item) => item.id || item.path).filter(Boolean);
     expect(allIds.some((id) => id.endsWith('.tsx'))).toBe(true);
   });
 
-  it('writes docs/orphan-detection-report.md when ORPHAN_DETECTION_WRITE_DOCS=1', { timeout: 180_000 }, () => {
+  it('writes docs/orphan-detection-report.md when ORPHAN_DETECTION_WRITE_DOCS=1', { timeout: 480_000 }, () => {
     if (!process.env.ORPHAN_DETECTION_WRITE_DOCS) return;
 
     const markdown = formatOrphanDetectionMarkdown();

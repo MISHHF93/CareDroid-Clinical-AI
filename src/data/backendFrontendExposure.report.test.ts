@@ -17,7 +17,10 @@ import { formatOrphanedBackendFunctionsMarkdown } from './backendOrphanAudit';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const docsDir = join(__dirname, '../../docs');
-const HEAVY_EXPOSURE_SCAN_TIMEOUT_MS = 180_000;
+// Was 180_000 -- measured ~57s when originally set (Cycle 156), now ~300s as
+// the route/page/backend-module corpus this scans has grown; bumped with
+// headroom rather than tuned to the exact current runtime.
+const HEAVY_EXPOSURE_SCAN_TIMEOUT_MS = 480_000;
 
 describe('backendFrontendExposure report', () => {
   it('scan passes before writing docs', () => {
