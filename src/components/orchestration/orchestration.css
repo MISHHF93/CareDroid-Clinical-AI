@@ -23,6 +23,10 @@
    equivalent shade in light mode (#334155) and a light slate (#cbd5e1) in
    dark mode. Confirmed live via Playwright on the patient detail panel's
    "Recommended for this case" strip in both themes. */
+/* WCAG 2.2 SC 2.5.8: min-height guarantees a >=24px hit area -- these chips
+   launch clinical tools (Sepsis screen, NIHSS, HEART Score) and sit only
+   6px apart, so the spacing exception doesn't apply and undersized chips
+   are a real mis-tap risk. */
 .patient-orchestration__chip {
   display: inline-flex;
   align-items: center;
@@ -32,6 +36,7 @@
   color: var(--medical-text-muted, #374151);
   border-radius: 999px;
   padding: 4px 10px;
+  min-height: 24px;
   font-size: 11px;
   font-weight: 700;
   cursor: pointer;
@@ -58,6 +63,8 @@
 }
 
 .patient-orchestration__more {
+  display: inline-flex;
+  align-items: center;
   border: none;
   background: transparent;
   color: var(--medical-text-muted, #374151);
@@ -65,6 +72,7 @@
   font-weight: 600;
   cursor: pointer;
   padding: 2px 4px;
+  min-height: 24px;
 }
 
 .patient-orchestration__meta {

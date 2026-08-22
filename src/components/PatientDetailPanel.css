@@ -614,11 +614,19 @@
   font-size: var(--ed-type-body);
 }
 
+/* WCAG 2.2 SC 2.5.8: min-width/min-height ensure a >=24x24px hit area even
+   though the visible "x" glyph stays small -- a clinician mis-tapping this
+   would silently drop an active clinical flag. */
 .patient-detail-flag-chip__remove {
   border: 0;
   background: transparent;
   color: var(--ed-text-secondary);
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  min-height: 24px;
   padding: 0;
 }
 
