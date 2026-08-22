@@ -90,7 +90,7 @@ import EmsOffloadTrackerPanel from '../../components/ems/EmsOffloadTrackerPanel'
 import EmsOffloadAttentionStrip from '../../components/ems/EmsOffloadAttentionStrip';
 import EmsOffloadAggregateStrip from '../../components/ems/EmsOffloadAggregateStrip';
 import { shouldShowChargeNurseOperationalStrip } from '../../components/whiteboard/chargeNurseWorkflowModel';
-import { shouldShowShiftHandoffStrip } from '../../components/whiteboard/shiftHandoffSnapshotModel';
+import { countHighRiskPatients, shouldShowShiftHandoffStrip } from '../../components/whiteboard/shiftHandoffSnapshotModel';
 import { buildOperationalHandoffDomains } from '../../components/whiteboard/operationalHandoffSummaryModel';
 import {
   patientMatchesReassessmentAttention,
@@ -172,8 +172,15 @@ function isHighRisk(patient: Patient): boolean {
 }
 
 function isBoarding(patient: Patient): boolean {
+  // Was missing PatientState.Disposition -- the "Boarders" command-layer
+  // metric (careDroidCentralNode.ts's isBoarding, also reused by
+  // physicianWorkflowModel.ts and chargeNurseWorkflowModel.ts) already
+  // counts Disposition-state patients as boarding, so this narrower local
+  // definition disagreed with 3 other already-consistent call sites.
   return (
-    patient.state === PatientState.Admission || hasPatientFlag(patient, PatientFlag.PendingAdmission)
+    patient.state === PatientState.Admission ||
+    patient.state === PatientState.Disposition ||
+    hasPatientFlag(patient, PatientFlag.PendingAdmission)
   );
 }
 
@@ -532,7 +539,13 @@ export default function EmergencyWhiteboard() {
 
   const stats = useMemo(() => {
     const waiting = patients.filter((patient) => patient.state === PatientState.Waiting).length;
-    const highRisk = patients.filter(isHighRisk).length;
+    // Was patients.filter(isHighRisk).length -- isHighRisk() alone doesn't
+    // exclude discharged/deceased patients, so this stat tile could count
+    // someone no longer on the board. countHighRiskPatients() (the same
+    // function the top summary card's "N high risk" already uses) applies
+    // that exclusion; reusing it here makes the two numbers agree instead of
+    // silently disagreeing on the same page.
+    const highRisk = countHighRiskPatients(patients);
     const boarding = patients.filter(isBoarding).length;
     const reassessmentDue =
       capacity.reassessmentDueCount ??
@@ -1549,9 +1562,18 @@ export default function EmergencyWhiteboard() {
               {presentation.pageEyebrow}
             </span>
           ) : null}
-          <h1 className="emergency-whiteboard-page__title">
-            {presentation.pageTitle}
-          </h1>
+          {surfaces.whiteboard.showHeroChrome ? (
+            // AppShell's ShellRouteTab already renders a real <h1> ("Board")
+            // for every route -- this second, page-owned <h1> duplicated it
+            // (both visually and as a second <h1> landmark) whenever hero
+            // chrome was already suppressed elsewhere on this same page.
+            // Gating it here matches suppressWhiteboardHeroChrome's own
+            // documented intent ("flatten nested chrome... minimal hero
+            // copy"), which already applied to its eyebrow/subtitle siblings.
+            <h1 className="emergency-whiteboard-page__title">
+              {presentation.pageTitle}
+            </h1>
+          ) : null}
           {surfaces.whiteboard.showHeroChrome ? (
             <p className="emergency-whiteboard-page__subtitle">
               {presentation.pageSubtitle}

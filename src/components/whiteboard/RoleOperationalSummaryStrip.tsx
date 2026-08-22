@@ -44,7 +44,12 @@ export default function RoleOperationalSummaryStrip({
 
   const cards = useMemo(() => {
     const workloads = buildStaffWorkloads(staff, patients, activeShift as any);
-    const activePatients = patients.filter((patient) => patient.state !== PatientState.Discharge);
+    // Was Discharge-only -- a Deceased patient with a matching flag still
+    // inflated "Active patients"/"Critical" below despite no longer being on
+    // the board.
+    const activePatients = patients.filter(
+      (patient) => patient.state !== PatientState.Discharge && patient.state !== PatientState.Deceased,
+    );
     const waitingPatients = patients.filter((patient) => patient.state === PatientState.Waiting);
     const registrationPending = patients.filter(
       (patient) =>

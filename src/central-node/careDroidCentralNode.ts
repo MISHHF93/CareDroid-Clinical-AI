@@ -35,6 +35,8 @@ import {
   buildBottleneckRegistrySnapshot,
   type BottleneckRegistrySnapshot,
 } from '../services/bottleneckRegistry';
+import { REASSESSMENT_ATTENTION_FLAGS } from '../components/whiteboard/reassessmentVisibilityModel';
+import { classifyReferralBucket } from '../components/whiteboard/referralAwarenessModel';
 
 export type CareDroidPressure = 'normal' | 'watch' | 'strained' | 'critical';
 
@@ -240,6 +242,17 @@ function minutesSince(value?: string | null): number {
   return Math.max(0, Math.round((Date.now() - timestamp) / 60000));
 }
 
+// Same reasoning and value as emergencyStore.ts's HEAL-326 fix
+// (PLAUSIBLE_MAX_WAIT_MINUTES): an abandoned/orphaned patient record left in
+// an active state for weeks computes a "Longest Wait" of hundreds of hours --
+// a data anomaly, not a genuine current-wait signal. That fix landed on
+// selectEmergencyOperationalSummary, which turned out to have zero real
+// callers (dead code) -- this file's currentDepartmentStatus.longestWait is
+// the actually-live header KPI and never got the same ceiling. 24h is
+// generously above even the most extreme genuine CTAS P5 critical/LWBS
+// threshold.
+const PLAUSIBLE_MAX_WAIT_MINUTES = 24 * 60;
+
 function formatWaitMinutes(minutes: number): string {
   if (minutes < 60) return `${minutes}m`;
   const hours = Math.floor(minutes / 60);
@@ -276,7 +289,12 @@ function isBoarding(patient: Patient): boolean {
 }
 
 function isReferralPending(referral: Referral): boolean {
-  return !['Closed', 'Completed', 'Declined', 'PatientDeparted'].includes(referral.status);
+  // Was its own broader closed-status list, which counted Accepted/Delayed
+  // referrals as "pending" too -- disagreeing with the identically-labeled
+  // "Referrals Pending" stat tile (referralAwarenessModel.ts's
+  // classifyReferralBucket, which already has their own separate buckets).
+  // Reusing the same classifier makes both readings agree by construction.
+  return classifyReferralBucket(referral) === 'pending';
 }
 
 // HEAL-347.38: department-level status (capacity, queue, EMS, sync/system)
@@ -289,7 +307,13 @@ function isDepartmentLevelAlert(alert: Alert): boolean {
 }
 
 function activePatients(source: CareDroidCentralNodeSource): Patient[] {
-  return source.patients.filter((patient) => patient.state !== PatientState.Discharge);
+  // Was Discharge-only -- a Deceased patient with a matching flag (e.g.
+  // high-risk/reassessment) still leaked into "active"-derived counts
+  // (critical patients, reassessment due, etc.) despite no longer being on
+  // the board in any actionable sense.
+  return source.patients.filter(
+    (patient) => patient.state !== PatientState.Discharge && patient.state !== PatientState.Deceased,
+  );
 }
 
 function toPatientReference(patient: Patient, referrals: Referral[] = []): CareDroidPatientReference {
@@ -824,7 +848,9 @@ export function buildCareDroidCentralNodeSnapshot(
   const generatedAt = new Date().toISOString();
   const active = activePatients(source);
   const waiting = active.filter((patient) => patient.state === PatientState.Waiting);
-  const waits = active.map((patient) => minutesSince(patient.arrivalTime));
+  const waits = active
+    .map((patient) => minutesSince(patient.arrivalTime))
+    .filter((minutes) => minutes <= PLAUSIBLE_MAX_WAIT_MINUTES);
   const activeAlerts = source.alerts.filter((alert) => !alert.dismissed);
   // HEAL-347.38: `activeAlerts` above stays the full undismissed list --
   // it's also what feeds snapshot.operationalAlerts (notification center,
@@ -842,8 +868,12 @@ export function buildCareDroidCentralNodeSnapshot(
     (patient) => patientFlags(patient).includes(PatientFlag.EMSArrival) && isHighRisk(patient),
   ).length;
   const boarders = active.filter(isBoarding).length;
+  // Was ReassessmentDue-only -- the identically-purposed "Reassess Due" stat
+  // tile (reassessmentVisibilityModel.ts's patientMatchesReassessmentAttention)
+  // already correctly matches on all 5 attention flags. Reusing the same
+  // flag list here makes both readings agree by construction.
   const reassessmentDue = active.filter((patient) =>
-    patientFlags(patient).includes(PatientFlag.ReassessmentDue),
+    patientFlags(patient).some((flag) => (REASSESSMENT_ATTENTION_FLAGS as string[]).includes(flag)),
   ).length;
   const screenMode = resolveScreenMode(source, roleContext, options.screenMode, options.pathname);
   const screenConfig = CARE_DROID_SCREEN_MODE_CONFIG[screenMode];

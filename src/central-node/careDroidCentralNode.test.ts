@@ -192,6 +192,42 @@ describe('CareDroidCentralNode contract', () => {
     );
   });
 
+  it('excludes an implausibly stale active patient (e.g. an abandoned/orphaned record) from longestWait/averageWait, matching HEAL-326\'s ceiling reasoning', () => {
+    const snapshot = buildCareDroidCentralNodeSnapshot(
+      source({
+        patients: [
+          patient({
+            id: 'patient-fresh',
+            mrn: 'MRN-SENSITIVE-2',
+            // 45 minutes before `now` -- a genuine, plausible current wait.
+            arrivalTime: '2026-06-13T11:15:00.000Z',
+            state: PatientState.Waiting,
+          }),
+          patient({
+            id: 'patient-orphaned',
+            mrn: 'MRN-SENSITIVE-3',
+            // 26 days before `now` -- an abandoned/orphaned record, not a
+            // genuine current wait (real EDs escalate/transfer/discharge long
+            // before this).
+            arrivalTime: '2026-05-18T12:00:00.000Z',
+            state: PatientState.Waiting,
+          }),
+        ],
+      }),
+      {
+        role: 'charge_nurse',
+        roleLabel: 'Charge Nurse',
+        readOnly: false,
+        allowedRoutes: ['/emergency/whiteboard'],
+      },
+    );
+
+    // Longest/average wait must be derived only from the plausible 45-minute
+    // patient -- the 26-day-stale record would otherwise dominate both.
+    expect(snapshot.currentDepartmentStatus.longestWait).toBe(45);
+    expect(snapshot.currentDepartmentStatus.averageWait).toBe(45);
+  });
+
   it('harmonizes the backend central-node envelope into the visible operational snapshot', () => {
     const snapshot = buildCareDroidCentralNodeSnapshot(
       source(),
