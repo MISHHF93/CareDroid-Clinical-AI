@@ -194,15 +194,6 @@ export const SOLUTIONS_SIDEBAR_NAV_ITEMS = Object.freeze([
     showInMobile: false,
   },
   {
-    id: 'products',
-    label: 'Products',
-    mobileLabel: 'Products',
-    path: CANONICAL_ROUTES.products,
-    matchPaths: [CANONICAL_ROUTES.products, CANONICAL_ROUTES.plans],
-    matchPrefixes: [`${CANONICAL_ROUTES.products}/`, `${CANONICAL_ROUTES.plans}`],
-    showInMobile: false,
-  },
-  {
     id: 'asset-packs',
     label: 'Asset Packs',
     mobileLabel: 'Packs',
@@ -232,30 +223,6 @@ export const SOLUTIONS_SIDEBAR_NAV_ITEMS = Object.freeze([
     mobileLabel: 'Lines',
     path: CANONICAL_ROUTES.serviceLines,
     matchPaths: [CANONICAL_ROUTES.serviceLines],
-    showInMobile: false,
-  },
-  {
-    id: 'integration-readiness',
-    label: 'Integration Readiness',
-    mobileLabel: 'Integrations',
-    path: CANONICAL_ROUTES.integrationReadiness,
-    matchPaths: [CANONICAL_ROUTES.integrationReadiness, CANONICAL_ROUTES.integrationsMarketplace],
-    showInMobile: false,
-  },
-  {
-    id: 'solution-builder',
-    label: 'Solution Builder',
-    mobileLabel: 'Builder',
-    path: CANONICAL_ROUTES.solutionBuilder,
-    matchPaths: [CANONICAL_ROUTES.solutionBuilder],
-    showInMobile: false,
-  },
-  {
-    id: 'value-tracking',
-    label: 'Value Tracking',
-    mobileLabel: 'Value',
-    path: CANONICAL_ROUTES.valueTracking,
-    matchPaths: [CANONICAL_ROUTES.valueTracking, CANONICAL_ROUTES.outcomes],
     showInMobile: false,
   },
   {
@@ -319,37 +286,23 @@ export const SOLUTIONS_SIDEBAR_NAV_ITEMS = Object.freeze([
     trackMindPermission: 'trackmind.intelligence.view',
   },
   {
+    // Traced 2026-08-22: this item's path used to be successCenter
+    // ('/success-center'), which IN_SHELL_ROUTE_REDIRECTS chains to
+    // customerSuccess ('/customer-success'), which itself redirects to
+    // '/admin/tenant' -- a real page, but not the one this item's own
+    // label/ROUTE_RECORDS documentation claimed ("Success Center" /
+    // CustomerSuccessDashboard). A real, fully-built CustomerSuccessDashboard
+    // component exists at CANONICAL_ROUTES.customerSuccessDashboard
+    // ('/customer-success-dashboard', platformConsoleRoutes.ts) but had NO
+    // nav entry pointing at it at all. Repointed this item at the real
+    // page directly; kept the old paths in matchPaths so the still-live
+    // legacy redirect chain (bookmarks/deep links to /success-center or
+    // /customer-success) still highlights this nav item correctly.
     id: 'customer-success',
     label: 'Success Center',
     mobileLabel: 'Success',
-    path: CANONICAL_ROUTES.successCenter,
-    matchPaths: [CANONICAL_ROUTES.customerSuccess, CANONICAL_ROUTES.successCenter],
-    showInMobile: false,
-  },
-  {
-    id: 'specialties',
-    label: 'Specialties',
-    mobileLabel: 'Specialty',
-    path: CANONICAL_ROUTES.specialties,
-    matchPaths: [CANONICAL_ROUTES.specialties],
-    matchPrefixes: [`${CANONICAL_ROUTES.specialties}/`],
-    showInMobile: false,
-  },
-  {
-    id: 'care-pathways',
-    label: 'Pathways',
-    mobileLabel: 'Path',
-    path: CANONICAL_ROUTES.carePathways,
-    matchPaths: [CANONICAL_ROUTES.carePathways],
-    matchPrefixes: [`${CANONICAL_ROUTES.carePathways}/`],
-    showInMobile: false,
-  },
-  {
-    id: 'agents',
-    label: 'AI Agents',
-    mobileLabel: 'Agents',
-    path: CANONICAL_ROUTES.agents,
-    matchPaths: [CANONICAL_ROUTES.agents],
+    path: CANONICAL_ROUTES.customerSuccessDashboard,
+    matchPaths: [CANONICAL_ROUTES.customerSuccessDashboard, CANONICAL_ROUTES.customerSuccess, CANONICAL_ROUTES.successCenter],
     showInMobile: false,
   },
 ]);
@@ -369,15 +322,6 @@ export const OPERATIONS_SIDEBAR_NAV_ITEMS = Object.freeze([
     mobileLabel: 'Graph',
     path: CANONICAL_ROUTES.workspaceDependencyGraph,
     matchPaths: [CANONICAL_ROUTES.workspaceDependencyGraph],
-    showInMobile: false,
-  },
-  {
-    id: 'digital-twin-intelligence',
-    label: 'Twin Intelligence',
-    mobileLabel: 'Twin AI',
-    path: CANONICAL_ROUTES.digitalTwinIntelligence,
-    matchPaths: [CANONICAL_ROUTES.digitalTwinIntelligence],
-    matchPrefixes: [`${CANONICAL_ROUTES.digitalTwinIntelligence}/`],
     showInMobile: false,
   },
   {
@@ -672,15 +616,6 @@ export const ADVANCED_SIDEBAR_NAV_ITEMS = Object.freeze([
       '/governance/regulatory/evidence',
     ],
     permission: 'VIEW_REGULATORY',
-    showInMobile: false,
-  },
-  {
-    id: 'assets',
-    label: 'Assets',
-    mobileLabel: 'Assets',
-    path: CANONICAL_ROUTES.assets,
-    matchPaths: [CANONICAL_ROUTES.assets],
-    matchPrefixes: [`${CANONICAL_ROUTES.assets}/`],
     showInMobile: false,
   },
 ]);

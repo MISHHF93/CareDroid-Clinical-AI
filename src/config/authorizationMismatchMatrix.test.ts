@@ -133,47 +133,50 @@ describe('authorization mismatch matrix', () => {
 
     console.log('MATRIX_SUMMARY ' + JSON.stringify(summary, null, 2));
 
-    // 2026-08-22: originally 19 routes landed here. /search and
-    // /notifications are now excluded from this matrix entirely (see
-    // collectNavRoutes's `kind !== 'action'` filter) -- they're client-side
-    // action triggers (a search overlay, a notification panel), not real
-    // navigable pages, confirmed via their Header.tsx click handlers rather
-    // than a <Route> registration. That leaves 17 tracked below. 5 sampled
-    // (digital-twin, assets, live-map, agents, products) are confirmed via
-    // exhaustive grep across router.tsx and every *RouteTree.tsx/*.Routes.ts
-    // file to have ZERO <Route> registration anywhere in the app -- dead nav
-    // entries pointing at URLs with no page behind them, a different and
-    // more basic defect than an authorization-dimension gap (this matrix
-    // can only prove "no dimension grants access to this path"; it can't
-    // distinguish that from "no page exists at this path" without
-    // cross-referencing the full route tree).
+    // 2026-08-22: originally 19 routes landed here. Resolved via a full
+    // per-item trace (agent investigation + manual classification) rather
+    // than blanket permission grants:
     //
-    // Not hard-failing on this list: distinguishing "genuinely orphaned
-    // authorization gap on a real page" from "dead nav entry with no page"
-    // for the remaining 12 requires the same per-route <Route>-registration
-    // check as the 5 sampled, which hasn't been done for all of them yet.
-    // Tracking the exact known set below so any NEW entry (a route that
-    // wasn't in this list before) fails the test and gets investigated
-    // before it can silently join an already-known backlog.
-    const KNOWN_UNRESOLVED_NO_ACCESS_ROUTES = new Set([
-      '/customer-portal',
-      '/knowledge-base',
-      '/recommendations',
-      '/products',
-      '/service-lines',
-      '/integration-readiness',
-      '/solution-builder',
-      '/value-tracking',
-      '/success-center',
-      '/specialties',
-      '/care-pathways',
-      '/agents',
-      '/workspace-dependency-graph',
-      '/digital-twin-intelligence',
-      '/digital-twin',
-      '/live-map',
-      '/assets',
-    ]);
+    // /search, /notifications -- excluded from this matrix by construction
+    // (`kind !== 'action'` in collectNavRoutes): client-side action
+    // triggers, not real pages.
+    //
+    // 9 dead nav entries REMOVED (navigation.config.ts): products,
+    // specialties, care-pathways, agents, integration-readiness,
+    // solution-builder, value-tracking, digital-twin-intelligence, assets.
+    // All confirmed via exhaustive grep to have zero <Route> registration
+    // anywhere in the app. 8 of the 9 trace to a single deliberate commit
+    // (eb6a2463, "normalize codebase into one unified ED application",
+    // 2026-06-25) that purged CommercialPages.jsx's pre-pivot SaaS/
+    // marketing pages -- these nav entries were simply never cleaned up
+    // afterward. `assets` is the one exception with no history of ever
+    // having a page at all. Backend routes for the purged features were
+    // deliberately RETAINED (not deleted) per "don't delete useful backend
+    // capability merely because its old page disappeared" -- they may
+    // still serve API consumers outside the nav, and rebuilding pre-pivot
+    // commercial pages for a now-ED-focused clinical platform isn't this
+    // fix's call to make unilaterally.
+    //
+    // 7 real, working routes were missing PERMISSION_ROUTE_MAP coverage
+    // (or, for customer-portal, the permission existed in the map but was
+    // granted to zero roles -- same failure shape as VIEW_OBSERVABILITY)
+    // and are now fixed in userProfileCatalog.ts: recommendations,
+    // knowledgeBase, digitalTwin (-> VIEW_TOOLS), workspaceDependencyGraph,
+    // liveMap (-> VIEW_OPERATIONS), serviceLines (-> MANAGE_ORGANIZATION),
+    // customerPortal (-> MANAGE_SUBSCRIPTIONS, now granted to platform-admin).
+    //
+    // 1 rename-drift case fixed: the 'customer-success' nav item
+    // (label "Success Center") pointed at a stale two-hop redirect chain
+    // ending at /admin/tenant, while a real, fully-built
+    // CustomerSuccessDashboard page sat unlinked at
+    // /customer-success-dashboard. Repointed the nav item at the real page
+    // and added its missing PERMISSION_ROUTE_MAP entry.
+    //
+    // The known-unresolved set is now empty. Any route that lands in
+    // deniedForEveryone from this point on is a genuinely NEW regression,
+    // not a backlog item -- investigate it the same way, don't just add it
+    // here.
+    const KNOWN_UNRESOLVED_NO_ACCESS_ROUTES = new Set<string>([]);
     const newlyUnreachable = deniedForEveryone
       .map((r) => r.path)
       .filter((path) => !KNOWN_UNRESOLVED_NO_ACCESS_ROUTES.has(path));

@@ -31,7 +31,6 @@ describe('primaryNavigation', () => {
     expect(OPERATIONS_SIDEBAR_NAV_ITEMS.map((item) => [item.label, item.path])).toEqual([
       ['Workflow Mining', '/workflow-mining'],
       ['Workspace Graph', '/workspace-dependency-graph'],
-      ['Twin Intelligence', '/digital-twin-intelligence'],
       ['Digital Twin', '/digital-twin'],
       ['Hospital Map', '/hospital-map'],
       ['Medical IoT', '/medical-iot'],
@@ -71,31 +70,37 @@ describe('primaryNavigation', () => {
       ['Data Lineage', '/data-lineage'],
       ['Self Diagnostics', '/self-diagnostics'],
       ['Learning Engine', '/platform-learning-engine'],
-      ['Brain', '/brain'],
       ['Business Brain', '/business-brain'],
       ['AI Evaluation', '/ai-evaluation'],
       ['Governance', '/emergency/ai-governance'],
       ['Security', '/security'],
       ['Audit', '/audit'],
       ['Regulatory', '/regulatory'],
-      ['Assets', '/assets'],
     ]);
     expect(getPrimaryNavItemForPath('/business-brain')?.id).toBe('business-brain');
   });
 
-  it('keeps solution builder discoverable in the solutions group', () => {
+  it('keeps commercial-intelligence destinations discoverable in the solutions group', () => {
+    // 'Solution Builder' (/solution-builder) and 'Value Tracking'
+    // (/value-tracking) were removed from navigation.config.ts 2026-08-22:
+    // both traced to CommercialPages.jsx, deleted wholesale in commit
+    // eb6a2463 ("normalize codebase into one unified ED application",
+    // 2026-06-25) -- these nav entries pointed at pages that had been gone
+    // for months, confirmed via exhaustive <Route>-registration search
+    // across the whole app. 'Success Center' now points at the real
+    // CustomerSuccessDashboard page (/customer-success-dashboard) instead
+    // of a stale two-hop redirect chain -- see navigation.config.ts's
+    // 'customer-success' item.
     expect(SOLUTIONS_SIDEBAR_NAV_ITEMS.map((item) => [item.label, item.path])).toEqual(
       expect.arrayContaining([
-        ['Solution Builder', '/solution-builder'],
-        ['Value Tracking', '/value-tracking'],
         ['Product Intelligence', '/product-intelligence'],
         ['Expansion Opportunities', '/expansion-opportunities'],
         ['Readiness Assessment', '/maturity-assessment'],
-        ['Success Center', '/success-center'],
+        ['Success Center', CANONICAL_ROUTES.customerSuccessDashboard],
       ]),
     );
-    expect(getPrimaryNavItemForPath('/solution-builder')?.id).toBe('solution-builder');
-    expect(getPrimaryNavItemForPath('/value-tracking')?.id).toBe('value-tracking');
+    expect(SOLUTIONS_SIDEBAR_NAV_ITEMS.some((item) => item.id === 'solution-builder')).toBe(false);
+    expect(SOLUTIONS_SIDEBAR_NAV_ITEMS.some((item) => item.id === 'value-tracking')).toBe(false);
     expect(getPrimaryNavItemForPath('/product-intelligence')?.id).toBe('product-intelligence');
     expect(getPrimaryNavItemForPath('/expansion-opportunities')?.id).toBe(
       'expansion-opportunities',

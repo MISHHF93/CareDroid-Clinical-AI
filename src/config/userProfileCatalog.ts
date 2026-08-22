@@ -127,6 +127,16 @@ export const PERMISSION_ROUTE_MAP: Record<string, string[]> = Object.freeze({
     // three-competing-redirect-systems bug found in the same sweep.
     CANONICAL_ROUTES.marketplace,
     CANONICAL_ROUTES.plugins,
+    // recommendations/knowledgeBase/digitalTwin have no `permission` field
+    // in navigation.config.ts at all (visible to everyone) yet were still
+    // unreachable by direct nav for the usual reason -- no
+    // PERMISSION_ROUTE_MAP bucket. All three resolve to Tools-console
+    // destinations (ToolsFilteredConsole / ToolsRedirect), so VIEW_TOOLS is
+    // the natural fit. Traced 2026-08-22 as part of the authorization
+    // mismatch matrix's 19-route backlog.
+    CANONICAL_ROUTES.recommendations,
+    CANONICAL_ROUTES.knowledgeBase,
+    CANONICAL_ROUTES.digitalTwin,
   ],
   VIEW_EMERGENCY: [CANONICAL_ROUTES.emergencyWhiteboard],
   VIEW_EMERGENCY_RECEPTION: [
@@ -159,6 +169,15 @@ export const PERMISSION_ROUTE_MAP: Record<string, string[]> = Object.freeze({
     CANONICAL_ROUTES.systemHealth,
     CANONICAL_ROUTES.saasHealth,
     CANONICAL_ROUTES.selfDiagnostics,
+    // workspaceDependencyGraph/liveMap also had no `permission` field and
+    // no PERMISSION_ROUTE_MAP coverage despite both being real, fully-built,
+    // internally-linked pages (WorkspaceDependencyGraph.tsx,
+    // LiveTrackingMap.tsx) -- confirmed live 2026-08-22, part of the same
+    // 19-route backlog. Both are platform/operations-monitoring
+    // capabilities, matching this bucket's existing siblings
+    // (dependencyMap/dependencyGraph/systemHealth).
+    CANONICAL_ROUTES.workspaceDependencyGraph,
+    CANONICAL_ROUTES.liveMap,
   ],
   // /vehicle is a legacy-alias path -- PilotExtensionRouteGuard (see
   // edApplication.config.ts's ED_EXTENSION_ROUTE_REDIRECTS) already has the
@@ -235,6 +254,12 @@ export const PERMISSION_ROUTE_MAP: Record<string, string[]> = Object.freeze({
     // ADMIN_NAV_PERMISSION_BY_ID grants 'enterprise-readiness' nav visibility
     // to VIEW_ANALYTICS holders; same gap, same sweep.
     CANONICAL_ROUTES.enterpriseReadiness,
+    // customerSuccessDashboard is the real page a stale nav-item redirect
+    // chain was pointed away from (see navigation.config.ts's
+    // 'customer-success' item, fixed 2026-08-22) -- had zero
+    // PERMISSION_ROUTE_MAP coverage since nothing linked to it directly
+    // before. Business-intelligence page, same bucket as its siblings.
+    CANONICAL_ROUTES.customerSuccessDashboard,
   ],
   VIEW_SURVEILLANCE: [CANONICAL_ROUTES.surveillanceNexus],
   VIEW_TRACKMIND: [CANONICAL_ROUTES.trackMindWorkspace],
@@ -262,6 +287,12 @@ export const PERMISSION_ROUTE_MAP: Record<string, string[]> = Object.freeze({
     // navigation.config.ts gates 'organization' on MANAGE_ORGANIZATION too;
     // same coverage-gap sweep, 2026-08-21.
     CANONICAL_ROUTES.organization,
+    // serviceLines is a real, fully-built, backend-wired organization
+    // structure page (ServiceLinesPage.tsx, platformConsoleRoutes.ts) with
+    // no `permission` field in navigation.config.ts and zero
+    // PERMISSION_ROUTE_MAP coverage -- confirmed live 2026-08-22 as part of
+    // the 19-route backlog. Same bucket as its sibling organization pages.
+    CANONICAL_ROUTES.serviceLines,
   ],
   CONFIGURE_SYSTEM: [
     CANONICAL_ROUTES.platformAdmin,

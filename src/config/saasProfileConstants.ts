@@ -103,6 +103,16 @@ export const ROLE_PERMISSION_PRESETS: Record<SaasUserRole, string[]> = Object.fr
     'CONFIGURE_SYSTEM',
     'VIEW_TRACKMIND',
     'MANAGE_PLATFORM_TENANTS',
+    // MANAGE_SUBSCRIPTIONS was granted to zero roles in this whole preset
+    // table -- PERMISSION_ROUTE_MAP already had customerPortal/billing in
+    // its bucket (added 2026-08-21), but with nobody holding the
+    // permission, both were unreachable regardless -- same failure shape
+    // as VIEW_OBSERVABILITY. platform-admin already manages
+    // MANAGE_PLATFORM_TENANTS/CONFIGURE_SYSTEM, so subscription/billing
+    // administration is a natural, minimal extension rather than a new
+    // role. Confirmed live 2026-08-22 via the authorization mismatch
+    // matrix's 19-route backlog.
+    'MANAGE_SUBSCRIPTIONS',
   ],
   'racetrack-admin': [
     'VIEW_DASHBOARD',
