@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { Type } from 'class-transformer';
 import {
   ArrayMaxSize,
@@ -107,9 +108,38 @@ class TelemetryIngestDto {
 export class PlatformTelemetryController {
   constructor(private readonly telemetry: PlatformTelemetryService) {}
 
+  // HEAL-347.83: this handler carried NO guards at all (not even JWT auth) --
+  // every other handler in this file requires AuthGuard('jwt') +
+  // AuthorizationGuard. It has to stay reachable pre-login (main.tsx wires
+  // observabilityService.recordError() to global window.onerror/unhandled-
+  // rejection handlers at the true app root, before any auth gate mounts,
+  // so a crash on the login page itself can still be reported), so a hard
+  // auth requirement would silently drop real pre-login crash telemetry --
+  // confirmed by tracing every observabilityService consumer before touching
+  // this. What's actually unjustified is accepting a client-declared
+  // `patientId` on an event nobody has verified the caller may legitimately
+  // associate with -- a pre-login caller has no patient in view, so a real
+  // one never needs this field, while an anonymous attacker could tag
+  // arbitrary events with a real patientId they merely guessed. Stripped
+  // patientId at this specific unauthenticated ingress path only --
+  // ingestEvents() is also called internally by this same service with a
+  // real patientId from several already-authenticated code paths (see
+  // platform-telemetry.service.ts), which must keep working unchanged.
+  // Rate-limited as defense in depth, matching the identical
+  // must-work-without-hard-auth pattern already used by
+  // app-navigator.controller.ts's query() handler.
   @Post('events')
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { limit: 20, ttl: 60000 } })
   ingestEvents(@Body() payload: TelemetryIngestDto) {
-    return this.telemetry.ingestEvents(payload);
+    const sanitized: TelemetryIngestDto = {
+      ...payload,
+      events: (payload.events || []).map((event) => {
+        const { patientId: _patientId, ...rest } = event;
+        return rest as PlatformTelemetryEventDto;
+      }),
+    };
+    return this.telemetry.ingestEvents(sanitized);
   }
 
   @Get('diagnostics')

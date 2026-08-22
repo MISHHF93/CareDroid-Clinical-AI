@@ -9,6 +9,9 @@ import { LMECSService, type HospitalClient } from '../../services/lmecs.service'
 import { OrganizationalDigitalTwin } from '../../services/organizational-digital-twin.service';
 import { ERPulseHandoverService } from '../../services/smart-handover-v2.service';
 import { SkipTenantIsolation } from '../tenant-context/tenant-scope.decorator';
+import { AuthorizationGuard } from '../auth/guards/authorization.guard';
+import { RequirePermission } from '../auth/decorators/permissions.decorator';
+import { Permission } from '../auth/enums/permission.enum';
 import {
   HandoverRequestDto,
   Process112CallDto,
@@ -29,8 +32,20 @@ import {
  * completely unauthenticated requests. They're @SkipTenantIsolation() rather
  * than tenant-scoped like EmergencyOsController because they don't carry an
  * organizationId/workspaceId and operate on request-body payloads directly,
- * not tenant-scoped DB records — but they still require a valid authenticated
- * user, matching every other PHI-adjacent endpoint in this module.
+ * not tenant-scoped DB records.
+ *
+ * HEAL-347.83: a prior fix added AuthGuard('jwt') (see the "previously had no
+ * guards at all" language above) but never actually finished the job this
+ * comment claims -- the handlers that genuinely touch patient/clinical-shaped
+ * data (chief complaints, ECG waveforms, wearable vitals, call audio,
+ * synchronized patient-flow state) had no AuthorizationGuard/Permission check
+ * at all, unlike every other PHI-adjacent handler in this module (all of
+ * which require READ_PHI/WRITE_PHI). The purely aggregate/non-patient
+ * handlers (info/health status strings, hospital-level federated-learning
+ * model weights, hospital-client selection stats) are deliberately left as
+ * JWT-only, matching this module's own established treatment of the
+ * comparable federated-learning register/update/aggregate endpoints in
+ * EmergencyOsController.
  */
 
 @UseGuards(AuthGuard('jwt'))
@@ -40,6 +55,8 @@ export class ERPulseHandoverController {
   constructor(private readonly handoverService: ERPulseHandoverService) {}
 
   @Post('er-pulse')
+  @UseGuards(AuthorizationGuard)
+  @RequirePermission(Permission.WRITE_PHI)
   generateERPulseHandover(@Body() dto: HandoverRequestDto) {
     const patientId =
       dto.patientId || String(dto.patient?.patientId || dto.patient?.id || 'demo-patient');
@@ -95,6 +112,8 @@ export class FederatedEMSController {
   }
 
   @Post('112-call')
+  @UseGuards(AuthorizationGuard)
+  @RequirePermission(Permission.WRITE_PHI)
   async process112Call(@Body() dto: Process112CallDto) {
     const call = this.normalizeCall(dto);
     const [triage, dispatch] = await Promise.all([
@@ -154,6 +173,8 @@ export class LMECSController {
   }
 
   @Post('predict')
+  @UseGuards(AuthorizationGuard)
+  @RequirePermission(Permission.READ_PHI)
   predictSeverity(@Body() dto: PredictSeverityDto) {
     return this.lmecsService.predictSeverity(
       dto.patientData || {},
@@ -193,6 +214,8 @@ export class AICallInterrogationController {
   constructor(private readonly callInterrogationService: AICallInterrogationService) {}
 
   @Post('ai-call-interrogation')
+  @UseGuards(AuthorizationGuard)
+  @RequirePermission(Permission.READ_PHI)
   async detectOHCA(@Body() dto: CallInterrogationRequestDto) {
     const call = this.normalizeEmergencyCall(dto);
     const detection = await this.callInterrogationService.detectOHCA(call);
@@ -201,6 +224,8 @@ export class AICallInterrogationController {
   }
 
   @Post('ai-call-interrogation/ecg')
+  @UseGuards(AuthorizationGuard)
+  @RequirePermission(Permission.READ_PHI)
   interpretECG(@Body() dto: InterpretEcgDto) {
     return this.callInterrogationService.interpretECG(dto.ecgData || []);
   }
@@ -226,11 +251,15 @@ export class OrganizationalDigitalTwinController {
   constructor(private readonly organizationalDigitalTwin: OrganizationalDigitalTwin) {}
 
   @Post('synchronize')
+  @UseGuards(AuthorizationGuard)
+  @RequirePermission(Permission.WRITE_PHI)
   synchronizePatientFlow(@Body() dto: SynchronizePatientFlowDto) {
     return this.organizationalDigitalTwin.synchronizePatientFlow(dto);
   }
 
   @Post('simulate')
+  @UseGuards(AuthorizationGuard)
+  @RequirePermission(Permission.READ_PHI)
   runPredictiveSimulation(@Body() dto: RunPredictiveSimulationDto) {
     return this.organizationalDigitalTwin.runPredictiveSimulation(dto.scenario || 'baseline');
   }

@@ -1,4 +1,5 @@
 import { Test } from '@nestjs/testing';
+import { AuthGuard } from '@nestjs/passport';
 import {
   AICallInterrogationController,
   ERPulseHandoverController,
@@ -12,6 +13,7 @@ import { FederatedEMSService } from '../../services/federated-ems.service';
 import { LMECSService } from '../../services/lmecs.service';
 import { OrganizationalDigitalTwin } from '../../services/organizational-digital-twin.service';
 import { ERPulseHandoverService } from '../../services/smart-handover-v2.service';
+import { AuthorizationGuard } from '../auth/guards/authorization.guard';
 
 describe('CareDroid research controllers', () => {
   let handoverController: ERPulseHandoverController;
@@ -38,7 +40,21 @@ describe('CareDroid research controllers', () => {
         EdgeAIAmbulanceService,
         OrganizationalDigitalTwin,
       ],
-    }).compile();
+    })
+      // HEAL-347.83: these 5 controllers now carry handler-level
+      // AuthorizationGuard on their PHI-touching routes (previously had no
+      // permission decorator at all). This suite calls controller methods
+      // directly, not through the real HTTP guard pipeline, so the guard's
+      // own behavior is irrelevant here -- but Nest's DI container still
+      // eagerly resolves every provider referenced by a @UseGuards() class,
+      // including AuthorizationGuard's real AuditService dependency, at
+      // compile() time. Override with a no-op the same way
+      // emergency-os.controller.spec.ts already does for the same guard.
+      .overrideGuard(AuthGuard('jwt'))
+      .useValue({ canActivate: () => true })
+      .overrideGuard(AuthorizationGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     handoverController = moduleRef.get(ERPulseHandoverController);
     federatedEMSController = moduleRef.get(FederatedEMSController);
