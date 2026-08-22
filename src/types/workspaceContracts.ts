@@ -80,10 +80,17 @@ export const WorkspaceMembershipContractSchema = z.object({
   role: z.string(),
   permissions: z.array(z.string()).default([]),
   teams: z.array(z.string()).default([]),
-  department: z.string().optional(),
+  // Real, intentional DB columns (backend/src/modules/workspaces/entities/
+  // workspace-membership.entity.ts: `@Column({ nullable: true })`) -- the
+  // backend genuinely sends `null` here, not just "field omitted", for a
+  // membership with no assigned department or that was never accessed
+  // through a normal join flow. `.optional()` alone rejects an explicit
+  // `null`; every real workspace-context response was failing this
+  // validation until `.nullable()` was added to match.
+  department: z.string().nullable().optional(),
   status: z.string(),
-  joinedAt: z.union([z.string(), z.date()]).optional(),
-  lastAccessedAt: z.union([z.string(), z.date()]).optional(),
+  joinedAt: z.union([z.string(), z.date()]).nullable().optional(),
+  lastAccessedAt: z.union([z.string(), z.date()]).nullable().optional(),
 });
 export type WorkspaceMembershipContract = z.infer<typeof WorkspaceMembershipContractSchema>;
 

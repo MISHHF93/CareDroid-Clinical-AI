@@ -199,6 +199,62 @@ describe('WorkspaceContext backend context', () => {
     );
   });
 
+  // Regression guard: backend/src/modules/workspaces/entities/
+  // workspace-membership.entity.ts declares department/joinedAt/
+  // lastAccessedAt as genuinely nullable DB columns, and the real backend
+  // sends explicit `null` for a membership with no department or that was
+  // never accessed through a normal join flow -- not merely "field
+  // omitted". WorkspaceMembershipContractSchema's `.optional()` alone
+  // rejected an explicit `null`, so every such real response (this is the
+  // common case, not an edge case) logged a false-positive contract
+  // violation. `.nullable()` was added to match the real, intentional data
+  // shape.
+  it('does not log a contract violation for a real membership with null department/joinedAt/lastAccessedAt', async () => {
+    mocks.apiFetch.mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          workspace: buildIcuWorkspace(),
+          workspaceState: {
+            workspaces: [buildIcuWorkspace()],
+            memberships: [],
+            activeWorkspaceId: 'workspace-icu',
+            recentWorkspaceIds: [],
+          },
+          membership: {
+            id: 'membership-1',
+            workspaceId: 'workspace-icu',
+            userId: 'user-1',
+            role: 'member',
+            permissions: [],
+            teams: [],
+            department: null,
+            status: 'active',
+            joinedAt: null,
+            lastAccessedAt: null,
+          },
+          effectivePermissions: [],
+          visibleAssetIds: ['sofa-score'],
+          entitledPackIds: [],
+          assetAccessDecisions: {},
+          recommendations: [],
+          workspaceTypes: ['icu'],
+        }),
+        { status: 200, headers: { 'content-type': 'application/json' } },
+      ),
+    );
+
+    const wrapper = ({ children }) => <WorkspaceProvider>{children}</WorkspaceProvider>;
+    const { result } = renderHook(() => useWorkspace(), { wrapper });
+
+    await waitFor(() => {
+      expect(result.current.activeWorkspaceId).toBe('icu');
+    });
+    expect(mocks.loggerWarn).not.toHaveBeenCalledWith(
+      'Workspace context response violated the canonical contract',
+      expect.anything(),
+    );
+  });
+
   it('HEAL-234: a slower refreshWorkspaceContext() call does not overwrite a faster, more recently-started one', async () => {
     function deferred<T>() {
       let resolve!: (value: T) => void;
