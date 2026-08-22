@@ -5,6 +5,7 @@ import { CategoryBarChart } from '../../components/dashboard/DashboardCharts';
 import { GraphicIconBadge } from '../../components/graphics/CdlGraphicKit';
 import StateSourceNotice from '../../components/StateSourceNotice';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import {
   DEMO_SIMULATION_OUTCOMES,
   SIMULATION_SCENARIOS,
@@ -28,6 +29,7 @@ import {
 import './SimulationOutcomes.css';
 
 export default function SimulationOutcomes() {
+  useRouteChromeRegistration({ title: 'Simulation Outcomes' });
   const [runsTick, setRunsTick] = useState(0);
   const runs = useMemo(() => listSimulationRuns(), [runsTick]);
   const hasRealRuns = runs.length > 0;
@@ -70,7 +72,7 @@ export default function SimulationOutcomes() {
         <div className="simulation-outcomes-page__title-row">
           <GraphicIconBadge iconKey="activity" accent="brand" size="md" />
           <div>
-            <h1>Simulation Outcomes</h1>
+            <p className="simulation-outcomes-page__title-text" data-testid="cd-page-title-text">Simulation Outcomes</p>
             <p>Completion trends, safety scores, competency coverage, and recommended practice scenarios.</p>
           </div>
         </div>

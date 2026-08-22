@@ -5,6 +5,7 @@ import { CategoryBarChart } from '../../components/dashboard/DashboardCharts';
 import { GraphicIconBadge } from '../../components/graphics/CdlGraphicKit';
 import StateSourceNotice from '../../components/StateSourceNotice';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import { fetchMedicalIotSnapshot } from '../../services/medicalIotService';
 import { DEMO_LIVE_STATES } from '../../utils/demoLiveState';
 import {
@@ -139,6 +140,7 @@ function DeviceRow({
 }
 
 export default function MedicalIotDashboard() {
+  useRouteChromeRegistration({ title: 'Medical IoT Dashboard' });
   const [devices, setDevices] = useState<IotDevice[]>(DEMO_DEVICES);
   const [alerts, setAlerts] = useState<any[]>([]);
   const [connectivityTimeline, setConnectivityTimeline] = useState<any[]>([]);
@@ -220,7 +222,7 @@ export default function MedicalIotDashboard() {
         <div className="medical-iot-page__title-row">
           <GraphicIconBadge iconKey="activity" accent="brand" size="md" />
           <div>
-            <h1>Medical IoT Dashboard</h1>
+            <p className="medical-iot-page__title-text" data-testid="cd-page-title-text">Medical IoT Dashboard</p>
             <p>Device fleet connectivity, battery health, active alarms, and bedside telemetry positions.</p>
           </div>
         </div>

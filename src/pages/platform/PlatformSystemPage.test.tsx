@@ -36,7 +36,7 @@ describe('PlatformSystemPage header actions', () => {
   it('renders exactly one control that navigates to the tool library, not a duplicate pair (HEAL-140)', async () => {
     renderRoute('/governance');
 
-    await screen.findByRole('heading', { level: 1 });
+    await screen.findByTestId('cd-page-title-text');
 
     const toolLibraryControls = [
       ...screen.queryAllByRole('link', { name: /tool library/i }),

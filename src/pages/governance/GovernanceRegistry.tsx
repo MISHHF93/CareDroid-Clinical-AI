@@ -13,9 +13,18 @@ import {
   governanceRiskTone,
   type GovernanceRegistrySnapshot,
 } from '../../utils/platformSaasChartModel';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import './GovernanceRegistry.css';
 
+const GOVERNANCE_REGISTRY_ROUTE_CHROME = Object.freeze({
+  title: 'Platform Governance Registry',
+  subtitle: 'Stewardship metadata, risk classification, audit requirements, and review schedules.',
+});
+
 export default function GovernanceRegistry() {
+  // AppShell's ShellRouteTab already renders a real page-level <h1> for this
+  // route; this page also rendered its own <h1>, a duplicate-heading bug.
+  useRouteChromeRegistration(GOVERNANCE_REGISTRY_ROUTE_CHROME);
   const fallback = useMemo(() => buildLocalGovernanceRegistryFallback(), []);
   const [registry, setRegistry] = useState<GovernanceRegistrySnapshot>(fallback);
   const [sourceState, setSourceState] = useState<
@@ -50,7 +59,7 @@ export default function GovernanceRegistry() {
         <div className="governance-registry-page__title-row">
           <GraphicIconBadge iconKey="shield-check" accent="brand" size="md" />
           <div>
-            <h1>Platform Governance Registry</h1>
+            <p className="governance-registry-page__title-text" data-testid="cd-page-title-text">Platform Governance Registry</p>
             <p>Stewardship metadata, risk classification, audit requirements, and review schedules.</p>
           </div>
         </div>

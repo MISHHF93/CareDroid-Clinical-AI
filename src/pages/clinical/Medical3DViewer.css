@@ -23,9 +23,10 @@
   align-items: start;
 }
 
-.medical-3d-page__title-row h1 {
+.medical-3d-page__title-row .medical-3d-page-title-text {
   margin: 0;
   font-size: clamp(22px, 3vw, 28px);
+  font-weight: 700;
   color: var(--medical-text-heading, var(--app-text-primary));
 }
 

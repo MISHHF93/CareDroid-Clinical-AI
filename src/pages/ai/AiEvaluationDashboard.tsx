@@ -15,9 +15,21 @@ import {
   buildEvaluationQualityChart,
 } from '../../utils/clinicalInsightsChartModel';
 import { AiMaturityBadge } from '../../components/ai/AiMaturityBadge';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import './AiEvaluationDashboard.css';
 
+const AI_EVAL_ROUTE_CHROME = Object.freeze({
+  title: 'AI Evaluation Lab',
+  subtitle:
+    'Offline safety gates and benchmark trends. Seed demo metrics are labeled and must not be used for model promotion.',
+});
+
 export default function AiEvaluationDashboard() {
+  // AppShell's ShellRouteTab already renders a real page-level <h1> for this
+  // route; this page also rendered its own <h1>, a duplicate-heading bug.
+  // Registering the real title/subtitle here lets the local heading demote
+  // to a <p> instead.
+  useRouteChromeRegistration(AI_EVAL_ROUTE_CHROME);
   const [loading, setLoading] = useState(true);
   const [fromApi, setFromApi] = useState(false);
   const [message, setMessage] = useState('');
@@ -65,7 +77,7 @@ export default function AiEvaluationDashboard() {
         <div className="ai-eval-page__title-row">
           <GraphicIconBadge iconKey="shield-check" accent="brand" size="md" />
           <div>
-            <h1>AI Evaluation Lab</h1>
+            <p className="ai-eval-page__title-text" data-testid="cd-page-title-text">AI Evaluation Lab</p>
             <p>
               Offline safety gates and benchmark trends. Seed demo metrics are labeled and must not
               be used for model promotion.

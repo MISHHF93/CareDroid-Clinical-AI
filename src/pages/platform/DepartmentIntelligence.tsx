@@ -12,9 +12,11 @@ import {
   buildDepartmentOutcomeSourceChart,
   departmentHealthTone,
 } from '../../utils/platformSaasChartModel';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import './DepartmentIntelligence.css';
 
 export function DepartmentIntelligencePage() {
+  useRouteChromeRegistration({ title: 'Department Intelligence' });
   const intelligence = useMemo(() => buildDepartmentPerformanceIntelligence(), []);
   const healthChart = useMemo(() => buildDepartmentHealthChart(intelligence.departments), [intelligence.departments]);
   const sourceChart = useMemo(
@@ -28,7 +30,7 @@ export function DepartmentIntelligencePage() {
         <div className="department-intelligence-page__title-row">
           <GraphicIconBadge iconKey="chart-bar" accent="brand" size="md" />
           <div>
-            <h1>Department Intelligence</h1>
+            <p className="department-intelligence-page-title-text" data-testid="cd-page-title-text">Department Intelligence</p>
             <p>Measurable outcomes across emergency, laboratory, and operations service lines.</p>
           </div>
         </div>

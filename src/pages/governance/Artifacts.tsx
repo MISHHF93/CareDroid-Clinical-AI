@@ -12,11 +12,13 @@ import {
 } from '../../data/artifactIntelligence';
 import { DEMO_LIVE_STATES } from '../../utils/demoLiveState';
 import { buildArtifactCategoryChart, buildArtifactTypeChart } from '../../utils/platformSaasChartModel';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import './Artifacts.css';
 
 const DISPLAY_LIMIT = 48;
 
 export default function Artifacts() {
+  useRouteChromeRegistration({ title: 'CareDroid Artifacts' });
   const [typeFilter, setTypeFilter] = useState('all');
   const [query, setQuery] = useState('');
 
@@ -52,7 +54,7 @@ export default function Artifacts() {
         <div className="artifacts-page__title-row">
           <GraphicIconBadge iconKey="report" accent="brand" size="md" />
           <div>
-            <h1>CareDroid Artifacts</h1>
+            <p className="artifacts-page-title-text" data-testid="cd-page-title-text">CareDroid Artifacts</p>
             <p>Machine-learning-ready artifact catalog with resonance metadata, validation, and export-ready schema fields.</p>
           </div>
         </div>

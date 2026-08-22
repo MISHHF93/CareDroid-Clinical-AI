@@ -8,9 +8,11 @@ import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { buildHealthcareKnowledgeHub } from '../../data/healthcareKnowledgeHub';
 import { DEMO_LIVE_STATES } from '../../utils/demoLiveState';
 import { buildKnowledgeHubTypeChart } from '../../utils/platformSaasChartModel';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import './HealthcareKnowledgeHub.css';
 
 export function HealthcareKnowledgeHubPage() {
+  useRouteChromeRegistration({ title: 'Knowledge Hub' });
   const [query, setQuery] = useState('');
   const [specialty, setSpecialty] = useState('all');
   const [role, setRole] = useState('all');
@@ -29,7 +31,7 @@ export function HealthcareKnowledgeHubPage() {
         <div className="knowledge-hub-page__title-row">
           <GraphicIconBadge iconKey="notes" accent="brand" size="md" />
           <div>
-            <h1>Knowledge Hub</h1>
+            <p className="knowledge-hub-page-title-text" data-testid="cd-page-title-text">Knowledge Hub</p>
             <p>Protocols, pathways, calculators, simulations, AI guidance, and documentation across workspaces.</p>
           </div>
         </div>

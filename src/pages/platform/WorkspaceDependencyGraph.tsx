@@ -12,9 +12,11 @@ import {
   buildWorkspaceDependencyTypeChart,
   workspaceDependencyStrengthTone,
 } from '../../utils/platformSaasChartModel';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import './WorkspaceDependencyGraph.css';
 
 export function WorkspaceDependencyGraphPage() {
+  useRouteChromeRegistration({ title: 'Workspace Dependency Graph' });
   const graph = useMemo(() => buildWorkspaceDependencyGraph(), []);
   const typeChart = useMemo(() => buildWorkspaceDependencyTypeChart(graph.edges), [graph.edges]);
   const strengthChart = useMemo(() => buildWorkspaceDependencyStrengthChart(graph.edges), [graph.edges]);
@@ -25,7 +27,7 @@ export function WorkspaceDependencyGraphPage() {
         <div className="workspace-graph-page__title-row">
           <GraphicIconBadge iconKey="layout-dashboard" accent="brand" size="md" />
           <div>
-            <h1>Workspace Dependency Graph</h1>
+            <p className="workspace-graph-page-title-text" data-testid="cd-page-title-text">Workspace Dependency Graph</p>
             <p>Cross-workspace handoffs, signals, workflows, and operational dependencies.</p>
           </div>
         </div>

@@ -13,9 +13,11 @@ import {
   businessBrainScoreTone,
   recommendationPriorityTone,
 } from '../../utils/platformSaasChartModel';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import './BusinessBrain.css';
 
 export function CareDroidBusinessBrainPage() {
+  useRouteChromeRegistration({ title: 'Business Brain' });
   const brain = useMemo(() => buildCareDroidBusinessBrain(), []);
   const domainChart = useMemo(() => buildBusinessBrainDomainChart(brain.analytics), [brain.analytics]);
   const recommendationChart = useMemo(
@@ -29,7 +31,7 @@ export function CareDroidBusinessBrainPage() {
         <div className="business-brain-page__title-row">
           <GraphicIconBadge iconKey="chart-bar" accent="brand" size="md" />
           <div>
-            <h1>Business Brain</h1>
+            <p className="business-brain-page-title-text" data-testid="cd-page-title-text">Business Brain</p>
             <p>Platform and business analytics fused into expansion, retirement, merge, onboarding, and training advisories.</p>
           </div>
         </div>

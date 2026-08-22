@@ -12,6 +12,7 @@ import {
 import { useOrganizationContext } from '../../contexts/OrganizationContext';
 import { useUserIdentity } from '../../contexts/UserIdentityContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import { PlatformAssetsApi } from '../../services/platformAssetsApi';
 import { ProductCatalogApi } from '../../services/productCatalogApi';
 import logger from '../../utils/logger';
@@ -167,6 +168,7 @@ export function OrganizationDashboard() {
 }
 
 export function OrganizationSettings() {
+  useRouteChromeRegistration({ title: 'Organization settings' });
   const { organization, refreshPlatformContext, refreshIdentity } = useUserIdentity();
   const {
     branding,
@@ -309,7 +311,7 @@ export function OrganizationSettings() {
   return (
     <div className="org-page">
       <header className="org-page-header">
-        <h1>Organization settings</h1>
+        <p className="org-page-title-text" data-testid="cd-page-title-text">Organization settings</p>
         <Link to="/organization">← Organization home</Link>
       </header>
 
@@ -449,6 +451,7 @@ export function OrganizationSettings() {
 }
 
 export function PackMarketplace() {
+  useRouteChromeRegistration({ title: 'Asset Pack Marketplace' });
   const {
     organization,
     platformContext,
@@ -560,7 +563,7 @@ export function PackMarketplace() {
   return (
     <div className="org-page">
       <header className="org-page-header">
-        <h1>Asset Pack Marketplace</h1>
+        <p className="org-page-title-text" data-testid="cd-page-title-text">Asset Pack Marketplace</p>
         <p className="org-page-subtitle">
           Enable clinical, operations, training, governance, and research packs for the active
           organization. Each pack maps assets, dependencies, modules, and target roles.
@@ -701,6 +704,7 @@ export function PackMarketplace() {
 }
 
 export function PlatformAnalyticsPage() {
+  useRouteChromeRegistration({ title: 'Platform analytics' });
   const { organization, platformContext } = useUserIdentity();
   const [analytics, setAnalytics] = useState<any>(null);
 
@@ -762,7 +766,7 @@ export function PlatformAnalyticsPage() {
   return (
     <div className="org-page">
       <header className="org-page-header">
-        <h1>Platform analytics</h1>
+        <p className="org-page-title-text" data-testid="cd-page-title-text">Platform analytics</p>
         <p className="org-page-subtitle">
           Asset utilization intelligence for data-driven promotion, improvement, hiding, and merge decisions.
         </p>
@@ -859,6 +863,7 @@ function CustomerSuccessMetricCard({ label, metric, suffix = '' }) {
 }
 
 export function CustomerSuccessDashboard() {
+  useRouteChromeRegistration({ title: 'Customer Success' });
   const { organization } = useUserIdentity();
   const [period, setPeriod] = useState('month');
   const [dashboard, setDashboard] = useState<any>(null);
@@ -879,7 +884,7 @@ export function CustomerSuccessDashboard() {
     return (
       <div className="org-page">
         <header className="org-page-header">
-          <h1>Customer Success</h1>
+          <p className="org-page-title-text" data-testid="cd-page-title-text">Customer Success</p>
           <p className="org-page-subtitle">Link an organization to view customer health.</p>
         </header>
       </div>
@@ -894,7 +899,7 @@ export function CustomerSuccessDashboard() {
   return (
     <div className="org-page">
       <header className="org-page-header">
-        <h1>Customer Success</h1>
+        <p className="org-page-title-text" data-testid="cd-page-title-text">Customer Success</p>
         <p className="org-page-subtitle">
           Customer health, retention signals, adoption, active users, asset usage, AI usage,
           simulations, workflows, and underused products for {organization.name}.
@@ -1071,6 +1076,7 @@ function IntelligenceUsageList({ title, rows = [] as any[], emptyText = 'No usag
 }
 
 export function OrganizationIntelligenceProfile() {
+  useRouteChromeRegistration({ title: 'Organization Intelligence' });
   const userIdentity = useUserIdentity();
   const organizationContext = useOrganizationContext();
   const workspaceContext = useWorkspace();
@@ -1140,7 +1146,7 @@ export function OrganizationIntelligenceProfile() {
   return (
     <div className="org-page">
       <header className="org-page-header">
-        <h1>Organization Intelligence</h1>
+        <p className="org-page-title-text" data-testid="cd-page-title-text">Organization Intelligence</p>
         <p className="org-page-subtitle">
           Organization Intelligence Profile for {profile.organization.name}: behavior-aware
           recommendations across packs, assets, AI usage, adoption, workflows, simulations, and automation.
@@ -1250,6 +1256,7 @@ export function OrganizationIntelligenceProfile() {
 }
 
 export function AssetLifecycleAdmin() {
+  useRouteChromeRegistration({ title: 'Asset lifecycle' });
   const [assets, setAssets] = useState<any[]>([]);
   const [status, setStatus] = useState('');
 
@@ -1291,7 +1298,7 @@ export function AssetLifecycleAdmin() {
   return (
     <div className="org-page">
       <header className="org-page-header">
-        <h1>Asset lifecycle</h1>
+        <p className="org-page-title-text" data-testid="cd-page-title-text">Asset lifecycle</p>
         <p className="org-page-subtitle">
           Manage draft, beta, active, deprecated, and archived states for tools, calculators,
           simulations, workflows, AI agents, and integrations.
@@ -1358,6 +1365,7 @@ export function AssetLifecycleAdmin() {
 }
 
 export function DepartmentsPage() {
+  useRouteChromeRegistration({ title: 'Departments' });
   const { organization } = useUserIdentity();
   const [graph, setGraph] = useState<any>(null);
   const [selectedDepartmentId, setSelectedDepartmentId] = useState('emergency');
@@ -1381,7 +1389,7 @@ export function DepartmentsPage() {
   return (
     <div className="org-page">
       <header className="org-page-header">
-        <h1>Departments</h1>
+        <p className="org-page-title-text" data-testid="cd-page-title-text">Departments</p>
         <p className="org-page-subtitle">
           Department-to-asset mapping across packs, assets, roles, permissions, and users.
         </p>
@@ -1485,6 +1493,7 @@ export function DepartmentsPage() {
 }
 
 export function ServiceLinesPage() {
+  useRouteChromeRegistration({ title: 'Service Lines' });
   const { organization } = useUserIdentity();
   const [graph, setGraph] = useState<any>(null);
   const [selectedServiceLineId, setSelectedServiceLineId] = useState('emergency-medicine');
@@ -1508,7 +1517,7 @@ export function ServiceLinesPage() {
   return (
     <div className="org-page">
       <header className="org-page-header">
-        <h1>Service Lines</h1>
+        <p className="org-page-title-text" data-testid="cd-page-title-text">Service Lines</p>
         <p className="org-page-subtitle">
           Service Line to Department to Asset Pack to Asset architecture for clinical and operational rollouts.
         </p>
@@ -1606,6 +1615,7 @@ export function ServiceLinesPage() {
 }
 
 export function TenantAdministrationCenter() {
+  useRouteChromeRegistration({ title: 'Tenant Administration Center' });
   const { organization, refreshPlatformContext } = useUserIdentity();
   const [admin, setAdmin] = useState<any>(null);
   const [form, setForm] = useState({
@@ -1741,7 +1751,7 @@ export function TenantAdministrationCenter() {
     return (
       <div className="org-page">
         <header className="org-page-header">
-          <h1>Tenant Administration Center</h1>
+          <p className="org-page-title-text" data-testid="cd-page-title-text">Tenant Administration Center</p>
           <p className="org-page-subtitle">Create an organization before managing tenant settings.</p>
         </header>
       </div>
@@ -1787,7 +1797,7 @@ export function TenantAdministrationCenter() {
   return (
     <div className="org-page">
       <header className="org-page-header">
-        <h1>Tenant Administration Center</h1>
+        <p className="org-page-title-text" data-testid="cd-page-title-text">Tenant Administration Center</p>
         <p className="org-page-subtitle">
           Tenant-scoped administration for organization profile, departments, workspaces, users,
           roles, permissions, branding, integrations, and subscriptions without code changes.

@@ -55,6 +55,12 @@
   margin: 8px 0 0;
 }
 
+.automation-audit-hero .automation-audit-title-text {
+  margin: 4px 0 0;
+  font-size: 28px;
+  font-weight: 700;
+}
+
 .automation-audit-tenant-filter {
   min-width: min(100%, 280px);
   display: grid;

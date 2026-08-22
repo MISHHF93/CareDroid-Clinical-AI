@@ -15,9 +15,11 @@ import {
 } from '../../data/researchEvidenceHub';
 import { DEMO_LIVE_STATES } from '../../utils/demoLiveState';
 import { buildResearchSectionChart } from '../../utils/clinicalInsightsChartModel';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import './ResearchEvidenceHub.css';
 
 export default function ResearchEvidenceHub() {
+  useRouteChromeRegistration({ title: 'Research and Evidence Hub' });
   const [query, setQuery] = useState('');
   const snapshot = useMemo(() => getResearchHubSnapshot(), []);
   const sectionChart = useMemo(() => buildResearchSectionChart(snapshot), [snapshot]);
@@ -29,7 +31,7 @@ export default function ResearchEvidenceHub() {
         <div className="research-hub-page__title-row">
           <GraphicIconBadge iconKey="activity" accent="brand" size="md" />
           <div>
-            <h1>Research and Evidence Hub</h1>
+            <p className="research-hub-title-text" data-testid="cd-page-title-text">Research and Evidence Hub</p>
             <p>Literature, guidelines, evidence summaries, study tracking, and citation exploration.</p>
           </div>
         </div>

@@ -8,9 +8,11 @@ import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { buildWorkflowMiningReport } from '../../data/workflowMiningEngine';
 import { DEMO_LIVE_STATES } from '../../utils/demoLiveState';
 import { buildWorkflowJourneyChart, buildWorkflowSignalChart } from '../../utils/platformSaasChartModel';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import './WorkflowMiningEngine.css';
 
 export function WorkflowMiningEnginePage() {
+  useRouteChromeRegistration({ title: 'Workflow Mining' });
   const report = useMemo(() => buildWorkflowMiningReport(), []);
   const signalChart = useMemo(() => buildWorkflowSignalChart(report.signalCounts), [report.signalCounts]);
   const journeyChart = useMemo(() => buildWorkflowJourneyChart(report.mostCommonUserJourneys), [report.mostCommonUserJourneys]);
@@ -21,7 +23,7 @@ export function WorkflowMiningEnginePage() {
         <div className="workflow-mining-page__title-row">
           <GraphicIconBadge iconKey="journey" accent="brand" size="md" />
           <div>
-            <h1>Workflow Mining</h1>
+            <p className="workflow-mining-page-title-text" data-testid="cd-page-title-text">Workflow Mining</p>
             <p>Journey frequency, friction signals, dead ends, unnecessary clicks, and automation recommendations.</p>
           </div>
         </div>

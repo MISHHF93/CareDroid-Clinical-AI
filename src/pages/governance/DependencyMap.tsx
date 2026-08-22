@@ -12,9 +12,18 @@ import {
   buildDependencyIssueChart,
   dependencyIssueTone,
 } from '../../utils/platformSaasChartModel';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import './DependencyMap.css';
 
+const DEPENDENCY_MAP_ROUTE_CHROME = Object.freeze({
+  title: 'Platform Wiring Map',
+  subtitle: 'Route, inventory, API client, backend endpoint, service, and executor dependency chains.',
+});
+
 export default function DependencyMap() {
+  // AppShell's ShellRouteTab already renders a real page-level <h1> for this
+  // route; this page also rendered its own <h1>, a duplicate-heading bug.
+  useRouteChromeRegistration(DEPENDENCY_MAP_ROUTE_CHROME);
   const map = useMemo(() => buildDependencyMap(), []);
   const issueChart = useMemo(() => buildDependencyIssueChart(map.issueCounts), [map.issueCounts]);
   const executorChart = useMemo(() => buildDependencyExecutorChart(map.dependencies), [map.dependencies]);
@@ -25,7 +34,7 @@ export default function DependencyMap() {
         <div className="dependency-map-page__title-row">
           <GraphicIconBadge iconKey="route" accent="brand" size="md" />
           <div>
-            <h1>Platform Wiring Map</h1>
+            <p className="dependency-map-page__title-text" data-testid="cd-page-title-text">Platform Wiring Map</p>
             <p>Route, inventory, API client, backend endpoint, service, and executor dependency chains.</p>
           </div>
         </div>

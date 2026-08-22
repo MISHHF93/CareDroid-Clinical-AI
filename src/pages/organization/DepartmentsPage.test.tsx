@@ -104,7 +104,10 @@ describe('DepartmentsPage', () => {
       </MemoryRouter>,
     );
 
-    expect(await screen.findByRole('heading', { name: /departments/i })).toBeInTheDocument();
+    // Page title is registered into the shell chrome (useRouteChromeRegistration)
+    // rather than rendered as a local heading -- rendered here without a real
+    // AppShell/RouteChromeProvider, so it falls back to the sr-equivalent testid.
+    expect(await screen.findByTestId('cd-page-title-text')).toHaveTextContent(/departments/i);
     expect(screen.getByRole('button', { name: /emergency/i })).toBeInTheDocument();
     expect(screen.getByText('Emergency Department Pack')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /qsofa/i })).toHaveAttribute(

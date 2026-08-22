@@ -137,7 +137,10 @@ describe('OrganizationIntelligenceProfile', () => {
       </MemoryRouter>
     );
 
-    expect(await screen.findByRole('heading', { level: 1, name: /organization intelligence/i })).toBeInTheDocument();
+    // Page title is registered into the shell chrome (useRouteChromeRegistration)
+    // rather than rendered as a local heading -- rendered here without a real
+    // AppShell/RouteChromeProvider, so it falls back to the sr-equivalent testid.
+    expect(await screen.findByTestId('cd-page-title-text')).toHaveTextContent(/organization intelligence/i);
     expect(screen.getByText(/Organization Intelligence Profile for Demo Hospital/i)).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /missing packs/i })).toBeInTheDocument();
     expect(screen.getByText(/Enable Simulation Training Pack/i)).toBeInTheDocument();

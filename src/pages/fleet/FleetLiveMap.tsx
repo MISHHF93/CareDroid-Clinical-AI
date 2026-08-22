@@ -6,6 +6,7 @@ import StateSourceNotice from '../../components/StateSourceNotice';
 import { GraphicIconBadge } from '../../components/graphics/CdlGraphicKit';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import { DEMO_LIVE_STATES } from '../../utils/demoLiveState';
 import {
   FLEET_VEHICLE_STATUS_LABELS,
@@ -74,6 +75,7 @@ function formatVehicleStatus(status: string) {
 }
 
 export default function FleetLiveMap() {
+  useRouteChromeRegistration({ title: 'Fleet Live Map' });
   const { recordToolAccess } = useToolPreferences();
   const recordToolAccessRef = useRef(recordToolAccess);
   recordToolAccessRef.current = recordToolAccess;
@@ -138,7 +140,7 @@ export default function FleetLiveMap() {
         <div className="fleet-live-map-page__title-row">
           <GraphicIconBadge iconKey="ems" accent="brand" size="md" />
           <div>
-            <h1>Fleet Live Map</h1>
+            <p className="fleet-live-map-page__title-text" data-testid="cd-page-title-text">Fleet Live Map</p>
             <p>Demo vehicle positions, active routes, and operational alerts for dispatcher review.</p>
           </div>
         </div>

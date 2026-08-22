@@ -6,6 +6,7 @@ import StateSourceNotice from '../../components/StateSourceNotice';
 import { GraphicIconBadge } from '../../components/graphics/CdlGraphicKit';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import { DEMO_LIVE_STATES } from '../../utils/demoLiveState';
 import {
   buildFleetTrackingMarkers,
@@ -28,6 +29,7 @@ const MARKER_FILL: Record<string, string> = {
 };
 
 export default function LiveTrackingMap() {
+  useRouteChromeRegistration({ title: 'Live Tracking Map' });
   const { recordToolAccess } = useToolPreferences();
   const recordToolAccessRef = useRef(recordToolAccess);
   recordToolAccessRef.current = recordToolAccess;
@@ -95,7 +97,7 @@ export default function LiveTrackingMap() {
         <div className="live-map-page__title-row">
           <GraphicIconBadge iconKey="route" accent="brand" size="md" />
           <div>
-            <h1>Live Tracking Map</h1>
+            <p className="live-map-page__title-text" data-testid="cd-page-title-text">Live Tracking Map</p>
             <p>Unified fleet vehicle and Medical IoT marker canvas for operations review.</p>
           </div>
         </div>

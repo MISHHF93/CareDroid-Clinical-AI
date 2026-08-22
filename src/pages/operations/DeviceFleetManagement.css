@@ -19,9 +19,10 @@
   align-items: start;
 }
 
-.device-fleet-page__title-row h1 {
+.device-fleet-page__title-row .device-fleet-page__title-text {
   margin: 0;
   font-size: clamp(22px, 3vw, 28px);
+  font-weight: 700;
 }
 
 .device-fleet-page__title-row p {

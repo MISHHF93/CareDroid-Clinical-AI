@@ -138,9 +138,14 @@ describe('1. Fleet dashboard rendering', () => {
       'href',
       '#fleet-dashboard-main'
     );
-    expect(
-      screen.getByRole('heading', { level: 1, name: /Fleet Command Dashboard/i })
-    ).toBeInTheDocument();
+    // FleetDashboard registers its title into the shell chrome
+    // (useRouteChromeRegistration) rather than rendering its own <h1> --
+    // correct in the real app (AppShell's ShellRouteTab provides the one
+    // real h1), but this test renders the page alone with no ShellRouteTab
+    // ancestor, so a plain text match is the right check here (matching
+    // routePagesSmoke.test.tsx's own documented 'heading-text' pattern for
+    // this exact class of page).
+    expect(screen.getByText(/Fleet Command Dashboard/i)).toBeInTheDocument();
     expect(screen.getByText(/Loading fleet telemetry/i)).toBeInTheDocument();
 
     await waitFor(() => {

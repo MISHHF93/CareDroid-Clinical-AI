@@ -23,9 +23,10 @@
   align-items: start;
 }
 
-.workflow-mining-page__title-row h1 {
+.workflow-mining-page__title-row .workflow-mining-page-title-text {
   margin: 0;
   font-size: clamp(22px, 3vw, 28px);
+  font-weight: 700;
 }
 
 .workflow-mining-page__title-row p {

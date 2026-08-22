@@ -11,9 +11,10 @@
   align-items: start;
 }
 
-.route-optimizer-page__header h1 {
+.route-optimizer-page__header .route-optimizer-page__title-text {
   margin: 0;
   font-size: clamp(24px, 3vw, 30px);
+  font-weight: 700;
 }
 
 .route-optimizer-page__grid {

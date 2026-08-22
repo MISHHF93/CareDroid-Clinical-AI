@@ -77,7 +77,10 @@ describe('CustomerSuccessDashboard', () => {
       </BrowserRouter>
     );
 
-    expect(await screen.findByRole('heading', { name: /customer success/i })).toBeInTheDocument();
+    // Page title is registered into the shell chrome (useRouteChromeRegistration)
+    // rather than rendered as a local heading -- rendered here without a real
+    // AppShell/RouteChromeProvider, so it falls back to the sr-equivalent testid.
+    expect(await screen.findByTestId('cd-page-title-text')).toHaveTextContent(/customer success/i);
     expect(screen.getByRole('heading', { name: /health score/i })).toBeInTheDocument();
     expect(screen.getByText('82')).toBeInTheDocument();
     expect(screen.getByText('low')).toBeInTheDocument();

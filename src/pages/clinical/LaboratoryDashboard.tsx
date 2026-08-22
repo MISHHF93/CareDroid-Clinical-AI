@@ -12,9 +12,11 @@ import {
   DEMO_LAB_RESULTS,
   labStatusTone,
 } from '../../utils/laboratoryChartModel';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import './LaboratoryDashboard.css';
 
 export default function LaboratoryDashboard() {
+  useRouteChromeRegistration({ title: 'Laboratory' });
   const results = DEMO_LAB_RESULTS;
   const statusChart = useMemo(() => buildLabStatusChart(results), [results]);
   const queueChart = useMemo(() => buildSpecimenQueueChart(results), [results]);
@@ -29,7 +31,7 @@ export default function LaboratoryDashboard() {
         <div className="laboratory-page__title-row">
           <GraphicIconBadge iconKey="activity" accent="brand" size="md" />
           <div>
-            <h1>Laboratory</h1>
+            <p className="laboratory-page-title-text" data-testid="cd-page-title-text">Laboratory</p>
             <p>Demo specimen queue, abnormal result triage, and reference-range trend cards.</p>
           </div>
         </div>

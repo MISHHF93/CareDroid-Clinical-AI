@@ -5,12 +5,14 @@ import { CategoryBarChart } from '../../components/dashboard/DashboardCharts';
 import { GraphicIconBadge } from '../../components/graphics/CdlGraphicKit';
 import StateSourceNotice from '../../components/StateSourceNotice';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import { buildCompetencyCredentialingSnapshot } from '../../data/competencyCredentialingCatalog';
 import { DEMO_LIVE_STATES } from '../../utils/demoLiveState';
 import { buildCompetencyStatusChart, competencyStatusTone } from '../../utils/simulationChartModel';
 import './Competencies.css';
 
 export default function Competencies() {
+  useRouteChromeRegistration({ title: 'Competency Platform' });
   const snapshot = useMemo(
     () => buildCompetencyCredentialingSnapshot({ role: 'medical student', specialty: 'medical education' }),
     [],
@@ -23,7 +25,7 @@ export default function Competencies() {
         <div className="competencies-page__title-row">
           <GraphicIconBadge iconKey="shield-check" accent="brand" size="md" />
           <div>
-            <h1>Competency Platform</h1>
+            <p className="competencies-page__title-text" data-testid="cd-page-title-text">Competency Platform</p>
             <p>Simulation completion, skill progress, training gaps, and recommended practice actions.</p>
           </div>
         </div>

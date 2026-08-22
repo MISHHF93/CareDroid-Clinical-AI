@@ -72,7 +72,10 @@ describe('AssetLifecycleAdmin', () => {
       </MemoryRouter>
     );
 
-    expect(await screen.findByRole('heading', { name: /asset lifecycle/i })).toBeInTheDocument();
+    // Page title is registered into the shell chrome (useRouteChromeRegistration)
+    // rather than rendered as a local heading -- rendered here without a real
+    // AppShell/RouteChromeProvider, so it falls back to the sr-equivalent testid.
+    expect(await screen.findByTestId('cd-page-title-text')).toHaveTextContent(/asset lifecycle/i);
     expect(screen.getByText('CareDroid')).toBeInTheDocument();
     expect(screen.getAllByRole('button', { name: /^Archived$/i }).length).toBeGreaterThan(0);
 

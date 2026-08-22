@@ -5,6 +5,7 @@ import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVis
 import { useProfileNavigate } from '../../hooks/useProfileNavigate';
 import { useConversation } from '../../contexts/ConversationContext';
 import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import { applyRegistryToolLaunch } from '../../navigation/registryToolLaunch';
 import toolRegistry from '../../data/toolRegistry';
 import {
@@ -410,6 +411,7 @@ function CategoryBadge({ category }) {
 }
 
 const ClinicalToolCatalog = () => {
+  useRouteChromeRegistration({ title: 'Developer Catalog / Source Audit' });
   const surfaces = usePractitionerSurfaceVisibility();
   const { profileNavigate, rawNavigate } = useProfileNavigate();
   const { setActiveTool, addMessage, selectTool } = useConversation();
@@ -675,10 +677,10 @@ const ClinicalToolCatalog = () => {
       </button>
 
       <header className="clinical-tool-catalog-header">
-        <h1>
+        <p className="clinical-tool-catalog-title-text" data-testid="cd-page-title-text">
           <NavIcon icon={CHROME_ICONS.tools} size={32} aria-hidden />
           Developer Catalog / Source Audit
-        </h1>
+        </p>
         <p className="clinical-tool-catalog-subtitle">
           Developer-facing source inventory for CareDroid: launchable references, backend executors,
           source-scan rows, aliases, platform APIs, and audit artifacts.

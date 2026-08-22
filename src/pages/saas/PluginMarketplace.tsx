@@ -14,9 +14,11 @@ import {
 } from '../../data/pluginMarketplace';
 import { DEMO_LIVE_STATES } from '../../utils/demoLiveState';
 import { buildPluginTypeChart } from '../../utils/platformSaasChartModel';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import './PluginMarketplace.css';
 
 export default function PluginMarketplace() {
+  useRouteChromeRegistration({ title: 'Plugin Marketplace' });
   const [marketplaceState, setMarketplaceState] = useState(() => loadPluginMarketplaceState());
   const marketplace = useMemo(
     () => buildPluginMarketplace({ state: marketplaceState }),
@@ -36,7 +38,7 @@ export default function PluginMarketplace() {
         <div className="plugin-marketplace-page__title-row">
           <GraphicIconBadge iconKey="route" accent="brand" size="md" />
           <div>
-            <h1>Plugin Marketplace</h1>
+            <p className="plugin-marketplace-page-title-text" data-testid="cd-page-title-text">Plugin Marketplace</p>
             <p>Install, enable, and validate CareDroid plugins linked to the unified tool inventory.</p>
           </div>
         </div>

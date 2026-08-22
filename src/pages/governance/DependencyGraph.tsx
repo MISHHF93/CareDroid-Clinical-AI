@@ -14,9 +14,18 @@ import {
   dependencyIssueTone,
   type AssetDependencyGraphSnapshot,
 } from '../../utils/platformSaasChartModel';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import './DependencyGraph.css';
 
+const DEPENDENCY_GRAPH_ROUTE_CHROME = Object.freeze({
+  title: 'Asset Dependency Graph',
+  subtitle: 'Product, asset pack, governed asset, route, backend service, and integration chains.',
+});
+
 export default function DependencyGraph() {
+  // AppShell's ShellRouteTab already renders a real page-level <h1> for this
+  // route; this page also rendered its own <h1>, a duplicate-heading bug.
+  useRouteChromeRegistration(DEPENDENCY_GRAPH_ROUTE_CHROME);
   const fallback = useMemo(() => buildLocalAssetDependencyGraph(), []);
   const [graph, setGraph] = useState<AssetDependencyGraphSnapshot>(fallback);
   const [sourceState, setSourceState] = useState<
@@ -52,7 +61,7 @@ export default function DependencyGraph() {
         <div className="dependency-graph-page__title-row">
           <GraphicIconBadge iconKey="chart-bar" accent="brand" size="md" />
           <div>
-            <h1>Asset Dependency Graph</h1>
+            <p className="dependency-graph-page__title-text" data-testid="cd-page-title-text">Asset Dependency Graph</p>
             <p>Product, asset pack, governed asset, route, backend service, and integration chains.</p>
           </div>
         </div>

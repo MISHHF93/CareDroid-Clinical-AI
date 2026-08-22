@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import Card from '../components/ui/card';
+import { useRouteChromeRegistration } from '../contexts/RouteChromeContext';
 import { queryNavigator, type NavigatorDestination } from '../services/navigatorApi';
 import './AppNavigator.css';
 
@@ -11,6 +12,7 @@ const EXAMPLE_QUERIES = [
 ];
 
 export default function AppNavigator() {
+  useRouteChromeRegistration({ title: 'Where do I find that?' });
   const [query, setQuery] = useState('');
   const [answer, setAnswer] = useState<string | null>(null);
   const [destinations, setDestinations] = useState<NavigatorDestination[]>([]);
@@ -42,7 +44,7 @@ export default function AppNavigator() {
     <div className="app-navigator-page">
       <header className="app-navigator-page__header">
         <p className="app-navigator-page__eyebrow">App navigator</p>
-        <h1>Where do I find that?</h1>
+        <p className="app-navigator-page__title-text" data-testid="cd-page-title-text">Where do I find that?</p>
         <p className="app-navigator-page__subtitle">
           Ask a workflow question in plain language and get grounded matches from the verified CareDroid route
           catalog. This never invents a route — every answer is drawn from real, live pages.

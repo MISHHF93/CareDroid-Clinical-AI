@@ -11,9 +11,10 @@
   align-items: start;
 }
 
-.predictive-maintenance-page__header h1 {
+.predictive-maintenance-page__header .predictive-maintenance-page__title-text {
   margin: 0;
   font-size: clamp(24px, 3vw, 30px);
+  font-weight: 700;
 }
 
 .predictive-maintenance-page__grid {

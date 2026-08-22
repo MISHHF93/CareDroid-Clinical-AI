@@ -12,9 +12,11 @@ import {
   buildDiagnosticsStatusChart,
   diagnosticStatusTone,
 } from '../../utils/platformSaasChartModel';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import './PlatformSelfDiagnostics.css';
 
 export default function PlatformSelfDiagnostics() {
+  useRouteChromeRegistration({ title: 'Platform Self-Diagnostics' });
   const diagnostics = useMemo(() => buildPlatformSelfDiagnostics(), []);
   const categoryChart = useMemo(
     () => buildDiagnosticsCategoryChart(diagnostics.summary.categories),
@@ -28,7 +30,7 @@ export default function PlatformSelfDiagnostics() {
         <div className="self-diagnostics-page__title-row">
           <GraphicIconBadge iconKey="activity" accent="brand" size="md" />
           <div>
-            <h1>Platform Self-Diagnostics</h1>
+            <p className="self-diagnostics-page-title-text" data-testid="cd-page-title-text">Platform Self-Diagnostics</p>
             <p>Route, API, inventory, auth, layout, dependency, executor, and asset health checks.</p>
           </div>
         </div>

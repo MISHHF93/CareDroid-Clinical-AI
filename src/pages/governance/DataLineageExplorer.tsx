@@ -12,11 +12,20 @@ import {
 } from '../../data/dataLineageExplorer';
 import { DEMO_LIVE_STATES } from '../../utils/demoLiveState';
 import { buildLineageCategoryChart, buildLineageStageChart } from '../../utils/platformSaasChartModel';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import './DataLineageExplorer.css';
 
 const LINEAGE_CATEGORIES = ['all', 'AI extension', 'Calculator', 'AI workflow', 'Simulation'];
 
+const DATA_LINEAGE_ROUTE_CHROME = Object.freeze({
+  title: 'Data Lineage Explorer',
+  subtitle: 'Transparent Input → AI → Tool → Backend → Output flows with transformations and retention notes.',
+});
+
 export default function DataLineageExplorer() {
+  // AppShell's ShellRouteTab already renders a real page-level <h1> for this
+  // route; this page also rendered its own <h1>, a duplicate-heading bug.
+  useRouteChromeRegistration(DATA_LINEAGE_ROUTE_CHROME);
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('all');
   const lineage = useMemo(() => buildDataLineageExplorer(), []);
@@ -33,7 +42,7 @@ export default function DataLineageExplorer() {
         <div className="data-lineage-page__title-row">
           <GraphicIconBadge iconKey="report" accent="brand" size="md" />
           <div>
-            <h1>Data Lineage Explorer</h1>
+            <p className="data-lineage-page__title-text" data-testid="cd-page-title-text">Data Lineage Explorer</p>
             <p>Transparent Input → AI → Tool → Backend → Output flows with transformations and retention notes.</p>
           </div>
         </div>

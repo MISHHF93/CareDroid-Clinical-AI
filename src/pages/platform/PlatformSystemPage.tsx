@@ -21,6 +21,7 @@ import {
   buildPlatformSystemModuleChart,
   platformSystemScoreTone,
 } from '../../utils/platformSystemChartModel';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import './PlatformSystemPage.css';
 
 const HUB_BY_PATH = Object.freeze({
@@ -106,6 +107,7 @@ export default function PlatformSystemPage({ pack }: { pack?: string }) {
       }),
     [capability, hubPack, patientId, remoteState, contractResult, loading, error],
   );
+  useRouteChromeRegistration({ title: view.title || 'Platform Systems' });
   const moduleChart = useMemo(() => buildPlatformSystemModuleChart(view.chart), [view.chart]);
 
   const runDemoContract = async () => {
@@ -130,7 +132,7 @@ export default function PlatformSystemPage({ pack }: { pack?: string }) {
           <GraphicIconBadge iconKey={view.iconKey} accent="brand" size="md" />
           <div>
             <p className="platform-system-page__eyebrow">{view.eyebrow}</p>
-            <h1>{view.title}</h1>
+            <p className="platform-system-page-title-text" data-testid="cd-page-title-text">{view.title}</p>
             <p>{view.summary}</p>
           </div>
         </div>

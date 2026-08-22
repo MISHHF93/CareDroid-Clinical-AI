@@ -5,12 +5,14 @@ import { CategoryBarChart } from '../../components/dashboard/DashboardCharts';
 import { GraphicIconBadge } from '../../components/graphics/CdlGraphicKit';
 import StateSourceNotice from '../../components/StateSourceNotice';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import { buildCompetencyCredentialingSnapshot } from '../../data/competencyCredentialingCatalog';
 import { DEMO_LIVE_STATES } from '../../utils/demoLiveState';
 import { buildCredentialStatusChart, credentialStatusTone } from '../../utils/simulationChartModel';
 import './Credentials.css';
 
 export default function Credentials() {
+  useRouteChromeRegistration({ title: 'Credentialing Platform' });
   const snapshot = useMemo(
     () => buildCompetencyCredentialingSnapshot({ role: 'medical student', specialty: 'medical education' }),
     [],
@@ -23,7 +25,7 @@ export default function Credentials() {
         <div className="credentials-page__title-row">
           <GraphicIconBadge iconKey="shield-check" accent="brand" size="md" />
           <div>
-            <h1>Credentialing Platform</h1>
+            <p className="credentials-page__title-text" data-testid="cd-page-title-text">Credentialing Platform</p>
             <p>Certifications, renewal status, CME credits, and credential readiness for demo training review.</p>
           </div>
         </div>

@@ -12,9 +12,11 @@ import {
 } from '../../data/clinicalKnowledgeGraph';
 import { DEMO_LIVE_STATES } from '../../utils/demoLiveState';
 import { buildKnowledgeGraphTypeChart } from '../../utils/clinicalInsightsChartModel';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import './ClinicalKnowledgeGraph.css';
 
 export default function ClinicalKnowledgeGraph() {
+  useRouteChromeRegistration({ title: 'Clinical Knowledge Graph' });
   const [query, setQuery] = useState('');
   const [type, setType] = useState('all');
   const [selectedNodeId, setSelectedNodeId] = useState(CLINICAL_KNOWLEDGE_GRAPH_NODES[0]?.id || '');
@@ -31,7 +33,7 @@ export default function ClinicalKnowledgeGraph() {
         <div className="knowledge-graph-page__title-row">
           <GraphicIconBadge iconKey="layout-dashboard" accent="brand" size="md" />
           <div>
-            <h1>Clinical Knowledge Graph</h1>
+            <p className="knowledge-graph-title-text" data-testid="cd-page-title-text">Clinical Knowledge Graph</p>
             <p>Relationships across calculators, protocols, simulations, labs, devices, and AI workflows.</p>
           </div>
         </div>

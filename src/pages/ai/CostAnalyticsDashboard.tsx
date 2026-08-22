@@ -8,9 +8,18 @@ import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { LOCAL_COST_DASHBOARD } from '../../services/aiCommandCenterApi';
 import { DEMO_LIVE_STATES } from '../../utils/demoLiveState';
 import { buildCostRouteChart } from '../../utils/clinicalInsightsChartModel';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import './CostAnalyticsDashboard.css';
 
+const COST_ANALYTICS_ROUTE_CHROME = Object.freeze({
+  title: 'Cost Analytics',
+  subtitle: 'Request spend, token cost, cache efficiency, and route complexity for AI operations review.',
+});
+
 export default function CostAnalyticsDashboard() {
+  // AppShell's ShellRouteTab already renders a real page-level <h1> for this
+  // route; this page also rendered its own <h1>, a duplicate-heading bug.
+  useRouteChromeRegistration(COST_ANALYTICS_ROUTE_CHROME);
   const cost = LOCAL_COST_DASHBOARD;
   const routeChart = useMemo(() => buildCostRouteChart(), []);
   const complexityChart = useMemo(
@@ -28,7 +37,7 @@ export default function CostAnalyticsDashboard() {
         <div className="cost-page__title-row">
           <GraphicIconBadge iconKey="activity" accent="brand" size="md" />
           <div>
-            <h1>Cost Analytics</h1>
+            <p className="cost-page__title-text" data-testid="cd-page-title-text">Cost Analytics</p>
             <p>Request spend, token cost, cache efficiency, and route complexity for AI operations review.</p>
           </div>
         </div>

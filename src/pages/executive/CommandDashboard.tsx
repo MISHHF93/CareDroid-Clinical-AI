@@ -7,6 +7,7 @@ import OperationsLiveSnapshotPanel from '../../components/operations/OperationsL
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { buildCommandDashboardModel, COMMAND_DASHBOARD_PROMPTS } from '../../data/commandDashboardModel';
 import { useOperationsHubLiveFeeds } from '../../hooks/useOperationsHubLiveFeeds';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import '../../components/operations/OperationsLiveSnapshotPanel.css';
 import '../CommandDashboard.css';
 
@@ -44,6 +45,7 @@ function ToolPanel({
 }
 
 export default function CommandDashboard() {
+  useRouteChromeRegistration({ title: 'CareDroid Command Center' });
   const model = useMemo(() => buildCommandDashboardModel(), []);
   const quickPrompts = useMemo(() => COMMAND_DASHBOARD_PROMPTS.slice(0, 6), []);
   const { loading, liveFeeds, lastRefreshed, refresh } = useOperationsHubLiveFeeds({
@@ -57,7 +59,7 @@ export default function CommandDashboard() {
         <div className="command-dashboard-page__title-row">
           <GraphicIconBadge iconKey="layout-dashboard" accent="brand" size="md" />
           <div>
-            <h1>CareDroid Command Center</h1>
+            <p className="command-dashboard-page-title-text" data-testid="cd-page-title-text">CareDroid Command Center</p>
             <p>Platform inventory, operational launch points, and governed assistant quick starts.</p>
           </div>
         </div>

@@ -6,7 +6,14 @@ import {
   summarizeAutomationAuditTrail,
 } from '../data/automationAuditTrail';
 import { fetchAutomationAuditEntries } from '../services/automationAuditApi';
+import { useRouteChromeRegistration } from '../contexts/RouteChromeContext';
 import './AutomationAuditTrail.css';
+
+const AUTOMATION_AUDIT_ROUTE_CHROME = Object.freeze({
+  title: 'Automation Audit',
+  subtitle:
+    'Tenant-scoped record of every automation trigger, condition decision, selected action, AI/tool involvement, endpoint, outcome, timestamp, and reviewer requirement.',
+});
 
 function formatTimestamp(timestamp) {
   try {
@@ -87,6 +94,9 @@ function AuditEntryCard({ entry }) {
 }
 
 export default function AutomationAuditTrail() {
+  // AppShell's ShellRouteTab already renders a real page-level <h1> for this
+  // route; this page also rendered its own <h1>, a duplicate-heading bug.
+  useRouteChromeRegistration(AUTOMATION_AUDIT_ROUTE_CHROME);
   const fallbackEntries = useMemo(() => getAutomationAuditEntries(), []);
   const [allEntries, setAllEntries] = useState(fallbackEntries);
   const [auditSource, setAuditSource] = useState('local');
@@ -134,7 +144,7 @@ export default function AutomationAuditTrail() {
       <header className="automation-audit-hero">
         <div>
           <p className="automation-audit-eyebrow">Automation Audit Trail</p>
-          <h1>Automation Audit</h1>
+          <p className="automation-audit-title-text" data-testid="cd-page-title-text">Automation Audit</p>
           <p>
             Tenant-scoped record of every automation trigger, condition decision, selected action,
             AI/tool involvement, endpoint, outcome, timestamp, and reviewer requirement.

@@ -7,6 +7,8 @@ import { MetricCard, VisualizationPanel } from '../../components/dashboard/Dashb
 import { CategoryBarChart } from '../../components/dashboard/DashboardCharts';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
+import { Spinner } from '../../components/ui/Spinner';
 import { PLATFORM_AI_MODEL_REGISTRY } from '../../data/aiModelRegistry';
 import {
   FLEET_MAINTENANCE_LABELS,
@@ -67,6 +69,20 @@ function formatVehicleStatus(status: string) {
 }
 
 export default function FleetDashboard() {
+  // AppShell's ShellRouteTab already renders a real page-level <h1> for this
+  // route (falling back to a generic nav label); this page also rendered its
+  // own <h1>Fleet Command Dashboard</h1> below, a duplicate-heading bug.
+  // Registering the real title/subtitle here makes the shell show the
+  // correct, specific text, so the local heading can be demoted to a <p>.
+  useRouteChromeRegistration(
+    useMemo(
+      () => ({
+        title: 'Fleet Command Dashboard',
+        subtitle: 'Live fleet telemetry, utilization signals, and governed dispatch decision support.',
+      }),
+      [],
+    ),
+  );
   const { recordToolAccess } = useToolPreferences();
   const recordToolAccessRef = useRef(recordToolAccess);
   recordToolAccessRef.current = recordToolAccess;
@@ -152,7 +168,7 @@ export default function FleetDashboard() {
       <header className="fleet-dashboard__header">
         <GraphicIconBadge iconKey="ems" accent="brand" size="md" />
         <div>
-          <h1>Fleet Command Dashboard</h1>
+          <p className="fleet-dashboard__title-text" data-testid="cd-page-title-text">Fleet Command Dashboard</p>
           <p>Live fleet telemetry, utilization signals, and governed dispatch decision support.</p>
         </div>
       </header>
@@ -161,9 +177,13 @@ export default function FleetDashboard() {
       <p className="fleet-dashboard__safety">{FLEET_DISPATCH_SAFETY_COPY}</p>
 
       {loading ? (
-        <p className="fleet-dashboard__state" role="status" aria-live="polite">
+        // Spinner renders a <div> internally -- a <p> wrapper here is invalid
+        // HTML nesting (block element inside a paragraph), confirmed by a
+        // real React validateDOMNesting warning. div is the correct container.
+        <div className="fleet-dashboard__state" role="status" aria-live="polite">
+          <Spinner size="sm" />
           Loading fleet telemetry…
-        </p>
+        </div>
       ) : null}
 
       {!loading && error ? (

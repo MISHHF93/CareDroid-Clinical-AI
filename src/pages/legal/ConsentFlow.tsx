@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import useProfileNavigate from '../../hooks/useProfileNavigate';
 import { Checkbox } from '../../components/forms/Checkbox';
 import { recordConsentPreferences } from '../../services/complianceApi';
@@ -15,6 +16,7 @@ import logger from '../../utils/logger';
  * Tracks consent in audit log
  */
 export const ConsentFlow = ({ onComplete }) => {
+  useRouteChromeRegistration({ title: 'Privacy & Consent' });
   const { profileNavigate } = useProfileNavigate();
   const [consents, setConsents] = useState({
     hipaa: false,
@@ -97,7 +99,7 @@ export const ConsentFlow = ({ onComplete }) => {
     <div className="consent-flow">
       <div className="consent-container">
         <div className="consent-header">
-          <h1>Privacy & Consent</h1>
+          <p className="consent-header__title-text" data-testid="cd-page-title-text">Privacy & Consent</p>
           <p className="consent-intro">
             Before you can use CareDroid, we need your consent to collect and process Protected 
             Health Information (PHI) in compliance with HIPAA regulations.

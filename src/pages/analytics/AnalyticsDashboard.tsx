@@ -13,9 +13,18 @@ import {
   buildPlatformEventTypeChart,
   decisionTone,
 } from '../../utils/platformSaasChartModel';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import './AnalyticsDashboard.css';
 
+const PLATFORM_ANALYTICS_ROUTE_CHROME = Object.freeze({
+  title: 'Platform Analytics',
+  subtitle: 'Privacy-safe adoption trends, feature engagement, and inventory stewardship decisions.',
+});
+
 export default function AnalyticsDashboard() {
+  // AppShell's ShellRouteTab already renders a real page-level <h1> for this
+  // route; this page also rendered its own <h1>, a duplicate-heading bug.
+  useRouteChromeRegistration(PLATFORM_ANALYTICS_ROUTE_CHROME);
   const analytics = useMemo(() => buildPlatformAnalytics(), []);
   const trendChart = useMemo(() => buildPlatformAdoptionTrendChart(analytics), [analytics]);
   const eventChart = useMemo(() => buildPlatformEventTypeChart(analytics), [analytics]);
@@ -27,7 +36,7 @@ export default function AnalyticsDashboard() {
         <div className="platform-analytics-page__title-row">
           <GraphicIconBadge iconKey="activity" accent="brand" size="md" />
           <div>
-            <h1>Platform Analytics</h1>
+            <p className="platform-analytics-page__title-text" data-testid="cd-page-title-text">Platform Analytics</p>
             <p>Privacy-safe adoption trends, feature engagement, and inventory stewardship decisions.</p>
           </div>
         </div>

@@ -16,6 +16,7 @@ import {
   readinessBandTone,
   readinessScoreTone,
 } from '../../utils/platformSaasChartModel';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import './CommercialIntelligence.css';
 
 type QuestionnaireQuestion = {
@@ -25,6 +26,7 @@ type QuestionnaireQuestion = {
 };
 
 export function MaturityAssessmentPage() {
+  useRouteChromeRegistration({ title: 'Hospital Maturity Assessment' });
   const fallbackQuestionnaire = DEFAULT_HOSPITAL_READINESS_QUESTIONNAIRE;
   const [questionnaire, setQuestionnaire] = useState<{ questions: QuestionnaireQuestion[] }>({
     questions: [...fallbackQuestionnaire.questions],
@@ -92,7 +94,7 @@ export function MaturityAssessmentPage() {
         <div className="commercial-page__title-row">
           <GraphicIconBadge iconKey="shield-check" accent="brand" size="md" />
           <div>
-            <h1>Hospital Maturity Assessment</h1>
+            <p className="commercial-page-title-text" data-testid="cd-page-title-text">Hospital Maturity Assessment</p>
             <p>Digital, AI, interoperability, simulation, IoT, and governance readiness scoring.</p>
           </div>
         </div>

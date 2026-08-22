@@ -4,6 +4,7 @@ import { MetricCard } from '../../components/dashboard/DashboardVisualizations';
 import { GraphicIconBadge } from '../../components/graphics/CdlGraphicKit';
 import StateSourceNotice from '../../components/StateSourceNotice';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import {
   buildScenarioDebrief,
   getSimulationScenarioById,
@@ -18,6 +19,7 @@ export default function SimulationScenarioPlayer() {
     () => getSimulationScenarioById(scenarioId) || getSimulationScenarioById('sepsis-deterioration'),
     [scenarioId],
   );
+  useRouteChromeRegistration({ title: scenario?.title ?? 'Simulation Scenario' });
   const [selectedActions, setSelectedActions] = useState<string[]>([]);
   const [recordedRunId, setRecordedRunId] = useState<string | null>(null);
   const debrief = useMemo(
@@ -42,7 +44,7 @@ export default function SimulationScenarioPlayer() {
   if (!scenario) {
     return (
       <main className="scenario-player-page">
-        <h1>Simulation Scenario</h1>
+        <p className="scenario-player-page__title-text" data-testid="cd-page-title-text">Simulation Scenario</p>
         <p>Scenario not found in demo catalog.</p>
         <Link to={CANONICAL_ROUTES.simulation}>Back to simulation suite</Link>
       </main>
@@ -62,7 +64,7 @@ export default function SimulationScenarioPlayer() {
         <div className="scenario-player-page__title-row">
           <GraphicIconBadge iconKey="activity" accent="brand" size="md" />
           <div>
-            <h1>{scenario.title}</h1>
+            <p className="scenario-player-page__title-text" data-testid="cd-page-title-text">{scenario.title}</p>
             <p>{scenario.caseStem}</p>
           </div>
         </div>

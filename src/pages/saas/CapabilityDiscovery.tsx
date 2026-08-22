@@ -8,9 +8,11 @@ import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { buildCapabilityDiscovery } from '../../data/capabilityDiscoveryEngine';
 import { DEMO_LIVE_STATES } from '../../utils/demoLiveState';
 import { buildDiscoverySectionChart } from '../../utils/platformSaasChartModel';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import './CapabilityDiscovery.css';
 
 export default function CapabilityDiscovery() {
+  useRouteChromeRegistration({ title: 'Discover CareDroid Capabilities' });
   const [query, setQuery] = useState('');
   const discovery = useMemo(() => buildCapabilityDiscovery({ recentToolIds: ['qsofa', 'heart-score'] }), []);
   const sectionChart = useMemo(() => buildDiscoverySectionChart(discovery), [discovery]);
@@ -37,7 +39,7 @@ export default function CapabilityDiscovery() {
         <div className="capability-discovery-page__title-row">
           <GraphicIconBadge iconKey="clinical-tools" accent="brand" size="md" />
           <div>
-            <h1>Discover CareDroid Capabilities</h1>
+            <p className="capability-discovery-page-title-text" data-testid="cd-page-title-text">Discover CareDroid Capabilities</p>
             <p>Profile-aware recommendations for tools, simulations, workflows, and clinical protocols.</p>
           </div>
         </div>

@@ -16,9 +16,11 @@ import {
   loadFeatureFlagCenterOverrides,
   saveFeatureFlagCenterOverrides,
 } from '../../utils/platformSaasChartModel';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import './FeatureFlagCenter.css';
 
 export default function FeatureFlagCenter() {
+  useRouteChromeRegistration({ title: 'Feature Flag Center' });
   const [overrides, setOverrides] = useState(() => loadFeatureFlagCenterOverrides());
   const view = useMemo(() => buildFeatureFlagCenterView(overrides), [overrides]);
   const categoryChart = useMemo(() => buildFeatureFlagCategoryChart(view.summary.categoryCounts), [view.summary]);
@@ -37,7 +39,7 @@ export default function FeatureFlagCenter() {
         <div className="feature-flag-page__title-row">
           <GraphicIconBadge iconKey="settings" accent="brand" size="md" />
           <div>
-            <h1>Feature Flag Center</h1>
+            <p className="feature-flag-page-title-text" data-testid="cd-page-title-text">Feature Flag Center</p>
             <p>Rollout registry for AI, tools, simulation, fleet, IoT, and governance capability packs.</p>
           </div>
         </div>

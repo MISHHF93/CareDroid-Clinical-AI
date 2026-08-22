@@ -14,7 +14,13 @@ import { useEmergencyRolePermissions } from '../../hooks/useEmergencyRolePermiss
 import { useOperationsHubLiveFeeds } from '../../hooks/useOperationsHubLiveFeeds';
 import { DEMO_LIVE_STATES } from '../../utils/demoLiveState';
 import { applyLiveMetricsToSurfaces } from '../../utils/operationsHubLiveMetrics';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import './Operations.css';
+
+const OPERATIONS_HUB_ROUTE_CHROME = Object.freeze({
+  title: 'Default Operations',
+  subtitle: 'Unified command surfaces for hospital capacity, device telemetry, fleet, and system health.',
+});
 
 const SURFACE_ICON: Record<string, string> = {
   'digital-twin': 'layout-dashboard',
@@ -41,6 +47,9 @@ function resolveOperationsRole(role: string) {
 }
 
 export default function Operations() {
+  // AppShell's ShellRouteTab already renders a real page-level <h1> for this
+  // route; this page also rendered its own <h1>, a duplicate-heading bug.
+  useRouteChromeRegistration(OPERATIONS_HUB_ROUTE_CHROME);
   const { role, allowedActions = [] } = useEmergencyRolePermissions();
   const [query, setQuery] = useState('');
   const { loading, liveFeeds, lastRefreshed, liveFeedCount, refresh } = useOperationsHubLiveFeeds({
@@ -94,7 +103,7 @@ export default function Operations() {
         <div className="operations-hub__title-row">
           <GraphicIconBadge iconKey="activity" accent="brand" size="md" />
           <div>
-            <h1>Default Operations</h1>
+            <p className="operations-hub__title-text" data-testid="cd-page-title-text">Default Operations</p>
             <p>Unified command surfaces for hospital capacity, device telemetry, fleet, and system health.</p>
           </div>
         </div>

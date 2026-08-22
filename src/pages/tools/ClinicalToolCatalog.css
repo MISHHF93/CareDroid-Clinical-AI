@@ -13,9 +13,10 @@
   text-align: center;
 }
 
-.clinical-tool-catalog-header h1 {
+.clinical-tool-catalog-header .clinical-tool-catalog-title-text {
   font-size: var(--app-type-title);
-  margin-bottom: 8px;
+  font-weight: 700;
+  margin: 0 0 8px;
   color: var(--text-primary);
   display: inline-flex;
   align-items: center;
@@ -559,7 +560,7 @@
     padding: 20px 16px;
   }
 
-  .clinical-tool-catalog-header h1 {
+  .clinical-tool-catalog-header .clinical-tool-catalog-title-text {
     font-size: 28px;
   }
 
@@ -597,7 +598,7 @@
     text-align: left;
   }
 
-  .clinical-tool-catalog-header h1 {
+  .clinical-tool-catalog-header .clinical-tool-catalog-title-text {
     font-size: 22px;
     justify-content: flex-start;
   }

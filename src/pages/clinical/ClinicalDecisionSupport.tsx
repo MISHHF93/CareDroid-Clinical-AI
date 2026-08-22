@@ -12,9 +12,11 @@ import {
 import { getUserFacingToolRegistryProjection } from '../../data/toolInventory';
 import { DEMO_LIVE_STATES } from '../../utils/demoLiveState';
 import { buildCdsSignalRiskChart, riskLevelTone } from '../../utils/clinicalInsightsChartModel';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import './ClinicalDecisionSupport.css';
 
 export default function ClinicalDecisionSupport() {
+  useRouteChromeRegistration({ title: 'Clinical Decision Support Engine' });
   const [symptoms, setSymptoms] = useState(DEFAULT_SYMPTOMS);
   const calculatorInventory = useMemo(
     () =>
@@ -44,7 +46,7 @@ export default function ClinicalDecisionSupport() {
         <div className="cds-page__title-row">
           <GraphicIconBadge iconKey="activity" accent="brand" size="md" />
           <div>
-            <h1>Clinical Decision Support Engine</h1>
+            <p className="cds-page-title-text" data-testid="cd-page-title-text">Clinical Decision Support Engine</p>
             <p>Symptom-driven risk signals, calculator recommendations, labs, imaging, and escalation framing.</p>
           </div>
         </div>

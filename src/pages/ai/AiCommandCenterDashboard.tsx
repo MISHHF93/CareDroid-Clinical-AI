@@ -8,6 +8,7 @@ import {
 } from '../../services/aiCommandCenterApi';
 import StateSourceNotice from '../../components/StateSourceNotice';
 import { DEMO_LIVE_STATES } from '../../utils/demoLiveState';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 
 // -- types ---------------------------------------------------------------------
 
@@ -147,6 +148,7 @@ function WarningBanner({ warnings }: { warnings: string[] }) {
 // -- page ----------------------------------------------------------------------
 
 export default function AiCommandCenterDashboard() {
+  useRouteChromeRegistration({ title: 'AI Command Center' });
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
   const [loading, setLoading] = useState(true);
   const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
@@ -182,9 +184,9 @@ export default function AiCommandCenterDashboard() {
       {/* -- Header -- */}
       <div className="ai-cc-header">
         <div>
-          <h1 className="ai-cc-header__title">
+          <p className="ai-cc-header__title" data-testid="cd-page-title-text">
             AI Command Center
-          </h1>
+          </p>
           <p className="ai-cc-header__subtitle">
             Unified AI Node · Evaluation · Memory · Cost · Expert routing
           </p>

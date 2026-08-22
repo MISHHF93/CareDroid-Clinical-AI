@@ -8,9 +8,11 @@ import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { buildCustomerExpansionOpportunities } from '../../data/customerExpansionEngine';
 import { DEMO_LIVE_STATES } from '../../utils/demoLiveState';
 import { buildExpansionScoreChart, expansionBandTone } from '../../utils/platformSaasChartModel';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import './CommercialIntelligence.css';
 
 export function CustomerExpansionOpportunitiesPage() {
+  useRouteChromeRegistration({ title: 'Expansion Opportunities' });
   const expansion = useMemo(() => buildCustomerExpansionOpportunities(), []);
   const scoreChart = useMemo(() => buildExpansionScoreChart(expansion.segments), [expansion.segments]);
 
@@ -20,7 +22,7 @@ export function CustomerExpansionOpportunitiesPage() {
         <div className="commercial-page__title-row">
           <GraphicIconBadge iconKey="send" accent="brand" size="md" />
           <div>
-            <h1>Expansion Opportunities</h1>
+            <p className="commercial-page-title-text" data-testid="cd-page-title-text">Expansion Opportunities</p>
             <p>Upsell, cross-sell, and evaluation motions with evidence-backed pack recommendations.</p>
           </div>
         </div>

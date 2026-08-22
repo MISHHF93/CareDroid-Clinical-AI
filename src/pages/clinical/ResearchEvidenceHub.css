@@ -22,9 +22,10 @@
   gap: 12px;
 }
 
-.research-hub-page__title-row h1 {
+.research-hub-page__title-row .research-hub-title-text {
   margin: 0;
   font-size: clamp(22px, 3vw, 28px);
+  font-weight: 700;
 }
 
 .research-hub-page__title-row p {

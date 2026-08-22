@@ -5,6 +5,7 @@ import { GraphicIconBadge } from '../../components/graphics/CdlGraphicKit';
 import { MetricCard, VisualizationPanel } from '../../components/dashboard/DashboardVisualizations';
 import { CategoryBarChart } from '../../components/dashboard/DashboardCharts';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import { FLEET_ROUTE_PRIORITY_INPUT } from '../../data/testHelpers/fleetToolsTestFixtures';
 import {
   hasMinimumRouteInput,
@@ -39,6 +40,7 @@ function formatClock(minutes: number) {
 }
 
 export default function RouteOptimizer() {
+  useRouteChromeRegistration({ title: 'Route Optimization' });
   const [depotLabel, setDepotLabel] = useState<string>(FLEET_ROUTE_PRIORITY_INPUT.depotLabel);
   const [routeStart, setRouteStart] = useState('08:00');
   const [trafficLevel, setTrafficLevel] = useState(
@@ -96,7 +98,7 @@ export default function RouteOptimizer() {
       <header className="route-optimizer-page__header">
         <GraphicIconBadge iconKey="route" accent="brand" size="md" />
         <div>
-          <h1>Route Optimization</h1>
+          <p className="route-optimizer-page__title-text" data-testid="cd-page-title-text">Route Optimization</p>
           <p>Deterministic stop sequencing support for human-reviewed fleet routing.</p>
         </div>
       </header>

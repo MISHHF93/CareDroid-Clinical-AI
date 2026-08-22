@@ -20,9 +20,10 @@
   align-items: start;
 }
 
-.live-map-page__title-row h1 {
+.live-map-page__title-row .live-map-page__title-text {
   margin: 0;
   font-size: clamp(24px, 3vw, 32px);
+  font-weight: 700;
 }
 
 .live-map-page__actions {

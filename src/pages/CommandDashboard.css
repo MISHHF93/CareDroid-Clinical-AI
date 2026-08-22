@@ -23,9 +23,10 @@
   align-items: start;
 }
 
-.command-dashboard-page__title-row h1 {
+.command-dashboard-page__title-row .command-dashboard-page-title-text {
   margin: 0;
   font-size: clamp(24px, 3vw, 32px);
+  font-weight: 700;
   color: var(--medical-text-heading, var(--app-text-primary));
 }
 

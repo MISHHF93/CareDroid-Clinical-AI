@@ -8,6 +8,7 @@ import {
   resolvePredictiveRiskBand,
   searchPredictiveModels,
 } from '../../data/predictiveAnalyticsDashboard';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import './PredictiveAnalyticsDashboard.css';
 
 // ── constants ─────────────────────────────────────────────────────────────────
@@ -215,6 +216,7 @@ function ModelCard({
 // ── page ──────────────────────────────────────────────────────────────────────
 
 export default function PredictiveAnalyticsDashboard() {
+  useRouteChromeRegistration({ title: 'Predictive Analytics Dashboard' });
   const navigate = useNavigate();
   const [query, setQuery]     = useState('');
   const [models, setModels]   = useState(DEMO_PREDICTIVE_ANALYTICS_MODELS as any[]);
@@ -230,7 +232,7 @@ export default function PredictiveAnalyticsDashboard() {
     <main className="pad-page">
       {/* Header */}
       <div className="u-mb-20">
-        <h1 className="pad-page-title">Predictive Analytics Dashboard</h1>
+        <p className="pad-page-title" data-testid="cd-page-title-text">Predictive Analytics Dashboard</p>
         <p className="pad-page-subtitle">
           Deterioration · Sepsis · Readmission · ICU transfer · Device & fleet risk
         </p>

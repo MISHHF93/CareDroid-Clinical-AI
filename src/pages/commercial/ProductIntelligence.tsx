@@ -12,9 +12,11 @@ import {
   buildProductHealthChart,
   productHealthTone,
 } from '../../utils/platformSaasChartModel';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import './CommercialIntelligence.css';
 
 export function ProductIntelligenceLayerPage() {
+  useRouteChromeRegistration({ title: 'Product Intelligence' });
   const layer = useMemo(() => buildProductIntelligenceLayer(), []);
   const healthChart = useMemo(() => buildProductHealthChart(layer.products), [layer.products]);
   const adoptionChart = useMemo(() => buildProductAdoptionChart(layer.products), [layer.products]);
@@ -25,7 +27,7 @@ export function ProductIntelligenceLayerPage() {
         <div className="commercial-page__title-row">
           <GraphicIconBadge iconKey="chart-bar" accent="brand" size="md" />
           <div>
-            <h1>Product Intelligence</h1>
+            <p className="commercial-page-title-text" data-testid="cd-page-title-text">Product Intelligence</p>
             <p>Product → pack → asset value chains with adoption, engagement, outcomes, and ROI.</p>
           </div>
         </div>

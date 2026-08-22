@@ -20,9 +20,10 @@
   align-items: start;
 }
 
-.fleet-live-map-page__title-row h1 {
+.fleet-live-map-page__title-row .fleet-live-map-page__title-text {
   margin: 0;
   font-size: clamp(24px, 3vw, 32px);
+  font-weight: 700;
   color: var(--medical-text-heading, var(--app-text-primary));
 }
 

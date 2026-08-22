@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Spinner } from '../../components/ui/Spinner';
 import { EmptyState as EmptyStateBase } from '../../components/ui/EmptyState';
 const EmptyState = EmptyStateBase as any;
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import { fetchConsentStatus } from '../../services/complianceApi';
 import { isBackendCapabilityEnabled } from '../../config/backendApiCapabilities';
 import './ConsentHistory.css';
@@ -15,6 +16,7 @@ import logger from '../../utils/logger';
  * Shows all consent events with timestamps and IP addresses
  */
 export const ConsentHistory = () => {
+  useRouteChromeRegistration({ title: 'Consent History' });
   const [consents, setConsents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<any>(null);
@@ -166,7 +168,7 @@ export const ConsentHistory = () => {
     <div className="consent-history">
       <div className="consent-history-container">
         <div className="consent-history-header">
-          <h1>Consent History</h1>
+          <p className="consent-history-header__title-text" data-testid="cd-page-title-text">Consent History</p>
           {notice && (
             <p className="consent-history-notice" role="status">
               {notice}

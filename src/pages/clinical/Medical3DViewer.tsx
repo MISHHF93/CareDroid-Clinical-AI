@@ -10,6 +10,7 @@ import {
   modelStatusLabel,
   modelStatusTone,
 } from '../../utils/medical3dViewerModel';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import './Medical3DViewer.css';
 
 const MARKER_FILL: Record<string, string> = {
@@ -20,6 +21,7 @@ const MARKER_FILL: Record<string, string> = {
 };
 
 export default function Medical3DViewer() {
+  useRouteChromeRegistration({ title: '3D Viewer' });
   const [selectedModelId, setSelectedModelId] = useState<string | null>(DEMO_ANATOMY_MODELS[0]?.id ?? null);
 
   const models = DEMO_ANATOMY_MODELS;
@@ -38,7 +40,7 @@ export default function Medical3DViewer() {
         <div className="medical-3d-page__title-row">
           <GraphicIconBadge iconKey="layout-dashboard" accent="brand" size="md" />
           <div>
-            <h1>3D Viewer</h1>
+            <p className="medical-3d-page-title-text" data-testid="cd-page-title-text">3D Viewer</p>
             <p>Asset-safe anatomy model shell with demo markers — no committed Three.js or DICOM viewer.</p>
           </div>
         </div>

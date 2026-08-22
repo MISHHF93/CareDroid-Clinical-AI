@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import HospitalMapInsights from '../../components/operations/HospitalMapInsights';
 import { GraphicIconBadge } from '../../components/graphics/CdlGraphicKit';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import '../HospitalMapDashboard.css';
 import {
   fetchEmergencyCapacityDashboard,
@@ -104,6 +105,7 @@ function UnitRow({ unit }: { unit: BedUnit }) {
 }
 
 export default function HospitalMapDashboard() {
+  useRouteChromeRegistration({ title: 'Hospital Map' });
   const [capacity, setCapacity] = useState<any>(null);
   const [history, setHistory] = useState<any[]>([]);
   const [surge, setSurge] = useState<any>(null);
@@ -181,7 +183,7 @@ export default function HospitalMapDashboard() {
         <div className="hospital-map-page__title-row">
           <GraphicIconBadge iconKey="layout-dashboard" accent="brand" size="md" />
           <div>
-            <h1>Hospital Map</h1>
+            <p className="hospital-map-page__title-text" data-testid="cd-page-title-text">Hospital Map</p>
             <p>Real-time capacity, boarding, diversion status, and floor-plan device intelligence.</p>
           </div>
         </div>

@@ -5,6 +5,7 @@ import { CategoryBarChart } from '../../components/dashboard/DashboardCharts';
 import { GraphicIconBadge } from '../../components/graphics/CdlGraphicKit';
 import StateSourceNotice from '../../components/StateSourceNotice';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import {
   getRecommendedSimulationScenarios,
   SIMULATION_SCENARIOS,
@@ -18,6 +19,7 @@ import {
 import './MedicalSimulationSuite.css';
 
 export default function MedicalSimulationSuite() {
+  useRouteChromeRegistration({ title: 'Medical Simulation Suite' });
   const [query, setQuery] = useState('');
   const recommended = useMemo(() => getRecommendedSimulationScenarios({ role: 'medical student' }), []);
   const categoryChart = useMemo(() => buildScenarioCategoryChart(), []);
@@ -45,7 +47,7 @@ export default function MedicalSimulationSuite() {
         <div className="simulation-suite-page__title-row">
           <GraphicIconBadge iconKey="activity" accent="brand" size="md" />
           <div>
-            <h1>Medical Simulation Suite</h1>
+            <p className="simulation-suite-page__title-text" data-testid="cd-page-title-text">Medical Simulation Suite</p>
             <p>Virtual patient cases, timed drills, team simulations, and AI-tutor-guided training scenarios.</p>
           </div>
         </div>

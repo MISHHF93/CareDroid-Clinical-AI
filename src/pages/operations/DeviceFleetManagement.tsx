@@ -4,6 +4,7 @@ import { MetricCard } from '../../components/dashboard/DashboardVisualizations';
 import { GraphicIconBadge } from '../../components/graphics/CdlGraphicKit';
 import StateSourceNotice from '../../components/StateSourceNotice';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import { fetchMedicalIotSnapshot } from '../../services/medicalIotService';
 import { DEMO_LIVE_STATES } from '../../utils/demoLiveState';
 import { categoryLabel, resolveDeviceCategory } from '../../utils/medicalIotChartModel';
@@ -38,6 +39,7 @@ function mapFleetDevice(device: any): FleetDevice {
 }
 
 export default function DeviceFleetManagement() {
+  useRouteChromeRegistration({ title: 'Device Fleet Management' });
   const [devices, setDevices] = useState<FleetDevice[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDemo, setIsDemo] = useState(true);
@@ -76,7 +78,7 @@ export default function DeviceFleetManagement() {
         <div className="device-fleet-page__title-row">
           <GraphicIconBadge iconKey="route" accent="brand" size="md" />
           <div>
-            <h1>Device Fleet Management</h1>
+            <p className="device-fleet-page__title-text" data-testid="cd-page-title-text">Device Fleet Management</p>
             <p>Enterprise device registry, maintenance posture, and operations cross-links.</p>
           </div>
         </div>

@@ -4,6 +4,7 @@ import ClinicalDecisionSupportDisclaimer from '../../components/clinical/Clinica
 import { GraphicIconBadge } from '../../components/graphics/CdlGraphicKit';
 import { MetricCard, VisualizationPanel } from '../../components/dashboard/DashboardVisualizations';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import { FLEET_PM_MODERATE_INPUT } from '../../data/testHelpers/fleetToolsTestFixtures';
 import {
   hasMinimumScoringInput,
@@ -16,6 +17,7 @@ const MAINTENANCE_SAFETY_COPY =
   'Decision support only. Maintenance recommendations require human review before work orders or downtime actions.';
 
 export default function PredictiveMaintenance() {
+  useRouteChromeRegistration({ title: 'Predictive Maintenance' });
   const [vehicleAgeYears, setVehicleAgeYears] = useState(
     String(FLEET_PM_MODERATE_INPUT.vehicleAgeYears),
   );
@@ -79,7 +81,7 @@ export default function PredictiveMaintenance() {
       <header className="predictive-maintenance-page__header">
         <GraphicIconBadge iconKey="refresh" accent="warning" size="md" />
         <div>
-          <h1>Predictive Maintenance</h1>
+          <p className="predictive-maintenance-page__title-text" data-testid="cd-page-title-text">Predictive Maintenance</p>
           <p>Rule-based maintenance risk scoring for fleet operations review.</p>
         </div>
       </header>

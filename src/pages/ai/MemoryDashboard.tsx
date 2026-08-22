@@ -7,9 +7,11 @@ import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { DEMO_LIVE_STATES } from '../../utils/demoLiveState';
 import { DEMO_MEMORY_ACTIVITY, DEMO_MEMORY_WORKFLOWS } from '../../utils/clinicalInsightsChartModel';
 import { fetchMemoryDashboard } from '../../services/memoryApi';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import './MemoryDashboard.css';
 
 export default function MemoryDashboard() {
+  useRouteChromeRegistration({ title: 'Memory Dashboard' });
   const [loading, setLoading] = useState(true);
   const [fromApi, setFromApi] = useState(false);
   const [message, setMessage] = useState('');
@@ -44,7 +46,7 @@ export default function MemoryDashboard() {
         <div className="memory-page__title-row">
           <GraphicIconBadge iconKey="activity" accent="brand" size="md" />
           <div>
-            <h1>Memory Dashboard</h1>
+            <p className="memory-dashboard-title-text" data-testid="cd-page-title-text">Memory Dashboard</p>
             <p>Short-term assistant context, saved workflows, and recent clinical tool activity.</p>
           </div>
         </div>

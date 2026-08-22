@@ -9,6 +9,7 @@ import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { WORKFLOW_MINING_JOURNEYS } from '../../data/workflowMiningEngine';
 import { DEMO_LIVE_STATES } from '../../utils/demoLiveState';
 import { buildWorkflowPriorityChart } from '../../utils/platformSaasChartModel';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import './WorkflowBuilder.css';
 
 const WORKFLOW_TONE_CLASS: Record<string, string> = {
@@ -19,6 +20,7 @@ const WORKFLOW_TONE_CLASS: Record<string, string> = {
 };
 
 export function WorkflowBuilderPage() {
+  useRouteChromeRegistration({ title: 'Workflows' });
   const priorityChart = useMemo(() => buildWorkflowPriorityChart(), []);
   const actionCount = COMMAND_CENTER_WORKFLOW_ACTIONS.length;
   const journeyCount = WORKFLOW_MINING_JOURNEYS.length;
@@ -38,7 +40,7 @@ export function WorkflowBuilderPage() {
         <div className="workflow-builder-page__title-row">
           <GraphicIconBadge iconKey="journey" accent="brand" size="md" />
           <div>
-            <h1>Workflows</h1>
+            <p className="workflow-builder-page-title-text" data-testid="cd-page-title-text">Workflows</p>
             <p>Operational command-center actions, journey templates, and automation launch points.</p>
           </div>
         </div>

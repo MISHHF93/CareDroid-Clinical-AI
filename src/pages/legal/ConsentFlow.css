@@ -17,7 +17,7 @@
   margin-bottom: var(--space-8);
 }
 
-.consent-header h1 {
+.consent-header .consent-header__title-text {
   font-size: var(--font-36);
   font-weight: 700;
   color: var(--text-color);
@@ -242,7 +242,7 @@
     padding: var(--space-4) var(--space-3);
   }
 
-  .consent-header h1 {
+  .consent-header .consent-header__title-text {
     font-size: var(--font-28);
   }
 

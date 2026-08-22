@@ -29,9 +29,10 @@
   gap: 8px;
 }
 
-.fleet-dashboard__header h1 {
+.fleet-dashboard__header .fleet-dashboard__title-text {
   margin: 0;
   font-size: clamp(24px, 3vw, 32px);
+  font-weight: 700;
   color: var(--medical-text-heading, var(--app-text-primary));
 }
 
@@ -42,6 +43,9 @@
 }
 
 .fleet-dashboard__state {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   margin: 0;
   padding: 14px 16px;
   border-radius: 12px;

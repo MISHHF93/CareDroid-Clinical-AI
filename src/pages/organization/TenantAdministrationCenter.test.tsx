@@ -123,7 +123,10 @@ describe('TenantAdministrationCenter', () => {
       </MemoryRouter>,
     );
 
-    expect(await screen.findByRole('heading', { name: /tenant administration center/i })).toBeInTheDocument();
+    // Page title is registered into the shell chrome (useRouteChromeRegistration)
+    // rather than rendered as a local heading -- rendered here without a real
+    // AppShell/RouteChromeProvider, so it falls back to the sr-equivalent testid.
+    expect(await screen.findByTestId('cd-page-title-text')).toHaveTextContent(/tenant administration center/i);
     expect(screen.getByText(/Tenant: demo-hospital/i)).toBeInTheDocument();
     expect(screen.getByText('Dr. Rivera')).toBeInTheDocument();
     expect(screen.getByText('Emergency Physician')).toBeInTheDocument();
