@@ -122,23 +122,20 @@ describe('backendFrontendExposure scan', () => {
     }
   });
 
-  scanIt('covers profile, workspace, activity, and personalization client calls', () => {
+  scanIt('covers profile, workspace, and activity client calls actually reachable from the UI', () => {
+    // Cycle: fetchPreferences/fetchActivity/fetchSecurity/fetchWorkspaces/createWorkspace/
+    // fetchPersonalization/updatePersonalization/savePrompt are defined in userIdentityApi.ts
+    // but no page ever calls them -- the Profile* pages all read the combined GET /api/profile/me
+    // via UserIdentityContext instead. Those routes moved to backendRouteExposurePolicy.ts as
+    // deferred/orphaned rather than counted here as wired. See docs/orphaned-backend-functions.md.
     const expectedUserIdentityCalls = [
       ['GET', '/api/profile/me'],
       ['PATCH', '/api/profile/me'],
-      ['GET', '/api/profile/me/preferences'],
       ['PATCH', '/api/profile/me/preferences'],
-      ['GET', '/api/profile/me/activity'],
-      ['GET', '/api/profile/me/security'],
-      ['GET', '/api/profile/me/workspaces'],
       ['PATCH', '/api/profile/me/workspaces/active'],
-      ['GET', '/api/workspaces'],
-      ['POST', '/api/workspaces'],
+      ['GET', '/api/workspaces/context'],
       ['POST', '/api/workspaces/active'],
       ['POST', '/api/activity'],
-      ['GET', '/api/personalization/me'],
-      ['PATCH', '/api/personalization/me'],
-      ['POST', '/api/personalization/me/saved-prompts'],
     ];
 
     for (const [method, path] of expectedUserIdentityCalls) {
@@ -146,6 +143,24 @@ describe('backendFrontendExposure scan', () => {
         expect.arrayContaining([expect.objectContaining({ method, path })])
       );
       expect(findBackendRoute(method, path), `${method} ${path}`).toBeTruthy();
+    }
+
+    const noLongerWiredCalls = [
+      ['GET', '/api/profile/me/preferences'],
+      ['GET', '/api/profile/me/activity'],
+      ['GET', '/api/profile/me/security'],
+      ['GET', '/api/profile/me/workspaces'],
+      ['GET', '/api/workspaces'],
+      ['POST', '/api/workspaces'],
+      ['GET', '/api/personalization/me'],
+      ['PATCH', '/api/personalization/me'],
+      ['POST', '/api/personalization/me/saved-prompts'],
+    ];
+
+    for (const [method, path] of noLongerWiredCalls) {
+      expect(FRONTEND_API_CALLS, `${method} ${path}`).not.toEqual(
+        expect.arrayContaining([expect.objectContaining({ method, path })])
+      );
     }
   });
 

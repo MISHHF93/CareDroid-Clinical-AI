@@ -73,6 +73,31 @@ const BASE_BACKEND_ROUTE_EXPOSURE_POLICY = Object.freeze({
     reason: 'Workspace tool preference editor pending',
   },
 
+  'GET /api/profile/me/preferences': {
+    strategy: 'deferred',
+    reason: 'ProfilePreferences.tsx reads the combined GET /api/profile/me via UserIdentityContext instead; the dead fetchPreferences() client wrapper was removed from userIdentityApi.ts',
+  },
+  'GET /api/profile/me/activity': {
+    strategy: 'deferred',
+    reason: 'ProfileActivity.tsx reads the combined GET /api/profile/me via UserIdentityContext instead; the dead fetchActivity() client wrapper was removed from userIdentityApi.ts',
+  },
+  'GET /api/profile/me/security': {
+    strategy: 'deferred',
+    reason: 'ProfileSecurity.tsx reads the combined GET /api/profile/me via UserIdentityContext instead; the dead fetchSecurity() client wrapper was removed from userIdentityApi.ts',
+  },
+  'GET /api/profile/me/workspaces': {
+    strategy: 'deferred',
+    reason: 'ProfileWorkspaces.tsx reads the combined GET /api/profile/me via UserIdentityContext instead; the dead fetchWorkspaces() client wrapper was removed from userIdentityApi.ts',
+  },
+  'GET /api/workspaces': {
+    strategy: 'deferred',
+    reason: 'No frontend client function calls this route',
+  },
+  'POST /api/workspaces': {
+    strategy: 'deferred',
+    reason: 'The dead createWorkspace() client wrapper was removed from userIdentityApi.ts; no page ever called it',
+  },
+
   'GET /api/activity/me': { strategy: 'deferred', reason: 'Profile activity dashboard pending' },
   'GET /api/activity/me/summary': {
     strategy: 'deferred',
@@ -83,6 +108,18 @@ const BASE_BACKEND_ROUTE_EXPOSURE_POLICY = Object.freeze({
     reason: 'Workspace activity surface pending',
   },
 
+  'GET /api/personalization/me': {
+    strategy: 'deferred',
+    reason: 'The dead fetchPersonalization() client wrapper was removed from userIdentityApi.ts; no page ever called it',
+  },
+  'PATCH /api/personalization/me': {
+    strategy: 'deferred',
+    reason: 'The dead updatePersonalization() client wrapper was removed from userIdentityApi.ts; no page ever called it',
+  },
+  'POST /api/personalization/me/saved-prompts': {
+    strategy: 'deferred',
+    reason: 'The dead savePrompt() client wrapper was removed from userIdentityApi.ts; no page ever called it',
+  },
   'GET /api/personalization/me/recommendations': {
     strategy: 'deferred',
     reason: 'Personalization recommendations UI pending',

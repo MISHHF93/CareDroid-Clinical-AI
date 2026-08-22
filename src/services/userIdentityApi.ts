@@ -31,27 +31,11 @@ export const UserIdentityApi = {
     });
   },
 
-  fetchPreferences() {
-    return requestJson('/api/profile/me/preferences');
-  },
-
   updatePreferences(preferences) {
     return requestJson('/api/profile/me/preferences', {
       method: 'PATCH',
       body: JSON.stringify(preferences || {}),
     });
-  },
-
-  fetchActivity() {
-    return requestJson('/api/profile/me/activity');
-  },
-
-  fetchSecurity() {
-    return requestJson('/api/profile/me/security');
-  },
-
-  fetchWorkspaces() {
-    return requestJson('/api/profile/me/workspaces');
   },
 
   switchWorkspace(workspaceId) {
@@ -61,35 +45,10 @@ export const UserIdentityApi = {
     });
   },
 
-  createWorkspace(workspace) {
-    return requestJson('/api/workspaces', {
-      method: 'POST',
-      body: JSON.stringify(workspace || {}),
-    });
-  },
-
   recordActivity(activity) {
     return requestJson('/api/activity', {
       method: 'POST',
       body: JSON.stringify(activity || {}),
-    });
-  },
-
-  fetchPersonalization() {
-    return requestJson('/api/personalization/me');
-  },
-
-  updatePersonalization(updates) {
-    return requestJson('/api/personalization/me', {
-      method: 'PATCH',
-      body: JSON.stringify(updates || {}),
-    });
-  },
-
-  savePrompt(prompt) {
-    return requestJson('/api/personalization/me/saved-prompts', {
-      method: 'POST',
-      body: JSON.stringify(prompt || {}),
     });
   },
 };
