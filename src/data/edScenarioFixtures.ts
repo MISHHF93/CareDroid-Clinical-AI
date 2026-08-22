@@ -978,7 +978,50 @@ export function buildSrcEmergencyScenarioState(scenarioId = getInitialEdScenario
     capacity: scenario.capacity,
     alerts: scenario.alerts,
     emsArrivals: scenario.emsArrivals,
+    // HEAL-347.55 follow-up: buildEdScenarioFixture() already computes a real
+    // emsUnits array (derived from emsArrivals) on `scenario`, but this
+    // wrapper never forwarded it -- only emsArrivals. emergencyStore.ts reads
+    // buildSrcEmergencyScenarioState(...).emsUnits with no fallback, so
+    // store.emsUnits was undefined from the moment the app booted, which
+    // crashed careDroidCentralNode.ts's buildCareDroidCentralNodeSnapshot
+    // (`source.emsUnits.filter(...)`) on first render -- taking down
+    // NotificationShellProvider and the whole app via the top-level
+    // ErrorBoundary on every page load. Confirmed live via Playwright.
+    emsUnits: scenario.emsUnits,
     queues: scenario.queues,
+    // HEAL-347.55 follow-up: buildEdScenarioFixture() never computes referrals
+    // or an active shift at all for this ("Src") pipeline (unlike emsUnits
+    // above, there's no scenario.referrals/scenario.activeShift to forward).
+    // emergencyStore.ts reads both of these fields with no fallback, so they
+    // were undefined from boot -- broke every escalation/shift-handoff store
+    // action reading state.activeShift.chargeStaffId, and would crash
+    // careDroidCentralNode.ts's buildQueueHealth (`source.referrals.filter`)
+    // the moment the emsUnits crash above was fixed. Defaults mirror
+    // buildRootEmergencyScenarioState's own equivalent fallback below,
+    // adapted to this pipeline's un-prefixed staff ids (e.g. 's3', not
+    // 'staff-s3').
+    referrals: [],
+    activeShift: {
+      id: `shift-${scenario.id}`,
+      // ActiveShift (types/emergency.ts) declares `label`, not `name` --
+      // `name`/`endTime` belong to the differently-shaped sibling `Shift`
+      // interface. Two real call sites read `.activeShift.label`
+      // (shiftSummaryData.ts, emergencyStore.ts's own shift-summary
+      // builder) and would silently render a blank shift name with the
+      // wrong field name (a pre-existing bug in this pipeline too, not
+      // just the new one added alongside it).
+      label: `${scenario.label} demo shift`,
+      startTime: minutesAgo(240),
+      endTime: minutesFromNow(240),
+      status: 'Active',
+      // Not hardcoded to 's3' -- the First Customer Demo Mode branch above
+      // uses a completely different staff roster (demo.simple.staff, e.g.
+      // 'demo-charge-rn') with no 's3' member at all.
+      chargeStaffId:
+        scenario.staff.find((member) => /charge/i.test(member.role))?.id || scenario.staff[0]?.id,
+      staffIds: scenario.staff.map((member) => member.id),
+      handoffNotes: [],
+    },
     scenarioData: scenario,
   };
 }
@@ -1124,7 +1167,14 @@ export function buildRootEmergencyScenarioState(scenarioId = getInitialEdScenari
     referrals: [],
     activeShift: {
       id: `shift-${scenario.id}`,
-      name: `${scenario.label} demo shift`,
+      // ActiveShift (types/emergency.ts) declares `label`, not `name` --
+      // `name`/`endTime` belong to the differently-shaped sibling `Shift`
+      // interface. Two real call sites read `.activeShift.label`
+      // (shiftSummaryData.ts, emergencyStore.ts's own shift-summary
+      // builder) and would silently render a blank shift name with the
+      // wrong field name (a pre-existing bug in this pipeline too, not
+      // just the new one added alongside it).
+      label: `${scenario.label} demo shift`,
       startTime: minutesAgo(240),
       endTime: minutesFromNow(240),
       status: 'Active',

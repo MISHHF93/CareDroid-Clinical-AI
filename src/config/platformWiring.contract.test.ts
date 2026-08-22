@@ -112,9 +112,16 @@ describe('platform wiring — offline / demo safe surfaces', () => {
   });
 
   it('emergency store seeds patients for desk continuity', () => {
+    // HEAL-347.55 removed the hardcoded SEED_PATIENTS fallback array once every
+    // call site (initial load here, and setActiveScenario) started sourcing
+    // state from edScenarioFixtures.ts's scenario builders, which always
+    // populate `patients` (never undefined/null) for all 10 scenarios. Desk
+    // continuity now comes from that guarantee instead of a `|| SEED_PATIENTS`
+    // fallback, so assert the wiring to the scenario builder directly.
     const store = read('store/emergencyStore.ts');
-    expect(store).toContain('SEED_PATIENTS');
-    expect(store).toMatch(/patients:\s*initialScenarioState\.patients\s*\|\|\s*SEED_PATIENTS/);
+    expect(store).toContain('buildSrcEmergencyScenarioState');
+    expect(store).toMatch(/initialScenarioState\s*=\s*buildSrcEmergencyScenarioState/);
+    expect(store).toMatch(/patients:\s*initialScenarioState\.patients/);
   });
 
   it('clinical alerts page falls back to emergency store when API soft', () => {
