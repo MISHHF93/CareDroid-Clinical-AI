@@ -1,5 +1,6 @@
 import { Suspense, type ReactNode } from 'react';
 import { lazyWithRetry } from '../utils/lazyWithRetry';
+import { Spinner } from '../components/ui/Spinner';
 import './RouteLoadingFallback.css';
 import {
   Navigate,
@@ -36,6 +37,12 @@ const lazyNamed = (loader, exportName) =>
 // ── Platform entry hub ───────────────────────────────────────────────────────
 const PlatformEntryHub = lazyRoute(() => import('../pages/PlatformEntryHub'));
 const AuthPage = lazyRoute(() => import('../pages/auth/AuthPage'));
+
+// ── Developer-only design-system catalog (item 41) ──────────────────────────
+// Deliberately NOT in CANONICAL_ROUTE_MAP, any navigation config, or the
+// command palette -- reachable only by direct URL, and only outside a
+// production build (see the import.meta.env.DEV guard on the route below).
+const DesignSystemPlayground = lazyRoute(() => import('../pages/DesignSystemPlayground'));
 
 // ── Display / wall mode ──────────────────────────────────────────────────────
 const WhiteboardDisplayRoute = lazyRoute(() => import('../features/whiteboard/WhiteboardDisplayRoute'));
@@ -138,7 +145,13 @@ export function RouteLoadingFallback({ label = 'Loading CareDroid...' }) {
       aria-live="polite"
       className="route-loading-fallback"
     >
-      {label}
+      {/* Spinner carries its own role="status" + aria-label -- hidden here so it
+          doesn't create a second, competing status region / duplicate
+          announcement alongside this div's own (more specific) label text. */}
+      <span aria-hidden="true">
+        <Spinner size="md" />
+      </span>
+      <span>{label}</span>
     </div>
   );
 }
@@ -703,6 +716,20 @@ export function AppRoutes() {
           </LazyRoute>
         }
       />
+
+      {/* Item 41: developer-only, hidden from every navigation surface, and
+          absent entirely from a production build (no route element is even
+          registered when import.meta.env.DEV is false). */}
+      {import.meta.env.DEV ? (
+        <Route
+          path="/dev/design-system"
+          element={
+            <LazyRoute label="Loading design-system playground...">
+              <DesignSystemPlayground />
+            </LazyRoute>
+          }
+        />
+      ) : null}
 
       {/* ── Display / wall-mount shell ── */}
       <Route element={<DisplayShell />}>

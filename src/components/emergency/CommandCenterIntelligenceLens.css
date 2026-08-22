@@ -41,6 +41,9 @@
 }
 
 .command-center-lens__loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   margin: 0;
   color: var(--cd-ink-muted, #cbd5e1);
   font-size: 0.875rem;

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import Card from '../components/ui/card';
+import { LoadingText } from '../components/ui/Spinner';
 import { useTenantContext } from '../contexts/TenantContext';
 import PageShellBase from './commercial/CommercialPageShell';
 const PageShell = PageShellBase as any;
@@ -75,7 +76,7 @@ export default function UsagePage() {
     >
       {error && <p className="commercial-error-text">{error}</p>}
       {isLoading ? (
-        <p>Loading usage...</p>
+        <LoadingText text="Loading usage..." />
       ) : (
         <>
           <section className="commercial-section">

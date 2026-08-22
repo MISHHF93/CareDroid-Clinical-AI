@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import ApiStateBanner from '../components/ApiStateBanner';
+import { Spinner } from '../components/ui/Spinner';
 import { sendClinicalChatMessage } from '../services/clinicalChatService';
 import {
   buildDocumentationAssistantPrompt,
@@ -229,7 +230,11 @@ export default function ClinicalDocumentationAssistant() {
           <ApiStateBanner error={error as any} onRetry={(() => handleAiAction(actionId)) as any} />
 
           {loading ? (
-            <article className="documentation-assistant-card documentation-assistant-output" aria-busy="true">
+            <article
+              className="documentation-assistant-card documentation-assistant-output documentation-assistant-output--loading"
+              aria-busy="true"
+            >
+              <Spinner size="sm" />
               Generating documentation draft...
             </article>
           ) : draftText ? (

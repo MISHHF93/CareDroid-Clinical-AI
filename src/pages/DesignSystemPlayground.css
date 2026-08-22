@@ -1,0 +1,135 @@
+.ds-playground {
+  min-height: 100%;
+  background: var(--medical-surface-page, #f1f5f9);
+  color: var(--medical-ink, #111827);
+  padding: 28px 32px 80px;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.ds-playground__masthead {
+  margin-bottom: 28px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--medical-border, #e2e8f0);
+}
+
+.ds-playground__eyebrow {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--medical-accent, #0ea5e9);
+  margin-bottom: 8px;
+}
+
+.ds-playground__masthead h1 {
+  margin: 0 0 8px;
+  font-size: 26px;
+}
+
+.ds-playground__masthead p {
+  margin: 0;
+  max-width: 72ch;
+  color: var(--medical-text-subtle, #6b7280);
+  font-size: 14px;
+}
+
+.ds-playground__section {
+  border: 1px solid var(--medical-border, #e2e8f0);
+  border-radius: 14px;
+  background: var(--app-surface-1, #ffffff);
+  padding: 20px 22px;
+  margin-bottom: 20px;
+}
+
+.ds-playground__section-head {
+  margin-bottom: 14px;
+}
+
+.ds-playground__section-head h2 {
+  margin: 0 0 4px;
+  font-size: 16px;
+}
+
+.ds-playground__section-head p {
+  margin: 0;
+  font-size: 12px;
+  font-family: ui-monospace, monospace;
+  color: var(--medical-text-subtle, #6b7280);
+}
+
+.ds-playground__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.ds-playground__row--wrap {
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.ds-playground__stack {
+  display: grid;
+  gap: 10px;
+}
+
+.ds-playground__gap {
+  height: 14px;
+}
+
+.ds-playground__swatch {
+  display: grid;
+  gap: 6px;
+}
+
+.ds-playground__swatch-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--medical-text-subtle, #6b7280);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.ds-playground__swatch-content {
+  border: 1px dashed var(--medical-border, #e2e8f0);
+  border-radius: 10px;
+  padding: 14px;
+  min-width: 220px;
+}
+
+.ds-playground__table-wrap {
+  overflow-x: auto;
+}
+
+.ds-playground__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ds-playground__table th,
+.ds-playground__table td {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--medical-border, #e2e8f0);
+  font-size: 13px;
+}
+
+.ds-playground__frame {
+  display: grid;
+  gap: 6px;
+}
+
+.ds-playground__frame-label {
+  font-size: 11px;
+  font-family: ui-monospace, monospace;
+  color: var(--medical-text-subtle, #6b7280);
+}
+
+@media (prefers-color-scheme: dark) {
+  .ds-playground__section {
+    background: var(--app-surface-1, #1e293b);
+  }
+}

@@ -96,6 +96,22 @@
   text-transform: uppercase;
 }
 
+/* HEAL follow-up: .ed-copilot-shell__tabs lays its 3 tabs out on
+   `grid-template-columns: repeat(3, minmax(0, 1fr))`, which deliberately lets
+   each column shrink below its content's natural width -- but the label
+   <span> here had no white-space/overflow handling, so "CONTEXT" (the
+   longest of the 3 uppercase labels) wrapped letter-by-line inside its
+   narrow pill instead of staying on one line, with the badge number landing
+   awkwardly mid-word ("CON / TEX 5 / T"). Reproduced live in both light and
+   dark theme -- a layout bug independent of theme, just more visible during
+   a dark-theme sweep. Scoped to the label span only (not the badge span)
+   so the count badge keeps its own layout. */
+.ed-copilot-shell__tab > span:first-child {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
 .ed-copilot-shell__tab[data-active='true'] {
   border-color: var(--copilot-border-strong);
   background: color-mix(in srgb, var(--copilot-ai) 14%, var(--copilot-surface-soft));

@@ -18,9 +18,13 @@ import {
 // "Auth UI removed" redirect) -- DIRECTORY_OWNER_RULES.auth already routes
 // them to the 'auth' module with zero gaps, so only the pinned totals move,
 // +1 source file and +1 style file.
-export const PAGE_INVENTORY_EXPECTED_TOTAL = 241;
-export const PAGE_SOURCE_EXPECTED_TOTAL = 150;
-export const PAGE_STYLE_EXPECTED_TOTAL = 91;
+// Item 41 (design-system playground): src/pages/DesignSystemPlayground.tsx +
+// .css are new, real, dev-only files (root-level, no owner rule -- falls
+// through to the 'platform' default, same as every other unscoped root
+// page, with zero gaps), +1 source file and +1 style file.
+export const PAGE_INVENTORY_EXPECTED_TOTAL = 243;
+export const PAGE_SOURCE_EXPECTED_TOTAL = 151;
+export const PAGE_STYLE_EXPECTED_TOTAL = 92;
 export const PAGE_TOOLS_INVENTORY_EXPECTED_TOTAL = 58;
 export const PAGE_TOOLS_SOURCE_EXPECTED_TOTAL = 48;
 

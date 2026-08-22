@@ -130,6 +130,13 @@
   white-space: pre-wrap;
 }
 
+.documentation-assistant-output--loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: normal;
+}
+
 .documentation-assistant-export-status {
   font-size: 13px;
 }

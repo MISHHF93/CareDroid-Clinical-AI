@@ -1,3 +1,4 @@
+import { Spinner } from '../ui/Spinner';
 import './copilot-shell.css';
 
 export default function CopilotPanelLoader() {
@@ -8,7 +9,12 @@ export default function CopilotPanelLoader() {
           <span aria-hidden className="ed-copilot-panel__live-dot" />
           <div className="ed-copilot-panel__identity">
             <span>CareDroid Copilot</span>
-            <strong>Loading…</strong>
+            {/* Spinner renders a <div> internally -- <strong> is phrasing
+                content only, so div is the valid wrapper here. */}
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontWeight: 700 }}>
+              <Spinner size="sm" />
+              Loading…
+            </div>
           </div>
         </header>
         <div className="ed-copilot-panel__messages" role="status">

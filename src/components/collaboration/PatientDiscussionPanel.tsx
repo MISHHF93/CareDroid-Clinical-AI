@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Text, Button } from '../primitives';
 import MessageList from './MessageList';
 import MessageComposer from './MessageComposer';
+import { Spinner } from '../ui/Spinner';
 import './CollaborationHub.css';
 import { useUser } from '../../contexts/UserContext';
 import useSecurityAccess from '../../hooks/useSecurityAccess';
@@ -74,7 +75,10 @@ export function PatientDiscussionPanel({ patientId }: PatientDiscussionPanelProp
         </Button>
       </div>
       {loading ? (
-        <Text as="p" size="xs" color="secondary">
+        /* Spinner renders a <div> internally -- as="p" would be invalid HTML
+           nesting (block element inside a paragraph); div is correct here. */
+        <Text as="div" size="xs" color="secondary" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <Spinner size="sm" />
           Loading discussion…
         </Text>
       ) : (

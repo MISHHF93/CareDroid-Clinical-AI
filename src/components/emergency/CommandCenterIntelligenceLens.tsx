@@ -16,6 +16,7 @@ import {
   buildPredictiveAnalyticsSummary,
   DEMO_PREDICTIVE_ANALYTICS_MODELS,
 } from '../../data/predictiveAnalyticsDashboard';
+import { Spinner } from '../ui/Spinner';
 import './CommandCenterIntelligenceLens.css';
 
 type LensProps = {
@@ -81,7 +82,12 @@ function ExecutiveLensPanel() {
   }, [load]);
 
   if (loading) {
-    return <p className="command-center-lens__loading">Loading executive intelligence…</p>;
+    return (
+      <div className="command-center-lens__loading" role="status" aria-live="polite">
+        <Spinner size="sm" />
+        Loading executive intelligence…
+      </div>
+    );
   }
 
   return (
@@ -123,7 +129,12 @@ function AiLensPanel() {
   }, [load]);
 
   if (loading) {
-    return <p className="command-center-lens__loading">Loading AI operations intelligence…</p>;
+    return (
+      <div className="command-center-lens__loading" role="status" aria-live="polite">
+        <Spinner size="sm" />
+        Loading AI operations intelligence…
+      </div>
+    );
   }
 
   return (
