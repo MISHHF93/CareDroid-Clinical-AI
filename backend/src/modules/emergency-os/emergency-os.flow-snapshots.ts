@@ -249,7 +249,9 @@ function makeTask(
   },
 ): AdministrativeAutomationTask {
   return Object.freeze({
-    aiGenerated: partial.aiGenerated ?? true,
+    // Deterministic-rule generator, no AI call anywhere in this file --
+    // see the identical fix in administrative-automation-orchestration.lib.ts.
+    aiGenerated: partial.aiGenerated ?? false,
     humanReviewRequired: true as const,
     automationId: partial.automationId,
     route: partial.route || '/emergency/command-center',

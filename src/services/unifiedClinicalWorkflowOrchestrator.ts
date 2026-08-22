@@ -53,7 +53,11 @@ function makeTask(
   },
 ): AdministrativeAutomationTask {
   return Object.freeze({
-    aiGenerated: partial.aiGenerated ?? true,
+    // This file builds tasks entirely from deterministic rules over patient
+    // state -- no AI call exists anywhere in it. See the same fix in
+    // backend/administrative-automation-orchestration.lib.ts for the one
+    // implementation that genuinely enriches tasks with real AI output.
+    aiGenerated: partial.aiGenerated ?? false,
     humanReviewRequired: true as const,
     automationId: partial.automationId || CATEGORY_AUTOMATION_IDS[partial.category],
     route:

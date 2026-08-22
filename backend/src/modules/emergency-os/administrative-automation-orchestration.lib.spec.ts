@@ -1,6 +1,7 @@
 import { PatientState, Priority, type Patient } from '../../../../src/types/emergency';
 import type { AdministrativeAutomationTask } from '../../../../src/types/administrativeAutomation';
 import {
+  buildAdministrativeAutomationSnapshot,
   buildBackendEnrichedAdministrativeAutomationSnapshot,
   reviewBackendAdministrativeAutomationWithExecution,
 } from './administrative-automation-orchestration.lib';
@@ -45,6 +46,40 @@ describe('administrative-automation-orchestration.lib', () => {
       | undefined;
     expect(aiDecision).toBeTruthy();
     expect(aiDecision?.requiresClinicianReview).toBe(true);
+    // AI_ORCHESTRATION_AUDIT.md §3.6: aiGenerated used to default to `true`
+    // unconditionally, so every task -- AI-enriched or not -- looked
+    // AI-generated. Once real AI enrichment has run (proven above via the
+    // attached aiDecision), the field should now honestly say so.
+    expect(routingTask?.aiGenerated).toBe(true);
+  });
+
+  it('marks rule-generated tasks aiGenerated:false before any AI enrichment runs', () => {
+    const patient = {
+      id: 'p-rules-only',
+      mrn: 'MRN-B3',
+      firstName: 'Jordan',
+      lastName: 'Kim',
+      age: 30,
+      sex: 'F',
+      state: PatientState.Registration,
+      priority: Priority.P3,
+      chiefComplaint: 'Ankle pain',
+      flags: [],
+      notes: [],
+      timeline: [],
+    } as unknown as Patient;
+
+    const snapshot = buildAdministrativeAutomationSnapshot({
+      patients: [patient],
+      staff: [],
+      referrals: [],
+      alerts: [],
+      emsArrivals: [],
+      existingTasks: [],
+    });
+
+    expect(snapshot.tasks.length).toBeGreaterThan(0);
+    expect(snapshot.tasks.every((task) => task.aiGenerated === false)).toBe(true);
   });
 
   it('filters routing tasks when strict entitlements exclude mapped operations asset', async () => {

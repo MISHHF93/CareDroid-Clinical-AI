@@ -68,6 +68,12 @@ describe('unifiedClinicalWorkflowOrchestrator', () => {
     expect(snapshot.tasks.some((task) => task.category === 'staff_assignment')).toBe(true);
     expect(snapshot.tasks.every((task) => task.humanReviewRequired)).toBe(true);
     expect(snapshot.metrics.pendingReview).toBeGreaterThan(0);
+    // AI_ORCHESTRATION_AUDIT.md §3.6: this file builds tasks entirely from
+    // deterministic rules (thresholds/flags/state transitions) and never
+    // calls any AI model, but aiGenerated used to default to `true`
+    // unconditionally -- corrupting the aiInvolvement.involved field this
+    // orchestrator's own audit-trail logging derives from it.
+    expect(snapshot.tasks.every((task) => task.aiGenerated === false)).toBe(true);
   });
 
   it('records audit trail and workflow action when a clinician reviews a task', () => {

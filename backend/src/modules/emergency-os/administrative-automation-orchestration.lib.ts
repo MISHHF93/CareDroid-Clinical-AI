@@ -103,7 +103,12 @@ function makeTask(
   },
 ): AdministrativeAutomationTask {
   return Object.freeze({
-    aiGenerated: partial.aiGenerated ?? true,
+    // Tasks are built here by deterministic rules over patient/staff/alert
+    // state (thresholds, flags, state transitions) -- no AI call is ever
+    // made in this function. Real AI involvement is stamped explicitly by
+    // enrichAdministrativeAutomationSnapshotWithAi() below when it actually
+    // runs runCareDroidAI(); everything else stays honestly rule-based.
+    aiGenerated: partial.aiGenerated ?? false,
     humanReviewRequired: true as const,
     automationId: partial.automationId || CATEGORY_AUTOMATION_IDS[partial.category],
     route:
@@ -749,6 +754,7 @@ async function enrichAdministrativeAutomationSnapshotWithAi(
         const emsDecision = await evaluateEmsPrearrivalAiDecision(arrival, patient, input.tenant);
         return Object.freeze({
           ...task,
+          aiGenerated: true,
           priority: emsDecision.priority === 'critical' ? 'critical' : task.priority,
           summary: `${task.summary} EMS AI pre-arrival: ${emsDecision.data?.riskLevel || 'review'} — ${(emsDecision.redFlags || []).slice(0, 2).join('; ') || 'no red flags'}. Clinician review required.`,
           proposedPayload: Object.freeze({
@@ -771,6 +777,7 @@ async function enrichAdministrativeAutomationSnapshotWithAi(
       const aiSummary = formatAiDecisionSummary(bundle);
       return Object.freeze({
         ...task,
+        aiGenerated: true,
         summary: `${task.summary} ${aiSummary}`,
         proposedPayload: Object.freeze({
           ...task.proposedPayload,
