@@ -32,7 +32,13 @@ import { canAccessRoute, compileCareDroidAccessProfile } from '../lib/users/cano
  * combination visible and auditable, not to argue they're wrong.
  */
 
-type NavItem = { id?: string; path?: string; label?: string; permission?: string | string[] };
+type NavItem = {
+  id?: string;
+  path?: string;
+  label?: string;
+  permission?: string | string[];
+  kind?: 'route' | 'action';
+};
 
 const NAV_ITEM_ARRAYS: ReadonlyArray<readonly NavItem[]> = [
   APP_SHELL_NAV_ITEMS,
@@ -46,7 +52,11 @@ function collectNavRoutes(): Array<{ id: string; path: string; label: string }> 
   const seen = new Map<string, { id: string; path: string; label: string }>();
   for (const items of NAV_ITEM_ARRAYS) {
     for (const item of items) {
-      if (item.path && !seen.has(item.path)) {
+      // kind: 'action' items (e.g. search, notifications) are client-side
+      // triggers, not real navigable pages -- excluded by construction from
+      // the reachability matrix rather than via an ever-growing exception
+      // list. See navigation.config.ts's NavigationDestinationKind doc.
+      if (item.path && item.kind !== 'action' && !seen.has(item.path)) {
         seen.set(item.path, { id: item.id || item.path, path: item.path, label: item.label || item.id || item.path });
       }
     }
@@ -123,21 +133,20 @@ describe('authorization mismatch matrix', () => {
 
     console.log('MATRIX_SUMMARY ' + JSON.stringify(summary, null, 2));
 
-    // 2026-08-22: 19 routes currently land here. Sampled 5 (digital-twin,
-    // assets, live-map, agents, products) and confirmed via exhaustive grep
-    // across router.tsx and every *RouteTree.tsx/*.Routes.ts file that they
-    // have ZERO <Route> registration anywhere in the app -- these are dead
-    // nav entries pointing at URLs with no page behind them at all, a
-    // different and more basic defect than an authorization-dimension gap
-    // (this matrix can only prove "no dimension grants access to this path";
-    // it can't distinguish that from "no page exists at this path" without
-    // cross-referencing the full route tree, which is a separate, larger
-    // sweep). /search and /notifications are also in this list but are a
-    // third, more benign case: UTILITY_NAV_IDS exempts them from the nav-
-    // visibility permission check entirely, and neither has a <Route>
-    // registration either -- they're client-side action triggers (a search
-    // overlay, a notification panel), not real navigable pages, so their
-    // `path` field is just used for nav-item bookkeeping.
+    // 2026-08-22: originally 19 routes landed here. /search and
+    // /notifications are now excluded from this matrix entirely (see
+    // collectNavRoutes's `kind !== 'action'` filter) -- they're client-side
+    // action triggers (a search overlay, a notification panel), not real
+    // navigable pages, confirmed via their Header.tsx click handlers rather
+    // than a <Route> registration. That leaves 17 tracked below. 5 sampled
+    // (digital-twin, assets, live-map, agents, products) are confirmed via
+    // exhaustive grep across router.tsx and every *RouteTree.tsx/*.Routes.ts
+    // file to have ZERO <Route> registration anywhere in the app -- dead nav
+    // entries pointing at URLs with no page behind them, a different and
+    // more basic defect than an authorization-dimension gap (this matrix
+    // can only prove "no dimension grants access to this path"; it can't
+    // distinguish that from "no page exists at this path" without
+    // cross-referencing the full route tree).
     //
     // Not hard-failing on this list: distinguishing "genuinely orphaned
     // authorization gap on a real page" from "dead nav entry with no page"
@@ -147,10 +156,8 @@ describe('authorization mismatch matrix', () => {
     // wasn't in this list before) fails the test and gets investigated
     // before it can silently join an already-known backlog.
     const KNOWN_UNRESOLVED_NO_ACCESS_ROUTES = new Set([
-      '/search',
       '/customer-portal',
       '/knowledge-base',
-      '/notifications',
       '/recommendations',
       '/products',
       '/service-lines',

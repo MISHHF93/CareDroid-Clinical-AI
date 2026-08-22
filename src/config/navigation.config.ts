@@ -15,6 +15,24 @@ import {
 } from './routes.config';
 import { FEATURE_REGISTRY_BY_ID } from '../../lib/features/featureRegistry';
 
+/**
+ * Navigation destination kind. Added 2026-08-22: the authorization
+ * mismatch matrix (authorizationMismatchMatrix.test.ts) found 'search' and
+ * 'notifications' had a real-looking `path`/`matchPaths` but no <Route>
+ * registration anywhere in the app and no authorization dimension granting
+ * access to either -- because they aren't pages at all. Clicking them
+ * triggers a client-side overlay (a search panel, a notification drawer)
+ * via Header.tsx's own click handling; `path` exists only for nav-item
+ * active-state bookkeeping, not for React Router.
+ *
+ * 'route' (the default when `kind` is omitted, matching every pre-existing
+ * item) is a real navigable page that must have a <Route> registration and
+ * is subject to the unreachable-route invariant. 'action' is a client-side
+ * trigger that is exempt from that invariant by construction -- do not add
+ * a <Route> for one merely to satisfy a route test.
+ */
+export type NavigationDestinationKind = 'route' | 'action';
+
 function appShellNavItemFromUnified(item) {
   return Object.freeze({
     id: item.id,
@@ -48,6 +66,7 @@ export const ACCOUNT_UTILITY_NAV_ITEMS = Object.freeze([
     mobileLabel: 'Search',
     path: CANONICAL_ROUTES.search,
     matchPaths: [CANONICAL_ROUTES.search],
+    kind: 'action' as NavigationDestinationKind,
     showInMobile: false,
     showInSidebar: false,
     disclosure: 'utility',
@@ -156,6 +175,7 @@ export const ACCOUNT_UTILITY_NAV_ITEMS = Object.freeze([
     mobileLabel: 'Alerts',
     path: CANONICAL_ROUTES.notifications,
     matchPaths: [CANONICAL_ROUTES.notifications, '/notification-preferences'],
+    kind: 'action' as NavigationDestinationKind,
     showInMobile: false,
     showInSidebar: false,
     disclosure: 'utility',
