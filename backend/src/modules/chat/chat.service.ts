@@ -658,6 +658,15 @@ export class ChatService {
       const composed = this.aiResponseComposer.compose(
         {
           ...fallback,
+          // The real LLM/tool call above threw -- generateAIResponse() is a
+          // deterministic, rule-based canned responder, not an LLM call.
+          // Without this hint, ResponseComposerService's naive inference
+          // (no toolResult, no RAG chunks -> LLM_GENERATED) mislabels this
+          // fallback content as real model output in the response's own
+          // provenance.responseSource, which a clinician or auditor reading
+          // that field would trust as accurate (item 9/15: never present
+          // deterministic content as if it were AI-generated).
+          responseSourceHint: 'DETERMINISTIC_RULE' as const,
           suggestions: this.mergeWorkspaceSuggestions(
             fallback.suggestions || [],
             message,

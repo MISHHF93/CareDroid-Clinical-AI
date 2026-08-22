@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import {
   buildAiResponseProvenance,
+  isAiResponseSourceCategory,
   PROVENANCE_CONTRACT_VERSION,
   type AIResponseSourceCategory,
 } from '../../../../lib/ai/provenanceContract';
@@ -58,21 +59,28 @@ export class ResponseComposerService {
         ? (response as any).confidence
         : routePlan.confidence;
 
-    // Not explicit from the caller: this composer is a single, generic
-    // finishing step for many different underlying generation shapes (pure
-    // LLM free text, tool-orchestrator results, RAG-grounded answers), and
-    // ChatService.processMessage() does not yet pass through which one
-    // happened. Inferred conservatively from what's actually present on the
-    // response rather than assumed -- real retrieved chunks mean
-    // RAG_ASSISTED; an executed tool result means TOOL_RESULT; otherwise
-    // this composer is only reached after a real aiService LLM call
-    // upstream, so LLM_GENERATED. Threading an explicit signal through from
-    // ChatService is real future work, not guessed at here.
-    const inferredResponseSource: AIResponseSourceCategory = (response as any).toolResult
-      ? 'TOOL_RESULT'
-      : chunks.length > 0
-        ? 'RAG_ASSISTED'
-        : 'LLM_GENERATED';
+    // This composer is a single, generic finishing step for many different
+    // underlying generation shapes (pure LLM free text, tool-orchestrator
+    // results, RAG-grounded answers, and the deterministic fallback path
+    // ChatService takes when the real AI call throws). Callers that know
+    // their content did NOT come from a real model call (e.g. ChatService's
+    // catch-block fallback to generateAIResponse()) pass an explicit
+    // `responseSourceHint` so it isn't defaulted to LLM_GENERATED -- without
+    // this, a rate-limited/unconfigured/failed AI call silently mislabeled
+    // its own canned fallback text as real model output. Callers that don't
+    // set the hint keep the same conservative inference as before: real
+    // retrieved chunks mean RAG_ASSISTED, an executed tool result means
+    // TOOL_RESULT, otherwise LLM_GENERATED (this composer is otherwise only
+    // reached after a real aiService LLM call upstream).
+    const inferredResponseSource: AIResponseSourceCategory = isAiResponseSourceCategory(
+      (response as any).responseSourceHint,
+    )
+      ? (response as any).responseSourceHint
+      : (response as any).toolResult
+        ? 'TOOL_RESULT'
+        : chunks.length > 0
+          ? 'RAG_ASSISTED'
+          : 'LLM_GENERATED';
 
     const provenance =
       (response as any).provenance &&
