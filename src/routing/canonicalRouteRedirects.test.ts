@@ -120,12 +120,20 @@ describe('canonical route tree', () => {
     expect(appSource).toContain('COMMAND_CENTER_INTELLIGENCE_REDIRECTS.map');
     expect(appSource).toContain('LEGACY_EMERGENCY_ROUTE_REDIRECTS.map(({ path, to }) => (');
     expect(appSource).toContain('IN_SHELL_ROUTE_REDIRECTS.map');
+    // The exact '/organization' entry was removed 2026-08-21: it never
+    // actually fired (platformConsoleRoutes.ts's real Organization Dashboard
+    // page always won that exact path -- proven live across fresh-load,
+    // refresh, and client-side navigation). Only the wildcard child-path
+    // redirect is live; asserting on that instead.
     expect(IN_SHELL_ROUTE_REDIRECTS).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ path: '/organization', to: CANONICAL_ROUTES.adminOperations }),
+        expect.objectContaining({ path: '/organization/*', to: CANONICAL_ROUTES.adminOperations }),
         expect.objectContaining({ path: '/fleet', to: CANONICAL_ROUTES.fleetCommand }),
         expect.objectContaining({ path: '/ai/evaluation', to: CANONICAL_ROUTES.aiEvaluation }),
       ]),
+    );
+    expect(IN_SHELL_ROUTE_REDIRECTS).not.toEqual(
+      expect.arrayContaining([expect.objectContaining({ path: '/organization' })]),
     );
     expect(LEGACY_EMERGENCY_ROUTE_REDIRECTS).toEqual(
       expect.arrayContaining([

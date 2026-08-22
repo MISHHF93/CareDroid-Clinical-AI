@@ -454,7 +454,16 @@ export const NON_ED_WORKSPACE_REDIRECT_ROUTES = Object.freeze([
  */
 export const IN_SHELL_ROUTE_REDIRECTS = Object.freeze(
   [
-    ['/organization', CANONICAL_ROUTES.adminOperations],
+    // The exact '/organization' entry that used to sit here never actually
+    // fired: platformConsoleRoutes.ts registers a real, unwildcarded page
+    // route at the same exact path (CANONICAL_ROUTES.organization ->
+    // organizationDashboard), and it always won the match -- proven live
+    // 2026-08-21 across fresh-load, refresh, and client-side SPA navigation,
+    // all three landing on the real Organization Dashboard with the URL
+    // staying '/organization'. Only the wildcard below is actually reachable
+    // (proven live: '/organization/anything' does redirect to /admin).
+    // Removed the dead exact entry rather than leaving two registrations
+    // whose outcome depended on undocumented router precedence.
     ['/organization/*', CANONICAL_ROUTES.adminOperations],
     [CANONICAL_ROUTES.customerPortal, `${CANONICAL_ROUTES.adminOperations}/tenant`],
     [CANONICAL_ROUTES.successCenter, CANONICAL_ROUTES.customerSuccess],
