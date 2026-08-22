@@ -121,6 +121,33 @@ describe('RouteChromeContext registration vs navigation reset', () => {
     expect(screen.queryByRole('button', { name: 'Add Patient' })).not.toBeInTheDocument();
   });
 
+  it('does not infinite-loop when a caller passes a fresh inline object literal every render', () => {
+    // Reproduces the real bug: a page calling
+    // useRouteChromeRegistration({ title: 'X' }) with a NEW literal on every
+    // render (not memoized, unlike Registrant above). setChrome's resulting
+    // context-value change re-renders this component's own caller (it uses
+    // useContext internally) -- without value-stabilizing `chrome` inside
+    // the hook, that recreates the literal and re-fires the effect forever.
+    let renderCount = 0;
+    function UnmemoizedRegistrant({ title }: { title: string }) {
+      renderCount += 1;
+      useRouteChromeRegistration({ title });
+      return null;
+    }
+
+    render(
+      <RouteChromeProvider>
+        <UnmemoizedRegistrant title="Departments" />
+        <ChromeConsumer />
+      </RouteChromeProvider>,
+    );
+
+    expect(screen.getByText('Departments')).toBeInTheDocument();
+    // A genuine loop would run into the thousands (or hang the test/OOM);
+    // a handful of settling renders is normal React behavior.
+    expect(renderCount).toBeLessThan(10);
+  });
+
   it('AppShell&apos;s RouteChromeReset clears in the layout phase, not the passive phase', () => {
     const appShellSource = readFileSync(join(__dirname, '../components/AppShell.tsx'), 'utf8');
     const resetStart = appShellSource.indexOf('function RouteChromeReset');
