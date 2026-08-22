@@ -16,13 +16,13 @@ import {
   type WorkflowAiCard,
 } from '../../contracts/interactiveAi';
 import {
-  approveProposal,
-  createActionProposal,
-  executeProposal,
-  getActionProposal,
-  rejectProposal,
-  rollbackProposal,
-} from '../../services/interactiveAi/actionProposalService';
+  approveProposalApi,
+  createActionProposalApi,
+  executeProposalApi,
+  getActionProposalApi,
+  rejectProposalApi,
+  rollbackProposalApi,
+} from '../../services/interactiveAi/actionProposalApi';
 import { runInteractiveAssist } from '../../services/interactiveAi/interactiveAiOrchestrator';
 import {
   acknowledgeWorkflowCard,
@@ -188,7 +188,7 @@ export function InteractiveAIWorkspace({
           const intent = resolvePromptNavigationIntent(clean, { role, permissions });
           if (intent) {
             const requestId = `nav-${Date.now().toString(36)}`;
-            const created = createActionProposal(
+            const created = await createActionProposalApi(
               navigationIntentToProposalInput(intent, {
                 originatingRequestId: requestId,
                 correlationId: requestId,
@@ -311,29 +311,35 @@ export function InteractiveAIWorkspace({
     if (!proposal) return;
     try {
       // Navigation proposals may execute from proposed when requiresApproval is false.
-      if (proposal.requiresApproval || proposal.state === 'proposed' || proposal.state === 'reviewing') {
-        if (proposal.state === 'proposed' || proposal.state === 'reviewing') {
-          approveProposal(proposal.proposalId, userId);
+      let current = proposal;
+      if (current.requiresApproval || current.state === 'proposed' || current.state === 'reviewing') {
+        if (current.state === 'proposed' || current.state === 'reviewing') {
+          current = await approveProposalApi(current.proposalId);
         }
       }
-      const executed = await executeProposal(proposal.proposalId, async (p) => {
-        if (isNavigationProposalTool(p.toolName)) {
-          const result = applyNavigationProposal(p, {
-            navigate: (path) => navigate(path),
-            currentPath: location.pathname + location.search,
-          });
-          const opened =
-            typeof result.opened === 'string' ? result.opened : p.previewSummary || p.toolName;
-          announce(`Opened ${opened}`);
-          return result;
-        }
-        return {
+      // The backend's execute endpoint records a pre-computed outcome rather
+      // than running arbitrary logic server-side ("records draft outcome; no
+      // silent chart writes") -- run the same local executor logic first,
+      // then report its result for durable, audited recording.
+      let result: Record<string, unknown>;
+      if (isNavigationProposalTool(current.toolName)) {
+        const navResult = applyNavigationProposal(current, {
+          navigate: (path) => navigate(path),
+          currentPath: location.pathname + location.search,
+        });
+        const opened =
+          typeof navResult.opened === 'string' ? navResult.opened : current.previewSummary || current.toolName;
+        announce(`Opened ${opened}`);
+        result = navResult;
+      } else {
+        result = {
           ok: true,
-          toolName: p.toolName,
+          toolName: current.toolName,
           draftSaved: true,
           note: 'Draft stored for review — no chart write performed.',
         };
-      });
+      }
+      const executed = await executeProposalApi(current.proposalId, result);
       setProposal(executed);
       setInboxTick((n) => n + 1);
       if (!isNavigationProposalTool(executed.toolName)) {
@@ -350,10 +356,10 @@ export function InteractiveAIWorkspace({
     }
   };
 
-  const onRejectProposal = () => {
+  const onRejectProposal = async () => {
     if (!proposal) return;
     try {
-      const next = rejectProposal(proposal.proposalId, 'User rejected after preview');
+      const next = await rejectProposalApi(proposal.proposalId, 'User rejected after preview');
       setProposal(next);
       setInboxTick((n) => n + 1);
       announce('Proposal rejected');
@@ -362,10 +368,10 @@ export function InteractiveAIWorkspace({
     }
   };
 
-  const onRollbackProposal = () => {
+  const onRollbackProposal = async () => {
     if (!proposal) return;
     try {
-      const next = rollbackProposal(proposal.proposalId);
+      const next = await rollbackProposalApi(proposal.proposalId);
       setProposal(next);
       setInboxTick((n) => n + 1);
       announce('Proposal rolled back');
@@ -431,9 +437,9 @@ export function InteractiveAIWorkspace({
           ownerUserId={userId}
           ownerRole={role}
           channel={channel}
-          onOpenItem={(item) => {
+          onOpenItem={async (item) => {
             if (item.kind === 'proposal' || item.kind === 'failed_action' || item.kind === 'draft') {
-              const p = getActionProposal(item.sourceId);
+              const p = await getActionProposalApi(item.sourceId);
               if (p) setProposal(p);
             }
             if (item.summary) setInput(item.summary);

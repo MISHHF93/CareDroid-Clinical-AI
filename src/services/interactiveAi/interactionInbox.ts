@@ -4,7 +4,7 @@
  */
 
 import type { AIActionProposal, WorkflowAiCard } from '../../contracts/interactiveAi';
-import { listActionProposals } from './actionProposalService';
+import { listActionProposalsApi } from './actionProposalApi';
 import { listWorkflowAiCards } from './workflowAiCards';
 import { countInboxComments, getInboxAssignment } from './inboxCollaboration';
 
@@ -111,12 +111,21 @@ const TERMINAL_PROPOSAL = new Set([
   'rolled_back',
 ]);
 
-export function buildInteractionInbox(
+export async function buildInteractionInbox(
   filter: InteractionInboxFilter = {},
-): InteractionInboxItem[] {
-  const proposals = listActionProposals({
-    ownerUserId: filter.ownerUserId,
-  })
+): Promise<InteractionInboxItem[]> {
+  // The real API scopes proposals to the caller's own JWT identity (there is
+  // no cross-user "view someone else's inbox" mode server-side) -- every real
+  // caller of this function already passes its own signed-in user's id here,
+  // so ownerUserId being set maps onto "mine".
+  //
+  // Proposals are network-backed now (they weren't when this combined
+  // proposals+cards synchronously) -- a failed fetch must not blank out the
+  // whole inbox; workflow cards (still local) should still render.
+  const rawProposals = await listActionProposalsApi(filter.ownerUserId ? { mine: true } : {}).catch(
+    () => [],
+  );
+  const proposals = rawProposals
     .filter((p) => {
       if (!filter.includeTerminal && TERMINAL_PROPOSAL.has(p.state) && p.state !== 'failed') {
         return false;
@@ -150,7 +159,7 @@ export function buildInteractionInbox(
   });
 }
 
-export function countOpenInboxItems(filter: InteractionInboxFilter = {}): number {
-  return buildInteractionInbox({ ...filter, includeTerminal: false }).filter((i) => i.resumable)
-    .length;
+export async function countOpenInboxItems(filter: InteractionInboxFilter = {}): Promise<number> {
+  const items = await buildInteractionInbox({ ...filter, includeTerminal: false });
+  return items.filter((i) => i.resumable).length;
 }

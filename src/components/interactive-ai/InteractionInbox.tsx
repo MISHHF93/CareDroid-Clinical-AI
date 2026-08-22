@@ -3,7 +3,7 @@
  * plus lightweight assign/comment collaboration on top (IX13).
  */
 
-import { useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   buildInteractionInbox,
   type InboxItemKind,
@@ -15,6 +15,7 @@ import {
   listInboxComments,
   unassignInboxItem,
 } from '../../services/interactiveAi/inboxCollaboration';
+import { Spinner } from '../ui/Spinner';
 import './interactiveAi.css';
 
 export type InteractionInboxProps = {
@@ -42,21 +43,35 @@ export function InteractionInbox({
   const [collabTick, setCollabTick] = useState(0);
   const [expandedItemId, setExpandedItemId] = useState<string | null>(null);
   const [commentDraft, setCommentDraft] = useState('');
+  const [items, setItems] = useState<InteractionInboxItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const items = useMemo(
-    () =>
-      buildInteractionInbox({
-        ownerUserId,
-        ownerRole,
-        channel,
-        kind: kind === 'all' ? undefined : kind,
-        includeTerminal: kind === 'failed_action' || kind === 'draft',
-      }),
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    void buildInteractionInbox({
+      ownerUserId,
+      ownerRole,
+      channel,
+      kind: kind === 'all' ? undefined : kind,
+      includeTerminal: kind === 'failed_action' || kind === 'draft',
+    })
+      .then((next) => {
+        if (!cancelled) setItems(next);
+      })
+      .catch(() => {
+        if (!cancelled) setItems([]);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
     // collabTick forces a re-read after assign/comment mutate the
     // collaboration store, which buildInteractionInbox reads but doesn't
     // itself trigger React state changes for.
-    [ownerUserId, ownerRole, channel, kind, collabTick],
-  );
+    return () => {
+      cancelled = true;
+    };
+  }, [ownerUserId, ownerRole, channel, kind, collabTick]);
 
   function toggleAssignToMe(item: InteractionInboxItem) {
     if (item.assignedToUserId && item.assignedToUserId === ownerUserId) {
@@ -102,7 +117,15 @@ export function InteractionInbox({
         ))}
       </div>
 
-      {items.length === 0 ? (
+      {loading && items.length === 0 ? (
+        // Only the very first load (or a filter change starting from empty)
+        // shows the spinner -- a collabTick-triggered background refetch
+        // (after assign/comment) must not blank out already-visible items
+        // while it's in flight.
+        <div className="cd-iaw-inbox__empty" role="status" aria-live="polite">
+          <Spinner size="sm" /> Loading inbox…
+        </div>
+      ) : items.length === 0 ? (
         <p className="cd-iaw-inbox__empty" role="status">
           No open interaction items for this role.
         </p>

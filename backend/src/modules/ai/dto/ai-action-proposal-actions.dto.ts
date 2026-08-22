@@ -21,13 +21,15 @@ import type { AiRiskLevel } from '../ai-action-proposal.service';
  * one alternate key the controller also reads via `body.originatingRequestId
  * || body.requestId`).
  *
- * A frontend sweep found the interactive-AI action-proposal UI
- * (src/services/interactiveAi/actionProposalService.ts) is a fully separate,
- * local-only, in-memory implementation with its own state machine -- it
- * never calls these backend HTTP routes at all (confirmed: no apiFetch/fetch
- * call to /ai/proposals anywhere in src/). These 3 routes are real, wired
- * backend code with zero live callers today, the same "unreached but real"
- * pattern as several prior cycles (Cycle 250, Cycle 252, 4-of-5 in Cycle 253).
+ * UPDATE 2026-08-21: a frontend sweep had found the interactive-AI
+ * action-proposal UI was a fully separate, local-only, in-memory
+ * implementation with its own state machine that never called these routes
+ * at all -- the same "unreached but real" pattern as several prior cycles
+ * (Cycle 250, Cycle 252, 4-of-5 in Cycle 253). That gap is now closed:
+ * `src/services/interactiveAi/actionProposalApi.ts` replaced the in-memory
+ * mock and is the real client for all `/ai/proposals*` routes
+ * (InteractiveAIWorkspace.tsx, interactiveAiOrchestrator.ts,
+ * interactionInbox.ts). These 3 routes have live callers now.
  */
 
 export class CreateAiActionProposalDto {

@@ -3,9 +3,69 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { clearActionProposalStoreForTests } from '../../services/interactiveAi/actionProposalService';
 import { InteractiveAIWorkspace } from './InteractiveAIWorkspace';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
+
+// InteractiveAIWorkspace now calls the real backend-backed action-proposal API
+// (actionProposalApi.ts) instead of an in-memory mock. This is a small
+// stateful fake mirroring the real backend's create -> approve -> execute
+// contract closely enough for these integration-style tests, without hitting
+// the network.
+const { store, listActionProposalsApi } = vi.hoisted(() => ({
+  store: new Map<string, any>(),
+  listActionProposalsApi: vi.fn(async () => []),
+}));
+
+vi.mock('../../services/interactiveAi/actionProposalApi', () => ({
+  createActionProposalApi: vi.fn(async (input: any) => {
+    const proposal = {
+      ...input,
+      proposalId: `test-proposal-${store.size + 1}`,
+      evidence: [],
+      citations: [],
+      state: 'proposed',
+      requiresApproval: input.requiresApproval ?? true,
+      rollbackCapable: Boolean(input.rollbackCapable),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      expiresAt: new Date(Date.now() + 60_000).toISOString(),
+    };
+    store.set(proposal.proposalId, proposal);
+    return proposal;
+  }),
+  getActionProposalApi: vi.fn(async (proposalId: string) => store.get(proposalId) ?? null),
+  approveProposalApi: vi.fn(async (proposalId: string) => {
+    const next = { ...store.get(proposalId), state: 'approved', updatedAt: new Date().toISOString() };
+    store.set(proposalId, next);
+    return next;
+  }),
+  rejectProposalApi: vi.fn(async (proposalId: string, reason: string) => {
+    const next = {
+      ...store.get(proposalId),
+      state: 'rejected',
+      rejectionReason: reason,
+      updatedAt: new Date().toISOString(),
+    };
+    store.set(proposalId, next);
+    return next;
+  }),
+  executeProposalApi: vi.fn(async (proposalId: string, result: Record<string, unknown>) => {
+    const next = {
+      ...store.get(proposalId),
+      state: 'completed',
+      executionResult: result,
+      updatedAt: new Date().toISOString(),
+    };
+    store.set(proposalId, next);
+    return next;
+  }),
+  rollbackProposalApi: vi.fn(async (proposalId: string) => {
+    const next = { ...store.get(proposalId), state: 'rolled_back', updatedAt: new Date().toISOString() };
+    store.set(proposalId, next);
+    return next;
+  }),
+  listActionProposalsApi,
+}));
 
 function renderWorkspace(
   ui: React.ReactElement,
@@ -15,7 +75,8 @@ function renderWorkspace(
 }
 
 afterEach(() => {
-  clearActionProposalStoreForTests();
+  store.clear();
+  vi.clearAllMocks();
 });
 
 describe('InteractiveAIWorkspace', () => {

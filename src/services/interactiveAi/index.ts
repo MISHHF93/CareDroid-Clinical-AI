@@ -1,4 +1,4 @@
-export * from './actionProposalService';
+export * from './actionProposalApi';
 export * from './contextAssembler';
 export * from './suggestedPrompts';
 export * from './workflowAiCards';

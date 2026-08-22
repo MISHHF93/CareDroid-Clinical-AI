@@ -9,7 +9,7 @@
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import type { AiRiskLevel } from '../../contracts/interactiveAi';
 import type { AIActionProposal } from '../../contracts/interactiveAi';
-import type { CreateActionProposalInput } from './actionProposalService';
+import type { CreateActionProposalInput } from './actionProposalApi';
 
 export type PromptNavigationToolName = 'open_route' | 'open_tool' | 'open_panel';
 

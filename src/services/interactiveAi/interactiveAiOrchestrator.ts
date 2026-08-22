@@ -9,7 +9,7 @@ import { resolveUnifiedChannelFromRole } from '../unifiedAiEnvelope';
 import { invokeUnifiedAiConversational } from '../careDroidUnifiedAiNode';
 import { assembleInteractiveContext, describeContextForPrompt } from './contextAssembler';
 import { createStreamProgressController, runDefaultStreamProgress } from './streamProgress';
-import { createActionProposal, type CreateActionProposalInput } from './actionProposalService';
+import { createActionProposalApi, type CreateActionProposalInput } from './actionProposalApi';
 import { getSuggestedPrompts, type SuggestedPromptContext } from './suggestedPrompts';
 import { buildWorkflowAiCard, type WorkflowTriggerEvent } from './workflowAiCards';
 import { reviewAIRequestForSafety } from '../../../lib/ai/safetyPolicy';
@@ -205,7 +205,7 @@ export async function runInteractiveAssist(
 
     let proposal: AIActionProposal | undefined;
     if (shouldOfferFollowUpProposal(input.query, channel)) {
-      proposal = createActionProposal(buildFollowUpProposal(ids, input, channel, accountable));
+      proposal = await createActionProposalApi(buildFollowUpProposal(ids, input, channel, accountable));
       controller.advance(
         'awaiting_human_approval',
         'Optional follow-up action proposed — human approval required',
