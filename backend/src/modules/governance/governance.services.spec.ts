@@ -47,6 +47,44 @@ describe('GovernanceController.getSummary', () => {
   });
 });
 
+describe('ModelRegistryService.listModels — real registry, not fabricated placeholders', () => {
+  // Previously this returned 3 hardcoded, entirely fictional models ("Clinical Draft
+  // Composer", "Synthetic Validation Runner") with made-up status/approval state. The real,
+  // governed registry (data/model-registry/entries/*.json, validated by
+  // scripts/validate-model-registry.mjs) existed on disk the whole time -- this pins that
+  // the service now actually reads it instead of returning fiction.
+  it('serves the real 5-entry model registry from disk, including real measured accuracy for the trained classifiers', () => {
+    const service = new ModelRegistryService();
+    const models = service.listModels();
+
+    expect(models.length).toBe(5);
+    expect(models.map((m) => m.modelName)).not.toEqual(
+      expect.arrayContaining(['Clinical Draft Composer', 'Synthetic Validation Runner']),
+    );
+
+    const claude = models.find((m) => m.modelId === 'mdl-claude-sonnet-4-6-v1');
+    expect(claude).toBeDefined();
+    expect(claude?.provider).toBe('anthropic');
+    expect(claude?.status).toBe('approved');
+    expect(claude?.outOfScopeUse).toEqual(
+      expect.arrayContaining(['Autonomous diagnosis or prescription']),
+    );
+
+    const unifiedNode = models.find((m) => m.modelId === 'mdl-unified-ai-node-v1');
+    expect(unifiedNode).toBeDefined();
+    // Real measured accuracy, not a fabricated number -- must survive unchanged from the
+    // registry file (this is the "never fabricate" guarantee this fix exists for).
+    expect(
+      (unifiedNode?.performanceMeasures as { nlu?: { reportedAccuracy?: number } })?.nlu
+        ?.reportedAccuracy,
+    ).toBe(1.0);
+    expect(
+      (unifiedNode?.performanceMeasures as { artifactRouter?: { reportedAccuracy?: number } })
+        ?.artifactRouter?.reportedAccuracy,
+    ).toBe(0.9645);
+  });
+});
+
 describe('Governance services', () => {
   it('classifies PHI and side-effecting clinical actions as high risk', () => {
     const service = new RiskClassificationService();

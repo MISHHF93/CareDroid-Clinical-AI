@@ -1,5 +1,7 @@
 import { Body, Controller, Get, Injectable, Module, Post, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { existsSync, readFileSync, readdirSync } from 'fs';
+import { join } from 'path';
 import { Permissions } from '../auth/decorators/permissions.decorator';
 import { Permission } from '../auth/enums/permission.enum';
 import { AuthorizationGuard } from '../auth/guards/authorization.guard';
@@ -7,29 +9,112 @@ import { patientSafetyContextFromRecord } from '../../../../lib/ai/clinicalSafet
 import { PlatformGovernanceModule, PlatformGovernanceService } from '../platform-governance';
 import { AIGovernanceService } from '../../services/ai-governance.service';
 
+interface ModelRegistryDeploymentHistoryEntry {
+  at: string;
+  event: string;
+  actor?: string;
+  note?: string;
+}
+
+/** Mirrors the real, human-curated `data/model-registry/entries/*.json` schema (validated
+ * by `scripts/validate-model-registry.mjs`) -- not every field this service returns comes
+ * from here (some are genuinely absent, and are omitted rather than guessed). */
+interface ModelRegistryEntry {
+  id: string;
+  displayName?: string;
+  kind?: string;
+  status?: string;
+  purpose?: string;
+  prohibitedUses?: string[];
+  owner?: string;
+  reviewers?: string[];
+  trainingDataLineage?: string;
+  benchmarkResults?: unknown;
+  regulatoryClass?: string;
+  jurisdictions?: string[];
+  limitations?: string[];
+  deployment?: {
+    environments?: string[];
+    featureFlag?: string;
+    rollback?: string;
+    history?: ModelRegistryDeploymentHistoryEntry[];
+  };
+  expiresAt?: string;
+  retirementPlan?: string;
+  provider?: string;
+  modelIdentifier?: string;
+  relatedServiceIds?: string[];
+  relatedPaths?: string[];
+}
+
+/** Same repo-root-relative-directory pattern as `loadKnowledgeRegistryArtifacts()`
+ * (`backend/src/modules/rag/utils/knowledge-registry-enrichment.ts`) -- `process.cwd()` can
+ * be either the repo root or `backend/` depending on how the process was launched. */
+function loadModelRegistryEntries(repoRoot = process.cwd()): ModelRegistryEntry[] {
+  const candidates = [
+    join(repoRoot, 'data', 'model-registry', 'entries'),
+    join(repoRoot, '..', 'data', 'model-registry', 'entries'),
+  ];
+  for (const dir of candidates) {
+    if (!existsSync(dir)) continue;
+    try {
+      return readdirSync(dir)
+        .filter((name) => name.endsWith('.json'))
+        .map((name) => JSON.parse(readFileSync(join(dir, name), 'utf8')) as ModelRegistryEntry);
+    } catch {
+      return [];
+    }
+  }
+  return [];
+}
+
+function lastEvaluatedFrom(entry: ModelRegistryEntry): string | undefined {
+  const history = entry.deployment?.history;
+  if (!history?.length) return undefined;
+  return [...history].sort((a, b) => a.at.localeCompare(b.at)).at(-1)?.at;
+}
+
+/**
+ * Real, governed AI model cards (item 10 of the Care Ops Inbox mega-directive) --
+ * previously this returned 3 hardcoded, entirely fictional models ("Clinical Draft
+ * Composer", "Synthetic Validation Runner") with fabricated status/approval state, wired
+ * through `GET /api/ai-governance/summary`'s `panels.modelInventory` and never noticed
+ * because nothing in the frontend renders that panel by name (it only feeds the generic
+ * `scoreGovernancePanels`/`controls` surface in `platformGovernanceSurfaces.ts`, so the
+ * fake data silently passed as real records to anyone inspecting the API). The real,
+ * carefully governed data already existed on disk the whole time
+ * (`data/model-registry/entries/*.json`, 5 entries, validated by
+ * `scripts/validate-model-registry.mjs`) -- this now serves that instead of fabricating.
+ * Fields with no real source (e.g. a formal input-domain/output-type taxonomy) are omitted
+ * rather than guessed, per that item's explicit "never fabricate" instruction.
+ */
 @Injectable()
 export class ModelRegistryService {
   listModels() {
-    return [
-      {
-        modelName: 'CareDroid',
-        version: 'v1',
-        status: 'active',
-        approvalState: 'approved',
-      },
-      {
-        modelName: 'Clinical Draft Composer',
-        version: 'v1',
-        status: 'guarded',
-        approvalState: 'pending',
-      },
-      {
-        modelName: 'Synthetic Validation Runner',
-        version: 'v1',
-        status: 'sandbox',
-        approvalState: 'approved',
-      },
-    ];
+    return loadModelRegistryEntries().map((entry) => ({
+      modelId: entry.id,
+      modelName: entry.displayName || entry.modelIdentifier || entry.id,
+      version: entry.modelIdentifier || entry.id,
+      provider: entry.provider,
+      kind: entry.kind,
+      status: entry.status,
+      approvalState: entry.status,
+      purpose: entry.purpose,
+      intendedUse: entry.purpose,
+      outOfScopeUse: entry.prohibitedUses || [],
+      workflowsUsingIt: entry.relatedServiceIds || [],
+      allowedEnvironments: entry.deployment?.environments || [],
+      fallback: entry.deployment?.rollback,
+      lastEvaluated: lastEvaluatedFrom(entry),
+      performanceMeasures: entry.benchmarkResults ?? null,
+      knownLimitations: entry.limitations || [],
+      changeHistory: entry.deployment?.history || [],
+      owner: entry.owner,
+      reviewers: entry.reviewers || [],
+      regulatoryClass: entry.regulatoryClass,
+      expiresAt: entry.expiresAt,
+      retirementPlan: entry.retirementPlan,
+    }));
   }
 }
 
