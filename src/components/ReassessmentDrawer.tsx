@@ -312,8 +312,8 @@ export default function ReassessmentDrawer({ open, count, onClose }: Reassessmen
   // HEAL-221: this dialog had zero focus management -- Escape closed it,
   // but nothing moved focus in on open or restored it on close, so a
   // keyboard user's focus was silently dropped to document.body every
-  // time. The sibling surfaces/Modal.tsx and surfaces/Drawer.tsx already
-  // implement the correct pattern (capture the trigger, focus the dialog
+  // time. ui/Drawer.tsx (this app's canonical overlay primitive) already
+  // implements the correct pattern (capture the trigger, focus the dialog
   // on open, restore the trigger on close); this dialog was built from
   // scratch and never adopted it. Reachable via the global "r" keyboard
   // shortcut, CapacityCrisisMode, and the command palette -- not a rare

@@ -606,7 +606,6 @@ export default function PatientDetailPanel() {
   const selectedPatientId = useEmergencyStore((state) => state.selectedPatientId);
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
   const updatePatient = useEmergencyStore((state) => state.updatePatient);
-  const movePatientToState = useEmergencyStore((state) => state.movePatientToState);
   const assignStaff = useEmergencyStore((state) => state.assignStaff);
   const assignRoom = useEmergencyStore((state) => state.assignRoom);
   const addFlag = useEmergencyStore((state) => state.addFlag);
@@ -819,11 +818,11 @@ export default function PatientDetailPanel() {
   // in, closing it never restored focus, and Tab/Shift+Tab could walk keyboard
   // focus straight out of the panel onto whatever patient card/control happened
   // to sit behind it (confirmed live: Shift+Tab from the close button landed on a
-  // patient card, not inside the panel). The sibling surfaces/Drawer.tsx and
-  // surfaces/Modal.tsx primitives already capture+restore focus on open/close for
-  // their own dialogs but don't cycle Tab within them either -- this goes one step
-  // further and actually contains Tab/Shift+Tab inside the panel while open, since
-  // that's the specific gap reported here.
+  // patient card, not inside the panel). ui/Drawer.tsx (this app's canonical
+  // overlay primitive) captures+restores focus on open/close for its own dialogs
+  // but doesn't cycle Tab within them either -- this goes one step further and
+  // actually contains Tab/Shift+Tab inside the panel while open, since that's
+  // the specific gap reported here.
   useEffect(() => {
     if (!selectedPatientId) return undefined;
 
