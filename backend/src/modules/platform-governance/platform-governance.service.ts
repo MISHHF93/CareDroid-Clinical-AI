@@ -790,13 +790,27 @@ export class PlatformGovernanceService {
     };
   }
 
-  async getSourceProvenance(sourceId = 'synthetic-source') {
+  // HEAL follow-up (platform interoperability audit): PlatformSourceProvenance
+  // had no organizationId at all -- externalResourceId is caller-supplied
+  // (integrations.controller.ts's GET /source-provenance/:sourceId), so a
+  // sourceId collision with another org's real synced record would return
+  // that org's provenance data instead of creating a fresh one for the
+  // caller's own org. Same "match own org's rows + legacy null-org rows"
+  // idiom as HEAL-338's getConsent, for the same reason: rows written before
+  // this fix have no organizationId to match against.
+  async getSourceProvenance(sourceId = 'synthetic-source', organizationId?: string) {
     const existing = await this.sourceProvenance.findOne({
-      where: { externalResourceId: sourceId },
+      where: organizationId
+        ? [
+            { externalResourceId: sourceId, organizationId },
+            { externalResourceId: sourceId, organizationId: IsNull() },
+          ]
+        : { externalResourceId: sourceId },
     });
     if (existing) return existing;
     return this.sourceProvenance.save(
       this.sourceProvenance.create({
+        organizationId,
         sourceSystem: 'CareDroid Synthetic Interoperability',
         sourceType: 'synthetic',
         externalResourceId: sourceId,
@@ -810,9 +824,14 @@ export class PlatformGovernanceService {
     );
   }
 
-  async getPatientSourceData(patientId: string) {
+  async getPatientSourceData(patientId: string, organizationId?: string) {
     const sources = await this.sourceProvenance.find({
-      where: { patientId },
+      where: organizationId
+        ? [
+            { patientId, organizationId },
+            { patientId, organizationId: IsNull() },
+          ]
+        : { patientId },
       order: { fetchedAt: 'DESC' },
       take: 50,
     });
@@ -820,7 +839,7 @@ export class PlatformGovernanceService {
       patientId,
       sources: sources.length
         ? sources
-        : [await this.getSourceProvenance(`synthetic-${patientId}`)],
+        : [await this.getSourceProvenance(`synthetic-${patientId}`, organizationId)],
       safety: {
         provenanceRequired: true,
         writebackAllowed: false,

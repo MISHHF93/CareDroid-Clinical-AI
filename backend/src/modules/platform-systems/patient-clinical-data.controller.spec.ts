@@ -88,7 +88,7 @@ describe('PatientClinicalDataController', () => {
       patientId: 'pt-001',
       sources: [],
     });
-    expect(platformGovernanceService?.getPatientSourceData).toHaveBeenCalledWith('pt-001');
+    expect(platformGovernanceService?.getPatientSourceData).toHaveBeenCalledWith('pt-001', undefined);
   });
 
   it('falls back to the platform systems service when governance is unavailable', async () => {

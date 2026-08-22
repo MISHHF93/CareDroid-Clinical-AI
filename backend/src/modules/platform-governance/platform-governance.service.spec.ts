@@ -483,4 +483,55 @@ describe('PlatformGovernanceService', () => {
       );
     });
   });
+
+  describe('platform interoperability audit: tenant isolation on source provenance', () => {
+    // PlatformSourceProvenance was the one platform-governance table HEAL-338
+    // and its own follow-up (privacy requests/observability events) both
+    // missed. externalResourceId/patientId are caller-supplied (integrations.
+    // controller.ts's GET /source-provenance/:sourceId, patient-clinical-data.
+    // controller.ts's GET /patients/:patientId/source-data), so a collision
+    // with another org's real synced record returned that org's data instead
+    // of creating/reading the caller's own.
+    it("scopes getSourceProvenance and getPatientSourceData to the caller's organization (own-org OR legacy/null rows)", async () => {
+      const { service, repositories } = buildService({ sourceProvenance: [] });
+
+      await service.getSourceProvenance('source-1', 'org-a');
+      expect(repositories.sourceProvenance.findOne).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: [
+            { externalResourceId: 'source-1', organizationId: 'org-a' },
+            { externalResourceId: 'source-1', organizationId: expect.anything() },
+          ],
+        }),
+      );
+
+      await service.getPatientSourceData('patient-1', 'org-a');
+      expect(repositories.sourceProvenance.find).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: [
+            { patientId: 'patient-1', organizationId: 'org-a' },
+            { patientId: 'patient-1', organizationId: expect.anything() },
+          ],
+        }),
+      );
+    });
+
+    it('stamps organizationId when creating a new source-provenance record', async () => {
+      const { service, repositories } = buildService({ sourceProvenance: [] });
+
+      await service.getSourceProvenance('source-1', 'org-a');
+      expect(repositories.sourceProvenance.create).toHaveBeenCalledWith(
+        expect.objectContaining({ organizationId: 'org-a', externalResourceId: 'source-1' }),
+      );
+    });
+
+    it('omitting organizationId preserves unfiltered behavior for callers with no tenant context', async () => {
+      const { service, repositories } = buildService({ sourceProvenance: [] });
+
+      await service.getSourceProvenance('source-1');
+      expect(repositories.sourceProvenance.findOne).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { externalResourceId: 'source-1' } }),
+      );
+    });
+  });
 });

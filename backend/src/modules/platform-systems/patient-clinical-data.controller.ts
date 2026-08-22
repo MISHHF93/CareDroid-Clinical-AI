@@ -16,6 +16,8 @@ import { Permission } from '../auth/enums/permission.enum';
 import { AuthorizationGuard } from '../auth/guards/authorization.guard';
 import { PlatformSystemsService } from './platform-systems.service';
 import { PlatformGovernanceService } from '../platform-governance';
+import { TenantContext } from '../tenant-context/tenant-context.decorator';
+import type { TenantContext as TenantContextValue } from '../tenant-context/tenant-context.types';
 import {
   EhrPatientImportDto,
   ImportLabsDto,
@@ -83,9 +85,15 @@ export class PatientClinicalDataController {
 
   @Get('patients/:patientId/source-data')
   @Permissions(Permission.READ_PHI)
-  async getPatientSourceData(@Param('patientId') patientId: string) {
+  async getPatientSourceData(
+    @Param('patientId') patientId: string,
+    @TenantContext() tenantContext?: TenantContextValue,
+  ) {
     if (this.platformGovernanceService) {
-      return this.platformGovernanceService.getPatientSourceData(patientId);
+      return this.platformGovernanceService.getPatientSourceData(
+        patientId,
+        tenantContext?.organizationId,
+      );
     }
     return this.platformSystemsService.getSourceProvenance(patientId);
   }

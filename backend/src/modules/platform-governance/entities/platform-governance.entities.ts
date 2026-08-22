@@ -480,6 +480,10 @@ export class PlatformSourceProvenance {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  /** See PlatformPrivacyRequest.organizationId for the nullable/legacy-row rationale. */
+  @Column({ type: 'uuid', nullable: true })
+  organizationId: string;
+
   @Column({ type: 'varchar', length: 120 })
   sourceSystem: string;
 

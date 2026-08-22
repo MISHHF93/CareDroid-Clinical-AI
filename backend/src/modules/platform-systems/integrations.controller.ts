@@ -16,6 +16,8 @@ import { Permission } from '../auth/enums/permission.enum';
 import { AuthorizationGuard } from '../auth/guards/authorization.guard';
 import { PlatformSystemsService } from './platform-systems.service';
 import { PlatformGovernanceService } from '../platform-governance';
+import { TenantContext } from '../tenant-context/tenant-context.decorator';
+import type { TenantContext as TenantContextValue } from '../tenant-context/tenant-context.types';
 import {
   CreateFhirConnectionDto,
   TestFhirConnectionDto,
@@ -127,9 +129,15 @@ export class IntegrationsController {
 
   @Get('source-provenance/:sourceId')
   @Permissions(Permission.VIEW_INTEGRATIONS)
-  async getSourceProvenance(@Param('sourceId') sourceId: string) {
+  async getSourceProvenance(
+    @Param('sourceId') sourceId: string,
+    @TenantContext() tenantContext?: TenantContextValue,
+  ) {
     if (this.platformGovernanceService) {
-      return this.platformGovernanceService.getSourceProvenance(sourceId);
+      return this.platformGovernanceService.getSourceProvenance(
+        sourceId,
+        tenantContext?.organizationId,
+      );
     }
     return this.platformSystemsService.getSourceProvenance(sourceId);
   }
