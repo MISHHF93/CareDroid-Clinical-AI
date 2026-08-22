@@ -16,11 +16,16 @@ import {
   type SelfCheckinStep,
 } from '../../services/selfCheckinService';
 import type { IntakeHandoffResult } from '../../services/receptionHandoff';
+import { Spinner } from '../ui/Spinner';
 import './SelfCheckin.css';
+
+export type SelfCheckinCompleteOutcome = { ok: boolean };
 
 export type SelfCheckinProps = {
   kioskMode?: boolean;
-  onComplete?: (result: SelfCheckinBuildResult) => void;
+  onComplete?: (
+    result: SelfCheckinBuildResult,
+  ) => Promise<SelfCheckinCompleteOutcome | void> | SelfCheckinCompleteOutcome | void;
   onCancel?: () => void;
   handoff?: IntakeHandoffResult | null;
   showStaffHandoffLink?: boolean;
@@ -61,6 +66,8 @@ export default function SelfCheckin({
   const [error, setError] = useState('');
   const [integrationMessage, setIntegrationMessage] = useState('');
   const [submitted, setSubmitted] = useState<SelfCheckinBuildResult | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [checkInFailed, setCheckInFailed] = useState(false);
 
   const currentStepIndex = stepIndex(step);
   const progressPercent = ((currentStepIndex + 1) / SELF_CHECKIN_STEPS.length) * 100;
@@ -130,7 +137,7 @@ export default function SelfCheckin({
     }
   };
 
-  const handleSubmit = (event: FormEvent) => {
+  const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     const validationError = validateSelfCheckinStep('allergies', form);
     if (validationError) {
@@ -139,11 +146,38 @@ export default function SelfCheckin({
     }
 
     const result = buildSelfCheckinPatient(form);
+    setSubmitting(true);
+    // No staff device is physically present when a kiosk submits (unlike
+    // reception's own desk) -- this screen must not tell the patient "you
+    // are checked in" until the record has actually reached the shared
+    // backend other devices read from. A void/undefined outcome (a caller
+    // that doesn't report status) is treated as success for backward
+    // compatibility; only an explicit `ok: false` shows the failure state.
+    const outcome = await onComplete?.(result);
+    setSubmitting(false);
+    if (outcome && outcome.ok === false) {
+      setCheckInFailed(true);
+      return;
+    }
     setSubmitted(result);
-    onComplete?.(result);
   };
 
   const rootClassName = kioskMode ? 'self-checkin self-checkin--kiosk' : 'self-checkin';
+
+  if (checkInFailed) {
+    return (
+      <main className={rootClassName} aria-labelledby="self-checkin-title">
+        <section className="self-checkin__confirmation self-checkin__confirmation--error" role="alert">
+          <h2 id="self-checkin-title">We couldn&apos;t finish your check-in</h2>
+          <p>
+            Your information was not saved. Please see the front desk so a staff member can
+            complete your check-in directly -- don&apos;t wait in the seating area for your name to
+            be called.
+          </p>
+        </section>
+      </main>
+    );
+  }
 
   if (submitted) {
     return (
@@ -429,12 +463,27 @@ export default function SelfCheckin({
         ) : null}
 
         <div className="self-checkin__actions">
-          <button type="button" className="self-checkin__button self-checkin__button--secondary" onClick={goBack}>
+          <button
+            type="button"
+            className="self-checkin__button self-checkin__button--secondary"
+            onClick={goBack}
+            disabled={submitting}
+          >
             {currentStepIndex === 0 ? 'Cancel' : 'Back'}
           </button>
           {step === 'review' ? (
-            <button type="submit" className="self-checkin__button self-checkin__button--primary">
-              Complete check-in
+            <button
+              type="submit"
+              className="self-checkin__button self-checkin__button--primary"
+              disabled={submitting}
+            >
+              {submitting ? (
+                <>
+                  <Spinner size="sm" /> Checking you in...
+                </>
+              ) : (
+                'Complete check-in'
+              )}
             </button>
           ) : (
             <button

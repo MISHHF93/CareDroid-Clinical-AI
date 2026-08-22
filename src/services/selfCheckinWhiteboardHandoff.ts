@@ -1,5 +1,6 @@
 import type { useEmergencyStore } from '../store/emergencyStore';
 import { registerArrivalControl } from './arrivalControlLayer';
+import { syncReceptionPatientToBackend } from './receptionIntakeOrchestrator';
 import {
   completeIntakeHandoff,
   refreshIntakeHandoffSurfaces,
@@ -31,6 +32,19 @@ export type SelfCheckinWhiteboardHandoffOptions = {
   actorName?: string;
 };
 
+export type SelfCheckinWhiteboardHandoffResult = {
+  handoff: IntakeHandoffResult;
+  /**
+   * Whether the patient actually reached the shared backend. self-arrival is
+   * the one intake surface with no staff device physically present at
+   * submission -- unlike reception's own "local-first, backend sync awaited"
+   * pattern (createPatientAndRouteFromReception), a kiosk that only updates
+   * its OWN browser's local store is invisible to every other device, so the
+   * confirmation screen must not claim success until this is known.
+   */
+  backendSynced: boolean;
+};
+
 function withPersistedPatient(
   store: SelfCheckinHandoffStore,
   patient: Patient,
@@ -48,13 +62,24 @@ function withPersistedPatient(
 /**
  * Reception-first handoff: persist self-check-in patient, register arrival control,
  * assign triage queue, and sync whiteboard operational surfaces.
+ *
+ * Local-first create (immediate UI feedback on the kiosk itself); backend sync
+ * is awaited explicitly, same pattern as reception's own
+ * createPatientAndRouteFromReception -- reuses that same
+ * syncReceptionPatientToBackend() call (same backend route, same duplicate
+ * guard) rather than a second write path. Was previously local-only
+ * (syncToBackend always false, no backend call anywhere in this flow): a
+ * kiosk patient existed only in that kiosk's own browser tab, invisible to
+ * every staff device, while the confirmation screen unconditionally told the
+ * patient "you are checked in... a nurse will call you." backendSynced on
+ * the result lets the caller withhold that promise until it's actually true.
  */
-export function completeSelfCheckinWhiteboardHandoff(
+export async function completeSelfCheckinWhiteboardHandoff(
   store: SelfCheckinHandoffStore,
   result: SelfCheckinBuildResult,
   options: SelfCheckinWhiteboardHandoffOptions = {},
-): IntakeHandoffResult {
-  store.addPatient(result.patient, { syncToBackend: options.syncToBackend ?? false });
+): Promise<SelfCheckinWhiteboardHandoffResult> {
+  store.addPatient(result.patient, { syncToBackend: false });
   const handoffStore = withPersistedPatient(store, result.patient);
 
   registerArrivalControl(handoffStore as unknown as Parameters<typeof registerArrivalControl>[0], result.patient.id, {
@@ -70,5 +95,17 @@ export function completeSelfCheckinWhiteboardHandoff(
 
   refreshIntakeHandoffSurfaces(handoffStore);
 
-  return handoff;
+  const backendSync =
+    options.syncToBackend === false
+      ? { status: 'skipped' as const }
+      : await syncReceptionPatientToBackend(result.patient);
+  const backendSynced = backendSync.status === 'synced';
+  if (backendSync.status === 'failed') {
+    handoffStore.updatePatient(result.patient.id, {
+      handoffSyncPending: true,
+      handoffSyncError: backendSync.error,
+    } as unknown as Partial<Patient>);
+  }
+
+  return { handoff, backendSynced };
 }

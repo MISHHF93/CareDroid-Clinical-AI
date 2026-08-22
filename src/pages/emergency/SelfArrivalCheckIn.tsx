@@ -8,12 +8,12 @@ import type { SelfCheckinBuildResult } from '../../services/selfCheckinService';
 export default function SelfArrivalCheckIn() {
   const [handoff, setHandoff] = useState<IntakeHandoffResult | null>(null);
 
-  const handleComplete = (result: SelfCheckinBuildResult) => {
-    const nextHandoff = completeSelfCheckinWhiteboardHandoff(useEmergencyStore.getState(), result, {
-      syncToBackend: false,
+  const handleComplete = async (result: SelfCheckinBuildResult) => {
+    const outcome = await completeSelfCheckinWhiteboardHandoff(useEmergencyStore.getState(), result, {
       actorName: 'self-arrival',
     });
-    setHandoff(nextHandoff);
+    setHandoff(outcome.handoff);
+    return { ok: outcome.backendSynced };
   };
 
   return (
