@@ -6,9 +6,11 @@ import {
 import { dispatchAlert } from '../engine/alertEngine';
 import { confirmCareDroidAction } from '../services/careDroidInteractionFeedback';
 import { invokeUnifiedAiRequest } from '../services/careDroidUnifiedAiNode';
+import { dischargePatientSafely } from '../services/queueAssignment';
 import { useEmergencyStore } from '../store/emergencyStore';
+import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
 import {
-  PatientState,
   type CapacitySnapshot,
   type EMSArrival,
   type Patient,
@@ -105,10 +107,25 @@ export default function CapacityCrisisMode({
   readOnly = false,
 }: CapacityCrisisModeProps) {
   const addNote = useEmergencyStore((state) => state.addNote);
-  const movePatientToState = useEmergencyStore((state) => state.movePatientToState);
   const setActiveQueueFilter = useEmergencyStore((state) => state.setActiveQueueFilter);
   const requestAdditionalStaff = useEmergencyStore((state) => state.requestAdditionalStaff);
   const activeShift = useEmergencyStore((state) => state.activeShift);
+  // HEAL-347.85: this panel's action buttons had no permission check of
+  // their own -- readOnly (below) only reflects wall-display/kiosk mode, not
+  // the current user's clinical write permission, so any non-kiosk
+  // authenticated role reaching the whiteboard (which includes read-only
+  // viewers and registration clerks, per the route-reachability work this
+  // session) could see and click "Complete Discharge"/"Contact admitting
+  // team" regardless of actual permission. Mirrors PatientDetailPanel.tsx's
+  // own gate for the identical discharge transition
+  // (emergencyRole.presentAction(EMERGENCY_ACTIONS.dischargePatient)), the
+  // established, purpose-built per-action permission check elsewhere in
+  // this codebase -- not the coarser canAccessRoute() used for
+  // ReassessmentDrawer (HEAL-347.84), since this is gating specific actions
+  // within an already-reachable page, not the page itself.
+  const emergencyRole = useEmergencyRolePermissions();
+  const canDischarge = emergencyRole.presentAction(EMERGENCY_ACTIONS.dischargePatient).enabled;
+  const canWriteNote = emergencyRole.presentAction(EMERGENCY_ACTIONS.writeNote).enabled;
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [aiRequest, setAiRequest] = useState<AiRequestSnapshot | null>(null);
   const [aiSuggestion, setAiSuggestion] = useState('');
@@ -189,6 +206,7 @@ export default function CapacityCrisisMode({
   };
 
   const contactAdmittingTeam = (patientId: string) => {
+    if (!canWriteNote) return;
     const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     addNote(patientId, `Admitting team contacted at ${time}`, activeShift.chargeStaffId);
     setActionMessage(`Admitting team contact documented at ${time}.`);
@@ -204,6 +222,7 @@ export default function CapacityCrisisMode({
   // patient list is most likely -- so it was the one discharge path with
   // the least protection against an accidental click.
   const completeDischarge = async (patientId: string, patientName: string) => {
+    if (!canDischarge) return;
     const confirmed = await confirmCareDroidAction({
       title: 'Discharge patient?',
       message: `${patientName} will be marked discharged.`,
@@ -212,11 +231,15 @@ export default function CapacityCrisisMode({
     });
     if (!confirmed) return;
 
-    movePatientToState(patientId, PatientState.Discharge, {
-      staffId: activeShift.chargeStaffId,
+    const result = dischargePatientSafely(patientId, {
+      actorId: activeShift.chargeStaffId,
       note: 'Capacity crisis action panel: discharge completed.',
     });
-    setActionMessage('Patient moved to Discharge.');
+    setActionMessage(
+      result.ok
+        ? 'Patient moved to Discharge.'
+        : 'Could not discharge patient -- patient record not found.',
+    );
   };
 
   const openReassessmentDrawer = () => {
@@ -341,7 +364,11 @@ export default function CapacityCrisisMode({
                       <span>
                         {item.name} | {item.targetDepartment} | boarding {formatDuration(item.boardingMinutes)}
                       </span>
-                      <button type="button" onClick={() => contactAdmittingTeam(item.patient.id)}>
+                      <button
+                        type="button"
+                        disabled={!canWriteNote}
+                        onClick={() => contactAdmittingTeam(item.patient.id)}
+                      >
                         Contact admitting team
                       </button>
                     </article>
@@ -357,7 +384,11 @@ export default function CapacityCrisisMode({
                       <span>
                         {item.name} | in Disposition since {formatClockTime(item.sinceTime)}
                       </span>
-                      <button type="button" onClick={() => void completeDischarge(item.patient.id, item.name)}>
+                      <button
+                        type="button"
+                        disabled={!canDischarge}
+                        onClick={() => void completeDischarge(item.patient.id, item.name)}
+                      >
                         Complete Discharge
                       </button>
                     </article>
