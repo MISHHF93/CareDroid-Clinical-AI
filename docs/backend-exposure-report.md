@@ -1,6 +1,6 @@
 # Backend exposure report
 
-**Generated:** 2026-08-08T13:21:38.099Z
+**Generated:** 2026-08-22T18:41:22.125Z
 
 > Regenerate: `npm run exposure:write-docs`
 
@@ -8,10 +8,10 @@
 
 | Metric | Count |
 |--------|------:|
-| Backend HTTP routes (inventory) | 649 |
-| Frontend API calls (inventory) | 358 |
-| Wired (route exists) | 336 |
-| Gated stubs (no route, capability off) | 22 |
+| Backend HTTP routes (inventory) | 656 |
+| Frontend API calls (inventory) | 399 |
+| Wired (route exists) | 378 |
+| Gated stubs (no route, capability off) | 21 |
 | Unguarded missing routes | 0 |
 | POST executors (backend) | 39 |
 | Contract gaps (matrix) | 0 |
@@ -20,9 +20,9 @@
 
 | Setting | Value |
 |---------|-------|
-| Frontend dev port | 5190 |
-| Preview port | 5190 |
-| Proxy target | http://127.0.0.1:3350 |
+| Frontend dev port | 3000 |
+| Preview port | 3000 |
+| Proxy target | http://127.0.0.1:8000 |
 | Proxies `/api` | yes |
 | Proxies `/health` | yes |
 | Proxies `/socket.io` | yes |
@@ -90,7 +90,6 @@
 | emergency-queue-analytics | GET | `/api/emergency/queues/analytics` | emergencyQueueAnalytics | emergencyAnalyticsApi.js |
 | emergency-shift-report-export | GET | `/api/emergency/shift/report/export` | emergencyShiftReportExport | emergencyAnalyticsApi.js |
 | emergency-referral-history | GET | `/api/emergency/patients/:patientId/referrals` | emergencyReferralHistory | emergencyTransportApi.js |
-| emergency-transfer-status | PATCH | `/api/emergency/transfers/:referralId/status` | emergencyTransferWorkflow | emergencyTransportApi.js |
 | emergency-diversion-status | GET | `/api/emergency/diversion/status` | emergencyDiversionStatus | emergencyTransportApi.js |
 | exports-pdf | POST | `/api/exports/pdf` | exportsPdf | export/ExportService.js |
 | exports-excel | POST | `/api/exports/excel` | exportsExcel | export/ExportService.js |

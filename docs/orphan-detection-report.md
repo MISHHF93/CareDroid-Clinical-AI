@@ -1,6 +1,6 @@
 # Orphan Detection Report
 
-Generated: 2026-08-08 (regenerate with `npm run orphan-detection:write-docs`)
+Generated: 2026-08-22 (regenerate with `npm run orphan-detection:write-docs`)
 
 ## Classification key
 
@@ -15,17 +15,17 @@ Generated: 2026-08-08 (regenerate with `npm run orphan-detection:write-docs`)
 
 | Metric | Count |
 |--------|------:|
-| Total orphan findings | 432 |
-| App.jsx routes | 269 |
-| Orphan / gap routes | 125 |
-| Orphan pages | 149 |
+| Total orphan findings | 419 |
+| App.jsx routes | 290 |
+| Orphan / gap routes | 113 |
+| Orphan pages | 151 |
 | Orphan components | 0 |
 | Domain module findings (dashboard / simulation / lab / 3D) | 20 |
 | Orphan services | 0 |
 | Executor contract gaps | 0 |
-| API orphans / stubs | 127 |
-| Weakly linked markdown | 11 |
-| **wire** | 165 |
+| API orphans / stubs | 125 |
+| Weakly linked markdown | 10 |
+| **wire** | 152 |
 | **merge** | 0 |
 | **quarantine** | 0 |
 | **legacy** | 267 |
@@ -56,17 +56,16 @@ Generated: 2026-08-08 (regenerate with `npm run orphan-detection:write-docs`)
 | /auth/invite | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /reset-password | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /verify-email | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
+| /login | legacy | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
+| /register | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /intake | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /alerts | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /ai-chief | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /analytics | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /executive | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /automation-analytics | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /assistant | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /ai-command-center | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /workspaces | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /operations-center | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /predictive-analytics | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /surveillance/nexus | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /digital-twin-intelligence | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /customer-portal | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
@@ -86,34 +85,24 @@ Generated: 2026-08-08 (regenerate with `npm run orphan-detection:write-docs`)
 | /regulatory | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /human-review | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /assets | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /training | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /ai-models | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /platform-learning-engine | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /brain | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /settings/organization | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /tenant-admin | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /tenant-admin/workspaces | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /settings/organization/packs | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /settings/organization/assets | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /departments | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /service-lines | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /products | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /asset-packs | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /plans | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /specialties | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /care-pathways | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /agents | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /outcomes | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /value-tracking | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /customer-success | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /success-center | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /integrations-marketplace | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /integration-readiness | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /solution-builder | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /configuration-studio | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /welcome | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /organization/ | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /settings/organization/ | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /ai/evaluation | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /governance/ai | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /governance/model-usage | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
@@ -152,7 +141,6 @@ Generated: 2026-08-08 (regenerate with `npm run orphan-detection:write-docs`)
 | /ai-governance | wire | toolInventory route not registered in App.jsx |
 | /audit/ai | wire | toolInventory route not registered in App.jsx |
 | /assistant | wire | toolInventory route not registered in App.jsx |
-| /training | wire | toolInventory route not registered in App.jsx |
 | /audit | wire | toolInventory route not registered in App.jsx |
 | /governance/equity/findings | wire | toolInventory route not registered in App.jsx |
 | /governance/equity | wire | toolInventory route not registered in App.jsx |
@@ -181,13 +169,14 @@ Generated: 2026-08-08 (regenerate with `npm run orphan-detection:write-docs`)
 | --- | --- | --- |
 | src/pages/admin/AdminOperationsHome.tsx | legacy | import:./pages/admin/AdminOperationsHome |
 | src/pages/admin/EdStaffWorkflowAdmin.tsx | legacy | import:src/pages/admin/EdStaffWorkflowAdmin |
-| src/pages/ai/AiCommandCenterDashboard.tsx | legacy | import:AiCommandCenterDashboard |
+| src/pages/ai/AiCommandCenterDashboard.tsx | legacy | import:./pages/ai/AiCommandCenterDashboard |
 | src/pages/ai/AiEvaluationDashboard.tsx | legacy | import:./pages/ai/AiEvaluationDashboard |
 | src/pages/ai/CostAnalyticsDashboard.tsx | legacy | import:./pages/ai/CostAnalyticsDashboard |
 | src/pages/ai/MemoryDashboard.tsx | legacy | import:./pages/ai/MemoryDashboard |
 | src/pages/analytics/AnalyticsDashboard.tsx | legacy | import:./pages/analytics/AnalyticsDashboard |
-| src/pages/analytics/PredictiveAnalyticsDashboard.tsx | legacy | import:PredictiveAnalyticsDashboard |
+| src/pages/analytics/PredictiveAnalyticsDashboard.tsx | legacy | import:./pages/analytics/PredictiveAnalyticsDashboard |
 | src/pages/AppNavigator.tsx | legacy | import:./pages/AppNavigator |
+| src/pages/auth/AuthPage.tsx | legacy | import:src/pages/auth/AuthPage.tsx |
 | src/pages/AutomationAuditTrail.tsx | legacy | import:./pages/AutomationAuditTrail |
 | src/pages/BillingPage.tsx | legacy | import:./pages/BillingPage |
 | src/pages/clinical/ClinicalDecisionSupport.tsx | legacy | import:./pages/clinical/ClinicalDecisionSupport |
@@ -198,11 +187,11 @@ Generated: 2026-08-08 (regenerate with `npm run orphan-detection:write-docs`)
 | src/pages/ClinicalAlertsPage.tsx | legacy | import:src/pages/ClinicalAlertsPage.tsx |
 | src/pages/ClinicalDocumentationAssistant.tsx | wire | import:src/pages/ClinicalDocumentationAssistant.tsx |
 | src/pages/collaboration/CollaborationHub.tsx | legacy | import:./pages/collaboration/CollaborationHub |
-| src/pages/commercial/CommercialPages.tsx | legacy | import:src/pages/commercial/CommercialPages |
 | src/pages/commercial/CommercialPageShell.tsx | legacy | import:CommercialPageShell |
 | src/pages/commercial/ExpansionOpportunities.tsx | legacy | import:./pages/commercial/ExpansionOpportunities |
 | src/pages/commercial/MaturityAssessment.tsx | legacy | import:./pages/commercial/MaturityAssessment |
 | src/pages/commercial/ProductIntelligence.tsx | legacy | import:./pages/commercial/ProductIntelligence |
+| src/pages/DesignSystemPlayground.tsx | legacy | import:src/pages/DesignSystemPlayground.tsx |
 | src/pages/emergency/DispatchConsole.tsx | legacy | import:src/pages/emergency/DispatchConsole.tsx |
 | src/pages/emergency/EmergencyAnalytics.tsx | legacy | import:src/pages/emergency/EmergencyAnalytics |
 | src/pages/emergency/emergencyRoutePages.tsx | legacy | import:src/pages/emergency/emergencyRoutePages |
@@ -241,11 +230,12 @@ Generated: 2026-08-08 (regenerate with `npm run orphan-detection:write-docs`)
 | src/pages/legal/PrivacyPolicy.tsx | legacy | import:src/pages/legal/PrivacyPolicy.tsx |
 | src/pages/legal/TermsOfService.tsx | legacy | import:src/pages/legal/TermsOfService.tsx |
 | src/pages/NotificationPreferences.tsx | legacy | import:src/pages/NotificationPreferences.tsx |
-| src/pages/operations/DeviceFleetManagement.tsx | legacy | import:./pages/operations/DeviceFleetManagement |
+| src/pages/operations/DeviceFleetManagement.tsx | legacy | import:src/pages/operations/DeviceFleetManagement.tsx |
 | src/pages/operations/HospitalMapDashboard.tsx | legacy | import:./pages/operations/HospitalMapDashboard |
 | src/pages/operations/LiveTrackingMap.tsx | legacy | import:./pages/operations/LiveTrackingMap |
 | src/pages/operations/MedicalIotDashboard.tsx | legacy | import:./pages/operations/MedicalIotDashboard |
 | src/pages/operations/Operations.tsx | legacy | import:./pages/operations/Operations |
+| src/pages/organization/OrganizationOnboarding.tsx | legacy | import:./pages/organization/OrganizationOnboarding |
 | src/pages/organization/OrganizationPages.tsx | legacy | import:src/pages/organization/OrganizationPages |
 | src/pages/platform/BusinessBrain.tsx | legacy | import:./pages/platform/BusinessBrain |
 | src/pages/platform/DepartmentIntelligence.tsx | legacy | import:./pages/platform/DepartmentIntelligence |
@@ -303,7 +293,7 @@ Generated: 2026-08-08 (regenerate with `npm run orphan-detection:write-docs`)
 | src/pages/tools/OrderSetAi.tsx | wire | import:src/pages/tools/OrderSetAi.tsx |
 | src/pages/tools/PatientSummaryAi.tsx | wire | import:src/pages/tools/PatientSummaryAi.tsx |
 | src/pages/tools/PediatricsObgynAssistantPage.tsx | wire | import:src/pages/tools/PediatricsObgynAssistantPage.tsx |
-| src/pages/tools/pediatricsObgynCalculators.tsx | legacy | import:pediatricsObgynCalculators |
+| src/pages/tools/pediatricsObgynCalculators.tsx | legacy | import:src/pages/tools/pediatricsObgynCalculators.tsx |
 | src/pages/tools/pr4aCalculators.tsx | legacy | import:src/pages/tools/pr4aCalculators.tsx |
 | src/pages/tools/pr8ClinicalBatchCalculators.tsx | legacy | import:pr8ClinicalBatchCalculators |
 | src/pages/tools/ProcedureGuide.tsx | wire | import:src/pages/tools/ProcedureGuide.tsx |
@@ -325,7 +315,7 @@ Generated: 2026-08-08 (regenerate with `npm run orphan-detection:write-docs`)
 | src/pages/training/MedicalSimulationSuite.tsx | legacy | import:./pages/training/MedicalSimulationSuite |
 | src/pages/training/SimulationOutcomes.tsx | legacy | import:./pages/training/SimulationOutcomes |
 | src/pages/training/SimulationScenarioPlayer.tsx | legacy | import:./pages/training/SimulationScenarioPlayer |
-| src/pages/training/TrainingDashboard.tsx | legacy | import:TrainingDashboard |
+| src/pages/training/TrainingDashboard.tsx | legacy | import:./pages/training/TrainingDashboard |
 | src/pages/UsagePage.tsx | legacy | import:./pages/UsagePage |
 | src/pages/Version.tsx | legacy | import:./pages/Version |
 
@@ -379,14 +369,20 @@ _None detected._
 | emergency-queue-analytics | legacy | Gated stub — intentional no-op until backend exists |
 | emergency-shift-report-export | legacy | Gated stub — intentional no-op until backend exists |
 | emergency-referral-history | legacy | Gated stub — intentional no-op until backend exists |
-| emergency-transfer-status | legacy | Gated stub — intentional no-op until backend exists |
 | emergency-diversion-status | legacy | Gated stub — intentional no-op until backend exists |
 | exports-pdf | legacy | Gated stub — intentional no-op until backend exists |
 | exports-excel | legacy | Gated stub — intentional no-op until backend exists |
 | reports-generate | legacy | Gated stub — intentional no-op until backend exists |
 | reports-schedule-create | legacy | Gated stub — intentional no-op until backend exists |
 | reports-schedule-cancel | legacy | Gated stub — intentional no-op until backend exists |
+| GET /api/emergency/public-waiting-snapshot | legacy | Backend-only route (no SPA client) |
+| PATCH /api/emergency/patients/:patientId | legacy | Backend-only route (no SPA client) |
+| PATCH /api/emergency/patients/:patientId/staff | legacy | Backend-only route (no SPA client) |
+| PATCH /api/emergency/patients/:patientId/escalate | legacy | Backend-only route (no SPA client) |
 | GET /api/emergency/patients/:patientId/workflow-logs | legacy | Backend-only route (no SPA client) |
+| PATCH /api/emergency/ems/arrivals/:arrivalId/status | legacy | Backend-only route (no SPA client) |
+| GET /api/emergency/staff | legacy | Backend-only route (no SPA client) |
+| PATCH /api/emergency/staff/:staffId/duty-status | legacy | Backend-only route (no SPA client) |
 | POST /api/emergency/copilot/interactions | legacy | Backend-only route (no SPA client) |
 | POST /api/emergency/clinical-calculators/results | legacy | Backend-only route (no SPA client) |
 | POST /api/emergency/digital-twin/organizational/simulate | legacy | Backend-only route (no SPA client) |
@@ -408,6 +404,11 @@ _None detected._
 | GET /api/auth/oidc | legacy | Backend-only route (no SPA client) |
 | GET /api/auth/saml | legacy | Backend-only route (no SPA client) |
 | GET /api/auth/me | legacy | Backend-only route (no SPA client) |
+| GET /api/profile/me/preferences | legacy | Backend-only route (no SPA client) |
+| GET /api/profile/me/activity | legacy | Backend-only route (no SPA client) |
+| GET /api/profile/me/security | legacy | Backend-only route (no SPA client) |
+| GET /api/workspaces | legacy | Backend-only route (no SPA client) |
+| POST /api/workspaces | legacy | Backend-only route (no SPA client) |
 | GET /api/workspaces/:workspaceId | legacy | Backend-only route (no SPA client) |
 | GET /api/workspaces/:workspaceId/members | legacy | Backend-only route (no SPA client) |
 | POST /api/workspaces/:workspaceId/invitations | legacy | Backend-only route (no SPA client) |
@@ -433,7 +434,10 @@ _None detected._
 | GET /api/activity/me | legacy | Backend-only route (no SPA client) |
 | GET /api/activity/me/summary | legacy | Backend-only route (no SPA client) |
 | GET /api/activity/workspaces/:workspaceId | legacy | Backend-only route (no SPA client) |
+| GET /api/personalization/me | legacy | Backend-only route (no SPA client) |
+| PATCH /api/personalization/me | legacy | Backend-only route (no SPA client) |
 | GET /api/personalization/me/recommendations | legacy | Backend-only route (no SPA client) |
+| POST /api/personalization/me/saved-prompts | legacy | Backend-only route (no SPA client) |
 | DELETE /api/personalization/me/saved-prompts/:promptId | legacy | Backend-only route (no SPA client) |
 | POST /api/artifacts | legacy | Backend-only route (no SPA client) |
 | GET /api/artifacts/:id | legacy | Backend-only route (no SPA client) |
@@ -445,27 +449,12 @@ _None detected._
 | GET /api/subscriptions/config | legacy | Backend-only route (no SPA client) |
 | POST /api/subscriptions/webhook | legacy | Backend-only route (no SPA client) |
 | POST /api/chat/message-3d | legacy | Backend-only route (no SPA client) |
-| GET /api/patients | legacy | Backend-only route (no SPA client) |
-| GET /api/patients/:patientId | legacy | Backend-only route (no SPA client) |
-| POST /api/patients | legacy | Backend-only route (no SPA client) |
-| PATCH /api/patients/:patientId | legacy | Backend-only route (no SPA client) |
-| GET /api/staff | legacy | Backend-only route (no SPA client) |
-| GET /api/rooms | legacy | Backend-only route (no SPA client) |
-| GET /api/shift | legacy | Backend-only route (no SPA client) |
-| GET /api/ems | legacy | Backend-only route (no SPA client) |
-| GET /api/referrals | legacy | Backend-only route (no SPA client) |
-| POST /api/referrals | legacy | Backend-only route (no SPA client) |
+| GET /api/ai-feedback | legacy | Backend-only route (no SPA client) |
+| GET /api/surface-views | legacy | Backend-only route (no SPA client) |
 | GET /api/v1/governance/registry | legacy | Backend-only route (no SPA client) |
 | GET /api/v1/governance/safety-rules | legacy | Backend-only route (no SPA client) |
 | GET /api/v1/governance/compliance | legacy | Backend-only route (no SPA client) |
 | GET /api/v1/governance/violations | legacy | Backend-only route (no SPA client) |
-| GET /api/v1/governance/validate-prompts | legacy | Backend-only route (no SPA client) |
-| POST /api/interoperability/events | legacy | Backend-only route (no SPA client) |
-| GET /api/interoperability/events | legacy | Backend-only route (no SPA client) |
-| GET /api/interoperability/events/:id | legacy | Backend-only route (no SPA client) |
-| POST /api/tools/execute | legacy | Backend-only route (no SPA client) |
-| POST /api/tool-calling/execute | legacy | Backend-only route (no SPA client) |
-| GET /api/tool-calling/catalog | legacy | Backend-only route (no SPA client) |
 | POST /api/platform/users/me/pinned-assets | legacy | Platform/product API is deferred and not frontend-inventory wired |
 | POST /api/platform/users/me/hidden-assets | legacy | Platform/product API is deferred and not frontend-inventory wired |
 | GET /api/platform/assets/:assetId | legacy | Platform/product API is deferred and not frontend-inventory wired |
@@ -484,8 +473,9 @@ _None detected._
 | POST /api/platform-governance/review/items/:itemId/decision | legacy | Platform/product API is deferred and not frontend-inventory wired |
 | GET /api/platform-governance/security/events | legacy | Platform/product API is deferred and not frontend-inventory wired |
 | GET /api/platform-governance/source-provenance/:sourceId | legacy | Platform/product API is deferred and not frontend-inventory wired |
+| GET /api/platform-governance/summary | legacy | Platform/product API is deferred and not frontend-inventory wired |
 
-_… and 7 more API rows._
+_… and 5 more API rows._
 
 ## Orphan markdown (weak inbound links)
 
@@ -496,7 +486,6 @@ _… and 7 more API rows._
 | docs/archive/INTERACTION_EXECUTION_REPORT.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
 | docs/archive/PLATFORM_MODERNIZATION_REPORT.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
 | docs/archive/reception-upgrade/02-dependency-map.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
-| docs/archive/reception-upgrade/02-scorecard-baseline.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
 | docs/archive/reception-upgrade/03-orphaned-code.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
 | docs/archive/reception-upgrade/04-rbac-permission-matrix.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
 | docs/archive/reception-upgrade/05-information-architecture.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |

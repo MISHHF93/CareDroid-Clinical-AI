@@ -1,6 +1,6 @@
 # Endpoint-to-frontend matrix
 
-**Generated:** 2026-08-08T13:21:38.101Z
+**Generated:** 2026-08-22T18:41:22.130Z
 
 | Method | Path | Backend | Frontend client | Exposure |
 |--------|------|---------|-----------------|----------|
@@ -77,6 +77,7 @@
 | GET | `/api/emergency/reception/snapshot` | EmergencyOsController | emergencyOsApi.js / fetchReceptionSnapshot | ✅ |
 | POST | `/api/emergency/reception/handoff` | EmergencyOsController | emergencyOsApi.js / postReceptionHandoff | ✅ |
 | POST | `/api/emergency/reception/escalation` | EmergencyOsController | emergencyOsApi.js / postReceptionEscalation | ✅ |
+| POST | `/api/emergency/waiting-room-safety/escalation-notify` | EmergencyOsController | emergencyOsApi.js / postWaitingRoomEscalationNotify | ✅ |
 | POST | `/api/emergency/triage/assist` | EmergencyOsController | emergencyOsApi.js / postTriageAssist | ✅ |
 | GET | `/api/emergency/patients/:patientId/orchestration` | EmergencyOsController | emergencyOsApi.js / fetchPatientOrchestration | ✅ |
 | GET | `/api/emergency/patient-flow` | EmergencyOsController | emergencyOsApi.js / fetchPatientFlow | ✅ |
@@ -89,7 +90,7 @@
 | GET | `/api/emergency/clinical-calculators/results` | EmergencyOsController | emergencyOsApi.js | ✅ |
 | GET | `/api/emergency/whiteboard` | EmergencyOsController | emergencyOsApi.js / useEmergencyWhiteboard | ✅ |
 | GET | `/api/emergency/patients` | EmergencyOsController | emergencyOsApi.js / useEmergencyPatients | ✅ |
-| POST | `/api/emergency/patients` | EmergencyOsController | emergencyOsApi.js / createEmergencyPatient | ✅ |
+| POST | `/api/emergency/patients` | EmergencyOsController | none as of 2026-08-12 | ✅ |
 | GET | `/api/emergency/journey` | EmergencyOsController | emergencyOsApi.js / usePatientJourney / PatientsRoute journey status | ✅ |
 | GET | `/api/emergency/ems` | EmergencyOsController | emergencyOsApi.js / useEMSIntake | ✅ |
 | POST | `/api/emergency/ems/handoff` | EmergencyOsController | emergencyOsApi.js | ✅ |
@@ -99,7 +100,7 @@
 | GET | `/api/emergency/ems/incoming` | EmsController | emergencyTransportApi.ts / fetchIncomingEmergencyEms | ✅ |
 | GET | `/api/emergency/intake` | EmergencyOsController | emergencyOsApi.js / useSmartIntake | ✅ |
 | POST | `/api/emergency/intake` | EmergencyOsController | emergencyOsApi.js / QuickIntake | ✅ |
-| POST | `/api/emergency/intake/vertical-slice` | EmergencyOsController | emergencyOsApi.js / NewPatientIntake | ✅ |
+| POST | `/api/emergency/intake/vertical-slice` | EmergencyOsController | emergencyOsApi.js / SmartIntake (runSmartIntakeVerticalSlice) | ✅ |
 | GET | `/api/emergency/queues` | EmergencyOsController | emergencyOsApi.js / useEmergencyQueues | ✅ |
 | GET | `/api/emergency/reassessment` | EmergencyOsController | emergencyOsApi.js / useReassessmentQueue | ✅ |
 | GET | `/api/emergency/reassessment/due` | ReassessmentController | reassessmentApi.ts / fetchDueReassessments | ✅ |
@@ -121,6 +122,42 @@
 | GET | `/api/emergency/copilot` | EmergencyOsController | emergencyOsApi.js / useEDCopilot | ✅ |
 | POST | `/api/ai/node/conversational` | EmergencyAIController | lib/ai/client.ts / careDroidUnifiedAiNode.ts | ✅ |
 | POST | `/api/ai/node` | AIController | careDroidAiApi.ts / careDroidUnifiedAiNode.ts | ✅ |
+| POST | `/api/ai/proposals` | AIController | actionProposalApi.ts / InteractiveAIWorkspace.tsx / interactiveAiOrchestrator.ts | ✅ |
+| GET | `/api/ai/proposals` | AIController | actionProposalApi.ts / interactionInbox.ts | ✅ |
+| GET | `/api/ai/proposals/:proposalId` | AIController | actionProposalApi.ts / InteractiveAIWorkspace.tsx | ✅ |
+| POST | `/api/ai/proposals/:proposalId/approve` | AIController | actionProposalApi.ts / InteractiveAIWorkspace.tsx | ✅ |
+| POST | `/api/ai/proposals/:proposalId/reject` | AIController | actionProposalApi.ts / InteractiveAIWorkspace.tsx | ✅ |
+| POST | `/api/ai/proposals/:proposalId/execute` | AIController | actionProposalApi.ts / InteractiveAIWorkspace.tsx | ✅ |
+| POST | `/api/ai/proposals/:proposalId/rollback` | AIController | actionProposalApi.ts / InteractiveAIWorkspace.tsx | ✅ |
+| POST | `/api/ai-feedback` | AiFeedbackController | aiFeedbackApi.ts / AiFeedbackControl.tsx | ✅ |
+| POST | `/api/surface-views/:surfaceKey` | SurfaceViewsController | surfaceViewsApi.ts / CareOperationsInboxPanel.tsx | ✅ |
+| GET | `/api/emergency/care-operations/inbox` | CareOperationsController | careOperationsApi.ts / CareOperationsInboxPanel.tsx | ✅ |
+| PATCH | `/api/emergency/care-operations/inbox/:id` | CareOperationsController | careOperationsApi.ts / CareOperationsInboxPanel.tsx | ✅ |
+| GET | `/api/governance/clinical/readiness` | PlatformSystemsController | platformGovernanceApi.ts / PlatformGovernanceWorkspace.tsx | ✅ |
+| GET | `/api/governance/ai-security/summary` | PlatformSystemsController | platformGovernanceApi.ts / PlatformGovernanceWorkspace.tsx | ✅ |
+| GET | `/api/governance/regulatory/capabilities` | PlatformSystemsController | platformGovernanceApi.ts / PlatformGovernanceWorkspace.tsx | ✅ |
+| GET | `/api/governance/equity/summary` | PlatformSystemsController | platformGovernanceApi.ts / PlatformGovernanceWorkspace.tsx | ✅ |
+| GET | `/api/governance/validation/scenarios` | PlatformSystemsController | platformGovernanceApi.ts / PlatformGovernanceWorkspace.tsx | ✅ |
+| GET | `/api/review/items` | PlatformSystemsController | platformGovernanceApi.ts / PlatformGovernanceWorkspace.tsx | ✅ |
+| GET | `/api/consent/:patientId` | PlatformSystemsController | platformGovernanceApi.ts / PlatformGovernanceWorkspace.tsx | ✅ |
+| GET | `/api/privacy/access-log` | PlatformSystemsController | platformGovernanceApi.ts / PlatformGovernanceWorkspace.tsx | ✅ |
+| GET | `/api/audit/integrity/status` | PlatformSystemsController | platformGovernanceApi.ts / PlatformGovernanceWorkspace.tsx | ✅ |
+| GET | `/api/operations/observability/summary` | PlatformSystemsController | platformGovernanceApi.ts / PlatformGovernanceWorkspace.tsx | ✅ |
+| GET | `/api/source-provenance/:sourceId` | PlatformSystemsController | platformGovernanceApi.ts / PlatformGovernanceWorkspace.tsx | ✅ |
+| GET | `/api/audit/runs/:runId` | PlatformSystemsController | platformGovernanceApi.ts / PlatformGovernanceWorkspace.tsx | ✅ |
+| GET | `/api/audit/patients/:patientId/access` | PlatformSystemsController | platformGovernanceApi.ts / PlatformGovernanceWorkspace.tsx | ✅ |
+| GET | `/api/operations/deployments/current` | PlatformSystemsController | platformGovernanceApi.ts / PlatformGovernanceWorkspace.tsx | ✅ |
+| GET | `/api/operations/service-health` | PlatformSystemsController | platformGovernanceApi.ts / PlatformGovernanceWorkspace.tsx | ✅ |
+| GET | `/api/operations/incidents` | PlatformSystemsController | platformGovernanceApi.ts / PlatformGovernanceWorkspace.tsx | ✅ |
+| GET | `/api/governance/validation/runs/:runId` | PlatformSystemsController | platformGovernanceApi.ts / PlatformGovernanceWorkspace.tsx | ✅ |
+| GET | `/api/governance/validation/release-gates/:capabilityId` | PlatformSystemsController | platformGovernanceApi.ts / PlatformGovernanceWorkspace.tsx | ✅ |
+| GET | `/api/governance/equity/metrics` | PlatformSystemsController | platformGovernanceApi.ts / PlatformGovernanceWorkspace.tsx | ✅ |
+| GET | `/api/governance/equity/cohorts` | PlatformSystemsController | platformGovernanceApi.ts / PlatformGovernanceWorkspace.tsx | ✅ |
+| GET | `/api/governance/regulatory/evidence/:capabilityId` | PlatformSystemsController | platformGovernanceApi.ts / PlatformGovernanceWorkspace.tsx | ✅ |
+| GET | `/api/governance/ai-security/incidents` | PlatformSystemsController | platformGovernanceApi.ts / PlatformGovernanceWorkspace.tsx | ✅ |
+| GET | `/api/governance/clinical/policies` | PlatformSystemsController | platformGovernanceApi.ts / PlatformGovernanceWorkspace.tsx | ✅ |
+| GET | `/api/emergency/surge/status` | SurgeController | surgeApi.ts / CommandCenterIntelligenceLens.tsx / ExecutiveCommandCenter.tsx / HospitalMapDashboard.tsx | ✅ |
+| POST | `/api/navigator/query` | AppNavigatorController | navigatorApi.ts / AppNavigator.tsx | ✅ |
 | POST | `/api/emergency/copilot/message` | EmergencyAIController | backend legacy shim | ✅ |
 | POST | `/api/emergency/intake/ai/message` | EmergencyAIController | backend legacy shim | ✅ |
 | POST | `/api/emergency/referrals/ai/message` | EmergencyAIController | backend legacy shim | ✅ |
@@ -153,7 +190,7 @@
 | GET | `/api/emergency/shift/report/export` | — | emergencyAnalyticsApi.js | ⚠️ gated |
 | POST | `/api/emergency/referrals` | EmergencyOsController | emergencyTransportApi.js | ✅ |
 | GET | `/api/emergency/patients/:patientId/referrals` | — | emergencyTransportApi.js | ⚠️ gated |
-| PATCH | `/api/emergency/transfers/:referralId/status` | — | emergencyTransportApi.js | ⚠️ gated |
+| PATCH | `/api/emergency/transfers/:referralId/status` | EmergencyOsController | emergencyTransportApi.js | ✅ |
 | GET | `/api/emergency/diversion/status` | — | emergencyTransportApi.js | ⚠️ gated |
 | POST | `/api/emergency/intake/sessions` | SmartIntakeController | smartIntakeApi.ts | ✅ |
 | POST | `/api/emergency/intake/:sessionId/manual-entry` | SmartIntakeController | smartIntakeApi.ts | ✅ |
@@ -280,19 +317,23 @@
 | PATCH | `/api/users/profile` | UsersController | UserContext.jsx / syncService.js | ✅ |
 | GET | `/api/profile/me` | UserProfileController | userIdentityApi.js / UserIdentityContext.jsx | ✅ |
 | PATCH | `/api/profile/me` | UserProfileController | userIdentityApi.js / UserIdentityContext.jsx | ✅ |
-| GET | `/api/profile/me/preferences` | UserProfileController | userIdentityApi.js / ProfilePreferences.jsx | ✅ |
-| PATCH | `/api/profile/me/preferences` | UserProfileController | userIdentityApi.js / ProfilePreferences.jsx | ✅ |
-| GET | `/api/profile/me/activity` | UserProfileController | userIdentityApi.js / ProfileActivity.jsx | ✅ |
-| GET | `/api/profile/me/security` | UserProfileController | userIdentityApi.js / ProfileSecurity.jsx | ✅ |
-| GET | `/api/profile/me/workspaces` | UserProfileController | userIdentityApi.js / ProfileWorkspaces.jsx | ✅ |
-| PATCH | `/api/profile/me/workspaces/active` | UserProfileController | userIdentityApi.js / UserIdentityContext.jsx | ✅ |
-| GET | `/api/workspaces` | WorkspacesController | userIdentityApi.js / UserIdentityContext.jsx | ✅ |
-| POST | `/api/workspaces` | WorkspacesController | userIdentityApi.js / ProfileWorkspaces.jsx | ✅ |
-| POST | `/api/workspaces/active` | WorkspacesController | userIdentityApi.js / Sidebar.jsx | ✅ |
-| POST | `/api/activity` | UserActivityController | userIdentityApi.js / UserIdentityContext.jsx | ✅ |
-| GET | `/api/personalization/me` | PersonalizationController | userIdentityApi.js / UserIdentityContext.jsx | ✅ |
-| PATCH | `/api/personalization/me` | PersonalizationController | userIdentityApi.js / ProfilePreferences.jsx | ✅ |
-| POST | `/api/personalization/me/saved-prompts` | PersonalizationController | userIdentityApi.js / ProfilePreferences.jsx | ✅ |
+| PATCH | `/api/profile/me/preferences` | UserProfileController | userIdentityApi.ts / UserIdentityContext.tsx | ✅ |
+| PATCH | `/api/profile/me/workspaces/active` | UserProfileController | userIdentityApi.ts / UserIdentityContext.tsx | ✅ |
+| GET | `/api/workspaces/context` | WorkspacesController | WorkspaceContext.tsx | ✅ |
+| POST | `/api/workspaces/active` | WorkspacesController | WorkspaceContext.tsx | ✅ |
+| POST | `/api/activity` | UserActivityController | userIdentityApi.ts / UserIdentityContext.tsx | ✅ |
+| GET | `/api/collaboration/channels` | CollaborationHubController | collaborationApi.ts / CollaborationHub.tsx | ✅ |
+| GET | `/api/collaboration/channels/:channelId/messages` | CollaborationHubController | collaborationApi.ts / CollaborationHub.tsx / PatientDiscussionPanel.tsx | ✅ |
+| POST | `/api/collaboration/channels/:channelId/messages` | CollaborationHubController | collaborationApi.ts / CollaborationHub.tsx / PatientDiscussionPanel.tsx | ✅ |
+| DELETE | `/api/collaboration/messages/:messageId` | CollaborationHubController | collaborationApi.ts / CollaborationHub.tsx / PatientDiscussionPanel.tsx | ✅ |
+| POST | `/api/collaboration/messages/:messageId/reactions` | CollaborationHubController | collaborationApi.ts / CollaborationHub.tsx / PatientDiscussionPanel.tsx | ✅ |
+| POST | `/api/collaboration/channels/:channelId/read` | CollaborationHubController | collaborationApi.ts / CollaborationHub.tsx | ✅ |
+| POST | `/api/collaboration/channels/:channelId/typing` | CollaborationHubController | collaborationApi.ts / CollaborationHub.tsx | ✅ |
+| GET | `/api/collaboration/patients/:patientId/thread` | CollaborationHubController | collaborationApi.ts / CollaborationHub.tsx / PatientDiscussionPanel.tsx | ✅ |
+| GET | `/api/native-ai/registry` | NativeAiController | nativeAiApi.ts / useNativeAiBackendSync.ts / useNativeAiDashboardData.ts | ✅ |
+| GET | `/api/native-ai/drift` | NativeAiController | nativeAiApi.ts / DriftMonitoringPanel.tsx / useNativeAiBackendSync.ts / useNativeAiDashboardData.ts | ✅ |
+| POST | `/api/native-ai/drift/evaluate` | NativeAiController | nativeAiApi.ts / DriftMonitoringPanel.tsx | ✅ |
+| POST | `/api/native-ai/clinical-acuity` | NativeAiController | nativeAiApi.ts / useNativeAiDashboardData.ts | ✅ |
 | GET | `/api/artifacts` | ArtifactsController | artifactsApi.js / Artifacts.jsx | ✅ |
 | GET | `/api/artifacts/graph` | ArtifactsController | artifactsApi.js / Artifacts.jsx | ✅ |
 | GET | `/api/artifacts/:artifactId/versions` | ArtifactsController | artifactsApi.js / Artifacts.jsx | ✅ |
@@ -370,21 +411,21 @@
 - `GET /api/settings/features`
 - `PATCH /api/settings/features`
 - `GET /api/emergency/whiteboard`
+- `GET /api/emergency/public-waiting-snapshot`
 - `GET /api/emergency/central-node/snapshot`
 - `GET /api/emergency/patients`
 - `POST /api/emergency/patients`
+- `PATCH /api/emergency/patients/:patientId`
+- `PATCH /api/emergency/patients/:patientId/staff`
+- `PATCH /api/emergency/patients/:patientId/escalate`
 - `GET /api/emergency/journey`
 - `GET /api/emergency/workflow-logs`
 - `GET /api/emergency/implementation-readiness`
 - `GET /api/emergency/patients/:patientId/workflow-logs`
 - `GET /api/emergency/ems`
 - `POST /api/emergency/ems/handoff`
-- `GET /api/emergency/intake`
-- `POST /api/emergency/intake`
-- `POST /api/emergency/intake/vertical-slice`
-- `GET /api/emergency/queues`
-- `GET /api/emergency/reassessment`
-- `GET /api/emergency/capacity`
+- `PATCH /api/emergency/ems/arrivals/:arrivalId/status`
+- `POST /api/emergency/waiting-room-safety/escalation-notify`
 
-_…and 629 more in src/data/backendHttpRouteInventory.js_
+_…and 636 more in src/data/backendHttpRouteInventory.js_
 

@@ -1,6 +1,6 @@
 # Orphaned backend functions
 
-**Generated:** 2026-08-08T13:22:00.199Z
+**Generated:** 2026-08-22T18:42:52.317Z
 
 > Regenerate: `npm run exposure:write-docs`
 
@@ -53,7 +53,14 @@ Every backend HTTP route is either **wired** to a frontend client or listed belo
 
 | Route | Controller | Reason |
 |-------|------------|--------|
+| `/api/emergency/public-waiting-snapshot` | EmergencyOsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/emergency/patients/:patientId` | EmergencyOsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/emergency/patients/:patientId/staff` | EmergencyOsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/emergency/patients/:patientId/escalate` | EmergencyOsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/emergency/patients/:patientId/workflow-logs` | EmergencyOsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/emergency/ems/arrivals/:arrivalId/status` | EmergencyOsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/emergency/staff` | EmergencyOsController | HEAL-282 (roadmap G1): real staff directory read, added alongside real email/onDuty columns. No admin UI to browse/assign on-duty status exists yet -- an operator sets it via the PATCH endpoint below directly. Deferred, not gated: the data model and route are real, only the UI is pending. |
+| `/api/emergency/staff/:staffId/duty-status` | EmergencyOsController | HEAL-282 (roadmap G1): marks a staff member on/off duty so waiting-room-safety escalation can route to a real on-duty charge nurse instead of only a static distribution list. Same deferred-UI status as GET /api/emergency/staff above. |
 | `/api/emergency/copilot/interactions` | EmergencyOsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/emergency/clinical-calculators/results` | EmergencyOsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/emergency/digital-twin/organizational/simulate` | OrganizationalDigitalTwinController | Research controller; active ED digital twin UI uses the core EmergencyOsController endpoints |
@@ -70,6 +77,11 @@ Every backend HTTP route is either **wired** to a frontend client or listed belo
 | `/api/auth/oidc` | AuthController | SSO placeholder |
 | `/api/auth/saml` | AuthController | SSO placeholder |
 | `/api/auth/me` | AuthController | JWT introspection; SPA uses profile |
+| `/api/profile/me/preferences` | UserProfileController | ProfilePreferences.tsx reads the combined GET /api/profile/me via UserIdentityContext instead; the dead fetchPreferences() client wrapper was removed from userIdentityApi.ts |
+| `/api/profile/me/activity` | UserProfileController | ProfileActivity.tsx reads the combined GET /api/profile/me via UserIdentityContext instead; the dead fetchActivity() client wrapper was removed from userIdentityApi.ts |
+| `/api/profile/me/security` | UserProfileController | ProfileSecurity.tsx reads the combined GET /api/profile/me via UserIdentityContext instead; the dead fetchSecurity() client wrapper was removed from userIdentityApi.ts |
+| `/api/workspaces` | WorkspacesController | No frontend client function calls this route |
+| `/api/workspaces` | WorkspacesController | The dead createWorkspace() client wrapper was removed from userIdentityApi.ts; no page ever called it |
 | `/api/workspaces/:workspaceId` | WorkspacesController | Workspace detail route for future workspace settings |
 | `/api/workspaces/:workspaceId/members` | WorkspacesController | Workspace member management surface pending |
 | `/api/workspaces/:workspaceId/invitations` | WorkspacesController | Workspace invitation UX pending |
@@ -95,7 +107,10 @@ Every backend HTTP route is either **wired** to a frontend client or listed belo
 | `/api/activity/me` | UserActivityController | Profile activity dashboard pending |
 | `/api/activity/me/summary` | UserActivityController | Profile activity summary pending |
 | `/api/activity/workspaces/:workspaceId` | UserActivityController | Workspace activity surface pending |
+| `/api/personalization/me` | PersonalizationController | The dead fetchPersonalization() client wrapper was removed from userIdentityApi.ts; no page ever called it |
+| `/api/personalization/me` | PersonalizationController | The dead updatePersonalization() client wrapper was removed from userIdentityApi.ts; no page ever called it |
 | `/api/personalization/me/recommendations` | PersonalizationController | Personalization recommendations UI pending |
+| `/api/personalization/me/saved-prompts` | PersonalizationController | The dead savePrompt() client wrapper was removed from userIdentityApi.ts; no page ever called it |
 | `/api/personalization/me/saved-prompts/:promptId` | PersonalizationController | Saved prompt deletion UI pending |
 | `/api/artifacts` | ArtifactsController | Artifact authoring is not exposed in dashboard yet |
 | `/api/artifacts/:id` | ArtifactsController | Artifact detail route is not linked yet |
@@ -105,16 +120,8 @@ Every backend HTTP route is either **wired** to a frontend client or listed belo
 | `/api/memory/clinical` | MemoryController | Memory dashboard uses aggregate route |
 | `/api/subscriptions/config` | SubscriptionsController | Stripe config for checkout UI |
 | `/api/chat/message-3d` | ChatController | 3D avatar experiment |
-| `/api/patients` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/patients/:patientId` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/patients` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/patients/:patientId` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/staff` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/rooms` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/shift` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/ems` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/referrals` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/referrals` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/ai-feedback` | AiFeedbackController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/surface-views` | SurfaceViewsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/interoperability/events` | InteroperabilityController | Integration Hub traceability list for a future admin/review surface |
 | `/api/interoperability/events/:id` | InteroperabilityController | Integration Hub event trace detail for a future admin/review surface |
 | `/api/tools/execute` | ToolOrchestratorController | Batch execute; UI uses per-id execute |
@@ -134,45 +141,30 @@ Every backend HTTP route is either **wired** to a frontend client or listed belo
 | `/api/audit/events` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/audit/events/:eventId` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/audit/export` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/audit/integrity/status` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/audit/integrity/verify` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/audit/patients/:patientId/access` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/audit/runs/:runId` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/governance/ai-security/incidents` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/governance/ai-security/incidents/:incidentId/review` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/governance/ai-security/evaluate` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/governance/ai-security/model-access` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/governance/ai-security/model-access/:policyId` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/governance/ai-security/rules` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/governance/ai-security/rules/:ruleId` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/governance/ai-security/summary` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/governance/clinical/policies` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/governance/clinical/policies` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/governance/clinical/policies/:policyId/approve` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/governance/clinical/policies/:policyId` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/governance/clinical/readiness` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/governance/clinical/release-gates` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/governance/clinical/release-gates/:gateId/decision` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/governance/clinical/safety-findings` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/governance/clinical/safety-findings/:findingId/review` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/governance/equity/cohorts` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/governance/equity/cohorts` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/governance/equity/findings` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/governance/equity/findings/:findingId/review` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/governance/equity/metrics` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/governance/equity/reports` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/governance/equity/summary` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/governance/regulatory/capabilities` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/governance/regulatory/capabilities/:capabilityId` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/governance/regulatory/capabilities/:capabilityId/approve` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/governance/regulatory/capabilities/:capabilityId/classification` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/governance/regulatory/evidence/:capabilityId` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/governance/regulatory/evidence/:capabilityId/artifacts` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/governance/validation/release-gates/:capabilityId` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/governance/validation/runs/:runId` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/governance/validation/runs` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/governance/validation/runs/:runId/approve` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/governance/validation/scenarios` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/governance/validation/scenarios` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/governance/validation/synthetic-patients` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/hospital-map/devices/:deviceId` | HospitalMapController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
@@ -181,15 +173,11 @@ Every backend HTTP route is either **wired** to a frontend client or listed belo
 | `/api/integrations/hl7/messages/quarantine` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/integrations/hl7/messages/:messageId/replay-preview` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/medical-iot/snapshot` | TelemetryController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/operations/deployments/current` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/operations/health` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/operations/incidents` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/operations/incidents/:incidentId/review` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/operations/observability/ai-runs` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/operations/observability/integrations` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/operations/observability/orchestrator` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/operations/observability/summary` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/operations/service-health` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/platform-governance/consent/:patientId` | PlatformGovernanceController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/platform-governance/consent/:patientId/:scope` | PlatformGovernanceController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/platform-governance/gate/evaluate` | PlatformGovernanceController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
@@ -207,7 +195,7 @@ Every backend HTTP route is either **wired** to a frontend client or listed belo
 | `/api/platform-governance/validation/scenarios` | PlatformGovernanceController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/privacy/requests` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/privacy/requests/:requestId/review` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/review/items` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/profile/me/workspaces` | UserProfileController | ProfileWorkspaces.tsx reads the combined GET /api/profile/me via UserIdentityContext instead; the dead fetchWorkspaces() client wrapper was removed from userIdentityApi.ts |
 | `/api/review/items` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/review/items/:itemId` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/review/items/:itemId/assign` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
@@ -220,7 +208,6 @@ Every backend HTTP route is either **wired** to a frontend client or listed belo
 | `/api/simulation/runs/:id/complete` | SimulationController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/simulation/outcomes` | SimulationController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/simulation/recommendations` | SimulationController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/source-provenance/:sourceId` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/ai/organizations/:organizationId/usage` | AIController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/organizations/current/engine` | OrganizationsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/organizations/:organizationId/engine` | OrganizationsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
@@ -231,24 +218,15 @@ Every backend HTTP route is either **wired** to a frontend client or listed belo
 | `/api/organizations/:organizationId/tenant-admin` | OrganizationsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/organizations/:organizationId/commercial-plan` | ProductCatalogController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/platform/organizations/:organizationId/customer-success` | PlatformAssetsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/products/builder` | ProductCatalogController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/subscriptions/downgrade` | SubscriptionsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/subscriptions/trial/convert` | SubscriptionsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/subscriptions/upgrade` | SubscriptionsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/workspaces/context` | WorkspacesController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/workspaces/:workspaceId/context` | WorkspacesController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/auth/magic-link/verify` | AuthController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/auth/forgot-password` | AuthController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/auth/reset-password` | AuthController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/ai/unified` | AIController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/ai/proposals` | AIController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/ai/proposals` | AIController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/ai/proposals/:proposalId` | AIController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/ai/proposals/:proposalId/audit` | AIController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/ai/proposals/:proposalId/approve` | AIController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/ai/proposals/:proposalId/reject` | AIController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/ai/proposals/:proposalId/execute` | AIController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/ai/proposals/:proposalId/rollback` | AIController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/ai/providers/health` | AIController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/ai/models` | AIController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/ai/tools` | AIController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
@@ -263,13 +241,9 @@ Every backend HTTP route is either **wired** to a frontend client or listed belo
 | `/api/emergency/patients/:patientId/document-artifacts` | EmergencyOsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/emergency/patients/:patientId/document-artifacts/extract` | EmergencyOsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/emergency/patients/:patientId/document-artifacts/:artifactId/review` | EmergencyOsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/native-ai/drift` | NativeAiController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/native-ai/drift/evaluate` | NativeAiController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/native-ai/registry` | NativeAiController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/native-ai/triage-rules` | NativeAiController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/native-ai/triage-rules` | NativeAiController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/native-ai/triage-rules/evaluate` | NativeAiController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/native-ai/clinical-acuity` | NativeAiController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/native-ai/route` | NativeAiController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/native-ai/specialists/infer` | NativeAiController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/surveillance/alerts` | SurveillanceController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
@@ -300,25 +274,17 @@ Every backend HTTP route is either **wired** to a frontend client or listed belo
 | `/api/workspaces/invitations/:token` | WorkspaceInvitationsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/workspaces/invitations/:token/accept` | WorkspaceInvitationsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/collaboration/channels` | CollaborationHubController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/collaboration/channels` | CollaborationHubController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/collaboration/channels/:channelId/archive` | CollaborationHubController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/collaboration/channels/:channelId/messages` | CollaborationHubController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/collaboration/channels/:channelId/messages` | CollaborationHubController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/collaboration/messages/:messageId` | CollaborationHubController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/collaboration/messages/:messageId` | CollaborationHubController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/collaboration/messages/:messageId/reactions` | CollaborationHubController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/collaboration/messages/:messageId/reactions/:emoji` | CollaborationHubController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/collaboration/messages/:messageId/pin` | CollaborationHubController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/collaboration/messages/:messageId/pin` | CollaborationHubController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/collaboration/channels/:channelId/pinned` | CollaborationHubController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/collaboration/channels/:channelId/read` | CollaborationHubController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/collaboration/channels/:channelId/membership` | CollaborationHubController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/collaboration/channels/:channelId/typing` | CollaborationHubController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/collaboration/messages/:messageId/attachments` | CollaborationHubController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/collaboration/channels/:channelId/external-links` | CollaborationHubController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/collaboration/channels/:channelId/external-links/:provider` | CollaborationHubController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/collaboration/search` | CollaborationHubController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/collaboration/patients/:patientId/thread` | CollaborationHubController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/collaboration/incidents` | CollaborationHubController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/collaboration/incidents/:channelId/resolve` | CollaborationHubController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/collaboration/analytics/summary` | CollaborationHubController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
@@ -341,14 +307,14 @@ Every backend HTTP route is either **wired** to a frontend client or listed belo
 | `/api/emergency/surge/batch-ems-intake` | SurgeController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/emergency/surge/bottlenecks` | SurgeController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/emergency/surge/deactivate` | SurgeController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/emergency/surge/status` | SurgeController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/emergency/capacity/dashboard` | CapacityController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/deterioration` | DeteriorationController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/deterioration/health` | DeteriorationController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/deterioration/predict` | DeteriorationController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/protocol` | ProtocolController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/protocol/health` | ProtocolController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/protocol/evaluate` | ProtocolController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/navigator/health` | AppNavigatorController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/navigator/catalog` | AppNavigatorController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 
 ## D. Frontend calls without backend (gated)
 
@@ -369,7 +335,6 @@ Every backend HTTP route is either **wired** to a frontend client or listed belo
 | emergency-queue-analytics | GET | `/api/emergency/queues/analytics` | emergencyQueueAnalytics | emergencyAnalyticsApi.js |
 | emergency-shift-report-export | GET | `/api/emergency/shift/report/export` | emergencyShiftReportExport | emergencyAnalyticsApi.js |
 | emergency-referral-history | GET | `/api/emergency/patients/:patientId/referrals` | emergencyReferralHistory | emergencyTransportApi.js |
-| emergency-transfer-status | PATCH | `/api/emergency/transfers/:referralId/status` | emergencyTransferWorkflow | emergencyTransportApi.js |
 | emergency-diversion-status | GET | `/api/emergency/diversion/status` | emergencyDiversionStatus | emergencyTransportApi.js |
 | exports-pdf | POST | `/api/exports/pdf` | exportsPdf | export/ExportService.js |
 | exports-excel | POST | `/api/exports/excel` | exportsExcel | export/ExportService.js |
@@ -397,11 +362,11 @@ NLU profiles without POST executor (180): client-side / chat only.
 
 | Category | Count |
 |----------|------:|
-| Backend HTTP routes (total inventory) | 649 |
-| Wired frontend → backend | 336 |
-| Backend-only / deferred (policy) | 314 |
-| Gated frontend (no route) | 22 |
+| Backend HTTP routes (total inventory) | 656 |
+| Wired frontend → backend | 378 |
+| Backend-only / deferred (policy) | 280 |
+| Gated frontend (no route) | 21 |
 | POST executors | 39 |
 
-_Cross-check: total inventory (649) should equal wired (336) + backend-only (314) + any remaining unlisted routes. See [backend-exposure-report.md](./backend-exposure-report.md) for the authoritative scan._
+_Cross-check: total inventory (656) should equal wired (378) + backend-only (280) + any remaining unlisted routes. See [backend-exposure-report.md](./backend-exposure-report.md) for the authoritative scan._
 
