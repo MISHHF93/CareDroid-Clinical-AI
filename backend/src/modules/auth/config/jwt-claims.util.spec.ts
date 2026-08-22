@@ -46,6 +46,54 @@ describe('jwt-claims.util', () => {
     expect(claims.permissions).toContain(Permission.CONFIGURE_SYSTEM);
   });
 
+  // P0 regression guard: it_admin/ed_manager both use UserRole.ADMIN as their
+  // JWT container, but neither should inherit that role's full PHI grant --
+  // this codebase's own emergencyNestPermissionMap.ts already documented
+  // it_admin as "no clinical PHI grants" and ed_manager as "limited write"
+  // (i.e. READ_PHI only), but nothing enforced it until now. The pre-fix
+  // behavior (both silently getting READ/WRITE/EXPORT/DELETE PHI) is exactly
+  // what this test would have caught if it existed before the fix.
+  it('it_admin gets zero PHI permissions despite UserRole.ADMIN normally granting full PHI access', () => {
+    const claims = buildAccessTokenClaims({
+      userId: 'u-it2',
+      email: 'it2@example.com',
+      role: UserRole.ADMIN,
+      roleProfileId: 'it_admin',
+    });
+    expect(claims.permissions).not.toContain(Permission.READ_PHI);
+    expect(claims.permissions).not.toContain(Permission.WRITE_PHI);
+    expect(claims.permissions).not.toContain(Permission.EXPORT_PHI);
+    expect(claims.permissions).not.toContain(Permission.DELETE_PHI);
+  });
+
+  it('ed_manager gets READ_PHI only -- never WRITE/EXPORT/DELETE -- despite UserRole.ADMIN normally granting all four', () => {
+    const claims = buildAccessTokenClaims({
+      userId: 'u-em',
+      email: 'edmanager@example.com',
+      role: UserRole.ADMIN,
+      roleProfileId: 'ed_manager',
+    });
+    expect(claims.emergencyRole).toBe('ed_manager');
+    expect(claims.permissions).toContain(Permission.READ_PHI);
+    expect(claims.permissions).not.toContain(Permission.WRITE_PHI);
+    expect(claims.permissions).not.toContain(Permission.EXPORT_PHI);
+    expect(claims.permissions).not.toContain(Permission.DELETE_PHI);
+  });
+
+  it('a genuine admin persona (no it_admin/ed_manager override) keeps full UserRole.ADMIN PHI access unchanged', () => {
+    const claims = buildAccessTokenClaims({
+      userId: 'u-admin',
+      email: 'admin@example.com',
+      role: UserRole.ADMIN,
+      roleProfileId: 'admin',
+    });
+    expect(claims.emergencyRole).toBe('admin');
+    expect(claims.permissions).toContain(Permission.READ_PHI);
+    expect(claims.permissions).toContain(Permission.WRITE_PHI);
+    expect(claims.permissions).toContain(Permission.EXPORT_PHI);
+    expect(claims.permissions).toContain(Permission.DELETE_PHI);
+  });
+
   it('ignores unknown roleProfileId strings', () => {
     expect(resolveEmergencyRoleClaim(UserRole.PHYSICIAN, 'not-a-real-role')).toBe('physician');
   });

@@ -62,6 +62,56 @@ export const EMERGENCY_ROLE_TO_USER_ROLE: Record<EmergencyRoleClaimId, UserRole>
   public_display: UserRole.STUDENT,
 };
 
+/**
+ * P0 fix: ed_manager and it_admin both use UserRole.ADMIN as their JWT auth
+ * container (see EMERGENCY_ROLE_TO_USER_ROLE above) purely so token issuance
+ * has a UserRole to work with -- but buildAccessTokenClaims used to derive
+ * `permissions` from that UserRole ALONE, so both silently inherited
+ * UserRole.ADMIN's full READ/WRITE/EXPORT/DELETE PHI + platform-governance
+ * permission set. That directly contradicted this codebase's own documented
+ * intent everywhere else: src/config/emergencyRolePermissions.ts's action
+ * lists for both roles have no PHI-write actions at all; the frontend's own
+ * "should-be" model (src/config/emergencyNestPermissionMap.ts) explicitly
+ * scopes it_admin to zero PHI ("technical administration only") and
+ * ed_manager to READ_PHI only ("limited write") -- and that file's own doc
+ * comment says JWT issuance "should expand claims from this map, not from
+ * UserRole alone," which was never actually wired in until now. Confirmed
+ * live-exploitable: authenticated as either role, POST/PATCH endpoints
+ * gated on WRITE_PHI/EXPORT_PHI/DELETE_PHI succeeded via direct API call
+ * even though neither role's UI ever exposes a PHI-mutating control.
+ *
+ * Deliberately a narrow override keyed by emergencyRole, not a change to
+ * getRolePermissions/RolePermissions[UserRole.ADMIN] itself -- every other
+ * emergency role (including a genuine 'admin' persona) keeps its existing,
+ * unrestricted UserRole-derived permission set unchanged. Permission lists
+ * below are ported verbatim from emergencyNestPermissionMap.ts's own
+ * it_admin/ed_manager entries (the values that file already declared as the
+ * correct target, just never enforced).
+ */
+export const EMERGENCY_ROLE_PERMISSION_OVERRIDES: Partial<
+  Record<EmergencyRoleClaimId, Permission[]>
+> = {
+  it_admin: [
+    Permission.CONFIGURE_SYSTEM,
+    Permission.MANAGE_USERS,
+    Permission.VIEW_USERS,
+    Permission.VIEW_AUDIT_LOGS,
+    Permission.VIEW_GOVERNANCE,
+    Permission.VIEW_ANALYTICS,
+  ],
+  ed_manager: [
+    Permission.READ_PHI,
+    Permission.USE_AI_CHAT,
+    Permission.VIEW_ANALYTICS,
+    Permission.VIEW_OPERATIONS,
+    Permission.VIEW_GOVERNANCE,
+    Permission.VIEW_AUDIT_LOGS,
+    Permission.VIEW_SENTINEL_COMMAND,
+    Permission.ACK_SENTINEL_ALARMS,
+    Permission.VIEW_SENTINEL_ANALYTICS,
+  ],
+};
+
 export type CareDroidAccessTokenClaims = {
   sub: string;
   email: string;
@@ -95,8 +145,9 @@ export function buildAccessTokenClaims(input: {
   tokenUse?: 'access' | 'refresh';
 }): CareDroidAccessTokenClaims {
   const role = input.role;
-  const permissions = getRolePermissions(role);
   const emergencyRole = resolveEmergencyRoleClaim(role, input.roleProfileId);
+  const permissions =
+    EMERGENCY_ROLE_PERMISSION_OVERRIDES[emergencyRole] ?? getRolePermissions(role);
 
   return {
     sub: input.userId,

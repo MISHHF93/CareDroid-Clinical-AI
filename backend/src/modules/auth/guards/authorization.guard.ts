@@ -8,6 +8,7 @@ import {
 } from '../decorators/permissions.decorator';
 import { hasPermissionWithHierarchy } from '../config/role-permissions.config';
 import { hasSaasProfilePermission } from '../../user-profile/saas-profile-rbac.config';
+import { EMERGENCY_ROLE_PERMISSION_OVERRIDES } from '../config/jwt-claims.util';
 import { UserRole } from '../../users/entities/user.entity';
 import { AuditService } from '../../audit/audit.service';
 import { AuditAction } from '../../audit/entities/audit-log.entity';
@@ -72,9 +73,35 @@ export class AuthorizationGuard implements CanActivate {
     const userId: string = user.id;
     const roleProfileId: string | null = user.profile?.roleProfileId || null;
 
+    // P0 fix: ed_manager/it_admin both persist UserRole.ADMIN on the user
+    // record (see EMERGENCY_ROLE_TO_USER_ROLE in jwt-claims.util.ts), so
+    // hasPermissionWithHierarchy(UserRole.ADMIN, ...) alone always grants
+    // full PHI read/write/export/delete -- and since this check previously
+    // OR-combined that with hasSaasProfilePermission, a roleProfileId-based
+    // check could only ever ADD permissions on top of the base UserRole,
+    // never restrict below it. Confirmed live-exploitable: an ed_manager or
+    // it_admin persona could call any WRITE_PHI/EXPORT_PHI/DELETE_PHI-gated
+    // endpoint directly despite neither role's own permission registry
+    // (src/config/emergencyRolePermissions.ts) or documented intent
+    // (src/config/emergencyNestPermissionMap.ts) ever granting PHI writes.
+    // EMERGENCY_ROLE_PERMISSION_OVERRIDES (same table used to fix JWT claim
+    // issuance for the legacy/socket auth path) takes precedence and
+    // REPLACES rather than adds to the base-role grant for exactly these two
+    // profiles; every other roleProfileId keeps the prior OR-combined
+    // behavior unchanged.
+    const permissionOverride =
+      roleProfileId &&
+      Object.prototype.hasOwnProperty.call(EMERGENCY_ROLE_PERMISSION_OVERRIDES, roleProfileId)
+        ? EMERGENCY_ROLE_PERMISSION_OVERRIDES[
+            roleProfileId as keyof typeof EMERGENCY_ROLE_PERMISSION_OVERRIDES
+          ]
+        : undefined;
+
     const hasRolePermission = (permission: Permission) =>
-      hasPermissionWithHierarchy(userRole, permission) ||
-      hasSaasProfilePermission(roleProfileId, permission);
+      permissionOverride
+        ? permissionOverride.includes(permission)
+        : hasPermissionWithHierarchy(userRole, permission) ||
+          hasSaasProfilePermission(roleProfileId, permission);
 
     // Get route information for audit logging
     const handler = context.getHandler();
