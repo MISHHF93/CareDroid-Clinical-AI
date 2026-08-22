@@ -321,15 +321,20 @@ const ToolPageLayout = ({
             <RiskFactorsList factors={riskData.riskFactors} />
           )}
 
-          {/* Anomaly Banner */}
+          {/* Anomaly Banner -- score/types are derived from riskData.anomalies
+              (real outlier count), not fabricated. AnomalyBanner itself gates
+              on score >= 0.5, so a low-severity result no longer forces the
+              banner to appear. */}
           {riskData && riskData.anomalies.length > 0 && !dismissedAnomalies.has('anomaly') && (
             <AnomalyBanner
-              score={0.65}
-              types={['Statistical Outlier', 'Lab Value']}
+              score={riskData.riskScore}
+              types={[
+                `${riskData.anomalies.length} statistical outlier${riskData.anomalies.length > 1 ? 's' : ''} detected`,
+              ]}
               recommendations={[
-                'Verify specimen quality and testing methodology',
-                'Consider repeat testing if clinically indicated',
-                'Review patient context for potential explanations'
+                'Review the flagged result(s) for data-entry or measurement error.',
+                'Correlate with the patient\'s clinical presentation before acting on this value.',
+                'Consider repeat testing or re-measurement if clinically indicated.',
               ]}
               onDismiss={handleDismissAnomaly}
             />
