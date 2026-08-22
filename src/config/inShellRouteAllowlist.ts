@@ -1,4 +1,4 @@
-import { CANONICAL_ROUTES } from './routes.config';
+import { CANONICAL_ROUTES, IN_SHELL_ROUTE_REDIRECTS } from './routes.config';
 import { isGovernanceWorkspacePath } from './governanceConsoleRoutes';
 import { ADMIN_CONSOLE_ROUTE_PATHS } from './adminConsoleRoutes';
 import { OPERATIONS_FLEET_CONSOLE_ROUTE_PATHS } from './operationsFleetConsoleRoutes';
@@ -26,6 +26,22 @@ function matchesPrefix(pathname: string, prefix: string) {
 /** True when the path should mount a real in-shell page instead of folding into ED redirects. */
 export function isInShellRoute(pathname = '') {
   const normalized = String(pathname || '/').split('?')[0].split('#')[0].replace(/\/+$/, '') || '/';
+
+  // HEAL-347.79: an exact-path entry in IN_SHELL_ROUTE_REDIRECTS (e.g.
+  // /customer-portal -> /admin/tenant) is a real, intentional alias, but
+  // this function previously only recognized DIRECTLY-mounted console page
+  // prefixes below -- an alias whose own path also happened to match an
+  // ED_EXTENSION_ROUTE_REDIRECTS prefix (edApplication.config.ts) was
+  // silently and permanently shadowed, since resolveEdExtensionRedirect()
+  // only skips paths this function says are "in shell". Proven live: every
+  // role hitting /customer-portal landed on /emergency/settings, the
+  // IN_SHELL_ROUTE_REDIRECTS alias never getting a chance to fire. Checking
+  // the redirect table's own registered paths here closes the gap
+  // structurally, so a future alias addition doesn't need a matching manual
+  // scrub of ED_EXTENSION_ROUTE_REDIRECTS to avoid the same shadowing.
+  if (IN_SHELL_ROUTE_REDIRECTS.some((entry) => matchesPrefix(normalized, entry.path))) {
+    return true;
+  }
 
   if (isGovernanceWorkspacePath(normalized)) {
     return true;

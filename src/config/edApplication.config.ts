@@ -86,7 +86,6 @@ export const ED_EXTENSION_ROUTE_REDIRECTS: readonly EdExtensionRedirect[] = Obje
   { prefix: '/platform-admin',            to: CANONICAL_ROUTES.emergencySettings,        reason: 'platform-admin' },
   { prefix: '/enterprise-platform',       to: CANONICAL_ROUTES.emergencySettings,        reason: 'enterprise-platform' },
   { prefix: '/trackmind',                 to: CANONICAL_ROUTES.emergencySettings,        reason: 'trackmind-extension' },
-  { prefix: '/customer-portal',           to: CANONICAL_ROUTES.emergencySettings,        reason: 'customer-portal' },
   // ── Removed redirects (real pages now exist for these paths) ───────────────
   // /executive          → ExecutiveCommandCenter
   // /ai-command-center  → AiCommandCenterDashboard
@@ -106,6 +105,15 @@ export const ED_EXTENSION_ROUTE_REDIRECTS: readonly EdExtensionRedirect[] = Obje
   // /knowledge-hub      → HealthcareKnowledgeHubPage
   // /knowledge-base     → (tools console knowledge shortcuts)
   // /live-map           → LiveTrackingMap (tools console)
+  // /customer-portal    → HEAL-347.79: this entry silently shadowed
+  //   IN_SHELL_ROUTE_REDIRECTS' /customer-portal -> /admin/tenant alias for
+  //   EVERY role (PilotExtensionRouteGuard wraps <Outlet/> above the route
+  //   tree and redirects here before the nested <Route> for /customer-portal
+  //   ever mounts) -- proven live via console instrumentation, not inferred:
+  //   /customer-portal jumped straight to /emergency/settings with the
+  //   IN_SHELL_ROUTE_REDIRECTS-driven EmergencyAliasRedirect never firing.
+  //   Same duplicate-registration bug shape as the /organization fix
+  //   (HEAL-347.74), this time the OLDER table won instead of losing.
 ]);
 
 function readEnvFlag(value: string | undefined, defaultWhenUnset: boolean): boolean {

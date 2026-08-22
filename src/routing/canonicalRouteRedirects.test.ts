@@ -151,6 +151,33 @@ describe('canonical route tree', () => {
     );
   });
 
+  it('never lets an IN_SHELL_ROUTE_REDIRECTS alias get shadowed by resolveEdExtensionRedirect', async () => {
+    // HEAL-347.79: PilotExtensionRouteGuard wraps <Outlet/> ABOVE every
+    // nested <Route>, including the ones IN_SHELL_ROUTE_REDIRECTS.map()
+    // renders -- so if resolveEdExtensionRedirect(path) returns a DIFFERENT
+    // target than the one this table declares, that Route's own
+    // EmergencyAliasRedirect never gets a chance to mount at all. Proven
+    // live for /customer-portal: every role landed on /emergency/settings
+    // (an ED_EXTENSION_ROUTE_REDIRECTS prefix match) instead of the real
+    // /admin/tenant page IN_SHELL_ROUTE_REDIRECTS declares. Fixed at the
+    // root by teaching isInShellRoute() about this table's own paths
+    // (inShellRouteAllowlist.ts) -- this test guards the whole class, not
+    // just the one instance, so a future IN_SHELL_ROUTE_REDIRECTS addition
+    // that collides with an ED_EXTENSION_ROUTE_REDIRECTS prefix fails loudly
+    // here instead of silently dead-ending in production.
+    const { resolveEdExtensionRedirect } = await import('../config/edApplication.config');
+    for (const entry of IN_SHELL_ROUTE_REDIRECTS) {
+      const exactPath = entry.path.replace(/\/\*$/, '');
+      const shadowTarget = resolveEdExtensionRedirect(exactPath);
+      expect(
+        shadowTarget === null || shadowTarget === entry.to,
+        `IN_SHELL_ROUTE_REDIRECTS entry '${entry.path}' -> '${entry.to}' is shadowed by ` +
+          `resolveEdExtensionRedirect, which resolves it to '${shadowTarget}' instead -- the ` +
+          `real alias route would never actually render.`,
+      ).toBe(true);
+    }
+  });
+
   it('redirects non-ED workspace routes while preserving CareDroid fallbacks', () => {
     expect(appSource).toContain('path="/app"');
     expect(appSource).toContain('path={CANONICAL_ROUTES.workspace}');
