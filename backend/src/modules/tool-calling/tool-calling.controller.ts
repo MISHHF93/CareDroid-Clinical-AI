@@ -10,6 +10,9 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { AuthorizationGuard } from '../auth/guards/authorization.guard';
+import { RequirePermission } from '../auth/decorators/permissions.decorator';
+import { Permission } from '../auth/enums/permission.enum';
 import { ToolExecutionService } from './tool-execution.service';
 import { ToolResolverService } from './tool-resolver.service';
 import { EntitlementService } from '../platform-assets/entitlement.service';
@@ -28,7 +31,17 @@ export class ToolCallingController {
     private readonly entitlementService: EntitlementService,
   ) {}
 
+  // HEAL-347.89: gated only by assertEntitlementLaunchFromRequest -- a
+  // subscription/feature-rollout check (plan tier + rollout state), not the
+  // RBAC Permission system. Any authenticated user whose org has the
+  // entitlement could execute arbitrary prompts against clinical AI tools
+  // regardless of clinical role. ai.controller.ts's equivalent handlers
+  // (query/structured/node/unified) all require USE_AI_CHAT on top of their
+  // own entitlement/workspace checks -- this endpoint does the same class
+  // of work and was simply missing that layer.
   @Post('execute')
+  @UseGuards(AuthorizationGuard)
+  @RequirePermission(Permission.USE_AI_CHAT)
   @HttpCode(HttpStatus.OK)
   async execute(@Body() body: ToolCallingExecuteDto, @Request() req: any) {
     await assertEntitlementLaunchFromRequest(

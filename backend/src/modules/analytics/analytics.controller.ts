@@ -14,8 +14,21 @@ export class AnalyticsController {
 
   constructor(private readonly analyticsService: AnalyticsService) {}
 
+  // HEAL-347.89: this handler had no auth guard at all -- ThrottlerGuard
+  // only rate-limits, it doesn't authenticate. Any anonymous caller could
+  // post up to 60 events/min, each with a client-declared `userId` string
+  // the backend trusted unverified, plus an unrestricted `properties`/
+  // `parameters` object. Same shape as the already-fixed telemetry-ingest
+  // gap (HEAL-347.83), but unlike that one this doesn't need to stay
+  // reachable pre-login: every real frontend caller of
+  // analyticsService.track() (DrugChecker, ToolPageLayout,
+  // fullEmergencyCareJourneyService, intakeArtifactCapture,
+  // roleIntelligenceTelemetry) lives entirely inside the authenticated
+  // clinical app -- none run on AuthPage or any pre-login surface -- so
+  // requiring JWT auth here doesn't drop any legitimate traffic the way it
+  // would have on the telemetry endpoint.
   @Post('analytics/events')
-  @UseGuards(ThrottlerGuard)
+  @UseGuards(AuthGuard('jwt'), ThrottlerGuard)
   @Throttle({ default: { limit: 60, ttl: 60000 } })
   async submitAnalyticsEvents(
     @Body() payload: AnalyticsPayloadDto,
@@ -70,6 +83,15 @@ export class AnalyticsController {
     );
   }
 
+  // Deliberately left without AuthGuard, unlike analytics/events above:
+  // crashReportingService.ts is wired to main.tsx's global window.onerror/
+  // unhandledrejection handlers at the true app root, before any auth gate
+  // mounts, specifically so a crash on the login page itself can still be
+  // reported (same reasoning as the observability/events fix, HEAL-347.83).
+  // Lower risk than that endpoint was: this DTO carries no client-declared
+  // identity field to misattribute (error name/message/stack/breadcrumbs/
+  // componentStack only) -- rate-limited via ThrottlerGuard as the
+  // appropriate defense here.
   @Post('crashes')
   @UseGuards(ThrottlerGuard)
   @Throttle({ default: { limit: 20, ttl: 60000 } })

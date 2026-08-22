@@ -16,6 +16,9 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { AuthorizationGuard } from '../../auth/guards/authorization.guard';
+import { RequirePermission } from '../../auth/decorators/permissions.decorator';
+import { Permission } from '../../auth/enums/permission.enum';
 import { ToolOrchestratorService } from './tool-orchestrator.service';
 import {
   ExecuteToolDto,
@@ -100,8 +103,19 @@ export class ToolOrchestratorController {
   /**
    * POST /tools/:id/execute
    * Execute a clinical tool
+   *
+   * HEAL-347.89: had no permission decorator at all -- executes named
+   * clinical severity/deterioration calculators (SOFA, APACHE II, NEWS2,
+   * GCS, Wells DVT, CHA2DS2-VASc) against caller-supplied vitals/lab-shaped
+   * parameters. USE_CALCULATORS matches the identical-shape precedent in
+   * chat.controller.ts's analyzeVitals -- freeform calculator execution
+   * with no patientId/chart linkage in this DTO (unlike deterioration.
+   * controller.ts's predict or protocol.controller.ts's evaluate, which
+   * require READ_PHI because they operate against a real patient record).
    */
   @Post(':id/execute')
+  @UseGuards(AuthorizationGuard)
+  @RequirePermission(Permission.USE_CALCULATORS)
   @HttpCode(HttpStatus.OK)
   async executeTool(
     @Param('id') toolId: string,
@@ -123,6 +137,8 @@ export class ToolOrchestratorController {
    * Execute any tool (alternative endpoint)
    */
   @Post('execute')
+  @UseGuards(AuthorizationGuard)
+  @RequirePermission(Permission.USE_CALCULATORS)
   @HttpCode(HttpStatus.OK)
   async executeToolGeneric(
     @Body() dto: ExecuteToolDto,
@@ -138,6 +154,8 @@ export class ToolOrchestratorController {
    * Persist tool results from offline sync
    */
   @Post('results')
+  @UseGuards(AuthorizationGuard)
+  @RequirePermission(Permission.USE_CALCULATORS)
   @HttpCode(HttpStatus.OK)
   async recordToolResult(@Body() body: RecordToolResultDto, @Request() req: any) {
     const userId = req.user?.id || 'anonymous';
