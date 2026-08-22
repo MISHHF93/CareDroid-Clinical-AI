@@ -297,7 +297,7 @@ describe('EmergencyWhiteboardService — the whiteboard, the single most-viewed 
       }
     });
 
-    it('still carries the fields the public aggregation actually needs (state, timestamps, flags)', () => {
+    it('still carries the fields the public aggregation actually needs (state, timestamps, high-risk boolean)', () => {
       const { patientService, whiteboard } = makeWhiteboard();
       const created = patientService.createPatient(makeRichPatient(), 'org-a');
 
@@ -310,14 +310,31 @@ describe('EmergencyWhiteboardService — the whiteboard, the single most-viewed 
       expect(patient).toBeDefined();
       expect(patient.state).toBeDefined();
       expect(patient.arrivalTime).toBeDefined();
-      // createPatient derives/merges flags and highRiskComplaintFlags itself
-      // (e.g. its own complaint-text detection) rather than passing input
-      // overrides through verbatim -- assert the snapshot faithfully reflects
-      // whatever createPatient actually produced, not a specific literal.
-      expect(patient.flags).toEqual(created.flags);
       expect(patient.hasHighRiskComplaintFlag).toBe(
         Boolean(created.highRiskComplaintFlags?.length),
       );
+    });
+
+    it('never exposes the raw clinical flags array -- only the booleanized hasHighRiskComplaintFlag', () => {
+      // Item found in a design-system/AI-truthfulness audit pass: `flags`
+      // (real values include SepsisAlert/DeteriorationRisk/HighRisk) used to
+      // pass straight through to this VIEW_PUBLIC_DISPLAY-only endpoint,
+      // inconsistent with hasHighRiskComplaintFlag's correct minimization
+      // right next to it, and confirmed unused by the real frontend consumer.
+      const { patientService, whiteboard } = makeWhiteboard();
+      const created = patientService.createPatient(
+        { ...makeRichPatient(), flags: ['SepsisAlert', 'DeteriorationRisk'] } as any,
+        'org-a',
+      );
+
+      const patient = whiteboard
+        .getPublicWaitingSnapshot('org-a')
+        .data.patients.find((p) => p.id === created.id)!;
+      expect(patient).toBeDefined();
+      expect(patient).not.toHaveProperty('flags');
+      const serialized = JSON.stringify(patient);
+      expect(serialized).not.toContain('SepsisAlert');
+      expect(serialized).not.toContain('DeteriorationRisk');
     });
 
     it("scopes to organization the same way getWhiteboard does (own-org and legacy/unscoped, never a different org's)", () => {

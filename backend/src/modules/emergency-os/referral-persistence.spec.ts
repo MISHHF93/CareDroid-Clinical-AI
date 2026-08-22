@@ -167,10 +167,13 @@ describe('ReferralService realtime broadcast (MB-P0-6 follow-up)', () => {
       reason: 'Chest pain workup',
     });
 
-    expect(publish).toHaveBeenCalledWith({
-      type: 'referral_created',
-      payload: { referral: result.data.referral },
-    });
+    expect(publish).toHaveBeenCalledWith(
+      {
+        type: 'referral_created',
+        payload: { referral: result.data.referral },
+      },
+      undefined,
+    );
     expect(publishBoardMutations).toHaveBeenCalledTimes(1);
   });
 
@@ -196,10 +199,13 @@ describe('ReferralService realtime broadcast (MB-P0-6 follow-up)', () => {
 
     const result = service.updateReferralStatus(referralId, 'Accepted');
 
-    expect(publish).toHaveBeenCalledWith({
-      type: 'referral_status_changed',
-      payload: { referral: result.data.referral },
-    });
+    expect(publish).toHaveBeenCalledWith(
+      {
+        type: 'referral_status_changed',
+        payload: { referral: result.data.referral },
+      },
+      undefined,
+    );
     expect(publishBoardMutations).toHaveBeenCalledTimes(1);
   });
 });

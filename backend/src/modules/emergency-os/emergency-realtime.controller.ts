@@ -6,6 +6,8 @@ import { JwtQueryAuthGuard } from './guards/jwt-query-auth.guard';
 import { AuthorizationGuard } from '../auth/guards/authorization.guard';
 import { RequirePermission } from '../auth/decorators/permissions.decorator';
 import { Permission } from '../auth/enums/permission.enum';
+import { TenantContext } from '../tenant-context/tenant-context.decorator';
+import type { TenantContext as TenantContextValue } from '../tenant-context/tenant-context.types';
 
 const HEARTBEAT_MS = 25_000;
 
@@ -32,17 +34,26 @@ const HEARTBEAT_MS = 25_000;
 export class EmergencyRealtimeController {
   constructor(private readonly realtimeService: EmergencyRealtimeService) {}
 
+  // HEAL-347.91 (tenant-scoping audit, 2026-08-22): stream() collected and broadcast
+  // every org's live whiteboard/central-node/EMS/collaboration data to every
+  // connected client on the process, with zero tenant boundary -- any authenticated
+  // user at any hospital holding ordinary READ_PHI could open this SSE connection
+  // and continuously receive every OTHER hospital's live patient names, chief
+  // complaints, states, and EMS arrivals. Now scopes both the initial snapshot and
+  // every subsequent broadcast to the connecting caller's own organization (see
+  // EmergencyRealtimeService.subscribe()'s doc comment for the filtering mechanics).
   @Sse('stream')
   @RequirePermission(Permission.READ_PHI)
-  stream(): Observable<MessageEvent> {
+  stream(@TenantContext() tenantContext?: TenantContextValue): Observable<MessageEvent> {
+    const organizationId = tenantContext?.organizationId;
     return new Observable<MessageEvent>((subscriber) => {
-      for (const event of this.realtimeService.buildInitialBurst()) {
+      for (const event of this.realtimeService.buildInitialBurst(organizationId)) {
         subscriber.next({ data: event });
       }
 
       const unsubscribe = this.realtimeService.subscribe((event) => {
         subscriber.next({ data: event });
-      });
+      }, organizationId);
 
       const heartbeat = setInterval(() => {
         subscriber.next({

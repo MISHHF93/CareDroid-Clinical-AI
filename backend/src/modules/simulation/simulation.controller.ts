@@ -19,6 +19,8 @@ import {
   StartSimulationDto,
   SubmitSimulationStepDto,
 } from './simulation.types';
+import { TenantContext } from '../tenant-context/tenant-context.decorator';
+import type { TenantContext as TenantContextValue } from '../tenant-context/tenant-context.types';
 
 @Controller('simulation')
 @UseGuards(AuthGuard('jwt'))
@@ -44,27 +46,38 @@ export class SimulationController {
 
   @Post('runs')
   @HttpCode(HttpStatus.OK)
-  startRun(@Body() body: StartSimulationDto) {
-    return this.runs.startRun(body);
+  startRun(
+    @Body() body: StartSimulationDto,
+    @TenantContext() tenantContext?: TenantContextValue,
+  ) {
+    return this.runs.startRun(body, tenantContext?.userId, tenantContext?.organizationId);
   }
 
   @Post('runs/:id/steps')
   @HttpCode(HttpStatus.OK)
-  submitStep(@Param('id') id: string, @Body() body: SubmitSimulationStepDto) {
-    return this.runs.submitStep(id, body);
+  submitStep(
+    @Param('id') id: string,
+    @Body() body: SubmitSimulationStepDto,
+    @TenantContext() tenantContext?: TenantContextValue,
+  ) {
+    return this.runs.submitStep(id, body, tenantContext?.organizationId);
   }
 
   @Post('runs/:id/complete')
   @HttpCode(HttpStatus.OK)
-  completeRun(@Param('id') id: string, @Body() body: CompleteSimulationDto) {
-    return this.runs.completeRun(id, body);
+  completeRun(
+    @Param('id') id: string,
+    @Body() body: CompleteSimulationDto,
+    @TenantContext() tenantContext?: TenantContextValue,
+  ) {
+    return this.runs.completeRun(id, body, tenantContext?.organizationId);
   }
 
   @Get('outcomes')
   @HttpCode(HttpStatus.OK)
-  getOutcomes() {
+  getOutcomes(@TenantContext() tenantContext?: TenantContextValue) {
     return {
-      ...this.outcomes.getOutcomes(),
+      ...this.outcomes.getOutcomes(tenantContext?.organizationId),
       competencyCoverage: this.competencies.getCoverage().competencies,
     };
   }

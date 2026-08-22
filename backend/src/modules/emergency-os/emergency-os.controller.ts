@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  ForbiddenException,
   Get,
   Logger,
   NotFoundException,
@@ -98,6 +99,40 @@ import {
   EvaluateDigitalTwinScenarioDto,
 } from './dto/emergency-os-actions.dto';
 
+/**
+ * Emergency roles whose own permission registry (src/config/
+ * emergencyRolePermissions.ts) grants BOTH writeVitals and manageFlags.
+ * Ported directly from that file's per-role `actions` arrays -- used by
+ * patchPatient's field-level check below since backend Permission is only
+ * as granular as WRITE_PHI and can't distinguish a state transition from a
+ * vitals/flags write on its own.
+ */
+const EMERGENCY_ROLES_ALLOWED_VITALS_FLAGS_WRITE = new Set([
+  'charge_nurse',
+  'triage_nurse',
+  'physician',
+  'admin',
+]);
+
+/**
+ * Exported standalone so it's directly unit-testable without constructing
+ * the full EmergencyOsController (many injected service dependencies, and
+ * no existing test in this codebase does that -- see
+ * authorization.wrong-role.systematic.spec.ts's own doc comment on why
+ * RBAC checks buried inside heavy controllers tend to go unexercised).
+ * Throws when a PATCH body writes vitals/flags but the caller's
+ * roleProfileId isn't one of the roles actually granted that action.
+ */
+export function assertCanWriteVitalsOrFlags(
+  roleProfileId: string | null | undefined,
+  body: { vitals?: unknown; flags?: unknown },
+): void {
+  if (!body.vitals && !body.flags) return;
+  if (!roleProfileId || !EMERGENCY_ROLES_ALLOWED_VITALS_FLAGS_WRITE.has(roleProfileId)) {
+    throw new ForbiddenException('This role cannot write vitals or manage patient safety flags.');
+  }
+}
+
 @ApiTags('emergency')
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'), AuthorizationGuard)
@@ -154,10 +189,15 @@ export class EmergencyOsController {
     return this.whiteboardService.getPublicWaitingSnapshot(tenantContext?.organizationId);
   }
 
+  // HEAL-347.91: getSnapshot() previously took no organizationId at all, so this
+  // endpoint returned every org's aggregated patient/capacity/EMS counts to any
+  // authenticated caller with READ_PHI, regardless of tenant -- found while
+  // fixing the same underlying gap in the /emergency/realtime SSE stream, which
+  // broadcasts this identical snapshot shape.
   @RequirePermission(Permission.READ_PHI)
   @Get('central-node/snapshot')
-  getCentralNodeSnapshot() {
-    return this.centralNodeService.getSnapshot();
+  getCentralNodeSnapshot(@TenantContext() tenantContext?: TenantContextValue) {
+    return this.centralNodeService.getSnapshot(tenantContext?.organizationId);
   }
 
   @RequirePermission(Permission.VIEW_OBSERVABILITY)
@@ -209,7 +249,24 @@ export class EmergencyOsController {
     @Param('patientId') patientId: string,
     @Body() body: PatchEmergencyPatientDto,
     @TenantContext() tenantContext?: TenantContextValue,
+    @Req() request?: Request,
   ) {
+    // P0 fix: this endpoint bundled state-transition, vitals, and flags
+    // writes behind one coarse WRITE_PHI check, but the frontend's own
+    // permission registry (src/config/emergencyRolePermissions.ts) treats
+    // writeVitals/manageFlags as separate, more restrictively-granted
+    // actions than a plain state transition -- only charge_nurse,
+    // triage_nurse, physician, and admin have both. Every other WRITE_PHI
+    // role that maps to UserRole.NURSE (registration_clerk, ems_user,
+    // dispatcher, ems_coordinator) could still write vitals/manage safety
+    // flags (e.g. clear a SepsisAlert/HighRisk flag) via direct API call
+    // despite the UI never exposing that control to them. State transitions
+    // alone are unaffected -- multiple roles legitimately move patients
+    // through the queue (e.g. EMS converting an arrival).
+    const roleProfileId =
+      (request as unknown as { user?: { profile?: { roleProfileId?: string | null } } })?.user
+        ?.profile?.roleProfileId ?? null;
+    assertCanWriteVitalsOrFlags(roleProfileId, body);
     // staffId/note are accepted for future audit-trail use but are not
     // EmergencyPatient fields -- only forward the real patient field(s).
     const patch: Partial<import('./emergency-os.types').EmergencyPatient> = {};
@@ -720,14 +777,17 @@ export class EmergencyOsController {
 
   @RequirePermission(Permission.READ_PHI)
   @Get('patient-flow')
-  getPatientFlow() {
-    return this.patientFlowService.getPatientFlow();
+  getPatientFlow(@TenantContext() tenantContext?: TenantContextValue) {
+    return this.patientFlowService.getPatientFlow(undefined, tenantContext?.organizationId);
   }
 
   @RequirePermission(Permission.READ_PHI)
   @Get('patient-flow/:patientId')
-  getPatientFlowForPatient(@Param('patientId') patientId: string) {
-    return this.patientFlowService.getPatientFlow(patientId);
+  getPatientFlowForPatient(
+    @Param('patientId') patientId: string,
+    @TenantContext() tenantContext?: TenantContextValue,
+  ) {
+    return this.patientFlowService.getPatientFlow(patientId, tenantContext?.organizationId);
   }
 
   @RequirePermission(Permission.READ_PHI)
@@ -1051,46 +1111,61 @@ export class EmergencyOsController {
     return this.analyticsService.getAnalytics(tenantContext?.organizationId);
   }
 
+  // HEAL-347.91: these 7 routes previously called EmergencyOsUpgradeHarnessService
+  // with no organizationId at all -- see the service's own getHarness() doc
+  // comment for the full account.
   @RequirePermission(Permission.READ_PHI)
   @Get('upgrade-harness')
-  getUpgradeHarness() {
-    return this.upgradeHarnessService.getHarness();
+  getUpgradeHarness(@TenantContext() tenantContext?: TenantContextValue) {
+    return this.upgradeHarnessService.getHarness(tenantContext?.organizationId);
   }
 
   @RequirePermission(Permission.READ_PHI)
   @Get('upgrade-harness/capacity')
-  getUpgradeHarnessCapacity() {
-    return this.upgradeHarnessService.getCapacityAndForecasting();
+  getUpgradeHarnessCapacity(@TenantContext() tenantContext?: TenantContextValue) {
+    return this.upgradeHarnessService.getCapacityAndForecasting(tenantContext?.organizationId);
   }
 
   @RequirePermission(Permission.READ_PHI)
   @Get('upgrade-harness/patient-flow')
-  getUpgradeHarnessPatientFlow() {
-    return this.upgradeHarnessService.getPatientFlow();
+  getUpgradeHarnessPatientFlow(@TenantContext() tenantContext?: TenantContextValue) {
+    return this.upgradeHarnessService.getPatientFlow(undefined, tenantContext?.organizationId);
   }
 
   @RequirePermission(Permission.READ_PHI)
   @Get('upgrade-harness/patient-flow/:patientId')
-  getUpgradeHarnessPatientFlowForPatient(@Param('patientId') patientId: string) {
-    return this.upgradeHarnessService.getPatientFlow(patientId);
+  getUpgradeHarnessPatientFlowForPatient(
+    @Param('patientId') patientId: string,
+    @TenantContext() tenantContext?: TenantContextValue,
+  ) {
+    return this.upgradeHarnessService.getPatientFlow(patientId, tenantContext?.organizationId);
   }
 
   @RequirePermission(Permission.READ_PHI)
   @Get('upgrade-harness/clinical-intelligence')
-  getUpgradeHarnessClinicalIntelligence() {
-    return this.upgradeHarnessService.getClinicalDecisionSupport();
+  getUpgradeHarnessClinicalIntelligence(@TenantContext() tenantContext?: TenantContextValue) {
+    return this.upgradeHarnessService.getClinicalDecisionSupport(
+      undefined,
+      tenantContext?.organizationId,
+    );
   }
 
   @RequirePermission(Permission.READ_PHI)
   @Get('upgrade-harness/clinical-intelligence/:patientId')
-  getUpgradeHarnessClinicalIntelligenceForPatient(@Param('patientId') patientId: string) {
-    return this.upgradeHarnessService.getClinicalDecisionSupport(patientId);
+  getUpgradeHarnessClinicalIntelligenceForPatient(
+    @Param('patientId') patientId: string,
+    @TenantContext() tenantContext?: TenantContextValue,
+  ) {
+    return this.upgradeHarnessService.getClinicalDecisionSupport(
+      patientId,
+      tenantContext?.organizationId,
+    );
   }
 
   @RequirePermission(Permission.READ_PHI)
   @Get('upgrade-harness/audit-summary')
-  getUpgradeHarnessAuditSummary() {
-    return this.upgradeHarnessService.getAuditSummary();
+  getUpgradeHarnessAuditSummary(@TenantContext() tenantContext?: TenantContextValue) {
+    return this.upgradeHarnessService.getAuditSummary(tenantContext?.organizationId);
   }
 
   @RequirePermission(Permission.CONFIGURE_SYSTEM)

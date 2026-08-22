@@ -181,14 +181,17 @@ export class WorkflowOrchestrationService {
 
   private publish(snapshot: AdministrativeAutomationSnapshot, tenant?: TenantContext) {
     const scope = resolveBackendTenantScope(tenant);
-    this.realtimeService?.publish({
-      type: 'workflow_orchestration_updated',
-      payload: {
-        snapshot,
-        tasks: snapshot.tasks,
-        tenant: scope,
+    this.realtimeService?.publish(
+      {
+        type: 'workflow_orchestration_updated',
+        payload: {
+          snapshot,
+          tasks: snapshot.tasks,
+          tenant: scope,
+        },
       },
-    });
+      scope.organizationId,
+    );
     this.operationalIntelligenceService?.publishRealtimeSignals('workflow_orchestration_updated');
   }
 }

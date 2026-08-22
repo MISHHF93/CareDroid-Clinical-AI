@@ -29,10 +29,16 @@ export class PatientFlowService {
     @Optional() private readonly operationalIntelligenceService?: OperationalIntelligenceService,
   ) {}
 
-  private buildSnapshot(patientId?: string): BackendPatientFlowSnapshot {
-    const patients = this.patientService.listPatients() as unknown as Patient[];
+  // HEAL-347.91: listPatients()/getReferrals() were called with no organizationId
+  // at all -- this service's own REST endpoints (GET /emergency-os/patient-flow[/:id])
+  // and its realtime broadcast both returned every org's full patient roster
+  // (names, chief complaints, detections, AI recommendations), found while
+  // auditing the same gap class in the /emergency/realtime SSE stream.
+  private buildSnapshot(patientId?: string, organizationId?: string): BackendPatientFlowSnapshot {
+    const patients = this.patientService.listPatients(organizationId) as unknown as Patient[];
     const referrals =
-      (this.referralService.getReferrals().data.referrals as unknown as Referral[]) || [];
+      (this.referralService.getReferrals(organizationId).data.referrals as unknown as Referral[]) ||
+      [];
     const staff = this.patientService.listStaff() as unknown as Staff[];
     const capacity = this.patientService.computeCapacity();
     const snapshot = buildBackendPatientFlowSnapshot({
@@ -57,12 +63,15 @@ export class PatientFlowService {
     });
   }
 
-  getPatientFlow(patientId?: string) {
-    const snapshot = this.buildSnapshot(patientId);
-    this.realtimeService?.publish({
-      type: 'patient_flow_updated',
-      payload: { patientFlowSnapshot: snapshot, patientId: patientId || null },
-    });
+  getPatientFlow(patientId?: string, organizationId?: string) {
+    const snapshot = this.buildSnapshot(patientId, organizationId);
+    this.realtimeService?.publish(
+      {
+        type: 'patient_flow_updated',
+        payload: { patientFlowSnapshot: snapshot, patientId: patientId || null },
+      },
+      organizationId,
+    );
     this.operationalIntelligenceService?.publishRealtimeSignals('patient_flow_updated');
     return envelope('Continuous Patient Flow Engine', {
       patientId: patientId || null,

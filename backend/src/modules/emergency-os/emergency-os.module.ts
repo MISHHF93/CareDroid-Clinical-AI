@@ -178,6 +178,6 @@ import { EmergencyOperatingSurfacesService } from './emergency-os.operating-surf
     EmergencyOperatingSurfacesService,
     EmergencyReferenceDataSeedService,
   ],
-  exports: [EmergencyPatientService, ReferralService, EMSIntakeService],
+  exports: [EmergencyPatientService, ReferralService, EMSIntakeService, WorkflowActionLogService],
 })
 export class EmergencyOsModule {}

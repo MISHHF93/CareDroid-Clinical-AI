@@ -598,6 +598,7 @@ const WORKFLOW_LOG_TITLES: Record<WorkflowActionType, string> = {
   operational_alert_dispatched: 'Operational alert dispatched',
   patient_escalated: 'Patient escalated',
   patient_duplicate_flagged: 'Duplicate patient flagged',
+  care_task_transitioned: 'Care task updated',
 };
 
 type WorkflowActionInput = Omit<
@@ -916,6 +917,24 @@ export class EmergencyPatientService implements OnModuleInit {
         take: 500,
       });
       if (!rows.length) {
+        // Item 28: never let the hardcoded demo fixture become a silent
+        // production dependency. A genuinely empty production database means
+        // zero real patients exist yet -- not "show the fixture board
+        // instead," and definitely not "persist the fixture board as if it
+        // were real," which the write-through below would otherwise do
+        // (and which then looks exactly like real rehydrated data on every
+        // later boot, with nothing distinguishing it from a real patient).
+        const envConfig = getEnvironmentConfig();
+        if (envConfig.environment.isProduction && !envConfig.auth.allowDemoAuthInProduction) {
+          this.logger.error(
+            'SAFETY: production deployment with an empty patient database -- clearing the in-memory ' +
+              'demo fixture board instead of persisting it as real patient data. Set ' +
+              'ALLOW_DEMO_AUTH_IN_PRODUCTION=true if this is an intentional hosted demo.',
+          );
+          this.patients.length = 0;
+          this.boardRehydrated = true;
+          return;
+        }
         this.logger.log('No durable patients in database — keeping fixture seed board');
         // Ensure fixture seed is written through so a cold DB starts gaining durable rows.
         for (const patient of this.patients) {
@@ -1094,10 +1113,11 @@ export class EmergencyPatientService implements OnModuleInit {
     payload: unknown,
     patient?: EmergencyPatient,
   ): void {
-    this.realtimeService?.publish({ type, payload });
-    this.realtimeService?.publishBoardMutations();
+    const organizationId = patient?.organizationId;
+    this.realtimeService?.publish({ type, payload }, organizationId);
+    this.realtimeService?.publishBoardMutations(organizationId);
     if (patient && this.isEmsPatient(patient)) {
-      this.realtimeService?.publishEmsUpdate();
+      this.realtimeService?.publishEmsUpdate(organizationId);
     }
   }
 
@@ -1484,8 +1504,8 @@ export class EmergencyPatientService implements OnModuleInit {
       severity: input.severity === 'Critical' ? 'Critical' : 'Warning',
       metadata: (input.metadata || {}) as Record<string, string | number | boolean | null>,
     });
-    this.realtimeService?.publish({ type: 'alert_created', payload: alert });
-    this.realtimeService?.publishBoardMutations();
+    this.realtimeService?.publish({ type: 'alert_created', payload: alert }, alert.organizationId);
+    this.realtimeService?.publishBoardMutations(alert.organizationId);
     return clone(alert);
   }
 
@@ -1787,8 +1807,11 @@ export class ReferralService implements OnModuleInit {
     // self-dispatched local event, not a real backend broadcast). Matches
     // the same event-type vocabulary the frontend's local-only
     // createReferral action already uses for its workflow-log entry.
-    this.realtimeService?.publish({ type: 'referral_created', payload: { referral } });
-    this.realtimeService?.publishBoardMutations();
+    this.realtimeService?.publish(
+      { type: 'referral_created', payload: { referral } },
+      referral.organizationId,
+    );
+    this.realtimeService?.publishBoardMutations(referral.organizationId);
 
     return envelope('Referral Created', {
       referral,
@@ -1810,8 +1833,13 @@ export class ReferralService implements OnModuleInit {
     referral.status = status;
     referral.statusUpdatedAt = new Date().toISOString();
     this.persistReferralToDatabase(referral);
-    this.realtimeService?.publish({ type: 'referral_status_changed', payload: { referral } });
-    this.realtimeService?.publishBoardMutations();
+    const referralOrganizationId =
+      typeof referral.organizationId === 'string' ? referral.organizationId : organizationId;
+    this.realtimeService?.publish(
+      { type: 'referral_status_changed', payload: { referral } },
+      referralOrganizationId,
+    );
+    this.realtimeService?.publishBoardMutations(referralOrganizationId);
 
     return envelope('Referral Status Updated', {
       referral,
@@ -1898,7 +1926,16 @@ export class EmergencyWhiteboardService {
         firstContactAt: patient.firstContactAt,
         queueDestination: patient.queueDestination,
         triagePending: patient.triagePending,
-        flags: Array.isArray(patient.flags) ? patient.flags : [],
+        // Was the raw flags array (real values include SepsisAlert/
+        // DeteriorationRisk/HighRisk) passed straight through to a
+        // VIEW_PUBLIC_DISPLAY-only endpoint that's supposed to be
+        // "aggregate-only, no-identifier" -- inconsistent with the adjacent
+        // hasHighRiskComplaintFlag field below, which correctly booleanizes
+        // the same kind of signal instead of exposing the raw clinical
+        // labels. Confirmed unused by the real consumer
+        // (PublicWaitingDisplay.tsx/publicWaitingDisplayModel.ts never reads
+        // `flags`), so this was pure unnecessary exposure surface, not a
+        // feature regression to preserve.
         source: (patient as { source?: string }).source,
         arrivalMode: patient.arrivalMode,
         priority: patient.priority,
@@ -2060,7 +2097,7 @@ export class EMSIntakeService implements OnModuleInit {
     // just never called from the one place that actually mutates this
     // service's own state; only EmergencyPatientService called it, and only
     // when an EMS-flagged PATIENT record changed, not an EMS ARRIVAL record.
-    this.realtimeService?.publishEmsUpdate();
+    this.realtimeService?.publishEmsUpdate(organizationId);
 
     return envelope('EMS Arrival Status', { ok: true, arrivalId: id, ...merged });
   }
@@ -2643,22 +2680,25 @@ export class ReceptionWorkspaceService {
     });
 
     // Explicit realtime event for clinical workstations (beyond generic alert_created).
-    this.realtimeService?.publish({
-      type: 'reception_escalation',
-      payload: {
-        alertId: alert.id,
-        patientId,
-        reasonId,
-        reasonLabel,
-        severity,
-        notifyTargets,
-        notifyRoles,
-        actorName,
-        detail,
-        timestamp: alert.createdAt,
-        message,
+    this.realtimeService?.publish(
+      {
+        type: 'reception_escalation',
+        payload: {
+          alertId: alert.id,
+          patientId,
+          reasonId,
+          reasonLabel,
+          severity,
+          notifyTargets,
+          notifyRoles,
+          actorName,
+          detail,
+          timestamp: alert.createdAt,
+          message,
+        },
       },
-    });
+      organizationId,
+    );
 
     this.workflowLogService.record({
       type: 'patient_escalated',
@@ -3239,8 +3279,8 @@ export class EmergencySettingsService implements OnModuleInit {
     // it just never received anything, since this service never broadcast
     // at all (same gap shape as ReferralService/EMSIntakeService before
     // HEAL-094/095).
-    this.realtimeService?.publish({ type: 'settings_updated', payload: result });
-    this.realtimeService?.publishBoardMutations();
+    this.realtimeService?.publish({ type: 'settings_updated', payload: result }, organizationId);
+    this.realtimeService?.publishBoardMutations(organizationId);
     return result;
   }
 }
@@ -3253,16 +3293,22 @@ export class CareDroidCentralNodeService {
     private readonly workflowLogService: WorkflowActionLogService,
   ) {}
 
-  getSnapshot(): EmergencyModuleEnvelope<CareDroidCentralNodeSnapshot> {
+  // HEAL-347.91: organizationId scopes the patient/alert/settings data that feeds
+  // this snapshot. capacity (computeCapacity()) stays a known, pre-existing,
+  // documented gap -- room/bed occupancy counts aggregated across every org --
+  // left unfiltered here rather than expanded mid-fix; see the emergency-realtime
+  // tenant-scoping audit for the full account. Called with no argument, this
+  // preserves the prior fully-unfiltered behavior for any not-yet-migrated caller.
+  getSnapshot(organizationId?: string): EmergencyModuleEnvelope<CareDroidCentralNodeSnapshot> {
     const generatedAt = new Date().toISOString();
-    const patients = this.patientService.listPatients();
+    const patients = this.patientService.listPatients(organizationId);
     const activePatients = patients.filter((patient) => patient.state !== 'Discharge');
     const waitingPatients = activePatients.filter((patient) => patient.state === 'Waiting');
     const waits = activePatients.map((patient) => minutesSince(patient.arrivalTime));
     const capacity = this.patientService.computeCapacity();
-    const settings = this.settingsService.getSettings().data;
+    const settings = this.settingsService.getSettings(organizationId).data;
     const operationalAlerts = this.patientService
-      .listAlerts()
+      .listAlerts(organizationId)
       .filter((alert) => !alert.dismissed)
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     const emsInbound = activePatients.filter(

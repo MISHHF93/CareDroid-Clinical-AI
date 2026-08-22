@@ -31,8 +31,20 @@ export class CollaborationRealtimeController {
   ) {}
 
   @Sse('stream')
-  stream(@Req() req: Request & { user?: { sub?: string; id?: string } }): Observable<MessageEvent> {
+  stream(
+    @Req()
+    req: Request & {
+      user?: { sub?: string; id?: string };
+      tenantContext?: { organizationId?: string };
+    },
+  ): Observable<MessageEvent> {
     const userId = req.user?.sub || req.user?.id || '';
+    // Per-channel membership filtering below (memberChannelIds) is the real
+    // security boundary here and was already tenant-safe by construction --
+    // a user simply has no membership row in another org's channel. This is
+    // defense-in-depth to match the now-scoped bus (HEAL-347.91), not a fix
+    // for a leak that existed on this specific stream.
+    const organizationId = req.tenantContext?.organizationId;
 
     return new Observable<MessageEvent>((subscriber) => {
       let memberChannelIds = new Set<string>();
@@ -54,7 +66,7 @@ export class CollaborationRealtimeController {
         const payload = (event.payload || {}) as { channelId?: string };
         if (payload.channelId && !memberChannelIds.has(payload.channelId)) return;
         subscriber.next({ data: event });
-      });
+      }, organizationId);
 
       const heartbeat = setInterval(() => {
         subscriber.next({

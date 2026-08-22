@@ -520,7 +520,10 @@ export class CollaborationHubService {
       userAgent: context.userAgent,
     });
 
-    this.realtimeService.publish({ type: 'message_created', payload: { channelId, message } });
+    this.realtimeService.publish(
+      { type: 'message_created', payload: { channelId, message } },
+      organizationId,
+    );
     // Notification fan-out and external mirroring are side effects, not part
     // of "did the message send" ΓÇö fire-and-forget so a channel with many
     // members (or a slow external provider) never adds latency to the
@@ -572,7 +575,10 @@ export class CollaborationHubService {
       }),
     );
 
-    this.realtimeService.publish({ type: 'message_created', payload: { channelId, message } });
+    this.realtimeService.publish(
+      { type: 'message_created', payload: { channelId, message } },
+      channel.organizationId,
+    );
     void this.notifyChannelMembers(channel, message, null).catch((error) => {
       this.logger.warn(
         `notifyChannelMembers failed for message ${message.id}: ${
@@ -611,15 +617,19 @@ export class CollaborationHubService {
       userAgent: context.userAgent,
     });
 
-    this.realtimeService.publish({
-      type: 'message_updated',
-      payload: { channelId: saved.channelId, message: saved },
-    });
+    this.realtimeService.publish(
+      {
+        type: 'message_updated',
+        payload: { channelId: saved.channelId, message: saved },
+      },
+      await this.channelOrganizationId(saved.channelId),
+    );
     return saved;
   }
 
   async deleteMessage(userId: string, messageId: string, context: RequestContext): Promise<void> {
     const message = await this.getOwnedMessage(messageId, userId);
+    const organizationId = await this.channelOrganizationId(message.channelId);
     message.deletedAt = new Date();
     message.deletedByUserId = userId;
     await this.messageRepo.save(message);
@@ -633,10 +643,24 @@ export class CollaborationHubService {
       userAgent: context.userAgent,
     });
 
-    this.realtimeService.publish({
-      type: 'message_deleted',
-      payload: { channelId: message.channelId, messageId },
+    this.realtimeService.publish(
+      {
+        type: 'message_deleted',
+        payload: { channelId: message.channelId, messageId },
+      },
+      organizationId,
+    );
+  }
+
+  // HEAL-347.91: editMessage/deleteMessage authorize via channel membership
+  // (getOwnedMessage), not an organizationId param, so the realtime broadcast
+  // has no org in scope without this lookup.
+  private async channelOrganizationId(channelId: string): Promise<string | undefined> {
+    const channel = await this.channelRepo.findOne({
+      where: { id: channelId },
+      select: ['organizationId'],
     });
+    return channel?.organizationId;
   }
 
   private async getOwnedMessage(messageId: string, userId: string): Promise<CollaborationMessage> {
@@ -735,10 +759,13 @@ export class CollaborationHubService {
     const reaction = await this.reactionRepo.save(
       this.reactionRepo.create({ messageId, userId, emoji }),
     );
-    this.realtimeService.publish({
-      type: 'reaction_added',
-      payload: { channelId: message.channelId, messageId, reaction },
-    });
+    this.realtimeService.publish(
+      {
+        type: 'reaction_added',
+        payload: { channelId: message.channelId, messageId, reaction },
+      },
+      organizationId,
+    );
     return reaction;
   }
 
@@ -751,10 +778,13 @@ export class CollaborationHubService {
     const { message, channel } = await this.getMessageWithChannel(messageId, organizationId);
     await this.assertAccess(channel, userId);
     await this.reactionRepo.delete({ messageId, userId, emoji });
-    this.realtimeService.publish({
-      type: 'reaction_removed',
-      payload: { channelId: message.channelId, messageId, userId, emoji },
-    });
+    this.realtimeService.publish(
+      {
+        type: 'reaction_removed',
+        payload: { channelId: message.channelId, messageId, userId, emoji },
+      },
+      organizationId,
+    );
   }
 
   async pinMessage(
@@ -767,10 +797,13 @@ export class CollaborationHubService {
     message.pinnedAt = new Date();
     message.pinnedByUserId = userId;
     const saved = await this.messageRepo.save(message);
-    this.realtimeService.publish({
-      type: 'message_pinned',
-      payload: { channelId: message.channelId, message: saved },
-    });
+    this.realtimeService.publish(
+      {
+        type: 'message_pinned',
+        payload: { channelId: message.channelId, message: saved },
+      },
+      organizationId,
+    );
     return saved;
   }
 
@@ -784,10 +817,13 @@ export class CollaborationHubService {
     message.pinnedAt = null;
     message.pinnedByUserId = null;
     const saved = await this.messageRepo.save(message);
-    this.realtimeService.publish({
-      type: 'message_unpinned',
-      payload: { channelId: message.channelId, message: saved },
-    });
+    this.realtimeService.publish(
+      {
+        type: 'message_unpinned',
+        payload: { channelId: message.channelId, message: saved },
+      },
+      organizationId,
+    );
     return saved;
   }
 
@@ -837,8 +873,16 @@ export class CollaborationHubService {
     return this.membershipRepo.save(membership);
   }
 
-  broadcastTyping(channelId: string, userId: string, isTyping: boolean): void {
-    this.realtimeService.publish({ type: 'typing', payload: { channelId, userId, isTyping } });
+  broadcastTyping(
+    channelId: string,
+    userId: string,
+    isTyping: boolean,
+    organizationId?: string,
+  ): void {
+    this.realtimeService.publish(
+      { type: 'typing', payload: { channelId, userId, isTyping } },
+      organizationId,
+    );
   }
 
   // ---------------------------------------------------------------------
@@ -879,10 +923,13 @@ export class CollaborationHubService {
       }),
     );
 
-    this.realtimeService.publish({
-      type: 'attachment_added',
-      payload: { channelId: message.channelId, messageId, attachment },
-    });
+    this.realtimeService.publish(
+      {
+        type: 'attachment_added',
+        payload: { channelId: message.channelId, messageId, attachment },
+      },
+      organizationId,
+    );
 
     return attachment;
   }

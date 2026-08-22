@@ -229,7 +229,12 @@ export class CollaborationHubController {
   @Post('channels/:channelId/typing')
   @ApiOperation({ summary: 'Broadcast a typing indicator (ephemeral, not persisted)' })
   async typing(@Req() req: any, @Param('channelId') channelId: string, @Body() body: TypingDto) {
-    this.collaborationHubService.broadcastTyping(channelId, req.user.id, Boolean(body?.isTyping));
+    this.collaborationHubService.broadcastTyping(
+      channelId,
+      req.user.id,
+      Boolean(body?.isTyping),
+      req.tenantContext?.organizationId,
+    );
     return { ok: true };
   }
 

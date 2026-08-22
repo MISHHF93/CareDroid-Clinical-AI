@@ -40,6 +40,12 @@ export interface SimulationRun {
     selectedActions?: string[];
     submittedAt: string;
   }>;
+  // HEAL-347.91: this module-singleton in-memory array had no owner/tenant
+  // concept at all -- any authenticated user of any org who knew/observed a
+  // runId could submit steps to or complete another org's in-progress
+  // training exercise. Absent on legacy in-flight runs from before this fix.
+  userId?: string;
+  organizationId?: string;
 }
 
 import { IsArray, IsOptional, IsString, MaxLength } from 'class-validator';

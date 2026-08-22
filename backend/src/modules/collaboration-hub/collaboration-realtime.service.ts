@@ -5,6 +5,11 @@ export type CollaborationRealtimeEvent = {
   type: string;
   payload?: unknown;
   receivedAt?: string;
+  // See EmergencyRealtimeService's identical field for the full rationale
+  // (HEAL-347.91): absent means broadcast to everyone (heartbeat, or a
+  // not-yet-migrated caller failing open to the pre-fix behavior); present
+  // means deliver only to subscribers connected under that same organization.
+  organizationId?: string;
 };
 
 type RealtimeSubscriber = (event: CollaborationRealtimeEvent) => void;
@@ -40,20 +45,31 @@ export class CollaborationRealtimeService implements OnModuleDestroy {
     return this.subscriberCount;
   }
 
-  publish(event: { type: string; payload?: unknown }): void {
+  publish(event: { type: string; payload?: unknown }, organizationId?: string): void {
     const normalized: CollaborationRealtimeEvent = {
       type: normalizeEventType(event.type),
       payload: event.payload,
       receivedAt: new Date().toISOString(),
+      organizationId,
     };
     this.bus.emit('event', normalized);
   }
 
-  subscribe(handler: RealtimeSubscriber): () => void {
+  // HEAL-347.91: this bus is a single process-wide EventEmitter shared by every
+  // connected SSE client regardless of hospital tenant -- see
+  // EmergencyRealtimeService.subscribe()'s doc comment for the full incident
+  // account (found via the same audit). Before this fix every collaboration
+  // message, reaction, pin, and typing indicator from any org was broadcast to
+  // every other org's connected clients.
+  subscribe(handler: RealtimeSubscriber, organizationId?: string): () => void {
     this.subscriberCount += 1;
-    this.bus.on('event', handler);
+    const scopedHandler: RealtimeSubscriber = (event) => {
+      if (event.organizationId && event.organizationId !== organizationId) return;
+      handler(event);
+    };
+    this.bus.on('event', scopedHandler);
     return () => {
-      this.bus.off('event', handler);
+      this.bus.off('event', scopedHandler);
       this.subscriberCount = Math.max(0, this.subscriberCount - 1);
     };
   }

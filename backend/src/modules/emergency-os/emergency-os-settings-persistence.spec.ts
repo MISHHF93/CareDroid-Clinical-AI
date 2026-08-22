@@ -170,7 +170,10 @@ describe('EmergencySettingsService realtime broadcast (MB-P0-6 follow-up)', () =
 
     const result = service.updateSettings({ tenantName: 'Broadcast General' }, 'org-broadcast');
 
-    expect(publish).toHaveBeenCalledWith({ type: 'settings_updated', payload: result });
+    expect(publish).toHaveBeenCalledWith(
+      { type: 'settings_updated', payload: result },
+      'org-broadcast',
+    );
     expect(publishBoardMutations).toHaveBeenCalledTimes(1);
     expect((result.data as { tenantName: string }).tenantName).toBe('Broadcast General');
   });

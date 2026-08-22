@@ -109,11 +109,27 @@ export class EmergencyOsUpgradeHarnessService {
     private readonly workflowLogService: WorkflowActionLogService,
   ) {}
 
-  getHarness(): EmergencyModuleEnvelope<AdvancedEmergencyOsUpgradeHarness> {
+  // HEAL-347.91: every signal-builder below traces back to activePatients(),
+  // which called EmergencyPatientService.listPatients() with no organizationId
+  // at all -- every one of this harness's 5 endpoints returned every org's real
+  // patient roster (unit assignments, high-risk flags, capacity/forecast bands
+  // derived from cross-tenant patient counts) to any authenticated caller with
+  // READ_PHI. Found while auditing the same gap class in the
+  // /emergency/realtime SSE stream and the sibling PatientFlowService.
+  getHarness(
+    organizationId?: string,
+  ): EmergencyModuleEnvelope<AdvancedEmergencyOsUpgradeHarness> {
     const generatedAt = new Date().toISOString();
-    const capacityAndForecasting = this.buildCapacityAndForecastingSignals(generatedAt);
-    const patientFlow = this.buildPatientFlowSignals(generatedAt);
-    const clinicalDecisionSupport = this.buildClinicalDecisionSupportSignals(generatedAt);
+    const capacityAndForecasting = this.buildCapacityAndForecastingSignals(
+      generatedAt,
+      organizationId,
+    );
+    const patientFlow = this.buildPatientFlowSignals(generatedAt, undefined, organizationId);
+    const clinicalDecisionSupport = this.buildClinicalDecisionSupportSignals(
+      generatedAt,
+      undefined,
+      organizationId,
+    );
     const governance = this.buildGovernanceSignals(generatedAt, [
       ...capacityAndForecasting,
       ...patientFlow,
@@ -148,24 +164,24 @@ export class EmergencyOsUpgradeHarnessService {
     });
   }
 
-  getCapacityAndForecasting() {
+  getCapacityAndForecasting(organizationId?: string) {
     const generatedAt = new Date().toISOString();
     this.recordHarnessAudit('capacity', 'Capacity and 10-hour forecasting harness generated.');
     return envelope('Advanced CareDroid Capacity Upgrade Harness', {
-      signals: this.buildCapacityAndForecastingSignals(generatedAt),
+      signals: this.buildCapacityAndForecastingSignals(generatedAt, organizationId),
     });
   }
 
-  getPatientFlow(patientId?: string) {
+  getPatientFlow(patientId?: string, organizationId?: string) {
     const generatedAt = new Date().toISOString();
     this.recordHarnessAudit('patient-flow', 'Patient flow upgrade harness generated.', patientId);
     return envelope('Advanced CareDroid Patient Flow Upgrade Harness', {
       patientId: patientId || null,
-      signals: this.buildPatientFlowSignals(generatedAt, patientId),
+      signals: this.buildPatientFlowSignals(generatedAt, patientId, organizationId),
     });
   }
 
-  getClinicalDecisionSupport(patientId?: string) {
+  getClinicalDecisionSupport(patientId?: string, organizationId?: string) {
     const generatedAt = new Date().toISOString();
     this.recordHarnessAudit(
       'clinical-intelligence',
@@ -174,16 +190,16 @@ export class EmergencyOsUpgradeHarnessService {
     );
     return envelope('Advanced CareDroid Clinical Intelligence Upgrade Harness', {
       patientId: patientId || null,
-      signals: this.buildClinicalDecisionSupportSignals(generatedAt, patientId),
+      signals: this.buildClinicalDecisionSupportSignals(generatedAt, patientId, organizationId),
     });
   }
 
-  getAuditSummary() {
+  getAuditSummary(organizationId?: string) {
     const generatedAt = new Date().toISOString();
     const signals = [
-      ...this.buildCapacityAndForecastingSignals(generatedAt),
-      ...this.buildPatientFlowSignals(generatedAt),
-      ...this.buildClinicalDecisionSupportSignals(generatedAt),
+      ...this.buildCapacityAndForecastingSignals(generatedAt, organizationId),
+      ...this.buildPatientFlowSignals(generatedAt, undefined, organizationId),
+      ...this.buildClinicalDecisionSupportSignals(generatedAt, undefined, organizationId),
     ];
     this.recordHarnessAudit('audit-summary', 'Immutable audit abstraction summary generated.');
     return envelope('Advanced CareDroid Upgrade Audit Summary', {
@@ -194,8 +210,9 @@ export class EmergencyOsUpgradeHarnessService {
 
   private buildCapacityAndForecastingSignals(
     generatedAt: string,
+    organizationId?: string,
   ): Array<UpgradeHarnessSignal<Record<string, unknown>>> {
-    const patients = this.activePatients();
+    const patients = this.activePatients(organizationId);
     const capacity = this.patientService.computeCapacity();
     const waiting = patients.filter((patient) => patient.state === 'Waiting').length;
     const highRisk = patients.filter(isHighRisk).length;
@@ -312,9 +329,10 @@ export class EmergencyOsUpgradeHarnessService {
   private buildPatientFlowSignals(
     generatedAt: string,
     patientId?: string,
+    organizationId?: string,
   ): Array<UpgradeHarnessSignal<Record<string, unknown>>> {
-    const patients = this.patientsFor(patientId);
-    const activePatients = this.activePatients();
+    const patients = this.patientsFor(patientId, organizationId);
+    const activePatients = this.activePatients(organizationId);
     const modularUnits = ['cardiac', 'respiratory', 'mental-health', 'infection', 'fast-track'].map(
       (unit) => {
         const assigned = activePatients.filter((patient) => this.pathologyUnit(patient) === unit);
@@ -453,9 +471,10 @@ export class EmergencyOsUpgradeHarnessService {
   private buildClinicalDecisionSupportSignals(
     generatedAt: string,
     patientId?: string,
+    organizationId?: string,
   ): Array<UpgradeHarnessSignal<Record<string, unknown>>> {
-    const patients = this.patientsFor(patientId);
-    const activePatients = this.activePatients();
+    const patients = this.patientsFor(patientId, organizationId);
+    const activePatients = this.activePatients(organizationId);
     const highRiskPatients = patients.filter(isHighRisk);
 
     const cdssSignal = this.signal(
@@ -653,14 +672,16 @@ export class EmergencyOsUpgradeHarnessService {
     };
   }
 
-  private patientsFor(patientId?: string): EmergencyPatient[] {
-    const patients = this.activePatients();
+  private patientsFor(patientId?: string, organizationId?: string): EmergencyPatient[] {
+    const patients = this.activePatients(organizationId);
     if (!patientId) return patients;
     return patients.filter((patient) => patient.id === patientId);
   }
 
-  private activePatients(): EmergencyPatient[] {
-    return this.patientService.listPatients().filter((patient) => patient.state !== 'Discharge');
+  private activePatients(organizationId?: string): EmergencyPatient[] {
+    return this.patientService
+      .listPatients(organizationId)
+      .filter((patient) => patient.state !== 'Discharge');
   }
 
   private pathologyUnit(patient: EmergencyPatient): string {
