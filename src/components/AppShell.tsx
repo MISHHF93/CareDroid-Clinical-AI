@@ -1027,7 +1027,23 @@ function AppShellFrame({ children }: AppShellProps) {
       }
 
       if (e.key.toLowerCase() === 'r' && !e.metaKey && !e.ctrlKey && !e.altKey && !e.repeat) {
-        if (screenCapabilities.showReassessAction) {
+        // HEAL-347.84: screenCapabilities.showReassessAction is a pure
+        // screen-mode/device flag (useScreenModeCapabilities.ts) -- it has no
+        // awareness of the current role at all, unlike the identical-shape
+        // 'd' shortcut just above, which already checks canAccessRoute(). A
+        // role with no /emergency/reassessment access (registration-clerk,
+        // read-only-viewer) could open ReassessmentDrawer -- which itself
+        // also has zero permission check of its own -- purely because their
+        // device happened to be in a clinical screen mode. The backend's
+        // reassess/dismiss endpoints already require WRITE_PHI (confirmed via
+        // the backend authorization audit, HEAL-347.83), so this was never a
+        // real PHI-disclosure gap, but it let an unauthorized role open a
+        // write-capable clinical UI it can't actually use -- fixed the same
+        // way the route-level guard already does it.
+        if (
+          screenCapabilities.showReassessAction &&
+          emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyReassessment)
+        ) {
           e.preventDefault();
           setShowReassessmentDrawer((open) => !open);
         }
@@ -1069,7 +1085,12 @@ function AppShellFrame({ children }: AppShellProps) {
       setShowReassessmentDrawer(false);
     };
     const openReassessmentDrawer = () => {
-      if (screenCapabilities.showReassessAction) setShowReassessmentDrawer(true);
+      if (
+        screenCapabilities.showReassessAction &&
+        emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyReassessment)
+      ) {
+        setShowReassessmentDrawer(true);
+      }
     };
     document.addEventListener('open-command-palette', openPalette);
     document.addEventListener('open-reassessment', openReassessmentDrawer);
@@ -1081,7 +1102,7 @@ function AppShellFrame({ children }: AppShellProps) {
       document.removeEventListener('open-reassessment-drawer', openReassessmentDrawer);
       document.removeEventListener('close-all-panels', closePanels);
     };
-  }, [screenCapabilities.showReassessAction]);
+  }, [screenCapabilities.showReassessAction, emergencyRole]);
 
   useEffect(() => {
     const openTools = (event: Event) => {
@@ -1302,7 +1323,10 @@ function AppShellFrame({ children }: AppShellProps) {
 
         </Suspense>
       </ErrorBoundary>
-      {showReassessmentDrawer && screenCapabilities.showReassessAction && !useKioskShell ? (
+      {showReassessmentDrawer &&
+      screenCapabilities.showReassessAction &&
+      emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyReassessment) &&
+      !useKioskShell ? (
         <ErrorBoundary fallbackText="Reassessment drawer encountered an error.">
           <Suspense fallback={null}>
             <ReassessmentDrawer
