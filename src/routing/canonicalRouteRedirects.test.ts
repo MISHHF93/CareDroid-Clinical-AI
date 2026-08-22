@@ -178,6 +178,55 @@ describe('canonical route tree', () => {
     }
   });
 
+  it('never lets resolveEdExtensionRedirect intercept a real nav-visible destination', async () => {
+    // HEAL-347.80: the general form of the /customer-portal (347.79) and
+    // /workspaces (347.80) bugs -- ED_EXTENSION_ROUTE_REDIRECTS exists to
+    // fold DEFUNCT non-ED-app extension paths back into the app, not to
+    // intercept real, currently nav-visible destinations. Any nav item whose
+    // path resolveEdExtensionRedirect() claims for itself is either a route
+    // that's about to have the exact same silent-shadow bug those two fixes
+    // closed, or a genuinely dead nav entry that should be removed instead
+    // (see HEAL-347.78's 9-entry sweep) -- either way this should never be
+    // silently true, so it's asserted here across every nav item at once
+    // rather than one path at a time as new instances are found.
+    // These 4 are a DIFFERENT case from /customer-portal and /workspaces:
+    // all carry real, dedicated trackMindPermission grants
+    // (trackmind.workspace.view / .enterprise.view / .intelligence.view) and
+    // platform-admin has its own MANAGE_USERS/CONFIGURE_SYSTEM buckets plus
+    // heavy cross-references in trackMindWorkspaceModel.ts -- clear ongoing
+    // investment in a still-being-built TrackMind subsystem, not abandoned
+    // pivot debris like HEAL-347.78's 9-entry sweep. No <Route> exists for
+    // any of the four anywhere in the app (confirmed via exhaustive grep), so
+    // removing the ED_EXTENSION_ROUTE_REDIRECTS shadow would trade a soft
+    // /emergency/settings landing for a bare EmergencyDefaultRedirect
+    // fallback -- no functional improvement without an actual page. Whether
+    // to build these pages or retire the nav entries is a product decision
+    // outside a route-collision bug-fix pass; tracked as a known gap instead
+    // of silently passing or endlessly re-discovering it.
+    const KNOWN_MISSING_TRACKMIND_PAGES = new Set(['/platform-admin', '/trackmind', '/enterprise-platform', '/platform-intelligence']);
+    const { resolveEdExtensionRedirect } = await import('../config/edApplication.config');
+    const { APP_SHELL_NAV_ITEMS, ACCOUNT_UTILITY_NAV_ITEMS, SOLUTIONS_SIDEBAR_NAV_ITEMS, OPERATIONS_SIDEBAR_NAV_ITEMS, ADVANCED_SIDEBAR_NAV_ITEMS } = await import('../config/navigation.config');
+    const navItemArrays = [APP_SHELL_NAV_ITEMS, ACCOUNT_UTILITY_NAV_ITEMS, SOLUTIONS_SIDEBAR_NAV_ITEMS, OPERATIONS_SIDEBAR_NAV_ITEMS, ADVANCED_SIDEBAR_NAV_ITEMS];
+    const seenPaths = new Set<string>();
+    const shadowed: Array<{ id: string; path: string; shadowTarget: string }> = [];
+    for (const items of navItemArrays) {
+      for (const item of (items as Array<{ id?: string; path?: string; kind?: string }>)) {
+        if (!item.path || item.kind === 'action' || seenPaths.has(item.path)) continue;
+        seenPaths.add(item.path);
+        if (KNOWN_MISSING_TRACKMIND_PAGES.has(item.path)) continue;
+        const shadowTarget = resolveEdExtensionRedirect(item.path);
+        if (shadowTarget !== null) {
+          shadowed.push({ id: item.id || item.path, path: item.path, shadowTarget });
+        }
+      }
+    }
+    expect(
+      shadowed,
+      `Nav-visible route(s) newly shadowed by resolveEdExtensionRedirect, not in the known TrackMind ` +
+        `gap set above (same bug shape as the /customer-portal and /workspaces fixes): ${JSON.stringify(shadowed)}`,
+    ).toEqual([]);
+  });
+
   it('redirects non-ED workspace routes while preserving CareDroid fallbacks', () => {
     expect(appSource).toContain('path="/app"');
     expect(appSource).toContain('path={CANONICAL_ROUTES.workspace}');
