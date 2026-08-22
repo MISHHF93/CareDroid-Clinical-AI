@@ -3,6 +3,19 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import { AiChiefRouteRecommendationsPanel } from './AiChiefRouteRecommendationsPanel';
+import { PERMISSIVE_EMERGENCY_ROLE_MOCK, withEmergencyRoleMock } from '../../test/permissiveEmergencyRoleMock';
+import { EMERGENCY_ACTIONS } from '../../config/emergencyRolePermissions';
+
+// HEAL-347.88: handleAccept now checks emergencyRole.presentAction(EMERGENCY_ACTIONS.
+// escalatePatient) before calling escalatePatient() -- default to a permissive role (the
+// real hook needs full store/route context this render tree doesn't provide) so the
+// existing escalation-flow test below keeps exercising an allowed role; the dedicated
+// authorization test at the bottom of this file overrides it per-test.
+let currentRoleMock: any = PERMISSIVE_EMERGENCY_ROLE_MOCK;
+vi.mock('../../hooks/useEmergencyRolePermissions', () => ({
+  useEmergencyRolePermissions: () => currentRoleMock,
+  default: () => currentRoleMock,
+}));
 
 const mockEscalate = vi.fn();
 const mockSelectPatient = vi.fn();
@@ -75,6 +88,7 @@ vi.mock('../../services/careDroidInteractionFeedback', () => ({
 describe('AiChiefRouteRecommendationsPanel', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    currentRoleMock = PERMISSIVE_EMERGENCY_ROLE_MOCK;
   });
 
   it('renders orchestrator recommendations with advisory safety copy', () => {
@@ -165,5 +179,32 @@ describe('AiChiefRouteRecommendationsPanel', () => {
     );
 
     expect(screen.getByText(/department signals appear stable/i)).toBeInTheDocument();
+  });
+
+  it('HEAL-347.88: disables Accept for an escalation recommendation and never calls escalatePatient, for a role without escalatePatient permission', async () => {
+    currentRoleMock = withEmergencyRoleMock({
+      presentAction: (actionId: string) => ({
+        state: 'A',
+        visible: true,
+        enabled: actionId !== EMERGENCY_ACTIONS.escalatePatient,
+        readOnly: false,
+        permission: null,
+      }),
+    });
+
+    render(
+      <MemoryRouter>
+        <AiChiefRouteRecommendationsPanel />
+      </MemoryRouter>,
+    );
+
+    const acceptButton = screen.getByRole('button', { name: /^accept$/i });
+    expect(acceptButton).toBeDisabled();
+
+    const { confirmCareDroidAction } = await import('../../services/careDroidInteractionFeedback');
+    acceptButton.click();
+
+    expect(confirmCareDroidAction).not.toHaveBeenCalled();
+    expect(mockEscalate).not.toHaveBeenCalled();
   });
 });

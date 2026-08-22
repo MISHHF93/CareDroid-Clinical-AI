@@ -6,6 +6,8 @@ import type { AiChiefExplainableRecommendation } from '../../config/aiChiefOrche
 import useAiChiefOrchestrator from '../../hooks/useAiChiefOrchestrator';
 import useProfileNavigate from '../../hooks/useProfileNavigate';
 import { useEmergencyStore } from '../../store/emergencyStore';
+import { useEmergencyRolePermissions } from '../../hooks/useEmergencyRolePermissions';
+import { EMERGENCY_ACTIONS } from '../../config/emergencyRolePermissions';
 import {
   confirmCareDroidAction,
   showActionSuccess,
@@ -24,6 +26,10 @@ const TONE_LABELS: Record<AiChiefExplainableRecommendation['tone'], string> = {
 
 const RECOMMENDATION_LIMIT = 8;
 
+function recommendationRequiresEscalation(recommendation: AiChiefExplainableRecommendation): boolean {
+  return Boolean(recommendation.patientId) && /escalat|assign physician|reassess/i.test(recommendation.action);
+}
+
 type AiChiefRouteRecommendationsPanelProps = Readonly<{
   limit?: number;
 }>;
@@ -36,6 +42,14 @@ export function AiChiefRouteRecommendationsPanel({
   const patients = useEmergencyStore((state) => state.patients);
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
   const escalatePatient = useEmergencyStore((state) => state.escalatePatient);
+  // HEAL-347.88: PatientDetailPanel.tsx already gates its own Escalate
+  // button via emergencyRole.presentAction(EMERGENCY_ACTIONS.escalatePatient)
+  // -- this AI-recommendation panel calls the exact same store action
+  // (escalatePatient) with no permission check at all, reachable from the
+  // Copilot route (gated only by USE_AI_CHAT, a much broader permission
+  // than clinical escalation authority).
+  const emergencyRole = useEmergencyRolePermissions();
+  const canEscalate = emergencyRole.presentAction(EMERGENCY_ACTIONS.escalatePatient).enabled;
 
   const [dismissed, setDismissed] = useState<Set<string>>(() => new Set());
   const [accepted, setAccepted] = useState<Set<string>>(() => new Set());
@@ -66,9 +80,9 @@ export function AiChiefRouteRecommendationsPanel({
 
   const handleAccept = useCallback(
     async (recommendation: AiChiefExplainableRecommendation) => {
-      const shouldEscalate =
-        Boolean(recommendation.patientId) &&
-        /escalat|assign physician|reassess/i.test(recommendation.action);
+      const shouldEscalate = recommendationRequiresEscalation(recommendation);
+
+      if (shouldEscalate && !canEscalate) return;
 
       if (shouldEscalate && recommendation.patientId) {
         const confirmed = await confirmCareDroidAction({
@@ -97,7 +111,7 @@ export function AiChiefRouteRecommendationsPanel({
 
       setAccepted((previous) => new Set([...previous, recommendation.id]));
     },
-    [escalatePatient, profileNavigate, selectPatient],
+    [canEscalate, escalatePatient, profileNavigate, selectPatient],
   );
 
   if (allRecommendations.length === 0) {
@@ -190,6 +204,7 @@ export function AiChiefRouteRecommendationsPanel({
                   <button
                     type="button"
                     className="cd-ai-actions__button"
+                    disabled={recommendationRequiresEscalation(recommendation) && !canEscalate}
                     onClick={() => void handleAccept(recommendation)}
                   >
                     Accept
