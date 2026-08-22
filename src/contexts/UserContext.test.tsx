@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { UserProvider, useUser } from './UserContext';
+import { useEmergencyStore } from '../store/emergencyStore';
 
 vi.mock('../services/devBackendAuth', () => ({
   ensureDevBackendSession: vi.fn().mockResolvedValue({ token: 'dev-bypass-token', source: 'mock' }),
@@ -64,6 +65,104 @@ describe('UserContext setUser', () => {
     });
 
     expect(result.current.user.authMode).toBe('real');
+  });
+});
+
+// Item 37: PHI-adjacent state (the currently-selected patient, and anything
+// else listening for a session change) must not survive a sign-out or a
+// real role switch. A re-hydration of the SAME identity must NOT wipe it --
+// only an actual identity change should trigger the clear.
+describe('UserContext PHI-context clearing on sign-out / role switch (item 37)', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    useEmergencyStore.getState().selectPatient('patient-should-be-cleared');
+  });
+
+  it('clears the selected patient on signOut', async () => {
+    const { result } = renderHook(() => useUser(), { wrapper });
+    await act(async () => {});
+
+    expect(useEmergencyStore.getState().selectedPatientId).toBe('patient-should-be-cleared');
+
+    act(() => {
+      result.current.signOut();
+    });
+
+    expect(useEmergencyStore.getState().selectedPatientId).toBeNull();
+  });
+
+  it('dispatches close-all-panels and a dedicated session-context-clear event on signOut', async () => {
+    const { result } = renderHook(() => useUser(), { wrapper });
+    await act(async () => {});
+
+    const closeAllPanels = vi.fn();
+    const clearSessionContext = vi.fn();
+    window.addEventListener('close-all-panels', closeAllPanels);
+    window.addEventListener('caredroid:clear-session-context', clearSessionContext);
+
+    act(() => {
+      result.current.signOut();
+    });
+
+    expect(closeAllPanels).toHaveBeenCalledTimes(1);
+    expect(clearSessionContext).toHaveBeenCalledTimes(1);
+
+    window.removeEventListener('close-all-panels', closeAllPanels);
+    window.removeEventListener('caredroid:clear-session-context', clearSessionContext);
+  });
+
+  it('clears the selected patient when setUser switches to a genuinely different identity', async () => {
+    const { result } = renderHook(() => useUser(), { wrapper });
+    await act(async () => {});
+
+    act(() => {
+      result.current.setUser({
+        id: 'user-a',
+        email: 'a@hospital.org',
+        role: 'physician',
+        authMode: 'explicit-dev-bypass',
+        profile: { roleProfileId: 'physician' },
+      });
+    });
+    useEmergencyStore.getState().selectPatient('patient-should-be-cleared');
+
+    act(() => {
+      result.current.setUser({
+        id: 'user-b',
+        email: 'b@hospital.org',
+        role: 'triage_nurse',
+        authMode: 'explicit-dev-bypass',
+        profile: { roleProfileId: 'triage_nurse' },
+      });
+    });
+
+    expect(useEmergencyStore.getState().selectedPatientId).toBeNull();
+  });
+
+  it('does NOT clear the selected patient when setUser re-hydrates the SAME identity', async () => {
+    const { result } = renderHook(() => useUser(), { wrapper });
+    await act(async () => {});
+
+    act(() => {
+      result.current.setUser({
+        id: 'user-a',
+        email: 'a@hospital.org',
+        role: 'physician',
+        authMode: 'explicit-dev-bypass',
+        profile: { roleProfileId: 'physician' },
+      });
+    });
+    useEmergencyStore.getState().selectPatient('patient-should-survive');
+
+    act(() => {
+      // Same id + same role -- e.g. a background token refresh, not a real switch.
+      result.current.setUser({
+        ...result.current.user,
+        email: 'a@hospital.org',
+      });
+    });
+
+    expect(useEmergencyStore.getState().selectedPatientId).toBe('patient-should-survive');
   });
 });
 

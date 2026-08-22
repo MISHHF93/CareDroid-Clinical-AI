@@ -14,6 +14,7 @@ export const BACKEND_HTTP_ROUTES = Object.freeze([
   { method: 'GET', path: '/api/settings/features', controller: 'SettingsFeaturesController' },
   { method: 'PATCH', path: '/api/settings/features', controller: 'SettingsFeaturesController' },
   { method: 'GET', path: '/api/emergency/whiteboard', controller: 'EmergencyOsController' },
+  { method: 'GET', path: '/api/emergency/public-waiting-snapshot', controller: 'EmergencyOsController' },
   { method: 'GET', path: '/api/emergency/central-node/snapshot', controller: 'EmergencyOsController' },
   { method: 'GET', path: '/api/emergency/patients', controller: 'EmergencyOsController' },
   { method: 'POST', path: '/api/emergency/patients', controller: 'EmergencyOsController' },
@@ -399,6 +400,10 @@ export const BACKEND_HTTP_ROUTES = Object.freeze([
     controller: 'PlatformSystemsController',
   },
   { method: 'GET', path: '/api/ai-governance/summary', controller: 'GovernanceController' },
+  { method: 'POST', path: '/api/ai-feedback', controller: 'AiFeedbackController' },
+  { method: 'GET', path: '/api/ai-feedback', controller: 'AiFeedbackController' },
+  { method: 'POST', path: '/api/surface-views/:surfaceKey', controller: 'SurfaceViewsController' },
+  { method: 'GET', path: '/api/surface-views', controller: 'SurfaceViewsController' },
   { method: 'GET', path: '/api/v1/governance/registry', controller: 'AIGovernanceV1Controller' },
   { method: 'GET', path: '/api/v1/governance/safety-rules', controller: 'AIGovernanceV1Controller' },
   { method: 'GET', path: '/api/v1/governance/compliance', controller: 'AIGovernanceV1Controller' },
@@ -996,6 +1001,9 @@ export const BACKEND_HTTP_ROUTES = Object.freeze([
   { method: 'POST', path: '/api/emergency/reception/escalation', controller: 'EmergencyOsController' },
   { method: 'POST', path: '/api/emergency/triage/assist', controller: 'EmergencyOsController' },
 
+  { method: 'GET', path: '/api/emergency/care-operations/inbox', controller: 'CareOperationsController' },
+  { method: 'PATCH', path: '/api/emergency/care-operations/inbox/:id', controller: 'CareOperationsController' },
+
   { method: 'GET', path: '/api/native-ai/drift', controller: 'NativeAiController' },
   { method: 'POST', path: '/api/native-ai/drift/evaluate', controller: 'NativeAiController' },
   { method: 'GET', path: '/api/native-ai/registry', controller: 'NativeAiController' },
@@ -1265,7 +1273,17 @@ export function routePatternMatches(callPath, routePath) {
  */
 export function findBackendRoute(method, path) {
   const m = method.toUpperCase();
-  return BACKEND_HTTP_ROUTES.find((r) => r.method === m && routePatternMatches(path, r.path));
+  const candidates = BACKEND_HTTP_ROUTES.filter((r) => r.method === m && routePatternMatches(path, r.path));
+  if (candidates.length <= 1) return candidates[0];
+  // Multiple routes can match the same call when a static segment (e.g. "context")
+  // collides with an earlier param route (e.g. ":workspaceId") at the same position.
+  // Prefer the most specific match — the one using the fewest wildcard segments —
+  // instead of array order, which silently misattributed wiring in that exact shape.
+  return candidates.reduce((best, candidate) => {
+    const wildcards = (routePath) =>
+      normalizeRoutePattern(routePath).split('/').filter((part) => part === ':param').length;
+    return wildcards(candidate.path) < wildcards(best.path) ? candidate : best;
+  });
 }
 
 export function listBackendRoutePaths() {

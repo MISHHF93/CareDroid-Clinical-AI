@@ -61,6 +61,9 @@ import { MetricChip } from './ui/CareDroidPrimitives';
 import { persistCopilotInteractionSafely } from '../services/emergencyOsApi';
 import { AccountableRecommendationCard } from './ai/AccountableRecommendationCard';
 import AiRouteMetadata from './chat/AiRouteMetadata';
+import { AiTruthLabel, fromAIResponseSourceCategory } from './ai/AiTruthLabel';
+import { isAiResponseSourceCategory } from '../../lib/ai/provenanceContract';
+import AiFeedbackControl from './ai/AiFeedbackControl';
 import { accountableFromGatewayPayload } from '../utils/accountableFromGateway';
 import { abstainFromAiFailure } from '../services/aiFailureAbstention';
 import { normalizeAiFoundationMetadata } from '../services/clinicalChatService';
@@ -77,6 +80,10 @@ type CopilotMessage = {
   /** CareDroid gateway + unified AI node routing snapshot */
   aiFoundation?: Record<string, unknown>;
   aiGateway?: Record<string, unknown>;
+  /** Real-vs-fallback provenance (lib/ai/provenanceContract.ts) -- distinct from
+   * aiGateway.fallbackApplied, which describes routing-tier model escalation, not
+   * "the AI call failed and this is a canned deterministic response instead." */
+  responseSource?: string;
 };
 
 type StoreCopilotMessage = ReturnType<typeof useEmergencyStore.getState>['copilotMessages'][number];
@@ -475,6 +482,22 @@ export function CopilotPanel() {
   }, [welcomeMessage]);
   const [input, setInput] = useState('');
   const [attachments, setAttachments] = useState<CopilotAttachment[]>([]);
+  // Item 37: conversation text can carry PHI, and this panel stays mounted
+  // across sign-out/role-switch (it's app chrome, not a route). UserContext
+  // fires this event on any real identity change -- reset back to a fresh,
+  // PHI-free welcome state rather than letting the next session/role read
+  // the previous one's chat history.
+  useEffect(() => {
+    const clearForNewSession = () => {
+      setMessages([
+        { id: 'copilot-welcome', role: 'copilot', content: welcomeMessage, timestamp: new Date() },
+      ]);
+      setInput('');
+      setAttachments([]);
+    };
+    window.addEventListener('caredroid:clear-session-context', clearForNewSession);
+    return () => window.removeEventListener('caredroid:clear-session-context', clearForNewSession);
+  }, [welcomeMessage]);
   const [composerStatus, setComposerStatus] = useState('');
   const [voiceListening, setVoiceListening] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -945,11 +968,16 @@ export function CopilotPanel() {
         (responsePayload.metadata as { aiGateway?: Record<string, unknown> }).aiGateway
           ? (responsePayload.metadata as { aiGateway: Record<string, unknown> }).aiGateway
           : undefined;
+      const responseSource =
+        typeof (responsePayload.provenance as { responseSource?: unknown })?.responseSource ===
+        'string'
+          ? ((responsePayload.provenance as { responseSource: string }).responseSource)
+          : undefined;
       await streamIntoMessage(accountable.content || responseText, assistantId, setMessages);
       setMessages((current) =>
         current.map((message) =>
           message.id === assistantId
-            ? { ...message, accountable, aiFoundation, aiGateway }
+            ? { ...message, accountable, aiFoundation, aiGateway, responseSource }
             : message,
         ),
       );
@@ -1082,6 +1110,33 @@ export function CopilotPanel() {
               <AiRouteMetadata
                 aiFoundation={message.aiFoundation}
                 aiGateway={message.aiGateway}
+              />
+            ) : null}
+            {message.role === 'copilot' &&
+            !message.accountable &&
+            isAiResponseSourceCategory(message.responseSource) &&
+            message.responseSource !== 'LLM_GENERATED' &&
+            message.responseSource !== 'RAG_ASSISTED' ? (
+              <AiTruthLabel
+                {...fromAIResponseSourceCategory(message.responseSource, {
+                  sourceContext:
+                    message.responseSource === 'DETERMINISTIC_RULE'
+                      ? 'AI was unavailable -- this reply is a rule-based fallback, not a model response.'
+                      : 'This reply is not backed by a live model call.',
+                })}
+                compact
+              />
+            ) : null}
+            {message.role === 'copilot' && message.id !== 'copilot-welcome' && message.aiFoundation ? (
+              <AiFeedbackControl
+                runId={
+                  typeof message.aiFoundation.runId === 'string' ? message.aiFoundation.runId : undefined
+                }
+                capabilityId={
+                  typeof message.aiFoundation.capabilityId === 'string'
+                    ? message.aiFoundation.capabilityId
+                    : undefined
+                }
               />
             ) : null}
             {message.attachments?.length ? (

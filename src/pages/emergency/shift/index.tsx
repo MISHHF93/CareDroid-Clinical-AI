@@ -4,6 +4,7 @@ import OperationalEmptyState from '../../../components/ui/OperationalEmptyState'
 import { CareDroidPage } from '../../../components/ui/CareDroidPrimitives';
 import { EMPTY_STATE_COPY } from '../../../config/emptyStateCopy';
 import EdDataSourceBanner from '../../../components/emergency/EdDataSourceBanner';
+import CareOperationsInboxPanel from '../../../components/emergency/CareOperationsInboxPanel';
 import { usePractitionerSurfaceVisibility } from '../../../contexts/PractitionerVisibilityContext';
 import useEmergencyOperatingSurface from '../../../hooks/useEmergencyOperatingSurface';
 import { useEmergencyStore } from '../../../store/emergencyStore';
@@ -186,6 +187,10 @@ export default function EmergencyShiftSummaryPage() {
         ),
         activeWork: (
           <>
+            <CareOperationsInboxPanel
+              title="Outstanding Work for Handover"
+              lead="Unresolved registration exceptions, reassessments due, and EMS handoffs pending -- the same live inbox the outgoing shift is working, not a separately maintained note."
+            />
             {summary.volume.active === 0 ? (
               <OperationalEmptyState
                 title={EMPTY_STATE_COPY.shift.empty.title}

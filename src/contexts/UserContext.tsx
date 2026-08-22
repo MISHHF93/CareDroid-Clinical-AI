@@ -16,6 +16,7 @@ import {
 import logger from '../utils/logger';
 import { ensureDevBackendSession } from '../services/devBackendAuth';
 import { USER_BOOTSTRAP_MAX_MS } from '../config/startupTimeouts';
+import { useEmergencyStore } from '../store/emergencyStore';
 
 export { Permission } from '../config/backendPermissionCatalog';
 
@@ -74,6 +75,32 @@ const persistSession = (nextUser, nextToken) => {
   localStorage.setItem(USER_PROFILE_KEY, JSON.stringify(userToPersist));
   localStorage.setItem(AUTH_TOKEN_KEY, tokenToPersist);
   localStorage.removeItem(LEGACY_AUTH_TOKEN_KEY);
+};
+
+/** A stable-enough key to detect "this is actually a different session/role,"
+ * not just a re-hydration of the same identity (e.g. a background token
+ * refresh). Only real identity changes should trigger a PHI-context wipe. */
+const identityKey = (candidate) => (candidate ? `${candidate.id || ''}::${candidate.role || ''}` : '');
+
+/**
+ * Item 37: unauthorized PHI context must not survive a sign-out or role
+ * switch. Clears the shared patient-selection store (closing anything driven
+ * by it, e.g. PatientDetailPanel) and fires the same `close-all-panels`
+ * event Copilot/Notification-Center already coordinate on (see HEAL-313),
+ * plus a dedicated event any PHI-holding local component state (e.g.
+ * CopilotPanel's own conversation history, which is not in the shared store)
+ * can listen for to reset itself.
+ */
+const clearPhiAdjacentContext = () => {
+  try {
+    useEmergencyStore.getState().selectPatient(null);
+  } catch {
+    // Best-effort -- never let session-context cleanup break sign-out/role-switch itself.
+  }
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event('close-all-panels'));
+    window.dispatchEvent(new Event('caredroid:clear-session-context'));
+  }
 };
 
 const UserContext = createContext<any>({
@@ -213,8 +240,12 @@ export const UserProvider = ({ children }) => {
   // nextUser (passing 'real'/dev-session modes through untouched) -- trust it.
   const setUser = (newUser) => {
     const nextUser = newUser ? hydrateStoredDemoUser(newUser) : OPEN_ACCESS_USER;
+    const identityChanged = identityKey(user) !== identityKey(nextUser);
     setUserState(nextUser);
     persistSession(nextUser, authToken);
+    if (identityChanged) {
+      clearPhiAdjacentContext();
+    }
   };
 
   const setAuthToken = (nextToken = OPEN_ACCESS_TOKEN) => {
@@ -227,6 +258,7 @@ export const UserProvider = ({ children }) => {
     setUserState(OPEN_ACCESS_USER);
     setAuthTokenState(OPEN_ACCESS_TOKEN);
     persistSession(OPEN_ACCESS_USER, OPEN_ACCESS_TOKEN);
+    clearPhiAdjacentContext();
   };
 
   /**

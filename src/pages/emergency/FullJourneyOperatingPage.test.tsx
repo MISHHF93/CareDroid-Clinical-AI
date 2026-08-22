@@ -1,8 +1,10 @@
 import { describe, expect, it, vi, afterEach } from 'vitest';
-import { act } from '@testing-library/react';
+import { act, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import FullJourneyOperatingPage from './FullJourneyOperatingPage';
 import { renderPageWithRouter } from '../../test/testRenderUtils';
 import { createReadinessPlan } from '../../services/edReadinessService';
+import * as careOperationsApi from '../../services/careOperationsApi';
 
 /**
  * HEAL-182: snapshot (and the StickyActionBanner it feeds, mounted on all 5 views) only
@@ -39,5 +41,61 @@ describe('FullJourneyOperatingPage — readiness-overdue freshness (HEAL-182)', 
     });
 
     expect(container.textContent).toMatch(/readiness plan.*overdue/i);
+  });
+});
+
+describe('FullJourneyOperatingPage handoffs view — Care Operations Inbox', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('renders a fetched task and claims it through the real transition API', async () => {
+    const task = {
+      id: 'care-task-1',
+      taskType: 'reassessment_due' as const,
+      status: 'OPEN' as const,
+      priority: 'Warning' as const,
+      ownerRole: 'triage_nurse',
+      reason: 'Reassessment due for Jane Doe',
+      sourceEvent: 'reassessment.due.scan',
+      deepLink: '/emergency/reassessment?patient=patient-1',
+      isOverdue: true,
+      createdAt: '2026-08-20T00:00:00.000Z',
+      updatedAt: '2026-08-20T00:00:00.000Z',
+    };
+
+    const fetchSpy = vi
+      .spyOn(careOperationsApi, 'fetchCareOperationsInbox')
+      .mockResolvedValueOnce({ ok: true, tasks: [task], message: '' })
+      .mockResolvedValue({
+        ok: true,
+        tasks: [{ ...task, status: 'ACKNOWLEDGED', ownerUserId: 'user-1' }],
+        message: '',
+      });
+    const transitionSpy = vi
+      .spyOn(careOperationsApi, 'transitionCareTask')
+      .mockResolvedValue({ ok: true, task: { ...task, status: 'ACKNOWLEDGED' }, message: '' });
+
+    renderPageWithRouter(<FullJourneyOperatingPage view="handoffs" />);
+
+    expect(await screen.findByText(/reassessment due for jane doe/i)).toBeInTheDocument();
+    expect(screen.getByText(/1 item overdue/i)).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: /claim/i }));
+
+    await waitFor(() => expect(transitionSpy).toHaveBeenCalledWith('care-task-1', 'ACKNOWLEDGED'));
+    expect(fetchSpy).toHaveBeenCalled();
+  });
+
+  it('shows an empty-inbox message when there is no outstanding work', async () => {
+    vi.spyOn(careOperationsApi, 'fetchCareOperationsInbox').mockResolvedValue({
+      ok: true,
+      tasks: [],
+      message: '',
+    });
+
+    renderPageWithRouter(<FullJourneyOperatingPage view="handoffs" />);
+
+    expect(await screen.findByText(/inbox clear/i)).toBeInTheDocument();
   });
 });

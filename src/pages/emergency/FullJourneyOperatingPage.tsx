@@ -18,6 +18,7 @@ import { getStaffRoutingSummary } from '../../services/staffRoutingService';
 import { getCADSystemSummary } from '../../services/cadIntegrationService';
 import { getPrehospitalSummary, getAllActiveAssessments } from '../../services/prehospitalAssessmentService';
 import EdDataSourceBanner from '../../components/emergency/EdDataSourceBanner';
+import CareOperationsInboxPanel from '../../components/emergency/CareOperationsInboxPanel';
 import useEmergencyOperatingSurface from '../../hooks/useEmergencyOperatingSurface';
 import type { OperatingSurfaceId } from '../../services/emergencyOsApi';
 import { EmergencyRoutePage, MetricGrid } from './emergencyRouteShared';
@@ -825,6 +826,8 @@ function HandoffsView() {
 
   return (
     <>
+      <CareOperationsInboxPanel />
+
       <div className="u-flex-wrap-gap-10">
         <MetricChip label="Disposition patients" value={dispositionPatients.length} />
         <MetricChip label="Pending handoffs" value={pendingHandoffs.length} warn />

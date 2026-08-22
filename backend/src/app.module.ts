@@ -81,6 +81,9 @@ import { ProductCatalogModule } from './modules/product-catalog/product-catalog.
 import { TenantContextModule } from './modules/tenant-context/tenant-context.module';
 import { AutomationAuditModule } from './modules/automation-audit/automation-audit.module';
 import { EmergencyOsModule } from './modules/emergency-os/emergency-os.module';
+import { CareOperationsModule } from './modules/care-operations/care-operations.module';
+import { AiFeedbackModule } from './modules/ai-feedback/ai-feedback.module';
+import { SurfaceViewsModule } from './modules/surface-views/surface-views.module';
 import { CigModule } from './modules/cig/cig.module';
 import { CollaborationHubModule } from './modules/collaboration-hub/collaboration-hub.module';
 import { NativeAiModule } from './modules/native-ai/native-ai.module';
@@ -246,6 +249,9 @@ function resolveDatabaseClient() {
     TenantContextModule,
     AutomationAuditModule,
     EmergencyOsModule,
+    CareOperationsModule,
+    AiFeedbackModule,
+    SurfaceViewsModule,
     CigModule,
     SentinelModule,
     SurgeModule,
