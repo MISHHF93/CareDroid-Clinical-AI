@@ -303,7 +303,22 @@ export function calculateSepsisShiftMetrics(patients: Patient[], alerts: Alert[]
   };
 }
 
-export default function SepsisBundleTracker({ patient }: { patient: Patient }) {
+export default function SepsisBundleTracker({
+  patient,
+  canWriteNote = true,
+}: {
+  patient: Patient;
+  // HEAL-347.87: this tracker's sibling in PatientDetailPanel.tsx,
+  // StrokeCodeProtocol, already receives canWriteNote from the parent
+  // (which computes it via emergencyRole.presentAction(EMERGENCY_ACTIONS.
+  // writeNote)) -- this component was simply missed when that prop was
+  // wired up, so any role that can view the patient but not write clinical
+  // notes could still mark SEP-1 bundle elements complete, silently calling
+  // addNote() each time. Defaults to true only so existing callers/tests
+  // that don't pass it keep working; PatientDetailPanel always passes the
+  // real computed value explicitly.
+  canWriteNote?: boolean;
+}) {
   const addNote = useEmergencyStore((state) => state.addNote);
   const activeShift = useEmergencyStore((state) => state.activeShift);
   const staff = useEmergencyStore((state) => state.staff);
@@ -322,7 +337,7 @@ export default function SepsisBundleTracker({ patient }: { patient: Patient }) {
   if (!hasSepsisAlert) return null;
 
   const completePendingElement = () => {
-    if (!pendingElement) return;
+    if (!pendingElement || !canWriteNote) return;
     const completedAt = new Date().toISOString();
     addNote(patient.id, buildSep1CompletionNote(pendingElement.id, completedAt, staffId), staffId);
     setPendingElement(null);
@@ -370,7 +385,7 @@ export default function SepsisBundleTracker({ patient }: { patient: Patient }) {
                 type="button"
                 className="sepsis-bundle-row__checkbox"
                 aria-label={completion ? `${element.label} completed` : `Mark ${element.label} complete`}
-                disabled={Boolean(completion)}
+                disabled={Boolean(completion) || !canWriteNote}
                 onClick={() => setPendingElement(element)}
               >
                 {completion ? '✓' : ''}

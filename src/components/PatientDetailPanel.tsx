@@ -1549,7 +1549,7 @@ export default function PatientDetailPanel() {
         </div>
       </section>
 
-      <SepsisBundleTracker patient={selectedPatient} />
+      <SepsisBundleTracker patient={selectedPatient} canWriteNote={canWriteNote} />
 
       <StrokeCodeProtocol
         patient={selectedPatient}

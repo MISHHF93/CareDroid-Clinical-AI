@@ -1,7 +1,9 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
+import { render, screen, fireEvent } from '@testing-library/react';
 import type { Alert, Note, Patient } from '../types/emergency';
 import { PatientFlag, PatientState, Priority } from '../types/emergency';
-import {
+import { useEmergencyStore } from '../store/emergencyStore';
+import SepsisBundleTracker, {
   buildSep1CompletionNote,
   calculateAntibioticTiming,
   calculateBundleProgress,
@@ -136,5 +138,45 @@ describe('SepsisBundleTracker helpers', () => {
       completedRequiredElements: 3,
       totalRequiredElements: 3,
     });
+  });
+});
+
+describe('HEAL-347.87: SepsisBundleTracker respects canWriteNote', () => {
+  const originalState = useEmergencyStore.getState();
+
+  afterEach(() => {
+    useEmergencyStore.setState(originalState, true);
+  });
+
+  it('disables every bundle-element button and never writes a note when canWriteNote is false', () => {
+    const patient = makePatient();
+    useEmergencyStore.setState({ ...originalState, patients: [patient] }, true);
+
+    render(<SepsisBundleTracker patient={patient} canWriteNote={false} />);
+
+    const cultureButton = screen.getByRole('button', { name: /Mark Blood cultures.*complete/i });
+    expect(cultureButton).toBeDisabled();
+
+    fireEvent.click(cultureButton);
+
+    const savedPatient = useEmergencyStore.getState().patients.find((p) => p.id === patient.id);
+    expect(savedPatient?.notes ?? []).toHaveLength(0);
+    expect(screen.queryByText(/Mark .* as complete\?/i)).not.toBeInTheDocument();
+  });
+
+  it('allows completing a bundle element when canWriteNote is true (the default, matching prior behavior)', () => {
+    const patient = makePatient();
+    useEmergencyStore.setState({ ...originalState, patients: [patient] }, true);
+
+    render(<SepsisBundleTracker patient={patient} />);
+
+    const cultureButton = screen.getByRole('button', { name: /Mark Blood cultures.*complete/i });
+    expect(cultureButton).not.toBeDisabled();
+
+    fireEvent.click(cultureButton);
+    fireEvent.click(screen.getByRole('button', { name: 'Complete' }));
+
+    const savedPatient = useEmergencyStore.getState().patients.find((p) => p.id === patient.id);
+    expect(savedPatient?.notes?.length).toBeGreaterThan(0);
   });
 });
