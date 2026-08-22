@@ -1637,15 +1637,18 @@ export class EmergencyPatientService implements OnModuleInit {
     return snapshot;
   }
 
-  getPatientEnvelope(): EmergencyModuleEnvelope<{
+  getPatientEnvelope(organizationId?: string): EmergencyModuleEnvelope<{
     patients: EmergencyPatient[];
     staff: EmergencyStaff[];
     alerts: EmergencyAlert[];
   }> {
     return envelope('Patients', {
-      patients: this.listPatients(),
+      patients: this.listPatients(organizationId),
+      // listStaff() has no organizationId parameter at all -- the Staff
+      // entity itself has no organizationId column yet (a separate,
+      // documented schema gap; see EmergencyOsController's staff routes).
       staff: this.listStaff(),
-      alerts: this.listAlerts(),
+      alerts: this.listAlerts(organizationId),
     });
   }
 }
@@ -1774,8 +1777,12 @@ export class ReferralService implements OnModuleInit {
 
   createReferral(input: Record<string, unknown>, organizationId?: string) {
     const patientId = String(input.patientId || '');
+    // HEAL follow-up (BOLA audit): organizationId was already threaded
+    // through from the controller but never actually used here -- a caller
+    // in Org A referencing a patientId belonging to Org B got that patient's
+    // full record embedded in the created (and later returned) referral.
     const patient = this.patientService
-      .listPatients()
+      .listPatients(organizationId)
       .find((candidate) => candidate.id === patientId);
     const now = new Date().toISOString();
     const referral = {
@@ -2332,6 +2339,7 @@ export class SmartIntakeService {
    */
   private guardAgainstUnconfirmedDuplicate(
     input: SmartIntakeCreateInput,
+    organizationId?: string,
   ): PatientDuplicateCandidate[] {
     const demographics = {
       firstName: input.firstName,
@@ -2340,8 +2348,14 @@ export class SmartIntakeService {
       sex: input.sex,
       mrn: input.mrn,
     };
+    // HEAL follow-up (BOLA audit): was unscoped -- matched a new patient
+    // against every organization's roster, not just the creating org's own.
+    // Cross-tenant duplicate matches make no clinical sense (an unrelated
+    // same-name patient at a different hospital isn't a real duplicate) and
+    // leak the existence/demographics of another org's patient into this
+    // response's duplicateCandidates.
     const candidates = findPatientDuplicateCandidates(
-      this.patientService.listPatients(),
+      this.patientService.listPatients(organizationId),
       demographics,
       {
         minScore: DUPLICATE_MANUAL_REVIEW_THRESHOLD,
@@ -2392,14 +2406,26 @@ export class SmartIntakeService {
     return candidates;
   }
 
-  createFromIntake(input: SmartIntakeCreateInput) {
-    const duplicateCandidates = this.guardAgainstUnconfirmedDuplicate(input);
-    const patient = this.patientService.createPatient(input);
+  // HEAL follow-up (BOLA audit): none of this method's 3 HTTP callers
+  // (POST /emergency/patients, /emergency/intake, /emergency/intake/
+  // vertical-slice) ever passed organizationId at all, and
+  // patientService.createPatient()'s own fallback for a missing
+  // organizationId is `?? normalized.organizationId` -- i.e. whatever the
+  // CLIENT sent in the request body. SmartIntakeCreateInput is a plain type,
+  // not a class-validator DTO, so nothing strips a client-supplied
+  // organizationId field. In practice this meant any authenticated
+  // WRITE_PHI caller could set organizationId in their own POST body and
+  // create a patient directly inside a different hospital's roster --
+  // exactly the "server-resolved tenant context always wins" protection
+  // createPatient()'s own comment describes, just never actually wired up.
+  createFromIntake(input: SmartIntakeCreateInput, organizationId?: string) {
+    const duplicateCandidates = this.guardAgainstUnconfirmedDuplicate(input, organizationId);
+    const patient = this.patientService.createPatient(input, organizationId);
     return envelope('Smart Intake', { patient, duplicateCandidates });
   }
 
-  createVerticalSlice(input: SmartIntakeCreateInput & { staffId?: string }) {
-    const duplicateCandidates = this.guardAgainstUnconfirmedDuplicate(input);
+  createVerticalSlice(input: SmartIntakeCreateInput & { staffId?: string }, organizationId?: string) {
+    const duplicateCandidates = this.guardAgainstUnconfirmedDuplicate(input, organizationId);
     const now = new Date().toISOString();
     const staffId = input.staffId || input.assignedStaffId || 'smart-intake-rn';
     const requestedState = 'Arrival' as const;
@@ -2410,12 +2436,15 @@ export class SmartIntakeService {
       staffId,
       note: 'Smart Intake created patient and moved them to ARRIVAL.',
     };
-    const patient = this.patientService.createPatient({
-      ...input,
-      state: requestedState,
-      triageTime: undefined,
-      timeline: [arrivalEvent],
-    });
+    const patient = this.patientService.createPatient(
+      {
+        ...input,
+        state: requestedState,
+        triageTime: undefined,
+        timeline: [arrivalEvent],
+      },
+      organizationId,
+    );
     const encounter: EmergencyEncounter = {
       id: input.id ? `encounter-${input.id}` : createId('encounter'),
       patientId: patient.id,

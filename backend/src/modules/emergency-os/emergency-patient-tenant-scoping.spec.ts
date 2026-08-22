@@ -132,6 +132,16 @@ describe('EmergencyPatientService — organization tenant scoping (Emergency-OS 
     expect(unscoped.some((alert) => alert.patientId === patientA.id)).toBe(true);
     expect(unscoped.some((alert) => alert.patientId === patientB.id)).toBe(true);
   });
+
+  it("getPatientEnvelope(organizationId) scopes patients and alerts to the caller's org (BOLA audit: GET /emergency/patients previously returned every hospital's full roster)", () => {
+    const { service } = makeService();
+    const patientA = service.createPatient({ firstName: 'Own', lastName: 'Org' } as any, 'org-a');
+    const patientB = service.createPatient({ firstName: 'Other', lastName: 'Org' } as any, 'org-b');
+
+    const scoped = service.getPatientEnvelope('org-a').data.patients;
+    expect(scoped.some((patient) => patient.id === patientA.id)).toBe(true);
+    expect(scoped.some((patient) => patient.id === patientB.id)).toBe(false);
+  });
 });
 
 describe('EmergencyWhiteboardService — the whiteboard, the single most-viewed clinical screen', () => {
@@ -531,6 +541,26 @@ describe('ReferralService — organization tenant scoping (HEAL-347.5 follow-up,
       'org-a',
     );
     expect((result.data.referral as { organizationId?: string }).organizationId).toBe('org-a');
+  });
+
+  it("createReferral does not embed a different org's patient data even when patientId belongs to another organization (BOLA audit)", () => {
+    // organizationId was already threaded through from the controller to
+    // createReferral, but never actually used in the listPatients() lookup
+    // that resolves the embedded `patient` field -- a caller in org-a
+    // referencing a real patientId from org-b got that patient's full
+    // record (name, vitals, chief complaint) embedded in the response.
+    const { patientService, referrals } = makeReferralService();
+    const otherOrgPatient = patientService.createPatient(
+      { firstName: 'Other', lastName: 'OrgPatient' } as any,
+      'org-b',
+    );
+
+    const result = referrals.createReferral(
+      { patientId: otherOrgPatient.id, reason: 'Should not resolve' },
+      'org-a',
+    );
+
+    expect((result.data.referral as { patient?: unknown }).patient).toBeUndefined();
   });
 
   it('getReferrals(organizationId) includes own-org and legacy/unscoped created referrals, excludes a different org', () => {

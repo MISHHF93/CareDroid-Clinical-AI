@@ -227,16 +227,31 @@ export class EmergencyOsController {
     );
   }
 
+  // HEAL follow-up (BOLA audit): getPatients() called getPatientEnvelope()
+  // with no organizationId at all -- any authenticated caller holding
+  // READ_PHI got back every hospital tenant's live patient roster (names,
+  // vitals, chief complaints, flags) in one call. No @TenantContext() was
+  // even declared on this handler, unlike every other patient-list route in
+  // this same file.
   @RequirePermission(Permission.READ_PHI)
   @Get('patients')
-  getPatients() {
-    return this.patientService.getPatientEnvelope();
+  getPatients(@TenantContext() tenantContext?: TenantContextValue) {
+    return this.patientService.getPatientEnvelope(tenantContext?.organizationId);
   }
 
+  // HEAL follow-up (BOLA audit): no @TenantContext() at all -- createPatient()
+  // (patient service)'s own organizationId fallback (`?? normalized.organizationId`)
+  // then took whatever CLIENT-SUPPLIED organizationId was in the request body
+  // (SmartIntakeCreateInput is a plain type, not a validated DTO, so nothing
+  // stripped it), letting any WRITE_PHI caller create a patient directly
+  // inside a different hospital's roster.
   @RequirePermission(Permission.WRITE_PHI)
   @Post('patients')
-  createPatient(@Body() dto: SmartIntakeCreateInput) {
-    return this.smartIntakeService.createFromIntake(dto);
+  createPatient(
+    @Body() dto: SmartIntakeCreateInput,
+    @TenantContext() tenantContext?: TenantContextValue,
+  ) {
+    return this.smartIntakeService.createFromIntake(dto, tenantContext?.organizationId);
   }
 
   /** Durable patient state-transition/field persistence -- see MB-P0-6:
@@ -393,7 +408,7 @@ export class EmergencyOsController {
       patientId,
       resource: `emergency/patients/${patientId}/document-artifacts`,
     });
-    return this.documentArtifactService.getEnvelope(patientId);
+    return this.documentArtifactService.getEnvelope(patientId, tenantContext?.organizationId);
   }
 
   @RequirePermission(Permission.WRITE_PHI)
@@ -410,7 +425,11 @@ export class EmergencyOsController {
       patientId,
       resource: `emergency/patients/${patientId}/document-artifacts/extract`,
     });
-    return this.documentArtifactService.extract(patientId, { ...body, patientId });
+    return this.documentArtifactService.extract(
+      patientId,
+      { ...body, patientId },
+      tenantContext?.organizationId,
+    );
   }
 
   @RequirePermission(Permission.WRITE_PHI)
@@ -428,10 +447,15 @@ export class EmergencyOsController {
       patientId,
       resource: `emergency/patients/${patientId}/document-artifacts/${artifactId}/review`,
     });
-    return this.documentArtifactService.review(patientId, artifactId, {
-      ...body,
+    return this.documentArtifactService.review(
+      patientId,
       artifactId,
-    });
+      {
+        ...body,
+        artifactId,
+      },
+      tenantContext?.organizationId,
+    );
   }
 
   @RequirePermission(Permission.WRITE_PHI)
@@ -658,27 +682,38 @@ export class EmergencyOsController {
     return this.smartIntakeService.getSmartIntake();
   }
 
+  // See BOLA-audit comment on createPatient() above -- same gap, same fix.
   @RequirePermission(Permission.WRITE_PHI)
   @Post('intake')
-  createIntakePatient(@Body() dto: SmartIntakeCreateInput) {
-    return this.smartIntakeService.createFromIntake(dto);
+  createIntakePatient(
+    @Body() dto: SmartIntakeCreateInput,
+    @TenantContext() tenantContext?: TenantContextValue,
+  ) {
+    return this.smartIntakeService.createFromIntake(dto, tenantContext?.organizationId);
   }
 
+  // See BOLA-audit comment on createPatient() above -- same gap, same fix.
   @RequirePermission(Permission.WRITE_PHI)
   @Post('intake/vertical-slice')
   createSmartIntakeVerticalSlice(
     @Body()
     dto: SmartIntakeCreateInput & { patient?: SmartIntakeCreateInput; staffId?: string },
+    @TenantContext() tenantContext?: TenantContextValue,
   ) {
-    const slice = this.smartIntakeService.createVerticalSlice({
-      ...(dto.patient || dto),
-      confirmDuplicateOverride:
-        dto.patient?.confirmDuplicateOverride ?? dto.confirmDuplicateOverride,
-      staffId: dto.staffId,
-    });
-    const whiteboard = this.whiteboardService.getWhiteboard().data;
-    const queueMetrics = this.queueService.getQueues().data;
-    const reassessment = this.reassessmentService.getReassessmentQueue().data;
+    const slice = this.smartIntakeService.createVerticalSlice(
+      {
+        ...(dto.patient || dto),
+        confirmDuplicateOverride:
+          dto.patient?.confirmDuplicateOverride ?? dto.confirmDuplicateOverride,
+        staffId: dto.staffId,
+      },
+      tenantContext?.organizationId,
+    );
+    const whiteboard = this.whiteboardService.getWhiteboard(tenantContext?.organizationId).data;
+    const queueMetrics = this.queueService.getQueues(tenantContext?.organizationId).data;
+    const reassessment = this.reassessmentService.getReassessmentQueue(
+      tenantContext?.organizationId,
+    ).data;
     const capacity = this.capacityService.getCapacity().data;
 
     return {

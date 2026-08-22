@@ -129,3 +129,100 @@ describe('PatientDocumentArtifactService truthfulness', () => {
     expect(allergy?.safety.isAiDerived).toBe(false);
   });
 });
+
+describe('PatientDocumentArtifactService organization tenant scoping (BOLA audit)', () => {
+  // This Map-backed store was keyed only by patientId, with zero
+  // organization concept anywhere -- getEnvelope()/review() had no
+  // existence check at all, and extract()'s own check used an unscoped
+  // patient list. Any clinician in any org with READ_PHI/WRITE_PHI could
+  // read or write extracted PHI (chief complaint, allergies, medications,
+  // lab mentions) for a patient in a different hospital by
+  // guessing/observing the patientId.
+  let service: PatientDocumentArtifactService;
+  let patientService: EmergencyPatientService;
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        WorkflowActionLogService,
+        EmergencyPatientService,
+        PatientDocumentArtifactService,
+      ],
+    }).compile();
+
+    service = module.get(PatientDocumentArtifactService);
+    patientService = module.get(EmergencyPatientService);
+  });
+
+  it("extract() refuses a patientId belonging to a different organization, and succeeds for the owning org", () => {
+    const patient = patientService.createPatient(
+      { firstName: 'Org', lastName: 'B', chiefComplaint: 'Test', complaintCategory: 'Other' } as any,
+      'org-b',
+    );
+
+    const crossOrg = service.extract(
+      patient.id,
+      { patientId: patient.id, documentType: 'Referral Note', sourceType: 'referral_note', rawText: 'Chief complaint: Chest pain' } as any,
+      'org-a',
+    );
+    expect(crossOrg.status).toBe('error');
+    expect(crossOrg.data.artifacts).toEqual([]);
+
+    const ownOrg = service.extract(
+      patient.id,
+      { patientId: patient.id, documentType: 'Referral Note', sourceType: 'referral_note', rawText: 'Chief complaint: Chest pain' } as any,
+      'org-b',
+    );
+    expect(ownOrg.status).toBe('active');
+    expect(ownOrg.data.artifacts.length).toBeGreaterThan(0);
+  });
+
+  it('getEnvelope() refuses a patientId belonging to a different organization', () => {
+    const patient = patientService.createPatient(
+      { firstName: 'Org', lastName: 'B', chiefComplaint: 'Test', complaintCategory: 'Other' } as any,
+      'org-b',
+    );
+    service.extract(
+      patient.id,
+      { patientId: patient.id, documentType: 'Referral Note', sourceType: 'referral_note', rawText: 'Chief complaint: Chest pain' } as any,
+      'org-b',
+    );
+
+    const crossOrg = service.getEnvelope(patient.id, 'org-a');
+    expect(crossOrg.status).toBe('error');
+    expect(crossOrg.data.artifacts).toEqual([]);
+
+    const ownOrg = service.getEnvelope(patient.id, 'org-b');
+    expect(ownOrg.status).toBe('active');
+    expect(ownOrg.data.artifacts.length).toBeGreaterThan(0);
+  });
+
+  it('review() refuses a patientId belonging to a different organization', () => {
+    const patient = patientService.createPatient(
+      { firstName: 'Org', lastName: 'B', chiefComplaint: 'Test', complaintCategory: 'Other' } as any,
+      'org-b',
+    );
+    const created = service.extract(
+      patient.id,
+      { patientId: patient.id, documentType: 'Referral Note', sourceType: 'referral_note', rawText: 'Chief complaint: Chest pain' } as any,
+      'org-b',
+    );
+    const artifactId = created.data.artifacts[0].id;
+
+    const crossOrg = service.review(
+      patient.id,
+      artifactId,
+      { reviewStatus: 'accepted', reviewer: 'attacker' } as any,
+      'org-a',
+    );
+    expect(crossOrg.status).toBe('error');
+
+    const ownOrg = service.review(
+      patient.id,
+      artifactId,
+      { reviewStatus: 'accepted', reviewer: 'nurse-1' } as any,
+      'org-b',
+    );
+    expect(ownOrg.status).toBe('active');
+  });
+});

@@ -186,3 +186,55 @@ describe('SmartIntakeService duplicate gate', () => {
     });
   });
 });
+
+describe('SmartIntakeService organization tenant scoping (BOLA audit)', () => {
+  // Neither createFromIntake nor createVerticalSlice used to accept an
+  // organizationId parameter at all, and none of their 3 HTTP callers
+  // (POST /emergency/patients, /emergency/intake, /emergency/intake/
+  // vertical-slice) passed one -- EmergencyPatientService.createPatient()'s
+  // own fallback for a missing organizationId is `?? normalized.organizationId`,
+  // i.e. whatever the CLIENT put in the request body (SmartIntakeCreateInput
+  // is a plain type, not a validated class-DTO, so nothing strips it). Any
+  // authenticated WRITE_PHI caller could therefore create a patient directly
+  // inside a different hospital's roster by setting organizationId in their
+  // own POST body.
+
+  it('createFromIntake threads the caller-resolved organizationId to createPatient, not whatever the request body claims', () => {
+    const { service, patientService } = makeServices();
+
+    service.createFromIntake(
+      { firstName: 'Org', lastName: 'A', organizationId: 'org-spoofed' } as any,
+      'org-real',
+    );
+
+    expect(patientService.createPatient).toHaveBeenCalledWith(
+      expect.objectContaining({ organizationId: 'org-spoofed' }),
+      'org-real',
+    );
+  });
+
+  it('createVerticalSlice threads the caller-resolved organizationId to createPatient, not whatever the request body claims', () => {
+    const { service, patientService } = makeServices();
+
+    service.createVerticalSlice(
+      { firstName: 'Org', lastName: 'A', organizationId: 'org-spoofed' } as any,
+      'org-real',
+    );
+
+    expect(patientService.createPatient).toHaveBeenCalledWith(
+      expect.objectContaining({ organizationId: 'org-spoofed' }),
+      'org-real',
+    );
+  });
+
+  it('createFromIntake only matches duplicate candidates within the caller\'s own organization', () => {
+    const { service, patientService } = makeServices([makeExistingPatient()]);
+
+    service.createFromIntake(
+      { firstName: 'Nobody', lastName: 'Nowhere', dob: '2000-01-01' },
+      'org-a',
+    );
+
+    expect(patientService.listPatients).toHaveBeenCalledWith('org-a');
+  });
+});

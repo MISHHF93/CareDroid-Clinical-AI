@@ -35,7 +35,35 @@ export class PatientDocumentArtifactService {
     return this.store.get(patientId)!;
   }
 
-  getEnvelope(patientId: string) {
+  // HEAL follow-up (BOLA audit): this Map is keyed only by patientId, with
+  // no organization concept anywhere -- getEnvelope()/review() had zero
+  // existence check at all (ensureStore() happily creates an empty bucket
+  // for any id), and extract()'s own check used an unscoped patient list.
+  // Any clinician in any org with READ_PHI/WRITE_PHI could read or write
+  // extracted PHI (chief complaint, allergies, medications, lab mentions)
+  // for a patient in a different hospital by guessing/observing the
+  // patientId. Same "not found" shape as every other cross-org access
+  // attempt in this codebase -- doesn't confirm the patient exists.
+  private notFoundEnvelope(patientId: string) {
+    return {
+      module: 'Patient Document Artifacts',
+      generatedAt: nowIso(),
+      source: 'backend-fixture',
+      status: 'error',
+      data: {
+        patientId,
+        artifacts: [],
+        sources: [],
+        pendingReviewCount: 0,
+      },
+      remainingGaps: ['Patient not found'],
+    };
+  }
+
+  getEnvelope(patientId: string, organizationId?: string) {
+    if (!this.patientService.getPatient(patientId, organizationId)) {
+      return this.notFoundEnvelope(patientId);
+    }
     const bucket = this.ensureStore(patientId);
     const pendingReviewCount = bucket.artifacts.filter(
       (artifact) =>
@@ -59,23 +87,9 @@ export class PatientDocumentArtifactService {
     };
   }
 
-  extract(patientId: string, input: ExtractDocumentArtifactsInput) {
-    const patients = this.patientService.getPatientEnvelope().data.patients;
-    const patientExists = patients.some((patient) => patient.id === patientId);
-    if (!patientExists) {
-      return {
-        module: 'Patient Document Artifacts',
-        generatedAt: nowIso(),
-        source: 'backend-fixture',
-        status: 'error',
-        data: {
-          patientId,
-          artifacts: [],
-          sources: [],
-          pendingReviewCount: 0,
-        },
-        remainingGaps: ['Patient not found'],
-      };
+  extract(patientId: string, input: ExtractDocumentArtifactsInput, organizationId?: string) {
+    if (!this.patientService.getPatient(patientId, organizationId)) {
+      return this.notFoundEnvelope(patientId);
     }
 
     const bucket = this.ensureStore(patientId);
@@ -104,10 +118,18 @@ export class PatientDocumentArtifactService {
     bucket.sources.push(source);
     bucket.artifacts = this.mergeArtifacts(bucket.artifacts, artifacts);
 
-    return this.getEnvelope(patientId);
+    return this.getEnvelope(patientId, organizationId);
   }
 
-  review(patientId: string, artifactId: string, input: PatientDocumentArtifactReviewInput) {
+  review(
+    patientId: string,
+    artifactId: string,
+    input: PatientDocumentArtifactReviewInput,
+    organizationId?: string,
+  ) {
+    if (!this.patientService.getPatient(patientId, organizationId)) {
+      return this.notFoundEnvelope(patientId);
+    }
     const bucket = this.ensureStore(patientId);
     bucket.artifacts = bucket.artifacts.map((artifact) => {
       if (artifact.id !== artifactId) return artifact;
@@ -135,7 +157,7 @@ export class PatientDocumentArtifactService {
       };
     });
 
-    return this.getEnvelope(patientId);
+    return this.getEnvelope(patientId, organizationId);
   }
 
   private mergeArtifacts(
