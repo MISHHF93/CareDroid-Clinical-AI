@@ -1184,6 +1184,12 @@ export function CopilotPanel() {
           <strong>
             {selectedPatient.firstName} {selectedPatient.lastName}
           </strong>
+          {/* SAFER patient-identification guidance: name alone doesn't
+              distinguish two same-name patients -- this is the one AI-assist
+              surface most likely to influence a clinical decision, and
+              previously showed no second identifier at all. MRN matches
+              what PatientDetailPanel already leads with. */}
+          {selectedPatient.mrn ? ` · MRN ${selectedPatient.mrn}` : ''}
           {patientOrchestration?.operationalStage
             ? ` · ${patientOrchestration.operationalStage}`
             : ''}
