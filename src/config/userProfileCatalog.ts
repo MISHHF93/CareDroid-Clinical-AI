@@ -91,7 +91,13 @@ function getBaseProfileRoutes(entry?: UserProfileCatalogEntry): string[] {
   ];
 }
 
-const PERMISSION_ROUTE_MAP: Record<string, string[]> = Object.freeze({
+// Exported (not just module-private) specifically so
+// navigationPermissionInvariants.test.ts can cross-check this against every
+// permission gate in navigation.config.ts -- the two are independently
+// maintained and drifted apart repeatedly (2026-08-21 sweep, 17 routes across
+// 8 buckets). No other consumer should import this directly; use
+// isRouteAllowedForProfile/buildNavigationRoutes instead.
+export const PERMISSION_ROUTE_MAP: Record<string, string[]> = Object.freeze({
   USE_ASSISTANT: [CANONICAL_ROUTES.assistant, CANONICAL_ROUTES.emergencyCopilot],
   // HEAL-347.47: /protocols and /lab are standalone top-level pages
   // (toolsConsoleRoutes.ts's TOOLS_SHORTCUT_PAGE_ROUTES) -- unlike
@@ -145,6 +151,14 @@ const PERMISSION_ROUTE_MAP: Record<string, string[]> = Object.freeze({
     CANONICAL_ROUTES.workflows,
     CANONICAL_ROUTES.workflowMining,
     CANONICAL_ROUTES.discover,
+    // systemHealth/saasHealth/selfDiagnostics are gated in navigation.config.ts
+    // on permission: ['VIEW_OPERATIONS', 'VIEW_OBSERVABILITY'] (either grants
+    // nav visibility) but VIEW_OBSERVABILITY has no PERMISSION_ROUTE_MAP bucket
+    // at all -- same missing-coverage bug found live 2026-08-21. Listing them
+    // under the OR'd permission that does have a bucket.
+    CANONICAL_ROUTES.systemHealth,
+    CANONICAL_ROUTES.saasHealth,
+    CANONICAL_ROUTES.selfDiagnostics,
   ],
   // /vehicle is a legacy-alias path -- PilotExtensionRouteGuard (see
   // edApplication.config.ts's ED_EXTENSION_ROUTE_REDIRECTS) already has the
@@ -165,13 +179,62 @@ const PERMISSION_ROUTE_MAP: Record<string, string[]> = Object.freeze({
     CANONICAL_ROUTES.aiGovernance,
     CANONICAL_ROUTES.humanReview,
     CANONICAL_ROUTES.security,
+    // Caught by navigationPermissionInvariants.test.ts, not the manual sweep:
+    // the 'governance' nav item uses CANONICAL_ROUTES.emergencyAiGovernance
+    // ('/emergency/ai-governance'), a DIFFERENT route from the
+    // similarly-named CANONICAL_ROUTES.aiGovernance ('/ai-governance') above
+    // -- a naming collision that made this bucket look complete on manual
+    // inspection while actually missing the real target route.
+    CANONICAL_ROUTES.emergencyAiGovernance,
   ],
-  VIEW_AUDIT_LOGS: [CANONICAL_ROUTES.audit, CANONICAL_ROUTES.automationAudit],
+  // dataLineage is gated in navigation.config.ts on permission:
+  // 'VIEW_AUDIT_LOGS' (it's also reachable via CONFIGURE_SYSTEM below, but a
+  // role holding only VIEW_AUDIT_LOGS -- exactly what its own nav item
+  // requires -- still couldn't reach it directly). Same sweep, 2026-08-21.
+  VIEW_AUDIT_LOGS: [CANONICAL_ROUTES.audit, CANONICAL_ROUTES.automationAudit, CANONICAL_ROUTES.dataLineage],
+  // Broader sweep of the same PERMISSION_ROUTE_MAP-coverage bug (2026-08-21):
+  // navigation.config.ts gates 'security' on VIEW_AI_SECURITY (nav shows it
+  // to VIEW_AI_SECURITY holders), 'regulatory' on VIEW_REGULATORY, and
+  // 'customerPortal' on MANAGE_SUBSCRIPTIONS -- none of the three had ANY
+  // PERMISSION_ROUTE_MAP bucket, so a role with exactly the permission its
+  // own nav item requires (and nothing else) still couldn't reach the route
+  // by direct navigation. 'security' was already reachable via VIEW_GOVERNANCE
+  // for roles that hold both; this restores the intended standalone path too.
+  VIEW_AI_SECURITY: [CANONICAL_ROUTES.security],
+  VIEW_REGULATORY: [CANONICAL_ROUTES.regulatory],
+  // navigation.config.ts's ADMIN_NAV_PERMISSION_BY_ID (a SECOND, separate
+  // route->permission mapping, distinct from the per-item `permission` field
+  // above) ORs 'billing' in under MANAGE_SUBSCRIPTIONS too, and grants
+  // 'platform-admin'/'tenant-admin' nav visibility to MANAGE_USERS holders
+  // as an alternative to CONFIGURE_SYSTEM/MANAGE_ORGANIZATION -- a role with
+  // only MANAGE_USERS saw both in nav but had no PERMISSION_ROUTE_MAP path
+  // to either. Same coverage-gap sweep, 2026-08-21.
+  MANAGE_SUBSCRIPTIONS: [CANONICAL_ROUTES.customerPortal, CANONICAL_ROUTES.billing],
+  MANAGE_USERS: [CANONICAL_ROUTES.platformAdmin, CANONICAL_ROUTES.tenantAdmin],
+  // Live sweep (2026-08-21) found 5 more nav items gated on permission:
+  // 'VIEW_ANALYTICS' in navigation.config.ts with zero PERMISSION_ROUTE_MAP
+  // coverage -- same bug class as HEAL-347.47/347.48: the nav shows/hides
+  // these for VIEW_ANALYTICS holders, but direct navigation (ProfileRouteGuard
+  // -> isRouteAllowedInCompiledProfile) silently bounced everyone, including
+  // those holders, back to their landing route with no error message.
+  // departmentIntelligence had no `permission` field in navigation.config.ts
+  // at all (visible in nav to everyone) yet was still unreachable by direct
+  // nav for the same reason -- grouped here since it's an analytics/insights
+  // surface like its siblings, not because its nav gate said so.
   VIEW_ANALYTICS: [
     CANONICAL_ROUTES.emergencyAnalytics,
     CANONICAL_ROUTES.executive,
     CANONICAL_ROUTES.expansionOpportunities,
     CANONICAL_ROUTES.productIntelligence,
+    CANONICAL_ROUTES.usage,
+    CANONICAL_ROUTES.platformLearningEngine,
+    CANONICAL_ROUTES.businessBrain,
+    CANONICAL_ROUTES.aiEvaluation,
+    CANONICAL_ROUTES.departmentIntelligence,
+    CANONICAL_ROUTES.maturityAssessment,
+    // ADMIN_NAV_PERMISSION_BY_ID grants 'enterprise-readiness' nav visibility
+    // to VIEW_ANALYTICS holders; same gap, same sweep.
+    CANONICAL_ROUTES.enterpriseReadiness,
   ],
   VIEW_SURVEILLANCE: [CANONICAL_ROUTES.surveillanceNexus],
   VIEW_TRACKMIND: [CANONICAL_ROUTES.trackMindWorkspace],
@@ -193,7 +256,13 @@ const PERMISSION_ROUTE_MAP: Record<string, string[]> = Object.freeze({
   MANAGE_STEWARDING: [CANONICAL_ROUTES.trackMindWorkspace, CANONICAL_ROUTES.governanceRegistry],
   MANAGE_RACEDAY_OPERATIONS: [CANONICAL_ROUTES.trackMindWorkspace, CANONICAL_ROUTES.operations],
   MANAGE_PLATFORM_TENANTS: [CANONICAL_ROUTES.platformAdmin, CANONICAL_ROUTES.tenantAdmin],
-  MANAGE_ORGANIZATION: [CANONICAL_ROUTES.tenantAdmin, CANONICAL_ROUTES.adminOperations],
+  MANAGE_ORGANIZATION: [
+    CANONICAL_ROUTES.tenantAdmin,
+    CANONICAL_ROUTES.adminOperations,
+    // navigation.config.ts gates 'organization' on MANAGE_ORGANIZATION too;
+    // same coverage-gap sweep, 2026-08-21.
+    CANONICAL_ROUTES.organization,
+  ],
   CONFIGURE_SYSTEM: [
     CANONICAL_ROUTES.platformAdmin,
     CANONICAL_ROUTES.featureFlags,
@@ -201,6 +270,12 @@ const PERMISSION_ROUTE_MAP: Record<string, string[]> = Object.freeze({
     CANONICAL_ROUTES.dependencyGraph,
     CANONICAL_ROUTES.dataLineage,
     CANONICAL_ROUTES.selfDiagnostics,
+    // configurationStudio/developerCatalog/plugins are gated in
+    // navigation.config.ts on permission: 'CONFIGURE_SYSTEM' but were
+    // missing from this bucket -- same coverage-gap sweep, 2026-08-21.
+    CANONICAL_ROUTES.configurationStudio,
+    CANONICAL_ROUTES.developerCatalog,
+    CANONICAL_ROUTES.plugins,
   ],
 });
 

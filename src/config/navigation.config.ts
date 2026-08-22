@@ -477,8 +477,12 @@ export const ADVANCED_SIDEBAR_NAV_ITEMS = Object.freeze([
     mobileLabel: 'Health',
     path: CANONICAL_ROUTES.systemHealth,
     matchPaths: [CANONICAL_ROUTES.systemHealth],
+    // requireAllPermissions: true previously forced BOTH VIEW_OPERATIONS and
+    // VIEW_OBSERVABILITY -- but VIEW_OBSERVABILITY is granted to zero roles
+    // anywhere in saasProfileConstants.ts/emergencyRolePermissions.ts, so
+    // this nav item was permanently invisible to every role in the system.
+    // Reverted to either-permission (default) semantics, 2026-08-21.
     permission: ['VIEW_OPERATIONS', 'VIEW_OBSERVABILITY'],
-    requireAllPermissions: true,
     showInMobile: false,
   },
   {
@@ -487,8 +491,9 @@ export const ADVANCED_SIDEBAR_NAV_ITEMS = Object.freeze([
     mobileLabel: 'SaaS',
     path: CANONICAL_ROUTES.saasHealth,
     matchPaths: [CANONICAL_ROUTES.saasHealth],
+    // See system-health above -- requireAllPermissions:true made this
+    // unreachable for every role since VIEW_OBSERVABILITY is never granted.
     permission: ['VIEW_OPERATIONS', 'VIEW_OBSERVABILITY'],
-    requireAllPermissions: true,
     showInMobile: false,
   },
   {
@@ -551,8 +556,9 @@ export const ADVANCED_SIDEBAR_NAV_ITEMS = Object.freeze([
     mobileLabel: 'Diag',
     path: CANONICAL_ROUTES.selfDiagnostics,
     matchPaths: [CANONICAL_ROUTES.selfDiagnostics],
+    // See system-health above -- requireAllPermissions:true made this
+    // unreachable for every role since VIEW_OBSERVABILITY is never granted.
     permission: ['VIEW_OPERATIONS', 'VIEW_OBSERVABILITY'],
-    requireAllPermissions: true,
     showInMobile: false,
   },
   {
@@ -561,15 +567,6 @@ export const ADVANCED_SIDEBAR_NAV_ITEMS = Object.freeze([
     mobileLabel: 'Learn',
     path: CANONICAL_ROUTES.platformLearningEngine,
     matchPaths: [CANONICAL_ROUTES.platformLearningEngine],
-    permission: 'VIEW_ANALYTICS',
-    showInMobile: false,
-  },
-  {
-    id: 'brain',
-    label: 'Brain',
-    mobileLabel: 'Brain',
-    path: CANONICAL_ROUTES.brain,
-    matchPaths: [CANONICAL_ROUTES.brain],
     permission: 'VIEW_ANALYTICS',
     showInMobile: false,
   },
@@ -693,7 +690,10 @@ const NORMAL_PRIMARY_NAV_IDS = new Set([
   ...APP_SHELL_NAV_ITEMS.map((item) => item.id),
 ]);
 const UTILITY_NAV_IDS = new Set(['search', 'notifications']);
-const ADMIN_NAV_PERMISSION_BY_ID = Object.freeze({
+// Exported for navigationPermissionInvariants.test.ts -- this is a SECOND,
+// independent route->permission mapping (distinct from each item's own
+// `permission` field below), so it needs the same drift check.
+export const ADMIN_NAV_PERMISSION_BY_ID = Object.freeze({
   'customer-portal': ['MANAGE_SUBSCRIPTIONS'],
   'enterprise-readiness': ['VIEW_ANALYTICS'],
   'platform-admin': ['CONFIGURE_SYSTEM', 'MANAGE_USERS'],

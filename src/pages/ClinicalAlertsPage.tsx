@@ -83,7 +83,20 @@ const ClinicalAlertsPage = () => {
       setIsLoadingAlerts(true);
       const result = await syncClinicalAlertsFromBackend();
       if (cancelled) return;
-      setApiNotice(result.message);
+      // syncClinicalAlertsFromBackend() has no explicit ok/error field --
+      // ingested === 0 && skipped === 0 is the only signal a sync attempt
+      // failed (capability disabled, fetch error, auth hiccup) rather than
+      // genuinely finding zero new alerts to merge. Live sweep 2026-08-21
+      // found this call intermittently 401ing on this page's own initial
+      // load while the store already had real alerts from elsewhere (e.g.
+      // the whiteboard's bundled snapshot) -- surfacing that failure's raw
+      // message ("Sign in required to load this data.") persistently
+      // misled an already-authenticated user who had real data on screen.
+      // Only show the notice when it's actually informative: a real sync
+      // summary, or a failure the user has nothing else to see for.
+      const syncFailed = result.ingested === 0 && result.skipped === 0;
+      const hasVisibleAlerts = useEmergencyStore.getState().alerts.length > 0;
+      setApiNotice(syncFailed && hasVisibleAlerts ? '' : result.message);
       setIsLoadingAlerts(false);
     }
 

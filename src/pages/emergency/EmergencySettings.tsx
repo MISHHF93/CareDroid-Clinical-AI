@@ -5,6 +5,7 @@ import {
   useEmergencyStore,
 } from '../../store/emergencyStore';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
+import { REFRESH_DATASET_TIMEOUT_MS } from '../../config/startupTimeouts';
 import { FIRST_CUSTOMER_DEMO_MODE } from '../../data/firstCustomerDemoMode';
 import {
   DEFAULT_CENTRAL_CONTROL_SETTINGS,
@@ -385,14 +386,32 @@ export default function EmergencySettings() {
     setLoading(true);
     setError('');
 
-    fetchOrganizationEmergencyOsSettings()
-      .then((orgResult) => {
-        if (cancelled || !orgResult.ok || !orgResult.data) return null;
-        return orgResult.data;
-      })
-      .then((orgEmergencyOs) =>
-        fetchEmergencyOsSettings().then((result) => ({ result, orgEmergencyOs })),
-      )
+    // Live sweep 2026-08-21: fetchOrganizationEmergencyOsSettings/
+    // fetchEmergencyOsSettings have no AbortController/timeout of their own,
+    // so if the backend ever fails to respond (rather than erroring) this
+    // two-step sequential chain never resolves or rejects -- `loading` never
+    // clears and the whole page hangs indefinitely. Reproduced independently
+    // twice: this was the only route to fail to load across two full sweeps
+    // while every sibling page loaded fine in the same runs. Race the chain
+    // against the same timeout other dataset loads in this app already use
+    // (emergencyStore.ts's loadDatasetWithTimeout) so a stuck backend
+    // degrades to local settings instead of freezing the page.
+    Promise.race([
+      fetchOrganizationEmergencyOsSettings()
+        .then((orgResult) => {
+          if (cancelled || !orgResult.ok || !orgResult.data) return null;
+          return orgResult.data;
+        })
+        .then((orgEmergencyOs) =>
+          fetchEmergencyOsSettings().then((result) => ({ result, orgEmergencyOs })),
+        ),
+      new Promise<never>((_, reject) => {
+        window.setTimeout(
+          () => reject(new Error(`CareDroid settings load timed out after ${REFRESH_DATASET_TIMEOUT_MS}ms`)),
+          REFRESH_DATASET_TIMEOUT_MS,
+        );
+      }),
+    ])
       .then(({ result, orgEmergencyOs }) => {
         if (cancelled) return;
         if (!result.ok && !orgEmergencyOs) {

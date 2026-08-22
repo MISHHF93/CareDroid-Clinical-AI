@@ -114,7 +114,15 @@ function buildSituationBrief(
   }
 
   const phaseSummary = snapshot.phases.find((phase) => phase.phaseId === surface.phaseId);
-  const status = `${surface.label} — ${metrics.activePatients} active patient${metrics.activePatients === 1 ? '' : 's'}${
+  // Live sweep 2026-08-21: this is a DEPARTMENT-WIDE active-patient count
+  // (metrics.activePatients), not a count of anything specific to
+  // `surface.label`'s own topic. The previous "${surface.label} — N active
+  // patients" phrasing (e.g. "Referrals — 7 active patients") read as if the
+  // number described referrals, directly contradicting the page's own
+  // referral-specific counters (which correctly showed 0 with no referrals
+  // recorded). Rephrased so the department-wide scope is explicit regardless
+  // of which surface this renders on.
+  const status = `${surface.label} — department has ${metrics.activePatients} active patient${metrics.activePatients === 1 ? '' : 's'}${
     phaseSummary?.activeCount ? ` · ${phaseSummary.activeCount} in ${phaseSummary.label}` : ''
   }`;
 
