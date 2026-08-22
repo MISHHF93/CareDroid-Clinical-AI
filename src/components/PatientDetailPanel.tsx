@@ -1116,7 +1116,23 @@ export default function PatientDetailPanel() {
             <h2 className="patient-detail-panel__title">
               {selectedPatient.firstName} {selectedPatient.lastName}
             </h2>
-            <div className="patient-detail-panel__mrn">{selectedPatient.mrn}</div>
+            {/* SAFER patient-identification guidance: high-risk actions (this
+                panel writes vitals, clears safety flags, adds notes) should
+                expose at least two identifiers, not name/MRN alone shown
+                elsewhere -- a second same-name patient with a different MRN
+                is otherwise indistinguishable from this header at a glance.
+                Age/sex matches the identifier pair already shown on
+                PatientCard.tsx, not a new convention. */}
+            <div className="patient-detail-panel__mrn">
+              {selectedPatient.mrn}
+              {selectedPatient.age != null || selectedPatient.sex ? (
+                <span className="patient-detail-panel__mrn-demographics">
+                  {' · '}
+                  {selectedPatient.age != null ? `${selectedPatient.age}` : '—'}
+                  {selectedPatient.sex ? ` ${selectedPatient.sex}` : ''}
+                </span>
+              ) : null}
+            </div>
             {selectedPatient.state === PatientState.Waiting || selectedPatient.state === PatientState.Triage ? (
               <div className="patient-detail-panel__header-slot">
                 <WaitingRoomCommunicationBadge
