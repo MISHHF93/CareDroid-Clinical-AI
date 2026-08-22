@@ -347,6 +347,16 @@ export class ChatService {
         {
           text: escalationResult.message,
           suggestions: escalationResult.recommendations.slice(0, 3), // Top 3 recommendations
+          // this.emergencyEscalation.escalate() is 100% deterministic severity/
+          // category branching (getEscalationActions/buildEscalationMessage/
+          // getRecommendations) -- no LLM call anywhere in this path, some
+          // outputs literally labeled 'SIMULATED 911 escalation placeholder'.
+          // Without this hint, ResponseComposerService's naive inference (no
+          // toolResult, no RAG chunks -> LLM_GENERATED) mislabeled the most
+          // safety-critical response path in the app as real model output --
+          // same defect already fixed on this file's catch-block fallback,
+          // left unfixed on this earlier, always-executed branch.
+          responseSourceHint: 'DETERMINISTIC_RULE' as const,
           emergencyAlert: {
             severity: classification.emergencySeverity!,
             message: escalationResult.message,
