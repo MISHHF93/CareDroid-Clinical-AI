@@ -1706,6 +1706,7 @@ export default function PatientDetailPanel() {
           currentStaffId={checklistStaffId}
           currentStaffName={staffName(staff, checklistStaffId)}
           titleHint={criticalChecklistTitleHint}
+          readOnly={!canWriteNote}
         />
       </ErrorBoundary>
     </aside>

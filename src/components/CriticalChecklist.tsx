@@ -22,6 +22,7 @@ type CriticalChecklistProps = {
   currentStaffId?: string | null;
   currentStaffName?: string | null;
   titleHint?: string;
+  readOnly?: boolean;
 };
 
 const categoryIcon: Record<ChecklistItemCategory, string> = {
@@ -82,10 +83,12 @@ function ChecklistRow({
   item,
   completion,
   onCheck,
+  disabled,
 }: {
   item: ChecklistItem;
   completion?: ChecklistCompletion;
   onCheck: (item: ChecklistItem) => void;
+  disabled?: boolean;
 }) {
   const checked = Boolean(completion);
 
@@ -108,6 +111,7 @@ function ChecklistRow({
       <input
         type="checkbox"
         checked={checked}
+        disabled={disabled}
         onChange={(event) => {
           if (event.target.checked) onCheck(item);
         }}
@@ -154,6 +158,7 @@ export default function CriticalChecklist({
   currentStaffId,
   currentStaffName,
   titleHint,
+  readOnly = false,
 }: CriticalChecklistProps) {
   const addNote = useEmergencyStore((state) => state.addNote);
   const [selectedChecklistId, setSelectedChecklistId] = useState(checklist?.id || '');
@@ -216,7 +221,15 @@ export default function CriticalChecklist({
   if (!open) return null;
 
   const checkItem = (item: ChecklistItem) => {
-    if (!activeChecklist || completionsByItem.has(item.id)) return;
+    // HEAL-347.86: this checklist is auto-opened by PatientDetailPanel for
+    // stroke-code flags and critical EMS arrivals -- highest-acuity modal
+    // in the app -- yet had no permission check at all, unlike every other
+    // note-writing surface in that same parent (which computes
+    // canWriteNote via emergencyRole.presentAction(EMERGENCY_ACTIONS.
+    // writeNote) and passes it down, but never to this component). A role
+    // that can view the patient but not write clinical notes could still
+    // check off critical-checklist items, which silently calls addNote().
+    if (readOnly || !activeChecklist || completionsByItem.has(item.id)) return;
 
     const completion: ChecklistCompletion = {
       checklistId: activeChecklist.id,
@@ -329,6 +342,7 @@ export default function CriticalChecklist({
                   item={item}
                   completion={completionsByItem.get(item.id)}
                   onCheck={checkItem}
+                  disabled={readOnly}
                 />
               ))}
             </div>

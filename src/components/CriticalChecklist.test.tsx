@@ -136,6 +136,33 @@ describe('CriticalChecklist', () => {
     expect(screen.queryByText('1/5 items checked')).not.toBeNull();
   });
 
+  it('HEAL-347.86: readOnly disables every checklist item and never writes a note, even if clicked', async () => {
+    const user = userEvent.setup();
+    const checklist = findChecklistById('stemi') || CHECKLISTS[0];
+    useEmergencyStore.setState({ ...originalState, patients: [basePatient] }, true);
+
+    render(
+      <CriticalChecklist
+        patient={basePatient}
+        checklist={checklist}
+        open
+        onClose={() => undefined}
+        currentStaffId="s1"
+        currentStaffName="Dr. Test"
+        readOnly
+      />,
+    );
+
+    const checkbox = screen.getByLabelText(/Prepare ECG machine/i) as HTMLInputElement;
+    expect(checkbox).toBeDisabled();
+
+    await user.click(checkbox);
+
+    const savedPatient = useEmergencyStore.getState().patients.find((patient) => patient.id === basePatient.id);
+    expect(savedPatient?.notes).toHaveLength(0);
+    expect(checkbox.checked).toBe(false);
+  });
+
   it('HEAL-261: closes on Escape', async () => {
     const user = userEvent.setup();
     const checklist = findChecklistById('stemi') || CHECKLISTS[0];
