@@ -10,6 +10,14 @@ import { TRAINING_CONSOLE_ROUTE_PATHS } from './trainingConsoleRoutes';
 const PLATFORM_ENTRY_ROUTE_PREFIXES = Object.freeze([
   CANONICAL_ROUTES.platformStart,
   CANONICAL_ROUTES.workspace,
+  // HEAL-347.80: plural /workspaces was already treated as an active-path
+  // alias of the Platform nav item (unified-navigation.config.ts) and has
+  // its own dedicated AppShell title/subtitle, but had no <Route> at all --
+  // it silently bounced to EmergencyDefaultRedirect instead. Now mounted
+  // alongside singular /workspace in router.tsx; listed here so it isn't
+  // shadowed by ED_EXTENSION_ROUTE_REDIRECTS' generic fallback the same way
+  // /customer-portal was.
+  CANONICAL_ROUTES.workspaces,
   CANONICAL_ROUTES.integrationHub,
 ]);
 

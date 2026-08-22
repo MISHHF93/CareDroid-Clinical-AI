@@ -140,6 +140,18 @@ const ALL_CAREDROID_ROUTES = Object.freeze([
   CANONICAL_ROUTES.emergencyHelp,
   CANONICAL_ROUTES.triage,
   CANONICAL_ROUTES.workspace,
+  // HEAL-347.80: plural /workspaces was missing from this list -- a THIRD,
+  // independent spot (beyond PERMISSION_ROUTE_MAP and
+  // inShellRouteAllowlist.ts's PLATFORM_ENTRY_ROUTE_PREFIXES, both already
+  // fixed) where singular vs. plural workspace drifted apart. Routes listed
+  // here with no ROUTE_REQUIRED_PERMISSIONS entry are vacuously granted to
+  // every role via buildRouteAccess()'s permissionRoutes filter below --
+  // singular /workspace got that free pass, plural never did, so
+  // ProfileRouteGuard's Dimension-A check (canAccessRoute) denied it even
+  // after /workspaces had a real mounted <Route>. Proven live via
+  // instrumented ProfileRouteGuard logging: dimA/dimB both false for
+  // /workspaces, both true for /workspace, under the identical session.
+  CANONICAL_ROUTES.workspaces,
   CANONICAL_ROUTES.laboratory,
   CANONICAL_ROUTES.audit,
   CANONICAL_ROUTES.aiCommandCenter,

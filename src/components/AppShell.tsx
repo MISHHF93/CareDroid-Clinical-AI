@@ -126,7 +126,7 @@ export const EMERGENCY_OS_PAGE_TITLES: Record<string, string> = {
   [CANONICAL_ROUTES.emergencyAnalytics]: `${EMERGENCY_OS_BRANDING.productName} - Analytics`,
   [CANONICAL_ROUTES.workspace]: `${EMERGENCY_OS_BRANDING.productName} - Platform`,
   [CANONICAL_ROUTES.workspaces]: `${EMERGENCY_OS_BRANDING.productName} - Workspaces`,
-  '/settings': `${EMERGENCY_OS_BRANDING.productName} - Settings`,
+  '/settings': `${EMERGENCY_OS_BRANDING.productName} - Platform Settings`,
   [CANONICAL_ROUTES.emergencySettings]: `${EMERGENCY_OS_BRANDING.productName} - Settings`,
   [CANONICAL_ROUTES.emergencyPulse]: `${EMERGENCY_OS_BRANDING.productName} - Department Pulse`,
   [CANONICAL_ROUTES.emergencyShift]: `${EMERGENCY_OS_BRANDING.productName} - Shift`,
@@ -165,7 +165,13 @@ export const EMERGENCY_OS_PAGE_SUBTITLES: Record<string, string> = {
   [CANONICAL_ROUTES.emergencyAnalytics]: 'Operational KPIs and local analytics fallback.',
   [CANONICAL_ROUTES.workspace]: 'App map for platform, product, operations, and admin routes.',
   [CANONICAL_ROUTES.workspaces]: 'Workspace registry and platform operating model.',
-  '/settings': 'Tenant, module, AI, integration, and threshold controls.',
+  // HEAL-347.80: '/settings' (Settings.tsx -- billing/subscription, compliance
+  // data export/deletion, audit log, enterprise identity registry, tenant
+  // isolation audit) previously shared this literal string's title/subtitle
+  // with the unrelated /emergency/settings entry below, so this page's header
+  // described ED tenant/module/AI/integration/threshold controls -- content
+  // that page doesn't have. Found via a route-collision trace, not visually.
+  '/settings': 'Billing, compliance exports, audit log, and tenant identity administration.',
   [CANONICAL_ROUTES.emergencySettings]: 'Tenant, module, AI, integration, and threshold controls.',
   [CANONICAL_ROUTES.emergencyDispatch]: 'Emergency call intake, CAD unit dispatch, and ED pre-alert coordination.',
   [CANONICAL_ROUTES.emergencyEdReadiness]: 'Bay and room readiness plans, equipment checks, and pre-arrival preparation.',

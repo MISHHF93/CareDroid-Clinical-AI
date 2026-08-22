@@ -50,13 +50,6 @@ function isFutureModuleRoute(path = '') {
 
 const COMMERCIAL_CAPABILITY_GROUPS = Object.freeze([
   {
-    id: 'products',
-    title: 'Product Catalog',
-    description: 'Search and launch CareDroid product packages, pack mappings, outcomes, and product detail pages.',
-    path: CANONICAL_ROUTES.products,
-    aliases: ['product catalog', 'products', 'solution catalog', 'product detail'],
-  },
-  {
     id: 'asset-packs',
     title: 'Asset Pack Builder',
     description: 'Discover sellable asset packs and the products, routes, and assets each pack powers.',
@@ -69,27 +62,6 @@ const COMMERCIAL_CAPABILITY_GROUPS = Object.freeze([
     description: 'Compare Starter, Professional, Enterprise, Academic, and Government packaging.',
     path: CANONICAL_ROUTES.plans,
     aliases: ['pricing', 'subscription', 'plans', 'commercial packaging'],
-  },
-  {
-    id: 'specialties',
-    title: 'Specialty Marketplace',
-    description: 'Find capabilities by clinical specialty and launch specialty-specific solution pages.',
-    path: CANONICAL_ROUTES.specialties,
-    aliases: ['specialty', 'emergency department solution', 'cardiology solution', 'clinical specialty'],
-  },
-  {
-    id: 'care-pathways',
-    title: 'Care Pathways',
-    description: 'Discover outcome-oriented pathways, pathway assets, and pathway launch routes.',
-    path: CANONICAL_ROUTES.carePathways,
-    aliases: ['pathways', 'care pathway', 'clinical pathway', 'outcome pathway'],
-  },
-  {
-    id: 'agents',
-    title: 'AI Agents Registry',
-    description: 'Launch commercial AI agents and workspace agent experiences from search.',
-    path: CANONICAL_ROUTES.agents,
-    aliases: ['agents', 'ai agents', 'copilot agents', 'agent registry'],
   },
   {
     id: 'maturity-assessment',
@@ -131,20 +103,6 @@ const COMMERCIAL_CAPABILITY_GROUPS = Object.freeze([
     aliases: ['platform intelligence', 'data catalog', 'data lineage', 'technical debt', 'convergence review'],
   },
   {
-    id: 'outcomes',
-    title: 'Outcome Tracking',
-    description: 'Open leadership outcome metrics and value tracking signals.',
-    path: CANONICAL_ROUTES.outcomes,
-    aliases: ['outcomes', 'metrics', 'leadership metrics', 'value outcomes'],
-  },
-  {
-    id: 'value-tracking',
-    title: 'Value Tracking',
-    description: 'Review value metrics, adoption, and ROI signals for organizations.',
-    path: CANONICAL_ROUTES.valueTracking,
-    aliases: ['value', 'roi', 'adoption', 'value tracking'],
-  },
-  {
     id: 'product-intelligence',
     title: 'Product Intelligence',
     description: 'Measure SaaS product health from product to pack to asset to outcome.',
@@ -166,20 +124,6 @@ const COMMERCIAL_CAPABILITY_GROUPS = Object.freeze([
     aliases: ['integrations', 'fhir', 'hl7', 'sso', 'lab interface', 'telehealth'],
   },
   {
-    id: 'integration-readiness',
-    title: 'Integration Readiness',
-    description: 'Review integration requirements, readiness gaps, and implementation next steps.',
-    path: CANONICAL_ROUTES.integrationReadiness,
-    aliases: ['readiness', 'integration readiness', 'implementation readiness'],
-  },
-  {
-    id: 'solution-builder',
-    title: 'Hospital Solution Builder',
-    description: 'Build a recommended hospital solution from organization type, departments, and packs.',
-    path: CANONICAL_ROUTES.solutionBuilder,
-    aliases: ['solution builder', 'hospital builder', 'recommend solution', 'implementation plan'],
-  },
-  {
     id: 'automation-analytics',
     title: 'Automation Analytics',
     description: 'Track solution automation runs, adoption, failures, human overrides, and accepted AI recommendations.',
@@ -196,57 +140,6 @@ const COMMERCIAL_CAPABILITY_GROUPS = Object.freeze([
 ]);
 
 const COMMERCIAL_ROW_LEVEL_ENTRIES = Object.freeze([
-  {
-    id: 'specialty-emergency',
-    title: 'Emergency Flow Intelligence Platform',
-    description: 'Emergency specialty capabilities, ED flow workflows, EMS handoff, bottleneck reduction, triage, command routes, and alerts.',
-    path: `${CANONICAL_ROUTES.specialties}/emergency`,
-    workspaceIds: ['emergency'],
-    aliases: [
-      'ed',
-      'emergency medicine',
-      'emergency flow intelligence',
-      'ems handoff',
-      'ambulance offload',
-      'bed flow',
-      'boarding pressure',
-      'surge prediction',
-      'triage solution',
-      'rapid response',
-    ],
-  },
-  {
-    id: 'specialty-cardiology',
-    title: 'Cardiology Solution',
-    description: 'Cardiology specialty capabilities, ACS pathways, cardiac calculators, and follow-up tools.',
-    path: `${CANONICAL_ROUTES.specialties}/cardiology`,
-    workspaceIds: ['cardiology'],
-    aliases: ['heart', 'acs', 'cardiac', 'chest pain'],
-  },
-  {
-    id: 'specialty-laboratory',
-    title: 'Laboratory Solution',
-    description: 'Laboratory interpretation, abnormal result workflows, specimen context, and lab tools.',
-    path: `${CANONICAL_ROUTES.specialties}/laboratory`,
-    workspaceIds: ['laboratory'],
-    aliases: ['labs', 'lab interpreter', 'critical values'],
-  },
-  {
-    id: 'pathway-sepsis',
-    title: 'Sepsis Care Pathway',
-    description: 'Find sepsis pathway assets, calculators, simulation, and escalation workflows.',
-    path: `${CANONICAL_ROUTES.carePathways}/sepsis`,
-    workspaceIds: ['emergency', 'icu'],
-    aliases: ['sepsis', 'qsofa', 'sofa', 'infection', 'deterioration'],
-  },
-  {
-    id: 'pathway-stroke',
-    title: 'Stroke Care Pathway',
-    description: 'Find stroke pathway assets, NIHSS support, simulations, and time-sensitive escalation.',
-    path: `${CANONICAL_ROUTES.carePathways}/stroke`,
-    workspaceIds: ['emergency', 'cardiology'],
-    aliases: ['stroke', 'nihss', 'tia', 'neurology'],
-  },
   {
     id: 'integration-fhir',
     title: 'FHIR Patient Integration',

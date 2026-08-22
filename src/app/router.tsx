@@ -1116,6 +1116,13 @@ export function AppRoutes() {
           path={CANONICAL_ROUTES.workspace}
           element={<EdApplicationEntryRedirect />}
         />
+        {/* HEAL-347.80: plural /workspaces had chrome copy + nav active-path
+            wiring but no <Route> at all -- fell through the whole tree to
+            EmergencyDefaultRedirect. Mounted the same as singular /workspace. */}
+        <Route
+          path={CANONICAL_ROUTES.workspaces}
+          element={<EdApplicationEntryRedirect />}
+        />
         {IN_SHELL_ROUTE_REDIRECTS.map(({ path, to }) => (
           <Route key={`in-shell-${path}`} path={path} element={<EmergencyAliasRedirect to={to} />} />
         ))}

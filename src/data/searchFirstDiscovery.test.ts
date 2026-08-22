@@ -4,6 +4,7 @@ import {
   buildSearchFirstResults,
 } from './searchFirstDiscovery';
 import { getPilotCustomerNavigationItems } from '../config/unified-navigation.config';
+import { CANONICAL_ROUTES } from '../config/routes.config';
 
 const PILOT_VISIBLE_PATHS = getPilotCustomerNavigationItems().map((item) => item.path);
 
@@ -168,37 +169,23 @@ describe('search-first discovery index', () => {
   });
 
   it('indexes commercial catalog capabilities and row-level launch targets', () => {
-    expect(buildSearchFirstResults({ query: 'emergency flow intelligence platform', includePlatformCatalog: true })).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          kind: 'commercial',
-          sourceId: 'specialty-emergency',
-          path: '/specialties/emergency',
-        }),
-      ])
-    );
-    expect(buildSearchFirstResults({ query: 'ems handoff bed flow bottleneck', includePlatformCatalog: true })[0]).toEqual(
-      expect.objectContaining({
-        kind: 'commercial',
-        sourceId: 'specialty-emergency',
-        path: '/specialties/emergency',
-      })
-    );
+    // HEAL-347.80: 'specialty-emergency'/'specialty-cardiology'/'specialty-laboratory'/
+    // 'pathway-sepsis'/'pathway-stroke' (row-level) and 'products'/'specialties'/
+    // 'care-pathways'/'agents'/'outcomes'/'value-tracking'/'integration-readiness'/
+    // 'solution-builder' (group-level) were removed from searchFirstDiscovery.ts --
+    // a route-collision trace found they all pointed at CANONICAL_ROUTES constants
+    // with zero <Route> registration anywhere (the same pre-pivot CommercialPages
+    // purge leftovers HEAL-347.78 already removed from navigation.config.ts; two of
+    // these, outcomes/value-tracking, were net-new findings this same trace). This
+    // registry only ever surfaces to a real user when includePlatformCatalog:true,
+    // which no live caller ever passes (only tests) -- so these were dormant, not an
+    // active user-facing dead link, but still confirmed-dead data worth removing.
     expect(buildSearchFirstResults({ query: 'fhir patient integration', includePlatformCatalog: true })).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           kind: 'commercial',
           sourceId: 'integration-fhir',
           path: '/integrations-marketplace?category=fhir',
-        }),
-      ])
-    );
-    expect(buildSearchFirstResults({ query: 'hospital solution builder', includePlatformCatalog: true })).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          kind: 'commercial',
-          sourceId: 'solution-builder',
-          path: '/solution-builder',
         }),
       ])
     );
@@ -210,6 +197,22 @@ describe('search-first discovery index', () => {
           path: '/automation-analytics',
         }),
       ])
+    );
+    expect(buildSearchFirstResults({ query: 'customer success renewal readiness', includePlatformCatalog: true })).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          kind: 'commercial',
+          sourceId: 'customer-success',
+          path: CANONICAL_ROUTES.customerSuccess,
+        }),
+      ])
+    );
+    expect(
+      buildSearchFirstResults({ query: 'products specialties care pathways agents outcomes value tracking solution builder', includePlatformCatalog: true }),
+    ).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ sourceId: expect.stringMatching(/^(products|specialties|care-pathways|agents|outcomes|value-tracking|integration-readiness|solution-builder|specialty-emergency|specialty-cardiology|specialty-laboratory|pathway-sepsis|pathway-stroke)$/) }),
+      ]),
     );
   });
 });
