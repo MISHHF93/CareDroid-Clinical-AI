@@ -1,12 +1,28 @@
 /* CareDroid Interactive Intelligence — Medical Light, compact clinical density */
 
+/* HEAL 2026-08-23: this file's background declarations were split between two
+   different dark-mode bugs, both invisible in light mode and both confirmed
+   live on /emergency/ems's EMS Handoff Assist panel:
+   (1) 3 instances referenced var(--medical-surface, #f8fafc) -- a custom
+       property never defined anywhere in the codebase (only suffixed variants
+       exist: --medical-surface-page/-muted/-card/-inset) -- so they silently
+       fell through to the light fallback in both themes.
+   (2) 11 more instances (chips, response/proposal/inbox cards, composer,
+       suggestion pills, action buttons) hardcoded background: #fff outright,
+       never theme-aware at all.
+   Both classes paired a light-mode-only background with text colors that
+   -- correctly -- DO switch for dark mode (--medical-ink and friends, a few
+   lines down in this same file), producing near-white or literally
+   white-on-white text throughout this whole panel in dark mode. All 14
+   retargeted to --medical-surface-card, matching every sibling surface on
+   this page that already rendered correctly dark. */
 .cd-iaw {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
   min-height: 0;
   height: 100%;
-  background: var(--medical-surface, #f8fafc);
+  background: var(--medical-surface-card, #f8fafc);
   color: var(--medical-ink, #0f172a);
   border: 1px solid var(--medical-border, #e2e8f0);
   border-radius: 12px;
@@ -58,7 +74,7 @@
   padding: 0.2rem 0.5rem;
   border-radius: 999px;
   border: 1px solid var(--medical-border, #e2e8f0);
-  background: #fff;
+  background: var(--medical-surface-card, #fff);
   font-size: 0.72rem;
   color: var(--medical-ink-subtle, #475569);
 }
@@ -82,7 +98,7 @@
   gap: 0.35rem;
   padding: 0.55rem 0.65rem;
   border-radius: 10px;
-  background: #fff;
+  background: var(--medical-surface-card, #fff);
   border: 1px solid var(--medical-border, #e2e8f0);
 }
 
@@ -129,7 +145,7 @@
 .cd-iaw__response {
   padding: 0.7rem 0.75rem;
   border-radius: 10px;
-  background: #fff;
+  background: var(--medical-surface-card, #fff);
   border: 1px solid var(--medical-border, #e2e8f0);
   font-size: 0.88rem;
   line-height: 1.45;
@@ -144,7 +160,7 @@
 
 .cd-iaw__suggestion {
   border: 1px solid var(--medical-border, #e2e8f0);
-  background: #fff;
+  background: var(--medical-surface-card, #fff);
   border-radius: 999px;
   padding: 0.28rem 0.65rem;
   font-size: 0.75rem;
@@ -176,13 +192,13 @@
   padding: 0.5rem 0.65rem;
   font: inherit;
   font-size: 0.88rem;
-  background: #fff;
+  background: var(--medical-surface-card, #fff);
 }
 
 .cd-iaw__composer button {
   border-radius: 10px;
   border: 1px solid var(--medical-border, #e2e8f0);
-  background: #fff;
+  background: var(--medical-surface-card, #fff);
   padding: 0.5rem 0.75rem;
   font-size: 0.8rem;
   font-weight: 600;
@@ -212,7 +228,7 @@
 .cd-iaw-card {
   border: 1px solid var(--medical-border, #e2e8f0);
   border-radius: 10px;
-  background: #fff;
+  background: var(--medical-surface-card, #fff);
   padding: 0.65rem 0.75rem;
   display: grid;
   gap: 0.4rem;
@@ -266,7 +282,7 @@
 .cd-iaw-card__actions button {
   border-radius: 8px;
   border: 1px solid var(--medical-border, #e2e8f0);
-  background: #fff;
+  background: var(--medical-surface-card, #fff);
   font-size: 0.72rem;
   padding: 0.28rem 0.55rem;
   cursor: pointer;
@@ -276,7 +292,7 @@
   border: 1px solid color-mix(in srgb, #7c3aed 30%, #e2e8f0);
   border-left: 3px solid var(--semantic-ai-assistance, #7c3aed);
   border-radius: 10px;
-  background: #fff;
+  background: var(--medical-surface-card, #fff);
   padding: 0.7rem 0.75rem;
   display: grid;
   gap: 0.4rem;
@@ -309,7 +325,7 @@
 .cd-iaw-proposal__actions button {
   border-radius: 8px;
   border: 1px solid var(--medical-border, #e2e8f0);
-  background: #fff;
+  background: var(--medical-surface-card, #fff);
   font-size: 0.75rem;
   padding: 0.3rem 0.6rem;
   cursor: pointer;
@@ -328,7 +344,7 @@
 .cd-iaw-inbox {
   border: 1px solid var(--medical-border, #e2e8f0);
   border-radius: 10px;
-  background: #fff;
+  background: var(--medical-surface-card, #fff);
   padding: 0.65rem 0.75rem;
   display: grid;
   gap: 0.45rem;
@@ -377,7 +393,7 @@
   text-align: left;
   border: 1px solid var(--medical-border, #e2e8f0);
   border-radius: 8px;
-  background: var(--medical-surface, #f8fafc);
+  background: var(--medical-surface-card, #f8fafc);
   padding: 0.45rem 0.55rem;
   display: grid;
   gap: 0.15rem;
@@ -427,7 +443,7 @@
 .cd-iaw-inbox__thread {
   border: 1px solid var(--medical-border, #e2e8f0);
   border-radius: 8px;
-  background: var(--medical-surface, #f8fafc);
+  background: var(--medical-surface-card, #f8fafc);
   padding: 0.45rem 0.55rem;
   display: grid;
   gap: 0.4rem;
