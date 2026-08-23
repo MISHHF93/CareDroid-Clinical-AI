@@ -36,6 +36,7 @@ import {
 } from '../services/securityAccessService';
 import { getDemoUserById, getDefaultDemoUser } from '../lib/users/demoUsers';
 import { ensureDevBackendSession, isDev } from '../services/devBackendAuth';
+import { clearTenantContext } from '../services/tenantContextStore';
 
 export function useEmergencyRolePermissions() {
   const { user, setUser } = useUser();
@@ -199,6 +200,33 @@ export function useEmergencyRolePermissions() {
           ...context,
         }).readOnly,
       switchDemoRole: async (nextRole) => {
+        // HEAL: found live -- switching roles left tenantContextStore's cached
+        // `role` (used by apiClient.ts's getTenantHeaders() to build the
+        // X-CareDroid-Role assertion header on every request) pointing at the
+        // OLD persona until TenantContext.tsx's own effect finished a full
+        // /api/tenant/context round-trip. ProfileRoleSwitcher navigates to the
+        // new persona's landing route in the same tick (see its own comment:
+        // "the backend session sync continues in the background and only
+        // needs to land before the new screen's data requests fire") -- but
+        // nothing enforced that ordering, so the new screen's mount-time
+        // fetches raced the stale cache and got rejected with "Tenant role
+        // header does not match authenticated user." (tenant-context.service.ts)
+        // even though the client-side role switch had already visibly
+        // succeeded. Confirmed live via Playwright: a burst of 403s
+        // (analytics, reassessment, boarding, referrals, queues, ai/node,
+        // central-node/snapshot...) immediately after switching to ed_manager.
+        // The correct post-switch `user.role` value depends on
+        // EMERGENCY_ROLE_TO_USER_ROLE, a backend-only mapping table (some
+        // persona ids map to a DIFFERENT base role than their own slug, e.g.
+        // ed_manager -> admin) -- guessing it here would just trade one racy
+        // value for another. Clearing the cache instead makes
+        // hasRequiredTenantContext() fail closed, so getTenantHeaders()
+        // sends no tenant-assertion headers at all until the existing
+        // TenantContext refresh (already wired to re-fire on `user` change)
+        // repopulates a real, server-confirmed value -- the backend's own
+        // JWT-derived tenant resolution remains authoritative throughout, this
+        // header is a redundant client-side assertion on top of it.
+        clearTenantContext();
         const normalizedRole = normalizeEmergencyRole(nextRole);
         const nextMapping = getCanonicalRoleMapping(nextRole);
         const nextProfile = normalizeCareDroidProfile({
