@@ -1,6 +1,6 @@
 # Orphan Detection Report
 
-Generated: 2026-08-22 (regenerate with `npm run orphan-detection:write-docs`)
+Generated: 2026-08-23 (regenerate with `npm run orphan-detection:write-docs`)
 
 ## Classification key
 
@@ -15,20 +15,20 @@ Generated: 2026-08-22 (regenerate with `npm run orphan-detection:write-docs`)
 
 | Metric | Count |
 |--------|------:|
-| Total orphan findings | 419 |
-| App.jsx routes | 290 |
-| Orphan / gap routes | 113 |
+| Total orphan findings | 366 |
+| App.jsx routes | 317 |
+| Orphan / gap routes | 64 |
 | Orphan pages | 151 |
 | Orphan components | 0 |
 | Domain module findings (dashboard / simulation / lab / 3D) | 20 |
 | Orphan services | 0 |
 | Executor contract gaps | 0 |
 | API orphans / stubs | 125 |
-| Weakly linked markdown | 10 |
-| **wire** | 152 |
+| Weakly linked markdown | 6 |
+| **wire** | 103 |
 | **merge** | 0 |
 | **quarantine** | 0 |
-| **legacy** | 267 |
+| **legacy** | 263 |
 
 ## Merge candidates (explicit)
 
@@ -78,12 +78,6 @@ Generated: 2026-08-22 (regenerate with `npm run orphan-detection:write-docs`)
 | /platform-admin | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /notifications | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /timeline | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /system-health | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /ai-governance | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /security | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /audit | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /regulatory | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /human-review | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /assets | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /ai-models | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /platform-learning-engine | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
@@ -104,55 +98,12 @@ Generated: 2026-08-22 (regenerate with `npm run orphan-detection:write-docs`)
 | /configuration-studio | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /welcome | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /ai/evaluation | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /governance/ai | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /governance/model-usage | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /governance/costs | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /governance/clinical-safety | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /governance/consent | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /governance/privacy | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /privacy | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /governance/ai-security | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /governance/ai-security/policy | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /governance/ai-security/model-access | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /governance/ai-security/incidents | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /audit-logs | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /audit/ai | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /audit/phi | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /audit/integrations | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /audit/policy | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /governance/regulatory | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /governance/regulatory/capabilities | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /governance/regulatory/intended-use | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /governance/regulatory/evidence | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /assistant | wire | toolInventory route not registered in App.jsx |
-| /governance/clinical | wire | toolInventory route not registered in App.jsx |
-| /governance/clinical/release-gates | wire | toolInventory route not registered in App.jsx |
-| /governance/clinical-safety | wire | toolInventory route not registered in App.jsx |
-| /governance/clinical/safety-findings | wire | toolInventory route not registered in App.jsx |
-| /governance/consent | wire | toolInventory route not registered in App.jsx |
-| /governance/costs | wire | toolInventory route not registered in App.jsx |
-| /governance/model-usage | wire | toolInventory route not registered in App.jsx |
-| /governance/privacy | wire | toolInventory route not registered in App.jsx |
-| /integrations/fhir | wire | toolInventory route not registered in App.jsx |
-| /integrations/hl7 | wire | toolInventory route not registered in App.jsx |
-| /integrations/source-provenance | wire | toolInventory route not registered in App.jsx |
 | /ai-command-center | wire | toolInventory route not registered in App.jsx |
 | /assistant | wire | toolInventory route not registered in App.jsx |
-| /ai-governance | wire | toolInventory route not registered in App.jsx |
-| /audit/ai | wire | toolInventory route not registered in App.jsx |
 | /assistant | wire | toolInventory route not registered in App.jsx |
-| /audit | wire | toolInventory route not registered in App.jsx |
-| /governance/equity/findings | wire | toolInventory route not registered in App.jsx |
-| /governance/equity | wire | toolInventory route not registered in App.jsx |
-| /review | wire | toolInventory route not registered in App.jsx |
-| /governance/regulatory/intended-use | wire | toolInventory route not registered in App.jsx |
-| /security | wire | toolInventory route not registered in App.jsx |
-| /governance/ai-security/model-access | wire | toolInventory route not registered in App.jsx |
 | /assistant | wire | toolInventory route not registered in App.jsx |
-| /governance/ai-security/prompt-firewall | wire | toolInventory route not registered in App.jsx |
-| /governance/regulatory | wire | toolInventory route not registered in App.jsx |
-| /governance/validation/synthetic-patients | wire | toolInventory route not registered in App.jsx |
-| /governance/validation | wire | toolInventory route not registered in App.jsx |
 | /assistant | wire | toolInventory route not registered in App.jsx |
 | /predictive-analytics | wire | toolInventory route not registered in App.jsx |
 | /home | legacy | Redirect or alias route in App.jsx |
@@ -481,16 +432,12 @@ _… and 5 more API rows._
 
 | Doc | Class | Evidence |
 | --- | --- | --- |
-| docs/archive/CAREDROID_ARCHITECTURE_CLEANUP_REPORT.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
-| docs/archive/CLINICAL_PROCESS_SAAS_HARMONIZATION_REPORT.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
-| docs/archive/INTERACTION_EXECUTION_REPORT.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
-| docs/archive/PLATFORM_MODERNIZATION_REPORT.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
-| docs/archive/reception-upgrade/02-dependency-map.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
-| docs/archive/reception-upgrade/03-orphaned-code.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
-| docs/archive/reception-upgrade/04-rbac-permission-matrix.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
-| docs/archive/reception-upgrade/05-information-architecture.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
-| docs/archive/reception-upgrade/NEW_HEADER_INTEGRATION_GUIDE.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
-| docs/archive/SCORECARD-archive-2026-07-23-cycles-1-157.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
+| docs/archive/clickable-map-report.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
+| docs/archive/component-mounting-report.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
+| docs/archive/current-codebase-findings.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
+| docs/archive/layout-routing-consolidation-report.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
+| docs/archive/system-evaluation.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
+| docs/archive/ui-surface-compression.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
 
 ## Appendix
 

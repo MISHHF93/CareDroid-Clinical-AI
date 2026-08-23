@@ -20,6 +20,7 @@ import { PLATFORM_CONSOLE_ROUTE_PATHS } from '../config/platformConsoleRoutes';
 import { OPERATIONS_FLEET_CONSOLE_ROUTE_PATHS } from '../config/operationsFleetConsoleRoutes';
 import { ADMIN_CONSOLE_ROUTE_PATHS } from '../config/adminConsoleRoutes';
 import { TRAINING_CONSOLE_ROUTE_PATHS } from '../config/trainingConsoleRoutes';
+import { GOVERNANCE_CONSOLE_ROUTE_PATHS } from '../config/governanceConsoleRoutes';
 import {
   getCanonicalToolInventory,
   getUserFacingToolInventory,
@@ -147,15 +148,26 @@ function parseAppRoutePaths() {
     ...app.matchAll(/import\(['"](\.\/[^'"]+)['"]\)/g),
     ...app.matchAll(/from\s+['"](\.\/pages\/[^'"]+)['"]/g),
   ].map((m) => m[1]);
-  // router.tsx is not the only place a route gets genuinely mounted — 7 separate
+  // router.tsx is not the only place a route gets genuinely mounted — 8 separate
   // "console route tree" files (profile/public/tools/platform/operations-fleet/
-  // admin/training) each register real routes via renderXConsoleRoutes(), called
-  // from router.tsx but with paths defined in their own config files that the
+  // admin/training/governance) each register real routes via renderXConsoleRoutes(),
+  // called from router.tsx but with paths defined in their own config files that the
   // regexes above never scan. Without these, every console-route-tree path (e.g.
   // /navigator, /help-center, /version) was a false-positive "wire" gap here —
   // found 2026-08-06 when a newly-added real route (/navigator) got flagged
   // despite being live and working, matching several pre-existing same-shaped
   // false positives already in this report.
+  //
+  // governanceConsoleRouteTree.tsx (mounted at router.tsx via
+  // renderGovernanceConsoleRoutes(LazyRoute)) was missed when the other 7 trees
+  // were added here — its config export is named GOVERNANCE_CONSOLE_ROUTE_PATHS
+  // rather than the exact same X_CONSOLE_ROUTE_PATHS grep pattern used to find the
+  // others, so it slipped through. Its routes (governance/audit/regulatory/
+  // ai-governance/human-review/equity/privacy/integrations/operations-observability/
+  // operations-incidents/system-health, several as /* wildcards) are real and
+  // live-mounted, but every one of them — dozens of entries — was being reported as
+  // a false "wire" gap here. Found 2026-08-23 while investigating this report's own
+  // accuracy as part of a frontend/backend-linkage healing pass.
   const consoleTreePaths = [
     ...PROFILE_CONSOLE_ROUTE_PATHS,
     ...PUBLIC_CONSOLE_ROUTE_PATHS,
@@ -164,6 +176,7 @@ function parseAppRoutePaths() {
     ...OPERATIONS_FLEET_CONSOLE_ROUTE_PATHS,
     ...ADMIN_CONSOLE_ROUTE_PATHS,
     ...TRAINING_CONSOLE_ROUTE_PATHS,
+    ...GOVERNANCE_CONSOLE_ROUTE_PATHS,
   ];
   return {
     paths: [
