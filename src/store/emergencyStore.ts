@@ -2026,6 +2026,14 @@ type EmergencyOsSettings = {
 
 interface EmergencyStoreState {
   patients: Patient[];
+  /** DOWNTIME-001: patient ids whose most recent local mutation (vitals,
+   * state transition, etc.) has NOT been durably confirmed by the backend --
+   * either the sync call failed, or it's still in flight. hydrateFromApi()
+   * uses this to avoid silently overwriting an unsynced local patient with a
+   * stale backend copy (e.g. on the app's mount-time initializeFromBackend()
+   * call, which otherwise had no way to tell "this patient's backend copy is
+   * just old" from "this patient's local copy has an unsaved change"). */
+  unsyncedPatientIds: Set<string>;
   staff: Staff[];
   rooms: Room[];
   capacity: CapacitySnapshot;
@@ -2511,9 +2519,33 @@ const initialEmergencySettings = mergeEmergencyOsSettings(
   settingsPatchFromThresholds(initialThresholds),
 );
 
+// DOWNTIME-001: only invoked from inside store actions (after the module has
+// fully initialized), so referencing useEmergencyStore here -- defined a few
+// lines below -- is safe despite the textual ordering; same pattern already
+// used by alertEngine.ts calling useEmergencyStore.getState() from a wholly
+// separate module.
+function markPatientUnsynced(patientId: string): void {
+  useEmergencyStore.setState((state) => {
+    if (state.unsyncedPatientIds.has(patientId)) return state;
+    const next = new Set(state.unsyncedPatientIds);
+    next.add(patientId);
+    return { unsyncedPatientIds: next };
+  });
+}
+
+function markPatientSynced(patientId: string): void {
+  useEmergencyStore.setState((state) => {
+    if (!state.unsyncedPatientIds.has(patientId)) return state;
+    const next = new Set(state.unsyncedPatientIds);
+    next.delete(patientId);
+    return { unsyncedPatientIds: next };
+  });
+}
+
 export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
   create<EmergencyStoreState>((set, get) => ({
     patients: initialScenarioState.patients,
+    unsyncedPatientIds: new Set<string>(),
     staff: initialScenarioState.staff,
     rooms: initialScenarioState.rooms,
     capacity: initialCapacity,
@@ -3106,9 +3138,12 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         // immediate UI responsiveness; this is what makes the transition survive a
         // reload or reach a different workstation instead of staying stuck on
         // whatever state the backend's own patient copy was last left at.
-        void patchEmergencyPatient(patientId, { state: to }).catch((error) => {
-          logger.warn('[emergencyStore] Failed to sync patient state transition to backend', error);
-        });
+        markPatientUnsynced(patientId);
+        void patchEmergencyPatient(patientId, { state: to })
+          .then(() => markPatientSynced(patientId))
+          .catch((error) => {
+            logger.warn('[emergencyStore] Failed to sync patient state transition to backend', error);
+          });
       }
     },
 
@@ -3164,9 +3199,12 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
       });
 
       // Fire-and-forget durable sync (MB-P0-6) -- see movePatientToState's identical call.
-      void patchEmergencyPatient(patientId, { state: PatientState.Discharge }).catch((error) => {
-        logger.warn('[emergencyStore] Failed to sync patient discharge to backend', error);
-      });
+      markPatientUnsynced(patientId);
+      void patchEmergencyPatient(patientId, { state: PatientState.Discharge })
+        .then(() => markPatientSynced(patientId))
+        .catch((error) => {
+          logger.warn('[emergencyStore] Failed to sync patient discharge to backend', error);
+        });
     },
 
     assignStaff: (patientId, staffId, options: any = {}) => {
@@ -3553,12 +3591,15 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
       // reassessment-urgency signal, already carry the safety-relevant part.
       const updatedPatient = patients.find((patient) => patient.id === patientId);
       if (updatedPatient) {
+        markPatientUnsynced(patientId);
         void patchEmergencyPatient(patientId, {
           vitals: updatedPatient.vitals,
           flags: updatedPatient.flags,
-        }).catch((error) => {
-          logger.warn('[emergencyStore] Failed to sync patient vitals to backend', error);
-        });
+        })
+          .then(() => markPatientSynced(patientId))
+          .catch((error) => {
+            logger.warn('[emergencyStore] Failed to sync patient vitals to backend', error);
+          });
       }
     },
 
@@ -5649,12 +5690,22 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
 
     hydrateFromApi: (payload) =>
       set((state) => {
+        // DOWNTIME-001: a payload patient whose local copy has an unsynced
+        // mutation (addVitals' backend PATCH failed/never confirmed) must
+        // NOT win here -- the backend's copy is the one that's actually
+        // stale in that case. Without this, initializeFromBackend()'s
+        // mount-time refresh (page reload, session-timeout reauth, opening
+        // the app on a second workstation) would silently and permanently
+        // discard whatever local change never made it to the backend.
         const patients = payload.patients
           ? [
-              ...payload.patients.map(hydratePatientFromBackendApi),
+              ...payload.patients
+                .filter((payloadPatient) => !state.unsyncedPatientIds.has(payloadPatient.id))
+                .map(hydratePatientFromBackendApi),
               ...state.patients
                 .filter(
                   (patient) =>
+                    state.unsyncedPatientIds.has(patient.id) ||
                     !payload.patients!.some((payloadPatient) => payloadPatient.id === patient.id),
                 )
                 .map(hydratePatientFromBackendApi),
