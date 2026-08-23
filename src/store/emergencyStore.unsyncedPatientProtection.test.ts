@@ -16,12 +16,16 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 // instead of trusting the backend payload.
 
 const patchEmergencyPatient = vi.fn(() => Promise.resolve({ data: { ok: true } }));
+const assignEmergencyPatientStaff = vi.fn(() => Promise.resolve({ data: { ok: true } }));
+const escalateEmergencyPatient = vi.fn(() => Promise.resolve({ data: { ok: true } }));
 
 vi.mock('../services/emergencyOsApi', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../services/emergencyOsApi')>();
   return {
     ...actual,
     patchEmergencyPatient: (...args: unknown[]) => patchEmergencyPatient(...args),
+    assignEmergencyPatientStaff: (...args: unknown[]) => assignEmergencyPatientStaff(...args),
+    escalateEmergencyPatient: (...args: unknown[]) => escalateEmergencyPatient(...args),
   };
 });
 
@@ -76,5 +80,48 @@ describe('emergencyStore unsynced-patient protection (DOWNTIME-001)', () => {
 
     expect(useEmergencyStore.getState().unsyncedPatientIds.has(patient.id)).toBe(false);
     expect(patchEmergencyPatient).toHaveBeenCalledTimes(1);
+  });
+
+  // Same bug shape, two more real call sites found on a follow-up sweep for
+  // every "Fire-and-forget durable sync (MB-P0-6)" site in this file --
+  // assignStaff and escalatePatient had the identical unprotected pattern.
+  it('protects assignStaff the same way: a failed staff-assignment sync marks the patient unsynced', async () => {
+    const store = useEmergencyStore.getState();
+    const patient = store.patients[0];
+    const staffMember = store.staff[0];
+    expect(staffMember).toBeTruthy();
+
+    assignEmergencyPatientStaff.mockImplementationOnce(() =>
+      Promise.reject(new Error('network down')),
+    );
+
+    store.assignStaff(patient.id, staffMember.id);
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(useEmergencyStore.getState().unsyncedPatientIds.has(patient.id)).toBe(true);
+
+    const staleBackendCopy = { ...patient, assignedStaffId: null };
+    useEmergencyStore.getState().hydrateFromApi({ patients: [staleBackendCopy] as any });
+
+    const afterHydrate = useEmergencyStore
+      .getState()
+      .patients.find((candidate) => candidate.id === patient.id);
+    expect(afterHydrate?.assignedStaffId).toBe(staffMember.id);
+  });
+
+  it('protects escalatePatient the same way: a failed escalation sync marks the patient unsynced', async () => {
+    const store = useEmergencyStore.getState();
+    const patient = store.patients[0];
+
+    escalateEmergencyPatient.mockImplementationOnce(() =>
+      Promise.reject(new Error('network down')),
+    );
+
+    store.escalatePatient(patient.id, { staffId: 's1' });
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(useEmergencyStore.getState().unsyncedPatientIds.has(patient.id)).toBe(true);
   });
 });

@@ -3292,11 +3292,12 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
       // movePatientToState/dischargePatient's precedent: the local optimistic
       // assignment stays authoritative for immediate UI responsiveness; this
       // is what makes it survive a reload or reach a different workstation.
-      void assignEmergencyPatientStaff(patientId, staffId, options.actorStaffId).catch(
-        (error) => {
+      markPatientUnsynced(patientId);
+      void assignEmergencyPatientStaff(patientId, staffId, options.actorStaffId)
+        .then(() => markPatientSynced(patientId))
+        .catch((error) => {
           logger.warn('[emergencyStore] Failed to sync staff assignment to backend', error);
-        },
-      );
+        });
     },
 
     assignRoom: (patientId, roomId) =>
@@ -3876,9 +3877,12 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         // assignStaff's precedent: the local optimistic escalation stays
         // authoritative for immediate UI responsiveness; this is what makes
         // it survive a reload or reach a different workstation.
-        void escalateEmergencyPatient(patientId, input.staffId).catch((error) => {
-          logger.warn('[emergencyStore] Failed to sync patient escalation to backend', error);
-        });
+        markPatientUnsynced(patientId);
+        void escalateEmergencyPatient(patientId, input.staffId)
+          .then(() => markPatientSynced(patientId))
+          .catch((error) => {
+            logger.warn('[emergencyStore] Failed to sync patient escalation to backend', error);
+          });
       }
     },
 
