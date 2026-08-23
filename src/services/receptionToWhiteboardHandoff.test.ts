@@ -92,7 +92,7 @@ describe('reception to whiteboard handoff chain', () => {
     expect(handoff.queuesPath).toContain('queue=pretriage');
   });
 
-  it('connects self-check-in through arrival control to the whiteboard triage queue', () => {
+  it('connects self-check-in through arrival control to the whiteboard triage queue', async () => {
     const result = buildSelfCheckinPatient(
       {
         ...createEmptySelfCheckinForm(),
@@ -107,7 +107,13 @@ describe('reception to whiteboard handoff chain', () => {
     const { store, patients, websocketEvents, getSelectedPatientId, getQueueFilter } =
       buildHandoffStore();
 
-    const handoff = completeSelfCheckinWhiteboardHandoff(store as never, result);
+    // completeSelfCheckinWhiteboardHandoff is async (it awaits a backend
+    // sync) -- must be awaited to get the resolved { handoff, backendSynced }
+    // result rather than the Promise itself. syncToBackend: false keeps this
+    // test focused on the local handoff/store logic it actually exercises.
+    const { handoff } = await completeSelfCheckinWhiteboardHandoff(store as never, result, {
+      syncToBackend: false,
+    });
 
     const updated = patients.find((entry) => entry.id === 'self-arrival-handoff-1');
     expect(updated).toBeTruthy();

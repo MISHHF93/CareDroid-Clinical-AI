@@ -63,9 +63,13 @@ describe('ClinicalToolCatalog — launch buttons', () => {
 
   it('renders catalog search and category quick filters', async () => {
     const { container } = renderCatalog();
-    expect(
-      screen.getByRole('heading', { name: /developer catalog \/ source audit/i })
-    ).toBeInTheDocument();
+    // The page's own <h1> became a <p data-testid="cd-page-title-text">
+    // (HEAL: ~58 pages still rendered a raw <h1>, duplicating AppShell's own
+    // route-title <h1>) -- the real heading now lives in AppShell chrome via
+    // useRouteChromeRegistration, which this isolated render doesn't mount.
+    expect(screen.getByTestId('cd-page-title-text')).toHaveTextContent(
+      /developer catalog \/ source audit/i
+    );
     expect(container.textContent).toMatch(/user-facing tools now live at \/tools/i);
     expect(screen.getByRole('searchbox', { name: /search developer catalog/i })).toBeInTheDocument();
     expect(await screen.findByRole('group', { name: /quick category filters/i })).toBeInTheDocument();

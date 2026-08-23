@@ -22,9 +22,13 @@ import {
 // .css are new, real, dev-only files (root-level, no owner rule -- falls
 // through to the 'platform' default, same as every other unscoped root
 // page, with zero gaps), +1 source file and +1 style file.
-export const PAGE_INVENTORY_EXPECTED_TOTAL = 243;
+// HEAL: src/pages/NotificationPreferences.css was a dead sibling stylesheet
+// (the real, tokenized styles live in the co-located CSS module) deleted
+// alongside the NotificationPreferences.css tokenization fix -- -1 style
+// file, no source-file or gap change.
+export const PAGE_INVENTORY_EXPECTED_TOTAL = 242;
 export const PAGE_SOURCE_EXPECTED_TOTAL = 151;
-export const PAGE_STYLE_EXPECTED_TOTAL = 92;
+export const PAGE_STYLE_EXPECTED_TOTAL = 91;
 export const PAGE_TOOLS_INVENTORY_EXPECTED_TOTAL = 58;
 export const PAGE_TOOLS_SOURCE_EXPECTED_TOTAL = 48;
 
