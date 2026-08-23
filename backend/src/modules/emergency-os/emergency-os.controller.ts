@@ -566,11 +566,23 @@ export class EmergencyOsController {
     const role = (
       allowedRoles.has(String(roleQuery || '')) ? roleQuery : 'physician'
     ) as import('../../../../lib/patient-orchestration').EmergencyRoleId;
-    const orchestration = this.orchestrationService.buildPatientOrchestration(
-      patientId,
-      role,
-      tenantContext?.organizationId,
-    );
+    let orchestration: ReturnType<PatientOrchestrationService['buildPatientOrchestration']>;
+    try {
+      orchestration = this.orchestrationService.buildPatientOrchestration(
+        patientId,
+        role,
+        tenantContext?.organizationId,
+      );
+    } catch (error) {
+      // buildPatientOrchestration throws a plain Error for an unknown id (same
+      // shape as updatePatient's, translated the same way above) -- without
+      // this, a demo/fixture patient id with no backend record surfaced as a
+      // bare 500 instead of a clean 404.
+      if (error instanceof Error && /not found/i.test(error.message)) {
+        throw new NotFoundException(error.message);
+      }
+      throw error;
+    }
     return {
       module: 'Patient Card Orchestration',
       generatedAt: orchestration.generatedAt,
@@ -684,7 +696,17 @@ export class EmergencyOsController {
         remainingGaps: [],
       };
     }
-    const triageAssist = await this.orchestrationService.buildTriageAssist(patientId, body);
+    let triageAssist: Awaited<ReturnType<PatientOrchestrationService['buildTriageAssist']>>;
+    try {
+      triageAssist = await this.orchestrationService.buildTriageAssist(patientId, body);
+    } catch (error) {
+      // Same translation as getPatientOrchestration/updatePatient above --
+      // buildTriageAssist throws a plain Error for an unknown id.
+      if (error instanceof Error && /not found/i.test(error.message)) {
+        throw new NotFoundException(error.message);
+      }
+      throw error;
+    }
     return {
       module: 'Triage Assist',
       generatedAt: new Date().toISOString(),
