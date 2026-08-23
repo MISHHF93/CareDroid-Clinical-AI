@@ -4253,6 +4253,14 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
           alerts: operationalAlerts.length
             ? mergeEmergencyAlerts(operationalAlerts, state.alerts)
             : state.alerts,
+          // Matches initializeFromBackend's own `backendAvailable: !hasBackendErrors` --
+          // this refresh cycle is also invoked directly by AppShell's onPoll (bypassing
+          // initializeFromBackend entirely), which previously never touched this flag at
+          // all. A single transient failure of the one-time mount-time reachability probe
+          // (1.2s timeout, easily missed under load) pinned backendAvailable false and
+          // every "BACKEND UNAVAILABLE" source-status banner for the rest of the session,
+          // even once polling resumed successfully refreshing every other dataset here.
+          backendAvailable: Object.keys(errors).length === 0,
           loading: false,
           ui: {
             ...state.ui,
