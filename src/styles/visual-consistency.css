@@ -249,6 +249,28 @@
   white-space: normal;
 }
 
+/* HEAL: CriticalAlertBanner's "View alerts" CTA (.cdl-alarm-banner__action--primary,
+   alarm.css) is a flex-shrink:0/flex-grow:0 sibling of a flex:1 (flex-basis:0%)
+   message span that depends on the link staying content-sized so the message keeps
+   the remaining row width. Confirmed live at a 768px viewport that this specific
+   link's flex-basis:auto was NOT resolving to its content size: it ballooned to
+   702px of the 736px banner, squeezing the message to 0px width/1072px height
+   (wrapping one character per line). The equivalent .cdl-alarm-banner__action button
+   in AlarmBanner.tsx (e.g. on /emergency/patients) sizes correctly under the same
+   wide-net rule, so this is specific to this banner's combination of the message's
+   flex-basis:0% sibling and the .critical-alert-banner/.cdl-alarm-banner dual-class
+   container -- not a general flex+text-node quirk. Forcing flex-basis to
+   max-content here (proven live: drops the link to ~101px and grows the message to
+   ~563px) restores content-based sizing without touching the shared AlarmBanner
+   component. white-space:nowrap is kept as a defensive pairing -- the wide-net
+   rule's white-space:normal would otherwise still be sitting there waiting to wrap
+   the link's own label if this box is ever squeezed narrower than "View alerts"
+   itself (e.g. an even smaller viewport). */
+:is(.app-shell, .emergency-app-shell) .critical-alert-banner__link.cdl-alarm-banner__action {
+  flex-basis: max-content;
+  white-space: nowrap;
+}
+
 :is(.app-shell, .emergency-app-shell)
   :is(
     button[class*='secondary'],
