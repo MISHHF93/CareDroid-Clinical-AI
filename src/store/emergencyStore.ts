@@ -4249,6 +4249,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
             return nextArrivals.length ? nextArrivals : state.emsArrivals;
           })(),
           queues: queues.data ? extractQueueSummaries(queues.data) : state.queues,
+          referrals: referrals.data ? extractReferrals(referrals.data) : state.referrals,
           alerts: operationalAlerts.length
             ? mergeEmergencyAlerts(operationalAlerts, state.alerts)
             : state.alerts,
