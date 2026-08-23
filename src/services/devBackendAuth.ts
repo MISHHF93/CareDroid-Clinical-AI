@@ -92,8 +92,30 @@ function persistDevSession(payload) {
     // hydrateStoredDemoUser()/isDemoPersonaUser(). Only the accessToken (already
     // persisted above) is actually needed from a late-resolving fetch in demo mode;
     // don't let it clobber an already-active, correctly-role-switched demo persona.
+    //
+    // HEAL: found live -- isDemoPersonaUser() alone still isn't enough. This
+    // app's actual dev-bypass session (AuthPage.tsx's "Bypass sign-in"
+    // button) stamps authMode 'explicit-dev-bypass', which isDemoPersonaUser()
+    // has never recognized -- the identical gap hydrateStoredDemoUser() (right
+    // below, in demoPersonaModel.ts) already had to special-case for
+    // HEAL-347.14/.16. So this write still clobbered an explicit-dev-bypass
+    // session's profile with the raw backend response whenever it landed
+    // after a role switch -- confirmed live two ways: a switched-to
+    // registration_clerk session lost its own action grants after a reload
+    // (compiledProfile fallback rebuilt with the wrong emergencyRoleId, see
+    // useEmergencyRolePermissions.ts's own HEAL comment), and a switched-to
+    // public_display session came back with the backend's raw `role`
+    // ("student") on later API calls, 403ing on READ_PHI for a page that
+    // should have worked. Match hydrateStoredDemoUser()'s own already-shipped
+    // "must survive a reload" authMode set here too, instead of only
+    // checking isDemoPersonaUser().
     const existingProfile = readStoredUserProfile();
-    if (!isDemoPersonaUser(existingProfile)) {
+    const preservesExistingProfile =
+      isDemoPersonaUser(existingProfile) ||
+      ['real', 'local-dev-demo', 'dev-demo', 'explicit-dev-bypass'].includes(
+        (existingProfile as any)?.authMode,
+      );
+    if (!preservesExistingProfile) {
       localStorage.setItem(
         USER_PROFILE_KEY,
         JSON.stringify({

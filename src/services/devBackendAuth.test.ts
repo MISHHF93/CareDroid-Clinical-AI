@@ -40,6 +40,22 @@ function demoPersonaProfile(role: string) {
   };
 }
 
+function explicitDevBypassProfile(role: string) {
+  // Real shape from AuthPage.tsx's "Bypass sign-in" button + a subsequent
+  // switchDemoRole() -- authMode 'explicit-dev-bypass' is a real backend
+  // dev-session user (a UUID id, no OPEN_ACCESS_USER_ID/demoPersona
+  // markers), so isDemoPersonaUser() returns false for it. compiledAccessProfile/
+  // caredroidProfile are the frontend-only fields switchDemoRole() attaches.
+  return {
+    id: 'c610b6b5-4826-4190-aebe-97b433c62df8',
+    authMode: 'explicit-dev-bypass',
+    role,
+    profile: { roleProfileId: role, hospitalRole: role },
+    compiledAccessProfile: { user: { role } },
+    caredroidProfile: { role },
+  };
+}
+
 describe('devBackendAuth persistDevSession (HEAL-319)', () => {
   beforeEach(() => {
     localStorage.clear();
@@ -79,6 +95,30 @@ describe('devBackendAuth persistDevSession (HEAL-319)', () => {
     // selection.
     expect(stored.role).toBe('physician');
     expect(stored.profile.roleProfileId).toBe('physician');
+  });
+
+  it('does not overwrite an already-active explicit-dev-bypass session either, not just the open-access demo persona shape', async () => {
+    // The actual session type this app's own "Bypass sign-in" button + demo
+    // role switcher produce -- isDemoPersonaUser() alone doesn't recognize
+    // it (no OPEN_ACCESS_USER_ID, no demoPersona marker), so this write used
+    // to clobber it exactly like the pre-HEAL-319 open-access case above.
+    // Confirmed live: a switched-to registration_clerk session lost its own
+    // action grants after a reload (the top-level `role` field this test
+    // checks got overwritten with the backend's generic UserRole, unrelated
+    // to the Emergency-OS role actually switched to), and a switched-to
+    // public_display session's compiledAccessProfile/caredroidProfile
+    // (frontend-only fields, absent from any backend response) were lost
+    // outright.
+    localStorage.setItem(PROFILE_KEY, JSON.stringify(explicitDevBypassProfile('ems_user')));
+
+    const { ensureDevBackendSession } = await import('./devBackendAuth');
+    await ensureDevBackendSession({ force: true, roleProfileId: 'ems_user' });
+
+    const stored = JSON.parse(localStorage.getItem(PROFILE_KEY) as string);
+    expect(stored.role).toBe('ems_user');
+    expect(stored.profile.roleProfileId).toBe('ems_user');
+    expect(stored.compiledAccessProfile).toBeTruthy();
+    expect(stored.caredroidProfile).toBeTruthy();
   });
 
   it('still persists the backend session payload on a genuinely fresh session (no demo persona yet)', async () => {
