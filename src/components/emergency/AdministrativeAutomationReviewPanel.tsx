@@ -230,13 +230,20 @@ export function AdministrativeAutomationReviewPanel() {
 
   const statusChart = useMemo(() => {
     const items = workflow.items || [];
+    // WorkflowAutomationItemStatus (workflow.items' own status type) has no
+    // 'overridden' member at all -- it can only ever be pending_review/
+    // active/acknowledged/executed. The real override count lives on
+    // adminQueue's AdministrativeAutomationTask.status instead (set by the
+    // Override button above, which always requires a reason). This chart
+    // was silently reporting 0 regardless of how many overrides actually
+    // happened, rather than reading the count that was already in scope.
     const metrics = {
       pendingReview: workflow.pendingCount,
       executedToday: items.filter((item) => item.status === 'executed').length,
-      overridden: 0,
+      overridden: adminQueue.filter((task) => task.status === 'overridden').length,
     };
     return buildAutomationStatusChart(metrics);
-  }, [workflow.items, workflow.pendingCount]);
+  }, [workflow.items, workflow.pendingCount, adminQueue]);
 
   const categoryChart = useMemo(
     () =>

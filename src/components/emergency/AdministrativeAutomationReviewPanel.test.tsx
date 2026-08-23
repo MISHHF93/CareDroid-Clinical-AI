@@ -108,9 +108,20 @@ vi.mock('../../hooks/useUnifiedWorkflowAutomation', () => ({
   }),
 }));
 
+const overriddenTask: AdministrativeAutomationTask = {
+  ...aiTask,
+  id: 'auto-route-p-2',
+  patientId: 'p-2',
+  patientName: 'Alex Rivera',
+  status: 'overridden',
+  overrideReason: 'Charge nurse judgment: patient already en route to resus bay.',
+  reviewedByStaffId: 'user-1',
+  reviewedAt: '2026-07-01T12:05:00.000Z',
+};
+
 vi.mock('../../store/emergencyStore', () => ({
   useEmergencyStore: (selector: (state: { administrativeAutomationQueue: AdministrativeAutomationTask[] }) => unknown) =>
-    selector({ administrativeAutomationQueue: [aiTask] }),
+    selector({ administrativeAutomationQueue: [aiTask, overriddenTask] }),
 }));
 
 vi.mock('../../contexts/UserContext', () => ({
@@ -156,5 +167,15 @@ describe('AdministrativeAutomationReviewPanel', () => {
     expect(screen.getByText('By domain')).toBeInTheDocument();
     expect(screen.getByTestId('distribution-donut-chart')).toBeInTheDocument();
     expect(screen.getByTestId('category-bar-chart')).toBeInTheDocument();
+  });
+
+  it('reflects real overridden tasks in the status chart instead of a hardcoded 0', () => {
+    renderPanel();
+
+    // buildAutomationStatusChart filters out any row with value 0, so before
+    // the fix this segment never rendered at all regardless of how many
+    // overrides had actually happened -- the mocked queue above has one
+    // task with status: 'overridden'.
+    expect(screen.getByText('Overridden: 1')).toBeInTheDocument();
   });
 });
