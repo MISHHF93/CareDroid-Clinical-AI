@@ -13,7 +13,7 @@ import { PatientFlag } from '../types/emergency';
 import { Sidebar } from './Sidebar';
 
 function renderSidebar(role: string, initialPath = '/emergency/whiteboard') {
-  render(
+  return render(
     <UserProvider>
       <MemoryRouter initialEntries={[initialPath]}>
         <Sidebar navigationItems={getVisibleNavigation(role)} />
@@ -219,6 +219,38 @@ describe('Sidebar unified navigation rendering', () => {
         overrides: previousOverrides,
       });
     }
+  });
+
+  it('scrolls the active nav item into view on mount (fixes the Queues item clipping at the scroll boundary next to the utility footer)', () => {
+    // sidebar__body scrolls independently of the fixed sidebar__footer below
+    // it -- correct, deliberate layout -- but nothing scrolled the active
+    // item into view when landing directly on a route (a fresh mount, same
+    // as this test's render), so an item whose nav entry fell near the
+    // bottom edge of the body's initial scroll position rendered with its
+    // icon and label clipped off. Checked for two different active routes to
+    // prove the effect keys off whichever page is actually active, not one
+    // hardcoded element.
+    const scrollIntoView = window.HTMLElement.prototype.scrollIntoView as ReturnType<typeof vi.fn>;
+
+    scrollIntoView.mockClear();
+    const first = renderSidebar('admin', '/emergency/queues');
+    const queuesLink = within(
+      screen.getByRole('navigation', { name: 'Emergency desktop navigation' }),
+    ).getByRole('link', { name: 'Queues' });
+
+    expect(scrollIntoView).toHaveBeenCalledTimes(1);
+    expect(scrollIntoView.mock.instances[0]).toBe(queuesLink);
+    expect(scrollIntoView).toHaveBeenCalledWith({ block: 'nearest' });
+    first.unmount();
+
+    scrollIntoView.mockClear();
+    renderSidebar('admin', '/emergency/analytics');
+    const analyticsLink = within(
+      screen.getByRole('navigation', { name: 'Emergency desktop navigation' }),
+    ).getByRole('link', { name: 'Analytics' });
+
+    expect(scrollIntoView).toHaveBeenCalledTimes(1);
+    expect(scrollIntoView.mock.instances[0]).toBe(analyticsLink);
   });
 
   it('toggles the docked Copilot panel closed on a second click (HEAL-211)', () => {

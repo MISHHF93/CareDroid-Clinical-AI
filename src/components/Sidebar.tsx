@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import appConfig from '../config/appConfig';
 import {
@@ -158,6 +158,7 @@ function isActiveRoute(pathname: string, item: SidebarNavItem, search = ''): boo
 export function Sidebar({ navigationItems }: SidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
+  const sidebarBodyRef = useRef<HTMLDivElement>(null);
   const [moreOpen, setMoreOpen] = useState(false);
   const emergencyRole = useEmergencyRolePermissions();
   const screenCapabilities = useScreenModeCapabilities();
@@ -486,6 +487,20 @@ export function Sidebar({ navigationItems }: SidebarProps) {
     return navLink;
   };
 
+  // sidebar__body scrolls independently of the fixed sidebar__footer below it
+  // (utility shortcuts + session controls) -- correct, deliberate layout. But
+  // nothing ever scrolled the active item into view on navigation, so landing
+  // directly on a route whose nav entry falls near the bottom edge of the
+  // body's own scroll window (e.g. Queues, right where the scrollable list
+  // meets the footer) rendered as a highlighted bar with its icon and label
+  // clipped off -- confirmed live via screenshot, not a CSS overlap bug, just
+  // a missing "reveal the current page" behavior every other item already
+  // gets for free by being fully within the initial scroll position.
+  useEffect(() => {
+    const active = sidebarBodyRef.current?.querySelector('.sidebar-nav-item--active');
+    active?.scrollIntoView({ block: 'nearest' });
+  }, [location.pathname]);
+
   return (
     <aside className="sidebar sidebar--clinical" aria-label="Emergency navigation">
       <header className="sidebar__brand">
@@ -498,7 +513,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
         </div>
       </header>
       <nav className="sidebar-desktop-nav" aria-label="Emergency desktop navigation">
-        <div className="sidebar__body">
+        <div className="sidebar__body" ref={sidebarBodyRef}>
           {groupedDesktopPrimaryNav.map(({ group, items }) => (
             <div key={group} className="sidebar-nav-group" role="group" aria-label={group}>
               <span className="sidebar-nav-group__label">{group}</span>
