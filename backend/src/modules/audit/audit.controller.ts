@@ -11,6 +11,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { AuditService } from './audit.service';
 import { AuditAction } from './entities/audit-log.entity';
 import { AuthorizationGuard } from '../auth/guards/authorization.guard';
@@ -25,7 +26,20 @@ export class AuditController {
 
   constructor(private readonly auditService: AuditService) {}
 
+  // AUDIT-001: no update/delete route exists on this controller at all --
+  // ordinary users genuinely cannot modify or erase audit evidence over the
+  // API (the hash chain in AuditService also makes any out-of-band DB
+  // tampering detectable, not just preventable via routing). But this route
+  // had no rate limit: any authenticated user (any role, any tenant) could
+  // flood the same tamper-evident ledger the platform treats as security
+  // evidence with an unlimited volume of attacker-chosen SECURITY_EVENT
+  // entries -- degrading its practical value (real events buried in noise)
+  // without ever touching an existing row. Matches
+  // analytics.controller.ts's identical-shape authenticated POST
+  // /analytics/events limit (HEAL-347.89).
   @Post('sync')
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { limit: 60, ttl: 60000 } })
   async syncAuditEvent(@Body() body: SyncAuditEventDto, @Req() req: any) {
     const action = String(body.action || body.eventType || 'client_audit_event');
     const resourceType = String(body.resourceType || 'client');
