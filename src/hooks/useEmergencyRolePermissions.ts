@@ -36,7 +36,10 @@ import {
 } from '../services/securityAccessService';
 import { getDemoUserById, getDefaultDemoUser } from '../lib/users/demoUsers';
 import { ensureDevBackendSession, isDev } from '../services/devBackendAuth';
-import { clearTenantContext } from '../services/tenantContextStore';
+import {
+  beginTenantContextTransition,
+  endTenantContextTransition,
+} from '../services/tenantContextStore';
 
 export function useEmergencyRolePermissions() {
   const { user, setUser } = useUser();
@@ -215,18 +218,21 @@ export function useEmergencyRolePermissions() {
         // succeeded. Confirmed live via Playwright: a burst of 403s
         // (analytics, reassessment, boarding, referrals, queues, ai/node,
         // central-node/snapshot...) immediately after switching to ed_manager.
-        // The correct post-switch `user.role` value depends on
-        // EMERGENCY_ROLE_TO_USER_ROLE, a backend-only mapping table (some
-        // persona ids map to a DIFFERENT base role than their own slug, e.g.
-        // ed_manager -> admin) -- guessing it here would just trade one racy
-        // value for another. Clearing the cache instead makes
-        // hasRequiredTenantContext() fail closed, so getTenantHeaders()
-        // sends no tenant-assertion headers at all until the existing
-        // TenantContext refresh (already wired to re-fire on `user` change)
-        // repopulates a real, server-confirmed value -- the backend's own
-        // JWT-derived tenant resolution remains authoritative throughout, this
-        // header is a redundant client-side assertion on top of it.
-        clearTenantContext();
+        //
+        // A first attempt just cleared the cache (hasRequiredTenantContext()
+        // fails closed, no headers sent) and later re-applied the fresh
+        // tenantContext from ensureDevBackendSession's own response once that
+        // resolved -- but TenantContext.tsx's independent effect (re-fires on
+        // this same `user` change, below) races that same window with its own
+        // GET /api/tenant/context, and a plain GET routinely resolves *faster*
+        // than the dev-session POST it's racing. Confirmed live: it kept
+        // winning and repopulating the cache with the role the backend still
+        // had *before* this switch's sync applied -- the 403s persisted.
+        // beginTenantContextTransition() makes every OTHER setTenantContext()
+        // caller (specifically that effect) a no-op until this switch calls
+        // endTenantContextTransition() with its own guaranteed-fresh result,
+        // so it can no longer win that race.
+        const tenantTransitionToken = beginTenantContextTransition();
         const normalizedRole = normalizeEmergencyRole(nextRole);
         const nextMapping = getCanonicalRoleMapping(nextRole);
         const nextProfile = normalizeCareDroidProfile({
@@ -284,12 +290,30 @@ export function useEmergencyRolePermissions() {
         // session to match before any of the new persona's screens fire real
         // requests; dev-only (isDev), and errors here must never block the
         // (already-applied) client-side role switch.
-        if (isDev) {
-          try {
-            await ensureDevBackendSession({ force: true, roleProfileId: normalizedRole });
-          } catch {
-            // best-effort: FE role state above is already updated regardless
+        try {
+          if (isDev) {
+            const sessionResult = await ensureDevBackendSession({
+              force: true,
+              roleProfileId: normalizedRole,
+            });
+            // sessionResult.tenantContext is the dev-session response's own
+            // tenantContext (already in the exact flat shape tenantContextStore
+            // expects -- see auth.service.ts's ensureDevTenantForUser), built
+            // from `user.role` strictly *after* the sync wrote it -- the one
+            // guaranteed-fresh source, no second fetch or race possible.
+            endTenantContextTransition(tenantTransitionToken, sessionResult?.tenantContext ?? null);
+          } else {
+            // No backend sync to wait for outside dev -- release the
+            // transition immediately so TenantContext's own refresh (already
+            // in flight from the `user` change above) can populate normally.
+            endTenantContextTransition(tenantTransitionToken);
           }
+        } catch {
+          // best-effort: FE role state above is already updated regardless.
+          // Still release the transition -- leaving it held forever would
+          // permanently block every future tenant-context update, not just
+          // this switch's.
+          endTenantContextTransition(tenantTransitionToken, null);
         }
       },
     }),
