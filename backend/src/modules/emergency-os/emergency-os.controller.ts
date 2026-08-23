@@ -1153,17 +1153,25 @@ export class EmergencyOsController {
   listClinicalCalculatorResults(
     @Query('patientId') patientId?: string,
     @Query('calculatorId') calculatorId?: string,
+    @TenantContext() tenantContext?: TenantContextValue,
   ) {
     return this.clinicalDecisionSupportService.listCalculatorResults({
       patientId,
       calculatorId: calculatorId as RecordClinicalCalculatorDto['calculatorId'] | undefined,
+      organizationId: tenantContext?.organizationId,
     });
   }
 
   @RequirePermission(Permission.USE_AI_CHAT)
   @Get('copilot/interactions')
-  listCopilotInteractions(@Query('patientId') patientId?: string) {
-    return this.clinicalDecisionSupportService.listCopilotInteractions({ patientId });
+  listCopilotInteractions(
+    @Query('patientId') patientId?: string,
+    @TenantContext() tenantContext?: TenantContextValue,
+  ) {
+    return this.clinicalDecisionSupportService.listCopilotInteractions({
+      patientId,
+      organizationId: tenantContext?.organizationId,
+    });
   }
 
   @RequirePermission(Permission.USE_AI_CHAT)

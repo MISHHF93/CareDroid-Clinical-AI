@@ -142,10 +142,22 @@ export class ClinicalDecisionSupportService implements OnModuleInit {
     return envelope('Clinical Calculator Result', record);
   }
 
-  listCalculatorResults(filters: { patientId?: string; calculatorId?: string } = {}) {
+  // BOLA fix: recordCalculatorResult() has always stamped tenantId on every
+  // row, but this read path never checked it -- any USE_CALCULATORS-permitted
+  // user could list every org's calculator results by omitting patientId, or
+  // read another org's patient's results by supplying that patientId. Same
+  // own-org-or-legacy-null rule as every other tenant-scoping fix in this
+  // codebase: a row with no tenantId (pre-migration/legacy) stays visible,
+  // a row with a real, different tenantId does not.
+  listCalculatorResults(
+    filters: { patientId?: string; calculatorId?: string; organizationId?: string } = {},
+  ) {
     const rows = this.calculatorResults.filter((row) => {
       if (filters.patientId && row.patientId !== filters.patientId) return false;
       if (filters.calculatorId && row.calculatorId !== filters.calculatorId) return false;
+      if (filters.organizationId && row.tenantId && row.tenantId !== filters.organizationId) {
+        return false;
+      }
       return true;
     });
     return envelope('Clinical Calculator Results', {
@@ -184,9 +196,15 @@ export class ClinicalDecisionSupportService implements OnModuleInit {
     return envelope('Copilot Interaction', record);
   }
 
-  listCopilotInteractions(filters: { patientId?: string } = {}) {
+  // Same BOLA fix as listCalculatorResults() above -- these rows carry
+  // patientContextSummary/draftGuidance, real PHI-adjacent clinical content,
+  // and were readable across every tenant with no filtering at all.
+  listCopilotInteractions(filters: { patientId?: string; organizationId?: string } = {}) {
     const rows = this.copilotInteractions.filter((row) => {
       if (filters.patientId && row.patientId !== filters.patientId) return false;
+      if (filters.organizationId && row.tenantId && row.tenantId !== filters.organizationId) {
+        return false;
+      }
       return true;
     });
     return envelope('Copilot Interactions', {
