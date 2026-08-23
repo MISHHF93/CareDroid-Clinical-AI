@@ -18,19 +18,19 @@
   text-align: center;
   margin-bottom: 3rem;
   padding-bottom: 2rem;
-  border-bottom: 2px solid rgba(33, 150, 243, 0.2);
+  border-bottom: 2px solid color-mix(in srgb, var(--app-info) 20%, transparent);
 }
 
 .preferences-header h2 {
   margin: 0 0 0.5rem 0;
   font-size: 1.8rem;
-  color: #1a237e;
+  color: var(--app-text-primary);
   font-weight: 600;
 }
 
 .preferences-header p {
   margin: 0;
-  color: #666;
+  color: var(--app-text-secondary);
   font-size: 1rem;
 }
 
@@ -65,7 +65,7 @@
 .preferences-section h3 {
   margin: 0 0 1.5rem 0;
   font-size: 1.2rem;
-  color: #1a237e;
+  color: var(--app-text-primary);
   font-weight: 600;
 }
 
@@ -82,7 +82,7 @@
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
-  color: #424242;
+  color: var(--app-text-primary);
   font-size: 0.95rem;
 }
 
@@ -91,7 +91,7 @@
 .form-group input[type='time'] {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--app-border-subtle);
   border-radius: 6px;
   font-size: 0.95rem;
   transition: all 0.3s ease;
@@ -101,14 +101,14 @@
 .form-group input[type='tel']:focus,
 .form-group input[type='time']:focus {
   outline: none;
-  border-color: #64748b;
-  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+  border-color: var(--app-accent-interactive);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--app-info) 10%, transparent);
 }
 
 .form-group small {
   display: block;
   margin-top: 0.3rem;
-  color: #999;
+  color: var(--app-text-muted);
   font-size: 0.85rem;
 }
 
@@ -133,7 +133,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #ccc;
+  background-color: var(--app-border-subtle);
   transition: 0.4s;
   border-radius: 28px;
 }
@@ -152,7 +152,7 @@
 }
 
 input:checked + .slider {
-  background-color: #64748b;
+  background-color: var(--app-accent-interactive);
 }
 
 input:checked + .slider:before {
@@ -169,7 +169,7 @@ input:checked + .slider:before {
 }
 
 .channel-toggle:hover {
-  background: #eeeeee;
+  background: var(--app-surface-2);
 }
 
 .toggle-header {
@@ -183,13 +183,13 @@ input:checked + .slider:before {
 
 .toggle-header span {
   font-weight: 600;
-  color: #1a237e;
+  color: var(--app-text-primary);
   font-size: 0.9rem;
 }
 
 .channel-desc {
   margin: 0;
-  color: #666;
+  color: var(--app-text-secondary);
   font-size: 0.85rem;
 }
 
@@ -199,12 +199,12 @@ input:checked + .slider:before {
   background: var(--app-surface-1);
   border-radius: 8px;
   margin-bottom: 1rem;
-  border-left: 4px solid #64748b;
+  border-left: 4px solid var(--app-accent-interactive);
   transition: all 0.3s ease;
 }
 
 .alert-type:hover {
-  background: #eeeeee;
+  background: var(--app-surface-2);
 }
 
 .alert-header {
@@ -218,13 +218,13 @@ input:checked + .slider:before {
 
 .alert-header span {
   font-weight: 600;
-  color: #1a237e;
+  color: var(--app-text-primary);
   font-size: 0.9rem;
 }
 
 .alert-desc {
   margin: 0 0 1rem 0;
-  color: #666;
+  color: var(--app-text-secondary);
   font-size: 0.85rem;
 }
 
@@ -239,7 +239,7 @@ input:checked + .slider:before {
   display: block;
   font-weight: 500;
   margin-bottom: 0.5rem;
-  color: #424242;
+  color: var(--app-text-primary);
   font-size: 0.9rem;
 }
 
@@ -247,7 +247,7 @@ input:checked + .slider:before {
   width: 100%;
   height: 6px;
   border-radius: 3px;
-  background: #ddd;
+  background: var(--app-border-subtle);
   outline: none;
   -webkit-appearance: none;
   appearance: none;
@@ -260,7 +260,7 @@ input:checked + .slider:before {
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: #64748b;
+  background: var(--app-accent-interactive);
   cursor: pointer;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
@@ -269,7 +269,7 @@ input:checked + .slider:before {
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: #64748b;
+  background: var(--app-accent-interactive);
   cursor: pointer;
   border: none;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -278,7 +278,7 @@ input:checked + .slider:before {
 .cost-threshold small {
   display: block;
   margin-top: 0.5rem;
-  color: #999;
+  color: var(--app-text-muted);
   font-size: 0.8rem;
 }
 
@@ -287,7 +287,7 @@ input:checked + .slider:before {
   padding: 1.5rem;
   background: var(--app-surface-1);
   border-radius: 8px;
-  border-left: 4px solid #ff9800;
+  border-left: 4px solid var(--app-warning);
 }
 
 .digest-header {
@@ -299,7 +299,7 @@ input:checked + .slider:before {
 
 .digest-header span {
   font-weight: 600;
-  color: #1a237e;
+  color: var(--app-text-primary);
   font-size: 0.9rem;
 }
 
@@ -314,14 +314,14 @@ input:checked + .slider:before {
   display: block;
   font-weight: 500;
   margin-bottom: 0.5rem;
-  color: #424242;
+  color: var(--app-text-primary);
   font-size: 0.9rem;
 }
 
 .digest-time input[type='time'] {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--app-border-subtle);
   border-radius: 6px;
   font-size: 0.9rem;
   margin-bottom: 0.5rem;
@@ -329,7 +329,7 @@ input:checked + .slider:before {
 
 .digest-desc {
   margin: 0;
-  color: #666;
+  color: var(--app-text-secondary);
   font-size: 0.85rem;
 }
 
@@ -344,7 +344,7 @@ input:checked + .slider:before {
 
 .save-btn {
   padding: 1rem 2.5rem;
-  background: linear-gradient(135deg, #64748b, #475569);
+  background: linear-gradient(135deg, var(--app-accent-interactive), var(--app-accent-2));
   color: var(--app-on-solid);
   border: none;
   border-radius: 8px;
@@ -352,12 +352,12 @@ input:checked + .slider:before {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(100, 116, 139, 0.3);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--app-accent-interactive) 30%, transparent);
 }
 
 .save-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(100, 116, 139, 0.4);
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--app-accent-interactive) 40%, transparent);
 }
 
 .save-btn:disabled {
@@ -370,10 +370,10 @@ input:checked + .slider:before {
   bottom: 2rem;
   right: 2rem;
   padding: 1rem 1.5rem;
-  background: #22c55e;
+  background: var(--app-success);
   color: var(--app-on-solid);
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--app-success) 30%, transparent);
   animation: slideInRight 0.3s ease;
   z-index: 1000;
 }
@@ -400,7 +400,7 @@ input:checked + .slider:before {
 .preferences-summary h3 {
   margin: 0 0 1.5rem 0;
   font-size: 1.2rem;
-  color: #1a237e;
+  color: var(--app-text-primary);
   font-weight: 600;
 }
 
@@ -421,17 +421,17 @@ input:checked + .slider:before {
 
 .summary-label {
   font-weight: 500;
-  color: #424242;
+  color: var(--app-text-primary);
 }
 
 .summary-value {
   font-weight: 700;
-  color: #64748b;
+  color: var(--app-accent-interactive);
 }
 
 .preferences-eyebrow {
   margin: 0 0 0.35rem;
-  color: #475569;
+  color: var(--app-text-secondary);
   font-size: 0.78rem;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -447,15 +447,15 @@ input:checked + .slider:before {
 }
 
 .notification-status--success {
-  border: 1px solid rgba(46, 125, 50, 0.25);
-  background: rgba(46, 125, 50, 0.12);
-  color: #1b5e20;
+  border: 1px solid color-mix(in srgb, var(--app-success) 25%, transparent);
+  background: color-mix(in srgb, var(--app-success) 12%, transparent);
+  color: var(--app-success);
 }
 
 .notification-status--error {
-  border: 1px solid rgba(198, 40, 40, 0.25);
-  background: rgba(198, 40, 40, 0.1);
-  color: #8e0000;
+  border: 1px solid color-mix(in srgb, var(--app-danger) 25%, transparent);
+  background: color-mix(in srgb, var(--app-danger) 10%, transparent);
+  color: var(--app-danger);
 }
 
 .notification-section-header {
@@ -473,7 +473,7 @@ input:checked + .slider:before {
 .section-help,
 .empty-note {
   margin: 0;
-  color: #666;
+  color: var(--app-text-secondary);
   font-size: 0.9rem;
   line-height: 1.45;
 }
@@ -484,14 +484,14 @@ input:checked + .slider:before {
   justify-content: space-between;
   gap: 1rem;
   padding: 1.25rem;
-  border: 1px solid rgba(33, 150, 243, 0.18);
+  border: 1px solid color-mix(in srgb, var(--app-info) 18%, transparent);
   border-radius: 12px;
-  background: rgba(33, 150, 243, 0.08);
+  background: color-mix(in srgb, var(--app-info) 8%, transparent);
 }
 
 .unread-count {
   display: block;
-  color: #1a237e;
+  color: var(--app-text-primary);
   font-size: 2.25rem;
   font-weight: 800;
   line-height: 1;
@@ -500,7 +500,7 @@ input:checked + .slider:before {
 .unread-label {
   display: block;
   margin-top: 0.25rem;
-  color: #424242;
+  color: var(--app-text-primary);
   font-weight: 600;
 }
 
@@ -522,22 +522,22 @@ input:checked + .slider:before {
 }
 
 .notification-recent-item--unread {
-  border-left: 4px solid #64748b;
+  border-left: 4px solid var(--app-accent-interactive);
 }
 
 .notification-recent-item strong {
-  color: #1a237e;
+  color: var(--app-text-primary);
 }
 
 .notification-recent-item p {
   margin: 0.35rem 0 0;
-  color: #666;
+  color: var(--app-text-secondary);
   font-size: 0.9rem;
 }
 
 .notification-recent-item span {
   flex: 0 0 auto;
-  color: #475569;
+  color: var(--app-text-secondary);
   font-size: 0.8rem;
   font-weight: 800;
   text-transform: uppercase;
@@ -551,18 +551,18 @@ input:checked + .slider:before {
 
 .secondary-btn {
   padding: 0.7rem 1rem;
-  border: 1px solid rgba(33, 150, 243, 0.3);
+  border: 1px solid color-mix(in srgb, var(--app-info) 30%, transparent);
   border-radius: 8px;
   background: var(--app-surface-1);
-  color: #475569;
+  color: var(--app-text-secondary);
   cursor: pointer;
   font-weight: 700;
   transition: all 0.2s ease;
 }
 
 .secondary-btn:hover:not(:disabled) {
-  border-color: #475569;
-  background: rgba(33, 150, 243, 0.08);
+  border-color: var(--app-text-secondary);
+  background: color-mix(in srgb, var(--app-info) 8%, transparent);
 }
 
 .secondary-btn:disabled {
@@ -571,13 +571,13 @@ input:checked + .slider:before {
 }
 
 .secondary-btn--danger {
-  border-color: rgba(198, 40, 40, 0.3);
-  color: #b71c1c;
+  border-color: color-mix(in srgb, var(--app-danger) 30%, transparent);
+  color: var(--app-danger);
 }
 
 .secondary-btn--danger:hover:not(:disabled) {
-  border-color: #b71c1c;
-  background: rgba(198, 40, 40, 0.08);
+  border-color: var(--app-danger);
+  background: color-mix(in srgb, var(--app-danger) 8%, transparent);
 }
 
 .quiet-hours-grid {
@@ -590,14 +590,14 @@ input:checked + .slider:before {
 .quiet-hours-grid label {
   display: grid;
   gap: 0.45rem;
-  color: #424242;
+  color: var(--app-text-primary);
   font-weight: 700;
 }
 
 .quiet-hours-grid input {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--app-border-subtle);
   border-radius: 6px;
 }
 
@@ -605,8 +605,8 @@ input:checked + .slider:before {
   flex: 0 0 auto;
   padding: 0.35rem 0.7rem;
   border-radius: 999px;
-  background: rgba(33, 150, 243, 0.1);
-  color: #475569;
+  background: color-mix(in srgb, var(--app-info) 10%, transparent);
+  color: var(--app-text-secondary);
   font-size: 0.82rem;
   font-weight: 800;
 }
@@ -626,12 +626,12 @@ input:checked + .slider:before {
 
 .notification-device-card h4 {
   margin: 0 0 0.2rem;
-  color: #1a237e;
+  color: var(--app-text-primary);
 }
 
 .notification-device-card p {
   margin: 0;
-  color: #666;
+  color: var(--app-text-secondary);
   text-transform: capitalize;
 }
 
@@ -648,21 +648,21 @@ input:checked + .slider:before {
 }
 
 .notification-device-card dt {
-  color: #666;
+  color: var(--app-text-secondary);
   font-size: 0.84rem;
 }
 
 .notification-device-card dd {
   margin: 0;
-  color: #424242;
+  color: var(--app-text-primary);
   font-size: 0.84rem;
   font-weight: 700;
   text-align: right;
 }
 
 .save-btn--danger {
-  background: linear-gradient(135deg, #c62828, #8e0000);
-  box-shadow: 0 4px 12px rgba(198, 40, 40, 0.25);
+  background: linear-gradient(135deg, var(--app-danger), var(--app-danger));
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--app-danger) 25%, transparent);
 }
 
 .notification-confirm-backdrop {
@@ -685,12 +685,12 @@ input:checked + .slider:before {
 
 .notification-confirm-dialog h3 {
   margin: 0 0 0.7rem;
-  color: #1a237e;
+  color: var(--app-text-primary);
 }
 
 .notification-confirm-dialog p {
   margin: 0;
-  color: #424242;
+  color: var(--app-text-primary);
   line-height: 1.5;
 }
 
