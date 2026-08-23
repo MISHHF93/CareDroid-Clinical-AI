@@ -125,6 +125,85 @@ html[data-theme][data-role-theme='admin'] {
    platform-standard accent already defined in theme-tokens.css and
    medical-color-layer.css. */
 
+/**
+ * Dark-mode variants of the 6 hardcoded-hex role blocks above.
+ *
+ * Found live (visual-polish pass, 2026-08-23): the header account-menu
+ * avatar's "DC" initials were essentially invisible in dark mode --
+ * traced via the live cascade (getComputedStyle + walking document.styleSheets,
+ * not source reading alone) to `--medical-accent-hover` resolving to
+ * `color-mix(in srgb, #5925dc 82%, black)`, a near-black purple, used as
+ * TEXT color against a background built from `--medical-accent-tint`
+ * (`color-mix(in srgb, #5925dc 10%, transparent)`) composited over the dark
+ * header -- both ends of that pairing land dark, so contrast collapses.
+ * Per this file's own doc comment above, this exact token pair also drives
+ * the Sidebar's active-nav highlight (`--nav-item-active-bg`/`--nav-fg-active`/
+ * `--cdl-sidebar-item-bg-active`) -- the same "readable in light mode only"
+ * problem applies there too, not just the one element that happened to
+ * surface it.
+ *
+ * Each role block above picked light-mode-only values: `...82%, black` for
+ * hover/link text (dark, reads fine on a pale tint background) and a plain
+ * 10%-opacity tint (reads as near-white on a light page). Neither survives
+ * a dark page background. These blocks replace the darkening recipe with a
+ * lightening one for hover/link text (`...78%, white` -- mirrors the
+ * existing `--medical-accent-soft`'s `...60%, white` shape, pushed a little
+ * further since this is now the primary-contrast color, not a soft wash)
+ * and raise the tint opacity slightly (10% -> 16%) since a low-alpha tint
+ * needs more strength to read as a distinct surface against a dark base
+ * rather than washing out to near-transparent-on-black. `--medical-accent`/
+ * `--medical-accent-soft`/`--medical-accent-border` are left as-is --
+ * no reproduced contrast failure traces through them, and guessing new
+ * values for tokens with unconfirmed consumers risks a different visual
+ * regression instead of fixing one.
+ *
+ * Same [data-theme='dark'][data-role-theme='x'] specificity (2 attribute +
+ * 1 type selector) as the light/theme-agnostic blocks above -- CSS breaks
+ * the tie by source order, so placing these after is what makes them win
+ * for dark mode without needing a higher-specificity selector.
+ */
+html[data-theme='dark'][data-role-theme='triage'] {
+  --medical-accent-hover: color-mix(in srgb, #92400e 78%, white);
+  --medical-accent-tint: color-mix(in srgb, #92400e 16%, transparent);
+  --medical-text-link: color-mix(in srgb, #92400e 78%, white);
+  --medical-text-link-hover: color-mix(in srgb, #92400e 88%, white);
+}
+
+html[data-theme='dark'][data-role-theme='nurse'] {
+  --medical-accent-hover: color-mix(in srgb, #0f766e 78%, white);
+  --medical-accent-tint: color-mix(in srgb, #0f766e 16%, transparent);
+  --medical-text-link: color-mix(in srgb, #0f766e 78%, white);
+  --medical-text-link-hover: color-mix(in srgb, #0f766e 88%, white);
+}
+
+html[data-theme='dark'][data-role-theme='physician'] {
+  --medical-accent-hover: color-mix(in srgb, #175cd3 78%, white);
+  --medical-accent-tint: color-mix(in srgb, #175cd3 16%, transparent);
+  --medical-text-link: color-mix(in srgb, #175cd3 78%, white);
+  --medical-text-link-hover: color-mix(in srgb, #175cd3 88%, white);
+}
+
+html[data-theme='dark'][data-role-theme='ems'] {
+  --medical-accent-hover: color-mix(in srgb, #16a34a 78%, white);
+  --medical-accent-tint: color-mix(in srgb, #16a34a 16%, transparent);
+  --medical-text-link: color-mix(in srgb, #16a34a 78%, white);
+  --medical-text-link-hover: color-mix(in srgb, #16a34a 88%, white);
+}
+
+html[data-theme='dark'][data-role-theme='operations'] {
+  --medical-accent-hover: color-mix(in srgb, #5925dc 78%, white);
+  --medical-accent-tint: color-mix(in srgb, #5925dc 16%, transparent);
+  --medical-text-link: color-mix(in srgb, #5925dc 78%, white);
+  --medical-text-link-hover: color-mix(in srgb, #5925dc 88%, white);
+}
+
+html[data-theme='dark'][data-role-theme='admin'] {
+  --medical-accent-hover: color-mix(in srgb, #667085 78%, white);
+  --medical-accent-tint: color-mix(in srgb, #667085 16%, transparent);
+  --medical-text-link: color-mix(in srgb, #667085 78%, white);
+  --medical-text-link-hover: color-mix(in srgb, #667085 88%, white);
+}
+
 /* —— Reception's own workspace content only (not the shared command bars) —— */
 html[data-theme][data-role-theme='reception'] .reception-workspace {
   --app-accent: var(--medical-sky-500, #64748b);
