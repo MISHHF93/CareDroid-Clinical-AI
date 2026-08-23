@@ -117,6 +117,20 @@ function buildProductionCorpus() {
   return { files, text: files.map((f) => readFileSync(f, 'utf8')).join('\n') };
 }
 
+// The 8 "console route tree" files (see parseAppRoutePaths's own comment below)
+// -- all live in src/app/ alongside router.tsx, so their page imports resolve
+// the same way router.tsx's do ('../pages/...').
+const CONSOLE_TREE_FILES = Object.freeze([
+  'src/app/profileConsoleRouteTree.tsx',
+  'src/app/publicConsoleRouteTree.tsx',
+  'src/app/toolsConsoleRouteTree.tsx',
+  'src/app/platformConsoleRouteTree.tsx',
+  'src/app/operationsFleetConsoleRouteTree.tsx',
+  'src/app/adminConsoleRouteTree.tsx',
+  'src/app/trainingConsoleRouteTree.tsx',
+  'src/app/governanceConsoleRouteTree.tsx',
+]);
+
 function parseAppRoutePaths() {
   const app = readRepoFile('src/app/router.tsx');
   const directPaths = [...app.matchAll(/path:\s*['"]([^'"]+)['"]/g)].map((m) => m[1]);
@@ -144,9 +158,25 @@ function parseAppRoutePaths() {
     ...app.matchAll(/LegacyProtectedRouteRedirect\s+to=['"]([^'"]+)['"]/g),
     ...app.matchAll(/LegacyProtectedRouteRedirect\s+to=\{([^}]+)\}/g),
   ].map((m) => m[1].replace(/['"]/g, '').trim());
+  // router.tsx (and the 8 console-tree files below, all living in src/app/)
+  // import pages as '../pages/...', never './pages/...' -- confirmed via direct
+  // grep, zero './'-prefixed imports exist in router.tsx. This regex only ever
+  // matched a literal './' prefix, so lazyImports has been an empty match against
+  // router.tsx from the day this scanner was written: appWired (built from it,
+  // below) was effectively always empty, and detectOrphanPages()'s `inAppRoutes`
+  // check was permanently false for every real page. Most pages still avoided a
+  // false "wire"/orphan verdict only because classifyItem() falls back to LEGACY
+  // (harmless) when referenced-but-not-inAppRoutes and not in nav/inventory --
+  // but any page ALSO in the tool inventory (PlatformGovernanceWorkspace.tsx,
+  // several tools/*.tsx assistant pages, FleetDashboard.tsx...) got wrongly
+  // promoted to WIRE ("gap"), despite being real, live-mounted pages. Found
+  // 2026-08-23 in the same frontend/backend-linkage healing pass as the
+  // consoleTreePaths fix below -- matches '\.\.?\/' (either './' or '../') so it
+  // actually catches the real convention.
+  const lazyImportSourceText = [app, ...CONSOLE_TREE_FILES.map(readRepoFile)].join('\n');
   const lazyImports = [
-    ...app.matchAll(/import\(['"](\.\/[^'"]+)['"]\)/g),
-    ...app.matchAll(/from\s+['"](\.\/pages\/[^'"]+)['"]/g),
+    ...lazyImportSourceText.matchAll(/import\(['"](\.\.?\/[^'"]+)['"]\)/g),
+    ...lazyImportSourceText.matchAll(/from\s+['"](\.\.?\/pages\/[^'"]+)['"]/g),
   ].map((m) => m[1]);
   // router.tsx is not the only place a route gets genuinely mounted — 8 separate
   // "console route tree" files (profile/public/tools/platform/operations-fleet/
@@ -198,10 +228,25 @@ function parseAppRoutePaths() {
 }
 
 function normalizeImportToSrcPath(specifier) {
-  let p = specifier.replace(/^\.\//, 'src/');
+  // Every specifier this normalizes comes from router.tsx or a CONSOLE_TREE_FILES
+  // entry, all of which live in src/app/ -- '../x' resolves to 'src/x' (up one
+  // from src/app/ to src/), '/.x' resolves to 'src/app/x'. Only '../' actually
+  // occurs in practice (confirmed via grep), but both are handled correctly
+  // rather than assuming one convention.
+  let p = specifier.startsWith('../')
+    ? specifier.replace(/^\.\.\//, 'src/')
+    : specifier.replace(/^\.\//, 'src/app/');
   if (!/\.(jsx|js|tsx|ts)$/.test(p)) {
-    if (existsSync(join(REPO_ROOT, `${p}.jsx`))) p += '.jsx';
+    // Extensionless specifiers overwhelmingly resolve to .tsx in this codebase
+    // (every page this normalization was silently failing to match --
+    // PlatformGovernanceWorkspace.tsx, the tools/*.tsx assistant pages,
+    // FleetDashboard.tsx -- is one), but this only ever checked .jsx/.js and
+    // fell back to guessing .jsx regardless of what file actually existed.
+    if (existsSync(join(REPO_ROOT, `${p}.tsx`))) p += '.tsx';
+    else if (existsSync(join(REPO_ROOT, `${p}.ts`))) p += '.ts';
+    else if (existsSync(join(REPO_ROOT, `${p}.jsx`))) p += '.jsx';
     else if (existsSync(join(REPO_ROOT, `${p}.js`))) p += '.js';
+    else if (existsSync(join(REPO_ROOT, p)) && statSync(join(REPO_ROOT, p)).isDirectory() && existsSync(join(REPO_ROOT, p, 'index.tsx'))) p += '/index.tsx';
     else p += '.jsx';
   }
   return p.replace(/\\/g, '/');
