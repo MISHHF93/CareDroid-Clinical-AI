@@ -206,6 +206,61 @@ describe('UserAccountMenu', () => {
     expect(toggle).toHaveBeenCalledTimes(1);
   });
 
+  it('SESSION-001: shows a working Sign out control for a real session, calling signOut() and redirecting to /login', async () => {
+    const signOut = vi.fn();
+    vi.mocked(useUser).mockReturnValue({
+      user: { id: 'real-user-1', name: 'Real Clinician' },
+      isRealSession: true,
+      signOut,
+    });
+    vi.mocked(useProfileSwitcherVisibility).mockReturnValue(false);
+    vi.mocked(useSimulationMode).mockReturnValue({
+      enabled: false,
+      active: false,
+      setActive: vi.fn(),
+      toggle: vi.fn(),
+    });
+
+    const originalLocation = window.location;
+    // window.location.href is not directly assignable in jsdom without this.
+    Object.defineProperty(window, 'location', {
+      configurable: true,
+      value: { ...originalLocation, href: originalLocation.href },
+    });
+
+    render(
+      <MemoryRouter>
+        <UserAccountMenu />
+      </MemoryRouter>,
+    );
+
+    await openAccountMenu('Real Clinician');
+    const signOutButton = screen.getByRole('button', { name: 'Sign out' });
+    await userEvent.click(signOutButton);
+
+    expect(signOut).toHaveBeenCalledTimes(1);
+    expect(window.location.href).toContain('/login');
+
+    Object.defineProperty(window, 'location', { configurable: true, value: originalLocation });
+  });
+
+  it('never shows Sign out for the open-access/demo persona (isRealSession: false)', async () => {
+    vi.mocked(useUser).mockReturnValue({
+      user: { id: 'open-access-user', name: 'Demo User' },
+      isRealSession: false,
+      signOut: vi.fn(),
+    });
+
+    render(
+      <MemoryRouter>
+        <UserAccountMenu />
+      </MemoryRouter>,
+    );
+
+    await openAccountMenu();
+    expect(screen.queryByRole('button', { name: 'Sign out' })).not.toBeInTheDocument();
+  });
+
   it('closes the menu when Escape is pressed', async () => {
     vi.mocked(useUser).mockReturnValue({
       user: { id: 'open-access-user', name: 'Demo User' },

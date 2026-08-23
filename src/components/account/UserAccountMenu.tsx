@@ -7,6 +7,7 @@ import { useUserIdentity } from '../../contexts/UserIdentityContext';
 import { useSimulationMode } from '../../contexts/SimulationModeContext';
 import useEffectiveUserProfile from '../../hooks/useEffectiveUserProfile';
 import { isAdminSaasRole } from '../../config/platformEntryModel';
+import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { DEMO_PERSONA } from '../../config/demoPersonaModel';
 import useProfileSwitcherVisibility from '../../hooks/useProfileSwitcherVisibility';
 import { resolveAccountMenuDestinations } from './accountChrome.config';
@@ -53,7 +54,11 @@ type PanelPosition = {
  * Panel is portaled to document.body so header overflow:hidden cannot clip it.
  */
 export default function UserAccountMenu() {
-  const { user } = useUser() as { user: AppUser | null };
+  const { user, isRealSession, signOut } = useUser() as {
+    user: AppUser | null;
+    isRealSession: boolean;
+    signOut: () => void;
+  };
   const { account } = useUserIdentity() as { account: AppAccount | null };
   const { accessSummary, profileCopy } = useEffectiveUserProfile();
   const { enabled: simulationEnabled, active: simulationActive, toggle: toggleSimulation } =
@@ -95,8 +100,21 @@ export default function UserAccountMenu() {
     [showAdminLink],
   );
   const showProfileSwitcher = useProfileSwitcherVisibility();
-  const showSessionSection = showProfileSwitcher || simulationEnabled;
+  // SESSION-001: signOut() exists and correctly clears PHI-adjacent context
+  // (UserContext.tsx's clearPhiAdjacentContext) but had no reachable UI
+  // trigger anywhere in the app -- confirmed via a repo-wide search turning
+  // up only the LOGOUT audit-log-action display label, never a real button.
+  // Gated on isRealSession (not shown for the open-access/demo persona,
+  // which has nothing meaningful to sign out of) so the existing "no Sign
+  // out for the demo user" test expectation stays correct.
+  const showSessionSection = showProfileSwitcher || simulationEnabled || isRealSession;
   const triggerLabel = `Account menu for ${displayName}`;
+
+  const handleSignOut = useCallback(() => {
+    setOpen(false);
+    signOut();
+    window.location.href = CANONICAL_ROUTES.login;
+  }, [signOut]);
 
   const updatePanelPosition = useCallback(() => {
     const trigger = triggerRef.current;
@@ -206,6 +224,16 @@ export default function UserAccountMenu() {
             {showSessionSection ? (
               <div className="account-menu__section account-menu__section--session">
                 <div className="account-menu__section-title">Session</div>
+
+                {isRealSession ? (
+                  <button
+                    type="button"
+                    className="account-menu__item account-menu__item--danger"
+                    onClick={handleSignOut}
+                  >
+                    Sign out
+                  </button>
+                ) : null}
 
                 {showProfileSwitcher ? (
                   <div className="account-menu__section--profiles">
