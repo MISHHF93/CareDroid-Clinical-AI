@@ -604,6 +604,7 @@ export default function PatientDetailPanel() {
   const referrals = useEmergencyStore((state) => state.referrals);
   const emsArrivals = useEmergencyStore((state) => state.emsArrivals);
   const selectedPatientId = useEmergencyStore((state) => state.selectedPatientId);
+  const unsyncedPatientIds = useEmergencyStore((state) => state.unsyncedPatientIds);
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
   const updatePatient = useEmergencyStore((state) => state.updatePatient);
   const assignStaff = useEmergencyStore((state) => state.assignStaff);
@@ -1133,6 +1134,21 @@ export default function PatientDetailPanel() {
                 </span>
               ) : null}
             </div>
+            {unsyncedPatientIds.has(selectedPatient.id) ? (
+              // SESSION-001 follow-up: addVitals/movePatientToState/dischargePatient/
+              // assignStaff/escalatePatient all clear their form and apply the
+              // mutation to local state immediately, but the backend sync is
+              // fire-and-forget -- a clinician had no way to know a sync had
+              // failed short of an f12 console. unsyncedPatientIds (DOWNTIME-001)
+              // already tracks this; this just makes it visible.
+              <div
+                className="patient-detail-panel__sync-warning"
+                role="status"
+                title="A recent change to this patient hasn't been confirmed saved to the server yet. It's safe locally, but reloading or switching workstations before this clears could lose it."
+              >
+                Not yet saved to server
+              </div>
+            ) : null}
             {selectedPatient.state === PatientState.Waiting || selectedPatient.state === PatientState.Triage ? (
               <div className="patient-detail-panel__header-slot">
                 <WaitingRoomCommunicationBadge

@@ -81,6 +81,19 @@
   margin-top: var(--ed-space-2);
 }
 
+.patient-detail-panel__sync-warning {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  margin-top: var(--ed-space-1);
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--app-warning-contrast);
+  color: var(--app-warning);
+  font-size: var(--ed-type-meta);
+  font-weight: 700;
+}
+
 .patient-detail-panel__close-btn {
   width: 32px;
   height: 32px;
