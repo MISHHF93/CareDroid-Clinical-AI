@@ -1940,11 +1940,11 @@ function buildBackendEmergencyAnalytics(
     shift: {
       ...local.shift,
       patientsSeen: Number(backendData.activeCensus ?? local.shift.patientsSeen),
-      waitingCount: Number(backendData.waiting ?? 0),
-      highRiskCount: Number(backendData.highRisk ?? 0),
-      boardingCount: Number(backendData.boarding ?? capacity.boardingCount ?? 0),
+      waitingCount: Number(backendData.waiting ?? local.shift.waitingCount),
+      highRiskCount: Number(backendData.highRisk ?? local.shift.highRiskCount),
+      boardingCount: Number(backendData.boarding ?? capacity.boardingCount ?? local.shift.boardingCount),
       reassessmentDueCount: Number(backendData.reassessmentDue ?? local.shift.reassessmentDueCount),
-      averageWaitMinutes: Number(backendData.averageWaitMinutes ?? 0),
+      averageWaitMinutes: Number(backendData.averageWaitMinutes ?? local.shift.averageWaitMinutes),
       capacityScore: capacity.score ?? local.shift.capacityScore,
     },
     operationalCommand: {
@@ -1953,11 +1953,11 @@ function buildBackendEmergencyAnalytics(
       capacity,
       backendSummary: {
         activeCensus: Number(backendData.activeCensus ?? local.shift.patientsSeen),
-        waiting: Number(backendData.waiting ?? 0),
-        highRisk: Number(backendData.highRisk ?? 0),
-        boarding: Number(backendData.boarding ?? capacity.boardingCount ?? 0),
+        waiting: Number(backendData.waiting ?? local.shift.waitingCount),
+        highRisk: Number(backendData.highRisk ?? local.shift.highRiskCount),
+        boarding: Number(backendData.boarding ?? capacity.boardingCount ?? local.shift.boardingCount),
         reassessmentDue: Number(backendData.reassessmentDue ?? local.shift.reassessmentDueCount),
-        averageWaitMinutes: Number(backendData.averageWaitMinutes ?? 0),
+        averageWaitMinutes: Number(backendData.averageWaitMinutes ?? local.shift.averageWaitMinutes),
       },
     },
   };
