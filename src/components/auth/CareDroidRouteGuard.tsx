@@ -20,9 +20,20 @@ export function CareDroidRouteGuard({ children, path }: CareDroidRouteGuardProps
   }
 
   const hospitalRole = access.compiledProfile?.user?.role;
+  // HEAL: access.nearestRoute() resolves through canAccessEmergencyRoute(),
+  // a separate permission check from the access.canRoute() gate just above
+  // (canAccessCanonicalRoute()) -- when the two disagree, nearestRoute() can
+  // hand back the exact path that was just denied, since its own internal
+  // "is preferredPath already allowed" check passes even though the gate's
+  // check didn't. Confirmed live: physician denied /emergency/intake, then
+  // clicking "Go to permitted CareDroid page" didn't navigate anywhere
+  // because the fallback silently resolved back to /emergency/intake itself.
+  // Re-validate every candidate against the same check that produced this
+  // denial before offering it as the escape hatch.
+  const nearestRoute = access.nearestRoute(checkPath);
   const fallbackPath =
-    access.nearestRoute(checkPath) ||
-    access.landingRoute ||
+    (nearestRoute && access.canRoute(nearestRoute) ? nearestRoute : null) ||
+    (access.landingRoute && access.canRoute(access.landingRoute) ? access.landingRoute : null) ||
     getUnauthorizedFallback(hospitalRole);
   const roleLabel = access.roleLabel || getRoleLabel(hospitalRole || access.role);
 

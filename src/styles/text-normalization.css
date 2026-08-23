@@ -67,7 +67,15 @@ html[data-theme='dark'],
    __link-substring rule below via two independent selector paths (it's an
    <a> with no "btn"/"button"/role="button" marker). Its own CSS is a solid
    critical-red button with white text — see color-normalization.css's
-   --primary sweep for the measured ~1.18:1 contrast this produces. */
+   --primary sweep for the measured ~1.18:1 contrast this produces.
+   2026-08-23: .adp-link (AccessDeniedPanel's "Go to permitted CareDroid
+   page" CTA) is the same shape again — a solid brand-blue button rendered
+   as a react-router <Link>, own CSS sets color:#fff, no btn/button/role
+   marker. Confirmed live: computed color came out as a dark navy
+   (--medical-text-link) against its own rgb(23,92,211) background, well
+   under WCAG AA on a page users land on specifically because a route was
+   denied — the one page where a broken/unreadable escape-hatch link is
+   worst. */
 :is(.app-shell, .emergency-app-shell)
   a:not([class*='btn']):not([class*='button']):not([role='button']):not(
     .fj-critical-banner__cta
@@ -75,7 +83,7 @@ html[data-theme='dark'],
     .profile-activity-cta
   ):not(.platform-entry__card--primary):not(.entry-shell__link--primary):not(
     .critical-alert-banner__link
-  ) {
+  ):not(.adp-link) {
   color: var(--medical-text-link);
   text-decoration-color: color-mix(in srgb, var(--medical-text-link) 35%, transparent);
 }
@@ -101,7 +109,10 @@ html[data-theme='dark'],
    is a real, previously-unprotected instance of this exact collision.
    Cycle 266: .entry-shell__link--primary matches [class*='__link'] here too
    (that branch has no --primary/--solid exclusion, unlike the __cta one) —
-   see color-normalization.css's --primary sweep for the full writeup. */
+   see color-normalization.css's --primary sweep for the full writeup.
+   2026-08-23: .adp-link matches [class*='-link'] here too (the substring
+   "-link" appears in "adp-link") -- same collision as the plain a:not() rule
+   above, see that rule's comment for the full writeup. */
 :is(.app-shell, .emergency-app-shell)
   :is(
     [class*='__link'],
@@ -113,7 +124,7 @@ html[data-theme='dark'],
     .cdl-public-page__cta
   ):not(.profile-section-header__cta):not(.reception-attention__cta):not(.platform-entry__cta):not(
     .reception-queue-row__cta
-  ):not(.entry-shell__link--primary):not(.critical-alert-banner__link) {
+  ):not(.entry-shell__link--primary):not(.critical-alert-banner__link):not(.adp-link) {
   color: var(--medical-text-link);
 }
 
