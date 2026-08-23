@@ -389,22 +389,29 @@ export default function EmergencySettings() {
     // Live sweep 2026-08-21: fetchOrganizationEmergencyOsSettings/
     // fetchEmergencyOsSettings have no AbortController/timeout of their own,
     // so if the backend ever fails to respond (rather than erroring) this
-    // two-step sequential chain never resolves or rejects -- `loading` never
-    // clears and the whole page hangs indefinitely. Reproduced independently
-    // twice: this was the only route to fail to load across two full sweeps
-    // while every sibling page loaded fine in the same runs. Race the chain
-    // against the same timeout other dataset loads in this app already use
-    // (emergencyStore.ts's loadDatasetWithTimeout) so a stuck backend
-    // degrades to local settings instead of freezing the page.
+    // chain never resolves or rejects -- `loading` never clears and the whole
+    // page hangs indefinitely. Reproduced independently twice: this was the
+    // only route to fail to load across two full sweeps while every sibling
+    // page loaded fine in the same runs. Race the chain against the same
+    // timeout other dataset loads in this app already use (emergencyStore.ts's
+    // loadDatasetWithTimeout) so a stuck backend degrades to local settings
+    // instead of freezing the page.
+    //
+    // HEAL 2026-08-23: the two fetches were chained sequentially even though
+    // fetchEmergencyOsSettings() never uses orgEmergencyOs -- it's called with
+    // no arguments, so it doesn't depend on the first fetch's result at all.
+    // Confirmed live: fetchOrganizationEmergencyOsSettings()'s own
+    // /tenant-admin call alone took ~5.7s under load, already exceeding this
+    // whole chain's REFRESH_DATASET_TIMEOUT_MS budget (4s) before
+    // fetchEmergencyOsSettings() even started. Running them in parallel makes
+    // the total wait the slower of the two instead of their sum.
     Promise.race([
-      fetchOrganizationEmergencyOsSettings()
-        .then((orgResult) => {
-          if (cancelled || !orgResult.ok || !orgResult.data) return null;
-          return orgResult.data;
-        })
-        .then((orgEmergencyOs) =>
-          fetchEmergencyOsSettings().then((result) => ({ result, orgEmergencyOs })),
-        ),
+      Promise.all([fetchOrganizationEmergencyOsSettings(), fetchEmergencyOsSettings()]).then(
+        ([orgResult, result]) => ({
+          result,
+          orgEmergencyOs: !cancelled && orgResult.ok && orgResult.data ? orgResult.data : null,
+        }),
+      ),
       new Promise<never>((_, reject) => {
         window.setTimeout(
           () => reject(new Error(`CareDroid settings load timed out after ${REFRESH_DATASET_TIMEOUT_MS}ms`)),
