@@ -458,10 +458,19 @@ export class EmergencyOsController {
     );
   }
 
+  // HEAL follow-up (OCR intake tenant-scoping audit): this whole subsystem
+  // (create/list/get/review/apply) had zero tenant context threaded through
+  // at all -- see the detailed rationale on OcrIntakeService.getJob().
   @RequirePermission(Permission.WRITE_PHI)
   @Post('intake/ocr-jobs')
-  createOcrJob(@Body() body: CreateOcrJobDto) {
-    return this.ocrIntakeService.createJob(body);
+  createOcrJob(
+    @Body() body: CreateOcrJobDto,
+    @TenantContext() tenantContext?: TenantContextValue,
+  ) {
+    return this.ocrIntakeService.createJob({
+      ...body,
+      organizationId: tenantContext?.organizationId,
+    });
   }
 
   @RequirePermission(Permission.READ_PHI)
@@ -469,8 +478,15 @@ export class EmergencyOsController {
   listOcrJobs(
     @Query('patientId') patientId?: string,
     @Query('intakeSessionId') intakeSessionId?: string,
+    @TenantContext() tenantContext?: TenantContextValue,
   ) {
-    return { jobs: this.ocrIntakeService.listJobs({ patientId, intakeSessionId }) };
+    return {
+      jobs: this.ocrIntakeService.listJobs({
+        patientId,
+        intakeSessionId,
+        organizationId: tenantContext?.organizationId,
+      }),
+    };
   }
 
   @RequirePermission(Permission.READ_PHI)
@@ -486,7 +502,7 @@ export class EmergencyOsController {
     @TenantContext() tenantContext: TenantContextValue | undefined,
     @Req() request: Request,
   ) {
-    const job = this.ocrIntakeService.getJob(jobId);
+    const job = this.ocrIntakeService.getJob(jobId, tenantContext?.organizationId);
     if (job.patientId) {
       await this.patientAuditService.logPatientAccess({
         request,
@@ -504,16 +520,24 @@ export class EmergencyOsController {
     @Param('jobId') jobId: string,
     @Param('field') field: string,
     @Body() body: OcrFieldReviewDto,
+    @TenantContext() tenantContext?: TenantContextValue,
   ) {
-    return this.ocrIntakeService.reviewField(jobId, field, body);
+    return this.ocrIntakeService.reviewField(jobId, field, body, tenantContext?.organizationId);
   }
 
   @RequirePermission(Permission.WRITE_PHI)
   @Post('intake/ocr-jobs/:jobId/apply')
-  applyOcrJobToIntake(@Param('jobId') jobId: string, @Body() body: ApplyOcrJobToIntakeDto) {
-    return this.ocrIntakeService.applyToIntake(jobId, body?.actor || 'unknown', {
-      autoAcceptHighConfidence: body?.autoAcceptHighConfidence,
-    });
+  applyOcrJobToIntake(
+    @Param('jobId') jobId: string,
+    @Body() body: ApplyOcrJobToIntakeDto,
+    @TenantContext() tenantContext?: TenantContextValue,
+  ) {
+    return this.ocrIntakeService.applyToIntake(
+      jobId,
+      body?.actor || 'unknown',
+      { autoAcceptHighConfidence: body?.autoAcceptHighConfidence },
+      tenantContext?.organizationId,
+    );
   }
 
   @RequirePermission(Permission.READ_PHI)

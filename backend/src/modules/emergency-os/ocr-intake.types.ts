@@ -52,6 +52,7 @@ export interface OcrJob {
   extractedFields: OcrExtractedField[];
   overallConfidence: number;
   warnings: string[];
+  organizationId?: string;
   patientId?: string;
   intakeSessionId?: string;
   intakeDraftId?: string;
@@ -76,6 +77,7 @@ export interface CreateOcrJobInput {
   dataUrl?: string;
   rawText?: string;
   documentTypeHint?: string;
+  organizationId?: string;
   patientId?: string;
   intakeSessionId?: string;
   intakeDraftId?: string;

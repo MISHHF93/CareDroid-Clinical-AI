@@ -52,6 +52,15 @@ function nowIso(): string {
   return new Date().toISOString();
 }
 
+/** Same own-org-or-legacy rule as EmergencyPatientService.isVisibleToOrganization:
+ * a missing organizationId on either side (no tenant context on the call, or a
+ * job created before this field existed) doesn't filter anything out. */
+function isJobVisibleToOrganization(job: OcrJob, organizationId?: string): boolean {
+  if (!organizationId) return true;
+  if (!job.organizationId) return true;
+  return job.organizationId === organizationId;
+}
+
 /** Strips non-printable control characters (keeps tab/newline/CR) and caps length. */
 function sanitizeRawText(text: string): string {
   let result = '';
@@ -159,6 +168,7 @@ export class OcrIntakeService implements OnModuleDestroy {
       extractedFields: [],
       overallConfidence: 0,
       warnings: [],
+      organizationId: input.organizationId,
       patientId: input.patientId,
       intakeSessionId: input.intakeSessionId,
       intakeDraftId: input.intakeDraftId,
@@ -223,21 +233,40 @@ export class OcrIntakeService implements OnModuleDestroy {
     return job;
   }
 
-  getJob(jobId: string): OcrJob {
+  // AUDIT-adjacent finding: this whole subsystem (create/list/get/review/apply)
+  // had zero tenant scoping -- any WRITE_PHI/READ_PHI user of ANY org could
+  // read, tamper with, or -- via applyToIntake() below -- write real PHI onto
+  // another org's patient record just by guessing/learning a jobId (jobs were
+  // never partitioned by organization in storage, and the controller never
+  // threaded @TenantContext() through to any of these calls). organizationId
+  // is caller-derived only (set by the controller from TenantContext, never
+  // client-supplied), and a cross-org lookup 404s rather than 403s, matching
+  // this codebase's established not-found-not-forbidden convention.
+  getJob(jobId: string, organizationId?: string): OcrJob {
     const job = this.jobs.get(jobId);
-    if (!job) throw new NotFoundException(`OCR job ${jobId} not found`);
+    if (!job || !isJobVisibleToOrganization(job, organizationId)) {
+      throw new NotFoundException(`OCR job ${jobId} not found`);
+    }
     return job;
   }
 
-  listJobs(filter: { patientId?: string; intakeSessionId?: string } = {}): OcrJob[] {
+  listJobs(
+    filter: { patientId?: string; intakeSessionId?: string; organizationId?: string } = {},
+  ): OcrJob[] {
     return Array.from(this.jobs.values())
+      .filter((job) => isJobVisibleToOrganization(job, filter.organizationId))
       .filter((job) => !filter.patientId || job.patientId === filter.patientId)
       .filter((job) => !filter.intakeSessionId || job.intakeSessionId === filter.intakeSessionId)
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }
 
-  reviewField(jobId: string, field: string, input: OcrFieldReviewInput): OcrJob {
-    const job = this.getJob(jobId);
+  reviewField(
+    jobId: string,
+    field: string,
+    input: OcrFieldReviewInput,
+    organizationId?: string,
+  ): OcrJob {
+    const job = this.getJob(jobId, organizationId);
     const target = job.extractedFields.find((extracted) => extracted.field === field);
     if (!target) throw new NotFoundException(`Field ${field} not found on OCR job ${jobId}`);
 
@@ -258,8 +287,9 @@ export class OcrIntakeService implements OnModuleDestroy {
     jobId: string,
     actor: string,
     options: { autoAcceptHighConfidence?: boolean } = {},
+    organizationId?: string,
   ): Promise<OcrJob> {
-    const job = this.getJob(jobId);
+    const job = this.getJob(jobId, organizationId);
     if (job.status !== 'completed') {
       throw new BadRequestException('Only completed OCR jobs can be applied to an intake draft');
     }
@@ -310,7 +340,7 @@ export class OcrIntakeService implements OnModuleDestroy {
 
     if (job.patientId && this.patientService) {
       try {
-        const existing = this.patientService.getPatient(job.patientId);
+        const existing = this.patientService.getPatient(job.patientId, organizationId);
         if (existing) {
           const patch: Record<string, unknown> = {};
           if (demographics.firstName) patch.firstName = demographics.firstName;
@@ -332,7 +362,7 @@ export class OcrIntakeService implements OnModuleDestroy {
               .join(' ')
               .trim();
           }
-          this.patientService.updatePatient(job.patientId, patch as any);
+          this.patientService.updatePatient(job.patientId, patch as any, organizationId);
           job.patientUpdated = true;
           job.auditLog.push(
             this.audit('applied_to_intake', actorName, {
@@ -373,18 +403,22 @@ export class OcrIntakeService implements OnModuleDestroy {
         // unconditionally rather than accepting a caller override. Which
         // OCR provider supplied the raw text is still recorded at the
         // source level via sourceSystem/sourceType below.
-        this.documentArtifactService.extract(job.patientId, {
-          patientId: job.patientId,
-          encounterId: job.intakeSessionId,
-          sourceDocumentId: job.id,
-          documentType: job.documentType,
-          sourceSystem: `ocr_intake_service:${job.provider}`,
-          sourceType: referralSourceType(job.documentType),
-          rawText: job.extractedText,
-          filename: job.sourceFilename,
-          confidence: job.overallConfidence,
-          sourceState: 'extracted',
-        });
+        this.documentArtifactService.extract(
+          job.patientId,
+          {
+            patientId: job.patientId,
+            encounterId: job.intakeSessionId,
+            sourceDocumentId: job.id,
+            documentType: job.documentType,
+            sourceSystem: `ocr_intake_service:${job.provider}`,
+            sourceType: referralSourceType(job.documentType),
+            rawText: job.extractedText,
+            filename: job.sourceFilename,
+            confidence: job.overallConfidence,
+            sourceState: 'extracted',
+          },
+          organizationId,
+        );
       } catch (error) {
         // Document artifact enrichment is best-effort; the OCR job itself remains applied.
         // HEAL-246: this catch was completely empty -- a failed extraction
