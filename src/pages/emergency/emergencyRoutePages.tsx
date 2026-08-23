@@ -275,6 +275,7 @@ export function QueueRoute() {
   const setActiveQueueFilter = useEmergencyStore((state) => state.setActiveQueueFilter);
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
   const escalatePatient = useEmergencyStore((state) => state.escalatePatient);
+  const unsyncedPatientIds = useEmergencyStore((state) => state.unsyncedPatientIds);
   const queues = useEmergencyQueues();
   const [escalatedIds, setEscalatedIds] = useState<Set<string>>(new Set());
   const requestedQueueFilter =
@@ -556,7 +557,28 @@ export function QueueRoute() {
                               ⚡ Escalate
                             </button>
                           )}
-                          {alreadyEscalated && (
+                          {alreadyEscalated && unsyncedPatientIds.has(patient.id) && (
+                            // HEAL: escalatePatient() applies to local state
+                            // immediately and syncs to the backend
+                            // fire-and-forget (DOWNTIME-001/SESSION-001
+                            // pattern) -- this row used to show the same "✓
+                            // Escalated" badge regardless of whether that sync
+                            // actually succeeded, so a failed save (confirmed
+                            // live: a 404 from a demo patient with no backend
+                            // record) looked identical to a real one. Only
+                            // PatientDetailPanel surfaced unsyncedPatientIds;
+                            // this is the same clinician-facing signal on the
+                            // page where the escalate action was actually
+                            // taken.
+                            <span
+                              className="emergency-route-queue-row__escalated-badge emergency-route-queue-row__escalated-badge--unsynced"
+                              role="status"
+                              title="Escalated locally, but not yet confirmed saved to the server. It's safe here, but reloading or switching workstations before this clears could lose it."
+                            >
+                              ⚠ Escalated (not yet saved)
+                            </span>
+                          )}
+                          {alreadyEscalated && !unsyncedPatientIds.has(patient.id) && (
                             <span className="emergency-route-queue-row__escalated-badge">✓ Escalated</span>
                           )}
                         </span>

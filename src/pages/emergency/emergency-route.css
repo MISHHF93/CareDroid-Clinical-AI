@@ -465,6 +465,15 @@
   color: #10b981;
 }
 
+.emergency-route-queue-row__escalated-badge--unsynced {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--app-warning-contrast);
+  color: var(--app-warning);
+}
+
 .emergency-route-queue-row__patient-btn {
   border: 1px solid var(--ed-border-subtle);
   border-radius: 999px;
