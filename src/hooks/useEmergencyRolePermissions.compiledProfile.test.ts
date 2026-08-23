@@ -5,24 +5,29 @@ import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
 
 const setUser = vi.fn();
 
-vi.mock('react-router-dom', () => ({
-  useSearchParams: () => [new URLSearchParams(), vi.fn()],
-}));
-
 // Shaped like the browser state after a dev-bypass reload following a demo
 // role switch: devBackendAuth.ts's persistDevSession() overwrites the stored
 // profile with the backend's dev-session response, which has no
 // compiledAccessProfile/caredroidProfile and a stale top-level `role` that
 // doesn't match `profile.roleProfileId` (the backend's own UserRole enum has
-// no registration_clerk equivalent). Only profile.roleProfileId is reliable.
+// no equivalent for most of these emergencyRoleIds). Only profile.roleProfileId
+// is reliable. Mutated per-test via mockUser below rather than baked into the
+// vi.mock factory, so the same fallback-reconstruction path can be exercised
+// for more than one role.
+const mockUser: any = {
+  id: 'c610b6b5-4826-4190-aebe-97b433c62df8',
+  authMode: 'explicit-dev-bypass',
+  role: 'nurse',
+  profile: { roleProfileId: 'registration_clerk' },
+};
+
+vi.mock('react-router-dom', () => ({
+  useSearchParams: () => [new URLSearchParams(), vi.fn()],
+}));
+
 vi.mock('../contexts/UserContext', () => ({
   useUser: () => ({
-    user: {
-      id: 'c610b6b5-4826-4190-aebe-97b433c62df8',
-      authMode: 'explicit-dev-bypass',
-      role: 'nurse',
-      profile: { roleProfileId: 'registration_clerk' },
-    },
+    user: mockUser,
     setUser,
   }),
 }));
@@ -49,14 +54,25 @@ vi.mock('../services/devBackendAuth', () => ({
 }));
 
 describe('useEmergencyRolePermissions compiledProfile reconstruction', () => {
-  it('grants registration_clerk actions, not the default demo user\'s, when compiledAccessProfile/caredroidProfile are both missing', () => {
-    const { result } = renderHook(() => useEmergencyRolePermissions());
+  // Each action below belongs to its role but NOT to ed_manager (the default
+  // demo user this fallback used to leak emergencyRoleId from) -- so a test
+  // passing here can only mean the role's OWN action list was actually used,
+  // not that the assertion happens to overlap with ed_manager's grants too.
+  it.each([
+    ['registration_clerk', EMERGENCY_ACTIONS.createPatient],
+    ['triage_nurse', EMERGENCY_ACTIONS.triage],
+    ['physician', EMERGENCY_ACTIONS.dischargePatient],
+  ])(
+    'grants %s actions, not the default demo user\'s, when compiledAccessProfile/caredroidProfile are both missing',
+    (roleProfileId, action) => {
+      mockUser.profile = { roleProfileId };
 
-    expect(result.current.role).toBe('registration_clerk');
-    expect(result.current.compiledProfile.role.emergencyRoleId).toBe('registration_clerk');
-    expect(result.current.compiledProfile.emergencyAccess.allowedActions).toContain(
-      EMERGENCY_ACTIONS.createPatient,
-    );
-    expect(result.current.canMutate(EMERGENCY_ACTIONS.createPatient)).toBe(true);
-  });
+      const { result } = renderHook(() => useEmergencyRolePermissions());
+
+      expect(result.current.role).toBe(roleProfileId);
+      expect(result.current.compiledProfile.role.emergencyRoleId).toBe(roleProfileId);
+      expect(result.current.compiledProfile.emergencyAccess.allowedActions).toContain(action);
+      expect(result.current.canMutate(action)).toBe(true);
+    },
+  );
 });
