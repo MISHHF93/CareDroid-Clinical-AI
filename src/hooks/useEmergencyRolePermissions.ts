@@ -84,14 +84,31 @@ export function useEmergencyRolePermissions() {
     const caredroidProfile = user?.caredroidProfile;
     if (caredroidProfile?.role) return compileCareDroidAccessProfile(caredroidProfile);
     const demoProfile = getDemoUserById(user?.id) || getDefaultDemoUser();
+    const resolvedRole =
+      (user?.profile?.hospitalRole as any) ||
+      (user?.profile?.roleProfileId as any) ||
+      (user?.role as any) ||
+      demoProfile.role;
+    // HEAL: found live -- after a dev-bypass reload, persistDevSession
+    // (devBackendAuth.ts) overwrites the stored profile with a shape that
+    // has no compiledAccessProfile/caredroidProfile, so this fallback fires.
+    // It used to only override `role` on top of `...demoProfile`, leaving
+    // emergencyRoleId (which compileCareDroidAccessProfile actually keys
+    // allowedActions off of) stuck on whatever unrelated role
+    // getDefaultDemoUser() returns -- e.g. a reloaded registration_clerk
+    // session silently inherited ed_manager's action list (no
+    // patient.create), while the role label/route stayed correct. Re-derive
+    // all four identity fields from the same resolved role, mirroring
+    // switchDemoRole's own nextMapping pattern below.
+    const resolvedMapping = getCanonicalRoleMapping(resolvedRole);
     return compileCareDroidAccessProfile(
       normalizeCareDroidProfile({
         ...demoProfile,
-        role:
-          (user?.profile?.hospitalRole as any) ||
-          (user?.profile?.roleProfileId as any) ||
-          (user?.role as any) ||
-          demoProfile.role,
+        role: resolvedMapping.hospitalRole,
+        emergencyRoleId: resolvedMapping.emergencyRoleId,
+        saasRole: resolvedMapping.saasRole,
+        backendRole: resolvedMapping.backendRole,
+        roleProfileId: resolvedMapping.roleProfileId,
       }),
     );
   }, [user]);
