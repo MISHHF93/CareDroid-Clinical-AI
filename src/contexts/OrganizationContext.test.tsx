@@ -301,6 +301,60 @@ describe('OrganizationContextProvider', () => {
     });
   });
 
+  describe('HEAL-348: hasCheckedOrganizationSettings stays unchecked on a failed fetch', () => {
+    it('does not flip to checked when the engine fetch rejects (e.g. an aborted/failed request)', async () => {
+      mocks.getOrganizationEngine.mockRejectedValueOnce(new Error('net::ERR_ABORTED'));
+
+      render(
+        <OrganizationContextProvider>
+          <SettingsCheckedProbe />
+        </OrganizationContextProvider>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId('settings-status')).toHaveTextContent('loading:unchecked');
+      });
+
+      // The fetch settles (with a rejection), isLoading clears, but a
+      // consumer gating a decision on "do we have a real settings value" --
+      // like emergency/index.tsx's HEAL-314 Whiteboard-vs-Command-Center
+      // redirect -- must NOT be told this is safe to act on. Before HEAL-348,
+      // this went to 'idle:checked' here, and the redirect fired off
+      // useEmergencyStore's untouched default commandCenterMode instead of a
+      // real, confirmed org setting.
+      await waitFor(() => {
+        expect(screen.getByTestId('settings-status')).toHaveTextContent('idle:unchecked');
+      });
+    });
+
+    it('recovers to checked once a later retry succeeds', async () => {
+      mocks.getOrganizationEngine.mockRejectedValueOnce(new Error('net::ERR_ABORTED'));
+
+      let refresh: (() => Promise<any>) | null = null;
+      render(
+        <OrganizationContextProvider>
+          <SettingsCheckedRefreshProbe onReady={(fn) => { refresh = fn; }} />
+        </OrganizationContextProvider>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId('settings-status')).toHaveTextContent('idle:unchecked');
+      });
+
+      mocks.getOrganizationEngine.mockResolvedValueOnce({
+        organization: { id: 'org-1', name: 'CareDroid Hospital' },
+        branding: { displayName: 'CareDroid Health' },
+        subscription: { tier: 'enterprise', status: 'active' },
+        integrations: [],
+      });
+      await refresh!();
+
+      await waitFor(() => {
+        expect(screen.getByTestId('settings-status')).toHaveTextContent('idle:checked');
+      });
+    });
+  });
+
   describe('HEAL-322: hasCheckedOrganizationSettings resets on a fresh check', () => {
     it('goes back to unchecked while a second refreshOrganizationEngine() call is in flight, not just on first mount', async () => {
       function deferred<T>() {

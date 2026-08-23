@@ -14,13 +14,18 @@ type OrgContextValue = {
   integrations: any[];
   supportedOrganizationTypes: any[];
   isLoading: boolean;
-  // HEAL-314: distinct from isLoading (which is only true DURING an in-flight
-  // fetch, and starts false before the mount effect has even fired). This
-  // tracks whether the org's real settings (specifically
-  // emergencyOs.commandCenterMode, which several roles' Whiteboard-vs-
-  // Command-Center routing decision depends on) have been checked at least
-  // once for the current session -- false for the unauthenticated case too,
-  // where no fetch will ever run. See emergency/index.tsx's HEAL-314 usage.
+  // HEAL-314 (see HEAL-348 below): distinct from isLoading (which is only
+  // true DURING an in-flight fetch, and starts false before the mount effect
+  // has even fired). This tracks whether the org's real settings
+  // (specifically emergencyOs.commandCenterMode, which several roles'
+  // Whiteboard-vs-Command-Center routing decision depends on) have been
+  // successfully confirmed at least once for the current session -- false
+  // for the unauthenticated case too, where no fetch will ever run (that
+  // branch sets it true directly, since there's nothing left to wait for).
+  // HEAL-348: does NOT become true on a failed/aborted fetch -- see the
+  // catch block in refreshOrganizationEngine. A gate reading this as "safe
+  // to act on the real value" would otherwise act on an unconfirmed default.
+  // See emergency/index.tsx's HEAL-314 usage.
   hasCheckedOrganizationSettings: boolean;
   error: string;
   refreshOrganizationEngine: (...args: any[]) => any;
@@ -107,6 +112,7 @@ export function OrganizationContextProvider({ children }) {
         useEmergencyStore.getState().saveEmergencySettings(emergencyOs);
       }
       setError('');
+      setHasCheckedOrganizationSettings(true);
       return normalized || null;
     } catch (engineError: any) {
       if (token !== refreshTokenRef.current) return null;
@@ -114,11 +120,19 @@ export function OrganizationContextProvider({ children }) {
       logger.warn('Organization engine unavailable', { message });
       setOrganizationEngine(null);
       setError(message);
+      // Deliberately NOT setting hasCheckedOrganizationSettings here. A failed/
+      // aborted fetch (tenant-context hiccup, backend restart, flaky network --
+      // all realistic in a hospital) left this true anyway via the old `finally`,
+      // so emergency/index.tsx's HEAL-314 gate treated an unconfirmed, still-
+      // default useEmergencyStore.commandCenterMode (true) as a real answer and
+      // bounced charge_nurse/ed_manager/admin/etc. off the Whiteboard to Command
+      // Center with no error shown -- reproduced live by aborting
+      // /api/organizations/current/engine. "Checked" must mean "we have a real
+      // value," not "we stopped trying."
       return null;
     } finally {
       if (token === refreshTokenRef.current) {
         setIsLoading(false);
-        setHasCheckedOrganizationSettings(true);
       }
     }
   }, [authToken, isAuthenticated, organization?.id]);
