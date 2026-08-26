@@ -1,5 +1,6 @@
 import {
   Entity,
+  Index,
   PrimaryGeneratedColumn,
   Column,
   OneToOne,
@@ -9,6 +10,7 @@ import {
 } from 'typeorm';
 
 @Entity('two_factor_auth')
+@Index(['userId'], { unique: true })
 export class TwoFactor {
   @PrimaryGeneratedColumn('uuid')
   id: string;

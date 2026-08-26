@@ -189,17 +189,6 @@ export class DischargePredictionService {
     return candidates.filter((_, index) => readinessByPatient[index].readinessScore >= 70);
   }
 
-  async predictDischargeTime(patientId: string): Promise<Date> {
-    const patient = await Patient.findById(patientId);
-    if (!patient) throw new Error('Patient not found');
-
-    const baseTime = new Date();
-    const hoursByDpsScore: Record<number, number> = { 1: 48, 2: 24, 3: 12, 4: 6, 5: 3 };
-    baseTime.setHours(baseTime.getHours() + (hoursByDpsScore[patient.dps_score] || 12));
-
-    return baseTime;
-  }
-
   private async checkStableVitals(patient: IPatient): Promise<boolean> {
     const vitals = patient.vitals;
     if (!vitals) return false;

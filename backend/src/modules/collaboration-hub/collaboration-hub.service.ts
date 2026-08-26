@@ -1,6 +1,7 @@
 import { ForbiddenException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, IsNull, Not, Repository } from 'typeorm';
+import { randomUUID } from 'crypto';
 import { AuditAction } from '../audit/entities/audit-log.entity';
 import { AuditService } from '../audit/audit.service';
 import { NotificationService } from '../notifications/services/notification.service';
@@ -228,16 +229,35 @@ export class CollaborationHubService {
       }
       return existing;
     }
-    return this.membershipRepo.save(
-      this.membershipRepo.create({
-        channelId,
-        userId,
-        role,
-        status: CollaborationChannelMembershipStatus.ACTIVE,
-        notificationPreference: CollaborationNotificationPreference.ALL,
-        joinedAt: new Date(),
-      }),
-    );
+
+    // HEAL: findOne-then-create above had a TOCTOU race -- e.g. two
+    // concurrent requests auto-joining the same never-before-seen user to a
+    // DEPARTMENT channel via assertAccess() could both find no row and both
+    // attempt to insert, and the loser's .save() would throw an uncaught
+    // unique-constraint QueryFailedError against the entity's
+    // `@Index(['channelId', 'userId'], { unique: true })`. orIgnore() relies
+    // on that same index to make the losing insert a silent no-op, then
+    // reads back whichever row actually won. Same pattern as
+    // workspaces.service.ts's getOrCreateState.
+    const candidate = this.membershipRepo.create({
+      id: randomUUID(),
+      channelId,
+      userId,
+      role,
+      status: CollaborationChannelMembershipStatus.ACTIVE,
+      notificationPreference: CollaborationNotificationPreference.ALL,
+      joinedAt: new Date(),
+    });
+
+    await this.membershipRepo
+      .createQueryBuilder()
+      .insert()
+      .into(CollaborationChannelMembership)
+      .values(candidate as any)
+      .orIgnore()
+      .execute();
+
+    return this.membershipRepo.findOneOrFail({ where: { channelId, userId } });
   }
 
   /** Department channels auto-join on first reference; every other channel type requires explicit membership. */
@@ -756,9 +776,24 @@ export class CollaborationHubService {
     const existing = await this.reactionRepo.findOne({ where: { messageId, userId, emoji } });
     if (existing) return existing;
 
-    const reaction = await this.reactionRepo.save(
-      this.reactionRepo.create({ messageId, userId, emoji }),
-    );
+    // HEAL: findOne-then-create above had a TOCTOU race -- two concurrent
+    // "react with the same emoji" requests for the same user/message (e.g. a
+    // double-tap) could both find no row and both attempt to insert, and the
+    // loser's .save() would throw an uncaught unique-constraint
+    // QueryFailedError against the entity's
+    // `@Index(['messageId', 'userId', 'emoji'], { unique: true })`.
+    // orIgnore() relies on that same index to make the losing insert a
+    // silent no-op, then reads back whichever row actually won.
+    const candidate = this.reactionRepo.create({ id: randomUUID(), messageId, userId, emoji });
+    await this.reactionRepo
+      .createQueryBuilder()
+      .insert()
+      .into(CollaborationMessageReaction)
+      .values(candidate as any)
+      .orIgnore()
+      .execute();
+    const reaction = await this.reactionRepo.findOneOrFail({ where: { messageId, userId, emoji } });
+
     this.realtimeService.publish(
       {
         type: 'reaction_added',

@@ -37,11 +37,25 @@ describe('TwoFactorService', () => {
     save: jest.fn(),
   };
 
+  let pendingInsertValues: any = null;
+  const insertQueryBuilder: any = {
+    insert: jest.fn().mockReturnThis(),
+    into: jest.fn().mockReturnThis(),
+    values: jest.fn((values: any) => {
+      pendingInsertValues = values;
+      return insertQueryBuilder;
+    }),
+    orIgnore: jest.fn().mockReturnThis(),
+    execute: jest.fn().mockResolvedValue(undefined),
+  };
+
   const mockTwoFactorRepository = {
     create: jest.fn(),
     save: jest.fn(),
     findOne: jest.fn(),
+    findOneOrFail: jest.fn(async () => pendingInsertValues),
     remove: jest.fn(),
+    createQueryBuilder: jest.fn(() => insertQueryBuilder),
     manager: {
       transaction: jest.fn(async (callback) => callback(mockEntityManager)),
     },
@@ -80,6 +94,8 @@ describe('TwoFactorService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    pendingInsertValues = null;
+    insertQueryBuilder.execute.mockResolvedValue(undefined);
     mockTwoFactorRepository.manager.transaction.mockImplementation(async (callback) =>
       callback(mockEntityManager),
     );
@@ -309,25 +325,14 @@ describe('TwoFactorService', () => {
       (bcrypt.hash as jest.Mock).mockResolvedValue('hashed_backup_code');
 
       mockTwoFactorRepository.findOne.mockResolvedValue(null);
-      mockTwoFactorRepository.create.mockReturnValue({
-        userId,
-        enabled: true,
-        secret: 'test_secret',
-        backupCodes: ['hashed_backup_code'],
-      });
-      mockTwoFactorRepository.save.mockResolvedValue({
-        userId,
-        enabled: true,
-        secret: 'test_secret',
-        backupCodes: ['hashed_backup_code'],
-      });
 
       const result = await service.enable(userId, 'test_secret', token);
 
       expect(result).toEqual({
         backupCodes: ['code1', 'code2'],
       });
-      expect(mockTwoFactorRepository.save).toHaveBeenCalled();
+      expect(mockTwoFactorRepository.createQueryBuilder).toHaveBeenCalled();
+      expect(insertQueryBuilder.orIgnore).toHaveBeenCalled();
       expect(mockAuditService.log).toHaveBeenCalled();
     });
 
@@ -351,6 +356,66 @@ describe('TwoFactorService', () => {
 
       await expect(service.enable(userId, 'test_secret', token)).rejects.toThrow(
         'Invalid verification code',
+      );
+    });
+
+    it('updates the existing row in place when one is already present (not yet enabled)', async () => {
+      const userId = '1';
+      const token = '123456';
+
+      (speakeasy.totp.verify as jest.Mock).mockReturnValue(true);
+      jest.spyOn(service as any, 'generateBackupCodes').mockReturnValue(['code1', 'code2']);
+      (bcrypt.hash as jest.Mock).mockResolvedValue('hashed_backup_code');
+
+      const existingRow = { id: 'existing-id', userId, enabled: false, secret: null };
+      mockTwoFactorRepository.findOne.mockResolvedValue(existingRow);
+      mockTwoFactorRepository.save.mockResolvedValue({
+        ...existingRow,
+        enabled: true,
+        secret: 'test_secret',
+      });
+
+      const result = await service.enable(userId, 'test_secret', token);
+
+      expect(result).toEqual({ backupCodes: ['code1', 'code2'] });
+      expect(mockTwoFactorRepository.save).toHaveBeenCalledWith(
+        expect.objectContaining({ userId, enabled: true, secret: 'test_secret' }),
+      );
+      expect(mockTwoFactorRepository.createQueryBuilder).not.toHaveBeenCalled();
+    });
+
+    // HEAL: findOne-then-create had a TOCTOU race -- two concurrent enable()
+    // calls for a user with no existing row (e.g. a double-submitted enable
+    // request) could both find no row and both attempt to insert. Before
+    // the new `@Index(['userId'], { unique: true })` + orIgnore()+read-back
+    // fix, the loser's .save() would throw an uncaught unique-constraint
+    // QueryFailedError. Now the loser's insert is a silent no-op and the
+    // read-back finds the winner's row -- since only the winner's bcrypt
+    // HASHES are persisted, the loser cannot honestly return working
+    // plaintext codes, so it must fail the same way a second synchronous
+    // call would, rather than pretend to have succeeded.
+    it('fails cleanly on the losing side of a concurrent first-time enable() race', async () => {
+      const userId = '1';
+      const token = '123456';
+
+      (speakeasy.totp.verify as jest.Mock).mockReturnValue(true);
+      jest.spyOn(service as any, 'generateBackupCodes').mockReturnValue(['code1', 'code2']);
+      (bcrypt.hash as jest.Mock).mockResolvedValue('hashed_backup_code');
+
+      mockTwoFactorRepository.findOne.mockResolvedValue(null);
+      const winningRow = {
+        id: 'winning-row-id',
+        userId,
+        enabled: true,
+        secret: 'someone-elses-secret',
+      };
+      insertQueryBuilder.execute.mockImplementationOnce(async () => {
+        // orIgnore() means execute() never actually stores our candidate.
+      });
+      mockTwoFactorRepository.findOneOrFail.mockResolvedValueOnce(winningRow);
+
+      await expect(service.enable(userId, 'test_secret', token)).rejects.toThrow(
+        '2FA is already enabled',
       );
     });
   });

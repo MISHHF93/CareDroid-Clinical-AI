@@ -9,7 +9,7 @@ import { Repository } from 'typeorm';
 import * as speakeasy from 'speakeasy';
 import * as QRCode from 'qrcode';
 import * as bcrypt from 'bcrypt';
-import { randomInt } from 'crypto';
+import { randomInt, randomUUID } from 'crypto';
 import { TwoFactor } from './entities/two-factor.entity';
 import { User } from '../users/entities/user.entity';
 import { AuditService } from '../audit/audit.service';
@@ -65,7 +65,7 @@ export class TwoFactorService {
     const backupCodes = this.generateBackupCodes(10);
     const hashedBackupCodes = await Promise.all(backupCodes.map((code) => bcrypt.hash(code, 10)));
 
-    let twoFactor = await this.twoFactorRepository.findOne({ where: { userId } });
+    const twoFactor = await this.twoFactorRepository.findOne({ where: { userId } });
 
     if (twoFactor) {
       if (twoFactor.enabled) {
@@ -74,16 +74,43 @@ export class TwoFactorService {
       twoFactor.enabled = true;
       twoFactor.secret = secret;
       twoFactor.backupCodes = hashedBackupCodes;
+      await this.twoFactorRepository.save(twoFactor);
     } else {
-      twoFactor = this.twoFactorRepository.create({
-        userId,
-        enabled: true,
-        secret,
-        backupCodes: hashedBackupCodes,
-      });
-    }
+      // HEAL: findOne-then-create above had a TOCTOU race -- two concurrent
+      // enable() calls for a user with no existing row (e.g. a
+      // double-submitted enable request) could both find no row and both
+      // attempt to insert, and the loser's .save() would throw an uncaught
+      // unique-constraint QueryFailedError (500) against the entity's new
+      // `@Index(['userId'], { unique: true })`. orIgnore() relies on that
+      // same index to make the losing insert a silent no-op, then reads back
+      // whichever row actually won. Same pattern as
+      // workspaces.service.ts's getOrCreateState.
+      //
+      // Unlike that idempotent get-or-create pattern, the loser here cannot
+      // honestly report success: only the bcrypt HASHES of the winning
+      // call's backup codes are ever persisted, so a losing call has no way
+      // to return plaintext codes that would actually verify later. Fail the
+      // same way a second synchronous call above would.
+      const candidateId = randomUUID();
+      await this.twoFactorRepository
+        .createQueryBuilder()
+        .insert()
+        .into(TwoFactor)
+        .values({
+          id: candidateId,
+          userId,
+          enabled: true,
+          secret,
+          backupCodes: hashedBackupCodes,
+        } as any)
+        .orIgnore()
+        .execute();
 
-    await this.twoFactorRepository.save(twoFactor);
+      const savedTwoFactor = await this.twoFactorRepository.findOneOrFail({ where: { userId } });
+      if (savedTwoFactor.id !== candidateId) {
+        throw new BadRequestException('2FA is already enabled');
+      }
+    }
 
     // Audit log
     await this.auditService.log({
