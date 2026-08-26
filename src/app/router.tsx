@@ -8,11 +8,10 @@ import {
   Route,
   Routes,
   useLocation,
-  useNavigate,
   useParams,
   useSearchParams,
 } from 'react-router-dom';
-import { UserIdentityProvider, useUserIdentity } from '../contexts/UserIdentityContext';
+import { useUserIdentity } from '../contexts/UserIdentityContext';
 import { useUser } from '../contexts/UserContext';
 import { buildAuthUrl } from '../auth/authSession';
 import { requireRealAuthGate } from '../config/authGate.config';
@@ -111,15 +110,11 @@ import {
 import { COMMAND_CENTER_INTELLIGENCE_REDIRECTS } from '../config/hospitalCommandCenterViews.config';
 import { resolveRegistryId } from '../data/clinicalCatalogWiring';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
-import TrackMindRouteGuard from '../components/TrackMindRouteGuard';
 import ProfileRouteGuard from '../components/ProfileRouteGuard';
 import {
   getEmergencyRoleDefinition,
-  getEmergencyRoleHomeRoute,
   getReceptionEmbeddedIntakePath,
 } from '../config/emergencyRolePermissions';
-import { getPlatformHomeRoute } from '../config/receptionFirstUx.config';
-import { resolvePlatformLanding } from '../config/platformEntryModel';
 import { resolveDemoDefaultLandingRoute } from '../config/demoPersonaModel';
 import { resolveAppStartupRoute } from '../config/appStartupModel';
 import { EntryShell } from '../layouts/EntryShell';
@@ -466,9 +461,26 @@ export function buildEmergencyToolsRedirect(location) {
   } else if (pathname.startsWith('/tools/cardiology/') || pathname.startsWith('/tools/nephrology/') ||
              pathname.startsWith('/tools/neurology/') || pathname.startsWith('/tools/gastroenterology/') ||
              pathname.startsWith('/tools/endocrine/') || pathname.startsWith('/tools/pediatrics/') ||
+             pathname.startsWith('/tools/pediatrics-obgyn/') ||
              pathname.startsWith('/tools/psychiatry/') || pathname.startsWith('/tools/pulmonology/')) {
-    // Specialty shortcut deep-links → canonical /emergency/tools/<specialty>/:toolId routes
-    const specialty = pathname.replace(/^\/tools\//, '').split('/')[0];
+    // Specialty shortcut deep-links → canonical /emergency/tools/<specialty>/:toolId routes.
+    // 2026-08-25: toolRegistry.ts/clinicalIntentToolCatalog.ts (the real tool
+    // catalog every one of these 9 pediatrics/OB-GYN tools is actually
+    // advertised through) both use 'pediatrics-obgyn' as this specialty's
+    // path segment -- but the canonical destination route below was
+    // registered as /emergency/tools/pediatrics/:toolId (matching
+    // PediatricsObgynDashboard.tsx's own direct links, which bypass this
+    // redirect entirely and so were never affected). Since the trigger
+    // condition above only matched '/tools/pediatrics/', every one of these
+    // 9 real, catalog-advertised deep links fell through to the generic
+    // /tools/ handler below instead of ever reaching this branch, landing on
+    // a generic tool-search results page instead of the intended specialty
+    // assistant page -- confirmed live via a Playwright responsive-QA run.
+    // Normalizing here (not renaming the registered route or
+    // PediatricsObgynDashboard's own links) is the minimal fix: it makes
+    // both spellings resolve to the one destination that already exists.
+    const rawSpecialty = pathname.replace(/^\/tools\//, '').split('/')[0];
+    const specialty = rawSpecialty === 'pediatrics-obgyn' ? 'pediatrics' : rawSpecialty;
     const toolId = pathname.split('/').filter(Boolean)[2] || '';
     const search = params.toString();
     return {
