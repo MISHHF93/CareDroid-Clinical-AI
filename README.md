@@ -85,6 +85,14 @@ All routes live under `/emergency/*`. Legacy paths (`/tools`, `/calculators`, `/
 | `/audit` | **Governance Workspace** — audit logs, AI oversight, compliance | 7 |
 | `/admin` | **Admin Console** — tenant administration, staff, system health | 10 |
 
+### Multi-department clinical dashboards
+
+CareDroid is expanding from an ED-only product into a hospital-wide platform, with the ED kept as the mature reference environment rather than the ceiling. Eleven department-level dashboards are live, each with its own suite of specialty assistants, protocols, and decision support:
+
+`/cardiology` · `/endocrinology` · `/gastroenterology` · `/nephrology` · `/neurology` · `/pediatrics-obgyn` · `/pharmacy` · `/psychiatry` · `/pulmonology` · `/radiology` · `/education`
+
+Most share a common `SpecialtyHubLayout` (card grid of department-specific assistants and dashboards); Pharmacy and Radiology have richer, purpose-built layouts (a drug-interaction checker; a study-queue/read-status triage view). Route definitions live in [`src/config/platformConsoleRoutes.ts`](src/config/platformConsoleRoutes.ts); page components are in [`src/pages/clinical/`](src/pages/clinical/).
+
 ---
 
 ## Hospital roles
@@ -147,6 +155,12 @@ CareDroid runs **17 distinct AI services** across generation, prediction, edge i
 | MoH Patient Matching | Embedding-based patient record matching for identity resolution | Roadmap |
 | Federated EMS Triage | Coordinated edge triage with federated local model aggregation | Roadmap |
 | Edge AI Ambulance | Vital stream and ultrasound frame analysis at the ambulance edge | Roadmap |
+
+### Clinical Agent Command Platform (in progress)
+
+A standing architecture direction: evolve from an LLM-with-direct-access model toward a **Chief orchestrator** that discovers and delegates to a typed, registered **capability registry** (calculators, LLM adapters, RAG, tools, human review) rather than giving any model unrestricted backend access. Core vocabulary: **autonomy levels** (OBSERVE → ANALYZE → RECOMMEND → PREPARE → EXECUTE — more autonomy must never mean less control) and **truthful states** (LIVE / STALE / PENDING / DEGRADED / FAILED / INSUFFICIENT_DATA / OUTSIDE_SCOPE / REQUIRES_HUMAN_REVIEW, surfaced via `AiTruthLabel`) so no AI surface implies more certainty or autonomy than it actually has. Consequential actions always require human approval.
+
+First vertical slice — **Chief Investigation** — is a deterministic "investigate this patient's deterioration" plan runner (`backend/src/modules/chief-investigation/`, OBSERVE + PREPARE only, no LLM planning, no autonomous mutation) that prepares human-reviewed action proposals, with a real frontend surface (`ChiefInvestigationPanel`) on the patient chart. The capability registry itself (`lib/ai/capabilityRegistry.ts` + `capabilityRegistrations.ts`) declares every existing AI/tool/service capability with honest modality and source-category metadata — calculators are tagged `TOOL_RESULT`, not implied to be model output. Full architecture: **[`CLINICAL_AGENT_COMMAND_PLATFORM.md`](CLINICAL_AGENT_COMMAND_PLATFORM.md)**.
 
 ---
 
@@ -229,28 +243,28 @@ cp .env.example .env
 cp backend/.env.example backend/.env
 ```
 
-Start the full local stack (frontend on :5190 — Vite proxies `/api` to Nest on :3350):
+Start the full local stack (frontend on :3000 — Vite proxies `/api` to Nest on :8000):
 
 ```bash
 npm start
 ```
 
-Local defaults use **SQLite** and disable optional ML/RAG services so the app boots without Docker or external credentials.
+Local defaults use **SQLite** and disable optional ML/RAG services so the app boots without Docker or external credentials. Both ports are overridable via `FRONTEND_PORT`/`VITE_DEV_PORT` and `BACKEND_PORT`/`PORT` if 3000/8000 are already in use.
 
 | Service | URL |
 |---------|-----|
-| App (frontend + API proxy) | http://localhost:5190 |
-| API (proxied) | http://localhost:5190/api |
-| Backend (direct, internal) | http://localhost:3350 |
-| Health check | http://localhost:5190/health |
-| API docs (Swagger, dev/staging only) | http://localhost:5190/api/docs |
-| App navigator ("where do I find X?") | http://localhost:5190/navigator |
+| App (frontend + API proxy) | http://localhost:3000 |
+| API (proxied) | http://localhost:3000/api |
+| Backend (direct, internal) | http://localhost:8000 |
+| Health check | http://localhost:8000/health |
+| API docs (Swagger, dev/staging only) | http://localhost:3000/api/docs |
+| App navigator ("where do I find X?") | http://localhost:3000/navigator |
 
 ### Focused commands
 
 ```bash
-npm run dev:web          # Frontend only (Vite on :5190)
-npm run dev:api          # Backend only (Nest on :3350)
+npm run dev:web          # Frontend only (Vite on :3000)
+npm run dev:api          # Backend only (Nest on :8000)
 npm run backend:build    # Compile NestJS
 npm run backend:start    # Run compiled backend
 npm run typecheck:frontend
@@ -279,7 +293,7 @@ Key walkthrough surfaces in order:
 
 | Variable | Purpose |
 |----------|---------|
-| `VITE_API_URL` | Leave empty in local dev (same-origin `/api` via Vite on :5190) |
+| `VITE_API_URL` | Leave empty in local dev (same-origin `/api` via Vite on :3000) |
 | `VITE_ED_SINGLE_APPLICATION` | `true` (default) — activates Emergency OS as single app |
 | `AI_ENABLED` | Enable AI features globally |
 | `ED_COPILOT_AI_ENABLED` | Enable the ED Copilot specifically |
@@ -302,7 +316,7 @@ See `.env.example` for the full variable list.
 | `ANTHROPIC_API_KEY` | Backend AI key |
 | `PINECONE_API_KEY` | Pinecone API key for RAG |
 | `NLU_SERVICE_MODE` | `in-process` (default) or `http` for an external NLU deployment |
-| `NLU_SERVICE_URL` | NLU base URL (default `http://127.0.0.1:3350/api/nlu` when in-process) |
+| `NLU_SERVICE_URL` | NLU base URL (default `http://127.0.0.1:8000/api/nlu` when in-process) |
 | `ANOMALY_DETECTION_URL` | Anomaly detection service URL |
 | `REDIS_URL` | Optional Redis cache |
 
