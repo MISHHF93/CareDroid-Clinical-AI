@@ -2,6 +2,7 @@ import { Column, CreateDateColumn, Entity, Index, PrimaryColumn, UpdateDateColum
 
 @Entity('sentinel_ems_episodes')
 @Index(['unitId', 'status'])
+@Index(['organizationId', 'updatedAt'])
 export class SentinelEpisodeEntity {
   @PrimaryColumn({ type: 'varchar', length: 120 })
   id: string;

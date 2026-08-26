@@ -142,11 +142,22 @@ export class SurgeCapacityService extends EventEmitter {
       (reserved as { actualPatientCount?: number } | null)?.actualPatientCount ??
       surgeEvent.actualPatientCount;
 
-    const createdPatients: BatchEMSPatient[] = [];
-
-    for (const patient of patients) {
-      const patientNumber = startingPatientCount + createdPatients.length + 1;
-      const newPatient = await Patient.create({
+    // Perf sweep: this used to `await Patient.create()` once per patient in
+    // a `for` loop -- an N+1 write on precisely the path that most needs to
+    // be fast (a mass-casualty-incident batch intake can be dozens of
+    // patients arriving at once, and every extra round trip here delays
+    // triage for all of them). Each document only depends on its own input
+    // `patient` and its own index (patientNumber is derived from the
+    // already-reserved `startingPatientCount` + index, not from any prior
+    // iteration's DB response), so building the full batch up front and
+    // inserting it in one `insertMany` call is safe and cuts N+1 round trips
+    // down to 1. The schema's field-sync logic lives in a `pre('validate')`
+    // hook (unified-patient.model.ts), not `pre('save')`, and Mongoose runs
+    // validation (and therefore 'validate' middleware) for `insertMany` by
+    // default, so per-document legacy-field syncing still happens correctly.
+    const documents = patients.map((patient, index) => {
+      const patientNumber = startingPatientCount + index + 1;
+      return {
         // HEAL-347.49: the highest-priority instance of the Mongoose Patient
         // model's tenant-scoping gap -- this is a LIVE, frontend-reachable
         // MCI batch-intake write path (surgeApi.ts -> SurgeController ->
@@ -175,13 +186,19 @@ export class SurgeCapacityService extends EventEmitter {
         alerts: [`MCI Patient - Mechanism: ${patient.mechanismOfInjury}`],
         lastModifiedBy: 'surge-capacity-service',
         modifiedAt: new Date(),
-      });
+      };
+    });
 
-      createdPatients.push({
-        ...patient,
-        patientId: String(newPatient._id),
-      });
-    }
+    // `ordered: true` (the default) preserves input order in the returned
+    // array, so `insertedPatients[index]` lines up with `patients[index]`.
+    const insertedPatients = documents.length
+      ? await Patient.insertMany(documents, { ordered: true })
+      : [];
+
+    const createdPatients: BatchEMSPatient[] = patients.map((patient, index) => ({
+      ...patient,
+      patientId: String(insertedPatients[index]._id),
+    }));
 
     // actualPatientCount was already incremented atomically above; a
     // trailing full-document $set here would overwrite it with the

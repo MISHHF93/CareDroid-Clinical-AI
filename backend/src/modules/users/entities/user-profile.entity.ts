@@ -6,9 +6,11 @@ import {
   JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  Index,
 } from 'typeorm';
 
 @Entity('user_profiles')
+@Index(['userId'])
 export class UserProfile {
   @PrimaryGeneratedColumn('uuid')
   id: string;
