@@ -87,6 +87,7 @@ import { SurfaceViewsModule } from './modules/surface-views/surface-views.module
 import { CigModule } from './modules/cig/cig.module';
 import { CollaborationHubModule } from './modules/collaboration-hub/collaboration-hub.module';
 import { NativeAiModule } from './modules/native-ai/native-ai.module';
+import { ChiefInvestigationModule } from './modules/chief-investigation/chief-investigation.module';
 import { UnifiedAiNodeModule } from '../ml-services/unified-ai-node/unified-ai-node.module';
 import { SentinelModule } from './modules/sentinel/sentinel.module';
 import { SurgeModule } from './modules/surge/surge.module';
@@ -270,6 +271,10 @@ function resolveDatabaseClient() {
 
     // Medical Control Plane (Intent Classification, Tool Orchestration)
     MedicalControlPlaneModule,
+
+    // Clinical Agent Command Platform — first vertical slice (deterministic
+    // deterioration investigation runner). See CLINICAL_AGENT_COMMAND_PLATFORM.md.
+    ChiefInvestigationModule,
 
     // Encryption (Batch 4)
     EncryptionModule,
