@@ -67,32 +67,38 @@
   font-style: italic;
 }
 
-@media (prefers-color-scheme: dark) {
-  .cd-ai-truth-label__chip {
-    color: var(--medical-text-muted, #94a3b8);
-  }
+/* 2026-08-25: this app sets dark mode via an explicit html[data-theme='dark']
+   attribute (ThemeContext.tsx's applyDomTheme), not the OS-level
+   prefers-color-scheme -- gating on the media query alone meant these rules
+   never applied for anyone using the in-app theme toggle without their OS
+   also being in dark mode (the common case), leaving chips mixed toward
+   literal white and visually mismatched against the rest of a dark page.
+   Confirmed live via screenshot: a "MANUAL" chip rendered as a bright white
+   pill on the Pharmacy dashboard in dark mode. */
+html[data-theme='dark'] .cd-ai-truth-label__chip {
+  color: var(--medical-text-muted, #94a3b8);
+}
 
-  .cd-ai-truth-label--live .cd-ai-truth-label__chip {
-    background: color-mix(in srgb, #22c55e 22%, #0b1220);
-    color: #4ade80;
-  }
+html[data-theme='dark'] .cd-ai-truth-label--live .cd-ai-truth-label__chip {
+  background: color-mix(in srgb, #22c55e 22%, #0b1220);
+  color: #4ade80;
+}
 
-  .cd-ai-truth-label--manual .cd-ai-truth-label__chip {
-    background: color-mix(in srgb, #0ea5e9 22%, #0b1220);
-    color: #38bdf8;
-  }
+html[data-theme='dark'] .cd-ai-truth-label--manual .cd-ai-truth-label__chip {
+  background: color-mix(in srgb, #0ea5e9 22%, #0b1220);
+  color: #38bdf8;
+}
 
-  .cd-ai-truth-label--stale .cd-ai-truth-label__chip {
-    background: color-mix(in srgb, #f59e0b 24%, #0b1220);
-    color: #fbbf24;
-  }
+html[data-theme='dark'] .cd-ai-truth-label--stale .cd-ai-truth-label__chip {
+  background: color-mix(in srgb, #f59e0b 24%, #0b1220);
+  color: #fbbf24;
+}
 
-  .cd-ai-truth-label--demo .cd-ai-truth-label__chip {
-    background: color-mix(in srgb, #94a3b8 24%, #0b1220);
-    color: #cbd5e1;
-  }
+html[data-theme='dark'] .cd-ai-truth-label--demo .cd-ai-truth-label__chip {
+  background: color-mix(in srgb, #94a3b8 24%, #0b1220);
+  color: #cbd5e1;
+}
 
-  .cd-ai-truth-label__review {
-    color: #fbbf24;
-  }
+html[data-theme='dark'] .cd-ai-truth-label__review {
+  color: #fbbf24;
 }

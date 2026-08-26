@@ -128,8 +128,10 @@
   color: var(--medical-text-subtle, #6b7280);
 }
 
-@media (prefers-color-scheme: dark) {
-  .ds-playground__section {
-    background: var(--app-surface-1, #1e293b);
-  }
+/* 2026-08-25: same fix as AiTruthLabel.css/CareOperationsInboxPanel.css/
+   AiFeedbackControl.css this session -- gated on the OS-level
+   prefers-color-scheme, never applied for this app's own manual
+   html[data-theme='dark'] toggle (ThemeContext.tsx). */
+html[data-theme='dark'] .ds-playground__section {
+  background: var(--app-surface-1, #1e293b);
 }

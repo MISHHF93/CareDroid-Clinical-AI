@@ -30,16 +30,14 @@ import { PUBLIC_CONSOLE_ROUTES } from '../config/publicConsoleRoutes';
 import { OPERATIONS_FLEET_CONSOLE_ROUTES } from '../config/operationsFleetConsoleRoutes';
 import { PLATFORM_CONSOLE_ROUTES } from '../config/platformConsoleRoutes';
 import { EMERGENCY_OS_BRANDING } from '../config/emergencyOsBranding.config';
-import { isReceptionFirstUxEnabled, RECEPTION_FIRST_UX } from '../config/receptionFirstUx.config';
+import { isReceptionFirstUxEnabled } from '../config/receptionFirstUx.config';
 import {
   PractitionerVisibilityProvider,
   usePractitionerSurfaceVisibility,
 } from '../contexts/PractitionerVisibilityContext';
 import {
   EMERGENCY_ACTIONS,
-  EMERGENCY_ROLE_IDS,
   getReceptionPrimaryCreatePath,
-  getReceptionQuickCreatePath,
   prefersReceptionForPatientCreate,
 } from '../config/emergencyRolePermissions';
 import { getVisibleNavigation } from '../config/unified-navigation.config';
@@ -214,6 +212,26 @@ const ADMIN_WORKSPACE_ROUTES: ConsoleWorkspaceEntry[] = ADMIN_CONSOLE_CHILD_ROUT
   (route) => route.path,
 ).map((route) => ({ path: `${CANONICAL_ROUTES.adminOperations}/${route.path}`, label: route.label }));
 
+/** Clinical specialty/department dashboards that live in PLATFORM_CONSOLE_ROUTES for routing convenience but need their own subtitle, not the platform-admin one. */
+const CLINICAL_SPECIALTY_CONSOLE_ROUTE_PATHS: string[] = [
+  CANONICAL_ROUTES.clinicalDecisionSupport,
+  CANONICAL_ROUTES.research,
+  CANONICAL_ROUTES.knowledgeGraph,
+  CANONICAL_ROUTES.laboratory,
+  CANONICAL_ROUTES.pharmacy,
+  CANONICAL_ROUTES.radiology,
+  CANONICAL_ROUTES.education,
+  CANONICAL_ROUTES.cardiology,
+  CANONICAL_ROUTES.nephrology,
+  CANONICAL_ROUTES.neurologyDept,
+  CANONICAL_ROUTES.gastroenterology,
+  CANONICAL_ROUTES.endocrinology,
+  CANONICAL_ROUTES.pediatricsObgyn,
+  CANONICAL_ROUTES.psychiatryDept,
+  CANONICAL_ROUTES.pulmonology,
+  CANONICAL_ROUTES.medical3dViewer,
+];
+
 const CONSOLE_WORKSPACE_GROUPS: Array<{ routes: readonly ConsoleWorkspaceEntry[]; subtitle: string }> = [
   {
     routes: GOVERNANCE_WORKSPACE_ROUTES,
@@ -243,6 +261,21 @@ const CONSOLE_WORKSPACE_GROUPS: Array<{ routes: readonly ConsoleWorkspaceEntry[]
   {
     routes: OPERATIONS_FLEET_CONSOLE_ROUTES,
     subtitle: 'Fleet, hospital IoT, and operations command surfaces.',
+  },
+  {
+    // 2026-08-25: PLATFORM_CONSOLE_ROUTES mixes clinical specialty/department
+    // dashboards in with genuine platform-admin/analytics pages (routing
+    // convenience, not a content grouping) -- every clinical page in it was
+    // inheriting this group's platform-admin subtitle verbatim (e.g. the new
+    // Cardiology dashboard showing "Platform intelligence, analytics, and
+    // system administration surfaces."). Split by CANONICAL_ROUTES key
+    // instead of hand-writing 30+ individual subtitles.
+    routes: PLATFORM_CONSOLE_ROUTES.filter((route) =>
+      CLINICAL_SPECIALTY_CONSOLE_ROUTE_PATHS.some(
+        (path) => route.path === path || route.path === `${path}/*`,
+      ),
+    ),
+    subtitle: 'Specialty and department clinical dashboards — tools, protocols, and decision support by service line.',
   },
   {
     routes: PLATFORM_CONSOLE_ROUTES,
@@ -292,10 +325,6 @@ function isEditableShortcutTarget(target: EventTarget | null): boolean {
 
 function matchesNavigationPath(pathname: string, path: string): boolean {
   return pathname === path || (path !== '/emergency' && pathname.startsWith(`${path}/`));
-}
-
-function routePermissionPath(path: string): string {
-  return path.split(/[?#]/)[0] || path;
 }
 
 const COPILOT_AGENT_PREFILL_LABELS: Record<string, string> = {

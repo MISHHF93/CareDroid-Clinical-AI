@@ -167,16 +167,19 @@
   color: #dc2626;
 }
 
-@media (prefers-color-scheme: dark) {
-  .care-ops-inbox {
-    background: var(--app-surface-1, #1e293b);
-  }
+/* 2026-08-25: gated on the OS-level prefers-color-scheme, not this app's
+   own html[data-theme='dark'] attribute (ThemeContext.tsx) -- never applied
+   for the in-app manual theme toggle. .care-ops-inbox__row has no background
+   at all outside this block, so it was rendering transparent (not the
+   intended dark surface) whenever dark mode was toggled manually. */
+html[data-theme='dark'] .care-ops-inbox {
+  background: var(--app-surface-1, #1e293b);
+}
 
-  .care-ops-inbox__row {
-    background: var(--medical-surface-page, #0f172a);
-  }
+html[data-theme='dark'] .care-ops-inbox__row {
+  background: var(--medical-surface-page, #0f172a);
+}
 
-  .care-ops-inbox__btn {
-    background: var(--app-surface-1, #1e293b);
-  }
+html[data-theme='dark'] .care-ops-inbox__btn {
+  background: var(--app-surface-1, #1e293b);
 }
