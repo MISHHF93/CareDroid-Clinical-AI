@@ -145,7 +145,6 @@ const FULL_VISIBILITY = Object.freeze({
     showJourneyEngineCard: true,
   }),
   ems: Object.freeze({
-    showFleetUnitGrid: true,
     showOffloadTrackerPanel: true,
   }),
   shift: Object.freeze({
@@ -299,7 +298,6 @@ function buildPilotVisibility(context: any = {}) {
       showJourneyEngineCard: !c.hidePatientJourneyEngineCard,
     }),
     ems: Object.freeze({
-      showFleetUnitGrid: !c.suppressEmsFleetUnitGrid,
       showOffloadTrackerPanel: !c.suppressEmsOffloadTrackerPanel,
     }),
     shift: Object.freeze({

@@ -1,30 +1,6 @@
 import { apiFetch, getApiErrorMessage, parseApiResponse } from './apiClient';
 import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
 
-function normalizeUnit(vehicle: any = {}) {
-  const status =
-    vehicle.status === 'available'
-      ? 'Available'
-      : vehicle.status === 'maintenance'
-        ? 'OutOfService'
-        : vehicle.status === 'occupied'
-          ? 'Inbound'
-          : 'Dispatched';
-
-  return {
-    id: vehicle.id,
-    callSign: vehicle.label || vehicle.id,
-    agency: 'Backend Fleet',
-    status,
-    crewStaffIds: [],
-    lastKnownLocation: vehicle.destination || vehicle.locationSource || 'Location unavailable',
-    driver: vehicle.driver,
-    etaMinutes: vehicle.etaMinutes,
-    freshness: vehicle.freshness,
-    source: 'backend-fleet-demo',
-  };
-}
-
 async function guardedJson(capability, path, options: any = {}) {
   if (!isBackendCapabilityEnabled(capability)) {
     return { ok: false, data: null, message: 'Backend endpoint not available yet.' };
@@ -40,32 +16,6 @@ async function guardedJson(capability, path, options: any = {}) {
   } catch (error: any) {
     return { ok: false, data: null, message: getApiErrorMessage(error) };
   }
-}
-
-export async function fetchEmsFleetSnapshot() {
-  const result = await guardedJson('fleetLiveTracking', '/api/fleet/snapshot');
-  if (!result.ok) return result;
-
-  const snapshot = result.data?.data || result.data || {};
-  const vehicles = snapshot.vehicles || [];
-  return {
-    ok: true,
-    data: {
-      source: result.data?.source || 'demo-fleet-live-tracking',
-      generatedAt:
-        result.data?.generatedAt ||
-        snapshot.generatedAt ||
-        snapshot.updatedAt ||
-        new Date().toISOString(),
-      sourceLabel:
-        result.data?.sourceLabel ||
-        'Backend demo fleet live tracking - not an EMS CAD/ePCR feed.',
-      units: vehicles.map(normalizeUnit),
-      summary: snapshot.summary || {},
-      alerts: snapshot.alerts || [],
-    },
-    message: result.message,
-  };
 }
 
 export function persistEmergencyReferral(referral) {

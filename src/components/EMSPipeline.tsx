@@ -8,7 +8,7 @@ import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermission
 import useEmsScreen from '../hooks/useEmsScreen';
 import { useEMSIntake } from '../hooks/useEmergencyOs';
 import { convertEmsArrivalForReception } from '../services/receptionIntakeBridge';
-import { fetchEmsFleetSnapshot, fetchEmergencyDiversionStatus } from '../services/emergencyTransportApi';
+import { fetchEmergencyDiversionStatus } from '../services/emergencyTransportApi';
 import { postEmsHandoff } from '../services/emergencyOsApi';
 import { reportEmsHandoffSyncFailure } from '../services/emsHandoffSyncFailure';
 import EmsOffloadTrackerPanel from './ems/EmsOffloadTrackerPanel';
@@ -126,6 +126,37 @@ function roomName(rooms, roomId) {
   return rooms.find((room) => room.id === roomId)?.name || 'Bay pending';
 }
 
+// ATMIST (Age, Time of onset, Mechanism/Medical complaint, Injuries/Information,
+// Signs/Symptoms, Treatments given) -- the real pre-hospital-to-ED handover data
+// standard. `arrival.atmist` is a READ-TIME DERIVED VIEW the backend already
+// builds from data on the chart (see buildAtmistHandoverSummary in
+// emergency-os.services.ts); this just renders it, it never fabricates a value
+// itself. Only present on simulated physician-initiated arrivals.
+function atmistFields(atmist) {
+  if (!atmist) return [];
+  return [
+    { letter: 'A', label: 'Age', value: atmist.age },
+    { letter: 'T', label: 'Time of onset', value: formatAtmistTimestamp(atmist.timeOfOnset) },
+    { letter: 'M', label: 'Mechanism / complaint', value: atmist.mechanismOrComplaint },
+    { letter: 'I', label: 'Injuries / information', value: atmist.injuriesOrInformation },
+    { letter: 'S', label: 'Signs / symptoms', value: atmist.signsAndSymptoms },
+    { letter: 'T', label: 'Treatments given', value: atmist.treatmentsGiven },
+  ];
+}
+
+function formatAtmistTimestamp(value) {
+  if (!value || value === 'Not recorded') return 'Not recorded';
+  const parsed = new Date(value);
+  return Number.isFinite(parsed.getTime())
+    ? parsed.toLocaleString(undefined, {
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+      })
+    : value;
+}
+
 function EMSArrivalRow({
   arrival,
   now,
@@ -171,7 +202,8 @@ function EMSArrivalRow({
   const hasExpandableDetails =
     isIncoming ||
     arrival.status === 'Inbound' ||
-    showHandoffChecklist;
+    showHandoffChecklist ||
+    Boolean(arrival.atmist);
   const showDetails = detailsOpen;
 
   return (
@@ -343,6 +375,33 @@ function EMSArrivalRow({
         </div>
       ) : null}
 
+      {showDetails && arrival.atmist ? (
+        <div
+          className="ems-pipeline__row-details ems-pipeline__atmist"
+          aria-label="ATMIST handover summary"
+        >
+          <div className="ems-pipeline__atmist-header">
+            <strong>ATMIST Handover Summary</strong>
+            <span className="ems-pipeline__atmist-tag">
+              Auto-derived from the chart — not typed by the physician
+            </span>
+          </div>
+          <dl className="ems-pipeline__atmist-grid">
+            {atmistFields(arrival.atmist).map((field, index) => (
+              <div className="ems-pipeline__atmist-row" key={`atmist-${index}-${field.letter}`}>
+                <dt>
+                  <span className="ems-pipeline__atmist-letter" aria-hidden>
+                    {field.letter}
+                  </span>
+                  {field.label}
+                </dt>
+                <dd>{field.value}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      ) : null}
+
       {showDetails && showHandoffChecklist ? (
         <div className="ems-pipeline__row-details">
           <AmbulanceHandoffChecklistPanel
@@ -387,7 +446,6 @@ export default function EMSPipeline() {
     (state) => state.updateAmbulanceHandoffChecklist,
   );
   const [now, setNow] = useState(() => new Date());
-  const [fleetSnapshot, setFleetSnapshot] = useState<any>({ status: 'loading', units: [], message: '' });
   const [diversionStatus, setDiversionStatus] = useState<any>({ status: 'idle', data: null, message: '' });
   const incomingSectionRef = useRef<any>(null);
   const receivingSectionRef = useRef<any>(null);
@@ -438,34 +496,6 @@ export default function EMSPipeline() {
 
   useEffect(() => {
     let cancelled = false;
-    fetchEmsFleetSnapshot()
-      .then((result) => {
-        if (cancelled) return;
-        if (result.ok) {
-          setFleetSnapshot({
-            status: 'ready',
-            units: result.data?.units || [],
-            message: [
-              result.data?.sourceLabel || 'Live EMS feed connected.',
-              formatFreshness(result.data?.generatedAt),
-            ].join(' '),
-          });
-        } else {
-          setFleetSnapshot({
-            status: 'error',
-            units: [],
-            message: 'EMS unit feed is unavailable. Use active inbound units below for coordination.',
-          });
-        }
-      })
-      .catch(() => {
-        if (cancelled) return;
-        setFleetSnapshot({
-          status: 'error',
-          units: [],
-          message: 'EMS unit feed is unavailable. Use active inbound units below for coordination.',
-        });
-      });
     fetchEmergencyDiversionStatus()
       .then((result) => {
         if (cancelled) return;
@@ -749,49 +779,16 @@ export default function EMSPipeline() {
       <div className="ems-pipeline__sections">
         {showInboundSection ? (
           <>
-            <section className="ems-pipeline__section">
-              <div className="ems-pipeline__section-heading">
-                <Ambulance size={17} aria-hidden />
-                <h2>EMS Unit Visibility</h2>
-                <span>{fleetSnapshot.units.length}</span>
-              </div>
-              <p className="ems-pipeline__source">
-                {fleetSnapshot.message || 'Live EMS feed status is pending.'}
-              </p>
-              {diversionStatus.status === 'ready' && diversionStatus.data ? (
+            {diversionStatus.status === 'ready' && diversionStatus.data ? (
+              <section className="ems-pipeline__section">
                 <div className="ems-pipeline__diversion">
                   <strong>Diversion Status</strong>
                   <span role="status" aria-label="Diversion status">
                     {diversionStatus.data.active ? 'Active diversion' : 'No diversion'}
                   </span>
                 </div>
-              ) : null}
-              {surfaces.ems.showFleetUnitGrid ? (
-                <div className="ems-pipeline__unit-grid">
-                  {fleetSnapshot.status === 'loading' ? (
-                    <p className="ems-pipeline__empty" role="status">Loading department data...</p>
-                  ) : fleetSnapshot.status === 'error' ? (
-                    <p className="ems-pipeline__empty" role="alert">
-                      {fleetSnapshot.message || 'EMS unit feed is unavailable. Use active inbound units below for coordination.'}
-                    </p>
-                  ) : fleetSnapshot.units.length ? (
-                    fleetSnapshot.units.slice(0, 6).map((unit) => (
-                      <article key={unit.id}>
-                        <strong>{unit.callSign}</strong>
-                        <span>{unit.status}</span>
-                        <small>{unit.lastKnownLocation}</small>
-                      </article>
-                    ))
-                  ) : (
-                    <p className="ems-pipeline__empty">No EMS units returned by the current source. Confirm the live EMS/CAD feed before director demo claims.</p>
-                  )}
-                </div>
-              ) : (
-                <p className="ems-pipeline__source ems-pipeline__source--compact" role="note">
-                  Fleet telemetry hidden during pilot review. Use incoming and awaiting-handoff rows below.
-                </p>
-              )}
-            </section>
+              </section>
+            ) : null}
 
             <section className="ems-pipeline__section" ref={incomingSectionRef}>
               <PreArrivalForm

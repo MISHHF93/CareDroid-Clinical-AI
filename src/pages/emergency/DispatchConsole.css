@@ -410,3 +410,42 @@
 .dc-pad-note {
   padding: 10px 14px;
 }
+
+/* Physician-requested simulated transport visibility panel -- read-only, and
+   deliberately amber-toned like the simulated badges on PatientDetailPanel/
+   EMSPipeline so it reads as an honesty label, not a clinical/CAD status. */
+.dispatch-console__physician-sim-panel {
+  border-color: color-mix(in srgb, var(--medical-status-warning-text, #b45309) 30%, var(--medical-border, #e2e8f0));
+}
+
+.dispatch-console__physician-sim-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--medical-status-warning-text, #b45309) 18%, transparent);
+  color: var(--medical-status-warning-text, #b45309);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.dispatch-console__physician-sim-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.dispatch-console__physician-sim-row {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--medical-status-warning-text, #b45309) 22%, var(--medical-border, #e2e8f0));
+  background: color-mix(in srgb, var(--medical-status-warning-text, #b45309) 5%, var(--medical-surface-card, #fff));
+}
+
+.dispatch-console__physician-sim-summary {
+  font-size: 13px;
+  color: var(--medical-ink, #111827);
+}

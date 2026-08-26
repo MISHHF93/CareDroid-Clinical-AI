@@ -28,6 +28,7 @@ export const BACKEND_HTTP_ROUTES = Object.freeze([
   { method: 'GET', path: '/api/emergency/ems', controller: 'EmergencyOsController' },
   { method: 'POST', path: '/api/emergency/ems/handoff', controller: 'EmergencyOsController' },
   { method: 'PATCH', path: '/api/emergency/ems/arrivals/:arrivalId/status', controller: 'EmergencyOsController' },
+  { method: 'POST', path: '/api/emergency/ems/transport-requests', controller: 'EmergencyOsController' },
   { method: 'POST', path: '/api/emergency/waiting-room-safety/escalation-notify', controller: 'EmergencyOsController' },
   { method: 'GET', path: '/api/emergency/staff', controller: 'EmergencyOsController' },
   { method: 'PATCH', path: '/api/emergency/staff/:staffId/duty-status', controller: 'EmergencyOsController' },

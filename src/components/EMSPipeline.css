@@ -149,19 +149,6 @@
   gap: var(--space-3);
 }
 
-.ems-pipeline__source {
-  margin: 0;
-  color: var(--color-text-muted);
-  font-size: var(--font-size-sm);
-}
-
-.ems-pipeline__unit-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--space-2);
-}
-
-.ems-pipeline__unit-grid article,
 .ems-pipeline__diversion {
   display: grid;
   gap: 4px;
@@ -177,28 +164,14 @@
     transform var(--motion-transition-fast);
 }
 
-.ems-pipeline__unit-grid article:hover,
 .ems-pipeline__diversion:hover {
   background: color-mix(in srgb, var(--status-info) 7%, var(--component-inner-row-bg));
   transform: translateY(-1px);
 }
 
-.ems-pipeline__unit-grid strong,
 .ems-pipeline__diversion strong {
   color: var(--color-text-primary);
   font-size: var(--font-size-sm);
-}
-
-.ems-pipeline__unit-grid span {
-  color: var(--status-info);
-  font-size: var(--font-size-xs);
-  font-weight: 900;
-  text-transform: uppercase;
-}
-
-.ems-pipeline__unit-grid small {
-  color: var(--color-text-muted);
-  font-size: var(--font-size-xs);
 }
 
 .ems-pipeline__diversion {
@@ -390,6 +363,80 @@
   font-weight: 600;
 }
 
+/* ATMIST handover summary -- an auto-derived, read-only VIEW over data already
+   on the chart (see buildAtmistHandoverSummary in emergency-os.services.ts),
+   never a form. Amber accent matches the simulated badge/note above it so this
+   whole block reads as belonging to the same "simulated request" context. */
+.ems-pipeline__atmist {
+  border-top-color: color-mix(in srgb, var(--status-warning) 35%, var(--color-border-subtle));
+}
+
+.ems-pipeline__atmist-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.ems-pipeline__atmist-header strong {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+}
+
+.ems-pipeline__atmist-tag {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-style: italic;
+}
+
+.ems-pipeline__atmist-grid {
+  display: grid;
+  gap: var(--space-2) var(--space-4);
+  margin: 0;
+}
+
+.ems-pipeline__atmist-row {
+  display: grid;
+  grid-template-columns: minmax(140px, max-content) 1fr;
+  gap: var(--space-1) var(--space-3);
+  align-items: baseline;
+}
+
+.ems-pipeline__atmist-row dt {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}
+
+.ems-pipeline__atmist-row dd {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  word-break: break-word;
+}
+
+.ems-pipeline__atmist-letter {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-sm, 4px);
+  background: color-mix(in srgb, var(--status-warning) 20%, var(--color-elevated));
+  color: var(--status-warning);
+  font-size: var(--font-size-xs);
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .ems-pipeline__atmist-row {
+    grid-template-columns: 1fr;
+  }
+}
+
 .ems-pipeline__eta {
   display: inline-flex;
   align-items: center;
@@ -555,10 +602,6 @@
 }
 
 @media (max-width: 1180px) {
-  .ems-pipeline__unit-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .ems-pipeline__row {
     grid-template-columns: minmax(0, 1fr) auto auto;
   }
@@ -593,10 +636,6 @@
     padding: var(--space-3);
   }
 
-  .ems-pipeline__unit-grid {
-    grid-template-columns: 1fr;
-  }
-
   .ems-pipeline__diversion,
   .ems-pipeline__row {
     grid-template-columns: minmax(0, 1fr);
@@ -622,7 +661,6 @@
     scroll-behavior: auto;
   }
 
-  .ems-pipeline__unit-grid article,
   .ems-pipeline__diversion,
   .ems-pipeline__row,
   .ems-pipeline__row--critical,
@@ -630,7 +668,6 @@
     animation: none !important;
   }
 
-  .ems-pipeline__unit-grid article:hover,
   .ems-pipeline__diversion:hover,
   .ems-pipeline__row:hover,
   .ems-pipeline__actions button:hover:not(:disabled),

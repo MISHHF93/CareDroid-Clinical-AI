@@ -23,7 +23,6 @@ import {
   shouldSuppressEmergencyRouteMetricCards,
   shouldSuppressEmergencyRouteCrossLinks,
   shouldSuppressCapacityUpgradeHarness,
-  shouldSuppressEmsFleetUnitGrid,
   shouldSuppressEmsOffloadTrackerPanel,
   shouldSuppressShiftSecondarySections,
   shouldSuppressDepartmentPulseStatCards,
@@ -79,7 +78,6 @@ describe('practitionerCleanup.config', () => {
     expect(shouldSuppressEmergencyRouteMetricCards()).toBe(true);
     expect(shouldSuppressEmergencyRouteCrossLinks()).toBe(true);
     expect(shouldSuppressCapacityUpgradeHarness()).toBe(true);
-    expect(shouldSuppressEmsFleetUnitGrid()).toBe(true);
     expect(shouldSuppressEmsOffloadTrackerPanel()).toBe(true);
     expect(shouldSuppressShiftSecondarySections()).toBe(true);
     expect(shouldSuppressDepartmentPulseStatCards()).toBe(true);

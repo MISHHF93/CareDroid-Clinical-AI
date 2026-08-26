@@ -122,8 +122,7 @@ export const PRACTITIONER_CLEANUP = Object.freeze({
   suppressEmergencyRouteMetricCards: true,
   suppressEmergencyRouteCrossLinks: true,
   suppressCapacityUpgradeHarness: true,
-  /** EMS — handoff rows first; hide demo fleet grid and duplicate offload panel */
-  suppressEmsFleetUnitGrid: true,
+  /** EMS — handoff rows first; hide duplicate offload panel */
   suppressEmsOffloadTrackerPanel: true,
   /** Shift summary — volume/queue/handoff only during pilot */
   suppressShiftSecondarySections: true,
@@ -403,10 +402,6 @@ export function shouldSuppressEmergencyRouteCrossLinks() {
 
 export function shouldSuppressCapacityUpgradeHarness() {
   return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressCapacityUpgradeHarness;
-}
-
-export function shouldSuppressEmsFleetUnitGrid() {
-  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressEmsFleetUnitGrid;
 }
 
 export function shouldSuppressEmsOffloadTrackerPanel() {

@@ -4,7 +4,12 @@
  * Represents the CAD system that assigns ambulance/EMS units to emergency calls
  * based on location, unit availability, severity, and required resource type.
  * In production this would connect to an external CAD feed (e.g. Motorola PremierOne,
- * Hexagon). For demo/development it manages an in-memory unit registry.
+ * Hexagon). There is NO such connection here: this module manages a fixed,
+ * in-memory, fictional 7-unit registry only (see `cadUnits` below) -- not
+ * connected to a real ambulance, EMS unit, or 911/CAD dispatch system. Same
+ * terminology/limitation as the separate physician-initiated SIMULATED
+ * transport-request feature (EMSIntakeService.requestPhysicianTransport) --
+ * DispatchConsole.tsx surfaces both, deliberately never linked to each other.
  */
 
 import type {

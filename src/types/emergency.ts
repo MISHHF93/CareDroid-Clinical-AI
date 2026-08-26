@@ -454,6 +454,38 @@ export interface EMSArrival {
   requestReason?: string;
   requestUrgency?: Priority;
   requestLocation?: string;
+  /** Simulated-request-only: the identified patient's own name (every other
+   * arrival on this list omits patient identity -- see the doc comment on
+   * `requestSource` above). Used by DispatchConsole.tsx's read-only visibility
+   * panel to show "Dr. X requested a simulated transport for Patient Y". */
+  requestPatientName?: string;
+  /**
+   * ATMIST (Age, Time of onset, Mechanism/Medical complaint, Injuries/Information,
+   * Signs/Symptoms, Treatments given) handover summary -- backend
+   * buildAtmistHandoverSummary()'s READ-TIME DERIVED VIEW over data already on the
+   * patient's chart (age, this request's own reason/timestamp, active safety
+   * flags, latest vitals, latest recent clinical note). NOT a new field the
+   * physician types in -- only present when `simulated` is true, and never
+   * fabricated: a field with genuinely nothing to derive from is the literal
+   * string "Not recorded"/"None recorded", not an invented value. Distinct from
+   * `PreArrivalNotification.mist` above, which is a real EMS/staff-SUBMITTED form.
+   */
+  atmist?: AtmistHandoverSummary;
+}
+
+export interface AtmistHandoverSummary {
+  /** A -- Age */
+  age: string;
+  /** T -- Time of onset */
+  timeOfOnset: string;
+  /** M -- Mechanism of injury / medical complaint */
+  mechanismOrComplaint: string;
+  /** I -- Injuries / Information */
+  injuriesOrInformation: string;
+  /** S -- Signs / Symptoms */
+  signsAndSymptoms: string;
+  /** T -- Treatments given */
+  treatmentsGiven: string;
 }
 
 export type EMSCase = EMSArrival;

@@ -79,7 +79,6 @@ export const FRONTEND_API_CALLS = Object.freeze([
   { id: 'fleet-live-vehicles', method: 'GET', path: '/api/fleet/vehicles/live', client: 'fleetTelemetryService.js', capability: 'fleetLiveTracking' },
   { id: 'fleet-active-routes', method: 'GET', path: '/api/fleet/routes/active', client: 'fleetTelemetryService.js', capability: 'fleetActiveRoutes' },
   { id: 'fleet-alerts', method: 'GET', path: '/api/fleet/alerts', client: 'fleetTelemetryService.js', capability: 'fleetAlerts' },
-  { id: 'fleet-snapshot', method: 'GET', path: '/api/fleet/snapshot', client: 'emergencyTransportApi.js', capability: 'fleetLiveTracking' },
   { id: 'hospital-map-floors', method: 'GET', path: '/api/hospital-map/floors', client: 'hospitalMapService.js', capability: 'hospitalMap' },
   { id: 'hospital-map-devices', method: 'GET', path: '/api/hospital-map/devices', client: 'hospitalMapService.js', capability: 'deviceFleet' },
   { id: 'medical-devices-live', method: 'GET', path: '/api/devices/live', client: 'medicalIotService.js', capability: 'medicalDeviceRegistry' },

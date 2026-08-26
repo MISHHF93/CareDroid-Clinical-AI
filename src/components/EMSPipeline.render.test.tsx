@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
-import { render } from '@testing-library/react';
+import { render, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import EMSPipeline from './EMSPipeline';
 import { HelpHubProvider } from '../contexts/HelpHubContext';
@@ -134,6 +134,34 @@ describe('EMSPipeline render', () => {
       </MemoryRouter>,
     );
     expect(getByText('No inbound EMS units in the active CareDroid state.')).toBeInTheDocument();
+  });
+
+  it('never mislabels the demo courier/delivery-van fleet feed as ambulance/EMS unit data', () => {
+    // Regression: this page used to show a "EMS Unit Visibility" section
+    // sourced from fetchEmsFleetSnapshot() -> /api/fleet/snapshot, which is
+    // backend/src/modules/fleet's hardcoded demo courier/home-health
+    // delivery-van fleet (VH-101 etc., destinations like "CareDroid North
+    // Clinic" / "Home health stop S-4") -- not ambulances, no CAD/EMS-agency
+    // link. normalizeUnit() remapped that data into a shape that read like
+    // real ambulance/EMS units on a page a clinician uses for real ED
+    // operational awareness. Removed entirely rather than relabeled: courier
+    // van locations have no operational value for ambulance/EMS-arrival
+    // coordination, which is what this page is for.
+    const { queryByText } = render(
+      <MemoryRouter initialEntries={['/emergency/ems']}>
+        <RouteChromeProvider>
+          <PractitionerVisibilityProvider>
+            <HelpHubProvider>
+              <EMSPipeline />
+            </HelpHubProvider>
+          </PractitionerVisibilityProvider>
+        </RouteChromeProvider>
+      </MemoryRouter>,
+    );
+
+    expect(queryByText('EMS Unit Visibility')).not.toBeInTheDocument();
+    expect(queryByText(/fleet telemetry hidden during pilot review/i)).not.toBeInTheDocument();
+    expect(queryByText(/backend fleet/i)).not.toBeInTheDocument();
   });
 
   it('HEAL-276: excludes an arrival already converted to a patient from "Awaiting Handoff", matching EMSPressureScore', () => {
@@ -430,5 +458,116 @@ describe('EMSPipeline render', () => {
 
     // Never anything that could read as a real dispatch outcome.
     expect(queryByText(/ambulance dispatched/i)).not.toBeInTheDocument();
+  });
+
+  it('renders the ATMIST handover summary from arrival.atmist once details are expanded, and never fabricates a missing field', () => {
+    // arrival.atmist is a READ-TIME DERIVED VIEW the backend already builds
+    // (buildAtmistHandoverSummary in emergency-os.services.ts) -- this proves
+    // EMSPipeline.tsx actually renders it, including an honest "Not recorded"
+    // for a field with genuinely nothing on file, rather than inventing one.
+    useEmergencyStore.setState(
+      {
+        ...originalState,
+        patients: [],
+        emsArrivals: [
+          {
+            id: 'ems-arrival-patient-atmist-1',
+            unitId: 'ED-000002',
+            unitName: 'ED-000002',
+            status: 'Inbound',
+            severity: 'Critical',
+            eta: 10,
+            dispatchTime: new Date().toISOString(),
+            estimatedArrivalTime: new Date(Date.now() + 10 * 60000).toISOString(),
+            chiefComplaint: 'Sepsis red flags on phone triage',
+            simulated: true,
+            requestSource: 'physician_initiated_simulated',
+            requestedByName: 'Dr. Alvarez',
+            requestReason: 'Sepsis red flags on phone triage',
+            requestLocation: '9 Birch Ave',
+            atmist: {
+              age: '54 years',
+              timeOfOnset: new Date().toISOString(),
+              mechanismOrComplaint: 'Sepsis red flags on phone triage',
+              injuriesOrInformation: 'Deterioration Risk, Sepsis Alert',
+              signsAndSymptoms: 'HR 118, BP 96/58, SpO2 91%, Temp 38.9°C, RR 26, GCS 14, Pain 6/10',
+              treatmentsGiven: 'Not recorded',
+            },
+          } as any,
+        ],
+        staff: [],
+        rooms: [],
+        alerts: [],
+        capacity: originalState.capacity,
+        emergencySettings: originalState.emergencySettings,
+      },
+      true,
+    );
+
+    const { getByText, getByRole } = render(
+      <MemoryRouter initialEntries={['/emergency/ems']}>
+        <RouteChromeProvider>
+          <PractitionerVisibilityProvider>
+            <HelpHubProvider>
+              <EMSPipeline />
+            </HelpHubProvider>
+          </PractitionerVisibilityProvider>
+        </RouteChromeProvider>
+      </MemoryRouter>,
+    );
+
+    fireEvent.click(getByRole('button', { name: /show details/i }));
+
+    expect(getByText('ATMIST Handover Summary')).toBeInTheDocument();
+    expect(getByText('54 years')).toBeInTheDocument();
+    expect(getByText('Deterioration Risk, Sepsis Alert')).toBeInTheDocument();
+    expect(
+      getByText('HR 118, BP 96/58, SpO2 91%, Temp 38.9°C, RR 26, GCS 14, Pain 6/10'),
+    ).toBeInTheDocument();
+    // The genuinely-missing field renders the honest fallback, not a fabricated value.
+    expect(getByText('Not recorded')).toBeInTheDocument();
+  });
+
+  it('never renders an ATMIST summary for a real, non-simulated EMS-initiated arrival', () => {
+    useEmergencyStore.setState(
+      {
+        ...originalState,
+        patients: [],
+        emsArrivals: [
+          {
+            id: 'ems-arrival-patient-real-atmist',
+            unitId: 'Medic 12',
+            unitName: 'Medic 12',
+            status: 'Inbound',
+            severity: 'High',
+            eta: 8,
+            dispatchTime: new Date().toISOString(),
+            estimatedArrivalTime: new Date(Date.now() + 8 * 60000).toISOString(),
+            chiefComplaint: 'MVC with trauma',
+          } as any,
+        ],
+        staff: [],
+        rooms: [],
+        alerts: [],
+        capacity: originalState.capacity,
+        emergencySettings: originalState.emergencySettings,
+      },
+      true,
+    );
+
+    const { getByRole, queryByText } = render(
+      <MemoryRouter initialEntries={['/emergency/ems']}>
+        <RouteChromeProvider>
+          <PractitionerVisibilityProvider>
+            <HelpHubProvider>
+              <EMSPipeline />
+            </HelpHubProvider>
+          </PractitionerVisibilityProvider>
+        </RouteChromeProvider>
+      </MemoryRouter>,
+    );
+
+    fireEvent.click(getByRole('button', { name: /show details/i }));
+    expect(queryByText('ATMIST Handover Summary')).not.toBeInTheDocument();
   });
 });

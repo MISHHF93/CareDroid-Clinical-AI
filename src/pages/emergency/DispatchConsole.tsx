@@ -17,9 +17,11 @@ import {
   type CADUnitType,
 } from '../../services/cadIntegrationService';
 import { createReadinessPlan } from '../../services/edReadinessService';
-import type { EmergencyCall, CallPriority, DispatchAssignment } from '../../types/emergency';
+import type { EmergencyCall, CallPriority, DispatchAssignment, EMSArrival } from '../../types/emergency';
 import EdDataSourceBanner from '../../components/emergency/EdDataSourceBanner';
 import useEmergencyOperatingSurface from '../../hooks/useEmergencyOperatingSurface';
+import { useEMSIntake } from '../../hooks/useEmergencyOs';
+import { useEmergencyStore } from '../../store/emergencyStore';
 import { EmergencyRoutePage } from './emergencyRouteShared';
 import './DispatchConsole.css';
 import './emergency-route.css';
@@ -568,6 +570,65 @@ function CallCard({
   );
 }
 
+// ── Physician-Requested Transport (Simulated) Visibility Panel ────────────────
+//
+// A physician can create a SIMULATED transport request directly from a patient
+// chart (PatientDetailPanel.tsx → EMSIntakeService.requestPhysicianTransport) —
+// a completely separate simulation from this console's own CAD unit dispatch
+// below. Before this panel, a dispatcher working this console had no way to
+// know a physician had already made one of these requests. This is READ-ONLY
+// visibility only: it deliberately does NOT trigger cadDispatchUnit() or link
+// the two simulations together in any way, since doing so would make two
+// intentionally-separate honest simulations look more "connected"/real than
+// they are. There is still no real EMS/CAD/911 dispatch system connected
+// anywhere in this codebase for either one.
+//
+// Reads from useEmergencyStore rather than this hook's own one-shot response
+// so a new request appears live: EMSIntakeService.requestPhysicianTransport()
+// broadcasts through the same real EmergencyRealtimeService SSE channel every
+// other EMS action uses, and AppShell's shared subscription already writes
+// every 'ems_updated' broadcast straight into state.emsArrivals (see
+// dispatchWebSocketEvent in emergencyStore.ts) — useEMSIntake() here only
+// exists to trigger this page's own initial GET /emergency/ems fetch.
+function PhysicianRequestedTransportPanel() {
+  useEMSIntake();
+  const arrivals = useEmergencyStore((state) => state.emsArrivals) as EMSArrival[];
+  const simulatedRequests = arrivals.filter(
+    (arrival) => arrival?.simulated === true || arrival?.requestSource === 'physician_initiated_simulated',
+  );
+
+  if (simulatedRequests.length === 0) return null;
+
+  return (
+    <div className="dc-panel dispatch-console__physician-sim-panel">
+      <div className="u-flex-between">
+        <strong className="dc-title-14">Physician-Requested Transport (Simulated)</strong>
+        <span className="dispatch-console__physician-sim-count">{simulatedRequests.length}</span>
+      </div>
+      <div className="dc-muted-12-mt">
+        Read-only visibility into SIMULATED transport requests physicians created directly from a
+        patient chart — not created through this console, and not linked to the CAD unit board
+        below. No real ambulance, EMS unit, or 911/CAD dispatch system is connected to either.
+      </div>
+      <div className="dispatch-console__physician-sim-list">
+        {simulatedRequests.map((arrival) => (
+          <div key={arrival.id} className="dispatch-console__physician-sim-row">
+            <div className="dispatch-console__physician-sim-summary">
+              <strong>{arrival.requestedByName || 'A physician'}</strong> requested a simulated
+              transport for <strong>{arrival.requestPatientName || 'this patient'}</strong>
+            </div>
+            <div className="dc-muted-12">
+              Reason: {arrival.requestReason || arrival.chiefComplaint || 'Not specified'}
+              {arrival.requestUrgency ? ` · Urgency: ${arrival.requestUrgency}` : ''}
+              {arrival.requestLocation ? ` · Location: ${arrival.requestLocation}` : ''}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ── CAD Unit Board ────────────────────────────────────────────────────────────
 
 function CADUnitBoard() {
@@ -715,6 +776,9 @@ export default function DispatchConsole() {
         </div>
       )}
 
+      {/* Physician-requested simulated transport requests (separate from CAD dispatch below) */}
+      <PhysicianRequestedTransportPanel />
+
       {/* CAD Unit Board */}
       <CADUnitBoard />
 
@@ -741,7 +805,11 @@ export default function DispatchConsole() {
         className="dispatch-console__notice dc-muted-12 dc-pad-note"
       >
         CareDroid AI is decision support only. All dispatch decisions must be made by licensed dispatchers following
-        local medical protocols. Unit assignment, pre-alert, and ED readiness activation require dispatcher authorization.
+        local medical protocols. Unit assignment, pre-alert, and ED readiness activation require dispatcher
+        authorization. The CAD unit board and Dispatch Unit action above use a SIMULATED demo unit registry — not
+        connected to a real ambulance, EMS unit, or 911/CAD dispatch system. The physician-requested transport panel
+        above is a separate, also-simulated CareDroid record with the same real-world limitation; the two panels are
+        never linked to each other.
       </div>
     </EmergencyRoutePage>
   );

@@ -2214,7 +2214,53 @@ export class EMSIntakeService implements OnModuleInit {
       'SIMULATED transport request -- no real ambulance, EMS unit, or 911/CAD dispatch system is ' +
       `connected or contacted. This creates an internal, audited CareDroid record only. Reason: ${reason}`;
 
-    // 1) Update the clinical fields a physician would actually be reporting
+    // 1) Record the request-specific metadata (source/reason/urgency/
+    // location/requestedBy) on the same durable arrival-status side table
+    // real EMS arrivals already use for their offload-clock timestamps --
+    // this is what buildInboundEmsRecord() reads back to render the
+    // "Physician-Requested (Simulated)" badge and disclaimer details on the
+    // EMS pipeline.
+    //
+    // Deliberately done FIRST, before the patient record itself becomes
+    // EMS-pipeline-visible (steps 2/3 below): updatePatient() and
+    // movePatientToState() each independently broadcast a live
+    // EmergencyRealtimeService.publishEmsUpdate() (see their own bodies --
+    // publishPatientBoardRealtime() fires it for any EMS-flagged patient).
+    // Confirmed live (via a throwaway subscribed-listener probe) that with
+    // the ORIGINAL step order (patient fields -> state -> this metadata
+    // last), movePatientToState's broadcast landed with the arrival already
+    // visible in emsArrivals but its arrival-status metadata not yet
+    // written, so `simulated` briefly read `false` -- an ED workstation
+    // catching exactly that broadcast would render this row as if it were a
+    // genuine EMS-initiated arrival, the one thing this whole feature is
+    // built to never let happen (see this method's own doc comment above).
+    // Writing the metadata first means every broadcast that DOES make this
+    // patient visible already carries `simulated: true` and the full
+    // request context, with no window where it looks real.
+    this.updateArrivalStatus(
+      arrivalId,
+      {
+        status: 'Inbound',
+        patientId: patient.id,
+        source: 'physician_initiated_simulated',
+        requestedByStaffId: actor.staffId,
+        requestedByName: actor.name,
+        reason,
+        urgency,
+        location,
+        // Not one of persistArrivalStatus()'s whitelisted DB columns (see
+        // EmsArrivalStatus entity), so this survives only for the current
+        // process's in-memory arrivalStatusById lifetime, same tradeoff the
+        // rest of this in-memory-first side table already documents on its
+        // own doc comment. Read back by buildAtmistHandoverSummary() as the
+        // ATMIST "Time of onset" field -- the closest real timestamp
+        // CareDroid has for when this specific request was made.
+        requestedAt: timestamp,
+      },
+      organizationId,
+    );
+
+    // 2) Update the clinical fields a physician would actually be reporting
     // during the call -- reason becomes the chief complaint ED staff see on
     // the inbound card, urgency becomes priority, and flags mark this as
     // both an EMS-pipeline-visible arrival and (distinctly) a simulated one.
@@ -2232,9 +2278,13 @@ export class EMSIntakeService implements OnModuleInit {
       organizationId,
     );
 
-    // 2) Transition to 'Arrival' -- the same state a genuine EMS pre-arrival
+    // 3) Transition to 'Arrival' -- the same state a genuine EMS pre-arrival
     // sits in until handoff, which is what makes this show up in
-    // getEMSIntake()'s emsArrivals list / EMSPipeline.tsx at all.
+    // getEMSIntake()'s emsArrivals list / EMSPipeline.tsx at all. This is
+    // the step whose broadcast is the first one where the arrival actually
+    // appears (getEMSIntake() only surfaces patients with state==='Arrival')
+    // -- and by now the metadata from step 1 is already in place, so it
+    // appears correctly labeled simulated from the very first frame.
     this.patientService.movePatientToState(
       patient.id,
       'Arrival',
@@ -2242,27 +2292,6 @@ export class EMSIntakeService implements OnModuleInit {
         staffId: actor.staffId || 'physician',
         note: simulationNote,
         timestamp,
-      },
-      organizationId,
-    );
-
-    // 3) Record the request-specific metadata (source/reason/urgency/
-    // location/requestedBy) on the same durable arrival-status side table
-    // real EMS arrivals already use for their offload-clock timestamps --
-    // this is what buildInboundEmsRecord() reads back to render the
-    // "Physician-Requested (Simulated)" badge and disclaimer details on the
-    // EMS pipeline.
-    this.updateArrivalStatus(
-      arrivalId,
-      {
-        status: 'Inbound',
-        patientId: patient.id,
-        source: 'physician_initiated_simulated',
-        requestedByStaffId: actor.staffId,
-        requestedByName: actor.name,
-        reason,
-        urgency,
-        location,
       },
       organizationId,
     );
@@ -2420,6 +2449,144 @@ function emsSeverityFromPatient(patient: EmergencyPatient, offloadRisk: string):
   return 'Moderate';
 }
 
+/** ATMIST "Treatments given" only looks at a note/timeline entry this recent -- an
+ * older note is from an earlier, unrelated visit/episode, not "given" for this
+ * transport request, and surfacing it as if it were would misrepresent the record. */
+const ATMIST_RECENT_TREATMENT_WINDOW_MS = 24 * 60 * 60 * 1000;
+
+/** These two flags describe THIS REQUEST's own plumbing (see requestPhysicianTransport),
+ * not the patient's clinical condition -- excluded from the ATMIST "Injuries/Information"
+ * field so that field only ever reflects genuine clinical safety flags on file. */
+const ATMIST_NON_CLINICAL_PATIENT_FLAGS = new Set([
+  'EMSArrival',
+  'PhysicianRequestedTransportSimulated',
+]);
+
+function humanizeAtmistFlagLabel(flag: string): string {
+  const spaced = String(flag || '')
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+    .replace(/[_-]+/g, ' ')
+    .trim();
+  return spaced ? spaced[0].toUpperCase() + spaced.slice(1) : flag;
+}
+
+function formatAtmistVitals(vitals?: EmergencyVitals): string {
+  if (!vitals) return 'Not recorded';
+  const bp = vitals.sbp != null && vitals.dbp != null ? `${vitals.sbp}/${vitals.dbp}` : undefined;
+  const parts = [
+    vitals.hr != null ? `HR ${vitals.hr}` : undefined,
+    bp ? `BP ${bp}` : undefined,
+    vitals.spo2 != null ? `SpO2 ${vitals.spo2}%` : undefined,
+    vitals.temp != null ? `Temp ${vitals.temp}°C` : undefined,
+    vitals.rr != null ? `RR ${vitals.rr}` : undefined,
+    vitals.gcs != null ? `GCS ${vitals.gcs}` : undefined,
+    vitals.pain != null ? `Pain ${vitals.pain}/10` : undefined,
+  ].filter(Boolean);
+  return parts.length ? parts.join(', ') : 'Not recorded';
+}
+
+export interface AtmistHandoverSummary {
+  /** A -- Age */
+  age: string;
+  /** T -- Time of onset */
+  timeOfOnset: string;
+  /** M -- Mechanism of injury / medical complaint */
+  mechanismOrComplaint: string;
+  /** I -- Injuries / Information */
+  injuriesOrInformation: string;
+  /** S -- Signs / Symptoms */
+  signsAndSymptoms: string;
+  /** T -- Treatments given */
+  treatmentsGiven: string;
+}
+
+/**
+ * ATMIST (Age, Time of onset, Mechanism/Medical complaint, Injuries/Information,
+ * Signs/Symptoms, Treatments given) is the real pre-hospital-to-ED handover data
+ * standard. This is a READ-TIME DERIVED VIEW over data CareDroid already has for a
+ * physician-initiated simulated transport request -- deliberately NOT a new form/
+ * input for the physician to fill out (that would add friction to a rushed
+ * phone-triage moment, and this codebase's existing reason/urgency/location fields
+ * already capture the essential context). Every field traces to a real record;
+ * a field with genuinely nothing to derive from renders an honest "Not recorded"/
+ * "None recorded" rather than fabricated content.
+ */
+function buildAtmistHandoverSummary(
+  patient: EmergencyPatient,
+  trackedStatus: Record<string, unknown> | undefined,
+): AtmistHandoverSummary {
+  const requestedAt = (trackedStatus?.requestedAt as string) || '';
+  const requestReason = (trackedStatus?.reason as string) || '';
+
+  // A - patient's own age, as already recorded on the chart.
+  const age =
+    typeof patient.age === 'number' && patient.age > 0 ? `${patient.age} years` : 'Not recorded';
+
+  // T (onset) - this specific request's own timestamp (see requestPhysicianTransport's
+  // updateArrivalStatus call) -- the closest real "onset of this episode" timestamp
+  // CareDroid actually has, since there is no separate real-world EMS dispatch clock.
+  const timeOfOnset = requestedAt || 'Not recorded';
+
+  // M - the REQUEST's own reason wins over patient.chiefComplaint (even though
+  // requestPhysicianTransport already writes reason into chiefComplaint) because
+  // chiefComplaint can drift after the request (edited later by other staff) while
+  // the request's own reason is immutable history of what the physician actually
+  // reported for THIS transport request.
+  const mechanismOrComplaint = requestReason || patient.chiefComplaint || 'Not recorded';
+
+  // I - active clinical safety flags on file, excluding this request's own
+  // pipeline/administrative markers (see ATMIST_NON_CLINICAL_PATIENT_FLAGS above).
+  const clinicalFlags = (patient.flags || []).filter(
+    (flag) => !ATMIST_NON_CLINICAL_PATIENT_FLAGS.has(flag),
+  );
+  const injuriesOrInformation = clinicalFlags.length
+    ? clinicalFlags.map(humanizeAtmistFlagLabel).join(', ')
+    : 'None recorded';
+
+  // S - most recently recorded vitals (same field/format convention as this file's
+  // own inbound EMS record -- see buildInboundEmsRecord's `latestVitals`).
+  const latestVitals = patient.vitals?.[patient.vitals.length - 1];
+  const signsAndSymptoms = formatAtmistVitals(latestVitals);
+
+  // T (treatments) - the most recent clinical note, or (if none) the most recent
+  // timeline entry's note, but ONLY if it STRICTLY PREDATES this request's own
+  // timestamp and falls within a recent window before it (see
+  // ATMIST_RECENT_TREATMENT_WINDOW_MS above). Strict-before, not "at or before",
+  // is deliberate and was found live via this function's own test suite: step 3
+  // of requestPhysicianTransport (movePatientToState) writes a new timeline entry
+  // carrying the SAME timestamp as this very request (the simulation-disclaimer
+  // note, not a real treatment) -- with an inclusive `<=` comparison that entry
+  // IS the "most recent timeline entry" and would render as if it were a
+  // treatment given for every single physician-initiated request, which is
+  // exactly the kind of fabricated-looking content this feature must never show.
+  const requestedAtMs = requestedAt ? Date.parse(requestedAt) : NaN;
+  const anchorMs = Number.isFinite(requestedAtMs) ? requestedAtMs : Date.now();
+  const latestNote = patient.notes?.[patient.notes.length - 1];
+  const latestTimelineEntry = patient.timeline?.[patient.timeline.length - 1];
+  const isRecentPriorEntry = (isoTimestamp?: string) => {
+    if (!isoTimestamp) return false;
+    const ms = Date.parse(isoTimestamp);
+    return (
+      Number.isFinite(ms) && ms < anchorMs && anchorMs - ms <= ATMIST_RECENT_TREATMENT_WINDOW_MS
+    );
+  };
+  let treatmentsGiven = 'None recorded';
+  if (latestNote?.text && isRecentPriorEntry(latestNote.timestamp)) {
+    treatmentsGiven = latestNote.text;
+  } else if (latestTimelineEntry?.note && isRecentPriorEntry(latestTimelineEntry.timestamp)) {
+    treatmentsGiven = latestTimelineEntry.note;
+  }
+
+  return {
+    age,
+    timeOfOnset,
+    mechanismOrComplaint,
+    injuriesOrInformation,
+    signsAndSymptoms,
+    treatmentsGiven,
+  };
+}
+
 function buildInboundEmsRecord(
   row: {
     patient: EmergencyPatient;
@@ -2471,6 +2638,27 @@ function buildInboundEmsRecord(
     requestReason: trackedStatus?.reason as string | undefined,
     requestUrgency: trackedStatus?.urgency as string | undefined,
     requestLocation: trackedStatus?.location as string | undefined,
+    // Also simulated-only: the identified patient's own name. Every OTHER arrival
+    // on this list deliberately omits patient identity (patientId stays undefined
+    // above -- see EMSPipeline.tsx's "Add to Whiteboard" gate, a real pre-arrival
+    // genuinely doesn't have a linked chart yet), but a physician-initiated request
+    // is for a specific, already-known existing patient, and DispatchConsole.tsx's
+    // read-only visibility panel needs a name to show ("Dr. X requested a simulated
+    // transport for Patient Y") -- this endpoint is already PHI-bearing for every
+    // arrival (age/sex/chiefComplaint above), so this adds no new category of
+    // exposure, only extends what a READ_PHI-gated caller already receives.
+    requestPatientName:
+      trackedStatus?.source === 'physician_initiated_simulated'
+        ? `${patient.firstName} ${patient.lastName}`
+        : undefined,
+    // ATMIST handover summary, derived read-time from data already on the chart --
+    // only populated for simulated physician-initiated requests (see
+    // buildAtmistHandoverSummary's own doc comment); absent/undefined for every
+    // normal EMS-initiated arrival, same conditional pattern as the fields above.
+    atmist:
+      trackedStatus?.source === 'physician_initiated_simulated'
+        ? buildAtmistHandoverSummary(patient, trackedStatus)
+        : undefined,
   };
 }
 

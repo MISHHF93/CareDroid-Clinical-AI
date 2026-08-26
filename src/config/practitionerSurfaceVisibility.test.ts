@@ -53,7 +53,6 @@ describe('practitionerSurfaceVisibility', () => {
     expect(surfaces.emergencyRoutes.showMetricCards).toBe(false);
     expect(surfaces.emergencyRoutes.showCrossLinks).toBe(false);
     expect(surfaces.emergencyRoutes.showCapacityUpgradeHarness).toBe(false);
-    expect(surfaces.ems.showFleetUnitGrid).toBe(false);
     expect(surfaces.ems.showOffloadTrackerPanel).toBe(false);
     expect(surfaces.shift.showSecondarySections).toBe(false);
     expect(surfaces.pulse.showStatCards).toBe(false);
