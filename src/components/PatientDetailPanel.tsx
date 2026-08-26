@@ -26,6 +26,8 @@ import { useEmergencyStore, workflowLogFromJourneyEvent } from '../store/emergen
 import { dispatchAlert } from '../engine/alertEngine';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+import { MaturityChip } from '../pages/emergency/emergencyRouteShared';
+import { requestEmergencyTransport as requestEmergencyTransportApi } from '../services/emergencyOsApi';
 import { EMPTY_STATE_COPY } from '../config/emptyStateCopy';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import { usePhiViewAudit } from '../hooks/usePhiAccess';
@@ -111,6 +113,25 @@ const emptyVitalsForm = {
 
 type VitalsForm = typeof emptyVitalsForm;
 type ActionMode = null | 'staff' | 'room';
+
+const emptyTransportRequestForm = {
+  reason: '',
+  urgency: 'P3' as Priority,
+  location: '',
+};
+
+type TransportRequestForm = typeof emptyTransportRequestForm;
+
+/** Result of a submitted SIMULATED transport request -- see submitTransportRequest below. */
+type TransportRequestResult = {
+  arrivalId: string;
+  reason: string;
+  urgency: string;
+  location: string;
+  requestedByName: string | null;
+  requestedAt: string;
+  disclaimer: string;
+};
 type VitalsHistoryView = 'chart' | 'table';
 type VitalsLineKey = 'hr' | 'spo2' | 'sbp' | 'temp';
 type VitalTrend = {
@@ -634,6 +655,14 @@ export default function PatientDetailPanel() {
   const [criticalChecklistTitleHint, setCriticalChecklistTitleHint] = useState<string | undefined>();
   const [autoOpenedChecklistKey, setAutoOpenedChecklistKey] = useState('');
   const [suggestedScores, setSuggestedScores] = useState<string[]>([]);
+  const [showTransportRequestForm, setShowTransportRequestForm] = useState(false);
+  const [transportRequestForm, setTransportRequestForm] = useState<TransportRequestForm>(
+    emptyTransportRequestForm,
+  );
+  const [transportRequestSubmitting, setTransportRequestSubmitting] = useState(false);
+  const [transportRequestError, setTransportRequestError] = useState('');
+  const [transportRequestResult, setTransportRequestResult] =
+    useState<TransportRequestResult | null>(null);
   const swipeStartYRef = useRef<number | null>(null);
   const [swipeOffset, setSwipeOffset] = useState(0);
   const panelRef = useRef<HTMLElement | null>(null);
@@ -651,6 +680,9 @@ export default function PatientDetailPanel() {
   const assignRoomPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.assignRoom);
   const escalatePresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.escalatePatient);
   const dischargePresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.dischargePatient);
+  const transportRequestPresentation = emergencyRole.presentAction(
+    EMERGENCY_ACTIONS.requestEmergencyTransport,
+  );
   const canTransition = transitionPresentation.enabled;
   const canWriteVitals = vitalsPresentation.enabled;
   const canWriteNote = notePresentation.enabled;
@@ -659,6 +691,7 @@ export default function PatientDetailPanel() {
   const canAssignRoom = assignRoomPresentation.enabled;
   const canEscalate = escalatePresentation.enabled;
   const canDischarge = dischargePresentation.enabled;
+  const canRequestTransport = transportRequestPresentation.enabled;
 
   const selectedPatient = useMemo(
     () => patients.find((patient) => patient.id === selectedPatientId) || null,
@@ -713,6 +746,15 @@ export default function PatientDetailPanel() {
     setActiveCriticalChecklist(null);
     setCriticalChecklistTitleHint(undefined);
     setAutoOpenedChecklistKey('');
+    // Same reasoning as every other reset above: an in-progress or just-
+    // submitted SIMULATED transport request is patient-specific (reason,
+    // urgency, and the confirmation record) and must never silently survive
+    // attribution to a different patient after a switch.
+    setShowTransportRequestForm(false);
+    setTransportRequestForm(emptyTransportRequestForm);
+    setTransportRequestSubmitting(false);
+    setTransportRequestError('');
+    setTransportRequestResult(null);
   }, [selectedPatient?.id]);
   const openCalculatorHub = useCallback((calculatorId: string) => {
     if (!selectedPatientId) return;
@@ -1092,6 +1134,57 @@ export default function PatientDetailPanel() {
 
     addNote(selectedPatient.id, note);
     setNoteText('');
+  };
+
+  /**
+   * Physician-initiated SIMULATED "Request Emergency Transport" action.
+   * Unlike submitNote/submitVitals (client-memory-only, fire-and-forget
+   * backend sync), this is a real, persisted, audited backend request --
+   * there is NO real EMS/CAD/911 dispatch system connected anywhere in this
+   * codebase, so the confirmation state below must come back from the real
+   * backend record (who/when/why), never be assumed locally, before showing
+   * "Transport Request Recorded (Simulated)".
+   */
+  const submitTransportRequest = async (event: FormEvent) => {
+    event.preventDefault();
+    if (!canRequestTransport || !selectedPatient) return;
+    const reason = transportRequestForm.reason.trim();
+    if (!reason) return;
+
+    setTransportRequestSubmitting(true);
+    setTransportRequestError('');
+    try {
+      const response: any = await requestEmergencyTransportApi({
+        patientId: selectedPatient.id,
+        reason,
+        urgency: transportRequestForm.urgency,
+        location: transportRequestForm.location.trim() || undefined,
+      });
+      const record = response?.data || {};
+      setTransportRequestResult({
+        arrivalId: record.arrivalId,
+        reason: record.reason || reason,
+        urgency: record.urgency || transportRequestForm.urgency,
+        location: record.location || transportRequestForm.location.trim(),
+        requestedByName: record.requestedByName || null,
+        requestedAt: record.requestedAt || new Date().toISOString(),
+        disclaimer:
+          record.disclaimer ||
+          'Transport Request Recorded (Simulated) — not connected to a real ambulance, EMS unit, or 911/CAD dispatch system.',
+      });
+      setShowTransportRequestForm(false);
+      setTransportRequestForm(emptyTransportRequestForm);
+      showActionSuccess(
+        STANDARD_ACTION_FEEDBACK.patientAdvanced,
+        'Transport request recorded (simulated) — no real ambulance was dispatched.',
+      );
+    } catch (error: any) {
+      setTransportRequestError(
+        error?.message || 'Unable to record the simulated transport request. Please try again.',
+      );
+    } finally {
+      setTransportRequestSubmitting(false);
+    }
   };
 
   const openManualChecklist = () => {
@@ -1679,6 +1772,110 @@ export default function PatientDetailPanel() {
           </button>
         </form>
       </section>
+
+      {transportRequestPresentation.visible ? (
+        <section className="patient-detail-panel__section patient-detail-transport-request">
+          <h3 className="patient-detail-panel__section-title">
+            Emergency Transport <MaturityChip maturity="demo" />
+          </h3>
+          <p role="note" className="patient-detail-transport-request__disclaimer">
+            SIMULATION ONLY — CareDroid is not connected to a real ambulance, EMS unit, or 911/CAD
+            dispatch system. This records an internal, audited transport request within CareDroid
+            only. No real ambulance will be dispatched.
+          </p>
+
+          {transportRequestResult ? (
+            <div className="patient-detail-transport-request__confirmation" role="status">
+              <strong>Transport Request Recorded (Simulated)</strong>
+              <p>
+                Requested by {transportRequestResult.requestedByName || 'you'} on{' '}
+                {formatTime(transportRequestResult.requestedAt)} · Urgency{' '}
+                {transportRequestResult.urgency} · Reason: {transportRequestResult.reason}
+                {transportRequestResult.location ? ` · Location: ${transportRequestResult.location}` : ''}
+              </p>
+              <p role="note" className="patient-detail-transport-request__disclaimer">
+                {transportRequestResult.disclaimer}
+              </p>
+              <FieldButton onClick={() => setTransportRequestResult(null)}>Dismiss</FieldButton>
+            </div>
+          ) : showTransportRequestForm ? (
+            <form
+              onSubmit={(event) => void submitTransportRequest(event)}
+              className="patient-detail-transport-request__form"
+            >
+              <textarea
+                value={transportRequestForm.reason}
+                onChange={(event) =>
+                  setTransportRequestForm((form) => ({ ...form, reason: event.target.value }))
+                }
+                disabled={!canRequestTransport || transportRequestSubmitting}
+                placeholder="Clinical reason for transport (e.g. deterioration reported during a phone follow-up)"
+                className="patient-detail-panel__textarea"
+                required
+              />
+              <div className="patient-detail-transport-request__row">
+                <select
+                  value={transportRequestForm.urgency}
+                  onChange={(event) =>
+                    setTransportRequestForm((form) => ({
+                      ...form,
+                      urgency: event.target.value as Priority,
+                    }))
+                  }
+                  disabled={!canRequestTransport || transportRequestSubmitting}
+                  className="patient-detail-panel__select"
+                  aria-label="Transport urgency"
+                >
+                  <option value="P1">P1 — Immediate</option>
+                  <option value="P2">P2 — Emergent</option>
+                  <option value="P3">P3 — Urgent</option>
+                  <option value="P4">P4 — Less urgent</option>
+                  <option value="P5">P5 — Non-urgent</option>
+                </select>
+                <input
+                  type="text"
+                  value={transportRequestForm.location}
+                  onChange={(event) =>
+                    setTransportRequestForm((form) => ({ ...form, location: event.target.value }))
+                  }
+                  disabled={!canRequestTransport || transportRequestSubmitting}
+                  placeholder="Transport location (e.g. address given by phone; defaults to requesting clinic)"
+                  className="patient-detail-vitals-form__input"
+                  aria-label="Transport location"
+                />
+              </div>
+              {transportRequestError ? (
+                <div role="alert" className="patient-detail-transport-request__error">
+                  {transportRequestError}
+                </div>
+              ) : null}
+              <div className="patient-detail-transport-request__actions">
+                <button
+                  type="submit"
+                  disabled={
+                    !canRequestTransport ||
+                    transportRequestSubmitting ||
+                    !transportRequestForm.reason.trim()
+                  }
+                  className="patient-detail-panel__field-btn patient-detail-panel__field-btn--primary"
+                >
+                  {transportRequestSubmitting
+                    ? 'Recording (simulated)…'
+                    : 'Record Simulated Transport Request'}
+                </button>
+                <FieldButton onClick={() => setShowTransportRequestForm(false)}>Cancel</FieldButton>
+              </div>
+            </form>
+          ) : (
+            <FieldButton
+              disabled={!canRequestTransport}
+              onClick={() => setShowTransportRequestForm(true)}
+            >
+              Request Emergency Transport (Simulated)
+            </FieldButton>
+          )}
+        </section>
+      ) : null}
 
       {actionMode ? (
         <section className="patient-detail-panel__section patient-detail-action-panel">

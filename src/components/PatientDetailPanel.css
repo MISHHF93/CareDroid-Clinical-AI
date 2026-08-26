@@ -689,6 +689,52 @@
   background: var(--component-inner-row-bg, var(--medical-surface-page, #f1f5f9));
 }
 
+.patient-detail-transport-request__disclaimer {
+  margin: var(--ed-space-2) 0;
+  padding: 8px 10px;
+  border-radius: var(--ed-radius-sm);
+  background: color-mix(in srgb, var(--status-warning) 16%, var(--color-elevated));
+  border: 1px solid color-mix(in srgb, var(--status-warning) 45%, transparent);
+  color: var(--status-warning);
+  font-size: var(--ed-type-caption, 12px);
+  font-weight: 600;
+}
+
+.patient-detail-transport-request__form {
+  margin-top: var(--ed-space-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ed-space-2);
+}
+
+.patient-detail-transport-request__row {
+  display: flex;
+  gap: var(--ed-space-2);
+}
+
+.patient-detail-transport-request__actions {
+  display: flex;
+  gap: var(--ed-space-2);
+  align-items: center;
+}
+
+.patient-detail-transport-request__error {
+  color: var(--status-critical);
+  font-size: var(--ed-type-caption, 12px);
+  font-weight: 600;
+}
+
+.patient-detail-transport-request__confirmation {
+  margin-top: var(--ed-space-2);
+  padding: 10px;
+  border-radius: var(--ed-radius-md);
+  background: var(--component-inner-row-bg, var(--medical-surface-page, #f1f5f9));
+  border: 1px solid var(--ed-border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
 .patient-detail-action-panel__prompt {
   margin: 0 0 10px;
   color: var(--ed-text-primary);

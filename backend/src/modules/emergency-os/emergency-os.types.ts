@@ -53,6 +53,7 @@ export type WorkflowActionType =
   | 'reassessment_completed'
   | 'ems_arrival_created'
   | 'ems_converted_to_patient'
+  | 'ems_transport_request_created'
   | 'capacity_score_changed'
   | 'boarding_started'
   | 'referral_created'

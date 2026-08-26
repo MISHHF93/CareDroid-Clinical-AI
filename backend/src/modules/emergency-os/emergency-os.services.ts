@@ -586,6 +586,7 @@ const WORKFLOW_LOG_TITLES: Record<WorkflowActionType, string> = {
   reassessment_completed: 'Reassessment completed',
   ems_arrival_created: 'EMS arrival created',
   ems_converted_to_patient: 'EMS converted to patient',
+  ems_transport_request_created: 'Physician-requested transport (simulated)',
   capacity_score_changed: 'Capacity score changed',
   boarding_started: 'Boarding started',
   referral_created: 'Referral created',
@@ -1171,7 +1172,20 @@ export class EmergencyPatientService implements OnModuleInit {
 
   getPatient(patientId: string, organizationId?: string): EmergencyPatient | undefined {
     const patient = this.patients.find((candidate) => candidate.id === patientId);
-    if (patient && !this.isVisibleToOrganization(patient, organizationId)) return undefined;
+    if (!patient) return undefined;
+    if (!this.isVisibleToOrganization(patient, organizationId)) return undefined;
+    // Found live while building requestPhysicianTransport's not-found test: a
+    // genuinely missing id fell through to `clone(patient)` with
+    // `patient === undefined` -- clone() does
+    // `JSON.parse(JSON.stringify(value))`, and JSON.stringify(undefined)
+    // returns the actual `undefined` value (not a string), so JSON.parse
+    // coerced it to the string "undefined" and threw a raw SyntaxError
+    // instead of this method's documented `EmergencyPatient | undefined`
+    // contract. Every caller that does `if (!patientService.getPatient(...))
+    // throw new NotFoundException(...)` (this file's own
+    // requestPhysicianTransport, updateArrivalStatus, completeHandoff, plus
+    // controller call sites) never reached its clean 404 mapping for a
+    // truly-missing id -- it hit an unhandled 500 SyntaxError instead.
     return clone(patient);
   }
 
@@ -2029,6 +2043,12 @@ export class EMSIntakeService implements OnModuleInit {
       arrivedAt: entity.arrivedAt,
       handoffStartedAt: entity.handoffStartedAt,
       handoffCompletedAt: entity.handoffCompletedAt,
+      source: entity.source,
+      requestedByStaffId: entity.requestedByStaffId,
+      requestedByName: entity.requestedByName,
+      reason: entity.reason,
+      urgency: entity.urgency,
+      location: entity.location,
     };
   }
 
@@ -2043,6 +2063,12 @@ export class EMSIntakeService implements OnModuleInit {
       arrivedAt: record.arrivedAt ? String(record.arrivedAt) : undefined,
       handoffStartedAt: record.handoffStartedAt ? String(record.handoffStartedAt) : undefined,
       handoffCompletedAt: record.handoffCompletedAt ? String(record.handoffCompletedAt) : undefined,
+      source: record.source ? String(record.source) : undefined,
+      requestedByStaffId: record.requestedByStaffId ? String(record.requestedByStaffId) : undefined,
+      requestedByName: record.requestedByName ? String(record.requestedByName) : undefined,
+      reason: record.reason ? String(record.reason) : undefined,
+      urgency: record.urgency ? String(record.urgency) : undefined,
+      location: record.location ? String(record.location) : undefined,
     });
     this.arrivalStatusRepository.save(entity).catch((error) => {
       this.logger.warn(`Failed to persist EMS arrival status ${arrivalId} to database: ${error}`);
@@ -2140,6 +2166,144 @@ export class EMSIntakeService implements OnModuleInit {
       availableResusRooms: this.patientService
         .listRooms()
         .filter((room) => room.type === 'Resus' && room.status === 'Available').length,
+    });
+  }
+
+  /**
+   * Physician-initiated SIMULATED transport request, created directly from an
+   * existing patient's chart (e.g. during a phone follow-up call) rather than
+   * a real EMS unit calling in. There is NO real EMS/CAD/911 dispatch system
+   * connected anywhere in this codebase or environment -- this creates a
+   * real, persisted, audited CareDroid record only. It reuses the SAME live
+   * EMS pipeline real EMS arrivals already flow through (state='Arrival' +
+   * the EMSArrival flag, surfaced by getEMSIntake()/EMSPipeline.tsx) rather
+   * than a parallel notification surface, and is clearly distinguished from
+   * a real EMS-initiated arrival via source='physician_initiated_simulated'
+   * (see buildInboundEmsRecord's requestSource/simulated fields) so the ED
+   * side can never mistake this for a genuine ambulance dispatch.
+   *
+   * Deliberately transitions the EXISTING patient record to state 'Arrival'
+   * (mirroring exactly how a genuine EMS pre-arrival looks) instead of
+   * creating a second, duplicate patient row for the same person -- this is
+   * the same real patient the physician is looking at, now expected back in
+   * the department, so the whiteboard/EMS pipeline reflects that under their
+   * one real chart, not a synthetic double.
+   */
+  requestPhysicianTransport(
+    input: { patientId: string; reason: string; urgency: string; location?: string },
+    actor: { staffId?: string; name?: string },
+    organizationId?: string,
+  ) {
+    const patientId = String(input.patientId || '').trim();
+    const patient = patientId
+      ? this.patientService.getPatient(patientId, organizationId)
+      : undefined;
+    if (!patient) {
+      throw new NotFoundException(`Patient ${patientId} not found`);
+    }
+
+    const reason =
+      String(input.reason || '').trim() || 'Physician-requested transport (simulated).';
+    const urgency = input.urgency || patient.priority || 'P3';
+    const location =
+      String(input.location || '').trim() ||
+      'Requesting clinic (physician did not provide a separate transport address)';
+    const timestamp = new Date().toISOString();
+    const arrivalId = `ems-arrival-${patient.id}`;
+    const simulationNote =
+      'SIMULATED transport request -- no real ambulance, EMS unit, or 911/CAD dispatch system is ' +
+      `connected or contacted. This creates an internal, audited CareDroid record only. Reason: ${reason}`;
+
+    // 1) Update the clinical fields a physician would actually be reporting
+    // during the call -- reason becomes the chief complaint ED staff see on
+    // the inbound card, urgency becomes priority, and flags mark this as
+    // both an EMS-pipeline-visible arrival and (distinctly) a simulated one.
+    this.patientService.updatePatient(
+      patient.id,
+      {
+        chiefComplaint: reason,
+        priority: urgency as EmergencyPatient['priority'],
+        flags: normalizePatientFlags([
+          ...(patient.flags || []),
+          'EMSArrival',
+          'PhysicianRequestedTransportSimulated',
+        ]),
+      },
+      organizationId,
+    );
+
+    // 2) Transition to 'Arrival' -- the same state a genuine EMS pre-arrival
+    // sits in until handoff, which is what makes this show up in
+    // getEMSIntake()'s emsArrivals list / EMSPipeline.tsx at all.
+    this.patientService.movePatientToState(
+      patient.id,
+      'Arrival',
+      {
+        staffId: actor.staffId || 'physician',
+        note: simulationNote,
+        timestamp,
+      },
+      organizationId,
+    );
+
+    // 3) Record the request-specific metadata (source/reason/urgency/
+    // location/requestedBy) on the same durable arrival-status side table
+    // real EMS arrivals already use for their offload-clock timestamps --
+    // this is what buildInboundEmsRecord() reads back to render the
+    // "Physician-Requested (Simulated)" badge and disclaimer details on the
+    // EMS pipeline.
+    this.updateArrivalStatus(
+      arrivalId,
+      {
+        status: 'Inbound',
+        patientId: patient.id,
+        source: 'physician_initiated_simulated',
+        requestedByStaffId: actor.staffId,
+        requestedByName: actor.name,
+        reason,
+        urgency,
+        location,
+      },
+      organizationId,
+    );
+
+    // 4) Durable, actor+timestamp audit trail entry, matching this session's
+    // established convention (WorkflowActionLogService.record(), the same
+    // mechanism completeHandoff() below already uses for its own writes).
+    const log = this.workflowLogService.record({
+      type: 'ems_transport_request_created',
+      title: 'Physician-requested transport (simulated)',
+      summary: `${actor.name || 'A physician'} requested a SIMULATED emergency transport for ${patient.firstName} ${patient.lastName}: ${reason}`,
+      timestamp,
+      patientId: patient.id,
+      actorStaffId: actor.staffId,
+      actorName: actor.name,
+      source: 'ems-transport-request',
+      severity: urgency === 'P1' || urgency === 'P2' ? 'Warning' : 'Info',
+      metadata: {
+        simulated: true,
+        arrivalId,
+        urgency,
+        location,
+        reason,
+      },
+    });
+
+    return envelope('EMS Transport Request', {
+      ok: true,
+      simulated: true,
+      disclaimer:
+        'Transport Request Recorded (Simulated) -- not connected to a real ambulance, EMS unit, or ' +
+        '911/CAD dispatch system. No real transport has been dispatched.',
+      arrivalId,
+      patientId: patient.id,
+      reason,
+      urgency,
+      location,
+      requestedByStaffId: actor.staffId || null,
+      requestedByName: actor.name || null,
+      requestedAt: timestamp,
+      workflowLogId: log.id,
     });
   }
 
@@ -2295,6 +2459,18 @@ function buildInboundEmsRecord(
     priority: patient.priority,
     notes: patient.timeline?.[patient.timeline.length - 1]?.note || patient.chiefComplaint,
     mechanismOfInjury: patient.complaintCategory,
+    // Physician-initiated SIMULATED transport request fields (see
+    // EMSIntakeService.requestPhysicianTransport) -- absent/undefined for
+    // every normal EMS-initiated arrival, which is what lets the frontend
+    // (EMSPipeline.tsx) render a distinct "Physician-Requested (Simulated)"
+    // badge only on rows that are actually simulated, never on real ones.
+    requestSource: trackedStatus?.source as string | undefined,
+    simulated: trackedStatus?.source === 'physician_initiated_simulated',
+    requestedByStaffId: trackedStatus?.requestedByStaffId as string | undefined,
+    requestedByName: trackedStatus?.requestedByName as string | undefined,
+    requestReason: trackedStatus?.reason as string | undefined,
+    requestUrgency: trackedStatus?.urgency as string | undefined,
+    requestLocation: trackedStatus?.location as string | undefined,
   };
 }
 
@@ -2425,7 +2601,10 @@ export class SmartIntakeService {
     return envelope('Smart Intake', { patient, duplicateCandidates });
   }
 
-  createVerticalSlice(input: SmartIntakeCreateInput & { staffId?: string }, organizationId?: string) {
+  createVerticalSlice(
+    input: SmartIntakeCreateInput & { staffId?: string },
+    organizationId?: string,
+  ) {
     const duplicateCandidates = this.guardAgainstUnconfirmedDuplicate(input, organizationId);
     const now = new Date().toISOString();
     const staffId = input.staffId || input.assignedStaffId || 'smart-intake-rn';
@@ -2837,9 +3016,7 @@ export class ReassessmentService {
   async listStaff(organizationId?: string): Promise<Staff[]> {
     if (!this.staffRepository) return [];
     return this.staffRepository.find({
-      where: organizationId
-        ? [{ organizationId }, { organizationId: IsNull() }]
-        : undefined,
+      where: organizationId ? [{ organizationId }, { organizationId: IsNull() }] : undefined,
       order: { name: 'ASC' },
     });
   }
@@ -2869,7 +3046,10 @@ export class ReassessmentService {
     }
     const staff = await this.staffRepository.findOne({
       where: organizationId
-        ? [{ id: staffId, organizationId }, { id: staffId, organizationId: IsNull() }]
+        ? [
+            { id: staffId, organizationId },
+            { id: staffId, organizationId: IsNull() },
+          ]
         : { id: staffId },
     });
     if (!staff) {

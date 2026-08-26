@@ -234,6 +234,22 @@ export class PatchEmsArrivalStatusDto {
   @IsOptional() @IsString() handoffCompletedAt?: string;
 }
 
+/**
+ * Physician-initiated SIMULATED transport request (see
+ * EMSIntakeService.requestPhysicianTransport). Deliberately has no
+ * actor/requestedByName field -- the requesting physician's identity is
+ * always derived server-side from the authenticated session
+ * (request.user), never trusted from the client, matching this session's
+ * "never let a client-suppliable field override the authoritative server
+ * value" precedent (HEAL-325/327/328/329/333).
+ */
+export class RequestEmergencyTransportDto {
+  @IsDefined() @IsString() @MaxLength(96) patientId: string;
+  @IsDefined() @IsString() @MaxLength(2000) reason: string;
+  @IsDefined() @IsIn(['P1', 'P2', 'P3', 'P4', 'P5']) urgency: string;
+  @IsOptional() @IsString() @MaxLength(300) location?: string;
+}
+
 export class PostReceptionEscalationDto {
   @IsOptional() @IsString() @MaxLength(96) reasonId?: string;
   @IsOptional() @IsString() @MaxLength(200) reasonLabel?: string;

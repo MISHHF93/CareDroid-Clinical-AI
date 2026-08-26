@@ -365,6 +365,31 @@
   color: var(--status-critical);
 }
 
+/* Physician-initiated SIMULATED transport request -- distinguishes these
+   rows from real EMS-initiated arrivals. Deliberately amber/warning-toned
+   (not the same visual language as a real severity badge) so it reads as an
+   honesty label, not a clinical status. */
+.ems-pipeline__simulated-badge {
+  display: inline-grid;
+  place-items: center;
+  padding: 0 10px;
+  height: 26px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--status-warning) 22%, var(--color-elevated));
+  color: var(--status-warning);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.ems-pipeline__simulated-note {
+  display: block;
+  margin-top: 2px;
+  color: var(--status-warning);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}
+
 .ems-pipeline__eta {
   display: inline-flex;
   align-items: center;

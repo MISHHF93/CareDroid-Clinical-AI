@@ -350,4 +350,85 @@ describe('EMSPipeline render', () => {
     }
     expect(error).toBeUndefined();
   });
+
+  it('renders a "Physician-Requested (Simulated)" badge on a physician-initiated transport request, and never on a real EMS-initiated arrival', () => {
+    // Live-verified end-to-end (curl against the real running backend, not
+    // mocked): EMSIntakeService.requestPhysicianTransport() sets
+    // simulated/requestSource/requestedByName/requestReason/requestLocation
+    // on the arrival record it returns from getEMSIntake(). This is the
+    // real-rendering counterpart proving EMSPipeline.tsx surfaces that data
+    // as an explicit, distinguishing badge -- never silently indistinguishable
+    // from a genuine EMS-initiated arrival.
+    useEmergencyStore.setState(
+      {
+        ...originalState,
+        patients: [],
+        emsArrivals: [
+          {
+            id: 'ems-arrival-patient-simulated-1',
+            unitId: 'ED-000001',
+            unitName: 'ED-000001',
+            status: 'Inbound',
+            severity: 'Critical',
+            eta: 14,
+            dispatchTime: new Date().toISOString(),
+            estimatedArrivalTime: new Date(Date.now() + 14 * 60000).toISOString(),
+            chiefComplaint: 'Worsening chest pain reported by phone',
+            simulated: true,
+            requestSource: 'physician_initiated_simulated',
+            requestedByName: 'Dr. Rivera',
+            requestReason: 'Worsening chest pain reported by phone',
+            requestLocation: '123 Verification St, QA City',
+          } as any,
+          {
+            id: 'ems-arrival-patient-real-1',
+            unitId: 'Medic 12',
+            unitName: 'Medic 12',
+            status: 'Inbound',
+            severity: 'High',
+            eta: 8,
+            dispatchTime: new Date().toISOString(),
+            estimatedArrivalTime: new Date(Date.now() + 8 * 60000).toISOString(),
+            chiefComplaint: 'MVC with trauma',
+          } as any,
+        ],
+        staff: [],
+        rooms: [],
+        alerts: [],
+        capacity: originalState.capacity,
+        emergencySettings: originalState.emergencySettings,
+      },
+      true,
+    );
+
+    const { getAllByText, getByText, queryByText } = render(
+      <MemoryRouter initialEntries={['/emergency/ems']}>
+        <RouteChromeProvider>
+          <PractitionerVisibilityProvider>
+            <HelpHubProvider>
+              <EMSPipeline />
+            </HelpHubProvider>
+          </PractitionerVisibilityProvider>
+        </RouteChromeProvider>
+      </MemoryRouter>,
+    );
+
+    // Exactly one badge -- only the simulated arrival gets it, not the real one.
+    const badges = getAllByText('Physician-Requested (Simulated)');
+    expect(badges).toHaveLength(1);
+    expect(badges[0]).toHaveAttribute(
+      'title',
+      expect.stringContaining('SIMULATED transport request'),
+    );
+
+    // The row-level SIMULATED note names the requester and states plainly
+    // that no real EMS/CAD/911 system is connected.
+    expect(getByText(/simulated — requested by dr\. rivera/i)).toBeInTheDocument();
+    expect(
+      getByText(/no real ambulance, ems unit, or 911\/cad dispatch system is connected/i),
+    ).toBeInTheDocument();
+
+    // Never anything that could read as a real dispatch outcome.
+    expect(queryByText(/ambulance dispatched/i)).not.toBeInTheDocument();
+  });
 });

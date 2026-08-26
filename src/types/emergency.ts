@@ -436,6 +436,24 @@ export interface EMSArrival {
   epcrFeed?: PatientCareRecordFeed[];
   /** Transport mode when supplied by EMS integration (ground/air/etc.). */
   transportMode?: string;
+  /**
+   * Physician-initiated SIMULATED transport request fields (see
+   * PatientDetailPanel.tsx's "Request Emergency Transport" action and
+   * backend EMSIntakeService.requestPhysicianTransport). Undefined/absent
+   * for every normal EMS-initiated arrival -- `simulated`/`requestSource`
+   * are what let EMSPipeline.tsx render a "Physician-Requested (Simulated)"
+   * badge only on rows that are actually simulated, never a real one. There
+   * is NO real EMS/CAD/911 dispatch system connected anywhere in this
+   * codebase; a `simulated: true` row is an internal, audited CareDroid
+   * record only, never a real ambulance dispatch.
+   */
+  requestSource?: 'ems_initiated' | 'physician_initiated_simulated';
+  simulated?: boolean;
+  requestedByStaffId?: EntityId;
+  requestedByName?: string;
+  requestReason?: string;
+  requestUrgency?: Priority;
+  requestLocation?: string;
 }
 
 export type EMSCase = EMSArrival;

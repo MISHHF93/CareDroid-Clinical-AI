@@ -195,6 +195,14 @@ function EMSArrivalRow({
           >
             {arrival.severity || 'Moderate'}
           </span>
+          {arrival.simulated || arrival.requestSource === 'physician_initiated_simulated' ? (
+            <span
+              className="ems-pipeline__simulated-badge"
+              title="Physician-initiated SIMULATED transport request -- not a real ambulance dispatch. No real EMS/CAD/911 system is connected."
+            >
+              Physician-Requested (Simulated)
+            </span>
+          ) : null}
           {showHandoffChecklist ? (
             <AmbulanceHandoffChecklistBadge
               arrival={arrival}
@@ -205,6 +213,14 @@ function EMSArrivalRow({
           ) : null}
         </div>
         <span>{safeArrivalText(arrival.mechanismOfInjury) || safeArrivalText(arrival.notes)}</span>
+        {arrival.simulated || arrival.requestSource === 'physician_initiated_simulated' ? (
+          <span role="note" className="ems-pipeline__simulated-note">
+            SIMULATED — requested by {arrival.requestedByName || 'a physician'} from the patient
+            chart, not a real EMS unit. No real ambulance, EMS unit, or 911/CAD dispatch system is
+            connected.
+            {arrival.requestLocation ? ` Location: ${arrival.requestLocation}.` : ''}
+          </span>
+        ) : null}
       </div>
 
       <time

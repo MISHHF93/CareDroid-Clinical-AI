@@ -23,6 +23,7 @@ export const EMERGENCY_OS_API_ENDPOINTS = Object.freeze({
   journey: '/api/emergency/journey',
   ems: '/api/emergency/ems',
   emsHandoff: '/api/emergency/ems/handoff',
+  emsTransportRequest: '/api/emergency/ems/transport-requests',
   waitingRoomEscalationNotify: '/api/emergency/waiting-room-safety/escalation-notify',
   receptionSnapshot: '/api/emergency/reception/snapshot',
   receptionHandoff: '/api/emergency/reception/handoff',
@@ -98,6 +99,7 @@ export const ACTIVE_EMERGENCY_OS_API_ENDPOINT_KEYS = Object.freeze([
   'journey',
   'ems',
   'emsHandoff',
+  'emsTransportRequest',
   'waitingRoomEscalationNotify',
   'receptionSnapshot',
   'receptionHandoff',
@@ -262,6 +264,26 @@ export const postEmsHandoff = (payload) =>
 export const patchEmsArrivalStatus = (arrivalId: string, payload: Record<string, unknown>) =>
   requestEmergencyJson(`${EMERGENCY_OS_API_ENDPOINTS.ems}/arrivals/${encodeURIComponent(arrivalId)}/status`, {
     method: 'PATCH',
+    body: JSON.stringify(payload),
+  });
+/**
+ * Physician-initiated SIMULATED "Request Emergency Transport" action (see
+ * PatientDetailPanel.tsx). Awaited (not fire-and-forget like the sync calls
+ * above) -- the confirmation UI needs the real, persisted record (who/when/
+ * why, and the disclaimer text) back from the backend before it can show
+ * "Transport Request Recorded (Simulated)". There is NO real EMS/CAD/911
+ * dispatch system connected anywhere in this codebase; this only creates an
+ * internal, audited CareDroid record, surfaced on the same EMS pipeline real
+ * arrivals already use.
+ */
+export const requestEmergencyTransport = (payload: {
+  patientId: string;
+  reason: string;
+  urgency: string;
+  location?: string;
+}) =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.emsTransportRequest, {
+    method: 'POST',
     body: JSON.stringify(payload),
   });
 /**
@@ -513,6 +535,9 @@ export default Object.freeze({
   fetchEmergencyPatients,
   fetchPatientJourney,
   fetchEMSIntake,
+  postEmsHandoff,
+  patchEmsArrivalStatus,
+  requestEmergencyTransport,
   fetchReceptionSnapshot,
   postReceptionHandoff,
   postReceptionEscalation,

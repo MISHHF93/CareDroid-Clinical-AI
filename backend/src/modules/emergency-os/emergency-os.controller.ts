@@ -78,6 +78,7 @@ import {
   AssignPatientStaffDto,
   EscalatePatientDto,
   PatchEmsArrivalStatusDto,
+  RequestEmergencyTransportDto,
   PostWaitingRoomEscalationNotifyDto,
   UpdateStaffDutyStatusDto,
   PostReceptionEscalationDto,
@@ -130,6 +131,27 @@ export function assertCanWriteVitalsOrFlags(
   if (!body.vitals && !body.flags) return;
   if (!roleProfileId || !EMERGENCY_ROLES_ALLOWED_VITALS_FLAGS_WRITE.has(roleProfileId)) {
     throw new ForbiddenException('This role cannot write vitals or manage patient safety flags.');
+  }
+}
+
+/**
+ * Physician-tier only (see src/config/emergencyRolePermissions.ts's
+ * `physician` role definition, plus `admin` as the same superuser override
+ * every other role-scoped write check in this controller already grants).
+ * Deliberately excludes every other WRITE_PHI-capable role -- charge_nurse,
+ * triage_nurse, ems_user, dispatcher, ems_coordinator, registration_clerk --
+ * a SIMULATED "Request Emergency Transport" action initiated straight from a
+ * patient chart is a physician clinical-decision action, not a general
+ * PHI-write action every clinical role should have.
+ */
+const EMERGENCY_ROLES_ALLOWED_TRANSPORT_REQUEST = new Set(['physician', 'admin']);
+
+/** Exported standalone for the same unit-testability reason as assertCanWriteVitalsOrFlags above. */
+export function assertCanRequestEmergencyTransport(roleProfileId: string | null | undefined): void {
+  if (!roleProfileId || !EMERGENCY_ROLES_ALLOWED_TRANSPORT_REQUEST.has(roleProfileId)) {
+    throw new ForbiddenException(
+      'Only physician-tier roles can request emergency transport from a patient chart.',
+    );
   }
 }
 
@@ -463,10 +485,7 @@ export class EmergencyOsController {
   // at all -- see the detailed rationale on OcrIntakeService.getJob().
   @RequirePermission(Permission.WRITE_PHI)
   @Post('intake/ocr-jobs')
-  createOcrJob(
-    @Body() body: CreateOcrJobDto,
-    @TenantContext() tenantContext?: TenantContextValue,
-  ) {
+  createOcrJob(@Body() body: CreateOcrJobDto, @TenantContext() tenantContext?: TenantContextValue) {
     return this.ocrIntakeService.createJob({
       ...body,
       organizationId: tenantContext?.organizationId,
@@ -626,6 +645,57 @@ export class EmergencyOsController {
       { ...body },
       tenantContext?.organizationId,
     );
+  }
+
+  /**
+   * Physician-initiated SIMULATED "Request Emergency Transport" action from
+   * an existing patient's chart (e.g. during a phone follow-up call). There
+   * is NO real EMS/CAD/911 dispatch system connected anywhere in this
+   * codebase or environment -- this creates a real, persisted, audited
+   * CareDroid record only, surfaced through the same live EMS pipeline real
+   * arrivals already use (see EMSIntakeService.requestPhysicianTransport's
+   * own doc comment). WRITE_PHI is necessary but not sufficient here:
+   * assertCanRequestEmergencyTransport further restricts this to
+   * physician-tier roles specifically, mirroring assertCanWriteVitalsOrFlags
+   * above for the same reason -- every WRITE_PHI clinical role should not
+   * automatically get every physician-tier clinical-decision action.
+   */
+  @RequirePermission(Permission.WRITE_PHI)
+  @Post('ems/transport-requests')
+  requestEmergencyTransport(
+    @Body() body: RequestEmergencyTransportDto,
+    @TenantContext() tenantContext?: TenantContextValue,
+    @Req() request?: Request,
+  ) {
+    const authenticatedUser = (
+      request as unknown as {
+        user?: {
+          id?: string;
+          email?: string;
+          profile?: { roleProfileId?: string | null; fullName?: string | null };
+        };
+      }
+    )?.user;
+    assertCanRequestEmergencyTransport(authenticatedUser?.profile?.roleProfileId ?? null);
+    const actor = {
+      // Actor identity is always server-derived from the authenticated
+      // session, never trusted from the request body -- see
+      // RequestEmergencyTransportDto's own doc comment.
+      staffId: authenticatedUser?.id,
+      name: authenticatedUser?.profile?.fullName || authenticatedUser?.email,
+    };
+    try {
+      return this.emsIntakeService.requestPhysicianTransport(
+        body,
+        actor,
+        tenantContext?.organizationId,
+      );
+    } catch (error) {
+      if (error instanceof Error && /not found/i.test(error.message)) {
+        throw new NotFoundException(error.message);
+      }
+      throw error;
+    }
   }
 
   @RequirePermission(Permission.READ_PHI)
