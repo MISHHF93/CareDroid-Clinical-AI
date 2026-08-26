@@ -140,7 +140,11 @@
   --shell-header-border: var(--app-border, #e5e7eb);
   --shell-header-fg: var(--app-text-primary, #1f2937);
 
-  --shell-sidebar-bg: var(--sidebar-bg, #0f172a);
+  /* --sidebar-bg doesn't exist -- the sidebar's real background mechanism
+     (theme-tokens.css) is a --sidebar-gradient-from/-to pair, not a flat
+     color. This token itself has no consumers anywhere in the codebase
+     (dead code), so this was never a live bug, just a correctness gap. */
+  --shell-sidebar-bg: var(--sidebar-gradient-from, #0f172a);
   --shell-sidebar-fg: var(--sidebar-fg, #e2e8f0);
   --shell-sidebar-border: var(--sidebar-border, #1e293b);
 

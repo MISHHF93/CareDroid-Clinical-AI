@@ -9,7 +9,10 @@
   display: flex;
   justify-content: center;
   margin-bottom: 1rem;
-  color: var(--color-warning, #c45c2c);
+  /* --color-warning is never defined anywhere in this codebase (same class of
+     bug as ToolApiErrorBanner.css's --color-error-*), so this always fell back
+     to a static, non-theme-aware #c45c2c. Alias to the real theme-aware token. */
+  color: var(--app-warning, #c45c2c);
 }
 
 .tool-not-found-title {
@@ -53,18 +56,23 @@
 }
 
 .tool-not-found-btn--primary {
-  background: var(--primary, #4a7c9e);
+  /* --primary doesn't exist -- --app-accent is the real equivalent, but its
+     dark-mode value (#38bdf8, a bright sky blue) fails WCAG AA with white
+     text, same reasoning as the reception CTA fixes elsewhere this session.
+     Fixed background, not theme-toggling. */
+  background: #075985;
   color: var(--medical-text-on-solid, #ffffff);
 }
 
 .tool-not-found-btn--secondary {
   background: var(--surface-elevated, #f0f4f8);
-  border-color: var(--border, #ccc);
+  /* --border doesn't exist -- the real, theme-aware token is --app-border. */
+  border-color: var(--app-border, #ccc);
   color: inherit;
 }
 
 .tool-not-found-btn--ghost {
   background: transparent;
-  border-color: var(--border, #ddd);
+  border-color: var(--app-border, #ddd);
   color: inherit;
 }

@@ -86,7 +86,17 @@
   scroll-padding-top: calc(var(--app-layout-header-height) + var(--app-layout-page-gutter-block));
 }
 
-.emergency-app-shell .app-shell-main-content > * {
+/* 2026-08-25: excludes .sr-only -- CareDroidPage (CareDroidPrimitives.tsx)
+   renders a visually-hidden <p class="sr-only cd-page-shell__title-text">
+   as a raw sibling before its own PageShell, which lands as a direct child
+   of .app-shell-main-content with no wrapping container of its own. This
+   sweep's width: 100% was overriding .sr-only's own width: 1px (higher
+   specificity: 2 classes here vs .sr-only's 1), stretching a
+   should-be-invisible title node out to the full content width and
+   producing a real, measured horizontal-overflow failure at narrow
+   viewports -- confirmed live via getComputedStyle and a real
+   responsive-qa.spec.mjs run before and after this fix. */
+.emergency-app-shell .app-shell-main-content > *:not(.sr-only) {
   width: 100%;
   max-width: var(--app-layout-content-max);
   margin-inline: auto;

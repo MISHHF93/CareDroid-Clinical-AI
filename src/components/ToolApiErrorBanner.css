@@ -1,14 +1,20 @@
+/* background/border/color deliberately omitted here -- they used to hardcode
+   var(--color-error-bg, #fef2f2) / var(--color-error-text, #991b1b), custom
+   properties that are never defined anywhere in this codebase, so they always
+   resolved to those literal light-mode fallbacks. That permanently outranked
+   the shared Alert component's own theme-aware .cd-alert--danger background
+   (this class is applied alongside cd-alert/cd-alert--danger on the same
+   element, and this file loads after Alert.css in the bundle), while
+   .cd-alert__body's theme-aware text color still applied underneath -- in
+   dark mode that meant light, dark-mode-correct text sitting on a background
+   stuck at light-mode's pale pink, nearly invisible. Letting Alert's own
+   tone/background/text styling apply directly fixes it in both themes. */
 .tool-api-error-banner {
-  background: var(--color-error-bg, #fef2f2);
-  border: 1px solid var(--color-error-border, #fecaca);
-  border-radius: 8px;
-  color: var(--color-error-text, #991b1b);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.75rem;
   margin: 1rem 0;
-  padding: 0.75rem 1rem;
 }
 
 .tool-api-error-banner__text {

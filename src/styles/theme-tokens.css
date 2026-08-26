@@ -36,6 +36,13 @@ html[data-theme='light'] {
   --app-warning: var(--semantic-attention, #b54708);
   --app-success: var(--semantic-healthy, #027a48);
   --app-info: var(--semantic-information, #175cd3);
+  /* --app-status-good/--app-status-warning were never defined anywhere in this
+     codebase (confirmed by grep) despite being referenced, always at the same
+     literal fallback, by ~15 platform/governance/analytics pages' status badges
+     (e.g. GovernanceRegistry.css, PlatformSystemPage.css, FeatureFlagCenter.css).
+     Alias to the equivalent already-theme-aware tokens instead of duplicating them. */
+  --app-status-good: var(--app-success);
+  --app-status-warning: var(--app-warning);
   /* Focus indicator is two-layer by design: a solid, WCAG-2.4.11-contrast-
      bearing ring in the brand accent (--app-focus-ring-aa) plus a soft
      CCDS-yellow glow (--app-focus) as a highly visible secondary highlight.
@@ -205,6 +212,8 @@ html[data-theme='dark'] {
   --app-warning: #fbbf24;
   --app-success: #4ade80;
   --app-info: #38bdf8;
+  --app-status-good: var(--app-success);
+  --app-status-warning: var(--app-warning);
   --app-focus: rgba(56, 189, 248, 0.24);
   --app-focus-ring-aa: #38bdf8;
   --app-hover: rgba(56, 189, 248, 0.12);
@@ -335,22 +344,6 @@ html {
   --app-elevation-subtle: var(--app-shadow-1);
   --app-elevation-card: var(--app-shadow-1);
   --app-elevation-overlay: var(--app-shadow-2);
-  --motion-fast: 120ms;
-  --motion-normal: 180ms;
-  --motion-slow: 240ms;
-  --animation-fast: var(--motion-fast);
-  --animation-base: var(--motion-normal);
-  --animation-slow: var(--motion-slow);
-  --motion-duration-fast: var(--motion-fast);
-  --motion-duration-normal: var(--motion-normal);
-  --motion-duration-slow: var(--motion-slow);
-  --motion-ease-standard: cubic-bezier(0.22, 1, 0.36, 1);
-  --motion-transition-fast: var(--motion-duration-fast) var(--motion-ease-standard);
-  --motion-transition-normal: var(--motion-duration-normal) var(--motion-ease-standard);
-  --motion-transition-slow: var(--motion-duration-slow) var(--motion-ease-standard);
-  --motion-hover-lift-y: -1px;
-  --motion-enter-distance: 6px;
-  --motion-skeleton-duration: 1.15s;
   --app-status-online: var(--app-success);
   --app-status-offline: var(--app-fg-muted);
   --app-status-degraded: var(--app-warning);
@@ -359,18 +352,7 @@ html {
   --app-status-critical: var(--app-danger);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  html {
-    --motion-fast: 1ms;
-    --motion-normal: 1ms;
-    --motion-slow: 1ms;
-    --animation-fast: 1ms;
-    --animation-base: 1ms;
-    --animation-slow: 1ms;
-    --motion-duration-fast: 1ms;
-    --motion-duration-normal: 1ms;
-    --motion-duration-slow: 1ms;
-    --motion-hover-lift-y: 0;
-    --motion-enter-distance: 0;
-  }
-}
+/* The prefers-reduced-motion override for these tokens lives in
+   design-tokens.css now (it already covered --motion-press-y too, which
+   this block never did) -- see the "Motion" comment in that file's :root
+   block for why theme-tokens.css no longer owns any copy of these. */

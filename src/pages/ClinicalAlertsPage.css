@@ -586,7 +586,9 @@
   font-weight: 600;
   color: var(--color-text-muted, var(--cdl-ink-muted, #334155));
   padding: 4px 8px;
-  border: 1px solid var(--color-border, #e5e7eb);
+  /* Was var(--color-border, #e5e7eb) -- --color-border is never defined anywhere;
+     --medical-border is the real, theme-aware border token (13-file fix). */
+  border: 1px solid var(--medical-border, #e5e7eb);
   border-radius: 6px;
   letter-spacing: 0.02em;
 }

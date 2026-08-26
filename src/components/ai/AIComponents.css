@@ -3,7 +3,7 @@
   border: 1px solid var(--medical-border, #dbeafe);
   border-radius: var(--cd-radius-lg, 8px);
   background: var(--medical-surface-card, #ffffff);
-  color: var(--medical-text, #111827);
+  color: var(--medical-ink, #111827);
   box-shadow: 0 10px 26px rgba(15, 23, 42, 0.06);
 }
 
@@ -79,7 +79,7 @@
 }
 
 .cd-ai-card__provenance strong {
-  color: var(--medical-text, #111827);
+  color: var(--medical-ink, #111827);
   font-size: 11px;
   letter-spacing: 0.04em;
   text-transform: uppercase;

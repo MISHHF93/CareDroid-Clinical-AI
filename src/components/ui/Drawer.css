@@ -1,11 +1,15 @@
 /* Drawer Component Styles */
 
+/* Fallbacks corrected (overlay 900->500, drawer 1000->700): design-tokens.css
+   had second, dead/shadowed --z-overlay/--z-drawer definitions that
+   shell-tokens.css's later @import always overrode -- see NotificationToast.css
+   for the full explanation. */
 .drawer-overlay {
   position: fixed;
   inset: 0;
   background: color-mix(in srgb, #000 66%, transparent);
   backdrop-filter: blur(2px);
-  z-index: var(--z-overlay, 900);
+  z-index: var(--z-overlay, 500);
   opacity: 0;
   transition: opacity 0.3s ease;
   pointer-events: none;
@@ -27,7 +31,7 @@
   min-width: 0;
   overflow: hidden;
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: var(--z-drawer, 1000);
+  z-index: var(--z-drawer, 700);
 }
 
 /* Side variants */

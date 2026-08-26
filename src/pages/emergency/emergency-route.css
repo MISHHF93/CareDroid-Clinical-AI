@@ -447,10 +447,14 @@
   padding: 1px 7px;
   border-radius: 4px;
   /* Tailwind red-500 with white text measured 3.76:1 via live axe-core scan
-     (Cycle 214) — short of WCAG AA's 4.5:1. --cdl-danger-600 is this
-     codebase's already-verified-safe critical-red (4.83:1 with white text,
-     same token used by ReceptionSkillStrip.css's --critical tone). */
-  background: var(--cdl-danger-600, #dc2626);
+     (Cycle 214) — short of WCAG AA's 4.5:1. --cdl-danger-600 doesn't exist
+     in the cdl-v2 design system (the tone is "critical", not "danger", with
+     no numbered scale) so this always silently fell back to the literal
+     #dc2626 regardless of theme; --cdl-critical is the real, theme-aware
+     token (4.83:1 with white text in light mode; also theme-aware in dark
+     mode, unlike the old fallback-only behavior). Same token used by
+     ReceptionSkillStrip.css's --critical tone. */
+  background: var(--cdl-critical, #dc2626);
   color: #fff;
   border: none;
   font-size: 10px;

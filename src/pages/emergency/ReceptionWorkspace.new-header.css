@@ -20,13 +20,23 @@
 }
 
 .reception-metric {
+  /* Was a flat solid-outline tile (1px border, zero shadow) -- the dated
+     "boxed KPI number" look. The muted background already separates it from
+     the page; a soft shadow now does the elevation work modern KPI tiles use
+     instead of a hard-edged rectangle, and the border is a near-transparent
+     hairline rather than a crisp line. */
   display: flex;
   flex-direction: column;
   gap: 2px;
   padding: 10px 12px;
   background: var(--cdl-surface-muted, #f1f5f9);
-  border: 1px solid var(--cdl-border, #e2e8f0);
+  border: 1px solid color-mix(in srgb, var(--cdl-border, #e2e8f0) 45%, transparent);
   border-radius: var(--cdl-radius-md, 8px);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03), 0 2px 6px rgba(15, 23, 42, 0.04);
+}
+
+html[data-theme='dark'] .reception-metric {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25), 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .reception-metric__value {

@@ -81,9 +81,12 @@
 }
 
 .capacity-crisis-drawer {
+  /* Was a bare 980 -- an arbitrary number just below the real --z-drawer
+     tier (700, live-verified value) rather than referencing it, for no
+     apparent reason (this genuinely is a right-side slide-in drawer). */
   position: fixed;
   inset: 0 0 0 auto;
-  z-index: 980;
+  z-index: var(--z-drawer, 700);
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   width: min(480px, 100vw);

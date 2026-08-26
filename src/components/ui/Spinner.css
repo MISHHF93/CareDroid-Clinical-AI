@@ -62,7 +62,11 @@
   }
 }
 
-/* Loading Screen (Full Overlay) */
+/* Loading Screen (Full Overlay) -- was a bare magic-number 9999, colliding
+   with ToolResultShare.css independently also picking 9999. Now uses a
+   dedicated named tier above every real toast/modal (design-tokens.css's
+   --z-app-boot-overlay), since this is the one legitimate "above literally
+   everything" case in the app, not an ordinary dialog. */
 .loading-screen {
   position: fixed;
   top: 0;
@@ -73,7 +77,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
+  z-index: var(--z-app-boot-overlay, 1300);
 }
 
 .loading-screen-content {

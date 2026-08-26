@@ -1,3 +1,10 @@
+/* --ml-surface (bare)/--ml-surface-hover/--ml-primary/--ml-primary-hover/
+   --ml-on-primary/--ml-status-success-bg don't exist in the ml-* token family
+   (src/styles/medical-light-theme.css) -- real equivalents are --ml-surface-
+   card, --ml-surface-muted, --ml-accent-blue(-hover), and --medical-text-on-
+   solid; success-bg was simply missing (added as a sibling of the already-
+   defined warning-bg/critical-bg). Same bug class fixed in
+   StreamingResponse.css. */
 .cd-proposal {
   display: flex;
   flex-direction: column;
@@ -5,7 +12,7 @@
   padding: var(--ml-space-3, 12px);
   border-radius: var(--ml-radius-md, 10px);
   border: 1px solid var(--ml-ai-purple-border, color-mix(in srgb, #7c3aed 35%, #cbd5e1));
-  background: var(--ml-surface, #fff);
+  background: var(--ml-surface-card, #fff);
   color: var(--ml-text-primary, #102a43);
 }
 
@@ -135,22 +142,22 @@
 }
 
 .cd-proposal__approve {
-  background: var(--ml-primary, #075985);
-  color: var(--ml-on-primary, #fff);
+  background: var(--ml-accent-blue, #075985);
+  color: var(--medical-text-on-solid, #fff);
 }
 
 .cd-proposal__approve:hover {
-  background: var(--ml-primary-hover, #0b6fa4);
+  background: var(--ml-accent-blue-hover, #0b6fa4);
 }
 
 .cd-proposal__reject {
-  background: var(--ml-surface, #fff);
+  background: var(--ml-surface-card, #fff);
   border-color: var(--ml-border, #cbd5e1);
   color: var(--ml-text-primary, #102a43);
 }
 
 .cd-proposal__reject:hover {
-  background: var(--ml-surface-hover, #f1f5f9);
+  background: var(--ml-surface-muted, #f1f5f9);
 }
 
 .cd-proposal__perm {

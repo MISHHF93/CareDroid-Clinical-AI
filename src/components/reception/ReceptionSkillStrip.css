@@ -1,3 +1,8 @@
+/* --cdl-border-subtle/--cdl-text-primary/--cdl-text-secondary and the numbered
+   --cdl-danger-*/--cdl-warning-*/--cdl-info-* tokens below don't exist in the cdl-v2
+   design system (src/styles/cdl-v2/theme.css) -- it uses --cdl-border, --cdl-ink/
+   --cdl-ink-muted, and semantic-suffix tone families (critical/warning/info, not a
+   numbered "danger" scale). Same bug class already fixed in ReceptionJobProfileCard.css. */
 .reception-skill-strip {
   display: flex;
   flex-wrap: wrap;
@@ -6,23 +11,23 @@
   gap: 0.75rem 1rem;
   padding: 0.65rem 0.85rem;
   border-radius: var(--cdl-radius-md, 0.5rem);
-  border: 1px solid var(--cdl-border-subtle, rgba(15, 23, 42, 0.1));
+  border: 1px solid var(--cdl-border, rgba(15, 23, 42, 0.1));
   background: var(--cdl-surface-muted, #f8fafc);
   margin-bottom: var(--cdl-space-3, 0.75rem);
 }
 
 .reception-skill-strip--critical {
-  border-color: var(--cdl-danger-400, #f87171);
-  background: var(--cdl-danger-bg, rgba(239, 68, 68, 0.08));
+  border-color: var(--cdl-critical-border, #f87171);
+  background: var(--cdl-critical-bg, rgba(239, 68, 68, 0.08));
 }
 
 .reception-skill-strip--warning {
-  border-color: var(--cdl-warning-400, #fbbf24);
+  border-color: var(--cdl-warning-border, #fbbf24);
   background: var(--cdl-warning-bg, rgba(245, 158, 11, 0.08));
 }
 
 .reception-skill-strip--info {
-  border-color: var(--cdl-info-400, #38bdf8);
+  border-color: var(--cdl-info-border, #38bdf8);
   background: var(--cdl-info-bg, rgba(14, 165, 233, 0.06));
 }
 
@@ -32,20 +37,20 @@
   font-weight: 600;
   letter-spacing: 0.02em;
   text-transform: uppercase;
-  color: var(--cdl-text-secondary, #64748b);
+  color: var(--cdl-ink-muted, #64748b);
 }
 
 .reception-skill-strip__title {
   margin: 0.15rem 0 0;
   font-size: var(--cdl-text-sm, 0.875rem);
   font-weight: 650;
-  color: var(--cdl-text-primary, #0f172a);
+  color: var(--cdl-ink, #0f172a);
 }
 
 .reception-skill-strip__detail {
   margin: 0.2rem 0 0;
   font-size: var(--cdl-text-xs, 0.75rem);
-  color: var(--cdl-text-secondary, #64748b);
+  color: var(--cdl-ink-muted, #64748b);
   max-width: 42rem;
 }
 
@@ -67,8 +72,8 @@
 }
 
 .reception-skill-strip--critical .reception-skill-strip__cta {
-  border-color: var(--cdl-danger-600, #dc2626);
-  background: var(--cdl-danger-600, #dc2626);
+  border-color: var(--cdl-critical, #dc2626);
+  background: var(--cdl-critical, #dc2626);
 }
 
 .reception-skill-strip__cta:hover {
@@ -80,5 +85,5 @@ html[data-theme='dark'] .reception-skill-strip {
 }
 
 html[data-theme='dark'] .reception-skill-strip__title {
-  color: var(--cdl-text-primary, #f8fafc);
+  color: var(--cdl-ink, #f8fafc);
 }

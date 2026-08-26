@@ -34,7 +34,10 @@ html {
   --accent-1: var(--app-accent);
   --accent-2: var(--app-accent-2);
   --accent-cyan: var(--app-accent-2);
-  --accent-green: #374151;
+  /* See color-normalization.css's own --accent-green comment: was a static #374151 with
+     no dark-mode override, illegible on the near-transparent dark-mode tinted backgrounds
+     consumers pair it with (e.g. ClinicalDocumentationAssistant's note-type chips). */
+  --accent-green: var(--app-accent);
   --accent-link: var(--app-link-fg, #374151);
   --link-color: var(--app-link-fg, #374151);
   --accent-hover: #111827;

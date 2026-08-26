@@ -85,7 +85,8 @@
 .training-notice {
   margin: 0;
   padding: var(--space-3, 12px);
-  background: color-mix(in srgb, var(--warning-color, #f59e0b) 12%, var(--app-surface-1));
+  /* --warning-color doesn't exist -- the real, theme-aware token is --app-warning. */
+  background: color-mix(in srgb, var(--app-warning, #f59e0b) 12%, var(--app-surface-1));
 }
 
 .training-metrics {

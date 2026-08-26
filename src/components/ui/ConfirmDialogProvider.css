@@ -1,7 +1,10 @@
+/* Fallback corrected 1100->800: design-tokens.css had a second, dead/shadowed
+   --z-modal definition that shell-tokens.css's later @import always overrode
+   -- see NotificationToast.css for the full explanation. */
 .cd-confirm-dialog-overlay {
   position: fixed;
   inset: 0;
-  z-index: var(--z-modal, 1100);
+  z-index: var(--z-modal, 800);
   display: flex;
   align-items: center;
   justify-content: center;

@@ -150,10 +150,14 @@
 }
 
 .amb-handoff-checklist__inline-form button {
+  /* --accent doesn't exist anywhere -- same static-dark-button pattern as
+     ClinicalCalculatorHub.css's __save button this session: the real
+     theme-aware --app-accent would fail WCAG AA with white text in dark mode
+     (#38bdf8), so this stays a fixed literal instead. */
   border: 0;
   border-radius: 6px;
   padding: 0.35rem 0.55rem;
-  background: var(--accent, #374151);
+  background: #374151;
   color: var(--medical-text-on-solid, #ffffff);
   cursor: pointer;
 }

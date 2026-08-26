@@ -1,3 +1,8 @@
+/* --ml-surface (bare)/--ml-surface-hover/--ml-status-success-bg don't exist in
+   the ml-* token family (src/styles/medical-light-theme.css) -- real names are
+   --ml-surface-card/--ml-surface-muted, and success-bg was simply missing
+   (added as a sibling of the already-defined warning-bg/critical-bg). Same
+   bug class fixed in ActionProposalCard.css. */
 .cd-stream {
   display: flex;
   flex-direction: column;
@@ -5,7 +10,7 @@
   padding: var(--ml-space-3, 12px);
   border-radius: var(--ml-radius-md, 10px);
   border: 1px solid var(--ml-border, #cbd5e1);
-  background: var(--ml-surface, #fff);
+  background: var(--ml-surface-card, #fff);
   color: var(--ml-text-primary, #102a43);
 }
 
@@ -85,13 +90,13 @@
   padding: 3px 10px;
   border-radius: var(--ml-radius-sm, 6px);
   border: 1px solid var(--ml-border, #cbd5e1);
-  background: var(--ml-surface, #fff);
+  background: var(--ml-surface-card, #fff);
   color: var(--ml-text-primary, #102a43);
   cursor: pointer;
 }
 
 .cd-stream__cancel:hover {
-  background: var(--ml-surface-hover, #f1f5f9);
+  background: var(--ml-surface-muted, #f1f5f9);
 }
 
 .cd-stream__text {

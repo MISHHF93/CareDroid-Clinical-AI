@@ -326,7 +326,9 @@
   color: var(--app-danger);
 }
 
-/* Edit User Modal */
+/* Edit User Modal -- was a bare 1000, tied with the app's real --z-drawer tier
+   instead of --z-modal (800, real live-verified value) that this genuine
+   modal backdrop belongs at. */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -337,7 +339,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: var(--z-modal, 800);
   padding: var(--space-4);
 }
 

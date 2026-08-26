@@ -1,4 +1,10 @@
 .tool-result-share-modal {
+  /* Was a bare magic-number 9999 -- above even the app's real toast tier
+     (--z-toast: 900, shell-tokens.css), and collided with Spinner.css's
+     .loading-screen also independently picking 9999 (pure DOM-order luck
+     would decide which won if both were ever mounted together). This is a
+     genuine modal dialog, so it belongs at the same tier every other real
+     modal in this app uses. */
   position: fixed;
   top: 0;
   left: 0;
@@ -7,7 +13,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
+  z-index: var(--z-modal, 800);
   animation: fadeIn 0.2s ease;
 }
 

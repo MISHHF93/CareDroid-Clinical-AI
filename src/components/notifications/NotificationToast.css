@@ -1,10 +1,14 @@
 /* NotificationToast Styles */
 
+/* Fallback corrected 1200->900: design-tokens.css had a second, dead/shadowed
+   --z-toast definition (1200) that shell-tokens.css's later @import always
+   overrode (900, the real live-verified value) -- the old fallback here could
+   never actually trigger today, but was wrong if it ever did. */
 .notification-toast-container {
   position: fixed;
   bottom: 24px;
   right: 24px;
-  z-index: var(--z-toast, 1200);
+  z-index: var(--z-toast, 900);
   display: flex;
   flex-direction: column;
   gap: var(--space-3);

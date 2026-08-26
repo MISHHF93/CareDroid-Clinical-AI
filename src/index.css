@@ -617,11 +617,14 @@ textarea {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Fallback corrected 1200->900: design-tokens.css had a second, dead/shadowed
+   --z-toast definition that shell-tokens.css's later @import always
+   overrode -- see NotificationToast.css for the full explanation. */
 .ed-skip-link {
   position: fixed;
   inset-block-start: var(--space-2, 8px);
   inset-inline-start: var(--space-2, 8px);
-  z-index: var(--z-toast, 1200);
+  z-index: var(--z-toast, 900);
   padding: var(--space-2, 8px) var(--space-3, 12px);
   border: 1px solid #374151;
   border-radius: var(--radius-md, 8px);

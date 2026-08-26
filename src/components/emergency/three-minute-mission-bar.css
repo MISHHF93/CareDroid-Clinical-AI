@@ -1,3 +1,5 @@
+/* --ed-accent doesn't exist -- fixed to the real, theme-aware --app-accent.
+   Same fix applied to 3 sibling files (see operational-intelligence-bar.css). */
 .three-minute-mission-bar {
   display: grid;
   gap: 8px;
@@ -103,7 +105,7 @@
 }
 
 .three-minute-mission-bar__btn--primary {
-  background: var(--ed-accent, #64748b);
+  background: var(--app-accent, #64748b);
   border-color: transparent;
   color: #fff;
 }

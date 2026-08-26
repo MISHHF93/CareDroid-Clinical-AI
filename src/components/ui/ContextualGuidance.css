@@ -15,11 +15,16 @@
   flex-wrap: wrap;
 }
 
+/* --semantic-info-text and --text-primary don't exist anywhere -- this component
+   has no background of its own (it inherits whatever card/surface it's mounted
+   in, e.g. ReceptionWorkspace's light cards), so their dark-mode-style literal
+   fallbacks (#7eb8ff, #e8edf4) rendered as near-illegible light text in light
+   mode. Fixed to the real, theme-aware --cdl-info-text/--cdl-ink. */
 .cd-contextual-guidance__help-link {
   padding: 0.15rem 0.45rem;
   border: none;
   background: transparent;
-  color: var(--semantic-info-text, #7eb8ff);
+  color: var(--cdl-info-text, #0369a1);
   font-size: 0.82rem;
   cursor: pointer;
   text-decoration: underline;
@@ -27,7 +32,7 @@
 }
 
 .cd-contextual-guidance__help-link:hover {
-  color: var(--text-primary, #e8edf4);
+  color: var(--cdl-ink, #0f172a);
 }
 
 .cd-contextual-guidance__dismiss {

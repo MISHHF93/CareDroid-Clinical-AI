@@ -179,31 +179,46 @@
   --app-chart-min-height: clamp(14rem, 32dvh, 20rem);
   --app-drawer-inline-padding: clamp(10px, 2vw, 16px);
 
-  /* z-index layers */
-  --z-base: 0;
-  --z-dropdown: 700;
-  --z-sticky: 800;
-  --z-overlay: 900;
-  --z-header: 920;
-  --z-popover: 940;
-  --z-drawer: 1000;
-  --z-modal: 1100;
-  --z-toast: 1200;
+  /* z-index layers -- REMOVED (2026-08-24): this block independently
+     redefined --z-base/--z-dropdown/--z-sticky/--z-overlay/--z-header/
+     --z-popover/--z-drawer/--z-modal/--z-toast with DIFFERENT values (0,
+     700, 800, 900, 920, 940, 1000, 1100, 1200) than shell-tokens.css's
+     identically-named scale (0, 400, 300, 500, 200, 600, 700, 800, 900),
+     which is @import-ed AFTER this file from design-system.css and so
+     silently won for every one of these properties, everywhere in the app
+     -- confirmed via live getComputedStyle() that 100% of this block's
+     values were dead/shadowed code, never actually applied. shell-tokens.css
+     (which matches cdl-v2/shell.css's --cdl-z-* scale exactly) is the real,
+     single source of truth for these names; this duplicate definition only
+     served to make every consumer's fallback value (e.g.
+     "var(--z-toast, 1200)") a decoy that could never trigger, since the
+     property was always actually defined. Do not re-add a competing
+     definition of these names here. --z-app-boot-overlay (below) is the one
+     addition this file still legitimately owns, since shell-tokens.css has
+     no equivalent "above everything" tier. */
+  /* Reserved for the one genuinely "above everything" case: a full-app-boot
+     blocking overlay (Spinner.css's .loading-screen) where nothing else
+     should be interactive or visible regardless of what's mounted. Not for
+     ordinary modals/dialogs -- those belong at --z-modal like everything
+     else, so a future component can't casually out-rank this tier the way
+     ToolResultShare.css's old bare "9999" did. */
+  --z-app-boot-overlay: 1300;
 
   /* focus/elevation */
   --app-focus-ring-width: 2px;
   --app-focus-ring-offset: 2px;
   --app-focus-ring: 0 0 0 3px var(--app-focus);
-  --motion-fast: 120ms;
-  --motion-normal: 180ms;
-  --motion-slow: 240ms;
-  --animation-fast: var(--motion-fast);
-  --animation-base: var(--motion-normal);
-  --animation-slow: var(--motion-slow);
-  --motion-duration-fast: var(--motion-fast);
-  --motion-duration-normal: var(--motion-normal);
-  --motion-duration-slow: var(--motion-slow);
-  --motion-ease-standard: cubic-bezier(0.22, 1, 0.36, 1);
+  /* --motion-fast/normal/slow, --animation-*, --motion-duration-*, and
+     --motion-ease-standard were a byte-identical triplicate of
+     primitives.css's own "Motion" block (also duplicated a 3rd time in
+     theme-tokens.css) -- primitives.css's header already self-declares as
+     canonical for these, so this file now only owns the semantic aliases
+     built on top of them (below) plus the reduced-motion override further
+     down, which still applies regardless of which file defines the base
+     value. Same latent-drift risk class as the z-index dead-scale bug this
+     session already found and fixed elsewhere in this file -- these three
+     copies happened to still agree, this one just removes the risk before
+     it doesn't. */
   --motion-transition-fast: var(--motion-duration-fast) var(--motion-ease-standard);
   --motion-transition-normal: var(--motion-duration-normal) var(--motion-ease-standard);
   --motion-transition-slow: var(--motion-duration-slow) var(--motion-ease-standard);

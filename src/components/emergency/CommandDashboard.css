@@ -4,7 +4,12 @@
   padding: clamp(16px, 2vw, 24px);
   border-bottom: 1px solid var(--medical-border, #e0f2fe);
   background: var(--medical-surface-page, #f1f5f9);
-  color: var(--medical-text, #111827);
+  /* Was var(--medical-text, #111827) -- --medical-text is never defined anywhere in
+     this codebase, so this root color (inherited by all descendant text without its
+     own override) always fell back to near-black, regardless of theme. --medical-ink
+     is the real, theme-aware equivalent (same fix applied to 3 sibling files:
+     AIComponents.css, ThreeMinuteTimer.css, AiEvaluationDashboard.css). */
+  color: var(--medical-ink, #111827);
 }
 
 .command-dashboard__header {

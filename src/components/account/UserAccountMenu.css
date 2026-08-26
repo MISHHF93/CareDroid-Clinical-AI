@@ -118,14 +118,20 @@
   unicode-bidi: isolate;
 }
 
-/* Portaled panel escapes header overflow:hidden so items are visible and clickable */
+/* Portaled panel escapes header overflow:hidden so items are visible and clickable.
+   Was a bare z-index: 1400 -- above every real tier. --z-popover (600) is the
+   real, live-verified value (shell-tokens.css; getComputedStyle confirmed
+   design-tokens.css's separate --z-popover:940 definition is dead/shadowed
+   code, since shell-tokens.css @imports after it and wins) -- same token
+   Header.css's own popover-style overlay already uses, and comfortably clears
+   the header (--z-header: 200) and sidebar (100) that motivated the 1400. */
 .account-menu__panel--portal {
   position: fixed;
   top: auto;
   right: auto;
   left: auto;
   bottom: auto;
-  z-index: 1400;
+  z-index: var(--z-popover, 600);
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;

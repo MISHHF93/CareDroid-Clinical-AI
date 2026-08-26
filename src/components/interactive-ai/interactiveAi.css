@@ -127,11 +127,14 @@
 
 .cd-iaw__progress--blocked .cd-iaw__progress-bar > span,
 .cd-iaw__progress--failed .cd-iaw__progress-bar > span {
-  background: var(--semantic-danger, #dc2626);
+  /* --semantic-danger/--semantic-success don't exist -- the real tone names in
+     this design system are "critical" and "ok" (medical-color-layer.css /
+     cdl-v2), each with a theme-aware light/dark pair. */
+  background: var(--semantic-critical, #dc2626);
 }
 
 .cd-iaw__progress--completed .cd-iaw__progress-bar > span {
-  background: var(--semantic-success, #059669);
+  background: var(--cdl-ok, #059669);
 }
 
 .cd-iaw__body {
@@ -332,13 +335,17 @@
 }
 
 .cd-iaw-proposal__actions button.cd-iaw-approve {
-  background: var(--semantic-success, #059669);
+  /* --semantic-success doesn't exist -- the real "positive" tone is named "ok",
+     and its dark-mode value (#4ade80, a light pastel green) fails WCAG AA with
+     white text (~1.7:1). Fixed background, not theme-toggling, same reasoning
+     as the reception CTA fixes elsewhere this session. */
+  background: #047857;
   border-color: transparent;
   color: #fff;
 }
 
 .cd-iaw-proposal__actions button.cd-iaw-reject {
-  color: var(--semantic-danger, #dc2626);
+  color: var(--semantic-critical, #dc2626);
 }
 
 .cd-iaw-inbox {

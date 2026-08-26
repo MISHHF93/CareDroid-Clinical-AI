@@ -31,3 +31,17 @@
   --app-text-link: #374151;
   --app-text-link-hover: #374151;
 }
+
+/* This file had no dark-mode block at all -- every --medical-status-*-text value was
+   static, so critical/urgent/warning text (used directly as `color` on card surfaces
+   by FullJourneyOperatingPage.css and DispatchConsole.css, not just as pill/badge
+   backgrounds) rendered as dark, low-contrast text on dark backgrounds in dark mode.
+   Lifted tints mirror the already-theme-aware --semantic-* equivalents in
+   medical-color-layer.css. */
+html[data-theme='dark'] {
+  --medical-status-critical-text: var(--semantic-critical, #f87171);
+  --medical-status-high-text: var(--semantic-urgent, #fb923c);
+  --medical-status-warning-text: var(--semantic-attention, #fbbf24);
+  --medical-status-info-text: #94a3b8;
+  --medical-status-success-text: #4ade80;
+}

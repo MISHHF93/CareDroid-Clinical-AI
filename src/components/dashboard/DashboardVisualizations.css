@@ -9,11 +9,23 @@
 .dashboard-metric-card,
 .dashboard-status-card,
 .dashboard-visual-panel {
+  /* Was a fully-opaque 1px border with only a very faint (6% light-mode)
+     shadow -- the border did all the visual work, reading as a flat outlined
+     box. Softened the border and let the shadow carry more of the elevation,
+     shadow-led-elevation modernization matching reception-desk-theme.css. This
+     is a shared primitive (dashboard/analytics metric+status+visual cards
+     across multiple pages), so this one fix has broad reach. */
   min-width: 0;
-  border: 1px solid var(--app-panel-border);
+  border: 1px solid color-mix(in srgb, var(--app-panel-border) 55%, transparent);
   background: var(--app-surface-1);
   box-shadow: var(--compact-shadow, none);
   box-sizing: border-box;
+}
+
+html[data-theme='dark'] .dashboard-metric-card,
+html[data-theme='dark'] .dashboard-status-card,
+html[data-theme='dark'] .dashboard-visual-panel {
+  border-color: color-mix(in srgb, var(--app-panel-border) 85%, transparent);
 }
 
 .dashboard-metric-card,

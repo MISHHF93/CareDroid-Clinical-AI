@@ -1,13 +1,17 @@
 /* Offline Support Styles */
 
-/* Offline Indicator */
+/* Offline Indicator -- was a bare 1100 with no relation to the other 2 offline
+   banners in this same file (1500, 999) despite all 3 being system-status
+   banners of comparable urgency. Converged all 3 onto --z-toast (900, real
+   live-verified value), the app's "system-wide notice" tier, instead of 3
+   unrelated magic numbers. */
 .offline-indicator {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   padding: var(--space-3) var(--space-6);
-  z-index: 1100;
+  z-index: var(--z-toast, 900);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -65,10 +69,13 @@
 }
 
 .offline-mode-banner {
+  /* Was 1500 -- above every real tier in the app including toast, for no
+     documented reason. Converged onto --z-toast (900) with its 2 sibling
+     offline banners in this file. */
   position: fixed;
   top: calc(10px + env(safe-area-inset-top, 0px));
   left: 50%;
-  z-index: 1500;
+  z-index: var(--z-toast, 900);
   display: flex;
   align-items: flex-start;
   gap: var(--space-3);
@@ -180,7 +187,9 @@
   cursor: pointer;
 }
 
-/* Sync Status */
+/* Sync Status -- was 999 (just below --z-drawer's 1000, coincidence not
+   intent). This is toast-shaped (bottom-right, slide-in), same tier as its
+   2 sibling offline banners above. */
 .sync-status {
   position: fixed;
   bottom: 24px;
@@ -191,7 +200,7 @@
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-3, var(--app-shadow-2, 0 12px 32px rgba(15, 23, 42, 0.08)));
   padding: var(--space-4);
-  z-index: 999;
+  z-index: var(--z-toast, 900);
   animation: slideInRight 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 

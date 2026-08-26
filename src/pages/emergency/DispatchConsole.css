@@ -1,3 +1,6 @@
+/* --medical-text-status-critical (word order swapped) was never defined anywhere --
+   see the identical note in FullJourneyOperatingPage.css. Fixed to the real
+   --medical-status-critical-text, now theme-aware in dark mode too. */
 .dispatch-console {
   display: flex;
   flex-direction: column;
@@ -84,7 +87,7 @@
 }
 
 .dispatch-console__summary-card--highlight .dispatch-console__summary-card__value {
-  color: var(--medical-text-status-critical, #b91c1c);
+  color: var(--medical-status-critical-text, #b91c1c);
 }
 
 .dispatch-console__summary-card__label {
@@ -104,7 +107,7 @@
 }
 
 .dc-priority-badge[data-priority='Echo'] {
-  background: var(--medical-text-status-critical, #b91c1c);
+  background: var(--medical-status-critical-text, #b91c1c);
 }
 
 .dc-priority-badge[data-priority='Delta'] {
@@ -172,20 +175,20 @@
 
 .dc-critical-12 {
   font-size: 12px;
-  color: var(--medical-text-status-critical, #b91c1c);
+  color: var(--medical-status-critical-text, #b91c1c);
   font-weight: 700;
 }
 
 .dc-critical-11 {
   font-size: 11px;
-  color: var(--medical-text-status-critical, #b91c1c);
+  color: var(--medical-status-critical-text, #b91c1c);
   font-weight: 700;
 }
 
 .dc-critical-12-badge {
   font-size: 12px;
   font-weight: 800;
-  color: var(--medical-text-status-critical, #b91c1c);
+  color: var(--medical-status-critical-text, #b91c1c);
 }
 
 .dc-link-accent {
@@ -268,7 +271,7 @@
 .dc-title-14-critical {
   font-size: 14px;
   font-weight: 700;
-  color: var(--medical-text-status-critical, #b91c1c);
+  color: var(--medical-status-critical-text, #b91c1c);
 }
 
 .dc-title-15 {
@@ -291,7 +294,7 @@
 .dc-call-card--critical {
   border-color: color-mix(
     in srgb,
-    var(--medical-text-status-critical, #b91c1c) 45%,
+    var(--medical-status-critical-text, #b91c1c) 45%,
     var(--medical-border)
   );
 }
@@ -331,7 +334,7 @@
 }
 
 .dc-btn-primary--critical {
-  background: var(--medical-text-status-critical, #b91c1c);
+  background: var(--medical-status-critical-text, #b91c1c);
 }
 
 .dc-btn-primary--disabled {

@@ -23,7 +23,7 @@
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: color-mix(in srgb, var(--tone-color) 80%, var(--medical-text, #111827));
+  color: color-mix(in srgb, var(--tone-color) 80%, var(--medical-ink, #111827));
 }
 
 .three-minute-timer__clock {

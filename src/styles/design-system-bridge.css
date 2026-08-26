@@ -37,7 +37,10 @@ html[data-theme='light'] {
 
   --cd-success-bg: var(--app-success, #22c55e);
   --cd-success-bg-subtle: var(--semantic-healthy-bg, #ecfdf5);
-  --cd-success-border: var(--medical-success-border, #166534);
+  /* --medical-success-border doesn't exist -- this file's own established
+     "healthy" naming (used by every sibling line here) already has a real,
+     theme-aware border variant. */
+  --cd-success-border: var(--semantic-healthy-border, #166534);
   --cd-success-text: var(--semantic-healthy, #15803d);
 
   --cd-warning-bg: var(--app-warning, #f59e0b);

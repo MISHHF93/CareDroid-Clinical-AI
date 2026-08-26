@@ -60,7 +60,12 @@
   overflow-y: auto;
 }
 
-.emergency-app-shell .app-shell-main-content > * {
+/* Excludes .sr-only for the same reason as the matching rule in
+   layout-engine.css -- see its comment for the full trace. This file
+   duplicates that selector verbatim (a separate finding, not fixed here)
+   so the sr-only exclusion needs to go on both to be safe regardless of
+   which one wins the cascade. */
+.emergency-app-shell .app-shell-main-content > *:not(.sr-only) {
   width: 100%;
   max-width: 100%;
   margin-inline: 0;

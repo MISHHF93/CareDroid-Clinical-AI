@@ -21,23 +21,32 @@
   border: 1px solid var(--cd-border-subtle, rgba(255, 255, 255, 0.08));
 }
 
+/* This component mounts on the theme-aware .cd-surface-card background (light
+   card in light mode), but its text used --cd-ink/--cd-ink-muted/--cd-ink-subtle
+   -- not a real token; the "cd-" bridge (src/styles/cdl-v2/compat.css) actually
+   names these --cd-text-primary/--cd-text-secondary/--cd-text-tertiary. Because
+   the guessed names were never defined, they always fell back to their literal
+   dark-mode-style fallbacks (#e2e8f0 etc.) -- near-white text on a light card in
+   light mode, i.e. nearly invisible metric values, the mirror image of this
+   session's other dark-mode-only bugs. Same for --cd-warning-bg-subtle/-border,
+   which don't exist even as a bridge alias -- fixed to the real cdl-v2 tokens. */
 .command-center-lens__metric-label {
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--cd-ink-subtle, #94a3b8);
+  color: var(--cd-text-tertiary, #475569);
 }
 
 .command-center-lens__metric-value {
   font-size: 1.25rem;
   line-height: 1.2;
-  color: var(--cd-ink, #e2e8f0);
+  color: var(--cd-text-primary, #0f172a);
 }
 
 .command-center-lens__metric-detail {
   font-size: 0.75rem;
-  color: var(--cd-ink-muted, #cbd5e1);
+  color: var(--cd-text-secondary, #334155);
 }
 
 .command-center-lens__loading {
@@ -45,7 +54,7 @@
   align-items: center;
   gap: 8px;
   margin: 0;
-  color: var(--cd-ink-muted, #cbd5e1);
+  color: var(--cd-text-secondary, #334155);
   font-size: 0.875rem;
 }
 
@@ -53,8 +62,8 @@
   margin: 0 0 var(--cd-space-3, 12px);
   padding: var(--cd-space-2, 8px) var(--cd-space-3, 12px);
   border-radius: var(--cd-radius-md, 8px);
-  background: var(--cd-warning-bg-subtle, #fffbeb);
-  border: 1px solid var(--cd-warning-border, #b45309);
+  background: var(--cdl-warning-bg, #fffbeb);
+  border: 1px solid var(--cdl-warning-border, #b45309);
   color: var(--cd-warning-text, #b45309);
   font-size: 0.75rem;
 }

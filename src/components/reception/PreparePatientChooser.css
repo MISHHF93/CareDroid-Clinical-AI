@@ -1,9 +1,14 @@
 /* Create / prepare patient modal — CDL dual-mode, dashboard-aligned */
 
 .reception-prepare {
+  /* Was a bare z-index: 1200. --z-modal (800) is the real, live-verified value
+     (shell-tokens.css; a separate design-tokens.css --z-modal:1100 definition
+     is dead/shadowed code -- shell-tokens.css @imports after it and wins).
+     Keeps this correctly BELOW --z-toast (900), so a critical alert toast
+     still interrupts this modal instead of rendering behind it. */
   position: fixed;
   inset: 0;
-  z-index: 1200;
+  z-index: var(--z-modal, 800);
   display: grid;
   place-items: center;
   padding: 24px;

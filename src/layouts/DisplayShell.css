@@ -1,9 +1,15 @@
 .display-shell {
+  /* --emergency-surface-page/--emergency-ink are never defined anywhere -- but
+     unlike this session's other undefined-token bugs, that's not a live bug
+     here: DisplayShell (WhiteboardDisplayRoute) is a kiosk/wall-display screen
+     meant to stay dark regardless of the app's light/dark toggle, same as the
+     sibling rgba(255,255,255,...) border below. Made the literal intent
+     explicit instead of relying on an undefined-token fallback accident. */
   min-height: var(--app-viewport-height, 100vh);
   display: flex;
   flex-direction: column;
-  background: var(--emergency-surface-page, #0b1220);
-  color: var(--emergency-ink, #f8fafc);
+  background: #0b1220;
+  color: #f8fafc;
 }
 
 .display-shell__brand {

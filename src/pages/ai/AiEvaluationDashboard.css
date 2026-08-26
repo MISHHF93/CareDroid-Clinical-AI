@@ -68,7 +68,7 @@
 .ai-eval-page__honesty p {
   margin: 0;
   font-size: 13px;
-  color: var(--medical-text, #111827);
+  color: var(--medical-ink, #111827);
   line-height: 1.4;
 }
 

@@ -53,7 +53,9 @@
 .drift-monitoring-panel__card {
   padding: 0.6rem;
   border-radius: 0.45rem;
-  border: 1px solid var(--color-border, #e2e8f0);
+  /* Was var(--color-border, #e2e8f0) -- --color-border is never defined anywhere;
+     --medical-border is the real, theme-aware border token (13-file fix). */
+  border: 1px solid var(--medical-border, #e2e8f0);
   font-size: 0.8rem;
 }
 

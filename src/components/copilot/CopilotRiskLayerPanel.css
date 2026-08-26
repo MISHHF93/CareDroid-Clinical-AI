@@ -54,9 +54,12 @@
 }
 
 .copilot-risk-layer-panel__cds-detail {
+  /* Was var(--color-border, var(--medical-text-muted, #6b7280)) -- --color-border
+     is never defined anywhere; --medical-border is the real, theme-aware border
+     token (same bug class fixed across 13 files this session). */
   margin-top: 0.45rem;
   padding-top: 0.45rem;
-  border-top: 1px dashed var(--color-border, var(--medical-text-muted, #6b7280));
+  border-top: 1px dashed var(--medical-border, #6b7280);
 }
 
 .copilot-risk-layer-panel--compact .copilot-risk-layer-panel__layers {

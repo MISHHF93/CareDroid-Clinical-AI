@@ -1,10 +1,12 @@
 .bottleneck-command-panel {
+  /* --surface-raised doesn't exist anywhere -- fixed to the real, theme-aware
+     --app-surface-1 (same bug class fixed at var(--surface, ...) below). */
   display: grid;
   gap: 12px;
   border: 1px solid var(--border-subtle, #d7dee8);
   border-radius: 8px;
   padding: 14px;
-  background: var(--surface-raised, #ffffff);
+  background: var(--app-surface-1, #ffffff);
 }
 
 .bottleneck-command-panel > header,
@@ -57,7 +59,9 @@
   border: 1px solid var(--border-subtle, #d7dee8);
   border-radius: 8px;
   padding: 10px;
-  background: var(--surface, #f8fafc);
+  /* --surface doesn't exist anywhere -- fixed to the real, theme-aware
+     --app-surface-muted. */
+  background: var(--app-surface-muted, #f8fafc);
 }
 
 .bottleneck-impact-card {

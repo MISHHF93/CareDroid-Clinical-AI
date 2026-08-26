@@ -783,8 +783,14 @@
 }
 
 .patient-card__vital {
+  /* Border was always-visible neutral gray on every vital chip, in every
+     state -- a grid of 4 hard-edged boxes per card that reads as decoration,
+     not signal. The background tint alone already separates each chip from
+     the card; kept a transparent 1px border (not none) purely to reserve the
+     same layout width so --critical/--warning below don't shift the grid
+     when their border becomes a real clinical cue. */
   background: color-mix(in srgb, var(--color-floating-surface) 64%, transparent);
-  border: 1px solid var(--component-inner-surface-border);
+  border: 1px solid transparent;
   border-radius: 10px;
   color: var(--color-text-primary);
   display: grid;

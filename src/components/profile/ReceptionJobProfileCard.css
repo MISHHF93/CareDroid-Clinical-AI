@@ -1,10 +1,17 @@
+/* This file's original --cdl-text-primary/--cdl-text-secondary/--cdl-border-default/
+   --cdl-border-subtle names don't exist in the cdl-v2 design system (src/styles/cdl-v2/
+   theme.css) -- its real token names are --cdl-ink/--cdl-ink-muted/--cdl-border. Since
+   the guessed names were never defined anywhere, every color() below always fell back
+   to its literal light-mode hex, most visibly on .reception-job-profile-card__guardrail:
+   confirmed live in dark mode, its text rendered as rgb(15,23,42) on a
+   rgba(15,23,42,0.65) background -- functionally invisible. Swapped to the real tokens. */
 .reception-job-profile-card {
   display: flex;
   flex-direction: column;
   gap: 0.85rem;
   padding: 1rem 1.1rem;
   border-radius: var(--cdl-radius-md, 0.5rem);
-  border: 1px solid var(--cdl-border-subtle, rgba(15, 23, 42, 0.1));
+  border: 1px solid var(--cdl-border, rgba(15, 23, 42, 0.1));
   background: var(--cdl-surface-muted, #f8fafc);
   margin-top: 1rem;
 }
@@ -23,19 +30,19 @@
   font-weight: 650;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--cdl-text-secondary, #64748b);
+  color: var(--cdl-ink-muted, #64748b);
 }
 
 .reception-job-profile-card__title {
   margin: 0.2rem 0 0;
   font-size: 1.05rem;
-  color: var(--cdl-text-primary, #0f172a);
+  color: var(--cdl-ink, #0f172a);
 }
 
 .reception-job-profile-card__description {
   margin: 0.35rem 0 0;
   font-size: var(--cdl-text-sm, 0.875rem);
-  color: var(--cdl-text-secondary, #64748b);
+  color: var(--cdl-ink-muted, #64748b);
   max-width: 40rem;
 }
 
@@ -68,7 +75,7 @@
   border-left: 3px solid var(--cdl-brand-500, #0ea5e9);
   background: var(--cdl-surface-card, #fff);
   font-size: var(--cdl-text-sm, 0.875rem);
-  color: var(--cdl-text-primary, #0f172a);
+  color: var(--cdl-ink, #0f172a);
 }
 
 .reception-job-profile-card__skills h4,
@@ -102,7 +109,7 @@
 }
 
 .reception-job-profile-card__skills span {
-  color: var(--cdl-text-secondary, #64748b);
+  color: var(--cdl-ink-muted, #64748b);
 }
 
 .reception-job-profile-card__shortcuts li {
@@ -117,7 +124,7 @@
   min-width: 5.5rem;
   padding: 0.15rem 0.4rem;
   border-radius: 0.25rem;
-  border: 1px solid var(--cdl-border-default, #cbd5e1);
+  border: 1px solid var(--cdl-border, #cbd5e1);
   background: var(--cdl-surface-card, #fff);
   font-size: 0.7rem;
   font-family: ui-monospace, monospace;
@@ -127,7 +134,7 @@
 .reception-job-profile-card__empty {
   margin: 0;
   font-size: var(--cdl-text-sm, 0.875rem);
-  color: var(--cdl-text-secondary, #64748b);
+  color: var(--cdl-ink-muted, #64748b);
 }
 
 html[data-theme='dark'] .reception-job-profile-card {

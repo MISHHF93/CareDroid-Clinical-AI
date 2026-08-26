@@ -212,12 +212,11 @@
   background: var(--color-card);
   border-radius: var(--radius-xl);
   overflow: hidden;
-  border: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
-  /* Matches .dashboard-visual-panel's elevation (the "Daily Patient Volume"
-     card directly below this strip) -- without it, this strip's border
-     alone (rgb(226,232,240) on white) reads as no border at all, while an
-     identically-colored bordered sibling with this same shadow token reads
-     as a properly defined card. */
+  /* Softened from a fully-opaque border -- the shadow below (already present,
+     see the original note this replaces) now carries more of the definition,
+     matching the shadow-led-elevation modernization applied to
+     DashboardVisualizations.css's cards just below this strip. */
+  border: 1px solid color-mix(in srgb, var(--color-border-subtle, var(--medical-border, #e0f2fe)) 60%, transparent);
   box-shadow: var(--shadow-1);
 }
 

@@ -45,6 +45,9 @@
   --ml-status-critical: #b91c1c; /* red — immediate */
   --ml-status-warning-bg: color-mix(in srgb, var(--ml-status-warning) 12%, white);
   --ml-status-critical-bg: color-mix(in srgb, var(--ml-status-critical) 12%, white);
+  /* Missing sibling of the two above -- referenced by StreamingResponse.css/
+     ActionProposalCard.css but never actually defined. */
+  --ml-status-success-bg: color-mix(in srgb, var(--ml-status-success) 12%, white);
 
   /* —— AI purple (labelled assistant chrome only) —— */
   --ml-ai-purple: #7c3aed;

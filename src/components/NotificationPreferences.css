@@ -366,6 +366,10 @@ input:checked + .slider:before {
 }
 
 .save-confirmation {
+  /* Was a bare 1000 -- this is a toast-shaped success notification
+     (bottom-right, slide-in), so it belongs at --z-toast (900, the real
+     live-verified value from shell-tokens.css) like every other toast, not
+     tied with an unrelated real drawer that also happens to sit at 1000. */
   position: fixed;
   bottom: 2rem;
   right: 2rem;
@@ -375,7 +379,7 @@ input:checked + .slider:before {
   border-radius: 8px;
   box-shadow: 0 4px 12px color-mix(in srgb, var(--app-success) 30%, transparent);
   animation: slideInRight 0.3s ease;
-  z-index: 1000;
+  z-index: var(--z-toast, 900);
 }
 
 @keyframes slideInRight {
@@ -666,13 +670,16 @@ input:checked + .slider:before {
 }
 
 .notification-confirm-backdrop {
+  /* Was a bare 1000 -- this is a genuine modal backdrop (fixed inset, scrim,
+     centered dialog), so it belongs at --z-modal (800, real live-verified
+     value) like every other modal, not tied with an unrelated drawer. */
   position: fixed;
   inset: 0;
   display: grid;
   place-items: center;
   padding: 1rem;
   background: rgba(0, 0, 0, 0.45);
-  z-index: 1000;
+  z-index: var(--z-modal, 800);
 }
 
 .notification-confirm-dialog {

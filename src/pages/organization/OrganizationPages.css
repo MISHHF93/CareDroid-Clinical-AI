@@ -1,3 +1,8 @@
+/* --muted/--muted-foreground/--card are a shadcn/ui-style naming convention
+   this codebase doesn't actually use (it uses cdl-v2's --cdl-surface-*/--cdl-
+   ink-* family) -- none of the three were ever defined, so every use always
+   fell back to its literal light-mode-only hex regardless of theme. Fixed to
+   the real, theme-aware --cdl-surface-muted/--cdl-ink-muted/--cdl-surface-card. */
 .org-page {
   padding: 1.5rem;
   max-width: 1100px;
@@ -84,7 +89,7 @@
 
 .org-pack-meta {
   font-size: 0.85rem;
-  color: var(--muted-foreground, #64748b);
+  color: var(--cdl-ink-muted, #64748b);
 }
 
 .org-pack-card-header {
@@ -108,8 +113,8 @@
 .org-chip {
   border-radius: 999px;
   padding: 0.2rem 0.55rem;
-  background: var(--muted, #f1f5f9);
-  color: var(--muted-foreground, #475569);
+  background: var(--cdl-surface-muted, #f1f5f9);
+  color: var(--cdl-ink-muted, #475569);
   font-size: 0.76rem;
 }
 
@@ -139,7 +144,7 @@
 }
 
 .org-asset-list small {
-  color: var(--muted-foreground, #64748b);
+  color: var(--cdl-ink-muted, #64748b);
 }
 
 .org-warning-list {
@@ -169,15 +174,15 @@
 
 .org-integration-row small {
   display: block;
-  color: var(--muted-foreground, #64748b);
+  color: var(--cdl-ink-muted, #64748b);
 }
 
 .org-status-pill {
   border-radius: 999px;
   padding: 0.2rem 0.55rem;
   font-size: 0.75rem;
-  background: var(--muted, #f1f5f9);
-  color: var(--muted-foreground, #475569);
+  background: var(--cdl-surface-muted, #f1f5f9);
+  color: var(--cdl-ink-muted, #475569);
 }
 
 .org-status-pill--enabled {
@@ -286,7 +291,7 @@
 }
 
 .org-analytics-list small {
-  color: var(--muted-foreground, #64748b);
+  color: var(--cdl-ink-muted, #64748b);
 }
 
 .org-department-grid {
@@ -303,7 +308,7 @@
   padding: 0.85rem;
   border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: 0.85rem;
-  background: var(--card, #fff);
+  background: var(--cdl-surface-card, #fff);
   color: inherit;
   cursor: pointer;
 }
@@ -314,7 +319,7 @@
 }
 
 .org-department-card span {
-  color: var(--muted-foreground, #64748b);
+  color: var(--cdl-ink-muted, #64748b);
   font-size: 0.82rem;
 }
 

@@ -1,7 +1,10 @@
+/* Fallback corrected 1100->800: design-tokens.css had a second, dead/shadowed
+   --z-modal definition that shell-tokens.css's later @import always overrode
+   -- see NotificationToast.css for the full explanation. */
 .help-hub-backdrop {
   position: fixed;
   inset: 0;
-  z-index: var(--z-modal, 1100);
+  z-index: var(--z-modal, 800);
   background: color-mix(in srgb, var(--medical-ink, #111827) 28%, transparent);
 }
 
@@ -9,7 +12,7 @@
   position: fixed;
   inset-block: 0;
   inset-inline-end: 0;
-  z-index: calc(var(--z-modal, 1100) + 1);
+  z-index: calc(var(--z-modal, 800) + 1);
   display: flex;
   flex-direction: column;
   width: min(100%, 680px);

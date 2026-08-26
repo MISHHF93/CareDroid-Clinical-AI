@@ -1,5 +1,7 @@
 .pre-arrival-form {
-  border: 1px solid var(--color-border, #d8dee8);
+  /* Was var(--color-border, #d8dee8) -- --color-border is never defined anywhere;
+     --medical-border is the real, theme-aware border token (13-file fix). */
+  border: 1px solid var(--medical-border, #d8dee8);
   border-radius: 10px;
   padding: 0.85rem 1rem;
   background: var(--color-surface-raised, var(--medical-card-muted-bg, #f1f5f9));
@@ -39,7 +41,7 @@
 }
 
 .pre-arrival-form__framework button {
-  border: 1px solid var(--color-border, #d8dee8);
+  border: 1px solid var(--medical-border, #d8dee8);
   background: #fff;
   border-radius: 999px;
   padding: 0.2rem 0.65rem;
@@ -91,7 +93,7 @@
   resize: vertical;
   min-height: 2.5rem;
   border-radius: 6px;
-  border: 1px solid var(--color-border, #d8dee8);
+  border: 1px solid var(--medical-border, #d8dee8);
   padding: 0.35rem 0.45rem;
   font: inherit;
 }

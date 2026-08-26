@@ -21,7 +21,13 @@ html {
   --status-info: var(--medical-accent);
   --primary-color: #374151;
   --accent-color: #374151;
-  --accent-green: #374151;
+  /* Was a static #374151 (dark slate) with no dark-mode override -- fine as text on a
+     light background, illegible on the dark, near-transparent tinted backgrounds several
+     components (e.g. ClinicalDocumentationAssistant's note-type chips) pair it with in
+     dark mode. Alias to the already theme-aware accent token instead, matching this
+     file's own --color-primary/--status-info right above. Confirmed live: the note-type
+     chip labels were nearly invisible in dark mode before this fix. */
+  --accent-green: var(--medical-accent);
   --bg-base: var(--medical-surface-page);
   --bg-surface: var(--medical-surface-card);
   --bg-elevated: var(--medical-surface-card);
@@ -134,7 +140,22 @@ html {
    red visual weight; combined with text-normalization.css's __link rule (see
    there) also overwriting the white text to link-blue, measured contrast
    drops to ~1.18:1 against the intended red background — effectively
-   invisible text on the app's single highest-severity alert action. */
+   invisible text on the app's single highest-severity alert action.
+   2026-08-25: swept every remaining "cta"-substring className app-wide again
+   (same discipline as Cycle 261/269) rather than assuming the prior sweeps
+   were exhaustive. One new hit, a different shape than any before: the
+   Whiteboard's "Card key" legend swatch, .emergency-whiteboard-page__card-
+   key-swatch--ctas (index.tsx) — CTAS here is the triage-acuity-scale
+   acronym, not a call-to-action, but [class*='cta'] substring-matches it
+   regardless. Its own CSS (emergency-whiteboard-cleanup.css) deliberately
+   paints it var(--priority-p1, #ef4444) red, matching its "CTAS band" label
+   right next to the actually-red Critical-risk swatch in the same legend —
+   this sweep was silently repainting it the same dark gray as every other
+   swept element, so two adjacent legend keys meant to look different (and
+   one of the four meant to be the app's own P1-priority red) rendered
+   identically. Confirmed live via computed style before fixing: injecting
+   the real className into the real app shell resolved to rgb(55, 65, 81),
+   this sweep's #374151, not the swatch's own red. */
 :is(.app-shell, .emergency-app-shell)
   :is([class*='--primary'], .btn-primary, [class*='cta']):not(.reception-desk-toolbar__action):not(
     .cdl-zone--primary-actions
@@ -144,7 +165,9 @@ html {
     .profile-section-header__cta
   ):not(.profile-activity-cta):not(.reception-attention__cta):not(.platform-entry__cta):not(
     .reception-queue-row__cta
-  ):not(.platform-entry__card--primary):not(.patient-orchestration__chip--primary):not(
+  ):not(.emergency-whiteboard-page__card-key-swatch--ctas):not(
+    .platform-entry__card--primary
+  ):not(.patient-orchestration__chip--primary):not(
     .reception-prepare__option--primary
   ):not(.entry-shell__link--primary):not(.account-menu__item--primary):not(
     .workflow-automation-command-bar__btn--primary

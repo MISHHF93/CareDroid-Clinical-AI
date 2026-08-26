@@ -1,5 +1,11 @@
 /* Full Journey Operating Page — replaces MEDICAL_THEME inline styles */
 
+/* --medical-text-status-critical (word order swapped) was never defined anywhere --
+   real token is --medical-status-critical-text (src/styles/medical-type-layer.css),
+   which previously had no dark-mode override, so critical text/borders (used directly
+   on card surfaces, not just pill backgrounds) rendered as low-contrast dark red on
+   dark backgrounds. Both fixed this cycle. */
+
 .fj-status-chip {
   white-space: nowrap;
 }
@@ -29,7 +35,7 @@
 }
 
 .fj-metric-chip--warn {
-  border-color: var(--medical-text-status-critical, #b91c1c);
+  border-color: var(--medical-status-critical-text, #b91c1c);
 }
 
 .fj-metric-chip__value {
@@ -39,7 +45,7 @@
 }
 
 .fj-metric-chip--warn .fj-metric-chip__value {
-  color: var(--medical-text-status-critical, #b91c1c);
+  color: var(--medical-status-critical-text, #b91c1c);
 }
 
 .fj-metric-chip__label {
@@ -93,18 +99,18 @@
 }
 
 .fj-text-critical {
-  color: var(--medical-text-status-critical, #b91c1c);
+  color: var(--medical-status-critical-text, #b91c1c);
 }
 
 .fj-text-critical-13 {
-  color: var(--medical-text-status-critical, #b91c1c);
+  color: var(--medical-status-critical-text, #b91c1c);
   font-size: 13px;
 }
 
 .fj-text-critical-11 {
   font-size: 11px;
   font-weight: 800;
-  color: var(--medical-text-status-critical, #b91c1c);
+  color: var(--medical-status-critical-text, #b91c1c);
 }
 
 .fj-text-ok {
@@ -137,7 +143,7 @@
 }
 
 .fj-text-critical-flex {
-  color: var(--medical-text-status-critical, #b91c1c);
+  color: var(--medical-status-critical-text, #b91c1c);
   flex-shrink: 0;
 }
 
@@ -190,7 +196,7 @@
   padding: 8px 14px;
   border-radius: 8px;
   background: var(--medical-accent, #64748b);
-  color: var(--medical-on-accent, #ffffff);
+  color: var(--medical-text-on-accent, #ffffff);
   font-weight: 700;
   font-size: 13px;
   border: none;
@@ -200,7 +206,7 @@
 .fj-btn-critical {
   padding: 4px 10px;
   border-radius: 6px;
-  background: var(--medical-text-status-critical, #b91c1c);
+  background: var(--medical-status-critical-text, #b91c1c);
   color: #fff;
   border: none;
   font-size: 11px;
@@ -224,7 +230,7 @@
 
 .fj-btn-toggle--off {
   background: var(--medical-accent, #64748b);
-  color: var(--medical-on-accent, #ffffff);
+  color: var(--medical-text-on-accent, #ffffff);
 }
 
 .fj-alert-box {
@@ -263,7 +269,7 @@
 
 .fj-priority-badge[data-priority='stat'],
 .fj-priority-badge[data-priority='critical'] {
-  color: var(--medical-text-status-critical, #b91c1c);
+  color: var(--medical-status-critical-text, #b91c1c);
 }
 
 .fj-priority-badge[data-priority='urgent'] {
@@ -305,7 +311,7 @@
 
 .fj-plan-status--overdue {
   background: rgba(239, 68, 68, 0.12);
-  color: var(--medical-text-status-critical, #b91c1c);
+  color: var(--medical-status-critical-text, #b91c1c);
 }
 
 .fj-plan-status--ready {
@@ -367,7 +373,7 @@
 }
 
 .fj-plan-card--overdue {
-  border-color: var(--medical-text-status-critical, #b91c1c);
+  border-color: var(--medical-status-critical-text, #b91c1c);
 }
 
 .fj-plan-card--ready {
@@ -410,7 +416,7 @@
   padding: 10px 16px;
   border-radius: 8px;
   background: rgba(239, 68, 68, 0.1);
-  border: 2px solid var(--medical-text-status-critical, #b91c1c);
+  border: 2px solid var(--medical-status-critical-text, #b91c1c);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -424,7 +430,7 @@
 .fj-critical-banner__cta {
   padding: 6px 12px;
   border-radius: 6px;
-  background: var(--medical-text-status-critical, #b91c1c);
+  background: var(--medical-status-critical-text, #b91c1c);
   color: #fff;
   font-weight: 700;
   font-size: 12px;
@@ -436,7 +442,7 @@
   padding: 10px 14px;
   border-radius: 8px;
   background: rgba(239, 68, 68, 0.1);
-  border: 2px solid var(--medical-text-status-critical, #b91c1c);
+  border: 2px solid var(--medical-status-critical-text, #b91c1c);
 }
 
 .fj-metric-count-ok {
@@ -444,11 +450,11 @@
 }
 
 .fj-metric-count-bad {
-  color: var(--medical-text-status-critical, #b91c1c);
+  color: var(--medical-status-critical-text, #b91c1c);
 }
 
 .fj-severity-critical {
-  color: var(--medical-text-status-critical, #b91c1c);
+  color: var(--medical-status-critical-text, #b91c1c);
 }
 
 .fj-severity-warn {
@@ -456,7 +462,7 @@
 }
 
 .emergency-command-action__tone--critical {
-  background-color: var(--medical-text-status-critical, #b91c1c);
+  background-color: var(--medical-status-critical-text, #b91c1c);
 }
 
 .emergency-command-action__tone--warning {

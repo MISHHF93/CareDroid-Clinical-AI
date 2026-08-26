@@ -417,9 +417,11 @@
 }
 
 :is(.app-shell, .emergency-app-shell) .command-compact-action--primary {
+  /* --workspace-os-accent doesn't exist -- the real, theme-aware accent token is
+     --app-accent. */
   background: linear-gradient(
     135deg,
-    color-mix(in srgb, var(--workspace-os-accent, #374151) 22%, var(--app-surface-2)),
+    color-mix(in srgb, var(--app-accent, #374151) 22%, var(--app-surface-2)),
     var(--app-surface-2)
   );
   box-shadow: var(--app-elevation-card, var(--shadow-1));

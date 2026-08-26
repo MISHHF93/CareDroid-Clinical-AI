@@ -8,6 +8,10 @@
   background: rgba(15, 23, 42, 0.45);
 }
 
+/* --cdl-border-subtle/--cdl-text-secondary/--cdl-border-default/--cdl-shadow-lg don't
+   exist in the cdl-v2 design system -- real names are --cdl-border, --cdl-ink-muted,
+   and --cdl-elev-3 (src/styles/cdl-v2/theme.css). Same bug class already fixed in
+   ReceptionJobProfileCard.css and ReceptionSkillStrip.css. */
 .reception-shift-clearance__panel {
   width: min(28rem, 100%);
   max-height: min(88vh, 34rem);
@@ -15,8 +19,8 @@
   padding: 1rem 1.1rem;
   border-radius: var(--cdl-radius-lg, 0.75rem);
   background: var(--cdl-surface-card, #fff);
-  border: 1px solid var(--cdl-border-subtle, rgba(15, 23, 42, 0.12));
-  box-shadow: var(--cdl-shadow-lg, 0 16px 40px rgba(15, 23, 42, 0.2));
+  border: 1px solid var(--cdl-border, rgba(15, 23, 42, 0.12));
+  box-shadow: var(--cdl-elev-3, 0 16px 40px rgba(15, 23, 42, 0.2));
 }
 
 .reception-shift-clearance__header {
@@ -34,7 +38,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  color: var(--cdl-text-secondary, #64748b);
+  color: var(--cdl-ink-muted, #64748b);
 }
 
 .reception-shift-clearance__header h2 {
@@ -45,14 +49,14 @@
 .reception-shift-clearance__intro {
   margin: 0.35rem 0 0;
   font-size: var(--cdl-text-sm, 0.875rem);
-  color: var(--cdl-text-secondary, #64748b);
+  color: var(--cdl-ink-muted, #64748b);
 }
 
 .reception-shift-clearance__close {
   border: none;
   background: transparent;
   cursor: pointer;
-  color: var(--cdl-text-secondary, #64748b);
+  color: var(--cdl-ink-muted, #64748b);
   padding: 0.25rem;
 }
 
@@ -69,7 +73,7 @@
   width: 100%;
   padding: 0.65rem 0.4rem;
   border-radius: var(--cdl-radius-sm, 0.375rem);
-  border: 1px solid var(--cdl-border-subtle, rgba(15, 23, 42, 0.1));
+  border: 1px solid var(--cdl-border, rgba(15, 23, 42, 0.1));
   background: var(--cdl-surface-muted, #f8fafc);
   cursor: pointer;
   display: flex;
@@ -85,7 +89,7 @@
 
 .reception-shift-clearance__counts span {
   font-size: 0.7rem;
-  color: var(--cdl-text-secondary, #64748b);
+  color: var(--cdl-ink-muted, #64748b);
   text-align: center;
 }
 
@@ -117,7 +121,7 @@
 }
 
 .reception-shift-clearance__list small {
-  color: var(--cdl-text-secondary, #64748b);
+  color: var(--cdl-ink-muted, #64748b);
   font-size: var(--cdl-text-xs, 0.75rem);
 }
 
@@ -140,13 +144,15 @@
 }
 
 .reception-shift-clearance__secondary {
-  border: 1px solid var(--cdl-border-default, #cbd5e1);
+  border: 1px solid var(--cdl-border, #cbd5e1);
   background: transparent;
 }
 
 .reception-shift-clearance__primary {
-  border: 1px solid var(--cdl-brand-600, #0284c7);
-  background: var(--cdl-brand-600, #0284c7);
+  /* Fixed, not theme-toggling -- see the identical note in ReceptionJobProfileCard.css.
+     --cdl-brand-600 fails WCAG AA with white text in both themes; #075985 gives 7.56:1. */
+  border: 1px solid #075985;
+  background: #075985;
   color: #fff;
 }
 
