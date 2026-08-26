@@ -65,9 +65,16 @@ export class GovernanceController {
 
   @Get('governance/clinical/policies')
   @Permissions(Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS)
-  async getClinicalPolicies() {
+  async getClinicalPolicies(@Req() req: any) {
     if (this.platformGovernanceService) {
-      return this.platformGovernanceService.listPolicies();
+      // HEAL-347.58: previously unscoped -- returned every organization's
+      // clinical-safety policies to any CONFIGURE_SYSTEM+VIEW_AUDIT_LOGS
+      // holder (any hospital's own admin), and handed out other orgs'
+      // policyIds for free to feed into the update/approve BOLA below.
+      return this.platformGovernanceService.listPolicies(
+        undefined,
+        req.tenantContext?.organizationId,
+      );
     }
     return this.platformSystemsService.demo('clinical-governance');
   }
@@ -75,9 +82,15 @@ export class GovernanceController {
   @Post('governance/clinical/policies')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS)
-  async createClinicalPolicy(@Body() body: CreateClinicalPolicyDto) {
+  async createClinicalPolicy(@Body() body: CreateClinicalPolicyDto, @Req() req: any) {
     if (this.platformGovernanceService) {
-      return this.platformGovernanceService.createPolicy({ ...body });
+      // HEAL-347.58: previously trusted CreateClinicalPolicyDto's own
+      // client-settable organizationId verbatim, same anti-pattern already
+      // fixed for createReviewItem (HEAL-347.22, platform-governance.controller.ts).
+      return this.platformGovernanceService.createPolicy({
+        ...body,
+        organizationId: req.tenantContext?.organizationId,
+      });
     }
     return this.platformSystemsService.demo('clinical-governance', 'policy-draft', { ...body });
   }
@@ -87,9 +100,17 @@ export class GovernanceController {
   async updateClinicalPolicy(
     @Param('policyId') policyId: string,
     @Body() body: UpdateClinicalPolicyDto,
+    @Req() req: any,
   ) {
     if (this.platformGovernanceService) {
-      const result = await this.platformGovernanceService.updatePolicy(policyId, { ...body });
+      // HEAL-347.58: previously resolved the policy by policyId alone --
+      // any CONFIGURE_SYSTEM+VIEW_AUDIT_LOGS holder could overwrite another
+      // hospital's clinical-safety policy content/version/status.
+      const result = await this.platformGovernanceService.updatePolicy(
+        policyId,
+        { ...body },
+        req.tenantContext?.organizationId,
+      );
       if (result) return result;
     }
     return this.platformSystemsService.demo('clinical-governance', policyId, { ...body });
@@ -101,9 +122,16 @@ export class GovernanceController {
   async approveClinicalPolicy(
     @Param('policyId') policyId: string,
     @Body() body: GovernanceDecisionDto,
+    @Req() req: any,
   ) {
     if (this.platformGovernanceService) {
-      const result = await this.platformGovernanceService.approvePolicy(policyId, { ...body });
+      // HEAL-347.58: same gap as updateClinicalPolicy above -- could flip
+      // another org's policy to ACTIVE and stamp an approvedBy on it.
+      const result = await this.platformGovernanceService.approvePolicy(
+        policyId,
+        { ...body },
+        req.tenantContext?.organizationId,
+      );
       if (result) return result;
     }
     return this.platformSystemsService.demo('clinical-governance', policyId, { ...body });
@@ -600,9 +628,16 @@ export class GovernanceController {
   @Post('review/items')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.VIEW_AUDIT_LOGS)
-  async createReviewItem(@Body() body: CreateReviewItemDto) {
+  async createReviewItem(@Body() body: CreateReviewItemDto, @Req() req: any) {
     if (this.platformGovernanceService) {
-      return this.platformGovernanceService.createReviewItem({ ...body });
+      // HEAL-347.58: previously trusted CreateReviewItemDto's own
+      // client-settable organizationId verbatim -- same anti-pattern
+      // already fixed once for this exact route on the sibling
+      // PlatformGovernanceController (HEAL-347.22).
+      return this.platformGovernanceService.createReviewItem({
+        ...body,
+        organizationId: req.tenantContext?.organizationId,
+      });
     }
     return this.platformSystemsService.demo('human-review-queue', 'review-item', { ...body });
   }

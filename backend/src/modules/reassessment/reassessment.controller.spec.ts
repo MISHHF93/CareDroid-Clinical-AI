@@ -63,11 +63,37 @@ describe('ReassessmentController', () => {
       notes: 'improved',
       clinician: 'Dr. Lee',
     });
-    expect(service.reassessPatient).toHaveBeenCalledWith('p1', 2, 'improved', undefined, 'Dr. Lee');
+    expect(service.reassessPatient).toHaveBeenCalledWith(
+      'p1',
+      2,
+      'improved',
+      undefined,
+      'Dr. Lee',
+      undefined,
+    );
     expect(result).toEqual({
       message: 'Reassessment recorded',
       patient: { id: 'p1', dps_score: 3 },
     });
+  });
+
+  // Regression for HEAL-347.55: reassess()/dismiss() are POST .../:patientId
+  // write endpoints -- before this fix they never forwarded the resolved
+  // tenant organizationId to the service at all, so the service had no way
+  // to reject a cross-org patientId. Proves the resolved tenant context now
+  // reaches the service, same pattern as due()'s HEAL-347.54 regression test.
+  it('reassess() forwards the resolved tenant organizationId to the service', async () => {
+    await controller.reassess('p1', { new_dps_score: 2, notes: 'improved', clinician: 'Dr. Lee' }, {
+      organizationId: 'org-1',
+    } as any);
+    expect(service.reassessPatient).toHaveBeenCalledWith(
+      'p1',
+      2,
+      'improved',
+      undefined,
+      'Dr. Lee',
+      'org-1',
+    );
   });
 
   it('reassess() maps a "not found" service error to NotFoundException', async () => {
@@ -88,8 +114,25 @@ describe('ReassessmentController', () => {
 
   it('dismiss() delegates to the service', async () => {
     const result = await controller.dismiss('p1', { reason: 'discharged', clinician: 'Dr. Lee' });
-    expect(service.dismissReassessment).toHaveBeenCalledWith('p1', 'discharged', 'Dr. Lee');
+    expect(service.dismissReassessment).toHaveBeenCalledWith(
+      'p1',
+      'discharged',
+      'Dr. Lee',
+      undefined,
+    );
     expect(result).toEqual({ message: 'Reassessment dismissed', patient: { id: 'p1' } });
+  });
+
+  it('dismiss() forwards the resolved tenant organizationId to the service', async () => {
+    await controller.dismiss('p1', { reason: 'discharged', clinician: 'Dr. Lee' }, {
+      organizationId: 'org-1',
+    } as any);
+    expect(service.dismissReassessment).toHaveBeenCalledWith(
+      'p1',
+      'discharged',
+      'Dr. Lee',
+      'org-1',
+    );
   });
 });
 

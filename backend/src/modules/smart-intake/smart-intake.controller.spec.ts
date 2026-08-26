@@ -44,18 +44,18 @@ describe('SmartIntakeController', () => {
 
   it('createSession() resolves actor from staff and returns sessionId + session', async () => {
     const result = await controller.createSession({ staff: 'Nurse Joy' });
-    expect(service.createSession).toHaveBeenCalledWith('Nurse Joy');
+    expect(service.createSession).toHaveBeenCalledWith('Nurse Joy', undefined);
     expect(result).toEqual({ sessionId: 'session-1', session: { _id: 'session-1' } });
   });
 
   it('createSession() falls back to the x-caredroid-user-id header when no staff/clinician given', async () => {
     await controller.createSession({}, 'user-header-id');
-    expect(service.createSession).toHaveBeenCalledWith('user-header-id');
+    expect(service.createSession).toHaveBeenCalledWith('user-header-id', undefined);
   });
 
   it('createSession() falls back to unknown-staff when nothing identifies the actor', async () => {
     await controller.createSession({});
-    expect(service.createSession).toHaveBeenCalledWith('unknown-staff');
+    expect(service.createSession).toHaveBeenCalledWith('unknown-staff', undefined);
   });
 
   it('createSession() throws ServiceUnavailableException when MongoDB is not connected', async () => {
@@ -65,12 +65,12 @@ describe('SmartIntakeController', () => {
 
   it('manualEntry() unwraps the manual field before delegating', async () => {
     await controller.manualEntry('s1', { manual: { firstName: 'Jo' }, staff: 'a' });
-    expect(service.addManualEntry).toHaveBeenCalledWith('s1', { firstName: 'Jo' }, 'a');
+    expect(service.addManualEntry).toHaveBeenCalledWith('s1', { firstName: 'Jo' }, 'a', undefined);
   });
 
   it('documents() unwraps the document field before delegating', async () => {
     await controller.documents('s1', { document: { type: 'id_card' }, staff: 'a' });
-    expect(service.addDocument).toHaveBeenCalledWith('s1', { type: 'id_card' }, 'a');
+    expect(service.addDocument).toHaveBeenCalledWith('s1', { type: 'id_card' }, 'a', undefined);
   });
 
   it('ocrResults() passes the whole body through, matching the real caller spread shape', async () => {
@@ -79,12 +79,63 @@ describe('SmartIntakeController', () => {
       's1',
       { demographics: { firstName: 'Jo' }, staff: 'a' },
       'a',
+      undefined,
     );
   });
 
   it('emsEvidence() unwraps the ems field before delegating', async () => {
     await controller.emsEvidence('s1', { ems: { emsUnitId: 'unit-1' }, staff: 'a' });
-    expect(service.addEMSEvidence).toHaveBeenCalledWith('s1', { emsUnitId: 'unit-1' }, 'a');
+    expect(service.addEMSEvidence).toHaveBeenCalledWith(
+      's1',
+      { emsUnitId: 'unit-1' },
+      'a',
+      undefined,
+    );
+  });
+
+  // Regression for HEAL-347.59: this Mongoose intake-session model (and its
+  // getSession() chokepoint every method below reads/writes through) had no
+  // organizationId field or check at all before this fix -- these tests
+  // prove the resolved tenant context now reaches the service on every
+  // write path, same pattern as HEAL-347.49's match()/createPatient()/etc.
+  // regression tests just below.
+  it('forwards the resolved tenant organizationId on createSession/manualEntry/documents/ocrResults/emsEvidence', async () => {
+    const tenantContext = { organizationId: 'org-1' } as never;
+
+    await controller.createSession({ staff: 'a' }, undefined, tenantContext);
+    expect(service.createSession).toHaveBeenCalledWith('a', 'org-1');
+
+    await controller.manualEntry(
+      's1',
+      { manual: { firstName: 'Jo' }, staff: 'a' },
+      undefined,
+      tenantContext,
+    );
+    expect(service.addManualEntry).toHaveBeenCalledWith('s1', { firstName: 'Jo' }, 'a', 'org-1');
+
+    await controller.documents(
+      's1',
+      { document: { type: 'id_card' }, staff: 'a' },
+      undefined,
+      tenantContext,
+    );
+    expect(service.addDocument).toHaveBeenCalledWith('s1', { type: 'id_card' }, 'a', 'org-1');
+
+    await controller.ocrResults('s1', { staff: 'a' }, undefined, tenantContext);
+    expect(service.ingestOcrResult).toHaveBeenCalledWith('s1', { staff: 'a' }, 'a', 'org-1');
+
+    await controller.emsEvidence(
+      's1',
+      { ems: { emsUnitId: 'unit-1' }, staff: 'a' },
+      undefined,
+      tenantContext,
+    );
+    expect(service.addEMSEvidence).toHaveBeenCalledWith(
+      's1',
+      { emsUnitId: 'unit-1' },
+      'a',
+      'org-1',
+    );
   });
 
   it('match() delegates to the service', async () => {
@@ -114,7 +165,31 @@ describe('SmartIntakeController', () => {
       edited_value: 'Smith',
       staff: 'a',
     });
-    expect(service.verifyField).toHaveBeenCalledWith('s1', 'lastName', 'edited', 'a', 'Smith');
+    expect(service.verifyField).toHaveBeenCalledWith(
+      's1',
+      'lastName',
+      'edited',
+      'a',
+      'Smith',
+      undefined,
+    );
+  });
+
+  it('verifyField() forwards the resolved tenant organizationId to the service', async () => {
+    await controller.verifyField(
+      's1',
+      { field: 'lastName', decision: 'edited', edited_value: 'Smith', staff: 'a' },
+      undefined,
+      { organizationId: 'org-1' } as never,
+    );
+    expect(service.verifyField).toHaveBeenCalledWith(
+      's1',
+      'lastName',
+      'edited',
+      'a',
+      'Smith',
+      'org-1',
+    );
   });
 
   it('linkPatient() throws BadRequestException when patientId is missing', async () => {
@@ -125,7 +200,14 @@ describe('SmartIntakeController', () => {
 
   it('linkPatient() delegates to the service', async () => {
     await controller.linkPatient('s1', { patientId: 'p1', staff: 'a' });
-    expect(service.linkPatient).toHaveBeenCalledWith('s1', 'p1', 'a');
+    expect(service.linkPatient).toHaveBeenCalledWith('s1', 'p1', 'a', undefined);
+  });
+
+  it('linkPatient() forwards the resolved tenant organizationId to the service', async () => {
+    await controller.linkPatient('s1', { patientId: 'p1', staff: 'a' }, undefined, {
+      organizationId: 'org-1',
+    } as never);
+    expect(service.linkPatient).toHaveBeenCalledWith('s1', 'p1', 'a', 'org-1');
   });
 
   it('createPatient() delegates to the service', async () => {
@@ -176,17 +258,42 @@ describe('SmartIntakeController', () => {
       's1',
       { consentGranted: true, staff: 'a' },
       'a',
+      undefined,
     );
   });
 
   it('withdrawBiometricConsent() delegates to the service', async () => {
     await controller.withdrawBiometricConsent('s1', { staff: 'a' });
-    expect(service.withdrawBiometricConsent).toHaveBeenCalledWith('s1', 'a');
+    expect(service.withdrawBiometricConsent).toHaveBeenCalledWith('s1', 'a', undefined);
   });
 
   it('auditLog() wraps the result with a count', async () => {
     const result = await controller.auditLog('s1');
     expect(result).toEqual({ count: 1, auditLog: [{ id: 'audit-1' }] });
+    expect(service.getAuditLog).toHaveBeenCalledWith('s1', undefined);
+  });
+
+  it('forwards the resolved tenant organizationId on biometricConsent/withdrawBiometricConsent/auditLog', async () => {
+    const tenantContext = { organizationId: 'org-1' } as never;
+
+    await controller.biometricConsent(
+      's1',
+      { consentGranted: true, staff: 'a' },
+      undefined,
+      tenantContext,
+    );
+    expect(service.captureBiometricConsent).toHaveBeenCalledWith(
+      's1',
+      { consentGranted: true, staff: 'a' },
+      'a',
+      'org-1',
+    );
+
+    await controller.withdrawBiometricConsent('s1', { staff: 'a' }, undefined, tenantContext);
+    expect(service.withdrawBiometricConsent).toHaveBeenCalledWith('s1', 'a', 'org-1');
+
+    await controller.auditLog('s1', tenantContext);
+    expect(service.getAuditLog).toHaveBeenCalledWith('s1', 'org-1');
   });
 
   it('maps a "not found" service error to NotFoundException', async () => {

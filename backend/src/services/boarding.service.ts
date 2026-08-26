@@ -49,13 +49,29 @@ export class BoardingService extends EventEmitter {
 
   /**
    * Track decision-to-admit timestamp, the starting point for ED boarding.
+   *
+   * HEAL-347.57: this Mongoose boarding path (a live, mounted, non-canonical
+   * duplicate of the TypeORM boarding surface -- see the class doc comment
+   * above) resolved/wrote every patient by patientId alone with zero
+   * organizationId check, across trackDecisionToAdmit, calculateBoardMetrics,
+   * getBoardedPatients, and generateBoardReport -- any WRITE_PHI/READ_PHI
+   * caller from ANY hospital could start another org's patient's boarding
+   * clock, or list/aggregate every org's boarding queue. Same
+   * own-org-or-legacy-null convention as the rest of this sweep
+   * (reassessment.service.ts HEAL-347.55, ems.service.ts HEAL-347.56).
    */
   async trackDecisionToAdmit(
     patientId: string,
     clinicianId: string,
+    organizationId?: string | null,
   ): Promise<BoardingDecisionResult> {
     const patient = await Patient.findById(patientId);
-    if (!patient) throw new Error('Patient not found');
+    if (
+      !patient ||
+      (organizationId && patient.organizationId && patient.organizationId !== organizationId)
+    ) {
+      throw new Error('Patient not found');
+    }
 
     const timestamp = new Date();
     patient.decisionToAdmitTime = timestamp;
@@ -75,11 +91,13 @@ export class BoardingService extends EventEmitter {
     };
   }
 
-  async calculateBoardMetrics(): Promise<BoardingMetrics> {
+  async calculateBoardMetrics(organizationId?: string | null): Promise<BoardingMetrics> {
+    const orgClause = organizationId ? { $or: [{ organizationId }, { organizationId: null }] } : {};
     const boardingPatients = await Patient.find({
       boardingStartTime: { $ne: null },
       boardingStatus: 'boarding',
       current_state: { $nin: ['DISCHARGE', 'ADMISSION_COMPLETED'] },
+      ...orgClause,
     });
 
     const boardTimes = boardingPatients
@@ -122,8 +140,8 @@ export class BoardingService extends EventEmitter {
     };
   }
 
-  async generateBoardReport(): Promise<BoardReport> {
-    const metrics = await this.calculateBoardMetrics();
+  async generateBoardReport(organizationId?: string | null): Promise<BoardReport> {
+    const metrics = await this.calculateBoardMetrics(organizationId);
     let colorCode: BoardReport['colorCode'] = 'green';
     const recommendations: string[] = [];
 
@@ -161,10 +179,12 @@ export class BoardingService extends EventEmitter {
     };
   }
 
-  async getBoardedPatients(): Promise<IPatient[]> {
+  async getBoardedPatients(organizationId?: string | null): Promise<IPatient[]> {
+    const orgClause = organizationId ? { $or: [{ organizationId }, { organizationId: null }] } : {};
     return Patient.find({
       boardingStartTime: { $ne: null },
       boardingStatus: 'boarding',
+      ...orgClause,
     }).sort({ boardingStartTime: 1 });
   }
 

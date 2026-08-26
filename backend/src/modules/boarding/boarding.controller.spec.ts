@@ -50,12 +50,42 @@ describe('BoardingController', () => {
 
   it('trackDecision() delegates and spreads the decision result', async () => {
     const result = await controller.trackDecision({ patientId: 'p1', clinicianId: 'clin-1' });
-    expect(boardingService.trackDecisionToAdmit).toHaveBeenCalledWith('p1', 'clin-1');
+    expect(boardingService.trackDecisionToAdmit).toHaveBeenCalledWith('p1', 'clin-1', undefined);
     expect(result).toMatchObject({
       success: true,
       message: 'Decision to admit tracked',
       clinicianId: 'clin-1',
     });
+  });
+
+  // Regression for HEAL-347.57: trackDecision()/metrics()/report()/boarded()
+  // and HEAL-347.57's discharge-prediction sibling dischargeReadiness()/
+  // sameDayDischarges() previously never forwarded the resolved tenant
+  // organizationId to the service at all, so any WRITE_PHI/READ_PHI caller
+  // from ANY hospital could start another org's patient's boarding clock or
+  // read/aggregate every org's boarding queue. Proves the resolved tenant
+  // context now reaches every service call, same pattern as reassessment's
+  // HEAL-347.55 regression tests.
+  it('forwards the resolved tenant organizationId to every boarding/discharge service call', async () => {
+    const tenantContext = { organizationId: 'org-1' } as any;
+
+    await controller.trackDecision({ patientId: 'p1', clinicianId: 'clin-1' }, tenantContext);
+    expect(boardingService.trackDecisionToAdmit).toHaveBeenCalledWith('p1', 'clin-1', 'org-1');
+
+    await controller.metrics(tenantContext);
+    expect(boardingService.calculateBoardMetrics).toHaveBeenCalledWith('org-1');
+
+    await controller.report(tenantContext);
+    expect(boardingService.generateBoardReport).toHaveBeenCalledWith('org-1');
+
+    await controller.boarded(tenantContext);
+    expect(boardingService.getBoardedPatients).toHaveBeenCalledWith('org-1');
+
+    await controller.dischargeReadiness('p1', tenantContext);
+    expect(dischargeService.calculateDischargeReadiness).toHaveBeenCalledWith('p1', 'org-1');
+
+    await controller.sameDayDischarges(tenantContext);
+    expect(dischargeService.identifySameDayDischarges).toHaveBeenCalledWith('org-1');
   });
 
   it('trackDecision() maps a "not found" service error to NotFoundException', async () => {

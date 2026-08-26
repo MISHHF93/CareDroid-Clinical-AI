@@ -28,9 +28,24 @@ export interface DischargeReadiness {
 
 @Injectable()
 export class DischargePredictionService {
-  async calculateDischargeReadiness(patientId: string): Promise<DischargeReadiness> {
+  // HEAL-347.57: calculateDischargeReadiness() and identifySameDayDischarges()
+  // resolved/listed patients with zero organizationId check, and the former
+  // both reads AND writes (patient.dischargeReadinessScore) -- any READ_PHI
+  // caller from ANY hospital could read, and overwrite the discharge score
+  // on, another hospital's patient by guessing a patientId. Same
+  // own-org-or-legacy-null convention as boarding.service.ts (HEAL-347.57)
+  // and the rest of this sweep.
+  async calculateDischargeReadiness(
+    patientId: string,
+    organizationId?: string | null,
+  ): Promise<DischargeReadiness> {
     const patient = await Patient.findById(patientId);
-    if (!patient) throw new Error('Patient not found');
+    if (
+      !patient ||
+      (organizationId && patient.organizationId && patient.organizationId !== organizationId)
+    ) {
+      throw new Error('Patient not found');
+    }
     return this.scoreDischargeReadiness(patient);
   }
 
@@ -143,7 +158,7 @@ export class DischargePredictionService {
    * see scoreDischargeReadiness's checkPainControl comment. That's the safe direction for a
    * gap in the underlying data (silence, not a false recommendation).
    */
-  async identifySameDayDischarges(): Promise<IPatient[]> {
+  async identifySameDayDischarges(organizationId?: string | null): Promise<IPatient[]> {
     const now = new Date();
     const isMidday = now.getHours() >= 11 && now.getHours() <= 14;
     if (!isMidday) {
@@ -151,10 +166,20 @@ export class DischargePredictionService {
       return [];
     }
 
+    // Same $and-combine as reassessment.service.ts's getPatientsNeedingReassessment --
+    // this query already has its own `$or` (temperature), so the org filter's `$or`
+    // must be combined via `$and` rather than spread, or one would silently overwrite
+    // the other's `$or` key.
+    const tempClause = {
+      $or: [{ 'vitals.temperature': { $lte: 37.5 } }, { 'vitals.temperature': { $exists: false } }],
+    };
+    const orgClause = organizationId
+      ? { $or: [{ organizationId }, { organizationId: null }] }
+      : null;
     const candidates = await Patient.find({
       current_state: 'DISPOSITION',
       decisionToAdmitTime: null,
-      $or: [{ 'vitals.temperature': { $lte: 37.5 } }, { 'vitals.temperature': { $exists: false } }],
+      $and: orgClause ? [tempClause, orgClause] : [tempClause],
     });
 
     const readinessByPatient = await Promise.all(

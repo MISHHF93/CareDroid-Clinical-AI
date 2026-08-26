@@ -140,9 +140,21 @@ export class PlatformGovernanceService {
     };
   }
 
-  async listPolicies(capabilityId?: string) {
+  // HEAL-347.58: same class of gap as HEAL-338's reviewItems fix above --
+  // listPolicies/updatePolicy/approvePolicy resolved/listed clinical-safety
+  // policies with zero organizationId check, and createPolicy trusted a
+  // client-settable `organizationId` field on the request body verbatim
+  // instead of stamping the caller's own tenant context (the same
+  // already-fixed anti-pattern as createReviewItem's HEAL-347.22 comment in
+  // platform-governance.controller.ts). Any CONFIGURE_SYSTEM+VIEW_AUDIT_LOGS
+  // holder (any hospital's own admin) could list every org's clinical
+  // policies, or read/overwrite/approve another org's policy by policyId.
+  async listPolicies(capabilityId?: string, organizationId?: string) {
     return this.policies.find({
-      where: capabilityId ? { capabilityId } : {},
+      where: {
+        ...(capabilityId ? { capabilityId } : {}),
+        ...(organizationId ? { organizationId } : {}),
+      },
       order: { updatedAt: 'DESC' },
       take: 50,
     });
@@ -178,9 +190,14 @@ export class PlatformGovernanceService {
     return policy;
   }
 
-  async updatePolicy(policyId: string, input: Record<string, any> = {}) {
+  async updatePolicy(policyId: string, input: Record<string, any> = {}, organizationId?: string) {
     const policy = await this.policies.findOne({ where: { id: policyId } });
-    if (!policy) return null;
+    if (
+      !policy ||
+      (organizationId && policy.organizationId && policy.organizationId !== organizationId)
+    ) {
+      return null;
+    }
 
     policy.policyType = input.policyType || policy.policyType;
     policy.version = input.version || policy.version;
@@ -198,9 +215,18 @@ export class PlatformGovernanceService {
     return saved;
   }
 
-  async approvePolicy(policyId: string, decision: Record<string, any> = {}) {
+  async approvePolicy(
+    policyId: string,
+    decision: Record<string, any> = {},
+    organizationId?: string,
+  ) {
     const policy = await this.policies.findOne({ where: { id: policyId } });
-    if (!policy) return null;
+    if (
+      !policy ||
+      (organizationId && policy.organizationId && policy.organizationId !== organizationId)
+    ) {
+      return null;
+    }
 
     policy.status = PlatformGovernanceStatus.ACTIVE;
     policy.approvedBy = decision.approvedBy;

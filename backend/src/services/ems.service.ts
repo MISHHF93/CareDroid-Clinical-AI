@@ -28,7 +28,17 @@ type EMSStatus = 'dispatched' | 'on_scene' | 'en_route' | 'arrived';
 
 @Injectable()
 export class EMSService {
-  async createPrehospitalAlert(alert: EMSAlert): Promise<IPatient> {
+  // HEAL-347.56: this Mongoose EMS path is the "Mongoose Patient fork" gap
+  // flagged as still-open after the HEAL-343/347.4-8 (TypeORM) and
+  // HEAL-347.49/347.54/347.55 (Mongoose UnifiedPatient) tenant-scoping
+  // sweeps -- createPrehospitalAlert() never stamped organizationId, and
+  // updateEMSStatus()/confirmArrival()/getIncomingEMS() resolved/listed
+  // patients by ems_unit_id alone with zero org check, so any WRITE_PHI
+  // caller from ANY hospital could flip another hospital's EMS unit status
+  // or overwrite a patient's real name/age via arrive, and any READ_PHI
+  // caller could list every hospital's incoming EMS roster. Same
+  // own-org-or-legacy-null convention as the rest of this sweep.
+  async createPrehospitalAlert(alert: EMSAlert, organizationId?: string | null): Promise<IPatient> {
     const dpsScore = this.triageToDPS(alert.triage_code);
 
     const patient = new Patient({
@@ -46,6 +56,7 @@ export class EMSService {
       vitals: alert.vitals,
       alerts: [...alert.risk_flags, ...(alert.notes ? [alert.notes] : [])],
       assigned_clinician: null,
+      organizationId: organizationId ?? null,
     });
 
     // Calculate initial reassessment due date
@@ -60,12 +71,18 @@ export class EMSService {
     emsUnitId: string,
     status: EMSStatus,
     etaMinutes?: number,
+    organizationId?: string | null,
   ): Promise<IPatient | null> {
     const patient = await Patient.findOne({
       ems_unit_id: emsUnitId,
       ems_status: { $ne: 'arrived' },
     });
-    if (!patient) return null;
+    if (
+      !patient ||
+      (organizationId && patient.organizationId && patient.organizationId !== organizationId)
+    ) {
+      return null;
+    }
 
     patient.ems_status = status;
     if (etaMinutes !== undefined) patient.eta_minutes = etaMinutes;
@@ -93,9 +110,15 @@ export class EMSService {
     emsUnitId: string,
     realName?: string,
     realAge?: string,
+    organizationId?: string | null,
   ): Promise<IPatient | null> {
     const patient = await Patient.findOne({ ems_unit_id: emsUnitId });
-    if (!patient) return null;
+    if (
+      !patient ||
+      (organizationId && patient.organizationId && patient.organizationId !== organizationId)
+    ) {
+      return null;
+    }
 
     if (realName && patient.name.startsWith('Unknown')) {
       patient.name = realName;
@@ -112,10 +135,15 @@ export class EMSService {
     return patient;
   }
 
-  async getIncomingEMS(): Promise<IPatient[]> {
+  async getIncomingEMS(organizationId?: string | null): Promise<IPatient[]> {
+    // No pre-existing `$or` on this query, so the org clause can be spread
+    // directly (unlike reassessment.service.ts's getPatientsNeedingReassessment,
+    // which has to combine two independent `$or` clauses via `$and`).
+    const orgClause = organizationId ? { $or: [{ organizationId }, { organizationId: null }] } : {};
     return Patient.find({
       ems_status: { $in: ['dispatched', 'on_scene', 'en_route'] },
       current_state: { $in: ['EMS_DISPATCHED', 'EMS_ON_SCENE', 'EMS_EN_ROUTE'] },
+      ...orgClause,
     }).sort({ eta_minutes: 1 });
   }
 

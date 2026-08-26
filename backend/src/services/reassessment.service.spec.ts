@@ -68,6 +68,67 @@ describe('ReassessmentService.getPatientsNeedingReassessment tenant scoping (HEA
   });
 });
 
+// HEAL-347.55: reassessPatient()/dismissReassessment() are the write paths
+// behind POST /emergency/reassessment/:patientId/{reassess,dismiss} -- the
+// HEAL-347.49/347.54 sweep fixed the sibling read/create paths on this same
+// Mongoose Patient model but missed these two, which resolved the target
+// patient by patientId alone with zero organizationId check. Same
+// own-org-or-legacy-null convention as the rest of that sweep.
+describe('ReassessmentService cross-org guard (HEAL-347.55)', () => {
+  const service = new ReassessmentService();
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('reassessPatient() rejects a patient belonging to a different organization', async () => {
+    const patient = buildFakePatient({ organizationId: 'org-a' });
+    jest.spyOn(Patient, 'findById').mockResolvedValue(patient as any);
+
+    await expect(
+      service.reassessPatient('patient-1', null, 'note', {}, 'nurse-1', 'org-b'),
+    ).rejects.toThrow('Patient not found');
+    expect(patient.save).not.toHaveBeenCalled();
+  });
+
+  it('reassessPatient() allows the same organization', async () => {
+    const patient = buildFakePatient({ organizationId: 'org-a', vitals: {} });
+    jest.spyOn(Patient, 'findById').mockResolvedValue(patient as any);
+
+    await expect(
+      service.reassessPatient('patient-1', null, 'note', {}, 'nurse-1', 'org-a'),
+    ).resolves.toBe(patient);
+  });
+
+  it('reassessPatient() allows a legacy patient with no organizationId (own-org-or-legacy-null)', async () => {
+    const patient = buildFakePatient({ organizationId: null, vitals: {} });
+    jest.spyOn(Patient, 'findById').mockResolvedValue(patient as any);
+
+    await expect(
+      service.reassessPatient('patient-1', null, 'note', {}, 'nurse-1', 'org-b'),
+    ).resolves.toBe(patient);
+  });
+
+  it('dismissReassessment() rejects a patient belonging to a different organization', async () => {
+    const patient = buildFakePatient({ organizationId: 'org-a' });
+    jest.spyOn(Patient, 'findById').mockResolvedValue(patient as any);
+
+    await expect(
+      service.dismissReassessment('patient-1', 'discharged', 'nurse-1', 'org-b'),
+    ).rejects.toThrow('Patient not found');
+    expect(patient.save).not.toHaveBeenCalled();
+  });
+
+  it('dismissReassessment() allows the same organization', async () => {
+    const patient = buildFakePatient({ organizationId: 'org-a' });
+    jest.spyOn(Patient, 'findById').mockResolvedValue(patient as any);
+
+    await expect(
+      service.dismissReassessment('patient-1', 'discharged', 'nurse-1', 'org-a'),
+    ).resolves.toBe(patient);
+  });
+});
+
 describe('ReassessmentService.reassessPatient abnormal-vitals alerts (HEAL-254)', () => {
   const service = new ReassessmentService();
 

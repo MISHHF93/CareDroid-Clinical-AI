@@ -79,9 +79,23 @@ export class ReassessmentService {
     notes: string,
     _findings: unknown,
     clinician: string,
+    organizationId?: string | null,
   ): Promise<IPatient> {
     const patient = await Patient.findById(patientId);
-    if (!patient) throw new Error('Patient not found');
+    // HEAL-347.55: reassessPatient()/dismissReassessment() are the remaining
+    // Mongoose Patient write paths the HEAL-347.49/347.54 sweep missed --
+    // POST /emergency/reassessment/:patientId/{reassess,dismiss} resolved
+    // the target purely by patientId, with no organizationId check, so any
+    // WRITE_PHI-holding caller from ANY hospital could overwrite another
+    // org's patient's DPS score/reassessment history/alerts by guessing an
+    // id. Same own-org-or-legacy-null check and no-existence-leak error
+    // shape as smart-intake.service.ts's reconcileUnknown() (HEAL-343).
+    if (
+      !patient ||
+      (organizationId && patient.organizationId && patient.organizationId !== organizationId)
+    ) {
+      throw new Error('Patient not found');
+    }
 
     const oldDpsScore = patient.dps_score;
     const finalDpsScore = newDpsScore !== null ? newDpsScore : oldDpsScore;
@@ -133,9 +147,16 @@ export class ReassessmentService {
     patientId: string,
     reason: string,
     clinician: string,
+    organizationId?: string | null,
   ): Promise<IPatient> {
     const patient = await Patient.findById(patientId);
-    if (!patient) throw new Error('Patient not found');
+    // Same own-org-or-legacy-null guard as reassessPatient() above (HEAL-347.55).
+    if (
+      !patient ||
+      (organizationId && patient.organizationId && patient.organizationId !== organizationId)
+    ) {
+      throw new Error('Patient not found');
+    }
 
     const validReasons = ['transferred', 'discharged', 'clinical_decision', 'already_assessed'];
     if (!validReasons.includes(reason)) {

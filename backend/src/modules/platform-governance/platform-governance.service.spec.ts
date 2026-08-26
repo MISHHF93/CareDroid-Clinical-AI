@@ -381,6 +381,55 @@ describe('PlatformGovernanceService', () => {
     });
   });
 
+  // HEAL-347.58: same class of gap as HEAL-338 above, on the sibling
+  // `policies` table -- updatePolicy/approvePolicy resolved by policyId
+  // alone with zero organizationId check, and listPolicies returned every
+  // organization's clinical-safety policies unfiltered.
+  describe('HEAL-347.58: tenant isolation on clinical policies', () => {
+    it("does not let updatePolicy act on another organization's policy", async () => {
+      const { service } = buildService({
+        policies: [
+          { id: 'policy-1', organizationId: 'org-a', capabilityId: 'clinical-governance' },
+        ],
+      });
+
+      await expect(
+        service.updatePolicy('policy-1', { status: PlatformGovernanceStatus.ACTIVE }, 'org-b'),
+      ).resolves.toBeNull();
+      await expect(
+        service.updatePolicy('policy-1', { status: PlatformGovernanceStatus.ACTIVE }, 'org-a'),
+      ).resolves.toEqual(
+        expect.objectContaining({ id: 'policy-1', status: PlatformGovernanceStatus.ACTIVE }),
+      );
+    });
+
+    it("does not let approvePolicy act on another organization's policy", async () => {
+      const { service } = buildService({
+        policies: [
+          { id: 'policy-1', organizationId: 'org-a', capabilityId: 'clinical-governance' },
+        ],
+      });
+
+      await expect(
+        service.approvePolicy('policy-1', { decision: 'approve' }, 'org-b'),
+      ).resolves.toBeNull();
+      await expect(
+        service.approvePolicy('policy-1', { decision: 'approve' }, 'org-a'),
+      ).resolves.toEqual(
+        expect.objectContaining({ id: 'policy-1', status: PlatformGovernanceStatus.ACTIVE }),
+      );
+    });
+
+    it("scopes listPolicies to the caller's organization", async () => {
+      const { service, repositories } = buildService({ policies: [] });
+
+      await service.listPolicies(undefined, 'org-a');
+      expect(repositories.policies.find).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { organizationId: 'org-a' } }),
+      );
+    });
+  });
+
   describe('HEAL-347: tenant isolation on privacy requests and the PHI-access observability log', () => {
     // PlatformPrivacyRequest/PlatformObservabilityEvent never got the
     // organizationId column HEAL-338 already used for review items/consent

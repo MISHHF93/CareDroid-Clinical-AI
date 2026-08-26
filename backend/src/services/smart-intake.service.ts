@@ -46,9 +46,10 @@ export class SmartIntakeService {
   private textMining = textMiningService;
   private fhir = fhirService;
 
-  async createSession(createdBy: string): Promise<IntakeSession> {
+  async createSession(createdBy: string, organizationId?: string | null): Promise<IntakeSession> {
     const session = new SmartIntakeSession({
       createdBy,
+      organizationId: organizationId ?? null,
       biometricConsent: { enabledByTenant: BIOMETRIC_TENANT_DEFAULT, consentGranted: false },
       auditLog: [this.audit('manual_override_used', createdBy, { event: 'session_created' })],
     });
@@ -60,8 +61,9 @@ export class SmartIntakeService {
     sessionId: string,
     manual: ExtractedDemographics & { chiefComplaint?: string; staffNotes?: string },
     actor: string,
+    organizationId?: string | null,
   ) {
-    const session = await this.getSession(sessionId);
+    const session = await this.getSession(sessionId, organizationId);
     session.status = 'capturing_inputs';
     session.inputs.push({ source: 'manual_entry', manual, staffNotes: manual.staffNotes });
     this.addEvidenceFromDemographics(
@@ -78,8 +80,13 @@ export class SmartIntakeService {
     return this.output(session);
   }
 
-  async addDocument(sessionId: string, document: Partial<DocumentCapture>, actor: string) {
-    const session = await this.getSession(sessionId);
+  async addDocument(
+    sessionId: string,
+    document: Partial<DocumentCapture>,
+    actor: string,
+    organizationId?: string | null,
+  ) {
+    const session = await this.getSession(sessionId, organizationId);
     const capture: DocumentCapture = {
       id: document.id || id('doc'),
       type: document.type || 'referral_letter',
@@ -108,8 +115,13 @@ export class SmartIntakeService {
     return this.output(session);
   }
 
-  async ingestOcrResult(sessionId: string, payload: any, actor: string) {
-    const session = await this.getSession(sessionId);
+  async ingestOcrResult(
+    sessionId: string,
+    payload: any,
+    actor: string,
+    organizationId?: string | null,
+  ) {
+    const session = await this.getSession(sessionId, organizationId);
     session.status = 'review_ocr';
     const normalizedPayload = this.ocr.normalizePayload(payload);
     const source = normalizedPayload.source;
@@ -142,8 +154,13 @@ export class SmartIntakeService {
     return this.output(session);
   }
 
-  async addEMSEvidence(sessionId: string, ems: SmartIntakeInput['ems'], actor: string) {
-    const session = await this.getSession(sessionId);
+  async addEMSEvidence(
+    sessionId: string,
+    ems: SmartIntakeInput['ems'],
+    actor: string,
+    organizationId?: string | null,
+  ) {
+    const session = await this.getSession(sessionId, organizationId);
     session.inputs.push({ source: 'ems_prearrival', ems });
     if (ems?.temporaryId) {
       session.evidence.push(
@@ -161,7 +178,7 @@ export class SmartIntakeService {
   }
 
   async match(sessionId: string, actor: string, organizationId?: string) {
-    const session = await this.getSession(sessionId);
+    const session = await this.getSession(sessionId, organizationId);
     session.status = 'matching';
     const demographics = this.demographicsFromEvidence(session);
     const candidates = await this.matcher.findCandidates(demographics, organizationId);
@@ -185,8 +202,9 @@ export class SmartIntakeService {
     decision: VerificationDecision,
     actor: string,
     editedValue?: unknown,
+    organizationId?: string | null,
   ) {
-    const session = await this.getSession(sessionId);
+    const session = await this.getSession(sessionId, organizationId);
     session.status = 'verifying';
     const evidence = session.evidence.find(
       (item) => item.field === field && item.verificationDecision === 'pending',
@@ -209,8 +227,13 @@ export class SmartIntakeService {
     return this.output(session);
   }
 
-  async linkPatient(sessionId: string, patientId: string, actor: string) {
-    const session = await this.getSession(sessionId);
+  async linkPatient(
+    sessionId: string,
+    patientId: string,
+    actor: string,
+    organizationId?: string | null,
+  ) {
+    const session = await this.getSession(sessionId, organizationId);
     if (!session.matchCandidates.some((candidate) => candidate.patientId === patientId)) {
       throw new Error('Patient link requires a generated match candidate');
     }
@@ -224,7 +247,7 @@ export class SmartIntakeService {
   }
 
   async createPatient(sessionId: string, actor: string, organizationId?: string) {
-    const session = await this.getSession(sessionId);
+    const session = await this.getSession(sessionId, organizationId);
     this.assertCriticalFieldsReviewed(session);
     if (session.duplicateWarning) {
       const overrideReviewed = session.auditLog.some(
@@ -271,7 +294,7 @@ export class SmartIntakeService {
     actor: string,
     organizationId?: string,
   ) {
-    const session = await this.getSession(sessionId);
+    const session = await this.getSession(sessionId, organizationId);
     const temporaryEncounterId = id('UNK-ENC');
     const patient = new Patient({
       organizationId: organizationId ?? null,
@@ -316,7 +339,7 @@ export class SmartIntakeService {
     actor: string,
     organizationId?: string,
   ) {
-    const session = await this.getSession(sessionId);
+    const session = await this.getSession(sessionId, organizationId);
     const unknown = session.linkedPatientId
       ? await Patient.findById(session.linkedPatientId)
       : null;
@@ -339,8 +362,13 @@ export class SmartIntakeService {
     return this.output(session);
   }
 
-  async captureBiometricConsent(sessionId: string, payload: any, actor: string) {
-    const session = await this.getSession(sessionId);
+  async captureBiometricConsent(
+    sessionId: string,
+    payload: any,
+    actor: string,
+    organizationId?: string | null,
+  ) {
+    const session = await this.getSession(sessionId, organizationId);
     const tenantEnabled = Boolean(payload.enabledByTenant);
     if (!tenantEnabled || !payload.consentGranted) {
       throw new Error(
@@ -364,8 +392,8 @@ export class SmartIntakeService {
     return this.output(session);
   }
 
-  async withdrawBiometricConsent(sessionId: string, actor: string) {
-    const session = await this.getSession(sessionId);
+  async withdrawBiometricConsent(sessionId: string, actor: string, organizationId?: string | null) {
+    const session = await this.getSession(sessionId, organizationId);
     session.biometricConsent.consentGranted = false;
     session.biometricConsent.consentWithdrawnAt = new Date();
     session.auditLog.push(this.audit('biometric_consent_withdrawn', actor, {}));
@@ -373,14 +401,35 @@ export class SmartIntakeService {
     return this.output(session);
   }
 
-  async getAuditLog(sessionId: string): Promise<PatientIdentityAuditLog[]> {
-    const session = await this.getSession(sessionId);
+  async getAuditLog(
+    sessionId: string,
+    organizationId?: string | null,
+  ): Promise<PatientIdentityAuditLog[]> {
+    const session = await this.getSession(sessionId, organizationId);
     return session.auditLog;
   }
 
-  private async getSession(sessionId: string): Promise<IntakeSession> {
+  // HEAL-347.59: getSession() is the single chokepoint every public method
+  // above reads/writes an intake session through -- before this fix it
+  // resolved sessionId with zero organizationId check (the schema had no
+  // such field at all), so any WRITE_PHI/READ_PHI caller from ANY hospital
+  // could read or tamper with another hospital's in-progress patient
+  // identity data (demographics, scanned ID/insurance documents, OCR
+  // results, biometric consent, and the full identity-verification audit
+  // trail) by guessing/enumerating a Mongo sessionId. Same
+  // own-org-or-legacy-null convention and no-existence-leak error shape as
+  // the rest of this sweep.
+  private async getSession(
+    sessionId: string,
+    organizationId?: string | null,
+  ): Promise<IntakeSession> {
     const session = await SmartIntakeSession.findById(sessionId);
-    if (!session) throw new Error('Intake session not found');
+    if (
+      !session ||
+      (organizationId && session.organizationId && session.organizationId !== organizationId)
+    ) {
+      throw new Error('Intake session not found');
+    }
     return session;
   }
 

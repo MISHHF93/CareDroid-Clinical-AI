@@ -90,6 +90,16 @@ describe('EmsController', () => {
         patient: { id: 'p1', ems_unit_id: 'unit-1' },
       });
     });
+
+    it('forwards the resolved tenant organizationId to the service', async () => {
+      await controller.alert({ ems_unit_id: 'unit-1', triage_code: 'CTAS2', eta_minutes: 5 }, {
+        organizationId: 'org-1',
+      } as any);
+      expect(service.createPrehospitalAlert).toHaveBeenCalledWith(
+        { ems_unit_id: 'unit-1', triage_code: 'CTAS2', eta_minutes: 5 },
+        'org-1',
+      );
+    });
   });
 
   describe('status()', () => {
@@ -108,9 +118,29 @@ describe('EmsController', () => {
 
     it('normalizes legacy status aliases and emits an update event', async () => {
       const result = await controller.status('unit-1', { status: 'Inbound' });
-      expect(service.updateEMSStatus).toHaveBeenCalledWith('unit-1', 'en_route', undefined);
+      expect(service.updateEMSStatus).toHaveBeenCalledWith(
+        'unit-1',
+        'en_route',
+        undefined,
+        undefined,
+      );
       expect(emitSpy).toHaveBeenCalledWith('ems_status_updated', expect.any(Object));
       expect(result.message).toBe('EMS status updated');
+    });
+
+    // Regression for HEAL-347.56: this Mongoose EMS path resolved
+    // patients by ems_unit_id alone with zero organizationId check, so any
+    // WRITE_PHI caller from ANY hospital could flip another hospital's EMS
+    // unit status. Proves the resolved tenant context now reaches the
+    // service, same pattern as reassessment's HEAL-347.55 regression test.
+    it('forwards the resolved tenant organizationId to the service', async () => {
+      await controller.status('unit-1', { status: 'en_route' }, { organizationId: 'org-1' } as any);
+      expect(service.updateEMSStatus).toHaveBeenCalledWith(
+        'unit-1',
+        'en_route',
+        undefined,
+        'org-1',
+      );
     });
   });
 
@@ -122,8 +152,21 @@ describe('EmsController', () => {
 
     it('confirms arrival and emits an event', async () => {
       const result = await controller.arrive('unit-1', { real_name: 'Jane Doe' });
+      expect(service.confirmArrival).toHaveBeenCalledWith(
+        'unit-1',
+        'Jane Doe',
+        undefined,
+        undefined,
+      );
       expect(emitSpy).toHaveBeenCalledWith('ems_arrival_confirmed', expect.any(Object));
       expect(result.message).toBe('EMS arrival confirmed');
+    });
+
+    it('forwards the resolved tenant organizationId to the service', async () => {
+      await controller.arrive('unit-1', { real_name: 'Jane Doe' }, {
+        organizationId: 'org-1',
+      } as any);
+      expect(service.confirmArrival).toHaveBeenCalledWith('unit-1', 'Jane Doe', undefined, 'org-1');
     });
   });
 
@@ -131,6 +174,12 @@ describe('EmsController', () => {
     it('returns count and patients', async () => {
       const result = await controller.incoming();
       expect(result).toEqual({ count: 1, patients: [{ id: 'p1' }] });
+      expect(service.getIncomingEMS).toHaveBeenCalledWith(undefined);
+    });
+
+    it('forwards the resolved tenant organizationId to the service', async () => {
+      await controller.incoming({ organizationId: 'org-1' } as any);
+      expect(service.getIncomingEMS).toHaveBeenCalledWith('org-1');
     });
   });
 });

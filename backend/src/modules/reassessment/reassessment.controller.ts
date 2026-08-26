@@ -59,7 +59,11 @@ export class ReassessmentController {
   @Post(':patientId/reassess')
   @RequirePermission(Permission.WRITE_PHI)
   @ApiOperation({ summary: 'Record a reassessment for a patient' })
-  async reassess(@Param('patientId') patientId: string, @Body() body: ReassessPatientDto) {
+  async reassess(
+    @Param('patientId') patientId: string,
+    @Body() body: ReassessPatientDto,
+    @TenantContext() tenantContext?: TenantContextValue,
+  ) {
     assertMongoReady();
     try {
       const patient = await this.reassessmentService.reassessPatient(
@@ -68,6 +72,7 @@ export class ReassessmentController {
         body.notes,
         body.findings,
         body.clinician,
+        tenantContext?.organizationId,
       );
       return { message: 'Reassessment recorded', patient };
     } catch (error) {
@@ -78,13 +83,18 @@ export class ReassessmentController {
   @Post(':patientId/dismiss')
   @RequirePermission(Permission.WRITE_PHI)
   @ApiOperation({ summary: 'Dismiss a pending reassessment for a patient' })
-  async dismiss(@Param('patientId') patientId: string, @Body() body: DismissReassessmentDto) {
+  async dismiss(
+    @Param('patientId') patientId: string,
+    @Body() body: DismissReassessmentDto,
+    @TenantContext() tenantContext?: TenantContextValue,
+  ) {
     assertMongoReady();
     try {
       const patient = await this.reassessmentService.dismissReassessment(
         patientId,
         body.reason,
         body.clinician,
+        tenantContext?.organizationId,
       );
       return { message: 'Reassessment dismissed', patient };
     } catch (error) {

@@ -199,6 +199,15 @@ export interface IntakeSession extends Document {
   createdBy: string;
   createdAt: Date;
   updatedAt: Date;
+  /**
+   * HEAL-347.59: added retroactively -- until this fix, IntakeSession carried
+   * no per-org field at all, so getSession() (the single chokepoint every
+   * public SmartIntakeService method reads/writes through) could not be
+   * tenant-scoped no matter how the caller was guarded. Nullable/no-backfill,
+   * same own-org-or-legacy-null convention as UnifiedPatient.organizationId
+   * (HEAL-347.49, models/unified-patient.model.ts).
+   */
+  organizationId?: string | null;
 }
 
 const IdentityEvidenceSchema = new Schema<IdentityEvidence>({
@@ -293,6 +302,7 @@ const IntakeSessionSchema = new Schema<IntakeSession>(
     duplicateWarning: { type: Boolean, default: false },
     missingFieldWarnings: { type: [String], default: [] },
     createdBy: { type: String, required: true },
+    organizationId: { type: String, default: null },
   },
   { timestamps: true },
 );
@@ -301,5 +311,6 @@ IntakeSessionSchema.index({ status: 1 });
 IntakeSessionSchema.index({ linkedPatientId: 1 });
 IntakeSessionSchema.index({ temporaryEncounterId: 1 });
 IntakeSessionSchema.index({ 'evidence.field': 1 });
+IntakeSessionSchema.index({ organizationId: 1 });
 
 export const SmartIntakeSession = model<IntakeSession>('SmartIntakeSession', IntakeSessionSchema);

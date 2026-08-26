@@ -17,6 +17,8 @@ import mongoose from 'mongoose';
 import { AuthorizationGuard } from '../auth/guards/authorization.guard';
 import { RequirePermission } from '../auth/decorators/permissions.decorator';
 import { Permission } from '../auth/enums/permission.enum';
+import { TenantContext } from '../tenant-context/tenant-context.decorator';
+import type { TenantContext as TenantContextValue } from '../tenant-context/tenant-context.types';
 import { EMSService } from '../../services/ems.service';
 import { EmsAlertDto, EmsArrivalDto, EmsStatusUpdateDto } from './dto/ems-actions.dto';
 
@@ -85,7 +87,7 @@ export class EmsController {
   @Post('alert')
   @RequirePermission(Permission.WRITE_PHI)
   @ApiOperation({ summary: 'Record a prehospital EMS alert' })
-  async alert(@Body() body: EmsAlertDto) {
+  async alert(@Body() body: EmsAlertDto, @TenantContext() tenantContext?: TenantContextValue) {
     assertMongoReady();
     if (!body?.ems_unit_id && !body?.unitId) {
       throw new BadRequestException('ems_unit_id is required');
@@ -97,7 +99,10 @@ export class EmsController {
       throw new BadRequestException('triage_code is required');
     }
 
-    const patient = await this.emsService.createPrehospitalAlert(body as never);
+    const patient = await this.emsService.createPrehospitalAlert(
+      body as never,
+      tenantContext?.organizationId,
+    );
     this.emitToWhiteboard('ems_alert_received', patient);
     await this.dualWriteSentinelInbound(body as Record<string, unknown>);
     return { message: 'EMS alert received', patient };
@@ -106,7 +111,11 @@ export class EmsController {
   @Patch('status/:emsUnitId')
   @RequirePermission(Permission.WRITE_PHI)
   @ApiOperation({ summary: 'Update EMS unit lifecycle status' })
-  async status(@Param('emsUnitId') emsUnitId: string, @Body() body: EmsStatusUpdateDto) {
+  async status(
+    @Param('emsUnitId') emsUnitId: string,
+    @Body() body: EmsStatusUpdateDto,
+    @TenantContext() tenantContext?: TenantContextValue,
+  ) {
     assertMongoReady();
     const normalizedStatus = normalizeEMSStatus(body.status);
     if (!normalizedStatus) {
@@ -120,6 +129,7 @@ export class EmsController {
       emsUnitId,
       normalizedStatus,
       body.eta_minutes,
+      tenantContext?.organizationId,
     );
     if (!patient) {
       throw new NotFoundException('EMS unit not found');
@@ -132,9 +142,18 @@ export class EmsController {
   @Post('arrive/:emsUnitId')
   @RequirePermission(Permission.WRITE_PHI)
   @ApiOperation({ summary: 'Confirm EMS unit arrival' })
-  async arrive(@Param('emsUnitId') emsUnitId: string, @Body() body: EmsArrivalDto) {
+  async arrive(
+    @Param('emsUnitId') emsUnitId: string,
+    @Body() body: EmsArrivalDto,
+    @TenantContext() tenantContext?: TenantContextValue,
+  ) {
     assertMongoReady();
-    const patient = await this.emsService.confirmArrival(emsUnitId, body.real_name, body.real_age);
+    const patient = await this.emsService.confirmArrival(
+      emsUnitId,
+      body.real_name,
+      body.real_age,
+      tenantContext?.organizationId,
+    );
     if (!patient) {
       throw new NotFoundException('EMS unit not found');
     }
@@ -146,9 +165,9 @@ export class EmsController {
   @Get('incoming')
   @RequirePermission(Permission.READ_PHI)
   @ApiOperation({ summary: 'List incoming EMS units' })
-  async incoming() {
+  async incoming(@TenantContext() tenantContext?: TenantContextValue) {
     assertMongoReady();
-    const incoming = await this.emsService.getIncomingEMS();
+    const incoming = await this.emsService.getIncomingEMS(tenantContext?.organizationId);
     return { count: incoming.length, patients: incoming };
   }
 }

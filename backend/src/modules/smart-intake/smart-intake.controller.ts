@@ -84,11 +84,13 @@ export class SmartIntakeController {
   async createSession(
     @Body() body: CreateSmartIntakeSessionDto,
     @Headers('x-caredroid-user-id') caredroidUserId?: string,
+    @TenantContext() tenantContext?: TenantContextValue,
   ) {
     assertMongoReady();
     try {
       const session = (await this.smartIntakeService.createSession(
         this.actor(body, caredroidUserId),
+        tenantContext?.organizationId,
       )) as unknown as { _id: unknown };
       return { sessionId: session._id, session };
     } catch (error) {
@@ -104,6 +106,7 @@ export class SmartIntakeController {
     @Param('id') id: string,
     @Body() body: SmartIntakeManualEntryDto,
     @Headers('x-caredroid-user-id') caredroidUserId?: string,
+    @TenantContext() tenantContext?: TenantContextValue,
   ) {
     assertMongoReady();
     try {
@@ -111,6 +114,7 @@ export class SmartIntakeController {
         id,
         (body.manual || {}) as never,
         this.actor(body, caredroidUserId),
+        tenantContext?.organizationId,
       );
     } catch (error) {
       rethrowAsHttpException(error);
@@ -125,6 +129,7 @@ export class SmartIntakeController {
     @Param('id') id: string,
     @Body() body: SmartIntakeDocumentDto,
     @Headers('x-caredroid-user-id') caredroidUserId?: string,
+    @TenantContext() tenantContext?: TenantContextValue,
   ) {
     assertMongoReady();
     try {
@@ -132,6 +137,7 @@ export class SmartIntakeController {
         id,
         (body.document || {}) as never,
         this.actor(body, caredroidUserId),
+        tenantContext?.organizationId,
       );
     } catch (error) {
       rethrowAsHttpException(error);
@@ -146,6 +152,7 @@ export class SmartIntakeController {
     @Param('id') id: string,
     @Body() body: SmartIntakeOcrResultDto,
     @Headers('x-caredroid-user-id') caredroidUserId?: string,
+    @TenantContext() tenantContext?: TenantContextValue,
   ) {
     assertMongoReady();
     try {
@@ -153,6 +160,7 @@ export class SmartIntakeController {
         id,
         body,
         this.actor(body, caredroidUserId),
+        tenantContext?.organizationId,
       );
     } catch (error) {
       rethrowAsHttpException(error);
@@ -167,6 +175,7 @@ export class SmartIntakeController {
     @Param('id') id: string,
     @Body() body: SmartIntakeEmsEvidenceDto,
     @Headers('x-caredroid-user-id') caredroidUserId?: string,
+    @TenantContext() tenantContext?: TenantContextValue,
   ) {
     assertMongoReady();
     try {
@@ -174,6 +183,7 @@ export class SmartIntakeController {
         id,
         (body.ems || {}) as never,
         this.actor(body, caredroidUserId),
+        tenantContext?.organizationId,
       );
     } catch (error) {
       rethrowAsHttpException(error);
@@ -210,6 +220,7 @@ export class SmartIntakeController {
     @Param('id') id: string,
     @Body() body: SmartIntakeVerifyFieldDto,
     @Headers('x-caredroid-user-id') caredroidUserId?: string,
+    @TenantContext() tenantContext?: TenantContextValue,
   ) {
     assertMongoReady();
     if (!body.field || !body.decision) {
@@ -222,6 +233,7 @@ export class SmartIntakeController {
         body.decision as VerificationDecision,
         this.actor(body, caredroidUserId),
         body.edited_value,
+        tenantContext?.organizationId,
       );
     } catch (error) {
       rethrowAsHttpException(error);
@@ -236,6 +248,7 @@ export class SmartIntakeController {
     @Param('id') id: string,
     @Body() body: SmartIntakeLinkPatientDto,
     @Headers('x-caredroid-user-id') caredroidUserId?: string,
+    @TenantContext() tenantContext?: TenantContextValue,
   ) {
     assertMongoReady();
     if (!body.patientId) {
@@ -246,6 +259,7 @@ export class SmartIntakeController {
         id,
         body.patientId,
         this.actor(body, caredroidUserId),
+        tenantContext?.organizationId,
       );
     } catch (error) {
       rethrowAsHttpException(error);
@@ -331,6 +345,7 @@ export class SmartIntakeController {
     @Param('id') id: string,
     @Body() body: SmartIntakeBiometricConsentDto,
     @Headers('x-caredroid-user-id') caredroidUserId?: string,
+    @TenantContext() tenantContext?: TenantContextValue,
   ) {
     assertMongoReady();
     try {
@@ -338,6 +353,7 @@ export class SmartIntakeController {
         id,
         body,
         this.actor(body, caredroidUserId),
+        tenantContext?.organizationId,
       );
     } catch (error) {
       rethrowAsHttpException(error);
@@ -352,12 +368,14 @@ export class SmartIntakeController {
     @Param('id') id: string,
     @Body() body: SmartIntakeWithdrawBiometricConsentDto,
     @Headers('x-caredroid-user-id') caredroidUserId?: string,
+    @TenantContext() tenantContext?: TenantContextValue,
   ) {
     assertMongoReady();
     try {
       return await this.smartIntakeService.withdrawBiometricConsent(
         id,
         this.actor(body, caredroidUserId),
+        tenantContext?.organizationId,
       );
     } catch (error) {
       rethrowAsHttpException(error);
@@ -367,10 +385,10 @@ export class SmartIntakeController {
   @Get(':id/audit-log')
   @RequirePermission(Permission.READ_PHI)
   @ApiOperation({ summary: 'Fetch the identity-verification audit log for an intake session' })
-  async auditLog(@Param('id') id: string) {
+  async auditLog(@Param('id') id: string, @TenantContext() tenantContext?: TenantContextValue) {
     assertMongoReady();
     try {
-      const auditLog = await this.smartIntakeService.getAuditLog(id);
+      const auditLog = await this.smartIntakeService.getAuditLog(id, tenantContext?.organizationId);
       return { count: auditLog.length, auditLog };
     } catch (error) {
       rethrowAsHttpException(error);

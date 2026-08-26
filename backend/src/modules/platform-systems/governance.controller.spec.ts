@@ -35,6 +35,7 @@ describe('GovernanceController', () => {
       recordObservabilityEvent: jest.fn().mockResolvedValue({ id: 'event-1' }),
       getPrivacyAccessLog: jest.fn((patientId?: string) => ({ patientId, accessLog: [] })),
       recentObservability: jest.fn(() => ({ status: 'synthetic_ready' })),
+      createReviewItem: jest.fn((body: Record<string, unknown>) => ({ id: 'review-1', ...body })),
       ...governanceOverrides,
     };
 
@@ -78,12 +79,12 @@ describe('GovernanceController', () => {
   it('routes clinical governance policies, release gates, and safety findings through durable services', async () => {
     const { controller, platformGovernanceService } = buildController();
 
-    await expect(controller.getClinicalPolicies()).resolves.toEqual([{ id: 'policy-1' }]);
+    await expect(controller.getClinicalPolicies(mockReq())).resolves.toEqual([{ id: 'policy-1' }]);
     await expect(
-      controller.createClinicalPolicy({ capabilityId: 'clinical-governance' }),
+      controller.createClinicalPolicy({ capabilityId: 'clinical-governance' }, mockReq()),
     ).resolves.toEqual(expect.objectContaining({ id: 'policy-2' }));
     await expect(
-      controller.approveClinicalPolicy('policy-1', { decision: 'approve' }),
+      controller.approveClinicalPolicy('policy-1', { decision: 'approve' }, mockReq()),
     ).resolves.toEqual(expect.objectContaining({ status: 'active' }));
     await expect(controller.getClinicalReleaseGates()).resolves.toEqual([{ id: 'gate-1' }]);
     await expect(
@@ -94,11 +95,16 @@ describe('GovernanceController', () => {
       controller.reviewGovernanceSafetyFinding('finding-1', { decision: 'resolve' }),
     ).resolves.toEqual(expect.objectContaining({ status: 'resolved' }));
 
-    expect(platformGovernanceService.listPolicies).toHaveBeenCalled();
-    expect(platformGovernanceService.createPolicy).toHaveBeenCalled();
-    expect(platformGovernanceService.approvePolicy).toHaveBeenCalledWith('policy-1', {
-      decision: 'approve',
+    expect(platformGovernanceService.listPolicies).toHaveBeenCalledWith(undefined, 'org-test');
+    expect(platformGovernanceService.createPolicy).toHaveBeenCalledWith({
+      capabilityId: 'clinical-governance',
+      organizationId: 'org-test',
     });
+    expect(platformGovernanceService.approvePolicy).toHaveBeenCalledWith(
+      'policy-1',
+      { decision: 'approve' },
+      'org-test',
+    );
     expect(platformGovernanceService.listReleaseGates).toHaveBeenCalled();
     expect(platformGovernanceService.decideReleaseGate).toHaveBeenCalledWith('gate-1', {
       decision: 'reject',
@@ -106,6 +112,32 @@ describe('GovernanceController', () => {
     expect(platformGovernanceService.listSafetyFindings).toHaveBeenCalled();
     expect(platformGovernanceService.reviewSafetyFinding).toHaveBeenCalledWith('finding-1', {
       decision: 'resolve',
+    });
+  });
+
+  // Regression for HEAL-347.58: getClinicalPolicies/createClinicalPolicy/
+  // updateClinicalPolicy/approveClinicalPolicy/createReviewItem previously
+  // resolved-by-id or trusted a client-settable organizationId with zero
+  // tenant scoping -- any CONFIGURE_SYSTEM+VIEW_AUDIT_LOGS holder (any
+  // hospital's own admin) could read/overwrite/approve another org's
+  // clinical-safety policy, or stamp a review item into another org's queue.
+  it('threads the resolved tenant organizationId through the clinical-policy and review-item routes', async () => {
+    const { controller, platformGovernanceService } = buildController();
+
+    await controller.updateClinicalPolicy('policy-1', { status: 'active' }, mockReq('org-a'));
+    expect(platformGovernanceService.updatePolicy).toHaveBeenCalledWith(
+      'policy-1',
+      { status: 'active' },
+      'org-a',
+    );
+
+    await controller.createReviewItem(
+      { capabilityId: 'clinical-governance' } as any,
+      mockReq('org-a'),
+    );
+    expect(platformGovernanceService.createReviewItem).toHaveBeenCalledWith({
+      capabilityId: 'clinical-governance',
+      organizationId: 'org-a',
     });
   });
 
