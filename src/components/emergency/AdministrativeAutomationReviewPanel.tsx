@@ -85,19 +85,28 @@ function AiDecisionBlock({ decision }: { decision: AiDecisionPayload }) {
         ) : null}
       </div>
       {/*
-       * This payload comes from patientJourneyAiDecisionService, which does
-       * call the real AI Chief gateway (invokeUnifiedAiStructuredByIntent) —
-       * unlike the predictive badges' heuristics, this is architecturally a
-       * genuine "Live" AI surface. Per-decision success/failure provenance
-       * (CareDroidAIResponse.status/provenance) is stripped before it
-       * reaches this component (enrichAdministrativeAutomationsWithAi.ts
-       * only forwards `.data`), so this label reflects the pathway's
-       * architecture, not a live per-response confirmation — a real,
-       * honestly-flagged gap, not silently expanded scope for this pass.
+       * Traced the full call chain (not just this file) before labeling:
+       * this payload comes from patientJourneyAiDecisionService, which calls
+       * invokeUnifiedAiStructuredByIntent -> POST /api/ai/node ->
+       * backend ai.service.ts's runCareDroidAINode -> runCareDroidAI()
+       * (lib/ai/careDroidAI.ts). That shared function's handlers for all 4
+       * intents used here (critical_alert_assessment, patient_intake_assist,
+       * triage_recommendation, patient_summary) are pure keyword/threshold
+       * logic with zero model or network call, and its own success-path
+       * response sets provenance.responseSource: 'DETERMINISTIC_RULE' — the
+       * exact category this same AiTruthLabel.tsx file always maps to
+       * 'Manual' everywhere else. If the backend call fails,
+       * transportCareDroidAINode (careDroidAiApi.ts) falls back to calling
+       * that SAME runCareDroidAI() locally, so there is no code path here
+       * that is actually model-backed. A prior version of this comment
+       * claimed this was "architecturally a genuine Live AI surface" based
+       * on the request reaching a real gateway — that was true but not
+       * sufficient: the gateway's own handler is rule-based, so "Live" was
+       * an overclaim regardless of per-response success/failure.
        */}
       <AiTruthLabel
-        state="Live"
-        sourceContext="Patient Journey AI decision service via the CareDroid AI Chief gateway"
+        state="Manual"
+        sourceContext="Patient Journey AI decision service — CareDroid AI Chief gateway routes to deterministic rule handlers (keyword/threshold logic), not a trained model"
         reviewRequired={decision.requiresClinicianReview ?? true}
         compact
       />

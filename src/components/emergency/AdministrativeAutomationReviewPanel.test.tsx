@@ -151,11 +151,20 @@ describe('AdministrativeAutomationReviewPanel', () => {
     expect(screen.getByText('Clinician review required')).toBeInTheDocument();
   });
 
-  it('P0.4: labels the AI decision block Live, with review required', () => {
+  it('P0.4: labels the AI decision block Manual (deterministic rule handlers), with review required', () => {
+    // Was asserted 'Live' until this session traced the full call chain
+    // (patientJourneyAiDecisionService -> POST /api/ai/node -> backend
+    // ai.service.ts's runCareDroidAINode -> lib/ai/careDroidAI.ts's
+    // runCareDroidAI()) and found every intent used here resolves to a
+    // pure keyword/threshold handler with responseSource:
+    // 'DETERMINISTIC_RULE' -- no model or network-bound inference on any
+    // code path, including the local fallback used when the backend call
+    // fails. 'Live' was a real overclaim; this test now pins the honest
+    // label so it can't silently regress back.
     renderPanel();
 
     const label = screen.getByTestId('ai-truth-label-chip');
-    expect(label).toHaveTextContent('Live');
+    expect(label).toHaveTextContent('Manual');
     expect(label.getAttribute('title')).toMatch(/AI Chief gateway/i);
     expect(label.getAttribute('title')).toMatch(/human review required/i);
   });
