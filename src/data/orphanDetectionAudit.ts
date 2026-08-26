@@ -18,14 +18,15 @@ import {
   OUTSIDE_SHELL_ROUTE_REDIRECTS,
   ROUTE_ALIAS_REDIRECTS,
 } from '../config/routes.config';
-import { PROFILE_CONSOLE_ROUTE_PATHS } from '../config/profileConsoleRoutes';
-import { PUBLIC_CONSOLE_ROUTE_PATHS } from '../config/publicConsoleRoutes';
+import { PROFILE_CONSOLE_REDIRECT_ROUTES, PROFILE_CONSOLE_ROUTE_PATHS } from '../config/profileConsoleRoutes';
+import { PUBLIC_CONSOLE_REDIRECT_ROUTES, PUBLIC_CONSOLE_ROUTE_PATHS } from '../config/publicConsoleRoutes';
 import { TOOLS_CONSOLE_ROUTE_PATHS } from '../config/toolsConsoleRoutes';
 import { PLATFORM_CONSOLE_ROUTE_PATHS } from '../config/platformConsoleRoutes';
 import { OPERATIONS_FLEET_CONSOLE_ROUTE_PATHS } from '../config/operationsFleetConsoleRoutes';
-import { ADMIN_CONSOLE_ROUTE_PATHS } from '../config/adminConsoleRoutes';
+import { ADMIN_CONSOLE_REDIRECT_ROUTES, ADMIN_CONSOLE_ROUTE_PATHS } from '../config/adminConsoleRoutes';
 import { TRAINING_CONSOLE_ROUTE_PATHS } from '../config/trainingConsoleRoutes';
 import { GOVERNANCE_CONSOLE_ROUTE_PATHS } from '../config/governanceConsoleRoutes';
+import { COMMAND_CENTER_INTELLIGENCE_REDIRECTS } from '../config/hospitalCommandCenterViews.config';
 import {
   getCanonicalToolInventory,
   getUserFacingToolInventory,
@@ -185,6 +186,51 @@ function parseAppRoutePaths() {
   const authSignupPathAliases = app.includes('AUTH_SIGNUP_PATH_ALIASES')
     ? AUTH_SIGNUP_PATH_ALIASES
     : [];
+  // router.tsx's AppRoutes() also assembles a local (non-exported)
+  // `legacyAuthPaths` array from named CANONICAL_ROUTES members plus 2 string
+  // literals, mounted via `{legacyAuthPaths.map((path) => <Route key={...}
+  // path={path} element={<AuthPathsRedirect />} />)}` -- same loop-variable
+  // blind spot as inShellPaths/outsideShellPaths/edCanonicalAliasPaths above,
+  // except this array isn't an exported routes.config const at all, so
+  // app.includes() can only check for the variable name itself, and the path
+  // list has to be mirrored here by hand. Found 2026-08-25: /auth,
+  // /auth-callback, /auth/forgot-password, /reset-password, /verify-email,
+  // /auth/magic-link, /auth/invite, and /welcome were all reported as "wire"
+  // gaps despite being live (AuthPathsRedirect sends them to the role-
+  // appropriate landing route, not a dead end), confirmed via a real
+  // Playwright navigation trace, not assumed from the report.
+  const legacyAuthPaths = app.includes('legacyAuthPaths')
+    ? [
+        CANONICAL_ROUTES.auth,
+        CANONICAL_ROUTES.authCallback,
+        CANONICAL_ROUTES.authForgotPassword,
+        CANONICAL_ROUTES.resetPassword,
+        CANONICAL_ROUTES.verifyEmail,
+        CANONICAL_ROUTES.authMagicLink,
+        CANONICAL_ROUTES.authInvite,
+        CANONICAL_ROUTES.welcome,
+        '/two-factor-setup',
+        '/biometric-setup',
+      ]
+    : [];
+  // router.tsx also renders `{COMMAND_CENTER_INTELLIGENCE_REDIRECTS.map(({path,
+  // view}) => <Route path={path} element={<CommandCenterIntelligenceRedirect
+  // view={view} />} />)}` -- same loop-variable blind spot again. This array
+  // (hospitalCommandCenterViews.config.ts) is the one legacy-path table that
+  // actually got wired up out of the whole ROUTE_RECORDS.aliases catalog (most
+  // of the rest only ever reach the never-mounted ROUTE_ALIAS_REDIRECTS /
+  // PROTECTED_ROUTE_ALIAS_REDIRECTS derived arrays, a real, separately-flagged
+  // gap -- see /operations-center et al., still genuinely dead). Found
+  // 2026-08-25: /ai-command-center, /ai/command-center, /ai-command,
+  // /predictive-analytics, and /executive were reported as "wire" gaps despite
+  // being live (redirect to Hospital Command Center with the matching
+  // ?view=ai/predictive/executive lens), confirmed via a real Playwright
+  // navigation trace.
+  const commandCenterIntelligenceRedirectPaths = app.includes(
+    'COMMAND_CENTER_INTELLIGENCE_REDIRECTS',
+  )
+    ? COMMAND_CENTER_INTELLIGENCE_REDIRECTS.map((entry) => entry.path)
+    : [];
   const futureReleasePaths = app.includes('FUTURE_RELEASE_ROUTES')
     ? [...app.matchAll(/\[\s*['"][^'"]+['"]\s*,\s*['"](\/[^'"]+)['"]\s*\]/g)].map((m) => m[1])
     : [];
@@ -232,13 +278,29 @@ function parseAppRoutePaths() {
   // live-mounted, but every one of them — dozens of entries — was being reported as
   // a false "wire" gap here. Found 2026-08-23 while investigating this report's own
   // accuracy as part of a frontend/backend-linkage healing pass.
+  //
+  // Each *_CONSOLE_ROUTE_PATHS export above only covers a console tree's main
+  // page routes. 3 of the 8 trees (admin/profile/public) also render a sibling
+  // *_CONSOLE_REDIRECT_ROUTES array as real `<Route path={route.path}
+  // element={<Navigate to={route.to} replace />} />` mounts (see e.g.
+  // adminConsoleRouteTree.tsx's `{ADMIN_CONSOLE_REDIRECT_ROUTES.map(...)}`) —
+  // those redirect paths were never included here. Found 2026-08-25:
+  // /notifications (PROFILE_CONSOLE_REDIRECT_ROUTES, redirects to
+  // /notification-preferences) and /tenant-admin (ADMIN_CONSOLE_REDIRECT_ROUTES,
+  // redirects to /admin/tenant) were reported as "wire" gaps despite being live,
+  // confirmed via a real Playwright navigation trace. PUBLIC_CONSOLE_REDIRECT_ROUTES
+  // (/gdpr, /hipaa, /terms, /privacy-policy) had no current false-positive rows but
+  // is the same mounted mechanism, so it's included for the same reason.
   const consoleTreePaths = [
     ...PROFILE_CONSOLE_ROUTE_PATHS,
+    ...PROFILE_CONSOLE_REDIRECT_ROUTES.map((route) => route.path),
     ...PUBLIC_CONSOLE_ROUTE_PATHS,
+    ...PUBLIC_CONSOLE_REDIRECT_ROUTES.map((route) => route.path),
     ...TOOLS_CONSOLE_ROUTE_PATHS,
     ...PLATFORM_CONSOLE_ROUTE_PATHS,
     ...OPERATIONS_FLEET_CONSOLE_ROUTE_PATHS,
     ...ADMIN_CONSOLE_ROUTE_PATHS,
+    ...ADMIN_CONSOLE_REDIRECT_ROUTES.map((route) => route.path),
     ...TRAINING_CONSOLE_ROUTE_PATHS,
     ...GOVERNANCE_CONSOLE_ROUTE_PATHS,
   ];
@@ -257,6 +319,8 @@ function parseAppRoutePaths() {
         ...edCanonicalAliasPaths,
         ...authPathAliases,
         ...authSignupPathAliases,
+        ...legacyAuthPaths,
+        ...commandCenterIntelligenceRedirectPaths,
         ...futureReleasePaths,
         ...consoleTreePaths,
       ]),

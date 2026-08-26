@@ -1,6 +1,6 @@
 # Orphan Detection Report
 
-Generated: 2026-08-25 (regenerate with `npm run orphan-detection:write-docs`)
+Generated: 2026-08-26 (regenerate with `npm run orphan-detection:write-docs`)
 
 ## Classification key
 
@@ -15,9 +15,9 @@ Generated: 2026-08-25 (regenerate with `npm run orphan-detection:write-docs`)
 
 | Metric | Count |
 |--------|------:|
-| Total orphan findings | 209 |
-| App.jsx routes | 368 |
-| Orphan / gap routes | 49 |
+| Total orphan findings | 196 |
+| App.jsx routes | 390 |
+| Orphan / gap routes | 36 |
 | Orphan pages | 27 |
 | Orphan components | 0 |
 | Domain module findings (dashboard / simulation / lab / 3D) | 2 |
@@ -25,7 +25,7 @@ Generated: 2026-08-25 (regenerate with `npm run orphan-detection:write-docs`)
 | Executor contract gaps | 0 |
 | API orphans / stubs | 125 |
 | Weakly linked markdown | 6 |
-| **wire** | 41 |
+| **wire** | 28 |
 | **merge** | 0 |
 | **quarantine** | 0 |
 | **legacy** | 168 |
@@ -49,14 +49,6 @@ Generated: 2026-08-25 (regenerate with `npm run orphan-detection:write-docs`)
 
 | Route | Class | Evidence |
 | --- | --- | --- |
-| /auth | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /auth-callback | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /auth/forgot-password | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /auth/magic-link | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /auth/invite | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /reset-password | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /verify-email | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /ai-command-center | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /operations-center | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /surveillance/nexus | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /digital-twin-intelligence | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
@@ -66,13 +58,11 @@ Generated: 2026-08-25 (regenerate with `npm run orphan-detection:write-docs`)
 | /enterprise-platform | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /platform-intelligence | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /platform-admin | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /notifications | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /timeline | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /assets | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /ai-models | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /platform-learning-engine | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /brain | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /tenant-admin | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /tenant-admin/workspaces | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /products | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /plans | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
@@ -85,9 +75,6 @@ Generated: 2026-08-25 (regenerate with `npm run orphan-detection:write-docs`)
 | /integration-readiness | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /solution-builder | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /configuration-studio | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /welcome | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /ai-command-center | wire | toolInventory route not registered in App.jsx |
-| /predictive-analytics | wire | toolInventory route not registered in App.jsx |
 | /home | legacy | Redirect or alias route in App.jsx |
 | /workspace | legacy | Redirect or alias route in App.jsx |
 | /medical-simulation | legacy | Redirect or alias route in App.jsx |
