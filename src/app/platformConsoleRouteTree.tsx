@@ -15,6 +15,17 @@ const MemoryDashboardPage = lazyRoute(() => import('../pages/ai/MemoryDashboard'
 const CostAnalyticsDashboardPage = lazyRoute(() => import('../pages/ai/CostAnalyticsDashboard'));
 const AiEvaluationDashboardPage = lazyRoute(() => import('../pages/ai/AiEvaluationDashboard'));
 const LaboratoryDashboardPage = lazyRoute(() => import('../pages/clinical/LaboratoryDashboard'));
+const PharmacyDashboardPage = lazyRoute(() => import('../pages/clinical/PharmacyDashboard'));
+const RadiologyDashboardPage = lazyRoute(() => import('../pages/clinical/RadiologyDashboard'));
+const EducationHubPage = lazyRoute(() => import('../pages/clinical/EducationHub'));
+const CardiologyDashboardPage = lazyRoute(() => import('../pages/clinical/CardiologyDashboard'));
+const NephrologyDashboardPage = lazyRoute(() => import('../pages/clinical/NephrologyDashboard'));
+const NeurologyDashboardDeptPage = lazyRoute(() => import('../pages/clinical/NeurologyDashboard'));
+const GastroenterologyDashboardPage = lazyRoute(() => import('../pages/clinical/GastroenterologyDashboard'));
+const EndocrinologyDashboardPage = lazyRoute(() => import('../pages/clinical/EndocrinologyDashboard'));
+const PediatricsObgynDashboardPage = lazyRoute(() => import('../pages/clinical/PediatricsObgynDashboard'));
+const PsychiatryDashboardDeptPage = lazyRoute(() => import('../pages/clinical/PsychiatryDashboard'));
+const PulmonologyDashboardPage = lazyRoute(() => import('../pages/clinical/PulmonologyDashboard'));
 const Medical3DViewerPage = lazyRoute(() => import('../pages/clinical/Medical3DViewer'));
 const AnalyticsDashboardPage = lazyRoute(() => import('../pages/analytics/AnalyticsDashboard'));
 const GovernanceRegistryPage = lazyRoute(() => import('../pages/governance/GovernanceRegistry'));
@@ -114,6 +125,17 @@ const PLATFORM_CONSOLE_PAGE_COMPONENTS = Object.freeze({
   costAnalyticsDashboard: CostAnalyticsDashboardPage,
   aiEvaluationDashboard: AiEvaluationDashboardPage,
   laboratoryDashboard: LaboratoryDashboardPage,
+  pharmacyDashboard: PharmacyDashboardPage,
+  radiologyDashboard: RadiologyDashboardPage,
+  educationHub: EducationHubPage,
+  cardiologyDashboard: CardiologyDashboardPage,
+  nephrologyDashboard: NephrologyDashboardPage,
+  neurologyDashboardDept: NeurologyDashboardDeptPage,
+  gastroenterologyDashboard: GastroenterologyDashboardPage,
+  endocrinologyDashboard: EndocrinologyDashboardPage,
+  pediatricsObgynDashboard: PediatricsObgynDashboardPage,
+  psychiatryDashboardDept: PsychiatryDashboardDeptPage,
+  pulmonologyDashboard: PulmonologyDashboardPage,
   medical3dViewer: Medical3DViewerPage,
   analyticsDashboard: AnalyticsDashboardPage,
   governanceRegistry: GovernanceRegistryPage,
