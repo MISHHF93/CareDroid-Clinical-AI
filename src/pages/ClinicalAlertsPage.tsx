@@ -132,11 +132,21 @@ const ClinicalAlertsPage = () => {
   }, [displayAlerts, searchTerm, selectedSeverity]);
 
   const handleAcknowledge = async (alertId: string) => {
-    await transitionAlertLifecycle(alertId, 'acknowledge', {
-      actorId: profile.employeeId,
-      actorRole: profile.role,
-      sourceScreen: 'clinical-alerts-page',
-    });
+    // onClick invokes this fire-and-forget (no await at the call site), so a
+    // rejection here would otherwise be an unhandled promise rejection with
+    // zero feedback -- the "Acknowledge" button would appear to just do
+    // nothing, indistinguishable from a slow network. transitionAlertLifecycle
+    // now rejects when the backend acknowledge call fails instead of silently
+    // patching local state as if it succeeded, so surface that failure here.
+    try {
+      await transitionAlertLifecycle(alertId, 'acknowledge', {
+        actorId: profile.employeeId,
+        actorRole: profile.role,
+        sourceScreen: 'clinical-alerts-page',
+      });
+    } catch (error: any) {
+      setApiNotice(error?.message || 'Failed to acknowledge alert. Please try again.');
+    }
   };
 
   /**

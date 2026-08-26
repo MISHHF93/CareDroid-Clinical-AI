@@ -328,11 +328,22 @@ export async function transitionAlertLifecycle(
       auditAction = 'acknowledged';
       summary = `${existing.title} acknowledged by ${actor.actorRole || actor.actorId || 'staff'}.`;
       if (options.syncBackend !== false && isBackendCapabilityEnabled('clinicalAlerts')) {
-        await acknowledgeClinicalAlertApi(alertId, {
+        // The result was previously discarded here: a failed backend
+        // acknowledgement (network error, 401, 500) still fell through to the
+        // unconditional local-state patch below, so the UI flipped the alert
+        // to "acknowledged" even though nothing was persisted server-side --
+        // a clinician had no way to know the acknowledgement didn't actually
+        // take. Throwing on failure stops the false-positive local patch and
+        // lets callers (e.g. ClinicalAlertsPage's handleAcknowledge) surface
+        // a real error instead of silently succeeding.
+        const ackResult = await acknowledgeClinicalAlertApi(alertId, {
           acknowledgedAt: timestamp,
           acknowledgedBy: actor.actorId,
           userRole: actor.actorRole,
         });
+        if (!ackResult.ok) {
+          throw new Error(ackResult.message || 'Failed to acknowledge alert on the server.');
+        }
       }
       break;
     case 'dismiss':
@@ -345,11 +356,17 @@ export async function transitionAlertLifecycle(
       auditAction = 'dismissed';
       summary = `${existing.title} dismissed${options.reason ? `: ${options.reason}` : '.'}`;
       if (options.syncBackend !== false && isBackendCapabilityEnabled('clinicalAlerts')) {
-        await dismissClinicalAlertApi(alertId, {
+        // Same false-positive-success gap as the acknowledge branch above:
+        // a failed backend dismissal must not be allowed to fall through to
+        // the local-state patch as if it succeeded.
+        const dismissResult = await dismissClinicalAlertApi(alertId, {
           dismissedAt: timestamp,
           dismissedBy: actor.actorId,
           reason: options.reason,
         });
+        if (!dismissResult.ok) {
+          throw new Error(dismissResult.message || 'Failed to dismiss alert on the server.');
+        }
       }
       break;
     case 'resolve':
