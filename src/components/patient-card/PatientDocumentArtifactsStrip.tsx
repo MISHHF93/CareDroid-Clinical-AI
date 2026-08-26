@@ -18,6 +18,15 @@ type PatientDocumentArtifactsStripProps = {
   className?: string;
 };
 
+// Matches the "HH:MM" clock-time convention already used for recorded-at
+// displays elsewhere in this app (e.g. PatientDetailPanel's formatTime).
+function formatArtifactTime(value?: string): string {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  return new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit' }).format(date);
+}
+
 function groupArtifacts(artifacts: PatientDocumentArtifact[]) {
   const clinical = artifacts.filter(
     (artifact) => !artifact.artifactType.startsWith('COPILOT_') && artifact.artifactType !== 'DOCUMENT_METADATA',
@@ -93,6 +102,14 @@ export default function PatientDocumentArtifactsStrip({
                 >
                   — {reviewStatusLabel(artifact.reviewStatus)}
                 </span>
+                {formatArtifactTime(artifact.provenance.extractedAt) ? (
+                  <span
+                    className="patient-doc-artifacts__time"
+                    title={`Extracted ${new Date(artifact.provenance.extractedAt).toLocaleString()}`}
+                  >
+                    {formatArtifactTime(artifact.provenance.extractedAt)}
+                  </span>
+                ) : null}
                 {!readOnly && artifact.reviewStatus === 'pending_human_review' ? (
                   <button
                     type="button"

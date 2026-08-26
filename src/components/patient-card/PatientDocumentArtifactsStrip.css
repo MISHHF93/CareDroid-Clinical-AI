@@ -80,6 +80,12 @@
   color: var(--status-success, #059669);
 }
 
+.patient-doc-artifacts__time {
+  color: var(--color-text-muted, #64748b);
+  font-size: 0.68rem;
+  white-space: nowrap;
+}
+
 .patient-doc-artifacts__accept {
   margin-left: auto;
   border: 1px solid color-mix(in srgb, var(--status-success, #059669) 45%, transparent);

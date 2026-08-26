@@ -121,6 +121,7 @@ type VitalTrend = {
 type VitalsChartPoint = {
   timestamp: string;
   time: string;
+  recordedBy?: string;
   hr?: number;
   spo2?: number;
   sbp?: number;
@@ -366,7 +367,7 @@ function VitalsTooltip({
   );
 }
 
-function VitalsHistoryChart({ vitals }: { vitals: Vitals[] }) {
+function VitalsHistoryChart({ vitals, staff }: { vitals: Vitals[]; staff: Staff[] }) {
   const [view, setView] = useState<VitalsHistoryView>('chart');
   const [hiddenLines, setHiddenLines] = useState<Record<VitalsLineKey, boolean>>({
     hr: false,
@@ -395,6 +396,7 @@ function VitalsHistoryChart({ vitals }: { vitals: Vitals[] }) {
   const chartData: VitalsChartPoint[] = [...vitals].reverse().map((vital) => ({
     timestamp: vital.recordedAt,
     time: formatChartTime(vital.recordedAt),
+    recordedBy: vital.recordedBy ? staffName(staff, vital.recordedBy) : undefined,
     hr: vital.hr,
     spo2: vital.spo2,
     sbp: vital.sbp,
@@ -492,7 +494,7 @@ function VitalsHistoryChart({ vitals }: { vitals: Vitals[] }) {
           <table className="patient-detail-vitals-trend__table">
             <thead>
               <tr>
-                {['Time', 'HR', 'BP', 'SpO2', 'Temp', 'RR', 'GCS'].map((heading) => (
+                {['Time', 'HR', 'BP', 'SpO2', 'Temp', 'RR', 'GCS', 'Recorded by'].map((heading) => (
                   <th key={heading}>{heading}</th>
                 ))}
               </tr>
@@ -509,6 +511,7 @@ function VitalsHistoryChart({ vitals }: { vitals: Vitals[] }) {
                   <td style={{ color: vitalTone('Temp', point.temp) }}>{point.temp ?? '--'}</td>
                   <td style={{ color: vitalTone('RR', point.rr) }}>{point.rr ?? '--'}</td>
                   <td style={{ color: vitalTone('GCS', point.gcs) }}>{point.gcs ?? '--'}</td>
+                  <td>{point.recordedBy ?? '--'}</td>
                 </tr>
               ))}
             </tbody>
@@ -1291,7 +1294,15 @@ export default function PatientDetailPanel() {
             position only, nothing duplicated or removed. */}
         <section className="patient-detail-panel__section">
           <div className="patient-detail-panel__section-header">
-            <h3 className="patient-detail-panel__section-title patient-detail-panel__section-title--flush">Latest Vitals</h3>
+            <div>
+              <h3 className="patient-detail-panel__section-title patient-detail-panel__section-title--flush">Latest Vitals</h3>
+              {latestVitals ? (
+                <p className="patient-detail-panel__section-lead">
+                  Recorded {formatTime(latestVitals.recordedAt)}
+                  {latestVitals.recordedBy ? ` · ${staffName(staff, latestVitals.recordedBy)}` : ''}
+                </p>
+              ) : null}
+            </div>
             {vitalsPresentation.visible ? (
             <FieldButton disabled={!canWriteVitals} onClick={() => setShowVitalsForm((open) => !open)}>Add Vitals</FieldButton>
             ) : null}
@@ -1336,7 +1347,7 @@ export default function PatientDetailPanel() {
             })}
           </div>
 
-          <VitalsHistoryChart vitals={vitalsHistory} />
+          <VitalsHistoryChart vitals={vitalsHistory} staff={staff} />
 
           {showVitalsForm && canWriteVitals ? (
             <form onSubmit={submitVitals} className="patient-detail-vitals-form">

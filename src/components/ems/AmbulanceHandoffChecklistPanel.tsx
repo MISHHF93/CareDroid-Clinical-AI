@@ -14,8 +14,24 @@ function vitalChip(label, value, unit = '') {
   return `${label} ${value}${unit}`;
 }
 
+// Matches the "HH:MM" clock-time convention already used for other recorded-at
+// displays in this app (e.g. PatientDetailPanel's formatTime/formatChartTime).
+function formatVitalsTime(value) {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  return new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit' }).format(date);
+}
+
 function VitalsRow({ vitals }) {
   if (!vitals) return <p className="amb-handoff-checklist__muted">No vitals received from EMS.</p>;
+  // HEAL: these are pre-hospital vitals handed off by EMS -- by the time a
+  // clinician is reading this checklist they may already be 20+ minutes old.
+  // Showing the values with no recorded-at time made a stale EMS reading
+  // indistinguishable from a just-taken one (Vitals.recordedAt is always
+  // populated on this type -- see types/emergency.ts -- it just wasn't
+  // rendered here).
+  const recordedTime = formatVitalsTime(vitals.recordedAt);
   return (
     <div className="amb-handoff-checklist__vitals">
       <span>{vitalChip('HR', vitals.hr ?? vitals.heartRate)}</span>
@@ -28,6 +44,11 @@ function VitalsRow({ vitals }) {
       </span>
       <span>{vitalChip('SpO2', vitals.spo2 ?? vitals.oxygenSaturation, '%')}</span>
       <span>{vitalChip('GCS', vitals.gcs)}</span>
+      {recordedTime ? (
+        <span className="amb-handoff-checklist__vitals-time" title="When EMS recorded these vitals">
+          as of {recordedTime}
+        </span>
+      ) : null}
     </div>
   );
 }
@@ -234,7 +255,11 @@ export default function AmbulanceHandoffChecklistPanel({
                 }
               />
               {checklist.handoffAccepted
-                ? `Accepted${checklist.handoffAcceptedByStaffName ? ` by ${checklist.handoffAcceptedByStaffName}` : ''}`
+                ? `Accepted${checklist.handoffAcceptedByStaffName ? ` by ${checklist.handoffAcceptedByStaffName}` : ''}${
+                    formatVitalsTime(checklist.handoffAcceptedAt)
+                      ? ` at ${formatVitalsTime(checklist.handoffAcceptedAt)}`
+                      : ''
+                  }`
                 : 'Awaiting acceptance'}
             </label>
           </dd>
