@@ -53,6 +53,7 @@ import PhysicianOperationalStrip from '../../components/whiteboard/PhysicianOper
 import RoleOperationalSummaryStrip from '../../components/whiteboard/RoleOperationalSummaryStrip';
 import OperationalHandoffDomainBar from '../../components/whiteboard/OperationalHandoffDomainBar';
 import WhiteboardOpsDetailStrip from '../../components/whiteboard/WhiteboardOpsDetailStrip';
+import CareOperationsInboxPanel from '../../components/emergency/CareOperationsInboxPanel';
 import { evaluateWhiteboardDensity } from '../../config/whiteboardDensityModel';
 import useScreenDensityMode from '../../hooks/useScreenDensityMode';
 import ReassessmentAttentionStrip from '../../components/whiteboard/ReassessmentAttentionStrip';
@@ -1644,6 +1645,23 @@ export default function EmergencyWhiteboard() {
           domains={operationalHandoffDomains as any[]}
           onMetricSelect={handleOperationalStripMetricSelect}
           readOnly={display.isDisplayMode}
+        />
+      ) : null}
+      {showShiftHandoffStrip ? (
+        // Continuous-awareness fix: this is the same backend-persisted task
+        // inbox already mounted on the Shift Summary and Handoffs pages
+        // (reassessment-due, EMS-handoff-pending, and operational-exception
+        // tasks). Before this, it was only reachable from those two
+        // low-traffic pages, so a task opened by one shift -- especially an
+        // operational_exception, which has no other ambient representation
+        // anywhere on the whiteboard -- could sit unseen through an entire
+        // next shift unless someone happened to open Shift Summary. Sharing
+        // the panel's default surfaceKey here is deliberate: it already
+        // tracks "seen" per key across its other mounts, so viewing it from
+        // the whiteboard correctly counts too.
+        <CareOperationsInboxPanel
+          title="Outstanding Work"
+          lead="Reassessments due, EMS handoffs pending, and operational exceptions -- visible here for the whole shift, not just at handoff."
         />
       ) : null}
       {whiteboardDensity.surfaces.opsDetail.visible &&
