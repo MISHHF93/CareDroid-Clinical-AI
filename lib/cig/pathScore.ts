@@ -90,7 +90,6 @@ export type ScoredPath = {
 function goalEdgeMultiplier(goal: CigTraverseGoal, type: string): number {
   if (goal === 'explain_delay') {
     if (type === 'blocks' || type === 'affects' || type === 'waiting_in') return 1.15;
-    if (type === 'located_in' && false) return 1;
     return 1;
   }
   if (goal === 'find_owner') {

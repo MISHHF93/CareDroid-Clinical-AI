@@ -13,7 +13,7 @@ const PATTERNS: Array<{ re: RegExp; label: string }> = [
   { re: /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi, label: '[redacted-email]' },
   // US-style dates that often appear with DOB labels
   {
-    re: /\b(?:DOB|Date of Birth|Born)[:\s]+\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}\b/gi,
+    re: /\b(?:DOB|Date of Birth|Born)[:\s]+\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b/gi,
     label: '[redacted-dob]',
   },
   {
