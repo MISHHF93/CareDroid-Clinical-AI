@@ -237,6 +237,7 @@ export class AIController {
       proposalId,
       String(body.reason || body.rejectionReason || 'Rejected by user'),
       req.tenantContext?.organizationId,
+      req.user?.id,
     );
   }
 
@@ -257,6 +258,7 @@ export class AIController {
         ? (body.result as Record<string, unknown>)
         : undefined,
       req.tenantContext?.organizationId,
+      req.user?.id,
     );
   }
 
@@ -267,7 +269,7 @@ export class AIController {
     return this.actionProposals.transition(
       proposalId,
       'rolled_back',
-      undefined,
+      req.user?.id ? { ownerUserId: req.user.id } : undefined,
       req.tenantContext?.organizationId,
     );
   }

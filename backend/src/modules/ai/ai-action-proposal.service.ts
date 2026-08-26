@@ -512,23 +512,44 @@ export class AiActionProposalService implements OnModuleInit {
     return this.transition(proposalId, 'approved', { ownerUserId: actorUserId }, organizationId);
   }
 
-  reject(proposalId: string, reason: string, organizationId?: string): ServerAiActionProposal {
-    return this.transition(proposalId, 'rejected', { rejectionReason: reason }, organizationId);
+  // HEAL: reject() previously took no actor at all, unlike approve() (which
+  // has always recorded actorUserId into the hash-chain audit entry) --
+  // ai.controller.ts's rejectProposal handler had req.user available but
+  // never passed it through, so a clinician's decision to DISMISS an AI
+  // action proposal was audited with a reason and a timestamp but no
+  // "who" -- the exact "AI suggests, human dismisses, but that interaction
+  // isn't logged" gap. actorUserId is optional so existing callers/tests
+  // that don't pass one keep working unchanged (entry lands with a null
+  // actorUserId, same as before).
+  reject(
+    proposalId: string,
+    reason: string,
+    organizationId?: string,
+    actorUserId?: string,
+  ): ServerAiActionProposal {
+    return this.transition(
+      proposalId,
+      'rejected',
+      { rejectionReason: reason, ...(actorUserId ? { ownerUserId: actorUserId } : {}) },
+      organizationId,
+    );
   }
 
   execute(
     proposalId: string,
     result?: Record<string, unknown>,
     organizationId?: string,
+    actorUserId?: string,
   ): ServerAiActionProposal {
     const current = this.get(proposalId, organizationId);
     if (current.requiresApproval && current.state !== 'approved') {
       throw new BadRequestException('Human approval required before execution');
     }
+    const ownerPatch = actorUserId ? { ownerUserId: actorUserId } : undefined;
     if (current.state === 'proposed' && !current.requiresApproval) {
-      this.transition(proposalId, 'approved', undefined, organizationId);
+      this.transition(proposalId, 'approved', ownerPatch, organizationId);
     }
-    this.transition(proposalId, 'executing', undefined, organizationId);
+    this.transition(proposalId, 'executing', ownerPatch, organizationId);
     return this.transition(
       proposalId,
       'completed',
@@ -537,6 +558,7 @@ export class AiActionProposalService implements OnModuleInit {
           ok: true,
           note: 'Server recorded draft execution — no chart write performed.',
         },
+        ...ownerPatch,
       },
       organizationId,
     );

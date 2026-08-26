@@ -126,6 +126,49 @@ describe('AiActionProposalService — hash-chain audit', () => {
     expect(verification).toEqual({ valid: true, entryCount: 2 });
   });
 
+  // HEAL: unlike approve(), reject()/execute()/rollback (via transition())
+  // previously had no way to record WHO made the human decision on an AI
+  // proposal -- ai.controller.ts had req.user available but never passed it
+  // through. A clinician dismissing (or executing, or rolling back) an AI
+  // action proposal was audited with a timestamp and reason but no actor,
+  // which is exactly the "AI suggests, human decides, decision not logged"
+  // gap this audit trail exists to close.
+  it('reject() records the rejecting clinician as actorUserId in the chain', async () => {
+    const journal = createJournalMock();
+    const auditLog = createAuditLogMock();
+    const service = new AiActionProposalService(journal as any, auditLog as any);
+
+    const created = service.create(createInput);
+    service.reject(created.proposalId, 'Not clinically indicated', undefined, 'attending-md-3');
+    await flushAsync();
+
+    const trail = service.getAuditTrail(created.proposalId);
+    expect(trail[1]).toMatchObject({
+      toState: 'rejected',
+      actorUserId: 'attending-md-3',
+    });
+  });
+
+  it('rollback (via transition to rolled_back) records the actorUserId when the controller supplies one', async () => {
+    const journal = createJournalMock();
+    const auditLog = createAuditLogMock();
+    const service = new AiActionProposalService(journal as any, auditLog as any);
+
+    const created = service.create({
+      ...createInput,
+      rollbackCapable: true,
+      reversibleWindowMs: 60_000,
+    });
+    service.approve(created.proposalId, 'charge-nurse-7');
+    service.execute(created.proposalId, undefined, undefined, 'charge-nurse-7');
+    service.transition(created.proposalId, 'rolled_back', { ownerUserId: 'charge-nurse-9' });
+    await flushAsync();
+
+    const trail = service.getAuditTrail(created.proposalId);
+    const rollbackEntry = trail.find((entry) => entry.toState === 'rolled_back');
+    expect(rollbackEntry).toMatchObject({ actorUserId: 'charge-nurse-9' });
+  });
+
   it('detects a tampered entry after a simulated restart, at the correct sequence index', async () => {
     const journal = createJournalMock();
     const auditLog = createAuditLogMock();
