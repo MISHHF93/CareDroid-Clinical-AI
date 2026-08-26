@@ -32,7 +32,7 @@ async function isAvailable(): Promise<boolean> {
   }
 }
 
-async function authenticate(options: BiometricPromptOptions = {}): Promise<BiometricAuthResult> {
+async function authenticate(_options: BiometricPromptOptions = {}): Promise<BiometricAuthResult> {
   if (!(await isAvailable())) {
     return { success: false, error: 'Biometric authentication not available on this device' };
   }

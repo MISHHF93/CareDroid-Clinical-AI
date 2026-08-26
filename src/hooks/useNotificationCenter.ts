@@ -7,7 +7,6 @@ import { CANONICAL_ROUTES } from '../config/routes.config';
 import { EMERGENCY_ROLE_IDS } from '../config/emergencyRolePermissions';
 import {
   filterOperationalMetrics,
-  getOperationalMetricRoute,
   groupOperationalAlertsByMetric,
 } from '../config/operationalMetricsModel';
 import {
@@ -61,7 +60,6 @@ export function useNotificationCenter() {
 
   const alerts = useEmergencyStore((store) => store.alerts);
   const patients = useEmergencyStore((store) => store.patients);
-  const referrals = useEmergencyStore((store) => store.referrals);
   const emsArrivals = useEmergencyStore((store) => store.emsArrivals);
   const staff = useEmergencyStore((store) => store.staff);
   const workflowLogs = useEmergencyStore((store) => store.workflowLogs);

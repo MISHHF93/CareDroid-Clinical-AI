@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import { PatientFlag, PatientState, Priority } from '../../types/emergency';
 import {
   listOperationalHandoffArtifacts,
   OPERATIONAL_HANDOFF_DOMAINS,

@@ -9,7 +9,6 @@ import {
   REASSESSMENT_REMINDER_OVERDUE_MS,
   activeReassessmentReminders,
   nextActiveReminder,
-  reminderStage,
 } from '../utils/reassessmentScheduler';
 
 export type ReassessmentTimerStage = 'none' | 'upcoming' | 'due' | 'overdue';
@@ -281,7 +280,7 @@ export function deriveLastNurseContactTime(patient: Patient): string | null {
 
 export function deriveReassessmentSchedule(
   patient: Patient,
-  now = new Date(),
+  _now = new Date(),
   thresholds: ReassessmentTimerThresholds = DEFAULT_REASSESSMENT_TIMER_THRESHOLDS,
 ): {
   dueAt: string | null;

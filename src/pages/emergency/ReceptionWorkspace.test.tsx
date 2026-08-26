@@ -92,4 +92,11 @@ describe('Reception front door wiring', () => {
     expect(headerSource).toContain('disabled = false');
     expect(headerSource).toContain('disabled={disabled}');
   });
+
+  it('does not duplicate Preferred language / Interpreter needed fields across intake phases', () => {
+    const languageFieldCount = (unifiedIntakeSource.match(/<span>Preferred language<\/span>/g) || []).length;
+    const interpreterFieldCount = (unifiedIntakeSource.match(/<span>Interpreter needed<\/span>/g) || []).length;
+    expect(languageFieldCount).toBe(1);
+    expect(interpreterFieldCount).toBe(1);
+  });
 });

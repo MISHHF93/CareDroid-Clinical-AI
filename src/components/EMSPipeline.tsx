@@ -4,7 +4,6 @@ import { Ambulance, Bed, CheckCircle2, Clock3 } from 'lucide-react';
 import { useEmergencyStore } from '../store/emergencyStore';
 import EMSPressureScore from './EMSPressureScore';
 import { EMERGENCY_ACTIONS, EMERGENCY_ROLE_ACTIONS, getReceptionEmbeddedIntakePath, prefersReceptionForPatientCreate } from '../config/emergencyRolePermissions';
-import { CANONICAL_ROUTES } from '../config/routes.config';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import useEmsScreen from '../hooks/useEmsScreen';
 import { useEMSIntake } from '../hooks/useEmergencyOs';

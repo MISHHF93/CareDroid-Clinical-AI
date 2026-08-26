@@ -3,7 +3,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import PatientDetailPanel from './PatientDetailPanel';
 import { useEmergencyStore } from '../store/emergencyStore';
-import { PatientFlag, PatientState, Priority, type Patient } from '../types/emergency';
+import { PatientState, Priority, type Patient } from '../types/emergency';
 
 const emergencyRoleMock = vi.hoisted(() => {
   const { withEmergencyRoleMock } = require('../test/permissiveEmergencyRoleMock.ts');

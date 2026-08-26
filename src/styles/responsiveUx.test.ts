@@ -11,7 +11,6 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const responsiveUxCss = readFileSync(join(__dirname, 'responsive-ux.css'), 'utf8');
 const layoutVisibilityCss = readFileSync(join(__dirname, 'layout-visibility.css'), 'utf8');
 const designTokensCss = readFileSync(join(__dirname, 'design-tokens.css'), 'utf8');
-const stylesIndexCss = readFileSync(join(__dirname, 'index.css'), 'utf8');
 const mobileFirstRecoveryCss = readFileSync(join(__dirname, 'mobile-first-recovery.css'), 'utf8');
 const indexCss = readFileSync(join(__dirname, '../index.css'), 'utf8');
 const mainJsx = readFileSync(join(__dirname, '../main.tsx'), 'utf8');

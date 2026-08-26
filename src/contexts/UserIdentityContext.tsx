@@ -796,22 +796,6 @@ function buildFallbackProfile({
   });
 }
 
-/** Raw profile shape before normalisation (from backend or local builder). */
-interface RawProfileForNormalization {
-  userId?: string;
-  account?: Record<string, unknown>;
-  preferences?: Record<string, unknown>;
-  saasProfile?: Record<string, unknown>;
-  [key: string]: unknown;
-}
-
-/** Raw workspace state before normalisation. */
-interface RawWorkspaceState {
-  activeWorkspace?: Workspace;
-  workspaces?: Workspace[];
-  [key: string]: unknown;
-}
-
 function normalizeSaasProfile(
   profile: any,
   workspaceState: any,

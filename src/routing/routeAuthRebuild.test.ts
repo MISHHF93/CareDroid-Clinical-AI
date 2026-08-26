@@ -6,7 +6,6 @@ import {
   CANONICAL_ROUTES,
   IN_SHELL_ROUTE_REDIRECTS,
   LEGACY_EMERGENCY_ROUTE_REDIRECTS,
-  NON_ED_WORKSPACE_REDIRECT_ROUTES,
   OUTSIDE_SHELL_ROUTE_REDIRECTS,
 } from '../config/routes.config';
 import { OPERATIONS_FLEET_CONSOLE_ROUTE_PATHS } from '../config/operationsFleetConsoleRoutes';
@@ -15,9 +14,6 @@ import { getCanonicalAppPagePaths } from '../data/emergencyPageRenderInventory';
 const appSource = readFileSync(join(__dirname, '..', 'app', 'router.tsx'), 'utf8');
 const redirectsByPath = Object.fromEntries(
   LEGACY_EMERGENCY_ROUTE_REDIRECTS.map((redirect) => [redirect.path, redirect.to]),
-);
-const nonEdRedirectPaths = new Set(
-  NON_ED_WORKSPACE_REDIRECT_ROUTES.map((redirect) => redirect.path),
 );
 
 describe('canonical route/auth architecture', () => {

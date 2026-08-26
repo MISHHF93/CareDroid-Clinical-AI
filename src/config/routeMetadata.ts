@@ -7,7 +7,7 @@
  * Replaces the pattern of copying metadata into individual page components.
  */
 
-import { CANONICAL_ROUTE_MAP, CANONICAL_ROUTES } from '../config/routes.config';
+import { CANONICAL_ROUTE_MAP } from '../config/routes.config';
 
 export interface RouteMetadata {
   /** Route ID (e.g., 'reception', 'triage', 'whiteboard') */

@@ -691,15 +691,6 @@ export function canExposeNavigationItem(
   return includeContextual && item.disclosure !== 'admin';
 }
 
-function uniqueNavItemsByPath(items) {
-  const seen = new Set();
-  return items.filter((item) => {
-    if (!item.path || seen.has(item.path)) return false;
-    seen.add(item.path);
-    return true;
-  });
-}
-
 function quickCommandDestinationFromAppShellItem(item) {
   return Object.freeze({
     id: item.id,

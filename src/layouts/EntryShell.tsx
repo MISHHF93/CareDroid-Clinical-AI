@@ -20,7 +20,7 @@ export function EntryShell({ children }: EntryShellProps) {
     <div className="entry-shell cdl-shell cdl-shell--entry">
       <header className="entry-shell__header">
         <div className="entry-shell__brand">
-          <span className="entry-shell__eyebrow">CareDroid · {CAREDROID_PRODUCT.name}</span>
+          <span className="entry-shell__eyebrow">CareDroid · {CAREDROID_PRODUCT.tagline}</span>
           <strong className="entry-shell__title">Platform entry</strong>
         </div>
         <nav className="entry-shell__nav" aria-label="Entry shortcuts">

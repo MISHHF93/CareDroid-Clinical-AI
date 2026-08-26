@@ -133,23 +133,6 @@ function formatElapsed(minutes) {
   return remainder ? `${hours}h ${remainder}m` : `${hours}h`;
 }
 
-function formatFreshness(timestamp) {
-  if (!timestamp) return 'latest local queue';
-  const parsed = new Date(timestamp).getTime();
-  if (!Number.isFinite(parsed)) return 'latest local queue';
-  const elapsedMinutes = Math.max(0, Math.round((Date.now() - parsed) / 60000));
-  if (elapsedMinutes < 1) return 'updated now';
-  if (elapsedMinutes < 60) return `updated ${elapsedMinutes}m ago`;
-  return `updated ${Math.round(elapsedMinutes / 60)}h ago`;
-}
-
-function sourceLabel(source) {
-  if (!source) return 'local referral queue - no live referral network integration';
-  return /fixture|demo|fallback|scenario|first-customer/i.test(source)
-    ? 'walkthrough/local dataset - no live referral network integration'
-    : source;
-}
-
 function urgencyTone(urgency) {
   if (urgency === 'Emergent') return 'critical';
   if (urgency === 'Urgent') return 'warning';
@@ -158,13 +141,6 @@ function urgencyTone(urgency) {
 
 function statusLabel(status) {
   return STATUS_LABEL[status] || status;
-}
-
-function acknowledgementMinutes(referral) {
-  const start = new Date(referral.requestedAt).getTime();
-  const end = new Date(referral.respondedAt).getTime();
-  if (!Number.isFinite(start) || !Number.isFinite(end) || end < start) return null;
-  return Math.round((end - start) / 60000);
 }
 
 function ReferralRow({ referral, patient, now, note, onNoteChange, onStatusChange, onSelectPatient, canUpdateWorkflow, statusChangePending }) {
@@ -358,9 +334,6 @@ export default function ReferralPanel() {
   const canUpdateWorkflow =
     (referralPresentation.visible && referralPresentation.enabled) ||
     (transferPresentation.visible && transferPresentation.enabled);
-  const referralSource = sourceLabel(referralsModule.data?.source);
-  const referralFreshness = formatFreshness(referralsModule.data?.generatedAt);
-
   useEffect(() => {
     const intervalId = window.setInterval(() => setNow(new Date()), 30_000);
     return () => window.clearInterval(intervalId);

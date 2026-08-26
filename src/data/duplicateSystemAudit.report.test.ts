@@ -3,7 +3,6 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, it, expect } from 'vitest';
 import {
-  buildDuplicateSystemReport,
   formatDuplicateSystemAuditMarkdown,
   DUPLICATE_AUDIT_SECTIONS,
 } from './duplicateSystemAudit';

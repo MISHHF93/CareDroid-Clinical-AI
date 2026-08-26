@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import './AiCommandCenterDashboard.css';
-import { MEDICAL_THEME, MEDICAL_TYPE } from '../../config/medicalTheme.constants';
+import { MEDICAL_THEME } from '../../config/medicalTheme.constants';
 import {
   AI_COMMAND_CENTER_REFRESH_MS,
   AI_EXPERTS,

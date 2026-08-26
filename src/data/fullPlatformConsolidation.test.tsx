@@ -22,8 +22,6 @@ const srcRoot = dirname(__dirname);
 const appSource = readFileSync(join(srcRoot, 'app', 'router.tsx'), 'utf8');
 const userContextSource = readFileSync(join(srcRoot, 'contexts/UserContext.tsx'), 'utf8');
 const platformEntrySource = readFileSync(join(srcRoot, 'pages/PlatformEntryHub.tsx'), 'utf8');
-const appConfigSource = readFileSync(join(srcRoot, 'config/appConfig.ts'), 'utf8');
-const authConfigSource = readFileSync(join(srcRoot, 'config/auth.config.ts'), 'utf8');
 const appShellCss = readFileSync(join(srcRoot, 'components/app-shell.css'), 'utf8');
 const copilotPanelCss = readFileSync(
   join(srcRoot, 'components/styles/CopilotPanel-part-01.css'),

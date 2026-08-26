@@ -1,5 +1,4 @@
 import type { ToolRecommendation } from '../../lib/patient-orchestration';
-import { CANONICAL_ROUTES } from '../config/routes.config';
 import {
   applyRegistryToolLaunch,
   resolveRegistryToolLaunchAccess,
@@ -24,19 +23,6 @@ export type LaunchOrchestrationInput = OrchestrationLaunchDetail & {
 };
 
 export type LaunchRegistryToolHandlers = Parameters<typeof applyRegistryToolLaunch>[1];
-
-function buildToolsPath(patientId: string, open?: string, filter = 'clinical-tools') {
-  const params = new URLSearchParams({
-    source: 'orchestration',
-    filter,
-    patientId,
-  });
-  if (open) {
-    params.set('open', open);
-    params.set('q', open);
-  }
-  return `${CANONICAL_ROUTES.emergencyTools}?${params.toString()}`;
-}
 
 function dispatchCalculatorOpen(calculatorId: string, patientId: string) {
   window.dispatchEvent(

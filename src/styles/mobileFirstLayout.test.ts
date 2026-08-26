@@ -11,7 +11,6 @@ import {
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, '../..');
 const indexHtml = readFileSync(join(root, 'index.html'), 'utf8');
-const mainJsx = readFileSync(join(__dirname, '../main.tsx'), 'utf8');
 const mobileFirstCss = readFileSync(join(__dirname, 'mobile-first-layout.css'), 'utf8');
 const calculatorsCss = readFileSync(join(__dirname, '../pages/tools/Calculators.css'), 'utf8');
 const labCss = readFileSync(join(__dirname, '../pages/tools/LabInterpreter.css'), 'utf8');

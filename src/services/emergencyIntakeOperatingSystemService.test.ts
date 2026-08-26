@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import { existsSync } from 'node:fs';
 import EmergencyIntakeOperatingSystemService, {
   DocumentIntelligenceService,
   getEmergencyIntakeAutomationFeed,

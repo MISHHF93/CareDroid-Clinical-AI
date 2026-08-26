@@ -26,9 +26,20 @@ import {
 // (the real, tokenized styles live in the co-located CSS module) deleted
 // alongside the NotificationPreferences.css tokenization fix -- -1 style
 // file, no source-file or gap change.
-export const PAGE_INVENTORY_EXPECTED_TOTAL = 242;
-export const PAGE_SOURCE_EXPECTED_TOTAL = 151;
-export const PAGE_STYLE_EXPECTED_TOTAL = 91;
+// 2026-08-24: 8 new hospital-department dashboards graduated from
+// placeholder redirects into real pages under src/pages/clinical/
+// (Pharmacy, Radiology, Education, Cardiology, Nephrology, Neurology,
+// Gastroenterology, Endocrinology, Pediatrics & OB/GYN, Psychiatry,
+// Pulmonology -- 11 .tsx route sources). The existing 'clinical' entry in
+// DIRECTORY_OWNER_RULES already routes them to the 'tools' module with
+// zero gaps. 4 of the 11 (Pharmacy/Radiology/Education/Cardiology) ship
+// their own .css; the other 7 share the new SpecialtyHubLayout component,
+// which lives under src/components/clinical/ and is outside this glob.
+// +11 source files, +4 style files, +15 total. Tools-prefixed totals
+// (src/pages/tools/*) are unaffected -- these live under src/pages/clinical/.
+export const PAGE_INVENTORY_EXPECTED_TOTAL = 257;
+export const PAGE_SOURCE_EXPECTED_TOTAL = 162;
+export const PAGE_STYLE_EXPECTED_TOTAL = 95;
 export const PAGE_TOOLS_INVENTORY_EXPECTED_TOTAL = 58;
 export const PAGE_TOOLS_SOURCE_EXPECTED_TOTAL = 48;
 

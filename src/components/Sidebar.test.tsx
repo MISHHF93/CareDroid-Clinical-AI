@@ -22,16 +22,6 @@ function renderSidebar(role: string, initialPath = '/emergency/whiteboard') {
   );
 }
 
-function renderSidebarWithDefaultNavigation(initialPath = '/emergency/whiteboard') {
-  render(
-    <UserProvider>
-      <MemoryRouter initialEntries={[initialPath]}>
-        <Sidebar />
-      </MemoryRouter>
-    </UserProvider>,
-  );
-}
-
 describe('Sidebar unified navigation rendering', () => {
   it('renders only the requested CareDroid pages for admin users', () => {
     renderSidebar('admin');

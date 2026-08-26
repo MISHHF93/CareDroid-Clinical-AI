@@ -101,7 +101,6 @@ describe('whiteboardAutomationEngine', () => {
   });
 
   it('moves to awaiting disposition when a physician records a diagnosis', () => {
-    const now = new Date('2026-06-24T11:00:00.000Z');
     const source = patient({
       state: PatientState.Results,
       chiefComplaint: 'Chest pain',

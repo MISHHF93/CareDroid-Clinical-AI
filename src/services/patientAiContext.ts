@@ -114,11 +114,7 @@ export function scopeCopilotPatientArtifactContextForRole(
 ): Record<string, unknown> | null {
   if (!context || includeClinicalDetail) return context;
 
-  const { vitals, recentNotes, savedScores, nativeAi, orchestration, ...rest } = context as {
-    vitals?: unknown;
-    recentNotes?: unknown;
-    savedScores?: unknown;
-    nativeAi?: unknown;
+  const { orchestration, ...rest } = context as {
     orchestration?: { stage?: unknown; overlays?: unknown; complaintRoute?: unknown } | null;
     [key: string]: unknown;
   };

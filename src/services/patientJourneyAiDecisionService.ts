@@ -8,7 +8,7 @@ import type { CareDroidAIResponse } from '../../lib/ai/careDroidAI';
 import type { CareDroidAIIntent } from '../../lib/ai/careDroidAITypes';
 import { invokeUnifiedAiStructuredByIntent } from './careDroidUnifiedAiNode';
 import type { EMSArrival, Patient, Vitals } from '../types/emergency';
-import { PatientFlag, PatientState } from '../types/emergency';
+import { PatientState } from '../types/emergency';
 
 export type PatientJourneyAiDecisionBundle = Readonly<{
   patientId: string;

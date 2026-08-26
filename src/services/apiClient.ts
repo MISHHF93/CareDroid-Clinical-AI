@@ -136,16 +136,6 @@ async function bootstrapDevSessionIfNeeded(path) {
   await devSessionBootstrapPromise;
 }
 
-function shouldSilenceInDev(status, url) {
-  if (!isDev) return false;
-  if (status === 401 || status === 403) return true; // auth is often bypassed or not fully set in pure demo
-  if (status >= 500) return true; // disabled services (RAG, AI, Redis, external, etc.)
-  // Common dev-disabled or demo paths
-  const p = String(url || '');
-  if (/\/ai\/|\/rag\/|\/memory\/|\/realtime\/|\/central-node|\/operational-intelligence/.test(p)) return true;
-  return false;
-}
-
 const shouldShortCircuitProtectedApi = (path, headers) => {
   const apiPath = normalizeApiPath(path);
   if (!apiPath.startsWith('/api/')) return false;

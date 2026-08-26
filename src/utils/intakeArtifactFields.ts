@@ -20,7 +20,6 @@ export function clinicalDataToFieldRows(
   data: ClinicalArtifactData,
   artifact: IntakeArtifactDefinition,
   {
-    boardPatient = null,
     seedFields = [] as any[],
   }: {
     boardPatient?: Record<string, unknown> | null;

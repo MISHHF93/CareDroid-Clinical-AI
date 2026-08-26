@@ -337,7 +337,7 @@ function toolIdentityValues(tool) {
     .map((value) => String(value).trim().toLowerCase());
 }
 
-function resolveActiveTool(tools, queryValue, filteredTools = [] as any[]) {
+function resolveActiveTool(tools, queryValue) {
   const normalized = normalizeSearch(queryValue);
   if (!normalized) return null;
   const exactTool = tools.find((tool) => toolIdentityValues(tool).includes(normalized));
@@ -931,7 +931,7 @@ const ToolsOverview = () => {
   ]);
   const activeToolRequest = requestedOpenTool || requestedSearch;
   const activeTool = useMemo(
-    () => resolveActiveTool(allToolsWithAccess, activeToolRequest, filteredTools),
+    () => resolveActiveTool(allToolsWithAccess, activeToolRequest),
     [activeToolRequest, allToolsWithAccess, filteredTools]
   );
   const requestedActiveToolMissing = Boolean(requestedOpenTool && !activeTool);

@@ -2,20 +2,30 @@ import type { CSSProperties, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import {
   IconActivity,
+  IconActivityHeartbeat,
   IconAlertTriangle,
   IconAmbulance,
   IconArrowRight,
+  IconBabyCarriage,
   IconBed,
   IconBell,
+  IconBodyScan,
+  IconBrain,
   IconChartBar,
   IconClipboardPlus,
+  IconDroplet,
+  IconFlask2,
   IconGauge,
   IconLayoutDashboard,
   IconListDetails,
+  IconLungs,
+  IconMoodSmile,
   IconNotes,
+  IconPill,
   IconRefresh,
   IconReport,
   IconRobot,
+  IconSchool,
   IconSend,
   IconShieldCheck,
   IconStethoscope,
@@ -30,7 +40,6 @@ import {
   resolveEmsPhaseProgress,
   resolveMetricGraphicKey,
 } from '../../config/cdlGraphicModel';
-import { CdlGraphicMotif } from './CdlGraphicIllustrations';
 import './CdlGraphicKit.css';
 
 type TablerIcon = typeof IconActivity;
@@ -63,6 +72,21 @@ const GRAPHIC_ICON_MAP: Record<string, TablerIcon> = {
   settings: IconShieldCheck,
   help: IconListDetails,
   'user-check': IconUserCircle,
+  // Hospital-department dashboards (Pharmacy/Radiology/Education/Cardiology/
+  // Nephrology/Neurology/Gastroenterology/Endocrinology/Pediatrics-OBGYN/
+  // Psychiatry/Pulmonology) — one distinct icon per specialty rather than
+  // reusing the generic 'activity' glyph for all of them.
+  pharmacy: IconPill,
+  radiology: IconBodyScan,
+  education: IconSchool,
+  cardiology: IconActivityHeartbeat,
+  nephrology: IconDroplet,
+  neurology: IconBrain,
+  gastroenterology: IconFlask2,
+  endocrinology: IconDroplet,
+  'pediatrics-obgyn': IconBabyCarriage,
+  psychiatry: IconMoodSmile,
+  pulmonology: IconLungs,
 };
 
 function resolveGraphicIcon(iconKey: string): TablerIcon {

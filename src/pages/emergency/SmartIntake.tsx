@@ -20,7 +20,11 @@ import {
   provisionalKindFromIntakeMode,
 } from '../../services/provisionalIdentityIntake';
 import { getReceptionEmbeddedIntakePath } from '../../config/emergencyRolePermissions';
-import { findDuplicateCandidates, mergeDuplicateCandidates } from '../../utils/patientDuplicateDetection';
+import {
+  DUPLICATE_HIGH_CONFIDENCE_THRESHOLD,
+  findDuplicateCandidates,
+  mergeDuplicateCandidates,
+} from '../../utils/patientDuplicateDetection';
 import PatientVerificationExperience from '../../components/verification/PatientVerificationExperience';
 import {
   VERIFICATION_STEP_QUERY_INDEX,
@@ -253,11 +257,15 @@ export default function SmartIntake({
     [extractedFields],
   );
 
-  const matchCandidates = useMemo(() => {
+  const realMatchCandidates = useMemo(() => {
     const localCandidates = findDuplicateCandidates(patients, intakeDemographics);
-    const merged = mergeDuplicateCandidates(localCandidates, remoteMatchCandidates);
-    return merged.length ? merged : [...SMART_INTAKE_DEMO.candidates];
+    return mergeDuplicateCandidates(localCandidates, remoteMatchCandidates);
   }, [patients, intakeDemographics, remoteMatchCandidates]);
+
+  const matchCandidates = useMemo(
+    () => (realMatchCandidates.length ? realMatchCandidates : [...SMART_INTAKE_DEMO.candidates]),
+    [realMatchCandidates],
+  );
 
   useEffect(() => {
     if (!sessionReady || !canVerifyIntake) return;
@@ -436,7 +444,12 @@ export default function SmartIntake({
   };
 
   const verificationComplete = useMemo(
-    () => isVerificationComplete(fieldDecisions),
+    () =>
+      isVerificationComplete(
+        Object.fromEntries(
+          REQUIRED_IDENTITY_FIELDS.map((field) => [field, fieldDecisions[field] || 'unverified']),
+        ),
+      ),
     [fieldDecisions],
   );
 
@@ -1039,9 +1052,13 @@ export default function SmartIntake({
                 : runSmartIntakeVerticalSlice({
                     patient,
                     staffId: 'smart-intake-rn',
-                    // Staff already reviewed matchCandidates and explicitly chose
-                    // "Create patient" over "Link patient" above.
-                    confirmDuplicateOverride: true,
+                    // Only true when a real (non-demo) high-confidence match was
+                    // actually shown and staff chose "Create patient" over "Link
+                    // patient" anyway; otherwise false so the backend's own
+                    // independent duplicate index can still block a match this
+                    // session never locally detected.
+                    confirmDuplicateOverride:
+                      (realMatchCandidates[0]?.matchScore ?? 0) >= DUPLICATE_HIGH_CONFIDENCE_THRESHOLD,
                   }),
             (result) =>
               result

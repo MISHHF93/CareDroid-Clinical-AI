@@ -67,10 +67,7 @@ import PatientJourneyStateBadge from './emergency/PatientJourneyStateBadge';
 import { getRecentSavedScores } from '../utils/clinicalScoreEvents';
 import { hasPatientFlag, latestPatientVitals, patientFlags } from '../utils/patientVitals';
 import WhiteboardOperationalIconStrip from './whiteboard/WhiteboardOperationalIconStrip';
-import {
-  buildWhiteboardCardOperationalMeta,
-  resolveWhiteboardStateLabel,
-} from '../services/whiteboardViewModel';
+import { buildWhiteboardCardOperationalMeta } from '../services/whiteboardViewModel';
 import JourneyPredictionBadge from './predictive/JourneyPredictionBadge';
 import AdmissionProbabilityBadge from './predictive/AdmissionProbabilityBadge';
 import PatientDocumentArtifactsStrip from './patient-card/PatientDocumentArtifactsStrip';

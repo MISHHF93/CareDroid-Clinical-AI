@@ -210,7 +210,7 @@ export function assessDataLineage() {
   );
 }
 
-export function assessKpiIntelligence(signals = {} as any) {
+export function assessKpiIntelligence(_signals = {} as any) {
   const recommendations = Object.freeze([
     Object.freeze({ id: 'KR-001', kpi: 'Reception registration', signal: 'above cohort p75', action: 'Maintain express-register workflow' }),
     Object.freeze({ id: 'KR-002', kpi: 'Data quality risks', signal: 'duplicate rate elevated', action: 'Enable duplicate review banner' }),

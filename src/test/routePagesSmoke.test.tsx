@@ -40,7 +40,6 @@ import AiEvaluationDashboard from '../pages/ai/AiEvaluationDashboard';
 import AiCommandCenterDashboard from '../pages/ai/AiCommandCenterDashboard';
 import PlatformSystemPage from '../pages/platform/PlatformSystemPage';
 import PlatformGovernanceWorkspace from '../pages/platform/PlatformGovernanceWorkspace';
-import SystemHealth from '../pages/SystemHealth';
 import SaasHealthCenter from '../pages/saas/SaasHealthCenter';
 import CommandDashboard from '../pages/executive/CommandDashboard';
 import ExecutiveCommandCenter from '../pages/executive/ExecutiveCommandCenter';

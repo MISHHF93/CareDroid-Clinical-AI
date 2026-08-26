@@ -12,7 +12,7 @@ import {
   resolveCatalogLaunch,
   resolveRegistryId,
 } from './clinicalCatalogWiring';
-import { CANONICAL_ROUTES, LEGACY_EMERGENCY_ROUTE_REDIRECTS } from '../config/routes.config';
+import { LEGACY_EMERGENCY_ROUTE_REDIRECTS } from '../config/routes.config';
 import { getCommandDashboardModel } from './commandDashboardModel';
 import { getUserFacingToolRegistryProjection } from './toolInventory';
 

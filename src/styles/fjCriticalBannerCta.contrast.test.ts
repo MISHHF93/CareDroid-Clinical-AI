@@ -51,8 +51,11 @@ describe('fj-critical-banner__cta contrast (Cycle 207)', () => {
   });
 
   it('FullJourneyOperatingPage.css still declares the intended white-on-red styling (unchanged)', () => {
+    // --medical-text-status-critical (word order swapped) doesn't exist -- fixed to the
+    // real --medical-status-critical-text, same #b91c1c light-mode fallback, now
+    // theme-aware in dark mode via medical-type-layer.css's new dark override.
     expect(fjCss).toContain(
-      'background: var(--medical-text-status-critical, #b91c1c);\n  color: #fff;',
+      'background: var(--medical-status-critical-text, #b91c1c);\n  color: #fff;',
     );
   });
 });
@@ -108,10 +111,13 @@ describe('reception-job-profile-card__cta and reception-skill-strip__cta contras
     expect(receptionJobProfileCardCss).not.toContain('background: var(--cdl-brand-600');
   });
 
-  it('ReceptionSkillStrip.css uses a fixed, theme-constant WCAG-AA-safe background for its default tone (unaffected by the --critical override, still #dc2626)', () => {
+  it('ReceptionSkillStrip.css uses a fixed, theme-constant WCAG-AA-safe background for its default tone (unaffected by the --critical override, still #dc2626 fallback)', () => {
     expect(receptionSkillStripCss).toContain('background: #075985;');
+    // --cdl-danger-600 doesn't exist in the cdl-v2 design system (the tone is named
+    // "critical", not "danger", with no numbered scale) -- fixed to --cdl-critical,
+    // which resolves to the same #dc2626 in light mode and is theme-aware in dark mode.
     expect(receptionSkillStripCss).toContain(
-      '.reception-skill-strip--critical .reception-skill-strip__cta {\n  border-color: var(--cdl-danger-600, #dc2626);\n  background: var(--cdl-danger-600, #dc2626);\n}',
+      '.reception-skill-strip--critical .reception-skill-strip__cta {\n  border-color: var(--cdl-critical, #dc2626);\n  background: var(--cdl-critical, #dc2626);\n}',
     );
   });
 });
@@ -298,8 +304,9 @@ describe('6 more --primary-substring collisions found by auditing the other half
     expect(workflowAutomationCommandBarCss).toContain(
       '.workflow-automation-command-bar__btn--primary {',
     );
+    // --ed-accent doesn't exist -- fixed to the real, theme-aware --app-accent.
     expect(workflowAutomationCommandBarCss).toContain(
-      'background: color-mix(in srgb, var(--ed-accent, #64748b) 12%, transparent);',
+      'background: color-mix(in srgb, var(--app-accent, #64748b) 12%, transparent);',
     );
   });
 });
@@ -454,14 +461,17 @@ describe('dc-panel critical dispatch styling contrast (2026-08-07, 5th sweep fam
   });
 
   it('DispatchConsole.css still declares the intended critical-red border/title/badge styling (unchanged)', () => {
+    // --medical-text-status-critical (word order swapped) doesn't exist -- fixed to the
+    // real --medical-status-critical-text, same #b91c1c light-mode fallback, now
+    // theme-aware in dark mode via medical-type-layer.css's new dark override.
     expect(dispatchConsoleCss).toContain(
-      '.dc-call-card--critical {\n  border-color: color-mix(\n    in srgb,\n    var(--medical-text-status-critical, #b91c1c) 45%,\n    var(--medical-border)\n  );\n}',
+      '.dc-call-card--critical {\n  border-color: color-mix(\n    in srgb,\n    var(--medical-status-critical-text, #b91c1c) 45%,\n    var(--medical-border)\n  );\n}',
     );
     expect(dispatchConsoleCss).toContain(
-      '.dc-title-14-critical {\n  font-size: 14px;\n  font-weight: 700;\n  color: var(--medical-text-status-critical, #b91c1c);\n}',
+      '.dc-title-14-critical {\n  font-size: 14px;\n  font-weight: 700;\n  color: var(--medical-status-critical-text, #b91c1c);\n}',
     );
     expect(dispatchConsoleCss).toContain(
-      '.dc-critical-11 {\n  font-size: 11px;\n  color: var(--medical-text-status-critical, #b91c1c);\n  font-weight: 700;\n}',
+      '.dc-critical-11 {\n  font-size: 11px;\n  color: var(--medical-status-critical-text, #b91c1c);\n  font-weight: 700;\n}',
     );
   });
 

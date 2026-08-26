@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
-import { MEDICAL_THEME, MEDICAL_TYPE } from '../../config/medicalTheme.constants';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { buildFullEmergencyCareJourneySnapshot } from '../../services/fullEmergencyCareJourneyService';
 import {
@@ -11,18 +10,17 @@ import {
   checkEquipmentItem,
   markReady,
   notifyStaff,
-  type ReadinessTrigger,
 } from '../../services/edReadinessService';
 import { getDiagnosticsBoard, getDiagnosticsSummary, DIAGNOSTIC_TYPE_LABELS, DIAGNOSTIC_PRIORITY_LABELS } from '../../services/diagnosticsCoordinationService';
 import { getStaffRoutingSummary } from '../../services/staffRoutingService';
 import { getCADSystemSummary } from '../../services/cadIntegrationService';
-import { getPrehospitalSummary, getAllActiveAssessments } from '../../services/prehospitalAssessmentService';
+import { getAllActiveAssessments } from '../../services/prehospitalAssessmentService';
 import EdDataSourceBanner from '../../components/emergency/EdDataSourceBanner';
 import CareOperationsInboxPanel from '../../components/emergency/CareOperationsInboxPanel';
 import useEmergencyOperatingSurface from '../../hooks/useEmergencyOperatingSurface';
 import type { OperatingSurfaceId } from '../../services/emergencyOsApi';
 import { EmergencyRoutePage, MetricGrid } from './emergencyRouteShared';
-import type { DiagnosticOrder, EDReadinessPlan } from '../../types/emergency';
+import type { EDReadinessPlan } from '../../types/emergency';
 import {
   buildCommandCenterWorkflowActions,
   type OperationalWorkflowAction,
@@ -69,12 +67,6 @@ const VIEW_STAGE_IDS: Record<ViewId, readonly string[]> = {
   diagnostics: ['diagnostics', 'treatment-observation'],
   handoffs: ['hospital-pre-arrival', 'disposition', 'handoff-reporting'],
   reports: ['outcome-tracking', 'analytics-feedback'],
-};
-
-const STATUS_COLORS: Record<string, string> = {
-  active: '#10B981',
-  attention: '#EF4444',
-  ready: MEDICAL_THEME.inkSubtle,
 };
 
 // ── Shared card shell ────────────────────────────────────────────────────────
@@ -726,11 +718,6 @@ function DiagnosticsView() {
     const id = setInterval(refresh, 5000);
     return () => clearInterval(id);
   }, [refresh]);
-
-  const priorityColor = (priority: DiagnosticOrder['priority']) =>
-    priority === 'stat' ? MEDICAL_TYPE.statusCritical
-    : priority === 'urgent' ? '#F59E0B'
-    : MEDICAL_THEME.inkSubtle;
 
   return (
     <>

@@ -7,15 +7,12 @@ import {
   isTrackMindReadOnlyRole,
   normalizeTrackMindRoleId,
   TRACKMIND_ROLE_OPTIONS,
-  TRACKMIND_ROLE_ID,
   type TrackMindRoleId,
 } from './trackMindRoleCatalog';
 import {
   canAccessTrackMindRoute,
-  canPerformTrackMindMutation,
   hasTrackMindPermission,
   listTrackMindPermissionsForRole,
-  TRACKMIND_PERMISSION_KEYS,
   TRACKMIND_ROUTE_PERMISSION_MAP,
   type TrackMindPermissionContext,
 } from './trackMindPermissionRegistry';
@@ -91,7 +88,7 @@ export function getNearestTrackMindRoute(role: string, requestedPath: string): s
 
 export function buildTrackMindRoleContext(
   role: string,
-  overrides: Record<string, string[]> = {},
+  _overrides: Record<string, string[]> = {},
 ): TrackMindPermissionContext {
   return { roleReadOnly: isTrackMindReadOnlyRole(role) };
 }

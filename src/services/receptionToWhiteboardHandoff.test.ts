@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { PatientState, Priority, type Patient } from '../types/emergency';
+import { PatientState, type Patient } from '../types/emergency';
 import { registerNewArrival } from './arrivalControlLayer';
 import { readIntakeEncounterChain } from './intakeEncounterChain';
 import { completeReceptionHandoff, type IntakeHandoffStore } from './receptionHandoff';

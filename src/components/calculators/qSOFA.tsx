@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { MEDICAL_THEME, MEDICAL_TYPE } from '../../config/medicalTheme.constants';
-import type { Patient, Vitals } from '../../types/emergency';
+import { MEDICAL_THEME } from '../../config/medicalTheme.constants';
+import type { Vitals } from '../../types/emergency';
 import { PatientFlag } from '../../types/emergency';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { dispatchScoreAlert } from '../../engine/alertEngine';

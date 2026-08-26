@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import type { Patient } from '../types/emergency';
 import type { PatientSearchResult } from '../utils/patientSearch';

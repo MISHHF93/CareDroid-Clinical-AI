@@ -209,7 +209,6 @@ function buildPatientNodes(
   referrals: readonly Referral[],
   queues: readonly QueueSummary[],
 ): void {
-  const staffById = new Map(staff.map((member) => [member.id, member]));
   const queueByState = new Map(
     queues.map((queue) => [String(queue.type || queue.label || '').toLowerCase(), queue]),
   );

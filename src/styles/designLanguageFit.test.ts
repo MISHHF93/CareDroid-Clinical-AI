@@ -28,7 +28,6 @@ const notificationToastCss = readFileSync(
 const clinicalCanvasCss = readFileSync(join(__dirname, 'clinical-page-canvas.css'), 'utf8');
 const clinicalTargetsCss = readFileSync(join(__dirname, 'clinical-page-targets.css'), 'utf8');
 const clinicalFlowCss = readFileSync(join(__dirname, 'clinical-operational-flow.css'), 'utf8');
-const clinicalSweepCss = readFileSync(join(__dirname, 'clinical-page-sweep.css'), 'utf8');
 const unifiedCss = readFileSync(join(__dirname, 'cdl-unified-application.css'), 'utf8');
 const publicPageCss = readFileSync(join(__dirname, 'cdl-public-page.css'), 'utf8');
 

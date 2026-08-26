@@ -350,7 +350,7 @@ export function advancePatientJourneyState(
       note: options.note,
     });
     return { ok: true as const };
-  } catch (error) {
+  } catch (_error) {
     // Expected when journey rules block the requested state transition.
     return { ok: false as const, reason: 'transition_blocked' as const };
   }
@@ -475,7 +475,7 @@ export function enterWaitingQueue(
       staffId,
       note,
     });
-  } catch (error) {
+  } catch (_error) {
     // Expected when journey rules block the triage → waiting transition.
     return { ok: false as const, reason: 'transition_blocked' as const };
   }

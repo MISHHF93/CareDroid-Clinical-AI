@@ -135,6 +135,7 @@ type OrchestratorOptions = {
   actorStaffId?: string;
   aiUnavailable?: boolean;
   now?: string;
+  confirmDuplicateOverride?: boolean;
 };
 
 const HIGH_RISK_TERMS = [
@@ -718,6 +719,7 @@ export function assertReceptionMutationAllowed(
  */
 export async function syncReceptionPatientToBackend(
   patient: Patient,
+  confirmDuplicateOverride = false,
 ): Promise<{
   status: ReceptionBackendSyncStatus;
   backendPatientId?: string;
@@ -729,11 +731,12 @@ export async function syncReceptionPatientToBackend(
 
   try {
     const payload = serializePatientForBackendApi(patient);
-    // Reception's own duplicate gate (createAndRoute's high-confidence block, staff
-    // confirmation dialog) has already resolved by the time a patient reaches sync —
-    // this is a trusted internal caller, not the unchecked-API-client case the
-    // backend's own duplicate gate exists to catch.
-    const syncOptions = { confirmDuplicateOverride: true };
+    // Only true when the caller already confirmed a locally-flagged high-confidence
+    // duplicate (see createAndRoute's ReceptionDuplicateConfirm modal in
+    // ReceptionWorkspace.tsx). Otherwise false, so the backend's own independent
+    // duplicate index — which sees patients this client's local cache doesn't
+    // (e.g. one just created from another terminal) — can still block a match.
+    const syncOptions = { confirmDuplicateOverride };
     // Used to branch to createEmergencyPatient() (POST /emergency/patients) when
     // emergencySmartIntake was disabled but emergencyPatients was enabled -- both
     // capabilities are hardcoded REAL in backendApiCapabilities.ts with no runtime
@@ -802,7 +805,10 @@ export async function createPatientAndRouteFromReception(
   // Local-first create; backend sync is awaited explicitly below (not fire-and-forget).
   store.addPatient(enrichedPatient, { syncToBackend: false });
 
-  const backendSync = await syncReceptionPatientToBackend(enrichedPatient);
+  const backendSync = await syncReceptionPatientToBackend(
+    enrichedPatient,
+    Boolean(options.confirmDuplicateOverride),
+  );
   if (backendSync.status === 'synced') {
     useEmergencyStore.getState().updatePatient(
       enrichedPatient.id,

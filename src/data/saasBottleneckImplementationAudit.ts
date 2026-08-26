@@ -48,12 +48,6 @@ function statusFromBoolean(value) {
   return value ? AUDIT_STATUSES.PASS : AUDIT_STATUSES.FAIL;
 }
 
-function statusFromCounts(passed, total) {
-  if (passed === total) return AUDIT_STATUSES.PASS;
-  if (passed > 0) return AUDIT_STATUSES.PARTIAL;
-  return AUDIT_STATUSES.FAIL;
-}
-
 function formatStatus(status) {
   return status.toUpperCase();
 }

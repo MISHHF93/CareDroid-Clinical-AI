@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
   ROUTE_ACCESS_CONFIG,
-  getRouteAccess,
   canRoleAccessRoute,
   getNavVisibleRoutes,
   getUnauthorizedFallback,

@@ -1,5 +1,4 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { PatientState, Priority, type Patient } from '../types/emergency';
 import type { AdministrativeAutomationTask } from '../types/administrativeAutomation';
 import { taskNeedsAiEnrichment } from '../services/administrativeAutomationAiUtils';
 

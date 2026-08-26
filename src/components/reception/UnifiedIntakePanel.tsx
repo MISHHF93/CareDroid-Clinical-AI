@@ -341,53 +341,6 @@ export default function UnifiedIntakePanel({
               <input type="date" value={draft.dob} onChange={(event) => onDraftChange({ dob: event.target.value })} />
             </label>
             <label className="reception-command-field">
-              <span>Sex if known</span>
-              <select
-                value={draft.sex}
-                onChange={(event) => onDraftChange({ sex: event.target.value as ReceptionIntakeDraft['sex'] })}
-              >
-                <option value="">Unknown</option>
-                <option value="F">Female</option>
-                <option value="M">Male</option>
-                <option value="Intersex">Intersex</option>
-                <option value="Other">Other</option>
-              </select>
-            </label>
-            <label className="reception-command-field">
-              <span>Preferred language</span>
-              <input
-                value={draft.preferredLanguage || ''}
-                onChange={(event) => onDraftChange({ preferredLanguage: event.target.value })}
-                placeholder="English, Spanish, ASL…"
-                list="reception-language-suggestions-critical"
-                autoComplete="off"
-              />
-              <datalist id="reception-language-suggestions-critical">
-                <option value="English" />
-                <option value="Spanish" />
-                <option value="French" />
-                <option value="Mandarin" />
-                <option value="Arabic" />
-                <option value="ASL" />
-                <option value="Other" />
-              </datalist>
-            </label>
-            <label className="reception-command-field">
-              <span>Interpreter needed</span>
-              <select
-                value={draft.interpreterNeeded || 'unknown'}
-                onChange={(event) =>
-                  onDraftChange({
-                    interpreterNeeded: event.target.value as ReceptionIntakeDraft['interpreterNeeded'],
-                  })
-                }
-              >
-                <option value="unknown">Unknown</option>
-                <option value="yes">Yes — flag for care team</option>
-                <option value="no">No</option>
-              </select>
-            </label>
-            <label className="reception-command-field">
               <span>Consciousness</span>
               <select
                 value={draft.consciousnessStatus}
@@ -460,14 +413,6 @@ export default function UnifiedIntakePanel({
                 placeholder="0-10"
               />
             </label>
-            <label className="reception-command-field">
-              <span>Contact / callback</span>
-              <input
-                value={draft.contactCallback}
-                onChange={(event) => onDraftChange({ contactCallback: event.target.value })}
-                placeholder="If available"
-              />
-            </label>
           </div>
 
           <fieldset className="reception-command-red-flags">
@@ -529,6 +474,19 @@ export default function UnifiedIntakePanel({
                   </button>
                 </div>
                 <label className="reception-command-field">
+                  <span>Sex if known</span>
+                  <select
+                    value={draft.sex}
+                    onChange={(event) => onDraftChange({ sex: event.target.value as ReceptionIntakeDraft['sex'] })}
+                  >
+                    <option value="">Unknown</option>
+                    <option value="F">Female</option>
+                    <option value="M">Male</option>
+                    <option value="Intersex">Intersex</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </label>
+                <label className="reception-command-field">
                   <span>Preferred language</span>
                   <input
                     value={draft.preferredLanguage || ''}
@@ -560,6 +518,14 @@ export default function UnifiedIntakePanel({
                     <option value="yes">Yes</option>
                     <option value="no">No</option>
                   </select>
+                </label>
+                <label className="reception-command-field">
+                  <span>Contact / callback</span>
+                  <input
+                    value={draft.contactCallback}
+                    onChange={(event) => onDraftChange({ contactCallback: event.target.value })}
+                    placeholder="If available"
+                  />
                 </label>
                 <label className="reception-command-field">
                   <span>Next of kin / support person</span>

@@ -447,7 +447,6 @@ export function CopilotPanel() {
     realtime: false,
     selectedPatientId,
   });
-  const operationalIntelligence = aiChiefOrchestrator.operationalIntelligence;
   const centralSnapshot = aiChiefOrchestrator.centralSnapshot;
   const intelligenceSnapshot = aiChiefOrchestrator.intelligenceSnapshot;
   const aiChiefSnapshot = aiChiefOrchestrator.snapshot;
@@ -498,6 +497,36 @@ export function CopilotPanel() {
     window.addEventListener('caredroid:clear-session-context', clearForNewSession);
     return () => window.removeEventListener('caredroid:clear-session-context', clearForNewSession);
   }, [welcomeMessage]);
+  // Tracks a patient id that a dock prefill (see handlePrefill below) just
+  // switched to in the same tick, so the reset effect right after this one
+  // can tell "the user asked to open Copilot on this patient with a message
+  // already typed" apart from every other selectPatient() call and leave
+  // that prefilled input alone instead of wiping it out on the next render.
+  const prefillTargetPatientIdRef = useRef<string | null>(null);
+  // This panel is a single global instance, not remounted per patient (same
+  // shape as PatientDetailPanel -- see its patient-switch reset effect for
+  // the sibling fix). Nothing previously reset the chat transcript when
+  // selectedPatientId changed: `history`/`requestMessages` below resend the
+  // full unfiltered message list as prior conversation turns on every new
+  // send, so a prior patient's chief complaint/vitals/triage rationale
+  // would keep riding along -- visibly on screen, and in the AI request
+  // payload -- after switching to a different patient (search, command
+  // palette, alert click-through, reassessment drawer, any selectPatient()
+  // call). Reset to a fresh welcome state on every real switch, matching
+  // the safe default already used for session/role changes just above.
+  useEffect(() => {
+    setMessages([
+      { id: 'copilot-welcome', role: 'copilot', content: welcomeMessage, timestamp: new Date() },
+    ]);
+    if (prefillTargetPatientIdRef.current === selectedPatientId) {
+      // The dock "ask Copilot about this patient" prefill just switched to
+      // this same patient and set its own input in this tick -- leave it.
+      prefillTargetPatientIdRef.current = null;
+    } else {
+      setInput('');
+      setAttachments([]);
+    }
+  }, [selectedPatientId, welcomeMessage]);
   const [composerStatus, setComposerStatus] = useState('');
   const [voiceListening, setVoiceListening] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -582,6 +611,7 @@ export function CopilotPanel() {
     const handlePrefill = (event: Event) => {
       const detail = (event as CustomEvent<{ message?: string; patientId?: string }>).detail;
       if (detail?.patientId) {
+        prefillTargetPatientIdRef.current = detail.patientId;
         selectPatient(detail.patientId);
         setCopilotOpen(true);
       }

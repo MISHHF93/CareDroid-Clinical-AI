@@ -1,5 +1,5 @@
 import './canonicalRouteTree.testShared';
-import { cleanup, screen, waitFor, within } from '@testing-library/react';
+import { cleanup, screen, within } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { renderRoute, ROUTE_LOAD_TIMEOUT } from './canonicalRouteTree.testShared';

@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   ok, err, isOk, isErr, assertNever,
   ErrorCode, resultError, errorToHttpStatus, httpStatusToErrorCode,
-  type Result, type ResultError, type ProblemDetails,
+  type Result,
 } from './results';
 
 describe('Result contracts', () => {

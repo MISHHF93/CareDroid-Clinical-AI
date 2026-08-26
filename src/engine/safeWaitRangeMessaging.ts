@@ -17,14 +17,6 @@ export type SafeWaitRangeBucketId =
 export const PUBLIC_WAIT_URGENCY_DISCLAIMER =
   'Emergency patients are prioritized by urgency — these wait ranges are estimates, not guarantees.';
 
-const BUCKET_ORDER: SafeWaitRangeBucketId[] = [
-  SAFE_WAIT_RANGE_BUCKET.UNDER_30,
-  SAFE_WAIT_RANGE_BUCKET.THIRTY_TO_SIXTY,
-  SAFE_WAIT_RANGE_BUCKET.ONE_TO_TWO_HOURS,
-  SAFE_WAIT_RANGE_BUCKET.TWO_TO_FOUR_HOURS,
-  SAFE_WAIT_RANGE_BUCKET.OVER_FOUR_HOURS,
-];
-
 const BUCKET_LABELS: Record<SafeWaitRangeBucketId, string> = {
   [SAFE_WAIT_RANGE_BUCKET.UNDER_30]: 'Less than 30 minutes',
   [SAFE_WAIT_RANGE_BUCKET.THIRTY_TO_SIXTY]: '30–60 minutes',
@@ -59,10 +51,6 @@ export function classifySafeWaitRangeBucket(minutes: number): SafeWaitRangeBucke
 
 export function formatSafeWaitRangeBucket(minutes: number): string {
   return BUCKET_LABELS[classifySafeWaitRangeBucket(minutes)];
-}
-
-function bucketIndex(bucketId: SafeWaitRangeBucketId): number {
-  return BUCKET_ORDER.indexOf(bucketId);
 }
 
 function formatBucketSpan(

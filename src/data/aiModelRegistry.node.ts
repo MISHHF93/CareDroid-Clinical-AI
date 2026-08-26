@@ -46,7 +46,6 @@ export function getLocalTrainedMlModelRegistry() {
 
   return heads.map((head) => {
     const classifierPath = path.join(modelsRoot, head.head, 'classifier.json');
-    const metricsPath = path.join(modelsRoot, head.head, 'metrics.json');
     const headMeta = manifest.heads?.[head.head] || {};
     const trained = existsSync(classifierPath);
     return Object.freeze({

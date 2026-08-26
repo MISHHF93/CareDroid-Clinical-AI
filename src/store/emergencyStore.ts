@@ -60,8 +60,6 @@ import {
 } from '../services/emergencySettingsApi';
 import {
   fetchBoardingStatus,
-  fetchCapacityStatus,
-  fetchEMSIntake,
   fetchEmergencyAnalytics,
   fetchEmergencyQueues,
   fetchEmergencyWhiteboard,
@@ -127,7 +125,6 @@ import type { PatientDocumentArtifact } from '../types/patientDocumentArtifact';
 import { calculateCapacity } from '../engine/capacityEngine';
 import { buildContinuousPatientFlowSnapshot } from '../engine/continuousPatientFlowEngine';
 import {
-  buildAdministrativeAutomationSnapshot,
   reviewAdministrativeAutomationTask,
 } from '../services/unifiedClinicalWorkflowOrchestrator';
 import { normalizeAlert } from '../engine/alertEngineDerived';
@@ -1234,15 +1231,6 @@ const mergeWorkflowLogs = (
     .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
     .slice(0, MAX_WORKFLOW_LOGS);
 };
-
-const emptyCapacityMetrics = (): EmergencyCapacityMetrics => ({
-  score: 0,
-  color: 'unknown',
-  triggers: [],
-  recommendations: [],
-  updatedAt: null,
-  raw: null,
-});
 
 /**
  * Architect Mode Stage F: keep capacityMetrics.score aligned with capacity.score

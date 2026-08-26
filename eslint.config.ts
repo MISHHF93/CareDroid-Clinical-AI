@@ -92,6 +92,24 @@ const config: Linter.Config[] = [
     settings: { react: { version: 'detect' } },
   },
   {
+    // This block's own broader glob (src/**/*.{js,jsx,ts,tsx}, above) re-enables
+    // the plain `no-unused-vars` for .ts/.tsx too, silently undoing the .ts/.tsx-
+    // only block's deliberate `'no-unused-vars': 'off'` (it's meant to be replaced
+    // by the TS-aware version below, not left off entirely) -- the plain rule
+    // doesn't understand TypeScript interface/type method signatures and flags
+    // every descriptive parameter name in them as "unused" (hundreds of false
+    // positives, e.g. every method in emergencyStore.ts's store interface).
+    files: ['src/**/*.{ts,tsx}'],
+    plugins: { '@typescript-eslint': tseslint.plugin },
+    rules: {
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        { argsIgnorePattern: '^_', caughtErrorsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+      ],
+    },
+  },
+  {
     files: ['src/**/*.test.{js,jsx,ts,tsx}', 'src/test/**/*.{js,ts}'],
     languageOptions: {
       globals: { ...globals.browser, ...vitestAndLegacyJestGlobals },

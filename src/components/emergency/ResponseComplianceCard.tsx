@@ -1,7 +1,5 @@
 import './ResponseComplianceCard.css';
 
-const THREE_MINUTES_MS = 3 * 60 * 1000;
-
 export type ComplianceAlert = {
   createdAt: string | Date;
   acknowledgedAt?: string | Date | null;

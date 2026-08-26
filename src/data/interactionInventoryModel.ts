@@ -50,11 +50,8 @@ export type InteractionInventorySummary = Readonly<{
 
 const HANDLER_RE =
   /\bonClick\s*=|\bonSubmit\s*=|\bto\s*=|\bhref\s*=|\bnavigate\s*\(|\bdispatch\s*\(|\buseMutation\b|\btype\s*=\s*["']submit["']/;
-const DISABLED_RE = /\bdisabled\s*=\s*\{\s*true\s*\}|\bdisabled\s*(?:=\{\s*true\s*\})?/;
 const DISABLED_REASON_RE =
   /\btitle\s*=|\baria-describedby\s*=|\baria-label\s*=|\bdisabledReason\s*=|\bdata-disabled-reason\s*=/;
-const ACCESSIBLE_NAME_RE =
-  /\baria-label\s*=\s*["'`]([^"'`]+)["'`]|\bchildren\s*=|>\s*([^<{\n][^<\n]{0,80})\s*</;
 
 export type ClassifyControlInput = Readonly<{
   kind: InteractionControlKind;

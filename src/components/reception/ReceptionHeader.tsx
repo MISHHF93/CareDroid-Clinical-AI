@@ -1,5 +1,4 @@
 import { type ReactNode } from 'react';
-import { Activity, AlertCircle, Users } from 'lucide-react';
 import '../../pages/emergency/ReceptionWorkspace.new-header.css';
 
 export type ReceptionHeaderMetric = {

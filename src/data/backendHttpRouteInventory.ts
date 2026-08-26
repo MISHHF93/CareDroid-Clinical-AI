@@ -975,6 +975,10 @@ export const BACKEND_HTTP_ROUTES = Object.freeze([
   { method: 'GET', path: '/api/ai/models', controller: 'AIController' },
   { method: 'GET', path: '/api/ai/tools', controller: 'AIController' },
   { method: 'GET', path: '/api/ai/requests/:requestId', controller: 'AIController' },
+
+  { method: 'POST', path: '/api/chief-investigation/deterioration/:patientId', controller: 'ChiefInvestigationController' },
+  { method: 'GET', path: '/api/chief-investigation/:runId', controller: 'ChiefInvestigationController' },
+
   { method: 'GET', path: '/api/governance/registry', controller: 'NestAiGovernanceController' },
   { method: 'GET', path: '/api/governance/safety-rules', controller: 'NestAiGovernanceController' },
   { method: 'GET', path: '/api/governance/compliance', controller: 'NestAiGovernanceController' },

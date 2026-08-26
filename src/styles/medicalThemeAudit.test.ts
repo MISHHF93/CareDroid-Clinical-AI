@@ -31,14 +31,6 @@ const cssBundle = globSync('src/**/*.css', {
   .map((file) => readFileSync(file, 'utf8'))
   .join('\n');
 
-const codeBundle = globSync('src/**/*.{tsx,jsx}', {
-  cwd: join(srcRoot, '..'),
-  absolute: true,
-  ignore: ['**/*.test.*', '**/*.spec.*'],
-})
-  .map((file) => readFileSync(file, 'utf8'))
-  .join('\n');
-
 describe('medical theme full-scale audit', () => {
   it('loads every normalization layer through the design-system entry', () => {
     const designSystem = tokenFiles[11];

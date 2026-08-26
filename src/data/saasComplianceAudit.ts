@@ -3,11 +3,10 @@
  * Regenerate: npm run saas-compliance-audit:write-docs
  */
 
-import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
-  getCanonicalToolInventory,
   getUserFacingToolInventory,
   TOOL_LIFECYCLE_STATES,
 } from './toolInventory';
@@ -449,34 +448,6 @@ function summarizeViolations(rows) {
 
 function escapeCell(value) {
   return String(value ?? '—').replace(/\|/g, '\\|').replace(/\n/g, ' ');
-}
-
-function formatViolationTable(rows, limit = 50) {
-  const header = [
-    'Feature',
-    'Route',
-    'Asset ID',
-    'Pack',
-    'Platform asset?',
-    'Violations',
-  ];
-  const lines = [
-    `| ${header.join(' | ')} |`,
-    `| ${header.map(() => '---').join(' | ')} |`,
-  ];
-  const slice = rows.slice(0, limit);
-  for (const row of slice) {
-    const violationText = row.violations.map((v) => v.rule).join(', ') || '—';
-    lines.push(
-      `| ${[row.feature, row.route, row.assetId, row.packAssignment, row.isPlatformAsset, violationText]
-        .map(escapeCell)
-        .join(' | ')} |`
-    );
-  }
-  if (rows.length > limit) {
-    lines.push('', `_… and ${rows.length - limit} more rows (see full matrix)._`);
-  }
-  return lines.join('\n');
 }
 
 export function getSaasComplianceDocument() {

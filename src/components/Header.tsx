@@ -9,11 +9,9 @@ import {
   EMERGENCY_ROLE_IDS,
   getReceptionEmbeddedIntakePath,
   getReceptionQuickCreatePath,
-  isRegistrationClerkRole,
   prefersReceptionForPatientCreate,
   prefersReceptionForPatientSearch,
 } from '../config/emergencyRolePermissions';
-import { RECEPTION_COPY } from './reception/receptionCopy';
 import { getCentralControlPolicy } from '../config/centralControl.config';
 import { PILOT_CUSTOMER_MODE } from '../config/unified-navigation.config';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';

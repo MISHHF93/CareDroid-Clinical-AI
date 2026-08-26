@@ -153,6 +153,28 @@ const ALL_CAREDROID_ROUTES = Object.freeze([
   // /workspaces, both true for /workspace, under the identical session.
   CANONICAL_ROUTES.workspaces,
   CANONICAL_ROUTES.laboratory,
+  // Pharmacy, Radiology, and Education graduated from
+  // NON_ED_WORKSPACE_REDIRECT_ROUTES to real mounted pages
+  // (PharmacyDashboard/RadiologyDashboard/EducationHub) alongside Laboratory
+  // above — same vacuous-grant treatment so Dimension-A doesn't block them
+  // for every role. Cardiology never had a placeholder redirect at all (its
+  // real content was nested under /emergency/tools/cardiology/:toolId) but
+  // needs the same treatment now that CardiologyDashboard gives it a
+  // first-class, non-ED-nested home.
+  CANONICAL_ROUTES.pharmacy,
+  CANONICAL_ROUTES.radiology,
+  CANONICAL_ROUTES.education,
+  CANONICAL_ROUTES.cardiology,
+  // Nephrology/Neurology/Gastroenterology: same situation as Cardiology —
+  // real workflow content already existed nested under
+  // /emergency/tools/<specialty>/:toolId with no hospital-wide home.
+  CANONICAL_ROUTES.nephrology,
+  CANONICAL_ROUTES.neurologyDept,
+  CANONICAL_ROUTES.gastroenterology,
+  CANONICAL_ROUTES.endocrinology,
+  CANONICAL_ROUTES.pediatricsObgyn,
+  CANONICAL_ROUTES.psychiatryDept,
+  CANONICAL_ROUTES.pulmonology,
   CANONICAL_ROUTES.audit,
   CANONICAL_ROUTES.aiCommandCenter,
   CANONICAL_ROUTES.adminOperations,

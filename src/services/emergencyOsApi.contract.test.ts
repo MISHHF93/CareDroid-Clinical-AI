@@ -16,7 +16,6 @@ describe('emergencyOsApi contract', () => {
         missing.push(`${key}: undefined`);
         continue;
       }
-      const normalized = path.replace(/:patientId/g, ':patientId').replace(/:surfaceId/g, ':surfaceId');
       const hasInventory =
         INVENTORY_PATHS.has(path) ||
         INVENTORY_PATHS.has(`${path}/:patientId`) ||

@@ -16,10 +16,8 @@ import {
 import { buildPublicWaitingDisplaySnapshot } from '../components/whiteboard/publicWaitingDisplayModel';
 import { buildCrowdLevelSnapshot } from '../engine/crowdLevelEngine';
 import { selectChargeNurseOperationalStrip } from '../components/whiteboard/chargeNurseWorkflowModel';
-import { buildArrivalControlSummary } from '../services/arrivalControlLayer';
 import { buildTriageBreachVisibilitySnapshot } from '../services/triageBreachVisibilityModel';
 import { buildProviderWaitVisibilitySnapshot } from '../services/providerWaitVisibilityModel';
-import { summarizeTriageBreachBoard } from '../services/triageBreachTimer';
 import { summarizeEmsAwareness } from '../components/whiteboard/emsAwarenessModel';
 import {
   PatientState,
@@ -1075,7 +1073,6 @@ export function buildScreenModeKpiSnapshot(input: {
     const arrivalsToday = patients.filter(
       (patient) => localDateKey(patient.arrivalTime) === today,
     ).length;
-    const arrivalControl = buildArrivalControlSummary(patients);
     const triageVisibility = buildTriageBreachVisibilitySnapshot(patients, {
       settings: input.settings ? { emergencySettings: input.settings } : undefined,
       now: input.now || new Date(),

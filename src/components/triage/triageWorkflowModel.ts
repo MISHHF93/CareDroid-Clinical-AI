@@ -1,4 +1,3 @@
-import { buildArrivalControlSummary } from '../../services/arrivalControlLayer';
 import { selectTriageBreachVisibilityMetrics } from '../../services/triageBreachVisibilityModel';
 import { summarizeEmsAwareness } from '../whiteboard/emsAwarenessModel';
 import { resolveTriageStripMetricIds } from '../../config/emergencyScreenKpiPolicy';

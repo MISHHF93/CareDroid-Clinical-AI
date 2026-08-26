@@ -7,7 +7,6 @@ import {
 import { buildArrivalControlSummary } from '../../services/arrivalControlLayer';
 import {
   buildWaitingRoomStatusMessagingSnapshot,
-  PUBLIC_WAITING_ESCALATION_MESSAGE,
   type WaitingRoomStatusMessagingSnapshot,
 } from '../../services/waitingRoomStatusMessaging';
 import { buildCrowdLevelSnapshot, type CrowdLevelTone } from '../../engine/crowdLevelEngine';
@@ -138,7 +137,6 @@ export function buildPublicWaitingDisplaySnapshot(
   const patients = input.patients || [];
   const capacity = input.capacity;
   const waitingPatients = patients.filter((patient) => patient.state === PatientState.Waiting);
-  const waitingCount = capacity?.waitingCount ?? waitingPatients.length;
 
   const avgWait =
     capacity?.averageWaitMinutes ??

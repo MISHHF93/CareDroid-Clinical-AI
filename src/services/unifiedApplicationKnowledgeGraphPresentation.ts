@@ -94,7 +94,6 @@ export function resolvePatientKnowledgeGraphSubgraph(
   patientId: string,
 ): PatientKnowledgeGraphContext {
   const nodeIds = graph.patientIndex[patientId] || [];
-  const nodes = nodeMap(graph);
   const neighborMap = new Map<string, KnowledgeGraphNeighbor>();
 
   for (const connectedNodeId of nodeIds) {

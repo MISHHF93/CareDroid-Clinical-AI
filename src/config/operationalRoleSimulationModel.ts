@@ -240,7 +240,6 @@ export function simulateOperationalRole(profileId: SimulatedOperationalRoleId): 
   const homeRoute = getHomeRouteForRole(profileId);
   const landingRoute = resolveRoleLandingRoute({ role: profileId });
   const navItemIds = getNavItemIdsForRole(profileId);
-  const defaultRoute = getDefaultRouteForProfile(profileId);
 
   return Object.freeze({
     profileId,

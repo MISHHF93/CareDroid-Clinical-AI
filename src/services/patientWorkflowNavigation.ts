@@ -8,7 +8,7 @@ import {
   resolveWorkflowStepForState,
   type PatientWorkflowStep,
 } from '../config/unifiedPatientWorkflowModel';
-import { PatientState, type Patient } from '../types/emergency';
+import { type Patient } from '../types/emergency';
 
 export type PatientWorkflowNavigationContext = Readonly<{
   patientId?: string;

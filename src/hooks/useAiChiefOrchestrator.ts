@@ -7,7 +7,6 @@ import useOperationalIntelligenceCore from './useOperationalIntelligenceCore';
 import useAiChiefRouting from './useAiChiefRouting';
 import {
   buildAiChiefOrchestrationSnapshot,
-  type AiChiefOrchestrationSnapshot,
 } from '../services/aiChiefContinuousMonitoringService';
 import {
   requestAiChiefCopilotQuery,

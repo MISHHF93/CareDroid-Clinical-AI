@@ -30,7 +30,6 @@ import { useEmergencyRolePermissions } from '../../hooks/useEmergencyRolePermiss
 import { shouldSuppressOperationalSurface } from '../../config/roleOperationalDashboardModel';
 import useTriageScreen from '../../hooks/useTriageScreen';
 import useChargeNurseScreen from '../../hooks/useChargeNurseScreen';
-import useReceptionScreen from '../../hooks/useReceptionScreen';
 import usePhysicianScreen from '../../hooks/usePhysicianScreen';
 import usePublicWaitingScreen from '../../hooks/usePublicWaitingScreen';
 import useReadOnlyWhiteboardScreen from '../../hooks/useReadOnlyWhiteboardScreen';
@@ -55,7 +54,6 @@ import RoleOperationalSummaryStrip from '../../components/whiteboard/RoleOperati
 import OperationalHandoffDomainBar from '../../components/whiteboard/OperationalHandoffDomainBar';
 import WhiteboardOpsDetailStrip from '../../components/whiteboard/WhiteboardOpsDetailStrip';
 import { evaluateWhiteboardDensity } from '../../config/whiteboardDensityModel';
-import { resolveScreenDensityProfile } from '../../config/screenDensityModeModel';
 import useScreenDensityMode from '../../hooks/useScreenDensityMode';
 import ReassessmentAttentionStrip from '../../components/whiteboard/ReassessmentAttentionStrip';
 import WaitingRoomSafetyBoard from '../../components/whiteboard/WaitingRoomSafetyBoard';
@@ -329,7 +327,6 @@ export default function EmergencyWhiteboard() {
   );
   const triage = useTriageScreen();
   const charge = useChargeNurseScreen();
-  const reception = useReceptionScreen();
   const physician = usePhysicianScreen();
   const publicWaiting = usePublicWaitingScreen();
   const readOnlyWhiteboard = useReadOnlyWhiteboardScreen();

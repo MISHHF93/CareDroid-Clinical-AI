@@ -7,7 +7,6 @@ import {
   ED_STAFF_EMERGENCY_ROLE_IDS,
   assertEdStaffCollaborationWiring,
   buildEdStaffCollaborationPath,
-  edStaffNavIncludesCollaboration,
   edStaffShouldSeeCollaboration,
   listCuratedEdStaffRoleViews,
   resolveEdStaffCollabChannelSlug,

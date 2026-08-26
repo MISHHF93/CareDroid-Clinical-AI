@@ -754,19 +754,6 @@ function normalizeCapacityBand(capacity?: Partial<CapacitySnapshot> | Record<str
   return String(capacity?.band || capacity?.riskLevel || '').toLowerCase();
 }
 
-function isCriticalPatient(patient?: PatientReferenceInput): boolean {
-  if (!patient) return false;
-  const flags = patient.flags || [];
-  return (
-    String(patient.priority) === 'P1' ||
-    String(patient.priority) === 'P2' ||
-    flags.includes('HighRisk') ||
-    flags.includes('DeteriorationRisk') ||
-    flags.includes('SepsisAlert') ||
-    flags.includes('StrokeCode')
-  );
-}
-
 function bottleneck(input: Omit<BottleneckEvent, 'detectedAt' | 'status'>, detectedAt: string): BottleneckEvent {
   const ownership = canonicalAlertOwnership(input);
   return {

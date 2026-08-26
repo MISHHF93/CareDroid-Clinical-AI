@@ -6,7 +6,6 @@ import { PHYSICIAN_SCREEN_WIDGETS } from '../../config/physicianScreenModel';
 import {
   PHYSICIAN_NAV_EXCLUDED_IDS,
   PHYSICIAN_WORKFLOW_LAUNCHERS,
-  PHYSICIAN_WORKFLOW_SURFACES,
   physicianCardActionIds,
   resolvePatientCardWorkflowProfile,
   selectPhysicianOperationalStrip,

@@ -69,7 +69,6 @@ export function buildSmartIntakeVerticalSlicePatient({
   autoSuggestion = {} as any,
   triageSuggestion = {} as any,
   sessionId = null,
-  staffId = SMART_INTAKE_VERTICAL_SLICE_FIXTURE.staffId,
   timestamp = new Date().toISOString(),
   source = 'Smart Intake',
 } = {} as any) {

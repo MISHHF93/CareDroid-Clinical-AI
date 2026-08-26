@@ -13,7 +13,6 @@ import {
   TOOL_LAUNCH_TYPES,
 } from './toolInventory';
 import { enrichToolWithSegmentation } from './profileToolSegmentation';
-import { FRONTEND_API_CALLS } from './frontendApiCallsInventory';
 import { findBackendRoute } from './backendHttpRouteInventory';
 import { TIER_B_CHAT_CALCULATOR_REGISTRY_IDS } from './clinicalToolIdContract';
 
@@ -555,13 +554,6 @@ export function getFeatureCoverageDocument() {
     if (!byKind[row.kind]) byKind[row.kind] = [];
     byKind[row.kind].push(row);
   }
-
-  const frontendApiGaps = FRONTEND_API_CALLS.filter(
-    (c) =>
-      c.path.includes('/api/platform') ||
-      c.path.includes('/api/products') ||
-      c.path.includes('/api/commercial')
-  );
 
   const sections = [
     '# Feature Coverage Matrix',

@@ -9,13 +9,7 @@ import {
   type RegistrationStatus,
 } from '../types/emergency';
 import { WHITEBOARD_QUEUE_FILTER } from './queueAssignment';
-import { getArrivalReasonFromPatient } from './intakeEncounterChain';
-import {
-  deriveQueueDestination,
-  deriveRegistrationStatus,
-  deriveTriagePending,
-  normalizeArrivalMode,
-} from './arrivalDerivations';
+import { normalizeArrivalMode } from './arrivalDerivations';
 import { arrivalRecordToControlSnapshot } from './patientArrivalModel';
 import {
   buildHighRiskComplaintPatch,
@@ -123,17 +117,6 @@ export {
   triageAcuityToPriority,
   deriveWaitingRoomStatus,
 } from './patientArrivalModel';
-
-function extractQuickSafetyFlags(patient: Patient): QuickSafetyFlag[] {
-  const stored = patient.quickSafetyFlags?.filter((flag): flag is QuickSafetyFlag =>
-    QUICK_SAFETY_FLAG_SET.has(flag),
-  );
-  if (stored?.length) return stored;
-
-  return ((patient.flags || []) as PatientFlagEntry[])
-    .map((entry) => (typeof entry === 'string' ? entry : entry?.type))
-    .filter((flag): flag is QuickSafetyFlag => Boolean(flag && QUICK_SAFETY_FLAG_SET.has(flag)));
-}
 
 export function buildArrivalControlSnapshot(patient: Patient): ArrivalControlSnapshot {
   return arrivalRecordToControlSnapshot(patient);

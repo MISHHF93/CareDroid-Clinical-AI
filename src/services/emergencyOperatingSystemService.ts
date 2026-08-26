@@ -25,7 +25,6 @@ import EmergencyPatientPathService from './emergencyPatientPathService';
 import EmergencyResourceBoardService from './emergencyResourceBoardService';
 import EmergencySimulationScenariosService from './emergencySimulationScenariosService';
 import EmergencyWhiteboardService from './emergencyWhiteboardService';
-import QueueIntelligenceService from './queueIntelligenceService';
 import { getLiveQueueDashboard } from './queueAssignment';
 import ReassessmentAutomationService from './reassessmentAutomationService';
 import ReferralHub from './referralHub';

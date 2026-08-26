@@ -39,7 +39,6 @@ const backendPatternsSource = readFileSync(
   join(repoRoot, 'backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts'),
   'utf8'
 );
-const appSource = readFileSync(join(repoRoot, 'src/app/router.tsx'), 'utf8');
 const providersSource = readFileSync(join(repoRoot, 'src/app/providers.tsx'), 'utf8');
 const themeContextSource = readFileSync(join(repoRoot, 'src/contexts/ThemeContext.tsx'), 'utf8');
 const themeTestSource = readFileSync(join(repoRoot, 'src/contexts/ThemeContext.test.tsx'), 'utf8');

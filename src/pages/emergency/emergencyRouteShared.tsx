@@ -4,7 +4,7 @@ import PatientCard from '../../components/PatientCard';
 import EdJourneyProgressRail from '../../components/emergency/EdJourneyProgressRail';
 import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import { OperationalPageTemplate, PageShell } from '../../components/ui/CareDroidPrimitives';
-import { PatientFlag, PatientState } from '../../types/emergency';
+import { PatientFlag } from '../../types/emergency';
 import { isEmergencyOsBoarding } from '../../../lib/emergency-os/logic';
 import { resolveEdDataFreshness, resolveEdSourceLabel } from '../../utils/edDataSource';
 import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
@@ -141,13 +141,11 @@ export function FlowCapacityViewTabs({ activeView, onViewChange }) {
 }
 
 export function EmergencyRoutePage({
-  eyebrow = undefined,
   title = undefined,
   titleId = undefined,
   description = undefined,
   children = undefined,
   actions = undefined,
-  maturity = undefined,
   situationBrief = undefined,
   showJourneyRail = true,
   surfaceClassName = '',

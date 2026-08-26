@@ -1,13 +1,5 @@
-import { PatientState, Priority, type Patient } from '../types/emergency';
+import { PatientState, type Patient } from '../types/emergency';
 import { normalizePatientArrival } from '../services/patientArrivalModel';
-
-const PRIORITY_RANK: Record<Priority, number> = {
-  [Priority.P1]: 1,
-  [Priority.P2]: 2,
-  [Priority.P3]: 3,
-  [Priority.P4]: 4,
-  [Priority.P5]: 5,
-};
 
 export function whiteboardArrivalTimestamp(patient: Pick<Patient, 'arrivalTime' | 'arrival'>): string {
   return patient.arrival?.arrivalTimestamp || patient.arrivalTime;

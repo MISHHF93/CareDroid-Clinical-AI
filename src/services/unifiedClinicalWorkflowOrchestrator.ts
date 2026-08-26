@@ -12,7 +12,6 @@ import {
 import type {
   AdministrativeAutomationCategory,
   AdministrativeAutomationPriority,
-  AdministrativeAutomationReviewDecision,
   AdministrativeAutomationSnapshot,
   AdministrativeAutomationTask,
   ReviewAdministrativeAutomationInput,

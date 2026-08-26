@@ -530,7 +530,7 @@ const addRandomArrival = (): void => {
   useEmergencyStore.getState().addPatient(createArrivalPatient(template));
 };
 
-const addFlagIfMissing = (patient: Patient, flag: PatientFlagType, reason: string): void => {
+const addFlagIfMissing = (patient: Patient, flag: PatientFlagType, _reason: string): void => {
   if (!hasPatientFlag(patient, flag)) {
     useEmergencyStore.getState().addFlag(patient.id, flag);
   }

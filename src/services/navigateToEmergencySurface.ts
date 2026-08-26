@@ -2,7 +2,6 @@ import { CANONICAL_ROUTES } from '../config/routes.config';
 import { getEmergencySurface } from '../config/emergencyPipelineModel';
 import {
   getReceptionEmbeddedIntakePath,
-  getReceptionExpressCreatePath,
   prefersReceptionForPatientCreate,
   prefersReceptionForPatientSearch,
 } from '../config/emergencyRolePermissions';

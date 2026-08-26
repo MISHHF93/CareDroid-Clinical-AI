@@ -4,7 +4,6 @@ import {
   buildAutoApprovedFieldDecisions,
   canContinueSmartIntakeStep,
   countBulkApprovableFields,
-  measureSmartIntakePath,
   resolveSmartIntakeContinueStep,
   resolveSmartIntakeStartStep,
 } from './smartIntakeFlowModel';

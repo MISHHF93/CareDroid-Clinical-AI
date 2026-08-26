@@ -153,7 +153,6 @@ function fromReassessmentScenario(
   });
   if (!timer || timer.stage === 'none') return null;
 
-  const overdueMinutes = timer.minutesOverdue ?? (timer.isOverdue ? timer.minutesOverdue : null);
   const remainingLabel = timer.isOverdue
     ? timer.overdueLabel || buildRemainingLabel(null, timer.minutesOverdue)
     : timer.dueInLabel || buildRemainingLabel(timer.minutesUntilDue, null);

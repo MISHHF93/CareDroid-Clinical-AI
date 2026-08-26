@@ -204,10 +204,6 @@ function patientFlags(patient: Patient): PatientFlag[] {
   );
 }
 
-function hasFlag(patient: Patient, flag: PatientFlag): boolean {
-  return patientFlags(patient).includes(flag);
-}
-
 export function deriveTriageLevelLabel(patient: Patient): string | null {
   if (!patient.triageTime || !patient.priority) return null;
   return `${patient.priority} · ${PriorityLabel[patient.priority]}`;

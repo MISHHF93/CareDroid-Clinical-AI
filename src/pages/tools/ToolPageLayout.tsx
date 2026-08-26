@@ -247,7 +247,14 @@ const ToolPageLayout = ({
       className={`tool-page${embedded ? ' tool-page--embedded' : ''}`}
       contentClassName="cd-page-stack cd-page-stack--compact tool-page__content"
       title={tool.name}
-      description={surfaces.tools.showPageMetaBadges ? tool.description : undefined}
+      // Always registers as the shared shell's route-chrome subtitle (ShellRouteTab), independent
+      // of showPageMetaBadges below -- that flag only controls the smaller on-page category/shortcut
+      // badges. Withholding this too left the shell subtitle with nothing tool-specific to show for
+      // roles with showPageMetaBadges off, so it fell back to the CURRENT USER's own role
+      // description (AppShell's currentPage.subtitle -> profileCopy.workspaceDescription) -- e.g. a
+      // registration clerk viewing the ECG Interpretation Assistant saw "Register patients, confirm
+      // identity, and send arrivals to triage" as the tool's subtitle. Confirmed live.
+      description={tool.description}
       leadingIcon={<NavIcon icon={getToolIcon(tool.id)} size={28} />}
       actions={headerActions}
       registerRouteChrome={!embedded}

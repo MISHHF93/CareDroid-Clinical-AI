@@ -1,4 +1,4 @@
-import { PatientState, Priority, type CapacitySnapshot, type EMSArrival, type Patient, type Referral, type Staff } from '../../types/emergency';
+import { PatientState, type CapacitySnapshot, type EMSArrival, type Patient, type Referral, type Staff } from '../../types/emergency';
 import { buildArrivalControlSummary } from '../../services/arrivalControlLayer';
 import { summarizeDeteriorationWatchBoard } from '../../services/waitingRoomDeteriorationWatch';
 import { summarizeLwbsRiskBoard } from '../../services/lwbsRiskLayer';

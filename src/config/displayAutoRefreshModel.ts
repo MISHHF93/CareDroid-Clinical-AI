@@ -72,7 +72,7 @@ export function summarizeDisplayRefreshErrors(
 
 export function formatDisplayUpdatedAt(
   timestamp: string | null | undefined,
-  now = new Date(),
+  _now = new Date(),
 ): string {
   if (!timestamp) return '—';
   try {

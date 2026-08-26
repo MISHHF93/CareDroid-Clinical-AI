@@ -11,10 +11,7 @@ import { TOOL_LAUNCH_PATHS } from './clinicalToolIdContract';
 import { AUTH_CONFIG } from '../config/auth.config';
 import { CALCULATOR_ROUTE_DEFS } from '../routes/clinicalToolRoutes';
 import {
-  PRIMARY_NAV_ITEMS,
-  QUICK_COMMAND_DESTINATION_ITEMS,
   PRIMARY_SIDEBAR_NAV_ITEMS,
-  OPERATIONS_SIDEBAR_NAV_ITEMS,
 } from '../config/navigation.config';
 import { CARE_WORKSPACES } from '../config/workspace.config';
 import {

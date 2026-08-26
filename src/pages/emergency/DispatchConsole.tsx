@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { MEDICAL_THEME, MEDICAL_TYPE } from '../../config/medicalTheme.constants';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import {
   createEmergencyCall,
@@ -12,7 +11,6 @@ import {
 } from '../../services/dispatchIntakeService';
 import {
   cadDispatchUnit,
-  cadUpdateAssignmentStatus,
   getAvailableUnits,
   getCADSystemSummary,
   type CADUnit,
@@ -25,14 +23,6 @@ import useEmergencyOperatingSurface from '../../hooks/useEmergencyOperatingSurfa
 import { EmergencyRoutePage } from './emergencyRouteShared';
 import './DispatchConsole.css';
 import './emergency-route.css';
-
-const CALL_PRIORITY_COLORS: Record<CallPriority, string> = {
-  Echo: MEDICAL_TYPE.statusCritical,
-  Delta: '#c2410c',
-  Charlie: '#b45309',
-  Bravo: '#1d4ed8',
-  Alpha: '#166534',
-};
 
 const CALL_PRIORITY_LABELS: Record<CallPriority, string> = {
   Echo: 'Echo — Life Threatening',

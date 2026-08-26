@@ -2,7 +2,6 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { CANONICAL_ROUTES } from './routes.config';
 import { TOOL_LAUNCH_PATHS } from '../data/clinicalToolIdContract';
 import {
   TOOLS_AI_PAGE_ROUTES,

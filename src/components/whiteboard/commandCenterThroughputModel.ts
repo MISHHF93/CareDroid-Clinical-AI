@@ -159,7 +159,7 @@ function isAwaitingProvider(patient: Patient): boolean {
   return patient.state === PatientState.Waiting && !patient.lastAssessedTime;
 }
 
-function computeAverageMinutes(patients: Patient[], selector: (patient: Patient) => number, now: Date): number | null {
+function computeAverageMinutes(patients: Patient[], selector: (patient: Patient) => number, _now: Date): number | null {
   if (!patients.length) return null;
   const values = patients.map(selector).filter((value) => value > 0);
   if (!values.length) return null;

@@ -3,7 +3,6 @@ import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
 import { SMART_INTAKE_DEMO } from '../data/smartIntakeFixtures';
 
 const jsonHeaders = { 'Content-Type': 'application/json' };
-const SMART_INTAKE_UNAVAILABLE_MESSAGE = 'Backend Smart Intake endpoint is not available yet.';
 const SMART_INTAKE_INVALID_RESPONSE_MESSAGE =
   'The API did not return a valid response. Check backend availability or the request mock.';
 

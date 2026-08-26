@@ -17,7 +17,6 @@ import {
   applyAlertRoutingToResponse,
   enrichStructuredRequest,
   inferAlertScenario,
-  requestAiChiefConversational,
   requestAiChiefCopilotQuery,
   requestAiChiefStructured,
   resolveAIChiefDomain,

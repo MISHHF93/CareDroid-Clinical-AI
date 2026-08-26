@@ -11,7 +11,7 @@ vi.mock('./tenantContextStore', () => ({
 const TOKEN_KEY = 'caredroid_access_token';
 const PROFILE_KEY = 'caredroid_user_profile';
 
-function backendDevSessionResponse(overrides: Record<string, unknown> = {}) {
+function backendDevSessionResponse() {
   // Real shape from backend/src/modules/auth/auth.service.ts's sanitizeUser --
   // no isDemoPersonaUser() markers (no authMode:'open-access', no demoPersona,
   // no profile.demoPersonaId).

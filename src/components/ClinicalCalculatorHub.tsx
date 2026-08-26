@@ -476,7 +476,6 @@ export default function ClinicalCalculatorHub({
 
   const closeCalculator = useCallback(() => {
     const params = new URLSearchParams(searchParams);
-    const activeId = activeCalculatorId;
     if (resolveKnownCalculatorId(params.get('q'))) params.delete('q');
     if (resolveKnownCalculatorId(params.get('search'))) params.delete('search');
     params.delete('open');

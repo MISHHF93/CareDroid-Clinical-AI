@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import { CANONICAL_ROUTES } from './routes.config';
 import { EMERGENCY_ACTIONS, EMERGENCY_ROLE_IDS } from './emergencyRolePermissions';
 import {
   TRIAGE_SCREEN_ACTIONS,

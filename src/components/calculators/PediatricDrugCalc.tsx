@@ -66,6 +66,17 @@ export default function PediatricDrugCalc({ patientId, onClose }: PediatricDrugC
     weightInputRef.current?.focus();
   }, []);
 
+  // Defense in depth: this modal is currently only opened via a
+  // conditionally-rendered block that unmounts on close (see
+  // PatientDetailPanel's patient-switch reset effect), so a fresh open
+  // already gets a clean weightInput. But weight-based dosing is high
+  // enough stakes -- a stale weight from a different, differently-sized
+  // patient silently carried into a calculated dose -- that this also
+  // self-resets if it were ever kept mounted across a patientId change.
+  useEffect(() => {
+    setWeightInput('');
+  }, [patientId]);
+
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') onClose();

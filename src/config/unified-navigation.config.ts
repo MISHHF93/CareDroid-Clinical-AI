@@ -10,7 +10,6 @@ import {
   normalizeEmergencyRole,
   shouldHideStandaloneIntakeNav,
 } from './emergencyRolePermissions';
-import { PHYSICIAN_NAV_EXCLUDED_IDS } from '../components/whiteboard/physicianWorkflowModel';
 import { getReceptionNavActivePaths } from './emergencyPipelineModel';
 import {
   getHiddenNavItemIdsForRole,

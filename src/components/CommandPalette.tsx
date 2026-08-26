@@ -26,7 +26,6 @@ import {
   EMERGENCY_OS_HELP_COMMANDS,
   EMERGENCY_OS_TOOL_COMMANDS,
 } from '../config/commandPalette.config';
-import { RECEPTION_FIRST_UX, isReceptionFirstUxEnabled } from '../config/receptionFirstUx.config';
 import { navigateToEmergencySurface } from '../services/navigateToEmergencySurface';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import { MEDICAL_THEME } from '../config/medicalTheme.constants';
@@ -47,7 +46,6 @@ import {
   formatOperationalSearchEntityLabel,
   searchOperationalEntities,
   type OperationalSearchEntityType,
-  type OperationalSearchHit,
 } from '../services/unifiedOperationalSearch';
 import {
   AI_PALETTE_COMMANDS,

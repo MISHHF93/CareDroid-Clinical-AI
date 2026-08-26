@@ -304,7 +304,11 @@ export default function MedicalIotDashboard() {
                   <g
                     key={marker.id}
                     transform={`translate(${marker.x} ${marker.y})`}
-                    className={selected ? 'is-selected' : undefined}
+                    // The marker label's CSS (.medical-iot-map-canvas__marker text, MedicalIotDashboard.css)
+                    // never matched anything without this class -- the <text> inherited an unscaled 15px
+                    // page font-size into this 100x100 SVG viewBox's user-unit space, rendering each device
+                    // label at ~15 units tall (vs. the r="2.2" marker circle), swamping the whole map canvas.
+                    className={`medical-iot-map-canvas__marker${selected ? ' is-selected' : ''}`}
                     onClick={() => setSelectedDeviceId(marker.id)}
                     role="button"
                     tabIndex={0}

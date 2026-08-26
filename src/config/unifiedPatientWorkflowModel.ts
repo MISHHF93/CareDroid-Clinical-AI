@@ -45,19 +45,6 @@ export type PatientWorkflowStep = Readonly<{
   clicksSavedEstimate: number;
 }>;
 
-const STEP_ORDER: readonly PatientWorkflowStepId[] = Object.freeze([
-  'arrival',
-  'registration',
-  'triage',
-  'waiting',
-  'assessment',
-  'orders',
-  'results',
-  'disposition',
-  'admission',
-  'discharge',
-]);
-
 export const PATIENT_WORKFLOW_STEPS = Object.freeze([
   Object.freeze({
     id: 'arrival',

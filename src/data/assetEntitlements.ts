@@ -77,7 +77,6 @@ export function filterToolsByEntitlements(tools, context = cachedEntitlementCont
   const entitled = new Set(context?.entitledAssetIds || []);
   const hidden = new Set(context?.roleProfile?.hiddenAssetIds || []);
   const strict = isStrictSaasEntitlementsEnabled(context);
-  const saasRole = context?.roleProfile?.id || context?.membership?.roleProfileId || context?.saasRole;
   const profilePacks = context?.roleProfile?.allowedPacks || context?.resolvedProfilePacks;
   const effectivePacks = profilePacks?.length
     ? intersectProfileAllowedPacks(profilePacks, context?.entitledPackIds || [], strict)

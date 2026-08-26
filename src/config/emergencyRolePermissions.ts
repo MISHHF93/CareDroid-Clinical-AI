@@ -1,13 +1,10 @@
 import { CANONICAL_ROUTES, getDefaultRouteForProfile } from './routes.config';
 import {
-  canAccessEmergencyRoutePermission,
   canPerformEmergencyMutation,
   EMERGENCY_PERMISSION_KEYS,
   hasEmergencyPermission,
   isPublicDisplayContext,
   isReadOnlyOperationalContext,
-  listPermissionsForRole,
-  resolveEmergencyPermissionKey,
 } from './emergencyPermissionRegistry';
 import {
   getPlatformHomeRoute,

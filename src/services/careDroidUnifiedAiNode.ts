@@ -3,7 +3,7 @@
  * Structured intents and conversational copilot traffic route through AI Chief.
  */
 
-import type { CareDroidAIRequest, CareDroidAIResponse } from '../../lib/ai/careDroidAI';
+import type { CareDroidAIResponse } from '../../lib/ai/careDroidAI';
 import type { AIResponse } from '../lib/ai/client';
 import {
   AI_SYSTEM_TOOL_NODE_MAP,

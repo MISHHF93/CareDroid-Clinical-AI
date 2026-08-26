@@ -70,6 +70,7 @@ import { selectReassessmentTimerForPatient } from '../engine/reassessmentTimerEn
 import RecommendedToolsStrip from './orchestration/RecommendedToolsStrip';
 import SavedClinicalScoresStrip from './orchestration/SavedClinicalScoresStrip';
 import PatientCardCopilot from './copilot/PatientCardCopilot';
+import ChiefInvestigationPanel from './investigation/ChiefInvestigationPanel';
 import './PatientDetailPanel.css';
 
 const HEARTScore = lazy(() => import('./calculators/HEARTScore'));
@@ -606,7 +607,6 @@ export default function PatientDetailPanel() {
   const selectedPatientId = useEmergencyStore((state) => state.selectedPatientId);
   const unsyncedPatientIds = useEmergencyStore((state) => state.unsyncedPatientIds);
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
-  const updatePatient = useEmergencyStore((state) => state.updatePatient);
   const assignStaff = useEmergencyStore((state) => state.assignStaff);
   const assignRoom = useEmergencyStore((state) => state.assignRoom);
   const addFlag = useEmergencyStore((state) => state.addFlag);
@@ -680,12 +680,36 @@ export default function PatientDetailPanel() {
   // must not silently survive attribution to a different patient, even at
   // the cost of losing in-progress typing if the clinician switches away
   // and back.
+  //
+  // The same reasoning applies to the calculator/checklist modals below,
+  // which this reset originally missed: HEARTScore/QSOFA/PediatricDrugCalc
+  // are only conditionally rendered (unmount on close, so closing them here
+  // is enough to force a fresh remount next open), but CriticalChecklist is
+  // rendered unconditionally and keyed off activeCriticalChecklist/
+  // criticalChecklistOpen -- without clearing those too, switching away from
+  // a stroke-code/EMS-critical patient mid-checklist would leave that
+  // patient's checklist open and selectable against whichever patient is
+  // selected next, since CriticalChecklist's own item-check handler (like
+  // addVitals/addNote above) reads patient.id live at click time. Checking
+  // an item then writes a checklist-completion note -- for the wrong
+  // protocol entirely -- onto the new patient's chart. Same for
+  // PediatricDrugCalc's typed weight: it's conditionally rendered so a real
+  // remount already fixes this, but closing here removes any window where a
+  // pending weight entry could be saved as a dose calculated for a
+  // different (and differently sized) patient.
   useEffect(() => {
     setShowVitalsForm(false);
     setVitalsForm(emptyVitalsForm);
     setFlagToAdd(PatientFlag.ReassessmentDue);
     setNoteText('');
     setActionMode(null);
+    setHeartScoreOpen(false);
+    setQsofaOpen(false);
+    setPediatricDrugCalcOpen(false);
+    setCriticalChecklistOpen(false);
+    setActiveCriticalChecklist(null);
+    setCriticalChecklistTitleHint(undefined);
+    setAutoOpenedChecklistKey('');
   }, [selectedPatient?.id]);
   const openCalculatorHub = useCallback((calculatorId: string) => {
     if (!selectedPatientId) return;
@@ -1256,6 +1280,8 @@ export default function PatientDetailPanel() {
         </div>
 
         <PatientCardCopilot patient={selectedPatient} />
+
+        <ChiefInvestigationPanel patient={selectedPatient} />
 
         {/* HEAL-191: previously rendered far below (after Journey Timeline, Patient Timeline,
             Data Quality, Waiting Room Communication, Operational History, and Discussion Panel) --

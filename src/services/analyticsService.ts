@@ -164,7 +164,7 @@ export class AnalyticsService {
         // Re-queue on failure
         this.queue = [...eventsToFlush, ...this.queue];
       }
-    } catch (error: any) {
+    } catch (_error: any) {
       // Re-queue on error
       this.queue = [...eventsToFlush, ...this.queue];
     }

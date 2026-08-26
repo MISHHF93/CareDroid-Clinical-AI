@@ -1,4 +1,3 @@
-/* global __CARE_BUILD_INFO__:readonly */
 import appConfig from './appConfig';
 
 const injectedBuildInfo: any =

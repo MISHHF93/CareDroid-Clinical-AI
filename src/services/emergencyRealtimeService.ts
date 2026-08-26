@@ -1,4 +1,4 @@
-import { buildApiUrl, buildStreamUrl, getStoredAccessToken } from './apiClient';
+import { buildStreamUrl, getStoredAccessToken } from './apiClient';
 import { probeBackendReachability } from './backendReachability';
 import observabilityService from './observabilityService';
 import { startWorkflowTrace } from './observabilityTrace';

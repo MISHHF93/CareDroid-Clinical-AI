@@ -69,7 +69,7 @@ export default function PreArrivalNotificationForm({
       </header>
 
       <div className="pre-arrival-form__framework" role="tablist" aria-label="Notification framework">
-        {Object.entries(PRE_ARRIVAL_FRAMEWORK_LABELS).map(([id, label]) => (
+        {Object.entries(PRE_ARRIVAL_FRAMEWORK_LABELS).map(([id]) => (
           <button
             key={id}
             type="button"

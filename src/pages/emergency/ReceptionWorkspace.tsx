@@ -47,7 +47,6 @@ import {
   syncReceptionPatientToBackend,
   validateReceptionMinimumCriticalData,
   type ReceptionAiIntakeAssist,
-  type ReceptionArrivalType,
   type ReceptionIntakeDraft,
   type ReceptionRouteResult,
 } from '../../services/receptionIntakeOrchestrator';
@@ -245,7 +244,6 @@ export default function ReceptionWorkspace() {
   const { pinnedQueueTab } = useReceptionPinnedActions();
   const patients = useEmergencyStore((state) => state.patients);
   const alerts = useEmergencyStore((state) => state.alerts);
-  const capacity = useEmergencyStore((state) => state.capacity);
   const selectedPatientId = useEmergencyStore((state) => state.selectedPatientId);
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
   const lookupInputRef = useRef<HTMLInputElement | null>(null);
@@ -332,11 +330,6 @@ export default function ReceptionWorkspace() {
     user?.name ||
     user?.email ||
     'Reception Desk';
-  const hospitalSite =
-    emergencyRole.canonicalProfile?.hospitalSite ||
-    (capacity as { siteName?: string }).siteName ||
-    'Virtual City Hospital';
-  const shiftStatus = emergencyRole.canonicalProfile?.shiftStatus || 'On shift';
   const canCreatePatient = emergencyRole.canMutate(EMERGENCY_ACTIONS.createPatient);
   const clinicalOverride = assertReceptionMutationAllowed(emergencyRole.role, EMERGENCY_ACTIONS.triage);
   const missingCriticalFields = validateReceptionMinimumCriticalData(draft);
@@ -627,7 +620,9 @@ export default function ReceptionWorkspace() {
     };
   }, [openSmartIntake, resetForNextPatient]);
 
-  const executeCreateAndRoute = async (options: { aiUnavailable?: boolean } = {}) => {
+  const executeCreateAndRoute = async (
+    options: { aiUnavailable?: boolean; confirmDuplicateOverride?: boolean } = {},
+  ) => {
     if (!canCreatePatient) {
       showActionError('Reception action failed', 'Your profile cannot create patients.');
       return;
@@ -640,6 +635,7 @@ export default function ReceptionWorkspace() {
         actorName: currentUserName,
         actorStaffId: emergencyRole.canonicalProfile?.employeeId || emergencyRole.canonicalProfile?.id,
         aiUnavailable: options.aiUnavailable,
+        confirmDuplicateOverride: Boolean(options.confirmDuplicateOverride),
       });
       setAiAssist(routeResult.aiAssist);
       setResult(routeResult);
@@ -1196,7 +1192,7 @@ export default function ReceptionWorkspace() {
         }}
         onCreateAnyway={() => {
           setDuplicateConfirmOpen(false);
-          void executeCreateAndRoute(pendingRouteOptions || {});
+          void executeCreateAndRoute({ ...(pendingRouteOptions || {}), confirmDuplicateOverride: true });
         }}
       />
 

@@ -1,4 +1,3 @@
-import { CANONICAL_ROUTES } from '../config/routes.config';
 import { WHITEBOARD_QUEUE_FILTER } from './queueAssignment';
 import type { EMSArrival, Patient, QueueSummary, Referral } from '../types/emergency';
 import { getExistingEncounterId } from './intakeEncounter';

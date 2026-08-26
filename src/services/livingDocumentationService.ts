@@ -13,7 +13,7 @@ import {
   EMERGENCY_PERMISSION_REGISTRY,
   listPermissionsForRole,
 } from '../config/emergencyPermissionRegistry';
-import { EMERGENCY_ROLE_IDS, EMERGENCY_ROLE_LABELS } from '../config/emergencyRolePermissions';
+import { EMERGENCY_ROLE_LABELS } from '../config/emergencyRolePermissions';
 import { PAGE_API_BINDINGS } from '../config/pageApiBinding.registry';
 import {
   ACTIVE_EMERGENCY_OS_API_ENDPOINT_KEYS,

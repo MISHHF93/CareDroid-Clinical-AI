@@ -77,7 +77,7 @@ export const ANONYMIZED_BENCHMARK_COHORTS = Object.freeze([
   }),
 ]);
 
-export function assessOperationalBenchmarking(signals = {} as any) {
+export function assessOperationalBenchmarking(_signals = {} as any) {
   const survivability = evaluateOperationalSurvivabilityKpis();
   const reception = survivability.kpis.reception.expressWalkInSeconds;
   const chargeNurse = survivability.kpis.chargeNurse.estimatedReadSeconds;
@@ -209,8 +209,7 @@ export const ENTERPRISE_RISK_REGISTER = Object.freeze([
   Object.freeze({ id: 'R-006', category: 'financial', severity: 'low', summary: 'Usage metering not linked to operations KPIs', mitigation: 'Customer success platform linkage', owner: 'Finance', status: 'mitigating' }),
 ]);
 
-export function assessRiskManagement(signals = {} as any) {
-  const production = auditTrackMindMaturity(signals);
+export function assessRiskManagement(_signals = {} as any) {
   const openRisks = ENTERPRISE_RISK_REGISTER.filter((risk) => risk.status === 'open');
   const criticalOpen = openRisks.filter((risk) => risk.severity === 'critical' || (risk.severity as any) === 'high').length;
   const mitigating = ENTERPRISE_RISK_REGISTER.filter((risk) => risk.status === 'mitigating').length;
@@ -288,7 +287,7 @@ export const ENTERPRISE_ASSET_TAXONOMY = Object.freeze([
   Object.freeze({ type: 'infrastructure', label: 'Infrastructure', examples: ['Power feed', 'Network edge', 'Irrigation'] }),
 ]);
 
-export function assessEnterpriseAssetRegistry(context = {} as any) {
+export function assessEnterpriseAssetRegistry(_context = {} as any) {
   const assets = Object.freeze([
     Object.freeze({ id: 'AST-001', type: 'facility', name: 'Main track surface', zone: 'Racing', status: 'operational', lastInspection: '2026-06-01' }),
     Object.freeze({ id: 'AST-002', type: 'system', name: 'Timing & results feed', zone: 'Technology', status: 'operational', lastInspection: '2026-06-10' }),
