@@ -253,3 +253,129 @@ describe('SentinelTrackingService cross-organization unit identity (HEAL-347.26)
     expect(unitBAfter.latitude).toBe(90);
   });
 });
+
+/**
+ * Real-repository regression coverage for upsertUnit()'s findOne-then-create
+ * TOCTOU race: two near-simultaneous CAD/AVL events for the same
+ * never-before-seen unit (e.g. two overlapping webhook deliveries carrying a
+ * unit's first-ever position/status update) could both find no row and both
+ * attempt to insert, and the loser's .save() would throw an unhandled
+ * unique-constraint QueryFailedError. Also proves the entity's split partial
+ * unique indexes (organizationId IS NOT NULL / IS NULL) still correctly
+ * enforce one-row-per-unit for a no-tenant-context unit, not just the
+ * org-scoped case.
+ */
+describe('SentinelTrackingService upsertUnit concurrent-insert race', () => {
+  let module: TestingModule;
+  let service: SentinelTrackingService;
+  let unitRepo: any;
+
+  beforeAll(async () => {
+    module = await Test.createTestingModule({
+      imports: [
+        TypeOrmModule.forRoot({
+          type: 'sqlite',
+          database: ':memory:',
+          entities: [
+            SentinelUnitEntity,
+            SentinelPositionEntity,
+            SentinelEtaEntity,
+            SentinelGeofenceEntity,
+            SentinelGeofenceEventEntity,
+            SentinelEpisodeEntity,
+            SentinelIntegrationCursorEntity,
+          ],
+          synchronize: true,
+          logging: false,
+        }),
+        TypeOrmModule.forFeature([
+          SentinelUnitEntity,
+          SentinelPositionEntity,
+          SentinelEtaEntity,
+          SentinelGeofenceEntity,
+          SentinelGeofenceEventEntity,
+          SentinelEpisodeEntity,
+          SentinelIntegrationCursorEntity,
+        ]),
+      ],
+      providers: [
+        SentinelTrackingService,
+        { provide: SentinelAlarmService, useValue: { raise: jest.fn() } },
+        { provide: SentinelOutboxService, useValue: { enqueue: jest.fn() } },
+      ],
+    }).compile();
+
+    service = module.get(SentinelTrackingService);
+    unitRepo = module.get(getRepositoryToken(SentinelUnitEntity));
+  });
+
+  afterAll(async () => {
+    await module.close();
+  });
+
+  it('collapses two concurrent events for the same never-before-seen org-scoped unit into ONE row, without either call rejecting', async () => {
+    await Promise.all([
+      service.ingestCadEvents(
+        [
+          {
+            kind: 'status',
+            eventId: 'evt-race-org-1',
+            vendorId: 'webhook-cad',
+            unitExternalId: 'Unit-RACE-ORG',
+            occurredAt: '2026-01-01T00:00:00.000Z',
+            status: 'available',
+          },
+        ],
+        'org-race',
+      ),
+      service.ingestCadEvents(
+        [
+          {
+            kind: 'status',
+            eventId: 'evt-race-org-2',
+            vendorId: 'webhook-cad',
+            unitExternalId: 'Unit-RACE-ORG',
+            occurredAt: '2026-01-01T00:00:01.000Z',
+            status: 'assigned',
+          },
+        ],
+        'org-race',
+      ),
+    ]);
+
+    const units = await unitRepo.find({
+      where: { externalId: 'Unit-RACE-ORG', vendorId: 'webhook-cad', organizationId: 'org-race' },
+    });
+    expect(units).toHaveLength(1);
+  });
+
+  it('collapses two concurrent events for the same never-before-seen no-organization unit into ONE row (the nullable-column partial-index case)', async () => {
+    await Promise.all([
+      service.ingestCadEvents([
+        {
+          kind: 'status',
+          eventId: 'evt-race-noorg-1',
+          vendorId: 'webhook-cad',
+          unitExternalId: 'Unit-RACE-NOORG',
+          occurredAt: '2026-01-01T00:00:00.000Z',
+          status: 'available',
+        },
+      ]),
+      service.ingestCadEvents([
+        {
+          kind: 'status',
+          eventId: 'evt-race-noorg-2',
+          vendorId: 'webhook-cad',
+          unitExternalId: 'Unit-RACE-NOORG',
+          occurredAt: '2026-01-01T00:00:01.000Z',
+          status: 'assigned',
+        },
+      ]),
+    ]);
+
+    const units = await unitRepo.find({
+      where: { externalId: 'Unit-RACE-NOORG', vendorId: 'webhook-cad' },
+    });
+    expect(units.filter((u: any) => u.organizationId == null)).toHaveLength(1);
+  });
+});

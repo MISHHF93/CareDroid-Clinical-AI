@@ -4,7 +4,17 @@ import { Column, CreateDateColumn, Entity, Index, PrimaryColumn, UpdateDateColum
 @Index(['organizationId', 'status'])
 // HEAL-347.26: was a GLOBAL unique index on (externalId, vendorId) alone --
 // see migration 1772703000000 for the cross-tenant corruption this caused.
-@Index(['organizationId', 'externalId', 'vendorId'], { unique: true })
+// Two partial unique indexes, not one plain composite one: organizationId
+// is nullable, and SQL treats every NULL as distinct from every other NULL
+// in a unique constraint, so a plain (organizationId, externalId, vendorId)
+// index never enforced uniqueness among no-tenant-context rows -- see
+// migration 1772703900000 (same gotcha already fixed for the sibling
+// sentinel_inbound_patients table one migration after this one, 1772703100000).
+@Index(['organizationId', 'externalId', 'vendorId'], {
+  unique: true,
+  where: '"organizationId" IS NOT NULL',
+})
+@Index(['externalId', 'vendorId'], { unique: true, where: '"organizationId" IS NULL' })
 export class SentinelUnitEntity {
   @PrimaryColumn({ type: 'varchar', length: 120 })
   id: string;

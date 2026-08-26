@@ -26,6 +26,16 @@ export class EmergencyPatientAuditService {
       'unknown';
     const userAgent = String(input.request?.headers['user-agent'] || 'unknown');
 
+    // HEAL: this used to catch and swallow any error from the audit write,
+    // logging a warning but letting the caller proceed anyway. Every call
+    // site (emergency-os.controller.ts) is a READ_PHI/WRITE_PHI-gated
+    // endpoint that awaits this BEFORE returning the actual patient data,
+    // specifically so the access is on record before it's served (see the
+    // "logs a HIPAA patient-access audit entry" specs) -- a failed audit
+    // write should deny the request an audit trail can't account for, not
+    // silently grant PHI access with zero record it happened. Matches
+    // AuthorizationGuard's own permission-check audit log, which is
+    // likewise never wrapped in a swallowing catch.
     try {
       await this.auditService.log({
         userId,
@@ -42,9 +52,10 @@ export class EmergencyPatientAuditService {
         },
       });
     } catch (error) {
-      this.logger.warn(
-        `Patient access audit skipped for ${input.patientId}: ${(error as Error).message}`,
+      this.logger.error(
+        `Patient access audit FAILED for ${input.patientId}: ${(error as Error).message}`,
       );
+      throw error;
     }
   }
 }

@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { randomUUID } from 'crypto';
 import { AuditAction } from '../audit/entities/audit-log.entity';
 import { AuditService } from '../audit/audit.service';
 import { LEGACY_TOOL_ID_ALIASES } from '../platform-assets/data/platform-asset-seed.data';
@@ -384,17 +385,40 @@ export class WorkspacesService {
     return this.membershipRepository.save(membership);
   }
 
+  // HEAL: findOne-then-create had a TOCTOU race -- listForUser()/
+  // getActiveWorkspaceState() call this on every session/workspace load, so
+  // two concurrent requests for the same never-before-seen user (e.g. two
+  // tabs both loading right after first login) could both find no row and
+  // both attempt to insert, and the loser's .save() would throw an
+  // uncaught unique-constraint QueryFailedError (500) against the entity's
+  // `@Index(['userId'], { unique: true })`. orIgnore() relies on that same
+  // index to make the losing insert a silent no-op, then reads back
+  // whichever row actually won. Same pattern as
+  // notification-preference.service.ts's HEAL-347.33 fix.
   private async getOrCreateState(userId: string, fallbackWorkspaceId?: string) {
-    let state = await this.stateRepository.findOne({ where: { userId } });
-    if (!state) {
-      state = this.stateRepository.create({
-        userId,
-        activeWorkspaceId: fallbackWorkspaceId || undefined,
-        recentWorkspaceIds: fallbackWorkspaceId ? [fallbackWorkspaceId] : [],
-      });
-      state = await this.stateRepository.save(state);
+    const state = await this.stateRepository.findOne({ where: { userId } });
+    if (state) {
+      return state;
     }
-    return state;
+
+    // id is @PrimaryGeneratedColumn('uuid') -- pre-assigned so the
+    // winner-check below has a value to compare against.
+    const candidate = this.stateRepository.create({
+      id: randomUUID(),
+      userId,
+      activeWorkspaceId: fallbackWorkspaceId || undefined,
+      recentWorkspaceIds: fallbackWorkspaceId ? [fallbackWorkspaceId] : [],
+    });
+
+    await this.stateRepository
+      .createQueryBuilder()
+      .insert()
+      .into(UserWorkspaceState)
+      .values(candidate as any)
+      .orIgnore()
+      .execute();
+
+    return this.stateRepository.findOneOrFail({ where: { userId } });
   }
 
   private async requireManager(user: User, workspaceId: string) {

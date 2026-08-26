@@ -14,16 +14,32 @@ import { OrganizationOnboardingService } from './organization-onboarding.service
 describe('OrganizationOnboardingService', () => {
   let service: OrganizationOnboardingService;
   let organizationRepository: { [key: string]: jest.Mock };
+  let membershipRepository: { [key: string]: jest.Mock };
   let productRepository: { [key: string]: jest.Mock };
   let platformAssetsService: { [key: string]: jest.Mock };
   let workspacesService: { [key: string]: jest.Mock };
 
-  const mockRepo = () => ({
-    create: jest.fn((entity) => entity),
-    find: jest.fn(),
-    findOne: jest.fn(),
-    save: jest.fn((entity) => Promise.resolve({ id: entity.id || 'org-1', ...entity })),
-  });
+  const mockRepo = () => {
+    let lastInsertValues: any = null;
+    const insertQueryBuilder: any = {
+      insert: jest.fn().mockReturnThis(),
+      into: jest.fn().mockReturnThis(),
+      values: jest.fn((values: any) => {
+        lastInsertValues = values;
+        return insertQueryBuilder;
+      }),
+      orIgnore: jest.fn().mockReturnThis(),
+      execute: jest.fn().mockResolvedValue(undefined),
+    };
+    return {
+      create: jest.fn((entity) => entity),
+      find: jest.fn(),
+      findOne: jest.fn(),
+      findOneOrFail: jest.fn(async () => lastInsertValues),
+      save: jest.fn((entity) => Promise.resolve({ id: entity.id || 'org-1', ...entity })),
+      createQueryBuilder: jest.fn(() => insertQueryBuilder),
+    };
+  };
 
   const user = { id: 'user-1' } as User;
 
@@ -71,6 +87,7 @@ describe('OrganizationOnboardingService', () => {
 
     service = module.get(OrganizationOnboardingService);
     organizationRepository = module.get(getRepositoryToken(Organization)) as any;
+    membershipRepository = module.get(getRepositoryToken(OrganizationMembership)) as any;
     productRepository = module.get(getRepositoryToken(Product)) as any;
     platformAssetsService = module.get(PlatformAssetsService) as any;
     workspacesService = module.get(WorkspacesService) as any;
@@ -120,20 +137,22 @@ describe('OrganizationOnboardingService', () => {
       ],
     });
 
+    const orgId = result.organization.id;
+    expect(orgId).toEqual(expect.any(String));
     expect(platformAssetsService.installPackForOrganization).toHaveBeenCalledWith(
-      'org-1',
+      orgId,
       'core-platform',
     );
     expect(platformAssetsService.installPackForOrganization).toHaveBeenCalledWith(
-      'org-1',
+      orgId,
       'emergency-medicine',
     );
     expect(platformAssetsService.installPackForOrganization).toHaveBeenCalledWith(
-      'org-1',
+      orgId,
       'fleet-logistics',
     );
     expect(platformAssetsService.installPackForOrganization).toHaveBeenCalledWith(
-      'org-1',
+      orgId,
       'enterprise-governance',
     );
     expect(workspacesService.createWorkspace).toHaveBeenCalledWith(
@@ -142,7 +161,7 @@ describe('OrganizationOnboardingService', () => {
         name: 'EMS Command',
         emergencyModeEnabled: true,
       }),
-      { organizationId: 'org-1' },
+      { organizationId: orgId },
     );
 
     const saveCalls = organizationRepository.save.mock.calls;
@@ -216,5 +235,37 @@ describe('OrganizationOnboardingService', () => {
       'administrator',
     );
     expect(result.tenantProfile.roleProfileId).toBe('administrator');
+  });
+
+  it('rejects onboarding when a concurrent request wins the race for the same slug (TOCTOU regression guard)', async () => {
+    // The findOne() pre-check at the top of completeOnboarding() only
+    // catches a slug collision that already existed BEFORE this call
+    // started. It cannot see a second request that passed its own findOne()
+    // check in the same narrow window and committed first. Simulate that:
+    // this call's orIgnore() insert is a no-op (someone else's row already
+    // holds the slug), so the read-back must return the winner's row, not
+    // this call's candidate -- and completeOnboarding must reject with the
+    // same clean error a synchronous duplicate would get, not silently
+    // proceed to create a membership/workspaces/packs against someone
+    // else's organization.
+    const winningOrg = { id: 'winner-org-id', name: 'Other Org', slug: 'north-ems' };
+    organizationRepository.createQueryBuilder.mockReturnValue({
+      insert: jest.fn().mockReturnThis(),
+      into: jest.fn().mockReturnThis(),
+      values: jest.fn().mockReturnThis(),
+      orIgnore: jest.fn().mockReturnThis(),
+      execute: jest.fn().mockResolvedValue(undefined),
+    });
+    organizationRepository.findOneOrFail.mockResolvedValue(winningOrg);
+
+    await expect(
+      service.completeOnboarding(user, {
+        name: 'North EMS',
+        slug: 'north-ems',
+        organizationType: OrganizationType.EMS,
+      } as any),
+    ).rejects.toThrow('Organization slug already exists: north-ems');
+
+    expect(membershipRepository.save).not.toHaveBeenCalled();
   });
 });

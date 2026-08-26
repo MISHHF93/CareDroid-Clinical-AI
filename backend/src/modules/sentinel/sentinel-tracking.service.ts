@@ -329,36 +329,57 @@ export class SentinelTrackingService implements OnModuleInit {
     // aren't namespaced per hospital (vendorId is a fixed per-adapter
     // constant), so two orgs whose CAD systems label a unit the same way
     // resolved to the same row and overwrote each other's live GPS/status.
-    let unit = await this.unitRepo.findOne({
-      where: {
-        externalId: event.unitExternalId,
-        vendorId: event.vendorId,
-        organizationId: organizationId ?? IsNull(),
-      },
-    });
-    if (!unit) {
-      unit = this.unitRepo.create({
-        id: createId('sunit'),
-        externalId: event.unitExternalId,
-        vendorId: event.vendorId,
-        label: event.unitExternalId,
-        unitType: 'ALS',
-        status: event.status || 'available',
-        freshness: 'fresh',
-        latitude: event.latitude ?? null,
-        longitude: event.longitude ?? null,
-        heading: event.heading ?? null,
-        speedKmh: event.speedKmh ?? null,
-        lastSeenAt: event.occurredAt,
-        lastEventSeq: event.sequence ?? 0,
-        organizationId: organizationId ?? null,
-        workspaceId: null,
-        metadata: event.raw ? { ...event.raw } : null,
-      });
-      await this.unitRepo.save(unit);
-      await this.ensureEpisode(unit);
+    const where = {
+      externalId: event.unitExternalId,
+      vendorId: event.vendorId,
+      organizationId: organizationId ?? IsNull(),
+    };
+    const unit = await this.unitRepo.findOne({ where });
+    if (unit) {
+      return unit;
     }
-    return unit;
+
+    // HEAL: findOne-then-create above only closes the common case -- two
+    // near-simultaneous CAD/AVL events for the same never-before-seen unit
+    // (e.g. two overlapping webhook deliveries carrying a unit's first-ever
+    // position/status update) could both find no row and both attempt to
+    // insert, and the loser's .save() would throw an unhandled
+    // unique-constraint QueryFailedError instead of the event being applied
+    // against whichever row actually won. orIgnore() relies on the entity's
+    // partial unique indexes (see sentinel-unit.entity.ts) to make the
+    // losing insert a silent no-op; the read-back then returns whichever
+    // row actually won. Same pattern as sentinel-inbound.service.ts's
+    // HEAL-311 fix.
+    const candidate = this.unitRepo.create({
+      id: createId('sunit'),
+      externalId: event.unitExternalId,
+      vendorId: event.vendorId,
+      label: event.unitExternalId,
+      unitType: 'ALS',
+      status: event.status || 'available',
+      freshness: 'fresh',
+      latitude: event.latitude ?? null,
+      longitude: event.longitude ?? null,
+      heading: event.heading ?? null,
+      speedKmh: event.speedKmh ?? null,
+      lastSeenAt: event.occurredAt,
+      lastEventSeq: event.sequence ?? 0,
+      organizationId: organizationId ?? null,
+      workspaceId: null,
+      metadata: event.raw ? { ...event.raw } : null,
+    });
+    await this.unitRepo
+      .createQueryBuilder()
+      .insert()
+      .into(SentinelUnitEntity)
+      .values(candidate as any)
+      .orIgnore()
+      .execute();
+    const winner = await this.unitRepo.findOneOrFail({ where });
+    if (winner.id === candidate.id) {
+      await this.ensureEpisode(winner);
+    }
+    return winner;
   }
 
   private async recalculateEta(unit: SentinelUnitEntity): Promise<SentinelEtaEntity | null> {

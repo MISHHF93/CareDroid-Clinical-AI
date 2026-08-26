@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { randomUUID } from 'crypto';
 import { AuditAction } from '../audit/entities/audit-log.entity';
 import { AuditService } from '../audit/audit.service';
 import { UpdateUserPreferencesDto } from './dto/update-user-preferences.dto';
@@ -101,16 +102,40 @@ export class UserPreferencesService {
     return this.serializePreferences(preference);
   }
 
+  // HEAL: findOne-then-create had a TOCTOU race -- two concurrent
+  // getPreferences()/updatePreferences() calls for the same never-before-seen
+  // user (e.g. two tabs both loading the app right after first login) could
+  // both find no row and both attempt to insert one, and the loser's
+  // .save() would throw an uncaught unique-constraint QueryFailedError (500)
+  // against the entity's `@Index(['userId'], { unique: true })`. orIgnore()
+  // relies on that same index to make the losing insert a silent no-op, then
+  // reads back whichever row actually won. Same pattern as
+  // notification-preference.service.ts's HEAL-347.33 fix.
   private async getOrCreatePreferences(userId: string) {
-    let preference = await this.preferenceRepository.findOne({ where: { userId } });
-    if (!preference) {
-      preference = this.preferenceRepository.create({
-        userId,
-        ...DEFAULT_PREFERENCES,
-      });
-      preference = await this.preferenceRepository.save(preference);
+    const preference = await this.preferenceRepository.findOne({ where: { userId } });
+    if (preference) {
+      return preference;
     }
-    return preference;
+
+    // id is @PrimaryGeneratedColumn('uuid') -- normally left for the
+    // database to assign, but the orIgnore()+read-back below needs a value
+    // to compare against so the winner-check can tell a genuine insert
+    // apart from a losing race.
+    const candidate = this.preferenceRepository.create({
+      id: randomUUID(),
+      userId,
+      ...DEFAULT_PREFERENCES,
+    });
+
+    await this.preferenceRepository
+      .createQueryBuilder()
+      .insert()
+      .into(UserPreference)
+      .values(candidate as any)
+      .orIgnore()
+      .execute();
+
+    return this.preferenceRepository.findOneOrFail({ where: { userId } });
   }
 
   private serializePreferences(preference: UserPreference) {

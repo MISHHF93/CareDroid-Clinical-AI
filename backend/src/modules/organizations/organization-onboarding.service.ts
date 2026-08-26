@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, Logger, Optional } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
+import { randomUUID } from 'crypto';
 import { hasPermission } from '../auth/config/role-permissions.config';
 import { Permission } from '../auth/enums/permission.enum';
 import { User, UserRole } from '../users/entities/user.entity';
@@ -79,29 +80,53 @@ export class OrganizationOnboardingService {
     };
     const onboardingCompletedAt = new Date().toISOString();
 
-    const org = await this.organizationRepository.save(
-      this.organizationRepository.create({
-        name: dto.name,
-        slug: dto.slug,
-        organizationType: dto.organizationType,
-        country: dto.country,
+    // HEAL: the findOne() check above only closes the common case -- two
+    // near-simultaneous onboarding submissions for the same slug (a
+    // double-submit, or two admins racing to claim the same name) could
+    // both pass it before either insert commits, and the loser's .save()
+    // would throw an unhandled unique-constraint QueryFailedError (500)
+    // against the entity's `slug` column (`unique: true`) instead of the
+    // clean "slug already exists" rejection above. orIgnore() relies on
+    // that same unique constraint to make the losing insert a silent
+    // no-op; the read-back then finds whichever row actually won, so the
+    // loser gets the same BadRequestException as the pre-check. Same
+    // pattern as integration-hub.service.ts's HEAL-347.32 fix.
+    const candidate = this.organizationRepository.create({
+      // id is @PrimaryGeneratedColumn('uuid') -- pre-assigned so the
+      // winner-check below has a value to compare against.
+      id: randomUUID(),
+      name: dto.name,
+      slug: dto.slug,
+      organizationType: dto.organizationType,
+      country: dto.country,
+      branding,
+      settings: {
+        onboardingCompletedAt,
+        specialties: dto.specialties || [],
+        departments: dto.departments || [],
+        workspaceDefaults: dto.workspaceSetups || [],
+        enabledProductIds,
+        commercialPlanId: dto.commercialPlanId || null,
+        integrations: dto.integrationSlugs || [],
+        integrationsRequested: dto.integrationSlugs || [],
+        complianceMode,
         branding,
-        settings: {
-          onboardingCompletedAt,
-          specialties: dto.specialties || [],
-          departments: dto.departments || [],
-          workspaceDefaults: dto.workspaceSetups || [],
-          enabledProductIds,
-          commercialPlanId: dto.commercialPlanId || null,
-          integrations: dto.integrationSlugs || [],
-          integrationsRequested: dto.integrationSlugs || [],
-          complianceMode,
-          branding,
-          pilotStrictSaasEntitlements: dto.pilotStrictSaasEntitlements === true,
-          strictSaasEntitlements: dto.pilotStrictSaasEntitlements === true,
-        },
-      }),
-    );
+        pilotStrictSaasEntitlements: dto.pilotStrictSaasEntitlements === true,
+        strictSaasEntitlements: dto.pilotStrictSaasEntitlements === true,
+      },
+    });
+
+    await this.organizationRepository
+      .createQueryBuilder()
+      .insert()
+      .into(Organization)
+      .values(candidate as any)
+      .orIgnore()
+      .execute();
+    const org = await this.organizationRepository.findOneOrFail({ where: { slug: dto.slug } });
+    if (org.id !== candidate.id) {
+      throw new BadRequestException(`Organization slug already exists: ${dto.slug}`);
+    }
 
     await this.membershipRepository.save(
       this.membershipRepository.create({
