@@ -51,6 +51,11 @@ const A11Y_PAGES = [
   { id: 'emergency-settings', label: 'Emergency Settings (form)', path: '/emergency/settings' },
   { id: 'triage-queue', label: 'Triage Queue', path: '/triage' },
   { id: 'simulation', label: 'Medical Simulation Suite', path: '/simulation' },
+  // Multi-department expansion (2026-08-25): the new SpecialtyHubLayout
+  // archetype (7 of 11 new clinical department dashboards share it) had zero
+  // a11y coverage. One representative page, matching this file's own
+  // established "one page per archetype" scoping.
+  { id: 'cardiology-dashboard', label: 'Cardiology Dashboard (specialty hub)', path: '/cardiology' },
 ];
 
 /** WCAG 2.1 A/AA is the baseline every page must clear; best-practice rules are reported, not enforced yet. */

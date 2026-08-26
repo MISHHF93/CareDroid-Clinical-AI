@@ -269,16 +269,21 @@ export async function measureVisibleElementOverlaps(page) {
 
 export const QA_AUTH_STORAGE = {
   caredroid_access_token: 'responsive-qa-token',
-  // `authMode: 'open-access'` is required: UserContext.tsx reads this profile
-  // through demoPersonaModel.ts's hydrateStoredDemoUser(), which only honors
-  // a stored `role` when isDemoPersonaUser() recognizes the payload (id ===
-  // OPEN_ACCESS_USER_ID, or authMode open-access/platform-access, or a
-  // matching demoPersona marker). Without one of those, the whole payload —
-  // including `role: 'admin'` below — was silently discarded and every
-  // consumer of this constant (11 e2e specs/scripts) has been testing under
-  // the app's default demo role (charge_nurse) instead of admin this whole
-  // time (roadmap item #22, Cycle 214 — same root cause as Cycle 213's
-  // capture-reception-screenshots.mjs fix).
+  // 2026-08-25: `authMode: 'open-access'` (the Cycle 214 fix's own value, see
+  // the superseded comment this replaces) stopped working once router.tsx's
+  // RequireRealSession gate (HEAL-347.13/14/16) shipped -- that gate only
+  // ever admits authMode 'real' or ('explicit-dev-bypass' + isDev), and
+  // 'open-access' matches neither, so every one of this constant's consumers
+  // (11 e2e specs/scripts) has silently been bounced to /login and stuck on
+  // waitForAppReady/similar readiness waits ever since, not exercising the
+  // app at all -- confirmed live via a real Playwright run against this
+  // exact fixture (page snapshot at timeout showed the login screen, not the
+  // target route). 'explicit-dev-bypass' satisfies RequireRealSession AND is
+  // the one authMode value demoPersonaModel.ts's hydrateStoredDemoUser()
+  // returns completely untouched (see its own explicit-dev-bypass branch,
+  // HEAL-347.16) rather than routing through isDemoPersonaUser()'s narrower
+  // role-hydration path the old comment described -- so `role: 'admin'`
+  // below is preserved even more directly than the Cycle 214 fix achieved.
   caredroid_user_profile: JSON.stringify({
     id: 'responsive-qa-user',
     email: 'qa@caredroid.local',
@@ -288,7 +293,8 @@ export const QA_AUTH_STORAGE = {
     isEmailVerified: true,
     twoFactorEnabled: false,
     createdAt: '2026-01-01T00:00:00.000Z',
-    authMode: 'open-access',
+    authMode: 'explicit-dev-bypass',
+    isDevAuthBypass: true,
   }),
 };
 

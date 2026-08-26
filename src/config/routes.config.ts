@@ -104,6 +104,17 @@ export const CANONICAL_ROUTES = Object.freeze({
   simulation: '/simulation',
   simulationOutcomes: '/simulation/outcomes',
   laboratory: '/laboratory',
+  pharmacy: '/pharmacy',
+  radiology: '/radiology',
+  education: '/education',
+  cardiology: '/cardiology',
+  nephrology: '/nephrology',
+  neurologyDept: '/neurology',
+  gastroenterology: '/gastroenterology',
+  endocrinology: '/endocrinology',
+  pediatricsObgyn: '/pediatrics-obgyn',
+  psychiatryDept: '/psychiatry',
+  pulmonology: '/pulmonology',
   medical3dViewer: '/3d-viewer',
   liveMap: '/live-map',
   hospitalMap: '/hospital-map',
@@ -440,12 +451,6 @@ export const NON_ED_WORKSPACE_REDIRECT_ROUTES = Object.freeze([
   Object.freeze({ path: '/vehicle', moduleName: 'Vehicle Operations' }),
   Object.freeze({ path: '/vehicle/*', moduleName: 'Vehicle Operations' }),
   Object.freeze({ path: '/research/*', moduleName: 'Research' }),
-  Object.freeze({ path: '/education', moduleName: 'Education' }),
-  Object.freeze({ path: '/education/*', moduleName: 'Education' }),
-  Object.freeze({ path: '/pharmacy', moduleName: 'Pharmacy' }),
-  Object.freeze({ path: '/pharmacy/*', moduleName: 'Pharmacy' }),
-  Object.freeze({ path: '/radiology', moduleName: 'Radiology' }),
-  Object.freeze({ path: '/radiology/*', moduleName: 'Radiology' }),
 ]);
 
 /**
@@ -621,16 +626,6 @@ const READ_ONLY_OPERATIONAL_PROFILES = Object.freeze([
   'quality_safety_officer',
   'demo_observer',
 ]);
-const NON_NAV_PROFILE_ROUTES = Object.freeze([
-  CANONICAL_ROUTES.profile,
-  CANONICAL_ROUTES.profileSettings,
-  CANONICAL_ROUTES.profileToolPreferences,
-  '/profile/activity',
-  '/profile/preferences',
-  '/profile/security',
-  '/profile/workspaces',
-]);
-
 /** Ordered pilot-customer sidebar IDs — single source for pilot nav visibility. */
 export const CANONICAL_PILOT_VISIBLE_NAV_IDS = Object.freeze([
   'reception',
@@ -1647,6 +1642,29 @@ export function getRouteByPath(path) {
   return (
     CANONICAL_ROUTE_MAP.find((record) => routePatternMatches(record.path, normalizedPath)) ||
     CANONICAL_ROUTE_MAP.find((record) =>
+      (record.aliases || []).some((alias) => routePatternMatches(alias, normalizedPath, false)),
+    ) ||
+    // 2026-08-25: ROUTE_RECORDS (defined further below in this file) is a
+    // separate, larger array from CANONICAL_ROUTE_MAP -- not a subset or
+    // superset of it, confirmed by id overlap (only 6 of ~113 combined ids
+    // appear in both). Real, live consequence found and verified: the
+    // 'copilot' record in CANONICAL_ROUTE_MAP (path /emergency/copilot,
+    // requiredPermissions/allowedRoles set) carries no `aliases` field at
+    // all, while its ROUTE_RECORDS counterpart (id 'assistant') declares
+    // ASSISTANT_ROUTE_ALIASES ('/assistant', '/chat', '/ai', '/copilot').
+    // canonicalAccess.ts's routeAccessMatches() falls back to this function
+    // specifically to resolve an alias back to whatever canonical path a
+    // role's access list actually names -- with the alias invisible here,
+    // any role whose access list names /emergency/copilot (not one of its
+    // aliases) was being denied on every one of those 4 alias URLs,
+    // regardless of role, confirmed live even for 'admin'. Falling back to
+    // ROUTE_RECORDS (same two-phase own-path-then-aliases search) closes
+    // that gap for every current and future caller of this function, not
+    // just the one path found so far -- without changing any existing
+    // CANONICAL_ROUTE_MAP match (this is strictly additive: it only returns
+    // a ROUTE_RECORDS hit when CANONICAL_ROUTE_MAP had none).
+    ROUTE_RECORDS.find((record) => routePatternMatches(record.path, normalizedPath)) ||
+    ROUTE_RECORDS.find((record) =>
       (record.aliases || []).some((alias) => routePatternMatches(alias, normalizedPath, false)),
     ) ||
     null

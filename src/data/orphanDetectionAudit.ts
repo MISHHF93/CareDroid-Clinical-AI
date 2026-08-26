@@ -4,13 +4,18 @@
  */
 
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
-import { dirname, join, relative, sep } from 'node:path';
+import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
+  AUTH_PATH_ALIASES,
+  AUTH_SIGNUP_PATH_ALIASES,
   CANONICAL_APP_ROUTE_TREE,
   CANONICAL_ROUTES,
+  ED_CANONICAL_ROUTE_ALIASES,
+  IN_SHELL_ROUTE_REDIRECTS,
   LEGACY_EMERGENCY_ROUTE_REDIRECTS,
   NON_ED_WORKSPACE_REDIRECT_ROUTES,
+  OUTSIDE_SHELL_ROUTE_REDIRECTS,
   ROUTE_ALIAS_REDIRECTS,
 } from '../config/routes.config';
 import { PROFILE_CONSOLE_ROUTE_PATHS } from '../config/profileConsoleRoutes';
@@ -151,6 +156,35 @@ function parseAppRoutePaths() {
   const legacyEmergencyPaths = app.includes('LEGACY_EMERGENCY_ROUTE_REDIRECTS')
     ? LEGACY_EMERGENCY_ROUTE_REDIRECTS.map((entry) => entry.path)
     : [];
+  // Same false-positive class as nonEdRedirectPaths/legacyEmergencyPaths above:
+  // IN_SHELL_ROUTE_REDIRECTS, OUTSIDE_SHELL_ROUTE_REDIRECTS, and
+  // ED_CANONICAL_ROUTE_ALIASES are all real, mounted `{ARRAY.map(({path, to}) =>
+  // <Route path={path} .../>)}` blocks in router.tsx, but their `path` prop is a
+  // dynamic variable reference, not a literal string or CANONICAL_ROUTES.x
+  // member access -- neither jsxLiteralPaths nor jsxCanonicalRoutePaths' regexes
+  // can see them. Found 2026-08-25: /assistant (and its /chat, /ai, /copilot
+  // siblings, all real and OUTSIDE_SHELL_ROUTE_REDIRECTS-mounted) were reported
+  // as "wire" gaps despite being live and working, confirmed via a real
+  // Playwright navigation trace, not assumed from the report.
+  const inShellPaths = app.includes('IN_SHELL_ROUTE_REDIRECTS')
+    ? IN_SHELL_ROUTE_REDIRECTS.map((entry) => entry.path)
+    : [];
+  const outsideShellPaths = app.includes('OUTSIDE_SHELL_ROUTE_REDIRECTS')
+    ? OUTSIDE_SHELL_ROUTE_REDIRECTS.map((entry) => entry.path)
+    : [];
+  const edCanonicalAliasPaths = app.includes('ED_CANONICAL_ROUTE_ALIASES')
+    ? ED_CANONICAL_ROUTE_ALIASES.map((entry) => entry.path)
+    : [];
+  // Same false-positive class again: router.tsx renders `{signInAliases.map(...)}`
+  // / `{AUTH_SIGNUP_PATH_ALIASES.map(...)}`, where signInAliases is a local
+  // `AUTH_PATH_ALIASES.filter(...)` derivative -- the literal array names are
+  // still present in source text (import + filter call), so app.includes(...)
+  // still finds them, even though the rendered <Route path={path}> itself is a
+  // loop variable like the other 3 arrays above.
+  const authPathAliases = app.includes('AUTH_PATH_ALIASES') ? AUTH_PATH_ALIASES : [];
+  const authSignupPathAliases = app.includes('AUTH_SIGNUP_PATH_ALIASES')
+    ? AUTH_SIGNUP_PATH_ALIASES
+    : [];
   const futureReleasePaths = app.includes('FUTURE_RELEASE_ROUTES')
     ? [...app.matchAll(/\[\s*['"][^'"]+['"]\s*,\s*['"](\/[^'"]+)['"]\s*\]/g)].map((m) => m[1])
     : [];
@@ -218,6 +252,11 @@ function parseAppRoutePaths() {
         ...nonEdRedirectPaths,
         ...generatedAliasPaths,
         ...legacyEmergencyPaths,
+        ...inShellPaths,
+        ...outsideShellPaths,
+        ...edCanonicalAliasPaths,
+        ...authPathAliases,
+        ...authSignupPathAliases,
         ...futureReleasePaths,
         ...consoleTreePaths,
       ]),
@@ -503,7 +542,7 @@ function detectOrphanServices(corpus) {
       const rel = relative(REPO_ROOT, full).replace(/\\/g, '/');
       const ref = isReferenced(rel, corpus.text, new Set());
       if (ref.referenced) return null;
-      const merge = MERGE_DUPLICATES.find((m) => rel.includes('NotificationService'));
+      const merge = MERGE_DUPLICATES.find(() => rel.includes('NotificationService'));
       return {
         id: rel,
         path: rel,
@@ -669,7 +708,6 @@ export function buildOrphanDetectionReport() {
   const corpus = buildProductionCorpus();
   const { paths: appPaths, lazyImports } = parseAppRoutePaths();
   const navPaths = collectCanonicalNavPaths();
-  const appWiredSet = new Set(lazyImports.map((s) => normalizeImportToSrcPath(s)));
 
   const routes = detectOrphanRoutes(appPaths, navPaths);
   const pages = detectOrphanPages(corpus, lazyImports);
@@ -795,12 +833,6 @@ export function formatOrphanDetectionMarkdown(report = buildOrphanDetectionRepor
     '3. **Chart/export components** — legacy barrel-only components have been removed; keep new chart surfaces route-owned. Class: **resolved**.',
     '4. **Dual registry** — hundreds of tools in inventory without dedicated page components (route-only). Class: **legacy** (inventory-first) unless promoting to assets.',
     '',
-  ];
-
-  const col = [
-    { key: 'id', label: 'ID / Path' },
-    { key: 'classification', label: 'Class' },
-    { key: 'evidence', label: 'Evidence' },
   ];
 
   lines.push(

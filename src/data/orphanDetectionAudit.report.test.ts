@@ -11,7 +11,19 @@ import {
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, '../..');
 const docsDir = join(repoRoot, 'docs');
-const EMERGENCY_OS_APP_ROUTE_RANGE = Object.freeze({ min: 30, max: 320 });
+// max bumped 320->360: 11 new clinical department dashboard routes (cardiology,
+// pharmacy, radiology, education, nephrology, neurology, gastroenterology,
+// endocrinology, pediatrics-obgyn, psychiatry, pulmonology) were wired into
+// platformConsoleRouteTree.tsx this session, legitimately growing the real
+// app route count past the old ceiling -- not a regression. Headroom added
+// per this file's own documented pattern rather than tuned to the exact count.
+// max bumped 360->420 (2026-08-25): orphanDetectionAudit.ts's parseAppRoutePaths()
+// previously didn't recognize IN_SHELL_ROUTE_REDIRECTS/OUTSIDE_SHELL_ROUTE_REDIRECTS/
+// ED_CANONICAL_ROUTE_ALIASES/AUTH_PATH_ALIASES/AUTH_SIGNUP_PATH_ALIASES as covering
+// real, mounted routes (their <Route path={path}> is a loop variable, invisible to
+// the literal-string-match regexes) -- fixing that accuracy gap correctly counts
+// ~30 more real routes as covered (appRouteCount 354->368), not a regression either.
+const EMERGENCY_OS_APP_ROUTE_RANGE = Object.freeze({ min: 30, max: 420 });
 
 // Each of the 3 tests below re-runs the same corpus-wide scan; 180s was
 // enough at some point but each now measures ~300s as the scanned corpus

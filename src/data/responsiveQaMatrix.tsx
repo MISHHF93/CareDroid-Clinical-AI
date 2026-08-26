@@ -20,7 +20,7 @@ import { MOBILE_FIRST_BREAKPOINTS } from '../config/layout.config';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 
 /** @typedef {{ id: string, width: number, height: number, label: string, tier?: string }} ResponsiveQaViewport */
-/** @typedef {{ id: string, label: string, path: string, category: string, registryId?: string }} ResponsiveQaPage */
+/** @typedef {{ id: string, label: string, path: string, category: string, registryId?: string, expectRedirect?: boolean }} ResponsiveQaPage */
 
 /**
  * Mobile-first acceptance widths (phones + tablets for device QA).
@@ -298,12 +298,27 @@ export function buildResponsiveQaPages() {
       label: 'Command Dashboard',
       path: '/dashboard',
       category: 'core',
+      // /dashboard's own route is EmergencyDefaultRedirect -- a deliberate,
+      // role-dependent "smart default landing page" redirect, not a page
+      // with fixed content of its own. See the matching comment in
+      // responsive-qa.spec.mjs for why this opts out of the strict
+      // post-navigation path assertion the other entries get.
+      expectRedirect: true,
     },
     {
       id: 'assistant',
       label: 'Assistant',
       path: '/assistant',
       category: 'core',
+      // /assistant resolves to CANONICAL_ROUTES.emergencyCopilot, which is
+      // itself a deliberate "virtual" deep-link route: AppShell.tsx's effect
+      // (~line 886) treats landing on /emergency/copilot as "open the docked
+      // Copilot panel," opens it, then immediately replace-navigates to
+      // /emergency/whiteboard carrying the search params forward. No role
+      // ever stays on /emergency/copilot -- confirmed live via console
+      // instrumentation (not inferred), so this opts out of the strict
+      // post-navigation path assertion like /dashboard above.
+      expectRedirect: true,
     },
     {
       id: 'fleet-map',
@@ -633,6 +648,20 @@ export function buildResponsiveQaPages() {
       path,
       category: 'tier-c',
       registryId: registryId as any,
+      // 2026-08-25: every specialty shortcut here (router.tsx's
+      // '/tools/<specialty>/' -> '/emergency/tools/<specialty>/:toolId'
+      // redirect) keeps the same specialty segment on both sides, so the
+      // canonical destination literally contains this original path as a
+      // trailing substring -- except pediatrics-obgyn, whose canonical
+      // destination was registered under the shorter 'pediatrics' segment
+      // (PediatricsObgynDashboard.tsx's own direct links use that form
+      // too). router.tsx now normalizes the redirect so these 9 tools
+      // actually reach their real assistant page instead of falling through
+      // to a generic tool-search page (a real bug, fixed same pass) -- but
+      // that means their post-redirect URL genuinely won't contain this
+      // original path string, same reason the 'dashboard' entry above opts
+      // out.
+      ...(path.startsWith('/tools/pediatrics-obgyn/') ? { expectRedirect: true } : {}),
     });
   }
 
