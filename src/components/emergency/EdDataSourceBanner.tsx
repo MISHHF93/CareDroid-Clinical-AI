@@ -19,9 +19,6 @@ export default function EdDataSourceBanner({
   const surfaces = usePractitionerSurfaceVisibility();
   const { active: simulationModeActive } = useSimulationMode();
 
-  if (!surfaces.chrome.showEdDataSourceBanner) {
-    return null;
-  }
   const { sourceLabel, freshness, warnStale } = resolveEdDataSourcePresentation({
     ...input,
     simulationModeActive,
@@ -34,13 +31,29 @@ export default function EdDataSourceBanner({
   }
 
   const hasError = Boolean(input.error);
-  if (!warnStale && !hasError) {
-    return null;
+
+  // "Backend unavailable" is safety-relevant clinical information (clinicians
+  // need to know their data may be stale/incomplete during a real outage) and
+  // must never be swept into the same suppression flag as the cosmetic
+  // "just stale, still connected" freshness note below -- that one alone
+  // stays gated behind showEdDataSourceBanner, which pilot-customer cleanup
+  // mode is allowed to suppress as noise.
+  if (hasError) {
+    if (!surfaces.chrome.showBackendUnavailableIndicator) {
+      return null;
+    }
+  } else {
+    if (!surfaces.chrome.showEdDataSourceBanner) {
+      return null;
+    }
+    if (!warnStale) {
+      return null;
+    }
   }
 
   return (
     <p
-      className={`ed-data-source${warnStale ? ' ed-data-source--stale' : ''}${compact ? ' ed-data-source--compact' : ''} ${className}`.trim()}
+      className={`ed-data-source${warnStale ? ' ed-data-source--stale' : ''}${hasError ? ' ed-data-source--error' : ''}${compact ? ' ed-data-source--compact' : ''} ${className}`.trim()}
       role="status"
       title={
         warnStale ? 'Data may be stale. Validate against current department state.' : undefined

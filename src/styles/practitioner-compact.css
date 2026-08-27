@@ -352,7 +352,13 @@
   font-size: 18px;
 }
 
-[data-practitioner-compact] .ed-data-source,
+/* .ed-data-source--error (genuine "backend unavailable") is exempted --
+   this rule must stay in sync with EdDataSourceBanner.tsx's
+   showBackendUnavailableIndicator split: that flag is never suppressed by
+   pilot cleanup, so this CSS must not blanket-hide the element it renders
+   into either, or the banner would be unsuppressible in React but still
+   invisible in the actual rendered app. */
+[data-practitioner-compact] .ed-data-source:not(.ed-data-source--error),
 [data-practitioner-compact] .emergency-route-data-source,
 [data-practitioner-compact] .emergency-route-metric-strip,
 [data-practitioner-compact] .emergency-route-metric-grid {

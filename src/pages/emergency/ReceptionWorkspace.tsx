@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FolderOpen, ShieldCheck } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 
+import EdDataSourceBanner from '../../components/emergency/EdDataSourceBanner';
 import ReceptionEscalationPanel from '../../components/reception/ReceptionEscalationPanel';
 import ReceptionEscalationQuickActions from '../../components/reception/ReceptionEscalationQuickActions';
 import ReceptionOperationalRail from '../../components/reception/ReceptionOperationalRail';
@@ -246,6 +247,17 @@ export default function ReceptionWorkspace() {
   const alerts = useEmergencyStore((state) => state.alerts);
   const selectedPatientId = useEmergencyStore((state) => state.selectedPatientId);
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
+  // Reception previously had no connectivity indicator at all -- the header's
+  // "Sync" pill is gated off for this screen mode (useScreenModeCapabilities'
+  // showOperationalStrip is false for reception) and it also bundles capacity/
+  // EMS/reassessment KPIs that don't belong on this desk. Reusing the same
+  // EdDataSourceBanner already shown on Whiteboard/Queues/EMS gives reception
+  // clerks the identical, always-visible "Department data unavailable" signal
+  // instead of a third, bespoke pattern.
+  const backendAvailable = useEmergencyStore((state) => state.backendAvailable);
+  const backendError = useEmergencyStore((state) => state.ui.error);
+  const backendLoading = useEmergencyStore((state) => state.loading);
+  const activeScenarioId = useEmergencyStore((state) => state.activeScenarioId);
   const lookupInputRef = useRef<HTMLInputElement | null>(null);
 
   const [draft, setDraft] = useState<ReceptionIntakeDraft>(EMPTY_DRAFT);
@@ -997,6 +1009,13 @@ export default function ReceptionWorkspace() {
       }
       mainContent={
         <>
+          <EdDataSourceBanner
+            envelope={null}
+            loading={backendLoading}
+            error={backendError}
+            backendAvailable={backendAvailable}
+            activeScenarioId={activeScenarioId}
+          />
           <EmsCriticalArrivalPrep />
           <ReceptionContentSection>
             <Stepper draft={draft} aiAssist={aiAssist} result={result} />

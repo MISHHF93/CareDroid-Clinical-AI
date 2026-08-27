@@ -152,4 +152,83 @@ describe('ReceptionWorkspace render', () => {
 
     expect(createPatientAndRouteFromReceptionMock).toHaveBeenCalledTimes(1);
   });
+
+  // Reception previously had no connectivity indicator at all (no persistent
+  // signal once a per-action toast auto-dismissed). It now reuses the same
+  // EdDataSourceBanner shown on Whiteboard/Queues/EMS, driven by the store's
+  // real backendAvailable/ui.error fields. PractitionerVisibilityProvider is
+  // left un-mocked here (unlike the other tests in this file) specifically so
+  // this proves the indicator survives real pilot-customer cleanup mode,
+  // which is enabled by default in this codebase.
+  it('shows a persistent backend-unavailable indicator when the backend is unreachable', () => {
+    useEmergencyStore.setState(
+      {
+        ...originalState,
+        patients: [],
+        emsArrivals: [],
+        alerts: [],
+        workflowLogs: [],
+        referrals: [],
+        staff: [],
+        rooms: [],
+        capacity: originalState.capacity,
+        emergencySettings: originalState.emergencySettings,
+        backendAvailable: false,
+        loading: false,
+        ui: { ...originalState.ui, loading: false, error: 'CareDroid backend unavailable.' },
+      },
+      true,
+    );
+
+    render(
+      <MemoryRouter initialEntries={['/emergency/reception']}>
+        <RouteChromeProvider>
+          <PractitionerVisibilityProvider>
+            <HelpHubProvider>
+              <ReceptionWorkspace />
+            </HelpHubProvider>
+          </PractitionerVisibilityProvider>
+        </RouteChromeProvider>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText('Department data unavailable — check connection')).toBeInTheDocument();
+  });
+
+  it('shows no backend-unavailable indicator once the backend is reachable', () => {
+    useEmergencyStore.setState(
+      {
+        ...originalState,
+        patients: [],
+        emsArrivals: [],
+        alerts: [],
+        workflowLogs: [],
+        referrals: [],
+        staff: [],
+        rooms: [],
+        capacity: originalState.capacity,
+        emergencySettings: originalState.emergencySettings,
+        backendAvailable: true,
+        loading: false,
+        ui: { ...originalState.ui, loading: false, error: null },
+      },
+      true,
+    );
+
+    render(
+      <MemoryRouter initialEntries={['/emergency/reception']}>
+        <RouteChromeProvider>
+          <PractitionerVisibilityProvider>
+            <HelpHubProvider>
+              <ReceptionWorkspace />
+            </HelpHubProvider>
+          </PractitionerVisibilityProvider>
+        </RouteChromeProvider>
+      </MemoryRouter>,
+    );
+
+    expect(
+      screen.queryByText('Department data unavailable — check connection'),
+    ).not.toBeInTheDocument();
+  });
 });

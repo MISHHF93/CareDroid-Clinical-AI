@@ -98,6 +98,12 @@ const FULL_VISIBILITY = Object.freeze({
   chrome: Object.freeze({
     showDeveloperApiBanners: true,
     showEdDataSourceBanner: true,
+    // Safety-relevant "backend unavailable" outage signal -- distinct from
+    // showEdDataSourceBanner (cosmetic data-source/freshness lines) and
+    // showDeveloperApiBanners (verbose dev/API diagnostic banners). Always
+    // true; see buildPilotVisibility() below for why pilot cleanup never
+    // suppresses it.
+    showBackendUnavailableIndicator: true,
     showSessionDevSegments: true,
     showSessionSimulation: true,
     // Copilot opens only from sidebar nav id `copilot` — not a second session chrome strip.
@@ -255,6 +261,12 @@ function buildPilotVisibility(context: any = {}) {
     chrome: Object.freeze({
       showDeveloperApiBanners: !c.suppressDeveloperApiBanners,
       showEdDataSourceBanner: !c.suppressEdDataSourceBanner,
+      // Never gated on PRACTITIONER_CLEANUP -- "the backend is unreachable and
+      // your data may be stale" is safety-relevant clinical information, not
+      // the cosmetic/dev-only noise showEdDataSourceBanner and
+      // showDeveloperApiBanners exist to hide during pilot cleanup. Always
+      // true regardless of isPractitionerCleanupEnabled().
+      showBackendUnavailableIndicator: true,
       showSessionDevSegments: !c.suppressSessionChromeDevSegments,
       showSessionSimulation: !c.suppressSessionChromeSimulation,
       // Always false — single AI entry is sidebar nav `copilot` (docked CareDroid Copilot).

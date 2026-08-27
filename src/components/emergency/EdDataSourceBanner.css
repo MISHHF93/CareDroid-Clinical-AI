@@ -17,6 +17,10 @@
   color: var(--status-warning, #f59e0b);
 }
 
+.ed-data-source--error {
+  color: var(--status-critical, #dc2626);
+}
+
 .ed-data-source__label {
   font-weight: 700;
   letter-spacing: 0.02em;

@@ -16,6 +16,7 @@ describe('practitionerSurfaceVisibility', () => {
     expect(surfaces.whiteboard.showRoleStrips).toBe(true);
     expect(surfaces.reception.showAlertRail).toBe(true);
     expect(surfaces.patientCard.badgeLimit).toBe(2);
+    expect(surfaces.chrome.showBackendUnavailableIndicator).toBe(true);
   });
 
   it('returns flattened pilot surfaces when cleanup is active', () => {
@@ -37,6 +38,11 @@ describe('practitionerSurfaceVisibility', () => {
     expect(surfaces.settings.showPlatformStrip).toBe(false);
     expect(surfaces.chrome.showHeaderSubtitle).toBe(false);
     expect(surfaces.chrome.showEdDataSourceBanner).toBe(false);
+    // The safety-relevant "backend unavailable" indicator must stay visible
+    // even while pilot-customer cleanup mode suppresses the cosmetic
+    // showEdDataSourceBanner/showDeveloperApiBanners diagnostic surfaces
+    // above -- this is the exact gap this flag was introduced to close.
+    expect(surfaces.chrome.showBackendUnavailableIndicator).toBe(true);
     expect(surfaces.chrome.showSessionSimulation).toBe(false);
     expect(surfaces.chrome.showPageEyebrow).toBe(false);
     expect(surfaces.chrome.showEntryHubBackendSync).toBe(false);
