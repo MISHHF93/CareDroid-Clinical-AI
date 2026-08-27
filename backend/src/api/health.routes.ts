@@ -5,6 +5,7 @@ import { connect as connectTls } from 'tls';
 import type { Server as SocketIOServer } from 'socket.io';
 import type { DataSource } from 'typeorm';
 import { checkServiceHealth } from '../services/service-registry';
+import { probeHttpEndpoint } from '../services/http-endpoint-probe';
 
 type ComponentStatus = 'healthy' | 'degraded' | 'unhealthy' | 'not-configured';
 type OverallStatus = 'healthy' | 'degraded' | 'unhealthy';
@@ -369,46 +370,6 @@ async function checkMqttBroker(): Promise<ComponentHealth> {
   });
 }
 
-async function probeHttpEndpoint(endpoint: string) {
-  if (typeof fetch !== 'function') {
-    throw new Error('Global fetch is unavailable in this Node runtime.');
-  }
-
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), CHECK_TIMEOUT_MS);
-
-  try {
-    let response = await fetch(endpoint, {
-      method: 'HEAD',
-      signal: controller.signal,
-      headers: {
-        accept: 'application/fhir+json, application/json;q=0.9, */*;q=0.1',
-      },
-    });
-    let method = 'HEAD';
-
-    if (response.status === 405 || response.status === 501) {
-      response = await fetch(endpoint, {
-        method: 'GET',
-        signal: controller.signal,
-        headers: {
-          accept: 'application/fhir+json, application/json;q=0.9, */*;q=0.1',
-        },
-      });
-      method = 'GET';
-    }
-
-    return {
-      method,
-      statusCode: response.status,
-      statusText: response.statusText,
-      reachable: response.status < 500,
-    };
-  } finally {
-    clearTimeout(timeout);
-  }
-}
-
 async function checkExternalApi(label: string, envKeys: string[]): Promise<ComponentHealth> {
   return timedComponent(false, async () => {
     const configuredEndpoint = configuredValue(...envKeys);
@@ -440,7 +401,7 @@ async function checkExternalApi(label: string, envKeys: string[]): Promise<Compo
       };
     }
 
-    const probe = await probeHttpEndpoint(endpoint);
+    const probe = await probeHttpEndpoint(endpoint, CHECK_TIMEOUT_MS);
     return {
       status: probe.reachable ? 'healthy' : 'degraded',
       configured: true,

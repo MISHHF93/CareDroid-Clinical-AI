@@ -292,6 +292,14 @@ export const BACKEND_API_CAPABILITY_STATUS = Object.freeze({
   sentinelIngest: BACKEND_CAPABILITY_STATUS.REAL,
   sentinelAi: BACKEND_CAPABILITY_STATUS.REAL,
   sentinelAnalytics: BACKEND_CAPABILITY_STATUS.REAL,
+  /**
+   * subscriptions.service.ts makes real, config-gated Stripe SDK calls
+   * (stripe.customers.create/checkout.sessions.create/
+   * billingPortal.sessions.create) via BillingPage.tsx/Settings.tsx's
+   * subscriptionApi.ts -- the single most real, most-live integration in
+   * this codebase, previously absent from this capability map entirely.
+   */
+  stripeBilling: BACKEND_CAPABILITY_STATUS.REAL,
 });
 
 export const BACKEND_API_CAPABILITIES = Object.freeze(

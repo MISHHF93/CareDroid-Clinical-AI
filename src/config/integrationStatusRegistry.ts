@@ -13,6 +13,7 @@ export const INTEGRATION_CATEGORY = Object.freeze({
   PROVINCIAL: 'Provincial',
   NOTIFICATION: 'Notification',
   IDENTITY: 'Identity',
+  BILLING: 'Billing',
 });
 
 export const INTEGRATION_STATUS_LABELS = Object.freeze({
@@ -264,6 +265,24 @@ export const INTEGRATION_POINT_REGISTRY = Object.freeze([
     surfaces: ['identity-provider-registry.service.ts'],
     summary: 'Planned providers in registry; Google OAuth config-detect only.',
   },
+
+  // —— Billing ——
+  // This registry's own audit was, until now, missing the single most real,
+  // most-live integration in the codebase: every other entry above is a
+  // demo/fixture/placeholder in some real way, while Stripe billing makes
+  // genuine, config-gated Stripe SDK calls (customers.create,
+  // checkout.sessions.create, billingPortal.sessions.create) and throws a
+  // real 503 rather than silently faking success when unconfigured.
+  {
+    id: 'stripe-billing',
+    category: INTEGRATION_CATEGORY.BILLING,
+    label: 'Stripe billing',
+    status: INTEGRATION_STATUS.IMPLEMENTED,
+    capability: 'stripeBilling',
+    surfaces: ['BillingPage', 'Settings'],
+    backend: 'subscriptions.service.ts',
+    summary: 'Live Stripe checkout, billing-portal, and customer creation via the real Stripe SDK -- not a demo adapter.',
+  },
 ]);
 
 const STATUS_RANK = Object.freeze({
@@ -374,6 +393,6 @@ export function auditIntegrationDiscovery(registry = INTEGRATION_POINT_REGISTRY)
       pointCount,
       counts,
     })),
-    passesAudit: registry.length >= 20 && categories.length === 5,
+    passesAudit: registry.length >= 20 && categories.length === 6,
   };
 }

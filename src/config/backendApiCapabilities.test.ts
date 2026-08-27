@@ -154,6 +154,13 @@ describe('backendApiCapabilities', () => {
     expect(getBackendCapabilityStatus('clinicalAlerts')).toBe(BACKEND_CAPABILITY_STATUS.DEMO);
   });
 
+  it('marks Stripe billing as a real, live capability (HEAL)', () => {
+    // subscriptions.service.ts makes real Stripe SDK calls -- previously
+    // absent from this capability map entirely.
+    expect(isBackendCapabilityEnabled('stripeBilling')).toBe(true);
+    expect(getBackendCapabilityStatus('stripeBilling')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
+  });
+
   it('exports frozen capability map', () => {
     expect(Object.isFrozen(BACKEND_API_CAPABILITIES)).toBe(true);
     expect(Object.isFrozen(BACKEND_API_CAPABILITY_STATUS)).toBe(true);

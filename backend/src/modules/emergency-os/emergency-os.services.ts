@@ -3779,7 +3779,22 @@ export class IntegrationHubService {
             id: 'fhir-demo',
             label: 'FHIR patient snapshot',
             status: 'demo-ready',
-            lastEventAt: new Date().toISOString(),
+            // HEAL: this used to be `new Date().toISOString()` -- stamped
+            // with the CURRENT request time on every single call, so the
+            // "Last event" column in IntegrationHubPage always read "just
+            // now" no matter whether a real FHIR event had ever occurred.
+            // This source entry is a demo/catalog row, not backed by a
+            // persisted event -- the real, persisted event ledger lives in
+            // interoperability/integration-hub.service.ts's listRecent(),
+            // but that ledger's events are keyed by family
+            // ('fhir'/'hl7'/'lis'/'device_telemetry') and sourceSystem, not
+            // by this catalog's synthetic 'fhir-demo' id, so there is no
+            // honest, non-fabricated way to map "most recent persisted FHIR
+            // event" onto this specific row without inventing that mapping.
+            // Report the honest absence of a real event instead of a fake
+            // timestamp; IntegrationHubPage renders this as "No events
+            // recorded".
+            lastEventAt: null,
           },
           { id: 'hl7-demo', label: 'HL7 ADT interface', status: 'placeholder', lastEventAt: null },
           {

@@ -112,7 +112,9 @@ export default function IntegrationHubPage() {
                       {String(source.status || 'unknown')}
                     </small>
                   </td>
-                  <td>{source.lastEventAt ? String(source.lastEventAt) : '—'}</td>
+                  <td>
+                    {source.lastEventAt ? String(source.lastEventAt) : 'No events recorded'}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -143,17 +145,27 @@ export default function IntegrationHubPage() {
                 <th>Type</th>
                 <th>Status</th>
                 <th>Received</th>
+                <th>Error</th>
               </tr>
             </thead>
             <tbody>
-              {recentEvents.slice(0, 12).map((event) => (
-                <tr key={String(event.id || `${event.family}-${event.receivedAt}`)}>
-                  <td>{String(event.family || '—')}</td>
-                  <td>{String(event.eventType || '—')}</td>
-                  <td>{String(event.processingStatus || event.status || '—')}</td>
-                  <td>{String(event.receivedAt || '—')}</td>
-                </tr>
-              ))}
+              {recentEvents.slice(0, 12).map((event) => {
+                const processingStatus = String(event.processingStatus || event.status || '');
+                const failed = processingStatus.toLowerCase() === 'failed';
+                return (
+                  <tr key={String(event.id || `${event.family}-${event.receivedAt}`)}>
+                    <td>{String(event.family || '—')}</td>
+                    <td>{String(event.eventType || '—')}</td>
+                    <td>{processingStatus || '—'}</td>
+                    <td>{String(event.receivedAt || '—')}</td>
+                    <td>
+                      {failed
+                        ? String(event.error || 'Failed — no error detail recorded')
+                        : '—'}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         ) : (

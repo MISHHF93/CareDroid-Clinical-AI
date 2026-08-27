@@ -1,5 +1,5 @@
 /**
- * Integration discovery audit — FHIR, HL7, Provincial, Notification, Identity.
+ * Integration discovery audit — FHIR, HL7, Provincial, Notification, Identity, Billing.
  * Run: node scripts/integration-discovery.mjs
  */
 import { mkdirSync, writeFileSync } from 'node:fs';

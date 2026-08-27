@@ -6,6 +6,7 @@ import {
 } from '../../store/emergencyStore';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { REFRESH_DATASET_TIMEOUT_MS } from '../../config/startupTimeouts';
+import { getApiErrorMessage } from '../../services/apiClient';
 import { FIRST_CUSTOMER_DEMO_MODE } from '../../data/firstCustomerDemoMode';
 import {
   DEFAULT_CENTRAL_CONTROL_SETTINGS,
@@ -487,9 +488,11 @@ export default function EmergencySettings() {
           setBackendWorkflowLogs(Array.isArray(logs) ? logs : []);
           setAuditStatus('ready');
         })
-        .catch(() => {
+        .catch((error) => {
           if (cancelled) return;
-          setAuditError('Workflow audit logs are temporarily unavailable.');
+          setAuditError(
+            getApiErrorMessage(error) || 'Workflow audit logs are temporarily unavailable.',
+          );
           setAuditStatus('error');
         });
     }, SETTINGS_FETCH_STAGGER_MS.audit);
@@ -512,9 +515,11 @@ export default function EmergencySettings() {
           setIntegrationHubEnvelope(result);
           setIntegrationHubStatus(result?.remainingGaps?.length ? 'partial' : 'ready');
         })
-        .catch(() => {
+        .catch((error) => {
           if (cancelled) return;
-          setIntegrationHubError('Integration Hub status is temporarily unavailable.');
+          setIntegrationHubError(
+            getApiErrorMessage(error) || 'Integration Hub status is temporarily unavailable.',
+          );
           setIntegrationHubStatus('error');
         });
     }, SETTINGS_FETCH_STAGGER_MS.integrationHub);
@@ -537,9 +542,12 @@ export default function EmergencySettings() {
           setProvincialHealthEnvelope(result);
           setProvincialHealthStatus(result?.remainingGaps?.length ? 'partial' : 'ready');
         })
-        .catch(() => {
+        .catch((error) => {
           if (cancelled) return;
-          setProvincialHealthError('Provincial Health connector status is temporarily unavailable.');
+          setProvincialHealthError(
+            getApiErrorMessage(error) ||
+              'Provincial Health connector status is temporarily unavailable.',
+          );
           setProvincialHealthStatus('error');
         });
     }, SETTINGS_FETCH_STAGGER_MS.provincialHealth);

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { getApiErrorMessage } from '../services/apiClient';
 import { fetchIntegrationHub } from '../services/emergencyOsApi';
 import {
   fetchIntegrationEvents,
@@ -51,7 +52,10 @@ export function useIntegrationHub(eventLimit = 25): IntegrationHubState {
     } else {
       setEnvelope(null);
       setStatus('error');
-      setError('Integration Hub status is temporarily unavailable.');
+      setError(
+        getApiErrorMessage(hubResult.reason) ||
+          'Integration Hub status is temporarily unavailable.',
+      );
     }
 
     if (summaryResult.status === 'fulfilled') {
