@@ -586,13 +586,19 @@
 }
 
 .emergency-route-action-chip {
+  /* !important: visual-consistency.css's [class*='action']/[class*='control']
+     wide-net rule (button/a scope) forces min-height:44px and
+     font-weight:650 at higher specificity, turning a compact pill nav
+     chip into a ~70% taller, visibly lighter-weight button. Same
+     collision shape as .caredroid-header__action above. */
+  min-height: 0 !important;
   border: 1px solid var(--app-border-subtle);
-  border-radius: 999px;
+  border-radius: 999px !important;
   background: var(--app-surface-1);
   color: var(--app-accent-interactive);
   padding: 6px 10px;
   font-size: var(--ed-type-body);
-  font-weight: 800;
+  font-weight: 800 !important;
 }
 
 .emergency-command-action-grid {

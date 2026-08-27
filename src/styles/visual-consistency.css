@@ -159,6 +159,15 @@
   font-family: inherit;
 }
 
+/* Excluded .empty-state (2026-08-27, same shape as the .alarm-kpi__badge
+   exclusion below): the [class*='-state '] wildcard also matches its
+   own "empty-state empty-state-md" multi-class attribute, forcing an
+   unwanted card background/border/shadow onto a component whose own
+   CSS (EmptyState.css) is deliberately chrome-less, AND collapsing its
+   sm/md/lg padding differentiation down to one flat card-padding value
+   via the sibling rule below. Confirmed live across 18+ consumers
+   (ConsentHistory, CommandPalette, PatientSearchResults, etc.) all
+   losing their intended flat "no data" placeholder look. */
 :is(.app-shell, .emergency-app-shell)
   :is(
     .card,
@@ -172,7 +181,7 @@
     [class*='-notice '],
     [class$='-state'],
     [class*='-state ']
-  ) {
+  ):not(.empty-state) {
   min-width: 0;
   border-color: var(--cdl-clinical-border, var(--app-border));
   border-radius: var(--cdl-clinical-radius, var(--app-visual-panel-radius));
@@ -213,7 +222,7 @@
     [class*='-notice '],
     [class$='-state'],
     [class*='-state ']
-  ):not(.card):not(.cd-metric-card):not(.cd-insight-card):not(.cd-status-widget) {
+  ):not(.card):not(.cd-metric-card):not(.cd-insight-card):not(.cd-status-widget):not(.empty-state) {
   padding: var(--app-visual-card-padding);
 }
 
@@ -427,8 +436,13 @@
   box-shadow: var(--app-elevation-card, var(--shadow-1));
 }
 
+/* Same .three-minute-timer-badge exclusion as the sibling min-height/
+   white-space rule in visual-responsive-standards.css -- this one forces
+   the pill border-radius that badge's own CSS deliberately avoids. */
 :is(.app-shell, .emergency-app-shell)
-  :is([class*='badge'], [class*='chip'], [class*='pill'], [class*='tag']) {
+  :is([class*='badge'], [class*='chip'], [class*='pill'], [class*='tag']):not(
+    .three-minute-timer-badge
+  ) {
   border-radius: var(--app-radius-pill);
   font-size: var(--app-type-caption);
   line-height: 1.2;

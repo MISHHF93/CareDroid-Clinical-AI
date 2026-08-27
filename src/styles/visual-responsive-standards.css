@@ -317,11 +317,18 @@
    the same rail -- confirmed live via computed-style + cascade inspection,
    not guessed. alarm-system.css already has its own complete, deliberate
    sizing for this badge across every .alarm-kpi consumer app-wide, not
-   just the header. */
+   just the header.
+
+   2026-08-27: also excluded .three-minute-timer-badge -- the compact
+   3-minute-to-physician-contact indicator shown on every P1/P2 patient
+   card (ThreeMinuteTimer.css) is deliberately a small rounded-rect chip
+   (border-radius: 4px, ~15-19px tall); this rule was forcing it to a
+   999px pill at a stretched 28px min-height, distorting a safety-critical
+   clinical timer's shape rather than a cosmetic mismatch. */
 :is(.app-shell, .emergency-app-shell)
   :is([class*='badge'], [class*='chip'], [class*='pill'], [class*='tag'], .cd-metric-chip):not(
     .alarm-kpi__badge
-  ) {
+  ):not(.three-minute-timer-badge) {
   min-height: 28px;
   align-items: center;
   white-space: normal;

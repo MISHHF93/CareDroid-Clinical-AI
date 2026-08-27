@@ -5,7 +5,7 @@
 }
 
 .checklist-chooser__option {
-  background: var(--medical-white, #ffffff);
+  background: var(--medical-white, #ffffff) !important;
   border: 1px solid #e0f2fe;
   border-radius: 10px;
   color: var(--medical-ink, #111827);

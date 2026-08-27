@@ -14,20 +14,28 @@
   font-size: 0.66rem;
 }
 
+/* !important on all three: visual-consistency.css's [class*='badge']
+   wide-net rule matches each of these (their own class names contain
+   "badge") and forces white-space: normal at higher specificity. The
+   parent .native-ai-routing-badge already flex-wraps as a group
+   (deliberately, so the whole badge can drop to a new line under
+   crowding on PatientCard) -- each individual piece (e.g. a multi-
+   specialist __value like "Cardiology + Nephrology") should still stay
+   on one line as a unit rather than breaking mid-phrase. */
 .native-ai-routing-badge__label {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.03em;
   color: var(--color-accent, #374151);
-  white-space: nowrap;
+  white-space: nowrap !important;
 }
 
 .native-ai-routing-badge__value {
   color: var(--medical-card-fg, #111827);
-  white-space: nowrap;
+  white-space: nowrap !important;
 }
 
 .native-ai-routing-badge__meta {
   color: var(--color-text-muted, #64748b);
-  white-space: nowrap;
+  white-space: nowrap !important;
 }
