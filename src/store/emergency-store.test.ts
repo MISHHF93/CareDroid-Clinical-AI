@@ -402,6 +402,65 @@ describe('CareDroid store shim', () => {
     expect(latestWorkflowLog?.actorStaffId).not.toBe('staff-A-requester');
   });
 
+  // Regression coverage for the 2026-08-27 fix: extractReferrals never read
+  // lastActionByStaffId/lastActionByName off a raw referral payload -- the
+  // entire point of the actor-tracking fix above. ReferralService.
+  // updateReferralStatus's own realtime broadcast (referral_status_changed,
+  // shape `{ referral: updated }`) round-trips through this exact function
+  // via buildRealtimeHydrationPayload -- and hydrateFromApi's referral merge
+  // fully replaces the matching-id record -- so the just-set local
+  // optimistic actor was being silently clobbered back to undefined almost
+  // immediately, not just on a later reload. Same "durable field, dead read
+  // path" bug class as the EMS patientId and Alert ownerRole fixes.
+  it('preserves lastActionByStaffId/lastActionByName through the realtime referral_status_changed round-trip, not clobbering them back to undefined', () => {
+    const patientId = useEmergencyStore.getState().patients[0]?.id;
+    expect(patientId).toBeTruthy();
+
+    const localReferral = useEmergencyStore.getState().createReferral({
+      patientId,
+      requestingStaffId: 'staff-A-requester',
+      targetDepartment: 'Cardiology',
+      urgency: 'Urgent',
+      reason: 'Realtime actor round-trip regression test.',
+      clinicalSummary: 'Realtime actor round-trip regression test.',
+      status: 'Sent',
+    });
+
+    useEmergencyStore.setState((state) => ({
+      activeShift: { ...state.activeShift, chargeStaffId: 'staff-B-responder' },
+    }));
+    useEmergencyStore
+      .getState()
+      .updateReferralStatus(localReferral.id, 'Accepted');
+
+    const afterLocalUpdate = useEmergencyStore
+      .getState()
+      .referrals.find((candidate) => candidate.id === localReferral.id);
+    expect(afterLocalUpdate?.lastActionByStaffId).toBe('staff-B-responder');
+
+    // Mirrors exactly what the real backend does immediately after
+    // processing that PATCH: EmergencyOsController.updateTransferStatus
+    // derives the actor server-side and ReferralService.updateReferralStatus
+    // publishes the full updated referral, actor fields included
+    // (mapEntityToReferral echoes them back verbatim).
+    useEmergencyStore.getState().dispatchWebSocketEvent({
+      type: 'referral_status_changed',
+      payload: {
+        referral: {
+          ...afterLocalUpdate,
+          lastActionByStaffId: 'staff-B-responder',
+          lastActionByName: 'Staff B Responder',
+        },
+      },
+    });
+
+    const afterRealtimeEcho = useEmergencyStore
+      .getState()
+      .referrals.find((candidate) => candidate.id === localReferral.id);
+    expect(afterRealtimeEcho?.lastActionByStaffId).toBe('staff-B-responder');
+    expect(afterRealtimeEcho?.lastActionByName).toBe('Staff B Responder');
+  });
+
   it('parses ems_updated as a full EMS-intake envelope, not a phantom single arrival built from envelope fields', () => {
     const store = useEmergencyStore.getState();
     const before = store.emsArrivals.length;

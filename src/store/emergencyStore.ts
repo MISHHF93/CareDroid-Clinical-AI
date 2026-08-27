@@ -820,6 +820,20 @@ const extractReferrals = (raw: unknown): Referral[] => {
       requestedAt,
       respondedAt: stringFrom(record.respondedAt) || undefined,
       responseNote: stringFrom(record.responseNote) || undefined,
+      // Found 2026-08-27: these two were the entire point of the
+      // referral-actor-tracking fix (updateReferralStatus's own doc comment,
+      // HEAL referral-actor-tracking) -- the backend durably sets and returns
+      // both (ReferralService.updateReferralStatus / mapEntityToReferral),
+      // but this function never read them back. Worse than a lost reload:
+      // updateReferralStatus's realtime publish (`referral_status_changed`)
+      // round-trips the SAME referral back through this exact function within
+      // the same session, and hydrateFromApi's referral merge fully replaces
+      // the matching-id record -- so the just-set local optimistic actor was
+      // being clobbered back to undefined almost immediately, not just on a
+      // later reload. Same "durable field, dead read path" bug class as
+      // buildInboundEmsRecord's patientId and Alert.ownerRole.
+      lastActionByStaffId: stringFrom(record.lastActionByStaffId) || undefined,
+      lastActionByName: stringFrom(record.lastActionByName) || undefined,
       summary:
         stringFrom(record.summary) ||
         stringFrom(record.reason) ||
