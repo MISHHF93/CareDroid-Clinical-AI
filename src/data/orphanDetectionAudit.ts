@@ -17,6 +17,7 @@ import {
   NON_ED_WORKSPACE_REDIRECT_ROUTES,
   OUTSIDE_SHELL_ROUTE_REDIRECTS,
   ROUTE_ALIAS_REDIRECTS,
+  ROUTE_RECORDS,
 } from '../config/routes.config';
 import { PROFILE_CONSOLE_REDIRECT_ROUTES, PROFILE_CONSOLE_ROUTE_PATHS } from '../config/profileConsoleRoutes';
 import { PUBLIC_CONSOLE_REDIRECT_ROUTES, PUBLIC_CONSOLE_ROUTE_PATHS } from '../config/publicConsoleRoutes';
@@ -82,6 +83,19 @@ const EXPECTED_LEGACY_NON_ROUTE_FILES = new Set([
   'src/pages/CommandDashboard.jsx',
   'src/pages/fleet/FleetDashboardWidgets.jsx',
   'src/pages/SimulationLaboratoryViewer.css',
+  // Same false-positive class as SimulationLaboratoryViewer.css above: both
+  // are real support files imported directly by their page component
+  // (Medical3DViewer.tsx imports './Medical3DViewer.css' and
+  // '../../utils/medical3dViewerModel'), so isReferenced() correctly finds
+  // them, but detectDomainModuleOrphans() only skips a file when it's BOTH
+  // referenced AND itself present in appWired (router.tsx/console-tree lazy
+  // imports) -- a support file a page imports internally is never itself
+  // lazy-imported by router.tsx, so it fails that second check and gets
+  // wrongly promoted to WIRE despite Medical3DViewer.tsx being a real,
+  // live-mounted page (platformConsoleRouteTree.tsx -> /3d-viewer). Found
+  // 2026-08-26.
+  'src/pages/clinical/Medical3DViewer.css',
+  'src/utils/medical3dViewerModel.ts',
 ]);
 
 const LEGACY_ROUTE_PREFIXES = ['/login', '/signin', '/home', '/chat', '/calculator/', '/medical-simulation', '/lab', '/anatomy-viewer'];
@@ -393,8 +407,28 @@ function classifyItem({ referenced, inAppRoutes, inNav, inInventory, isRedirectA
   return ORPHAN_CLASSIFICATIONS.QUARANTINE;
 }
 
+// ROUTE_RECORDS entries explicitly marked status: 'future' are deliberate,
+// documented product-roadmap placeholders that are not built yet -- e.g. the
+// whole TrackMind Enterprise Operating Platform, Platform Admin, the
+// products/plans/specialties commercial catalog, Digital Twin Intelligence,
+// CareDroid Brain, and the AI Models registry. routes.config.ts's own
+// ROUTE_ALIAS_REDIRECTS/aliasesForRoute() already filter these out
+// (`record.status !== 'future'`) for exactly this reason -- they are
+// intentionally excluded from live routing/redirects/aliases until built,
+// and routeRecordsDrift.test.ts independently guards that no 'future' record
+// is ever live in CANONICAL_ROUTE_MAP. Without this exclusion here too,
+// collectCanonicalNavPaths()'s blanket `Object.values(CANONICAL_ROUTES)`
+// inclusion flagged every one of these (~20 routes) as a "wire" (real,
+// missing-registration) gap despite being deliberately unbuilt roadmap
+// items, not accidental omissions. Found 2026-08-26.
+const FUTURE_ROUTE_PATHS: Set<string> = new Set(
+  ROUTE_RECORDS.filter((record) => record.status === 'future').map((record) => record.path)
+);
+
 function collectCanonicalNavPaths() {
-  const paths: Set<any> = new Set(Object.values(CANONICAL_ROUTES));
+  const paths: Set<any> = new Set(
+    Object.values(CANONICAL_ROUTES).filter((path) => !FUTURE_ROUTE_PATHS.has(path))
+  );
   const nav = readRepoFile('src/config/navigation.config.ts');
   for (const m of nav.matchAll(/['"](\/[^'"]+)['"]/g)) {
     paths.add(m[1]);

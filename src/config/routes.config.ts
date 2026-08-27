@@ -188,7 +188,6 @@ export const CANONICAL_ROUTES = Object.freeze({
   organizationIntelligence: '/organization-intelligence',
   organizationSettings: '/settings/organization',
   tenantAdmin: '/tenant-admin',
-  tenantAdminWorkspaces: '/tenant-admin/workspaces',
   organizationPacks: '/settings/organization/packs',
   organizationAssets: '/settings/organization/assets',
   organizationAnalytics: '/organization-analytics',
@@ -358,11 +357,28 @@ export const LEGACY_EMERGENCY_ROUTE_REDIRECTS = Object.freeze(
     ['/emergency/arrival', CANONICAL_ROUTES.emergencyReception],
     ['/workspace/emergency/reception', CANONICAL_ROUTES.emergencyReception],
     ['/queues', CANONICAL_ROUTES.emergencyQueues],
+    // ROUTE_RECORDS' 'operations' record (status: 'redirect', aliases:
+    // OPERATIONS_ROUTE_ALIASES) already documents /operations-center as an
+    // alias of /emergency/queues, but that documentation only ever fed
+    // ROUTE_ALIAS_REDIRECTS/PROTECTED_ROUTE_ALIAS_REDIRECTS, both derived
+    // arrays that router.tsx never imports or mounts (confirmed 2026-08-26 --
+    // zero references to either name in router.tsx) -- so the alias was
+    // never actually live. Mounting it here (the array router.tsx really
+    // renders) fulfills the pre-existing documented intent for real.
+    ['/operations-center', CANONICAL_ROUTES.emergencyQueues],
     ['/reassessment', CANONICAL_ROUTES.emergencyReassessment],
     ['/capacity', CANONICAL_ROUTES.emergencyCapacity],
     ['/boarding', CANONICAL_ROUTES.emergencyBoarding],
     ['/referrals', CANONICAL_ROUTES.emergencyReferrals],
     ['/provincial-health', CANONICAL_ROUTES.emergencyWhiteboard],
+    // Same gap as /operations-center above: CANONICAL_ROUTE_MAP's 'surveillance'
+    // record (path /surveillance/nexus) already carries `redirectTo:
+    // emergencyWhiteboard` and `showInNav: false`, and ROUTE_RECORDS'
+    // 'surveillanceNexus' record's own note says "Redirected to the ED
+    // whiteboard; dedicated surveillance nexus page not mounted" -- but no
+    // array router.tsx actually renders ever included this path, so the
+    // documented interim redirect never fired. Mounted here for real.
+    ['/surveillance/nexus', CANONICAL_ROUTES.emergencyWhiteboard],
     ['/integrations/hub', CANONICAL_ROUTES.integrationHub],
     ['/platform/cosmos', CANONICAL_ROUTES.cosmosViewer],
     ['/cosmos', CANONICAL_ROUTES.cosmosViewer],
@@ -1850,6 +1866,29 @@ export const ROUTE_RECORDS = Object.freeze([
     notes:
       'Enterprise readiness center with weighted SSO, RBAC, tenant isolation, audit, governance, integration, and security scoring.',
   }),
+  // Found 2026-08-26: trackMindWorkspace ('/trackmind') had no ROUTE_RECORDS
+  // entry at all, unlike its 3 siblings below (trackMindMaturity/
+  // enterprisePlatform/platformIntelligence) which are all documented
+  // 'future' rows -- a documentation gap, not evidence the hub itself is
+  // dead. The rest of the TrackMind system is real and substantial: a full
+  // role model (steward/veterinarian/paddock-official/etc., see
+  // trackMindRoleCatalog.ts), a permission registry, KPI/audit/notification/
+  // privacy policy modules, and a route guard component
+  // (TrackMindRouteGuard.tsx) that already resolves this exact path as the
+  // fallback landing route for every TrackMind role -- it is simply never
+  // mounted in router.tsx and no workspace page component exists yet.
+  Object.freeze({
+    id: 'trackMindWorkspace',
+    path: CANONICAL_ROUTES.trackMindWorkspace,
+    componentKey: 'TrackMindWorkspaceHub',
+    layout: 'app',
+    auth: 'required',
+    status: 'future',
+    aliases: [],
+    navGroup: 'account',
+    notes:
+      'TrackMind Operating System hub — role-based landing workspace for racetrack/equine-operations roles (steward, veterinarian, paddock official, security manager, etc.), linking out to the TrackMind maturity, enterprise platform, and platform intelligence surfaces below.',
+  }),
   Object.freeze({
     id: 'trackMindMaturity',
     path: CANONICAL_ROUTES.trackMindMaturity,
@@ -2139,6 +2178,38 @@ export const ROUTE_RECORDS = Object.freeze([
     navGroup: 'products',
     notes:
       'Department performance intelligence with health scores and measurable platform outcomes.',
+  }),
+  // Found 2026-08-26: timeline ('/timeline') and assets ('/assets') had no
+  // ROUTE_RECORDS entry at all -- unlike most other CANONICAL_ROUTES members
+  // -- yet canonicalConfig.contract.test.ts's "compact clinical OS route
+  // surface" test deliberately keeps both in CANONICAL_ROUTES, and
+  // frontendOperatingSystem.ts already reserves them as the 'result' and
+  // 'asset-launch' stage placeholders in its FRONTEND_OS_FLOW model. No page
+  // component exists for either yet. Documented here as future so they read
+  // the same way as every other reserved-but-unbuilt route in this catalog.
+  Object.freeze({
+    id: 'timeline',
+    path: CANONICAL_ROUTES.timeline,
+    componentKey: 'TimelineResultsPage',
+    layout: 'app',
+    auth: 'required',
+    status: 'future',
+    aliases: [],
+    navGroup: 'operations',
+    notes:
+      'Reserved "result" stage of the frontend operating system flow — results, signals, outcomes, and follow-up context.',
+  }),
+  Object.freeze({
+    id: 'assets',
+    path: CANONICAL_ROUTES.assets,
+    componentKey: 'AssetLaunchPage',
+    layout: 'app',
+    auth: 'required',
+    status: 'future',
+    aliases: [],
+    navGroup: 'operations',
+    notes:
+      'Reserved "asset launch" stage of the frontend operating system flow — asset discovery and launch outside search/assistant/tools.',
   }),
   Object.freeze({
     id: 'workflowMining',

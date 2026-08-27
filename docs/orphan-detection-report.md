@@ -15,20 +15,20 @@ Generated: 2026-08-26 (regenerate with `npm run orphan-detection:write-docs`)
 
 | Metric | Count |
 |--------|------:|
-| Total orphan findings | 196 |
-| App.jsx routes | 390 |
-| Orphan / gap routes | 36 |
+| Total orphan findings | 174 |
+| App.jsx routes | 392 |
+| Orphan / gap routes | 10 |
 | Orphan pages | 27 |
 | Orphan components | 0 |
 | Domain module findings (dashboard / simulation / lab / 3D) | 2 |
 | Orphan services | 0 |
 | Executor contract gaps | 0 |
 | API orphans / stubs | 125 |
-| Weakly linked markdown | 6 |
-| **wire** | 28 |
+| Weakly linked markdown | 10 |
+| **wire** | 0 |
 | **merge** | 0 |
 | **quarantine** | 0 |
-| **legacy** | 168 |
+| **legacy** | 174 |
 
 ## Merge candidates (explicit)
 
@@ -49,32 +49,6 @@ Generated: 2026-08-26 (regenerate with `npm run orphan-detection:write-docs`)
 
 | Route | Class | Evidence |
 | --- | --- | --- |
-| /operations-center | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /surveillance/nexus | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /digital-twin-intelligence | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /enterprise-readiness | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /trackmind | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /trackmind-maturity | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /enterprise-platform | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /platform-intelligence | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /platform-admin | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /timeline | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /assets | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /ai-models | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /platform-learning-engine | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /brain | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /tenant-admin/workspaces | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /products | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /plans | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /specialties | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /care-pathways | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /agents | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /outcomes | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /value-tracking | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /integrations-marketplace | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /integration-readiness | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /solution-builder | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /configuration-studio | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /home | legacy | Redirect or alias route in App.jsx |
 | /workspace | legacy | Redirect or alias route in App.jsx |
 | /medical-simulation | legacy | Redirect or alias route in App.jsx |
@@ -277,12 +251,16 @@ _… and 5 more API rows._
 
 | Doc | Class | Evidence |
 | --- | --- | --- |
-| docs/archive/clickable-map-report.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
-| docs/archive/component-mounting-report.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
-| docs/archive/current-codebase-findings.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
-| docs/archive/layout-routing-consolidation-report.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
-| docs/archive/system-evaluation.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
-| docs/archive/ui-surface-compression.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
+| docs/archive/CAREDROID_ARCHITECTURE_CLEANUP_REPORT.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
+| docs/archive/CLINICAL_PROCESS_SAAS_HARMONIZATION_REPORT.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
+| docs/archive/INTERACTION_EXECUTION_REPORT.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
+| docs/archive/PLATFORM_MODERNIZATION_REPORT.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
+| docs/archive/reception-upgrade/02-dependency-map.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
+| docs/archive/reception-upgrade/03-orphaned-code.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
+| docs/archive/reception-upgrade/04-rbac-permission-matrix.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
+| docs/archive/reception-upgrade/05-information-architecture.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
+| docs/archive/reception-upgrade/NEW_HEADER_INTEGRATION_GUIDE.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
+| docs/archive/SCORECARD-archive-2026-07-23-cycles-1-157.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
 
 ## Appendix
 

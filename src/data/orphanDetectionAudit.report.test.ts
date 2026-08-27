@@ -25,6 +25,28 @@ const docsDir = join(repoRoot, 'docs');
 // ~30 more real routes as covered (appRouteCount 354->368), not a regression either.
 const EMERGENCY_OS_APP_ROUTE_RANGE = Object.freeze({ min: 30, max: 420 });
 
+// 2026-08-26: every then-current "wire" finding (28 -- 26 routes +
+// Medical3DViewer.css/medical3dViewerModel.ts) was individually investigated
+// and resolved to 0: 2 routes (/operations-center, /surveillance/nexus) were
+// genuinely missing their documented redirect and are now mounted for real
+// in LEGACY_EMERGENCY_ROUTE_REDIRECTS; 1 (/tenant-admin/workspaces) was a
+// zero-consumer dead CANONICAL_ROUTES entry duplicating a section already
+// built into the live /tenant-admin page, and was deleted; the remaining 23
+// are deliberately-unbuilt ROUTE_RECORDS status:'future' roadmap items
+// (TrackMind, Platform Admin, the products/plans/specialties commercial
+// catalog, Digital Twin Intelligence, CareDroid Brain, AI Models, etc.) that
+// orphanDetectionAudit.ts's collectCanonicalNavPaths() now correctly
+// excludes via FUTURE_ROUTE_PATHS instead of misreporting as missing
+// registrations; and the 2 domain-module findings were reclassified legacy
+// via EXPECTED_LEGACY_NON_ROUTE_FILES (same false-positive class as
+// SimulationLaboratoryViewer.css). Pinned to exactly 0 rather than a range
+// so a brand-new, unexplained "wire" finding fails this test immediately
+// instead of silently inflating a tolerance band -- if a future change adds
+// a genuinely new gap, investigate and fix it (or, for a deliberately
+// unbuilt route, give it a ROUTE_RECORDS status:'future' row) rather than
+// raising this ceiling.
+const EXPECTED_WIRE_FINDING_COUNT = 0;
+
 // Each of the 3 tests below re-runs the same corpus-wide scan; 180s was
 // enough at some point but each now measures ~300s as the scanned corpus
 // (routes/pages/backend modules) has grown -- bumped with headroom rather
@@ -43,6 +65,7 @@ describe('orphanDetectionAudit report', () => {
       (classified[ORPHAN_CLASSIFICATIONS.LEGACY] ?? 0) > 0 ||
       (classified[ORPHAN_CLASSIFICATIONS.QUARANTINE] ?? 0) > 0;
     expect(hasOrphanTaxonomy).toBe(true);
+    expect(classified[ORPHAN_CLASSIFICATIONS.WIRE] ?? 0).toBe(EXPECTED_WIRE_FINDING_COUNT);
   });
 
   it('scans real .tsx/.ts page, component, and service files, not just legacy .jsx/.js (Cycle 153 — was scanning zero files)', { timeout: 480_000 }, () => {
