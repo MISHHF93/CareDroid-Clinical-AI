@@ -2066,7 +2066,10 @@ interface EmergencyStoreState {
   patientFlowSnapshot: import('../engine/continuousPatientFlowEngine').ContinuousPatientFlowSnapshot | null;
   administrativeAutomationQueue: import('../types/administrativeAutomation').AdministrativeAutomationTask[];
 
-  addPatient: (patient: Patient, options?: { syncToBackend?: boolean }) => void;
+  addPatient: (
+    patient: Patient,
+    options?: { syncToBackend?: boolean; markUnsynced?: boolean },
+  ) => void;
   registerArrivalControl: (
     patientId: string,
     options?: RegisterArrivalControlOptions,
@@ -2685,6 +2688,22 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
             error: error instanceof Error ? error.message : String(error),
           });
         });
+      }
+
+      // HEAL: QuickIntake.tsx/SmartIntake.tsx both call addPatient() in their
+      // own catch block as a local-only fallback after a real backend create
+      // attempt already failed -- but neither marked the result unsynced the
+      // way every other optimistic-write-then-fail path in this file does
+      // (movePatientToState/dischargePatient/assignStaff/addVitals/
+      // escalatePatient all call markPatientUnsynced() on failure). Without
+      // this, a patient created only because the backend was unreachable had
+      // no "Not yet saved to server" indicator and no protection against a
+      // later hydrateFromApi() silently discarding it. markUnsynced is opt-in
+      // (not automatic) because addPatient's OTHER callers -- ordinary local
+      // patient creation with no prior failed attempt -- have nothing to mark
+      // unsynced yet.
+      if (options?.markUnsynced) {
+        markPatientUnsynced(patientWithTimeline.id);
       }
     },
 

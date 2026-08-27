@@ -385,7 +385,13 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
       profileNavigate(handoff.nextRoute);
       onClose();
     } catch (error: any) {
-      addPatient(patient);
+      // HEAL: the real backend create attempt (createSmartIntakePatient
+      // above) already failed -- this is a local-only fallback so the intake
+      // isn't lost, matching every other optimistic-write-then-fail path in
+      // this codebase, mark it unsynced so it gets the same "Not yet saved
+      // to server" indicator and protection against a later refresh silently
+      // discarding it.
+      addPatient(patient, { markUnsynced: true });
       registerNewArrival(
         {
           patients: useEmergencyStore.getState().patients,

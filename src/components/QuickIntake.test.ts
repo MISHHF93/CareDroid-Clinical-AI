@@ -38,3 +38,16 @@ describe('QuickIntake complaint recognition wiring (2026-08-08)', () => {
     expect(recognitionBlock).not.toContain('setComplaint(');
   });
 });
+
+describe('QuickIntake local-only-fallback unsynced marking (2026-08-27)', () => {
+  // Real behavioral coverage for the markUnsynced flag lives in
+  // emergencyStore.unsyncedPatientProtection.test.ts; this file has no
+  // render harness (see the module doc comment above), so this is a
+  // source-wiring guard confirming the catch block actually opts in.
+  it('marks the local-only-fallback patient unsynced after the real backend create attempt fails', () => {
+    const catchStart = source.indexOf('} catch (error: any) {');
+    expect(catchStart).toBeGreaterThan(-1);
+    const catchBlock = source.slice(catchStart, catchStart + 700);
+    expect(catchBlock).toContain('addPatient(patient, { markUnsynced: true })');
+  });
+});

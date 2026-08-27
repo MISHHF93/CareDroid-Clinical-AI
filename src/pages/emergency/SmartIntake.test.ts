@@ -170,3 +170,15 @@ describe('updateDecision field-review audit tracking (2026-08-08)', () => {
     expect(fnBody).toContain('`${field} ${nextStatus} by ${emergencyRole.roleLabel}`');
   });
 });
+
+describe('SmartIntake local-only-fallback unsynced marking (2026-08-27)', () => {
+  // Real behavioral coverage for the markUnsynced flag lives in
+  // emergencyStore.unsyncedPatientProtection.test.ts; this is a
+  // source-wiring guard confirming the catch block actually opts in, same
+  // pattern this file already uses elsewhere.
+  it('marks the local-only-fallback patient unsynced after routeSmartIntakeThroughOrchestrator fails', () => {
+    expect(smartIntakeSource).toContain(
+      "addPatient(patientRecord as any, { syncToBackend: false, markUnsynced: true });",
+    );
+  });
+});

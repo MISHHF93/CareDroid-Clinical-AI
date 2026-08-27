@@ -124,4 +124,52 @@ describe('emergencyStore unsynced-patient protection (DOWNTIME-001)', () => {
 
     expect(useEmergencyStore.getState().unsyncedPatientIds.has(patient.id)).toBe(true);
   });
+
+  // QuickIntake.tsx/SmartIntake.tsx both call addPatient() as a local-only
+  // fallback in their own catch block, after a real backend create attempt
+  // (createSmartIntakePatient / routeSmartIntakeThroughOrchestrator) already
+  // failed -- a genuinely-offline patient creation, the same failure shape
+  // as the other 3 tests above, just via a different call path (addPatient
+  // itself, not a store action that awaits its own PATCH). Found 2026-08-27:
+  // unlike movePatientToState/assignStaff/escalatePatient/addVitals, neither
+  // caller marked the result unsynced, so a patient created only because the
+  // backend was unreachable had no "Not yet saved to server" indicator and
+  // no protection against hydrateFromApi() silently discarding it.
+  it('addPatient({ markUnsynced: true }) marks a local-only-fallback patient unsynced, giving it the same "not yet saved" protection as every other failed-sync path', () => {
+    const store = useEmergencyStore.getState();
+    const existing = store.patients[0];
+    const localOnlyPatient = {
+      ...existing,
+      id: 'patient-local-only-fallback',
+      firstName: 'Offline',
+      lastName: 'Fallback',
+    };
+
+    store.addPatient(localOnlyPatient as any, { markUnsynced: true });
+
+    expect(useEmergencyStore.getState().unsyncedPatientIds.has('patient-local-only-fallback')).toBe(
+      true,
+    );
+
+    // A patient the backend never actually received (this scenario) has no
+    // stale backend copy to conflict with, so the concrete, testable
+    // protection this unlocks is the UI indicator (PatientDetailPanel.tsx's
+    // "Not yet saved to server" line, gated on this same set) -- verified
+    // here at the store level, where that gate reads from. The
+    // conflicting-stale-payload guarantee the other 3 tests above verify
+    // matters most for a patient that already reached the backend once and
+    // then had a LATER mutation fail, not this brand-new-patient case.
+  });
+
+  it('addPatient() without markUnsynced does not mark the patient unsynced (ordinary local creation, no prior failed attempt)', () => {
+    const store = useEmergencyStore.getState();
+    const existing = store.patients[0];
+    const ordinaryPatient = { ...existing, id: 'patient-ordinary-create', firstName: 'Ordinary' };
+
+    store.addPatient(ordinaryPatient as any);
+
+    expect(useEmergencyStore.getState().unsyncedPatientIds.has('patient-ordinary-create')).toBe(
+      false,
+    );
+  });
 });

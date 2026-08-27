@@ -684,7 +684,12 @@ export default function SmartIntake({
         patientRecord.triageAssistGeneratedAt = triageAssist.generatedAt;
         patientRecord.triagePending = true;
       }
-      addPatient(patientRecord as any, { syncToBackend: false });
+      // HEAL: routeSmartIntakeThroughOrchestrator above already failed --
+      // this is a local-only fallback so the intake isn't lost, matching
+      // every other optimistic-write-then-fail path in this codebase; mark
+      // it unsynced so it gets the same "Not yet saved to server" indicator
+      // and protection against a later refresh silently discarding it.
+      addPatient(patientRecord as any, { syncToBackend: false, markUnsynced: true });
       applyIntakeArrivalContext(useEmergencyStore.getState(), patient.id as any, arrivalContext);
       registerArrivalControl(patient.id as any, { source: 'smart-intake' });
       selectPatient(patient.id as any);
