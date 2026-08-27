@@ -50,7 +50,7 @@ function blocker(id, severity, domain, summary, resolution = '') {
 /** @type {ReadonlyArray} */
 export const PRODUCTION_RISK_CATALOG = Object.freeze([
   risk('R001', 'critical', 'security', 'CareDroid API lacks JWT authentication', 'Add AuthGuard to EmergencyOsController'),
-  risk('R002', 'critical', 'security', 'EmergencySettingsService singleton shared across tenants', 'Scope settings by organizationId'),
+  risk('R002', 'critical', 'security', 'RESOLVED (verified 2026-08-27, fix predates this check): EmergencySettingsService was a singleton shared across tenants', 'Scoped by organizationId via a byOrganization map (materializeSettings), durably persisted and rehydrated on restart'),
   risk('R003', 'critical', 'pilot', 'Vercel frontend-only deploy serves /api as index.html', 'Set VITE_API_URL to Nest backend'),
   risk('R004', 'critical', 'security', 'TenantIsolationGuard passes unauthenticated requests', 'Require auth before tenant scope or fail closed'),
   risk('R005', 'high', 'backend', 'ED patient/workflow state is in-memory only', 'Persist to Postgres per org'),
@@ -159,7 +159,7 @@ export const PRODUCTION_QUICK_WIN_CATALOG = Object.freeze([
 export const PRODUCTION_DEPLOYMENT_BLOCKER_CATALOG = Object.freeze([
   blocker('B001', 'critical', 'security', 'Unauthenticated /api/emergency/* in production', 'Deploy with JWT guards enabled'),
   blocker('B002', 'critical', 'pilot', 'No VITE_API_URL on Vercel — API calls hit SPA', 'Deploy backend + set env'),
-  blocker('B003', 'critical', 'security', 'Shared ED settings singleton across tenants', 'Org-scoped settings service'),
+  blocker('B003', 'critical', 'security', 'RESOLVED (verified 2026-08-27, fix predates this check): ED settings were a shared singleton across tenants', 'Org-scoped settings service (verified against current EmergencySettingsService)'),
   blocker('B004', 'critical', 'pilot', 'JWT_SECRET left at CHANGE_ME_IN_PRODUCTION', 'Rotate secrets in prod'),
   blocker('B005', 'high', 'pilot', 'Multi-tenant readiness audit fails (score 50)', 'All domains org-configurable'),
   blocker('B006', 'high', 'backend', 'ED state not durable — data loss on restart', 'Postgres persistence layer'),
