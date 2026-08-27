@@ -74,6 +74,13 @@
   text-transform: uppercase;
   color: var(--medical-ink-subtle);
   line-height: 1;
+  /* !important: this class name unfortunately contains "tag" as a
+     substring ("brand-tag" meaning "branding label", not an HTML/UI
+     tag chip), which collides with visual-consistency.css's wide-net
+     [class*="tag"] normalization rule and its white-space: normal --
+     confirmed via a live cascade query, same root cause as the header
+     KPI capsule rewrite. */
+  white-space: nowrap !important;
 }
 
 /* ── Scrollable body ───────────────────────────────────────────── */
@@ -338,24 +345,41 @@
 }
 
 /* ── Collapse toggle (brand header) ────────────────────────────── */
+/* Icon-only in a plain box read as unclear/decorative -- a visible
+   "Collapse"/"Expand" label plus a filled default background (not just
+   on hover) makes it unambiguously a control rather than something you
+   have to hover-and-wait on to discover via the title tooltip alone. */
 .sidebar__collapse-toggle {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 5px;
   flex-shrink: 0;
-  width: 24px;
-  height: 24px;
+  height: 26px;
+  padding: 0 9px 0 7px;
   margin-left: auto;
-  border: 1px solid color-mix(in srgb, var(--medical-border) 55%, transparent);
-  border-radius: 6px;
-  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--medical-border) 65%, transparent);
+  border-radius: 999px;
+  background: var(--medical-slate-50);
   color: var(--medical-ink-subtle);
+  font-size: 11px;
+  font-weight: 600;
   cursor: pointer;
 }
 
+.sidebar__collapse-toggle-label {
+  white-space: nowrap;
+}
+
 .sidebar__collapse-toggle:hover {
-  background: var(--medical-slate-50);
+  background: var(--medical-accent-tint, var(--medical-slate-100));
+  border-color: var(--medical-accent, var(--medical-border-strong));
   color: var(--medical-ink);
+}
+
+.sidebar__collapse-toggle:focus-visible {
+  outline: 2px solid var(--medical-accent);
+  outline-offset: 1px;
 }
 
 @media (max-width: 1024px) {
@@ -389,7 +413,13 @@
   }
 
   .sidebar--collapsed .sidebar__collapse-toggle {
+    width: 26px;
+    padding: 0;
     margin-left: 0;
+  }
+
+  .sidebar--collapsed .sidebar__collapse-toggle-label {
+    display: none;
   }
 
   .sidebar--collapsed .sidebar__body,

@@ -554,6 +554,14 @@ export function Sidebar({ navigationItems }: SidebarProps) {
           ) : (
             <IconChevronLeft size={16} stroke={2} />
           )}
+          {/* Icon-only read as unclear/decorative with no visible label --
+              this text is hidden in the icon-rail (collapsed) state via CSS,
+              where there's no room for it, but visible whenever there's
+              space so the control doesn't depend on a hover tooltip alone
+              to be understood. */}
+          <span className="sidebar__collapse-toggle-label">
+            {sidebarCollapsed ? 'Expand' : 'Collapse'}
+          </span>
         </button>
       </header>
       <nav className="sidebar-desktop-nav" aria-label="Emergency desktop navigation">
