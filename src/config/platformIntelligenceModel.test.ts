@@ -5,6 +5,7 @@ import {
   TECHNICAL_DEBT_REGISTRY,
   UNIFIED_ARTIFACT_ENTITY_TYPES,
   assessDataLineage,
+  assessTechnicalDebtRegistry,
   auditPlatformIntelligence,
   buildPlatformIntelligenceAssessment,
 } from './platformIntelligenceModel';
@@ -54,6 +55,19 @@ describe('platformIntelligenceModel', () => {
     expect(stagesKpi.value).toBe(explorer.stages.length);
     expect(module.artifacts.sampleFlows.map((f) => f.id)).toEqual(
       explorer.flows.map((f) => f.id),
+    );
+  });
+
+  it('marks the connector-registry tiering debt item resolved, matching integrationStatusRegistry.ts', () => {
+    // Regression: TD-005 described work ("registry now distinguishes
+    // implemented, partial, and roadmap surfaces") that's already true --
+    // integrationStatusRegistry.ts's INTEGRATION_STATUS already has 3
+    // distinct tiers applied consistently across all real entries -- but
+    // status was still 'mitigating'.
+    const td005 = TECHNICAL_DEBT_REGISTRY.find((d) => d.id === 'TD-005');
+    expect(td005?.status).toBe('resolved');
+    expect(assessTechnicalDebtRegistry().kpis.find((k) => k.id === 'debt-items').value).toBe(
+      TECHNICAL_DEBT_REGISTRY.length,
     );
   });
 

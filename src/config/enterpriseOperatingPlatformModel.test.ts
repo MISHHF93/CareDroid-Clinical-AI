@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   ENTERPRISE_PLATFORM_MODULES,
+  ENTERPRISE_RISK_REGISTER,
   auditEnterpriseOperatingPlatform,
   buildEnterpriseOperatingPlatformAssessment,
 } from './enterpriseOperatingPlatformModel';
@@ -22,6 +23,22 @@ describe('enterpriseOperatingPlatformModel', () => {
       expect(module.assessment.kpis.length).toBeGreaterThan(0);
       expect(module.assessment.artifacts).toBeTruthy();
     });
+  });
+
+  it('marks the emergency API auth risk resolved, matching the AuthGuard already applied on EmergencyOsController', () => {
+    // Regression: R-003 was stuck at status 'open' describing a JWT
+    // AuthGuard rollout that's actually already live (verified directly
+    // against backend/src/modules/emergency-os/emergency-os.controller.ts's
+    // @UseGuards(AuthGuard('jwt'), AuthorizationGuard)) -- a different,
+    // stale copy of the same fact TD-002 in the technical debt registry
+    // already had correctly marked 'resolved'.
+    const r003 = ENTERPRISE_RISK_REGISTER.find((r) => r.id === 'R-003');
+    expect(r003?.status).toBe('resolved');
+
+    const assessment = buildEnterpriseOperatingPlatformAssessment();
+    const riskModule = assessment.modules.find((m) => m.id === 'risk_management');
+    if (!riskModule) throw new Error('expected risk_management module');
+    expect(riskModule.assessment.artifacts.openRisks.some((r) => r.id === 'R-003')).toBe(false);
   });
 
   it('includes anonymized benchmarking without track identifiers', () => {

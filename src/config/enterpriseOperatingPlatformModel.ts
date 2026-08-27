@@ -203,7 +203,10 @@ export function assessTrackCertification(signals = {} as any) {
 export const ENTERPRISE_RISK_REGISTER = Object.freeze([
   Object.freeze({ id: 'R-001', category: 'operational', severity: 'high', summary: 'Queue visibility degrades under load', mitigation: 'Whiteboard density tiers', owner: 'Operations', status: 'mitigating' }),
   Object.freeze({ id: 'R-002', category: 'safety', severity: 'high', summary: 'Reassessment timers missed during surge', mitigation: 'Reassessment attention strips', owner: 'Clinical safety', status: 'mitigating' }),
-  Object.freeze({ id: 'R-003', category: 'security', severity: 'critical', summary: 'Unauthenticated emergency API paths', mitigation: 'JWT AuthGuard rollout', owner: 'Security', status: 'open' }),
+  // Verified 2026-08-27 directly against backend/src/modules/emergency-os/emergency-os.controller.ts:187
+  // -- @UseGuards(AuthGuard('jwt'), AuthorizationGuard) is applied at the
+  // controller level; the rollout this risk describes is done, not open.
+  Object.freeze({ id: 'R-003', category: 'security', severity: 'critical', summary: 'Unauthenticated emergency API paths', mitigation: 'JWT AuthGuard rollout', owner: 'Security', status: 'resolved' }),
   Object.freeze({ id: 'R-004', category: 'compliance', severity: 'medium', summary: 'Audit trail gaps on restart', mitigation: 'Durable workflow log store', owner: 'Compliance', status: 'open' }),
   Object.freeze({ id: 'R-005', category: 'equine_welfare', severity: 'medium', summary: 'Welfare incident registry incomplete', mitigation: 'Standardize vet clearance workflow', owner: 'Welfare officer', status: 'open' }),
   Object.freeze({ id: 'R-006', category: 'financial', severity: 'low', summary: 'Usage metering not linked to operations KPIs', mitigation: 'Customer success platform linkage', owner: 'Finance', status: 'mitigating' }),
@@ -211,7 +214,7 @@ export const ENTERPRISE_RISK_REGISTER = Object.freeze([
 
 export function assessRiskManagement(_signals = {} as any) {
   const openRisks = ENTERPRISE_RISK_REGISTER.filter((risk) => risk.status === 'open');
-  const criticalOpen = openRisks.filter((risk) => risk.severity === 'critical' || (risk.severity as any) === 'high').length;
+  const criticalOpen = openRisks.filter((risk) => (risk.severity as string) === 'critical' || (risk.severity as string) === 'high').length;
   const mitigating = ENTERPRISE_RISK_REGISTER.filter((risk) => risk.status === 'mitigating').length;
   const score = clampScore(100 - criticalOpen * 15 - openRisks.length * 5 + mitigating * 3);
 

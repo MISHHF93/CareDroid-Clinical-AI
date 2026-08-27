@@ -633,7 +633,11 @@ export const TECHNICAL_DEBT_REGISTRY: readonly TechnicalDebtItem[] = Object.free
   Object.freeze({ id: 'TD-002', area: 'security', summary: 'Emergency API auth guards applied to active Nest emergency controllers', priority: 'P0', effort: 'medium', status: 'resolved' }),
   Object.freeze({ id: 'TD-003', area: 'frontend', summary: 'Large App shell coupling reduced through route-tree extraction and lazy route smoke coverage', priority: 'P2', effort: 'high', status: 'mitigating' }),
   Object.freeze({ id: 'TD-004', area: 'auditability', summary: 'Workflow logs hydrate through backend snapshots; durable partitioned store remains planned', priority: 'P1', effort: 'medium', status: 'mitigating' }),
-  Object.freeze({ id: 'TD-005', area: 'integrations', summary: 'Connector registry now distinguishes implemented, partial, and roadmap surfaces', priority: 'P1', effort: 'high', status: 'mitigating' }),
+  // Verified 2026-08-27 directly against integrationStatusRegistry.ts --
+  // INTEGRATION_STATUS already has 3 distinct tiers (placeholder/partial/
+  // implemented) consistently applied across all 26 registry entries; the
+  // distinction this item describes is already in place, not in progress.
+  Object.freeze({ id: 'TD-005', area: 'integrations', summary: 'Connector registry now distinguishes implemented, partial, and roadmap surfaces', priority: 'P1', effort: 'high', status: 'resolved' }),
   Object.freeze({ id: 'TD-006', area: 'architecture', summary: 'Dual persistence planes', priority: 'P1', effort: 'high', status: 'open' }),
 ]);
 
