@@ -21,6 +21,15 @@ export const BACKEND_HTTP_ROUTES = Object.freeze([
   { method: 'PATCH', path: '/api/emergency/patients/:patientId', controller: 'EmergencyOsController' },
   { method: 'PATCH', path: '/api/emergency/patients/:patientId/staff', controller: 'EmergencyOsController' },
   { method: 'PATCH', path: '/api/emergency/patients/:patientId/escalate', controller: 'EmergencyOsController' },
+  // Added 2026-08-27: this route (EmergencyOsController) has existed since
+  // the patient-identity safety pass (commit 39192a96), which added the
+  // controller method but never added it here -- found by a full-suite
+  // health-check run of backendControllerRouteScan.test.ts /
+  // backendOrphanAudit.test.ts, both of which were failing on exactly this
+  // gap. Genuinely reachable/real, not orphaned -- PatientDetailPanel.tsx's
+  // identity-reconciliation workflow calls reconcilePatientIdentity() in
+  // emergencyOsApi.ts, which PATCHes this exact path.
+  { method: 'PATCH', path: '/api/emergency/patients/:patientId/reconcile-identity', controller: 'EmergencyOsController' },
   { method: 'GET', path: '/api/emergency/journey', controller: 'EmergencyOsController' },
   { method: 'GET', path: '/api/emergency/workflow-logs', controller: 'EmergencyOsController' },
   { method: 'GET', path: '/api/emergency/implementation-readiness', controller: 'EmergencyOsController' },
