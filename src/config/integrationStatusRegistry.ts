@@ -226,7 +226,10 @@ export const INTEGRATION_POINT_REGISTRY = Object.freeze([
     category: INTEGRATION_CATEGORY.IDENTITY,
     label: 'Client duplicate detection (MPI-style)',
     status: INTEGRATION_STATUS.IMPLEMENTED,
-    surfaces: ['patientDuplicateDetection.ts', 'DuplicatePatientBanner'],
+    // DuplicatePatientBanner was deleted (commit d76bd3cc, orphaned reception
+    // component cleanup) -- ReceptionDuplicateConfirm.tsx/DuplicateCandidatePanel.tsx
+    // are the real, live surfaces that now consume patientDuplicateDetection.ts.
+    surfaces: ['patientDuplicateDetection.ts', 'ReceptionDuplicateConfirm', 'DuplicateCandidatePanel'],
     summary: 'Local scoring with health card, name, DOB thresholds.',
   },
   {
