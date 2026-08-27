@@ -1252,6 +1252,7 @@ export class EmergencyOsController {
         userRole: dto?.user_role || 'unknown',
         requiresReview,
         safetyCheckPassed: safetyCheckPassed ?? null,
+        tenantId: tenantContext?.organizationId ?? null,
       },
     });
     if (patientId) {

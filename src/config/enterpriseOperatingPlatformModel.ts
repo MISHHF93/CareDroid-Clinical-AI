@@ -265,7 +265,9 @@ export function assessDisasterRecovery(signals = {} as any) {
   const indicators = Object.freeze([
     Object.freeze({ id: 'DR-001', label: 'Backup verification cadence', status: security >= 65 ? 'green' : 'amber', target: 'Weekly' }),
     Object.freeze({ id: 'DR-002', label: 'Tenant-scoped settings restore', status: signals.orgScopedSettings !== false ? 'green' : 'red', target: 'Per org' }),
-    Object.freeze({ id: 'DR-003', label: 'Workflow log durability', status: 'amber', target: 'Durable store' }),
+    // Verified 2026-08-27: WorkflowActionLogEntry's durable journal
+    // (Cycle 92/HEAL-252) write-through/rehydrate cycle already existed.
+    Object.freeze({ id: 'DR-003', label: 'Workflow log durability', status: 'green', target: 'Durable store' }),
     Object.freeze({ id: 'DR-004', label: 'Failover runbook', status: compliance >= 70 ? 'green' : 'amber', target: 'Documented' }),
     Object.freeze({ id: 'DR-005', label: 'Recovery time objective', status: score >= 65 ? 'green' : 'amber', target: '< 4 hours' }),
   ]);
@@ -614,7 +616,11 @@ export function assessArchitectureGovernance(signals = {} as any) {
   const decisions = Object.freeze([
     Object.freeze({ id: 'ADR-001', title: 'Org-scoped emergency settings', status: 'accepted', debt: 'low' }),
     Object.freeze({ id: 'ADR-002', title: 'NestJS emergency API auth', status: 'accepted', debt: 'low' }),
-    Object.freeze({ id: 'ADR-003', title: 'Durable workflow log store', status: 'proposed', debt: 'medium' }),
+    // Verified 2026-08-27: implemented in Cycle 92/HEAL-252
+    // (WorkflowActionLogEntry + journal write-through/rehydrate), then
+    // tenant-partitioned by threading metadata.tenantId through all real
+    // call sites.
+    Object.freeze({ id: 'ADR-003', title: 'Durable workflow log store', status: 'accepted', debt: 'low' }),
   ]);
 
   return moduleResult(
@@ -623,7 +629,7 @@ export function assessArchitectureGovernance(signals = {} as any) {
     score,
     [
       kpi('standards-compliance', 'Standards compliance', score, 70),
-      kpi('open-adrs', 'Open ADRs', decisions.filter((d) => d.status === 'proposed').length, 2, { max: true }),
+      kpi('open-adrs', 'Open ADRs', decisions.filter((d) => (d.status as string) === 'proposed').length, 2, { max: true }),
       kpi('platform-maturity', 'Platform maturity', maturity.scores.overall, 65),
     ],
     { architectureDecisions: decisions, technicalDebt: decisions.filter((d) => d.debt !== 'low'), standards: ['Multi-tenant isolation', 'Auditability', 'Node-safe config models'] },

@@ -136,7 +136,12 @@ export class EmergencyOsUpgradeHarnessService {
       ...clinicalDecisionSupport,
     ]);
 
-    this.recordHarnessAudit('aggregate', 'Advanced upgrade harness aggregate generated.');
+    this.recordHarnessAudit(
+      'aggregate',
+      'Advanced upgrade harness aggregate generated.',
+      undefined,
+      organizationId,
+    );
 
     return envelope('Advanced CareDroid Upgrade Harness', {
       harnessId: 'advanced-emergency-os-upgrade-harness',
@@ -166,7 +171,12 @@ export class EmergencyOsUpgradeHarnessService {
 
   getCapacityAndForecasting(organizationId?: string) {
     const generatedAt = new Date().toISOString();
-    this.recordHarnessAudit('capacity', 'Capacity and 10-hour forecasting harness generated.');
+    this.recordHarnessAudit(
+      'capacity',
+      'Capacity and 10-hour forecasting harness generated.',
+      undefined,
+      organizationId,
+    );
     return envelope('Advanced CareDroid Capacity Upgrade Harness', {
       signals: this.buildCapacityAndForecastingSignals(generatedAt, organizationId),
     });
@@ -174,7 +184,12 @@ export class EmergencyOsUpgradeHarnessService {
 
   getPatientFlow(patientId?: string, organizationId?: string) {
     const generatedAt = new Date().toISOString();
-    this.recordHarnessAudit('patient-flow', 'Patient flow upgrade harness generated.', patientId);
+    this.recordHarnessAudit(
+      'patient-flow',
+      'Patient flow upgrade harness generated.',
+      patientId,
+      organizationId,
+    );
     return envelope('Advanced CareDroid Patient Flow Upgrade Harness', {
       patientId: patientId || null,
       signals: this.buildPatientFlowSignals(generatedAt, patientId, organizationId),
@@ -187,6 +202,7 @@ export class EmergencyOsUpgradeHarnessService {
       'clinical-intelligence',
       'Clinical intelligence upgrade harness generated.',
       patientId,
+      organizationId,
     );
     return envelope('Advanced CareDroid Clinical Intelligence Upgrade Harness', {
       patientId: patientId || null,
@@ -201,7 +217,12 @@ export class EmergencyOsUpgradeHarnessService {
       ...this.buildPatientFlowSignals(generatedAt, undefined, organizationId),
       ...this.buildClinicalDecisionSupportSignals(generatedAt, undefined, organizationId),
     ];
-    this.recordHarnessAudit('audit-summary', 'Immutable audit abstraction summary generated.');
+    this.recordHarnessAudit(
+      'audit-summary',
+      'Immutable audit abstraction summary generated.',
+      undefined,
+      organizationId,
+    );
     return envelope('Advanced CareDroid Upgrade Audit Summary', {
       signals: this.buildGovernanceSignals(generatedAt, signals),
       workflowLogs: this.workflowLogService.listLogs().slice(0, 10),
@@ -693,7 +714,12 @@ export class EmergencyOsUpgradeHarnessService {
     return 'fast-track';
   }
 
-  private recordHarnessAudit(scope: string, summary: string, patientId?: string) {
+  private recordHarnessAudit(
+    scope: string,
+    summary: string,
+    patientId?: string,
+    organizationId?: string,
+  ) {
     this.workflowLogService.record({
       type: 'upgrade_harness_used',
       title: 'Upgrade harness used',
@@ -705,6 +731,7 @@ export class EmergencyOsUpgradeHarnessService {
         safetyPolicyVersion: SAFETY_POLICY_VERSION,
         reviewRequired: true,
         autonomousActionsBlocked: BLOCKED_AUTONOMOUS_ACTIONS.join(', '),
+        tenantId: organizationId ?? null,
       },
     });
   }

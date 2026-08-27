@@ -888,3 +888,53 @@ describe('SmartIntakeService, ProvincialHealthService, EDCopilotService — orga
     expect(scoped).toBeGreaterThanOrEqual(before);
   });
 });
+
+describe('WorkflowActionLogEntry tenantId threading (2026-08-27)', () => {
+  // Every EmergencyPatientService call site into workflowLogService.record()
+  // omitted metadata.tenantId, so every durable workflow_action_logs row
+  // fell through record()'s own 'default-tenant' fallback regardless of
+  // which real org the action belonged to -- durability existed (Cycle 92/
+  // HEAL-252) but every org's rows landed in one shared bucket. Verifies the
+  // real organizationId now reaches record()'s metadata for each mutation
+  // that logs one, using the patient's own stamped organizationId (not just
+  // whatever the caller passed) as the source of truth.
+  function makeService() {
+    const workflowLogService = { record: jest.fn(() => ({ id: 'log-1' })) } as unknown as {
+      record: jest.Mock;
+    };
+    const service = new EmergencyPatientService(workflowLogService as any);
+    return { service, workflowLogService };
+  }
+
+  it('assignStaffToPatient threads the patient organizationId into the workflow log metadata', () => {
+    const { service, workflowLogService } = makeService();
+    const patient = service.createPatient({ firstName: 'Org', lastName: 'A' } as any, 'org-a');
+
+    service.assignStaffToPatient(patient.id, 'staff-1', 'actor-1', 'org-a');
+
+    const call = workflowLogService.record.mock.calls.find((c) => c[0]?.type === 'staff_assigned');
+    expect(call?.[0]?.metadata?.tenantId).toBe('org-a');
+  });
+
+  it('escalatePatient threads the patient organizationId into the workflow log metadata', () => {
+    const { service, workflowLogService } = makeService();
+    const patient = service.createPatient({ firstName: 'Org', lastName: 'A' } as any, 'org-a');
+
+    service.escalatePatient(patient.id, 'actor-1', 'org-a');
+
+    const call = workflowLogService.record.mock.calls.find((c) => c[0]?.type === 'patient_escalated');
+    expect(call?.[0]?.metadata?.tenantId).toBe('org-a');
+  });
+
+  it('addPatientNote threads the patient organizationId into the workflow log metadata, with no organizationId parameter of its own', () => {
+    const { service, workflowLogService } = makeService();
+    const patient = service.createPatient({ firstName: 'Org', lastName: 'A' } as any, 'org-a');
+
+    service.addPatientNote(patient.id, 'A note', 'actor-1');
+
+    const call = workflowLogService.record.mock.calls.find(
+      (c) => c[0]?.type === 'patient_note_added',
+    );
+    expect(call?.[0]?.metadata?.tenantId).toBe('org-a');
+  });
+});

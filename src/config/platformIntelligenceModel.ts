@@ -629,10 +629,20 @@ type TechnicalDebtItem = {
 
 /** Technical debt registry — Prompt 135. */
 export const TECHNICAL_DEBT_REGISTRY: readonly TechnicalDebtItem[] = Object.freeze([
-  Object.freeze({ id: 'TD-001', area: 'backend', summary: 'ED patient persistence migration active; workflow log durability remains in progress', priority: 'P0', effort: 'high', status: 'mitigating' }),
+  // ED patient/board state (Nest in-memory vs Mongoose, TD-006) is a
+  // separate, still-open migration from workflow log durability, which
+  // TD-004 below covers -- the two used to be bundled in one summary.
+  Object.freeze({ id: 'TD-001', area: 'backend', summary: 'ED patient persistence migration active (dual in-memory/Mongoose planes, see TD-006)', priority: 'P0', effort: 'high', status: 'mitigating' }),
   Object.freeze({ id: 'TD-002', area: 'security', summary: 'Emergency API auth guards applied to active Nest emergency controllers', priority: 'P0', effort: 'medium', status: 'resolved' }),
   Object.freeze({ id: 'TD-003', area: 'frontend', summary: 'Large App shell coupling reduced through route-tree extraction and lazy route smoke coverage', priority: 'P2', effort: 'high', status: 'mitigating' }),
-  Object.freeze({ id: 'TD-004', area: 'auditability', summary: 'Workflow logs hydrate through backend snapshots; durable partitioned store remains planned', priority: 'P1', effort: 'medium', status: 'mitigating' }),
+  // Verified 2026-08-27: WorkflowActionLogEntry's durable journal
+  // (Cycle 92/HEAL-252) already existed with a working write-through/
+  // rehydrate cycle, but every real call site omitted metadata.tenantId,
+  // so every org's rows fell into record()'s 'default-tenant' fallback --
+  // fixed by threading the patient/task's own organizationId through all
+  // 10 call sites (emergency-os.services.ts x7, emergency-os.controller.ts,
+  // emergency-os.upgrade-harness.service.ts, care-operations.service.ts x2).
+  Object.freeze({ id: 'TD-004', area: 'auditability', summary: 'Workflow logs are durably persisted and now tenant-partitioned via metadata.tenantId', priority: 'P1', effort: 'medium', status: 'resolved' }),
   // Verified 2026-08-27 directly against integrationStatusRegistry.ts --
   // INTEGRATION_STATUS already has 3 distinct tiers (placeholder/partial/
   // implemented) consistently applied across all 26 registry entries; the

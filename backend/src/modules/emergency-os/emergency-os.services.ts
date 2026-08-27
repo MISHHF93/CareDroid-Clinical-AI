@@ -1340,6 +1340,7 @@ export class EmergencyPatientService implements OnModuleInit {
       source: 'identity-reconciliation',
       severity: 'Info',
       metadata: {
+        tenantId: organizationId ?? null,
         previousFirstName,
         previousLastName,
         previousMrn,
@@ -1609,7 +1610,7 @@ export class EmergencyPatientService implements OnModuleInit {
       patientId,
       actorStaffId,
       source: 'emergency-patient-service',
-      metadata: { staffId },
+      metadata: { staffId, tenantId: patient.organizationId ?? organizationId ?? null },
     });
     const updated = clone(this.patients[index]);
     this.persistPatientToDatabase(updated);
@@ -1647,7 +1648,7 @@ export class EmergencyPatientService implements OnModuleInit {
       patientId,
       actorStaffId: authorId,
       source: 'emergency-patient-service',
-      metadata: { noteId: note.id },
+      metadata: { noteId: note.id, tenantId: patient.organizationId ?? null },
     });
     const updated = clone(this.patients[index]);
     this.persistPatientToDatabase(updated);
@@ -1757,6 +1758,7 @@ export class EmergencyPatientService implements OnModuleInit {
       actorStaffId,
       source: 'emergency-patient-service',
       severity: 'Critical',
+      metadata: { tenantId: patient.organizationId ?? organizationId ?? null },
     });
     const updated = clone(this.patients[index]);
     this.persistPatientToDatabase(updated);
@@ -2693,6 +2695,7 @@ export class EMSIntakeService implements OnModuleInit {
           arrivalId,
           unitId: input.unitId ?? null,
           unitName: input.unitName ?? null,
+          tenantId: patient.organizationId ?? organizationId ?? null,
         },
       });
     }
@@ -3343,6 +3346,7 @@ export class ReceptionWorkspaceService {
         source: input.source || 'reception',
         queue: 'Triage',
         targetState: 'Triage',
+        tenantId: patient.organizationId ?? organizationId ?? null,
       },
     });
 
@@ -3928,6 +3932,7 @@ export class EDCopilotService {
       metadata: {
         patientCount: patients.length,
         highRiskCount: patients.filter(isHighRisk).length,
+        tenantId: organizationId ?? null,
       },
     });
     return envelope('ED Copilot', {

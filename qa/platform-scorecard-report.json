@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-27T18:41:16.024Z",
+  "generatedAt": "2026-08-27T19:27:19.654Z",
   "goal": "CareDroid platform scorecard across intelligence, enterprise readiness, customer success, maturity, and production readiness",
   "overallScore": 87,
   "overallStatus": "excellent",
@@ -298,7 +298,7 @@
         "integration_governance": 85,
         "api_governance": 100,
         "platform_observability": 84,
-        "technical_debt_registry": 86,
+        "technical_debt_registry": 88,
         "platform_convergence": 87
       }
     },

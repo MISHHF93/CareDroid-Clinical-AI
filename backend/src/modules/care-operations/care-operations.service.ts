@@ -121,9 +121,12 @@ const PRIORITY_RANK: Record<string, number> = { Critical: 0, Warning: 1, Info: 2
  * in-memory services every other emergency-os surface reads from, not a
  * separate/stale mirror); the third (operational_exception) is derived from
  * WorkflowActionLogService's own live, in-process log buffer, filtered
- * through the caller's own org-visible patient set for tenant safety since
- * WorkflowActionLogEntry itself has no real per-row org scoping yet (a
- * known, separately-tracked gap -- see HEAL-347.70's own follow-up note).
+ * through the caller's own org-visible patient set for tenant safety.
+ * WorkflowActionLogEntry rows do now carry a real per-row tenantId
+ * (2026-08-27, threaded through every record() call site) -- this
+ * patient-visibility filter is kept as a second, independent safety net
+ * rather than trusted alone, since not every historical row necessarily
+ * has tenantId populated.
  *
  * This reconcile-on-read design keeps the inbox honestly synced to current
  * state (item 8: never show stale data as live) without requiring a domain
@@ -212,6 +215,7 @@ export class CareOperationsService {
         from,
         to,
         actorRole: input.actorRole || null,
+        tenantId: row.organizationId,
       },
     });
     return toView(row);
@@ -374,7 +378,7 @@ export class CareOperationsService {
           patientId: row.patientId,
           source: 'care-operations-service',
           severity: 'Info',
-          metadata: { taskId: row.id, taskType: row.taskType, status: row.status },
+          metadata: { taskId: row.id, taskType: row.taskType, status: row.status, tenantId: organizationId },
         });
       }
     }
