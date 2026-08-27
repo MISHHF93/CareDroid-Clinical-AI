@@ -228,6 +228,26 @@ export function ingestRealtimeAlertPayload(payload: unknown): Alert | null {
     createdAt: String(nested.createdAt || nested.timestamp || nested.receivedAt || '') || undefined,
     dismissed: Boolean(nested.dismissed),
     source: String(nested.source || 'emergency-realtime'),
+    // Found 2026-08-27: dispatchOperationalAlert's realtime broadcast
+    // (emergency-os.services.ts, type 'alert_created') carries the raw alert
+    // object -- ownerRole included -- straight over the wire, but this
+    // function never read it, so prepareUnifiedAlert's `normalized.ownerRole
+    // || routing?.suggestedOwnerRole` (below) always fell through to a
+    // keyword-guessed role instead of the real, deliberately-set one. Note:
+    // ownerRole does NOT currently gate any production visibility filter --
+    // filterAlertsForRole (below) reads it but has zero real callers today
+    // (ClinicalAlertsPage.tsx uses filterAlertsForProfile instead, which is
+    // scenario-keyword-based and ignores ownerRole entirely). The concrete,
+    // current-day bug this closes is data consistency: the same escalation
+    // alert showed a correct "Owner: physician" finding
+    // (mapAlertToClinicalDisplay) when fetched via REST (already fixed,
+    // normalizeOperationalAlert, commit 7f7ae82d) but a blank/guessed one the
+    // instant it arrived live -- flickering between two different values for
+    // the identical alert depending purely on which path delivered it first.
+    // Same "durable field, dead read path" bug class as that fix; this was
+    // its sibling ingestion path, not yet closed.
+    ownerRole: String(nested.ownerRole || '') || undefined,
+    escalationRole: String(nested.escalationRole || '') || undefined,
     metadata: (nested.metadata as Alert['metadata']) || undefined,
   });
 }

@@ -63,6 +63,8 @@ import {
   filterAlertsForRole,
   getActiveAlerts,
   ingestClinicalApiAlert,
+  ingestRealtimeAlertPayload,
+  mapAlertToClinicalDisplay,
   prepareOperationalDerivedAlerts,
   prepareUnifiedAlert,
   publishAlert,
@@ -220,6 +222,48 @@ describe('alertLifecycleOrchestrator', () => {
 
     expect(updated?.acknowledgedByStaffId).toBe('dr-rivera');
     expect(updated?.acknowledgedByRole).toBe('physician');
+  });
+
+  // Regression coverage for the 2026-08-27 fix: dispatchOperationalAlert's
+  // realtime broadcast (emergency-os.services.ts, type 'alert_created')
+  // carries the raw alert -- ownerRole included -- straight over the wire,
+  // but ingestRealtimeAlertPayload never read it, so prepareUnifiedAlert
+  // always fell through to a keyword-guessed role instead of the real,
+  // deliberately-set one. ownerRole doesn't gate any production visibility
+  // filter today (filterAlertsForRole below has zero real callers --
+  // ClinicalAlertsPage.tsx uses the scenario-keyword-based
+  // filterAlertsForProfile instead, which ignores ownerRole entirely) -- the
+  // concrete bug is data consistency: the same escalation alert's
+  // "Owner: physician" finding (mapAlertToClinicalDisplay, already wired
+  // into ClinicalAlertsPage.tsx) showed correctly when fetched via REST
+  // (already fixed, normalizeOperationalAlert, commit 7f7ae82d) but was
+  // blank the instant it arrived live -- flickering between two different
+  // values for the identical alert depending purely on which path delivered
+  // it first.
+  it('preserves ownerRole from a realtime alert_created payload, matching what the already-fixed REST path shows', () => {
+    const escalationAlert = ingestRealtimeAlertPayload({
+      id: 'alert-escalation-realtime-test',
+      title: 'ESCALATION — Test Patient',
+      message: 'Room 4 · Chest pain · Escalated by Priya Nair',
+      severity: 'Critical',
+      source: 'emergency-patient-service',
+      ownerRole: 'physician',
+    });
+
+    expect(escalationAlert?.ownerRole).toBe('physician');
+    expect(mapAlertToClinicalDisplay(escalationAlert!).findings).toContain('Owner: physician');
+  });
+
+  it('leaves ownerRole undefined (not a stale guess) for a realtime alert with no ownerRole in the payload', () => {
+    const genericAlert = ingestRealtimeAlertPayload({
+      id: 'alert-generic-realtime-test',
+      title: 'Capacity pressure rising',
+      message: 'ED capacity score dropped to 62.',
+      severity: 'Warning',
+      source: 'capacity-intelligence',
+    });
+
+    expect(genericAlert?.ownerRole).toBeUndefined();
   });
 
   it('prepares derived alerts and records lifecycle sync for new and expired ids', () => {
