@@ -161,6 +161,48 @@ describe('Settings Billing card', () => {
     expect(screen.getByText('Backend feature A')).toBeInTheDocument();
   });
 
+  // Regression coverage for the 2026-08-27 fix: canceledAt/trialEnd are real,
+  // persisted columns set from live Stripe webhooks (SubscriptionsService.
+  // handleSubscriptionUpdated/Deleted) and already returned by
+  // GET /subscriptions/current -- this page never read them, so a canceled
+  // or trialing subscription showed no cancellation/trial-expiry date at all.
+  it('shows the real cancellation date for a canceled subscription', async () => {
+    vi.mocked(fetchCurrentSubscription).mockResolvedValue({
+      ok: true,
+      data: {
+        tier: 'professional',
+        status: 'canceled',
+        currentPeriodEnd: '2026-06-01T00:00:00.000Z',
+        cancelAtPeriodEnd: false,
+        canceledAt: '2026-05-15T00:00:00.000Z',
+      },
+      message: '',
+    });
+
+    renderSettings();
+
+    expect(await screen.findByText(/canceled on/i)).toBeInTheDocument();
+  });
+
+  it('shows the real trial-end date for a trialing subscription with no cancellation', async () => {
+    vi.mocked(fetchCurrentSubscription).mockResolvedValue({
+      ok: true,
+      data: {
+        tier: 'professional',
+        status: 'trialing',
+        currentPeriodEnd: '2026-06-01T00:00:00.000Z',
+        cancelAtPeriodEnd: false,
+        trialStart: '2026-05-01T00:00:00.000Z',
+        trialEnd: '2026-05-15T00:00:00.000Z',
+      },
+      message: '',
+    });
+
+    renderSettings();
+
+    expect(await screen.findByText(/trial ends/i)).toBeInTheDocument();
+  });
+
   it('starts checkout with a backend-returned plan id', async () => {
     renderSettings();
 

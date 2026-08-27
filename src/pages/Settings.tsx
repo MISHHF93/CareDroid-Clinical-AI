@@ -607,6 +607,19 @@ const Settings = () => {
                 <div className={`settings-billing-payment-state settings-billing-payment-state--${subscription?.status || 'unknown'}`}>
                   {paymentMessage}
                   {subscription?.cancelAtPeriodEnd ? ' Cancellation is scheduled at the period end.' : ''}
+                  {/* Found 2026-08-27: canceledAt/trialStart/trialEnd are real,
+                      persisted columns (set from live Stripe webhooks --
+                      SubscriptionsService.handleSubscriptionUpdated/Deleted)
+                      already returned by GET /subscriptions/current, but this
+                      page never read them -- a canceled or trialing
+                      subscription showed no cancellation/trial-expiry date
+                      anywhere. */}
+                  {subscription?.canceledAt
+                    ? ` Canceled on ${new Date(subscription.canceledAt).toLocaleDateString()}.`
+                    : ''}
+                  {!subscription?.canceledAt && subscription?.trialEnd
+                    ? ` Trial ends ${new Date(subscription.trialEnd).toLocaleDateString()}.`
+                    : ''}
                 </div>
 
                 {billingStatus.type !== 'idle' && (
