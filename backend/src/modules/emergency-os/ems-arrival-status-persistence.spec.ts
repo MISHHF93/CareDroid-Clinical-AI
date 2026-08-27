@@ -269,3 +269,83 @@ describe('EMSIntakeService realtime broadcast (MB-P0-6 follow-up)', () => {
     expect(publishEmsUpdate).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('EMSIntakeService.getEMSIntake() patientId echo-back (2026-08-27)', () => {
+  // Regression coverage for a real bug: buildInboundEmsRecord() hardcoded
+  // `patientId: undefined` unconditionally instead of reading it back from
+  // trackedStatus (the same way it already reads status/arrivedAt/handoff*),
+  // even though updateArrivalStatus() has persisted a real patientId ever
+  // since "Add to Whiteboard" (convertEMSArrivalToPatient) started sending
+  // one. This is the sole live path both EMSPipeline.tsx (useEMSIntake ->
+  // GET /emergency/ems) and the reception snapshot bundle
+  // (ReceptionWorkspaceService.getSnapshot -> the same getEMSIntake()) read
+  // on every mount/reload -- so the lost patientId wasn't just a cosmetic
+  // gap: EMSPipeline's "Add to Whiteboard" button (gated on
+  // !arrival.patientId) reappeared for an arrival already converted to a
+  // patient, and convertEMSArrivalToPatient's own idempotency guard
+  // (`if (!arrival || arrival.patientId) return {}`) reads this same field
+  // -- so a second click would mint a genuinely new random patient id
+  // (emsArrivalToPatient's createId('patient-ems') fallback), a real
+  // duplicate chart for the same patient.
+  let service: EMSIntakeService;
+  let patientService: EmergencyPatientService;
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [WorkflowActionLogService, EmergencyPatientService, EMSIntakeService],
+    }).compile();
+    service = module.get<EMSIntakeService>(EMSIntakeService);
+    patientService = module.get<EmergencyPatientService>(EmergencyPatientService);
+  });
+
+  it('echoes back the real patientId for an arrival already converted via "Add to Whiteboard", surviving a reload', () => {
+    const patient = patientService.createPatient(
+      {
+        firstName: 'Pending',
+        lastName: 'Handoff',
+        state: 'Arrival',
+        chiefComplaint: 'EMS pre-arrival: chest pain',
+        flags: ['EMSArrival'],
+      },
+      'org-a',
+    );
+
+    // Mirrors convertEMSArrivalToPatient's own patch shape exactly
+    // (src/store/emergencyStore.ts) -- status stays 'Handoff', not
+    // 'Complete', since the handoff itself hasn't finished yet.
+    service.updateArrivalStatus(`ems-arrival-${patient.id}`, {
+      status: 'Handoff',
+      patientId: patient.id,
+    });
+
+    const intake = service.getEMSIntake('org-a');
+    const arrival = (intake.data.emsArrivals as Array<Record<string, unknown>>).find(
+      (candidate) => candidate.id === `ems-arrival-${patient.id}`,
+    );
+
+    expect(arrival).toBeDefined();
+    expect(arrival?.patientId).toBe(patient.id);
+    expect(arrival?.status).toBe('Handoff');
+  });
+
+  it('still returns patientId undefined for a genuine pre-arrival with no tracked conversion', () => {
+    const patient = patientService.createPatient(
+      {
+        firstName: 'Inbound',
+        lastName: 'NotYetConverted',
+        state: 'Arrival',
+        chiefComplaint: 'EMS pre-arrival: MVC',
+        flags: ['EMSArrival'],
+      },
+      'org-a',
+    );
+
+    const intake = service.getEMSIntake('org-a');
+    const arrival = (intake.data.emsArrivals as Array<Record<string, unknown>>).find(
+      (candidate) => candidate.id === `ems-arrival-${patient.id}`,
+    );
+
+    expect(arrival).toBeDefined();
+    expect(arrival?.patientId).toBeUndefined();
+  });
+});

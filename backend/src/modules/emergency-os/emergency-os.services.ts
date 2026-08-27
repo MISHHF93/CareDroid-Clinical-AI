@@ -2899,7 +2899,19 @@ function buildInboundEmsRecord(
   const latestVitals = patient.vitals?.[patient.vitals.length - 1];
   return {
     id: `ems-arrival-${patient.id || index}`,
-    patientId: undefined,
+    // Durable like status/arrivedAt/handoff* below -- undefined for a genuine
+    // pre-arrival (no tracked status yet), but echoes back the real id once
+    // "Add to Whiteboard" (EMSPipeline.tsx's convertEMSArrivalToPatient) has
+    // persisted one via patchEmsArrivalStatus. Found 2026-08-27: this was
+    // hardcoded undefined unconditionally, so ANY reload mid-handoff wiped
+    // the link -- EMSPipeline's "Add to Whiteboard" button (gated on
+    // !arrival.patientId) reappeared for an already-converted arrival, and
+    // since convertEMSArrivalToPatient's own idempotency guard
+    // (`if (!arrival || arrival.patientId) return {}`) reads this same
+    // field, a second click generated a genuinely new random patient id
+    // (emsArrivalToPatient's createId('patient-ems') fallback) -- a real
+    // duplicate chart for the same patient, not just a lost UI link.
+    patientId: (trackedStatus?.patientId as string | undefined) || undefined,
     unitId: (trackedStatus?.unitId as string) || patient.mrn || `EMS-${index + 1}`,
     unitName: (trackedStatus?.unitName as string) || patient.mrn || `EMS Unit ${index + 1}`,
     crewNames: ['EMS crew en route'],
@@ -2947,11 +2959,11 @@ function buildInboundEmsRecord(
     handoffMedicationsEnRoute: trackedStatus?.handoffMedicationsEnRoute as string[] | undefined,
     handoffCriticalFlags: trackedStatus?.handoffCriticalFlags as unknown[] | undefined,
     handoffPatientDestination: trackedStatus?.handoffPatientDestination as string | undefined,
-    // Also simulated-only: the identified patient's own name. Every OTHER arrival
-    // on this list deliberately omits patient identity (patientId stays undefined
-    // above -- see EMSPipeline.tsx's "Add to Whiteboard" gate, a real pre-arrival
-    // genuinely doesn't have a linked chart yet), but a physician-initiated request
-    // is for a specific, already-known existing patient, and DispatchConsole.tsx's
+    // Also simulated-only: the identified patient's own name. A genuine,
+    // not-yet-converted pre-arrival still has no linked chart to name (patientId
+    // above stays undefined for those -- see EMSPipeline.tsx's "Add to Whiteboard"
+    // gate), but a physician-initiated request is for a specific, already-known
+    // existing patient, and DispatchConsole.tsx's
     // read-only visibility panel needs a name to show ("Dr. X requested a simulated
     // transport for Patient Y") -- this endpoint is already PHI-bearing for every
     // arrival (age/sex/chiefComplaint above), so this adds no new category of
