@@ -10,13 +10,42 @@ import { fetchMemoryDashboard } from '../../services/memoryApi';
 import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import './MemoryDashboard.css';
 
+// Found 2026-08-27: the real GET /memory/dashboard response
+// (MemoryController.toActivity(), backend/src/modules/memory/memory.controller.ts)
+// shapes each activity item as { title, occurredAt, ... } and each saved
+// workflow as a raw LongMemoryEntry ({ title, ... }, no status field) --
+// this page only ever read label/detail/time/status, field names that exist
+// ONLY on the local DEMO_MEMORY_ACTIVITY/DEMO_MEMORY_WORKFLOWS fallback data
+// (utils/clinicalInsightsChartModel.ts). Every real (non-demo) load rendered
+// a blank bold line and the generic "Recent session" subtitle -- the title
+// column three separate memory tables persist, and the timestamp the
+// controller computes specifically for display ordering, never reached the
+// user. Reads both shapes so the same rendering works for live and demo data.
+function activityLabel(item: { label?: string; title?: string }): string {
+  return item.label || item.title || 'Memory event';
+}
+
+function activitySubtitle(item: { detail?: string; time?: string; occurredAt?: string }): string {
+  if (item.detail) return item.detail;
+  if (item.time) return item.time;
+  if (item.occurredAt) {
+    const parsed = new Date(item.occurredAt);
+    if (!Number.isNaN(parsed.getTime())) return parsed.toLocaleString();
+  }
+  return 'Recent session';
+}
+
 export default function MemoryDashboard() {
   useRouteChromeRegistration({ title: 'Memory Dashboard' });
   const [loading, setLoading] = useState(true);
   const [fromApi, setFromApi] = useState(false);
   const [message, setMessage] = useState('');
-  const [activity, setActivity] = useState<readonly { id: string; label: string; detail?: string; time?: string }[]>([]);
-  const [workflows, setWorkflows] = useState<readonly { id: string; label: string; status?: string }[]>([]);
+  const [activity, setActivity] = useState<
+    readonly { id: string; label?: string; title?: string; detail?: string; time?: string; occurredAt?: string }[]
+  >([]);
+  const [workflows, setWorkflows] = useState<
+    readonly { id: string; label?: string; title?: string; status?: string }[]
+  >([]);
 
   useEffect(() => {
     let active = true;
@@ -81,8 +110,8 @@ export default function MemoryDashboard() {
           <div className="memory-page__list">
             {activity.map((item) => (
               <article key={item.id} className="memory-page__item">
-                <strong>{item.label}</strong>
-                <span>{item.detail || item.time || 'Recent session'}</span>
+                <strong>{activityLabel(item)}</strong>
+                <span>{activitySubtitle(item)}</span>
               </article>
             ))}
           </div>
@@ -92,7 +121,7 @@ export default function MemoryDashboard() {
           <div className="memory-page__list">
             {workflows.map((item) => (
               <article key={item.id} className="memory-page__item">
-                <strong>{item.label}</strong>
+                <strong>{activityLabel(item)}</strong>
                 <span>{item.status || 'saved'}</span>
               </article>
             ))}
