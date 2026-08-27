@@ -76,7 +76,18 @@ describe('health routes', () => {
     expect(response.body.components.wearableApi.status).toBe('not-configured');
   });
 
-  it('returns unhealthy when the core service registry has failed services', async () => {
+  // Regression coverage for the 2026-08-27 fix: this test previously asserted
+  // a 503/unhealthy overall response here and locked in the bug it exposed --
+  // service-registry.ts's ~24 registered services (service-registry.ts's own
+  // doc comment: most are manually constructed OUTSIDE Nest DI, a standalone
+  // shadow copy built solely for this health check, not the real request-serving
+  // app) were marked critical:true, so a single optional/legacy service (OCR,
+  // IoT digital twin, wearables, federated EMS, etc.) throwing flipped the
+  // ENTIRE /health response to 503 -- and probeBackendReachability() only
+  // checks response.ok, so that alone made the whole frontend show "Department
+  // data unavailable" and skip real data fetching, even with both real
+  // databases and every core patient/queue/EMS workflow fully healthy.
+  it('degrades (not a full outage) when the registered-service registry has failed services', async () => {
     mockedCheckServiceHealth.mockResolvedValue({
       generatedAt: '2026-06-13T00:00:00.000Z',
       totals: {
@@ -93,10 +104,37 @@ describe('health routes', () => {
       },
     } as Awaited<ReturnType<typeof checkServiceHealth>>);
 
-    const response = await request(buildApp()).get('/health').expect(503);
+    // The failure detail must still surface (this isn't a "hide the problem"
+    // fix) -- only the overall status/HTTP code changes, from a false full
+    // outage to an accurate "degraded, still usable" signal.
+    const response = await request(buildApp()).get('/health').expect(200);
+
+    expect(response.body.status).toBe('degraded');
+    expect(response.body.components.services.status).toBe('unhealthy');
+    expect(response.body.components.services.critical).toBe(false);
+    expect(response.body.components.services.error).toContain('registered service');
+  });
+
+  // The real infrastructure dependencies must still be able to declare a
+  // genuine outage -- this fix narrows WHICH component can trigger 503, it
+  // doesn't remove the mechanism entirely.
+  it('still returns a full 503 outage when the real SQL database is unavailable, unaffected by the registered-service fix above', async () => {
+    mockedCheckServiceHealth.mockResolvedValue({
+      generatedAt: '2026-06-13T00:00:00.000Z',
+      totals: { registered: 1, ready: 1, failed: 0 },
+      services: {
+        emsService: { status: 'ready', checkedAt: '2026-06-13T00:00:00.000Z' },
+      },
+    } as Awaited<ReturnType<typeof checkServiceHealth>>);
+
+    const app = express();
+    app.set('typeormDataSource', { isInitialized: false });
+    app.use('/health', healthRoutes);
+
+    const response = await request(app).get('/health').expect(503);
 
     expect(response.body.status).toBe('unhealthy');
-    expect(response.body.components.services.status).toBe('unhealthy');
-    expect(response.body.components.services.error).toContain('registered service');
+    expect(response.body.components.sqlDatabase.status).toBe('unhealthy');
+    expect(response.body.components.sqlDatabase.critical).toBe(true);
   });
 });

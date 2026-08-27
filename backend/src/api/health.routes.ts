@@ -214,7 +214,29 @@ function summarizeServiceStatuses(services: Record<string, { status?: unknown }>
 }
 
 async function checkRegisteredServices(): Promise<ComponentHealth> {
-  return timedComponent(true, async () => {
+  // Found 2026-08-27: this was critical: true, meaning ANY ONE of the ~24
+  // heterogeneous services in emergencyOsServiceRegistry (service-registry.ts)
+  // throwing in its health-check method flipped the WHOLE /health response to
+  // 503 -- and probeBackendReachability() (src/services/backendReachability.ts)
+  // only looks at response.ok, so that alone made the ENTIRE frontend show
+  // "Department data unavailable" and skip real data fetching, even with both
+  // real databases and every core patient/queue/EMS workflow fully healthy.
+  // Worse: this registry doesn't even test the real app. service-registry.ts's
+  // own doc comment on patientJourneyService/queueIntelligenceService/
+  // realTimeSimulationService says they're "manually constructed outside Nest
+  // DI... no real controller reads or writes patient data through this
+  // registry" -- it's a standalone shadow copy built solely to have something
+  // to health-check, most of the other ~20 entries are optional/legacy
+  // features (OCR, IoT digital twin, wearables, federated EMS, MoH FHIR,
+  // organizational digital twin). None of that should be able to declare the
+  // real app down. The real infrastructure dependencies (checkDatabaseConnectivity
+  // /checkSqlDatabaseConnectivity above, both still critical: true) already
+  // correctly gate the actual outage signal. Demoting this to non-critical
+  // doesn't hide the failure -- determineOverallStatus still flips overall
+  // status to 'degraded' (200, not 503) whenever any configured check reports
+  // unhealthy/degraded regardless of its critical flag, so the detail (which
+  // service, why) still surfaces; it just stops causing a false full-outage.
+  return timedComponent(false, async () => {
     const summary = await checkServiceHealth();
     const { unhealthy, degraded } = summarizeServiceStatuses(summary.services);
 
