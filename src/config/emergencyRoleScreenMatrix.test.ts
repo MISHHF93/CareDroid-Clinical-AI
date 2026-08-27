@@ -66,6 +66,12 @@ describe('emergencyRoleScreenMatrix', () => {
     expect(
       resolveRouteScreenMode(CANONICAL_ROUTES.emergencyReception, EMERGENCY_ROLE_ID.triageNurse),
     ).toBe(CARE_DROID_SCREEN_MODES.triage);
+    expect(
+      resolveEmergencyScreenMode({
+        pathname: CANONICAL_ROUTES.emergencyReception,
+        role: EMERGENCY_ROLE_ID.physician,
+      }),
+    ).toBe(CARE_DROID_SCREEN_MODES.reception);
     expect(resolveRouteScreenMode(CANONICAL_ROUTES.emergencyEms, EMERGENCY_ROLE_ID.emsUser)).toBe(
       CARE_DROID_SCREEN_MODES.ems,
     );
@@ -75,6 +81,27 @@ describe('emergencyRoleScreenMatrix', () => {
     expect(
       resolveRouteScreenMode(CANONICAL_ROUTES.emergencyReassessment, EMERGENCY_ROLE_ID.triageNurse),
     ).toBe(CARE_DROID_SCREEN_MODES.triage);
+  });
+
+  it('forces non-ED department pages to a no-pills mode for every visiting role (regression: was falling through to the visiting role\'s own unrelated default)', () => {
+    expect(
+      resolveEmergencyScreenMode({
+        pathname: CANONICAL_ROUTES.laboratory,
+        role: EMERGENCY_ROLE_ID.readOnlyViewer,
+      }),
+    ).toBe(CARE_DROID_SCREEN_MODES.readOnlyWhiteboard);
+    expect(
+      resolveEmergencyScreenMode({
+        pathname: CANONICAL_ROUTES.pharmacy,
+        role: EMERGENCY_ROLE_ID.physician,
+      }),
+    ).toBe(CARE_DROID_SCREEN_MODES.readOnlyWhiteboard);
+    expect(
+      resolveEmergencyScreenMode({
+        pathname: CANONICAL_ROUTES.radiology,
+        role: EMERGENCY_ROLE_ID.triageNurse,
+      }),
+    ).toBe(CARE_DROID_SCREEN_MODES.readOnlyWhiteboard);
   });
 
   it('uses command center on whiteboard when tenant commandCenterMode is enabled', () => {

@@ -3,12 +3,16 @@ import { CARE_DROID_SCREEN_MODES } from '../central-node/careDroidCentralNode';
 import { resolveScreenModeCapabilities } from './useScreenModeCapabilities';
 
 describe('useScreenModeCapabilities', () => {
-  it('hides command-layer chrome on registration screen', () => {
+  it('hides command-layer chrome on registration screen, but still shows its own header KPI pair', () => {
     const capabilities = resolveScreenModeCapabilities(CARE_DROID_SCREEN_MODES.reception);
 
     expect(capabilities.isRegistrationScreen).toBe(true);
     expect(capabilities.showCentralNodeBadge).toBe(false);
-    expect(capabilities.showOperationalStrip).toBe(false);
+    // Reception shows its own operational strip (Triage queue / Longest wait)
+    // in the header rather than going pill-less -- everything else in this
+    // block (the central-node badge, reassess action, EMS overlay, capacity/
+    // reassessment engines) stays suppressed, unchanged.
+    expect(capabilities.showOperationalStrip).toBe(true);
     expect(capabilities.showReassessAction).toBe(false);
     expect(capabilities.showEmsCriticalOverlay).toBe(false);
     expect(capabilities.showCapacityEngine).toBe(false);

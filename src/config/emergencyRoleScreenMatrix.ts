@@ -2,7 +2,7 @@
  * Canonical CareDroid role → screen-mode matrix.
  * Single resolver for route, role, tenant settings, and wall-display query params.
  */
-import { CANONICAL_ROUTES } from './routes.config';
+import { CANONICAL_ROUTES, LABORATORY_ROUTE_ALIASES } from './routes.config';
 import {
   CARE_DROID_SCREEN_MODES,
   CARE_DROID_SCREEN_MODE_CONFIG,
@@ -42,6 +42,20 @@ export const EMERGENCY_ROLE_ID = Object.freeze({
 });
 
 export type EmergencyRoleId = (typeof EMERGENCY_ROLE_ID)[keyof typeof EMERGENCY_ROLE_ID];
+
+/**
+ * Non-ED department pages that share the app shell's Header but have no
+ * screen-mode branch of their own -- kept out of the reception/triage/etc.
+ * matrix entirely so resolveEmergencyScreenMode() can force them to a
+ * no-misleading-pills mode instead of falling through to a visiting role's
+ * unrelated ED default.
+ */
+export const NON_EMERGENCY_DEPARTMENT_ROUTES: ReadonlySet<string> = new Set([
+  CANONICAL_ROUTES.laboratory,
+  ...LABORATORY_ROUTE_ALIASES,
+  CANONICAL_ROUTES.pharmacy,
+  CANONICAL_ROUTES.radiology,
+]);
 
 /** Staff-facing persona labels aligned to ED operations (not separate product roles). */
 export const ED_PERSONA_LABELS = Object.freeze({
@@ -295,6 +309,16 @@ export function resolveEmergencyScreenMode(input: ResolveEmergencyScreenModeInpu
   }
 
   if (settings.readOnlyDisplayMode || input.readOnly) {
+    return finalize(CARE_DROID_SCREEN_MODES.readOnlyWhiteboard, { skipRoleCoercion: true });
+  }
+
+  // Laboratory/Pharmacy/Radiology aren't part of the ED role/screen-mode
+  // matrix at all -- resolveRouteScreenMode() has no branch for them, so
+  // every role used to fall through to getDefaultScreenModeForRole() and
+  // show that role's own (irrelevant) header pills on someone else's
+  // department page. skipRoleCoercion so this can't itself get redirected
+  // to a different mode for roles readOnlyWhiteboard doesn't allow.
+  if (input.pathname && NON_EMERGENCY_DEPARTMENT_ROUTES.has(input.pathname)) {
     return finalize(CARE_DROID_SCREEN_MODES.readOnlyWhiteboard, { skipRoleCoercion: true });
   }
 

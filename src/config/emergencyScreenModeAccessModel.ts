@@ -63,6 +63,7 @@ export const DEFAULT_ALLOWED_ROLES_BY_SCREEN_MODE: Readonly<
     EMERGENCY_ROLE_ID.chargeNurse,
     EMERGENCY_ROLE_ID.edManager,
     EMERGENCY_ROLE_ID.admin,
+    EMERGENCY_ROLE_ID.physician,
   ]),
   [CARE_DROID_SCREEN_MODES.triage]: Object.freeze([
     EMERGENCY_ROLE_ID.triageNurse,

@@ -19,17 +19,28 @@ type Snapshot = Awaited<ReturnType<typeof fetchAiCommandCenterSnapshot>>;
 const pct = (v: number) => `${Math.round(v * 100)}%`;
 const usd = (v: number) => `$${v.toFixed(2)}`;
 
+// Resolve through the same alarm-system.css custom properties every other
+// severity badge/card in the app uses (alarmVisualModel.ts's
+// resolveAlarmSeverity()/alarmSeverityBadge(), consumed by MetricCard/
+// MetricChip in CareDroidPrimitives.tsx) instead of the separate
+// MEDICAL_THEME danger/warning/success palette, so these tiles render the
+// same red/amber/green the rest of the app does (and stay theme-aware in
+// dark mode, which the old hardcoded hex values were not).
+const ALARM_CRITICAL = 'var(--alarm-critical)';
+const ALARM_WARNING = 'var(--alarm-warning)';
+const ALARM_OK = 'var(--alarm-ok)';
+
 const toneColor: Record<string, string> = {
-  critical: MEDICAL_THEME.danger,
-  warning:  MEDICAL_THEME.warning,
-  good:     MEDICAL_THEME.success,
+  critical: ALARM_CRITICAL,
+  warning:  ALARM_WARNING,
+  good:     ALARM_OK,
   neutral:  MEDICAL_THEME.inkMuted,
 };
 
 const statusColor: Record<string, string> = {
-  healthy:  MEDICAL_THEME.success,
-  review:   MEDICAL_THEME.warning,
-  degraded: MEDICAL_THEME.danger,
+  healthy:  ALARM_OK,
+  review:   ALARM_WARNING,
+  degraded: ALARM_CRITICAL,
 };
 
 // -- sub-components ------------------------------------------------------------
@@ -114,10 +125,10 @@ function ExpertRow({
           style={{
             color:
               expert.confidence >= 90
-                ? MEDICAL_THEME.success
+                ? ALARM_OK
                 : expert.confidence >= 80
-                  ? MEDICAL_THEME.warning
-                  : MEDICAL_THEME.danger,
+                  ? ALARM_WARNING
+                  : ALARM_CRITICAL,
           }}
         >
           {expert.confidence}% conf{expert.confidenceSeedOnly ? ' (demo)' : ''}
@@ -258,21 +269,21 @@ export default function AiCommandCenterDashboard() {
                   sub={node.nodeId || 'caredroid-unified-ai-node'}
                   accent={
                     node.ready || node.status === 'ready'
-                      ? MEDICAL_THEME.success
-                      : MEDICAL_THEME.warning
+                      ? ALARM_OK
+                      : ALARM_WARNING
                   }
                 />
                 <MetricTile
                   label="NLU head"
                   value={node.nluLabel ?? '—'}
                   sub="intent classifier"
-                  accent={MEDICAL_THEME.success}
+                  accent={ALARM_OK}
                 />
                 <MetricTile
                   label="Artifact head"
                   value={node.artifactLabel ?? '—'}
                   sub="type router"
-                  accent={MEDICAL_THEME.success}
+                  accent={ALARM_OK}
                 />
                 <MetricTile
                   label="Composite"
@@ -314,7 +325,7 @@ export default function AiCommandCenterDashboard() {
               label="Accuracy"
               value={health ? pct(health.accuracy) : '—'}
               sub="evaluation score"
-              accent={health && health.accuracy >= 0.85 ? MEDICAL_THEME.success : MEDICAL_THEME.warning}
+              accent={health && health.accuracy >= 0.85 ? ALARM_OK : ALARM_WARNING}
             />
             <MetricTile
               label="Cache Hit"
@@ -332,8 +343,8 @@ export default function AiCommandCenterDashboard() {
               sub={`target ${snapshot?.hallucinationMetrics.benchmark ?? '<= 5%'}`}
               accent={
                 snapshot && snapshot.hallucinationMetrics.rate <= 0.05
-                  ? MEDICAL_THEME.success
-                  : MEDICAL_THEME.danger
+                  ? ALARM_OK
+                  : ALARM_CRITICAL
               }
             />
           </div>
@@ -467,7 +478,7 @@ export default function AiCommandCenterDashboard() {
                     </span>
                     <span
                       className="ai-cc-source-row__value"
-                      style={{ color: status === 'live' ? MEDICAL_THEME.success : MEDICAL_THEME.warning }}
+                      style={{ color: status === 'live' ? ALARM_OK : ALARM_WARNING }}
                     >
                       {String(status)}
                     </span>

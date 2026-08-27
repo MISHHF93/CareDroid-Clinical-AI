@@ -269,4 +269,30 @@ describe('Sidebar unified navigation rendering', () => {
       useEmergencyStore.setState({ copilotOpen: previousCopilotOpen });
     }
   });
+
+  it('toggles manual sidebar collapse, persists the preference, and restores it on remount', () => {
+    localStorage.removeItem('caredroid-sidebar-collapsed');
+    delete document.documentElement.dataset.sidebarCollapsed;
+
+    const first = renderSidebar('admin');
+    const toggle = screen.getByRole('button', { name: 'Collapse sidebar' });
+    expect(toggle.getAttribute('aria-pressed')).toBe('false');
+
+    fireEvent.click(toggle);
+
+    expect(screen.getByRole('button', { name: 'Expand sidebar' }).getAttribute('aria-pressed')).toBe(
+      'true',
+    );
+    expect(localStorage.getItem('caredroid-sidebar-collapsed')).toBe('true');
+    expect(document.documentElement.dataset.sidebarCollapsed).toBe('true');
+    first.unmount();
+
+    renderSidebar('admin');
+    expect(screen.getByRole('button', { name: 'Expand sidebar' }).getAttribute('aria-pressed')).toBe(
+      'true',
+    );
+
+    localStorage.removeItem('caredroid-sidebar-collapsed');
+    delete document.documentElement.dataset.sidebarCollapsed;
+  });
 });

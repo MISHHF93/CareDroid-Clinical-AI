@@ -16,6 +16,7 @@
   color: var(--cdl-ink-muted, #334155);
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 12px;
+  white-space: nowrap;
 }
 
 .caredroid-header--compact {
@@ -566,7 +567,7 @@
 
   .caredroid-header__topbar {
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr) minmax(0, auto);
+    grid-template-columns: auto minmax(0, 1fr);
     gap: 8px;
     overflow: hidden;
   }

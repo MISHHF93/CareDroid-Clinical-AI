@@ -150,6 +150,10 @@ body {
 }
 
 :where(select) {
+  color-scheme: dark light;
+}
+
+html[data-theme='light'] :where(select) {
   color-scheme: light;
 }
 

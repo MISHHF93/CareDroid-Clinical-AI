@@ -76,7 +76,11 @@ export function resolveScreenModeCapabilities(
     defaultLandingRoute: getScreenModeDefaultLandingRoute(screenMode),
     defaultFocus: config.defaultFocus,
     showCentralNodeBadge: !isReceptionScreen && !isWallKiosk,
-    showOperationalStrip: !isReceptionScreen && !isWallKiosk,
+    // Reception itself is flagged useMinimalAppChrome (kiosk-style front-desk
+    // displays), which would otherwise suppress this via !isWallKiosk too --
+    // but Reception should show its OWN kpi pair here, not go pill-less, so
+    // it's forced on regardless of that flag.
+    showOperationalStrip: isReceptionScreen || !isWallKiosk,
     showReassessAction: (CLINICAL_COMMAND_MODES.has(screenMode) || isTriageScreen) && !isWallKiosk,
     showEmsCriticalOverlay: !isReceptionScreen && !isWallKiosk,
     showCapacityEngine: !isReceptionScreen && !isWallKiosk,

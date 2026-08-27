@@ -260,6 +260,21 @@
   }
 }
 
+/* Sidebar is a DOM sibling, not an ancestor, so its manual collapse state
+   (Sidebar.tsx's .sidebar--collapsed) can't be reached with a descendant
+   selector -- read it off the documentElement broadcast instead. */
+@media (min-width: 1025px) {
+  [data-sidebar-collapsed='true'] .nc-backdrop,
+  [data-sidebar-collapsed='true'] .nc-panel {
+    inset-inline-start: var(--cdl-sidebar-width-collapsed, 56px);
+  }
+
+  [data-sidebar-collapsed='true'] .nc-panel {
+    width: min(380px, calc(100vw - var(--cdl-sidebar-width-collapsed, 56px)));
+    max-width: calc(100vw - var(--cdl-sidebar-width-collapsed, 56px));
+  }
+}
+
 @media (max-width: 768px) {
   .nc-backdrop {
     inset-inline-start: 0;

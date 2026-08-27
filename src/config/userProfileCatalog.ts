@@ -412,6 +412,21 @@ export function resolveEffectiveEmergencyRole(
   if (profileId && mapping[profileId]) {
     return normalizeEmergencyRole(mapping[profileId]);
   }
+  // If the profile's own roleProfileId is ALREADY one of the canonical
+  // emergency role id strings (e.g. 'registration_clerk', 'charge_nurse'),
+  // that's the strongest possible signal -- stronger than the HEAL-336
+  // user.role check below, whose value can be a broader SaaS-tier bucket
+  // (e.g. account role 'nurse') that is LESS specific than a profile
+  // already carrying its exact emergency role. Checked directly against
+  // the canonical id strings, not via normalizeEmergencyRole(), which
+  // fails closed to readOnlyViewer for anything unrecognized and would
+  // otherwise make this check win unconditionally regardless of profileId.
+  if (profileId) {
+    const normalizedProfileId = String(profileId).trim().toLowerCase().replace(/-/g, '_');
+    if ((Object.values(EMERGENCY_ROLE_IDS) as string[]).includes(normalizedProfileId)) {
+      return normalizedProfileId;
+    }
+  }
   // HEAL-336: a user's own role is checked before the catalog's generic
   // saasRole -> emergencyRoleId default. The catalog maps each broad
   // saasRole to a single representative emergency role (e.g. 'nurse' ->

@@ -9,6 +9,8 @@ import {
   IconBed,
   IconBell,
   IconChartBar,
+  IconChevronLeft,
+  IconChevronRight,
   IconClipboardPlus,
   IconClock,
   IconDots,
@@ -154,11 +156,22 @@ function isActiveRoute(pathname: string, item: SidebarNavItem, search = ''): boo
   );
 }
 
+const SIDEBAR_COLLAPSE_STORAGE_KEY = 'caredroid-sidebar-collapsed';
+
+function loadSidebarCollapsePreference(): boolean {
+  try {
+    return localStorage.getItem(SIDEBAR_COLLAPSE_STORAGE_KEY) === 'true';
+  } catch {
+    return false;
+  }
+}
+
 export function Sidebar({ navigationItems }: SidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const sidebarBodyRef = useRef<HTMLDivElement>(null);
   const [moreOpen, setMoreOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(loadSidebarCollapsePreference);
   const emergencyRole = useEmergencyRolePermissions();
   const screenCapabilities = useScreenModeCapabilities();
   const copilotOpen = useEmergencyStore((state) => state.copilotOpen);
@@ -500,8 +513,26 @@ export function Sidebar({ navigationItems }: SidebarProps) {
     active?.scrollIntoView({ block: 'nearest' });
   }, [location.pathname]);
 
+  // Persist across sessions and broadcast to SidebarNotificationPanel (a DOM
+  // sibling, not a descendant, so it can't pick this up from a class on the
+  // <aside> alone) -- same document.documentElement broadcast pattern
+  // ThemeContext uses for theme.
+  useEffect(() => {
+    try {
+      localStorage.setItem(SIDEBAR_COLLAPSE_STORAGE_KEY, String(sidebarCollapsed));
+    } catch {
+      /* ignore */
+    }
+    document.documentElement.dataset.sidebarCollapsed = String(sidebarCollapsed);
+  }, [sidebarCollapsed]);
+
   return (
-    <aside className="sidebar sidebar--clinical" aria-label="Emergency navigation">
+    <aside
+      className={['sidebar', 'sidebar--clinical', sidebarCollapsed ? 'sidebar--collapsed' : '']
+        .filter(Boolean)
+        .join(' ')}
+      aria-label="Emergency navigation"
+    >
       <header className="sidebar__brand">
         <div className="sidebar__brand-mark" aria-hidden="true">
           C
@@ -510,6 +541,20 @@ export function Sidebar({ navigationItems }: SidebarProps) {
           <span className="sidebar__brand-name">CareDroid</span>
           <span className="sidebar__brand-tag">Clinical OS</span>
         </div>
+        <button
+          type="button"
+          className="sidebar__collapse-toggle"
+          onClick={() => setSidebarCollapsed((prev) => !prev)}
+          aria-pressed={sidebarCollapsed}
+          aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        >
+          {sidebarCollapsed ? (
+            <IconChevronRight size={16} stroke={2} />
+          ) : (
+            <IconChevronLeft size={16} stroke={2} />
+          )}
+        </button>
       </header>
       <nav className="sidebar-desktop-nav" aria-label="Emergency desktop navigation">
         <div className="sidebar__body" ref={sidebarBodyRef}>

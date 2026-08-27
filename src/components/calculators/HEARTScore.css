@@ -9,7 +9,7 @@
   max-width: 480px;
   max-height: 92vh;
   overflow-y: auto;
-  background: #ffffff;
+  background: var(--medical-white, #ffffff);
   border: 1px solid #e0f2fe;
   border-radius: 12px;
   color: var(--medical-ink, #111827);

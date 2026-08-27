@@ -57,6 +57,22 @@ describe('userProfileCatalog', () => {
     ).toBe(EMERGENCY_ROLE_IDS.chargeNurse);
   });
 
+  it('prefers a profile\'s own specific roleProfileId over a broader account role bucket (regression: reception dev-bypass session with role "nurse" + roleProfileId "registration_clerk" was resolving to triage_nurse, showing triage\'s header KPI pair on the Reception page)', () => {
+    // The account-level `role` field can be a broad SaaS-tier bucket (e.g.
+    // 'nurse', which normalizeEmergencyRole() aliases to 'triage_nurse')
+    // even when profile.roleProfileId already carries the user's exact,
+    // specific emergency role -- the reverse of the HEAL-336 scenario
+    // above, where the specific role lived in `role` and the generic
+    // bucket lived in the catalog. Either way the more specific value must
+    // win.
+    expect(
+      resolveEffectiveEmergencyRole(
+        { role: 'nurse', profile: { roleProfileId: 'registration_clerk' } },
+        {},
+      ),
+    ).toBe(EMERGENCY_ROLE_IDS.registrationClerk);
+  });
+
   it('builds access summary for admin assignment preview', () => {
     const summary = buildUserProfileAccessSummary('platform-admin');
     expect(summary.emergencyRole).toBe(EMERGENCY_ROLE_IDS.admin);

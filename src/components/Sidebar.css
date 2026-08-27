@@ -87,7 +87,7 @@
 
 .sidebar__body {
   display: flex;
-  flex: 1;
+  flex: 0 1 auto;
   flex-direction: column;
   gap: var(--cdl-sidebar-group-gap, 4px);
   min-height: 0;
@@ -334,6 +334,103 @@
   }
   50% {
     transform: scale(1.08);
+  }
+}
+
+/* ── Collapse toggle (brand header) ────────────────────────────── */
+.sidebar__collapse-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  margin-left: auto;
+  border: 1px solid color-mix(in srgb, var(--medical-border) 55%, transparent);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--medical-ink-subtle);
+  cursor: pointer;
+}
+
+.sidebar__collapse-toggle:hover {
+  background: var(--medical-slate-50);
+  color: var(--medical-ink);
+}
+
+@media (max-width: 1024px) {
+  .sidebar__collapse-toggle {
+    display: none;
+  }
+}
+
+/* ── Manual collapse (desktop only — same treatment as the tablet
+   icon-rail below, triggered by a class instead of a media query) ─── */
+@media (min-width: 1025px) {
+  .sidebar--collapsed {
+    width: var(--cdl-sidebar-width-collapsed, 56px);
+    padding: 0;
+    align-items: center;
+  }
+
+  .sidebar--collapsed .sidebar__footer .sidebar-desktop-nav__demo-switcher,
+  .sidebar--collapsed .sidebar__footer .sidebar-chrome-controls {
+    display: none;
+  }
+
+  .sidebar--collapsed .sidebar__brand {
+    justify-content: center;
+    padding: 10px 0 8px;
+    gap: 4px;
+  }
+
+  .sidebar--collapsed .sidebar__brand-copy {
+    display: none;
+  }
+
+  .sidebar--collapsed .sidebar__collapse-toggle {
+    margin-left: 0;
+  }
+
+  .sidebar--collapsed .sidebar__body,
+  .sidebar--collapsed .sidebar__footer {
+    padding-inline: 4px;
+  }
+
+  .sidebar--collapsed .sidebar-nav-group__label {
+    display: none;
+  }
+
+  .sidebar--collapsed .sidebar-desktop-nav {
+    align-items: center;
+    gap: 4px;
+  }
+
+  .sidebar--collapsed .sidebar-nav-item {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    justify-content: center;
+    gap: 0;
+    border-left-width: 2px;
+  }
+
+  .sidebar--collapsed .sidebar-nav-item__label {
+    display: none;
+  }
+
+  .sidebar--collapsed .sidebar-nav-item__tooltip {
+    display: block;
+  }
+
+  .sidebar--collapsed .sidebar-nav-item:hover .sidebar-nav-item__tooltip,
+  .sidebar--collapsed .sidebar-nav-item:focus-visible .sidebar-nav-item__tooltip {
+    opacity: 1;
+    transform: translateY(-50%) translateX(2px);
+  }
+
+  .sidebar--collapsed .sidebar-desktop-nav__utility {
+    align-items: center;
   }
 }
 
