@@ -382,15 +382,24 @@
   outline-offset: 1px;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 768px) {
   .sidebar__collapse-toggle {
     display: none;
   }
 }
 
-/* ── Manual collapse (desktop only — same treatment as the tablet
-   icon-rail below, triggered by a class instead of a media query) ─── */
-@media (min-width: 1025px) {
+/* ── Manual collapse (769px+ — desktop AND tablet width) ──────────
+   Was previously desktop-only (min-width:1025px), with a SEPARATE,
+   unconditional !important tablet rule below forcing icon-rail at
+   769-1024px regardless of any user choice, AND the toggle button
+   itself hidden entirely in that same range -- meaning on any window
+   narrower than 1025px (a common width for an embedded/side-panel
+   browser view, not just a physical tablet) there was no visible
+   control and no way to override the forced-narrow layout at all.
+   Unified into one range so the same manual toggle governs icon-rail
+   vs. full sidebar all the way down to 769px, where the mobile bottom
+   tab bar takes over instead. */
+@media (min-width: 769px) {
   .sidebar--collapsed {
     width: var(--cdl-sidebar-width-collapsed, 56px);
     padding: 0;
@@ -464,70 +473,11 @@
   }
 }
 
-/* ── Tablet: collapse to icon-only ─────────────────────────────── */
-@media (max-width: 1024px) and (min-width: 769px) {
-  .sidebar {
-    width: 56px !important;
-    padding: 0 !important;
-    align-items: center;
-  }
-
-  .sidebar__footer .sidebar-desktop-nav__demo-switcher,
-  .sidebar__footer .sidebar-chrome-controls {
-    display: none;
-  }
-
-  .sidebar__brand {
-    justify-content: center;
-    padding: 10px 0 8px;
-    gap: 0;
-  }
-
-  .sidebar__brand-copy {
-    display: none;
-  }
-
-  .sidebar__body,
-  .sidebar__footer {
-    padding-inline: 4px;
-  }
-
-  .sidebar-nav-group__label {
-    display: none;
-  }
-
-  .sidebar-desktop-nav {
-    align-items: center;
-    gap: 4px;
-  }
-
-  .sidebar-nav-item {
-    width: 44px !important;
-    height: 44px !important;
-    padding: 0 !important;
-    justify-content: center !important;
-    gap: 0 !important;
-    border-left-width: 2px;
-  }
-
-  .sidebar-nav-item__label {
-    display: none;
-  }
-
-  .sidebar-nav-item__tooltip {
-    display: block;
-  }
-
-  .sidebar-nav-item:hover .sidebar-nav-item__tooltip,
-  .sidebar-nav-item:focus-visible .sidebar-nav-item__tooltip {
-    opacity: 1;
-    transform: translateY(-50%) translateX(2px);
-  }
-
-  .sidebar-desktop-nav__utility {
-    align-items: center;
-  }
-}
+/* Tablet width (769-1024px) used to force icon-rail unconditionally
+   here, with the manual toggle hidden in that same range -- replaced by
+   the unified .sidebar--collapsed block above (now min-width:769px),
+   so this range now defaults to the full sidebar like desktop, and the
+   user's own toggle choice controls it instead of the viewport alone. */
 
 /* ── Mobile: bottom tab bar ───────────────────────────────────── */
 @media (max-width: 768px) {
