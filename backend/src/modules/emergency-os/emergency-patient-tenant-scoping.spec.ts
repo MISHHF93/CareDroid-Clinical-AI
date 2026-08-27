@@ -671,7 +671,11 @@ describe('EMSIntakeService — organization tenant scoping (HEAL-347.69)', () =>
     // and rejects the whole handoff for a cross-org patientId, same as a
     // direct updateArrivalStatus call would.
     expect(() =>
-      emsIntake.completeHandoff({ arrivalId, patientId: patient.id, unitName: 'Medic 7' }, 'org-b'),
+      emsIntake.completeHandoff(
+        { arrivalId, patientId: patient.id, unitName: 'Medic 7' },
+        {},
+        'org-b',
+      ),
     ).toThrow(/not found/i);
     expect(
       workflowLogService.record.mock.calls.some((call) => call[0]?.type === 'patient_note_added'),
@@ -679,6 +683,7 @@ describe('EMSIntakeService — organization tenant scoping (HEAL-347.69)', () =>
 
     const ownOrgResult = emsIntake.completeHandoff(
       { arrivalId, patientId: patient.id, unitName: 'Medic 7' },
+      {},
       'org-a',
     ).data as { ok: boolean };
     expect(ownOrgResult.ok).toBe(true);

@@ -77,6 +77,110 @@ describe('EMSIntakeService arrival status persistence', () => {
     expect(result.data.status).toBe('Handoff');
   });
 
+  // Regression coverage for the "rich EMS handoff checklist data never
+  // durably reaches the backend" fix: EMSIntakeService.completeHandoff()
+  // used to send/persist only {handoffAccepted, handoffAcceptedAt} -- the
+  // identity/vitals/medications/critical-flags/destination a clinician
+  // actually documented during handoff, and WHO accepted it, were thrown
+  // away and never reached the repository at all.
+  it('persists handoff-acceptance identity and checklist content to the repository (write-then-read within the same process)', () => {
+    service.completeHandoff(
+      {
+        arrivalId: 'ems-arrival-handoff-checklist-1',
+        unitName: 'Medic 12',
+        checklist: {
+          identityStatus: 'verified',
+          vitalsReceived: true,
+          medicationsEnRoute: ['Naloxone'],
+          criticalFlags: [
+            { id: 'ems-critical', label: 'EMS critical severity', source: 'ems-severity' },
+          ],
+          patientDestination: 'monitored-chair',
+        },
+      },
+      // The acceptor is what EmergencyOsController.postEmsHandoff derives
+      // from the authenticated session -- never taken from `checklist` or
+      // any other client-suppliable field (see the controller's own doc
+      // comment on postEmsHandoff).
+      { staffId: 'staff-77', name: 'Dr. Accepting' },
+    );
+
+    const lastSaved = savedRows[savedRows.length - 1];
+    expect(lastSaved).toEqual(
+      expect.objectContaining({
+        id: 'ems-arrival-handoff-checklist-1',
+        status: 'Complete',
+        handoffAcceptedByStaffId: 'staff-77',
+        handoffAcceptedByStaffName: 'Dr. Accepting',
+        handoffIdentityStatus: 'verified',
+        handoffVitalsReceived: true,
+        handoffMedicationsEnRoute: ['Naloxone'],
+        handoffCriticalFlags: [
+          { id: 'ems-critical', label: 'EMS critical severity', source: 'ems-severity' },
+        ],
+        handoffPatientDestination: 'monitored-chair',
+      }),
+    );
+
+    // Also readable back through the same tracked-status path the rest of
+    // this file already relies on (updateArrivalStatus's merged return).
+    const readBack = service.updateArrivalStatus('ems-arrival-handoff-checklist-1', {});
+    expect(readBack.data.handoffAcceptedByStaffId).toBe('staff-77');
+    expect(readBack.data.handoffVitalsReceived).toBe(true);
+    expect(readBack.data.handoffMedicationsEnRoute).toEqual(['Naloxone']);
+  });
+
+  it('rehydrates handoff-acceptance identity and checklist content from the repository on module init, surviving a restart', async () => {
+    const rehydrateRepository = {
+      create: jest.fn((row) => row),
+      save: jest.fn((row) => Promise.resolve(row)),
+      find: jest.fn(() =>
+        Promise.resolve([
+          {
+            id: 'ems-arrival-handoff-checklist-2',
+            status: 'Complete',
+            patientId: 'p10',
+            unitId: 'unit-12',
+            unitName: 'Medic 12',
+            handoffCompletedAt: '2026-08-08T11:00:00.000Z',
+            handoffAcceptedByStaffId: 'staff-77',
+            handoffAcceptedByStaffName: 'Dr. Accepting',
+            handoffIdentityStatus: 'verified',
+            handoffVitalsReceived: true,
+            handoffMedicationsEnRoute: ['Naloxone'],
+            handoffCriticalFlags: [
+              { id: 'ems-critical', label: 'EMS critical severity', source: 'ems-severity' },
+            ],
+            handoffPatientDestination: 'monitored-chair',
+          },
+        ]),
+      ),
+    };
+
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        WorkflowActionLogService,
+        EmergencyPatientService,
+        EMSIntakeService,
+        { provide: getRepositoryToken(EmsArrivalStatus), useValue: rehydrateRepository },
+      ],
+    }).compile();
+
+    const rehydratedService = module.get<EMSIntakeService>(EMSIntakeService);
+    await rehydratedService.onModuleInit();
+
+    const result = rehydratedService.updateArrivalStatus('ems-arrival-handoff-checklist-2', {});
+    expect(result.data.handoffAcceptedByStaffId).toBe('staff-77');
+    expect(result.data.handoffAcceptedByStaffName).toBe('Dr. Accepting');
+    expect(result.data.handoffIdentityStatus).toBe('verified');
+    expect(result.data.handoffVitalsReceived).toBe(true);
+    expect(result.data.handoffMedicationsEnRoute).toEqual(['Naloxone']);
+    expect(result.data.handoffCriticalFlags).toEqual([
+      { id: 'ems-critical', label: 'EMS critical severity', source: 'ems-severity' },
+    ]);
+    expect(result.data.handoffPatientDestination).toBe('monitored-chair');
+  });
+
   it('rehydrates tracked arrival status from the repository on module init, surviving a restart', async () => {
     const rehydrateRepository = {
       create: jest.fn((row) => row),

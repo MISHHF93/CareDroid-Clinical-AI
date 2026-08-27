@@ -257,6 +257,12 @@ export interface Referral {
   respondedAt?: ISODateString;
   completedAt?: ISODateString;
   responseNote?: string;
+  /** Who most recently changed `status` -- distinct from `requestingStaffId`
+   * above, which only ever records who originally created the referral. See
+   * emergencyStore.ts's updateReferralStatus and the matching backend
+   * columns on the Referral entity (HEAL referral-actor-tracking). */
+  lastActionByStaffId?: EntityId;
+  lastActionByName?: string;
   createdAt?: ISODateString;
   updatedAt?: ISODateString;
   summary?: string;

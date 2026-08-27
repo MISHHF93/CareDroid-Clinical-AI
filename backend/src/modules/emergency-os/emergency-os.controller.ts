@@ -715,13 +715,34 @@ export class EmergencyOsController {
     return this.emsIntakeService.getEMSIntake(tenantContext?.organizationId);
   }
 
+  /**
+   * Persists a REAL EMS handoff acceptance -- see EMSIntakeService.
+   * completeHandoff's own doc comment. The accepting clinician's identity
+   * (handoffAcceptedByStaffId/Name) is always derived server-side from the
+   * authenticated session here, never trusted from the request body --
+   * matching requestEmergencyTransport/reconcilePatientIdentity above.
+   * `acceptor.staffId` is intentionally optional (not required/throwing),
+   * matching requestEmergencyTransport's own softer pattern: this records an
+   * operational handoff-acceptance event, not a rewrite of the patient's
+   * core identity/MRN the way reconcilePatientIdentity is.
+   */
   @RequirePermission(Permission.WRITE_PHI)
   @Post('ems/handoff')
   postEmsHandoff(
     @Body() body: PostEmsHandoffDto,
     @TenantContext() tenantContext?: TenantContextValue,
+    @Req() request?: Request,
   ) {
-    return this.emsIntakeService.completeHandoff(body, tenantContext?.organizationId);
+    const authenticatedUser = (
+      request as unknown as {
+        user?: { id?: string; email?: string; profile?: { fullName?: string | null } };
+      }
+    )?.user;
+    const acceptor = {
+      staffId: authenticatedUser?.id,
+      name: authenticatedUser?.profile?.fullName || authenticatedUser?.email,
+    };
+    return this.emsIntakeService.completeHandoff(body, acceptor, tenantContext?.organizationId);
   }
 
   /** Durable EMS arrival status transitions (arrived / handoff-started) -- see
@@ -1080,15 +1101,48 @@ export class EmergencyOsController {
    * existed on the backend -- found 2026-08-06, the frontend was silently
    * 404ing and falling back to "live sync is pending" every time. Mounted
    * under /emergency/transfers (not /emergency/referrals) to match the real
-   * caller's URL exactly, not the sibling GET/POST referrals routes' prefix. */
+   * caller's URL exactly, not the sibling GET/POST referrals routes' prefix.
+   *
+   * Actor identity is always server-derived from the authenticated session,
+   * never trusted from the request body -- matching requestEmergencyTransport/
+   * reconcilePatientIdentity above (UpdateReferralStatusDto's own doc
+   * comment states this explicitly). Before this fix there was no actor
+   * parameter at all, so every status change (Accept/Decline/Complete/etc.)
+   * left the referral's audit trail attributing the change to whoever
+   * originally CREATED it (`requestingStaffId`), even when a different
+   * receiving-side staff member actually acted -- unlike
+   * reconcilePatientIdentity, a missing authenticated identity here doesn't
+   * throw: `actor.staffId` is simply omitted from the record rather than
+   * blocking a status update, matching requestEmergencyTransport's own
+   * "optional actor" precedent for a non-identity-rewriting action. */
   @RequirePermission(Permission.WRITE_PHI)
   @Patch('transfers/:id/status')
   updateTransferStatus(
     @Param('id') id: string,
     @Body() dto: UpdateReferralStatusDto,
     @TenantContext() tenantContext?: TenantContextValue,
+    @Req() request?: Request,
   ) {
-    return this.referralService.updateReferralStatus(id, dto.status, tenantContext?.organizationId);
+    const authenticatedUser = (
+      request as unknown as {
+        user?: {
+          id?: string;
+          email?: string;
+          profile?: { fullName?: string | null } | null;
+        };
+      }
+    )?.user;
+    const actor = {
+      staffId: authenticatedUser?.id,
+      name: authenticatedUser?.profile?.fullName || authenticatedUser?.email,
+    };
+    return this.referralService.updateReferralStatus(
+      id,
+      dto.status,
+      tenantContext?.organizationId,
+      actor,
+      dto.responseNote,
+    );
   }
 
   @RequirePermission(Permission.READ_PHI)

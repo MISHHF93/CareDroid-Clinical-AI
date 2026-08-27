@@ -508,7 +508,7 @@ export default function ReferralPanel() {
     // 404 gracefully via guardedJson's existing ok:false handling below --
     // same degrade-quietly behavior the transfer case already relied on.
     setBackendPending(true);
-    updateEmergencyTransferWorkflow(referralId, status)
+    updateEmergencyTransferWorkflow(referralId, status, responseNote)
       .then((result) => {
         setBackendStatus(
           result.ok

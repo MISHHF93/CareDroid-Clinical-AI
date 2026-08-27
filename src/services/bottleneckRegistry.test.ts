@@ -241,6 +241,61 @@ describe('detectBottleneckEvents', () => {
     expect(events.find((e) => e.id === 'bn-interoperability-referral-backlog')).toBeUndefined();
   });
 
+  // HEAL referralHub-fixture-honesty: adaptReferralSignals (via
+  // adaptExistingServiceSignalsToBottlenecks -> existingServiceSignals.
+  // referralDashboard) previously had no way to know whether the
+  // `delays` it was fed came from real referral data or from
+  // ReferralHub.getReferralDashboard()'s fabricated demo fixture rows --
+  // it would emit a "Cardiology referral delayed" bottleneck event either
+  // way. It now checks the new `isFixtureData` flag ReferralHub's dashboard
+  // carries and suppresses fabricated events entirely.
+  it('emits a referral bottleneck event from real (non-fixture) referral delay data', () => {
+    const events = adaptExistingServiceSignalsToBottlenecks(
+      {
+        referralDashboard: {
+          isFixtureData: false,
+          delays: [
+            {
+              referralId: 'ref-real-1',
+              department: 'Cardiology',
+              priority: 'high',
+              reason: 'Real cardiology referral delayed in review.',
+            },
+          ],
+        },
+      },
+      ISO,
+    );
+
+    const event = events.find((candidate) => candidate.id === 'bn-referral-service-ref-real-1');
+    expect(event).toBeTruthy();
+    expect(event?.title).toBe('Cardiology delayed');
+  });
+
+  it('suppresses fabricated referral bottleneck events when the dashboard is fixture-only demo data', () => {
+    const events = adaptExistingServiceSignalsToBottlenecks(
+      {
+        referralDashboard: {
+          isFixtureData: true,
+          delays: [
+            {
+              referralId: 'REF-1002',
+              department: 'Neurology',
+              priority: 'critical',
+              reason: 'Fabricated fixture delay -- must never surface as a real bottleneck.',
+            },
+          ],
+        },
+      },
+      ISO,
+    );
+
+    expect(events.find((candidate) => candidate.id === 'bn-referral-service-REF-1002')).toBeUndefined();
+    expect(events.some((candidate) => candidate.source === 'ReferralHub.getReferralDashboard')).toBe(
+      false,
+    );
+  });
+
   it('sorts events with impactsThreeMinuteTarget=true first', () => {
     const events = detectBottleneckEvents({
       generatedAt: ISO,

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import ReferralHub, {
+  DEMO_REFERRAL_FIXTURES,
   REFERRAL_DEPARTMENTS,
   REFERRAL_FLOW_STAGES,
   getDepartmentQueues,
@@ -90,5 +91,58 @@ describe('ReferralHub', () => {
       })
     );
     expect(ReferralHub.getReferralDashboard().delays.length).toBeGreaterThan(0);
+  });
+
+  // HEAL referralHub-fixture-honesty: getReferralDashboard() is called with
+  // no arguments by 5 dashboard/KPI/bottleneck aggregation services
+  // (emergencyOperatingSystemService.ts, emergencyKpiLayerService.ts,
+  // emergencyPatientPathService.ts, emergencyFlowEngineService.ts,
+  // bottleneckRegistry.ts), which always silently fell back to
+  // DEMO_REFERRAL_FIXTURES (8 fabricated rows, IDs REF-1001..REF-1008) --
+  // entirely unrelated to the real, persisted Referral entity/
+  // ReferralService on the backend. These tests prove the dashboard now
+  // honestly self-labels that fact instead of looking indistinguishable
+  // from live data.
+  it('labels its output as fixture/demo data when called with no real referrals', () => {
+    const dashboard = getReferralDashboard();
+
+    expect(dashboard.isFixtureData).toBe(true);
+    expect(dashboard.sourceState).toBe('demo');
+    expect(dashboard.sourceStateLabel).toMatch(/demo/i);
+    expect(dashboard.dataSourceNote).toMatch(/fabricated demo fixture/i);
+    expect(dashboard.dataSourceNote).toMatch(/not live CareDroid referrals/i);
+  });
+
+  it('labels its output as live when real referral data is actually supplied', () => {
+    const realReferrals = [
+      {
+        id: 'ref-real-patient-42',
+        patientLabel: 'ED-4200',
+        department: 'Cardiology',
+        stage: 'review',
+        priority: 'high',
+        elapsedMinutes: 12,
+        requestedBy: 'ED physician',
+        reason: 'Real referral',
+        handoffSummary: 'Real referral handoff.',
+      },
+    ];
+
+    const dashboard = getReferralDashboard(realReferrals);
+
+    expect(dashboard.isFixtureData).toBe(false);
+    expect(dashboard.sourceState).toBe('live');
+    expect(dashboard.referrals.some((referral) => referral.id === 'ref-real-patient-42')).toBe(true);
+    // The fabricated fixture IDs must never leak into a dashboard built from
+    // real data.
+    expect(dashboard.referrals.some((referral) => referral.id.startsWith('REF-100'))).toBe(false);
+  });
+
+  it('DEMO_REFERRAL_FIXTURES is unmistakably fixture data, not a real referral ID scheme', () => {
+    // The real backend Referral entity/ReferralService mints ids like
+    // `ref-<patientId>-<timestamp>` (lowercase, patient-derived) -- these
+    // fixture rows use a visually distinct REF-100x scheme specifically so
+    // the two can never be confused for one another.
+    expect(DEMO_REFERRAL_FIXTURES.every((referral) => /^REF-100\d$/.test(referral.id))).toBe(true);
   });
 });

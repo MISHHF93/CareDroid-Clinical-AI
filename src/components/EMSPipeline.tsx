@@ -21,7 +21,10 @@ import PreArrivalNotificationForm from './ems/PreArrivalNotificationForm';
 import PreArrivalForm from './ems/PreArrivalForm';
 import ResourceActivationStrip from './ems/ResourceActivationStrip';
 import HandoffClosePanel from './ems/HandoffClosePanel';
-import { resolveAmbulanceHandoffChecklist } from '../services/ambulanceHandoffChecklist';
+import {
+  resolveAmbulanceHandoffChecklist,
+  buildEmsHandoffChecklistSyncPayload,
+} from '../services/ambulanceHandoffChecklist';
 import { syncResourceActivationsForArrival } from '../services/resourceActivation';
 import EdDataSourceBanner from './emergency/EdDataSourceBanner';
 import { EmergencyRoutePage } from '../pages/emergency/emergencyRouteShared';
@@ -584,6 +587,18 @@ export default function EMSPipeline() {
     const timestamp = new Date().toISOString();
     const arrival = emsArrivals.find((entry) => entry.id === arrivalId);
     const handoffStartedAt = arrival?.handoffStartedAt || arrival?.arrivedAt || timestamp;
+    const linkedPatient = arrival?.patientId
+      ? patients.find((candidate) => candidate.id === arrival.patientId)
+      : undefined;
+    // The full checklist state the clinician actually documented during
+    // handoff (identity/vitals/medications/critical-flags/destination) --
+    // resolved the same way AmbulanceHandoffChecklistPanel and
+    // updateAmbulanceHandoffChecklist below already do, so what gets synced
+    // to the backend matches what was on screen when "Complete Handoff" was
+    // clicked.
+    const currentChecklist = arrival
+      ? resolveAmbulanceHandoffChecklist(arrival, { patient: linkedPatient, rooms })
+      : undefined;
     // Optimistic local update keeps offline/demo path working; server persist is best-effort.
     updateAmbulanceHandoffChecklist(
       arrivalId,
@@ -605,7 +620,12 @@ export default function EMSPipeline() {
       handoffAcceptedAt: timestamp,
       handoffStartedAt,
       arrivedAt: arrival?.arrivedAt,
-      checklist: { handoffAccepted: true, handoffAcceptedAt: timestamp },
+      // Previously this only sent {handoffAccepted, handoffAcceptedAt} -- the
+      // actual checklist content was thrown away and never reached the
+      // backend at all. See buildEmsHandoffChecklistSyncPayload's own doc
+      // comment for why handoffAcceptedByStaffId/Name are deliberately
+      // omitted here.
+      checklist: buildEmsHandoffChecklistSyncPayload(currentChecklist, timestamp),
     }).catch((error) => {
       reportEmsHandoffSyncFailure({
         arrivalId,

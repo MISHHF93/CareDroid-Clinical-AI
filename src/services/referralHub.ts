@@ -1,3 +1,5 @@
+import { DEMO_LIVE_STATES, getDemoLiveStateLabel } from '../utils/demoLiveState';
+
 export const REFERRAL_FLOW_STAGES = Object.freeze([
   Object.freeze({ id: 'request', label: 'Request', targetMinutes: 10 }),
   Object.freeze({ id: 'classification', label: 'Classification', targetMinutes: 15 }),
@@ -18,7 +20,39 @@ export const REFERRAL_DEPARTMENTS = Object.freeze([
   'Other',
 ]);
 
-export const DEFAULT_REFERRALS = Object.freeze([
+/**
+ * HEAL referralHub-fixture-honesty: entirely fabricated fixture rows,
+ * completely unrelated to the real, persisted `Referral` entity/
+ * `ReferralService` on the backend (different ID scheme -- `REF-*` here vs
+ * the real `ref-*`/created-referral ids -- and a different data model
+ * entirely). Every ReferralHub method below defaults to this fixture set
+ * when called with no `referrals` argument, which is exactly what 5
+ * consumer services (emergencyOperatingSystemService.ts,
+ * emergencyKpiLayerService.ts, emergencyPatientPathService.ts,
+ * emergencyFlowEngineService.ts, bottleneckRegistry.ts) do today --
+ * `getReferralDashboard()`'s own return value now carries an explicit
+ * `sourceState`/`isFixtureData` flag (see below) so nothing downstream can
+ * mistake this for live operational data. Renamed from `DEFAULT_REFERRALS`
+ * to make that fabricated nature unmistakable at the call site, matching
+ * this codebase's `DEMO_LIVE_STATES` honest-labeling convention
+ * (src/utils/demoLiveState.ts) used elsewhere (e.g.
+ * EmergencyDemoEnvironmentService.getDemoEnvironment()'s own
+ * `sourceState: 'Demo data · No live integration'`).
+ *
+ * Investigated (2026-08-26) whether the 5 consumers above could instead be
+ * wired to real referral data (`store.referrals` / `fetchReferrals()` in
+ * emergencyOsApi.ts): all 5 are pure, synchronous functions embedded deep
+ * inside a much larger fully-synthetic "digital twin" composition tree
+ * (EmergencyDemoEnvironmentService, BoardingIntelligenceEngine,
+ * DoorToDoctorIntelligenceService, EmsOffloadCommandCenterService, etc. --
+ * every sibling call in the same functions is equally hardcoded/demo), none
+ * of which accept live store data today, and 4 of the 5 have zero real
+ * production consumer at all (dead code, confirmed by a full-repo import
+ * sweep). Rewiring would mean refactoring that entire ~20-service tree, not
+ * a same-round fix -- so this fix takes the honest-labeling path instead of
+ * the wiring path.
+ */
+export const DEMO_REFERRAL_FIXTURES = Object.freeze([
   Object.freeze({
     id: 'REF-1001',
     patientLabel: 'ED-1042',
@@ -159,11 +193,11 @@ export const ReferralHub = Object.freeze({
     return REFERRAL_DEPARTMENTS;
   },
 
-  getReferrals(referrals = DEFAULT_REFERRALS) {
+  getReferrals(referrals = DEMO_REFERRAL_FIXTURES) {
     return Object.freeze(sortReferrals(referrals.map(normalizeReferral)));
   },
 
-  getDepartmentQueues(referrals = DEFAULT_REFERRALS) {
+  getDepartmentQueues(referrals = DEMO_REFERRAL_FIXTURES) {
     const normalized = this.getReferrals(referrals);
     return Object.freeze(
       REFERRAL_DEPARTMENTS.map((department) => {
@@ -184,7 +218,7 @@ export const ReferralHub = Object.freeze({
     );
   },
 
-  getReferralMetrics(referrals = DEFAULT_REFERRALS) {
+  getReferralMetrics(referrals = DEMO_REFERRAL_FIXTURES) {
     const normalized = this.getReferrals(referrals);
     const delayed = normalized.filter(isDelayed);
     return Object.freeze({
@@ -199,7 +233,7 @@ export const ReferralHub = Object.freeze({
     });
   },
 
-  getReferralDelays(referrals = DEFAULT_REFERRALS) {
+  getReferralDelays(referrals = DEMO_REFERRAL_FIXTURES) {
     return Object.freeze(
       this.getReferrals(referrals)
         .filter(isDelayed)
@@ -219,7 +253,7 @@ export const ReferralHub = Object.freeze({
     );
   },
 
-  getReferralRecommendations(referrals = DEFAULT_REFERRALS) {
+  getReferralRecommendations(referrals = DEMO_REFERRAL_FIXTURES) {
     return Object.freeze(
       this.getReferralDelays(referrals).map((delay) =>
         Object.freeze({
@@ -235,7 +269,15 @@ export const ReferralHub = Object.freeze({
     );
   },
 
-  getReferralDashboard(referrals = DEFAULT_REFERRALS) {
+  getReferralDashboard(referrals = DEMO_REFERRAL_FIXTURES) {
+    // HEAL referralHub-fixture-honesty: true exactly when the caller passed
+    // no real referrals (the default parameter binds `referrals` to this
+    // exact frozen fixture array reference) -- every one of this method's 5
+    // real call sites today calls it with no argument at all, so this flag
+    // is what lets any current or future downstream consumer detect that
+    // and avoid presenting fabricated referral counts/delays as live data.
+    const isFixtureData = referrals === DEMO_REFERRAL_FIXTURES;
+    const sourceState = isFixtureData ? DEMO_LIVE_STATES.DEMO : DEMO_LIVE_STATES.LIVE;
     return Object.freeze({
       flowStages: this.getFlowStages(),
       departments: this.getDepartments(),
@@ -246,6 +288,12 @@ export const ReferralHub = Object.freeze({
       recommendations: this.getReferralRecommendations(referrals),
       safetyStatement:
         'ReferralHub measures referral work only. Sending, accepting, closing, and external communications remain human-reviewed.',
+      isFixtureData,
+      sourceState,
+      sourceStateLabel: getDemoLiveStateLabel(sourceState),
+      dataSourceNote: isFixtureData
+        ? 'No real referral data was supplied -- these are fabricated demo fixture rows (REF-1001..REF-1008), not live CareDroid referrals.'
+        : 'Derived from real referral records supplied by the caller.',
     });
   },
 });

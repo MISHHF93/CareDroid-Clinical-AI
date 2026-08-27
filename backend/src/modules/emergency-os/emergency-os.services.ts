@@ -594,6 +594,7 @@ const WORKFLOW_LOG_TITLES: Record<WorkflowActionType, string> = {
   capacity_score_changed: 'Capacity score changed',
   boarding_started: 'Boarding started',
   referral_created: 'Referral created',
+  referral_status_changed: 'Referral status changed',
   copilot_used: 'Copilot used',
   provincial_data_viewed: 'Provincial data viewed',
   integration_event_received: 'Integration event received',
@@ -627,6 +628,7 @@ const COLLABORATION_NOTABLE_WORKFLOW_TYPES = new Set<WorkflowActionType>([
   'reassessment_completed',
   'boarding_started',
   'referral_created',
+  'referral_status_changed',
   'patient_escalated',
   'patient_note_added',
   'patient_identity_reconciled',
@@ -1844,6 +1846,7 @@ export class ReferralService implements OnModuleInit {
     @InjectRepository(ReferralEntity)
     private readonly referralRepository?: Repository<ReferralEntity>,
     @Optional() private readonly realtimeService?: EmergencyRealtimeService,
+    @Optional() private readonly workflowLogService?: WorkflowActionLogService,
   ) {}
 
   private readonly createdReferrals: Array<Record<string, unknown>> = [];
@@ -1884,6 +1887,9 @@ export class ReferralService implements OnModuleInit {
       workflow: entity.workflow,
       requestedAt: entity.requestedAt,
       statusUpdatedAt: entity.statusUpdatedAt,
+      lastActionByStaffId: entity.lastActionByStaffId,
+      lastActionByName: entity.lastActionByName,
+      responseNote: entity.responseNote,
       createdAt: entity.requestedAt,
       organizationId: entity.organizationId,
     };
@@ -1904,6 +1910,11 @@ export class ReferralService implements OnModuleInit {
       workflow: String(referral.workflow || ''),
       requestedAt: String(referral.requestedAt || ''),
       statusUpdatedAt: referral.statusUpdatedAt ? String(referral.statusUpdatedAt) : undefined,
+      lastActionByStaffId: referral.lastActionByStaffId
+        ? String(referral.lastActionByStaffId)
+        : undefined,
+      lastActionByName: referral.lastActionByName ? String(referral.lastActionByName) : undefined,
+      responseNote: referral.responseNote ? String(referral.responseNote) : undefined,
       organizationId: referral.organizationId ? String(referral.organizationId) : undefined,
     });
     this.referralRepository.save(entity).catch((error) => {
@@ -2012,14 +2023,40 @@ export class ReferralService implements OnModuleInit {
    * patient-derived rows in getReferrals() aren't real records to mutate.
    * Cross-org access throws the exact same not-found error shape as a
    * genuinely-missing id -- no existence leak, same pattern as
-   * EmergencyPatientService's mutation methods. */
-  updateReferralStatus(referralId: string, status: string, organizationId?: string) {
+   * EmergencyPatientService's mutation methods.
+   *
+   * `actor` is always server-derived from the authenticated session by the
+   * controller (EmergencyOsController.updateTransferStatus), never trusted
+   * from the request body -- same precedent as requestEmergencyTransport/
+   * reconcilePatientIdentity. Before this fix there was no actor parameter
+   * at all: every status change (Accept/Decline/Complete/etc.) left
+   * `requestingStaffId` -- whoever originally CREATED the referral -- as the
+   * only staff identity on the record, so the frontend's audit trail
+   * misattributed every response to the original requester even when a
+   * different receiving-side staff member actually acted.
+   *
+   * `responseNote` is optional and only overwrites the stored note when a
+   * non-empty value is supplied, mirroring the frontend's own
+   * `responseNote || referral.responseNote` merge in emergencyStore.ts --
+   * an Acknowledge with no note must never clobber an earlier Decline
+   * reason. */
+  updateReferralStatus(
+    referralId: string,
+    status: string,
+    organizationId?: string,
+    actor?: { staffId?: string; name?: string },
+    responseNote?: string,
+  ) {
     const referral = this.createdReferrals.find((entry) => entry.id === referralId);
     if (!referral || !this.isReferralVisibleToOrganization(referral, organizationId)) {
       throw new NotFoundException(`Referral ${referralId} not found`);
     }
+    const previousStatus = referral.status;
     referral.status = status;
     referral.statusUpdatedAt = new Date().toISOString();
+    if (actor?.staffId) referral.lastActionByStaffId = actor.staffId;
+    if (actor?.name) referral.lastActionByName = actor.name;
+    if (responseNote) referral.responseNote = responseNote;
     this.persistReferralToDatabase(referral);
     const referralOrganizationId =
       typeof referral.organizationId === 'string' ? referral.organizationId : organizationId;
@@ -2029,9 +2066,31 @@ export class ReferralService implements OnModuleInit {
     );
     this.realtimeService?.publishBoardMutations(referralOrganizationId);
 
+    // Durable, actor+timestamp audit trail entry, matching this session's
+    // established convention (WorkflowActionLogService.record()) -- the
+    // entity columns above only ever hold the LATEST actor; this is the
+    // per-transition trail that survives even if a later status change
+    // overwrites lastActionByStaffId/lastActionByName.
+    const log = this.workflowLogService?.record({
+      type: 'referral_status_changed',
+      title: 'Referral status changed',
+      summary: `${actor?.name || 'A staff member'} changed referral ${referralId} status from ${String(previousStatus || 'Unknown')} to ${status}.`,
+      patientId: typeof referral.patientId === 'string' ? referral.patientId : undefined,
+      actorStaffId: actor?.staffId,
+      actorName: actor?.name,
+      source: 'referral-workflow',
+      metadata: {
+        referralId,
+        previousStatus: String(previousStatus || ''),
+        status,
+        hasResponseNote: Boolean(responseNote),
+      },
+    });
+
     return envelope('Referral Status Updated', {
       referral,
       referrals: this.getReferrals(organizationId).data.referrals,
+      workflowLogId: log?.id,
     });
   }
 }
@@ -2215,6 +2274,13 @@ export class EMSIntakeService implements OnModuleInit {
       reason: entity.reason,
       urgency: entity.urgency,
       location: entity.location,
+      handoffAcceptedByStaffId: entity.handoffAcceptedByStaffId,
+      handoffAcceptedByStaffName: entity.handoffAcceptedByStaffName,
+      handoffIdentityStatus: entity.handoffIdentityStatus,
+      handoffVitalsReceived: entity.handoffVitalsReceived,
+      handoffMedicationsEnRoute: entity.handoffMedicationsEnRoute,
+      handoffCriticalFlags: entity.handoffCriticalFlags,
+      handoffPatientDestination: entity.handoffPatientDestination,
     };
   }
 
@@ -2235,6 +2301,28 @@ export class EMSIntakeService implements OnModuleInit {
       reason: record.reason ? String(record.reason) : undefined,
       urgency: record.urgency ? String(record.urgency) : undefined,
       location: record.location ? String(record.location) : undefined,
+      handoffAcceptedByStaffId: record.handoffAcceptedByStaffId
+        ? String(record.handoffAcceptedByStaffId)
+        : undefined,
+      handoffAcceptedByStaffName: record.handoffAcceptedByStaffName
+        ? String(record.handoffAcceptedByStaffName)
+        : undefined,
+      handoffIdentityStatus: record.handoffIdentityStatus
+        ? String(record.handoffIdentityStatus)
+        : undefined,
+      handoffVitalsReceived:
+        typeof record.handoffVitalsReceived === 'boolean'
+          ? record.handoffVitalsReceived
+          : undefined,
+      handoffMedicationsEnRoute: Array.isArray(record.handoffMedicationsEnRoute)
+        ? (record.handoffMedicationsEnRoute as string[])
+        : undefined,
+      handoffCriticalFlags: Array.isArray(record.handoffCriticalFlags)
+        ? (record.handoffCriticalFlags as unknown[])
+        : undefined,
+      handoffPatientDestination: record.handoffPatientDestination
+        ? String(record.handoffPatientDestination)
+        : undefined,
     });
     this.arrivalStatusRepository.save(entity).catch((error) => {
       this.logger.warn(`Failed to persist EMS arrival status ${arrivalId} to database: ${error}`);
@@ -2507,6 +2595,18 @@ export class EMSIntakeService implements OnModuleInit {
    * Mirrors reception→triage handoff: server-side workflow audit + optional patient note.
    * Local whiteboard status remains the frontend source of truth for unit tracking;
    * this endpoint makes completion survive refresh / multi-workstation use.
+   *
+   * Also persists the actual handoff-acceptance identity and checklist
+   * content onto the durable ems_arrival_status side table (see the entity's
+   * own doc comment) -- before this, EMSPipeline.tsx's "Complete Handoff"
+   * click only ever sent {handoffAccepted, handoffAcceptedAt}, so the
+   * identity/vitals/medications/critical-flags/destination a clinician
+   * actually documented during handoff were thrown away, and there was no
+   * durable record of WHO accepted a real EMS handoff at all. `acceptor` is
+   * always server-derived from the authenticated session
+   * (EmergencyOsController.postEmsHandoff), never trusted from
+   * input/checklist -- matching requestPhysicianTransport's own actor
+   * parameter above.
    */
   completeHandoff(
     input: {
@@ -2519,9 +2619,23 @@ export class EMSIntakeService implements OnModuleInit {
       handoffAcceptedAt?: string;
       handoffStartedAt?: string;
       arrivedAt?: string;
-      checklist?: Record<string, unknown>;
+      checklist?: {
+        identityStatus?: string;
+        vitalsReceived?: boolean;
+        medicationsEnRoute?: string[];
+        criticalFlags?: unknown[];
+        patientDestination?: string;
+        destinationLabel?: string;
+        destinationRoomId?: string;
+        handoffNotes?: string;
+        handoffSummary?: string;
+        complaintSummary?: string;
+        handoffAccepted?: boolean;
+        handoffAcceptedAt?: string;
+      };
       notes?: string;
     },
+    acceptor: { staffId?: string; name?: string } = {},
     organizationId?: string,
   ) {
     const arrivalId = String(input.arrivalId || '').trim();
@@ -2568,6 +2682,19 @@ export class EMSIntakeService implements OnModuleInit {
         arrivedAt: input.arrivedAt,
         handoffStartedAt: input.handoffStartedAt,
         handoffCompletedAt: timestamp,
+        // Server-derived acceptor identity -- never taken from input/checklist
+        // (see this method's own doc comment and EmergencyOsController.
+        // postEmsHandoff, which builds `acceptor` from request.user).
+        handoffAcceptedByStaffId: acceptor.staffId,
+        handoffAcceptedByStaffName: acceptor.name,
+        // The actual checklist content the clinician documented during
+        // handoff -- previously discarded entirely (see this method's own
+        // doc comment above).
+        handoffIdentityStatus: input.checklist?.identityStatus,
+        handoffVitalsReceived: input.checklist?.vitalsReceived,
+        handoffMedicationsEnRoute: input.checklist?.medicationsEnRoute,
+        handoffCriticalFlags: input.checklist?.criticalFlags,
+        handoffPatientDestination: input.checklist?.patientDestination,
       },
       organizationId,
     );
@@ -2591,6 +2718,10 @@ export class EMSIntakeService implements OnModuleInit {
         handoffStartedAt: input.handoffStartedAt || input.arrivedAt || timestamp,
         arrivedAt: input.arrivedAt || null,
         checklistJson: input.checklist ? JSON.stringify(input.checklist) : null,
+        // Queryable acceptor identity, not just free-text actorName in the
+        // log summary above -- see this method's own doc comment.
+        handoffAcceptedByStaffId: acceptor.staffId || null,
+        handoffAcceptedByStaffName: acceptor.name || null,
         notes: input.notes || null,
         status: 'Complete',
       },
@@ -2804,6 +2935,18 @@ function buildInboundEmsRecord(
     requestReason: trackedStatus?.reason as string | undefined,
     requestUrgency: trackedStatus?.urgency as string | undefined,
     requestLocation: trackedStatus?.location as string | undefined,
+    // Durable handoff-acceptance identity + checklist content (see
+    // EMSIntakeService.completeHandoff) -- undefined until a real "Complete
+    // Handoff" has actually persisted, which is what lets this survive a
+    // reload / different workstation instead of living only in the browser
+    // tab that accepted the handoff.
+    handoffAcceptedByStaffId: trackedStatus?.handoffAcceptedByStaffId as string | undefined,
+    handoffAcceptedByStaffName: trackedStatus?.handoffAcceptedByStaffName as string | undefined,
+    handoffIdentityStatus: trackedStatus?.handoffIdentityStatus as string | undefined,
+    handoffVitalsReceived: trackedStatus?.handoffVitalsReceived as boolean | undefined,
+    handoffMedicationsEnRoute: trackedStatus?.handoffMedicationsEnRoute as string[] | undefined,
+    handoffCriticalFlags: trackedStatus?.handoffCriticalFlags as unknown[] | undefined,
+    handoffPatientDestination: trackedStatus?.handoffPatientDestination as string | undefined,
     // Also simulated-only: the identified patient's own name. Every OTHER arrival
     // on this list deliberately omits patient identity (patientId stays undefined
     // above -- see EMSPipeline.tsx's "Add to Whiteboard" gate, a real pre-arrival

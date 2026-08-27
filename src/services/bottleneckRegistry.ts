@@ -137,6 +137,13 @@ export type ExistingServiceBottleneckSignals = {
   referralDashboard?: {
     delays?: readonly Record<string, unknown>[];
     metrics?: Record<string, unknown>;
+    /** True when the referral dashboard this came from
+     * (ReferralHub.getReferralDashboard()) fell back to its fabricated
+     * DEMO_REFERRAL_FIXTURES rows rather than being built from real
+     * referral data. See adaptReferralSignals below -- a real bottleneck
+     * feed must never emit fabricated "Cardiology referral delayed" alerts
+     * sourced from demo fixture data (HEAL referralHub-fixture-honesty). */
+    isFixtureData?: boolean;
   };
 };
 
@@ -963,6 +970,18 @@ function adaptReferralSignals(
   signals: ExistingServiceBottleneckSignals,
   detectedAt: string,
 ): BottleneckEvent[] {
+  // HEAL referralHub-fixture-honesty: ReferralHub.getReferralDashboard()
+  // silently defaults to 8 entirely fabricated demo rows (REF-1001..
+  // REF-1008) whenever no real referral data is supplied -- every caller
+  // that reaches this adapter today does exactly that. A bottleneck feed
+  // is meant to represent a real, actionable operational problem; emitting
+  // "Cardiology referral delayed" alerts sourced from fake data here would
+  // be the single most misleading surface of the 5 known ReferralHub call
+  // sites (this one has real, live-reachable consumers -- aiChiefOrchestrator,
+  // aiChiefContinuousMonitoringService -- unlike the other 4, which are
+  // dead code). Skip entirely rather than fabricate a "bottleneck" that
+  // does not exist.
+  if (signals.referralDashboard?.isFixtureData) return [];
   return (signals.referralDashboard?.delays || []).map((delay) => {
     const id = readString(delay.referralId, readString(delay.id, readString(delay.department, 'referral')));
     const severity = normalizeBottleneckSeverity(delay.priority);

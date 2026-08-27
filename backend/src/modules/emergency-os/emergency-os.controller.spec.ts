@@ -46,6 +46,7 @@ import { ChatService } from '../chat/chat.service';
 describe('EmergencyOsController', () => {
   let controller: EmergencyOsController;
   let patientService: EmergencyPatientService;
+  let emsIntakeService: EMSIntakeService;
   let chatService: { processMessage: jest.Mock };
 
   beforeEach(async () => {
@@ -128,6 +129,7 @@ describe('EmergencyOsController', () => {
 
     controller = moduleRef.get(EmergencyOsController);
     patientService = moduleRef.get(EmergencyPatientService);
+    emsIntakeService = moduleRef.get(EMSIntakeService);
   });
 
   it('returns backend envelopes for all normalized CareDroid modules', async () => {
@@ -850,6 +852,78 @@ describe('EmergencyOsController', () => {
       module: 'EMS Handoff',
       data: { ok: false, error: 'arrivalId is required' },
     });
+  });
+
+  it('EMS handoff acceptance: derives the accepting clinician from req.user, not a client-supplied body field, and persists the actual checklist content', () => {
+    const created = controller.createIntakePatient({
+      mrn: 'ED-EMS-HANDOFF-2',
+      firstName: 'EMS',
+      lastName: 'Acceptor',
+      chiefComplaint: 'EMS pre-arrival: shortness of breath',
+      complaintCategory: 'Respiratory',
+      flags: ['EMSArrival'],
+    });
+    const patientId = created.data.patient.id;
+    const arrivalId = 'ems-arrival-acceptor-test';
+
+    const result = controller.postEmsHandoff(
+      {
+        arrivalId,
+        patientId,
+        // A pre-existing, client-controlled free-text field used only for
+        // workflow-log display attribution -- must NOT become the acceptor
+        // of record.
+        actorName: 'Impostor Nurse',
+        unitId: 'Unit-9',
+        unitName: 'Medic 9',
+        handoffAcceptedAt: '2026-07-16T08:00:00.000Z',
+        checklist: {
+          identityStatus: 'verified',
+          vitalsReceived: true,
+          medicationsEnRoute: ['Aspirin', 'Oxygen'],
+          criticalFlags: [{ id: 'ems-high', label: 'EMS high severity', source: 'ems-severity' }],
+          patientDestination: 'room',
+          // Even if a compromised/careless client tried to smuggle an
+          // acceptor identity directly in the checklist body, the controller
+          // never reads these fields off the body at all -- PostEmsHandoff
+          // ChecklistDto doesn't even declare them (see its own doc comment).
+          handoffAcceptedByStaffId: 'client-injected-staff-id',
+          handoffAcceptedByStaffName: 'Client Injected Name',
+        } as any,
+      },
+      undefined,
+      {
+        user: {
+          id: 'staff-99',
+          email: 'real.doc@hospital.test',
+          profile: { fullName: 'Dr. Real Acceptor' },
+        },
+      } as any,
+    );
+
+    expect(result.data.ok).toBe(true);
+
+    // Read back through the same tracked-status path updateArrivalStatus's
+    // own merged return already uses elsewhere (see ems-arrival-status-
+    // persistence.spec.ts for the repository/DB-survival half of this proof).
+    const readBack = emsIntakeService.updateArrivalStatus(arrivalId, {});
+
+    expect(readBack.data.handoffAcceptedByStaffId).toBe('staff-99');
+    expect(readBack.data.handoffAcceptedByStaffName).toBe('Dr. Real Acceptor');
+    expect(readBack.data.handoffAcceptedByStaffId).not.toBe('client-injected-staff-id');
+    expect(readBack.data.handoffAcceptedByStaffName).not.toBe('Client Injected Name');
+    expect(readBack.data.handoffAcceptedByStaffName).not.toBe('Impostor Nurse');
+
+    // The actual checklist content the clinician documented during
+    // handoff -- previously thrown away entirely (see EMSIntakeService.
+    // completeHandoff's own doc comment).
+    expect(readBack.data.handoffIdentityStatus).toBe('verified');
+    expect(readBack.data.handoffVitalsReceived).toBe(true);
+    expect(readBack.data.handoffMedicationsEnRoute).toEqual(['Aspirin', 'Oxygen']);
+    expect(readBack.data.handoffCriticalFlags).toEqual([
+      { id: 'ems-high', label: 'EMS high severity', source: 'ems-severity' },
+    ]);
+    expect(readBack.data.handoffPatientDestination).toBe('room');
   });
 
   it('filters patient-flow and clinical intelligence harness endpoints by patient id', () => {

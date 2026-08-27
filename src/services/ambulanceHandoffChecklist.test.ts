@@ -5,6 +5,7 @@ import {
   AMBULANCE_HANDOFF_DESTINATION_LABELS,
   buildAmbulanceHandoffChecklistSteps,
   buildAmbulanceHandoffChecklist,
+  buildEmsHandoffChecklistSyncPayload,
   buildPatientPatchFromHandoffChecklist,
   deriveAmbulanceHandoffDestination,
   mergeAmbulanceHandoffChecklistPatch,
@@ -135,6 +136,53 @@ describe('ambulanceHandoffChecklist', () => {
     expect(merged.handoffAccepted).toBe(true);
     expect(merged.handoffAcceptedByStaffName).toBe('Dr. Lee');
     expect(merged.destinationLabel).toBe('Resus 2');
+  });
+
+  it('builds the exact EMS-handoff sync payload from a resolved checklist, omitting the accepting clinician identity (server-derived, never client-sent)', () => {
+    // Regression: EMSPipeline.tsx's "Complete Handoff" click used to send
+    // only {handoffAccepted, handoffAcceptedAt} to POST /ems/handoff -- the
+    // identity/vitals/medications/critical-flags/destination a clinician
+    // actually documented during handoff were thrown away and never reached
+    // the backend at all.
+    const checklist = mergeAmbulanceHandoffChecklistPatch(buildAmbulanceHandoffChecklist(baseArrival), {
+      handoffAccepted: true,
+      handoffAcceptedAt: '2026-06-20T12:00:00.000Z',
+      // Exactly like the local optimistic store update
+      // (emergencyStore.ts's updateAmbulanceHandoffChecklist), the resolved
+      // checklist itself does carry an acceptor identity by this point --
+      // proving the payload builder strips it, not that it was never set.
+      handoffAcceptedByStaffId: 'staff-should-not-be-sent',
+      handoffAcceptedByStaffName: 'Should Not Be Sent',
+    });
+
+    const payload = buildEmsHandoffChecklistSyncPayload(checklist, '2026-06-20T12:00:00.000Z');
+
+    // The real checklist content the clinician documented.
+    expect(payload.identityStatus).toBe(checklist.identityStatus);
+    expect(payload.vitalsReceived).toBe(true);
+    expect(payload.medicationsEnRoute).toEqual(
+      expect.arrayContaining(['Aspirin', 'Nitroglycerin']),
+    );
+    expect(Array.isArray(payload.criticalFlags)).toBe(true);
+    expect((payload.criticalFlags as unknown[]).length).toBeGreaterThan(0);
+    expect(payload.patientDestination).toBe(checklist.patientDestination);
+    expect(payload.handoffAccepted).toBe(true);
+    expect(payload.handoffAcceptedAt).toBe('2026-06-20T12:00:00.000Z');
+
+    // The accepting clinician's identity is never sent from the client --
+    // the backend derives handoffAcceptedByStaffId/Name from the
+    // authenticated session instead (EmergencyOsController.postEmsHandoff's
+    // own doc comment).
+    expect(payload).not.toHaveProperty('handoffAcceptedByStaffId');
+    expect(payload).not.toHaveProperty('handoffAcceptedByStaffName');
+  });
+
+  it('falls back to a minimal {handoffAccepted, handoffAcceptedAt} payload when no checklist has been resolved yet', () => {
+    const payload = buildEmsHandoffChecklistSyncPayload(undefined, '2026-06-20T12:00:00.000Z');
+    expect(payload).toEqual({
+      handoffAccepted: true,
+      handoffAcceptedAt: '2026-06-20T12:00:00.000Z',
+    });
   });
 
   it('does not throw when a staff patch carries a non-string medicationsEnRoute entry', () => {

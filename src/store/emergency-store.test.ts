@@ -345,6 +345,63 @@ describe('CareDroid store shim', () => {
     );
   });
 
+  it('HEAL referral-actor-tracking: updateReferralStatus never attributes a status change to the original requester', () => {
+    const before = useEmergencyStore.getState();
+    const patientId = before.patients[0]?.id;
+    expect(patientId).toBeTruthy();
+
+    // Staff A originally requests the referral...
+    const localReferral = useEmergencyStore.getState().createReferral({
+      patientId,
+      requestingStaffId: 'staff-A-requester',
+      targetDepartment: 'Cardiology',
+      urgency: 'Urgent',
+      reason: 'Chest pain requiring cardiology review',
+      clinicalSummary: 'Actor-tracking regression test.',
+      status: 'Sent',
+    });
+
+    // ...but a different staff member (the current shift's charge nurse) is
+    // the one actually responding. Before this fix, both the local audit
+    // log entry and the referral_status_changed workflow log entry always
+    // used `referral.requestingStaffId` ('staff-A-requester') regardless of
+    // who was really acting.
+    useEmergencyStore.setState((state) => ({
+      activeShift: { ...state.activeShift, chargeStaffId: 'staff-B-responder' },
+    }));
+
+    useEmergencyStore
+      .getState()
+      .updateReferralStatus(localReferral.id, 'Declined', 'No cardiology beds available.');
+
+    const state = useEmergencyStore.getState();
+    const updatedReferral = state.referrals.find((candidate) => candidate.id === localReferral.id);
+    expect(updatedReferral).toMatchObject({
+      status: 'Declined',
+      responseNote: 'No cardiology beds available.',
+      lastActionByStaffId: 'staff-B-responder',
+    });
+    expect(updatedReferral?.lastActionByStaffId).not.toBe('staff-A-requester');
+    // requestingStaffId itself must stay untouched -- it still correctly
+    // records who originally created the referral, just no longer doubles
+    // as "who last acted on it".
+    expect(updatedReferral?.requestingStaffId).toBe('staff-A-requester');
+
+    const latestAuditEntry = state.auditLog.find(
+      (entry) => entry.action === 'updateReferralStatus' && entry.details?.referralId === localReferral.id,
+    );
+    expect(latestAuditEntry?.staffId).toBe('staff-B-responder');
+    expect(latestAuditEntry?.staffId).not.toBe('staff-A-requester');
+
+    const latestWorkflowLog = [...state.workflowLogs]
+      .reverse()
+      .find(
+        (log) => log.type === 'referral_status_changed' && log.metadata?.referralId === localReferral.id,
+      );
+    expect(latestWorkflowLog?.actorStaffId).toBe('staff-B-responder');
+    expect(latestWorkflowLog?.actorStaffId).not.toBe('staff-A-requester');
+  });
+
   it('parses ems_updated as a full EMS-intake envelope, not a phantom single arrival built from envelope fields', () => {
     const store = useEmergencyStore.getState();
     const before = store.emsArrivals.length;

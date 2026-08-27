@@ -67,6 +67,48 @@ export class EmsArrivalStatus {
   @Column({ type: 'varchar', length: 300, nullable: true })
   location?: string;
 
+  /**
+   * The RECEIVING clinician who accepted a REAL EMS handoff (EMSIntakeService.
+   * completeHandoff) -- distinct from requestedByStaffId/Name above, which is
+   * the requesting/EMS-side identity for a physician-initiated SIMULATED
+   * transport. Always server-derived from the authenticated session on the
+   * "Complete Handoff" endpoint (see EmergencyOsController.postEmsHandoff),
+   * never trusted from the client body, matching this session's
+   * requestPhysicianTransport/reconcilePatientIdentity precedent.
+   */
+  @Column({ type: 'varchar', length: 96, nullable: true })
+  handoffAcceptedByStaffId?: string;
+
+  /** Accepting clinician's display name, for the audit trail and ED-facing badge. */
+  @Column({ type: 'varchar', length: 160, nullable: true })
+  handoffAcceptedByStaffName?: string;
+
+  /**
+   * Structured ambulance handoff checklist content the receiving clinician
+   * actually documented during handoff -- mirrors AmbulanceHandoffChecklist's
+   * field names (src/services/ambulanceHandoffChecklist.ts) exactly so no
+   * translation layer is needed between the client type and this column set.
+   * Before these columns existed, EMSPipeline.tsx's "Complete Handoff" only
+   * ever sent a stripped {handoffAccepted, handoffAcceptedAt} payload -- the
+   * identity/vitals/medications/critical-flags/destination fields the
+   * clinician actually filled in were thrown away, never reaching the
+   * backend at all (see EMSIntakeService.completeHandoff's own doc comment).
+   */
+  @Column({ type: 'varchar', length: 24, nullable: true })
+  handoffIdentityStatus?: string;
+
+  @Column({ type: 'boolean', nullable: true })
+  handoffVitalsReceived?: boolean;
+
+  @Column({ type: 'simple-json', nullable: true })
+  handoffMedicationsEnRoute?: string[];
+
+  @Column({ type: 'simple-json', nullable: true })
+  handoffCriticalFlags?: unknown[];
+
+  @Column({ type: 'varchar', length: 24, nullable: true })
+  handoffPatientDestination?: string;
+
   @CreateDateColumn()
   createdAt: Date;
 

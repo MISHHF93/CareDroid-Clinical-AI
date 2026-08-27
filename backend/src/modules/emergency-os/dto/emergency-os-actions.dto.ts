@@ -134,6 +134,34 @@ export class ApplyOcrJobToIntakeDto {
 // caller's sent fields were checked field-by-field against the shape
 // below; 2 real mismatches were found and are called out per-field.
 
+/**
+ * Structured ambulance handoff checklist content -- mirrors
+ * AmbulanceHandoffChecklist's own field names (src/services/
+ * ambulanceHandoffChecklist.ts) exactly. Deliberately has NO
+ * handoffAcceptedByStaffId/handoffAcceptedByStaffName fields even though the
+ * client-side AmbulanceHandoffChecklist type carries them -- the accepting
+ * clinician's identity is always derived server-side from the authenticated
+ * session (EmergencyOsController.postEmsHandoff), never trusted from the
+ * client, matching ReconcilePatientIdentityDto/RequestEmergencyTransportDto's
+ * own doc comments above.
+ */
+export class PostEmsHandoffChecklistDto {
+  @IsOptional() @IsIn(['unknown', 'provisional', 'verified', 'mismatch']) identityStatus?: string;
+  @IsOptional() @IsBoolean() vitalsReceived?: boolean;
+  @IsOptional() @IsArray() @IsString({ each: true }) medicationsEnRoute?: string[];
+  @IsOptional() @IsArray() criticalFlags?: unknown[];
+  @IsOptional()
+  @IsIn(['pending', 'waiting', 'room', 'monitored-chair', 'hallway', 'offload-area'])
+  patientDestination?: string;
+  @IsOptional() @IsString() @MaxLength(300) destinationLabel?: string;
+  @IsOptional() @IsString() @MaxLength(120) destinationRoomId?: string;
+  @IsOptional() @IsString() @MaxLength(2000) handoffNotes?: string;
+  @IsOptional() @IsString() @MaxLength(2000) handoffSummary?: string;
+  @IsOptional() @IsString() @MaxLength(2000) complaintSummary?: string;
+  @IsOptional() @IsBoolean() handoffAccepted?: boolean;
+  @IsOptional() @IsString() handoffAcceptedAt?: string;
+}
+
 export class PostEmsHandoffDto {
   @IsOptional() @IsString() @MaxLength(96) arrivalId?: string;
   @IsOptional() @IsString() @MaxLength(96) patientId?: string;
@@ -144,7 +172,10 @@ export class PostEmsHandoffDto {
   @IsOptional() @IsString() handoffAcceptedAt?: string;
   @IsOptional() @IsString() handoffStartedAt?: string;
   @IsOptional() @IsString() arrivedAt?: string;
-  @IsOptional() @IsObject() checklist?: Record<string, unknown>;
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => PostEmsHandoffChecklistDto)
+  checklist?: PostEmsHandoffChecklistDto;
   @IsOptional() @IsString() @MaxLength(2000) notes?: string;
 }
 
@@ -359,9 +390,19 @@ export class CreateReferralDto {
  * route anywhere in emergency-os.controller.ts). The frontend already
  * degrades gracefully on failure ("Transfer updated for this shift, live
  * sync is pending"), so this wasn't crashing anything -- just silently never
- * actually syncing. */
+ * actually syncing.
+ *
+ * Deliberately has no actor/actorStaffId/actorName field -- the acting
+ * staff member's identity is always derived server-side from the
+ * authenticated session (request.user), never trusted from the client,
+ * matching RequestEmergencyTransportDto/ReconcilePatientIdentityDto above.
+ * `responseNote` mirrors ReferralPanel.tsx's real caller: the decline/
+ * response-note text captured in its `needsResponseNote` field, previously
+ * captured client-side and silently discarded before this fix (see
+ * ReferralService.updateReferralStatus's own doc comment). */
 export class UpdateReferralStatusDto {
   @IsDefined() @IsString() @MaxLength(40) status!: string;
+  @IsOptional() @IsString() @MaxLength(2000) responseNote?: string;
 }
 
 /** No live frontend caller exists for this route today (confirmed by

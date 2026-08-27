@@ -483,6 +483,48 @@ export function mergeAmbulanceHandoffChecklistPatch(
   return next;
 }
 
+/**
+ * Trims a resolved AmbulanceHandoffChecklist down to the exact fields
+ * `POST /ems/handoff`'s checklist body accepts (PostEmsHandoffChecklistDto,
+ * backend/src/modules/emergency-os/dto/emergency-os-actions.dto.ts) -- the
+ * shape EMSPipeline.tsx's "Complete Handoff" click sends. Deliberately omits
+ * handoffAcceptedByStaffId/handoffAcceptedByStaffName even though
+ * AmbulanceHandoffChecklist carries them: the accepting clinician's
+ * identity is always derived server-side from the authenticated session,
+ * never sent from the client (see EmergencyOsController.postEmsHandoff's
+ * own doc comment). Also omits arrivalId/patientId/vitalsSnapshot/updatedAt
+ * -- those are already sent as top-level PostEmsHandoffDto fields
+ * (arrivalId/patientId) or aren't part of the backend's structured columns
+ * at all (vitalsSnapshot/updatedAt).
+ *
+ * Before this existed, "Complete Handoff" only ever sent a stripped
+ * `{handoffAccepted, handoffAcceptedAt}` payload -- the identity/vitals/
+ * medications/critical-flags/destination a clinician actually documented
+ * during handoff were thrown away and never reached the backend at all.
+ */
+export function buildEmsHandoffChecklistSyncPayload(
+  checklist: AmbulanceHandoffChecklist | undefined | null,
+  timestamp: ISODateString,
+): Record<string, unknown> {
+  if (!checklist) {
+    return { handoffAccepted: true, handoffAcceptedAt: timestamp };
+  }
+  return {
+    identityStatus: checklist.identityStatus,
+    vitalsReceived: checklist.vitalsReceived,
+    medicationsEnRoute: checklist.medicationsEnRoute,
+    criticalFlags: checklist.criticalFlags,
+    patientDestination: checklist.patientDestination,
+    destinationLabel: checklist.destinationLabel,
+    destinationRoomId: checklist.destinationRoomId,
+    handoffNotes: checklist.handoffNotes,
+    handoffSummary: checklist.handoffSummary,
+    complaintSummary: checklist.complaintSummary,
+    handoffAccepted: true,
+    handoffAcceptedAt: timestamp,
+  };
+}
+
 export function formatAmbulanceHandoffDestination(
   checklist: Pick<AmbulanceHandoffChecklist, 'patientDestination' | 'destinationLabel'>,
 ): string {

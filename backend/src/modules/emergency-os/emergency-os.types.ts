@@ -57,6 +57,7 @@ export type WorkflowActionType =
   | 'capacity_score_changed'
   | 'boarding_started'
   | 'referral_created'
+  | 'referral_status_changed'
   | 'copilot_used'
   | 'provincial_data_viewed'
   | 'integration_event_received'

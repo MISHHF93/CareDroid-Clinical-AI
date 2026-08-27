@@ -33,13 +33,23 @@ export function fetchEmergencyReferralHistory(patientId) {
   );
 }
 
-export function updateEmergencyTransferWorkflow(referralId, status) {
+export function updateEmergencyTransferWorkflow(referralId, status, responseNote?: string) {
+  // HEAL referral-actor-tracking: ReferralPanel.tsx already captures a
+  // decline/response-note reason in its response-note field and passes it
+  // to this function, but it was silently discarded here -- only `{status}`
+  // ever reached the backend, so the reason never survived a reload or
+  // reached a different workstation. The acting staff member's identity is
+  // deliberately NOT sent here -- the backend derives it server-side from
+  // the authenticated session (see UpdateReferralStatusDto's own doc
+  // comment), never trusted from the client body.
+  const body: Record<string, unknown> = { status };
+  if (responseNote) body.responseNote = responseNote;
   return guardedJson(
     'emergencyTransferWorkflow',
     `/api/emergency/transfers/${encodeURIComponent(referralId)}/status`,
     {
       method: 'PATCH',
-      body: JSON.stringify({ status }),
+      body: JSON.stringify(body),
     }
   );
 }

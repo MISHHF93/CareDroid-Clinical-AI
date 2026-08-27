@@ -5585,6 +5585,21 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
       set((state) => {
         const now = new Date().toISOString();
         const referral = state.referrals.find((candidate) => candidate.id === referralId);
+        // HEAL referral-actor-tracking: this previously fell back to
+        // `referral.requestingStaffId` below -- whoever originally CREATED
+        // the referral -- which misattributed every status change (Accept/
+        // Decline/Complete/etc.) to the original requester even when a
+        // completely different receiving-side staff member is the one
+        // actually acting. There is no real per-user login identity flowing
+        // into this store (updateReferralStatus is a Zustand action, not a
+        // component, so it has no useUser() access), so this uses the same
+        // "current acting staff" fallback chain this exact file already
+        // uses elsewhere for the same problem (see saveClinicalScore's
+        // `state.activeShift.chargeStaffId || state.staff[0]?.id`, and
+        // requestAdditionalStaff's `state.activeShift.chargeStaffId`) rather
+        // than inventing a new one.
+        const actorStaffId = state.activeShift.chargeStaffId || state.staff[0]?.id || 'system';
+        const actorName = state.staff.find((member) => member.id === actorStaffId)?.name;
         const referrals = state.referrals.map((referral) =>
           referral.id === referralId
             ? {
@@ -5592,6 +5607,8 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
                 status,
                 responseNote: responseNote || referral.responseNote,
                 respondedAt: status === 'Sent' || status === 'Draft' ? referral.respondedAt : now,
+                lastActionByStaffId: actorStaffId,
+                lastActionByName: actorName,
               }
             : referral,
         );
@@ -5605,7 +5622,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
               ? {
                   action: 'updateReferralStatus',
                   patientId: referral.patientId,
-                  staffId: referral.requestingStaffId || 'system',
+                  staffId: actorStaffId,
                   details: { referralId, status, hasResponseNote: Boolean(responseNote) },
                 }
               : null,
@@ -5617,7 +5634,8 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
                   title: 'Referral status changed',
                   summary: `${referral.targetDepartment} referral moved to ${status}.`,
                   patientId: referral.patientId,
-                  actorStaffId: referral.requestingStaffId,
+                  actorStaffId,
+                  actorName,
                   source: 'referral-workflow',
                   metadata: {
                     referralId,
