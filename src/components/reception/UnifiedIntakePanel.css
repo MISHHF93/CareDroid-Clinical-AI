@@ -92,11 +92,16 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  min-height: 40px;
+  /* !important: visual-consistency.css's button[class*='action'] wide-net
+     rule (matched via the .unified-intake-actionbar/.reception-command-
+     actionbar ancestor's own class containing "action") forces
+     min-height:44px and font-weight:650, visibly lighter/taller than
+     designed. */
+  min-height: 40px !important;
   padding: 0 14px;
   border-radius: var(--cdl-radius-md, 8px);
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 800 !important;
   cursor: pointer;
 }
 

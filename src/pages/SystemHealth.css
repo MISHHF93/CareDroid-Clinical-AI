@@ -44,8 +44,12 @@
 }
 
 .system-health-hero h1 {
-  font-size: clamp(1.8rem, 5vw, 3.1rem);
-  line-height: 1.05;
+  /* !important: visual-consistency.css's [class$='-hero'] wide-net rule
+     forces this h1 to var(--app-type-title) (clamps to ~1.85rem max)
+     at higher specificity, shrinking the intended marquee-style hero
+     heading to roughly ordinary-page-title size. */
+  font-size: clamp(1.8rem, 5vw, 3.1rem) !important;
+  line-height: 1.05 !important;
 }
 
 .system-health-hero p,

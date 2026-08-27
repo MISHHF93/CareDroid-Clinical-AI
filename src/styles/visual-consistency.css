@@ -181,7 +181,9 @@
     [class*='-notice '],
     [class$='-state'],
     [class*='-state ']
-  ):not(.empty-state) {
+  ):not(.empty-state):not(.tool-loading-state):not(.tool-empty-state):not(.tool-card-notice):not(
+      .state-source-notice
+    ) {
   min-width: 0;
   border-color: var(--cdl-clinical-border, var(--app-border));
   border-radius: var(--cdl-clinical-radius, var(--app-visual-panel-radius));
@@ -222,7 +224,9 @@
     [class*='-notice '],
     [class$='-state'],
     [class*='-state ']
-  ):not(.card):not(.cd-metric-card):not(.cd-insight-card):not(.cd-status-widget):not(.empty-state) {
+  ):not(.card):not(.cd-metric-card):not(.cd-insight-card):not(.cd-status-widget):not(.empty-state):not(
+      .tool-loading-state
+    ):not(.tool-empty-state):not(.tool-card-notice):not(.state-source-notice) {
   padding: var(--app-visual-card-padding);
 }
 
