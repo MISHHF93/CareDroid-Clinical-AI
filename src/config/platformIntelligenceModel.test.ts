@@ -4,9 +4,11 @@ import {
   PLATFORM_INTELLIGENCE_MODULES,
   TECHNICAL_DEBT_REGISTRY,
   UNIFIED_ARTIFACT_ENTITY_TYPES,
+  assessDataLineage,
   auditPlatformIntelligence,
   buildPlatformIntelligenceAssessment,
 } from './platformIntelligenceModel';
+import { buildDataLineageExplorer } from '../data/dataLineageExplorer';
 
 describe('platformIntelligenceModel', () => {
   it('registers all 20 prompts (117–136)', () => {
@@ -37,6 +39,22 @@ describe('platformIntelligenceModel', () => {
     const convergence = assessment.modules.find((m) => m.id === 'platform_convergence');
     if (!convergence) throw new Error('expected platform_convergence module');
     expect(convergence.assessment.artifacts.correctiveActions.length).toBeGreaterThan(0);
+  });
+
+  it('derives the data-lineage module from the real /data-lineage explorer, not a stale sample list', () => {
+    // Was a hardcoded 3-item sample list whose ids ('qsofa-calculator-trace',
+    // 'simulation-debrief-trace') no longer matched the real page's flows
+    // (renamed to 'news2-calculator-trace'/'simulation-protocol-trace') --
+    // now reads the same builder DataLineageExplorer.tsx renders from.
+    const explorer = buildDataLineageExplorer();
+    const module = assessDataLineage();
+    const flowsKpi = module.kpis.find((k) => k.id === 'lineage-flows');
+    const stagesKpi = module.kpis.find((k) => k.id === 'stage-coverage');
+    expect(flowsKpi.value).toBe(explorer.flows.length);
+    expect(stagesKpi.value).toBe(explorer.stages.length);
+    expect(module.artifacts.sampleFlows.map((f) => f.id)).toEqual(
+      explorer.flows.map((f) => f.id),
+    );
   });
 
   it('produces audit artifact for prompts 117–136', () => {

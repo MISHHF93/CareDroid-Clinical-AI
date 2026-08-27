@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-08-27T18:06:42.669Z",
+  "generatedAt": "2026-08-27T18:30:53.646Z",
   "goal": "CareDroid platform scorecard across intelligence, enterprise readiness, customer success, maturity, and production readiness",
-  "overallScore": 86,
+  "overallScore": 87,
   "overallStatus": "excellent",
   "sections": [
     {
       "id": "platform-intelligence",
       "label": "Platform Intelligence",
-      "score": 88,
+      "score": 89,
       "status": "ready",
       "weight": 35,
       "source": "auditPlatformIntelligence"
@@ -46,7 +46,7 @@
     }
   ],
   "summary": {
-    "platformScore": 88,
+    "platformScore": 89,
     "enterpriseScore": 87,
     "customerScore": 97,
     "customerFeatureUtilizationRate": 100,
@@ -86,20 +86,20 @@
         "kpisTotal": 2
       },
       {
-        "id": "data_lineage",
-        "prompt": 121,
-        "label": "Data lineage platform",
-        "score": 76,
-        "status": "developing",
-        "kpisPassed": 1,
-        "kpisTotal": 2
-      },
-      {
         "id": "cross_domain_analytics",
         "prompt": 124,
         "label": "Cross-domain analytics",
         "score": 78,
         "status": "developing",
+        "kpisPassed": 2,
+        "kpisTotal": 2
+      },
+      {
+        "id": "platform_observability",
+        "prompt": 134,
+        "label": "Platform observability center",
+        "score": 84,
+        "status": "ready",
         "kpisPassed": 2,
         "kpisTotal": 2
       }
@@ -224,16 +224,6 @@
       "source": "enterpriseOperatingPlatformModel"
     },
     {
-      "id": "platform:data_lineage",
-      "area": "platform-intelligence",
-      "label": "Data lineage platform",
-      "score": 76,
-      "target": 80,
-      "gap": 4,
-      "impact": 1,
-      "source": "platformIntelligenceModel"
-    },
-    {
       "id": "enterprise:portfolio_management",
       "area": "enterprise-operating-platform",
       "label": "Portfolio management",
@@ -304,7 +294,7 @@
         "artifact_relationship_mapping": 100,
         "enterprise_metadata": 88,
         "data_catalog": 100,
-        "data_lineage": 76,
+        "data_lineage": 88,
         "kpi_intelligence": 88,
         "operational_intelligence_graph": 100,
         "cross_domain_analytics": 78,

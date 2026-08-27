@@ -4,6 +4,7 @@
  */
 
 import { BACKEND_HTTP_ROUTES } from '../data/backendHttpRouteInventory';
+import { buildDataLineageExplorer } from '../data/dataLineageExplorer';
 import { auditIntegrationDiscovery } from './integrationStatusRegistry';
 import { auditProductionReadiness } from './productionReadinessModel';
 import { buildCustomerSuccessPlatformAssessment } from './customerSuccessPlatformModel';
@@ -184,13 +185,16 @@ export function assessDataCatalog() {
 }
 
 export function assessDataLineage() {
-  const sampleFlows = Object.freeze([
-    Object.freeze({ id: 'guideline-rag-trace', title: 'Guideline RAG Evidence Answer', category: 'AI extension' }),
-    Object.freeze({ id: 'qsofa-calculator-trace', title: 'qSOFA Calculator Result', category: 'Clinical calculator' }),
-    Object.freeze({ id: 'simulation-debrief-trace', title: 'Simulation Debrief Coaching', category: 'Simulation' }),
-  ]);
-  const flowCount = sampleFlows.length;
-  const stageCoverage = 5;
+  // Was a hardcoded 3-item sample list that had drifted out of sync with
+  // the real /data-lineage page (its ids -- 'qsofa-calculator-trace',
+  // 'simulation-debrief-trace' -- didn't even match the current real flow
+  // ids in data/dataLineageExplorer.ts, which had been renamed to
+  // 'news2-calculator-trace'/'simulation-protocol-trace'). Reads the same
+  // builder DataLineageExplorer.tsx renders from, so this tracks the real
+  // page instead of a stale duplicate.
+  const explorer = buildDataLineageExplorer();
+  const flowCount = explorer.flows.length;
+  const stageCoverage = explorer.stages.length;
   const score = clampScore(Math.min(100, flowCount * 12 + stageCoverage * 8));
 
   return moduleResult(
@@ -203,8 +207,12 @@ export function assessDataLineage() {
     ],
     {
       flowCount,
-      stages: ['input', 'ai', 'tool', 'backend', 'output'],
-      sampleFlows,
+      stages: explorer.stages.map((stage) => stage.stage),
+      sampleFlows: explorer.flows.map((flow) => ({
+        id: flow.id,
+        title: flow.title,
+        category: flow.category,
+      })),
       route: '/data-lineage',
     },
   );
