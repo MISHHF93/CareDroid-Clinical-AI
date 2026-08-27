@@ -52,6 +52,10 @@ import type {
   WorkflowActionType,
 } from './emergency-os.types';
 import { ensurePatientArrivalBlock } from './patient-arrival.sync';
+// PatientFlag.IdentityPending -- reconcilePatientIdentity's precondition
+// check, same source of truth administrative-automation-orchestration.lib.ts's
+// hasFlag() already imports this enum from.
+import { PatientFlag } from '../../../../src/types/emergency';
 import {
   DUPLICATE_HIGH_CONFIDENCE_THRESHOLD,
   DUPLICATE_MANUAL_REVIEW_THRESHOLD,
@@ -600,6 +604,7 @@ const WORKFLOW_LOG_TITLES: Record<WorkflowActionType, string> = {
   operational_alert_dispatched: 'Operational alert dispatched',
   patient_escalated: 'Patient escalated',
   patient_duplicate_flagged: 'Duplicate patient flagged',
+  patient_identity_reconciled: 'Patient identity reconciled',
   care_task_transitioned: 'Care task updated',
 };
 
@@ -624,6 +629,7 @@ const COLLABORATION_NOTABLE_WORKFLOW_TYPES = new Set<WorkflowActionType>([
   'referral_created',
   'patient_escalated',
   'patient_note_added',
+  'patient_identity_reconciled',
 ]);
 
 @Injectable()
@@ -1223,6 +1229,165 @@ export class EmergencyPatientService implements OnModuleInit {
     return updated;
   }
 
+  /**
+   * Confirms a provisional identity ("Unknown Patient" / "Temporary Patient" /
+   * "Identity Pending" -- see the frontend's src/services/
+   * provisionalIdentityIntake.ts) once it becomes known: family arrives, ID
+   * is found, or the patient regains consciousness. This is the LIVE
+   * TypeORM path's equivalent of the off-by-default Mongoose/MPI path's
+   * SmartIntakeService.reconcileUnknown() (backend/src/services/smart-intake
+   * .service.ts, gated behind ENABLE_MONGOOSE_EMERGENCY_OS) -- no code
+   * ported directly (this path's EmergencyPatient has a different shape),
+   * but the same design: require the pending flag as a precondition, clear
+   * it, and write a durable, actor-attributed audit entry that PRESERVES the
+   * old provisional identity (patient note + workflow-log metadata) rather
+   * than silently discarding it.
+   *
+   * Deliberately requires the confirmed identity to be supplied explicitly
+   * by a human caller (the controller's DTO has no optional/inferred path
+   * here) -- this never auto-merges or infers identity via matching/
+   * fuzzy-similarity of any kind, unlike e.g. findPatientDuplicateCandidates
+   * elsewhere in this file, which only ever surfaces candidates for a human
+   * to review, never auto-applies one.
+   *
+   * PatchEmergencyPatientDto's own doc comment already calls out that a
+   * generic patch "deliberately does not accept demographics, MRN, or other
+   * identity fields -- those go through dedicated verification-aware flows,
+   * not a generic patch." This is that flow.
+   */
+  reconcilePatientIdentity(
+    patientId: string,
+    confirmedIdentity: {
+      firstName: string;
+      lastName: string;
+      dob: string;
+      sex: EmergencyPatient['sex'];
+      mrn?: string;
+      autoGenerateMrn?: boolean;
+    },
+    actor: { staffId: string; name?: string },
+    organizationId?: string,
+  ): EmergencyPatient {
+    const current = this.getPatient(patientId, organizationId);
+    if (!current) {
+      throw new NotFoundException(`Emergency patient ${patientId} not found`);
+    }
+    if (!current.flags.includes(PatientFlag.IdentityPending)) {
+      throw new ConflictException(
+        `Patient ${patientId} has no pending identity to reconcile -- this endpoint resolves a ` +
+          'provisional identity (PatientFlag.IdentityPending) and is not a general demographics ' +
+          'edit. Use PATCH /emergency/patients/:patientId for a routine field update instead.',
+      );
+    }
+
+    const timestamp = new Date().toISOString();
+    const previousFirstName = current.firstName;
+    const previousLastName = current.lastName;
+    const previousMrn = current.mrn;
+    const previousDob = current.dob;
+
+    // MRN-collision-safety: reuses the same generateCollisionSafeMrn()
+    // createPatient() now uses (bounded-retry against the in-memory board
+    // rather than a plain random 6-digit stamp) -- not a second, divergent
+    // generator.
+    const autoGenerateMrn = confirmedIdentity.autoGenerateMrn || !confirmedIdentity.mrn;
+    const confirmedMrn = autoGenerateMrn
+      ? this.generateCollisionSafeMrn(organizationId)
+      : (confirmedIdentity.mrn as string);
+
+    // Provenance (constraint: never silently discard the old provisional
+    // identity) -- written directly onto the patient's own chart, not just
+    // the workflow log, so it's visible to anyone opening this chart later.
+    const provenanceNote = {
+      id: createId('note'),
+      text:
+        `Identity reconciled by ${actor.name || actor.staffId}: previously registered as ` +
+        `"${previousFirstName} ${previousLastName}" (MRN ${previousMrn}). Confirmed identity: ` +
+        `"${confirmedIdentity.firstName} ${confirmedIdentity.lastName}" (MRN ${confirmedMrn}).`,
+      authorId: actor.staffId,
+      timestamp,
+    };
+
+    const updated = this.updatePatient(
+      patientId,
+      {
+        firstName: confirmedIdentity.firstName,
+        lastName: confirmedIdentity.lastName,
+        dob: confirmedIdentity.dob,
+        sex: confirmedIdentity.sex,
+        mrn: confirmedMrn,
+        flags: current.flags.filter((flag) => flag !== PatientFlag.IdentityPending),
+        notes: [...(current.notes || []), provenanceNote],
+      },
+      organizationId,
+    );
+
+    this.workflowLogService.record({
+      type: 'patient_identity_reconciled',
+      title: 'Patient identity reconciled',
+      summary:
+        `${actor.name || 'A staff member'} reconciled a provisional identity: previously ` +
+        `"${previousFirstName} ${previousLastName}" (MRN ${previousMrn}), now confirmed as ` +
+        `"${confirmedIdentity.firstName} ${confirmedIdentity.lastName}" (MRN ${confirmedMrn}).`,
+      timestamp,
+      patientId,
+      actorStaffId: actor.staffId,
+      actorName: actor.name,
+      source: 'identity-reconciliation',
+      severity: 'Info',
+      metadata: {
+        previousFirstName,
+        previousLastName,
+        previousMrn,
+        previousDob: previousDob || '',
+        confirmedFirstName: confirmedIdentity.firstName,
+        confirmedLastName: confirmedIdentity.lastName,
+        confirmedMrn,
+        confirmedDob: confirmedIdentity.dob,
+        autoGeneratedMrn: autoGenerateMrn,
+      },
+    });
+
+    return updated;
+  }
+
+  /**
+   * True when `mrn` is already in use by another patient in the same
+   * uniqueness scope as the DB-level partial unique indexes added in
+   * migration 1772704400000-AddPatientsMrnUniqueIndex: unique within an
+   * organization, or unique among the null-organization (legacy/unscoped)
+   * bucket -- never across two different organizations, since two hospitals
+   * legitimately reusing the same random MRN scheme is not a real collision.
+   */
+  private isMrnTaken(mrn: string, organizationId?: string): boolean {
+    const scope = organizationId || null;
+    return this.patients.some(
+      (patient) => patient.mrn === mrn && (patient.organizationId || null) === scope,
+    );
+  }
+
+  /**
+   * MRN was auto-generated as a random 6-digit number with zero collision
+   * checking -- nothing stopped two different patients (in the same org
+   * scope) from ending up with the same MRN. Bounded retry against the
+   * in-memory board (the actual source of truth for reads -- see
+   * persistPatientToDatabase's comment) rather than a distributed-systems
+   * -grade allocator: with ~900,000 possible 6-digit values, a same-scope
+   * collision on the first attempt is already rare, so a handful of retries
+   * is enough to make it a non-event instead of a silent corruption.
+   */
+  private generateCollisionSafeMrn(organizationId?: string): string {
+    const MAX_ATTEMPTS = 5;
+    for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt += 1) {
+      const candidate = `ED-${Math.floor(100000 + Math.random() * 900000)}`;
+      if (!this.isMrnTaken(candidate, organizationId)) return candidate;
+    }
+    // Exhausted every attempt (astronomically unlikely) -- fall back to a
+    // value that structurally cannot collide rather than giving up and
+    // silently reusing a taken MRN.
+    return `ED-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+  }
+
   createPatient(input: Partial<EmergencyPatient>, organizationId?: string): EmergencyPatient {
     // Idempotency guard: real frontend callers (receptionIntakeOrchestrator.ts,
     // QuickIntake.tsx, emergencyStore.ts's fire-and-forget backend sync) send the
@@ -1249,6 +1414,7 @@ export class EmergencyPatientService implements OnModuleInit {
     const normalized = ensurePatientArrivalBlock(input);
     const state = normalized.state || 'Triage';
     const priority = normalized.priority || 'P3';
+    const resolvedOrganizationId = organizationId ?? normalized.organizationId;
     const patient: EmergencyPatient = {
       // Spread every field the caller sent (normalized already carries the
       // full input through via its own spread in syncPatientFromArrival) so
@@ -1262,8 +1428,8 @@ export class EmergencyPatientService implements OnModuleInit {
       // Server-resolved tenant context always wins over anything present on
       // `input` -- matches the "never let a client-suppliable field override
       // the authoritative server value" precedent (HEAL-325/327/328/329/333).
-      organizationId: organizationId ?? normalized.organizationId,
-      mrn: normalized.mrn || `ED-${Math.floor(100000 + Math.random() * 900000)}`,
+      organizationId: resolvedOrganizationId,
+      mrn: normalized.mrn || this.generateCollisionSafeMrn(resolvedOrganizationId),
       firstName: normalized.firstName || 'Unknown',
       lastName: normalized.lastName || 'Patient',
       dob: normalized.dob || now.slice(0, 10),

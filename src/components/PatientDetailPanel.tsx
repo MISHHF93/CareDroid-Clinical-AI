@@ -27,7 +27,10 @@ import { dispatchAlert } from '../engine/alertEngine';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
 import { MaturityChip } from '../pages/emergency/emergencyRouteShared';
-import { requestEmergencyTransport as requestEmergencyTransportApi } from '../services/emergencyOsApi';
+import {
+  reconcilePatientIdentity as reconcilePatientIdentityApi,
+  requestEmergencyTransport as requestEmergencyTransportApi,
+} from '../services/emergencyOsApi';
 import { EMPTY_STATE_COPY } from '../config/emptyStateCopy';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import { usePhiViewAudit } from '../hooks/usePhiAccess';
@@ -131,6 +134,26 @@ type TransportRequestResult = {
   requestedByName: string | null;
   requestedAt: string;
   disclaimer: string;
+};
+
+const emptyIdentityReconcileForm = {
+  firstName: '',
+  lastName: '',
+  dob: '',
+  sex: 'Other' as 'M' | 'F' | 'Other',
+  mrn: '',
+};
+
+type IdentityReconcileForm = typeof emptyIdentityReconcileForm;
+
+/** Result of a submitted "Resolve Patient Identity" action -- see submitIdentityReconcile below. */
+type IdentityReconcileResult = {
+  previousFirstName: string;
+  previousLastName: string;
+  previousMrn: string;
+  firstName: string;
+  lastName: string;
+  mrn: string;
 };
 type VitalsHistoryView = 'chart' | 'table';
 type VitalsLineKey = 'hr' | 'spo2' | 'sbp' | 'temp';
@@ -637,6 +660,7 @@ export default function PatientDetailPanel() {
   const removeFlag = useEmergencyStore((state) => state.removeFlag);
   const addVitals = useEmergencyStore((state) => state.addVitals);
   const addNote = useEmergencyStore((state) => state.addNote);
+  const updatePatient = useEmergencyStore((state) => state.updatePatient);
   const workflowLogs = useEmergencyStore((state) => state.workflowLogs);
   const recordWorkflowAction = useEmergencyStore((state) => state.recordWorkflowAction);
   const recordWaitingRoomCommunication = useEmergencyStore(
@@ -663,6 +687,14 @@ export default function PatientDetailPanel() {
   const [transportRequestError, setTransportRequestError] = useState('');
   const [transportRequestResult, setTransportRequestResult] =
     useState<TransportRequestResult | null>(null);
+  const [showIdentityReconcileForm, setShowIdentityReconcileForm] = useState(false);
+  const [identityReconcileForm, setIdentityReconcileForm] = useState<IdentityReconcileForm>(
+    emptyIdentityReconcileForm,
+  );
+  const [identityReconcileSubmitting, setIdentityReconcileSubmitting] = useState(false);
+  const [identityReconcileError, setIdentityReconcileError] = useState('');
+  const [identityReconcileResult, setIdentityReconcileResult] =
+    useState<IdentityReconcileResult | null>(null);
   const swipeStartYRef = useRef<number | null>(null);
   const [swipeOffset, setSwipeOffset] = useState(0);
   const panelRef = useRef<HTMLElement | null>(null);
@@ -683,6 +715,14 @@ export default function PatientDetailPanel() {
   const transportRequestPresentation = emergencyRole.presentAction(
     EMERGENCY_ACTIONS.requestEmergencyTransport,
   );
+  // "Resolve Patient Identity" is a demographics-edit action (new real
+  // firstName/lastName/dob/sex/MRN), not a generic PHI write -- reuses the
+  // same editPatientDemographics permission key the backend's
+  // assertCanReconcilePatientIdentity role gate was designed to mirror
+  // (src/config/emergencyPermissionRegistry.ts's ROLE_PERMISSION_GRANTS).
+  const identityReconcilePresentation = emergencyRole.presentAction(
+    EMERGENCY_ACTIONS.editPatientDemographics,
+  );
   const canTransition = transitionPresentation.enabled;
   const canWriteVitals = vitalsPresentation.enabled;
   const canWriteNote = notePresentation.enabled;
@@ -692,6 +732,7 @@ export default function PatientDetailPanel() {
   const canEscalate = escalatePresentation.enabled;
   const canDischarge = dischargePresentation.enabled;
   const canRequestTransport = transportRequestPresentation.enabled;
+  const canReconcileIdentity = identityReconcilePresentation.enabled;
 
   const selectedPatient = useMemo(
     () => patients.find((patient) => patient.id === selectedPatientId) || null,
@@ -755,6 +796,16 @@ export default function PatientDetailPanel() {
     setTransportRequestSubmitting(false);
     setTransportRequestError('');
     setTransportRequestResult(null);
+    // Same reasoning again: an in-progress or just-submitted "Resolve
+    // Patient Identity" form/result is patient-specific (typed demographics,
+    // the confirmation record) and must never silently survive attribution
+    // to a different patient after a switch -- the exact bug class this
+    // whole effect exists to prevent.
+    setShowIdentityReconcileForm(false);
+    setIdentityReconcileForm(emptyIdentityReconcileForm);
+    setIdentityReconcileSubmitting(false);
+    setIdentityReconcileError('');
+    setIdentityReconcileResult(null);
   }, [selectedPatient?.id]);
   const openCalculatorHub = useCallback((calculatorId: string) => {
     if (!selectedPatientId) return;
@@ -1184,6 +1235,74 @@ export default function PatientDetailPanel() {
       );
     } finally {
       setTransportRequestSubmitting(false);
+    }
+  };
+
+  /**
+   * Confirms a provisional identity (PatientFlag.IdentityPending -- see
+   * src/services/provisionalIdentityIntake.ts) once it becomes known: family
+   * arrives, ID is found, or the patient regains consciousness. Every field
+   * here comes straight from what the caller typed in the form below --
+   * nothing is inferred, auto-filled, or matched from any other patient or
+   * any AI/fuzzy-similarity process. The real, persisted result (previous
+   * identity preserved for provenance, confirmed identity applied) comes
+   * back from the backend before this shows a confirmation, matching
+   * submitTransportRequest's precedent above.
+   */
+  const submitIdentityReconcile = async (event: FormEvent) => {
+    event.preventDefault();
+    if (!canReconcileIdentity || !selectedPatient) return;
+    const firstName = identityReconcileForm.firstName.trim();
+    const lastName = identityReconcileForm.lastName.trim();
+    const dob = identityReconcileForm.dob.trim();
+    if (!firstName || !lastName || !dob) return;
+
+    setIdentityReconcileSubmitting(true);
+    setIdentityReconcileError('');
+    try {
+      const response: any = await reconcilePatientIdentityApi(selectedPatient.id, {
+        firstName,
+        lastName,
+        dob,
+        sex: identityReconcileForm.sex,
+        mrn: identityReconcileForm.mrn.trim() || undefined,
+        autoGenerateMrn: !identityReconcileForm.mrn.trim(),
+      });
+      const record = response?.data || response || {};
+      // Reflect the confirmed identity locally right away rather than
+      // waiting on a realtime broadcast/reload -- the same "apply what the
+      // backend just persisted" pattern patchEmergencyPatient's other local
+      // callers already use.
+      updatePatient(selectedPatient.id, {
+        firstName: record.firstName || firstName,
+        lastName: record.lastName || lastName,
+        dob: record.dob || dob,
+        sex: record.sex || identityReconcileForm.sex,
+        mrn: record.mrn || identityReconcileForm.mrn,
+        flags: Array.isArray(record.flags)
+          ? record.flags
+          : selectedPatient.flags.filter((flag) => flag !== PatientFlag.IdentityPending),
+      });
+      setIdentityReconcileResult({
+        previousFirstName: selectedPatient.firstName,
+        previousLastName: selectedPatient.lastName,
+        previousMrn: selectedPatient.mrn,
+        firstName: record.firstName || firstName,
+        lastName: record.lastName || lastName,
+        mrn: record.mrn || identityReconcileForm.mrn,
+      });
+      setShowIdentityReconcileForm(false);
+      setIdentityReconcileForm(emptyIdentityReconcileForm);
+      showActionSuccess(
+        STANDARD_ACTION_FEEDBACK.patientAdvanced,
+        'Patient identity reconciled and confirmed.',
+      );
+    } catch (error: any) {
+      setIdentityReconcileError(
+        error?.message || 'Unable to reconcile the patient identity. Please try again.',
+      );
+    } finally {
+      setIdentityReconcileSubmitting(false);
     }
   };
 
@@ -1872,6 +1991,136 @@ export default function PatientDetailPanel() {
               onClick={() => setShowTransportRequestForm(true)}
             >
               Request Emergency Transport (Simulated)
+            </FieldButton>
+          )}
+        </section>
+      ) : null}
+
+      {identityReconcilePresentation.visible &&
+      // Once reconciled, the local optimistic update below clears
+      // IdentityPending immediately -- but the just-submitted confirmation
+      // must stay visible (until dismissed) rather than vanishing along
+      // with the rest of this section the instant the flag clears.
+      (selectedPatient.flags.includes(PatientFlag.IdentityPending) || identityReconcileResult) ? (
+        <section className="patient-detail-panel__section patient-detail-identity-reconcile">
+          <h3 className="patient-detail-panel__section-title">Resolve Patient Identity</h3>
+          <p role="note" className="patient-detail-identity-reconcile__disclaimer">
+            This chart is registered under a provisional identity. Confirming replaces it with a
+            real, verified identity you enter below -- the previous provisional name and MRN stay
+            on the chart as a permanent record, never discarded. Nothing here is guessed or
+            auto-filled; every field must be entered by you.
+          </p>
+
+          {identityReconcileResult ? (
+            <div className="patient-detail-identity-reconcile__confirmation" role="status">
+              <strong>Patient Identity Reconciled</strong>
+              <p>
+                Previously "{identityReconcileResult.previousFirstName}{' '}
+                {identityReconcileResult.previousLastName}" (MRN {identityReconcileResult.previousMrn}
+                ) -- now confirmed as "{identityReconcileResult.firstName}{' '}
+                {identityReconcileResult.lastName}" (MRN {identityReconcileResult.mrn}).
+              </p>
+              <FieldButton onClick={() => setIdentityReconcileResult(null)}>Dismiss</FieldButton>
+            </div>
+          ) : showIdentityReconcileForm ? (
+            <form
+              onSubmit={(event) => void submitIdentityReconcile(event)}
+              className="patient-detail-identity-reconcile__form"
+            >
+              <div className="patient-detail-identity-reconcile__row">
+                <input
+                  type="text"
+                  value={identityReconcileForm.firstName}
+                  onChange={(event) =>
+                    setIdentityReconcileForm((form) => ({ ...form, firstName: event.target.value }))
+                  }
+                  disabled={!canReconcileIdentity || identityReconcileSubmitting}
+                  placeholder="Confirmed first name"
+                  className="patient-detail-vitals-form__input"
+                  aria-label="Confirmed first name"
+                  required
+                />
+                <input
+                  type="text"
+                  value={identityReconcileForm.lastName}
+                  onChange={(event) =>
+                    setIdentityReconcileForm((form) => ({ ...form, lastName: event.target.value }))
+                  }
+                  disabled={!canReconcileIdentity || identityReconcileSubmitting}
+                  placeholder="Confirmed last name"
+                  className="patient-detail-vitals-form__input"
+                  aria-label="Confirmed last name"
+                  required
+                />
+              </div>
+              <div className="patient-detail-identity-reconcile__row">
+                <input
+                  type="date"
+                  value={identityReconcileForm.dob}
+                  onChange={(event) =>
+                    setIdentityReconcileForm((form) => ({ ...form, dob: event.target.value }))
+                  }
+                  disabled={!canReconcileIdentity || identityReconcileSubmitting}
+                  className="patient-detail-vitals-form__input"
+                  aria-label="Confirmed date of birth"
+                  required
+                />
+                <select
+                  value={identityReconcileForm.sex}
+                  onChange={(event) =>
+                    setIdentityReconcileForm((form) => ({
+                      ...form,
+                      sex: event.target.value as 'M' | 'F' | 'Other',
+                    }))
+                  }
+                  disabled={!canReconcileIdentity || identityReconcileSubmitting}
+                  className="patient-detail-panel__select"
+                  aria-label="Confirmed sex"
+                >
+                  <option value="M">M</option>
+                  <option value="F">F</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <input
+                type="text"
+                value={identityReconcileForm.mrn}
+                onChange={(event) =>
+                  setIdentityReconcileForm((form) => ({ ...form, mrn: event.target.value }))
+                }
+                disabled={!canReconcileIdentity || identityReconcileSubmitting}
+                placeholder="New MRN (leave blank to auto-generate)"
+                className="patient-detail-vitals-form__input"
+                aria-label="Confirmed MRN (leave blank to auto-generate)"
+              />
+              {identityReconcileError ? (
+                <div role="alert" className="patient-detail-identity-reconcile__error">
+                  {identityReconcileError}
+                </div>
+              ) : null}
+              <div className="patient-detail-identity-reconcile__actions">
+                <button
+                  type="submit"
+                  disabled={
+                    !canReconcileIdentity ||
+                    identityReconcileSubmitting ||
+                    !identityReconcileForm.firstName.trim() ||
+                    !identityReconcileForm.lastName.trim() ||
+                    !identityReconcileForm.dob.trim()
+                  }
+                  className="patient-detail-panel__field-btn patient-detail-panel__field-btn--primary"
+                >
+                  {identityReconcileSubmitting ? 'Reconciling…' : 'Confirm Identity'}
+                </button>
+                <FieldButton onClick={() => setShowIdentityReconcileForm(false)}>Cancel</FieldButton>
+              </div>
+            </form>
+          ) : (
+            <FieldButton
+              disabled={!canReconcileIdentity}
+              onClick={() => setShowIdentityReconcileForm(true)}
+            >
+              Resolve Patient Identity
             </FieldButton>
           )}
         </section>

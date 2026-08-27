@@ -146,6 +146,24 @@
   white-space: nowrap;
 }
 
+/* SAFER patient-identification guidance: matches PatientSearchResults.css's
+   same-name warning treatment for visual consistency across both search
+   surfaces. Specificity note: this is a `<small>` inside `.reception-patient-
+   lookup__result-main`, so a class-only selector here would silently lose to
+   `.reception-patient-lookup__result-main small` above (class+element beats
+   class alone) -- same bug class that comment on PatientSearchResults.css
+   already documents. Qualifying with `small` here keeps this rule's
+   specificity strictly higher so it always wins. */
+.reception-patient-lookup__result-main small.reception-patient-lookup__same-name-warning {
+  display: block;
+  overflow: visible;
+  color: var(--status-warning, #f59e0b);
+  font-size: var(--cdl-text-xs, 0.75rem);
+  font-weight: 700;
+  text-overflow: unset;
+  white-space: normal;
+}
+
 .reception-patient-lookup__match {
   font-size: 0.65rem;
   text-transform: uppercase;

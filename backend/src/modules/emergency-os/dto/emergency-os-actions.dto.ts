@@ -224,6 +224,37 @@ export class EscalatePatientDto {
   @IsString() @IsNotEmpty() @MaxLength(96) actorStaffId!: string;
 }
 
+/**
+ * Confirms a provisional ("Unknown Patient" / "Temporary Patient" /
+ * "Identity Pending") record's real identity once it becomes known -- a
+ * distinct domain command from PatchEmergencyPatientDto's generic patch
+ * (whose own doc comment above says demographics/MRN "go through dedicated
+ * verification-aware flows, not a generic patch" -- this is that flow). See
+ * EmergencyPatientService.reconcilePatientIdentity. Every field here must be
+ * explicitly supplied by the human caller confirming the identity -- there
+ * is no optional/inferred path, matching this feature's "never auto-merge
+ * or guess identity" requirement.
+ *
+ * Deliberately has no actor/actorName field -- the confirming staff member's
+ * identity is always derived server-side from the authenticated session
+ * (request.user), never trusted from the client, matching
+ * RequestEmergencyTransportDto's own doc comment above. This action rewrites
+ * a patient's core identity/MRN, so a client-suppliable actor id would let a
+ * compromised or careless frontend misattribute who confirmed a real
+ * identity in the audit trail.
+ */
+export class ReconcilePatientIdentityDto {
+  @IsDefined() @IsString() @IsNotEmpty() @MaxLength(120) firstName: string;
+  @IsDefined() @IsString() @IsNotEmpty() @MaxLength(120) lastName: string;
+  @IsDefined() @IsString() @MaxLength(40) dob: string;
+  @IsDefined() @IsIn(['M', 'F', 'Other']) sex: 'M' | 'F' | 'Other';
+  /** Omit (or pass `autoGenerateMrn: true`) to have the server generate a
+   * new real MRN rather than trusting a client-supplied one. */
+  @IsOptional() @IsString() @MaxLength(64) mrn?: string;
+  @IsOptional() @IsBoolean() autoGenerateMrn?: boolean;
+  @IsOptional() @IsString() @MaxLength(2000) note?: string;
+}
+
 export class PatchEmsArrivalStatusDto {
   @IsOptional() @IsString() @MaxLength(32) status?: string;
   @IsOptional() @IsString() @MaxLength(96) patientId?: string;

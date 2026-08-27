@@ -188,6 +188,27 @@ function createId(prefix: string, now = Date.now()): string {
   return `${prefix}-${now}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
+/**
+ * MRN was auto-generated as a random 6-digit number with zero collision
+ * checking -- an independently-duplicated copy of the same unguarded pattern
+ * fixed on the backend's live TypeORM path (EmergencyPatientService
+ * .createPatient, see migration 1772704400000-AddPatientsMrnUniqueIndex).
+ * Bounded retry (5 attempts) against the local board -- the same board this
+ * intake is about to add its own record to -- before falling back to a
+ * value that structurally cannot collide. No org-scoping needed here (unlike
+ * the backend helper this mirrors): the frontend's local store only ever
+ * holds the current session's own organization's patients.
+ */
+export function generateCollisionSafeReceptionMrn(existingPatients: Patient[] = []): string {
+  const MAX_ATTEMPTS = 5;
+  const isTaken = (candidate: string) => existingPatients.some((patient) => patient.mrn === candidate);
+  for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt += 1) {
+    const candidate = `ED-${Math.floor(100000 + Math.random() * 900000)}`;
+    if (!isTaken(candidate)) return candidate;
+  }
+  return `ED-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+}
+
 function unique(values: Array<string | null | undefined>): string[] {
   return [...new Set(values.map((value) => String(value || '').trim()).filter(Boolean))];
 }
@@ -529,6 +550,7 @@ function buildReceptionPatient(
   draft: ReceptionIntakeDraft,
   aiAssist: ReceptionAiIntakeAssist,
   options: Required<Pick<OrchestratorOptions, 'actorName' | 'now'>>,
+  existingPatients: Patient[] = [],
 ): Patient {
   const redFlags = aiAssist.redFlags;
   const now = options.now;
@@ -567,7 +589,7 @@ function buildReceptionPatient(
   const base = syncPatientFromArrival(
     {
       id: createId('patient'),
-      mrn: `ED-${Math.floor(100000 + Math.random() * 900000)}`,
+      mrn: generateCollisionSafeReceptionMrn(existingPatients),
       firstName,
       lastName,
       name: `${firstName} ${lastName}`.trim(),
@@ -724,6 +746,19 @@ export async function syncReceptionPatientToBackend(
   status: ReceptionBackendSyncStatus;
   backendPatientId?: string;
   error?: string;
+  /**
+   * True when the failure was specifically the backend's own duplicate guard
+   * (SmartIntakeService.guardAgainstUnconfirmedDuplicate, a 409 Conflict)
+   * rejecting this create -- distinct from a generic network/backend
+   * failure. requestEmergencyJson (emergencyOsApi.ts) attaches the real HTTP
+   * status to every thrown error, so this is available without parsing the
+   * response body. The local patient record already exists on the board at
+   * this point (local-first create -- see createPatientAndRouteFromReception
+   * below), so callers use this to flag it as a probable duplicate for
+   * reception review rather than leaving it indistinguishable from an
+   * ordinary sync hiccup.
+   */
+  duplicateBlocked?: boolean;
 }> {
   if (!isBackendCapabilityEnabled('emergencySmartIntake')) {
     return { status: 'skipped' };
@@ -754,10 +789,11 @@ export async function syncReceptionPatientToBackend(
         ? String(remotePatient.id)
         : undefined) || patient.id;
     return { status: 'synced', backendPatientId };
-  } catch (error) {
+  } catch (error: any) {
     return {
       status: 'failed',
       error: formatSyncRecoveryMessage(error),
+      duplicateBlocked: error?.status === 409,
     };
   }
 }
@@ -790,7 +826,7 @@ export async function createPatientAndRouteFromReception(
     { minScore: 35, limit: 5 },
   );
 
-  const patient = buildReceptionPatient(intakeDraft, aiAssist, { actorName, now });
+  const patient = buildReceptionPatient(intakeDraft, aiAssist, { actorName, now }, store.patients);
   const triageAssist = buildClientTriageAssist(patient, store.patients, {
     arrivalReason: patient.chiefComplaint,
     complaintCategory: patient.complaintCategory,
@@ -821,11 +857,23 @@ export async function createPatientAndRouteFromReception(
       } as unknown as Partial<Patient>,
     );
   } else if (backendSync.status === 'failed') {
+    // A backend-detected duplicate must never look like an ordinary sync
+    // hiccup: the local record already exists on the board (local-first
+    // create, above), so this is the only signal reception staff get that
+    // one of two visually-identical cards was actually flagged by the
+    // backend's own duplicate index. PatientFlag.PossibleDuplicate reuses
+    // PatientCard's existing flag-badge rendering rather than inventing a
+    // new UI surface -- never auto-resolved, always a human review.
     useEmergencyStore.getState().updatePatient(
       enrichedPatient.id,
       {
         handoffSyncPending: true,
-        handoffSyncError: backendSync.error,
+        handoffSyncError: backendSync.duplicateBlocked
+          ? 'Backend flagged this as a possible duplicate patient — needs reception review before continuing.'
+          : backendSync.error,
+        ...(backendSync.duplicateBlocked
+          ? { flags: Array.from(new Set([...(enrichedPatient.flags || []), PatientFlag.PossibleDuplicate])) }
+          : {}),
       } as unknown as Partial<Patient>,
     );
   }

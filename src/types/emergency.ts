@@ -80,6 +80,17 @@ export enum PatientFlag {
   DeterioratingNeuro = 'DeterioratingNeuro',
   StrokeCode = 'StrokeCode',
   IdentityPending = 'IdentityPending',
+  /**
+   * Backend's own duplicate guard (SmartIntakeService
+   * .guardAgainstUnconfirmedDuplicate, a 409 Conflict) rejected this
+   * patient's create sync after it was already added to the local board
+   * (local-first create -- see receptionIntakeOrchestrator.ts's
+   * createPatientAndRouteFromReception). Distinct from the generic
+   * handoffSyncPending state so a probable duplicate doesn't look like an
+   * ordinary transient network hiccup -- must surface for a human reception
+   * decision, never auto-resolved.
+   */
+  PossibleDuplicate = 'PossibleDuplicate',
 }
 
 export type PatientFlagType = `${PatientFlag}`;

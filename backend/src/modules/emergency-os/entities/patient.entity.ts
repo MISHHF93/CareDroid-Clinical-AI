@@ -4,6 +4,17 @@ import { Column, CreateDateColumn, Entity, Index, PrimaryColumn, UpdateDateColum
 @Index(['state'])
 @Index(['priority'])
 @Index(['organizationId'])
+// mrn had no uniqueness enforcement anywhere -- two independently-duplicated
+// random-6-digit MRN generators (EmergencyPatientService and
+// receptionIntakeOrchestrator.ts on the frontend) with zero collision
+// checking. Two partial unique indexes, not one plain composite one:
+// organizationId is nullable (legacy/unscoped rows), and SQL treats every
+// NULL as distinct from every other NULL in a unique constraint, so a plain
+// (organizationId, mrn) index would never enforce uniqueness among
+// null-org rows. Same shape as SentinelUnitEntity's split index -- see
+// migration 1772704400000-AddPatientsMrnUniqueIndex.
+@Index(['organizationId', 'mrn'], { unique: true, where: '"organizationId" IS NOT NULL' })
+@Index(['mrn'], { unique: true, where: '"organizationId" IS NULL' })
 export class Patient {
   @PrimaryColumn({ type: 'varchar', length: 120 })
   id: string;

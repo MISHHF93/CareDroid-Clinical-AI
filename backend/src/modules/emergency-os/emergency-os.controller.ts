@@ -78,6 +78,7 @@ import {
   AssignPatientStaffDto,
   EscalatePatientDto,
   PatchEmsArrivalStatusDto,
+  ReconcilePatientIdentityDto,
   RequestEmergencyTransportDto,
   PostWaitingRoomEscalationNotifyDto,
   UpdateStaffDutyStatusDto,
@@ -152,6 +153,32 @@ export function assertCanRequestEmergencyTransport(roleProfileId: string | null 
     throw new ForbiddenException(
       'Only physician-tier roles can request emergency transport from a patient chart.',
     );
+  }
+}
+
+/**
+ * Resolving a provisional identity is a demographics-edit action, not a
+ * generic PHI write -- so this mirrors the frontend's own patientDemographicsEdit
+ * permission grant (src/config/emergencyPermissionRegistry.ts's
+ * ROLE_PERMISSION_GRANTS), not assertCanWriteVitalsOrFlags's narrower
+ * charge_nurse/triage_nurse/physician/admin set (which excludes
+ * registration_clerk -- the role that most often has family/ID information
+ * to confirm a walk-in's identity in the first place, and the only role
+ * this action's precondition, PatientFlag.IdentityPending, would otherwise
+ * be unreachable to besides admin).
+ */
+const EMERGENCY_ROLES_ALLOWED_IDENTITY_RECONCILE = new Set([
+  'admin',
+  'charge_nurse',
+  'triage_nurse',
+  'physician',
+  'registration_clerk',
+]);
+
+/** Exported standalone for the same unit-testability reason as assertCanWriteVitalsOrFlags above. */
+export function assertCanReconcilePatientIdentity(roleProfileId: string | null | undefined): void {
+  if (!roleProfileId || !EMERGENCY_ROLES_ALLOWED_IDENTITY_RECONCILE.has(roleProfileId)) {
+    throw new ForbiddenException("This role cannot reconcile a patient's provisional identity.");
   }
 }
 
@@ -381,6 +408,72 @@ export class EmergencyOsController {
       }
       throw error;
     }
+  }
+
+  /**
+   * Confirms a provisional ("Unknown Patient"/"Temporary Patient"/"Identity
+   * Pending") record's real identity once it becomes known -- see
+   * EmergencyPatientService.reconcilePatientIdentity's own doc comment for
+   * the full design rationale (this LIVE TypeORM path's equivalent of the
+   * off-by-default Mongoose/MPI path's SmartIntakeService.reconcileUnknown()).
+   * WRITE_PHI is necessary but not sufficient: assertCanReconcilePatientIdentity
+   * further restricts this to the same roles the frontend's own
+   * patientDemographicsEdit permission grants. The service itself enforces
+   * the real precondition (PatientFlag.IdentityPending must already be set)
+   * and throws real NotFoundException/ConflictException directly, so no
+   * plain-Error-to-404 translation is needed here unlike patchPatient/
+   * assignPatientStaff/escalatePatient above.
+   *
+   * Actor identity is always server-derived from the authenticated session,
+   * never trusted from the request body -- matching requestEmergencyTransport
+   * above (RequestEmergencyTransportDto's own doc comment states this
+   * explicitly). This action rewrites a patient's core identity/MRN, so a
+   * client-suppliable actor id would let a compromised or careless frontend
+   * misattribute who confirmed a real identity in the audit trail.
+   */
+  @RequirePermission(Permission.WRITE_PHI)
+  @Patch('patients/:patientId/reconcile-identity')
+  reconcilePatientIdentity(
+    @Param('patientId') patientId: string,
+    @Body() body: ReconcilePatientIdentityDto,
+    @TenantContext() tenantContext?: TenantContextValue,
+    @Req() request?: Request,
+  ) {
+    const authenticatedUser = (
+      request as unknown as {
+        user?: {
+          id?: string;
+          email?: string;
+          profile?: { roleProfileId?: string | null; fullName?: string | null };
+        };
+      }
+    )?.user;
+    assertCanReconcilePatientIdentity(authenticatedUser?.profile?.roleProfileId ?? null);
+    if (!authenticatedUser?.id) {
+      // Unreachable in practice -- AuthGuard('jwt') already requires a valid
+      // authenticated session -- but reconcilePatientIdentity's actor.staffId
+      // is intentionally required (not optional, unlike
+      // requestPhysicianTransport's actor above) because this action rewrites
+      // a patient's core identity, and "who confirmed this" must never be
+      // recorded as absent in the audit trail.
+      throw new ForbiddenException('A valid authenticated staff identity is required.');
+    }
+    return this.patientService.reconcilePatientIdentity(
+      patientId,
+      {
+        firstName: body.firstName,
+        lastName: body.lastName,
+        dob: body.dob,
+        sex: body.sex,
+        mrn: body.mrn,
+        autoGenerateMrn: body.autoGenerateMrn,
+      },
+      {
+        staffId: authenticatedUser.id,
+        name: authenticatedUser.profile?.fullName || authenticatedUser.email,
+      },
+      tenantContext?.organizationId,
+    );
   }
 
   @RequirePermission(Permission.READ_PHI)

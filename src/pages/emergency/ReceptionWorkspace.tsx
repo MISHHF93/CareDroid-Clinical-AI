@@ -252,6 +252,7 @@ export default function ReceptionWorkspace() {
   const [aiAssist, setAiAssist] = useState<ReceptionAiIntakeAssist | null>(null);
   const [result, setResult] = useState<ReceptionRouteResult | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const createAndRouteInFlightRef = useRef(false);
   const [provisionalUnknownSubmitting, setProvisionalUnknownSubmitting] = useState(false);
   const provisionalUnknownInFlightRef = useRef(false);
   const [now, setNow] = useState(() => Date.now());
@@ -627,7 +628,15 @@ export default function ReceptionWorkspace() {
       showActionError('Reception action failed', 'Your profile cannot create patients.');
       return;
     }
-    if (submitting) return;
+    // Synchronous ref guard, not just the submitting state: createPatientAndRouteFromReception
+    // below creates a patient record synchronously (no await before it -- see
+    // receptionIntakeOrchestrator.ts's store.addPatient call), so a plain double-click on
+    // this standard registration path -- reached either directly from the create/route
+    // button or via the duplicate-confirm dialog's "create anyway" button -- would
+    // otherwise reliably create two duplicate patient records before React re-renders to
+    // disable the button. Mirrors handleProvisionalUnknown's guard below exactly.
+    if (createAndRouteInFlightRef.current) return;
+    createAndRouteInFlightRef.current = true;
 
     setSubmitting(true);
     try {
@@ -689,6 +698,7 @@ export default function ReceptionWorkspace() {
         routeError instanceof Error ? routeError.message : 'Unable to route patient.',
       );
     } finally {
+      createAndRouteInFlightRef.current = false;
       setSubmitting(false);
     }
   };
@@ -698,7 +708,12 @@ export default function ReceptionWorkspace() {
       showActionError('Reception action failed', 'Your profile cannot create patients.');
       return;
     }
-    if (submitting) return;
+    // Same synchronous ref guard as executeCreateAndRoute below (the state-based
+    // `submitting` check this used to have doesn't protect against a double-click
+    // reading a stale closure before React re-renders -- see executeCreateAndRoute's
+    // comment). Checked here too, not just inside executeCreateAndRoute, so a rapid
+    // double-click doesn't even redundantly reopen the duplicate-confirm dialog below.
+    if (createAndRouteInFlightRef.current) return;
 
     // High-confidence duplicate gate — skill: duplicate_resolution
     const highConfidenceDupes = scanReceptionDraftDuplicates(draft, patients).filter(

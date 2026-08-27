@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Search, UserCheck, UserPlus } from 'lucide-react';
 import type { Patient } from '../../types/emergency';
 import {
+  findSameNamePatientIds,
   getPatientDisplayName,
   isPatientSearchQueryReady,
   rankPatientsBySearch,
@@ -31,6 +32,14 @@ export default function ReceptionPatientLookup({
     () => (isPatientSearchQueryReady(query) ? rankPatientsBySearch(patients, query, 6) : []),
     [patients, query],
   );
+  // SAFER patient-identification guidance (same as PatientSearchResults.tsx):
+  // this widget exists specifically so reception staff can find an EXISTING
+  // chart before creating a new one -- the highest-consequence surface for a
+  // same-name mix-up, since picking the wrong "John Smith" here either opens
+  // someone else's chart or spawns a needless duplicate registration. MRN/DOB
+  // already render in the row's secondary text below, but nothing forces the
+  // reader to actually compare them across rows.
+  const sameNamePatientIds = useMemo(() => findSameNamePatientIds(results), [results]);
 
   return (
     <section className="reception-patient-lookup" aria-labelledby="reception-lookup-title">
@@ -97,6 +106,15 @@ export default function ReceptionPatientLookup({
                       ? ` · ${patient.chiefComplaint || patient.complaint}`
                       : ''}
                   </small>
+                  {sameNamePatientIds.has(patient.id) ? (
+                    // Same treatment as PatientSearchResults.tsx's
+                    // same-name warning -- flag exactly the colliding rows
+                    // rather than a single banner, so it stays attached to
+                    // the moment of selection.
+                    <small className="reception-patient-lookup__same-name-warning" role="note">
+                      ⚠ Another result has the same name — check MRN/DOB
+                    </small>
+                  ) : null}
                 </span>
                 <span className="reception-patient-lookup__match">{matchKind.replace(/-/g, ' ')}</span>
               </button>

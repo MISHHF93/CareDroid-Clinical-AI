@@ -735,6 +735,71 @@
   gap: 6px;
 }
 
+/* "Resolve Patient Identity" -- same visual treatment as
+   .patient-detail-transport-request above (disclaimer/form/row/actions/
+   error/confirmation), mirrored under its own prefix since this section is
+   a real, non-simulated demographics action, not a simulated transport
+   request. */
+.patient-detail-identity-reconcile__disclaimer {
+  margin: var(--ed-space-2) 0;
+  padding: 8px 10px;
+  border-radius: var(--ed-radius-sm);
+  background: color-mix(in srgb, var(--status-warning) 16%, var(--color-elevated));
+  border: 1px solid color-mix(in srgb, var(--status-warning) 45%, transparent);
+  color: var(--status-warning);
+  font-size: var(--ed-type-caption, 12px);
+  font-weight: 600;
+}
+
+.patient-detail-identity-reconcile__form {
+  margin-top: var(--ed-space-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ed-space-2);
+}
+
+.patient-detail-identity-reconcile__row {
+  display: flex;
+  gap: var(--ed-space-2);
+}
+
+/* Live-verified bug: the date-of-birth input (`.patient-detail-vitals-form__input`,
+   a shared class reused elsewhere in this panel so its own base rule can't be
+   touched here) has no `flex` set, so its flex-basis defaults to its native
+   max-content width -- wide enough on its own to leave the sex `<select>`
+   (`.patient-detail-panel__select { flex: 1 1 0%; }`) almost no row space to
+   grow into. Confirmed via a real click-through of the "Resolve Patient
+   Identity" form: the select rendered at 20px wide, just the dropdown arrow,
+   no visible M/F/Other text. Give both children of this row equal flex-basis
+   so they split the row evenly instead. */
+.patient-detail-identity-reconcile__row > * {
+  flex: 1;
+  min-width: 0;
+}
+
+.patient-detail-identity-reconcile__actions {
+  display: flex;
+  gap: var(--ed-space-2);
+  align-items: center;
+}
+
+.patient-detail-identity-reconcile__error {
+  color: var(--status-critical);
+  font-size: var(--ed-type-caption, 12px);
+  font-weight: 600;
+}
+
+.patient-detail-identity-reconcile__confirmation {
+  margin-top: var(--ed-space-2);
+  padding: 10px;
+  border-radius: var(--ed-radius-md);
+  background: var(--component-inner-row-bg, var(--medical-surface-page, #f1f5f9));
+  border: 1px solid var(--ed-border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
 .patient-detail-action-panel__prompt {
   margin: 0 0 10px;
   color: var(--ed-text-primary);

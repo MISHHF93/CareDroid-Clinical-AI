@@ -67,6 +67,7 @@ export type WorkflowActionType =
   | 'operational_alert_dispatched'
   | 'patient_escalated'
   | 'patient_duplicate_flagged'
+  | 'patient_identity_reconciled'
   | 'care_task_transitioned';
 
 export type WorkflowActionSeverity = 'Info' | 'Warning' | 'Critical';

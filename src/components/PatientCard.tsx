@@ -143,6 +143,7 @@ const flagTones: Partial<Record<PatientFlag, SignalTone>> = {
   [PatientFlag.LongWait]: 'warning',
   [PatientFlag.PsychAlert]: 'warning',
   [PatientFlag.Isolation]: 'warning',
+  [PatientFlag.PossibleDuplicate]: 'warning',
   [PatientFlag.EMSArrival]: 'info',
   [PatientFlag.IdentityPending]: 'info',
   [PatientFlag.PendingAdmission]: 'flow',
@@ -163,6 +164,7 @@ const flagLabels: Partial<Record<PatientFlag, string>> = {
   [PatientFlag.DeterioratingNeuro]: 'Neuro change',
   [PatientFlag.StrokeCode]: 'Stroke code',
   [PatientFlag.IdentityPending]: 'Identity pending',
+  [PatientFlag.PossibleDuplicate]: 'Possible duplicate',
 };
 
 function resolveFlagTone(flag: PatientFlag): SignalTone {

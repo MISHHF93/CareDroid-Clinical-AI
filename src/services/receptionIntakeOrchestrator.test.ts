@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { EMERGENCY_ACTIONS, EMERGENCY_ROLE_IDS } from '../config/emergencyRolePermissions';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { PatientFlag, PatientState, Priority } from '../types/emergency';
@@ -22,6 +22,7 @@ const {
   assertReceptionMutationAllowed,
   applyExtractedFieldsToReceptionDraft,
   createPatientAndRouteFromReception,
+  generateCollisionSafeReceptionMrn,
   mapQuickIntakeInputToDraft,
   resolveUnifiedIntakePrimaryAction,
   routeQuickIntakeThroughOrchestrator,
@@ -287,6 +288,44 @@ describe('receptionIntakeOrchestrator', () => {
     expect(result.backendSyncError).toBeTruthy();
     expect(useEmergencyStore.getState().patients).toHaveLength(1);
     expect(useEmergencyStore.getState().patients[0].state).toBe(PatientState.Triage);
+    // A generic sync failure (network down, no HTTP status) must NOT be
+    // mistaken for a backend-detected duplicate -- see the dedicated
+    // duplicate-flagging test below.
+    expect(useEmergencyStore.getState().patients[0].flags).not.toContain(PatientFlag.PossibleDuplicate);
+  });
+
+  it('HEAL follow-up: flags the local record as a possible duplicate, distinctly from a generic sync failure, when the backend duplicate guard blocks the create sync', async () => {
+    // Mirrors the shape requestEmergencyJson (emergencyOsApi.ts) attaches to a
+    // thrown error for a non-2xx response: the real HTTP status from
+    // SmartIntakeService.guardAgainstUnconfirmedDuplicate's 409 ConflictException.
+    const duplicateBlockedError: any = new Error(
+      'Possible duplicate patient detected. Review the candidates and resubmit with confirmDuplicateOverride to proceed.',
+    );
+    duplicateBlockedError.status = 409;
+    createSmartIntakePatient.mockRejectedValueOnce(duplicateBlockedError);
+
+    const result = await createPatientAndRouteFromReception(baseDraft(), {
+      actorName: 'Reception Clerk',
+      now: '2026-06-29T12:22:00.000Z',
+    });
+
+    expect(result.backendSyncStatus).toBe('failed');
+    // The local record was already added to the board (local-first create) --
+    // this proves it's still there, now visibly flagged rather than silently
+    // left as a duplicate-looking, un-reviewed card.
+    expect(useEmergencyStore.getState().patients).toHaveLength(1);
+    const localPatient = useEmergencyStore.getState().patients[0];
+    expect(localPatient.flags).toContain(PatientFlag.PossibleDuplicate);
+    expect(localPatient).toMatchObject({ handoffSyncPending: true });
+    // Distinctly-flagged, not just handoffSyncPending: true looking like
+    // every other transient sync failure -- the surfaced message names the
+    // duplicate specifically, not the generic sync-failed copy.
+    expect((localPatient as any).handoffSyncError).toMatch(/duplicate/i);
+    expect((localPatient as any).handoffSyncError).toMatch(/reception review/i);
+    // Same signal must also reach the caller's result, not just the store --
+    // ReceptionWorkspace.tsx surfaces backendSyncError directly in its toast.
+    expect(result.patient.flags).toContain(PatientFlag.PossibleDuplicate);
+    expect(result.backendSyncError).toMatch(/duplicate/i);
   });
 
   it('skips backend sync when intake capabilities are disabled', async () => {
@@ -441,6 +480,73 @@ describe('receptionIntakeOrchestrator', () => {
       const assist = runReceptionAiIntakeAssist(draft);
       expect(assist.redFlags).toContain('Shortness of breath');
       expect(assist.urgencySuggestion).not.toBe('standard');
+    });
+  });
+
+  describe('generateCollisionSafeReceptionMrn (MRN collision safety, HEAL follow-up)', () => {
+    // Exact Math.random() fraction that makes `ED-${Math.floor(100000 + Math.random() * 900000)}`
+    // produce `ED-<sixDigitMrn>`.
+    const randomFractionFor = (sixDigitMrn: number) => (sixDigitMrn - 100000) / 900000;
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it('retries with a new MRN when the first randomly-generated candidate collides with an existing patient', () => {
+      const existing = [{ mrn: 'ED-123456' }] as any;
+      const randomSpy = vi
+        .spyOn(Math, 'random')
+        .mockReturnValueOnce(randomFractionFor(123456)) // 1st attempt collides
+        .mockReturnValueOnce(randomFractionFor(654321)); // 2nd attempt is free
+
+      const mrn = generateCollisionSafeReceptionMrn(existing);
+
+      expect(randomSpy).toHaveBeenCalledTimes(2);
+      expect(mrn).toBe('ED-654321');
+    });
+
+    it('falls back to a guaranteed-unique MRN after exhausting all retry attempts against a saturated board', () => {
+      const existing = [{ mrn: 'ED-500000' }] as any;
+      // Every attempt (all 5) collides with the one existing patient's MRN.
+      const randomSpy = vi.spyOn(Math, 'random').mockReturnValue(randomFractionFor(500000));
+
+      const mrn = generateCollisionSafeReceptionMrn(existing);
+
+      // 5 retry attempts + 1 more inside the timestamp-based fallback.
+      expect(randomSpy).toHaveBeenCalledTimes(6);
+      expect(mrn).not.toBe('ED-500000');
+      expect(mrn).toMatch(/^ED-\d+-\d+$/);
+    });
+
+    it('confirms two patients can never end up with the same MRN across many auto-generated creates (real randomness)', () => {
+      const existingPatients: Array<{ mrn: string }> = [];
+      for (let i = 0; i < 100; i += 1) {
+        existingPatients.push({ mrn: generateCollisionSafeReceptionMrn(existingPatients as any) });
+      }
+      const mrns = existingPatients.map((patient) => patient.mrn);
+      expect(new Set(mrns).size).toBe(mrns.length);
+      expect(mrns.every((mrn) => /^ED-\d{6}$/.test(mrn))).toBe(true);
+    });
+
+    it('integration: createPatientAndRouteFromReception never reuses an MRN already on the local board', async () => {
+      const first = await createPatientAndRouteFromReception(baseDraft(), {
+        actorName: 'Reception Clerk',
+        now: '2026-06-29T12:40:00.000Z',
+      });
+      expect(first.patient.mrn).toMatch(/^ED-\d{6}$/);
+      const collidingDigits = Number(first.patient.mrn.replace('ED-', ''));
+
+      // Force the second create's MRN generation to always collide with the
+      // first patient's real, already-on-the-board MRN.
+      const randomSpy = vi.spyOn(Math, 'random').mockReturnValue(randomFractionFor(collidingDigits));
+
+      const second = await createPatientAndRouteFromReception(
+        baseDraft({ firstName: 'Other', lastName: 'Person' }),
+        { actorName: 'Reception Clerk', now: '2026-06-29T12:41:00.000Z' },
+      );
+
+      expect(second.patient.mrn).not.toBe(first.patient.mrn);
+      randomSpy.mockRestore();
     });
   });
 });

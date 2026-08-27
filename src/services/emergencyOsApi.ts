@@ -276,6 +276,34 @@ export const patchEmsArrivalStatus = (arrivalId: string, payload: Record<string,
  * internal, audited CareDroid record, surfaced on the same EMS pipeline real
  * arrivals already use.
  */
+/**
+ * Confirms a provisional ("Unknown Patient" / "Temporary Patient" /
+ * "Identity Pending" -- see provisionalIdentityIntake.ts) record's real
+ * identity once it becomes known (family arrives, ID is found, patient
+ * regains consciousness). See PatientDetailPanel.tsx's "Resolve Patient
+ * Identity" action. Awaited (not fire-and-forget), matching
+ * requestEmergencyTransport's precedent above -- the confirmation UI needs
+ * the real, persisted result back before it can show success, and this
+ * write must never be silently lost.
+ */
+export const reconcilePatientIdentity = (
+  patientId: string,
+  payload: {
+    firstName: string;
+    lastName: string;
+    dob: string;
+    sex: 'M' | 'F' | 'Other';
+    mrn?: string;
+    autoGenerateMrn?: boolean;
+  },
+) =>
+  requestEmergencyJson(
+    `${EMERGENCY_OS_API_ENDPOINTS.patients}/${encodeURIComponent(patientId)}/reconcile-identity`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    },
+  );
 export const requestEmergencyTransport = (payload: {
   patientId: string;
   reason: string;
@@ -538,6 +566,7 @@ export default Object.freeze({
   postEmsHandoff,
   patchEmsArrivalStatus,
   requestEmergencyTransport,
+  reconcilePatientIdentity,
   fetchReceptionSnapshot,
   postReceptionHandoff,
   postReceptionEscalation,
