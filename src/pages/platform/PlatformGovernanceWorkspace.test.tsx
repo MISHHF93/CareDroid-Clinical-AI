@@ -83,6 +83,52 @@ describe('PlatformGovernanceWorkspace governance/security dashboards', () => {
     );
   });
 
+  it('renders the AI Model Inventory panel as real, readable fields instead of truncated JSON', async () => {
+    platformGovernanceApiMock.fetchPlatformGovernanceSurface.mockResolvedValue({
+      ok: true,
+      sourceStatus: 'live',
+      data: {
+        status: 'guarded',
+        readiness: { blocked: false },
+        panels: {
+          modelInventory: [
+            {
+              modelId: 'mdl-claude-sonnet-4-6-v1',
+              modelName: 'Anthropic Claude Sonnet 4.6 (CareDroid default generation)',
+              version: 'claude-sonnet-4-6',
+              status: 'approved',
+              purpose: 'Conversational ED copilot / chat under human confirmation.',
+              regulatoryClass: 'informational_cds',
+              owner: 'Clinical Informatics',
+              knownLimitations: ['Requires human review on all clinical outputs.'],
+              expiresAt: '2027-07-11',
+              retirementPlan: 'Rotate to next approved model via registry entry + canary.',
+            },
+          ],
+        },
+      },
+    });
+
+    renderRoute('/ai-governance');
+
+    expect(await screen.findByRole('heading', { name: /ai model inventory/i })).toBeVisible();
+    expect(
+      screen.getByText(/anthropic claude sonnet 4\.6 \(caredroid default generation\)/i),
+    ).toBeVisible();
+    expect(screen.getByText('claude-sonnet-4-6')).toBeVisible();
+    expect(
+      screen.getByText(/conversational ed copilot \/ chat under human confirmation/i),
+    ).toBeVisible();
+    expect(screen.getByText('informational_cds')).toBeVisible();
+    expect(screen.getByText('Clinical Informatics')).toBeVisible();
+    expect(screen.getByText(/requires human review on all clinical outputs/i)).toBeVisible();
+    expect(screen.getByText(/rotate to next approved model via registry entry/i)).toBeVisible();
+
+    // The old fallback rendering (truncated JSON.stringify of the whole array) must
+    // not appear anywhere on the page once the real fields are rendered.
+    expect(screen.queryByText(/"modelId":"mdl-claude-sonnet-4-6-v1"/)).not.toBeInTheDocument();
+  });
+
   it('does not claim governance/consent controls block production action (Cycle 235 — evaluateGate() is only acted on, not blocking, at 1 of 4 real call sites)', async () => {
     platformGovernanceApiMock.fetchPlatformGovernanceSurface.mockResolvedValue({
       ok: true,

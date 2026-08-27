@@ -63,6 +63,13 @@ export default function PlatformGovernanceWorkspace() {
     [surface, location.pathname, state.data, state.sourceStatus],
   );
   const panelChart = useMemo(() => buildGovernancePanelChart(view.panels), [view.panels]);
+  // Real, human-curated model cards (data/model-registry/entries/*.json, served via
+  // GET /api/ai-governance/summary's panels.modelInventory) -- only present on the
+  // /ai-governance surface's panels; buildModelInventoryCards returns [] elsewhere.
+  const modelInventoryRecords = useMemo(
+    () => view.controls.find((control) => control.id === 'modelInventory')?.modelInventory || [],
+    [view.controls],
+  );
 
   // The shell chrome (ShellRouteTab, AppShell.tsx) renders the page's real <h1>.
   // Registering this page's own title/subtitle keeps that shell heading in sync
@@ -157,11 +164,54 @@ export default function PlatformGovernanceWorkspace() {
                 <span className={`governance-workspace-page__pill governance-workspace-page__pill--${governancePanelTone(control.score)}`}>
                   Score {control.score}
                 </span>
-                <span>{control.detail.slice(0, 220)}</span>
+                {control.modelInventory && control.modelInventory.length > 0 ? (
+                  <span>See the AI Model Inventory table below for each model's full record.</span>
+                ) : (
+                  <span>{control.detail.slice(0, 220)}</span>
+                )}
               </article>
             ))}
         </div>
       </section>
+
+      {modelInventoryRecords.length > 0 ? (
+        <section className="governance-workspace-page__panel" aria-labelledby="platform-model-inventory-title">
+          <h2 id="platform-model-inventory-title">AI Model Inventory</h2>
+          <p>Governed model cards — identity, purpose, regulatory classification, ownership, known limitations, and retirement plan for every registered AI model, sourced from data/model-registry/entries.</p>
+          <div className="governance-workspace-page__model-cards">
+            {modelInventoryRecords.map((model) => (
+              <article className="governance-workspace-page__card governance-workspace-page__model-card" key={model.modelId}>
+                <span className="governance-workspace-page__card-meta">{model.status}</span>
+                <strong>{model.modelName}</strong>
+                <dl>
+                  <dt>Model identifier</dt>
+                  <dd><code>{model.modelIdentifier}</code></dd>
+                  <dt>Purpose</dt>
+                  <dd>{model.purpose}</dd>
+                  <dt>Regulatory class</dt>
+                  <dd>{model.regulatoryClass}</dd>
+                  <dt>Owner</dt>
+                  <dd>{model.owner}</dd>
+                  <dt>Limitations</dt>
+                  <dd>
+                    {model.limitations.length > 0 ? (
+                      <ul>
+                        {model.limitations.map((limitation, index) => (
+                          <li key={index}>{limitation}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      'None documented'
+                    )}
+                  </dd>
+                  <dt>Expires / retirement plan</dt>
+                  <dd>{model.expiresAt} — {model.retirementPlan}</dd>
+                </dl>
+              </article>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       <section className="governance-workspace-page__panel" aria-labelledby="platform-decision-title">
         <h2 id="platform-decision-title">Human Review Gate</h2>
@@ -194,7 +244,11 @@ export default function PlatformGovernanceWorkspace() {
                     {control.summary}
                   </span>
                 </span>
-                <span role="cell">{control.detail}</span>
+                <span role="cell">
+                  {control.modelInventory && control.modelInventory.length > 0
+                    ? `${control.modelInventory.length} governed model card(s) — see AI Model Inventory above.`
+                    : control.detail}
+                </span>
               </div>
             ))}
         </div>

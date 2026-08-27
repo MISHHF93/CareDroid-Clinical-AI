@@ -654,59 +654,80 @@ registerCapability({
 // Source:
 //   backend/src/modules/clinical-intelligence/ — clinical-intelligence.service.ts
 //
-// RAG-grounded clinical intelligence — separate from the chat pipeline. Used for
-// structured clinical queries that need retrieval plus synthesis. Integrates RAG
-// at its call site.
+// Registry-accuracy correction (2026-08-26): this record previously declared
+// modalities ['rag_assisted', 'llm_generation', 'analysis'] and
+// responseSourceCategory RAG_ASSISTED for the WHOLE service, but direct
+// reading of clinical-intelligence.service.ts (confirmed: zero import of
+// aiService/unifiedAIClient/any LLM provider client anywhere in the file)
+// shows 7 of its 8 sub-capabilities (ambient-scribe, differential-ai,
+// timeline-ai, patient-summary-ai, order-set-ai, ai-explainability,
+// clinical-audit) are pure keyword-trigger-table / threshold-rule matching
+// over submitted text — DETERMINISTIC_RULE, never LLM_GENERATED. Only
+// guideline-rag calls RAGService.retrieve() for real vector retrieval, and
+// even that is an EXTRACTIVE summary of retrieved chunks (buildCitations /
+// buildCitationBoundRecommendations) — never a generative model call. This
+// matches src/pages/tools/ToolPageLayout.tsx's truthLabelForTool(), which
+// independently arrived at the same conclusion and labels all 8 sub-tools
+// 'Manual' (never 'Demo'/AI-generated). responseSourceCategory is corrected
+// to the dominant, service-wide behavior (DETERMINISTIC_RULE), following the
+// same "pick the dominant category, note sub-component variation" pattern
+// used above for agent:copilot-chat-pipeline (LLM_GENERATED "may include
+// RAG_ASSISTED... as sub-components") — here inverted, since deterministic
+// rule-matching dominates and only one sub-tool is RAG_ASSISTED.
 // ---------------------------------------------------------------------------
 
 registerCapability({
   id: 'service:clinical-intelligence',
   capabilityType: 'service',
   name: 'Clinical Intelligence Service',
-  purpose: 'RAG-grounded clinical intelligence — structured clinical queries with retrieval and synthesis, separate from the conversational copilot path.',
+  purpose: 'Structured clinical intelligence queries — deterministic keyword/pattern matching over submitted clinical text for 7 of 8 sub-tools, plus real extractive guideline-evidence retrieval (no generative step) for the 8th — separate from the conversational copilot path.',
   version: 'clinical-intelligence@1',
-  intendedUse: 'Structured clinical queries requiring evidence retrieval and synthesis — e.g., "what is the evidence for this protocol?", "summarize this patient\'s clinical context with citations".',
+  intendedUse: 'Structured clinical queries where a deterministic rule engine is safer and faster than an LLM — e.g., ranking differentials from submitted symptoms/labs, drafting a documentation note for review, or retrieving cited guideline evidence for "what is the evidence for this protocol?" (guideline-rag only; the other 7 sub-tools operate on submitted text, not retrieval).',
   notIntendedFor: [
     'Conversational chat (use the copilot pipeline instead)',
     'Autonomous diagnosis or treatment',
     'Silent mutation of clinical state',
+    'Representing itself as LLM-generated or model-inferred content',
   ],
   limitations: [
-    'Shares RAG\'s open adversarial tenant-isolation integration caveat.',
-    'Synthesis quality depends on the LLM provider selected and the retrieved evidence coverage.',
+    'Guideline-rag shares RAG\'s open adversarial tenant-isolation integration caveat.',
+    'The other 7 sub-tools are keyword/threshold rule matching over submitted text, not retrieval — coverage is limited to the curated trigger tables in clinical-intelligence.service.ts, not general clinical knowledge.',
+    'Guideline-rag\'s summary is extractive (cited passages only); it does not generate recommendations beyond retrieved source text.',
   ],
-  modalities: ['rag_assisted', 'llm_generation', 'analysis'],
+  modalities: ['deterministic_rule', 'rag_assisted', 'analysis'],
   riskClass: 'moderate',
   writeCategory: 'none',
   maxAutonomyLevel: 'RECOMMEND',
   minAutonomyLevel: 'OBSERVE',
   requiredContext: { patientRequired: true, encounterRequired: false, tenantRequired: true, userRequired: true, crossPatient: false },
-  inputSchema: { type: 'object', properties: { query: { type: 'string' } }, required: ['query'], description: 'A structured clinical query requiring evidence retrieval plus synthesis for a bound patient.' },
-  outputSchema: { type: 'object', description: 'Synthesized, cited clinical intelligence response.' },
-  dataSources: ['RAG pipeline', 'clinical data sources', 'LLM provider'],
+  inputSchema: { type: 'object', properties: { query: { type: 'string' } }, required: ['query'], description: 'A structured clinical query — submitted text for deterministic rule matching, or a guideline-evidence query for retrieval, for a bound patient.' },
+  outputSchema: { type: 'object', description: 'Structured, cited clinical intelligence response — rule-matched findings, or (guideline-rag only) retrieved and cited evidence.' },
+  dataSources: ['RAG pipeline (guideline-rag only)', 'submitted clinical text'],
   evidence: {
-    expectedSources: ['RAG-retrieved evidence', 'clinical data'],
+    expectedSources: ['RAG-retrieved evidence (guideline-rag only)', 'submitted clinical text'],
     requiresEvidence: true,
     supportsProvenance: true,
     reportsMissingData: true,
     reportsUncertainty: true,
     fabricatesWhenInsufficient: false,
   },
-  responseSourceCategory: SOURCE.RAG_ASSISTED,
+  responseSourceCategory: SOURCE.DETERMINISTIC_RULE,
   requiresHumanApproval: false,
   permittedRoles: [],
   tenantScope: 'tenant_only',
   patientBinding: 'required',
-  authorizationRequirements: ['clinical-read', 'llm-egress-authorized', 'tenant-isolation', 'safety-policy-gated'],
+  authorizationRequirements: ['clinical-read', 'tenant-isolation', 'safety-policy-gated'],
   failureMode: 'circuit_breaks',
-  failureBehavior: 'Degrades gracefully when RAG or LLM is unavailable; returns an explicit error or deterministic fallback rather than a fabricated clinical finding.',
+  failureBehavior: 'Degrades gracefully when RAG retrieval is unavailable (guideline-rag only); returns an explicit error or deterministic fallback rather than a fabricated clinical finding. No LLM provider is in this service\'s failure path — it never calls one.',
   approved: true,
-  lastVerified: '2026-08-23',
+  lastVerified: '2026-08-26',
   accountable: 'CareDroid clinical intelligence maintainers',
   implementationRef: 'backend/src/modules/clinical-intelligence/clinical-intelligence.service.ts',
   usageNotes: [
-    'This service integrates RAG at its call site (clinical-intelligence.service.ts:142). It is not a replacement for the copilot pipeline — it is a parallel, query-oriented intelligence surface.',
-    'RAG tenant isolation applies here too — same open adversarial integration caveat as the RAG capability itself.',
+    'Only guideline-rag (1 of 8 sub-capabilities) integrates RAG, at clinical-intelligence.service.ts queryGuidelineEvidence() via RAGService.retrieve(). The other 7 (ambient-scribe, differential-ai, timeline-ai, patient-summary-ai, order-set-ai, ai-explainability, clinical-audit) are deterministic keyword/threshold rule matching with zero retrieval and zero LLM call.',
+    'It is not a replacement for the copilot pipeline — it is a parallel, query-oriented intelligence surface.',
+    'RAG tenant isolation applies to guideline-rag — same open adversarial integration caveat as the RAG capability itself.',
+    'See src/pages/tools/ToolPageLayout.tsx\'s CLINICAL_INTELLIGENCE_DETERMINISTIC_TOOL_IDS / truthLabelForTool() for the frontend\'s independently-verified, matching truth label (\'Manual\' for all 8 sub-tools).',
   ],
 });
 

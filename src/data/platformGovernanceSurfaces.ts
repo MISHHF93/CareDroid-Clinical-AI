@@ -186,6 +186,50 @@ const DEMO_PANELS_BY_SURFACE = Object.freeze({
   },
 });
 
+/**
+ * Structured view of one `panels.modelInventory` entry (GET /api/ai-governance/summary,
+ * ModelRegistryService.listModels() in backend/src/modules/governance/governance.module.ts).
+ * That data is real and human-curated (data/model-registry/entries/*.json, 5 entries) -- but
+ * without this, the generic control-card renderer below (`detail: JSON.stringify(value)`)
+ * collapsed it to a fallback score of 60, a "5 records" summary, and a 220-char JSON slice,
+ * so none of it was actually readable by an admin. Only the fields the governance workspace
+ * renders as real columns are extracted here; anything missing is labeled, never guessed.
+ */
+export interface ModelInventoryCardView {
+  modelId: string;
+  modelName: string;
+  modelIdentifier: string;
+  status: string;
+  purpose: string;
+  regulatoryClass: string;
+  owner: string;
+  limitations: string[];
+  expiresAt: string;
+  retirementPlan: string;
+}
+
+const MODEL_INVENTORY_FIELD_NOT_DOCUMENTED = 'Not documented';
+
+export function buildModelInventoryCards(value: unknown): ModelInventoryCardView[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .filter((entry): entry is Record<string, unknown> => Boolean(entry) && typeof entry === 'object')
+    .map((entry, index) => ({
+      modelId: typeof entry.modelId === 'string' ? entry.modelId : `model-${index}`,
+      modelName: typeof entry.modelName === 'string' ? entry.modelName : MODEL_INVENTORY_FIELD_NOT_DOCUMENTED,
+      // ModelRegistryService.listModels() puts the real curated modelIdentifier
+      // (data/model-registry/entries/*.json's `modelIdentifier` field) into `version`.
+      modelIdentifier: typeof entry.version === 'string' ? entry.version : MODEL_INVENTORY_FIELD_NOT_DOCUMENTED,
+      status: typeof entry.status === 'string' ? entry.status : MODEL_INVENTORY_FIELD_NOT_DOCUMENTED,
+      purpose: typeof entry.purpose === 'string' ? entry.purpose : MODEL_INVENTORY_FIELD_NOT_DOCUMENTED,
+      regulatoryClass: typeof entry.regulatoryClass === 'string' ? entry.regulatoryClass : MODEL_INVENTORY_FIELD_NOT_DOCUMENTED,
+      owner: typeof entry.owner === 'string' ? entry.owner : MODEL_INVENTORY_FIELD_NOT_DOCUMENTED,
+      limitations: Array.isArray(entry.knownLimitations) ? entry.knownLimitations.map(String) : [],
+      expiresAt: typeof entry.expiresAt === 'string' ? entry.expiresAt : MODEL_INVENTORY_FIELD_NOT_DOCUMENTED,
+      retirementPlan: typeof entry.retirementPlan === 'string' ? entry.retirementPlan : MODEL_INVENTORY_FIELD_NOT_DOCUMENTED,
+    }));
+}
+
 export type PlatformGovernanceSurfaceId = keyof typeof PLATFORM_GOVERNANCE_SURFACE_COPY;
 
 export function inferPlatformGovernanceSurface(pathname = ''): PlatformGovernanceSurfaceId {
@@ -291,6 +335,9 @@ export function buildPlatformGovernanceSurfaceView({
       score: panelScore(value),
       summary: summarizePanelValue(value),
       detail: typeof value === 'object' ? JSON.stringify(value) : String(value ?? 'Ready'),
+      // Every control carries this key (even as null) so PlatformGovernanceWorkspace.tsx
+      // can branch on it without a union-type mismatch across map iterations.
+      modelInventory: key === 'modelInventory' ? buildModelInventoryCards(value) : null,
     })),
     safety: (apiData?.safety as Record<string, unknown> | undefined) || {
       autonomousActionTaken: false,

@@ -4,7 +4,16 @@ import { normalizePriority } from '../../src/types/emergency';
 import type { NativeAiSourceState, PostEdOrientationClass, PostEdOrientationPrediction } from './types';
 
 const MODEL_ID = 'post-ed-orientation';
-const MODEL_VERSION = '1.0.0-xgboost-heuristic';
+// Not a trained XGBoost model -- confirmed by direct read: this is a
+// hand-authored sigmoid-weighted linear combination of fixed coefficients
+// (see admitLogit/edouLogit/dischargeLogit below), with zero training step.
+// modelRegistry.ts's REGISTRY entry for 'post-ed-orientation' already
+// corrected its `algorithm` field to 'rules' for the same reason (Cycle 272
+// audit comment above that file's REGISTRY constant). The UI already
+// downgrades this to a 'Manual' truth-state via truthLabelForTool(), so this
+// rename has no user-facing behavior change -- it only stops the source
+// string itself from misleading a future developer or auditor.
+const MODEL_VERSION = '1.0.0-linear-heuristic';
 
 function sigmoid(value: number): number {
   return 1 / (1 + Math.exp(-value));
