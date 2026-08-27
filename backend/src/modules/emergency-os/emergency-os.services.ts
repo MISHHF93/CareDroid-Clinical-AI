@@ -3240,6 +3240,16 @@ export class QueueIntelligenceService {
   }
 }
 
+// Mirrors src/services/receptionEscalationWorkflow.ts's CLINICAL_REASONS /
+// applyClinicalEscalationFlags exactly -- only these 3 (of 5) reception
+// escalation reasons are clinical; 'duplicate-registration'/'identity-mismatch'
+// are administrative and deliberately apply no patient flags on the frontend.
+const CLINICAL_RECEPTION_ESCALATION_REASONS = new Set([
+  'worsening-symptoms',
+  'collapse-distress',
+  'urgent-triage-attention',
+]);
+
 @Injectable()
 export class ReceptionWorkspaceService {
   private readonly logger = new Logger(ReceptionWorkspaceService.name);
@@ -3459,14 +3469,33 @@ export class ReceptionWorkspaceService {
       },
     });
 
-    if (patientId && patient) {
+    // Found 2026-08-27: this used to write a literal 'Escalated' string --
+    // not a member of the frontend PatientFlag enum (src/types/emergency.ts)
+    // -- the exact same bug already found and fixed in this file's sibling
+    // EmergencyPatientService.escalatePatient (its own ESCALATION_FLAGS
+    // comment explains it: "not a recognized frontend PatientFlag ... it
+    // rendered no badge and drove no queue/reassessment logic"). The
+    // originating station showed correct badges immediately (the frontend's
+    // own local optimistic flags via applyClinicalEscalationFlags, which
+    // DOES use real flags), but the durable backend-truth patient record got
+    // a flag no frontend code recognizes -- so after a reload, or on any
+    // other station loading patient state fresh from the backend, this
+    // escalation showed no visual indicator at all despite the alert and
+    // workflow log both having arrived correctly.
+    if (patientId && patient && CLINICAL_RECEPTION_ESCALATION_REASONS.has(reasonId)) {
       try {
         const flags = patient.flags || [];
-        if (!flags.includes('Escalated')) {
+        // Matches applyClinicalEscalationFlags' own reasonId branch exactly.
+        const flagsToAdd =
+          reasonId === 'collapse-distress'
+            ? ['HighRisk', 'DeteriorationRisk', 'ReassessmentDue']
+            : ['HighRisk', 'ReassessmentDue'];
+        const nextFlags = [...new Set([...flags, ...flagsToAdd])];
+        if (nextFlags.length !== flags.length) {
           this.patientService.updatePatient(
             patientId,
             {
-              flags: [...flags, 'Escalated'],
+              flags: nextFlags,
             } as any,
             organizationId,
           );
@@ -3474,12 +3503,12 @@ export class ReceptionWorkspaceService {
       } catch (error) {
         // HEAL-255: the alert/workflow-log/realtime broadcast above already
         // fired, so the escalation itself isn't lost -- but a failure here
-        // means the patient board silently won't show the "Escalated"
+        // means the patient board silently won't show the escalation
         // visual indicator, with no trace of why. Logged rather than
         // discarded, matching this file's own convention elsewhere
         // (escalatePatient / HEAL-250's reception escalation sync).
         this.logger.warn(
-          `Failed to set Escalated flag for patient ${patientId} after reception escalation`,
+          `Failed to set escalation flags for patient ${patientId} after reception escalation`,
           error instanceof Error ? error.message : String(error),
         );
       }
