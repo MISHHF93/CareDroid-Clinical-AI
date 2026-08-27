@@ -270,6 +270,18 @@ function countRecords(data: Record<string, unknown> | null | undefined, surface:
   if (Array.isArray(data)) return data.length;
   if (Array.isArray(data.items)) return data.items.length;
   if (Array.isArray(data.events)) return data.events.length;
+  // Found 2026-08-27: PlatformGovernanceService.getConsent() (consent surface)
+  // returns { patientId, records, effectiveStatus } and getPrivacyAccessLog()
+  // (privacy surface) returns { patientId, accessLog, safety } -- neither key
+  // was recognized here, so both surfaces' "Records" metric silently showed 0
+  // regardless of how many real consent grants/privacy-access entries existed
+  // in the database, every time. Not attempting a broader audit of every
+  // other governance surface's response shape here (this shared function is
+  // fed by dozens of distinct endpoints across platformGovernanceApi.ts's
+  // SURFACE_ENDPOINTS/endpointForSurface) -- scoped to these two specifically
+  // verified, real, currently-broken shapes.
+  if (Array.isArray(data.records)) return data.records.length;
+  if (Array.isArray(data.accessLog)) return data.accessLog.length;
   const counts = data.counts as Record<string, number> | undefined;
   if (counts) {
     const key = Object.keys(counts).find((entry) => entry.includes(surface.replace('-', '')));

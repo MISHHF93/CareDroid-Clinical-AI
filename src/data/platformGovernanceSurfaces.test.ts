@@ -35,6 +35,46 @@ describe('platformGovernanceSurfaces', () => {
     expect(view.controls.length).toBeGreaterThan(0);
   });
 
+  // Regression coverage for the 2026-08-27 fix: PlatformGovernanceService's
+  // real getConsent()/getPrivacyAccessLog() responses shape their record
+  // arrays as `records`/`accessLog` -- neither key was recognized by the
+  // "Records" metric's counting logic, so the consent and privacy surfaces
+  // always showed "Records: 0" no matter how many real records existed.
+  it('counts real consent records under the "records" response key', () => {
+    const view = buildPlatformGovernanceSurfaceView({
+      surface: 'consent',
+      pathname: '/consent/patient-1',
+      apiData: {
+        patientId: 'patient-1',
+        effectiveStatus: 'granted',
+        records: [
+          { id: 'c1', status: 'granted' },
+          { id: 'c2', status: 'revoked' },
+        ],
+      },
+      sourceStatus: 'live',
+    });
+
+    const recordsMetric = view.metrics.find((metric) => metric.label === 'Records');
+    expect(recordsMetric?.value).toBe('2');
+  });
+
+  it('counts real privacy access-log entries under the "accessLog" response key', () => {
+    const view = buildPlatformGovernanceSurfaceView({
+      surface: 'privacy',
+      pathname: '/privacy',
+      apiData: {
+        patientId: 'patient-1',
+        accessLog: [{ id: 'a1' }, { id: 'a2' }, { id: 'a3' }],
+        safety: { failClosed: true },
+      },
+      sourceStatus: 'live',
+    });
+
+    const recordsMetric = view.metrics.find((metric) => metric.label === 'Records');
+    expect(recordsMetric?.value).toBe('3');
+  });
+
   // GET /api/ai-governance/summary's panels.modelInventory serves real, human-curated
   // model cards (data/model-registry/entries/*.json via ModelRegistryService.listModels()
   // in backend/src/modules/governance/governance.module.ts) -- previously the generic
