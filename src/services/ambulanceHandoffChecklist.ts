@@ -411,6 +411,58 @@ function pickStaffOverrides(
   return patch;
 }
 
+/**
+ * Reconstructs a checklist-shaped object from the durable flat fields the
+ * backend echoes back (handoffIdentityStatus/handoffMedicationsEnRoute/etc.,
+ * see EMSArrival's doc comment on those fields in types/emergency.ts).
+ *
+ * Found 2026-08-27: arrival.ambulanceHandoffChecklist (the nested object
+ * used below) only ever exists in the browser tab that actively worked
+ * through the checklist -- it's never itself persisted. The flat fields ARE
+ * durable (added so completeHandoff's real checklist content would survive
+ * a reload -- see that migration's doc comment), but nothing read them back
+ * into checklist shape, so a genuine reload or a second workstation viewing
+ * an already-handed-off arrival silently re-derived the checklist from raw
+ * signals (vitals/flags/text-parsed notes) instead of showing what staff
+ * actually documented -- discarding a manually-verified identity status,
+ * staff-added critical flags, a chosen destination override, medications
+ * staff added by hand, and who actually accepted the handoff. Same "durable
+ * field, dead read path" bug class as buildInboundEmsRecord's patientId and
+ * Alert.ownerRole fixed earlier this session.
+ */
+function checklistFromDurableFields(arrival: EMSArrival): AmbulanceHandoffChecklist | null {
+  const hasAnyDurableField =
+    arrival.handoffIdentityStatus != null ||
+    arrival.handoffVitalsReceived != null ||
+    (arrival.handoffMedicationsEnRoute?.length ?? 0) > 0 ||
+    (arrival.handoffCriticalFlags?.length ?? 0) > 0 ||
+    arrival.handoffPatientDestination != null ||
+    arrival.handoffAcceptedByStaffId != null;
+  if (!hasAnyDurableField) return null;
+
+  const patientDestination = arrival.handoffPatientDestination;
+
+  return {
+    arrivalId: arrival.id,
+    patientId: arrival.patientId,
+    identityStatus: arrival.handoffIdentityStatus || 'unknown',
+    complaintSummary: arrival.chiefComplaint || arrival.prearrivalComplaint || 'Complaint pending',
+    vitalsReceived: Boolean(arrival.handoffVitalsReceived),
+    medicationsEnRoute: arrival.handoffMedicationsEnRoute || [],
+    criticalFlags: arrival.handoffCriticalFlags || [],
+    handoffSummary: arrival.handoffSummary,
+    handoffAccepted: Boolean(arrival.handoffCompletedAt),
+    handoffAcceptedAt: arrival.handoffCompletedAt,
+    handoffAcceptedByStaffId: arrival.handoffAcceptedByStaffId,
+    handoffAcceptedByStaffName: arrival.handoffAcceptedByStaffName,
+    patientDestination: patientDestination || 'pending',
+    destinationLabel: patientDestination
+      ? AMBULANCE_HANDOFF_DESTINATION_LABELS[patientDestination]
+      : undefined,
+    updatedAt: arrival.handoffCompletedAt || nowIso(),
+  };
+}
+
 export function resolveAmbulanceHandoffChecklist(
   arrival: EMSArrival,
   options: {
@@ -420,7 +472,7 @@ export function resolveAmbulanceHandoffChecklist(
   } = {},
 ): AmbulanceHandoffChecklist {
   const derived = buildAmbulanceHandoffChecklist(arrival, options);
-  const stored = arrival.ambulanceHandoffChecklist;
+  const stored = arrival.ambulanceHandoffChecklist || checklistFromDurableFields(arrival);
   if (!stored) return derived;
 
   const mergedMedications = [
@@ -433,7 +485,7 @@ export function resolveAmbulanceHandoffChecklist(
     medicationsEnRoute: mergedMedications,
     criticalFlags: [
       ...derived.criticalFlags,
-      ...stored.criticalFlags.filter(
+      ...(stored.criticalFlags || []).filter(
         (flag) => flag.source === 'staff' && !derived.criticalFlags.some((entry) => entry.id === flag.id),
       ),
     ],

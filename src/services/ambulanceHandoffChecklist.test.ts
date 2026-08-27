@@ -138,6 +138,63 @@ describe('ambulanceHandoffChecklist', () => {
     expect(merged.destinationLabel).toBe('Resus 2');
   });
 
+  // Regression coverage for the 2026-08-27 fix: arrival.ambulanceHandoffChecklist
+  // (the nested object above) only ever exists in the browser tab that
+  // actively worked the checklist -- it is never itself persisted. The
+  // backend DOES durably persist and echo back flat handoff* fields
+  // (see EMSArrival's doc comment in types/emergency.ts), but nothing read
+  // them back into checklist shape, so a genuine reload or a second
+  // workstation viewing an already-handed-off arrival silently re-derived
+  // the checklist from raw signals instead of what staff actually
+  // documented. Same bug class as buildInboundEmsRecord's patientId and
+  // Alert.ownerRole fixed earlier this session.
+  it('reconstructs the checklist from durable flat fields when the nested ambulanceHandoffChecklist is absent (a reload / different workstation)', () => {
+    const reloadedArrival = {
+      ...baseArrival,
+      // No ambulanceHandoffChecklist -- this is what a fresh fetch actually
+      // looks like: only the flat fields the backend persists survive.
+      ambulanceHandoffChecklist: undefined,
+      handoffCompletedAt: '2026-06-20T12:05:00.000Z',
+      handoffIdentityStatus: 'verified' as const,
+      handoffVitalsReceived: true,
+      handoffMedicationsEnRoute: ['Aspirin 325mg', 'Nitroglycerin'],
+      handoffCriticalFlags: [
+        { id: 'staff-added-allergy', label: 'Anticoagulant allergy', source: 'staff' as const },
+      ],
+      handoffPatientDestination: 'room' as const,
+      handoffAcceptedByStaffId: 'staff-77',
+      handoffAcceptedByStaffName: 'Dr. Accepting',
+    };
+
+    const resolved = resolveAmbulanceHandoffChecklist(reloadedArrival, {
+      patient: {
+        id: 'patient-ems-1',
+        firstName: 'Sam',
+        lastName: 'Rivera',
+        registrationStatus: 'complete',
+        flags: [PatientFlag.EMSArrival],
+      } as never,
+    });
+
+    expect(resolved.identityStatus).toBe('verified');
+    expect(resolved.handoffAcceptedByStaffId).toBe('staff-77');
+    expect(resolved.handoffAcceptedByStaffName).toBe('Dr. Accepting');
+    expect(resolved.patientDestination).toBe('room');
+    expect(resolved.destinationLabel).toBe(AMBULANCE_HANDOFF_DESTINATION_LABELS.room);
+    expect(resolved.criticalFlags.some((flag) => flag.id === 'staff-added-allergy')).toBe(true);
+    // The auto-derived flags (EMS severity, chief-complaint keyword match,
+    // STEMI checklist) still show up too -- reconstruction augments,
+    // it doesn't replace, matching the nested-object merge path's own
+    // behavior.
+    expect(resolved.criticalFlags.some((flag) => flag.id === 'ems-critical')).toBe(true);
+  });
+
+  it('falls back to a freshly-derived checklist when no durable fields and no nested checklist are present (a genuine not-yet-worked pre-arrival)', () => {
+    const resolved = resolveAmbulanceHandoffChecklist(baseArrival);
+    expect(resolved.identityStatus).toBe('unknown');
+    expect(resolved.handoffAcceptedByStaffId).toBeUndefined();
+  });
+
   it('builds the exact EMS-handoff sync payload from a resolved checklist, omitting the accepting clinician identity (server-derived, never client-sent)', () => {
     // Regression: EMSPipeline.tsx's "Complete Handoff" click used to send
     // only {handoffAccepted, handoffAcceptedAt} to POST /ems/handoff -- the

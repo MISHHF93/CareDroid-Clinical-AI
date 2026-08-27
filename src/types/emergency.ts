@@ -443,6 +443,26 @@ export interface EMSArrival {
   medicationsEnRoute?: string[];
   /** Structured handoff checklist — synced to linked patient.emsArrival when present. */
   ambulanceHandoffChecklist?: AmbulanceHandoffChecklist;
+  /**
+   * Durable mirror of the checklist content actually documented at "Complete
+   * Handoff" time (EMSPipeline.tsx's completeHandoff -> postEmsHandoff ->
+   * EMSIntakeService.completeHandoff), read back from the backend on every
+   * fetch (emergency-os.services.ts's buildInboundEmsRecord). Distinct from
+   * `ambulanceHandoffChecklist` above, which only exists in THIS session's
+   * local Zustand state -- these flat fields are what
+   * resolveAmbulanceHandoffChecklist() falls back to reconstructing from
+   * when the nested object is absent (a reload, or a different workstation),
+   * so a completed handoff's actually-documented identity/meds/critical-flags/
+   * destination/acceptor don't silently re-derive from scratch and discard
+   * what staff really entered.
+   */
+  handoffAcceptedByStaffId?: EntityId;
+  handoffAcceptedByStaffName?: string;
+  handoffIdentityStatus?: AmbulanceHandoffIdentityStatus;
+  handoffVitalsReceived?: boolean;
+  handoffMedicationsEnRoute?: string[];
+  handoffCriticalFlags?: AmbulanceHandoffCriticalFlag[];
+  handoffPatientDestination?: AmbulanceHandoffDestination;
   /** MIST/SBAR structured pre-arrival notification from EMS or call-in. */
   preArrivalNotification?: PreArrivalNotification;
   /** Recommended resource activations derived from clinical data. */
