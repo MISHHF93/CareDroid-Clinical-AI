@@ -5,6 +5,7 @@
 
 import { auditMultiTenantReadiness } from './multiTenantReadinessModel';
 import { simulateClinicOnboarding } from './clinicOnboardingModel';
+import { auditIntegrationDiscovery } from './integrationStatusRegistry';
 
 export const PRODUCTION_READINESS_DIMENSION = Object.freeze({
   ARCHITECTURE: 'architecture',
@@ -23,6 +24,10 @@ const BASE_SCORES = Object.freeze({
   frontend: 74,
   backend: 58,
   responsiveness: 71,
+  // Fallback only -- scoreProductionReadiness() below replaces this with a
+  // live score derived from integrationStatusRegistry.ts's actual
+  // implemented/partial/placeholder counts, so this constant only matters
+  // if the registry is ever empty.
   integrations: 38,
   securityControls: 52,
   auditability: 65,
@@ -214,6 +219,23 @@ export function scoreProductionReadiness(signals: any = {}) {
     edRbacWired: Boolean(signals.edRbacWired),
   });
 
+  // Same partial-credit convention as evaluateMultiTenantReadiness()'s own
+  // readinessScore: (implemented + partial * 0.5) / total * 100 -- reused
+  // here so this dimension tracks the actual registry (integrations moving
+  // from placeholder to implemented moves this score automatically) instead
+  // of a static guess someone has to remember to bump by hand.
+  const integrationDiscovery = auditIntegrationDiscovery();
+  const implementedCount = integrationDiscovery.byStatus.implemented || 0;
+  const partialCount = integrationDiscovery.byStatus.partial || 0;
+  const liveIntegrationsScore =
+    integrationDiscovery.totalPoints > 0
+      ? Math.round(
+          ((implementedCount + partialCount * 0.5) / integrationDiscovery.totalPoints) * 100,
+        )
+      : BASE_SCORES.integrations;
+
+  const resolvedBaseScores = { ...BASE_SCORES, integrations: liveIntegrationsScore };
+
   const adjustments = {
     architecture: multiTenant.passesAudit ? 15 : multiTenant.overallReadinessScore > 50 ? 5 : 0,
     backend: signals.emergencyApiAuthenticated ? 12 : 0,
@@ -222,7 +244,7 @@ export function scoreProductionReadiness(signals: any = {}) {
   };
 
   const dimensions = Object.fromEntries(
-    Object.entries(BASE_SCORES).map(([key, base]) => {
+    Object.entries(resolvedBaseScores).map(([key, base]) => {
       const adjusted = Math.min(100, base + (adjustments[key] || 0));
       return [
         key,
