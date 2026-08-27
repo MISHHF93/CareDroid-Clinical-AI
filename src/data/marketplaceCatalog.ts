@@ -121,7 +121,15 @@ export const MARKETPLACE_ITEMS = Object.freeze([
     id: 'integration-fhir',
     category: 'integrations',
     title: 'FHIR Integration Connector',
-    summary: 'Connects CareDroid to FHIR-capable EHR and clinical data sources.',
+    // Roadmap item, not a live connector -- matches the honest 'roadmap'
+    // status the equivalent, actually-reachable /integrations-marketplace
+    // offering already carries (backend/src/modules/product-catalog/data/
+    // product-catalog-seed.data.ts). This entry is itself currently
+    // unreachable by any live UI (its 'integrations' category is filtered
+    // out everywhere marketplaceCatalog.ts is consumed), but the summary
+    // text should never overclaim even while inert, in case a future
+    // change makes it reachable.
+    summary: 'Planned connector for FHIR-capable EHR and clinical data sources -- not yet a live integration.',
     owner: 'CareDroid Integration Hub',
     route: '/integrations-marketplace',
     entitlement: 'integrations',
