@@ -908,8 +908,8 @@ export class EmergencyOsController {
 
   @RequirePermission(Permission.READ_PHI)
   @Get('intake')
-  getIntake() {
-    return this.smartIntakeService.getSmartIntake();
+  getIntake(@TenantContext() tenantContext?: TenantContextValue) {
+    return this.smartIntakeService.getSmartIntake(tenantContext?.organizationId);
   }
 
   // See BOLA-audit comment on createPatient() above -- same gap, same fix.
@@ -1147,8 +1147,8 @@ export class EmergencyOsController {
 
   @RequirePermission(Permission.READ_PHI)
   @Get('provincial-health')
-  getProvincialHealth() {
-    return this.provincialHealthService.getProvincialHealth();
+  getProvincialHealth(@TenantContext() tenantContext?: TenantContextValue) {
+    return this.provincialHealthService.getProvincialHealth(tenantContext?.organizationId);
   }
 
   @RequirePermission(Permission.VIEW_INTEGRATIONS)
@@ -1165,7 +1165,7 @@ export class EmergencyOsController {
       { user: (request as any)?.user, tenantContext },
       'agent-clinical',
     );
-    return this.copilotService.getCopilotContext();
+    return this.copilotService.getCopilotContext(tenantContext?.organizationId);
   }
 
   // Converged 2026-08-08: this endpoint previously called EDCopilotService.processQuery(),

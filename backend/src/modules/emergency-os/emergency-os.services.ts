@@ -3020,7 +3020,15 @@ export class SmartIntakeService {
     private readonly workflowLogService: WorkflowActionLogService,
   ) {}
 
-  getSmartIntake() {
+  // Found 2026-08-27 continuing HEAL-343/347.x's tenant-scoping pass:
+  // listPatients() was called with no organizationId at all -- any
+  // READ_PHI-permitted staff member hitting GET /emergency/intake (any
+  // hospital, since RBAC has no tenant concept) saw the 3 most recently
+  // created patients across EVERY organization in the system as
+  // "recentPatients", a real cross-tenant PHI leak on a live route. Same
+  // optional-trailing-param, own-org-or-legacy-null pattern as every other
+  // fix in this campaign.
+  getSmartIntake(organizationId?: string) {
     return envelope('Smart Intake', {
       mode: 'quick-intake',
       identityReview: [
@@ -3037,7 +3045,7 @@ export class SmartIntakeService {
           action: 'Review candidate matches before chart merge.',
         },
       ],
-      recentPatients: this.patientService.listPatients().slice(-3),
+      recentPatients: this.patientService.listPatients(organizationId).slice(-3),
     });
   }
 
@@ -3789,8 +3797,14 @@ export class ProvincialHealthService {
     private readonly workflowLogService: WorkflowActionLogService,
   ) {}
 
-  getProvincialHealth() {
-    const patients = this.patientService.listPatients().slice(0, 3);
+  // Found 2026-08-27 continuing HEAL-343/347.x's tenant-scoping pass:
+  // listPatients() was called with no organizationId at all -- the
+  // `medications`/`allergies`/`recentEncounters` fields below are
+  // honestly-labeled placeholder text, but `patientId`/`mrn` are REAL,
+  // cross-tenant patient identifiers, unscoped on a live READ_PHI route
+  // (GET /emergency/provincial-health).
+  getProvincialHealth(organizationId?: string) {
+    const patients = this.patientService.listPatients(organizationId).slice(0, 3);
     this.workflowLogService.record({
       type: 'provincial_data_viewed',
       title: 'Provincial data viewed',
@@ -3893,8 +3907,19 @@ export class EDCopilotService {
     private readonly workflowLogService: WorkflowActionLogService,
   ) {}
 
-  getCopilotContext() {
-    const patients = this.patientService.listPatients();
+  // Found 2026-08-27 continuing HEAL-343/347.x's tenant-scoping pass:
+  // listPatients() was called with no organizationId AND no slice limit at
+  // all (unlike the SmartIntake/ProvincialHealth siblings fixed alongside
+  // this) -- the ED Copilot's own prompt context (patientCount/highRiskCount
+  // /reassessmentCount) was computed across every patient in every
+  // organization. No individual patient identifiers leave this function
+  // (aggregate counts only), but hospital census/capacity is still
+  // cross-tenant-sensitive data that shouldn't blend across organizations.
+  // computeCapacity() below is deliberately left unscoped -- see HEAL-347.4's
+  // note on its own process-wide shared-state/realtime-broadcast side effect,
+  // which needs its own dedicated pass, not a parameter thread here.
+  getCopilotContext(organizationId?: string) {
+    const patients = this.patientService.listPatients(organizationId);
     this.workflowLogService.record({
       type: 'copilot_used',
       title: 'Copilot used',

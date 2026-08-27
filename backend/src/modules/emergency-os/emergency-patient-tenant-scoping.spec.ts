@@ -9,6 +9,9 @@ import {
   ReferralService,
   EMSIntakeService,
   ReceptionWorkspaceService,
+  SmartIntakeService,
+  ProvincialHealthService,
+  EDCopilotService,
 } from './emergency-os.services';
 
 function makeService() {
@@ -810,5 +813,78 @@ describe('ReceptionWorkspaceService — organization tenant scoping (HEAL-347.71
     // id, never org-b's real patient name.
     expect(crossOrgResult.record.patientLabel).toBe(patientB.id);
     expect(crossOrgResult.record.patientLabel).not.toContain('ShouldNotLeak');
+  });
+});
+
+// Found 2026-08-27 continuing this campaign: three more real, live,
+// READ_PHI-gated routes (GET /emergency/intake, GET /emergency/provincial-health,
+// GET /emergency/copilot) called listPatients() with zero organizationId at
+// all -- any staff member at any hospital could see another hospital's
+// most-recent patients (SmartIntake), real patient identifiers (Provincial
+// Health, labeled placeholder records but with genuine patientId/mrn), or
+// aggregate census counts blended across organizations (ED Copilot).
+describe('SmartIntakeService, ProvincialHealthService, EDCopilotService — organization tenant scoping (2026-08-27)', () => {
+  function makeServices() {
+    const workflowLogService = { record: jest.fn() } as unknown as { record: jest.Mock };
+    const patientService = new EmergencyPatientService(workflowLogService as any);
+    return {
+      patientService,
+      smartIntake: new SmartIntakeService(patientService, workflowLogService as any),
+      provincialHealth: new ProvincialHealthService(patientService, workflowLogService as any),
+      copilot: new EDCopilotService(patientService, workflowLogService as any),
+    };
+  }
+
+  it("SmartIntakeService.getSmartIntake(organizationId) scopes recentPatients to the caller's org", () => {
+    const { patientService, smartIntake } = makeServices();
+    const patientA = patientService.createPatient(
+      { firstName: 'Own', lastName: 'Org' } as any,
+      'org-a',
+    );
+    const patientB = patientService.createPatient(
+      { firstName: 'Other', lastName: 'Org' } as any,
+      'org-b',
+    );
+
+    const scoped = smartIntake.getSmartIntake('org-a').data as {
+      recentPatients: Array<{ id: string }>;
+    };
+    expect(scoped.recentPatients.some((patient) => patient.id === patientA.id)).toBe(true);
+    expect(scoped.recentPatients.some((patient) => patient.id === patientB.id)).toBe(false);
+
+    const unscoped = smartIntake.getSmartIntake().data as { recentPatients: Array<{ id: string }> };
+    expect(unscoped.recentPatients.some((patient) => patient.id === patientB.id)).toBe(true);
+  });
+
+  it('ProvincialHealthService.getProvincialHealth(organizationId) threads organizationId into the scoped patient lookup', () => {
+    // getProvincialHealth() takes the first 3 of listPatients(organizationId)
+    // -- append-order, not recency, so a positional/behavioral assertion
+    // would depend on exactly how many legacy fixture patients already
+    // precede whatever this test creates, making it unreliable either way.
+    // Spying on listPatients() directly verifies the actual bug that was
+    // fixed here (organizationId was never passed at all) without coupling
+    // the test to fixture ordering.
+    const { patientService, provincialHealth } = makeServices();
+    const listPatientsSpy = jest.spyOn(patientService, 'listPatients');
+
+    provincialHealth.getProvincialHealth('org-a');
+    expect(listPatientsSpy).toHaveBeenCalledWith('org-a');
+
+    provincialHealth.getProvincialHealth();
+    expect(listPatientsSpy).toHaveBeenLastCalledWith(undefined);
+  });
+
+  it("EDCopilotService.getCopilotContext(organizationId) scopes the census used for prompt context to the caller's org", () => {
+    const { patientService, copilot } = makeServices();
+    const before = copilot.getCopilotContext().data.promptContext.patientCount;
+    patientService.createPatient({ firstName: 'Own', lastName: 'Org' } as any, 'org-a');
+    patientService.createPatient({ firstName: 'Other', lastName: 'Org' } as any, 'org-b');
+
+    const scoped = copilot.getCopilotContext('org-a').data.promptContext.patientCount;
+    const unscoped = copilot.getCopilotContext().data.promptContext.patientCount;
+    // A different real org's patient must not inflate this org's Copilot
+    // prompt context, even though it's aggregate-only (no identifiers).
+    expect(scoped).toBeLessThan(unscoped);
+    expect(scoped).toBeGreaterThanOrEqual(before);
   });
 });
