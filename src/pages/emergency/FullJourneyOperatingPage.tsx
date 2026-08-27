@@ -19,7 +19,7 @@ import EdDataSourceBanner from '../../components/emergency/EdDataSourceBanner';
 import CareOperationsInboxPanel from '../../components/emergency/CareOperationsInboxPanel';
 import useEmergencyOperatingSurface from '../../hooks/useEmergencyOperatingSurface';
 import type { OperatingSurfaceId } from '../../services/emergencyOsApi';
-import { EmergencyRoutePage, MetricGrid } from './emergencyRouteShared';
+import { EmergencyRoutePage, MetricGrid, MaturityChip } from './emergencyRouteShared';
 import type { EDReadinessPlan } from '../../types/emergency';
 import {
   buildCommandCenterWorkflowActions,
@@ -72,7 +72,7 @@ const VIEW_STAGE_IDS: Record<ViewId, readonly string[]> = {
 // ── Shared card shell ────────────────────────────────────────────────────────
 
 function SectionCard({ title, lead, badge, children }: {
-  title: string;
+  title: React.ReactNode;
   lead?: string;
   badge?: string | number;
   children: React.ReactNode;
@@ -734,13 +734,19 @@ function DiagnosticsView() {
       </div>
 
       <SectionCard
-        title="Diagnostics Board"
+        title={
+          <>
+            Diagnostics Board <MaturityChip maturity="planned" />
+          </>
+        }
         lead="Active diagnostic orders sorted by priority. STAT orders appear first."
         badge={board.length}
       >
         {board.length === 0 ? (
           <p className="fj-caption-13-mt">
-            No active diagnostic orders. Orders appear here when created via the patient care workflow.
+            Order-based diagnostics tracking is not yet built -- there is no clinician-facing way to place a
+            lab, imaging, ECG, or pharmacy order in CareDroid today, so this board can never show real data.
+            The metrics above will always read 0 until order placement is implemented.
           </p>
         ) : (
           <div className="emergency-route-stack u-mt-10" >

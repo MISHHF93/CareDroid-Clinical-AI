@@ -99,3 +99,24 @@ describe('FullJourneyOperatingPage handoffs view — Care Operations Inbox', () 
     expect(await screen.findByText(/inbox clear/i)).toBeInTheDocument();
   });
 });
+
+/**
+ * Diagnostics Board honesty: diagnosticsCoordinationService.createDiagnosticOrder is real,
+ * exported code, but nothing in the app ever calls it -- there is no clinician-facing way to
+ * place a lab/imaging/ECG/pharmacy order, so this board can never show real data in
+ * production. The empty state used to read "Orders appear here when created via the patient
+ * care workflow", implying such a workflow exists -- it doesn't. Pinned here so this stays
+ * honest rather than silently reverting to an implied-but-nonexistent workflow.
+ */
+describe('FullJourneyOperatingPage diagnostics view — Diagnostics Board honesty', () => {
+  it('marks the board Planned and states plainly that order placement is not built, not that orders are simply absent', () => {
+    renderPageWithRouter(<FullJourneyOperatingPage view="diagnostics" />);
+
+    expect(screen.getByText(/diagnostics board/i)).toBeInTheDocument();
+    expect(screen.getByText(/planned/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/order-based diagnostics tracking is not yet built/i),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/orders appear here when created via the patient care workflow/i)).not.toBeInTheDocument();
+  });
+});
