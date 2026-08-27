@@ -103,4 +103,38 @@ describe('useIntegrationHub (HEAL)', () => {
 
     expect(result.current.error).toBe(GENERIC_FALLBACK);
   });
+
+  // Regression coverage for the 2026-08-27 fix: GET /interoperability/events
+  // (IntegrationHubService.listRecent()) has always returned { events, count }
+  // -- this hook checked payload.items, which never existed on the real
+  // response, so recentEvents was always [] regardless of what the backend
+  // actually persisted. Every ingested FHIR/HL7/lab/device-telemetry event
+  // was silently invisible on the Integration Hub page.
+  it('reads recentEvents off the real { events, count } response shape, not a nonexistent .items field', async () => {
+    vi.mocked(fetchIntegrationHub).mockResolvedValue({ data: {} });
+    vi.mocked(fetchIntegrationEvents).mockResolvedValue({
+      events: [
+        { id: 'evt-1', family: 'FHIR', eventType: 'Patient', processingStatus: 'processed' },
+        { id: 'evt-2', family: 'HL7', eventType: 'ADT^A01', processingStatus: 'failed', error: 'boom' },
+      ],
+      count: 2,
+    });
+
+    const { result } = renderHook(() => useIntegrationHub());
+
+    await waitFor(() => expect(result.current.recentEvents).toHaveLength(2));
+
+    expect(result.current.recentEvents[0]).toMatchObject({ id: 'evt-1', family: 'FHIR' });
+    expect(result.current.recentEvents[1]).toMatchObject({ id: 'evt-2', error: 'boom' });
+  });
+
+  it('still accepts a bare array response, for backward compatibility', async () => {
+    vi.mocked(fetchIntegrationHub).mockResolvedValue({ data: {} });
+    vi.mocked(fetchIntegrationEvents).mockResolvedValue([{ id: 'evt-legacy' }]);
+
+    const { result } = renderHook(() => useIntegrationHub());
+
+    await waitFor(() => expect(result.current.recentEvents).toHaveLength(1));
+    expect(result.current.recentEvents[0]).toMatchObject({ id: 'evt-legacy' });
+  });
 });

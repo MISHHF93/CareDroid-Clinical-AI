@@ -66,7 +66,23 @@ export function useIntegrationHub(eventLimit = 25): IntegrationHubState {
 
     if (eventsResult.status === 'fulfilled') {
       const payload = eventsResult.value;
-      setRecentEvents(Array.isArray(payload) ? payload : Array.isArray(payload?.items) ? payload.items : []);
+      // Found 2026-08-27: GET /interoperability/events (IntegrationHubService
+      // .listRecent()) returns { events, count } -- this checked payload.items
+      // instead, which never existed on the real response, so recentEvents
+      // was always [] regardless of what the backend actually persisted.
+      // Every ingested FHIR/HL7/lab/device-telemetry event (with real
+      // processing status and error detail) was silently invisible on the
+      // Integration Hub page, which rendered "No persisted interoperability
+      // events yet." even when the pipeline was working correctly.
+      setRecentEvents(
+        Array.isArray(payload)
+          ? payload
+          : Array.isArray(payload?.events)
+            ? payload.events
+            : Array.isArray(payload?.items)
+              ? payload.items
+              : [],
+      );
     } else {
       setRecentEvents([]);
     }
