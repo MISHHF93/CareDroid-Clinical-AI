@@ -551,20 +551,34 @@ export default function EMSPipeline() {
     }
   };
 
-  // HEAL-276: EMSPressureScore (rendered directly above this section on
-  // the same page, from the same emsArrivals array) excludes arrivals
-  // that already have a patientId set -- convertEMSArrivalToPatient()
-  // assigns patientId but leaves status as 'Handoff' (not 'Complete'), so
-  // an arrival already converted to a live patient (bed assigned, patient
-  // in the ED) would otherwise still count here as a phantom "still
-  // waiting" ambulance, disagreeing with the widget right above it.
+  // HEAL-276 (2026-08-16) excluded arrivals with a patientId set from this
+  // list, to stop an arrival already converted to a live patient (bed
+  // assigned, patient in the ED) from still counting as a phantom
+  // "still waiting" ambulance, disagreeing with EMSPressureScore (rendered
+  // directly above this section, from the same emsArrivals array). That fix
+  // had a real side effect, found 2026-08-27: convertEMSArrivalToPatient()
+  // assigns patientId but leaves status as 'Handoff' (not 'Complete') --
+  // exactly the shape the "Complete Handoff" button's own render condition
+  // (arrival.patientId && !arrival.handoffCompletedAt, below) targets. Since
+  // this list is the only place that button renders, excluding
+  // patientId-bearing arrivals made the button permanently unreachable for
+  // every real EMS arrival: an arrival could never simultaneously satisfy
+  // "in this list" and "the button's own precondition." The backend's
+  // completeHandoff() doesn't require a patientId either (input.patientId is
+  // optional, emergency-os.services.ts), confirming patientId was never the
+  // right signal for "still needs a Complete-Handoff action" -- swapped to
+  // !handoffCompletedAt, which correctly excludes the same converted-and-done
+  // arrivals HEAL-276 cared about (once Complete Handoff is actually
+  // clicked) without colliding with the button's own precondition.
+  // EMSPressureScore.tsx's matching filter gets the identical fix so the two
+  // widgets keep agreeing -- HEAL-276's actual point -- via the correct signal.
   const incoming = activeArrivals
     .filter((arrival) => arrival.status === 'Inbound' && minutesRemaining(arrival, now) > 0 && !arrival.patientId)
     .sort((a, b) => minutesRemaining(a, now) - minutesRemaining(b, now));
   const awaitingHandoff = activeArrivals
     .filter(
       (arrival) =>
-        !arrival.patientId &&
+        !arrival.handoffCompletedAt &&
         (arrival.status === 'Arrived' || arrival.status === 'Handoff' || minutesRemaining(arrival, now) <= 0)
     )
     .sort((a, b) => minutesRemaining(a, now) - minutesRemaining(b, now));

@@ -34,9 +34,15 @@ export function calculateEMSPressureScore(emsArrivals = [] as any[], now = new D
     (arrival) =>
       arrival.status === 'Inbound' && minutesUntilEMSArrival(arrival, now) > 0 && !arrival.patientId
   );
+  // Matches EMSPipeline.tsx's identical awaitingHandoff filter -- see that
+  // file's comment for the full HEAL-276 history. !handoffCompletedAt (not
+  // !patientId) correctly excludes an arrival once its handoff is actually
+  // done, without also excluding a converted-but-not-yet-completed arrival
+  // (patientId set, status 'Handoff', no handoffCompletedAt) -- exactly the
+  // arrival EMSPipeline.tsx's "Complete Handoff" button needs to act on.
   const awaitingHandoff = activeArrivals.filter(
     (arrival) =>
-      !arrival.patientId &&
+      !arrival.handoffCompletedAt &&
       (arrival.status === 'Arrived' ||
         arrival.status === 'Handoff' ||
         minutesUntilEMSArrival(arrival, now) <= 0)

@@ -2,6 +2,7 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { render, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import EMSPipeline from './EMSPipeline';
+import { calculateEMSPressureScore } from './EMSPressureScore';
 import { HelpHubProvider } from '../contexts/HelpHubContext';
 import { PractitionerVisibilityProvider } from '../contexts/PractitionerVisibilityContext';
 import { RouteChromeProvider } from '../contexts/RouteChromeContext';
@@ -164,30 +165,40 @@ describe('EMSPipeline render', () => {
     expect(queryByText(/backend fleet/i)).not.toBeInTheDocument();
   });
 
-  it('HEAL-276: excludes an arrival already converted to a patient from "Awaiting Handoff", matching EMSPressureScore', () => {
-    // convertEMSArrivalToPatient() assigns patientId but leaves
-    // status: 'Handoff' -- this arrival has already become a live patient
-    // (bed assigned, in the ED), so it should not show as a phantom
-    // "still waiting" ambulance.
+  // HEAL-276 (2026-08-16) originally excluded any arrival with a patientId
+  // set from "Awaiting Handoff", to stop an arrival already converted to a
+  // live patient (bed assigned, in the ED) from counting as a phantom
+  // "still waiting" ambulance, disagreeing with EMSPressureScore. That fix
+  // had a real side effect, found 2026-08-27: convertEMSArrivalToPatient()
+  // assigns patientId but leaves status 'Handoff' (not 'Complete') -- exactly
+  // the shape the "Complete Handoff" button's own render condition targets,
+  // and this list is the only place that button renders. Excluding every
+  // patientId-bearing arrival made the button permanently unreachable for a
+  // real EMS handoff. Fixed by keying both this list and EMSPressureScore's
+  // matching filter off !handoffCompletedAt instead of !patientId -- the two
+  // widgets still agree (HEAL-276's actual goal, reasserted below), but a
+  // converted-and-still-pending arrival now correctly stays visible and
+  // actionable until its handoff is actually completed.
+  const CONVERTED_BUT_NOT_COMPLETED_ARRIVAL = {
+    id: 'ems-already-converted',
+    unitId: 'Medic 9',
+    unitName: 'Medic 9',
+    status: 'Handoff',
+    severity: 'Moderate',
+    eta: 0,
+    dispatchTime: new Date().toISOString(),
+    estimatedArrivalTime: new Date().toISOString(),
+    arrivedAt: new Date().toISOString(),
+    patientId: 'patient-already-converted',
+    chiefComplaint: 'Abdominal pain',
+  } as any;
+
+  it('HEAL-276 (corrected): a converted-but-not-yet-completed arrival still counts in "Awaiting Handoff", agreeing with EMSPressureScore', () => {
     useEmergencyStore.setState(
       {
         ...originalState,
         patients: [],
-        emsArrivals: [
-          {
-            id: 'ems-already-converted',
-            unitId: 'Medic 9',
-            unitName: 'Medic 9',
-            status: 'Handoff',
-            severity: 'Moderate',
-            eta: 0,
-            dispatchTime: new Date().toISOString(),
-            estimatedArrivalTime: new Date().toISOString(),
-            arrivedAt: new Date().toISOString(),
-            patientId: 'patient-already-converted',
-            chiefComplaint: 'Abdominal pain',
-          } as any,
-        ],
+        emsArrivals: [CONVERTED_BUT_NOT_COMPLETED_ARRIVAL],
         staff: [],
         rooms: [],
         alerts: [],
@@ -211,7 +222,80 @@ describe('EMSPipeline render', () => {
 
     const heading = getByText('Awaiting Handoff');
     const countBadge = heading.parentElement?.querySelector('span');
+    expect(countBadge?.textContent).toBe('1');
+    // The actual HEAL-276 guarantee: the two widgets that read the same
+    // emsArrivals array must never disagree.
+    expect(calculateEMSPressureScore([CONVERTED_BUT_NOT_COMPLETED_ARRIVAL]).awaitingHandoff).toBe(1);
+  });
+
+  it('the "Complete Handoff" button is reachable for a converted-but-not-yet-completed arrival (the bug this fix resolves)', () => {
+    useEmergencyStore.setState(
+      {
+        ...originalState,
+        patients: [],
+        emsArrivals: [CONVERTED_BUT_NOT_COMPLETED_ARRIVAL],
+        staff: [],
+        rooms: [],
+        alerts: [],
+        capacity: originalState.capacity,
+        emergencySettings: originalState.emergencySettings,
+      },
+      true,
+    );
+
+    const { getByTestId } = render(
+      <MemoryRouter initialEntries={['/emergency/ems']}>
+        <RouteChromeProvider>
+          <PractitionerVisibilityProvider>
+            <HelpHubProvider>
+              <EMSPipeline />
+            </HelpHubProvider>
+          </PractitionerVisibilityProvider>
+        </RouteChromeProvider>
+      </MemoryRouter>,
+    );
+
+    expect(getByTestId('ems-handoff-complete')).toBeInTheDocument();
+  });
+
+  it('a genuinely completed handoff (handoffCompletedAt set) is excluded from "Awaiting Handoff" and shows no Complete-Handoff button', () => {
+    const completedArrival = {
+      ...CONVERTED_BUT_NOT_COMPLETED_ARRIVAL,
+      id: 'ems-handoff-done',
+      status: 'Complete',
+      handoffCompletedAt: new Date().toISOString(),
+    };
+
+    useEmergencyStore.setState(
+      {
+        ...originalState,
+        patients: [],
+        emsArrivals: [completedArrival],
+        staff: [],
+        rooms: [],
+        alerts: [],
+        capacity: originalState.capacity,
+        emergencySettings: originalState.emergencySettings,
+      },
+      true,
+    );
+
+    const { getByText, queryByTestId } = render(
+      <MemoryRouter initialEntries={['/emergency/ems']}>
+        <RouteChromeProvider>
+          <PractitionerVisibilityProvider>
+            <HelpHubProvider>
+              <EMSPipeline />
+            </HelpHubProvider>
+          </PractitionerVisibilityProvider>
+        </RouteChromeProvider>
+      </MemoryRouter>,
+    );
+
+    const heading = getByText('Awaiting Handoff');
+    const countBadge = heading.parentElement?.querySelector('span');
     expect(countBadge?.textContent).toBe('0');
+    expect(queryByTestId('ems-handoff-complete')).not.toBeInTheDocument();
   });
 
   it('HEAL-321: renders without throwing when an arrival has no severity (real backend/CAD feed gap)', () => {
