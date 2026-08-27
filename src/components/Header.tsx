@@ -440,6 +440,7 @@ export function Header() {
               syncPulse={syncPulse}
               intelligenceSnapshot={intelligenceSnapshot}
               screenMode={routeScreenMode}
+              variant="header"
             />
           ) : null}
         </div>

@@ -37,3 +37,152 @@
     box-shadow: 0 0 0 0 transparent;
   }
 }
+
+/* ── KPI capsule (header status indicator) ───────────────────────
+ * Redesigned from scratch, header-scoped only (not the shared AlarmKpi
+ * used elsewhere, e.g. the Patients page metrics rail). One row: a dot
+ * carries severity, the value leads because it's what you scan for
+ * first, the label trails and is the only part allowed to truncate.
+ * Severity color is spent on the dot + value text, not a full-pill
+ * wash -- critical is the one severity that also escalates to a tinted
+ * border/background, so it reads as visibly more urgent than warning
+ * rather than every tier looking equally loud.
+ *
+ * Naming + !important note: visual-consistency.css has several
+ * `.app-shell [class*="…"]` wide-net normalization rules (targeting
+ * "pill"/"chip"/"badge"/"tag"/"header"/"action"/"control"/"toolbar"/
+ * "filter" as class substrings, PLUS an unconditional one keyed off the
+ * `span`/`label`/etc. tag itself) that silently forced white-space:normal
+ * and max-width:100% here the first time, at higher selector specificity
+ * than a single custom class can beat -- confirmed via a live
+ * getComputedStyle + matching-rule query, not guessed. Renamed away from
+ * every substring trigger AND kept !important on the handful of
+ * properties this component's layout actually depends on, matching the
+ * same override pattern already used elsewhere in this codebase (e.g.
+ * Sidebar.css's tablet breakpoint) for exactly this "a broader utility
+ * rule outranks my one class" situation. */
+.cdl-kpi-capsule-rail {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.cdl-kpi-capsule {
+  display: inline-flex !important;
+  align-items: center !important;
+  flex: 0 0 auto !important;
+  gap: 7px;
+  height: var(--cdl-control-height-sm, 32px);
+  min-height: 0 !important;
+  padding: 0 12px;
+  box-sizing: border-box;
+  max-width: 210px !important;
+  border: 1px solid var(--cdl-neutral-border, var(--cdl-border, #e2e8f0));
+  border-radius: var(--cdl-radius-full, 999px);
+  background: var(--cdl-neutral-bg, var(--cdl-surface-card, #fff));
+  overflow: hidden;
+  cursor: default;
+  text-align: start;
+}
+
+.cdl-kpi-capsule__dot {
+  flex: 0 0 auto;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--cdl-ink-disabled, #94a3b8);
+}
+
+.cdl-kpi-capsule__value {
+  flex: 0 0 auto;
+  max-width: none !important;
+  color: var(--cdl-ink, #0f172a);
+  font-family: var(--cdl-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: var(--cdl-text-sm, 13px);
+  font-weight: var(--cdl-font-bold, 700);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  white-space: nowrap !important;
+}
+
+.cdl-kpi-capsule__label {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: none !important;
+  color: var(--cdl-ink-subtle, #475569);
+  font-size: var(--cdl-text-xs, 11px);
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap !important;
+  overflow: hidden;
+  overflow-wrap: normal !important;
+  text-overflow: ellipsis;
+}
+
+.cdl-kpi-capsule--warning .cdl-kpi-capsule__dot {
+  background: var(--cdl-warning, #b45309);
+}
+.cdl-kpi-capsule--warning .cdl-kpi-capsule__value {
+  color: var(--cdl-warning-text, #92400e);
+}
+
+.cdl-kpi-capsule--urgent {
+  border-color: var(--cdl-urgent-border, #e2e8f0);
+  background: var(--cdl-urgent-bg, #fff);
+}
+.cdl-kpi-capsule--urgent .cdl-kpi-capsule__dot {
+  background: var(--cdl-urgent, #c2410c);
+}
+.cdl-kpi-capsule--urgent .cdl-kpi-capsule__value {
+  color: var(--cdl-urgent-text, #9a3412);
+}
+
+.cdl-kpi-capsule--critical {
+  border-color: var(--cdl-critical-border, #e2e8f0);
+  background: var(--cdl-critical-bg, #fff);
+}
+.cdl-kpi-capsule--critical .cdl-kpi-capsule__dot {
+  background: var(--cdl-critical, #dc2626);
+}
+.cdl-kpi-capsule--critical .cdl-kpi-capsule__value {
+  color: var(--cdl-critical-text, #991b1b);
+}
+
+.cdl-kpi-capsule--info .cdl-kpi-capsule__dot {
+  background: var(--cdl-info, #0369a1);
+}
+.cdl-kpi-capsule--info .cdl-kpi-capsule__value {
+  color: var(--cdl-info-text, #075985);
+}
+
+.cdl-kpi-capsule--ok .cdl-kpi-capsule__dot {
+  background: var(--cdl-ok, #047857);
+}
+
+.cdl-kpi-capsule--ai .cdl-kpi-capsule__dot {
+  background: var(--cdl-ai, #6d28d9);
+}
+.cdl-kpi-capsule--ai .cdl-kpi-capsule__value {
+  color: var(--cdl-ai-text, #5b21b6);
+}
+
+.cdl-kpi-capsule--pulse .cdl-kpi-capsule__dot {
+  animation: cdl-kpi-capsule-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes cdl-kpi-capsule-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--cdl-critical, #dc2626) 45%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--cdl-critical, #dc2626) 25%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cdl-kpi-capsule--pulse .cdl-kpi-capsule__dot {
+    animation: none;
+  }
+}

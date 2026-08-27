@@ -1,13 +1,66 @@
-import { useMemo } from 'react';
+import { useMemo, type ReactNode } from 'react';
 import type { CareDroidScreenMode } from '../../config/careDroidScreenModes';
-import { AlarmKpi } from '../../alarm';
-import { resolveAlarmSeverity } from '../../alarm/types';
+import { resolveAlarmSeverity, shouldPulse, type AlarmSeverity } from '../../alarm/types';
 import OperationalStrip from './OperationalStrip';
 import {
   buildHeaderOperationalAlertMetrics,
   type BuildOperationalAlertMetricsInput,
 } from './operationalAlertRailModel';
 import './OperationalAlertRail.css';
+
+/**
+ * Header-only status capsule -- deliberately NOT AlarmKpi. AlarmKpi is a
+ * stacked stat-card (badge+label crammed on one line, value below) shared
+ * with the Patients page metrics rail; in the header's narrow slim bar that
+ * layout truncated labels mid-word ("Triage que…") and duplicated severity
+ * signal twice (a colored card fill AND a text "WARN"/"CRIT" badge).
+ * This is a single-row capsule instead: a status dot carries severity,
+ * the value leads (what you'd scan for first), the label trails and is
+ * the only thing allowed to truncate. Scoped to the header only -- the
+ * Patients page rail and everywhere else AlarmKpi is used are untouched.
+ *
+ * Naming note: avoid "pill"/"chip"/"badge"/"tag"/"header"/"action"/
+ * "control"/"toolbar"/"filter" as class-name substrings -- visual-
+ * consistency.css has several `.app-shell [class*="…"]` wide-net
+ * normalization rules targeting exactly those words with higher
+ * specificity than a single custom class, which silently overrode this
+ * component's white-space/max-width the first time around (confirmed via
+ * a live cascade query, not guessed). "capsule" avoids all of them.
+ */
+function KpiCapsule({
+  severity,
+  value,
+  label,
+  hint,
+}: {
+  severity: AlarmSeverity;
+  value: ReactNode;
+  label: ReactNode;
+  hint?: string;
+}) {
+  const pulse = shouldPulse(severity, false);
+  // Full text always reachable on hover/focus, even when the label
+  // truncates -- the pill's fixed max-width means a long label can be
+  // clipped visually, but nothing here should require it to read the value.
+  const title = [String(value), String(label), hint].filter(Boolean).join(' — ');
+  return (
+    <div
+      className={[
+        'cdl-kpi-capsule',
+        `cdl-kpi-capsule--${severity}`,
+        pulse ? 'cdl-kpi-capsule--pulse' : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
+      data-severity={severity}
+      title={title}
+    >
+      <span className="cdl-kpi-capsule__dot" aria-hidden="true" />
+      <span className="cdl-kpi-capsule__value">{value}</span>
+      <span className="cdl-kpi-capsule__label">{label}</span>
+    </div>
+  );
+}
 
 type OperationalAlertRailProps = BuildOperationalAlertMetricsInput & {
   ariaLabel?: string;
@@ -72,7 +125,7 @@ export default function OperationalAlertRail({
         className={[
           'operational-alert-rail',
           'operational-alert-rail--header',
-          'cdl-alarm-kpi-rail',
+          'cdl-kpi-capsule-rail',
           syncPulse ? 'operational-alert-rail--sync-pulse' : '',
           className,
         ]
@@ -81,13 +134,12 @@ export default function OperationalAlertRail({
         aria-label={ariaLabel}
       >
         {metrics.map((metric) => (
-          <AlarmKpi
+          <KpiCapsule
             key={metric.id}
             severity={resolveAlarmSeverity(metric.tone)}
             value={metric.value}
             label={metric.label}
-            size="sm"
-            className="operational-alert-rail__kpi"
+            hint={metric.hint}
           />
         ))}
       </div>
