@@ -183,6 +183,45 @@ describe('alertLifecycleOrchestrator', () => {
     expect(useEmergencyStore.setState).toHaveBeenCalled();
   });
 
+  // Regression coverage for the 2026-08-27 fix: actor.actorId/actorRole were
+  // already passed into every acknowledge/dismiss call but silently dropped
+  // before patching the alert -- a real alert's card could only ever show a
+  // shared checkmark, never who actually acted, across all ~15 roles with
+  // ALERT_ACKNOWLEDGE permission.
+  it('records who actually acknowledged the alert, not just a boolean', async () => {
+    const { useEmergencyStore } = await import('../store/emergencyStore');
+    const alertBefore = {
+      id: 'alert-ack-attribution',
+      severity: 'Warning' as const,
+      title: 'Lab critical',
+      message: 'Review critical lab',
+      source: 'clinical-alerts-api',
+      dismissed: false,
+      createdAt: new Date().toISOString(),
+    };
+    useEmergencyStore.getState = () =>
+      ({
+        alerts: [alertBefore],
+        ingestPreparedAlert,
+      }) as unknown as ReturnType<typeof useEmergencyStore.getState>;
+
+    await transitionAlertLifecycle('alert-ack-attribution', 'acknowledge', {
+      actorId: 'dr-rivera',
+      actorRole: 'physician',
+      sourceScreen: 'test',
+    });
+
+    const latestUpdater = (useEmergencyStore.setState as unknown as { mock: { calls: unknown[][] } })
+      .mock.calls.at(-1)?.[0] as (state: { alerts: unknown[]; workflowLogs: unknown[] }) => {
+      alerts: Array<{ id: string; acknowledgedByStaffId?: string; acknowledgedByRole?: string }>;
+    };
+    const result = latestUpdater({ alerts: [alertBefore], workflowLogs: [] });
+    const updated = result.alerts.find((alert) => alert.id === 'alert-ack-attribution');
+
+    expect(updated?.acknowledgedByStaffId).toBe('dr-rivera');
+    expect(updated?.acknowledgedByRole).toBe('physician');
+  });
+
   it('prepares derived alerts and records lifecycle sync for new and expired ids', () => {
     const prepared = prepareOperationalDerivedAlerts([
       {

@@ -322,6 +322,12 @@ export async function transitionAlertLifecycle(
       patch = {
         acknowledged: true,
         acknowledgedAt: timestamp,
+        // actor was always available here but silently dropped before this
+        // fix -- see the doc comment on Alert.acknowledgedByStaffId
+        // (src/types/emergency.ts) for why this closes a real "can't tell who
+        // actually acted" gap.
+        acknowledgedByStaffId: actor.actorId,
+        acknowledgedByRole: actor.actorRole,
         read: true,
         lifecycleStatus: 'acknowledged',
       };
@@ -350,6 +356,8 @@ export async function transitionAlertLifecycle(
       patch = {
         dismissed: true,
         dismissedAt: timestamp,
+        dismissedByStaffId: actor.actorId,
+        dismissedByRole: actor.actorRole,
         read: true,
         lifecycleStatus: 'dismissed',
       };
@@ -600,6 +608,7 @@ export function mapAlertToClinicalDisplay(alert: Alert) {
     findings: [
       alert.ownerRole ? `Owner: ${alert.ownerRole}` : '',
       alert.escalationRole ? `Escalation: ${alert.escalationRole}` : '',
+      alert.acknowledgedByRole ? `Acknowledged by: ${alert.acknowledgedByRole}` : '',
       alert.recommendedAction || '',
       typeof alert.metadata?.findings === 'string' ? alert.metadata.findings : '',
     ].filter(Boolean),

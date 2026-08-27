@@ -975,6 +975,7 @@ export class EmergencyPatientService implements OnModuleInit {
               organizationId: row.organizationId,
               createdAt: row.dispatchedAt || new Date().toISOString(),
               dismissed: Boolean(row.dismissed),
+              ownerRole: row.ownerRole,
             }));
             this.alerts.splice(0, this.alerts.length, ...mapped);
             this.logger.log(`Rehydrated ${mapped.length} open alert(s) from database`);
@@ -1105,6 +1106,7 @@ export class EmergencyPatientService implements OnModuleInit {
       patientId: alert.patientId,
       dispatchedAt: alert.createdAt,
       dismissed: alert.dismissed,
+      ownerRole: alert.ownerRole,
     });
     this.alertRepository.save(entity).catch((error) => {
       this.logger.warn(`Failed to persist alert ${alert.id} to database: ${error}`);
@@ -1665,6 +1667,14 @@ export class EmergencyPatientService implements OnModuleInit {
     source?: string;
     metadata?: Record<string, unknown>;
     organizationId?: string;
+    /**
+     * The role this alert is actually meant for (e.g. 'physician'). Threads
+     * through to the frontend's Alert.ownerRole (src/types/emergency.ts),
+     * which mapAlertToClinicalDisplay() already renders as a "Owner: <role>"
+     * finding on ClinicalAlertsPage.tsx -- that display existed with nothing
+     * ever setting the field on a real (non-demo) alert.
+     */
+    ownerRole?: string;
   }): EmergencyAlert {
     const alert: EmergencyAlert = {
       id: createId('alert'),
@@ -1675,6 +1685,7 @@ export class EmergencyPatientService implements OnModuleInit {
       organizationId: input.organizationId,
       createdAt: new Date().toISOString(),
       dismissed: false,
+      ownerRole: input.ownerRole,
     };
     this.alerts.unshift(alert);
     this.persistAlertToDatabase(alert);
@@ -1723,6 +1734,20 @@ export class EmergencyPatientService implements OnModuleInit {
       source: 'workflow-orchestrator',
       metadata: { actorStaffId },
       organizationId: patient.organizationId ?? organizationId,
+      // Found 2026-08-27: an ED "escalate patient" action (charge_nurse/
+      // triage_nurse/physician can all trigger it, emergencyRolePermissions.ts)
+      // is the codebase's only nurse-facing mechanism for flagging a patient for
+      // physician-level attention, but it dispatched a pure broadcast alert with
+      // no intended-recipient at all -- no way to tell whether the physician it
+      // was really for actually saw it, vs. any of the other roles who share
+      // acknowledge permission. 'physician' matches this action's real clinical
+      // meaning in this workflow (escalation = needs physician review); left as
+      // a fixed default rather than a caller-supplied target because the only
+      // UI trigger (emergencyRoutePages.tsx's one-click "Escalate" button) is
+      // deliberately zero-friction for a time-critical action -- adding a
+      // role-picker step would slow down exactly the workflow this exists to
+      // speed up.
+      ownerRole: 'physician',
     });
     this.workflowLogService.record({
       type: 'patient_escalated',

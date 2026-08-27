@@ -370,6 +370,11 @@ describe('emergencyStore manual escalation', () => {
       severity: 'Critical',
       title: 'ESCALATION — Aarav Patel',
       patientId: patient!.id,
+      // Regression coverage (2026-08-27): a manual escalation is the ED's
+      // only nurse-facing "flag for physician attention" mechanism, but the
+      // dispatched alert used to have no intended-recipient at all -- see
+      // emergencyOperationalSync.ts's buildEscalatePatientPatch doc comment.
+      ownerRole: 'physician',
     });
     expect(reassessmentQueue[0]).toMatchObject({
       patientId: patient!.id,
@@ -424,6 +429,37 @@ describe('emergencyStore manual escalation', () => {
 
     expect(patient && hasPatientFlag(patient, 'HighRisk')).toBe(true);
     expect(patient?.timeline.some((event) => event.type === 'ESCALATION_CANCELLED')).toBe(false);
+  });
+});
+
+describe('emergencyStore alert ownerRole survives a backend refetch (2026-08-27)', () => {
+  // Regression coverage for the same bug class as buildInboundEmsRecord's
+  // patientId (emergency-os.services.ts): normalizeOperationalAlert
+  // (emergencyStore.ts's private raw-payload -> Alert mapper, used by every
+  // hydrateFromApi({ alerts }) call) explicitly whitelisted which fields it
+  // copied from a raw record and did not include ownerRole -- so even after
+  // the backend started persisting and returning it, this one read-path
+  // would have silently thrown it away again on the very next reload.
+  it('preserves ownerRole when a raw backend-shaped alert payload is hydrated', () => {
+    useEmergencyStore.getState().hydrateFromApi({
+      alerts: [
+        {
+          id: 'alert-escalation-reload-test',
+          severity: 'Critical',
+          title: 'ESCALATION — Reload Test',
+          message: 'Escalated by Priya Nair',
+          patientId: 'pt-005',
+          dismissed: false,
+          ownerRole: 'physician',
+        },
+      ],
+    } as any);
+
+    const alert = useEmergencyStore
+      .getState()
+      .alerts.find((candidate) => candidate.id === 'alert-escalation-reload-test');
+
+    expect(alert?.ownerRole).toBe('physician');
   });
 });
 

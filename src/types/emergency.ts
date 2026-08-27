@@ -1004,8 +1004,21 @@ export interface Alert {
   read?: boolean;
   acknowledged?: boolean;
   acknowledgedAt?: ISODateString;
+  /**
+   * Who actually acted, not just a shared boolean -- transitionAlertLifecycle
+   * already receives actor.actorId/actorRole on every call but used to drop
+   * them before patching the alert, so a real (non-demo) alert's card could
+   * only ever show a checkmark, never who checked it. Session/client-local
+   * only (see alertLifecycleOrchestrator.ts's doc comment on the acknowledge
+   * branch) -- there is no backend acknowledge endpoint for a real alert to
+   * round-trip this through yet, unlike ownerRole above.
+   */
+  acknowledgedByStaffId?: string;
+  acknowledgedByRole?: string;
   dismissed: boolean;
   dismissedAt?: ISODateString;
+  dismissedByStaffId?: string;
+  dismissedByRole?: string;
   autoDismissAfter?: number;
   source?: string;
   lifecycleStatus?: AlertLifecycleStatus;

@@ -30,6 +30,10 @@ export class Alert {
   @Column({ type: 'boolean', default: false })
   dismissed: boolean;
 
+  /** The role this alert is actually meant for (e.g. 'physician'), nullable/legacy-row-safe like organizationId above. */
+  @Column({ type: 'varchar', length: 32, nullable: true })
+  ownerRole?: string;
+
   @CreateDateColumn()
   createdAt: Date;
 

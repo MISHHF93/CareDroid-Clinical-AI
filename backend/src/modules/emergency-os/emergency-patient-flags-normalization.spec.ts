@@ -157,4 +157,24 @@ describe('EmergencyPatientService.escalatePatient — flags match the frontend c
       expect.arrayContaining(['HighRisk', 'DeteriorationRisk', 'ReassessmentDue']),
     );
   });
+
+  // Regression coverage for the 2026-08-27 fix: escalatePatient's dispatched
+  // alert was a pure broadcast with no intended-recipient at all -- any of
+  // the ~15 roles with ALERT_ACKNOWLEDGE permission could acknowledge it with
+  // no way to tell whether the physician it was really for ever saw it.
+  it("dispatches the escalation alert with ownerRole: physician, matching this action's real clinical meaning", () => {
+    const { service } = makeService();
+    const patient = service.createPatient({
+      firstName: 'Needs',
+      lastName: 'PhysicianReview',
+      flags: [],
+    });
+
+    service.escalatePatient(patient.id, 'staff-charge-nurse');
+
+    const alerts = service.listAlerts();
+    const escalationAlert = alerts.find((alert) => alert.patientId === patient.id);
+    expect(escalationAlert).toBeDefined();
+    expect(escalationAlert?.ownerRole).toBe('physician');
+  });
 });

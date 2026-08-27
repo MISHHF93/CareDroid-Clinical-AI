@@ -460,6 +460,12 @@ export function buildEscalatePatientPatch(
       dismissed: false,
       actionLabel: 'View Patient',
       actionType: 'VIEW_PATIENT',
+      // Matches the backend's escalatePatient()/dispatchOperationalAlert() default
+      // (emergency-os.services.ts) -- see that call site's doc comment for why
+      // 'physician' and why it's fixed rather than caller-selectable. Set here too
+      // so the optimistic local alert already carries it before the durable sync
+      // below resolves, instead of it appearing only after a reconciliation.
+      ownerRole: 'physician',
     },
     new Date(timestamp),
   );

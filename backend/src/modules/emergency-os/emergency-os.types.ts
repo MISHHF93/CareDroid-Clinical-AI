@@ -222,6 +222,13 @@ export interface EmergencyAlert {
   organizationId?: string;
   createdAt: string;
   dismissed: boolean;
+  /**
+   * The role this alert is actually meant for (e.g. 'physician'), distinct from
+   * who's PERMITTED to acknowledge it. Was previously write-only on the frontend
+   * type (Alert.ownerRole in src/types/emergency.ts) with no backend field to
+   * round-trip through -- see dispatchOperationalAlert's doc comment.
+   */
+  ownerRole?: string;
 }
 
 export interface CapacitySnapshot {

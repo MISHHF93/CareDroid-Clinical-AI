@@ -882,12 +882,30 @@ const normalizeOperationalAlert = (
     read: Boolean(record.read),
     acknowledged: Boolean(record.acknowledged),
     acknowledgedAt: stringFrom(record.acknowledgedAt) || undefined,
+    // acknowledgedByStaffId/Role are session/client-local only today (see
+    // Alert type's doc comment) so a real backend payload never carries them
+    // -- reading them through here anyway keeps this normalizer from
+    // clobbering a locally-set value the moment a broader refetch (e.g.
+    // extractOperationalAlerts pulled in from a wider bundle) re-processes
+    // the same alert.
+    acknowledgedByStaffId: stringFrom(record.acknowledgedByStaffId) || undefined,
+    acknowledgedByRole: stringFrom(record.acknowledgedByRole) || undefined,
     dismissed: Boolean(record.dismissed),
     dismissedAt: stringFrom(record.dismissedAt) || undefined,
+    dismissedByStaffId: stringFrom(record.dismissedByStaffId) || undefined,
+    dismissedByRole: stringFrom(record.dismissedByRole) || undefined,
     autoDismissAfter: Number.isFinite(Number(record.autoDismissAfter))
       ? Number(record.autoDismissAfter)
       : undefined,
     source: stringFrom(record.source) || source,
+    // Found 2026-08-27 fixing the same "durable field silently stripped by
+    // this whitelist normalizer" bug class as buildInboundEmsRecord's
+    // patientId (emergency-os.services.ts) -- the backend now persists and
+    // returns ownerRole (dispatchOperationalAlert/escalatePatient), but this
+    // was the one place in the whole read path that would have thrown it
+    // away again on every refetch.
+    ownerRole: stringFrom(record.ownerRole) || undefined,
+    escalationRole: stringFrom(record.escalationRole) || undefined,
     metadata: isObject(record.metadata) ? (record.metadata as Alert['metadata']) : undefined,
   };
 };
