@@ -65,3 +65,32 @@ describe('PlatformGovernanceController — createReviewItem organizationId scopi
     );
   });
 });
+
+/**
+ * getSourceProvenance never forwarded req.tenantContext.organizationId to the
+ * service at all -- getSourceProvenance() itself was hardened (see its own
+ * doc comment) to require organizationId to scope the lookup to the caller's
+ * own org's rows, but this route always called it with organizationId
+ * undefined, so a sourceId collision with another org's real synced record
+ * returned that org's provenance data (including patientId) verbatim. The
+ * sibling route on integrations.controller.ts already forwarded it correctly.
+ */
+describe('PlatformGovernanceController — getSourceProvenance organizationId scoping', () => {
+  it('forwards req.tenantContext.organizationId to the service', () => {
+    const getSourceProvenance = jest.fn().mockResolvedValue({ id: 'source-1' });
+    const controller = new PlatformGovernanceController({ getSourceProvenance } as any);
+
+    controller.getSourceProvenance('source-1', { tenantContext: { organizationId: 'org-a' } });
+
+    expect(getSourceProvenance).toHaveBeenCalledWith('source-1', 'org-a');
+  });
+
+  it('passes undefined, not a client-controlled value, when tenantContext is missing', () => {
+    const getSourceProvenance = jest.fn().mockResolvedValue({ id: 'source-1' });
+    const controller = new PlatformGovernanceController({ getSourceProvenance } as any);
+
+    controller.getSourceProvenance('source-1', {});
+
+    expect(getSourceProvenance).toHaveBeenCalledWith('source-1', undefined);
+  });
+});

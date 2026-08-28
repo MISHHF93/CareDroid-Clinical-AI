@@ -145,8 +145,11 @@ export class PlatformGovernanceController {
 
   @Get('source-provenance/:sourceId')
   @Permissions(Permission.CONFIGURE_SYSTEM)
-  getSourceProvenance(@Param('sourceId') sourceId: string) {
-    return this.platformGovernanceService.getSourceProvenance(sourceId);
+  getSourceProvenance(@Param('sourceId') sourceId: string, @Req() req: any) {
+    return this.platformGovernanceService.getSourceProvenance(
+      sourceId,
+      req.tenantContext?.organizationId,
+    );
   }
 
   @Get('synthetic/fhir')
