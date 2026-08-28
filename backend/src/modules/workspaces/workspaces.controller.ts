@@ -44,7 +44,9 @@ export class WorkspacesController {
   @Post()
   @ApiOperation({ summary: 'Create a workspace owned by the current user' })
   async create(@Req() req: any, @Body() dto: CreateWorkspaceDto) {
-    return this.workspacesService.createWorkspace(req.user, dto);
+    return this.workspacesService.createWorkspace(req.user, dto, {
+      organizationId: req.tenantContext?.organizationId ?? null,
+    });
   }
 
   @Post('active')
