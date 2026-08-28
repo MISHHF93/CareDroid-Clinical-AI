@@ -220,6 +220,25 @@ export default function AuthPage({ initialMode = 'login' }: { initialMode?: Mode
           </div>
         ) : null}
 
+        {isDev && !twoFactor ? (
+          <>
+            <button
+              type="button"
+              className="auth-page__dev-enter"
+              onClick={handleDevBypassClick}
+              disabled={pending}
+            >
+              {pending ? 'Entering…' : 'Enter CareDroid now'}
+            </button>
+            <p className="auth-page__dev-enter-hint">
+              Full access, no credentials needed — local development only.
+            </p>
+            <div className="auth-page__divider" role="separator">
+              <span>or sign in with an account</span>
+            </div>
+          </>
+        ) : null}
+
         <form className="auth-page__form" onSubmit={handleSubmit}>
           {twoFactor ? (
             <label className="auth-page__field">
@@ -324,20 +343,11 @@ export default function AuthPage({ initialMode = 'login' }: { initialMode?: Mode
           </div>
         ) : null}
 
-        {isDev && !twoFactor ? (
-          <button
-            type="button"
-            className="auth-page__dev-bypass"
-            onClick={handleDevBypassClick}
-            disabled={pending}
-          >
-            Bypass sign-in (local dev only)
-          </button>
+        {!isDev && !twoFactor ? (
+          <div className="auth-page__footer">
+            <Link to={CANONICAL_ROUTES.platformStart}>Explore the CareDroid demo instead</Link>
+          </div>
         ) : null}
-
-        <div className="auth-page__footer">
-          <Link to={CANONICAL_ROUTES.platformStart}>Explore the CareDroid demo instead</Link>
-        </div>
       </div>
     </div>
   );

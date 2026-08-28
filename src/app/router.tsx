@@ -623,7 +623,7 @@ function AdminSectionBoundary() {
  * env flag can still opt out for local iteration.
  *
  * HEAL-347.14/347.16: also accepts a dev-bypass session (AuthPage.tsx's
- * explicit "Bypass sign-in (local dev only)" button) -- but ONLY when isDev
+ * explicit "Enter CareDroid now" dev-entry button) -- but ONLY when isDev
  * is true, matching the same three-layer safety this app's existing
  * dev-session mechanism already relies on (see devBackendAuth.ts's isDev
  * export doc comment). A tampered/forced client-side isDev check alone still
