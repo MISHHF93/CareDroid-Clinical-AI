@@ -1,9 +1,16 @@
 import { Controller, Post, Get, Body, UseGuards, Req, Delete, HttpCode } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { TwoFactorService } from './two-factor.service';
 import { EnableTwoFactorDto, VerifyTwoFactorDto } from './dto/two-factor.dto';
 import { SkipTenantIsolation } from '../tenant-context/tenant-scope.decorator';
+
+// Same ceiling as auth.controller.ts's login/register/verify-2fa brute-force
+// guard -- these routes accept a TOTP/backup-code guess from an authenticated
+// session, so an attacker holding a stolen/hijacked JWT but not the victim's
+// authenticator app must face the same throttle a pre-session guesser does.
+const TWO_FACTOR_GUARD_LIMIT = { default: { limit: 10, ttl: 60000 } };
 
 /**
  * Every route here operates purely on req.user.id (the caller's own 2FA
@@ -37,6 +44,8 @@ export class TwoFactorController {
   }
 
   @Delete('disable')
+  @UseGuards(ThrottlerGuard)
+  @Throttle(TWO_FACTOR_GUARD_LIMIT)
   @ApiOperation({ summary: 'Disable 2FA' })
   @ApiResponse({ status: 200, description: '2FA disabled successfully' })
   async disable(@Req() req: any, @Body() dto: VerifyTwoFactorDto) {
@@ -45,6 +54,8 @@ export class TwoFactorController {
 
   @Post('verify')
   @HttpCode(200)
+  @UseGuards(ThrottlerGuard)
+  @Throttle(TWO_FACTOR_GUARD_LIMIT)
   @ApiOperation({ summary: 'Verify 2FA token' })
   @ApiResponse({ status: 200, description: 'Token verified' })
   async verify(@Req() req: any, @Body() dto: VerifyTwoFactorDto) {
