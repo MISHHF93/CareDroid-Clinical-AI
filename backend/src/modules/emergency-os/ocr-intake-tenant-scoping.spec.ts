@@ -73,11 +73,16 @@ describe('OcrIntakeService — organization tenant scoping', () => {
         status: 'pending',
       } as any);
     }
-    ocrIntakeService.reviewField(job.id, job.extractedFields[0].field, { decision: 'accepted' }, 'org-b');
+    ocrIntakeService.reviewField(
+      job.id,
+      job.extractedFields[0].field,
+      { decision: 'accepted' },
+      'org-b',
+    );
 
-    await expect(
-      ocrIntakeService.applyToIntake(job.id, 'attacker', {}, 'org-a'),
-    ).rejects.toThrow(NotFoundException);
+    await expect(ocrIntakeService.applyToIntake(job.id, 'attacker', {}, 'org-a')).rejects.toThrow(
+      NotFoundException,
+    );
 
     // The org-B patient record must be completely untouched by the failed
     // cross-org attempt.
@@ -104,7 +109,12 @@ describe('OcrIntakeService — organization tenant scoping', () => {
         status: 'pending',
       } as any);
     }
-    ocrIntakeService.reviewField(job.id, job.extractedFields[0].field, { decision: 'accepted' }, 'org-a');
+    ocrIntakeService.reviewField(
+      job.id,
+      job.extractedFields[0].field,
+      { decision: 'accepted' },
+      'org-a',
+    );
 
     const applied = await ocrIntakeService.applyToIntake(job.id, 'nurse', {}, 'org-a');
     expect(applied.patientUpdated).toBe(true);

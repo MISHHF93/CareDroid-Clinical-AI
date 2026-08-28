@@ -378,7 +378,12 @@ export class CareOperationsService {
           patientId: row.patientId,
           source: 'care-operations-service',
           severity: 'Info',
-          metadata: { taskId: row.id, taskType: row.taskType, status: row.status, tenantId: organizationId },
+          metadata: {
+            taskId: row.id,
+            taskType: row.taskType,
+            status: row.status,
+            tenantId: organizationId,
+          },
         });
       }
     }

@@ -23,7 +23,6 @@ describe('Sentinel tenant isolation (HEAL-339)', () => {
   let module: TestingModule;
   let alarmService: SentinelAlarmService;
   let inboundService: SentinelInboundService;
-  let alarmRepo: Repository<SentinelAlarmEntity>;
   let inboundRepo: Repository<SentinelInboundPatientEntity>;
   let aiRepo: Repository<SentinelAiRecommendationEntity>;
 
@@ -58,7 +57,6 @@ describe('Sentinel tenant isolation (HEAL-339)', () => {
 
     alarmService = module.get(SentinelAlarmService);
     inboundService = module.get(SentinelInboundService);
-    alarmRepo = module.get(getRepositoryToken(SentinelAlarmEntity));
     inboundRepo = module.get(getRepositoryToken(SentinelInboundPatientEntity));
     aiRepo = module.get(getRepositoryToken(SentinelAiRecommendationEntity));
   });

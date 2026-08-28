@@ -116,9 +116,7 @@ export class EmergencyOsUpgradeHarnessService {
   // derived from cross-tenant patient counts) to any authenticated caller with
   // READ_PHI. Found while auditing the same gap class in the
   // /emergency/realtime SSE stream and the sibling PatientFlowService.
-  getHarness(
-    organizationId?: string,
-  ): EmergencyModuleEnvelope<AdvancedEmergencyOsUpgradeHarness> {
+  getHarness(organizationId?: string): EmergencyModuleEnvelope<AdvancedEmergencyOsUpgradeHarness> {
     const generatedAt = new Date().toISOString();
     const capacityAndForecasting = this.buildCapacityAndForecastingSignals(
       generatedAt,

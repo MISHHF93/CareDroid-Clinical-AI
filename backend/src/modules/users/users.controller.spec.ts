@@ -18,7 +18,6 @@ import { User } from './entities/user.entity';
  * prove the fix works, not just that it's declared.
  */
 describe('UsersController @Exclude() enforcement (ClassSerializerInterceptor)', () => {
-
   it('strips passwordHash, encrypted PHI blobs, and live security tokens when a raw User entity is serialized through the real interceptor', async () => {
     const user = Object.assign(new User(), {
       id: 'user-1',

@@ -50,7 +50,7 @@ describe('EmergencyPatientService.createPatient — idempotency on retried id (p
 
   it('does not let a retry overwrite the existing record with different data from a second, differing call', () => {
     const { service } = makeService();
-    const first = service.createPatient({ id: 'patient-fixed-id', firstName: 'Original' } as any);
+    service.createPatient({ id: 'patient-fixed-id', firstName: 'Original' } as any);
     const second = service.createPatient({ id: 'patient-fixed-id', firstName: 'Different' } as any);
 
     expect(second.firstName).toBe('Original');

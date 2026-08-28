@@ -922,7 +922,9 @@ describe('WorkflowActionLogEntry tenantId threading (2026-08-27)', () => {
 
     service.escalatePatient(patient.id, 'actor-1', 'org-a');
 
-    const call = workflowLogService.record.mock.calls.find((c) => c[0]?.type === 'patient_escalated');
+    const call = workflowLogService.record.mock.calls.find(
+      (c) => c[0]?.type === 'patient_escalated',
+    );
     expect(call?.[0]?.metadata?.tenantId).toBe('org-a');
   });
 

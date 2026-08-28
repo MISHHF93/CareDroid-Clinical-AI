@@ -147,7 +147,9 @@ describe('ChiefInvestigationService — real end-to-end vertical slice', () => {
     expect(trendFindings.some((f) => f.summary.includes('direction of concern'))).toBe(true);
 
     // A real, human-approval-required AiActionProposal was created — not just described.
-    const prepared = result.preparedActions.find((a) => a.actionType === 'request_urgent_reassessment');
+    const prepared = result.preparedActions.find(
+      (a) => a.actionType === 'request_urgent_reassessment',
+    );
     expect(prepared).toBeDefined();
     expect(prepared?.requiresApproval).toBe(true);
     expect(prepared?.proposalId).toBeDefined();
@@ -180,7 +182,9 @@ describe('ChiefInvestigationService — real end-to-end vertical slice', () => {
     expect(result.overallState).toBe('PARTIALLY_SUPPORTED');
     expect(result.preparedActions).toHaveLength(0);
     expect(result.findings.some((f) => f.state === 'REQUIRES_HUMAN_REVIEW')).toBe(false);
-    const news2Finding = result.findings.find((f) => f.summary.startsWith('NEWS2 calculated successfully'));
+    const news2Finding = result.findings.find((f) =>
+      f.summary.startsWith('NEWS2 calculated successfully'),
+    );
     expect(news2Finding?.state).toBe('SUPPORTED');
   });
 });

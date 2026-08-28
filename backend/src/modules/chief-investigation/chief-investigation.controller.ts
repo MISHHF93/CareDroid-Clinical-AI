@@ -33,7 +33,10 @@ export class ChiefInvestigationController {
     summary:
       'Run the deterministic deterioration investigation for a patient (OBSERVE + PREPARE only; no clinical mutation).',
   })
-  @ApiResponse({ status: 201, description: 'Investigation run completed with truthful states and prepared actions.' })
+  @ApiResponse({
+    status: 201,
+    description: 'Investigation run completed with truthful states and prepared actions.',
+  })
   async runDeteriorationInvestigation(@Param('patientId') patientId: string, @Req() req: any) {
     return this.chiefInvestigation.runDeteriorationInvestigation({
       patientId,

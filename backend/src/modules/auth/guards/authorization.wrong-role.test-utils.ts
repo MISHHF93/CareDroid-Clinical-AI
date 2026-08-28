@@ -8,6 +8,9 @@ import {
 } from '../decorators/permissions.decorator';
 import { Permission } from '../enums/permission.enum';
 
+type ControllerClass = new (...args: unknown[]) => unknown;
+type RouteHandler = (...args: unknown[]) => unknown;
+
 /**
  * Shared harness for the systematic wrong-role authorization check -- see
  * authorization.wrong-role.systematic.spec.ts (EmergencyOsController, where this
@@ -25,15 +28,15 @@ export const testAuthorizationGuard = new AuthorizationGuard(new Reflector(), {
 const reflector = new Reflector();
 
 export function getControllerRouteHandlers(
-  controllerClass: Function,
-): Array<{ name: string; handler: Function }> {
+  controllerClass: ControllerClass,
+): Array<{ name: string; handler: RouteHandler }> {
   const proto = (controllerClass as any).prototype;
   return Object.getOwnPropertyNames(proto)
     .filter((name) => name !== 'constructor' && typeof proto[name] === 'function')
     .map((name) => ({ name, handler: proto[name] }));
 }
 
-export function routeMetadata(handler: Function, controllerClass: Function) {
+export function routeMetadata(handler: RouteHandler, controllerClass: ControllerClass) {
   const isPublic = reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [handler, controllerClass]);
   const required = reflector.getAllAndOverride<Permission[]>(PERMISSIONS_KEY, [
     handler,
@@ -46,7 +49,7 @@ export function routeMetadata(handler: Function, controllerClass: Function) {
   return { isPublic, required: required || [], anyOf: anyOf || [] };
 }
 
-function buildContext(handler: Function, controllerClass: Function, user: any) {
+function buildContext(handler: RouteHandler, controllerClass: ControllerClass, user: any) {
   return {
     getHandler: () => handler,
     getClass: () => controllerClass,
@@ -72,7 +75,7 @@ function buildContext(handler: Function, controllerClass: Function, user: any) {
  * (a real, separately-tracked architectural gap, not this check's job).
  */
 export async function assertOnlySoleGrantedPermissionPasses(
-  controllerClass: Function,
+  controllerClass: ControllerClass,
   soleGrantedPermission: Permission,
   userOverrides: Record<string, unknown> = {},
 ) {

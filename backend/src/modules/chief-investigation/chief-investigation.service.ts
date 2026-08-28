@@ -14,7 +14,7 @@
  * human approval through the existing AiActionProposal flow.
  */
 
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { EmergencyPatientService } from '../emergency-os/emergency-os.services';
 import type { EmergencyPatient } from '../emergency-os/emergency-os.types';
@@ -25,7 +25,14 @@ import {
 } from '../ai/ai-action-proposal.service';
 import { AuditService } from '../audit/audit.service';
 import { AuditAction } from '../audit/entities/audit-log.entity';
-import { INVESTIGATION_DISCLAIMER, INVESTIGATION_PLAN_VERSION, deriveInvestigationSynthesis, deriveTrendNotes, deriveVitalsFreshness, mapLatestVitalsToNews2Parameters } from './investigation-plan.lib';
+import {
+  INVESTIGATION_DISCLAIMER,
+  INVESTIGATION_PLAN_VERSION,
+  deriveInvestigationSynthesis,
+  deriveTrendNotes,
+  deriveVitalsFreshness,
+  mapLatestVitalsToNews2Parameters,
+} from './investigation-plan.lib';
 import type {
   InvestigationAutonomyLevel,
   InvestigationRunResult,
@@ -68,7 +75,9 @@ export class ChiefInvestigationService {
     return run;
   }
 
-  async runDeteriorationInvestigation(input: RunInvestigationInput): Promise<InvestigationRunResult> {
+  async runDeteriorationInvestigation(
+    input: RunInvestigationInput,
+  ): Promise<InvestigationRunResult> {
     const runId = randomUUID();
     const steps: InvestigationStepTrace[] = [];
 
@@ -96,7 +105,15 @@ export class ChiefInvestigationService {
         trendNotes: [],
         assumptions: [],
       });
-      return this.finalizeRun(runId, input, steps, synthesis.findings, synthesis.preparedActionSpecs, [], 'LEVEL_0_OBSERVE');
+      return this.finalizeRun(
+        runId,
+        input,
+        steps,
+        synthesis.findings,
+        synthesis.preparedActionSpecs,
+        [],
+        'LEVEL_0_OBSERVE',
+      );
     }
 
     steps.push({
@@ -106,16 +123,20 @@ export class ChiefInvestigationService {
       detail: `In-scope patient resolved (${patient.mrn ?? patient.id}).`,
     });
 
-    this.auditAsync(this.auditService.log({
-      userId: input.requestedByUserId,
-      organizationId: input.organizationId,
-      action: AuditAction.CLINICAL_DATA_ACCESS,
-      resource: `emergency_patient:${patient.id}`,
-      ipAddress: input.ipAddress ?? 'unknown',
-      userAgent: input.userAgent ?? 'unknown',
-      phiAccessed: true,
-      metadata: { runId, goal: 'deterioration_investigation' },
-    }), 'clinical data access', runId);
+    this.auditAsync(
+      this.auditService.log({
+        userId: input.requestedByUserId,
+        organizationId: input.organizationId,
+        action: AuditAction.CLINICAL_DATA_ACCESS,
+        resource: `emergency_patient:${patient.id}`,
+        ipAddress: input.ipAddress ?? 'unknown',
+        userAgent: input.userAgent ?? 'unknown',
+        phiAccessed: true,
+        metadata: { runId, goal: 'deterioration_investigation' },
+      }),
+      'clinical data access',
+      runId,
+    );
 
     // Step 2 — retrieve vitals + freshness.
     const freshness = deriveVitalsFreshness(patient.vitals);
@@ -164,10 +185,18 @@ export class ChiefInvestigationService {
           });
           if (response.success && response.result.success) {
             news2Executed = true;
-            news2Total = typeof response.result.data.total === 'number' ? response.result.data.total : undefined;
+            news2Total =
+              typeof response.result.data.total === 'number'
+                ? response.result.data.total
+                : undefined;
             news2RiskBand =
-              typeof response.result.data.riskBand === 'string' ? response.result.data.riskBand : undefined;
-            news2HasRed = typeof response.result.data.hasRed === 'boolean' ? response.result.data.hasRed : undefined;
+              typeof response.result.data.riskBand === 'string'
+                ? response.result.data.riskBand
+                : undefined;
+            news2HasRed =
+              typeof response.result.data.hasRed === 'boolean'
+                ? response.result.data.hasRed
+                : undefined;
             steps.push({
               stepId: 'calculate_news2',
               label: 'Calculate NEWS2',
@@ -253,7 +282,9 @@ export class ChiefInvestigationService {
           }),
         );
       } catch (error) {
-        this.logger.warn(`Failed to create proposal for ${spec.actionType} in run ${runId}: ${String(error)}`);
+        this.logger.warn(
+          `Failed to create proposal for ${spec.actionType} in run ${runId}: ${String(error)}`,
+        );
       }
     }
 
@@ -334,25 +365,29 @@ export class ChiefInvestigationService {
 
     this.retainRun(result);
 
-    this.auditAsync(this.auditService.log({
-      userId: input.requestedByUserId,
-      organizationId: input.organizationId,
-      action: AuditAction.AI_QUERY,
-      resource: `chief_investigation:${runId}`,
-      ipAddress: input.ipAddress ?? 'unknown',
-      userAgent: input.userAgent ?? 'unknown',
-      phiAccessed: Boolean(patient),
-      metadata: {
-        runId,
-        goal: result.goal,
-        planVersion: result.planVersion,
-        overallState: result.overallState,
-        autonomyLevelUsed,
-        preparedActions: result.preparedActions.map((a) => a.actionType),
-        proposalIds: proposals.map((p) => p.proposalId),
-        stepsCompleted: steps.filter((s) => s.status !== 'failed').length,
-      },
-    }), 'investigation run audit', runId);
+    this.auditAsync(
+      this.auditService.log({
+        userId: input.requestedByUserId,
+        organizationId: input.organizationId,
+        action: AuditAction.AI_QUERY,
+        resource: `chief_investigation:${runId}`,
+        ipAddress: input.ipAddress ?? 'unknown',
+        userAgent: input.userAgent ?? 'unknown',
+        phiAccessed: Boolean(patient),
+        metadata: {
+          runId,
+          goal: result.goal,
+          planVersion: result.planVersion,
+          overallState: result.overallState,
+          autonomyLevelUsed,
+          preparedActions: result.preparedActions.map((a) => a.actionType),
+          proposalIds: proposals.map((p) => p.proposalId),
+          stepsCompleted: steps.filter((s) => s.status !== 'failed').length,
+        },
+      }),
+      'investigation run audit',
+      runId,
+    );
 
     return result;
   }
@@ -368,7 +403,9 @@ export class ChiefInvestigationService {
 
   /** Audit failures must never break the synchronous investigation workflow. */
   private auditAsync(promise: Promise<unknown>, what: string, runId: string): void {
-    promise.catch((error) => this.logger.warn(`Audit write failed (${what}) for run ${runId}: ${String(error)}`));
+    promise.catch((error) =>
+      this.logger.warn(`Audit write failed (${what}) for run ${runId}: ${String(error)}`),
+    );
   }
 }
 

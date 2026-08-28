@@ -46,10 +46,7 @@ export class SimulationController {
 
   @Post('runs')
   @HttpCode(HttpStatus.OK)
-  startRun(
-    @Body() body: StartSimulationDto,
-    @TenantContext() tenantContext?: TenantContextValue,
-  ) {
+  startRun(@Body() body: StartSimulationDto, @TenantContext() tenantContext?: TenantContextValue) {
     return this.runs.startRun(body, tenantContext?.userId, tenantContext?.organizationId);
   }
 

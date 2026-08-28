@@ -41,7 +41,12 @@ export function deriveVitalsFreshness(
     return { hasVitals: true, latest, ageMinutes: null, stale: true };
   }
   const ageMinutes = Math.max(0, Math.round((now.getTime() - recordedAt) / 60000));
-  return { hasVitals: true, latest, ageMinutes, stale: now.getTime() - recordedAt > VITALS_STALE_THRESHOLD_MS };
+  return {
+    hasVitals: true,
+    latest,
+    ageMinutes,
+    stale: now.getTime() - recordedAt > VITALS_STALE_THRESHOLD_MS,
+  };
 }
 
 export type News2ParameterMapping =
@@ -63,7 +68,9 @@ export function mapLatestVitalsToNews2Parameters(latest: EmergencyVitals): News2
   if (missing.length > 0) return { ok: false, missing };
 
   const assumptions: string[] = [];
-  const supplementalOxygen = Boolean((latest as { supplementalOxygen?: boolean }).supplementalOxygen);
+  const supplementalOxygen = Boolean(
+    (latest as { supplementalOxygen?: boolean }).supplementalOxygen,
+  );
   if (!(latest as { supplementalOxygen?: boolean }).supplementalOxygen) {
     assumptions.push('supplementalOxygen assumed false (not recorded on the vitals entry)');
   }
@@ -86,7 +93,12 @@ export function mapLatestVitalsToNews2Parameters(latest: EmergencyVitals): News2
   };
 }
 
-const TREND_FIELDS: Array<{ key: keyof EmergencyVitals; label: string; unit: string; higherIsWorse: boolean }> = [
+const TREND_FIELDS: Array<{
+  key: keyof EmergencyVitals;
+  label: string;
+  unit: string;
+  higherIsWorse: boolean;
+}> = [
   { key: 'hr', label: 'Heart rate', unit: 'bpm', higherIsWorse: true },
   { key: 'sbp', label: 'Systolic BP', unit: 'mmHg', higherIsWorse: false },
   { key: 'spo2', label: 'SpO2', unit: '%', higherIsWorse: false },
@@ -122,7 +134,12 @@ export interface InvestigationSynthesis {
 
 function isElevatedNews2(ctx: InvestigationContext): boolean {
   if (!ctx.news2Executed) return false;
-  return ctx.news2HasRed === true || ctx.news2RiskBand === 'high' || ctx.news2RiskBand === 'medium' || ctx.news2RiskBand === 'low_medium_red';
+  return (
+    ctx.news2HasRed === true ||
+    ctx.news2RiskBand === 'high' ||
+    ctx.news2RiskBand === 'medium' ||
+    ctx.news2RiskBand === 'low_medium_red'
+  );
 }
 
 /**
@@ -163,9 +180,7 @@ export function deriveInvestigationSynthesis(ctx: InvestigationContext): Investi
     sources: ['emergency-os patient registry'],
   });
 
-  let dataQualityState: InvestigationFindingState | null = null;
   if (!ctx.hasVitals) {
-    dataQualityState = 'INSUFFICIENT_DATA';
     findings.push({
       state: 'INSUFFICIENT_DATA',
       summary: 'No recorded vital signs available; physiological assessment cannot proceed.',
@@ -178,12 +193,16 @@ export function deriveInvestigationSynthesis(ctx: InvestigationContext): Investi
       rationale: 'No vital signs are on record, so no early-warning calculation was possible.',
       expectedEffect: 'Creates a vitals task assignment for clinical staff to action.',
     });
-  } else if (ctx.vitalsAgeMinutes === null || (ctx.vitalsAgeMinutes ?? 0) * 60000 > VITALS_STALE_THRESHOLD_MS) {
-    dataQualityState = 'STALE_DATA';
+  } else if (
+    ctx.vitalsAgeMinutes === null ||
+    (ctx.vitalsAgeMinutes ?? 0) * 60000 > VITALS_STALE_THRESHOLD_MS
+  ) {
     findings.push({
       state: 'STALE_DATA',
       summary: `Latest vital signs are stale (${ctx.vitalsAgeMinutes === null ? 'unparseable timestamp' : `${ctx.vitalsAgeMinutes} minutes old`}); findings may not reflect the patient's current condition.`,
-      evidence: [`latest vitals recorded ${ctx.vitalsAgeMinutes === null ? 'at an unknown time' : `${ctx.vitalsAgeMinutes} minutes ago`}`],
+      evidence: [
+        `latest vitals recorded ${ctx.vitalsAgeMinutes === null ? 'at an unknown time' : `${ctx.vitalsAgeMinutes} minutes ago`}`,
+      ],
       sources: ['emergency-os vitals'],
     });
     preparedActionSpecs.push({
@@ -242,7 +261,8 @@ export function deriveInvestigationSynthesis(ctx: InvestigationContext): Investi
   if (ctx.assumptions.length > 0) {
     findings.push({
       state: 'PARTIALLY_SUPPORTED',
-      summary: 'Some inputs were assumed rather than observed; see evidence for the exact assumptions.',
+      summary:
+        'Some inputs were assumed rather than observed; see evidence for the exact assumptions.',
       evidence: [...ctx.assumptions],
       sources: ['input mapping'],
     });

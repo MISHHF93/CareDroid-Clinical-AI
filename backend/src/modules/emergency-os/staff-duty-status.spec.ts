@@ -120,7 +120,15 @@ describe('ReassessmentService staff organization tenant scoping (BOLA audit)', (
   // email with an attacker-controlled address).
   it('listStaff(organizationId) includes own-org and legacy/null-org rows, excludes a different org', async () => {
     const rows = [
-      { id: 's-a', organizationId: 'org-a', name: 'Own Org', role: 'MD', active: true, onDuty: false, email: null },
+      {
+        id: 's-a',
+        organizationId: 'org-a',
+        name: 'Own Org',
+        role: 'MD',
+        active: true,
+        onDuty: false,
+        email: null,
+      },
     ];
     const repository = { find: jest.fn().mockResolvedValue(rows) };
     const module = await buildModule(repository);
@@ -162,7 +170,11 @@ describe('ReassessmentService staff organization tenant scoping (BOLA audit)', (
     const service = module.get<ReassessmentService>(ReassessmentService);
 
     await expect(
-      service.updateStaffDutyStatus('s-b', { onDuty: true, email: 'attacker@example.com' }, 'org-a'),
+      service.updateStaffDutyStatus(
+        's-b',
+        { onDuty: true, email: 'attacker@example.com' },
+        'org-a',
+      ),
     ).rejects.toThrow(NotFoundException);
     expect(repository.save).not.toHaveBeenCalled();
 

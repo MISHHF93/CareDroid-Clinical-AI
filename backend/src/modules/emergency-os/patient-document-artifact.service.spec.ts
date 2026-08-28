@@ -154,15 +154,25 @@ describe('PatientDocumentArtifactService organization tenant scoping (BOLA audit
     patientService = module.get(EmergencyPatientService);
   });
 
-  it("extract() refuses a patientId belonging to a different organization, and succeeds for the owning org", () => {
+  it('extract() refuses a patientId belonging to a different organization, and succeeds for the owning org', () => {
     const patient = patientService.createPatient(
-      { firstName: 'Org', lastName: 'B', chiefComplaint: 'Test', complaintCategory: 'Other' } as any,
+      {
+        firstName: 'Org',
+        lastName: 'B',
+        chiefComplaint: 'Test',
+        complaintCategory: 'Other',
+      } as any,
       'org-b',
     );
 
     const crossOrg = service.extract(
       patient.id,
-      { patientId: patient.id, documentType: 'Referral Note', sourceType: 'referral_note', rawText: 'Chief complaint: Chest pain' } as any,
+      {
+        patientId: patient.id,
+        documentType: 'Referral Note',
+        sourceType: 'referral_note',
+        rawText: 'Chief complaint: Chest pain',
+      } as any,
       'org-a',
     );
     expect(crossOrg.status).toBe('error');
@@ -170,7 +180,12 @@ describe('PatientDocumentArtifactService organization tenant scoping (BOLA audit
 
     const ownOrg = service.extract(
       patient.id,
-      { patientId: patient.id, documentType: 'Referral Note', sourceType: 'referral_note', rawText: 'Chief complaint: Chest pain' } as any,
+      {
+        patientId: patient.id,
+        documentType: 'Referral Note',
+        sourceType: 'referral_note',
+        rawText: 'Chief complaint: Chest pain',
+      } as any,
       'org-b',
     );
     expect(ownOrg.status).toBe('active');
@@ -179,12 +194,22 @@ describe('PatientDocumentArtifactService organization tenant scoping (BOLA audit
 
   it('getEnvelope() refuses a patientId belonging to a different organization', () => {
     const patient = patientService.createPatient(
-      { firstName: 'Org', lastName: 'B', chiefComplaint: 'Test', complaintCategory: 'Other' } as any,
+      {
+        firstName: 'Org',
+        lastName: 'B',
+        chiefComplaint: 'Test',
+        complaintCategory: 'Other',
+      } as any,
       'org-b',
     );
     service.extract(
       patient.id,
-      { patientId: patient.id, documentType: 'Referral Note', sourceType: 'referral_note', rawText: 'Chief complaint: Chest pain' } as any,
+      {
+        patientId: patient.id,
+        documentType: 'Referral Note',
+        sourceType: 'referral_note',
+        rawText: 'Chief complaint: Chest pain',
+      } as any,
       'org-b',
     );
 
@@ -199,12 +224,22 @@ describe('PatientDocumentArtifactService organization tenant scoping (BOLA audit
 
   it('review() refuses a patientId belonging to a different organization', () => {
     const patient = patientService.createPatient(
-      { firstName: 'Org', lastName: 'B', chiefComplaint: 'Test', complaintCategory: 'Other' } as any,
+      {
+        firstName: 'Org',
+        lastName: 'B',
+        chiefComplaint: 'Test',
+        complaintCategory: 'Other',
+      } as any,
       'org-b',
     );
     const created = service.extract(
       patient.id,
-      { patientId: patient.id, documentType: 'Referral Note', sourceType: 'referral_note', rawText: 'Chief complaint: Chest pain' } as any,
+      {
+        patientId: patient.id,
+        documentType: 'Referral Note',
+        sourceType: 'referral_note',
+        rawText: 'Chief complaint: Chest pain',
+      } as any,
       'org-b',
     );
     const artifactId = created.data.artifacts[0].id;

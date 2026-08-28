@@ -52,7 +52,10 @@ describe('EmergencyPatientAuditService', () => {
     const service = buildService(undefined);
 
     await expect(
-      service.logPatientAccess({ patientId: 'patient-1', resource: 'emergency/patients/patient-1' }),
+      service.logPatientAccess({
+        patientId: 'patient-1',
+        resource: 'emergency/patients/patient-1',
+      }),
     ).resolves.toBeUndefined();
   });
 });

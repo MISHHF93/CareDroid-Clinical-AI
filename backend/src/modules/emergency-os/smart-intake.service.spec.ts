@@ -227,7 +227,7 @@ describe('SmartIntakeService organization tenant scoping (BOLA audit)', () => {
     );
   });
 
-  it('createFromIntake only matches duplicate candidates within the caller\'s own organization', () => {
+  it("createFromIntake only matches duplicate candidates within the caller's own organization", () => {
     const { service, patientService } = makeServices([makeExistingPatient()]);
 
     service.createFromIntake(

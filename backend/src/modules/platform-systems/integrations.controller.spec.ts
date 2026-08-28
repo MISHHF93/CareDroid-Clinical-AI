@@ -130,7 +130,10 @@ describe('IntegrationsController', () => {
       sourceId: 'source-1',
       governed: true,
     });
-    expect(platformGovernanceService?.getSourceProvenance).toHaveBeenCalledWith('source-1', undefined);
+    expect(platformGovernanceService?.getSourceProvenance).toHaveBeenCalledWith(
+      'source-1',
+      undefined,
+    );
   });
 
   it('falls back to the platform systems service when governance is unavailable', async () => {
