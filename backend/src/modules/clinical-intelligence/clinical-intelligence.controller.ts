@@ -75,7 +75,7 @@ export class ClinicalIntelligenceController {
         ipAddress: req.ip || req.connection?.remoteAddress,
         userAgent: req.headers?.['user-agent'],
       },
-      req.user?.profile?.organizationId || undefined,
+      req.tenantContext?.organizationId,
     );
   }
 
