@@ -77,8 +77,29 @@ describe('SurgeController', () => {
 
     expect(service.activateSurgeMode).toHaveBeenCalledWith(
       expect.objectContaining({ type: 'mci', actualPatientCount: 0 }),
+      undefined,
     );
     expect(result).toEqual({ success: true, surgeEvent: fakeSurgeEvent });
+  });
+
+  // Regression: activateSurgeMode used to be called with no organizationId at
+  // all -- a single in-memory `activeSurgeEvent` field shared across every
+  // org on this backend, plus unscoped Mongo lookups, meant any hospital
+  // could see or terminate another hospital's live MCI/disaster response.
+  it('activate() forwards the resolved tenant organizationId to the service', async () => {
+    await controller.activate(
+      {
+        type: 'mci',
+        estimatedPatientCount: 20,
+        resourceStatus: fakeSurgeEvent.resourceStatus,
+      } as any,
+      { organizationId: 'org-1' } as any,
+    );
+
+    expect(service.activateSurgeMode).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'mci' }),
+      'org-1',
+    );
   });
 
   it('batchEmsIntake() delegates patients + surgeEventId and wraps the result', async () => {
@@ -118,6 +139,12 @@ describe('SurgeController', () => {
       estimatedTimeToDepletion: {},
       recommendations: [],
     });
+    expect(service.assessResourceBottlenecks).toHaveBeenCalledWith(undefined);
+  });
+
+  it('bottlenecks() forwards the resolved tenant organizationId to the service', async () => {
+    await controller.bottlenecks({ organizationId: 'org-1' } as any);
+    expect(service.assessResourceBottlenecks).toHaveBeenCalledWith('org-1');
   });
 
   it('deactivate() wraps a found surge event', async () => {
@@ -126,8 +153,16 @@ describe('SurgeController', () => {
       debriefNotes: 'All clear',
     } as any);
 
-    expect(service.deactivateSurgeMode).toHaveBeenCalledWith('surge-1', 'All clear');
+    expect(service.deactivateSurgeMode).toHaveBeenCalledWith('surge-1', 'All clear', undefined);
     expect(result).toEqual({ success: true, surgeEvent: fakeSurgeEvent });
+  });
+
+  it('deactivate() forwards the resolved tenant organizationId to the service', async () => {
+    await controller.deactivate(
+      { surgeEventId: 'surge-1', debriefNotes: 'All clear' } as any,
+      { organizationId: 'org-1' } as any,
+    );
+    expect(service.deactivateSurgeMode).toHaveBeenCalledWith('surge-1', 'All clear', 'org-1');
   });
 
   it('deactivate() throws NotFoundException when the service returns null', async () => {
@@ -140,6 +175,12 @@ describe('SurgeController', () => {
   it('status() returns the service result directly (unwrapped)', async () => {
     const result = await controller.status();
     expect(result).toEqual({ active: false });
+    expect(service.getCurrentSurgeStatus).toHaveBeenCalledWith(undefined);
+  });
+
+  it('status() forwards the resolved tenant organizationId to the service', async () => {
+    await controller.status({ organizationId: 'org-1' } as any);
+    expect(service.getCurrentSurgeStatus).toHaveBeenCalledWith('org-1');
   });
 
   it('every route throws ServiceUnavailableException when MongoDB is not connected', async () => {

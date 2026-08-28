@@ -45,15 +45,21 @@ export class SurgeController {
   @Post('activate')
   @RequirePermission(Permission.ACTIVATE_SURGE_MODE)
   @ApiOperation({ summary: 'Activate a hospital-wide mass-casualty / disaster surge event' })
-  async activate(@Body() body: ActivateSurgeDto) {
+  async activate(
+    @Body() body: ActivateSurgeDto,
+    @TenantContext() tenantContext?: TenantContextValue,
+  ) {
     assertMongoReady();
-    const surgeEvent = await this.surgeCapacityService.activateSurgeMode({
-      ...body,
-      // SurgeEventInput's actualPatientCount is typed as required, but
-      // activateSurgeMode's own implementation already defaults it to 0 --
-      // matching that real fallback here rather than the stricter type.
-      actualPatientCount: body.actualPatientCount ?? 0,
-    });
+    const surgeEvent = await this.surgeCapacityService.activateSurgeMode(
+      {
+        ...body,
+        // SurgeEventInput's actualPatientCount is typed as required, but
+        // activateSurgeMode's own implementation already defaults it to 0 --
+        // matching that real fallback here rather than the stricter type.
+        actualPatientCount: body.actualPatientCount ?? 0,
+      },
+      tenantContext?.organizationId,
+    );
     return { success: true, surgeEvent };
   }
 
@@ -76,19 +82,23 @@ export class SurgeController {
   @Get('bottlenecks')
   @RequirePermission(Permission.VIEW_SURGE_COMMAND)
   @ApiOperation({ summary: 'Assess resource bottlenecks for the active surge event' })
-  async bottlenecks() {
+  async bottlenecks(@TenantContext() tenantContext?: TenantContextValue) {
     assertMongoReady();
-    return this.surgeCapacityService.assessResourceBottlenecks();
+    return this.surgeCapacityService.assessResourceBottlenecks(tenantContext?.organizationId);
   }
 
   @Post('deactivate')
   @RequirePermission(Permission.ACTIVATE_SURGE_MODE)
   @ApiOperation({ summary: 'Deactivate an active surge event' })
-  async deactivate(@Body() body: DeactivateSurgeDto) {
+  async deactivate(
+    @Body() body: DeactivateSurgeDto,
+    @TenantContext() tenantContext?: TenantContextValue,
+  ) {
     assertMongoReady();
     const surgeEvent = await this.surgeCapacityService.deactivateSurgeMode(
       body.surgeEventId,
       body.debriefNotes || 'No debrief notes provided',
+      tenantContext?.organizationId,
     );
     if (!surgeEvent) {
       throw new NotFoundException('Surge event not found');
@@ -99,8 +109,8 @@ export class SurgeController {
   @Get('status')
   @RequirePermission(Permission.VIEW_SURGE_COMMAND)
   @ApiOperation({ summary: 'Current surge status and resource bottlenecks' })
-  async status() {
+  async status(@TenantContext() tenantContext?: TenantContextValue) {
     assertMongoReady();
-    return this.surgeCapacityService.getCurrentSurgeStatus();
+    return this.surgeCapacityService.getCurrentSurgeStatus(tenantContext?.organizationId);
   }
 }

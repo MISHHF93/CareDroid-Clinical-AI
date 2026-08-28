@@ -365,12 +365,82 @@ describe('SurgeCapacityService (real MongoDB via mongodb-memory-server)', () => 
       });
 
       // A brand-new instance (e.g. a new request in a real deployment) has
-      // no in-memory `activeSurgeEvent` -- getCurrentSurgeStatus() must
-      // fall back to querying Mongo directly, not just an in-memory cache.
+      // no in-memory cache -- getCurrentSurgeStatus() must fall back to
+      // querying Mongo directly, not just an in-memory cache.
       const freshInstanceService = new SurgeCapacityService();
       const status = await freshInstanceService.getCurrentSurgeStatus();
       expect(status.active).toBe(true);
       expect(status.surgeEvent?.id).toBe(event.id);
+    });
+
+    // HEAL follow-up (2026-08-28): activeSurgeEvent used to be a single
+    // SurgeEvent | null shared by the WHOLE process regardless of caller --
+    // any hospital on this backend read the same cached "active" event as
+    // any other. Proves org A's status/bottleneck views never see org B's
+    // live MCI/disaster response, whether served from the in-memory cache
+    // or a fresh instance falling back to Mongo.
+    it('never surfaces another organization\'s active surge event as this org\'s status', async () => {
+      await service.activateSurgeMode(
+        { type: 'mci', estimatedPatientCount: 30, actualPatientCount: 0, resourceStatus },
+        'org-a',
+      );
+
+      const orgBStatus = await service.getCurrentSurgeStatus('org-b');
+      expect(orgBStatus).toEqual({ active: false });
+
+      const freshInstanceService = new SurgeCapacityService();
+      const orgBStatusFresh = await freshInstanceService.getCurrentSurgeStatus('org-b');
+      expect(orgBStatusFresh).toEqual({ active: false });
+
+      const orgAStatus = await service.getCurrentSurgeStatus('org-a');
+      expect(orgAStatus.active).toBe(true);
+    });
+  });
+
+  describe('cross-organization isolation', () => {
+    it('does not let one organization deactivate another organization\'s surge event by id', async () => {
+      const event = await service.activateSurgeMode(
+        { type: 'disaster', estimatedPatientCount: 10, actualPatientCount: 0, resourceStatus },
+        'org-a',
+      );
+
+      const result = await service.deactivateSurgeMode(event.id, 'attacker debrief', 'org-b');
+      expect(result).toBeNull();
+
+      const stored = await mongoose.connection
+        .db!.collection('surge_events')
+        .findOne({ id: event.id });
+      expect(stored!.status).toBe('activated');
+
+      const realDeactivation = await service.deactivateSurgeMode(
+        event.id,
+        'real debrief',
+        'org-a',
+      );
+      expect(realDeactivation!.status).toBe('deactivated');
+    });
+
+    it('does not let one organization batch-intake EMS patients into another organization\'s surge event', async () => {
+      const event = await service.activateSurgeMode(
+        { type: 'mci', estimatedPatientCount: 10, actualPatientCount: 0, resourceStatus },
+        'org-a',
+      );
+
+      await expect(
+        service.batchEMSIntake(
+          [
+            {
+              temporaryId: 't1',
+              chiefComplaint: 'Blunt trauma',
+              triageColor: 'RED',
+              etaMinutes: 5,
+              mechanismOfInjury: 'MVC',
+            },
+          ],
+          event.id,
+          'org-b',
+        ),
+      ).rejects.toThrow('No active surge event');
     });
   });
 });

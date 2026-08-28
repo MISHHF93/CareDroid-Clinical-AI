@@ -18,6 +18,7 @@ export interface SurgeResourceStatus {
 
 export interface SurgeEvent {
   id: string;
+  organizationId?: string | null;
   type: 'mci' | 'disaster' | 'local_surge';
   estimatedPatientCount: number;
   actualPatientCount: number;
@@ -50,7 +51,10 @@ export interface BatchEMSPatient {
   };
 }
 
-type SurgeEventInput = Omit<SurgeEvent, 'id' | 'activationTime' | 'status' | 'communicationLog'>;
+type SurgeEventInput = Omit<
+  SurgeEvent,
+  'id' | 'organizationId' | 'activationTime' | 'status' | 'communicationLog'
+>;
 type DepletableResource =
   | 'surgeonsAvailable'
   | 'anaesthetistsAvailable'
@@ -74,16 +78,30 @@ function getMongoDb() {
 
 @Injectable()
 export class SurgeCapacityService extends EventEmitter {
-  private activeSurgeEvent: SurgeEvent | null = null;
+  // HEAL follow-up (2026-08-28): was a single SurgeEvent | null shared by the
+  // whole process regardless of caller -- worse than a missing WHERE clause,
+  // since it's a server-memory cache no query can scope after the fact. Every
+  // hospital on this backend read/wrote the SAME cached "active" surge event.
+  // Keyed by a normalized org key so each org's cached active event (and the
+  // legacy/no-org bucket, for rows written before this fix) stays isolated.
+  private activeSurgeEventByOrg = new Map<string, SurgeEvent>();
+
+  private orgKey(organizationId?: string | null): string {
+    return organizationId || '__legacy__';
+  }
 
   /**
    * Activate surge mode for mass casualty incident.
    * Based on surge testing literature where early estimated patient count drives resource recall.
    */
-  async activateSurgeMode(event: SurgeEventInput): Promise<SurgeEvent> {
+  async activateSurgeMode(
+    event: SurgeEventInput,
+    organizationId?: string | null,
+  ): Promise<SurgeEvent> {
     const surgeEvent: SurgeEvent = {
       id: `surge_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
       ...event,
+      organizationId: organizationId ?? null,
       actualPatientCount: event.actualPatientCount ?? 0,
       activationTime: new Date(),
       status: 'activated',
@@ -96,7 +114,7 @@ export class SurgeCapacityService extends EventEmitter {
       ],
     };
 
-    this.activeSurgeEvent = surgeEvent;
+    this.activeSurgeEventByOrg.set(this.orgKey(organizationId), surgeEvent);
     await this.saveSurgeEvent(surgeEvent);
     this.emit('surge_activated', surgeEvent);
     await this.reallocateResources(surgeEvent);
@@ -113,7 +131,7 @@ export class SurgeCapacityService extends EventEmitter {
     surgeEventId: string,
     organizationId?: string,
   ): Promise<BatchEMSPatient[]> {
-    const surgeEvent = await this.getSurgeEvent(surgeEventId);
+    const surgeEvent = await this.getSurgeEvent(surgeEventId, organizationId);
     if (!surgeEvent || surgeEvent.status !== 'activated') {
       throw new Error('No active surge event. Activate surge mode first.');
     }
@@ -213,12 +231,14 @@ export class SurgeCapacityService extends EventEmitter {
     return createdPatients;
   }
 
-  async assessResourceBottlenecks(): Promise<{
+  async assessResourceBottlenecks(organizationId?: string | null): Promise<{
     criticalResources: string[];
     estimatedTimeToDepletion: Record<string, number>;
     recommendations: string[];
   }> {
-    const surgeEvent = this.activeSurgeEvent || (await this.getLatestActiveSurgeEvent());
+    const surgeEvent =
+      this.activeSurgeEventByOrg.get(this.orgKey(organizationId)) ||
+      (await this.getLatestActiveSurgeEvent(organizationId));
     if (!surgeEvent) {
       return { criticalResources: [], estimatedTimeToDepletion: {}, recommendations: [] };
     }
@@ -289,8 +309,9 @@ export class SurgeCapacityService extends EventEmitter {
   async deactivateSurgeMode(
     surgeEventId: string,
     debriefNotes: string,
+    organizationId?: string | null,
   ): Promise<SurgeEvent | null> {
-    const surgeEvent = await this.getSurgeEvent(surgeEventId);
+    const surgeEvent = await this.getSurgeEvent(surgeEventId, organizationId);
     if (!surgeEvent) return null;
 
     surgeEvent.status = 'deactivated';
@@ -303,25 +324,27 @@ export class SurgeCapacityService extends EventEmitter {
 
     await this.updateSurgeEvent(surgeEvent);
     this.emit('surge_deactivated', surgeEvent);
-    this.activeSurgeEvent = null;
+    this.activeSurgeEventByOrg.delete(this.orgKey(organizationId));
     await this.generatePostEventReport(surgeEvent);
 
     return surgeEvent;
   }
 
-  async getCurrentSurgeStatus(): Promise<{
+  async getCurrentSurgeStatus(organizationId?: string | null): Promise<{
     active: boolean;
     surgeEvent?: SurgeEvent;
     bottlenecks?: Awaited<ReturnType<SurgeCapacityService['assessResourceBottlenecks']>>;
   }> {
-    const surgeEvent = this.activeSurgeEvent || (await this.getLatestActiveSurgeEvent());
+    const key = this.orgKey(organizationId);
+    const surgeEvent =
+      this.activeSurgeEventByOrg.get(key) || (await this.getLatestActiveSurgeEvent(organizationId));
     if (!surgeEvent) return { active: false };
 
-    this.activeSurgeEvent = surgeEvent;
+    this.activeSurgeEventByOrg.set(key, surgeEvent);
     return {
       active: true,
       surgeEvent,
-      bottlenecks: await this.assessResourceBottlenecks(),
+      bottlenecks: await this.assessResourceBottlenecks(organizationId),
     };
   }
 
@@ -329,17 +352,33 @@ export class SurgeCapacityService extends EventEmitter {
     await getMongoDb().collection('surge_events').insertOne(event);
   }
 
-  private async getSurgeEvent(id: string): Promise<SurgeEvent | null> {
-    return (await getMongoDb()
-      .collection('surge_events')
-      .findOne({ id })) as unknown as SurgeEvent | null;
-  }
-
-  private async getLatestActiveSurgeEvent(): Promise<SurgeEvent | null> {
+  // Matches own org's rows + legacy null-org rows written before this fix --
+  // same idiom as getSourceProvenance()/getConsent() (HEAL-338).
+  private async getSurgeEvent(
+    id: string,
+    organizationId?: string | null,
+  ): Promise<SurgeEvent | null> {
     return (await getMongoDb()
       .collection('surge_events')
       .findOne(
-        { status: 'activated' },
+        organizationId
+          ? { id, $or: [{ organizationId }, { organizationId: null }, { organizationId: { $exists: false } }] }
+          : { id },
+      )) as unknown as SurgeEvent | null;
+  }
+
+  private async getLatestActiveSurgeEvent(
+    organizationId?: string | null,
+  ): Promise<SurgeEvent | null> {
+    return (await getMongoDb()
+      .collection('surge_events')
+      .findOne(
+        organizationId
+          ? {
+              status: 'activated',
+              $or: [{ organizationId }, { organizationId: null }, { organizationId: { $exists: false } }],
+            }
+          : { status: 'activated' },
         { sort: { activationTime: -1 } },
       )) as unknown as SurgeEvent | null;
   }
