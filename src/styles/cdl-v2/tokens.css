@@ -29,7 +29,9 @@
   --cdl-space-fluid-lg: clamp(16px, 2.5vw, 28px);
 
   /* ── Typography ── */
-  --cdl-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --cdl-font-sans:
+    'Inter', 'Segoe UI Variable', 'Aptos', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    sans-serif;
   --cdl-font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
 
   --cdl-text-2xs: 10px;
@@ -54,10 +56,10 @@
   /* ── Radius ── */
   --cdl-radius-xs: 2px;
   --cdl-radius-sm: 4px;
-  --cdl-radius-md: 8px;
-  --cdl-radius-lg: 12px;
-  --cdl-radius-xl: 16px;
-  --cdl-radius-2xl: 20px;
+  --cdl-radius-md: 10px;
+  --cdl-radius-lg: 14px;
+  --cdl-radius-xl: 18px;
+  --cdl-radius-2xl: 24px;
   --cdl-radius-full: 9999px;
 
   /* ── Primary workflow card contract (platform-wide) ── */
@@ -66,8 +68,8 @@
   --cdl-card-min-height: 220px;
   --cdl-card-padding-min: 16px;
   --cdl-card-padding-max: 24px;
-  --cdl-card-radius-min: 12px;
-  --cdl-card-radius-max: 16px;
+  --cdl-card-radius-min: 14px;
+  --cdl-card-radius-max: 18px;
 
   /* ── Elevation (clinical depth 0–4) ── */
   --cdl-elev-0: none;
@@ -92,9 +94,9 @@
 
   /* ── Control / icon optical sizes ── */
   --cdl-touch-min: 44px;
-  --cdl-control-height-sm: 32px;
-  --cdl-control-height-md: 36px;
-  --cdl-control-height-lg: 40px;
+  --cdl-control-height-sm: 34px;
+  --cdl-control-height-md: 40px;
+  --cdl-control-height-lg: 44px;
   --cdl-icon-xs: 12px;
   --cdl-icon-sm: 16px;
   --cdl-icon-md: 20px;
@@ -105,9 +107,9 @@
   /* ── Layout ── */
   --cdl-content-max: 1680px;
   --cdl-content-max-wide: 2400px;
-  --cdl-page-gutter: clamp(16px, 2vw, 24px);
-  --cdl-section-gap: 16px;
-  --cdl-panel-gap: 12px;
+  --cdl-page-gutter: clamp(18px, 2.2vw, 32px);
+  --cdl-section-gap: 24px;
+  --cdl-panel-gap: 16px;
 }
 
 @media (prefers-reduced-motion: reduce) {

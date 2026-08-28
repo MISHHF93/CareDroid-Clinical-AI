@@ -6,10 +6,10 @@
 export const CDL_RADIUS_PX = Object.freeze({
   xs: 2,
   sm: 4,
-  md: 8,
-  lg: 12,
-  xl: 16,
-  '2xl': 20,
+  md: 10,
+  lg: 14,
+  xl: 18,
+  '2xl': 24,
   full: 9999,
 } as const);
 

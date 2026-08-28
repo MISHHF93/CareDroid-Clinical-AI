@@ -3,13 +3,13 @@
  */
 
 :root {
-  --cdl-header-height: 52px;
-  --cdl-workspace-height: 44px;
+  --cdl-header-height: 60px;
+  --cdl-workspace-height: 72px;
   --cdl-chrome-stack-height: calc(var(--cdl-header-height) + var(--cdl-workspace-height));
   --cdl-header-height-compact: 44px;
 
-  --cdl-sidebar-width: 232px;
-  --cdl-sidebar-width-collapsed: 56px;
+  --cdl-sidebar-width: 252px;
+  --cdl-sidebar-width-collapsed: 64px;
   --cdl-sidebar-drawer-max: min(280px, 88vw);
   --cdl-mobile-nav-height: 72px;
 

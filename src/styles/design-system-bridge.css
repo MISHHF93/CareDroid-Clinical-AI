@@ -14,7 +14,12 @@ html[data-theme='light'] {
   --cd-text-secondary: var(--app-fg-muted, #6b7280);
   --cd-text-disabled: var(--medical-ink-subtle, #9ca3af);
   --cd-text-inverse: var(--app-on-solid, #ffffff);
-  --cd-text-brand: #111827;
+  /* Was hardcoded #111827, overriding cdl-v2/compat.css's already-correct
+     --cd-text-brand: var(--cdl-brand-600) alias at the same :root
+     specificity (compat.css loads first; this file loads later and always
+     won the tie) -- the same "bridge file left un-aliased" gap as
+     --cd-brand-bg above, just for brand-colored text instead of a button. */
+  --cd-text-brand: var(--app-accent, #111827);
   --cd-text-danger: var(--semantic-critical, #b91c1c);
 
   --cd-border-subtle: var(--app-border-subtle, #e0f2fe);
@@ -22,10 +27,21 @@ html[data-theme='light'] {
   --cd-border-strong: var(--app-border-strong, #d1d5db);
   --cd-border-brand: var(--medical-accent-border, rgba(100, 116, 139, 0.35));
   --cd-border-danger: var(--semantic-critical, #b91c1c);
-  --cd-border-focus: #374151;
+  --cd-border-focus: var(--app-accent, #374151);
 
-  --cd-brand-bg: #374151;
-  --cd-brand-bg-hover: #111827;
+  /* Was hardcoded #374151/#111827 -- the same pre-CDL dark-slate pair every
+     other legacy bridge in this app aliased to --app-accent/-hover except
+     this one, confirmed live: CollaborationHub's "Send" cd-btn--primary
+     rendered flat gray regardless of enabled/disabled state. Every other
+     line in this file aliases --cd- names to --app-, --medical-, and
+     --semantic- ones -- this was the one gap. */
+  --cd-brand-bg: var(--app-accent, #374151);
+  --cd-brand-bg-hover: var(--app-accent-hover, #111827);
+  /* Not previously aliased here at all -- fell through to tokens.css's base
+     sky-blue palette (hsl(--cd-palette-sky-700)) instead of the app's
+     brand color, visible only during a cd-btn--primary's brief :active
+     (mousedown) state. */
+  --cd-brand-bg-active: var(--app-accent-hover, #111827);
   --cd-brand-bg-subtle: var(--medical-accent-tint, rgba(100, 116, 139, 0.12));
   --cd-brand-fg: var(--app-on-solid, #ffffff);
   --cd-brand-fg-subtle: var(--semantic-information, #475569);

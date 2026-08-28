@@ -4,11 +4,11 @@
  */
 
 :root {
-  --cdl-header-height: 52px;
+  --cdl-header-height: 60px;
   --cdl-header-padding-block: 8px;
   /* Match page gutter so header, route tab, and content share one vertical edge */
   --cdl-header-padding-inline: var(--app-layout-page-gutter-inline, 16px);
-  --cdl-route-tab-height: 48px;
+  --cdl-route-tab-height: 72px;
   --cdl-route-tab-bg: var(--medical-white);
   --cdl-chrome-stack-height: calc(
     var(--cdl-header-height) + var(--cdl-route-tab-height) + var(--cdl-alarm-dock-estimate, 0px)

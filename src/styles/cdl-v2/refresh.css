@@ -1,0 +1,874 @@
+/**
+ * CareDroid Clinical Design Language 2.1 — visual authority layer.
+ *
+ * This file is intentionally loaded after the application module graph. It is
+ * the visible end of the CDL migration: legacy aliases may continue to exist,
+ * but shared chrome and primitives resolve to one calm clinical language.
+ */
+
+/*
+ * Sidebar follows the theme directly instead of staying a fixed navy band: white in
+ * light mode, black in dark mode. (Navy was the original CDL 2.1 "structural chrome"
+ * treatment, but against a dark canvas the fixed navy read almost the same as the
+ * rest of the shell -- confirmed live, ~11.6% vs ~8.6% average brightness, an 85pp
+ * gap in light mode collapsing to ~3pp in dark. A themed white/black sidebar sidesteps
+ * that calibration problem entirely instead of chasing a bigger navy/canvas gap.)
+ * Every --cdl-shell-sidebar-* ink/state token below flips with it so nav labels,
+ * icons, hover/active states, and badges all stay legible in both themes -- a plain
+ * background swap without this would put white-on-navy text onto a white sidebar.
+ */
+html,
+html[data-theme='light'] {
+  --cdl-sidebar-bg: var(--cdl-surface-card);
+  --cdl-sidebar-item-fg: var(--cdl-ink-muted);
+  --cdl-sidebar-item-fg-hover: var(--cdl-ink);
+  --cdl-sidebar-item-fg-active: var(--cdl-brand-700);
+  --cdl-shell-sidebar-ink: var(--cdl-ink);
+  --cdl-shell-sidebar-muted: var(--cdl-ink-muted);
+  --cdl-shell-sidebar-subtle: var(--cdl-ink-subtle);
+  --cdl-shell-sidebar-hover: color-mix(in srgb, var(--cdl-ink) 5%, transparent);
+  --cdl-shell-sidebar-active: var(--cdl-brand-50);
+  --cdl-shell-sidebar-active-border: var(--cdl-brand-500);
+  --cdl-shell-sidebar-active-fg: var(--cdl-brand-700);
+  --cdl-shell-sidebar-alert-fg: var(--cdl-critical-text);
+  --cdl-shell-sidebar-footer-tint: color-mix(in srgb, var(--cdl-ink) 3%, transparent);
+  --cdl-shell-sidebar-divider: color-mix(in srgb, var(--cdl-ink) 10%, transparent);
+  --cdl-shell-sidebar-control-border: color-mix(in srgb, var(--cdl-ink) 14%, transparent);
+  --cdl-shell-sidebar-control-bg: color-mix(in srgb, var(--cdl-ink) 4%, transparent);
+  --cdl-shell-sidebar-due-fg: var(--cdl-warning-text);
+}
+
+html[data-theme='dark'] {
+  --cdl-sidebar-bg: #000000;
+  --cdl-sidebar-item-fg: var(--cdl-ink-muted);
+  --cdl-sidebar-item-fg-hover: var(--cdl-ink);
+  --cdl-sidebar-item-fg-active: #ffffff;
+  --cdl-shell-sidebar-ink: var(--cdl-ink);
+  --cdl-shell-sidebar-muted: var(--cdl-ink-muted);
+  --cdl-shell-sidebar-subtle: var(--cdl-ink-subtle);
+  --cdl-shell-sidebar-hover: rgba(255, 255, 255, 0.07);
+  --cdl-shell-sidebar-active: rgba(94, 234, 212, 0.13);
+  --cdl-shell-sidebar-active-border: var(--cdl-brand-mint);
+  --cdl-shell-sidebar-active-fg: #ffffff;
+  --cdl-shell-sidebar-alert-fg: #fecaca;
+  --cdl-shell-sidebar-footer-tint: rgba(0, 0, 0, 0.35);
+  --cdl-shell-sidebar-divider: rgba(197, 213, 226, 0.11);
+  --cdl-shell-sidebar-control-border: rgba(197, 213, 226, 0.14);
+  --cdl-shell-sidebar-control-bg: rgba(255, 255, 255, 0.055);
+  --cdl-shell-sidebar-due-fg: #fed7aa;
+}
+
+:root {
+  --cdl-font-display: var(--cdl-font-sans);
+  --cdl-shell-topbar-bg: color-mix(in srgb, var(--cdl-surface-card) 97%, transparent);
+  --cdl-shell-context-bg: var(--cdl-surface-card);
+  --cdl-shell-canvas-bg: var(--cdl-surface-page);
+  --cdl-control-radius: var(--cdl-radius-md);
+  --cdl-panel-radius: var(--cdl-radius-lg);
+  --cdl-panel-shadow: 0 1px 2px rgba(16, 42, 67, 0.04), 0 8px 24px rgba(16, 42, 67, 0.055);
+  --cdl-panel-shadow-hover: 0 2px 4px rgba(16, 42, 67, 0.05), 0 14px 32px rgba(16, 42, 67, 0.09);
+  --cdl-chrome-shadow: 0 1px 0 rgba(16, 42, 67, 0.08), 0 10px 30px rgba(16, 42, 67, 0.035);
+
+  /* Legacy consumers inherit the refreshed typography and geometry. */
+  --app-font-family-body: var(--cdl-font-sans);
+  --app-radius-sm: var(--cdl-radius-sm);
+  --app-radius-md: var(--cdl-radius-md);
+  --app-radius-lg: var(--cdl-radius-lg);
+  --app-button-height: var(--cdl-control-height-md);
+  --app-input-height: var(--cdl-control-height-lg);
+  --app-accent-action: var(--cdl-brand-500);
+  --app-accent-interactive: var(--cdl-brand-500);
+  --app-focus: color-mix(in srgb, var(--cdl-brand-500) 24%, transparent);
+}
+
+/*
+ * compat.css already sets --app-accent/--app-accent-hover to the CDL brand teal, but
+ * theme-tokens.css redeclares the same names under `html, html[data-theme='light']` /
+ * `html[data-theme='dark']` — an attribute selector, specificity (0,1,1), which beats a plain
+ * `:root` (0,1,0) regardless of import order. That silently reverted --app-accent to the
+ * pre-refresh medical blue (#075985) for the ~200 components that consume the alias instead of
+ * --cdl-* directly. Matching the same selector shape here (refresh.css loads dead last) is what
+ * actually makes the brand teal stick app-wide.
+ */
+html[data-theme='light'],
+html[data-theme='dark'],
+:root {
+  --app-accent: var(--cdl-brand-500);
+  --app-accent-2: var(--cdl-brand-600);
+  --app-accent-hover: var(--cdl-brand-600);
+}
+
+html {
+  font-family: var(--cdl-font-sans);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: var(--cdl-font-sans);
+  font-size: var(--cdl-text-md);
+  line-height: var(--cdl-leading-normal);
+  letter-spacing: -0.006em;
+  background: var(--cdl-shell-canvas-bg);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--cdl-brand-400) 28%, transparent);
+  color: var(--cdl-ink);
+}
+
+/* ── Application frame ── */
+.emergency-app-shell {
+  --app-shell-sidebar-offset: var(--cdl-sidebar-width);
+  background: var(--cdl-shell-canvas-bg);
+  color: var(--cdl-ink);
+  font-family: var(--cdl-font-sans);
+}
+
+.emergency-app-shell .app-shell-main-content {
+  background: var(--cdl-shell-canvas-bg);
+  scrollbar-color: color-mix(in srgb, var(--cdl-ink-muted) 32%, transparent) transparent;
+}
+
+.emergency-app-shell .app-shell-main-content::-webkit-scrollbar {
+  width: 10px;
+}
+
+.emergency-app-shell .app-shell-main-content::-webkit-scrollbar-thumb {
+  border: 3px solid transparent;
+  border-radius: var(--cdl-radius-full);
+  background: color-mix(in srgb, var(--cdl-ink-muted) 32%, transparent);
+  background-clip: padding-box;
+}
+
+/* ── Sidebar: recognizable product structure, not a pale utility list ── */
+.emergency-app-shell > .sidebar,
+.emergency-app-shell .sidebar {
+  width: var(--cdl-sidebar-width);
+  background: var(--cdl-sidebar-bg, var(--cdl-brand-navy));
+  color: var(--cdl-shell-sidebar-ink);
+  border-right: 0;
+  box-shadow: var(--cdl-sidebar-shadow);
+}
+
+.sidebar__brand {
+  min-height: var(--cdl-sidebar-brand-height);
+  gap: var(--cdl-space-3);
+  padding: var(--cdl-space-3) var(--cdl-space-3) var(--cdl-space-3) var(--cdl-space-4);
+  box-shadow: 0 1px 0 var(--cdl-shell-sidebar-divider);
+}
+
+.sidebar__brand-mark {
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  border: 1px solid rgba(153, 246, 228, 0.26);
+  border-radius: 11px;
+  background: linear-gradient(145deg, #2dd4bf 0%, #0f766e 100%);
+  color: #ffffff;
+  box-shadow:
+    0 7px 20px rgba(45, 212, 191, 0.23),
+    inset 0 1px 0 rgba(255, 255, 255, 0.24);
+}
+
+.sidebar__brand-name {
+  color: var(--cdl-shell-sidebar-ink);
+  font-size: 15px;
+  font-weight: var(--cdl-font-bold);
+  letter-spacing: -0.025em;
+}
+
+.sidebar__brand-tag {
+  color: var(--cdl-shell-sidebar-muted);
+  font-size: 9px;
+  font-weight: var(--cdl-font-semibold);
+  letter-spacing: 0.14em;
+}
+
+.sidebar__collapse-toggle {
+  min-width: 32px;
+  height: 32px;
+  padding-inline: 8px;
+  border-color: var(--cdl-shell-sidebar-control-border) !important;
+  background: var(--cdl-shell-sidebar-control-bg);
+  color: var(--cdl-shell-sidebar-muted);
+}
+
+.sidebar__collapse-toggle:hover {
+  border-color: rgba(94, 234, 212, 0.38) !important;
+  background: rgba(94, 234, 212, 0.1);
+  color: var(--cdl-shell-sidebar-ink);
+}
+
+.emergency-app-shell .sidebar .sidebar__collapse-toggle,
+.emergency-app-shell .sidebar .sidebar__collapse-toggle-label {
+  color: var(--cdl-shell-sidebar-muted) !important;
+}
+
+.emergency-app-shell .sidebar .sidebar__collapse-toggle:hover,
+.emergency-app-shell .sidebar .sidebar__collapse-toggle:hover .sidebar__collapse-toggle-label {
+  color: var(--cdl-shell-sidebar-ink) !important;
+}
+
+.sidebar__body {
+  gap: var(--cdl-sidebar-group-gap);
+  padding: var(--cdl-space-4) var(--cdl-space-2) var(--cdl-space-3);
+  scrollbar-color: rgba(169, 191, 206, 0.3) transparent;
+}
+
+.sidebar-nav-group {
+  gap: var(--cdl-space-1);
+}
+
+.sidebar-nav-group__label {
+  padding: 0 var(--cdl-space-3) var(--cdl-space-1);
+  color: var(--cdl-shell-sidebar-subtle);
+  font-size: 10px;
+  font-weight: var(--cdl-font-bold);
+  letter-spacing: 0.13em;
+}
+
+.sidebar-nav-group__items,
+.sidebar-desktop-nav__utility {
+  gap: var(--cdl-sidebar-nav-gap);
+}
+
+.sidebar-nav-item {
+  min-height: var(--cdl-sidebar-item-height);
+  gap: var(--cdl-space-3);
+  padding: 8px 10px 8px 12px;
+  border: 0;
+  border-radius: var(--cdl-sidebar-item-radius);
+  background: transparent;
+  color: var(--cdl-sidebar-item-fg);
+  transition:
+    background-color var(--cdl-duration-normal) var(--cdl-ease-standard),
+    color var(--cdl-duration-normal) var(--cdl-ease-standard),
+    transform var(--cdl-duration-fast) var(--cdl-ease-standard);
+}
+
+.sidebar-nav-item::before {
+  content: '';
+  position: absolute;
+  inset-block: 10px;
+  inset-inline-start: 0;
+  width: 3px;
+  border-radius: 0 var(--cdl-radius-full) var(--cdl-radius-full) 0;
+  background: transparent;
+}
+
+.sidebar-nav-item:hover {
+  background: var(--cdl-shell-sidebar-hover);
+  color: var(--cdl-shell-sidebar-ink);
+  transform: translateX(1px);
+}
+
+.sidebar-nav-item--active {
+  background: var(--cdl-shell-sidebar-active);
+  color: var(--cdl-sidebar-item-fg-active);
+  font-weight: var(--cdl-font-semibold);
+  box-shadow: inset 0 0 0 1px rgba(94, 234, 212, 0.1);
+}
+
+.sidebar-nav-item--active::before {
+  background: var(--cdl-shell-sidebar-active-border);
+  box-shadow: 0 0 10px rgba(94, 234, 212, 0.5);
+}
+
+.sidebar-nav-item--alerts.sidebar-nav-item--active {
+  background: color-mix(in srgb, var(--cdl-critical) 18%, transparent);
+  color: var(--cdl-shell-sidebar-alert-fg);
+}
+
+.sidebar-nav-item--alerts.sidebar-nav-item--active::before {
+  background: var(--cdl-critical);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--cdl-critical) 45%, transparent);
+}
+
+.sidebar-nav-item__icon,
+.sidebar-nav-item__graphic-badge {
+  flex: 0 0 auto;
+}
+
+.sidebar-nav-item__label {
+  color: inherit;
+  font-size: 13px;
+  font-weight: inherit;
+  letter-spacing: -0.005em;
+}
+
+/*
+ * Several pre-CDL layers scope navigation states through
+ * `.emergency-app-shell`, which makes them more specific than the component
+ * class above. Keep this scoped rule as the single visible shell contract
+ * until those compatibility layers can be retired.
+ */
+.emergency-app-shell .sidebar .sidebar-nav-item {
+  border-color: transparent;
+  border-left-color: transparent !important;
+  background: transparent;
+  /* The legacy application link-normalizer explicitly colors every anchor. */
+  color: var(--cdl-shell-sidebar-muted) !important;
+  box-shadow: none;
+}
+
+.emergency-app-shell .sidebar .sidebar-nav-item:hover {
+  background: var(--cdl-shell-sidebar-hover);
+  color: var(--cdl-shell-sidebar-ink) !important;
+}
+
+.emergency-app-shell .sidebar .sidebar-nav-item--active {
+  border-color: transparent;
+  border-left-color: transparent !important;
+  background: var(--cdl-shell-sidebar-active);
+  color: var(--cdl-shell-sidebar-active-fg) !important;
+  box-shadow: inset 0 0 0 1px rgba(94, 234, 212, 0.1);
+}
+
+.emergency-app-shell .sidebar .sidebar-nav-item--alerts.sidebar-nav-item--active {
+  background: color-mix(in srgb, var(--cdl-critical) 18%, transparent);
+  color: var(--cdl-shell-sidebar-alert-fg) !important;
+}
+
+.emergency-app-shell .sidebar .sidebar-nav-item .sidebar-nav-item__icon,
+.emergency-app-shell .sidebar .sidebar-nav-item .sidebar-nav-item__label {
+  color: currentColor;
+}
+
+/* The left rail is the active indicator in CDL 2.1; remove the legacy dot. */
+.emergency-app-shell .sidebar .sidebar-nav-item--active::after {
+  display: none;
+}
+
+.sidebar-nav-item__count--due {
+  border-color: rgba(253, 186, 116, 0.45);
+  background: rgba(194, 65, 12, 0.2);
+  color: var(--cdl-shell-sidebar-due-fg);
+}
+
+.sidebar__footer {
+  gap: var(--cdl-space-2);
+  padding: var(--cdl-space-3) var(--cdl-space-2);
+  background: var(--cdl-shell-sidebar-footer-tint);
+  box-shadow: 0 -1px 0 var(--cdl-shell-sidebar-divider);
+}
+
+.emergency-app-shell .sidebar .sidebar-chrome-control,
+.emergency-app-shell .sidebar .sidebar-chrome-control__label {
+  color: var(--cdl-shell-sidebar-muted) !important;
+}
+
+.emergency-app-shell .sidebar .sidebar-chrome-control:hover,
+.emergency-app-shell .sidebar .sidebar-chrome-control:hover .sidebar-chrome-control__label,
+.emergency-app-shell .sidebar .sidebar-chrome-control--active,
+.emergency-app-shell .sidebar .sidebar-chrome-control--active .sidebar-chrome-control__label {
+  color: var(--cdl-shell-sidebar-ink) !important;
+}
+
+/* ── Top utility bar ── */
+.caredroid-header--compact,
+.caredroid-header--slim {
+  min-height: var(--cdl-header-height);
+  height: var(--cdl-header-height);
+  grid-template-rows: var(--cdl-header-height);
+  overflow: visible;
+  border: 0;
+  background: var(--cdl-shell-topbar-bg);
+  box-shadow: none;
+  backdrop-filter: blur(14px);
+}
+
+.caredroid-header--slim .caredroid-header__topbar,
+.caredroid-header__topbar {
+  min-height: var(--cdl-header-height);
+  height: var(--cdl-header-height);
+  gap: var(--cdl-space-4);
+  padding: 0 clamp(16px, 1.8vw, 26px);
+  overflow: visible;
+}
+
+.caredroid-header__brand--slim {
+  min-width: auto;
+}
+
+.caredroid-header__clock {
+  padding: 6px 9px;
+  border-radius: var(--cdl-radius-md);
+  background: var(--cdl-surface-muted);
+  color: var(--cdl-ink-muted);
+  font-family: var(--cdl-font-mono);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.03em;
+}
+
+.caredroid-header__center {
+  min-height: 40px;
+  height: 40px;
+  justify-content: flex-start;
+}
+
+.caredroid-header--pilot-metrics .caredroid-header__center {
+  justify-content: flex-start;
+  /* KNOWN ISSUE, not fixed here: with 3 real KPI pills (e.g. Triage queue +
+     Longest wait + Stale Sync at 1440px), this rail's content (439.5px)
+     exceeds .caredroid-header__center's allocated flex space (~411.8px,
+     constrained by Header.css's min-width: 0), and since the rail itself
+     is flex: 0 0 auto with overflow: visible (deliberate — the CDL fix for
+     an older "Stale" -> "St" hard-truncation bug), the excess visually
+     overlaps the New Patient button by ~12px. Tried min-width: min-content
+     here to make .caredroid-header__actions's shrinkable search input
+     yield the space instead; confirmed live it removes the overlap but
+     shifts .caredroid-header__action--primary ~25px above the topbar's own
+     box (y: -14.5 instead of 10.5) — a worse, equally visible regression.
+     Needs a real layout pass across every .caredroid-header--pilot-metrics
+     route/breakpoint, not a one-line flex tweak. */
+}
+
+.caredroid-header__actions {
+  gap: var(--cdl-space-2);
+}
+
+.caredroid-header__action,
+.caredroid-header__palette-trigger {
+  min-height: 38px !important;
+  height: 38px;
+  border-radius: var(--cdl-control-radius);
+  font-size: 12px !important;
+  font-weight: var(--cdl-font-semibold) !important;
+}
+
+.caredroid-header__action--primary {
+  padding-inline: 14px;
+  border-color: var(--cdl-brand-500);
+  background: var(--cdl-brand-500);
+  color: var(--cdl-on-brand);
+  box-shadow: 0 5px 14px color-mix(in srgb, var(--cdl-brand-500) 20%, transparent);
+}
+
+.caredroid-header__action--primary:not(:disabled):hover,
+.caredroid-header__action--primary:not(:disabled):focus-visible {
+  border-color: var(--cdl-brand-600);
+  background: var(--cdl-brand-600);
+  color: var(--cdl-on-brand);
+}
+
+.caredroid-header__lookup,
+.caredroid-header__lookup--emphasis {
+  width: clamp(230px, 28vw, 430px);
+  min-width: 210px;
+  height: 40px;
+  border-color: var(--cdl-border);
+  border-radius: var(--cdl-control-radius);
+  background: var(--cdl-surface-page);
+  color: var(--cdl-ink-muted);
+  box-shadow: inset 0 1px 2px rgba(16, 42, 67, 0.025);
+}
+
+.caredroid-header__lookup:focus-within {
+  border-color: var(--cdl-brand-500);
+  background: var(--cdl-surface-card);
+  box-shadow: var(--cdl-focus-ring);
+}
+
+.caredroid-header__lookup input {
+  font-size: 13px;
+}
+
+.emergency-app-shell__main-column .caredroid-header__lookup,
+.emergency-app-shell__main-column .caredroid-header__lookup--emphasis {
+  min-height: 40px;
+  height: 40px;
+}
+
+.caredroid-header__palette-trigger {
+  width: 38px;
+  border-color: var(--cdl-border);
+  background: var(--cdl-surface-card);
+  color: var(--cdl-ink-muted);
+}
+
+.caredroid-header .account-menu__trigger {
+  min-height: 40px;
+  border-color: var(--cdl-border);
+  border-radius: 12px;
+  background: var(--cdl-surface-card);
+}
+
+.caredroid-header .account-menu__avatar {
+  background: var(--cdl-brand-100);
+  color: var(--cdl-brand-700);
+}
+
+/* KPI capsules read as an operational rail, not a row of form fields. */
+.caredroid-header__central-status .cdl-kpi-capsule,
+.caredroid-header__central-status .operational-strip__metric {
+  min-height: 36px;
+  border-color: transparent;
+  border-radius: var(--cdl-radius-full);
+  background: var(--cdl-surface-muted);
+  box-shadow: none;
+}
+
+.caredroid-header--pilot-metrics .caredroid-header__central-status {
+  width: max-content;
+  max-width: min(42vw, 452px);
+  overflow: visible;
+}
+
+/* ── Route identity band ── */
+.app-chrome {
+  background: var(--cdl-shell-context-bg);
+  border: 0;
+  box-shadow: var(--cdl-chrome-shadow);
+}
+
+.app-chrome-context {
+  min-height: var(--cdl-route-tab-height);
+  gap: var(--cdl-space-5);
+  padding: 10px clamp(18px, 2.2vw, 32px) 12px;
+  background: var(--cdl-shell-context-bg);
+  border: 0;
+}
+
+.emergency-app-shell__main-column .app-chrome-context {
+  padding-inline: 16px;
+}
+
+.app-chrome-context__title {
+  gap: 3px;
+}
+
+.app-chrome-context__breadcrumbs ol {
+  color: var(--cdl-ink-subtle);
+  font-size: 10px;
+  font-weight: var(--cdl-font-bold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.app-chrome-context__breadcrumbs li:last-child {
+  color: var(--cdl-brand-600);
+}
+
+.app-chrome-context__h1 {
+  color: var(--cdl-ink);
+  font-family: var(--cdl-font-display);
+  font-size: clamp(21px, 1.7vw, 26px);
+  font-weight: var(--cdl-font-bold);
+  letter-spacing: -0.035em;
+  line-height: 1.15;
+}
+
+.app-chrome-context__sub {
+  color: var(--cdl-ink-muted);
+  font-size: 12.5px;
+  line-height: 1.35;
+}
+
+.app-chrome-context__aside {
+  gap: var(--cdl-space-2);
+}
+
+/* Contextual status bars remain available but visually sit behind page identity. */
+.session-chrome-bar {
+  min-height: 34px;
+  padding: 4px clamp(18px, 2.2vw, 32px);
+  border: 0;
+  background: color-mix(in srgb, var(--cdl-surface-muted) 70%, var(--cdl-surface-card));
+  color: var(--cdl-ink-muted);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--cdl-border) 60%, transparent);
+}
+
+.session-chrome-bar__segment,
+.session-chrome-bar__pill {
+  border-radius: var(--cdl-radius-full);
+  background: var(--cdl-surface-card);
+  color: var(--cdl-ink-muted);
+}
+
+/* ── Shared primitives ── */
+.btn {
+  min-height: var(--cdl-control-height-md);
+  gap: var(--cdl-space-2);
+  border-radius: var(--cdl-control-radius);
+  font-size: 13px;
+  font-weight: var(--cdl-font-semibold);
+  letter-spacing: -0.006em;
+  transition:
+    background-color var(--cdl-duration-normal) var(--cdl-ease-standard),
+    border-color var(--cdl-duration-normal) var(--cdl-ease-standard),
+    box-shadow var(--cdl-duration-normal) var(--cdl-ease-standard),
+    transform var(--cdl-duration-fast) var(--cdl-ease-standard);
+}
+
+.btn-primary {
+  border-color: var(--cdl-brand-500);
+  background: var(--cdl-brand-500);
+  color: var(--cdl-on-brand);
+  box-shadow: 0 5px 14px color-mix(in srgb, var(--cdl-brand-500) 18%, transparent);
+}
+
+.btn-primary:hover {
+  border-color: var(--cdl-brand-600);
+  background: var(--cdl-brand-600);
+  box-shadow: 0 8px 18px color-mix(in srgb, var(--cdl-brand-500) 24%, transparent);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  border-color: var(--cdl-border);
+  background: var(--cdl-surface-card);
+  color: var(--cdl-ink);
+  box-shadow: 0 1px 2px rgba(16, 42, 67, 0.04);
+}
+
+.btn-secondary:hover {
+  border-color: var(--cdl-border-strong);
+  background: var(--cdl-surface-muted);
+}
+
+.btn-ghost {
+  color: var(--cdl-brand-600);
+}
+
+.btn:focus-visible {
+  outline: none;
+  box-shadow: var(--cdl-focus-ring), var(--cdl-elev-1);
+}
+
+.card,
+.cdl-card {
+  border-color: var(--cdl-border);
+  border-radius: var(--cdl-panel-radius);
+  background: var(--cdl-surface-card);
+  color: var(--cdl-ink);
+  box-shadow: var(--cdl-panel-shadow);
+}
+
+.card-hover:hover,
+.cdl-card:hover {
+  border-color: var(--cdl-border-strong);
+  box-shadow: var(--cdl-panel-shadow-hover);
+  transform: translateY(-1px);
+}
+
+.input-label {
+  color: var(--cdl-ink-muted);
+  font-size: 12px;
+  font-weight: var(--cdl-font-semibold);
+}
+
+.input-field {
+  min-height: var(--cdl-control-height-lg);
+  border-color: var(--cdl-border-input);
+  border-radius: var(--cdl-control-radius);
+  background: var(--cdl-surface-card);
+  color: var(--cdl-ink);
+  font-size: 15px;
+  box-shadow: inset 0 1px 2px rgba(16, 42, 67, 0.025);
+}
+
+.input-field:hover {
+  border-color: var(--cdl-border-strong);
+  background: var(--cdl-surface-card);
+}
+
+.input-field:focus,
+.input-focused {
+  border-color: var(--cdl-brand-500);
+  background: var(--cdl-surface-card);
+  box-shadow: var(--cdl-focus-ring);
+}
+
+.cd-page-header__eyebrow {
+  color: var(--cdl-brand-600);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+}
+
+.cd-page-header__title {
+  color: var(--cdl-ink);
+  font-family: var(--cdl-font-display);
+  font-size: clamp(24px, 2.3vw, 34px);
+  font-weight: var(--cdl-font-bold);
+  letter-spacing: -0.04em;
+}
+
+.cd-page-header__description {
+  color: var(--cdl-ink-muted);
+  font-size: 14px;
+}
+
+/* ── Loading and empty transitions ── */
+.route-loading-fallback {
+  min-height: 40vh;
+  gap: var(--cdl-space-3);
+  color: var(--cdl-ink-muted);
+  background: transparent;
+  font-family: var(--cdl-font-sans);
+  font-size: 13px;
+  font-weight: var(--cdl-font-medium);
+}
+
+.spinner-accent {
+  border-color: color-mix(in srgb, var(--cdl-brand-500) 18%, transparent);
+  border-top-color: var(--cdl-brand-500);
+}
+
+.app-shell-route-loading {
+  min-height: 240px;
+  justify-content: center;
+  color: var(--cdl-ink-muted);
+}
+
+.app-shell-route-loading::before {
+  border-color: color-mix(in srgb, var(--cdl-brand-500) 18%, transparent);
+  border-top-color: var(--cdl-brand-500);
+}
+
+/* ── Mobile shell ── */
+@media (max-width: 1600px) and (min-width: 1025px) {
+  /* The live clock is secondary to operational status and search. */
+  .caredroid-header__brand--slim {
+    display: none;
+  }
+
+  .caredroid-header__lookup,
+  .caredroid-header__lookup--emphasis {
+    width: clamp(240px, 24vw, 360px);
+  }
+}
+
+@media (max-width: 1024px) and (min-width: 769px) {
+  .emergency-app-shell {
+    --app-shell-sidebar-offset: var(--cdl-sidebar-width-collapsed);
+  }
+
+  .caredroid-header__central-status {
+    max-width: 34vw;
+  }
+
+  .caredroid-header__lookup,
+  .caredroid-header__lookup--emphasis {
+    width: min(28vw, 300px);
+    min-width: 170px;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --cdl-route-tab-height: auto;
+  }
+
+  .emergency-app-shell {
+    --app-shell-sidebar-offset: 0px;
+  }
+
+  .caredroid-header--compact,
+  .caredroid-header--slim,
+  .caredroid-header--slim .caredroid-header__topbar,
+  .caredroid-header__topbar {
+    min-height: 58px;
+    height: 58px;
+  }
+
+  .caredroid-header__topbar {
+    padding-inline: 12px;
+  }
+
+  .caredroid-header__brand {
+    display: none;
+  }
+
+  .emergency-app-shell__main-column .caredroid-header__lookup,
+  .emergency-app-shell__main-column .caredroid-header__lookup--emphasis {
+    flex: 1 1 150px;
+    width: auto;
+    min-width: 120px;
+    max-width: min(42vw, 168px);
+    min-height: 42px;
+    height: 42px !important;
+  }
+
+  .emergency-app-shell__main-column .caredroid-header__actions {
+    width: 100%;
+    height: 46px;
+    flex-wrap: nowrap !important;
+    align-items: center;
+  }
+
+  .app-chrome-context {
+    min-height: 68px;
+    padding: 10px 16px 12px;
+  }
+
+  .emergency-app-shell__main-column .app-chrome-context {
+    padding-inline: 12px;
+  }
+
+  .app-chrome-context__h1 {
+    font-size: 21px;
+  }
+
+  .app-chrome-context__sub {
+    display: -webkit-box;
+    overflow: hidden;
+    white-space: normal;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .sidebar {
+    background: var(--cdl-sidebar-bg);
+    box-shadow:
+      0 -1px 0 var(--cdl-shell-sidebar-divider),
+      0 -10px 30px rgba(7, 31, 51, 0.16);
+  }
+
+  .sidebar-item {
+    color: var(--cdl-shell-sidebar-muted);
+  }
+
+  .sidebar-item:active,
+  .sidebar-item:focus-visible,
+  .sidebar-item--active {
+    border-top-color: var(--cdl-brand-mint);
+    background: rgba(94, 234, 212, 0.1);
+    color: var(--cdl-shell-sidebar-active-fg);
+  }
+
+  .sidebar-item .sidebar-nav-item__count {
+    box-shadow: 0 0 0 2px var(--cdl-sidebar-bg);
+  }
+
+  .sidebar-more-sheet {
+    border-radius: 20px 20px 0 0;
+    background: var(--cdl-surface-card);
+    color: var(--cdl-ink);
+  }
+}
+
+@media (max-width: 390px) {
+  .emergency-app-shell__main-column .caredroid-header__lookup,
+  .emergency-app-shell__main-column .caredroid-header__lookup--emphasis {
+    min-width: 112px;
+    max-width: 132px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar-nav-item:hover,
+  .btn-primary:hover,
+  .card-hover:hover,
+  .cdl-card:hover {
+    transform: none;
+  }
+}

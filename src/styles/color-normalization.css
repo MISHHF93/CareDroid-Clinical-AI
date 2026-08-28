@@ -46,8 +46,18 @@ html {
   background-color: var(--app-bg, var(--medical-surface-page));
 }
 
+/* .caredroid-header--compact excluded: refresh.css owns its background via
+   --cdl-shell-topbar-bg (a deliberate color-mix off --cdl-surface-card, matching the
+   route-identity band right below it). This rule's higher specificity
+   (:is(.app-shell,...) :is(...) beats refresh.css's plain 2-selector list) was
+   silently repainting the topbar with --app-surface-1 instead — confirmed live in dark
+   theme: topbar rendered rgb(30,41,59) while the route band and sidebar's own themed
+   surfaces sat around rgb(13,36,56)/rgb(7,31,51), an extra shade the design never
+   intended, most visible as a seam between the topbar and the route-identity band
+   directly beneath it. .sidebar already wins its own background via a more specific
+   `.emergency-app-shell .sidebar` rule regardless of this one, so it's unaffected. */
 :is(.app-shell, .emergency-app-shell)
-  :is(.sidebar, .caredroid-header--compact, .ed-os-header, .session-chrome-bar) {
+  :is(.sidebar, .ed-os-header, .session-chrome-bar) {
   background: var(--app-surface-1, var(--medical-surface-card));
   border-color: var(--medical-border);
   color: var(--medical-ink);
@@ -155,9 +165,30 @@ html {
    one of the four meant to be the app's own P1-priority red) rendered
    identically. Confirmed live via computed style before fixing: injecting
    the real className into the real app shell resolved to rgb(55, 65, 81),
-   this sweep's #374151, not the swatch's own red. */
+   this sweep's #374151, not the swatch's own red.
+   CDL 2.1: .btn-primary was never a substring collision like the classes
+   above — it was named verbatim in this sweep's own :is() list, on the
+   assumption the shared Button component's primary variant had no
+   deliberate color of its own. That assumption is now false: button.css/
+   refresh.css give variant="primary" a first-class solid-teal background
+   (--cdl-brand-500) as the product's one sanctioned primary-action color
+   (cdl-v2/DESIGN-LANGUAGE.md's "Buttons" grammar). This sweep's higher
+   specificity was silently repainting every primary button inside the app
+   shell — Save, Submit, New Patient, every route's main CTA — back to flat
+   #374151, the same "overrides a component's own deliberate styling" bug
+   as every exemption above, just app-wide instead of one class. Excluded
+   the same way.
+   .caredroid-header__action--primary is the same bug, one class over: the
+   utility-bar "New Patient" / route primary action. refresh.css gives it
+   its own deliberate solid-teal background+hover; this sweep's [class*=
+   '--primary'] substring match caught it too (never previously excluded,
+   since refresh.css's header primary action postdates every prior cycle
+   listed above) and silently repainted the app's main create-action button
+   back to #374151 on every route that renders one. */
 :is(.app-shell, .emergency-app-shell)
-  :is([class*='--primary'], .btn-primary, [class*='cta']):not(.reception-desk-toolbar__action):not(
+  :is([class*='--primary'], [class*='cta']):not(.btn-primary):not(
+    .caredroid-header__action--primary
+  ):not(.reception-desk-toolbar__action):not(
     .cdl-zone--primary-actions
   ):not(.fj-critical-banner__cta):not(.profile-copilot-card__cta):not(
     .reception-job-profile-card__cta
@@ -172,7 +203,23 @@ html {
   ):not(.entry-shell__link--primary):not(.account-menu__item--primary):not(
     .workflow-automation-command-bar__btn--primary
   ):not(.critical-alert-banner__link) {
-  background: #374151;
+  /* Was a hardcoded #374151 fallback -- the pre-CDL default for any
+     "--primary"/"cta" element this sweep catches that hasn't (yet) earned
+     its own :not() exemption above. Confirmed live on a THIRD independent
+     component system this same session (after .btn-primary and
+     .caredroid-header__action--primary): src/components/primitives/
+     Button.css's .cd-btn--primary, used by CollaborationHub's "Send"
+     button, substring-matches [class*='--primary'] and was never excluded
+     -- its own --cd-brand-bg alias resolved correctly to teal, but this
+     sweep's higher specificity painted over it with the same stale gray
+     regardless. Rather than keep enumerating every "--primary" class this
+     app will ever grow one at a time, default the fallback itself to the
+     app's one sanctioned primary-action color (cdl-v2/DESIGN-LANGUAGE.md's
+     "Buttons" grammar) -- any element that genuinely needs a different
+     color keeps working exactly as before via its own :not() exemption
+     above; anything not yet exempted now defaults to the CURRENT brand
+     color instead of an obsolete one with no remaining justification. */
+  background: var(--app-accent, #374151);
   border-color: color-mix(in srgb, var(--medical-accent) 55%, var(--medical-border));
   color: var(--app-on-solid, #ffffff);
 }

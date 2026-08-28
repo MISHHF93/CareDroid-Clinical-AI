@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
 import { useUser } from '../contexts/UserContext';
 import { resolvePlatformLanding } from '../config/platformEntryModel';
@@ -7,6 +7,8 @@ import { isStrictSaasEntitlementsEnabled, getPlatformEntitlementContext } from '
 import { compileUserProfile, isRouteAllowedInCompiledProfile } from '../config/userProfileCompiler';
 import { expandEntitlementPacksToCatalogPacks } from '../config/profilePackTaxonomy';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+import { getRoleLabel } from '../lib/users/roleAccess';
+import AccessDeniedPanel from './auth/AccessDeniedPanel';
 
 const PROFILE_ROUTE_EXEMPT_PREFIXES = Object.freeze([
   '/auth',
@@ -23,7 +25,7 @@ function isExemptProfileRoute(pathname) {
 
 export default function ProfileRouteGuard({ children }) {
   const location = useLocation();
-  const { authMode, saasProfile } = useUser();
+  const { authMode, saasProfile, isLoading } = useUser();
   const effectiveProfile = useEffectiveUserProfile();
   const emergencyRole = useEmergencyRolePermissions();
   const pathname = location.pathname;
@@ -45,12 +47,15 @@ export default function ProfileRouteGuard({ children }) {
   );
 
   if (
+    isLoading ||
     authMode === 'open-access' ||
     isExemptProfileRoute(pathname) ||
     emergencyRole.canAccessRoute(pathname)
   ) {
     return children;
   }
+
+  const roleLabel = getRoleLabel(saasRole || 'this role');
 
   if (
     entitlementContext?.organization?.organizationType &&
@@ -61,7 +66,7 @@ export default function ProfileRouteGuard({ children }) {
       saasRole: 'student',
       onboardingStatus: saasProfile?.onboardingStatus,
     });
-    return <Navigate to={destination} replace state={{ profileAccessDenied: true }} />;
+    return <AccessDeniedPanel roleLabel={roleLabel} fallbackPath={destination} />;
   }
 
   if (!isRouteAllowedInCompiledProfile(pathname, compiled)) {
@@ -73,13 +78,7 @@ export default function ProfileRouteGuard({ children }) {
         onboardingStatus: saasProfile?.onboardingStatus,
       }) || compiled.routes.home || compiled.routes.allowed[0] || '/emergency/reception';
 
-    return (
-      <Navigate
-        to={destination}
-        replace
-        state={{ profileAccessDenied: true, requestedPath: pathname }}
-      />
-    );
+    return <AccessDeniedPanel roleLabel={roleLabel} fallbackPath={destination} />;
   }
 
   if (isStrictSaasEntitlementsEnabled(entitlementContext)) {
@@ -99,7 +98,13 @@ export default function ProfileRouteGuard({ children }) {
           saasRole,
           onboardingStatus: saasProfile?.onboardingStatus,
         });
-      return <Navigate to={destination} replace state={{ entitlementDenied: true }} />;
+      return (
+        <AccessDeniedPanel
+          roleLabel={roleLabel}
+          fallbackPath={destination}
+          message={`${roleLabel} isn't entitled to this CareDroid page under the organization's current packs.`}
+        />
+      );
     }
   }
 

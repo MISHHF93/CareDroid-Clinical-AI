@@ -73,7 +73,7 @@
   font-size: 14px;
 }
 
-.profile-nav-links a {
+.profile-nav-link {
   color: var(--cdl-info-text);
   text-decoration: none;
   font-weight: 700;

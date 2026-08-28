@@ -8,17 +8,26 @@ html,
 html[data-theme='light'] {
   color-scheme: light;
 
-  --cdl-surface-page: #f8fafc;
+  --cdl-surface-page: #f4f7fb;
   --cdl-surface-card: #ffffff;
-  --cdl-surface-muted: #f1f5f9;
-  --cdl-surface-inset: #f1f5f9;
+  /* --cdl-surface-muted/-inset used to sit ~2% and ~3% darker than
+     --cdl-surface-page (#edf3f7 / #e8eff5 vs #f4f7fb) -- close enough that
+     "muted" tiles/badges/hover-states read as flat rather than as a
+     distinct recessed layer. Confirmed live: ReceptionWorkspace's KPI
+     tiles (.reception-metric) already carry a soft shadow + radius +
+     muted background specifically to read as elevated, but that background
+     was visually indistinguishable from the page canvas behind it at
+     normal viewing scale. Widened to a real, still-calm step down instead
+     of a near-invisible one; card/elevated (pure white) is untouched. */
+  --cdl-surface-muted: #e4ebf2;
+  --cdl-surface-inset: #dce5ee;
   --cdl-surface-elevated: #ffffff;
-  --cdl-border: #e2e8f0;
-  --cdl-border-strong: #cbd5e1;
+  --cdl-border: #dbe5ee;
+  --cdl-border-strong: #bdccd9;
   --cdl-border-input: #cbd5e1;
 
   /* Primary ink: near-black; muted: slate-600 (≥4.5:1 on white) — not #9ca3af */
-  --cdl-ink: #0f172a;
+  --cdl-ink: #102a43;
   --cdl-ink-muted: #334155;
   --cdl-ink-subtle: #475569;
   --cdl-ink-disabled: #94a3b8;
@@ -77,14 +86,14 @@ html[data-theme='light'] {
 html[data-theme='dark'] {
   color-scheme: dark;
 
-  --cdl-surface-page: #0f172a;
-  --cdl-surface-card: #1e293b;
-  --cdl-surface-muted: #1e293b;
-  --cdl-surface-inset: #0f172a;
-  --cdl-surface-elevated: #334155;
-  --cdl-border: #334155;
-  --cdl-border-strong: #475569;
-  --cdl-border-input: #475569;
+  --cdl-surface-page: #061725;
+  --cdl-surface-card: #0d2438;
+  --cdl-surface-muted: #132c42;
+  --cdl-surface-inset: #081c2c;
+  --cdl-surface-elevated: #18364f;
+  --cdl-border: #27445c;
+  --cdl-border-strong: #3c5b73;
+  --cdl-border-input: #3c5b73;
 
   /* Primary near-white; muted slate-300 for AA on #1e293b */
   --cdl-ink: #f8fafc;
@@ -157,10 +166,10 @@ html[data-theme='dark'] {
   --cdl-overlay: rgba(0, 0, 0, 0.55);
   --cdl-scrim: rgba(0, 0, 0, 0.65);
 
-  --cdl-brand-500: #38bdf8;
-  --cdl-brand-600: #0ea5e9;
-  --cdl-brand-700: #7dd3fc;
-  --cdl-on-brand: #0f172a;
+  --cdl-brand-500: #5eead4;
+  --cdl-brand-600: #2dd4bf;
+  --cdl-brand-700: #99f6e4;
+  --cdl-on-brand: #042f2e;
 }
 
 /* Document body follows CDL page ink (all modes) */

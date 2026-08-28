@@ -452,13 +452,13 @@ const Profile = () => {
         </section>
 
         <div className="profile-nav-links">
-          <Link to="/profile/settings">Edit profile</Link>
-          <Link to="/profile/tool-preferences">Tool preferences</Link>
-          <Link to="/profile/activity">Activity</Link>
-          <Link to="/profile/workspaces">Manage workspaces</Link>
-          <Link to="/profile/security">Security</Link>
-          <Link to="/settings">Platform settings</Link>
-          {canViewPhiAccess && <Link to="/audit">Audit logs</Link>}
+          <Link className="profile-nav-link" to="/profile/settings">Edit profile</Link>
+          <Link className="profile-nav-link" to="/profile/tool-preferences">Tool preferences</Link>
+          <Link className="profile-nav-link" to="/profile/activity">Activity</Link>
+          <Link className="profile-nav-link" to="/profile/workspaces">Manage workspaces</Link>
+          <Link className="profile-nav-link" to="/profile/security">Security</Link>
+          <Link className="profile-nav-link" to="/settings">Platform settings</Link>
+          {canViewPhiAccess && <Link className="profile-nav-link" to="/audit">Audit logs</Link>}
         </div>
         <div className="profile-back-link-wrap">
           <Link to="/dashboard" className="profile-back-link">

@@ -145,7 +145,7 @@ export function OrganizationDashboard() {
           <ul>
             {(platformContext?.aiAgents || []).map((agent) => (
               <li key={agent.id}>
-                <Link to={`/assistant?agent=${agent.id}`}>{agent.title}</Link>
+                <Link className="org-card__link" to={`/assistant?agent=${agent.id}`}>{agent.title}</Link>
               </li>
             ))}
           </ul>

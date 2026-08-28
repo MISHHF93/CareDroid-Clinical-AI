@@ -66,8 +66,16 @@
     color-mix(in srgb, var(--cdl-graphic-accent-start) 18%, var(--medical-white)),
     color-mix(in srgb, var(--cdl-graphic-accent-end) 14%, var(--medical-white))
   );
-  color: var(--medical-accent-hover);
-  box-shadow: 0 4px 14px color-mix(in srgb, var(--medical-accent) 18%, transparent);
+  /* Was var(--medical-accent-hover)/var(--medical-accent) -- role-tinted
+     (role-accent-theme.css), so RouteGraphicBadge's page-header icon (used
+     on nearly every route via ROUTE_NAV_GRAPHIC_KEYS, explicitly passed
+     accent="brand" to mean "the app's consistent identity color", not a
+     role signal) rendered a different icon color per role even though its
+     own background gradient above is already deliberately fixed/non-role.
+     Confirmed live: purple icon under "Command & operations", green under
+     "EMS handoff", same badge, same page. */
+  color: var(--app-accent-hover, var(--app-accent));
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--app-accent) 18%, transparent);
 }
 
 /* Situation brief graphic cards */

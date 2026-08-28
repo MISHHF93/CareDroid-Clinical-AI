@@ -8,7 +8,7 @@
 }
 
 :is(.app-shell, .emergency-app-shell)
-  :is(.app-header, .header, [class*='Header'], .sidebar, [class*='Sidebar'], [class*='sidebar'])
+  :is(.app-header, .header, [class*='Header'])
   :is(
     [class*='__label'],
     [class*='__meta'],
@@ -25,9 +25,22 @@
 }
 
 :is(.app-shell, .emergency-app-shell)
-  :is(.app-header, .header, .sidebar, [class*='Sidebar'])
+  :is(.app-header, .header)
   :is(h1, h2, h3, h4, strong, [class*='__title'], [class*='brand']) {
   color: var(--cdl-ink) !important;
+  opacity: 1 !important;
+}
+
+/* Sidebar owns a dark structural palette in CDL 2.1. Keep the broad legacy
+   readability guard away from nav-item labels so active/hover states may
+   inherit their semantic foreground instead of being forced back to page ink. */
+:is(.app-shell, .emergency-app-shell) .sidebar :is(.sidebar__brand-tag, .sidebar-nav-group__label) {
+  color: var(--cdl-shell-sidebar-subtle, #7693a8) !important;
+  opacity: 1 !important;
+}
+
+:is(.app-shell, .emergency-app-shell) .sidebar .sidebar__brand-name {
+  color: var(--cdl-shell-sidebar-ink, #f5fbff) !important;
   opacity: 1 !important;
 }
 

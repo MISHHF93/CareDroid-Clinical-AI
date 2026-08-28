@@ -65,7 +65,7 @@
   gap: 8px;
 }
 
-.profile-settings-shell__nav a {
+.profile-settings-shell__nav-link {
   border: 1px solid var(--medical-border, #e2e8f0);
   border-radius: 999px;
   color: var(--medical-text-muted, #6b7280);
@@ -75,7 +75,7 @@
   text-decoration: none;
 }
 
-.profile-settings-shell__nav a.is-active {
+.profile-settings-shell__nav-link.is-active {
   border-color: color-mix(in srgb, var(--status-info, #374151) 50%, transparent);
   background: color-mix(in srgb, var(--status-info, #374151) 16%, transparent);
   color: var(--color-text-primary, #111827);

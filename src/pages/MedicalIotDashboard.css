@@ -48,7 +48,12 @@
   padding: 8px 14px;
   border-radius: var(--compact-panel-radius, 12px);
   border: 1px solid var(--medical-card-border, var(--app-panel-border));
-  background: var(--medical-accent, var(--app-accent));
+  /* Was var(--medical-accent, ...) -- a generic "refresh the data" utility
+     action, no role-identity meaning, but --medical-accent is role-tinted
+     (role-accent-theme.css), so this rendered a different color per role
+     (confirmed live: solid purple #5925DC under "Command & operations")
+     instead of the brand teal every other primary action in the app uses. */
+  background: var(--app-accent);
   color: #fff;
   font-size: 13px;
   font-weight: 600;
@@ -151,8 +156,8 @@
 }
 
 .medical-iot-page__filters button.is-active {
-  background: var(--medical-accent, var(--app-accent));
-  border-color: var(--medical-accent, var(--app-accent));
+  background: var(--app-accent);
+  border-color: var(--app-accent);
   color: #fff;
 }
 

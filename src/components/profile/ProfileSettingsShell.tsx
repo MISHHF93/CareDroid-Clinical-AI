@@ -76,7 +76,7 @@ export default function ProfileSettingsShell({
             <Link
               key={item.id}
               to={item.path}
-              className={active ? 'is-active' : ''}
+              className={active ? 'profile-settings-shell__nav-link is-active' : 'profile-settings-shell__nav-link'}
               {...(active ? { 'aria-current': 'page' as const } : {})}
             >
               {item.label}

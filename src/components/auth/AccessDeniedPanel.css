@@ -50,7 +50,16 @@
   display: inline-flex;
   margin-top: 10px;
   border-radius: 10px;
-  background: var(--medical-accent, #0ea5e9);
+  /* Was var(--medical-accent, ...) -- role-tinted (role-accent-theme.css),
+     so this escape-hatch CTA rendered a different color per role (confirmed
+     live: solid purple under "Command & operations"). role-accent-theme.css's
+     own header comment already establishes the precedent that a shared,
+     generic action ("Acknowledge" on the critical alert banner) must look
+     the same regardless of who's viewing it -- this button is the same
+     shape: it's not a role-identity signal, just "go somewhere you're
+     allowed." var(--app-accent) is the same non-role-tinted teal every
+     other primary action in the app already uses. */
+  background: var(--app-accent, #0ea5e9);
   color: #ffffff;
   padding: 10px 13px;
   text-decoration: none;

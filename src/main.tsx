@@ -13,6 +13,9 @@ import './index.css';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './app/App';
+/* CDL 2.1 visual authority: loaded after the application graph so route/component
+   styles cannot silently restore the legacy shell and primitive appearance. */
+import './styles/cdl-v2/refresh.css';
 
 import logger from './utils/logger';
 import observabilityService from './services/observabilityService';
@@ -79,7 +82,7 @@ const clearDevelopmentServiceWorkers = () => {
   navigator.serviceWorker
     .getRegistrations()
     .then((registrations) =>
-      Promise.all(registrations.map((registration) => registration.unregister()))
+      Promise.all(registrations.map((registration) => registration.unregister())),
     )
     .then(() => {
       if (!('caches' in window)) return null;
@@ -128,7 +131,7 @@ const syncViewportMetrics = () => {
 
   document.documentElement.style.setProperty(
     '--app-visual-viewport-offset-top',
-    `${Math.round(offsetTop)}px`
+    `${Math.round(offsetTop)}px`,
   );
 
   document.documentElement.style.setProperty('--app-keyboard-inset-bottom', `${keyboardInset}px`);
@@ -166,7 +169,7 @@ try {
     ReactDOM.createRoot(root).render(
       <React.StrictMode>
         <App />
-      </React.StrictMode>
+      </React.StrictMode>,
     );
   }
 } catch (error: any) {

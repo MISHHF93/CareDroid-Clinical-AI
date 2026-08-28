@@ -15,8 +15,8 @@
 
 .cd-page-header__eyebrow {
   margin: 0 0 6px;
-  color: var(--app-accent-action, var(--app-accent-interactive));
-  font-size: var(--font-12);
+  color: var(--cdl-brand-600, var(--app-accent-action));
+  font-size: var(--cdl-text-2xs, 10px);
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -24,9 +24,12 @@
 
 .cd-page-header__title {
   margin: 0;
-  color: var(--app-text-primary);
-  font-size: var(--text-title-fluid);
-  line-height: 1.16;
+  color: var(--cdl-ink, var(--app-text-primary));
+  font-family: var(--cdl-font-display, var(--cdl-font-sans));
+  font-size: clamp(24px, 2.3vw, 34px);
+  font-weight: var(--cdl-font-bold, 700);
+  letter-spacing: -0.04em;
+  line-height: 1.12;
   overflow-wrap: anywhere;
 }
 

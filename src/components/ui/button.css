@@ -7,12 +7,13 @@
   gap: var(--app-space-sm, 8px);
   min-width: 0;
   max-width: 100%;
-  min-height: var(--app-button-height, var(--compact-control-height, 38px));
+  min-height: var(--cdl-control-height-md, var(--app-button-height, 40px));
   border: 1px solid transparent;
-  border-radius: var(--app-radius-md, var(--radius-md));
+  border-radius: var(--cdl-control-radius, var(--cdl-radius-md, 10px));
   color: var(--app-text-primary);
   font-family: inherit;
-  font-weight: 650;
+  font-size: var(--cdl-text-sm, 13px);
+  font-weight: var(--cdl-font-semibold, 600);
   line-height: 1.2;
   text-align: center;
   text-decoration: none;
@@ -89,21 +90,17 @@
 
 /* Button Variants */
 .btn-primary {
-  background: var(--app-accent-action, var(--app-accent-interactive));
-  color: var(--app-on-solid);
-  border-color: color-mix(
-    in srgb,
-    var(--app-accent-action, var(--app-accent-interactive)) 88%,
-    transparent
-  );
-  box-shadow: var(--app-elevation-subtle, var(--app-shadow-1));
+  background: var(--cdl-brand-500, var(--app-accent-action));
+  color: var(--cdl-on-brand, var(--app-on-solid));
+  border-color: var(--cdl-brand-500, var(--app-accent-action));
+  box-shadow: 0 5px 14px color-mix(in srgb, var(--cdl-brand-500) 18%, transparent);
 }
 
 .btn-primary:hover {
-  background: #111827;
-  border-color: #111827;
-  box-shadow: var(--app-elevation-card, var(--app-shadow-1));
-  transform: none;
+  background: var(--cdl-brand-600, var(--app-accent-hover));
+  border-color: var(--cdl-brand-600, var(--app-accent-hover));
+  box-shadow: 0 8px 18px color-mix(in srgb, var(--cdl-brand-500) 24%, transparent);
+  transform: translateY(-1px);
 }
 
 .btn-primary:active {
@@ -111,9 +108,10 @@
 }
 
 .btn-secondary {
-  background: var(--app-surface-raised);
-  color: var(--app-text-primary);
-  border-color: var(--app-border);
+  background: var(--cdl-surface-card, var(--app-surface-raised));
+  color: var(--cdl-ink, var(--app-text-primary));
+  border-color: var(--cdl-border, var(--app-border));
+  box-shadow: var(--cdl-elev-1, none);
 }
 
 .btn-secondary:hover {
@@ -123,7 +121,7 @@
 
 .btn-ghost {
   background: transparent;
-  color: var(--app-accent-action, var(--app-accent-interactive));
+  color: var(--cdl-brand-600, var(--app-accent-action));
   border-color: transparent;
 }
 

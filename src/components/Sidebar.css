@@ -1,7 +1,7 @@
 /* ── CareDroid Clinical Sidebar — CDL shell rail ───────────────── */
 .sidebar {
-  --sidebar-width: 232px;
-  width: 232px;
+  --sidebar-width: var(--cdl-sidebar-width, 252px);
+  width: var(--cdl-sidebar-width, 252px);
   height: var(--app-viewport-height, 100dvh);
   flex-shrink: 0;
   display: flex;

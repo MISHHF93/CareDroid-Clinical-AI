@@ -40,9 +40,15 @@ html {
   --accent-green: var(--app-accent);
   --accent-link: var(--app-link-fg, #374151);
   --link-color: var(--app-link-fg, #374151);
-  --accent-hover: #111827;
-  --accent-gradient: linear-gradient(135deg, #374151, var(--app-accent-2));
-  --gradient-accent: linear-gradient(135deg, #374151, var(--app-accent-2));
+  /* --accent-hover/--accent-gradient/--gradient-accent/--primary-color/--primary-hover were
+     hardcoded to the pre-CDL #374151/#111827 dark-slate pair instead of aliasing --app-accent*
+     like every other line in this file — the one gap in this bridge's own migration pattern.
+     Real effect: theme-surfaces.css's calculator/lab :where(...) primary-action sweep (and any
+     other --accent-gradient/--primary-color consumer) rendered flat dark slate instead of the
+     CDL 2.1 brand color no matter what --app-accent itself resolved to. */
+  --accent-hover: var(--app-accent-hover);
+  --accent-gradient: linear-gradient(135deg, var(--app-accent), var(--app-accent-2));
+  --gradient-accent: linear-gradient(135deg, var(--app-accent), var(--app-accent-2));
   --danger: var(--app-danger);
   --error-color: var(--app-danger);
   --warning: var(--app-warning);
@@ -53,8 +59,8 @@ html {
   --input-border: var(--app-input-border);
   --focus-ring: var(--app-focus);
   --disabled: var(--app-disabled);
-  --primary-color: #374151;
-  --primary-hover: #111827;
+  --primary-color: var(--app-accent);
+  --primary-hover: var(--app-accent-hover);
   --chart-1: var(--app-chart-1);
   --chart-2: var(--app-chart-2);
   --chart-3: var(--app-chart-3);

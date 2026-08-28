@@ -18,10 +18,10 @@
      ════════════════════════════════════════════════════════════════════════ */
 
   /** Primary application header (top bar with brand, search, notifications, user) */
-  --shell-header-height: 52px;
+  --shell-header-height: 60px;
 
   /** Workspace context bar (role nav, breadcrumbs, page actions) */
-  --shell-workspace-height: 44px;
+  --shell-workspace-height: 72px;
 
   /** Combined chrome stack height (header + workspace) */
   --shell-chrome-stack-height: calc(var(--shell-header-height) + var(--shell-workspace-height));
@@ -41,10 +41,10 @@
      ════════════════════════════════════════════════════════════════════════ */
 
   /** Expanded sidebar width (desktop) */
-  --shell-sidebar-width: 232px;
+  --shell-sidebar-width: 252px;
 
   /** Collapsed sidebar (tablet icon rail) */
-  --shell-sidebar-width-collapsed: 56px;
+  --shell-sidebar-width-collapsed: 64px;
 
   /** Mobile drawer max width */
   --shell-sidebar-drawer-max: min(280px, 88vw);

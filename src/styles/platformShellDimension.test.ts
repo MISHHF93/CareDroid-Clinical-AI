@@ -14,29 +14,23 @@ const sidebarSource = readFileSync(join(__dirname, '../components/Sidebar.tsx'),
 
 describe('platform shell dimension contract', () => {
   it('defines canonical chrome heights in shell-header-polish', () => {
-    expect(shellHeaderPolishCss).toContain('--cdl-header-height: 52px');
-    // shell-header-polish.css imports last in design-system.css, so its
-    // --cdl-route-tab-height wins the cascade over medical-shell-layer.css's
-    // (52px) and shell-tokens.css's earlier definitions — a deliberate later
-    // tightening pass (44px -> 52px -> 48px per git history), not a drift.
-    expect(shellHeaderPolishCss).toContain('--cdl-route-tab-height: 48px');
+    expect(shellHeaderPolishCss).toContain('--cdl-header-height: 60px');
+    // CDL 2.1 gives utility controls a 60px topbar and route identity a
+    // dedicated 72px context band; all shell token layers must agree.
+    expect(shellHeaderPolishCss).toContain('--cdl-route-tab-height: 72px');
     expect(shellHeaderPolishCss).toContain('--cdl-chrome-stack-height');
   });
 
   it('aligns design-tokens shell header height with CDL chrome', () => {
-    expect(designTokensCss).toMatch(
-      /--app-shell-header-height:\s*var\(--cdl-header-height/,
-    );
-    expect(medicalShellLayerCss).toContain('--cdl-header-height: 52px');
-    expect(medicalShellLayerCss).toContain('--cdl-sidebar-width: 232px');
+    expect(designTokensCss).toMatch(/--app-shell-header-height:\s*var\(--cdl-header-height/);
+    expect(medicalShellLayerCss).toContain('--cdl-header-height: 60px');
+    expect(medicalShellLayerCss).toContain('--cdl-sidebar-width: 252px');
   });
 
   it('uses chrome stack height for layout-engine scroll padding', () => {
     expect(layoutEngineCss).toContain('--cdl-chrome-stack-height');
     expect(layoutEngineCss).toContain('--app-layout-header-height');
-    expect(layoutEngineCss).toContain(
-      'scroll-padding-top: calc(var(--app-layout-header-height)',
-    );
+    expect(layoutEngineCss).toContain('scroll-padding-top: calc(var(--app-layout-header-height)');
     expect(shellHeaderPolishCss).toContain('scroll-padding-top: calc(');
     expect(shellHeaderPolishCss).toContain('var(--cdl-chrome-stack-height)');
   });

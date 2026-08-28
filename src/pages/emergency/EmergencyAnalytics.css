@@ -250,6 +250,28 @@
   text-align: center;
 }
 
+/* CDL 2.1: "signal has a budget" -- only the metrics that represent an active
+   safety/operational concern (and only once non-zero) get a semantic accent, so a
+   quiet shift stays visually quiet and a real one is unmistakable at a glance
+   without opening a chart. */
+.emergency-analytics__kpi-strip-item--critical {
+  background: var(--cdl-critical-bg, color-mix(in srgb, var(--cdl-critical, #dc2626) 8%, transparent));
+  box-shadow: inset 0 2px 0 var(--cdl-critical, #dc2626);
+}
+
+.emergency-analytics__kpi-strip-item--critical strong {
+  color: var(--cdl-critical-text, #991b1b);
+}
+
+.emergency-analytics__kpi-strip-item--warning {
+  background: var(--cdl-warning-bg, color-mix(in srgb, var(--cdl-warning, #b45309) 8%, transparent));
+  box-shadow: inset 0 2px 0 var(--cdl-warning, #b45309);
+}
+
+.emergency-analytics__kpi-strip-item--warning strong {
+  color: var(--cdl-warning-text, #78350f);
+}
+
 .emergency-analytics__link {
   width: fit-content;
   border-radius: var(--radius-pill);

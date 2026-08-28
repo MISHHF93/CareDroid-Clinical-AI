@@ -4,32 +4,32 @@
  */
 :root {
   /* Shell layout offsets (sidebar rail → main canvas) */
-  --app-shell-sidebar-offset: var(--cdl-sidebar-width, 232px);
+  --app-shell-sidebar-offset: var(--cdl-sidebar-width, 252px);
 
   /* Sidebar */
-  --cdl-sidebar-width: 232px;
-  --cdl-sidebar-bg: var(--medical-white);
-  --cdl-sidebar-border: color-mix(in srgb, var(--medical-border) 55%, transparent);
+  --cdl-sidebar-width: 252px;
+  --cdl-sidebar-bg: var(--cdl-brand-navy, #071f33);
+  --cdl-sidebar-border: color-mix(in srgb, var(--cdl-brand-mint, #5eead4) 12%, transparent);
   --cdl-sidebar-shadow:
-    1px 0 0 color-mix(in srgb, var(--medical-border) 45%, transparent),
-    4px 0 24px rgba(15, 23, 42, 0.05);
-  --cdl-sidebar-brand-height: 44px;
-  --cdl-sidebar-nav-gap: 1px;
-  --cdl-sidebar-group-gap: 4px;
-  --cdl-sidebar-item-height: 40px;
-  --cdl-sidebar-item-radius: 6px;
-  --cdl-sidebar-item-fg: var(--medical-ink-muted);
-  --cdl-sidebar-item-fg-hover: var(--medical-ink);
-  --cdl-sidebar-item-fg-active: var(--medical-accent-hover);
-  --cdl-sidebar-item-bg-hover: var(--medical-slate-100);
-  --cdl-sidebar-item-bg-active: var(--medical-accent-tint);
-  --cdl-sidebar-item-rail-active: var(--medical-accent);
-  --cdl-sidebar-group-label-fg: var(--medical-ink-subtle);
-  --cdl-sidebar-footer-border: color-mix(in srgb, var(--medical-border) 50%, transparent);
+    1px 0 0 color-mix(in srgb, var(--cdl-brand-mint, #5eead4) 10%, transparent),
+    14px 0 36px rgba(7, 31, 51, 0.12);
+  --cdl-sidebar-brand-height: 60px;
+  --cdl-sidebar-nav-gap: 3px;
+  --cdl-sidebar-group-gap: 10px;
+  --cdl-sidebar-item-height: 42px;
+  --cdl-sidebar-item-radius: 10px;
+  --cdl-sidebar-item-fg: #c5d5e2;
+  --cdl-sidebar-item-fg-hover: #ffffff;
+  --cdl-sidebar-item-fg-active: #ffffff;
+  --cdl-sidebar-item-bg-hover: rgba(255, 255, 255, 0.07);
+  --cdl-sidebar-item-bg-active: rgba(94, 234, 212, 0.13);
+  --cdl-sidebar-item-rail-active: var(--cdl-brand-mint, #5eead4);
+  --cdl-sidebar-group-label-fg: #7f9bb0;
+  --cdl-sidebar-footer-border: rgba(197, 213, 226, 0.12);
 
   /* Header */
-  --cdl-header-height: 52px;
-  --cdl-route-tab-height: 52px;
+  --cdl-header-height: 60px;
+  --cdl-route-tab-height: 72px;
   --cdl-chrome-stack-height: calc(var(--cdl-header-height) + var(--cdl-route-tab-height));
   --cdl-header-bg: var(--medical-white);
   --cdl-header-border: color-mix(in srgb, var(--medical-border) 50%, transparent);

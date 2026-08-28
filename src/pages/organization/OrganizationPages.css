@@ -31,6 +31,43 @@
   margin-bottom: 0.5rem;
 }
 
+/* 2026-08-28: the "Default AI agent" card's <Link> list (CareDroid/Education AI/
+   Fleet AI/...) had zero className -- rendered as plain unstyled browser-default
+   blue underlined text, confirmed live, the only element on this page not
+   following CDL 2.1. */
+.org-card__link {
+  color: var(--app-accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.org-card__link:hover {
+  color: var(--app-accent-hover);
+  text-decoration: underline;
+}
+
+/* This whole file (OrganizationDashboard/OrganizationSettings/
+   TenantAdministrationCenter/...) has ~15 more bare <Link>s scattered across
+   headers, action rows, and table cells -- "Organization home"/"Billing"/
+   "Customer success dashboard" confirmed live as unstyled, underlined,
+   browser-default blue text on Tenant Administration Center. Rather than
+   hand-add a class to each call site (and miss the next one someone adds),
+   .org-page wraps every page in this file, so this catches all of them --
+   present and future -- the same way text-normalization.css's app-shell-wide
+   sweep does for the rest of the app. Buttons render their own <button> with
+   deliberate color inside an unclassed wrapping <Link>'s <a>; excluded
+   defensively even though the button's own explicit color already wins over
+   inherited color regardless. */
+.org-page a:not([class*='btn']):not([class*='button']):not([role='button']) {
+  color: var(--app-accent);
+  text-decoration: none;
+}
+
+.org-page a:not([class*='btn']):not([class*='button']):not([role='button']):hover {
+  color: var(--app-accent-hover);
+  text-decoration: underline;
+}
+
 .org-card label {
   display: block;
   margin: 0.75rem 0;

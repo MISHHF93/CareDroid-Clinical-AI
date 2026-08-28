@@ -41,13 +41,21 @@
   color: var(--medical-text-muted, var(--app-text-muted));
 }
 
+/* 2026-08-28: .profile-nav-links a / .profile-back-link / .profile-summary-card__link
+   removed from this list -- this rule reads --medical-text-link, which
+   role-accent-theme.css re-tints per operational role (see
+   text-normalization.css's matching exclusions for the full writeup on why
+   that assumption breaks down). Confirmed live: the /profile nav bar rendered
+   a different color per role even after excluding it from
+   text-normalization.css's generic sweep, because this dedicated
+   profile-surface-normalization.css rule was independently applying the same
+   token to the same elements. All three now carry their own deliberate,
+   non-role-tinted color (Profile.css's --cdl-info-text, ProfileSummaryCard.css's
+   var(--app-accent)) and no longer need this rule. */
 :is(.app-shell, .emergency-app-shell)
   :is(
-    .profile-nav-links a,
-    .profile-back-link,
     .profile-overview-card__header a,
     .profile-overview-row a,
-    .profile-summary-card__link,
     .profile-settings-back-link,
     .profile-activity-cta,
     .profile-identity-row a
@@ -58,11 +66,8 @@
 
 :is(.app-shell, .emergency-app-shell)
   :is(
-    .profile-nav-links a:hover,
-    .profile-back-link:hover,
     .profile-overview-card__header a:hover,
     .profile-overview-row a:hover,
-    .profile-summary-card__link:hover,
     .profile-settings-back-link:hover,
     .profile-activity-cta:hover,
     .profile-identity-row a:hover

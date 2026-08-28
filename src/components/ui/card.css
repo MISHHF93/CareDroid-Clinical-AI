@@ -2,11 +2,11 @@
 .card {
   min-width: 0;
   max-width: 100%;
-  background: var(--app-surface);
-  border: 1px solid color-mix(in srgb, var(--app-border) 55%, transparent);
-  border-radius: var(--compact-panel-radius, var(--app-radius-lg, var(--radius-lg)));
-  box-shadow: var(--compact-shadow, var(--app-elevation-card, var(--app-shadow-1)));
-  color: var(--app-text-primary);
+  background: var(--cdl-surface-card, var(--app-surface));
+  border: 1px solid var(--cdl-border, var(--app-border));
+  border-radius: var(--cdl-panel-radius, var(--cdl-radius-lg, 14px));
+  box-shadow: var(--cdl-panel-shadow, var(--cdl-elev-1));
+  color: var(--cdl-ink, var(--app-text-primary));
   position: relative;
   overflow: hidden;
   overflow-wrap: break-word;
@@ -60,12 +60,8 @@
 }
 
 .card-hover:hover {
-  border-color: color-mix(
-    in srgb,
-    var(--app-accent-action, var(--app-accent-interactive)) 34%,
-    var(--app-border)
-  );
-  box-shadow: var(--compact-shadow, var(--app-elevation-card, var(--app-shadow-1)));
+  border-color: var(--cdl-border-strong, var(--app-border-strong));
+  box-shadow: var(--cdl-panel-shadow-hover, var(--cdl-elev-2));
   transform: translateY(-1px);
 }
 

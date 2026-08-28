@@ -166,16 +166,38 @@ export default function EmergencyAnalytics() {
     ? triageBreachAnalytics.summary.longestElapsedLabel
     : `${triageBreachAnalytics.summary.targetMinutes}m target`;
 
-  const shiftKpis = [
+  const triageBreachCount = triageBreachAnalytics.summary.breachedCount;
+
+  // Signal has a budget (CDL 2.1): only the metrics that represent an active
+  // safety/operational concern get a semantic accent, and only once they're
+  // actually non-zero -- a routine "0 boarding" stays as quiet as "44 patients
+  // seen" instead of every tile competing for the same attention.
+  const shiftKpis: Array<{ label: string; value: string | number; tone?: 'critical' | 'warning' }> = [
     { label: 'Patients seen', value: shift.patientsSeen ?? 0 },
     { label: 'Discharges', value: shift.dischargeCount ?? 0 },
     { label: 'Daily volume', value: totalDailyVolume },
     { label: 'Avg wait', value: `${shift.averageWaitMinutes ?? 0}m` },
     { label: 'ER occupancy', value: erOccupancyLabel },
-    { label: 'Triage breaches', value: triageBreachAnalytics.summary.breachedCount },
-    { label: 'Boarding', value: shift.boardingCount ?? 0 },
-    { label: 'High risk', value: shift.highRiskCount ?? 0 },
-    { label: 'Reassess due', value: shift.reassessmentDueCount ?? 0 },
+    {
+      label: 'Triage breaches',
+      value: triageBreachCount,
+      tone: triageBreachCount > 0 ? 'critical' : undefined,
+    },
+    {
+      label: 'Boarding',
+      value: shift.boardingCount ?? 0,
+      tone: (shift.boardingCount ?? 0) > 0 ? 'warning' : undefined,
+    },
+    {
+      label: 'High risk',
+      value: shift.highRiskCount ?? 0,
+      tone: (shift.highRiskCount ?? 0) > 0 ? 'critical' : undefined,
+    },
+    {
+      label: 'Reassess due',
+      value: shift.reassessmentDueCount ?? 0,
+      tone: (shift.reassessmentDueCount ?? 0) > 0 ? 'warning' : undefined,
+    },
     { label: 'Top complaint', value: topComplaint ? `${topComplaint.count}` : '0' },
   ];
 
@@ -471,7 +493,14 @@ export default function EmergencyAnalytics() {
       {useCompactKpis ? (
         <div className="emergency-analytics__kpi-strip" aria-label="Emergency analytics KPIs">
           {shiftKpis.map((kpi) => (
-            <span key={kpi.label} className="emergency-analytics__kpi-strip-item">
+            <span
+              key={kpi.label}
+              className={
+                kpi.tone
+                  ? `emergency-analytics__kpi-strip-item emergency-analytics__kpi-strip-item--${kpi.tone}`
+                  : 'emergency-analytics__kpi-strip-item'
+              }
+            >
               <strong>{kpi.value}</strong>
               <span>{kpi.label}</span>
             </span>

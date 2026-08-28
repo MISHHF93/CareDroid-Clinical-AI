@@ -1,5 +1,13 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
+import {
+  Activity,
+  ArrowRight,
+  CheckCircle2,
+  LockKeyhole,
+  ShieldCheck,
+  Sparkles,
+} from 'lucide-react';
 import { CAREDROID_PRODUCT } from '../../config/caredroidProduct.config';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { sanitizeReturnUrl, resolvePostAuthDestination } from '../../auth/authSession';
@@ -13,14 +21,17 @@ import {
 } from '../../services/realAuthApi';
 import { ensureDevBackendSession, isDev } from '../../services/devBackendAuth';
 import { AUTH_CONFIG } from '../../config/auth.config';
-import { MEDICAL_THEME } from '../../config/medicalTheme.constants';
 import './AuthPage.css';
 
 type Mode = 'login' | 'signup';
 
 function completeRealSession(result: RealLoginSuccess, returnUrl: string | null) {
   persistRealSession(result);
-  const destination = resolvePostAuthDestination({ returnUrl, user: result.user, profile: result.user });
+  const destination = resolvePostAuthDestination({
+    returnUrl,
+    user: result.user,
+    profile: result.user,
+  });
   // Hard navigation, not client-side routing: UserProvider only reads the
   // stored session once, in its initial useState() -- a full reload is what
   // makes it re-mount and pick up the just-written real session cleanly,
@@ -39,7 +50,9 @@ export default function AuthPage({ initialMode = 'login' }: { initialMode?: Mode
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [pending, setPending] = useState(false);
-  const [twoFactor, setTwoFactor] = useState<{ userId: string; challengeToken: string } | null>(null);
+  const [twoFactor, setTwoFactor] = useState<{ userId: string; challengeToken: string } | null>(
+    null,
+  );
   const [twoFactorCode, setTwoFactorCode] = useState('');
 
   // Programmatic focus instead of the autoFocus prop -- same "ready to type
@@ -84,7 +97,11 @@ export default function AuthPage({ initialMode = 'login' }: { initialMode?: Mode
 
   const handleTwoFactorSubmit = async () => {
     if (!twoFactor) return;
-    const result = await verifyTwoFactorLogin(twoFactor.userId, twoFactorCode.trim(), twoFactor.challengeToken);
+    const result = await verifyTwoFactorLogin(
+      twoFactor.userId,
+      twoFactorCode.trim(),
+      twoFactor.challengeToken,
+    );
     completeRealSession(result, returnUrl);
   };
 
@@ -186,169 +203,265 @@ export default function AuthPage({ initialMode = 'login' }: { initialMode?: Mode
   };
 
   return (
-    <div className="auth-page" style={{ background: MEDICAL_THEME.surfacePage }}>
-      <div className="auth-page__card" style={{ background: MEDICAL_THEME.surfaceCard, boxShadow: MEDICAL_THEME.shadowModal }}>
-        <div className="auth-page__brand">
+    <main className="auth-page">
+      <section className="auth-page__story" aria-label="About CareDroid">
+        <div className="auth-page__story-inner">
+          <div className="auth-page__brand-lockup">
+            <span className="auth-page__brand-mark" aria-hidden="true">
+              <Activity size={22} strokeWidth={2.1} />
+            </span>
+            <span className="auth-page__brand-copy">
+              <strong>CareDroid</strong>
+              <span>Clinical OS</span>
+            </span>
+          </div>
+
+          <div className="auth-page__story-copy">
+            <span className="auth-page__eyebrow">
+              <Sparkles size={14} aria-hidden="true" />
+              Emergency care, clearly orchestrated
+            </span>
+            <h2>Calm command for the moments that move fastest.</h2>
+            <p>
+              One operational workspace for arrivals, queues, capacity, handoffs, and human-reviewed
+              clinical intelligence.
+            </p>
+          </div>
+
+          <div className="auth-page__workspace-preview" aria-hidden="true">
+            <div className="auth-page__preview-head">
+              <span>
+                <Activity size={15} /> Department pulse
+              </span>
+              <span className="auth-page__live-indicator">Live workspace</span>
+            </div>
+            <div className="auth-page__preview-grid">
+              <div>
+                <span>Arrivals</span>
+                <strong>12</strong>
+                <small>4 inbound</small>
+              </div>
+              <div>
+                <span>Rooms ready</span>
+                <strong>8/10</strong>
+                <small>Stable capacity</small>
+              </div>
+              <div>
+                <span>Reassessments</span>
+                <strong>03</strong>
+                <small>Need attention</small>
+              </div>
+            </div>
+            <div className="auth-page__preview-flow">
+              <span className="auth-page__flow-step auth-page__flow-step--complete">Arrival</span>
+              <span className="auth-page__flow-line" />
+              <span className="auth-page__flow-step auth-page__flow-step--active">Triage</span>
+              <span className="auth-page__flow-line" />
+              <span className="auth-page__flow-step">Care</span>
+              <span className="auth-page__flow-line" />
+              <span className="auth-page__flow-step">Disposition</span>
+            </div>
+          </div>
+
+          <div className="auth-page__principles">
+            <span>
+              <ShieldCheck size={16} /> Human-reviewed decisions
+            </span>
+            <span>
+              <CheckCircle2 size={16} /> Role-aware workflows
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <section className="auth-page__access" aria-label="CareDroid account access">
+        <div className="auth-page__mobile-brand">
+          <span className="auth-page__brand-mark" aria-hidden="true">
+            <Activity size={20} strokeWidth={2.1} />
+          </span>
           <strong>CareDroid</strong>
-          <span>{CAREDROID_PRODUCT.tagline}</span>
         </div>
 
-        {twoFactor ? (
-          <>
-            <h1 className="auth-page__title">Verify your identity</h1>
-            <p className="auth-page__subtitle">{notice}</p>
-          </>
-        ) : (
-          <>
-            <h1 className="auth-page__title">{mode === 'login' ? 'Log in' : 'Create your account'}</h1>
-            <p className="auth-page__subtitle">
-              {mode === 'login'
-                ? 'Sign in with your CareDroid credentials.'
-                : 'Register a real CareDroid account.'}
-            </p>
-          </>
-        )}
-
-        {error ? (
-          <div className="auth-page__error" role="alert">
-            {error}
-          </div>
-        ) : null}
-        {notice && !twoFactor ? (
-          <div className="auth-page__notice" role="status">
-            {notice}
-          </div>
-        ) : null}
-
-        {isDev && !twoFactor ? (
-          <>
-            <button
-              type="button"
-              className="auth-page__dev-enter"
-              onClick={handleDevBypassClick}
-              disabled={pending}
-            >
-              {pending ? 'Entering…' : 'Enter CareDroid now'}
-            </button>
-            <p className="auth-page__dev-enter-hint">
-              Full access, no credentials needed — local development only.
-            </p>
-            <div className="auth-page__divider" role="separator">
-              <span>or sign in with an account</span>
-            </div>
-          </>
-        ) : null}
-
-        <form className="auth-page__form" onSubmit={handleSubmit}>
-          {twoFactor ? (
-            <label className="auth-page__field">
-              <span>Verification code</span>
-              <input
-                ref={twoFactorInputRef}
-                type="text"
-                inputMode="numeric"
-                autoComplete="one-time-code"
-                value={twoFactorCode}
-                onChange={(event) => setTwoFactorCode(event.target.value)}
-                placeholder="123456"
-                required
-              />
-            </label>
-          ) : (
-            <>
-              {mode === 'signup' ? (
-                <label className="auth-page__field">
-                  <span>Full name</span>
-                  <input
-                    type="text"
-                    autoComplete="name"
-                    value={fullName}
-                    onChange={(event) => setFullName(event.target.value)}
-                    placeholder="Dr. Jordan Rivera"
-                    required
-                  />
-                </label>
-              ) : null}
-              <label className="auth-page__field">
-                <span>Email</span>
-                <input
-                  ref={emailInputRef}
-                  type="email"
-                  autoComplete="email"
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
-                  placeholder="you@hospital.org"
-                  required
-                />
-              </label>
-              <label className="auth-page__field">
-                <span>Password</span>
-                <input
-                  type="password"
-                  autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
-                  value={password}
-                  onChange={(event) => setPassword(event.target.value)}
-                  placeholder="••••••••"
-                  minLength={mode === 'signup' ? 8 : undefined}
-                  required
-                />
-              </label>
-            </>
-          )}
-
-          <button type="submit" className="auth-page__submit" disabled={pending}>
-            {pending
-              ? 'Please wait…'
-              : twoFactor
-                ? 'Verify'
-                : mode === 'login'
-                  ? 'Log in'
-                  : 'Create account'}
-          </button>
-        </form>
-
-        {!twoFactor ? (
-          <div className="auth-page__switch">
-            {mode === 'login' ? (
+        <div className="auth-page__card">
+          <div className="auth-page__card-heading">
+            <span className="auth-page__secure-label">
+              <LockKeyhole size={13} aria-hidden="true" /> Secure workspace
+            </span>
+            {twoFactor ? (
               <>
-                Don&rsquo;t have an account?{' '}
-                <button
-                  type="button"
-                  className="auth-page__link-button"
-                  onClick={() => {
-                    setMode('signup');
-                    setError('');
-                    setNotice('');
-                  }}
-                >
-                  Create one
-                </button>
+                <h1 className="auth-page__title">Verify your identity</h1>
+                <p className="auth-page__subtitle">{notice}</p>
               </>
             ) : (
               <>
-                Already have an account?{' '}
-                <button
-                  type="button"
-                  className="auth-page__link-button"
-                  onClick={() => {
-                    setMode('login');
-                    setError('');
-                    setNotice('');
-                  }}
-                >
-                  Log in
-                </button>
+                <h1 className="auth-page__title">
+                  {mode === 'login' ? 'Welcome back' : 'Create your account'}
+                </h1>
+                <p className="auth-page__subtitle">
+                  {mode === 'login'
+                    ? 'Sign in to continue to your clinical workspace.'
+                    : 'Create secure access to your CareDroid workspace.'}
+                </p>
               </>
             )}
           </div>
-        ) : null}
 
-        {!isDev && !twoFactor ? (
-          <div className="auth-page__footer">
-            <Link to={CANONICAL_ROUTES.platformStart}>Explore the CareDroid demo instead</Link>
-          </div>
-        ) : null}
-      </div>
-    </div>
+          {error ? (
+            <div className="auth-page__error" role="alert">
+              {error}
+            </div>
+          ) : null}
+          {notice && !twoFactor ? (
+            <div className="auth-page__notice" role="status">
+              {notice}
+            </div>
+          ) : null}
+
+          {isDev && !twoFactor ? (
+            <div className="auth-page__dev-access">
+              <div>
+                <span>Local development</span>
+                <p>Open a fully provisioned clinical workspace without credentials.</p>
+              </div>
+              <button
+                type="button"
+                className="auth-page__dev-enter"
+                onClick={handleDevBypassClick}
+                disabled={pending}
+              >
+                <span>{pending ? 'Entering…' : 'Enter CareDroid now'}</span>
+                <ArrowRight size={17} aria-hidden="true" />
+              </button>
+            </div>
+          ) : null}
+
+          {isDev && !twoFactor ? (
+            <div className="auth-page__divider" role="separator">
+              <span>or use your account</span>
+            </div>
+          ) : null}
+
+          <form className="auth-page__form" onSubmit={handleSubmit}>
+            {twoFactor ? (
+              <label className="auth-page__field">
+                <span>Verification code</span>
+                <input
+                  ref={twoFactorInputRef}
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  value={twoFactorCode}
+                  onChange={(event) => setTwoFactorCode(event.target.value)}
+                  placeholder="123456"
+                  required
+                />
+              </label>
+            ) : (
+              <>
+                {mode === 'signup' ? (
+                  <label className="auth-page__field">
+                    <span>Full name</span>
+                    <input
+                      type="text"
+                      autoComplete="name"
+                      value={fullName}
+                      onChange={(event) => setFullName(event.target.value)}
+                      placeholder="Dr. Jordan Rivera"
+                      required
+                    />
+                  </label>
+                ) : null}
+                <label className="auth-page__field">
+                  <span>Email address</span>
+                  <input
+                    ref={emailInputRef}
+                    type="email"
+                    autoComplete="email"
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                    placeholder="you@hospital.org"
+                    required
+                  />
+                </label>
+                <label className="auth-page__field">
+                  <span>Password</span>
+                  <input
+                    type="password"
+                    autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                    placeholder="••••••••"
+                    minLength={mode === 'signup' ? 8 : undefined}
+                    required
+                  />
+                </label>
+              </>
+            )}
+
+            <button type="submit" className="auth-page__submit" disabled={pending}>
+              <span>
+                {pending
+                  ? 'Please wait…'
+                  : twoFactor
+                    ? 'Verify identity'
+                    : mode === 'login'
+                      ? 'Log in securely'
+                      : 'Create account'}
+              </span>
+              {!pending ? <ArrowRight size={17} aria-hidden="true" /> : null}
+            </button>
+          </form>
+
+          {!twoFactor ? (
+            <div className="auth-page__switch">
+              {mode === 'login' ? (
+                <>
+                  New to CareDroid?{' '}
+                  <button
+                    type="button"
+                    className="auth-page__link-button"
+                    onClick={() => {
+                      setMode('signup');
+                      setError('');
+                      setNotice('');
+                    }}
+                  >
+                    Create an account
+                  </button>
+                </>
+              ) : (
+                <>
+                  Already have an account?{' '}
+                  <button
+                    type="button"
+                    className="auth-page__link-button"
+                    onClick={() => {
+                      setMode('login');
+                      setError('');
+                      setNotice('');
+                    }}
+                  >
+                    Log in
+                  </button>
+                </>
+              )}
+            </div>
+          ) : null}
+
+          {!isDev && !twoFactor ? (
+            <div className="auth-page__footer">
+              <Link to={CANONICAL_ROUTES.platformStart}>Explore the CareDroid demo instead</Link>
+            </div>
+          ) : null}
+
+          <p className="auth-page__session-note">
+            <LockKeyhole size={13} aria-hidden="true" /> Encrypted session · Access is logged and
+            role-aware
+          </p>
+        </div>
+
+        <p className="auth-page__legal">{CAREDROID_PRODUCT.safetyLine}</p>
+      </section>
+    </main>
   );
 }

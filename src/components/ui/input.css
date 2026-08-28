@@ -9,9 +9,9 @@
 }
 
 .input-label {
-  font-size: var(--font-14);
-  font-weight: 650;
-  color: var(--app-text-secondary);
+  font-size: var(--cdl-text-xs, 12px);
+  font-weight: var(--cdl-font-semibold, 600);
+  color: var(--cdl-ink-muted, var(--app-text-secondary));
   transition: color 0.2s var(--ease-smooth);
 }
 
@@ -32,13 +32,13 @@
   min-width: 0;
   max-width: 100%;
   padding: 9px 12px;
-  min-height: var(--app-input-height, var(--compact-control-height, 38px));
-  font-size: var(--text-input-min, var(--font-16));
+  min-height: var(--cdl-control-height-lg, var(--app-input-height, 44px));
+  font-size: var(--cdl-text-md, var(--text-input-min, 15px));
   font-family: inherit;
-  color: var(--app-text-primary);
-  background: var(--app-input-bg);
-  border: 1px solid var(--app-input-border);
-  border-radius: var(--compact-card-radius, var(--app-radius-md, var(--radius-md)));
+  color: var(--cdl-ink, var(--app-text-primary));
+  background: var(--cdl-surface-card, var(--app-input-bg));
+  border: 1px solid var(--cdl-border-input, var(--app-input-border));
+  border-radius: var(--cdl-control-radius, var(--cdl-radius-md, 10px));
   outline: none;
   transition:
     background-color 0.2s var(--ease-smooth),
@@ -61,9 +61,9 @@
 
 .input-field:focus,
 .input-focused {
-  border-color: var(--app-accent-action, var(--app-accent-interactive));
-  background: var(--app-input-bg-hover);
-  box-shadow: 0 0 0 2px var(--app-focus);
+  border-color: var(--cdl-brand-500, var(--app-accent-action));
+  background: var(--cdl-surface-card, var(--app-input-bg-hover));
+  box-shadow: var(--cdl-focus-ring, 0 0 0 3px var(--app-focus));
 }
 
 .input-with-left-icon {

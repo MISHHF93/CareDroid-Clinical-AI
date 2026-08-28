@@ -82,6 +82,7 @@ pages-map.txt
 # Local agent worktrees / settings
 .claude/
 .bob/
+.codex-artifacts/
 
 
 # Local health scan outputs
@@ -96,4 +97,3 @@ source-dirt-report.json
 # later should be committed the same way, not auto-ignored here.
 backend/*.traineddata
 !backend/eng.traineddata
-

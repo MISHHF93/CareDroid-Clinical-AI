@@ -43,7 +43,7 @@
   border-bottom: 1px solid var(--app-panel-border, rgba(255, 255, 255, 0.08));
 }
 
-.admin-ops-shell__nav a {
+.admin-ops-nav-link {
   padding: 8px 12px;
   border-radius: 999px;
   text-decoration: none;
@@ -52,15 +52,20 @@
   border: 1px solid transparent;
 }
 
-.admin-ops-shell__nav a:hover {
+.admin-ops-nav-link:hover {
   color: var(--text-color);
   border-color: var(--app-panel-border);
 }
 
-.admin-ops-shell__nav a.is-active {
+.admin-ops-nav-link.is-active {
   color: var(--text-color);
-  background: color-mix(in srgb, #374151 12%, transparent);
-  border-color: color-mix(in srgb, #374151 30%, transparent);
+  /* Was color-mix(... #374151 ...) -- the same stale pre-CDL gray fixed
+     elsewhere this session, here marking which admin section tab is
+     selected. Brand teal reads as "active/selected" everywhere else in the
+     app (sidebar rail, route-band breadcrumb); this tab bar was the one
+     place still using the old neutral. */
+  background: color-mix(in srgb, var(--app-accent) 12%, transparent);
+  border-color: color-mix(in srgb, var(--app-accent) 30%, transparent);
 }
 
 .admin-ops-shell__content {
@@ -107,7 +112,29 @@
 .admin-ops-status-list strong {
   font-size: 11px;
   text-transform: uppercase;
-  color: #374151;
+  /* Was a hardcoded #374151 -- fine contrast on the light-mode card, but
+     this card's own background (--panel-bg) is a barely-tinted dark
+     surface in dark theme, so a fixed medium-gray never adapted and read
+     low-contrast there. */
+  color: var(--app-fg-muted);
+}
+
+/* Confirmed live: every Link in this admin section (the primary "Manage ED
+   workflows ->" / "Open surveillance nexus ->" card actions, the
+   secondary-links row, and this inline "view" link) rendered with zero
+   deliberate color -- plain unstyled anchor text, browser default. None of
+   CDL 2.1's teal ever reached this whole page. */
+.admin-ops-card__link,
+.admin-ops-inline-link {
+  color: var(--app-accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.admin-ops-card__link:hover,
+.admin-ops-inline-link:hover {
+  color: var(--app-accent-hover);
+  text-decoration: underline;
 }
 
 .admin-ops-inline-link {

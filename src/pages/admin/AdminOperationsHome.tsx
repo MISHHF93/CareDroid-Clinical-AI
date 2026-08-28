@@ -54,7 +54,9 @@ export default function AdminOperationsHome() {
             Your profile ({profileCopy.personaTitle}) does not include admin operations surfaces.
             Contact your organization administrator to request access.
           </p>
-          <Link to={CANONICAL_ROUTES.profile}>Back to profile →</Link>
+          <Link to={CANONICAL_ROUTES.profile} className="admin-ops-card__link">
+            Back to profile →
+          </Link>
         </section>
       </div>
     );
@@ -66,7 +68,9 @@ export default function AdminOperationsHome() {
         <section key={section.id} className="admin-ops-card">
           <h3>{section.title}</h3>
           <p>{section.description}</p>
-          <Link to={section.primaryLink.route}>{section.primaryLink.label}</Link>
+          <Link to={section.primaryLink.route} className="admin-ops-card__link">
+            {section.primaryLink.label}
+          </Link>
           {section.id === 'surveillance-iot' && surfaces.admin.showSurveillanceDetailList ? (
             <ul className="admin-ops-status-list">
               {SURVEILLANCE_STATUS.map((item) => (
@@ -87,7 +91,7 @@ export default function AdminOperationsHome() {
           section.id !== 'surveillance-iot' ? (
             <div className="admin-ops-secondary-links">
               {filterAdminOpsLinks(saasRole, section.secondaryLinks).map((link) => (
-                <Link key={link.route} to={link.route}>
+                <Link key={link.route} to={link.route} className="admin-ops-card__link">
                   {link.label}
                 </Link>
               ))}

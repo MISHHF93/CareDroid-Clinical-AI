@@ -50,12 +50,18 @@ export default function AdminOperationsShell() {
             (item.path !== CANONICAL_ROUTES.adminOperations &&
               location.pathname.startsWith(item.path));
           return (
-            <Link key={item.id} to={item.path} className={active ? 'is-active' : ''}>
+            <Link
+              key={item.id}
+              to={item.path}
+              className={active ? 'admin-ops-nav-link is-active' : 'admin-ops-nav-link'}
+            >
               {item.label}
             </Link>
           );
         })}
-        <Link to={CANONICAL_ROUTES.platformStart}>← Platform entry</Link>
+        <Link to={CANONICAL_ROUTES.platformStart} className="admin-ops-nav-link">
+          ← Platform entry
+        </Link>
       </nav>
 
       <div className="admin-ops-shell__content">

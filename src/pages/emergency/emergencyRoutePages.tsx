@@ -4,6 +4,7 @@ import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { PatientFlag, PatientState } from '../../types/emergency';
 import { EMERGENCY_OS_BRANDING } from '../../config/emergencyOsBranding.config';
 import useEdRouteDataContext from '../../hooks/useEdRouteDataContext';
+import useScreenModeCapabilities from '../../hooks/useScreenModeCapabilities';
 import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { confirmCareDroidAction } from '../../services/careDroidInteractionFeedback';
@@ -48,6 +49,18 @@ import { AlarmBanner, AlarmKpi } from '../../alarm';
 
 export function PatientsRoute() {
   const surfaces = usePractitionerSurfaceVisibility();
+  // AppShell.tsx unconditionally omits <PatientDetailPanel /> for
+  // isRegistrationScreen (every route, not just /emergency/reception --
+  // resolveEmergencyScreenMode() coerces registration_clerk into reception
+  // mode everywhere, since that's the only screen mode its role is allowed
+  // for). This page's own copy didn't know that: it told a registration
+  // clerk to "open a patient card to review flags, assignment, and next
+  // clinical action" and offered a "Review list" action, both promising a
+  // detail view that structurally cannot open for this role -- confirmed
+  // live, clicking any patient card produces zero visible change (no panel,
+  // no error, nothing) for a registration_clerk session. Adjust the copy
+  // instead of the access-control gate itself.
+  const { isRegistrationScreen: patientDetailUnavailable } = useScreenModeCapabilities();
   const [searchParams, setSearchParams] = useSearchParams();
   const { activeScenarioId, backendAvailable } = useEdRouteDataContext();
   const storePatients = useEmergencyStore((state) => state.patients);
@@ -122,16 +135,24 @@ export function PatientsRoute() {
     <EmergencyRoutePage
       eyebrow="Patients"
       title="Department Patients"
-      description="Find active patients, search by name or MRN, and open a patient card for next steps."
+      description={
+        patientDetailUnavailable
+          ? 'Find active patients and search by name or MRN.'
+          : 'Find active patients, search by name or MRN, and open a patient card for next steps.'
+      }
       situationBrief={{
         status: `${patients.length} active patient${patients.length === 1 ? '' : 's'} on the board`,
         attention:
           highRiskCount || waitingCount
             ? `${highRiskCount} high-risk · ${waitingCount} waiting`
             : 'No high-risk or waiting backlog flagged',
-        owner: 'Care team — open a patient card to confirm assignment',
+        owner: patientDetailUnavailable
+          ? 'Care team assignment'
+          : 'Care team — open a patient card to confirm assignment',
         nextAction: query
-          ? 'Refine search or open a matching patient card'
+          ? patientDetailUnavailable
+            ? 'Refine search to find a matching patient'
+            : 'Refine search or open a matching patient card'
           : requestedPatient
             ? `Review ${displayPatientName(requestedPatient)} and plan next steps`
             : 'Search or select a patient for handoff',
@@ -159,7 +180,11 @@ export function PatientsRoute() {
         <AlarmBanner
           severity="critical"
           title={`${highRiskCount} high-risk patient${highRiskCount === 1 ? '' : 's'} on the board`}
-          message="Open a patient card to review flags, assignment, and next clinical action. AI suggestions require human review."
+          message={
+            patientDetailUnavailable
+              ? 'Flag the care team for assignment and next clinical action. AI suggestions require human review.'
+              : 'Open a patient card to review flags, assignment, and next clinical action. AI suggestions require human review.'
+          }
           actions={[
             {
               id: 'review',

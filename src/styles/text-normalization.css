@@ -76,6 +76,56 @@ html[data-theme='dark'],
    under WCAG AA on a page users land on specifically because a route was
    denied — the one page where a broken/unreadable escape-hatch link is
    worst. */
+/* 2026-08-28: .admin-ops-card__link/.admin-ops-inline-link (AdminOperationsHome's
+   "Manage ED workflows ->" card actions and the surveillance status list's "view"
+   links) are the same collision again, one level up: role-accent-theme.css's own
+   header comment claims --medical-text-link is "safe to override globally --
+   ...nothing else critical reads this chain" besides the sidebar's active-nav
+   highlight, which is why it re-tints per role (html[data-theme][data-role-theme]).
+   That assumption is false for this rule -- confirmed live, computed color came out
+   as color-mix(#5925dc 82%, black) (the "operations" role's purple) instead of the
+   app's teal brand on the admin console, and would shift to a DIFFERENT hue per
+   role for the exact same shared link -- the identical "huge color mismatching"
+   failure role-accent-theme.css's own comment already describes fixing once for
+   --app-accent* (scoped that override down to .reception-workspace only). Excluding
+   these two classes here does the same for the generic link sweep instead of
+   re-scoping role-accent-theme.css itself.
+   Same sweep, following the trail further: .admin-ops-nav-link (this same admin
+   shell's own section tabs -- inactive tabs rendered className="" before this fix,
+   so EVERY inactive tab leaked full role-tint instead of the intended
+   --app-fg-muted grey) and .care-ops-inbox__chip (the "Open" action on
+   CareOperationsInboxPanel's overdue-item rows, seen on /emergency/whiteboard for
+   every role) confirmed live the same way -- both already had a deliberate color
+   declaration of their own, single-class selectors, still beaten by this sweep's
+   many :not() exclusions on specificity alone.
+   The biggest instance yet: /profile itself. ProfileSettingsShell.tsx's own
+   section tab bar (Overview/Identity/Preferences/Tools/Workspaces/Security/
+   Activity) had the identical className={active ? 'is-active' : ''} bug as
+   admin-ops-nav-link -- every inactive tab was literally classless. Profile.tsx's
+   .profile-nav-links list (Edit profile/Tool preferences/Activity/Manage
+   workspaces/Security/Platform settings/Audit logs) and .profile-back-link were
+   bare <Link>s whose deliberate --cdl-info-text color (Profile.css) was beaten
+   the same way. .profile-summary-card__link ("Switch workspace") had its OWN
+   color already stale-hardcoded #374151 (fixed to var(--app-accent) in
+   ProfileSummaryCard.css) yet was still fully overridden by this sweep on top of
+   that. Confirmed live across 3 roles: this entire nav bar rendered a different
+   color per role on the one page every user visits (Reception #054364,
+   Charge-flow teal, Provider-rounds blue) instead of a single consistent design.
+   .profile-settings-shell__nav-link and .profile-nav-link are new base classes
+   added specifically to make this exclusion possible (both were unclassed
+   before).
+   Same day: .org-card__link (OrganizationDashboard's "Default AI agent" list --
+   CareDroid/Education AI/Fleet AI/...) was ALSO plain unstyled browser-default
+   blue/underlined text before this pass; even after giving it its own
+   var(--app-accent) color (OrganizationPages.css), it still rendered role-tinted
+   purple until excluded here too. Same file has ~15 MORE bare <Link>s scattered
+   across headers/action-rows/table-cells with no per-element class to target --
+   rather than hand-classing each one (and missing the next one someone adds),
+   :not(.org-page a) excludes the whole container by a descendant selector
+   (Selectors Level 4, already relied on implicitly by this codebase's
+   color-mix() usage elsewhere) so OrganizationPages.css's own blanket
+   ".org-page a" rule always wins for every link in every page this file
+   renders, present and future. */
 :is(.app-shell, .emergency-app-shell)
   a:not([class*='btn']):not([class*='button']):not([role='button']):not(
     .fj-critical-banner__cta
@@ -83,7 +133,13 @@ html[data-theme='dark'],
     .profile-activity-cta
   ):not(.platform-entry__card--primary):not(.entry-shell__link--primary):not(
     .critical-alert-banner__link
-  ):not(.adp-link) {
+  ):not(.adp-link):not(.admin-ops-card__link):not(.admin-ops-inline-link):not(
+    .admin-ops-nav-link
+  ):not(.care-ops-inbox__chip):not(.ed-skip-link):not(.profile-settings-shell__nav-link):not(
+    .profile-nav-link
+  ):not(.profile-back-link):not(.profile-summary-card__link):not(.org-card__link):not(
+    .org-page a
+  ) {
   color: var(--medical-text-link);
   text-decoration-color: color-mix(in srgb, var(--medical-text-link) 35%, transparent);
 }
@@ -112,7 +168,16 @@ html[data-theme='dark'],
    see color-normalization.css's --primary sweep for the full writeup.
    2026-08-23: .adp-link matches [class*='-link'] here too (the substring
    "-link" appears in "adp-link") -- same collision as the plain a:not() rule
-   above, see that rule's comment for the full writeup. */
+   above, see that rule's comment for the full writeup.
+   2026-08-28: .admin-ops-nav-link and .ed-skip-link both match [class*='-link']
+   the same way ("nav-link" / "skip-link") -- excluded here too, see the plain
+   a:not() rule above for the full writeup on both.
+   Same day: .profile-settings-shell__nav-link, .profile-nav-link, and
+   .profile-back-link all match [class*='-link']; .profile-summary-card__link
+   and .org-card__link match [class*='__link'] directly -- see the plain
+   a:not() rule above for the full writeup on each, and for why the rest of
+   OrganizationPages.tsx's bare <Link>s are excluded by container
+   (:not(.org-page a)) instead of by individual class. */
 :is(.app-shell, .emergency-app-shell)
   :is(
     [class*='__link'],
@@ -124,12 +189,24 @@ html[data-theme='dark'],
     .cdl-public-page__cta
   ):not(.profile-section-header__cta):not(.reception-attention__cta):not(.platform-entry__cta):not(
     .reception-queue-row__cta
-  ):not(.entry-shell__link--primary):not(.critical-alert-banner__link):not(.adp-link) {
+  ):not(.entry-shell__link--primary):not(.critical-alert-banner__link):not(
+    .adp-link
+  ):not(.admin-ops-card__link):not(.admin-ops-inline-link):not(.admin-ops-nav-link):not(
+    .ed-skip-link
+  ):not(.profile-settings-shell__nav-link):not(.profile-nav-link):not(.profile-back-link):not(
+    .profile-summary-card__link
+  ):not(.org-card__link):not(.org-page a) {
   color: var(--medical-text-link);
 }
 
 :is(.app-shell, .emergency-app-shell)
-  a:not([class*='btn']):not([class*='button']):not([role='button']):hover {
+  a:not([class*='btn']):not([class*='button']):not([role='button']):not(
+    .admin-ops-card__link
+  ):not(.admin-ops-inline-link):not(.admin-ops-nav-link):not(.care-ops-inbox__chip):not(
+    .ed-skip-link
+  ):not(.profile-settings-shell__nav-link):not(.profile-nav-link):not(.profile-back-link):not(
+    .profile-summary-card__link
+  ):not(.org-card__link):not(.org-page a):hover {
   color: var(--medical-text-link-hover);
 }
 
