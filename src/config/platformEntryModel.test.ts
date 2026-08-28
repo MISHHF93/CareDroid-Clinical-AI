@@ -36,4 +36,16 @@ describe('platformEntryModel', () => {
     expect(isAdminSaasRole('student')).toBe(false);
     expect(resolveAdminHomeRoute()).toBe(`${CANONICAL_ROUTES.adminOperations}/tenant`);
   });
+
+  it('resolves a role with a curated hospital-role home route to exactly that route', () => {
+    // triage_nurse's curated route (the pretriage queue) is distinct from
+    // the generic ED whiteboard every fallback in the chain below it would
+    // otherwise produce -- see hasExplicitHomeRoute()'s tests in
+    // roleClusterNav.config.test.ts for the underlying precedence bug this
+    // guards (getHomeRouteForRole() never returns falsy, so a naive `||`
+    // chain past it is dead code).
+    expect(resolveClinicalHomeRoute('triage_nurse')).toBe(
+      '/emergency/queues?queue=pretriage',
+    );
+  });
 });

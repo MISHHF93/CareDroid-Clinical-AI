@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { getApiErrorMessage } from '../services/apiClient';
 import { fetchIntegrationHub } from '../services/emergencyOsApi';
 import {
@@ -35,7 +35,14 @@ export function useIntegrationHub(eventLimit = 25): IntegrationHubState {
   > | null>(null);
   const [recentEvents, setRecentEvents] = useState<Array<Record<string, unknown>>>([]);
 
+  // Staleness guard: without it, a slower in-flight refresh() call (e.g. the
+  // mount effect racing a manual "Refresh" click) can resolve after a newer
+  // call's and silently overwrite fresh Integration Hub status/events with
+  // stale data. Same fix shape as TenantContext's refreshTenantContext.
+  const refreshTokenRef = useRef(0);
+
   const refresh = useCallback(async () => {
+    const token = ++refreshTokenRef.current;
     setStatus('loading');
     setError('');
 
@@ -44,6 +51,8 @@ export function useIntegrationHub(eventLimit = 25): IntegrationHubState {
       fetchInteroperabilitySummary(),
       fetchIntegrationEvents(eventLimit),
     ]);
+
+    if (token !== refreshTokenRef.current) return;
 
     if (hubResult.status === 'fulfilled') {
       const nextEnvelope = hubResult.value as IntegrationHubEnvelope;

@@ -41,8 +41,13 @@ export default function IntegrationHubPage() {
           <Link className="cd-btn cd-btn--secondary cd-btn--sm" to={CANONICAL_ROUTES.emergencySettings}>
             Emergency Settings
           </Link>
-          <button type="button" className="cd-btn cd-btn--primary cd-btn--sm" onClick={() => void refresh()}>
-            Refresh
+          <button
+            type="button"
+            className="cd-btn cd-btn--primary cd-btn--sm"
+            onClick={() => void refresh()}
+            disabled={status === 'loading'}
+          >
+            {status === 'loading' ? 'Refreshing…' : 'Refresh'}
           </button>
         </div>
       }

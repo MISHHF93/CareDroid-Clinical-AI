@@ -214,6 +214,24 @@ export function getHomeRouteForRole(role: string | null | undefined): string {
 }
 
 /**
+ * Whether `role` has an explicit, curated entry in HOSPITAL_ROLE_HOME_ROUTES
+ * (vs. getHomeRouteForRole()'s own generic ED-whiteboard fallback). Callers
+ * chaining getHomeRouteForRole() with a further fallback (e.g. a
+ * legacy-emergency-role resolver, or a reception-first default) must check
+ * this FIRST -- getHomeRouteForRole() never returns falsy, so
+ * `getHomeRouteForRole(role) || nextFallback` never reaches nextFallback
+ * (found 2026-08-28: this exact bug in platformEntryModel.ts's
+ * resolveClinicalHomeRoute silently misrouted any role absent from both
+ * HOSPITAL_ROLE_HOME_ROUTES and EMERGENCY_TO_HOSPITAL_ROLE, e.g. the raw
+ * SaaS role 'nurse', to the generic ED Whiteboard instead of its intended,
+ * more-specific landing page).
+ */
+export function hasExplicitHomeRoute(role: string | null | undefined): boolean {
+  const hospitalRole = resolveToHospitalRole(role);
+  return Boolean(HOSPITAL_ROLE_HOME_ROUTES[hospitalRole]);
+}
+
+/**
  * Returns the ordered sidebar nav item ID allowlist for a given role.
  * Accepts both hospital role IDs (e.g. 'emergency_physician') and legacy
  * emergency role IDs (e.g. 'physician').

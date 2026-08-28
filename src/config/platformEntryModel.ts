@@ -5,7 +5,7 @@ import { CANONICAL_ROUTES } from './routes.config';
 import { getEmergencyRoleHomeRoute } from './emergencyRolePermissions';
 import { getPlatformHomeRoute } from './receptionFirstUx.config';
 import { resolveUserProfileFromSaasRole } from './userProfileCatalog';
-import { getHomeRouteForRole } from './roleClusterNav.config';
+import { getHomeRouteForRole, hasExplicitHomeRoute } from './roleClusterNav.config';
 
 export const ADMIN_SAAS_ROLES = Object.freeze([
   'hospital-administrator',
@@ -36,8 +36,14 @@ export function resolveAdminHomeRoute(): string {
 }
 
 export function resolveClinicalHomeRoute(role: string | null | undefined): string {
+  // hasExplicitHomeRoute() gates the curated hospital-role mapping first --
+  // getHomeRouteForRole() itself never returns falsy (it self-fallbacks to
+  // the generic ED whiteboard), so without this gate the `||` chain below
+  // could never reach the more-specific emergency-role/reception-first
+  // fallbacks for a role absent from the curated map (e.g. raw SaaS role
+  // 'nurse'). See hasExplicitHomeRoute()'s doc comment for the full story.
+  if (hasExplicitHomeRoute(role)) return getHomeRouteForRole(role);
   return (
-    getHomeRouteForRole(role) ||
     getEmergencyRoleHomeRoute(role) ||
     getPlatformHomeRoute() ||
     CANONICAL_ROUTES.emergencyReception
