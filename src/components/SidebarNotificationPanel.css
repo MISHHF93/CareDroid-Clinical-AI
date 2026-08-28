@@ -248,22 +248,21 @@
   background: var(--semantic-urgent-bg);
 }
 
-@media (max-width: 1024px) and (min-width: 769px) {
-  .nc-backdrop,
-  .nc-panel {
-    inset-inline-start: var(--app-shell-sidebar-offset, 56px);
-  }
-
-  .nc-panel {
-    width: min(380px, calc(100vw - var(--app-shell-sidebar-offset, 56px)));
-    max-width: calc(100vw - var(--app-shell-sidebar-offset, 56px));
-  }
-}
-
 /* Sidebar is a DOM sibling, not an ancestor, so its manual collapse state
    (Sidebar.tsx's .sidebar--collapsed) can't be reached with a descendant
-   selector -- read it off the documentElement broadcast instead. */
-@media (min-width: 1025px) {
+   selector -- read it off the documentElement broadcast instead.
+   HEAL: this range used to force a flat 56px icon-rail offset here
+   unconditionally (regardless of collapse state), left over from when
+   769-1024px always forced icon-rail. Sidebar.css's manual collapse toggle
+   now governs that same 769px+ range (tablet defaults to the full,
+   expanded sidebar just like desktop), so an unconditional 56px here made
+   this panel render under/behind the sidebar at tablet width whenever it
+   was left expanded -- confirmed live via screenshot at 800px. Widening
+   this collapsed-only rule down to 769px (from 1025px) unifies both tiers:
+   collapsed uses the icon-rail width at any width 769px+, and expanded
+   (no matching rule here) correctly falls through to the base rule's
+   full --cdl-sidebar-width. */
+@media (min-width: 769px) {
   [data-sidebar-collapsed='true'] .nc-backdrop,
   [data-sidebar-collapsed='true'] .nc-panel {
     inset-inline-start: var(--cdl-sidebar-width-collapsed, 56px);

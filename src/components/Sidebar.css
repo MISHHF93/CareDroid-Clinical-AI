@@ -137,40 +137,6 @@
   margin-top: 0;
 }
 
-.sidebar__footer .demo-user-switcher {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  width: 100%;
-}
-
-.sidebar__footer .demo-user-switcher__header {
-  padding: 4px 8px 1px;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  color: var(--medical-ink-subtle);
-}
-
-.sidebar__footer .demo-user-switcher__select {
-  width: 100%;
-  min-height: 40px;
-  box-sizing: border-box;
-  border: 1px solid color-mix(in srgb, var(--medical-border) 60%, transparent);
-  border-left: 3px solid transparent;
-  border-radius: var(--cdl-sidebar-item-radius, 6px);
-  background: var(--medical-white);
-  color: var(--medical-ink);
-  font: inherit;
-  font-size: 12.5px;
-  padding: 5px 8px;
-}
-
-.sidebar-desktop-nav__demo-switcher {
-  padding-top: 0;
-}
-
 .sidebar-mobile-nav,
 .sidebar-more-backdrop {
   display: none;
@@ -213,6 +179,21 @@
   border-left: 3px solid transparent;
   box-sizing: border-box;
   position: relative;
+  /* alerts/copilot render this class on a <button>, not an <a> -- without an
+     explicit background a native button keeps its UA chrome (Chrome/Windows
+     renders a flat rgb(240,240,240) face), which showed up as a permanently
+     "selected"-looking gray box on those two items at rest, confirmed live
+     via computed style. Anchors were never affected (no UA button chrome). */
+  background: transparent;
+  /* !important: button-tag nav items (alerts, copilot) also collide with
+     visual-consistency.css's app-wide ":is(button, [role='button'], .btn,
+     [class*='__action'], [class*='-button']):not(...)" border-color reset,
+     which targets every native <button> regardless of its own classname and
+     outranks this plain class selector on specificity -- confirmed live via
+     computed style (a stray blue-gray tint on the left rail instead of
+     transparent). Link-based items are untouched by that rule and don't
+     need the guard, but applying it here is a no-op for them. */
+  border-left-color: transparent !important;
   transition:
     background-color var(--motion-transition-fast, 120ms),
     border-color var(--motion-transition-fast, 120ms),
@@ -226,7 +207,12 @@
 
 .sidebar-nav-item--active {
   background: var(--cdl-sidebar-item-bg-active, var(--medical-accent-tint));
-  border-left-color: var(--cdl-sidebar-item-rail-active, var(--medical-accent));
+  /* !important: same app-wide button border-color collision as the base
+     rule above -- without it, the active *button* items (Copilot open,
+     Critical Alerts open) silently lose their accent-colored left rail to
+     the generic gray-blue tint, confirmed live via computed style on the
+     open alerts button. Link-based active items were already correct. */
+  border-left-color: var(--cdl-sidebar-item-rail-active, var(--medical-accent)) !important;
   color: var(--cdl-sidebar-item-fg-active, var(--medical-accent-hover));
   font-weight: 600;
 }
@@ -237,7 +223,11 @@
 
 .sidebar-nav-item--alerts.sidebar-nav-item--active {
   background: var(--semantic-critical-bg);
-  border-left-color: var(--semantic-critical);
+  /* !important: see .sidebar-nav-item--active above -- the alerts button is
+     the one item where this matters most (it's the critical-severity rail),
+     so it silently losing its red accent to a gray-blue tint was the most
+     visible instance of the collision, confirmed live. */
+  border-left-color: var(--semantic-critical) !important;
   color: var(--semantic-critical);
 }
 
@@ -365,6 +355,12 @@
   font-size: 11px;
   font-weight: 600;
   cursor: pointer;
+  /* !important: this is a native <button>, which collides with
+     visual-consistency.css's app-wide ":is(button, ...)" border-color reset
+     (targets every plain button regardless of classname) -- confirmed live
+     via computed style that it silently overrode this rest-state border to
+     the same generic gray-blue tint every time, at both rest and hover. */
+  border-color: color-mix(in srgb, var(--medical-border) 65%, transparent) !important;
 }
 
 .sidebar__collapse-toggle-label {
@@ -373,7 +369,10 @@
 
 .sidebar__collapse-toggle:hover {
   background: var(--medical-accent-tint, var(--medical-slate-100));
-  border-color: var(--medical-accent, var(--medical-border-strong));
+  /* !important: without it the intended accent-colored hover border never
+     actually rendered -- the app-wide button border-color collision above
+     wins on specificity, confirmed live (hover captured no visible change). */
+  border-color: var(--medical-accent, var(--medical-border-strong)) !important;
   color: var(--medical-ink);
 }
 
@@ -406,7 +405,6 @@
     align-items: center;
   }
 
-  .sidebar--collapsed .sidebar__footer .sidebar-desktop-nav__demo-switcher,
   .sidebar--collapsed .sidebar__footer .sidebar-chrome-controls {
     display: none;
   }

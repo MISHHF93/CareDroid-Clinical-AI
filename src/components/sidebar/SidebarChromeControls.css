@@ -34,6 +34,18 @@
   cursor: pointer;
   font: inherit;
   text-align: left;
+  /* !important x3: this class name contains "control", which collides with
+     visual-consistency.css's app-wide ":is(button, a)[class*='control']"
+     rule (forces centered content) plus its separate ":is(button, ...)"
+     border-color reset that targets every plain <button> outright --
+     confirmed live via computed style: justify-content/text-align both
+     came back "center" instead of this component's own left-alignment, and
+     the intended transparent border was a stray gray-blue tint instead.
+     Same root cause/fix pattern as Sidebar.css's collapse-toggle and
+     button-tag nav-item guards above. */
+  justify-content: flex-start !important;
+  text-align: left !important;
+  border-color: transparent !important;
   transition:
     background-color var(--motion-transition-fast, 120ms),
     border-color var(--motion-transition-fast, 120ms),
@@ -80,36 +92,6 @@
 }
 
 .sidebar-chrome-control--active .sidebar-chrome-control__label {
-  font-weight: 600;
-}
-
-/* Simulation toggle in sidebar rail */
-.sidebar-chrome-controls .simulation-mode-toggle--sidebar {
-  width: 100%;
-  min-height: 40px;
-  box-sizing: border-box;
-  justify-content: flex-start;
-  gap: 8px;
-  border: 1px solid transparent;
-  border-left: 3px solid transparent;
-  border-radius: var(--cdl-sidebar-item-radius, 6px);
-  background: transparent;
-  color: var(--medical-ink-muted);
-  font-size: 12.5px;
-  font-weight: 500;
-  padding: 5px 8px;
-  text-align: left;
-}
-
-.sidebar-chrome-controls .simulation-mode-toggle--sidebar:hover {
-  background: var(--medical-slate-100);
-  color: var(--medical-ink);
-}
-
-.sidebar-chrome-controls .simulation-mode-toggle--sidebar[aria-pressed='true'] {
-  border-left-color: var(--semantic-attention);
-  background: var(--semantic-attention-bg);
-  color: var(--semantic-attention);
   font-weight: 600;
 }
 
