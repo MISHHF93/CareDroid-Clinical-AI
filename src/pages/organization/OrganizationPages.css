@@ -1,8 +1,8 @@
 /* --muted/--muted-foreground/--card are a shadcn/ui-style naming convention
-   this codebase doesn't actually use (it uses cdl-v2's --cdl-surface-*/--cdl-
-   ink-* family) -- none of the three were ever defined, so every use always
-   fell back to its literal light-mode-only hex regardless of theme. Fixed to
-   the real, theme-aware --cdl-surface-muted/--cdl-ink-muted/--cdl-surface-card. */
+   this codebase doesn't actually use (it uses cdl-v2's --cdl-surface (wildcard)/
+   --cdl-ink (wildcard) family) -- none of the three were ever defined, so every
+   use always fell back to its literal light-mode-only hex regardless of theme.
+   Fixed to the real, theme-aware --cdl-surface-muted/--cdl-ink-muted/--cdl-surface-card. */
 .org-page {
   padding: 1.5rem;
   max-width: 1100px;

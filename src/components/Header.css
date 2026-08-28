@@ -143,8 +143,21 @@
 }
 
 .caredroid-header--pilot-metrics .caredroid-header__central-status {
-  flex: 0 1 auto;
-  max-width: min(36vw, 320px);
+  /* Found 2026-08-28 (live Playwright verification): each .cdl-kpi-capsule
+     child already refuses to shrink (flex:0 0 auto !important) and
+     ellipsizes its own label internally as a last-resort safety net, so
+     this rail was never meant to shrink its children -- but the 320px cap
+     below was smaller than the 3 capsules' real combined content width
+     (measured 393px for "2 Waiting" + "33 Green Capacity" + "Stale ·
+     Sync"), so instead of any single capsule gracefully ellipsizing, the
+     RAIL's own overflow:hidden hard-clipped the third capsule from the
+     outside -- visible live as "Stale" rendering as just "St". flex:0 0 auto
+     stops the rail itself from being asked to shrink below content (mirrors
+     the capsules' own protection); the max-width is bumped past the
+     measured real-world width with headroom, staying a safety net for a
+     pathological case rather than the normal 3-capsule case. */
+  flex: 0 0 auto;
+  max-width: min(40vw, 420px);
 }
 
 .caredroid-header__page-title {
@@ -215,6 +228,18 @@
   letter-spacing: 0.02em;
   padding: 6px 10px;
   white-space: nowrap;
+  /* Found 2026-08-28: no flex-shrink protection here (unlike the KpiCapsule
+     pills' flex:0 0 auto fix), so .caredroid-header__center's flex row
+     shrank this badge below its content width whenever the row got tight --
+     with white-space:nowrap and the parent's overflow:hidden, the excess
+     text was hard-clipped instead of eliding, showing e.g.
+     "Station: Controller..." as just "St". flex:0 0 auto stops routine
+     shrinking; the max-width + ellipsis is a safety net for a pathological
+     long role/profile label rather than the normal case. */
+  flex: 0 0 auto;
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .caredroid-header__central-status {

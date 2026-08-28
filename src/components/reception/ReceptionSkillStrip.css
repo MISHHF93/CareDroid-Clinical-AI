@@ -1,8 +1,9 @@
 /* --cdl-border-subtle/--cdl-text-primary/--cdl-text-secondary and the numbered
-   --cdl-danger-*/--cdl-warning-*/--cdl-info-* tokens below don't exist in the cdl-v2
-   design system (src/styles/cdl-v2/theme.css) -- it uses --cdl-border, --cdl-ink/
-   --cdl-ink-muted, and semantic-suffix tone families (critical/warning/info, not a
-   numbered "danger" scale). Same bug class already fixed in ReceptionJobProfileCard.css. */
+   --cdl-danger (wildcard)/--cdl-warning (wildcard)/--cdl-info (wildcard) tokens below
+   don't exist in the cdl-v2 design system (src/styles/cdl-v2/theme.css) -- it uses
+   --cdl-border, --cdl-ink/--cdl-ink-muted, and semantic-suffix tone families
+   (critical/warning/info, not a numbered "danger" scale). Same bug class already
+   fixed in ReceptionJobProfileCard.css. */
 .reception-skill-strip {
   display: flex;
   flex-wrap: wrap;

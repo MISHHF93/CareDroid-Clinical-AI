@@ -52,7 +52,7 @@
 /* HEAL-159: removed .reception-command-header and its __eyebrow/__meta/
    __metrics descendants, .reception-command-badge, .reception-command-help,
    and .reception-command-metric--critical -- zero live renders of any of
-   them anywhere in src/**/*.tsx. This was the OLD reception header, before
+   them anywhere in src's .tsx files. This was the OLD reception header, before
    ReceptionHeader.tsx + ReceptionWorkspace.new-header.css replaced it (the
    "new-header" filename is the tell). .reception-command-chip and
    .reception-command-chip--critical below are real (ReceptionOperationalRail.tsx,

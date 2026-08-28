@@ -11,10 +11,10 @@
   --alarm-critical-text: #991b1b;
 
   /* Reused verbatim from src/styles/cdl-v2/color.css's already-designed
-     --cdl-urgent-*/--cdl-ai-* tokens (HEAL-177 alarm-severity consolidation)
-     rather than inventing new colors -- keeps this file's palette visually
-     consistent with the canonical src/alarm/types.ts system it now agrees
-     with semantically. */
+     --cdl-urgent (wildcard)/--cdl-ai (wildcard) tokens (HEAL-177 alarm-severity
+     consolidation) rather than inventing new colors -- keeps this file's palette
+     visually consistent with the canonical src/alarm/types.ts system it now
+     agrees with semantically. */
   --alarm-urgent: #c2410c;
   --alarm-urgent-bg: color-mix(in srgb, #ea580c 12%, #ffffff);
   --alarm-urgent-border: color-mix(in srgb, #ea580c 50%, #e2e8f0);

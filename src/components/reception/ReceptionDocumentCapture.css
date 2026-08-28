@@ -1,8 +1,9 @@
 /* --cdl-border-subtle/--cdl-border-default/--cdl-text-primary/--cdl-text-secondary/
-   --cdl-text-tertiary/--cdl-danger-*/--cdl-success-*/--cdl-warning-500 don't exist in
-   the cdl-v2 design system -- real names are --cdl-border, --cdl-ink family, and the
-   semantic-suffix tone families (critical/warning/ok, no numbered scale). Same bug
-   class already fixed in the other Reception* components this session. */
+   --cdl-text-tertiary/--cdl-danger (wildcard)/--cdl-success (wildcard)/--cdl-warning-500
+   don't exist in the cdl-v2 design system -- real names are --cdl-border, --cdl-ink
+   family, and the semantic-suffix tone families (critical/warning/ok, no numbered
+   scale). Same bug class already fixed in the other Reception* components this
+   session. */
 .reception-document-capture {
   display: flex;
   flex-direction: column;
