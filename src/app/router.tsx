@@ -161,7 +161,21 @@ function AuthPathsRedirect() {
   // HEAL-207: see resolveEmergencyDefaultRedirectDestination's header --
   // same reception-first-bypasses-role-access bug as AppStartupRedirect/
   // EmergencyDefaultRedirect, just reached via a legacy /auth-style alias.
+  // HEAL: this component (and its two siblings below) used to compute and
+  // <Navigate> to an in-app destination unconditionally, with no auth check
+  // at all -- RequireRealSession only gets a chance to redirect an
+  // unauthenticated visitor to /login AFTER first landing here and being
+  // routed INTO the app shell. Confirmed live: a completely fresh page load
+  // visibly flashes into /emergency/reception (full sidebar/header chrome
+  // rendered) before bouncing back to /login a moment later, reproducible on
+  // every load, not just under slow-network conditions -- deciding "is this
+  // visitor even authenticated" here first, before computing a role-based
+  // in-app destination that's about to be discarded anyway, removes the
+  // flash while leaving RequireRealSession's actual gating decision
+  // unchanged (same shared check, same outcome, just evaluated earlier).
+  const authGate = useUnauthenticatedRedirectGate();
   const emergencyRole = useEmergencyRolePermissions();
+  if (authGate) return <>{authGate}</>;
   const destination = resolveEmergencyDefaultRedirectDestination({
     receptionFirstDestination: resolveAppStartupRoute(),
     // canonicalAccess.ts's canAccessRoute() is deliberately broader (it also
@@ -182,6 +196,7 @@ function AuthPathsRedirect() {
 }
 
 function AppStartupRedirect() {
+  const authGate = useUnauthenticatedRedirectGate();
   const { saasProfile } = useUserIdentity();
   const emergencyRole = useEmergencyRolePermissions();
   // HEAL-207: this is the actual `/` route handler (not EmergencyDefaultRedirect,
@@ -189,6 +204,14 @@ function AppStartupRedirect() {
   // catch-all) -- it previously called resolveAppStartupRoute() with no
   // role-awareness at all, so RECEPTION_FIRST_UX's unconditional Reception
   // default reached every role unfiltered on the app's actual front door.
+  // HEAL: this is also the app's actual front door for a brand-new visitor
+  // -- it used to navigate into an in-app destination unconditionally, with
+  // no auth check, so RequireRealSession only got a chance to bounce an
+  // unauthenticated visitor to /login AFTER already landing inside the app
+  // shell. See useUnauthenticatedRedirectGate's own comment for the full
+  // writeup (confirmed live: this was the dominant cause of the "flashes
+  // into the app then bounces back to /login" symptom on every fresh load).
+  if (authGate) return <>{authGate}</>;
   const destination = resolveEmergencyDefaultRedirectDestination({
     receptionFirstDestination: resolveAppStartupRoute({
       saasRole: saasProfile?.role || saasProfile?.saasRole,
@@ -253,8 +276,14 @@ export function resolveEmergencyDefaultRedirectDestination({
 }
 
 function EmergencyDefaultRedirect() {
+  const authGate = useUnauthenticatedRedirectGate();
   const { saasProfile } = useUserIdentity();
   const emergencyRole = useEmergencyRolePermissions();
+  // HEAL: see useUnauthenticatedRedirectGate's own comment -- this handler
+  // (/emergency, /dashboard, /home, /app, /mobile, and the catch-all) had
+  // the identical unconditional-in-app-navigation issue as
+  // AppStartupRedirect ('/') and AuthPathsRedirect.
+  if (authGate) return <>{authGate}</>;
 
   const receptionFirstDestination = resolveAppStartupRoute({
     saasRole: saasProfile?.role || saasProfile?.saasRole,
@@ -641,17 +670,23 @@ function AdminSectionBoundary() {
  * whether they ever clicked the bypass button -- confirmed live, caught
  * before commit. 'explicit-dev-bypass' is a marker AuthPage.tsx's button
  * handler stamps itself, which the ambient bootstrap never sets. */
-function RequireRealSession({ children }: { children: ReactNode }) {
+function useUnauthenticatedRedirectGate(): ReactNode | null {
   const location = useLocation();
   const { authMode, isLoading } = useUser();
 
-  if (!requireRealAuthGate) return <>{children}</>;
+  if (!requireRealAuthGate) return null;
   if (isLoading) return <RouteLoadingFallback label="Loading CareDroid..." />;
   const isDevBypassSession = isDev && authMode === 'explicit-dev-bypass';
   if (authMode !== 'real' && !isDevBypassSession) {
     const returnUrl = `${location.pathname}${location.search}`;
     return <Navigate to={buildAuthUrl({ returnUrl })} replace />;
   }
+  return null;
+}
+
+function RequireRealSession({ children }: { children: ReactNode }) {
+  const gate = useUnauthenticatedRedirectGate();
+  if (gate) return <>{gate}</>;
   return <>{children}</>;
 }
 

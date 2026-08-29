@@ -342,7 +342,7 @@ export type EmergencyDashboardRefreshResult = {
   errors: Record<string, string>;
 };
 
-export type EmergencyRefreshScope = 'full' | 'reception';
+export type EmergencyRefreshScope = 'full' | 'reception' | 'full-supplemental';
 
 export type EmergencyRefreshOptions = {
   scope?: EmergencyRefreshScope;
@@ -372,21 +372,41 @@ const FULL_REFRESH_DATASETS = Object.freeze([
   { key: 'queues', label: 'queues', fetcher: fetchEmergencyQueues },
 ] as const);
 
+// AppShell mounts reception with an awaited scope:'reception' call, then
+// immediately fires a background scope:'full' top-up -- but FULL_REFRESH_DATASETS
+// already includes every RECEPTION_REFRESH_DATASETS entry, so whiteboard/
+// receptionSnapshot were being fetched twice, overlapping in time, on every
+// single mount. Each duplicate pair raced its own local give-up timer against
+// the real (longer) AbortController timeout underneath, and the UI's "give
+// up" bookkeeping finishing early while the real duplicated requests kept
+// running toward their own later abort was the dominant contributor to the
+// ~12-13s reception-landing stall (confirmed live). This scope only carries
+// what scope:'reception' doesn't already cover.
+const SUPPLEMENTAL_REFRESH_DATASETS = Object.freeze(
+  FULL_REFRESH_DATASETS.filter(
+    (dataset) => !RECEPTION_REFRESH_DATASETS.some((reception) => reception.key === dataset.key),
+  ),
+);
+
+// Was: raced fetcher() against a local setTimeout that, on "winning" (i.e.
+// losing -- it fires because the real call is slow), did NOT cancel the
+// underlying apiFetch -- that request kept running toward its own separate,
+// longer AbortController deadline (apiEnv.ts's DEFAULT_API_TIMEOUT_MS) in
+// the background regardless. The UI's own bookkeeping (this function
+// returning `{error}`, unblocking the store's loading flag) finished early
+// while real, still-in-flight network requests kept running -- confirmed
+// live to be the dominant contributor to the ~12-13s reception-landing
+// stall (the give-up race, 2.5-4s, vs. the real abort, 5-8s, working
+// against each other rather than together). Passing timeoutMs into the
+// fetcher instead drives the SAME real AbortController via apiFetch's own
+// mergeAbortSignals -- one deadline, not two racing ones.
 const loadDatasetWithTimeout = async (
   label: string,
-  fetcher: () => Promise<unknown>,
+  fetcher: (options: { timeoutMs?: number }) => Promise<unknown>,
   timeoutMs: number,
 ): Promise<{ data?: unknown; error?: string }> => {
   try {
-    const data = await Promise.race([
-      fetcher(),
-      new Promise<never>((_, reject) => {
-        window.setTimeout(
-          () => reject(new Error(`CareDroid ${label} timed out after ${timeoutMs}ms`)),
-          timeoutMs,
-        );
-      }),
-    ]);
+    const data = await fetcher({ timeoutMs });
     return { data };
   } catch (error: unknown) {
     return {
@@ -4202,7 +4222,11 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
       }
 
       const datasetDefs =
-        scope === 'reception' ? RECEPTION_REFRESH_DATASETS : FULL_REFRESH_DATASETS;
+        scope === 'reception'
+          ? RECEPTION_REFRESH_DATASETS
+          : scope === 'full-supplemental'
+            ? SUPPLEMENTAL_REFRESH_DATASETS
+            : FULL_REFRESH_DATASETS;
       const timeoutMs =
         scope === 'reception' ? RECEPTION_DATASET_TIMEOUT_MS : REFRESH_DATASET_TIMEOUT_MS;
 

@@ -550,8 +550,16 @@ function AppShellFrame({ children }: AppShellProps) {
       console.error('[AppShell] observabilityService initialization failed:', error);
     });
     void (async () => {
-      await ensureDevBackendSession();
-      const backendReachable = await probeBackendReachability();
+      const session = await ensureDevBackendSession();
+      // A successful ensureDevBackendSession() already proves the backend is
+      // reachable (either a real response just landed, or an already-cached
+      // JWT was reused) -- re-probing /health here was pure sequential
+      // latency added on top of a fact we already know, confirmed live to
+      // add up to ~1.2s to the reception page's pre-data-load chain.
+      const backendReachable =
+        session?.source === 'dev-session' || session?.source === 'cached-jwt'
+          ? true
+          : await probeBackendReachability();
       // Was `||`: since RECEPTION_FIRST_UX.enabled is a hardcoded `true`
       // constant (never toggled), that made receptionStartup unconditionally
       // true on EVERY route, so EVERY page load fired the reception-scoped
@@ -568,7 +576,12 @@ function AppShellFrame({ children }: AppShellProps) {
       if (backendReachable) {
         if (receptionStartup) {
           await useEmergencyStore.getState().initializeFromBackend({ scope: 'reception' });
-          void useEmergencyStore.getState().initializeFromBackend({ scope: 'full', silent: true });
+          // 'full-supplemental' (not 'full'): scope:'reception' just fetched
+          // whiteboard + receptionSnapshot already -- see
+          // SUPPLEMENTAL_REFRESH_DATASETS's own comment in emergencyStore.ts.
+          void useEmergencyStore
+            .getState()
+            .initializeFromBackend({ scope: 'full-supplemental', silent: true });
         } else {
           await useEmergencyStore.getState().initializeFromBackend();
         }

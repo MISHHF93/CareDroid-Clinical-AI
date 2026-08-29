@@ -287,7 +287,16 @@ describe('AppShell R12 startup wiring', () => {
 
     await waitFor(() => expect(initializeFromBackend).toHaveBeenCalledTimes(2));
     expect(initializeFromBackend).toHaveBeenNthCalledWith(1, { scope: 'reception' });
-    expect(initializeFromBackend).toHaveBeenNthCalledWith(2, { scope: 'full', silent: true });
+    // 'full-supplemental', not 'full' -- the reception-scope call above
+    // already fetched whiteboard + receptionSnapshot; re-requesting them a
+    // second time here (scope:'full' includes every reception dataset) was
+    // confirmed live to be the dominant contributor to a ~12-13s
+    // reception-landing stall. See SUPPLEMENTAL_REFRESH_DATASETS's comment
+    // in emergencyStore.ts.
+    expect(initializeFromBackend).toHaveBeenNthCalledWith(2, {
+      scope: 'full-supplemental',
+      silent: true,
+    });
   });
 });
 

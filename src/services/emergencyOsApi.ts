@@ -183,8 +183,8 @@ async function requestEmergencyJson(path, options: any = {}) {
   }
 }
 
-export const fetchEmergencyWhiteboard = () =>
-  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.whiteboard);
+export const fetchEmergencyWhiteboard = ({ timeoutMs }: { timeoutMs?: number } = {}) =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.whiteboard, { timeoutMs });
 /** Aggregate-only, no-identifier feed for the public waiting-room kiosk
  * (Permission.VIEW_PUBLIC_DISPLAY, not READ_PHI) -- see
  * WhiteboardDisplayRoute.tsx and backend emergency-os.controller.ts. */
@@ -329,8 +329,8 @@ export const postWaitingRoomEscalationNotify = (payload: {
     method: 'POST',
     body: JSON.stringify(payload),
   });
-export const fetchReceptionSnapshot = () =>
-  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.receptionSnapshot);
+export const fetchReceptionSnapshot = ({ timeoutMs }: { timeoutMs?: number } = {}) =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.receptionSnapshot, { timeoutMs });
 export const postReceptionHandoff = (payload) =>
   requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.receptionHandoff, {
     method: 'POST',
@@ -353,9 +353,10 @@ export const fetchPatientOrchestration = (patientId, role = 'physician') => {
   );
 };
 export const fetchSmartIntake = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.intake);
-export const fetchEmergencyQueues = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.queues);
-export const fetchReassessmentQueue = () =>
-  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.reassessment);
+export const fetchEmergencyQueues = ({ timeoutMs }: { timeoutMs?: number } = {}) =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.queues, { timeoutMs });
+export const fetchReassessmentQueue = ({ timeoutMs }: { timeoutMs?: number } = {}) =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.reassessment, { timeoutMs });
 export const fetchPatientFlow = (patientId?: string) =>
   requestEmergencyJson(
     patientId
@@ -370,8 +371,10 @@ export const reviewWorkflowAutomation = (payload: Record<string, unknown>) =>
     body: JSON.stringify(payload),
   });
 export const fetchCapacityStatus = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.capacity);
-export const fetchBoardingStatus = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.boarding);
-export const fetchReferrals = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.referrals);
+export const fetchBoardingStatus = ({ timeoutMs }: { timeoutMs?: number } = {}) =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.boarding, { timeoutMs });
+export const fetchReferrals = ({ timeoutMs }: { timeoutMs?: number } = {}) =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.referrals, { timeoutMs });
 export const fetchProvincialHealth = () =>
   requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.provincialHealth);
 export const fetchIntegrationHub = () =>
@@ -422,8 +425,8 @@ export function persistCopilotInteractionSafely(payload: any = {}) {
     });
   });
 }
-export const fetchEmergencyWorkflowLogs = () =>
-  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.workflowLogs);
+export const fetchEmergencyWorkflowLogs = ({ timeoutMs }: { timeoutMs?: number } = {}) =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.workflowLogs, { timeoutMs });
 export const fetchPatientWorkflowLogs = (patientId) =>
   requestEmergencyJson(
     `${EMERGENCY_OS_API_ENDPOINTS.patientWorkflowLogs}/${encodeURIComponent(patientId)}/workflow-logs`,

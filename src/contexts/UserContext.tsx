@@ -34,6 +34,31 @@ const OPEN_ACCESS_TOKEN = appConfig.dev.bearerToken || 'dev-bypass-token';
 
 const OPEN_ACCESS_USER = buildOpenAccessDemoUser();
 
+// HEAL: bootstrapSession() below only ever runs `if (import.meta.env.DEV)`,
+// so every fallback it reaches for is inherently a dev-only outcome -- but
+// its fallback chains used to bottom out at OPEN_ACCESS_USER
+// (authMode:'open-access'), which RequireRealSession (router.tsx) treats as
+// "definitely not authenticated" and bounces to /login. That's the wrong
+// read of "we couldn't confirm a session in time" for a code path whose sole
+// purpose is frictionless dev/demo access -- a slow-but-live backend isn't
+// evidence the visitor needs to log in for real. Same identity as
+// OPEN_ACCESS_USER, but tagged the way a normal successful dev-session
+// already is (persistDevSession()'s own authMode stamp), so
+// RequireRealSession accepts it instead of bouncing.
+const DEV_BOOTSTRAP_FALLBACK_USER = { ...OPEN_ACCESS_USER, authMode: 'local-dev-demo' };
+
+// A plain `readStoredUser() || userRef.current || DEV_BOOTSTRAP_FALLBACK_USER`
+// chain never actually reaches the new fallback in practice: userRef.current
+// is itself seeded from `readStoredUser() || OPEN_ACCESS_USER` at mount, so
+// on a fresh session it's already a truthy, open-access-tagged object that
+// short-circuits the `||` chain before DEV_BOOTSTRAP_FALLBACK_USER is ever
+// reached -- confirmed to be exactly the common-case path that reproduced
+// the /login bounce. Relabel any resolved candidate whose authMode is
+// 'open-access' (rather than only substituting when the whole chain is
+// falsy) so this actually covers the case it was written for.
+const resolveDevBootstrapFallbackUser = (candidate: any) =>
+  candidate && candidate.authMode !== 'open-access' ? candidate : DEV_BOOTSTRAP_FALLBACK_USER;
+
 const canUseStorage = () => typeof localStorage !== 'undefined';
 
 const readStoredUser = () => {
@@ -199,7 +224,7 @@ export const UserProvider = ({ children }) => {
       // effect's own possibly-stale fallback overwriting it.
       const storedToken = resolveSessionToken();
       if (looksLikeJwt(storedToken)) {
-        const latestStoredUser = readStoredUser() || userRef.current || OPEN_ACCESS_USER;
+        const latestStoredUser = resolveDevBootstrapFallbackUser(readStoredUser() || userRef.current);
         setAuthTokenState(storedToken);
         setUserState(latestStoredUser);
         setIsLoading(false);
@@ -207,7 +232,7 @@ export const UserProvider = ({ children }) => {
       }
 
       const nextToken = resolveSessionToken(session?.token);
-      const storedUser = readStoredUser() || userRef.current || OPEN_ACCESS_USER;
+      const storedUser = resolveDevBootstrapFallbackUser(readStoredUser() || userRef.current);
       setAuthTokenState(nextToken);
       setUserState(storedUser);
       persistSession(storedUser, nextToken);

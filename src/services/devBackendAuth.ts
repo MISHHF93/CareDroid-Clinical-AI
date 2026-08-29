@@ -1,7 +1,7 @@
 import appConfig from '../config/appConfig';
 import { AUTH_CONFIG } from '../config/auth.config';
 import { API_ROUTES } from '../config/api.config';
-import { BACKEND_PROBE_TIMEOUT_MS, DEV_SESSION_FETCH_TIMEOUT_MS } from '../config/startupTimeouts';
+import { DEV_SESSION_FETCH_TIMEOUT_MS } from '../config/startupTimeouts';
 import { setTenantContext } from './tenantContextStore';
 import { isJwtExpired } from '../utils/jwt';
 import { isDemoPersonaUser } from '../config/demoPersonaModel';
@@ -186,10 +186,23 @@ async function resolveDevBackendSession({
 
   // When local demo auth is allowed and no backend API URL is configured,
   // skip the network request — it will fail with ECONNREFUSED since there's no backend.
+  // HEAL: this probe used to hardcode BACKEND_PROBE_TIMEOUT_MS (1200ms) --
+  // tuned for apiClient.ts's snappier per-call UX tradeoff, not for "is
+  // there a backend at all" here. A merely slow-to-answer-/health-in-time
+  // (but genuinely live) backend produced a false "unreachable" verdict,
+  // which the unforced (ambient bootstrap) caller then turned into a
+  // BYPASS_TOKEN/'local-demo-bypass' result WITHOUT ever attempting the
+  // real session POST -- confirmed live to be the dominant cause of
+  // UserContext.tsx's ambient bootstrap effect landing on
+  // authMode:'open-access' and RequireRealSession bouncing to /login on
+  // ordinary page loads. Give the probe the same patience already budgeted
+  // for the real fetch it's gating, via this function's own timeoutMs
+  // (defaults to DEV_SESSION_FETCH_TIMEOUT_MS), instead of the tighter
+  // shared constant.
   try {
     const { ensureBackendReachabilityProbed } = await import('./backendReachability');
     const backendReachable = await ensureBackendReachabilityProbed({
-      timeoutMs: BACKEND_PROBE_TIMEOUT_MS,
+      timeoutMs,
     });
     if (!backendReachable && !force) {
       return { token: existingToken || BYPASS_TOKEN, source: 'local-demo-bypass' };
