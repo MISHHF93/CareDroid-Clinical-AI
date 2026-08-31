@@ -42,14 +42,27 @@ describe('displayAutoRefreshModel', () => {
     ).toBe(60000);
   });
 
-  it('summarizes partial refresh failures', () => {
+  it('summarizes partial refresh failures as a generic, patient-safe message', () => {
+    // Wall/kiosk displays are ambient and often patient-facing (public
+    // waiting room, ops hallway board) -- the raw per-endpoint backend
+    // error ("patients: timeout") must never reach that surface verbatim,
+    // so this summary is intentionally generic regardless of which
+    // endpoint failed or why.
     expect(
       summarizeDisplayRefreshErrors({
         errors: { patients: 'timeout', capacity: null },
       } as never),
-    ).toBe('patients: timeout');
+    ).toBe('Some information may be temporarily unavailable.');
 
-    expect(summarizeDisplayRefreshErrors(null, new Error('network down'))).toBe('network down');
+    expect(summarizeDisplayRefreshErrors(null, new Error('network down'))).toBe(
+      'Some information may be temporarily unavailable.',
+    );
+
+    expect(
+      summarizeDisplayRefreshErrors({
+        errors: { patients: null, capacity: null },
+      } as never),
+    ).toBeNull();
   });
 
   it('marks stale and error refresh states without hiding cached content', () => {

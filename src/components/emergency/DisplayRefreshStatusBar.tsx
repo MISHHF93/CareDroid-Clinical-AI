@@ -37,9 +37,7 @@ export default function DisplayRefreshStatusBar({
       <span>Auto-refresh every {intervalSeconds}s</span>
       {refreshStatus.showStaleBanner ? (
         <span className="display-refresh-status__warning" role="status">
-          {refreshStatus.errorMessage
-            ? `Sync issue — ${refreshStatus.errorMessage}`
-            : 'Data may be stale — retrying automatically'}
+          {refreshStatus.errorMessage || 'Data may be stale — retrying automatically'}
         </span>
       ) : null}
     </div>

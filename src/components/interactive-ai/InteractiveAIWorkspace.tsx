@@ -54,6 +54,37 @@ import { useSecurityAccess } from '../../hooks/useSecurityAccess';
 import { Permission } from '../../config/backendPermissionCatalog';
 import './interactiveAi.css';
 
+const CHANNEL_LABELS: Record<string, string> = {
+  reception: 'Reception',
+  ems: 'EMS',
+  triage: 'Triage',
+  whiteboard: 'Whiteboard',
+  physician: 'Physician',
+  'command-center': 'Command Center',
+};
+
+const ACRONYM_WORDS = new Set(['ems', 'ai', 'ed']);
+
+/**
+ * Context chips previously rendered raw internal identifiers verbatim
+ * (e.g. "Role: ems_user", "Channel: ems") straight from backend/route enums
+ * -- confirmed live on the EMS handoff copilot, a staff-facing surface, not
+ * a debug tool. Humanize snake_case/kebab-case tokens and special-case
+ * known acronyms rather than leaking the raw enum value.
+ */
+function humanizeContextToken(value: string): string {
+  if (CHANNEL_LABELS[value]) return CHANNEL_LABELS[value];
+  const words = value.split(/[-_]/).filter(Boolean);
+  if (!words.length) return value;
+  return words
+    .map((word) =>
+      ACRONYM_WORDS.has(word.toLowerCase())
+        ? word.toUpperCase()
+        : word.charAt(0).toUpperCase() + word.slice(1),
+    )
+    .join(' ');
+}
+
 export type InteractiveAIWorkspaceProps = {
   role: string;
   organizationId?: string;
@@ -389,8 +420,8 @@ export function InteractiveAIWorkspace({
 
   const contextChips = useMemo(() => {
     const chips: Array<{ id: string; label: string; kind: string }> = [];
-    chips.push({ id: 'channel', label: `Channel: ${channel}`, kind: 'scope' });
-    chips.push({ id: 'role', label: `Role: ${role}`, kind: 'scope' });
+    chips.push({ id: 'channel', label: `Channel: ${humanizeContextToken(channel)}`, kind: 'scope' });
+    chips.push({ id: 'role', label: `Role: ${humanizeContextToken(role)}`, kind: 'scope' });
     if (patientId) chips.push({ id: 'patient', label: `Patient: ${patientId}`, kind: 'patient' });
     return chips;
   }, [channel, role, patientId]);
@@ -485,10 +516,9 @@ export function InteractiveAIWorkspace({
               {card.summary}
             </p>
             <div className="cd-iaw-card__meta">
-              <span>{card.source}</span>
-              <span>{card.urgency}</span>
+              <span>{humanizeContextToken(card.urgency)}</span>
               <span>{new Date(card.timestamp).toLocaleTimeString()}</span>
-              {card.ownerRole ? <span>Owner: {card.ownerRole}</span> : null}
+              {card.ownerRole ? <span>Owner: {humanizeContextToken(card.ownerRole)}</span> : null}
             </div>
             <div className="cd-iaw-card__actions">
               {card.recommendedActions.map((action) => (

@@ -56,18 +56,27 @@ export function resolveDisplayRefreshIntervalMs(
   return Math.max(DISPLAY_AUTO_REFRESH_MIN_MS, candidate);
 }
 
+/**
+ * Wall/kiosk displays are ambient and often patient-facing (public waiting
+ * room, ops hallway board) -- the underlying per-endpoint backend errors
+ * (raw messages like "You do not have permission to access this resource",
+ * keyed by internal field names like receptionSnapshot/workflowLogs) must
+ * never reach that surface verbatim. Callers that need the raw detail for
+ * staff-facing debugging should read `result.errors` / the caught error
+ * directly rather than this summary.
+ */
+const DISPLAY_REFRESH_GENERIC_ERROR_MESSAGE = 'Some information may be temporarily unavailable.';
+
 export function summarizeDisplayRefreshErrors(
   result?: EmergencyDashboardRefreshResult | null,
   caughtError?: unknown,
 ): string | null {
   if (caughtError) {
-    return caughtError instanceof Error ? caughtError.message : 'Unable to refresh display data.';
+    return DISPLAY_REFRESH_GENERIC_ERROR_MESSAGE;
   }
   if (!result?.errors) return null;
-  const messages = Object.entries(result.errors)
-    .map(([key, message]) => (message ? `${key}: ${message}` : null))
-    .filter((entry): entry is string => Boolean(entry));
-  return messages.length ? messages.join(' · ') : null;
+  const hasFailure = Object.values(result.errors).some((message) => Boolean(message));
+  return hasFailure ? DISPLAY_REFRESH_GENERIC_ERROR_MESSAGE : null;
 }
 
 export function formatDisplayUpdatedAt(

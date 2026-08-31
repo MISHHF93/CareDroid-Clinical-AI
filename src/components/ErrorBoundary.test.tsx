@@ -30,7 +30,7 @@ describe('ErrorBoundary', () => {
         <Bomb />
       </ErrorBoundary>,
     );
-    expect(screen.getByText('Something went wrong')).toBeInTheDocument();
+    expect(screen.getByText('CareDroid hit a snag')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Reload Application' })).toBeInTheDocument();
   });
 

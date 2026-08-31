@@ -6,33 +6,39 @@
 
 .eb-fallback-text {
   padding: 16px;
-  color: #b91c1c;
+  color: var(--app-fg, #102a43);
+  border-left: 3px solid var(--status-critical, #ef4444);
+  background: color-mix(in srgb, var(--status-critical, #ef4444) 6%, var(--app-surface-1, #fff));
+  border-radius: var(--cdl-radius-md, 10px);
 }
 
 .eb-fallback-msg {
   margin: 0 0 12px;
+  color: var(--app-fg, #102a43);
 }
 
 .eb-details {
   margin-bottom: 12px;
   text-align: left;
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: var(--app-surface-muted, #eef4f7);
   padding: 10px;
-  border-radius: 5px;
-  color: var(--text-color, #e5e7eb);
+  border-radius: var(--cdl-radius-md, 5px);
+  color: var(--app-fg, #102a43);
 }
 
 .eb-details--full-page {
   margin-bottom: 20px;
   text-align: left;
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: var(--app-surface-muted, #eef4f7);
   padding: 10px;
-  border-radius: 5px;
+  border-radius: var(--cdl-radius-md, 5px);
+  color: var(--app-fg, #102a43);
 }
 
 .eb-details-summary {
   cursor: pointer;
   margin-bottom: 10px;
+  color: var(--app-fg-muted, #627d98);
 }
 
 .eb-error-pre {
@@ -52,33 +58,60 @@
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background-color: var(--navy-bg);
-  color: var(--text-color);
+  background-color: var(--app-surface-muted, #eef4f7);
+  color: var(--app-fg, #102a43);
   padding: 20px;
 }
 
 .eb-page-content {
-  max-width: 600px;
+  max-width: 460px;
+  width: 100%;
   text-align: center;
+  background: var(--app-surface-0, #fff);
+  border: 1px solid var(--app-border-subtle, #e2e8f0);
+  border-radius: var(--cdl-radius-lg, 14px);
+  box-shadow: var(--cdl-elev-2, 0 2px 6px rgba(15, 23, 42, 0.06));
+  padding: 40px 36px 32px;
+}
+
+.eb-page-brand {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin: 0 auto 20px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--app-accent, #075985) 14%, var(--app-surface-0, #fff));
+  color: var(--app-accent, #075985);
 }
 
 .eb-page-title {
-  color: #ff0000;
-  margin-bottom: 20px;
+  color: var(--app-fg, #102a43);
+  font-size: 19px;
+  font-weight: 650;
+  margin: 0 0 8px;
 }
 
 .eb-page-desc {
-  margin-bottom: 20px;
-  font-size: 16px;
+  margin: 0 0 24px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--app-fg-muted, #627d98);
 }
 
 .eb-reload-btn {
-  background-color: #00ff88;
-  color: var(--navy-ink);
+  background-color: var(--app-accent, #075985);
+  color: var(--app-surface-0, #fff);
   border: none;
-  padding: 15px 30px;
-  font-size: 16px;
-  border-radius: 5px;
+  padding: 11px 24px;
+  font-size: 14px;
+  border-radius: var(--cdl-radius-md, 10px);
   cursor: pointer;
-  font-weight: bold;
+  font-weight: 600;
+  box-shadow: var(--cdl-elev-1, 0 1px 2px rgba(15, 23, 42, 0.05));
+}
+
+.eb-reload-btn:hover {
+  background-color: color-mix(in srgb, var(--app-accent, #075985) 88%, black);
 }

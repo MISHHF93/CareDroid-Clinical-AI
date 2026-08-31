@@ -90,13 +90,13 @@ describe('InteractiveAIWorkspace', () => {
     expect(screen.getByRole('heading', { name: /caredroid assist/i })).toBeInTheDocument();
   });
 
-  it('renders context chips for the channel, role, and an attached patient', () => {
+  it('renders context chips for the channel, role, and an attached patient, humanized rather than raw enum values', () => {
     renderWorkspace(
       <InteractiveAIWorkspace role="charge-nurse" channel="ems" patientId="patient-42" />,
     );
     const contextBar = screen.getByTestId('interactive-context-bar');
-    expect(contextBar).toHaveTextContent('Channel: ems');
-    expect(contextBar).toHaveTextContent('Role: charge-nurse');
+    expect(contextBar).toHaveTextContent('Channel: EMS');
+    expect(contextBar).toHaveTextContent('Role: Charge Nurse');
     expect(contextBar).toHaveTextContent('Patient: patient-42');
   });
 

@@ -112,9 +112,21 @@ class ErrorBoundary extends Component<any, any> {
       return (
         <div className="eb-page">
           <div className="eb-page-content">
-            <h1 className="eb-page-title">Something went wrong</h1>
+            <span className="eb-page-brand" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M3 12h4l2-6 4 12 2-6h6"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </span>
+            <h1 className="eb-page-title">CareDroid hit a snag</h1>
             <p className="eb-page-desc">
-              The application encountered an unexpected error. This has been automatically reported.
+              This screen ran into an unexpected error and has been automatically reported. Your other
+              work in CareDroid is unaffected — reloading usually resolves it.
             </p>
             {showErrorDetails && this.state.error && (
               <details className="eb-details--full-page">
