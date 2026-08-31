@@ -22,28 +22,36 @@ describe('canonical route tree — intake, capacity, queues', () => {
   it('/emergency/capacity renders capacity, rooms, boarding, and discharge pipeline from store', async () => {
     renderRoute('/emergency/capacity');
 
-    // The shell chrome route-tab and the page's own (visually-hidden) accessibility
-    // heading both render "Flow & Capacity" — scope to <main> for the page's heading.
+    // There is now exactly ONE "Flow & Capacity" heading -- the shell chrome
+    // route-tab's -- so this queries document-wide. It previously had to scope
+    // to <main> to disambiguate a duplicate visually-hidden copy the page also
+    // rendered; that duplicate was removed (two elements with the same heading
+    // role and name is what a screen reader announces twice).
     // The lazy-loaded route module + hook chain here can take longer than the
     // default findByRole timeout to resolve, so use the shared ROUTE_LOAD_TIMEOUT.
     const main = await screen.findByRole('main', {}, { timeout: ROUTE_LOAD_TIMEOUT });
     expect(
-      await within(main).findByRole('heading', { name: 'Flow & Capacity' }, { timeout: ROUTE_LOAD_TIMEOUT }),
+      await screen.findByRole('heading', { name: 'Flow & Capacity' }, { timeout: ROUTE_LOAD_TIMEOUT }),
     ).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: 'Capacity' })).toHaveAttribute('aria-selected', 'true');
+    // The shell heading now resolves as soon as the chrome registers, which is
+    // EARLIER than the lazy page body -- so wait on a page-owned element too,
+    // a job the old within(main) heading query was quietly doing.
+    expect(
+      await screen.findByRole('tab', { name: 'Capacity' }, { timeout: ROUTE_LOAD_TIMEOUT }),
+    ).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByRole('tablist', { name: 'Flow and capacity views' })).toBeInTheDocument();
   });
 
   it('/emergency/queues renders queue intelligence from store state', async () => {
     renderRoute('/emergency/queues');
 
-    // Same dual-heading + slow-lazy-load situation as the capacity test above:
-    // the shell chrome route-tab catches up to the page's own registered title
-    // ("Department Queues") once its effect fires, so scope to <main> and use
-    // the shared ROUTE_LOAD_TIMEOUT rather than the default findByRole timeout.
+    // Same single-heading + slow-lazy-load situation as the capacity test
+    // above: one shell-rendered "Department Queues" heading, queried
+    // document-wide, with the shared ROUTE_LOAD_TIMEOUT rather than the
+    // default findByRole timeout.
     const main = await screen.findByRole('main', {}, { timeout: ROUTE_LOAD_TIMEOUT });
     expect(
-      await within(main).findByRole('heading', { name: 'Department Queues' }, { timeout: ROUTE_LOAD_TIMEOUT }),
+      await screen.findByRole('heading', { name: 'Department Queues' }, { timeout: ROUTE_LOAD_TIMEOUT }),
     ).toBeInTheDocument();
     expect(screen.getAllByText('Waiting').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Triage').length).toBeGreaterThan(0);

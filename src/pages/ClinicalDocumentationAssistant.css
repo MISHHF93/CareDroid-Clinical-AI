@@ -20,7 +20,8 @@
   padding: 18px;
 }
 
-.documentation-assistant-hero h1,
+/* Section hero, not page identity -- see ClinicalCalculatorHub.css. */
+.documentation-assistant-hero h2,
 .documentation-assistant-hero p,
 .documentation-assistant-panel h2,
 .documentation-assistant-panel p,

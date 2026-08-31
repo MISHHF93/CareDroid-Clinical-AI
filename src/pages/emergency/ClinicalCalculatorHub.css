@@ -37,7 +37,9 @@
   text-transform: uppercase;
 }
 
-.clinical-calculator-hub__header h1,
+/* Section hero, not page identity -- the page's single <h1> is the shell
+   chrome route-tab's. Kept as h2 so there is one heading per role/name. */
+.clinical-calculator-hub__header h2,
 .clinical-calculator-shell__header h2 {
   margin: 4px 0;
   color: var(--app-text-primary);

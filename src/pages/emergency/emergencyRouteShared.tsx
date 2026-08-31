@@ -190,13 +190,42 @@ export function EmergencyRoutePage({
     [description, headerActions, showDescription, title],
   );
 
-  useRouteChromeRegistration(routeChrome);
+  // HEAL-185 applied to the emergency route shell too. This component
+  // registers its title with the shell's RouteChrome slot (ShellRouteTab
+  // renders the page's one REAL, visible <h1>) and ALSO passed `title` to
+  // PageShell, whose suppressHeader branch renders a visually-hidden <h1>
+  // with the same text -- leaving two elements in the accessibility tree
+  // with an identical heading role and name. Confirmed live across 16
+  // emergency routes (queues, ems, patients, alerts, boarding, capacity,
+  // reassessment, referrals, handoffs, diagnostics, ed-readiness, dispatch,
+  // journey, reports, ...): a screen reader announced every page title twice
+  // when navigating by headings. CareDroidPage already guarded against
+  // exactly this; this shell never got the same treatment.
+  //
+  // Withhold the title from PageShell ONLY when registration actually
+  // succeeded, mirroring CareDroidPage: outside a RouteChromeProvider (unit
+  // harnesses) the hook no-ops, and dropping the title unconditionally would
+  // leave those pages with no <h1> at all.
+  // Withholding the title alone is not enough, and CareDroidPage already
+  // learned why: registration "succeeding" only means a provider was present,
+  // not that anything rendered ShellRouteTab to consume it. Several route
+  // tests mount a provider without the shell, so dropping the title outright
+  // removed it from the tree entirely and those tests hung waiting for it.
+  // Keep an always-rendered plain-text copy -- a <p>, deliberately NOT a
+  // heading, so it carries the name without competing for the heading role.
+  const chromeRegistered = useRouteChromeRegistration(routeChrome);
 
   return (
+    <>
+      {chromeRegistered && title ? (
+        <p className="sr-only cd-page-shell__title-text" data-testid="cd-page-title-text">
+          {title}
+        </p>
+      ) : null}
     <PageShell
       as="section"
       suppressHeader
-      title={title}
+      title={chromeRegistered ? undefined : title}
       titleId={titleId}
       className={[
         'emergency-route-page',
@@ -239,6 +268,7 @@ export function EmergencyRoutePage({
         }}
       />
     </PageShell>
+    </>
   );
 }
 

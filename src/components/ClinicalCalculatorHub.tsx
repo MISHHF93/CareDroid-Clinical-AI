@@ -501,7 +501,7 @@ export default function ClinicalCalculatorHub({
       <section className="clinical-calculator-hub__header" aria-labelledby="clinical-tools-title">
         <div>
           <span className="clinical-calculator-hub__eyebrow">CareDroid</span>
-          <h1 id="clinical-tools-title">Clinical Calculator Hub</h1>
+          <h2 id="clinical-tools-title">Clinical Calculator Hub</h2>
           {surfaces.calculatorHub.showHeroDescription ? (
             <p>One searchable hub for clinical calculators and score workflows. {HUMAN_REVIEW_DISCLAIMER}</p>
           ) : null}

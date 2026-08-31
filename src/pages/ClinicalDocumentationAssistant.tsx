@@ -124,7 +124,7 @@ export default function ClinicalDocumentationAssistant() {
       <section className="documentation-assistant-hero" aria-labelledby="documentation-title">
         <div>
           <p className="documentation-assistant-eyebrow">Draft only - clinician review required</p>
-          <h1 id="documentation-title">Clinical Documentation Assistant</h1>
+          <h2 id="documentation-title">Clinical Documentation Assistant</h2>
           <p>
             Draft SOAP notes, H&P notes, progress notes, discharge summaries, consultation notes,
             procedure notes, encounter summaries, and patient instructions with explicit export support.

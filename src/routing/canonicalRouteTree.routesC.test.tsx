@@ -33,7 +33,7 @@ describe('canonical route tree — queues params, reassessment, boarding, referr
     // The shell chrome route-tab and the page's own (visually-hidden) accessibility
     // heading both render "Reassessment" — scope to <main> for the page's heading.
     const main = await screen.findByRole('main');
-    expect(await within(main).findByRole('heading', { name: 'Reassessment' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Reassessment' })).toBeInTheDocument();
   });
 
   it('/emergency/boarding renders boarding and discharge capacity detail', async () => {
@@ -42,11 +42,15 @@ describe('canonical route tree — queues params, reassessment, boarding, referr
     await waitFor(() => {
       expect(screen.getByTestId('location')).toHaveTextContent('/emergency/capacity?view=boarding');
     }, { timeout: ROUTE_LOAD_TIMEOUT });
-    // The shell chrome route-tab and the page's own (visually-hidden) accessibility
-    // heading both render "Flow & Capacity" — scope to <main> for the page's heading.
+    // One "Flow & Capacity" heading now (the shell chrome route-tab's), so this
+    // queries document-wide rather than scoping to <main> to dodge a duplicate.
+    // The shell heading resolves before the lazy page body, so the tab -- a
+    // page-owned element -- is awaited rather than queried synchronously.
     const main = await screen.findByRole('main');
-    expect(await within(main).findByRole('heading', { name: 'Flow & Capacity' })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: 'Boarding' })).toHaveAttribute('aria-selected', 'true');
+    expect(await screen.findByRole('heading', { name: 'Flow & Capacity' })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('tab', { name: 'Boarding' }, { timeout: ROUTE_LOAD_TIMEOUT }),
+    ).toHaveAttribute('aria-selected', 'true');
   });
 
   it('/emergency/referrals renders referral candidates from the active patient list', async () => {
