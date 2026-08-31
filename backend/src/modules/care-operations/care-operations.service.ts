@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CareTaskEntity } from './entities/care-task.entity';
@@ -178,6 +183,56 @@ export class CareOperationsService {
       }
     }
     const now = new Date().toISOString();
+
+    // Claiming is the one transition where two people can legitimately race,
+    // and it used to be a read-check-write: findOne() above, `!row.ownerUserId`
+    // here, save() below. Two nurses acknowledging the same task at the same
+    // moment both read it unowned, both set themselves, and the last writer
+    // won silently -- leaving the first nurse's UI showing they own work that
+    // is actually someone else's. In an ED, two people each believing the
+    // other has the reassessment is precisely the coordination failure this
+    // inbox exists to prevent.
+    //
+    // Acquire ownership with a single conditional UPDATE instead, so the
+    // database decides the winner. affected === 0 means someone else claimed
+    // it between our read and our write; re-read and tell the loser the truth
+    // rather than overwriting the winner.
+    const isOwnershipAcquiring =
+      (to === 'ACKNOWLEDGED' || to === 'IN_PROGRESS') && !row.ownerUserId && Boolean(input.actorUserId);
+    if (isOwnershipAcquiring) {
+      const claim = await this.careTaskRepository
+        .createQueryBuilder()
+        .update(CareTaskEntity)
+        .set(
+          to === 'ACKNOWLEDGED'
+            ? {
+                ownerUserId: input.actorUserId,
+                acknowledgedAt: now,
+                acknowledgedBy: input.actorUserId,
+                status: to,
+              }
+            : { ownerUserId: input.actorUserId, status: to },
+        )
+        .where('id = :id', { id: row.id })
+        .andWhere('organizationId = :organizationId', { organizationId: row.organizationId })
+        .andWhere('ownerUserId IS NULL')
+        .execute();
+
+      if (!claim.affected) {
+        const current = await this.careTaskRepository.findOne({ where: { id } });
+        if (current?.ownerUserId && current.ownerUserId !== input.actorUserId) {
+          throw new ConflictException(
+            `Care task ${id} was already claimed by another user`,
+          );
+        }
+      }
+      const claimed = await this.careTaskRepository.findOne({ where: { id } });
+      if (claimed) {
+        this.recordTransition(claimed, from, to, input);
+        return toView(claimed);
+      }
+    }
+
     row.status = to;
     if (to === 'ACKNOWLEDGED' && !row.ownerUserId) {
       row.ownerUserId = input.actorUserId;
@@ -201,6 +256,16 @@ export class CareOperationsService {
       row.acknowledgedBy = undefined;
     }
     await this.careTaskRepository.save(row);
+    this.recordTransition(row, from, to, input);
+    return toView(row);
+  }
+
+  private recordTransition(
+    row: CareTaskEntity,
+    from: CareTaskStatus,
+    to: CareTaskStatus,
+    input: { actorUserId?: string; actorRole?: string },
+  ): void {
     this.workflowLogService.record({
       type: 'care_task_transitioned',
       title: 'Care task updated',
@@ -218,7 +283,6 @@ export class CareOperationsService {
         tenantId: row.organizationId,
       },
     });
-    return toView(row);
   }
 
   private async reconcile(organizationId: string): Promise<void> {

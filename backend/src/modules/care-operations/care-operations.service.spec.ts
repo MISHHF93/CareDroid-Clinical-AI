@@ -1,4 +1,4 @@
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
 import {
   EmergencyPatientService,
   EMSIntakeService,
@@ -25,16 +25,64 @@ class FakeCareTaskRepository {
 
   async find(options?: { where?: Partial<CareTaskEntity> }): Promise<CareTaskEntity[]> {
     const where = options?.where || {};
-    return this.rows.filter((row) =>
-      Object.entries(where).every(
-        ([key, value]) => (row as unknown as Record<string, unknown>)[key] === value,
-      ),
+    return (
+      this.rows
+        .filter((row) =>
+          Object.entries(where).every(
+            ([key, value]) => (row as unknown as Record<string, unknown>)[key] === value,
+          ),
+        )
+        // A real repository hydrates a NEW object per read. Returning the
+        // stored instance let one caller's in-place mutation retroactively
+        // change what a concurrent caller had already read, which hid the
+        // very claim race these tests exist to catch.
+        .map((row) => ({ ...row }))
     );
   }
 
   async findOne(options: { where: Partial<CareTaskEntity> }): Promise<CareTaskEntity | null> {
     const results = await this.find(options);
     return results[0] ?? null;
+  }
+
+  /**
+   * Minimal stand-in for the conditional-UPDATE claim path. It must honour the
+   * `ownerUserId IS NULL` guard, because that guard IS the thing under test:
+   * a fake that ignores it would make the concurrency test pass vacuously.
+   */
+  createQueryBuilder() {
+    const rows = () => this.rows;
+    const state: { values: Partial<CareTaskEntity>; id?: string; requireUnowned: boolean } = {
+      values: {},
+      requireUnowned: false,
+    };
+    const builder = {
+      update() {
+        return builder;
+      },
+      set(values: Partial<CareTaskEntity>) {
+        state.values = values;
+        return builder;
+      },
+      where(_clause: string, params?: Record<string, unknown>) {
+        if (params && 'id' in params) state.id = String(params.id);
+        return builder;
+      },
+      andWhere(clause: string, params?: Record<string, unknown>) {
+        if (params && 'id' in params) state.id = String(params.id);
+        if (/ownerUserId IS NULL/i.test(clause)) state.requireUnowned = true;
+        return builder;
+      },
+      async execute() {
+        const row = rows().find((candidate) => candidate.id === state.id);
+        if (!row) return { affected: 0 };
+        if (state.requireUnowned && row.ownerUserId) return { affected: 0 };
+        Object.assign(row, state.values);
+        row.updatedAt = new Date();
+        return { affected: 1 };
+      },
+    };
+    return builder;
   }
 
   async save(entityOrEntities: CareTaskEntity | CareTaskEntity[]): Promise<unknown> {
@@ -237,5 +285,75 @@ describe('CareOperationsService', () => {
     await expect(
       service.transition(task.id, { status: 'ACKNOWLEDGED', actorUserId: 'intruder' }, 'org-b'),
     ).rejects.toThrow(NotFoundException);
+  });
+
+  describe('claim concurrency', () => {
+    async function openTaskFor(org: string) {
+      const services = makeServices();
+      const patient = services.patientService.createPatient(
+        { firstName: 'Race', lastName: 'Candidate', flags: ['ReassessmentDue'] } as any,
+        org,
+      );
+      const inbox = await services.service.getInbox(org);
+      const task = inbox.tasks.find((t) => t.patientId === patient.id)!;
+      return { ...services, task };
+    }
+
+    it('gives exactly one owner when two users claim the same task concurrently', async () => {
+      // Before this fix the claim was read-check-write: both callers read the
+      // task unowned, both assigned themselves, and the last save silently
+      // won -- leaving the loser's UI showing they owned work that was really
+      // someone else's. In an ED that is two nurses each assuming the other
+      // has the reassessment.
+      const { service, careTaskRepository, task } = await openTaskFor('org-a');
+
+      const results = await Promise.allSettled([
+        service.transition(task.id, { status: 'ACKNOWLEDGED', actorUserId: 'nurse-1' }, 'org-a'),
+        service.transition(task.id, { status: 'ACKNOWLEDGED', actorUserId: 'nurse-2' }, 'org-a'),
+      ]);
+
+      const fulfilled = results.filter((r) => r.status === 'fulfilled');
+      const rejected = results.filter((r) => r.status === 'rejected');
+      expect(fulfilled).toHaveLength(1);
+      expect(rejected).toHaveLength(1);
+      expect((rejected[0] as PromiseRejectedResult).reason).toBeInstanceOf(ConflictException);
+
+      // The database, not the last writer, decided the owner.
+      const stored = careTaskRepository.rows.find((row) => row.id === task.id)!;
+      expect(['nurse-1', 'nurse-2']).toContain(stored.ownerUserId);
+      expect(stored.acknowledgedBy).toBe(stored.ownerUserId);
+      const winner = (fulfilled[0] as PromiseFulfilledResult<{ ownerUserId?: string }>).value;
+      expect(winner.ownerUserId).toBe(stored.ownerUserId);
+    });
+
+    it('lets the existing owner keep transitioning their own task', async () => {
+      const { service, task } = await openTaskFor('org-a');
+
+      await service.transition(task.id, { status: 'ACKNOWLEDGED', actorUserId: 'nurse-1' }, 'org-a');
+      const progressed = await service.transition(
+        task.id,
+        { status: 'IN_PROGRESS', actorUserId: 'nurse-1' },
+        'org-a',
+      );
+
+      expect(progressed.status).toBe('IN_PROGRESS');
+      expect(progressed.ownerUserId).toBe('nurse-1');
+    });
+
+    it('still allows a different user to complete work already owned', async () => {
+      // Completion is not ownership-acquiring: a charge nurse closing out a
+      // colleague's task must not be blocked by the claim guard.
+      const { service, task } = await openTaskFor('org-a');
+
+      await service.transition(task.id, { status: 'ACKNOWLEDGED', actorUserId: 'nurse-1' }, 'org-a');
+      const completed = await service.transition(
+        task.id,
+        { status: 'COMPLETED', actorUserId: 'charge-1' },
+        'org-a',
+      );
+
+      expect(completed.status).toBe('COMPLETED');
+      expect(completed.ownerUserId).toBe('nurse-1');
+    });
   });
 });
