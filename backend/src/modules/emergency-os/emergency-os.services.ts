@@ -1130,7 +1130,7 @@ export class EmergencyPatientService implements OnModuleInit {
       arrivalMode: patient.arrivalMode,
     };
 
-    const openNewEncounter = () =>
+    const openNewEncounter = (options: { returning?: boolean } = {}) =>
       repository.save(
         repository.create({
           // Unique per VISIT -- unlike the legacy `encounter-${patient.id}`,
@@ -1139,7 +1139,11 @@ export class EmergencyPatientService implements OnModuleInit {
           organizationId: patient.organizationId,
           patientId: patient.id,
           status: 'active',
-          startedAt: patient.arrivalTime || now,
+          // A RETURNING visit starts now. The patients row's arrivalTime may
+          // still hold the PREVIOUS visit's arrival (a bare state PATCH out of
+          // Discharge refreshes nothing else) -- confirmed live: visit 2's
+          // startedAt came back identical to visit 1's.
+          startedAt: options.returning ? now : patient.arrivalTime || now,
           ...snapshot,
         }),
       );
@@ -1171,7 +1175,7 @@ export class EmergencyPatientService implements OnModuleInit {
                 // Returning patient, or an update arriving before any create
                 // ever reached this table (pre-migration rows): open the
                 // visit now.
-                return openNewEncounter();
+                return openNewEncounter({ returning });
               }
               return repository.save(Object.assign(active, snapshot));
             });

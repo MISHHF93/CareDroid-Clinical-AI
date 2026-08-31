@@ -112,6 +112,11 @@ describe('EmergencyPatientService encounter history write-through', () => {
     service.updatePatient(patient.id, { state: 'Discharge' } as never, 'org-a');
     await flush();
 
+    // Both visits otherwise run inside one millisecond in a unit test, which
+    // would make the started-now assertion below compare identical ISO
+    // strings regardless of the logic under test.
+    await new Promise((resolve) => setTimeout(resolve, 5));
+
     // Weeks later: same person, new problem. The board reuses the identity
     // and overwrites the patient-row visit fields -- that part is unchanged.
     service.updatePatient(
@@ -134,6 +139,11 @@ describe('EmergencyPatientService encounter history write-through', () => {
     expect(secondVisit.status).toBe('active');
     expect(secondVisit.chiefComplaint).toBe('Chest pain');
     expect(secondVisit.id).not.toBe(firstVisit.id);
+    // A returning visit starts NOW -- not at the stale arrivalTime still
+    // sitting on the patients row from visit 1. Confirmed live before the
+    // fix: both rows carried identical startedAt values.
+    expect(secondVisit.startedAt).not.toBe(firstVisit.startedAt);
+    expect(String(secondVisit.startedAt) > String(firstVisit.startedAt)).toBe(true);
   });
 
   it('refreshes the active encounter snapshot on ordinary updates without opening new rows', async () => {
