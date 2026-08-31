@@ -105,15 +105,20 @@ export default function AuthPage({ initialMode = 'login' }: { initialMode?: Mode
     completeRealSession(result, returnUrl);
   };
 
-  // HEAL-347.14: explicit, one-click local-dev bypass -- distinct from a real
-  // login (never sets authMode: 'real'). Structurally incapable of doing
-  // anything in a real deployment: this button doesn't even render unless
-  // isDev is true, ensureDevBackendSession() hits the backend's own
-  // /auth/dev-session endpoint, and THAT endpoint independently refuses to
-  // issue a token outside local development or an explicit
-  // ENABLE_DEV_AUTH_BYPASS opt-in (auth.service.ts's createDevSession()) --
-  // a tampered/forced client-side isDev check alone can't reach a real
-  // session this way in a real deployment.
+  // Explicit, one-click developer bypass -- distinct from a real login (never
+  // sets authMode: 'real').
+  //
+  // The button now renders in every environment (product decision: one
+  // developer entry point, always in the same place). Visibility is NOT the
+  // security control and never was: the only thing that decides whether a
+  // token is actually issued is the backend's own /auth/dev-session endpoint,
+  // which refuses outside local development unless BOTH
+  // ENABLE_DEV_AUTH_BYPASS and ALLOW_DEMO_AUTH_IN_PRODUCTION are explicitly
+  // set (auth.service.ts's createDevSession()). So in an ordinary production
+  // deployment this button is inert and surfaces the server's own refusal
+  // message rather than silently doing nothing. Do not "simplify" that
+  // server-side gate away to make the button work in production -- that gate
+  // is what keeps this from being a credential-free path into patient data.
   const handleDevBypass = async () => {
     // HEAL-347.15: devBackendAuth.ts's persistDevSession() deliberately
     // refuses to overwrite an ALREADY-stored demo-persona profile (HEAL-319's
@@ -317,11 +322,15 @@ export default function AuthPage({ initialMode = 'login' }: { initialMode?: Mode
             </div>
           ) : null}
 
-          {isDev && !twoFactor ? (
+          {!twoFactor ? (
             <div className="auth-page__dev-access">
               <div>
-                <span>Local development</span>
-                <p>Open a fully provisioned clinical workspace without credentials.</p>
+                <span>{isDev ? 'Local development' : 'Developer access'}</span>
+                <p>
+                  {isDev
+                    ? 'Open a fully provisioned clinical workspace without credentials.'
+                    : 'Requires the server-side developer bypass to be enabled for this deployment.'}
+                </p>
               </div>
               <button
                 type="button"
@@ -335,7 +344,7 @@ export default function AuthPage({ initialMode = 'login' }: { initialMode?: Mode
             </div>
           ) : null}
 
-          {isDev && !twoFactor ? (
+          {!twoFactor ? (
             <div className="auth-page__divider" role="separator">
               <span>or use your account</span>
             </div>
