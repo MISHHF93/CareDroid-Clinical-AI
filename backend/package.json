@@ -101,6 +101,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@medplum/fhirtypes": "^5.1.36",
     "@nestjs/cli": "^11.0.23",
     "@nestjs/schematics": "^11.1.0",
     "@nestjs/testing": "^11.1.28",

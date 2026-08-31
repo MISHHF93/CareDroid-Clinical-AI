@@ -59,11 +59,38 @@ export type ArtifactReviewStatus =
 
 export type ArtifactSourceStateLabel = 'live' | 'demo' | 'simulated' | 'extracted' | 'staff_entered';
 
+/**
+ * Every producer of this type named a code system and then supplied only free
+ * text -- `{ system: 'SNOMED_CT', display: 'penicillin' }` with no `code` --
+ * across seven call sites and four different systems. Nothing rendered it, so
+ * the claim was never visible, but "this allergy is SNOMED-coded" is exactly
+ * the kind of assertion a downstream consumer (or an export, or a reviewer)
+ * would reasonably trust.
+ *
+ * `status` makes the difference explicit and un-fakeable: `coded` requires a
+ * real `code` from a terminology lookup, `unbound` says the system is the
+ * intended binding target and nothing has bound it yet. See
+ * normalizedCodeIsCoherent() for the invariant, which is enforced by test.
+ */
 export type NormalizedCode = {
   system?: 'SNOMED_CT' | 'RXNORM' | 'LOINC' | 'ICD-10-CM' | 'LOCAL';
   code?: string | null;
   display?: string;
+  /** `coded` ONLY when `code` holds a real identifier from that system. */
+  status?: 'coded' | 'unbound';
+  /** Why it is not coded -- licensing, or no lookup performed yet. */
+  unboundReason?: string;
 };
+
+/**
+ * A NormalizedCode must not claim to be coded without carrying a code.
+ * Exported so both the model and its tests share one definition of coherent.
+ */
+export function normalizedCodeIsCoherent(value: NormalizedCode | undefined): boolean {
+  if (!value) return true;
+  if (value.status === 'coded') return Boolean(value.code && String(value.code).trim());
+  return true;
+}
 
 export type SourceTextSpan = {
   page?: number;

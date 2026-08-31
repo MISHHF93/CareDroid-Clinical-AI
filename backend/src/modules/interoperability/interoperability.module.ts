@@ -29,6 +29,7 @@ import {
 import { IntegrationAutomationRouter } from './integration-automation-router.service';
 import { IntegrationEventRegistry } from './integration-event-registry.service';
 import { IntegrationHubIngestRequest, IntegrationHubService } from './integration-hub.service';
+import { TerminologyService } from './terminology.service';
 
 @Injectable()
 export class FHIRService {
@@ -156,6 +157,7 @@ export class InteroperabilityController {
     IntegrationEventRegistry,
     IntegrationAutomationRouter,
     IntegrationHubService,
+    TerminologyService,
   ],
   exports: [
     FHIRService,
@@ -166,6 +168,7 @@ export class InteroperabilityController {
     IntegrationEventRegistry,
     IntegrationAutomationRouter,
     IntegrationHubService,
+    TerminologyService,
   ],
 })
 export class InteroperabilityModule {}
