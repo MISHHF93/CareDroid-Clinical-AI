@@ -86,7 +86,20 @@ html[data-theme='light'] {
   --app-code-bg: var(--medical-surface-muted, #eef4f7);
   --app-tool-card-body-bg: rgba(255, 255, 255, 0.98);
   --app-tool-card-body-fg: var(--medical-ink, #102a43);
-  --app-chart-1: var(--medical-accent, #075985);
+  /* Chart series colors encode DATA, not viewer identity, so this must not
+     read the `--medical-accent` chain: role-accent-theme.css re-tints that
+     per role by design (its own header notes it is safe "because nothing
+     else critical reads this chain" -- this palette did). Confirmed live:
+     the same Daily Patient Volume bars rendered teal for one role and
+     #5925dc for the `operations` persona -- the purple the design system
+     reserves for AI-generated content (--semantic-ai-assistance/--cdl-ai),
+     so plain operational volume read as AI-derived. The dark-mode block
+     below already uses fixed literals for all six slots; light mode was the
+     odd one out, so this slot is a literal too. Value is brand teal snapped
+     to the nearest step that clears the categorical-palette chroma floor:
+     --cdl-brand-500 (#0f766e) measures 0.086 and reads gray, --cdl-brand-400
+     (#2bc7b7) drops under 3:1 against the surface; #0d9488 clears both. */
+  --app-chart-1: #0d9488;
   --app-chart-2: var(--semantic-healthy, #027a48);
   --app-chart-3: var(--semantic-attention, #b54708);
   --app-chart-4: var(--semantic-critical, #b42318);
