@@ -347,7 +347,14 @@ export function getVisibleNavigation(
   userRole: string | null | undefined,
   options: { saasRole?: string | null; compiledProfile?: CompiledCareDroidAccessProfile | null } = {},
 ): readonly NavigationItem[] {
-  if (options.compiledProfile) {
+  // Defence in depth. useEmergencyRolePermissions now validates the stored
+  // profile before trusting it, but this function is exported and reachable
+  // from three other call sites (AppShell, Sidebar, edStaffCollaborationModel)
+  // with any caller-supplied object. Navigation failing to resolve a role must
+  // degrade to the role-based branch below, never throw -- this line crashing
+  // on `profile.role` being undefined took down the entire AppShell, not just
+  // the sidebar, because nothing between here and the shell caught it.
+  if (options.compiledProfile?.role) {
     const profile = options.compiledProfile as CompiledCareDroidAccessProfile;
     const hospitalRole: string = (profile.role.hospitalRole as string) || profile.role.emergencyRoleId;
     const hiddenForRole = getHiddenNavItemIdsForRole(hospitalRole);

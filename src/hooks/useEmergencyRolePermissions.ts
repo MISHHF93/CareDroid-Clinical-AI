@@ -17,6 +17,8 @@ import {
   getPersonaLabelForRole,
 } from '../config/emergencyRoleScreenMatrix';
 import { presentEmergencyPermission } from '../config/emergencyActionPresentationModel';
+import { parseCompiledAccessProfile } from '../lib/users/compiledAccessProfile.schema';
+import logger from '../utils/logger';
 import { applyDemoRoleView, isDemoPersonaUser } from '../config/demoPersonaModel';
 import { resolveRoleLandingRoute } from '../config/emergencyRoleNavigationModel';
 import useEmergencyDeviceContext from './useEmergencyDeviceContext';
@@ -79,8 +81,23 @@ export function useEmergencyRolePermissions() {
   }, [operationalProfile?.accessSummary, operationalProfile?.effectiveProfile, user]);
 
   const compiledProfile = useMemo(() => {
+    // `attached` comes from localStorage, so its type is a claim, not a fact.
+    // This gate used to be `if (attached?.user)` -- it checked one field and
+    // downstream consumers dereferenced another (getVisibleNavigation reads
+    // profile.role.hospitalRole), so a stored profile with `user` but no
+    // `role` was accepted as trusted and then threw from inside AppShellFrame,
+    // taking down the whole shell. Validate the shape consumers actually rely
+    // on; anything unusable falls through to the recompile-from-role path
+    // below, which is the same recovery a session with no compiled profile
+    // already gets.
     const attached = user?.compiledAccessProfile;
-    if (attached?.user) return attached;
+    if (attached) {
+      const parsed = parseCompiledAccessProfile(attached);
+      if (parsed.ok) return parsed.profile;
+      logger.warn('Discarding malformed stored compiledAccessProfile; rebuilding from role.', {
+        reason: parsed.reason,
+      });
+    }
     const caredroidProfile = user?.caredroidProfile;
     if (caredroidProfile?.role) return compileCareDroidAccessProfile(caredroidProfile);
     const demoProfile = getDemoUserById(user?.id) || getDefaultDemoUser();
