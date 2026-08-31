@@ -44,7 +44,7 @@
 
 .hospital-command-center__metric-card:hover {
   border-color: #374151;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+  box-shadow: var(--cdl-clinical-shadow-rest);
 }
 
 /* Metric card semantic borders owned by caredroid-design-language.css */
@@ -97,7 +97,8 @@
   justify-content: space-between;
   gap: 10px;
   padding: 10px 12px;
-  border-radius: 8px;
+  /* 8px is not on the radius scale; nested rows take the small step. */
+  border-radius: var(--cdl-clinical-radius-sm);
   border: 1px solid var(--ed-border-subtle, #e2e8f0);
   background: var(--ed-surface-raised, #f8fafc);
 }

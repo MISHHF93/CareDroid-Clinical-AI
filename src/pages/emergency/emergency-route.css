@@ -30,7 +30,7 @@
 /* Outer summary only — composition.css owns the final single-surface treatment */
 .emergency-route-situation-brief {
   border: 1px solid var(--cdl-border, var(--ed-border-subtle));
-  border-radius: var(--cdl-radius-lg, 12px);
+  border-radius: var(--cdl-radius-lg, 14px);
   background: var(--cdl-surface-card, var(--ed-surface-raised));
   box-shadow: var(--cdl-elev-1);
   padding: var(--cdl-space-3, 12px) var(--cdl-space-4, 16px);
@@ -68,7 +68,7 @@
 .emergency-route-card {
   box-shadow: var(--cdl-elev-1, none);
   border-color: var(--cdl-border, var(--ed-border-subtle));
-  border-radius: var(--cdl-radius-lg, 12px);
+  border-radius: var(--cdl-radius-lg, 14px);
   background: var(--cdl-surface-card, var(--ed-surface-raised));
 }
 

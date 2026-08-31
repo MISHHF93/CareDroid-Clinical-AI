@@ -22,7 +22,7 @@
   text-align: left;
   background-color: var(--app-surface-muted, #eef4f7);
   padding: 10px;
-  border-radius: var(--cdl-radius-md, 5px);
+  border-radius: var(--cdl-radius-md, 10px);
   color: var(--app-fg, #102a43);
 }
 
@@ -31,7 +31,7 @@
   text-align: left;
   background-color: var(--app-surface-muted, #eef4f7);
   padding: 10px;
-  border-radius: var(--cdl-radius-md, 5px);
+  border-radius: var(--cdl-radius-md, 10px);
   color: var(--app-fg, #102a43);
 }
 

@@ -29,7 +29,7 @@
 .reception-prepare__panel {
   width: min(560px, 100%);
   border: 1px solid var(--cdl-border, #e2e8f0);
-  border-radius: var(--cdl-radius-xl, 16px);
+  border-radius: var(--cdl-radius-xl, 18px);
   background: var(--cdl-surface-card, #ffffff);
   color: var(--cdl-ink, #0f172a);
   box-shadow: var(--cdl-elev-4, 0 20px 48px rgba(0, 0, 0, 0.2));
@@ -86,7 +86,7 @@
   width: 36px;
   height: 36px;
   border: 1px solid var(--cdl-border, #e2e8f0);
-  border-radius: var(--cdl-radius-md, 8px);
+  border-radius: var(--cdl-radius-md, 10px);
   background: var(--cdl-surface-muted, #f1f5f9);
   color: var(--cdl-ink-muted, #334155);
   cursor: pointer;
@@ -110,7 +110,7 @@
   min-height: 72px;
   padding: 14px 16px;
   border: 1px solid var(--cdl-border, #e2e8f0);
-  border-radius: var(--cdl-radius-lg, 12px);
+  border-radius: var(--cdl-radius-lg, 14px);
   background: var(--cdl-surface-muted, #f8fafc);
   color: var(--cdl-ink, #0f172a);
   text-align: left;

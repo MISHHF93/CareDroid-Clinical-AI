@@ -105,7 +105,7 @@
 .reception-card {
   background: var(--cdl-surface-card, var(--app-surface-1, #ffffff));
   border: 1px solid var(--cdl-border, var(--app-border-subtle, #e2e8f0));
-  border-radius: var(--cdl-radius-lg, 12px);
+  border-radius: var(--cdl-radius-lg, 14px);
   box-shadow: var(--cdl-elev-1, 0 1px 2px rgba(0, 0, 0, 0.04));
   color: var(--cdl-ink, #0f172a);
 }

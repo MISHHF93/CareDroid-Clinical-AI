@@ -79,7 +79,7 @@
   box-sizing: border-box;
   max-width: 210px !important;
   border: 1px solid var(--cdl-neutral-border, var(--cdl-border, #e2e8f0));
-  border-radius: var(--cdl-radius-full, 999px);
+  border-radius: var(--cdl-radius-full, 9999px);
   background: var(--cdl-neutral-bg, var(--cdl-surface-card, #fff));
   overflow: hidden;
   cursor: default;

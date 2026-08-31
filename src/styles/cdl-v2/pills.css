@@ -14,7 +14,7 @@
 .patient-card__score,
 .patient-card__state-pill {
   align-items: center;
-  border-radius: var(--cdl-radius-full, 999px);
+  border-radius: var(--cdl-radius-full, 9999px);
   box-sizing: border-box;
   display: inline-flex;
   font-size: var(--cdl-text-2xs, 10px);

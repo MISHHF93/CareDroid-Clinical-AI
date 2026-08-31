@@ -15,8 +15,8 @@
   --reception-text-secondary: var(--cdl-ink-muted, #334155);
   --reception-border: var(--cdl-border, #e2e8f0);
   --reception-border-strong: var(--cdl-border-strong, #cbd5e1);
-  --reception-radius-lg: var(--cdl-radius-lg, 12px);
-  --reception-radius-md: var(--cdl-radius-md, 8px);
+  --reception-radius-lg: var(--cdl-radius-lg, 14px);
+  --reception-radius-md: var(--cdl-radius-md, 10px);
   --reception-success: var(--cdl-ok, #047857);
   --reception-warning: var(--cdl-warning, #b45309);
   --reception-danger: var(--cdl-critical, #dc2626);
@@ -52,9 +52,8 @@ html[data-theme='dark'] .reception-page-layout {
 .reception-workspace .reception-command-panel {
   background: var(--reception-surface-card) !important;
   border: 1px solid color-mix(in srgb, var(--reception-border) 55%, transparent) !important;
-  box-shadow:
-    0 1px 2px rgba(15, 23, 42, 0.04),
-    0 2px 8px rgba(15, 23, 42, 0.06) !important;
+  /* Was a near-copy of the canonical clinical rest shadow. */
+  box-shadow: var(--cdl-clinical-shadow-rest) !important;
   border-radius: var(--reception-radius-lg) !important;
   color: var(--reception-text-primary);
 }

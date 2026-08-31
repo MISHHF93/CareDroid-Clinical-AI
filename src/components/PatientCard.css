@@ -64,7 +64,7 @@
   background: var(--cdl-card-bg, var(--cdl-surface-card, #ffffff));
   color: var(--cdl-card-fg, var(--cdl-ink, #111827));
   border: 1px solid var(--cdl-card-border, var(--cdl-border, #e2e8f0));
-  border-radius: var(--cdl-radius-lg, 12px);
+  border-radius: var(--cdl-radius-lg, 14px);
   box-shadow: var(--cdl-elev-1);
   /* One acuity rail only (border-left). CDL ::before disabled for patient-card. */
   border-left: 4px solid var(--patient-priority-color, var(--cdl-brand-500));
@@ -344,7 +344,7 @@
   align-items: center;
   background: var(--cdl-surface-muted, var(--cdl-slate-50, #f8fafc));
   border: 1px solid var(--cdl-border, #e2e8f0);
-  border-radius: var(--cdl-radius-md, 8px);
+  border-radius: var(--cdl-radius-md, 10px);
   color: var(--cdl-ink, #111827);
   display: flex;
   flex-wrap: wrap;
@@ -384,7 +384,7 @@
   /* Neutral muted pill — dual-mode ink (never white on light) */
   background: var(--cdl-pill-neutral-bg, var(--cdl-surface-muted, #f1f5f9)) !important;
   border: 1px solid var(--cdl-pill-neutral-bd, var(--cdl-border, #e2e8f0)) !important;
-  border-radius: var(--cdl-radius-full, 999px);
+  border-radius: var(--cdl-radius-full, 9999px);
   color: var(--cdl-pill-neutral-fg, var(--cdl-ink, #0f172a)) !important;
   font-size: 11px;
   font-weight: 700;
@@ -523,7 +523,7 @@
   align-items: center;
   background: var(--cdl-surface-muted) !important;
   border: 1px solid var(--cdl-border) !important;
-  border-radius: var(--cdl-radius-full, 999px);
+  border-radius: var(--cdl-radius-full, 9999px);
   box-shadow: none !important;
   color: var(--cdl-ink) !important;
   display: inline-flex;
@@ -602,7 +602,7 @@
 .patient-card__signals [class*='badge'],
 .patient-card__signals [class*='Badge'],
 .patient-card__queue-reason [class*='badge'] {
-  border-radius: var(--cdl-radius-full, 999px) !important;
+  border-radius: var(--cdl-radius-full, 9999px) !important;
   box-shadow: none !important;
   font-weight: 700 !important;
   max-width: 100%;

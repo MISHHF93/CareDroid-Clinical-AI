@@ -12,9 +12,18 @@
   --cdl-clinical-border-strong: color-mix(in srgb, var(--medical-border, #e2e8f0) 55%, transparent);
   --cdl-clinical-border-focus: color-mix(in srgb, #374151 38%, transparent);
   --cdl-clinical-hairline: color-mix(in srgb, var(--medical-border, #e2e8f0) 42%, transparent);
-  --cdl-clinical-radius: 12px;
-  --cdl-clinical-radius-sm: 10px;
-  --cdl-clinical-radius-lg: 14px;
+  /* Derived from the canonical cdl-v2 radius scale rather than restating
+     literals. This layer loads last and its surface recipe below paints ~24
+     card classes app-wide, so its own numbers were in practice THE app's
+     radii -- measured live: 317 elements at 12px against 88 at 10px and 26 at
+     8px. 12px is not a step on the scale (4/10/14/18/24) and sat below
+     --cdl-card-radius-min (14px), so the most common surface in the product
+     was quietly off its own design system. These now alias md/lg/xl, giving
+     one 10/14/18 ramp that matches the documented card range of 14-18px.
+     -sm is unchanged at 10px; the base moves 12px -> 14px. */
+  --cdl-clinical-radius: var(--cdl-radius-lg, 14px);
+  --cdl-clinical-radius-sm: var(--cdl-radius-md, 10px);
+  --cdl-clinical-radius-lg: var(--cdl-radius-xl, 18px);
   --cdl-clinical-shadow-rest: 0 1px 2px rgba(15, 23, 42, 0.04), 0 4px 14px rgba(15, 23, 42, 0.06);
   --cdl-clinical-shadow-hover: 0 4px 8px rgba(15, 23, 42, 0.07), 0 12px 24px rgba(15, 23, 42, 0.09);
   --cdl-clinical-shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.9);

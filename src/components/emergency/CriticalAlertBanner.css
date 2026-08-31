@@ -8,7 +8,7 @@
   align-items: center;
   gap: var(--cdl-space-2-5, 10px);
   padding: var(--cdl-space-2-5, 10px) var(--cdl-space-4, 16px);
-  border-radius: var(--cdl-radius-md, 8px);
+  border-radius: var(--cdl-radius-md, 10px);
   font-size: var(--cdl-text-sm, 14px);
   font-weight: var(--cdl-font-medium, 500);
 }
