@@ -1,4 +1,4 @@
-import { EMERGENCY_ROLE_IDS } from './emergencyRolePermissions';
+import { EMERGENCY_ROLE_IDS, EMERGENCY_ROLE_LABELS } from './emergencyRolePermissions';
 
 export type HospitalCommandMetricId =
   | 'department-occupancy'
@@ -117,5 +117,11 @@ export function resolveHospitalCommandMetricsForRole(
 
 export function resolveHospitalCommandRoleLabel(role: string | null | undefined): string {
   if (!role) return 'Department command';
-  return role.replace(/_/g, ' ');
+  // Underscore-stripping alone rendered "Role view: read only viewer" on the
+  // command centre -- lowercase and, worse, silently dropping the hyphen that
+  // carries the meaning in "read-only". EMERGENCY_ROLE_LABELS is the canonical
+  // display name for these ids; fall back to the old behaviour for anything
+  // outside that map.
+  const canonical = (EMERGENCY_ROLE_LABELS as Record<string, string | undefined>)[role];
+  return canonical || role.replace(/_/g, ' ');
 }

@@ -51,6 +51,18 @@ import UnifiedApplicationKnowledgeGraphPanel from '../../components/emergency/Un
 
 import './hospital-command-center.css';
 
+/**
+ * The raw union values ('live' | 'cache' | 'unavailable') were rendered
+ * verbatim on this page -- "Sentinel: cache" told a charge nurse nothing about
+ * whether the numbers in front of them can be trusted. Data freshness belongs
+ * on a command centre, so these are spelled out rather than dropped.
+ */
+const SENTINEL_SOURCE_LABELS: Record<'live' | 'cache' | 'unavailable', string> = {
+  live: 'Live',
+  cache: 'Cached — may be behind',
+  unavailable: 'Unavailable',
+};
+
 export default function HospitalCommandCenter() {
   const location = useLocation();
   const intelligenceView = resolveCommandCenterIntelligenceView(location.search);
@@ -226,9 +238,10 @@ export default function HospitalCommandCenter() {
               <span>{CAREDROID_PRODUCT.safetyShort}</span>
               <span>Role view: {roleLabel}</span>
               <span>
-                3-min: {snapshot.threeMinuteCompliance.compliant ? 'compliant' : 'breach'}
+                3-minute response:{' '}
+                {snapshot.threeMinuteCompliance.compliant ? 'On target' : 'Breached'}
               </span>
-              <span>Sentinel: {sentinelSource}</span>
+              <span>Sentinel data: {SENTINEL_SOURCE_LABELS[sentinelSource]}</span>
             </div>
           </div>
           <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
@@ -275,7 +288,8 @@ export default function HospitalCommandCenter() {
                 <strong id="sentinel-ems-command-heading">Sentinel EMS command</strong>
                 <p className="emergency-route-section-card__lead">
                   Live units, ETA confidence ranges, inbound pre-arrival, durable alarms, and
-                  human-review AI. Source: {sentinelSource}. {sentinelMessage}
+                  human-review AI. Data: {SENTINEL_SOURCE_LABELS[sentinelSource]}.{' '}
+                  {sentinelMessage}
                 </p>
               </div>
               <Link
