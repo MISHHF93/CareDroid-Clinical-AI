@@ -67,25 +67,38 @@ type HospitalMapInsightsProps = {
   message?: string;
 };
 
+/**
+ * Room/device state is a STATUS, so it reads the semantic status tokens --
+ * not the categorical chart palette, which exists to tell unrelated series
+ * apart and carries no meaning of its own.
+ *
+ * Routing these through chart slots had silently mis-assigned two of the four
+ * states: `warning` resolved to --app-chart-5 (#38bdf8, sky blue) and
+ * `neutral` to --app-chart-3 (--semantic-attention, amber). On a hospital map
+ * that inverted the two signals that matter -- a room needing attention
+ * rendered a benign blue, while an ordinary room rendered amber as though it
+ * did. The semantic tokens also carry proper dark-mode values, which the raw
+ * chart literals did not.
+ */
 const ROOM_FILL: Record<string, string> = {
-  good: 'color-mix(in srgb, var(--app-chart-2) 18%, transparent)',
-  warning: 'color-mix(in srgb, var(--app-chart-5) 22%, transparent)',
-  critical: 'color-mix(in srgb, var(--app-status-critical, #ef4444) 24%, transparent)',
-  neutral: 'color-mix(in srgb, var(--app-chart-3) 12%, transparent)',
+  good: 'color-mix(in srgb, var(--semantic-healthy, #027a48) 18%, transparent)',
+  warning: 'color-mix(in srgb, var(--semantic-warning, #b54708) 22%, transparent)',
+  critical: 'color-mix(in srgb, var(--semantic-critical, #b42318) 24%, transparent)',
+  neutral: 'color-mix(in srgb, var(--app-fg-muted, #627d98) 12%, transparent)',
 };
 
 const ROOM_STROKE: Record<string, string> = {
-  good: 'var(--app-chart-2)',
-  warning: 'var(--app-chart-5)',
-  critical: 'var(--app-status-critical, #ef4444)',
-  neutral: 'var(--app-chart-3)',
+  good: 'var(--semantic-healthy, #027a48)',
+  warning: 'var(--semantic-warning, #b54708)',
+  critical: 'var(--semantic-critical, #b42318)',
+  neutral: 'var(--app-fg-muted, #627d98)',
 };
 
 const DEVICE_FILL: Record<string, string> = {
-  good: 'var(--app-chart-2)',
-  warning: 'var(--app-chart-5)',
-  critical: 'var(--app-status-critical, #ef4444)',
-  neutral: 'var(--app-chart-3)',
+  good: 'var(--semantic-healthy, #027a48)',
+  warning: 'var(--semantic-warning, #b54708)',
+  critical: 'var(--semantic-critical, #b42318)',
+  neutral: 'var(--app-fg-muted, #627d98)',
 };
 
 export default function HospitalMapInsights({

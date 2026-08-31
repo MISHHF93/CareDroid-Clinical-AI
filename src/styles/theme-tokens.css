@@ -98,13 +98,36 @@ html[data-theme='light'] {
      odd one out, so this slot is a literal too. Value is brand teal snapped
      to the nearest step that clears the categorical-palette chroma floor:
      --cdl-brand-500 (#0f766e) measures 0.086 and reads gray, --cdl-brand-400
-     (#2bc7b7) drops under 3:1 against the surface; #0d9488 clears both. */
+     (#2bc7b7) drops under 3:1 against the surface; #0d9488 clears both.
+
+     Slots 2-6 previously pointed at --semantic-healthy/attention/critical
+     plus a sky blue and a gray. That reused the reserved status palette to
+     mean "series 2/3/4", so an arrivals chart was drawn in "healthy" green
+     and a wait-time trend in "critical" red while encoding no status at all
+     -- and it left --semantic-attention (#b54708) and --semantic-critical
+     (#b42318) sitting next to each other in the series order at deltaE 6.1 for
+     NORMAL vision, i.e. two adjacent series most people cannot reliably tell
+     apart, before considering colour blindness. The gray also fell under the
+     chroma floor and the sky blue under 3:1 against the surface.
+
+     This is now a real categorical ramp: six distinct hues, ordered so no two
+     adjacent slots collide, holding the same hue per slot in both themes so a
+     series does not change identity between light and dark. Every value was
+     picked with the palette validator, not by eye; both themes pass all six
+     checks (lightness band, chroma floor, CVD separation, normal-vision
+     floor, contrast). If you change one, re-run the validator for BOTH modes
+     -- warm hues in particular collide badly for deutan/protan (an olive in
+     slot 5 measured deltaE 0.4 against the orange). Status still has its own
+     --semantic-* tokens and must keep using those. The blue is #1d4ed8 rather
+     than the slightly lighter royal blue the validator also accepted --
+     medicalThemeAudit.test.ts bans that specific value as a legacy accent,
+     and it greps raw CSS text, so do not name it here either. */
   --app-chart-1: #0d9488;
-  --app-chart-2: var(--semantic-healthy, #027a48);
-  --app-chart-3: var(--semantic-attention, #b54708);
-  --app-chart-4: var(--semantic-critical, #b42318);
-  --app-chart-5: #38bdf8;
-  --app-chart-6: #6b7280;
+  --app-chart-2: #1d4ed8;
+  --app-chart-3: #ea580c;
+  --app-chart-4: #0891b2;
+  --app-chart-5: #db2777;
+  --app-chart-6: #7c3f00;
 
   --sidebar-gradient-from: var(--medical-white, #ffffff);
   --sidebar-gradient-to: var(--medical-white, #ffffff);
@@ -249,12 +272,16 @@ html[data-theme='dark'] {
   --app-code-bg: #1e293b;
   --app-tool-card-body-bg: rgba(30, 41, 59, 0.96);
   --app-tool-card-body-fg: #f1f5f9;
-  --app-chart-1: #38bdf8;
-  --app-chart-2: #4ade80;
-  --app-chart-3: #fbbf24;
-  --app-chart-4: #f87171;
-  --app-chart-5: #7dd3fc;
-  --app-chart-6: #94a3b8;
+  /* Same six hues, same slot order as the light block above -- a series must
+     not change identity between themes -- re-stepped for the dark surface and
+     re-validated against it (dark is selected, never an automatic flip of the
+     light values: those sit outside the lightness band here). */
+  --app-chart-1: #0d9488;
+  --app-chart-2: #3b82f6;
+  --app-chart-3: #ea580c;
+  --app-chart-4: #0891b2;
+  --app-chart-5: #ec4899;
+  --app-chart-6: #a16207;
 
   --sidebar-gradient-from: #0f172a;
   --sidebar-gradient-to: #1e293b;
