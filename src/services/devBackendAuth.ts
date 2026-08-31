@@ -243,7 +243,19 @@ async function resolveDevBackendSession({
     window.clearTimeout(timeoutId);
     const payload = await readJsonBody(response, {});
     if (!response.ok || !payload?.accessToken) {
-      return { token: existingToken || BYPASS_TOKEN, source: 'fallback-bypass', error: payload?.message };
+      // The app's error envelope nests the human message ({ success:false,
+      // error:{ message } }), and a proxy-level 5xx (backend restarting)
+      // carries no JSON body at all -- both used to surface as `undefined`
+      // here, which AuthPage then replaced with its generic "unavailable
+      // right now", hiding the actual reason from the person clicking.
+      const serverMessage = payload?.error?.message || payload?.message;
+      return {
+        token: existingToken || BYPASS_TOKEN,
+        source: 'fallback-bypass',
+        error:
+          serverMessage ||
+          `The sign-in service responded with HTTP ${response.status}. If the backend was just restarted, try again in a few seconds.`,
+      };
     }
 
     persistDevSession(payload);
@@ -256,7 +268,7 @@ async function resolveDevBackendSession({
   } catch (error: any) {
     const message =
       error?.name === 'AbortError'
-        ? 'Dev session timed out'
+        ? 'The sign-in service took too long to respond. It may still be starting up — try again in a few seconds.'
         : error instanceof Error
           ? error.message
           : 'Dev session unavailable';
@@ -293,7 +305,18 @@ export async function ensureDevBackendSession({
       return resolveDevBackendSession({ force, timeoutMs, roleProfileId });
     }
     if (inFlightForcedSession) {
-      return inFlightForcedSession;
+      // Same rule as the unforced-join below: joining is for deduplication,
+      // not for inheriting someone else's failure. The in-flight forced call
+      // may be an apiClient 401-retry running on the DEFAULT 4s timeout --
+      // confirmed live on a cold backend: the bypass click (20s budget)
+      // joined such a chain and surfaced its abort at ~8s, never getting to
+      // use its own budget. If the joined result is not a real session, run
+      // this caller's own attempt with this caller's own timeout.
+      return inFlightForcedSession.then((result) =>
+        result?.source === 'dev-session'
+          ? result
+          : resolveDevBackendSession({ force: true, timeoutMs }),
+      );
     }
     // HEAL-347.46: an unforced caller (e.g. UserContext.tsx's ambient
     // bootstrap effect, which runs on every mount including the /login page

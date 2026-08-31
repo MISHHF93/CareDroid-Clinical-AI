@@ -134,7 +134,13 @@ export default function AuthPage({ initialMode = 'login' }: { initialMode?: Mode
     // guarantees this explicit action always wins.
     localStorage.removeItem(AUTH_CONFIG.userProfileStorageKey);
     localStorage.removeItem(AUTH_CONFIG.tokenStorageKey);
-    const session = await ensureDevBackendSession({ force: true });
+    // A generous timeout, deliberately above the ambient bootstrap's 4s: this
+    // is a human who clicked a button and is watching the spinner, and the
+    // backend's dev-session bootstrap on a COLD process (bcrypt + org/
+    // workspace/pack checks on sqlite) measures 5-16s while a warm one takes
+    // ~0.3s. Aborting a deliberate click at 4s during a restart window is what
+    // produced "Dev session bypass is unavailable right now" with no cause.
+    const session = await ensureDevBackendSession({ force: true, timeoutMs: 20_000 });
     // HEAL-347.17: UserContext.tsx's OWN ambient bootstrap effect (see
     // HEAL-347.16 below) also calls ensureDevBackendSession() -- unforced --
     // on every mount, including this login page itself, since before the

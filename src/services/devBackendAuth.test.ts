@@ -281,4 +281,41 @@ describe('devBackendAuth ensureDevBackendSession concurrency (HEAL-347.42)', () 
     expect(forced.source).toBe('dev-session');
     expect(forced.token).toBe('header.payload.signature');
   });
+
+  it('does not let a forced caller inherit ANOTHER forced caller\'s failure either', async () => {
+    // Confirmed live on a cold backend: apiClient's 401-retry fires forced
+    // calls on the DEFAULT 4s timeout; the bypass click (20s budget) joined
+    // one of those chains via inFlightForcedSession and surfaced its abort at
+    // ~8s without ever using its own budget. Joining is for deduplication,
+    // not for inheriting a failure -- a joined non-session result must trigger
+    // this caller's own attempt.
+    let call = 0;
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => {
+        call += 1;
+        if (call === 1) {
+          // First forced caller's fetch: slow, then dies (a timeout/abort in
+          // the wild). Keep it pending long enough for the second caller to
+          // arrive and join.
+          await new Promise((resolve) => setTimeout(resolve, 30));
+          throw new Error('aborted');
+        }
+        return { ok: true, json: async () => backendDevSessionResponse() };
+      }),
+    );
+
+    const { ensureDevBackendSession } = await import('./devBackendAuth');
+    const firstForced = ensureDevBackendSession({ force: true, timeoutMs: 50 });
+    await new Promise((resolve) => setTimeout(resolve, 5));
+    const secondForced = ensureDevBackendSession({ force: true, timeoutMs: 20_000 });
+
+    const [first, second] = await Promise.all([firstForced, secondForced]);
+
+    expect(first.source).toBe('fallback-bypass');
+    // The second caller ran its own fetch instead of settling for the failure.
+    expect(second.source).toBe('dev-session');
+    expect(second.token).toBe('header.payload.signature');
+    expect(call).toBe(2);
+  });
 });
