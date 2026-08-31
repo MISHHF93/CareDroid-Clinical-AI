@@ -192,10 +192,12 @@
   margin-top: 4px;
 }
 
+/* Was var(--medical-accent, ...) -- role-tinted (role-accent-theme.css),
+   but this is a generic primary action button, no role-identity meaning. */
 .fj-btn-primary {
   padding: 8px 14px;
   border-radius: 8px;
-  background: var(--medical-accent, #64748b);
+  background: var(--app-accent);
   color: var(--medical-text-on-accent, #ffffff);
   font-weight: 700;
   font-size: 13px;
@@ -228,8 +230,10 @@
   color: var(--medical-ink, #111827);
 }
 
+/* Was var(--medical-accent, ...) -- role-tinted, but this is a generic
+   "+ Create Readiness Plan"/"Cancel" toggle, no role-identity meaning. */
 .fj-btn-toggle--off {
-  background: var(--medical-accent, #64748b);
+  background: var(--app-accent);
   color: var(--medical-text-on-accent, #ffffff);
 }
 
@@ -356,9 +360,12 @@
   cursor: pointer;
 }
 
+/* Was var(--medical-accent, ...) -- role-tinted, but this is a generic
+   resource-type filter chip, no role-identity meaning (same shape as
+   DispatchConsole.css's .dc-resource-chip--on). */
 .fj-resource-chip--on {
-  border-color: var(--medical-accent, #64748b);
-  background: color-mix(in srgb, var(--medical-accent, #64748b) 15%, transparent);
+  border-color: var(--app-accent);
+  background: color-mix(in srgb, var(--app-accent) 15%, transparent);
   color: var(--medical-ink, #111827);
 }
 
@@ -473,7 +480,10 @@
   background-color: #10b981;
 }
 
+/* Was var(--medical-accent, ...) -- role-tinted, which broke the tone
+   system's own consistency: critical/warning/success are fixed hex colors
+   regardless of role, but info/neutral alone would shift hue per role. */
 .emergency-command-action__tone--info,
 .emergency-command-action__tone--neutral {
-  background-color: var(--medical-accent, #64748b);
+  background-color: var(--app-accent);
 }

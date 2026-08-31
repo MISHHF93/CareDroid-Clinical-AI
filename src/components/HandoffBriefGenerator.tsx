@@ -278,8 +278,12 @@ const COMPONENT_STYLES = `
 }
 
 .handoff-brief-generator button:first-child {
-  background: var(--medical-accent, #0ea5e9);
-  border-color: var(--medical-accent, #0ea5e9);
+  /* Was var(--medical-accent, ...) -- role-tinted (role-accent-theme.css),
+     but "Generate Handoff Brief"/"Regenerate" is a generic utility action
+     with no role-identity meaning, the same shape as the Medical IoT
+     Refresh button fixed earlier this session. */
+  background: var(--app-accent);
+  border-color: var(--app-accent);
   color: var(--medical-text-on-accent, #ffffff);
 }
 

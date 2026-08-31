@@ -116,9 +116,13 @@
   margin: 0;
 }
 
+/* Was var(--medical-text-link, ...) -- role-tinted (role-accent-theme.css),
+   but this is a plain <p> eyebrow/caption label, no role-identity meaning
+   (unrelated to text-normalization.css's <a>-only sweep, so needed its own
+   direct fix here). */
 .cd-ai-panel__header p,
 .cd-ai-card__title p {
-  color: var(--medical-text-link, #0369a1);
+  color: var(--app-accent);
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -144,7 +148,7 @@
   background: color-mix(in srgb, var(--app-accent-action, #0ea5e9) 12%, #ffffff);
   border: 1px solid color-mix(in srgb, var(--app-accent-action, #0ea5e9) 30%, #ffffff);
   border-radius: 999px;
-  color: var(--medical-text-link, #0369a1);
+  color: var(--app-accent);
   display: inline-flex;
   font-size: 12px;
   justify-content: center;
@@ -330,7 +334,7 @@
 
 .cd-ai-card__next {
   background: color-mix(in srgb, var(--app-accent-action, #0ea5e9) 8%, #ffffff);
-  color: var(--medical-text-link, #0369a1);
+  color: var(--app-accent);
   padding: 10px;
 }
 

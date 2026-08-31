@@ -322,6 +322,9 @@
   color: var(--medical-ink-muted, #64748b);
 }
 
+/* Was var(--medical-accent, ...) -- role-tinted (role-accent-theme.css),
+   but this is the "Log New Call"/"Log Critical Call" form-submit button, a
+   generic action, no role-identity meaning. */
 .dc-btn-primary {
   padding: 10px 16px;
   border-radius: 8px;
@@ -329,7 +332,7 @@
   font-weight: 700;
   font-size: 13px;
   cursor: pointer;
-  background: var(--medical-accent, #64748b);
+  background: var(--app-accent);
   color: #fff;
 }
 
@@ -353,9 +356,12 @@
   color: var(--medical-ink-subtle, var(--cdl-ink-subtle, #475569));
 }
 
+/* Was var(--medical-accent, ...) -- role-tinted (role-accent-theme.css),
+   but this is a generic resource-type filter toggle, no role-identity
+   meaning. */
 .dc-resource-chip--on {
-  border-color: var(--medical-accent, #64748b);
-  background: color-mix(in srgb, var(--medical-accent, #64748b) 14%, transparent);
+  border-color: var(--app-accent);
+  background: color-mix(in srgb, var(--app-accent) 14%, transparent);
   color: var(--medical-ink, #111827);
 }
 

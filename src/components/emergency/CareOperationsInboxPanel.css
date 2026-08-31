@@ -63,7 +63,10 @@
   margin-right: 6px;
   padding: 1px 6px;
   border-radius: 999px;
-  background: var(--medical-accent, #0ea5e9);
+  /* Was var(--medical-accent, ...) -- role-tinted (role-accent-theme.css),
+     but a "NEW" badge on an inbox task is generic UI chrome, no
+     role-identity meaning. */
+  background: var(--app-accent);
   color: #ffffff;
   font-size: 9px;
   font-weight: 700;
@@ -149,9 +152,12 @@
   cursor: not-allowed;
 }
 
+/* Was var(--medical-accent, ...) -- role-tinted (role-accent-theme.css),
+   but "Claim"/"Start"/"Complete" are generic task-transition actions, no
+   role-identity meaning. */
 .care-ops-inbox__btn--primary {
-  background: var(--medical-accent, #0ea5e9);
-  border-color: var(--medical-accent, #0ea5e9);
+  background: var(--app-accent);
+  border-color: var(--app-accent);
   color: #ffffff;
 }
 

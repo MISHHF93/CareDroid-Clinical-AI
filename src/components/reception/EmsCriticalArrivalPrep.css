@@ -133,7 +133,11 @@
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: var(--medical-accent, #64748b);
+  /* Was var(--medical-accent, ...) -- role-tinted (role-accent-theme.css),
+     but this is a checklist-completion progress fill, no role-identity
+     meaning -- any role viewing the reception desk can see/interact with
+     this checklist, not just EMS. */
+  background: var(--app-accent);
 }
 
 .ems-critical-arrival-prep__checklist-items {

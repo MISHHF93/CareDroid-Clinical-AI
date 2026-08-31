@@ -102,8 +102,11 @@
   background: var(--status-critical, #ef4444);
 }
 
+/* Was var(--medical-accent, ...) -- role-tinted, inconsistent with its own
+   sibling tones (--information/--warning/--critical above all use fixed
+   --status-* tokens regardless of role); "action" should be equally fixed. */
 .cdl-situation-graphic-card--action::before {
-  background: color-mix(in srgb, var(--medical-accent, #64748b) 70%, #6366f1);
+  background: color-mix(in srgb, var(--app-accent) 70%, #6366f1);
 }
 
 /* Tinted backgrounds — use !important to win over any cascade-order issues.
