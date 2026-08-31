@@ -58,7 +58,7 @@ describe('OrganizationOnboarding', () => {
     expect(slugInput.value).toBe('riverside-walk-in-clinic');
   });
 
-  it('submits the real onboarding contract and redirects to tenant admin on success', async () => {
+  it('submits the real onboarding contract and hands over the remaining setup instead of navigating away', async () => {
     vi.mocked(ProductCatalogApi.completeOnboarding).mockResolvedValue({ id: 'org-new' } as any);
     const user = userEvent.setup();
     render(
@@ -80,7 +80,16 @@ describe('OrganizationOnboarding', () => {
       );
     });
     await waitFor(() => expect(refreshPlatformContext).toHaveBeenCalled());
-    await waitFor(() => expect(navigateMock).toHaveBeenCalledWith('/tenant-admin'));
+
+    // Previously this auto-navigated to /tenant-admin the moment the one
+    // automated step finished, discarding the five remaining onboarding steps
+    // the model defines -- the user landed on an unrelated admin page with no
+    // idea they existed. Success now confirms in place and surfaces the rest.
+    await waitFor(() =>
+      expect(screen.getByRole('status')).toHaveTextContent(/continue with the remaining setup/i),
+    );
+    expect(navigateMock).not.toHaveBeenCalled();
+    expect(screen.getByRole('button', { name: /go to tenant admin/i })).toBeInTheDocument();
   });
 
   it('shows the backend error message and does not navigate when onboarding fails', async () => {

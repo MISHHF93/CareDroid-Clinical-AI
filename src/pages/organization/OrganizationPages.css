@@ -96,6 +96,57 @@
   font-size: 0.9rem;
 }
 
+/* A failed onboarding used to look exactly like a successful one -- same bare
+   paragraph, same ink. Carry the semantic state visually as well as via
+   role="alert"/"status", never by colour alone (each tone also reads
+   differently in copy). */
+.org-status--error {
+  color: var(--status-critical, #b42318);
+  font-weight: 600;
+}
+
+.org-status--success {
+  color: var(--semantic-healthy, #027a48);
+  font-weight: 600;
+}
+
+.org-status--progress {
+  color: var(--app-fg-muted, #627d98);
+}
+
+.org-onboarding-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.org-onboarding-step {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--app-border-subtle, #e2e8f0);
+  border-radius: var(--cdl-radius-md, 10px);
+  background: var(--app-surface-1, #fff);
+}
+
+.org-onboarding-step > div {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.org-onboarding-step__pending {
+  font-size: 0.8rem;
+  color: var(--app-fg-muted, #627d98);
+}
+
 .org-lifecycle-table {
   width: 100%;
   border-collapse: collapse;
