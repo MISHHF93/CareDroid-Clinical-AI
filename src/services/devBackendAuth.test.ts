@@ -247,4 +247,38 @@ describe('devBackendAuth ensureDevBackendSession concurrency (HEAL-347.42)', () 
     expect(unforced.token).toBe('header.payload.signature');
     expect(forced.token).toBe('header.payload.signature');
   });
+
+  it('does not let an explicit bypass click inherit an unforced caller\'s non-session fallback', async () => {
+    // The join added in HEAL-347.46 assumed the in-flight unforced fetch "is
+    // fetching the exact same fresh session a forced call would". When the
+    // reachability probe says the backend is unreachable, an UNFORCED call
+    // never performs the session POST at all -- it resolves
+    // source:'local-demo-bypass'. A forced caller that joined that inherited
+    // it, and AuthPage.tsx's bypass click (which requires source ===
+    // 'dev-session') threw and left the developer stranded on /login with
+    // only the ambient authMode:'local-dev-demo' profile that
+    // RequireRealSession refuses. Reproduced live as an intermittent
+    // "clicking Enter CareDroid now does nothing" depending purely on whether
+    // the click landed inside the ambient call's in-flight window.
+    const reachability = await import('./backendReachability');
+    vi.mocked(reachability.ensureBackendReachabilityProbed).mockImplementation(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 20));
+      return false;
+    });
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => ({ ok: true, json: async () => backendDevSessionResponse() })),
+    );
+
+    const { ensureDevBackendSession } = await import('./devBackendAuth');
+    const unforcedPromise = ensureDevBackendSession();
+    const forcedPromise = ensureDevBackendSession({ force: true });
+    const [unforced, forced] = await Promise.all([unforcedPromise, forcedPromise]);
+
+    // The unforced ambient caller still short-circuits, as designed.
+    expect(unforced.source).toBe('local-demo-bypass');
+    // The explicit click must still come back with a real session.
+    expect(forced.source).toBe('dev-session');
+    expect(forced.token).toBe('header.payload.signature');
+  });
 });

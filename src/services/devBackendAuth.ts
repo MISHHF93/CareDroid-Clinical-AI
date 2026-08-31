@@ -315,7 +315,29 @@ export async function ensureDevBackendSession({
       // ever nulls inFlightDevSession, so aliasing directly would leave
       // inFlightForcedSession permanently pointing at a stale, already-
       // resolved promise once this fetch settles.
-      inFlightForcedSession = inFlightDevSession.finally(() => {
+      //
+      // HEAL-347.46 assumed the unforced fetch in flight "is fetching the
+      // exact same fresh session a forced call would". It is not, always: an
+      // unforced call can spend its whole life in the backend-reachability
+      // probe and then resolve as 'local-demo-bypass' (or 'fallback-bypass'
+      // on a non-OK response) WITHOUT ever performing the session POST. A
+      // forced caller that joined such a result inherited a non-'dev-session'
+      // source, and AuthPage.tsx's bypass click -- which requires source ===
+      // 'dev-session' -- threw and left the user on /login holding only the
+      // ambient authMode:'local-dev-demo' profile, which RequireRealSession
+      // refuses. Confirmed live: repeated "Enter CareDroid now" clicks stuck
+      // at /login with a 200 dev-session POST in the network log, and the
+      // outcome flipped run to run purely on whether the click landed inside
+      // the ambient call's in-flight window. So: still join (that is what
+      // keeps this route off its known DB-pool cliff), but if the joined
+      // result is not a real dev session, do this caller's own forced fetch
+      // rather than handing back a result it cannot use.
+      const joined = inFlightDevSession.then((result) =>
+        result?.source === 'dev-session'
+          ? result
+          : resolveDevBackendSession({ force: true, timeoutMs }),
+      );
+      inFlightForcedSession = joined.finally(() => {
         inFlightForcedSession = null;
       });
       return inFlightForcedSession;

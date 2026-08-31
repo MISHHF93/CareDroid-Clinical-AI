@@ -422,6 +422,26 @@ export class AuthService {
         user.profile.roleProfileId = normalizedRoleProfileId;
         await this.profileRepository.save(user.profile);
       }
+    } else if (user.role === UserRole.STUDENT) {
+      // This is ONE singleton dev user, so the role written by a persona
+      // switch sticks in the database forever. read_only_viewer/public_display
+      // both map to UserRole.STUDENT (see saas-profile.constants.ts), which
+      // carries no clinical permissions -- so once anyone previewed the
+      // waiting-room wall, every later plain "Enter CareDroid now" (which
+      // sends no roleProfileId) signed back in as that permission-less user.
+      // Confirmed live: GET /api/auth/dev-session returned role 'student' with
+      // a stuck roleProfileId of 'public_display', and the ED routes 403'd in
+      // a burst on every load. STUDENT is never a real CareDroid clinical
+      // persona -- it is the DB column default and the SaaS low-tier fallback
+      // -- so an unqualified dev sign-in heals back to the same clinical role
+      // a freshly-created dev user gets, exactly like the subscription-tier
+      // self-heal above. A qualified call (roleProfileId present) still wins,
+      // so switching INTO the public wall persona is unaffected.
+      user.role = UserRole.PHYSICIAN;
+      if (user.profile && user.profile.roleProfileId) {
+        user.profile.roleProfileId = null;
+        await this.profileRepository.save(user.profile);
+      }
     }
 
     user.lastLoginAt = new Date();

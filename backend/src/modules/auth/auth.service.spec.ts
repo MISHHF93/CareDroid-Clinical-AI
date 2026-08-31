@@ -380,6 +380,72 @@ describe('AuthService', () => {
       );
     });
 
+    it('heals an unqualified dev sign-in out of the permission-less student role a persona preview left behind', async () => {
+      // There is ONE singleton dev user, so the role a persona switch writes
+      // sticks in the database forever. read_only_viewer/public_display both
+      // map to UserRole.STUDENT, which carries no clinical permissions -- so
+      // once anyone previewed the waiting-room wall, every later plain "Enter
+      // CareDroid now" (which sends no roleProfileId) signed back in as that
+      // permission-less user and the ED routes 403'd on every load.
+      // Confirmed live before the fix: POST /api/auth/dev-session returned
+      // role 'student' with a stuck roleProfileId of 'public_display'.
+      process.env.ENABLE_DEV_AUTH_BYPASS = 'true';
+
+      const profile = { userId: 'dev-user-stuck', roleProfileId: 'public_display' };
+      const devUser = {
+        id: 'dev-user-stuck',
+        email: 'dev@caredroid.local',
+        role: 'student',
+        profile,
+        subscription: { tier: 'enterprise' },
+        twoFactor: null,
+      };
+
+      mockUserRepository.findOne.mockResolvedValue(devUser);
+      mockUserRepository.save.mockImplementation(async (entity) => entity);
+      mockProfileRepository.save.mockImplementation(async (entity) => entity);
+      mockOrganizationRepository.findOne.mockResolvedValue({ id: 'org-1', organizationType: 'hospital' });
+      mockOrganizationMembershipRepository.findOne.mockResolvedValue({ id: 'om-1' });
+      mockWorkspaceRepository.findOne.mockResolvedValue({ id: 'ws-1', name: 'Emergency Operations' });
+      mockWorkspaceMembershipRepository.findOne.mockResolvedValue({ id: 'wm-1' });
+      mockJwtService.sign.mockReturnValue('signed-token');
+
+      await service.createDevSession('127.0.0.1', 'test-agent');
+
+      expect(devUser.role).toBe('physician');
+      expect(profile.roleProfileId).toBeNull();
+    });
+
+    it('still honours an explicitly requested low-privilege persona', async () => {
+      // The heal above must not make the public-wall/read-only personas
+      // unreachable -- a qualified call still wins.
+      process.env.ENABLE_DEV_AUTH_BYPASS = 'true';
+
+      const profile = { userId: 'dev-user-switch', roleProfileId: 'physician' };
+      const devUser = {
+        id: 'dev-user-switch',
+        email: 'dev@caredroid.local',
+        role: 'physician',
+        profile,
+        subscription: { tier: 'enterprise' },
+        twoFactor: null,
+      };
+
+      mockUserRepository.findOne.mockResolvedValue(devUser);
+      mockUserRepository.save.mockImplementation(async (entity) => entity);
+      mockProfileRepository.save.mockImplementation(async (entity) => entity);
+      mockOrganizationRepository.findOne.mockResolvedValue({ id: 'org-1', organizationType: 'hospital' });
+      mockOrganizationMembershipRepository.findOne.mockResolvedValue({ id: 'om-1' });
+      mockWorkspaceRepository.findOne.mockResolvedValue({ id: 'ws-1', name: 'Emergency Operations' });
+      mockWorkspaceMembershipRepository.findOne.mockResolvedValue({ id: 'wm-1' });
+      mockJwtService.sign.mockReturnValue('signed-token');
+
+      await service.createDevSession('127.0.0.1', 'test-agent', 'public_display');
+
+      expect(devUser.role).toBe('student');
+      expect(profile.roleProfileId).toBe('public_display');
+    });
+
     it('seeds a freshly-created dev user with an Enterprise subscription, not Free (HEAL-079)', async () => {
       // Regression: the dev user was previously seeded at SubscriptionTier.FREE,
       // which caused every subscription-gated AI feature (e.g. POST /api/ai/node,
