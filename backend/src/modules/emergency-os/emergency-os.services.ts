@@ -64,6 +64,7 @@ import {
 } from './patient-duplicate-detection';
 import { Patient } from './entities/patient.entity';
 import { Alert } from './entities/alert.entity';
+import { Encounter } from './entities/encounter.entity';
 import { Referral as ReferralEntity } from './entities/referral.entity';
 import { EmsArrivalStatus } from './entities/ems-arrival-status.entity';
 import { EmergencyOsSettingsEntity } from './entities/emergency-os-settings.entity';
@@ -859,6 +860,11 @@ export class EmergencyPatientService implements OnModuleInit {
     private readonly alertRepository?: Repository<Alert>,
     /** PR-5b: Mode B CIG shadow projection after board mutations */
     @Optional() private readonly cigProjection?: CigProjectionFacade,
+    /** Durable per-visit history -- see syncEncounterHistory(). Kept LAST so
+     * existing positional spec constructions keep their argument slots. */
+    @Optional()
+    @InjectRepository(Encounter)
+    private readonly encounterRepository?: Repository<Encounter>,
   ) {
     for (const alert of this.alerts) {
       this.persistAlertToDatabase(alert);
@@ -1090,6 +1096,94 @@ export class EmergencyPatientService implements OnModuleInit {
   }
 
   /**
+   * Durable per-visit history, following persistPatientToDatabase()'s own
+   * best-effort/non-blocking write-through pattern. The in-memory model has
+   * no encounter concept (an "encounter" is a timeline event whose id is
+   * derived from the patient id), so a returning patient's new visit used to
+   * overwrite the previous one in place with nothing durable left of it.
+   * This keeps `ed_encounters` current instead:
+   *
+   *   created                       -> open a new active encounter row
+   *   state -> Discharge            -> close the active row (frozen snapshot)
+   *   Discharge -> anything else    -> RETURNING visit: open a NEW row
+   *   any other update              -> refresh the active row's snapshot
+   *
+   * Reads have not been cut over -- the whiteboard/timeline still use the
+   * legacy model. Never throws; a failed history write must not break the
+   * synchronous board mutation that triggered it.
+   */
+  private syncEncounterHistory(
+    patient: EmergencyPatient,
+    change: 'created' | 'updated',
+    previousState?: string,
+  ): void {
+    if (!this.encounterRepository) return;
+    const repository = this.encounterRepository;
+    const now = new Date().toISOString();
+
+    const snapshot = {
+      arrivalTime: patient.arrivalTime,
+      chiefComplaint: patient.chiefComplaint,
+      complaintCategory: patient.complaintCategory,
+      priority: patient.priority,
+      state: patient.state,
+      arrivalMode: patient.arrivalMode,
+    };
+
+    const openNewEncounter = () =>
+      repository.save(
+        repository.create({
+          // Unique per VISIT -- unlike the legacy `encounter-${patient.id}`,
+          // which made a second visit structurally impossible.
+          id: `enc-${patient.id}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`,
+          organizationId: patient.organizationId,
+          patientId: patient.id,
+          status: 'active',
+          startedAt: patient.arrivalTime || now,
+          ...snapshot,
+        }),
+      );
+
+    // Promise-chained, not an async method body: emergency-patient-atomicity-
+    // invariant.spec.ts token-scans this class to keep per-request methods
+    // free of suspension points (it reads raw source, comments included --
+    // hence this wording), and persistPatientToDatabase() above set the same
+    // .then/.catch style for exactly this fire-and-forget seam.
+    const chain: Promise<unknown> =
+      change === 'created'
+        ? openNewEncounter()
+        : repository
+            .findOne({
+              where: { patientId: patient.id, status: 'active' },
+              order: { startedAt: 'DESC' },
+            })
+            .then((active) => {
+              const discharging = patient.state === 'Discharge';
+              const returning = previousState === 'Discharge' && !discharging;
+
+              if (discharging) {
+                if (!active) return undefined;
+                return repository.save(
+                  Object.assign(active, { ...snapshot, status: 'completed', endedAt: now }),
+                );
+              }
+              if (returning || !active) {
+                // Returning patient, or an update arriving before any create
+                // ever reached this table (pre-migration rows): open the
+                // visit now.
+                return openNewEncounter();
+              }
+              return repository.save(Object.assign(active, snapshot));
+            });
+
+    chain.catch((error) => {
+      this.logger.warn(
+        `Failed to sync encounter history for patient ${patient.id}: ${error}`,
+      );
+    });
+  }
+
+  /**
    * Mirrors `persistPatientToDatabase()`: best-effort, non-blocking
    * write-through to the real `alerts` table. Called for every dispatched
    * alert (and once per fixture-seeded alert at construction) so real data
@@ -1221,6 +1315,7 @@ export class EmergencyPatientService implements OnModuleInit {
         new Date().toISOString(),
       );
     }
+    const previousState = current.state;
     this.patients[index] = {
       ...current,
       ...normalizedPatch,
@@ -1228,6 +1323,7 @@ export class EmergencyPatientService implements OnModuleInit {
     };
     const updated = clone(this.patients[index]);
     this.persistPatientToDatabase(updated);
+    this.syncEncounterHistory(updated, 'updated', previousState);
     this.publishPatientBoardRealtime('patient_updated', updated, updated);
     this.projectCigBoard('patient.updated', `patient-updated-${updated.id}`);
     return updated;
@@ -1483,6 +1579,7 @@ export class EmergencyPatientService implements OnModuleInit {
     });
     const created = clone(patient);
     this.persistPatientToDatabase(created);
+    this.syncEncounterHistory(created, 'created');
     this.publishPatientBoardRealtime('patient_created', created, created);
     this.projectCigBoard('patient.created', `patient-created-${created.id}`);
     return created;

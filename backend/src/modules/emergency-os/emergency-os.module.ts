@@ -66,6 +66,7 @@ import { PatientFlowService } from './emergency-os.patient-flow.service';
 import { AdministrativeAutomationQueueService } from './administrative-automation-queue.service';
 import { AdministrativeAutomationTaskEntity } from './entities/administrative-automation-task.entity';
 import { Patient } from './entities/patient.entity';
+import { Encounter } from './entities/encounter.entity';
 import { Room } from './entities/room.entity';
 import { Staff } from './entities/staff.entity';
 import { Alert } from './entities/alert.entity';
@@ -84,6 +85,7 @@ import { EmergencyOperatingSurfacesService } from './emergency-os.operating-surf
     TypeOrmModule.forFeature([
       AdministrativeAutomationTaskEntity,
       Patient,
+      Encounter,
       Room,
       Staff,
       Alert,
