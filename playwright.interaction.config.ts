@@ -2,7 +2,9 @@ import baseConfig from './playwright.config';
 
 export default {
   ...baseConfig,
-  testMatch: 'interaction-execution.spec.mjs',
+  // Both real-interaction specs: the generic click sweep and the keyboard
+  // contract for dialogs.
+  testMatch: /(interaction-execution|dialog-keyboard).spec.mjs/,
   timeout: 120_000,
   workers: 1,
   retries: 0,

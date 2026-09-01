@@ -86,7 +86,14 @@ export default function useModalDialog(
       const active = document.activeElement as HTMLElement | null;
 
       if (event.shiftKey) {
-        if (active === first || !container.contains(active)) {
+        // `active === container` matters and is easy to miss: with
+        // initialFocus 'container' the caret starts on the dialog itself, which
+        // is neither the first focusable nor outside the dialog, so an earlier
+        // version let Shift+Tab walk backwards straight out of it. The
+        // browser-level contract test found it because nothing covered the
+        // container-focus mode yet; the unit test added alongside this
+        // reproduces it too.
+        if (active === container || active === first || !container.contains(active)) {
           event.preventDefault();
           last.focus();
         }

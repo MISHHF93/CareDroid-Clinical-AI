@@ -16,6 +16,17 @@ function Dialog({ onClose, lockScroll = true }: { onClose?: () => void; lockScro
   );
 }
 
+function ContainerFocusDialog() {
+  const ref = useRef<HTMLDivElement>(null);
+  useModalDialog(ref, { initialFocus: 'container' });
+  return (
+    <div ref={ref} tabIndex={-1} role="dialog" aria-modal="true" aria-label="Reassessment">
+      <button type="button">Close</button>
+      <button type="button">Save</button>
+    </div>
+  );
+}
+
 function Harness({ open, onClose }: { open: boolean; onClose?: () => void }) {
   return (
     <>
@@ -51,6 +62,19 @@ describe('useModalDialog', () => {
     render(<Dialog />);
 
     screen.getByRole('button', { name: 'Close' }).focus();
+    await user.tab({ shift: true });
+
+    expect(screen.getByRole('button', { name: 'Save' })).toHaveFocus();
+  });
+
+  it('wraps Shift+Tab when focus is still on the dialog container', async () => {
+    const user = userEvent.setup();
+    render(<ContainerFocusDialog />);
+
+    // initialFocus 'container' leaves the caret on the dialog itself, which is
+    // neither the first focusable nor outside the dialog. A real browser walked
+    // backwards out of the dialog from here.
+    expect(screen.getByRole('dialog')).toHaveFocus();
     await user.tab({ shift: true });
 
     expect(screen.getByRole('button', { name: 'Save' })).toHaveFocus();
