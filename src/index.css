@@ -258,11 +258,11 @@ code {
 }
 
 .animate-pulse {
-  animation: pulse 2s ease-in-out infinite;
+  animation: pulse var(--cdl-pulse-attention, 2s) ease-in-out infinite;
 }
 
 .animate-glow {
-  animation: glow 2s ease-in-out infinite;
+  animation: glow var(--cdl-pulse-attention, 2s) ease-in-out infinite;
 }
 
 /* Page Transitions */

@@ -43,7 +43,7 @@
 }
 
 .high-risk-complaint-badge--rapid-review {
-  animation: high-risk-complaint-pulse 2.4s ease-in-out infinite;
+  animation: high-risk-complaint-pulse var(--cdl-pulse-attention, 2s) ease-in-out infinite;
 }
 
 @keyframes high-risk-complaint-pulse {

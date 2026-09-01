@@ -168,7 +168,7 @@
 }
 
 .cdl-kpi-capsule--pulse .cdl-kpi-capsule__dot {
-  animation: cdl-kpi-capsule-pulse 1.6s ease-in-out infinite;
+  animation: cdl-kpi-capsule-pulse var(--cdl-pulse-critical, 1.6s) ease-in-out infinite;
 }
 
 @keyframes cdl-kpi-capsule-pulse {

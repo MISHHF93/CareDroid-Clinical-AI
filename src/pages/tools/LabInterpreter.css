@@ -634,10 +634,10 @@
 .lab-status-badge.critical-low {
   background: color-mix(in srgb, var(--app-danger) 18%, transparent);
   color: var(--danger);
-  animation: pulse 2s ease-in-out infinite;
+  animation: lab-value-pulse var(--cdl-pulse-attention, 2s) ease-in-out infinite;
 }
 
-@keyframes pulse {
+@keyframes lab-value-pulse {
   0%,
   100% {
     opacity: 1;
@@ -694,7 +694,7 @@
   border: 2px solid color-mix(in srgb, var(--app-danger) 45%, transparent);
   border-radius: 12px;
   margin-bottom: 24px;
-  animation: alertPulse 2s ease-in-out infinite;
+  animation: alertPulse var(--cdl-pulse-attention, 2s) ease-in-out infinite;
   overflow-wrap: anywhere;
   word-break: break-word;
 }
@@ -725,7 +725,12 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  animation: shake 0.5s ease-in-out infinite;
+  /* Was `shake 0.5s ease-in-out infinite`: a critical lab result icon that
+     juddered for as long as the result was on screen. A shake draws the eye
+     once; held indefinitely beside a value a clinician is trying to read, it
+     competes with the reading itself and is a poor thing to put in front of
+     anyone motion-sensitive. Three shakes, then still. */
+  animation: shake 0.5s ease-in-out 3;
 }
 
 @keyframes shake {

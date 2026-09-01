@@ -14,7 +14,7 @@
   line-height: 1;
   box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.65);
   cursor: pointer;
-  animation: reassessment-badge-pulse 1.6s var(--motion-ease-standard, ease-out) infinite;
+  animation: reassessment-badge-pulse var(--cdl-pulse-critical, 1.6s) var(--motion-ease-standard, ease-out) infinite;
   transition:
     background-color var(--motion-transition-fast),
     border-color var(--motion-transition-fast),
@@ -209,7 +209,7 @@
 .reassessment-drawer__row--reassessment-due {
   animation:
     reassessment-row-enter var(--motion-transition-normal) both,
-    reassessment-row-pulse 1.8s var(--motion-ease-standard, ease-in-out) infinite;
+    reassessment-row-pulse var(--cdl-pulse-critical, 1.6s) var(--motion-ease-standard, ease-in-out) infinite;
 }
 
 .reassessment-drawer__priority-bar {

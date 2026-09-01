@@ -371,7 +371,7 @@
   background: color-mix(in srgb, var(--status-critical, #ef4444) 10%, var(--color-card, #ffffff));
   border-color: color-mix(in srgb, var(--status-critical, #ef4444) 28%, transparent);
   color: var(--status-critical, #ef4444);
-  animation: alerts-pending-pulse 2s ease-in-out infinite;
+  animation: alerts-pending-pulse var(--cdl-pulse-attention, 2s) ease-in-out infinite;
 }
 
 @keyframes alerts-pending-pulse {

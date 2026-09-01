@@ -222,7 +222,7 @@ button.cdl-alarm-kpi:focus-visible {
 /* Pulse only for unacked critical */
 .cdl-alarm-kpi--pulse[data-severity='critical'],
 .cdl-alarm-banner--pulse[data-severity='critical'] {
-  animation: cdl-alarm-critical-pulse 1.6s ease-in-out infinite;
+  animation: cdl-alarm-critical-pulse var(--cdl-pulse-critical, 1.6s) ease-in-out infinite;
 }
 
 @keyframes cdl-alarm-critical-pulse {

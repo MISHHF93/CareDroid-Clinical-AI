@@ -92,6 +92,17 @@
   --cdl-ease-decelerate: cubic-bezier(0, 0, 0.2, 1);
   --cdl-ease-accelerate: cubic-bezier(0.4, 0, 1, 1);
 
+  /* ── Status pulse cadences ──
+     One tempo per urgency tier. These were 9 different durations (0.9s, 1s,
+     1.2s, 1.4s, 1.6s, 1.8s, 2s, 2.4s and a 0.5s shake) chosen per component,
+     so a busy board beat in several unrelated rhythms at once and urgency read
+     as noise rather than hierarchy. Tier, not taste, now decides the tempo:
+     critical alarms share one, attention-level indicators another, and ambient
+     "this is live" affordances a third. */
+  --cdl-pulse-critical: 1.6s;
+  --cdl-pulse-attention: 2s;
+  --cdl-pulse-live: 1.2s;
+
   /* ── Control / icon optical sizes ── */
   --cdl-touch-min: 44px;
   --cdl-control-height-sm: 34px;

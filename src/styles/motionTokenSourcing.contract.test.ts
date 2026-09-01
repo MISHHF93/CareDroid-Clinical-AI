@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
@@ -70,6 +70,37 @@ describe('motion token sourcing', () => {
         `--motion-transition-${step} should have exactly one owner`,
       ).toEqual(['design-tokens.css']);
     }
+  });
+
+  it('gives every looping status indicator a tier token instead of its own tempo', () => {
+    const cssFiles = readdirSync(join(__dirname, '..'), { recursive: true, encoding: 'utf8' })
+      .filter((name) => name.endsWith('.css'))
+      .map((name) => join(__dirname, '..', name));
+
+    // Spinners and skeletons are progress affordances, not urgency signals --
+    // their tempo is a separate concern and deliberately out of scope here.
+    const EXEMPT = /spin|shimmer|skeleton|dash/i;
+    const offenders: string[] = [];
+
+    for (const file of cssFiles) {
+      for (const line of readFileSync(file, 'utf8').split('\n')) {
+        // Comments describing the old values are not declarations. This codebase
+        // has several checkers that scan comment prose and flag it, which is how
+        // a note explaining a rule ends up failing that very rule.
+        const trimmed = line.trim();
+        if (trimmed.startsWith('/*') || trimmed.startsWith('*') || trimmed.startsWith('//')) continue;
+        if (!line.includes('infinite') || EXEMPT.test(line)) continue;
+        // A bare duration literal on a looping indicator is the thing this
+        // guard exists to stop: it is how nine unsynchronised cadences appeared.
+        if (/\b\d+(\.\d+)?m?s\b/.test(line) && !line.includes('var(--cdl-pulse-')) {
+          offenders.push(`${file.replace(/.*[\\/]src[\\/]/, 'src/')}: ${line.trim()}`);
+        }
+      }
+    }
+
+    expect(offenders, `looping indicators with a hand-picked tempo:\n${offenders.join('\n')}`).toEqual(
+      [],
+    );
   });
 
   it('keeps the reduced-motion collapse with the scale that owns the values', () => {

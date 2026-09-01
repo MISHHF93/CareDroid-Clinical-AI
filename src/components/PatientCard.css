@@ -153,7 +153,7 @@
 .patient-card--reassessment-due {
   animation:
     patient-card-enter var(--cdl-duration-normal, 180ms) var(--cdl-ease-standard, ease-out),
-    patient-card-reassessment-pulse 1.4s var(--cdl-ease-standard, ease-in-out) infinite
+    patient-card-reassessment-pulse var(--cdl-pulse-critical, 1.6s) var(--cdl-ease-standard, ease-in-out) infinite
       var(--cdl-duration-normal, 180ms);
 }
 
@@ -1151,7 +1151,7 @@
 }
 
 .patient-card--row.patient-card--reassessment-due {
-  animation: patient-card-reassessment-pulse 1.4s var(--motion-ease-standard, ease-in-out) infinite;
+  animation: patient-card-reassessment-pulse var(--cdl-pulse-critical, 1.6s) var(--motion-ease-standard, ease-in-out) infinite;
 }
 
 .emergency-whiteboard-page__patient-list .patient-card--row + .patient-card--row {

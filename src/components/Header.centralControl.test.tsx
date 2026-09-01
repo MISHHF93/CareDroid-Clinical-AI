@@ -33,8 +33,13 @@ describe('Header chrome (caredroid-header)', () => {
 
     const header = screen.getByRole('banner');
     expect(header).toHaveClass('caredroid-header');
+    // The field is a combobox, not a plain searchbox: it owns a results listbox
+    // and drives it with aria-expanded/aria-controls/aria-activedescendant, so
+    // assistive tech should announce the expanded state and the highlighted
+    // result. `role="combobox"` overrides the implicit searchbox role that this
+    // assertion originally looked for.
     expect(
-      within(header).getByRole('searchbox', { name: /operational search|patient search/i }),
+      within(header).getByRole('combobox', { name: /operational search|patient search/i }),
     ).toBeInTheDocument();
     expect(within(header).getByRole('button', { name: /start a new patient intake/i })).toBeInTheDocument();
     expect(within(header).getByRole('button', { name: /Account menu for/i })).toBeInTheDocument();
@@ -60,7 +65,7 @@ describe('Header chrome (caredroid-header)', () => {
     renderHeader();
 
     const header = screen.getByRole('banner');
-    const search = within(header).getByRole('searchbox');
+    const search = within(header).getByRole('combobox');
     const create = within(header).getByRole('button', { name: /start a new patient intake/i });
     expect(
       Boolean(create.compareDocumentPosition(search) & Node.DOCUMENT_POSITION_FOLLOWING),

@@ -85,7 +85,7 @@
   height: 6px;
   border-radius: 999px;
   background: #475569;
-  animation: ed-copilot-typing 900ms infinite ease-in-out;
+  animation: ed-copilot-typing var(--cdl-pulse-live, 1.2s) infinite ease-in-out;
 }
 
 .ed-copilot-typing-dot:nth-child(1) {

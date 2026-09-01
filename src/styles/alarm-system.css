@@ -337,7 +337,7 @@ html[data-theme='dark'] {
 /* Pulse for active critical alarms */
 .alarm-kpi--pulse.alarm-kpi--critical,
 .alarm-kpi--pulse[data-alarm='critical'] {
-  animation: alarm-kpi-critical-pulse 1.6s ease-in-out infinite;
+  animation: alarm-kpi-critical-pulse var(--cdl-pulse-critical, 1.6s) ease-in-out infinite;
 }
 
 @keyframes alarm-kpi-critical-pulse {
@@ -439,7 +439,7 @@ html[data-theme='dark'] {
 .alarm-dot--critical {
   background: var(--alarm-critical);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--alarm-critical) 25%, transparent);
-  animation: alarm-dot-pulse 1.4s ease-in-out infinite;
+  animation: alarm-dot-pulse var(--cdl-pulse-critical, 1.6s) ease-in-out infinite;
 }
 
 .alarm-dot--urgent {
@@ -565,7 +565,7 @@ html[data-theme='dark'] {
 
 .alarm-surface--pulse.alarm-surface--critical,
 .alarm-surface--pulse[data-alarm='critical'] {
-  animation: alarm-surface-critical-pulse 1.8s ease-in-out infinite;
+  animation: alarm-surface-critical-pulse var(--cdl-pulse-critical, 1.6s) ease-in-out infinite;
 }
 
 @keyframes alarm-surface-critical-pulse {

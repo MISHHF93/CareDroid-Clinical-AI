@@ -24,7 +24,7 @@
 }
 
 .patient-detail-timeline-dot--current {
-  animation: patient-detail-current-pulse 1.4s var(--motion-ease-standard, ease-in-out) infinite;
+  animation: patient-detail-current-pulse var(--cdl-pulse-critical, 1.6s) var(--motion-ease-standard, ease-in-out) infinite;
 }
 
 .patient-detail-panel__drag-handle {
@@ -285,7 +285,7 @@
   box-shadow:
     0 0 0 3px color-mix(in srgb, #374151 20%, transparent),
     0 0 0 6px color-mix(in srgb, #374151 8%, transparent);
-  animation: journey-dot-pulse 2s ease-in-out infinite;
+  animation: journey-dot-pulse var(--cdl-pulse-attention, 2s) ease-in-out infinite;
 }
 
 @keyframes journey-dot-pulse {

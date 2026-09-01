@@ -71,7 +71,7 @@
 
 @media (prefers-reduced-motion: no-preference) {
   .cd-stream__pulse {
-    animation: cd-stream-pulse 1.2s ease-in-out infinite;
+    animation: cd-stream-pulse var(--cdl-pulse-live, 1.2s) ease-in-out infinite;
   }
 }
 

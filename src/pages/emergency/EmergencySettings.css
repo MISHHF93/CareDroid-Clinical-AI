@@ -427,7 +427,7 @@
 
 .emergency-settings__status--red {
   background: var(--status-critical);
-  animation: emergency-settings-status-red 1.6s var(--motion-ease-standard, ease-in-out) infinite;
+  animation: emergency-settings-status-red var(--cdl-pulse-critical, 1.6s) var(--motion-ease-standard, ease-in-out) infinite;
 }
 
 @keyframes emergency-settings-page-enter {

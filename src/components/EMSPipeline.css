@@ -255,7 +255,7 @@
 .ems-pipeline__row--critical {
   animation:
     ems-row-enter var(--motion-transition-normal) both,
-    ems-critical-pulse 1.4s var(--motion-ease-standard, ease-in-out) infinite;
+    ems-critical-pulse var(--cdl-pulse-critical, 1.6s) var(--motion-ease-standard, ease-in-out) infinite;
 }
 
 @keyframes ems-critical-pulse {

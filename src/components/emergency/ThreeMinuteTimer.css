@@ -41,7 +41,7 @@
 }
 
 .three-minute-timer--breach .three-minute-timer__clock {
-  animation: timer-breach-pulse 1s ease-in-out infinite alternate;
+  animation: timer-breach-pulse var(--cdl-pulse-critical, 1.6s) ease-in-out infinite alternate;
 }
 
 @keyframes timer-breach-pulse {
@@ -78,5 +78,5 @@
 .three-minute-timer-badge--critical {
   background: #fee2e2;
   color: #dc2626;
-  animation: timer-breach-pulse 1s ease-in-out infinite alternate;
+  animation: timer-breach-pulse var(--cdl-pulse-critical, 1.6s) ease-in-out infinite alternate;
 }

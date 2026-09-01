@@ -145,7 +145,7 @@
   border-radius: 999px;
   background: var(--status-success, #22c55e);
   box-shadow: 0 0 0 5px color-mix(in srgb, var(--status-success, #22c55e) 14%, transparent);
-  animation: ed-copilot-live-pulse 1200ms infinite ease-in-out;
+  animation: ed-copilot-live-pulse var(--cdl-pulse-live, 1.2s) infinite ease-in-out;
 }
 
 .ed-copilot-panel__identity {
