@@ -672,11 +672,26 @@ function AdminSectionBoundary() {
  * handler stamps itself, which the ambient bootstrap never sets. */
 function useUnauthenticatedRedirectGate(): ReactNode | null {
   const location = useLocation();
-  const { authMode, isLoading } = useUser();
+  const { authMode, isLoading, user } = useUser();
 
   if (!requireRealAuthGate) return null;
   if (isLoading) return <RouteLoadingFallback label="Loading CareDroid..." />;
-  const isDevBypassSession = isDev && authMode === 'explicit-dev-bypass';
+  // Outside dev, an explicit bypass session is admitted only when it was created
+  // by AuthPage's no-backend fallback -- i.e. on a frontend-only deployment where
+  // POST /api/auth/dev-session reached no server at all. That is the Vercel case:
+  // vercel.json builds the Vite app and its rewrites exclude /api, so there is no
+  // API, and therefore no patient data behind this gate -- only the bundled demo
+  // dataset. Where a backend DOES exist, this stays exactly as strict as before:
+  // the marker is never set on a session that came from one, a real server's
+  // 401/403 still fails the click outright, and the backend's own dev-bypass gate
+  // (ENABLE_DEV_AUTH_BYPASS + ALLOW_DEMO_AUTH_IN_PRODUCTION) is untouched. Do not
+  // widen this to "any explicit-dev-bypass session" -- that gate is what keeps
+  // this from being a credential-free path into real patient data.
+  const isLocalDemoFallback = Boolean(
+    (user as { isLocalDemoFallback?: boolean } | null)?.isLocalDemoFallback,
+  );
+  const isDevBypassSession =
+    authMode === 'explicit-dev-bypass' && (isDev || isLocalDemoFallback);
   if (authMode !== 'real' && !isDevBypassSession) {
     const returnUrl = `${location.pathname}${location.search}`;
     return <Navigate to={buildAuthUrl({ returnUrl })} replace />;

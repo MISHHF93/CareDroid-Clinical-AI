@@ -197,6 +197,9 @@ export const UserProvider = ({ children }) => {
               resolve({
                 token: resolveSessionToken(),
                 source: 'bootstrap-timeout',
+                // A timeout is not evidence that no backend exists, so this
+                // carries no reachability verdict for AuthPage's fallback.
+                status: undefined,
                 error: 'Dev session bootstrap timed out',
               }),
             USER_BOOTSTRAP_MAX_MS,

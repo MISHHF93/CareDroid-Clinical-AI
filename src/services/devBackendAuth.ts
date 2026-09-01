@@ -175,7 +175,7 @@ async function resolveDevBackendSession({
   timeoutMs?: number;
   roleProfileId?: string;
 } = {}) {
-  if (!isDev) return { token: readStoredToken(), source: 'production' };
+  if (!isDev) return { token: readStoredToken(), source: 'production' as string, status: undefined as number | undefined, error: undefined as string | undefined };
 
   const existingToken = readStoredToken();
   if (!force && hasUsableDevSession(existingToken)) {
@@ -252,6 +252,10 @@ async function resolveDevBackendSession({
       return {
         token: existingToken || BYPASS_TOKEN,
         source: 'fallback-bypass',
+        // Callers need to tell "there is no backend here" apart from "the backend
+        // refused". A frontend-only deployment (Vercel serves no /api) is the
+        // former; 401/403 from a real server is a deliberate no and must stay one.
+        status: response.status,
         error:
           serverMessage ||
           `The sign-in service responded with HTTP ${response.status}. If the backend was just restarted, try again in a few seconds.`,
@@ -275,6 +279,9 @@ async function resolveDevBackendSession({
     return {
       token: existingToken || BYPASS_TOKEN,
       source: 'fallback-bypass',
+      // 0 = the request never reached a server (DNS/network/abort). Same meaning
+      // as a 404 for callers deciding whether a backend exists at all.
+      status: 0,
       error: message,
     };
   }
@@ -287,6 +294,46 @@ async function resolveDevBackendSession({
  * Falls back to the local bypass token only when the proxied dev-session route is unreachable.
  * Concurrent callers share one in-flight request so UserContext and AppShell do not double-fetch.
  */
+/**
+ * Is there an API behind this deployment at all?
+ *
+ * Needed because resolveDevBackendSession() short-circuits on `!isDev` and never
+ * calls anything, so a production build cannot otherwise tell "frontend-only
+ * deployment" from "deployment whose backend refused". Vercel is the first case:
+ * vercel.json builds the Vite app and its rewrites explicitly exclude /api, so
+ * the route resolves to nothing.
+ *
+ * Deliberately treats only "no route" and "could not connect" as absent. Any real
+ * response -- including 401/403 -- means a server is there and answering, and its
+ * answer stands.
+ */
+export async function isBackendAbsent(timeoutMs = 6_000): Promise<boolean> {
+  if (typeof fetch !== 'function') return true;
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetch(API_ROUTES.auth.devSession, {
+      method: 'POST',
+      headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+      body: '{}',
+      signal: controller.signal,
+    });
+    if (response.status === 404 || response.status === 405) return true;
+    // A frontend-only host can also answer 200 with index.html, because its SPA
+    // rewrite swallowed the route -- the long-documented "Vercel serves /api as
+    // index.html" failure. HTML is not an API, whatever the status line says, so
+    // judge on the content type rather than the code. A real backend answers
+    // JSON even when it refuses.
+    const contentType = response.headers.get('content-type') || '';
+    return !contentType.toLowerCase().includes('json');
+  } catch {
+    // Network error / abort: nothing answered.
+    return true;
+  } finally {
+    window.clearTimeout(timeoutId);
+  }
+}
+
 export async function ensureDevBackendSession({
   force = false,
   timeoutMs = DEV_SESSION_FETCH_TIMEOUT_MS,

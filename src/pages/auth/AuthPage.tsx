@@ -19,8 +19,9 @@ import {
   isTwoFactorChallenge,
   type RealLoginSuccess,
 } from '../../services/realAuthApi';
-import { ensureDevBackendSession, isDev } from '../../services/devBackendAuth';
+import { ensureDevBackendSession, isBackendAbsent, isDev } from '../../services/devBackendAuth';
 import { AUTH_CONFIG } from '../../config/auth.config';
+import { buildOpenAccessDemoUser } from '../../config/demoPersonaModel';
 import './AuthPage.css';
 
 type Mode = 'login' | 'signup';
@@ -161,7 +162,46 @@ export default function AuthPage({ initialMode = 'login' }: { initialMode?: Mode
     // effect can no longer end up baked into the identity this click
     // produces.
     if (!session?.token || session.source !== 'dev-session' || !session.user) {
-      throw new Error(session?.error || 'Dev session bypass is unavailable right now.');
+      // A frontend-only deployment has no session service to call at all: Vercel
+      // builds the Vite app and its rewrites deliberately exclude /api, so this
+      // POST reaches no server. Stranding the user behind "unavailable right now"
+      // is the wrong answer there -- with no backend there is also no patient
+      // data, only the bundled demo dataset, so a local identity is the honest
+      // thing to hand them.
+      //
+      // Narrow on purpose. status 0 (never reached a server) and 404 (no such
+      // route) mean "there is no backend here". On a production build the
+      // resolver short-circuits before calling anything and reports
+      // source: 'production', so that case is settled by an explicit probe
+      // instead of an assumption. A 401/403 from a real server is a deliberate
+      // refusal and still fails, because the server-side gate saying no must keep
+      // meaning no. This does not touch that gate.
+      const backendAbsent =
+        session?.status === 0 ||
+        session?.status === 404 ||
+        (session?.source === 'production' && (await isBackendAbsent()));
+      if (!backendAbsent) {
+        throw new Error(session?.error || 'Dev session bypass is unavailable right now.');
+      }
+
+      // On the production short-circuit there may be no stored token at all, and
+      // an empty string reads as "signed out" downstream. There is no server to
+      // authenticate against here, so this is a marker, not a credential.
+      localStorage.setItem(AUTH_CONFIG.tokenStorageKey, session.token || 'local-demo-session');
+      localStorage.setItem(
+        AUTH_CONFIG.userProfileStorageKey,
+        JSON.stringify({
+          ...buildOpenAccessDemoUser(),
+          authMode: 'explicit-dev-bypass',
+          isDevAuthBypass: true,
+          // Set only here. The route gate uses it to admit this session outside
+          // dev, so it must never be stamped on a session that came from a real
+          // backend -- see useUnauthenticatedRedirectGate.
+          isLocalDemoFallback: true,
+        }),
+      );
+      window.location.href = returnUrl && returnUrl !== '/' ? returnUrl : '/';
+      return;
     }
     localStorage.setItem(AUTH_CONFIG.tokenStorageKey, session.token);
     // HEAL-347.16: UserContext.tsx's OWN background bootstrap effect already
