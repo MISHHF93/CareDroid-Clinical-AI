@@ -1,39 +1,39 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
-  IconActivity,
-  IconAlertTriangle,
-  IconAmbulance,
-  IconApps,
-  IconArrowsExchange,
-  IconBed,
-  IconBell,
-  IconChartBar,
-  IconChevronLeft,
-  IconChevronRight,
-  IconClipboardPlus,
-  IconClock,
-  IconDots,
-  IconGauge,
-  IconHelpCircle,
-  IconLayoutDashboard,
-  IconListDetails,
-  IconMap,
-  IconMessages,
-  IconNotes,
-  IconPlugConnected,
-  IconRefresh,
-  IconReport,
-  IconRobot,
-  IconSend,
-  IconSettings,
-  IconShieldCheck,
-  IconStethoscope,
-  IconTrendingUp,
-  IconUserCircle,
-  IconUsers,
-  type Icon,
-} from '@tabler/icons-react';
+  Activity,
+  AlertTriangle,
+  Ambulance,
+  ArrowLeftRight,
+  BarChart3,
+  Bed,
+  Bell,
+  Bot,
+  ChevronLeft,
+  ChevronRight,
+  ClipboardList,
+  ClipboardPlus,
+  Clock,
+  Gauge,
+  HelpCircle,
+  LayoutDashboard,
+  LayoutGrid,
+  ListChecks,
+  Map as MapIcon,
+  MessagesSquare,
+  MoreHorizontal,
+  Notebook,
+  PlugZap,
+  RefreshCw,
+  Send,
+  Settings,
+  ShieldCheck,
+  Stethoscope,
+  TrendingUp,
+  UserCircle,
+  Users,
+  type LucideIcon,
+} from 'lucide-react';
 import { PatientFlag } from '../types/emergency';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import { useEmergencyStore } from '../store/emergencyStore';
@@ -72,59 +72,59 @@ export type SidebarProps = {
   navigationItems?: readonly NavigationItem[];
 };
 
-const ICONS: Record<string, Icon> = {
-  'layout-dashboard': IconLayoutDashboard,
-  'emergency-whiteboard': IconLayoutDashboard,
-  'emergency-patients': IconUsers,
-  journey: IconListDetails,
-  notes: IconNotes,
-  ambulance: IconAmbulance,
-  ems: IconAmbulance,
-  send: IconSend,
-  intake: IconClipboardPlus,
-  referrals: IconArrowsExchange,
-  'provincial-health': IconShieldCheck,
-  integrations: IconPlugConnected,
-  'chart-bar': IconChartBar,
-  capacity: IconGauge,
-  'emergency-analytics': IconChartBar,
-  alerts: IconBell,
-  messages: IconMessages,
-  'department-pulse': IconActivity,
-  'surge-management': IconGauge,
-  'list-check': IconListDetails,
-  queues: IconListDetails,
-  reassessment: IconRefresh,
-  boarding: IconBed,
-  'ed-copilot': IconRobot,
-  'shield-check': IconShieldCheck,
-  shield: IconShieldCheck,
-  'safety-dashboard': IconShieldCheck,
-  stethoscope: IconStethoscope,
-  'virtual-care': IconStethoscope,
-  'clinical-tools': IconStethoscope,
-  report: IconReport,
-  'shift-summary': IconReport,
-  'wearable-monitor': IconReport,
-  settings: IconSettings,
-  'emergency-settings': IconSettings,
-  account: IconUserCircle,
-  users: IconUsers,
-  platform: IconApps,
-  activity: IconActivity,
-  clock: IconClock,
-  'help-circle': IconHelpCircle,
+const ICONS: Record<string, LucideIcon> = {
+  'layout-dashboard': LayoutDashboard,
+  'emergency-whiteboard': LayoutDashboard,
+  'emergency-patients': Users,
+  journey: ListChecks,
+  notes: Notebook,
+  ambulance: Ambulance,
+  ems: Ambulance,
+  send: Send,
+  intake: ClipboardPlus,
+  referrals: ArrowLeftRight,
+  'provincial-health': ShieldCheck,
+  integrations: PlugZap,
+  'chart-bar': BarChart3,
+  capacity: Gauge,
+  'emergency-analytics': BarChart3,
+  alerts: Bell,
+  messages: MessagesSquare,
+  'department-pulse': Activity,
+  'surge-management': Gauge,
+  'list-check': ListChecks,
+  queues: ListChecks,
+  reassessment: RefreshCw,
+  boarding: Bed,
+  'ed-copilot': Bot,
+  'shield-check': ShieldCheck,
+  shield: ShieldCheck,
+  'safety-dashboard': ShieldCheck,
+  stethoscope: Stethoscope,
+  'virtual-care': Stethoscope,
+  'clinical-tools': Stethoscope,
+  report: ClipboardList,
+  'shift-summary': ClipboardList,
+  'wearable-monitor': ClipboardList,
+  settings: Settings,
+  'emergency-settings': Settings,
+  account: UserCircle,
+  users: Users,
+  platform: LayoutGrid,
+  activity: Activity,
+  clock: Clock,
+  'help-circle': HelpCircle,
   // Additional for full nav
-  fleet: IconAmbulance,
-  surveillance: IconActivity,
-  simulation: IconListDetails,
-  laboratory: IconStethoscope,
-  knowledge: IconChartBar,
-  'ai-center': IconRobot,
-  admin: IconSettings,
-  map: IconMap,
-  'triage-priority': IconAlertTriangle,
-  'predictive-trend': IconTrendingUp,
+  fleet: Ambulance,
+  surveillance: Activity,
+  simulation: ListChecks,
+  laboratory: Stethoscope,
+  knowledge: BarChart3,
+  'ai-center': Bot,
+  admin: Settings,
+  map: MapIcon,
+  'triage-priority': AlertTriangle,
+  'predictive-trend': TrendingUp,
 };
 
 function matchesNavigationPath(pathname: string, path: string): boolean {
@@ -300,7 +300,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
   }, [location.pathname, location.search, navigate, setCopilotOpen, toggleCopilot]);
 
   const desktopNavLink = (item: SidebarNavItem) => {
-    const IconComponent = ICONS[item.icon] || IconLayoutDashboard;
+    const IconComponent = ICONS[item.icon] || LayoutDashboard;
     const active =
       item.id === 'copilot' ? copilotOpen : isActiveRoute(location.pathname, item, location.search);
     const alertCount = navAlertCount(item);
@@ -366,7 +366,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
           data-nav-id={item.id}
           data-icon-key={item.icon}
         >
-          <IconComponent size={16} stroke={2} className="sidebar-nav-item__icon" />
+          <IconComponent size={16} strokeWidth={2} className="sidebar-nav-item__icon" />
           <span className="sidebar-nav-item__label">{item.label}</span>
           {renderNavCountBadge(
             globalUnreadCount,
@@ -396,7 +396,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
         data-nav-id={item.id}
         data-icon-key={item.icon}
       >
-        <IconComponent size={16} stroke={2} className="sidebar-nav-item__icon" />
+        <IconComponent size={16} strokeWidth={2} className="sidebar-nav-item__icon" />
         <span className="sidebar-nav-item__label">{item.label}</span>
         {renderNavCountBadge(
           alertCount,
@@ -411,7 +411,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
   };
 
   const mobileNavLink = (item: SidebarNavItem) => {
-    const IconComponent = ICONS[item.icon] || IconLayoutDashboard;
+    const IconComponent = ICONS[item.icon] || LayoutDashboard;
     const active =
       item.id === 'copilot' ? copilotOpen : isActiveRoute(location.pathname, item, location.search);
     const label = item.id === 'whiteboard' ? 'Whiteboard' : item.mobileLabel || item.label;
@@ -475,7 +475,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
           data-nav-id={item.id}
           data-icon-key={item.icon}
         >
-          <IconComponent size={20} stroke={2} className="sidebar-nav-item__icon" />
+          <IconComponent size={20} strokeWidth={2} className="sidebar-nav-item__icon" />
           {renderNavCountBadge(
             globalUnreadCount,
             'alert',
@@ -498,7 +498,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
         data-icon-key={item.icon}
         onClick={() => setMoreOpen(false)}
       >
-        <IconComponent size={20} stroke={2} className="sidebar-nav-item__icon" />
+        <IconComponent size={20} strokeWidth={2} className="sidebar-nav-item__icon" />
         {renderNavCountBadge(
           alertCount,
           item.id === 'reassessment' ? 'due' : 'alert',
@@ -547,7 +547,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
     >
       <header className="sidebar__brand">
         <div className="sidebar__brand-mark" aria-hidden="true">
-          <IconActivity size={17} stroke={2.2} />
+          <Activity size={17} strokeWidth={2.2} />
         </div>
         <div className="sidebar__brand-copy">
           <span className="sidebar__brand-name">CareDroid</span>
@@ -562,9 +562,9 @@ export function Sidebar({ navigationItems }: SidebarProps) {
           title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
           {sidebarCollapsed ? (
-            <IconChevronRight size={16} stroke={2} />
+            <ChevronRight size={16} strokeWidth={2} />
           ) : (
-            <IconChevronLeft size={16} stroke={2} />
+            <ChevronLeft size={16} strokeWidth={2} />
           )}
           {/* Icon-only read as unclear/decorative with no visible label --
               this text is hidden in the icon-rail (collapsed) state via CSS,
@@ -638,7 +638,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
             aria-controls="sidebar-more-sheet"
             aria-label="More"
           >
-            <IconDots size={20} stroke={2} className="sidebar-nav-item__icon" />
+            <MoreHorizontal size={20} strokeWidth={2} className="sidebar-nav-item__icon" />
             <span className="sidebar-nav-item__label">More</span>
           </button>
         ) : null}
@@ -668,7 +668,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
             </header>
             <div className="sidebar-more-sheet__items">
               {moreNav.map((item) => {
-                const IconComponent = ICONS[item.icon] || IconLayoutDashboard;
+                const IconComponent = ICONS[item.icon] || LayoutDashboard;
                 const active = isActiveRoute(location.pathname, item);
                 const alertCount = navAlertCount(item);
                 const navLink = (
@@ -685,7 +685,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
                     data-icon-key={item.icon}
                     onClick={() => setMoreOpen(false)}
                   >
-                    <IconComponent size={18} stroke={2} />
+                    <IconComponent size={18} strokeWidth={2} />
                     <span>{item.label}</span>
                     {renderNavCountBadge(
                       alertCount,

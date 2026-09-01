@@ -1,37 +1,38 @@
 import type { CSSProperties, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  IconActivity,
-  IconActivityHeartbeat,
-  IconAlertTriangle,
-  IconAmbulance,
-  IconArrowRight,
-  IconBabyCarriage,
-  IconBed,
-  IconBell,
-  IconBodyScan,
-  IconBrain,
-  IconChartBar,
-  IconClipboardPlus,
-  IconDroplet,
-  IconFlask2,
-  IconGauge,
-  IconLayoutDashboard,
-  IconListDetails,
-  IconLungs,
-  IconMoodSmile,
-  IconNotes,
-  IconPill,
-  IconRefresh,
-  IconReport,
-  IconRobot,
-  IconSchool,
-  IconSend,
-  IconShieldCheck,
-  IconStethoscope,
-  IconUserCircle,
-  IconUsers,
-} from '@tabler/icons-react';
+  Activity,
+  AlertTriangle,
+  Ambulance,
+  ArrowRight,
+  Baby,
+  BarChart3,
+  Bed,
+  Bell,
+  Bot,
+  Brain,
+  ClipboardList,
+  ClipboardPlus,
+  Droplet,
+  FlaskConical,
+  Gauge,
+  GraduationCap,
+  HeartPulse,
+  LayoutDashboard,
+  ListChecks,
+  Notebook,
+  Pill,
+  RefreshCw,
+  Scan,
+  Send,
+  ShieldCheck,
+  Smile,
+  Stethoscope,
+  UserCircle,
+  Users,
+  Wind,
+  type LucideIcon,
+} from 'lucide-react';
 import {
   ROUTE_NAV_GRAPHIC_KEYS,
   SITUATION_BRIEF_GRAPHICS,
@@ -42,55 +43,54 @@ import {
 } from '../../config/cdlGraphicModel';
 import './CdlGraphicKit.css';
 
-type TablerIcon = typeof IconActivity;
 
-const GRAPHIC_ICON_MAP: Record<string, TablerIcon> = {
-  activity: IconActivity,
-  alert: IconAlertTriangle,
-  owner: IconUserCircle,
-  route: IconArrowRight,
-  'layout-dashboard': IconLayoutDashboard,
-  'emergency-patients': IconUsers,
-  journey: IconListDetails,
-  notes: IconNotes,
-  ems: IconAmbulance,
-  send: IconSend,
-  intake: IconClipboardPlus,
-  'chart-bar': IconChartBar,
-  capacity: IconGauge,
-  'emergency-analytics': IconChartBar,
-  alerts: IconBell,
-  'department-pulse': IconActivity,
-  queues: IconListDetails,
-  reassessment: IconRefresh,
-  boarding: IconBed,
-  'ed-copilot': IconRobot,
-  'shield-check': IconShieldCheck,
-  stethoscope: IconStethoscope,
-  'clinical-tools': IconStethoscope,
-  report: IconReport,
-  settings: IconShieldCheck,
-  help: IconListDetails,
-  'user-check': IconUserCircle,
+const GRAPHIC_ICON_MAP: Record<string, LucideIcon> = {
+  activity: Activity,
+  alert: AlertTriangle,
+  owner: UserCircle,
+  route: ArrowRight,
+  'layout-dashboard': LayoutDashboard,
+  'emergency-patients': Users,
+  journey: ListChecks,
+  notes: Notebook,
+  ems: Ambulance,
+  send: Send,
+  intake: ClipboardPlus,
+  'chart-bar': BarChart3,
+  capacity: Gauge,
+  'emergency-analytics': BarChart3,
+  alerts: Bell,
+  'department-pulse': Activity,
+  queues: ListChecks,
+  reassessment: RefreshCw,
+  boarding: Bed,
+  'ed-copilot': Bot,
+  'shield-check': ShieldCheck,
+  stethoscope: Stethoscope,
+  'clinical-tools': Stethoscope,
+  report: ClipboardList,
+  settings: ShieldCheck,
+  help: ListChecks,
+  'user-check': UserCircle,
   // Hospital-department dashboards (Pharmacy/Radiology/Education/Cardiology/
   // Nephrology/Neurology/Gastroenterology/Endocrinology/Pediatrics-OBGYN/
   // Psychiatry/Pulmonology) — one distinct icon per specialty rather than
   // reusing the generic 'activity' glyph for all of them.
-  pharmacy: IconPill,
-  radiology: IconBodyScan,
-  education: IconSchool,
-  cardiology: IconActivityHeartbeat,
-  nephrology: IconDroplet,
-  neurology: IconBrain,
-  gastroenterology: IconFlask2,
-  endocrinology: IconDroplet,
-  'pediatrics-obgyn': IconBabyCarriage,
-  psychiatry: IconMoodSmile,
-  pulmonology: IconLungs,
+  pharmacy: Pill,
+  radiology: Scan,
+  education: GraduationCap,
+  cardiology: HeartPulse,
+  nephrology: Droplet,
+  neurology: Brain,
+  gastroenterology: FlaskConical,
+  endocrinology: Droplet,
+  'pediatrics-obgyn': Baby,
+  psychiatry: Smile,
+  pulmonology: Wind,
 };
 
-function resolveGraphicIcon(iconKey: string): TablerIcon {
-  return GRAPHIC_ICON_MAP[iconKey] || IconActivity;
+function resolveGraphicIcon(iconKey: string): LucideIcon {
+  return GRAPHIC_ICON_MAP[iconKey] || Activity;
 }
 
 type GraphicIconBadgeProps = {
@@ -119,7 +119,10 @@ export function GraphicIconBadge({
         .join(' ')}
       aria-hidden
     >
-      <IconComponent size={size === 'lg' ? 22 : size === 'sm' ? 15 : 18} stroke={size === 'lg' ? 2.25 : 2.1} />
+      <IconComponent
+        size={size === 'lg' ? 22 : size === 'sm' ? 15 : 18}
+        strokeWidth={size === 'lg' ? 2.25 : 2.1}
+      />
     </span>
   );
 }

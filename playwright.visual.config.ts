@@ -29,7 +29,11 @@ export default defineConfig({
     // more than any small token change moves. A net that only catches redesigns
     // is not a net.
     toHaveScreenshot: {
-      maxDiffPixelRatio: 0.0005,
+      // An absolute budget, not a ratio. A ratio scales with the element, so the
+      // same swapped 16px icon slipped under it on the sidebar (83px allowed) the
+      // same way it did on the full page (648px allowed). What this net needs to
+      // resolve is roughly "one icon", so the budget is stated in those terms.
+      maxDiffPixels: 25,
       animations: 'disabled',
       caret: 'hide',
       scale: 'css',

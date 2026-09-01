@@ -180,7 +180,6 @@
     "report:ai-node-worker": "node scripts/export-ai-node-worker-report.mjs"
   },
   "dependencies": {
-    "@tabler/icons-react": "^3.44.0",
     "axios": "^1.16.1",
     "dexie": "^4.3.0",
     "firebase": "^12.13.0",

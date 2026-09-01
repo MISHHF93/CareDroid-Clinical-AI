@@ -32,6 +32,11 @@ const THEMES = ['light', 'dark'];
  */
 const VOLATILE_SELECTORS = [
   '.caredroid-header__clock',
+  // Live counts: the sidebar alert badge moved 40 -> 38 between two runs, and the
+  // header capsules track the current census. Their styling still gets watched --
+  // only the digits are masked.
+  '.sidebar-nav-item__count',
+  '.cdl-kpi-capsule__value',
   '[class*="elapsed"]',
   '[class*="timer"]',
   '[class*="wait-time"]',
@@ -89,10 +94,20 @@ for (const theme of THEMES) {
         await settle(page);
 
         const mask = VOLATILE_SELECTORS.map((selector) => page.locator(selector));
-        await expect(page).toHaveScreenshot(`${surface.id}-${theme}.png`, {
-          fullPage: false,
-          mask,
-        });
+
+        // Snapshot the shared shell, not the whole viewport. The first version
+        // captured the full page and drifted on live KPI values (devices online
+        // went 2 -> 1 between runs) -- a net that fails on data nobody changed
+        // teaches people to ignore it. The chrome is what a design-system net is
+        // actually for, and it is stable.
+        await expect(page.locator('.sidebar-desktop-nav')).toHaveScreenshot(
+          `${surface.id}-${theme}-sidebar.png`,
+          { mask },
+        );
+        await expect(page.locator('.caredroid-header').first()).toHaveScreenshot(
+          `${surface.id}-${theme}-header.png`,
+          { mask },
+        );
       });
     }
   });
