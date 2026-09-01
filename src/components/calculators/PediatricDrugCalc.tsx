@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import useModalDialog from '../../hooks/useModalDialog';
 import { MEDICAL_THEME } from '../../config/medicalTheme.constants';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { saveCalculatorResult } from './calculatorSave';
@@ -77,14 +78,12 @@ export default function PediatricDrugCalc({ patientId, onClose }: PediatricDrugC
     setWeightInput('');
   }, [patientId]);
 
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose();
-    };
+  const dialogRef = useRef<HTMLDivElement>(null);
 
-    document.addEventListener('keydown', onKeyDown);
-    return () => document.removeEventListener('keydown', onKeyDown);
-  }, [onClose]);
+  // Escape, Tab containment, initial focus, focus restore and scroll lock all come
+  // from the shared hook: this dialog declares aria-modal="true" and previously had
+  // none of the containment that claim promises.
+  useModalDialog(dialogRef, { onClose });
 
   const saveToPatient = () => {
     if (!patient || weight === null) return;
@@ -117,6 +116,7 @@ export default function PediatricDrugCalc({ patientId, onClose }: PediatricDrugC
   return (
     <div
       className="clinical-calculator-modal u-modal-scrim"
+      ref={dialogRef}
       role="dialog"
       aria-modal="true"
       aria-labelledby="pediatric-drug-title"

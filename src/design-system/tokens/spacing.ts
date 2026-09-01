@@ -3,7 +3,7 @@
  * The CSS custom properties remain the single source of truth (dual-theme,
  * cascade-aware); this module exists so JS/TS layout math (row heights,
  * virtualization, canvas/chart layout) doesn't need to parse CSS at runtime.
- * cdlv2TokenMirror.contract.test.ts asserts these values stay in sync with tokens.css.
+ * cdlTokenMirror.contract.test.ts asserts these values stay in sync with tokens.css.
  */
 
 export const CDL_SPACING_PX = Object.freeze({
@@ -45,6 +45,6 @@ export const CDL_CARD_DIMENSIONS = Object.freeze({
   minHeightPx: 220,
   paddingMinPx: 16,
   paddingMaxPx: 24,
-  radiusMinPx: 12,
-  radiusMaxPx: 16,
+  radiusMinPx: 14,
+  radiusMaxPx: 18,
 });

@@ -69,6 +69,14 @@
   text-align: left;
 }
 
+/* Keyboard highlight from Header's arrow keys. Focus stays in the search input
+   (aria-activedescendant), so this is the only visible cue for the active row --
+   it carries a border as well as a fill so it does not rely on colour alone. */
+.patient-search-results__primary--active {
+  background: var(--app-surface-muted, #f1f5f9);
+  box-shadow: inset 3px 0 0 0 var(--app-accent, #0d9488);
+}
+
 .patient-search-results__primary:hover {
   background: var(--app-surface-muted, #f1f5f9);
 }

@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useRef, useEffect, useMemo, useState } from 'react';
+import useModalDialog from '../../hooks/useModalDialog';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { saveCalculatorResult } from './calculatorSave';
 import './mobileCalculator.css';
@@ -116,14 +117,12 @@ export default function HEARTScore({ patientId, onClose }: HEARTScoreProps) {
     setScores((previous) => ({ ...previous, age: ageScoreFromDob(patient.dob) }));
   }, [patient]);
 
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose();
-    };
+  const dialogRef = useRef<HTMLDivElement>(null);
 
-    document.addEventListener('keydown', onKeyDown);
-    return () => document.removeEventListener('keydown', onKeyDown);
-  }, [onClose]);
+  // Escape, Tab containment, initial focus, focus restore and scroll lock all come
+  // from the shared hook: this dialog declares aria-modal="true" and previously had
+  // none of the containment that claim promises.
+  useModalDialog(dialogRef, { onClose });
 
   const total = useMemo(
     () => Object.values(scores).reduce<number>((sum, value) => sum + value, 0),
@@ -152,6 +151,7 @@ export default function HEARTScore({ patientId, onClose }: HEARTScoreProps) {
   return (
     <div
       className="clinical-calculator-modal u-modal-scrim"
+      ref={dialogRef}
       role="dialog"
       aria-modal="true"
       aria-labelledby="heart-score-title"

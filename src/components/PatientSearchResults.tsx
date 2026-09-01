@@ -22,6 +22,13 @@ import './PatientSearchResults.css';
 // this long anyway.
 const MAX_DISPLAYED_QUERY_LENGTH = 60;
 
+/** Shared with Header.tsx so the search input's aria-controls/activedescendant resolve. */
+export const PATIENT_SEARCH_LISTBOX_ID = 'caredroid-patient-search-listbox';
+
+export function patientSearchOptionId(index: number): string {
+  return `caredroid-patient-search-option-${index}`;
+}
+
 function truncateQueryForDisplay(value: string): string {
   if (value.length <= MAX_DISPLAYED_QUERY_LENGTH) return value;
   return `${value.slice(0, MAX_DISPLAYED_QUERY_LENGTH)}…`;
@@ -56,6 +63,13 @@ type PatientSearchResultsProps = {
    * must be an explicit opt-in, not an accidentally-inherited default.
    */
   canViewPatients?: boolean;
+  /**
+   * Index of the keyboard-highlighted patient row, owned by Header's arrow-key
+   * handler. Options are buttons inside the listbox rather than focusable stops,
+   * so the highlight is reported via aria-selected + the input's
+   * aria-activedescendant; -1 means nothing is highlighted.
+   */
+  activeIndex?: number;
   isReceptionRoute?: boolean;
   onFindPatient: (patientId: string) => void;
   onStartIntake: (patientId: string) => void;
@@ -113,6 +127,7 @@ export default function PatientSearchResults({
   backendVerifiedPatientIds = new Set(),
   canCreatePatient = false,
   canViewPatients = false,
+  activeIndex = -1,
   isReceptionRoute = false,
   onFindPatient,
   onStartIntake,
@@ -137,7 +152,12 @@ export default function PatientSearchResults({
   const hasAnyResults = visiblePatientResults.length > 0 || supplementalCount > 0;
 
   return (
-    <div className="patient-search-results" role="listbox" aria-label="Operational search results">
+    <div
+      className="patient-search-results"
+      role="listbox"
+      id={PATIENT_SEARCH_LISTBOX_ID}
+      aria-label="Operational search results"
+    >
       <header className="patient-search-results__header">
         <strong>Operational search</strong>
         <span>Patient · Encounter · Referral · EMS · Queue</span>
@@ -147,13 +167,16 @@ export default function PatientSearchResults({
         <section className="patient-search-results__section">
           <h3 className="patient-search-results__section-title">Patients</h3>
           <ul className="patient-search-results__list">
-            {visiblePatientResults.map(({ patient, matchKind }) => (
+            {visiblePatientResults.map(({ patient, matchKind }, patientIndex) => (
               <li key={patient.id} className="patient-search-results__item">
                 <button
                   type="button"
-                  className="patient-search-results__primary"
+                  className={`patient-search-results__primary${
+                    patientIndex === activeIndex ? ' patient-search-results__primary--active' : ''
+                  }`}
+                  id={patientSearchOptionId(patientIndex)}
                   role="option"
-                  aria-selected="false"
+                  aria-selected={patientIndex === activeIndex}
                   onMouseDown={(event) => event.preventDefault()}
                   onClick={() => onFindPatient(patient.id)}
                 >

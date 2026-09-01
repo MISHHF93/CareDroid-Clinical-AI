@@ -224,14 +224,22 @@ async function fetchMedicalIotSnapshotFromApi(options: any = {}) {
     telemetryResult.generatedAt ||
     new Date().toISOString();
 
+  // The backend marks seeded telemetry with `demo: true`. A successful request is not
+  // evidence of a live device feed, so demo state must come from that flag, never from
+  // whether the call happened to reach the server.
+  const demo = Boolean(devicesResult.demo || telemetryResult.demo || alertsResult.demo);
+
   return {
     ok: true,
     unsupported: false,
+    demo,
     snapshot: {
-      source: 'backend-demo-telemetry',
+      source: demo ? 'backend-demo-telemetry' : 'backend-telemetry',
       sourceLabel:
         telemetryResult.sourceLabel ||
-        'Backend demo Medical IoT contract - replace with real device feeds before clinical use',
+        (demo
+          ? 'Backend demo Medical IoT contract - replace with real device feeds before clinical use'
+          : 'Live Medical IoT device feed'),
       generatedAt,
       devices: devicesResult.payload?.devices || [],
       vitals: telemetryResult.payload?.vitals || [],
@@ -242,7 +250,9 @@ async function fetchMedicalIotSnapshotFromApi(options: any = {}) {
     backendStatus: MEDICAL_IOT_BACKEND_STATUS,
     message:
       telemetryResult.message ||
-      'Medical IoT uses backend demo telemetry only; do not treat it as live patient monitoring.',
+      (demo
+        ? 'Medical IoT uses backend demo telemetry only; do not treat it as live patient monitoring.'
+        : 'Medical IoT is reading a live device feed.'),
   };
 }
 
@@ -253,6 +263,7 @@ export async function fetchMedicalIotSnapshot(options: any = {}) {
   return {
     ok: true,
     unsupported: true,
+    demo: true,
     snapshot: buildDemoMedicalIotSnapshot(),
     backendStatus: MEDICAL_IOT_BACKEND_STATUS,
     message:

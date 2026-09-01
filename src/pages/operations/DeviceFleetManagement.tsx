@@ -54,7 +54,7 @@ export default function DeviceFleetManagement() {
         if (cancelled) return;
         const rows = (result.snapshot?.devices || []).map(mapFleetDevice);
         setDevices(rows);
-        setIsDemo(Boolean(result.unsupported));
+        setIsDemo(Boolean(result.demo || result.unsupported));
         setSourceLabel(result.snapshot?.sourceLabel || result.message || '');
       } finally {
         if (!cancelled) setLoading(false);

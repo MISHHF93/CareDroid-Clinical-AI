@@ -163,7 +163,7 @@ export default function MedicalIotDashboard() {
         setConnectivityTimeline(result.snapshot.connectivityTimeline || []);
         setSourceLabel(result.snapshot.sourceLabel || '');
         setMessage(result.message || '');
-        setIsDemo(Boolean(result.unsupported));
+        setIsDemo(Boolean(result.demo || result.unsupported));
       } else {
         setDevices(DEMO_DEVICES);
         setAlerts([]);

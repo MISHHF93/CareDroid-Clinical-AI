@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import useModalDialog from '../../hooks/useModalDialog';
 import { MEDICAL_TYPE } from '../../config/medicalTheme.constants';
 import { dispatchAlert } from '../../engine/alertEngine';
 import { saveCalculatorResult } from './calculatorSave';
@@ -162,14 +163,12 @@ export default function ColumbiaSSRS({ patientId, onClose }: ColumbiaSSRSProps) 
   const [savedMessage, setSavedMessage] = useState('');
   const alertedRiskRef = useRef<string>('');
 
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose();
-    };
+  const dialogRef = useRef<HTMLDivElement>(null);
 
-    document.addEventListener('keydown', onKeyDown);
-    return () => document.removeEventListener('keydown', onKeyDown);
-  }, [onClose]);
+  // Escape, Tab containment, initial focus, focus restore and scroll lock all come
+  // from the shared hook: this dialog declares aria-modal="true" and previously had
+  // none of the containment that claim promises.
+  useModalDialog(dialogRef, { onClose });
 
   const risk = useMemo(() => classifyRisk(answers), [answers]);
   const riskDisplay = RISK_DISPLAY[risk];
@@ -250,6 +249,7 @@ export default function ColumbiaSSRS({ patientId, onClose }: ColumbiaSSRSProps) 
       aria-modal="true"
       aria-labelledby="cssrs-title"
       className="u-modal-scrim"
+      ref={dialogRef}
     >
       <div className="cssrs-panel">
         <header

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import useModalDialog from '../../hooks/useModalDialog';
 import { MEDICAL_THEME } from '../../config/medicalTheme.constants';
 import type { Vitals } from '../../types/emergency';
 import { PatientFlag } from '../../types/emergency';
@@ -83,14 +84,12 @@ export default function QSOFA({ patientId, onClose }: QSOFAProps) {
     alertCreatedRef.current = false;
   }, [patient]);
 
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose();
-    };
+  const dialogRef = useRef<HTMLDivElement>(null);
 
-    document.addEventListener('keydown', onKeyDown);
-    return () => document.removeEventListener('keydown', onKeyDown);
-  }, [onClose]);
+  // Escape, Tab containment, initial focus, focus restore and scroll lock all come
+  // from the shared hook: this dialog declares aria-modal="true" and previously had
+  // none of the containment that claim promises.
+  useModalDialog(dialogRef, { onClose });
 
   const total = useMemo(
     () => Object.values(criteria).reduce<number>((sum, value) => sum + (value ? 1 : 0), 0),
@@ -188,6 +187,7 @@ export default function QSOFA({ patientId, onClose }: QSOFAProps) {
   return (
     <div
       className="clinical-calculator-modal u-modal-scrim"
+      ref={dialogRef}
       role="dialog"
       aria-modal="true"
       aria-labelledby="qsofa-title"

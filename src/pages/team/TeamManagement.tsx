@@ -1,4 +1,5 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useRef, useState, useEffect } from 'react';
+import useModalDialog from '../../hooks/useModalDialog';
 import './TeamManagement.css';
 import { apiFetch, apiFetchJson, getStoredAccessToken } from '../../services/apiClient';
 import {
@@ -436,6 +437,11 @@ const EditUserModal = ({ user, onSave, onCancel, disabled = false }) => {
   const [role, setRole] = useState(user.role);
   const [permissions] = useState(user.permissions || []);
   const [saving, setSaving] = useState(false);
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  // This dialog previously had no role, no aria-modal, no Escape and no focus
+  // handling at all -- it could only be dismissed with a mouse.
+  useModalDialog(dialogRef, { onClose: onCancel });
 
   const roleDefinitions = {
     'Admin': ['Read All', 'Write All', 'Delete All', 'Manage Users', 'View Audit Logs'],
@@ -455,11 +461,23 @@ const EditUserModal = ({ user, onSave, onCancel, disabled = false }) => {
 
   return (
     // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- click-outside-to-dismiss backdrop; the real Close button below is the keyboard-accessible dismiss control
-    <div className="modal-overlay" onClick={onCancel}>
-      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- onClick only stops propagation to the backdrop's close handler, it is not an interactive control itself */}
-      <div className="edit-user-modal" onClick={(e) => e.stopPropagation()}>
+    <div
+      className="modal-overlay"
+      onClick={(event) => {
+        // Only a click on the backdrop itself dismisses, so the dialog no longer
+        // needs a stopPropagation handler of its own (same rule as ui/Drawer).
+        if (event.target === event.currentTarget) onCancel();
+      }}
+    >
+      <div
+        className="edit-user-modal"
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="edit-user-modal-title"
+      >
         <div className="modal-header">
-          <h2>Edit User</h2>
+          <h2 id="edit-user-modal-title">Edit User</h2>
           <button type="button" className="modal-close" onClick={onCancel}>✕</button>
         </div>
 
@@ -550,6 +568,9 @@ const RoleSelector = ({ value, onChange }) => {
  */
 const InviteUserModal = ({ email, onEmailChange, onInvite, onCancel, disabled = false }) => {
   const [loading, setLoading] = useState(false);
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  useModalDialog(dialogRef, { onClose: onCancel });
 
   const handleInvite = async () => {
     setLoading(true);
@@ -564,11 +585,21 @@ const InviteUserModal = ({ email, onEmailChange, onInvite, onCancel, disabled = 
 
   return (
     // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- click-outside-to-dismiss backdrop; the real Close button below is the keyboard-accessible dismiss control
-    <div className="modal-overlay" onClick={onCancel}>
-      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- onClick only stops propagation to the backdrop's close handler, it is not an interactive control itself */}
-      <div className="invite-user-modal" onClick={(e) => e.stopPropagation()}>
+    <div
+      className="modal-overlay"
+      onClick={(event) => {
+        if (event.target === event.currentTarget) onCancel();
+      }}
+    >
+      <div
+        className="invite-user-modal"
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="invite-user-modal-title"
+      >
         <div className="modal-header">
-          <h2>Invite Team Member</h2>
+          <h2 id="invite-user-modal-title">Invite Team Member</h2>
           <button type="button" className="modal-close" onClick={onCancel}>✕</button>
         </div>
 

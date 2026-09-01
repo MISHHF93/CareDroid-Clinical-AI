@@ -76,7 +76,7 @@ export type CareDroidCentralNodeRoleContext = {
   role: string;
   roleLabel: string;
   readOnly: boolean;
-  allowedRoutes: string[];
+  allowedRoutes: readonly string[];
   can?: (action: string) => boolean;
 };
 

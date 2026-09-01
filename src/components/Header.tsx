@@ -22,7 +22,10 @@ import useRouteScreenMode from '../hooks/useRouteScreenMode';
 import useScreenModeCapabilities from '../hooks/useScreenModeCapabilities';
 import { rankPatientsBySearch } from '../utils/patientSearch';
 import { searchPatientsFromBackend } from '../services/patientManagementApi';
-import PatientSearchResults from './PatientSearchResults';
+import PatientSearchResults, {
+  PATIENT_SEARCH_LISTBOX_ID,
+  patientSearchOptionId,
+} from './PatientSearchResults';
 import {
   buildEncounterSearchPath,
   buildEmsCasePath,
@@ -103,6 +106,7 @@ export function Header() {
   );
   const [patientLookupQuery, setPatientLookupQuery] = useState('');
   const [patientLookupOpen, setPatientLookupOpen] = useState(false);
+  const [lookupActiveIndex, setLookupActiveIndex] = useState(-1);
   const lookupWrapperRef = useRef<HTMLDivElement>(null);
   const [lookupPanelPosition, setLookupPanelPosition] = useState<{
     top: number;
@@ -478,21 +482,50 @@ export function Header() {
               aria-label={
                 screenCapabilities.isRegistrationScreen ? 'Patient search' : 'Operational search'
               }
+              role="combobox"
+              aria-expanded={lookupResultsOpen}
+              aria-controls={PATIENT_SEARCH_LISTBOX_ID}
+              aria-autocomplete="list"
+              aria-activedescendant={
+                lookupResultsOpen && lookupActiveIndex >= 0
+                  ? patientSearchOptionId(lookupActiveIndex)
+                  : undefined
+              }
               onFocus={() => setPatientLookupOpen(true)}
               onChange={(event) => {
                 syncPatientLookupQuery(event.target.value);
                 setPatientLookupOpen(true);
+                setLookupActiveIndex(-1);
               }}
               onKeyDown={(event) => {
+                // Arrow keys move a highlight through the patient rows. Without this
+                // Enter always took result[0], so a keyboard-only clinician could
+                // never reach the second match.
+                if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+                  if (!patientLookupResults.length) return;
+                  event.preventDefault();
+                  setPatientLookupOpen(true);
+                  setLookupActiveIndex((current) => {
+                    const step = event.key === 'ArrowDown' ? 1 : -1;
+                    const next = current + step;
+                    if (next < 0) return patientLookupResults.length - 1;
+                    if (next >= patientLookupResults.length) return 0;
+                    return next;
+                  });
+                  return;
+                }
                 if (event.key === 'Enter') {
                   event.preventDefault();
-                  if (patientLookupResults[0]) selectLookupPatient(patientLookupResults[0].patient.id);
+                  const highlighted = patientLookupResults[lookupActiveIndex];
+                  if (highlighted) selectLookupPatient(highlighted.patient.id);
+                  else if (patientLookupResults[0]) selectLookupPatient(patientLookupResults[0].patient.id);
                   else if (firstOperationalHit) handleOpenOperationalHit(firstOperationalHit);
                   else openPatientLookupRoute();
                 }
                 if (event.key === 'Escape') {
                   event.preventDefault();
                   setPatientLookupOpen(false);
+                  setLookupActiveIndex(-1);
                 }
               }}
             />
@@ -513,6 +546,7 @@ export function Header() {
                       backendVerifiedPatientIds={backendVerifiedPatientIds}
                       canCreatePatient={canCreatePatient}
                       canViewPatients={canOpenPatients}
+                      activeIndex={lookupActiveIndex}
                       isReceptionRoute={isReceptionRoute}
                       onFindPatient={selectLookupPatient}
                       onStartIntake={(patientId) =>

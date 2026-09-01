@@ -26,11 +26,12 @@
     color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 12%, transparent) 50%,
     transparent 100%
   );
-  animation: shimmer var(--motion-skeleton-duration, 1.15s) var(--motion-ease-standard, ease-in-out)
-    infinite;
+  animation: cd-ui-skeleton-shimmer var(--motion-skeleton-duration, 1.15s)
+    var(--motion-ease-standard, ease-in-out) infinite;
 }
 
-@keyframes shimmer {
+/* Scoped name -- see ui/card.css: both files defined a global "shimmer". */
+@keyframes cd-ui-skeleton-shimmer {
   0% {
     left: -100%;
   }

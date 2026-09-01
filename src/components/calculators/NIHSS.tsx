@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useRef, useEffect, useMemo, useState } from 'react';
+import useModalDialog from '../../hooks/useModalDialog';
 import { MEDICAL_THEME, MEDICAL_TYPE } from '../../config/medicalTheme.constants';
 import { saveCalculatorResult } from './calculatorSave';
 import { useEmergencyStore } from '../../store/emergencyStore';
@@ -217,14 +218,12 @@ export default function NIHSS({ patientId, onClose }: NIHSSProps) {
     return () => window.clearInterval(timer);
   }, []);
 
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose();
-    };
+  const dialogRef = useRef<HTMLDivElement>(null);
 
-    document.addEventListener('keydown', onKeyDown);
-    return () => document.removeEventListener('keydown', onKeyDown);
-  }, [onClose]);
+  // Escape, Tab containment, initial focus, focus restore and scroll lock all come
+  // from the shared hook: this dialog declares aria-modal="true" and previously had
+  // none of the containment that claim promises.
+  useModalDialog(dialogRef, { onClose });
 
   const total = useMemo(
     () => NIHSS_ITEMS.reduce((sum, item) => sum + (scores[item.id] ?? 0), 0),
@@ -264,6 +263,7 @@ export default function NIHSS({ patientId, onClose }: NIHSSProps) {
       aria-modal="true"
       aria-labelledby="nihss-title"
       className="u-modal-scrim"
+      ref={dialogRef}
     >
       <div className="nihss-panel">
         <header

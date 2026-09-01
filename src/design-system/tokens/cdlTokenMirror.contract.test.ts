@@ -3,7 +3,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { CDL_SPACING_PX, CDL_CARD_DIMENSIONS } from './spacing';
-import { CDL_FONT_SIZE_PX, CDL_FONT_WEIGHT } from './typography';
+import { CDL_FONT_FAMILY, CDL_FONT_SIZE_PX, CDL_FONT_WEIGHT } from './typography';
 import { CDL_RADIUS_PX } from './radius';
 import { CDL_DURATION_MS } from './motion';
 import { CDL_SEMANTIC_TONES } from './colors';
@@ -72,5 +72,37 @@ describe('CEDS token mirror stays in sync with cdl-v2 CSS', () => {
     expect(tokensCss).toMatch(new RegExp(`--cdl-card-min-height:\\s*${CDL_CARD_DIMENSIONS.minHeightPx}px`));
     expect(cardsCss).toContain('.cdl-card--workflow');
     expect(cardsCss).toContain('min-width: var(--cdl-card-min-width)');
+  });
+
+  // The three assertions above covered width/height only, which let the radius and
+  // padding halves of the same object drift (radiusMinPx read 12 while the CSS said
+  // 14px). Assert every numeric field so a partial guard can't imply a whole one.
+  it('every card padding and radius value in the TS mirror matches tokens.css', () => {
+    const cardTokenByField = {
+      paddingMinPx: '--cdl-card-padding-min',
+      paddingMaxPx: '--cdl-card-padding-max',
+      radiusMinPx: '--cdl-card-radius-min',
+      radiusMaxPx: '--cdl-card-radius-max',
+    } as const;
+
+    for (const [field, cssName] of Object.entries(cardTokenByField)) {
+      const px = CDL_CARD_DIMENSIONS[field as keyof typeof cardTokenByField];
+      expect(tokensCss, `${cssName} vs CDL_CARD_DIMENSIONS.${field}`).toMatch(
+        new RegExp(`${cssName}:\\s*${px}px`),
+      );
+    }
+  });
+
+  it('the TS font stacks match the --cdl-font-* declarations', () => {
+    // tokens.css wraps the sans stack across lines; compare on collapsed whitespace.
+    const collapsedCss = tokensCss.replace(/\s+/g, ' ');
+    for (const [key, cssName] of [
+      ['sans', '--cdl-font-sans'],
+      ['mono', '--cdl-font-mono'],
+    ] as const) {
+      const stack = CDL_FONT_FAMILY[key];
+      if (!stack) continue;
+      expect(collapsedCss, cssName).toContain(`${cssName}: ${stack.replace(/\s+/g, ' ')};`);
+    }
   });
 });

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import useModalDialog from '../../hooks/useModalDialog';
 import { MEDICAL_THEME, MEDICAL_TYPE } from '../../config/medicalTheme.constants';
 import { dispatchAlert } from '../../engine/alertEngine';
 import { useEmergencyStore } from '../../store/emergencyStore';
@@ -54,14 +55,12 @@ export default function NEWS2({ patientId, onClose }: NEWS2Props) {
     alertedKeyRef.current = '';
   }, [patient]);
 
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose();
-    };
+  const dialogRef = useRef<HTMLDivElement>(null);
 
-    document.addEventListener('keydown', onKeyDown);
-    return () => document.removeEventListener('keydown', onKeyDown);
-  }, [onClose]);
+  // Escape, Tab containment, initial focus, focus restore and scroll lock all come
+  // from the shared hook: this dialog declares aria-modal="true" and previously had
+  // none of the containment that claim promises.
+  useModalDialog(dialogRef, { onClose });
 
   const score = useMemo(() => scoreNews2(values), [values]);
   const response = useMemo(() => news2Response(score.total, score.hasSingleRed), [score.hasSingleRed, score.total]);
@@ -147,6 +146,7 @@ export default function NEWS2({ patientId, onClose }: NEWS2Props) {
       aria-modal="true"
       aria-labelledby="news2-title"
       className="u-modal-scrim"
+      ref={dialogRef}
     >
       <div className="news2-panel">
         <header

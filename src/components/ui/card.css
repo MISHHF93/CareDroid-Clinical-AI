@@ -99,10 +99,13 @@
   left: 0;
   transform: translateX(-100%);
   background: linear-gradient(90deg, transparent, var(--app-overlay-on-surface), transparent);
-  animation: shimmer 2s infinite;
+  animation: cd-card-shimmer 2s infinite;
 }
 
-@keyframes shimmer {
+/* Scoped name: @keyframes are global, and this transform-based shimmer previously
+   shared the name "shimmer" with ui/Skeleton.css's left-based one, so whichever
+   stylesheet loaded last silently drove both. */
+@keyframes cd-card-shimmer {
   100% {
     transform: translateX(100%);
   }

@@ -996,7 +996,10 @@ function AppShellFrame({ children }: AppShellProps) {
       if (inInput) return;
 
       if (e.key === 'Escape') {
-        document.dispatchEvent(new Event('close-help-hub'));
+        // HelpHubContext listens on window, and `new Event()` does not bubble, so
+        // dispatching this on document never reached it -- Escape silently failed to
+        // close an aria-modal drawer. Match the open-help-hub dispatch target.
+        window.dispatchEvent(new Event('close-help-hub'));
         if (store.copilotOpen) {
           store.setCopilotOpen(false);
           return;

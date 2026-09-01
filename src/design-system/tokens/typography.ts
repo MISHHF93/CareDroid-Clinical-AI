@@ -4,7 +4,7 @@
  */
 
 export const CDL_FONT_FAMILY = Object.freeze({
-  sans: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+  sans: "'Inter', 'Segoe UI Variable', 'Aptos', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
   mono: "'JetBrains Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace",
 });
 
