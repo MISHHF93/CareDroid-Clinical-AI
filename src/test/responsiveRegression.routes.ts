@@ -32,7 +32,10 @@ export const CORE_ROUTE_SMOKE = Object.freeze([
   { id: 'tools-overview', path: '/tools', match: 'heading-text', heading: /careDroid tool console/i },
   { id: 'protocols', path: '/protocols', match: 'heading-text', heading: /protocol and clinical pathway library/i },
   { id: 'research', path: '/research', match: 'heading-text', heading: /research and evidence hub/i },
-  { id: 'documentation', path: '/documentation', match: 'heading', heading: /clinical documentation assistant/i },
+  // 'heading-text', like every other page whose <h1> the shell owns. These smoke
+  // tests render the page without the shell, so requiring a level-1 heading here
+  // asserted something the page deliberately does not render on its own.
+  { id: 'documentation', path: '/documentation', match: 'heading-text', heading: /clinical documentation assistant/i },
   { id: 'knowledge-graph', path: '/knowledge-graph', match: 'heading-text', heading: /clinical knowledge graph/i },
   { id: 'predictive-analytics', path: '/predictive-analytics', match: 'heading-text', heading: /predictive analytics dashboard/i },
   {
@@ -64,8 +67,11 @@ export const CORE_ROUTE_SMOKE = Object.freeze([
   { id: 'devices', path: '/devices', match: 'heading-text', heading: /device fleet management/i },
   {
     id: 'clinical-alerts',
+    // Renders through EmergencyRoutePage, which registers its title with the shell
+    // chrome; the page itself emits the sr-only cd-page-title-text mirror instead
+    // of a second <h1>. Same reason as /documentation above.
     path: '/clinical/alerts',
-    match: 'heading',
+    match: 'heading-text',
     heading: /^critical alerts$/i,
   },
 
