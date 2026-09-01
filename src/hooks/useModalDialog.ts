@@ -23,6 +23,13 @@ type UseModalDialogOptions = {
   onClose?: () => void;
   /** Element to focus on open; falls back to the first focusable, then the container. */
   initialFocusSelector?: string;
+  /**
+   * Where focus lands on open. 'first-focusable' suits dialogs with a clear
+   * primary control; 'container' suits panels that should be read from the top,
+   * which is the pattern ReassessmentDrawer and CriticalChecklist already use
+   * and have tests for.
+   */
+  initialFocus?: 'first-focusable' | 'container';
   /** Prevents the page behind from scrolling while the dialog is open. */
   lockScroll?: boolean;
   /** Set false while the dialog is unmounted or inert. */
@@ -31,7 +38,13 @@ type UseModalDialogOptions = {
 
 export default function useModalDialog(
   containerRef: RefObject<HTMLElement | null>,
-  { onClose, initialFocusSelector, lockScroll = true, enabled = true }: UseModalDialogOptions = {},
+  {
+    onClose,
+    initialFocusSelector,
+    initialFocus = 'first-focusable',
+    lockScroll = true,
+    enabled = true,
+  }: UseModalDialogOptions = {},
 ): void {
   useEffect(() => {
     if (!enabled) return undefined;
@@ -45,7 +58,10 @@ export default function useModalDialog(
     const explicitTarget = initialFocusSelector
       ? container.querySelector<HTMLElement>(initialFocusSelector)
       : null;
-    const initialTarget = explicitTarget || getFocusable()[0] || container;
+    const initialTarget =
+      initialFocus === 'container'
+        ? container
+        : explicitTarget || getFocusable()[0] || container;
     if (initialTarget === container && !container.hasAttribute('tabindex')) {
       // A bare <div> cannot take focus, which would leave the caret in the page
       // behind and defeat the trap before it starts.
@@ -96,5 +112,5 @@ export default function useModalDialog(
         previouslyFocused.focus();
       }
     };
-  }, [containerRef, enabled, initialFocusSelector, lockScroll, onClose]);
+  }, [containerRef, enabled, initialFocus, initialFocusSelector, lockScroll, onClose]);
 }

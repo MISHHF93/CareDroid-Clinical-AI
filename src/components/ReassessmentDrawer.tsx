@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
+import useModalDialog from '../hooks/useModalDialog';
 import { PatientFlag, type Note, type Patient, type Room } from '../types/emergency';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { OPERATIONAL_AUDIT_DOMAIN } from '../config/operationalAuditModel';
@@ -309,31 +310,12 @@ export default function ReassessmentDrawer({ open, count, onClose }: Reassessmen
   const attentionCount = count ?? sortedPatients.length;
   const dialogRef = useRef<HTMLElement>(null);
 
-  // HEAL-221: this dialog had zero focus management -- Escape closed it,
-  // but nothing moved focus in on open or restored it on close, so a
-  // keyboard user's focus was silently dropped to document.body every
-  // time. ui/Drawer.tsx (this app's canonical overlay primitive) already
-  // implements the correct pattern (capture the trigger, focus the dialog
-  // on open, restore the trigger on close); this dialog was built from
-  // scratch and never adopted it. Reachable via the global "r" keyboard
-  // shortcut, CapacityCrisisMode, and the command palette -- not a rare
-  // surface.
-  useEffect(() => {
-    if (!open) return undefined;
-
-    const previouslyFocused = document.activeElement as HTMLElement | null;
-    dialogRef.current?.focus();
-
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose();
-    };
-
-    document.addEventListener('keydown', handleEscape);
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-      previouslyFocused?.focus();
-    };
-  }, [onClose, open]);
+  // HEAL-221 added Escape, focus-in and focus-restore here by hand. What it
+  // still lacked was Tab containment, so focus could walk out of a dialog that
+  // claims aria-modal="true". The shared hook now owns all of it -- reachable via
+  // the global "r" shortcut, CapacityCrisisMode and the command palette, so not a
+  // rare surface.
+  useModalDialog(dialogRef, { onClose, enabled: open, initialFocus: 'container' });
 
   if (!open) return null;
 

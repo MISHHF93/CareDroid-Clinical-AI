@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import useModalDialog from '../../hooks/useModalDialog';
 import Button from './button';
 import { registerConfirmDialogHandler } from '../../services/careDroidInteractionFeedback';
 import type { ConfirmActionOptions } from '../../config/careDroidInteractionModel';
@@ -24,17 +25,18 @@ export function ConfirmDialogProvider({ children }: { children: React.ReactNode 
     });
   }, []);
 
-  useEffect(() => {
-    if (!pending) return;
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        event.preventDefault();
-        close(false);
-      }
-    };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, [close, pending]);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const dismiss = useCallback(() => close(false), [close]);
+
+  // Escape was already handled here; focus containment, focus restore and scroll
+  // lock were not, on the app's canonical destructive-action confirm. The shared
+  // hook owns all four so this dialog cannot drift from the rest again.
+  useModalDialog(dialogRef, {
+    onClose: dismiss,
+    enabled: Boolean(pending),
+    // The WAI-ARIA alertdialog pattern puts focus on the safe action.
+    initialFocusSelector: '.cd-confirm-dialog__actions button',
+  });
 
   return (
     <>
@@ -44,6 +46,7 @@ export function ConfirmDialogProvider({ children }: { children: React.ReactNode 
           {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions -- onClick only stops propagation to the backdrop's close handler, it is not an interactive control itself */}
           <div
             className={`cd-confirm-dialog cd-confirm-dialog--${pending.tone || 'default'}`}
+            ref={dialogRef}
             role="alertdialog"
             aria-modal="true"
             aria-labelledby="cd-confirm-dialog-title"

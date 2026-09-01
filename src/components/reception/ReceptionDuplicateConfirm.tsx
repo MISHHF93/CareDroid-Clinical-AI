@@ -1,5 +1,7 @@
+import { useRef } from 'react';
 import type { PatientDuplicateCandidate } from '../../utils/patientDuplicateDetection';
 import { AiTruthLabel, patientDuplicateMatchTruthLabel } from '../ai/AiTruthLabel';
+import useModalDialog from '../../hooks/useModalDialog';
 import './ReceptionDuplicateConfirm.css';
 
 export type ReceptionDuplicateConfirmProps = {
@@ -20,11 +22,26 @@ export default function ReceptionDuplicateConfirm({
   onCreateAnyway,
   onCancel,
 }: ReceptionDuplicateConfirmProps) {
-  if (!open || !candidates.length) return null;
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const isOpen = open && candidates.length > 0;
+
+  // A safety-critical gate (link vs create a duplicate chart) that had no
+  // keyboard dismissal at all and no focus containment, while claiming
+  // aria-modal="true". Declared before the early return so the hook order stays
+  // stable across open and closed renders.
+  useModalDialog(dialogRef, { onClose: onCancel, enabled: isOpen });
+
+  if (!isOpen) return null;
   const top = candidates[0];
 
   return (
-    <div className="reception-dupe-confirm" role="dialog" aria-modal="true" aria-labelledby="reception-dupe-title">
+    <div
+      className="reception-dupe-confirm"
+      ref={dialogRef}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="reception-dupe-title"
+    >
       <div className="reception-dupe-confirm__panel">
         <header className="reception-dupe-confirm__header">
           <h2 id="reception-dupe-title">Possible existing patient</h2>
