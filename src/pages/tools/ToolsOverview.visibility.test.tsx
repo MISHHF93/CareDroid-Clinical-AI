@@ -385,6 +385,15 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
     }
   });
 
+  // Heavier than its siblings rather than broken: it renders the full catalog
+  // like they do, then asserts across four execution modes and walks the registry
+  // projection for a platform-executor example. It measures ~15s against the 10s
+  // default. Looked for an inefficiency to remove first and did not find one --
+  // toolCard() is a single querySelector, and the executorStatus check
+  // short-circuits before it -- so this is a timeout that was too tight, stated
+  // explicitly the way backendOrphanAudit.test.ts states its own.
+  const FULL_CATALOG_RENDER_TIMEOUT_MS = 30_000;
+
   it('labels execution modes from the executor catalog without promoting unsupported local tools', async () => {
     const { container } = renderOverview();
     showAllTools();
@@ -409,7 +418,7 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
     if (platformTool) {
       expect(toolCard(container, platformTool.id)).toHaveTextContent(/platform service/i);
     }
-  }, 10000);
+  }, FULL_CATALOG_RENDER_TIMEOUT_MS);
 
   it('shows a resettable empty state for unmatched search', () => {
     renderOverview();
