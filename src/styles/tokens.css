@@ -378,32 +378,33 @@
 /* ─────────────────────────────────────────────────────────────
    8. MOTION / ANIMATION
 ───────────────────────────────────────────────────────────── */
-:root {
-  --cd-duration-instant: 0ms;
-  --cd-duration-fast: 80ms;
-  --cd-duration-normal: 150ms;
-  --cd-duration-slow: 250ms;
-  --cd-duration-slower: 400ms;
+/* This scale used to be declared here with its own literals -- 0/80/150/250/400ms
+   and the same three cubic-beziers -- byte-for-byte identical to cdl-v2/tokens.css.
+   Two copies of one scale can only stay equal by luck, so these now resolve from
+   the cdl tokens rather than repeating them. Values are unchanged; this is a
+   single-sourcing change, not a retune.
 
-  --cd-ease-standard: cubic-bezier(0.4, 0, 0.2, 1); /* material ease */
-  --cd-ease-decelerate: cubic-bezier(0, 0, 0.2, 1); /* enter */
-  --cd-ease-accelerate: cubic-bezier(0.4, 0, 1, 1); /* exit */
-  --cd-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1); /* spring overshoot */
+   The reduced-motion collapse that used to sit below is gone for the same reason:
+   cdl-v2/tokens.css already zeroes --cdl-duration-* under prefers-reduced-motion,
+   and these aliases follow it automatically. */
+:root {
+  --cd-duration-instant: var(--cdl-duration-instant);
+  --cd-duration-fast: var(--cdl-duration-fast);
+  --cd-duration-normal: var(--cdl-duration-normal);
+  --cd-duration-slow: var(--cdl-duration-slow);
+  --cd-duration-slower: var(--cdl-duration-slower);
+
+  --cd-ease-standard: var(--cdl-ease-standard);
+  --cd-ease-decelerate: var(--cdl-ease-decelerate);
+  --cd-ease-accelerate: var(--cdl-ease-accelerate);
+  /* No cdl equivalent, and currently unused by any rule -- kept rather than
+     deleted so a future spring/bounce has one place to come from. */
+  --cd-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --cd-ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
   --cd-transition-fast: var(--cd-duration-fast) var(--cd-ease-standard);
   --cd-transition-normal: var(--cd-duration-normal) var(--cd-ease-standard);
   --cd-transition-slow: var(--cd-duration-slow) var(--cd-ease-standard);
-}
-
-/* Respect reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  :root {
-    --cd-duration-fast: 0ms;
-    --cd-duration-normal: 0ms;
-    --cd-duration-slow: 0ms;
-    --cd-duration-slower: 0ms;
-  }
 }
 
 /* ─────────────────────────────────────────────────────────────

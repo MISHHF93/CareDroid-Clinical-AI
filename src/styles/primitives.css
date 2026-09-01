@@ -79,9 +79,11 @@
   --ease-smooth: var(--motion-ease-standard);
   --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
   --ease-elastic: cubic-bezier(0.68, -0.6, 0.32, 1.6);
-  --motion-transition-fast: var(--motion-duration-fast) var(--motion-ease-standard);
-  --motion-transition-normal: var(--motion-duration-normal) var(--motion-ease-standard);
-  --motion-transition-slow: var(--motion-duration-slow) var(--motion-ease-standard);
+  /* --motion-transition-fast/normal/slow are the composites built on the scale
+     above, and design-tokens.css already declares itself their owner. They were
+     defined byte-identically in both files; this one is removed so the pair
+     cannot drift apart later. Both files load from design-system.css, primitives
+     first, so nothing loses the token. */
 
   /* Component sizing */
   --component-card-padding: 20px;
