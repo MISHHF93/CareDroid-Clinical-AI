@@ -81,10 +81,17 @@ export const ED_EXTENSION_ROUTE_REDIRECTS: readonly EdExtensionRedirect[] = Obje
   { prefix: '/surveillance',              to: CANONICAL_ROUTES.emergencySettings,        reason: 'surveillance-extension' },
   { prefix: '/cosmos',                    to: CANONICAL_ROUTES.emergencyWhiteboard,      reason: 'cosmos-extension' },
   { prefix: '/operations-center',         to: CANONICAL_ROUTES.emergencyAnalytics,       reason: 'operations-center' },
-  { prefix: '/platform-intelligence',     to: CANONICAL_ROUTES.emergencySettings,        reason: 'platform-intelligence' },
   { prefix: '/platform-admin',            to: CANONICAL_ROUTES.emergencySettings,        reason: 'platform-admin' },
   { prefix: '/enterprise-platform',       to: CANONICAL_ROUTES.emergencySettings,        reason: 'enterprise-platform' },
   // ── Removed redirects (real pages now exist for these paths) ───────────────
+  // /platform-intelligence → PlatformIntelligenceHub. Same exit condition as
+  //   /trackmind below: the page now exists and is mounted behind
+  //   TrackMindRouteGuard, so the shadow comes off. Its 20-module model
+  //   (platformIntelligenceModel.ts) had been sitting unrendered; the page
+  //   labels which modules track the platform and which score themselves.
+  //   Removed from canonicalRouteRedirects.test.ts KNOWN_MISSING_TRACKMIND_PAGES
+  //   in the same commit. /platform-admin and /enterprise-platform still have
+  //   no page and stay shadowed.
   // /trackmind          → TrackMindWorkspaceHub. Removed once the page was
   //   built: this prefix was the LAST thing standing between a TrackMind role
   //   and its own workspace. Same silent-shadow shape as /customer-portal
@@ -95,8 +102,9 @@ export const ED_EXTENSION_ROUTE_REDIRECTS: readonly EdExtensionRedirect[] = Obje
   //   The entry was correct while it stood -- canonicalRouteRedirects.test.ts
   //   recorded it as a known gap precisely because no <Route> existed yet;
   //   that test's KNOWN_MISSING_TRACKMIND_PAGES set drops /trackmind in the
-  //   same commit. The other three (/platform-admin, /enterprise-platform,
-  //   /platform-intelligence) still have no page and stay listed above.
+  //   same commit. /platform-intelligence has since followed the same path;
+  //   /platform-admin and /enterprise-platform still have no page and remain
+  //   listed above.
   // /executive          → ExecutiveCommandCenter
   // /ai-command-center  → AiCommandCenterDashboard
   // /hospital-map       → HospitalMapDashboard

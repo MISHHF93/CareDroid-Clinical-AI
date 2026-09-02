@@ -1924,7 +1924,7 @@ export const ROUTE_RECORDS = Object.freeze([
     componentKey: 'PlatformIntelligenceHub',
     layout: 'app',
     auth: 'required',
-    status: 'future',
+    status: 'active',
     aliases: [],
     navGroup: 'account',
     notes:

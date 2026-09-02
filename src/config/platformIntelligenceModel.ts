@@ -13,6 +13,8 @@ import { auditEnterpriseOperatingPlatform } from './enterpriseOperatingPlatformM
 import {
   PLATFORM_INTELLIGENCE_MODULE,
   PLATFORM_INTELLIGENCE_MODULES,
+  PLATFORM_INTELLIGENCE_MODULE_PROVENANCE,
+  PLATFORM_INTELLIGENCE_PROVENANCE,
 } from './platformIntelligenceRegistry';
 
 export { PLATFORM_INTELLIGENCE_MODULE, PLATFORM_INTELLIGENCE_MODULES };
@@ -747,7 +749,13 @@ export function buildPlatformIntelligenceAssessment({
   const modules = PLATFORM_INTELLIGENCE_MODULES.map((meta) => {
     const assess = MODULE_ASSESSORS[meta.id];
     const result = assess(context, signals);
-    return Object.freeze({ ...meta, assessment: result });
+    return Object.freeze({
+      ...meta,
+      assessment: result,
+      provenance:
+        PLATFORM_INTELLIGENCE_MODULE_PROVENANCE[meta.id] ||
+        PLATFORM_INTELLIGENCE_PROVENANCE.REGISTRY,
+    });
   });
 
   const overallScore = clampScore(
@@ -763,6 +771,14 @@ export function buildPlatformIntelligenceAssessment({
     modules,
     summary: Object.freeze({
       moduleCount: modules.length,
+      // How much of overallScore actually tracks the platform. A surface that
+      // prints the headline has to be able to print this next to it.
+      liveModuleCount: modules.filter(
+        (module) => module.provenance === PLATFORM_INTELLIGENCE_PROVENANCE.LIVE,
+      ).length,
+      registryModuleCount: modules.filter(
+        (module) => module.provenance === PLATFORM_INTELLIGENCE_PROVENANCE.REGISTRY,
+      ).length,
       readyModules: modules.filter((m) => m.assessment.status === 'ready').length,
       kpisPassed: modules.reduce((s, m) => s + m.assessment.passedKpis, 0),
       kpisTotal: modules.reduce((s, m) => s + m.assessment.totalKpis, 0),

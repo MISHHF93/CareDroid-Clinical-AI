@@ -39,6 +39,7 @@ const AuthPage = lazyRoute(() => import('../pages/auth/AuthPage'));
 const TwoFactorSetupPage = lazyRoute(() => import('../pages/auth/TwoFactorSetupPage'));
 const TrackMindWorkspaceHub = lazyRoute(() => import('../pages/trackmind/TrackMindWorkspaceHub'));
 const TrackMindMaturityDashboard = lazyRoute(() => import('../pages/trackmind/TrackMindMaturityDashboard'));
+const PlatformIntelligenceHub = lazyRoute(() => import('../pages/platform/PlatformIntelligenceHub'));
 
 // ── Developer-only design-system catalog (item 41) ──────────────────────────
 // Deliberately NOT in CANONICAL_ROUTE_MAP, any navigation config, or the
@@ -1214,6 +1215,21 @@ export function AppRoutes() {
         <Route
           path={CANONICAL_ROUTES.workspaces}
           element={<EdApplicationEntryRedirect />}
+        />
+        {/*
+          Platform intelligence. TrackMind-guarded like its siblings: the 20
+          module assessments are TrackMind platform data, and intelligenceView
+          is the permission that gates this path.
+        */}
+        <Route
+          path={CANONICAL_ROUTES.platformIntelligence}
+          element={
+            <TrackMindRouteGuard path={CANONICAL_ROUTES.platformIntelligence}>
+              <LazyRoute label="Loading platform intelligence...">
+                <PlatformIntelligenceHub />
+              </LazyRoute>
+            </TrackMindRouteGuard>
+          }
         />
         {/*
           Maturity assessment. Same guard as the workspace: the model exposes
