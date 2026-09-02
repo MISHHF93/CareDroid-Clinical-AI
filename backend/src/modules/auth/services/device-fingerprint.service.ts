@@ -9,6 +9,25 @@ import { createHash } from 'crypto';
  * - Device tracking (remember this device)
  * - Risk scoring
  */
+/**
+ * Device fingerprinting for login anomaly detection.
+ *
+ * Unwired, and unlike emergency-access.service.ts nothing else does this job --
+ * this is a real capability waiting to be linked, not a duplicate. Three things
+ * are needed before it can be, and none of them are mechanical:
+ *
+ * 1. generateFingerprint() reads req.headers (user-agent, accept-language) and
+ *    req.ip, but AuthService.login() only receives ipAddress and userAgent, so
+ *    the request has to be plumbed through or the fingerprint computed in the
+ *    controller.
+ * 2. Comparing against a known device needs somewhere to keep prior
+ *    fingerprints per user; there is no such store today.
+ * 3. An anomaly needs a defined consequence. Beware the setting: an ED runs
+ *    shared workstations behind NAT, so an IP-and-user-agent fingerprint will
+ *    differ constantly for legitimate clinicians. Blocking on mismatch would
+ *    lock people out mid-shift; recording to the audit trail, or requiring a
+ *    second factor rather than refusing, are the safer readings.
+ */
 @Injectable()
 export class DeviceFingerprintService {
   /**

@@ -9,6 +9,23 @@ import { AuditAction } from '../../audit/entities/audit-log.entity';
 /**
  * Emergency Access Service
  *
+ * DO NOT WIRE THIS AS-IS. It is unreferenced on purpose.
+ *
+ * TwoFactorService.verifyToken() already accepts backup codes and is what the
+ * live 2FA path uses. This service duplicates that check using the exact
+ * pattern HEAL-231 removed from it: fetch the row, bcrypt-compare against the
+ * in-memory backupCodes array, splice, save. That is a check-then-act race --
+ * two concurrent requests presenting the SAME single-use code each read their
+ * own copy, both compare successfully, and both authenticate before either
+ * removal is persisted. verifyToken() now performs the read-check-remove-save
+ * inside a transaction holding a pessimistic write lock on the row, so the
+ * second request blocks, re-reads, and correctly fails against a code that is
+ * genuinely gone.
+ *
+ * Mounting this would hand back a one-time code that authenticates twice.
+ * If a dedicated break-glass endpoint is wanted, it should delegate to
+ * TwoFactorService.verifyToken() rather than repeat the comparison here.
+ *
  * Allows users with saved emergency bypass codes to access their account
  * when 2FA device is unavailable (phone lost, etc.)
  *
