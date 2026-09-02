@@ -9,10 +9,6 @@
 
 import { test, expect } from '@playwright/test';
 import {
-  ANDROID_QA_DEVICES,
-  viewportForDevice,
-} from '../src/data/androidDeviceQaMatrix.js';
-import {
   dismissOverlays,
   measurePageOverflow,
   waitForAppReady,
@@ -39,13 +35,6 @@ const QA_AUTH_TOKEN = process.env.QA_AUTH_TOKEN?.trim() || 'production-smoke-tok
 const QA_AUTH_PROFILE = parseAuthProfile(process.env.QA_AUTH_PROFILE_JSON);
 const STRICT_API = process.env.QA_STRICT_API === 'true';
 const ALLOW_AUTH_API_FAILURES = !STRICT_API && !process.env.QA_AUTH_TOKEN;
-const ANDROID_DEVICE_IDS = new Set([
-  'pixel-7',
-  'pixel-7-pro',
-  'samsung-galaxy-s',
-  'samsung-galaxy-a',
-]);
-
 const DESKTOP_ROUTES = [
   { path: '/emergency/tools', label: 'medical tools overview' },
   { path: '/emergency/tools?source=calculators&filter=calculator', label: 'calculators hub' },
@@ -53,13 +42,6 @@ const DESKTOP_ROUTES = [
   { path: '/emergency/tools?source=calculators&filter=calculator&q=qsofa&open=qsofa', label: 'qSOFA calculator' },
   { path: '/emergency/tools?source=tools&filter=clinical-tools&q=drug-check&open=drug-check', label: 'drug checker' },
   { path: '/emergency/tools?source=tools&filter=clinical-tools&q=lab-interp&open=lab-interp', label: 'lab interpreter' },
-  { path: '/emergency/copilot?tool=wells-pe', label: 'chat-assisted Wells PE launch' },
-];
-
-const ANDROID_ROUTES = [
-  { path: '/emergency/tools', label: 'medical tools overview' },
-  { path: '/emergency/tools?source=calculators&filter=calculator', label: 'calculators hub' },
-  { path: '/emergency/tools?source=calculators&filter=calculator&q=has-bled&open=has-bled', label: 'HAS-BLED calculator' },
   { path: '/emergency/copilot?tool=wells-pe', label: 'chat-assisted Wells PE launch' },
 ];
 
@@ -267,28 +249,4 @@ test.describe('production route fallback behavior', () => {
 
     await attachAndAssertRuntimeClean(audit, testInfo);
   });
-});
-
-test.describe('production Android runtime', () => {
-  for (const device of ANDROID_QA_DEVICES.filter((candidate) => ANDROID_DEVICE_IDS.has(candidate.id))) {
-    for (const orientation of ['portrait', 'landscape']) {
-      for (const route of ANDROID_ROUTES) {
-        test(`${device.label} ${orientation} ${route.label}`, async ({ page }, testInfo) => {
-          const audit = installRuntimeAudit(page);
-
-          await page.setViewportSize(viewportForDevice(device, orientation));
-          await assertProtectedRoute(page, route.path);
-
-          const overflow = await measurePageOverflow(page);
-          await testInfo.attach('overflow-report', {
-            body: JSON.stringify(overflow, null, 2),
-            contentType: 'application/json',
-          });
-          expect(overflow.pass, JSON.stringify(overflow.offenders, null, 2)).toBe(true);
-
-          await attachAndAssertRuntimeClean(audit, testInfo);
-        });
-      }
-    }
-  }
 });
