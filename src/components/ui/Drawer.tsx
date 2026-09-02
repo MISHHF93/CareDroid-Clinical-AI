@@ -1,4 +1,5 @@
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
+import useModalDialog from '../../hooks/useModalDialog';
 import { createPortal } from 'react-dom';
 import './Drawer.css';
 
@@ -31,48 +32,19 @@ export const Drawer = ({
   ...props
 }: any) => {
   const drawerRef = useRef<any>(null);
-  const previousFocusRef = useRef<any>(null);
-  const previousBodyOverflowRef = useRef('');
 
-  // Handle escape key
-  useEffect(() => {
-    if (!isOpen || !closeOnEscape) return;
-
-    const handleEscape = (e) => {
-      if (e.key === 'Escape') {
-        onClose();
-      }
-    };
-
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
-  }, [isOpen, onClose, closeOnEscape]);
-
-  // Focus management
-  useEffect(() => {
-    if (isOpen) {
-      previousFocusRef.current = document.activeElement;
-      
-      setTimeout(() => {
-        const focusableElements = drawerRef.current?.querySelectorAll(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        );
-        if (focusableElements && focusableElements.length > 0) {
-          focusableElements[0].focus();
-        }
-      }, 10);
-
-      previousBodyOverflowRef.current = document.body.style.overflow;
-      document.body.style.overflow = 'hidden';
-    } else {
-      previousFocusRef.current?.focus();
-      document.body.style.overflow = previousBodyOverflowRef.current;
-    }
-
-    return () => {
-      document.body.style.overflow = previousBodyOverflowRef.current;
-    };
-  }, [isOpen]);
+  // Escape, initial focus, focus restore and scroll lock were all hand-rolled here
+  // -- correctly, except for the one thing aria-modal="true" below actually
+  // promises: Tab was never contained, so focus walked out of the drawer onto the
+  // page behind it. The shared hook owns all five. It also removes a setTimeout(10)
+  // that raced the drawer's own mount to place initial focus.
+  //
+  // closeOnEscape is preserved by passing no onClose: the hook only binds Escape
+  // when it has something to call.
+  useModalDialog(drawerRef, {
+    onClose: closeOnEscape ? onClose : undefined,
+    enabled: isOpen,
+  });
 
   // Handle overlay click
   const handleOverlayClick = (e) => {
