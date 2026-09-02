@@ -8,7 +8,13 @@ import {
 } from '../decorators/permissions.decorator';
 import { Permission } from '../enums/permission.enum';
 
-type ControllerClass = new (...args: unknown[]) => unknown;
+// `never[]` rather than `unknown[]`: constructor parameters are contravariant,
+// so a controller whose constructor takes real injected services is NOT
+// assignable to `new (...args: unknown[]) => unknown`, and every caller failed
+// to compile with TS2345. Nothing here constructs the class -- it only reads
+// .prototype and hands the class to Reflector -- so the parameter list just has
+// to accept any constructor, which `never[]` does without reaching for `any`.
+type ControllerClass = new (...args: never[]) => unknown;
 type RouteHandler = (...args: unknown[]) => unknown;
 
 /**
