@@ -43,9 +43,12 @@ import {
 // Same shape as the AuthPage addition above: DIRECTORY_OWNER_RULES.auth already
 // routes src/pages/auth/* to the 'auth' module with zero gaps, so only the
 // pinned totals move, +1 source file and +1 style file.
-export const PAGE_INVENTORY_EXPECTED_TOTAL = 259;
-export const PAGE_SOURCE_EXPECTED_TOTAL = 163;
-export const PAGE_STYLE_EXPECTED_TOTAL = 96;
+// TrackMind workspace hub: src/pages/trackmind/TrackMindWorkspaceHub.tsx + .css
+// are new, real files -- the page routes.config.ts had declared since
+// 2026-08-26 while recording that no component existed. +1 source, +1 style.
+export const PAGE_INVENTORY_EXPECTED_TOTAL = 261;
+export const PAGE_SOURCE_EXPECTED_TOTAL = 164;
+export const PAGE_STYLE_EXPECTED_TOTAL = 97;
 export const PAGE_TOOLS_INVENTORY_EXPECTED_TOTAL = 58;
 export const PAGE_TOOLS_SOURCE_EXPECTED_TOTAL = 48;
 

@@ -37,6 +37,7 @@ const lazyNamed = (loader, exportName) =>
 const PlatformEntryHub = lazyRoute(() => import('../pages/PlatformEntryHub'));
 const AuthPage = lazyRoute(() => import('../pages/auth/AuthPage'));
 const TwoFactorSetupPage = lazyRoute(() => import('../pages/auth/TwoFactorSetupPage'));
+const TrackMindWorkspaceHub = lazyRoute(() => import('../pages/trackmind/TrackMindWorkspaceHub'));
 
 // ── Developer-only design-system catalog (item 41) ──────────────────────────
 // Deliberately NOT in CANONICAL_ROUTE_MAP, any navigation config, or the
@@ -112,6 +113,7 @@ import { COMMAND_CENTER_INTELLIGENCE_REDIRECTS } from '../config/hospitalCommand
 import { resolveRegistryId } from '../data/clinicalCatalogWiring';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import ProfileRouteGuard from '../components/ProfileRouteGuard';
+import TrackMindRouteGuard from '../components/TrackMindRouteGuard';
 import {
   getEmergencyRoleDefinition,
   getReceptionEmbeddedIntakePath,
@@ -1212,6 +1214,23 @@ export function AppRoutes() {
           path={CANONICAL_ROUTES.workspaces}
           element={<EdApplicationEntryRedirect />}
         />
+        {/* TrackMind Operating System hub. routes.config.ts has carried this
+            route and componentKey since 2026-08-26, recording that the role
+            catalog, permission registry, policy modules and TrackMindRouteGuard
+            were all real and only the page and the mount were missing. Guarded
+            by TrackMindRouteGuard so a role without TrackMind access gets its
+            own access-denied surface rather than the generic one. */}
+        <Route
+          path={CANONICAL_ROUTES.trackMindWorkspace}
+          element={
+            <TrackMindRouteGuard path={CANONICAL_ROUTES.trackMindWorkspace}>
+              <LazyRoute label="Loading TrackMind workspace...">
+                <TrackMindWorkspaceHub />
+              </LazyRoute>
+            </TrackMindRouteGuard>
+          }
+        />
+
         {/* Security settings for the signed-in user. TwoFactorEnforcementGuard
             tells high-privilege callers to "enable it in your security
             settings"; this is that screen, and it talks to the

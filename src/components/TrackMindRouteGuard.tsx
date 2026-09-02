@@ -4,7 +4,10 @@ import { useUser } from '../contexts/UserContext';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import { PILOT_CUSTOMER_MODE } from '../config/unified-navigation.config';
 import { getPlatformHomeRoute } from '../config/receptionFirstUx.config';
-import { resolveUserProfileFromSaasRole } from '../config/userProfileCatalog';
+import {
+  resolveSaasRoleFromUser,
+  resolveUserProfileFromSaasRole,
+} from '../config/userProfileCatalog';
 
 function TrackMindAccessDenied({ requestedPath }) {
   const trackMindRole = useTrackMindRolePermissions();
@@ -19,17 +22,6 @@ function TrackMindAccessDenied({ requestedPath }) {
         Go to your workspace
       </Link>
     </section>
-  );
-}
-
-function resolveSaasRoleFromUser(user) {
-  const profile = user?.profile || {};
-  return (
-    user?.saasRole ||
-    profile.saasRole ||
-    profile.roleProfileId ||
-    user?.role ||
-    ''
   );
 }
 

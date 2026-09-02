@@ -189,21 +189,28 @@ describe('canonical route tree', () => {
     // (see HEAL-347.78's 9-entry sweep) -- either way this should never be
     // silently true, so it's asserted here across every nav item at once
     // rather than one path at a time as new instances are found.
-    // These 4 are a DIFFERENT case from /customer-portal and /workspaces:
+    // These 3 are a DIFFERENT case from /customer-portal and /workspaces:
     // all carry real, dedicated trackMindPermission grants
     // (trackmind.workspace.view / .enterprise.view / .intelligence.view) and
     // platform-admin has its own MANAGE_USERS/CONFIGURE_SYSTEM buckets plus
     // heavy cross-references in trackMindWorkspaceModel.ts -- clear ongoing
     // investment in a still-being-built TrackMind subsystem, not abandoned
     // pivot debris like HEAL-347.78's 9-entry sweep. No <Route> exists for
-    // any of the four anywhere in the app (confirmed via exhaustive grep), so
-    // removing the ED_EXTENSION_ROUTE_REDIRECTS shadow would trade a soft
+    // any of the three anywhere in the app, so removing the
+    // ED_EXTENSION_ROUTE_REDIRECTS shadow would trade a soft
     // /emergency/settings landing for a bare EmergencyDefaultRedirect
     // fallback -- no functional improvement without an actual page. Whether
     // to build these pages or retire the nav entries is a product decision
     // outside a route-collision bug-fix pass; tracked as a known gap instead
     // of silently passing or endlessly re-discovering it.
-    const KNOWN_MISSING_TRACKMIND_PAGES = new Set(['/platform-admin', '/trackmind', '/enterprise-platform', '/platform-intelligence']);
+    // /trackmind GRADUATED out of this set: TrackMindWorkspaceHub now exists
+    // and is mounted behind TrackMindRouteGuard, so its /trackmind ->
+    // /emergency/settings entry was deleted from ED_EXTENSION_ROUTE_REDIRECTS.
+    // That is exactly the exit condition this comment described -- build the
+    // page, then drop the shadow. The remaining three must follow the same
+    // order: page first, THEN the redirect entry, or they regress to the
+    // bare-fallback state above.
+    const KNOWN_MISSING_TRACKMIND_PAGES = new Set(['/platform-admin', '/enterprise-platform', '/platform-intelligence']);
     const { resolveEdExtensionRedirect } = await import('../config/edApplication.config');
     const { APP_SHELL_NAV_ITEMS, ACCOUNT_UTILITY_NAV_ITEMS, SOLUTIONS_SIDEBAR_NAV_ITEMS, OPERATIONS_SIDEBAR_NAV_ITEMS, ADVANCED_SIDEBAR_NAV_ITEMS } = await import('../config/navigation.config');
     const navItemArrays = [APP_SHELL_NAV_ITEMS, ACCOUNT_UTILITY_NAV_ITEMS, SOLUTIONS_SIDEBAR_NAV_ITEMS, OPERATIONS_SIDEBAR_NAV_ITEMS, ADVANCED_SIDEBAR_NAV_ITEMS];

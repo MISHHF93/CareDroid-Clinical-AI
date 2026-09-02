@@ -1883,7 +1883,12 @@ export const ROUTE_RECORDS = Object.freeze([
     componentKey: 'TrackMindWorkspaceHub',
     layout: 'app',
     auth: 'required',
-    status: 'future',
+    // 'future' until the page existed. src/pages/trackmind/TrackMindWorkspaceHub.tsx
+    // now renders it and router.tsx mounts it behind TrackMindRouteGuard, so the
+    // record has to say so -- routeRecordsDrift.test.ts fails an entry claiming
+    // 'active' with no component, and equally one still claiming 'future' once
+    // the path is live.
+    status: 'active',
     aliases: [],
     navGroup: 'account',
     notes:

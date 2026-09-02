@@ -1,0 +1,227 @@
+/*
+ * TrackMind workspace hub. CDL 2.1 custom properties only -- no literal
+ * colours, so light and dark both follow the theme switch.
+ */
+
+.trackmind-hub {
+  max-width: 68rem;
+  margin: 0 auto;
+  padding: var(--cdl-space-6, 24px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--cdl-space-6, 24px);
+  color: var(--cdl-text, #0f172a);
+}
+
+.trackmind-hub__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--cdl-space-5, 20px);
+}
+
+.trackmind-hub__eyebrow {
+  margin: 0 0 var(--cdl-space-1, 4px);
+  font-size: var(--cdl-text-xs, 12px);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cdl-text-muted, #475569);
+}
+
+.trackmind-hub__header h1 {
+  margin: 0;
+  font-size: var(--cdl-text-2xl, 24px);
+  font-weight: var(--cdl-font-semibold, 600);
+  text-wrap: balance;
+}
+
+.trackmind-hub__subtitle {
+  margin: var(--cdl-space-1, 4px) 0 0;
+  color: var(--cdl-text-muted, #475569);
+  max-width: 60ch;
+}
+
+.trackmind-hub__role {
+  display: flex;
+  align-items: center;
+  gap: var(--cdl-space-3, 12px);
+  padding: var(--cdl-space-4, 16px);
+  border: 1px solid var(--cdl-border, #e2e8f0);
+  border-radius: var(--cdl-radius-lg, 12px);
+  background: var(--cdl-surface, #ffffff);
+  box-shadow: var(--cdl-elev-1);
+  max-width: 30rem;
+}
+
+.trackmind-hub__role > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.trackmind-hub__role span {
+  font-size: var(--cdl-text-sm, 14px);
+  color: var(--cdl-text-muted, #475569);
+}
+
+.trackmind-hub__readonly {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cdl-space-1, 4px);
+  padding: 2px var(--cdl-space-2, 8px);
+  border-radius: var(--cdl-radius-full, 9999px);
+  background: var(--cdl-surface-muted, #f1f5f9);
+  font-size: var(--cdl-text-xs, 12px);
+  font-weight: var(--cdl-font-semibold, 600);
+  white-space: nowrap;
+}
+
+.trackmind-hub__facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: var(--cdl-space-4, 16px);
+  margin: 0;
+  padding: var(--cdl-space-4, 16px);
+  border: 1px solid var(--cdl-border, #e2e8f0);
+  border-radius: var(--cdl-radius-lg, 12px);
+  background: var(--cdl-surface, #ffffff);
+}
+
+.trackmind-hub__facts dt {
+  font-size: var(--cdl-text-xs, 12px);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--cdl-text-muted, #475569);
+}
+
+.trackmind-hub__facts dd {
+  margin: var(--cdl-space-1, 4px) 0 0;
+  font-weight: var(--cdl-font-semibold, 600);
+  font-variant-numeric: tabular-nums;
+}
+
+.trackmind-hub__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cdl-space-3, 12px);
+}
+
+.trackmind-hub__section h2 {
+  display: flex;
+  align-items: center;
+  gap: var(--cdl-space-2, 8px);
+  margin: 0;
+  font-size: var(--cdl-text-lg, 18px);
+  font-weight: var(--cdl-font-semibold, 600);
+}
+
+.trackmind-hub__note,
+.trackmind-hub__empty {
+  margin: 0;
+  max-width: 72ch;
+  color: var(--cdl-text-muted, #475569);
+  line-height: 1.55;
+}
+
+.trackmind-hub__kpis,
+.trackmind-hub__actions,
+.trackmind-hub__related,
+.trackmind-hub__channels {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--cdl-space-3, 12px);
+}
+
+.trackmind-hub__kpis {
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+}
+
+.trackmind-hub__kpis li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--cdl-space-3, 12px) var(--cdl-space-4, 16px);
+  border: 1px solid var(--cdl-border, #e2e8f0);
+  border-radius: var(--cdl-radius-md, 8px);
+  background: var(--cdl-surface, #ffffff);
+}
+
+.trackmind-hub__kpis span {
+  font-size: var(--cdl-text-xs, 12px);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--cdl-text-muted, #475569);
+}
+
+.trackmind-hub__actions,
+.trackmind-hub__related {
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+}
+
+.trackmind-hub__actions a,
+.trackmind-hub__related a,
+.trackmind-hub__actions span,
+.trackmind-hub__related .trackmind-hub__locked {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cdl-space-2, 8px);
+  padding: var(--cdl-space-3, 12px) var(--cdl-space-4, 16px);
+  border: 1px solid var(--cdl-border, #e2e8f0);
+  border-radius: var(--cdl-radius-md, 8px);
+  background: var(--cdl-surface, #ffffff);
+  color: inherit;
+  text-decoration: none;
+  font-weight: var(--cdl-font-medium, 500);
+}
+
+.trackmind-hub__actions span {
+  color: var(--cdl-text-muted, #475569);
+}
+
+.trackmind-hub__actions a:hover,
+.trackmind-hub__related a:hover {
+  border-color: var(--app-accent, var(--cdl-brand-500, #0f766e));
+}
+
+.trackmind-hub__actions a:focus-visible,
+.trackmind-hub__related a:focus-visible {
+  outline: 2px solid var(--app-accent, var(--cdl-brand-500, #0f766e));
+  outline-offset: 2px;
+}
+
+.trackmind-hub__channels {
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+}
+
+.trackmind-hub__channels li {
+  padding: var(--cdl-space-2, 8px) var(--cdl-space-3, 12px);
+  border-radius: var(--cdl-radius-full, 9999px);
+  background: var(--cdl-surface-muted, #f1f5f9);
+  font-size: var(--cdl-text-sm, 14px);
+  text-align: center;
+}
+
+/* A related surface the profile cannot open: named, not linked. */
+.trackmind-hub__related .trackmind-hub__locked {
+  color: var(--cdl-text-muted, #475569);
+  background: var(--cdl-surface-muted, #f1f5f9);
+  border-style: dashed;
+}
+
+.trackmind-hub__locked-note {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cdl-space-1, 4px);
+  font-size: var(--cdl-text-xs, 12px);
+  font-weight: var(--cdl-font-medium, 500);
+  white-space: nowrap;
+}
+
+.trackmind-hub__locked-note svg {
+  width: 0.875em;
+  height: 0.875em;
+}

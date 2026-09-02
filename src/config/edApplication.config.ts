@@ -84,8 +84,19 @@ export const ED_EXTENSION_ROUTE_REDIRECTS: readonly EdExtensionRedirect[] = Obje
   { prefix: '/platform-intelligence',     to: CANONICAL_ROUTES.emergencySettings,        reason: 'platform-intelligence' },
   { prefix: '/platform-admin',            to: CANONICAL_ROUTES.emergencySettings,        reason: 'platform-admin' },
   { prefix: '/enterprise-platform',       to: CANONICAL_ROUTES.emergencySettings,        reason: 'enterprise-platform' },
-  { prefix: '/trackmind',                 to: CANONICAL_ROUTES.emergencySettings,        reason: 'trackmind-extension' },
   // ── Removed redirects (real pages now exist for these paths) ───────────────
+  // /trackmind          → TrackMindWorkspaceHub. Removed once the page was
+  //   built: this prefix was the LAST thing standing between a TrackMind role
+  //   and its own workspace. Same silent-shadow shape as /customer-portal
+  //   (347.79) -- PilotExtensionRouteGuard wraps <Outlet/> above the route
+  //   tree, so /trackmind replaceState'd to /emergency/settings before the
+  //   new <Route> could mount, and neither access-denied panel ever rendered.
+  //   Confirmed live by stack-tracing history.replaceState, not inferred.
+  //   The entry was correct while it stood -- canonicalRouteRedirects.test.ts
+  //   recorded it as a known gap precisely because no <Route> existed yet;
+  //   that test's KNOWN_MISSING_TRACKMIND_PAGES set drops /trackmind in the
+  //   same commit. The other three (/platform-admin, /enterprise-platform,
+  //   /platform-intelligence) still have no page and stay listed above.
   // /executive          → ExecutiveCommandCenter
   // /ai-command-center  → AiCommandCenterDashboard
   // /hospital-map       → HospitalMapDashboard
