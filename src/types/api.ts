@@ -95,14 +95,3 @@ export interface DrugDetailResponse {
   drug: Record<string, unknown> | null;
   error?: string;
 }
-
-export interface BackendQueueItem {
-  id: string;
-  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
-  path: string;
-  controller: string;
-  category: 'patient' | 'clinical' | 'operational';
-  reason: string;
-  targetSurface: string;
-  status: 'queued';
-}
