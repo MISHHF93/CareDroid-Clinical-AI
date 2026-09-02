@@ -1,4 +1,5 @@
 import { useMemo, type ReactNode } from 'react';
+import useRovingTabs from '../../hooks/useRovingTabs';
 import EdDataSourceBanner from '../../components/emergency/EdDataSourceBanner';
 import PatientCard from '../../components/PatientCard';
 import EdJourneyProgressRail from '../../components/emergency/EdJourneyProgressRail';
@@ -114,19 +115,37 @@ export function MaturityChip({ maturity }) {
   );
 }
 
+const FLOW_CAPACITY_VIEWS = [
+  { id: 'capacity', label: 'Capacity' },
+  { id: 'boarding', label: 'Boarding' },
+] as const;
+
+const FLOW_CAPACITY_VIEW_IDS = FLOW_CAPACITY_VIEWS.map((view) => view.id);
+
 export function FlowCapacityViewTabs({ activeView, onViewChange }) {
-  const views = [
-    { id: 'capacity', label: 'Capacity' },
-    { id: 'boarding', label: 'Boarding' },
-  ];
+  // Declared role="tablist"/role="tab" with an accurate aria-selected, but had
+  // none of the keyboard half: no arrow keys, and every tab left in the tab order
+  // so Tab walked through the strip instead of treating it as one stop.
+  const { tabListRef, onKeyDown, tabIndexFor } = useRovingTabs({
+    ids: FLOW_CAPACITY_VIEW_IDS,
+    activeId: activeView,
+    onSelect: onViewChange,
+  });
 
   return (
-    <div className="emergency-route-view-tabs" role="tablist" aria-label="Flow and capacity views">
-      {views.map((view) => (
+    <div
+      className="emergency-route-view-tabs"
+      role="tablist"
+      aria-label="Flow and capacity views"
+      ref={tabListRef}
+    >
+      {FLOW_CAPACITY_VIEWS.map((view) => (
         <button
           key={view.id}
           type="button"
           role="tab"
+          tabIndex={tabIndexFor(view.id)}
+          onKeyDown={onKeyDown}
           {...((activeView === view.id) ? { 'aria-selected': 'true' as const } : { 'aria-selected': 'false' as const })}
           className={`emergency-route-view-tabs__btn${
             activeView === view.id ? ' emergency-route-view-tabs__btn--active' : ''
