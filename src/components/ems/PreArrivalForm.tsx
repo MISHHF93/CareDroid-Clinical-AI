@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import useRovingTabs from '../../hooks/useRovingTabs';
 import { Ambulance, Clock3, Send } from 'lucide-react';
 import {
   PRE_ARRIVAL_FRAMEWORK_LABELS,
@@ -152,6 +153,12 @@ export default function PreArrivalForm({
     patchForm({ framework });
   };
 
+  const frameworkTabs = useRovingTabs({
+    ids: Object.keys(PRE_ARRIVAL_FRAMEWORK_LABELS),
+    activeId: form.framework,
+    onSelect: (id) => switchFramework(id as PreArrivalNotificationFramework),
+  });
+
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     if (!canSubmit || submitting) return;
@@ -293,12 +300,19 @@ export default function PreArrivalForm({
         ))}
       </div>
 
-      <div className="pre-arrival-intake__framework" role="tablist" aria-label="Notification framework">
+      <div
+        className="pre-arrival-intake__framework"
+        role="tablist"
+        aria-label="Notification framework"
+        ref={frameworkTabs.tabListRef}
+      >
         {Object.entries(PRE_ARRIVAL_FRAMEWORK_LABELS).map(([id, _label]) => (
           <button
             key={id}
             type="button"
             role="tab"
+            tabIndex={frameworkTabs.tabIndexFor(id)}
+            onKeyDown={frameworkTabs.onKeyDown}
             {...((form.framework === id) ? { 'aria-selected': 'true' as const } : { 'aria-selected': 'false' as const })}
             className={form.framework === id ? 'is-active' : ''}
             disabled={!canSubmit}

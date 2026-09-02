@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import useRovingTabs from '../../hooks/useRovingTabs';
 import { useNavigate } from 'react-router-dom';
 import { useHelpHub, type HelpHubTab } from '../../contexts/HelpHubContext';
 import { useContextualHelp } from '../../hooks/useContextualHelp';
@@ -31,6 +32,11 @@ export default function HelpHub({ variant = 'drawer' }: HelpHubProps) {
   const navigate = useNavigate();
   const emergencyRole = useEmergencyRolePermissions();
   const { state, closeHelp, setTab, setTopicId } = useHelpHub();
+  const helpTabs = useRovingTabs({
+    ids: TABS.map((tab) => tab.id),
+    activeId: state.tab,
+    onSelect: setTab,
+  });
   const help = useContextualHelp(state.topicId);
 
   const activeTopic =
@@ -81,12 +87,19 @@ export default function HelpHub({ variant = 'drawer' }: HelpHubProps) {
         ) : null}
       </header>
 
-      <div className="help-hub__tabs" role="tablist" aria-label="Guide sections">
+      <div
+        className="help-hub__tabs"
+        role="tablist"
+        aria-label="Guide sections"
+        ref={helpTabs.tabListRef}
+      >
         {TABS.map((tab) => (
           <button
             key={tab.id}
             type="button"
             role="tab"
+            tabIndex={helpTabs.tabIndexFor(tab.id)}
+            onKeyDown={helpTabs.onKeyDown}
             className="help-hub__tab"
             data-active={state.tab === tab.id ? 'true' : 'false'}
             {...((state.tab === tab.id) ? { 'aria-selected': 'true' as const } : { 'aria-selected': 'false' as const })}

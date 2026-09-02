@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import useRovingTabs from '../../hooks/useRovingTabs';
 import {
   OPERATIONAL_AUDIT_DOMAIN,
   OPERATIONAL_AUDIT_DOMAIN_LABELS,
@@ -41,6 +42,12 @@ export default function OperationalHistoryPanel({
     [domains],
   );
 
+  const { tabListRef, onKeyDown, tabIndexFor } = useRovingTabs({
+    ids: visibleDomains,
+    activeId: activeDomain,
+    onSelect: setActiveDomain,
+  });
+
   const entries = useMemo(
     () =>
       filterOperationalHistory(logs, {
@@ -75,12 +82,19 @@ export default function OperationalHistoryPanel({
           {!compact ? <p>{description}</p> : null}
         </div>
         {!compact && visibleDomains.length > 1 ? (
-          <div className="operational-history-panel__tabs" role="tablist" aria-label="History domains">
+          <div
+            className="operational-history-panel__tabs"
+            role="tablist"
+            aria-label="History domains"
+            ref={tabListRef}
+          >
             {visibleDomains.map((domain) => (
               <button
                 key={domain}
                 type="button"
                 role="tab"
+                tabIndex={tabIndexFor(domain)}
+                onKeyDown={onKeyDown}
                 {...((activeDomain === domain) ? { 'aria-selected': 'true' as const } : { 'aria-selected': 'false' as const })}
                 className={[
                   'operational-history-panel__tab',

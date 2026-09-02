@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import useRovingTabs from '../../hooks/useRovingTabs';
 import './copilot-shell.css';
 
 export type CopilotShellTab = 'chat' | 'context' | 'safety';
@@ -42,6 +43,17 @@ export default function CopilotShell({
     safety: safetyContent,
   };
 
+  const copilotTabs = useRovingTabs({
+
+    ids: tabs.map((tab) => tab.id),
+
+    activeId: activeTab,
+
+    onSelect: onTabChange,
+
+  });
+
+
   const chatOnly = tabs.length <= 1;
 
   return (
@@ -54,7 +66,12 @@ export default function CopilotShell({
       {header}
 
       {chatOnly ? null : (
-        <div className="ed-copilot-shell__tabs" role="tablist" aria-label="Copilot panel sections">
+        <div
+          className="ed-copilot-shell__tabs"
+          role="tablist"
+          aria-label="Copilot panel sections"
+          ref={copilotTabs.tabListRef}
+        >
           {tabs.map((tab) => {
             const selected = activeTab === tab.id;
             // Edge Tools rejects JSX expressions in ARIA values — use literals only.
@@ -65,6 +82,8 @@ export default function CopilotShell({
                   type="button"
                   role="tab"
                   id={`ed-copilot-tab-${tab.id}`}
+                  tabIndex={copilotTabs.tabIndexFor(tab.id)}
+                  onKeyDown={copilotTabs.onKeyDown}
                   aria-selected="true"
                   aria-controls={`ed-copilot-panel-${tab.id}`}
                   className="ed-copilot-shell__tab"
@@ -86,6 +105,8 @@ export default function CopilotShell({
                 type="button"
                 role="tab"
                 id={`ed-copilot-tab-${tab.id}`}
+                tabIndex={copilotTabs.tabIndexFor(tab.id)}
+                onKeyDown={copilotTabs.onKeyDown}
                 aria-selected="false"
                 aria-controls={`ed-copilot-panel-${tab.id}`}
                 className="ed-copilot-shell__tab"

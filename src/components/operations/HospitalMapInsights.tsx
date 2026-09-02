@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import useRovingTabs from '../../hooks/useRovingTabs';
 import { Link } from 'react-router-dom';
 import { MetricCard, VisualizationPanel } from '../dashboard/DashboardVisualizations';
 import { CategoryBarChart } from '../dashboard/DashboardCharts';
@@ -110,6 +111,11 @@ export default function HospitalMapInsights({
   const floors = snapshot?.floors || [];
   const [selectedFloorId, setSelectedFloorId] = useState(floors[0]?.id || '');
   const activeFloorId = selectedFloorId || floors[0]?.id || '';
+  const floorTabs = useRovingTabs({
+    ids: floors.map((floor) => floor.id),
+    activeId: activeFloorId,
+    onSelect: setSelectedFloorId,
+  });
 
   const floorRooms = useMemo(
     () => (snapshot?.rooms || []).filter((room) => !activeFloorId || room.floorId === activeFloorId),
@@ -189,12 +195,19 @@ export default function HospitalMapInsights({
       <div className="hospital-map-insights__layout">
         <section className="hospital-map-insights__map-shell" aria-label="Hospital floor plan canvas">
           {floors.length > 1 ? (
-            <div className="hospital-map-insights__floor-tabs" role="tablist" aria-label="Hospital floors">
+            <div
+              className="hospital-map-insights__floor-tabs"
+              role="tablist"
+              aria-label="Hospital floors"
+              ref={floorTabs.tabListRef}
+            >
               {floors.map((floor) => (
                 <button
                   key={floor.id}
                   type="button"
                   role="tab"
+                  tabIndex={floorTabs.tabIndexFor(floor.id)}
+                  onKeyDown={floorTabs.onKeyDown}
                   {...((floor.id === activeFloorId) ? { 'aria-selected': 'true' as const } : { 'aria-selected': 'false' as const })}
                   className={floor.id === activeFloorId ? 'is-active' : undefined}
                   onClick={() => setSelectedFloorId(floor.id)}

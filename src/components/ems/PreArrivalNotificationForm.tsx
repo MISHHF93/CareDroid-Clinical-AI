@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import useRovingTabs from '../../hooks/useRovingTabs';
 import {
   PRE_ARRIVAL_FRAMEWORK_LABELS,
   emptyMISTNotification,
@@ -55,6 +56,12 @@ export default function PreArrivalNotificationForm({
     applyPatch({ framework: nextFramework });
   };
 
+  const { tabListRef, onKeyDown, tabIndexFor } = useRovingTabs({
+    ids: Object.keys(PRE_ARRIVAL_FRAMEWORK_LABELS),
+    activeId: framework,
+    onSelect: switchFramework,
+  });
+
   return (
     <section
       className={['pre-arrival-form', className].filter(Boolean).join(' ')}
@@ -68,12 +75,19 @@ export default function PreArrivalNotificationForm({
         <span className="pre-arrival-form__completion">{completion}% complete</span>
       </header>
 
-      <div className="pre-arrival-form__framework" role="tablist" aria-label="Notification framework">
+      <div
+        className="pre-arrival-form__framework"
+        role="tablist"
+        aria-label="Notification framework"
+        ref={tabListRef}
+      >
         {Object.entries(PRE_ARRIVAL_FRAMEWORK_LABELS).map(([id]) => (
           <button
             key={id}
             type="button"
             role="tab"
+            tabIndex={tabIndexFor(id)}
+            onKeyDown={onKeyDown}
             {...((framework === id) ? { 'aria-selected': 'true' as const } : { 'aria-selected': 'false' as const })}
             className={framework === id ? 'is-active' : ''}
             onClick={() => switchFramework(id)}
