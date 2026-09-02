@@ -7,6 +7,8 @@ import { CDL_FONT_FAMILY, CDL_FONT_SIZE_PX, CDL_FONT_WEIGHT } from './typography
 import { CDL_RADIUS_PX } from './radius';
 import { CDL_DURATION_MS } from './motion';
 import { CDL_SEMANTIC_TONES } from './colors';
+import { CDL_ELEVATION_STEPS } from './elevations';
+import { CDL_ICON_SIZE_PX, CDL_ICON_STROKE_WIDTH } from './icons';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const cdlV2Dir = join(__dirname, '../../styles/cdl-v2');
@@ -54,6 +56,34 @@ describe('CEDS token mirror stays in sync with cdl-v2 CSS', () => {
     for (const [step, ms] of Object.entries(CDL_DURATION_MS)) {
       expect(tokensCss, `--cdl-duration-${step}`).toMatch(new RegExp(`--cdl-duration-${step}:\\s*${ms}ms`));
     }
+  });
+
+  it('every elevation step in the TS mirror is declared in tokens.css', () => {
+    for (const step of CDL_ELEVATION_STEPS) {
+      expect(tokensCss, `--cdl-elev-${step}`).toMatch(new RegExp(`--cdl-elev-${step}:\\s*\\S`));
+    }
+  });
+
+  it('every elevation step above 0 gets its own dark-theme shadow', () => {
+    // elevations.ts promises components that cdlElevationVar() gives dark mode a
+    // stronger, non-tinted shadow set automatically. That only holds while
+    // theme.css redeclares each step; a new step added to tokens.css alone would
+    // silently fall back to the light shadow in dark mode. Step 0 is `none`, so
+    // it needs no dark variant.
+    const darkBlock = themeCss.slice(themeCss.indexOf("html[data-theme='dark']"));
+    for (const step of CDL_ELEVATION_STEPS) {
+      if (step === 0) continue;
+      expect(darkBlock, `dark --cdl-elev-${step}`).toContain(`--cdl-elev-${step}:`);
+    }
+  });
+
+  it('every icon size in the TS mirror matches its --cdl-icon-* declaration', () => {
+    for (const [step, px] of Object.entries(CDL_ICON_SIZE_PX)) {
+      expect(tokensCss, `--cdl-icon-${step}`).toMatch(new RegExp(`--cdl-icon-${step}:\\s*${px}px`));
+    }
+    expect(tokensCss, '--cdl-icon-stroke').toMatch(
+      new RegExp(`--cdl-icon-stroke:\\s*${CDL_ICON_STROKE_WIDTH}`),
+    );
   });
 
   it('every semantic tone in CDL_SEMANTIC_TONES has both a light and dark declaration in theme.css', () => {
