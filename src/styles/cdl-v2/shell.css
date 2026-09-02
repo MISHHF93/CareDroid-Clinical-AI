@@ -28,3 +28,33 @@
   --cdl-z-tooltip: 1000;
   --cdl-z-alarm-dock: 950;
 }
+
+/*
+ * Collapsing the sidebar must actually give the width back.
+ *
+ * Sidebar.tsx puts `sidebar--collapsed` on the element and
+ * data-sidebar-collapsed on <html>, and Sidebar.css sizes
+ * `.sidebar--collapsed` to the collapsed token -- but cdl-v2/refresh.css
+ * carries `.emergency-app-shell > .sidebar, .emergency-app-shell .sidebar
+ * { width: var(--cdl-sidebar-width) }`, which is (0,2,0) against the
+ * collapsed rule's (0,1,0). So the class won and the width did not: the
+ * rail visually collapsed its contents while the element stayed 252px and
+ * the main column never reclaimed the space. Confirmed by enumerating the
+ * matching CSSOM rules on the live element, not by reading the files.
+ *
+ * Fixing it at the token rather than by out-specifying refresh.css means
+ * every consumer follows in one move -- .sidebar itself,
+ * --app-shell-sidebar-offset (app-shell.css), the notification panel insets
+ * (SidebarNotificationPanel.css), caredroid-design-language.css -- instead
+ * of each needing its own collapsed override, which is how this drifted
+ * apart in the first place.
+ *
+ * Scoped to the breakpoint that actually has a collapsible rail. Below 769px
+ * the sidebar is a drawer sized by its own rules, and a stale
+ * data-sidebar-collapsed from a desktop session must not shrink it.
+ */
+@media (min-width: 769px) {
+  :root[data-sidebar-collapsed='true'] {
+    --cdl-sidebar-width: var(--cdl-sidebar-width-collapsed, 64px);
+  }
+}
