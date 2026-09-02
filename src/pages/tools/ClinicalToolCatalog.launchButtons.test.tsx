@@ -9,6 +9,18 @@ import ClinicalToolCatalog from './ClinicalToolCatalog';
 import { PractitionerVisibilityProvider } from '../../contexts/PractitionerVisibilityContext';
 import { getMedicalToolsCatalogRows } from '../../data/medicalToolsCatalogIndex';
 
+/**
+ * These render the whole medical catalog -- 291 rows through jsdom -- so they are
+ * inherently slow, and the 20s they carried was tighter than the project's own
+ * 30s default. Measured: ~19.7s standing alone, ~25.0s inside the
+ * responsive-regression group, where it tipped over and failed. The work is
+ * legitimate, not a leak; the projection behind it is already memoized (46ms on
+ * first call, 0ms after), so there is no algorithmic cost to remove here.
+ *
+ * Set from the measurement with headroom rather than nudged until green.
+ */
+const CATALOG_RENDER_TIMEOUT_MS = 45_000;
+
 const navigate = vi.fn();
 
 vi.mock('react-router-dom', async () => {
@@ -73,7 +85,7 @@ describe('ClinicalToolCatalog — launch buttons', () => {
     expect(container.textContent).toMatch(/user-facing tools now live at \/tools/i);
     expect(screen.getByRole('searchbox', { name: /search developer catalog/i })).toBeInTheDocument();
     expect(await screen.findByRole('group', { name: /quick category filters/i })).toBeInTheDocument();
-  }, 20000);
+  }, CATALOG_RENDER_TIMEOUT_MS);
 
   it('shows launch or open actions for launchable medical catalog rows', async () => {
     renderCatalog();
@@ -93,7 +105,7 @@ describe('ClinicalToolCatalog — launch buttons', () => {
     expect(
       scoped.getAllByRole('button', { name: /^(launch|start guided chat)$/i }).length
     ).toBeGreaterThan(0);
-  }, 20000);
+  }, CATALOG_RENDER_TIMEOUT_MS);
 
   it('includes Wells PE launch control discoverable by tool name', async () => {
     renderCatalog();
@@ -109,5 +121,5 @@ describe('ClinicalToolCatalog — launch buttons', () => {
     expect(
       within(medicalSection as HTMLElement).getAllByRole('button', { name: /start guided chat/i }).length
     ).toBeGreaterThan(0);
-  }, 20000);
+  }, CATALOG_RENDER_TIMEOUT_MS);
 });
