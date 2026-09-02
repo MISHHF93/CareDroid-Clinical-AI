@@ -147,6 +147,13 @@ type CommandPaletteProps = {
   onExecute?: (action: { type: string; commandId?: string }) => void;
 };
 
+/** Ties the search input to the results list via aria-controls/activedescendant. */
+const COMMAND_PALETTE_LISTBOX_ID = 'command-palette-results';
+
+function commandPaletteOptionId(index: number): string {
+  return `command-palette-option-${index}`;
+}
+
 const RECENT_COMMANDS_KEY = 'caredroid.ed.commandPalette.recents.v1';
 const RECENT_COMMAND_LIMIT = 5;
 const MAX_PATIENT_RESULTS = 5;
@@ -1002,11 +1009,28 @@ export default function CommandPalette({ open, onClose, onExecute }: CommandPale
             onKeyDown={handleKeyDown}
             placeholder="Quick actions, patient search, or type a command..."
             aria-label="Operational search and commands"
+            // The arrow keys already move selectedIndex and each option already
+            // carries an accurate aria-selected, but focus stays in this input, so
+            // without aria-activedescendant nothing announced the row a user had
+            // arrowed onto -- the highlight was visual only. These four attributes
+            // are what turn a text box next to a list into a combobox that owns it.
+            role="combobox"
+            aria-expanded={results.length > 0}
+            aria-controls={COMMAND_PALETTE_LISTBOX_ID}
+            aria-autocomplete="list"
+            aria-activedescendant={
+              results[selectedIndex] ? commandPaletteOptionId(selectedIndex) : undefined
+            }
             style={styles.input}
           />
         </div>
 
-        <div style={styles.results} role="listbox" aria-label="Command palette results">
+        <div
+          style={styles.results}
+          role="listbox"
+          id={COMMAND_PALETTE_LISTBOX_ID}
+          aria-label="Command palette results"
+        >
           {groupedResults.map((group) => (
             <div key={group.group} style={styles.group}>
               <div style={styles.groupLabel}>{group.group}</div>
@@ -1016,6 +1040,7 @@ export default function CommandPalette({ open, onClose, onExecute }: CommandPale
                   <button
                     key={result.id}
                     type="button"
+                    id={commandPaletteOptionId(index)}
                     // eslint-disable-next-line jsx-a11y/role-has-required-aria-props -- aria-selected is always set via the conditional spread below, the linter can't trace it statically
                     role="option"
                     {...(active

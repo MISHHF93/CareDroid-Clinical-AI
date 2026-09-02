@@ -1339,9 +1339,17 @@ export default function PatientDetailPanel() {
       : undefined;
 
   return (
+    // This panel already contains Tab and Shift+Tab (see the focus effect above),
+    // which is the behaviour of a modal dialog -- but it announced as a bare
+    // `complementary` landmark with no accessible name, so a screen-reader user was
+    // held inside something that describes itself as nothing. The containment and
+    // the semantics now agree, and the label is the patient the panel is about.
     <aside
       className="patient-detail-panel"
       ref={panelRef}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="patient-detail-panel-title"
       tabIndex={-1}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
@@ -1353,7 +1361,7 @@ export default function PatientDetailPanel() {
       <header className="patient-detail-panel__header">
         <div className="patient-detail-panel__header-top">
           <div>
-            <h2 className="patient-detail-panel__title">
+            <h2 id="patient-detail-panel-title" className="patient-detail-panel__title">
               {selectedPatient.firstName} {selectedPatient.lastName}
             </h2>
             {/* SAFER patient-identification guidance: high-risk actions (this
