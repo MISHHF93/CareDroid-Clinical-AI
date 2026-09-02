@@ -74,7 +74,7 @@ export const FRONTEND_API_CALLS = Object.freeze([
   { id: 'team-user-delete', method: 'DELETE', path: '/api/team/users/:id', client: 'TeamManagement.jsx', capability: 'teamManagement' },
   { id: 'team-invite', method: 'POST', path: '/api/team/invite', client: 'TeamManagement.jsx', capability: 'teamManagement' },
 
-  { id: 'bulk-sync', method: 'POST', path: '/api/sync', client: 'offline.js / OfflineSupport.jsx', capability: 'bulkSync' },
+  { id: 'bulk-sync', method: 'POST', path: '/api/sync', client: 'OfflineSupport.jsx', capability: 'bulkSync' },
 
   { id: 'fleet-live-vehicles', method: 'GET', path: '/api/fleet/vehicles/live', client: 'fleetTelemetryService.js', capability: 'fleetLiveTracking' },
   { id: 'fleet-active-routes', method: 'GET', path: '/api/fleet/routes/active', client: 'fleetTelemetryService.js', capability: 'fleetActiveRoutes' },
