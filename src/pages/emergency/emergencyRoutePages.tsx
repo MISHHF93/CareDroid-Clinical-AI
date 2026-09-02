@@ -7,6 +7,8 @@ import useEdRouteDataContext from '../../hooks/useEdRouteDataContext';
 import useScreenModeCapabilities from '../../hooks/useScreenModeCapabilities';
 import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
 import { useEmergencyStore } from '../../store/emergencyStore';
+import useEmergencyRolePermissions from '../../hooks/useEmergencyRolePermissions';
+import { TriageInteractiveAssistPanel } from '../../components/interactive-ai/TriageInteractiveAssistPanel';
 import { confirmCareDroidAction } from '../../services/careDroidInteractionFeedback';
 import {
   useBoardingStatus,
@@ -302,6 +304,8 @@ export function QueueRoute() {
   const escalatePatient = useEmergencyStore((state) => state.escalatePatient);
   const unsyncedPatientIds = useEmergencyStore((state) => state.unsyncedPatientIds);
   const queues = useEmergencyQueues();
+  const emergencyRole = useEmergencyRolePermissions();
+  const alerts = useEmergencyStore((state) => state.alerts);
   const [escalatedIds, setEscalatedIds] = useState<Set<string>>(new Set());
   const requestedQueueFilter =
     searchParams.get('queue') || searchParams.get('filter') || searchParams.get('queueFilter') || '';
@@ -435,6 +439,39 @@ export function QueueRoute() {
   );
   const triageCount = triageQueue?.count ?? triageQueue?.patients?.length ?? 0;
 
+  // Focus the triage assist on the patient who has been waiting longest --
+  // that is the one a triage nurse opens next.
+  const longestWaitingTriagePatientId = useMemo(() => {
+    const waiting = triageQueue?.patients || [];
+    let oldest = null;
+    let oldestAt = Infinity;
+    for (const patient of waiting) {
+      const arrivedAt = new Date(patient.arrivalTime).getTime();
+      if (!Number.isFinite(arrivedAt)) continue;
+      if (arrivedAt < oldestAt) {
+        oldestAt = arrivedAt;
+        oldest = patient.id;
+      }
+    }
+    return oldest || undefined;
+  }, [triageQueue]);
+
+  // Drives which seed trigger the panel opens with: an unacknowledged alert on
+  // a patient in this queue is a different first question than a missing
+  // clinical field. Matches the repo-wide predicate (!acknowledged,
+  // !dismissed) rather than inventing a third notion of "unresolved".
+  const hasUnresolvedTriageAlert = useMemo(() => {
+    const queuePatientIds = new Set((triageQueue?.patients || []).map((patient) => patient.id));
+    if (!queuePatientIds.size) return false;
+    return alerts.some(
+      (alert) =>
+        !alert.acknowledged &&
+        !alert.dismissed &&
+        Boolean(alert.patientId) &&
+        queuePatientIds.has(alert.patientId as string),
+    );
+  }, [alerts, triageQueue]);
+
   return (
     <EmergencyRoutePage
       eyebrow={isTriageWorkspace ? 'Triage' : 'Queues'}
@@ -506,6 +543,26 @@ export function QueueRoute() {
           <button type="button" onClick={clearQueueFilter} className="emergency-route-filter-banner__btn">
             Clear queue filter
           </button>
+        </div>
+      ) : null}
+      {/*
+        Triage is the one of the three interactive-assist workflows whose panel
+        was written and never mounted: EMSPipeline mounts
+        EmsInteractiveAssistPanel and ReceptionWorkspace mounts
+        InteractiveAIWorkspace directly, while TriageInteractiveAssistPanel --
+        already configured for pageId "triage_queue", channel "triage" -- had no
+        host. Gated on isTriageWorkspace so it appears on the triage workspace it
+        was built for, not on the general Department Queues view.
+      */}
+      {isTriageWorkspace ? (
+        <div className="emergency-route-interactive-ai">
+          <TriageInteractiveAssistPanel
+            role={emergencyRole.role || 'triage_nurse'}
+            userId={emergencyRole.canonicalProfile?.id}
+            organizationId={emergencyRole.canonicalProfile?.organizationId}
+            patientId={longestWaitingTriagePatientId}
+            hasUnresolvedAlert={hasUnresolvedTriageAlert}
+          />
         </div>
       ) : null}
       <div className="emergency-route-stack">

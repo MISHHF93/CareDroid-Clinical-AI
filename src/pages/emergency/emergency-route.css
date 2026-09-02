@@ -340,6 +340,11 @@
   gap: var(--ed-space-2);
 }
 
+/* Triage interactive assist wrapper -- mirrors .ems-pipeline__interactive-ai,
+   using this page family tokens so spacing matches its siblings. */
+.emergency-route-interactive-ai {
+  margin: var(--ed-space-2, 0.75rem) 0 var(--ed-space-3, 1rem);
+}
 .emergency-route-stack {
   display: grid;
   gap: var(--ed-space-3);
