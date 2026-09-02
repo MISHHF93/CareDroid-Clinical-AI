@@ -3,7 +3,12 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem 0.85rem;
-  color: rgba(203, 213, 225, 0.92);
+  /* Was rgba(203, 213, 225, 0.92), a light-on-dark grey. All three consumers
+     render on light surfaces -- PublicWaitingDisplay, DepartmentStatusScreen
+     (--app-surface-1) and CommandCenterThroughputScreen
+     (--medical-surface-page) -- where it measured 1.38:1 and the refresh
+     status was unreadable on both wall displays. */
+  color: var(--cdl-text-muted, #475569);
   font-size: 0.78rem;
   line-height: 1.35;
 }

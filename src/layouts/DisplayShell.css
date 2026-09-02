@@ -32,7 +32,23 @@
   opacity: 0.72;
 }
 
+/*
+ * The chrome above stays dark on purpose. The CONTENT does not: every public
+ * display component under here is authored for a light surface --
+ * PublicWaitingDisplay.css paints tiles `var(--app-surface-1, #ffffff)` and
+ * sets `var(--medical-text-heading, #111827)` on the text it styles.
+ *
+ * The elements it does NOT set a colour on were inheriting #f8fafc from the
+ * dark shell and rendering near-white on a white tile: 19 elements measured
+ * below 3:1 contrast, the worst at 1.01:1 -- effectively invisible, on an
+ * unattended waiting-room screen whose entire job is to be readable from
+ * across a room. Giving the content area the app ink it was written against
+ * fixes all of them at once, and makes this board match the other wall
+ * display (/emergency/whiteboard?display=readonly), which is light.
+ */
 .display-shell__main {
+  background: var(--cdl-canvas-bg, var(--medical-surface-page, #f4f7fb));
+  color: var(--medical-ink, #0f172a);
   flex: 1;
   min-height: 0;
   overflow: auto;

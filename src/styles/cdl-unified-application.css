@@ -18,15 +18,34 @@
   min-height: var(--cdl-header-height, 56px);
 }
 
-.cdl-shell--display .display-shell {
-  background: var(--cdl-canvas-bg, var(--medical-surface-page));
-  color: var(--medical-ink);
+/*
+ * Was `.cdl-shell--display .display-shell` -- a DESCENDANT selector. Both
+ * classes are on the same element (DisplayShell renders
+ * `class="display-shell cdl-shell cdl-shell--display"`), so this rule has
+ * never matched anything and its background/colour never applied.
+ *
+ * Corrected to a compound selector, but deliberately WITHOUT the background
+ * and colour it used to declare. Those would have made the whole wall shell
+ * light, which contradicts DisplayShell.css's documented decision that this
+ * chrome stays dark regardless of the theme toggle -- and since the rule
+ * never applied, nothing has ever depended on them. The readability problem
+ * they would have masked is fixed properly in DisplayShell.css, on the
+ * content area where the light-authored components actually live.
+ */
+.display-shell.cdl-shell--display {
   font-family: var(--app-font-family-body);
 }
 
-.cdl-shell--display .display-shell__brand {
-  border-bottom: 1px solid var(--app-border);
-  background: var(--app-surface);
+/*
+ * Same never-matched descendant bug as above. Correcting the selector made it
+ * apply for the first time and it painted the brand bar `--app-surface`
+ * (white) under the shell's near-white chrome text -- 1.05:1. The brand bar
+ * belongs to the dark chrome DisplayShell.css owns, which already gives it its
+ * own translucent-white bottom border, so the background is dropped rather
+ * than reinstated.
+ */
+.display-shell.cdl-shell--display .display-shell__brand {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 /* ══════════════════════════════════════════════════════════════════

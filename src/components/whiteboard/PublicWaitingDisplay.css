@@ -99,7 +99,10 @@
   font-size: 12px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #34d399;
+  /* Was #34d399 -- a mint chosen against a dark board. This display renders
+     on a light surface in both of its mounts (WhiteboardDisplayRoute and
+     pages/emergency), where it measured 1.82:1. */
+  color: var(--cdl-success-text, #065f46);
   font-weight: 800;
 }
 
@@ -180,7 +183,10 @@ html.public-waiting-kiosk-active
   font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #34d399;
+  /* Was #34d399 -- a mint chosen against a dark board. This display renders
+     on a light surface in both of its mounts (WhiteboardDisplayRoute and
+     pages/emergency), where it measured 1.82:1. */
+  color: var(--cdl-success-text, #065f46);
 }
 
 .public-waiting-display__header h2 {
@@ -241,7 +247,10 @@ html.public-waiting-kiosk-active
 
 .public-waiting-display__tile[data-tone='critical'] {
   border-color: #ef4444;
-  background: linear-gradient(180deg, #2a1215 0%, var(--app-surface-1, #ffffff) 100%);
+  /* Was a #2a1215 (near-black red) to white gradient -- the top half of a dark
+     board that was only partly converted to light. On a light surface it reads
+     as a muddy band; the critical tone is carried by the red border. */
+  background: var(--cdl-danger-surface, #fef2f2);
 }
 
 .public-waiting-display__tile[data-tone='warning'] {
@@ -336,7 +345,10 @@ html.public-waiting-kiosk-active
   padding: 16px 18px;
   border-radius: 14px;
   border: 1px solid #f59e0b;
-  background: linear-gradient(180deg, #2a1f0d 0%, var(--app-surface-1, #ffffff) 100%);
+  /* Same half-converted dark gradient. This is the deterioration warning -- the
+     single most important thing on a waiting-room board -- so it becomes a real
+     light-surface warning notice rather than amber-on-white. */
+  background: var(--cdl-warning-surface, #fffbeb);
 }
 
 .public-waiting-display__escalation strong {
@@ -345,13 +357,15 @@ html.public-waiting-kiosk-active
   font-size: 12px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #fbbf24;
+  /* Was #fbbf24 on white: 1.58:1. */
+  color: var(--cdl-warning-text, #78350f);
 }
 
 .public-waiting-display__escalation p {
   margin: 0;
   font-size: clamp(16px, 2.2vw, 22px);
   font-weight: 700;
-  color: #fef3c7;
+  /* Was #fef3c7 on white: 1.05:1 -- the safety line was invisible. */
+  color: var(--cdl-text, #0f172a);
   line-height: 1.35;
 }

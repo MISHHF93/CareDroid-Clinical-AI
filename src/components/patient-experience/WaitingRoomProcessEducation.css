@@ -12,7 +12,10 @@
   font-size: 11px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(148, 163, 184, 0.95);
+  /* Was rgba(148, 163, 184, 0.95): 2.56:1 on the white card it sits on. This
+     block runs on the public waiting-room wall display, which is read from
+     across a room, so it needs real contrast rather than a decorative grey. */
+  color: var(--cdl-text-muted, #475569);
 }
 
 .waiting-room-process-education__header h3 {
@@ -25,7 +28,9 @@
   margin: 6px 0 0;
   font-size: 13px;
   line-height: 1.5;
-  color: rgba(203, 213, 225, 0.9);
+  /* Was a light-on-dark grey; this block only ever renders inside
+     PublicWaitingDisplay, which is a light board. Measured 1.48:1. */
+  color: var(--cdl-text-muted, #475569);
 }
 
 .waiting-room-process-education__steps {
@@ -74,7 +79,8 @@
   margin: 0;
   font-size: 13px;
   line-height: 1.45;
-  color: rgba(203, 213, 225, 0.92);
+  /* Same light-on-dark leftover, measured 1.41:1 on the white card. */
+  color: var(--cdl-text, #0f172a);
 }
 
 .waiting-room-process-education--compact .waiting-room-process-education__steps {
