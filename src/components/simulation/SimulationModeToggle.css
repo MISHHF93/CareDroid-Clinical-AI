@@ -1,0 +1,50 @@
+.simulation-mode-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 999px;
+  border: 1px solid var(--medical-border, #e0f2fe);
+  background: var(--medical-surface-card, #ffffff);
+  color: #e5e7eb;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  cursor: pointer;
+}
+
+.simulation-mode-toggle:hover {
+  border-color: rgba(245, 158, 11, 0.55);
+  color: var(--medical-status-warning-text, #b45309);
+}
+
+.simulation-mode-toggle[aria-pressed='true'] {
+  border-color: rgba(245, 158, 11, 0.65);
+  background: rgba(245, 158, 11, 0.16);
+  color: var(--medical-status-warning-text, #b45309);
+}
+
+.simulation-mode-toggle--banner {
+  background: var(--medical-surface-card, #ffffff);
+}
+
+.simulation-mode-toggle__indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #6b7280;
+}
+
+.simulation-mode-toggle[aria-pressed='true'] .simulation-mode-toggle__indicator {
+  background: #f59e0b;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25);
+}
+
+@media (max-width: 480px) {
+  .simulation-mode-toggle {
+    flex: 0 0 auto;
+    gap: 6px;
+    font-size: 11px;
+    padding: 4px 8px;
+    white-space: nowrap;
+  }
+}
