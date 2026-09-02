@@ -1,6 +1,13 @@
 import { afterEach, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
 import { cancelAllBackgroundTimers } from '../services/backgroundTimerRegistry';
+
+// Captured at module load, before any suite can call vi.useFakeTimers(). The
+// settle loop below has to keep working under fake timers: a faked setTimeout
+// never fires unless the test advances it, so scheduling against the patched
+// global made the teardown hook hang for its full 30s timeout instead of
+// yielding. alertEngine.test.ts caught exactly that.
+const realSetTimeout: typeof globalThis.setTimeout = globalThis.setTimeout.bind(globalThis);
 import '@testing-library/jest-dom/vitest';
 
 const originalConsoleWarn = console.warn.bind(console);
@@ -62,7 +69,7 @@ afterEach(async () => {
   // "Cannot load ... after the environment was torn down". Giving the macrotask
   // queue a few turns lets the in-flight ones finish first.
   for (let i = 0; i < 3; i += 1) {
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    await new Promise((resolve) => realSetTimeout(resolve, 0));
   }
   cancelAllBackgroundTimers();
 });
