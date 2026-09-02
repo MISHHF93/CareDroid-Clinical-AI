@@ -1,5 +1,14 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
+  // Both are imported behind a guard with a working fallback, so a missing
+  // install is a degraded mode rather than a break: scripts/ai-query.mjs does
+  // `try { await import('tsx/esm/api') } catch { tsx = null }` and falls back to
+  // a pure local path, and scripts/generate-icons.mjs does
+  // `await import('sharp').catch(() => null)` and prints manual instructions.
+  // Declaring them would force a heavy native install (sharp) on every checkout
+  // for a script nothing wires; listing them here keeps `unlisted` at zero so a
+  // genuinely undeclared import stands out.
+  "ignoreDependencies": ["sharp", "tsx"],
   "workspaces": {
     ".": {
       "entry": [
@@ -27,10 +36,6 @@
         "src/database/migrations/*.ts",
         "src/**/*.spec.ts",
         "test/**/*.e2e-spec.ts",
-
-        // Jest wires this in via setupFilesAfterEach in backend/package.json;
-        // nothing imports it.
-        "test/jest-setup.ts",
 
         // A second Jest project (backend/test/jest-mongo.json) collects these by
         // testRegex ".mongo-spec.ts$". They need a live MongoDB, which is why they

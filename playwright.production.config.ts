@@ -2,14 +2,22 @@ import { defineConfig, devices } from '@playwright/test';
 
 const rawBaseURL = process.env.QA_BASE_URL?.trim();
 
-if (!rawBaseURL) {
-  throw new Error(
-    'QA_BASE_URL is required for production smoke tests. ' +
-      'Example: QA_BASE_URL=https://app.example.com npm run test:e2e:production',
-  );
+/**
+ * Validated on read rather than at module load. The message is the same and
+ * still fires the moment Playwright resolves baseURL to run a production smoke
+ * test -- but importing this file no longer throws, so tools that enumerate
+ * configs can load it. Knip reported this as a hard error on every run,
+ * including runs that had nothing to do with production smoke tests.
+ */
+function requireBaseURL(): string {
+  if (!rawBaseURL) {
+    throw new Error(
+      'QA_BASE_URL is required for production smoke tests. ' +
+        'Example: QA_BASE_URL=https://app.example.com npm run test:e2e:production',
+    );
+  }
+  return rawBaseURL.replace(/\/+$/, '');
 }
-
-const baseURL = rawBaseURL.replace(/\/+$/, '');
 const storageState = process.env.QA_AUTH_STATE?.trim();
 
 export default defineConfig({
@@ -32,7 +40,9 @@ export default defineConfig({
     ],
   ],
   use: {
-    baseURL,
+    get baseURL() {
+      return requireBaseURL();
+    },
     ...(storageState ? { storageState } : {}),
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',

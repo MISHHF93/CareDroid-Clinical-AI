@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types';
+import type { ReactNode } from 'react';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS } from '../../navigation/iconRegistry';
 import {
@@ -16,14 +16,17 @@ const VARIANT_COPY = {
   'drug-interaction': DRUG_INTERACTION_DISCLAIMER_UI,
 };
 
-/**
- * @param {{ variant?: keyof VARIANT_COPY, className?: string, children?: import('react').ReactNode }} props
- */
+export type ClinicalDecisionSupportDisclaimerProps = {
+  variant?: keyof typeof VARIANT_COPY;
+  className?: string;
+  children?: ReactNode;
+};
+
 export default function ClinicalDecisionSupportDisclaimer({
   variant = 'clinical',
   className = '',
-  children = undefined as any,
-}) {
+  children = undefined,
+}: ClinicalDecisionSupportDisclaimerProps) {
   const copy = children || VARIANT_COPY[variant] || VARIANT_COPY.clinical;
 
   return (
@@ -39,9 +42,3 @@ export default function ClinicalDecisionSupportDisclaimer({
     </div>
   );
 }
-
-ClinicalDecisionSupportDisclaimer.propTypes = {
-  variant: PropTypes.oneOf(['clinical', 'fleet', 'ai-documentation', 'drug-interaction']),
-  className: PropTypes.string,
-  children: PropTypes.node,
-};

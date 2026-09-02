@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS } from '../../navigation/iconRegistry';
 import './ClinicalExecutorFeedback.css';
@@ -6,7 +5,19 @@ import './ClinicalExecutorFeedback.css';
 /**
  * Loading, error, and unsupported states for POST orchestrator tools.
  */
-export function ClinicalExecutorFeedback({ loading, error, unsupported, unsupportedDetail }) {
+export type ClinicalExecutorFeedbackProps = {
+  loading?: boolean;
+  error?: string | null;
+  unsupported?: boolean;
+  unsupportedDetail?: string | null;
+};
+
+export function ClinicalExecutorFeedback({
+  loading,
+  error,
+  unsupported,
+  unsupportedDetail,
+}: ClinicalExecutorFeedbackProps) {
   if (loading) {
     return (
       <div className="clinical-executor-feedback clinical-executor-feedback--loading" role="status">
@@ -43,10 +54,3 @@ export function ClinicalExecutorFeedback({ loading, error, unsupported, unsuppor
 
   return null;
 }
-
-ClinicalExecutorFeedback.propTypes = {
-  loading: PropTypes.bool,
-  error: PropTypes.string,
-  unsupported: PropTypes.bool,
-  unsupportedDetail: PropTypes.string,
-};
