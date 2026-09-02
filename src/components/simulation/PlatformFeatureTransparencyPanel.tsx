@@ -48,17 +48,26 @@ export default function PlatformFeatureTransparencyPanel({
 }: PlatformFeatureTransparencyPanelProps) {
   const { active } = useSimulationMode();
 
-  const entries = useMemo(
+  // Summary counts come from the FULL set, the list from a capped slice.
+  // Summarizing the slice made the chips read as platform-wide totals while
+  // actually describing only the first `limit` rows -- on a transparency
+  // panel that is the one thing that must not be off.
+  const allEntries = useMemo(
     () =>
       buildPlatformFeatureTransparency({
         simulationActive: active,
         includeRegistryFeatures: !compact,
         includeFeatureFlags: false,
-      }).slice(0, limit),
-    [active, compact, limit],
+      }),
+    [active, compact],
   );
 
-  const summary = useMemo(() => summarizePlatformFeatureTransparency(entries), [entries]);
+  const entries = useMemo(() => allEntries.slice(0, limit), [allEntries, limit]);
+
+  const summary = useMemo(
+    () => summarizePlatformFeatureTransparency(allEntries),
+    [allEntries],
+  );
 
   return (
     <section className="platform-feature-transparency" aria-label="Platform feature transparency">
@@ -76,6 +85,12 @@ export default function PlatformFeatureTransparencyPanel({
           <FeatureRow key={entry.id} entry={entry} />
         ))}
       </div>
+      {allEntries.length > entries.length ? (
+        <p className="platform-feature-transparency__more">
+          Showing {entries.length} of {allEntries.length} tracked features. The counts above
+          cover all {allEntries.length}.
+        </p>
+      ) : null}
     </section>
   );
 }

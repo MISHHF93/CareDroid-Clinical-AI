@@ -13,6 +13,7 @@ import {
 import { resolveDemoRoleLandingRoute } from '../../config/demoPersonaModel';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import HelpTopicView from './HelpTopicView';
+import PlatformFeatureTransparencyPanel from '../simulation/PlatformFeatureTransparencyPanel';
 import './HelpHub.css';
 
 const TABS: { id: HelpHubTab; label: string }[] = [
@@ -199,6 +200,18 @@ export default function HelpHub({ variant = 'drawer' }: HelpHubProps) {
           </p>
         ) : null}
 
+        {state.tab === 'reference' ? (
+          <div className="help-hub__reference-card">
+            <h3>What is actually live</h3>
+            <p>
+              Which parts of CareDroid are running for real, which are demonstrations, and
+              which are still planned -- read from the platform&apos;s own enhancement, suite
+              and feature registries rather than maintained by hand. While simulation mode is
+              on, live features are shown as demo, because that is what you are looking at.
+            </p>
+            <PlatformFeatureTransparencyPanel />
+          </div>
+        ) : null}
         {state.tab === 'role' && help.rolePlaybook ? (
           <div className="help-hub__role-card">
             <h3>{help.rolePlaybook.label} playbook</h3>

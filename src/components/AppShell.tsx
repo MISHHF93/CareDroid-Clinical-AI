@@ -5,6 +5,7 @@ import { ConfirmDialogProvider } from './ui/ConfirmDialogProvider';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import ErrorBoundary from './ErrorBoundary';
+import LivingContextualHelpBanner from './help/LivingContextualHelpBanner';
 import { useEmergencyStore, type EmergencyWebSocketStatus } from '../store/emergencyStore';
 import { startReassessmentEngine } from '../engine/reassessmentEngine';
 import { startCapacityEngine } from '../engine/capacityEngine';
@@ -1332,6 +1333,17 @@ function AppShellFrame({ children }: AppShellProps) {
               resetKey={location.pathname}
               fallbackText={`${screenCapabilities.productLabel} page encountered an error. Refresh to reload.`}
             >
+              {/*
+                Route-linked guidance for all 14 routes in
+                LIVING_CONTEXTUAL_HELP_ENTRIES. Before this, the config was a
+                dead read path: only ReceptionWorkspace showed guidance, and it
+                did so with copy hardcoded inline that duplicated the config
+                entry character for character -- the other 13 routes had
+                authored guidance nothing ever rendered. Renders null on any
+                unmapped route, and ContextualGuidance is dismissible with
+                sessionStorage persistence, so it does not nag.
+              */}
+              <LivingContextualHelpBanner />
               <Suspense
                 fallback={
                   <div role="status" className="app-shell-route-loading">

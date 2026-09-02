@@ -58,7 +58,6 @@ import type {
   ReceptionEscalationReasonId,
 } from '../../services/receptionEscalationWorkflow';
 import { ReceptionFlowGraphic } from '../../components/graphics/CdlGraphicKit';
-import ContextualGuidance from '../../components/ui/ContextualGuidance';
 import { showActionError, showActionSuccess } from '../../services/careDroidInteractionFeedback';
 import { STANDARD_ACTION_FEEDBACK } from '../../config/careDroidInteractionModel';
 import { notifyWorkflowHandoffComplete } from '../../services/workflowNavigationFeedback';
@@ -1086,15 +1085,6 @@ export default function ReceptionWorkspace() {
               />
             </ReceptionCard>
 
-            {!result ? (
-              <ContextualGuidance
-                id="reception-workspace-intake-hint"
-                title="One-step intake routing"
-                detail="Capture complaint and identity, then route — triage assist, encounter, and queue placement sync automatically."
-                tone="info"
-                helpTopicId="reception"
-              />
-            ) : null}
           </ReceptionContentSection>
 
           {/* Nested escalation strip removed — single attention surface lives in sidebar.
