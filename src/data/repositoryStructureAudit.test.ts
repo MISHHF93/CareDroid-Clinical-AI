@@ -58,7 +58,12 @@ function findStrayListenCalls(dir: string): string[] {
     }
     if (!SOURCE_EXTENSIONS.some((ext) => entry.endsWith(ext))) continue;
     const relPath = relative(REPO_ROOT, full).replace(/\\/g, '/');
-    if (/\.(test|spec)\.[jt]sx?$/.test(relPath)) continue;
+    // [.-] not just \.: this repo also uses hyphenated suffixes -- NestJS e2e
+    // specs are named *.e2e-spec.ts (backend/test/) and the Mongo-only backend
+    // specs *.mongo-spec.ts. A dot-only pattern treated those as production
+    // code, so moving an integration test onto the e2e harness made its
+    // app.listen() read as a stray server.
+    if (/[.-](test|spec)\.[jt]sx?$/.test(relPath)) continue;
     if (ALLOWED_LISTEN_FILES.has(relPath)) continue;
     const text = readFileSync(full, 'utf8');
     if (/\.listen\(/.test(text)) found.push(relPath);
