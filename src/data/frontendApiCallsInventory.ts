@@ -439,10 +439,6 @@ export const FRONTEND_API_CALLS = Object.freeze([
   { id: 'auth-biometric-enroll', method: 'POST', path: '/api/auth/biometric/enroll', client: 'BiometricSetup.jsx' },
   { id: 'auth-biometric-available', method: 'GET', path: '/api/auth/biometric/available', client: 'BiometricSetup.jsx' },
   { id: 'auth-biometric-delete', method: 'DELETE', path: '/api/auth/biometric/delete/:deviceId', client: 'BiometricSetup.jsx' },
-  { id: 'two-factor-generate', method: 'GET', path: '/api/two-factor/generate', client: 'TwoFactorSetup.jsx' },
-  { id: 'two-factor-enable', method: 'POST', path: '/api/two-factor/enable', client: 'TwoFactorSetup.jsx' },
-  { id: 'two-factor-status', method: 'GET', path: '/api/two-factor/status', client: 'TwoFactorSettings.jsx' },
-  { id: 'two-factor-disable', method: 'DELETE', path: '/api/two-factor/disable', client: 'TwoFactorSettings.jsx' },
 
   { id: 'crashes', method: 'POST', path: '/api/crashes', client: 'ErrorBoundary.jsx' },
   { id: 'analytics-events', method: 'POST', path: '/api/analytics/events', client: 'analyticsService.ts' },
