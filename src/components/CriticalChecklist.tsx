@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import useModalDialog from '../hooks/useModalDialog';
 import './CriticalChecklist.css';
 import {
   CHECKLISTS,
@@ -183,22 +184,11 @@ export default function CriticalChecklist({
   // EMS arrivals -- the single highest-acuity modal in the app -- yet was
   // the one dialog a keyboard user couldn't dismiss without finding the
   // small "X" with a mouse.
-  useEffect(() => {
-    if (!open) return undefined;
-
-    const previouslyFocused = document.activeElement as HTMLElement | null;
-    dialogRef.current?.focus();
-
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose();
-    };
-
-    document.addEventListener('keydown', handleEscape);
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-      previouslyFocused?.focus();
-    };
-  }, [onClose, open]);
+  // HEAL-261 added Escape, focus-in and focus-restore by hand; Tab containment was
+  // the missing piece behind this dialog's own aria-modal="true". initialFocus
+  // stays on the container, which is the behaviour that shipped and is asserted by
+  // this component's tests.
+  useModalDialog(dialogRef, { onClose, enabled: open, initialFocus: 'container' });
 
   const noteCompletions = useMemo(
     () => parseChecklistCompletionsFromNotes(patient.notes || []),

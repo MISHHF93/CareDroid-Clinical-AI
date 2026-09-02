@@ -1,4 +1,5 @@
-import { useEffect } from 'react';
+import { useRef } from 'react';
+import useModalDialog from '../../hooks/useModalDialog';
 import { ClipboardList, X } from 'lucide-react';
 import type { Patient } from '../../types/emergency';
 import './ReceptionShiftClearance.css';
@@ -36,14 +37,11 @@ export default function ReceptionShiftClearance({
   // (ReceptionShiftClearance.css: position: fixed, inset: 0, background
   // rgba(...)), visually a dismissable modal, but had no onClick and no
   // Escape handler.
-  useEffect(() => {
-    if (!open) return undefined;
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose();
-    };
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
-  }, [onClose, open]);
+  // Escape was added by hand; the containment this dialog's own aria-modal="true"
+  // promises was not. Declared before the early return below so hook order stays
+  // stable across open and closed renders.
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useModalDialog(dialogRef, { onClose, enabled: open });
 
   if (!open) return null;
 
@@ -58,6 +56,7 @@ export default function ReceptionShiftClearance({
     // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events
     <div
       className="reception-shift-clearance"
+      ref={dialogRef}
       role="dialog"
       aria-modal="true"
       aria-labelledby="reception-shift-clearance-title"

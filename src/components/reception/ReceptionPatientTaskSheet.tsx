@@ -1,4 +1,5 @@
-import { useEffect } from 'react';
+import { useRef } from 'react';
+import useModalDialog from '../../hooks/useModalDialog';
 import { FolderOpen, ShieldAlert, UserCheck, X, ArrowRight } from 'lucide-react';
 import type { Patient } from '../../types/emergency';
 import './ReceptionPatientTaskSheet.css';
@@ -63,13 +64,11 @@ export default function ReceptionPatientTaskSheet({
   // anywhere else (or if that one page-level branch is ever dropped),
   // it silently loses all keyboard dismissal. Self-contained, matching
   // every other dialog fixed this batch (HEAL-261/263/270/271/272).
-  useEffect(() => {
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose();
-    };
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
-  }, [onClose]);
+  // HEAL-273 added Escape by hand. What it still lacked was the containment its
+  // own aria-modal="true" promises, plus focus restore -- the shared hook owns
+  // Escape, Tab/Shift+Tab containment, initial focus, restore and scroll lock.
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useModalDialog(dialogRef, { onClose });
 
   return (
     <>
@@ -84,6 +83,7 @@ export default function ReceptionPatientTaskSheet({
       />
       <div
         className="reception-task-sheet"
+        ref={dialogRef}
         role="dialog"
         aria-label={`Patient tasks: ${displayName}`}
         aria-modal="true"
