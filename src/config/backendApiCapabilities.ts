@@ -40,6 +40,10 @@ export const BACKEND_API_CAPABILITY_STATUS = Object.freeze({
   automationAudit: BACKEND_CAPABILITY_STATUS.REAL,
   platformAssets: BACKEND_CAPABILITY_STATUS.REAL,
   notificationsRest: BACKEND_CAPABILITY_STATUS.REAL,
+  // TwoFactorController is mounted and every route is in
+  // backendHttpRouteInventory; it simply had no caller until the security
+  // settings page shipped.
+  twoFactor: BACKEND_CAPABILITY_STATUS.REAL,
   userProfile: BACKEND_CAPABILITY_STATUS.REAL,
   operationalProfile: BACKEND_CAPABILITY_STATUS.REAL,
   workspaces: BACKEND_CAPABILITY_STATUS.REAL,

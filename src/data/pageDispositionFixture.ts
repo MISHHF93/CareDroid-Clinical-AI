@@ -37,9 +37,15 @@ import {
 // which lives under src/components/clinical/ and is outside this glob.
 // +11 source files, +4 style files, +15 total. Tools-prefixed totals
 // (src/pages/tools/*) are unaffected -- these live under src/pages/clinical/.
-export const PAGE_INVENTORY_EXPECTED_TOTAL = 257;
-export const PAGE_SOURCE_EXPECTED_TOTAL = 162;
-export const PAGE_STYLE_EXPECTED_TOTAL = 95;
+// Two-factor security settings: src/pages/auth/TwoFactorSetupPage.tsx + .css
+// are new, real files -- the screen TwoFactorEnforcementGuard's own error text
+// ("enable it in your security settings") sends people to, which did not exist.
+// Same shape as the AuthPage addition above: DIRECTORY_OWNER_RULES.auth already
+// routes src/pages/auth/* to the 'auth' module with zero gaps, so only the
+// pinned totals move, +1 source file and +1 style file.
+export const PAGE_INVENTORY_EXPECTED_TOTAL = 259;
+export const PAGE_SOURCE_EXPECTED_TOTAL = 163;
+export const PAGE_STYLE_EXPECTED_TOTAL = 96;
 export const PAGE_TOOLS_INVENTORY_EXPECTED_TOTAL = 58;
 export const PAGE_TOOLS_SOURCE_EXPECTED_TOTAL = 48;
 

@@ -74,6 +74,11 @@ export const FRONTEND_API_CALLS = Object.freeze([
   { id: 'team-user-delete', method: 'DELETE', path: '/api/team/users/:id', client: 'TeamManagement.jsx', capability: 'teamManagement' },
   { id: 'team-invite', method: 'POST', path: '/api/team/invite', client: 'TeamManagement.jsx', capability: 'teamManagement' },
 
+  { id: 'two-factor-status', method: 'GET', path: '/api/two-factor/status', client: 'TwoFactorSetupPage.tsx', capability: 'twoFactor' },
+  { id: 'two-factor-generate', method: 'GET', path: '/api/two-factor/generate', client: 'TwoFactorSetupPage.tsx', capability: 'twoFactor' },
+  { id: 'two-factor-enable', method: 'POST', path: '/api/two-factor/enable', client: 'TwoFactorSetupPage.tsx', capability: 'twoFactor' },
+  { id: 'two-factor-disable', method: 'DELETE', path: '/api/two-factor/disable', client: 'TwoFactorSetupPage.tsx', capability: 'twoFactor' },
+
   { id: 'bulk-sync', method: 'POST', path: '/api/sync', client: 'OfflineSupport.jsx', capability: 'bulkSync' },
 
   { id: 'fleet-live-vehicles', method: 'GET', path: '/api/fleet/vehicles/live', client: 'fleetTelemetryService.js', capability: 'fleetLiveTracking' },

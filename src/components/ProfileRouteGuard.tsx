@@ -16,6 +16,12 @@ const PROFILE_ROUTE_EXEMPT_PREFIXES = Object.freeze([
   '/welcome',
   '/start',
   '/profile',
+  // Managing your own second factor is a personal account action, not a
+  // role-gated feature -- every authenticated role can reach it, the same way
+  // /profile works. It is exempted here rather than added to
+  // PERMISSION_ROUTE_MAP because canAccessRoute matches by prefix, so a bucket
+  // entry would also hand out anything nested beneath it.
+  '/two-factor-setup',
 ]);
 
 function isExemptProfileRoute(pathname) {

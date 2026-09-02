@@ -36,6 +36,7 @@ const lazyNamed = (loader, exportName) =>
 // ── Platform entry hub ───────────────────────────────────────────────────────
 const PlatformEntryHub = lazyRoute(() => import('../pages/PlatformEntryHub'));
 const AuthPage = lazyRoute(() => import('../pages/auth/AuthPage'));
+const TwoFactorSetupPage = lazyRoute(() => import('../pages/auth/TwoFactorSetupPage'));
 
 // ── Developer-only design-system catalog (item 41) ──────────────────────────
 // Deliberately NOT in CANONICAL_ROUTE_MAP, any navigation config, or the
@@ -734,7 +735,6 @@ export function AppRoutes() {
     CANONICAL_ROUTES.authMagicLink,
     CANONICAL_ROUTES.authInvite,
     CANONICAL_ROUTES.welcome,
-    '/two-factor-setup',
     '/biometric-setup',
   ];
 
@@ -1212,6 +1212,19 @@ export function AppRoutes() {
           path={CANONICAL_ROUTES.workspaces}
           element={<EdApplicationEntryRedirect />}
         />
+        {/* Security settings for the signed-in user. TwoFactorEnforcementGuard
+            tells high-privilege callers to "enable it in your security
+            settings"; this is that screen, and it talks to the
+            already-live TwoFactorController. */}
+        <Route
+          path="/two-factor-setup"
+          element={
+            <LazyRoute label="Loading security settings...">
+              <TwoFactorSetupPage />
+            </LazyRoute>
+          }
+        />
+
         {IN_SHELL_ROUTE_REDIRECTS.map(({ path, to }) => (
           <Route key={`in-shell-${path}`} path={path} element={<EmergencyAliasRedirect to={to} />} />
         ))}

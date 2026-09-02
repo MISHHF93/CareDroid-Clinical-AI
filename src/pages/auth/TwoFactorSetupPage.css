@@ -1,0 +1,254 @@
+/*
+ * Two-factor security settings. Uses the CDL 2.1 custom properties so it picks
+ * up light and dark automatically -- no literal colours, since a value defined
+ * only here would not follow the theme switch.
+ */
+
+.two-factor-page {
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: var(--cdl-space-6, 24px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--cdl-space-5, 20px);
+  color: var(--cdl-text, #0f172a);
+}
+
+.two-factor-page__header h1 {
+  margin: 0 0 var(--cdl-space-2, 8px);
+  font-size: var(--cdl-text-2xl, 24px);
+  font-weight: var(--cdl-font-semibold, 600);
+  text-wrap: balance;
+}
+
+.two-factor-page__header p {
+  margin: 0;
+  max-width: 60ch;
+  color: var(--cdl-text-muted, #475569);
+  line-height: 1.55;
+}
+
+.two-factor-page__error {
+  padding: var(--cdl-space-3, 12px) var(--cdl-space-4, 16px);
+  border-radius: var(--cdl-radius-md, 8px);
+  border: 1px solid var(--cdl-danger, #b42318);
+  background: var(--cdl-danger-soft, rgba(180, 35, 24, 0.08));
+  color: var(--cdl-danger, #b42318);
+}
+
+.two-factor-page__loading {
+  display: flex;
+  align-items: center;
+  gap: var(--cdl-space-2, 8px);
+  color: var(--cdl-text-muted, #475569);
+}
+
+.two-factor-page__spin {
+  animation: two-factor-spin var(--cdl-duration-slow, 900ms) linear infinite;
+}
+
+@keyframes two-factor-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .two-factor-page__spin {
+    animation: none;
+  }
+}
+
+.two-factor-page__status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cdl-space-5, 20px);
+  padding: var(--cdl-space-4, 16px);
+  border: 1px solid var(--cdl-border, #e2e8f0);
+  border-radius: var(--cdl-radius-lg, 12px);
+  background: var(--cdl-surface, #ffffff);
+  box-shadow: var(--cdl-elev-1);
+}
+
+.two-factor-page__status span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cdl-space-2, 8px);
+  font-weight: var(--cdl-font-semibold, 600);
+}
+
+.two-factor-page__status .is-on {
+  color: var(--cdl-success, #067647);
+}
+
+.two-factor-page__status .is-off {
+  color: var(--cdl-warning, #b54708);
+}
+
+.two-factor-page__status dl {
+  display: flex;
+  gap: var(--cdl-space-6, 24px);
+  margin: 0;
+}
+
+.two-factor-page__status dt {
+  font-size: var(--cdl-text-xs, 12px);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--cdl-text-muted, #475569);
+}
+
+.two-factor-page__status dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--cdl-font-semibold, 600);
+}
+
+.two-factor-page__enroll,
+.two-factor-page__codes,
+.two-factor-page__disable {
+  padding: var(--cdl-space-5, 20px);
+  border: 1px solid var(--cdl-border, #e2e8f0);
+  border-radius: var(--cdl-radius-lg, 12px);
+  background: var(--cdl-surface, #ffffff);
+  display: flex;
+  flex-direction: column;
+  gap: var(--cdl-space-4, 16px);
+}
+
+.two-factor-page__steps {
+  margin: 0;
+  padding-left: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--cdl-space-4, 16px);
+  line-height: 1.55;
+}
+
+.two-factor-page__steps img {
+  display: block;
+  margin-top: var(--cdl-space-3, 12px);
+  width: 176px;
+  height: 176px;
+  /* The QR is a dark-on-white bitmap from the backend, so it needs its own
+     white plate to stay scannable when the page is in dark mode. */
+  background: #ffffff;
+  padding: var(--cdl-space-2, 8px);
+  border-radius: var(--cdl-radius-md, 8px);
+}
+
+.two-factor-page__secret {
+  display: inline-block;
+  margin-top: var(--cdl-space-2, 8px);
+  padding: var(--cdl-space-2, 8px) var(--cdl-space-3, 12px);
+  border-radius: var(--cdl-radius-sm, 6px);
+  background: var(--cdl-surface-muted, #f1f5f9);
+  font-family: var(--cdl-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: var(--cdl-text-sm, 14px);
+  letter-spacing: 0.08em;
+  word-break: break-all;
+}
+
+.two-factor-page__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cdl-space-2, 8px);
+  max-width: 18rem;
+}
+
+.two-factor-page__field span {
+  font-size: var(--cdl-text-sm, 14px);
+  font-weight: var(--cdl-font-medium, 500);
+}
+
+.two-factor-page__field input {
+  padding: var(--cdl-space-3, 12px);
+  border: 1px solid var(--cdl-border, #e2e8f0);
+  border-radius: var(--cdl-radius-md, 8px);
+  background: var(--cdl-surface, #ffffff);
+  color: inherit;
+  font-size: var(--cdl-text-lg, 18px);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.3em;
+}
+
+.two-factor-page__field input[aria-invalid='true'] {
+  border-color: var(--cdl-danger, #b42318);
+}
+
+.two-factor-page__primary,
+.two-factor-page__danger,
+.two-factor-page__codes button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--cdl-space-2, 8px);
+  align-self: flex-start;
+  padding: var(--cdl-space-3, 12px) var(--cdl-space-5, 20px);
+  border-radius: var(--cdl-radius-md, 8px);
+  border: 1px solid transparent;
+  font-weight: var(--cdl-font-semibold, 600);
+  cursor: pointer;
+  transition: filter var(--cdl-duration-fast, 150ms) ease;
+}
+
+.two-factor-page__primary {
+  background: var(--app-accent, var(--cdl-brand-500, #0f766e));
+  color: var(--cdl-on-brand, #ffffff);
+}
+
+.two-factor-page__danger {
+  background: transparent;
+  border-color: var(--cdl-danger, #b42318);
+  color: var(--cdl-danger, #b42318);
+}
+
+.two-factor-page__codes button {
+  background: var(--cdl-surface-muted, #f1f5f9);
+  border-color: var(--cdl-border, #e2e8f0);
+  color: inherit;
+}
+
+.two-factor-page__primary:disabled,
+.two-factor-page__danger:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.two-factor-page__primary:not(:disabled):hover,
+.two-factor-page__danger:not(:disabled):hover {
+  filter: brightness(0.95);
+}
+
+.two-factor-page__primary:focus-visible,
+.two-factor-page__danger:focus-visible,
+.two-factor-page__codes button:focus-visible,
+.two-factor-page__field input:focus-visible {
+  outline: 2px solid var(--app-accent, var(--cdl-brand-500, #0f766e));
+  outline-offset: 2px;
+}
+
+.two-factor-page__codes h2 {
+  margin: 0;
+  font-size: var(--cdl-text-lg, 18px);
+}
+
+.two-factor-page__codes p {
+  margin: 0;
+  color: var(--cdl-text-muted, #475569);
+}
+
+.two-factor-page__codes ul {
+  list-style: none;
+  margin: 0;
+  padding: var(--cdl-space-4, 16px);
+  border-radius: var(--cdl-radius-md, 8px);
+  background: var(--cdl-surface-muted, #f1f5f9);
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+  gap: var(--cdl-space-2, 8px);
+  font-family: var(--cdl-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+}
