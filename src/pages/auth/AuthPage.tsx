@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { CAREDROID_PRODUCT } from '../../config/caredroidProduct.config';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
+import { ariaInvalid } from '../../utils/ariaInvalid';
 import { sanitizeReturnUrl, resolvePostAuthDestination } from '../../auth/authSession';
 import {
   loginWithPassword,
@@ -358,7 +359,7 @@ export default function AuthPage({ initialMode = 'login' }: { initialMode?: Mode
           </div>
 
           {error ? (
-            <div className="auth-page__error" role="alert">
+            <div className="auth-page__error" role="alert" id="auth-page-error">
               {error}
             </div>
           ) : null}
@@ -405,6 +406,8 @@ export default function AuthPage({ initialMode = 'login' }: { initialMode?: Mode
                   type="text"
                   inputMode="numeric"
                   autoComplete="one-time-code"
+                  {...ariaInvalid(error)}
+                  aria-describedby={error ? 'auth-page-error' : undefined}
                   value={twoFactorCode}
                   onChange={(event) => setTwoFactorCode(event.target.value)}
                   placeholder="123456"
@@ -432,6 +435,8 @@ export default function AuthPage({ initialMode = 'login' }: { initialMode?: Mode
                     ref={emailInputRef}
                     type="email"
                     autoComplete="email"
+                    {...ariaInvalid(error)}
+                    aria-describedby={error ? 'auth-page-error' : undefined}
                     value={email}
                     onChange={(event) => setEmail(event.target.value)}
                     placeholder="you@hospital.org"
@@ -443,6 +448,8 @@ export default function AuthPage({ initialMode = 'login' }: { initialMode?: Mode
                   <input
                     type="password"
                     autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+                    {...ariaInvalid(error)}
+                    aria-describedby={error ? 'auth-page-error' : undefined}
                     value={password}
                     onChange={(event) => setPassword(event.target.value)}
                     placeholder="••••••••"
