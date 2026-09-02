@@ -3,13 +3,22 @@ import { dispatchAlert } from '../../engine/alertEngine';
 import './NotificationToast.css';
 
 /**
- * NotificationToast Component
- * 
- * Temporary toast notification that appears at bottom-right of screen
- * Auto-dismisses after 4 seconds (or immediately if action taken)
- * 
- * @param {Array<id, title, message, type, action>} toasts - List of toasts to display
- * @param {Function} onDismiss - Callback when toast is dismissed
+ * Legacy toast compatibility shim -- NOT a toast renderer.
+ *
+ * CareDroid has one notification surface, the alert engine. This module keeps
+ * the old toast call shapes working by forwarding them into dispatchAlert()
+ * (tagged source 'notification-toast-compat'), so nothing here paints
+ * anything: the container renders null, `toasts` is always empty, and
+ * removeToast/clearToasts are no-ops because the alert engine owns dismissal.
+ *
+ * It currently has no callers -- the migration it exists for is finished --
+ * and is kept as the landing pad for any legacy toast call that resurfaces.
+ * Do not wire it expecting a bottom-right toast; raise an alert-engine alert
+ * instead. The docblock previously here described exactly that bottom-right,
+ * 4-second auto-dismissing toast, which this has not been for some time.
+ *
+ * @param toasts    Legacy toast notices; each is forwarded, then dismissed.
+ * @param onDismiss Invoked per notice once forwarded.
  */
 export const NotificationToastContainer = ({ toasts = [] as any[], onDismiss }) => {
   useEffect(() => {
@@ -23,10 +32,12 @@ export const NotificationToastContainer = ({ toasts = [] as any[], onDismiss }) 
 };
 
 /**
- * Custom Hook for Using Toasts
- * Usage:
- * const { addToast } = useToasts();
- * addToast({ type: 'success', title: 'Success!', message: 'Operation completed.' });
+ * Legacy toast hook. addToast() raises an alert-engine alert; it does not
+ * queue a toast. `toasts` stays empty and remove/clear are no-ops, so do not
+ * drive UI from them.
+ *
+ *   const { addToast } = useToasts();
+ *   addToast({ type: 'success', title: 'Saved', message: 'Operation completed.' });
  */
 export const useToasts = () => {
   const addToast = (notice) => {

@@ -17,8 +17,7 @@ import { PILOT_CUSTOMER_MODE } from '../config/unified-navigation.config';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
 import { navigateProfileAware } from '../navigation/profileRouteLaunch';
-import useOperationalIntelligence from '../hooks/useOperationalIntelligence';
-import useRouteScreenMode from '../hooks/useRouteScreenMode';
+import useHeaderOperationalMetrics from '../hooks/useHeaderOperationalMetrics';
 import useScreenModeCapabilities from '../hooks/useScreenModeCapabilities';
 import { rankPatientsBySearch } from '../utils/patientSearch';
 import { searchPatientsFromBackend } from '../services/patientManagementApi';
@@ -60,41 +59,30 @@ function Clock() {
   return <span className="caredroid-header__clock">{now.toLocaleTimeString()}</span>;
 }
 
-function formatSyncAge(timestamp?: string | null): string {
-  if (!timestamp) return 'no sync';
-  const parsed = new Date(timestamp).getTime();
-  if (!Number.isFinite(parsed)) return 'no sync';
-  const elapsedMinutes = Math.max(0, Math.round((Date.now() - parsed) / 60000));
-  if (elapsedMinutes < 1) return 'now';
-  if (elapsedMinutes < 60) return `${elapsedMinutes}m`;
-  return `${Math.round(elapsedMinutes / 60)}h`;
-}
-
 export function Header() {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const emergencyRole = useEmergencyRolePermissions();
   const { saasRole } = useEffectiveUserProfile();
-  const routeScreenMode = useRouteScreenMode();
   const screenCapabilities = useScreenModeCapabilities();
   const patientLookupInputRef = useRef<HTMLInputElement>(null);
   const isReceptionRoute = location.pathname === CANONICAL_ROUTES.emergencyReception;
-  const operationalIntelligence = useOperationalIntelligence({
-    realtime: false,
+  // useHeaderOperationalMetrics derives exactly these seven values, and the
+  // header had its own character-for-character copy of the whole derivation --
+  // formatter, websocket subscription, sync pulse effect and label/title
+  // strings. Two copies of the same operational-status logic drift; this is
+  // the shared one. `screenMode` is aliased so every downstream reference
+  // below reads the same as before.
+  const {
+    centralSnapshot,
+    intelligenceSnapshot,
+    syncLabel,
+    syncTitle,
+    syncStale,
+    syncPulse,
     screenMode: routeScreenMode,
-  });
-  const websocket = useEmergencyStore((store) => store.websocket);
-  const [syncPulse, setSyncPulse] = useState(false);
-  const centralSnapshot = operationalIntelligence.centralSnapshot;
-  const intelligenceSnapshot = operationalIntelligence.snapshot;
-
-  useEffect(() => {
-    if (!websocket.lastEventAt) return undefined;
-    setSyncPulse(true);
-    const timer = window.setTimeout(() => setSyncPulse(false), 1200);
-    return () => window.clearTimeout(timer);
-  }, [websocket.lastEventAt]);
+  } = useHeaderOperationalMetrics();
 
   const patients = useEmergencyStore((store) => store.patients);
   const referrals = useEmergencyStore((store) => store.referrals);
@@ -140,25 +128,6 @@ export function Header() {
   // declared createPatient action is the single source of truth used everywhere
   // else in this permission system; rely on that alone here too.
   const canSubmitCentralIntake = canCreatePatient;
-  const syncMode = websocket.mode || centralSnapshot.sync.mode || 'polling';
-  const syncAge = formatSyncAge(websocket.lastEventAt || centralSnapshot.sync.lastSyncedAt);
-  const syncStale =
-    websocket.status === 'connected'
-      ? false
-      : centralSnapshot.sync.stale || websocket.status === 'reconnecting';
-  // Compact header pill value -- every sibling status pill ("Waiting WARN 2")
-  // has a short value; the mode prefix here was redundant once the chip is
-  // already labeled "Sync" and the full mode detail lives in syncTitle below.
-  const syncLabel = syncStale ? 'Stale' : syncAge;
-  const syncTitle = [
-    `Status: ${websocket.status || centralSnapshot.sync.status}`,
-    `Mode: ${syncMode}`,
-    `Last update: ${syncAge}`,
-    `Source: ${centralSnapshot.sync.source}`,
-    websocket.message || centralSnapshot.sync.message,
-  ]
-    .filter(Boolean)
-    .join('. ');
 
   const patientLookupResults = useMemo(
     () =>
