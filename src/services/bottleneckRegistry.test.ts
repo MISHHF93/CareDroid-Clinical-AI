@@ -1,3 +1,5 @@
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   CURRENT_SERVICE_MAP,
@@ -651,5 +653,46 @@ describe('adaptExistingServiceSignalsToBottlenecks', () => {
     const events = adaptExistingServiceSignalsToBottlenecks(signals, ISO);
     const event = events.find((e) => e.category === 'operational');
     expect(event).toBeTruthy();
+  });
+});
+
+describe('CURRENT_SERVICE_MAP integrity', () => {
+  // CURRENT_SERVICE_MAP is what unifiedServiceRegistry surfaces to
+  // SaasHealthCenter and ExecutiveCommandCenter, so a service whose file has
+  // moved or been deleted misreports platform health rather than failing
+  // loudly. Every entry is hand-authored with a real filePath and nothing was
+  // checking that those paths still resolve.
+  it('every declared filePath resolves to a real file', () => {
+    const missing = CURRENT_SERVICE_MAP.filter(
+      (entry) => !existsSync(resolve(process.cwd(), entry.filePath)),
+    ).map((entry) => `${entry.serviceName} -> ${entry.filePath}`);
+
+    expect(
+      missing,
+      `Service map entries point at files that no longer exist. Update the ` +
+        `filePath (the service moved) or remove the entry (the service is ` +
+        `gone) -- do not leave it: platform health reads this map. Broken: ` +
+        missing.join('; '),
+    ).toEqual([]);
+  });
+
+  it('service names are unique', () => {
+    // serviceName is the join key: unifiedServiceRegistry looks entries up by
+    // it, so a duplicate silently shadows one of the two services.
+    const names = CURRENT_SERVICE_MAP.map((entry) => entry.serviceName);
+    const duplicates = names.filter((name, index) => names.indexOf(name) !== index);
+    expect(duplicates).toEqual([]);
+  });
+
+  it('every entry carries the fields the health surfaces render', () => {
+    const incomplete = CURRENT_SERVICE_MAP.filter(
+      (entry) =>
+        !entry.serviceName?.trim() ||
+        !entry.filePath?.trim() ||
+        !entry.purpose?.trim() ||
+        !Array.isArray(entry.failureModes) ||
+        entry.failureModes.length === 0,
+    ).map((entry) => entry.serviceName || entry.filePath);
+    expect(incomplete).toEqual([]);
   });
 });

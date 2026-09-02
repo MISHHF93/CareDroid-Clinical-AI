@@ -1,10 +1,29 @@
 /**
- * Route Metadata — Single Source of Truth
+ * Route metadata -- a DERIVED VIEW over CANONICAL_ROUTE_MAP. Not adopted.
  *
- * Centralizes route-level metadata so page titles, breadcrumbs, permissions,
- * and workspace context are declared once and consumed consistently.
+ * Nothing in the app imports this file. It is kept because the shape it
+ * projects (title/description/breadcrumbs/permissions/roles/navigationGroup/
+ * helpTopicId) is a reasonable one, but two things must be understood before
+ * anyone wires it:
  *
- * Replaces the pattern of copying metadata into individual page components.
+ * 1. It is NOT a source of truth. Every value is read out of
+ *    CANONICAL_ROUTE_MAP in routes.config.ts, which is the actual registry
+ *    driving navigation and authorization. The previous header here called
+ *    this file the "Single Source of Truth" and said it "replaces the pattern
+ *    of copying metadata into individual page components" -- it replaced
+ *    nothing, because it has no consumers.
+ *
+ * 2. Its matcher is narrower than the real one. getRouteMetadata() below
+ *    searches CANONICAL_ROUTE_MAP only. routes.config.ts's getRouteByPath()
+ *    deliberately falls back to ROUTE_RECORDS as well, in both own-path and
+ *    alias phases, because CANONICAL_ROUTE_MAP's `copilot` record declares no
+ *    aliases while ROUTE_RECORDS' `assistant` declares /assistant, /chat, /ai
+ *    and /copilot -- without that fallback every role was denied on all four
+ *    alias URLs. Wiring this file as-is would reintroduce exactly that bug.
+ *
+ * If you need route metadata today, call getRouteByPath() / getRouteById()
+ * from routes.config.ts. If you adopt this module instead, route its lookups
+ * through those functions first rather than re-walking CANONICAL_ROUTE_MAP.
  */
 
 import { CANONICAL_ROUTE_MAP } from '../config/routes.config';
