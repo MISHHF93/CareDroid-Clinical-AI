@@ -367,13 +367,6 @@ export const EMERGENCY_ARCHITECTURE_REGISTRY: readonly EmergencyArchitectureArti
     note: 'Reception intake staff toggle for ten high-risk complaint fast flags',
   },
   {
-    id: 'high-risk-complaint-attention-strip',
-    path: 'src/components/waiting-room/HighRiskComplaintAttentionStrip.tsx',
-    classification: EMERGENCY_ARCHITECTURE_CLASSIFICATION.DEAD_SAFE_TO_REMOVE,
-    canonical: 'src/components/whiteboard/WaitingRoomSafetyBoard.tsx',
-    note: 'Superseded, not imported anywhere. The safety board renders HighRiskComplaintFlagBadge per row plus a flag list, so re-mounting this strip would duplicate the signal',
-  },
-  {
     id: 'fit-to-wait-pathway',
     path: 'src/services/fitToWaitPathway.ts',
     classification: EMERGENCY_ARCHITECTURE_CLASSIFICATION.ACTIVE_SCREEN_LOGIC,
@@ -385,13 +378,6 @@ export const EMERGENCY_ARCHITECTURE_REGISTRY: readonly EmergencyArchitectureArti
     classification: EMERGENCY_ARCHITECTURE_CLASSIFICATION.ACTIVE_SCREEN_LOGIC,
     canonical: 'src/services/fitToWaitPathway.ts',
     note: 'Staff selector for five waiting-room seating / disposition classifications',
-  },
-  {
-    id: 'fit-to-wait-attention-strip',
-    path: 'src/components/waiting-room/FitToWaitAttentionStrip.tsx',
-    classification: EMERGENCY_ARCHITECTURE_CLASSIFICATION.DEAD_SAFE_TO_REMOVE,
-    canonical: 'src/components/whiteboard/WaitingRoomSafetyBoard.tsx',
-    note: 'Superseded, not imported anywhere. The safety board summarises fitToWaitUnclassified / fitToWaitImmediateRoom and offers the classification select per row',
   },
   {
     id: 'patient-experience-status',
@@ -461,13 +447,6 @@ export const EMERGENCY_ARCHITECTURE_REGISTRY: readonly EmergencyArchitectureArti
     note: 'Per-patient LWBS advisory badge for cards and waiting-room board',
   },
   {
-    id: 'lwbs-risk-strip',
-    path: 'src/components/waiting-room/LwbsRiskStrip.tsx',
-    classification: EMERGENCY_ARCHITECTURE_CLASSIFICATION.DEAD_SAFE_TO_REMOVE,
-    canonical: 'src/components/whiteboard/WaitingRoomSafetyBoard.tsx',
-    note: 'Superseded, not imported anywhere. The safety board carries the LWBS advisory count and an LwbsRiskBadge column',
-  },
-  {
     id: 'waiting-room-deterioration-watch',
     path: 'src/services/waitingRoomDeteriorationWatch.ts',
     classification: EMERGENCY_ARCHITECTURE_CLASSIFICATION.ACTIVE_SCREEN_LOGIC,
@@ -479,13 +458,6 @@ export const EMERGENCY_ARCHITECTURE_REGISTRY: readonly EmergencyArchitectureArti
     classification: EMERGENCY_ARCHITECTURE_CLASSIFICATION.ACTIVE_SCREEN_LOGIC,
     canonical: 'src/services/waitingRoomDeteriorationWatch.ts',
     note: 'Per-patient deterioration watch badge for cards and waiting-room board',
-  },
-  {
-    id: 'deterioration-watch-strip',
-    path: 'src/components/waiting-room/DeteriorationWatchStrip.tsx',
-    classification: EMERGENCY_ARCHITECTURE_CLASSIFICATION.DEAD_SAFE_TO_REMOVE,
-    canonical: 'src/components/whiteboard/WaitingRoomSafetyBoard.tsx',
-    note: 'Superseded, not imported anywhere. The safety board carries the deterioration watch count and a DeteriorationWatchBadge column',
   },
   {
     id: 'triage-breach-timer',
