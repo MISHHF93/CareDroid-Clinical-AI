@@ -38,6 +38,7 @@ const PlatformEntryHub = lazyRoute(() => import('../pages/PlatformEntryHub'));
 const AuthPage = lazyRoute(() => import('../pages/auth/AuthPage'));
 const TwoFactorSetupPage = lazyRoute(() => import('../pages/auth/TwoFactorSetupPage'));
 const TrackMindWorkspaceHub = lazyRoute(() => import('../pages/trackmind/TrackMindWorkspaceHub'));
+const TrackMindMaturityDashboard = lazyRoute(() => import('../pages/trackmind/TrackMindMaturityDashboard'));
 
 // ── Developer-only design-system catalog (item 41) ──────────────────────────
 // Deliberately NOT in CANONICAL_ROUTE_MAP, any navigation config, or the
@@ -1213,6 +1214,21 @@ export function AppRoutes() {
         <Route
           path={CANONICAL_ROUTES.workspaces}
           element={<EdApplicationEntryRedirect />}
+        />
+        {/*
+          Maturity assessment. Same guard as the workspace: the model exposes
+          per-domain scores and improvement priorities, so it is TrackMind data
+          and follows TrackMind access, not the ED role model.
+        */}
+        <Route
+          path={CANONICAL_ROUTES.trackMindMaturity}
+          element={
+            <TrackMindRouteGuard path={CANONICAL_ROUTES.trackMindMaturity}>
+              <LazyRoute label="Loading TrackMind maturity assessment...">
+                <TrackMindMaturityDashboard />
+              </LazyRoute>
+            </TrackMindRouteGuard>
+          }
         />
         {/* TrackMind Operating System hub. routes.config.ts has carried this
             route and componentKey since 2026-08-26, recording that the role

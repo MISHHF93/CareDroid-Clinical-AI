@@ -1900,7 +1900,7 @@ export const ROUTE_RECORDS = Object.freeze([
     componentKey: 'TrackMindMaturityDashboard',
     layout: 'app',
     auth: 'required',
-    status: 'future',
+    status: 'active',
     aliases: [],
     navGroup: 'account',
     notes:
@@ -2529,11 +2529,14 @@ export const ROUTE_RECORDS = Object.freeze([
     componentKey: 'GovernanceRegistry',
     layout: 'app',
     auth: 'required',
-    status: 'future',
+    status: 'active',
     aliases: [],
     navGroup: 'advanced',
     notes:
-      'Platform governance registry for owner, steward, approver, risk, evidence, version, audit, and review schedules.',
+      'Platform governance registry for owner, steward, approver, risk, evidence, version, audit, and review schedules. ' +
+      'Status corrected 2026-09-02: this record said future while the page has been real and mounted — ' +
+      'src/pages/governance/GovernanceRegistry.tsx, wired in platformConsoleRouteTree.tsx and serving /governance-registry. ' +
+      'It was the only future-status record whose component is actually mounted; the other 24 are genuinely unbuilt.',
   }),
   Object.freeze({
     id: 'aiGovernance',

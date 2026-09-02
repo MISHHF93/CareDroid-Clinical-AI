@@ -9,6 +9,8 @@ import {
   levelToScore,
   scoreTrackMindDomain,
   scoreTrackMindMaturity,
+  TRACKMIND_DOMAIN_SCORE_PROVENANCE,
+  TRACKMIND_SCORE_PROVENANCE,
 } from './trackMindMaturityModel';
 
 describe('trackMindMaturityModel', () => {
@@ -75,5 +77,49 @@ describe('trackMindMaturityModel', () => {
     expect(assessment.organizationName).toBe('Demo Track');
     expect(assessment.recommendations.immediate.length).toBeGreaterThan(0);
     expect(assessment.recommendations.nearTerm.length).toBeGreaterThan(0);
+  });
+});
+
+describe('score provenance', () => {
+  // Five domains call a real audit; four return a constant (AI_GOVERNANCE is
+  // literally `return 66`, and FACILITIES/FINANCE/EQUINE_WELFARE return
+  // base + hardcodedList.length * 6). Any UI printing overallScore has to be
+  // able to say how much of it is measured, so the split is part of the
+  // contract rather than something a reader has to rediscover in the source.
+  it('labels every domain as audited or static', () => {
+    const result = scoreTrackMindMaturity();
+    const values = Object.values(TRACKMIND_SCORE_PROVENANCE);
+    for (const dimension of result.dimensions) {
+      expect(values, `${dimension.id} has no provenance`).toContain(dimension.provenance);
+      expect(TRACKMIND_DOMAIN_SCORE_PROVENANCE[dimension.id]).toBe(dimension.provenance);
+    }
+    expect(Object.keys(TRACKMIND_DOMAIN_SCORE_PROVENANCE)).toHaveLength(result.dimensions.length);
+  });
+
+  it('reports how much of the overall score is actually measured', () => {
+    const { summary, dimensions } = scoreTrackMindMaturity();
+    expect(summary.auditedDomainCount + summary.staticDomainCount).toBe(dimensions.length);
+    expect(summary.auditedWeightShare).toBeGreaterThan(0);
+    expect(summary.auditedWeightShare).toBeLessThanOrEqual(100);
+  });
+
+  it('does not let a domain claim audited without a scorer that reads real state', () => {
+    // Guards the flip direction that matters: marking a domain audited is a
+    // claim that its score moves with the platform. A static scorer returns the
+    // same number for any input, so feeding it different signals proves nothing
+    // moved -- which is exactly what must NOT be labelled audited.
+    const withSignals = scoreTrackMindMaturity({
+      signals: { productionReadiness: { securityControls: 10 }, safety: { incidents: 99 } },
+    });
+    for (const dimension of withSignals.dimensions) {
+      if (dimension.provenance !== TRACKMIND_SCORE_PROVENANCE.STATIC) continue;
+      const baseline = scoreTrackMindDomain(dimension.id);
+      if (!baseline) throw new Error(`no baseline for ${dimension.id}`);
+      expect(
+        dimension.platformScore,
+        `${dimension.id} is marked static but its score responded to signals -- ` +
+          `if it now reads real state, mark it audited instead`,
+      ).toBe(baseline.platformScore);
+    }
   });
 });

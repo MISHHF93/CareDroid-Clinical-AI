@@ -328,6 +328,39 @@ function scoreFromEquineWelfare() {
   return clampScore(50 + evidence.length * 6);
 }
 
+/**
+ * Where each domain score actually comes from.
+ *
+ * Five domains call a real audit and move when the platform moves. Four do
+ * not: AI_GOVERNANCE returns the literal 66, and FACILITIES / FINANCE /
+ * EQUINE_WELFARE return `base + evidence.length * 6` over a hardcoded list of
+ * prose strings, so they are always 76, 72 and 74 no matter what the platform
+ * is doing. That is a placeholder, not a measurement.
+ *
+ * Consumers MUST be able to tell the two apart. A maturity dashboard that
+ * blends all nine into one number and prints it next to a level badge is
+ * presenting four fixed constants as findings, which is the failure mode this
+ * codebase has repeatedly had to undo elsewhere (integration status conflated
+ * config-presence with health; the AI surfaces overclaimed "Live" for
+ * deterministic rule handlers). Hence this map and the `provenance` field on
+ * every scored dimension.
+ *
+ * To move a domain to STATIC -> AUDITED, give it a scorer that reads real
+ * state and flip its entry here. Do not flip it without doing that.
+ */
+export const TRACKMIND_SCORE_PROVENANCE = Object.freeze({ AUDITED: 'audited', STATIC: 'static' });
+
+export const TRACKMIND_DOMAIN_SCORE_PROVENANCE = Object.freeze({
+  [TRACKMIND_MATURITY_DOMAIN.OPERATIONS]: TRACKMIND_SCORE_PROVENANCE.AUDITED,
+  [TRACKMIND_MATURITY_DOMAIN.SAFETY]: TRACKMIND_SCORE_PROVENANCE.AUDITED,
+  [TRACKMIND_MATURITY_DOMAIN.COMPLIANCE]: TRACKMIND_SCORE_PROVENANCE.AUDITED,
+  [TRACKMIND_MATURITY_DOMAIN.SECURITY]: TRACKMIND_SCORE_PROVENANCE.AUDITED,
+  [TRACKMIND_MATURITY_DOMAIN.DATA_QUALITY]: TRACKMIND_SCORE_PROVENANCE.AUDITED,
+  [TRACKMIND_MATURITY_DOMAIN.AI_GOVERNANCE]: TRACKMIND_SCORE_PROVENANCE.STATIC,
+  [TRACKMIND_MATURITY_DOMAIN.FACILITIES]: TRACKMIND_SCORE_PROVENANCE.STATIC,
+  [TRACKMIND_MATURITY_DOMAIN.FINANCE]: TRACKMIND_SCORE_PROVENANCE.STATIC,
+  [TRACKMIND_MATURITY_DOMAIN.EQUINE_WELFARE]: TRACKMIND_SCORE_PROVENANCE.STATIC,
+});
 const PLATFORM_SIGNAL_SCORERS = Object.freeze({
   [TRACKMIND_MATURITY_DOMAIN.OPERATIONS]: () => scoreFromSurvivabilityKpis(),
   [TRACKMIND_MATURITY_DOMAIN.SAFETY]: (signals) => scoreFromSafety(signals),
@@ -363,6 +396,8 @@ export function scoreTrackMindDomain(domainId, { answers = {} as any, signals = 
     ...domain,
     score,
     platformScore,
+    provenance:
+      TRACKMIND_DOMAIN_SCORE_PROVENANCE[domainId] || TRACKMIND_SCORE_PROVENANCE.STATIC,
     questionnaireScore,
     maturityLevel,
     currentCriteria: domain.levelCriteria[criteriaIndex],
@@ -400,6 +435,21 @@ export function scoreTrackMindMaturity({ answers = {} as any, signals = {} as an
     dimensions,
     summary: Object.freeze({
       domainCount: dimensions.length,
+      // How much of the overall score is actually measured. Any surface that
+      // prints `overallScore` has to be able to say this alongside it.
+      auditedDomainCount: dimensions.filter(
+        (dimension) => dimension.provenance === TRACKMIND_SCORE_PROVENANCE.AUDITED,
+      ).length,
+      staticDomainCount: dimensions.filter(
+        (dimension) => dimension.provenance === TRACKMIND_SCORE_PROVENANCE.STATIC,
+      ).length,
+      auditedWeightShare: Math.round(
+        (dimensions
+          .filter((dimension) => dimension.provenance === TRACKMIND_SCORE_PROVENANCE.AUDITED)
+          .reduce((sum, dimension) => sum + dimension.weight, 0) /
+          weightSum) *
+          100,
+      ),
       optimizingCount: dimensions.filter(
         (dimension) => dimension.maturityLevel.id === TRACKMIND_MATURITY_LEVEL.OPTIMIZING,
       ).length,
