@@ -12,23 +12,22 @@ import request from 'supertest';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { io as createSocketClient } from 'socket.io-client';
 
-import { EmsModule } from '../../backend/src/modules/ems/ems.module';
-import { CapacityModule } from '../../backend/src/modules/capacity/capacity.module';
-import { BoardingModule } from '../../backend/src/modules/boarding/boarding.module';
-import { ProtocolModule } from '../../backend/src/modules/protocol/protocol.module';
-import { DeteriorationModule } from '../../backend/src/modules/deterioration/deterioration.module';
-import { SurgeModule } from '../../backend/src/modules/surge/surge.module';
-import { AuthorizationGuard } from '../../backend/src/modules/auth/guards/authorization.guard';
-import { registerEMSWebSocketSupport } from '../../backend/src/api/ems.socket';
+import { EmsModule } from '../src/modules/ems/ems.module';
+import { BoardingModule } from '../src/modules/boarding/boarding.module';
+import { ProtocolModule } from '../src/modules/protocol/protocol.module';
+import { DeteriorationModule } from '../src/modules/deterioration/deterioration.module';
+import { SurgeModule } from '../src/modules/surge/surge.module';
+import { AuthorizationGuard } from '../src/modules/auth/guards/authorization.guard';
+import { registerEMSWebSocketSupport } from '../src/api/ems.socket';
 
 // Dynamically imported in beforeAll, after the env vars above are set --
 // these backend modules read them at import time, and static ESM imports
 // are hoisted before any other top-level code (unlike the original CJS
 // require() calls, which ran in textual order).
-let REQUIRED_SERVICE_NAMES: typeof import('../../backend/src/services').REQUIRED_SERVICE_NAMES;
-let checkServiceHealth: typeof import('../../backend/src/services').checkServiceHealth;
-let initializeAllServices: typeof import('../../backend/src/services').initializeAllServices;
-let UnifiedPatient: typeof import('../../backend/src/models/unified-patient.model').UnifiedPatient;
+let REQUIRED_SERVICE_NAMES: typeof import('../src/services').REQUIRED_SERVICE_NAMES;
+let checkServiceHealth: typeof import('../src/services').checkServiceHealth;
+let initializeAllServices: typeof import('../src/services').initializeAllServices;
+let UnifiedPatient: typeof import('../src/models/unified-patient.model').UnifiedPatient;
 
 const TEST_AUTH_HEADER = 'Bearer integration-test-token';
 const FAKE_USER = {
@@ -51,7 +50,12 @@ const FAKE_USER = {
  * this went unnoticed across the whole Cycle 277-286 migration.
  *
  * This version boots the real Nest modules directly (no AppModule -- Ems/
- * Capacity/Boarding/Protocol/Deterioration/Surge are all self-contained,
+ * Capacity moved out of this suite: CapacityModule was deleted and the endpoint
+ * now lives on EmergencyOsController as GET /api/emergency/capacity, whose module
+ * pulls TypeORM and does not belong in this in-memory Mongo harness. It keeps its
+ * coverage in emergency-os.controller.spec.ts (calls getCapacity) and
+ * emergency-os-patient-endpoints-authorization.spec.ts (asserts READ_PHI).
+ * Boarding/Protocol/Deterioration/Surge are all self-contained,
  * dependency-free @Module()s with no TypeORM/Mongoose wiring of their own)
  * and overrides AuthGuard('jwt')/AuthorizationGuard the same way this repo's
  * other e2e specs do (see backend/test/tool-orchestrator-api.e2e-spec.ts),
@@ -140,9 +144,9 @@ describe('Emergency OS end-to-end integration', () => {
 
   beforeAll(async () => {
     ({ REQUIRED_SERVICE_NAMES, checkServiceHealth, initializeAllServices } = await import(
-      '../../backend/src/services'
+      '../src/services'
     ));
-    ({ UnifiedPatient } = await import('../../backend/src/models/unified-patient.model'));
+    ({ UnifiedPatient } = await import('../src/models/unified-patient.model'));
 
     mongoServer = await MongoMemoryServer.create({
       instance: {
@@ -158,11 +162,15 @@ describe('Emergency OS end-to-end integration', () => {
 
     const moduleFixture = await overrideAuth(
       Test.createTestingModule({
-        imports: [EmsModule, CapacityModule, BoardingModule, ProtocolModule, DeteriorationModule, SurgeModule],
+        imports: [EmsModule, BoardingModule, ProtocolModule, DeteriorationModule, SurgeModule],
       }),
     ).compile();
 
     app = moduleFixture.createNestApplication();
+    // Mirror main.ts. Without it every route mounts at /emergency/... while this
+    // suite asks for /api/emergency/..., so each request 404s and the assertions
+    // describe a routing layout production does not have.
+    app.setGlobalPrefix('api', { exclude: ['health', 'metrics', ''] });
     app.useGlobalPipes(
       new ValidationPipe({
         whitelist: true,
@@ -199,7 +207,6 @@ describe('Emergency OS end-to-end integration', () => {
     expect(health.totals.failed).toBe(0);
 
     const httpServerHandle = app.getHttpServer();
-    await request(httpServerHandle).get('/api/emergency/capacity/dashboard').set('Authorization', TEST_AUTH_HEADER).expect(200);
     await request(httpServerHandle)
       .post('/api/emergency/ems/alert')
       .set('Authorization', TEST_AUTH_HEADER)
@@ -237,13 +244,6 @@ describe('Emergency OS end-to-end integration', () => {
     });
     socket.disconnect();
 
-    const capacityResponse = await request(httpServerHandle)
-      .get('/api/emergency/capacity/dashboard')
-      .set('Authorization', TEST_AUTH_HEADER)
-      .expect(200);
-    expect(capacityResponse.body.metrics.active_patients).toBeGreaterThanOrEqual(1);
-    expect(capacityResponse.body.metrics.ems_inbound_45min).toBeGreaterThanOrEqual(1);
-
     const onSceneResponse = await request(httpServerHandle)
       .patch(`/api/emergency/ems/status/${emsUnitId}`)
       .set('Authorization', TEST_AUTH_HEADER)
@@ -255,14 +255,18 @@ describe('Emergency OS end-to-end integration', () => {
       .post(`/api/emergency/ems/arrive/${emsUnitId}`)
       .set('Authorization', TEST_AUTH_HEADER)
       .send({ real_name: 'Integration Patient', real_age: '58' })
-      .expect(200);
+      // 201: @Post('arrive/:emsUnitId') carries no @HttpCode, so Nest returns
+      // Created. This suite already expects 201 from POST /ems/alert, so the
+      // 200 here was the outlier rather than a controller bug worth changing --
+      // a status code is part of the contract clients hold.
+      .expect(201);
     expect(arrivalResponse.body.patient.current_state).toBe('ARRIVAL');
 
     const boardingResponse = await request(httpServerHandle)
       .post('/api/emergency/boarding/track-decision')
       .set('Authorization', TEST_AUTH_HEADER)
       .send({ patientId, clinicianId: 'clinician-integration' })
-      .expect(200);
+      .expect(201); // @Post with no @HttpCode -> Nest returns Created
     expect(boardingResponse.body.success).toBe(true);
 
     const boardedPatient = await UnifiedPatient.findById(patientId).lean();
@@ -294,7 +298,7 @@ describe('Emergency OS end-to-end integration', () => {
         vitals: { hr: 132, sbp: 84, spo2: 90, rr: 28, temp: 38.8, gcs: 13 },
         riskFlags: ['sepsis', 'shock'],
       })
-      .expect(200);
+      .expect(201);
     expect(deteriorationResponse.body.prediction.riskBand).toBe('critical');
     expect(deteriorationResponse.body.prediction.contributingSignals).toEqual(
       expect.arrayContaining(['hypotension', 'hypoxia', 'high-risk-flag']),

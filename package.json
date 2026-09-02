@@ -31,7 +31,7 @@
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
     "test:run:stable": "vitest run --pool=threads --maxWorkers=1",
-    "test:integration": "vitest run --config vitest.integration.config.ts",
+    "test:integration": "cd backend && jest --config ./test/jest-e2e.json emergency-os",
     "test:run:parallel": "node scripts/run-vitest-parallel.mjs",
     "test:run:frontend": "vitest run src",
     "test:lib": "vitest run lib",
