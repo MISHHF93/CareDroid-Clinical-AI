@@ -99,8 +99,10 @@ describe('platform cohesion contract', () => {
   });
 
   it('routes production permission consumers through useSecurityAccess', () => {
+    // RoleBasedNav.tsx was removed: it had no importer anywhere, and Sidebar is
+    // the navigation the app actually renders. A file that no longer exists
+    // cannot be a production permission consumer, and readSource() throws on it.
     for (const relPath of [
-      'src/components/layout/RoleBasedNav.tsx',
       'src/pages/ClinicalAlertsPage.tsx',
       'src/hooks/useAiChiefRouting.ts',
     ]) {
