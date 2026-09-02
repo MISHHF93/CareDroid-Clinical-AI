@@ -1,0 +1,43 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "workspaces": {
+    ".": {
+      "entry": [
+        "index.html",
+        "scripts/**/*.mjs",
+        "e2e/**/*.spec.mjs",
+        "e2e/*.helpers.mjs",
+
+        // Node-only companions, reachable ONLY through a dynamic import whose
+        // specifier is assembled at runtime (see the comment block at the top of
+        // src/data/artifactIntelligence.ts). The string is built with .join('/')
+        // specifically so Rollup cannot trace it and therefore will not try to
+        // bundle node:fs into the browser build. Static analysis cannot see these
+        // by design, so they must be declared here or Knip reports live code as
+        // unused. They are reached from pages/governance/Artifacts.tsx.
+        "src/data/artifactIntelligence.node.ts",
+        "src/data/aiModelRegistry.node.ts"
+      ],
+      "project": ["src/**/*.{ts,tsx}", "scripts/**/*.mjs", "e2e/**/*.mjs"]
+    },
+    "backend": {
+      "entry": [
+        "src/main.ts",
+        "src/**/*.module.ts",
+        "src/database/migrations/*.ts",
+        "src/**/*.spec.ts",
+        "test/**/*.e2e-spec.ts",
+
+        // Jest wires this in via setupFilesAfterEach in backend/package.json;
+        // nothing imports it.
+        "test/jest-setup.ts",
+
+        // A second Jest project (backend/test/jest-mongo.json) collects these by
+        // testRegex ".mongo-spec.ts$". They need a live MongoDB, which is why they
+        // are split out of the default run rather than named *.spec.ts.
+        "src/**/*.mongo-spec.ts"
+      ],
+      "project": ["src/**/*.ts", "test/**/*.ts"]
+    }
+  }
+}
