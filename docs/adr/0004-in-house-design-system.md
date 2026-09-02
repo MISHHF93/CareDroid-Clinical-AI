@@ -18,6 +18,38 @@ Build and maintain an in-house set of primitives (`src/components/primitives/`: 
 - **Theming is centralized but currently single-mode** — the CSS-variable approach makes a future dark mode technically straightforward to add, but as of this writing `THEME_CONFIG.standardTheme` is hardcoded to `'light'` and `setPreference()` is a no-op. This is a direct consequence of the in-house approach not yet including a second theme, not a limitation of the architecture itself.
 - **New contributors need onboarding to the in-house primitive set** rather than being able to rely on familiarity with a well-known library's docs.
 
+## Update — 2026-09-02: theming is no longer single-mode
+
+The consequence above ("currently single-mode ... `setPreference()` is a no-op")
+is no longer true and is kept only as the historical record of the decision.
+
+`src/contexts/ThemeContext.tsx` now implements real theming: a `light | dark |
+system` preference, persisted to `localStorage`, applied to the DOM as
+`documentElement.dataset.theme` plus `style.colorScheme`, with a live
+`prefers-color-scheme` listener so `system` follows the OS while it is selected.
+`ThemeProvider` is mounted in `src/app/providers.tsx` and `ThemeToggle`
+(`src/components/chrome/ThemeToggle.tsx`) exposes it in the UI.
+
+`THEME_CONFIG.standardTheme` is still `'light'`, but it is now the *default*
+consumed by `ThemeContext` as `DEFAULT_THEME` -- not a hardcoded single mode.
+Two tests pin that literal (`src/styles/medicalThemeAudit.test.ts`,
+`src/data/medicalExpansionCrossPackValidation.test.ts`), so change it there too
+if the default ever moves.
+
+The prediction in the original consequence held: the CSS-custom-property
+approach did make the second theme straightforward to add.
+
+## Note on scope: CEDS is a separate, partly-unadopted layer
+
+This ADR covers `src/components/primitives/` and `src/components/layout/`, which
+are in active use. It does **not** cover the later "CareDroid Enterprise Design
+System" layer (`src/design-system/**`, `src/components/data-display/EmptyState`,
+`src/components/feedback/{Alert,Banner}`). Those are built and exported but the
+app did not adopt them -- pages use `OperationalEmptyState` (10 call sites) and
+the alert engine instead. They are kept, not deleted: unadopted is not dead. Do
+not read their existence as evidence that CareDroid has migrated onto CEDS
+components; the CSS in `src/styles/cdl-v2/*.css` remains the styling source of
+truth, as `src/design-system/tokens/design-tokens.ts` says in its own header.
 ## Alternatives considered
 
 - Adopting Radix/shadcn for accessible unstyled primitives plus Tailwind for styling — would have reduced initial build cost and improved accessibility baseline, at the cost of a dependency and less granular control over the exact bundle-splitting strategy already in place. Not pursued; the in-house approach was already established by the time of this research pass.

@@ -273,6 +273,36 @@ npm run lint:all
 
 The app navigator (`backend/src/modules/app-navigator/`, `src/pages/AppNavigator.tsx`) answers "where do I manage X?" from the canonical route catalog (`src/config/routes.config.ts`), grounded so it can never invent a route. It's a real, linked page in the main app — not a separate process — reachable at `/navigator` or the sidebar's Help section once signed in. Refresh its catalog after adding routes with `npm run navigator-catalog:sync`.
 
+### Diagnose, verify, ship
+
+There is one command per stage of the loop, so nobody has to guess which of the
+many `test:*` scripts is the real gate:
+
+```bash
+npm run doctor            # Is my environment sane? Run this before anything else
+npm run verify            # Static gate -- fast, runs no tests
+npm run verify:full       # verify + the whole frontend suite + root integration
+npm run production:check  # verify:full + frontend and backend builds
+```
+
+| Command | What it actually runs | When |
+|---|---|---|
+| `doctor` | Node/npm against `engines`, lockfiles, `node_modules`, stray yarn/pnpm locks, missing env keys (**names only — never values**), ports 3000/8000, backend `/health`, Playwright browsers, generated-docs freshness, knip config | Straight after `npm install`, or whenever the app behaves oddly |
+| `verify` | `typecheck:all` (frontend **and** backend), `lint`, `docs:check`, `deps:integrity`, `architecture:check` | Before every commit |
+| `verify:full` | `verify`, then `test:run:parallel` and `test:integration` | Before opening a PR |
+| `production:check` | `verify:full`, then `build` and `build:backend` | Before tagging a release |
+
+`doctor` exits non-zero only on a real FAIL. Warnings — an unset optional env
+key, say — are reported and do not block, so it stays useful rather than
+becoming something people skip.
+
+`architecture:check` enforces the two rules the type system cannot express: no
+**new** import cycles, and no file under `src/` importing `backend/src/`. Cycles
+are held to a baseline rather than zero — the existing ones are real debt that
+needs individually-verified refactors, and failing on them would make the command
+permanently red and therefore ignored. A new cycle fails immediately.
+
+---
 ### Demo walkthrough
 
 For a pilot or sales demo: start at `/emergency/whiteboard` and select **First Customer Demo Mode** from the scenario selector (or from `/emergency/settings`). This mode uses deterministic local data and stays stable even when optional backend integrations are unavailable.
@@ -326,11 +356,18 @@ See `.env.example` for the full variable list.
 
 ```bash
 npm test                       # Vitest watch mode
-npm run test:run               # Single Vitest pass
+npm run test:run               # Single Vitest pass -- serial, slow across the whole suite
+npm run test:run:parallel      # The whole frontend suite, sharded across workers
 npm run test:all               # Frontend + backend unit tests
-npm run validate:ci            # Full CI validation pipeline
+npm run validate:ci            # CI gate -- a targeted subset, not the whole frontend suite
 npm run test:e2e:responsive    # Playwright responsive QA
 ```
+
+Use `test:run:parallel` when you mean "run everything" — plain `vitest run` is
+serial and takes long enough that people abandon it mid-run. Note that
+`validate:ci` deliberately runs a **named subset** of frontend tests plus the
+backend build/test/e2e and a bundle-budget check; it is not the full frontend
+suite, so a green CI is not the same claim as a green `verify:full`.
 
 Backend tests from `backend/`:
 

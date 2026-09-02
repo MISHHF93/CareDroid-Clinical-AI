@@ -63,6 +63,64 @@ Many narrow `test:*` scripts exist scoped to specific console/route groups (e.g.
 
 `qa/` is **not** an automated test suite — it's QA audit artifacts (JSON reports, screenshots) produced by `qa:*` scripts (`qa:responsive`, `qa:page-screenshots`, `qa:dashboard-resize`, `qa:reception-swarm`, etc.).
 
+## The verification loop
+
+The intended path through this repo, and the one command that owns each step:
+
+```
+CLONE -> INSTALL -> DOCTOR -> START -> VERIFY -> DEVELOP -> TEST -> HEAL -> PRODUCTION CHECK
+```
+
+| Step | Command | Notes |
+|---|---|---|
+| INSTALL | `npm install && npm --prefix backend install` | Two package trees; the backend is **not** a workspace |
+| DOCTOR | `npm run doctor` | `scripts/doctor.mjs`. Diagnoses only — changes nothing |
+| START | `npm start` | Frontend :3000, Nest :8000, `/api` proxied |
+| VERIFY | `npm run verify` | Static gate, runs no tests |
+| TEST | `npm run test:run:parallel` | The whole frontend suite. Plain `vitest run` is serial |
+| PRODUCTION CHECK | `npm run production:check` | `verify:full` plus both builds |
+
+### What `doctor` checks
+
+Node and npm against `engines`, both lockfiles, both `node_modules` trees, stray
+yarn/pnpm lockfiles (a real source of "works on my machine"), env keys missing
+from `.env` against `.env.example` — **by name only, values are never read or
+printed** — ports 3000/8000, backend `/health`, installed Playwright browsers,
+generated-docs freshness, and the knip config. It exits non-zero only on a FAIL;
+warnings are informational so the command stays worth running.
+
+### What `architecture:check` enforces
+
+`scripts/architecture-check.mjs` builds the import graph across `src/` and
+`backend/src/` (skipping `*.test.*`/`*.spec.*`, which may legitimately import
+across boundaries for fixtures) and applies two rules:
+
+1. **No new import cycles.** Cycles are not a style preference here: a module
+   calling into a partially-initialized module is how
+   `ReferenceError: Cannot access 'X' before initialization` reaches production,
+   which has happened in this repo. Detected with an iterative Tarjan SCC pass
+   and held to `MAX_IMPORT_CYCLES` rather than zero — the existing cycles are
+   real debt needing individually-verified refactors, several running through
+   permission and role resolution, and a permanently-red gate gets ignored.
+   Lower the baseline whenever you genuinely break one; that is the point.
+2. **No `src/` -> `backend/src/` imports.** The boundary is the HTTP API.
+
+### Composite commands
+
+```bash
+verify           = typecheck:all && lint && docs:check && deps:integrity && architecture:check
+verify:full      = verify && test:run:parallel && test:integration
+production:check = verify:full && build && build:backend
+```
+
+`deps:integrity` is `knip --include unlisted,unresolved`: it fails on an import
+with no matching dependency declaration, which is narrower (and far more
+actionable) than knip's full unused-code report.
+
+`validate:ci` is a different thing and should not be mistaken for the full
+suite: it runs `lint:all`, `typecheck:frontend`, a **named subset** of frontend
+tests, the backend build/test/e2e, the frontend build and a bundle-budget check.
+A green CI therefore does not imply a green `verify:full`.
 ## Living documentation generator
 
 `docs/generated/` is regenerated from source, not hand-maintained:

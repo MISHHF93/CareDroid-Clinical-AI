@@ -643,6 +643,19 @@ Tested directly after realizing the SAC fix might extend beyond esbuild: `playwr
 - **Runtime impact**: None directly (no live user-facing behavior reads `ROUTE_RECORDS`) — but real impact on the RELIABILITY of this campaign's own and the repo's other automated audit/documentation tooling, which has been trusting `ROUTE_RECORDS` uncritically.
 - **Current status**: `CONFIRMED`, deliberately not fixed — reconciling or retiring `ROUTE_RECORDS` needs its 8 real consumer files individually verified first (does each need real route data, or would `CANONICAL_ROUTE_MAP` alone suffice for its purpose, matching the app's actual, single real route source of truth?), a multi-file task beyond this round's remaining scope.
 - **Dependencies**: None blocking future investigation.
+- **Correction (2026-09-02)**: the source evidence above is now partly stale on one
+  point. `getRouteByPath()` no longer searches only `CANONICAL_ROUTE_MAP` -- it was
+  later extended (see its own dated comment in `routes.config.ts`) to fall back to
+  `ROUTE_RECORDS`, in both own-path and alias phases, because the `copilot` record in
+  `CANONICAL_ROUTE_MAP` carries no `aliases` while its `ROUTE_RECORDS` counterpart
+  (id `assistant`) declares `/assistant`, `/chat`, `/ai` and `/copilot`; without the
+  fallback every role was denied on all four alias URLs. So `ROUTE_RECORDS` DOES now
+  feed live authorization, which raises the stakes of this item rather than lowering
+  them: the two registries are no longer cleanly separable into "real" and
+  "documentation-only". The line reference (`routes.config.ts:1577-1586`) has also
+  drifted. Related trap found the same day: `src/config/routeMetadata.ts` reimplements
+  path matching against `CANONICAL_ROUTE_MAP` alone, so anything wired to it would
+  reintroduce exactly the alias bug the fallback fixed.
 - **Recommended canonical solution**: Long-term, converge to ONE route registry (`CANONICAL_ROUTE_MAP`) per the operating directive's own "ONE route architecture" goal — either migrate `ROUTE_RECORDS`'s 8 real consumers to read `CANONICAL_ROUTE_MAP` directly, or if `ROUTE_RECORDS` genuinely needs different/richer fields those tools rely on, derive it FROM `CANONICAL_ROUTE_MAP` at build/runtime instead of hand-maintaining a second, independently-drifting array.
 - **Validation requirements**: N/A yet (investigation only).
 - **Commit when resolved**: N/A yet.
