@@ -75,6 +75,9 @@ pages-map.txt
 /qa/a11y-results.json
 /qa/a11y-results/
 /qa/playwright-a11y-report.json
+# Same class as the two reports above: a Playwright JSON report that embeds
+# absolute local paths, so it must not be committed.
+/qa/playwright-production-smoke-report.json
 /qa/performance-results/
 /e2e/.auth/qa-user.json
 .vercel
