@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useRouteChromeRegistration } from '../contexts/RouteChromeContext';
 import ApiStateBanner from '../components/ApiStateBanner';
 import { Spinner } from '../components/ui/Spinner';
 import { sendClinicalChatMessage } from '../services/clinicalChatService';
@@ -42,7 +43,13 @@ function downloadTextFile({ filename, content }) {
   return true;
 }
 
+const DOCUMENTATION_ROUTE_CHROME = Object.freeze({
+  title: 'Clinical Documentation Assistant',
+  subtitle: 'Draft clinical notes with explicit export support — clinician review required',
+});
+
 export default function ClinicalDocumentationAssistant() {
+  useRouteChromeRegistration(DOCUMENTATION_ROUTE_CHROME);
   const [noteTypeId, setNoteTypeId] = useState('soap');
   const [actionId, setActionId] = useState('draft-note');
   const [form, setForm] = useState(DEFAULT_DOCUMENTATION_CONTEXT);
@@ -124,7 +131,15 @@ export default function ClinicalDocumentationAssistant() {
       <section className="documentation-assistant-hero" aria-labelledby="documentation-title">
         <div>
           <p className="documentation-assistant-eyebrow">Draft only - clinician review required</p>
-          <h2 id="documentation-title">Clinical Documentation Assistant</h2>
+          {/* Not a heading. This page's title is registered with the shell above,
+              which renders it as the page's single <h1> outside <main>. Left as an
+              <h2> it both duplicated that title and sat at the same level as this
+              page's own section headings ("Documentation inputs", "Draft and
+              export"), so the page title did not outrank its own contents. Styling
+              keeps the weight it had -- this is a semantics change, not a visual one. */}
+          <p id="documentation-title" className="documentation-assistant-title-text">
+            Clinical Documentation Assistant
+          </p>
           <p>
             Draft SOAP notes, H&P notes, progress notes, discharge summaries, consultation notes,
             procedure notes, encounter summaries, and patient instructions with explicit export support.

@@ -43,6 +43,16 @@
   text-transform: uppercase;
 }
 
+/* The hero title, demoted from <h2> to <p> so the shell owns this page's single
+   <h1>. The rule above deliberately mutes every other <p> in this hero, and the
+   title must not inherit that -- it keeps the weight and colour it had. */
+.documentation-assistant-hero .documentation-assistant-title-text {
+  color: var(--app-text-primary, var(--medical-ink));
+  font-size: var(--cdl-font-size-xl, 20px);
+  font-weight: 600;
+  line-height: 1.25;
+}
+
 .documentation-assistant-hero__actions,
 .documentation-assistant-actions,
 .documentation-assistant-chip-grid {
