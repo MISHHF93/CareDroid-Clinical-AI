@@ -1,6 +1,6 @@
 # CareDroid living documentation index
 
-> Generated: **2026-08-14T21:39:09.929Z**
+> Generated: **2026-09-02T20:12:48.120Z**
 > Engine: `living-documentation`
 
 ## Metrics
@@ -8,14 +8,14 @@
 | Section | Count |
 |---------|------:|
 | routes | 16 |
-| apis | 53 |
+| apis | 54 |
 | roles | 12 |
 | workflows | 21 |
 | services | 32 |
 | aiCapabilities | 10 |
-| permissions | 37 |
+| permissions | 38 |
 | components | 12 |
-| configuration | 82 |
+| configuration | 81 |
 
 ## Generated files
 

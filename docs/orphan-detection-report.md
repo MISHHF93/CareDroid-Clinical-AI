@@ -1,6 +1,6 @@
 # Orphan Detection Report
 
-Generated: 2026-08-26 (regenerate with `npm run orphan-detection:write-docs`)
+Generated: 2026-09-02 (regenerate with `npm run orphan-detection:write-docs`)
 
 ## Classification key
 
@@ -15,27 +15,27 @@ Generated: 2026-08-26 (regenerate with `npm run orphan-detection:write-docs`)
 
 | Metric | Count |
 |--------|------:|
-| Total orphan findings | 174 |
-| App.jsx routes | 392 |
+| Total orphan findings | 171 |
+| app/router.tsx routes | 392 |
 | Orphan / gap routes | 10 |
 | Orphan pages | 27 |
 | Orphan components | 0 |
 | Domain module findings (dashboard / simulation / lab / 3D) | 2 |
-| Orphan services | 0 |
+| Orphan services | 1 |
 | Executor contract gaps | 0 |
 | API orphans / stubs | 125 |
-| Weakly linked markdown | 10 |
+| Weakly linked markdown | 6 |
 | **wire** | 0 |
 | **merge** | 0 |
-| **quarantine** | 0 |
-| **legacy** | 174 |
+| **quarantine** | 1 |
+| **legacy** | 170 |
 
 ## Merge candidates (explicit)
 
 | ID | Primary | Duplicate | Note |
 |----|---------|-----------|------|
-| dashboard-dual-home | src/pages/CommandDashboard.jsx | removed: src/pages/Dashboard.jsx | Former assistant page duplicate removed; ED Copilot now lives in src/components/CopilotPanel.tsx (ChatInterface.tsx superseded it and was itself removed as dead code, 2026-07-17). |
-| pack-marketplace-dual | src/pages/organization/OrganizationPages.jsx (PackMarketplace) | /asset-packs vs /settings/organization/packs | Intentional dual context: product discovery and organization entitlement management share PackMarketplace. |
+| dashboard-dual-home | src/components/emergency/CommandDashboard.tsx | removed: src/pages/Dashboard.jsx | Former assistant page duplicate removed; ED Copilot now lives in src/components/CopilotPanel.tsx (ChatInterface.tsx superseded it and was itself removed as dead code, 2026-07-17). |
+| pack-marketplace-dual | src/pages/organization/OrganizationPages.tsx (PackMarketplace) | /asset-packs vs /settings/organization/packs | Intentional dual context: product discovery and organization entitlement management share PackMarketplace. |
 | notification-services-dual | src/services/NotificationService.ts | src/test/fixtures/legacyNotificationService.ts | Legacy queue-style client moved to test fixtures; active app client is src/services/NotificationService.ts. |
 
 ## Critical findings
@@ -49,16 +49,16 @@ Generated: 2026-08-26 (regenerate with `npm run orphan-detection:write-docs`)
 
 | Route | Class | Evidence |
 | --- | --- | --- |
-| /home | legacy | Redirect or alias route in App.jsx |
-| /workspace | legacy | Redirect or alias route in App.jsx |
-| /medical-simulation | legacy | Redirect or alias route in App.jsx |
-| /anatomy-viewer | legacy | Redirect or alias route in App.jsx |
-| /chat | legacy | Redirect or alias route in App.jsx |
-| /login | legacy | Redirect or alias route in App.jsx |
-| /signin | legacy | Redirect or alias route in App.jsx |
-| /lab | legacy | Redirect or alias route in App.jsx |
-| /laboratory | legacy | Redirect or alias route in App.jsx |
-| /laboratory/* | legacy | Redirect or alias route in App.jsx |
+| /home | legacy | Redirect or alias route in app/router.tsx |
+| /workspace | legacy | Redirect or alias route in app/router.tsx |
+| /medical-simulation | legacy | Redirect or alias route in app/router.tsx |
+| /anatomy-viewer | legacy | Redirect or alias route in app/router.tsx |
+| /chat | legacy | Redirect or alias route in app/router.tsx |
+| /login | legacy | Redirect or alias route in app/router.tsx |
+| /signin | legacy | Redirect or alias route in app/router.tsx |
+| /lab | legacy | Redirect or alias route in app/router.tsx |
+| /laboratory | legacy | Redirect or alias route in app/router.tsx |
+| /laboratory/* | legacy | Redirect or alias route in app/router.tsx |
 
 ## Orphan pages
 
@@ -114,7 +114,9 @@ _None detected._
 
 ## Orphan services
 
-_None detected._
+| Service | Class | Evidence |
+| --- | --- | --- |
+| src/services/_workflowTestMocks.ts | quarantine | No production import of service module |
 
 ## Orphan executors
 
@@ -149,6 +151,7 @@ _None detected._
 | PATCH /api/emergency/patients/:patientId | legacy | Backend-only route (no SPA client) |
 | PATCH /api/emergency/patients/:patientId/staff | legacy | Backend-only route (no SPA client) |
 | PATCH /api/emergency/patients/:patientId/escalate | legacy | Backend-only route (no SPA client) |
+| PATCH /api/emergency/patients/:patientId/reconcile-identity | legacy | Backend-only route (no SPA client) |
 | GET /api/emergency/patients/:patientId/workflow-logs | legacy | Backend-only route (no SPA client) |
 | PATCH /api/emergency/ems/arrivals/:arrivalId/status | legacy | Backend-only route (no SPA client) |
 | GET /api/emergency/staff | legacy | Backend-only route (no SPA client) |
@@ -224,7 +227,6 @@ _None detected._
 | GET /api/v1/governance/registry | legacy | Backend-only route (no SPA client) |
 | GET /api/v1/governance/safety-rules | legacy | Backend-only route (no SPA client) |
 | GET /api/v1/governance/compliance | legacy | Backend-only route (no SPA client) |
-| GET /api/v1/governance/violations | legacy | Backend-only route (no SPA client) |
 | POST /api/platform/users/me/pinned-assets | legacy | Platform/product API is deferred and not frontend-inventory wired |
 | POST /api/platform/users/me/hidden-assets | legacy | Platform/product API is deferred and not frontend-inventory wired |
 | GET /api/platform/assets/:assetId | legacy | Platform/product API is deferred and not frontend-inventory wired |
@@ -251,16 +253,12 @@ _… and 5 more API rows._
 
 | Doc | Class | Evidence |
 | --- | --- | --- |
-| docs/archive/CAREDROID_ARCHITECTURE_CLEANUP_REPORT.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
-| docs/archive/CLINICAL_PROCESS_SAAS_HARMONIZATION_REPORT.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
-| docs/archive/INTERACTION_EXECUTION_REPORT.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
-| docs/archive/PLATFORM_MODERNIZATION_REPORT.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
-| docs/archive/reception-upgrade/02-dependency-map.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
-| docs/archive/reception-upgrade/03-orphaned-code.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
-| docs/archive/reception-upgrade/04-rbac-permission-matrix.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
-| docs/archive/reception-upgrade/05-information-architecture.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
-| docs/archive/reception-upgrade/NEW_HEADER_INTEGRATION_GUIDE.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
-| docs/archive/SCORECARD-archive-2026-07-23-cycles-1-157.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
+| docs/archive/clickable-map-report.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
+| docs/archive/component-mounting-report.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
+| docs/archive/current-codebase-findings.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
+| docs/archive/layout-routing-consolidation-report.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
+| docs/archive/system-evaluation.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
+| docs/archive/ui-surface-compression.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
 
 ## Appendix
 

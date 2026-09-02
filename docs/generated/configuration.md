@@ -3,7 +3,7 @@
 > Auto-generated from implementation. Do not edit manually.
 > Regenerate: `npm run docs:generate`
 
-**Entries:** 82
+**Entries:** 81
 
 ### app-config
 
@@ -490,14 +490,6 @@ Role-based ED dashboard matrix — information hierarchy and primary surfaces. [
 - **Source:** `src/config/roleOperationalDashboardModel.ts`
 - **Status:** active
 
-### layouts-app-shell-shim
-
-Thin re-export shim — implementation lives in src/components/AppShell.tsx. [compat]
-
-- **Source:** `src/layouts/AppShell.tsx`
-- **Status:** redirect
-- **Roles:** `src/components/AppShell.tsx`
-
 ### VITE_APP_NAME
 
 Application display name. (parser: appConfig)
@@ -584,7 +576,7 @@ Fetch timeout for apiClient (milliseconds). (parser: apiEnv)
 
 ### Configuration audit
 
-69 registry entries, 55 env vars, 1 conflicts (4 compat shims).
+68 registry entries, 55 env vars, 0 conflicts (3 compat shims).
 
 - **Source:** `canonicalConfigurationAudit.ts`
 - **Status:** active

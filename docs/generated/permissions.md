@@ -3,7 +3,7 @@
 > Auto-generated from implementation. Do not edit manually.
 > Regenerate: `npm run docs:generate`
 
-**Entries:** 37
+**Entries:** 38
 
 ### Create patient
 
@@ -95,6 +95,13 @@ Convert pre-arrival EMS unit to registered patient.
 
 - **Source:** `emergencyPermissionRegistry.ts`
 - **Permissions:** `ems.convertArrival`
+
+### Request emergency transport
+
+Physician-initiated SIMULATED emergency transport request from a patient chart -- not connected to a real ambulance or dispatch system.
+
+- **Source:** `emergencyPermissionRegistry.ts`
+- **Permissions:** `ems.requestTransport`
 
 ### Create referral
 

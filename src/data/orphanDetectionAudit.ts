@@ -57,14 +57,14 @@ export const ORPHAN_CLASSIFICATIONS = Object.freeze({
 const MERGE_DUPLICATES = Object.freeze([
   {
     id: 'dashboard-dual-home',
-    primary: 'src/pages/CommandDashboard.jsx',
+    primary: 'src/components/emergency/CommandDashboard.tsx',
     duplicate: 'removed: src/pages/Dashboard.jsx',
     route: '/assistant vs /dashboard',
     note: 'Former assistant page duplicate removed; ED Copilot now lives in src/components/CopilotPanel.tsx (ChatInterface.tsx superseded it and was itself removed as dead code, 2026-07-17).',
   },
   {
     id: 'pack-marketplace-dual',
-    primary: 'src/pages/organization/OrganizationPages.jsx (PackMarketplace)',
+    primary: 'src/pages/organization/OrganizationPages.tsx (PackMarketplace)',
     duplicate: '/asset-packs vs /settings/organization/packs',
     route: 'organization packs',
     note: 'Intentional dual context: product discovery and organization entitlement management share PackMarketplace.',
@@ -80,8 +80,11 @@ const MERGE_DUPLICATES = Object.freeze([
 
 const EXPECTED_LEGACY_NON_ROUTE_FILES = new Set([
   'src/pages/tools/Calculators.tsx',
-  'src/pages/CommandDashboard.jsx',
-  'src/pages/fleet/FleetDashboardWidgets.jsx',
+  // CommandDashboard moved to src/components/emergency/ in the JS->TS migration;
+  // FleetDashboardWidgets.jsx and pages/Dashboard.jsx were deleted outright. Entries
+  // keyed to paths that no longer exist can never match a scanned file, so they
+  // silently stop suppressing anything -- they read as coverage without providing it.
+  'src/components/emergency/CommandDashboard.tsx',
   'src/pages/SimulationLaboratoryViewer.css',
   // Same false-positive class as SimulationLaboratoryViewer.css above: both
   // are real support files imported directly by their page component
@@ -384,7 +387,7 @@ function fileReferenceNeedles(relFromRepo) {
 
 function isReferenced(relPath, corpusText, appWiredPaths) {
   if (appWiredPaths.has(relPath.replace(/\\/g, '/'))) {
-    return { referenced: true, via: 'App.jsx import' };
+    return { referenced: true, via: 'app/router.tsx import' };
   }
   const needles = fileReferenceNeedles(relPath);
   for (const needle of needles) {
@@ -469,7 +472,7 @@ function detectOrphanRoutes(appPaths, navPaths) {
         id: path,
         route: path,
         classification: isLegacy ? ORPHAN_CLASSIFICATIONS.LEGACY : ORPHAN_CLASSIFICATIONS.WIRE,
-        evidence: 'In navigation.config / CANONICAL_ROUTES but no exact App.jsx route',
+        evidence: 'In navigation.config / CANONICAL_ROUTES but no exact app/router.tsx route',
       });
     }
   }
@@ -481,7 +484,7 @@ function detectOrphanRoutes(appPaths, navPaths) {
       id: tool.id,
       route,
       classification: ORPHAN_CLASSIFICATIONS.WIRE,
-      evidence: 'toolInventory route not registered in App.jsx',
+      evidence: 'toolInventory route not registered in app/router.tsx',
     });
   }
 
@@ -496,7 +499,7 @@ function detectOrphanRoutes(appPaths, navPaths) {
         id: path,
         route: path,
         classification: ORPHAN_CLASSIFICATIONS.LEGACY,
-        evidence: 'Redirect or alias route in App.jsx',
+        evidence: 'Redirect or alias route in app/router.tsx',
       });
     }
   }
@@ -902,7 +905,7 @@ export function formatOrphanDetectionMarkdown(report = buildOrphanDetectionRepor
     '| Metric | Count |',
     '|--------|------:|',
     `| Total orphan findings | ${summary.total} |`,
-    `| App.jsx routes | ${summary.appRouteCount} |`,
+    `| app/router.tsx routes | ${summary.appRouteCount} |`,
     `| Orphan / gap routes | ${summary.routes} |`,
     `| Orphan pages | ${summary.pages} |`,
     `| Orphan components | ${summary.components} |`,

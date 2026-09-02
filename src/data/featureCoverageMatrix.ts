@@ -452,7 +452,7 @@ export function buildFeatureCoverageRows() {
       roleVisibility: 'Role profile default',
       workspaceVisibility: 'assistant',
       backendStatus: 'Shared chat gateway',
-      frontendStatus: 'Partial (?agent= not read in Dashboard)',
+      frontendStatus: 'Wired (?agent= read by AppShell, prefills CopilotPanel)',
       testStatus: 'Missing',
       documentationStatus: 'solution-packs.md',
       roleProfileMapping: roleProfileMapping(agentId, roleToAssets),

@@ -145,7 +145,46 @@
 - **Commit when resolved**: `1255d020`
 - **Scorecard impact when resolved**: real authentication/session-integrity fix affecting every profile's dev/demo session; closes a genuine gap in MB-K2 not previously documented (the prior MB-K2 note only covered "no production login flow" — this covers "the dev bypass session itself also silently breaks after 15 minutes with no recovery").
 
-### HEAL-070 (P1_HIGH, CONFIRMED — root cause narrowed, NOT resolved) — `/emergency/patients` is permanently stuck on its route-level "Loading patients..." fallback and never renders; one real, independent latent bug found and fixed along the way, primary cause still open
+### HEAL-070 (P1_HIGH, NOT_REPRODUCIBLE as of 2026-09-02 — re-measured, see re-test note below) — `/emergency/patients` was permanently stuck on its route-level "Loading patients..." fallback and never rendered; one real, independent latent bug found and fixed along the way
+
+**Re-test 2026-09-02 (quiet machine, dev server, live Playwright).** The hang does
+not reproduce. The route renders its first patient card in 1158ms and 2412ms
+across two cold runs, settles, and stays settled: 18 DOM mutation batches over 8
+seconds with **zero** node additions or removals — attribute/text updates only,
+which is the 1s clock components ticking, not a commit loop. Compare the original
+symptom: 30-40 full component renders in 8 seconds, never painting, for 61+
+seconds.
+
+**What is NOT proven, and why this is not closed as FIXED.** The original
+measurement was taken against a 77-patient roster; this re-test saw 7 cards from
+the backend module (46 from the store roster transiently, before the fetched
+payload replaced it). The leading theory was render-cost starvation, and card
+count is precisely the variable that theory depends on, so a 10x smaller roster
+is a confound, not a control. Nothing in this re-test rules the bug back in at 77
+cards. What can be said: at today's data volume the route is healthy, and the
+"whole route is completely unusable for every role" framing below is no longer
+an accurate description of the running application.
+
+**Plausible but unproven contributor.** Between the original finding and this
+re-test, `scheduleWorkflowAutomationRefresh` was fixed (commit 71a8356f): it threw
+`ReferenceError: Cannot access 'lastBackendEventType' before initialization` on
+every debounced fire, and `refreshWorkflowAutomationFromBackend` discarded its
+promise so the throw surfaced as an unhandled rejection. A repeatedly-throwing
+engine on a timer is the right shape to disturb commit scheduling, but no
+before/after bisect was run, so this is recorded as a candidate and not a cause.
+
+**Structural risk still standing.** `PatientGrid` still renders the full roster
+unpaginated with no virtualization, and this is still the only page in the app
+that renders every patient card at once. Whatever the original trigger, that
+property is unchanged and is what would make it recur at scale.
+
+**Adjacent finding from the same re-test (new).** With `**/api/emergency/patients**`
+aborted, first card render took **21552ms** rather than 1158ms. The route waits
+on the failing fetch instead of falling back promptly to the store roster, so a
+backend patients outage degrades this page to a ~21s blank rather than an
+immediate local render. Reproducible, and separate from the original hang.
+
+Original finding, preserved verbatim below.
 
 - **Severity**: P1_HIGH (a whole route is completely unusable for every role that can reach it — not cosmetic; also found to degrade OTHER concurrent tabs/sessions via shared backend resource pressure, see below)
 - **Domain**: Frontend rendering / state architecture (found while continuing the MB-E13 sweep; not a duplicate-CTA finding itself, but the SAME live-screenshot methodology surfaced it)

@@ -10,7 +10,7 @@
 Emergency role: admin
 
 - **Source:** `emergencyRolePermissions.ts`
-- **Permissions:** `patient.create`, `patient.demographics.edit`, `encounter.create`, `intake.verify`, `triage.assign_acuity`, `queue.move`, `reassessment.complete`, `vitals.write`, `notes.write`, `flags.manage`, `ems.handoff.complete`, `ems.prepareBay`, `ems.convertArrival`, `referral.create`, `transfers.manage`, `capacity.manage`, `boarding.manage`, `workload.reassign`, `patient.escalate`, `reception.escalate`, `patient.discharge`, `patient.assignStaff`, `patient.assignRoom`, `copilot.use`, `analytics.view`, `simulation.run`, `settings.manage`, `display.public.waitboard`, `display.public.publish`, `display.whiteboard.readonly`, `screen.admin`, `screen.command_center`, `screen.charge_nurse`, `screen.triage`, `screen.registration`, `screen.physician`, `screen.ems`
+- **Permissions:** `patient.create`, `patient.demographics.edit`, `encounter.create`, `intake.verify`, `triage.assign_acuity`, `queue.move`, `reassessment.complete`, `vitals.write`, `notes.write`, `flags.manage`, `ems.handoff.complete`, `ems.prepareBay`, `ems.convertArrival`, `ems.requestTransport`, `referral.create`, `transfers.manage`, `capacity.manage`, `boarding.manage`, `workload.reassign`, `patient.escalate`, `reception.escalate`, `patient.discharge`, `patient.assignStaff`, `patient.assignRoom`, `copilot.use`, `analytics.view`, `simulation.run`, `settings.manage`, `display.public.waitboard`, `display.public.publish`, `display.whiteboard.readonly`, `screen.admin`, `screen.command_center`, `screen.charge_nurse`, `screen.triage`, `screen.registration`, `screen.physician`, `screen.ems`
 
 ### IT Admin
 
@@ -45,7 +45,7 @@ Emergency role: triage_nurse
 Emergency role: physician
 
 - **Source:** `emergencyRolePermissions.ts`
-- **Permissions:** `patient.demographics.edit`, `queue.move`, `reassessment.complete`, `vitals.write`, `notes.write`, `flags.manage`, `patient.escalate`, `patient.discharge`, `referral.create`, `transfers.manage`, `copilot.use`, `analytics.view`, `display.whiteboard.readonly`, `screen.physician`
+- **Permissions:** `patient.demographics.edit`, `queue.move`, `reassessment.complete`, `vitals.write`, `notes.write`, `flags.manage`, `patient.escalate`, `patient.discharge`, `referral.create`, `transfers.manage`, `ems.requestTransport`, `copilot.use`, `analytics.view`, `display.whiteboard.readonly`, `screen.physician`
 
 ### Registration Clerk
 
