@@ -1,5 +1,6 @@
 import { afterEach, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
+import { cancelAllBackgroundTimers } from '../services/backgroundTimerRegistry';
 import '@testing-library/jest-dom/vitest';
 
 const originalConsoleWarn = console.warn.bind(console);
@@ -44,7 +45,26 @@ vi.mock('react-router-dom', async () => {
 
 // Cleanup after each test
 afterEach(() => {
+  // Background debounces can outlive the file that armed them and then fire
+  // against a torn-down environment, which Vitest reports as an
+  // EnvironmentTeardownError and which makes the run exit non-zero even when
+  // every test passed. Cancelling here covers every file at once rather than
+  // each suite remembering to do it. The registry is dependency-free, so this
+  // import costs nothing for files that never arm a timer.
+  cancelAllBackgroundTimers();
   cleanup();
+});
+
+afterEach(async () => {
+  // Several services hand off through `void import(...)` fire-and-forget calls.
+  // Those module graphs keep loading after the test that started them returns,
+  // and tearing the environment down mid-load is what produces
+  // "Cannot load ... after the environment was torn down". Giving the macrotask
+  // queue a few turns lets the in-flight ones finish first.
+  for (let i = 0; i < 3; i += 1) {
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  }
+  cancelAllBackgroundTimers();
 });
 
 // Mock localStorage

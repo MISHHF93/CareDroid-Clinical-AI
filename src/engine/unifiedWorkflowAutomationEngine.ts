@@ -4,6 +4,7 @@ import { fetchWorkflowOrchestration } from '../services/emergencyOsApi';
 import { useEmergencyStore } from '../store/emergencyStore';
 import type { AdministrativeAutomationTask } from '../types/administrativeAutomation';
 import { startWorkflowTrace } from '../services/observabilityTrace';
+import { registerBackgroundTimerCanceller } from '../services/backgroundTimerRegistry';
 
 var REFRESH_DEBOUNCE_MS = 1_500;
 var refreshTimerId: number | null = null;
@@ -34,7 +35,13 @@ export function scheduleWorkflowAutomationRefresh(eventType?: string): void {
   }
   refreshTimerId = window.setTimeout(() => {
     refreshTimerId = null;
-    void refreshWorkflowAutomationFromBackend(eventType);
+    // The promise was discarded bare. refreshWorkflowAutomationFromBackend is
+    // async, so anything it throws -- including a module binding that is not
+    // initialized yet when this debounce fires late -- became an unhandled
+    // rejection that failed the whole run rather than a logged failure.
+    void refreshWorkflowAutomationFromBackend(eventType).catch((error) => {
+      console.error('[UnifiedWorkflowAutomationEngine] debounced refresh failed:', error);
+    });
   }, REFRESH_DEBOUNCE_MS);
 }
 
@@ -53,6 +60,10 @@ export function cancelWorkflowAutomationRefresh(): void {
     refreshTimerId = null;
   }
 }
+
+// The debounce below can outlive whatever scheduled it, so make it cancellable
+// from a teardown path that has no reason to know this module exists.
+registerBackgroundTimerCanceller(cancelWorkflowAutomationRefresh);
 
 export async function refreshWorkflowAutomationFromBackend(eventType?: string): Promise<void> {
   const trace = startWorkflowTrace('workflow-automation-refresh', {
@@ -95,6 +106,8 @@ export function handleWorkflowAutomationBackendEvent(eventType: string): void {
 }
 
 export function startUnifiedWorkflowAutomationEngine(): () => void {
-  void refreshWorkflowAutomationFromBackend('engine_start');
+  void refreshWorkflowAutomationFromBackend('engine_start').catch((error) => {
+    console.error('[UnifiedWorkflowAutomationEngine] engine-start refresh failed:', error);
+  });
   return cancelWorkflowAutomationRefresh;
 }
