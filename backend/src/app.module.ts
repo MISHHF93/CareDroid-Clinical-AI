@@ -45,7 +45,6 @@ import { RAGModule } from './modules/rag/rag.module';
 import { NotificationModule } from './modules/notifications/notification.module';
 import { EmailModule } from './modules/email/email.module';
 import { CacheModule } from './modules/cache/cache.module';
-import { LiveTrackingModule } from './modules/live-tracking/live-tracking.module';
 import { ClinicalAlertsModule } from './modules/clinical-alerts/clinical-alerts.module';
 import { PlatformSystemsModule } from './modules/platform-systems/platform-systems.module';
 import { UserProfileModule } from './modules/user-profile/user-profile.module';
@@ -235,7 +234,6 @@ function resolveDatabaseClient() {
     EhrAuditModule,
     ObservabilityModule,
     UserProfileModule,
-    LiveTrackingModule,
     HospitalMapModule,
     TelemetryModule,
     FleetModule,
