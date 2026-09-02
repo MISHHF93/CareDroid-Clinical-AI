@@ -98,6 +98,51 @@ Testing expectations:
 - Add focused tests for AI schema validation, response shape, error handling, fallback behavior, and AI card rendering.
 - Keep the app buildable with frontend typecheck and Vite build.
 
+## Verifying your work
+
+Do not invent a verification command or reach for a narrow `test:*` script.
+There is one command per stage, and they compose:
+
+```bash
+npm run doctor            # environment diagnosis; changes nothing
+npm run verify            # typecheck (BOTH sides) + lint + docs:check + deps:integrity + architecture:check
+npm run verify:full       # verify + the whole frontend suite + root integration
+npm run production:check  # verify:full + frontend and backend builds
+```
+
+- **`npm run verify` before you claim a change is done.** It typechecks the
+  backend too; `typecheck:frontend` alone will miss a backend break.
+- **`npm run test:run:parallel` is how you run the whole frontend suite.**
+  Plain `vitest run` is serial and slow enough to get abandoned midway, which
+  is how partial runs get reported as full ones.
+- **`npm run validate:ci` is NOT the full suite.** It runs a named subset of
+  frontend tests plus backend build/test/e2e and a bundle-budget check. A green
+  CI is a weaker claim than a green `verify:full`; do not conflate them.
+- **Do not edit source while a full suite run is in flight.** Mid-run edits
+  produce stale-read failures that look like real regressions.
+- Report what actually ran. If a suite failed, say so with the output; if a
+  step was skipped, say that.
+
+`npm run architecture:check` enforces two rules the type system cannot:
+
+1. **No new import cycles.** A module calling into a partially-initialized
+   module is how `ReferenceError: Cannot access 'X' before initialization`
+   reaches production, which has happened here. Held to a baseline, not zero --
+   lower the baseline when you genuinely break one, never raise it without a
+   comment saying why the new cycle is unavoidable.
+2. **No `src/` importing `backend/src/`.** The boundary is the HTTP API.
+
+When a route redirects and neither access-denied panel renders, check
+`ED_EXTENSION_ROUTE_REDIRECTS` (`src/config/edApplication.config.ts`) before
+anything else: it matches by *prefix* above the route tree, so grepping the
+redirect tables for your path finds nothing. This has silently swallowed a real
+route three times.
+
+**Unwired is not dead.** A module with no importers is usually a function not
+linked yet, not garbage. Read what it does and either wire it or label it;
+delete only what actively contradicts the live implementation. Before deleting
+anything, grep tests twice -- once for imports, once for files that read it
+from disk (`readFileSync`), because contract tests do the latter.
 ## User profiles and role-based access control
 
 CareDroid models realistic hospital roles for the CareDroid Virtual City Health Network.
