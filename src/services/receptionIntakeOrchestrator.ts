@@ -199,6 +199,41 @@ function createId(prefix: string, now = Date.now()): string {
  * the backend helper this mirrors): the frontend's local store only ever
  * holds the current session's own organization's patients.
  */
+/**
+ * The two background handoffs below are deliberately fire-and-forget: a walk-in
+ * intake must not block on the journey orchestrator or the automation engine,
+ * and both are imported dynamically so their (heavy) module graphs stay out of
+ * the reception bundle.
+ *
+ * Nothing could await them, though, which made them invisible to tests. A suite
+ * that completed while an import was still resolving tore its environment down
+ * underneath it, and Vitest reported an EnvironmentTeardownError for whatever
+ * module happened to be mid-load -- 85 of the 99 errors in a full run, all from
+ * receptionIntakeOrchestrator.test.ts, surfacing as
+ * "Cannot load administrativeAutomationAiUtils.ts / prehospitalAssessmentService.ts
+ * after the environment was torn down". The tests passed; the run still exited 1.
+ *
+ * Tracking the promises keeps production behaviour identical -- callers still do
+ * not wait -- while giving tests (and anything else that needs to settle) a way
+ * to await the work instead of racing it.
+ */
+const pendingBackgroundWork = new Set<Promise<unknown>>();
+
+function trackBackgroundWork(work: Promise<unknown>): void {
+  pendingBackgroundWork.add(work);
+  void work.finally(() => {
+    pendingBackgroundWork.delete(work);
+  });
+}
+
+/** Resolves once every background handoff started so far has settled. */
+export async function flushReceptionIntakeBackgroundWork(): Promise<void> {
+  while (pendingBackgroundWork.size > 0) {
+    // A settled handoff can start another, so drain rather than snapshot once.
+    await Promise.allSettled([...pendingBackgroundWork]);
+  }
+}
+
 export function generateCollisionSafeReceptionMrn(existingPatients: Patient[] = []): string {
   const MAX_ATTEMPTS = 5;
   const isTaken = (candidate: string) => existingPatients.some((patient) => patient.mrn === candidate);
@@ -947,20 +982,28 @@ export async function createPatientAndRouteFromReception(
     });
   }
 
-  void import('./emergencyCareJourneyOrchestrator').then(({ onRapidIntakeCompleted }) =>
-    onRapidIntakeCompleted(enrichedPatient, {
-      criticalAlertId,
-      actorName,
-    }),
-  ).catch((error) => {
-    console.error('[ReceptionIntakeOrchestrator] onRapidIntakeCompleted failed:', error);
-  });
+  trackBackgroundWork(
+    import('./emergencyCareJourneyOrchestrator')
+      .then(({ onRapidIntakeCompleted }) =>
+        onRapidIntakeCompleted(enrichedPatient, {
+          criticalAlertId,
+          actorName,
+        }),
+      )
+      .catch((error) => {
+        console.error('[ReceptionIntakeOrchestrator] onRapidIntakeCompleted failed:', error);
+      }),
+  );
 
-  void import('../engine/unifiedWorkflowAutomationEngine').then(({ scheduleWorkflowAutomationRefresh }) =>
-    scheduleWorkflowAutomationRefresh('patient_created'),
-  ).catch((error) => {
-    console.error('[ReceptionIntakeOrchestrator] scheduleWorkflowAutomationRefresh failed:', error);
-  });
+  trackBackgroundWork(
+    import('../engine/unifiedWorkflowAutomationEngine')
+      .then(({ scheduleWorkflowAutomationRefresh }) =>
+        scheduleWorkflowAutomationRefresh('patient_created'),
+      )
+      .catch((error) => {
+        console.error('[ReceptionIntakeOrchestrator] scheduleWorkflowAutomationRefresh failed:', error);
+      }),
+  );
 
   const latestPatient =
     useEmergencyStore.getState().patients.find((entry) => entry.id === enrichedPatient.id) || enrichedPatient;

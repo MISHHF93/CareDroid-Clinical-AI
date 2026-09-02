@@ -28,6 +28,7 @@ const {
   routeQuickIntakeThroughOrchestrator,
   runReceptionAiIntakeAssist,
   syncReceptionPatientToBackend,
+  flushReceptionIntakeBackgroundWork,
 } = await import('./receptionIntakeOrchestrator');
 
 import type { ReceptionIntakeDraft } from './receptionIntakeOrchestrator';
@@ -75,6 +76,25 @@ function baseDraft(patch: Partial<ReceptionIntakeDraft> = {}): ReceptionIntakeDr
 }
 
 describe('receptionIntakeOrchestrator', () => {
+  // createPatientAndRouteFromReception starts two fire-and-forget handoffs that
+  // dynamically import the journey orchestrator and the automation engine. Without
+  // waiting for them, this file ended while those graphs were still loading and the
+  // torn-down environment produced 85 EnvironmentTeardownErrors -- every test passed
+  // and the run still exited 1.
+  afterEach(async () => {
+    await flushReceptionIntakeBackgroundWork();
+    // The automation refresh is debounced 1.5s out, well past the end of these
+    // tests; left armed it fires against a torn-down module graph.
+    // emergencyCareJourneyOrchestrator starts its own untracked fire-and-forget
+    // import of the engine, so the debounce can be re-armed after the flush
+    // above drains. Let the macrotask queue turn over first, then cancel.
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    const { cancelWorkflowAutomationRefresh } = await import(
+      '../engine/unifiedWorkflowAutomationEngine'
+    );
+    cancelWorkflowAutomationRefresh();
+  });
+
   beforeEach(() => {
     resetStore();
     vi.clearAllMocks();
