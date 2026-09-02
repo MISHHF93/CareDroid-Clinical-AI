@@ -186,11 +186,12 @@
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "typecheck:backend": "cd backend && tsc --noEmit -p tsconfig.json",
     "typecheck:all": "npm run typecheck && npm run typecheck:backend",
-    "verify": "npm run typecheck:all && npm run lint && npm run docs:check && npm run deps:integrity",
+    "verify": "npm run typecheck:all && npm run lint && npm run docs:check && npm run deps:integrity && npm run architecture:check",
     "verify:full": "npm run verify && npm run test:run:parallel && npm run test:integration",
     "production:check": "npm run verify:full && npm run build && npm run build:backend",
     "build:backend": "cd backend && npm run build",
-    "deps:integrity": "knip --include unlisted,unresolved --no-progress"
+    "deps:integrity": "knip --include unlisted,unresolved --no-progress",
+    "architecture:check": "node scripts/architecture-check.mjs"
   },
   "dependencies": {
     "axios": "^1.16.1",
