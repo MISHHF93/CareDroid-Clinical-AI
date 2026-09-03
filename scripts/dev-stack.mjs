@@ -141,7 +141,6 @@ let backendPort = preferredBackendPort;
 let frontendEnv;
 let backendEnv;
 let frontendOrigin;
-let backendOrigin;
 
 const isCareDroidHealthPayload = (rawBody = '') => {
   try {
@@ -527,10 +526,7 @@ if (!frontendProxyHealthy && backendAlreadyHealthy && !forceRestart) {
   const existingFrontendPort = await findExistingCareDroidFrontendPort(preferredFrontendPort);
   if (existingFrontendPort) {
     frontendPort = existingFrontendPort;
-    ({ frontendEnv, backendEnv, frontendOrigin, backendOrigin } = buildStackEnv(
-      frontendPort,
-      backendPort,
-    ));
+    ({ frontendEnv, backendEnv, frontendOrigin } = buildStackEnv(frontendPort, backendPort));
     frontendProxyHealthy = true;
   }
 }

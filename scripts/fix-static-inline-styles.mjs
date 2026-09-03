@@ -327,7 +327,6 @@ function transformV2(src) {
       if (gt >= 0 && gt < start) continue;
     }
 
-    const openSlice = out.slice(tagStart, start);
     // className may not be immediately before style; search in open tag
     const openTagEnd = out.indexOf('>', end);
     const fullOpen = out.slice(tagStart, openTagEnd === -1 ? end : openTagEnd);

@@ -66,57 +66,6 @@ function qsofaScore(vitals) {
   };
 }
 
-// ─── Protocol keyword retrieval (simulates RAG top-1 against registry topics) ───
-const PROTOCOL_INDEX = [
-  {
-    id: 'kn-acls-cardiac-arrest-v1',
-    keywords: [
-      'cardiac arrest',
-      'vf',
-      'pvt',
-      'defibrill',
-      'epinephrine',
-      'acls',
-      'shockable',
-      'cpr',
-    ],
-  },
-  {
-    id: 'kn-sepsis-hour-1-v1',
-    keywords: ['sepsis', 'hour-1', 'hour 1', 'lactate', 'antibiotic', 'vasopressor', 'bundle'],
-  },
-  {
-    id: 'kn-sofa-overview-v1',
-    keywords: ['sofa', 'organ failure', 'bilirubin', 'platelets', 'sequential organ'],
-  },
-  {
-    id: 'kn-warfarin-aspirin-v1',
-    keywords: ['warfarin', 'aspirin', 'bleeding', 'inr', 'anticoagul'],
-  },
-  {
-    id: 'kn-stroke-fast-v1',
-    keywords: ['stroke', 'fast', 'facial droop', 'last known well', 'slurred'],
-  },
-  {
-    id: 'kn-pediatric-fever-caution-v1',
-    keywords: ['pediatric', 'fever', 'infant', 'neonate', 'child', 'pals'],
-  },
-  {
-    id: 'kn-pregnancy-ed-caution-v1',
-    keywords: ['pregnancy', 'pregnant', 'trimester', 'obstetric', 'gestational'],
-  },
-];
-
-function retrieveProtocol(query) {
-  const q = String(query || '').toLowerCase();
-  let best = { id: null, score: 0 };
-  for (const row of PROTOCOL_INDEX) {
-    const score = row.keywords.reduce((n, k) => n + (q.includes(k) ? 1 : 0), 0);
-    if (score > best.score) best = { id: row.id, score };
-  }
-  return best.score > 0 ? best.id : null;
-}
-
 // ─── Tool selection heuristic (mirrors expected copilot routing) ───
 function selectTool(query) {
   const q = String(query || '').toLowerCase();
@@ -217,7 +166,6 @@ function scoreTool(caseRow) {
 function scoreMissing(caseRow) {
   const expected = new Set(caseRow.expect?.missing || []);
   const got = new Set(caseRow.fixtureCandidate?.missing || []);
-  const missingExpected = [...expected].filter((k) => !got.has(k));
   // stricter: exact set equality for success cases
   const exact = expected.size === got.size && [...expected].every((k) => got.has(k));
   return { pass: exact, detail: `expected=[${[...expected]}] got=[${[...got]}]` };
