@@ -9,6 +9,10 @@ import {
   auditPlatformIntelligence,
   buildPlatformIntelligenceAssessment,
 } from './platformIntelligenceModel';
+import {
+  PLATFORM_INTELLIGENCE_MODULE_PROVENANCE,
+  PLATFORM_INTELLIGENCE_PROVENANCE,
+} from './platformIntelligenceRegistry';
 import { buildDataLineageExplorer } from '../data/dataLineageExplorer';
 
 describe('platformIntelligenceModel', () => {
@@ -77,5 +81,30 @@ describe('platformIntelligenceModel', () => {
       117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136,
     ]);
     expect(Object.keys(audit.moduleScores)).toHaveLength(20);
+  });
+});
+
+describe('module score provenance', () => {
+  // Half these modules score themselves from lists inside the model file.
+  // The hub prints an overall number, so it has to be able to say how much of
+  // it is measured -- and that claim is only worth anything if every module
+  // carries a label and the counts add up. assessReportingStudio was shipped
+  // as LIVE by mistake (it takes no arguments and returns 100 from a hardcoded
+  // template list); this is what would have caught it.
+  it('labels every module and the counts reconcile', () => {
+    const assessment = buildPlatformIntelligenceAssessment({});
+    const values = Object.values(PLATFORM_INTELLIGENCE_PROVENANCE);
+
+    for (const module of assessment.modules) {
+      expect(values, `${module.id} has no provenance`).toContain(module.provenance);
+      expect(PLATFORM_INTELLIGENCE_MODULE_PROVENANCE[module.id]).toBe(module.provenance);
+    }
+
+    expect(Object.keys(PLATFORM_INTELLIGENCE_MODULE_PROVENANCE)).toHaveLength(
+      assessment.modules.length,
+    );
+    expect(
+      assessment.summary.liveModuleCount + assessment.summary.registryModuleCount,
+    ).toBe(assessment.modules.length);
   });
 });

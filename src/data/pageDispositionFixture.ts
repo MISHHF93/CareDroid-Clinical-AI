@@ -46,9 +46,9 @@ import {
 // TrackMind workspace hub: src/pages/trackmind/TrackMindWorkspaceHub.tsx + .css
 // are new, real files -- the page routes.config.ts had declared since
 // 2026-08-26 while recording that no component existed. +1 source, +1 style.
-export const PAGE_INVENTORY_EXPECTED_TOTAL = 261;
-export const PAGE_SOURCE_EXPECTED_TOTAL = 164;
-export const PAGE_STYLE_EXPECTED_TOTAL = 97;
+export const PAGE_INVENTORY_EXPECTED_TOTAL = 265;
+export const PAGE_SOURCE_EXPECTED_TOTAL = 166;
+export const PAGE_STYLE_EXPECTED_TOTAL = 99;
 export const PAGE_TOOLS_INVENTORY_EXPECTED_TOTAL = 58;
 export const PAGE_TOOLS_SOURCE_EXPECTED_TOTAL = 48;
 
