@@ -16,12 +16,27 @@ import { PLATFORM_AI_MODEL_REGISTRY } from './aiModelRegistry';
 export function getLocalTrainedMlModelRegistry() {
   const modelsRoot = path.join(process.cwd(), 'backend', 'ml-services', 'models');
   const manifestPath = path.join(modelsRoot, 'manifest.json');
+  // Both heads are loaded IN-PROCESS by the unified AI node (see
+  // intent-classifier.service.ts: "Unified AI node -- intent head +
+  // artifact-router head (in-process by default)"). They are not separately
+  // addressable over HTTP.
+  //
+  // This list used to advertise `/api/nlu/predict` and
+  // `${MODELS_PATH}/route` as each head's route. Both 404 -- verified against
+  // a running backend, not assumed -- and these entries surface on the
+  // governance Artifacts page, so it was telling operators to hit endpoints
+  // that do not exist. `statusRoute` is the endpoint that genuinely reports
+  // each head (it returns heads.nlu / heads.artifactRouter with loaded flags,
+  // architecture and accuracy), and `invocation` says how the head is actually
+  // reached. The real HTTP surface that exercises them is POST
+  // CARE_DROID_AI_NODE_PATH, already carried below as `nodeRoute`.
   const heads = [
     {
       modelId: 'nlu-intent-classifier',
       name: 'NLU Intent Classifier',
       head: 'nlu',
-      route: '/api/nlu/predict',
+      statusRoute: `${CARE_DROID_UNIFIED_AI_NODE_MODELS_PATH}/health`,
+      invocation: 'in-process (unified AI node)',
       purpose:
         'Maps clinical utterances to 10 governed intent classes for chat, copilot, and AI Chief routing.',
     },
@@ -29,7 +44,8 @@ export function getLocalTrainedMlModelRegistry() {
       modelId: 'artifact-router',
       name: 'Artifact Router',
       head: 'artifact-router',
-      route: `${CARE_DROID_UNIFIED_AI_NODE_MODELS_PATH}/route`,
+      statusRoute: `${CARE_DROID_UNIFIED_AI_NODE_MODELS_PATH}/health`,
+      invocation: 'in-process (unified AI node)',
       purpose:
         'Maps utterances to artifact types (calculator, tool, route, …) for unified AI node routing.',
     },
@@ -53,7 +69,8 @@ export function getLocalTrainedMlModelRegistry() {
       name: head.name,
       purpose: head.purpose,
       head: head.head,
-      route: head.route,
+      statusRoute: head.statusRoute,
+      invocation: head.invocation,
       classifierPath: ['backend', 'ml-services', 'models', head.head, 'classifier.json'].join('/'),
       metricsPath: ['backend', 'ml-services', 'models', head.head, 'metrics.json'].join('/'),
       manifestPath: 'backend/ml-services/models/manifest.json',
