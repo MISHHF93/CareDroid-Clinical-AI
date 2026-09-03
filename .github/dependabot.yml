@@ -1,0 +1,65 @@
+# Dependency updates as reviewable PRs with release notes, gated by validate.yml.
+#
+# Dependabot is built into GitHub and needs no app installation, which is why
+# it is used instead of Renovate. It replaces dependency-updates.yml, which
+# ran an unreviewable `npm update && npm audit fix` every Monday and opened one
+# PR carrying every bump at once.
+#
+# Two npm trees (the backend is a separate package, not a workspace). Routine
+# minor/patch bumps arrive as one grouped PR per tree per week; majors of the
+# packages the schema, auth and crypto sit on are ignored here and bumped by a
+# human on purpose.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '08:00'
+      timezone: America/Toronto
+    open-pull-requests-limit: 5
+    groups:
+      non-major:
+        update-types: [minor, patch]
+    ignore:
+      - dependency-name: react
+        update-types: [version-update:semver-major]
+      - dependency-name: react-dom
+        update-types: [version-update:semver-major]
+      - dependency-name: vite
+        update-types: [version-update:semver-major]
+      - dependency-name: typescript
+        update-types: [version-update:semver-major]
+
+  - package-ecosystem: npm
+    directory: /backend
+    schedule:
+      interval: weekly
+      day: monday
+      time: '08:00'
+      timezone: America/Toronto
+    open-pull-requests-limit: 5
+    groups:
+      non-major:
+        update-types: [minor, patch]
+    ignore:
+      - dependency-name: typeorm
+        update-types: [version-update:semver-major]
+      - dependency-name: pg
+        update-types: [version-update:semver-major]
+      - dependency-name: sqlite3
+        update-types: [version-update:semver-major]
+      - dependency-name: bcrypt
+        update-types: [version-update:semver-major]
+      - dependency-name: jsonwebtoken
+        update-types: [version-update:semver-major]
+      - dependency-name: helmet
+        update-types: [version-update:semver-major]
+      - dependency-name: '@nestjs/*'
+        update-types: [version-update:semver-major]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
