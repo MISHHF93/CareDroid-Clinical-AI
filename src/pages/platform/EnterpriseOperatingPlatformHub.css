@@ -1,0 +1,310 @@
+/*
+ * Enterprise operating platform hub.
+ *
+ * Deliberately the same visual system as PlatformIntelligenceHub.css -- the
+ * two pages present the same thing (weighted modules, a headline score and a
+ * measured/self-reported split), so they should not look like different
+ * products. Generated from that sheet with the class prefix swapped; if you
+ * restyle one, restyle both, or extract a shared sheet.
+ *
+ * CDL 2.1 custom properties only, so both themes follow the token set.
+ */
+
+.eop-hub {
+  max-width: 76rem;
+  margin: 0 auto;
+  padding: var(--cdl-space-6, 24px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--cdl-space-5, 20px);
+  color: var(--cdl-text, #0f172a);
+}
+
+.eop-hub__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--cdl-space-5, 20px);
+}
+
+.eop-hub__eyebrow {
+  margin: 0 0 var(--cdl-space-1, 4px);
+  font-size: var(--cdl-text-xs, 12px);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cdl-text-muted, #475569);
+}
+
+.eop-hub__header h1 {
+  margin: 0;
+  font-size: var(--cdl-text-2xl, 24px);
+  font-weight: var(--cdl-font-semibold, 600);
+  text-wrap: balance;
+}
+
+.eop-hub__subtitle {
+  margin: var(--cdl-space-1, 4px) 0 0;
+  color: var(--cdl-text-muted, #475569);
+  max-width: 64ch;
+}
+
+.eop-hub__score {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 7.5rem;
+  padding: var(--cdl-space-4, 16px);
+  border: 1px solid var(--cdl-border, #e2e8f0);
+  border-radius: var(--cdl-radius-lg, 12px);
+  background: var(--cdl-surface, #ffffff);
+  box-shadow: var(--cdl-elev-1);
+}
+
+.eop-hub__score strong {
+  font-size: var(--cdl-text-3xl, 30px);
+  font-weight: var(--cdl-font-semibold, 600);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.eop-hub__score span {
+  font-size: var(--cdl-text-sm, 14px);
+  color: var(--cdl-text-muted, #475569);
+  text-transform: capitalize;
+}
+
+.eop-hub__coverage {
+  padding: var(--cdl-space-4, 16px);
+  border: 1px solid var(--cdl-warning-border, #fcd34d);
+  border-left-width: 4px;
+  border-radius: var(--cdl-radius-md, 8px);
+  background: var(--cdl-warning-surface, #fffbeb);
+  color: var(--cdl-warning-text, #78350f);
+}
+
+.eop-hub__coverage h2 {
+  display: flex;
+  align-items: center;
+  gap: var(--cdl-space-2, 8px);
+  margin: 0 0 var(--cdl-space-2, 8px);
+  font-size: var(--cdl-text-base, 16px);
+  font-weight: var(--cdl-font-semibold, 600);
+}
+
+.eop-hub__coverage p {
+  margin: 0;
+  max-width: 80ch;
+  line-height: 1.55;
+}
+
+.eop-hub__facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: var(--cdl-space-4, 16px);
+  margin: 0;
+  padding: var(--cdl-space-4, 16px);
+  border: 1px solid var(--cdl-border, #e2e8f0);
+  border-radius: var(--cdl-radius-lg, 12px);
+  background: var(--cdl-surface, #ffffff);
+}
+
+.eop-hub__facts dt {
+  font-size: var(--cdl-text-xs, 12px);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--cdl-text-muted, #475569);
+}
+
+.eop-hub__facts dd {
+  margin: var(--cdl-space-1, 4px) 0 0;
+  font-weight: var(--cdl-font-semibold, 600);
+  font-variant-numeric: tabular-nums;
+}
+
+.eop-hub__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cdl-space-2, 8px);
+}
+
+.eop-hub__filter {
+  padding: var(--cdl-space-2, 8px) var(--cdl-space-3, 12px);
+  border: 1px solid var(--cdl-border, #e2e8f0);
+  border-radius: var(--cdl-radius-full, 9999px);
+  background: var(--cdl-surface, #ffffff);
+  color: inherit;
+  font: inherit;
+  font-size: var(--cdl-text-sm, 14px);
+  cursor: pointer;
+}
+
+.eop-hub__filter[data-active='true'] {
+  border-color: var(--app-accent, var(--cdl-brand-500, #0f766e));
+  background: var(--cdl-surface-muted, #f1f5f9);
+  font-weight: var(--cdl-font-semibold, 600);
+}
+
+.eop-hub__filter:focus-visible {
+  outline: 2px solid var(--app-accent, var(--cdl-brand-500, #0f766e));
+  outline-offset: 2px;
+}
+
+.eop-hub__modules {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr));
+  gap: var(--cdl-space-4, 16px);
+}
+
+.eop-hub__module {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cdl-space-2, 8px);
+  padding: var(--cdl-space-4, 16px);
+  border: 1px solid var(--cdl-border, #e2e8f0);
+  border-radius: var(--cdl-radius-lg, 12px);
+  background: var(--cdl-surface, #ffffff);
+}
+
+.eop-hub__module-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--cdl-space-3, 12px);
+}
+
+.eop-hub__module-head h2 {
+  margin: 0;
+  font-size: var(--cdl-text-base, 16px);
+  font-weight: var(--cdl-font-semibold, 600);
+}
+
+.eop-hub__module-desc {
+  margin: 2px 0 0;
+  font-size: var(--cdl-text-sm, 14px);
+  color: var(--cdl-text-muted, #475569);
+  line-height: 1.45;
+}
+
+.eop-hub__module-score {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  white-space: nowrap;
+}
+
+.eop-hub__module-score strong {
+  font-size: var(--cdl-text-xl, 20px);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.eop-hub__module-score span {
+  font-size: var(--cdl-text-xs, 12px);
+  text-transform: capitalize;
+  color: var(--cdl-text-muted, #475569);
+}
+
+.eop-hub__module-score span[data-status='ready'] {
+  color: var(--cdl-success-text, #065f46);
+}
+
+.eop-hub__module-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cdl-space-2, 8px);
+  margin: 0;
+  font-size: var(--cdl-text-xs, 12px);
+  color: var(--cdl-text-muted, #475569);
+}
+
+.eop-hub__provenance {
+  padding: 2px var(--cdl-space-2, 8px);
+  border-radius: var(--cdl-radius-full, 9999px);
+  font-weight: var(--cdl-font-semibold, 600);
+}
+
+.eop-hub__provenance[data-provenance='live'] {
+  background: var(--cdl-success-surface, #ecfdf5);
+  color: var(--cdl-success-text, #065f46);
+}
+
+.eop-hub__provenance[data-provenance='registry'] {
+  background: var(--cdl-warning-surface, #fffbeb);
+  color: var(--cdl-warning-text, #78350f);
+}
+
+.eop-hub__kpis {
+  list-style: none;
+  margin: var(--cdl-space-1, 4px) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--cdl-space-1, 4px);
+}
+
+.eop-hub__kpis li {
+  display: grid;
+  grid-template-columns: 1rem 1fr auto;
+  align-items: baseline;
+  gap: var(--cdl-space-2, 8px);
+  font-size: var(--cdl-text-sm, 14px);
+}
+
+.eop-hub__kpis svg {
+  width: 0.875em;
+  height: 0.875em;
+  align-self: center;
+  color: var(--cdl-text-muted, #475569);
+}
+
+.eop-hub__kpis li[data-passes='true'] svg {
+  color: var(--cdl-success-text, #065f46);
+}
+
+.eop-hub__kpis em {
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.eop-hub__kpis small {
+  color: var(--cdl-text-muted, #475569);
+}
+
+.eop-hub__footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cdl-space-4, 16px);
+  margin: 0;
+}
+
+.eop-hub__footer a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cdl-space-1, 4px);
+  color: inherit;
+  font-weight: var(--cdl-font-medium, 500);
+}
+
+.eop-hub__footer a:focus-visible {
+  outline: 2px solid var(--app-accent, var(--cdl-brand-500, #0f766e));
+  outline-offset: 2px;
+}
+
+.eop-hub__footer svg {
+  width: 0.875em;
+  height: 0.875em;
+}
+
+.eop-hub__module-score span[data-status='watch'] {
+  color: var(--cdl-warning-text, #78350f);
+}
+
+.eop-hub__module-score span[data-status='at-risk'] {
+  color: var(--cdl-danger-text, #991b1b);
+}

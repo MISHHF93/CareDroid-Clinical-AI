@@ -189,7 +189,7 @@ describe('canonical route tree', () => {
     // (see HEAL-347.78's 9-entry sweep) -- either way this should never be
     // silently true, so it's asserted here across every nav item at once
     // rather than one path at a time as new instances are found.
-    // These 2 are a DIFFERENT case from /customer-portal and /workspaces:
+    // This one is a DIFFERENT case from /customer-portal and /workspaces:
     // all carry real, dedicated trackMindPermission grants
     // (trackmind.workspace.view / .enterprise.view / .intelligence.view) and
     // platform-admin has its own MANAGE_USERS/CONFIGURE_SYSTEM buckets plus
@@ -210,7 +210,7 @@ describe('canonical route tree', () => {
     // page, then drop the shadow. The remaining three must follow the same
     // order: page first, THEN the redirect entry, or they regress to the
     // bare-fallback state above.
-    const KNOWN_MISSING_TRACKMIND_PAGES = new Set(['/platform-admin', '/enterprise-platform']);
+    const KNOWN_MISSING_TRACKMIND_PAGES = new Set(['/platform-admin']);
     const { resolveEdExtensionRedirect } = await import('../config/edApplication.config');
     const { APP_SHELL_NAV_ITEMS, ACCOUNT_UTILITY_NAV_ITEMS, SOLUTIONS_SIDEBAR_NAV_ITEMS, OPERATIONS_SIDEBAR_NAV_ITEMS, ADVANCED_SIDEBAR_NAV_ITEMS } = await import('../config/navigation.config');
     const navItemArrays = [APP_SHELL_NAV_ITEMS, ACCOUNT_UTILITY_NAV_ITEMS, SOLUTIONS_SIDEBAR_NAV_ITEMS, OPERATIONS_SIDEBAR_NAV_ITEMS, ADVANCED_SIDEBAR_NAV_ITEMS];

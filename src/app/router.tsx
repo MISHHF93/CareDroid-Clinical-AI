@@ -40,6 +40,7 @@ const TwoFactorSetupPage = lazyRoute(() => import('../pages/auth/TwoFactorSetupP
 const TrackMindWorkspaceHub = lazyRoute(() => import('../pages/trackmind/TrackMindWorkspaceHub'));
 const TrackMindMaturityDashboard = lazyRoute(() => import('../pages/trackmind/TrackMindMaturityDashboard'));
 const PlatformIntelligenceHub = lazyRoute(() => import('../pages/platform/PlatformIntelligenceHub'));
+const EnterpriseOperatingPlatformHub = lazyRoute(() => import('../pages/platform/EnterpriseOperatingPlatformHub'));
 
 // ── Developer-only design-system catalog (item 41) ──────────────────────────
 // Deliberately NOT in CANONICAL_ROUTE_MAP, any navigation config, or the
@@ -1235,6 +1236,20 @@ export function AppRoutes() {
         <Route
           path={CANONICAL_ROUTES.workspaces}
           element={<EdApplicationEntryRedirect />}
+        />
+        {/*
+          Enterprise operating platform. TrackMind-guarded like its siblings;
+          enterpriseView is the permission that gates this path.
+        */}
+        <Route
+          path={CANONICAL_ROUTES.enterprisePlatform}
+          element={
+            <TrackMindRouteGuard path={CANONICAL_ROUTES.enterprisePlatform}>
+              <LazyRoute label="Loading enterprise operating platform...">
+                <EnterpriseOperatingPlatformHub />
+              </LazyRoute>
+            </TrackMindRouteGuard>
+          }
         />
         {/*
           Platform intelligence. TrackMind-guarded like its siblings: the 20

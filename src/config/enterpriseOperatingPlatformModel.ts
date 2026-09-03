@@ -10,6 +10,8 @@ import { auditTrackMindMaturity } from './trackMindMaturityModel';
 import {
   ENTERPRISE_PLATFORM_MODULE,
   ENTERPRISE_PLATFORM_MODULES,
+  ENTERPRISE_PLATFORM_MODULE_PROVENANCE,
+  ENTERPRISE_PLATFORM_PROVENANCE,
 } from './enterpriseOperatingPlatformRegistry';
 
 export { ENTERPRISE_PLATFORM_MODULE, ENTERPRISE_PLATFORM_MODULES };
@@ -665,7 +667,13 @@ export function buildEnterpriseOperatingPlatformAssessment({
   const modules = ENTERPRISE_PLATFORM_MODULES.map((meta) => {
     const assess = MODULE_ASSESSORS[meta.id];
     const result = assess(context, signals);
-    return Object.freeze({ ...meta, assessment: result });
+    return Object.freeze({
+      ...meta,
+      assessment: result,
+      provenance:
+        ENTERPRISE_PLATFORM_MODULE_PROVENANCE[meta.id] ||
+        ENTERPRISE_PLATFORM_PROVENANCE.REGISTRY,
+    });
   });
 
   const overallScore = clampScore(
@@ -679,6 +687,13 @@ export function buildEnterpriseOperatingPlatformAssessment({
     generatedAt: new Date().toISOString(),
     organizationName,
     framework: 'TrackMind Enterprise Operating Platform (Prompts 99–116)',
+    // How much of overallScore actually tracks the platform.
+    liveModuleCount: modules.filter(
+      (module) => module.provenance === ENTERPRISE_PLATFORM_PROVENANCE.LIVE,
+    ).length,
+    registryModuleCount: modules.filter(
+      (module) => module.provenance === ENTERPRISE_PLATFORM_PROVENANCE.REGISTRY,
+    ).length,
     overallScore,
     overallStatus: statusFromScore(overallScore),
     modules,

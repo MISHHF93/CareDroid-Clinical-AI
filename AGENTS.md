@@ -38,6 +38,22 @@ plain `vitest run` is serial. `npm run validate:ci` is a **subset**, so a green
 CI is a weaker claim than a green `verify:full`. Never edit source while a full
 suite run is in flight.
 
+## Adding a page file? Update the inventory pins
+
+Every `.tsx`/`.css` you add under `src/pages/` is counted by
+`src/data/pageDispositionFixture.ts`, which pins the totals so new pages get
+noticed rather than accumulating silently. Adding a page without bumping
+`PAGE_INVENTORY_EXPECTED_TOTAL` / `PAGE_SOURCE_EXPECTED_TOTAL` /
+`PAGE_STYLE_EXPECTED_TOTAL` fails `pageDispositionFixture.test.ts`.
+
+It is easy to miss because targeted test runs selected by keyword usually do
+not match that file — it surfaces only in the full suite, as one failure among
+thousands. If you added a page, run:
+
+```bash
+npx vitest run src/data/pageDispositionFixture.test.ts
+```
+
 ## Two traps that have each cost real time
 
 - **A route redirects and neither access-denied panel renders.** Check

@@ -82,8 +82,13 @@ export const ED_EXTENSION_ROUTE_REDIRECTS: readonly EdExtensionRedirect[] = Obje
   { prefix: '/cosmos',                    to: CANONICAL_ROUTES.emergencyWhiteboard,      reason: 'cosmos-extension' },
   { prefix: '/operations-center',         to: CANONICAL_ROUTES.emergencyAnalytics,       reason: 'operations-center' },
   { prefix: '/platform-admin',            to: CANONICAL_ROUTES.emergencySettings,        reason: 'platform-admin' },
-  { prefix: '/enterprise-platform',       to: CANONICAL_ROUTES.emergencySettings,        reason: 'enterprise-platform' },
   // ── Removed redirects (real pages now exist for these paths) ───────────────
+  // /enterprise-platform → EnterpriseOperatingPlatformHub. Same exit
+  //   condition, same order: page first, then the shadow, then the
+  //   KNOWN_MISSING_TRACKMIND_PAGES entry. Its 18-module model had been
+  //   unrendered; the page labels which modules track the platform and which
+  //   score themselves. /platform-admin is now the only one still shadowed,
+  //   and it has no backing model at all.
   // /platform-intelligence → PlatformIntelligenceHub. Same exit condition as
   //   /trackmind below: the page now exists and is mounted behind
   //   TrackMindRouteGuard, so the shadow comes off. Its 20-module model

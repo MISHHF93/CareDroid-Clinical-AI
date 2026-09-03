@@ -1912,7 +1912,7 @@ export const ROUTE_RECORDS = Object.freeze([
     componentKey: 'EnterpriseOperatingPlatformHub',
     layout: 'app',
     auth: 'required',
-    status: 'future',
+    status: 'active',
     aliases: [],
     navGroup: 'account',
     notes:
