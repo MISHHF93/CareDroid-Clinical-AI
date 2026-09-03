@@ -128,10 +128,33 @@ export const COPILOT_PLATFORM = Object.freeze({
     ] satisfies CopilotContextInputKey[]),
 
     multimodal: Object.freeze({
-      enabledInputs: ['text', 'image-metadata', 'voice-dictation'] as const,
+      enabledInputs: ['text', 'image-metadata', 'document-text', 'voice-dictation'] as const,
       maxAttachments: 3,
       maxAttachmentBytes: 8 * 1024 * 1024,
       acceptedMimePrefix: 'image/',
+
+      // Text-bearing attachments whose CONTENT is read and put in the prompt.
+      //
+      // Images are accepted but deliberately not interpreted (visionModelConnected
+      // is false, and multimodalBoundary says so). That left attachments as a
+      // capability that did nothing: the picker accepted image/* only, so the one
+      // media type a user could attach was the one the model is instructed to
+      // ignore. These types need no vision contract -- the file is text, and the
+      // text goes in the prompt -- so they close that gap without touching the
+      // image boundary.
+      acceptedTextMimeTypes: Object.freeze([
+        'text/plain',
+        'text/markdown',
+        'text/csv',
+        'text/tab-separated-values',
+        'application/json',
+      ]),
+      // Extensions for files browsers hand over with an empty or generic type.
+      acceptedTextExtensions: Object.freeze(['.txt', '.md', '.csv', '.tsv', '.json', '.log']),
+      // Cap on characters lifted from any one document. A prompt is not a file
+      // store, and an 8 MB CSV would bury the operational context underneath it.
+      maxAttachmentTextChars: 20000,
+
       voiceLang: 'en-US',
     }),
 

@@ -52,7 +52,12 @@ describe('practitionerSurfaceVisibility', () => {
     expect(surfaces.admin.showSecondaryLinks).toBe(false);
     expect(surfaces.copilot.showContextTab).toBe(false);
     expect(surfaces.copilot.showSafetyTab).toBe(false);
-    expect(surfaces.copilot.showMultimodalInput).toBe(false);
+    // Deliberately TRUE while the rest of the chat-first chrome stays hidden.
+    // It was suppressed when the picker accepted image/* only and images are
+    // never interpreted (visionModelConnected is false), so the control did
+    // nothing. Text-bearing attachments are now read into the prompt, so it
+    // earns its space; see practitionerCleanup.config.tsx for the reasoning.
+    expect(surfaces.copilot.showMultimodalInput).toBe(true);
     expect(surfaces.copilot.compactLayout).toBe(true);
     expect(surfaces.copilot.showSafetyBadge).toBe(false);
     expect(surfaces.emergencyRoutes.showDescriptions).toBe(false);

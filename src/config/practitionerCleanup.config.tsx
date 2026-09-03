@@ -94,7 +94,20 @@ export const PRACTITIONER_CLEANUP = Object.freeze({
   suppressCopilotContextTab: true,
   suppressCopilotSafetyTab: true,
   suppressCopilotStatusStrip: true,
-  suppressCopilotMultimodalInput: true,
+  /**
+   * Re-enabled 2026-09-02. This was switched off with the rest of the
+   * chat-first chrome, and at the time that was right: the picker accepted
+   * image/* only, and images are explicitly not interpreted
+   * (visionModelConnected is false), so the control did nothing but take up
+   * space in a narrow docked panel.
+   *
+   * It now does real work. Text-bearing attachments (.txt, .md, .csv, .tsv,
+   * .json, .log) are read and their contents go into the prompt, so a
+   * clinician can attach a handover note or a CSV and have the copilot
+   * actually read it. The image boundary is unchanged and is now stated only
+   * when an image is genuinely attached.
+   */
+  suppressCopilotMultimodalInput: false,
   suppressCopilotOrchestrationActions: true,
   /** Narrow docked panel + hide safety badge row for chat-first pilot */
   forceCompactCopilotLayout: true,

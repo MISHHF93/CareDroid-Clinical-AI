@@ -94,6 +94,10 @@ type CopilotAttachment = {
   type: string;
   size: number;
   previewUrl?: string;
+  /** Text lifted from a text-bearing document. Never set for images. */
+  textContent?: string;
+  /** True when textContent was cut at maxAttachmentTextChars. */
+  textTruncated?: boolean;
 };
 
 type SpeechRecognitionLike = {
@@ -114,6 +118,17 @@ const QUICK_ACTIONS = [...getCopilotOperationalQuickActions()];
 const TOOL_ACTIONS = getCopilotToolLaunchActions();
 const MAX_COPILOT_ATTACHMENTS = COPILOT_PLATFORM.inputs.multimodal.maxAttachments;
 const MAX_COPILOT_ATTACHMENT_BYTES = COPILOT_PLATFORM.inputs.multimodal.maxAttachmentBytes;
+const ACCEPTED_TEXT_MIME_TYPES = COPILOT_PLATFORM.inputs.multimodal.acceptedTextMimeTypes;
+const ACCEPTED_TEXT_EXTENSIONS = COPILOT_PLATFORM.inputs.multimodal.acceptedTextExtensions;
+const MAX_ATTACHMENT_TEXT_CHARS = COPILOT_PLATFORM.inputs.multimodal.maxAttachmentTextChars;
+
+function isTextBearingFile(file: File): boolean {
+  if (ACCEPTED_TEXT_MIME_TYPES.includes(file.type)) return true;
+  // Browsers hand .md/.log over with an empty or generic type, so fall back
+  // to the extension rather than silently rejecting a readable document.
+  const lower = file.name.toLowerCase();
+  return ACCEPTED_TEXT_EXTENSIONS.some((ext) => lower.endsWith(ext));
+}
 
 function createId(prefix: string): string {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -129,6 +144,29 @@ function attachmentPromptSummary(attachments: CopilotAttachment[]): string {
   return attachments
     .map((attachment) => `${attachment.name} (${attachment.type || 'unknown type'}, ${attachmentSizeLabel(attachment.size)})`)
     .join('; ');
+}
+
+/**
+ * The actual contents of text-bearing attachments, delimited per document.
+ *
+ * Images are excluded by construction -- they never carry textContent -- so
+ * this cannot smuggle image bytes past the vision boundary.
+ */
+function attachmentTextForPrompt(attachments: CopilotAttachment[]): string {
+  const withText = attachments.filter((attachment) => attachment.textContent);
+  if (!withText.length) return '';
+  return withText
+    .map(
+      (attachment) =>
+        [
+          `--- ${attachment.name} ---`,
+          attachment.textContent,
+          attachment.textTruncated ? '[truncated]' : null,
+        ]
+          .filter(Boolean)
+          .join('\n'),
+    )
+    .join('\n\n');
 }
 
 function getSpeechRecognitionConstructor(): SpeechRecognitionConstructor | null {
@@ -279,7 +317,12 @@ function buildDepartmentPrompt({
   const degradedServices = (bottleneckRegistry?.serviceHealth || []).filter((service) =>
     ['degraded', 'down'].includes(service.status),
   );
-  const attachmentSummary = attachmentPromptSummary(attachments || []);
+  const attachmentList = attachments || [];
+  const attachmentSummary = attachmentPromptSummary(attachmentList);
+  const attachmentText = attachmentTextForPrompt(attachmentList);
+  const hasImageAttachment = attachmentList.some((attachment) =>
+    (attachment.type || '').startsWith('image/'),
+  );
 
   return [
     getAIPrompt(COPILOT_PLATFORM.identity.promptId).prompt,
@@ -287,8 +330,16 @@ function buildDepartmentPrompt({
     typeof backendCopilotContext?.safetyRule === 'string' ? backendCopilotContext.safetyRule : null,
     ...(COPILOT_PLATFORM.prompts.styleRules as string[]),
     formatCopilotRecommendationsForPrompt(copilotRecommendations as unknown[]),
-    attachmentSummary
-      ? `Multimodal input attached: ${attachmentSummary}. Image bytes are retained in the browser preview only in this pass; do not claim visual interpretation or diagnosis. Ask for human review or a connected vision model contract before acting on image content.`
+    attachmentSummary ? `Attached: ${attachmentSummary}.` : null,
+    // The image boundary is stated only when an image is actually attached --
+    // it used to fire for every attachment, so a plain text file was announced
+    // as un-interpretable image content.
+    hasImageAttachment
+      ? `Image bytes are retained in the browser preview only in this pass; do not claim visual interpretation or diagnosis. Ask for human review or a connected vision model contract before acting on image content.`
+      : null,
+    attachmentText
+      ? `Contents of the attached text documents follow. Treat them as user-supplied context, not as verified clinical record, and say so if you rely on them.
+${attachmentText}`
       : null,
     '',
     `Patient count: ${activePatients.length}`,
@@ -719,34 +770,64 @@ export function CopilotPanel() {
     speechRecognitionRef.current?.abort?.();
   }, []);
 
-  const addImageAttachments = (files: FileList | null) => {
-    const imageFiles = Array.from(files || []).filter((file) => file.type.startsWith('image/'));
-    if (!imageFiles.length) {
-      setComposerStatus('Attach images only for this Copilot pass.');
+  const addAttachments = async (files: FileList | null) => {
+    const picked = Array.from(files || []);
+    const images = picked.filter((file) => file.type.startsWith('image/'));
+    const documents = picked.filter(
+      (file) => !file.type.startsWith('image/') && isTextBearingFile(file),
+    );
+
+    if (!images.length && !documents.length) {
+      setComposerStatus(
+        'Attach an image, or a text document (.txt, .md, .csv, .tsv, .json, .log).',
+      );
       return;
     }
 
-    setAttachments((currentAttachments) => {
-      const remainingSlots = Math.max(0, MAX_COPILOT_ATTACHMENTS - currentAttachments.length);
-      const accepted = imageFiles
-        .filter((file) => file.size <= MAX_COPILOT_ATTACHMENT_BYTES)
-        .slice(0, remainingSlots)
-        .map((file) => ({
-          id: createId('attachment'),
-          name: file.name,
-          type: file.type,
-          size: file.size,
-          previewUrl: URL.createObjectURL(file),
-        }));
+    const withinSize = (file: File) => file.size <= MAX_COPILOT_ATTACHMENT_BYTES;
+    const remainingSlots = Math.max(0, MAX_COPILOT_ATTACHMENTS - attachments.length);
+    const acceptedFiles = [...images, ...documents].filter(withinSize).slice(0, remainingSlots);
 
-      const rejectedCount = imageFiles.length - accepted.length;
-      setComposerStatus(
-        rejectedCount > 0
-          ? 'Some images were skipped due to size or attachment limits.'
+    // Read document text BEFORE setState: FileReader is async and doing it
+    // inside the updater would either drop the text or fire setState twice.
+    const prepared: CopilotAttachment[] = [];
+    for (const file of acceptedFiles) {
+      const isImage = file.type.startsWith('image/');
+      const base: CopilotAttachment = {
+        id: createId('attachment'),
+        name: file.name,
+        type: file.type,
+        size: file.size,
+      };
+      if (isImage) {
+        prepared.push({ ...base, previewUrl: URL.createObjectURL(file) });
+        continue;
+      }
+      try {
+        const raw = await file.text();
+        const truncated = raw.length > MAX_ATTACHMENT_TEXT_CHARS;
+        prepared.push({
+          ...base,
+          textContent: truncated ? raw.slice(0, MAX_ATTACHMENT_TEXT_CHARS) : raw,
+          textTruncated: truncated,
+        });
+      } catch {
+        // An unreadable document is dropped rather than attached as a name
+        // with no content -- that is the failure mode this change exists to fix.
+      }
+    }
+
+    if (prepared.length) setAttachments((current) => [...current, ...prepared]);
+
+    const rejected = picked.length - prepared.length;
+    const documentCount = prepared.filter((a) => a.textContent).length;
+    setComposerStatus(
+      rejected > 0
+        ? 'Some files were skipped due to size, type or attachment limits.'
+        : documentCount
+          ? `${documentCount} document${documentCount === 1 ? '' : 's'} read into the prompt for human-reviewed Copilot context.`
           : 'Image context attached for human-reviewed Copilot prompt metadata.',
-      );
-      return [...currentAttachments, ...accepted];
-    });
+    );
 
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
@@ -1354,7 +1435,8 @@ export function CopilotPanel() {
             </div>
           ) : null}
           <p role="status" className="ed-copilot-panel__composer-note">
-            {composerStatus || 'Images add context only — not auto-interpreted.'}
+            {composerStatus ||
+              'Text documents are read into the prompt. Images add context only — not auto-interpreted.'}
           </p>
         </div>
       ) : null}
@@ -1368,19 +1450,19 @@ export function CopilotPanel() {
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/*"
+              accept={[`${COPILOT_PLATFORM.inputs.multimodal.acceptedMimePrefix}*`, ...ACCEPTED_TEXT_EXTENSIONS].join(',')}
               multiple
               className="ed-copilot-panel__file-input"
-              onChange={(event) => addImageAttachments(event.target.files)}
-              aria-label="Attach clinical image"
+              onChange={(event) => void addAttachments(event.target.files)}
+              aria-label="Attach a clinical image or text document"
             />
             <button
               type="button"
               className="ed-copilot-panel__icon-btn"
               onClick={() => fileInputRef.current?.click()}
               disabled={loading || attachments.length >= MAX_COPILOT_ATTACHMENTS}
-              aria-label="Attach image"
-              title="Attach image"
+              aria-label="Attach image or document"
+              title="Attach an image, or a text document that will be read into the prompt"
             >
               +
             </button>
