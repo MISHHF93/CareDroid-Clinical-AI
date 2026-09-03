@@ -421,7 +421,11 @@
    deliberately amber-toned like the simulated badges on PatientDetailPanel/
    EMSPipeline so it reads as an honesty label, not a clinical/CAD status. */
 .dispatch-console__physician-sim-panel {
-  border-color: color-mix(in srgb, var(--medical-status-warning-text, #b45309) 30%, var(--medical-border, #e2e8f0));
+  border-color: color-mix(
+    in srgb,
+    var(--medical-status-warning-text, #b45309) 30%,
+    var(--medical-border, #e2e8f0)
+  );
 }
 
 .dispatch-console__physician-sim-count {
@@ -447,8 +451,17 @@
 .dispatch-console__physician-sim-row {
   padding: 10px 12px;
   border-radius: 8px;
-  border: 1px solid color-mix(in srgb, var(--medical-status-warning-text, #b45309) 22%, var(--medical-border, #e2e8f0));
-  background: color-mix(in srgb, var(--medical-status-warning-text, #b45309) 5%, var(--medical-surface-card, #fff));
+  border: 1px solid
+    color-mix(
+      in srgb,
+      var(--medical-status-warning-text, #b45309) 22%,
+      var(--medical-border, #e2e8f0)
+    );
+  background: color-mix(
+    in srgb,
+    var(--medical-status-warning-text, #b45309) 5%,
+    var(--medical-surface-card, #fff)
+  );
 }
 
 .dispatch-console__physician-sim-summary {

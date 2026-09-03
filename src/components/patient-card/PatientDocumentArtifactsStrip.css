@@ -11,7 +11,7 @@
     var(--medical-accent, #64748b) 12%
   );
   border: 1px solid
-  /* Was var(--color-border, ...) -- --color-border is never defined anywhere;
+    /* Was var(--color-border, ...) -- --color-border is never defined anywhere;
      --medical-border is the real, theme-aware border token (13-file fix). */
     color-mix(in srgb, var(--medical-border, #6b7280) 80%, transparent);
   font-size: 0.78rem;
@@ -30,8 +30,7 @@
 }
 
 .patient-doc-artifacts__section--copilot {
-  border-top: 1px dashed
-    color-mix(in srgb, var(--medical-border, #6b7280) 70%, transparent);
+  border-top: 1px dashed color-mix(in srgb, var(--medical-border, #6b7280) 70%, transparent);
   padding-top: 0.35rem;
 }
 

@@ -56,7 +56,8 @@
 }
 
 .ems-pressure--critical .ems-pressure__dot {
-  animation: ems-pressure-red-breathe var(--cdl-pulse-critical, 1.6s) var(--motion-ease-standard, ease-in-out) infinite;
+  animation: ems-pressure-red-breathe var(--cdl-pulse-critical, 1.6s)
+    var(--motion-ease-standard, ease-in-out) infinite;
 }
 
 .ems-pressure--gauge {

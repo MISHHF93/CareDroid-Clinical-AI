@@ -83,17 +83,21 @@ describe('motion token sourcing', () => {
     const offenders: string[] = [];
 
     for (const file of cssFiles) {
-      for (const line of readFileSync(file, 'utf8').split('\n')) {
-        // Comments describing the old values are not declarations. This codebase
-        // has several checkers that scan comment prose and flag it, which is how
-        // a note explaining a rule ends up failing that very rule.
-        const trimmed = line.trim();
-        if (trimmed.startsWith('/*') || trimmed.startsWith('*') || trimmed.startsWith('//')) continue;
-        if (!line.includes('infinite') || EXEMPT.test(line)) continue;
+      // Comments describing the old values are not declarations. This codebase
+      // has several checkers that scan comment prose and flag it, which is how
+      // a note explaining a rule ends up failing that very rule.
+      const withoutComments = readFileSync(file, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+      // Walk DECLARATIONS, not lines: Prettier wraps a long `animation:` value
+      // onto continuation lines, and a line-based scan then either misses the
+      // duration (it sits on the next line) or reports the continuation line
+      // as a declaration of its own -- both happened on 2026-09-03.
+      for (const unit of withoutComments.split(/(?<=[;{}])/)) {
+        const declaration = unit.replace(/\s+/g, ' ').trim();
+        if (!declaration.includes('infinite') || EXEMPT.test(declaration)) continue;
         // A bare duration literal on a looping indicator is the thing this
         // guard exists to stop: it is how nine unsynchronised cadences appeared.
-        if (/\b\d+(\.\d+)?m?s\b/.test(line) && !line.includes('var(--cdl-pulse-')) {
-          offenders.push(`${file.replace(/.*[\\/]src[\\/]/, 'src/')}: ${line.trim()}`);
+        if (/\b\d+(\.\d+)?m?s\b/.test(declaration) && !declaration.includes('var(--cdl-pulse-')) {
+          offenders.push(`${file.replace(/.*[\\/]src[\\/]/, 'src/')}: ${declaration}`);
         }
       }
     }

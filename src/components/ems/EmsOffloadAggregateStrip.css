@@ -15,7 +15,9 @@
 
 html[data-theme='dark'] .ems-offload-aggregate-strip {
   border-color: color-mix(in srgb, var(--medical-border, #e0f2fe) 85%, transparent);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 10px rgba(0, 0, 0, 0.25);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.3),
+    0 2px 10px rgba(0, 0, 0, 0.25);
 }
 
 .ems-offload-aggregate-strip__header {
@@ -77,12 +79,16 @@ html[data-theme='dark'] .ems-offload-aggregate-strip {
   border-radius: 10px;
   background: var(--medical-surface-page, #f1f5f9);
   border: 1px solid color-mix(in srgb, var(--medical-border, #e0f2fe) 55%, transparent);
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03), 0 2px 6px rgba(15, 23, 42, 0.04);
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.03),
+    0 2px 6px rgba(15, 23, 42, 0.04);
 }
 
 html[data-theme='dark'] .ems-offload-aggregate-strip__count {
   border-color: color-mix(in srgb, var(--medical-border, #e0f2fe) 85%, transparent);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25), 0 2px 8px rgba(0, 0, 0, 0.2);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.25),
+    0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .ems-offload-aggregate-strip__count strong {

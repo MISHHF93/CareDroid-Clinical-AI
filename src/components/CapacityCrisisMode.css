@@ -25,7 +25,8 @@
   background: #ef444415;
   animation:
     capacity-crisis-banner-enter var(--motion-transition-normal) both,
-    capacity-crisis-red-glow var(--cdl-pulse-critical, 1.6s) var(--motion-ease-standard, ease-in-out) infinite;
+    capacity-crisis-red-glow var(--cdl-pulse-critical, 1.6s)
+      var(--motion-ease-standard, ease-in-out) infinite;
 }
 
 .capacity-crisis-banner strong {

@@ -26,6 +26,12 @@ npm run doctor      # diagnoses the environment; changes nothing
 npm start           # frontend :3000, backend :8000, /api proxied
 ```
 
+`npm install` also installs a pre-commit hook (lefthook) that runs
+`prettier --check` on the staged files that are already Prettier-clean —
+frontend js/jsx/json/css and the whole backend. It never rewrites files;
+`LEFTHOOK=0 git commit` skips it once. Frontend `.ts/.tsx` is deliberately not
+checked: most of it never matched `.prettierrc`.
+
 ## Before you say it's done
 
 ```bash

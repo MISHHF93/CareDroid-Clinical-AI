@@ -219,7 +219,8 @@
 
 .queue-intel__health--red {
   background: var(--status-critical);
-  animation: queue-health-red-pulse var(--cdl-pulse-critical, 1.6s) var(--motion-ease-standard, ease-in-out) infinite;
+  animation: queue-health-red-pulse var(--cdl-pulse-critical, 1.6s)
+    var(--motion-ease-standard, ease-in-out) infinite;
   box-shadow: 0 0 0 0 color-mix(in srgb, var(--status-critical) 42%, transparent);
 }
 

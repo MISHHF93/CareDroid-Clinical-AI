@@ -24,7 +24,8 @@
 }
 
 .patient-detail-timeline-dot--current {
-  animation: patient-detail-current-pulse var(--cdl-pulse-critical, 1.6s) var(--motion-ease-standard, ease-in-out) infinite;
+  animation: patient-detail-current-pulse var(--cdl-pulse-critical, 1.6s)
+    var(--motion-ease-standard, ease-in-out) infinite;
 }
 
 .patient-detail-panel__drag-handle {
@@ -375,13 +376,13 @@
 .patient-detail-vital-tile__severity--critical {
   color: #7f1d1d;
   background: #fee2e2;
-  border: 1px solid #EF4444;
+  border: 1px solid #ef4444;
 }
 
 .patient-detail-vital-tile__severity--warning {
   color: #78350f;
   background: #fef3c7;
-  border: 1px solid #F59E0B;
+  border: 1px solid #f59e0b;
 }
 
 .patient-detail-vital-tile__trend {

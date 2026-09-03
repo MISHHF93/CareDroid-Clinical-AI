@@ -112,7 +112,10 @@
   text-align: left;
   font: inherit;
   text-decoration: none;
-  transition: box-shadow 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+  transition:
+    box-shadow 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease;
 }
 
 .operational-strip--command .operational-strip__metric,

@@ -56,8 +56,7 @@ html {
    intended, most visible as a seam between the topbar and the route-identity band
    directly beneath it. .sidebar already wins its own background via a more specific
    `.emergency-app-shell .sidebar` rule regardless of this one, so it's unaffected. */
-:is(.app-shell, .emergency-app-shell)
-  :is(.sidebar, .ed-os-header, .session-chrome-bar) {
+:is(.app-shell, .emergency-app-shell) :is(.sidebar, .ed-os-header, .session-chrome-bar) {
   background: var(--app-surface-1, var(--medical-surface-card));
   border-color: var(--medical-border);
   color: var(--medical-ink);
@@ -188,17 +187,15 @@ html {
 :is(.app-shell, .emergency-app-shell)
   :is([class*='--primary'], [class*='cta']):not(.btn-primary):not(
     .caredroid-header__action--primary
-  ):not(.reception-desk-toolbar__action):not(
-    .cdl-zone--primary-actions
-  ):not(.fj-critical-banner__cta):not(.profile-copilot-card__cta):not(
-    .reception-job-profile-card__cta
-  ):not(.reception-skill-strip__cta):not(.cdl-public-page__cta):not(
-    .profile-section-header__cta
-  ):not(.profile-activity-cta):not(.reception-attention__cta):not(.platform-entry__cta):not(
-    .reception-queue-row__cta
-  ):not(.emergency-whiteboard-page__card-key-swatch--ctas):not(
-    .platform-entry__card--primary
-  ):not(.patient-orchestration__chip--primary):not(
+  ):not(.reception-desk-toolbar__action):not(.cdl-zone--primary-actions):not(
+    .fj-critical-banner__cta
+  ):not(.profile-copilot-card__cta):not(.reception-job-profile-card__cta):not(
+    .reception-skill-strip__cta
+  ):not(.cdl-public-page__cta):not(.profile-section-header__cta):not(.profile-activity-cta):not(
+    .reception-attention__cta
+  ):not(.platform-entry__cta):not(.reception-queue-row__cta):not(
+    .emergency-whiteboard-page__card-key-swatch--ctas
+  ):not(.platform-entry__card--primary):not(.patient-orchestration__chip--primary):not(
     .reception-prepare__option--primary
   ):not(.entry-shell__link--primary):not(.account-menu__item--primary):not(
     .workflow-automation-command-bar__btn--primary

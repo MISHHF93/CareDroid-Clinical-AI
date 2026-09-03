@@ -118,15 +118,27 @@
    OperationalHandoffDomainBar.css (theme-tokens.css: #ffffff light / #334155 dark) --
    mixing into it instead of a literal keeps the same tint intent in both themes. */
 .cdl-situation-graphic-card--information {
-  background: color-mix(in srgb, var(--status-info, #64748b) 5%, var(--app-surface-2, #fff)) !important;
+  background: color-mix(
+    in srgb,
+    var(--status-info, #64748b) 5%,
+    var(--app-surface-2, #fff)
+  ) !important;
 }
 
 .cdl-situation-graphic-card--warning {
-  background: color-mix(in srgb, var(--status-warning, #f59e0b) 6%, var(--app-surface-2, #fff)) !important;
+  background: color-mix(
+    in srgb,
+    var(--status-warning, #f59e0b) 6%,
+    var(--app-surface-2, #fff)
+  ) !important;
 }
 
 .cdl-situation-graphic-card--critical {
-  background: color-mix(in srgb, var(--status-critical, #ef4444) 6%, var(--app-surface-2, #fff)) !important;
+  background: color-mix(
+    in srgb,
+    var(--status-critical, #ef4444) 6%,
+    var(--app-surface-2, #fff)
+  ) !important;
 }
 
 /* ─────────────────────────────────────────────────────────────────

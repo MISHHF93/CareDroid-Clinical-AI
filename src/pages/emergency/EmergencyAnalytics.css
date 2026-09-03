@@ -216,7 +216,8 @@
      see the original note this replaces) now carries more of the definition,
      matching the shadow-led-elevation modernization applied to
      DashboardVisualizations.css's cards just below this strip. */
-  border: 1px solid color-mix(in srgb, var(--color-border-subtle, var(--medical-border, #e0f2fe)) 60%, transparent);
+  border: 1px solid
+    color-mix(in srgb, var(--color-border-subtle, var(--medical-border, #e0f2fe)) 60%, transparent);
   box-shadow: var(--shadow-1);
 }
 
@@ -255,7 +256,10 @@
    quiet shift stays visually quiet and a real one is unmistakable at a glance
    without opening a chart. */
 .emergency-analytics__kpi-strip-item--critical {
-  background: var(--cdl-critical-bg, color-mix(in srgb, var(--cdl-critical, #dc2626) 8%, transparent));
+  background: var(
+    --cdl-critical-bg,
+    color-mix(in srgb, var(--cdl-critical, #dc2626) 8%, transparent)
+  );
   box-shadow: inset 0 2px 0 var(--cdl-critical, #dc2626);
 }
 
@@ -264,7 +268,10 @@
 }
 
 .emergency-analytics__kpi-strip-item--warning {
-  background: var(--cdl-warning-bg, color-mix(in srgb, var(--cdl-warning, #b45309) 8%, transparent));
+  background: var(
+    --cdl-warning-bg,
+    color-mix(in srgb, var(--cdl-warning, #b45309) 8%, transparent)
+  );
   box-shadow: inset 0 2px 0 var(--cdl-warning, #b45309);
 }
 

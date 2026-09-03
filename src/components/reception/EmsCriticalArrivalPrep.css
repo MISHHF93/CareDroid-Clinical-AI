@@ -160,7 +160,11 @@
 }
 
 .ems-critical-arrival-prep__item--done {
-  border-color: color-mix(in srgb, var(--status-success, #22c55e) 40%, var(--medical-border, #e2e8f0));
+  border-color: color-mix(
+    in srgb,
+    var(--status-success, #22c55e) 40%,
+    var(--medical-border, #e2e8f0)
+  );
   background: color-mix(in srgb, var(--status-success, #22c55e) 6%, var(--medical-white, #fff));
 }
 

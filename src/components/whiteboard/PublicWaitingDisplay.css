@@ -145,9 +145,7 @@
    possible without touching the generic rules everywhere else in the app.
    A wall display benefits from using the entire screen, unlike a reading
    page -- go full-width specifically for this mode. */
-html.public-waiting-kiosk-active
-  .emergency-app-shell--public-waiting-kiosk
-  .app-shell-main-content,
+html.public-waiting-kiosk-active .emergency-app-shell--public-waiting-kiosk .app-shell-main-content,
 html.public-waiting-kiosk-active
   .emergency-app-shell--public-waiting-kiosk
   .app-shell-main-content

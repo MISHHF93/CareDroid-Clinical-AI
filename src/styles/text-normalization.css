@@ -137,9 +137,7 @@ html[data-theme='dark'],
     .admin-ops-nav-link
   ):not(.care-ops-inbox__chip):not(.ed-skip-link):not(.profile-settings-shell__nav-link):not(
     .profile-nav-link
-  ):not(.profile-back-link):not(.profile-summary-card__link):not(.org-card__link):not(
-    .org-page a
-  ) {
+  ):not(.profile-back-link):not(.profile-summary-card__link):not(.org-card__link):not(.org-page a) {
   color: var(--medical-text-link);
   text-decoration-color: color-mix(in srgb, var(--medical-text-link) 35%, transparent);
 }
@@ -189,24 +187,24 @@ html[data-theme='dark'],
     .cdl-public-page__cta
   ):not(.profile-section-header__cta):not(.reception-attention__cta):not(.platform-entry__cta):not(
     .reception-queue-row__cta
-  ):not(.entry-shell__link--primary):not(.critical-alert-banner__link):not(
-    .adp-link
-  ):not(.admin-ops-card__link):not(.admin-ops-inline-link):not(.admin-ops-nav-link):not(
-    .ed-skip-link
-  ):not(.profile-settings-shell__nav-link):not(.profile-nav-link):not(.profile-back-link):not(
-    .profile-summary-card__link
-  ):not(.org-card__link):not(.org-page a) {
+  ):not(.entry-shell__link--primary):not(.critical-alert-banner__link):not(.adp-link):not(
+    .admin-ops-card__link
+  ):not(.admin-ops-inline-link):not(.admin-ops-nav-link):not(.ed-skip-link):not(
+    .profile-settings-shell__nav-link
+  ):not(.profile-nav-link):not(.profile-back-link):not(.profile-summary-card__link):not(
+    .org-card__link
+  ):not(.org-page a) {
   color: var(--medical-text-link);
 }
 
 :is(.app-shell, .emergency-app-shell)
-  a:not([class*='btn']):not([class*='button']):not([role='button']):not(
-    .admin-ops-card__link
-  ):not(.admin-ops-inline-link):not(.admin-ops-nav-link):not(.care-ops-inbox__chip):not(
-    .ed-skip-link
-  ):not(.profile-settings-shell__nav-link):not(.profile-nav-link):not(.profile-back-link):not(
-    .profile-summary-card__link
-  ):not(.org-card__link):not(.org-page a):hover {
+  a:not([class*='btn']):not([class*='button']):not([role='button']):not(.admin-ops-card__link):not(
+    .admin-ops-inline-link
+  ):not(.admin-ops-nav-link):not(.care-ops-inbox__chip):not(.ed-skip-link):not(
+    .profile-settings-shell__nav-link
+  ):not(.profile-nav-link):not(.profile-back-link):not(.profile-summary-card__link):not(
+    .org-card__link
+  ):not(.org-page a):hover {
   color: var(--medical-text-link-hover);
 }
 

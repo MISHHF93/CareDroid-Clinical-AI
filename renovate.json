@@ -1,0 +1,30 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Dependency updates as reviewable per-package PRs with changelogs, gated by validate.yml. Inert until the Renovate GitHub App is installed on this repository; meant to replace .github/workflows/dependency-updates.yml, which runs an unreviewable `npm update && npm audit fix` every Monday.",
+  "extends": ["config:recommended"],
+  "timezone": "America/Toronto",
+  "schedule": ["before 8am on monday"],
+  "prConcurrentLimit": 5,
+  "rangeStrategy": "pin",
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 8am on the first day of the month"]
+  },
+  "packageRules": [
+    {
+      "description": "One weekly PR carries the routine minor/patch bumps",
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "non-major dependencies"
+    },
+    {
+      "description": "Major bumps of the database driver, auth and crypto layers wait for a human",
+      "matchPackageNames": ["pg", "sqlite3", "typeorm", "bcrypt", "jsonwebtoken", "helmet"],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
+    }
+  ],
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "labels": ["security"]
+  }
+}

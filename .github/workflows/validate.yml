@@ -60,13 +60,13 @@ jobs:
         working-directory: backend
         run: npm ci
 
-      # Non-blocking: 28 files currently fail this check (pre-existing drift,
-      # confirmed 2026-07-13, not something to silently gate merges/deploys on
-      # as a side effect of CI consolidation). Still runs and reports so it's
-      # visible; see SCORECARD.md roadmap for the real fix.
+      # Blocking since 2026-09-03: the 37 drifted files were formatted and a
+      # lefthook pre-commit hook checks the same scope locally, so this can
+      # only go red when someone commits with LEFTHOOK=0. Scope is
+      # js/jsx/json/css on purpose -- frontend .ts/.tsx never matched
+      # .prettierrc (2,095 of 2,481 files) and is not enforced anywhere yet.
       - name: Format check
         run: npm run format:check
-        continue-on-error: true
 
       - name: Validate (lint, tests, builds)
         run: npm run validate:ci
