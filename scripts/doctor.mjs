@@ -38,7 +38,11 @@ function readJson(relPath) {
 
 /** Compares a semver-ish version against a `>=x <y` range without a dependency. */
 function satisfiesRange(version, range) {
-  const nums = (v) => v.replace(/^[^\d]*/, '').split('.').map((n) => parseInt(n, 10) || 0);
+  const nums = (v) =>
+    v
+      .replace(/^[^\d]*/, '')
+      .split('.')
+      .map((n) => parseInt(n, 10) || 0);
   const cmp = (a, b) => {
     for (let i = 0; i < 3; i += 1) {
       if ((a[i] || 0) !== (b[i] || 0)) return (a[i] || 0) - (b[i] || 0);
@@ -110,6 +114,14 @@ async function httpStatus(url, timeoutMs = 2500) {
 }
 
 /** Names only. Never returns or logs a value. */
+/** Keys the backend refuses to boot without in production (productionSecret() in environment.config.ts). */
+function productionRequiredBackendKeys() {
+  const schemaPath = join(ROOT, 'backend/src/config/environment.config.ts');
+  if (!existsSync(schemaPath)) return [];
+  const source = readFileSync(schemaPath, 'utf8');
+  return [...source.matchAll(/productionSecret\('([A-Z0-9_]+)'/g)].map((m) => m[1]);
+}
+
 function envKeyNames(relPath) {
   try {
     return readFileSync(join(ROOT, relPath), 'utf8')
@@ -141,7 +153,10 @@ if (engines.node) {
 }
 
 try {
-  const npmVersion = execSync('npm -v', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+  const npmVersion = execSync('npm -v', {
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'ignore'],
+  }).trim();
   if (!engines.npm || satisfiesRange(npmVersion, engines.npm)) pass('NPM', `v${npmVersion}`);
   else fail('NPM', `v${npmVersion} does not satisfy "${engines.npm}"`, 'npm install -g npm@latest');
 } catch {
@@ -169,9 +184,12 @@ for (const [label, lock, modules, installDir] of [
 }
 
 // Mixed package managers produce installs CI cannot reproduce.
-const strayLocks = ['yarn.lock', 'pnpm-lock.yaml', 'backend/yarn.lock', 'backend/pnpm-lock.yaml'].filter((f) =>
-  existsSync(join(ROOT, f)),
-);
+const strayLocks = [
+  'yarn.lock',
+  'pnpm-lock.yaml',
+  'backend/yarn.lock',
+  'backend/pnpm-lock.yaml',
+].filter((f) => existsSync(join(ROOT, f)));
 if (strayLocks.length) {
   fail(
     'PACKAGE-MANAGER',
@@ -192,21 +210,40 @@ for (const [label, envFile, exampleFile] of [
     continue;
   }
   if (!existsSync(join(ROOT, envFile))) {
-    fail(`ENV:${label}`, `${envFile} is missing`, `cp ${exampleFile} ${envFile} and fill in the values.`);
+    fail(
+      `ENV:${label}`,
+      `${envFile} is missing`,
+      `cp ${exampleFile} ${envFile} and fill in the values.`,
+    );
     continue;
   }
-  const required = envKeyNames(exampleFile);
+  const documented = envKeyNames(exampleFile);
   const present = new Set(envKeyNames(envFile));
-  const missing = required.filter((k) => !present.has(k));
-  if (missing.length) {
-    // Names only — never the values.
+  const missing = documented.filter((k) => !present.has(k));
+  // Which absent keys actually matter. The backend's Joi schema
+  // (backend/src/config/environment.config.ts) requires nothing outside
+  // production; in production it requires every key declared through
+  // productionSecret(). The frontend has no schema at all -- every VITE_* is
+  // read with a code default. Listing 47 optional keys as a warning sent
+  // newcomers chasing integrations they do not need (2026-09-03).
+  const productionRequired = label === 'BACKEND' ? productionRequiredBackendKeys() : [];
+  const missingForProduction = productionRequired.filter((k) => !present.has(k));
+  // Names only — never the values.
+  if (missingForProduction.length) {
     warn(
       `ENV:${label}`,
-      `${missing.length} key(s) in ${exampleFile} absent from ${envFile}: ${missing.slice(0, 6).join(', ')}${missing.length > 6 ? ', …' : ''}`,
-      `Add the missing keys to ${envFile} (names above; see ${exampleFile} for documentation).`,
+      `production-required key(s) absent from ${envFile}: ${missingForProduction.join(', ')} (fine for local development; a production boot refuses to start without them)`,
+      `Set them in the production environment, never in a committed file.`,
+    );
+  }
+  if (missing.length) {
+    const optional = missing.filter((k) => !missingForProduction.includes(k));
+    pass(
+      `ENV:${label}`,
+      `${optional.length} documented optional key(s) absent from ${envFile} (defaults apply; see ${exampleFile} when enabling an integration)`,
     );
   } else {
-    pass(`ENV:${label}`, `${required.length} documented keys all present`);
+    pass(`ENV:${label}`, `${documented.length} documented keys all present`);
   }
 }
 
@@ -226,9 +263,14 @@ if (backendUp) {
       `something holds :${BACKEND_PORT} but /health did not answer`,
       `Another process may own the port. Check it, then start the API with: npm run dev:api`,
     );
-  else warn('BACKEND', `/health returned ${status} on :${BACKEND_PORT}`, 'Inspect the backend logs.');
+  else
+    warn('BACKEND', `/health returned ${status} on :${BACKEND_PORT}`, 'Inspect the backend logs.');
 } else {
-  warn('BACKEND', `not running on :${BACKEND_PORT}`, 'Start it with: npm run dev:api  (or the full stack: npm run dev)');
+  warn(
+    'BACKEND',
+    `not running on :${BACKEND_PORT}`,
+    'Start it with: npm run dev:api  (or the full stack: npm run dev)',
+  );
 }
 
 // There is ONE dev user per database. POST /api/auth/dev-session persists
@@ -243,7 +285,9 @@ if (backendUp) {
     pass('DEV PERSONA', 'no dev user bootstrapped yet (first dev sign-in creates it)');
   } else if (status === 200 && body && body.exists) {
     const persona = body.roleProfileId || '(none)';
-    const when = body.personaUpdatedAt ? ` since ${new Date(body.personaUpdatedAt).toISOString()}` : '';
+    const when = body.personaUpdatedAt
+      ? ` since ${new Date(body.personaUpdatedAt).toISOString()}`
+      : '';
     pass(
       'DEV PERSONA',
       `shared dev user is role=${body.role} persona=${persona}${when}; every dev session here inherits it`,
@@ -257,7 +301,11 @@ if (backendUp) {
       'Rebuild the API: npm --prefix backend run build  (the dev stack builds it once at start).',
     );
   } else {
-    warn('DEV PERSONA', `GET /api/auth/dev-session returned ${status}`, 'Inspect the backend logs.');
+    warn(
+      'DEV PERSONA',
+      `GET /api/auth/dev-session returned ${status}`,
+      'Inspect the backend logs.',
+    );
   }
 }
 
@@ -291,7 +339,11 @@ if (backendUp) {
     );
   }
   if (migrationCount === 0) {
-    fail('DB:VERIFY', 'backend/src/database/migrations holds no migrations', 'npm run db:migration -- InitialSchema');
+    fail(
+      'DB:VERIFY',
+      'backend/src/database/migrations holds no migrations',
+      'npm run db:migration -- InitialSchema',
+    );
   } else {
     try {
       const dockerVersion = execSync('docker info --format {{.ServerVersion}}', {
@@ -299,7 +351,10 @@ if (backendUp) {
         stdio: ['ignore', 'pipe', 'ignore'],
         timeout: 5000,
       }).trim();
-      pass('DB:VERIFY', `Docker ${dockerVersion} available — npm run db:verify can prove the migration chain here`);
+      pass(
+        'DB:VERIFY',
+        `Docker ${dockerVersion} available — npm run db:verify can prove the migration chain here`,
+      );
     } catch {
       warn(
         'DB:VERIFY',
@@ -320,7 +375,11 @@ if (frontendUp) {
       `Vite runs with --strictPort, so it will refuse to start while another process holds :${FRONTEND_PORT}.`,
     );
 } else {
-  warn('FRONTEND', `not running on :${FRONTEND_PORT}`, 'Start it with: npm run dev:web  (or the full stack: npm run dev)');
+  warn(
+    'FRONTEND',
+    `not running on :${FRONTEND_PORT}`,
+    'Start it with: npm run dev:web  (or the full stack: npm run dev)',
+  );
 }
 
 // ── optional local tooling ───────────────────────────────────────────────────
@@ -347,7 +406,11 @@ try {
 if (existsSync(join(ROOT, 'knip.jsonc')) || existsSync(join(ROOT, 'knip.json'))) {
   pass('REACHABILITY', 'knip is configured (npm run deps:check)');
 } else {
-  warn('REACHABILITY', 'no knip config found', 'Dead-code analysis is unavailable; see npm run deps:check.');
+  warn(
+    'REACHABILITY',
+    'no knip config found',
+    'Dead-code analysis is unavailable; see npm run deps:check.',
+  );
 }
 
 // ── report ───────────────────────────────────────────────────────────────────
