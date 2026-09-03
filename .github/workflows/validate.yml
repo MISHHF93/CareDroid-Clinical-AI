@@ -60,11 +60,10 @@ jobs:
         working-directory: backend
         run: npm ci
 
-      # Blocking since 2026-09-03: the 37 drifted files were formatted and a
-      # lefthook pre-commit hook checks the same scope locally, so this can
-      # only go red when someone commits with LEFTHOOK=0. Scope is
-      # js/jsx/json/css on purpose -- frontend .ts/.tsx never matched
-      # .prettierrc (2,095 of 2,481 files) and is not enforced anywhere yet.
+      # Blocking since 2026-09-03: the drifted files were formatted (37 js/css,
+      # then all 1,997 ts/tsx in one deliberate commit) and a lefthook
+      # pre-commit hook checks the same scope locally, so this can only go red
+      # when someone commits with LEFTHOOK=0.
       - name: Format check
         run: npm run format:check
 

@@ -9,15 +9,22 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, it, expect } from 'vitest';
 import { interpretAscvdTenYearRisk, computeAscvdPceResult } from '../utils/ascvdPceCalculator';
-import { interpretCkdStaging, computeCkdStagingResult, combineCkdPrognosticRisk, classifyGfrCategory, classifyAlbuminuria } from '../utils/ckdStagingCalculator';
+import {
+  interpretCkdStaging,
+  computeCkdStagingResult,
+  combineCkdPrognosticRisk,
+  classifyGfrCategory,
+  classifyAlbuminuria,
+} from '../utils/ckdStagingCalculator';
 import { interpretStopBangScore, computeStopBangResult } from '../utils/stopBangCalculator';
 import { interpretAuditCScore, computeAuditCResult } from '../utils/auditCCalculator';
-import {
-  clinicalIntentTools,
-} from './clinicalIntentToolCatalog';
+import { clinicalIntentTools } from './clinicalIntentToolCatalog';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const pr4aCalculatorsSource = readFileSync(join(__dirname, '../pages/tools/pr4aCalculators.tsx'), 'utf8');
+const pr4aCalculatorsSource = readFileSync(
+  join(__dirname, '../pages/tools/pr4aCalculators.tsx'),
+  'utf8',
+);
 
 const CERTAINTY_PATTERN =
   /\b(confirmed diagnosis|definitely has|diagnosis established|rules out ckd|ruled out|excluded osa|has alcohol use disorder)\b/i;
@@ -50,7 +57,7 @@ describe('PR4A NLU — chat seeds avoid diagnostic certainty and treatment direc
     expect(nlu.chatSeed).not.toMatch(CERTAINTY_PATTERN);
     expect(nlu.chatSeed).not.toMatch(TREATMENT_PATTERN);
     expect(`${nlu.description} ${nlu.chatSeed}`).toMatch(
-      /decision support|screening|does not diagnose|do not diagnose|does not recommend|primary prevention|risk estimate|stag/i
+      /decision support|screening|does not diagnose|do not diagnose|does not recommend|primary prevention|risk estimate|stag/i,
     );
   });
 });
@@ -165,15 +172,18 @@ describe('PR4A accessibility & UX — reset and validation affordances', () => {
     ['CkdStagingCalculator', 'ckd-age', true],
     ['StopBangCalculator', 'stop-bang-snoring', false],
     ['AuditCCalculator', 'audit-c-drinkingFrequency', true],
-  ])('%s clears result on reset and restores focus to %s', (component, focusId, clearsValidation) => {
-    const slice = sliceCalculatorComponent(pr4aCalculatorsSource, component);
-    expect(slice).toContain('setResult(null)');
-    if (clearsValidation) {
-      expect(slice).toContain('setValidationErrors([])');
-    }
-    expect(slice).toContain(focusId);
-    expect(slice).toMatch(/aria-label="Reset/i);
-  });
+  ])(
+    '%s clears result on reset and restores focus to %s',
+    (component, focusId, clearsValidation) => {
+      const slice = sliceCalculatorComponent(pr4aCalculatorsSource, component);
+      expect(slice).toContain('setResult(null)');
+      if (clearsValidation) {
+        expect(slice).toContain('setValidationErrors([])');
+      }
+      expect(slice).toContain(focusId);
+      expect(slice).toMatch(/aria-label="Reset/i);
+    },
+  );
 
   it.each([
     ['AscvdRiskCalculator', 'fieldClass'],
@@ -182,7 +192,8 @@ describe('PR4A accessibility & UX — reset and validation affordances', () => {
   ])('%s applies invalid field styling when validation fails', (component, helper) => {
     const slice = sliceCalculatorComponent(pr4aCalculatorsSource, component);
     expect(slice).toContain(helper);
-    expect(slice).toMatch(/fieldClass\(['"]calc-(input|select)-field/);
+    // \s* after the paren: Prettier may break the argument onto its own line.
+    expect(slice).toMatch(/fieldClass\(\s*['"]calc-(input|select)-field/);
     expect(slice).toContain('role="alert"');
   });
 });
@@ -213,7 +224,7 @@ describe('PR4A accessibility & UX — pr4aCalculators.jsx contracts', () => {
     expect(ckdUi).toContain('CalcInterpretationRegion');
     expect(ckdUi).toContain('CalcResultSafetyFooter');
     expect(ckdUi).toMatch(/aria-label="Calculate CKD/i);
-    expect(ckdUi).toContain('Does not recommend dialysis');
+    expect(ckdUi).toMatch(/Does\s+not\s+recommend\s+dialysis/);
     expect(ckdUi).toMatch(/≥3 months/i);
     expect(ckdUi).toContain('aria-labelledby={ckdScoreLabelId}');
     expect(ckdUi).toContain('Staging interpretation (decision support)');

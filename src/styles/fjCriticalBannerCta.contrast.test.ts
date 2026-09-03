@@ -476,8 +476,10 @@ describe('dc-panel critical dispatch styling contrast (2026-08-07, 5th sweep fam
   });
 
   it('DispatchConsole.tsx still applies dc-call-card--critical alongside dc-panel when isCritical (unchanged)', () => {
-    expect(dispatchConsoleTsx).toContain(
-      'className={`dc-panel ${isCritical ? "dc-call-card--critical" : ""}`}',
+    // Either quote style: .prettierrc's singleQuote rewrote the JS strings
+    // inside this template literal from "…" to '…' on 2026-09-03.
+    expect(dispatchConsoleTsx).toMatch(
+      /className=\{`dc-panel \$\{isCritical \? ['"]dc-call-card--critical['"] : (''|"")\}`\}/,
     );
   });
 });
@@ -508,7 +510,7 @@ describe('card-contrast-normalization.css meta/hint/caption/subtitle exclusion (
     cardContrastCss.indexOf('/* Light card bodies must not use on-solid text'),
   );
 
-  it("the muted meta/hint/caption/subtitle rule now excludes critical/danger/warning card ancestors, matching its 2 sibling rules", () => {
+  it('the muted meta/hint/caption/subtitle rule now excludes critical/danger/warning card ancestors, matching its 2 sibling rules', () => {
     const flat = flattenCss(mutedMetaRule);
     expect(flat).toContain(":not([class*='--critical'])");
     expect(flat).toContain(":not([class*='--danger'])");

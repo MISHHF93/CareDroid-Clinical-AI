@@ -8,7 +8,10 @@ import {
   REQUIRED_IDENTITY_FIELDS,
 } from '../../config/smartIntakeFlowModel';
 import { isVerificationComplete } from '../../utils/verificationWorkflow';
-import { BACKEND_API_CAPABILITY_STATUS, BACKEND_CAPABILITY_STATUS } from '../../config/backendApiCapabilities';
+import {
+  BACKEND_API_CAPABILITY_STATUS,
+  BACKEND_CAPABILITY_STATUS,
+} from '../../config/backendApiCapabilities';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const smartIntakeSource = readFileSync(join(__dirname, 'SmartIntake.tsx'), 'utf8');
@@ -112,7 +115,9 @@ describe('startBackendSession demo-identity clearing (2026-08-08 regression)', (
     expect(elseBranchStart).toBeGreaterThan(-1);
     expect(elseBranchEnd).toBeGreaterThan(elseBranchStart);
     const elseBranch = smartIntakeSource.slice(elseBranchStart, elseBranchEnd);
-    expect(elseBranch).toContain('clearDemoIdentitySeed(resolvedSessionId, { fetchAuditLog: false })');
+    expect(elseBranch).toContain(
+      'clearDemoIdentitySeed(resolvedSessionId, { fetchAuditLog: false })',
+    );
   });
 
   it('the catch (safeguarded review mode) branch also clears the demo identity seed, since sessionReady is still set true on error', () => {
@@ -124,7 +129,7 @@ describe('startBackendSession demo-identity clearing (2026-08-08 regression)', (
     expect(catchBranch).toContain('clearDemoIdentitySeed(null, { fetchAuditLog: false })');
   });
 
-  it('the fallback branch does not fetch /audit-log with a non-identity session id (would 404 and silently reintroduce the demo audit log via the API client\'s own fallback)', () => {
+  it("the fallback branch does not fetch /audit-log with a non-identity session id (would 404 and silently reintroduce the demo audit log via the API client's own fallback)", () => {
     const elseBranchStart = smartIntakeSource.indexOf('const result = await fetchSmartIntake();');
     const elseBranchEnd = smartIntakeSource.indexOf(
       "setActiveStepTracked(resolveSessionStartStep(), 'session-start');",
@@ -158,9 +163,13 @@ describe('updateDecision field-review audit tracking (2026-08-08)', () => {
     expect(fnEnd).toBeGreaterThan(fnStart);
     const fnBody = smartIntakeSource.slice(fnStart, fnEnd);
 
-    const auditAppendIndex = fnBody.indexOf('setIdentityAuditLog((current) => [...current,');
-    const capabilityGateIndex = fnBody.indexOf(
-      "if (isBackendCapabilityEnabled('emergencySmartIntakeIdentitySession') && sessionReady) {",
+    // Whitespace-tolerant positions: Prettier wraps both the array spread and
+    // the two-clause condition across lines.
+    const auditAppendIndex = fnBody.search(
+      /setIdentityAuditLog\(\(current\) => \[\s*\.\.\.current,/,
+    );
+    const capabilityGateIndex = fnBody.search(
+      /if \(\s*isBackendCapabilityEnabled\('emergencySmartIntakeIdentitySession'\)\s*&&\s*sessionReady\s*\) \{/,
     );
     expect(auditAppendIndex).toBeGreaterThan(-1);
     expect(capabilityGateIndex).toBeGreaterThan(-1);
@@ -178,7 +187,7 @@ describe('SmartIntake local-only-fallback unsynced marking (2026-08-27)', () => 
   // pattern this file already uses elsewhere.
   it('marks the local-only-fallback patient unsynced after routeSmartIntakeThroughOrchestrator fails', () => {
     expect(smartIntakeSource).toContain(
-      "addPatient(patientRecord as any, { syncToBackend: false, markUnsynced: true });",
+      'addPatient(patientRecord as any, { syncToBackend: false, markUnsynced: true });',
     );
   });
 });

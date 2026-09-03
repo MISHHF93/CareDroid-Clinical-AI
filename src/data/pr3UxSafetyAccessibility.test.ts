@@ -19,10 +19,7 @@ import {
   REGISTRY_ID_TO_ORCHESTRATOR_TOOL,
   resolveCatalogLaunch,
 } from './clinicalCatalogWiring';
-import {
-  auditChatSeed,
-  SAFETY_AUDIT_PATTERNS,
-} from './clinicalSafetyGuardrails';
+import { auditChatSeed, SAFETY_AUDIT_PATTERNS } from './clinicalSafetyGuardrails';
 import { graceAcsChatConfig } from './chatAssistedCalculators/graceAcs';
 import { nihssChatConfig } from './chatAssistedCalculators/nihss';
 import { canadianCSpineChatConfig } from './chatAssistedCalculators/canadianCSpine';
@@ -59,7 +56,8 @@ describe('PR3 hub groups — catalog clarity', () => {
     const cardiac = CHAT_ASSISTED_HUB_GROUPS.find((g) => g.groupId === 'cardiac');
     const neuro = CHAT_ASSISTED_HUB_GROUPS.find((g) => g.groupId === 'neurology');
     const trauma = CHAT_ASSISTED_HUB_GROUPS.find((g) => g.groupId === 'trauma');
-    if (!cardiac || !neuro || !trauma) throw new Error('expected cardiac, neuro, and trauma hub groups to exist');
+    if (!cardiac || !neuro || !trauma)
+      throw new Error('expected cardiac, neuro, and trauma hub groups to exist');
     expect(cardiac.lead).toMatch(/decision support only/i);
     expect(cardiac.lead).toMatch(/do not diagnose|does not diagnose|rule out ACS/i);
     expect(cardiac.lead).toMatch(/do not delay/i);
@@ -86,16 +84,19 @@ describe('PR3 accessibility — launch labels and hub UI', () => {
       expect(label).toMatch(/Start guided chat/i);
       expect(label).toMatch(/decision support only/i);
       expect(label).toMatch(/priority over/i);
-    }
+    },
   );
 
   it('Calculators hub exposes keyboard-accessible chat-assisted cards', () => {
     expect(calculatorsSource).toContain('chatAssistedLaunchAriaLabelForTool');
     expect(calculatorsSource).toContain('calc-chat-assisted-card');
     expect(calculatorsSource).toContain('type="button"');
-    expect(calculatorsSource).toContain('aria-describedby={`calc-chat-assisted-desc-${tool.toolId}`}');
+    expect(calculatorsSource).toContain(
+      'aria-describedby={`calc-chat-assisted-desc-${tool.toolId}`}',
+    );
     expect(calculatorsSource).toContain('calc-chat-assisted-lead');
-    expect(calculatorsSource).toContain('Use Tab and Enter to launch');
+    // \s+ rather than spaces: Prettier re-wraps JSX prose between words.
+    expect(calculatorsSource).toMatch(/Use\s+Tab\s+and\s+Enter\s+to\s+launch/);
     expect(calculatorsSource).toContain('role="group"');
     expect(calculatorsSource).toContain('aria-labelledby={groupHeadingId}');
   });
@@ -104,7 +105,9 @@ describe('PR3 accessibility — launch labels and hub UI', () => {
     expect(calculatorsCss).toContain('.calc-chat-assisted-card:focus-visible');
     expect(calculatorsCss).toContain('min-height: 44px');
     expect(calculatorsCss).toContain('touch-action: manipulation');
-    expect(calculatorsCss).toMatch(/@media \(max-width: 480px\)[\s\S]*calc-chat-assisted-grid[\s\S]*1fr/);
+    expect(calculatorsCss).toMatch(
+      /@media \(max-width: 480px\)[\s\S]*calc-chat-assisted-grid[\s\S]*1fr/,
+    );
     expect(calculatorsCss).toMatch(/@media \(max-width: 480px\)[\s\S]*min-height: 48px/);
     expect(calculatorsCss).toContain('overflow-wrap: anywhere');
     expect(calculatorsCss).toContain('prefers-reduced-motion');
@@ -114,11 +117,16 @@ describe('PR3 accessibility — launch labels and hub UI', () => {
 });
 
 describe('PR3 clinical safety — registry and catalog labels', () => {
-  it.each(PR3_CALCULATOR_REGISTRY_IDS)('%s registry description states clinical decision support', (id) => {
-    const desc = toolRegistryById[id]?.description || '';
-    expect(desc).toMatch(/clinical decision support|decision support|not .* clearance|not .* diagnosis|not fracture/i);
-    expect(desc.length).toBeGreaterThan(24);
-  });
+  it.each(PR3_CALCULATOR_REGISTRY_IDS)(
+    '%s registry description states clinical decision support',
+    (id) => {
+      const desc = toolRegistryById[id]?.description || '';
+      expect(desc).toMatch(
+        /clinical decision support|decision support|not .* clearance|not .* diagnosis|not fracture/i,
+      );
+      expect(desc.length).toBeGreaterThan(24);
+    },
+  );
 
   it('uses clear sidebar names for PR3 tools', () => {
     expect(toolRegistryById['grace-acs']?.name).toMatch(/GRACE ACS/i);
@@ -127,26 +135,26 @@ describe('PR3 clinical safety — registry and catalog labels', () => {
     expect(toolRegistryById['ottawa-ankle']?.name).toMatch(/Ottawa Ankle/i);
   });
 
-  it.each(PR3_CALCULATOR_REGISTRY_IDS)(
-    'NLU description matches chat config for %s',
-    (id) => {
-      const nlu = clinicalIntentTools.find((t) => t.toolId === id);
-      expect(nlu?.description).toBe(PR3_CONFIG_BY_ID[id].description);
-    }
-  );
+  it.each(PR3_CALCULATOR_REGISTRY_IDS)('NLU description matches chat config for %s', (id) => {
+    const nlu = clinicalIntentTools.find((t) => t.toolId === id);
+    expect(nlu?.description).toBe(PR3_CONFIG_BY_ID[id].description);
+  });
 });
 
 describe('PR3 clinical safety — chat seeds and descriptions', () => {
   it.each(PR3_CONFIGS)('$toolId description states decision support scope', (config) => {
     expect(config.description).toMatch(
-      /clinical decision support|decision support|does not replace|not a diagnosis|not clearance|not fracture clearance/i
+      /clinical decision support|decision support|does not replace|not a diagnosis|not clearance|not fracture clearance/i,
     );
   });
 
-  it.each(PR3_CONFIGS)('$toolId chat seed avoids absolute diagnosis and treatment dosing', (config) => {
-    expect(config.chatSeed).not.toMatch(ABSOLUTE_DIAGNOSIS_PATTERN);
-    expect(config.chatSeed).not.toMatch(TREATMENT_PATTERN);
-  });
+  it.each(PR3_CONFIGS)(
+    '$toolId chat seed avoids absolute diagnosis and treatment dosing',
+    (config) => {
+      expect(config.chatSeed).not.toMatch(ABSOLUTE_DIAGNOSIS_PATTERN);
+      expect(config.chatSeed).not.toMatch(TREATMENT_PATTERN);
+    },
+  );
 
   it.each(PR3_CALCULATOR_REGISTRY_IDS)('%s normalized NLU chat seed passes safety audit', (id) => {
     const nlu = clinicalIntentTools.find((t) => t.toolId === id);
@@ -195,16 +203,19 @@ describe('PR3 clinical safety — chat seeds and descriptions', () => {
 });
 
 describe('PR3 launch flow — hub path without dashboard fallback for PR3', () => {
-  it.each(PR3_CALCULATOR_REGISTRY_IDS)('resolveCatalogLaunch(%s) stays on calculators hub', (id) => {
-    const launch = resolveCatalogLaunch(id);
-    expect(launch.path).toBe('/tools/calculators');
-    // grace-acs and canadian-c-spine are now real registerTool() backend executors
-    // (Tier C / backend-backed), so openLabel is 'Open'; nihss/ottawa-ankle remain chat-only
-    // (no backend executor) and keep 'Start guided chat'.
-    const expectedOrchestratorTool = REGISTRY_ID_TO_ORCHESTRATOR_TOOL[id] ?? null;
-    expect(launch.openLabel).toBe(expectedOrchestratorTool ? 'Open' : 'Start guided chat');
-    expect(launch.chatSeed?.length).toBeGreaterThan(80);
-  });
+  it.each(PR3_CALCULATOR_REGISTRY_IDS)(
+    'resolveCatalogLaunch(%s) stays on calculators hub',
+    (id) => {
+      const launch = resolveCatalogLaunch(id);
+      expect(launch.path).toBe('/tools/calculators');
+      // grace-acs and canadian-c-spine are now real registerTool() backend executors
+      // (Tier C / backend-backed), so openLabel is 'Open'; nihss/ottawa-ankle remain chat-only
+      // (no backend executor) and keep 'Start guided chat'.
+      const expectedOrchestratorTool = REGISTRY_ID_TO_ORCHESTRATOR_TOOL[id] ?? null;
+      expect(launch.openLabel).toBe(expectedOrchestratorTool ? 'Open' : 'Start guided chat');
+      expect(launch.chatSeed?.length).toBeGreaterThan(80);
+    },
+  );
 
   it('hub launch handler routes chat-assisted tools to dashboard for visible conversation', () => {
     expect(calculatorsSource).toContain('resolveNavigationPathForLaunch(launch)');
@@ -215,7 +226,7 @@ describe('PR3 launch flow — hub path without dashboard fallback for PR3', () =
   it('catalog launch uses resolveNavigationPathForLaunch for hub chat tools', () => {
     const catalogSource = readFileSync(
       join(__dirname, '../pages/tools/ClinicalToolCatalog.tsx'),
-      'utf8'
+      'utf8',
     );
     expect(catalogSource).toContain('resolveNavigationPathForLaunch(launch)');
   });

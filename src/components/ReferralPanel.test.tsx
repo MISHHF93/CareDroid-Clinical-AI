@@ -32,9 +32,14 @@ describe('ReferralPanel double-submit guard', () => {
     );
     // The existing disabled={backendPending} wiring on all 3 submit buttons
     // must remain in place as the async-window safety net.
-    expect(referralPanelSource).toContain("onClick={() => submitReferral('Draft')} disabled={backendPending");
-    expect(referralPanelSource).toContain("onClick={() => submitReferral('TransferRequested')} disabled={backendPending");
-    expect(referralPanelSource).toContain("onClick={() => submitReferral('Sent')} disabled={backendPending");
+    // Whitespace-tolerant: Prettier puts each JSX attribute on its own line.
+    for (const status of ['Draft', 'TransferRequested', 'Sent']) {
+      expect(referralPanelSource).toMatch(
+        new RegExp(
+          `onClick=\\{\\(\\) => submitReferral\\('${status}'\\)\\}\\s+disabled=\\{backendPending`,
+        ),
+      );
+    }
   });
 
   it('HEAL-265: guards handleStatusChange (Accept Transfer, Complete, Arrange Transport, etc.) the same way submitReferral is guarded', () => {
@@ -48,7 +53,9 @@ describe('ReferralPanel double-submit guard', () => {
       /if \(statusChangeInFlightRef\.current\) return;\s*\n\s*statusChangeInFlightRef\.current = true;/,
     );
     const guardIndex = referralPanelSource.indexOf('statusChangeInFlightRef.current = true;');
-    const updateCallIndex = referralPanelSource.indexOf('updateReferralStatus(referralId, status, responseNote);');
+    const updateCallIndex = referralPanelSource.indexOf(
+      'updateReferralStatus(referralId, status, responseNote);',
+    );
     expect(guardIndex).toBeGreaterThan(-1);
     expect(updateCallIndex).toBeGreaterThan(guardIndex);
     expect(referralPanelSource).toMatch(
@@ -57,7 +64,9 @@ describe('ReferralPanel double-submit guard', () => {
     // statusChangePending must reach ReferralRow and gate every status-change button.
     expect(referralPanelSource).toContain('statusChangePending={backendPending}');
     const statusChangeButtonCount = (
-      referralPanelSource.match(/onClick=\{\(\) => onStatusChange\(referral\.id, [^)]+\)\}\s*(?:\n\s*)?disabled=\{statusChangePending/g) || []
+      referralPanelSource.match(
+        /onClick=\{\(\) => onStatusChange\(referral\.id, [^)]+\)\}\s*(?:\n\s*)?disabled=\{statusChangePending/g,
+      ) || []
     ).length;
     expect(statusChangeButtonCount).toBeGreaterThanOrEqual(8);
   });
@@ -67,8 +76,6 @@ describe('ReferralPanel double-submit guard', () => {
     // failed/slow referral fetch short of a full page reload -- unlike the
     // whiteboard page's onRetry/retryLabel="Refresh board" pattern.
     expect(referralPanelSource).toContain('ToolApiErrorBanner');
-    expect(referralPanelSource).toMatch(
-      /onRetry=\{\(\) => void referralsModule\.refresh\(\)\}/,
-    );
+    expect(referralPanelSource).toMatch(/onRetry=\{\(\) => void referralsModule\.refresh\(\)\}/);
   });
 });

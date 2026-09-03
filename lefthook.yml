@@ -1,13 +1,11 @@
 # Git hooks (lefthook, a repo-local devDependency; installed by `npm install`
 # through the `prepare` script; skip once with `LEFTHOOK=0 git commit`).
 #
-# Scope is deliberately the set of files that IS Prettier-clean today:
-# frontend js/jsx/json/css (what `npm run format:check` covers) and the whole
-# backend (its ESLint enforces prettier/prettier). Frontend .ts/.tsx is NOT
-# included: 2,095 of 2,481 files never matched .prettierrc, so checking them
-# here would block every commit, and auto-writing them would turn one-line
-# fixes into whole-file reformats. Widen the glob only after a deliberate
-# reformat commit.
+# Scope: everything `npm run format:check` covers (frontend
+# js/jsx/ts/tsx/json/css under src/) plus the whole backend (its ESLint
+# enforces prettier/prettier). The frontend .ts/.tsx files were reformatted in
+# one deliberate commit on 2026-09-03 (1,997 files) so this can hold the line
+# from here on. scripts/*.mjs is not in scope yet (119 of 161 drift).
 #
 # Why this exists: on 2026-09-03 backend lint (part of validate:ci) had 1,277
 # Prettier errors accumulated across a week of commits nobody could see
@@ -17,7 +15,7 @@ pre-commit:
   parallel: true
   commands:
     prettier-frontend:
-      glob: 'src/**/*.{js,jsx,json,css}'
+      glob: 'src/**/*.{js,jsx,ts,tsx,json,css}'
       run: npx prettier --check {staged_files}
       fail_text: 'Prettier drift. Fix with: npx prettier --write <file>  (then git add it)'
     # Uses the backend's own prettier binary -- root (3.8) and backend (3.6)

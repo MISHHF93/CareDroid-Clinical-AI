@@ -16,16 +16,19 @@ const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculato
 const chatHubGroupsSource = readFileSync(join(__dirname, './chatAssistedHubGroups.ts'), 'utf8');
 const mentalHealthUiSource = readFileSync(
   join(__dirname, '../pages/tools/mentalHealthCalculators.tsx'),
-  'utf8'
+  'utf8',
 );
 const calculatorPrimitivesSource = readFileSync(
   join(__dirname, '../pages/tools/calculatorPrimitives.tsx'),
-  'utf8'
+  'utf8',
 );
-const calculatorsCssSource = readFileSync(join(__dirname, '../pages/tools/Calculators.css'), 'utf8');
+const calculatorsCssSource = readFileSync(
+  join(__dirname, '../pages/tools/Calculators.css'),
+  'utf8',
+);
 const lazySpecialtyCalculatorsSource = readFileSync(
   join(__dirname, '../pages/tools/lazySpecialtyCalculators.tsx'),
-  'utf8'
+  'utf8',
 );
 
 function sliceExportedComponent(source, componentName) {
@@ -57,7 +60,10 @@ describe('PHQ-9 UX & accessibility', () => {
     expect(phq9Ui).toContain('type="submit"');
     expect(phq9Ui).toContain('htmlFor={id}');
     expect(phq9Ui).toContain('phq9-validation-summary');
-    expect(phq9Ui).toContain('formDescribedByIds(formDisclaimerId, validationSummaryId, hasValidationErrors)');
+    // Whitespace-tolerant: Prettier wraps the argument list, one per line.
+    expect(phq9Ui).toMatch(
+      /formDescribedByIds\(\s*formDisclaimerId,\s*validationSummaryId,\s*hasValidationErrors,?\s*\)/,
+    );
     expect(phq9Ui).toContain('phq9-form-disclaimer');
     expect(phq9Ui).toContain('likertSelectClassName(hasValidationErrors');
     expect(mentalHealthUiSource).toContain('calc-select-field--invalid');
@@ -90,7 +96,9 @@ describe('GAD-7 UX & accessibility', () => {
     expect(gad7Ui).toContain('type="submit"');
     expect(gad7Ui).toContain('htmlFor={id}');
     expect(gad7Ui).toContain('gad7-validation-summary');
-    expect(gad7Ui).toContain('formDescribedByIds(formDisclaimerId, validationSummaryId, hasValidationErrors)');
+    expect(gad7Ui).toMatch(
+      /formDescribedByIds\(\s*formDisclaimerId,\s*validationSummaryId,\s*hasValidationErrors,?\s*\)/,
+    );
     expect(gad7Ui).toContain('gad7-form-disclaimer');
     expect(gad7Ui).toContain('likertSelectClassName(hasValidationErrors');
     expect(gad7Ui).toContain('focusFirstEmptyLikertItem');
@@ -104,7 +112,7 @@ describe('GAD-7 UX & accessibility', () => {
     expect(gad7Ui).toContain('calc-gad7-severe-warning');
     expect(gad7Ui).toContain('calc-gad7-moderate-warning');
     expect(gad7Ui).toMatch(
-      /aria-live=\{\s*result\?\.acuteDistressSafetyAlert\?\.elevated \|\| result\?\.moderateSymptomEscalation\?\.warranted/
+      /aria-live=\{\s*result\?\.acuteDistressSafetyAlert\?\.elevated \|\| result\?\.moderateSymptomEscalation\?\.warranted/,
     );
     expect(calculatorsCssSource).toContain('.calc-gad7-moderate-warning');
     // CalcInterpretationRegion (incl. the <h3 id={headingId}> heading) is imported from
@@ -117,7 +125,9 @@ describe('GAD-7 UX & accessibility', () => {
 describe('Chat-assisted hub — COPD GOLD & Rome IV IBS', () => {
   it('uses native buttons with accessible names for Tier-B launches', () => {
     expect(calculatorsSource).toContain('chatAssistedLaunchAriaLabelForTool');
-    expect(calculatorsSource).toContain('aria-describedby={`calc-chat-assisted-desc-${tool.toolId}`}');
+    expect(calculatorsSource).toContain(
+      'aria-describedby={`calc-chat-assisted-desc-${tool.toolId}`}',
+    );
     expect(calculatorsSource).toMatch(/data-calc-id=\{tool\.toolId\}/);
     expect(chatHubGroupsSource).toContain("'copd-gold'");
     expect(chatHubGroupsSource).toContain("'rome-iv-ibs'");

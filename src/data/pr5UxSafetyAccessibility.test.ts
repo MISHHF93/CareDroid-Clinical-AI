@@ -13,15 +13,16 @@ import { clinicalIntentTools } from './clinicalIntentToolCatalog';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const mentalHealthUiSource = readFileSync(
   join(__dirname, '../pages/tools/mentalHealthCalculators.tsx'),
-  'utf8'
+  'utf8',
 );
 const calculatorPrimitivesSource = readFileSync(
   join(__dirname, '../pages/tools/calculatorPrimitives.tsx'),
-  'utf8'
+  'utf8',
 );
 
 const MEDICATION_PATTERN = /\b(prescribe|start antidepressant|ssri|snri|benzodiazepine|mg\/day)\b/i;
-const DEPRESSION_DIAGNOSIS_PATTERN = /\b(diagnosed with depression|has major depressive disorder|confirmed depression)\b/i;
+const DEPRESSION_DIAGNOSIS_PATTERN =
+  /\b(diagnosed with depression|has major depressive disorder|confirmed depression)\b/i;
 const ANXIETY_DIAGNOSIS_PATTERN =
   /\b(diagnosed with generalized anxiety|has generalized anxiety disorder|confirmed anxiety disorder)\b/i;
 
@@ -120,8 +121,9 @@ describe('PR5 accessibility & UX — Phq9Calculator UI contracts', () => {
     expect(phq9Ui).toContain('CalcInterpretationRegion');
     expect(phq9Ui).toContain('CalcResultSafetyFooter');
     expect(phq9Ui).toMatch(/Screening only/i);
-    expect(phq9Ui).toMatch(/not diagnose depression/i);
-    expect(phq9Ui).toMatch(/not recommend medications/i);
+    // \s+ rather than a space: Prettier re-wraps JSX prose between words.
+    expect(phq9Ui).toMatch(/not\s+diagnose\s+depression/i);
+    expect(phq9Ui).toMatch(/not\s+recommend\s+medications/i);
     expect(phq9Ui).toContain('role="alert"');
     expect(phq9Ui).toContain('calc-phq9-q9-inline-warning');
     expect(phq9Ui).toContain('calc-phq9-q9-result-warning');

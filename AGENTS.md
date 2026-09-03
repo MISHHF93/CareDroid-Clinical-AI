@@ -27,10 +27,10 @@ npm start           # frontend :3000, backend :8000, /api proxied
 ```
 
 `npm install` also installs a pre-commit hook (lefthook) that runs
-`prettier --check` on the staged files that are already Prettier-clean —
-frontend js/jsx/json/css and the whole backend. It never rewrites files;
-`LEFTHOOK=0 git commit` skips it once. Frontend `.ts/.tsx` is deliberately not
-checked: most of it never matched `.prettierrc`.
+`prettier --check` on staged files under `src/` and `backend/`. It never
+rewrites files — fix with `npx prettier --write <file>` — and
+`LEFTHOOK=0 git commit` skips it once. Tests that scan source text must
+tolerate Prettier's wrapping (match with `\s+`, not exact substrings).
 
 ## Before you say it's done
 

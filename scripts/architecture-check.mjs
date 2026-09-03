@@ -31,8 +31,15 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 /**
  * Raise this ONLY with a comment explaining why a new cycle is unavoidable.
  * Lower it whenever a cycle is genuinely broken -- that is the point.
+ *
+ * 9 -> 13 on 2026-09-03 without any dependency changing: IMPORT_PATTERN had
+ * never seen a wrapped `import { ... } from` (see its comment), so the graph
+ * was missing every multi-line import and the count was an undercount. The
+ * real picture is 13 cycles / 66 modules, the largest a 35-module component
+ * around src/central-node/careDroidCentralNode.ts. That is the debt to pay
+ * down, and this number goes down as it is paid.
  */
-const MAX_IMPORT_CYCLES = 9;
+const MAX_IMPORT_CYCLES = 13;
 
 const SOURCE_ROOTS = ['src', 'backend/src'];
 const SKIP_DIRS = new Set(['node_modules', 'dist', 'coverage', 'build', '.git']);
@@ -69,8 +76,16 @@ function collectSourceFiles(dir, acc = []) {
 const files = SOURCE_ROOTS.flatMap((root) => collectSourceFiles(join(ROOT, root)));
 const fileSet = new Set(files);
 
+// The specifier list may span lines (Prettier wraps long `import { a, b }`
+// lists), so the clause between the keyword and `from` must be allowed to
+// contain newlines. The single-line version of this pattern silently dropped
+// every wrapped import from the graph; on 2026-09-03 a formatting-only commit
+// then split one 15-module cycle into three smaller ones and "raised" the
+// count from 9 to 12 without a single dependency changing. Quotes stay
+// excluded so the clause can never cross a string and attach a later
+// statement's specifier to an earlier keyword.
 const IMPORT_PATTERN =
-  /(?:^|\n)\s*(?:import|export)\s+(?:type\s+)?[^'"\n]*from\s*['"]([^'"]+)['"]/g;
+  /(?:^|\n)\s*(?:import|export)\s+(?:type\s+)?[^'"]*?from\s*['"]([^'"]+)['"]/g;
 
 function resolveImport(importer, specifier) {
   if (!specifier.startsWith('.')) return null;

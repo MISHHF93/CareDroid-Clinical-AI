@@ -23,7 +23,9 @@ describe('Emergency Whiteboard navigation wiring', () => {
 
   it('keeps stale selected-patient state from rendering a blank overlay', () => {
     expect(patientDetailPanelSource).toContain('const selectedPatient = useMemo(');
-    expect(patientDetailPanelSource).toContain('patients.find((patient) => patient.id === selectedPatientId) || null');
+    expect(patientDetailPanelSource).toContain(
+      'patients.find((patient) => patient.id === selectedPatientId) || null',
+    );
     expect(patientDetailPanelSource).toContain('if (!selectedPatient) return null;');
   });
 
@@ -31,7 +33,9 @@ describe('Emergency Whiteboard navigation wiring', () => {
     expect(whiteboardSource).toContain('const [activeFilter, setActiveFilter]');
     expect(whiteboardSource).toContain('setQueueFilter(null);');
     expect(whiteboardSource).toContain('<QueueIntelligencePanel');
-    expect(whiteboardSource).toContain('matchesWhiteboardQueueFilter(patient, activeQueueFilter, pendingReferralPatientIds)');
+    expect(whiteboardSource).toContain(
+      'matchesWhiteboardQueueFilter(patient, activeQueueFilter, pendingReferralPatientIds)',
+    );
     expect(whiteboardSource).toContain('useWhiteboardDisplayMode');
     expect(whiteboardSource).toContain('operational awareness only');
     expect(whiteboardSource).toContain('<WhiteboardView');
@@ -68,8 +72,12 @@ describe('Emergency Whiteboard navigation wiring', () => {
     expect(patientCardSource).toContain('Referral pending');
     expect(patientCardSource).toContain('Transfer pending');
     expect(patientCardSource).toContain('Capacity pressure');
-    expect(patientCardSource).toContain("document.dispatchEvent(new Event('open-reassessment-drawer'))");
-    expect(patientCardSource).toContain("document.dispatchEvent(new Event('open-patient-discharge'))");
+    expect(patientCardSource).toContain(
+      "document.dispatchEvent(new Event('open-reassessment-drawer'))",
+    );
+    expect(patientCardSource).toContain(
+      "document.dispatchEvent(new Event('open-patient-discharge'))",
+    );
     expect(patientCardSource).toContain('advancePatientToBoarding');
   });
 
@@ -96,6 +104,9 @@ describe('Emergency Whiteboard navigation wiring', () => {
     expect(whiteboardSource).toContain('buildWorkloadRebalanceSuggestion');
     expect(whiteboardSource).toContain('canReassignWorkload');
     expect(whiteboardSource).toContain('onAssignStaff={assignStaff}');
-    expect(whiteboardSource).toContain("label={workloadRebalanceSuggestion ? `Balance Workload");
+    // Whitespace-tolerant: Prettier wraps the ternary across lines.
+    expect(whiteboardSource).toMatch(
+      /label=\{\s*workloadRebalanceSuggestion\s*\?\s*`Balance Workload/,
+    );
   });
 });

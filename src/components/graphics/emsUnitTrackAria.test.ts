@@ -17,7 +17,11 @@ describe('EmsUnitTrackGraphic ARIA role (Cycle 214)', () => {
   // correctly instead of just suppressing the axe finding.
 
   it('EmsUnitTrackGraphic declares role="progressbar" with aria-value* attributes', () => {
-    const fn = source.match(/export function EmsUnitTrackGraphic[\s\S]*?\n\}/)?.[0];
+    // The function ends at a `}` that starts a line AND ends it; the closing
+    // brace of the destructured parameter list (`}: EmsUnitTrackGraphicProps) {`)
+    // also starts a line once Prettier wraps the parameters, which is why the
+    // old `\n\}` cut the slice off before the JSX.
+    const fn = source.match(/export function EmsUnitTrackGraphic[\s\S]*?\n\}(?=\r?\n|$)/)?.[0];
     expect(fn).toBeDefined();
     expect(fn).toContain('role="progressbar"');
     expect(fn).toContain('aria-valuenow={progress}');

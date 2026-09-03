@@ -21,10 +21,11 @@ describe('feature flag UI coverage', () => {
         'emergency_whiteboard',
         'referral_intelligence',
         'capacity_intelligence',
-      ])
+      ]),
     );
     expect(sidebarItems).toHaveLength(
-      APP_SHELL_NAV_ITEMS.filter((item) => !(item.featureGate && item.featureId === 'ems_pipeline')).length
+      APP_SHELL_NAV_ITEMS.filter((item) => !(item.featureGate && item.featureId === 'ems_pipeline'))
+        .length,
     );
   });
 
@@ -37,7 +38,9 @@ describe('feature flag UI coverage', () => {
         expect(defaults[feature.id], feature.id).toBe(true);
       }
       if (feature.tier === 'professional') {
-        expect(defaults[feature.id], feature.id).toBe(import.meta.env.DEV ? true : feature.defaultEnabled);
+        expect(defaults[feature.id], feature.id).toBe(
+          import.meta.env.DEV ? true : feature.defaultEnabled,
+        );
       }
       if (feature.tier === 'enterprise') {
         expect(defaults[feature.id], feature.id).toBe(false);
@@ -60,9 +63,10 @@ describe('feature flag UI coverage', () => {
     const patientDetailSource = readSource('components/PatientDetailPanel.tsx');
     const calculatorHubSource = readSource('components/ClinicalCalculatorHub.tsx');
 
-    expect(patientDetailSource).toContain('<HEARTScore patientId={selectedPatient.id}');
-    expect(patientDetailSource).toContain('<QSOFA patientId={selectedPatient.id}');
-    expect(patientDetailSource).toContain('<PediatricDrugCalc patientId={selectedPatient.id}');
+    // \s+ between tag and attribute: Prettier wraps long JSX openings.
+    expect(patientDetailSource).toMatch(/<HEARTScore\s+patientId=\{selectedPatient\.id\}/);
+    expect(patientDetailSource).toMatch(/<QSOFA\s+patientId=\{selectedPatient\.id\}/);
+    expect(patientDetailSource).toMatch(/<PediatricDrugCalc\s+patientId=\{selectedPatient\.id\}/);
     expect(calculatorHubSource).toContain('export const CALCULATORS');
     expect(calculatorHubSource).toContain('component:');
   });
@@ -83,7 +87,9 @@ describe('feature flag UI coverage', () => {
   it('keeps requested feature ids registered for gated surfaces', () => {
     expect(FEATURE_REGISTRY_BY_ID.ems_pipeline.sidebarRoute).toBe('/emergency/ems');
     expect(FEATURE_REGISTRY_BY_ID.smart_intake.sidebarRoute).toBe('/emergency/intake');
-    expect(FEATURE_REGISTRY_BY_ID.clinical_calculator_hub.sidebarRoute).toBe('/emergency/whiteboard');
+    expect(FEATURE_REGISTRY_BY_ID.clinical_calculator_hub.sidebarRoute).toBe(
+      '/emergency/whiteboard',
+    );
     expect(FEATURE_REGISTRY_BY_ID.queue_intelligence.sidebarRoute).toBe('/emergency/queues');
     expect(FEATURE_REGISTRY_BY_ID.reassessment_engine.sidebarRoute).toBe('/emergency/reassessment');
     expect(FEATURE_REGISTRY_BY_ID.referral_intelligence.sidebarRoute).toBe('/emergency/referrals');
