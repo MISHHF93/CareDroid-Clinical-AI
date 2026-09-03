@@ -32,7 +32,7 @@ jobs:
       # GitHub Secrets must be configured in repository settings
       # Required: DOCKER_USERNAME, DOCKER_PASSWORD, PRODUCTION_HOST, PRODUCTION_USER, SSH_PRIVATE_KEY
       - name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v4
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
