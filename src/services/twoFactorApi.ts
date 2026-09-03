@@ -32,7 +32,11 @@ export type TwoFactorResult<T> = { ok: boolean; data: T | null; message: string 
 
 async function guardedJson<T>(path: string, options: any = {}): Promise<TwoFactorResult<T>> {
   if (!isBackendCapabilityEnabled('twoFactor')) {
-    return { ok: false, data: null, message: 'Two-factor authentication is not available on this deployment.' };
+    return {
+      ok: false,
+      data: null,
+      message: 'Two-factor authentication is not available on this deployment.',
+    };
   }
   try {
     const { response, data } = await apiFetchJson(path, options);

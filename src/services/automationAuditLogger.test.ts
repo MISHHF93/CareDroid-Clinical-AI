@@ -1,8 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  getAutomationAuditEntries,
-  resetAutomationAuditTrail,
-} from '../data/automationAuditTrail';
+import { getAutomationAuditEntries, resetAutomationAuditTrail } from '../data/automationAuditTrail';
 import { createAutomationAuditEvent } from './automationAuditApi';
 import { recordAutomationBlocked, recordAutomationFailure } from './automationAuditLogger';
 
@@ -25,9 +22,10 @@ describe('automationAuditLogger', () => {
   });
 
   it('falls back to local audit entries for blocked automation decisions', async () => {
-    vi.mocked(createAutomationAuditEvent).mockResolvedValue(
-      { ok: false, message: 'API unavailable' } as any,
-    );
+    vi.mocked(createAutomationAuditEvent).mockResolvedValue({
+      ok: false,
+      message: 'API unavailable',
+    } as any);
 
     await recordAutomationBlocked({
       triggerFired: 'Notification stream subscription requested',
@@ -44,7 +42,7 @@ describe('automationAuditLogger', () => {
         status: 'blocked',
         reason: 'Real-time notification stream is not available on this server.',
         user: { id: 'user-audit', name: 'Current user' },
-      })
+      }),
     );
   });
 
@@ -65,7 +63,7 @@ describe('automationAuditLogger', () => {
       expect.objectContaining({
         status: 'failed',
         error: 'Failed to sync tool result: 500',
-      })
+      }),
     );
   });
 });

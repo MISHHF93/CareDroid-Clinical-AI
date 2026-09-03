@@ -34,10 +34,7 @@ import {
   expectedLaunchPath,
   isKnownToolAreaPath,
 } from '../routes/clinicalToolRoutes';
-import {
-  buildClinicalToolAliasSyncReport,
-  TOOL_PATTERNS_PATH,
-} from './clinicalToolAliasSync';
+import { buildClinicalToolAliasSyncReport, TOOL_PATTERNS_PATH } from './clinicalToolAliasSync';
 import {
   aliasToSlug,
   extractToolPatternKeywords,
@@ -151,12 +148,7 @@ export const PR3_TEN_AREA_LABELS = [
 
 describe('PR3 ten-area coverage — matrix contract', () => {
   it('targets the four required registry ids', () => {
-    expect([...PR3_TOOL_IDS]).toEqual([
-      'grace-acs',
-      'nihss',
-      'canadian-c-spine',
-      'ottawa-ankle',
-    ]);
+    expect([...PR3_TOOL_IDS]).toEqual(['grace-acs', 'nihss', 'canadian-c-spine', 'ottawa-ankle']);
     expect([...PR3_CALCULATOR_REGISTRY_IDS]).toEqual([...PR3_TOOL_IDS]);
     expect([...PR3_TIER_B_CHAT_CALCULATOR_IDS]).toEqual([...PR3_TOOL_IDS]);
   });
@@ -259,7 +251,7 @@ describe('PR3 ten-area — 6. chatSeed presence', () => {
     // grace-acs and canadian-c-spine are real registerTool() backend executors, so
     // backendExecutable is true for them; nihss/ottawa-ankle have no backend executor.
     expect(nlu?.backendExecutable).toBe(
-      (ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS as readonly string[]).includes(id)
+      (ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS as readonly string[]).includes(id),
     );
   });
 
@@ -277,10 +269,10 @@ describe('PR3 ten-area — 7. backend alias consistency', () => {
   it('PR3 required catalog aliases pass clinicalToolAliasSync report', () => {
     const report = buildClinicalToolAliasSyncReport({ patternsSource });
     const pr3Missing = report.missingCatalogAliases.filter((row) =>
-      PR3_TOOL_IDS.includes(row.expected)
+      PR3_TOOL_IDS.includes(row.expected),
     );
     const pr3Wrong = report.wrongCatalogTargets.filter((row) =>
-      PR3_TOOL_IDS.includes(row.expected)
+      PR3_TOOL_IDS.includes(row.expected),
     );
     expect(pr3Missing).toEqual([]);
     expect(pr3Wrong).toEqual([]);
@@ -289,7 +281,7 @@ describe('PR3 ten-area — 7. backend alias consistency', () => {
   it.each(PR3_TOOL_IDS)('required phrases in NLU map or backend keywords for %s', (id) => {
     const keywords = extractToolPatternKeywords(patternsSource, id).map((k) => aliasToSlug(k));
     const requiredForTool = PR3_REQUIRED_NLU_ALIAS_PAIRS.filter(([, c]) => c === id).map(
-      ([a]) => a
+      ([a]) => a,
     );
     for (const phrase of requiredForTool) {
       const slug = aliasToSlug(phrase);
@@ -311,7 +303,7 @@ describe('PR3 ten-area — 7. backend alias consistency', () => {
       expect(patternsSource.split(`toolId: '${id}'`).length - 1).toBe(1);
     }
     expect(
-      clinicalIntentTools.filter((t) => (PR3_TOOL_IDS as readonly string[]).includes(t.toolId))
+      clinicalIntentTools.filter((t) => (PR3_TOOL_IDS as readonly string[]).includes(t.toolId)),
     ).toHaveLength(4);
   });
 });
@@ -345,7 +337,7 @@ describe('PR3 ten-area — 9. duplicate alias detection', () => {
 
   it('PR3-targeting discovery aliases have unique ids and consistent mapsTo', () => {
     const pr3Rows = toolIdAliases.filter((a) =>
-      (PR3_TOOL_IDS as readonly string[]).includes(a.mapsTo)
+      (PR3_TOOL_IDS as readonly string[]).includes(a.mapsTo),
     );
     const ids = pr3Rows.map((a) => a.id);
     expect(new Set(ids).size).toBe(ids.length);
@@ -362,7 +354,7 @@ describe('PR3 ten-area — 10. no orphaned tool IDs', () => {
 
   it('PR3-targeting discovery aliases do not point at missing registry ids', () => {
     const pr3AliasRows = toolIdAliases.filter((a) =>
-      (PR3_TOOL_IDS as readonly string[]).includes(a.mapsTo)
+      (PR3_TOOL_IDS as readonly string[]).includes(a.mapsTo),
     );
     for (const { id, mapsTo } of pr3AliasRows) {
       expect(toolRegistryById[mapsTo], `orphan mapsTo for alias ${id}`).toBeTruthy();
@@ -376,7 +368,8 @@ describe('PR3 ten-area — 10. no orphaned tool IDs', () => {
   it('hub registry rows for PR3 match frozen audit list exactly', () => {
     const hubPr3 = toolRegistry
       .filter(
-        (t) => t.path === '/tools/calculators' && (PR3_TOOL_IDS as readonly string[]).includes(t.id)
+        (t) =>
+          t.path === '/tools/calculators' && (PR3_TOOL_IDS as readonly string[]).includes(t.id),
       )
       .map((t) => t.id)
       .sort();

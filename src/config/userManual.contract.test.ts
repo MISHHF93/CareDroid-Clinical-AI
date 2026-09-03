@@ -31,7 +31,11 @@ const REQUIRED_ROLE_PLAYBOOKS = [
 
 describe('CareDroid manual contract', () => {
   it('exposes the in-app Help/User Manual page through navigation', () => {
-    expect(NAVIGATION_ITEMS.some((item) => item.id === 'help' && item.route === CANONICAL_ROUTES.emergencyHelp)).toBe(true);
+    expect(
+      NAVIGATION_ITEMS.some(
+        (item) => item.id === 'help' && item.route === CANONICAL_ROUTES.emergencyHelp,
+      ),
+    ).toBe(true);
   });
 
   it('covers the process manual response procedures', () => {

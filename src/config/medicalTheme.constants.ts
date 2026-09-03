@@ -34,8 +34,10 @@ export const MEDICAL_THEME = Object.freeze({
   onAccent: 'var(--app-accent-contrast, #ffffff)',
   overlay: 'rgba(17, 24, 39, 0.4)',
   // Clinical depth elevation (CDL v2 elev-2 / elev-4)
-  shadow: 'var(--app-shadow-1, 0 2px 6px hsl(222 47% 11% / 0.06), 0 1px 2px hsl(222 47% 11% / 0.04))',
-  shadowModal: 'var(--app-shadow-2, 0 16px 40px hsl(222 47% 11% / 0.14), 0 4px 12px hsl(222 47% 11% / 0.06))',
+  shadow:
+    'var(--app-shadow-1, 0 2px 6px hsl(222 47% 11% / 0.06), 0 1px 2px hsl(222 47% 11% / 0.04))',
+  shadowModal:
+    'var(--app-shadow-2, 0 16px 40px hsl(222 47% 11% / 0.14), 0 4px 12px hsl(222 47% 11% / 0.06))',
   // Solid semantic inks for text-on-white (WCAG AA large ≥3:1 / normal ≥4.5:1)
   danger: 'var(--app-danger, #991b1b)',
   warning: 'var(--app-warning, #b45309)',

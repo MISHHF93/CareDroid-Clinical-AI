@@ -5,9 +5,13 @@ import { OPERATIONS_FLEET_CONSOLE_ROUTES } from '../config/operationsFleetConsol
 
 const lazyRoute = lazyWithRetry;
 
-const HospitalMapDashboardPage = lazyRoute(() => import('../pages/operations/HospitalMapDashboard'));
+const HospitalMapDashboardPage = lazyRoute(
+  () => import('../pages/operations/HospitalMapDashboard'),
+);
 const MedicalIotDashboardPage = lazyRoute(() => import('../pages/operations/MedicalIotDashboard'));
-const DeviceFleetManagementPage = lazyRoute(() => import('../pages/operations/DeviceFleetManagement'));
+const DeviceFleetManagementPage = lazyRoute(
+  () => import('../pages/operations/DeviceFleetManagement'),
+);
 const OperationsHubPage = lazyRoute(() => import('../pages/operations/Operations'));
 const RouteOptimizerPage = lazyRoute(() => import('../pages/fleet/RouteOptimizer'));
 const PredictiveMaintenancePage = lazyRoute(() => import('../pages/fleet/PredictiveMaintenance'));

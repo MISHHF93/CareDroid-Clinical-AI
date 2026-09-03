@@ -15,7 +15,7 @@ describe('DepartmentPulse', () => {
         viewedAt: new Date(Date.now() - 47 * 60_000).toISOString(),
         capacityRisk: 'Yellow',
         activePatientCount: originalState.patients.length,
-      })
+      }),
     );
     act(() => {
       useEmergencyStore.setState(
@@ -24,7 +24,7 @@ describe('DepartmentPulse', () => {
           selectedPatientId: null,
           lastPulseView: Date.now() - 47 * 60_000,
         },
-        true
+        true,
       );
     });
   });
@@ -40,7 +40,7 @@ describe('DepartmentPulse', () => {
     render(
       <MemoryRouter>
         <DepartmentPulse />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     expect(screen.getByText(/You were away/i)).toBeInTheDocument();
@@ -67,7 +67,7 @@ describe('DepartmentPulse', () => {
     render(
       <MemoryRouter>
         <DepartmentPulse />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     expect(screen.getByText('Active patients')).toBeInTheDocument();

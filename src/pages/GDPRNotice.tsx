@@ -52,8 +52,7 @@ export default function GDPRNotice() {
         <section className="cdl-surface cdl-surface--information">
           <h3>Contact our Data Protection Officer</h3>
           <p>
-            For GDPR-related inquiries:{' '}
-            <a href="mailto:dpo@caredroid.ai">dpo@caredroid.ai</a>
+            For GDPR-related inquiries: <a href="mailto:dpo@caredroid.ai">dpo@caredroid.ai</a>
           </p>
         </section>
 

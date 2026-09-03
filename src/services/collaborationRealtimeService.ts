@@ -49,7 +49,12 @@ function createPollingLoop({ intervalMs, onPoll, onStatus }: any) {
 
   const runPoll = async () => {
     if (stopped) return;
-    onStatus?.({ status: 'reconnecting', mode: 'polling', message: 'Live updates paused — polling.', updatedAt: new Date().toISOString() });
+    onStatus?.({
+      status: 'reconnecting',
+      mode: 'polling',
+      message: 'Live updates paused — polling.',
+      updatedAt: new Date().toISOString(),
+    });
     try {
       await onPoll?.();
     } catch {
@@ -95,7 +100,11 @@ export function startCollaborationRealtime({ onEvent, onStatus, onPoll }: any = 
 
   const startPollingIfNeeded = () => {
     if (pollDispose || stopped) return;
-    pollDispose = createPollingLoop({ intervalMs: DEFAULT_POLL_INTERVAL_MS, onPoll, onStatus: emitStatus });
+    pollDispose = createPollingLoop({
+      intervalMs: DEFAULT_POLL_INTERVAL_MS,
+      onPoll,
+      onStatus: emitStatus,
+    });
   };
 
   const scheduleReconnect = () => {
@@ -130,7 +139,12 @@ export function startCollaborationRealtime({ onEvent, onStatus, onPoll }: any = 
     source.onopen = () => {
       reconnectAttempt = 0;
       stopPolling();
-      emitStatus({ status: 'connected', mode: 'sse', message: 'Collaboration Hub connected.', updatedAt: new Date().toISOString() });
+      emitStatus({
+        status: 'connected',
+        mode: 'sse',
+        message: 'Collaboration Hub connected.',
+        updatedAt: new Date().toISOString(),
+      });
     };
     source.onmessage = (message) => {
       const event = normalizeEvent(message.data);
@@ -139,7 +153,12 @@ export function startCollaborationRealtime({ onEvent, onStatus, onPoll }: any = 
     };
     source.onerror = () => {
       source.close();
-      emitStatus({ status: 'reconnecting', mode: 'sse', message: 'Reconnecting…', updatedAt: new Date().toISOString() });
+      emitStatus({
+        status: 'reconnecting',
+        mode: 'sse',
+        message: 'Reconnecting…',
+        updatedAt: new Date().toISOString(),
+      });
       startPollingIfNeeded();
       scheduleReconnect();
     };

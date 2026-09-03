@@ -14,11 +14,8 @@ vi.mock('./apiClient', () => ({
   parseApiResponse: async (response, { fallback }: any = {}) => response.mockData ?? fallback ?? {},
 }));
 
-const {
-  acknowledgeClinicalAlertApi,
-  dismissClinicalAlertApi,
-  fetchClinicalAlerts,
-} = await import('./clinicalAlertsApi');
+const { acknowledgeClinicalAlertApi, dismissClinicalAlertApi, fetchClinicalAlerts } =
+  await import('./clinicalAlertsApi');
 
 describe('clinicalAlertsApi', () => {
   beforeEach(() => {
@@ -45,11 +42,11 @@ describe('clinicalAlertsApi', () => {
 
     expect(apiFetch).toHaveBeenCalledWith(
       '/api/clinical/alerts/alert-1/acknowledge',
-      expect.objectContaining({ method: 'POST' })
+      expect.objectContaining({ method: 'POST' }),
     );
     expect(apiFetch).toHaveBeenCalledWith(
       '/api/clinical/alerts/alert-1/dismiss',
-      expect.objectContaining({ method: 'POST' })
+      expect.objectContaining({ method: 'POST' }),
     );
   });
 
@@ -59,7 +56,8 @@ describe('clinicalAlertsApi', () => {
     const result = await fetchClinicalAlerts();
 
     expect(result.ok).toBe(false);
-    if (!('disabled' in result)) throw new Error('expected fetchClinicalAlerts to return a disabled result');
+    if (!('disabled' in result))
+      throw new Error('expected fetchClinicalAlerts to return a disabled result');
     expect(result.disabled).toBe(true);
     expect(apiFetch).not.toHaveBeenCalled();
   });

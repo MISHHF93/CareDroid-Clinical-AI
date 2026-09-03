@@ -19,7 +19,10 @@ import './BusinessBrain.css';
 export function CareDroidBusinessBrainPage() {
   useRouteChromeRegistration({ title: 'Business Brain' });
   const brain = useMemo(() => buildCareDroidBusinessBrain(), []);
-  const domainChart = useMemo(() => buildBusinessBrainDomainChart(brain.analytics), [brain.analytics]);
+  const domainChart = useMemo(
+    () => buildBusinessBrainDomainChart(brain.analytics),
+    [brain.analytics],
+  );
   const recommendationChart = useMemo(
     () => buildBusinessBrainRecommendationChart(brain.recommendations),
     [brain.recommendations],
@@ -31,8 +34,13 @@ export function CareDroidBusinessBrainPage() {
         <div className="business-brain-page__title-row">
           <GraphicIconBadge iconKey="chart-bar" accent="brand" size="md" />
           <div>
-            <p className="business-brain-page-title-text" data-testid="cd-page-title-text">Business Brain</p>
-            <p>Platform and business analytics fused into expansion, retirement, merge, onboarding, and training advisories.</p>
+            <p className="business-brain-page-title-text" data-testid="cd-page-title-text">
+              Business Brain
+            </p>
+            <p>
+              Platform and business analytics fused into expansion, retirement, merge, onboarding,
+              and training advisories.
+            </p>
           </div>
         </div>
         <div className="business-brain-page__actions">
@@ -49,20 +57,43 @@ export function CareDroidBusinessBrainPage() {
         details="Demo advisory layer aggregating product intelligence, expansion signals, department outcomes, and workflow mining friction."
       />
 
-      <div className="business-brain-page__metrics" role="group" aria-label="Business brain summary metrics">
+      <div
+        className="business-brain-page__metrics"
+        role="group"
+        aria-label="Business brain summary metrics"
+      >
         <MetricCard
           label="Avg score"
           value={String(brain.summary.averageBusinessScore)}
           hint="Analytic domains"
           tone={businessBrainScoreTone(brain.summary.averageBusinessScore)}
         />
-        <MetricCard label="Domains" value={String(brain.summary.analyticDomainCount)} hint="Tracked areas" tone="neutral" />
-        <MetricCard label="Recommendations" value={String(brain.summary.recommendationCount)} hint="Advisory motions" tone="neutral" />
-        <MetricCard label="High priority" value={String(brain.summary.highPriorityCount)} hint="Score ≥ 80" tone="good" />
+        <MetricCard
+          label="Domains"
+          value={String(brain.summary.analyticDomainCount)}
+          hint="Tracked areas"
+          tone="neutral"
+        />
+        <MetricCard
+          label="Recommendations"
+          value={String(brain.summary.recommendationCount)}
+          hint="Advisory motions"
+          tone="neutral"
+        />
+        <MetricCard
+          label="High priority"
+          value={String(brain.summary.highPriorityCount)}
+          hint="Score ≥ 80"
+          tone="good"
+        />
       </div>
 
       <div className="business-brain-page__charts">
-        <VisualizationPanel title="Analytic domains" description="SaaS, organization, workspace, asset, AI, automation, and simulation scores." badge="Domains">
+        <VisualizationPanel
+          title="Analytic domains"
+          description="SaaS, organization, workspace, asset, AI, automation, and simulation scores."
+          badge="Domains"
+        >
           <CategoryBarChart
             data={domainChart}
             title="Analytic domains"
@@ -70,7 +101,11 @@ export function CareDroidBusinessBrainPage() {
             emptyMessage="Domain chart appears when analytics are registered."
           />
         </VisualizationPanel>
-        <VisualizationPanel title="Recommendation scores" description="Ranked advisory motions with evidence-backed priority." badge="Advisory">
+        <VisualizationPanel
+          title="Recommendation scores"
+          description="Ranked advisory motions with evidence-backed priority."
+          badge="Advisory"
+        >
           <CategoryBarChart
             data={recommendationChart}
             title="Recommendation scores"
@@ -114,7 +149,9 @@ export function CareDroidBusinessBrainPage() {
               <span role="cell">{item.title}</span>
               <span role="cell">{item.type.replace(/_/g, ' ')}</span>
               <span role="cell">
-                <span className={`business-brain-page__pill business-brain-page__pill--${recommendationPriorityTone(item.priority)}`}>
+                <span
+                  className={`business-brain-page__pill business-brain-page__pill--${recommendationPriorityTone(item.priority)}`}
+                >
                   {item.score}
                 </span>
               </span>

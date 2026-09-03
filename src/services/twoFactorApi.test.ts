@@ -13,12 +13,8 @@ vi.mock('../config/backendApiCapabilities', () => ({
   isBackendCapabilityEnabled: (...args: unknown[]) => isBackendCapabilityEnabled(...args),
 }));
 
-const {
-  disableTwoFactor,
-  enableTwoFactor,
-  fetchTwoFactorStatus,
-  generateTwoFactorSecret,
-} = await import('./twoFactorApi');
+const { disableTwoFactor, enableTwoFactor, fetchTwoFactorStatus, generateTwoFactorSecret } =
+  await import('./twoFactorApi');
 
 const ok = (data: unknown) => ({ response: { ok: true, status: 200 }, data });
 

@@ -53,11 +53,11 @@ describe('OfflineProvider feature gate', () => {
     render(
       <OfflineProvider>
         <div>CareDroid route content</div>
-      </OfflineProvider>
+      </OfflineProvider>,
     );
 
     expect(await screen.findByRole('alert', { name: /offline mode disabled/i })).toHaveTextContent(
-      /background sync, service worker registration, and offline catalog caching are disabled/i
+      /background sync, service worker registration, and offline catalog caching are disabled/i,
     );
     expect(screen.getByText(/CareDroid route content/i)).toBeInTheDocument();
 

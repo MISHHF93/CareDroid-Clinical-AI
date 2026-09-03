@@ -23,10 +23,7 @@ import { CANONICAL_ROUTE_MAP } from './routes.config';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, '../..');
-const catalogPath = join(
-  repoRoot,
-  'backend/src/modules/app-navigator/data/catalog.json',
-);
+const catalogPath = join(repoRoot, 'backend/src/modules/app-navigator/data/catalog.json');
 
 type CatalogRecord = {
   id: string;
@@ -46,9 +43,10 @@ describe('App Navigator catalog drift guard', () => {
     const missing = CANONICAL_ROUTE_MAP.filter((route) => !catalogById.has(route.id)).map(
       (route) => route.id,
     );
-    expect(missing, 'routes missing from catalog.json (run `npm run navigator-catalog:sync`)').toEqual(
-      [],
-    );
+    expect(
+      missing,
+      'routes missing from catalog.json (run `npm run navigator-catalog:sync`)',
+    ).toEqual([]);
   });
 
   it('no catalog.json record survives for a route removed from CANONICAL_ROUTE_MAP', () => {
@@ -56,20 +54,26 @@ describe('App Navigator catalog drift guard', () => {
     const orphaned = catalog.records
       .filter((record) => !canonicalIds.has(record.id))
       .map((record) => record.id);
-    expect(orphaned, 'catalog.json records for routes no longer in CANONICAL_ROUTE_MAP (run the sync script)').toEqual(
-      [],
-    );
+    expect(
+      orphaned,
+      'catalog.json records for routes no longer in CANONICAL_ROUTE_MAP (run the sync script)',
+    ).toEqual([]);
   });
 
   it.each(CANONICAL_ROUTE_MAP.map((route) => [route.id, route] as const))(
     '%s: label, path, component, and breadcrumbs match CANONICAL_ROUTE_MAP',
     (id, route) => {
       const record = catalogById.get(id);
-      expect(record, `catalog.json is missing '${id}' -- run npm run navigator-catalog:sync`).toBeTruthy();
+      expect(
+        record,
+        `catalog.json is missing '${id}' -- run npm run navigator-catalog:sync`,
+      ).toBeTruthy();
       if (!record) return;
       expect(record.label).toBe(route.label);
       expect(record.path).toBe(route.path);
-      expect(record.component).toBe(route.pageComponent || (route as { componentKey?: string }).componentKey);
+      expect(record.component).toBe(
+        route.pageComponent || (route as { componentKey?: string }).componentKey,
+      );
       expect(record.breadcrumbs).toEqual(route.breadcrumbs || []);
     },
   );

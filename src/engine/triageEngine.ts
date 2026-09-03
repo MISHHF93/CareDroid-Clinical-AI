@@ -89,7 +89,8 @@ function p1Complaint(complaint: string): string | null {
 }
 
 function p3Complaint(complaint: string): string | null {
-  if (hasChestPain(complaint) && !hasDiaphoresis(complaint)) return 'chest pain without diaphoresis';
+  if (hasChestPain(complaint) && !hasDiaphoresis(complaint))
+    return 'chest pain without diaphoresis';
   if (/\babdominal pain\b|\babdo\b/.test(complaint)) return 'abdominal pain';
   if (/\blaceration\b/.test(complaint) && /\brepair\b|\bsuture\b|\bstitch\b/.test(complaint)) {
     return 'laceration requiring repair';
@@ -147,7 +148,12 @@ export class TriageSuggestionEngine {
     const p3ComplaintMatch = p3Complaint(complaint);
 
     if (typeof spo2 === 'number' && spo2 < 88) {
-      return rule(Priority.P1, 'high', `P1 suggested - SpO2 ${formatValue(spo2, '%')}`, 'p1-spo2-under-88');
+      return rule(
+        Priority.P1,
+        'high',
+        `P1 suggested - SpO2 ${formatValue(spo2, '%')}`,
+        'p1-spo2-under-88',
+      );
     }
     if (typeof hr === 'number' && (hr < 40 || hr > 160)) {
       return rule(Priority.P1, 'high', `P1 suggested - HR ${formatValue(hr)}`, 'p1-hr-critical');
@@ -156,14 +162,24 @@ export class TriageSuggestionEngine {
       return rule(Priority.P1, 'high', `P1 suggested - SBP ${formatValue(sbp)}`, 'p1-sbp-under-70');
     }
     if (typeof gcs === 'number' && gcs <= 8) {
-      return rule(Priority.P1, 'high', `P1 suggested - GCS ${formatValue(gcs)}`, 'p1-gcs-8-or-less');
+      return rule(
+        Priority.P1,
+        'high',
+        `P1 suggested - GCS ${formatValue(gcs)}`,
+        'p1-gcs-8-or-less',
+      );
     }
     if (p1ComplaintMatch) {
       return rule(Priority.P1, 'high', `P1 suggested - ${p1ComplaintMatch}`, 'p1-complaint');
     }
 
     if (typeof spo2 === 'number' && spo2 >= 88 && spo2 <= 93) {
-      return rule(Priority.P2, 'high', `P2 suggested - SpO2 ${formatValue(spo2, '%')}`, 'p2-spo2-88-93');
+      return rule(
+        Priority.P2,
+        'high',
+        `P2 suggested - SpO2 ${formatValue(spo2, '%')}`,
+        'p2-spo2-88-93',
+      );
     }
     if (typeof hr === 'number' && ((hr >= 130 && hr <= 160) || hr < 50)) {
       return rule(Priority.P2, 'high', `P2 suggested - HR ${formatValue(hr)}`, 'p2-hr-emergent');
@@ -172,10 +188,20 @@ export class TriageSuggestionEngine {
       return rule(Priority.P2, 'high', `P2 suggested - SBP ${formatValue(sbp)}`, 'p2-sbp-emergent');
     }
     if (hasChestPain(complaint) && hasDiaphoresis(complaint)) {
-      return rule(Priority.P2, 'high', 'P2 suggested - chest pain with diaphoresis', 'p2-chest-pain-diaphoresis');
+      return rule(
+        Priority.P2,
+        'high',
+        'P2 suggested - chest pain with diaphoresis',
+        'p2-chest-pain-diaphoresis',
+      );
     }
     if (hasChestPain(complaint) && typeof hr === 'number' && hr > 120) {
-      return rule(Priority.P2, 'high', `P2 suggested - chest pain with HR ${formatValue(hr)}`, 'p2-chest-pain-hr-over-120');
+      return rule(
+        Priority.P2,
+        'high',
+        `P2 suggested - chest pain with HR ${formatValue(hr)}`,
+        'p2-chest-pain-hr-over-120',
+      );
     }
     if (hasStrokeSymptoms(complaint)) {
       return rule(Priority.P2, 'high', 'P2 suggested - stroke symptoms', 'p2-stroke-symptoms');
@@ -184,11 +210,21 @@ export class TriageSuggestionEngine {
       return rule(Priority.P2, 'high', 'P2 suggested - sepsis complaint', 'p2-sepsis');
     }
     if (hasSevereRespiratory(complaint)) {
-      return rule(Priority.P2, 'high', 'P2 suggested - severe respiratory complaint', 'p2-severe-respiratory');
+      return rule(
+        Priority.P2,
+        'high',
+        'P2 suggested - severe respiratory complaint',
+        'p2-severe-respiratory',
+      );
     }
 
     if (typeof spo2 === 'number' && spo2 >= 94 && spo2 <= 95) {
-      return rule(Priority.P3, 'medium', `P3 suggested - SpO2 ${formatValue(spo2, '%')}`, 'p3-spo2-94-95');
+      return rule(
+        Priority.P3,
+        'medium',
+        `P3 suggested - SpO2 ${formatValue(spo2, '%')}`,
+        'p3-spo2-94-95',
+      );
     }
     if (typeof hr === 'number' && hr >= 110 && hr < 130) {
       return rule(Priority.P3, 'medium', `P3 suggested - HR ${formatValue(hr)}`, 'p3-hr-110-130');
@@ -200,7 +236,12 @@ export class TriageSuggestionEngine {
     // to include the top of the scale rather than inventing a new P1/P2
     // pain-specific tier this engine doesn't otherwise have.
     if (typeof pain === 'number' && pain >= 6 && pain <= 10) {
-      return rule(Priority.P3, 'medium', `P3 suggested - pain ${formatValue(pain)}/10`, 'p3-moderate-pain');
+      return rule(
+        Priority.P3,
+        'medium',
+        `P3 suggested - pain ${formatValue(pain)}/10`,
+        'p3-moderate-pain',
+      );
     }
     if (p3ComplaintMatch) {
       return rule(Priority.P3, 'medium', `P3 suggested - ${p3ComplaintMatch}`, 'p3-complaint');

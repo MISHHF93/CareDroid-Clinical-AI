@@ -33,7 +33,12 @@ export default function PlatformGovernanceWorkspace() {
   const location = useLocation();
   const capability = getPlatformSystemCapabilityByPath(location.pathname);
   const surface = inferPlatformGovernanceSurface(location.pathname);
-  const [state, setState] = useState<any>({ loading: true, error: '', data: null, sourceStatus: 'loading' });
+  const [state, setState] = useState<any>({
+    loading: true,
+    error: '',
+    data: null,
+    sourceStatus: 'loading',
+  });
 
   useEffect(() => {
     let cancelled = false;
@@ -92,7 +97,11 @@ export default function PlatformGovernanceWorkspace() {
     <main className="governance-workspace-page" aria-label={view.copy.title}>
       <header className="governance-workspace-page__header">
         <div className="governance-workspace-page__title-row">
-          <GraphicIconBadge iconKey={view.copy.iconKey || 'shield-check'} accent="brand" size="md" />
+          <GraphicIconBadge
+            iconKey={view.copy.iconKey || 'shield-check'}
+            accent="brand"
+            size="md"
+          />
           <div>
             <p className="governance-workspace-page__eyebrow">
               {capability?.criticality || 'P0'} platform governance
@@ -126,7 +135,11 @@ export default function PlatformGovernanceWorkspace() {
         details="Governance, security, regulatory, review, privacy, audit, observability, and FHIR/HL7 interoperability routes show the current source status. Demo or synthetic panels are review artifacts only; unavailable or unsupported controls should not be treated as active production enforcement."
       />
 
-      <div className="governance-workspace-page__metrics" role="group" aria-label="Governance summary metrics">
+      <div
+        className="governance-workspace-page__metrics"
+        role="group"
+        aria-label="Governance summary metrics"
+      >
         {view.metrics.map((metric) => (
           <MetricCard
             key={metric.label}
@@ -153,39 +166,56 @@ export default function PlatformGovernanceWorkspace() {
         </VisualizationPanel>
       </div>
 
-      <section className="governance-workspace-page__panel" aria-labelledby="platform-dashboard-panels-title">
+      <section
+        className="governance-workspace-page__panel"
+        aria-labelledby="platform-dashboard-panels-title"
+      >
         <h2 id="platform-dashboard-panels-title">Dashboard Panels</h2>
         <p>Governance and security controls are split into reviewable operational panels.</p>
         <div className="governance-workspace-page__cards">
           {view.controls.map((control) => (
-              <article className="governance-workspace-page__card" key={control.id}>
-                <span className="governance-workspace-page__card-meta">{control.label}</span>
-                <strong>{control.summary}</strong>
-                <span className={`governance-workspace-page__pill governance-workspace-page__pill--${governancePanelTone(control.score)}`}>
-                  Score {control.score}
-                </span>
-                {control.modelInventory && control.modelInventory.length > 0 ? (
-                  <span>See the AI Model Inventory table below for each model's full record.</span>
-                ) : (
-                  <span>{control.detail.slice(0, 220)}</span>
-                )}
-              </article>
-            ))}
+            <article className="governance-workspace-page__card" key={control.id}>
+              <span className="governance-workspace-page__card-meta">{control.label}</span>
+              <strong>{control.summary}</strong>
+              <span
+                className={`governance-workspace-page__pill governance-workspace-page__pill--${governancePanelTone(control.score)}`}
+              >
+                Score {control.score}
+              </span>
+              {control.modelInventory && control.modelInventory.length > 0 ? (
+                <span>See the AI Model Inventory table below for each model's full record.</span>
+              ) : (
+                <span>{control.detail.slice(0, 220)}</span>
+              )}
+            </article>
+          ))}
         </div>
       </section>
 
       {modelInventoryRecords.length > 0 ? (
-        <section className="governance-workspace-page__panel" aria-labelledby="platform-model-inventory-title">
+        <section
+          className="governance-workspace-page__panel"
+          aria-labelledby="platform-model-inventory-title"
+        >
           <h2 id="platform-model-inventory-title">AI Model Inventory</h2>
-          <p>Governed model cards — identity, purpose, regulatory classification, ownership, known limitations, and retirement plan for every registered AI model, sourced from data/model-registry/entries.</p>
+          <p>
+            Governed model cards — identity, purpose, regulatory classification, ownership, known
+            limitations, and retirement plan for every registered AI model, sourced from
+            data/model-registry/entries.
+          </p>
           <div className="governance-workspace-page__model-cards">
             {modelInventoryRecords.map((model) => (
-              <article className="governance-workspace-page__card governance-workspace-page__model-card" key={model.modelId}>
+              <article
+                className="governance-workspace-page__card governance-workspace-page__model-card"
+                key={model.modelId}
+              >
                 <span className="governance-workspace-page__card-meta">{model.status}</span>
                 <strong>{model.modelName}</strong>
                 <dl>
                   <dt>Model identifier</dt>
-                  <dd><code>{model.modelIdentifier}</code></dd>
+                  <dd>
+                    <code>{model.modelIdentifier}</code>
+                  </dd>
                   <dt>Purpose</dt>
                   <dd>{model.purpose}</dd>
                   <dt>Regulatory class</dt>
@@ -205,7 +235,9 @@ export default function PlatformGovernanceWorkspace() {
                     )}
                   </dd>
                   <dt>Expires / retirement plan</dt>
-                  <dd>{model.expiresAt} — {model.retirementPlan}</dd>
+                  <dd>
+                    {model.expiresAt} — {model.retirementPlan}
+                  </dd>
                 </dl>
               </article>
             ))}
@@ -213,17 +245,32 @@ export default function PlatformGovernanceWorkspace() {
         </section>
       ) : null}
 
-      <section className="governance-workspace-page__panel" aria-labelledby="platform-decision-title">
+      <section
+        className="governance-workspace-page__panel"
+        aria-labelledby="platform-decision-title"
+      >
         <h2 id="platform-decision-title">Human Review Gate</h2>
-        <p>Approval, rejection, escalation, export, and writeback remain disabled until durable review records are approved.</p>
+        <p>
+          Approval, rejection, escalation, export, and writeback remain disabled until durable
+          review records are approved.
+        </p>
         <div className="governance-workspace-page__cards">
           <article className="governance-workspace-page__card">
             <strong>Governance decisioning</strong>
-            <span>Every AI run is evaluated for missing governance, consent, validation, classification, or audit controls, logged to the audit trail, and always marked as requiring human review. Today only ambient-scribe drafting routes a missing-control decision to the review queue; other integration points record the decision but do not yet block the underlying action on it.</span>
+            <span>
+              Every AI run is evaluated for missing governance, consent, validation, classification,
+              or audit controls, logged to the audit trail, and always marked as requiring human
+              review. Today only ambient-scribe drafting routes a missing-control decision to the
+              review queue; other integration points record the decision but do not yet block the
+              underlying action on it.
+            </span>
           </article>
           <article className="governance-workspace-page__card">
             <strong>No autonomous action</strong>
-            <span>CareDroid does not sign notes, place orders, write to an EHR, export PHI, or contact patients automatically.</span>
+            <span>
+              CareDroid does not sign notes, place orders, write to an EHR, export PHI, or contact
+              patients automatically.
+            </span>
           </article>
         </div>
       </section>
@@ -237,24 +284,28 @@ export default function PlatformGovernanceWorkspace() {
             <span role="columnheader">Evidence</span>
           </div>
           {view.controls.map((control) => (
-              <div key={control.id} className="governance-workspace-page__table-row" role="row">
-                <span role="cell">{control.label}</span>
-                <span role="cell">
-                  <span className={`governance-workspace-page__pill governance-workspace-page__pill--${governancePanelTone(control.score)}`}>
-                    {control.summary}
-                  </span>
+            <div key={control.id} className="governance-workspace-page__table-row" role="row">
+              <span role="cell">{control.label}</span>
+              <span role="cell">
+                <span
+                  className={`governance-workspace-page__pill governance-workspace-page__pill--${governancePanelTone(control.score)}`}
+                >
+                  {control.summary}
                 </span>
-                <span role="cell">
-                  {control.modelInventory && control.modelInventory.length > 0
-                    ? `${control.modelInventory.length} governed model card(s) — see AI Model Inventory above.`
-                    : control.detail}
-                </span>
-              </div>
-            ))}
+              </span>
+              <span role="cell">
+                {control.modelInventory && control.modelInventory.length > 0
+                  ? `${control.modelInventory.length} governed model card(s) — see AI Model Inventory above.`
+                  : control.detail}
+              </span>
+            </div>
+          ))}
         </div>
         <p>
           Source status:{' '}
-          <span className={`governance-workspace-page__pill governance-workspace-page__pill--${governanceSourceTone(state.sourceStatus)}`}>
+          <span
+            className={`governance-workspace-page__pill governance-workspace-page__pill--${governanceSourceTone(state.sourceStatus)}`}
+          >
             {state.sourceStatus}
           </span>
         </p>

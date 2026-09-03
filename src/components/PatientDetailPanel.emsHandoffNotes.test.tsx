@@ -129,7 +129,7 @@ describe('PatientDetailPanel EMS handoff notes (HEAL-189)', () => {
     ).toBeTruthy();
   });
 
-  it('shows the receiving clinician\'s closing notes, with their name, when present', () => {
+  it("shows the receiving clinician's closing notes, with their name, when present", () => {
     renderWithPatient(
       makePatient({
         emsArrival: makeEmsArrival({
@@ -144,7 +144,9 @@ describe('PatientDetailPanel EMS handoff notes (HEAL-189)', () => {
       }),
     );
 
-    const notesBlock = screen.getByText(/Confirmed allergy history directly with crew/).closest('div');
+    const notesBlock = screen
+      .getByText(/Confirmed allergy history directly with crew/)
+      .closest('div');
     expect(notesBlock).toHaveTextContent('Receiving clinician (R. Patel)');
   });
 

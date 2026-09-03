@@ -36,7 +36,13 @@ export function useSecurityAccess() {
       permissionContext: emergency.permissionContext,
       readOnly: emergency.readOnly ?? base.readOnly,
     };
-  }, [emergency.compiledProfile, emergency.permissionContext, emergency.readOnly, emergency.role, user]);
+  }, [
+    emergency.compiledProfile,
+    emergency.permissionContext,
+    emergency.readOnly,
+    emergency.role,
+    user,
+  ]);
 
   return useMemo(
     () => ({

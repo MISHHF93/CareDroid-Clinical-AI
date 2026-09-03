@@ -128,7 +128,8 @@ const ToolResultShare = ({ toolName, toolId, results, onClose }) => {
       // exportsPdf capability is disabled -- report what was actually
       // downloaded (from the real filename/mimeType it returns), not what the
       // user selected, so "exported as PDF" is never shown for a JSON file.
-      const actualFormat = downloaded?.filename?.split('.').pop()?.toUpperCase() || selectedFormat.toUpperCase();
+      const actualFormat =
+        downloaded?.filename?.split('.').pop()?.toUpperCase() || selectedFormat.toUpperCase();
       setFeedback({
         text:
           actualFormat === selectedFormat.toUpperCase()

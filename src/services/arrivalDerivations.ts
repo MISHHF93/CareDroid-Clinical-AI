@@ -17,10 +17,7 @@ function hasFlag(patient: Patient, flag: PatientFlag): boolean {
   );
 }
 
-export function normalizeArrivalMode(
-  input?: string | null,
-  patient?: Patient | null,
-): ArrivalMode {
+export function normalizeArrivalMode(input?: string | null, patient?: Patient | null): ArrivalMode {
   if (patient && (hasFlag(patient, PatientFlag.EMSArrival) || patient.source === 'EMS')) {
     return 'EMS';
   }

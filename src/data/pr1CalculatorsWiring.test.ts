@@ -22,9 +22,9 @@ const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
 const patternsSource = readFileSync(
   join(
     __dirname,
-    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts'
+    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts',
   ),
-  'utf8'
+  'utf8',
 );
 
 describe('PR1 calculator wiring (qSOFA, NEWS2, Child-Pugh, HAS-BLED)', () => {
@@ -42,13 +42,13 @@ describe('PR1 calculator wiring (qSOFA, NEWS2, Child-Pugh, HAS-BLED)', () => {
       expect(reg.panelTool).toBe('calculators');
 
       const nlu = clinicalIntentTools.find((t) => t.toolId === id);
-    if (!nlu) throw new Error('expected nlu tool entry to exist');
+      if (!nlu) throw new Error('expected nlu tool entry to exist');
       expect(nlu, `clinicalIntentTools missing ${id}`).toBeTruthy();
       expect(nlu.path).toBe(`/tools/calculators/${id}`);
       expect(nlu.sidebarToolId).toBe(id);
 
       const builtin = builtinUiCalculators.find((c) => c.id === id);
-    if (!builtin) throw new Error('expected builtin calculator entry to exist');
+      if (!builtin) throw new Error('expected builtin calculator entry to exist');
       expect(builtin, `builtinUiCalculators missing ${id}`).toBeTruthy();
       expect(builtin.path).toBe(`/tools/calculators/${id}`);
       expect(builtin.calcQuery).toBe(`/tools/calculators?calc=${id}`);
@@ -97,9 +97,9 @@ describe('PR1 calculator wiring (qSOFA, NEWS2, Child-Pugh, HAS-BLED)', () => {
     const catalogRows = getMedicalToolsCatalogRows();
 
     for (const id of PR1_CALCULATOR_REGISTRY_IDS) {
-      expect(discovered.some((r) => r.id === id && r.path?.includes(`/tools/calculators/${id}`))).toBe(
-        true
-      );
+      expect(
+        discovered.some((r) => r.id === id && r.path?.includes(`/tools/calculators/${id}`)),
+      ).toBe(true);
       const row = catalogRows.find((r) => r.primaryId === id || r.id === id);
       expect(row?.pagePath).toBe(`/tools/calculators/${id}`);
       expect(row?.uiCalculatorSlug).toBe(id);
@@ -138,8 +138,13 @@ describe('PR1 calculator wiring (qSOFA, NEWS2, Child-Pugh, HAS-BLED)', () => {
     expect(resolveCatalogLaunch(alias).registryId).toBe(canonical);
   });
 
-  it.each(PR1_CATALOG_SEARCH_QUERIES)('catalog search finds %s for query %s', (registryId, query) => {
-    const rows = catalogRowsMatchingQuery(getMedicalToolsCatalogRows(), query);
-    expect(rows.some((r) => r.sidebarToolId === registryId || r.primaryId === registryId)).toBe(true);
-  });
+  it.each(PR1_CATALOG_SEARCH_QUERIES)(
+    'catalog search finds %s for query %s',
+    (registryId, query) => {
+      const rows = catalogRowsMatchingQuery(getMedicalToolsCatalogRows(), query);
+      expect(rows.some((r) => r.sidebarToolId === registryId || r.primaryId === registryId)).toBe(
+        true,
+      );
+    },
+  );
 });

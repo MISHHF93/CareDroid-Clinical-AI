@@ -8,10 +8,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, it, expect } from 'vitest';
 import toolRegistry, { toolRegistryById } from './toolRegistry';
-import {
-  clinicalIntentTools,
-  nluCalculatorHubOnly,
-} from './clinicalIntentToolCatalog';
+import { clinicalIntentTools, nluCalculatorHubOnly } from './clinicalIntentToolCatalog';
 import {
   resolveCatalogLaunch,
   resolveNavigationPathForLaunch,
@@ -37,9 +34,9 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const patternsSource = readFileSync(
   join(
     __dirname,
-    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts'
+    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts',
   ),
-  'utf8'
+  'utf8',
 );
 
 describe('PR6 consistency — centralized audit lists', () => {
@@ -85,7 +82,7 @@ describe('PR6 consistency — aliases and launch', () => {
     for (const [alias, canonical] of PR6_ALL_ALIAS_PAIRS) {
       if (targetByAlias.has(alias) && targetByAlias.get(alias) !== canonical) {
         throw new Error(
-          `Conflicting PR6 alias "${alias}": ${targetByAlias.get(alias)} vs ${canonical}`
+          `Conflicting PR6 alias "${alias}": ${targetByAlias.get(alias)} vs ${canonical}`,
         );
       }
       targetByAlias.set(alias, canonical);

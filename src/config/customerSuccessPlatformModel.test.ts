@@ -24,7 +24,9 @@ describe('customerSuccessPlatformModel', () => {
           activeUsers: { value: 42 },
           assetUsage: {
             value: 128,
-            topAssets: [{ id: 'whiteboard', label: 'Whiteboard', count: 20, route: '/emergency/whiteboard' }],
+            topAssets: [
+              { id: 'whiteboard', label: 'Whiteboard', count: 20, route: '/emergency/whiteboard' },
+            ],
           },
           aiUsage: { value: 31 },
           simulationsCompleted: { value: 9 },
@@ -45,14 +47,22 @@ describe('customerSuccessPlatformModel', () => {
       organizationName: 'Demo Hospital',
     });
 
-    expect(assessment.capabilities[CUSTOMER_SUCCESS_CAPABILITY.ONBOARDING].percent).toBeGreaterThan(0);
-    expect(assessment.capabilities[CUSTOMER_SUCCESS_CAPABILITY.ADOPTION].adoptionScore).toBe(75);
-    expect(assessment.capabilities[CUSTOMER_SUCCESS_CAPABILITY.FEATURE_UTILIZATION].totalFeatures).toBe(
-      FEATURE_UTILIZATION_REGISTRY.length,
+    expect(assessment.capabilities[CUSTOMER_SUCCESS_CAPABILITY.ONBOARDING].percent).toBeGreaterThan(
+      0,
     );
-    expect(assessment.capabilities[CUSTOMER_SUCCESS_CAPABILITY.HEALTH_SCORE].score).toBeGreaterThan(0);
-    expect(assessment.capabilities[CUSTOMER_SUCCESS_CAPABILITY.SUPPORT_TRACKING].openCount).toBeGreaterThanOrEqual(0);
-    expect(assessment.capabilities[CUSTOMER_SUCCESS_CAPABILITY.RENEWAL_READINESS].score).toBeGreaterThan(0);
+    expect(assessment.capabilities[CUSTOMER_SUCCESS_CAPABILITY.ADOPTION].adoptionScore).toBe(75);
+    expect(
+      assessment.capabilities[CUSTOMER_SUCCESS_CAPABILITY.FEATURE_UTILIZATION].totalFeatures,
+    ).toBe(FEATURE_UTILIZATION_REGISTRY.length);
+    expect(assessment.capabilities[CUSTOMER_SUCCESS_CAPABILITY.HEALTH_SCORE].score).toBeGreaterThan(
+      0,
+    );
+    expect(
+      assessment.capabilities[CUSTOMER_SUCCESS_CAPABILITY.SUPPORT_TRACKING].openCount,
+    ).toBeGreaterThanOrEqual(0);
+    expect(
+      assessment.capabilities[CUSTOMER_SUCCESS_CAPABILITY.RENEWAL_READINESS].score,
+    ).toBeGreaterThan(0);
     expect(assessment.kpiEvaluation.totalCount).toBe(7);
   });
 

@@ -184,7 +184,7 @@ describe('aiCommandCenterApi', () => {
 
   it('falls back to local cost data when cost optimization is disabled', async () => {
     capabilityStatus.mockImplementation((capability) =>
-      capability === 'costOptimization' ? 'disabled' : 'real'
+      capability === 'costOptimization' ? 'disabled' : 'real',
     );
 
     const snapshot = await fetchAiCommandCenterSnapshot();

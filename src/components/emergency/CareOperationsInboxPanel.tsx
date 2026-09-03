@@ -107,7 +107,7 @@ function CareTaskRow({
  */
 export default function CareOperationsInboxPanel({
   title = 'Care Operations Inbox',
-  lead = "Real outstanding work claimed and closed here -- not scattered notes or memory.",
+  lead = 'Real outstanding work claimed and closed here -- not scattered notes or memory.',
   surfaceKey = 'care-operations-inbox',
 }: {
   title?: string;
@@ -150,7 +150,8 @@ export default function CareOperationsInboxPanel({
   }, [surfaceKey]);
 
   const isTaskNew = useCallback(
-    (task: CareTask) => previousViewedAt !== null && new Date(task.createdAt) > new Date(previousViewedAt),
+    (task: CareTask) =>
+      previousViewedAt !== null && new Date(task.createdAt) > new Date(previousViewedAt),
     [previousViewedAt],
   );
 
@@ -181,9 +182,7 @@ export default function CareOperationsInboxPanel({
       )}
 
       {newCount > 0 && (
-        <div className="care-ops-inbox__new-banner">
-          {newCount} new since you last checked
-        </div>
+        <div className="care-ops-inbox__new-banner">{newCount} new since you last checked</div>
       )}
 
       {!loading && tasks.length === 0 ? (

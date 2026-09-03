@@ -3,7 +3,11 @@ import './ReassessmentTimerPanel.css';
 
 function TimerCell({ label, value, tone = 'neutral', title = undefined }) {
   return (
-    <div className="reassessment-timer-panel__cell" data-tone={tone} title={title || `${label}: ${value}`}>
+    <div
+      className="reassessment-timer-panel__cell"
+      data-tone={tone}
+      title={title || `${label}: ${value}`}
+    >
       <span>{label}</span>
       <strong>{value}</strong>
     </div>

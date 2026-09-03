@@ -28,9 +28,11 @@ describe('patientDocumentArtifactModel', () => {
     });
 
     expect(source.patientId).toBe('p1');
-    expect(artifacts.some((a) => a.artifactType === 'ALLERGY' && a.label.toLowerCase().includes('penicillin'))).toBe(
-      true,
-    );
+    expect(
+      artifacts.some(
+        (a) => a.artifactType === 'ALLERGY' && a.label.toLowerCase().includes('penicillin'),
+      ),
+    ).toBe(true);
     expect(artifacts.some((a) => a.artifactType === 'MEDICATION')).toBe(true);
     expect(artifacts.some((a) => a.artifactType === 'CHIEF_COMPLAINT')).toBe(true);
     expect(artifacts.some((a) => a.artifactType === 'LAB_RESULT')).toBe(true);

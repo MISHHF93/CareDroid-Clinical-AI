@@ -1,8 +1,5 @@
 import type { TriageAssistEnvelope } from '../../lib/patient-orchestration/types';
-import type {
-  PatientDocumentArtifact,
-  PatientDocumentSource,
-} from './patientDocumentArtifact';
+import type { PatientDocumentArtifact, PatientDocumentSource } from './patientDocumentArtifact';
 
 export type EntityId = string;
 export type ISODateString = string;
@@ -52,10 +49,14 @@ export type LegacyPriority =
   | undefined;
 
 export function normalizePriority(value: LegacyPriority): Priority {
-  if (value === Priority.P1 || value === 1 || value === '1' || value === 'Immediate') return Priority.P1;
-  if (value === Priority.P2 || value === 2 || value === '2' || value === 'Emergent') return Priority.P2;
-  if (value === Priority.P3 || value === 3 || value === '3' || value === 'Urgent') return Priority.P3;
-  if (value === Priority.P4 || value === 4 || value === '4' || value === 'LessUrgent') return Priority.P4;
+  if (value === Priority.P1 || value === 1 || value === '1' || value === 'Immediate')
+    return Priority.P1;
+  if (value === Priority.P2 || value === 2 || value === '2' || value === 'Emergent')
+    return Priority.P2;
+  if (value === Priority.P3 || value === 3 || value === '3' || value === 'Urgent')
+    return Priority.P3;
+  if (value === Priority.P4 || value === 4 || value === '4' || value === 'LessUrgent')
+    return Priority.P4;
   return Priority.P5;
 }
 
@@ -197,7 +198,16 @@ export interface Encounter {
   metadata?: Record<string, string | number | boolean | null | undefined>;
 }
 
-export type NoteType = 'Clinical' | 'Nursing' | 'Operational' | 'Handoff' | 'Referral' | 'System' | 'Score' | 'Disposition' | string;
+export type NoteType =
+  | 'Clinical'
+  | 'Nursing'
+  | 'Operational'
+  | 'Handoff'
+  | 'Referral'
+  | 'System'
+  | 'Score'
+  | 'Disposition'
+  | string;
 
 export interface Note {
   id: EntityId;
@@ -302,11 +312,7 @@ export interface CriticalChecklistRecord {
 }
 
 /** Identity verification state captured at ambulance handoff. */
-export type AmbulanceHandoffIdentityStatus =
-  | 'unknown'
-  | 'provisional'
-  | 'verified'
-  | 'mismatch';
+export type AmbulanceHandoffIdentityStatus = 'unknown' | 'provisional' | 'verified' | 'mismatch';
 
 /** Where the patient was moved after EMS handoff. */
 export type AmbulanceHandoffDestination =
@@ -528,13 +534,7 @@ export interface AtmistHandoverSummary {
 export type EMSCase = EMSArrival;
 
 /** Canonical arrival channel for reception / triage routing. */
-export type ArrivalMode =
-  | 'walk-in'
-  | 'EMS'
-  | 'referral'
-  | 'self-check-in'
-  | 'police'
-  | 'transfer';
+export type ArrivalMode = 'walk-in' | 'EMS' | 'referral' | 'self-check-in' | 'police' | 'transfer';
 
 /** Staff-confirmed or suggested triage acuity lifecycle. */
 export type TriageAcuityStatus = 'unassigned' | 'suggested' | 'confirmed';
@@ -901,7 +901,14 @@ export interface Shift {
   handoffNotes: Note[];
 }
 
-export type EMSUnitStatus = 'Available' | 'Dispatched' | 'Inbound' | 'AtHospital' | 'OutOfService' | 'Arrived' | 'Offload';
+export type EMSUnitStatus =
+  | 'Available'
+  | 'Dispatched'
+  | 'Inbound'
+  | 'AtHospital'
+  | 'OutOfService'
+  | 'Arrived'
+  | 'Offload';
 
 export interface EmsUnit {
   id: EntityId;
@@ -1378,7 +1385,12 @@ export interface PrehospitalAssessment {
   vitalsHistory: PrehospitalVitals[];
   currentVitals?: PrehospitalVitals;
   interventions: string[];
-  medicationsAdministered: Array<{ name: string; dose: string; route: string; time: ISODateString }>;
+  medicationsAdministered: Array<{
+    name: string;
+    dose: string;
+    route: string;
+    time: ISODateString;
+  }>;
   ivAccess: boolean;
   airwayManagement?: string;
   traumaActivation: boolean;
@@ -1516,7 +1528,12 @@ export type CriticalAlert = Alert & {
 
 export interface ThreeMinuteResponse {
   id: EntityId;
-  triggerSource: 'critical_911_call' | 'ems_pre_alert' | 'ambulance_arrival' | 'walk_in_critical_intake' | 'staff_alert';
+  triggerSource:
+    | 'critical_911_call'
+    | 'ems_pre_alert'
+    | 'ambulance_arrival'
+    | 'walk_in_critical_intake'
+    | 'staff_alert';
   patientId?: EntityId;
   callId?: EntityId;
   alertId?: EntityId;

@@ -42,4 +42,3 @@ describe('saasBottleneckImplementationAudit report', () => {
     expect(existsSync(join(docsDir, 'saas-bottleneck-implementation-audit.md'))).toBe(true);
   });
 });
-

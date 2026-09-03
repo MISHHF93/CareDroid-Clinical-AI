@@ -57,15 +57,10 @@ function formatDuration(minutes: number): string {
   return remainder ? `${hours}h ${remainder}m` : `${hours}h`;
 }
 
-function computeAverageProviderWaitMinutes(
-  patients: Patient[],
-  now: Date,
-): number | null {
+function computeAverageProviderWaitMinutes(patients: Patient[], now: Date): number | null {
   const awaiting = patients.filter(isAwaitingProvider);
   if (!awaiting.length) return null;
-  const values = awaiting.map((patient) =>
-    resolveTriageToProviderElapsedMinutes(patient, now),
-  );
+  const values = awaiting.map((patient) => resolveTriageToProviderElapsedMinutes(patient, now));
   return Math.round(values.reduce((sum, value) => sum + value, 0) / values.length);
 }
 
@@ -83,9 +78,7 @@ export function buildProviderWaitVisibilitySnapshot(
     longestProviderWaitLabel: summary.longestElapsedLabel,
     averageProviderWaitMinutes,
     averageProviderWaitLabel:
-      averageProviderWaitMinutes != null
-        ? formatDuration(averageProviderWaitMinutes)
-        : '—',
+      averageProviderWaitMinutes != null ? formatDuration(averageProviderWaitMinutes) : '—',
     approachingThresholdCount: summary.approachingThresholdCount,
     breachedCount: summary.breachedCount,
     onTrackCount: summary.onTrackCount,
@@ -262,8 +255,6 @@ export function hasProviderWaitVisibilityActivity(
   snapshot: ProviderWaitVisibilitySnapshot,
 ): boolean {
   return Boolean(
-    snapshot.awaitingClinicianCount ||
-      snapshot.approachingThresholdCount ||
-      snapshot.breachedCount,
+    snapshot.awaitingClinicianCount || snapshot.approachingThresholdCount || snapshot.breachedCount,
   );
 }

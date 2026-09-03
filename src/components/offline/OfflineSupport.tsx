@@ -8,7 +8,7 @@ import logger from '../../utils/logger';
 
 /**
  * OfflineIndicator Component
- * 
+ *
  * Banner showing network status at top of app
  * Appears when connection is lost
  */
@@ -42,17 +42,18 @@ export const OfflineIndicator = () => {
   if (!showIndicator) return null;
 
   return (
-    <div className={`offline-indicator ${isOnline ? 'offline-indicator-online' : 'offline-indicator-offline'}`}>
+    <div
+      className={`offline-indicator ${isOnline ? 'offline-indicator-online' : 'offline-indicator-offline'}`}
+    >
       <div className="offline-indicator-content">
-        <span className="offline-indicator-icon">
-          {isOnline ? '✓' : '⚠️'}
-        </span>
+        <span className="offline-indicator-icon">{isOnline ? '✓' : '⚠️'}</span>
         <span className="offline-indicator-text">
           {isOnline ? 'You are back online' : 'You are offline - Some features may be limited'}
         </span>
       </div>
       {isOnline && (
-        <button type="button"
+        <button
+          type="button"
           className="offline-indicator-close"
           onClick={() => setShowIndicator(false)}
           aria-label="Close notification"
@@ -117,9 +118,7 @@ export const OfflineModeBanner = ({
             ))}
           </ul>
         )}
-        {lastSyncAt && (
-          <small>Last offline sync: {new Date(lastSyncAt).toLocaleString()}</small>
-        )}
+        {lastSyncAt && <small>Last offline sync: {new Date(lastSyncAt).toLocaleString()}</small>}
       </div>
       {onDismiss && isOnline && !isSyncing && (
         <button type="button" className="offline-mode-banner__close" onClick={onDismiss}>
@@ -132,13 +131,23 @@ export const OfflineModeBanner = ({
   // Static role strings only (Edge Tools rejects dynamic role expressions).
   if (!isOnline || syncError) {
     return (
-      <section className={bannerClassName} role="alert" aria-live="polite" aria-label="Offline mode status">
+      <section
+        className={bannerClassName}
+        role="alert"
+        aria-live="polite"
+        aria-label="Offline mode status"
+      >
         {bannerBody}
       </section>
     );
   }
   return (
-    <section className={bannerClassName} role="status" aria-live="polite" aria-label="Offline mode status">
+    <section
+      className={bannerClassName}
+      role="status"
+      aria-live="polite"
+      aria-label="Offline mode status"
+    >
       {bannerBody}
     </section>
   );
@@ -146,10 +155,15 @@ export const OfflineModeBanner = ({
 
 /**
  * SyncStatus Component
- * 
+ *
  * Shows progress of data synchronization when reconnecting
  */
-export const SyncStatus = ({ isVisible = false, progress = 0, itemsSynced = 0, totalItems = 0 }) => {
+export const SyncStatus = ({
+  isVisible = false,
+  progress = 0,
+  itemsSynced = 0,
+  totalItems = 0,
+}) => {
   if (!isVisible) return null;
 
   const isComplete = progress === 100;
@@ -171,7 +185,9 @@ export const SyncStatus = ({ isVisible = false, progress = 0, itemsSynced = 0, t
               <div className="sync-status-spinner"></div>
               <div className="sync-status-text">
                 <h4>Syncing Data</h4>
-                <p>{itemsSynced} of {totalItems} items ({progress}%)</p>
+                <p>
+                  {itemsSynced} of {totalItems} items ({progress}%)
+                </p>
               </div>
             </>
           )}
@@ -179,10 +195,7 @@ export const SyncStatus = ({ isVisible = false, progress = 0, itemsSynced = 0, t
 
         <div className="sync-status-bar">
           <div className="sync-progress-bar">
-            <div
-              className="sync-progress-fill"
-              style={{ width: `${progress}%` }}
-            ></div>
+            <div className="sync-progress-fill" style={{ width: `${progress}%` }}></div>
           </div>
         </div>
       </div>
@@ -192,7 +205,7 @@ export const SyncStatus = ({ isVisible = false, progress = 0, itemsSynced = 0, t
 
 /**
  * OfflineWarning Component
- * 
+ *
  * Alert banner showing which features are unavailable offline
  * Appears when critical features aren't accessible
  */
@@ -217,7 +230,8 @@ export const OfflineWarning = ({
       <div className="offline-warning-header">
         <span className="offline-warning-icon">⚠️</span>
         <h3>Limited Functionality</h3>
-        <button type="button"
+        <button
+          type="button"
           className="offline-warning-close"
           onClick={onDismiss}
           aria-label="Close warning"
@@ -243,7 +257,7 @@ export const OfflineWarning = ({
         )}
 
         <div className="offline-warning-note">
-          <strong>Available Offline:</strong> View cached conversations, review past encounters, 
+          <strong>Available Offline:</strong> View cached conversations, review past encounters,
           read downloaded guidelines, and prepare notes. Your work will sync when you reconnect.
         </div>
       </div>
@@ -253,7 +267,7 @@ export const OfflineWarning = ({
 
 /**
  * Hook for managing offline status and caching
- * 
+ *
  * Returns online status, sync state, and methods for caching
  */
 export const useOfflineStatus = () => {
@@ -435,17 +449,26 @@ function openIndexedDB() {
 export const useCacheMonitor = () => {
   const { cacheData } = useOfflineStatus();
 
-  const cacheConversation = useCallback((conversation) => {
-    return cacheData('conversations', conversation);
-  }, [cacheData]);
+  const cacheConversation = useCallback(
+    (conversation) => {
+      return cacheData('conversations', conversation);
+    },
+    [cacheData],
+  );
 
-  const cacheEncounter = useCallback((encounter) => {
-    return cacheData('encounters', encounter);
-  }, [cacheData]);
+  const cacheEncounter = useCallback(
+    (encounter) => {
+      return cacheData('encounters', encounter);
+    },
+    [cacheData],
+  );
 
-  const cacheGuideline = useCallback((guideline) => {
-    return cacheData('guidelines', guideline);
-  }, [cacheData]);
+  const cacheGuideline = useCallback(
+    (guideline) => {
+      return cacheData('guidelines', guideline);
+    },
+    [cacheData],
+  );
 
   return {
     cacheConversation,

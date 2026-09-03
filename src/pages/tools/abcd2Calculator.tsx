@@ -26,7 +26,8 @@ import {
 function CalcDecisionSupportLead() {
   return (
     <SharedCalcDecisionSupportLead>
-      Does not establish a diagnosis or replace clinician judgment; follow local stroke and TIA protocols.
+      Does not establish a diagnosis or replace clinician judgment; follow local stroke and TIA
+      protocols.
     </SharedCalcDecisionSupportLead>
   );
 }
@@ -63,7 +64,7 @@ export function Abcd2Calculator({ onResultChange }) {
               riskCategory: result.riskCategory,
               severity: result.severity,
             }
-          : null
+          : null,
       );
     }
   }, [onResultChange, result]);
@@ -245,7 +246,12 @@ export function Abcd2Calculator({ onResultChange }) {
           </div>
         </form>
       </div>
-      <div className="calculator-results" id={`calc-results-${slug}`} ref={resultsRef} tabIndex={-1}>
+      <div
+        className="calculator-results"
+        id={`calc-results-${slug}`}
+        ref={resultsRef}
+        tabIndex={-1}
+      >
         <ResultsPanelTitle />
         {result ? (
           <>

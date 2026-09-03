@@ -112,7 +112,14 @@ function inferStatus({ path, owner, block, generatedKind }) {
   return ROUTE_HEALTH_STATES.ACTIVE;
 }
 
-function buildRouteEntry({ path, source, generatedKind = undefined as string | undefined, owner = undefined as string | undefined, block = '', target = '' }) {
+function buildRouteEntry({
+  path,
+  source,
+  generatedKind = undefined as string | undefined,
+  owner = undefined as string | undefined,
+  block = '',
+  target = '',
+}) {
   const normalized = normalizePath(path);
   const resolvedOwner = owner || extractOwner(block, generatedKind || 'GeneratedRoute');
   return {

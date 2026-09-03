@@ -1,8 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  launchCareDroidTool,
-  launchOrchestrationRecommendation,
-} from './careDroidToolLaunch';
+import { launchCareDroidTool, launchOrchestrationRecommendation } from './careDroidToolLaunch';
 import type { ToolRecommendation } from '../../lib/patient-orchestration';
 
 describe('careDroidToolLaunch', () => {

@@ -5,10 +5,7 @@ import {
   projectToolsWithAccess,
   resolveAssetAccessState,
 } from './assetAccess';
-import {
-  getPlatformEntitlementContext,
-  setPlatformEntitlementContext,
-} from './assetEntitlements';
+import { getPlatformEntitlementContext, setPlatformEntitlementContext } from './assetEntitlements';
 
 describe('assetAccess', () => {
   it('marks locked assets when org entitlements exclude tool', () => {
@@ -20,7 +17,7 @@ describe('assetAccess', () => {
     const { accessState } = resolveAssetAccessState(
       tool,
       getPlatformEntitlementContext(),
-      'physician'
+      'physician',
     );
     expect(accessState).toBe(ASSET_ACCESS_STATES.LOCKED);
     setPlatformEntitlementContext(null);
@@ -33,9 +30,9 @@ describe('assetAccess', () => {
       strictSaasEntitlements: true,
     });
     const tool = { id: 'qsofa', lifecycleState: 'active', executorStatus: 'registered' };
-    expect(resolveAssetAccessState(tool, getPlatformEntitlementContext(), 'physician').accessState).toBe(
-      ASSET_ACCESS_STATES.LOCKED
-    );
+    expect(
+      resolveAssetAccessState(tool, getPlatformEntitlementContext(), 'physician').accessState,
+    ).toBe(ASSET_ACCESS_STATES.LOCKED);
     setPlatformEntitlementContext(null);
   });
 
@@ -58,9 +55,11 @@ describe('assetAccess', () => {
     setPlatformEntitlementContext(null);
     const tool = { id: 'system-config', lifecycleState: 'active' };
     expect(resolveAssetAccessState(tool, null, 'student').accessState).toBe(
-      ASSET_ACCESS_STATES.ADMIN_ONLY
+      ASSET_ACCESS_STATES.ADMIN_ONLY,
     );
-    expect(resolveAssetAccessState(tool, null, 'admin').accessState).toBe(ASSET_ACCESS_STATES.ALLOWED);
+    expect(resolveAssetAccessState(tool, null, 'admin').accessState).toBe(
+      ASSET_ACCESS_STATES.ALLOWED,
+    );
   });
 
   it('admin-only tools recognize a differently-cased or padded admin saasRole (HEAL-205)', () => {
@@ -74,31 +73,53 @@ describe('assetAccess', () => {
     // audit-logs/system-config/team-management.
     setPlatformEntitlementContext(null);
     const tool = { id: 'system-config', lifecycleState: 'active' };
-    expect(resolveAssetAccessState(tool, null, 'ADMIN').accessState).toBe(ASSET_ACCESS_STATES.ALLOWED);
+    expect(resolveAssetAccessState(tool, null, 'ADMIN').accessState).toBe(
+      ASSET_ACCESS_STATES.ALLOWED,
+    );
     expect(resolveAssetAccessState(tool, null, '  admin  ').accessState).toBe(
-      ASSET_ACCESS_STATES.ALLOWED
+      ASSET_ACCESS_STATES.ALLOWED,
     );
     expect(resolveAssetAccessState(tool, null, 'Hospital-Administrator').accessState).toBe(
-      ASSET_ACCESS_STATES.ALLOWED
+      ASSET_ACCESS_STATES.ALLOWED,
     );
   });
 
   it('applies canonical asset lifecycle states within organization context', () => {
     const organizationContext = { organization: { id: 'org-1' } };
 
-    expect(resolveAssetAccessState({ id: 'draft-tool', lifecycleState: 'draft' }, organizationContext, 'admin')).toEqual({
+    expect(
+      resolveAssetAccessState(
+        { id: 'draft-tool', lifecycleState: 'draft' },
+        organizationContext,
+        'admin',
+      ),
+    ).toEqual({
       accessState: ASSET_ACCESS_STATES.HIDDEN,
       reasons: ['draft'],
     });
-    expect(resolveAssetAccessState({ id: 'beta-tool', lifecycleState: 'beta' }, null, 'admin')).toEqual({
+    expect(
+      resolveAssetAccessState({ id: 'beta-tool', lifecycleState: 'beta' }, null, 'admin'),
+    ).toEqual({
       accessState: ASSET_ACCESS_STATES.BETA,
       reasons: ['beta'],
     });
-    expect(resolveAssetAccessState({ id: 'deprecated-tool', lifecycleState: 'deprecated' }, null, 'admin')).toEqual({
+    expect(
+      resolveAssetAccessState(
+        { id: 'deprecated-tool', lifecycleState: 'deprecated' },
+        null,
+        'admin',
+      ),
+    ).toEqual({
       accessState: ASSET_ACCESS_STATES.RESTRICTED,
       reasons: ['deprecated'],
     });
-    expect(resolveAssetAccessState({ id: 'archived-tool', lifecycleState: 'archived' }, organizationContext, 'admin')).toEqual({
+    expect(
+      resolveAssetAccessState(
+        { id: 'archived-tool', lifecycleState: 'archived' },
+        organizationContext,
+        'admin',
+      ),
+    ).toEqual({
       accessState: ASSET_ACCESS_STATES.HIDDEN,
       reasons: ['archived'],
     });
@@ -118,8 +139,8 @@ describe('assetAccess', () => {
           entitledPackIds: ['fleet-logistics'],
           subscriptionPlan: 'professional',
         },
-        'physician'
-      ).accessState
+        'physician',
+      ).accessState,
     ).toBe(ASSET_ACCESS_STATES.DISABLED);
   });
 
@@ -134,8 +155,8 @@ describe('assetAccess', () => {
           entitledPackIds: ['research-education'],
           subscriptionPlan: 'free',
         },
-        'physician'
-      ).accessState
+        'physician',
+      ).accessState,
     ).toBe(ASSET_ACCESS_STATES.SUBSCRIPTION_REQUIRED);
   });
 
@@ -155,8 +176,8 @@ describe('assetAccess', () => {
             },
           },
         },
-        'physician'
-      )
+        'physician',
+      ),
     ).toMatchObject({
       accessState: ASSET_ACCESS_STATES.LOCKED,
       reasons: ['asset-not-entitled'],
@@ -177,7 +198,7 @@ describe('assetAccess', () => {
     const [row] = projectToolsWithAccess(
       [{ id: 'calculators', lifecycleState: 'active', executorStatus: 'registered' }],
       null,
-      'physician'
+      'physician',
     );
     expect(row.accessLabel).toBeTruthy();
     expect(row.accessState).toBe(ASSET_ACCESS_STATES.ALLOWED);
@@ -199,8 +220,8 @@ describe('assetAccess', () => {
           entitledAssetIds: ['patient-summary-ai'],
           workspaceState: { effectivePermissions: ['USE_AI_CHAT'] },
         },
-        'physician'
-      )
+        'physician',
+      ),
     ).toEqual({
       accessState: ASSET_ACCESS_STATES.RESTRICTED,
       reasons: ['permission'],
@@ -214,8 +235,8 @@ describe('assetAccess', () => {
           entitledAssetIds: ['patient-summary-ai'],
           workspaceState: { effectivePermissions: ['READ_PHI', 'USE_AI_CHAT'] },
         },
-        'physician'
-      ).accessState
+        'physician',
+      ).accessState,
     ).toBe(ASSET_ACCESS_STATES.ALLOWED);
   });
 
@@ -238,21 +259,18 @@ describe('assetAccess', () => {
           entitledAssetIds: ['automation-device-offline-maintenance'],
           entitledPackIds: ['medical-iot-pack'],
         },
-        'student'
-      )
+        'student',
+      ),
     ).toEqual({
       accessState: ASSET_ACCESS_STATES.HIDDEN,
       reasons: ['role-hidden'],
     });
-    expect([
-      ASSET_ACCESS_STATES.ALLOWED,
-      ASSET_ACCESS_STATES.BETA,
-    ]).toContain(
+    expect([ASSET_ACCESS_STATES.ALLOWED, ASSET_ACCESS_STATES.BETA]).toContain(
       resolveAssetAccessState(
         automation,
         { subscriptionPlan: 'institutional' },
-        'biomedical engineer'
-      ).accessState
+        'biomedical engineer',
+      ).accessState,
     );
   });
 });

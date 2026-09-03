@@ -55,7 +55,10 @@ describe('Hepatology and Gastroenterology Tools Pack wiring', () => {
       expect(record?.launchType, registryId).toBe(TOOL_LAUNCH_TYPES.LOCAL_ONLY);
       expect(record?.route, registryId).toMatch(/^\/tools\/calculators\//);
       expect(calculatorSlugs.has(record.calculatorSlug), registryId).toBe(true);
-      expect(inventory.some((tool) => tool.id === registryId), registryId).toBe(true);
+      expect(
+        inventory.some((tool) => tool.id === registryId),
+        registryId,
+      ).toBe(true);
     }
   });
 
@@ -79,8 +82,12 @@ describe('Hepatology and Gastroenterology Tools Pack wiring', () => {
       const navigation = getRegistryToolNavigation(registryId);
       expect(record?.tier, registryId).toBe('B');
       expect(record?.launchType, registryId).toBe(TOOL_LAUNCH_TYPES.CHAT_ASSISTED);
-      expect(launch.chatSeed, registryId).toMatch(/decision support|does not diagnose|informational/i);
-      expect(launch.chatSeed, registryId).toMatch(/do not recommend|does not recommend|do not delay|does not diagnose/i);
+      expect(launch.chatSeed, registryId).toMatch(
+        /decision support|does not diagnose|informational/i,
+      );
+      expect(launch.chatSeed, registryId).toMatch(
+        /do not recommend|does not recommend|do not delay|does not diagnose/i,
+      );
       expect(navigation.mode, registryId).toBe('chat-assisted');
       expect(navigation.pathname, registryId).toBe(CANONICAL_ROUTES.emergencyCopilot);
     }
@@ -92,9 +99,13 @@ describe('Hepatology and Gastroenterology Tools Pack wiring', () => {
       const navigation = getRegistryToolNavigation(registryId);
       expect(record?.tier, registryId).toBe('C');
       expect(record?.launchType, registryId).toBe(TOOL_LAUNCH_TYPES.CLINICAL_PAGE);
-      expect(record?.component, registryId).toBe('src/pages/tools/GastroenterologyAssistantPage.tsx');
+      expect(record?.component, registryId).toBe(
+        'src/pages/tools/GastroenterologyAssistantPage.tsx',
+      );
       expect(record?.orchestratorToolId, registryId).toBeNull();
-      expect(clinicalIntentToolsById[registryId]?.chatSeed, registryId).toMatch(/do not recommend|does not recommend/i);
+      expect(clinicalIntentToolsById[registryId]?.chatSeed, registryId).toMatch(
+        /do not recommend|does not recommend/i,
+      );
       expect(navigation.mode, registryId).toBe('tool-page');
       expect(navigation.pathname, registryId).toBe(CANONICAL_ROUTES.emergencyTools);
       expect(navigation.search, registryId).toContain(registryId);

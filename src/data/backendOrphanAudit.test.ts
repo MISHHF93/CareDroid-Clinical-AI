@@ -23,11 +23,15 @@ import { assertExposureScanPasses } from './backendFrontendExposure';
 const HEAVY_ORPHAN_SCAN_TIMEOUT_MS = 120_000;
 
 describe('backend orphan audit', () => {
-  it('passes full orphan assertion (inventory ↔ controllers ↔ policy ↔ frontend)', () => {
-    const { ok, errors } = assertNoOrphanedBackendFunctionality();
-    expect(errors, errors.join('; ')).toEqual([]);
-    expect(ok).toBe(true);
-  }, HEAVY_ORPHAN_SCAN_TIMEOUT_MS);
+  it(
+    'passes full orphan assertion (inventory ↔ controllers ↔ policy ↔ frontend)',
+    () => {
+      const { ok, errors } = assertNoOrphanedBackendFunctionality();
+      expect(errors, errors.join('; ')).toEqual([]);
+      expect(ok).toBe(true);
+    },
+    HEAVY_ORPHAN_SCAN_TIMEOUT_MS,
+  );
 
   it('controller scan matches BACKEND_HTTP_ROUTES inventory', () => {
     const { missingInInventory, missingInControllers } = compareControllerScanToInventory();
@@ -40,7 +44,7 @@ describe('backend orphan audit', () => {
     const gaps = getBackendRouteExposureGaps().filter((g) => g.issue === 'missing-policy');
     expect(gaps, gaps.map((g) => g.key).join(', ')).toEqual([]);
     expect(Object.keys(BACKEND_ROUTE_EXPOSURE_POLICY).length).toBeGreaterThanOrEqual(
-      backendOnly.length
+      backendOnly.length,
     );
   });
 
@@ -49,19 +53,27 @@ describe('backend orphan audit', () => {
     expect(scanned.length).toBeGreaterThanOrEqual(BACKEND_HTTP_ROUTES.length);
   });
 
-  it('exposure scan and orphan audit agree on zero unguarded calls', () => {
-    const exposure = assertExposureScanPasses();
-    const orphan = assertNoOrphanedBackendFunctionality();
-    expect(exposure.ok).toBe(true);
-    expect(orphan.ok).toBe(true);
-  }, HEAVY_ORPHAN_SCAN_TIMEOUT_MS);
+  it(
+    'exposure scan and orphan audit agree on zero unguarded calls',
+    () => {
+      const exposure = assertExposureScanPasses();
+      const orphan = assertNoOrphanedBackendFunctionality();
+      expect(exposure.ok).toBe(true);
+      expect(orphan.ok).toBe(true);
+    },
+    HEAVY_ORPHAN_SCAN_TIMEOUT_MS,
+  );
 
-  it('orphaned-backend-functions markdown generator is non-empty', () => {
-    const md = formatOrphanedBackendFunctionsMarkdown();
-    expect(md).toContain('## A. Backend-only');
-    expect(md).toContain('## D. Frontend calls without backend');
-    expect(md.length).toBeGreaterThan(500);
-  }, HEAVY_ORPHAN_SCAN_TIMEOUT_MS);
+  it(
+    'orphaned-backend-functions markdown generator is non-empty',
+    () => {
+      const md = formatOrphanedBackendFunctionsMarkdown();
+      expect(md).toContain('## A. Backend-only');
+      expect(md).toContain('## D. Frontend calls without backend');
+      expect(md.length).toBeGreaterThan(500);
+    },
+    HEAVY_ORPHAN_SCAN_TIMEOUT_MS,
+  );
 
   it('frontend gated calls each declare a capability gate', () => {
     const gated = FRONTEND_API_CALLS.filter((c) => c.capability);

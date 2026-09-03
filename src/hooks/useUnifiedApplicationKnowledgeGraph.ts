@@ -28,7 +28,9 @@ export function useUnifiedApplicationKnowledgeGraph(
 ) {
   const { pathname } = useLocation();
   const storedSnapshot = useUnifiedApplicationKnowledgeGraphStore((state) => state.snapshot);
-  const lastRefreshedAt = useUnifiedApplicationKnowledgeGraphStore((state) => state.lastRefreshedAt);
+  const lastRefreshedAt = useUnifiedApplicationKnowledgeGraphStore(
+    (state) => state.lastRefreshedAt,
+  );
   const patients = useEmergencyStore((state) => state.patients);
   const staff = useEmergencyStore((state) => state.staff);
   const alerts = useEmergencyStore((state) => state.alerts);
@@ -36,7 +38,9 @@ export function useUnifiedApplicationKnowledgeGraph(
   const queues = useEmergencyStore((state) => state.queues);
   const referrals = useEmergencyStore((state) => state.referrals);
   const workflowLogs = useEmergencyStore((state) => state.workflowLogs);
-  const administrativeAutomationQueue = useEmergencyStore((state) => state.administrativeAutomationQueue);
+  const administrativeAutomationQueue = useEmergencyStore(
+    (state) => state.administrativeAutomationQueue,
+  );
   const emsArrivals = useEmergencyStore((state) => state.emsArrivals);
   const capacity = useEmergencyStore((state) => state.capacity);
   const patientFlowSnapshot = useEmergencyStore((state) => state.patientFlowSnapshot);
@@ -101,13 +105,18 @@ export function useUnifiedApplicationKnowledgeGraph(
   }, [selectedPatientId, snapshot]);
 
   const enrichTimelineContext = useMemo(
-    () => (patientId: string, baseContext: PatientTimelineContext = {}) => {
-      const enriched = enrichPatientTimelineContextFromKnowledgeGraph(patientId, snapshot, baseContext);
-      return Object.freeze({
-        ...enriched,
-        knowledgeGraphSnapshot: snapshot,
-      });
-    },
+    () =>
+      (patientId: string, baseContext: PatientTimelineContext = {}) => {
+        const enriched = enrichPatientTimelineContextFromKnowledgeGraph(
+          patientId,
+          snapshot,
+          baseContext,
+        );
+        return Object.freeze({
+          ...enriched,
+          knowledgeGraphSnapshot: snapshot,
+        });
+      },
     [snapshot],
   );
 

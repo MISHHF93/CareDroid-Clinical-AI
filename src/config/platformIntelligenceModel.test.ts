@@ -57,9 +57,7 @@ describe('platformIntelligenceModel', () => {
     const stagesKpi = module.kpis.find((k) => k.id === 'stage-coverage');
     expect(flowsKpi.value).toBe(explorer.flows.length);
     expect(stagesKpi.value).toBe(explorer.stages.length);
-    expect(module.artifacts.sampleFlows.map((f) => f.id)).toEqual(
-      explorer.flows.map((f) => f.id),
-    );
+    expect(module.artifacts.sampleFlows.map((f) => f.id)).toEqual(explorer.flows.map((f) => f.id));
   });
 
   it('marks the connector-registry tiering debt item resolved, matching integrationStatusRegistry.ts', () => {
@@ -78,7 +76,8 @@ describe('platformIntelligenceModel', () => {
   it('produces audit artifact for prompts 117–136', () => {
     const audit = auditPlatformIntelligence();
     expect(audit.promptsCovered).toEqual([
-      117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136,
+      117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135,
+      136,
     ]);
     expect(Object.keys(audit.moduleScores)).toHaveLength(20);
   });
@@ -103,8 +102,8 @@ describe('module score provenance', () => {
     expect(Object.keys(PLATFORM_INTELLIGENCE_MODULE_PROVENANCE)).toHaveLength(
       assessment.modules.length,
     );
-    expect(
-      assessment.summary.liveModuleCount + assessment.summary.registryModuleCount,
-    ).toBe(assessment.modules.length);
+    expect(assessment.summary.liveModuleCount + assessment.summary.registryModuleCount).toBe(
+      assessment.modules.length,
+    );
   });
 });

@@ -31,7 +31,9 @@ export default function LaboratoryDashboard() {
         <div className="laboratory-page__title-row">
           <GraphicIconBadge iconKey="activity" accent="brand" size="md" />
           <div>
-            <p className="laboratory-page-title-text" data-testid="cd-page-title-text">Laboratory</p>
+            <p className="laboratory-page-title-text" data-testid="cd-page-title-text">
+              Laboratory
+            </p>
             <p>Demo specimen queue, abnormal result triage, and reference-range trend cards.</p>
           </div>
         </div>
@@ -46,11 +48,19 @@ export default function LaboratoryDashboard() {
 
       <StateSourceNotice
         title="Laboratory source state"
-        states={[DEMO_LIVE_STATES.DEMO, DEMO_LIVE_STATES.SIMULATED, DEMO_LIVE_STATES.BACKEND_UNAVAILABLE]}
+        states={[
+          DEMO_LIVE_STATES.DEMO,
+          DEMO_LIVE_STATES.SIMULATED,
+          DEMO_LIVE_STATES.BACKEND_UNAVAILABLE,
+        ]}
         details="Demo lab results and specimen queue. Use Lab Interpreter for governed clinical decision support."
       />
 
-      <div className="laboratory-page__metrics" role="group" aria-label="Laboratory summary metrics">
+      <div
+        className="laboratory-page__metrics"
+        role="group"
+        aria-label="Laboratory summary metrics"
+      >
         <MetricCard
           label="Critical values"
           value={String(criticalCount)}
@@ -63,8 +73,18 @@ export default function LaboratoryDashboard() {
           hint="Outside reference range"
           tone={abnormalCount > 0 ? 'warning' : 'neutral'}
         />
-        <MetricCard label="Pending" value={String(pendingCount)} hint="Awaiting verification" tone="neutral" />
-        <MetricCard label="Specimens" value={String(results.length)} hint="In current demo queue" tone="neutral" />
+        <MetricCard
+          label="Pending"
+          value={String(pendingCount)}
+          hint="Awaiting verification"
+          tone="neutral"
+        />
+        <MetricCard
+          label="Specimens"
+          value={String(results.length)}
+          hint="In current demo queue"
+          tone="neutral"
+        />
       </div>
 
       <div className="laboratory-page__charts">
@@ -114,7 +134,10 @@ export default function LaboratoryDashboard() {
               </span>
               <span role="cell">{row.patient}</span>
               <span role="cell">{row.collectedAt}</span>
-              <span role="cell" className={`laboratory-page__status laboratory-page__status--${labStatusTone(row.status)}`}>
+              <span
+                role="cell"
+                className={`laboratory-page__status laboratory-page__status--${labStatusTone(row.status)}`}
+              >
                 {row.status}
               </span>
             </div>

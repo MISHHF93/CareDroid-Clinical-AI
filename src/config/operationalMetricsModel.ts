@@ -151,7 +151,13 @@ export function getWhiteboardMetricHandler(key) {
   return getOperationalMetricDefinition(key)?.whiteboardHandler || 'navigate';
 }
 
-export function canOpenOperationalMetricOnWhiteboard(key, { displayMode = false, canAccessRoute = (undefined as ((path: string) => boolean) | undefined) } = {}) {
+export function canOpenOperationalMetricOnWhiteboard(
+  key,
+  {
+    displayMode = false,
+    canAccessRoute = undefined as ((path: string) => boolean) | undefined,
+  } = {},
+) {
   if (displayMode) return false;
   const handler = getWhiteboardMetricHandler(key);
   if (handler !== 'navigate') return true;

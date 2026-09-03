@@ -40,7 +40,13 @@ export const NIHSS_ITEM_META = [
   { key: 'sensory', label: '8 — Sensory', min: 0, max: 2, untestableCode: null },
   { key: 'bestLanguage', label: '9 — Best language', min: 0, max: 3, untestableCode: null },
   { key: 'dysarthria', label: '10 — Dysarthria', min: 0, max: 1, untestableCode: 9 },
-  { key: 'extinctionInattention', label: '11 — Extinction / inattention', min: 0, max: 2, untestableCode: null },
+  {
+    key: 'extinctionInattention',
+    label: '11 — Extinction / inattention',
+    min: 0,
+    max: 2,
+    untestableCode: null,
+  },
 ];
 
 /**
@@ -79,7 +85,7 @@ export function validateNihssInputs(raw) {
       errors.push(
         `${meta.label}: score must be ${meta.min}–${meta.max}` +
           (meta.untestableCode !== null ? ` or ${meta.untestableCode} if untestable` : '') +
-          '.'
+          '.',
       );
     } else {
       scores[meta.key] = value;
@@ -160,7 +166,6 @@ export function interpretNihssSeverity(total) {
       'NIHSS is for structured neurologic assessment and documentation. It does not replace urgent stroke evaluation, neuroimaging, last-known-well timing, or institutional acute stroke protocols. Do not delay emergency stroke care to complete scoring.',
     pathwayDisclaimer:
       'Follow local stroke pathways and treating team judgment for thrombolysis, thrombectomy, blood pressure management, and disposition. This tool does not recommend specific treatments.',
-    referenceLine:
-      'NIH Stroke Scale — NINDS / Brott T, et al. Stroke. 1989;20(7):864–870.',
+    referenceLine: 'NIH Stroke Scale — NINDS / Brott T, et al. Stroke. 1989;20(7):864–870.',
   };
 }

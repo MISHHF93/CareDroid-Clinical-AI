@@ -31,12 +31,14 @@ describe('fib4Calculator', () => {
   });
 
   it('validateFib4Inputs enforces unit ranges', () => {
-    expect(validateFib4Inputs({
-      ageYears: 50,
-      astUPerL: 40,
-      altUPerL: 30,
-      platelets10e9PerL: 200,
-    }).valid).toBe(true);
+    expect(
+      validateFib4Inputs({
+        ageYears: 50,
+        astUPerL: 40,
+        altUPerL: 30,
+        platelets10e9PerL: 200,
+      }).valid,
+    ).toBe(true);
 
     const bad = validateFib4Inputs({
       ageYears: 10,
@@ -58,7 +60,9 @@ describe('fib4Calculator', () => {
   });
 
   it('returns null for invalid calculation inputs', () => {
-    expect(calculateFib4({ ageYears: 50, astUPerL: 0, altUPerL: 30, platelets10e9PerL: 200 })).toBeNull();
+    expect(
+      calculateFib4({ ageYears: 50, astUPerL: 0, altUPerL: 30, platelets10e9PerL: 200 }),
+    ).toBeNull();
     expect(interpretFib4(0, 50)).toBeNull();
   });
 });

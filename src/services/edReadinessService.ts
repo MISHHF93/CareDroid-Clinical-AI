@@ -56,7 +56,9 @@ export function createReadinessPlan(params: ReadinessTrigger): EDReadinessPlan {
   return plan;
 }
 
-function buildDefaultChecklist(activatedResources: string[]): EDReadinessPlan['equipmentChecklist'] {
+function buildDefaultChecklist(
+  activatedResources: string[],
+): EDReadinessPlan['equipmentChecklist'] {
   const base = [
     { item: 'IV access kit', ready: false },
     { item: 'Monitoring leads', ready: false },
@@ -86,7 +88,9 @@ export function notifyStaff(
   const plan = readinessPlans.get(planId);
   if (!plan) return null;
 
-  const already = plan.notifiedStaff.some((s) => s.roleId === staffMember.roleId && s.name === staffMember.name);
+  const already = plan.notifiedStaff.some(
+    (s) => s.roleId === staffMember.roleId && s.name === staffMember.name,
+  );
   if (already) return plan;
 
   const updated: EDReadinessPlan = {

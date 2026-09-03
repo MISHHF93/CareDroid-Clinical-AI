@@ -15,7 +15,9 @@ type AiTransparencyDashboardProps = {
   className?: string;
 };
 
-const LAYER_LABELS = Object.fromEntries(COPILOT_RISK_LAYERS.map((layer) => [layer.id, layer.label]));
+const LAYER_LABELS = Object.fromEntries(
+  COPILOT_RISK_LAYERS.map((layer) => [layer.id, layer.label]),
+);
 
 export default function AiTransparencyDashboard({
   patients,
@@ -99,8 +101,8 @@ export default function AiTransparencyDashboard({
                 </span>
               </div>
               <p>
-                {LAYER_LABELS[record.layer] || record.layer} · {Math.round(record.confidence * 100)}% ·{' '}
-                {record.modelId}
+                {LAYER_LABELS[record.layer] || record.layer} · {Math.round(record.confidence * 100)}
+                % · {record.modelId}
               </p>
               <ul>
                 {(record.keyPredictors ?? []).slice(0, 3).map((predictor) => (

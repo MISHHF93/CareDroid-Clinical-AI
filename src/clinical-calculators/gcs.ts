@@ -3,7 +3,11 @@ import {
   interpretGcsScore,
   validateRequiredSelections,
 } from '../utils/emergencyCriticalCareCalculators';
-import { asCalculatorSeverity, type AnyCalculatorResult, type CalculatorValidationResult } from './types';
+import {
+  asCalculatorSeverity,
+  type AnyCalculatorResult,
+  type CalculatorValidationResult,
+} from './types';
 
 export const GCS_META = {
   id: 'gcs' as const,

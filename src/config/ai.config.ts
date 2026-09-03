@@ -1,8 +1,4 @@
-import {
-  readAIPlatformConfig,
-  type AIProvider,
-  type GovernanceAIProvider,
-} from '../lib/ai/config';
+import { readAIPlatformConfig, type AIProvider, type GovernanceAIProvider } from '../lib/ai/config';
 
 export interface AIServiceConfig {
   name: string;

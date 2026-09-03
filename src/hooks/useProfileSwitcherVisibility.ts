@@ -4,7 +4,11 @@ import { isDemoPersonaUser } from '../config/demoPersonaModel';
 function isLocalDevHost(): boolean {
   if (typeof window === 'undefined') return false;
   const host = window.location.hostname;
-  return host === 'localhost' || host === '127.0.0.1' || Boolean((import.meta as { env?: { DEV?: boolean } }).env?.DEV);
+  return (
+    host === 'localhost' ||
+    host === '127.0.0.1' ||
+    Boolean((import.meta as { env?: { DEV?: boolean } }).env?.DEV)
+  );
 }
 
 /** Whether the workflow profile switcher should be shown in the shell. */

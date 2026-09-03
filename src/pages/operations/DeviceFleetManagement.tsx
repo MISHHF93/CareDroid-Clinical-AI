@@ -68,7 +68,9 @@ export default function DeviceFleetManagement() {
 
   const summary = useMemo(() => {
     const online = devices.filter((device) => device.status === 'online').length;
-    const maintenance = devices.filter((device) => ['due-soon', 'overdue', 'warning'].includes(device.maintenance)).length;
+    const maintenance = devices.filter((device) =>
+      ['due-soon', 'overdue', 'warning'].includes(device.maintenance),
+    ).length;
     return { online, maintenance, total: devices.length };
   }, [devices]);
 
@@ -78,7 +80,9 @@ export default function DeviceFleetManagement() {
         <div className="device-fleet-page__title-row">
           <GraphicIconBadge iconKey="route" accent="brand" size="md" />
           <div>
-            <p className="device-fleet-page__title-text" data-testid="cd-page-title-text">Device Fleet Management</p>
+            <p className="device-fleet-page__title-text" data-testid="cd-page-title-text">
+              Device Fleet Management
+            </p>
             <p>Enterprise device registry, maintenance posture, and operations cross-links.</p>
           </div>
         </div>
@@ -99,15 +103,33 @@ export default function DeviceFleetManagement() {
         className="device-fleet-page__notice"
         states={
           isDemo
-            ? [DEMO_LIVE_STATES.DEMO, DEMO_LIVE_STATES.BACKEND_UNAVAILABLE, DEMO_LIVE_STATES.UNSUPPORTED]
+            ? [
+                DEMO_LIVE_STATES.DEMO,
+                DEMO_LIVE_STATES.BACKEND_UNAVAILABLE,
+                DEMO_LIVE_STATES.UNSUPPORTED,
+              ]
             : [DEMO_LIVE_STATES.DEMO, DEMO_LIVE_STATES.UNSUPPORTED]
         }
         details={sourceLabel}
       />
 
-      <div className="device-fleet-page__metrics" role="group" aria-label="Device fleet summary metrics">
-        <MetricCard label="Registered devices" value={String(summary.total)} hint="Rows in current registry scan" tone="neutral" />
-        <MetricCard label="Online" value={String(summary.online)} hint="Healthy connectivity" tone="good" />
+      <div
+        className="device-fleet-page__metrics"
+        role="group"
+        aria-label="Device fleet summary metrics"
+      >
+        <MetricCard
+          label="Registered devices"
+          value={String(summary.total)}
+          hint="Rows in current registry scan"
+          tone="neutral"
+        />
+        <MetricCard
+          label="Online"
+          value={String(summary.online)}
+          hint="Healthy connectivity"
+          tone="good"
+        />
         <MetricCard
           label="Maintenance review"
           value={String(summary.maintenance)}
@@ -134,7 +156,10 @@ export default function DeviceFleetManagement() {
                 <tr key={`device-skeleton-${index}`} className="device-fleet-table__skeleton-row">
                   <td colSpan={6}>
                     {index === 0 ? <span className="sr-only">Loading device registry…</span> : null}
-                    <span className="cd-skeleton-shimmer device-fleet-table__skeleton-bar" aria-hidden="true" />
+                    <span
+                      className="cd-skeleton-shimmer device-fleet-table__skeleton-bar"
+                      aria-hidden="true"
+                    />
                   </td>
                 </tr>
               ))

@@ -131,12 +131,12 @@ function normalizeDeviceContextToken(value: string): string {
 }
 
 export function isEmergencyDeviceContextId(value: unknown): value is EmergencyDeviceContextId {
-  return typeof value === 'string' && Boolean(DEVICE_CONTEXT_BY_ID[value as EmergencyDeviceContextId]);
+  return (
+    typeof value === 'string' && Boolean(DEVICE_CONTEXT_BY_ID[value as EmergencyDeviceContextId])
+  );
 }
 
-export function normalizeEmergencyDeviceContextId(
-  value: unknown,
-): EmergencyDeviceContextId | null {
+export function normalizeEmergencyDeviceContextId(value: unknown): EmergencyDeviceContextId | null {
   const normalized = normalizeDeviceContextToken(String(value || ''));
   if (!normalized) return null;
   if (isEmergencyDeviceContextId(normalized)) return normalized;
@@ -213,10 +213,12 @@ export function isDeviceContextReadOnlyWall(
   return Boolean(DEVICE_CONTEXT_BY_ID[deviceContextId]?.readOnlyWall);
 }
 
-export function resolveEffectiveDeviceContextId(input: {
-  deviceParam?: string | null;
-  storedDeviceContext?: EmergencyDeviceContextId | null;
-} = {}): EmergencyDeviceContextId | null {
+export function resolveEffectiveDeviceContextId(
+  input: {
+    deviceParam?: string | null;
+    storedDeviceContext?: EmergencyDeviceContextId | null;
+  } = {},
+): EmergencyDeviceContextId | null {
   return (
     parseEmergencyDeviceContextParam(input.deviceParam) ||
     input.storedDeviceContext ||

@@ -1,7 +1,11 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import useEmergencyRolePermissions from './useEmergencyRolePermissions';
-import { setTenantContext, getTenantContext, getTenantHeaders } from '../services/tenantContextStore';
+import {
+  setTenantContext,
+  getTenantContext,
+  getTenantHeaders,
+} from '../services/tenantContextStore';
 import * as tenantContextStore from '../services/tenantContextStore';
 
 const setUser = vi.fn();

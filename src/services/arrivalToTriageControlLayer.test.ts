@@ -36,7 +36,7 @@ function buildHandoffStore(initialPatients: Patient[] = []) {
     recordWorkflowAction: () => ({ id: 'wf-arrival-control' }),
     updateCapacity: () => {},
     updateAlerts: () => {},
-    refreshAdministrativeAutomationsAsync: async () => ({} as any),
+    refreshAdministrativeAutomationsAsync: async () => ({}) as any,
   };
 
   return { store, patients, websocketEvents };
@@ -105,9 +105,10 @@ describe('arrival-to-triage control layer', () => {
     const syncEvents = websocketEvents.filter((event) => event.type === 'arrival_control_sync');
     expect(syncEvents.length).toBeGreaterThanOrEqual(1);
     expect(
-      syncEvents.some((event) =>
-        Array.isArray(event.payload?.surfaces) &&
-        (event.payload?.surfaces as string[]).includes('operational-snapshot'),
+      syncEvents.some(
+        (event) =>
+          Array.isArray(event.payload?.surfaces) &&
+          (event.payload?.surfaces as string[]).includes('operational-snapshot'),
       ),
     ).toBe(true);
 

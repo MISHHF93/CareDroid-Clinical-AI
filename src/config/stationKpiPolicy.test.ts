@@ -11,26 +11,32 @@ import {
 
 describe('stationKpiPolicy', () => {
   it('caps frontline KPI sets to two signals per station during pilot', () => {
-    expect(resolvePilotStationKpiIds(CARE_DROID_SCREEN_MODES.reception, [
-      'arrivals-today',
-      'awaiting-verification',
-      'awaiting-triage',
-      'ems-inbound',
-    ])).toEqual(PILOT_STATION_KPI_IDS[CARE_DROID_SCREEN_MODES.reception]);
+    expect(
+      resolvePilotStationKpiIds(CARE_DROID_SCREEN_MODES.reception, [
+        'arrivals-today',
+        'awaiting-verification',
+        'awaiting-triage',
+        'ems-inbound',
+      ]),
+    ).toEqual(PILOT_STATION_KPI_IDS[CARE_DROID_SCREEN_MODES.reception]);
 
-    expect(resolvePilotStationKpiIds(CARE_DROID_SCREEN_MODES.triage, [
-      'triage-pending',
-      'longest-untriaged-wait',
-      'triage-breached',
-      'rapid-review-flags',
-    ])).toEqual(PILOT_STATION_KPI_IDS[CARE_DROID_SCREEN_MODES.triage]);
+    expect(
+      resolvePilotStationKpiIds(CARE_DROID_SCREEN_MODES.triage, [
+        'triage-pending',
+        'longest-untriaged-wait',
+        'triage-breached',
+        'rapid-review-flags',
+      ]),
+    ).toEqual(PILOT_STATION_KPI_IDS[CARE_DROID_SCREEN_MODES.triage]);
 
-    expect(resolvePilotStationKpiIds(CARE_DROID_SCREEN_MODES.chargeNurse, [
-      'waiting-count',
-      'triage-breached',
-      'capacity-score',
-      'boarders',
-    ])).toEqual(PILOT_STATION_KPI_IDS[CARE_DROID_SCREEN_MODES.chargeNurse]);
+    expect(
+      resolvePilotStationKpiIds(CARE_DROID_SCREEN_MODES.chargeNurse, [
+        'waiting-count',
+        'triage-breached',
+        'capacity-score',
+        'boarders',
+      ]),
+    ).toEqual(PILOT_STATION_KPI_IDS[CARE_DROID_SCREEN_MODES.chargeNurse]);
   });
 
   it('resolves two compact header metric keys per frontline station', () => {
@@ -50,9 +56,8 @@ describe('stationKpiPolicy', () => {
       'Triage queue',
     );
     expect(
-      compactOperationalStripMetrics([
-        { id: 'waiting-count', label: 'Waiting count', value: 4 },
-      ])[0].label,
+      compactOperationalStripMetrics([{ id: 'waiting-count', label: 'Waiting count', value: 4 }])[0]
+        .label,
     ).toBe('Waiting');
   });
 });

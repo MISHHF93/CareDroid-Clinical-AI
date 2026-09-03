@@ -78,7 +78,7 @@ export function flattenRegressionChecklist() {
       groupTitle: group.title,
       checkId: `${group.id}-${index + 1}`,
       check,
-    }))
+    })),
   );
 }
 

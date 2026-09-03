@@ -36,7 +36,9 @@ describe('unifiedOperationalIntelligenceModel', () => {
     expect(UNIFIED_OPERATIONAL_INTELLIGENCE_TRIGGER_EVENTS.length).toBeGreaterThanOrEqual(20);
     expect(isUnifiedOperationalIntelligenceTriggerEvent('journey_state_changed')).toBe(true);
     expect(isUnifiedOperationalIntelligenceTriggerEvent('central_node_snapshot')).toBe(true);
-    expect(isUnifiedOperationalIntelligenceTriggerEvent('operational_intelligence_updated')).toBe(true);
+    expect(isUnifiedOperationalIntelligenceTriggerEvent('operational_intelligence_updated')).toBe(
+      true,
+    );
     expect(isUnifiedOperationalIntelligenceTriggerEvent('unknown_event')).toBe(false);
   });
 

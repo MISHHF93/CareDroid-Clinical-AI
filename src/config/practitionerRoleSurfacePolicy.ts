@@ -4,10 +4,7 @@
  * workflow-critical surfaces without re-enabling demo clutter.
  */
 import { EMERGENCY_ROLE_IDS, normalizeEmergencyRole } from './emergencyRolePermissions';
-import {
-  CARE_DROID_SCREEN_MODES,
-  normalizeCareDroidScreenMode,
-} from './careDroidScreenModes';
+import { CARE_DROID_SCREEN_MODES, normalizeCareDroidScreenMode } from './careDroidScreenModes';
 import { isPractitionerCleanupEnabled, PRACTITIONER_CLEANUP } from './practitionerCleanup.config';
 import { PRACTITIONER_PATIENT_CARD_BADGE_LIMIT } from './practitionerCleanup.constants';
 

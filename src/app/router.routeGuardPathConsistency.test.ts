@@ -45,7 +45,9 @@ describe('router.tsx CareDroidRouteGuard path consistency (HEAL-320)', () => {
       matchCount += 1;
       const [, routePath, guardPath] = match;
       if (routePath !== guardPath) {
-        mismatches.push(`<Route path={CANONICAL_ROUTES.${routePath}}> is guarded with CANONICAL_ROUTES.${guardPath} instead of its own route`);
+        mismatches.push(
+          `<Route path={CANONICAL_ROUTES.${routePath}}> is guarded with CANONICAL_ROUTES.${guardPath} instead of its own route`,
+        );
       }
     }
 

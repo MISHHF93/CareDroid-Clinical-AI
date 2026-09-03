@@ -52,7 +52,7 @@ describe('EmsPreArrivalPipelineService', () => {
             label: 'EMS handoff attached before arrival',
           }),
         }),
-      })
+      }),
     );
   });
 
@@ -75,7 +75,7 @@ describe('EmsPreArrivalPipelineService', () => {
         nextArrival: expect.objectContaining({
           etaMinutes: 4,
         }),
-      })
+      }),
     );
     expect(metrics).toEqual(
       expect.objectContaining({
@@ -84,14 +84,14 @@ describe('EmsPreArrivalPipelineService', () => {
         handoffReadyCount: 3,
         whiteboardVisibleCount: 3,
         journeyAttachmentCount: 3,
-      })
+      }),
     );
     expect(recommendations).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           action: expect.stringMatching(/before arrival/i),
         }),
-      ])
+      ]),
     );
   });
 
@@ -127,7 +127,7 @@ describe('EmsPreArrivalPipelineService', () => {
           }),
         ]),
         safetyStatement: expect.stringMatching(/pre-arrival context/i),
-      })
+      }),
     );
   });
 });

@@ -33,7 +33,7 @@ describe('toolVisibilityMatrix report', () => {
     mkdirSync(docsDir, { recursive: true });
     writeFileSync(
       join(docsDir, 'tool-visibility-matrix.md'),
-      `${formatToolVisibilityMatrixMarkdown()}\n`
+      `${formatToolVisibilityMatrixMarkdown()}\n`,
     );
   });
 });

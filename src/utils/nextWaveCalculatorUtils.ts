@@ -8,16 +8,56 @@ export const RASS_DISCLAIMER =
   'Sedation/agitation documentation support only. Does not recommend sedative dosing, restraints, airway management, or delirium treatment.';
 
 export const RASS_OPTIONS = Object.freeze([
-  { value: 4, label: '+4 Combative', description: 'Overtly combative or violent; immediate danger to staff.' },
-  { value: 3, label: '+3 Very agitated', description: 'Pulls/removes tubes or catheters; aggressive.' },
-  { value: 2, label: '+2 Agitated', description: 'Frequent non-purposeful movement or ventilator dyssynchrony.' },
-  { value: 1, label: '+1 Restless', description: 'Anxious or apprehensive but movements are not aggressive.' },
-  { value: 0, label: '0 Alert and calm', description: 'Spontaneously pays attention to caregiver.' },
-  { value: -1, label: '-1 Drowsy', description: 'Not fully alert, but sustained awakening to voice.' },
-  { value: -2, label: '-2 Light sedation', description: 'Briefly awakens to voice with eye contact.' },
-  { value: -3, label: '-3 Moderate sedation', description: 'Movement or eye opening to voice, but no eye contact.' },
-  { value: -4, label: '-4 Deep sedation', description: 'No response to voice, but movement or eye opening to physical stimulation.' },
-  { value: -5, label: '-5 Unarousable', description: 'No response to voice or physical stimulation.' },
+  {
+    value: 4,
+    label: '+4 Combative',
+    description: 'Overtly combative or violent; immediate danger to staff.',
+  },
+  {
+    value: 3,
+    label: '+3 Very agitated',
+    description: 'Pulls/removes tubes or catheters; aggressive.',
+  },
+  {
+    value: 2,
+    label: '+2 Agitated',
+    description: 'Frequent non-purposeful movement or ventilator dyssynchrony.',
+  },
+  {
+    value: 1,
+    label: '+1 Restless',
+    description: 'Anxious or apprehensive but movements are not aggressive.',
+  },
+  {
+    value: 0,
+    label: '0 Alert and calm',
+    description: 'Spontaneously pays attention to caregiver.',
+  },
+  {
+    value: -1,
+    label: '-1 Drowsy',
+    description: 'Not fully alert, but sustained awakening to voice.',
+  },
+  {
+    value: -2,
+    label: '-2 Light sedation',
+    description: 'Briefly awakens to voice with eye contact.',
+  },
+  {
+    value: -3,
+    label: '-3 Moderate sedation',
+    description: 'Movement or eye opening to voice, but no eye contact.',
+  },
+  {
+    value: -4,
+    label: '-4 Deep sedation',
+    description: 'No response to voice, but movement or eye opening to physical stimulation.',
+  },
+  {
+    value: -5,
+    label: '-5 Unarousable',
+    description: 'No response to voice or physical stimulation.',
+  },
 ]);
 
 function toFiniteNumber(value) {
@@ -52,7 +92,8 @@ export function interpretShockIndex(index) {
       label: 'Elevated shock index',
       interpretation:
         'Shock index is elevated. Review trend, perfusion, volume status, medication effects, and clinical context.',
-      referenceLine: 'Values around 0.5-0.7 are often considered typical in stable adults; thresholds vary by population.',
+      referenceLine:
+        'Values around 0.5-0.7 are often considered typical in stable adults; thresholds vary by population.',
     };
   }
   return {
@@ -87,7 +128,8 @@ export function interpretAnionGap(value) {
       label: 'High anion gap',
       interpretation:
         'The anion gap is above the common adult reference range. Correlate with pH, lactate, ketones, renal function, toxins, and local acid-base workflows.',
-      referenceLine: 'Common adult reference range often cited around 8-12 mEq/L; local laboratory ranges vary.',
+      referenceLine:
+        'Common adult reference range often cited around 8-12 mEq/L; local laboratory ranges vary.',
     };
   }
   if (gap < 8) {

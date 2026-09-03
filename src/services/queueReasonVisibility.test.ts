@@ -211,7 +211,12 @@ describe('queueReasonVisibility', () => {
 
   it('assigns a queue reason for every waiting or queued patient', () => {
     const patients = [
-      buildPatient({ state: PatientState.Triage, triagePending: true, triageTime: null, lastAssessedTime: null }),
+      buildPatient({
+        state: PatientState.Triage,
+        triagePending: true,
+        triageTime: null,
+        lastAssessedTime: null,
+      }),
       buildPatient({
         id: 'patient-2',
         state: PatientState.Waiting,
@@ -231,7 +236,12 @@ describe('queueReasonVisibility', () => {
   it('summarizes primary queue reasons across patients', () => {
     const summary = summarizeQueueReasonBoard(
       [
-        buildPatient({ state: PatientState.Triage, triagePending: true, triageTime: null, lastAssessedTime: null }),
+        buildPatient({
+          state: PatientState.Triage,
+          triagePending: true,
+          triageTime: null,
+          lastAssessedTime: null,
+        }),
         buildPatient({
           id: 'patient-2',
           state: PatientState.Registration,
@@ -263,18 +273,29 @@ describe('queueReasonVisibility', () => {
   });
 
   it('builds board summary lines for active queue reasons', () => {
-    const summary = buildQueueReasonBoardSummary([
-      buildPatient({ state: PatientState.Triage, triagePending: true, triageTime: null, lastAssessedTime: null }),
-      buildPatient({
-        id: 'patient-2',
-        state: PatientState.Waiting,
-        triageTime: '2026-06-20T10:30:00.000Z',
-        lastAssessedTime: '2026-06-20T10:32:00.000Z',
-        assignedStaffId: null,
-      }),
-    ], { now: STABLE_NOW });
+    const summary = buildQueueReasonBoardSummary(
+      [
+        buildPatient({
+          state: PatientState.Triage,
+          triagePending: true,
+          triageTime: null,
+          lastAssessedTime: null,
+        }),
+        buildPatient({
+          id: 'patient-2',
+          state: PatientState.Waiting,
+          triageTime: '2026-06-20T10:30:00.000Z',
+          lastAssessedTime: '2026-06-20T10:32:00.000Z',
+          assignedStaffId: null,
+        }),
+      ],
+      { now: STABLE_NOW },
+    );
 
     expect(summary.activeCount).toBe(2);
-    expect(summary.statusLines.map((line) => line.id)).toEqual(['triage-pending', 'provider-pending']);
+    expect(summary.statusLines.map((line) => line.id)).toEqual([
+      'triage-pending',
+      'provider-pending',
+    ]);
   });
 });

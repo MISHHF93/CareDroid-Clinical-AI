@@ -78,12 +78,7 @@ export const HOSPITAL_READINESS_RECOMMENDATIONS = Object.freeze({
     'Hospital Operations Command Center',
     'AI Governance Suite',
   ],
-  packs: [
-    'Emergency Pack',
-    'Simulation Pack',
-    'Medical IoT Pack',
-    'Governance Compliance Pack',
-  ],
+  packs: ['Emergency Pack', 'Simulation Pack', 'Medical IoT Pack', 'Governance Compliance Pack'],
   integrations: ['FHIR Patient Context', 'HL7 ADT', 'Laboratory Interface', 'Identity SSO'],
   training: [
     'Simulation readiness workshop',

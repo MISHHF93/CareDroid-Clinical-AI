@@ -29,10 +29,18 @@ describe('parseCompiledAccessProfile', () => {
   it('accepts a profile carrying either role identifier, and passes extra fields through', () => {
     const access = { navigationAccess: [], routeAccess: [], permissions: [] };
     expect(
-      isUsableCompiledAccessProfile({ user: {}, role: { hospitalRole: 'charge_nurse' }, ...access }),
+      isUsableCompiledAccessProfile({
+        user: {},
+        role: { hospitalRole: 'charge_nurse' },
+        ...access,
+      }),
     ).toBe(true);
     expect(
-      isUsableCompiledAccessProfile({ user: {}, role: { emergencyRoleId: 'triage_nurse' }, ...access }),
+      isUsableCompiledAccessProfile({
+        user: {},
+        role: { emergencyRoleId: 'triage_nurse' },
+        ...access,
+      }),
     ).toBe(true);
 
     // Extra members must survive -- this schema validates the load-bearing

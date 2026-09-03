@@ -14,7 +14,9 @@ import useRouteScreenMode from './useRouteScreenMode';
 
 /** Map emergency role ids onto HospitalRole keys used by HPEF persona profiles. */
 function personaRoleForEmergencyRole(role: string | null | undefined): HospitalRole | null {
-  const normalized = String(role || '').trim().toLowerCase();
+  const normalized = String(role || '')
+    .trim()
+    .toLowerCase();
   if (!normalized) return null;
   if (normalized === 'registration_clerk' || normalized === 'emergency_receptionist') {
     return 'registration_clerk';
@@ -64,7 +66,8 @@ export function useReceptionDeskUi(): ReceptionDeskUiState {
     const densityFromProfile = staffProfile.personalization.density === 'compact';
     const densityForcedSlim = persona?.informationDensity === 'compact' || densityFromProfile;
     const densityForcedFull =
-      persona?.informationDensity === 'spacious' || staffProfile.personalization.density === 'standard'
+      persona?.informationDensity === 'spacious' ||
+      staffProfile.personalization.density === 'standard'
         ? staffProfile.personalization.density === 'standard' && !densityFromProfile
         : false;
     const slim = densityForcedFull ? false : densityForcedSlim ? true : desk.slim;
@@ -80,7 +83,10 @@ export function useReceptionDeskUi(): ReceptionDeskUiState {
     return {
       ...desk,
       slim,
-      informationDensity: persona?.informationDensity || staffProfile.personalization.density || (slim ? 'compact' : 'standard'),
+      informationDensity:
+        persona?.informationDensity ||
+        staffProfile.personalization.density ||
+        (slim ? 'compact' : 'standard'),
       personaAiStyle: persona?.aiInteractionStyle || staffProfile.aiAssistanceLevel,
       personaPrimaryConcerns: persona?.primaryConcerns || staffProfile.responsibilities.slice(0, 4),
       showInlineCopilot: showCopilot,

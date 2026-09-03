@@ -4,20 +4,48 @@
  */
 
 export const RANSON_ADMISSION_META = [
-  { key: 'ageOver55', shortLabel: 'Age > 55 years', help: 'Age greater than 55 years at admission.' },
-  { key: 'wbcOver16000', shortLabel: 'WBC > 16,000/mm³', help: 'White blood cell count >16,000/mm³.' },
-  { key: 'glucoseOver200', shortLabel: 'Glucose > 200 mg/dL', help: 'Blood glucose >200 mg/dL (11.1 mmol/L).' },
+  {
+    key: 'ageOver55',
+    shortLabel: 'Age > 55 years',
+    help: 'Age greater than 55 years at admission.',
+  },
+  {
+    key: 'wbcOver16000',
+    shortLabel: 'WBC > 16,000/mm³',
+    help: 'White blood cell count >16,000/mm³.',
+  },
+  {
+    key: 'glucoseOver200',
+    shortLabel: 'Glucose > 200 mg/dL',
+    help: 'Blood glucose >200 mg/dL (11.1 mmol/L).',
+  },
   { key: 'ldhOver350', shortLabel: 'LDH > 350 IU/L', help: 'Serum LDH >350 IU/L.' },
   { key: 'astOver250', shortLabel: 'AST > 250 IU/L', help: 'Serum AST >250 IU/L.' },
 ];
 
 export const RANSON_AT_48H_META = [
-  { key: 'hematocritDrop10', shortLabel: 'Hematocrit fall > 10%', help: 'Hematocrit decrease >10% from admission.' },
-  { key: 'bunRise5', shortLabel: 'BUN rise > 5 mg/dL', help: 'BUN increase >5 mg/dL despite fluids.' },
-  { key: 'calciumBelow8', shortLabel: 'Calcium < 8 mg/dL', help: 'Serum calcium <8 mg/dL (2.0 mmol/L).' },
+  {
+    key: 'hematocritDrop10',
+    shortLabel: 'Hematocrit fall > 10%',
+    help: 'Hematocrit decrease >10% from admission.',
+  },
+  {
+    key: 'bunRise5',
+    shortLabel: 'BUN rise > 5 mg/dL',
+    help: 'BUN increase >5 mg/dL despite fluids.',
+  },
+  {
+    key: 'calciumBelow8',
+    shortLabel: 'Calcium < 8 mg/dL',
+    help: 'Serum calcium <8 mg/dL (2.0 mmol/L).',
+  },
   { key: 'pao2Below60', shortLabel: 'PaO₂ < 60 mmHg', help: 'Arterial PO₂ <60 mmHg (8 kPa).' },
   { key: 'baseDeficitOver4', shortLabel: 'Base deficit > 4 mEq/L', help: 'Base deficit >4 mEq/L.' },
-  { key: 'fluidSequestration6L', shortLabel: 'Fluid sequestration > 6 L', help: 'Estimated fluid sequestration >6 L in 48 h.' },
+  {
+    key: 'fluidSequestration6L',
+    shortLabel: 'Fluid sequestration > 6 L',
+    help: 'Estimated fluid sequestration >6 L in 48 h.',
+  },
 ];
 
 /**

@@ -23,9 +23,31 @@ interface Drug {
 }
 
 export const PEDIATRIC_DRUG_CALC_DRUGS: Drug[] = [
-  { name: 'Epinephrine IV (arrest)', category: 'Resus', dosePerKg: 0.01, unit: 'mg', max: 1, critical: true },
-  { name: 'Epinephrine IM (anaphylaxis)', category: 'Resus', dosePerKg: 0.01, unit: 'mg', max: 0.5, critical: true },
-  { name: 'Atropine', category: 'Resus', dosePerKg: 0.02, unit: 'mg', min: 0.1, max: 0.5, critical: true },
+  {
+    name: 'Epinephrine IV (arrest)',
+    category: 'Resus',
+    dosePerKg: 0.01,
+    unit: 'mg',
+    max: 1,
+    critical: true,
+  },
+  {
+    name: 'Epinephrine IM (anaphylaxis)',
+    category: 'Resus',
+    dosePerKg: 0.01,
+    unit: 'mg',
+    max: 0.5,
+    critical: true,
+  },
+  {
+    name: 'Atropine',
+    category: 'Resus',
+    dosePerKg: 0.02,
+    unit: 'mg',
+    min: 0.1,
+    max: 0.5,
+    critical: true,
+  },
   { name: 'Adenosine', category: 'Resus', dosePerKg: 0.1, unit: 'mg', max: 6 },
   { name: 'Amiodarone', category: 'Resus', dosePerKg: 5, unit: 'mg', max: 300 },
   { name: 'Ketamine IV', category: 'RSI', dosePerKg: 2, unit: 'mg', max: 200 },
@@ -120,7 +142,6 @@ export default function PediatricDrugCalc({ patientId, onClose }: PediatricDrugC
       role="dialog"
       aria-modal="true"
       aria-labelledby="pediatric-drug-title"
-      
     >
       <style>
         {`
@@ -163,10 +184,7 @@ export default function PediatricDrugCalc({ patientId, onClose }: PediatricDrugC
         `}
       </style>
       <div className="clinical-calculator-modal__panel pdc-panel">
-        <header
-          data-print-hide="true"
-          className="u-panel-header-row"
-        >
+        <header data-print-hide="true" className="u-panel-header-row">
           <div>
             <h2 id="pediatric-drug-title" className="u-title-18">
               Pediatric Drug Calculator
@@ -266,43 +284,44 @@ export default function PediatricDrugCalc({ patientId, onClose }: PediatricDrugC
                   {PEDIATRIC_DRUG_CALC_DRUGS.map((drug) => {
                     const crossCheckWarning = pediatricDoseCrossCheckWarning(drug.name);
                     return (
-                    <tr
-                      key={drug.name}
-                      className={drug.critical ? 'pdc-drug-row pdc-drug-row--critical' : 'pdc-drug-row'}
-                    >
-                      <td className="u-pad-10-border-b">
-                        <strong>{drug.name}</strong>
-                        <div className="pdc-drug-category">{drug.category}</div>
-                        {crossCheckWarning ? (
-                          <div
-                            className="pdc-cross-check-warning"
-                            role="alert"
-                            data-print-hide="true"
-                            title={`Pediatric Dose Safety Checker tool lists ${crossCheckWarning.checkerName} at ${crossCheckWarning.checkerDose} instead. ${crossCheckWarning.note} Verify against institutional protocol before administering.`}
-                          >
-                            ⚠ Conflicts with other in-app reference ({crossCheckWarning.checkerDose}) — verify before administering
-                          </div>
-                        ) : null}
-                      </td>
-                      <td className="pdc-muted-cell">
-                        {dosePerKgLabel(drug)}
-                      </td>
-                      <td
-                        style={{
-                          padding: 10,
-                          borderBottom: '1px solid #e0f2fe',
-                          fontWeight: 800,
-                          fontSize: 16,
-                          color: weight === null ? MEDICAL_THEME.inkMuted : MEDICAL_THEME.accent,
-                        }}
+                      <tr
+                        key={drug.name}
+                        className={
+                          drug.critical ? 'pdc-drug-row pdc-drug-row--critical' : 'pdc-drug-row'
+                        }
                       >
-                        {calculatedDose(weight, drug)}
-                      </td>
-                      <td className="pdc-muted-cell">
-                        {drug.max.toFixed(drug.max < 10 ? 2 : 0)}
-                      </td>
-                      <td className="pdc-muted-cell">{drug.unit}</td>
-                    </tr>
+                        <td className="u-pad-10-border-b">
+                          <strong>{drug.name}</strong>
+                          <div className="pdc-drug-category">{drug.category}</div>
+                          {crossCheckWarning ? (
+                            <div
+                              className="pdc-cross-check-warning"
+                              role="alert"
+                              data-print-hide="true"
+                              title={`Pediatric Dose Safety Checker tool lists ${crossCheckWarning.checkerName} at ${crossCheckWarning.checkerDose} instead. ${crossCheckWarning.note} Verify against institutional protocol before administering.`}
+                            >
+                              ⚠ Conflicts with other in-app reference (
+                              {crossCheckWarning.checkerDose}) — verify before administering
+                            </div>
+                          ) : null}
+                        </td>
+                        <td className="pdc-muted-cell">{dosePerKgLabel(drug)}</td>
+                        <td
+                          style={{
+                            padding: 10,
+                            borderBottom: '1px solid #e0f2fe',
+                            fontWeight: 800,
+                            fontSize: 16,
+                            color: weight === null ? MEDICAL_THEME.inkMuted : MEDICAL_THEME.accent,
+                          }}
+                        >
+                          {calculatedDose(weight, drug)}
+                        </td>
+                        <td className="pdc-muted-cell">
+                          {drug.max.toFixed(drug.max < 10 ? 2 : 0)}
+                        </td>
+                        <td className="pdc-muted-cell">{drug.unit}</td>
+                      </tr>
                     );
                   })}
                 </tbody>

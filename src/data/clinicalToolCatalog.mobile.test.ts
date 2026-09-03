@@ -20,10 +20,10 @@ describe('catalog mobile stylesheet', () => {
 
   it('uses stacked card rows up to 900px so launch buttons are not clipped', () => {
     expect(catalogMobileCss).toMatch(
-      /@media \(max-width: 900px\)[\s\S]*\.catalog-table--stacked tbody tr[\s\S]*display:\s*block/
+      /@media \(max-width: 900px\)[\s\S]*\.catalog-table--stacked tbody tr[\s\S]*display:\s*block/,
     );
     expect(catalogMobileCss).toMatch(
-      /\.catalog-table--stacked \.catalog-actions \.catalog-btn[\s\S]*min-height:\s*var\(--touch-target-min/
+      /\.catalog-table--stacked \.catalog-actions \.catalog-btn[\s\S]*min-height:\s*var\(--touch-target-min/,
     );
   });
 
@@ -40,7 +40,7 @@ describe('catalog mobile stylesheet', () => {
 describe('catalog layout — desktop sticky column guard', () => {
   it('only applies sticky actions on wide non-stacked tables', () => {
     expect(catalogCss).toMatch(
-      /@media \(min-width: 901px\)[\s\S]*\.catalog-table-wrap:not\(\.catalog-table-wrap--stacked\)/
+      /@media \(min-width: 901px\)[\s\S]*\.catalog-table-wrap:not\(\.catalog-table-wrap--stacked\)/,
     );
   });
 });

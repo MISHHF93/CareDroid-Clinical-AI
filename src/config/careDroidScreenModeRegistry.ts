@@ -22,12 +22,7 @@ export type CareDroidScreenMode =
 
 export type ScreenModeDensity = 'comfortable' | 'compact' | 'wall';
 
-export type ScreenModePhiVisibility =
-  | 'full'
-  | 'staff'
-  | 'operational'
-  | 'public_redacted'
-  | 'none';
+export type ScreenModePhiVisibility = 'full' | 'staff' | 'operational' | 'public_redacted' | 'none';
 
 export type ScreenModeAlertVisibility = 'all' | 'critical' | 'operational' | 'redacted';
 
@@ -433,9 +428,8 @@ for (const entry of CARE_DROID_SCREEN_MODE_REGISTRY) {
   }
 }
 
-export const CARE_DROID_SCREEN_MODE_OPTIONS: CareDroidScreenMode[] = CARE_DROID_SCREEN_MODE_REGISTRY.map(
-  (entry) => entry.id,
-);
+export const CARE_DROID_SCREEN_MODE_OPTIONS: CareDroidScreenMode[] =
+  CARE_DROID_SCREEN_MODE_REGISTRY.map((entry) => entry.id);
 
 /** Backward-compatible config shape used by central node and capabilities hooks */
 export type CareDroidScreenModeConfig = {
@@ -477,9 +471,12 @@ export function normalizeCareDroidScreenMode(
 ): CareDroidScreenMode | null {
   const normalized = String(mode || '').trim();
   if (!normalized) return null;
-  return ALIAS_TO_CANONICAL.get(normalized) || (REGISTRY_BY_ID.has(normalized as CareDroidScreenMode)
-    ? (normalized as CareDroidScreenMode)
-    : null);
+  return (
+    ALIAS_TO_CANONICAL.get(normalized) ||
+    (REGISTRY_BY_ID.has(normalized as CareDroidScreenMode)
+      ? (normalized as CareDroidScreenMode)
+      : null)
+  );
 }
 
 export function isValidCareDroidScreenMode(mode: unknown): mode is CareDroidScreenMode {
@@ -518,7 +515,10 @@ export function getScreenModeDefinition(
   return canonical ? REGISTRY_BY_ID.get(canonical) : undefined;
 }
 
-export function isScreenWidgetVisible(mode: string | CareDroidScreenMode, widgetId: string): boolean {
+export function isScreenWidgetVisible(
+  mode: string | CareDroidScreenMode,
+  widgetId: string,
+): boolean {
   const definition = getScreenModeDefinition(mode);
   if (!definition) return false;
   return definition.visibleWidgets.includes(widgetId);

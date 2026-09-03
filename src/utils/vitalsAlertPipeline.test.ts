@@ -4,13 +4,13 @@ import { evaluateVitalsAlerts, formatActiveVitalsForCopilot } from './vitalsAler
 describe('vitalsAlertPipeline', () => {
   it('classifies critical, warning, and watch vitals', () => {
     expect(evaluateVitalsAlerts({ spo2: 85 })).toEqual(
-      expect.arrayContaining([expect.objectContaining({ severity: 'critical', vital: 'SpO2' })])
+      expect.arrayContaining([expect.objectContaining({ severity: 'critical', vital: 'SpO2' })]),
     );
     expect(evaluateVitalsAlerts({ hr: 130 })).toEqual(
-      expect.arrayContaining([expect.objectContaining({ severity: 'warning', vital: 'HR' })])
+      expect.arrayContaining([expect.objectContaining({ severity: 'warning', vital: 'HR' })]),
     );
     expect(evaluateVitalsAlerts({ spo2: 95 })).toEqual(
-      expect.arrayContaining([expect.objectContaining({ severity: 'watch', vital: 'SpO2' })])
+      expect.arrayContaining([expect.objectContaining({ severity: 'watch', vital: 'SpO2' })]),
     );
   });
 
@@ -20,10 +20,10 @@ describe('vitalsAlertPipeline', () => {
     // hypertensive-emergency reading or a fat-finger typo (e.g. "1800"
     // for "180") produced zero alert no matter how extreme.
     expect(evaluateVitalsAlerts({ bpSystolic: 220 })).toEqual(
-      expect.arrayContaining([expect.objectContaining({ severity: 'critical', vital: 'SBP' })])
+      expect.arrayContaining([expect.objectContaining({ severity: 'critical', vital: 'SBP' })]),
     );
     expect(evaluateVitalsAlerts({ bpSystolic: 1800 })).toEqual(
-      expect.arrayContaining([expect.objectContaining({ severity: 'critical', vital: 'SBP' })])
+      expect.arrayContaining([expect.objectContaining({ severity: 'critical', vital: 'SBP' })]),
     );
   });
 
@@ -35,7 +35,7 @@ describe('vitalsAlertPipeline', () => {
           vital: 'GCS',
           reason: expect.stringMatching(/deteriorating neuro/i),
         }),
-      ])
+      ]),
     );
   });
 

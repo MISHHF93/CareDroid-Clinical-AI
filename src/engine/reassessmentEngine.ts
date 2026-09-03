@@ -26,7 +26,10 @@ const LONG_WAIT_ALERT_SOURCE = 'long-wait-rescue';
 
 type LongWaitAlertPhase = 'warning' | 'critical' | 'lwbs';
 
-export function longWaitAlertBucket(waitMins: number, intervalMinutes = LONG_WAIT_ALERT_DEDUPE_MINUTES): number {
+export function longWaitAlertBucket(
+  waitMins: number,
+  intervalMinutes = LONG_WAIT_ALERT_DEDUPE_MINUTES,
+): number {
   return Math.floor(Math.max(0, waitMins) / intervalMinutes);
 }
 
@@ -36,12 +39,13 @@ export function hasLongWaitAlertForBucket(
   phase: LongWaitAlertPhase,
   bucket: number,
 ): boolean {
-  return alerts.some((alert) =>
-    !alert.dismissed &&
-    alert.patientId === patientId &&
-    alert.source === LONG_WAIT_ALERT_SOURCE &&
-    alert.metadata?.longWaitPhase === phase &&
-    alert.metadata?.dedupeBucket === bucket
+  return alerts.some(
+    (alert) =>
+      !alert.dismissed &&
+      alert.patientId === patientId &&
+      alert.source === LONG_WAIT_ALERT_SOURCE &&
+      alert.metadata?.longWaitPhase === phase &&
+      alert.metadata?.dedupeBucket === bucket,
   );
 }
 
@@ -59,7 +63,11 @@ export function syncReassessmentDueFlag(
   const hasFlag = (flag: PatientFlag) => hasPatientFlag(patient, flag);
   const { shouldFlag } = evaluateReassessmentDueFlag(patient, { now, thresholds: { thresholds } });
 
-  if (patient.state === PatientState.Waiting && shouldFlag && !hasFlag(PatientFlag.ReassessmentDue)) {
+  if (
+    patient.state === PatientState.Waiting &&
+    shouldFlag &&
+    !hasFlag(PatientFlag.ReassessmentDue)
+  ) {
     addFlag(patient.id, PatientFlag.ReassessmentDue);
     return;
   }
@@ -106,7 +114,7 @@ export function startReassessmentEngine() {
       useEmergencyStore.getState();
     const now = new Date();
 
-    patients.forEach(patient => {
+    patients.forEach((patient) => {
       const vitalsList = Array.isArray(patient.vitals) ? patient.vitals : [];
       const latestVitals = vitalsList.at(-1);
       const hasFlag = (f: PatientFlag) => hasPatientFlag(patient, f);
@@ -162,9 +170,11 @@ export function startReassessmentEngine() {
       syncReassessmentDueFlag(patient, now, thresholds, addFlag, removeFlag);
 
       // Rule 2: P1/P2 not in Assessment+
-      if ([Priority.P1, Priority.P2].includes(patient.priority)
-          && !laterStates.includes(patient.state)
-          && !hasFlag(PatientFlag.HighRisk)) {
+      if (
+        [Priority.P1, Priority.P2].includes(patient.priority) &&
+        !laterStates.includes(patient.state) &&
+        !hasFlag(PatientFlag.HighRisk)
+      ) {
         addFlag(patient.id, PatientFlag.HighRisk);
       }
 
@@ -188,12 +198,10 @@ export function startReassessmentEngine() {
       }
 
       // Rule 4: Remove stale flags
-      if (patient.state !== PatientState.Waiting &&
-          hasFlag(PatientFlag.LongWait)) {
+      if (patient.state !== PatientState.Waiting && hasFlag(PatientFlag.LongWait)) {
         removeFlag(patient.id, PatientFlag.LongWait);
       }
-      if (patient.state !== PatientState.Waiting &&
-          hasFlag(PatientFlag.LWBSRisk)) {
+      if (patient.state !== PatientState.Waiting && hasFlag(PatientFlag.LWBSRisk)) {
         removeFlag(patient.id, PatientFlag.LWBSRisk);
       }
     });

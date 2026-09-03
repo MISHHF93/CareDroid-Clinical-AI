@@ -237,7 +237,9 @@ function isNonEmptyString(value) {
 }
 
 function unique(values) {
-  return [...new Set(values.filter((value) => value !== null && value !== undefined && value !== ''))];
+  return [
+    ...new Set(values.filter((value) => value !== null && value !== undefined && value !== '')),
+  ];
 }
 
 export function validatePluginRegistration(plugin, existingPlugins = PLUGIN_REGISTRY) {
@@ -260,12 +262,16 @@ export function validatePluginRegistration(plugin, existingPlugins = PLUGIN_REGI
   if (!isNonEmptyString(plugin.owner)) errors.push('Plugin owner is required.');
   if (!isNonEmptyString(plugin.version)) errors.push('Plugin version is required.');
 
-  const duplicate = existingPlugins.some((existing) => existing !== plugin && existing.id === plugin.id);
+  const duplicate = existingPlugins.some(
+    (existing) => existing !== plugin && existing.id === plugin.id,
+  );
   if (duplicate) errors.push(`Plugin id "${plugin.id}" is already registered.`);
 
   const status = plugin.lifecycle?.status;
   if (!Object.values(PLUGIN_LIFECYCLE_STATUS).includes(status)) {
-    errors.push(`Plugin lifecycle.status must be one of: ${Object.values(PLUGIN_LIFECYCLE_STATUS).join(', ')}.`);
+    errors.push(
+      `Plugin lifecycle.status must be one of: ${Object.values(PLUGIN_LIFECYCLE_STATUS).join(', ')}.`,
+    );
   }
 
   const permissionLogic = plugin.permissions?.logic || PLUGIN_PERMISSION_LOGIC.ALL;
@@ -290,11 +296,17 @@ export function validatePluginRegistration(plugin, existingPlugins = PLUGIN_REGI
     if (!isNonEmptyString(plugin.inventory.description)) {
       errors.push('Plugin inventory.description is required.');
     }
-    if (plugin.inventory.catalogVisible !== false && !plugin.inventory.route && !plugin.ai?.chatSeed) {
+    if (
+      plugin.inventory.catalogVisible !== false &&
+      !plugin.inventory.route &&
+      !plugin.ai?.chatSeed
+    ) {
       errors.push('Catalog-visible plugins need an inventory.route or ai.chatSeed.');
     }
     if (plugin.inventory.sidebarVisible) {
-      warnings.push('Plugin sidebar visibility is allowed, but prefer catalog-only until the plugin route is promoted.');
+      warnings.push(
+        'Plugin sidebar visibility is allowed, but prefer catalog-only until the plugin route is promoted.',
+      );
     }
   }
 
@@ -314,7 +326,7 @@ export function validatePluginRegistry(plugins = PLUGIN_REGISTRY) {
   const results = plugins.map((plugin) => {
     const validation = validatePluginRegistration(
       plugin,
-      plugins.filter((candidate) => candidate !== plugin)
+      plugins.filter((candidate) => candidate !== plugin),
     );
     if (seen.has(plugin.id)) {
       validation.errors.push(`Plugin id "${plugin.id}" is duplicated in the registry.`);
@@ -327,8 +339,12 @@ export function validatePluginRegistry(plugins = PLUGIN_REGISTRY) {
   return {
     valid: results.every((result) => result.valid),
     results,
-    errors: results.flatMap((result) => result.errors.map((error) => `${result.pluginId}: ${error}`)),
-    warnings: results.flatMap((result) => result.warnings.map((warning) => `${result.pluginId}: ${warning}`)),
+    errors: results.flatMap((result) =>
+      result.errors.map((error) => `${result.pluginId}: ${error}`),
+    ),
+    warnings: results.flatMap((result) =>
+      result.warnings.map((warning) => `${result.pluginId}: ${warning}`),
+    ),
   };
 }
 
@@ -371,7 +387,8 @@ export function buildPluginInventoryRecords(plugins = PLUGIN_REGISTRY) {
     return {
       id: plugin.id,
       label: plugin.name,
-      category: plugin.inventory.category || INVENTORY_CATEGORY_BY_PLUGIN_TYPE[plugin.type] || 'plugin',
+      category:
+        plugin.inventory.category || INVENTORY_CATEGORY_BY_PLUGIN_TYPE[plugin.type] || 'plugin',
       tier: 'plugin',
       status: plugin.lifecycle.status,
       lifecycleState:
@@ -387,7 +404,12 @@ export function buildPluginInventoryRecords(plugins = PLUGIN_REGISTRY) {
       navigationPath: isChatAssisted ? '/assistant' : route,
       nluToolId: null,
       nluProfileIds: [],
-      aliases: unique([plugin.id, plugin.name, ...(plugin.aliases || []), ...(plugin.inventory.tags || [])]),
+      aliases: unique([
+        plugin.id,
+        plugin.name,
+        ...(plugin.aliases || []),
+        ...(plugin.inventory.tags || []),
+      ]),
       backendKeywords: [],
       backendPatternId: null,
       requiredParameters: plugin.requiredParameters || [],
@@ -402,7 +424,8 @@ export function buildPluginInventoryRecords(plugins = PLUGIN_REGISTRY) {
       safetyCopy: plugin.inventory.description,
       chatSeed: plugin.ai?.chatSeed || null,
       testCoverage: unique(['pluginRegistry.test.ts', ...(plugin.inventory.testCoverage || [])]),
-      riskLevel: plugin.inventory.riskLevel || (permissionPolicy.permissions.length ? 'medium' : 'low'),
+      riskLevel:
+        plugin.inventory.riskLevel || (permissionPolicy.permissions.length ? 'medium' : 'low'),
       notes: `Plugin type: ${plugin.type}; owner: ${plugin.owner}; version: ${plugin.version}`,
       plugin: {
         id: plugin.id,

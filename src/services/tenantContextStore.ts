@@ -72,10 +72,10 @@ export function getTenantContext() {
 export function hasRequiredTenantContext(context = currentTenantContext) {
   return Boolean(
     normalizeValue(context?.organizationId) &&
-      normalizeValue(context?.workspaceId) &&
-      normalizeValue(context?.userId) &&
-      normalizeValue(context?.role) &&
-      normalizeValue(context?.subscriptionPlan)
+    normalizeValue(context?.workspaceId) &&
+    normalizeValue(context?.userId) &&
+    normalizeValue(context?.role) &&
+    normalizeValue(context?.subscriptionPlan),
   );
 }
 

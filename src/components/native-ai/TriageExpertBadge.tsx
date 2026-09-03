@@ -27,14 +27,12 @@ export default function TriageExpertBadge({
 
   return (
     <span
-      className={[
-        'triage-expert-badge',
-        compact ? 'triage-expert-badge--compact' : '',
-        className,
-      ]
+      className={['triage-expert-badge', compact ? 'triage-expert-badge--compact' : '', className]
         .filter(Boolean)
         .join(' ')}
-      title={[...inference.rationale, 'Staff confirmation required before assigning acuity.'].join(' ')}
+      title={[...inference.rationale, 'Staff confirmation required before assigning acuity.'].join(
+        ' ',
+      )}
       aria-label={`Suggested triage ${inference.suggestedPriority}, ${Math.round(inference.confidence * 100)} percent confidence, pending review`}
     >
       Suggested triage: {inference.suggestedPriority}

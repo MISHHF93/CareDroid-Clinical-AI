@@ -19,7 +19,7 @@ describe('PlatformAssetsApi marketplace helpers', () => {
     });
 
     expect(apiFetch).toHaveBeenCalledWith(
-      '/api/platform/marketplace/packs?organizationId=org-1&organizationType=hospital'
+      '/api/platform/marketplace/packs?organizationId=org-1&organizationType=hospital',
     );
   });
 
@@ -29,7 +29,7 @@ describe('PlatformAssetsApi marketplace helpers', () => {
     await PlatformAssetsApi.getMarketplacePack('icu-pack', { organizationId: 'org-1' });
 
     expect(apiFetch).toHaveBeenCalledWith(
-      '/api/platform/marketplace/packs/icu-pack?organizationId=org-1'
+      '/api/platform/marketplace/packs/icu-pack?organizationId=org-1',
     );
   });
 
@@ -44,7 +44,9 @@ describe('PlatformAssetsApi marketplace helpers', () => {
 
     await PlatformAssetsApi.getDepartment('emergency', { organizationId: 'org-1' });
 
-    expect(apiFetch).toHaveBeenCalledWith('/api/platform/departments/emergency?organizationId=org-1');
+    expect(apiFetch).toHaveBeenCalledWith(
+      '/api/platform/departments/emergency?organizationId=org-1',
+    );
   });
 
   it('lists service lines with organization scope', async () => {
@@ -59,7 +61,7 @@ describe('PlatformAssetsApi marketplace helpers', () => {
     await PlatformAssetsApi.getServiceLine('emergency-medicine', { organizationId: 'org-1' });
 
     expect(apiFetch).toHaveBeenCalledWith(
-      '/api/platform/service-lines/emergency-medicine?organizationId=org-1'
+      '/api/platform/service-lines/emergency-medicine?organizationId=org-1',
     );
   });
 
@@ -77,7 +79,7 @@ describe('PlatformAssetsApi marketplace helpers', () => {
     await PlatformAssetsApi.getCustomerSuccessDashboard('org-1', 'week');
 
     expect(apiFetch).toHaveBeenCalledWith(
-      '/api/platform/organizations/org-1/customer-success?period=week'
+      '/api/platform/organizations/org-1/customer-success?period=week',
     );
   });
 
@@ -109,7 +111,7 @@ describe('PlatformAssetsApi marketplace helpers', () => {
     });
 
     expect(apiFetch).toHaveBeenCalledWith(
-      '/api/platform/governance-registry?query=qsofa&riskLevel=clinical-decision-support&assetType=calculator'
+      '/api/platform/governance-registry?query=qsofa&riskLevel=clinical-decision-support&assetType=calculator',
     );
   });
 

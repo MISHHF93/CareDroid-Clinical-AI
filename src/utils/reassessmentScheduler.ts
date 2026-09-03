@@ -4,7 +4,7 @@ export const REASSESSMENT_REMINDER_OVERDUE_MS = 10 * 60 * 1000;
 
 export function activeReassessmentReminders(patient) {
   return (patient?.reassessmentReminders || []).filter((reminder) =>
-    ACTIVE_REMINDER_STATUSES.has(reminder.status)
+    ACTIVE_REMINDER_STATUSES.has(reminder.status),
   );
 }
 

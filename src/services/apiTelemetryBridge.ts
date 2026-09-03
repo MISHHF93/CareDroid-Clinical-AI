@@ -21,7 +21,12 @@
 
 export interface ApiTelemetryHooks {
   buildTraceHeaders(workflowTraceId?: string): Record<string, string>;
-  recordApiTiming(input: { path: string; method: string; durationMs: number; status: number }): void;
+  recordApiTiming(input: {
+    path: string;
+    method: string;
+    durationMs: number;
+    status: number;
+  }): void;
 }
 
 const noopHooks: ApiTelemetryHooks = {

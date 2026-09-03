@@ -176,8 +176,7 @@ export function interpretPhq9Score(total, question9Score) {
   const screeningDiscussion = {
     none_minimal:
       'Scores in the none–minimal range suggest few depressive symptoms on this screen over the past two weeks. A low score does not exclude important mood concerns or safety risk in other contexts.',
-    mild:
-      'Scores in the mild range may warrant watchful waiting or repeat screening depending on context, functional impairment, and patient preference. This tool does not establish a depression diagnosis.',
+    mild: 'Scores in the mild range may warrant watchful waiting or repeat screening depending on context, functional impairment, and patient preference. This tool does not establish a depression diagnosis.',
     moderate:
       'Scores in the moderate range often prompt clinical follow-up (e.g. repeat assessment, structured interview, or referral) per institutional guidance. This tool does not establish a depression diagnosis.',
     moderately_severe:
@@ -257,7 +256,7 @@ export function validatePhq9Inputs(raw) {
     return { valid: false, errors };
   }
 
-  return { valid: true, errors: [], inputs: (inputs as any) };
+  return { valid: true, errors: [], inputs: inputs as any };
 }
 
 /**

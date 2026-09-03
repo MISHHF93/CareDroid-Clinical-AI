@@ -80,8 +80,7 @@ export default function TrackMindWorkspaceHub() {
         // This page, and anything already offered above as a quick action --
         // /audit was rendering twice, once in each section.
         .filter(
-          (route) =>
-            route !== CANONICAL_ROUTES.trackMindWorkspace && !quickActionRoutes.has(route),
+          (route) => route !== CANONICAL_ROUTES.trackMindWorkspace && !quickActionRoutes.has(route),
         )
         .map((route) => {
           // Two independent ways a listed surface is not actually openable,
@@ -96,9 +95,7 @@ export default function TrackMindWorkspaceHub() {
             route,
             label: labelForRoute(route),
             reachable: permitted && !shadowed,
-            reason: !permitted
-              ? 'Not open to your role'
-              : 'Not part of the ED application',
+            reason: !permitted ? 'Not open to your role' : 'Not part of the ED application',
           };
         }),
     [workspace.relatedRoutes, quickActionRoutes, profile],
@@ -192,9 +189,7 @@ export default function TrackMindWorkspaceHub() {
             )}
           </ul>
         ) : (
-          <p className="trackmind-hub__empty">
-            No quick actions are available to this role.
-          </p>
+          <p className="trackmind-hub__empty">No quick actions are available to this role.</p>
         )}
       </section>
 

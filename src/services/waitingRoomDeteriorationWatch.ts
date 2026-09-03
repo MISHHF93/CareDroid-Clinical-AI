@@ -153,9 +153,9 @@ function detectReassessmentDelays(patient: Patient, now: Date): DeteriorationWat
   const repeated =
     delaySignals >= 2 ||
     (timer.isOverdue && hasDueReassessmentReminder(patient, now)) ||
-    ((patient.reassessmentReminders || []).filter((reminder) =>
+    (patient.reassessmentReminders || []).filter((reminder) =>
       ['overdue', 'missed'].includes(String(reminder.status || '')),
-    ).length >= 2);
+    ).length >= 2;
 
   if (!repeated && !timer.isOverdue && !hasDueReassessmentReminder(patient, now)) {
     return null;
@@ -206,9 +206,7 @@ function detectEmsIntakeObservation(
   }
 
   if (arrivalControl.quickSafetyFlags.length) {
-    observations.push(
-      `Intake safety flags: ${arrivalControl.quickSafetyFlags.join(', ')}`,
-    );
+    observations.push(`Intake safety flags: ${arrivalControl.quickSafetyFlags.join(', ')}`);
   }
 
   if (checklist?.criticalFlags.length) {
@@ -233,7 +231,9 @@ function detectEmsIntakeObservation(
   const tone: DeteriorationWatchTone =
     arrival?.severity === 'Critical' ||
     arrivalControl.quickSafetyFlags.some((flag) =>
-      [PatientFlag.SepsisAlert, PatientFlag.StrokeCode, PatientFlag.DeterioratingNeuro].includes(flag),
+      [PatientFlag.SepsisAlert, PatientFlag.StrokeCode, PatientFlag.DeterioratingNeuro].includes(
+        flag,
+      ),
     )
       ? 'critical'
       : 'watch';
@@ -349,13 +349,11 @@ export function buildDeteriorationWatchAlerts(
       patient,
       snapshot: resolveDeteriorationWatch(patient, { ...context, now }),
     }))
-    .filter(
-      (entry): entry is { patient: Patient; snapshot: DeteriorationWatchSnapshot } =>
-        Boolean(
-          entry.snapshot &&
-            (entry.snapshot.level === 'review-needed' ||
-              entry.snapshot.level === 'urgent-review'),
-        ),
+    .filter((entry): entry is { patient: Patient; snapshot: DeteriorationWatchSnapshot } =>
+      Boolean(
+        entry.snapshot &&
+        (entry.snapshot.level === 'review-needed' || entry.snapshot.level === 'urgent-review'),
+      ),
     )
     .sort((left, right) => {
       const rank = { 'urgent-review': 2, 'review-needed': 1, watch: 0, none: -1 };
@@ -415,9 +413,8 @@ export function sortPatientsForDeteriorationWatchAttention(
       patient,
       snapshot: resolveDeteriorationWatch(patient, context),
     }))
-    .filter(
-      (entry): entry is { patient: Patient; snapshot: DeteriorationWatchSnapshot } =>
-        Boolean(entry.snapshot && shouldSurfaceDeteriorationWatch(entry.snapshot)),
+    .filter((entry): entry is { patient: Patient; snapshot: DeteriorationWatchSnapshot } =>
+      Boolean(entry.snapshot && shouldSurfaceDeteriorationWatch(entry.snapshot)),
     )
     .sort(
       (left, right) =>
@@ -452,4 +449,3 @@ export function buildDeteriorationWatchAttentionSnapshot(
     previewRows: rows.slice(0, 4),
   };
 }
-

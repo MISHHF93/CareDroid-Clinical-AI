@@ -11,18 +11,22 @@ export default function OperationalEmptyState({
   icon = '○',
   title,
   guidance,
-  status = (undefined as any),
+  status = undefined as any,
   statusTone = 'stable',
-  nextSteps = ([] as any[]),
-  actions = (undefined as any),
-  helpTopicId = (undefined as string | undefined),
+  nextSteps = [] as any[],
+  actions = undefined as any,
+  helpTopicId = undefined as string | undefined,
   size = 'card',
   className = '',
   role = 'status',
   ...props
 }) {
   const sizeClass =
-    size === 'inline' ? 'operational-empty-state--inline' : size === 'panel' ? 'operational-empty-state--panel' : '';
+    size === 'inline'
+      ? 'operational-empty-state--inline'
+      : size === 'panel'
+        ? 'operational-empty-state--panel'
+        : '';
   const classNames = ['operational-empty-state', sizeClass, className].filter(Boolean).join(' ');
   const body = (
     <>
@@ -73,19 +77,35 @@ export default function OperationalEmptyState({
   // Static role strings only (Edge Tools rejects dynamic ARIA roles).
   if (role === 'alert') {
     return (
-      <section className={classNames} role="alert" aria-label={title || guidance || 'Empty state'} {...props}>
+      <section
+        className={classNames}
+        role="alert"
+        aria-label={title || guidance || 'Empty state'}
+        {...props}
+      >
         {body}
       </section>
     );
   }
   return (
-    <section className={classNames} role="status" aria-label={title || guidance || 'Empty state'} {...props}>
+    <section
+      className={classNames}
+      role="status"
+      aria-label={title || guidance || 'Empty state'}
+      {...props}
+    >
       {body}
     </section>
   );
 }
 
-export function OperationalEmptyAction({ children, onClick, secondary = false, type = 'button', ...props }) {
+export function OperationalEmptyAction({
+  children,
+  onClick,
+  secondary = false,
+  type = 'button',
+  ...props
+}) {
   return (
     <button
       type={type as any}

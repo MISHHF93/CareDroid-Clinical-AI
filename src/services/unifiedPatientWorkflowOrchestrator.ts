@@ -164,14 +164,22 @@ export function syncPatientWorkflowSurfaces(
   });
 
   if (toState === PatientState.Triage || context.fromState === PatientState.Registration) {
-    syncArrivalOperationalSurfaces(store as Parameters<typeof syncArrivalOperationalSurfaces>[0], patientId, {
-      destination: 'triage-queue',
-      source,
-    });
+    syncArrivalOperationalSurfaces(
+      store as Parameters<typeof syncArrivalOperationalSurfaces>[0],
+      patientId,
+      {
+        destination: 'triage-queue',
+        source,
+      },
+    );
   }
 
   const patient = store.patients.find((entry) => entry.id === patientId);
-  if (patient && (toState === PatientState.Triage || toState === PatientState.Assessment) && !patient.triageAssist) {
+  if (
+    patient &&
+    (toState === PatientState.Triage || toState === PatientState.Assessment) &&
+    !patient.triageAssist
+  ) {
     const triageAssist = buildClientTriageAssist(patient, store.patients, {
       arrivalReason: context.arrivalReason,
       complaintCategory: patient.complaintCategory,
@@ -187,15 +195,16 @@ export function syncPatientWorkflowSurfaces(
   store.updateAlerts?.();
   void store.refreshAdministrativeAutomationsAsync?.();
 
-  void import('../engine/unifiedWorkflowAutomationEngine').then(({ scheduleWorkflowAutomationRefresh }) =>
-    scheduleWorkflowAutomationRefresh(automationEvent),
+  void import('../engine/unifiedWorkflowAutomationEngine').then(
+    ({ scheduleWorkflowAutomationRefresh }) => scheduleWorkflowAutomationRefresh(automationEvent),
   );
 
-  void import('./emergencyCareJourneyOrchestrator').then(({ syncJourneyFromPatientStateTransition }) =>
-    syncJourneyFromPatientStateTransition(patientId, context.fromState, toState, {
-      actorId: options.actorId,
-      actorRole: options.actorRole || options.actorName,
-    }),
+  void import('./emergencyCareJourneyOrchestrator').then(
+    ({ syncJourneyFromPatientStateTransition }) =>
+      syncJourneyFromPatientStateTransition(patientId, context.fromState, toState, {
+        actorId: options.actorId,
+        actorRole: options.actorRole || options.actorName,
+      }),
   );
 }
 

@@ -158,7 +158,12 @@ describe('alertClassificationModel', () => {
       // old filter only checked `acknowledged`, and the sidebar's old filter only
       // checked `read`, so clearing an alert through one surface left the other
       // surface's count unchanged.
-      const acknowledgedOnly = { ...criticalAlert, read: false, dismissed: false, acknowledged: true };
+      const acknowledgedOnly = {
+        ...criticalAlert,
+        read: false,
+        dismissed: false,
+        acknowledged: true,
+      };
       expect(isAlertActionable(acknowledgedOnly)).toBe(false);
     });
 
@@ -177,7 +182,12 @@ describe('alertClassificationModel', () => {
     });
 
     it('excludes dismissed alerts', () => {
-      const dismissedAlert = { ...criticalAlert, read: false, dismissed: true, acknowledged: false };
+      const dismissedAlert = {
+        ...criticalAlert,
+        read: false,
+        dismissed: true,
+        acknowledged: false,
+      };
       expect(isAlertActionable(dismissedAlert)).toBe(false);
     });
   });

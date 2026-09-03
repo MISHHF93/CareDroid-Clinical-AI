@@ -3,7 +3,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import CapacityCrisisMode from './CapacityCrisisMode';
 import { confirmCareDroidAction } from '../services/careDroidInteractionFeedback';
 import { PatientState } from '../types/emergency';
-import { PERMISSIVE_EMERGENCY_ROLE_MOCK, withEmergencyRoleMock } from '../test/permissiveEmergencyRoleMock';
+import {
+  PERMISSIVE_EMERGENCY_ROLE_MOCK,
+  withEmergencyRoleMock,
+} from '../test/permissiveEmergencyRoleMock';
 import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
 
 vi.mock('../services/careDroidInteractionFeedback', () => ({

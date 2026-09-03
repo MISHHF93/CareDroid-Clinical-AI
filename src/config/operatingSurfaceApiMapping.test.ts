@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { listApiBackedJourneySurfaces, resolveApiOperatingSurfaceId } from './operatingSurfaceApiMapping';
+import {
+  listApiBackedJourneySurfaces,
+  resolveApiOperatingSurfaceId,
+} from './operatingSurfaceApiMapping';
 
 describe('operatingSurfaceApiMapping', () => {
   it('maps journey surface ids to Nest operating-surface API ids', () => {

@@ -1,11 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { createEmergencyCall } from './dispatchIntakeService';
 import { cadDispatchUnit } from './cadIntegrationService';
-import {
-  getActiveTraces,
-  getTraceByCallId,
-  getJourneyMetrics,
-} from './emergencySignalService';
+import { getActiveTraces, getTraceByCallId, getJourneyMetrics } from './emergencySignalService';
 import {
   onEmsUnitDispatched,
   onHospitalPreAlert,
@@ -48,7 +44,9 @@ describe('emergencyCareJourneyOrchestrator', () => {
 
     const { emsArrival, trace } = onEmsUnitDispatched(call, assignment);
     expect(emsArrival.id).toBe(`ems-${call.id}`);
-    expect(useEmergencyStore.getState().emsArrivals.some((entry) => entry.id === emsArrival.id)).toBe(true);
+    expect(
+      useEmergencyStore.getState().emsArrivals.some((entry) => entry.id === emsArrival.id),
+    ).toBe(true);
 
     const updated = onHospitalPreAlert(call.id, emsArrival.id);
     expect(updated?.currentStage).toBe('ed_readiness_activated');

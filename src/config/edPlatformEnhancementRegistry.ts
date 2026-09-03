@@ -38,7 +38,8 @@ export const ED_PLATFORM_ENHANCEMENTS: readonly EdPlatformEnhancement[] = [
       'src/engine/selfArrivalTriageEngine.ts',
       'src/services/smartIntakeApi.ts',
     ],
-    gapSummary: 'Patient-facing capture exists; live EHR write-back and kiosk device enrollment remain tenant-configured.',
+    gapSummary:
+      'Patient-facing capture exists; live EHR write-back and kiosk device enrollment remain tenant-configured.',
   },
   {
     id: 'algorithmic-triage-streaming',
@@ -48,7 +49,8 @@ export const ED_PLATFORM_ENHANCEMENTS: readonly EdPlatformEnhancement[] = [
     humanReviewRequired: true,
     primarySurfaces: ['/emergency/self-arrival', '/emergency/reception'],
     implementationHooks: ['src/engine/selfArrivalTriageEngine.ts', 'engine/triageEngine.ts'],
-    gapSummary: 'Rule-based P1–P5 and streaming lanes implemented; full ESI workflow and nurse sign-off UI still expanding.',
+    gapSummary:
+      'Rule-based P1–P5 and streaming lanes implemented; full ESI workflow and nurse sign-off UI still expanding.',
   },
   {
     id: 'whiteboard-operational-icons',
@@ -62,7 +64,8 @@ export const ED_PLATFORM_ENHANCEMENTS: readonly EdPlatformEnhancement[] = [
       'src/utils/whiteboardOperationalEvents.ts',
       'src/components/whiteboard/WhiteboardOperationalIconStrip.tsx',
     ],
-    gapSummary: 'Icon vocabulary and event derivation added; live bed-management ADT feed not yet connected.',
+    gapSummary:
+      'Icon vocabulary and event derivation added; live bed-management ADT feed not yet connected.',
   },
   {
     id: 'boarding-capacity-visibility',
@@ -71,8 +74,12 @@ export const ED_PLATFORM_ENHANCEMENTS: readonly EdPlatformEnhancement[] = [
     maturity: 'partial',
     humanReviewRequired: false,
     primarySurfaces: ['/emergency/boarding', '/emergency/capacity'],
-    implementationHooks: ['backend/src/services/boarding.service.ts', 'src/components/AppShell.tsx'],
-    gapSummary: 'Backend boarding APIs are live; frontend intelligence layer still uses demo fixtures in places.',
+    implementationHooks: [
+      'backend/src/services/boarding.service.ts',
+      'src/components/AppShell.tsx',
+    ],
+    gapSummary:
+      'Backend boarding APIs are live; frontend intelligence layer still uses demo fixtures in places.',
   },
   {
     id: 'adta-anticipated-admission',
@@ -82,7 +89,8 @@ export const ED_PLATFORM_ENHANCEMENTS: readonly EdPlatformEnhancement[] = [
     humanReviewRequired: true,
     primarySurfaces: ['/emergency/whiteboard', '/emergency/command-center'],
     implementationHooks: ['src/engine/anticipatedAdmissionScore.ts'],
-    gapSummary: 'Explainable heuristic ADTA implemented for staff review; hospital-local calibration and ML training are planned.',
+    gapSummary:
+      'Explainable heuristic ADTA implemented for staff review; hospital-local calibration and ML training are planned.',
   },
   {
     id: 'bottleneck-identification',
@@ -95,7 +103,8 @@ export const ED_PLATFORM_ENHANCEMENTS: readonly EdPlatformEnhancement[] = [
       'src/components/whiteboard/commandCenterThroughputModel.ts',
       'src/utils/whiteboardOperationalEvents.ts',
     ],
-    gapSummary: 'Rule-based bottleneck events on patient cards; backend OI still fixture-sourced for department-wide analytics.',
+    gapSummary:
+      'Rule-based bottleneck events on patient cards; backend OI still fixture-sourced for department-wide analytics.',
   },
   {
     id: 'ems-pre-arrival-placeholder',
@@ -108,7 +117,8 @@ export const ED_PLATFORM_ENHANCEMENTS: readonly EdPlatformEnhancement[] = [
       'src/services/preArrivalWorkflow.ts',
       'src/pages/emergency/ReceptionWorkspace.tsx',
     ],
-    gapSummary: 'Placeholder registration and arrival check-in normalized; live CAD/FHIR EMS feed still integration-dependent.',
+    gapSummary:
+      'Placeholder registration and arrival check-in normalized; live CAD/FHIR EMS feed still integration-dependent.',
   },
   {
     id: 'governance-provenance-labels',
@@ -122,7 +132,8 @@ export const ED_PLATFORM_ENHANCEMENTS: readonly EdPlatformEnhancement[] = [
       'src/components/emergency/EdDataSourceBanner.tsx',
       'src/config/edOperationalStandards.ts',
     ],
-    gapSummary: 'Governance infra is strong; per-widget provenance on all operational signals is still being extended.',
+    gapSummary:
+      'Governance infra is strong; per-widget provenance on all operational signals is still being extended.',
   },
   {
     id: 'structured-pre-arrival-mist-sbar',
@@ -136,7 +147,8 @@ export const ED_PLATFORM_ENHANCEMENTS: readonly EdPlatformEnhancement[] = [
       'src/components/ems/PreArrivalNotificationForm.tsx',
       'src/services/preArrivalWorkflow.ts',
     ],
-    gapSummary: 'Electronic MIST/SBAR forms and placeholder cards implemented; live CAD/ePCR auto-population remains integration-dependent.',
+    gapSummary:
+      'Electronic MIST/SBAR forms and placeholder cards implemented; live CAD/ePCR auto-population remains integration-dependent.',
   },
   {
     id: 'resource-activation-logic',
@@ -149,7 +161,8 @@ export const ED_PLATFORM_ENHANCEMENTS: readonly EdPlatformEnhancement[] = [
       'src/services/resourceActivation.ts',
       'src/components/ems/ResourceActivationStrip.tsx',
     ],
-    gapSummary: 'Rule-based STEMI/stroke/trauma activations surface on EMS and command views; tenant-specific activation playbooks are configurable next.',
+    gapSummary:
+      'Rule-based STEMI/stroke/trauma activations surface on EMS and command views; tenant-specific activation playbooks are configurable next.',
   },
   {
     id: 'handoff-close-checkpoint',
@@ -162,7 +175,8 @@ export const ED_PLATFORM_ENHANCEMENTS: readonly EdPlatformEnhancement[] = [
       'src/services/handoffClose.ts',
       'src/components/ems/HandoffClosePanel.tsx',
     ],
-    gapSummary: 'Receiving clinician confirmation checkpoint added; EHR documentation write-back is planned.',
+    gapSummary:
+      'Receiving clinician confirmation checkpoint added; EHR documentation write-back is planned.',
   },
   {
     id: 'patient-room-whiteboard',
@@ -176,7 +190,8 @@ export const ED_PLATFORM_ENHANCEMENTS: readonly EdPlatformEnhancement[] = [
       'src/utils/patientRoomWhiteboardModel.ts',
       'src/utils/patientFriendlyTerminology.ts',
     ],
-    gapSummary: 'Read-only patient-friendly view derived from clinical whiteboard data; kiosk enrollment per room is tenant-configured.',
+    gapSummary:
+      'Read-only patient-friendly view derived from clinical whiteboard data; kiosk enrollment per room is tenant-configured.',
   },
   {
     id: 'digital-door-signage',
@@ -189,7 +204,8 @@ export const ED_PLATFORM_ENHANCEMENTS: readonly EdPlatformEnhancement[] = [
       'src/components/whiteboard/DigitalDoorSign.tsx',
       'src/utils/digitalDoorSignModel.ts',
     ],
-    gapSummary: 'Auto-updating door signs from patient card data; physical display hardware pairing is out of band.',
+    gapSummary:
+      'Auto-updating door signs from patient card data; physical display hardware pairing is out of band.',
   },
   {
     id: 'journey-prediction-ml',
@@ -202,7 +218,8 @@ export const ED_PLATFORM_ENHANCEMENTS: readonly EdPlatformEnhancement[] = [
       'src/engine/patientJourneyPrediction.ts',
       'src/components/predictive/JourneyPredictionBadge.tsx',
     ],
-    gapSummary: 'Explainable feature-weighted predictor for admission, prolonged LOS, and CXR utilization; hospital-local XGBoost training is planned.',
+    gapSummary:
+      'Explainable feature-weighted predictor for admission, prolonged LOS, and CXR utilization; hospital-local XGBoost training is planned.',
   },
   {
     id: 'command-center-surge-mode',
@@ -216,7 +233,8 @@ export const ED_PLATFORM_ENHANCEMENTS: readonly EdPlatformEnhancement[] = [
       'src/components/whiteboard/CommandCenterSurgePanel.tsx',
       'src/components/whiteboard/commandCenterThroughputModel.ts',
     ],
-    gapSummary: 'RAG thresholds, zone occupancy, and surge/crisis mode added; full RHOCC-style external transfer feeds remain integration-dependent.',
+    gapSummary:
+      'RAG thresholds, zone occupancy, and surge/crisis mode added; full RHOCC-style external transfer feeds remain integration-dependent.',
   },
 ] as const;
 

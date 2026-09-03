@@ -6,7 +6,8 @@ import { describe, it, expect } from 'vitest';
 import { romeIvIbsChatConfig } from './chatAssistedCalculators/romeIvIbs';
 import { clinicalIntentTools } from './clinicalIntentToolCatalog';
 
-const TREATMENT_PATTERN = /\b(prescribe|recommend (a |the )?(low fodmap|rifaximin|lubiprostone|linaclotide))\b/i;
+const TREATMENT_PATTERN =
+  /\b(prescribe|recommend (a |the )?(low fodmap|rifaximin|lubiprostone|linaclotide))\b/i;
 
 describe('PR7 NLU — rome-iv-ibs chat seed safety', () => {
   it('chat seed is informational and recommends clinician review', () => {

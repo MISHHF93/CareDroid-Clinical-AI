@@ -40,14 +40,15 @@ describe('backendFrontendToolContract report', () => {
 
     for (const id of NLU_PROFILE_TOOL_IDS) {
       expect(patternIds.has(id), `missing pattern for ${id}`).toBe(true);
-      expect(nluRows.some((r) => r.canonicalId === id), `missing matrix row for ${id}`).toBe(
-        true
-      );
+      expect(
+        nluRows.some((r) => r.canonicalId === id),
+        `missing matrix row for ${id}`,
+      ).toBe(true);
     }
 
     const executors = nluRows.filter((r) => r.backendExecutor === 'yes');
     expect(executors.map((r) => r.canonicalId).sort()).toEqual(
-      [...ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS].sort()
+      [...ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS].sort(),
     );
   });
 
@@ -60,7 +61,7 @@ describe('backendFrontendToolContract report', () => {
     writeFileSync(join(docsDir, 'backend-frontend-tool-contract.md'), `${md}\n`);
     writeFileSync(
       join(docsDir, 'tool-contract-matrix.md'),
-      `${formatToolContractMatrixMarkdown(undefined, gaps)}\n`
+      `${formatToolContractMatrixMarkdown(undefined, gaps)}\n`,
     );
   });
 });

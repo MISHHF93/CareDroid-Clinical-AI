@@ -19,7 +19,11 @@ describe('hospital operations calculators', () => {
   });
 
   it('calculates staffing ratio without issuing staffing decisions', () => {
-    const result = calculateStaffingRatio({ patientCount: 31, staffCount: 7, targetPatientsPerStaff: 4 });
+    const result = calculateStaffingRatio({
+      patientCount: 31,
+      staffCount: 7,
+      targetPatientsPerStaff: 4,
+    });
 
     expect(result?.patientsPerStaff).toBe(4.43);
     expect(result?.targetStaff).toBe(8);

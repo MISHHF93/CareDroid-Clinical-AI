@@ -2551,7 +2551,8 @@ Then summarize entered findings, calculate the Wells DVT score, explain likely/u
     toolId: 'protocol-lookup',
     toolName: 'Protocol and Clinical Pathway Library',
     category: 'protocol',
-    description: 'Evidence-based protocol and clinical pathway viewer with calculators, simulations, version history, and AI explanation.',
+    description:
+      'Evidence-based protocol and clinical pathway viewer with calculators, simulations, version history, and AI explanation.',
     path: TOOL_LAUNCH_PATHS.protocols,
     sidebarToolId: 'protocols',
     chatSeed:

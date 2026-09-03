@@ -14,47 +14,83 @@ const PULMONOLOGY_WORKFLOW_DETAIL = Object.freeze({
   'asthma-exacerbation-assistant': {
     tier: 'Tier B',
     lead: 'Structured asthma exacerbation review for severity features, reassessment prompts, and safety handoff.',
-    checkpoints: ['Life-threatening features require urgent pathways', 'Trend response over time', 'No medication or disposition directives'],
+    checkpoints: [
+      'Life-threatening features require urgent pathways',
+      'Trend response over time',
+      'No medication or disposition directives',
+    ],
   },
   'ventilator-support-assistant': {
     tier: 'Tier B',
     lead: 'Ventilator support review for mode context, oxygenation/ventilation checks, alarms, and escalation prompts.',
-    checkpoints: ['Bedside clinician and RT review required', 'No autonomous ventilator setting changes', 'Escalate shock or severe hypoxemia'],
+    checkpoints: [
+      'Bedside clinician and RT review required',
+      'No autonomous ventilator setting changes',
+      'Escalate shock or severe hypoxemia',
+    ],
   },
   'oxygen-escalation-helper': {
     tier: 'Tier B',
     lead: 'Oxygen escalation checklist support across device context, work of breathing, ROX/PF ratio, and local policy.',
-    checkpoints: ['Do not delay urgent oxygen escalation', 'Local protocol governs device choice', 'Serial reassessment required'],
+    checkpoints: [
+      'Do not delay urgent oxygen escalation',
+      'Local protocol governs device choice',
+      'Serial reassessment required',
+    ],
   },
   'copd-workflow-assistant': {
     tier: 'Tier B',
     lead: 'COPD workflow support for GOLD context, exacerbation concerns, oxygen safety, and handoff prompts.',
-    checkpoints: ['Acute respiratory distress takes priority', 'No inhaler, steroid, antibiotic, or oxygen prescriptions', 'Confirm spirometry context'],
+    checkpoints: [
+      'Acute respiratory distress takes priority',
+      'No inhaler, steroid, antibiotic, or oxygen prescriptions',
+      'Confirm spirometry context',
+    ],
   },
   'ventilator-monitoring-dashboard': {
     tier: 'Tier C',
     lead: 'Ventilator monitoring dashboard concept for oxygenation, ventilation, alarms, trends, and human review queues.',
-    checkpoints: ['Does not change ventilator settings', 'Requires RT/clinician sign-off', 'Flags unresolved alarms and missing data'],
+    checkpoints: [
+      'Does not change ventilator settings',
+      'Requires RT/clinician sign-off',
+      'Flags unresolved alarms and missing data',
+    ],
   },
   'respiratory-telemetry-dashboard': {
     tier: 'Tier C',
     lead: 'Respiratory telemetry dashboard for SpO2, respiratory rate, oxygen device context, and deterioration signals.',
-    checkpoints: ['No autonomous triage', 'Escalate sustained desaturation locally', 'Surface gaps and artifact'],
+    checkpoints: [
+      'No autonomous triage',
+      'Escalate sustained desaturation locally',
+      'Surface gaps and artifact',
+    ],
   },
   'sleep-apnea-analytics': {
     tier: 'Tier C',
     lead: 'Sleep apnea analytics workspace for STOP-BANG context, symptoms, adherence trends, and review queues.',
-    checkpoints: ['Screening analytics only', 'Does not diagnose OSA', 'No CPAP or device recommendations'],
+    checkpoints: [
+      'Screening analytics only',
+      'Does not diagnose OSA',
+      'No CPAP or device recommendations',
+    ],
   },
   'pulmonary-trend-engine': {
     tier: 'Tier C',
     lead: 'Pulmonary trend support for oxygenation indices, symptoms, spirometry context, and serial respiratory observations.',
-    checkpoints: ['Trend support only', 'Acute deterioration needs immediate review', 'Avoid diagnostic certainty from trends alone'],
+    checkpoints: [
+      'Trend support only',
+      'Acute deterioration needs immediate review',
+      'Avoid diagnostic certainty from trends alone',
+    ],
   },
   'respiratory-command-center': {
     tier: 'Tier C',
     lead: 'Respiratory command-center view for oxygen, ventilator, COPD/asthma, and sleep-review operational queues.',
-    checkpoints: ['Human review required', 'No automated orders or bed moves', 'Summarize bottlenecks and unresolved alerts'],
+    checkpoints: [
+      'Human review required',
+      'No automated orders or bed moves',
+      'Summarize bottlenecks and unresolved alerts',
+    ],
   },
 });
 
@@ -90,7 +126,11 @@ export default function PulmonologyAssistantPage() {
     <ToolPageLayout
       tool={tool}
       actions={
-        <button type="button" className="btn-primary btn-primary--with-icon" onClick={startAssistant}>
+        <button
+          type="button"
+          className="btn-primary btn-primary--with-icon"
+          onClick={startAssistant}
+        >
           <NavIcon icon={CHROME_ICONS.message} size={16} aria-hidden />
           <span>Start guided assistant</span>
         </button>
@@ -105,7 +145,9 @@ export default function PulmonologyAssistantPage() {
           {detail.checkpoints.map((checkpoint) => (
             <div key={checkpoint} className="clinical-audit-summary-card">
               <strong>{checkpoint}</strong>
-              <span>Clinical decision support only; clinician review and local protocol remain required.</span>
+              <span>
+                Clinical decision support only; clinician review and local protocol remain required.
+              </span>
             </div>
           ))}
         </div>
@@ -121,8 +163,8 @@ export default function PulmonologyAssistantPage() {
         </div>
         <div className="calc-timi-disclaimer calc-has-bled-disclaimer" role="note">
           <p className="calc-disclaimer-detail">
-            Not a diagnosis, not a treatment recommendation, and not a replacement for emergency respiratory, oxygen,
-            ventilator, pneumonia, asthma, COPD, or sleep medicine pathways.
+            Not a diagnosis, not a treatment recommendation, and not a replacement for emergency
+            respiratory, oxygen, ventilator, pneumonia, asthma, COPD, or sleep medicine pathways.
           </p>
         </div>
       </section>

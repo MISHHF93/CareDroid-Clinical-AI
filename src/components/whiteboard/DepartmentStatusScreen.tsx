@@ -11,7 +11,7 @@ export default function DepartmentStatusScreen({
   snapshot,
   title = 'Department status',
   refreshIntervalMs = 30000,
-  refreshStatus = (null as any),
+  refreshStatus = null as any,
   privacyLabel,
   layout = 'default',
   kioskMode = false,
@@ -70,7 +70,9 @@ export default function DepartmentStatusScreen({
           </p>
           <h2>{displayTitle}</h2>
           <p className="department-status-screen__subtitle">
-            {kioskMode ? presentation.pageSubtitle : 'Aggregate operational metrics only · no patient names or clinical details'}
+            {kioskMode
+              ? presentation.pageSubtitle
+              : 'Aggregate operational metrics only · no patient names or clinical details'}
             {privacyLabel ? ` · ${privacyLabel}` : ''}
           </p>
         </div>

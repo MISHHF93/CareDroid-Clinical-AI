@@ -82,7 +82,7 @@ function seedPatientDetail() {
         },
         loadPatientBackendDetails: vi.fn(() => Promise.resolve(null)),
       } as unknown as EmergencyStoreState,
-      true
+      true,
     );
   });
 }
@@ -141,14 +141,16 @@ describe('PatientDetailPanel clinical intelligence', () => {
     render(
       <MemoryRouter>
         <PatientDetailPanel />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     expect(screen.getByRole('heading', { level: 2, name: /Avery Stone/i })).toBeInTheDocument();
     expect(screen.getByText('MRN-AI-1')).toBeInTheDocument();
     // The primary workflow action button now shows step-specific guidance
     // (from patientWorkflow.primaryAction) rather than a generic label.
-    expect(screen.getByRole('button', { name: /begin assessment or order diagnostics/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /begin assessment or order diagnostics/i }),
+    ).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: /add vitals/i }));
     fireEvent.change(screen.getByLabelText(/^HR$/i), { target: { value: '122' } });
@@ -184,7 +186,7 @@ describe('PatientDetailPanel clinical intelligence', () => {
             },
           ],
         },
-        true
+        true,
       );
     });
 
@@ -192,7 +194,7 @@ describe('PatientDetailPanel clinical intelligence', () => {
       <MemoryRouter>
         <PatientCard patient={patient} />
         <PatientDetailPanel />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     await user.click(screen.getByRole('button', { name: /open timeline for taylor timeline/i }));

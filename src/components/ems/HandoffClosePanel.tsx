@@ -31,7 +31,9 @@ export default function HandoffClosePanel({
 
   return (
     <section
-      className={['handoff-close', closed ? 'handoff-close--done' : '', className].filter(Boolean).join(' ')}
+      className={['handoff-close', closed ? 'handoff-close--done' : '', className]
+        .filter(Boolean)
+        .join(' ')}
       aria-label="Handoff close checkpoint"
     >
       <header>

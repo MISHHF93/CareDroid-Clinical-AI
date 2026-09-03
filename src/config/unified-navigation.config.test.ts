@@ -334,23 +334,50 @@ describe('unified navigation config', () => {
   it('keeps visible navigation non-redundant for every user profile', () => {
     for (const profileId of CAREDROID_USER_PROFILE_IDS) {
       const items = getVisibleNavigation(profileId);
-      expectUniqueValues(`${profileId} ids`, items.map((item) => item.id));
-      expectUniqueValues(`${profileId} labels`, items.map((item) => item.label));
-      expectUniqueValues(`${profileId} routes`, items.map((item) => item.route));
+      expectUniqueValues(
+        `${profileId} ids`,
+        items.map((item) => item.id),
+      );
+      expectUniqueValues(
+        `${profileId} labels`,
+        items.map((item) => item.label),
+      );
+      expectUniqueValues(
+        `${profileId} routes`,
+        items.map((item) => item.route),
+      );
     }
 
     for (const emergencyRoleId of Object.values(EMERGENCY_ROLE_IDS)) {
       const items = getVisibleNavigation(emergencyRoleId);
-      expectUniqueValues(`${emergencyRoleId} ids`, items.map((item) => item.id));
-      expectUniqueValues(`${emergencyRoleId} labels`, items.map((item) => item.label));
-      expectUniqueValues(`${emergencyRoleId} routes`, items.map((item) => item.route));
+      expectUniqueValues(
+        `${emergencyRoleId} ids`,
+        items.map((item) => item.id),
+      );
+      expectUniqueValues(
+        `${emergencyRoleId} labels`,
+        items.map((item) => item.label),
+      );
+      expectUniqueValues(
+        `${emergencyRoleId} routes`,
+        items.map((item) => item.route),
+      );
     }
 
     for (const saasRole of SAAS_USER_ROLES) {
       const items = getVisibleNavigationForSaasRole(saasRole);
-      expectUniqueValues(`${saasRole} ids`, items.map((item) => item.id));
-      expectUniqueValues(`${saasRole} labels`, items.map((item) => item.label));
-      expectUniqueValues(`${saasRole} routes`, items.map((item) => item.route));
+      expectUniqueValues(
+        `${saasRole} ids`,
+        items.map((item) => item.id),
+      );
+      expectUniqueValues(
+        `${saasRole} labels`,
+        items.map((item) => item.label),
+      );
+      expectUniqueValues(
+        `${saasRole} routes`,
+        items.map((item) => item.route),
+      );
     }
   });
 
@@ -402,7 +429,16 @@ describe('unified navigation config', () => {
 
   it('hides standalone intake nav for registration clerks', () => {
     const clerkNavIds = getVisibleNavigation('registration_clerk').map((item) => item.id);
-    expect(clerkNavIds).toEqual(['reception', 'patients', 'pulse', 'shift', 'alerts', 'copilot', 'collaboration', 'help']);
+    expect(clerkNavIds).toEqual([
+      'reception',
+      'patients',
+      'pulse',
+      'shift',
+      'alerts',
+      'copilot',
+      'collaboration',
+      'help',
+    ]);
     expect(clerkNavIds).not.toContain('whiteboard');
     expect(clerkNavIds).not.toContain('intake');
     expect(clerkNavIds).not.toContain('queues');
@@ -411,8 +447,12 @@ describe('unified navigation config', () => {
   });
 
   it('scopes reception clerk pilot nav to front-desk utilities, including Copilot', () => {
-    const clerkNavIds = getVisibleNavigationForSaasRole('registration-clerk').map((item) => item.id);
-    expect(clerkNavIds).toEqual(expect.arrayContaining(['reception', 'patients', 'pulse', 'shift', 'copilot']));
+    const clerkNavIds = getVisibleNavigationForSaasRole('registration-clerk').map(
+      (item) => item.id,
+    );
+    expect(clerkNavIds).toEqual(
+      expect.arrayContaining(['reception', 'patients', 'pulse', 'shift', 'copilot']),
+    );
     expect(clerkNavIds).not.toContain('whiteboard');
   });
 
@@ -447,7 +487,20 @@ describe('unified navigation config', () => {
 
   it('keeps physician navigation whiteboard-first with workflows on patient cards', () => {
     const physicianNavIds = getVisibleNavigation('physician').map((item) => item.id);
-    expect(physicianNavIds).toEqual(['whiteboard', 'patients', 'copilot', 'tools', 'analytics', 'command-center', 'alerts', 'diagnostics', 'handoffs', 'reports', 'collaboration', 'help']);
+    expect(physicianNavIds).toEqual([
+      'whiteboard',
+      'patients',
+      'copilot',
+      'tools',
+      'analytics',
+      'command-center',
+      'alerts',
+      'diagnostics',
+      'handoffs',
+      'reports',
+      'collaboration',
+      'help',
+    ]);
     expect(physicianNavIds).not.toContain('reception');
     expect(physicianNavIds).not.toContain('queues');
     expect(physicianNavIds).not.toContain('reassessment');

@@ -11,7 +11,8 @@ describe('interactionInventoryModel', () => {
   it('classifies wired buttons as LIVE', () => {
     const result = classifyInteractionControl({
       kind: 'button',
-      attributesAndBody: '<button type="button" onClick={handleSave} aria-label="Save">Save</button>',
+      attributesAndBody:
+        '<button type="button" onClick={handleSave} aria-label="Save">Save</button>',
     });
     expect(result.class).toBe(INTERACTION_CLASSES.LIVE);
     expect(result.hasClickHandler).toBe(true);

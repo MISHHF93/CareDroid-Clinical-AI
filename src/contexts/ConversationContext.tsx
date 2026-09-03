@@ -3,7 +3,7 @@ import logger from '../utils/logger';
 
 /**
  * Conversation Context - Centralized conversation state management
- * 
+ *
  * Manages conversations, messages, and active conversation across the entire app.
  * Dashboard is the primary interface, but other routes can access conversation data.
  */
@@ -14,21 +14,21 @@ const ConversationContext = createContext<any>({
   messages: [],
   selectedTool: null,
   isLoading: false,
-  
+
   // Conversation actions
   addConversation: () => {},
   selectConversation: () => {},
   deleteConversation: () => {},
-  
+
   // Message actions
   addMessage: () => {},
   clearMessages: () => {},
-  
+
   // Tool actions
   selectTool: () => {},
   setActiveTool: () => {},
   clearTool: () => {},
-  
+
   // Loading state
   setIsLoading: () => {},
 });
@@ -43,7 +43,7 @@ export const useConversation = () => {
 
 export const ConversationProvider = ({ children }) => {
   const [conversations, setConversations] = useState([
-    { id: '1', title: 'Initial Consultation', date: new Date().toISOString() }
+    { id: '1', title: 'Initial Consultation', date: new Date().toISOString() },
   ]);
   const [activeConversationId, setActiveConversationId] = useState('1');
   const [messages, setMessages] = useState<any[]>([]);
@@ -55,7 +55,7 @@ export const ConversationProvider = ({ children }) => {
     const newConversation = {
       id: Date.now().toString(),
       title,
-      date: new Date().toISOString()
+      date: new Date().toISOString(),
     };
     setConversations((prev) => [newConversation, ...prev]);
     setActiveConversationId(newConversation.id);
@@ -73,58 +73,72 @@ export const ConversationProvider = ({ children }) => {
   }, []);
 
   // Delete a conversation
-  const deleteConversation = useCallback((conversationId) => {
-    setConversations((prev) => prev.filter((c) => c.id !== conversationId));
-    if (activeConversationId === conversationId) {
-      // Switch to the first remaining conversation or create a new one
-      setConversations((prev) => {
-        if (prev.length === 0) {
-          const newConv = {
-            id: Date.now().toString(),
-            title: 'New Conversation',
-            date: new Date().toISOString()
-          };
+  const deleteConversation = useCallback(
+    (conversationId) => {
+      setConversations((prev) => prev.filter((c) => c.id !== conversationId));
+      if (activeConversationId === conversationId) {
+        // Switch to the first remaining conversation or create a new one
+        setConversations((prev) => {
+          if (prev.length === 0) {
+            const newConv = {
+              id: Date.now().toString(),
+              title: 'New Conversation',
+              date: new Date().toISOString(),
+            };
+            setMessages([]);
+            setActiveConversationId(newConv.id);
+            return [newConv];
+          }
+          setActiveConversationId(prev[0].id);
           setMessages([]);
-          setActiveConversationId(newConv.id);
-          return [newConv];
-        }
-        setActiveConversationId(prev[0].id);
-        setMessages([]);
-        return prev;
-      });
-    }
-    logger.info('Conversation deleted', { id: conversationId });
-  }, [activeConversationId]);
+          return prev;
+        });
+      }
+      logger.info('Conversation deleted', { id: conversationId });
+    },
+    [activeConversationId],
+  );
 
   // Add a message to the active conversation
   // Supports (content, role) or a full message object: { role, content, citations?, toolResult?, ... }
-  const addMessage = useCallback((contentOrPayload, role = 'user') => {
-    if (
-      contentOrPayload &&
-      typeof contentOrPayload === 'object' &&
-      !Array.isArray(contentOrPayload) &&
-      contentOrPayload.role
-    ) {
+  const addMessage = useCallback(
+    (contentOrPayload, role = 'user') => {
+      if (
+        contentOrPayload &&
+        typeof contentOrPayload === 'object' &&
+        !Array.isArray(contentOrPayload) &&
+        contentOrPayload.role
+      ) {
+        const message = {
+          id: contentOrPayload.id || `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+          ...contentOrPayload,
+          timestamp: contentOrPayload.timestamp || new Date(),
+        };
+        setMessages((prev) => [...prev, message]);
+        logger.debug('Message added', {
+          messageId: message.id,
+          role: message.role,
+          conversationId: activeConversationId,
+        });
+        return message;
+      }
+
       const message = {
-        id: contentOrPayload.id || `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
-        ...contentOrPayload,
-        timestamp: contentOrPayload.timestamp || new Date(),
+        id: Date.now().toString(),
+        role,
+        content: contentOrPayload,
+        timestamp: new Date(),
       };
       setMessages((prev) => [...prev, message]);
-      logger.debug('Message added', { messageId: message.id, role: message.role, conversationId: activeConversationId });
+      logger.debug('Message added', {
+        messageId: message.id,
+        role,
+        conversationId: activeConversationId,
+      });
       return message;
-    }
-
-    const message = {
-      id: Date.now().toString(),
-      role,
-      content: contentOrPayload,
-      timestamp: new Date(),
-    };
-    setMessages((prev) => [...prev, message]);
-    logger.debug('Message added', { messageId: message.id, role, conversationId: activeConversationId });
-    return message;
-  }, [activeConversationId]);
+    },
+    [activeConversationId],
+  );
 
   // Clear messages for the active conversation
   const clearMessages = useCallback(() => {
@@ -188,11 +202,7 @@ export const ConversationProvider = ({ children }) => {
     ],
   );
 
-  return (
-    <ConversationContext.Provider value={value}>
-      {children}
-    </ConversationContext.Provider>
-  );
+  return <ConversationContext.Provider value={value}>{children}</ConversationContext.Provider>;
 };
 
 export default ConversationContext;

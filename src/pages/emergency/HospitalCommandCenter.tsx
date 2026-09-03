@@ -77,7 +77,9 @@ export default function HospitalCommandCenter() {
   const referrals = useEmergencyStore((state) => state.referrals);
   const emergencySettings = useEmergencyStore((state) => state.emergencySettings);
   const patientFlowSnapshot = useEmergencyStore((state) => state.patientFlowSnapshot);
-  const administrativeAutomationQueue = useEmergencyStore((state) => state.administrativeAutomationQueue);
+  const administrativeAutomationQueue = useEmergencyStore(
+    (state) => state.administrativeAutomationQueue,
+  );
   const aiChief = useAiChiefOrchestrator({
     screenMode: CARE_DROID_SCREEN_MODES.commandCenter,
     realtime: true,
@@ -87,7 +89,9 @@ export default function HospitalCommandCenter() {
   const operationalIntelligence = aiChief.operationalIntelligence;
   const emergencyAnalytics = useEmergencyAnalytics();
   const [sentinelSnapshot, setSentinelSnapshot] = useState<SentinelCommandSnapshot | null>(null);
-  const [sentinelSource, setSentinelSource] = useState<'live' | 'cache' | 'unavailable'>('unavailable');
+  const [sentinelSource, setSentinelSource] = useState<'live' | 'cache' | 'unavailable'>(
+    'unavailable',
+  );
   const [sentinelMessage, setSentinelMessage] = useState('Sentinel not loaded');
 
   useEffect(() => {
@@ -206,10 +210,18 @@ export default function HospitalCommandCenter() {
               : 'No P0 compliance signals',
         owner: snapshot.ownerRole,
         nextAction: snapshot.nextAction,
-        tone: snapshot.tone === 'critical' ? 'critical' : snapshot.tone === 'warning' ? 'warning' : 'neutral',
+        tone:
+          snapshot.tone === 'critical'
+            ? 'critical'
+            : snapshot.tone === 'warning'
+              ? 'warning'
+              : 'neutral',
       }}
       actions={
-        <Link to={CANONICAL_ROUTES.emergencyWhiteboard} className="emergency-route-filter-banner__btn cd-btn cd-btn--secondary cd-btn--sm">
+        <Link
+          to={CANONICAL_ROUTES.emergencyWhiteboard}
+          className="emergency-route-filter-banner__btn cd-btn cd-btn--secondary cd-btn--sm"
+        >
           Open whiteboard
         </Link>
       }
@@ -255,7 +267,8 @@ export default function HospitalCommandCenter() {
             <div>
               <strong>Critical actions</strong>
               <p className="emergency-route-section-card__lead">
-                Prioritized from dispatch, readiness, alerts, AI review, bottlenecks, and staff routing.
+                Prioritized from dispatch, readiness, alerts, AI review, bottlenecks, and staff
+                routing.
               </p>
             </div>
           </div>
@@ -288,8 +301,7 @@ export default function HospitalCommandCenter() {
                 <strong id="sentinel-ems-command-heading">Sentinel EMS command</strong>
                 <p className="emergency-route-section-card__lead">
                   Live units, ETA confidence ranges, inbound pre-arrival, durable alarms, and
-                  human-review AI. Data: {SENTINEL_SOURCE_LABELS[sentinelSource]}.{' '}
-                  {sentinelMessage}
+                  human-review AI. Data: {SENTINEL_SOURCE_LABELS[sentinelSource]}. {sentinelMessage}
                 </p>
               </div>
               <Link
@@ -344,7 +356,8 @@ export default function HospitalCommandCenter() {
               <div>
                 <strong>Continuous patient flow</strong>
                 <p className="emergency-route-section-card__lead">
-                  Real-time workflow state, ownership, wait timers, bottlenecks, and AI next-step guidance.
+                  Real-time workflow state, ownership, wait timers, bottlenecks, and AI next-step
+                  guidance.
                 </p>
               </div>
             </div>
@@ -355,8 +368,9 @@ export default function HospitalCommandCenter() {
               <div>
                 <strong>Unified workflow automation</strong>
                 <p className="emergency-route-section-card__lead">
-                  One review queue for reception, intake, triage, routing, notifications, documentation,
-                  handoffs, staff assignments, analytics, reporting, and AI recommendations.
+                  One review queue for reception, intake, triage, routing, notifications,
+                  documentation, handoffs, staff assignments, analytics, reporting, and AI
+                  recommendations.
                 </p>
               </div>
             </div>
@@ -402,8 +416,8 @@ export default function HospitalCommandCenter() {
               <div>
                 <strong>Application knowledge graph</strong>
                 <p className="emergency-route-section-card__lead">
-                  Connected patients, staff, departments, alerts, workflows, services, queues, rooms,
-                  beds, diagnostics, and operational events.
+                  Connected patients, staff, departments, alerts, workflows, services, queues,
+                  rooms, beds, diagnostics, and operational events.
                 </p>
               </div>
             </div>
@@ -412,7 +426,9 @@ export default function HospitalCommandCenter() {
           <section className="emergency-route-card cd-surface-card">
             <div className="emergency-route-section-card__header">
               <strong>Service bottlenecks</strong>
-              <span className="emergency-route-journey-card__count">{snapshot.bottleneckCount}</span>
+              <span className="emergency-route-journey-card__count">
+                {snapshot.bottleneckCount}
+              </span>
             </div>
             {snapshot.bottlenecks.length === 0 ? (
               <p className="emergency-route-section-card__lead">No active bottleneck signals.</p>
@@ -445,7 +461,9 @@ export default function HospitalCommandCenter() {
               </span>
             </div>
             {snapshot.unresolvedAlertCount === 0 ? (
-              <p className="emergency-route-section-card__lead">All critical alerts acknowledged.</p>
+              <p className="emergency-route-section-card__lead">
+                All critical alerts acknowledged.
+              </p>
             ) : (
               <ul className="hospital-command-center__panel-list">
                 {snapshot.unresolvedAlerts.map((alert) => (
@@ -454,7 +472,10 @@ export default function HospitalCommandCenter() {
                       <strong>{alert.title}</strong>
                       <p>Acknowledgement required before next clinical action</p>
                     </div>
-                    <Link to={alert.route} className="emergency-route-filter-banner__btn cd-btn cd-btn--secondary cd-btn--sm">
+                    <Link
+                      to={alert.route}
+                      className="emergency-route-filter-banner__btn cd-btn cd-btn--secondary cd-btn--sm"
+                    >
                       Review
                     </Link>
                   </li>
@@ -502,10 +523,13 @@ export default function HospitalCommandCenter() {
       history={
         <>
           {intelligenceView ? <CommandCenterIntelligenceLens view={intelligenceView} /> : null}
-          <div role="note" className="emergency-route-card emergency-route-copilot-hint cdl-surface cdl-surface--inactive">
+          <div
+            role="note"
+            className="emergency-route-card emergency-route-copilot-hint cdl-surface cdl-surface--inactive"
+          >
             {CAREDROID_PRODUCT.safetyLine} Historical analytics and shift reports live under{' '}
-            <Link to={CANONICAL_ROUTES.emergencyAnalytics}>Analytics</Link> — this command center shows
-            only what needs action now.
+            <Link to={CANONICAL_ROUTES.emergencyAnalytics}>Analytics</Link> — this command center
+            shows only what needs action now.
           </div>
         </>
       }

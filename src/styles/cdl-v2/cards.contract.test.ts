@@ -10,11 +10,11 @@ const patientCardTsx = readFileSync(join(__dirname, '../../components/PatientCar
 
 describe('CDL v2 card contrast contract', () => {
   it('defines severity-aware card surfaces and wait text utilities', () => {
-    expect(cardsCss).toContain('.cdl-card[data-severity=\'critical\']');
-    expect(cardsCss).toContain('.cdl-wait[data-severity=\'critical\']');
+    expect(cardsCss).toContain(".cdl-card[data-severity='critical']");
+    expect(cardsCss).toContain(".cdl-wait[data-severity='critical']");
     expect(cardsCss).toContain('--cdl-critical-text');
     expect(cardsCss).toContain('.patient-card.cdl-card');
-    expect(cardsCss).toContain('.cdl-badge[data-tone=\'critical\']');
+    expect(cardsCss).toContain(".cdl-badge[data-tone='critical']");
   });
 
   it('does not force white contract over severity-tinted cards', () => {
@@ -40,10 +40,7 @@ describe('CDL v2 card contrast contract', () => {
   });
 
   it('does not force nested Visual QA min-height shells', () => {
-    const patientCss = readFileSync(
-      join(__dirname, '../../components/PatientCard.css'),
-      'utf8',
-    );
+    const patientCss = readFileSync(join(__dirname, '../../components/PatientCard.css'), 'utf8');
     expect(patientCss).not.toContain('min-height: 246px');
     expect(patientCss).not.toContain('min-height: 338px');
     expect(patientCss).not.toContain('border-left: 7px');

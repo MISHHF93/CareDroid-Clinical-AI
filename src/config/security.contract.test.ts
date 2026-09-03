@@ -6,10 +6,7 @@ import { EMERGENCY_PLATFORM_CONTRACT } from './emergencyPlatform.config';
 import { EMERGENCY_PERMISSION_KEYS } from './emergencyPermissionRegistry';
 import { Permission as FrontendPermission } from './backendPermissionCatalog';
 import { CAREDROID_PERMISSIONS } from '../lib/users/permissions';
-import {
-  BACKEND_PERMISSION_KEYS,
-  SECURITY_CONTRACT,
-} from './securityModel';
+import { BACKEND_PERMISSION_KEYS, SECURITY_CONTRACT } from './securityModel';
 import {
   expandPermissionAliases,
   listBridgeCoverage,
@@ -27,7 +24,10 @@ import {
   validatePatientIdentifier,
   validatePhiMutationRequest,
 } from '../services/securityApiBoundary';
-import { compileCareDroidAccessProfile, normalizeCareDroidProfile } from '../lib/users/canonicalAccess';
+import {
+  compileCareDroidAccessProfile,
+  normalizeCareDroidProfile,
+} from '../lib/users/canonicalAccess';
 import { getDefaultDemoUser } from '../lib/users/demoUsers';
 import {
   BLOCKED_AUTONOMOUS_OI_ACTIONS,
@@ -71,7 +71,9 @@ describe('security contract', () => {
     expect(aliases).toContain(EMERGENCY_PERMISSION_KEYS.displayWhiteboardReadonly);
     expect(aliases).toContain(CAREDROID_PERMISSIONS.PATIENT_READ);
     expect(aliases).toContain(BACKEND_PERMISSION_KEYS.READ_PHI);
-    expect(permissionRequiresPhiRead(EMERGENCY_PERMISSION_KEYS.displayWhiteboardReadonly)).toBe(true);
+    expect(permissionRequiresPhiRead(EMERGENCY_PERMISSION_KEYS.displayWhiteboardReadonly)).toBe(
+      true,
+    );
   });
 
   it('protects emergency API paths while keeping auth routes public', () => {
@@ -83,7 +85,9 @@ describe('security contract', () => {
   });
 
   it('authorizes PHI view for clinical demo roles via compiled profile', () => {
-    const demoProfile = compileCareDroidAccessProfile(normalizeCareDroidProfile(getDefaultDemoUser()));
+    const demoProfile = compileCareDroidAccessProfile(
+      normalizeCareDroidProfile(getDefaultDemoUser()),
+    );
     const context = { compiledProfile: demoProfile, emergencyRole: 'physician' };
     expect(checkPermission(context, BACKEND_PERMISSION_KEYS.READ_PHI)).toBe(true);
     expect(canAccessPhi(context, 'view')).toBe(true);
@@ -106,11 +110,15 @@ describe('security contract', () => {
 
   it('aligns canMutateEmergency with canPerformEmergencyAction semantics', () => {
     const readOnlyContext = {
-      compiledProfile: compileCareDroidAccessProfile(normalizeCareDroidProfile(getDefaultDemoUser())),
+      compiledProfile: compileCareDroidAccessProfile(
+        normalizeCareDroidProfile(getDefaultDemoUser()),
+      ),
       emergencyRole: 'physician',
       readOnly: true,
     };
-    expect(canMutateEmergency(readOnlyContext, EMERGENCY_PERMISSION_KEYS.patientCreate)).toBe(false);
+    expect(canMutateEmergency(readOnlyContext, EMERGENCY_PERMISSION_KEYS.patientCreate)).toBe(
+      false,
+    );
   });
 
   it('mirrors backend Permission enum keys in frontend catalog', () => {
@@ -132,7 +140,10 @@ describe('security contract', () => {
 
   it('routes backend operational intelligence disclaimers through shared lib constants', () => {
     const backendSource = readFileSync(
-      join(__dirname, '../../backend/src/modules/emergency-os/emergency-os.operational-intelligence.service.ts'),
+      join(
+        __dirname,
+        '../../backend/src/modules/emergency-os/emergency-os.operational-intelligence.service.ts',
+      ),
       'utf8',
     );
     expect(backendSource).toContain('OPERATIONAL_INTELLIGENCE_DISCLAIMERS');
@@ -144,7 +155,9 @@ describe('security contract', () => {
     expect(validatePatientIdentifier('').valid).toBe(false);
     expect(validatePatientIdentifier('patient-123').valid).toBe(true);
 
-    const demoProfile = compileCareDroidAccessProfile(normalizeCareDroidProfile(getDefaultDemoUser()));
+    const demoProfile = compileCareDroidAccessProfile(
+      normalizeCareDroidProfile(getDefaultDemoUser()),
+    );
     const authorized = validatePhiMutationRequest({
       patientId: 'patient-123',
       action: 'view',

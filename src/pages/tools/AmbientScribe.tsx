@@ -56,7 +56,9 @@ export default function AmbientScribe({ embedded = false, onCloseEmbedded }: any
   const handleDictation = () => {
     const SpeechRecognition = getSpeechRecognition();
     if (!SpeechRecognition) {
-      setError('Speech-to-text is not available in this browser. Paste or type a transcript instead.');
+      setError(
+        'Speech-to-text is not available in this browser. Paste or type a transcript instead.',
+      );
       return;
     }
 
@@ -166,12 +168,22 @@ export default function AmbientScribe({ embedded = false, onCloseEmbedded }: any
   return (
     <ToolPageLayout tool={TOOL_CONFIG} embedded={embedded} onCloseEmbedded={onCloseEmbedded}>
       <div className="simple-tool-page-inner">
-        <div className="simple-tool-result-panel" role="note" aria-label="Ambient scribe safety warnings">
+        <div
+          className="simple-tool-result-panel"
+          role="note"
+          aria-label="Ambient scribe safety warnings"
+        >
           <h2>Safety Requirements</h2>
           <ul>
-            <li>No auto-signing. Drafts remain unsigned until a clinician reviews and signs in the charting system.</li>
+            <li>
+              No auto-signing. Drafts remain unsigned until a clinician reviews and signs in the
+              charting system.
+            </li>
             <li>Human review is required before copying content into the medical record.</li>
-            <li>No autonomous chart modification. CareDroid does not write back to the EHR from this workflow.</li>
+            <li>
+              No autonomous chart modification. CareDroid does not write back to the EHR from this
+              workflow.
+            </li>
           </ul>
         </div>
 
@@ -235,7 +247,9 @@ export default function AmbientScribe({ embedded = false, onCloseEmbedded }: any
               id="ambient-instructions"
               className="diagnosis-field"
               value={patientContext.clinicianInstructions}
-              onChange={(event) => updatePatientContext('clinicianInstructions', event.target.value)}
+              onChange={(event) =>
+                updatePatientContext('clinicianInstructions', event.target.value)
+              }
               placeholder="e.g., emphasize medication reconciliation, include return precautions"
             />
 
@@ -249,7 +263,11 @@ export default function AmbientScribe({ embedded = false, onCloseEmbedded }: any
                 {loading ? 'Generating draft...' : 'Generate draft for clinician review'}
               </button>
               <button type="button" className="btn-diagnosis-secondary" onClick={handleDictation}>
-                {listening ? 'Stop dictation' : speechSupported ? 'Start speech-to-text' : 'Speech-to-text unavailable'}
+                {listening
+                  ? 'Stop dictation'
+                  : speechSupported
+                    ? 'Start speech-to-text'
+                    : 'Speech-to-text unavailable'}
               </button>
               <button type="button" className="btn-diagnosis-secondary" onClick={clearWorkflow}>
                 Clear
@@ -257,9 +275,15 @@ export default function AmbientScribe({ embedded = false, onCloseEmbedded }: any
             </div>
           </section>
 
-          <section className="diagnosis-panel diagnosis-panel--scroll" aria-labelledby="ambient-scribe-draft">
+          <section
+            className="diagnosis-panel diagnosis-panel--scroll"
+            aria-labelledby="ambient-scribe-draft"
+          >
             <h2 id="ambient-scribe-draft">Draft Output</h2>
-            <ApiStateBanner error={error} onRetry={(transcriptText.trim() ? handleGenerate : undefined) as any} />
+            <ApiStateBanner
+              error={error}
+              onRetry={(transcriptText.trim() ? handleGenerate : undefined) as any}
+            />
 
             {loading ? (
               <div className="tool-loading-state" aria-busy="true">
@@ -288,8 +312,8 @@ export default function AmbientScribe({ embedded = false, onCloseEmbedded }: any
                 <div className="simple-tool-result-panel">
                   <h3>Review Workflow</h3>
                   <p>
-                    This draft is not signed and has not modified the chart. Review, edit, and verify all
-                    facts before using it in documentation.
+                    This draft is not signed and has not modified the chart. Review, edit, and
+                    verify all facts before using it in documentation.
                   </p>
                   <label className="tool-inline-check">
                     <input
@@ -328,7 +352,8 @@ export default function AmbientScribe({ embedded = false, onCloseEmbedded }: any
               </div>
             ) : (
               <div className="tool-empty-state">
-                Add encounter text, choose a draft type, and generate a note. The output will require review.
+                Add encounter text, choose a draft type, and generate a note. The output will
+                require review.
               </div>
             )}
           </section>

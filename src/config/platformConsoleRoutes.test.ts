@@ -7,7 +7,10 @@ import { PLATFORM_CONSOLE_ROUTE_PATHS, PLATFORM_CONSOLE_ROUTES } from './platfor
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
-const routeTreeSource = readFileSync(join(__dirname, '../app/platformConsoleRouteTree.tsx'), 'utf8');
+const routeTreeSource = readFileSync(
+  join(__dirname, '../app/platformConsoleRouteTree.tsx'),
+  'utf8',
+);
 
 describe('platformConsoleRoutes', () => {
   it('covers high-traffic platform operations and SaaS surfaces', () => {
@@ -40,9 +43,15 @@ describe('platformConsoleRoutes', () => {
   });
 
   it('keeps platform console routes out of explicit router mounts', () => {
-    expect(appSource).not.toContain('element={<LazyRoute label="Loading Hospital Map..."><HospitalMapDashboard />');
-    expect(appSource).not.toContain('element={<LazyRoute label="Loading capability discovery..."><CapabilityDiscovery />');
-    expect(appSource).not.toContain('element={<LazyRoute label="Loading Fleet Command..."><FleetDashboard />');
+    expect(appSource).not.toContain(
+      'element={<LazyRoute label="Loading Hospital Map..."><HospitalMapDashboard />',
+    );
+    expect(appSource).not.toContain(
+      'element={<LazyRoute label="Loading capability discovery..."><CapabilityDiscovery />',
+    );
+    expect(appSource).not.toContain(
+      'element={<LazyRoute label="Loading Fleet Command..."><FleetDashboard />',
+    );
     expect(appSource).not.toContain('HospitalMapDashboard');
     expect(appSource).not.toContain('CapabilityDiscovery');
   });

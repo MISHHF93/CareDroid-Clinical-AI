@@ -8,7 +8,10 @@ import { getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
 import { getAllDiscoveredTools } from './sourceCodeToolDiscovery';
 
 const repoRoot = path.resolve(__dirname, '../..');
-const backendPatternsPath = path.resolve(repoRoot, 'backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts');
+const backendPatternsPath = path.resolve(
+  repoRoot,
+  'backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts',
+);
 
 function extractBackendToolIds() {
   const src = fs.readFileSync(backendPatternsPath, 'utf8');
@@ -42,7 +45,10 @@ describe('Inventory + backend/frontend wiring audit', () => {
 
     for (const id of backendIds) {
       if (allowedBackendOnly.has(id)) continue;
-      expect(frontendIds.has(id), `Backend tool pattern ${id} missing from frontend inventory`).toBe(true);
+      expect(
+        frontendIds.has(id),
+        `Backend tool pattern ${id} missing from frontend inventory`,
+      ).toBe(true);
     }
   });
 });

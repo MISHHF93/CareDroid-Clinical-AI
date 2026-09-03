@@ -44,11 +44,13 @@ export default function PatientSummaryAi({ embedded = false, onCloseEmbedded }: 
 
   const handleGenerate = async () => {
     const payload = Object.fromEntries(
-      Object.entries(form).map(([key, value]) => [key, value.trim() || undefined])
+      Object.entries(form).map(([key, value]) => [key, value.trim() || undefined]),
     );
 
     if (!Object.values(payload).some(Boolean)) {
-      setError('Add patient context, problems, medications, labs, alerts, risk factors, or notes first.');
+      setError(
+        'Add patient context, problems, medications, labs, alerts, risk factors, or notes first.',
+      );
       return;
     }
 
@@ -85,8 +87,9 @@ export default function PatientSummaryAi({ embedded = false, onCloseEmbedded }: 
         <section className="simple-tool-result-panel" role="note">
           <h2>Summary Scope</h2>
           <p>
-            Patient Summary AI extracts a review-ready snapshot from submitted chart context. It does not
-            reconcile the chart autonomously, update the EHR, or replace clinician source-record review.
+            Patient Summary AI extracts a review-ready snapshot from submitted chart context. It
+            does not reconcile the chart autonomously, update the EHR, or replace clinician
+            source-record review.
           </p>
         </section>
 
@@ -172,7 +175,12 @@ export default function PatientSummaryAi({ embedded = false, onCloseEmbedded }: 
             />
 
             <div className="tool-form-actions">
-              <button type="button" className="diagnosis-primary-btn" onClick={handleGenerate} disabled={loading}>
+              <button
+                type="button"
+                className="diagnosis-primary-btn"
+                onClick={handleGenerate}
+                disabled={loading}
+              >
                 {loading ? 'Generating summary...' : 'Generate patient summary'}
               </button>
               <button type="button" className="btn-diagnosis-secondary" onClick={clear}>
@@ -181,14 +189,19 @@ export default function PatientSummaryAi({ embedded = false, onCloseEmbedded }: 
             </div>
           </section>
 
-          <section className="diagnosis-panel diagnosis-panel--scroll" aria-labelledby="patient-summary-output">
+          <section
+            className="diagnosis-panel diagnosis-panel--scroll"
+            aria-labelledby="patient-summary-output"
+          >
             <h2 id="patient-summary-output">Patient Summary</h2>
             <ApiStateBanner error={error} onRetry={handleGenerate} />
 
             {loading ? (
               <div className="tool-loading-state" aria-busy="true">
                 <div className="simple-tool-spinner diagnosis-spinner" />
-                <p className="tool-loading-state__message">Extracting patient summary sections...</p>
+                <p className="tool-loading-state__message">
+                  Extracting patient summary sections...
+                </p>
               </div>
             ) : result ? (
               <div className="diagnosis-results-body">
@@ -206,7 +219,8 @@ export default function PatientSummaryAi({ embedded = false, onCloseEmbedded }: 
                     <ul>
                       {result.activeProblems.map((problem) => (
                         <li key={`${problem.label}-${problem.priority}`}>
-                          <strong>{problem.label}</strong> ({problem.priority}) - {problem.evidence.join(' ')}
+                          <strong>{problem.label}</strong> ({problem.priority}) -{' '}
+                          {problem.evidence.join(' ')}
                         </li>
                       ))}
                     </ul>
@@ -262,12 +276,16 @@ export default function PatientSummaryAi({ embedded = false, onCloseEmbedded }: 
                   ) : null}
                 </SummarySection>
 
-                <SummarySection title="Explainability and Safety" emptyText="No explainability returned.">
+                <SummarySection
+                  title="Explainability and Safety"
+                  emptyText="No explainability returned."
+                >
                   <p>
                     <strong>Method:</strong> {result.explainability?.method}
                   </p>
                   <p>
-                    <strong>Inputs used:</strong> {(result.explainability?.inputsUsed || []).join(', ')}
+                    <strong>Inputs used:</strong>{' '}
+                    {(result.explainability?.inputsUsed || []).join(', ')}
                   </p>
                   <ul>
                     {(result.safety?.warnings || []).map((warning) => (
@@ -278,7 +296,8 @@ export default function PatientSummaryAi({ embedded = false, onCloseEmbedded }: 
               </div>
             ) : (
               <div className="tool-empty-state">
-                Add chart context to generate active problems, medications, labs, alerts, and risk factors.
+                Add chart context to generate active problems, medications, labs, alerts, and risk
+                factors.
               </div>
             )}
           </section>

@@ -1,8 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import {
-  selectEmergencyOperationalSummary,
-  useEmergencyStore,
-} from './emergencyStore';
+import { selectEmergencyOperationalSummary, useEmergencyStore } from './emergencyStore';
 import { PatientState, Priority } from '../types/emergency';
 
 const originalState = useEmergencyStore.getState();

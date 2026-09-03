@@ -46,9 +46,10 @@ export default function OrganizationOnboarding() {
   // `status` was one string doing three jobs -- progress, success and failure --
   // rendered into a bare <p>, so a failure was visually and semantically
   // indistinguishable from a success and neither reached assistive tech.
-  const [status, setStatus] = useState<{ tone: 'progress' | 'success' | 'error'; message: string } | null>(
-    null,
-  );
+  const [status, setStatus] = useState<{
+    tone: 'progress' | 'success' | 'error';
+    message: string;
+  } | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [organizationCreated, setOrganizationCreated] = useState(false);
 
@@ -104,7 +105,9 @@ export default function OrganizationOnboarding() {
       description={`Step 1 of ${CLINIC_ONBOARDING_STEPS.length} — create the organization, then work through the remaining setup below.`}
     >
       <Card className="org-card">
-        <h2>{organizationCreated ? 'Organization details — done' : 'Step 1 · Organization details'}</h2>
+        <h2>
+          {organizationCreated ? 'Organization details — done' : 'Step 1 · Organization details'}
+        </h2>
         <label>
           Organization name <span aria-hidden="true">*</span>
           <input
@@ -180,14 +183,18 @@ export default function OrganizationOnboarding() {
                 <strong>
                   Step {index + 2} · {step.label}
                 </strong>
-                <span className="org-chip">{step.automated ? 'Provisioned by default' : 'Needs your input'}</span>
+                <span className="org-chip">
+                  {step.automated ? 'Provisioned by default' : 'Needs your input'}
+                </span>
               </div>
               {organizationCreated ? (
                 <Link to={step.route} className="org-card__link">
                   Open
                 </Link>
               ) : (
-                <span className="org-onboarding-step__pending">Available once the organization exists</span>
+                <span className="org-onboarding-step__pending">
+                  Available once the organization exists
+                </span>
               )}
             </li>
           ))}

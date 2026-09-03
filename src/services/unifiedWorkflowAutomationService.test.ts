@@ -5,7 +5,8 @@ import type { AdministrativeAutomationTask } from '../types/administrativeAutoma
 import { PatientState } from '../types/emergency';
 
 function makeTask(
-  partial: Partial<AdministrativeAutomationTask> & Pick<AdministrativeAutomationTask, 'id' | 'category' | 'title'>,
+  partial: Partial<AdministrativeAutomationTask> &
+    Pick<AdministrativeAutomationTask, 'id' | 'category' | 'title'>,
 ): AdministrativeAutomationTask {
   const now = new Date().toISOString();
   return Object.freeze({
@@ -70,7 +71,9 @@ describe('unifiedWorkflowAutomationService', () => {
       ],
     });
 
-    const aiItems = snapshot.items.filter((item) => item.source === 'ai_chief' && item.patientId === 'patient-1');
+    const aiItems = snapshot.items.filter(
+      (item) => item.source === 'ai_chief' && item.patientId === 'patient-1',
+    );
     expect(aiItems).toHaveLength(0);
   });
 

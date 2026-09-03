@@ -22,7 +22,8 @@ export const CARE_DROID_PAGE_ARCHITECTURE = Object.freeze([
     icon: 'dispatch',
     roles: [CARE_DROID_PAGE_ROLES.manager, CARE_DROID_PAGE_ROLES.nurse],
     priority: 1,
-    purpose: 'Capture emergency signals, triage 911 calls, and dispatch EMS within the 3-minute response window.',
+    purpose:
+      'Capture emergency signals, triage 911 calls, and dispatch EMS within the 3-minute response window.',
     workflow: 'pre-arrival',
     journeyPhase: 'pre-arrival',
     ownerRole: 'Dispatcher',
@@ -35,7 +36,8 @@ export const CARE_DROID_PAGE_ARCHITECTURE = Object.freeze([
     icon: 'ems',
     roles: [CARE_DROID_PAGE_ROLES.nurse, CARE_DROID_PAGE_ROLES.manager],
     priority: 2,
-    purpose: 'Coordinate inbound EMS, pre-arrival packets, offload pressure, and EMS-to-ED handoffs.',
+    purpose:
+      'Coordinate inbound EMS, pre-arrival packets, offload pressure, and EMS-to-ED handoffs.',
     workflow: 'pre-arrival',
     journeyPhase: 'pre-arrival',
     ownerRole: 'EMS coordinator',

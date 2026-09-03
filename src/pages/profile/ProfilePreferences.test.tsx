@@ -55,11 +55,17 @@ vi.mock('../../services/NotificationService', () => ({
 
 describe('ProfilePreferences', () => {
   it('persists profile preference changes', async () => {
-    render(<MemoryRouter><ProfilePreferences /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <ProfilePreferences />
+      </MemoryRouter>,
+    );
 
     fireEvent.change(screen.getByLabelText(/theme/i), { target: { value: 'dark' } });
     fireEvent.change(screen.getByLabelText(/density/i), { target: { value: 'compact' } });
-    fireEvent.change(screen.getByLabelText(/ai response style/i), { target: { value: 'teaching' } });
+    fireEvent.change(screen.getByLabelText(/ai response style/i), {
+      target: { value: 'teaching' },
+    });
     fireEvent.click(screen.getByRole('button', { name: /save preferences/i }));
 
     await waitFor(() => {
@@ -76,7 +82,11 @@ describe('ProfilePreferences', () => {
   });
 
   it('reads and writes delivery preferences through the notification preference service, not profile preferences', async () => {
-    render(<MemoryRouter><ProfilePreferences /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <ProfilePreferences />
+      </MemoryRouter>,
+    );
 
     await waitFor(() => {
       expect(mocks.getPreferences).toHaveBeenCalled();

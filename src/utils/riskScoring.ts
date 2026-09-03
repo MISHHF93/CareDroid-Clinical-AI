@@ -14,7 +14,11 @@ export const computeRiskScore = (tool, results) => {
   let scored = false;
 
   // SOFA Score Risk Assessment
-  if (effectiveTool === 'sofa' || results.sofaScore !== undefined || results.totalScore !== undefined) {
+  if (
+    effectiveTool === 'sofa' ||
+    results.sofaScore !== undefined ||
+    results.totalScore !== undefined
+  ) {
     const sofaScore = finiteNumber(results.sofaScore ?? results.totalScore);
     if (sofaScore === null || sofaScore < 0) return null;
     scored = true;
@@ -166,7 +170,10 @@ export const generateClinicalAlerts = (tool, results, riskData) => {
       });
     }
 
-    if ((effectiveTool === 'lab-interpreter' || effectiveTool === 'lab-interp') && criticalCount > 0) {
+    if (
+      (effectiveTool === 'lab-interpreter' || effectiveTool === 'lab-interp') &&
+      criticalCount > 0
+    ) {
       alerts.push({
         id: 'alert-lab-critical',
         severity: 'critical',
@@ -249,7 +256,7 @@ export const generateClinicalAlerts = (tool, results, riskData) => {
 const TOOL_ALIASES = Object.freeze({
   calculators: null,
   chads2vasc: 'cha2ds2-vasc',
-  'cha2ds2vasc': 'cha2ds2-vasc',
+  cha2ds2vasc: 'cha2ds2-vasc',
   'cha2ds2-vasc': 'cha2ds2-vasc',
   lab: 'lab-interp',
   'lab-interpreter': 'lab-interpreter',

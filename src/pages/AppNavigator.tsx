@@ -44,10 +44,13 @@ export default function AppNavigator() {
     <div className="app-navigator-page">
       <header className="app-navigator-page__header">
         <p className="app-navigator-page__eyebrow">App navigator</p>
-        <p className="app-navigator-page__title-text" data-testid="cd-page-title-text">Where do I find that?</p>
+        <p className="app-navigator-page__title-text" data-testid="cd-page-title-text">
+          Where do I find that?
+        </p>
         <p className="app-navigator-page__subtitle">
-          Ask a workflow question in plain language and get grounded matches from the verified CareDroid route
-          catalog. This never invents a route — every answer is drawn from real, live pages.
+          Ask a workflow question in plain language and get grounded matches from the verified
+          CareDroid route catalog. This never invents a route — every answer is drawn from real,
+          live pages.
         </p>
       </header>
 
@@ -116,7 +119,9 @@ export default function AppNavigator() {
                 <p className="app-navigator-page__result-path">{destination.path}</p>
                 <p className="app-navigator-page__result-description">{destination.description}</p>
                 {destination.workflowOwner ? (
-                  <p className="app-navigator-page__result-owner">Owner: {destination.workflowOwner}</p>
+                  <p className="app-navigator-page__result-owner">
+                    Owner: {destination.workflowOwner}
+                  </p>
                 ) : null}
               </Card>
             </li>

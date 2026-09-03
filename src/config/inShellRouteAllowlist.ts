@@ -33,7 +33,11 @@ function matchesPrefix(pathname: string, prefix: string) {
 
 /** True when the path should mount a real in-shell page instead of folding into ED redirects. */
 export function isInShellRoute(pathname = '') {
-  const normalized = String(pathname || '/').split('?')[0].split('#')[0].replace(/\/+$/, '') || '/';
+  const normalized =
+    String(pathname || '/')
+      .split('?')[0]
+      .split('#')[0]
+      .replace(/\/+$/, '') || '/';
 
   // HEAL-347.79: an exact-path entry in IN_SHELL_ROUTE_REDIRECTS (e.g.
   // /customer-portal -> /admin/tenant) is a real, intentional alias, but

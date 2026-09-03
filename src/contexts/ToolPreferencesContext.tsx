@@ -51,7 +51,11 @@ export const ToolPreferencesProvider = ({ children }) => {
       setPinned(Array.isArray(stored.pinned) ? stored.pinned : []);
       setRecentTools(Array.isArray(stored.recentTools) ? stored.recentTools : []);
       setHiddenTools(Array.isArray(stored.hiddenTools) ? stored.hiddenTools : []);
-      setProfileSettings(stored.profileSettings && typeof stored.profileSettings === 'object' ? stored.profileSettings : {});
+      setProfileSettings(
+        stored.profileSettings && typeof stored.profileSettings === 'object'
+          ? stored.profileSettings
+          : {},
+      );
     }
   }, []);
 
@@ -116,38 +120,39 @@ export const ToolPreferencesProvider = ({ children }) => {
     setRecentTools([]);
   }, []);
 
-  const value = useMemo(() => ({
-    favorites,
-    pinned,
-    recentTools,
-    hiddenTools,
-    profileSettings,
-    toggleFavorite,
-    togglePinned,
-    toggleHidden,
-    recordToolAccess,
-    clearRecentTools,
-    updateProfileSettings,
-    resetToolRecommendations,
-  }), [
-    favorites,
-    pinned,
-    recentTools,
-    hiddenTools,
-    profileSettings,
-    toggleFavorite,
-    togglePinned,
-    toggleHidden,
-    recordToolAccess,
-    clearRecentTools,
-    updateProfileSettings,
-    resetToolRecommendations,
-  ]);
+  const value = useMemo(
+    () => ({
+      favorites,
+      pinned,
+      recentTools,
+      hiddenTools,
+      profileSettings,
+      toggleFavorite,
+      togglePinned,
+      toggleHidden,
+      recordToolAccess,
+      clearRecentTools,
+      updateProfileSettings,
+      resetToolRecommendations,
+    }),
+    [
+      favorites,
+      pinned,
+      recentTools,
+      hiddenTools,
+      profileSettings,
+      toggleFavorite,
+      togglePinned,
+      toggleHidden,
+      recordToolAccess,
+      clearRecentTools,
+      updateProfileSettings,
+      resetToolRecommendations,
+    ],
+  );
 
   return (
-    <ToolPreferencesContext.Provider value={value}>
-      {children}
-    </ToolPreferencesContext.Provider>
+    <ToolPreferencesContext.Provider value={value}>{children}</ToolPreferencesContext.Provider>
   );
 };
 

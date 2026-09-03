@@ -63,12 +63,15 @@ export function SimulationModeProvider({ children }: { children: ReactNode }) {
     };
   }, [syncFromStorage]);
 
-  const setActive = useCallback((next: boolean) => {
-    if (!enabled) return;
-    if (setSimulationModeActive(next)) {
-      setActiveState(next);
-    }
-  }, [enabled]);
+  const setActive = useCallback(
+    (next: boolean) => {
+      if (!enabled) return;
+      if (setSimulationModeActive(next)) {
+        setActiveState(next);
+      }
+    },
+    [enabled],
+  );
 
   const toggle = useCallback(() => {
     if (!enabled) return;
@@ -87,9 +90,7 @@ export function SimulationModeProvider({ children }: { children: ReactNode }) {
     [active, enabled, setActive, toggle],
   );
 
-  return (
-    <SimulationModeContext.Provider value={value}>{children}</SimulationModeContext.Provider>
-  );
+  return <SimulationModeContext.Provider value={value}>{children}</SimulationModeContext.Provider>;
 }
 
 export function useSimulationMode(): SimulationModeContextValue {

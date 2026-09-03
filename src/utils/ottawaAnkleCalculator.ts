@@ -36,22 +36,22 @@ export function ottawaApplicabilityWarnings(applicability: any = {}) {
   }
   if (applicability.neurovascularCompromise) {
     warnings.push(
-      'Suspected neurovascular compromise — do not rely on Ottawa rules; pursue urgent evaluation and imaging per protocol.'
+      'Suspected neurovascular compromise — do not rely on Ottawa rules; pursue urgent evaluation and imaging per protocol.',
     );
   }
   if (applicability.openFractureOrGrossDeformity) {
     warnings.push(
-      'Open fracture or gross deformity — Ottawa rules must not delay appropriate trauma care and imaging.'
+      'Open fracture or gross deformity — Ottawa rules must not delay appropriate trauma care and imaging.',
     );
   }
   if (applicability.severeTraumaOrMultisystem) {
     warnings.push(
-      'Severe or multisystem trauma — full trauma evaluation takes precedence over rule-out radiography pathways.'
+      'Severe or multisystem trauma — full trauma evaluation takes precedence over rule-out radiography pathways.',
     );
   }
   if (applicability.pediatricUnder18) {
     warnings.push(
-      'Age under 18 — validated primarily in adults; consider pediatric-specific guidelines.'
+      'Age under 18 — validated primarily in adults; consider pediatric-specific guidelines.',
     );
   }
   return warnings;

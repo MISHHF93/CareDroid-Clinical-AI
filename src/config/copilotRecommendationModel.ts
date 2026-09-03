@@ -63,9 +63,9 @@ export function isActionableRecommendation(recommendation) {
   if (!recommendation) return false;
   return Boolean(
     recommendation.route ||
-      recommendation.whiteboardFilter ||
-      recommendation.eventName ||
-      recommendation.patientId,
+    recommendation.whiteboardFilter ||
+    recommendation.eventName ||
+    recommendation.patientId,
   );
 }
 
@@ -79,7 +79,8 @@ function freezeRecommendation(recommendation) {
   return Object.freeze({
     ...recommendation,
     actionable: isActionableRecommendation(recommendation),
-    generic: isGenericCopilotText(recommendation.action) || isGenericCopilotText(recommendation.detail),
+    generic:
+      isGenericCopilotText(recommendation.action) || isGenericCopilotText(recommendation.detail),
   });
 }
 
@@ -111,8 +112,10 @@ export function buildCopilotRecommendations(context: any = {}) {
   const capacityStatus = centralSnapshot.capacityStatus || {};
   const boardingStatus = centralSnapshot.boardingStatus || {};
   const reassessmentStatus = centralSnapshot.reassessmentStatus || {};
-  const breachedQueues = context.breachedQueues || centralSnapshot.queueHealth?.filter((queue) => queue.breached) || [];
-  const primaryBottleneck = context.primaryBottleneck || context.queueAuditSummary?.primaryBottleneck || null;
+  const breachedQueues =
+    context.breachedQueues || centralSnapshot.queueHealth?.filter((queue) => queue.breached) || [];
+  const primaryBottleneck =
+    context.primaryBottleneck || context.queueAuditSummary?.primaryBottleneck || null;
   const generatedAt = context.generatedAt || new Date().toISOString();
   const recommendations = [] as any[];
 
@@ -344,9 +347,7 @@ export function auditCopilotRecommendations(recommendations: readonly any[] = []
       actionable.length === recommendations.length &&
       generic.length === 0,
     issues: [
-      ...(generic.length
-        ? [`${generic.length} recommendation(s) use generic phrasing`]
-        : []),
+      ...(generic.length ? [`${generic.length} recommendation(s) use generic phrasing`] : []),
       ...(actionable.length < recommendations.length
         ? [`${recommendations.length - actionable.length} recommendation(s) lack route or filter`]
         : []),

@@ -54,14 +54,23 @@ describe('EmergencyCapacityIntelligenceService', () => {
         expect.objectContaining({ id: 'boarding-relief', category: 'bottlenecks' }),
         expect.objectContaining({ id: 'admission-handoff', category: 'bottlenecks' }),
         expect.objectContaining({ id: 'ems-arrival-readiness', category: 'bottlenecks' }),
-        expect.objectContaining({ id: 'discharge-acceleration', category: 'discharge opportunities' }),
-      ])
+        expect.objectContaining({
+          id: 'discharge-acceleration',
+          category: 'discharge opportunities',
+        }),
+      ]),
     );
     expect(dashboard).toEqual(
       expect.objectContaining({
         engineId: 'capacity-engine',
         title: 'Capacity Engine',
-        inputSchema: ['occupancy', 'boarding', 'pending admissions', 'discharge candidates', 'EMS arrivals'],
+        inputSchema: [
+          'occupancy',
+          'boarding',
+          'pending admissions',
+          'discharge candidates',
+          'EMS arrivals',
+        ],
         output: 'Capacity Score',
         score: expect.any(Number),
         riskLevel: expect.stringMatching(/Green|Yellow|Orange|Red/),
@@ -78,7 +87,7 @@ describe('EmergencyCapacityIntelligenceService', () => {
           ]),
         }),
         summary: expect.stringMatching(/capacity posture/i),
-      })
+      }),
     );
     expect(EmergencyCapacityIntelligenceService.getCapacityDashboard().signals).toHaveLength(7);
   });

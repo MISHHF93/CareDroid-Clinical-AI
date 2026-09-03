@@ -2,10 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import TimelineAi from './TimelineAi';
-import {
-  mockConversationValue,
-  mockToolPreferencesValue,
-} from '../../test/testRenderUtils';
+import { mockConversationValue, mockToolPreferencesValue } from '../../test/testRenderUtils';
 import { generateTimelineAi } from '../../services/clinicalIntelligenceApi';
 
 vi.mock('./ToolPageLayout.css', () => ({}));
@@ -116,7 +113,9 @@ describe('TimelineAi', () => {
       );
     });
 
-    expect(await screen.findByRole('heading', { name: /initial dyspnea visit/i })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: /initial dyspnea visit/i }),
+    ).toBeInTheDocument();
     expect(screen.getByText(/Respiratory status/i)).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /abnormal progression/i })).toBeInTheDocument();
     expect(screen.getByText(/urgent_review/i)).toBeInTheDocument();

@@ -97,7 +97,11 @@ export function buildWorkflowAiCard(event: WorkflowTriggerEvent): WorkflowAiCard
   };
 
   cardStore.set(card.cardId, card);
-  return { ...card, recommendedActions: [...card.recommendedActions], evidence: [...card.evidence] };
+  return {
+    ...card,
+    recommendedActions: [...card.recommendedActions],
+    evidence: [...card.evidence],
+  };
 }
 
 export function listWorkflowAiCards(filter?: {
@@ -181,21 +185,28 @@ function titleFor(kind: WorkflowTriggerKind): string {
 
 function defaultSummary(kind: WorkflowTriggerKind): string {
   const map: Record<WorkflowTriggerKind, string> = {
-    ems_prearrival: 'An inbound EMS unit may need ED preparation. Review handoff summary and ETA freshness.',
-    incomplete_registration: 'Registration is incomplete. Detect missing fields before triage handoff.',
+    ems_prearrival:
+      'An inbound EMS unit may need ED preparation. Review handoff summary and ETA freshness.',
+    incomplete_registration:
+      'Registration is incomplete. Detect missing fields before triage handoff.',
     new_ocr_document: 'A document was processed. Review low-confidence fields before committing.',
     queue_delay: 'A queue delay may need attention. Review wait times and next actions.',
-    unresolved_alert: 'An alert remains unresolved. Explain and assign ownership — do not auto-resolve.',
-    missing_clinical_field: 'Required clinical information is missing for the current workflow step.',
-    calculator_opportunity: 'A deterministic calculator may apply. Suggest selection only; never invent scores.',
-    operational_bottleneck: 'An operational bottleneck was detected. Summarize impact for the charge role.',
+    unresolved_alert:
+      'An alert remains unresolved. Explain and assign ownership — do not auto-resolve.',
+    missing_clinical_field:
+      'Required clinical information is missing for the current workflow step.',
+    calculator_opportunity:
+      'A deterministic calculator may apply. Suggest selection only; never invent scores.',
+    operational_bottleneck:
+      'An operational bottleneck was detected. Summarize impact for the charge role.',
   };
   return map[kind];
 }
 
 function ownerFor(kind: WorkflowTriggerKind): string {
   if (kind === 'ems_prearrival') return 'charge_nurse';
-  if (kind === 'incomplete_registration' || kind === 'new_ocr_document') return 'registration_clerk';
+  if (kind === 'incomplete_registration' || kind === 'new_ocr_document')
+    return 'registration_clerk';
   if (kind === 'unresolved_alert' || kind === 'missing_clinical_field') return 'triage_nurse';
   return 'ed_director';
 }
@@ -208,7 +219,11 @@ function workspaceFor(kind: WorkflowTriggerKind): string {
 }
 
 function actionsFor(kind: WorkflowTriggerKind): WorkflowAiCard['recommendedActions'] {
-  const base = (id: string, label: string, risk: WorkflowAiCard['recommendedActions'][0]['riskLevel'] = 'low') => ({
+  const base = (
+    id: string,
+    label: string,
+    risk: WorkflowAiCard['recommendedActions'][0]['riskLevel'] = 'low',
+  ) => ({
     id,
     label,
     riskLevel: risk,

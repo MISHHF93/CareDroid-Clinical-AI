@@ -68,7 +68,9 @@ export function buildSentinelCommandMetrics(
       detail: nearest
         ? `${nearest.label} · ${Math.round(nearest.eta!.confidence * 100)}% conf`
         : 'No active ETA',
-      tone: nearest?.eta?.stale ? ('watch' as HospitalCommandTone) : ('stable' as HospitalCommandTone),
+      tone: nearest?.eta?.stale
+        ? ('watch' as HospitalCommandTone)
+        : ('stable' as HospitalCommandTone),
     }),
     Object.freeze({
       id: 'unresolved-alerts' as HospitalCommandMetricId,

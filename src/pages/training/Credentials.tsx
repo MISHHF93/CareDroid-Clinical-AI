@@ -14,10 +14,17 @@ import './Credentials.css';
 export default function Credentials() {
   useRouteChromeRegistration({ title: 'Credentialing Platform' });
   const snapshot = useMemo(
-    () => buildCompetencyCredentialingSnapshot({ role: 'medical student', specialty: 'medical education' }),
+    () =>
+      buildCompetencyCredentialingSnapshot({
+        role: 'medical student',
+        specialty: 'medical education',
+      }),
     [],
   );
-  const statusChart = useMemo(() => buildCredentialStatusChart(snapshot.credentialRecords), [snapshot.credentialRecords]);
+  const statusChart = useMemo(
+    () => buildCredentialStatusChart(snapshot.credentialRecords),
+    [snapshot.credentialRecords],
+  );
 
   return (
     <main className="credentials-page" aria-label="Credentialing platform">
@@ -25,8 +32,13 @@ export default function Credentials() {
         <div className="credentials-page__title-row">
           <GraphicIconBadge iconKey="shield-check" accent="brand" size="md" />
           <div>
-            <p className="credentials-page__title-text" data-testid="cd-page-title-text">Credentialing Platform</p>
-            <p>Certifications, renewal status, CME credits, and credential readiness for demo training review.</p>
+            <p className="credentials-page__title-text" data-testid="cd-page-title-text">
+              Credentialing Platform
+            </p>
+            <p>
+              Certifications, renewal status, CME credits, and credential readiness for demo
+              training review.
+            </p>
           </div>
         </div>
         <div className="credentials-page__actions">
@@ -42,7 +54,11 @@ export default function Credentials() {
         details={snapshot.safetyLabel}
       />
 
-      <div className="credentials-page__metrics" role="group" aria-label="Credentialing summary metrics">
+      <div
+        className="credentials-page__metrics"
+        role="group"
+        aria-label="Credentialing summary metrics"
+      >
         <MetricCard
           label="Active credentials"
           value={String(snapshot.summary.activeCredentials)}

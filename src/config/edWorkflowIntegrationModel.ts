@@ -11,10 +11,7 @@ import {
   getEmergencyRoleHomeRoute,
   normalizeEmergencyRole,
 } from './emergencyRolePermissions';
-import {
-  getDefaultScreenModeForRole,
-  getPersonaLabelForRole,
-} from './emergencyRoleScreenMatrix';
+import { getDefaultScreenModeForRole, getPersonaLabelForRole } from './emergencyRoleScreenMatrix';
 import {
   buildUserProfileAccessSummary,
   resolveEffectiveEmergencyRole,
@@ -244,8 +241,7 @@ export function summarizeBackendFrontendSync(
   const emergencyWriteWired =
     BACKEND_API_CAPABILITY_STATUS.emergencyReceptionHandoff === 'real' ||
     BACKEND_API_CAPABILITY_STATUS.emergencyTriageAssist === 'real';
-  const realtimeWired =
-    (BACKEND_API_CAPABILITY_STATUS as any).emergencyCentralNode !== 'disabled';
+  const realtimeWired = (BACKEND_API_CAPABILITY_STATUS as any).emergencyCentralNode !== 'disabled';
   const fallbackPersistenceMode = emergencyWriteWired ? 'hybrid' : 'demo-fixture';
 
   return {
@@ -286,18 +282,14 @@ export function resolveNormalizedEdUserContext({
     'student';
 
   const catalog = resolveUserProfileFromSaasRole(saasRole);
-  const explicitEmergencyRole =
-    apiSummary?.emergencyRole || apiEffective?.emergencyRoleId || null;
+  const explicitEmergencyRole = apiSummary?.emergencyRole || apiEffective?.emergencyRoleId || null;
   const emergencyRoleId = normalizeEmergencyRole(
     explicitEmergencyRole ||
       resolveEffectiveEmergencyRole(
         {
           role: user?.role,
           profile: {
-            roleProfileId:
-              user?.profile?.roleProfileId ||
-              catalog.emergencyRoleId ||
-              user?.role,
+            roleProfileId: user?.profile?.roleProfileId || catalog.emergencyRoleId || user?.role,
           },
         },
         emergencySettings,
@@ -308,7 +300,8 @@ export function resolveNormalizedEdUserContext({
 
   const accessSummary = apiSummary || buildUserProfileAccessSummary(catalog.saasRole);
   const landingRoute = getEmergencyRoleHomeRoute(emergencyRoleId, emergencySettings);
-  const screenMode = getDefaultScreenModeForRole(emergencyRoleId) || catalog.defaultScreenMode || 'PHYSICIAN_SCREEN';
+  const screenMode =
+    getDefaultScreenModeForRole(emergencyRoleId) || catalog.defaultScreenMode || 'PHYSICIAN_SCREEN';
 
   return {
     saasRole: catalog.saasRole,

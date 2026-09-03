@@ -69,7 +69,9 @@ describe('Calculators.jsx route wiring', () => {
     expect(appSource).not.toContain("path: '/tools/lab-interpreter'");
     expect(appSource).not.toContain('<LegacyToolRouteRedirect toolId="lab-interp" />');
     expect(appSource).not.toContain("path: '/tools/calculator-recommender'");
-    expect(appSource).not.toContain('<LegacyToolRouteRedirect toolId="calculator-recommender-ai" />');
+    expect(appSource).not.toContain(
+      '<LegacyToolRouteRedirect toolId="calculator-recommender-ai" />',
+    );
     expect(appSource).not.toContain("path: '/protocols'");
     expect(appSource).not.toContain('element: <Protocols />');
   });

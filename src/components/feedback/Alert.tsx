@@ -12,14 +12,27 @@ type AlertProps = {
   children?: ReactNode;
 } & HTMLAttributes<HTMLDivElement>;
 
-export function Alert({ tone = 'info', title, icon, action, className, children, role, ...props }: AlertProps) {
+export function Alert({
+  tone = 'info',
+  title,
+  icon,
+  action,
+  className,
+  children,
+  role,
+  ...props
+}: AlertProps) {
   // Static role strings only (Edge Tools rejects dynamic ARIA roles).
   const useAlertRole =
     role === 'alert' || ((!role || role === 'status') && (tone === 'danger' || tone === 'warning'));
   const classNames = ['cd-alert', `cd-alert--${tone}`, className ?? ''].filter(Boolean).join(' ');
   const body = (
     <>
-      {icon && <span className="cd-alert__icon" aria-hidden="true">{icon}</span>}
+      {icon && (
+        <span className="cd-alert__icon" aria-hidden="true">
+          {icon}
+        </span>
+      )}
       <div className="cd-alert__body">
         {title && <p className="cd-alert__title">{title}</p>}
         {children && <div className="cd-alert__message">{children}</div>}

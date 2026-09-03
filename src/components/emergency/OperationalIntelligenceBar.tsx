@@ -108,7 +108,10 @@ function OperationalIntelligenceBar() {
             <strong>Suggest:</strong> {insightRecommendation.action}
           </p>
         ) : fallbackInsight ? (
-          <p className="operational-intelligence-bar__recommendation" title={fallbackInsight.summary}>
+          <p
+            className="operational-intelligence-bar__recommendation"
+            title={fallbackInsight.summary}
+          >
             <strong>Insight:</strong> {fallbackInsight.title}
           </p>
         ) : (
@@ -124,7 +127,10 @@ function OperationalIntelligenceBar() {
             Open workflow
           </Link>
         ) : null}
-        <Link to={CANONICAL_ROUTES.emergencyCopilot} className="operational-intelligence-bar__action">
+        <Link
+          to={CANONICAL_ROUTES.emergencyCopilot}
+          className="operational-intelligence-bar__action"
+        >
           Ask AI Chief
         </Link>
         <Link

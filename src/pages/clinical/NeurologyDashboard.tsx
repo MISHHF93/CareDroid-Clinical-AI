@@ -12,25 +12,29 @@ const CARDS = [
   {
     to: '/emergency/tools/neurology/stroke-command-center',
     title: 'Stroke command center',
-    description: 'Activation queues, last-known-well, imaging milestones, handoff status, unresolved review items.',
+    description:
+      'Activation queues, last-known-well, imaging milestones, handoff status, unresolved review items.',
     tier: 'Tier C' as const,
   },
   {
     to: '/emergency/tools/neurology/stroke-workflow-assistant',
     title: 'Stroke workflow assistant',
-    description: 'Last-known-well, deficits, NIHSS context, imaging status, contraindication prompts, handoff.',
+    description:
+      'Last-known-well, deficits, NIHSS context, imaging status, contraindication prompts, handoff.',
     tier: 'Tier B' as const,
   },
   {
     to: '/emergency/tools/neurology/seizure-assistant',
     title: 'Seizure assistant',
-    description: 'Witnessed events, recovery, triggers, antiseizure medication context, and missing data.',
+    description:
+      'Witnessed events, recovery, triggers, antiseizure medication context, and missing data.',
     tier: 'Tier B' as const,
   },
   {
     to: '/emergency/tools/neurology/headache-red-flag-assistant',
     title: 'Headache red-flag assistant',
-    description: 'Thunderclap onset, neuro deficits, infection, pregnancy/postpartum, cancer, trauma, age context.',
+    description:
+      'Thunderclap onset, neuro deficits, infection, pregnancy/postpartum, cancer, trauma, age context.',
     tier: 'Tier B' as const,
   },
   {
@@ -42,7 +46,8 @@ const CARDS = [
   {
     to: '/emergency/tools/neurology/neuro-exam-assistant',
     title: 'Neuro exam assistant',
-    description: 'Mental status, cranial nerves, motor, sensory, coordination, gait, reflexes, localization prompts.',
+    description:
+      'Mental status, cranial nerves, motor, sensory, coordination, gait, reflexes, localization prompts.',
     tier: 'Tier B' as const,
   },
   {
@@ -54,13 +59,15 @@ const CARDS = [
   {
     to: '/emergency/tools/neurology/neuro-monitoring-engine',
     title: 'Neuro monitoring engine',
-    description: 'Serial exams, consciousness scores, pupillary data, ICP context, and review queues.',
+    description:
+      'Serial exams, consciousness scores, pupillary data, ICP context, and review queues.',
     tier: 'Tier C' as const,
   },
   {
     to: '/emergency/tools/neurology/eeg-trend-dashboard',
     title: 'EEG trend dashboard',
-    description: 'EEG status, seizure burden context, artifact, report freshness, and review queues.',
+    description:
+      'EEG status, seizure burden context, artifact, report freshness, and review queues.',
     tier: 'Tier C' as const,
   },
   {

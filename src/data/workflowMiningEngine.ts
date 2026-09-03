@@ -92,10 +92,20 @@ export const WORKFLOW_MINING_JOURNEYS = Object.freeze([
     title: 'ED triage calculator to dashboard',
     frequency: 148,
     completionRate: 82,
-    steps: ['Search qSOFA calculator', 'Open qSOFA calculator', 'Launch patient summary AI', 'Open Emergency dashboard'],
-    frictionSignals: ['Repeated calculator searches before launch', 'AI summary opens after calculator instead of inline'],
+    steps: [
+      'Search qSOFA calculator',
+      'Open qSOFA calculator',
+      'Launch patient summary AI',
+      'Open Emergency dashboard',
+    ],
+    frictionSignals: [
+      'Repeated calculator searches before launch',
+      'AI summary opens after calculator instead of inline',
+    ],
     deadEnds: ['Users who stop after search often never open the calculator'],
-    unnecessaryClicks: ['Search -> tools overview -> calculator library -> qSOFA can be shortened to search -> qSOFA'],
+    unnecessaryClicks: [
+      'Search -> tools overview -> calculator library -> qSOFA can be shortened to search -> qSOFA',
+    ],
     recommendations: [
       'Promote qSOFA as the top search result for emergency users',
       'Add inline patient summary AI from calculator result pages',
@@ -106,10 +116,22 @@ export const WORKFLOW_MINING_JOURNEYS = Object.freeze([
     title: 'Protocol search to workflow completion',
     frequency: 96,
     completionRate: 74,
-    steps: ['Launch workflow builder', 'Search sepsis protocol', 'Open protocols', 'Mark workflow complete'],
-    frictionSignals: ['Users leave workflow builder to find protocols', 'Protocol lookup adds extra context switching'],
-    deadEnds: ['Protocol searches without workflow completion cluster around sepsis and stroke pathways'],
-    unnecessaryClicks: ['Workflow builder -> search -> protocol -> workflow builder loop repeats before completion'],
+    steps: [
+      'Launch workflow builder',
+      'Search sepsis protocol',
+      'Open protocols',
+      'Mark workflow complete',
+    ],
+    frictionSignals: [
+      'Users leave workflow builder to find protocols',
+      'Protocol lookup adds extra context switching',
+    ],
+    deadEnds: [
+      'Protocol searches without workflow completion cluster around sepsis and stroke pathways',
+    ],
+    unnecessaryClicks: [
+      'Workflow builder -> search -> protocol -> workflow builder loop repeats before completion',
+    ],
     recommendations: [
       'Embed protocol search inside workflow builder',
       'Suggest workflow blocks from protocol pages',

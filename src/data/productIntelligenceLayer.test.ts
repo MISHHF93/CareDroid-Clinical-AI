@@ -21,7 +21,9 @@ describe('productIntelligenceLayer', () => {
 
   it('represents the Product to Pack to Asset to Usage to Outcome value chain', () => {
     const layer = buildProductIntelligenceLayer();
-    const emergency = layer.products.find((product) => product.id === 'emergency-department-solution');
+    const emergency = layer.products.find(
+      (product) => product.id === 'emergency-department-solution',
+    );
 
     expect(emergency.valueChain.product).toBe('Emergency Flow Intelligence Platform');
     expect(emergency.valueChain.packs).toEqual(expect.arrayContaining(['Emergency Flow Pack']));
@@ -42,7 +44,9 @@ describe('productIntelligenceLayer', () => {
     expect(layer.summary.averageRoi).toBeGreaterThan(0);
     expect(layer.summary.averageHealth).toBeGreaterThan(0);
     expect(layer.summary.averageEngagement).toBeGreaterThan(0);
-    expect(layer.summary.totalEstimatedValue).toBeGreaterThan(layer.summary.totalImplementationCost);
+    expect(layer.summary.totalEstimatedValue).toBeGreaterThan(
+      layer.summary.totalImplementationCost,
+    );
     expect(getProductHealthBand(86)).toMatchObject({ id: 'excellent' });
   });
 });

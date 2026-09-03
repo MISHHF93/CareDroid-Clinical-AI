@@ -65,7 +65,8 @@ export default function OperationsCenterMenu() {
     return null;
   }
 
-  const criticalCount = aiChief.criticalDomainCount + missionState.breachCount + workflow.criticalCount;
+  const criticalCount =
+    aiChief.criticalDomainCount + missionState.breachCount + workflow.criticalCount;
   const attentionCount =
     aiChief.watchDomainCount + missionState.unacknowledgedCount + workflow.pendingCount;
   const tone = criticalCount > 0 ? 'critical' : attentionCount > 0 ? 'warning' : 'neutral';

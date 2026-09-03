@@ -100,9 +100,7 @@ export function scheduleUnifiedApplicationKnowledgeGraphRefresh(eventType?: stri
   }, REFRESH_DEBOUNCE_MS);
 }
 
-export function handleUnifiedApplicationKnowledgeGraphBackendEvent(
-  eventType: string,
-): void {
+export function handleUnifiedApplicationKnowledgeGraphBackendEvent(eventType: string): void {
   if (!isKnowledgeGraphTriggerEvent(eventType)) return;
   scheduleUnifiedApplicationKnowledgeGraphRefresh(eventType);
 }

@@ -30,8 +30,16 @@ export function AIInsightPanel({
         <strong>{responses.length}</strong>
       </header>
 
-      {isLoading ? <p className="cd-ai-panel__state" role="status">Generating AI insight...</p> : null}
-      {error ? <p className="cd-ai-panel__state cd-ai-panel__state--error" role="alert">{error}</p> : null}
+      {isLoading ? (
+        <p className="cd-ai-panel__state" role="status">
+          Generating AI insight...
+        </p>
+      ) : null}
+      {error ? (
+        <p className="cd-ai-panel__state cd-ai-panel__state--error" role="alert">
+          {error}
+        </p>
+      ) : null}
 
       {!isLoading && !error && responses.length === 0 ? (
         <p className="cd-ai-panel__state">{emptyMessage}</p>

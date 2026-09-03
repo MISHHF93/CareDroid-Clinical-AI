@@ -61,9 +61,7 @@ function hasFlag(patient: Patient, flag: PatientFlag): boolean {
   );
 }
 
-function mapSuggestionSource(
-  patient: Patient,
-): TriageAcuity['suggestionSource'] | undefined {
+function mapSuggestionSource(patient: Patient): TriageAcuity['suggestionSource'] | undefined {
   if (patient.source === 'Self-arrival' || patient.arrivalMode === 'self-check-in') {
     return 'self-arrival';
   }
@@ -122,10 +120,7 @@ export function deriveWaitingRoomStatus(patient: Patient): WaitingRoomStatus {
   const queueDestination = deriveQueueDestination(patient);
   const triagePending = deriveTriagePending(patient);
 
-  if (
-    patient.state === PatientState.Admission ||
-    hasFlag(patient, PatientFlag.PendingAdmission)
-  ) {
+  if (patient.state === PatientState.Admission || hasFlag(patient, PatientFlag.PendingAdmission)) {
     return 'awaiting-admission-bed';
   }
 
@@ -133,7 +128,10 @@ export function deriveWaitingRoomStatus(patient: Patient): WaitingRoomStatus {
     return 'preparing-discharge';
   }
 
-  if (patient.referral && !['Closed', 'Completed', 'Declined', 'PatientDeparted'].includes(patient.referral.status)) {
+  if (
+    patient.referral &&
+    !['Closed', 'Completed', 'Declined', 'PatientDeparted'].includes(patient.referral.status)
+  ) {
     return 'waiting-for-specialist-review';
   }
 
@@ -224,7 +222,9 @@ function defaultQueueDestination(
   return 'verification';
 }
 
-function defaultRegistrationStatus(state: PatientState = PatientState.Registration): RegistrationStatus {
+function defaultRegistrationStatus(
+  state: PatientState = PatientState.Registration,
+): RegistrationStatus {
   if (state === PatientState.Arrival) return 'pending';
   if (state === PatientState.Registration) return 'in-progress';
   return 'complete';

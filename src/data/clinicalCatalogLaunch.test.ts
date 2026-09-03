@@ -71,10 +71,14 @@ const AI_SYSTEM_ROUTE_ALLOWLIST = {
 const PULMONOLOGY_TIER_B_SET = new Set<string>(PULMONOLOGY_TIER_B_CHAT_REGISTRY_IDS);
 const NEPHROLOGY_TIER_B_SET = new Set<string>(NEPHROLOGY_TIER_B_CHAT_REGISTRY_IDS);
 const HEPATOLOGY_GI_TIER_B_SET = new Set<string>(HEPATOLOGY_GI_TIER_B_CHAT_REGISTRY_IDS);
-const ENDOCRINE_METABOLIC_TIER_B_SET = new Set<string>(ENDOCRINE_METABOLIC_TIER_B_CHAT_REGISTRY_IDS);
+const ENDOCRINE_METABOLIC_TIER_B_SET = new Set<string>(
+  ENDOCRINE_METABOLIC_TIER_B_CHAT_REGISTRY_IDS,
+);
 const NEUROLOGY_TIER_B_SET = new Set<string>(NEUROLOGY_TIER_B_CHAT_REGISTRY_IDS);
 const PEDIATRICS_OBGYN_TIER_B_SET = new Set<string>(PEDIATRICS_OBGYN_TIER_B_CHAT_REGISTRY_IDS);
-const PSYCHIATRY_SCREENING_TIER_B_SET = new Set<string>(PSYCHIATRY_SCREENING_TIER_B_CHAT_REGISTRY_IDS);
+const PSYCHIATRY_SCREENING_TIER_B_SET = new Set<string>(
+  PSYCHIATRY_SCREENING_TIER_B_CHAT_REGISTRY_IDS,
+);
 
 const TIER_B_ALL = [
   ...TIER_B_CHAT_CALCULATOR_REGISTRY_IDS.filter(
@@ -85,17 +89,19 @@ const TIER_B_ALL = [
       !ENDOCRINE_METABOLIC_TIER_B_SET.has(id) &&
       !NEUROLOGY_TIER_B_SET.has(id) &&
       !PEDIATRICS_OBGYN_TIER_B_SET.has(id) &&
-      !PSYCHIATRY_SCREENING_TIER_B_SET.has(id)
+      !PSYCHIATRY_SCREENING_TIER_B_SET.has(id),
   ),
   ...PR_FLEET_TIER_B_CHAT_REGISTRY_IDS,
 ];
 
 const TIER_B_HUB_TOOLS = TIER_B_ALL.filter(
-  (registryId) => !(CARDIOLOGY_TIER_B_CHAT_REGISTRY_IDS as readonly string[]).includes(registryId)
+  (registryId) => !(CARDIOLOGY_TIER_B_CHAT_REGISTRY_IDS as readonly string[]).includes(registryId),
 );
-const SOURCE_BACKED_DIRECT_CALCULATOR_SET = new Set<string>(SOURCE_BACKED_TIER_A_CALCULATOR_REGISTRY_IDS);
+const SOURCE_BACKED_DIRECT_CALCULATOR_SET = new Set<string>(
+  SOURCE_BACKED_TIER_A_CALCULATOR_REGISTRY_IDS,
+);
 const PR2_CHAT_ONLY_CALCULATOR_IDS = PR2_TIER_B_CHAT_CALCULATOR_IDS.filter(
-  (registryId) => !SOURCE_BACKED_DIRECT_CALCULATOR_SET.has(registryId)
+  (registryId) => !SOURCE_BACKED_DIRECT_CALCULATOR_SET.has(registryId),
 );
 
 /** Substrings chat seeds for clinical tools should include (safety / scope). */
@@ -172,7 +178,7 @@ describe('resolveCatalogLaunch — AI system contracts', () => {
       expect(resolveNavigationPathForLaunch(launch)).toBe(launch.path);
       expect(launch.chatSeed?.length).toBeGreaterThan(40);
       expect(launch.orchestratorTool).toBeNull();
-    }
+    },
   );
 
   it('documents intentional shared AI system routes', () => {
@@ -183,7 +189,7 @@ describe('resolveCatalogLaunch — AI system contracts', () => {
     }, {});
 
     expect(sharedRouteGroups[TOOL_LAUNCH_PATHS.assistant].sort()).toEqual(
-      [REGISTRY.aiGateway, REGISTRY.moeRouter, REGISTRY.aiToolCalling].sort()
+      [REGISTRY.aiGateway, REGISTRY.moeRouter, REGISTRY.aiToolCalling].sort(),
     );
     expect(sharedRouteGroups['/tools/guideline-rag']).toEqual([REGISTRY.aiRag]);
     expect(sharedRouteGroups[TOOL_LAUNCH_PATHS.aiCommandCenter]).toEqual([
@@ -209,7 +215,7 @@ describe('resolveCatalogLaunch — Tier A dedicated calculator routes', () => {
       } else {
         expect(launch.orchestratorTool).toBeNull();
       }
-    }
+    },
   );
 
   it.each(['sofa', 'gfr', 'bmi', 'chads2vasc'])(
@@ -218,7 +224,7 @@ describe('resolveCatalogLaunch — Tier A dedicated calculator routes', () => {
       const launch = resolveCatalogLaunch(slug);
       expect(launch.path).toBeTruthy();
       expect(launch.registryId).toBeTruthy();
-    }
+    },
   );
 });
 
@@ -229,7 +235,7 @@ describe('resolveNavigationPathForLaunch — chat visibility', () => {
       const launch = resolveCatalogLaunch(registryId);
       expect(launch.path).toBe(HUB);
       expect(resolveNavigationPathForLaunch(launch)).toBe('/assistant');
-    }
+    },
   );
 
   it.each(PR2_CHAT_ONLY_CALCULATOR_IDS)(
@@ -237,7 +243,7 @@ describe('resolveNavigationPathForLaunch — chat visibility', () => {
     (registryId) => {
       const launch = resolveCatalogLaunch(registryId);
       expect(resolveNavigationPathForLaunch(launch)).toBe('/assistant');
-    }
+    },
   );
 
   it.each(CLINICAL_TIER_A_CALCULATOR_REGISTRY_IDS)(
@@ -246,7 +252,7 @@ describe('resolveNavigationPathForLaunch — chat visibility', () => {
       const launch = resolveCatalogLaunch(registryId);
       expect(resolveNavigationPathForLaunch(launch)).toBe(launch.path);
       expect(resolveNavigationPathForLaunch(launch)).not.toBe('/dashboard');
-    }
+    },
   );
 });
 
@@ -256,7 +262,7 @@ describe('resolveCatalogLaunch — Tier B chat-assisted (calculators hub)', () =
     (registryId) => {
       const launch = resolveCatalogLaunch(registryId);
       const nlu = clinicalIntentTools.find(
-        (t) => t.toolId === registryId || t.sidebarToolId === registryId
+        (t) => t.toolId === registryId || t.sidebarToolId === registryId,
       );
       // Tools with a real backend executor (see REGISTRY_ID_TO_ORCHESTRATOR_TOOL) resolve
       // openLabel 'Open' and a non-null orchestratorTool instead of the old chat-only values.
@@ -272,7 +278,7 @@ describe('resolveCatalogLaunch — Tier B chat-assisted (calculators hub)', () =
         expect(launch.openLabel).toMatch(/guided chat|Try in chat/i);
         expect(launch.orchestratorTool).toBeNull();
       }
-    }
+    },
   );
 
   it.each(CARDIOLOGY_TIER_B_CHAT_REGISTRY_IDS)(
@@ -280,14 +286,14 @@ describe('resolveCatalogLaunch — Tier B chat-assisted (calculators hub)', () =
     (registryId) => {
       const launch = resolveCatalogLaunch(registryId);
       const nlu = clinicalIntentTools.find(
-        (t) => t.toolId === registryId || t.sidebarToolId === registryId
+        (t) => t.toolId === registryId || t.sidebarToolId === registryId,
       );
       expect(launch.path).toMatch(/^\/tools\/cardiology\//);
       expect(launch.registryId).toBe(registryId);
       expect(launch.chatSeed).toBe(nlu?.chatSeed);
       expect(launch.openLabel).toMatch(/guided chat/i);
       expect(launch.orchestratorTool).toBeNull();
-    }
+    },
   );
 
   it.each(PR2_TIER_B_CHAT_CALCULATOR_IDS)('alias launch for %s matches hub path', (registryId) => {
@@ -342,7 +348,7 @@ describe('resolveCatalogLaunch — Tier C orchestrator (registered executors onl
     // duplicates. Compare the deduplicated value set against the registered id list instead
     // of requiring a strict 1:1 mapping.
     expect(new Set(Object.values(REGISTRY_ID_TO_ORCHESTRATOR_TOOL))).toEqual(
-      new Set(ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS)
+      new Set(ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS),
     );
   });
 
@@ -404,7 +410,7 @@ describe('resolveCatalogLaunch — fleet Tier B dispatch hub', () => {
       expect(fromAlias.registryId).toBe('dispatch-ai');
       expect(fromAlias.chatSeed).toBe(fromCanonical.chatSeed);
       expect(resolveNavigationPathForLaunch(fromAlias)).toBe('/assistant');
-    }
+    },
   );
 });
 

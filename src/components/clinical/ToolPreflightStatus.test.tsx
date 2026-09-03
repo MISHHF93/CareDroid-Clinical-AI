@@ -66,7 +66,7 @@ describe('ToolPreflightStatus', () => {
         parameters={{ medications: ['Warfarin', 'Aspirin'], severityFilter: 'all' }}
         requiredInputs={[{ label: 'At least 2 medication names', present: true }]}
         onReadyChange={onReadyChange}
-      />
+      />,
     );
 
     expect(await screen.findByText('Available')).toBeInTheDocument();
@@ -87,7 +87,7 @@ describe('ToolPreflightStatus', () => {
         parameters={{ medications: ['Warfarin'], severityFilter: 'all' }}
         requiredInputs={[{ label: 'At least 2 medication names', present: false }]}
         onReadyChange={onReadyChange}
-      />
+      />,
     );
 
     expect(await screen.findByText(/missing: at least 2 medication names/i)).toBeInTheDocument();
@@ -102,7 +102,7 @@ describe('ToolPreflightStatus', () => {
         parameters={{}}
         requiredInputs={[{ label: 'Some input', present: false }]}
         onReadyChange={vi.fn()}
-      />
+      />,
     );
 
     expect(container).toBeEmptyDOMElement();

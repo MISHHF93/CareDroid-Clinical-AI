@@ -20,9 +20,7 @@ export default function QueueReasonAttentionStrip({
 
   const previewPatients = useMemo(
     () =>
-      patients
-        .filter((patient) => resolveQueueReason(patient, { referrals, staff }))
-        .slice(0, 4),
+      patients.filter((patient) => resolveQueueReason(patient, { referrals, staff })).slice(0, 4),
     [patients, referrals, staff],
   );
 
@@ -38,7 +36,8 @@ export default function QueueReasonAttentionStrip({
           <p className="queue-reason-attention-strip__eyebrow">Queue visibility</p>
           <h3>Why patients are waiting</h3>
           <p className="queue-reason-attention-strip__subtitle">
-            Derived from registration, triage, provider, room, result, referral, and reassessment state.
+            Derived from registration, triage, provider, room, result, referral, and reassessment
+            state.
           </p>
         </div>
         <div className="queue-reason-attention-strip__counts">

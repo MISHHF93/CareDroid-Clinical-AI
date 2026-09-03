@@ -15,12 +15,11 @@ const getFirebaseConfig = () => ({
   measurementId: appConfig.firebase.measurementId,
 });
 
-const hasFirebaseConfig = (config) => (
+const hasFirebaseConfig = (config) =>
   Boolean(config.apiKey) &&
   Boolean(config.projectId) &&
   Boolean(config.messagingSenderId) &&
-  Boolean(config.appId)
-);
+  Boolean(config.appId);
 
 export const initializeFirebase = async () => {
   const config = getFirebaseConfig();

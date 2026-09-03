@@ -2,10 +2,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import {
-  CANONICAL_APP_ROUTE_TREE,
-  CANONICAL_ROUTES,
-} from './routes.config';
+import { CANONICAL_APP_ROUTE_TREE, CANONICAL_ROUTES } from './routes.config';
 import {
   CARE_DROID_SCREEN_MODES,
   CARE_DROID_SCREEN_MODE_REGISTRY,
@@ -40,7 +37,10 @@ import { EMERGENCY_PAGE_PRIMARY_PATHS } from '../data/emergencyPageRenderInvento
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, '..', '..');
 const appSource = readFileSync(join(repoRoot, 'src', 'app', 'router.tsx'), 'utf8');
-const activeAppShellSource = readFileSync(join(repoRoot, 'src', 'components', 'AppShell.tsx'), 'utf8');
+const activeAppShellSource = readFileSync(
+  join(repoRoot, 'src', 'components', 'AppShell.tsx'),
+  'utf8',
+);
 
 const PRIMARY_SCREEN_MODES = Object.freeze([
   CARE_DROID_SCREEN_MODES.reception,
@@ -99,7 +99,9 @@ describe('emergencyMultiScreenConvergence', () => {
     PRIMARY_SCREEN_MODES.forEach((mode) => {
       const baseDensity = getScreenModeDensity(mode);
       const expectedDensity = isPractitionerCleanupEnabled()
-        ? baseDensity === 'wall' ? baseDensity : 'compact'
+        ? baseDensity === 'wall'
+          ? baseDensity
+          : 'compact'
         : baseDensity;
       expect(resolveOperationalPresentation(mode).density).toBe(expectedDensity);
     });
@@ -112,13 +114,28 @@ describe('emergencyMultiScreenConvergence', () => {
     };
     expect(isPublicDisplayContext(publicContext)).toBe(true);
     expect(
-      canPerformEmergencyMutation(EMERGENCY_ROLE_ID.physician, EMERGENCY_PERMISSION_KEYS.patientCreate, {}, publicContext),
+      canPerformEmergencyMutation(
+        EMERGENCY_ROLE_ID.physician,
+        EMERGENCY_PERMISSION_KEYS.patientCreate,
+        {},
+        publicContext,
+      ),
     ).toBe(false);
     expect(
-      canPerformEmergencyMutation(EMERGENCY_ROLE_ID.chargeNurse, EMERGENCY_PERMISSION_KEYS.queueMove, {}, publicContext),
+      canPerformEmergencyMutation(
+        EMERGENCY_ROLE_ID.chargeNurse,
+        EMERGENCY_PERMISSION_KEYS.queueMove,
+        {},
+        publicContext,
+      ),
     ).toBe(false);
     expect(
-      hasEmergencyPermission(EMERGENCY_ROLE_ID.physician, EMERGENCY_PERMISSION_KEYS.patientCreate, {}, publicContext),
+      hasEmergencyPermission(
+        EMERGENCY_ROLE_ID.physician,
+        EMERGENCY_PERMISSION_KEYS.patientCreate,
+        {},
+        publicContext,
+      ),
     ).toBe(false);
     expect(canMutateEmergencySurface(EMERGENCY_ROLE_ID.physician, publicContext)).toBe(false);
 
@@ -128,7 +145,9 @@ describe('emergencyMultiScreenConvergence', () => {
     expect(publicPrivacy.showPatientName).toBe(false);
     expect(publicPrivacy.showMrn).toBe(false);
     expect(publicPrivacy.aggregateMetricsOnly).toBe(true);
-    expect(getScreenModePhiVisibility(CARE_DROID_SCREEN_MODES.publicWaiting)).toBe('public_redacted');
+    expect(getScreenModePhiVisibility(CARE_DROID_SCREEN_MODES.publicWaiting)).toBe(
+      'public_redacted',
+    );
   });
 
   it('keeps wall and kiosk displays read-only while staff screens remain editable', () => {
@@ -162,7 +181,9 @@ describe('emergencyMultiScreenConvergence', () => {
     PRIMARY_SCREEN_MODES.forEach((mode) => {
       expect(registryIds.has(mode)).toBe(true);
     });
-    expect(CARE_DROID_SCREEN_MODE_REGISTRY.length).toBeGreaterThanOrEqual(PRIMARY_SCREEN_MODES.length);
+    expect(CARE_DROID_SCREEN_MODE_REGISTRY.length).toBeGreaterThanOrEqual(
+      PRIMARY_SCREEN_MODES.length,
+    );
   });
 
   it('classifies duplicate and legacy artifacts with canonical targets', () => {
@@ -182,7 +203,9 @@ describe('emergencyMultiScreenConvergence', () => {
       EMERGENCY_ARCHITECTURE_REGISTRY.some((entry) => entry.id === 'emergency-permission-registry'),
     ).toBe(true);
     expect(
-      EMERGENCY_ARCHITECTURE_REGISTRY.some((entry) => entry.id === 'operational-presentation-model'),
+      EMERGENCY_ARCHITECTURE_REGISTRY.some(
+        (entry) => entry.id === 'operational-presentation-model',
+      ),
     ).toBe(true);
   });
 
@@ -199,9 +222,8 @@ describe('emergencyMultiScreenConvergence', () => {
   });
 
   it('maps catalog default screen modes for emergency personas', async () => {
-    const { resolveUserProfileFromSaasRole, isSaasRoleCatalogComplete } = await import(
-      './userProfileCatalog'
-    );
+    const { resolveUserProfileFromSaasRole, isSaasRoleCatalogComplete } =
+      await import('./userProfileCatalog');
     expect(isSaasRoleCatalogComplete()).toBe(true);
     expect(resolveUserProfileFromSaasRole('nurse').defaultScreenMode).toBe('triage');
     expect(resolveUserProfileFromSaasRole('hospital-administrator').defaultScreenMode).toBe(

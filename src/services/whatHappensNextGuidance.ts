@@ -137,7 +137,9 @@ export type WhatHappensNextSnapshot = {
 
 function hasFlag(patient: Patient, flag: PatientFlag): boolean {
   return (patient.flags || []).some((entry) =>
-    typeof entry === 'string' ? entry === flag : (entry as unknown as { type: string })?.type === flag,
+    typeof entry === 'string'
+      ? entry === flag
+      : (entry as unknown as { type: string })?.type === flag,
   );
 }
 
@@ -148,8 +150,7 @@ export function isInArrivalWaitingFlow(patient: Patient | null | undefined): boo
 
 function activeReferral(patient: Patient, referrals: Referral[] = []): Referral | null {
   const match = referrals.find(
-    (referral) =>
-      referral.patientId === patient.id && classifyReferralBucket(referral) !== null,
+    (referral) => referral.patientId === patient.id && classifyReferralBucket(referral) !== null,
   );
   if (match) return match;
   if (patient.referral && !isClosedReferralStatus(patient.referral.status)) {
@@ -203,10 +204,7 @@ function detectSteps(
     });
   }
 
-  if (
-    patient.state === PatientState.Admission ||
-    hasFlag(patient, PatientFlag.PendingAdmission)
-  ) {
+  if (patient.state === PatientState.Admission || hasFlag(patient, PatientFlag.PendingAdmission)) {
     steps.push({
       id: 'admission-decision-pending',
       staffDetail: `Internal ${patient.state} · bed placement workflow`,
@@ -315,9 +313,10 @@ export function summarizeWhatHappensNextBoard(
   patients: Patient[] = [],
   context: WhatHappensNextContext = {},
 ): Record<WhatHappensNextStepId, number> {
-  const counts = Object.fromEntries(
-    WHAT_HAPPENS_NEXT_STEPS.map((step) => [step.id, 0]),
-  ) as Record<WhatHappensNextStepId, number>;
+  const counts = Object.fromEntries(WHAT_HAPPENS_NEXT_STEPS.map((step) => [step.id, 0])) as Record<
+    WhatHappensNextStepId,
+    number
+  >;
 
   patients.forEach((patient) => {
     if (!isInArrivalWaitingFlow(patient)) return;
@@ -346,9 +345,7 @@ export function buildWhatHappensNextCopilotLines(
         `Selected patient next step: ${snapshot.label} — ${snapshot.guidance} (${snapshot.staffDetail})`,
       );
       if (snapshot.secondarySteps.length) {
-        lines.push(
-          `Also watch: ${snapshot.secondarySteps.map((step) => step.label).join(', ')}`,
-        );
+        lines.push(`Also watch: ${snapshot.secondarySteps.map((step) => step.label).join(', ')}`);
       }
     }
   }

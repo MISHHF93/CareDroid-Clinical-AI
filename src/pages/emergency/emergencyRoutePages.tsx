@@ -48,7 +48,6 @@ import {
 } from '../../utils/receptionQueryParams';
 import { AlarmBanner, AlarmKpi } from '../../alarm';
 
-
 export function PatientsRoute() {
   const surfaces = usePractitionerSurfaceVisibility();
   // AppShell.tsx unconditionally omits <PatientDetailPanel /> for
@@ -74,14 +73,17 @@ export function PatientsRoute() {
   const patientSearchParam = searchParams.get('patientSearch') || '';
   const query = searchParams.get('q') || patientSearchParam || '';
   const requestedPatient = useMemo(
-    () => (patientIdParam ? patients.find((patient) => patient.id === patientIdParam) || null : null),
+    () =>
+      patientIdParam ? patients.find((patient) => patient.id === patientIdParam) || null : null,
     [patientIdParam, patients],
   );
   const journeyData = journeyModule.data?.data || {};
-  const journeyStateCounts = journeyData.stateCounts || patients.reduce((counts, patient) => {
-    counts[patient.state] = (counts[patient.state] || 0) + 1;
-    return counts;
-  }, {});
+  const journeyStateCounts =
+    journeyData.stateCounts ||
+    patients.reduce((counts, patient) => {
+      counts[patient.state] = (counts[patient.state] || 0) + 1;
+      return counts;
+    }, {});
   const journeyEvents = Array.isArray(journeyData.events)
     ? journeyData.events
     : patients.flatMap((patient) => patient.timeline || []);
@@ -117,10 +119,9 @@ export function PatientsRoute() {
   useEffect(() => {
     if (!patientIdParam || !requestedPatient?.id) return;
     selectPatient(requestedPatient.id);
-    setSearchParams(
-      clearPatientRouteParam(searchParams, PATIENT_ROUTE_PARAM_KEYS.context),
-      { replace: true },
-    );
+    setSearchParams(clearPatientRouteParam(searchParams, PATIENT_ROUTE_PARAM_KEYS.context), {
+      replace: true,
+    });
   }, [patientIdParam, requestedPatient?.id, searchParams, selectPatient, setSearchParams]);
 
   const updateQuery = (value) => {
@@ -214,7 +215,8 @@ export function PatientsRoute() {
       {highRiskFilterActive ? (
         <div role="status" className="emergency-route-card emergency-route-filter-banner">
           <span className="emergency-route-filter-banner__label">
-            Showing {visiblePatients.length} high-risk patient{visiblePatients.length === 1 ? '' : 's'} only.
+            Showing {visiblePatients.length} high-risk patient
+            {visiblePatients.length === 1 ? '' : 's'} only.
           </span>
           <button
             type="button"
@@ -229,7 +231,10 @@ export function PatientsRoute() {
           </button>
         </div>
       ) : null}
-      <div className="cdl-alarm-kpi-rail emergency-route-metric-kpi-rail" aria-label="Department patient metrics">
+      <div
+        className="cdl-alarm-kpi-rail emergency-route-metric-kpi-rail"
+        aria-label="Department patient metrics"
+      >
         {/* "Total patients" used to hard-clip to "TOTAL PATIENT" in this narrow
             chip (no room even with the label-truncation fix); shortened to
             match sibling label lengths ("High risk", "Waiting") instead. */}
@@ -253,28 +258,36 @@ export function PatientsRoute() {
             moduleState={journeyModule}
             fallbackText="Patient Journey endpoint is unavailable; patient cards remain available."
           />
-        <article aria-label="Patient Journey backend status" className="emergency-route-card emergency-route-journey-card">
-          <div className="emergency-route-section-card__header">
-            <div>
-              <strong>Patient Journey Engine</strong>
-              <p className="emergency-route-section-card__lead">
-                Backend state-count and timeline-event envelope rendered through the active Patients route.
-              </p>
+          <article
+            aria-label="Patient Journey backend status"
+            className="emergency-route-card emergency-route-journey-card"
+          >
+            <div className="emergency-route-section-card__header">
+              <div>
+                <strong>Patient Journey Engine</strong>
+                <p className="emergency-route-section-card__lead">
+                  Backend state-count and timeline-event envelope rendered through the active
+                  Patients route.
+                </p>
+              </div>
+              <span className="emergency-route-journey-card__count">
+                {journeyEvents.length} events
+              </span>
             </div>
-            <span className="emergency-route-journey-card__count">{journeyEvents.length} events</span>
-          </div>
-          <div className="emergency-route-chip-row">
-            {visibleJourneyStates.length ? (
-              visibleJourneyStates.map(([state, count]) => (
-                <span key={state} className="emergency-route-state-chip">
-                  {state}: {count as any}
+            <div className="emergency-route-chip-row">
+              {visibleJourneyStates.length ? (
+                visibleJourneyStates.map(([state, count]) => (
+                  <span key={state} className="emergency-route-state-chip">
+                    {state}: {count as any}
+                  </span>
+                ))
+              ) : (
+                <span className="emergency-route-section-card__lead">
+                  No active journey state counts yet.
                 </span>
-              ))
-            ) : (
-              <span className="emergency-route-section-card__lead">No active journey state counts yet.</span>
-            )}
-          </div>
-        </article>
+              )}
+            </div>
+          </article>
         </>
       ) : null}
       <PatientGrid
@@ -308,13 +321,19 @@ export function QueueRoute() {
   const alerts = useEmergencyStore((state) => state.alerts);
   const [escalatedIds, setEscalatedIds] = useState<Set<string>>(new Set());
   const requestedQueueFilter =
-    searchParams.get('queue') || searchParams.get('filter') || searchParams.get('queueFilter') || '';
+    searchParams.get('queue') ||
+    searchParams.get('filter') ||
+    searchParams.get('queueFilter') ||
+    '';
   const effectiveQueueFilter = activeQueueFilter || requestedQueueFilter;
   const pendingReferralPatientIds = useMemo(
     () =>
       new Set(
         referrals
-          .filter((referral) => !['Closed', 'Completed', 'Declined', 'PatientDeparted'].includes(referral.status))
+          .filter(
+            (referral) =>
+              !['Closed', 'Completed', 'Declined', 'PatientDeparted'].includes(referral.status),
+          )
           .map((referral) => referral.patientId),
       ),
     [referrals],
@@ -402,7 +421,9 @@ export function QueueRoute() {
     setSearchParams(nextParams, { replace: true });
   };
 
-  const activeFilterKey = String(effectiveQueueFilter || '').trim().toLowerCase();
+  const activeFilterKey = String(effectiveQueueFilter || '')
+    .trim()
+    .toLowerCase();
   const filteredQueueRows = useMemo(() => {
     if (!activeFilterKey) return visibleQueueRows;
     const exactMatches = visibleQueueRows.filter(
@@ -506,7 +527,12 @@ export function QueueRoute() {
                 ? 'Open the longest-waiting patient and complete triage'
                 : 'Monitor arrivals and prep for next pretriage patient'
               : 'Review longest waits and plan the next handoff',
-        tone: queueMetrics.breachedQueues > 0 ? 'warning' : isTriageWorkspace && triageCount ? 'info' : 'neutral',
+        tone:
+          queueMetrics.breachedQueues > 0
+            ? 'warning'
+            : isTriageWorkspace && triageCount
+              ? 'info'
+              : 'neutral',
       }}
     >
       <OperationalModuleState
@@ -540,7 +566,11 @@ export function QueueRoute() {
           <span className="emergency-route-filter-banner__label">
             Showing the {effectiveQueueFilter} queue requested from the whiteboard.
           </span>
-          <button type="button" onClick={clearQueueFilter} className="emergency-route-filter-banner__btn">
+          <button
+            type="button"
+            onClick={clearQueueFilter}
+            className="emergency-route-filter-banner__btn"
+          >
             Clear queue filter
           </button>
         </div>
@@ -589,86 +619,97 @@ export function QueueRoute() {
             >
               <div>
                 <strong>{queue.label}</strong>
-                <div className="emergency-route-queue-row__patients" aria-label={`${queue.label} queue patients`}>
-                  {patientsInQueue.length ? (
-                    patientsInQueue.slice(0, 3).map((patient) => {
-                      const patientWait = patient.arrivalTime
-                        ? Math.round((Date.now() - new Date(patient.arrivalTime).getTime()) / 60000)
-                        : 0;
-                      const patientBreached = patientWait > target;
-                      const alreadyEscalated = escalatedIds.has(patient.id);
-                      return (
-                        <span key={patient.id} className="emergency-route-queue-row__patient emergency-route-queue-row__patient--inline">
-                          <button
-                            type="button"
-                            onClick={() => selectPatient(patient.id)}
-                            className="emergency-route-queue-row__patient-btn"
+                <div
+                  className="emergency-route-queue-row__patients"
+                  aria-label={`${queue.label} queue patients`}
+                >
+                  {patientsInQueue.length
+                    ? patientsInQueue.slice(0, 3).map((patient) => {
+                        const patientWait = patient.arrivalTime
+                          ? Math.round(
+                              (Date.now() - new Date(patient.arrivalTime).getTime()) / 60000,
+                            )
+                          : 0;
+                        const patientBreached = patientWait > target;
+                        const alreadyEscalated = escalatedIds.has(patient.id);
+                        return (
+                          <span
+                            key={patient.id}
+                            className="emergency-route-queue-row__patient emergency-route-queue-row__patient--inline"
                           >
-                            {displayPatientName(patient)}
-                          </button>
-                          <QueueReasonBadge
-                            patient={patient}
-                            referrals={referrals}
-                            staff={staff}
-                            compact
-                            showAll
-                          />
-                          {patientBreached && !alreadyEscalated && (
                             <button
                               type="button"
-                              title={`Wait: ${patientWait}m — breaches ${target}m target. Click to escalate.`}
-                              onClick={async () => {
-                                // HEAL-227: fired escalatePatient() directly on
-                                // click with zero confirmation, unlike this
-                                // same store action's other real call site
-                                // (AiChiefRouteRecommendationsPanel.tsx's
-                                // handleAccept), which requires an explicit
-                                // confirmCareDroidAction step first.
-                                const confirmed = await confirmCareDroidAction({
-                                  title: 'Escalate patient?',
-                                  message: `${displayPatientName(patient)} has breached the ${target}m wait target and will be escalated.`,
-                                  confirmLabel: 'Escalate patient',
-                                  tone: 'danger',
-                                });
-                                if (!confirmed) return;
-                                escalatePatient(patient.id, { staffId: 'charge-nurse-current', staffName: 'Charge Nurse' });
-                                setEscalatedIds((prev) => new Set([...prev, patient.id]));
-                              }}
-                              className="emergency-route-queue-row__escalate-btn"
+                              onClick={() => selectPatient(patient.id)}
+                              className="emergency-route-queue-row__patient-btn"
                             >
-                              ⚡ Escalate
+                              {displayPatientName(patient)}
                             </button>
-                          )}
-                          {alreadyEscalated && unsyncedPatientIds.has(patient.id) && (
-                            // HEAL: escalatePatient() applies to local state
-                            // immediately and syncs to the backend
-                            // fire-and-forget (DOWNTIME-001/SESSION-001
-                            // pattern) -- this row used to show the same "✓
-                            // Escalated" badge regardless of whether that sync
-                            // actually succeeded, so a failed save (confirmed
-                            // live: a 404 from a demo patient with no backend
-                            // record) looked identical to a real one. Only
-                            // PatientDetailPanel surfaced unsyncedPatientIds;
-                            // this is the same clinician-facing signal on the
-                            // page where the escalate action was actually
-                            // taken.
-                            <span
-                              className="emergency-route-queue-row__escalated-badge emergency-route-queue-row__escalated-badge--unsynced"
-                              role="status"
-                              title="Escalated locally, but not yet confirmed saved to the server. It's safe here, but reloading or switching workstations before this clears could lose it."
-                            >
-                              ⚠ Escalated (not yet saved)
-                            </span>
-                          )}
-                          {alreadyEscalated && !unsyncedPatientIds.has(patient.id) && (
-                            <span className="emergency-route-queue-row__escalated-badge">✓ Escalated</span>
-                          )}
-                        </span>
-                      );
-                    })
-                  ) : (
-                    'Queue clear'
-                  )}
+                            <QueueReasonBadge
+                              patient={patient}
+                              referrals={referrals}
+                              staff={staff}
+                              compact
+                              showAll
+                            />
+                            {patientBreached && !alreadyEscalated && (
+                              <button
+                                type="button"
+                                title={`Wait: ${patientWait}m — breaches ${target}m target. Click to escalate.`}
+                                onClick={async () => {
+                                  // HEAL-227: fired escalatePatient() directly on
+                                  // click with zero confirmation, unlike this
+                                  // same store action's other real call site
+                                  // (AiChiefRouteRecommendationsPanel.tsx's
+                                  // handleAccept), which requires an explicit
+                                  // confirmCareDroidAction step first.
+                                  const confirmed = await confirmCareDroidAction({
+                                    title: 'Escalate patient?',
+                                    message: `${displayPatientName(patient)} has breached the ${target}m wait target and will be escalated.`,
+                                    confirmLabel: 'Escalate patient',
+                                    tone: 'danger',
+                                  });
+                                  if (!confirmed) return;
+                                  escalatePatient(patient.id, {
+                                    staffId: 'charge-nurse-current',
+                                    staffName: 'Charge Nurse',
+                                  });
+                                  setEscalatedIds((prev) => new Set([...prev, patient.id]));
+                                }}
+                                className="emergency-route-queue-row__escalate-btn"
+                              >
+                                ⚡ Escalate
+                              </button>
+                            )}
+                            {alreadyEscalated && unsyncedPatientIds.has(patient.id) && (
+                              // HEAL: escalatePatient() applies to local state
+                              // immediately and syncs to the backend
+                              // fire-and-forget (DOWNTIME-001/SESSION-001
+                              // pattern) -- this row used to show the same "✓
+                              // Escalated" badge regardless of whether that sync
+                              // actually succeeded, so a failed save (confirmed
+                              // live: a 404 from a demo patient with no backend
+                              // record) looked identical to a real one. Only
+                              // PatientDetailPanel surfaced unsyncedPatientIds;
+                              // this is the same clinician-facing signal on the
+                              // page where the escalate action was actually
+                              // taken.
+                              <span
+                                className="emergency-route-queue-row__escalated-badge emergency-route-queue-row__escalated-badge--unsynced"
+                                role="status"
+                                title="Escalated locally, but not yet confirmed saved to the server. It's safe here, but reloading or switching workstations before this clears could lose it."
+                              >
+                                ⚠ Escalated (not yet saved)
+                              </span>
+                            )}
+                            {alreadyEscalated && !unsyncedPatientIds.has(patient.id) && (
+                              <span className="emergency-route-queue-row__escalated-badge">
+                                ✓ Escalated
+                              </span>
+                            )}
+                          </span>
+                        );
+                      })
+                    : 'Queue clear'}
                 </div>
                 {movementStages.length ? (
                   <small className="emergency-route-queue-row__movement">
@@ -701,7 +742,8 @@ export function ReassessmentRoute() {
   const reassessment = useReassessmentQueue();
   const { contextPatientId: patientIdParam } = readPatientRouteContext(searchParams);
   const requestedPatient = useMemo(
-    () => (patientIdParam ? patients.find((patient) => patient.id === patientIdParam) || null : null),
+    () =>
+      patientIdParam ? patients.find((patient) => patient.id === patientIdParam) || null : null,
     [patientIdParam, patients],
   );
   const duePatients = useMemo(() => {
@@ -718,7 +760,10 @@ export function ReassessmentRoute() {
     if (!requestedPatient || !duePatients.some((patient) => patient.id === requestedPatient.id)) {
       return duePatients;
     }
-    return [requestedPatient, ...duePatients.filter((patient) => patient.id !== requestedPatient.id)];
+    return [
+      requestedPatient,
+      ...duePatients.filter((patient) => patient.id !== requestedPatient.id),
+    ];
   }, [duePatients, requestedPatient]);
   const overdueCount = Math.max(
     reassessment.data?.data?.overdueCount ?? 0,
@@ -728,10 +773,9 @@ export function ReassessmentRoute() {
   useEffect(() => {
     if (!patientIdParam || !requestedPatient?.id) return;
     selectPatient(requestedPatient.id);
-    setSearchParams(
-      clearPatientRouteParam(searchParams, PATIENT_ROUTE_PARAM_KEYS.context),
-      { replace: true },
-    );
+    setSearchParams(clearPatientRouteParam(searchParams, PATIENT_ROUTE_PARAM_KEYS.context), {
+      replace: true,
+    });
   }, [patientIdParam, requestedPatient?.id, searchParams, selectPatient, setSearchParams]);
 
   return (
@@ -774,7 +818,10 @@ export function ReassessmentRoute() {
           },
         ]}
       />
-      <PatientGrid patients={prioritizedDuePatients} emptyMessage="No reassessments are due right now." />
+      <PatientGrid
+        patients={prioritizedDuePatients}
+        emptyMessage="No reassessments are due right now."
+      />
       <OperationalModuleState moduleState={reassessment} placement="footer" />
     </EmergencyRoutePage>
   );
@@ -797,7 +844,10 @@ export function CapacityRoute() {
   const capacity = capacityStatus.data?.data?.capacity || storeCapacity;
   const rooms = capacityStatus.data?.data?.rooms || storeRooms;
   const upgradeSignals = upgradeCapacity.data?.data?.signals || [];
-  const simulationSignal = findUpgradeSignal(upgradeSignals, 'real_time_simulation_adaptive_policy');
+  const simulationSignal = findUpgradeSignal(
+    upgradeSignals,
+    'real_time_simulation_adaptive_policy',
+  );
   const bragSignal = findUpgradeSignal(upgradeSignals, 'brag_forecast_10h');
   const availableRooms = rooms.filter((room) => room.status === 'Available').length;
   const blockedRooms = rooms.filter((room) => room.status === 'Blocked').length;
@@ -830,7 +880,11 @@ export function CapacityRoute() {
                 ? 'Prioritize longest boarders for disposition or transfer'
                 : 'Monitor inpatient bed availability',
           tone:
-            longestBoardingMinutes > 240 ? 'critical' : longestBoardingMinutes > 120 ? 'warning' : 'neutral',
+            longestBoardingMinutes > 240
+              ? 'critical'
+              : longestBoardingMinutes > 120
+                ? 'warning'
+                : 'neutral',
         }
       : {
           status: `Capacity band ${capacity.band ?? 'unknown'} · ${availableRooms} rooms available`,
@@ -939,13 +993,17 @@ export function CapacityRoute() {
           {capacityStatus.data?.data?.recommendations?.length ? (
             <div className="emergency-route-stack">
               {capacityStatus.data.data.recommendations.map((recommendation) => (
-                <div key={recommendation} className="emergency-route-card emergency-route-recommendation">
+                <div
+                  key={recommendation}
+                  className="emergency-route-card emergency-route-recommendation"
+                >
                   {recommendation}
                 </div>
               ))}
             </div>
           ) : null}
-          {surfaces.emergencyRoutes.showCapacityUpgradeHarness && (simulationSignal || bragSignal) ? (
+          {surfaces.emergencyRoutes.showCapacityUpgradeHarness &&
+          (simulationSignal || bragSignal) ? (
             <div className="emergency-route-signal-grid">
               {simulationSignal ? (
                 <article className="emergency-route-card emergency-route-signal-row">
@@ -1066,8 +1124,9 @@ export function CopilotRoute() {
       <AiChiefRouteRecommendationsPanel />
 
       <p className="emergency-route-card emergency-route-copilot-hint">
-        Open the docked {EMERGENCY_OS_BRANDING.copilotName} panel to ask who needs attention, capacity
-        pressure, EMS status, or reassessment priorities. {EMERGENCY_OS_BRANDING.safetyLine}
+        Open the docked {EMERGENCY_OS_BRANDING.copilotName} panel to ask who needs attention,
+        capacity pressure, EMS status, or reassessment priorities.{' '}
+        {EMERGENCY_OS_BRANDING.safetyLine}
       </p>
       {showUpgradeSignals && (cdssSignal || telephoneSignal || federatedSignal || auditSignal) ? (
         <div className="emergency-route-signal-grid">
@@ -1090,7 +1149,9 @@ export function CopilotRoute() {
             auditSignal && {
               title: 'Immutable audit summary',
               body: `${auditSignal.data.ledgerEntries?.length || 0} linked pilot ledger entries.`,
-              meta: String(auditSignal.data.latestHash || auditSignal.audit.immutableLedgerHash).slice(0, 12),
+              meta: String(
+                auditSignal.data.latestHash || auditSignal.audit.immutableLedgerHash,
+              ).slice(0, 12),
             },
           ]
             .filter(Boolean)

@@ -311,8 +311,8 @@ export const BACKEND_API_CAPABILITIES = Object.freeze(
     Object.entries(BACKEND_API_CAPABILITY_STATUS).map(([capability, status]) => [
       capability,
       status !== BACKEND_CAPABILITY_STATUS.DISABLED,
-    ])
-  )
+    ]),
+  ),
 );
 
 /**

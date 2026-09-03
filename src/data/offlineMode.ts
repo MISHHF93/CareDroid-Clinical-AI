@@ -118,10 +118,11 @@ export function summarizeOfflineCatalogs(catalogs = [] as any[], now = Date.now(
     totalItems: entries.reduce((sum, entry) => sum + entry.count, 0),
     staleCount: entries.filter((entry) => entry.stale).length,
     readyCount: entries.filter((entry) => entry.count > 0).length,
-    lastCachedAt: entries
-      .map((entry) => entry.cachedAt)
-      .filter(Boolean)
-      .sort()
-      .at(-1) || null,
+    lastCachedAt:
+      entries
+        .map((entry) => entry.cachedAt)
+        .filter(Boolean)
+        .sort()
+        .at(-1) || null,
   };
 }

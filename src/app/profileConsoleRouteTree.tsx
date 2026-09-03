@@ -13,7 +13,9 @@ const ProfileSettingsPage = lazyRoute(() => import('../pages/ProfileSettings'));
 const ProfileActivityPage = lazyRoute(() => import('../pages/profile/ProfileActivity'));
 const ProfilePreferencesPage = lazyRoute(() => import('../pages/profile/ProfilePreferences'));
 const ProfileSecurityPage = lazyRoute(() => import('../pages/profile/ProfileSecurity'));
-const ProfileToolPreferencesPage = lazyRoute(() => import('../pages/profile/ProfileToolPreferences'));
+const ProfileToolPreferencesPage = lazyRoute(
+  () => import('../pages/profile/ProfileToolPreferences'),
+);
 const ProfileWorkspacesPage = lazyRoute(() => import('../pages/profile/ProfileWorkspaces'));
 const BillingPage = lazyRoute(() => import('../pages/BillingPage'));
 const UsagePage = lazyRoute(() => import('../pages/UsagePage'));

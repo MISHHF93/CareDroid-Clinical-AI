@@ -50,9 +50,9 @@ describe('administrativeAutomationAiUtils', () => {
         }),
       ),
     ).toBe(false);
-    expect(
-      taskNeedsAiEnrichment(makeTask({ category: 'patient_routing', patientId: 'p-1' })),
-    ).toBe(true);
+    expect(taskNeedsAiEnrichment(makeTask({ category: 'patient_routing', patientId: 'p-1' }))).toBe(
+      true,
+    );
     expect(
       taskNeedsAiEnrichment(
         makeTask({

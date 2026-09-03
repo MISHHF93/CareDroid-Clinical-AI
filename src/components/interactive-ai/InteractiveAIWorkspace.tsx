@@ -145,17 +145,20 @@ export function InteractiveAIWorkspace({
   const abortRef = useRef<AbortController | null>(null);
   const liveRegionRef = useRef<HTMLDivElement | null>(null);
 
-  const heading = title || (channel === 'reception' ? 'Reception Copilot' : channel === 'ems' ? 'EMS Assist' : 'CareDroid Assist');
+  const heading =
+    title ||
+    (channel === 'reception'
+      ? 'Reception Copilot'
+      : channel === 'ems'
+        ? 'EMS Assist'
+        : 'CareDroid Assist');
   const isNavProposal = proposal ? isNavigationProposalTool(proposal.toolName) : false;
 
   const refreshCards = useCallback(() => {
     setCards(listWorkflowAiCards({ channel, patientId }));
   }, [channel, patientId]);
 
-  const seedKey = useMemo(
-    () => seedTriggers.map((t) => t.kind).join('|'),
-    [seedTriggers],
-  );
+  const seedKey = useMemo(() => seedTriggers.map((t) => t.kind).join('|'), [seedTriggers]);
 
   useEffect(() => {
     for (const trigger of seedTriggers) {
@@ -289,12 +292,27 @@ export function InteractiveAIWorkspace({
           setProgress(result.progress[result.progress.length - 1]);
         }
         setInboxTick((n) => n + 1);
-        announce(isTerminalStreamState(result.finalState) ? streamStateLabel(result.finalState) : 'Updated');
+        announce(
+          isTerminalStreamState(result.finalState)
+            ? streamStateLabel(result.finalState)
+            : 'Updated',
+        );
       } finally {
         setLoading(false);
       }
     },
-    [announce, channel, loading, organizationId, pageId, patientId, permissions, purpose, role, userId],
+    [
+      announce,
+      channel,
+      loading,
+      organizationId,
+      pageId,
+      patientId,
+      permissions,
+      purpose,
+      role,
+      userId,
+    ],
   );
 
   // Typed palette commands (IX14): only registry ids arrive here — the id is
@@ -343,7 +361,11 @@ export function InteractiveAIWorkspace({
     try {
       // Navigation proposals may execute from proposed when requiresApproval is false.
       let current = proposal;
-      if (current.requiresApproval || current.state === 'proposed' || current.state === 'reviewing') {
+      if (
+        current.requiresApproval ||
+        current.state === 'proposed' ||
+        current.state === 'reviewing'
+      ) {
         if (current.state === 'proposed' || current.state === 'reviewing') {
           current = await approveProposalApi(current.proposalId);
         }
@@ -359,7 +381,9 @@ export function InteractiveAIWorkspace({
           currentPath: location.pathname + location.search,
         });
         const opened =
-          typeof navResult.opened === 'string' ? navResult.opened : current.previewSummary || current.toolName;
+          typeof navResult.opened === 'string'
+            ? navResult.opened
+            : current.previewSummary || current.toolName;
         announce(`Opened ${opened}`);
         result = navResult;
       } else {
@@ -420,7 +444,11 @@ export function InteractiveAIWorkspace({
 
   const contextChips = useMemo(() => {
     const chips: Array<{ id: string; label: string; kind: string }> = [];
-    chips.push({ id: 'channel', label: `Channel: ${humanizeContextToken(channel)}`, kind: 'scope' });
+    chips.push({
+      id: 'channel',
+      label: `Channel: ${humanizeContextToken(channel)}`,
+      kind: 'scope',
+    });
     chips.push({ id: 'role', label: `Role: ${humanizeContextToken(role)}`, kind: 'scope' });
     if (patientId) chips.push({ id: 'patient', label: `Patient: ${patientId}`, kind: 'patient' });
     return chips;
@@ -449,7 +477,9 @@ export function InteractiveAIWorkspace({
           </button>
           <div
             className="cd-iaw__realtime"
-            data-live={realtime && !realtime.isStale && realtime.status === 'connected' ? 'true' : 'false'}
+            data-live={
+              realtime && !realtime.isStale && realtime.status === 'connected' ? 'true' : 'false'
+            }
             data-testid="interactive-realtime-status"
           >
             {realtime
@@ -469,7 +499,11 @@ export function InteractiveAIWorkspace({
           ownerRole={role}
           channel={channel}
           onOpenItem={async (item) => {
-            if (item.kind === 'proposal' || item.kind === 'failed_action' || item.kind === 'draft') {
+            if (
+              item.kind === 'proposal' ||
+              item.kind === 'failed_action' ||
+              item.kind === 'draft'
+            ) {
               const p = await getActionProposalApi(item.sourceId);
               if (p) setProposal(p);
             }
@@ -479,7 +513,11 @@ export function InteractiveAIWorkspace({
         />
       ) : null}
 
-      <div className="cd-iaw__context-bar" data-testid="interactive-context-bar" aria-label="Attached context">
+      <div
+        className="cd-iaw__context-bar"
+        data-testid="interactive-context-bar"
+        aria-label="Attached context"
+      >
         {contextChips.map((chip) => (
           <span key={chip.id} className="cd-iaw__chip">
             {chip.label}
@@ -512,9 +550,7 @@ export function InteractiveAIWorkspace({
             data-testid="workflow-ai-card"
           >
             <h3 className="cd-iaw-card__title">{card.title}</h3>
-            <p className="cd-iaw-card__preview">
-              {card.summary}
-            </p>
+            <p className="cd-iaw-card__preview">{card.summary}</p>
             <div className="cd-iaw-card__meta">
               <span>{humanizeContextToken(card.urgency)}</span>
               <span>{new Date(card.timestamp).toLocaleTimeString()}</span>
@@ -522,11 +558,7 @@ export function InteractiveAIWorkspace({
             </div>
             <div className="cd-iaw-card__actions">
               {card.recommendedActions.map((action) => (
-                <button
-                  key={action.id}
-                  type="button"
-                  onClick={() => runQuery(action.label)}
-                >
+                <button key={action.id} type="button" onClick={() => runQuery(action.label)}>
                   {action.label}
                   {action.requiresApproval ? ' (review)' : ''}
                 </button>
@@ -571,7 +603,9 @@ export function InteractiveAIWorkspace({
           </div>
         ) : null}
 
-        {accountable ? <AccountableRecommendationCard recommendation={accountable} compact /> : null}
+        {accountable ? (
+          <AccountableRecommendationCard recommendation={accountable} compact />
+        ) : null}
 
         {proposal ? (
           <article className="cd-iaw-proposal" data-testid="action-proposal-card">
@@ -590,7 +624,9 @@ export function InteractiveAIWorkspace({
               ))}
             </ul>
             <div className="cd-iaw-proposal__actions">
-              {(proposal.state === 'proposed' || proposal.state === 'reviewing' || proposal.state === 'approved') && (
+              {(proposal.state === 'proposed' ||
+                proposal.state === 'reviewing' ||
+                proposal.state === 'approved') && (
                 <>
                   <button
                     type="button"

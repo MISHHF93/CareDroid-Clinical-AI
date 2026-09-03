@@ -95,13 +95,27 @@ const RECOMMENDATION_RULES = Object.freeze([
   {
     id: 'atrial-fibrillation',
     label: 'Atrial fibrillation stroke and bleeding risk',
-    keywords: ['atrial fibrillation', 'afib', 'af', 'anticoagulation', 'stroke risk', 'bleeding risk'],
+    keywords: [
+      'atrial fibrillation',
+      'afib',
+      'af',
+      'anticoagulation',
+      'stroke risk',
+      'bleeding risk',
+    ],
     toolIds: ['calc-chads2vasc', 'has-bled'],
   },
   {
     id: 'falls-skin-inpatient',
     label: 'Inpatient nursing risk screens',
-    keywords: ['fall', 'falls', 'pressure injury', 'pressure ulcer', 'skin breakdown', 'immobility'],
+    keywords: [
+      'fall',
+      'falls',
+      'pressure injury',
+      'pressure ulcer',
+      'skin breakdown',
+      'immobility',
+    ],
     toolIds: ['morse-fall-scale', 'braden-scale'],
   },
 ]);
@@ -136,7 +150,11 @@ function unique(values) {
 }
 
 function buildInputText({ symptoms = '', chiefComplaint = '', clinicalKeywords = '' }: any = {}) {
-  return [normalizeInput(chiefComplaint), normalizeInput(symptoms), normalizeInput(clinicalKeywords)]
+  return [
+    normalizeInput(chiefComplaint),
+    normalizeInput(symptoms),
+    normalizeInput(clinicalKeywords),
+  ]
     .join(' ')
     .replace(/\s+/g, ' ')
     .trim()

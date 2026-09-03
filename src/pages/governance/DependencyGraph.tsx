@@ -52,7 +52,10 @@ export default function DependencyGraph() {
     };
   }, [fallback]);
 
-  const issueChart = useMemo(() => buildAssetGraphIssueChart(graph.issueCounts), [graph.issueCounts]);
+  const issueChart = useMemo(
+    () => buildAssetGraphIssueChart(graph.issueCounts),
+    [graph.issueCounts],
+  );
   const productChart = useMemo(() => buildAssetGraphProductChart(graph.chains), [graph.chains]);
 
   return (
@@ -61,8 +64,12 @@ export default function DependencyGraph() {
         <div className="dependency-graph-page__title-row">
           <GraphicIconBadge iconKey="chart-bar" accent="brand" size="md" />
           <div>
-            <p className="dependency-graph-page__title-text" data-testid="cd-page-title-text">Asset Dependency Graph</p>
-            <p>Product, asset pack, governed asset, route, backend service, and integration chains.</p>
+            <p className="dependency-graph-page__title-text" data-testid="cd-page-title-text">
+              Asset Dependency Graph
+            </p>
+            <p>
+              Product, asset pack, governed asset, route, backend service, and integration chains.
+            </p>
           </div>
         </div>
         <div className="dependency-graph-page__actions">
@@ -83,10 +90,29 @@ export default function DependencyGraph() {
         details="Loads product catalog dependency graph from API with rollout-registry fallback when backend is unavailable."
       />
 
-      <div className="dependency-graph-page__metrics" role="group" aria-label="Asset dependency summary metrics">
-        <MetricCard label="Products" value={String(graph.summary.products)} hint="Capability platforms" tone="neutral" />
-        <MetricCard label="Asset packs" value={String(graph.summary.assetPacks)} hint="Rollout bundles" tone="neutral" />
-        <MetricCard label="Assets" value={String(graph.summary.assets)} hint="Linked inventory assets" tone="neutral" />
+      <div
+        className="dependency-graph-page__metrics"
+        role="group"
+        aria-label="Asset dependency summary metrics"
+      >
+        <MetricCard
+          label="Products"
+          value={String(graph.summary.products)}
+          hint="Capability platforms"
+          tone="neutral"
+        />
+        <MetricCard
+          label="Asset packs"
+          value={String(graph.summary.assetPacks)}
+          hint="Rollout bundles"
+          tone="neutral"
+        />
+        <MetricCard
+          label="Assets"
+          value={String(graph.summary.assets)}
+          hint="Linked inventory assets"
+          tone="neutral"
+        />
         <MetricCard
           label="Issues"
           value={String(graph.issues.length)}
@@ -96,7 +122,11 @@ export default function DependencyGraph() {
       </div>
 
       <div className="dependency-graph-page__charts">
-        <VisualizationPanel title="Product chains" description="Assets grouped by capability platform product." badge="Products">
+        <VisualizationPanel
+          title="Product chains"
+          description="Assets grouped by capability platform product."
+          badge="Products"
+        >
           <CategoryBarChart
             data={productChart}
             title="Product chains"
@@ -104,7 +134,11 @@ export default function DependencyGraph() {
             emptyMessage="Product chart appears when dependency chains are loaded."
           />
         </VisualizationPanel>
-        <VisualizationPanel title="Issue mix" description="Missing, duplicate, and orphan asset dependency signals." badge="Issues">
+        <VisualizationPanel
+          title="Issue mix"
+          description="Missing, duplicate, and orphan asset dependency signals."
+          badge="Issues"
+        >
           <CategoryBarChart
             data={issueChart.filter((row) => row.value > 0)}
             title="Issue mix"
@@ -117,7 +151,11 @@ export default function DependencyGraph() {
       <section className="dependency-graph-page__panel" aria-label="Dependency chains">
         <h2>Dependency chains</h2>
         <p>Product → pack → asset wiring with routes, backend services, and integrations.</p>
-        <div className="dependency-graph-page__table" role="table" aria-label="Dependency chains table">
+        <div
+          className="dependency-graph-page__table"
+          role="table"
+          aria-label="Dependency chains table"
+        >
           <div className="dependency-graph-page__table-head" role="row">
             <span role="columnheader">Product</span>
             <span role="columnheader">Pack</span>
@@ -143,7 +181,9 @@ export default function DependencyGraph() {
           <div className="dependency-graph-page__issues">
             {graph.issues.slice(0, 10).map((issue) => (
               <article key={issue.id} className="dependency-graph-page__issue">
-                <span className={`dependency-graph-page__pill dependency-graph-page__pill--${dependencyIssueTone(issue.severity)}`}>
+                <span
+                  className={`dependency-graph-page__pill dependency-graph-page__pill--${dependencyIssueTone(issue.severity)}`}
+                >
                   {issue.type.replace(/-/g, ' ')}
                 </span>
                 <strong>{issue.title}</strong>

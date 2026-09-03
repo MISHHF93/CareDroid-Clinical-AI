@@ -27,8 +27,16 @@ const EXPERIENCE_OVERRIDES = Object.freeze({
     recommendationsSubtitle:
       'Recommendations emphasize throughput, capacity, coordination, cognitive load, human review, and bottleneck reduction.',
     assistantTitle: 'CareDroid Copilot',
-    assistantPlaceholder: 'Ask about ED flow, EMS handoff, triage, bed pressure, referrals, discharge, equipment, surge, or bottlenecks...',
-    primaryActionIds: ['assistant', 'active-alerts', 'hospital-map', 'workflows', 'tools', 'calculators'],
+    assistantPlaceholder:
+      'Ask about ED flow, EMS handoff, triage, bed pressure, referrals, discharge, equipment, surge, or bottlenecks...',
+    primaryActionIds: [
+      'assistant',
+      'active-alerts',
+      'hospital-map',
+      'workflows',
+      'tools',
+      'calculators',
+    ],
     quickPrompts: [
       'Summarize current ED bottlenecks across waiting room, EMS arrivals, beds, referrals, equipment, and staffing.',
       'Build a flow-aware triage risk profile from vitals, chief complaint, arrival mode, age, and risk factors.',
@@ -65,7 +73,8 @@ const EXPERIENCE_OVERRIDES = Object.freeze({
     recommendationsSubtitle:
       'Recommendations now emphasize telemetry quality, offline devices, maintenance readiness, and safety limits.',
     assistantTitle: 'Medical IoT Assistant',
-    assistantPlaceholder: 'Ask about offline devices, telemetry freshness, battery risk, or maintenance priorities...',
+    assistantPlaceholder:
+      'Ask about offline devices, telemetry freshness, battery risk, or maintenance priorities...',
     primaryActionIds: ['medical-iot', 'devices', 'hospital-map', 'live-map', 'operations', 'tools'],
     quickPrompts: [
       'Which devices need attention based on stale telemetry?',
@@ -90,7 +99,8 @@ const EXPERIENCE_OVERRIDES = Object.freeze({
     toolsTitle: 'ICU Tool Console',
     recommendationsTitle: 'ICU Recommendations',
     assistantTitle: 'ICU Assistant',
-    assistantPlaceholder: 'Ask about SOFA trends, oxygenation, ventilation, telemetry, or escalation...',
+    assistantPlaceholder:
+      'Ask about SOFA trends, oxygenation, ventilation, telemetry, or escalation...',
     primaryActionIds: ['assistant', 'calculators', 'medical-iot', 'tools'],
     quickPrompts: [
       'Summarize critical-care deterioration risk.',
@@ -105,7 +115,8 @@ const EXPERIENCE_OVERRIDES = Object.freeze({
     toolsTitle: 'Cardiology Tool Console',
     recommendationsTitle: 'Cardiology Recommendations',
     assistantTitle: 'Cardiology Assistant',
-    assistantPlaceholder: 'Ask about chest pain, ACS, ECG, arrhythmia, troponin, or cardiac risk...',
+    assistantPlaceholder:
+      'Ask about chest pain, ACS, ECG, arrhythmia, troponin, or cardiac risk...',
     primaryActionIds: ['assistant', 'calculators', 'tools'],
     quickPrompts: [
       'Help me reason through chest pain and ACS risk.',
@@ -122,8 +133,16 @@ const EXPERIENCE_OVERRIDES = Object.freeze({
     toolsTitle: 'Operations Tool Console',
     recommendationsTitle: 'Operations Recommendations',
     assistantTitle: 'Operations Assistant',
-    assistantPlaceholder: 'Ask about capacity, devices, alerts, maps, staffing, or operational constraints...',
-    primaryActionIds: ['operations', 'hospital-map', 'live-map', 'devices', 'digital-twin', 'system-status'],
+    assistantPlaceholder:
+      'Ask about capacity, devices, alerts, maps, staffing, or operational constraints...',
+    primaryActionIds: [
+      'operations',
+      'hospital-map',
+      'live-map',
+      'devices',
+      'digital-twin',
+      'system-status',
+    ],
     quickPrompts: [
       'Summarize operational bottlenecks right now.',
       'Which alerts or device issues should be handled first?',
@@ -148,7 +167,8 @@ const EXPERIENCE_OVERRIDES = Object.freeze({
     recommendationsSubtitle:
       'Recommendations now emphasize dispatch, route sequencing, vehicle readiness, and maintenance risk.',
     assistantTitle: 'Fleet Assistant',
-    assistantPlaceholder: 'Ask about ETAs, route risk, vehicles, dispatch support, or maintenance...',
+    assistantPlaceholder:
+      'Ask about ETAs, route risk, vehicles, dispatch support, or maintenance...',
     primaryActionIds: ['fleet', 'live-map', 'operations', 'digital-twin', 'tools'],
     quickPrompts: [
       'Summarize route risk and transport readiness.',
@@ -173,7 +193,8 @@ const EXPERIENCE_OVERRIDES = Object.freeze({
     toolsTitle: 'Laboratory Tool Console',
     recommendationsTitle: 'Laboratory Recommendations',
     assistantTitle: 'Laboratory Assistant',
-    assistantPlaceholder: 'Ask about abnormal labs, critical values, specimen flow, or interpretation...',
+    assistantPlaceholder:
+      'Ask about abnormal labs, critical values, specimen flow, or interpretation...',
     primaryActionIds: ['laboratory', 'assistant', 'tools', 'calculators'],
     quickPrompts: [
       'Interpret these abnormal lab results and flag critical values.',
@@ -188,7 +209,8 @@ const EXPERIENCE_OVERRIDES = Object.freeze({
     toolsTitle: 'Pharmacy Tool Console',
     recommendationsTitle: 'Pharmacy Recommendations',
     assistantTitle: 'Pharmacy Assistant',
-    assistantPlaceholder: 'Ask about drug interactions, dosing, renal adjustment, antibiotics, or medication safety...',
+    assistantPlaceholder:
+      'Ask about drug interactions, dosing, renal adjustment, antibiotics, or medication safety...',
     primaryActionIds: ['assistant', 'tools', 'calculators'],
     quickPrompts: [
       'Check medication safety and interaction risk.',
@@ -203,7 +225,8 @@ const EXPERIENCE_OVERRIDES = Object.freeze({
     toolsTitle: 'Simulation Tool Console',
     recommendationsTitle: 'Simulation Recommendations',
     assistantTitle: 'Simulation Coach',
-    assistantPlaceholder: 'Ask for practice scenarios, debriefs, competency gaps, or learner feedback...',
+    assistantPlaceholder:
+      'Ask for practice scenarios, debriefs, competency gaps, or learner feedback...',
     primaryActionIds: ['simulation', 'simulation-outcomes', 'assistant', 'tools'],
     quickPrompts: [
       'Recommend a simulation scenario for this learner.',
@@ -218,7 +241,8 @@ const EXPERIENCE_OVERRIDES = Object.freeze({
     toolsTitle: 'Education Tool Console',
     recommendationsTitle: 'Education Recommendations',
     assistantTitle: 'Education Coach',
-    assistantPlaceholder: 'Ask for teaching plans, practice patients, debriefs, or competency goals...',
+    assistantPlaceholder:
+      'Ask for teaching plans, practice patients, debriefs, or competency goals...',
     primaryActionIds: ['simulation', 'simulation-outcomes', 'assistant', 'tools'],
     quickPrompts: [
       'Create a learning plan for this topic.',
@@ -233,7 +257,8 @@ const EXPERIENCE_OVERRIDES = Object.freeze({
     toolsTitle: 'Governance Tool Console',
     recommendationsTitle: 'Governance Recommendations',
     assistantTitle: 'Governance Assistant',
-    assistantPlaceholder: 'Ask about audit posture, safety review, policy, configuration, or unsupported capabilities...',
+    assistantPlaceholder:
+      'Ask about audit posture, safety review, policy, configuration, or unsupported capabilities...',
     primaryActionIds: ['system-status', 'settings', 'tools', 'assistant'],
     quickPrompts: [
       'Summarize governance and audit readiness.',
@@ -248,7 +273,8 @@ const EXPERIENCE_OVERRIDES = Object.freeze({
     toolsTitle: 'Administration Tool Console',
     recommendationsTitle: 'Administration Recommendations',
     assistantTitle: 'Administration Assistant',
-    assistantPlaceholder: 'Ask about workspace setup, roles, entitlements, backend readiness, or tenant operations...',
+    assistantPlaceholder:
+      'Ask about workspace setup, roles, entitlements, backend readiness, or tenant operations...',
     primaryActionIds: ['settings', 'system-status', 'tools', 'assistant'],
     quickPrompts: [
       'Summarize workspace and tenant setup gaps.',
@@ -312,7 +338,9 @@ export function normalizeWorkspaceShortcut(shortcut) {
   if (!shortcut) return null;
   if (typeof shortcut === 'string') return WORKSPACE_ROUTE_SHORTCUTS[shortcut] || null;
   if (shortcut.path && shortcut.label) return shortcut;
-  return WORKSPACE_ROUTE_SHORTCUTS[shortcut.id] || WORKSPACE_ROUTE_SHORTCUTS[shortcut.routeId] || null;
+  return (
+    WORKSPACE_ROUTE_SHORTCUTS[shortcut.id] || WORKSPACE_ROUTE_SHORTCUTS[shortcut.routeId] || null
+  );
 }
 
 export function getWorkspaceExperienceProfile(workspaceLike: any = null) {
@@ -323,7 +351,8 @@ export function getWorkspaceExperienceProfile(workspaceLike: any = null) {
     : {
         id: requestedId,
         label: workspaceLike?.name || workspaceLike?.label || 'CareDroid',
-        shortLabel: workspaceLike?.shortLabel || workspaceLike?.name || workspaceLike?.label || 'CareDroid',
+        shortLabel:
+          workspaceLike?.shortLabel || workspaceLike?.name || workspaceLike?.label || 'CareDroid',
         description: DEFAULT_EXPERIENCE.dashboardSubtitle,
         aiContext: workspaceLike?.assistantContext || DEFAULT_EXPERIENCE.modeSummary,
         toolIds: workspaceLike?.toolIds || [],
@@ -345,10 +374,14 @@ export function getWorkspaceExperienceProfile(workspaceLike: any = null) {
     toolIds: workspaceLike?.toolIds?.length ? workspaceLike.toolIds : workspace.toolIds,
     focusMetrics: override.focusMetrics || DEFAULT_EXPERIENCE.focusMetrics,
     operatingBrief: override.operatingBrief || DEFAULT_EXPERIENCE.operatingBrief,
-    dashboardSubtitle: override.dashboardSubtitle || workspace.description || DEFAULT_EXPERIENCE.dashboardSubtitle,
-    toolsSubtitle: override.toolsSubtitle || workspace.description || DEFAULT_EXPERIENCE.toolsSubtitle,
+    dashboardSubtitle:
+      override.dashboardSubtitle || workspace.description || DEFAULT_EXPERIENCE.dashboardSubtitle,
+    toolsSubtitle:
+      override.toolsSubtitle || workspace.description || DEFAULT_EXPERIENCE.toolsSubtitle,
     recommendationsSubtitle:
-      override.recommendationsSubtitle || workspace.description || DEFAULT_EXPERIENCE.recommendationsSubtitle,
+      override.recommendationsSubtitle ||
+      workspace.description ||
+      DEFAULT_EXPERIENCE.recommendationsSubtitle,
     assistantContext: workspaceLike?.assistantContext || workspace.aiContext,
   };
 }

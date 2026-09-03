@@ -35,7 +35,11 @@ vi.mock('../../services/interactiveAi/actionProposalApi', () => ({
   }),
   getActionProposalApi: vi.fn(async (proposalId: string) => store.get(proposalId) ?? null),
   approveProposalApi: vi.fn(async (proposalId: string) => {
-    const next = { ...store.get(proposalId), state: 'approved', updatedAt: new Date().toISOString() };
+    const next = {
+      ...store.get(proposalId),
+      state: 'approved',
+      updatedAt: new Date().toISOString(),
+    };
     store.set(proposalId, next);
     return next;
   }),
@@ -60,7 +64,11 @@ vi.mock('../../services/interactiveAi/actionProposalApi', () => ({
     return next;
   }),
   rollbackProposalApi: vi.fn(async (proposalId: string) => {
-    const next = { ...store.get(proposalId), state: 'rolled_back', updatedAt: new Date().toISOString() };
+    const next = {
+      ...store.get(proposalId),
+      state: 'rolled_back',
+      updatedAt: new Date().toISOString(),
+    };
     store.set(proposalId, next);
     return next;
   }),

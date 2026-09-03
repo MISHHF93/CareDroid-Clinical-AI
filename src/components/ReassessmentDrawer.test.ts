@@ -19,7 +19,12 @@ function minutesAgo(minutes: number): string {
   return new Date(NOW - minutes * 60000).toISOString();
 }
 
-function makePatient(id: string, flags: unknown[], arrivalMinutesAgo: number, overrides: Partial<Patient> = {}): Patient {
+function makePatient(
+  id: string,
+  flags: unknown[],
+  arrivalMinutesAgo: number,
+  overrides: Partial<Patient> = {},
+): Patient {
   return {
     id,
     mrn: `ED-${id}`,
@@ -49,7 +54,10 @@ describe('ReassessmentDrawer helpers', () => {
       makePatient('object', [{ type: PatientFlag.SepsisAlert, detectedAt: minutesAgo(5) }], 20),
     ];
 
-    expect(filterFlaggedReassessmentPatients(patients).map((patient) => patient.id)).toEqual(['due', 'object']);
+    expect(filterFlaggedReassessmentPatients(patients).map((patient) => patient.id)).toEqual([
+      'due',
+      'object',
+    ]);
   });
 
   it('selects the most severe flag and sorts by configured severity then longest wait', () => {
@@ -62,13 +70,9 @@ describe('ReassessmentDrawer helpers', () => {
     ];
 
     expect(getMostSevereReassessmentFlag(patients[4])).toBe(PatientFlag.DeteriorationRisk);
-    expect(sortFlaggedReassessmentPatients(patients, 'severity', NOW).map((patient) => patient.id)).toEqual([
-      'deterioration',
-      'sepsis',
-      'high-risk',
-      'due-long',
-      'due-short',
-    ]);
+    expect(
+      sortFlaggedReassessmentPatients(patients, 'severity', NOW).map((patient) => patient.id),
+    ).toEqual(['deterioration', 'sepsis', 'high-risk', 'due-long', 'due-short']);
   });
 
   it('sorts by wait time when requested', () => {
@@ -78,11 +82,9 @@ describe('ReassessmentDrawer helpers', () => {
       makePatient('deterioration', [PatientFlag.DeteriorationRisk], 20),
     ];
 
-    expect(sortFlaggedReassessmentPatients(patients, 'wait', NOW).map((patient) => patient.id)).toEqual([
-      'due',
-      'sepsis',
-      'deterioration',
-    ]);
+    expect(
+      sortFlaggedReassessmentPatients(patients, 'wait', NOW).map((patient) => patient.id),
+    ).toEqual(['due', 'sepsis', 'deterioration']);
   });
 
   it('reports exact flag time when available and falls back to note or arrival timestamps', () => {
@@ -100,7 +102,14 @@ describe('ReassessmentDrawer helpers', () => {
       ],
     });
     const noteFallback = makePatient('note', [PatientFlag.HighRisk], 80, {
-      notes: [{ id: 'note-1', type: 'Clinical', text: 'Reassessment concern persists', timestamp: noteTimestamp }],
+      notes: [
+        {
+          id: 'note-1',
+          type: 'Clinical',
+          text: 'Reassessment concern persists',
+          timestamp: noteTimestamp,
+        },
+      ],
     });
     const arrivalFallback = makePatient('arrival', [PatientFlag.ReassessmentDue], 70);
 

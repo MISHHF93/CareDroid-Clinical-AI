@@ -125,9 +125,7 @@ export function metricColorForTone(tone: string | undefined): string | undefined
 }
 
 /** Maps SaaS/platform health check statuses to semantic roles. */
-export function healthCheckStatusToSemanticRole(
-  status: string | undefined,
-): SemanticColorRole {
+export function healthCheckStatusToSemanticRole(status: string | undefined): SemanticColorRole {
   const normalized = String(status || '').toLowerCase();
   if (normalized === 'healthy' || normalized === 'ok') return 'healthy';
   if (normalized === 'critical' || normalized === 'failed' || normalized === 'error') {

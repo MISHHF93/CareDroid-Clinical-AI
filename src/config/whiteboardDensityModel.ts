@@ -203,16 +203,13 @@ export function evaluateWhiteboardDensity(context: any = {}) {
   const departmentScreen = wallKioskDisplay && !publicWaitingDisplay;
   const preferOperationalStrips = Boolean(densityProfile?.whiteboard?.preferOperationalStrips);
   const profileMaxCards = densityProfile?.whiteboard?.maxVisibleCards;
-  const suppressMissionControl =
-    densityProfile && !densityProfile.whiteboard.showMissionControl;
+  const suppressMissionControl = densityProfile && !densityProfile.whiteboard.showMissionControl;
   const suppressQueueIntelligence =
     densityProfile && !densityProfile.whiteboard.showQueueIntelligence;
-  const suppressSecondaryStats =
-    densityProfile && !densityProfile.whiteboard.showSecondaryStats;
+  const suppressSecondaryStats = densityProfile && !densityProfile.whiteboard.showSecondaryStats;
   const suppressWaitingRoomSafety =
     densityProfile && !densityProfile.whiteboard.showWaitingRoomSafety;
-  const suppressAttentionStrips =
-    densityProfile && !densityProfile.whiteboard.showAttentionStrips;
+  const suppressAttentionStrips = densityProfile && !densityProfile.whiteboard.showAttentionStrips;
 
   const surfaces = Object.freeze({
     heroTitle: Object.freeze({
@@ -253,10 +250,7 @@ export function evaluateWhiteboardDensity(context: any = {}) {
       tier: WHITEBOARD_DENSITY_TIER.ALWAYS_VISIBLE,
     }),
     secondaryStats: Object.freeze({
-      visible:
-        !wallKioskDisplay &&
-        !prioritizeAwareness &&
-        !suppressSecondaryStats,
+      visible: !wallKioskDisplay && !prioritizeAwareness && !suppressSecondaryStats,
       tier: WHITEBOARD_DENSITY_TIER.PROGRESSIVE,
     }),
     commandLayer: Object.freeze({
@@ -350,13 +344,14 @@ export function evaluateWhiteboardDensity(context: any = {}) {
       signalCount: opsDetailCount,
       tier: WHITEBOARD_DENSITY_TIER.PROGRESSIVE,
     }),
-    filters: Object.freeze({ visible: !wallKioskDisplay, tier: WHITEBOARD_DENSITY_TIER.ALWAYS_VISIBLE }),
+    filters: Object.freeze({
+      visible: !wallKioskDisplay,
+      tier: WHITEBOARD_DENSITY_TIER.ALWAYS_VISIBLE,
+    }),
     patientGrid: Object.freeze({
       visible: !wallKioskDisplay && !commandCenterScreen,
       maxVisibleCards:
-        densityProfile?.whiteboard != null
-          ? profileMaxCards
-          : operationalLoad.maxVisibleCards,
+        densityProfile?.whiteboard != null ? profileMaxCards : operationalLoad.maxVisibleCards,
       tier: WHITEBOARD_DENSITY_TIER.ALWAYS_VISIBLE,
     }),
   });
@@ -438,10 +433,14 @@ function buildRecommendations({
     items.push('Fold audit history, data quality, and queue pressure into one ops-detail drawer.');
   }
   if (operationalLoad.maxVisibleCards) {
-    items.push(`Cap unfiltered grid at ${operationalLoad.maxVisibleCards} cards with filter prompt.`);
+    items.push(
+      `Cap unfiltered grid at ${operationalLoad.maxVisibleCards} cards with filter prompt.`,
+    );
   }
   if (hiddenUnderLoad >= 4) {
-    items.push('Progressive disclosure active — expand ops detail or queue intelligence when bandwidth allows.');
+    items.push(
+      'Progressive disclosure active — expand ops detail or queue intelligence when bandwidth allows.',
+    );
   }
 
   return Object.freeze(items);

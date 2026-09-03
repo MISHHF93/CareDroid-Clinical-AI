@@ -35,7 +35,11 @@ vi.mock('./TenantContext', () => ({
 }));
 
 vi.mock('./WorkspaceContext', () => ({
-  useWorkspace: () => ({ workspaces: [], activeWorkspaceId: 'emergency', setActiveWorkspaceId: vi.fn() }),
+  useWorkspace: () => ({
+    workspaces: [],
+    activeWorkspaceId: 'emergency',
+    setActiveWorkspaceId: vi.fn(),
+  }),
 }));
 
 vi.mock('../services/userIdentityApi', () => ({
@@ -120,7 +124,11 @@ describe('UserIdentityProvider', () => {
     mocks.getContext.mockReset();
     mocks.fetchOperationalProfile.mockReset();
     mocks.fetchMemoryFabricContext.mockReset();
-    mocks.fetchOperationalProfile.mockResolvedValue({ ok: false, data: null, message: 'unavailable' });
+    mocks.fetchOperationalProfile.mockResolvedValue({
+      ok: false,
+      data: null,
+      message: 'unavailable',
+    });
     mocks.fetchMemoryFabricContext.mockResolvedValue({ ok: true, source: 'server' });
     mocks.getContext.mockResolvedValue(contextFor('org-initial'));
   });
@@ -139,7 +147,11 @@ describe('UserIdentityProvider', () => {
     let refresh: (() => Promise<any>) | null = null;
     render(
       <UserIdentityProvider>
-        <RefreshProbe onReady={(fn) => { refresh = fn; }} />
+        <RefreshProbe
+          onReady={(fn) => {
+            refresh = fn;
+          }}
+        />
       </UserIdentityProvider>,
     );
 
@@ -180,7 +192,11 @@ describe('UserIdentityProvider', () => {
     let refresh: (() => Promise<any>) | null = null;
     render(
       <UserIdentityProvider>
-        <IdentityRefreshProbe onReady={(fn) => { refresh = fn; }} />
+        <IdentityRefreshProbe
+          onReady={(fn) => {
+            refresh = fn;
+          }}
+        />
       </UserIdentityProvider>,
     );
 

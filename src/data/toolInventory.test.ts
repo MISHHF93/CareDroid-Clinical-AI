@@ -81,7 +81,7 @@ describe('canonical tool inventory', () => {
       expect(tool.name, tool.id).toBeTruthy();
       expect(tool.path, tool.id).toBeTruthy();
       expect(tool.category, tool.id).toMatch(
-        /Diagnostic|Calculator|Reference|Fleet|IoT|Hospital Operations|AI System|Education & Simulation|Laboratory|Visualization|Other/
+        /Diagnostic|Calculator|Reference|Fleet|IoT|Hospital Operations|AI System|Education & Simulation|Laboratory|Visualization|Other/,
       );
       // HEAL-347.11: MEDICAL_THEME values are now theme-aware
       // (`var(--app-token, #hex)`) so inline-styled consumers pick up dark
@@ -114,7 +114,7 @@ describe('canonical tool inventory', () => {
   it('normalizes backend-backed executors with endpoint, DTOs, client, route, and component', () => {
     const backendBacked = getBackendBackedToolInventory(records);
     expect(backendBacked.map((record) => record.orchestratorToolId).sort()).toEqual(
-      [...ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS].sort()
+      [...ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS].sort(),
     );
 
     for (const record of backendBacked) {
@@ -141,7 +141,9 @@ describe('canonical tool inventory', () => {
       expect(allowed.has(record.launchType), record.id).toBe(true);
       expect(record.fallbackRoute || record.route || record.navigationPath, record.id).toBeTruthy();
     }
-    expect(getCatalogToolInventory(records).length).toBeGreaterThan(ALL_REGISTRY_TOOL_IDS.length - 1);
+    expect(getCatalogToolInventory(records).length).toBeGreaterThan(
+      ALL_REGISTRY_TOOL_IDS.length - 1,
+    );
   });
 
   it('resolves aliases, NLU ids, and registry ids to canonical records', () => {
@@ -197,12 +199,18 @@ describe('canonical tool inventory', () => {
         expect(record.endpoint, record.id).toBeTruthy();
         if (record.executorStatus === TOOL_EXECUTOR_STATUS.REGISTERED) {
           expect(record.orchestratorToolId, record.id).toBeTruthy();
-          expect(record.endpoint, record.id).toBe(`/api/tools/${record.orchestratorToolId}/execute`);
-          expect(record.auditRefs.apiClient, record.id).toBe('src/services/clinicalOrchestratorApi.ts');
+          expect(record.endpoint, record.id).toBe(
+            `/api/tools/${record.orchestratorToolId}/execute`,
+          );
+          expect(record.auditRefs.apiClient, record.id).toBe(
+            'src/services/clinicalOrchestratorApi.ts',
+          );
         } else {
           expect(record.executorStatus, record.id).toBe(TOOL_EXECUTOR_STATUS.PLATFORM);
           expect(record.orchestratorToolId, record.id).toBeFalsy();
-          expect(record.auditRefs.apiClient, record.id).toBe('src/services/clinicalIntelligenceApi.ts');
+          expect(record.auditRefs.apiClient, record.id).toBe(
+            'src/services/clinicalIntelligenceApi.ts',
+          );
         }
       }
 
@@ -242,8 +250,14 @@ describe('canonical tool inventory', () => {
     const calculatorTools = getCalculatorToolInventory(records);
     expect(calculatorTools.length).toBeGreaterThan(0);
     expect(new Set(calculatorTools.map((record) => record.id)).size).toBe(calculatorTools.length);
-    expect(calculatorTools.some((record) => record.hasDedicatedForm && record.calculatorSlug === 'qsofa')).toBe(true);
-    expect(calculatorTools.some((record) => record.surface === TOOL_SURFACES.CHAT_ASSISTED)).toBe(true);
+    expect(
+      calculatorTools.some(
+        (record) => record.hasDedicatedForm && record.calculatorSlug === 'qsofa',
+      ),
+    ).toBe(true);
+    expect(calculatorTools.some((record) => record.surface === TOOL_SURFACES.CHAT_ASSISTED)).toBe(
+      true,
+    );
     expect(calculatorTools.some((record) => record.id === 'dispatch-ai')).toBe(false);
 
     const chatKeys = calculatorTools
@@ -266,7 +280,9 @@ describe('canonical tool inventory', () => {
       calculatorSlug: 'qsofa',
       component: 'src/pages/tools/Calculators.tsx',
     });
-    expect(getUserFacingToolInventory(records).find((record) => record.id === 'qsofa')).toMatchObject({
+    expect(
+      getUserFacingToolInventory(records).find((record) => record.id === 'qsofa'),
+    ).toMatchObject({
       id: 'qsofa',
       hasDedicatedForm: true,
     });
@@ -275,8 +291,12 @@ describe('canonical tool inventory', () => {
       id: 'nexus-cspine',
       launchType: TOOL_LAUNCH_TYPES.BACKEND_BACKED,
     });
-    expect(resolveToolInventoryRecord('nexus-cspine', records)?.chatSeed).toMatch(/decision support/i);
-    expect(getUserFacingToolInventory(records).find((record) => record.id === 'nexus-cspine')).toMatchObject({
+    expect(resolveToolInventoryRecord('nexus-cspine', records)?.chatSeed).toMatch(
+      /decision support/i,
+    );
+    expect(
+      getUserFacingToolInventory(records).find((record) => record.id === 'nexus-cspine'),
+    ).toMatchObject({
       id: 'nexus-cspine',
       surface: TOOL_SURFACES.CALCULATOR_FORM,
     });
@@ -291,7 +311,9 @@ describe('canonical tool inventory', () => {
   it('integrates plugin registrations into canonical and user-facing inventory', () => {
     const pluginIds = PLUGIN_REGISTRY.map((plugin) => plugin.id);
     const canonicalById = new Map(records.map((record) => [record.id, record]));
-    const userFacingById = new Map(getUserFacingToolInventory(records).map((record) => [record.id, record]));
+    const userFacingById = new Map(
+      getUserFacingToolInventory(records).map((record) => [record.id, record]),
+    );
 
     for (const plugin of PLUGIN_REGISTRY) {
       const canonical = canonicalById.get(plugin.id);
@@ -314,7 +336,7 @@ describe('canonical tool inventory', () => {
     // match directly (HEAL-080 moved this plugin to a real dedicated route,
     // so its 'future-tool' placeholder tag no longer applies).
     expect(resolveToolInventoryRecord('Fluid Resuscitation Calculator Plugin', records)?.id).toBe(
-      'plugin-fluid-resuscitation-calculator'
+      'plugin-fluid-resuscitation-calculator',
     );
     expect(pluginIds).toContain('plugin-guideline-copilot-extension');
   });

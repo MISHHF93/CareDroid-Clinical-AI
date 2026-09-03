@@ -20,14 +20,18 @@ const learningSignals = {
   successfulSimulations: [
     { id: 'sim-1', scenarioId: 'sepsis-deterioration', label: 'Sepsis Deterioration', count: 8 },
   ],
-  commonSearches: [
-    { id: 'search-1', category: 'sepsis', count: 12, resultCount: 4 },
-  ],
+  commonSearches: [{ id: 'search-1', category: 'sepsis', count: 12, resultCount: 4 }],
   abandonedPages: [
     { id: 'abandoned-1', route: '/ai-models', label: 'AI Models', views: 14, completedActions: 1 },
   ],
   failedLaunches: [
-    { id: 'failed-1', assetId: 'workflow-helper', label: 'Workflow Helper', count: 5, route: '/tools/workflow-builder-ai' },
+    {
+      id: 'failed-1',
+      assetId: 'workflow-helper',
+      label: 'Workflow Helper',
+      count: 5,
+      route: '/tools/workflow-builder-ai',
+    },
   ],
 };
 
@@ -37,9 +41,24 @@ describe('platformLearningEngine', () => {
       inventory,
       learningSignals,
       events: [
-        { eventType: PLATFORM_ANALYTICS_EVENT_TYPES.TOOL_USAGE, toolId: 'qsofa', count: 30, day: '2026-06-01' },
-        { eventType: PLATFORM_ANALYTICS_EVENT_TYPES.CALCULATOR_USAGE, toolId: 'news2', count: 18, day: '2026-06-01' },
-        { eventType: PLATFORM_ANALYTICS_EVENT_TYPES.WORKFLOW_USAGE, toolId: 'workflow-helper', count: 1, day: '2026-06-01' },
+        {
+          eventType: PLATFORM_ANALYTICS_EVENT_TYPES.TOOL_USAGE,
+          toolId: 'qsofa',
+          count: 30,
+          day: '2026-06-01',
+        },
+        {
+          eventType: PLATFORM_ANALYTICS_EVENT_TYPES.CALCULATOR_USAGE,
+          toolId: 'news2',
+          count: 18,
+          day: '2026-06-01',
+        },
+        {
+          eventType: PLATFORM_ANALYTICS_EVENT_TYPES.WORKFLOW_USAGE,
+          toolId: 'workflow-helper',
+          count: 1,
+          day: '2026-06-01',
+        },
       ],
     });
 

@@ -27,17 +27,13 @@ export default function HighRiskComplaintFlagBadge({
         .join(' ')}
       title={`High-risk complaint flags (staff alert only): ${labels.join(', ')}`}
     >
-      {needsReview ? (
-        <span className="high-risk-complaint-badge__review">Rapid review</span>
-      ) : null}
+      {needsReview ? <span className="high-risk-complaint-badge__review">Rapid review</span> : null}
       {visible.map((label) => (
         <span key={label} className="high-risk-complaint-badge__flag">
           {label}
         </span>
       ))}
-      {overflow > 0 ? (
-        <span className="high-risk-complaint-badge__more">+{overflow}</span>
-      ) : null}
+      {overflow > 0 ? <span className="high-risk-complaint-badge__more">+{overflow}</span> : null}
     </span>
   );
 }

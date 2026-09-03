@@ -16,13 +16,7 @@ describe('PreArrivalForm', () => {
       }),
     };
 
-    render(
-      <PreArrivalForm
-        store={store}
-        actorName="EMS Dispatch"
-        onSubmitted={vi.fn()}
-      />,
-    );
+    render(<PreArrivalForm store={store} actorName="EMS Dispatch" onSubmitted={vi.fn()} />);
 
     fireEvent.change(screen.getByPlaceholderText('Medic 12'), {
       target: { value: 'Medic 22' },
@@ -58,7 +52,9 @@ describe('PreArrivalForm', () => {
         useEmergencyStore.getState().addEMSArrival(arrival);
       }),
     };
-    const { unmount } = render(<PreArrivalForm store={store} actorName="EMS Dispatch" onSubmitted={vi.fn()} />);
+    const { unmount } = render(
+      <PreArrivalForm store={store} actorName="EMS Dispatch" onSubmitted={vi.fn()} />,
+    );
 
     fireEvent.change(screen.getByPlaceholderText('Medic 12'), { target: { value: 'Medic 22' } });
     fireEvent.change(screen.getByPlaceholderText('Open tibia fracture'), {

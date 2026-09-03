@@ -30,7 +30,9 @@ import useModalDialog from '../../hooks/useModalDialog';
 
 expect.extend(toHaveNoViolations);
 
-const WCAG = { runOnly: { type: 'tag' as const, values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'] } };
+const WCAG = {
+  runOnly: { type: 'tag' as const, values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'] },
+};
 
 async function expectNoViolations(ui: React.ReactElement) {
   const { container } = render(ui);
@@ -65,7 +67,9 @@ describe('Button', () => {
 
 describe('IconButton', () => {
   it('carries an accessible name even though it renders no text', async () => {
-    await expectNoViolations(<IconButton icon={<svg aria-hidden="true" />} label="Refresh telemetry" />);
+    await expectNoViolations(
+      <IconButton icon={<svg aria-hidden="true" />} label="Refresh telemetry" />,
+    );
   });
 });
 
@@ -79,7 +83,9 @@ describe('Input', () => {
   });
 
   it('is accessible in an error state', async () => {
-    await expectNoViolations(<Input label="Medical record number" error="That MRN does not exist" />);
+    await expectNoViolations(
+      <Input label="Medical record number" error="That MRN does not exist" />,
+    );
   });
 
   it('is accessible when required', async () => {

@@ -1,8 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  fetchMemoryFabricContext,
-  recordMemorySignal,
-} from './memoryApi';
+import { fetchMemoryFabricContext, recordMemorySignal } from './memoryApi';
 
 vi.mock('./apiClient', () => ({
   apiFetch: vi.fn(),
@@ -31,7 +28,9 @@ describe('memoryApi fabric methods', () => {
 
     expect(apiFetch).toHaveBeenCalledWith(
       '/api/memory/fabric/context',
-      expect.objectContaining({ headers: expect.objectContaining({ 'Content-Type': 'application/json' }) })
+      expect.objectContaining({
+        headers: expect.objectContaining({ 'Content-Type': 'application/json' }),
+      }),
     );
     expect(result.ok).toBe(true);
     expect(result.workspaceMemory.recentAssets).toEqual(['qsofa']);
@@ -57,7 +56,7 @@ describe('memoryApi fabric methods', () => {
       expect.objectContaining({
         method: 'POST',
         body: expect.stringContaining('"signalType":"recent_asset"'),
-      })
+      }),
     );
   });
 });

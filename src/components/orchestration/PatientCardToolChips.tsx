@@ -2,7 +2,10 @@ import type { MouseEvent } from 'react';
 import type { Patient } from '../../types/emergency';
 import usePatientOrchestration from '../../hooks/usePatientOrchestration';
 import { useEmergencyStore } from '../../store/emergencyStore';
-import { launchOrchestrationMoreTools, launchOrchestrationRecommendation } from '../../services/orchestrationToolLaunch';
+import {
+  launchOrchestrationMoreTools,
+  launchOrchestrationRecommendation,
+} from '../../services/orchestrationToolLaunch';
 import { HUMAN_REVIEW_DISCLAIMER } from '../../lib/ai/safety/policy';
 import './orchestration.css';
 
@@ -67,7 +70,10 @@ export function PatientCardToolChips({
   };
 
   return (
-    <div className="patient-orchestration patient-card__orchestration" aria-label="Recommended case tools">
+    <div
+      className="patient-orchestration patient-card__orchestration"
+      aria-label="Recommended case tools"
+    >
       <div className="patient-orchestration__chips">
         {chips.map((chip) => (
           <button

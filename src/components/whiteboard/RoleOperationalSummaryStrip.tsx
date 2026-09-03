@@ -25,7 +25,11 @@ type RoleCard = {
 
 function countByRole(workloads: ReturnType<typeof buildStaffWorkloads>, roleMatchers: string[]) {
   return workloads.filter((member) =>
-    roleMatchers.some((token) => String(member.role || '').toLowerCase().includes(token)),
+    roleMatchers.some((token) =>
+      String(member.role || '')
+        .toLowerCase()
+        .includes(token),
+    ),
   );
 }
 
@@ -48,7 +52,8 @@ export default function RoleOperationalSummaryStrip({
     // inflated "Active patients"/"Critical" below despite no longer being on
     // the board.
     const activePatients = patients.filter(
-      (patient) => patient.state !== PatientState.Discharge && patient.state !== PatientState.Deceased,
+      (patient) =>
+        patient.state !== PatientState.Discharge && patient.state !== PatientState.Deceased,
     );
     const waitingPatients = patients.filter((patient) => patient.state === PatientState.Waiting);
     const registrationPending = patients.filter(
@@ -145,15 +150,7 @@ export default function RoleOperationalSummaryStrip({
     }
 
     return catalog.filter((card) => shouldShowRoleSummaryCard(card.id, roleId));
-  }, [
-    activeShift,
-    capacityLabel,
-    escalationCount,
-    patients,
-    roleId,
-    staff,
-    waitingCount,
-  ]);
+  }, [activeShift, capacityLabel, escalationCount, patients, roleId, staff, waitingCount]);
 
   if (!cards.length) return null;
 

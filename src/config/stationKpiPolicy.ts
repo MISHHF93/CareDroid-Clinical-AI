@@ -157,9 +157,9 @@ export function resolveCompactHeaderMetricLabel(metricKey: string, fallback: str
   return COMPACT_HEADER_METRIC_LABELS[metricKey] || fallback;
 }
 
-export function compactOperationalStripMetrics<
-  T extends { id: string; label: string },
->(metrics: T[] = []): T[] {
+export function compactOperationalStripMetrics<T extends { id: string; label: string }>(
+  metrics: T[] = [],
+): T[] {
   if (!isPilotStationKpiPolicyActive()) return metrics;
   return metrics.map((metric) => ({
     ...metric,

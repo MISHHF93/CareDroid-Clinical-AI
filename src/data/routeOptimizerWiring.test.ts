@@ -19,13 +19,16 @@ import { getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
 import { getAllDiscoveredTools, toolIdAliases } from './sourceCodeToolDiscovery';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const routeOptimizerSource = readFileSync(join(__dirname, '../pages/fleet/RouteOptimizer.tsx'), 'utf8');
+const routeOptimizerSource = readFileSync(
+  join(__dirname, '../pages/fleet/RouteOptimizer.tsx'),
+  'utf8',
+);
 const patternsSource = readFileSync(
   join(
     __dirname,
-    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts'
+    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts',
   ),
-  'utf8'
+  'utf8',
 );
 
 describe('Route Optimizer (route-optimizer) wiring', () => {

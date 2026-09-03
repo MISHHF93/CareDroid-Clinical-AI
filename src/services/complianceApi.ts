@@ -50,7 +50,7 @@ export async function recordConsentPreferences(prefs) {
   }
   if (prefs.thirdPartySharing != null) {
     results.push(
-      await updateConsentPreference('third_party_sharing', Boolean(prefs.thirdPartySharing))
+      await updateConsentPreference('third_party_sharing', Boolean(prefs.thirdPartySharing)),
     );
   }
   if (prefs.marketing != null) {

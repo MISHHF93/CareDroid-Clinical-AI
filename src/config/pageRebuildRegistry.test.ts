@@ -26,7 +26,9 @@ describe('pageRebuildRegistry', () => {
     expect(reception?.status).toBe(PAGE_REBUILD_STATUS.rebuilt);
     const dispatch = PAGE_REBUILD_REGISTRY.find((page) => page.id === 'dispatch');
     expect(dispatch?.status).toBe(PAGE_REBUILD_STATUS.rebuilt);
-    const publicDisplay = PAGE_REBUILD_REGISTRY.find((page) => page.id === 'public-waiting-display');
+    const publicDisplay = PAGE_REBUILD_REGISTRY.find(
+      (page) => page.id === 'public-waiting-display',
+    );
     expect(publicDisplay?.status).toBe(PAGE_REBUILD_STATUS.rebuilt);
     expect(getNextPageRebuildTarget()?.status).not.toBe(PAGE_REBUILD_STATUS.rebuilt);
   });

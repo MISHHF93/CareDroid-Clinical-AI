@@ -117,6 +117,8 @@ describe('FullJourneyOperatingPage diagnostics view — Diagnostics Board honest
     expect(
       screen.getByText(/order-based diagnostics tracking is not yet built/i),
     ).toBeInTheDocument();
-    expect(screen.queryByText(/orders appear here when created via the patient care workflow/i)).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/orders appear here when created via the patient care workflow/i),
+    ).not.toBeInTheDocument();
   });
 });

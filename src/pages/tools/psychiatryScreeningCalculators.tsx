@@ -248,13 +248,34 @@ const configBySlug = {
   cage: {
     slug: 'cage',
     title: 'CAGE Alcohol Screen',
-    notice: 'Four-question alcohol screen. Does not diagnose alcohol use disorder or provide withdrawal-management advice.',
+    notice:
+      'Four-question alcohol screen. Does not diagnose alcohol use disorder or provide withdrawal-management advice.',
     initial: { cutDown: '', annoyed: '', guilty: '', eyeOpener: '' },
     fields: [
-      { name: 'cutDown', label: 'Felt you should cut down drinking?', type: 'select', options: yesNoOptions },
-      { name: 'annoyed', label: 'Annoyed by criticism of drinking?', type: 'select', options: yesNoOptions },
-      { name: 'guilty', label: 'Felt bad or guilty about drinking?', type: 'select', options: yesNoOptions },
-      { name: 'eyeOpener', label: 'Eye-opener drink first thing in the morning?', type: 'select', options: yesNoOptions },
+      {
+        name: 'cutDown',
+        label: 'Felt you should cut down drinking?',
+        type: 'select',
+        options: yesNoOptions,
+      },
+      {
+        name: 'annoyed',
+        label: 'Annoyed by criticism of drinking?',
+        type: 'select',
+        options: yesNoOptions,
+      },
+      {
+        name: 'guilty',
+        label: 'Felt bad or guilty about drinking?',
+        type: 'select',
+        options: yesNoOptions,
+      },
+      {
+        name: 'eyeOpener',
+        label: 'Eye-opener drink first thing in the morning?',
+        type: 'select',
+        options: yesNoOptions,
+      },
     ],
     compute: computeCageResult,
     emptyText: 'Answer all four CAGE questions.',
@@ -263,7 +284,8 @@ const configBySlug = {
   mmse: {
     slug: 'mmse',
     title: 'MMSE Score Entry',
-    notice: 'Enter domain subtotals from a governed MMSE administration. This form does not administer the copyrighted instrument.',
+    notice:
+      'Enter domain subtotals from a governed MMSE administration. This form does not administer the copyrighted instrument.',
     initial: {
       orientationTime: '',
       orientationPlace: '',
@@ -289,7 +311,8 @@ const configBySlug = {
   'moca-placeholder-workflow': {
     slug: 'moca-placeholder-workflow',
     title: 'MoCA Placeholder Workflow',
-    notice: 'Governance workflow only. Does not show MoCA items, administer MoCA, calculate MoCA score, or diagnose cognitive impairment.',
+    notice:
+      'Governance workflow only. Does not show MoCA items, administer MoCA, calculate MoCA score, or diagnose cognitive impairment.',
     initial: {
       officialFormAvailable: '',
       trainedAdministrator: '',
@@ -297,10 +320,30 @@ const configBySlug = {
       humanReviewPlan: '',
     },
     fields: [
-      { name: 'officialFormAvailable', label: 'Official MoCA form/version available?', type: 'select', options: yesNoOptions },
-      { name: 'trainedAdministrator', label: 'Trained administrator available?', type: 'select', options: yesNoOptions },
-      { name: 'accommodationsReviewed', label: 'Language, sensory, motor, and education context reviewed?', type: 'select', options: yesNoOptions },
-      { name: 'humanReviewPlan', label: 'Clinician review plan documented?', type: 'select', options: yesNoOptions },
+      {
+        name: 'officialFormAvailable',
+        label: 'Official MoCA form/version available?',
+        type: 'select',
+        options: yesNoOptions,
+      },
+      {
+        name: 'trainedAdministrator',
+        label: 'Trained administrator available?',
+        type: 'select',
+        options: yesNoOptions,
+      },
+      {
+        name: 'accommodationsReviewed',
+        label: 'Language, sensory, motor, and education context reviewed?',
+        type: 'select',
+        options: yesNoOptions,
+      },
+      {
+        name: 'humanReviewPlan',
+        label: 'Clinician review plan documented?',
+        type: 'select',
+        options: yesNoOptions,
+      },
     ],
     compute: computeMocaPlaceholderWorkflow,
     emptyText: 'Confirm governed MoCA workflow prerequisites.',
@@ -309,15 +352,28 @@ const configBySlug = {
   pcl5: {
     slug: 'pcl5',
     title: 'PCL-5 Score Entry',
-    notice: 'PTSD symptom screening support only. Requires trauma-exposure context and clinician review.',
+    notice:
+      'PTSD symptom screening support only. Requires trauma-exposure context and clinician review.',
     initial: {
       eventCriterionReviewed: '',
       currentSafetyConcern: '',
-      ...Object.fromEntries(scoreFields('q', 20, 'PCL-5 item', pclOptions).map((field) => [field.name, ''])),
+      ...Object.fromEntries(
+        scoreFields('q', 20, 'PCL-5 item', pclOptions).map((field) => [field.name, '']),
+      ),
     },
     fields: [
-      { name: 'eventCriterionReviewed', label: 'Trauma exposure context reviewed?', type: 'select', options: yesNoOptions },
-      { name: 'currentSafetyConcern', label: 'Current self-harm, suicidal ideation, or danger present?', type: 'select', options: yesNoOptions },
+      {
+        name: 'eventCriterionReviewed',
+        label: 'Trauma exposure context reviewed?',
+        type: 'select',
+        options: yesNoOptions,
+      },
+      {
+        name: 'currentSafetyConcern',
+        label: 'Current self-harm, suicidal ideation, or danger present?',
+        type: 'select',
+        options: yesNoOptions,
+      },
       ...scoreFields('q', 20, 'PCL-5 item', pclOptions),
     ],
     compute: computePcl5Result,
@@ -327,11 +383,17 @@ const configBySlug = {
   mdq: {
     slug: 'mdq',
     title: 'Mood Disorder Questionnaire (MDQ)',
-    notice: 'Bipolar-spectrum screening support only. Does not diagnose mania, hypomania, bipolar disorder, or medication need.',
+    notice:
+      'Bipolar-spectrum screening support only. Does not diagnose mania, hypomania, bipolar disorder, or medication need.',
     initial: { symptomCount: '', samePeriod: '', impairment: '', urgentSafetyConcern: '' },
     fields: [
       { name: 'symptomCount', label: 'Yes symptoms (0-13)', min: 0, max: 13 },
-      { name: 'samePeriod', label: 'Symptoms occurred during the same period?', type: 'select', options: yesNoOptions },
+      {
+        name: 'samePeriod',
+        label: 'Symptoms occurred during the same period?',
+        type: 'select',
+        options: yesNoOptions,
+      },
       {
         name: 'impairment',
         label: 'Functional impairment',
@@ -343,7 +405,12 @@ const configBySlug = {
           { value: 'serious', label: 'Serious problem' },
         ],
       },
-      { name: 'urgentSafetyConcern', label: 'Psychosis, unsafe behavior, suicidal ideation, or danger present?', type: 'select', options: yesNoOptions },
+      {
+        name: 'urgentSafetyConcern',
+        label: 'Psychosis, unsafe behavior, suicidal ideation, or danger present?',
+        type: 'select',
+        options: yesNoOptions,
+      },
     ],
     compute: computeMdqResult,
     emptyText: 'Enter MDQ summary fields and safety context.',
@@ -352,13 +419,22 @@ const configBySlug = {
   'epworth-sleepiness-scale': {
     slug: 'epworth-sleepiness-scale',
     title: 'Epworth Sleepiness Scale',
-    notice: 'Daytime sleepiness screening support only. Does not diagnose sleep apnea, narcolepsy, or medication effects.',
+    notice:
+      'Daytime sleepiness screening support only. Does not diagnose sleep apnea, narcolepsy, or medication effects.',
     initial: {
       safetySensitiveActivity: '',
-      ...Object.fromEntries(scoreFields('q', 8, 'Epworth situation', epworthOptions).map((field) => [field.name, ''])),
+      ...Object.fromEntries(
+        scoreFields('q', 8, 'Epworth situation', epworthOptions).map((field) => [field.name, '']),
+      ),
     },
     fields: [
-      { name: 'safetySensitiveActivity', label: 'Sleepiness during driving, machinery, clinical duty, or other safety-sensitive activity?', type: 'select', options: yesNoOptions },
+      {
+        name: 'safetySensitiveActivity',
+        label:
+          'Sleepiness during driving, machinery, clinical duty, or other safety-sensitive activity?',
+        type: 'select',
+        options: yesNoOptions,
+      },
       ...scoreFields('q', 8, 'Epworth situation', epworthOptions),
     ],
     compute: computeEpworthSleepinessResult,
@@ -368,14 +444,46 @@ const configBySlug = {
   'columbia-suicide-severity-workflow': {
     slug: 'columbia-suicide-severity-workflow',
     title: 'Columbia Suicide Severity Workflow Entry',
-    notice: 'Workflow routing support only. Does not administer or score the official C-SSRS and does not replace immediate safety assessment.',
-    initial: { ideation: '', intentOrPlan: '', behavior: '', currentUnsafe: '', directHumanReview: '' },
+    notice:
+      'Workflow routing support only. Does not administer or score the official C-SSRS and does not replace immediate safety assessment.',
+    initial: {
+      ideation: '',
+      intentOrPlan: '',
+      behavior: '',
+      currentUnsafe: '',
+      directHumanReview: '',
+    },
     fields: [
-      { name: 'ideation', label: 'Suicidal ideation disclosed?', type: 'select', options: yesNoOptions },
-      { name: 'intentOrPlan', label: 'Intent or plan disclosed?', type: 'select', options: yesNoOptions },
-      { name: 'behavior', label: 'Recent suicidal or preparatory behavior disclosed?', type: 'select', options: yesNoOptions },
-      { name: 'currentUnsafe', label: 'Unable to maintain immediate safety?', type: 'select', options: yesNoOptions },
-      { name: 'directHumanReview', label: 'Direct clinician/crisis review arranged?', type: 'select', options: yesNoOptions },
+      {
+        name: 'ideation',
+        label: 'Suicidal ideation disclosed?',
+        type: 'select',
+        options: yesNoOptions,
+      },
+      {
+        name: 'intentOrPlan',
+        label: 'Intent or plan disclosed?',
+        type: 'select',
+        options: yesNoOptions,
+      },
+      {
+        name: 'behavior',
+        label: 'Recent suicidal or preparatory behavior disclosed?',
+        type: 'select',
+        options: yesNoOptions,
+      },
+      {
+        name: 'currentUnsafe',
+        label: 'Unable to maintain immediate safety?',
+        type: 'select',
+        options: yesNoOptions,
+      },
+      {
+        name: 'directHumanReview',
+        label: 'Direct clinician/crisis review arranged?',
+        type: 'select',
+        options: yesNoOptions,
+      },
     ],
     compute: computeColumbiaSuicideSeverityWorkflow,
     emptyText: 'Enter suicide-safety workflow flags.',
@@ -384,29 +492,52 @@ const configBySlug = {
 };
 
 export function CageCalculator({ onResultChange }) {
-  return <PsychiatryScreeningCalculator config={configBySlug.cage} onResultChange={onResultChange} />;
+  return (
+    <PsychiatryScreeningCalculator config={configBySlug.cage} onResultChange={onResultChange} />
+  );
 }
 
 export function MmseCalculator({ onResultChange }) {
-  return <PsychiatryScreeningCalculator config={configBySlug.mmse} onResultChange={onResultChange} />;
+  return (
+    <PsychiatryScreeningCalculator config={configBySlug.mmse} onResultChange={onResultChange} />
+  );
 }
 
 export function MocaPlaceholderWorkflow({ onResultChange }) {
-  return <PsychiatryScreeningCalculator config={configBySlug['moca-placeholder-workflow']} onResultChange={onResultChange} />;
+  return (
+    <PsychiatryScreeningCalculator
+      config={configBySlug['moca-placeholder-workflow']}
+      onResultChange={onResultChange}
+    />
+  );
 }
 
 export function Pcl5Calculator({ onResultChange }) {
-  return <PsychiatryScreeningCalculator config={configBySlug.pcl5} onResultChange={onResultChange} />;
+  return (
+    <PsychiatryScreeningCalculator config={configBySlug.pcl5} onResultChange={onResultChange} />
+  );
 }
 
 export function MdqCalculator({ onResultChange }) {
-  return <PsychiatryScreeningCalculator config={configBySlug.mdq} onResultChange={onResultChange} />;
+  return (
+    <PsychiatryScreeningCalculator config={configBySlug.mdq} onResultChange={onResultChange} />
+  );
 }
 
 export function EpworthSleepinessScaleCalculator({ onResultChange }) {
-  return <PsychiatryScreeningCalculator config={configBySlug['epworth-sleepiness-scale']} onResultChange={onResultChange} />;
+  return (
+    <PsychiatryScreeningCalculator
+      config={configBySlug['epworth-sleepiness-scale']}
+      onResultChange={onResultChange}
+    />
+  );
 }
 
 export function ColumbiaSuicideSeverityWorkflow({ onResultChange }) {
-  return <PsychiatryScreeningCalculator config={configBySlug['columbia-suicide-severity-workflow']} onResultChange={onResultChange} />;
+  return (
+    <PsychiatryScreeningCalculator
+      config={configBySlug['columbia-suicide-severity-workflow']}
+      onResultChange={onResultChange}
+    />
+  );
 }

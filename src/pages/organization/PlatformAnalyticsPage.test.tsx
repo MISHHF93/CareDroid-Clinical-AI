@@ -119,7 +119,9 @@ describe('PlatformAnalyticsPage', () => {
     // Page title is registered into the shell chrome (useRouteChromeRegistration)
     // rather than rendered as a local heading -- rendered here without a real
     // AppShell/RouteChromeProvider, so it falls back to the sr-equivalent testid.
-    expect(await screen.findByTestId('cd-page-title-text')).toHaveTextContent(/platform analytics/i);
+    expect(await screen.findByTestId('cd-page-title-text')).toHaveTextContent(
+      /platform analytics/i,
+    );
     expect(screen.getByRole('heading', { name: /^adoption$/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /^engagement$/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /^top assets$/i })).toBeInTheDocument();

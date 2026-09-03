@@ -47,13 +47,22 @@ export default function PreparePatientChooser({
             <h2 id="prepare-patient-title">{copy.title}</h2>
             <p className="reception-prepare__description">{copy.description}</p>
           </div>
-          <button type="button" className="reception-prepare__close" onClick={onClose} aria-label="Close">
+          <button
+            type="button"
+            className="reception-prepare__close"
+            onClick={onClose}
+            aria-label="Close"
+          >
             <X size={18} aria-hidden />
           </button>
         </header>
 
         <div className="reception-prepare__options">
-          <button type="button" className="reception-prepare__option reception-prepare__option--primary" onClick={onSmartIntake}>
+          <button
+            type="button"
+            className="reception-prepare__option reception-prepare__option--primary"
+            onClick={onSmartIntake}
+          >
             <UserSearch size={20} aria-hidden />
             <span>
               <strong>{copy.fullIdentity}</strong>

@@ -69,7 +69,11 @@ function ResultCard({ slug, result, scoreLabel = 'Score' }) {
   const headingId = `${slug}-interpretation-heading`;
   if (!result) return null;
   return (
-    <CalcInterpretationRegion headingId={headingId} title={result.interpretation.label} severity={result.interpretation.severity}>
+    <CalcInterpretationRegion
+      headingId={headingId}
+      title={result.interpretation.label}
+      severity={result.interpretation.severity}
+    >
       <div className="calc-score-display" aria-label={`${scoreLabel}: ${result.primaryValue}`}>
         <span className="calc-score-number">{result.primaryValue}</span>
         <span className="calc-score-unit">{scoreLabel}</span>
@@ -95,7 +99,9 @@ function CheckboxScoreCalculator({
   scoreLabel = 'Score',
 }) {
   const icon = getCalculatorSubIcon(slug);
-  const [inputs, setInputs] = useState(() => Object.fromEntries(criteria.map((c) => [c.key, false])));
+  const [inputs, setInputs] = useState(() =>
+    Object.fromEntries(criteria.map((c) => [c.key, false])),
+  );
   const [result, setResult] = useState<any>(null);
   const resultsRef = useRef(null);
 
@@ -146,7 +152,10 @@ function CheckboxScoreCalculator({
                   type="checkbox"
                   checked={inputs[criterion.key]}
                   onChange={(event) =>
-                    setInputs((previous) => ({ ...previous, [criterion.key]: event.target.checked }))
+                    setInputs((previous) => ({
+                      ...previous,
+                      [criterion.key]: event.target.checked,
+                    }))
                   }
                 />
                 <span>
@@ -177,7 +186,13 @@ function CheckboxScoreCalculator({
       >
         <ResultsPanelTitle />
         {result ? (
-          <ResultCard slug={slug} title={title} result={{ ...result, primaryValue: result.score }} scoreLabel={scoreLabel} {...{} as any} />
+          <ResultCard
+            slug={slug}
+            title={title}
+            result={{ ...result, primaryValue: result.score }}
+            scoreLabel={scoreLabel}
+            {...({} as any)}
+          />
         ) : (
           <EmptyResults icon={icon} text="Select criteria and calculate to view risk context." />
         )}
@@ -223,7 +238,7 @@ export function DukeTreadmillScoreCalculator({ onResultChange }) {
             riskBand: result.interpretation.riskBand,
             severity: result.interpretation.severity,
           }
-        : null
+        : null,
     );
   }, [onResultChange, result]);
 
@@ -244,7 +259,11 @@ export function DukeTreadmillScoreCalculator({ onResultChange }) {
       stDeviationMm: Number(stDeviationMm),
       anginaIndex: Number(anginaIndex),
     });
-    setResult({ ...(computed as any), interpretation: interpretDukeTreadmillScore((computed as any).score), primaryValue: (computed as any).score });
+    setResult({
+      ...(computed as any),
+      interpretation: interpretDukeTreadmillScore((computed as any).score),
+      primaryValue: (computed as any).score,
+    });
   };
 
   const reset = () => {
@@ -264,26 +283,55 @@ export function DukeTreadmillScoreCalculator({ onResultChange }) {
         <div className="calc-timi-disclaimer calc-has-bled-disclaimer" role="note">
           <CalcDecisionSupportLead />
           <p className="calc-disclaimer-detail">
-            Exercise ECG prognostic score only. Do not use for unstable symptoms or uninterpretable ECGs.
+            Exercise ECG prognostic score only. Do not use for unstable symptoms or uninterpretable
+            ECGs.
           </p>
         </div>
         <ValidationSummary id={`${slug}-validation-summary`} errors={validationErrors} />
-        <form className="calc-pr1-form" noValidate aria-labelledby={`${slug}-form-title`} onSubmit={(event) => {
-          event.preventDefault();
-          runCalculate();
-        }}>
+        <form
+          className="calc-pr1-form"
+          noValidate
+          aria-labelledby={`${slug}-form-title`}
+          onSubmit={(event) => {
+            event.preventDefault();
+            runCalculate();
+          }}
+        >
           <div className="calc-input-grid">
             <label className="calc-input-group" htmlFor={`${slug}-minutes`}>
               <span className="calc-label">Exercise time (minutes)</span>
-              <input id={`${slug}-minutes`} className="calc-input" type="number" min="0" max="30" step="0.1" value={exerciseMinutes} onChange={(event) => setExerciseMinutes(event.target.value)} />
+              <input
+                id={`${slug}-minutes`}
+                className="calc-input"
+                type="number"
+                min="0"
+                max="30"
+                step="0.1"
+                value={exerciseMinutes}
+                onChange={(event) => setExerciseMinutes(event.target.value)}
+              />
             </label>
             <label className="calc-input-group" htmlFor={`${slug}-st`}>
               <span className="calc-label">Max ST deviation (mm)</span>
-              <input id={`${slug}-st`} className="calc-input" type="number" min="0" max="10" step="0.1" value={stDeviationMm} onChange={(event) => setStDeviationMm(event.target.value)} />
+              <input
+                id={`${slug}-st`}
+                className="calc-input"
+                type="number"
+                min="0"
+                max="10"
+                step="0.1"
+                value={stDeviationMm}
+                onChange={(event) => setStDeviationMm(event.target.value)}
+              />
             </label>
             <label className="calc-input-group" htmlFor={`${slug}-angina`}>
               <span className="calc-label">Exercise angina</span>
-              <select id={`${slug}-angina`} className="calc-select" value={anginaIndex} onChange={(event) => setAnginaIndex(event.target.value)}>
+              <select
+                id={`${slug}-angina`}
+                className="calc-select"
+                value={anginaIndex}
+                onChange={(event) => setAnginaIndex(event.target.value)}
+              >
                 <option value="0">No angina (0)</option>
                 <option value="1">Non-limiting angina (1)</option>
                 <option value="2">Exercise-limiting angina (2)</option>
@@ -291,14 +339,37 @@ export function DukeTreadmillScoreCalculator({ onResultChange }) {
             </label>
           </div>
           <div className="calculator-actions">
-            <button type="submit" className="calculate-btn">Calculate Duke Treadmill Score</button>
-            <button type="button" className="reset-btn" onClick={reset}>Reset</button>
+            <button type="submit" className="calculate-btn">
+              Calculate Duke Treadmill Score
+            </button>
+            <button type="button" className="reset-btn" onClick={reset}>
+              Reset
+            </button>
           </div>
         </form>
       </div>
-      <div className="calculator-results" ref={resultsRef} tabIndex={-1} role="region" aria-label="Duke Treadmill Score results">
+      <div
+        className="calculator-results"
+        ref={resultsRef}
+        tabIndex={-1}
+        role="region"
+        aria-label="Duke Treadmill Score results"
+      >
         <ResultsPanelTitle />
-        {result ? <ResultCard slug={slug} title="Duke Treadmill Score" result={result} scoreLabel="DTS" {...{} as any} /> : <EmptyResults icon={icon} text="Enter exercise test values to view Duke treadmill risk context." />}
+        {result ? (
+          <ResultCard
+            slug={slug}
+            title="Duke Treadmill Score"
+            result={result}
+            scoreLabel="DTS"
+            {...({} as any)}
+          />
+        ) : (
+          <EmptyResults
+            icon={icon}
+            text="Enter exercise test values to view Duke treadmill risk context."
+          />
+        )}
       </div>
     </div>
   );
@@ -331,7 +402,7 @@ export function ReynoldsRiskScoreCalculator({ onResultChange }) {
             riskCategory: result.riskCategory,
             severity: result.interpretation.severity,
           }
-        : null
+        : null,
     );
   }, [onResultChange, result]);
 
@@ -348,7 +419,11 @@ export function ReynoldsRiskScoreCalculator({ onResultChange }) {
       return;
     }
     const computed = computeReynoldsRiskHelper(form);
-    setResult({ ...(computed as any), interpretation: interpretReynoldsRiskHelper(computed as any), primaryValue: (computed as any).points });
+    setResult({
+      ...(computed as any),
+      interpretation: interpretReynoldsRiskHelper(computed as any),
+      primaryValue: (computed as any).points,
+    });
   };
   const reset = () => {
     setForm({
@@ -378,20 +453,35 @@ export function ReynoldsRiskScoreCalculator({ onResultChange }) {
   return (
     <div className={`calculator-interface calculator-interface--${slug}`}>
       <div className="calculator-inputs">
-        <CalcPanelTitle icon={icon}><span id={`${slug}-form-title`}>Reynolds Risk Score Helper</span></CalcPanelTitle>
+        <CalcPanelTitle icon={icon}>
+          <span id={`${slug}-form-title`}>Reynolds Risk Score Helper</span>
+        </CalcPanelTitle>
         <div className="calc-timi-disclaimer calc-has-bled-disclaimer" role="note">
           <CalcDecisionSupportLead />
-          <p className="calc-disclaimer-detail">Input-burden helper for Reynolds Risk Score context; use a validated Reynolds calculator for exact risk percentage.</p>
+          <p className="calc-disclaimer-detail">
+            Input-burden helper for Reynolds Risk Score context; use a validated Reynolds calculator
+            for exact risk percentage.
+          </p>
         </div>
         <ValidationSummary id={`${slug}-validation-summary`} errors={validationErrors} />
-        <form className="calc-pr1-form" noValidate aria-labelledby={`${slug}-form-title`} onSubmit={(event) => {
-          event.preventDefault();
-          runCalculate();
-        }}>
+        <form
+          className="calc-pr1-form"
+          noValidate
+          aria-labelledby={`${slug}-form-title`}
+          onSubmit={(event) => {
+            event.preventDefault();
+            runCalculate();
+          }}
+        >
           <div className="calc-input-grid">
             <label className="calc-input-group" htmlFor={`${slug}-sex`}>
               <span className="calc-label">Sex</span>
-              <select id={`${slug}-sex`} className="calc-select" value={form.sex} onChange={(event) => update('sex', event.target.value)}>
+              <select
+                id={`${slug}-sex`}
+                className="calc-select"
+                value={form.sex}
+                onChange={(event) => update('sex', event.target.value)}
+              >
                 <option value="">Select</option>
                 <option value="female">Female</option>
                 <option value="male">Male</option>
@@ -400,13 +490,27 @@ export function ReynoldsRiskScoreCalculator({ onResultChange }) {
             {textFields.map(([key, label]) => (
               <label className="calc-input-group" htmlFor={`${slug}-${key}`} key={key}>
                 <span className="calc-label">{label}</span>
-                <input id={`${slug}-${key}`} className="calc-input" type="number" step="0.1" value={form[key]} onChange={(event) => update(key, event.target.value)} />
+                <input
+                  id={`${slug}-${key}`}
+                  className="calc-input"
+                  type="number"
+                  step="0.1"
+                  value={form[key]}
+                  onChange={(event) => update(key, event.target.value)}
+                />
               </label>
             ))}
             {form.diabetes ? (
               <label className="calc-input-group" htmlFor={`${slug}-hba1c`}>
                 <span className="calc-label">HbA1c (%)</span>
-                <input id={`${slug}-hba1c`} className="calc-input" type="number" step="0.1" value={form.hba1cPct} onChange={(event) => update('hba1cPct', event.target.value)} />
+                <input
+                  id={`${slug}-hba1c`}
+                  className="calc-input"
+                  type="number"
+                  step="0.1"
+                  value={form.hba1cPct}
+                  onChange={(event) => update('hba1cPct', event.target.value)}
+                />
               </label>
             ) : null}
           </div>
@@ -418,20 +522,44 @@ export function ReynoldsRiskScoreCalculator({ onResultChange }) {
               ['diabetes', 'Diabetes mellitus'],
             ].map(([key, label]) => (
               <label className="calc-checkbox-group" key={key}>
-                <input type="checkbox" checked={Boolean(form[key])} onChange={(event) => update(key, event.target.checked)} />
+                <input
+                  type="checkbox"
+                  checked={Boolean(form[key])}
+                  onChange={(event) => update(key, event.target.checked)}
+                />
                 <span>{label}</span>
               </label>
             ))}
           </fieldset>
           <div className="calculator-actions">
-            <button type="submit" className="calculate-btn">Calculate Reynolds Helper</button>
-            <button type="button" className="reset-btn" onClick={reset}>Reset</button>
+            <button type="submit" className="calculate-btn">
+              Calculate Reynolds Helper
+            </button>
+            <button type="button" className="reset-btn" onClick={reset}>
+              Reset
+            </button>
           </div>
         </form>
       </div>
-      <div className="calculator-results" ref={resultsRef} tabIndex={-1} role="region" aria-label="Reynolds Risk Score results">
+      <div
+        className="calculator-results"
+        ref={resultsRef}
+        tabIndex={-1}
+        role="region"
+        aria-label="Reynolds Risk Score results"
+      >
         <ResultsPanelTitle />
-        {result ? <ResultCard slug={slug} title="Reynolds Risk Score Helper" result={result} scoreLabel="Helper points" {...{} as any} /> : <EmptyResults icon={icon} text="Enter prevention-risk values to view Reynolds context." />}
+        {result ? (
+          <ResultCard
+            slug={slug}
+            title="Reynolds Risk Score Helper"
+            result={result}
+            scoreLabel="Helper points"
+            {...({} as any)}
+          />
+        ) : (
+          <EmptyResults icon={icon} text="Enter prevention-risk values to view Reynolds context." />
+        )}
       </div>
     </div>
   );
@@ -460,7 +588,7 @@ export function HcmSuddenDeathRiskCalculator({ onResultChange }) {
             fiveYearRiskPct: result.fiveYearRiskPct,
             severity: result.interpretation.severity,
           }
-        : null
+        : null,
     );
   }, [onResultChange, result]);
 
@@ -500,16 +628,25 @@ export function HcmSuddenDeathRiskCalculator({ onResultChange }) {
   return (
     <div className={`calculator-interface calculator-interface--${slug}`}>
       <div className="calculator-inputs">
-        <CalcPanelTitle icon={icon}><span id={`${slug}-form-title`}>HCM Sudden Death Risk</span></CalcPanelTitle>
+        <CalcPanelTitle icon={icon}>
+          <span id={`${slug}-form-title`}>HCM Sudden Death Risk</span>
+        </CalcPanelTitle>
         <div className="calc-timi-disclaimer calc-has-bled-disclaimer" role="note">
           <CalcDecisionSupportLead />
-          <p className="calc-disclaimer-detail">HCM Risk-SCD model context for specialist review only; does not decide ICD eligibility.</p>
+          <p className="calc-disclaimer-detail">
+            HCM Risk-SCD model context for specialist review only; does not decide ICD eligibility.
+          </p>
         </div>
         <ValidationSummary id={`${slug}-validation-summary`} errors={validationErrors} />
-        <form className="calc-pr1-form" noValidate aria-labelledby={`${slug}-form-title`} onSubmit={(event) => {
-          event.preventDefault();
-          runCalculate();
-        }}>
+        <form
+          className="calc-pr1-form"
+          noValidate
+          aria-labelledby={`${slug}-form-title`}
+          onSubmit={(event) => {
+            event.preventDefault();
+            runCalculate();
+          }}
+        >
           <div className="calc-input-grid">
             {[
               ['ageYears', 'Age (years)'],
@@ -519,7 +656,14 @@ export function HcmSuddenDeathRiskCalculator({ onResultChange }) {
             ].map(([key, label]) => (
               <label className="calc-input-group" htmlFor={`${slug}-${key}`} key={key}>
                 <span className="calc-label">{label}</span>
-                <input id={`${slug}-${key}`} className="calc-input" type="number" step="0.1" value={form[key]} onChange={(event) => update(key, event.target.value)} />
+                <input
+                  id={`${slug}-${key}`}
+                  className="calc-input"
+                  type="number"
+                  step="0.1"
+                  value={form[key]}
+                  onChange={(event) => update(key, event.target.value)}
+                />
               </label>
             ))}
           </div>
@@ -531,20 +675,47 @@ export function HcmSuddenDeathRiskCalculator({ onResultChange }) {
               ['unexplainedSyncope', 'Unexplained syncope'],
             ].map(([key, label]) => (
               <label className="calc-checkbox-group" key={key}>
-                <input type="checkbox" checked={Boolean(form[key])} onChange={(event) => update(key, event.target.checked)} />
+                <input
+                  type="checkbox"
+                  checked={Boolean(form[key])}
+                  onChange={(event) => update(key, event.target.checked)}
+                />
                 <span>{label}</span>
               </label>
             ))}
           </fieldset>
           <div className="calculator-actions">
-            <button type="submit" className="calculate-btn">Calculate HCM SCD Risk</button>
-            <button type="button" className="reset-btn" onClick={reset}>Reset</button>
+            <button type="submit" className="calculate-btn">
+              Calculate HCM SCD Risk
+            </button>
+            <button type="button" className="reset-btn" onClick={reset}>
+              Reset
+            </button>
           </div>
         </form>
       </div>
-      <div className="calculator-results" ref={resultsRef} tabIndex={-1} role="region" aria-label="HCM sudden death risk results">
+      <div
+        className="calculator-results"
+        ref={resultsRef}
+        tabIndex={-1}
+        role="region"
+        aria-label="HCM sudden death risk results"
+      >
         <ResultsPanelTitle />
-        {result ? <ResultCard slug={slug} title="HCM Sudden Death Risk" result={result} scoreLabel="5-year risk" {...{} as any} /> : <EmptyResults icon={icon} text="Enter HCM model inputs to view 5-year SCD risk context." />}
+        {result ? (
+          <ResultCard
+            slug={slug}
+            title="HCM Sudden Death Risk"
+            result={result}
+            scoreLabel="5-year risk"
+            {...({} as any)}
+          />
+        ) : (
+          <EmptyResults
+            icon={icon}
+            text="Enter HCM model inputs to view 5-year SCD risk context."
+          />
+        )}
       </div>
     </div>
   );
@@ -584,39 +755,75 @@ export function HeartFailureStagingCalculator({ onResultChange }) {
   return (
     <div className={`calculator-interface calculator-interface--${slug}`}>
       <div className="calculator-inputs">
-        <CalcPanelTitle icon={icon}><span id={`${slug}-form-title`}>Heart Failure Staging Helper</span></CalcPanelTitle>
+        <CalcPanelTitle icon={icon}>
+          <span id={`${slug}-form-title`}>Heart Failure Staging Helper</span>
+        </CalcPanelTitle>
         <div className="calc-timi-disclaimer calc-has-bled-disclaimer" role="note">
           <CalcDecisionSupportLead />
           <p className="calc-disclaimer-detail">{HEART_FAILURE_STAGE_DISCLAIMER}</p>
         </div>
-        <form className="calc-pr1-form" noValidate aria-labelledby={`${slug}-form-title`} onSubmit={(event) => {
-          event.preventDefault();
-          runCalculate();
-        }}>
+        <form
+          className="calc-pr1-form"
+          noValidate
+          aria-labelledby={`${slug}-form-title`}
+          onSubmit={(event) => {
+            event.preventDefault();
+            runCalculate();
+          }}
+        >
           <fieldset className="calc-has-bled-fieldset">
             <legend className="calc-timi-legend">ACC/AHA stage features</legend>
             {[
-              ['riskFactors', 'Risk factors only (hypertension, ASCVD, diabetes, cardiotoxins, genetic risk)'],
-              ['structuralHeartDisease', 'Structural heart disease or abnormal cardiac function, no HF symptoms'],
+              [
+                'riskFactors',
+                'Risk factors only (hypertension, ASCVD, diabetes, cardiotoxins, genetic risk)',
+              ],
+              [
+                'structuralHeartDisease',
+                'Structural heart disease or abnormal cardiac function, no HF symptoms',
+              ],
               ['currentOrPriorSymptoms', 'Current or prior symptoms/signs of heart failure'],
-              ['refractorySymptoms', 'Marked/refractory symptoms or advanced HF features despite therapy'],
+              [
+                'refractorySymptoms',
+                'Marked/refractory symptoms or advanced HF features despite therapy',
+              ],
             ].map(([key, label]) => (
               <label className="calc-checkbox-group" key={key}>
-                <input type="checkbox" checked={Boolean(form[key])} onChange={(event) => setForm((previous) => ({ ...previous, [key]: event.target.checked }))} />
+                <input
+                  type="checkbox"
+                  checked={Boolean(form[key])}
+                  onChange={(event) =>
+                    setForm((previous) => ({ ...previous, [key]: event.target.checked }))
+                  }
+                />
                 <span>{label}</span>
               </label>
             ))}
           </fieldset>
           <div className="calculator-actions">
-            <button type="submit" className="calculate-btn">Calculate Heart Failure Stage</button>
-            <button type="button" className="reset-btn" onClick={reset}>Reset</button>
+            <button type="submit" className="calculate-btn">
+              Calculate Heart Failure Stage
+            </button>
+            <button type="button" className="reset-btn" onClick={reset}>
+              Reset
+            </button>
           </div>
         </form>
       </div>
-      <div className="calculator-results" ref={resultsRef} tabIndex={-1} role="region" aria-label="Heart failure staging results">
+      <div
+        className="calculator-results"
+        ref={resultsRef}
+        tabIndex={-1}
+        role="region"
+        aria-label="Heart failure staging results"
+      >
         <ResultsPanelTitle />
         {result ? (
-          <CalcInterpretationRegion headingId={`${slug}-interpretation-heading`} title={result.label} severity={result.severity}>
+          <CalcInterpretationRegion
+            headingId={`${slug}-interpretation-heading`}
+            title={result.label}
+            severity={result.severity}
+          >
             <div className="calc-score-display" aria-label={`ACC/AHA stage: ${result.stage}`}>
               <span className="calc-score-number">{result.stage}</span>
               <span className="calc-score-unit">ACC/AHA stage</span>
@@ -626,7 +833,10 @@ export function HeartFailureStagingCalculator({ onResultChange }) {
             <CalcResultSafetyFooter />
           </CalcInterpretationRegion>
         ) : (
-          <EmptyResults icon={icon} text="Select stage features to view ACC/AHA heart failure staging context." />
+          <EmptyResults
+            icon={icon}
+            text="Select stage features to view ACC/AHA heart failure staging context."
+          />
         )}
       </div>
     </div>

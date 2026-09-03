@@ -40,16 +40,20 @@ import {
   catalogRowsMatchingQuery,
 } from './pr3TestConstants';
 import { CHAT_ASSISTED_HUB_GROUPS } from './chatAssistedHubGroups';
-import { CALCULATOR_ROUTE_DEFS, expectedLaunchPath, isKnownToolAreaPath } from '../routes/clinicalToolRoutes';
+import {
+  CALCULATOR_ROUTE_DEFS,
+  expectedLaunchPath,
+  isKnownToolAreaPath,
+} from '../routes/clinicalToolRoutes';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
 const patternsSource = readFileSync(
   join(
     __dirname,
-    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts'
+    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts',
   ),
-  'utf8'
+  'utf8',
 );
 
 const ALL_PR3_ALIAS_PAIRS = [...PR3_NLU_ALIAS_PAIRS, ...PR3_DISCOVERY_ALIAS_PAIRS];
@@ -92,7 +96,7 @@ describe('PR3 consistency — registry, NLU, and chat config alignment', () => {
       // grace-acs and canadian-c-spine are real registerTool() backend executors, so
       // backendExecutable is true for them; nihss/ottawa-ankle have no backend executor.
       expect(nlu.backendExecutable).toBe(
-        (ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS as readonly string[]).includes(id)
+        (ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS as readonly string[]).includes(id),
       );
       expect(nlu.sidebarToolId).toBe(id);
       expect(nlu.path).toBe(PR3_HUB_PATH);
@@ -165,7 +169,7 @@ describe('PR3 consistency — aliases and duplicate detection', () => {
   it('covers every PR3 discovery alias in the global alias list', () => {
     for (const aliasId of PR3_DISCOVERY_ALIAS_IDS) {
       expect(PR3_CALCULATOR_REGISTRY_IDS).toContain(
-        toolIdAliases.find((a) => a.id === aliasId)?.mapsTo
+        toolIdAliases.find((a) => a.id === aliasId)?.mapsTo,
       );
     }
     expect(PR3_DISCOVERY_ALIAS_IDS.length).toBeGreaterThanOrEqual(PR3_DISCOVERY_ALIAS_PAIRS.length);
@@ -204,7 +208,7 @@ describe('PR3 consistency — catalog, discovery, and searchability', () => {
       // grace-acs and canadian-c-spine are real registerTool() backend executors, so
       // backendExecutor is true for them; nihss/ottawa-ankle have no backend executor.
       expect(row.backendExecutor).toBe(
-        (ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS as readonly string[]).includes(id)
+        (ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS as readonly string[]).includes(id),
       );
     }
   });
@@ -213,7 +217,10 @@ describe('PR3 consistency — catalog, discovery, and searchability', () => {
     const rows = getMedicalToolsCatalogRows();
     for (const [id, query] of PR3_CATALOG_SEARCH_QUERIES) {
       const hits = catalogRowsMatchingQuery(rows, query);
-      expect(hits.some((r) => r.primaryId === id), `search "${query}" → ${id}`).toBe(true);
+      expect(
+        hits.some((r) => r.primaryId === id),
+        `search "${query}" → ${id}`,
+      ).toBe(true);
     }
   });
 
@@ -222,7 +229,9 @@ describe('PR3 consistency — catalog, discovery, and searchability', () => {
     for (const id of PR3_CALCULATOR_REGISTRY_IDS) {
       const hits = merged.filter((r) => r.id === id);
       expect(hits.length, `discovery duplicates for ${id}`).toBe(1);
-      const blob = [hits[0].source, ...(hits[0].sources || []), hits[0].notes].filter(Boolean).join(' ');
+      const blob = [hits[0].source, ...(hits[0].sources || []), hits[0].notes]
+        .filter(Boolean)
+        .join(' ');
       expect(blob).toMatch(/toolRegistry|clinicalIntentToolCatalog|tool\.patterns|chatAssisted/i);
     }
   });
@@ -231,7 +240,7 @@ describe('PR3 consistency — catalog, discovery, and searchability', () => {
     const rows = getMedicalToolsCatalogRows();
     const summary = getMedicalCatalogSummary();
     const pr3Primaries = new Set(
-      rows.filter((r) => PR3_CALCULATOR_REGISTRY_IDS.includes(r.primaryId)).map((r) => r.primaryId)
+      rows.filter((r) => PR3_CALCULATOR_REGISTRY_IDS.includes(r.primaryId)).map((r) => r.primaryId),
     );
     expect(pr3Primaries.size).toBe(PR3_CALCULATOR_REGISTRY_IDS.length);
     expect(summary.total).toBeGreaterThanOrEqual(clinicalIntentTools.length);
@@ -274,7 +283,9 @@ describe('PR3 consistency — resolveCatalogLaunch, routes, sidebar, deep links'
   });
 
   it('exposes each PR3 registry id exactly once in toolRegistry (sidebar visibility)', () => {
-    const pr3Rows = toolRegistry.filter((t) => (PR3_CALCULATOR_REGISTRY_IDS as readonly string[]).includes(t.id));
+    const pr3Rows = toolRegistry.filter((t) =>
+      (PR3_CALCULATOR_REGISTRY_IDS as readonly string[]).includes(t.id),
+    );
     expect(pr3Rows).toHaveLength(PR3_CALCULATOR_REGISTRY_IDS.length);
     for (const id of PR3_CALCULATOR_REGISTRY_IDS) {
       const icon = getToolIcon(id);

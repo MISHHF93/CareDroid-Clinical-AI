@@ -14,7 +14,8 @@ import { useEmergencyStore } from '../../store/emergencyStore';
 const createPatientAndRouteFromReceptionMock = vi.hoisted(() => vi.fn());
 
 vi.mock('../../services/receptionIntakeOrchestrator', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('../../services/receptionIntakeOrchestrator')>();
+  const actual =
+    await importOriginal<typeof import('../../services/receptionIntakeOrchestrator')>();
   return {
     ...actual,
     createPatientAndRouteFromReception: createPatientAndRouteFromReceptionMock,

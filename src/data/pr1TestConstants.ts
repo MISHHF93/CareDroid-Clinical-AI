@@ -10,11 +10,11 @@ export const PR1_TOOL_IDS = Object.freeze([...PR1_CALCULATOR_REGISTRY_IDS]);
 
 /** Canonical Tier-A route for each PR1 registry id */
 export const PR1_ROUTE_BY_REGISTRY_ID = Object.freeze(
-  Object.fromEntries(PR1_TOOL_IDS.map((id) => [id, `/tools/calculators/${id}`]))
+  Object.fromEntries(PR1_TOOL_IDS.map((id) => [id, `/tools/calculators/${id}`])),
 );
 
 export const PR1_CALC_QUERY_BY_REGISTRY_ID = Object.freeze(
-  Object.fromEntries(PR1_TOOL_IDS.map((id) => [id, `/tools/calculators?calc=${id}`]))
+  Object.fromEntries(PR1_TOOL_IDS.map((id) => [id, `/tools/calculators?calc=${id}`])),
 );
 
 /** Product-required NLU / catalog aliases (space-separated) → registry id */

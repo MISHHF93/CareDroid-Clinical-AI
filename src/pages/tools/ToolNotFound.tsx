@@ -4,7 +4,10 @@ import { useConversation } from '../../contexts/ConversationContext';
 import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
 import { Permission, useUser } from '../../contexts/UserContext';
 import { resolveCatalogLaunch, resolveRegistryId } from '../../data/clinicalCatalogWiring';
-import { applyRegistryToolLaunch, getRegistryToolNavigation } from '../../navigation/registryToolLaunch';
+import {
+  applyRegistryToolLaunch,
+  getRegistryToolNavigation,
+} from '../../navigation/registryToolLaunch';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS } from '../../navigation/iconRegistry';
 import './ToolNotFound.css';
@@ -25,7 +28,9 @@ export default function ToolNotFound({
   const { recordToolAccess } = useToolPreferences();
   const resolvedId = toolId || location.state?.toolId || null;
   const registryId = resolvedId ? resolveRegistryId(resolvedId) : null;
-  const launch = registryId ? resolveCatalogLaunch(registryId) : resolveCatalogLaunch(resolvedId || '');
+  const launch = registryId
+    ? resolveCatalogLaunch(registryId)
+    : resolveCatalogLaunch(resolvedId || '');
   const navPlan = resolvedId ? getRegistryToolNavigation(resolvedId) : null;
 
   const suggestedPath =

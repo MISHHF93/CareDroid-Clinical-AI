@@ -32,8 +32,12 @@ describe('unifiedWorkflowAutomationModel', () => {
 
   it('maps administrative automation categories to primary workflow domains', () => {
     expect(resolvePrimaryDomainForAutomationCategory('patient_routing')).toBe('patient_routing');
-    expect(resolvePrimaryDomainForAutomationCategory('documentation_handoff')).toBe('documentation');
-    expect(resolvePrimaryDomainForAutomationCategory('ai_patient_summary')).toBe('ai_recommendations');
+    expect(resolvePrimaryDomainForAutomationCategory('documentation_handoff')).toBe(
+      'documentation',
+    );
+    expect(resolvePrimaryDomainForAutomationCategory('ai_patient_summary')).toBe(
+      'ai_recommendations',
+    );
     expect(resolvePrimaryDomainForAutomationCategory('staff_assignment')).toBe('staff_assignments');
   });
 
@@ -54,7 +58,10 @@ describe('unifiedWorkflowAutomationModel', () => {
     expect(UNIFIED_WORKFLOW_AUTOMATION_CONTRACT.domainCount).toBe(11);
     expect(UNIFIED_WORKFLOW_AUTOMATION_CONTRACT.eventDriven).toBe(true);
     expect(listWorkflowAutomationBackendEndpoints()).toEqual(
-      expect.arrayContaining(['/api/emergency/workflow-orchestration', '/api/emergency/patient-flow']),
+      expect.arrayContaining([
+        '/api/emergency/workflow-orchestration',
+        '/api/emergency/patient-flow',
+      ]),
     );
   });
 });

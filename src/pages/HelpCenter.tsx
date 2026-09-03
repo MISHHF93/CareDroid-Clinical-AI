@@ -69,34 +69,35 @@ export default function HelpCenter() {
           return (
             <section
               key={section.title}
-              className={[
-                'cdl-public-faq__section',
-                isOpen ? 'cdl-public-faq__section--open' : '',
-              ]
+              className={['cdl-public-faq__section', isOpen ? 'cdl-public-faq__section--open' : '']
                 .filter(Boolean)
                 .join(' ')}
             >
-              {isOpen ? (<button
-                type="button"
-                className="cdl-public-faq__trigger"
-                aria-expanded="true"
-                onClick={() => setExpandedSection(isOpen ? null : sectionIndex)}
-              >
-                <span>{section.title}</span>
-                <span className="cdl-public-faq__chevron" aria-hidden>
-                  ▾
-                </span>
-              </button>) : (<button
-                type="button"
-                className="cdl-public-faq__trigger"
-                aria-expanded="false"
-                onClick={() => setExpandedSection(isOpen ? null : sectionIndex)}
-              >
-                <span>{section.title}</span>
-                <span className="cdl-public-faq__chevron" aria-hidden>
-                  ▾
-                </span>
-              </button>)}
+              {isOpen ? (
+                <button
+                  type="button"
+                  className="cdl-public-faq__trigger"
+                  aria-expanded="true"
+                  onClick={() => setExpandedSection(isOpen ? null : sectionIndex)}
+                >
+                  <span>{section.title}</span>
+                  <span className="cdl-public-faq__chevron" aria-hidden>
+                    ▾
+                  </span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="cdl-public-faq__trigger"
+                  aria-expanded="false"
+                  onClick={() => setExpandedSection(isOpen ? null : sectionIndex)}
+                >
+                  <span>{section.title}</span>
+                  <span className="cdl-public-faq__chevron" aria-hidden>
+                    ▾
+                  </span>
+                </button>
+              )}
               {isOpen ? (
                 <div className="cdl-public-faq__panel">
                   {section.items.map((item) => (
@@ -116,8 +117,7 @@ export default function HelpCenter() {
         <h2>Need more help?</h2>
         <p>Contact support for deployment, governance, or clinical workflow questions.</p>
         <p>
-          Email:{' '}
-          <a href="mailto:support@caredroid.ai">support@caredroid.ai</a>
+          Email: <a href="mailto:support@caredroid.ai">support@caredroid.ai</a>
         </p>
       </aside>
     </PublicPageTemplate>

@@ -1,8 +1,5 @@
 import { CANONICAL_ROUTES } from './routes.config';
-import {
-  NAVIGATION_ITEMS,
-  getPilotCustomerNavigationItems,
-} from './unified-navigation.config';
+import { NAVIGATION_ITEMS, getPilotCustomerNavigationItems } from './unified-navigation.config';
 
 const ROUTE_COMMAND_METADATA_BY_NAV_ID = Object.freeze({
   whiteboard: {
@@ -119,12 +116,10 @@ const RETAINED_DIRECT_ROUTE_COMMANDS = Object.freeze([
   },
 ]);
 
-export const EMERGENCY_OS_ROUTE_COMMANDS = Object.freeze(
-  [
-    ...getPilotCustomerNavigationItems(NAVIGATION_ITEMS).map(routeCommandFromNavigationItem),
-    ...RETAINED_DIRECT_ROUTE_COMMANDS,
-  ],
-);
+export const EMERGENCY_OS_ROUTE_COMMANDS = Object.freeze([
+  ...getPilotCustomerNavigationItems(NAVIGATION_ITEMS).map(routeCommandFromNavigationItem),
+  ...RETAINED_DIRECT_ROUTE_COMMANDS,
+]);
 
 export const EMERGENCY_OS_HELP_COMMANDS = Object.freeze([
   {
@@ -136,7 +131,16 @@ export const EMERGENCY_OS_HELP_COMMANDS = Object.freeze([
     // duplicating the page command's exact text in palette search results.
     label: 'Open Help',
     hint: '?',
-    keywords: ['help', 'guide', 'manual', 'procedure', 'process', 'how to', 'training', 'walkthrough'],
+    keywords: [
+      'help',
+      'guide',
+      'manual',
+      'procedure',
+      'process',
+      'how to',
+      'training',
+      'walkthrough',
+    ],
     build: () => ({ type: 'OPEN_HELP', tab: 'page' }),
   },
   {

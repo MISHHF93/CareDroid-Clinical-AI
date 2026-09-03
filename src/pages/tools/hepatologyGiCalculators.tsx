@@ -28,8 +28,8 @@ import {
 function CalcDecisionSupportLead() {
   return (
     <SharedCalcDecisionSupportLead>
-      Does not establish a diagnosis, recommend treatment, or replace clinician judgment and local GI/hepatology
-      protocols.
+      Does not establish a diagnosis, recommend treatment, or replace clinician judgment and local
+      GI/hepatology protocols.
     </SharedCalcDecisionSupportLead>
   );
 }
@@ -37,8 +37,9 @@ function CalcDecisionSupportLead() {
 function CalcResultSafetyFooter() {
   return (
     <SharedCalcResultSafetyFooter>
-      Output reflects only the values entered here and may omit important context such as active bleeding,
-      encephalopathy, infection, hemodynamic instability, anticoagulants, and local pathway requirements.
+      Output reflects only the values entered here and may omit important context such as active
+      bleeding, encephalopathy, infection, hemodynamic instability, anticoagulants, and local
+      pathway requirements.
     </SharedCalcResultSafetyFooter>
   );
 }
@@ -69,7 +70,10 @@ function SafetyNote({ children = HEPATOLOGY_GI_DISCLAIMER }) {
 function ResultBlock({ slug, result, scoreLabel, children = null }: any) {
   return (
     <>
-      <div className={`calc-score-display ${result.severity}`} aria-labelledby={`${slug}-score-label`}>
+      <div
+        className={`calc-score-display ${result.severity}`}
+        aria-labelledby={`${slug}-score-label`}
+      >
         <div id={`${slug}-score-label`} className="calc-score-label">
           {scoreLabel}
         </div>
@@ -84,7 +88,9 @@ function ResultBlock({ slug, result, scoreLabel, children = null }: any) {
         emphasizeRisk={result.severity !== 'normal'}
       >
         <div className="calc-interpretation-text">{result.interpretation}</div>
-        <div className="calc-interpretation-text calc-interpretation-text--secondary">{result.disclaimer}</div>
+        <div className="calc-interpretation-text calc-interpretation-text--secondary">
+          {result.disclaimer}
+        </div>
       </CalcInterpretationRegion>
       <div className="calc-references">
         <div className="calc-references-title">Reference</div>
@@ -149,9 +155,9 @@ export function MaddreyDiscriminantFunctionCalculator({ onResultChange }) {
           <span id={`${slug}-form-title`}>Maddrey Discriminant Function</span>
         </CalcPanelTitle>
         <SafetyNote>
-          Maddrey DF uses prothrombin time prolongation and bilirubin as a historical severe-range marker in
-          alcoholic hepatitis cohorts. It does not diagnose alcoholic hepatitis and does not recommend steroids,
-          transplant referral, admission, or discharge.
+          Maddrey DF uses prothrombin time prolongation and bilirubin as a historical severe-range
+          marker in alcoholic hepatitis cohorts. It does not diagnose alcoholic hepatitis and does
+          not recommend steroids, transplant referral, admission, or discharge.
         </SafetyNote>
         <form
           className="calc-pr1-form"
@@ -222,13 +228,22 @@ export function MaddreyDiscriminantFunctionCalculator({ onResultChange }) {
             <button type="submit" className="calc-calculate-btn">
               Calculate Maddrey DF
             </button>
-            <button type="button" className="calc-reset-btn" onClick={reset} aria-label="Reset Maddrey DF form">
+            <button
+              type="button"
+              className="calc-reset-btn"
+              onClick={reset}
+              aria-label="Reset Maddrey DF form"
+            >
               Reset
             </button>
           </div>
         </form>
       </div>
-      <CalcResultsPanel id="calc-results-maddrey-discriminant-function" resultsRef={resultsRef} role="region">
+      <CalcResultsPanel
+        id="calc-results-maddrey-discriminant-function"
+        resultsRef={resultsRef}
+        role="region"
+      >
         <ResultsPanelTitle />
         {result ? (
           <ResultBlock slug={slug} result={result} scoreLabel="Maddrey DF" />
@@ -288,8 +303,9 @@ export function ApriCalculator({ onResultChange }) {
           <span id={`${slug}-form-title`}>APRI</span>
         </CalcPanelTitle>
         <SafetyNote>
-          APRI is a non-invasive fibrosis screening index from AST, AST upper limit of normal, and platelet count. It
-          does not diagnose cirrhosis or replace elastography, imaging, biopsy, or hepatology review.
+          APRI is a non-invasive fibrosis screening index from AST, AST upper limit of normal, and
+          platelet count. It does not diagnose cirrhosis or replace elastography, imaging, biopsy,
+          or hepatology review.
         </SafetyNote>
         <form
           className="calc-pr1-form"
@@ -347,7 +363,12 @@ export function ApriCalculator({ onResultChange }) {
             <button type="submit" className="calc-calculate-btn">
               Calculate APRI
             </button>
-            <button type="button" className="calc-reset-btn" onClick={reset} aria-label="Reset APRI form">
+            <button
+              type="button"
+              className="calc-reset-btn"
+              onClick={reset}
+              aria-label="Reset APRI form"
+            >
               Reset
             </button>
           </div>
@@ -401,7 +422,9 @@ export function GlasgowBlatchfordScoreCalculator({ onResultChange }) {
   };
 
   useEffect(() => {
-    onResultChange?.(result ? { glasgowBlatchfordScore: result.score, severity: result.severity } : null);
+    onResultChange?.(
+      result ? { glasgowBlatchfordScore: result.score, severity: result.severity } : null,
+    );
   }, [onResultChange, result]);
 
   useEffect(() => {
@@ -417,7 +440,15 @@ export function GlasgowBlatchfordScoreCalculator({ onResultChange }) {
     }
     const computed = calculateGlasgowBlatchfordScore(raw);
     const interpretation = computed ? interpretGlasgowBlatchford((computed as any).total) : null;
-    setResult(interpretation ? { score: (computed as any).total, breakdown: (computed as any).breakdown, ...interpretation } : null);
+    setResult(
+      interpretation
+        ? {
+            score: (computed as any).total,
+            breakdown: (computed as any).breakdown,
+            ...interpretation,
+          }
+        : null,
+    );
   };
 
   const reset = () => {
@@ -443,8 +474,9 @@ export function GlasgowBlatchfordScoreCalculator({ onResultChange }) {
           <span id={`${slug}-form-title`}>Glasgow-Blatchford Score</span>
         </CalcPanelTitle>
         <SafetyNote>
-          Glasgow-Blatchford Score supports upper GI bleeding risk stratification before endoscopy. It does not rule in
-          or rule out bleeding and does not recommend transfusion, endoscopy timing, medication, admission, or discharge.
+          Glasgow-Blatchford Score supports upper GI bleeding risk stratification before endoscopy.
+          It does not rule in or rule out bleeding and does not recommend transfusion, endoscopy
+          timing, medication, admission, or discharge.
         </SafetyNote>
         <form
           className="calc-pr1-form"
@@ -510,7 +542,12 @@ export function GlasgowBlatchfordScoreCalculator({ onResultChange }) {
             <label className="calc-label" htmlFor="gbs-sex">
               Sex for hemoglobin scoring
             </label>
-            <select id="gbs-sex" className="calc-select" value={sex} onChange={(e) => setSex(e.target.value)}>
+            <select
+              id="gbs-sex"
+              className="calc-select"
+              value={sex}
+              onChange={(e) => setSex(e.target.value)}
+            >
               <option value="">Select...</option>
               <option value="female">Female</option>
               <option value="male">Male</option>
@@ -532,13 +569,15 @@ export function GlasgowBlatchfordScoreCalculator({ onResultChange }) {
           </div>
           <fieldset className="calc-timi-fieldset">
             <legend className="calc-timi-legend">Clinical markers</legend>
-            {([
-              ['pulseAtLeast100', 'Pulse >= 100/min', pulseAtLeast100, setPulseAtLeast100],
-              ['melena', 'Melena', melena, setMelena],
-              ['syncope', 'Syncope', syncope, setSyncope],
-              ['hepaticDisease', 'Hepatic disease', hepaticDisease, setHepaticDisease],
-              ['cardiacFailure', 'Cardiac failure', cardiacFailure, setCardiacFailure],
-            ] as any[]).map(([key, label, checked, setter]) => (
+            {(
+              [
+                ['pulseAtLeast100', 'Pulse >= 100/min', pulseAtLeast100, setPulseAtLeast100],
+                ['melena', 'Melena', melena, setMelena],
+                ['syncope', 'Syncope', syncope, setSyncope],
+                ['hepaticDisease', 'Hepatic disease', hepaticDisease, setHepaticDisease],
+                ['cardiacFailure', 'Cardiac failure', cardiacFailure, setCardiacFailure],
+              ] as any[]
+            ).map(([key, label, checked, setter]) => (
               <div key={key} className="calc-checkbox-group">
                 <input
                   id={`gbs-${key}`}
@@ -557,13 +596,22 @@ export function GlasgowBlatchfordScoreCalculator({ onResultChange }) {
             <button type="submit" className="calc-calculate-btn">
               Calculate GBS
             </button>
-            <button type="button" className="calc-reset-btn" onClick={reset} aria-label="Reset GBS form">
+            <button
+              type="button"
+              className="calc-reset-btn"
+              onClick={reset}
+              aria-label="Reset GBS form"
+            >
               Reset
             </button>
           </div>
         </form>
       </div>
-      <CalcResultsPanel id="calc-results-glasgow-blatchford-score" resultsRef={resultsRef} role="region">
+      <CalcResultsPanel
+        id="calc-results-glasgow-blatchford-score"
+        resultsRef={resultsRef}
+        role="region"
+      >
         <ResultsPanelTitle />
         {result ? (
           <ResultBlock slug={slug} result={result} scoreLabel="GBS">
@@ -639,7 +687,15 @@ export function RockallScoreCalculator({ onResultChange }) {
   const runCalculate = () => {
     const computed = calculateRockallScore(inputs);
     const interpretation = computed ? interpretRockall((computed as any).total) : null;
-    setResult(interpretation ? { score: (computed as any).total, breakdown: (computed as any).breakdown, ...interpretation } : null);
+    setResult(
+      interpretation
+        ? {
+            score: (computed as any).total,
+            breakdown: (computed as any).breakdown,
+            ...interpretation,
+          }
+        : null,
+    );
   };
 
   return (
@@ -649,8 +705,9 @@ export function RockallScoreCalculator({ onResultChange }) {
           <span id={`${slug}-form-title`}>Rockall Score</span>
         </CalcPanelTitle>
         <SafetyNote>
-          Rockall Score supports upper GI bleeding risk stratification using clinical and endoscopic findings. It does
-          not recommend endoscopy timing, transfusion, medication, admission, discharge, or level of care.
+          Rockall Score supports upper GI bleeding risk stratification using clinical and endoscopic
+          findings. It does not recommend endoscopy timing, transfusion, medication, admission,
+          discharge, or level of care.
         </SafetyNote>
         <form
           className="calc-pr1-form"

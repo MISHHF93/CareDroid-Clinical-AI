@@ -57,13 +57,21 @@ const IMPLEMENTATION_PLAN_LINKS = Object.freeze([
   Object.freeze({
     docPath: 'docs/smart-patient-intake-engine.md',
     capability: 'Smart Intake',
-    implementedIn: Object.freeze(['EmergencyIntakeOperatingSystemService.intakeWorkflow', 'intakeRecord', '/workspace/emergency/intake']),
+    implementedIn: Object.freeze([
+      'EmergencyIntakeOperatingSystemService.intakeWorkflow',
+      'intakeRecord',
+      '/workspace/emergency/intake',
+    ]),
     acceptance: 'Patient intake becomes assisted rather than manual.',
   }),
   Object.freeze({
     docPath: 'docs/document-intelligence-pipeline.md',
     capability: 'Document Intelligence',
-    implementedIn: Object.freeze(['DocumentIntelligenceService', 'documentIntelligence.records', '/workspace/emergency/intake']),
+    implementedIn: Object.freeze([
+      'DocumentIntelligenceService',
+      'documentIntelligence.records',
+      '/workspace/emergency/intake',
+    ]),
     acceptance: 'Documents become structured data.',
   }),
   Object.freeze({
@@ -81,19 +89,30 @@ const IMPLEMENTATION_PLAN_LINKS = Object.freeze([
   Object.freeze({
     docPath: 'docs/allergy-risk-capture.md',
     capability: 'Allergy Capture',
-    implementedIn: Object.freeze(['allergyRiskCapture', '/workspace/emergency/triage', '/workspace/emergency/patient-context']),
+    implementedIn: Object.freeze([
+      'allergyRiskCapture',
+      '/workspace/emergency/triage',
+      '/workspace/emergency/patient-context',
+    ]),
     acceptance: 'High-risk information surfaces immediately.',
   }),
   Object.freeze({
     docPath: 'docs/emergency-registration-accelerator.md',
     capability: 'Registration Accelerator',
-    implementedIn: Object.freeze(['supportedIntakeModes', 'registrationCompletionScore', '/workspace/emergency/intake']),
+    implementedIn: Object.freeze([
+      'supportedIntakeModes',
+      'registrationCompletionScore',
+      '/workspace/emergency/intake',
+    ]),
     acceptance: 'Registration becomes faster and more consistent.',
   }),
   Object.freeze({
     docPath: 'docs/ai-patient-snapshot-generator.md',
     capability: 'AI Patient Snapshot Generator',
-    implementedIn: Object.freeze(['patientSnapshot.sections.sourceRecords', '/workspace/emergency/patient-context']),
+    implementedIn: Object.freeze([
+      'patientSnapshot.sections.sourceRecords',
+      '/workspace/emergency/patient-context',
+    ]),
     acceptance: 'Clinicians understand context quickly.',
   }),
   Object.freeze({
@@ -117,7 +136,11 @@ const IMPLEMENTATION_PLAN_LINKS = Object.freeze([
   Object.freeze({
     docPath: 'docs/consent-and-verification-framework.md',
     capability: 'Consent and Verification',
-    implementedIn: Object.freeze(['governance.artifacts', 'intakeRecord', '/workspace/emergency/intake']),
+    implementedIn: Object.freeze([
+      'governance.artifacts',
+      'intakeRecord',
+      '/workspace/emergency/intake',
+    ]),
     acceptance: 'Automation remains governance-ready.',
   }),
   Object.freeze({
@@ -129,7 +152,11 @@ const IMPLEMENTATION_PLAN_LINKS = Object.freeze([
   Object.freeze({
     docPath: 'docs/referral-document-ingestion.md',
     capability: 'Referral Document Ingestion',
-    implementedIn: Object.freeze(['referralDocumentIngestion', 'DocumentIntelligenceService', '/workspace/emergency/intake']),
+    implementedIn: Object.freeze([
+      'referralDocumentIngestion',
+      'DocumentIntelligenceService',
+      '/workspace/emergency/intake',
+    ]),
     acceptance: 'External information becomes searchable.',
   }),
   Object.freeze({
@@ -147,26 +174,41 @@ const IMPLEMENTATION_PLAN_LINKS = Object.freeze([
   Object.freeze({
     docPath: 'docs/emergency-intake-automation-marketplace.md',
     capability: 'Intake Automation Marketplace',
-    implementedIn: Object.freeze(['marketplace', 'patientJourneyFeed', '/workspace/emergency/intake']),
+    implementedIn: Object.freeze([
+      'marketplace',
+      'patientJourneyFeed',
+      '/workspace/emergency/intake',
+    ]),
     acceptance: 'Intake becomes a sellable product category.',
   }),
   Object.freeze({
     docPath: 'docs/emergency-flow-intelligence-integration.md',
     capability: 'Emergency Flow Intelligence Integration',
-    implementedIn: Object.freeze(['integrationFlow', 'patientJourneyFeed', 'EmergencyOperatingSystemService.intakeOperatingSystem']),
+    implementedIn: Object.freeze([
+      'integrationFlow',
+      'patientJourneyFeed',
+      'EmergencyOperatingSystemService.intakeOperatingSystem',
+    ]),
     acceptance: 'Intake is fully integrated into Emergency Department OS.',
   }),
   Object.freeze({
     docPath: 'docs/first-five-minute-experience.md',
     capability: 'First Five Minute Experience',
-    implementedIn: Object.freeze(['firstFiveMinuteExperience', '/workspace/emergency/intake-analytics']),
+    implementedIn: Object.freeze([
+      'firstFiveMinuteExperience',
+      '/workspace/emergency/intake-analytics',
+    ]),
     acceptance: 'CareDroid demonstrates measurable reduction in administrative delay.',
   }),
   Object.freeze({
     docPath: 'docs/emergency-intake-operating-system.md',
     capability: 'Emergency Intake Operating System',
-    implementedIn: Object.freeze(['EmergencyIntakeOperatingSystemService', 'WorkspaceDataPipelineService.emergency.intakeOperatingSystem']),
-    acceptance: 'Emergency Intake becomes a complete operational product that feeds the Emergency Department Operating System.',
+    implementedIn: Object.freeze([
+      'EmergencyIntakeOperatingSystemService',
+      'WorkspaceDataPipelineService.emergency.intakeOperatingSystem',
+    ]),
+    acceptance:
+      'Emergency Intake becomes a complete operational product that feeds the Emergency Department Operating System.',
   }),
 ]);
 
@@ -329,7 +371,10 @@ const INTAKE_AUTOMATION_MODULES = Object.freeze([
     tierAvailability: Object.freeze({ core: 'Included', pro: 'Included', enterprise: 'Included' }),
     route: '/workspace/emergency/intake',
     journeyStages: Object.freeze(['arrival', 'registration', 'triage']),
-    reviewControls: Object.freeze([...BASE_REVIEW_CONTROLS, 'patient or staff confirmation before finalizing']),
+    reviewControls: Object.freeze([
+      ...BASE_REVIEW_CONTROLS,
+      'patient or staff confirmation before finalizing',
+    ]),
     usageMetric: 'summarized arrivals in CareDroid',
   }),
   Object.freeze({
@@ -355,7 +400,8 @@ const INTAKE_AUTOMATION_MODULES = Object.freeze([
   Object.freeze({
     moduleId: 'identity-resolution',
     title: 'Identity Resolution',
-    description: 'Candidate patient matching with Confidence Score and review for uncertain matches.',
+    description:
+      'Candidate patient matching with Confidence Score and review for uncertain matches.',
     tierAvailability: Object.freeze({ core: 'Basic', pro: 'Included', enterprise: 'Advanced' }),
     route: '/workspace/emergency/intake',
     journeyStages: Object.freeze(['arrival', 'registration']),
@@ -375,7 +421,8 @@ const INTAKE_AUTOMATION_MODULES = Object.freeze([
   Object.freeze({
     moduleId: 'medication-capture',
     title: 'Medication Capture',
-    description: 'Medication Summary from patient report, prior records, and pharmacy integrations when available.',
+    description:
+      'Medication Summary from patient report, prior records, and pharmacy integrations when available.',
     tierAvailability: Object.freeze({ core: 'Limited', pro: 'Included', enterprise: 'Advanced' }),
     route: '/workspace/emergency/patient-context',
     journeyStages: Object.freeze(['registration', 'triage']),
@@ -385,7 +432,8 @@ const INTAKE_AUTOMATION_MODULES = Object.freeze([
   Object.freeze({
     moduleId: 'allergy-capture',
     title: 'Allergy Capture',
-    description: 'Early allergies, adverse reactions, anticoagulants, pregnancy status, and chronic condition capture.',
+    description:
+      'Early allergies, adverse reactions, anticoagulants, pregnancy status, and chronic condition capture.',
     tierAvailability: Object.freeze({ core: 'Included', pro: 'Included', enterprise: 'Included' }),
     route: '/workspace/emergency/patient-context',
     journeyStages: Object.freeze(['registration', 'triage']),
@@ -396,7 +444,11 @@ const INTAKE_AUTOMATION_MODULES = Object.freeze([
     moduleId: 'voice-intake',
     title: 'Voice Intake',
     description: 'Conversational intake that converts speech into structured intake fields.',
-    tierAvailability: Object.freeze({ core: 'Not included', pro: 'Add-on', enterprise: 'Included' }),
+    tierAvailability: Object.freeze({
+      core: 'Not included',
+      pro: 'Add-on',
+      enterprise: 'Included',
+    }),
     route: '/workspace/emergency/intake',
     journeyStages: Object.freeze(['arrival', 'registration']),
     reviewControls: Object.freeze([...BASE_REVIEW_CONTROLS, 'transcript correction']),
@@ -406,7 +458,11 @@ const INTAKE_AUTOMATION_MODULES = Object.freeze([
     moduleId: 'multi-language-intake',
     title: 'Multi-Language Intake',
     description: 'Multi-language assisted intake paths for registration and verification.',
-    tierAvailability: Object.freeze({ core: 'Not included', pro: 'Add-on', enterprise: 'Included' }),
+    tierAvailability: Object.freeze({
+      core: 'Not included',
+      pro: 'Add-on',
+      enterprise: 'Included',
+    }),
     route: '/workspace/emergency/intake',
     journeyStages: Object.freeze(['arrival', 'registration']),
     reviewControls: BASE_REVIEW_CONTROLS,
@@ -419,7 +475,8 @@ const INTAKE_JOURNEY_AUTOMATIONS = Object.freeze([
   Object.freeze({
     moduleId: 'consent-verification',
     title: 'Consent and Verification',
-    description: 'Patient confirmation, consent capture, audit logging, source attribution, and correction workflow.',
+    description:
+      'Patient confirmation, consent capture, audit logging, source attribution, and correction workflow.',
     tierAvailability: Object.freeze({ core: 'Included', pro: 'Included', enterprise: 'Included' }),
     route: '/workspace/emergency/intake',
     journeyStages: Object.freeze(['registration']),
@@ -429,7 +486,8 @@ const INTAKE_JOURNEY_AUTOMATIONS = Object.freeze([
   Object.freeze({
     moduleId: 'pre-triage-queue',
     title: 'Pre-Triage Queue',
-    description: 'Structured queue from intake, demographics, complaint, and risk indicators with no autonomous triage decisions.',
+    description:
+      'Structured queue from intake, demographics, complaint, and risk indicators with no autonomous triage decisions.',
     tierAvailability: Object.freeze({ core: 'Included', pro: 'Included', enterprise: 'Included' }),
     route: '/workspace/emergency/triage',
     journeyStages: Object.freeze(['triage']),
@@ -439,7 +497,8 @@ const INTAKE_JOURNEY_AUTOMATIONS = Object.freeze([
   Object.freeze({
     moduleId: 'intake-analytics',
     title: 'Intake Analytics',
-    description: 'Operational analytics for registration time, verification time, completion rate, document volume, and triage readiness.',
+    description:
+      'Operational analytics for registration time, verification time, completion rate, document volume, and triage readiness.',
     tierAvailability: Object.freeze({ core: 'Included', pro: 'Included', enterprise: 'Included' }),
     route: '/workspace/emergency/intake-analytics',
     journeyStages: Object.freeze(['arrival', 'registration', 'triage']),
@@ -466,38 +525,140 @@ function buildDocumentFields(documentType) {
   const normalized = String(documentType || '').toLowerCase();
   if (normalized.includes('insurance')) {
     return [
-      { field: 'payerName', value: 'CarePlus Health', confidence: 0.94, validationStatus: 'valid', reviewStatus: 'accepted' },
-      { field: 'memberId', value: 'CP-442190', confidence: 0.91, validationStatus: 'valid', reviewStatus: 'accepted' },
-      { field: 'groupId', value: 'GRP-88A', confidence: 0.79, validationStatus: 'needs review', reviewStatus: 'pending review' },
+      {
+        field: 'payerName',
+        value: 'CarePlus Health',
+        confidence: 0.94,
+        validationStatus: 'valid',
+        reviewStatus: 'accepted',
+      },
+      {
+        field: 'memberId',
+        value: 'CP-442190',
+        confidence: 0.91,
+        validationStatus: 'valid',
+        reviewStatus: 'accepted',
+      },
+      {
+        field: 'groupId',
+        value: 'GRP-88A',
+        confidence: 0.79,
+        validationStatus: 'needs review',
+        reviewStatus: 'pending review',
+      },
     ];
   }
-  if (normalized.includes('referral') || normalized.includes('clinic') || normalized.includes('ems')) {
+  if (
+    normalized.includes('referral') ||
+    normalized.includes('clinic') ||
+    normalized.includes('ems')
+  ) {
     return [
-      { field: 'diagnoses', value: 'Chest pain under evaluation', confidence: 0.86, validationStatus: 'review required', reviewStatus: 'pending review' },
-      { field: 'medications', value: 'Aspirin reported', confidence: 0.82, validationStatus: 'review required', reviewStatus: 'pending review' },
-      { field: 'allergies', value: 'Penicillin allergy mentioned', confidence: 0.8, validationStatus: 'review required', reviewStatus: 'pending review' },
-      { field: 'recommendations', value: 'ED assessment recommended', confidence: 0.88, validationStatus: 'review required', reviewStatus: 'pending review' },
+      {
+        field: 'diagnoses',
+        value: 'Chest pain under evaluation',
+        confidence: 0.86,
+        validationStatus: 'review required',
+        reviewStatus: 'pending review',
+      },
+      {
+        field: 'medications',
+        value: 'Aspirin reported',
+        confidence: 0.82,
+        validationStatus: 'review required',
+        reviewStatus: 'pending review',
+      },
+      {
+        field: 'allergies',
+        value: 'Penicillin allergy mentioned',
+        confidence: 0.8,
+        validationStatus: 'review required',
+        reviewStatus: 'pending review',
+      },
+      {
+        field: 'recommendations',
+        value: 'ED assessment recommended',
+        confidence: 0.88,
+        validationStatus: 'review required',
+        reviewStatus: 'pending review',
+      },
     ];
   }
   if (normalized.includes('discharge')) {
     return [
-      { field: 'diagnoses', value: 'Hypertension and chest pain follow-up', confidence: 0.85, validationStatus: 'review required', reviewStatus: 'pending review' },
-      { field: 'medications', value: 'Warfarin listed on discharge medication section', confidence: 0.81, validationStatus: 'review required', reviewStatus: 'pending review' },
-      { field: 'allergies', value: 'Penicillin allergy listed', confidence: 0.84, validationStatus: 'review required', reviewStatus: 'pending review' },
-      { field: 'recommendations', value: 'Follow up with primary care', confidence: 0.86, validationStatus: 'review required', reviewStatus: 'pending review' },
-      { field: 'recentEncounter', value: 'Discharged from medical unit 14 days ago', confidence: 0.9, validationStatus: 'valid', reviewStatus: 'accepted' },
-      { field: 'followUpInstructions', value: 'Follow up with primary care', confidence: 0.84, validationStatus: 'review required', reviewStatus: 'pending review' },
+      {
+        field: 'diagnoses',
+        value: 'Hypertension and chest pain follow-up',
+        confidence: 0.85,
+        validationStatus: 'review required',
+        reviewStatus: 'pending review',
+      },
+      {
+        field: 'medications',
+        value: 'Warfarin listed on discharge medication section',
+        confidence: 0.81,
+        validationStatus: 'review required',
+        reviewStatus: 'pending review',
+      },
+      {
+        field: 'allergies',
+        value: 'Penicillin allergy listed',
+        confidence: 0.84,
+        validationStatus: 'review required',
+        reviewStatus: 'pending review',
+      },
+      {
+        field: 'recommendations',
+        value: 'Follow up with primary care',
+        confidence: 0.86,
+        validationStatus: 'review required',
+        reviewStatus: 'pending review',
+      },
+      {
+        field: 'recentEncounter',
+        value: 'Discharged from medical unit 14 days ago',
+        confidence: 0.9,
+        validationStatus: 'valid',
+        reviewStatus: 'accepted',
+      },
+      {
+        field: 'followUpInstructions',
+        value: 'Follow up with primary care',
+        confidence: 0.84,
+        validationStatus: 'review required',
+        reviewStatus: 'pending review',
+      },
     ];
   }
   return [
-    { field: 'name', value: 'Jordan Lee', confidence: 0.96, validationStatus: 'valid', reviewStatus: 'accepted' },
-    { field: 'DOB', value: '1971-04-12', confidence: 0.93, validationStatus: 'valid', reviewStatus: 'accepted' },
-    { field: 'identifier', value: 'DL-REVIEW-4432', confidence: 0.81, validationStatus: 'needs review', reviewStatus: 'pending review' },
+    {
+      field: 'name',
+      value: 'Jordan Lee',
+      confidence: 0.96,
+      validationStatus: 'valid',
+      reviewStatus: 'accepted',
+    },
+    {
+      field: 'DOB',
+      value: '1971-04-12',
+      confidence: 0.93,
+      validationStatus: 'valid',
+      reviewStatus: 'accepted',
+    },
+    {
+      field: 'identifier',
+      value: 'DL-REVIEW-4432',
+      confidence: 0.81,
+      validationStatus: 'needs review',
+      reviewStatus: 'pending review',
+    },
   ];
 }
 
 function normalizeDocumentType(input: any = {}) {
-  const rawType = String(input.documentType || input.type || input.name || "driver's license").toLowerCase();
+  const rawType = String(
+    input.documentType || input.type || input.name || "driver's license",
+  ).toLowerCase();
   if (rawType.includes('health')) return 'health card';
   if (rawType.includes('insurance')) return 'insurance card';
   if (rawType.includes('referral')) return 'referral letters';
@@ -520,7 +681,7 @@ function buildRegistrationScore() {
   ];
   const score = Math.max(
     0,
-    fieldCompletionWeights.reduce((sum, item) => sum + (item.complete ? item.weight : 0), 0)
+    fieldCompletionWeights.reduce((sum, item) => sum + (item.complete ? item.weight : 0), 0),
   );
 
   return Object.freeze({
@@ -540,26 +701,133 @@ function buildIntakeRecord() {
     promotionRule: 'Only confirmed values are promoted into the intake patient context.',
     confirmationStatus: 'patient or staff confirmed',
     fieldProposals: Object.freeze([
-      { field: 'name', proposedValue: 'Jordan Lee', source: "driver's license OCR", editable: true, confirmationState: 'confirmed', conflict: false, missing: false },
-      { field: 'DOB', proposedValue: '1971-04-12', source: "driver's license OCR", editable: true, confirmationState: 'confirmed', conflict: false, missing: false },
-      { field: 'address', proposedValue: 'confirmed address on file', source: 'QR code intake', editable: true, confirmationState: 'confirmed', conflict: false, missing: false },
-      { field: 'phone', proposedValue: 'confirmed phone on file', source: 'patient-entered intake', editable: true, confirmationState: 'confirmed', conflict: false, missing: false },
-      { field: 'emergency contact', proposedValue: '', source: 'tablet intake', editable: true, confirmationState: 'missing', conflict: false, missing: true },
-      { field: 'identifiers', proposedValue: 'MRN and document reference retained', source: 'identity resolution review', editable: true, confirmationState: 'confirmed', conflict: false, missing: false },
-      { field: 'insurance metadata', proposedValue: 'payer and member ID accepted; group ID pending', source: 'insurance card OCR', editable: true, confirmationState: 'partial review', conflict: true, missing: false },
+      {
+        field: 'name',
+        proposedValue: 'Jordan Lee',
+        source: "driver's license OCR",
+        editable: true,
+        confirmationState: 'confirmed',
+        conflict: false,
+        missing: false,
+      },
+      {
+        field: 'DOB',
+        proposedValue: '1971-04-12',
+        source: "driver's license OCR",
+        editable: true,
+        confirmationState: 'confirmed',
+        conflict: false,
+        missing: false,
+      },
+      {
+        field: 'address',
+        proposedValue: 'confirmed address on file',
+        source: 'QR code intake',
+        editable: true,
+        confirmationState: 'confirmed',
+        conflict: false,
+        missing: false,
+      },
+      {
+        field: 'phone',
+        proposedValue: 'confirmed phone on file',
+        source: 'patient-entered intake',
+        editable: true,
+        confirmationState: 'confirmed',
+        conflict: false,
+        missing: false,
+      },
+      {
+        field: 'emergency contact',
+        proposedValue: '',
+        source: 'tablet intake',
+        editable: true,
+        confirmationState: 'missing',
+        conflict: false,
+        missing: true,
+      },
+      {
+        field: 'identifiers',
+        proposedValue: 'MRN and document reference retained',
+        source: 'identity resolution review',
+        editable: true,
+        confirmationState: 'confirmed',
+        conflict: false,
+        missing: false,
+      },
+      {
+        field: 'insurance metadata',
+        proposedValue: 'payer and member ID accepted; group ID pending',
+        source: 'insurance card OCR',
+        editable: true,
+        confirmationState: 'partial review',
+        conflict: true,
+        missing: false,
+      },
     ]),
     confirmedFields: Object.freeze([
-      { field: 'name', value: 'Jordan Lee', source: 'confirmed intake patient context', confirmedBy: 'patient', confirmedAt: 'frontend-runtime' },
-      { field: 'DOB', value: '1971-04-12', source: "driver's license OCR", confirmedBy: 'registration staff', confirmedAt: 'frontend-runtime' },
-      { field: 'address', value: 'confirmed address on file', source: 'QR code intake', confirmedBy: 'patient', confirmedAt: 'frontend-runtime' },
-      { field: 'phone', value: 'confirmed phone on file', source: 'patient-entered intake', confirmedBy: 'patient', confirmedAt: 'frontend-runtime' },
-      { field: 'identifiers', value: 'MRN and document reference retained', source: 'identity resolution review', confirmedBy: 'registration staff', confirmedAt: 'frontend-runtime' },
-      { field: 'insurance metadata', value: 'payer and member ID accepted', source: 'insurance card OCR', confirmedBy: 'registration staff', confirmedAt: 'frontend-runtime' },
+      {
+        field: 'name',
+        value: 'Jordan Lee',
+        source: 'confirmed intake patient context',
+        confirmedBy: 'patient',
+        confirmedAt: 'frontend-runtime',
+      },
+      {
+        field: 'DOB',
+        value: '1971-04-12',
+        source: "driver's license OCR",
+        confirmedBy: 'registration staff',
+        confirmedAt: 'frontend-runtime',
+      },
+      {
+        field: 'address',
+        value: 'confirmed address on file',
+        source: 'QR code intake',
+        confirmedBy: 'patient',
+        confirmedAt: 'frontend-runtime',
+      },
+      {
+        field: 'phone',
+        value: 'confirmed phone on file',
+        source: 'patient-entered intake',
+        confirmedBy: 'patient',
+        confirmedAt: 'frontend-runtime',
+      },
+      {
+        field: 'identifiers',
+        value: 'MRN and document reference retained',
+        source: 'identity resolution review',
+        confirmedBy: 'registration staff',
+        confirmedAt: 'frontend-runtime',
+      },
+      {
+        field: 'insurance metadata',
+        value: 'payer and member ID accepted',
+        source: 'insurance card OCR',
+        confirmedBy: 'registration staff',
+        confirmedAt: 'frontend-runtime',
+      },
     ]),
     draftSuggestions: Object.freeze([
-      { field: 'emergency contact', value: 'pending for some patients', source: 'tablet intake', reason: 'missing required value; not promoted until confirmed' },
-      { field: 'insurance group ID', value: 'GRP-88A', source: 'insurance card OCR', reason: 'needs review before promotion' },
-      { field: 'allergy confirmation', value: 'review incomplete', source: 'kiosk intake', reason: 'requires patient or staff confirmation' },
+      {
+        field: 'emergency contact',
+        value: 'pending for some patients',
+        source: 'tablet intake',
+        reason: 'missing required value; not promoted until confirmed',
+      },
+      {
+        field: 'insurance group ID',
+        value: 'GRP-88A',
+        source: 'insurance card OCR',
+        reason: 'needs review before promotion',
+      },
+      {
+        field: 'allergy confirmation',
+        value: 'review incomplete',
+        source: 'kiosk intake',
+        reason: 'requires patient or staff confirmation',
+      },
     ]),
     attribution: 'field-level source, reviewer, and confirmation timestamp retained',
   });
@@ -680,7 +948,9 @@ function buildGovernanceArtifacts() {
 function buildCommandCenter() {
   const arrivals = DEMO_PATIENTS.length;
   const registrationsStarted = DEMO_PATIENTS.filter((patient) => patient.identityCaptured).length;
-  const registrationsCompleted = DEMO_PATIENTS.filter((patient) => !patient.pendingVerification && !patient.pendingIntakeReview).length;
+  const registrationsCompleted = DEMO_PATIENTS.filter(
+    (patient) => !patient.pendingVerification && !patient.pendingIntakeReview,
+  ).length;
   const pendingVerification = DEMO_PATIENTS.filter((patient) => patient.pendingVerification).length;
   const pendingIntakeReview = DEMO_PATIENTS.filter((patient) => patient.pendingIntakeReview).length;
   const triageReadyPatients = DEMO_PATIENTS.filter((patient) => patient.triageReady).length;
@@ -706,21 +976,45 @@ function buildCommandCenter() {
     ]),
     intakeModes: Object.freeze([...new Set(DEMO_PATIENTS.map((patient) => patient.intakeMode))]),
     staleItems: Object.freeze(
-      DEMO_PATIENTS.filter((patient) => patient.arrivalMinutesAgo >= 8 || patient.pendingVerification).map((patient) =>
+      DEMO_PATIENTS.filter(
+        (patient) => patient.arrivalMinutesAgo >= 8 || patient.pendingVerification,
+      ).map((patient) =>
         Object.freeze({
           patientId: patient.patientId,
           label: patient.displayName,
-          delayedState: patient.pendingVerification ? 'pending verification' : 'pending intake review',
+          delayedState: patient.pendingVerification
+            ? 'pending verification'
+            : 'pending intake review',
           ageMinutes: patient.arrivalMinutesAgo,
           intakeMode: patient.intakeMode,
-        })
-      )
+        }),
+      ),
     ),
     bottleneckSignals: Object.freeze([
-      { id: 'verification-aging', label: 'Verification aging', value: `${pendingVerification} patients`, severity: pendingVerification ? 'medium' : 'low' },
-      { id: 'intake-review-aging', label: 'Pending intake review', value: `${pendingIntakeReview} patients`, severity: pendingIntakeReview ? 'medium' : 'low' },
-      { id: 'completion-rate', label: 'Intake completion rate', value: `${percent(registrationsCompleted, arrivals)}%`, severity: 'medium' },
-      { id: 'missing-fields', label: 'Missing or unconfirmed fields', value: `${DEMO_PATIENTS.flatMap((patient) => patient.missingFields).length} fields`, severity: 'medium' },
+      {
+        id: 'verification-aging',
+        label: 'Verification aging',
+        value: `${pendingVerification} patients`,
+        severity: pendingVerification ? 'medium' : 'low',
+      },
+      {
+        id: 'intake-review-aging',
+        label: 'Pending intake review',
+        value: `${pendingIntakeReview} patients`,
+        severity: pendingIntakeReview ? 'medium' : 'low',
+      },
+      {
+        id: 'completion-rate',
+        label: 'Intake completion rate',
+        value: `${percent(registrationsCompleted, arrivals)}%`,
+        severity: 'medium',
+      },
+      {
+        id: 'missing-fields',
+        label: 'Missing or unconfirmed fields',
+        value: `${DEMO_PATIENTS.flatMap((patient) => patient.missingFields).length} fields`,
+        severity: 'medium',
+      },
     ]),
   });
 }
@@ -749,7 +1043,8 @@ function buildPatientSnapshot() {
       {
         id: 'history',
         question: 'Key history?',
-        answer: 'Prior ED visit for chest discomfort and active hypertension are available for clinician review.',
+        answer:
+          'Prior ED visit for chest discomfort and active hypertension are available for clinician review.',
         sourceRecords: Object.freeze(['prior-encounter-summary', 'problem-list']),
       },
       {
@@ -795,18 +1090,40 @@ function buildPatientSnapshot() {
       arrivalComplaint: 'Chest Pain',
     }),
     freshnessIndicators: Object.freeze([
-      { context: 'demographics', freshness: 'confirmed during current intake', source: 'confirmed intake patient context' },
-      { context: 'allergies', freshness: 'current patient context', source: 'confirmed allergy patient context' },
-      { context: 'medications', freshness: 'stale until pharmacy connection or bedside verification', source: 'patient report + prior medication patient context' },
-      { context: 'recent encounters', freshness: '14 days old', source: 'discharge-summary-doc-142' },
+      {
+        context: 'demographics',
+        freshness: 'confirmed during current intake',
+        source: 'confirmed intake patient context',
+      },
+      {
+        context: 'allergies',
+        freshness: 'current patient context',
+        source: 'confirmed allergy patient context',
+      },
+      {
+        context: 'medications',
+        freshness: 'stale until pharmacy connection or bedside verification',
+        source: 'patient report + prior medication patient context',
+      },
+      {
+        context: 'recent encounters',
+        freshness: '14 days old',
+        source: 'discharge-summary-doc-142',
+      },
     ]),
-    missingContext: Object.freeze(['pharmacy integration not connected', 'emergency contact pending for one queued patient']),
+    missingContext: Object.freeze([
+      'pharmacy integration not connected',
+      'emergency contact pending for one queued patient',
+    ]),
     safetyStatement:
       'Patient Snapshot summarizes source-cited context for clinician review and does not diagnose, triage, reconcile medications, or change patient data autonomously.',
   });
 }
 
-function buildSmartArrival({ documentRecords = [] as any[], patientSnapshot = buildPatientSnapshot() }: any = {}) {
+function buildSmartArrival({
+  documentRecords = [] as any[],
+  patientSnapshot = buildPatientSnapshot(),
+}: any = {}) {
   const structuredSummary = patientSnapshot.structuredSummary || {};
   const documentReferences = documentRecords.map((record) => record.sourceDocumentReference);
   const confirmedByPatientOrStaff = true;
@@ -884,7 +1201,11 @@ function buildSmartArrival({ documentRecords = [] as any[], patientSnapshot = bu
       ]),
       arrivalState: 'patient arrives inside CareDroid already summarized',
       separateIntakeAppCreated: false,
-      payloads: Object.freeze(['Patient Snapshot', 'Pre-Triage Queue entry', 'Patient Journey update']),
+      payloads: Object.freeze([
+        'Patient Snapshot',
+        'Pre-Triage Queue entry',
+        'Patient Journey update',
+      ]),
     }),
     safetyStatement:
       'Smart Arrival summarizes and routes arrival context for human review; it does not create autonomous triage, diagnosis, medication reconciliation, or patient writeback.',
@@ -894,11 +1215,45 @@ function buildSmartArrival({ documentRecords = [] as any[], patientSnapshot = bu
 function buildMedicationSummary() {
   return Object.freeze({
     title: 'Medication Summary',
-    inputs: Object.freeze(['patient report', 'prior records', 'pharmacy integrations if available']),
+    inputs: Object.freeze([
+      'patient report',
+      'prior records',
+      'pharmacy integrations if available',
+    ]),
     entries: Object.freeze([
-      { name: 'Warfarin', dose: '5 mg', route: 'oral', frequency: 'daily', lastTaken: 'unknown', source: 'patient report', confidence: 0.76, verificationStatus: 'requires verification', uncertainty: 'reported anticoagulant' },
-      { name: 'Aspirin', dose: '81 mg', route: 'oral', frequency: 'daily', lastTaken: 'yesterday per prior record', source: 'prior records', confidence: 0.72, verificationStatus: 'requires verification', uncertainty: 'possible duplicate therapy review' },
-      { name: 'Atorvastatin', dose: '', route: 'oral', frequency: 'unknown', lastTaken: 'unknown', source: 'prior records', confidence: 0.55, verificationStatus: 'incomplete', uncertainty: 'missing dose' },
+      {
+        name: 'Warfarin',
+        dose: '5 mg',
+        route: 'oral',
+        frequency: 'daily',
+        lastTaken: 'unknown',
+        source: 'patient report',
+        confidence: 0.76,
+        verificationStatus: 'requires verification',
+        uncertainty: 'reported anticoagulant',
+      },
+      {
+        name: 'Aspirin',
+        dose: '81 mg',
+        route: 'oral',
+        frequency: 'daily',
+        lastTaken: 'yesterday per prior record',
+        source: 'prior records',
+        confidence: 0.72,
+        verificationStatus: 'requires verification',
+        uncertainty: 'possible duplicate therapy review',
+      },
+      {
+        name: 'Atorvastatin',
+        dose: '',
+        route: 'oral',
+        frequency: 'unknown',
+        lastTaken: 'unknown',
+        source: 'prior records',
+        confidence: 0.55,
+        verificationStatus: 'incomplete',
+        uncertainty: 'missing dose',
+      },
     ]),
     flags: Object.freeze({
       duplicates: Object.freeze(['possible duplicate anticoagulant/antiplatelet risk review']),
@@ -921,15 +1276,44 @@ function buildAllergyRiskCapture() {
   return Object.freeze({
     title: 'Allergy and Risk Capture',
     triageDisplay: 'prominent',
-    captureSources: Object.freeze(['patient or caregiver report', 'intake forms', 'prior records', 'medication history review', 'clinical staff review']),
+    captureSources: Object.freeze([
+      'patient or caregiver report',
+      'intake forms',
+      'prior records',
+      'medication history review',
+      'clinical staff review',
+    ]),
     collected: Object.freeze([
       { type: 'allergy', label: 'Penicillin', status: 'confirmed', source: 'allergy record' },
-      { type: 'adverse reaction', label: 'Rash', status: 'confirmed', source: 'patient confirmation' },
-      { type: 'anticoagulant', label: 'Warfarin reported', status: 'pending medication verification', source: 'patient report' },
-      { type: 'pregnancy status', label: 'Not applicable or pending by policy', status: 'review required', source: 'intake question' },
-      { type: 'major chronic condition', label: 'Hypertension', status: 'confirmed', source: 'problem list' },
+      {
+        type: 'adverse reaction',
+        label: 'Rash',
+        status: 'confirmed',
+        source: 'patient confirmation',
+      },
+      {
+        type: 'anticoagulant',
+        label: 'Warfarin reported',
+        status: 'pending medication verification',
+        source: 'patient report',
+      },
+      {
+        type: 'pregnancy status',
+        label: 'Not applicable or pending by policy',
+        status: 'review required',
+        source: 'intake question',
+      },
+      {
+        type: 'major chronic condition',
+        label: 'Hypertension',
+        status: 'confirmed',
+        source: 'problem list',
+      },
     ]),
-    unresolvedItems: Object.freeze(['pregnancy status requires policy-appropriate confirmation', 'allergy confirmation incomplete for INTAKE-004']),
+    unresolvedItems: Object.freeze([
+      'pregnancy status requires policy-appropriate confirmation',
+      'allergy confirmation incomplete for INTAKE-004',
+    ]),
     confirmationRequired: true,
   });
 }
@@ -945,7 +1329,11 @@ function buildIdentityResolution() {
         confidenceScore: 82,
         matchedFields: Object.freeze(['date of birth', 'phone', 'insurance member identifier']),
         conflictingFields: Object.freeze(['address differs from prior visit']),
-        sourceSignals: Object.freeze(['verified driver license', 'insurance card OCR', 'prior encounter demographics']),
+        sourceSignals: Object.freeze([
+          'verified driver license',
+          'insurance card OCR',
+          'prior encounter demographics',
+        ]),
         reviewStatus: 'uncertain match requires review',
       },
       {
@@ -962,7 +1350,11 @@ function buildIdentityResolution() {
       label: 'Confidence Score',
       value: 82,
       status: 'uncertain match requires review',
-      factors: Object.freeze(['partial identifier match', 'demographic similarity', 'verified document agreement']),
+      factors: Object.freeze([
+        'partial identifier match',
+        'demographic similarity',
+        'verified document agreement',
+      ]),
     }),
     uncertainMatchesRequireReview: true,
     resolutionWorkflow: Object.freeze([
@@ -974,10 +1366,23 @@ function buildIdentityResolution() {
       'record staff resolution decisions',
       'preserve audit trail of match suggestions and outcomes',
     ]),
-    duplicateRiskSignals: Object.freeze(['multiple candidate records with similar demographics', 'insurance member ID conflict']),
+    duplicateRiskSignals: Object.freeze([
+      'multiple candidate records with similar demographics',
+      'insurance member ID conflict',
+    ]),
     auditTrail: Object.freeze([
-      { event: 'match suggested', candidateRecordId: 'MRN-204421', actor: 'Emergency Identity Resolution Layer', timestamp: 'frontend-runtime' },
-      { event: 'staff review required', candidateRecordId: 'MRN-204421', actor: 'registration staff', timestamp: null },
+      {
+        event: 'match suggested',
+        candidateRecordId: 'MRN-204421',
+        actor: 'Emergency Identity Resolution Layer',
+        timestamp: 'frontend-runtime',
+      },
+      {
+        event: 'staff review required',
+        candidateRecordId: 'MRN-204421',
+        actor: 'registration staff',
+        timestamp: null,
+      },
     ]),
     auditState: 'match suggestions and staff resolution decisions are auditable',
   });
@@ -1000,11 +1405,13 @@ function buildPreTriageQueue() {
           intakeMode: patient.intakeMode,
           riskIndicators: Object.freeze(patient.riskIndicators),
           missingOrUnconfirmedFields: Object.freeze(patient.missingFields),
-          confirmationStatus: patient.pendingVerification ? 'verification pending' : 'confirmed or reviewed',
+          confirmationStatus: patient.pendingVerification
+            ? 'verification pending'
+            : 'confirmed or reviewed',
           sourceState: patient.sourceState,
           reviewable: true,
-        })
-      )
+        }),
+      ),
     ),
   });
 }
@@ -1015,38 +1422,100 @@ function buildAnalytics() {
     route: '/workspace/emergency/intake-analytics',
     title: 'Patient Intake Analytics',
     metrics: Object.freeze([
-      { id: 'average-registration-time', label: 'Average registration time', value: average(DEMO_PATIENTS.map((patient) => patient.registrationMinutes)), unit: 'min' },
-      { id: 'average-verification-time', label: 'Average verification time', value: average(DEMO_PATIENTS.map((patient) => patient.verificationMinutes)), unit: 'min' },
-      { id: 'intake-completion-rate', label: 'Intake completion rate', value: percent(DEMO_PATIENTS.filter((patient) => !patient.pendingIntakeReview).length, total), unit: '%' },
-      { id: 'document-processing-volume', label: 'Document processing volume', value: DEMO_PATIENTS.reduce((sum, patient) => sum + patient.documentsProcessed, 0), unit: 'docs' },
-      { id: 'triage-readiness-time', label: 'Triage readiness time', value: average(DEMO_PATIENTS.map((patient) => patient.triageReadyMinutes)), unit: 'min' },
+      {
+        id: 'average-registration-time',
+        label: 'Average registration time',
+        value: average(DEMO_PATIENTS.map((patient) => patient.registrationMinutes)),
+        unit: 'min',
+      },
+      {
+        id: 'average-verification-time',
+        label: 'Average verification time',
+        value: average(DEMO_PATIENTS.map((patient) => patient.verificationMinutes)),
+        unit: 'min',
+      },
+      {
+        id: 'intake-completion-rate',
+        label: 'Intake completion rate',
+        value: percent(
+          DEMO_PATIENTS.filter((patient) => !patient.pendingIntakeReview).length,
+          total,
+        ),
+        unit: '%',
+      },
+      {
+        id: 'document-processing-volume',
+        label: 'Document processing volume',
+        value: DEMO_PATIENTS.reduce((sum, patient) => sum + patient.documentsProcessed, 0),
+        unit: 'docs',
+      },
+      {
+        id: 'triage-readiness-time',
+        label: 'Triage readiness time',
+        value: average(DEMO_PATIENTS.map((patient) => patient.triageReadyMinutes)),
+        unit: 'min',
+      },
     ]),
     metricDefinitions: Object.freeze({
       averageRegistrationTime: 'Time from registration start to registration completion.',
-      averageVerificationTime: 'Time from verification start to verification completion for identity, demographic, document, or intake field review.',
-      intakeCompletionRate: 'Started intake workflows that reach completion with required fields resolved or marked for follow-up.',
-      documentProcessingVolume: 'Patient-provided or external documents captured, OCR-processed, extracted, validated, or reviewed.',
+      averageVerificationTime:
+        'Time from verification start to verification completion for identity, demographic, document, or intake field review.',
+      intakeCompletionRate:
+        'Started intake workflows that reach completion with required fields resolved or marked for follow-up.',
+      documentProcessingVolume:
+        'Patient-provided or external documents captured, OCR-processed, extracted, validated, or reviewed.',
       triageReadinessTime: 'Time from patient arrival or intake start to triage queue readiness.',
     }),
-    operationalViews: Object.freeze(['current day performance', 'active shift performance', 'trend views', 'intake mode comparison', 'bottlenecks', 'document throughput', 'triage readiness delays', 'completion rate by workflow stage']),
+    operationalViews: Object.freeze([
+      'current day performance',
+      'active shift performance',
+      'trend views',
+      'intake mode comparison',
+      'bottlenecks',
+      'document throughput',
+      'triage readiness delays',
+      'completion rate by workflow stage',
+    ]),
     trends: Object.freeze([
-      { metricId: 'average-registration-time', direction: 'improving', comparison: '2 min faster than prior demo shift' },
-      { metricId: 'document-processing-volume', direction: 'increasing', comparison: '7 documents processed in active window' },
+      {
+        metricId: 'average-registration-time',
+        direction: 'improving',
+        comparison: '2 min faster than prior demo shift',
+      },
+      {
+        metricId: 'document-processing-volume',
+        direction: 'increasing',
+        comparison: '7 documents processed in active window',
+      },
     ]),
     intakeModeComparison: Object.freeze(
-      ['QR code intake', 'Tablet intake', 'Receptionist-assisted intake', 'Self-service kiosk'].map((mode) =>
-        Object.freeze({
-          mode,
-          patients: DEMO_PATIENTS.filter((patient) => patient.intakeMode === mode).length,
-          completionRate: percent(DEMO_PATIENTS.filter((patient) => patient.intakeMode === mode && !patient.pendingIntakeReview).length, Math.max(1, DEMO_PATIENTS.filter((patient) => patient.intakeMode === mode).length)),
-        })
-      )
+      ['QR code intake', 'Tablet intake', 'Receptionist-assisted intake', 'Self-service kiosk'].map(
+        (mode) =>
+          Object.freeze({
+            mode,
+            patients: DEMO_PATIENTS.filter((patient) => patient.intakeMode === mode).length,
+            completionRate: percent(
+              DEMO_PATIENTS.filter(
+                (patient) => patient.intakeMode === mode && !patient.pendingIntakeReview,
+              ).length,
+              Math.max(1, DEMO_PATIENTS.filter((patient) => patient.intakeMode === mode).length),
+            ),
+          }),
+      ),
     ),
   });
 }
 
 function buildDoorToTriageFlow() {
-  const stages = ['Arrival', 'Identity Capture', 'Document Processing', 'Verification', 'Patient Context', 'Risk Capture', 'Triage Queue'];
+  const stages = [
+    'Arrival',
+    'Identity Capture',
+    'Document Processing',
+    'Verification',
+    'Patient Context',
+    'Risk Capture',
+    'Triage Queue',
+  ];
 
   return Object.freeze({
     title: 'Patient Flow Door To Triage',
@@ -1054,7 +1523,10 @@ function buildDoorToTriageFlow() {
     stages: Object.freeze(
       stages.map((stage, index) =>
         Object.freeze({
-          id: stage.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
+          id: stage
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-|-$/g, ''),
           label: stage,
           status: index < 5 ? 'measured' : 'review pending',
           startTimestamp: `T+${index}m`,
@@ -1062,11 +1534,17 @@ function buildDoorToTriageFlow() {
           processingMinutes: index + 1,
           completionRate: Math.max(60, 96 - index * 5),
           bottleneck: index === 3 ? 'verification queue aging' : null,
-          responsibleRole: index <= 1 ? 'registration staff' : index <= 3 ? 'intake reviewer' : 'triage staff',
-          blockers: Object.freeze(index === 3 ? ['identity or demographic verification pending'] : []),
-          sourceSystemOrIntakeMode: index <= 1 ? 'QR code intake, kiosk, tablet, receptionist-assisted intake' : 'DocumentIntelligenceService and Intake OS',
-        })
-      )
+          responsibleRole:
+            index <= 1 ? 'registration staff' : index <= 3 ? 'intake reviewer' : 'triage staff',
+          blockers: Object.freeze(
+            index === 3 ? ['identity or demographic verification pending'] : [],
+          ),
+          sourceSystemOrIntakeMode:
+            index <= 1
+              ? 'QR code intake, kiosk, tablet, receptionist-assisted intake'
+              : 'DocumentIntelligenceService and Intake OS',
+        }),
+      ),
     ),
     tracked: Object.freeze(['processing time', 'bottlenecks', 'completion rates']),
     operationalSignals: Object.freeze([
@@ -1087,14 +1565,92 @@ function buildFirstFiveMinuteExperience() {
     title: 'First Five Minute Experience',
     windowMinutes: 5,
     measures: Object.freeze([
-      { id: 'identity-captured', label: 'Identity captured', value: percent(DEMO_PATIENTS.filter((patient) => patient.identityCaptured && patient.arrivalMinutesAgo <= 5).length, total), unit: '%', completionStatus: 'measured', completionTimestamp: 'T+1m', sourceOrMode: 'QR code intake, kiosk, receptionist-assisted intake', missingOrUnresolvedFields: Object.freeze([]), verificationStatus: 'confirmed or review pending', responsibleRole: 'registration staff' },
-      { id: 'demographics-captured', label: 'Demographics captured', value: percent(DEMO_PATIENTS.filter((patient) => patient.demographicsCaptured && patient.arrivalMinutesAgo <= 5).length, total), unit: '%', completionStatus: 'measured', completionTimestamp: 'T+2m', sourceOrMode: 'patient-entered forms and prior context', missingOrUnresolvedFields: Object.freeze(['phone for INTAKE-003']), verificationStatus: 'verification required', responsibleRole: 'intake reviewer' },
-      { id: 'documents-processed', label: 'Documents processed', value: DEMO_PATIENTS.filter((patient) => patient.arrivalMinutesAgo <= 5).reduce((sum, patient) => sum + patient.documentsProcessed, 0), unit: 'docs', completionStatus: 'measured', completionTimestamp: 'T+3m', sourceOrMode: 'DocumentIntelligenceService', missingOrUnresolvedFields: Object.freeze(['insurance group ID review']), verificationStatus: 'document review required', responsibleRole: 'document reviewer' },
-      { id: 'context-generated', label: 'Context generated', value: percent(DEMO_PATIENTS.filter((patient) => patient.contextGenerated && patient.arrivalMinutesAgo <= 5).length, total), unit: '%', completionStatus: 'measured', completionTimestamp: 'T+4m', sourceOrMode: 'Patient Snapshot', missingOrUnresolvedFields: Object.freeze(['pharmacy integration not connected']), verificationStatus: 'clinician review required', responsibleRole: 'clinician reviewer' },
-      { id: 'triage-ready-status', label: 'Triage-ready status', value: percent(DEMO_PATIENTS.filter((patient) => patient.triageReady && patient.triageReadyMinutes <= 5).length, total), unit: '%', completionStatus: 'measured', completionTimestamp: 'T+5m', sourceOrMode: 'Pre-Triage Queue', missingOrUnresolvedFields: Object.freeze(['allergy confirmation incomplete']), verificationStatus: 'no autonomous triage decision', responsibleRole: 'triage staff' },
+      {
+        id: 'identity-captured',
+        label: 'Identity captured',
+        value: percent(
+          DEMO_PATIENTS.filter(
+            (patient) => patient.identityCaptured && patient.arrivalMinutesAgo <= 5,
+          ).length,
+          total,
+        ),
+        unit: '%',
+        completionStatus: 'measured',
+        completionTimestamp: 'T+1m',
+        sourceOrMode: 'QR code intake, kiosk, receptionist-assisted intake',
+        missingOrUnresolvedFields: Object.freeze([]),
+        verificationStatus: 'confirmed or review pending',
+        responsibleRole: 'registration staff',
+      },
+      {
+        id: 'demographics-captured',
+        label: 'Demographics captured',
+        value: percent(
+          DEMO_PATIENTS.filter(
+            (patient) => patient.demographicsCaptured && patient.arrivalMinutesAgo <= 5,
+          ).length,
+          total,
+        ),
+        unit: '%',
+        completionStatus: 'measured',
+        completionTimestamp: 'T+2m',
+        sourceOrMode: 'patient-entered forms and prior context',
+        missingOrUnresolvedFields: Object.freeze(['phone for INTAKE-003']),
+        verificationStatus: 'verification required',
+        responsibleRole: 'intake reviewer',
+      },
+      {
+        id: 'documents-processed',
+        label: 'Documents processed',
+        value: DEMO_PATIENTS.filter((patient) => patient.arrivalMinutesAgo <= 5).reduce(
+          (sum, patient) => sum + patient.documentsProcessed,
+          0,
+        ),
+        unit: 'docs',
+        completionStatus: 'measured',
+        completionTimestamp: 'T+3m',
+        sourceOrMode: 'DocumentIntelligenceService',
+        missingOrUnresolvedFields: Object.freeze(['insurance group ID review']),
+        verificationStatus: 'document review required',
+        responsibleRole: 'document reviewer',
+      },
+      {
+        id: 'context-generated',
+        label: 'Context generated',
+        value: percent(
+          DEMO_PATIENTS.filter(
+            (patient) => patient.contextGenerated && patient.arrivalMinutesAgo <= 5,
+          ).length,
+          total,
+        ),
+        unit: '%',
+        completionStatus: 'measured',
+        completionTimestamp: 'T+4m',
+        sourceOrMode: 'Patient Snapshot',
+        missingOrUnresolvedFields: Object.freeze(['pharmacy integration not connected']),
+        verificationStatus: 'clinician review required',
+        responsibleRole: 'clinician reviewer',
+      },
+      {
+        id: 'triage-ready-status',
+        label: 'Triage-ready status',
+        value: percent(
+          DEMO_PATIENTS.filter((patient) => patient.triageReady && patient.triageReadyMinutes <= 5)
+            .length,
+          total,
+        ),
+        unit: '%',
+        completionStatus: 'measured',
+        completionTimestamp: 'T+5m',
+        sourceOrMode: 'Pre-Triage Queue',
+        missingOrUnresolvedFields: Object.freeze(['allergy confirmation incomplete']),
+        verificationStatus: 'no autonomous triage decision',
+        responsibleRole: 'triage staff',
+      },
     ]),
     blockers: Object.freeze(['verification review aging', 'allergy confirmation incomplete']),
-    improvementStatement: 'CareDroid demonstrates measurable reduction in administrative delay by tracking first-five-minute completion.',
+    improvementStatement:
+      'CareDroid demonstrates measurable reduction in administrative delay by tracking first-five-minute completion.',
   });
 }
 
@@ -1102,19 +1658,45 @@ function buildVoiceIntake() {
   return Object.freeze({
     title: 'Voice Assisted Intake',
     conversionFlow: Object.freeze(['speech', 'transcription', 'structured intake']),
-    structuredFields: Object.freeze(['name', 'date of birth', 'address', 'phone', 'emergency contact', 'complaint', 'administrative acknowledgements']),
+    structuredFields: Object.freeze([
+      'name',
+      'date of birth',
+      'address',
+      'phone',
+      'emergency contact',
+      'complaint',
+      'administrative acknowledgements',
+    ]),
     sampleTranscript: 'My name is Jordan Lee, born April 12 1971. I am here for chest pain.',
     mappedFields: Object.freeze([
       { field: 'name', value: 'Jordan Lee', confidence: 0.95, correctionState: 'reviewed' },
       { field: 'date of birth', value: '1971-04-12', confidence: 0.9, correctionState: 'reviewed' },
-      { field: 'complaint', value: 'chest pain', confidence: 0.88, correctionState: 'requires staff confirmation' },
+      {
+        field: 'complaint',
+        value: 'chest pain',
+        confidence: 0.88,
+        correctionState: 'requires staff confirmation',
+      },
     ]),
     uncertainResponses: Object.freeze(['emergency contact not captured verbally']),
-    correctionWorkflow: Object.freeze(['review transcript', 'review mapped structured fields', 'correct transcription errors', 'correct field mapping errors', 'mark uncertain responses for follow-up', 'confirm reviewed fields']),
+    correctionWorkflow: Object.freeze([
+      'review transcript',
+      'review mapped structured fields',
+      'correct transcription errors',
+      'correct field mapping errors',
+      'mark uncertain responses for follow-up',
+      'confirm reviewed fields',
+    ]),
     reviewAndCorrectionRequired: true,
     voiceCaptureState: 'inactive until patient or staff starts capture',
-    alternateIntakePaths: Object.freeze(['kiosk', 'tablet', 'QR code', 'receptionist-assisted intake']),
-    accessibilityStatement: 'Patients or staff can answer intake questions verbally; speech-derived fields remain proposed until reviewed.',
+    alternateIntakePaths: Object.freeze([
+      'kiosk',
+      'tablet',
+      'QR code',
+      'receptionist-assisted intake',
+    ]),
+    accessibilityStatement:
+      'Patients or staff can answer intake questions verbally; speech-derived fields remain proposed until reviewed.',
   });
 }
 
@@ -1123,17 +1705,37 @@ function buildReferralDocumentIngestion() {
     title: 'Referral Document Ingestion',
     supportedDocuments: SUPPORTED_EXTERNAL_DOCUMENTS,
     extractedConcepts: Object.freeze(['diagnoses', 'medications', 'allergies', 'recommendations']),
-    sourceReferenceRequirements: Object.freeze(['source document type', 'source document identifier or file reference', 'page or section location', 'extracted text span', 'extraction confidence', 'review status', 'ingestion timestamp']),
+    sourceReferenceRequirements: Object.freeze([
+      'source document type',
+      'source document identifier or file reference',
+      'page or section location',
+      'extracted text span',
+      'extraction confidence',
+      'review status',
+      'ingestion timestamp',
+    ]),
     records: Object.freeze(
       SUPPORTED_EXTERNAL_DOCUMENTS.map((documentType) =>
         DocumentIntelligenceService.processDocument({
           documentType,
           sourceDocumentReference: `external-${documentType.replace(/[^a-z0-9]+/g, '-')}`,
-        })
-      )
+        }),
+      ),
     ),
-    searchableRecordFields: Object.freeze(['patient', 'document type', 'extracted concept', 'source', 'review state']),
-    searchModes: Object.freeze(['patient', 'document type', 'extracted concept', 'source', 'review state']),
+    searchableRecordFields: Object.freeze([
+      'patient',
+      'document type',
+      'extracted concept',
+      'source',
+      'review state',
+    ]),
+    searchModes: Object.freeze([
+      'patient',
+      'document type',
+      'extracted concept',
+      'source',
+      'review state',
+    ]),
     sourceReferencesStored: true,
     reviewRequired: true,
   });
@@ -1145,7 +1747,12 @@ function buildImplementationTraceability() {
     implementedPlans: IMPLEMENTATION_PLAN_LINKS.length,
     status: 'all intake markdown plans linked to service, route, pipeline, or test coverage',
     docs: IMPLEMENTATION_PLAN_LINKS,
-    routes: Object.freeze(['/workspace/emergency/intake', '/workspace/emergency/patient-context', '/workspace/emergency/intake-analytics', '/workspace/emergency/triage']),
+    routes: Object.freeze([
+      '/workspace/emergency/intake',
+      '/workspace/emergency/patient-context',
+      '/workspace/emergency/intake-analytics',
+      '/workspace/emergency/triage',
+    ]),
     services: Object.freeze([
       'EmergencyIntakeOperatingSystemService',
       'DocumentIntelligenceService',
@@ -1169,22 +1776,52 @@ function buildMarketplace() {
     tiers: Object.freeze(['Core', 'Pro', 'Enterprise']),
     metrics: Object.freeze({
       totalModules: INTAKE_AUTOMATION_MODULES.length,
-      includedInCore: INTAKE_AUTOMATION_MODULES.filter((module) => module.tierAvailability.core === 'Included').length,
-      addOnModules: INTAKE_AUTOMATION_MODULES.filter((module) => Object.values(module.tierAvailability).includes('Add-on')).length,
-      reviewControlledModules: INTAKE_AUTOMATION_MODULES.filter((module) => module.reviewControls.length > 0).length,
+      includedInCore: INTAKE_AUTOMATION_MODULES.filter(
+        (module) => module.tierAvailability.core === 'Included',
+      ).length,
+      addOnModules: INTAKE_AUTOMATION_MODULES.filter((module) =>
+        Object.values(module.tierAvailability).includes('Add-on'),
+      ).length,
+      reviewControlledModules: INTAKE_AUTOMATION_MODULES.filter(
+        (module) => module.reviewControls.length > 0,
+      ).length,
     }),
     upgradePaths: Object.freeze([
-      { from: 'Core', to: 'Pro', unlocks: Object.freeze(['full OCR Intake', 'Patient Snapshot', 'Medication Capture']) },
-      { from: 'Pro', to: 'Enterprise', unlocks: Object.freeze(['advanced Identity Resolution', 'Voice Intake', 'Multi-Language Intake']) },
+      {
+        from: 'Core',
+        to: 'Pro',
+        unlocks: Object.freeze(['full OCR Intake', 'Patient Snapshot', 'Medication Capture']),
+      },
+      {
+        from: 'Pro',
+        to: 'Enterprise',
+        unlocks: Object.freeze([
+          'advanced Identity Resolution',
+          'Voice Intake',
+          'Multi-Language Intake',
+        ]),
+      },
     ]),
-    configurationRules: Object.freeze(['role-based enablement', 'governance policy controls', 'review controls cannot be disabled for extracted clinical or identity data']),
+    configurationRules: Object.freeze([
+      'role-based enablement',
+      'governance policy controls',
+      'review controls cannot be disabled for extracted clinical or identity data',
+    ]),
     packagingStatement: 'Intake is packaged as a sellable CareDroid product category.',
   });
 }
 
 function buildEmergencyOsIntegration() {
   return Object.freeze({
-    flow: Object.freeze(['Arrival', 'Intake', 'Verification', 'Patient Context', 'Triage', 'Assessment', 'Disposition']),
+    flow: Object.freeze([
+      'Arrival',
+      'Intake',
+      'Verification',
+      'Patient Context',
+      'Triage',
+      'Assessment',
+      'Disposition',
+    ]),
     requirements: Object.freeze([
       'arrival events create or update journey context',
       'intake progress is visible as part of the patient journey',
@@ -1216,8 +1853,8 @@ function buildPatientJourneyFeed() {
         patientJourneyStates: module.journeyStages,
         validJourneyStages: ensureValidJourneyStages(module),
         route: module.route,
-      })
-    )
+      }),
+    ),
   );
 }
 
@@ -1232,7 +1869,8 @@ export const DocumentIntelligenceService = Object.freeze({
 
   processDocument(input: any = {}) {
     const documentType = normalizeDocumentType(input);
-    const sourceDocumentReference = input.sourceDocumentReference || `demo-${documentType.replace(/[^a-z0-9]+/g, '-')}`;
+    const sourceDocumentReference =
+      input.sourceDocumentReference || `demo-${documentType.replace(/[^a-z0-9]+/g, '-')}`;
     const extractedFields = Object.freeze(buildDocumentFields(documentType));
 
     return Object.freeze({
@@ -1241,7 +1879,9 @@ export const DocumentIntelligenceService = Object.freeze({
       classification: Object.freeze({
         detectedDocumentType: documentType,
         classified: true,
-        classificationSource: input.documentType ? 'provided document metadata' : 'document type classifier',
+        classificationSource: input.documentType
+          ? 'provided document metadata'
+          : 'document type classifier',
       }),
       sourceDocumentReference,
       pipeline: DOCUMENT_INTELLIGENCE_PIPELINE,
@@ -1258,15 +1898,19 @@ export const DocumentIntelligenceService = Object.freeze({
             confidence: field.confidence,
             reviewStatus: field.reviewStatus,
             ingestionTimestamp: input.ingestionTimestamp || 'frontend-runtime',
-          })
-        )
+          }),
+        ),
       ),
       structuredRecord: Object.freeze({
         documentType,
         sourceDocumentReference,
         extractedFields,
-        validationStatus: extractedFields.some((field) => field.validationStatus !== 'valid') ? 'review required' : 'valid',
-        reviewState: extractedFields.some((field) => field.reviewStatus !== 'accepted') ? 'pending review' : 'accepted',
+        validationStatus: extractedFields.some((field) => field.validationStatus !== 'valid')
+          ? 'review required'
+          : 'valid',
+        reviewState: extractedFields.some((field) => field.reviewStatus !== 'accepted')
+          ? 'pending review'
+          : 'accepted',
         reviewerAttribution: extractedFields.some((field) => field.reviewStatus !== 'accepted')
           ? 'intake reviewer pending'
           : 'registration staff',
@@ -1276,7 +1920,7 @@ export const DocumentIntelligenceService = Object.freeze({
         unresolvedFields: Object.freeze(
           extractedFields
             .filter((field) => field.reviewStatus !== 'accepted')
-            .map((field) => field.field)
+            .map((field) => field.field),
         ),
         reviewActions: Object.freeze([
           'view original document beside extracted fields',
@@ -1294,11 +1938,26 @@ export const DocumentIntelligenceService = Object.freeze({
 export const EmergencyIntakeOperatingSystemService = Object.freeze({
   getOperatingSystem() {
     const documentRecords = Object.freeze([
-      DocumentIntelligenceService.processDocument({ documentType: "driver's license", sourceDocumentReference: 'doc-driver-license-001' }),
-      DocumentIntelligenceService.processDocument({ documentType: 'health card', sourceDocumentReference: 'doc-health-card-001' }),
-      DocumentIntelligenceService.processDocument({ documentType: 'insurance card', sourceDocumentReference: 'doc-insurance-card-001' }),
-      DocumentIntelligenceService.processDocument({ documentType: 'referral letters', sourceDocumentReference: 'doc-referral-letter-001' }),
-      DocumentIntelligenceService.processDocument({ documentType: 'discharge papers', sourceDocumentReference: 'doc-discharge-papers-001' }),
+      DocumentIntelligenceService.processDocument({
+        documentType: "driver's license",
+        sourceDocumentReference: 'doc-driver-license-001',
+      }),
+      DocumentIntelligenceService.processDocument({
+        documentType: 'health card',
+        sourceDocumentReference: 'doc-health-card-001',
+      }),
+      DocumentIntelligenceService.processDocument({
+        documentType: 'insurance card',
+        sourceDocumentReference: 'doc-insurance-card-001',
+      }),
+      DocumentIntelligenceService.processDocument({
+        documentType: 'referral letters',
+        sourceDocumentReference: 'doc-referral-letter-001',
+      }),
+      DocumentIntelligenceService.processDocument({
+        documentType: 'discharge papers',
+        sourceDocumentReference: 'doc-discharge-papers-001',
+      }),
     ]);
     const patientSnapshot = buildPatientSnapshot();
     const smartArrival = buildSmartArrival({ documentRecords, patientSnapshot });
@@ -1320,7 +1979,12 @@ export const EmergencyIntakeOperatingSystemService = Object.freeze({
         'Verification',
         'Intake Analytics',
       ]),
-      supportedIntakeModes: Object.freeze(['self-service kiosk', 'tablet intake', 'QR code intake', 'receptionist-assisted intake']),
+      supportedIntakeModes: Object.freeze([
+        'self-service kiosk',
+        'tablet intake',
+        'QR code intake',
+        'receptionist-assisted intake',
+      ]),
       captureFields: REQUIRED_INTAKE_FIELDS,
       governance: Object.freeze({
         requirements: GOVERNANCE_REQUIREMENTS,
@@ -1358,18 +2022,66 @@ export const EmergencyIntakeOperatingSystemService = Object.freeze({
       patientJourneyFeed: buildPatientJourneyFeed(),
       implementationTraceability: buildImplementationTraceability(),
       emergencyOsIntegration: buildEmergencyOsIntegration(),
-      integrationFlow: Object.freeze(['Arrival', 'Intake', 'Verification', 'Patient Context', 'Triage', 'Assessment', 'Disposition']),
+      integrationFlow: Object.freeze([
+        'Arrival',
+        'Intake',
+        'Verification',
+        'Patient Context',
+        'Triage',
+        'Assessment',
+        'Disposition',
+      ]),
       productSurfaces: Object.freeze([
-        { surface: 'Intake dashboard', route: '/workspace/emergency/intake', artifact: 'commandCenter' },
-        { surface: 'Intake analytics dashboard', route: '/workspace/emergency/intake-analytics', artifact: 'analytics' },
-        { surface: 'Patient context workspace', route: '/workspace/emergency/patient-context', artifact: 'patientSnapshot' },
-        { surface: 'Pre-triage queue', route: '/workspace/emergency/triage', artifact: 'preTriageQueue' },
-        { surface: 'Registration completion views', route: '/workspace/emergency/intake', artifact: 'registrationCompletionScore' },
-        { surface: 'Document review workspace', route: '/workspace/emergency/intake', artifact: 'documentIntelligence' },
-        { surface: 'Identity resolution review', route: '/workspace/emergency/patient-context', artifact: 'identityResolution' },
-        { surface: 'Medication and allergy capture review', route: '/workspace/emergency/patient-context', artifact: 'medicationSummary + allergyRiskCapture' },
-        { surface: 'Smart Arrival summary in CareDroid', route: '/workspace/emergency', artifact: 'smartArrival' },
-        { surface: 'Emergency command center and Patient Journey Engine views', route: '/workspace/emergency', artifact: 'emergencyOsIntegration' },
+        {
+          surface: 'Intake dashboard',
+          route: '/workspace/emergency/intake',
+          artifact: 'commandCenter',
+        },
+        {
+          surface: 'Intake analytics dashboard',
+          route: '/workspace/emergency/intake-analytics',
+          artifact: 'analytics',
+        },
+        {
+          surface: 'Patient context workspace',
+          route: '/workspace/emergency/patient-context',
+          artifact: 'patientSnapshot',
+        },
+        {
+          surface: 'Pre-triage queue',
+          route: '/workspace/emergency/triage',
+          artifact: 'preTriageQueue',
+        },
+        {
+          surface: 'Registration completion views',
+          route: '/workspace/emergency/intake',
+          artifact: 'registrationCompletionScore',
+        },
+        {
+          surface: 'Document review workspace',
+          route: '/workspace/emergency/intake',
+          artifact: 'documentIntelligence',
+        },
+        {
+          surface: 'Identity resolution review',
+          route: '/workspace/emergency/patient-context',
+          artifact: 'identityResolution',
+        },
+        {
+          surface: 'Medication and allergy capture review',
+          route: '/workspace/emergency/patient-context',
+          artifact: 'medicationSummary + allergyRiskCapture',
+        },
+        {
+          surface: 'Smart Arrival summary in CareDroid',
+          route: '/workspace/emergency',
+          artifact: 'smartArrival',
+        },
+        {
+          surface: 'Emergency command center and Patient Journey Engine views',
+          route: '/workspace/emergency',
+          artifact: 'emergencyOsIntegration',
+        },
       ]),
       safetyStatement:
         'Emergency Intake OS reduces administrative burden and feeds ED OS context while preserving confirmation, review, audit, source attribution, correction workflows, and no autonomous triage decisions.',
@@ -1384,7 +2096,9 @@ export function getEmergencyIntakeAutomationFeed() {
         automationId: `emergency-intake-${module.moduleId}`,
         title: module.title,
         description: module.description,
-        riskLevel: module.reviewControls.some((control) => /clinician|medication|risk|match/i.test(control))
+        riskLevel: module.reviewControls.some((control) =>
+          /clinician|medication|risk|match/i.test(control),
+        )
           ? 'high'
           : 'medium',
         humanReviewRequired: true,
@@ -1392,15 +2106,18 @@ export function getEmergencyIntakeAutomationFeed() {
         journeyStages: module.journeyStages,
         requiredWorkflows: module.journeyStages,
         workspaceVisibility: Object.freeze(['intake', 'patient-context', 'intake-analytics']),
-        subscriptionTier: module.tierAvailability.enterprise === 'Included' ? 'enterprise' : 'professional',
+        subscriptionTier:
+          module.tierAvailability.enterprise === 'Included' ? 'enterprise' : 'professional',
         status: 'demo-preview',
         source: 'EmergencyIntakeOperatingSystemService',
-      })
-    )
+      }),
+    ),
   );
 }
 
 export const getEmergencyIntakeOperatingSystem =
-  EmergencyIntakeOperatingSystemService.getOperatingSystem.bind(EmergencyIntakeOperatingSystemService);
+  EmergencyIntakeOperatingSystemService.getOperatingSystem.bind(
+    EmergencyIntakeOperatingSystemService,
+  );
 
 export default EmergencyIntakeOperatingSystemService;

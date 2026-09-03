@@ -142,7 +142,7 @@ function buildVitals(now, patient, index) {
     sbp: deteriorating ? 88 + (index % 3) : 112 + ((index * 5) % 48),
     dbp: deteriorating ? 54 + (index % 5) : 66 + ((index * 3) % 30),
     spo2: deteriorating ? 90 + (index % 3) : 95 + (index % 5),
-    temp: patient.complaintCategory === 'Sepsis' ? 38.7 : 36.5 + ((index % 6) / 10),
+    temp: patient.complaintCategory === 'Sepsis' ? 38.7 : 36.5 + (index % 6) / 10,
     rr: p1 ? 24 + (index % 4) : 14 + (index % 10),
     gcs: patient.complaintCategory === 'Neurologic' ? 13 : 15,
     pain: 2 + (index % 8),
@@ -167,7 +167,12 @@ function buildActivePatientModels(now) {
     const priority = priorityFor(state, index, stateIndex);
     const flags = flagsFor(state, priority, index, stateIndex);
     const roomId = stateRoomId(state, stateIndex);
-    const assignedStaffId = ['demo-attending-1', 'demo-charge-rn', 'demo-triage-rn', 'demo-fasttrack-rn'][index % 4];
+    const assignedStaffId = [
+      'demo-attending-1',
+      'demo-charge-rn',
+      'demo-triage-rn',
+      'demo-fasttrack-rn',
+    ][index % 4];
     const patient = {
       id: `demo-pt-${String(index + 1).padStart(3, '0')}`,
       mrn: `ED-${String(42000 + index).padStart(6, '0')}`,
@@ -178,7 +183,10 @@ function buildActivePatientModels(now) {
       rootSex: simpleSex === 'M' ? 'Male' : 'Female',
       dob: dobFromAge(now, age),
       arrivalTime: isoMinutesAgo(now, waitMinutes),
-      triageTime: state === 'Waiting' ? isoMinutesAgo(now, waitMinutes - 6) : isoMinutesAgo(now, Math.max(8, waitMinutes - 12)),
+      triageTime:
+        state === 'Waiting'
+          ? isoMinutesAgo(now, waitMinutes - 6)
+          : isoMinutesAgo(now, Math.max(8, waitMinutes - 12)),
       lastAssessedTime:
         flags.includes('ReassessmentDue') || state === 'Waiting'
           ? isoMinutesAgo(now, Math.max(35, Math.round(waitMinutes * 0.7)))
@@ -227,7 +235,7 @@ function buildDischargedPatientModels(now) {
         sbp: 112 + (index % 36),
         dbp: 64 + (index % 24),
         spo2: 96 + (index % 4),
-        temp: 36.4 + ((index % 5) / 10),
+        temp: 36.4 + (index % 5) / 10,
         rr: 14 + (index % 8),
         gcs: 15,
         pain: index % 7,
@@ -445,22 +453,57 @@ function buildStaff() {
 
 function buildRooms(activeModels) {
   const occupiedByRoom = new Map(
-    activeModels.filter((patient) => patient.roomId).map((patient) => [patient.roomId, patient.id])
+    activeModels.filter((patient) => patient.roomId).map((patient) => [patient.roomId, patient.id]),
   );
   const roomSpecs = [
-    ...Array.from({ length: 4 }, (_, index) => [`demo-room-resus-${index + 1}`, `Resus ${index + 1}`, 'Resus', 'Resuscitation']),
-    ...Array.from({ length: 18 }, (_, index) => [`demo-room-assessment-${index + 1}`, `Assessment ${index + 1}`, 'Treatment', 'Assessment']),
-    ...Array.from({ length: 6 }, (_, index) => [`demo-room-observation-${index + 1}`, `Observation ${index + 1}`, 'Treatment', 'Observation']),
-    ...Array.from({ length: 2 }, (_, index) => [`demo-room-triage-${index + 1}`, `Triage ${index + 1}`, 'Treatment', 'Triage']),
-    ...Array.from({ length: 2 }, (_, index) => [`demo-room-waiting-${index + 1}`, `Waiting Area ${index + 1}`, 'Waiting', 'Waiting']),
-    ...Array.from({ length: 2 }, (_, index) => [`demo-room-isolation-${index + 1}`, `Isolation ${index + 1}`, 'Isolation', 'Isolation']),
+    ...Array.from({ length: 4 }, (_, index) => [
+      `demo-room-resus-${index + 1}`,
+      `Resus ${index + 1}`,
+      'Resus',
+      'Resuscitation',
+    ]),
+    ...Array.from({ length: 18 }, (_, index) => [
+      `demo-room-assessment-${index + 1}`,
+      `Assessment ${index + 1}`,
+      'Treatment',
+      'Assessment',
+    ]),
+    ...Array.from({ length: 6 }, (_, index) => [
+      `demo-room-observation-${index + 1}`,
+      `Observation ${index + 1}`,
+      'Treatment',
+      'Observation',
+    ]),
+    ...Array.from({ length: 2 }, (_, index) => [
+      `demo-room-triage-${index + 1}`,
+      `Triage ${index + 1}`,
+      'Treatment',
+      'Triage',
+    ]),
+    ...Array.from({ length: 2 }, (_, index) => [
+      `demo-room-waiting-${index + 1}`,
+      `Waiting Area ${index + 1}`,
+      'Waiting',
+      'Waiting',
+    ]),
+    ...Array.from({ length: 2 }, (_, index) => [
+      `demo-room-isolation-${index + 1}`,
+      `Isolation ${index + 1}`,
+      'Isolation',
+      'Isolation',
+    ]),
   ];
 
   const simple = roomSpecs.map(([id, name, simpleType]) => ({
     id,
     name,
     type: simpleType,
-    status: occupiedByRoom.has(id) || id === 'demo-room-resus-1' || id === 'demo-room-isolation-1' ? 'Occupied' : id === 'demo-room-assessment-18' ? 'Blocked' : 'Available',
+    status:
+      occupiedByRoom.has(id) || id === 'demo-room-resus-1' || id === 'demo-room-isolation-1'
+        ? 'Occupied'
+        : id === 'demo-room-assessment-18'
+          ? 'Blocked'
+          : 'Available',
     patientId: occupiedByRoom.get(id),
   }));
 
@@ -468,7 +511,12 @@ function buildRooms(activeModels) {
     id,
     name,
     type: rootType,
-    status: occupiedByRoom.has(id) || id === 'demo-room-resus-1' || id === 'demo-room-isolation-1' ? 'Occupied' : id === 'demo-room-assessment-18' ? 'Blocked' : 'Available',
+    status:
+      occupiedByRoom.has(id) || id === 'demo-room-resus-1' || id === 'demo-room-isolation-1'
+        ? 'Occupied'
+        : id === 'demo-room-assessment-18'
+          ? 'Blocked'
+          : 'Available',
     currentPatientId: occupiedByRoom.get(id) || null,
     isIsolationCapable: rootType === 'Isolation',
   }));
@@ -480,9 +528,17 @@ function capacityFor(simplePatients, simpleRooms, now) {
   const activePatients = simplePatients.filter((patient) => patient.state !== 'Discharge');
   const occupiedRooms = simpleRooms.filter((room) => room.status === 'Occupied').length;
   const boardingCount = activePatients.filter((patient) => patient.state === 'Admission').length;
-  const reassessmentDue = activePatients.filter((patient) => patient.flags.includes('ReassessmentDue')).length;
+  const reassessmentDue = activePatients.filter((patient) =>
+    patient.flags.includes('ReassessmentDue'),
+  ).length;
   const occupancyPenalty = Math.max(0, occupiedRooms / simpleRooms.length - 0.8) * 100;
-  const score = Math.max(0, Math.min(100, Math.round(100 - occupancyPenalty - boardingCount * 8 - (reassessmentDue > 3 ? 10 : 0))));
+  const score = Math.max(
+    0,
+    Math.min(
+      100,
+      Math.round(100 - occupancyPenalty - boardingCount * 8 - (reassessmentDue > 3 ? 10 : 0)),
+    ),
+  );
   const band = score >= 80 ? 'Green' : score >= 60 ? 'Yellow' : score >= 40 ? 'Orange' : 'Red';
   return {
     score,
@@ -498,14 +554,15 @@ function capacityFor(simplePatients, simpleRooms, now) {
 function buildAlerts(now, simplePatients) {
   const sepsisPatient = simplePatients.find((patient) => patient.complaintCategory === 'Sepsis');
   const waitingHighRisk = simplePatients.find(
-    (patient) => patient.state === 'Waiting' && patient.flags.includes('DeteriorationRisk')
+    (patient) => patient.state === 'Waiting' && patient.flags.includes('DeteriorationRisk'),
   );
   return [
     {
       id: 'demo-alert-capacity',
       severity: 'Critical',
       title: 'High-volume ED capacity pressure',
-      message: 'ED is running a 100-patient day with boarders, EMS arrivals, and reassessments due.',
+      message:
+        'ED is running a 100-patient day with boarders, EMS arrivals, and reassessments due.',
       createdAt: isoMinutesAgo(now, 8),
       dismissed: false,
     },
@@ -522,7 +579,8 @@ function buildAlerts(now, simplePatients) {
       id: 'demo-alert-sepsis',
       severity: 'Critical',
       title: 'Sepsis risk in waiting queue',
-      message: 'Walkthrough dataset includes a deteriorating infection patient for ED Copilot review.',
+      message:
+        'Walkthrough dataset includes a deteriorating infection patient for ED Copilot review.',
       patientId: sepsisPatient?.id,
       createdAt: isoMinutesAgo(now, 4),
       dismissed: false,
@@ -532,15 +590,87 @@ function buildAlerts(now, simplePatients) {
 
 function buildEMS(now) {
   const arrivals = [
-    ['demo-ems-501', 'demo-ems-unit-501', 'Medic 501', ['Maya Singh', 'Theo Campbell'], 58, 'Male', 'Crushing chest pain, ECG transmitted', undefined, 7, 'High', 'Aspirin given; anterior ST changes suspected.'],
-    ['demo-ems-214', 'demo-ems-unit-214', 'Medic 214', ['Ella Martin', 'David Ko'], 81, 'Female', 'Fall on anticoagulants with head strike', 'Ground-level fall at home', 11, 'Moderate', 'C-collar in place; repetitive questions.'],
-    ['demo-ems-733', 'demo-ems-unit-733', 'Medic 733', ['Andre Lewis', 'Priyanka Shah'], 43, 'Unknown', 'Opioid overdose, ventilated with BVM', undefined, 4, 'Critical', 'Naloxone given; airway support ongoing.'],
-    ['demo-ems-612', 'demo-ems-unit-612', 'Medic 612', ['Jordan Iqbal', 'Nina Park'], 68, 'Female', 'Sepsis alert, hypotensive', undefined, -3, 'Critical', 'Arrived at bay; offload delayed by bed pressure.'],
-    ['demo-ems-309', 'demo-ems-unit-309', 'Medic 309', ['Owen Clarke', 'Lena Price'], 12, 'Male', 'Pediatric asthma exacerbation', undefined, 18, 'High', 'Continuous neb en route; parent accompanying.'],
+    [
+      'demo-ems-501',
+      'demo-ems-unit-501',
+      'Medic 501',
+      ['Maya Singh', 'Theo Campbell'],
+      58,
+      'Male',
+      'Crushing chest pain, ECG transmitted',
+      undefined,
+      7,
+      'High',
+      'Aspirin given; anterior ST changes suspected.',
+    ],
+    [
+      'demo-ems-214',
+      'demo-ems-unit-214',
+      'Medic 214',
+      ['Ella Martin', 'David Ko'],
+      81,
+      'Female',
+      'Fall on anticoagulants with head strike',
+      'Ground-level fall at home',
+      11,
+      'Moderate',
+      'C-collar in place; repetitive questions.',
+    ],
+    [
+      'demo-ems-733',
+      'demo-ems-unit-733',
+      'Medic 733',
+      ['Andre Lewis', 'Priyanka Shah'],
+      43,
+      'Unknown',
+      'Opioid overdose, ventilated with BVM',
+      undefined,
+      4,
+      'Critical',
+      'Naloxone given; airway support ongoing.',
+    ],
+    [
+      'demo-ems-612',
+      'demo-ems-unit-612',
+      'Medic 612',
+      ['Jordan Iqbal', 'Nina Park'],
+      68,
+      'Female',
+      'Sepsis alert, hypotensive',
+      undefined,
+      -3,
+      'Critical',
+      'Arrived at bay; offload delayed by bed pressure.',
+    ],
+    [
+      'demo-ems-309',
+      'demo-ems-unit-309',
+      'Medic 309',
+      ['Owen Clarke', 'Lena Price'],
+      12,
+      'Male',
+      'Pediatric asthma exacerbation',
+      undefined,
+      18,
+      'High',
+      'Continuous neb en route; parent accompanying.',
+    ],
   ];
 
   const emsArrivals = arrivals.map((arrival, index) => {
-    const [id, unitId, unitName, crewNames, patientAge, patientSex, chiefComplaint, mechanismOfInjury, eta, severity, notes] = arrival as any[];
+    const [
+      id,
+      unitId,
+      unitName,
+      crewNames,
+      patientAge,
+      patientSex,
+      chiefComplaint,
+      mechanismOfInjury,
+      eta,
+      severity,
+      notes,
+    ] = arrival as any[];
     const status = (eta as number) < 0 ? 'Arrived' : 'Inbound';
     const estimatedArrivalTime = isoMinutesFrom(now, eta);
     return {
@@ -650,7 +780,9 @@ function buildAnalytics(now, activeModels) {
   const hourlyPattern = [1, 0, 0, 0, 1, 2, 4, 6, 7, 8, 7, 6, 5, 6, 7, 8, 9, 8, 6, 4, 3, 2, 2, 1];
   const topComplaints = COMPLAINTS.slice(0, 8).map(([name], index) => ({
     name,
-    count: activeModels.filter((patient) => patient.complaintCategory === name).length + (index < 2 ? 9 : 5),
+    count:
+      activeModels.filter((patient) => patient.complaintCategory === name).length +
+      (index < 2 ? 9 : 5),
   }));
 
   return {
@@ -686,12 +818,32 @@ function buildAnalytics(now, activeModels) {
           minute: '2-digit',
         }),
         score: [72, 68, 63, 56, 48, 41, 36, 34][index],
-        riskLevel: ['Yellow', 'Yellow', 'Yellow', 'Orange', 'Orange', 'Orange', 'Red', 'Red'][index],
+        riskLevel: ['Yellow', 'Yellow', 'Yellow', 'Orange', 'Orange', 'Orange', 'Red', 'Red'][
+          index
+        ],
       })),
       queuePerformance: [
-        { id: 'queue-waiting', type: 'Waiting', name: 'Waiting', avgWaitMinutes: 58, throughputCount: 16 },
-        { id: 'queue-reassessment', type: 'Reassessment', name: 'Reassessment', avgWaitMinutes: 42, throughputCount: 10 },
-        { id: 'queue-boarding', type: 'Boarding', name: 'Boarding', avgWaitMinutes: 236, throughputCount: 6 },
+        {
+          id: 'queue-waiting',
+          type: 'Waiting',
+          name: 'Waiting',
+          avgWaitMinutes: 58,
+          throughputCount: 16,
+        },
+        {
+          id: 'queue-reassessment',
+          type: 'Reassessment',
+          name: 'Reassessment',
+          avgWaitMinutes: 42,
+          throughputCount: 10,
+        },
+        {
+          id: 'queue-boarding',
+          type: 'Boarding',
+          name: 'Boarding',
+          avgWaitMinutes: 236,
+          throughputCount: 6,
+        },
         { id: 'queue-ems', type: 'EMS', name: 'EMS', avgWaitMinutes: 17, throughputCount: 5 },
       ],
       operationalCommand: {
@@ -722,17 +874,44 @@ function buildQueues(patients) {
   const queueDefinitions = [
     ['Waiting', 'Waiting queue', (patient) => patient.state === 'Waiting', 30],
     ['Triage', 'Triage queue', (patient) => patient.state === 'Triage', 10],
-    ['Assessment', 'Active assessment', (patient) => ['Assessment', 'Orders', 'Results'].includes(patient.state), 45],
-    ['HighRisk', 'High-risk waiting patients', (patient) => patient.state === 'Waiting' && (patient.priority === 'P1' || patient.priority === 'P2' || patient.flags.includes('HighRisk') || patient.flags.includes('DeteriorationRisk')), 15],
-    ['Reassessment', 'Reassessments due', (patient) => patient.flags.includes('ReassessmentDue'), 30],
-    ['Boarding', 'Boarders', (patient) => patient.state === 'Admission' || patient.flags.includes('PendingAdmission'), 120],
+    [
+      'Assessment',
+      'Active assessment',
+      (patient) => ['Assessment', 'Orders', 'Results'].includes(patient.state),
+      45,
+    ],
+    [
+      'HighRisk',
+      'High-risk waiting patients',
+      (patient) =>
+        patient.state === 'Waiting' &&
+        (patient.priority === 'P1' ||
+          patient.priority === 'P2' ||
+          patient.flags.includes('HighRisk') ||
+          patient.flags.includes('DeteriorationRisk')),
+      15,
+    ],
+    [
+      'Reassessment',
+      'Reassessments due',
+      (patient) => patient.flags.includes('ReassessmentDue'),
+      30,
+    ],
+    [
+      'Boarding',
+      'Boarders',
+      (patient) => patient.state === 'Admission' || patient.flags.includes('PendingAdmission'),
+      120,
+    ],
     ['EMS', 'EMS-linked patients', (patient) => patient.flags.includes('EMSArrival'), 15],
   ];
   return (queueDefinitions as any[]).map(([id, label, predicate, targetMinutes]) => {
     const queuePatients = patients.filter(predicate);
     const oldestWaitMinutes = Math.max(
       0,
-      ...queuePatients.map((patient) => Math.round((Date.now() - new Date(patient.arrivalTime).getTime()) / 60000))
+      ...queuePatients.map((patient) =>
+        Math.round((Date.now() - new Date(patient.arrivalTime).getTime()) / 60000),
+      ),
     );
     return {
       id,
@@ -753,9 +932,11 @@ function buildCopilotContext(simplePatients, capacity, alerts, emsArrivals) {
       patient.priority === 'P1' ||
       patient.priority === 'P2' ||
       patient.flags.includes('HighRisk') ||
-      patient.flags.includes('DeteriorationRisk')
+      patient.flags.includes('DeteriorationRisk'),
   );
-  const reassessmentPatients = activePatients.filter((patient) => patient.flags.includes('ReassessmentDue'));
+  const reassessmentPatients = activePatients.filter((patient) =>
+    patient.flags.includes('ReassessmentDue'),
+  );
   return {
     patientCount: activePatients.length,
     highRiskCount: highRiskPatients.length,
@@ -772,7 +953,8 @@ function buildCopilotContext(simplePatients, capacity, alerts, emsArrivals) {
       reason: `${patient.priority} ${patient.complaintCategory}`,
     })),
     activeAlerts: alerts.filter((alert) => !alert.dismissed).length,
-    safetyBoundary: 'Walkthrough data only. ED Copilot provides workflow guidance for human review.',
+    safetyBoundary:
+      'Walkthrough data only. ED Copilot provides workflow guidance for human review.',
   };
 }
 
@@ -793,9 +975,12 @@ export function buildFirstCustomerDemoMode(nowInput = new Date()) {
     activeCensus: ACTIVE_DEMO_CENSUS,
     waitingCount: simplePatients.filter((patient) => patient.state === 'Waiting').length,
     highRiskWaitingCount: simplePatients.filter(
-      (patient) => patient.state === 'Waiting' && (patient.priority === 'P1' || patient.priority === 'P2')
+      (patient) =>
+        patient.state === 'Waiting' && (patient.priority === 'P1' || patient.priority === 'P2'),
     ).length,
-    reassessmentDueCount: simplePatients.filter((patient) => patient.flags.includes('ReassessmentDue')).length,
+    reassessmentDueCount: simplePatients.filter((patient) =>
+      patient.flags.includes('ReassessmentDue'),
+    ).length,
     boarderCount: simplePatients.filter((patient) => patient.state === 'Admission').length,
     emsInboundCount: ems.emsArrivals.filter((arrival) => arrival.status === 'Inbound').length,
     generatedAt: now.toISOString(),
@@ -853,7 +1038,8 @@ export function buildFirstCustomerDemoApiEnvelope(moduleId, state, nowInput = ne
   const rooms = state.rooms || [];
   const alerts = state.alerts || [];
   const capacity = state.capacity || {};
-  const emsArrivals = state.demoMode.emsArrivals || buildFirstCustomerDemoMode(now).simple.emsArrivals;
+  const emsArrivals =
+    state.demoMode.emsArrivals || buildFirstCustomerDemoMode(now).simple.emsArrivals;
   const queues = buildQueues(patients);
   const promptContext = buildCopilotContext(patients, capacity, alerts, emsArrivals);
   const base = {
@@ -876,7 +1062,7 @@ export function buildFirstCustomerDemoApiEnvelope(moduleId, state, nowInput = ne
             (patient.timeline || []).map((event) => ({
               ...event,
               patientName: `${patient.firstName} ${patient.lastName}`,
-            }))
+            })),
           ),
           stateCounts: patients.reduce((counts, patient) => {
             counts[patient.state] = (counts[patient.state] || 0) + 1;
@@ -885,7 +1071,13 @@ export function buildFirstCustomerDemoApiEnvelope(moduleId, state, nowInput = ne
         },
       };
     case 'ems':
-      return { ...base, data: { arrivals: emsArrivals, incomingCount: emsArrivals.filter((arrival) => arrival.status === 'Inbound').length } };
+      return {
+        ...base,
+        data: {
+          arrivals: emsArrivals,
+          incomingCount: emsArrivals.filter((arrival) => arrival.status === 'Inbound').length,
+        },
+      };
     case 'queues':
       return { ...base, data: { queues } };
     case 'reassessment':
@@ -894,7 +1086,7 @@ export function buildFirstCustomerDemoApiEnvelope(moduleId, state, nowInput = ne
         data: {
           patients: patients.filter((patient) => patient.flags.includes('ReassessmentDue')),
           overdueCount: patients.filter(
-            (patient) => patient.flags.includes('ReassessmentDue') && patient.state === 'Waiting'
+            (patient) => patient.flags.includes('ReassessmentDue') && patient.state === 'Waiting',
           ).length,
           nextAction: 'Review high-risk waiting reassessments first',
         },
@@ -916,7 +1108,10 @@ export function buildFirstCustomerDemoApiEnvelope(moduleId, state, nowInput = ne
       return {
         ...base,
         data: {
-          patients: patients.filter((patient) => patient.state === 'Admission' || patient.flags.includes('PendingAdmission')),
+          patients: patients.filter(
+            (patient) =>
+              patient.state === 'Admission' || patient.flags.includes('PendingAdmission'),
+          ),
           longestBoardingMinutes: 355,
           escalation: 'Bed manager review active',
         },
@@ -926,11 +1121,19 @@ export function buildFirstCustomerDemoApiEnvelope(moduleId, state, nowInput = ne
         ...base,
         data: {
           promptContext,
-          quickActions: ['Who needs attention first?', 'Summarize EMS pressure', 'Review boarders', 'Explain reassessment priorities'],
+          quickActions: [
+            'Who needs attention first?',
+            'Summarize EMS pressure',
+            'Review boarders',
+            'Explain reassessment priorities',
+          ],
         },
       };
     case 'analytics':
-      return { ...base, data: state.demoMode.analytics || buildFirstCustomerDemoMode(now).simple.analytics };
+      return {
+        ...base,
+        data: state.demoMode.analytics || buildFirstCustomerDemoMode(now).simple.analytics,
+      };
     case 'settings':
       return { ...base, data: { demoMode: state.demoMode, tenantName: state.demoMode.tenantName } };
     default:

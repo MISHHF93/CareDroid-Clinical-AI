@@ -13,8 +13,8 @@ describe('adminOperationsModel', () => {
   it('shows surveillance for racetrack admin when route is allowed', () => {
     const sections = getVisibleAdminOpsSections('racetrack-admin');
     const hasSurveillance = sections.some((section) => section.id === 'surveillance-iot');
-    const hasOrgDashboard = sections.some((section) =>
-      section.primaryLink.route === CANONICAL_ROUTES.organization,
+    const hasOrgDashboard = sections.some(
+      (section) => section.primaryLink.route === CANONICAL_ROUTES.organization,
     );
     expect(hasSurveillance || hasOrgDashboard).toBe(true);
   });

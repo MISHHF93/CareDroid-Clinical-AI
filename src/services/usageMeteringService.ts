@@ -26,12 +26,14 @@ const ABANDONMENT_THRESHOLD_SECONDS = 15;
 
 function eventTypeForLaunch(plan) {
   const path = `${plan?.pathname || ''}${plan?.search || ''}`.toLowerCase();
-  if (path.includes('/calculators') || path.includes('calc=')) return USAGE_EVENT_TYPES.CALCULATOR_LAUNCH;
+  if (path.includes('/calculators') || path.includes('calc='))
+    return USAGE_EVENT_TYPES.CALCULATOR_LAUNCH;
   if (path.includes('/simulation')) return USAGE_EVENT_TYPES.SIMULATION;
   if (path.includes('/map') || path.includes('/live-map') || path.includes('/hospital-map')) {
     return USAGE_EVENT_TYPES.MAP_USAGE;
   }
-  if (path.includes('/medical-iot') || path.includes('/devices')) return USAGE_EVENT_TYPES.IOT_TELEMETRY;
+  if (path.includes('/medical-iot') || path.includes('/devices'))
+    return USAGE_EVENT_TYPES.IOT_TELEMETRY;
   return USAGE_EVENT_TYPES.TOOL_LAUNCH;
 }
 
@@ -253,7 +255,9 @@ export function recordAssetRecommendationAccepted({
     {
       usageEventType:
         usageEventType ||
-        (recommendation?.type === 'aiAgents' ? USAGE_EVENT_TYPES.AI_CALL : USAGE_EVENT_TYPES.TOOL_LAUNCH),
+        (recommendation?.type === 'aiAgents'
+          ? USAGE_EVENT_TYPES.AI_CALL
+          : USAGE_EVENT_TYPES.TOOL_LAUNCH),
       assetId: resolvedAssetId,
       recommendationId: recommendation?.id,
       recommendationType: recommendation?.type,

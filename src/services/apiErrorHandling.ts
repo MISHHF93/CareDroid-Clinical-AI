@@ -10,7 +10,12 @@ import {
 const DEFAULT_ERROR_MESSAGE = 'Unable to reach the API. Try again or check backend availability.';
 
 export function sanitizeApiError(error: unknown) {
-  const err = error as { name?: string; message?: string; status?: number; response?: { status?: number } };
+  const err = error as {
+    name?: string;
+    message?: string;
+    status?: number;
+    response?: { status?: number };
+  };
   return {
     name: err?.name || 'Error',
     message: err?.message || DEFAULT_ERROR_MESSAGE,
@@ -19,11 +24,13 @@ export function sanitizeApiError(error: unknown) {
 }
 
 /** Stage C: map API failures into canonical ResultError taxonomy. */
-export function apiFailureToResultError(error: unknown, fallbackMessage = DEFAULT_ERROR_MESSAGE): ResultError {
+export function apiFailureToResultError(
+  error: unknown,
+  fallbackMessage = DEFAULT_ERROR_MESSAGE,
+): ResultError {
   const sanitized = sanitizeApiError(error);
   const status = sanitized.status;
-  const code =
-    status > 0 ? httpStatusToErrorCode(status) : ErrorCode.NETWORK;
+  const code = status > 0 ? httpStatusToErrorCode(status) : ErrorCode.NETWORK;
   return resultError(code, sanitized.message || fallbackMessage, {
     detail: status ? `http_${status}` : 'network',
     retryable: status === 0 || status === 429 || status === 503 || status === 504,

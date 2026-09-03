@@ -1,7 +1,8 @@
-import {
-  isUnifiedOperationalIntelligenceTriggerEvent,
-} from '../config/unifiedOperationalIntelligenceModel';
-import type { OperationalInputEvent, OperationalIntelligenceSnapshot } from '../operational-intelligence/operationalIntelligence.types';
+import { isUnifiedOperationalIntelligenceTriggerEvent } from '../config/unifiedOperationalIntelligenceModel';
+import type {
+  OperationalInputEvent,
+  OperationalIntelligenceSnapshot,
+} from '../operational-intelligence/operationalIntelligence.types';
 import {
   evaluateOperationalIntelligence,
   fetchOperationalIntelligenceSnapshot,
@@ -39,8 +40,11 @@ function asRecord(value: unknown): Record<string, unknown> {
 
 function normalizeBackendEvent(eventType: string, payload: unknown): OperationalInputEvent {
   const record = asRecord(payload);
-  const tenantId =
-    String(record.tenantId ?? useEmergencyStore.getState().emergencySettings.tenantName ?? 'CareDroid Emergency Department');
+  const tenantId = String(
+    record.tenantId ??
+      useEmergencyStore.getState().emergencySettings.tenantName ??
+      'CareDroid Emergency Department',
+  );
 
   const normalizedPayload: Record<string, string | number | boolean | null> = {};
   for (const [key, value] of Object.entries(record)) {
@@ -187,7 +191,9 @@ export async function refreshUnifiedOperationalIntelligenceFromBackend(
     return null;
   } catch (error: unknown) {
     const message =
-      error instanceof Error ? error.message : 'Unable to refresh unified operational intelligence.';
+      error instanceof Error
+        ? error.message
+        : 'Unable to refresh unified operational intelligence.';
     if (error && typeof error === 'object' && (error as { status?: unknown }).status === 403) {
       permissionDenied = true;
       pendingEvents.length = 0;

@@ -15,15 +15,20 @@ import {
   getEdJourneyPhase,
 } from '../config/edOperatingSurface.config';
 import { resolveApiOperatingSurfaceId } from '../config/operatingSurfaceApiMapping';
-import {
-  fetchEmergencyOperatingSurface,
-  type OperatingSurfaceId,
-} from './emergencyOsApi';
+import { fetchEmergencyOperatingSurface, type OperatingSurfaceId } from './emergencyOsApi';
 import {
   buildFullEmergencyCareJourneySnapshot,
   type EmergencyJourneyStageId,
 } from './fullEmergencyCareJourneyService';
-import { PatientState, type Alert, type CapacitySnapshot, type EMSArrival, type Patient, type Referral, type Staff } from '../types/emergency';
+import {
+  PatientState,
+  type Alert,
+  type CapacitySnapshot,
+  type EMSArrival,
+  type Patient,
+  type Referral,
+  type Staff,
+} from '../types/emergency';
 import type { WorkflowSituationBriefProps } from '../pages/emergency/emergencyRouteShared';
 
 export type HospitalPhaseSummary = Readonly<{
@@ -101,10 +106,14 @@ function buildSituationBrief(
   const attentionParts: string[] = [];
 
   if (metrics.threeMinuteBreaches > 0) {
-    attentionParts.push(`${metrics.threeMinuteBreaches} three-minute breach${metrics.threeMinuteBreaches === 1 ? '' : 'es'}`);
+    attentionParts.push(
+      `${metrics.threeMinuteBreaches} three-minute breach${metrics.threeMinuteBreaches === 1 ? '' : 'es'}`,
+    );
   }
   if (metrics.criticalAlerts > 0) {
-    attentionParts.push(`${metrics.criticalAlerts} critical alert${metrics.criticalAlerts === 1 ? '' : 's'}`);
+    attentionParts.push(
+      `${metrics.criticalAlerts} critical alert${metrics.criticalAlerts === 1 ? '' : 's'}`,
+    );
   }
   if (metrics.p1p2Patients > 0) {
     attentionParts.push(`${metrics.p1p2Patients} P1/P2`);
@@ -167,12 +176,18 @@ function buildPhaseSummaries(
   patients: Patient[],
   referrals: Referral[],
 ): readonly HospitalPhaseSummary[] {
-  const stageStatusById = Object.fromEntries(journey.stages.map((stage) => [stage.id, stage.status]));
+  const stageStatusById = Object.fromEntries(
+    journey.stages.map((stage) => [stage.id, stage.status]),
+  );
 
   return Object.freeze(
     ED_JOURNEY_PHASES.map((phase) => {
-      const stagesActive = phase.stageIds.filter((stageId) => stageStatusById[stageId] === 'active').length;
-      const stagesAttention = phase.stageIds.filter((stageId) => stageStatusById[stageId] === 'attention').length;
+      const stagesActive = phase.stageIds.filter(
+        (stageId) => stageStatusById[stageId] === 'active',
+      ).length;
+      const stagesAttention = phase.stageIds.filter(
+        (stageId) => stageStatusById[stageId] === 'attention',
+      ).length;
       return Object.freeze({
         phaseId: phase.id,
         order: phase.order,
@@ -194,7 +209,8 @@ function buildDepartmentSummaries(
   const counts = new Map<HospitalDepartmentId, number>();
 
   for (const patient of patients) {
-    if (patient.state === PatientState.Discharge || patient.state === PatientState.Deceased) continue;
+    if (patient.state === PatientState.Discharge || patient.state === PatientState.Deceased)
+      continue;
     const referral = referrals.find((entry) => entry.patientId === patient.id) ?? null;
     const position = resolvePatientJourneyPosition(patient, referral);
     for (const departmentId of position.departmentIds) {

@@ -34,7 +34,10 @@ describe('surgeApi (HEAL-347.40 capability gate)', () => {
   it('surfaces a real backend error message instead of the generic "not available yet" placeholder', async () => {
     vi.mocked(apiFetchJson).mockResolvedValue({
       response: { ok: false } as Response,
-      data: { error: 'Surge capacity service requires MongoDB (set ENABLE_MONGOOSE_EMERGENCY_OS=true and MONGODB_URI).' },
+      data: {
+        error:
+          'Surge capacity service requires MongoDB (set ENABLE_MONGOOSE_EMERGENCY_OS=true and MONGODB_URI).',
+      },
     });
 
     const result = await fetchEmergencySurgeBottlenecks();

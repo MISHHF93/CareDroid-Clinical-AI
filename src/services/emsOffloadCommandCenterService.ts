@@ -52,13 +52,18 @@ function getPressureState({ incomingCount, waitingHandoffs, longestOffloadDelay 
 export const EmsOffloadCommandCenterService = Object.freeze({
   getDashboard(handoffs = DEFAULT_EMS_HANDOFFS) {
     const preArrival = EmsPreArrivalPipelineService.getPreArrivalDashboard();
-    const activeHandoffs = Object.freeze([...handoffs].sort((a, b) => b.offloadDelayMinutes - a.offloadDelayMinutes));
+    const activeHandoffs = Object.freeze(
+      [...handoffs].sort((a, b) => b.offloadDelayMinutes - a.offloadDelayMinutes),
+    );
     const waitingHandoffs = activeHandoffs.filter((handoff) =>
-      ['waiting handoff', 'handoff in progress'].includes(handoff.status)
+      ['waiting handoff', 'handoff in progress'].includes(handoff.status),
     );
     const longestOffloadDelay = activeHandoffs[0]?.offloadDelayMinutes || 0;
     const currentOffloadDelay = waitingHandoffs.length
-      ? Math.round(waitingHandoffs.reduce((sum, handoff) => sum + handoff.offloadDelayMinutes, 0) / waitingHandoffs.length)
+      ? Math.round(
+          waitingHandoffs.reduce((sum, handoff) => sum + handoff.offloadDelayMinutes, 0) /
+            waitingHandoffs.length,
+        )
       : 0;
     const pressureState = getPressureState({
       incomingCount: preArrival.metrics.incomingCount,
@@ -77,7 +82,7 @@ export const EmsOffloadCommandCenterService = Object.freeze({
           etaMinutes: patient.etaMinutes,
           riskLevel: patient.riskLevel,
           complaint: patient.complaint,
-        })
+        }),
       ),
       handoffs: activeHandoffs,
       metrics: Object.freeze({
@@ -91,10 +96,14 @@ export const EmsOffloadCommandCenterService = Object.freeze({
       recommendations: Object.freeze([
         Object.freeze({
           id: 'ems-offload-review',
-          title: pressureState === 'critical' ? 'Escalate EMS offload congestion' : 'Review EMS offload readiness',
+          title:
+            pressureState === 'critical'
+              ? 'Escalate EMS offload congestion'
+              : 'Review EMS offload readiness',
           priority: pressureState === 'critical' ? 'critical' : 'urgent',
           rationale: `${waitingHandoffs.length} handoffs waiting, longest offload delay ${longestOffloadDelay} minutes, ${preArrival.metrics.incomingCount} incoming ambulances.`,
-          action: 'Review available rooms, handoff ownership, triage readiness, and boarding constraints before the next EMS arrival.',
+          action:
+            'Review available rooms, handoff ownership, triage readiness, and boarding constraints before the next EMS arrival.',
         }),
       ]),
       sourceState: 'Demo data · No live EMS integration',

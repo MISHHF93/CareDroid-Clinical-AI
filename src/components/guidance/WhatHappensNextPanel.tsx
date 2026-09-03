@@ -4,8 +4,8 @@ import './WhatHappensNextBadge.css';
 
 export default function WhatHappensNextPanel({
   patient,
-  referrals = ([] as any[]),
-  staff = ([] as any[]),
+  referrals = [] as any[],
+  staff = [] as any[],
   className = '',
 }) {
   const snapshot = patient ? resolveWhatHappensNext(patient, { referrals, staff }) : null;

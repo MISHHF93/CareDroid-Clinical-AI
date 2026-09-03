@@ -22,7 +22,8 @@ export const EMERGENCY_QUEUE_DEFINITIONS = Object.freeze([
   Object.freeze({
     id: 'triage-queue',
     label: 'Triage Queue',
-    description: 'Patients waiting for vitals, chief complaint review, acuity, and calculator routing.',
+    description:
+      'Patients waiting for vitals, chief complaint review, acuity, and calculator routing.',
     journeyStates: ['triage', 'waiting'],
     targetWaitMinutes: 15,
     minimumThroughput: 5,
@@ -46,7 +47,8 @@ export const EMERGENCY_QUEUE_DEFINITIONS = Object.freeze([
   Object.freeze({
     id: 'reassessment-queue',
     label: 'Reassessment Queue',
-    description: 'Patients requiring repeat vitals, clinician reassessment, or staff concern review.',
+    description:
+      'Patients requiring repeat vitals, clinician reassessment, or staff concern review.',
     journeyStates: ['waiting', 'assessment', 'reassessment'],
     targetWaitMinutes: 30,
     minimumThroughput: 4,
@@ -62,7 +64,8 @@ export const EMERGENCY_QUEUE_DEFINITIONS = Object.freeze([
   Object.freeze({
     id: 'admission-queue',
     label: 'Admission Queue',
-    description: 'Admitted ED patients waiting for handoff, bed assignment, or prior authorization review.',
+    description:
+      'Admitted ED patients waiting for handoff, bed assignment, or prior authorization review.',
     journeyStates: ['disposition', 'admission'],
     targetWaitMinutes: 60,
     minimumThroughput: 3,
@@ -70,7 +73,8 @@ export const EMERGENCY_QUEUE_DEFINITIONS = Object.freeze([
   Object.freeze({
     id: 'discharge-queue',
     label: 'Discharge Queue',
-    description: 'Patients waiting for discharge instructions, summaries, medications, or follow-up closure.',
+    description:
+      'Patients waiting for discharge instructions, summaries, medications, or follow-up closure.',
     journeyStates: ['disposition', 'discharge', 'follow-up'],
     targetWaitMinutes: 45,
     minimumThroughput: 4,
@@ -78,7 +82,8 @@ export const EMERGENCY_QUEUE_DEFINITIONS = Object.freeze([
   Object.freeze({
     id: 'ems-pre-arrival-queue',
     label: 'EMS Pre-Arrival Queue',
-    description: 'Inbound EMS patients waiting for ED notification, receiving status, and structured handoff review.',
+    description:
+      'Inbound EMS patients waiting for ED notification, receiving status, and structured handoff review.',
     journeyStates: ['arrival', 'triage'],
     targetWaitMinutes: 20,
     minimumThroughput: 3,
@@ -86,70 +91,115 @@ export const EMERGENCY_QUEUE_DEFINITIONS = Object.freeze([
 ]);
 
 export const EMERGENCY_QUEUE_DEFINITION_BY_ID = Object.freeze(
-  Object.fromEntries(EMERGENCY_QUEUE_DEFINITIONS.map((queue) => [queue.id, queue]))
+  Object.fromEntries(EMERGENCY_QUEUE_DEFINITIONS.map((queue) => [queue.id, queue])),
 );
 
 export const DEFAULT_EMERGENCY_QUEUE_STATE = Object.freeze({
   'waiting-room': Object.freeze({
     count: 18,
     waitTime: 42,
-    oldestPatient: Object.freeze({ id: 'ED-1042', label: 'ED-1042', waitMinutes: 96, acuity: 'ESI 3' }),
+    oldestPatient: Object.freeze({
+      id: 'ED-1042',
+      label: 'ED-1042',
+      waitMinutes: 96,
+      acuity: 'ESI 3',
+    }),
     riskLevel: 'high',
     throughput: 5,
   }),
   'triage-queue': Object.freeze({
     count: 7,
     waitTime: 18,
-    oldestPatient: Object.freeze({ id: 'ED-1038', label: 'ED-1038', waitMinutes: 38, acuity: 'ESI 2' }),
+    oldestPatient: Object.freeze({
+      id: 'ED-1038',
+      label: 'ED-1038',
+      waitMinutes: 38,
+      acuity: 'ESI 2',
+    }),
     riskLevel: 'critical',
     throughput: 4,
   }),
   'provider-queue': Object.freeze({
     count: 11,
     waitTime: 52,
-    oldestPatient: Object.freeze({ id: 'ED-1027', label: 'ED-1027', waitMinutes: 88, acuity: 'ESI 3' }),
+    oldestPatient: Object.freeze({
+      id: 'ED-1027',
+      label: 'ED-1027',
+      waitMinutes: 88,
+      acuity: 'ESI 3',
+    }),
     riskLevel: 'high',
     throughput: 3,
   }),
   'results-queue': Object.freeze({
     count: 10,
     waitTime: 68,
-    oldestPatient: Object.freeze({ id: 'ED-1019', label: 'ED-1019', waitMinutes: 122, acuity: 'Sepsis review' }),
+    oldestPatient: Object.freeze({
+      id: 'ED-1019',
+      label: 'ED-1019',
+      waitMinutes: 122,
+      acuity: 'Sepsis review',
+    }),
     riskLevel: 'high',
     throughput: 4,
   }),
   'reassessment-queue': Object.freeze({
     count: 7,
     waitTime: 36,
-    oldestPatient: Object.freeze({ id: 'ED-1042', label: 'ED-1042', waitMinutes: 96, acuity: 'Needs Reassessment' }),
+    oldestPatient: Object.freeze({
+      id: 'ED-1042',
+      label: 'ED-1042',
+      waitMinutes: 96,
+      acuity: 'Needs Reassessment',
+    }),
     riskLevel: 'critical',
     throughput: 3,
   }),
   'referral-queue': Object.freeze({
     count: 9,
     waitTime: 50,
-    oldestPatient: Object.freeze({ id: 'ED-1011', label: 'ED-1011', waitMinutes: 74, acuity: 'Transfer review' }),
+    oldestPatient: Object.freeze({
+      id: 'ED-1011',
+      label: 'ED-1011',
+      waitMinutes: 74,
+      acuity: 'Transfer review',
+    }),
     riskLevel: 'medium',
     throughput: 2,
   }),
   'admission-queue': Object.freeze({
     count: 8,
     waitTime: 84,
-    oldestPatient: Object.freeze({ id: 'ED-1007', label: 'ED-1007', waitMinutes: 145, acuity: 'Bed hold' }),
+    oldestPatient: Object.freeze({
+      id: 'ED-1007',
+      label: 'ED-1007',
+      waitMinutes: 145,
+      acuity: 'Bed hold',
+    }),
     riskLevel: 'high',
     throughput: 2,
   }),
   'discharge-queue': Object.freeze({
     count: 6,
     waitTime: 39,
-    oldestPatient: Object.freeze({ id: 'ED-1004', label: 'ED-1004', waitMinutes: 58, acuity: 'Follow-up pending' }),
+    oldestPatient: Object.freeze({
+      id: 'ED-1004',
+      label: 'ED-1004',
+      waitMinutes: 58,
+      acuity: 'Follow-up pending',
+    }),
     riskLevel: 'medium',
     throughput: 4,
   }),
   'ems-pre-arrival-queue': Object.freeze({
     count: 5,
     waitTime: 17,
-    oldestPatient: Object.freeze({ id: 'EMS-204', label: 'EMS-204', waitMinutes: 29, acuity: 'Inbound stroke review' }),
+    oldestPatient: Object.freeze({
+      id: 'EMS-204',
+      label: 'EMS-204',
+      waitMinutes: 29,
+      acuity: 'Inbound stroke review',
+    }),
     riskLevel: 'high',
     throughput: 2,
   }),
@@ -184,23 +234,38 @@ function normalizeQueueState(queueState = DEFAULT_EMERGENCY_QUEUE_STATE) {
 
 function scoreQueue(queue) {
   const waitOverTarget = Math.max(0, queue.waitTime - queue.targetWaitMinutes);
-  const oldestOverTarget = Math.max(0, queue.oldestPatient.waitMinutes - queue.targetWaitMinutes * 2);
+  const oldestOverTarget = Math.max(
+    0,
+    queue.oldestPatient.waitMinutes - queue.targetWaitMinutes * 2,
+  );
   const throughputGap = Math.max(0, queue.minimumThroughput - queue.throughput);
 
-  return waitOverTarget + oldestOverTarget + throughputGap * 10 + RISK_WEIGHT[queue.riskLevel] * 15 + queue.count;
+  return (
+    waitOverTarget +
+    oldestOverTarget +
+    throughputGap * 10 +
+    RISK_WEIGHT[queue.riskLevel] * 15 +
+    queue.count
+  );
 }
 
 function getQueueBottleneck(queue) {
   const waitOverTarget = Math.max(0, queue.waitTime - queue.targetWaitMinutes);
-  const oldestOverTarget = Math.max(0, queue.oldestPatient.waitMinutes - queue.targetWaitMinutes * 2);
+  const oldestOverTarget = Math.max(
+    0,
+    queue.oldestPatient.waitMinutes - queue.targetWaitMinutes * 2,
+  );
   const throughputGap = Math.max(0, queue.minimumThroughput - queue.throughput);
   const riskScore = RISK_WEIGHT[queue.riskLevel] || 0;
-  const earlyWarning = waitOverTarget > 0 || oldestOverTarget > 0 || throughputGap > 0 || riskScore >= 2;
+  const earlyWarning =
+    waitOverTarget > 0 || oldestOverTarget > 0 || throughputGap > 0 || riskScore >= 2;
 
   if (!earlyWarning) return null;
 
   const severity =
-    riskScore >= 3 || waitOverTarget >= 20 || oldestOverTarget >= 30 || throughputGap >= 2 ? 'critical' : 'high';
+    riskScore >= 3 || waitOverTarget >= 20 || oldestOverTarget >= 30 || throughputGap >= 2
+      ? 'critical'
+      : 'high';
 
   return Object.freeze({
     queueId: queue.id,
@@ -222,7 +287,11 @@ function getQueueBottleneck(queue) {
 
 export const QueueIntelligenceService = Object.freeze({
   getQueues(queueState = DEFAULT_EMERGENCY_QUEUE_STATE) {
-    return Object.freeze(normalizeQueueState(queueState).map((queue) => Object.freeze({ ...queue, score: scoreQueue(queue) })));
+    return Object.freeze(
+      normalizeQueueState(queueState).map((queue) =>
+        Object.freeze({ ...queue, score: scoreQueue(queue) }),
+      ),
+    );
   },
 
   getQueueBottlenecks(queueState) {
@@ -230,7 +299,7 @@ export const QueueIntelligenceService = Object.freeze({
       normalizeQueueState(queueState)
         .map(getQueueBottleneck)
         .filter((b): b is NonNullable<ReturnType<typeof getQueueBottleneck>> => b !== null)
-        .sort((a, b) => b.score - a.score)
+        .sort((a, b) => b.score - a.score),
     );
   },
 
@@ -239,7 +308,10 @@ export const QueueIntelligenceService = Object.freeze({
     const bottlenecks = this.getQueueBottlenecks(queueState);
     const totalCount = queues.reduce((sum, queue) => sum + queue.count, 0);
     const totalThroughput = queues.reduce((sum, queue) => sum + queue.throughput, 0);
-    const weightedWait = queues.reduce((sum, queue) => sum + queue.waitTime * Math.max(queue.count, 1), 0);
+    const weightedWait = queues.reduce(
+      (sum, queue) => sum + queue.waitTime * Math.max(queue.count, 1),
+      0,
+    );
     const weight = queues.reduce((sum, queue) => sum + Math.max(queue.count, 1), 0);
     const highestRiskQueue = [...queues].sort((a, b) => scoreQueue(b) - scoreQueue(a))[0];
 
@@ -250,7 +322,8 @@ export const QueueIntelligenceService = Object.freeze({
       patientsWaiting: queues.find((queue) => queue.id === 'waiting-room')?.count || 0,
       averageWaitTime: Math.round(weightedWait / weight),
       longestWait: Math.max(0, ...queues.map((queue) => queue.oldestPatient.waitMinutes)),
-      patientsNeedingReassessment: queues.find((queue) => queue.id === 'reassessment-queue')?.count || 0,
+      patientsNeedingReassessment:
+        queues.find((queue) => queue.id === 'reassessment-queue')?.count || 0,
       bottleneckQueue: highestRiskQueue?.label || 'None',
       totalThroughput,
       bottleneckCount: bottlenecks.length,
@@ -275,15 +348,17 @@ export const QueueIntelligenceService = Object.freeze({
           priority: bottleneck.severity,
           rationale: bottleneck.reason,
           action: `Route staff attention to ${bottleneck.label.toLowerCase()} before downstream queues degrade.`,
-        })
-      )
+        }),
+      ),
     );
   },
 
   getQueueDashboard(queueState: any = undefined) {
     const queues = this.getQueues(queueState);
     const bottlenecks = this.getQueueBottlenecks(queueState);
-    const bottleneckByQueue = new Map(bottlenecks.map((bottleneck) => [bottleneck.queueId, bottleneck]));
+    const bottleneckByQueue = new Map(
+      bottlenecks.map((bottleneck) => [bottleneck.queueId, bottleneck]),
+    );
 
     return Object.freeze({
       queues: Object.freeze(
@@ -291,8 +366,8 @@ export const QueueIntelligenceService = Object.freeze({
           Object.freeze({
             ...queue,
             bottleneck: bottleneckByQueue.get(queue.id) || null,
-          })
-        )
+          }),
+        ),
       ),
       bottlenecks,
       metrics: this.getQueueMetrics(queueState),
@@ -302,9 +377,13 @@ export const QueueIntelligenceService = Object.freeze({
 });
 
 export const getQueues = QueueIntelligenceService.getQueues.bind(QueueIntelligenceService);
-export const getQueueBottlenecks = QueueIntelligenceService.getQueueBottlenecks.bind(QueueIntelligenceService);
-export const getQueueMetrics = QueueIntelligenceService.getQueueMetrics.bind(QueueIntelligenceService);
-export const getQueueRecommendations = QueueIntelligenceService.getQueueRecommendations.bind(QueueIntelligenceService);
-export const getQueueDashboard = QueueIntelligenceService.getQueueDashboard.bind(QueueIntelligenceService);
+export const getQueueBottlenecks =
+  QueueIntelligenceService.getQueueBottlenecks.bind(QueueIntelligenceService);
+export const getQueueMetrics =
+  QueueIntelligenceService.getQueueMetrics.bind(QueueIntelligenceService);
+export const getQueueRecommendations =
+  QueueIntelligenceService.getQueueRecommendations.bind(QueueIntelligenceService);
+export const getQueueDashboard =
+  QueueIntelligenceService.getQueueDashboard.bind(QueueIntelligenceService);
 
 export default QueueIntelligenceService;

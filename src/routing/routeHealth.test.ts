@@ -13,19 +13,19 @@ describe('route health graph', () => {
     expect(graph.routes.length).toBeGreaterThan(0);
     expect(graph.routes.every((route) => route.path && validStates.has(route.status))).toBe(true);
     expect(graph.routes.find((route) => route.path === '/emergency/whiteboard')?.status).toBe(
-      ROUTE_HEALTH_STATES.ACTIVE
+      ROUTE_HEALTH_STATES.ACTIVE,
     );
     expect(graph.routes.find((route) => route.path === '/dashboard')?.status).toBe(
-      ROUTE_HEALTH_STATES.ALIAS
+      ROUTE_HEALTH_STATES.ALIAS,
     );
     expect(graph.routes.find((route) => route.path === '/home')?.status).toBe(
-      ROUTE_HEALTH_STATES.ALIAS
+      ROUTE_HEALTH_STATES.ALIAS,
     );
     expect(graph.routes.find((route) => route.path === '/ai')?.status).toBe(
-      ROUTE_HEALTH_STATES.ALIAS
+      ROUTE_HEALTH_STATES.ALIAS,
     );
     expect(graph.routes.find((route) => route.path === '/tools/*')?.status).toBe(
-      ROUTE_HEALTH_STATES.ALIAS
+      ROUTE_HEALTH_STATES.ALIAS,
     );
   });
 
@@ -64,7 +64,10 @@ describe('findOrphanPageFiles (2026-08-08 regression)', () => {
     fixtureRoot = mkdtempSync(join(tmpdir(), 'route-health-orphan-'));
     const pagesDir = join(fixtureRoot, 'pages');
     mkdirSync(pagesDir, { recursive: true });
-    writeFileSync(join(pagesDir, 'TrulyOrphanedPage.tsx'), 'export default function TrulyOrphanedPage() { return null; }');
+    writeFileSync(
+      join(pagesDir, 'TrulyOrphanedPage.tsx'),
+      'export default function TrulyOrphanedPage() { return null; }',
+    );
     writeFileSync(join(fixtureRoot, 'unrelated.ts'), 'export const x = 1;');
 
     const orphans = findOrphanPageFiles(pagesDir, fixtureRoot);
@@ -77,7 +80,10 @@ describe('findOrphanPageFiles (2026-08-08 regression)', () => {
     fixtureRoot = mkdtempSync(join(tmpdir(), 'route-health-orphan-'));
     const pagesDir = join(fixtureRoot, 'pages');
     mkdirSync(pagesDir, { recursive: true });
-    writeFileSync(join(pagesDir, 'WiredPage.tsx'), 'export default function WiredPage() { return null; }');
+    writeFileSync(
+      join(pagesDir, 'WiredPage.tsx'),
+      'export default function WiredPage() { return null; }',
+    );
     writeFileSync(
       join(fixtureRoot, 'router.tsx'),
       "import WiredPage from './pages/WiredPage';\nconsole.log(WiredPage);",

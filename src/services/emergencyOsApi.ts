@@ -262,10 +262,13 @@ export const postEmsHandoff = (payload) =>
  * different workstation instead of resetting to the backend's synthetic 'Inbound'.
  */
 export const patchEmsArrivalStatus = (arrivalId: string, payload: Record<string, unknown>) =>
-  requestEmergencyJson(`${EMERGENCY_OS_API_ENDPOINTS.ems}/arrivals/${encodeURIComponent(arrivalId)}/status`, {
-    method: 'PATCH',
-    body: JSON.stringify(payload),
-  });
+  requestEmergencyJson(
+    `${EMERGENCY_OS_API_ENDPOINTS.ems}/arrivals/${encodeURIComponent(arrivalId)}/status`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    },
+  );
 /**
  * Physician-initiated SIMULATED "Request Emergency Transport" action (see
  * PatientDetailPanel.tsx). Awaited (not fire-and-forget like the sync calls
@@ -538,7 +541,10 @@ export const evaluateHybridDigitalTwinScenario = (payload: any = {}) =>
     body: JSON.stringify(payload),
   });
 
-export const createSmartIntakePatient = (patient, options: { confirmDuplicateOverride?: boolean } = {}) =>
+export const createSmartIntakePatient = (
+  patient,
+  options: { confirmDuplicateOverride?: boolean } = {},
+) =>
   requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.intake, {
     method: 'POST',
     body: JSON.stringify({

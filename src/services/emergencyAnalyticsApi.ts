@@ -25,7 +25,9 @@ function average(values) {
 function latestTerminalEvent(patient) {
   return [...(patient.timeline || [])]
     .reverse()
-    .find((event) => /discharg|admission|admitted|deceased|lwbs|left without/i.test(event.summary || ''));
+    .find((event) =>
+      /discharg|admission|admitted|deceased|lwbs|left without/i.test(event.summary || ''),
+    );
 }
 
 function compareValue(current, previous) {
@@ -39,11 +41,19 @@ function patientArrivalMs(patient) {
   return toMs(patient.arrivalTime) || Date.now();
 }
 
-export function buildLocalEmergencyAnalytics({ patients = [] as any[], queues = [] as any[], capacity = {} as any, activeShift = {} as any, now = new Date() }) {
+export function buildLocalEmergencyAnalytics({
+  patients = [] as any[],
+  queues = [] as any[],
+  capacity = {} as any,
+  activeShift = {} as any,
+  now = new Date(),
+}) {
   const nowMs = now.getTime();
   const shiftStartMs = toMs(activeShift.startTime) || nowMs - 8 * HOUR_MS;
   const previousShiftStartMs = shiftStartMs - 8 * HOUR_MS;
-  const currentShiftPatients = patients.filter((patient) => patientArrivalMs(patient) >= shiftStartMs);
+  const currentShiftPatients = patients.filter(
+    (patient) => patientArrivalMs(patient) >= shiftStartMs,
+  );
   const previousShiftPatients = patients.filter((patient) => {
     const arrivalMs = patientArrivalMs(patient);
     return arrivalMs >= previousShiftStartMs && arrivalMs < shiftStartMs;
@@ -53,16 +63,25 @@ export function buildLocalEmergencyAnalytics({ patients = [] as any[], queues = 
     const discharged = rows.filter((patient) => patient.state === 'Discharge');
     const admitted = rows.filter((patient) => patient.state === 'Admission');
     const lwbs = rows.filter((patient) =>
-      (patient.timeline || []).some((event) => /lwbs|left without being seen/i.test(event.summary || ''))
+      (patient.timeline || []).some((event) =>
+        /lwbs|left without being seen/i.test(event.summary || ''),
+      ),
     );
     const terminalRows = rows.filter((patient) => latestTerminalEvent(patient));
     return {
       patientsSeen: admitted.length + discharged.length,
-      avgWaitMinutes: average(rows.map((patient) => minutesBetween(patient.arrivalTime, patient.triageTime || patient.lastAssessedTime))),
+      avgWaitMinutes: average(
+        rows.map((patient) =>
+          minutesBetween(patient.arrivalTime, patient.triageTime || patient.lastAssessedTime),
+        ),
+      ),
       avgLosMinutes: average(
         terminalRows.map((patient) =>
-          minutesBetween(patient.arrivalTime, latestTerminalEvent(patient)?.timestamp || now.toISOString())
-        )
+          minutesBetween(
+            patient.arrivalTime,
+            latestTerminalEvent(patient)?.timestamp || now.toISOString(),
+          ),
+        ),
       ),
       dischargeCount: discharged.length,
       admissionCount: admitted.length,
@@ -114,12 +133,16 @@ export function buildLocalEmergencyAnalytics({ patients = [] as any[], queues = 
 
   const hourlyArrivals = Array.from({ length: 24 }, (_, hour) => ({
     hour: `${String(hour).padStart(2, '0')}:00`,
-    count: patients.filter((patient) => new Date(patientArrivalMs(patient)).getHours() === hour).length,
+    count: patients.filter((patient) => new Date(patientArrivalMs(patient)).getHours() === hour)
+      .length,
   }));
 
   const waitTrend = dailyVolume.map((point, index) => ({
     date: point.date,
-    avgWaitMinutes: Math.max(0, average(queues.map((queue) => queue.averageWaitMinutes || 0)) + index - 3),
+    avgWaitMinutes: Math.max(
+      0,
+      average(queues.map((queue) => queue.averageWaitMinutes || 0)) + index - 3,
+    ),
   }));
 
   const complaintCounts = patients.reduce((counts, patient) => {
@@ -164,7 +187,11 @@ async function guardedJson(capability, path) {
     const response = await apiFetch(path);
     const data = await parseApiResponse(response, { fallback: {} });
     if (!response.ok) {
-      return { ok: false, data: null, message: data?.message || getApiErrorMessage(null, response) };
+      return {
+        ok: false,
+        data: null,
+        message: data?.message || getApiErrorMessage(null, response),
+      };
     }
     return { ok: true, data, message: '' };
   } catch (error: any) {

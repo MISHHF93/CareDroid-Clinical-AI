@@ -22,7 +22,7 @@ export { Permission } from '../config/backendPermissionCatalog';
 
 /**
  * User Context for managing authentication and role-based access
- * 
+ *
  * Provides user information and role-based permission checking
  * throughout the application.
  */
@@ -105,7 +105,8 @@ const persistSession = (nextUser, nextToken) => {
 /** A stable-enough key to detect "this is actually a different session/role,"
  * not just a re-hydration of the same identity (e.g. a background token
  * refresh). Only real identity changes should trigger a PHI-context wipe. */
-const identityKey = (candidate) => (candidate ? `${candidate.id || ''}::${candidate.role || ''}` : '');
+const identityKey = (candidate) =>
+  candidate ? `${candidate.id || ''}::${candidate.role || ''}` : '';
 
 /**
  * Item 37: unauthorized PHI context must not survive a sign-out or role
@@ -227,7 +228,9 @@ export const UserProvider = ({ children }) => {
       // effect's own possibly-stale fallback overwriting it.
       const storedToken = resolveSessionToken();
       if (looksLikeJwt(storedToken)) {
-        const latestStoredUser = resolveDevBootstrapFallbackUser(readStoredUser() || userRef.current);
+        const latestStoredUser = resolveDevBootstrapFallbackUser(
+          readStoredUser() || userRef.current,
+        );
         setAuthTokenState(storedToken);
         setUserState(latestStoredUser);
         setIsLoading(false);
@@ -314,9 +317,9 @@ export const UserProvider = ({ children }) => {
   const isRealSession = looksLikeJwt(authToken);
   const isDevAuthBypass = Boolean(
     user?.isDevAuthBypass ||
-      user?.authMode === 'platform-access' ||
-      user?.authMode === 'local-dev-demo' ||
-      user?.authMode === 'dev-demo'
+    user?.authMode === 'platform-access' ||
+    user?.authMode === 'local-dev-demo' ||
+    user?.authMode === 'dev-demo',
   );
 
   // Debug logging for authentication state changes
@@ -358,7 +361,16 @@ export const UserProvider = ({ children }) => {
     // re-publish store updates on every tick — a self-sustaining render storm that could
     // starve a freshly-mounting lazy route's Suspense boundary from ever committing
     // (MB-P0-4 / HEAL-082: /emergency/patients permanently stuck on "Loading patients...").
-    [user, authToken, isAuthenticated, isRealSession, authMode, isDevAuthBypass, isLoading, securityContext],
+    [
+      user,
+      authToken,
+      isAuthenticated,
+      isRealSession,
+      authMode,
+      isDevAuthBypass,
+      isLoading,
+      securityContext,
+    ],
   );
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

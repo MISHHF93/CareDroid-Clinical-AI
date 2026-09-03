@@ -2,9 +2,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import {
-  BUILTIN_CALCULATOR_FORM_SMOKE_ROWS,
-} from './calculatorHubManifest';
+import { BUILTIN_CALCULATOR_FORM_SMOKE_ROWS } from './calculatorHubManifest';
 import { resolveCatalogLaunch } from './clinicalCatalogWiring';
 import { builtinUiCalculators } from './clinicalIntentToolCatalog';
 import {
@@ -12,7 +10,10 @@ import {
   ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS,
   REGISTRY_ID_TO_ORCHESTRATOR_TOOL,
 } from './clinicalToolIdContract';
-import { getMedicalExpansionCategoryPackRows, getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
+import {
+  getMedicalExpansionCategoryPackRows,
+  getMedicalToolsCatalogRows,
+} from './medicalToolsCatalogIndex';
 import { getAllDiscoveredTools } from './sourceCodeToolDiscovery';
 import {
   getCanonicalToolInventory,
@@ -36,8 +37,11 @@ import { buildToolContractMatrixRows } from './toolContractMatrix';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, '../..');
 const backendPatternsSource = readFileSync(
-  join(repoRoot, 'backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts'),
-  'utf8'
+  join(
+    repoRoot,
+    'backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts',
+  ),
+  'utf8',
 );
 const providersSource = readFileSync(join(repoRoot, 'src/app/providers.tsx'), 'utf8');
 const themeContextSource = readFileSync(join(repoRoot, 'src/contexts/ThemeContext.tsx'), 'utf8');
@@ -49,14 +53,17 @@ const allPackIds = [
       ...pack.tierA,
       ...pack.tierB,
       ...pack.tierC,
-    ])
+    ]),
   ),
 ];
 
-const sharedRouteAllowlist = new Set(['/tools/calculators', '/hospital-map', '/medical-iot', '/devices']);
-const documentedPlaceholderIds = new Set([
-  'moca-placeholder-workflow',
+const sharedRouteAllowlist = new Set([
+  '/tools/calculators',
+  '/hospital-map',
+  '/medical-iot',
+  '/devices',
 ]);
+const documentedPlaceholderIds = new Set(['moca-placeholder-workflow']);
 
 function expectNonBlank(value, label) {
   expect(String(value || '').trim(), label).not.toBe('');
@@ -79,11 +86,11 @@ describe('medical expansion cross-pack validation', () => {
     const userFacingIds = new Set(getUserFacingToolInventory().map((record) => record.id));
     const catalogIds = new Set(
       getMedicalToolsCatalogRows().flatMap((row) =>
-        [row.id, row.primaryId, row.sidebarToolId].filter(Boolean)
-      )
+        [row.id, row.primaryId, row.sidebarToolId].filter(Boolean),
+      ),
     );
     const discoveredIds = new Set(
-      getAllDiscoveredTools().flatMap((row) => [row.id, row.mapsTo].filter(Boolean))
+      getAllDiscoveredTools().flatMap((row) => [row.id, row.mapsTo].filter(Boolean)),
     );
 
     for (const id of allPackIds) {
@@ -110,7 +117,7 @@ describe('medical expansion cross-pack validation', () => {
         expect(record?.launchType, id).toBe(
           REGISTRY_ID_TO_ORCHESTRATOR_TOOL[id]
             ? TOOL_LAUNCH_TYPES.BACKEND_BACKED
-            : TOOL_LAUNCH_TYPES.LOCAL_ONLY
+            : TOOL_LAUNCH_TYPES.LOCAL_ONLY,
         );
         expect(launch.path, id).toMatch(/^\/tools\/calculators\//);
         expect(TIER_A_CALCULATOR_PATH_BY_REGISTRY_ID[id], id).toBe(launch.path);
@@ -140,7 +147,7 @@ describe('medical expansion cross-pack validation', () => {
         expect(nav.pathname, id).toBe(CANONICAL_ROUTES.emergencyCopilot);
         expect(launch.orchestratorTool, id).toBeNull();
         expect(launch.chatSeed, id).toMatch(
-          /decision support|do not|does not|human review|human approval|must not delay/i
+          /decision support|do not|does not|human review|human approval|must not delay/i,
         );
         expect(backendPatternsSource, id).toContain(`toolId: '${record?.nluToolId || id}'`);
       }
@@ -164,7 +171,7 @@ describe('medical expansion cross-pack validation', () => {
         expect(matrix, id).toBeTruthy();
         expect(record?.executorStatus, id).not.toBe(TOOL_EXECUTOR_STATUS.REGISTERED);
         expect(safetyCopy, id).toMatch(
-          /decision support|monitoring|dashboard|demo|human|no autonomous|does not/i
+          /decision support|monitoring|dashboard|demo|human|no autonomous|does not/i,
         );
       }
     }
@@ -223,13 +230,17 @@ describe('medical expansion cross-pack validation', () => {
   });
 
   it('covers all pack routes in mobile widths and standard light theme wiring', () => {
-    const responsiveRegistryIds = new Set(RESPONSIVE_QA_PAGES.map((page) => page.registryId).filter(Boolean));
+    const responsiveRegistryIds = new Set(
+      RESPONSIVE_QA_PAGES.map((page) => page.registryId).filter(Boolean),
+    );
     for (const id of allPackIds) {
-      expect(responsiveRegistryIds.has(id as any), `missing responsive QA route for ${id}`).toBe(true);
+      expect(responsiveRegistryIds.has(id as any), `missing responsive QA route for ${id}`).toBe(
+        true,
+      );
     }
 
     expect(MOBILE_FIRST_VIEWPORT_WIDTHS).toEqual(
-      expect.arrayContaining([320, 360, 375, 390, 412, 430, 480, 600, 768, 1024])
+      expect.arrayContaining([320, 360, 375, 390, 412, 430, 480, 600, 768, 1024]),
     );
     expect(providersSource).toContain('<ThemeProvider>');
     expect(themeContextSource).toMatch(/standardTheme|STANDARD_THEME/);
@@ -244,7 +255,7 @@ describe('medical expansion cross-pack validation', () => {
       const copy = `${record?.safetyCopy || ''} ${launch.chatSeed || ''} ${registry?.features?.join(' ') || ''}`;
 
       expect(copy, id).toMatch(
-        /decision support|do not|does not|human|demo|placeholder|must not delay|not a substitute/i
+        /decision support|do not|does not|human|demo|placeholder|must not delay|not a substitute/i,
       );
     }
   });

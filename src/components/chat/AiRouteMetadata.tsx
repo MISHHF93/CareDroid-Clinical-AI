@@ -67,10 +67,10 @@ export default function AiRouteMetadata({
   const primaryExpert = selectedExperts[0];
   const routeScore = formatScore(aiFoundation.routeScore ?? primaryExpert?.score);
   const confidence = formatPercent(
-    aiFoundation.confidence ?? unifiedNode?.confidence ?? primaryExpert?.confidence
+    aiFoundation.confidence ?? unifiedNode?.confidence ?? primaryExpert?.confidence,
   );
   const estimatedCost = formatCost(
-    aiFoundation.estimatedCost ?? routePlan?.costPlan?.estimatedCost
+    aiFoundation.estimatedCost ?? routePlan?.costPlan?.estimatedCost,
   );
   const reviewRequired =
     aiFoundation.requiresHumanReview ?? routePlan?.safetyPlan?.requiresHumanReview;
@@ -85,10 +85,7 @@ export default function AiRouteMetadata({
         {reviewRequired && <span className="ai-route-metadata__review">Human review</span>}
       </div>
       {unifiedNode && (
-        <div
-          className="ai-route-metadata__node"
-          aria-label="CareDroid unified AI node"
-        >
+        <div className="ai-route-metadata__node" aria-label="CareDroid unified AI node">
           <span className="ai-route-metadata__node-badge">1-node</span>
           <span className="ai-route-metadata__node-id">
             {unifiedNode.nodeId || 'caredroid-unified-ai-node'}
@@ -162,10 +159,7 @@ export default function AiRouteMetadata({
       {pipeline.length > 0 && (
         <div className="ai-route-metadata__pipeline" aria-label="AI gateway pipeline">
           {pipeline.map((item) => (
-            <span
-              className="ai-route-metadata__pipeline-step"
-              key={`${item.stage}-${item.status}`}
-            >
+            <span className="ai-route-metadata__pipeline-step" key={`${item.stage}-${item.status}`}>
               {formatLabel(item.stage)}: {formatLabel(item.status)}
             </span>
           ))}

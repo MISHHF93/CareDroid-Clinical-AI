@@ -73,11 +73,14 @@ function formatPressure(value = '') {
 function signalMeta(signal) {
   if (!signal) return 'Review required';
   const confidence =
-    typeof signal.confidence === 'number' ? `${Math.round(signal.confidence * 100)}% confidence` : 'confidence pending';
+    typeof signal.confidence === 'number'
+      ? `${Math.round(signal.confidence * 100)}% confidence`
+      : 'confidence pending';
   // Matches PatientDetailPanel.tsx's formatSignalMeta() for the same
   // upgradeHarness signal shape -- that page discloses provenance.provider,
   // this one was silently dropping it despite reading identical signal data.
-  const provider = signal.provenance?.provider || signal.provenance?.generatedBy || 'deterministic provider';
+  const provider =
+    signal.provenance?.provider || signal.provenance?.generatedBy || 'deterministic provider';
   return `${signal.safety?.status || 'review_required'} | ${confidence} | ${provider}`;
 }
 
@@ -89,7 +92,9 @@ export default function EmergencyAnalytics() {
   const loadEmergencyAnalytics = useEmergencyStore((state) => state.loadEmergencyAnalytics);
   const patients = useEmergencyStore((state) => state.patients);
   const emergencySettings = useEmergencyStore((state) => state.emergencySettings);
-  const operationalIntelligence = useOperationalIntelligence({ screenMode: 'COMMAND_CENTER_SCREEN' });
+  const operationalIntelligence = useOperationalIntelligence({
+    screenMode: 'COMMAND_CENTER_SCREEN',
+  });
   const { analyticsSummary } = useUnifiedApplicationKnowledgeGraph();
   const centralSnapshot = operationalIntelligence.centralSnapshot;
   const intelligenceSnapshot = operationalIntelligence.snapshot;
@@ -119,7 +124,9 @@ export default function EmergencyAnalytics() {
   const firstAlert = activeAlerts[0];
   const bottleneckRegistry = centralSnapshot.bottleneckRegistry;
   const activeBottlenecks = bottleneckRegistry.activeBottlenecks;
-  const breachCauses = Object.entries(bottleneckRegistry.analytics.threeMinuteTargetBreachesByCause);
+  const breachCauses = Object.entries(
+    bottleneckRegistry.analytics.threeMinuteTargetBreachesByCause,
+  );
   const upgradeHarness = useAdvancedEmergencyOsUpgradeHarness();
   const data = (emergencyAnalytics.data?.operationalCommand || {}) as any;
   const shift = (emergencyAnalytics.data?.shift || {}) as any;
@@ -127,7 +134,10 @@ export default function EmergencyAnalytics() {
   const hourlyArrivals = data.hourlyArrivals || [];
   const waitTrend = data.waitTrend || [];
   const topComplaints = data.topComplaints || [];
-  const totalDailyVolume = (data.dailyVolume || []).reduce((sum, point) => sum + Number(point.count || 0), 0);
+  const totalDailyVolume = (data.dailyVolume || []).reduce(
+    (sum, point) => sum + Number(point.count || 0),
+    0,
+  );
   const topComplaint = data.topComplaints?.[0];
   const hasOperationalData =
     dailyVolume.length || hourlyArrivals.length || waitTrend.length || topComplaints.length;
@@ -158,9 +168,11 @@ export default function EmergencyAnalytics() {
       : analyticsSourceLabel(emergencyAnalytics.source);
   const useCompactKpis = !surfaces.analytics.showKpiCards;
 
-  const erOccupancyLabel = centralSnapshot.capacityStatus.occupiedRooms != null && centralSnapshot.capacityStatus.occupiedRooms > 0
-    ? `${centralSnapshot.capacityStatus.occupiedRooms} / ${Math.max(centralSnapshot.capacityStatus.occupiedRooms, centralSnapshot.capacityStatus.totalPatients)}`
-    : `${centralSnapshot.capacityStatus.totalPatients}`;
+  const erOccupancyLabel =
+    centralSnapshot.capacityStatus.occupiedRooms != null &&
+    centralSnapshot.capacityStatus.occupiedRooms > 0
+      ? `${centralSnapshot.capacityStatus.occupiedRooms} / ${Math.max(centralSnapshot.capacityStatus.occupiedRooms, centralSnapshot.capacityStatus.totalPatients)}`
+      : `${centralSnapshot.capacityStatus.totalPatients}`;
 
   const avgTriageMins = triageBreachAnalytics.summary.longestElapsedLabel
     ? triageBreachAnalytics.summary.longestElapsedLabel
@@ -172,34 +184,35 @@ export default function EmergencyAnalytics() {
   // safety/operational concern get a semantic accent, and only once they're
   // actually non-zero -- a routine "0 boarding" stays as quiet as "44 patients
   // seen" instead of every tile competing for the same attention.
-  const shiftKpis: Array<{ label: string; value: string | number; tone?: 'critical' | 'warning' }> = [
-    { label: 'Patients seen', value: shift.patientsSeen ?? 0 },
-    { label: 'Discharges', value: shift.dischargeCount ?? 0 },
-    { label: 'Daily volume', value: totalDailyVolume },
-    { label: 'Avg wait', value: `${shift.averageWaitMinutes ?? 0}m` },
-    { label: 'ER occupancy', value: erOccupancyLabel },
-    {
-      label: 'Triage breaches',
-      value: triageBreachCount,
-      tone: triageBreachCount > 0 ? 'critical' : undefined,
-    },
-    {
-      label: 'Boarding',
-      value: shift.boardingCount ?? 0,
-      tone: (shift.boardingCount ?? 0) > 0 ? 'warning' : undefined,
-    },
-    {
-      label: 'High risk',
-      value: shift.highRiskCount ?? 0,
-      tone: (shift.highRiskCount ?? 0) > 0 ? 'critical' : undefined,
-    },
-    {
-      label: 'Reassess due',
-      value: shift.reassessmentDueCount ?? 0,
-      tone: (shift.reassessmentDueCount ?? 0) > 0 ? 'warning' : undefined,
-    },
-    { label: 'Top complaint', value: topComplaint ? `${topComplaint.count}` : '0' },
-  ];
+  const shiftKpis: Array<{ label: string; value: string | number; tone?: 'critical' | 'warning' }> =
+    [
+      { label: 'Patients seen', value: shift.patientsSeen ?? 0 },
+      { label: 'Discharges', value: shift.dischargeCount ?? 0 },
+      { label: 'Daily volume', value: totalDailyVolume },
+      { label: 'Avg wait', value: `${shift.averageWaitMinutes ?? 0}m` },
+      { label: 'ER occupancy', value: erOccupancyLabel },
+      {
+        label: 'Triage breaches',
+        value: triageBreachCount,
+        tone: triageBreachCount > 0 ? 'critical' : undefined,
+      },
+      {
+        label: 'Boarding',
+        value: shift.boardingCount ?? 0,
+        tone: (shift.boardingCount ?? 0) > 0 ? 'warning' : undefined,
+      },
+      {
+        label: 'High risk',
+        value: shift.highRiskCount ?? 0,
+        tone: (shift.highRiskCount ?? 0) > 0 ? 'critical' : undefined,
+      },
+      {
+        label: 'Reassess due',
+        value: shift.reassessmentDueCount ?? 0,
+        tone: (shift.reassessmentDueCount ?? 0) > 0 ? 'warning' : undefined,
+      },
+      { label: 'Top complaint', value: topComplaint ? `${topComplaint.count}` : '0' },
+    ];
 
   return (
     <CareDroidPage
@@ -234,225 +247,253 @@ export default function EmergencyAnalytics() {
       />
 
       {emergencyAnalytics.status === 'loading' ? (
-        <p className="emergency-analytics__state emergency-analytics__state--loading" role="status" aria-live="polite">
+        <p
+          className="emergency-analytics__state emergency-analytics__state--loading"
+          role="status"
+          aria-live="polite"
+        >
           Loading analytics…
         </p>
       ) : null}
       {statusMessage && surfaces.analytics.showDescriptions ? (
-        <p className="emergency-analytics__state">
-          {statusMessage}
-        </p>
+        <p className="emergency-analytics__state">{statusMessage}</p>
       ) : null}
       {emergencyAnalytics.status !== 'loading' && !hasOperationalData ? (
         <p className="emergency-analytics__state emergency-analytics__state--empty">
-          Operational analytics will populate when CareDroid has active patient flow data for this department. Do not present empty charts as connected hospital analytics.
+          Operational analytics will populate when CareDroid has active patient flow data for this
+          department. Do not present empty charts as connected hospital analytics.
         </p>
       ) : null}
 
       {surfaces.analytics.showPlatformLayers ? (
-      <>
-      <section
-        className="emergency-analytics__command-layer"
-        aria-label="Central node operational command layer"
-      >
-        <header>
-          <div>
-            <span>Central Node Metrics</span>
-            <h2>Operational Command Layer</h2>
-          </div>
-          <strong>{centralFreshness}</strong>
-        </header>
-        <div className="emergency-analytics__grid">
-          {centralCommandMetrics.map((metric) => (
-            <ChartCard key={metric.key} title={metric.label} subtitle={centralFreshness}>
-              <strong>{metric.value}</strong>
-              <small className="emergency-analytics__source">Source: {metric.source}</small>
-            </ChartCard>
-          ))}
-        </div>
-      </section>
+        <>
+          <section
+            className="emergency-analytics__command-layer"
+            aria-label="Central node operational command layer"
+          >
+            <header>
+              <div>
+                <span>Central Node Metrics</span>
+                <h2>Operational Command Layer</h2>
+              </div>
+              <strong>{centralFreshness}</strong>
+            </header>
+            <div className="emergency-analytics__grid">
+              {centralCommandMetrics.map((metric) => (
+                <ChartCard key={metric.key} title={metric.label} subtitle={centralFreshness}>
+                  <strong>{metric.value}</strong>
+                  <small className="emergency-analytics__source">Source: {metric.source}</small>
+                </ChartCard>
+              ))}
+            </div>
+          </section>
 
-      <section
-        className="emergency-analytics__command-layer"
-        aria-label="Operational awareness intelligence"
-      >
-        <header>
-          <div>
-            <span>Awareness Layer</span>
-            <h2>Operational Awareness</h2>
-          </div>
-          <strong>{centralSnapshot.sync.message}</strong>
-        </header>
-        <div className="emergency-analytics__grid">
-          <ChartCard title="Capacity" subtitle="Central node score and band">
-            <strong>{centralSnapshot.capacityStatus.score} {centralSnapshot.capacityStatus.band}</strong>
-            <small className="emergency-analytics__source">
-              {centralSnapshot.capacityStatus.occupiedRooms} rooms occupied · {centralSnapshot.capacityStatus.totalPatients} active records
-            </small>
-          </ChartCard>
-          <ChartCard title="EMS Pressure" subtitle="Inbound and critical pressure">
-            <strong>{formatPressure(centralSnapshot.emsPressure.status)}</strong>
-            <small className="emergency-analytics__source">
-              {centralSnapshot.emsPressure.inbound} inbound · {centralSnapshot.emsPressure.criticalInbound} critical
-            </small>
-          </ChartCard>
-          <ChartCard title="Boarding" subtitle="Boarding escalation state">
-            <strong>{centralSnapshot.boardingStatus.boarders}</strong>
-            <small className="emergency-analytics__source">
-              {formatPressure(centralSnapshot.boardingStatus.risk)} risk · source central node boardingStatus
-            </small>
-          </ChartCard>
-          <ChartCard title="Queue Health" subtitle="Breaches and oldest wait">
-            <strong>{breachedQueues.length}</strong>
-            <small className="emergency-analytics__source">
-              {firstBreachedQueue
-                ? `${firstBreachedQueue.label}: ${firstBreachedQueue.oldestWaitMinutes}m vs ${firstBreachedQueue.targetMinutes}m`
-                : 'No queue thresholds breached'}
-            </small>
-          </ChartCard>
-          <ChartCard title="Reassessment" subtitle="Due and overdue">
-            <strong>{centralSnapshot.reassessmentStatus.due}</strong>
-            <small className="emergency-analytics__source">
-              {centralSnapshot.reassessmentStatus.overdue} overdue · next action remains human reviewed
-            </small>
-          </ChartCard>
-          <ChartCard title="Triage breach timer" subtitle="Arrival to triage against site target">
-            <strong>{triageBreachAnalytics.summary.breachedCount}</strong>
-            <small className="emergency-analytics__source">
-              {triageBreachAnalytics.summary.breachRiskCount} at risk · target{' '}
-              {triageBreachAnalytics.summary.targetMinutes}m · longest{' '}
-              {triageBreachAnalytics.summary.longestElapsedLabel}
-            </small>
-          </ChartCard>
-          <ChartCard title="Alerts" subtitle="Active alert/escalation context">
-            <strong>{activeAlerts.length}</strong>
-            <small className="emergency-analytics__source">
-              {firstAlert ? `${firstAlert.severity}: ${firstAlert.title}` : 'All clear'}
-              {metricLinkedAlerts.length
-                ? ` · ${metricLinkedAlerts.map((entry) => `${entry.label} ${entry.count}`).join(' · ')}`
-                : ''}
-              {groupedOperationalAlerts.unmapped.length
-                ? ` · ${groupedOperationalAlerts.unmapped.length} other`
-                : ''}
-            </small>
-          </ChartCard>
-          <ChartCard title="Bottlenecks" subtitle="Active service/workflow causes">
-            <strong>{bottleneckRegistry.analytics.activeCount}</strong>
-            <small className="emergency-analytics__source">
-              {bottleneckRegistry.rootCauseSummary}
-            </small>
-          </ChartCard>
-          <ChartCard title="Service Latency" subtitle="Average service health latency">
-            <strong>{bottleneckRegistry.analytics.averageServiceLatencyMs}ms</strong>
-            <small className="emergency-analytics__source">
-              {bottleneckRegistry.serviceHealth.filter((service) => service.status !== 'healthy').length} degraded services
-            </small>
-          </ChartCard>
-          <ChartCard title="3-Minute Breach Causes" subtitle="By bottleneck category">
-            <strong>{breachCauses.reduce((sum, [, count]) => sum + count, 0)}</strong>
-            <small className="emergency-analytics__source">
-              {breachCauses.length
-                ? breachCauses.map(([cause, count]) => `${cause.replace(/_/g, ' ')} ${count}`).join(' · ')
-                : 'No projected breach causes'}
-            </small>
-          </ChartCard>
-          {intelligenceSnapshot.modelHealth ? (
-            <ChartCard title="Operational Intelligence" subtitle="Rule-based baseline health">
-              <strong>{intelligenceSnapshot.modelHealth.status}</strong>
-              <small className="emergency-analytics__source">
-                {intelligenceSnapshot.mode} · {intelligenceSnapshot.recommendations.length} advisory recommendations ·{' '}
-                {intelligenceSnapshot.disclaimers.operational}
-              </small>
-            </ChartCard>
-          ) : null}
-        </div>
-      </section>
+          <section
+            className="emergency-analytics__command-layer"
+            aria-label="Operational awareness intelligence"
+          >
+            <header>
+              <div>
+                <span>Awareness Layer</span>
+                <h2>Operational Awareness</h2>
+              </div>
+              <strong>{centralSnapshot.sync.message}</strong>
+            </header>
+            <div className="emergency-analytics__grid">
+              <ChartCard title="Capacity" subtitle="Central node score and band">
+                <strong>
+                  {centralSnapshot.capacityStatus.score} {centralSnapshot.capacityStatus.band}
+                </strong>
+                <small className="emergency-analytics__source">
+                  {centralSnapshot.capacityStatus.occupiedRooms} rooms occupied ·{' '}
+                  {centralSnapshot.capacityStatus.totalPatients} active records
+                </small>
+              </ChartCard>
+              <ChartCard title="EMS Pressure" subtitle="Inbound and critical pressure">
+                <strong>{formatPressure(centralSnapshot.emsPressure.status)}</strong>
+                <small className="emergency-analytics__source">
+                  {centralSnapshot.emsPressure.inbound} inbound ·{' '}
+                  {centralSnapshot.emsPressure.criticalInbound} critical
+                </small>
+              </ChartCard>
+              <ChartCard title="Boarding" subtitle="Boarding escalation state">
+                <strong>{centralSnapshot.boardingStatus.boarders}</strong>
+                <small className="emergency-analytics__source">
+                  {formatPressure(centralSnapshot.boardingStatus.risk)} risk · source central node
+                  boardingStatus
+                </small>
+              </ChartCard>
+              <ChartCard title="Queue Health" subtitle="Breaches and oldest wait">
+                <strong>{breachedQueues.length}</strong>
+                <small className="emergency-analytics__source">
+                  {firstBreachedQueue
+                    ? `${firstBreachedQueue.label}: ${firstBreachedQueue.oldestWaitMinutes}m vs ${firstBreachedQueue.targetMinutes}m`
+                    : 'No queue thresholds breached'}
+                </small>
+              </ChartCard>
+              <ChartCard title="Reassessment" subtitle="Due and overdue">
+                <strong>{centralSnapshot.reassessmentStatus.due}</strong>
+                <small className="emergency-analytics__source">
+                  {centralSnapshot.reassessmentStatus.overdue} overdue · next action remains human
+                  reviewed
+                </small>
+              </ChartCard>
+              <ChartCard
+                title="Triage breach timer"
+                subtitle="Arrival to triage against site target"
+              >
+                <strong>{triageBreachAnalytics.summary.breachedCount}</strong>
+                <small className="emergency-analytics__source">
+                  {triageBreachAnalytics.summary.breachRiskCount} at risk · target{' '}
+                  {triageBreachAnalytics.summary.targetMinutes}m · longest{' '}
+                  {triageBreachAnalytics.summary.longestElapsedLabel}
+                </small>
+              </ChartCard>
+              <ChartCard title="Alerts" subtitle="Active alert/escalation context">
+                <strong>{activeAlerts.length}</strong>
+                <small className="emergency-analytics__source">
+                  {firstAlert ? `${firstAlert.severity}: ${firstAlert.title}` : 'All clear'}
+                  {metricLinkedAlerts.length
+                    ? ` · ${metricLinkedAlerts.map((entry) => `${entry.label} ${entry.count}`).join(' · ')}`
+                    : ''}
+                  {groupedOperationalAlerts.unmapped.length
+                    ? ` · ${groupedOperationalAlerts.unmapped.length} other`
+                    : ''}
+                </small>
+              </ChartCard>
+              <ChartCard title="Bottlenecks" subtitle="Active service/workflow causes">
+                <strong>{bottleneckRegistry.analytics.activeCount}</strong>
+                <small className="emergency-analytics__source">
+                  {bottleneckRegistry.rootCauseSummary}
+                </small>
+              </ChartCard>
+              <ChartCard title="Service Latency" subtitle="Average service health latency">
+                <strong>{bottleneckRegistry.analytics.averageServiceLatencyMs}ms</strong>
+                <small className="emergency-analytics__source">
+                  {
+                    bottleneckRegistry.serviceHealth.filter(
+                      (service) => service.status !== 'healthy',
+                    ).length
+                  }{' '}
+                  degraded services
+                </small>
+              </ChartCard>
+              <ChartCard title="3-Minute Breach Causes" subtitle="By bottleneck category">
+                <strong>{breachCauses.reduce((sum, [, count]) => sum + count, 0)}</strong>
+                <small className="emergency-analytics__source">
+                  {breachCauses.length
+                    ? breachCauses
+                        .map(([cause, count]) => `${cause.replace(/_/g, ' ')} ${count}`)
+                        .join(' · ')
+                    : 'No projected breach causes'}
+                </small>
+              </ChartCard>
+              {intelligenceSnapshot.modelHealth ? (
+                <ChartCard title="Operational Intelligence" subtitle="Rule-based baseline health">
+                  <strong>{intelligenceSnapshot.modelHealth.status}</strong>
+                  <small className="emergency-analytics__source">
+                    {intelligenceSnapshot.mode} · {intelligenceSnapshot.recommendations.length}{' '}
+                    advisory recommendations · {intelligenceSnapshot.disclaimers.operational}
+                  </small>
+                </ChartCard>
+              ) : null}
+            </div>
+          </section>
 
-      <section
-        className="emergency-analytics__command-layer"
-        aria-label="Unified application knowledge graph analytics"
-      >
-        <header>
-          <div>
-            <span>Knowledge Graph</span>
-            <h2>Connected Operational Context</h2>
-          </div>
-          <strong>{analyticsSummary.nodeCount} entities · {analyticsSummary.edgeCount} relationships</strong>
-        </header>
-        <div className="emergency-analytics__grid">
-          <ChartCard title="Graph nodes" subtitle="Referenced operational entities">
-            <strong>{analyticsSummary.nodeCount}</strong>
-            <small className="emergency-analytics__source">
-              Patients {analyticsSummary.entityCounts.patient ?? 0} · staff {analyticsSummary.entityCounts.staff ?? 0} · alerts{' '}
-              {analyticsSummary.entityCounts.alert ?? 0}
-            </small>
-          </ChartCard>
-          <ChartCard title="Graph edges" subtitle="Cross-module relationships">
-            <strong>{analyticsSummary.edgeCount}</strong>
-            <small className="emergency-analytics__source">
-              Workflows {analyticsSummary.entityCounts.workflow ?? 0} · events {analyticsSummary.entityCounts.operational_event ?? 0}
-            </small>
-          </ChartCard>
-          <ChartCard title="Critical signals" subtitle="Connected high-severity graph nodes">
-            <strong>{analyticsSummary.connectedCriticalSignals}</strong>
-            <small className="emergency-analytics__source">
-              AI recommendations {analyticsSummary.entityCounts.ai_recommendation ?? 0} · services{' '}
-              {analyticsSummary.entityCounts.service ?? 0}
-            </small>
-          </ChartCard>
-        </div>
-        <UnifiedApplicationKnowledgeGraphPanel />
-      </section>
+          <section
+            className="emergency-analytics__command-layer"
+            aria-label="Unified application knowledge graph analytics"
+          >
+            <header>
+              <div>
+                <span>Knowledge Graph</span>
+                <h2>Connected Operational Context</h2>
+              </div>
+              <strong>
+                {analyticsSummary.nodeCount} entities · {analyticsSummary.edgeCount} relationships
+              </strong>
+            </header>
+            <div className="emergency-analytics__grid">
+              <ChartCard title="Graph nodes" subtitle="Referenced operational entities">
+                <strong>{analyticsSummary.nodeCount}</strong>
+                <small className="emergency-analytics__source">
+                  Patients {analyticsSummary.entityCounts.patient ?? 0} · staff{' '}
+                  {analyticsSummary.entityCounts.staff ?? 0} · alerts{' '}
+                  {analyticsSummary.entityCounts.alert ?? 0}
+                </small>
+              </ChartCard>
+              <ChartCard title="Graph edges" subtitle="Cross-module relationships">
+                <strong>{analyticsSummary.edgeCount}</strong>
+                <small className="emergency-analytics__source">
+                  Workflows {analyticsSummary.entityCounts.workflow ?? 0} · events{' '}
+                  {analyticsSummary.entityCounts.operational_event ?? 0}
+                </small>
+              </ChartCard>
+              <ChartCard title="Critical signals" subtitle="Connected high-severity graph nodes">
+                <strong>{analyticsSummary.connectedCriticalSignals}</strong>
+                <small className="emergency-analytics__source">
+                  AI recommendations {analyticsSummary.entityCounts.ai_recommendation ?? 0} ·
+                  services {analyticsSummary.entityCounts.service ?? 0}
+                </small>
+              </ChartCard>
+            </div>
+            <UnifiedApplicationKnowledgeGraphPanel />
+          </section>
 
-      <section
-        className="emergency-analytics__command-layer"
-        aria-label="Bottleneck analytics and three-minute risk"
-      >
-        <header>
-          <div>
-            <span>Bottleneck Trends</span>
-            <h2>Response Impact</h2>
-          </div>
-          <ThreeMinuteRiskIndicator registry={bottleneckRegistry} />
-        </header>
-        <BottleneckList
-          events={activeBottlenecks}
-          limit={4}
-          canViewPatients={emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyPatients)}
-        />
-      </section>
-      </>
+          <section
+            className="emergency-analytics__command-layer"
+            aria-label="Bottleneck analytics and three-minute risk"
+          >
+            <header>
+              <div>
+                <span>Bottleneck Trends</span>
+                <h2>Response Impact</h2>
+              </div>
+              <ThreeMinuteRiskIndicator registry={bottleneckRegistry} />
+            </header>
+            <BottleneckList
+              events={activeBottlenecks}
+              limit={4}
+              canViewPatients={emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyPatients)}
+            />
+          </section>
+        </>
       ) : null}
 
       {surfaces.analytics.showDepartmentShortcuts ? (
-      <div className="emergency-analytics__grid" aria-label="Department shortcut links">
-        <ChartCard title="Department Pulse" subtitle="Live command view">
-          <strong>Queues, staff, EMS, alerts</strong>
-          <small>Compact charge-nurse view surfaced from the CareDroid store.</small>
-          {emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyPulse) ? (
-            <Link className="emergency-analytics__link" to={CANONICAL_ROUTES.emergencyPulse}>
-              Open Department Pulse
-            </Link>
-          ) : (
-            <small>Department Pulse is restricted for this role.</small>
-          )}
-        </ChartCard>
-        <ChartCard title="Shift Summary" subtitle="Handoff ready">
-          <strong>Shift metrics and brief</strong>
-          <small>Generate a handoff brief from patients, referrals, capacity, alerts, and EMS data.</small>
-          {emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyShift) ? (
-            <Link className="emergency-analytics__link" to={CANONICAL_ROUTES.emergencyShift}>
-              Open Shift Summary
-            </Link>
-          ) : (
-            <small>Shift Summary is restricted for this role.</small>
-          )}
-        </ChartCard>
-      </div>
+        <div className="emergency-analytics__grid" aria-label="Department shortcut links">
+          <ChartCard title="Department Pulse" subtitle="Live command view">
+            <strong>Queues, staff, EMS, alerts</strong>
+            <small>Compact charge-nurse view surfaced from the CareDroid store.</small>
+            {emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyPulse) ? (
+              <Link className="emergency-analytics__link" to={CANONICAL_ROUTES.emergencyPulse}>
+                Open Department Pulse
+              </Link>
+            ) : (
+              <small>Department Pulse is restricted for this role.</small>
+            )}
+          </ChartCard>
+          <ChartCard title="Shift Summary" subtitle="Handoff ready">
+            <strong>Shift metrics and brief</strong>
+            <small>
+              Generate a handoff brief from patients, referrals, capacity, alerts, and EMS data.
+            </small>
+            {emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyShift) ? (
+              <Link className="emergency-analytics__link" to={CANONICAL_ROUTES.emergencyShift}>
+                Open Shift Summary
+              </Link>
+            ) : (
+              <small>Shift Summary is restricted for this role.</small>
+            )}
+          </ChartCard>
+        </div>
       ) : null}
 
       {surfaces.analytics.showPlatformLayers && upgradeHarness.data?.data ? (
-        <div className="emergency-analytics__grid" aria-label="Advanced CareDroid upgrade harness analytics">
+        <div
+          className="emergency-analytics__grid"
+          aria-label="Advanced CareDroid upgrade harness analytics"
+        >
           <ChartCard title="Upgrade Harness" subtitle="Pilot readiness">
             <strong>
               {upgradeHarness.data.data.pilotReadiness.reviewRequired}/
@@ -475,7 +516,10 @@ export default function EmergencyAnalytics() {
           <ChartCard title="Blocked Actions" subtitle="Autonomy guardrail">
             <strong>{blockedActions.length}</strong>
             <small>
-              {(blockedActions.length ? blockedActions : ['diagnosis', 'prescribing', 'disposition'])
+              {(blockedActions.length
+                ? blockedActions
+                : ['diagnosis', 'prescribing', 'disposition']
+              )
                 .slice(0, 3)
                 .join(', ')}
             </small>
@@ -507,7 +551,10 @@ export default function EmergencyAnalytics() {
           ))}
         </div>
       ) : (
-        <div className="emergency-analytics__grid emergency-analytics__grid--kpi" aria-label="Emergency analytics KPIs">
+        <div
+          className="emergency-analytics__grid emergency-analytics__grid--kpi"
+          aria-label="Emergency analytics KPIs"
+        >
           <ChartCard title="Patients Seen" subtitle="Current shift">
             <strong>{shift.patientsSeen ?? 0}</strong>
           </ChartCard>
@@ -518,7 +565,9 @@ export default function EmergencyAnalytics() {
             <strong>{totalDailyVolume}</strong>
           </ChartCard>
           <ChartCard title="Top Complaint" subtitle="Current board">
-            <strong>{topComplaint ? `${topComplaint.name}: ${topComplaint.count}` : 'No volume'}</strong>
+            <strong>
+              {topComplaint ? `${topComplaint.name}: ${topComplaint.count}` : 'No volume'}
+            </strong>
           </ChartCard>
           <ChartCard title="Average Wait" subtitle="Backend current">
             <strong>{shift.averageWaitMinutes ?? 0}m</strong>
@@ -535,14 +584,18 @@ export default function EmergencyAnalytics() {
           <ChartCard title="ER Occupancy" subtitle="Rooms occupied vs. total active">
             <strong>{erOccupancyLabel}</strong>
             <small className="emergency-analytics__source">
-              {centralSnapshot.capacityStatus.band ? `Capacity band: ${centralSnapshot.capacityStatus.band}` : 'Capacity band pending'}
+              {centralSnapshot.capacityStatus.band
+                ? `Capacity band: ${centralSnapshot.capacityStatus.band}`
+                : 'Capacity band pending'}
             </small>
           </ChartCard>
           <ChartCard title="Avg Triage Time" subtitle="Arrival-to-triage target tracking">
             <strong>{avgTriageMins}</strong>
             <small className="emergency-analytics__source">
-              {triageBreachAnalytics.summary.breachedCount} breach{triageBreachAnalytics.summary.breachedCount !== 1 ? 'es' : ''} ·{' '}
-              {triageBreachAnalytics.summary.breachRiskCount} at risk · target {triageBreachAnalytics.summary.targetMinutes}m
+              {triageBreachAnalytics.summary.breachedCount} breach
+              {triageBreachAnalytics.summary.breachedCount !== 1 ? 'es' : ''} ·{' '}
+              {triageBreachAnalytics.summary.breachRiskCount} at risk · target{' '}
+              {triageBreachAnalytics.summary.targetMinutes}m
             </small>
           </ChartCard>
         </div>

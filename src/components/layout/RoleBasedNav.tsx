@@ -16,10 +16,7 @@ export default function RoleBasedNav({ className = '', onNavigate }: RoleBasedNa
   if (!routes.length) return null;
 
   return (
-    <nav
-      className={`cd-role-nav ${className}`.trim()}
-      aria-label={`Navigation for ${role}`}
-    >
+    <nav className={`cd-role-nav ${className}`.trim()} aria-label={`Navigation for ${role}`}>
       {routes.map((entry) => (
         <NavLink
           key={entry.path}

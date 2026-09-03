@@ -106,11 +106,7 @@ function metricTone(
 ): EmsOffloadVisibilityStripMetric['tone'] {
   switch (id) {
     case 'ems-inbound':
-      return snapshot.inboundCount >= 3
-        ? 'warning'
-        : snapshot.inboundCount
-          ? 'info'
-          : 'neutral';
+      return snapshot.inboundCount >= 3 ? 'warning' : snapshot.inboundCount ? 'info' : 'neutral';
     case 'offload-delays':
       return snapshot.offloadDelaysCount >= 2
         ? 'critical'
@@ -276,15 +272,13 @@ export function selectEmsOffloadVisibilityMetrics(
   }));
 }
 
-export function hasEmsOffloadVisibilityActivity(
-  snapshot: EmsOffloadVisibilitySnapshot,
-): boolean {
+export function hasEmsOffloadVisibilityActivity(snapshot: EmsOffloadVisibilitySnapshot): boolean {
   return Boolean(
     snapshot.inboundCount ||
-      snapshot.offloadDelaysCount ||
-      snapshot.handoffPendingCount ||
-      snapshot.averageOffloadMinutes ||
-      snapshot.longestOffloadMinutes,
+    snapshot.offloadDelaysCount ||
+    snapshot.handoffPendingCount ||
+    snapshot.averageOffloadMinutes ||
+    snapshot.longestOffloadMinutes,
   );
 }
 

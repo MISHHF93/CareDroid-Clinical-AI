@@ -151,25 +151,25 @@ export default function PatientVerificationExperience({
           const isActive = index === activeDisplayIndex;
           const isComplete = index < activeDisplayIndex;
           return (
-          <li
-            key={step}
-            className={[
-              isActive ? 'patient-verification__step--active' : '',
-              isComplete ? 'patient-verification__step--complete' : '',
-            ]
-              .filter(Boolean)
-              .join(' ')}
-          >
-            <button
-              type="button"
-              onClick={() => onStepChange?.(index)}
-              {...(isActive ? { 'aria-current': 'step' as const } : {})}
+            <li
+              key={step}
+              className={[
+                isActive ? 'patient-verification__step--active' : '',
+                isComplete ? 'patient-verification__step--complete' : '',
+              ]
+                .filter(Boolean)
+                .join(' ')}
             >
-              <span>{index + 1}</span>
-              {step}
-            </button>
-          </li>
-        );
+              <button
+                type="button"
+                onClick={() => onStepChange?.(index)}
+                {...(isActive ? { 'aria-current': 'step' as const } : {})}
+              >
+                <span>{index + 1}</span>
+                {step}
+              </button>
+            </li>
+          );
         })}
       </ol>
 
@@ -177,7 +177,11 @@ export default function PatientVerificationExperience({
 
       {onContinue ? (
         <div className="patient-verification__continue">
-          <button type="button" disabled={!canContinue || Boolean(pendingAction)} onClick={onContinue}>
+          <button
+            type="button"
+            disabled={!canContinue || Boolean(pendingAction)}
+            onClick={onContinue}
+          >
             {continueLabel}
           </button>
         </div>
@@ -192,7 +196,9 @@ export default function PatientVerificationExperience({
           </div>
         ) : (
           <details className="patient-verification__warnings patient-verification__warnings--collapsed">
-            <summary>{warnings.length} verification note{warnings.length === 1 ? '' : 's'}</summary>
+            <summary>
+              {warnings.length} verification note{warnings.length === 1 ? '' : 's'}
+            </summary>
             {warnings.map((warning) => (
               <p key={warning}>{warning}</p>
             ))}
@@ -221,7 +227,9 @@ export default function PatientVerificationExperience({
           onClick={onCreatePatient}
         >
           <UserPlus size={17} aria-hidden />
-          {pendingAction === 'Create-and-triage intake' ? 'Sending...' : 'Create and send to triage'}
+          {pendingAction === 'Create-and-triage intake'
+            ? 'Sending...'
+            : 'Create and send to triage'}
         </button>
       </section>
 

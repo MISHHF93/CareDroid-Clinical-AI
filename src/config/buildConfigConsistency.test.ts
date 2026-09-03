@@ -52,7 +52,7 @@ describe('build and service config consistency', () => {
     expect(packageJson.scripts.dev).toBe('node scripts/dev-stack.mjs');
     expect(packageJson.scripts['dev:web']).toBe('vite --strictPort');
     expect(packageJson.scripts['dev:lan']).toBe('vite --strictPort --host');
-    expect(viteConfig).toContain("return 3000");
+    expect(viteConfig).toContain('return 3000');
     expect(viteConfig.match(/strictPort:\s*true/g)).toHaveLength(2);
     // Prefers 127.0.0.1 over localhost to avoid a Windows IPv6 ECONNREFUSED
     // when Nest binds IPv4-only (see vite.config.ts's own comment on this).
@@ -72,7 +72,7 @@ describe('build and service config consistency', () => {
     const mlCompose = read('docker-compose.ml.yml');
     const packageJson = read('package.json');
 
-    expect(mlCompose).toContain("NLU_SERVICE_MODE: in-process");
+    expect(mlCompose).toContain('NLU_SERVICE_MODE: in-process');
     expect(mlCompose).toContain("NLU_SERVICE_ENABLED: 'true'");
     expect(mlCompose).toContain('NLU_SERVICE_URL: http://backend:8000/api/nlu');
     expect(mlCompose).not.toContain('- nlu');
@@ -87,7 +87,7 @@ describe('build and service config consistency', () => {
     // The safe-by-default behavior now lives entirely in the validator script
     // (isTruthy(undefined) === false) rather than a hardcoded default in
     // vercel.json's env block, which no longer declares this var at all.
-    expect(validator).toContain("isTruthy(process.env.VITE_ALLOW_SAME_ORIGIN_API)");
+    expect(validator).toContain('isTruthy(process.env.VITE_ALLOW_SAME_ORIGIN_API)');
     expect(validator).toContain('VITE_SAME_ORIGIN_API_PROXY_VERIFIED');
     expect(validator).toContain('VITE_API_URL is required for Vercel frontend deploys');
     expect(validator).toContain('!isDemoMode');
@@ -176,7 +176,7 @@ describe('build and service config consistency', () => {
   it('keeps Vite on the documented local frontend port', () => {
     const viteConfig = read('vite.config.ts');
 
-    expect(viteConfig).toContain("return 3000");
+    expect(viteConfig).toContain('return 3000');
     expect(viteConfig).toContain('strictPort: true');
   });
 

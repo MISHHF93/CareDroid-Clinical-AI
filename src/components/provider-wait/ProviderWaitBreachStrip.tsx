@@ -8,8 +8,8 @@ import ProviderWaitBreachBadge from './ProviderWaitBreachBadge';
 import './ProviderWaitBreachBadge.css';
 
 export default function ProviderWaitBreachStrip({
-  patients = ([] as any[]),
-  settings = (null as any),
+  patients = [] as any[],
+  settings = null as any,
   onSelectPatient,
   className = '',
   alwaysShowWhenActive = true,
@@ -34,7 +34,11 @@ export default function ProviderWaitBreachStrip({
     [context, patients],
   );
 
-  if (!alwaysShowWhenActive && !snapshot.summary.approachingThresholdCount && !snapshot.summary.breachedCount) {
+  if (
+    !alwaysShowWhenActive &&
+    !snapshot.summary.approachingThresholdCount &&
+    !snapshot.summary.breachedCount
+  ) {
     return null;
   }
   if (alwaysShowWhenActive && !hasProviderWaitVisibilityActivity(visibility)) {
@@ -56,8 +60,8 @@ export default function ProviderWaitBreachStrip({
         <p className="provider-wait-breach-strip__subtitle">
           Triage-to-provider elapsed time against CTAS thresholds — {snapshot.summary.breachedCount}{' '}
           breached · {snapshot.summary.approachingThresholdCount} approaching · avg{' '}
-          {visibility.averageProviderWaitLabel} · {snapshot.summary.highRiskExceptionCount} high-risk
-          exceptions
+          {visibility.averageProviderWaitLabel} · {snapshot.summary.highRiskExceptionCount}{' '}
+          high-risk exceptions
         </p>
       </header>
       <div className="provider-wait-breach-strip__counts">
@@ -100,7 +104,12 @@ export default function ProviderWaitBreachStrip({
                   {row?.highRiskException ? (
                     <span className="provider-wait-breach-strip__exception">High-risk</span>
                   ) : null}
-                  <ProviderWaitBreachBadge patient={patient} settings={settings} compact showElapsed />
+                  <ProviderWaitBreachBadge
+                    patient={patient}
+                    settings={settings}
+                    compact
+                    showElapsed
+                  />
                 </button>
               </li>
             );

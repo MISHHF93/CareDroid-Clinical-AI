@@ -12,10 +12,7 @@ import DiagnosisAssistant from '../pages/tools/DiagnosisAssistant';
 import ProcedureGuide from '../pages/tools/ProcedureGuide';
 import ToolsOverview from '../pages/tools/ToolsOverview';
 import Calculators from '../pages/tools/Calculators';
-import {
-  buildRenderExecuteMatrix,
-  EXECUTION_MODES,
-} from '../data/toolRenderExecuteMatrix';
+import { buildRenderExecuteMatrix, EXECUTION_MODES } from '../data/toolRenderExecuteMatrix';
 import {
   expectNonEmptyPage,
   mockConversationValue,
@@ -46,7 +43,7 @@ vi.mock('../services/apiClient', () => ({
     return response?.json ? await response.json() : {};
   }),
   getApiErrorMessage: vi.fn((_err, res) =>
-    res?.status ? `Request failed (${res.status})` : 'Network error'
+    res?.status ? `Request failed (${res.status})` : 'Network error',
   ),
 }));
 
@@ -89,7 +86,7 @@ vi.mock('../services/clinicalToolsApi', () => ({
     Promise.resolve({
       ok: true,
       data: { id: toolId, name: toolId, parameters: [] },
-    })
+    }),
   ),
   fetchToolStatistics: vi.fn().mockResolvedValue({
     ok: true,
@@ -114,7 +111,7 @@ function renderAt(path, element) {
       <Routes>
         <Route path="*" element={element} />
       </Routes>
-    </MemoryRouter>
+    </MemoryRouter>,
   );
 }
 
@@ -163,7 +160,7 @@ describe('toolRenderExecuteSmoke — Tier C executor', () => {
     await waitFor(() => {
       expect(mockExecuteClinicalTool).toHaveBeenCalledWith(
         'drug-interactions',
-        expect.objectContaining({ medications: ['Warfarin', 'Aspirin'] })
+        expect.objectContaining({ medications: ['Warfarin', 'Aspirin'] }),
       );
     });
     expect(await screen.findByText(/no major interactions detected/i)).toBeInTheDocument();
@@ -217,7 +214,7 @@ describe('toolRenderExecuteSmoke — Tier C executor', () => {
     render(
       <MemoryRouter initialEntries={['/tools/calculator/sofa']}>
         <Calculators initialCalculatorId="sofa" />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
     fireEvent.change(screen.getByPlaceholderText('150'), { target: { value: '120' } });
     const calculateButton = screen.getByRole('button', { name: /calculate sofa score/i });
@@ -234,7 +231,12 @@ describe('toolRenderExecuteSmoke — Tier C executor', () => {
 describe('toolRenderExecuteSmoke — chat pages graceful API failure', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockApiFetch.mockResolvedValue({ ok: false, status: 503, statusText: 'Unavailable', _json: {} });
+    mockApiFetch.mockResolvedValue({
+      ok: false,
+      status: 503,
+      statusText: 'Unavailable',
+      _json: {},
+    });
   });
 
   it('Protocols shows alert on API failure', async () => {
@@ -254,7 +256,7 @@ describe('toolRenderExecuteSmoke — Tier A local (no orchestrator on qSOFA)', (
     const { container } = render(
       <MemoryRouter initialEntries={['/tools/calculators/qsofa']}>
         <Calculators initialCalculatorId="qsofa" />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
     const iface = container.querySelector('.calculator-interface--qsofa');
     expect(iface).toBeTruthy();

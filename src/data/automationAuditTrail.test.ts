@@ -64,7 +64,7 @@ describe('automationAuditTrail', () => {
       logAutomationAuditEvent({
         ...baseEvent,
         status: AUTOMATION_AUDIT_STATUSES.BLOCKED,
-      })
+      }),
     ).toThrow(/blocked automation audit entries require a reason/i);
   });
 
@@ -84,7 +84,7 @@ describe('automationAuditTrail', () => {
       logAutomationAuditEvent({
         ...baseEvent,
         status: AUTOMATION_AUDIT_STATUSES.FAILED,
-      })
+      }),
     ).toThrow(/failed automation audit entries require an error/i);
   });
 
@@ -103,7 +103,11 @@ describe('automationAuditTrail', () => {
     });
 
     expect(getAutomationAuditEntries({ tenantId: 'tenant-audit-a' })).toHaveLength(1);
-    expect(getAutomationAuditEntries({ tenantId: 'tenant-audit-a' })[0].tenant.id).toBe('tenant-audit-a');
-    expect(getAutomationAuditEntries({ tenantId: 'tenant-audit-b' })[0].tenant.id).toBe('tenant-audit-b');
+    expect(getAutomationAuditEntries({ tenantId: 'tenant-audit-a' })[0].tenant.id).toBe(
+      'tenant-audit-a',
+    );
+    expect(getAutomationAuditEntries({ tenantId: 'tenant-audit-b' })[0].tenant.id).toBe(
+      'tenant-audit-b',
+    );
   });
 });

@@ -59,10 +59,7 @@ export const MULTI_TENANT_SURFACE_REGISTRY = Object.freeze([
     label: 'Shell white-label (logo, colors, login copy)',
     intendedStorage: 'organization.branding + organization.settings.branding',
     actualStorage: 'organization.branding column + org engine normalizeBranding',
-    readPaths: [
-      'GET /api/white-label/:tenantId',
-      'GET /api/organizations/:organizationId/engine',
-    ],
+    readPaths: ['GET /api/white-label/:tenantId', 'GET /api/organizations/:organizationId/engine'],
     writePaths: ['PATCH /api/organizations/:organizationId/tenant-admin'],
     orgScopedRead: true,
     orgScopedWrite: true,
@@ -109,7 +106,9 @@ export const MULTI_TENANT_SURFACE_REGISTRY = Object.freeze([
     intendedStorage: 'organization.settings.emergencyOs.operationalModels',
     actualStorage: 'resolveOrgOperationalThresholds + static registries fallback',
     readPaths: ['resolveOrgOperationalThresholds', 'queueAuditModel ED_QUEUE_AUDIT_DEFINITIONS'],
-    writePaths: ['PATCH /api/organizations/:organizationId/tenant-admin (emergencyOs.operationalModels)'],
+    writePaths: [
+      'PATCH /api/organizations/:organizationId/tenant-admin (emergencyOs.operationalModels)',
+    ],
     orgScopedRead: true,
     orgScopedWrite: true,
     readiness: MULTI_TENANT_READINESS.READY,
@@ -152,7 +151,8 @@ export const MULTI_TENANT_SURFACE_REGISTRY = Object.freeze([
     domain: MULTI_TENANT_CONFIG_DOMAIN.ROLES,
     label: 'CareDroid role matrix (routes & actions)',
     intendedStorage: 'organization.settings.emergencyRoleOverrides',
-    actualStorage: 'resolveEmergencyRoleId + hasEmergencyActionPermission with permissionsOverrides',
+    actualStorage:
+      'resolveEmergencyRoleId + hasEmergencyActionPermission with permissionsOverrides',
     readPaths: [
       'resolveEmergencyRoleId(user, emergencyOsSettings)',
       'hasEmergencyActionPermission(role, action, permissionsOverrides)',
@@ -233,9 +233,9 @@ export function evaluateMultiTenantReadiness(options: any = {}) {
       orgScopedWriteCount,
       readiness: worst,
       surfaces: Object.freeze(domainSurfaces.map((surface) => surface.id)),
-      blockers: Object.freeze(
-        [...new Set(domainSurfaces.flatMap((surface) => surface.blockers || []))],
-      ),
+      blockers: Object.freeze([
+        ...new Set(domainSurfaces.flatMap((surface) => surface.blockers || [])),
+      ]),
     });
   });
 
@@ -284,8 +284,7 @@ export function auditMultiTenantReadiness() {
     evaluation.domains.map((summary) => [
       summary.domain,
       Object.freeze({
-        canConfigurePerOrganization:
-          summary.readiness === MULTI_TENANT_READINESS.READY,
+        canConfigurePerOrganization: summary.readiness === MULTI_TENANT_READINESS.READY,
         partiallyConfigured: (summary.readiness as any) === MULTI_TENANT_READINESS.PARTIAL,
         readiness: summary.readiness,
         readySurfaces: summary.readyCount,

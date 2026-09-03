@@ -17,7 +17,10 @@ import { useUser } from '../contexts/UserContext';
 import { AppRoutes } from '../App';
 import { PatientFlag, PatientState, Priority } from '../types/emergency';
 import { getPatientFlagType, useEmergencyStore } from '../store/emergencyStore';
-import { compileCareDroidAccessProfile, normalizeCareDroidProfile } from '../lib/users/canonicalAccess';
+import {
+  compileCareDroidAccessProfile,
+  normalizeCareDroidProfile,
+} from '../lib/users/canonicalAccess';
 import { createPatientAndRouteFromReception } from '../services/receptionIntakeOrchestrator';
 
 vi.mock('recharts', () => {
@@ -69,7 +72,9 @@ vi.mock('../services/emergencyTransportApi', () => ({
 }));
 
 vi.mock('../services/emergencySettingsApi', () => ({
-  fetchSettingsFeatureFlags: vi.fn().mockResolvedValue({ ok: false, message: 'Local pilot flags.' }),
+  fetchSettingsFeatureFlags: vi
+    .fn()
+    .mockResolvedValue({ ok: false, message: 'Local pilot flags.' }),
   subscribeToSettingsFeatureChanges: vi.fn(() => () => {}),
   updateSettingsFeatureFlag: vi.fn().mockResolvedValue({ ok: true }),
   fetchIntegrationStatuses: vi.fn().mockResolvedValue({}),
@@ -191,9 +196,7 @@ function AppRouteHarness({ initialPath = '/emergency/whiteboard' }) {
 }
 
 function findNewPatient(beforeIds) {
-  return useEmergencyStore
-    .getState()
-    .patients.find((patient) => !beforeIds.has(patient.id));
+  return useEmergencyStore.getState().patients.find((patient) => !beforeIds.has(patient.id));
 }
 
 async function waitForNewPatient(beforeIds) {
@@ -227,7 +230,9 @@ function flagTypes(patient) {
 }
 
 function referralForPatient(patientId) {
-  return useEmergencyStore.getState().referrals.find((referral) => referral.patientId === patientId);
+  return useEmergencyStore
+    .getState()
+    .referrals.find((referral) => referral.patientId === patientId);
 }
 
 // Builds a Triage-stage patient through the SAME production orchestrator the
@@ -286,36 +291,48 @@ describe('pilot walkthrough', () => {
   beforeEach(() => {
     useEmergencyStore.setState(originalEmergencyState, true);
     vi.clearAllMocks();
-    (global.fetch as any)?.mockRejectedValue?.(new Error('Pilot test uses local CareDroid fixtures.'));
+    (global.fetch as any)?.mockRejectedValue?.(
+      new Error('Pilot test uses local CareDroid fixtures.'),
+    );
   });
 
   afterEach(() => {
     useEmergencyStore.setState(originalEmergencyState, true);
   });
 
-  it('loads the default whiteboard route on demo access', { timeout: STAGE_TEST_TIMEOUT }, async () => {
-    render(<AppRouteHarness />);
+  it(
+    'loads the default whiteboard route on demo access',
+    { timeout: STAGE_TEST_TIMEOUT },
+    async () => {
+      render(<AppRouteHarness />);
 
-    expect(await screen.findByText('CareDroid')).toBeInTheDocument();
-    // Multiple surfaces legitimately show "Waiting" (alarm KPI chip, stat
-    // card, filter chip, per-patient state pills) -- this just confirms the
-    // whiteboard has finished loading real data, not which one rendered it.
-    expect(
-      (await screen.findAllByText('Waiting', {}, { timeout: PILOT_ROUTE_LOAD_TIMEOUT })).length,
-    ).toBeGreaterThan(0);
-  });
+      expect(await screen.findByText('CareDroid')).toBeInTheDocument();
+      // Multiple surfaces legitimately show "Waiting" (alarm KPI chip, stat
+      // card, filter chip, per-patient state pills) -- this just confirms the
+      // whiteboard has finished loading real data, not which one rendered it.
+      expect(
+        (await screen.findAllByText('Waiting', {}, { timeout: PILOT_ROUTE_LOAD_TIMEOUT })).length,
+      ).toBeGreaterThan(0);
+    },
+  );
 
   it(
     'creates a patient through the Reception intake flow and routes it to Triage',
     { timeout: STAGE_TEST_TIMEOUT },
     async () => {
       const user = userEvent.setup();
-      const beforePatientIds = new Set(useEmergencyStore.getState().patients.map((patient) => patient.id));
+      const beforePatientIds = new Set(
+        useEmergencyStore.getState().patients.map((patient) => patient.id),
+      );
 
       render(<AppRouteHarness initialPath="/emergency/intake" />);
 
       expect(
-        await screen.findByRole('heading', { name: 'Check patient identity' }, { timeout: PILOT_ROUTE_LOAD_TIMEOUT }),
+        await screen.findByRole(
+          'heading',
+          { name: 'Check patient identity' },
+          { timeout: PILOT_ROUTE_LOAD_TIMEOUT },
+        ),
       ).toBeInTheDocument();
 
       // Reception-embedded intake now runs the life-critical desk form and the
@@ -324,7 +341,11 @@ describe('pilot walkthrough', () => {
       // permission, not field completeness); identity capture is a separate,
       // non-blocking flow layered on top.
       expect(
-        await screen.findByRole('heading', { name: 'Life-critical intake' }, { timeout: PILOT_ROUTE_LOAD_TIMEOUT }),
+        await screen.findByRole(
+          'heading',
+          { name: 'Life-critical intake' },
+          { timeout: PILOT_ROUTE_LOAD_TIMEOUT },
+        ),
       ).toBeInTheDocument();
       await user.click(screen.getByRole('button', { name: 'Chest pain' }));
       // Primary CTA label escalates to "Route to priority triage" for
@@ -373,24 +394,38 @@ describe('pilot walkthrough', () => {
         });
         useEmergencyStore.getState().addFlag(createdPatient.id, 'ReassessmentDue');
       });
-      await waitForPatient(createdPatient.id, (patient) => flagTypes(patient).includes('ReassessmentDue'));
+      await waitForPatient(createdPatient.id, (patient) =>
+        flagTypes(patient).includes('ReassessmentDue'),
+      );
 
       act(() => {
-        const patient = useEmergencyStore.getState().patients.find((candidate) => candidate.id === createdPatient.id);
-        const reminder = patient?.reassessmentReminders?.find((candidate) => candidate.status !== 'completed');
+        const patient = useEmergencyStore
+          .getState()
+          .patients.find((candidate) => candidate.id === createdPatient.id);
+        const reminder = patient?.reassessmentReminders?.find(
+          (candidate) => candidate.status !== 'completed',
+        );
         if (reminder) {
-          useEmergencyStore.getState().completeReassessmentReminder(createdPatient.id, reminder.id, {
-            completedBy: 'pilot-demo-admin',
-          });
+          useEmergencyStore
+            .getState()
+            .completeReassessmentReminder(createdPatient.id, reminder.id, {
+              completedBy: 'pilot-demo-admin',
+            });
         }
         useEmergencyStore.getState().removeFlag(createdPatient.id, PatientFlag.ReassessmentDue);
       });
-      await waitForPatient(createdPatient.id, (patient) => !flagTypes(patient).includes('ReassessmentDue'));
+      await waitForPatient(
+        createdPatient.id,
+        (patient) => !flagTypes(patient).includes('ReassessmentDue'),
+      );
 
       act(() => {
         useEmergencyStore.getState().movePatientToState(createdPatient.id, PatientState.Assessment);
       });
-      await waitForPatient(createdPatient.id, (patient) => patient.state === PatientState.Assessment);
+      await waitForPatient(
+        createdPatient.id,
+        (patient) => patient.state === PatientState.Assessment,
+      );
     },
   );
 
@@ -412,7 +447,11 @@ describe('pilot walkthrough', () => {
       // route chrome via useRouteChromeRegistration, an effect that commits
       // one tick after the page body renders — findByRole waits for it.
       await user.click(
-        await screen.findByRole('button', { name: /New Referral/i }, { timeout: PILOT_ROUTE_LOAD_TIMEOUT }),
+        await screen.findByRole(
+          'button',
+          { name: /New Referral/i },
+          { timeout: PILOT_ROUTE_LOAD_TIMEOUT },
+        ),
       );
 
       await user.type(screen.getByPlaceholderText(/Search active patients/i), createdPatient.mrn);
@@ -424,7 +463,10 @@ describe('pilot walkthrough', () => {
       if (!patientResult) throw new Error(`expected a search result for ${createdPatient.mrn}`);
       await user.click(patientResult);
 
-      await user.type(screen.getByPlaceholderText('Clinical reason for referral'), 'Pilot cardiology referral');
+      await user.type(
+        screen.getByPlaceholderText('Clinical reason for referral'),
+        'Pilot cardiology referral',
+      );
       await user.click(screen.getByRole('button', { name: /Send Referral/i }));
       await waitFor(() => expect(referralForPatient(createdPatient.id)?.status).toBe('Sent'));
       // Same load-headroom class as PILOT_ROUTE_LOAD_TIMEOUT above: the sent
@@ -435,7 +477,11 @@ describe('pilot walkthrough', () => {
       // itself sent successfully (the preceding waitFor already confirms
       // that). Give it the same explicit headroom as the rest of this file.
       expect(
-        await screen.findByText('Pilot cardiology referral', {}, { timeout: PILOT_ROUTE_LOAD_TIMEOUT }),
+        await screen.findByText(
+          'Pilot cardiology referral',
+          {},
+          { timeout: PILOT_ROUTE_LOAD_TIMEOUT },
+        ),
       ).toBeInTheDocument();
     },
   );
@@ -455,7 +501,9 @@ describe('pilot walkthrough', () => {
       await act(async () => {
         createdPatient = await createTriagePatientViaReception();
         useEmergencyStore.getState().movePatientToState(createdPatient.id, PatientState.Assessment);
-        useEmergencyStore.getState().movePatientToState(createdPatient.id, PatientState.Disposition);
+        useEmergencyStore
+          .getState()
+          .movePatientToState(createdPatient.id, PatientState.Disposition);
         useEmergencyStore.getState().dischargePatient(createdPatient.id, {
           staffId: 'pilot-demo-admin',
           note: 'Patient discharged from pilot walkthrough.',
@@ -465,9 +513,15 @@ describe('pilot walkthrough', () => {
       render(<AppRouteHarness initialPath="/emergency/analytics" />);
 
       expect(
-        await screen.findByRole('heading', { name: 'Department Analytics' }, { timeout: ANALYTICS_ROUTE_LOAD_TIMEOUT }),
+        await screen.findByRole(
+          'heading',
+          { name: 'Department Analytics' },
+          { timeout: ANALYTICS_ROUTE_LOAD_TIMEOUT },
+        ),
       ).toBeInTheDocument();
-      await waitFor(() => expect(useEmergencyStore.getState().emergencyAnalytics.data?.shift).toBeTruthy());
+      await waitFor(() =>
+        expect(useEmergencyStore.getState().emergencyAnalytics.data?.shift).toBeTruthy(),
+      );
 
       const analytics = useEmergencyStore.getState().emergencyAnalytics.data;
       if (!analytics) throw new Error('expected emergencyAnalytics data to be populated');
@@ -477,12 +531,14 @@ describe('pilot walkthrough', () => {
           expect.objectContaining({
             name: createdPatient.complaintCategory,
           }),
-        ])
+        ]),
       );
 
       const analyticsKpis = screen.getByLabelText('Emergency analytics KPIs');
       expect(within(analyticsKpis).getByText('Discharges')).toBeInTheDocument();
-      expect(within(analyticsKpis).getAllByText(String(analytics.shift.dischargeCount)).length).toBeGreaterThan(0);
+      expect(
+        within(analyticsKpis).getAllByText(String(analytics.shift.dischargeCount)).length,
+      ).toBeGreaterThan(0);
     },
   );
 });

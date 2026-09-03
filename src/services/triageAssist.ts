@@ -63,7 +63,11 @@ export function isTriageAssistVisible(
   canReviewTriage: boolean,
 ): boolean {
   if (!patient || !canReviewTriage) return false;
-  if (!patient.triageAssist || patient.triageAssist.dismissedAt || patient.triageAssist.acceptedAt) {
+  if (
+    !patient.triageAssist ||
+    patient.triageAssist.dismissedAt ||
+    patient.triageAssist.acceptedAt
+  ) {
     return false;
   }
   if (patient.state === PatientState.Triage) return true;

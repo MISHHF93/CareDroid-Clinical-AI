@@ -91,7 +91,7 @@ const Settings = () => {
     () =>
       deleteEmail.trim().toLowerCase() === accountEmail.toLowerCase() &&
       deletePhrase.trim() === DATA_DELETE_CONFIRMATION,
-    [accountEmail, deleteEmail, deletePhrase]
+    [accountEmail, deleteEmail, deletePhrase],
   );
 
   const handleSave = () => {
@@ -107,7 +107,8 @@ const Settings = () => {
         setBillingLoading(false);
         setBillingStatus({
           type: 'idle',
-          message: 'Billing API unavailable in demo mode — subscription data stays local during the build phase.',
+          message:
+            'Billing API unavailable in demo mode — subscription data stays local during the build phase.',
         });
         return;
       }
@@ -196,7 +197,9 @@ const Settings = () => {
     if (authLoading) return undefined;
     if (!canLoadBilling) {
       setTenantIsolationAudit(null);
-      setTenantIsolationStatus('Open admin console as a tenant administrator to view the isolation audit.');
+      setTenantIsolationStatus(
+        'Open admin console as a tenant administrator to view the isolation audit.',
+      );
       return undefined;
     }
 
@@ -315,12 +318,18 @@ const Settings = () => {
     setBillingAction('');
 
     if (!result.ok) {
-      setBillingStatus({ type: 'error', message: result.message || 'Unable to open customer portal.' });
+      setBillingStatus({
+        type: 'error',
+        message: result.message || 'Unable to open customer portal.',
+      });
       error('Billing portal unavailable', result.message || 'Unable to open customer portal.');
       return;
     }
 
-    setBillingStatus({ type: 'success', message: 'Customer portal session created. Redirecting...' });
+    setBillingStatus({
+      type: 'success',
+      message: 'Customer portal session created. Redirecting...',
+    });
     openReturnedUrl(result.data?.url);
   };
 
@@ -329,7 +338,9 @@ const Settings = () => {
   const selectedPlan = plans.find((plan) => plan.id === selectedPlanId);
   const paymentMessage =
     PAYMENT_STATUS_MESSAGES[subscription?.status] ||
-    (subscription?.status ? `Backend status: ${subscription.status}` : 'No current subscription returned by the backend.');
+    (subscription?.status
+      ? `Backend status: ${subscription.status}`
+      : 'No current subscription returned by the backend.');
 
   return (
     <CareDroidPage
@@ -343,7 +354,6 @@ const Settings = () => {
       }
     >
       <Card>
-
         {surfaces.settings.showPlatformStrip && canViewPlatformAdmin ? (
           <div className="settings-platform-strip">
             <div className="settings-platform-strip__title">Organization platform</div>
@@ -351,7 +361,8 @@ const Settings = () => {
               Admin and billing hubs are separated from normal preferences.
             </p>
             <div className="settings-platform-strip__actions">
-              {hasPermission?.(Permission.VIEW_ANALYTICS) || hasPermission?.(Permission.MANAGE_USERS) ? (
+              {hasPermission?.(Permission.VIEW_ANALYTICS) ||
+              hasPermission?.(Permission.MANAGE_USERS) ? (
                 <Link to="/organization">
                   <Button variant="secondary">Organization dashboard</Button>
                 </Link>
@@ -394,29 +405,23 @@ const Settings = () => {
             </div>
 
             <div className="settings-privacy-warning">
-              Data exports may contain PHI or account identifiers. Deletion is irreversible and
-              may retain anonymized audit records where required for compliance.
+              Data exports may contain PHI or account identifiers. Deletion is irreversible and may
+              retain anonymized audit records where required for compliance.
             </div>
 
             {privacyStatus.type !== 'idle' && !privacyDrawerAction && (
-              <div className={`settings-privacy-status settings-privacy-status--${privacyStatus.type}`}>
+              <div
+                className={`settings-privacy-status settings-privacy-status--${privacyStatus.type}`}
+              >
                 {privacyStatus.message}
               </div>
             )}
 
             <div className="settings-privacy-actions">
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => openPrivacyDrawer('export')}
-              >
+              <Button type="button" variant="secondary" onClick={() => openPrivacyDrawer('export')}>
                 Request data export
               </Button>
-              <Button
-                type="button"
-                variant="danger"
-                onClick={() => openPrivacyDrawer('delete')}
-              >
+              <Button type="button" variant="danger" onClick={() => openPrivacyDrawer('delete')}>
                 Request data deletion
               </Button>
             </div>
@@ -442,7 +447,10 @@ const Settings = () => {
               ) : auditLogState.logs.length ? (
                 <div className="settings-audit-log-list">
                   {auditLogState.logs.slice(0, 20).map((log: any) => (
-                    <article key={log.id || `${log.action}-${log.timestamp}`} className="settings-audit-log-item">
+                    <article
+                      key={log.id || `${log.action}-${log.timestamp}`}
+                      className="settings-audit-log-item"
+                    >
                       <div>
                         <strong>{log.action || 'audit_event'}</strong>
                         <span>{log.resource || 'No resource recorded'}</span>
@@ -456,114 +464,120 @@ const Settings = () => {
                   ))}
                 </div>
               ) : (
-                <div className="settings-billing-empty">No audit events returned by the backend.</div>
+                <div className="settings-billing-empty">
+                  No audit events returned by the backend.
+                </div>
               )}
             </section>
           </FeatureGate>
 
           {surfaces.settings.showEnterpriseSections ? (
-          <section className="settings-billing-card" aria-labelledby="enterprise-identity-title">
-            <div className="settings-billing-card__header">
-              <div>
-                <h3 id="enterprise-identity-title">Enterprise Identity</h3>
-                <p>
-                  Identity Provider Registry for SSO, SAML, OIDC, Azure AD, Okta, and Google
-                  Workspace readiness.
-                </p>
+            <section className="settings-billing-card" aria-labelledby="enterprise-identity-title">
+              <div className="settings-billing-card__header">
+                <div>
+                  <h3 id="enterprise-identity-title">Enterprise Identity</h3>
+                  <p>
+                    Identity Provider Registry for SSO, SAML, OIDC, Azure AD, Okta, and Google
+                    Workspace readiness.
+                  </p>
+                </div>
+                <span className="settings-billing-card__badge">Registry</span>
               </div>
-              <span className="settings-billing-card__badge">Registry</span>
-            </div>
 
-            {identityStatus ? (
-              <div className="settings-billing-empty">{identityStatus}</div>
-            ) : (
-              <>
-                <div className="settings-billing-summary">
-                  <div>
-                    <span className="settings-billing-label">Supported</span>
-                    <strong>{identityRegistry?.summary?.supported ?? 0}</strong>
-                  </div>
-                  <div>
-                    <span className="settings-billing-label">Planned</span>
-                    <strong>{identityRegistry?.summary?.planned ?? 0}</strong>
-                  </div>
-                  <div>
-                    <span className="settings-billing-label">Unavailable</span>
-                    <strong>{identityRegistry?.summary?.unavailable ?? 0}</strong>
-                  </div>
-                </div>
-
-                <div className="settings-billing-plan-details">
-                  {(identityRegistry?.providers || []).map((provider) => (
-                    <div key={provider.id}>
-                      <strong>{provider.name}</strong>
-                      <span>
-                        {provider.status} · {provider.protocol}
-                        {provider.entryPath ? ` · ${provider.entryPath}` : ''}
-                      </span>
-                      <span>{provider.notes}</span>
+              {identityStatus ? (
+                <div className="settings-billing-empty">{identityStatus}</div>
+              ) : (
+                <>
+                  <div className="settings-billing-summary">
+                    <div>
+                      <span className="settings-billing-label">Supported</span>
+                      <strong>{identityRegistry?.summary?.supported ?? 0}</strong>
                     </div>
-                  ))}
-                  {!identityRegistry?.providers?.length && <span>Loading identity providers...</span>}
-                </div>
-              </>
-            )}
-          </section>
+                    <div>
+                      <span className="settings-billing-label">Planned</span>
+                      <strong>{identityRegistry?.summary?.planned ?? 0}</strong>
+                    </div>
+                    <div>
+                      <span className="settings-billing-label">Unavailable</span>
+                      <strong>{identityRegistry?.summary?.unavailable ?? 0}</strong>
+                    </div>
+                  </div>
+
+                  <div className="settings-billing-plan-details">
+                    {(identityRegistry?.providers || []).map((provider) => (
+                      <div key={provider.id}>
+                        <strong>{provider.name}</strong>
+                        <span>
+                          {provider.status} · {provider.protocol}
+                          {provider.entryPath ? ` · ${provider.entryPath}` : ''}
+                        </span>
+                        <span>{provider.notes}</span>
+                      </div>
+                    ))}
+                    {!identityRegistry?.providers?.length && (
+                      <span>Loading identity providers...</span>
+                    )}
+                  </div>
+                </>
+              )}
+            </section>
           ) : null}
 
           {surfaces.settings.showEnterpriseSections ? (
-          <section className="settings-billing-card" aria-labelledby="tenant-isolation-title">
-            <div className="settings-billing-card__header">
-              <div>
-                <h3 id="tenant-isolation-title">Tenant Data Isolation Audit</h3>
-                <p>
-                  Organization, user, workspace, asset, analytics, and audit-log controls that
-                  prevent cross-tenant data access.
-                </p>
+            <section className="settings-billing-card" aria-labelledby="tenant-isolation-title">
+              <div className="settings-billing-card__header">
+                <div>
+                  <h3 id="tenant-isolation-title">Tenant Data Isolation Audit</h3>
+                  <p>
+                    Organization, user, workspace, asset, analytics, and audit-log controls that
+                    prevent cross-tenant data access.
+                  </p>
+                </div>
+                <span className="settings-billing-card__badge">Tenant admin</span>
               </div>
-              <span className="settings-billing-card__badge">Tenant admin</span>
-            </div>
 
-            {tenantIsolationStatus ? (
-              <div className="settings-billing-empty">{tenantIsolationStatus}</div>
-            ) : (
-              <>
-                <div className="settings-billing-summary">
-                  <div>
-                    <span className="settings-billing-label">Status</span>
-                    <strong>{tenantIsolationAudit?.status || 'Loading department data...'}</strong>
-                  </div>
-                  <div>
-                    <span className="settings-billing-label">Domains audited</span>
-                    <strong>{tenantIsolationAudit?.summary?.auditedDomains ?? 0}</strong>
-                  </div>
-                  <div>
-                    <span className="settings-billing-label">Cross-tenant read</span>
-                    <strong>
-                      {tenantIsolationAudit?.summary?.crossTenantReadAllowed === false
-                        ? 'Blocked'
-                        : 'Loading department data...'}
-                    </strong>
-                  </div>
-                </div>
-
-                <div className="settings-billing-plan-details">
-                  {(tenantIsolationAudit?.domains || []).map((domain) => (
-                    <div key={domain.id}>
-                      <strong>{domain.name}</strong>
-                      <span>
-                        {domain.status} · {domain.tenantBoundary}
-                      </span>
-                      <span>{domain.residualRisk}</span>
+              {tenantIsolationStatus ? (
+                <div className="settings-billing-empty">{tenantIsolationStatus}</div>
+              ) : (
+                <>
+                  <div className="settings-billing-summary">
+                    <div>
+                      <span className="settings-billing-label">Status</span>
+                      <strong>
+                        {tenantIsolationAudit?.status || 'Loading department data...'}
+                      </strong>
                     </div>
-                  ))}
-                  {!tenantIsolationAudit?.domains?.length && (
-                    <span>Loading tenant isolation audit...</span>
-                  )}
-                </div>
-              </>
-            )}
-          </section>
+                    <div>
+                      <span className="settings-billing-label">Domains audited</span>
+                      <strong>{tenantIsolationAudit?.summary?.auditedDomains ?? 0}</strong>
+                    </div>
+                    <div>
+                      <span className="settings-billing-label">Cross-tenant read</span>
+                      <strong>
+                        {tenantIsolationAudit?.summary?.crossTenantReadAllowed === false
+                          ? 'Blocked'
+                          : 'Loading department data...'}
+                      </strong>
+                    </div>
+                  </div>
+
+                  <div className="settings-billing-plan-details">
+                    {(tenantIsolationAudit?.domains || []).map((domain) => (
+                      <div key={domain.id}>
+                        <strong>{domain.name}</strong>
+                        <span>
+                          {domain.status} · {domain.tenantBoundary}
+                        </span>
+                        <span>{domain.residualRisk}</span>
+                      </div>
+                    ))}
+                    {!tenantIsolationAudit?.domains?.length && (
+                      <span>Loading tenant isolation audit...</span>
+                    )}
+                  </div>
+                </>
+              )}
+            </section>
           ) : null}
 
           <section className="settings-billing-card" aria-labelledby="settings-billing-title">
@@ -571,8 +585,8 @@ const Settings = () => {
               <div>
                 <h3 id="settings-billing-title">Billing</h3>
                 <p>
-                  View your backend-returned subscription status and open Stripe checkout or
-                  the customer portal from protected subscription routes.
+                  View your backend-returned subscription status and open Stripe checkout or the
+                  customer portal from protected subscription routes.
                 </p>
               </div>
               <span className="settings-billing-card__badge">Demo mode</span>
@@ -585,14 +599,25 @@ const Settings = () => {
               </div>
             ) : (
               <>
-                <div className="settings-billing-summary" aria-busy={billingLoading ? 'true' : 'false'}>
+                <div
+                  className="settings-billing-summary"
+                  aria-busy={billingLoading ? 'true' : 'false'}
+                >
                   <div>
                     <span className="settings-billing-label">Current plan</span>
-                    <strong>{billingLoading ? 'Loading department data...' : subscription?.tier || 'Not returned'}</strong>
+                    <strong>
+                      {billingLoading
+                        ? 'Loading department data...'
+                        : subscription?.tier || 'Not returned'}
+                    </strong>
                   </div>
                   <div>
                     <span className="settings-billing-label">Payment status</span>
-                    <strong>{billingLoading ? 'Loading department data...' : subscription?.status || 'Not returned'}</strong>
+                    <strong>
+                      {billingLoading
+                        ? 'Loading department data...'
+                        : subscription?.status || 'Not returned'}
+                    </strong>
                   </div>
                   <div>
                     <span className="settings-billing-label">Current period ends</span>
@@ -604,9 +629,13 @@ const Settings = () => {
                   </div>
                 </div>
 
-                <div className={`settings-billing-payment-state settings-billing-payment-state--${subscription?.status || 'unknown'}`}>
+                <div
+                  className={`settings-billing-payment-state settings-billing-payment-state--${subscription?.status || 'unknown'}`}
+                >
                   {paymentMessage}
-                  {subscription?.cancelAtPeriodEnd ? ' Cancellation is scheduled at the period end.' : ''}
+                  {subscription?.cancelAtPeriodEnd
+                    ? ' Cancellation is scheduled at the period end.'
+                    : ''}
                   {/* Found 2026-08-27: canceledAt/trialStart/trialEnd are real,
                       persisted columns (set from live Stripe webhooks --
                       SubscriptionsService.handleSubscriptionUpdated/Deleted)
@@ -623,7 +652,9 @@ const Settings = () => {
                 </div>
 
                 {billingStatus.type !== 'idle' && (
-                  <div className={`settings-privacy-status settings-privacy-status--${billingStatus.type}`}>
+                  <div
+                    className={`settings-privacy-status settings-privacy-status--${billingStatus.type}`}
+                  >
                     {billingStatus.message}
                   </div>
                 )}
@@ -705,38 +736,40 @@ const Settings = () => {
         closeOnEscape={!privacyLoading}
         closeOnOverlay={!privacyLoading}
         footer={
-          (<div className="settings-privacy-drawer__footer">
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={closePrivacyDrawer}
-              disabled={privacyLoading}
-            >
-              Close
-            </Button>
-            {isExportDrawer && (
+          (
+            <div className="settings-privacy-drawer__footer">
               <Button
                 type="button"
-                variant="primary"
-                onClick={handleExportData}
-                loading={privacyLoading}
-                disabled={!exportAcknowledged || privacyLoading}
+                variant="secondary"
+                onClick={closePrivacyDrawer}
+                disabled={privacyLoading}
               >
-                Generate export
+                Close
               </Button>
-            )}
-            {isDeleteDrawer && (
-              <Button
-                type="button"
-                variant="danger"
-                onClick={handleDeleteData}
-                loading={privacyLoading}
-                disabled={!deleteReady || privacyLoading}
-              >
-                Permanently delete data
-              </Button>
-            )}
-          </div>) as any
+              {isExportDrawer && (
+                <Button
+                  type="button"
+                  variant="primary"
+                  onClick={handleExportData}
+                  loading={privacyLoading}
+                  disabled={!exportAcknowledged || privacyLoading}
+                >
+                  Generate export
+                </Button>
+              )}
+              {isDeleteDrawer && (
+                <Button
+                  type="button"
+                  variant="danger"
+                  onClick={handleDeleteData}
+                  loading={privacyLoading}
+                  disabled={!deleteReady || privacyLoading}
+                >
+                  Permanently delete data
+                </Button>
+              )}
+            </div>
+          ) as any
         }
       >
         <div className="settings-privacy-drawer__body">
@@ -754,7 +787,9 @@ const Settings = () => {
                   onChange={(event) => setExportAcknowledged(event.target.checked)}
                   disabled={privacyLoading}
                 />
-                <span>I understand the export may contain sensitive data and will store it securely.</span>
+                <span>
+                  I understand the export may contain sensitive data and will store it securely.
+                </span>
               </label>
             </>
           )}
@@ -764,8 +799,8 @@ const Settings = () => {
               <div className="settings-destructive-panel">
                 <strong>This action is irreversible.</strong>
                 <p>
-                  The backend will delete account-linked data for the signed-in user. Audit events may
-                  be anonymized and retained where required by compliance safeguards.
+                  The backend will delete account-linked data for the signed-in user. Audit events
+                  may be anonymized and retained where required by compliance safeguards.
                 </p>
               </div>
               <label className="settings-confirm-field">
@@ -793,7 +828,9 @@ const Settings = () => {
           )}
 
           {privacyStatus.type !== 'idle' && (
-            <div className={`settings-privacy-status settings-privacy-status--${privacyStatus.type}`}>
+            <div
+              className={`settings-privacy-status settings-privacy-status--${privacyStatus.type}`}
+            >
               {privacyStatus.message}
             </div>
           )}

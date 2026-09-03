@@ -59,7 +59,8 @@ const CARDS = [
   {
     to: '/emergency/tools/pulmonology/pulmonary-trend-engine',
     title: 'Pulmonary trend engine',
-    description: 'Oxygenation indices, symptoms, spirometry context, and serial respiratory observations.',
+    description:
+      'Oxygenation indices, symptoms, spirometry context, and serial respiratory observations.',
     tier: 'Tier C' as const,
   },
 ];

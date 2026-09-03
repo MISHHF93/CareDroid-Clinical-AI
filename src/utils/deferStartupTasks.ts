@@ -19,12 +19,15 @@ export function scheduleDeferredStartupTasks() {
   });
 
   runAfterFirstPaint(async () => {
-    const [{ default: CrashReportingService }, { default: AnalyticsService }, { NotificationService }] =
-      await Promise.all([
-        import('../services/crashReportingService'),
-        import('../services/analyticsService'),
-        import('../services/NotificationService'),
-      ]);
+    const [
+      { default: CrashReportingService },
+      { default: AnalyticsService },
+      { NotificationService },
+    ] = await Promise.all([
+      import('../services/crashReportingService'),
+      import('../services/analyticsService'),
+      import('../services/NotificationService'),
+    ]);
 
     if (appConfig.crashReporting.enabled && appConfig.crashReporting.dsn) {
       try {

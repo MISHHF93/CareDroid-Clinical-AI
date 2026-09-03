@@ -8,7 +8,8 @@ const TOOL_CONFIG = {
   name: 'Guideline Retrieval + Evidence Engine',
   path: '/tools/guideline-rag',
   color: '#4A7C9E',
-  description: 'Retrieve guideline evidence, summarize cited recommendations, and show source attribution',
+  description:
+    'Retrieve guideline evidence, summarize cited recommendations, and show source attribution',
   shortcut: 'Ctrl+Shift+G',
   category: 'Reference',
 };
@@ -58,8 +59,9 @@ export default function GuidelineRag({ embedded = false, onCloseEmbedded }: any 
         <div className="simple-tool-result-panel" role="note">
           <h2>Evidence Guardrails</h2>
           <p>
-            Summaries are generated only from retrieved guideline passages. If the evidence base does not
-            support an answer, the engine should say so instead of filling gaps with unsupported medical claims.
+            Summaries are generated only from retrieved guideline passages. If the evidence base
+            does not support an answer, the engine should say so instead of filling gaps with
+            unsupported medical claims.
           </p>
         </div>
 
@@ -104,14 +106,19 @@ export default function GuidelineRag({ embedded = false, onCloseEmbedded }: any 
             </div>
           </section>
 
-          <section className="diagnosis-panel diagnosis-panel--scroll" aria-labelledby="guideline-rag-output">
+          <section
+            className="diagnosis-panel diagnosis-panel--scroll"
+            aria-labelledby="guideline-rag-output"
+          >
             <h2 id="guideline-rag-output">Evidence Summary</h2>
             <ApiStateBanner error={error} onRetry={query.trim() ? handleSearch : undefined} />
 
             {loading ? (
               <div className="tool-loading-state" aria-busy="true">
                 <div className="simple-tool-spinner diagnosis-spinner" />
-                <p className="tool-loading-state__message">Retrieving guideline passages and citations...</p>
+                <p className="tool-loading-state__message">
+                  Retrieving guideline passages and citations...
+                </p>
               </div>
             ) : result ? (
               <div className="diagnosis-results-body">
@@ -130,12 +137,17 @@ export default function GuidelineRag({ embedded = false, onCloseEmbedded }: any 
                       {result.summary.recommendations.map((item) => (
                         <li key={item.id}>
                           {item.text}{' '}
-                          <strong>{(item.citationIds || []).map((id) => `[${id}]`).join(' ')}</strong>
+                          <strong>
+                            {(item.citationIds || []).map((id) => `[${id}]`).join(' ')}
+                          </strong>
                         </li>
                       ))}
                     </ul>
                   ) : (
-                    <p>{result.summary?.unsupportedClaimNotice || 'No supported recommendation summary found.'}</p>
+                    <p>
+                      {result.summary?.unsupportedClaimNotice ||
+                        'No supported recommendation summary found.'}
+                    </p>
                   )}
                 </section>
 
@@ -188,7 +200,8 @@ export default function GuidelineRag({ embedded = false, onCloseEmbedded }: any 
               </div>
             ) : (
               <div className="tool-empty-state">
-                Enter a guideline question to retrieve cited evidence and explain how the summary was assembled.
+                Enter a guideline question to retrieve cited evidence and explain how the summary
+                was assembled.
               </div>
             )}
           </section>

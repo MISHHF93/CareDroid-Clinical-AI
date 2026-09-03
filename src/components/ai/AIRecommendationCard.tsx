@@ -32,9 +32,13 @@ export function AIChiefRecommendationCard({
 }: AIRecommendationCardProps) {
   const primary = getPrimaryRecommendation(response);
   const facts = getDisplayFacts(response.data);
-  const missingData = getStringArray(response.data.missingFields ?? response.data.missingInformation);
+  const missingData = getStringArray(
+    response.data.missingFields ?? response.data.missingInformation,
+  );
   const responseRedFlags = Array.isArray(response.redFlags) ? response.redFlags : [];
-  const redFlags = responseRedFlags.length ? responseRedFlags : getStringArray(response.data.redFlags);
+  const redFlags = responseRedFlags.length
+    ? responseRedFlags
+    : getStringArray(response.data.redFlags);
   const visibleWarnings = response.warnings.filter(
     (warning) => warning !== CLINICAL_DECISION_SUPPORT_DISCLAIMER,
   );
@@ -45,10 +49,9 @@ export function AIChiefRecommendationCard({
     responseClass: provenance?.responseClass,
     evidenceKinds: provenance?.evidence?.map((e) => e.kind),
   });
-  const provenanceMissing =
-    provenance?.missingInformation?.length
-      ? provenance.missingInformation
-      : missingData;
+  const provenanceMissing = provenance?.missingInformation?.length
+    ? provenance.missingInformation
+    : missingData;
 
   return (
     <article
@@ -96,9 +99,14 @@ export function AIChiefRecommendationCard({
       <MissingDataAlert items={provenanceMissing} />
 
       {provenance ? (
-        <div className="cd-ai-card__provenance" data-provenance-version={provenance.contractVersion}>
+        <div
+          className="cd-ai-card__provenance"
+          data-provenance-version={provenance.contractVersion}
+        >
           <strong>Provenance</strong>
-          {provenance.uncertainty ? <p className="cd-ai-card__provenance-line">{provenance.uncertainty}</p> : null}
+          {provenance.uncertainty ? (
+            <p className="cd-ai-card__provenance-line">{provenance.uncertainty}</p>
+          ) : null}
           {provenance.recommendedReviewerRole ? (
             <p className="cd-ai-card__provenance-line">
               Reviewer: <span>{provenance.recommendedReviewerRole}</span>
@@ -119,7 +127,9 @@ export function AIChiefRecommendationCard({
                 : ''}
             </p>
           ) : (
-            <p className="cd-ai-card__provenance-line">No retrieved evidence attached — treat as ungrounded draft.</p>
+            <p className="cd-ai-card__provenance-line">
+              No retrieved evidence attached — treat as ungrounded draft.
+            </p>
           )}
         </div>
       ) : null}
@@ -210,9 +220,7 @@ function getDisplayFacts(data: Record<string, unknown>): Array<[string, string]>
 
 function getStringArray(value: unknown): string[] {
   if (Array.isArray(value)) {
-    return value
-      .map((item) => readText(item))
-      .filter(Boolean);
+    return value.map((item) => readText(item)).filter(Boolean);
   }
   if (typeof value === 'string' && value.trim()) return [value.trim()];
   return [];

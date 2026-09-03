@@ -32,7 +32,10 @@ import {
 } from './mountedCapabilityGraph';
 
 const uniq = (values) => [...new Set(values.flat().filter(Boolean))];
-const norm = (value) => String(value || '').trim().toLowerCase();
+const norm = (value) =>
+  String(value || '')
+    .trim()
+    .toLowerCase();
 const hasAny = (haystack, needles) => needles.some((needle) => haystack.includes(needle));
 
 export const SAAS_PRODUCTS = Object.freeze([
@@ -111,20 +114,72 @@ export const SAAS_PRODUCTS = Object.freeze([
 ]);
 
 export const ASSET_PACKS = Object.freeze([
-  Object.freeze({ id: 'core-platform', name: 'Core Platform', workspaceIds: ['clinical', 'operations'] }),
-  Object.freeze({ id: 'ai-workflow-pack', name: 'AI Workflow Pack', workspaceIds: ['assistant', 'ai-workflow'] }),
-  Object.freeze({ id: 'emergency-medicine', name: 'Emergency Medicine Pack', workspaceIds: ['emergency', 'clinical'] }),
-  Object.freeze({ id: 'emergency-department-pack', name: 'Emergency Department Pack', workspaceIds: ['emergency'] }),
+  Object.freeze({
+    id: 'core-platform',
+    name: 'Core Platform',
+    workspaceIds: ['clinical', 'operations'],
+  }),
+  Object.freeze({
+    id: 'ai-workflow-pack',
+    name: 'AI Workflow Pack',
+    workspaceIds: ['assistant', 'ai-workflow'],
+  }),
+  Object.freeze({
+    id: 'emergency-medicine',
+    name: 'Emergency Medicine Pack',
+    workspaceIds: ['emergency', 'clinical'],
+  }),
+  Object.freeze({
+    id: 'emergency-department-pack',
+    name: 'Emergency Department Pack',
+    workspaceIds: ['emergency'],
+  }),
   Object.freeze({ id: 'icu-pack', name: 'ICU Pack', workspaceIds: ['icu', 'clinical'] }),
-  Object.freeze({ id: 'cardiology-pack', name: 'Cardiology Pack', workspaceIds: ['cardiology', 'clinical'] }),
-  Object.freeze({ id: 'laboratory-intelligence', name: 'Laboratory Intelligence Pack', workspaceIds: ['laboratory'] }),
-  Object.freeze({ id: 'medical-iot-pack', name: 'Medical IoT Pack', workspaceIds: ['medical-iot', 'operations'] }),
-  Object.freeze({ id: 'fleet-logistics', name: 'Fleet Logistics Pack', workspaceIds: ['fleet', 'operations'] }),
-  Object.freeze({ id: 'hospital-operations', name: 'Hospital Operations Pack', workspaceIds: ['operations'] }),
-  Object.freeze({ id: 'digital-twin-pack', name: 'Digital Twin Pack', workspaceIds: ['operations', 'maps'] }),
-  Object.freeze({ id: 'simulation-training-pack', name: 'Simulation Training Pack', workspaceIds: ['education', 'simulation'] }),
-  Object.freeze({ id: 'governance-compliance-pack', name: 'Governance Compliance Pack', workspaceIds: ['governance', 'audit'] }),
-  Object.freeze({ id: 'research-education', name: 'Research Education Pack', workspaceIds: ['research', 'education'] }),
+  Object.freeze({
+    id: 'cardiology-pack',
+    name: 'Cardiology Pack',
+    workspaceIds: ['cardiology', 'clinical'],
+  }),
+  Object.freeze({
+    id: 'laboratory-intelligence',
+    name: 'Laboratory Intelligence Pack',
+    workspaceIds: ['laboratory'],
+  }),
+  Object.freeze({
+    id: 'medical-iot-pack',
+    name: 'Medical IoT Pack',
+    workspaceIds: ['medical-iot', 'operations'],
+  }),
+  Object.freeze({
+    id: 'fleet-logistics',
+    name: 'Fleet Logistics Pack',
+    workspaceIds: ['fleet', 'operations'],
+  }),
+  Object.freeze({
+    id: 'hospital-operations',
+    name: 'Hospital Operations Pack',
+    workspaceIds: ['operations'],
+  }),
+  Object.freeze({
+    id: 'digital-twin-pack',
+    name: 'Digital Twin Pack',
+    workspaceIds: ['operations', 'maps'],
+  }),
+  Object.freeze({
+    id: 'simulation-training-pack',
+    name: 'Simulation Training Pack',
+    workspaceIds: ['education', 'simulation'],
+  }),
+  Object.freeze({
+    id: 'governance-compliance-pack',
+    name: 'Governance Compliance Pack',
+    workspaceIds: ['governance', 'audit'],
+  }),
+  Object.freeze({
+    id: 'research-education',
+    name: 'Research Education Pack',
+    workspaceIds: ['research', 'education'],
+  }),
 ]);
 
 export const CANONICAL_WORKSPACE_IDS = Object.freeze([
@@ -154,10 +209,7 @@ const PACK_IDS_BY_ID = ASSET_PACKS.reduce((acc, pack) => {
 
 const PACKS_BY_CONTEXT_ASSET = (context) => {
   const packByAsset = new Map();
-  for (const pack of [
-    ...(context?.availablePacks || []),
-    ...(context?.entitledPacks || []),
-  ]) {
+  for (const pack of [...(context?.availablePacks || []), ...(context?.entitledPacks || [])]) {
     for (const assetId of pack.assetIds || pack.assets || []) {
       const id = typeof assetId === 'string' ? assetId : assetId?.id;
       if (!id) continue;
@@ -181,20 +233,47 @@ function inferPackIds(tool) {
       ...(tool.tags || []),
       ...(tool.workspaceTags || []),
       ...(tool.nluProfileIds || []),
-    ].join(' ')
+    ].join(' '),
   );
 
   const packs = [] as any[];
-  if (hasAny(text, ['assistant', 'ai', 'scribe', 'summary', 'differential', 'order set', 'timeline'])) {
+  if (
+    hasAny(text, ['assistant', 'ai', 'scribe', 'summary', 'differential', 'order set', 'timeline'])
+  ) {
     packs.push('ai-workflow-pack', 'core-platform');
   }
-  if (hasAny(text, ['qsofa', 'news2', 'sofa', 'nihss', 'stroke', 'trauma', 'emergency', 'sepsis', 'triage'])) {
+  if (
+    hasAny(text, [
+      'qsofa',
+      'news2',
+      'sofa',
+      'nihss',
+      'stroke',
+      'trauma',
+      'emergency',
+      'sepsis',
+      'triage',
+    ])
+  ) {
     packs.push('emergency-medicine', 'emergency-department-pack');
   }
   if (hasAny(text, ['icu', 'critical', 'ventilator', 'rox', 'oxygenation', 'apache'])) {
     packs.push('icu-pack');
   }
-  if (hasAny(text, ['cardio', 'heart', 'stemi', 'acs', 'timi', 'grace', 'ecg', 'atrial', 'chads', 'has-bled'])) {
+  if (
+    hasAny(text, [
+      'cardio',
+      'heart',
+      'stemi',
+      'acs',
+      'timi',
+      'grace',
+      'ecg',
+      'atrial',
+      'chads',
+      'has-bled',
+    ])
+  ) {
     packs.push('cardiology-pack');
   }
   if (hasAny(text, ['lab', 'abg', 'pharmacy', 'drug', 'medication', 'dose', 'antibiotic'])) {
@@ -206,13 +285,45 @@ function inferPackIds(tool) {
   if (hasAny(text, ['fleet', 'dispatch', 'route optimizer', 'predictive maintenance', 'eta'])) {
     packs.push('fleet-logistics');
   }
-  if (hasAny(text, ['hospital map', 'digital twin', 'operations', 'capacity', 'occupancy', 'incident', 'asset tracking', 'live map'])) {
+  if (
+    hasAny(text, [
+      'hospital map',
+      'digital twin',
+      'operations',
+      'capacity',
+      'occupancy',
+      'incident',
+      'asset tracking',
+      'live map',
+    ])
+  ) {
     packs.push('hospital-operations', 'digital-twin-pack');
   }
-  if (hasAny(text, ['simulation', 'scenario', 'competenc', 'credential', 'education', 'training', 'debrief'])) {
+  if (
+    hasAny(text, [
+      'simulation',
+      'scenario',
+      'competenc',
+      'credential',
+      'education',
+      'training',
+      'debrief',
+    ])
+  ) {
     packs.push('simulation-training-pack');
   }
-  if (hasAny(text, ['governance', 'security', 'audit', 'regulatory', 'privacy', 'system health', 'lineage', 'feature flag'])) {
+  if (
+    hasAny(text, [
+      'governance',
+      'security',
+      'audit',
+      'regulatory',
+      'privacy',
+      'system health',
+      'lineage',
+      'feature flag',
+    ])
+  ) {
     packs.push('governance-compliance-pack');
   }
   if (hasAny(text, ['research', 'evidence', 'guideline', 'rag', 'knowledge graph'])) {
@@ -255,16 +366,22 @@ function assetTypeFor(tool) {
   if (tool.hasDedicatedForm || tool.calculatorSlug) return 'calculator';
   if (tool.surface === TOOL_SURFACES.IOT_DASHBOARD || tool.category === 'IoT') return 'iot-module';
   if (tool.surface === TOOL_SURFACES.FLEET_PAGE || tool.category === 'Fleet') return 'fleet-module';
-  if (tool.surface === TOOL_SURFACES.HOSPITAL_OPERATIONS || /map/i.test(tool.category || '')) return 'map';
+  if (tool.surface === TOOL_SURFACES.HOSPITAL_OPERATIONS || /map/i.test(tool.category || ''))
+    return 'map';
   if (/simulation/i.test(tool.category || '')) return 'simulation';
-  if (/governance|audit|security|regulatory/i.test(`${tool.id} ${tool.category}`)) return 'governance';
-  if (tool.launchType === TOOL_LAUNCH_TYPES.CHAT_ASSISTED || /ai/i.test(tool.category || '')) return 'ai-assisted-tool';
+  if (/governance|audit|security|regulatory/i.test(`${tool.id} ${tool.category}`))
+    return 'governance';
+  if (tool.launchType === TOOL_LAUNCH_TYPES.CHAT_ASSISTED || /ai/i.test(tool.category || ''))
+    return 'ai-assisted-tool';
   if (tool.surface === TOOL_SURFACES.HUB) return 'hub';
   return 'tool';
 }
 
 function executionFor(tool) {
-  if (tool.launchType === TOOL_LAUNCH_TYPES.UNSUPPORTED_PLANNED || tool.executorStatus === TOOL_EXECUTOR_STATUS.UNSUPPORTED) {
+  if (
+    tool.launchType === TOOL_LAUNCH_TYPES.UNSUPPORTED_PLANNED ||
+    tool.executorStatus === TOOL_EXECUTOR_STATUS.UNSUPPORTED
+  ) {
     return {
       supportStatus: 'unsupported',
       mode: 'unsupported',
@@ -320,7 +437,11 @@ function executionFor(tool) {
 
 function demoStatusFor(tool, execution) {
   if (execution.supportStatus === 'unsupported') return 'unsupported';
-  if (execution.supportStatus === 'backend-backed' && tool.executorStatus === TOOL_EXECUTOR_STATUS.REGISTERED) return 'live';
+  if (
+    execution.supportStatus === 'backend-backed' &&
+    tool.executorStatus === TOOL_EXECUTOR_STATUS.REGISTERED
+  )
+    return 'live';
   if (execution.supportStatus === 'local-deterministic') return 'live';
   if (execution.supportStatus === 'ai-assisted') return 'demo-ready';
   return 'demo-only';
@@ -376,7 +497,8 @@ function mountedAssetFromTool(tool, context, contextPackByAsset) {
     capabilityId: mountedCapability.capabilityId,
     assetType: assetTypeFor(tool),
     title: tool.label || tool.name || tool.id,
-    description: tool.description || tool.safetyCopy || tool.notes || 'Mounted CareDroid platform asset.',
+    description:
+      tool.description || tool.safetyCopy || tool.notes || 'Mounted CareDroid platform asset.',
     category: tool.category || 'Clinical',
     route,
     lifecycle: tool.lifecycleState || 'active',
@@ -389,7 +511,10 @@ function mountedAssetFromTool(tool, context, contextPackByAsset) {
     intendedRoles: roleIds,
     layers: {
       tenant: context?.organization?.id || 'tenant-context',
-      subscription: context?.subscription?.tier || context?.organization?.settings?.subscriptionTier || 'plan-gated',
+      subscription:
+        context?.subscription?.tier ||
+        context?.organization?.settings?.subscriptionTier ||
+        'plan-gated',
       products: productIds,
       assetPacks: packIds,
       asset: tool.id,
@@ -402,15 +527,20 @@ function mountedAssetFromTool(tool, context, contextPackByAsset) {
     commercial: {
       productIds,
       packIds,
-      pricingTier: packIds.some((id) => ['medical-iot-pack', 'digital-twin-pack', 'governance-compliance-pack'].includes(id))
+      pricingTier: packIds.some((id) =>
+        ['medical-iot-pack', 'digital-twin-pack', 'governance-compliance-pack'].includes(id),
+      )
         ? 'enterprise'
         : 'standard',
     },
     access: {
-      organizationTypes: context?.organization?.organizationType ? [context.organization.organizationType] : ['hospital'],
+      organizationTypes: context?.organization?.organizationType
+        ? [context.organization.organizationType]
+        : ['hospital'],
       workspaceIds,
       roleIds,
-      permissions: tool.permissionPolicy?.permissions || tool.auditRefs?.permissionPolicy?.permissions || [],
+      permissions:
+        tool.permissionPolicy?.permissions || tool.auditRefs?.permissionPolicy?.permissions || [],
       entitled: entitlementFor(tool.id, context),
     },
     execution,
@@ -439,7 +569,7 @@ export function buildAssetInventoryProjection(context = getPlatformEntitlementCo
   const contextPackByAsset = PACKS_BY_CONTEXT_ASSET(context);
   const inventory = getUserFacingToolInventory();
   const registryProjection = new Map(
-    getUserFacingToolRegistryProjection().map((tool) => [tool.id, tool])
+    getUserFacingToolRegistryProjection().map((tool) => [tool.id, tool]),
   );
 
   return inventory.map((tool) => {
@@ -506,7 +636,7 @@ export function buildNavigationMountProjection() {
         section,
         sidebarVisible: section !== 'command' && item.showInSidebar !== false,
         commandVisible: section === 'command',
-      }))
+      })),
     )
     .filter((item) => {
       const key = `${item.section}:${item.id}`;

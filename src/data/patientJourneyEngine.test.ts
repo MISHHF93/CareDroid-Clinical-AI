@@ -47,7 +47,7 @@ describe('PatientJourneyEngine', () => {
     const journey = transitionPatientState(
       { patientId: 'ED-1', currentState: 'triage', history: [] },
       'assessment',
-      { transitionedAt: '2026-06-08T12:00:00.000Z', actor: 'triage-nurse' }
+      { transitionedAt: '2026-06-08T12:00:00.000Z', actor: 'triage-nurse' },
     );
 
     expect(journey).toEqual(
@@ -56,7 +56,7 @@ describe('PatientJourneyEngine', () => {
         previousState: 'triage',
         currentState: 'assessment',
         currentStateLabel: 'Assessment',
-      })
+      }),
     );
     expect(journey.history).toEqual([
       expect.objectContaining({
@@ -78,7 +78,7 @@ describe('PatientJourneyEngine', () => {
       expect.objectContaining({
         status: 'complete',
         automationCount: 1,
-      })
+      }),
     );
     const resultsState = journey.find((state) => state.id === 'results');
     if (!resultsState) throw new Error('expected results state in journey');
@@ -97,20 +97,23 @@ describe('PatientJourneyEngine', () => {
 
     const bottlenecks = getJourneyBottlenecks({ stateLoad });
     const metrics = getJourneyMetrics({ automations: sampleAutomations, stateLoad });
-    const recommendations = getJourneyRecommendations({ automations: sampleAutomations, stateLoad });
+    const recommendations = getJourneyRecommendations({
+      automations: sampleAutomations,
+      stateLoad,
+    });
 
     expect(bottlenecks.map((bottleneck) => bottleneck.stateId)).toEqual(
-      expect.arrayContaining(['waiting', 'results'])
+      expect.arrayContaining(['waiting', 'results']),
     );
     expect(metrics).toEqual(
       expect.objectContaining({
         totalStates: 12,
         bottleneckCount: bottlenecks.length,
         automationCount: 2,
-      })
+      }),
     );
     expect(recommendations.map((recommendation) => recommendation.stateId)).toEqual(
-      expect.arrayContaining(['waiting', 'assessment'])
+      expect.arrayContaining(['waiting', 'assessment']),
     );
   });
 });

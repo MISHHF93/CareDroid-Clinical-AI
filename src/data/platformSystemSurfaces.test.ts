@@ -10,9 +10,10 @@ describe('platformSystemSurfaces', () => {
 
     expect(buildPlatformSystemSurfaceView({ capability: workflow }).chart.length).toBe(4);
     expect(buildPlatformSystemSurfaceView({ capability: soap }).rows).toHaveLength(4);
-    expect(buildPlatformSystemSurfaceView({ capability: workspace, patientId: 'demo-patient' }).metrics[2].value).toBe(
-      'demo-patient',
-    );
+    expect(
+      buildPlatformSystemSurfaceView({ capability: workspace, patientId: 'demo-patient' })
+        .metrics[2].value,
+    ).toBe('demo-patient');
   });
 
   it('builds pack hub views when no capability is matched', () => {

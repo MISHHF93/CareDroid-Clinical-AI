@@ -25,7 +25,9 @@ export function UnifiedApplicationKnowledgeGraphPanel({
         <div className="unified-application-knowledge-graph-panel__identity">
           <GitBranch size={16} aria-hidden="true" />
           <strong>Application knowledge graph</strong>
-          <span>{metrics.nodeCount} nodes · {metrics.edgeCount} edges</span>
+          <span>
+            {metrics.nodeCount} nodes · {metrics.edgeCount} edges
+          </span>
           {lastRefreshedAt ? (
             <span className="unified-application-knowledge-graph-panel__refreshed">
               Updated {new Date(lastRefreshedAt).toLocaleTimeString()}
@@ -65,7 +67,9 @@ export function UnifiedApplicationKnowledgeGraphPanel({
         <section>
           <h3>Most connected patients</h3>
           {dashboardSummary.topConnectedPatients.length === 0 ? (
-            <p className="unified-application-knowledge-graph-panel__empty">No active patient connections.</p>
+            <p className="unified-application-knowledge-graph-panel__empty">
+              No active patient connections.
+            </p>
           ) : (
             <ul>
               {dashboardSummary.topConnectedPatients.map((entry) => (
@@ -100,7 +104,9 @@ export function UnifiedApplicationKnowledgeGraphPanel({
         <section>
           <h3>Critical connected signals</h3>
           {dashboardSummary.criticalNodes.length === 0 ? (
-            <p className="unified-application-knowledge-graph-panel__empty">No critical graph signals.</p>
+            <p className="unified-application-knowledge-graph-panel__empty">
+              No critical graph signals.
+            </p>
           ) : (
             <ul>
               {dashboardSummary.criticalNodes.slice(0, 6).map((node) => (

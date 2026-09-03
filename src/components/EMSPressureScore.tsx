@@ -28,11 +28,13 @@ export function getEMSPressureBand(score) {
 
 export function calculateEMSPressureScore(emsArrivals = [] as any[], now = new Date()) {
   const activeArrivals = emsArrivals.filter(
-    (arrival) => !['Complete', 'Cancelled'].includes(arrival.status)
+    (arrival) => !['Complete', 'Cancelled'].includes(arrival.status),
   );
   const incomingUnits = activeArrivals.filter(
     (arrival) =>
-      arrival.status === 'Inbound' && minutesUntilEMSArrival(arrival, now) > 0 && !arrival.patientId
+      arrival.status === 'Inbound' &&
+      minutesUntilEMSArrival(arrival, now) > 0 &&
+      !arrival.patientId,
   );
   // Matches EMSPipeline.tsx's identical awaitingHandoff filter -- see that
   // file's comment for the full HEAL-276 history. !handoffCompletedAt (not
@@ -45,10 +47,10 @@ export function calculateEMSPressureScore(emsArrivals = [] as any[], now = new D
       !arrival.handoffCompletedAt &&
       (arrival.status === 'Arrived' ||
         arrival.status === 'Handoff' ||
-        minutesUntilEMSArrival(arrival, now) <= 0)
+        minutesUntilEMSArrival(arrival, now) <= 0),
   );
   const criticalPending = activeArrivals.filter(
-    (arrival) => !arrival.patientId && arrival.severity === 'Critical'
+    (arrival) => !arrival.patientId && arrival.severity === 'Critical',
   );
   const offloadDurations = awaitingHandoff
     .map((arrival) => offloadStartTime(arrival, now))
@@ -62,7 +64,7 @@ export function calculateEMSPressureScore(emsArrivals = [] as any[], now = new D
   const handoffScore = Math.min(30, awaitingHandoff.length * 15);
   const offloadScore = Math.min(
     20,
-    Math.round((averageOffloadMinutes / TARGET_OFFLOAD_MINUTES) * 20)
+    Math.round((averageOffloadMinutes / TARGET_OFFLOAD_MINUTES) * 20),
   );
   const criticalScore = criticalPending.length * 10;
   const score = Math.min(100, incomingScore + handoffScore + offloadScore + criticalScore);
@@ -107,7 +109,10 @@ export default function EMSPressureScore({ variant = 'badge', className = '' }) 
   if (variant === 'gauge') {
     return (
       <section className={`ems-pressure ems-pressure--gauge ${modifier} ${className}`}>
-        <div className="ems-pressure__gauge" style={{ '--ems-pressure-score': pressure.score } as any}>
+        <div
+          className="ems-pressure__gauge"
+          style={{ '--ems-pressure-score': pressure.score } as any}
+        >
           <strong>{pressure.score}</strong>
           <span>/100</span>
         </div>

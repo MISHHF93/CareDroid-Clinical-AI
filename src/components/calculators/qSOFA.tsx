@@ -55,7 +55,8 @@ export function resultFor(total: number) {
   return {
     band: 'HIGH RISK',
     color: MEDICAL_THEME.danger,
-    recommendation: 'SEPSIS ALERT - High risk for organ dysfunction. Initiate sepsis bundle immediately',
+    recommendation:
+      'SEPSIS ALERT - High risk for organ dysfunction. Initiate sepsis bundle immediately',
     alert: true,
   };
 }
@@ -179,7 +180,9 @@ export default function QSOFA({ patientId, onClose }: QSOFAProps) {
       <span className="u-flex-col-gap-5">
         <strong className="qsofa-toggle-label">{label}</strong>
         {current ? <span className="qsofa-toggle-current">{current}</span> : null}
-        {autoFilledFromVitals ? <span className="qsofa-toggle-autofilled">Auto-filled from vitals</span> : null}
+        {autoFilledFromVitals ? (
+          <span className="qsofa-toggle-autofilled">Auto-filled from vitals</span>
+        ) : null}
       </span>
     </label>
   );
@@ -191,12 +194,9 @@ export default function QSOFA({ patientId, onClose }: QSOFAProps) {
       role="dialog"
       aria-modal="true"
       aria-labelledby="qsofa-title"
-      
     >
       <div className="clinical-calculator-modal__panel qsofa-panel">
-        <header
-          className="u-panel-header-row"
-        >
+        <header className="u-panel-header-row">
           <div>
             <h2 id="qsofa-title" className="u-title-18">
               qSOFA
@@ -247,9 +247,7 @@ export default function QSOFA({ patientId, onClose }: QSOFAProps) {
             }}
           >
             <div style={{ color: result.color, fontSize: 13, fontWeight: 700 }}>{result.band}</div>
-            <div className="u-mono-32">
-              {total}/3
-            </div>
+            <div className="u-mono-32">{total}/3</div>
             {result.alert ? (
               <div className="qsofa-sepsis-alert">
                 SEPSIS ALERT - High risk for organ dysfunction
@@ -262,7 +260,11 @@ export default function QSOFA({ patientId, onClose }: QSOFAProps) {
           </section>
 
           {patient ? (
-            <button className="clinical-calculator-modal__submit qsofa-save-btn" type="button" onClick={saveToPatient}>
+            <button
+              className="clinical-calculator-modal__submit qsofa-save-btn"
+              type="button"
+              onClick={saveToPatient}
+            >
               Save to Patient
             </button>
           ) : null}

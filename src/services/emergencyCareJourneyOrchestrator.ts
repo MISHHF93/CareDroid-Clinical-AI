@@ -57,13 +57,20 @@ function priorityToPatientPriority(priority: CallPriority): Priority {
 function advanceTrace(
   trace: EmergencyJourneyTrace | null,
   stage: JourneyStage,
-  meta?: ActorMeta & { patientId?: EntityId; linkedEmsArrivalId?: EntityId; payload?: Record<string, unknown> },
+  meta?: ActorMeta & {
+    patientId?: EntityId;
+    linkedEmsArrivalId?: EntityId;
+    payload?: Record<string, unknown>;
+  },
 ): EmergencyJourneyTrace | null {
   if (!trace) return null;
   return advanceJourney(trace.traceId, stage, meta);
 }
 
-function buildEmsArrivalFromDispatch(call: EmergencyCall, assignment: DispatchAssignment): EMSArrival {
+function buildEmsArrivalFromDispatch(
+  call: EmergencyCall,
+  assignment: DispatchAssignment,
+): EMSArrival {
   const etaMinutes = assignment.estimatedResponseMinutes ?? 8;
   const dispatchTime = assignment.assignedAt || new Date().toISOString();
   return {
@@ -92,7 +99,10 @@ function buildEmsArrivalFromDispatch(call: EmergencyCall, assignment: DispatchAs
   };
 }
 
-export function onEmergencyCallLogged(call: EmergencyCall, meta: ActorMeta = {}): EmergencyJourneyTrace {
+export function onEmergencyCallLogged(
+  call: EmergencyCall,
+  meta: ActorMeta = {},
+): EmergencyJourneyTrace {
   return startJourney({
     callId: call.id,
     initialStage: 'call_received',
@@ -101,7 +111,10 @@ export function onEmergencyCallLogged(call: EmergencyCall, meta: ActorMeta = {})
   });
 }
 
-export function onDispatcherTriage(callId: EntityId, meta: ActorMeta = {}): EmergencyJourneyTrace | null {
+export function onDispatcherTriage(
+  callId: EntityId,
+  meta: ActorMeta = {},
+): EmergencyJourneyTrace | null {
   const trace = getTraceByCallId(callId);
   return advanceTrace(trace, 'dispatcher_triage', {
     actorId: meta.actorId,
@@ -129,7 +142,8 @@ export function onEmsUnitDispatched(
     complaint: emsArrival.chiefComplaint,
     vitals: {},
     riskScoreBundle: [],
-    riskIndicators: call.patientConscious === false || call.patientBreathing === false ? ['life-threat'] : [],
+    riskIndicators:
+      call.patientConscious === false || call.patientBreathing === false ? ['life-threat'] : [],
     riskLevel: emsArrival.severity === 'Critical' ? 'critical' : 'high',
     handoffSummary: emsArrival.notes,
     notificationStatus: 'pending',
@@ -166,7 +180,11 @@ export function onEmsUnitDispatched(
   return { trace, emsArrival };
 }
 
-export function onHospitalPreAlert(callId: EntityId, emsArrivalId?: EntityId, meta: ActorMeta = {}): EmergencyJourneyTrace | null {
+export function onHospitalPreAlert(
+  callId: EntityId,
+  emsArrivalId?: EntityId,
+  meta: ActorMeta = {},
+): EmergencyJourneyTrace | null {
   const trace = getTraceByCallId(callId);
   let updated = advanceTrace(trace, 'hospital_pre_notification', {
     actorId: meta.actorId,
@@ -299,8 +317,7 @@ export function onPatientArrivalAtReception(
   }
 
   const trace =
-    (options.callId ? getTraceByCallId(options.callId) : null) ||
-    getTraceByPatientId(patientId);
+    (options.callId ? getTraceByCallId(options.callId) : null) || getTraceByPatientId(patientId);
 
   let updated = trace;
   if (!updated && options.callId) {
@@ -338,30 +355,33 @@ export function onRapidIntakeCompleted(
   });
 
   const needsThreeMinute =
-    patient.priority === Priority.P1 ||
-    patient.priority === Priority.P2 ||
-    options.criticalAlertId;
+    patient.priority === Priority.P1 || patient.priority === Priority.P2 || options.criticalAlertId;
 
   if (needsThreeMinute && options.criticalAlertId) {
     startResponseTimer(patient.id, options.criticalAlertId, 'triage_nurse');
   } else if (needsThreeMinute) {
     const store = useEmergencyStore.getState();
     const alert = store.alerts.find(
-      (entry) => entry.patientId === patient.id && entry.severity === 'Critical' && !entry.dismissed,
+      (entry) =>
+        entry.patientId === patient.id && entry.severity === 'Critical' && !entry.dismissed,
     );
     if (alert) {
       startResponseTimer(patient.id, alert.id, 'triage_nurse');
     }
   }
 
-  void import('../engine/unifiedWorkflowAutomationEngine').then(({ scheduleWorkflowAutomationRefresh }) =>
-    scheduleWorkflowAutomationRefresh('journey_state_changed'),
+  void import('../engine/unifiedWorkflowAutomationEngine').then(
+    ({ scheduleWorkflowAutomationRefresh }) =>
+      scheduleWorkflowAutomationRefresh('journey_state_changed'),
   );
 
   return updated;
 }
 
-export function onTriageAcuityConfirmed(patientId: EntityId, meta: ActorMeta = {}): EmergencyJourneyTrace | null {
+export function onTriageAcuityConfirmed(
+  patientId: EntityId,
+  meta: ActorMeta = {},
+): EmergencyJourneyTrace | null {
   const trace = getTraceByPatientId(patientId);
   return advanceTrace(trace, 'triage_assigned', {
     patientId,
@@ -370,16 +390,31 @@ export function onTriageAcuityConfirmed(patientId: EntityId, meta: ActorMeta = {
   });
 }
 
-export function onClinicalActionStarted(patientId: EntityId, meta: ActorMeta = {}): EmergencyJourneyTrace | null {
+export function onClinicalActionStarted(
+  patientId: EntityId,
+  meta: ActorMeta = {},
+): EmergencyJourneyTrace | null {
   const trace = getTraceByPatientId(patientId);
-  let updated = advanceTrace(trace, 'ai_chief_reviewed', { patientId, actorRole: meta.actorRole ?? 'emergency_physician' });
-  updated = advanceTrace(updated, 'clinical_action', { patientId, actorRole: meta.actorRole ?? 'emergency_physician' });
+  let updated = advanceTrace(trace, 'ai_chief_reviewed', {
+    patientId,
+    actorRole: meta.actorRole ?? 'emergency_physician',
+  });
+  updated = advanceTrace(updated, 'clinical_action', {
+    patientId,
+    actorRole: meta.actorRole ?? 'emergency_physician',
+  });
   return updated;
 }
 
-export function onDiagnosticsOrdered(patientId: EntityId, meta: ActorMeta = {}): EmergencyJourneyTrace | null {
+export function onDiagnosticsOrdered(
+  patientId: EntityId,
+  meta: ActorMeta = {},
+): EmergencyJourneyTrace | null {
   const trace = getTraceByPatientId(patientId);
-  return advanceTrace(trace, 'diagnostics_ordered', { patientId, actorRole: meta.actorRole ?? 'emergency_physician' });
+  return advanceTrace(trace, 'diagnostics_ordered', {
+    patientId,
+    actorRole: meta.actorRole ?? 'emergency_physician',
+  });
 }
 
 export function onTreatmentInProgress(patientId: EntityId): EmergencyJourneyTrace | null {
@@ -387,16 +422,34 @@ export function onTreatmentInProgress(patientId: EntityId): EmergencyJourneyTrac
   return advanceTrace(trace, 'treatment_in_progress', { patientId, actorRole: 'registered_nurse' });
 }
 
-export function onDispositionDecided(patientId: EntityId, meta: ActorMeta = {}): EmergencyJourneyTrace | null {
+export function onDispositionDecided(
+  patientId: EntityId,
+  meta: ActorMeta = {},
+): EmergencyJourneyTrace | null {
   const trace = getTraceByPatientId(patientId);
-  return advanceTrace(trace, 'disposition_decided', { patientId, actorRole: meta.actorRole ?? 'emergency_physician' });
+  return advanceTrace(trace, 'disposition_decided', {
+    patientId,
+    actorRole: meta.actorRole ?? 'emergency_physician',
+  });
 }
 
-export function onHandoffComplete(patientId: EntityId, meta: ActorMeta = {}): EmergencyJourneyTrace | null {
+export function onHandoffComplete(
+  patientId: EntityId,
+  meta: ActorMeta = {},
+): EmergencyJourneyTrace | null {
   const trace = getTraceByPatientId(patientId);
-  let updated = advanceTrace(trace, 'handoff_complete', { patientId, actorRole: meta.actorRole ?? 'registered_nurse' });
-  updated = advanceTrace(updated, 'outcome_recorded', { patientId, actorRole: 'quality_safety_officer' });
-  updated = advanceTrace(updated, 'analytics_fed', { patientId, actorRole: 'hospital_administrator' });
+  let updated = advanceTrace(trace, 'handoff_complete', {
+    patientId,
+    actorRole: meta.actorRole ?? 'registered_nurse',
+  });
+  updated = advanceTrace(updated, 'outcome_recorded', {
+    patientId,
+    actorRole: 'quality_safety_officer',
+  });
+  updated = advanceTrace(updated, 'analytics_fed', {
+    patientId,
+    actorRole: 'hospital_administrator',
+  });
   return updated;
 }
 

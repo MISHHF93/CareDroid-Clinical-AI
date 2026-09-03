@@ -74,7 +74,9 @@ function buildAiPatientSummary(patient: Patient, staff: Staff[], referrals: Refe
   return [
     `CareDroid operational summary for ${patientName(patient)} (${patient.priority}, ${patient.state}).`,
     `Chief complaint: ${patient.chiefComplaint || 'not documented'}.`,
-    next ? `Predicted next step: ${next.label} — ${next.guidance}` : 'No pending next-step guidance.',
+    next
+      ? `Predicted next step: ${next.label} — ${next.guidance}`
+      : 'No pending next-step guidance.',
     provider.label ? `Provider status: ${provider.label}.` : '',
     'Human review required before this summary enters the permanent record.',
   ]
@@ -105,7 +107,10 @@ function buildRoutingTasks(
           proposedAction: 'Move patient to triage queue and notify triage nurse.',
           proposedPayload: { targetState: PatientState.Triage, queue: 'pretriage' },
           ownerRole: 'triage_nurse',
-          priority: patient.priority === Priority.P1 || patient.priority === Priority.P2 ? 'high' : 'medium',
+          priority:
+            patient.priority === Priority.P1 || patient.priority === Priority.P2
+              ? 'high'
+              : 'medium',
           createdAt: now,
           updatedAt: now,
         }),
@@ -123,7 +128,8 @@ function buildRoutingTasks(
           patientId: patient.id,
           patientName: patientName(patient),
           title: `Advance ${patientName(patient)} to waiting`,
-          summary: 'Triage documentation captured — ready for waiting-room or provider queue routing.',
+          summary:
+            'Triage documentation captured — ready for waiting-room or provider queue routing.',
           proposedAction: 'Move patient to waiting queue after triage sign-off.',
           proposedPayload: { targetState: PatientState.Waiting, queue: 'waiting-room' },
           ownerRole: 'triage_nurse',
@@ -138,7 +144,11 @@ function buildRoutingTasks(
   return tasks;
 }
 
-function buildHandoffTasks(patients: Patient[], now: string, existing: Map<string, AdministrativeAutomationTask>): AdministrativeAutomationTask[] {
+function buildHandoffTasks(
+  patients: Patient[],
+  now: string,
+  existing: Map<string, AdministrativeAutomationTask>,
+): AdministrativeAutomationTask[] {
   return patients
     .filter(
       (patient) =>
@@ -206,7 +216,8 @@ function buildSummaryTasks(
         patientName: patientName(patient),
         title: `AI summary ready — ${patientName(patient)}`,
         summary,
-        proposedAction: 'Attach reviewed summary to patient record and share with assigned clinician.',
+        proposedAction:
+          'Attach reviewed summary to patient record and share with assigned clinician.',
         proposedPayload: { summaryText: summary },
         ownerRole: 'emergency_physician',
         priority: patient.priority === Priority.P1 ? 'critical' : 'high',
@@ -225,36 +236,39 @@ function buildTriagePrepTasks(
   existing: Map<string, AdministrativeAutomationTask>,
 ): AdministrativeAutomationTask[] {
   const inbound = emsArrivals.filter((arrival) => arrival.status === 'Inbound');
-  return inbound.map((arrival) => {
-    const id = `auto-triage-prep-${arrival.id}`;
-    if (existing.get(id)?.status === 'pending_review') return null;
-    const linkedPatient = patients.find(
-      (patient) =>
-        patient.mrn === (arrival as EMSArrival & { patientMrn?: string }).patientMrn ||
-        patient.emsArrival?.id === arrival.id,
-    );
-    return makeTask({
-      id,
-      category: 'triage_preparation',
-      status: 'pending_review',
-      patientId: linkedPatient?.id,
-      patientName: linkedPatient ? patientName(linkedPatient) : arrival.unitName,
-      title: `Prepare triage packet — ${arrival.unitName}`,
-      summary: `Inbound EMS ETA ${arrival.eta}m · ${arrival.chiefComplaint || 'complaint pending'}`,
-      proposedAction: 'Open pre-arrival triage packet, assign receiving nurse, and stage resus if critical.',
-      proposedPayload: {
-        arrivalId: arrival.id,
-        etaMinutes: arrival.eta,
-        severity: arrival.severity,
-        preArrivalNotification: Boolean(arrival.preArrivalNotification),
-      },
-      ownerRole: recommendRouting('ems_pre_arrival').primaryRole,
-      priority: arrival.severity === 'Critical' ? 'critical' : 'high',
-      createdAt: now,
-      updatedAt: now,
-      route: CANONICAL_ROUTES.emergencyEms,
-    });
-  }).filter((task): task is AdministrativeAutomationTask => Boolean(task));
+  return inbound
+    .map((arrival) => {
+      const id = `auto-triage-prep-${arrival.id}`;
+      if (existing.get(id)?.status === 'pending_review') return null;
+      const linkedPatient = patients.find(
+        (patient) =>
+          patient.mrn === (arrival as EMSArrival & { patientMrn?: string }).patientMrn ||
+          patient.emsArrival?.id === arrival.id,
+      );
+      return makeTask({
+        id,
+        category: 'triage_preparation',
+        status: 'pending_review',
+        patientId: linkedPatient?.id,
+        patientName: linkedPatient ? patientName(linkedPatient) : arrival.unitName,
+        title: `Prepare triage packet — ${arrival.unitName}`,
+        summary: `Inbound EMS ETA ${arrival.eta}m · ${arrival.chiefComplaint || 'complaint pending'}`,
+        proposedAction:
+          'Open pre-arrival triage packet, assign receiving nurse, and stage resus if critical.',
+        proposedPayload: {
+          arrivalId: arrival.id,
+          etaMinutes: arrival.eta,
+          severity: arrival.severity,
+          preArrivalNotification: Boolean(arrival.preArrivalNotification),
+        },
+        ownerRole: recommendRouting('ems_pre_arrival').primaryRole,
+        priority: arrival.severity === 'Critical' ? 'critical' : 'high',
+        createdAt: now,
+        updatedAt: now,
+        route: CANONICAL_ROUTES.emergencyEms,
+      });
+    })
+    .filter((task): task is AdministrativeAutomationTask => Boolean(task));
 }
 
 function buildDepartmentNotificationTasks(
@@ -403,7 +417,8 @@ function buildEscalationTasks(
           patientName: patientName(patient),
           title: `Escalation review — ${patientName(patient)}`,
           summary: `Operational flags: ${flags.join(', ') || 'risk signal detected'}.`,
-          proposedAction: 'Launch reassessment, notify charge nurse, and document escalation rationale.',
+          proposedAction:
+            'Launch reassessment, notify charge nurse, and document escalation rationale.',
           proposedPayload: { flags, escalationType: 'clinical_operational' },
           ownerRole: 'charge_nurse',
           priority: hasFlag(patient, PatientFlag.DeteriorationRisk) ? 'critical' : 'high',
@@ -428,7 +443,8 @@ function buildEscalationTasks(
           status: 'pending_review',
           title: 'Escalate unresolved critical alerts',
           summary: `${unresolvedCritical.length} critical alert(s) need acknowledgement before next workflow step.`,
-          proposedAction: 'Route alerts to charge nurse and attending physician for coordinated response.',
+          proposedAction:
+            'Route alerts to charge nurse and attending physician for coordinated response.',
           proposedPayload: { alertIds: unresolvedCritical.map((alert) => alert.id) },
           ownerRole: recommendRouting('critical_alert').primaryRole,
           priority: 'critical',
@@ -443,16 +459,18 @@ function buildEscalationTasks(
   return tasks;
 }
 
-export function buildAdministrativeAutomationSnapshot(input: {
-  patients?: Patient[];
-  staff?: Staff[];
-  referrals?: Referral[];
-  alerts?: Alert[];
-  emsArrivals?: EMSArrival[];
-  capacity?: CapacitySnapshot | null;
-  existingTasks?: readonly AdministrativeAutomationTask[];
-  now?: Date;
-} = {}): AdministrativeAutomationSnapshot {
+export function buildAdministrativeAutomationSnapshot(
+  input: {
+    patients?: Patient[];
+    staff?: Staff[];
+    referrals?: Referral[];
+    alerts?: Alert[];
+    emsArrivals?: EMSArrival[];
+    capacity?: CapacitySnapshot | null;
+    existingTasks?: readonly AdministrativeAutomationTask[];
+    now?: Date;
+  } = {},
+): AdministrativeAutomationSnapshot {
   const now = (input.now || new Date()).toISOString();
   const patients = input.patients || [];
   const staff = input.staff || [];
@@ -461,7 +479,10 @@ export function buildAdministrativeAutomationSnapshot(input: {
   const emsArrivals = input.emsArrivals || [];
   const existing = new Map(
     (input.existingTasks || [])
-      .filter((task) => task.status !== 'executed' && task.status !== 'dismissed' && task.status !== 'expired')
+      .filter(
+        (task) =>
+          task.status !== 'executed' && task.status !== 'dismissed' && task.status !== 'expired',
+      )
       .map((task) => [task.id, task]),
   );
 
@@ -540,7 +561,11 @@ function executeApprovedTask(
       if (!patientId) return { ok: false, detail: 'Missing patient for routing.' };
       const target = task.proposedPayload.targetState as PatientState;
       if (target === PatientState.Triage) {
-        enterTriageQueue(store, { patientId, actorId: actorStaffId, source: 'workflow-orchestrator' });
+        enterTriageQueue(store, {
+          patientId,
+          actorId: actorStaffId,
+          source: 'workflow-orchestrator',
+        });
         return { ok: true, detail: 'Patient routed to triage queue.' };
       }
       if (target === PatientState.Waiting) {
@@ -556,7 +581,10 @@ function executeApprovedTask(
         return { ok: false, detail: 'Staff assignment requires patient and proposed staff.' };
       }
       store.assignStaff(patientId, staffId);
-      return { ok: true, detail: `Assigned staff ${task.proposedPayload.proposedStaffName || staffId}.` };
+      return {
+        ok: true,
+        detail: `Assigned staff ${task.proposedPayload.proposedStaffName || staffId}.`,
+      };
     }
     case 'department_notification': {
       dispatchAlert({
@@ -619,7 +647,11 @@ export function reviewAdministrativeAutomationTask(
   tasks: readonly AdministrativeAutomationTask[],
   input: ReviewAdministrativeAutomationInput,
   store: ExecuteAutomationStore,
-): { tasks: AdministrativeAutomationTask[]; task: AdministrativeAutomationTask | null; execution?: { ok: boolean; detail: string } } {
+): {
+  tasks: AdministrativeAutomationTask[];
+  task: AdministrativeAutomationTask | null;
+  execution?: { ok: boolean; detail: string };
+} {
   const index = tasks.findIndex((task) => task.id === input.taskId);
   if (index < 0) return { tasks: [...tasks], task: null };
 

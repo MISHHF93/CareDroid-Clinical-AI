@@ -52,8 +52,8 @@ export default function ClinicalAudit({ embedded = false, onCloseEmbedded }: any
         <section className="simple-tool-result-panel" role="note">
           <h2>Audit Scope</h2>
           <p>
-            Clinical Audit shows sanitized execution logs, PHI access flags, tool chains, hash previews,
-            and integrity status. Formal exports remain role-gated in the audit module.
+            Clinical Audit shows sanitized execution logs, PHI access flags, tool chains, hash
+            previews, and integrity status. Formal exports remain role-gated in the audit module.
           </p>
         </section>
 
@@ -95,14 +95,19 @@ export default function ClinicalAudit({ embedded = false, onCloseEmbedded }: any
             </div>
           </section>
 
-          <section className="diagnosis-panel diagnosis-panel--scroll" aria-labelledby="clinical-audit-output">
+          <section
+            className="diagnosis-panel diagnosis-panel--scroll"
+            aria-labelledby="clinical-audit-output"
+          >
             <h2 id="clinical-audit-output">Execution Logs</h2>
             <ApiStateBanner error={error} onRetry={loadLogs} />
 
             {loading ? (
               <div className="tool-loading-state" aria-busy="true">
                 <div className="simple-tool-spinner diagnosis-spinner" />
-                <p className="tool-loading-state__message">Loading clinical audit execution logs...</p>
+                <p className="tool-loading-state__message">
+                  Loading clinical audit execution logs...
+                </p>
               </div>
             ) : result ? (
               <div className="diagnosis-results-body">
@@ -112,12 +117,14 @@ export default function ClinicalAudit({ embedded = false, onCloseEmbedded }: any
                     <strong>Status:</strong> {result.status}
                   </p>
                   <p>
-                    <strong>Logs:</strong> {result.summary?.logCount || 0} | <strong>PHI access:</strong>{' '}
-                    {result.summary?.phiAccessCount || 0} | <strong>Integrity verified:</strong>{' '}
+                    <strong>Logs:</strong> {result.summary?.logCount || 0} |{' '}
+                    <strong>PHI access:</strong> {result.summary?.phiAccessCount || 0} |{' '}
+                    <strong>Integrity verified:</strong>{' '}
                     {result.summary?.integrityVerifiedCount || 0}
                   </p>
                   <p>
-                    <strong>Capabilities:</strong> {(result.summary?.uniqueCapabilities || []).join(', ')}
+                    <strong>Capabilities:</strong>{' '}
+                    {(result.summary?.uniqueCapabilities || []).join(', ')}
                   </p>
                 </section>
 
@@ -136,9 +143,10 @@ export default function ClinicalAudit({ embedded = false, onCloseEmbedded }: any
                     <ul>
                       {result.executionLogs.map((log) => (
                         <li key={`${log.id}-${log.timestamp}`}>
-                          <strong>{log.capabilityId}</strong>: {log.action} on {log.resource}; status {log.status};
-                          PHI {log.phiAccessed ? 'yes' : 'no'}; integrity{' '}
-                          {log.integrityVerified ? 'verified' : 'unverified'}; hash {log.hashPreview}
+                          <strong>{log.capabilityId}</strong>: {log.action} on {log.resource};
+                          status {log.status}; PHI {log.phiAccessed ? 'yes' : 'no'}; integrity{' '}
+                          {log.integrityVerified ? 'verified' : 'unverified'}; hash{' '}
+                          {log.hashPreview}
                         </li>
                       ))}
                     </ul>

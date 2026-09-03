@@ -11,10 +11,7 @@ import {
 import { useUser } from '../contexts/UserContext';
 import { useUserIdentity } from '../contexts/UserIdentityContext';
 import { useNotificationActions } from '../hooks/useNotificationActions';
-import {
-  ActionRow,
-  DashboardSection,
-} from '../components/ui/CareDroidPrimitives';
+import { ActionRow, DashboardSection } from '../components/ui/CareDroidPrimitives';
 import './ProfileSettings.css';
 
 const ProfileSettings = ({ authToken }) => {
@@ -41,11 +38,7 @@ const ProfileSettings = ({ authToken }) => {
     () => ({
       displayName: account?.displayName || profile.fullName || user?.fullName || user?.name || '',
       institution: account?.organization || profile.institution || user?.institution || '',
-      specialty:
-        account?.specialty ||
-        profile.specialty ||
-        professional?.specialties?.[0] ||
-        '',
+      specialty: account?.specialty || profile.specialty || professional?.specialties?.[0] || '',
       licenseNumber: professional?.licenseNumber || profile.licenseNumber || '',
       country: account?.country || profile.country || '',
       timezone: account?.timezone || profile.timezone || '',
@@ -101,7 +94,7 @@ const ProfileSettings = ({ authToken }) => {
       country: country.trim(),
       timezone: timezone.trim(),
     }),
-    [country, displayName, institution, licenseNumber, specialty, timezone]
+    [country, displayName, institution, licenseNumber, specialty, timezone],
   );
 
   const hasChanges = useMemo(() => {
@@ -119,7 +112,10 @@ const ProfileSettings = ({ authToken }) => {
   const handleSave = async (event) => {
     event.preventDefault();
     if (!effectiveAuthToken) {
-      setStatus({ type: 'error', message: 'Profile API unavailable — changes stay local in demo mode.' });
+      setStatus({
+        type: 'error',
+        message: 'Profile API unavailable — changes stay local in demo mode.',
+      });
       return;
     }
     if (!payload.displayName) {
@@ -168,99 +164,96 @@ const ProfileSettings = ({ authToken }) => {
       accessSummary={accessSummary}
       profileCopy={profileCopy}
     >
-        <DashboardSection
-          className="profile-settings-section"
-          title={identityFormCopy.sectionTitle}
-          description={identityFormCopy.sectionDescription}
-        >
-          {!effectiveAuthToken && (
-            <div className="api-state-banner api-state-banner--warning" role="status">
-              Profile changes save locally during the build phase when the backend profile API is offline.
-            </div>
-          )}
-          {status.message && (
-            <div
-              className={`api-state-banner api-state-banner--${status.type === 'error' ? 'error' : status.type === 'success' ? 'success' : 'info'} profile-settings-status`}
-              role="status"
-            >
-              {status.message}
-            </div>
-          )}
-          <form
-            id="profile-settings-form"
-            onSubmit={handleSave}
-            className="profile-settings-form"
+      <DashboardSection
+        className="profile-settings-section"
+        title={identityFormCopy.sectionTitle}
+        description={identityFormCopy.sectionDescription}
+      >
+        {!effectiveAuthToken && (
+          <div className="api-state-banner api-state-banner--warning" role="status">
+            Profile changes save locally during the build phase when the backend profile API is
+            offline.
+          </div>
+        )}
+        {status.message && (
+          <div
+            className={`api-state-banner api-state-banner--${status.type === 'error' ? 'error' : status.type === 'success' ? 'success' : 'info'} profile-settings-status`}
+            role="status"
           >
+            {status.message}
+          </div>
+        )}
+        <form id="profile-settings-form" onSubmit={handleSave} className="profile-settings-form">
+          <Input
+            type="text"
+            label="Display name"
+            placeholder="Display name"
+            value={displayName}
+            onChange={(e) => setDisplayName(e.target.value)}
+            required
+            {...({} as any)}
+          />
+          <Input
+            type="text"
+            label="Institution"
+            placeholder="Institution"
+            value={institution}
+            onChange={(e) => setInstitution(e.target.value)}
+            {...({} as any)}
+          />
+          <Input
+            type="text"
+            label="Specialty"
+            placeholder="Specialty (e.g., Emergency Medicine)"
+            value={specialty}
+            onChange={(e) => setSpecialty(e.target.value)}
+            {...({} as any)}
+          />
+          <Input
+            type="text"
+            label="License number"
+            placeholder="License number"
+            value={licenseNumber}
+            onChange={(e) => setLicenseNumber(e.target.value)}
+            {...({} as any)}
+          />
+          <div className="profile-settings-grid">
             <Input
               type="text"
-              label="Display name"
-              placeholder="Display name"
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
-              required
-              {...{} as any}
+              label="Country"
+              placeholder="Country"
+              value={country}
+              onChange={(e) => setCountry(e.target.value)}
+              {...({} as any)}
             />
             <Input
               type="text"
-              label="Institution"
-              placeholder="Institution"
-              value={institution}
-              onChange={(e) => setInstitution(e.target.value)}
-              {...{} as any}
+              label="Timezone"
+              placeholder="Timezone"
+              value={timezone}
+              onChange={(e) => setTimezone(e.target.value)}
+              {...({} as any)}
             />
-            <Input
-              type="text"
-              label="Specialty"
-              placeholder="Specialty (e.g., Emergency Medicine)"
-              value={specialty}
-              onChange={(e) => setSpecialty(e.target.value)}
-              {...{} as any}
-            />
-            <Input
-              type="text"
-              label="License number"
-              placeholder="License number"
-              value={licenseNumber}
-              onChange={(e) => setLicenseNumber(e.target.value)}
-              {...{} as any}
-            />
-            <div className="profile-settings-grid">
-              <Input
-                type="text"
-                label="Country"
-                placeholder="Country"
-                value={country}
-                onChange={(e) => setCountry(e.target.value)}
-                {...{} as any}
-              />
-              <Input
-                type="text"
-                label="Timezone"
-                placeholder="Timezone"
-                value={timezone}
-                onChange={(e) => setTimezone(e.target.value)}
-                {...{} as any}
-              />
-            </div>
-            <div className="card-subtle profile-settings-role-note">
-              <strong>Account role:</strong> {accountRole}. Role changes stay controlled by backend
-              membership and RBAC policies.
-            </div>
-          </form>
-          <ActionRow className="profile-settings-actions">
-            <Button
-              type="submit"
-              form="profile-settings-form"
-              loading={saving}
-              disabled={saving || identityLoading || !hasChanges}
-            >
-              Save profile
-            </Button>
-            <Link to="/profile" className="profile-settings-back-link">
-              Back to Profile
-            </Link>
-          </ActionRow>
-        </DashboardSection>
+          </div>
+          <div className="card-subtle profile-settings-role-note">
+            <strong>Account role:</strong> {accountRole}. Role changes stay controlled by backend
+            membership and RBAC policies.
+          </div>
+        </form>
+        <ActionRow className="profile-settings-actions">
+          <Button
+            type="submit"
+            form="profile-settings-form"
+            loading={saving}
+            disabled={saving || identityLoading || !hasChanges}
+          >
+            Save profile
+          </Button>
+          <Link to="/profile" className="profile-settings-back-link">
+            Back to Profile
+          </Link>
+        </ActionRow>
+      </DashboardSection>
     </ProfileSettingsShell>
   );
 };

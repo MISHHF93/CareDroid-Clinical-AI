@@ -6,10 +6,7 @@ import {
   PRIMARY_SIDEBAR_NAV_ITEMS,
 } from '../config/navigation.config';
 import { builtinUiCalculators } from './clinicalIntentToolCatalog';
-import {
-  getCanonicalToolInventory,
-  getUserFacingToolInventory,
-} from './toolInventory';
+import { getCanonicalToolInventory, getUserFacingToolInventory } from './toolInventory';
 import { RESPONSIVE_QA_PAGES, RESPONSIVE_QA_VIEWPORTS } from './responsiveQaMatrix';
 import { E2E_MANUAL_QA_SECTIONS } from './e2eManualQaChecklist';
 
@@ -49,7 +46,9 @@ function unique(values) {
 }
 
 function normalize(value) {
-  return String(value || '').trim().toLowerCase();
+  return String(value || '')
+    .trim()
+    .toLowerCase();
 }
 
 function groupBy(items, getKey) {
@@ -89,13 +88,16 @@ function issue({
 function countDashboards(tools) {
   return tools.filter((tool) => {
     const text = `${tool.name || ''} ${tool.label || ''} ${tool.id || ''}`.toLowerCase();
-    return text.includes('dashboard') || text.includes('command center') || text.includes('analytics');
+    return (
+      text.includes('dashboard') || text.includes('command center') || text.includes('analytics')
+    );
   }).length;
 }
 
 function countMaps(tools) {
   return tools.filter((tool) => {
-    const text = `${tool.name || ''} ${tool.label || ''} ${tool.id || ''} ${tool.route || ''}`.toLowerCase();
+    const text =
+      `${tool.name || ''} ${tool.label || ''} ${tool.id || ''} ${tool.route || ''}`.toLowerCase();
     return text.includes('map') || text.includes('tracking') || text.includes('3d-viewer');
   }).length;
 }
@@ -122,7 +124,11 @@ function buildSurfaceInventory({
     {
       type: UX_SURFACE_TYPES.CARDS,
       count: tools.length,
-      sources: ['src/data/toolInventory.js', 'src/data/toolRegistry.ts', 'src/components/ToolCard.tsx'],
+      sources: [
+        'src/data/toolInventory.js',
+        'src/data/toolRegistry.ts',
+        'src/components/ToolCard.tsx',
+      ],
     },
     {
       type: UX_SURFACE_TYPES.FORMS,
@@ -147,7 +153,11 @@ function buildSurfaceInventory({
     {
       type: UX_SURFACE_TYPES.MAPS,
       count: countMaps(tools),
-      sources: ['src/pages/HospitalMapDashboard.jsx', 'src/pages/LiveTrackingMap.jsx', 'src/pages/fleet/FleetLiveMap.jsx'],
+      sources: [
+        'src/pages/HospitalMapDashboard.jsx',
+        'src/pages/LiveTrackingMap.jsx',
+        'src/pages/fleet/FleetLiveMap.jsx',
+      ],
     },
     {
       type: UX_SURFACE_TYPES.CALCULATORS,
@@ -157,7 +167,11 @@ function buildSurfaceInventory({
     {
       type: UX_SURFACE_TYPES.DASHBOARDS,
       count: countDashboards(tools),
-      sources: ['src/pages/CommandDashboard.jsx', 'src/components/ChatInterface.tsx', 'src/data/toolRegistry.ts'],
+      sources: [
+        'src/pages/CommandDashboard.jsx',
+        'src/components/ChatInterface.tsx',
+        'src/data/toolRegistry.ts',
+      ],
     },
     {
       type: 'manual QA',
@@ -179,16 +193,17 @@ function duplicateNavFindings(navItems) {
         severity: 'medium',
         title: `Navigation label "${items[0].label}" points to multiple destinations`,
         evidence: `Paths: ${unique(items.map((item) => item.path)).join(', ')}`,
-        recommendation: 'Use one canonical destination per visible navigation label or rename the secondary destination.',
+        recommendation:
+          'Use one canonical destination per visible navigation label or rename the secondary destination.',
         affected: items.map((item) => item.id),
-      })
+      }),
     );
 }
 
 function duplicateRouteFindings(routes) {
   const byPath = groupBy(
     Object.entries(routes).map(([id, path]) => ({ id, path })),
-    (route) => route.path
+    (route) => route.path,
   );
   return [...byPath.entries()]
     .filter(([, items]) => items.length > 1)
@@ -200,28 +215,36 @@ function duplicateRouteFindings(routes) {
         severity: 'high',
         title: `Canonical route "${path}" is declared by multiple route IDs`,
         evidence: `Route IDs: ${items.map((item) => item.id).join(', ')}`,
-        recommendation: 'Keep one canonical route owner and move alternatives into route alias groups.',
+        recommendation:
+          'Keep one canonical route owner and move alternatives into route alias groups.',
         affected: items.map((item) => item.id),
-      })
+      }),
     );
 }
 
 function sharedRouteFindings(tools) {
   const byRoute = groupBy(tools, (tool) => tool.route || tool.navigationPath || tool.path);
   return [...byRoute.entries()]
-    .filter(([route, items]) => items.length >= HEAVY_HUB_THRESHOLD && !SHARED_ROUTE_ALLOWLIST.has(route))
+    .filter(
+      ([route, items]) => items.length >= HEAVY_HUB_THRESHOLD && !SHARED_ROUTE_ALLOWLIST.has(route),
+    )
     .map(([route, items]) =>
       issue({
         id: `hidden-heavy-route-${route.replace(/[^a-z0-9]+/gi, '-')}`,
         classification: UX_DEBT_CLASSIFICATIONS.HIDDEN_UX,
-        surface: route.includes('calculator') ? UX_SURFACE_TYPES.CALCULATORS : UX_SURFACE_TYPES.ROUTES,
+        surface: route.includes('calculator')
+          ? UX_SURFACE_TYPES.CALCULATORS
+          : UX_SURFACE_TYPES.ROUTES,
         severity: 'medium',
         title: `${items.length} tools share "${route}" as their visible launch surface`,
-        evidence: `First tools: ${items.slice(0, 8).map((tool) => tool.name || tool.label || tool.id).join(', ')}`,
+        evidence: `First tools: ${items
+          .slice(0, 8)
+          .map((tool) => tool.name || tool.label || tool.id)
+          .join(', ')}`,
         recommendation:
           'Keep the shared hub, but add clear in-page grouping, deep links, and search anchors so individual tools do not feel buried.',
         affected: items.map((tool) => tool.id).slice(0, 30),
-      })
+      }),
     );
 }
 
@@ -242,7 +265,10 @@ function routeCoverageFindings(routes, responsivePages) {
       surface: UX_SURFACE_TYPES.ROUTES,
       severity: missing.length > 12 ? 'medium' : 'low',
       title: `${missing.length} canonical routes are not in the responsive route smoke matrix`,
-      evidence: `Missing examples: ${missing.slice(0, 10).map(([id, path]) => `${id} (${path})`).join(', ')}`,
+      evidence: `Missing examples: ${missing
+        .slice(0, 10)
+        .map(([id, path]) => `${id} (${path})`)
+        .join(', ')}`,
       recommendation:
         'Add responsive smoke coverage for high-traffic routes or mark intentionally internal routes in the audit allowlist.',
       affected: missing.map(([id]) => id),
@@ -266,12 +292,16 @@ function sourceSnapshotFindings(sourceSnapshot: any = {}) {
         severity: 'critical',
         title: 'Navigation rail and bottom navigation can render from the same shell',
         evidence: 'AppShell contains both ed-nav-rail and app-shell-bottom-nav.',
-        recommendation: 'Use the AppShell navigation rail as canonical navigation and keep bottom nav disabled.',
-      })
+        recommendation:
+          'Use the AppShell navigation rail as canonical navigation and keep bottom nav disabled.',
+      }),
     );
   }
 
-  if (appShellCss.includes('app-shell-bottom-nav') || appShellCss.includes('--app-bottom-nav-height')) {
+  if (
+    appShellCss.includes('app-shell-bottom-nav') ||
+    appShellCss.includes('--app-bottom-nav-height')
+  ) {
     findings.push(
       issue({
         id: 'obsolete-bottom-nav-spacing',
@@ -280,8 +310,9 @@ function sourceSnapshotFindings(sourceSnapshot: any = {}) {
         severity: 'high',
         title: 'Bottom navigation styles or spacing remain in the app shell',
         evidence: 'AppShell.css still references app-shell-bottom-nav or --app-bottom-nav-height.',
-        recommendation: 'Remove obsolete bottom-nav CSS and reserve only safe-area/keyboard spacing.',
-      })
+        recommendation:
+          'Remove obsolete bottom-nav CSS and reserve only safe-area/keyboard spacing.',
+      }),
     );
   }
 
@@ -295,7 +326,7 @@ function sourceSnapshotFindings(sourceSnapshot: any = {}) {
         title: 'Quick Command still offsets above a removed bottom nav',
         evidence: 'CommandPalette.tsx still references --app-bottom-nav-height.',
         recommendation: 'Anchor compact command UI to safe-area bottom spacing instead.',
-      })
+      }),
     );
   }
 
@@ -309,7 +340,7 @@ function sourceSnapshotFindings(sourceSnapshot: any = {}) {
         title: 'Authenticated pages lack a single main content scroll contract',
         evidence: 'AppShell.jsx does not expose data-layout-role="MainContent".',
         recommendation: 'Keep one main content scrollport for all protected routes.',
-      })
+      }),
     );
   }
 
@@ -322,12 +353,16 @@ function sourceSnapshotFindings(sourceSnapshot: any = {}) {
         severity: 'high',
         title: 'AppShell navigation rail lacks an accessible label',
         evidence: 'Missing aria-label="CareDroid navigation".',
-        recommendation: 'Keep the AppShell rail labelled so collapsed icon navigation is announced.',
-      })
+        recommendation:
+          'Keep the AppShell rail labelled so collapsed icon navigation is announced.',
+      }),
     );
   }
 
-  if (drawerJsx && (!drawerJsx.includes('role="dialog"') || !drawerJsx.includes('aria-modal="true"'))) {
+  if (
+    drawerJsx &&
+    (!drawerJsx.includes('role="dialog"') || !drawerJsx.includes('aria-modal="true"'))
+  ) {
     findings.push(
       issue({
         id: 'a11y-drawer-dialog-contract',
@@ -337,7 +372,7 @@ function sourceSnapshotFindings(sourceSnapshot: any = {}) {
         title: 'Drawer lacks modal dialog semantics',
         evidence: 'Drawer.jsx must include role="dialog" and aria-modal="true".',
         recommendation: 'Keep modal semantics on drawer surfaces and preserve close button labels.',
-      })
+      }),
     );
   }
 
@@ -345,7 +380,10 @@ function sourceSnapshotFindings(sourceSnapshot: any = {}) {
 }
 
 function aliasFindings(aliasGroups) {
-  const aliasCount = Object.values(aliasGroups).reduce<number>((total, group: any) => total + group.aliases.length, 0);
+  const aliasCount = Object.values(aliasGroups).reduce<number>(
+    (total, group: any) => total + group.aliases.length,
+    0,
+  );
   if (aliasCount <= 20) return [];
 
   return [
@@ -355,18 +393,25 @@ function aliasFindings(aliasGroups) {
       surface: UX_SURFACE_TYPES.ROUTES,
       severity: 'low',
       title: `${aliasCount} legacy route aliases remain in the routing layer`,
-      evidence: 'Aliases preserve compatibility but can hide obsolete UX entry points if left undocumented.',
-      recommendation: 'Keep redirects, but document owner, canonical target, and removal criteria for each alias group.',
+      evidence:
+        'Aliases preserve compatibility but can hide obsolete UX entry points if left undocumented.',
+      recommendation:
+        'Keep redirects, but document owner, canonical target, and removal criteria for each alias group.',
       affected: Object.keys(aliasGroups),
     }),
   ];
 }
 
 function summarizeByClassification(findings) {
-  return Object.values(UX_DEBT_CLASSIFICATIONS).reduce((acc: Record<string, number>, classification) => {
-    acc[classification] = findings.filter((finding) => finding.classification === classification).length;
-    return acc;
-  }, {});
+  return Object.values(UX_DEBT_CLASSIFICATIONS).reduce(
+    (acc: Record<string, number>, classification) => {
+      acc[classification] = findings.filter(
+        (finding) => finding.classification === classification,
+      ).length;
+      return acc;
+    },
+    {},
+  );
 }
 
 function summarizeBySurface(findings) {
@@ -421,14 +466,23 @@ export function buildUxDebtAudit({
     generatedAt: new Date().toISOString(),
     healthScore,
     healthGrade:
-      healthScore >= 90 ? 'strong' : healthScore >= 75 ? 'watch' : healthScore >= 60 ? 'at risk' : 'critical',
+      healthScore >= 90
+        ? 'strong'
+        : healthScore >= 75
+          ? 'watch'
+          : healthScore >= 60
+            ? 'at risk'
+            : 'critical',
     summary: {
       findings: findings.length,
       criticalFindings: findings.filter((finding) => finding.severity === 'critical').length,
       highFindings: findings.filter((finding) => finding.severity === 'high').length,
       classifications: summarizeByClassification(findings),
       surfaces: summarizeBySurface(findings),
-      auditedSurfaceCount: auditedSurfaces.reduce<number>((total, surface) => total + surface.count, 0),
+      auditedSurfaceCount: auditedSurfaces.reduce<number>(
+        (total, surface) => total + surface.count,
+        0,
+      ),
       responsiveCoverage: {
         pages: responsivePages.length,
         viewports: responsiveViewports.length,
@@ -472,7 +526,9 @@ export function formatUxDebtReportMarkdown(audit = buildUxDebtAudit()) {
     '',
     '## Classification Counts',
     '',
-    ...Object.entries(audit.summary.classifications).map(([classification, count]) => `- ${classification}: ${count}`),
+    ...Object.entries(audit.summary.classifications).map(
+      ([classification, count]) => `- ${classification}: ${count}`,
+    ),
     '',
     '## Surface Counts',
     '',
@@ -494,10 +550,13 @@ export function formatUxDebtReportMarkdown(audit = buildUxDebtAudit()) {
         `- Severity: ${finding.severity}`,
         `- Evidence: ${finding.evidence}`,
         `- Recommendation: ${finding.recommendation}`,
-        ''
+        '',
       );
       if (finding.affected.length) {
-        lines.push(`Affected examples: ${finding.affected.slice(0, 12).map(mdCell).join(', ')}`, '');
+        lines.push(
+          `Affected examples: ${finding.affected.slice(0, 12).map(mdCell).join(', ')}`,
+          '',
+        );
       }
     }
   }
@@ -509,7 +568,7 @@ export function formatUxDebtReportMarkdown(audit = buildUxDebtAudit()) {
     '',
     '## Acceptance Rule',
     '',
-    'No page should feel like it belongs to a different application. The engine enforces that by keeping navigation single-source, route paths canonical, responsive coverage visible, drawers/dialogs accessible, and high-volume hubs explicitly reviewed.'
+    'No page should feel like it belongs to a different application. The engine enforces that by keeping navigation single-source, route paths canonical, responsive coverage visible, drawers/dialogs accessible, and high-volume hubs explicitly reviewed.',
   );
 
   return lines.join('\n');

@@ -87,7 +87,10 @@ function resolveConfidence(fieldCount: number, source: IntakeArtifactCaptureSour
   return 0.2;
 }
 
-function parseAiPayload(content: string, artifactId: IntakeArtifactId): {
+function parseAiPayload(
+  content: string,
+  artifactId: IntakeArtifactId,
+): {
   demographics: IdArtifactDemographics;
   clinical: ClinicalArtifactData;
 } {
@@ -167,7 +170,8 @@ async function tryBackendOcrJob(params: {
     const demographics: IdArtifactDemographics = {};
     const clinical: ClinicalArtifactData = {};
     for (const field of job.extractedFields) {
-      const value = field.status === 'edited' && field.editedValue ? field.editedValue : field.value;
+      const value =
+        field.status === 'edited' && field.editedValue ? field.editedValue : field.value;
       if (artifact.parser === 'identity') {
         (demographics as Record<string, string>)[field.field] = value;
       } else {
@@ -189,7 +193,8 @@ async function tryBackendOcrJob(params: {
       parameters: {
         documentType: job.documentType,
         fieldCount: job.extractedFields.length,
-        confidenceBand: job.overallConfidence >= 0.7 ? 'high' : job.overallConfidence >= 0.4 ? 'medium' : 'low',
+        confidenceBand:
+          job.overallConfidence >= 0.7 ? 'high' : job.overallConfidence >= 0.4 ? 'medium' : 'low',
         warningCount: job.warnings.length,
       },
     });

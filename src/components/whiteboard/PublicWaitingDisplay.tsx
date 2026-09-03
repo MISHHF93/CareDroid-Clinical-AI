@@ -33,12 +33,17 @@ function buildPublicWaitingFallbackSnapshot(updatedAt = null) {
     },
     careStages: [],
     processEducation: null,
-    statusMessaging: { statusLines: [], advisories: [], escalationMessage: PUBLIC_WAITING_ESCALATION_MESSAGE },
+    statusMessaging: {
+      statusLines: [],
+      advisories: [],
+      escalationMessage: PUBLIC_WAITING_ESCALATION_MESSAGE,
+    },
     guidanceMessages: [],
     escalationMessage: PUBLIC_WAITING_ESCALATION_MESSAGE,
     waitDisclaimer: PUBLIC_WAIT_URGENCY_DISCLAIMER,
     emsCrowdingImpact: { active: false },
-    summaryLine: 'Waiting room information is temporarily unavailable — please ask staff if you need help.',
+    summaryLine:
+      'Waiting room information is temporarily unavailable — please ask staff if you need help.',
     updatedAt,
   };
 }
@@ -46,9 +51,9 @@ export default function PublicWaitingDisplay({
   snapshot,
   title = 'Emergency waiting room',
   refreshIntervalMs = 30000,
-  refreshStatus = (null as any),
+  refreshStatus = null as any,
   kioskMode = false,
-  liveClock = (null as any),
+  liveClock = null as any,
   showWaitRange = true,
   showCrowdLevel = true,
   showTriageWait = true,
@@ -144,9 +149,15 @@ export default function PublicWaitingDisplay({
               data-tone="info"
               aria-label={resolvedSnapshot.waitRange.label}
             >
-              <strong className="public-waiting-display__value">{resolvedSnapshot.waitRange.value}</strong>
-              <span className="public-waiting-display__label">{resolvedSnapshot.waitRange.label}</span>
-              <small className="public-waiting-display__detail">{resolvedSnapshot.waitRange.detail}</small>
+              <strong className="public-waiting-display__value">
+                {resolvedSnapshot.waitRange.value}
+              </strong>
+              <span className="public-waiting-display__label">
+                {resolvedSnapshot.waitRange.label}
+              </span>
+              <small className="public-waiting-display__detail">
+                {resolvedSnapshot.waitRange.detail}
+              </small>
               <small className="public-waiting-display__disclaimer-inline">
                 {resolvedSnapshot.waitRange.disclaimer}
               </small>
@@ -158,9 +169,13 @@ export default function PublicWaitingDisplay({
               data-tone={resolvedSnapshot.crowdLevel.tone}
               aria-label={`Current crowd level: ${resolvedSnapshot.crowdLevel.label}`}
             >
-              <strong className="public-waiting-display__value">{resolvedSnapshot.crowdLevel.label}</strong>
+              <strong className="public-waiting-display__value">
+                {resolvedSnapshot.crowdLevel.label}
+              </strong>
               <span className="public-waiting-display__label">Current crowd level</span>
-              <small className="public-waiting-display__detail">{resolvedSnapshot.crowdLevel.detail}</small>
+              <small className="public-waiting-display__detail">
+                {resolvedSnapshot.crowdLevel.detail}
+              </small>
             </article>
           ) : null}
           {showTriageWait ? (
@@ -169,9 +184,15 @@ export default function PublicWaitingDisplay({
               data-tone={resolvedSnapshot.triageWait.available ? 'watch' : 'stable'}
               aria-label={resolvedSnapshot.triageWait.label}
             >
-              <strong className="public-waiting-display__value">{resolvedSnapshot.triageWait.value}</strong>
-              <span className="public-waiting-display__label">{resolvedSnapshot.triageWait.label}</span>
-              <small className="public-waiting-display__detail">{resolvedSnapshot.triageWait.detail}</small>
+              <strong className="public-waiting-display__value">
+                {resolvedSnapshot.triageWait.value}
+              </strong>
+              <span className="public-waiting-display__label">
+                {resolvedSnapshot.triageWait.label}
+              </span>
+              <small className="public-waiting-display__detail">
+                {resolvedSnapshot.triageWait.detail}
+              </small>
               {resolvedSnapshot.triageWait.available ? (
                 <small className="public-waiting-display__disclaimer-inline">
                   {resolvedSnapshot.triageWait.disclaimer}
@@ -188,9 +209,13 @@ export default function PublicWaitingDisplay({
           data-tone={resolvedSnapshot.emsCrowdingImpact.tone}
           aria-label={resolvedSnapshot.emsCrowdingImpact.label}
         >
-          <strong className="public-waiting-display__value">{resolvedSnapshot.emsCrowdingImpact.label}</strong>
+          <strong className="public-waiting-display__value">
+            {resolvedSnapshot.emsCrowdingImpact.label}
+          </strong>
           <span className="public-waiting-display__label">Ambulance crowding impact</span>
-          <small className="public-waiting-display__detail">{resolvedSnapshot.emsCrowdingImpact.detail}</small>
+          <small className="public-waiting-display__detail">
+            {resolvedSnapshot.emsCrowdingImpact.detail}
+          </small>
         </article>
       ) : null}
 
@@ -202,7 +227,10 @@ export default function PublicWaitingDisplay({
       ) : null}
 
       {showCareProcessStages && resolvedSnapshot.statusMessaging?.statusLines?.length ? (
-        <section className="public-waiting-display__stages" aria-label="Waiting room status messages">
+        <section
+          className="public-waiting-display__stages"
+          aria-label="Waiting room status messages"
+        >
           <h3>Right now in the waiting room</h3>
           <p className="public-waiting-display__stages-note">
             General status messages only — counts, no names or clinical details
@@ -238,7 +266,10 @@ export default function PublicWaitingDisplay({
       ) : null}
 
       {showSymptomEscalation && resolvedSnapshot.statusMessaging?.advisories?.length ? (
-        <section className="public-waiting-display__advisories" aria-label="Waiting room advisories">
+        <section
+          className="public-waiting-display__advisories"
+          aria-label="Waiting room advisories"
+        >
           {resolvedSnapshot.statusMessaging.advisories.map((line) => (
             <aside
               key={line.id}

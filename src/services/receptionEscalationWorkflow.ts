@@ -231,7 +231,11 @@ export function buildReceptionEscalationWorkflowLog(
   };
 }
 
-function applyClinicalEscalationFlags(patient: Patient, reasonId: ReceptionEscalationReasonId, timestamp: string): Patient {
+function applyClinicalEscalationFlags(
+  patient: Patient,
+  reasonId: ReceptionEscalationReasonId,
+  timestamp: string,
+): Patient {
   if (!CLINICAL_REASONS.has(reasonId)) return patient;
 
   const flagsToAdd =
@@ -240,7 +244,9 @@ function applyClinicalEscalationFlags(patient: Patient, reasonId: ReceptionEscal
       : [PatientFlag.HighRisk, PatientFlag.ReassessmentDue];
 
   const existing = new Set(
-    (patient.flags || []).map((flag) => (typeof flag === 'string' ? flag : (flag as unknown as { type: string }).type)),
+    (patient.flags || []).map((flag) =>
+      typeof flag === 'string' ? flag : (flag as unknown as { type: string }).type,
+    ),
   );
 
   return {
@@ -342,7 +348,9 @@ export function isReceptionEscalationAlert(alert: Alert | null | undefined): boo
 export function listActiveReceptionEscalations(alerts: Alert[] = []): Alert[] {
   return alerts
     .filter((alert) => isReceptionEscalationAlert(alert) && !alert.dismissed && !alert.acknowledged)
-    .sort((left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime());
+    .sort(
+      (left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime(),
+    );
 }
 
 export function summarizeReceptionEscalationBoard(alerts: Alert[] = []): {
@@ -440,8 +448,10 @@ export function filterReceptionEscalationsForRole(
   roleId: string | null | undefined,
 ): Alert[] {
   const role = String(roleId || '');
-  if (role === EMERGENCY_ROLE_IDS.triageNurse) return filterReceptionEscalationsForTarget(alerts, 'triage');
-  if (role === EMERGENCY_ROLE_IDS.chargeNurse) return filterReceptionEscalationsForTarget(alerts, 'charge');
+  if (role === EMERGENCY_ROLE_IDS.triageNurse)
+    return filterReceptionEscalationsForTarget(alerts, 'triage');
+  if (role === EMERGENCY_ROLE_IDS.chargeNurse)
+    return filterReceptionEscalationsForTarget(alerts, 'charge');
   if (isClinicalEscalationRecipientRole(role)) return listActiveReceptionEscalations(alerts);
   return [];
 }
@@ -474,7 +484,8 @@ export function buildReceptionEscalationAttentionSnapshot(
   const limit = context.limit ?? 6;
 
   const rows = filtered.map((alert) => {
-    const reasonId = (alert.metadata?.receptionEscalationReason as ReceptionEscalationReasonId) || null;
+    const reasonId =
+      (alert.metadata?.receptionEscalationReason as ReceptionEscalationReasonId) || null;
     const reason = resolveReceptionEscalationReason(reasonId);
     return {
       alertId: alert.id,

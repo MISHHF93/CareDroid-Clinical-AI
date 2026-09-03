@@ -85,25 +85,41 @@ function mergeSystemConfig(data: any = {}) {
 class ConfigService {
   async getSystemConfig() {
     const result = await fetchConfigEndpoint(API_ROUTES.config.system, SYSTEM_CONFIG_DEFAULTS);
-    return { ...mergeSystemConfig(result.data), _meta: { ok: result.ok, error: result.error, fromDefaults: result.fromDefaults } };
+    return {
+      ...mergeSystemConfig(result.data),
+      _meta: { ok: result.ok, error: result.error, fromDefaults: result.fromDefaults },
+    };
   }
 
   async getAIRemainingQueries() {
     const result = await fetchConfigEndpoint(API_ROUTES.ai.remainingQueries, AI_USAGE_DEFAULTS);
-    return { ...result.data, _meta: { ok: result.ok, error: result.error, fromDefaults: result.fromDefaults } };
+    return {
+      ...result.data,
+      _meta: { ok: result.ok, error: result.error, fromDefaults: result.fromDefaults },
+    };
   }
 
   async getAvailableTools() {
     const result = await fetchConfigEndpoint(API_ROUTES.tools.available, TOOLS_DEFAULTS);
-    return { ...result.data, _meta: { ok: result.ok, error: result.error, fromDefaults: result.fromDefaults } };
+    return {
+      ...result.data,
+      _meta: { ok: result.ok, error: result.error, fromDefaults: result.fromDefaults },
+    };
   }
 
   async getCurrentSubscription() {
     const result = await fetchConfigEndpoint(API_ROUTES.subscriptions.current, null);
     if (!result.ok) {
-      return { tier: 'free', status: 'active', _meta: { ok: false, error: result.error, fromDefaults: true } };
+      return {
+        tier: 'free',
+        status: 'active',
+        _meta: { ok: false, error: result.error, fromDefaults: true },
+      };
     }
-    return { ...(result.data || { tier: 'free', status: 'active' }), _meta: { ok: true, fromDefaults: false } };
+    return {
+      ...(result.data || { tier: 'free', status: 'active' }),
+      _meta: { ok: true, fromDefaults: false },
+    };
   }
 
   async getSubscriptionPlans() {

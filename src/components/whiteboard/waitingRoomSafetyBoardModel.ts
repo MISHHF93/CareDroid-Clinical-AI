@@ -24,7 +24,10 @@ import {
   type PatientExperienceContext,
 } from '../../services/patientExperienceStatus';
 import { resolveQueueReason, type QueueReasonId } from '../../services/queueReasonVisibility';
-import { resolveWhatHappensNext, type WhatHappensNextTone } from '../../services/whatHappensNextGuidance';
+import {
+  resolveWhatHappensNext,
+  type WhatHappensNextTone,
+} from '../../services/whatHappensNextGuidance';
 import { deriveProviderWaitingStatus } from '../../services/providerWaitingStatus';
 import {
   resolveLwbsRisk,
@@ -200,7 +203,9 @@ function patientDisplayName(patient: Patient): string {
 
 function patientFlags(patient: Patient): PatientFlag[] {
   return (patient.flags || []).map((flag) =>
-    typeof flag === 'string' ? (flag as PatientFlag) : (flag as unknown as { type: PatientFlag }).type,
+    typeof flag === 'string'
+      ? (flag as PatientFlag)
+      : (flag as unknown as { type: PatientFlag }).type,
   );
 }
 
@@ -318,9 +323,7 @@ export function buildWaitingRoomSafetyRow(
   });
   const lwbsRisk = resolveLwbsRisk(patient, {
     now,
-    waitingPatientCount: selectWaitingRoomSafetyPatients(
-      options.allPatients || [patient],
-    ).length,
+    waitingPatientCount: selectWaitingRoomSafetyPatients(options.allPatients || [patient]).length,
     workflowLogs: options.workflowLogs,
     staff: options.staff,
   });
@@ -477,8 +480,12 @@ export function buildWaitingRoomSafetyBoard(
       lwbsRiskElevated: rows.filter((row) => row.lwbsRiskLevel === 'elevated').length,
       lwbsRiskHigh: rows.filter((row) => row.lwbsRiskLevel === 'high').length,
       lwbsRiskMedium: rows.filter((row) => row.lwbsRiskLevel === 'medium').length,
-      deteriorationWatchUrgent: rows.filter((row) => row.deteriorationWatchLevel === 'urgent-review').length,
-      deteriorationWatchReview: rows.filter((row) => row.deteriorationWatchLevel === 'review-needed').length,
+      deteriorationWatchUrgent: rows.filter(
+        (row) => row.deteriorationWatchLevel === 'urgent-review',
+      ).length,
+      deteriorationWatchReview: rows.filter(
+        (row) => row.deteriorationWatchLevel === 'review-needed',
+      ).length,
       deteriorationWatchActive: rows.filter((row) => row.deteriorationWatchLevel).length,
       triageBreachRiskCount: triageBreachSummary.breachRiskCount,
       triageBreachedCount: triageBreachSummary.breachedCount,

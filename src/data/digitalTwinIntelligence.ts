@@ -2,7 +2,10 @@ import {
   calculateBedOccupancy,
   calculateResourceUtilizationIndex,
 } from '../utils/hospitalOperationsCalculators';
-import { resolveRiskBand, scorePredictiveMaintenance } from '../services/predictiveMaintenanceScoring';
+import {
+  resolveRiskBand,
+  scorePredictiveMaintenance,
+} from '../services/predictiveMaintenanceScoring';
 
 const SCORE_LABELS = Object.freeze({
   excellent: 'Excellent',
@@ -50,7 +53,9 @@ function activeAlerts(alerts) {
 }
 
 function isOfflineOrStale(item) {
-  return ['offline', 'stale'].includes(item?.freshness) || ['offline', 'stale'].includes(item?.status);
+  return (
+    ['offline', 'stale'].includes(item?.freshness) || ['offline', 'stale'].includes(item?.status)
+  );
 }
 
 function isMaintenanceDue(item) {
@@ -135,7 +140,10 @@ function normalizeTelemetry(hospitalMap = {} as any, medicalIot = {} as any, fle
   );
   return [
     ...hospitalTelemetry,
-    ...list(medicalIot.vitals).map((vital) => ({ ...vital, source: vital.source || 'medical-iot' })),
+    ...list(medicalIot.vitals).map((vital) => ({
+      ...vital,
+      source: vital.source || 'medical-iot',
+    })),
     ...list(medicalIot.trends).map((trend) => ({ ...trend, source: 'medical-iot-trend' })),
     ...list(medicalIot.connectivityTimeline).map((row) => ({ ...row, source: 'iot-connectivity' })),
     ...list(fleet.vehicles).map((vehicle) => ({
@@ -193,13 +201,21 @@ function buildFactors({ occupancy, devices, telemetry, alerts, fleetVehicles }) 
   const activeAlertCount = activeAlerts(alerts).length;
   const staleDevices = devices.filter(isOfflineOrStale);
   const lowEnergyDevices = devices.filter(isLowEnergy);
-  const maintenanceDue = devices.filter((device) => isMaintenanceDue(device) || isCalibrationOverdue(device));
-  const staleTelemetry = telemetry.filter((row) => ['offline', 'stale', 'abnormal', 'warning'].includes(row.status));
-  const delayedFleet = fleetVehicles.filter((vehicle) =>
-    ['delayed', 'maintenance'].includes(vehicle.status) || ['stale', 'offline'].includes(vehicle.freshness),
+  const maintenanceDue = devices.filter(
+    (device) => isMaintenanceDue(device) || isCalibrationOverdue(device),
+  );
+  const staleTelemetry = telemetry.filter((row) =>
+    ['offline', 'stale', 'abnormal', 'warning'].includes(row.status),
+  );
+  const delayedFleet = fleetVehicles.filter(
+    (vehicle) =>
+      ['delayed', 'maintenance'].includes(vehicle.status) ||
+      ['stale', 'offline'].includes(vehicle.freshness),
   );
   const highFleetRisk = fleetVehicles.filter(
-    (vehicle) => vehicle.maintenanceRisk?.riskBand === 'high' || vehicle.maintenanceRisk?.riskBand === 'critical',
+    (vehicle) =>
+      vehicle.maintenanceRisk?.riskBand === 'high' ||
+      vehicle.maintenanceRisk?.riskBand === 'critical',
   );
 
   return {
@@ -208,13 +224,21 @@ function buildFactors({ occupancy, devices, telemetry, alerts, fleetVehicles }) 
         ? factor(`Occupancy pressure at ${occupancy.occupancyPercent}%`, 16, 'warning')
         : factor('Occupancy in planning range', 4, 'stable'),
       staleDevices.length
-        ? factor(`${staleDevices.length} stale or offline devices`, staleDevices.length * 8, 'degraded')
+        ? factor(
+            `${staleDevices.length} stale or offline devices`,
+            staleDevices.length * 8,
+            'degraded',
+          )
         : factor('Device connectivity stable', 2, 'stable'),
       activeAlertCount
         ? factor(`${activeAlertCount} active operational alerts`, activeAlertCount * 6, 'warning')
         : factor('No active operational alerts', 2, 'stable'),
       delayedFleet.length
-        ? factor(`${delayedFleet.length} fleet assets delayed or unavailable`, delayedFleet.length * 7, 'warning')
+        ? factor(
+            `${delayedFleet.length} fleet assets delayed or unavailable`,
+            delayedFleet.length * 7,
+            'warning',
+          )
         : factor('Fleet availability stable', 2, 'stable'),
     ],
     risk: [
@@ -222,24 +246,44 @@ function buildFactors({ occupancy, devices, telemetry, alerts, fleetVehicles }) 
         ? factor('High occupancy may reduce surge capacity', 24, 'critical')
         : factor('Occupancy risk monitored', Math.max(4, occupancy.occupancyPercent / 8), 'watch'),
       staleTelemetry.length
-        ? factor(`${staleTelemetry.length} degraded telemetry signals`, staleTelemetry.length * 5, 'degraded')
+        ? factor(
+            `${staleTelemetry.length} degraded telemetry signals`,
+            staleTelemetry.length * 5,
+            'degraded',
+          )
         : factor('Telemetry degradation low', 3, 'stable'),
       maintenanceDue.length
-        ? factor(`${maintenanceDue.length} devices need maintenance or calibration review`, maintenanceDue.length * 7, 'degraded')
+        ? factor(
+            `${maintenanceDue.length} devices need maintenance or calibration review`,
+            maintenanceDue.length * 7,
+            'degraded',
+          )
         : factor('Device maintenance queue low', 3, 'stable'),
       highFleetRisk.length
-        ? factor(`${highFleetRisk.length} fleet assets with elevated maintenance risk`, highFleetRisk.length * 10, 'critical')
+        ? factor(
+            `${highFleetRisk.length} fleet assets with elevated maintenance risk`,
+            highFleetRisk.length * 10,
+            'critical',
+          )
         : factor('Fleet maintenance risk controlled', 4, 'stable'),
     ],
     readiness: [
       lowEnergyDevices.length
-        ? factor(`${lowEnergyDevices.length} low battery or low energy assets`, lowEnergyDevices.length * 8, 'warning')
+        ? factor(
+            `${lowEnergyDevices.length} low battery or low energy assets`,
+            lowEnergyDevices.length * 8,
+            'warning',
+          )
         : factor('Energy reserves acceptable', 2, 'stable'),
       occupancy.availableBeds <= 5
         ? factor(`${occupancy.availableBeds} beds available`, 18, 'critical')
         : factor(`${occupancy.availableBeds} beds available`, 4, 'stable'),
       activeAlertCount
-        ? factor('Open alerts require review before full readiness', activeAlertCount * 4, 'warning')
+        ? factor(
+            'Open alerts require review before full readiness',
+            activeAlertCount * 4,
+            'warning',
+          )
         : factor('Alert queue clear', 2, 'stable'),
       maintenanceDue.length
         ? factor('Maintenance backlog blocks readiness', maintenanceDue.length * 6, 'degraded')
@@ -321,7 +365,8 @@ function buildInsights({ rooms, devices, occupancy, alerts, fleetVehicles, facto
       id: 'stable-operations',
       severity: 'stable',
       title: 'Operations stable',
-      detail: 'No major predictive blockers detected across occupancy, telemetry, alerts, or maintenance.',
+      detail:
+        'No major predictive blockers detected across occupancy, telemetry, alerts, or maintenance.',
       route: '/digital-twin',
     });
   }
@@ -355,7 +400,9 @@ export function buildDigitalTwinIntelligence({
   const occupancy = buildOccupancy(hospitalMap, digitalTwin);
   const maintenanceItems = [
     ...devices
-      .filter((device) => isMaintenanceDue(device) || isCalibrationOverdue(device) || isLowEnergy(device))
+      .filter(
+        (device) => isMaintenanceDue(device) || isCalibrationOverdue(device) || isLowEnergy(device),
+      )
       .map((device) => ({
         id: device.id,
         label: device.label,
@@ -364,7 +411,11 @@ export function buildDigitalTwinIntelligence({
         route: '/devices',
       })),
     ...fleetVehicles
-      .filter((vehicle) => isMaintenanceDue(vehicle) || ['high', 'critical'].includes(vehicle.maintenanceRisk?.riskBand))
+      .filter(
+        (vehicle) =>
+          isMaintenanceDue(vehicle) ||
+          ['high', 'critical'].includes(vehicle.maintenanceRisk?.riskBand),
+      )
       .map((vehicle) => ({
         id: vehicle.id,
         label: vehicle.label,
@@ -374,9 +425,24 @@ export function buildDigitalTwinIntelligence({
       })),
   ];
   const assets = [
-    ...devices.map((device) => ({ id: device.id, label: device.label, type: 'device', route: '/devices' })),
-    ...fleetVehicles.map((vehicle) => ({ id: vehicle.id, label: vehicle.label, type: 'fleet', route: '/fleet/map' })),
-    ...list(digitalTwin.fleet).map((asset) => ({ id: asset.id, label: asset.label, type: 'digital-twin', route: '/digital-twin' })),
+    ...devices.map((device) => ({
+      id: device.id,
+      label: device.label,
+      type: 'device',
+      route: '/devices',
+    })),
+    ...fleetVehicles.map((vehicle) => ({
+      id: vehicle.id,
+      label: vehicle.label,
+      type: 'fleet',
+      route: '/fleet/map',
+    })),
+    ...list(digitalTwin.fleet).map((asset) => ({
+      id: asset.id,
+      label: asset.label,
+      type: 'digital-twin',
+      route: '/digital-twin',
+    })),
   ];
   const resourceIndex = calculateResourceUtilizationIndex({
     bedUtilizationPercent: occupancy.occupancyPercent,
@@ -386,9 +452,22 @@ export function buildDigitalTwinIntelligence({
     fleetUtilizationPercent: fleet.summary?.averageUtilizationPercent,
   });
   const factors = buildFactors({ occupancy, devices, telemetry, alerts, fleetVehicles });
-  const healthScore = buildScore('Health Score', scoreFromFactors(100, factors.health), factors.health);
-  const riskScore = buildScore('Risk Score', scoreFromFactors(0, factors.risk, 'add'), factors.risk, true);
-  const readinessScore = buildScore('Readiness Score', scoreFromFactors(100, factors.readiness), factors.readiness);
+  const healthScore = buildScore(
+    'Health Score',
+    scoreFromFactors(100, factors.health),
+    factors.health,
+  );
+  const riskScore = buildScore(
+    'Risk Score',
+    scoreFromFactors(0, factors.risk, 'add'),
+    factors.risk,
+    true,
+  );
+  const readinessScore = buildScore(
+    'Readiness Score',
+    scoreFromFactors(100, factors.readiness),
+    factors.readiness,
+  );
 
   return {
     generatedAt: new Date().toISOString(),
@@ -413,7 +492,8 @@ export function buildDigitalTwinIntelligence({
       devices: {
         label: 'Devices',
         count: devices.length,
-        riskCount: devices.filter((device) => isOfflineOrStale(device) || isLowEnergy(device)).length,
+        riskCount: devices.filter((device) => isOfflineOrStale(device) || isLowEnergy(device))
+          .length,
         items: devices,
       },
       assets: {
@@ -425,7 +505,9 @@ export function buildDigitalTwinIntelligence({
       telemetry: {
         label: 'Telemetry',
         count: telemetry.length,
-        riskCount: telemetry.filter((row) => ['offline', 'stale', 'abnormal', 'warning'].includes(row.status)).length,
+        riskCount: telemetry.filter((row) =>
+          ['offline', 'stale', 'abnormal', 'warning'].includes(row.status),
+        ).length,
         items: telemetry,
       },
       alerts: {

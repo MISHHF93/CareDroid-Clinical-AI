@@ -94,7 +94,7 @@ const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
 const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.tsx'), 'utf8');
 const lazySpecialtyCalculatorsSource = readFileSync(
   join(__dirname, '../pages/tools/lazySpecialtyCalculators.tsx'),
-  'utf8'
+  'utf8',
 );
 const patternsSource = readFileSync(TOOL_PATTERNS_PATH, 'utf8');
 
@@ -114,12 +114,7 @@ export const PR4A_COVERAGE_AREA_LABELS = Object.freeze([
 
 describe('PR4A comprehensive — coverage matrix', () => {
   it('targets the four required Tier-A registry ids', () => {
-    expect([...PR4A_TOOL_IDS]).toEqual([
-      'ascvd-risk',
-      'ckd-staging',
-      'stop-bang',
-      'audit-c',
-    ]);
+    expect([...PR4A_TOOL_IDS]).toEqual(['ascvd-risk', 'ckd-staging', 'stop-bang', 'audit-c']);
     expect([...PR4A_CALCULATOR_REGISTRY_IDS]).toEqual([...PR4A_TOOL_IDS]);
     expect([...PR4A_TIER_A_CALCULATOR_REGISTRY_IDS]).toEqual([...PR4A_TOOL_IDS]);
   });
@@ -137,7 +132,7 @@ describe('PR4A comprehensive — 1. ASCVD calculations', () => {
     ({ sex, race, pct }) => {
       const r = computeAscvdPceTenYearRisk({ ...ASCVD_TABLE_A_DEMO, sex, race });
       expect(r.tenYearRiskPct).toBeCloseTo(pct, 0);
-    }
+    },
   );
 
   it('maps risk category boundaries', () => {
@@ -176,7 +171,12 @@ describe('PR4A comprehensive — 1. ASCVD calculations', () => {
   });
 
   it('rejects age outside PCE range', () => {
-    const out = computeAscvdPceResult({ ...ASCVD_TABLE_A_DEMO, sex: 'male', race: 'white', ageYears: 25 });
+    const out = computeAscvdPceResult({
+      ...ASCVD_TABLE_A_DEMO,
+      sex: 'male',
+      race: 'white',
+      ageYears: 25,
+    });
     expect(out.ok).toBe(false);
     if (out.ok) throw new Error('expected computeAscvdPceResult to fail');
     expect(out.errors.join(' ')).toMatch(/40.*79/i);
@@ -188,7 +188,7 @@ describe('PR4A comprehensive — 2. CKD staging calculations', () => {
     'CKD-EPI 2021 eGFR for age $ageYears $sex Cr $creatinine',
     ({ ageYears, sex, creatinine, expectedEgfr }) => {
       expect(computeCkdEpi2021Egfr(ageYears, sex, creatinine)).toBe(expectedEgfr);
-    }
+    },
   );
 
   it('classifies GFR and albuminuria at KDIGO boundaries', () => {
@@ -243,7 +243,7 @@ describe('PR4A comprehensive — 3. STOP-Bang scoring', () => {
       const i = interpretStopBangScore(score);
       expect(i?.osaRiskCategory).toBe(osaRiskCategory);
       expect(i?.severity).toBe(severity);
-    }
+    },
   );
 
   it('computeStopBangResult includes screening-only disclaimer', () => {
@@ -316,7 +316,9 @@ describe('PR4A comprehensive — 6. discovery inclusion', () => {
     const hits = getAllDiscoveredTools().filter((r) => r.id === id);
     expect(hits).toHaveLength(1);
     expect(hits[0].path).toBe(PR4A_ROUTE_BY_REGISTRY_ID[id]);
-    const blob = [hits[0].source, ...(hits[0].sources || []), hits[0].notes].filter(Boolean).join(' ');
+    const blob = [hits[0].source, ...(hits[0].sources || []), hits[0].notes]
+      .filter(Boolean)
+      .join(' ');
     expect(blob).toMatch(/toolRegistry|clinicalIntentToolCatalog|tool\.patterns|NLU/i);
   });
 
@@ -397,15 +399,18 @@ describe('PR4A comprehensive — 9. NLU aliases', () => {
     expect(resolveRegistryId(alias)).toBe(canonical);
   });
 
-  it.each(PR4A_ALL_ALIAS_PAIRS)('resolveCatalogLaunch("%s") matches canonical %s', (alias, canonical) => {
-    const fromAlias = resolveCatalogLaunch(alias);
-    const fromCanonical = resolveCatalogLaunch(canonical);
-    expect(fromAlias.path).toBe(PR4A_ROUTE_BY_REGISTRY_ID[canonical]);
-    expect(fromAlias.registryId).toBe(canonical);
-    expect(fromAlias.path).toBe(fromCanonical.path);
-    expect(fromAlias.chatSeed).toBe(fromCanonical.chatSeed);
-    expect(fromAlias.openLabel).toBe('Open');
-  });
+  it.each(PR4A_ALL_ALIAS_PAIRS)(
+    'resolveCatalogLaunch("%s") matches canonical %s',
+    (alias, canonical) => {
+      const fromAlias = resolveCatalogLaunch(alias);
+      const fromCanonical = resolveCatalogLaunch(canonical);
+      expect(fromAlias.path).toBe(PR4A_ROUTE_BY_REGISTRY_ID[canonical]);
+      expect(fromAlias.registryId).toBe(canonical);
+      expect(fromAlias.path).toBe(fromCanonical.path);
+      expect(fromAlias.chatSeed).toBe(fromCanonical.chatSeed);
+      expect(fromAlias.openLabel).toBe('Open');
+    },
+  );
 
   it.each(PR4A_TOOL_IDS)('clinicalIntentTools row for %s uses dedicated path', (id) => {
     const nlu = clinicalIntentTools.find((t) => t.toolId === id);
@@ -465,7 +470,7 @@ describe('PR4A comprehensive — 10. edge cases', () => {
   it.each(PR4A_TOOL_IDS)('required phrases in NLU map or backend keywords for %s', (id) => {
     const keywords = extractToolPatternKeywords(patternsSource, id).map((k) => aliasToSlug(k));
     const requiredForTool = PR4A_REQUIRED_NLU_ALIAS_PAIRS.filter(([, c]) => c === id).map(
-      ([a]) => a
+      ([a]) => a,
     );
     for (const phrase of requiredForTool) {
       const slug = aliasToSlug(phrase);
@@ -502,7 +507,7 @@ describe('PR4A comprehensive — per-tool dedicated launch', () => {
     expect(launch.path).toBe('/tools/calculators/ckd-staging');
     expect(launch.chatSeed).toMatch(/KDIGO|eGFR|albuminuria/i);
     expect(nlu.description).toMatch(
-      /Does not establish chronicity or recommend dialysis or drug therapy/i
+      /Does not establish chronicity or recommend dialysis or drug therapy/i,
     );
   });
 

@@ -11,7 +11,13 @@ import {
 const K = TRACKMIND_PERMISSION_KEYS;
 const R = TRACKMIND_ROLE_ID;
 
-export type TrackMindApprovalCapability = 'request' | 'review' | 'approve' | 'reject' | 'escalate' | 'export';
+export type TrackMindApprovalCapability =
+  | 'request'
+  | 'review'
+  | 'approve'
+  | 'reject'
+  | 'escalate'
+  | 'export';
 
 export const TRACKMIND_APPROVAL_CAPABILITY_PERMISSION: Record<TrackMindApprovalCapability, string> =
   Object.freeze({
@@ -38,22 +44,30 @@ export const TRACKMIND_REGULATED_APPROVAL_DOMAINS = Object.freeze([
   'welfare_safe_stream_access',
 ]);
 
-export const TRACKMIND_APPROVAL_AUTHORITY_BY_DOMAIN: Record<
-  string,
-  readonly TrackMindRoleId[]
-> = Object.freeze({
-  steward_decision: [R.steward, R.raceDayOperationsManager, R.racetrackAdmin, R.organizationAdmin],
-  veterinary_clearance: [R.veterinarian, R.equineWelfareOfficer, R.racetrackAdmin],
-  welfare_restriction: [R.equineWelfareOfficer, R.veterinarian, R.steward, R.racetrackAdmin],
-  race_start_authorization: [R.starterRaceOfficial, R.raceDayOperationsManager, R.steward],
-  financial_payout: [R.financeManager, R.organizationAdmin, R.executiveLeadership],
-  security_escalation: [R.securityManager, R.raceDayOperationsManager, R.racetrackAdmin],
-  compliance_control_closure: [R.complianceOfficer, R.organizationAdmin, R.auditorRegulator],
-  camera_privacy_override: [R.securityManager, R.complianceOfficer, R.racetrackAdmin],
-  surveillance_recording_access: [R.securityManager, R.complianceOfficer, R.auditorRegulator],
-  iot_device_provisioning: [R.facilitiesManager, R.securityManager, R.platformSuperAdmin],
-  welfare_safe_stream_access: [R.equineWelfareOfficer, R.veterinarian, R.securityManager, R.racetrackAdmin],
-});
+export const TRACKMIND_APPROVAL_AUTHORITY_BY_DOMAIN: Record<string, readonly TrackMindRoleId[]> =
+  Object.freeze({
+    steward_decision: [
+      R.steward,
+      R.raceDayOperationsManager,
+      R.racetrackAdmin,
+      R.organizationAdmin,
+    ],
+    veterinary_clearance: [R.veterinarian, R.equineWelfareOfficer, R.racetrackAdmin],
+    welfare_restriction: [R.equineWelfareOfficer, R.veterinarian, R.steward, R.racetrackAdmin],
+    race_start_authorization: [R.starterRaceOfficial, R.raceDayOperationsManager, R.steward],
+    financial_payout: [R.financeManager, R.organizationAdmin, R.executiveLeadership],
+    security_escalation: [R.securityManager, R.raceDayOperationsManager, R.racetrackAdmin],
+    compliance_control_closure: [R.complianceOfficer, R.organizationAdmin, R.auditorRegulator],
+    camera_privacy_override: [R.securityManager, R.complianceOfficer, R.racetrackAdmin],
+    surveillance_recording_access: [R.securityManager, R.complianceOfficer, R.auditorRegulator],
+    iot_device_provisioning: [R.facilitiesManager, R.securityManager, R.platformSuperAdmin],
+    welfare_safe_stream_access: [
+      R.equineWelfareOfficer,
+      R.veterinarian,
+      R.securityManager,
+      R.racetrackAdmin,
+    ],
+  });
 
 export function canPerformTrackMindApprovalCapability(
   role: string,

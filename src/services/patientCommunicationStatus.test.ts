@@ -48,7 +48,9 @@ function buildPatient(overrides: Partial<Patient> = {}): Patient {
 
 describe('patientCommunicationStatus', () => {
   it('formats checkpoint timestamps with clock and relative age', () => {
-    expect(formatCommunicationStatusTimestamp('2026-06-20T11:30:00.000Z', NOW)).toContain('30m ago');
+    expect(formatCommunicationStatusTimestamp('2026-06-20T11:30:00.000Z', NOW)).toContain(
+      '30m ago',
+    );
   });
 
   it('tracks last update, reassessment, vitals, checkpoint, and overdue flag', () => {

@@ -37,7 +37,7 @@ function renderOverview(initialEntry = '/tools') {
   return render(
     <MemoryRouter initialEntries={[initialEntry]}>
       <ToolsOverview />
-    </MemoryRouter>
+    </MemoryRouter>,
   );
 }
 
@@ -69,13 +69,15 @@ describe('ToolsOverview unified inventory', () => {
     });
     const graph = buildProfileToolGraph({ tools: getUserFacingToolRegistryProjection(), profile });
     const renderedCards = [...container.querySelectorAll('.tool-card-large h3')].map(
-      (heading) => heading.textContent
+      (heading) => heading.textContent,
     );
     const renderedIds = [...container.querySelectorAll('.tool-card-large')].map((card) =>
-      card.getAttribute('data-tool-id')
+      card.getAttribute('data-tool-id'),
     );
 
-    expect(screen.getByRole('heading', { level: 1, name: /caredroid.*console/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 1, name: /caredroid.*console/i }),
+    ).toBeInTheDocument();
     expectFilterPressed(/^recommended$/i);
     expect(renderedCards.length).toBeGreaterThan(0);
     expect(renderedCards.length).toBeLessThanOrEqual(graph.recommendedTools.length);
@@ -83,7 +85,7 @@ describe('ToolsOverview unified inventory', () => {
 
     fireEvent.click(getFilterButton(/^all$/i));
     const allRenderedIds = [...container.querySelectorAll('.tool-card-large')].map((card) =>
-      card.getAttribute('data-tool-id')
+      card.getAttribute('data-tool-id'),
     );
     expect(allRenderedIds.length).toBeGreaterThanOrEqual(graph.visibleTools.length);
     expect(container.textContent).not.toMatch(/developer catalog \/ source audit/i);
@@ -99,7 +101,7 @@ describe('ToolsOverview unified inventory', () => {
     });
 
     const renderedCards = [...container.querySelectorAll('.tool-card-large h3')].map(
-      (heading) => heading.textContent
+      (heading) => heading.textContent,
     );
     expect(renderedCards).toContain('Live Tracking Map');
     expect(renderedCards).toContain('Fleet Live Map');
@@ -109,7 +111,7 @@ describe('ToolsOverview unified inventory', () => {
       target: { value: 'medical iot' },
     });
     const iotCards = [...container.querySelectorAll('.tool-card-large h3')].map(
-      (heading) => heading.textContent
+      (heading) => heading.textContent,
     );
     expect(iotCards).toContain('Medical IoT Dashboard');
   });
@@ -118,13 +120,13 @@ describe('ToolsOverview unified inventory', () => {
     const { container } = renderOverview();
     fireEvent.click(getFilterButton(/^all$/i));
     const chatAssistedCount = [...container.querySelectorAll('.tool-card-large')].filter((card) =>
-      /start guided chat/i.test(card.textContent || '')
+      /start guided chat/i.test(card.textContent || ''),
     ).length;
 
     expect(
       [...container.querySelectorAll('.btn-open-tool')].filter((button) =>
-        /start guided chat/i.test(button.textContent || '')
-      )
+        /start guided chat/i.test(button.textContent || ''),
+      ),
     ).toHaveLength(chatAssistedCount);
     expect(container.textContent).not.toMatch(/open in assistant/i);
   }, 10000);
@@ -138,7 +140,7 @@ describe('ToolsOverview unified inventory', () => {
     });
 
     const renderedIds = [...container.querySelectorAll('.tool-card-large')].map((card) =>
-      card.getAttribute('data-tool-id')
+      card.getAttribute('data-tool-id'),
     );
     expect(renderedIds.length).toBeGreaterThan(0);
     expect(renderedIds).toContain('qsofa');
@@ -151,13 +153,7 @@ describe('ToolsOverview unified inventory', () => {
       .querySelectorAll('button');
     const tabLabels = [...tabs].map((button) => button.textContent?.trim());
 
-    const expectedLabels = [
-      'Recommended',
-      'All',
-      'Calculators',
-      'Clinical Tools',
-      'AI Workflows',
-    ];
+    const expectedLabels = ['Recommended', 'All', 'Calculators', 'Clinical Tools', 'AI Workflows'];
 
     expect(tabLabels).toEqual(expectedLabels);
   }, 10000);
@@ -170,7 +166,9 @@ describe('ToolsOverview unified inventory', () => {
   }, 10000);
 
   it('shows a non-blank empty state for empty custom workspaces', () => {
-    (mockWorkspaceValue as any).workspaces = [{ id: 'empty', name: 'Empty Workspace', toolIds: ['unknown-tool'] }];
+    (mockWorkspaceValue as any).workspaces = [
+      { id: 'empty', name: 'Empty Workspace', toolIds: ['unknown-tool'] },
+    ];
     mockWorkspaceValue.activeWorkspaceId = 'empty';
 
     renderOverview();
@@ -187,8 +185,8 @@ describe('ToolsOverview unified inventory', () => {
     expect(screen.getByRole('searchbox', { name: /search all tools/i })).toHaveValue('meld');
     expect(
       [...container.querySelectorAll('.tool-card-large')].map((card) =>
-        card.getAttribute('data-tool-id')
-      )
+        card.getAttribute('data-tool-id'),
+      ),
     ).toContain('meld');
   });
 

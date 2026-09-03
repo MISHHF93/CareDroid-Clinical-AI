@@ -102,7 +102,10 @@ describe('recommendationEngine', () => {
 
     expect(result.groups.tools.map((item) => item.item.id)).toEqual(['qsofa']);
     expect(result.groups.packs[0]).toMatchObject({ title: 'Sepsis Pack', type: 'packs' });
-    expect(result.groups.products[0]).toMatchObject({ title: 'Emergency Suite', route: '/products/emergency-suite' });
+    expect(result.groups.products[0]).toMatchObject({
+      title: 'Emergency Suite',
+      route: '/products/emergency-suite',
+    });
     expect(result.groups.aiAgents[0]).toMatchObject({ title: 'Clinical Copilot' });
     expect(result.groups.simulations[0]).toMatchObject({ title: 'Sepsis Deterioration' });
     expect(result.groups.protocols[0]).toMatchObject({ title: 'Sepsis Management' });

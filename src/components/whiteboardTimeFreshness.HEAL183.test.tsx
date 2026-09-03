@@ -15,7 +15,9 @@ import { render } from '@testing-library/react';
  */
 
 vi.mock('../services/triageBreachTimer', () => ({
-  buildTriageBreachAttentionSnapshot: vi.fn(() => ({ summary: { breachedCount: 0, breachRiskCount: 0 } })),
+  buildTriageBreachAttentionSnapshot: vi.fn(() => ({
+    summary: { breachedCount: 0, breachRiskCount: 0 },
+  })),
 }));
 vi.mock('../services/triageBreachVisibilityModel', () => ({
   buildTriageBreachVisibilitySnapshot: vi.fn(() => ({})),
@@ -74,10 +76,10 @@ describe('Whiteboard strip components thread now into their builders (HEAL-183)'
   });
 
   it('ProviderWaitBreachStrip re-invokes its builder with an updated now on rerender', async () => {
-    const { buildProviderWaitBreachAttentionSnapshot } = await import(
-      '../services/providerWaitBreachTimer'
-    );
-    const ProviderWaitBreachStrip = (await import('./provider-wait/ProviderWaitBreachStrip')).default;
+    const { buildProviderWaitBreachAttentionSnapshot } =
+      await import('../services/providerWaitBreachTimer');
+    const ProviderWaitBreachStrip = (await import('./provider-wait/ProviderWaitBreachStrip'))
+      .default;
     const mock = vi.mocked(buildProviderWaitBreachAttentionSnapshot);
     mock.mockClear();
 
@@ -92,7 +94,8 @@ describe('Whiteboard strip components thread now into their builders (HEAL-183)'
   });
 
   it('WaitingRoomSafetyBoard re-invokes its builder with an updated now on rerender', async () => {
-    const { buildWaitingRoomSafetyBoard } = await import('./whiteboard/waitingRoomSafetyBoardModel');
+    const { buildWaitingRoomSafetyBoard } =
+      await import('./whiteboard/waitingRoomSafetyBoardModel');
     const WaitingRoomSafetyBoard = (await import('./whiteboard/WaitingRoomSafetyBoard')).default;
     const mock = vi.mocked(buildWaitingRoomSafetyBoard);
     mock.mockClear();
@@ -108,16 +111,17 @@ describe('Whiteboard strip components thread now into their builders (HEAL-183)'
   });
 
   it('WaitingRoomSafetyEscalationStrip re-invokes its builder with an updated now on rerender', async () => {
-    const { buildWaitingRoomSafetyEscalationSnapshot } = await import(
-      '../services/waitingRoomSafetyEscalationVisibilityModel'
-    );
+    const { buildWaitingRoomSafetyEscalationSnapshot } =
+      await import('../services/waitingRoomSafetyEscalationVisibilityModel');
     const WaitingRoomSafetyEscalationStrip = (
       await import('./waiting-room/WaitingRoomSafetyEscalationStrip')
     ).default;
     const mock = vi.mocked(buildWaitingRoomSafetyEscalationSnapshot);
     mock.mockClear();
 
-    const { rerender } = render(<WaitingRoomSafetyEscalationStrip patients={patients} now={1000} />);
+    const { rerender } = render(
+      <WaitingRoomSafetyEscalationStrip patients={patients} now={1000} />,
+    );
     const firstNow = mock.mock.calls.at(-1)?.[1]?.now;
 
     rerender(<WaitingRoomSafetyEscalationStrip patients={patients} now={2000} />);
@@ -128,7 +132,8 @@ describe('Whiteboard strip components thread now into their builders (HEAL-183)'
   });
 
   it('EmsOffloadAggregateStrip re-invokes its builder with an updated now on rerender', async () => {
-    const { buildEmsOffloadVisibilitySnapshot } = await import('../services/emsOffloadVisibilityModel');
+    const { buildEmsOffloadVisibilitySnapshot } =
+      await import('../services/emsOffloadVisibilityModel');
     const EmsOffloadAggregateStrip = (await import('./ems/EmsOffloadAggregateStrip')).default;
     const mock = vi.mocked(buildEmsOffloadVisibilitySnapshot);
     mock.mockClear();

@@ -23,7 +23,7 @@ export default function ProfileWorkspaces() {
   } = useUserIdentity();
   const { switchWorkspace: switchWorkspaceContext, error: workspaceContextError } = useWorkspace();
   const visibleWorkspaces = workspaces.filter(
-    (workspace) => !isFutureWorkspace(workspace.workspaceKey || workspace.type || workspace.id)
+    (workspace) => !isFutureWorkspace(workspace.workspaceKey || workspace.type || workspace.id),
   );
 
   // Two independent backend resources track "active workspace" — the tenant
@@ -35,7 +35,9 @@ export default function ProfileWorkspaces() {
   };
 
   const handleSetDefault = async (workspace) => {
-    await updateProfile?.({ defaultWorkspace: workspace.type || workspace.workspaceKey || workspace.id });
+    await updateProfile?.({
+      defaultWorkspace: workspace.type || workspace.workspaceKey || workspace.id,
+    });
   };
 
   return (
@@ -50,7 +52,11 @@ export default function ProfileWorkspaces() {
           <h2 className="u-mt-0">Change Workspace</h2>
           <div className="profile-identity-row">
             <div>
-              <strong>{activeWorkspace?.branding?.displayName || activeWorkspace?.name || 'No active workspace'}</strong>
+              <strong>
+                {activeWorkspace?.branding?.displayName ||
+                  activeWorkspace?.name ||
+                  'No active workspace'}
+              </strong>
               <span>{activeWorkspace?.type || 'personal'} workspace</span>
               <span>Default: {saasProfile?.defaultWorkspace || 'not set'}</span>
             </div>
@@ -68,7 +74,9 @@ export default function ProfileWorkspaces() {
             </select>
           </div>
           {error ? <p className="profile-identity-muted">{error}</p> : null}
-          {workspaceContextError ? <p className="profile-identity-muted">{workspaceContextError}</p> : null}
+          {workspaceContextError ? (
+            <p className="profile-identity-muted">{workspaceContextError}</p>
+          ) : null}
         </Card>
 
         <div className="profile-identity-grid">
@@ -76,14 +84,20 @@ export default function ProfileWorkspaces() {
             <section key={workspace.id} className="profile-identity-card">
               <h3>{workspace.branding?.displayName || workspace.name}</h3>
               <p>{workspace.type} workspace</p>
-              {workspace.workspaceProfile?.description ? <p>{workspace.workspaceProfile.description}</p> : null}
+              {workspace.workspaceProfile?.description ? (
+                <p>{workspace.workspaceProfile.description}</p>
+              ) : null}
               <p>
                 {(workspace.settings?.enabledToolIds || []).length} tools ·{' '}
                 {(workspace.settings?.enabledModules || []).join(', ') || 'dashboard'}
               </p>
               <p>
                 Widgets:{' '}
-                {(workspace.workspaceProfile?.defaultDashboardWidgets || workspace.defaultDashboardWidgets || [])
+                {(
+                  workspace.workspaceProfile?.defaultDashboardWidgets ||
+                  workspace.defaultDashboardWidgets ||
+                  []
+                )
                   .slice(0, 4)
                   .join(', ') || 'recommended assets'}
               </p>
@@ -91,9 +105,13 @@ export default function ProfileWorkspaces() {
                 type="button"
                 className="profile-identity-button"
                 onClick={() => handleSetDefault(workspace)}
-                disabled={saasProfile?.defaultWorkspace === (workspace.type || workspace.workspaceKey || workspace.id)}
+                disabled={
+                  saasProfile?.defaultWorkspace ===
+                  (workspace.type || workspace.workspaceKey || workspace.id)
+                }
               >
-                {saasProfile?.defaultWorkspace === (workspace.type || workspace.workspaceKey || workspace.id)
+                {saasProfile?.defaultWorkspace ===
+                (workspace.type || workspace.workspaceKey || workspace.id)
                   ? 'Default'
                   : 'Set default'}
               </button>
@@ -104,7 +122,8 @@ export default function ProfileWorkspaces() {
         <Card>
           <h2 className="u-mt-0">Effective Permissions</h2>
           <p className="profile-identity-muted">
-            These permissions combine account role, active workspace membership, and explicit workspace grants.
+            These permissions combine account role, active workspace membership, and explicit
+            workspace grants.
           </p>
           <div className="profile-identity-list">
             {(workspaceState?.effectivePermissions || []).slice(0, 24).map((permission) => (

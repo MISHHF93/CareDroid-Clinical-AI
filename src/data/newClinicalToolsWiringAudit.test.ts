@@ -56,16 +56,16 @@ const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
 const patternsSource = readFileSync(
   join(
     __dirname,
-    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts'
+    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts',
   ),
-  'utf8'
+  'utf8',
 );
 const orchestratorSource = readFileSync(
   join(
     __dirname,
-    '../../backend/src/modules/medical-control-plane/tool-orchestrator/tool-orchestrator.registry.ts'
+    '../../backend/src/modules/medical-control-plane/tool-orchestrator/tool-orchestrator.registry.ts',
   ),
-  'utf8'
+  'utf8',
 );
 const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.tsx'), 'utf8');
 
@@ -102,9 +102,12 @@ describe('New clinical tools — registry IDs and routes', () => {
     expect(calculatorsSource).toMatch(new RegExp(`case\\s+'${id.replace(/-/g, '\\-')}'\\s*:`));
   });
 
-  it.each(NEW_CLINICAL_TOOLS_TIER_B_IDS)('%s has no dedicated /tools/calculators/<id> App route', (id) => {
-    expect(appSource).not.toContain(`path: '/tools/calculators/${id}'`);
-  });
+  it.each(NEW_CLINICAL_TOOLS_TIER_B_IDS)(
+    '%s has no dedicated /tools/calculators/<id> App route',
+    (id) => {
+      expect(appSource).not.toContain(`path: '/tools/calculators/${id}'`);
+    },
+  );
 
   it('registers all Tier-A tools in App.jsx via CALCULATOR_ROUTE_DEFS', () => {
     assertAppCalculatorRouteWiring(appSource, [...NEW_CLINICAL_TOOLS_TIER_A_IDS]);
@@ -166,7 +169,7 @@ describe('New clinical tools — aliases and discovery', () => {
       const launch = resolveCatalogLaunch(alias);
       expect(launch.registryId).toBe(canonical);
       expect(launch.path).toBe(NEW_CLINICAL_TOOLS_SPECS[canonical].routePath);
-    }
+    },
   );
 
   it.each(NEW_CLINICAL_TOOLS_DISCOVERY_ALIAS_PAIRS)(
@@ -175,9 +178,9 @@ describe('New clinical tools — aliases and discovery', () => {
       const row = toolIdAliases.find((a) => a.id === aliasId);
       expect(row?.mapsTo, `missing discovery alias ${aliasId}`).toBe(canonical);
       expect(getAllDiscoveredTools().some((r) => r.id === aliasId || r.mapsTo === canonical)).toBe(
-        true
+        true,
       );
-    }
+    },
   );
 
   it.each(NEW_CLINICAL_TOOLS_ALL_IDS)('canonical id %s appears in merged discovery', (id) => {
@@ -205,7 +208,10 @@ describe('New clinical tools — catalog and launch', () => {
     const rows = getMedicalToolsCatalogRows();
     for (const [canonical, query] of spec.catalogSearchQueries) {
       const hits = catalogRowsMatchingQuery(rows, query);
-      expect(hits.some((r) => r.primaryId === canonical), `search "${query}"`).toBe(true);
+      expect(
+        hits.some((r) => r.primaryId === canonical),
+        `search "${query}"`,
+      ).toBe(true);
     }
   });
 
@@ -260,9 +266,9 @@ describe('New clinical tools — mobile rendering matrix', () => {
     '%s has responsive QA page path matching dedicated route',
     (id) => {
       expect(TIER_A_CALCULATOR_PATH_BY_REGISTRY_ID[id]).toBe(
-        NEW_CLINICAL_TOOLS_SPECS[id].routePath
+        NEW_CLINICAL_TOOLS_SPECS[id].routePath,
       );
-    }
+    },
   );
 
   it('includes every new Tier-A tool in buildResponsiveQaPages', () => {

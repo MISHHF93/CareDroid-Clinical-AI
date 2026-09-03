@@ -26,7 +26,9 @@ describe('profilePackTaxonomy', () => {
 
   it('allows permissive mode for tools without packId', () => {
     expect(
-      toolMatchesProfilePackPolicy({ id: 'unknown-tool' }, 'emergency-physician', { strict: false }),
+      toolMatchesProfilePackPolicy({ id: 'unknown-tool' }, 'emergency-physician', {
+        strict: false,
+      }),
     ).toBe(true);
   });
 

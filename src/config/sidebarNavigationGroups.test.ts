@@ -16,6 +16,11 @@ describe('sidebarNavigationGroups', () => {
       { id: 'patients' },
       { id: 'copilot' },
     ]);
-    expect(grouped.map((entry) => entry.group)).toEqual(['Command', 'Patients', 'Intelligence', 'Analytics']);
+    expect(grouped.map((entry) => entry.group)).toEqual([
+      'Command',
+      'Patients',
+      'Intelligence',
+      'Analytics',
+    ]);
   });
 });

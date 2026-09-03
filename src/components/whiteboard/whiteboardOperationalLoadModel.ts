@@ -47,10 +47,7 @@ export function evaluateWhiteboardOperationalLoad(metrics: any = {}) {
   ].filter(Boolean).length;
 
   const overloadScore = round(
-    waitingPatients * 0.65 +
-      emsArrivals * 4 +
-      reassessmentsDue * 2.5 +
-      referralsPending * 2,
+    waitingPatients * 0.65 + emsArrivals * 4 + reassessmentsDue * 2.5 + referralsPending * 2,
     1,
   );
 
@@ -61,14 +58,14 @@ export function evaluateWhiteboardOperationalLoad(metrics: any = {}) {
         ? 'elevated'
         : 'normal';
 
-  const prioritizeAwareness =
-    loadLevel !== 'normal' || attentionSignals >= 2;
+  const prioritizeAwareness = loadLevel !== 'normal' || attentionSignals >= 2;
 
   const issues = [] as any[];
   if (waitingPatients >= WHITEBOARD_LOAD_THRESHOLDS.waitingElevated) {
     issues.push({
       id: 'waiting-wall',
-      severity: waitingPatients >= WHITEBOARD_LOAD_THRESHOLDS.waitingCritical ? 'critical' : 'warning',
+      severity:
+        waitingPatients >= WHITEBOARD_LOAD_THRESHOLDS.waitingCritical ? 'critical' : 'warning',
       summary: `${waitingPatients} patients waiting — full board grid reduces signal.`,
     });
   }
@@ -76,10 +73,14 @@ export function evaluateWhiteboardOperationalLoad(metrics: any = {}) {
     issues.push({
       id: 'duplicate-chrome',
       severity: 'warning',
-      summary: 'EMS, reassessment, and referral signals repeat across hero, stats, strips, and mission control.',
+      summary:
+        'EMS, reassessment, and referral signals repeat across hero, stats, strips, and mission control.',
     });
   }
-  if (totalPatients > WHITEBOARD_CARD_PREVIEW_LIMIT && waitingPatients >= WHITEBOARD_LOAD_THRESHOLDS.waitingElevated) {
+  if (
+    totalPatients > WHITEBOARD_CARD_PREVIEW_LIMIT &&
+    waitingPatients >= WHITEBOARD_LOAD_THRESHOLDS.waitingElevated
+  ) {
     issues.push({
       id: 'card-flood',
       severity: 'critical',
@@ -103,7 +104,8 @@ export function evaluateWhiteboardOperationalLoad(metrics: any = {}) {
       prioritizeAwareness && waitingPatients >= WHITEBOARD_LOAD_THRESHOLDS.waitingElevated
         ? WHITEBOARD_CARD_PREVIEW_LIMIT
         : null,
-    suggestedFilter: waitingPatients >= WHITEBOARD_LOAD_THRESHOLDS.waitingElevated ? 'Waiting' : 'All',
+    suggestedFilter:
+      waitingPatients >= WHITEBOARD_LOAD_THRESHOLDS.waitingElevated ? 'Waiting' : 'All',
     attentionSignals,
     overloadScore,
     readabilityScore,

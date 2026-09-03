@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { PatientFlag, PatientState, Priority, type ActiveShift, type Patient } from '../../../types/emergency';
+import {
+  PatientFlag,
+  PatientState,
+  Priority,
+  type ActiveShift,
+  type Patient,
+} from '../../../types/emergency';
 import { buildShiftSummary } from './shiftSummaryData';
 
 const now = new Date('2026-06-13T10:00:00.000Z');
@@ -51,10 +57,26 @@ describe('buildShiftSummary', () => {
           state: PatientState.Discharge,
           priority: Priority.P2,
           flags: [PatientFlag.SepsisAlert],
-          notes: [{ id: 'n1', text: 'HEART score 5 and SEP-1 sepsis activated', timestamp: '2026-06-13T08:50:00.000Z' }],
+          notes: [
+            {
+              id: 'n1',
+              text: 'HEART score 5 and SEP-1 sepsis activated',
+              timestamp: '2026-06-13T08:50:00.000Z',
+            },
+          ],
           timeline: [
-            { id: 'p1-assessment', type: 'StateChange', timestamp: '2026-06-13T08:40:00.000Z', to: PatientState.Assessment },
-            { id: 'p1-discharge', type: 'DispositionUpdated', timestamp: '2026-06-13T09:30:00.000Z', to: PatientState.Discharge },
+            {
+              id: 'p1-assessment',
+              type: 'StateChange',
+              timestamp: '2026-06-13T08:40:00.000Z',
+              to: PatientState.Assessment,
+            },
+            {
+              id: 'p1-discharge',
+              type: 'DispositionUpdated',
+              timestamp: '2026-06-13T09:30:00.000Z',
+              to: PatientState.Discharge,
+            },
           ],
         }),
         patient({
@@ -62,9 +84,20 @@ describe('buildShiftSummary', () => {
           arrivalTime: '2026-06-13T08:30:00.000Z',
           state: PatientState.Admission,
           priority: Priority.P1,
-          notes: [{ id: 'n2', text: 'qSOFA positive, NIHSS documented, code stroke activated', timestamp: '2026-06-13T08:35:00.000Z' }],
+          notes: [
+            {
+              id: 'n2',
+              text: 'qSOFA positive, NIHSS documented, code stroke activated',
+              timestamp: '2026-06-13T08:35:00.000Z',
+            },
+          ],
           timeline: [
-            { id: 'p2-admission', type: 'StateChange', timestamp: '2026-06-13T09:00:00.000Z', to: PatientState.Admission },
+            {
+              id: 'p2-admission',
+              type: 'StateChange',
+              timestamp: '2026-06-13T09:00:00.000Z',
+              to: PatientState.Admission,
+            },
           ],
         }),
         patient({
@@ -72,19 +105,52 @@ describe('buildShiftSummary', () => {
           arrivalTime: '2026-06-13T08:45:00.000Z',
           state: PatientState.Discharge,
           flags: ['LWBSRisk' as PatientFlag],
-          notes: [{ id: 'n3', text: 'Patient left without being seen', timestamp: '2026-06-13T09:00:00.000Z' }],
+          notes: [
+            {
+              id: 'n3',
+              text: 'Patient left without being seen',
+              timestamp: '2026-06-13T09:00:00.000Z',
+            },
+          ],
           timeline: [
-            { id: 'p3-discharge', type: 'DispositionUpdated', timestamp: '2026-06-13T09:05:00.000Z', to: PatientState.Discharge },
+            {
+              id: 'p3-discharge',
+              type: 'DispositionUpdated',
+              timestamp: '2026-06-13T09:05:00.000Z',
+              to: PatientState.Discharge,
+            },
           ],
         }),
       ],
-      referrals: [{ id: 'r1', patientId: 'p2', status: 'Accepted', createdAt: '2026-06-13T08:50:00.000Z' }],
+      referrals: [
+        { id: 'r1', patientId: 'p2', status: 'Accepted', createdAt: '2026-06-13T08:50:00.000Z' },
+      ],
       alerts: [],
-      capacity: { score: 50, band: 'Orange', totalPatients: 2, occupiedRooms: 1, boardingCount: 1, reassessmentDue: 0, updatedAt: now.toISOString() },
+      capacity: {
+        score: 50,
+        band: 'Orange',
+        totalPatients: 2,
+        occupiedRooms: 1,
+        boardingCount: 1,
+        reassessmentDue: 0,
+        updatedAt: now.toISOString(),
+      },
       capacityHistory: [
         { id: 'c1', timestamp: '2026-06-13T08:00:00.000Z', band: 'Green', score: 88 },
-        { id: 'c2', timestamp: '2026-06-13T09:00:00.000Z', band: 'Orange', fromBand: 'Green', score: 55 },
-        { id: 'c3', timestamp: '2026-06-13T09:30:00.000Z', band: 'Red', fromBand: 'Orange', score: 35 },
+        {
+          id: 'c2',
+          timestamp: '2026-06-13T09:00:00.000Z',
+          band: 'Orange',
+          fromBand: 'Green',
+          score: 55,
+        },
+        {
+          id: 'c3',
+          timestamp: '2026-06-13T09:30:00.000Z',
+          band: 'Red',
+          fromBand: 'Orange',
+          score: 35,
+        },
       ],
       workflowLogs: [
         {
@@ -125,7 +191,13 @@ describe('buildShiftSummary', () => {
     });
 
     expect(summary.shift.staffOnDuty).toEqual(['Charge RN', 'Dr. Shift']);
-    expect(summary.volume).toMatchObject({ patientsSeen: 3, discharged: 2, admitted: 1, active: 1, lwbs: 1 });
+    expect(summary.volume).toMatchObject({
+      patientsSeen: 3,
+      discharged: 2,
+      admitted: 1,
+      active: 1,
+      lwbs: 1,
+    });
     expect(summary.timeMetrics).toMatchObject({
       avgDoorToTriageMinutes: 10,
       avgDoorToProviderMinutes: 30,
@@ -148,6 +220,10 @@ describe('buildShiftSummary', () => {
     expect(summary.clinical.protocols).toMatchObject({ sepsis: 1, stroke: 1 });
     expect(summary.clinical.referrals).toMatchObject({ sent: 1, accepted: 1, declined: 0 });
     expect(summary.clinical.reassessments).toMatchObject({ flagged: 1, completed: 1 });
-    expect(summary.ems).toMatchObject({ unitsReceived: 1, avgOffloadMinutes: 15, criticalArrivals: 1 });
+    expect(summary.ems).toMatchObject({
+      unitsReceived: 1,
+      avgOffloadMinutes: 15,
+      criticalArrivals: 1,
+    });
   });
 });

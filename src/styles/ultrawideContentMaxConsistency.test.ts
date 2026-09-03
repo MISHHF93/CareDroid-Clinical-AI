@@ -6,7 +6,10 @@ import { describe, expect, it } from 'vitest';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const layoutEngineCss = readFileSync(join(__dirname, 'layout-engine.css'), 'utf8');
-const visualResponsiveCss = readFileSync(join(__dirname, 'visual-responsive-standards.css'), 'utf8');
+const visualResponsiveCss = readFileSync(
+  join(__dirname, 'visual-responsive-standards.css'),
+  'utf8',
+);
 const visualConsistencyCss = readFileSync(join(__dirname, 'visual-consistency.css'), 'utf8');
 
 // HEAL-216: --app-layout-content-max (layout-engine.css) and
@@ -34,7 +37,10 @@ describe('ultrawide content-max consistency across the two independent max-width
         layoutEngineCss.indexOf(`@media (min-width: ${minWidth}px)`),
       );
       const layoutMatch = layoutBlock.match(/--app-layout-content-max:\s*min\(100%,\s*(\d+)px\)/);
-      expect(layoutMatch, `layout-engine.css has no rule at min-width: ${minWidth}px`).not.toBeNull();
+      expect(
+        layoutMatch,
+        `layout-engine.css has no rule at min-width: ${minWidth}px`,
+      ).not.toBeNull();
       expect(Number(layoutMatch![1])).toBe(expectedMax);
 
       const visualBlock = visualResponsiveCss.slice(
@@ -50,6 +56,8 @@ describe('ultrawide content-max consistency across the two independent max-width
   );
 
   it('visual-consistency.css no longer redeclares --app-visual-page-max (was always shadowed, dead code)', () => {
-    expect(visualConsistencyCss).not.toMatch(/--app-visual-page-max:\s*var\(--app-fluid-container-max-wide\)/);
+    expect(visualConsistencyCss).not.toMatch(
+      /--app-visual-page-max:\s*var\(--app-fluid-container-max-wide\)/,
+    );
   });
 });

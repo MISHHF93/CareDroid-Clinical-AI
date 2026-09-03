@@ -20,7 +20,11 @@ async function guardedJson(capability, path, options: any = {}) {
     });
     const data = await parseApiResponse(response, { fallback: {} });
     if (!response.ok) {
-      return { ok: false, data: null, message: data?.message || getApiErrorMessage(null, response) };
+      return {
+        ok: false,
+        data: null,
+        message: data?.message || getApiErrorMessage(null, response),
+      };
     }
     return { ok: true, data, message: data?.message || '' };
   } catch (error: any) {
@@ -39,11 +43,21 @@ async function requestSettingsJson(path, options: any = {}) {
     });
     const data = await parseApiResponse(response, { fallback: {} });
     if (!response.ok) {
-      return { ok: false, data: null, message: data?.message || getApiErrorMessage(null, response), status: response.status };
+      return {
+        ok: false,
+        data: null,
+        message: data?.message || getApiErrorMessage(null, response),
+        status: response.status,
+      };
     }
     return { ok: true, data, message: data?.message || '', status: response.status };
   } catch (error: any) {
-    return { ok: false, data: null, message: getApiErrorMessage(error), status: error?.status || 0 };
+    return {
+      ok: false,
+      data: null,
+      message: getApiErrorMessage(error),
+      status: error?.status || 0,
+    };
   }
 }
 
@@ -84,7 +98,11 @@ function organizationId() {
 
 export function fetchEmergencyOsSettings() {
   if (!isBackendCapabilityEnabled('emergencyDepartmentSettings')) {
-    return Promise.resolve({ ok: false, data: null, message: 'Backend endpoint not available yet.' });
+    return Promise.resolve({
+      ok: false,
+      data: null,
+      message: 'Backend endpoint not available yet.',
+    });
   }
   return fetchEmergencySettings()
     .then((data) => ({ ok: true, data, message: data?.message || '' }))
@@ -96,7 +114,11 @@ export function fetchEmergencyOsSettings() {
  */
 export function saveEmergencyOsSettings(payload) {
   if (!isBackendCapabilityEnabled('emergencyDepartmentSettings')) {
-    return Promise.resolve({ ok: false, data: null, message: 'Backend endpoint not available yet.' });
+    return Promise.resolve({
+      ok: false,
+      data: null,
+      message: 'Backend endpoint not available yet.',
+    });
   }
   return updateEmergencySettings(payload)
     .then((data) => ({ ok: true, data, message: data?.message || '' }))
@@ -111,47 +133,65 @@ export function saveEmergencyOsSettings(payload) {
 export function saveOrganizationEmergencyOsSettings(payload) {
   const orgId = organizationId();
   if (!orgId) return saveEmergencyOsSettings(payload);
-  return guardedJson('tenantAdministration', `/api/organizations/${encodeURIComponent(orgId)}/tenant-admin`, {
-    method: 'PATCH',
-    body: JSON.stringify({
-      settings: {
-        emergencyOs: {
-          ...payload,
-          updatedAt: new Date().toISOString(),
+  return guardedJson(
+    'tenantAdministration',
+    `/api/organizations/${encodeURIComponent(orgId)}/tenant-admin`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify({
+        settings: {
+          emergencyOs: {
+            ...payload,
+            updatedAt: new Date().toISOString(),
+          },
         },
-      },
-    }),
-  });
+      }),
+    },
+  );
 }
 
 export function fetchOrganizationEmergencyOsSettings() {
   const orgId = organizationId();
   if (!orgId) {
-    return Promise.resolve({ ok: false, data: null, message: 'No organization context available.' });
+    return Promise.resolve({
+      ok: false,
+      data: null,
+      message: 'No organization context available.',
+    });
   }
-  return guardedJson('tenantAdministration', `/api/organizations/${encodeURIComponent(orgId)}/tenant-admin`).then(
-    (result) => {
-      if (!result.ok) return result;
-      const emergencyOs = result.data?.emergencyOs || result.data?.settings?.emergencyOs || null;
-      return { ...result, data: emergencyOs };
-    },
-  );
+  return guardedJson(
+    'tenantAdministration',
+    `/api/organizations/${encodeURIComponent(orgId)}/tenant-admin`,
+  ).then((result) => {
+    if (!result.ok) return result;
+    const emergencyOs = result.data?.emergencyOs || result.data?.settings?.emergencyOs || null;
+    return { ...result, data: emergencyOs };
+  });
 }
 
 function saveTenantEmergencySettings(section, payload) {
   const orgId = organizationId();
-  if (!orgId) return Promise.resolve({ ok: false, data: null, message: 'No organization context available.' });
-  return guardedJson('tenantAdministration', `/api/organizations/${encodeURIComponent(orgId)}/tenant-admin`, {
-    method: 'PATCH',
-    body: JSON.stringify({
-      settings: {
-        emergencyOs: {
-          [section]: payload,
-          updatedAt: new Date().toISOString(),
+  if (!orgId)
+    return Promise.resolve({
+      ok: false,
+      data: null,
+      message: 'No organization context available.',
+    });
+  return guardedJson(
+    'tenantAdministration',
+    `/api/organizations/${encodeURIComponent(orgId)}/tenant-admin`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify({
+        settings: {
+          emergencyOs: {
+            [section]: payload,
+            updatedAt: new Date().toISOString(),
+          },
         },
-      },
-    }),
-  });
+      }),
+    },
+  );
 }
 
 export function saveDepartmentSettings(payload) {
@@ -175,18 +215,28 @@ export function fetchIntegrationStatuses() {
     guardedJson('integrationStatus', '/api/integrations/fhir/connections'),
     guardedJson('integrationStatus', '/api/integrations/hl7/interfaces'),
   ]).then(([fhir, hl7]) => ({
-    fhir: fhir.status === 'fulfilled' ? fhir.value : { ok: false, data: null, message: fhir.reason?.message },
-    hl7: hl7.status === 'fulfilled' ? hl7.value : { ok: false, data: null, message: hl7.reason?.message },
+    fhir:
+      fhir.status === 'fulfilled'
+        ? fhir.value
+        : { ok: false, data: null, message: fhir.reason?.message },
+    hl7:
+      hl7.status === 'fulfilled'
+        ? hl7.value
+        : { ok: false, data: null, message: hl7.reason?.message },
   }));
 }
 
 export function testIntegrationConnection(kind, id) {
   const normalizedKind = String(kind || '').toLowerCase();
   if (normalizedKind === 'hl7') {
-    return guardedJson('integrationTest', `/api/integrations/hl7/interfaces/${encodeURIComponent(id)}/test-message`, {
-      method: 'POST',
-      body: JSON.stringify({ testOnly: true }),
-    });
+    return guardedJson(
+      'integrationTest',
+      `/api/integrations/hl7/interfaces/${encodeURIComponent(id)}/test-message`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ testOnly: true }),
+      },
+    );
   }
   return guardedJson('integrationTest', `/api/integrations/fhir/${encodeURIComponent(id)}/test`, {
     method: 'POST',
@@ -207,17 +257,34 @@ export function updateProtocolAdmin(id, payload) {
 
 export function fetchOrganizationFeatureFlags() {
   const orgId = organizationId();
-  if (!orgId) return Promise.resolve({ ok: false, data: null, message: 'No organization context available.' });
-  return guardedJson('organizationFeatureFlags', `/api/organizations/${encodeURIComponent(orgId)}/feature-flags`);
+  if (!orgId)
+    return Promise.resolve({
+      ok: false,
+      data: null,
+      message: 'No organization context available.',
+    });
+  return guardedJson(
+    'organizationFeatureFlags',
+    `/api/organizations/${encodeURIComponent(orgId)}/feature-flags`,
+  );
 }
 
 export function updateOrganizationFeatureFlag(payload) {
   const orgId = organizationId();
-  if (!orgId) return Promise.resolve({ ok: false, data: null, message: 'No organization context available.' });
-  return guardedJson('organizationFeatureFlags', `/api/organizations/${encodeURIComponent(orgId)}/feature-flags`, {
-    method: 'PATCH',
-    body: JSON.stringify(payload),
-  });
+  if (!orgId)
+    return Promise.resolve({
+      ok: false,
+      data: null,
+      message: 'No organization context available.',
+    });
+  return guardedJson(
+    'organizationFeatureFlags',
+    `/api/organizations/${encodeURIComponent(orgId)}/feature-flags`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    },
+  );
 }
 
 export function fetchSettingsFeatureFlags() {
@@ -246,10 +313,8 @@ export function subscribeToSettingsFeatureChanges(onChange) {
 
   const channel = supabaseClient
     .channel('features')
-    .on(
-      'postgres_changes',
-      { event: '*', schema: 'public', table: 'feature_flags' },
-      (payload) => onChange(payload),
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'feature_flags' }, (payload) =>
+      onChange(payload),
     )
     .subscribe();
 

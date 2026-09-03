@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { EMERGENCY_ROLE_IDS } from './emergencyRolePermissions';
-import { ROLE_ACCENT_GROUP_META, ROLE_ACCENT_GROUPS, resolveRoleAccentKey } from './roleAccentTheme';
+import {
+  ROLE_ACCENT_GROUP_META,
+  ROLE_ACCENT_GROUPS,
+  resolveRoleAccentKey,
+} from './roleAccentTheme';
 
 describe('roleAccentTheme', () => {
   it('maps every EMERGENCY_ROLE_IDS value to a defined accent group', () => {

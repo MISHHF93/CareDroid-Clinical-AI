@@ -1,4 +1,10 @@
-import { PatientState, type Patient, type Referral, type Staff, type WorkflowActionLog } from '../types/emergency';
+import {
+  PatientState,
+  type Patient,
+  type Referral,
+  type Staff,
+  type WorkflowActionLog,
+} from '../types/emergency';
 import {
   buildReassessmentTimerSnapshot,
   formatTimerClockTime,
@@ -74,7 +80,10 @@ function patientDisplayName(patient: Patient): string {
   return name || patient.mrn || patient.id;
 }
 
-function maxTimestamp(left: string | null | undefined, right: string | null | undefined): string | null {
+function maxTimestamp(
+  left: string | null | undefined,
+  right: string | null | undefined,
+): string | null {
   if (!left) return right || null;
   if (!right) return left;
   return new Date(left).getTime() >= new Date(right).getTime() ? left : right;
@@ -216,9 +225,7 @@ export function buildPatientCommunicationStatus(
   const waitingMinutes = minutesSince(patient.triageTime || patient.arrivalTime, now) ?? 0;
   const contactMinutes = communication.minutesSinceContact;
   const communicationOverdue =
-    contactMinutes === null
-      ? waitingMinutes >= overdueMinutes
-      : contactMinutes >= overdueMinutes;
+    contactMinutes === null ? waitingMinutes >= overdueMinutes : contactMinutes >= overdueMinutes;
 
   const nextCheckpoint = resolveNextCheckpoint({
     patient,

@@ -38,7 +38,10 @@ function createId(prefix: string): string {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
-function completionMap(completions: ChecklistCompletion[], checklistId?: string): Map<string, ChecklistCompletion> {
+function completionMap(
+  completions: ChecklistCompletion[],
+  checklistId?: string,
+): Map<string, ChecklistCompletion> {
   return completions.reduce((map, completion) => {
     if (!checklistId || completion.checklistId === checklistId) {
       map.set(completion.itemId, completion);
@@ -56,11 +59,7 @@ function formatTime(value: string): string {
   }).format(date);
 }
 
-function ChecklistChooser({
-  onSelect,
-}: {
-  onSelect: (checklistId: string) => void;
-}) {
+function ChecklistChooser({ onSelect }: { onSelect: (checklistId: string) => void }) {
   return (
     <div className="checklist-chooser">
       {CHECKLISTS.map((option) => (
@@ -165,7 +164,8 @@ export default function CriticalChecklist({
   const [selectedChecklistId, setSelectedChecklistId] = useState(checklist?.id || '');
   const [optimisticCompletions, setOptimisticCompletions] = useState<ChecklistCompletion[]>([]);
   const activeChecklist = checklist || findChecklistById(selectedChecklistId);
-  const checkedBy = currentStaffName || currentStaffId || patient.assignedStaffId || 'current-staff';
+  const checkedBy =
+    currentStaffName || currentStaffId || patient.assignedStaffId || 'current-staff';
 
   useEffect(() => {
     setSelectedChecklistId(checklist?.id || '');
@@ -266,88 +266,86 @@ export default function CriticalChecklist({
         className="critical-checklist-panel"
         tabIndex={-1}
       >
-      <header className="critical-checklist-panel__header">
-        <div className="critical-checklist-panel__header-row">
-          <div>
-            <span className="critical-checklist-panel__eyebrow">
-              CRITICAL CHECKLIST
-            </span>
-            <h2 className="critical-checklist-panel__title">
-              {activeChecklist?.name || titleHint || 'Choose a checklist'}
-            </h2>
-            <p className="critical-checklist-panel__subtitle">
-              {patient.firstName} {patient.lastName} · {patient.chiefComplaint}
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close checklist"
-            className="u-icon-btn-32"
-          >
-            X
-          </button>
-        </div>
-
-        {activeChecklist ? (
-          <div className="critical-checklist-panel__progress-wrap">
-            <div
-              aria-label={`${completedCount}/${totalCount} items checked`}
-              className="critical-checklist-progress-track"
+        <header className="critical-checklist-panel__header">
+          <div className="critical-checklist-panel__header-row">
+            <div>
+              <span className="critical-checklist-panel__eyebrow">CRITICAL CHECKLIST</span>
+              <h2 className="critical-checklist-panel__title">
+                {activeChecklist?.name || titleHint || 'Choose a checklist'}
+              </h2>
+              <p className="critical-checklist-panel__subtitle">
+                {patient.firstName} {patient.lastName} · {patient.chiefComplaint}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Close checklist"
+              className="u-icon-btn-32"
             >
-              <span
-                style={{
-                  background: progress === 100 ? '#22C55E' : '#EF4444',
-                  display: 'block',
-                  height: '100%',
-                  width: `${progress}%`,
-                }}
-              />
-            </div>
-            <strong className="critical-checklist-panel__progress-label">
-              {completedCount}/{totalCount} items checked
-            </strong>
+              X
+            </button>
           </div>
-        ) : null}
-      </header>
 
-      <div className="u-pad-16">
-        {activeChecklist ? (
-          <>
-            {!checklist ? (
-              <div className="critical-checklist-panel__change-row">
-                <button
-                  type="button"
-                  onClick={() => setSelectedChecklistId('')}
-                  className="critical-checklist-panel__change-btn"
-                >
-                  Change Checklist
-                </button>
-              </div>
-            ) : null}
-            <div className="u-grid-gap-10">
-              {sortedItems.map((item) => (
-                <ChecklistRow
-                  key={item.id}
-                  item={item}
-                  completion={completionsByItem.get(item.id)}
-                  onCheck={checkItem}
-                  disabled={readOnly}
+          {activeChecklist ? (
+            <div className="critical-checklist-panel__progress-wrap">
+              <div
+                aria-label={`${completedCount}/${totalCount} items checked`}
+                className="critical-checklist-progress-track"
+              >
+                <span
+                  style={{
+                    background: progress === 100 ? '#22C55E' : '#EF4444',
+                    display: 'block',
+                    height: '100%',
+                    width: `${progress}%`,
+                  }}
                 />
-              ))}
+              </div>
+              <strong className="critical-checklist-panel__progress-label">
+                {completedCount}/{totalCount} items checked
+              </strong>
             </div>
-          </>
-        ) : (
-          <>
-            <p className="critical-checklist-panel__empty-state">
-              Select one of the configured preparation checklists. StrokeCode has no configured C10 checklist yet.
-            </p>
-            <ChecklistChooser onSelect={setSelectedChecklistId} />
-          </>
-        )}
-      </div>
+          ) : null}
+        </header>
+
+        <div className="u-pad-16">
+          {activeChecklist ? (
+            <>
+              {!checklist ? (
+                <div className="critical-checklist-panel__change-row">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedChecklistId('')}
+                    className="critical-checklist-panel__change-btn"
+                  >
+                    Change Checklist
+                  </button>
+                </div>
+              ) : null}
+              <div className="u-grid-gap-10">
+                {sortedItems.map((item) => (
+                  <ChecklistRow
+                    key={item.id}
+                    item={item}
+                    completion={completionsByItem.get(item.id)}
+                    onCheck={checkItem}
+                    disabled={readOnly}
+                  />
+                ))}
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="critical-checklist-panel__empty-state">
+                Select one of the configured preparation checklists. StrokeCode has no configured
+                C10 checklist yet.
+              </p>
+              <ChecklistChooser onSelect={setSelectedChecklistId} />
+            </>
+          )}
+        </div>
       </aside>
     </>
   );
 }
-

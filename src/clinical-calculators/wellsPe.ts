@@ -4,7 +4,11 @@ import {
   interpretWellsPe,
   WELLS_PE_CRITERIA_META,
 } from '../utils/wellsPeCalculator';
-import { asCalculatorSeverity, type AnyCalculatorResult, type CalculatorValidationResult } from './types';
+import {
+  asCalculatorSeverity,
+  type AnyCalculatorResult,
+  type CalculatorValidationResult,
+} from './types';
 
 export const WELLS_PE_META = {
   id: 'wells-pe' as const,

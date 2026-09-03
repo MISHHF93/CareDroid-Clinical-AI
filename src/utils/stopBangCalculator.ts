@@ -137,16 +137,18 @@ export function interpretStopBangScore(score) {
   };
 
   const discussion = {
-    low:
-      'A low STOP-Bang score lowers pre-test probability of moderate-to-severe OSA in many validation cohorts but does not exclude disease. Consider symptoms, examination, and institutional sleep pathways if clinical suspicion remains.',
+    low: 'A low STOP-Bang score lowers pre-test probability of moderate-to-severe OSA in many validation cohorts but does not exclude disease. Consider symptoms, examination, and institutional sleep pathways if clinical suspicion remains.',
     intermediate:
       'An intermediate score warrants discussion of sleep symptoms and whether formal sleep evaluation (e.g. home sleep apnea test or polysomnography) is appropriate per local pathways. This tool does not order testing or prescribe therapy.',
-    high:
-      'A high score is associated with substantially increased probability of moderate-to-severe OSA in validation studies. Discuss referral for sleep assessment with the treating clinician; avoid using this score alone to initiate CPAP or surgery without diagnostic evaluation.',
+    high: 'A high score is associated with substantially increased probability of moderate-to-severe OSA in validation studies. Discuss referral for sleep assessment with the treating clinician; avoid using this score alone to initiate CPAP or surgery without diagnostic evaluation.',
   };
 
   const severity =
-    osaRiskCategory === 'high' ? 'critical' : osaRiskCategory === 'intermediate' ? 'warning' : 'normal';
+    osaRiskCategory === 'high'
+      ? 'critical'
+      : osaRiskCategory === 'intermediate'
+        ? 'warning'
+        : 'normal';
 
   return {
     severity,

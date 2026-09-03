@@ -59,7 +59,9 @@ export default function JourneyPredictionBadge({
       <span className="journey-prediction-badge__admission">
         Admission {prediction.admissionProbability}%
       </span>
-      <span className={`journey-prediction-badge__los journey-prediction-badge__los--${toneForRisk(prediction.prolongedStayRisk)}`}>
+      <span
+        className={`journey-prediction-badge__los journey-prediction-badge__los--${toneForRisk(prediction.prolongedStayRisk)}`}
+      >
         LOS risk {prediction.prolongedStayRisk}
       </span>
       {!compact && prediction.chestXrayUtilizationProbability >= 50 ? (

@@ -7,10 +7,7 @@ import { AUTH_CONFIG } from './auth.config';
 import { EMERGENCY_PERMISSION_KEYS } from './emergencyPermissionRegistry';
 import { CAREDROID_PERMISSIONS } from '../lib/users/permissions';
 
-export type SecurityPermissionVocabulary =
-  | 'emergency-dot'
-  | 'caredroid-colon'
-  | 'backend-rbac';
+export type SecurityPermissionVocabulary = 'emergency-dot' | 'caredroid-colon' | 'backend-rbac';
 
 export type SecuritySessionMode = 'open-access' | 'dev-demo' | 'authenticated';
 
@@ -44,7 +41,8 @@ export const BACKEND_PERMISSION_KEYS = Object.freeze({
   OVERRIDE_SAFETY_CHECKS: 'OVERRIDE_SAFETY_CHECKS',
 } as const);
 
-export type BackendPermissionKey = (typeof BACKEND_PERMISSION_KEYS)[keyof typeof BACKEND_PERMISSION_KEYS];
+export type BackendPermissionKey =
+  (typeof BACKEND_PERMISSION_KEYS)[keyof typeof BACKEND_PERMISSION_KEYS];
 
 export const PHI_ACCESS_ACTIONS: readonly PhiAccessAction[] = Object.freeze([
   'view',
@@ -56,16 +54,17 @@ export const PHI_ACCESS_ACTIONS: readonly PhiAccessAction[] = Object.freeze([
   'discharge',
 ]);
 
-export const PHI_ACTION_BACKEND_PERMISSION: Readonly<Record<PhiAccessAction, BackendPermissionKey>> =
-  Object.freeze({
-    view: BACKEND_PERMISSION_KEYS.READ_PHI,
-    create: BACKEND_PERMISSION_KEYS.WRITE_PHI,
-    update: BACKEND_PERMISSION_KEYS.WRITE_PHI,
-    export: BACKEND_PERMISSION_KEYS.EXPORT_PHI,
-    delete: BACKEND_PERMISSION_KEYS.DELETE_PHI,
-    assign: BACKEND_PERMISSION_KEYS.WRITE_PHI,
-    discharge: BACKEND_PERMISSION_KEYS.WRITE_PHI,
-  });
+export const PHI_ACTION_BACKEND_PERMISSION: Readonly<
+  Record<PhiAccessAction, BackendPermissionKey>
+> = Object.freeze({
+  view: BACKEND_PERMISSION_KEYS.READ_PHI,
+  create: BACKEND_PERMISSION_KEYS.WRITE_PHI,
+  update: BACKEND_PERMISSION_KEYS.WRITE_PHI,
+  export: BACKEND_PERMISSION_KEYS.EXPORT_PHI,
+  delete: BACKEND_PERMISSION_KEYS.DELETE_PHI,
+  assign: BACKEND_PERMISSION_KEYS.WRITE_PHI,
+  discharge: BACKEND_PERMISSION_KEYS.WRITE_PHI,
+});
 
 export const SECURITY_CONTRACT = Object.freeze({
   engineId: SECURITY_ENGINE_ID,

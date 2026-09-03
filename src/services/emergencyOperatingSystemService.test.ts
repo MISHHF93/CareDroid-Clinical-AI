@@ -22,7 +22,7 @@ describe('EmergencyOperatingSystemService', () => {
           'capacity flow',
           'discharge flow',
         ],
-      })
+      }),
     );
   });
 
@@ -45,9 +45,11 @@ describe('EmergencyOperatingSystemService', () => {
         emergencyWorkspaceFeed: expect.objectContaining({
           separateIntakeAppCreated: false,
         }),
-      })
+      }),
     );
-    expect(operatingSystem.patientFlow.journey.find((stage) => stage.id === 'registration')).toEqual(
+    expect(
+      operatingSystem.patientFlow.journey.find((stage) => stage.id === 'registration'),
+    ).toEqual(
       expect.objectContaining({
         automations: expect.arrayContaining([
           expect.objectContaining({
@@ -56,7 +58,7 @@ describe('EmergencyOperatingSystemService', () => {
             humanReviewRequired: true,
           }),
         ]),
-      })
+      }),
     );
     expect(operatingSystem.queueFlow.metrics.queueCount).toBe(9);
     expect(operatingSystem.throughput.kpi.metricId).toBe('doorToDoctor');
@@ -68,24 +70,37 @@ describe('EmergencyOperatingSystemService', () => {
           label: 'Needs Reassessment',
           generatedFrom: 'Reassessment Intelligence',
         }),
-      ])
+      ]),
     );
     expect(operatingSystem.referralFlow.departments).toEqual(
-      expect.arrayContaining(['Cardiology', 'Neurology', 'Psychiatry', 'Internal Medicine', 'Surgery', 'ICU'])
+      expect.arrayContaining([
+        'Cardiology',
+        'Neurology',
+        'Psychiatry',
+        'Internal Medicine',
+        'Surgery',
+        'ICU',
+      ]),
     );
     expect(operatingSystem.emsFlow.metrics.incomingCount).toBeGreaterThan(0);
     expect(operatingSystem.emsOffload.metrics.waitingHandoffs).toBeGreaterThan(0);
     expect(operatingSystem.capacityFlow.score).toEqual(expect.any(Number));
     expect(operatingSystem.boardingFlow.metrics.boardingCount).toBeGreaterThan(0);
     expect(operatingSystem.resourceBoard.resources.map((resource) => resource.label)).toEqual(
-      expect.arrayContaining(['Rooms', 'Stretchers', 'Monitors', 'Telemetry Units', 'Infusion Pumps'])
+      expect.arrayContaining([
+        'Rooms',
+        'Stretchers',
+        'Monitors',
+        'Telemetry Units',
+        'Infusion Pumps',
+      ]),
     );
     expect(operatingSystem.escalationEngine.metrics.activeEscalations).toBeGreaterThan(0);
     expect(operatingSystem.kpiLayer.metricById).toEqual(
       expect.objectContaining({
         doorToDoctor: expect.objectContaining({ label: 'Door-to-Doctor' }),
         boardingTime: expect.objectContaining({ label: 'Boarding Time' }),
-      })
+      }),
     );
     expect(operatingSystem.simulationScenarios.scenarios).toHaveLength(5);
     expect(operatingSystem.demoEnvironment.metrics.patientCount).toBeGreaterThanOrEqual(100);
@@ -100,7 +115,7 @@ describe('EmergencyOperatingSystemService', () => {
             attachedToPatientJourney: true,
           }),
         ]),
-      })
+      }),
     );
     expect(operatingSystem.digitalWhiteboard.cards).toEqual(
       expect.arrayContaining([
@@ -114,7 +129,7 @@ describe('EmergencyOperatingSystemService', () => {
           handoffStatus: expect.stringMatching(/Incoming|En Route|Arriving|Arrived/),
           edHandoffSummary: expect.objectContaining({ title: 'ED Handoff Summary' }),
         }),
-      ])
+      ]),
     );
     expect(operatingSystem.flowEngine).toEqual(
       expect.objectContaining({
@@ -128,7 +143,7 @@ describe('EmergencyOperatingSystemService', () => {
         metrics: expect.objectContaining({
           activeDetections: expect.any(Number),
         }),
-      })
+      }),
     );
     expect(operatingSystem.patientPath).toEqual(
       expect.objectContaining({
@@ -147,7 +162,7 @@ describe('EmergencyOperatingSystemService', () => {
             edHandoffSummary: expect.objectContaining({ title: 'ED Handoff Summary' }),
           }),
         ]),
-      })
+      }),
     );
     expect(operatingSystem.digitalWhiteboard.columns.map((column) => column.label)).toEqual([
       'EMS Incoming',
@@ -166,8 +181,14 @@ describe('EmergencyOperatingSystemService', () => {
     expect(operatingSystem.automationRoi).toEqual(
       expect.objectContaining({
         route: '/workspace/emergency/automation-roi',
-        metricDefinitions: ['time saved', 'clicks reduced', 'queue impact', 'throughput impact', 'adoption'],
-      })
+        metricDefinitions: [
+          'time saved',
+          'clicks reduced',
+          'queue impact',
+          'throughput impact',
+          'adoption',
+        ],
+      }),
     );
     expect(operatingSystem.knowledgeLayer.results.length).toBeGreaterThan(5);
   });
@@ -186,7 +207,7 @@ describe('EmergencyOperatingSystemService', () => {
             categories: expect.arrayContaining(['Discharge']),
           }),
         ]),
-      })
+      }),
     );
   });
 
@@ -214,7 +235,7 @@ describe('EmergencyOperatingSystemService', () => {
         resourceShortages: expect.any(Number),
         activeEscalations: expect.any(Number),
         automationModules: 10,
-      })
+      }),
     );
     expect(operatingSystem.positioning).toMatch(/standalone SaaS solution/i);
   });

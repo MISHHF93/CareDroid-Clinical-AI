@@ -102,11 +102,13 @@ describe('ckdStagingCalculator — full result', () => {
     expect(out.combinedStage).toMatch(/^G\d/);
     expect(out.combinedStageLabel).toMatch(/G×A category/);
     expect(out.clinicianPatientDisclaimer).toBe(
-      'Use as decision-support for clinician-patient discussions.'
+      'Use as decision-support for clinician-patient discussions.',
     );
     expect(out.pathwayDisclaimer.toLowerCase()).not.toMatch(/\bprescribe\b/);
     expect(out.stagingDiscussion.toLowerCase()).not.toMatch(/\bstart (ace|arb|sglt2)\b/);
-    expect(out.prognosticRisk).toBe(combineCkdPrognosticRisk(out.gfrCategory, out.albuminuriaCategory));
+    expect(out.prognosticRisk).toBe(
+      combineCkdPrognosticRisk(out.gfrCategory, out.albuminuriaCategory),
+    );
   });
 });
 
@@ -124,7 +126,8 @@ describe('ckdStagingCalculator — edge cases', () => {
     expect(classifyAlbuminuria(0)!.category).toBe('A1');
     const gfr = classifyGfrCategory(90);
     const alb = classifyAlbuminuria(0);
-    if (!gfr || !alb) throw new Error('expected classifyGfrCategory/classifyAlbuminuria to return a category');
+    if (!gfr || !alb)
+      throw new Error('expected classifyGfrCategory/classifyAlbuminuria to return a category');
     const risk = combineCkdPrognosticRisk(gfr.category, alb.category);
     const interp = interpretCkdStaging(90, gfr, alb, risk);
     expect(interp.prognosticRisk).toBe('low');

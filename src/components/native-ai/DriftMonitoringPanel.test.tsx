@@ -57,7 +57,8 @@ describe('DriftMonitoringPanel', () => {
             dropPercent: 19.1,
             thresholdPercent: 5,
             severity: 'retrain_required',
-            summary: 'post-ed-orientation accuracy dropped 19.1% — baseline is an unvalidated registry default, not a prior measurement',
+            summary:
+              'post-ed-orientation accuracy dropped 19.1% — baseline is an unvalidated registry default, not a prior measurement',
             sourceState: 'demo',
             baselineSource: 'unvalidated_registry_default',
           },

@@ -11,7 +11,11 @@ import {
 } from './operationalRoleSimulationModel';
 import { getHomeRouteForRole, getNavItemIdsForRole } from './roleClusterNav.config';
 import { getDefaultRouteForProfile } from './routes.config';
-import { compileCareDroidAccessProfile, canAccessRoute, normalizeCareDroidProfile } from '../lib/users/canonicalAccess';
+import {
+  compileCareDroidAccessProfile,
+  canAccessRoute,
+  normalizeCareDroidProfile,
+} from '../lib/users/canonicalAccess';
 import { getPermissionsForRole } from '../lib/users/permissions';
 import type { HospitalRole } from '../lib/users/userTypes';
 import { WORKFLOW_AUTOMATION_TRIGGER_EVENTS } from './unifiedWorkflowAutomationModel';
@@ -68,7 +72,10 @@ describe('operationalRoleSimulationModel', () => {
   it('simulates a coherent profile for every role without validation issues', () => {
     const issuesByRole = validateAllOperationalRolesCoherent();
     const failures = Object.entries(issuesByRole).filter(([, issues]) => issues.length > 0);
-    expect(failures, failures.map(([role, issues]) => `${role}: ${issues.join('; ')}`).join('\n')).toEqual([]);
+    expect(
+      failures,
+      failures.map(([role, issues]) => `${role}: ${issues.join('; ')}`).join('\n'),
+    ).toEqual([]);
   });
 
   it('aligns home, landing, and cluster navigation defaults', () => {

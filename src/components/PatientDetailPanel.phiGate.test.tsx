@@ -91,7 +91,8 @@ afterEach(() => {
 
 describe('PatientDetailPanel PHI gate (HEAL-206)', () => {
   it('renders nothing when the role cannot access the patients route', () => {
-    emergencyRoleMock.canAccessRoute = (path: string) => path !== CANONICAL_ROUTES.emergencyPatients;
+    emergencyRoleMock.canAccessRoute = (path: string) =>
+      path !== CANONICAL_ROUTES.emergencyPatients;
 
     const { container } = renderWithPatient(makePatient());
 

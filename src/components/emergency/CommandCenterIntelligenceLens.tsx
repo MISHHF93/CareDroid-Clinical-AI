@@ -57,10 +57,28 @@ function ExecutiveLensPanel() {
       ]);
 
       const analyticsData =
-        (analyticsResult as { ok?: boolean; data?: { shift?: { patientsSeen?: number; avgWaitMinutes?: number } } }).ok &&
-        (analyticsResult as { data?: { shift?: { patientsSeen?: number; avgWaitMinutes?: number } } }).data
-          ? (analyticsResult as { data: { shift?: { patientsSeen?: number; avgWaitMinutes?: number } } }).data
-          : buildLocalEmergencyAnalytics({ patients: [], queues: [], capacity: {}, activeShift: {} });
+        (
+          analyticsResult as {
+            ok?: boolean;
+            data?: { shift?: { patientsSeen?: number; avgWaitMinutes?: number } };
+          }
+        ).ok &&
+        (
+          analyticsResult as {
+            data?: { shift?: { patientsSeen?: number; avgWaitMinutes?: number } };
+          }
+        ).data
+          ? (
+              analyticsResult as {
+                data: { shift?: { patientsSeen?: number; avgWaitMinutes?: number } };
+              }
+            ).data
+          : buildLocalEmergencyAnalytics({
+              patients: [],
+              queues: [],
+              capacity: {},
+              activeShift: {},
+            });
 
       setShiftPatients(String(analyticsData.shift?.patientsSeen ?? '—'));
       setAvgWait(
@@ -69,9 +87,11 @@ function ExecutiveLensPanel() {
           : '—',
       );
       setPlatformStatus(healthBundle.saas.data?.status || 'unknown');
-      setSurgeLevel((surgeResult as { ok?: boolean; data?: { level?: string } }).ok
-        ? String((surgeResult as { data?: { level?: string } }).data?.level || 'normal')
-        : 'unknown');
+      setSurgeLevel(
+        (surgeResult as { ok?: boolean; data?: { level?: string } }).ok
+          ? String((surgeResult as { data?: { level?: string } }).data?.level || 'normal')
+          : 'unknown',
+      );
     } finally {
       setLoading(false);
     }
@@ -111,7 +131,12 @@ function AiLensPanel() {
     setLoading(true);
     try {
       const snapshot = await fetchAiCommandCenterSnapshot();
-      setExpertsActive(String(snapshot.experts?.filter((expert) => expert.active).length ?? snapshot.health.activeExperts));
+      setExpertsActive(
+        String(
+          snapshot.experts?.filter((expert) => expert.active).length ??
+            snapshot.health.activeExperts,
+        ),
+      );
       setModelHealth(snapshot.health.label || snapshot.health.status || 'unknown');
       setPendingReviews(String(snapshot.health.failedBenchmarks ?? snapshot.warnings.length));
       setDailyCost(
@@ -170,10 +195,7 @@ function PredictiveLensPanel() {
           detail={summary.highestRisk?.title}
         />
         <LensMetric label="Average risk score" value={`${summary.averageScore}/100`} />
-        <LensMetric
-          label="Highest risk band"
-          value={summary.highestRisk?.band ?? 'low'}
-        />
+        <LensMetric label="Highest risk band" value={summary.highestRisk?.band ?? 'low'} />
       </div>
     </>
   );
@@ -190,12 +212,16 @@ export default function CommandCenterIntelligenceLens({ view }: LensProps) {
   const Panel = PANEL_BY_VIEW[view];
 
   return (
-    <section className="command-center-lens emergency-route-card cd-surface-card" aria-label={definition?.label}>
+    <section
+      className="command-center-lens emergency-route-card cd-surface-card"
+      aria-label={definition?.label}
+    >
       <div className="emergency-route-section-card__header">
         <div>
           <strong>{definition?.label ?? 'Intelligence lens'}</strong>
           <p className="emergency-route-section-card__lead">
-            {definition?.description} Progressive disclosure — operational metrics remain primary above.
+            {definition?.description} Progressive disclosure — operational metrics remain primary
+            above.
           </p>
         </div>
         <div className="command-center-lens__header-actions">

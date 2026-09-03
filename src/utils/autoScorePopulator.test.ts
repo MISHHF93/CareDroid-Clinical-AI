@@ -53,7 +53,7 @@ describe('AutoScorePopulator', () => {
       patient({
         complaintCategory: 'Sepsis',
         chiefComplaint: 'Fever and suspected infection',
-      })
+      }),
     );
 
     if (!result) throw new Error('expected getAutoScorePrefill to return a qSOFA prefill');
@@ -71,7 +71,7 @@ describe('AutoScorePopulator', () => {
         complaintCategory: 'Stroke',
         chiefComplaint: 'Stroke symptoms',
         notes: [{ body: 'Left arm weakness and slurred speech documented by triage.' }],
-      })
+      }),
     );
 
     if (!result) throw new Error('expected getAutoScorePrefill to return a NIHSS prefill');

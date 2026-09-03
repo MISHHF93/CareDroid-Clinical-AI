@@ -22,7 +22,7 @@ describe('pluginRegistry', () => {
         PLUGIN_TYPES.DASHBOARD,
         PLUGIN_TYPES.WORKFLOW,
         PLUGIN_TYPES.AI_EXTENSION,
-      ])
+      ]),
     );
   });
 
@@ -38,9 +38,7 @@ describe('pluginRegistry', () => {
       inventory: { catalogVisible: true },
     };
 
-    const validation = validatePluginRegistration(invalid, [
-      { id: 'Bad Plugin Id' },
-    ] as any);
+    const validation = validatePluginRegistration(invalid, [{ id: 'Bad Plugin Id' }] as any);
 
     expect(validation.valid).toBe(false);
     expect(validation.errors.join(' ')).toMatch(/kebab-case/i);

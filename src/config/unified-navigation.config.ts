@@ -11,10 +11,7 @@ import {
   shouldHideStandaloneIntakeNav,
 } from './emergencyRolePermissions';
 import { getReceptionNavActivePaths } from './emergencyPipelineModel';
-import {
-  getHiddenNavItemIdsForRole,
-  sortNavigationItemsForRole,
-} from './emergencyNavPolicy';
+import { getHiddenNavItemIdsForRole, sortNavigationItemsForRole } from './emergencyNavPolicy';
 import { getNavItemIdsForRole } from './roleClusterNav.config';
 import { SAAS_USER_ROLES } from './saasProfileConstants';
 import { resolveUserProfileFromSaasRole } from './userProfileCatalog';
@@ -48,13 +45,21 @@ export const PILOT_UTILITY_NAV_ITEM_IDS: readonly string[] = Object.freeze([
 /** Extension/platform nav — hidden in pilot unless entitlements expand visibility. */
 export const PILOT_EXTENSION_NAV_ITEM_IDS: readonly string[] = CANONICAL_PILOT_EXTENSION_NAV_IDS;
 
-export const PILOT_CUSTOMER_VISIBLE_NAV_ITEM_IDS: readonly string[] = CANONICAL_PILOT_VISIBLE_NAV_IDS;
+export const PILOT_CUSTOMER_VISIBLE_NAV_ITEM_IDS: readonly string[] =
+  CANONICAL_PILOT_VISIBLE_NAV_IDS;
 
 /** Receptionist-first pilot: front-desk roles see a minimal nav shell. */
 export const PROFILE_SCOPED_PILOT_NAV_IDS: Readonly<Record<string, readonly string[]>> =
   Object.freeze({
     'registration-clerk': Object.freeze([
-      'reception', 'patients', 'pulse', 'shift', 'alerts', 'copilot', 'collaboration', 'help',
+      'reception',
+      'patients',
+      'pulse',
+      'shift',
+      'alerts',
+      'copilot',
+      'collaboration',
+      'help',
     ]),
     student: Object.freeze(['tools', 'platform', 'pulse']),
     steward: Object.freeze(['platform']),
@@ -123,14 +128,14 @@ export const NAV_ITEMS: readonly NavItem[] = Object.freeze(
   CANONICAL_ROUTE_MAP.filter((route) => route.showInNav)
     .sort((left, right) => (left.priority ?? 0) - (right.priority ?? 0))
     .map((route) => {
-    return Object.freeze({
-      id: route.id,
-      label: route.label,
-      icon: route.icon || 'layout-dashboard',
-      route: route.path,
-      featureGate: route.featureGate || null,
-    } satisfies NavItem);
-  }),
+      return Object.freeze({
+        id: route.id,
+        label: route.label,
+        icon: route.icon || 'layout-dashboard',
+        route: route.path,
+        featureGate: route.featureGate || null,
+      } satisfies NavItem);
+    }),
 ) satisfies readonly NavItem[];
 
 const ROLES = EMERGENCY_ROLE_IDS as Record<string, string>;
@@ -210,7 +215,17 @@ const NAV_REQUIRED_PERMISSIONS: Readonly<Record<string, readonly string[]>> = Ob
   admin: [CAREDROID_PERMISSIONS.SETTINGS_READ],
 });
 
-const READ_ONLY_NAV_ITEM_IDS = new Set(['command-center', 'whiteboard', 'alerts', 'analytics', 'reports', 'help', 'audit', 'laboratory', 'diagnostics']);
+const READ_ONLY_NAV_ITEM_IDS = new Set([
+  'command-center',
+  'whiteboard',
+  'alerts',
+  'analytics',
+  'reports',
+  'help',
+  'audit',
+  'laboratory',
+  'diagnostics',
+]);
 
 export const FEATURE_GATE_ALIASES = Object.freeze({
   referral_intel: 'referral_intelligence',
@@ -293,7 +308,8 @@ export const NAVIGATION_ITEMS = Object.freeze(
       order: index + 1,
       roles: routeRoles,
       allowedRoles: routeRoles,
-      requiredPermissions: routeRecord?.requiredPermissions || NAV_REQUIRED_PERMISSIONS[item.id] || [],
+      requiredPermissions:
+        routeRecord?.requiredPermissions || NAV_REQUIRED_PERMISSIONS[item.id] || [],
       visibleToProfiles: routeRecord?.userProfileVisibility || rolesForRoute(item.route),
       priority,
       emergencySafe:
@@ -304,23 +320,22 @@ export const NAVIGATION_ITEMS = Object.freeze(
       readOnlyAllowed: routeRecord?.readOnlyAllowed ?? READ_ONLY_NAV_ITEM_IDS.has(item.id),
       isEmergencyCore: !UTILITY_NAV_ITEM_IDS.has(item.id),
       mobileLabel: item.id === 'reassessment' ? 'Recheck' : item.label,
-      activePaths:
-        routeRecord?.activePaths
-          ? routeRecord.activePaths
-          : item.activePaths
-            ? item.activePaths
-        : item.id === 'reception'
-          ? getReceptionNavActivePaths()
-          : item.id === 'settings'
-            ? [CANONICAL_ROUTES.emergencySettings, '/settings']
-            : item.id === 'platform'
-              ? [
-                  CANONICAL_ROUTES.platformStart,
-                  CANONICAL_ROUTES.workspace,
-                  CANONICAL_ROUTES.workspaces,
-                  '/app',
-                ]
-            : undefined,
+      activePaths: routeRecord?.activePaths
+        ? routeRecord.activePaths
+        : item.activePaths
+          ? item.activePaths
+          : item.id === 'reception'
+            ? getReceptionNavActivePaths()
+            : item.id === 'settings'
+              ? [CANONICAL_ROUTES.emergencySettings, '/settings']
+              : item.id === 'platform'
+                ? [
+                    CANONICAL_ROUTES.platformStart,
+                    CANONICAL_ROUTES.workspace,
+                    CANONICAL_ROUTES.workspaces,
+                    '/app',
+                  ]
+                : undefined,
     });
   }),
 ) satisfies readonly NavigationItem[];
@@ -345,7 +360,10 @@ export function getPilotCustomerNavigationItems(
 
 export function getVisibleNavigation(
   userRole: string | null | undefined,
-  options: { saasRole?: string | null; compiledProfile?: CompiledCareDroidAccessProfile | null } = {},
+  options: {
+    saasRole?: string | null;
+    compiledProfile?: CompiledCareDroidAccessProfile | null;
+  } = {},
 ): readonly NavigationItem[] {
   // Defence in depth. useEmergencyRolePermissions now validates the stored
   // profile before trusting it, but this function is exported and reachable
@@ -356,7 +374,8 @@ export function getVisibleNavigation(
   // the sidebar, because nothing between here and the shell caught it.
   if (options.compiledProfile?.role) {
     const profile = options.compiledProfile as CompiledCareDroidAccessProfile;
-    const hospitalRole: string = (profile.role.hospitalRole as string) || profile.role.emergencyRoleId;
+    const hospitalRole: string =
+      (profile.role.hospitalRole as string) || profile.role.emergencyRoleId;
     const hiddenForRole = getHiddenNavItemIdsForRole(hospitalRole);
     const visibleItems = getPilotCustomerNavigationItems(
       NAVIGATION_ITEMS.filter(

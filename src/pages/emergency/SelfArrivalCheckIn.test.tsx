@@ -71,7 +71,9 @@ describe('SelfArrivalCheckIn', () => {
     expect(useEmergencyStore.getState().selectedPatientId).toBe(patient.id);
     expect(useEmergencyStore.getState().activeQueueFilter).toBe(WHITEBOARD_QUEUE_FILTER.triage);
 
-    expect(await screen.findByText(/whiteboard with a waiting-for-triage status/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/whiteboard with a waiting-for-triage status/i),
+    ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /open department whiteboard/i })).toBeInTheDocument();
     expect(createSmartIntakePatient).toHaveBeenCalledTimes(1);
   });

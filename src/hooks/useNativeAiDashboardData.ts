@@ -21,9 +21,15 @@ type NativeAiDashboardData = {
   refresh: () => Promise<void>;
 };
 
-function normalizeAcuityEntries(payload: unknown): ReturnType<typeof buildClinicalAcuityLeaderboard> {
+function normalizeAcuityEntries(
+  payload: unknown,
+): ReturnType<typeof buildClinicalAcuityLeaderboard> {
   if (Array.isArray(payload)) return payload;
-  if (payload && typeof payload === 'object' && Array.isArray((payload as { entries?: unknown[] }).entries)) {
+  if (
+    payload &&
+    typeof payload === 'object' &&
+    Array.isArray((payload as { entries?: unknown[] }).entries)
+  ) {
     return (payload as { entries: ReturnType<typeof buildClinicalAcuityLeaderboard> }).entries;
   }
   return [];
@@ -33,7 +39,11 @@ function extractRegistryModels(payload: unknown): unknown[] {
   if (!payload || typeof payload !== 'object') return [];
   const root = payload as Record<string, unknown>;
   if (Array.isArray(root.models)) return root.models;
-  if (root.data && typeof root.data === 'object' && Array.isArray((root.data as { models?: unknown[] }).models)) {
+  if (
+    root.data &&
+    typeof root.data === 'object' &&
+    Array.isArray((root.data as { models?: unknown[] }).models)
+  ) {
     return (root.data as { models: unknown[] }).models;
   }
   return [];
@@ -43,7 +53,11 @@ function extractDriftAlerts(payload: unknown): unknown[] {
   if (!payload || typeof payload !== 'object') return [];
   const root = payload as Record<string, unknown>;
   if (Array.isArray(root.alerts)) return root.alerts;
-  if (root.data && typeof root.data === 'object' && Array.isArray((root.data as { alerts?: unknown[] }).alerts)) {
+  if (
+    root.data &&
+    typeof root.data === 'object' &&
+    Array.isArray((root.data as { alerts?: unknown[] }).alerts)
+  ) {
     return (root.data as { alerts: unknown[] }).alerts;
   }
   return [];

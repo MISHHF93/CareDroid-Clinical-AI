@@ -48,9 +48,7 @@ function dispatchCopilotPrefill(patientId: string, message: string) {
   );
 }
 
-function navigateUnifiedToolsPath(
-  input: Parameters<typeof resolveClinicalToolLaunchTarget>[0],
-) {
+function navigateUnifiedToolsPath(input: Parameters<typeof resolveClinicalToolLaunchTarget>[0]) {
   const target = resolveClinicalToolLaunchTarget(input);
 
   if (target.mode === 'reception-embed') {
@@ -169,13 +167,20 @@ export function canLaunchRegistryTool(
 export type CareDroidToolLaunchInput =
   | ({ kind: 'orchestration' } & LaunchOrchestrationInput)
   | { kind: 'registry'; toolId: string; handlers: LaunchRegistryToolHandlers }
-  | { kind: 'calculator'; calculatorId: string; patientId: string; source?: CareDroidToolLaunchSource }
+  | {
+      kind: 'calculator';
+      calculatorId: string;
+      patientId: string;
+      source?: CareDroidToolLaunchSource;
+    }
   | { kind: 'copilot-prefill'; patientId: string; message: string };
 
 /**
  * Unified entry for ED tool launches from patient cards, orchestration, registry, and copilot.
  */
-export function launchCareDroidTool(input: CareDroidToolLaunchInput): RegistryToolNavigationPlan | void {
+export function launchCareDroidTool(
+  input: CareDroidToolLaunchInput,
+): RegistryToolNavigationPlan | void {
   switch (input.kind) {
     case 'orchestration':
       launchOrchestrationRecommendation(input);

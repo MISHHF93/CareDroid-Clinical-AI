@@ -156,8 +156,13 @@ describe('canonical segment inventory', () => {
       expect(record.recoveryBridge, record.id).toBeTruthy();
 
       for (const bridgeField of requiredBridgeFields) {
-        expect(record.bridges, `${record.id} bridge missing ${bridgeField}`).toHaveProperty(bridgeField);
-        expect(record.bridges[bridgeField], `${record.id}.bridges.${bridgeField}`).not.toBeUndefined();
+        expect(record.bridges, `${record.id} bridge missing ${bridgeField}`).toHaveProperty(
+          bridgeField,
+        );
+        expect(
+          record.bridges[bridgeField],
+          `${record.id}.bridges.${bridgeField}`,
+        ).not.toBeUndefined();
       }
       expect(Array.isArray(record.bridges.gaps), record.id).toBe(true);
     }
@@ -194,28 +199,39 @@ describe('canonical segment inventory', () => {
         const nav = getPrimaryNavItemForPath(record.canonicalRoute);
         if (nav) {
           if (nav.id === record.navEntry) {
-            expect(nav.id, `${record.id} canonical route ${record.canonicalRoute}`).toBe(record.navEntry);
+            expect(nav.id, `${record.id} canonical route ${record.canonicalRoute}`).toBe(
+              record.navEntry,
+            );
           } else {
-            expect(record.bridges.gaps.length, `${record.id} ${record.canonicalRoute}`).toBeGreaterThan(0);
+            expect(
+              record.bridges.gaps.length,
+              `${record.id} ${record.canonicalRoute}`,
+            ).toBeGreaterThan(0);
           }
         } else if (routeConfigOwnsPath(record.canonicalRoute)) {
-          expect(routeConfigOwnsPath(record.canonicalRoute), `${record.id} ${record.canonicalRoute}`).toBe(true);
+          expect(
+            routeConfigOwnsPath(record.canonicalRoute),
+            `${record.id} ${record.canonicalRoute}`,
+          ).toBe(true);
         } else {
-          expect(record.bridges.gaps.length, `${record.id} ${record.canonicalRoute}`).toBeGreaterThan(0);
+          expect(
+            record.bridges.gaps.length,
+            `${record.id} ${record.canonicalRoute}`,
+          ).toBeGreaterThan(0);
         }
       }
     }
 
     expect(getSegmentsByNavEntry('home').map((record) => record.id)).toContain('home');
     expect(getSegmentsByNavEntry('assistant').map((record) => record.id)).toEqual(
-      expect.arrayContaining(['assistant', 'chat-assisted-tools', 'dispatch-ai'])
+      expect.arrayContaining(['assistant', 'chat-assisted-tools', 'dispatch-ai']),
     );
     expect(getSegmentsByNavEntry('home').map((record) => record.id)).toContain('home');
     expect(getSegmentsByNavEntry('operations').map((record) => record.id)).toEqual(
-      expect.arrayContaining(['operations', 'fleet-operations'])
+      expect.arrayContaining(['operations', 'fleet-operations']),
     );
     expect(getSegmentsByNavEntry('audit').map((record) => record.id)).toEqual(
-      expect.arrayContaining(['audit-compliance'])
+      expect.arrayContaining(['audit-compliance']),
     );
   });
 
@@ -224,7 +240,9 @@ describe('canonical segment inventory', () => {
       const routeIsOwned =
         appDeclaresRoute(record.canonicalRoute) || routeConfigOwnsPath(record.canonicalRoute);
       if (!routeIsOwned) {
-        expect(record.bridges.gaps.length, `${record.id} ${record.canonicalRoute}`).toBeGreaterThan(0);
+        expect(record.bridges.gaps.length, `${record.id} ${record.canonicalRoute}`).toBeGreaterThan(
+          0,
+        );
       } else {
         expect(routeIsOwned, `${record.id} ${record.canonicalRoute}`).toBe(true);
       }
@@ -235,7 +253,10 @@ describe('canonical segment inventory', () => {
     const completeStatuses = new Set<string>([SEGMENT_STATUSES.COMPLETE, SEGMENT_STATUSES.HIDDEN]);
     for (const record of records) {
       if (completeStatuses.has(record.status)) continue;
-      expect(record.bridges.gaps.length, `${record.id} should document bridge gaps`).toBeGreaterThan(0);
+      expect(
+        record.bridges.gaps.length,
+        `${record.id} should document bridge gaps`,
+      ).toBeGreaterThan(0);
     }
   });
 
@@ -253,9 +274,13 @@ describe('canonical segment inventory', () => {
 
   it('resolves records by canonical id for follow-up implementation work', () => {
     expect(resolveSegmentRecord('assistant', records)?.canonicalRoute).toBe('/assistant');
-    expect(resolveSegmentRecord('clinical-alerts', records)?.status).toBe(SEGMENT_STATUSES.PARTIALLY_BUILT);
+    expect(resolveSegmentRecord('clinical-alerts', records)?.status).toBe(
+      SEGMENT_STATUSES.PARTIALLY_BUILT,
+    );
     expect(resolveSegmentRecord('clinical-alerts', records)?.frontendOnlyType).toBeNull();
-    expect(resolveSegmentRecord('backend-ai-rag-metrics', records)?.backendOnlyType).toBe(BACKEND_ONLY_TYPES.INTERNAL);
+    expect(resolveSegmentRecord('backend-ai-rag-metrics', records)?.backendOnlyType).toBe(
+      BACKEND_ONLY_TYPES.INTERNAL,
+    );
     expect(resolveSegmentRecord('not-a-real-segment', records)).toBeNull();
   });
 });

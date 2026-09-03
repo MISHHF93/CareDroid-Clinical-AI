@@ -25,9 +25,9 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const registrySource = readFileSync(
   join(
     __dirname,
-    '../../backend/src/modules/medical-control-plane/tool-orchestrator/tool-orchestrator.registry.ts'
+    '../../backend/src/modules/medical-control-plane/tool-orchestrator/tool-orchestrator.registry.ts',
   ),
-  'utf8'
+  'utf8',
 );
 const repoRoot = join(__dirname, '../..');
 const rootEnvExample = readFileSync(join(repoRoot, '.env.example'), 'utf8');
@@ -73,7 +73,9 @@ describe('backendFrontendExposure scan', () => {
   });
 
   scanIt('matches backend REGISTERED_EXECUTOR_TOOL_IDS in registry source', () => {
-    const block = registrySource.match(/REGISTERED_EXECUTOR_TOOL_IDS\s*=\s*\[([\s\S]*?)\]\s*as const/);
+    const block = registrySource.match(
+      /REGISTERED_EXECUTOR_TOOL_IDS\s*=\s*\[([\s\S]*?)\]\s*as const/,
+    );
     if (!block) throw new Error('expected REGISTERED_EXECUTOR_TOOL_IDS block in registry source');
     const backendIds = [...block[1].matchAll(/'([^']+)'/g)].map((m) => m[1]).sort();
     expect(backendIds).toEqual([...BACKEND_EXECUTOR_NLU_TOOL_IDS].sort());
@@ -97,16 +99,19 @@ describe('backendFrontendExposure scan', () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  scanIt('surfaces chat next-action and vitals endpoints through the canonical frontend inventory', () => {
-    expect(FRONTEND_API_CALLS).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ method: 'POST', path: '/api/chat/suggest-action' }),
-        expect.objectContaining({ method: 'POST', path: '/api/chat/analyze-vitals' }),
-      ])
-    );
-    expect(findBackendRoute('POST', '/api/chat/suggest-action')).toBeTruthy();
-    expect(findBackendRoute('POST', '/api/chat/analyze-vitals')).toBeTruthy();
-  });
+  scanIt(
+    'surfaces chat next-action and vitals endpoints through the canonical frontend inventory',
+    () => {
+      expect(FRONTEND_API_CALLS).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ method: 'POST', path: '/api/chat/suggest-action' }),
+          expect.objectContaining({ method: 'POST', path: '/api/chat/analyze-vitals' }),
+        ]),
+      );
+      expect(findBackendRoute('POST', '/api/chat/suggest-action')).toBeTruthy();
+      expect(findBackendRoute('POST', '/api/chat/analyze-vitals')).toBeTruthy();
+    },
+  );
 
   scanIt('covers protocol detail and compliance data export bridges', () => {
     const expectedCalls = [
@@ -116,118 +121,130 @@ describe('backendFrontendExposure scan', () => {
 
     for (const [method, path] of expectedCalls) {
       expect(FRONTEND_API_CALLS, `${method} ${path}`).toEqual(
-        expect.arrayContaining([expect.objectContaining({ method, path })])
+        expect.arrayContaining([expect.objectContaining({ method, path })]),
       );
       expect(findBackendRoute(method, path), `${method} ${path}`).toBeTruthy();
     }
   });
 
-  scanIt('covers profile, workspace, and activity client calls actually reachable from the UI', () => {
-    // Cycle: fetchPreferences/fetchActivity/fetchSecurity/fetchWorkspaces/createWorkspace/
-    // fetchPersonalization/updatePersonalization/savePrompt are defined in userIdentityApi.ts
-    // but no page ever calls them -- the Profile* pages all read the combined GET /api/profile/me
-    // via UserIdentityContext instead. Those routes moved to backendRouteExposurePolicy.ts as
-    // deferred/orphaned rather than counted here as wired. See docs/orphaned-backend-functions.md.
-    const expectedUserIdentityCalls = [
-      ['GET', '/api/profile/me'],
-      ['PATCH', '/api/profile/me'],
-      ['PATCH', '/api/profile/me/preferences'],
-      ['PATCH', '/api/profile/me/workspaces/active'],
-      ['GET', '/api/workspaces/context'],
-      ['POST', '/api/workspaces/active'],
-      ['POST', '/api/activity'],
-    ];
+  scanIt(
+    'covers profile, workspace, and activity client calls actually reachable from the UI',
+    () => {
+      // Cycle: fetchPreferences/fetchActivity/fetchSecurity/fetchWorkspaces/createWorkspace/
+      // fetchPersonalization/updatePersonalization/savePrompt are defined in userIdentityApi.ts
+      // but no page ever calls them -- the Profile* pages all read the combined GET /api/profile/me
+      // via UserIdentityContext instead. Those routes moved to backendRouteExposurePolicy.ts as
+      // deferred/orphaned rather than counted here as wired. See docs/orphaned-backend-functions.md.
+      const expectedUserIdentityCalls = [
+        ['GET', '/api/profile/me'],
+        ['PATCH', '/api/profile/me'],
+        ['PATCH', '/api/profile/me/preferences'],
+        ['PATCH', '/api/profile/me/workspaces/active'],
+        ['GET', '/api/workspaces/context'],
+        ['POST', '/api/workspaces/active'],
+        ['POST', '/api/activity'],
+      ];
 
-    for (const [method, path] of expectedUserIdentityCalls) {
-      expect(FRONTEND_API_CALLS, `${method} ${path}`).toEqual(
-        expect.arrayContaining([expect.objectContaining({ method, path })])
-      );
-      expect(findBackendRoute(method, path), `${method} ${path}`).toBeTruthy();
-    }
+      for (const [method, path] of expectedUserIdentityCalls) {
+        expect(FRONTEND_API_CALLS, `${method} ${path}`).toEqual(
+          expect.arrayContaining([expect.objectContaining({ method, path })]),
+        );
+        expect(findBackendRoute(method, path), `${method} ${path}`).toBeTruthy();
+      }
 
-    const noLongerWiredCalls = [
-      ['GET', '/api/profile/me/preferences'],
-      ['GET', '/api/profile/me/activity'],
-      ['GET', '/api/profile/me/security'],
-      ['GET', '/api/profile/me/workspaces'],
-      ['GET', '/api/workspaces'],
-      ['POST', '/api/workspaces'],
-      ['GET', '/api/personalization/me'],
-      ['PATCH', '/api/personalization/me'],
-      ['POST', '/api/personalization/me/saved-prompts'],
-    ];
+      const noLongerWiredCalls = [
+        ['GET', '/api/profile/me/preferences'],
+        ['GET', '/api/profile/me/activity'],
+        ['GET', '/api/profile/me/security'],
+        ['GET', '/api/profile/me/workspaces'],
+        ['GET', '/api/workspaces'],
+        ['POST', '/api/workspaces'],
+        ['GET', '/api/personalization/me'],
+        ['PATCH', '/api/personalization/me'],
+        ['POST', '/api/personalization/me/saved-prompts'],
+      ];
 
-    for (const [method, path] of noLongerWiredCalls) {
-      expect(FRONTEND_API_CALLS, `${method} ${path}`).not.toEqual(
-        expect.arrayContaining([expect.objectContaining({ method, path })])
-      );
-    }
-  });
+      for (const [method, path] of noLongerWiredCalls) {
+        expect(FRONTEND_API_CALLS, `${method} ${path}`).not.toEqual(
+          expect.arrayContaining([expect.objectContaining({ method, path })]),
+        );
+      }
+    },
+  );
 
-  scanIt('classifies optional Mongoose CareDroid routes separately from always-mounted Nest routes', () => {
-    // Cycle 284: /api/emergency/intake/* (the prior example here) moved off
-    // this list entirely — SmartIntakeController is now unconditionally
-    // mounted, not Mongoose-flag-gated. /api/emergency/governance/* is a
-    // documented compatibility alias still on the gated list.
-    const optionalRoutes = getOptionalRuntimeBackendRoutes();
+  scanIt(
+    'classifies optional Mongoose CareDroid routes separately from always-mounted Nest routes',
+    () => {
+      // Cycle 284: /api/emergency/intake/* (the prior example here) moved off
+      // this list entirely — SmartIntakeController is now unconditionally
+      // mounted, not Mongoose-flag-gated. /api/emergency/governance/* is a
+      // documented compatibility alias still on the gated list.
+      const optionalRoutes = getOptionalRuntimeBackendRoutes();
 
-    expect(optionalRoutes).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          method: 'GET',
-          path: '/api/emergency/governance/compliance',
-          runtime: 'mongoose-emergency-os',
-        }),
-      ])
-    );
-    expect(
-      OPTIONAL_RUNTIME_ROUTE_EXPOSURE_POLICY['GET /api/emergency/governance/compliance']
-    ).toMatchObject({
-      strategy: 'optional-runtime',
-    });
-    expect(
-      OPTIONAL_RUNTIME_ROUTE_EXPOSURE_POLICY['POST /api/emergency/intake/sessions']
-    ).toBeUndefined();
-  });
-
-  scanIt('smart-intake frontend calls are wired to the always-mounted SmartIntakeController', () => {
-    // Cycle 284: these 14 routes moved off the Mongoose-flag-gated list onto
-    // an unconditionally-registered Nest controller, so they now resolve as
-    // genuinely wired rather than a gated-stub — this test previously lived
-    // under the "gates optional CareDroid frontend calls" name/expectation.
-    const scan = runBackendFrontendExposureScan();
-    const wiredSmartIntakeIds = [
-      'emergency-smart-intake-session-create',
-      'emergency-smart-intake-manual-entry',
-      'emergency-smart-intake-document',
-      'emergency-smart-intake-ocr',
-      'emergency-smart-intake-match',
-      'emergency-smart-intake-verify-field',
-      'emergency-smart-intake-link-patient',
-      'emergency-smart-intake-create-patient',
-      'emergency-smart-intake-continue-unknown',
-      'emergency-smart-intake-ems-evidence',
-      'emergency-smart-intake-reconcile-unknown',
-      'emergency-smart-intake-biometric-consent',
-      'emergency-smart-intake-biometric-consent-withdraw',
-      'emergency-smart-intake-audit-log',
-    ];
-
-    expect(FRONTEND_API_CALLS).toEqual(
-      expect.arrayContaining([
-        ...wiredSmartIntakeIds.map((id) =>
+      expect(optionalRoutes).toEqual(
+        expect.arrayContaining([
           expect.objectContaining({
-            id,
-            capability: 'emergencySmartIntakeIdentitySession',
-          })
-        ),
-        expect.objectContaining({ id: 'emergency-referral-create', capability: 'emergencyReferralPersistence' }),
-      ])
-    );
-    for (const id of wiredSmartIntakeIds) {
-      expect(scan.analyzed.find((row) => row.id === id)?.exposure).toBe('wired');
-    }
-  });
+            method: 'GET',
+            path: '/api/emergency/governance/compliance',
+            runtime: 'mongoose-emergency-os',
+          }),
+        ]),
+      );
+      expect(
+        OPTIONAL_RUNTIME_ROUTE_EXPOSURE_POLICY['GET /api/emergency/governance/compliance'],
+      ).toMatchObject({
+        strategy: 'optional-runtime',
+      });
+      expect(
+        OPTIONAL_RUNTIME_ROUTE_EXPOSURE_POLICY['POST /api/emergency/intake/sessions'],
+      ).toBeUndefined();
+    },
+  );
+
+  scanIt(
+    'smart-intake frontend calls are wired to the always-mounted SmartIntakeController',
+    () => {
+      // Cycle 284: these 14 routes moved off the Mongoose-flag-gated list onto
+      // an unconditionally-registered Nest controller, so they now resolve as
+      // genuinely wired rather than a gated-stub — this test previously lived
+      // under the "gates optional CareDroid frontend calls" name/expectation.
+      const scan = runBackendFrontendExposureScan();
+      const wiredSmartIntakeIds = [
+        'emergency-smart-intake-session-create',
+        'emergency-smart-intake-manual-entry',
+        'emergency-smart-intake-document',
+        'emergency-smart-intake-ocr',
+        'emergency-smart-intake-match',
+        'emergency-smart-intake-verify-field',
+        'emergency-smart-intake-link-patient',
+        'emergency-smart-intake-create-patient',
+        'emergency-smart-intake-continue-unknown',
+        'emergency-smart-intake-ems-evidence',
+        'emergency-smart-intake-reconcile-unknown',
+        'emergency-smart-intake-biometric-consent',
+        'emergency-smart-intake-biometric-consent-withdraw',
+        'emergency-smart-intake-audit-log',
+      ];
+
+      expect(FRONTEND_API_CALLS).toEqual(
+        expect.arrayContaining([
+          ...wiredSmartIntakeIds.map((id) =>
+            expect.objectContaining({
+              id,
+              capability: 'emergencySmartIntakeIdentitySession',
+            }),
+          ),
+          expect.objectContaining({
+            id: 'emergency-referral-create',
+            capability: 'emergencyReferralPersistence',
+          }),
+        ]),
+      );
+      for (const id of wiredSmartIntakeIds) {
+        expect(scan.analyzed.find((row) => row.id === id)?.exposure).toBe('wired');
+      }
+    },
+  );
 
   scanIt('covers memory dashboard and memory fabric client calls', () => {
     const memoryCalls = [
@@ -241,7 +258,7 @@ describe('backendFrontendExposure scan', () => {
 
     for (const [method, path] of memoryCalls) {
       expect(FRONTEND_API_CALLS, `${method} ${path}`).toEqual(
-        expect.arrayContaining([expect.objectContaining({ method, path, capability: 'memory' })])
+        expect.arrayContaining([expect.objectContaining({ method, path, capability: 'memory' })]),
       );
       expect(findBackendRoute(method, path), `${method} ${path}`).toBeTruthy();
     }
@@ -256,38 +273,49 @@ describe('backendFrontendExposure scan', () => {
 
     for (const [method, path] of alertCalls) {
       expect(FRONTEND_API_CALLS, `${method} ${path}`).toEqual(
-        expect.arrayContaining([expect.objectContaining({ method, path, capability: 'clinicalAlerts' })])
+        expect.arrayContaining([
+          expect.objectContaining({ method, path, capability: 'clinicalAlerts' }),
+        ]),
       );
       expect(findBackendRoute(method, path), `${method} ${path}`).toBeTruthy();
     }
 
-    const stream = runBackendFrontendExposureScan().analyzed.find((row) => row.id === 'clinical-alerts-stream');
+    const stream = runBackendFrontendExposureScan().analyzed.find(
+      (row) => row.id === 'clinical-alerts-stream',
+    );
     expect(stream?.exposure).toBe('gated-stub');
   });
 
   scanIt('classifies frontend, backend-only, planned, and executor capabilities', () => {
     const rows = buildBackendFrontendCapabilityRows();
     const classifications = new Set(rows.map((row) => row.classification));
-    expect(classifications).toContain(BACKEND_FRONTEND_CAPABILITY_CLASSIFICATIONS.USER_FACING_WIRED);
-    expect(classifications).toContain(BACKEND_FRONTEND_CAPABILITY_CLASSIFICATIONS.BACKEND_ONLY_INTERNAL);
-    expect(classifications).toContain(BACKEND_FRONTEND_CAPABILITY_CLASSIFICATIONS.PLANNED_UNSUPPORTED);
+    expect(classifications).toContain(
+      BACKEND_FRONTEND_CAPABILITY_CLASSIFICATIONS.USER_FACING_WIRED,
+    );
+    expect(classifications).toContain(
+      BACKEND_FRONTEND_CAPABILITY_CLASSIFICATIONS.BACKEND_ONLY_INTERNAL,
+    );
+    expect(classifications).toContain(
+      BACKEND_FRONTEND_CAPABILITY_CLASSIFICATIONS.PLANNED_UNSUPPORTED,
+    );
     expect(
       rows.filter(
         (row) =>
           row.classification ===
-          BACKEND_FRONTEND_CAPABILITY_CLASSIFICATIONS.USER_FACING_MISSING_FRONTEND_ROUTE
-      )
+          BACKEND_FRONTEND_CAPABILITY_CLASSIFICATIONS.USER_FACING_MISSING_FRONTEND_ROUTE,
+      ),
     ).toEqual([]);
     expect(
       rows.filter(
         (row) =>
-          row.classification === BACKEND_FRONTEND_CAPABILITY_CLASSIFICATIONS.FRONTEND_VISIBLE_BACKEND_MISSING
-      )
+          row.classification ===
+          BACKEND_FRONTEND_CAPABILITY_CLASSIFICATIONS.FRONTEND_VISIBLE_BACKEND_MISSING,
+      ),
     ).toEqual([]);
 
     const executorRows = rows.filter((row) => row.source === 'user-facing-tool');
     expect(executorRows.map((row) => row.orchestratorToolId).sort()).toEqual(
-      [...BACKEND_EXECUTOR_NLU_TOOL_IDS].sort()
+      [...BACKEND_EXECUTOR_NLU_TOOL_IDS].sort(),
     );
     expect(executorRows.every((row) => row.classification === 'user-facing and wired')).toBe(true);
   });
@@ -309,13 +337,21 @@ describe('Vite proxy and ports', () => {
 
   it('keeps local example URLs aligned to Vite dev port and metrics route', () => {
     expect(rootEnvExample).toContain('VITE_PRIVACY_POLICY_URL=http://localhost:3000/privacy');
-    expect(rootEnvExample).toContain('GOOGLE_CALLBACK_URL=http://localhost:3000/api/auth/google/callback');
-    expect(rootEnvExample).toContain('LINKEDIN_CALLBACK_URL=http://localhost:3000/api/auth/linkedin/callback');
+    expect(rootEnvExample).toContain(
+      'GOOGLE_CALLBACK_URL=http://localhost:3000/api/auth/google/callback',
+    );
+    expect(rootEnvExample).toContain(
+      'LINKEDIN_CALLBACK_URL=http://localhost:3000/api/auth/linkedin/callback',
+    );
     expect(rootEnvExample).not.toMatch(/localhost:5173/);
     expect(rootEnvExample).not.toMatch(/localhost:4173/);
     expect(backendEnvExample).toContain('FRONTEND_URL=http://localhost:3000');
-    expect(backendEnvExample).toContain('GOOGLE_CALLBACK_URL=http://localhost:3000/api/auth/google/callback');
-    expect(backendEnvExample).toContain('STRIPE_SUCCESS_URL=http://localhost:3000/subscription/success');
+    expect(backendEnvExample).toContain(
+      'GOOGLE_CALLBACK_URL=http://localhost:3000/api/auth/google/callback',
+    );
+    expect(backendEnvExample).toContain(
+      'STRIPE_SUCCESS_URL=http://localhost:3000/subscription/success',
+    );
     expect(backendEnvExample).not.toMatch(/localhost:5173/);
     expect(backendEnvExample).not.toMatch(/localhost:4173/);
     expect(backendMainSource).toContain('http://localhost:${port}/api/metrics');

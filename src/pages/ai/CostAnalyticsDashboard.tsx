@@ -13,7 +13,8 @@ import './CostAnalyticsDashboard.css';
 
 const COST_ANALYTICS_ROUTE_CHROME = Object.freeze({
   title: 'Cost Analytics',
-  subtitle: 'Request spend, token cost, cache efficiency, and route complexity for AI operations review.',
+  subtitle:
+    'Request spend, token cost, cache efficiency, and route complexity for AI operations review.',
 });
 
 export default function CostAnalyticsDashboard() {
@@ -37,8 +38,13 @@ export default function CostAnalyticsDashboard() {
         <div className="cost-page__title-row">
           <GraphicIconBadge iconKey="activity" accent="brand" size="md" />
           <div>
-            <p className="cost-page__title-text" data-testid="cd-page-title-text">Cost Analytics</p>
-            <p>Request spend, token cost, cache efficiency, and route complexity for AI operations review.</p>
+            <p className="cost-page__title-text" data-testid="cd-page-title-text">
+              Cost Analytics
+            </p>
+            <p>
+              Request spend, token cost, cache efficiency, and route complexity for AI operations
+              review.
+            </p>
           </div>
         </div>
         <div className="cost-page__actions">
@@ -50,7 +56,11 @@ export default function CostAnalyticsDashboard() {
 
       <StateSourceNotice
         title="Cost analytics source state"
-        states={[DEMO_LIVE_STATES.DEMO, DEMO_LIVE_STATES.LOCAL_ONLY, DEMO_LIVE_STATES.BACKEND_UNAVAILABLE]}
+        states={[
+          DEMO_LIVE_STATES.DEMO,
+          DEMO_LIVE_STATES.LOCAL_ONLY,
+          DEMO_LIVE_STATES.BACKEND_UNAVAILABLE,
+        ]}
         details="Demo cost optimizer snapshot — falls back when backend cost API is disabled or unavailable."
       />
 
@@ -73,11 +83,20 @@ export default function CostAnalyticsDashboard() {
           hint={`${cost.cache.hits} hits / ${cost.cache.misses} misses`}
           tone={cost.cache.hitRate >= 0.4 ? 'good' : 'warning'}
         />
-        <MetricCard label="Requests" value={String(cost.totalRequests)} hint="Tracked demo requests" tone="neutral" />
+        <MetricCard
+          label="Requests"
+          value={String(cost.totalRequests)}
+          hint="Tracked demo requests"
+          tone="neutral"
+        />
       </div>
 
       <div className="cost-page__charts">
-        <VisualizationPanel title="Route mix" description="Demo AI route distribution by execution path." badge="Routes">
+        <VisualizationPanel
+          title="Route mix"
+          description="Demo AI route distribution by execution path."
+          badge="Routes"
+        >
           <CategoryBarChart
             data={routeChart}
             title="Route mix"
@@ -85,7 +104,11 @@ export default function CostAnalyticsDashboard() {
             emptyMessage="Route chart appears when cost telemetry is available."
           />
         </VisualizationPanel>
-        <VisualizationPanel title="Complexity mix" description="Simple, medium, and complex request distribution." badge="Complexity">
+        <VisualizationPanel
+          title="Complexity mix"
+          description="Simple, medium, and complex request distribution."
+          badge="Complexity"
+        >
           <CategoryBarChart
             data={complexityChart}
             title="Complexity mix"
@@ -98,8 +121,8 @@ export default function CostAnalyticsDashboard() {
       <section className="cost-page__panel" aria-label="Token cost summary">
         <h2>Token cost</h2>
         <p>
-          Last ${cost.tokenCost.lastUsd.toFixed(3)} · Total ${cost.tokenCost.totalUsd.toFixed(2)} · Average $
-          {cost.tokenCost.averageUsd.toFixed(3)}
+          Last ${cost.tokenCost.lastUsd.toFixed(3)} · Total ${cost.tokenCost.totalUsd.toFixed(2)} ·
+          Average ${cost.tokenCost.averageUsd.toFixed(3)}
         </p>
       </section>
     </main>

@@ -8,7 +8,11 @@ const mocks = vi.hoisted(() => ({
     isAuthenticated: true,
   },
   identityState: {
-    organization: { id: 'org-1', name: 'CareDroid Hospital', branding: { displayName: 'Hospital' } },
+    organization: {
+      id: 'org-1',
+      name: 'CareDroid Hospital',
+      branding: { displayName: 'Hospital' },
+    },
     platformContext: { organization: { id: 'org-1', branding: { displayName: 'Hospital' } } },
     refreshPlatformContext: vi.fn(),
   },
@@ -38,13 +42,17 @@ vi.mock('../utils/logger', () => ({
 }));
 
 function Probe() {
-  const { branding, integrations, subscription, saveOrganizationSettings } = useOrganizationContext();
+  const { branding, integrations, subscription, saveOrganizationSettings } =
+    useOrganizationContext();
   return (
     <div>
       <output data-testid="org-engine">
         {branding?.displayName}:{subscription?.tier}:{integrations.length}
       </output>
-      <button type="button" onClick={() => saveOrganizationSettings({ branding: { displayName: 'Next' } })}>
+      <button
+        type="button"
+        onClick={() => saveOrganizationSettings({ branding: { displayName: 'Next' } })}
+      >
         Save
       </button>
     </div>
@@ -66,8 +74,13 @@ function SettingsCheckedProbe() {
   );
 }
 
-function SettingsCheckedRefreshProbe({ onReady }: { onReady: (refresh: () => Promise<any>) => void }) {
-  const { isLoading, hasCheckedOrganizationSettings, refreshOrganizationEngine } = useOrganizationContext();
+function SettingsCheckedRefreshProbe({
+  onReady,
+}: {
+  onReady: (refresh: () => Promise<any>) => void;
+}) {
+  const { isLoading, hasCheckedOrganizationSettings, refreshOrganizationEngine } =
+    useOrganizationContext();
   onReady(refreshOrganizationEngine);
   return (
     <output data-testid="settings-status">
@@ -76,7 +89,11 @@ function SettingsCheckedRefreshProbe({ onReady }: { onReady: (refresh: () => Pro
   );
 }
 
-function SaveSettingsProbe({ onReady }: { onReady: (save: (updates: any) => Promise<any>) => void }) {
+function SaveSettingsProbe({
+  onReady,
+}: {
+  onReady: (save: (updates: any) => Promise<any>) => void;
+}) {
   const { branding, saveOrganizationSettings } = useOrganizationContext();
   onReady(saveOrganizationSettings);
   return <output data-testid="org-branding">{branding?.displayName}</output>;
@@ -159,7 +176,11 @@ describe('OrganizationContextProvider', () => {
     let refresh: (() => Promise<any>) | null = null;
     render(
       <OrganizationContextProvider>
-        <RefreshProbe onReady={(fn) => { refresh = fn; }} />
+        <RefreshProbe
+          onReady={(fn) => {
+            refresh = fn;
+          }}
+        />
       </OrganizationContextProvider>,
     );
 
@@ -214,7 +235,11 @@ describe('OrganizationContextProvider', () => {
     let save: ((updates: any) => Promise<any>) | null = null;
     render(
       <OrganizationContextProvider>
-        <SaveSettingsProbe onReady={(fn) => { save = fn; }} />
+        <SaveSettingsProbe
+          onReady={(fn) => {
+            save = fn;
+          }}
+        />
       </OrganizationContextProvider>,
     );
 
@@ -333,7 +358,11 @@ describe('OrganizationContextProvider', () => {
       let refresh: (() => Promise<any>) | null = null;
       render(
         <OrganizationContextProvider>
-          <SettingsCheckedRefreshProbe onReady={(fn) => { refresh = fn; }} />
+          <SettingsCheckedRefreshProbe
+            onReady={(fn) => {
+              refresh = fn;
+            }}
+          />
         </OrganizationContextProvider>,
       );
 
@@ -375,7 +404,11 @@ describe('OrganizationContextProvider', () => {
       let refresh: (() => Promise<any>) | null = null;
       render(
         <OrganizationContextProvider>
-          <SettingsCheckedRefreshProbe onReady={(fn) => { refresh = fn; }} />
+          <SettingsCheckedRefreshProbe
+            onReady={(fn) => {
+              refresh = fn;
+            }}
+          />
         </OrganizationContextProvider>,
       );
 

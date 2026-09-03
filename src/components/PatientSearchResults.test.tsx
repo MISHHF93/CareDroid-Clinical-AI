@@ -132,8 +132,16 @@ describe('PatientSearchResults footer query display (HEAL-342)', () => {
 describe('PatientSearchResults same-name warning (SAFER patient-identification)', () => {
   it('flags two results with the same display name so a same-name mix-up cannot go unnoticed', () => {
     const results: PatientSearchResult<Patient>[] = [
-      { patient: patient({ id: 'p1', mrn: 'ED-1', firstName: 'John', lastName: 'Smith' }), score: 1, matchKind: 'exact-name' },
-      { patient: patient({ id: 'p2', mrn: 'ED-2', firstName: 'John', lastName: 'Smith' }), score: 1, matchKind: 'exact-name' },
+      {
+        patient: patient({ id: 'p1', mrn: 'ED-1', firstName: 'John', lastName: 'Smith' }),
+        score: 1,
+        matchKind: 'exact-name',
+      },
+      {
+        patient: patient({ id: 'p2', mrn: 'ED-2', firstName: 'John', lastName: 'Smith' }),
+        score: 1,
+        matchKind: 'exact-name',
+      },
     ];
     render(
       <PatientSearchResults
@@ -153,8 +161,16 @@ describe('PatientSearchResults same-name warning (SAFER patient-identification)'
 
   it('does not warn when no two results share the same name', () => {
     const results: PatientSearchResult<Patient>[] = [
-      { patient: patient({ id: 'p1', firstName: 'John', lastName: 'Smith' }), score: 1, matchKind: 'exact-name' },
-      { patient: patient({ id: 'p2', firstName: 'Jane', lastName: 'Doe' }), score: 1, matchKind: 'exact-name' },
+      {
+        patient: patient({ id: 'p1', firstName: 'John', lastName: 'Smith' }),
+        score: 1,
+        matchKind: 'exact-name',
+      },
+      {
+        patient: patient({ id: 'p2', firstName: 'Jane', lastName: 'Doe' }),
+        score: 1,
+        matchKind: 'exact-name',
+      },
     ];
     render(
       <PatientSearchResults
@@ -173,8 +189,16 @@ describe('PatientSearchResults same-name warning (SAFER patient-identification)'
 
   it('is case/whitespace-insensitive (still catches "John Smith" vs " john   smith ")', () => {
     const results: PatientSearchResult<Patient>[] = [
-      { patient: patient({ id: 'p1', firstName: 'John', lastName: 'Smith' }), score: 1, matchKind: 'exact-name' },
-      { patient: patient({ id: 'p2', firstName: '  john', lastName: 'smith  ' }), score: 1, matchKind: 'exact-name' },
+      {
+        patient: patient({ id: 'p1', firstName: 'John', lastName: 'Smith' }),
+        score: 1,
+        matchKind: 'exact-name',
+      },
+      {
+        patient: patient({ id: 'p2', firstName: '  john', lastName: 'smith  ' }),
+        score: 1,
+        matchKind: 'exact-name',
+      },
     ];
     render(
       <PatientSearchResults

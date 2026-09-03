@@ -130,8 +130,7 @@ export function interpretGad7Score(total) {
   const screeningDiscussion = {
     none_minimal:
       'Scores in the minimal range suggest few anxiety symptoms on this screen over the past two weeks. A low score does not exclude clinically significant anxiety or comorbid conditions in other contexts.',
-    mild:
-      'Scores in the mild range may warrant watchful waiting or repeat screening depending on context, functional impairment, and patient preference. This tool does not establish an anxiety disorder diagnosis.',
+    mild: 'Scores in the mild range may warrant watchful waiting or repeat screening depending on context, functional impairment, and patient preference. This tool does not establish an anxiety disorder diagnosis.',
     moderate:
       'Scores in the moderate range often prompt clinical follow-up (e.g. repeat assessment, structured interview, or referral) per institutional guidance. This tool does not establish an anxiety disorder diagnosis.',
     severe:
@@ -194,7 +193,7 @@ export function validateGad7Inputs(raw) {
     return { valid: false, errors };
   }
 
-  return { valid: true, errors: [], inputs: (inputs as any) };
+  return { valid: true, errors: [], inputs: inputs as any };
 }
 
 /**

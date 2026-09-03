@@ -19,14 +19,8 @@ import {
   computeTimiBreakdown,
   interpretTimiUaNstemi,
 } from '../utils/timiUaNstemiCalculator';
-import {
-  calculateWellsPeScore,
-  interpretWellsPe,
-} from '../utils/wellsPeCalculator';
-import {
-  evaluatePerc,
-  interpretPerc,
-} from '../utils/percCalculator';
+import { calculateWellsPeScore, interpretWellsPe } from '../utils/wellsPeCalculator';
+import { evaluatePerc, interpretPerc } from '../utils/percCalculator';
 import { wellsPeChatConfig } from './chatAssistedCalculators/wellsPe';
 import { percChatConfig } from './chatAssistedCalculators/perc';
 import toolRegistry, { toolRegistryById } from './toolRegistry';
@@ -86,7 +80,7 @@ describe('PR2 comprehensive — MELD formula & MELD-Na', () => {
         inr: 1.5,
         creatinineMgDl: 1.2,
         onDialysis: false,
-      })
+      }),
     ).toBe(15);
   });
 
@@ -105,7 +99,7 @@ describe('PR2 comprehensive — MELD formula & MELD-Na', () => {
         onDialysis: MELD_NA_REGRESSION.onDialysis,
         sodium: MELD_NA_REGRESSION.sodium,
       },
-      { includeMeldNa: true }
+      { includeMeldNa: true },
     );
     expect(out.ok).toBe(true);
     if (!('meld' in out)) throw new Error('expected computeMeldResult to succeed');
@@ -123,9 +117,10 @@ describe('PR2 comprehensive — MELD formula & MELD-Na', () => {
     if (!('meld' in floored)) throw new Error('expected computeMeldResult to succeed');
     expect(low.meld).toBe(floored.meld);
     expect(low.clamped.creatinineMgDl).toBe(1);
-    expect(applyMeldLabClamps({ bilirubinMgDl: 1, inr: 1, creatinineMgDl: 0.3, onDialysis: false }).creatinineMgDl).toBe(
-      1
-    );
+    expect(
+      applyMeldLabClamps({ bilirubinMgDl: 1, inr: 1, creatinineMgDl: 0.3, onDialysis: false })
+        .creatinineMgDl,
+    ).toBe(1);
   });
 
   it('edge: dialysis applies UNOS creatinine 4.0 mg/dL', () => {
@@ -200,7 +195,7 @@ describe('PR2 comprehensive — TIMI scoring & interpretation', () => {
       const i = interpretTimiUaNstemi(score);
       expect(i?.severity).toBe(severity);
       expect(i?.riskBand).toBe(riskBand);
-    }
+    },
   );
 
   it('edge: max score (7) is critical higher-risk band', () => {
@@ -212,7 +207,12 @@ describe('PR2 comprehensive — TIMI scoring & interpretation', () => {
   });
 
   it('breakdown sums match total for partial selection', () => {
-    const partial = { ...TIMI_NONE, severeAngina: true, stDeviation: true, elevatedCardiacMarkers: true };
+    const partial = {
+      ...TIMI_NONE,
+      severeAngina: true,
+      stDeviation: true,
+      elevatedCardiacMarkers: true,
+    };
     const b = computeTimiBreakdown(partial);
     expect((Object.values(b) as number[]).reduce((a, n) => a + n, 0)).toBe(3);
     expect(calculateTimiUaNstemiScore(partial)).toBe(3);
@@ -244,7 +244,7 @@ describe('PR2 comprehensive — Wells PE scoring', () => {
       const i = interpretWellsPe(score);
       expect(i?.probabilityBand).toBe(band);
       expect(i?.severity).toBe(severity);
-    }
+    },
   );
 
   it('edge: high-risk path (all criteria) yields critical severity', () => {
@@ -352,8 +352,7 @@ describe('PR2 comprehensive — registry, catalog, discovery', () => {
     const reg = toolRegistryById[id];
     expect(reg).toBeTruthy();
     expect(toolRegistry.filter((t) => t.id === id)).toHaveLength(1);
-    const expectedPath =
-      PR2_ROUTE_BY_REGISTRY_ID[id] ?? PR2_HUB_ROUTE_BY_REGISTRY_ID[id] ?? HUB;
+    const expectedPath = PR2_ROUTE_BY_REGISTRY_ID[id] ?? PR2_HUB_ROUTE_BY_REGISTRY_ID[id] ?? HUB;
     expect(reg.path).toBe(expectedPath);
     if ((PR2_TIER_A_CALCULATOR_REGISTRY_IDS as readonly string[]).includes(id)) {
       expect(reg.initialCalc).toBe(id);
@@ -378,8 +377,7 @@ describe('PR2 comprehensive — registry, catalog, discovery', () => {
   it.each(PR2_TOOL_IDS)('discovery merge includes canonical %s', (id) => {
     const hits = getAllDiscoveredTools().filter((r) => r.id === id);
     expect(hits).toHaveLength(1);
-    const expectedPath =
-      PR2_ROUTE_BY_REGISTRY_ID[id] ?? PR2_HUB_ROUTE_BY_REGISTRY_ID[id] ?? HUB;
+    const expectedPath = PR2_ROUTE_BY_REGISTRY_ID[id] ?? PR2_HUB_ROUTE_BY_REGISTRY_ID[id] ?? HUB;
     expect(hits[0].path).toBe(expectedPath);
   });
 
@@ -409,18 +407,21 @@ describe('PR2 comprehensive — NLU aliases, routes, resolveCatalogLaunch', () =
     expect(expectedLaunchPath(id)).toBe(HUB);
   });
 
-  it.each(PR2_TIER_A_CALCULATOR_REGISTRY_IDS)('resolveCatalogLaunch(%s) dedicated path and chat seed', (id) => {
-    const launch = resolveCatalogLaunch(id);
-    expect(launch.path).toBe(PR2_ROUTE_BY_REGISTRY_ID[id]);
-    expect(launch.registryId).toBe(id);
-    expect(launch.path).not.toBe(HUB);
-    expect(launch.chatSeed?.length).toBeGreaterThan(20);
-    // timi-ua-nstemi is a real registerTool() backend executor, so orchestratorTool resolves
-    // to its tool id instead of null; meld/meld-na have no backend executor.
-    const expectedOrchestratorTool = REGISTRY_ID_TO_ORCHESTRATOR_TOOL[id] ?? null;
-    expect(launch.orchestratorTool).toBe(expectedOrchestratorTool);
-    expect(launch.openLabel).toBe('Open');
-  });
+  it.each(PR2_TIER_A_CALCULATOR_REGISTRY_IDS)(
+    'resolveCatalogLaunch(%s) dedicated path and chat seed',
+    (id) => {
+      const launch = resolveCatalogLaunch(id);
+      expect(launch.path).toBe(PR2_ROUTE_BY_REGISTRY_ID[id]);
+      expect(launch.registryId).toBe(id);
+      expect(launch.path).not.toBe(HUB);
+      expect(launch.chatSeed?.length).toBeGreaterThan(20);
+      // timi-ua-nstemi is a real registerTool() backend executor, so orchestratorTool resolves
+      // to its tool id instead of null; meld/meld-na have no backend executor.
+      const expectedOrchestratorTool = REGISTRY_ID_TO_ORCHESTRATOR_TOOL[id] ?? null;
+      expect(launch.orchestratorTool).toBe(expectedOrchestratorTool);
+      expect(launch.openLabel).toBe('Open');
+    },
+  );
 
   it.each(PR2_ALL_ALIAS_PAIRS)(
     'resolveCatalogLaunch("%s") matches canonical launch for %s',
@@ -430,20 +431,27 @@ describe('PR2 comprehensive — NLU aliases, routes, resolveCatalogLaunch', () =
       expect(a.path).toBe(c.path);
       expect(a.registryId).toBe(c.registryId);
       expect(a.chatSeed).toBe(c.chatSeed);
-    }
+    },
   );
 
   it.each(PR2_TIER_A_CALCULATOR_REGISTRY_IDS)('builtin calc query path for %s', (id) => {
     const builtin = builtinUiCalculators.find((c) => c.id === id);
     expect(builtin?.calcQuery).toBe(PR2_CALC_QUERY_BY_REGISTRY_ID[id]);
     expect(BUILTIN_CALC_ID_TO_REGISTRY_ID[id]).toBe(id);
-    expect(clinicalIntentTools.find((t) => t.toolId === id)?.path).toBe(PR2_ROUTE_BY_REGISTRY_ID[id]);
+    expect(clinicalIntentTools.find((t) => t.toolId === id)?.path).toBe(
+      PR2_ROUTE_BY_REGISTRY_ID[id],
+    );
   });
 
-  it.each(PR2_CATALOG_SEARCH_QUERIES)('catalog search resolves %s via "%s"', (registryId, query) => {
-    const rows = catalogRowsMatchingQuery(getMedicalToolsCatalogRows(), query);
-    expect(rows.some((r) => r.primaryId === registryId || r.sidebarToolId === registryId)).toBe(true);
-  });
+  it.each(PR2_CATALOG_SEARCH_QUERIES)(
+    'catalog search resolves %s via "%s"',
+    (registryId, query) => {
+      const rows = catalogRowsMatchingQuery(getMedicalToolsCatalogRows(), query);
+      expect(rows.some((r) => r.primaryId === registryId || r.sidebarToolId === registryId)).toBe(
+        true,
+      );
+    },
+  );
 
   it('resolveCatalogLaunch returns empty shape for unknown id', () => {
     const launch = resolveCatalogLaunch('not-a-pr2-tool-xyz');

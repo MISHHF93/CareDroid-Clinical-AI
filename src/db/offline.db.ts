@@ -23,25 +23,25 @@ class CareDroidDB extends Dexie {
     this.version(1).stores({
       // Chat messages
       messages: '++id, userId, conversationId, timestamp, synced',
-      
+
       // Conversations
       conversations: '++id, userId, lastMessageAt, synced',
-      
+
       // Tool results (SOFA, drug checker, etc.)
       toolResults: '++id, userId, toolType, timestamp, synced',
-      
+
       // User profile data
       userProfile: 'userId, lastSyncedAt',
-      
+
       // Offline actions queue
       syncQueue: '++id, action, timestamp, retryCount, synced',
-      
+
       // Cached medical knowledge (RAG responses)
       knowledgeCache: '++id, query, timestamp, expiresAt',
-      
+
       // Audit logs (local copy)
       auditLogs: '++id, userId, action, timestamp, synced',
-      
+
       // Notification history
       notifications: '++id, userId, timestamp, read, synced',
 
@@ -96,7 +96,7 @@ export const clearDatabase = async () => {
     await db.notifications.clear();
     await db.settings.clear();
     await db.offlineCatalogs.clear();
-    
+
     logger.info('Database cleared successfully');
   } catch (error: any) {
     logger.error('Failed to clear database', { error });
@@ -118,7 +118,7 @@ export const exportDatabase = async () => {
       settings: await db.settings.toArray(),
       offlineCatalogs: await db.offlineCatalogs.toArray(),
     };
-    
+
     return JSON.stringify(data, null, 2);
   } catch (error: any) {
     logger.error('Failed to export database', { error });
@@ -132,9 +132,9 @@ export const exportDatabase = async () => {
 export const importDatabase = async (jsonData) => {
   try {
     const data = JSON.parse(jsonData);
-    
+
     await clearDatabase();
-    
+
     if (data.messages) await db.messages.bulkAdd(data.messages);
     if (data.conversations) await db.conversations.bulkAdd(data.conversations);
     if (data.toolResults) await db.toolResults.bulkAdd(data.toolResults);
@@ -142,7 +142,7 @@ export const importDatabase = async (jsonData) => {
     if (data.notifications) await db.notifications.bulkAdd(data.notifications);
     if (data.settings) await db.settings.bulkAdd(data.settings);
     if (data.offlineCatalogs) await db.offlineCatalogs.bulkPut(data.offlineCatalogs);
-    
+
     logger.info('Database imported successfully');
   } catch (error: any) {
     logger.error('Failed to import database', { error });

@@ -148,9 +148,10 @@ describe('news2Calculator', () => {
     expect(bad.ok).toBe(false);
     expect(bad.errors.length).toBeGreaterThan(0);
 
-    expect(validateNews2Inputs({ ...NEWS2_VALID_BASE_INPUTS, spo2Scale: '2', supplementalOxygen: true }).ok).toBe(
-      true
-    );
+    expect(
+      validateNews2Inputs({ ...NEWS2_VALID_BASE_INPUTS, spo2Scale: '2', supplementalOxygen: true })
+        .ok,
+    ).toBe(true);
   });
 
   it('changes SpO₂ sub-score when switching between Scale 1 and Scale 2 at the same saturation', () => {
@@ -220,7 +221,7 @@ describe('news2Calculator', () => {
         pulse: 0,
         consciousness: 0,
         temperature: 0,
-      })
+      }),
     ).toBeNull();
   });
 

@@ -1,8 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  CARE_DROID_SCREEN_MODES,
-  buildCareDroidCentralNodeSnapshot,
-} from './careDroidCentralNode';
+import { CARE_DROID_SCREEN_MODES, buildCareDroidCentralNodeSnapshot } from './careDroidCentralNode';
 import { PatientState, Priority, type Patient } from '../types/emergency';
 import type { CareDroidCentralNodeSource } from './careDroidCentralNode';
 
@@ -192,7 +189,7 @@ describe('CareDroidCentralNode contract', () => {
     );
   });
 
-  it('excludes an implausibly stale active patient (e.g. an abandoned/orphaned record) from longestWait/averageWait, matching HEAL-326\'s ceiling reasoning', () => {
+  it("excludes an implausibly stale active patient (e.g. an abandoned/orphaned record) from longestWait/averageWait, matching HEAL-326's ceiling reasoning", () => {
     const snapshot = buildCareDroidCentralNodeSnapshot(
       source({
         patients: [

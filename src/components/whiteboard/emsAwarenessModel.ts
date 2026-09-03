@@ -72,7 +72,11 @@ export function isHighRiskEmsArrival(arrival) {
   );
 }
 
-export function summarizeEmsAwareness(emsArrivals = [] as any[], now = Date.now(), context: any = {}) {
+export function summarizeEmsAwareness(
+  emsArrivals = [] as any[],
+  now = Date.now(),
+  context: any = {},
+) {
   const active = activeEmsArrivals(emsArrivals);
   const inbound = active
     .filter((arrival) => isInboundEmsArrival(arrival, now))
@@ -88,16 +92,16 @@ export function summarizeEmsAwareness(emsArrivals = [] as any[], now = Date.now(
     offloadTargetMinutes: context.offloadTargetMinutes,
   });
   const riskArrivals = active.filter(isHighRiskEmsArrival);
-  const awaitingOffload = active.filter((arrival) => getArrivalOffloadMinutes(arrival, now) !== null);
+  const awaitingOffload = active.filter(
+    (arrival) => getArrivalOffloadMinutes(arrival, now) !== null,
+  );
 
   return Object.freeze({
     activeCount: active.length,
     inboundCount: inbound.length,
     soonestArrival: soonest,
     soonestEtaMinutes: soonestMinutes,
-    soonestEtaLabel: soonest
-      ? formatEta(soonestMinutes ?? 0, soonest.status)
-      : null,
+    soonestEtaLabel: soonest ? formatEta(soonestMinutes ?? 0, soonest.status) : null,
     soonestEtaTone: soonest ? etaTone(soonestMinutes ?? 0, soonest.status) : 'stable',
     riskCount: riskArrivals.length,
     riskArrivals: Object.freeze([...riskArrivals]),
@@ -114,7 +118,10 @@ export function summarizeEmsAwareness(emsArrivals = [] as any[], now = Date.now(
   });
 }
 
-export function shouldShowEmsAttentionStrip({ displayMode = false, summary = (undefined as any) }: any = {}) {
+export function shouldShowEmsAttentionStrip({
+  displayMode = false,
+  summary = undefined as any,
+}: any = {}) {
   if (displayMode || !summary) return false;
   return (
     summary.inboundCount > 0 ||
@@ -167,16 +174,17 @@ export function buildEmsAttentionStripMetrics(summary) {
     );
   }
 
-  if (summary.awaitingHandoff > 0 || summary.offloadMinutes > 0 || summary.delayedOffloadCount > 0) {
+  if (
+    summary.awaitingHandoff > 0 ||
+    summary.offloadMinutes > 0 ||
+    summary.delayedOffloadCount > 0
+  ) {
     metrics.push(
       Object.freeze({
         id: 'ems-offload',
         label: 'Offload',
         hint: `${summary.awaitingHandoff} unit${summary.awaitingHandoff === 1 ? '' : 's'} awaiting handoff`,
-        value:
-          summary.offloadMinutes > 0
-            ? `${summary.offloadMinutes}m`
-            : summary.awaitingHandoff,
+        value: summary.offloadMinutes > 0 ? `${summary.offloadMinutes}m` : summary.awaitingHandoff,
         surface: 'ems',
         tone:
           summary.delayedOffloadCount > 0 || summary.offloadMinutes >= 15

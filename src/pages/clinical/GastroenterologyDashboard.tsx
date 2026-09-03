@@ -18,7 +18,8 @@ const CARDS = [
   {
     to: '/emergency/tools/gastroenterology/gi-bleed-workflow-assistant',
     title: 'GI bleed workflow assistant',
-    description: 'Glasgow-Blatchford/Rockall context, hemodynamics, medications, and handoff prompts.',
+    description:
+      'Glasgow-Blatchford/Rockall context, hemodynamics, medications, and handoff prompts.',
     tier: 'Tier B' as const,
   },
   {
@@ -42,13 +43,15 @@ const CARDS = [
   {
     to: '/emergency/tools/gastroenterology/hepatic-trend-analytics',
     title: 'Hepatic trend analytics',
-    description: 'Synthetic function, cholestasis, platelets, MELD/Child-Pugh inputs, and missing labs.',
+    description:
+      'Synthetic function, cholestasis, platelets, MELD/Child-Pugh inputs, and missing labs.',
     tier: 'Tier C' as const,
   },
   {
     to: '/emergency/tools/gastroenterology/endoscopy-workflow-assistant',
     title: 'Endoscopy workflow assistant',
-    description: 'Indication, preparation status, risk context, documentation, and follow-up queues.',
+    description:
+      'Indication, preparation status, risk context, documentation, and follow-up queues.',
     tier: 'Tier C' as const,
   },
   {

@@ -1,8 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  buildDispatchLoadChart,
-  buildDispatchPriorityQueue,
-} from './dispatchIntelligenceModel';
+import { buildDispatchLoadChart, buildDispatchPriorityQueue } from './dispatchIntelligenceModel';
 
 describe('dispatchIntelligenceModel', () => {
   it('ranks vehicles by utilization, energy, maintenance, and alerts', () => {

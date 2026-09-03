@@ -40,7 +40,9 @@ export default function EdJourneyProgressRail({
           </span>
         ) : null}
         {priorityLabel ? (
-          <span className={`ed-journey-rail__priority ed-journey-rail__priority--${priorityLabel.toLowerCase()}`}>
+          <span
+            className={`ed-journey-rail__priority ed-journey-rail__priority--${priorityLabel.toLowerCase()}`}
+          >
             {priorityLabel}
           </span>
         ) : null}
@@ -55,7 +57,10 @@ export default function EdJourneyProgressRail({
               className={`ed-journey-rail__phase ed-journey-rail__phase--${state}`}
             >
               <Link
-                to={buildPhaseRouteWithPatientContext(phase.route, { patientId: patientId ?? undefined, encounterId })}
+                to={buildPhaseRouteWithPatientContext(phase.route, {
+                  patientId: patientId ?? undefined,
+                  encounterId,
+                })}
                 className="ed-journey-rail__link"
                 {...(state === 'active' ? { 'aria-current': 'step' as const } : {})}
                 title={`${phase.order}. ${phase.label}`}

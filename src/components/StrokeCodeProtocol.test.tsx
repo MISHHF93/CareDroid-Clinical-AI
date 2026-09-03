@@ -33,9 +33,15 @@ function patientWithComplaint(chiefComplaint: string, complaintCategory = 'Neuro
 describe('StrokeCodeProtocol helpers', () => {
   it('detects stroke complaints from complaint router and conservative fallback terms', () => {
     expect(isStrokeComplaint(patientWithComplaint('Facial droop and slurred speech'))).toBe(true);
-    expect(isStrokeComplaint(patientWithComplaint('Possible CVA with aphasia', 'Other'))).toBe(true);
-    expect(isStrokeComplaint(patientWithComplaint('Diffuse fatigue without focal deficits', 'General'))).toBe(false);
-    expect(isStrokeComplaint(patientWithComplaint('Abdominal pain right lower quadrant', 'Abdominal'))).toBe(false);
+    expect(isStrokeComplaint(patientWithComplaint('Possible CVA with aphasia', 'Other'))).toBe(
+      true,
+    );
+    expect(
+      isStrokeComplaint(patientWithComplaint('Diffuse fatigue without focal deficits', 'General')),
+    ).toBe(false);
+    expect(
+      isStrokeComplaint(patientWithComplaint('Abdominal pain right lower quadrant', 'Abdominal')),
+    ).toBe(false);
   });
 
   it('parses stroke activation and timeline notes from patient notes', () => {
@@ -74,13 +80,21 @@ describe('StrokeCodeProtocol helpers', () => {
   });
 
   it('classifies door-to-needle performance bands', () => {
-    expect(classifyDtn(30)).toEqual({ tone: 'green', message: '✓ Excellent — Canadian target met' });
-    expect(classifyDtn(45)).toEqual({ tone: 'yellow', message: '⚠ Within limit — target is ≤30min' });
+    expect(classifyDtn(30)).toEqual({
+      tone: 'green',
+      message: '✓ Excellent — Canadian target met',
+    });
+    expect(classifyDtn(45)).toEqual({
+      tone: 'yellow',
+      message: '⚠ Within limit — target is ≤30min',
+    });
     expect(classifyDtn(61)).toEqual({ tone: 'red', message: '✗ Exceeded — review process' });
   });
 
   it('summarizes tPA checklist eligibility without auto-deciding treatment', () => {
-    const allIncludes = Object.fromEntries(TPA_INCLUDE_CRITERIA.map((criterion) => [criterion.id, true]));
+    const allIncludes = Object.fromEntries(
+      TPA_INCLUDE_CRITERIA.map((criterion) => [criterion.id, true]),
+    );
     expect(getTpaEligibilityResult(allIncludes, {})).toEqual({
       status: 'eligible',
       tone: 'green',

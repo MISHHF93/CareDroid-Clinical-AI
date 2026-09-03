@@ -44,7 +44,7 @@ function buildFromNlu(nlu) {
     (c) =>
       c.orchestratorId === nlu.toolId ||
       c.id === nlu.toolId ||
-      (nlu.toolId === 'cha2ds2vasc-calculator' && c.id === 'chads2vasc')
+      (nlu.toolId === 'cha2ds2vasc-calculator' && c.id === 'chads2vasc'),
   );
   const hasDedicatedForm = Boolean(inventoryRecord?.calculatorSlug || uiCalc);
   const hubOnly =
@@ -62,7 +62,7 @@ function buildFromNlu(nlu) {
     chatOnRequest: true,
     chatSeed: inventoryRecord?.chatSeed || nlu.chatSeed || launch.chatSeed || '',
     backendExecutor: Boolean(
-      nlu.backendExecutable || inventoryRecord?.executorStatus === TOOL_EXECUTOR_STATUS.REGISTERED
+      nlu.backendExecutable || inventoryRecord?.executorStatus === TOOL_EXECUTOR_STATUS.REGISTERED,
     ),
     uiCalculatorSlug: inventoryRecord?.calculatorSlug || uiCalc?.id || null,
     chatOnlyForm:
@@ -80,10 +80,10 @@ function buildFromRegistry(reg) {
     (c) =>
       c.id === reg.initialCalc ||
       (reg.id === REGISTRY.sofaScore && c.id === BUILTIN_CALC.sofa) ||
-      (reg.id === REGISTRY.calcGfr && c.id === BUILTIN_CALC.gfr)
+      (reg.id === REGISTRY.calcGfr && c.id === BUILTIN_CALC.gfr),
   );
   const matchedNlu = clinicalIntentTools.find(
-    (n) => n.sidebarToolId === reg.id || n.path === reg.path
+    (n) => n.sidebarToolId === reg.id || n.path === reg.path,
   );
   const keywordRouted = KEYWORD_ROUTED_REGISTRY_IDS.includes(reg.id);
 
@@ -99,7 +99,8 @@ function buildFromRegistry(reg) {
     chatSeed: inventoryRecord?.chatSeed || matchedNlu?.chatSeed || launch.chatSeed || '',
     backendExecutor: Boolean(
       inventoryRecord?.executorStatus === TOOL_EXECUTOR_STATUS.REGISTERED ||
-        (inventoryRecord?.endpoint && inventoryRecord?.launchType === TOOL_LAUNCH_TYPES.BACKEND_BACKED)
+      (inventoryRecord?.endpoint &&
+        inventoryRecord?.launchType === TOOL_LAUNCH_TYPES.BACKEND_BACKED),
     ),
     uiCalculatorSlug: inventoryRecord?.calculatorSlug || uiCalc?.id || reg.initialCalc || null,
     chatOnlyForm: false,

@@ -30,7 +30,9 @@ export const SUPPORTED_APP_ENVIRONMENTS = Object.freeze([
 ]);
 
 export const normalizeAppEnvironment = (value) => {
-  const normalized = String(value || '').trim().toLowerCase();
+  const normalized = String(value || '')
+    .trim()
+    .toLowerCase();
   if (normalized === 'dev') return 'development';
   if (normalized === 'prod') return 'production';
   return SUPPORTED_APP_ENVIRONMENTS.includes(normalized) ? normalized : 'development';
@@ -45,7 +47,10 @@ const appConfig = {
     version: getEnvValue('VITE_APP_VERSION', '1.0.0'),
     environment: appEnvironment,
     environmentValidation: {
-      valid: appEnvironment === rawAppEnvironment || rawAppEnvironment === 'dev' || rawAppEnvironment === 'prod',
+      valid:
+        appEnvironment === rawAppEnvironment ||
+        rawAppEnvironment === 'dev' ||
+        rawAppEnvironment === 'prod',
       raw: rawAppEnvironment,
       allowed: SUPPORTED_APP_ENVIRONMENTS,
     },
@@ -64,7 +69,7 @@ const appConfig = {
   },
   analytics: {
     enabled: toBoolean(
-      getEnvValue('VITE_ENABLE_ANALYTICS', getEnvValue('VITE_ANALYTICS_ENABLED', 'false'))
+      getEnvValue('VITE_ENABLE_ANALYTICS', getEnvValue('VITE_ANALYTICS_ENABLED', 'false')),
     ),
     segmentWriteKey: getEnvValue('VITE_SEGMENT_WRITE_KEY', ''),
   },
@@ -82,7 +87,7 @@ const appConfig = {
     enableBiometricAuth: toBoolean(getEnvValue('VITE_ENABLE_BIOMETRIC_AUTH', 'false')),
     /** Local/demo auth defaults on in local dev and is opt-in for production demo deployments. */
     enableDevAuthBypass: toBoolean(
-      getEnvValue('VITE_ENABLE_DEV_AUTH_BYPASS', isProductionBuild() ? 'false' : 'true')
+      getEnvValue('VITE_ENABLE_DEV_AUTH_BYPASS', isProductionBuild() ? 'false' : 'true'),
     ),
     /** Production-safe demo flag for hosted demos. */
     enableDemoMode: toBoolean(getEnvValue('VITE_DEMO_MODE', 'false')),
@@ -91,20 +96,20 @@ const appConfig = {
      * to swap live data sources for mock scenario generators (no real patient data).
      */
     enableSimulationMode: toBoolean(
-      getEnvValue('VITE_SIMULATION_MODE', isProductionBuild() ? 'false' : 'true')
+      getEnvValue('VITE_SIMULATION_MODE', isProductionBuild() ? 'false' : 'true'),
     ),
     /**
      * Browser-only fallback demo sessions are local-dev only by default.
      * Hosted demos should use the backend /api/auth/dev-session endpoint.
      */
     allowLocalDemoAuth: toBoolean(
-      getEnvValue('VITE_ALLOW_LOCAL_DEMO_AUTH', isProductionBuild() ? 'false' : 'true')
+      getEnvValue('VITE_ALLOW_LOCAL_DEMO_AUTH', isProductionBuild() ? 'false' : 'true'),
     ),
     /** Explicit deployed-demo override for staging/demo builds that intentionally expose the bypass. */
     showDemoAuth: toBoolean(getEnvValue('VITE_SHOW_DEMO_AUTH', 'false')),
     /** Legacy hide flag retained for older deployments. */
     hideDivisionMode: toBoolean(
-      getEnvValue('VITE_HIDE_DIVISION_MODE', isProductionBuild() ? 'true' : 'false')
+      getEnvValue('VITE_HIDE_DIVISION_MODE', isProductionBuild() ? 'true' : 'false'),
     ),
     platformEntitlements: toBoolean(getEnvValue('VITE_PLATFORM_ENTITLEMENTS', 'true')),
     singleWorkspaceModel: toBoolean(getEnvValue('VITE_SINGLE_WORKSPACE_MODEL', 'true')),

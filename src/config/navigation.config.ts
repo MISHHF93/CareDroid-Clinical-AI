@@ -4,15 +4,8 @@
  * Canonical source: `unified-navigation.config.ts` (see `canonicalConfigurationModel.ts`).
  * `navigation/primaryNavigation.ts` is still a compatibility re-export.
  */
-import {
-  NAVIGATION_ITEMS,
-  getPilotCustomerNavigationItems,
-} from './unified-navigation.config';
-import {
-  CANONICAL_ROUTES,
-  FLEET_MAP_ROUTE_ALIASES,
-  LIVE_MAP_ROUTE_ALIASES,
-} from './routes.config';
+import { NAVIGATION_ITEMS, getPilotCustomerNavigationItems } from './unified-navigation.config';
+import { CANONICAL_ROUTES, FLEET_MAP_ROUTE_ALIASES, LIVE_MAP_ROUTE_ALIASES } from './routes.config';
 import { FEATURE_REGISTRY_BY_ID } from '../../lib/features/featureRegistry';
 
 /**
@@ -52,7 +45,7 @@ function appShellNavItemFromUnified(item) {
 }
 
 export const APP_SHELL_NAV_ITEMS = Object.freeze(
-  getPilotCustomerNavigationItems(NAVIGATION_ITEMS).map(appShellNavItemFromUnified)
+  getPilotCustomerNavigationItems(NAVIGATION_ITEMS).map(appShellNavItemFromUnified),
 );
 
 export const EMERGENCY_SIDEBAR_NAV_ITEMS = APP_SHELL_NAV_ITEMS;
@@ -302,7 +295,11 @@ export const SOLUTIONS_SIDEBAR_NAV_ITEMS = Object.freeze([
     label: 'Success Center',
     mobileLabel: 'Success',
     path: CANONICAL_ROUTES.customerSuccessDashboard,
-    matchPaths: [CANONICAL_ROUTES.customerSuccessDashboard, CANONICAL_ROUTES.customerSuccess, CANONICAL_ROUTES.successCenter],
+    matchPaths: [
+      CANONICAL_ROUTES.customerSuccessDashboard,
+      CANONICAL_ROUTES.customerSuccess,
+      CANONICAL_ROUTES.successCenter,
+    ],
     showInMobile: false,
   },
 ]);
@@ -629,21 +626,19 @@ export const PRIMARY_NAV_BY_ID = Object.freeze(
       ...OPERATIONS_SIDEBAR_NAV_ITEMS,
       ...ADVANCED_SIDEBAR_NAV_ITEMS,
       ...ACCOUNT_UTILITY_NAV_ITEMS,
-    ].map((item) => [item.id, item])
-  )
+    ].map((item) => [item.id, item]),
+  ),
 );
 
 export const PRIMARY_SIDEBAR_NAV_ITEMS = Object.freeze(
-  PRIMARY_NAV_ITEMS.filter((item) => (item as any).showInSidebar !== false)
+  PRIMARY_NAV_ITEMS.filter((item) => (item as any).showInSidebar !== false),
 );
 
 export const PRIMARY_MOBILE_NAV_ITEMS = Object.freeze(
-  PRIMARY_SIDEBAR_NAV_ITEMS.filter((item) => (item as any).showInMobile !== false)
+  PRIMARY_SIDEBAR_NAV_ITEMS.filter((item) => (item as any).showInMobile !== false),
 );
 
-const NORMAL_PRIMARY_NAV_IDS = new Set([
-  ...APP_SHELL_NAV_ITEMS.map((item) => item.id),
-]);
+const NORMAL_PRIMARY_NAV_IDS = new Set([...APP_SHELL_NAV_ITEMS.map((item) => item.id)]);
 const UTILITY_NAV_IDS = new Set(['search', 'notifications']);
 // Exported for navigationPermissionInvariants.test.ts -- this is a SECOND,
 // independent route->permission mapping (distinct from each item's own
@@ -672,7 +667,11 @@ function hasRequiredPermission(item, permissionSet) {
 
 export function canExposeNavigationItem(
   item,
-  { permissions = [] as any[], includeContextual = false, relevantDestinationIds = [] as any[] }: any = {}
+  {
+    permissions = [] as any[],
+    includeContextual = false,
+    relevantDestinationIds = [] as any[],
+  }: any = {},
 ) {
   if (!item?.id || !item.path) return false;
   const permissionSet = new Set(permissions || []);
@@ -702,7 +701,7 @@ function quickCommandDestinationFromAppShellItem(item) {
 }
 
 export const QUICK_COMMAND_NAV_ITEMS = Object.freeze(
-  APP_SHELL_NAV_ITEMS.map(quickCommandDestinationFromAppShellItem)
+  APP_SHELL_NAV_ITEMS.map(quickCommandDestinationFromAppShellItem),
 );
 export const QUICK_COMMAND_DESTINATION_ITEMS = QUICK_COMMAND_NAV_ITEMS;
 

@@ -6,7 +6,8 @@ import { describe, it, expect } from 'vitest';
 import { copdGoldChatConfig } from './chatAssistedCalculators/copdGold';
 import { clinicalIntentTools } from './clinicalIntentToolCatalog';
 
-const INHALER_PATTERN = /\b(laba|lama|ics|triple therapy|tiotropium|budesonide|formoterol|salmeterol)\b/i;
+const INHALER_PATTERN =
+  /\b(laba|lama|ics|triple therapy|tiotropium|budesonide|formoterol|salmeterol)\b/i;
 
 describe('PR6 NLU — copd-gold chat seed safety', () => {
   it('chat seed avoids treatment directives and emphasizes clinician review', () => {

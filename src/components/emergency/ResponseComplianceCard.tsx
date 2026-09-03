@@ -6,22 +6,21 @@ export type ComplianceAlert = {
   severity: string;
 };
 
-function calcCompliance(alerts: ComplianceAlert[], targetMs: number): {
+function calcCompliance(
+  alerts: ComplianceAlert[],
+  targetMs: number,
+): {
   rate: number;
   compliant: number;
   total: number;
   pending: number;
 } {
-  const critical = alerts.filter(
-    (a) => a.severity === 'critical' || a.severity === 'high',
-  );
+  const critical = alerts.filter((a) => a.severity === 'critical' || a.severity === 'high');
   if (!critical.length) return { rate: 100, compliant: 0, total: 0, pending: 0 };
 
   const compliant = critical.filter((a) => {
     if (!a.acknowledgedAt) return false;
-    return (
-      new Date(a.acknowledgedAt).getTime() - new Date(a.createdAt).getTime() <= targetMs
-    );
+    return new Date(a.acknowledgedAt).getTime() - new Date(a.createdAt).getTime() <= targetMs;
   });
   const pending = critical.filter((a) => !a.acknowledgedAt).length;
   const rate = Math.round((compliant.length / critical.length) * 100);
@@ -50,7 +49,9 @@ export default function ResponseComplianceCard({
 
   return (
     <article
-      className={['response-compliance-card', `response-compliance-card--${tone}`, className].filter(Boolean).join(' ')}
+      className={['response-compliance-card', `response-compliance-card--${tone}`, className]
+        .filter(Boolean)
+        .join(' ')}
       aria-label={`3-minute response compliance: ${total ? `${rate}%` : 'No critical alerts today'}`}
     >
       <div className="response-compliance-card__head">
@@ -59,9 +60,7 @@ export default function ResponseComplianceCard({
           {tone === 'green' ? 'On track' : tone === 'amber' ? 'At risk' : 'Below target'}
         </span>
       </div>
-      <strong className="response-compliance-card__rate">
-        {total ? `${rate}%` : '—'}
-      </strong>
+      <strong className="response-compliance-card__rate">{total ? `${rate}%` : '—'}</strong>
       <p className="response-compliance-card__detail">
         {total
           ? `${compliant}/${total} critical alerts acknowledged within ${targetMinutes} min`

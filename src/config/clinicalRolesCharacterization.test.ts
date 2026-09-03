@@ -51,10 +51,7 @@ describe('Charge nurse characterization', () => {
     const m = resolveNestMappingForEmergencyRole(role);
     expect(m.nestUserRole).toBe('nurse');
     expect(m.nestPermissions).toEqual(
-      expect.arrayContaining([
-        NEST_PERMISSION.WRITE_PHI,
-        NEST_PERMISSION.VIEW_OPERATIONS,
-      ]),
+      expect.arrayContaining([NEST_PERMISSION.WRITE_PHI, NEST_PERMISSION.VIEW_OPERATIONS]),
     );
     expect(m.nestPermissions).not.toContain(NEST_PERMISSION.CONFIGURE_SYSTEM);
   });
@@ -99,9 +96,9 @@ describe('Physician characterization', () => {
     expect(m.nestUserRole).toBe('physician');
     expect(m.nestPermissions).toContain(NEST_PERMISSION.EXPORT_PHI);
     expect(m.nestPermissions).not.toContain(NEST_PERMISSION.CONFIGURE_SYSTEM);
-    expect(
-      emergencyRoleSatisfiesNestAction(role, EMERGENCY_PERMISSION_KEYS.patientDischarge),
-    ).toBe(true);
+    expect(emergencyRoleSatisfiesNestAction(role, EMERGENCY_PERMISSION_KEYS.patientDischarge)).toBe(
+      true,
+    );
   });
 });
 

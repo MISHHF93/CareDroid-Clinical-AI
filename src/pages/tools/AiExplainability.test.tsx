@@ -2,10 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import AiExplainability from './AiExplainability';
-import {
-  mockConversationValue,
-  mockToolPreferencesValue,
-} from '../../test/testRenderUtils';
+import { mockConversationValue, mockToolPreferencesValue } from '../../test/testRenderUtils';
 import { fetchAiExplainabilityTrace } from '../../services/clinicalIntelligenceApi';
 
 vi.mock('./ToolPageLayout.css', () => ({}));
@@ -42,7 +39,9 @@ describe('AiExplainability', () => {
           label: 'high',
           rationale: 'Trace includes source metadata and verified execution logs.',
         },
-        source: [{ label: 'guideline-rag', detail: 'clinical-intelligence/guideline-rag; hash abc...' }],
+        source: [
+          { label: 'guideline-rag', detail: 'clinical-intelligence/guideline-rag; hash abc...' },
+        ],
         reasoning: ['Reviewed sanitized execution logs.', 'Excluded raw prompts and PHI text.'],
         toolChain: ['guideline-rag -> evidence_found -> ai_query'],
         executionLogs: [
@@ -69,7 +68,9 @@ describe('AiExplainability', () => {
     renderPage();
 
     expect(screen.getByRole('heading', { name: /ai explainability/i })).toBeInTheDocument();
-    expect(screen.getAllByText(/confidence, source, reasoning, tool chain/i).length).toBeGreaterThan(0);
+    expect(
+      screen.getAllByText(/confidence, source, reasoning, tool chain/i).length,
+    ).toBeGreaterThan(0);
     expect(screen.getByLabelText(/tool id/i)).toBeInTheDocument();
   });
 

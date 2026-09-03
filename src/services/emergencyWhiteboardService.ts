@@ -9,20 +9,44 @@ export const EMERGENCY_WHITEBOARD_COLUMNS = Object.freeze([
   Object.freeze({ id: 'ems-incoming', label: 'EMS Incoming', sourceStates: ['ems-prearrival'] }),
   Object.freeze({ id: 'waiting', label: 'Waiting', sourceStates: ['waiting-room'] }),
   Object.freeze({ id: 'triage', label: 'Triage', sourceStates: ['triage-queue'] }),
-  Object.freeze({ id: 'assessment', label: 'In Assessment', sourceStates: ['active-assessment', 'provider-queue'] }),
-  Object.freeze({ id: 'orders-pending', label: 'Orders Pending', sourceStates: ['orders-pending'] }),
-  Object.freeze({ id: 'results-pending', label: 'Results Pending', sourceStates: ['results-pending'] }),
-  Object.freeze({ id: 'reassessment-due', label: 'Reassessment Due', sourceStates: ['reassessment'] }),
-  Object.freeze({ id: 'disposition', label: 'Disposition', sourceStates: ['referral-pending', 'boarding'] }),
-  Object.freeze({ id: 'discharge-ready', label: 'Discharge Ready', sourceStates: ['discharge-ready'] }),
+  Object.freeze({
+    id: 'assessment',
+    label: 'In Assessment',
+    sourceStates: ['active-assessment', 'provider-queue'],
+  }),
+  Object.freeze({
+    id: 'orders-pending',
+    label: 'Orders Pending',
+    sourceStates: ['orders-pending'],
+  }),
+  Object.freeze({
+    id: 'results-pending',
+    label: 'Results Pending',
+    sourceStates: ['results-pending'],
+  }),
+  Object.freeze({
+    id: 'reassessment-due',
+    label: 'Reassessment Due',
+    sourceStates: ['reassessment'],
+  }),
+  Object.freeze({
+    id: 'disposition',
+    label: 'Disposition',
+    sourceStates: ['referral-pending', 'boarding'],
+  }),
+  Object.freeze({
+    id: 'discharge-ready',
+    label: 'Discharge Ready',
+    sourceStates: ['discharge-ready'],
+  }),
 ]);
 
 const COLUMN_BY_STATE = Object.freeze(
   Object.fromEntries(
     EMERGENCY_WHITEBOARD_COLUMNS.flatMap((column) =>
-      column.sourceStates.map((state) => [state, column.id])
-    )
-  )
+      column.sourceStates.map((state) => [state, column.id]),
+    ),
+  ),
 );
 
 function patientAge(patientId = '') {
@@ -31,7 +55,9 @@ function patientAge(patientId = '') {
 }
 
 function whiteboardPatientId(patientId = '') {
-  return String(patientId).startsWith('ED-') ? String(patientId).replace(/^ED-/, 'DEMO-ED-') : patientId;
+  return String(patientId).startsWith('ED-')
+    ? String(patientId).replace(/^ED-/, 'DEMO-ED-')
+    : patientId;
 }
 
 function assignedClinician(index = 0) {
@@ -43,16 +69,24 @@ function buildReassessmentLookup(reassessmentQueue) {
     (reassessmentQueue.items || []).flatMap((item) => [
       [item.patientId, item],
       [whiteboardPatientId(item.patientId), item],
-    ])
+    ]),
   );
 }
 
 function mapPatientToCard(patient, index, reassessmentByPatientId = new Map()) {
-  const riskLevel = patient.riskScore >= 85 ? 'critical' : patient.riskScore >= 70 ? 'high' : patient.riskScore >= 50 ? 'medium' : 'low';
+  const riskLevel =
+    patient.riskScore >= 85
+      ? 'critical'
+      : patient.riskScore >= 70
+        ? 'high'
+        : patient.riskScore >= 50
+          ? 'medium'
+          : 'low';
   const reassessmentAlert = reassessmentByPatientId.get(patient.patientId);
-  const currentColumn = reassessmentAlert || patient.reassessmentNeed
-    ? 'reassessment-due'
-    : COLUMN_BY_STATE[patient.journeyState] || (index % 5 === 0 ? 'orders-pending' : 'waiting');
+  const currentColumn =
+    reassessmentAlert || patient.reassessmentNeed
+      ? 'reassessment-due'
+      : COLUMN_BY_STATE[patient.journeyState] || (index % 5 === 0 ? 'orders-pending' : 'waiting');
   const alerts = [
     patient.waitDuration > 60 ? 'Waiting over target' : null,
     patient.reassessmentNeed ? 'Reassessment due' : null,
@@ -79,9 +113,9 @@ function mapPatientToCard(patient, index, reassessmentByPatientId = new Map()) {
       ? reassessmentAlert.recommendedAction
       : patient.reassessmentNeed
         ? 'Review reassessment recommendation'
-      : currentColumn === 'disposition'
-        ? 'Review disposition blocker'
-        : 'Continue ED workflow review',
+        : currentColumn === 'disposition'
+          ? 'Review disposition blocker'
+          : 'Continue ED workflow review',
     needsReassessment: Boolean(reassessmentAlert),
     reassessmentAlert: reassessmentAlert?.alert || null,
     reassessmentSignals: Object.freeze(reassessmentAlert?.thresholdSignals || []),
@@ -143,12 +177,15 @@ export const EmergencyWhiteboardService = Object.freeze({
           ...column,
           cards: Object.freeze(columnCards),
           count: columnCards.length,
-          highRiskCount: columnCards.filter((card) => ['high', 'critical'].includes(card.riskLevel)).length,
+          highRiskCount: columnCards.filter((card) => ['high', 'critical'].includes(card.riskLevel))
+            .length,
           oldestWaitMinutes: Math.max(0, ...columnCards.map((card) => card.waitingTime)),
         });
-      })
+      }),
     );
-    const bottleneckColumn = [...columns].sort((a, b) => b.oldestWaitMinutes - a.oldestWaitMinutes)[0];
+    const bottleneckColumn = [...columns].sort(
+      (a, b) => b.oldestWaitMinutes - a.oldestWaitMinutes,
+    )[0];
     const referralCards = cards.filter((card) => card.alerts.includes('Referral delay watch'));
     const boardingCards = cards.filter((card) => card.alerts.includes('Boarding pressure'));
 
@@ -198,20 +235,51 @@ export const EmergencyWhiteboardService = Object.freeze({
       }),
       columns,
       cards,
-      filters: Object.freeze(['Acuity', 'Chief complaint', 'Waiting over target', 'Needs Reassessment', 'Reassessment due', 'EMS arrivals', 'Alerts only', 'Referrals', 'Boarding', 'Capacity']),
-      searchFields: Object.freeze(['patient ID', 'chief complaint', 'queue', 'alert', 'reassessment', 'referral', 'EMS arrival', 'boarding', 'capacity']),
-      operatingAreas: Object.freeze(['patients', 'queues', 'alerts', 'referrals', 'EMS arrivals', 'boarding', 'capacity']),
+      filters: Object.freeze([
+        'Acuity',
+        'Chief complaint',
+        'Waiting over target',
+        'Needs Reassessment',
+        'Reassessment due',
+        'EMS arrivals',
+        'Alerts only',
+        'Referrals',
+        'Boarding',
+        'Capacity',
+      ]),
+      searchFields: Object.freeze([
+        'patient ID',
+        'chief complaint',
+        'queue',
+        'alert',
+        'reassessment',
+        'referral',
+        'EMS arrival',
+        'boarding',
+        'capacity',
+      ]),
+      operatingAreas: Object.freeze([
+        'patients',
+        'queues',
+        'alerts',
+        'referrals',
+        'EMS arrivals',
+        'boarding',
+        'capacity',
+      ]),
       summary: Object.freeze({
         patientsToday: queueDashboard.metrics.patientsToday,
         totalActivePatients: cards.length,
         waitingPatients: queueDashboard.metrics.patientsWaiting,
         currentAverageWait: queueDashboard.metrics.averageWaitTime,
-        highRiskPatients: cards.filter((card) => ['high', 'critical'].includes(card.riskLevel)).length,
+        highRiskPatients: cards.filter((card) => ['high', 'critical'].includes(card.riskLevel))
+          .length,
         reassessmentDue: cards.filter((card) => card.alerts.includes('Reassessment due')).length,
         needsReassessment: queueDashboard.metrics.patientsNeedingReassessment,
         reassessmentAlerts: reassessmentIntelligence.alerts.length,
         longestWaitMinutes: queueDashboard.metrics.longestWait,
-        bottleneckColumn: queueDashboard.metrics.bottleneckQueue || bottleneckColumn?.label || 'Waiting',
+        bottleneckColumn:
+          queueDashboard.metrics.bottleneckQueue || bottleneckColumn?.label || 'Waiting',
         activeAlerts: cards.reduce((sum, card) => sum + card.alerts.length, 0),
         queueBottlenecks: queueDashboard.metrics.bottleneckCount,
         referralDelays: referralCards.length,
@@ -233,6 +301,8 @@ export const EmergencyWhiteboardService = Object.freeze({
   },
 });
 
-export const getEmergencyWhiteboard = EmergencyWhiteboardService.getWhiteboard.bind(EmergencyWhiteboardService);
+export const getEmergencyWhiteboard = EmergencyWhiteboardService.getWhiteboard.bind(
+  EmergencyWhiteboardService,
+);
 
 export default EmergencyWhiteboardService;

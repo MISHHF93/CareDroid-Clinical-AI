@@ -45,13 +45,33 @@ describe('collaborationLocalCatalog', () => {
 
   it('normalizes channel list envelopes', () => {
     const bare = normalizeChannelListPayload([
-      { id: 'c1', name: 'ED', type: 'department', organizationId: 'o', status: 'active', isSystemManaged: true, createdAt: '' },
+      {
+        id: 'c1',
+        name: 'ED',
+        type: 'department',
+        organizationId: 'o',
+        status: 'active',
+        isSystemManaged: true,
+        createdAt: '',
+      },
     ]);
     expect(bare).toHaveLength(1);
     expect(bare[0].channel.id).toBe('c1');
 
     const wrapped = normalizeChannelListPayload({
-      data: [{ channel: { id: 'c2', name: 'Reception', type: 'department', organizationId: 'o', status: 'active', isSystemManaged: true, createdAt: '' } }],
+      data: [
+        {
+          channel: {
+            id: 'c2',
+            name: 'Reception',
+            type: 'department',
+            organizationId: 'o',
+            status: 'active',
+            isSystemManaged: true,
+            createdAt: '',
+          },
+        },
+      ],
     });
     expect(wrapped[0].channel.id).toBe('c2');
   });
@@ -63,9 +83,8 @@ describe('collaborationLocalCatalog', () => {
   });
 
   it('seeds preferred departments across major hospital profiles', async () => {
-    const { departmentChannelsForRole, pickDefaultCollaborationChannel } = await import(
-      './collaborationLocalCatalog'
-    );
+    const { departmentChannelsForRole, pickDefaultCollaborationChannel } =
+      await import('./collaborationLocalCatalog');
     const cases: Array<{ role: string; preferredKey: string }> = [
       { role: 'registration_clerk', preferredKey: 'reception' },
       { role: 'triage_nurse', preferredKey: 'triage' },

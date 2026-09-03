@@ -106,9 +106,18 @@ export const SIMULATION_SCENARIOS = Object.freeze([
     objectives: ['Recognize shock', 'Escalate monitoring', 'Use qSOFA/SOFA context safely'],
     tools: ['qSOFA', 'SOFA', 'Laboratory', 'Hospital Map'],
     roles: ['emergency physician', 'nurse', 'ICU clinician', 'medical student'],
-    caseStem: 'A 68-year-old with pneumonia returns from imaging confused, febrile, and hypotensive.',
-    prompts: ['What is your immediate reassessment?', 'Which critical actions belong in the first 10 minutes?'],
-    criticalActions: ['Recognize possible septic shock', 'Repeat vitals and mental status', 'Escalate team response', 'Review lactate and cultures'],
+    caseStem:
+      'A 68-year-old with pneumonia returns from imaging confused, febrile, and hypotensive.',
+    prompts: [
+      'What is your immediate reassessment?',
+      'Which critical actions belong in the first 10 minutes?',
+    ],
+    criticalActions: [
+      'Recognize possible septic shock',
+      'Repeat vitals and mental status',
+      'Escalate team response',
+      'Review lactate and cultures',
+    ],
     integrations: [
       { label: 'Open lab panel', path: '/laboratory', toolId: 'laboratory-dashboard' },
       { label: 'Open hospital map', path: '/hospital-map', toolId: 'hospital-map' },
@@ -123,15 +132,36 @@ export const SIMULATION_SCENARIOS = Object.freeze([
     type: 'branching-decision-scenario',
     difficulty: 'Intermediate',
     duration: 15,
-    objectives: ['Risk stratify safely', 'Recognize evolving ECG/troponin risk', 'Use HEART/TIMI context'],
+    objectives: [
+      'Risk stratify safely',
+      'Recognize evolving ECG/troponin risk',
+      'Use HEART/TIMI context',
+    ],
     tools: ['HEART', 'TIMI', 'Troponin trend', 'AI tutor'],
     roles: ['emergency physician', 'cardiologist', 'nurse', 'medical student'],
-    caseStem: 'A 57-year-old with pressure-like chest pain has borderline troponin and changing symptoms.',
-    vitals: { heartRate: '104', bloodPressure: '146/88', respiratoryRate: '18', spo2: '97%', temperature: '36.8 C' },
-    labs: [{ name: 'Troponin I', value: '0.09 ng/mL', status: 'High' }, { name: 'K', value: '4.5 mEq/L', status: 'Normal' }],
+    caseStem:
+      'A 57-year-old with pressure-like chest pain has borderline troponin and changing symptoms.',
+    vitals: {
+      heartRate: '104',
+      bloodPressure: '146/88',
+      respiratoryRate: '18',
+      spo2: '97%',
+      temperature: '36.8 C',
+    },
+    labs: [
+      { name: 'Troponin I', value: '0.09 ng/mL', status: 'High' },
+      { name: 'K', value: '4.5 mEq/L', status: 'Normal' },
+    ],
     prompts: ['What data changes disposition?', 'Which calculator/tool supports risk framing?'],
-    criticalActions: ['Repeat ECG/troponin', 'Assess instability', 'Escalate concerning ECG changes', 'Document risk and handoff'],
-    integrations: [{ label: 'Open lab panel', path: '/laboratory', toolId: 'laboratory-dashboard' }],
+    criticalActions: [
+      'Repeat ECG/troponin',
+      'Assess instability',
+      'Escalate concerning ECG changes',
+      'Document risk and handoff',
+    ],
+    integrations: [
+      { label: 'Open lab panel', path: '/laboratory', toolId: 'laboratory-dashboard' },
+    ],
     next: ['cardiac-arrest', 'medication-safety-event'],
   }),
   scenario({
@@ -145,11 +175,26 @@ export const SIMULATION_SCENARIOS = Object.freeze([
     objectives: ['Establish last-known-well', 'Coordinate stroke team', 'Use NIHSS safely'],
     tools: ['NIHSS', '3D Viewer', 'Hospital Map'],
     roles: ['emergency physician', 'nurse', 'medical student'],
-    caseStem: 'A 72-year-old arrives with aphasia and right-sided weakness after family found them at home.',
-    vitals: { heartRate: '92', bloodPressure: '178/96', respiratoryRate: '18', spo2: '96%', temperature: '36.9 C' },
-    labs: [{ name: 'Glucose', value: '102 mg/dL', status: 'Normal' }, { name: 'INR', value: '1.0', status: 'Normal' }],
+    caseStem:
+      'A 72-year-old arrives with aphasia and right-sided weakness after family found them at home.',
+    vitals: {
+      heartRate: '92',
+      bloodPressure: '178/96',
+      respiratoryRate: '18',
+      spo2: '96%',
+      temperature: '36.9 C',
+    },
+    labs: [
+      { name: 'Glucose', value: '102 mg/dL', status: 'Normal' },
+      { name: 'INR', value: '1.0', status: 'Normal' },
+    ],
     prompts: ['What are the time-critical data points?', 'How do you organize team communication?'],
-    criticalActions: ['Confirm last-known-well', 'Check glucose', 'Activate stroke pathway', 'Prepare NIHSS handoff'],
+    criticalActions: [
+      'Confirm last-known-well',
+      'Check glucose',
+      'Activate stroke pathway',
+      'Prepare NIHSS handoff',
+    ],
     integrations: [
       { label: 'Open anatomy viewer', path: '/3d-viewer', toolId: 'medical-3d-viewer' },
       { label: 'Open hospital map', path: '/hospital-map', toolId: 'hospital-map' },
@@ -164,15 +209,35 @@ export const SIMULATION_SCENARIOS = Object.freeze([
     type: 'ai-tutor-guided-case',
     difficulty: 'Advanced',
     duration: 16,
-    objectives: ['Recognize ventilatory failure', 'Interpret ABG/VBG context', 'Escalate respiratory support review'],
+    objectives: [
+      'Recognize ventilatory failure',
+      'Interpret ABG/VBG context',
+      'Escalate respiratory support review',
+    ],
     tools: ['ABG Interpreter', 'Medical IoT', 'Hospital Map'],
     roles: ['ICU clinician', 'emergency physician', 'nurse', 'respiratory therapist'],
     caseStem: 'A COPD patient becomes somnolent with rising CO2 and increasing work of breathing.',
-    vitals: { heartRate: '126', bloodPressure: '154/82', respiratoryRate: '32', spo2: '88%', temperature: '37.4 C' },
-    labs: [{ name: 'pH', value: '7.25', status: 'Low' }, { name: 'pCO2', value: '68 mmHg', status: 'High' }],
+    vitals: {
+      heartRate: '126',
+      bloodPressure: '154/82',
+      respiratoryRate: '32',
+      spo2: '88%',
+      temperature: '37.4 C',
+    },
+    labs: [
+      { name: 'pH', value: '7.25', status: 'Low' },
+      { name: 'pCO2', value: '68 mmHg', status: 'High' },
+    ],
     prompts: ['Which changes indicate fatigue?', 'What should be escalated before deterioration?'],
-    criticalActions: ['Recognize fatigue', 'Review blood gas', 'Call respiratory/critical care help', 'Monitor oxygenation and mental status'],
-    integrations: [{ label: 'Open IoT dashboard', path: '/medical-iot', toolId: 'medical-iot-dashboard' }],
+    criticalActions: [
+      'Recognize fatigue',
+      'Review blood gas',
+      'Call respiratory/critical care help',
+      'Monitor oxygenation and mental status',
+    ],
+    integrations: [
+      { label: 'Open IoT dashboard', path: '/medical-iot', toolId: 'medical-iot-dashboard' },
+    ],
     next: ['sepsis-deterioration', 'device-alarm-failure'],
   }),
   scenario({
@@ -186,9 +251,15 @@ export const SIMULATION_SCENARIOS = Object.freeze([
     objectives: ['Run primary survey', 'Identify hemorrhage risk', 'Communicate disposition needs'],
     tools: ['Revised Trauma Score', 'Hospital Map', 'Team Communication'],
     roles: ['emergency physician', 'nurse', 'operations', 'medical student'],
-    caseStem: 'A motor vehicle collision patient arrives hypotensive with pelvic pain and confusion.',
+    caseStem:
+      'A motor vehicle collision patient arrives hypotensive with pelvic pain and confusion.',
     prompts: ['What does the primary survey find?', 'Which team roles must be assigned now?'],
-    criticalActions: ['Airway/breathing/circulation assessment', 'Recognize shock', 'Activate trauma resources', 'Assign closed-loop roles'],
+    criticalActions: [
+      'Airway/breathing/circulation assessment',
+      'Recognize shock',
+      'Activate trauma resources',
+      'Assign closed-loop roles',
+    ],
     integrations: [{ label: 'Open hospital map', path: '/hospital-map', toolId: 'hospital-map' }],
     next: ['mass-casualty-incident', 'gi-bleed'],
   }),
@@ -200,14 +271,29 @@ export const SIMULATION_SCENARIOS = Object.freeze([
     type: 'branching-decision-scenario',
     difficulty: 'Intermediate',
     duration: 20,
-    objectives: ['Recognize DKA pattern', 'Track potassium and anion gap', 'Avoid unsafe insulin sequencing'],
+    objectives: [
+      'Recognize DKA pattern',
+      'Track potassium and anion gap',
+      'Avoid unsafe insulin sequencing',
+    ],
     tools: ['Anion Gap', 'Laboratory', 'AI Tutor'],
     roles: ['emergency physician', 'nurse', 'medical student'],
     caseStem: 'A 24-year-old with vomiting has glucose 520, anion gap 26, and dehydration.',
-    labs: [{ name: 'Glucose', value: '520 mg/dL', status: 'Critical' }, { name: 'Anion gap', value: '26', status: 'High' }, { name: 'K', value: '3.3 mEq/L', status: 'Low' }],
+    labs: [
+      { name: 'Glucose', value: '520 mg/dL', status: 'Critical' },
+      { name: 'Anion gap', value: '26', status: 'High' },
+      { name: 'K', value: '3.3 mEq/L', status: 'Low' },
+    ],
     prompts: ['Which lab creates immediate safety risk?', 'How should progress be monitored?'],
-    criticalActions: ['Recognize DKA', 'Check potassium before insulin context', 'Trend anion gap', 'Escalate protocol review'],
-    integrations: [{ label: 'Open lab panel', path: '/laboratory', toolId: 'laboratory-dashboard' }],
+    criticalActions: [
+      'Recognize DKA',
+      'Check potassium before insulin context',
+      'Trend anion gap',
+      'Escalate protocol review',
+    ],
+    integrations: [
+      { label: 'Open lab panel', path: '/laboratory', toolId: 'laboratory-dashboard' },
+    ],
     next: ['abnormal-lab-escalation', 'sepsis-deterioration'],
   }),
   scenario({
@@ -223,8 +309,15 @@ export const SIMULATION_SCENARIOS = Object.freeze([
     roles: ['pediatric clinician', 'nurse', 'medical student'],
     caseStem: 'An 8-month-old has fever, tachycardia, reduced intake, and worried parents.',
     prompts: ['What features change risk?', 'How should concerns be communicated?'],
-    criticalActions: ['Assess appearance', 'Check hydration', 'Review age-specific red flags', 'Provide escalation plan'],
-    integrations: [{ label: 'Open lab panel', path: '/laboratory', toolId: 'laboratory-dashboard' }],
+    criticalActions: [
+      'Assess appearance',
+      'Check hydration',
+      'Review age-specific red flags',
+      'Provide escalation plan',
+    ],
+    integrations: [
+      { label: 'Open lab panel', path: '/laboratory', toolId: 'laboratory-dashboard' },
+    ],
     next: ['anaphylaxis', 'sepsis-deterioration'],
   }),
   scenario({
@@ -235,13 +328,24 @@ export const SIMULATION_SCENARIOS = Object.freeze([
     type: 'team-based-simulation',
     difficulty: 'Advanced',
     duration: 16,
-    objectives: ['Recognize postpartum hemorrhage', 'Coordinate team response', 'Escalate blood bank/lab context'],
+    objectives: [
+      'Recognize postpartum hemorrhage',
+      'Coordinate team response',
+      'Escalate blood bank/lab context',
+    ],
     tools: ['Laboratory', 'Hospital Map', 'Team Communication'],
     roles: ['nurse', 'emergency physician', 'operations', 'medical student'],
     caseStem: 'A postpartum patient becomes tachycardic with heavy bleeding and dizziness.',
     prompts: ['What are the first team assignments?', 'Which labs/resources should be escalated?'],
-    criticalActions: ['Recognize hemorrhage', 'Call for help', 'Quantify blood loss', 'Escalate lab/blood bank workflow'],
-    integrations: [{ label: 'Open lab panel', path: '/laboratory', toolId: 'laboratory-dashboard' }],
+    criticalActions: [
+      'Recognize hemorrhage',
+      'Call for help',
+      'Quantify blood loss',
+      'Escalate lab/blood bank workflow',
+    ],
+    integrations: [
+      { label: 'Open lab panel', path: '/laboratory', toolId: 'laboratory-dashboard' },
+    ],
     next: ['trauma-triage', 'medication-safety-event'],
   }),
   scenario({
@@ -252,13 +356,24 @@ export const SIMULATION_SCENARIOS = Object.freeze([
     type: 'procedural-checklist',
     difficulty: 'Beginner',
     duration: 10,
-    objectives: ['Reconcile medications', 'Identify duplicate exposure', 'Practice disclosure and handoff'],
+    objectives: [
+      'Reconcile medications',
+      'Identify duplicate exposure',
+      'Practice disclosure and handoff',
+    ],
     tools: ['Drug Checker', 'Team Communication', 'AI Tutor'],
     roles: ['nurse', 'pharmacist', 'medical student', 'emergency physician'],
     caseStem: 'An older adult has possible duplicate anticoagulant exposure during transfer.',
     prompts: ['What information must be reconciled?', 'How should the team communicate risk?'],
-    criticalActions: ['Stop and verify medication list', 'Identify interaction/duplicate risk', 'Notify clinician/pharmacy', 'Document safety handoff'],
-    integrations: [{ label: 'Open drug checker', path: '/tools/drug-checker', toolId: 'drug-check' }],
+    criticalActions: [
+      'Stop and verify medication list',
+      'Identify interaction/duplicate risk',
+      'Notify clinician/pharmacy',
+      'Document safety handoff',
+    ],
+    integrations: [
+      { label: 'Open drug checker', path: '/tools/drug-checker', toolId: 'drug-check' },
+    ],
     next: ['gi-bleed', 'abnormal-lab-escalation'],
   }),
   scenario({
@@ -269,12 +384,22 @@ export const SIMULATION_SCENARIOS = Object.freeze([
     type: 'timed-emergency-drill',
     difficulty: 'Intermediate',
     duration: 9,
-    objectives: ['Recognize airway risk', 'Prioritize critical treatment escalation', 'Assign team roles'],
+    objectives: [
+      'Recognize airway risk',
+      'Prioritize critical treatment escalation',
+      'Assign team roles',
+    ],
     tools: ['Protocols', 'Team Communication'],
     roles: ['emergency physician', 'nurse', 'medical student'],
-    caseStem: 'A patient develops wheeze, hypotension, and diffuse urticaria after medication exposure.',
+    caseStem:
+      'A patient develops wheeze, hypotension, and diffuse urticaria after medication exposure.',
     prompts: ['What makes this high risk?', 'What must happen immediately?'],
-    criticalActions: ['Recognize anaphylaxis', 'Escalate airway risk', 'Assign medication/monitoring roles', 'Prepare reassessment plan'],
+    criticalActions: [
+      'Recognize anaphylaxis',
+      'Escalate airway risk',
+      'Assign medication/monitoring roles',
+      'Prepare reassessment plan',
+    ],
     next: ['medication-safety-event', 'respiratory-failure'],
   }),
   scenario({
@@ -285,12 +410,21 @@ export const SIMULATION_SCENARIOS = Object.freeze([
     type: 'team-based-simulation',
     difficulty: 'Advanced',
     duration: 12,
-    objectives: ['Run closed-loop team communication', 'Track rhythm/defibrillation timing', 'Document safety-critical events'],
+    objectives: [
+      'Run closed-loop team communication',
+      'Track rhythm/defibrillation timing',
+      'Document safety-critical events',
+    ],
     tools: ['ACLS Protocol', 'Team Communication', 'Hospital Map'],
     roles: ['emergency physician', 'nurse', 'ICU clinician', 'medical student'],
     caseStem: 'A monitored patient loses pulses while the team is preparing transfer.',
     prompts: ['Who leads and who documents?', 'Which rhythm/timing facts must be tracked?'],
-    criticalActions: ['Confirm pulselessness', 'Start high-quality CPR', 'Assign roles', 'Follow rhythm-specific algorithm'],
+    criticalActions: [
+      'Confirm pulselessness',
+      'Start high-quality CPR',
+      'Assign roles',
+      'Follow rhythm-specific algorithm',
+    ],
     integrations: [{ label: 'Open hospital map', path: '/hospital-map', toolId: 'hospital-map' }],
     next: ['anaphylaxis', 'respiratory-failure'],
   }),
@@ -302,14 +436,29 @@ export const SIMULATION_SCENARIOS = Object.freeze([
     type: 'virtual-patient-case',
     difficulty: 'Intermediate',
     duration: 14,
-    objectives: ['Recognize instability', 'Use lab trends', 'Prioritize handoff and consult context'],
+    objectives: [
+      'Recognize instability',
+      'Use lab trends',
+      'Prioritize handoff and consult context',
+    ],
     tools: ['Glasgow-Blatchford', 'Laboratory', 'AI Tutor'],
     roles: ['emergency physician', 'nurse', 'medical student'],
     caseStem: 'A patient presents with melena, dizziness, tachycardia, and falling hemoglobin.',
-    labs: [{ name: 'Hemoglobin', value: '7.4 g/dL', status: 'Critical' }, { name: 'BUN', value: '38 mg/dL', status: 'High' }, { name: 'INR', value: '1.6', status: 'High' }],
+    labs: [
+      { name: 'Hemoglobin', value: '7.4 g/dL', status: 'Critical' },
+      { name: 'BUN', value: '38 mg/dL', status: 'High' },
+      { name: 'INR', value: '1.6', status: 'High' },
+    ],
     prompts: ['What indicates instability?', 'Which labs and scores support escalation?'],
-    criticalActions: ['Assess hemodynamics', 'Trend hemoglobin/coags', 'Escalate GI/critical care context', 'Communicate safety risks'],
-    integrations: [{ label: 'Open lab panel', path: '/laboratory', toolId: 'laboratory-dashboard' }],
+    criticalActions: [
+      'Assess hemodynamics',
+      'Trend hemoglobin/coags',
+      'Escalate GI/critical care context',
+      'Communicate safety risks',
+    ],
+    integrations: [
+      { label: 'Open lab panel', path: '/laboratory', toolId: 'laboratory-dashboard' },
+    ],
     next: ['ob-hemorrhage', 'medication-safety-event'],
   }),
   scenario({
@@ -323,11 +472,23 @@ export const SIMULATION_SCENARIOS = Object.freeze([
     objectives: ['Identify critical values', 'Verify specimen context', 'Escalate safely'],
     tools: ['Laboratory', 'Lab Interpreter', 'Team Communication'],
     roles: ['nurse', 'medical student', 'emergency physician'],
-    caseStem: 'A critical potassium and lactate result arrives while multiple patients are waiting.',
-    labs: [{ name: 'K', value: '6.4 mEq/L', status: 'Critical' }, { name: 'Lactate', value: '4.8 mmol/L', status: 'Critical' }, { name: 'Creatinine', value: '2.4 mg/dL', status: 'High' }],
+    caseStem:
+      'A critical potassium and lactate result arrives while multiple patients are waiting.',
+    labs: [
+      { name: 'K', value: '6.4 mEq/L', status: 'Critical' },
+      { name: 'Lactate', value: '4.8 mmol/L', status: 'Critical' },
+      { name: 'Creatinine', value: '2.4 mg/dL', status: 'High' },
+    ],
     prompts: ['Which result is time-critical?', 'How do you verify and escalate without delay?'],
-    criticalActions: ['Recognize critical lab', 'Verify patient/specimen context', 'Notify responsible clinician', 'Document closed-loop escalation'],
-    integrations: [{ label: 'Open laboratory', path: '/laboratory', toolId: 'laboratory-dashboard' }],
+    criticalActions: [
+      'Recognize critical lab',
+      'Verify patient/specimen context',
+      'Notify responsible clinician',
+      'Document closed-loop escalation',
+    ],
+    integrations: [
+      { label: 'Open laboratory', path: '/laboratory', toolId: 'laboratory-dashboard' },
+    ],
     next: ['dka-management', 'sepsis-deterioration'],
   }),
   scenario({
@@ -338,13 +499,24 @@ export const SIMULATION_SCENARIOS = Object.freeze([
     type: 'device-alarm-simulation',
     difficulty: 'Intermediate',
     duration: 12,
-    objectives: ['Recognize telemetry gap', 'Triage device vs patient issue', 'Escalate biomedical handoff'],
+    objectives: [
+      'Recognize telemetry gap',
+      'Triage device vs patient issue',
+      'Escalate biomedical handoff',
+    ],
     tools: ['Medical IoT', 'Device Fleet', 'Hospital Map'],
     roles: ['biomedical engineer', 'nurse', 'operations'],
     caseStem: 'A telemetry alarm stops reporting while bedside staff report worsening vitals.',
     prompts: ['Is this a device failure or patient deterioration?', 'Who needs notification?'],
-    criticalActions: ['Validate bedside status', 'Check device connectivity', 'Escalate biomedical support', 'Document alarm safety risk'],
-    integrations: [{ label: 'Open IoT dashboard', path: '/medical-iot', toolId: 'medical-iot-dashboard' }],
+    criticalActions: [
+      'Validate bedside status',
+      'Check device connectivity',
+      'Escalate biomedical support',
+      'Document alarm safety risk',
+    ],
+    integrations: [
+      { label: 'Open IoT dashboard', path: '/medical-iot', toolId: 'medical-iot-dashboard' },
+    ],
     next: ['respiratory-failure', 'hospital-bed-surge'],
   }),
   scenario({
@@ -355,12 +527,21 @@ export const SIMULATION_SCENARIOS = Object.freeze([
     type: 'hospital-operations-simulation',
     difficulty: 'Intermediate',
     duration: 17,
-    objectives: ['Prioritize capacity decisions', 'Use hospital map context', 'Coordinate cross-team communication'],
+    objectives: [
+      'Prioritize capacity decisions',
+      'Use hospital map context',
+      'Coordinate cross-team communication',
+    ],
     tools: ['Hospital Map', 'Digital Twin', 'Operations'],
     roles: ['operations', 'fleet operator', 'administrator', 'nurse'],
     caseStem: 'ED boarding rises during a regional outage and ICU beds are constrained.',
     prompts: ['Which capacity signal matters first?', 'How should updates be communicated?'],
-    criticalActions: ['Identify bottleneck', 'Escalate capacity huddle', 'Map bed/resource state', 'Communicate operating plan'],
+    criticalActions: [
+      'Identify bottleneck',
+      'Escalate capacity huddle',
+      'Map bed/resource state',
+      'Communicate operating plan',
+    ],
     integrations: [
       { label: 'Open hospital map', path: '/hospital-map', toolId: 'hospital-map' },
       { label: 'Open digital twin', path: '/digital-twin', toolId: 'digital-twin' },
@@ -375,12 +556,22 @@ export const SIMULATION_SCENARIOS = Object.freeze([
     type: 'disaster-mass-casualty-scenario',
     difficulty: 'Advanced',
     duration: 24,
-    objectives: ['Coordinate triage flow', 'Align fleet/hospital resources', 'Maintain communication discipline'],
+    objectives: [
+      'Coordinate triage flow',
+      'Align fleet/hospital resources',
+      'Maintain communication discipline',
+    ],
     tools: ['Fleet Map', 'Hospital Map', 'Team Communication'],
     roles: ['operations', 'fleet operator', 'emergency physician', 'nurse'],
-    caseStem: 'Multiple ambulances are inbound after a bus crash while hospital capacity is strained.',
+    caseStem:
+      'Multiple ambulances are inbound after a bus crash while hospital capacity is strained.',
     prompts: ['How do you prioritize arrivals?', 'What must be communicated to receiving teams?'],
-    criticalActions: ['Activate incident command', 'Prioritize triage flow', 'Coordinate fleet/hospital capacity', 'Maintain closed-loop updates'],
+    criticalActions: [
+      'Activate incident command',
+      'Prioritize triage flow',
+      'Coordinate fleet/hospital capacity',
+      'Maintain closed-loop updates',
+    ],
     integrations: [
       { label: 'Open hospital map', path: '/hospital-map', toolId: 'hospital-map' },
       { label: 'Open fleet map', path: '/fleet/map', toolId: 'fleet-live-map' },
@@ -447,9 +638,24 @@ export const DEMO_SIMULATION_OUTCOMES = Object.freeze({
 });
 
 const ROLE_RECOMMENDATION_MAP = Object.freeze({
-  'emergency physician': ['sepsis-deterioration', 'chest-pain-acs', 'stroke-alert', 'trauma-triage'],
-  nurse: ['medication-safety-event', 'device-alarm-failure', 'sepsis-deterioration', 'abnormal-lab-escalation'],
-  'medical student': ['pediatric-fever', 'sepsis-deterioration', 'chest-pain-acs', 'abnormal-lab-escalation'],
+  'emergency physician': [
+    'sepsis-deterioration',
+    'chest-pain-acs',
+    'stroke-alert',
+    'trauma-triage',
+  ],
+  nurse: [
+    'medication-safety-event',
+    'device-alarm-failure',
+    'sepsis-deterioration',
+    'abnormal-lab-escalation',
+  ],
+  'medical student': [
+    'pediatric-fever',
+    'sepsis-deterioration',
+    'chest-pain-acs',
+    'abnormal-lab-escalation',
+  ],
   operations: ['hospital-bed-surge', 'mass-casualty-incident', 'trauma-triage'],
   'fleet operator': ['mass-casualty-incident', 'hospital-bed-surge', 'device-alarm-failure'],
   'biomedical engineer': ['device-alarm-failure', 'respiratory-failure', 'hospital-bed-surge'],
@@ -476,8 +682,13 @@ export function getRecommendedSimulationScenarios(profile: any = {}) {
 export function buildScenarioDebrief(scenarioItem, selectedActionIds = [] as any[]) {
   const selected = new Set(selectedActionIds);
   const correctActions = scenarioItem.criticalActions.filter((action) => selected.has(action));
-  const missedCriticalActions = scenarioItem.criticalActions.filter((action) => !selected.has(action));
-  const safetyScore = Math.max(40, Math.round((correctActions.length / scenarioItem.criticalActions.length) * 100));
+  const missedCriticalActions = scenarioItem.criticalActions.filter(
+    (action) => !selected.has(action),
+  );
+  const safetyScore = Math.max(
+    40,
+    Math.round((correctActions.length / scenarioItem.criticalActions.length) * 100),
+  );
 
   return {
     summary: `${scenarioItem.title} completed in demo mode with ${correctActions.length} of ${scenarioItem.criticalActions.length} critical actions selected.`,
@@ -502,7 +713,9 @@ export function buildScenarioDebrief(scenarioItem, selectedActionIds = [] as any
       safetyScore >= 85
         ? 'Strong prioritization and safety framing. Continue practicing team communication under time pressure.'
         : 'Focus next practice on earlier recognition, tool selection, and closed-loop escalation of critical findings.',
-    nextRecommendedScenarios: scenarioItem.nextRecommendedScenarioIds.map(getSimulationScenarioById).filter(Boolean),
+    nextRecommendedScenarios: scenarioItem.nextRecommendedScenarioIds
+      .map(getSimulationScenarioById)
+      .filter(Boolean),
     scores: {
       safetyScore,
       communicationScore: Math.max(50, safetyScore - 4),

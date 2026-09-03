@@ -64,7 +64,9 @@ type CollaborationStoreState = Readonly<{
   connectionStatus: ConnectionStatus;
   lastSyncedAt: string | null;
 
-  setChannels: (entries: Array<{ channel: CollaborationChannel; membership?: CollaborationMembership }>) => void;
+  setChannels: (
+    entries: Array<{ channel: CollaborationChannel; membership?: CollaborationMembership }>,
+  ) => void;
   upsertChannel: (channel: CollaborationChannel) => void;
   setActiveChannel: (channelId: string | null) => void;
   setMessages: (channelId: string, messages: CollaborationMessage[]) => void;
@@ -93,7 +95,12 @@ export const useCollaborationStore = create<CollaborationStoreState>()(
       messagesByChannelId: {},
       activeChannelId: null,
       typingByChannelId: {},
-      connectionStatus: { status: 'unknown', mode: 'unknown', message: '', updatedAt: new Date().toISOString() },
+      connectionStatus: {
+        status: 'unknown',
+        mode: 'unknown',
+        message: '',
+        updatedAt: new Date().toISOString(),
+      },
       lastSyncedAt: null,
 
       setChannels: (entries) =>
@@ -106,12 +113,15 @@ export const useCollaborationStore = create<CollaborationStoreState>()(
           return { channels, membershipsByChannelId, lastSyncedAt: new Date().toISOString() };
         }),
 
-      upsertChannel: (channel) => set((state) => ({ channels: upsertInArray(state.channels, channel) })),
+      upsertChannel: (channel) =>
+        set((state) => ({ channels: upsertInArray(state.channels, channel) })),
 
       setActiveChannel: (channelId) => set({ activeChannelId: channelId }),
 
       setMessages: (channelId, messages) =>
-        set((state) => ({ messagesByChannelId: { ...state.messagesByChannelId, [channelId]: messages } })),
+        set((state) => ({
+          messagesByChannelId: { ...state.messagesByChannelId, [channelId]: messages },
+        })),
 
       upsertMessage: (message) =>
         set((state) => {
@@ -128,13 +138,18 @@ export const useCollaborationStore = create<CollaborationStoreState>()(
         set((state) => ({
           messagesByChannelId: {
             ...state.messagesByChannelId,
-            [channelId]: (state.messagesByChannelId[channelId] || []).filter((m) => m.id !== messageId),
+            [channelId]: (state.messagesByChannelId[channelId] || []).filter(
+              (m) => m.id !== messageId,
+            ),
           },
         })),
 
       setMembership: (membership) =>
         set((state) => ({
-          membershipsByChannelId: { ...state.membershipsByChannelId, [membership.channelId]: membership },
+          membershipsByChannelId: {
+            ...state.membershipsByChannelId,
+            [membership.channelId]: membership,
+          },
         })),
 
       setTyping: (channelId, userId, isTyping) =>
@@ -158,7 +173,8 @@ export const useCollaborationStore = create<CollaborationStoreState>()(
             if (payload.message) get().upsertMessage(payload.message);
             break;
           case 'message_deleted':
-            if (payload.channelId && payload.messageId) get().removeMessage(payload.channelId, payload.messageId);
+            if (payload.channelId && payload.messageId)
+              get().removeMessage(payload.channelId, payload.messageId);
             break;
           case 'reaction_added':
           case 'reaction_removed':

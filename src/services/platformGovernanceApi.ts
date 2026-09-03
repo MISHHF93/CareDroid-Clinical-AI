@@ -57,7 +57,8 @@ function endpointForSurface(surface = 'governance', pathname = '') {
   if (pathname.includes('/regulatory/evidence')) {
     return '/api/governance/regulatory/evidence/clinical-governance';
   }
-  if (pathname.includes('/regulatory/capabilities')) return '/api/governance/regulatory/capabilities';
+  if (pathname.includes('/regulatory/capabilities'))
+    return '/api/governance/regulatory/capabilities';
   if (pathname.includes('/ai-security/incidents')) return '/api/governance/ai-security/incidents';
   if (pathname.includes('/clinical/policies')) return '/api/governance/clinical/policies';
   return SURFACE_ENDPOINTS[surface] || SURFACE_ENDPOINTS.governance;
@@ -151,7 +152,11 @@ export async function evaluatePlatformGate(payload: any = {}) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
-    return { ok: response.ok, data, message: response.ok ? '' : getApiErrorMessage(null, response) };
+    return {
+      ok: response.ok,
+      data,
+      message: response.ok ? '' : getApiErrorMessage(null, response),
+    };
   } catch (error: any) {
     return { ok: false, data: null, message: getApiErrorMessage(error) };
   }

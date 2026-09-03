@@ -11,7 +11,9 @@ type SkeletonProps = {
 export function Skeleton({ width, height, rounded, className, style, ...props }: SkeletonProps) {
   return (
     <span
-      className={['cd-skeleton', rounded ? 'cd-skeleton--rounded' : '', className ?? ''].filter(Boolean).join(' ')}
+      className={['cd-skeleton', rounded ? 'cd-skeleton--rounded' : '', className ?? '']
+        .filter(Boolean)
+        .join(' ')}
       aria-hidden="true"
       style={{
         width: typeof width === 'number' ? `${width}px` : width,

@@ -77,7 +77,7 @@ function renderSettings() {
   return render(
     <MemoryRouter>
       <Settings />
-    </MemoryRouter>
+    </MemoryRouter>,
   );
 }
 
@@ -97,9 +97,7 @@ describe('Settings Privacy & Data card', () => {
     const generateButton = screen.getByRole('button', { name: /generate export/i });
     expect(generateButton).toBeDisabled();
 
-    fireEvent.click(
-      screen.getByLabelText(/i understand the export may contain sensitive data/i)
-    );
+    fireEvent.click(screen.getByLabelText(/i understand the export may contain sensitive data/i));
     fireEvent.click(generateButton);
 
     await waitFor(() => {

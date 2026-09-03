@@ -47,14 +47,17 @@ describe('automationAuditApi', () => {
 
     const result = await fetchAutomationAuditEntries({ tenantId: 'tenant-demo-hospital' });
 
-    expect(apiFetch).toHaveBeenCalledWith('/api/automation-audit?tenantId=tenant-demo-hospital', expect.any(Object));
+    expect(apiFetch).toHaveBeenCalledWith(
+      '/api/automation-audit?tenantId=tenant-demo-hospital',
+      expect.any(Object),
+    );
     expect(result.ok).toBe(true);
     expect(result.data[0]).toEqual(
       expect.objectContaining({
         id: 'audit-backend-1',
         tenant: { id: 'tenant-demo-hospital', name: 'Demo Hospital' },
         aiInvolvement: { involved: true, summary: 'AI reviewed deterioration context.' },
-      })
+      }),
     );
   });
 
@@ -80,8 +83,10 @@ describe('automationAuditApi', () => {
       '/api/automation-audit',
       expect.objectContaining({
         method: 'POST',
-        body: expect.stringContaining('"tenant":{"id":"tenant-demo-hospital","name":"Demo Hospital"}'),
-      })
+        body: expect.stringContaining(
+          '"tenant":{"id":"tenant-demo-hospital","name":"Demo Hospital"}',
+        ),
+      }),
     );
     expect(result.ok).toBe(true);
     if (!result.data) throw new Error('expected createAutomationAuditEvent to return data');

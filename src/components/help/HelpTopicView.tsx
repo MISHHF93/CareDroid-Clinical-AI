@@ -8,7 +8,11 @@ type HelpTopicViewProps = {
   compact?: boolean;
 };
 
-export default function HelpTopicView({ topic, onSelectTopic, compact = false }: HelpTopicViewProps) {
+export default function HelpTopicView({
+  topic,
+  onSelectTopic,
+  compact = false,
+}: HelpTopicViewProps) {
   return (
     <article className="help-topic">
       <header className="help-topic__header">
@@ -75,7 +79,12 @@ export default function HelpTopicView({ topic, onSelectTopic, compact = false }:
               const related = getManualTopicById(id);
               if (!related) return null;
               return (
-                <button key={id} type="button" className="help-topic__related-btn" onClick={() => onSelectTopic(id)}>
+                <button
+                  key={id}
+                  type="button"
+                  className="help-topic__related-btn"
+                  onClick={() => onSelectTopic(id)}
+                >
                   {related.title}
                 </button>
               );

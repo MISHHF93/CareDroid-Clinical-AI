@@ -46,7 +46,7 @@ describe('QueueIntelligenceService', () => {
           }),
           riskLevel: expect.stringMatching(/low|medium|high|critical/),
           throughput: expect.any(Number),
-        })
+        }),
       );
     }
   });
@@ -79,12 +79,12 @@ describe('QueueIntelligenceService', () => {
           queueId: 'waiting-room',
           severity: 'high',
         }),
-      ])
+      ]),
     );
     expect(bottlenecks.find((bottleneck) => bottleneck.queueId === 'waiting-room')).toEqual(
       expect.objectContaining({
         reason: expect.stringMatching(/over target/i),
-      })
+      }),
     );
     expect(metrics.bottleneckCount).toBeGreaterThan(0);
     expect(recommendations).toEqual(
@@ -93,7 +93,7 @@ describe('QueueIntelligenceService', () => {
           queueId: 'waiting-room',
           action: expect.stringMatching(/before downstream queues degrade/i),
         }),
-      ])
+      ]),
     );
   });
 
@@ -114,7 +114,7 @@ describe('QueueIntelligenceService', () => {
         highestRiskQueue: expect.objectContaining({
           queueId: expect.any(String),
         }),
-      })
+      }),
     );
     expect(dashboard.queues.some((queue) => queue.bottleneck)).toBe(true);
   });

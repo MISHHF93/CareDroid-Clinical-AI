@@ -20,12 +20,15 @@ const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
 const patternsSource = readFileSync(
   join(
     __dirname,
-    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts'
+    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts',
   ),
-  'utf8'
+  'utf8',
 );
 const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.tsx'), 'utf8');
-const pr8Source = readFileSync(join(__dirname, '../pages/tools/pr8ClinicalBatchCalculators.tsx'), 'utf8');
+const pr8Source = readFileSync(
+  join(__dirname, '../pages/tools/pr8ClinicalBatchCalculators.tsx'),
+  'utf8',
+);
 
 describe.each([
   ['Bishop score', BISHOP, 'BISHOP_OBSTETRIC_DISCLAIMER', 'Cervical examination'],
@@ -53,7 +56,7 @@ describe.each([
     expect(calculatorsSource).toMatch(new RegExp(`case\\s+'${id}'\\s*:`));
     expect(matchCalculatorRoute(`/tools/calculators/${id}`)?.calculatorSlug).toBe(id);
     expect(CALCULATOR_ROUTE_DEFS.find((d) => d.calculatorSlug === id)?.path).toBe(
-      `/tools/calculators/${id}`
+      `/tools/calculators/${id}`,
     );
   });
 

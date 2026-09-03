@@ -1,12 +1,7 @@
 import { buildClinicalAcuityEntry } from '../../lib/native-ai/clinicalAcuityModel';
 import { calculateAnticipatedAdmissionScore } from '../engine/anticipatedAdmissionScore';
 import { latestPatientVitals } from '../utils/patientVitals';
-import {
-  PatientFlag,
-  PatientState,
-  Priority,
-  type Patient,
-} from '../types/emergency';
+import { PatientFlag, PatientState, Priority, type Patient } from '../types/emergency';
 
 export type DiagnosticRiskTier = 'critical' | 'high' | 'moderate' | 'watch' | 'stable';
 
@@ -63,13 +58,16 @@ function hasAbnormalVitals(patient: Patient): boolean {
 
 function hasFlag(patient: Patient, flag: PatientFlag): boolean {
   return (patient.flags || []).some((entry) =>
-    typeof entry === 'string' ? entry === flag : (entry as unknown as { type: string })?.type === flag,
+    typeof entry === 'string'
+      ? entry === flag
+      : (entry as unknown as { type: string })?.type === flag,
   );
 }
 
 function clinicalRuleDrivers(patient: Patient): string[] {
   const drivers: string[] = [];
-  const complaint = `${patient.chiefComplaint || ''} ${patient.complaintCategory || ''}`.toLowerCase();
+  const complaint =
+    `${patient.chiefComplaint || ''} ${patient.complaintCategory || ''}`.toLowerCase();
 
   if ((patient.age ?? 0) >= 65 && /\bchest pain\b/.test(complaint)) {
     drivers.push('Elderly patient with chest pain');
@@ -120,16 +118,21 @@ export function buildDiagnosticSafetyDashboardSnapshot(
     const acuity = buildClinicalAcuityEntry(patient, { now: now.getTime() });
     const ruleDrivers = clinicalRuleDrivers(patient);
     const riskDrivers = [
-      ...new Set([
-        ...ruleDrivers,
-        ...adta.envelope.rationale.slice(0, 2),
-        `Clinical acuity score ${acuity.acuityScore}`,
-        acuity.orientation ? `Predicted orientation: ${acuity.orientation}` : null,
-      ].filter(Boolean) as string[]),
+      ...new Set(
+        [
+          ...ruleDrivers,
+          ...adta.envelope.rationale.slice(0, 2),
+          `Clinical acuity score ${acuity.acuityScore}`,
+          acuity.orientation ? `Predicted orientation: ${acuity.orientation}` : null,
+        ].filter(Boolean) as string[],
+      ),
     ];
     const riskScore = Math.min(
       100,
-      Math.max(acuity.acuityScore, adta.score + ruleDrivers.length * 8 + (hasAbnormalVitals(patient) ? 10 : 0)),
+      Math.max(
+        acuity.acuityScore,
+        adta.score + ruleDrivers.length * 8 + (hasAbnormalVitals(patient) ? 10 : 0),
+      ),
     );
 
     return {
@@ -158,7 +161,10 @@ export function buildDiagnosticSafetyDashboardSnapshot(
       counts[entry.riskTier] += 1;
       return counts;
     },
-    { critical: 0, high: 0, moderate: 0, watch: 0, stable: 0 } as Record<DiagnosticRiskTier, number>,
+    { critical: 0, high: 0, moderate: 0, watch: 0, stable: 0 } as Record<
+      DiagnosticRiskTier,
+      number
+    >,
   );
 
   return {

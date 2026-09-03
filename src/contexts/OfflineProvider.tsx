@@ -1,6 +1,18 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { FEATURE_FLAGS } from '../config/featureFlags.config';
-import { OfflineModeBanner, SyncStatus, registerServiceWorker } from '../components/offline/OfflineSupport';
+import {
+  OfflineModeBanner,
+  SyncStatus,
+  registerServiceWorker,
+} from '../components/offline/OfflineSupport';
 import offlineService from '../services/offlineService';
 import { summarizeOfflineCatalogs } from '../data/offlineMode';
 import logger from '../utils/logger';
@@ -9,7 +21,9 @@ const OfflineModeContext = createContext<any>(null);
 const DISABLED_OFFLINE_SUMMARY = summarizeOfflineCatalogs([]);
 
 const getInitialOnlineState = () =>
-  typeof navigator === 'undefined' || typeof navigator.onLine !== 'boolean' ? true : navigator.onLine;
+  typeof navigator === 'undefined' || typeof navigator.onLine !== 'boolean'
+    ? true
+    : navigator.onLine;
 
 async function loadSyncService() {
   const module = await import('../services/syncService');
@@ -18,10 +32,10 @@ async function loadSyncService() {
 
 /**
  * OfflineProvider Component
- * 
+ *
  * Wraps the entire app to provide offline functionality
  * Place at the top level of your React app
- * 
+ *
  * Usage:
  * <OfflineProvider>
  *   <App />
@@ -176,11 +190,12 @@ export const OfflineProvider = ({ children }) => {
       syncProgress,
       syncStats,
       syncWhenOnline,
-    ]
+    ],
   );
 
   const showSyncStatus = isSyncing;
-  const showBanner = !isOnline || isSyncing || syncError || (!onlineNoticeDismissed && syncProgress === 100);
+  const showBanner =
+    !isOnline || isSyncing || syncError || (!onlineNoticeDismissed && syncProgress === 100);
   const showDisabledBanner = !offlineModeEnabled && !isOnline;
 
   return (
@@ -197,8 +212,8 @@ export const OfflineProvider = ({ children }) => {
               <strong>Offline mode disabled</strong>
             </div>
             <p>
-              Background sync, service worker registration, and offline catalog caching are disabled by
-              feature flag. Reconnect to use live CareDroid data.
+              Background sync, service worker registration, and offline catalog caching are disabled
+              by feature flag. Reconnect to use live CareDroid data.
             </p>
           </div>
         </section>

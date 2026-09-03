@@ -22,8 +22,12 @@ function waitingPatient(overrides: any = {}) {
     chiefComplaint: 'Chest pain',
     highRiskComplaintFlags: [{ id: 'chest-pain', label: 'Chest pain' }],
     flags: [PatientFlag.DeteriorationRisk],
-    vitals: [{ hr: 150, sbp: 85, spo2: 88, recordedAt: new Date(now.getTime() - 5 * 60000).toISOString() }],
-    reassessmentReminders: [{ id: 'r-1', dueAt: new Date(now.getTime() - 30 * 60000).toISOString(), status: 'overdue' }],
+    vitals: [
+      { hr: 150, sbp: 85, spo2: 88, recordedAt: new Date(now.getTime() - 5 * 60000).toISOString() },
+    ],
+    reassessmentReminders: [
+      { id: 'r-1', dueAt: new Date(now.getTime() - 30 * 60000).toISOString(), status: 'overdue' },
+    ],
     ...overrides,
   };
 }

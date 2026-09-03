@@ -289,7 +289,10 @@ export function buildWorkloadBalanceEntries(input: {
     return {
       ...entry,
       workloadTone: overloaded ? 'red' : underloaded ? 'green' : 'blue',
-      workloadPercent: Math.min(100, Math.round((entry.assignedCount / Math.max(1, average * 2 || 4)) * 100)),
+      workloadPercent: Math.min(
+        100,
+        Math.round((entry.assignedCount / Math.max(1, average * 2 || 4)) * 100),
+      ),
     };
   });
 }

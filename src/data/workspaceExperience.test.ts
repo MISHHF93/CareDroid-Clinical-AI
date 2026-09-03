@@ -18,7 +18,7 @@ describe('workspace experience profiles', () => {
       expect.arrayContaining([
         expect.objectContaining({ label: 'Volume', value: '50-150' }),
         expect.objectContaining({ label: 'Team', value: '<10' }),
-      ])
+      ]),
     );
     expect(profile.quickPrompts.join(' ')).toMatch(/bottlenecks|triage/i);
   });
@@ -38,16 +38,17 @@ describe('workspace experience profiles', () => {
       expect.objectContaining({
         id: 'medical-iot',
         label: 'Medical IoT',
-        path:
-          '/emergency/tools?source=operations&filter=operations&q=medical-iot-dashboard&open=medical-iot-dashboard',
-      })
+        path: '/emergency/tools?source=operations&filter=operations&q=medical-iot-dashboard&open=medical-iot-dashboard',
+      }),
     );
   });
 
   it('seeds assistant prompts with active workspace identity', () => {
     const profile = getWorkspaceExperienceProfile({ id: 'medical-iot' });
 
-    expect(buildWorkspaceAssistantPrompt('Check offline devices', profile)).toContain('[Medical IoT OS]');
+    expect(buildWorkspaceAssistantPrompt('Check offline devices', profile)).toContain(
+      '[Medical IoT OS]',
+    );
     expect(buildWorkspaceAssistantPrompt('', profile)).toBe('');
   });
 

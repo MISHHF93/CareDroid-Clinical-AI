@@ -5,7 +5,10 @@ import { describe, expect, it } from 'vitest';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const visualConsistencyCss = readFileSync(join(__dirname, 'visual-consistency.css'), 'utf8');
-const visualResponsiveStandardsCss = readFileSync(join(__dirname, 'visual-responsive-standards.css'), 'utf8');
+const visualResponsiveStandardsCss = readFileSync(
+  join(__dirname, 'visual-responsive-standards.css'),
+  'utf8',
+);
 const designSystemCss = readFileSync(join(__dirname, 'design-system.css'), 'utf8');
 
 describe('visual consistency sweep', () => {

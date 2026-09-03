@@ -1,11 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import {
-  AlertTriangle,
-  Ambulance,
-  Gauge,
-  RefreshCw,
-  Users,
-} from 'lucide-react';
+import { AlertTriangle, Ambulance, Gauge, RefreshCw, Users } from 'lucide-react';
 import {
   hasPatientFlag,
   selectQueueBottleneckAlert,
@@ -14,12 +8,15 @@ import {
 } from '../../../store/emergencyStore';
 import { CANONICAL_ROUTES } from '../../../config/routes.config';
 import useProfileNavigate from '../../../hooks/useProfileNavigate';
-import {
-  PatientFlag,
-  PatientState,
-  Priority,
+import { PatientFlag, PatientState, Priority } from '../../../types/emergency';
+import type {
+  Alert,
+  CapacitySnapshot,
+  Patient,
+  Referral,
+  Staff,
+  WorkflowActionLog,
 } from '../../../types/emergency';
-import type { Alert, CapacitySnapshot, Patient, Referral, Staff, WorkflowActionLog } from '../../../types/emergency';
 import { CareDroidPage } from '../../../components/ui/CareDroidPrimitives';
 import EdDataSourceBanner from '../../../components/emergency/EdDataSourceBanner';
 import { usePractitionerSurfaceVisibility } from '../../../contexts/PractitionerVisibilityContext';
@@ -80,7 +77,11 @@ function readPulseSnapshot(): PulseSnapshot {
     const viewedAt = typeof parsed?.viewedAt === 'string' ? parsed.viewedAt : undefined;
     const viewedAtTime = viewedAt ? Date.parse(viewedAt) : Number.NaN;
     return {
-      timestamp: Number.isFinite(timestamp) ? timestamp : Number.isFinite(viewedAtTime) ? viewedAtTime : null,
+      timestamp: Number.isFinite(timestamp)
+        ? timestamp
+        : Number.isFinite(viewedAtTime)
+          ? viewedAtTime
+          : null,
       viewedAt,
       capacityBand: parsed?.capacityBand || parsed?.capacityRisk,
       activePatientCount: Number.isFinite(Number(parsed?.activePatientCount))
@@ -92,14 +93,22 @@ function readPulseSnapshot(): PulseSnapshot {
       const raw = storage.getItem(LAST_VIEW_KEY);
       const numeric = Number(raw);
       const parsedDate = raw ? Date.parse(raw) : Number.NaN;
-      return { timestamp: Number.isFinite(numeric) ? numeric : Number.isFinite(parsedDate) ? parsedDate : null };
+      return {
+        timestamp: Number.isFinite(numeric)
+          ? numeric
+          : Number.isFinite(parsedDate)
+            ? parsedDate
+            : null,
+      };
     } catch {
       return { timestamp: null };
     }
   }
 }
 
-function writePulseSnapshot(snapshot: Required<Pick<PulseSnapshot, 'timestamp' | 'capacityBand' | 'activePatientCount'>>) {
+function writePulseSnapshot(
+  snapshot: Required<Pick<PulseSnapshot, 'timestamp' | 'capacityBand' | 'activePatientCount'>>,
+) {
   const storage = getPulseStorage();
   if (!storage || snapshot.timestamp === null) return;
   try {
@@ -166,7 +175,9 @@ function hasActiveEscalation(patient: Patient): boolean {
   const latestEscalation = timeline.find((event) => event.type === 'ESCALATION');
   const latestCancel = timeline.find((event) => event.type === 'ESCALATION_CANCELLED');
   if (!latestEscalation) return false;
-  return !latestCancel || timestampOf(latestEscalation.timestamp) > timestampOf(latestCancel.timestamp);
+  return (
+    !latestCancel || timestampOf(latestEscalation.timestamp) > timestampOf(latestCancel.timestamp)
+  );
 }
 
 function capacityTone(capacity: CapacitySnapshot): Tone {
@@ -204,8 +215,15 @@ function buildQueueRows(activePatients: Patient[], emsInboundCount: number, now:
         ? activePatients.filter((patient) => hasPatientFlag(patient, PatientFlag.ReassessmentDue))
         : activePatients.filter((patient) => patient.state === definition.key);
     const waits = patients.map((patient) => minutesSince(patient.arrivalTime, now));
-    const avgWait = waits.length ? Math.round(waits.reduce((sum, wait) => sum + wait, 0) / waits.length) : 0;
-    const health: Tone = avgWait >= definition.target * 1.5 ? 'red' : avgWait >= definition.target ? 'yellow' : 'green';
+    const avgWait = waits.length
+      ? Math.round(waits.reduce((sum, wait) => sum + wait, 0) / waits.length)
+      : 0;
+    const health: Tone =
+      avgWait >= definition.target * 1.5
+        ? 'red'
+        : avgWait >= definition.target
+          ? 'yellow'
+          : 'green';
     return {
       id: String(definition.key),
       name: definition.name,
@@ -235,7 +253,11 @@ function buildStaffRows(staff: Staff[], activePatients: Patient[]) {
     const count = activePatients.filter((patient) => patient.assignedStaffId === member.id).length;
     const overloaded = average > 0 && count > average * 2;
     const underloaded = average > 0 && count < average / 2;
-    const displayName = member.displayName || member.name || `${member.firstName || ''} ${member.lastName || ''}`.trim() || member.id;
+    const displayName =
+      member.displayName ||
+      member.name ||
+      `${member.firstName || ''} ${member.lastName || ''}`.trim() ||
+      member.id;
     const initials = displayName
       .split(/\s+/)
       .filter(Boolean)
@@ -295,7 +317,9 @@ function buildChangeEvents({
       const eventTime = timestampOf(event.timestamp);
       if (!eventTime || eventTime <= since) return;
       if (event.type === 'FlagAdded') {
-        const flag = String(event.metadata?.flag || event.metadata?.flagType || event.summary || 'Attention flag');
+        const flag = String(
+          event.metadata?.flag || event.metadata?.flagType || event.summary || 'Attention flag',
+        );
         changes.push({
           timestamp: eventTime,
           text: `${patientName(patient)} flagged: ${flag}`,
@@ -354,7 +378,9 @@ function buildChangeEvents({
   alerts
     .filter((alert) => alert.severity === 'Critical' && timestampOf(alert.createdAt) > since)
     .forEach((alert) => {
-      const patient = alert.patientId ? patients.find((candidate) => candidate.id === alert.patientId) : null;
+      const patient = alert.patientId
+        ? patients.find((candidate) => candidate.id === alert.patientId)
+        : null;
       changes.push({
         timestamp: timestampOf(alert.createdAt),
         text: `${patient ? `${patientName(patient)}: ` : ''}${alert.title}`,
@@ -419,7 +445,11 @@ export default function DepartmentPulse() {
   const [now, setNow] = useState(() => new Date());
   const [lastUpdatedAt, setLastUpdatedAt] = useState(() => new Date());
   const activePatients = useMemo(
-    () => patients.filter((patient) => patient.state !== PatientState.Discharge && patient.state !== PatientState.Deceased),
+    () =>
+      patients.filter(
+        (patient) =>
+          patient.state !== PatientState.Discharge && patient.state !== PatientState.Deceased,
+      ),
     [patients],
   );
 
@@ -486,12 +516,24 @@ export default function DepartmentPulse() {
             workflowLogs,
           })
         : [],
-    [alerts, capacity, emsArrivals, isReturningAfterAway, patients, previousSnapshot, referrals, workflowLogs],
+    [
+      alerts,
+      capacity,
+      emsArrivals,
+      isReturningAfterAway,
+      patients,
+      previousSnapshot,
+      referrals,
+      workflowLogs,
+    ],
   );
   const derivedBottleneck = queueRows
     .filter((queue) => queue.health === 'red')
     .sort((first, second) => second.avgWait - first.avgWait)[0];
-  const secondsSinceUpdate = Math.max(0, Math.floor((now.getTime() - lastUpdatedAt.getTime()) / 1000));
+  const secondsSinceUpdate = Math.max(
+    0,
+    Math.floor((now.getTime() - lastUpdatedAt.getTime()) / 1000),
+  );
 
   const surfaces = usePractitionerSurfaceVisibility();
   const activeScenarioId = useEmergencyStore((state) => state.activeScenarioId);
@@ -571,7 +613,11 @@ export default function DepartmentPulse() {
             ? `You were away ${awayMinutes} minutes. Here is what changed.`
             : `Live department status - ${formatClock(now)}`}
         </strong>
-        <span className="emergency-pulse__live" role="status" aria-label={`Live. Updated ${secondsSinceUpdate}s ago`}>
+        <span
+          className="emergency-pulse__live"
+          role="status"
+          aria-label={`Live. Updated ${secondsSinceUpdate}s ago`}
+        >
           Last updated {secondsSinceUpdate}s ago
           <span aria-hidden="true" />
         </span>
@@ -630,7 +676,9 @@ export default function DepartmentPulse() {
               ))}
             </ul>
           ) : (
-            <p className="emergency-pulse__empty">No timestamped changes were found since your last Pulse visit.</p>
+            <p className="emergency-pulse__empty">
+              No timestamped changes were found since your last Pulse visit.
+            </p>
           )}
         </section>
       ) : null}
@@ -656,7 +704,9 @@ export default function DepartmentPulse() {
             </button>
           ))}
           {!attentionPatients.length ? (
-            <p className="emergency-pulse__empty">No P1/P2, escalated, or reassessment-due patients right now.</p>
+            <p className="emergency-pulse__empty">
+              No P1/P2, escalated, or reassessment-due patients right now.
+            </p>
           ) : null}
         </div>
       </section>
@@ -672,20 +722,30 @@ export default function DepartmentPulse() {
               <div key={queue.id} className="emergency-pulse__queue-row">
                 <strong>{queue.name}</strong>
                 <span>{queue.count}</span>
-                <span className={`emergency-pulse__health emergency-pulse__health--${queue.health}`} aria-label={`${queue.health} health`} />
+                <span
+                  className={`emergency-pulse__health emergency-pulse__health--${queue.health}`}
+                  aria-label={`${queue.health} health`}
+                />
                 <small>Avg {queue.avgWait}m</small>
               </div>
             ))}
           </div>
           {bottleneckAlert || derivedBottleneck ? (
             <p className="emergency-pulse__bottleneck" role="alert">
-              Bottleneck: {bottleneckAlert?.message || `${derivedBottleneck.name} average wait is ${derivedBottleneck.avgWait}m.`}
+              Bottleneck:{' '}
+              {bottleneckAlert?.message ||
+                `${derivedBottleneck.name} average wait is ${derivedBottleneck.avgWait}m.`}
             </p>
           ) : null}
         </section>
       ) : bottleneckAlert || derivedBottleneck ? (
-        <p className="emergency-pulse__bottleneck emergency-pulse__bottleneck--compact" role="alert">
-          Bottleneck: {bottleneckAlert?.message || `${derivedBottleneck.name} average wait is ${derivedBottleneck.avgWait}m.`}
+        <p
+          className="emergency-pulse__bottleneck emergency-pulse__bottleneck--compact"
+          role="alert"
+        >
+          Bottleneck:{' '}
+          {bottleneckAlert?.message ||
+            `${derivedBottleneck.name} average wait is ${derivedBottleneck.avgWait}m.`}
         </p>
       ) : null}
 
@@ -697,11 +757,21 @@ export default function DepartmentPulse() {
           </div>
           <div className="emergency-pulse__staff-row">
             {staffRows.map((member) => (
-              <article key={member.id} className={`emergency-pulse__staff emergency-pulse__staff--${member.tone}`}>
-                {member.avatarUrl ? <img src={member.avatarUrl} alt="" loading="lazy" /> : <span>{member.initials}</span>}
+              <article
+                key={member.id}
+                className={`emergency-pulse__staff emergency-pulse__staff--${member.tone}`}
+              >
+                {member.avatarUrl ? (
+                  <img src={member.avatarUrl} alt="" loading="lazy" />
+                ) : (
+                  <span>{member.initials}</span>
+                )}
                 <strong>{member.displayName}</strong>
                 <small>{member.count} patients</small>
-                <div className="emergency-pulse__workload" aria-label={`${member.displayName} workload`}>
+                <div
+                  className="emergency-pulse__workload"
+                  aria-label={`${member.displayName} workload`}
+                >
                   <span style={{ width: `${Math.max(8, member.workloadPercent)}%` }} />
                 </div>
               </article>

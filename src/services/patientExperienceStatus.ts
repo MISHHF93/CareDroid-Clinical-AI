@@ -1,5 +1,8 @@
 import { isEmsRegistrationPatient } from '../components/reception/receptionQueueModel';
-import { classifyReferralBucket, isClosedReferralStatus } from '../components/whiteboard/referralAwarenessModel';
+import {
+  classifyReferralBucket,
+  isClosedReferralStatus,
+} from '../components/whiteboard/referralAwarenessModel';
 import { deriveQueueDestination, deriveTriagePending } from './arrivalControlLayer';
 import {
   PatientFlag,
@@ -82,7 +85,9 @@ export type PatientExperienceContext = {
 
 function hasFlag(patient: Patient, flag: PatientFlag): boolean {
   return (patient.flags || []).some((entry) =>
-    typeof entry === 'string' ? entry === flag : (entry as unknown as { type: string })?.type === flag,
+    typeof entry === 'string'
+      ? entry === flag
+      : (entry as unknown as { type: string })?.type === flag,
   );
 }
 
@@ -133,8 +138,7 @@ export function resolvePatientExperienceStatus(
   context: PatientExperienceContext = {},
 ): PatientExperienceStatusSnapshot {
   const referrals = context.referrals || [];
-  const queueDestination =
-    patient.arrival?.queueDestination ?? deriveQueueDestination(patient);
+  const queueDestination = patient.arrival?.queueDestination ?? deriveQueueDestination(patient);
   const triagePending =
     typeof patient.arrival?.triagePending === 'boolean'
       ? patient.arrival.triagePending
@@ -151,10 +155,7 @@ export function resolvePatientExperienceStatus(
 
   const referral = activeReferralForPatient(patient, referrals);
 
-  if (
-    patient.state === PatientState.Admission ||
-    hasFlag(patient, PatientFlag.PendingAdmission)
-  ) {
+  if (patient.state === PatientState.Admission || hasFlag(patient, PatientFlag.PendingAdmission)) {
     return buildSnapshot(
       'awaiting-admission-bed',
       patient,
@@ -273,8 +274,7 @@ export function summarizePatientExperienceStatuses(
 
   patients.forEach((patient) => {
     const statusId =
-      patient.arrival?.waitingRoomStatus ??
-      resolvePatientExperienceStatus(patient, context).id;
+      patient.arrival?.waitingRoomStatus ?? resolvePatientExperienceStatus(patient, context).id;
     counts[statusId] += 1;
   });
 
@@ -389,4 +389,3 @@ export function assertPublicPatientExperienceViewIsPhiSafe(
   if (PUBLIC_PHI_PATTERN.test(serialized)) return false;
   return Object.keys(view).every((key) => key === 'id' || key === 'label');
 }
-

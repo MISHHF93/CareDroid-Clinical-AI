@@ -34,16 +34,126 @@ type IotDevice = {
 };
 
 const DEMO_DEVICES: IotDevice[] = [
-  { id: 'dev-001', name: 'Philips IntelliVue MX800', category: 'monitor', room: 'ED Bay 3', battery: 98, status: 'online', lastSeen: '30s ago', alarms: 0, x: 18, y: 22 },
-  { id: 'dev-002', name: 'Baxter Sigma Spectrum', category: 'infusion', room: 'ED Bay 3', battery: 72, status: 'online', lastSeen: '1m ago', alarms: 1, x: 24, y: 28 },
-  { id: 'dev-003', name: 'Puritan Bennett 980', category: 'ventilator', room: 'ICU Bed 4', battery: null, status: 'online', lastSeen: '10s ago', alarms: 0, x: 42, y: 20 },
-  { id: 'dev-004', name: 'Masimo Root', category: 'wearable', room: 'ED Bay 7', battery: 41, status: 'warning', lastSeen: '2m ago', alarms: 2, x: 30, y: 44 },
-  { id: 'dev-005', name: 'GE Optima RF360', category: 'imaging', room: 'Radiology', battery: null, status: 'online', lastSeen: '5m ago', alarms: 0, x: 68, y: 24 },
-  { id: 'dev-006', name: 'Zoll R Series', category: 'portable', room: 'ED Bay 1', battery: 87, status: 'online', lastSeen: '45s ago', alarms: 0, x: 14, y: 52 },
-  { id: 'dev-007', name: 'Philips SureSigns VS4', category: 'monitor', room: 'OBS-2', battery: 62, status: 'online', lastSeen: '1m ago', alarms: 0, x: 52, y: 48 },
-  { id: 'dev-008', name: 'Smiths Medical Medfusion', category: 'infusion', room: 'ICU Bed 2', battery: 15, status: 'critical', lastSeen: '8m ago', alarms: 3, x: 46, y: 34 },
-  { id: 'dev-009', name: 'Drager Evita Infinity', category: 'ventilator', room: 'ICU Bed 6', battery: null, status: 'online', lastSeen: '20s ago', alarms: 1, x: 58, y: 30 },
-  { id: 'dev-010', name: 'Biobeat BB-613', category: 'wearable', room: 'Med-Surg B', battery: 8, status: 'critical', lastSeen: '15m ago', alarms: 1, x: 72, y: 56 },
+  {
+    id: 'dev-001',
+    name: 'Philips IntelliVue MX800',
+    category: 'monitor',
+    room: 'ED Bay 3',
+    battery: 98,
+    status: 'online',
+    lastSeen: '30s ago',
+    alarms: 0,
+    x: 18,
+    y: 22,
+  },
+  {
+    id: 'dev-002',
+    name: 'Baxter Sigma Spectrum',
+    category: 'infusion',
+    room: 'ED Bay 3',
+    battery: 72,
+    status: 'online',
+    lastSeen: '1m ago',
+    alarms: 1,
+    x: 24,
+    y: 28,
+  },
+  {
+    id: 'dev-003',
+    name: 'Puritan Bennett 980',
+    category: 'ventilator',
+    room: 'ICU Bed 4',
+    battery: null,
+    status: 'online',
+    lastSeen: '10s ago',
+    alarms: 0,
+    x: 42,
+    y: 20,
+  },
+  {
+    id: 'dev-004',
+    name: 'Masimo Root',
+    category: 'wearable',
+    room: 'ED Bay 7',
+    battery: 41,
+    status: 'warning',
+    lastSeen: '2m ago',
+    alarms: 2,
+    x: 30,
+    y: 44,
+  },
+  {
+    id: 'dev-005',
+    name: 'GE Optima RF360',
+    category: 'imaging',
+    room: 'Radiology',
+    battery: null,
+    status: 'online',
+    lastSeen: '5m ago',
+    alarms: 0,
+    x: 68,
+    y: 24,
+  },
+  {
+    id: 'dev-006',
+    name: 'Zoll R Series',
+    category: 'portable',
+    room: 'ED Bay 1',
+    battery: 87,
+    status: 'online',
+    lastSeen: '45s ago',
+    alarms: 0,
+    x: 14,
+    y: 52,
+  },
+  {
+    id: 'dev-007',
+    name: 'Philips SureSigns VS4',
+    category: 'monitor',
+    room: 'OBS-2',
+    battery: 62,
+    status: 'online',
+    lastSeen: '1m ago',
+    alarms: 0,
+    x: 52,
+    y: 48,
+  },
+  {
+    id: 'dev-008',
+    name: 'Smiths Medical Medfusion',
+    category: 'infusion',
+    room: 'ICU Bed 2',
+    battery: 15,
+    status: 'critical',
+    lastSeen: '8m ago',
+    alarms: 3,
+    x: 46,
+    y: 34,
+  },
+  {
+    id: 'dev-009',
+    name: 'Drager Evita Infinity',
+    category: 'ventilator',
+    room: 'ICU Bed 6',
+    battery: null,
+    status: 'online',
+    lastSeen: '20s ago',
+    alarms: 1,
+    x: 58,
+    y: 30,
+  },
+  {
+    id: 'dev-010',
+    name: 'Biobeat BB-613',
+    category: 'wearable',
+    room: 'Med-Surg B',
+    battery: 8,
+    status: 'critical',
+    lastSeen: '15m ago',
+    alarms: 1,
+    x: 72,
+    y: 56,
+  },
 ];
 
 const MARKER_FILL: Record<string, string> = {
@@ -72,7 +182,7 @@ function mapServiceDevice(device: any): IotDevice {
     battery: device.battery ?? null,
     status: device.status,
     lastSeen: lastSeenAgo,
-    alarms: Array.isArray(device.activeAlerts) ? device.activeAlerts.length : device.alarms ?? 0,
+    alarms: Array.isArray(device.activeAlerts) ? device.activeAlerts.length : (device.alarms ?? 0),
     x: device.location?.x ?? device.x,
     y: device.location?.y ?? device.y,
   };
@@ -107,7 +217,7 @@ function DeviceRow({
       type="button"
       className={`medical-iot-page__device-row${selected ? ' is-selected' : ''}`}
       onClick={() => onSelect(device.id)}
-      {...((selected) ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
+      {...(selected ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
     >
       <GraphicIconBadge iconKey={categoryIconKey(device.category)} accent="information" size="sm" />
       <div>
@@ -186,7 +296,12 @@ export default function MedicalIotDashboard() {
 
   const filteredDevices = devices.filter((device) => {
     if (filter !== 'all' && device.category !== filter && device.status !== filter) return false;
-    if (query && !`${device.name} ${device.room} ${device.category}`.toLowerCase().includes(query.toLowerCase())) {
+    if (
+      query &&
+      !`${device.name} ${device.room} ${device.category}`
+        .toLowerCase()
+        .includes(query.toLowerCase())
+    ) {
       return false;
     }
     return true;
@@ -195,7 +310,9 @@ export default function MedicalIotDashboard() {
   const criticalCount = devices.filter((device) => device.status === 'critical').length;
   const warningCount = devices.filter((device) => device.status === 'warning').length;
   const alarmCount = devices.reduce((sum, device) => sum + device.alarms, 0);
-  const lowBattery = devices.filter((device) => device.battery != null && device.battery <= 20).length;
+  const lowBattery = devices.filter(
+    (device) => device.battery != null && device.battery <= 20,
+  ).length;
   const onlineCount = devices.filter((device) => device.status === 'online').length;
 
   const statusChart = useMemo(() => buildDeviceStatusChart(devices), [devices]);
@@ -222,8 +339,13 @@ export default function MedicalIotDashboard() {
         <div className="medical-iot-page__title-row">
           <GraphicIconBadge iconKey="activity" accent="brand" size="md" />
           <div>
-            <p className="medical-iot-page__title-text" data-testid="cd-page-title-text">Medical IoT Dashboard</p>
-            <p>Device fleet connectivity, battery health, active alarms, and bedside telemetry positions.</p>
+            <p className="medical-iot-page__title-text" data-testid="cd-page-title-text">
+              Medical IoT Dashboard
+            </p>
+            <p>
+              Device fleet connectivity, battery health, active alarms, and bedside telemetry
+              positions.
+            </p>
           </div>
         </div>
         <div className="medical-iot-page__actions">
@@ -232,7 +354,9 @@ export default function MedicalIotDashboard() {
               {criticalCount} critical
             </span>
           ) : null}
-          {isDemo ? <span className="medical-iot-page__badge medical-iot-page__badge--demo">Demo data</span> : null}
+          {isDemo ? (
+            <span className="medical-iot-page__badge medical-iot-page__badge--demo">Demo data</span>
+          ) : null}
           <button type="button" onClick={load} disabled={loading}>
             {loading ? 'Scanning…' : 'Refresh'}
           </button>
@@ -243,14 +367,27 @@ export default function MedicalIotDashboard() {
         title="Medical IoT source state"
         states={
           isDemo
-            ? [DEMO_LIVE_STATES.DEMO, DEMO_LIVE_STATES.BACKEND_UNAVAILABLE, DEMO_LIVE_STATES.UNSUPPORTED]
+            ? [
+                DEMO_LIVE_STATES.DEMO,
+                DEMO_LIVE_STATES.BACKEND_UNAVAILABLE,
+                DEMO_LIVE_STATES.UNSUPPORTED,
+              ]
             : [DEMO_LIVE_STATES.DEMO, DEMO_LIVE_STATES.UNSUPPORTED]
         }
         details={sourceLabel || message}
       />
 
-      <div className="medical-iot-page__metrics" role="group" aria-label="Medical IoT summary metrics">
-        <MetricCard label="Devices online" value={String(onlineCount)} hint="Reporting healthy connectivity" tone="good" />
+      <div
+        className="medical-iot-page__metrics"
+        role="group"
+        aria-label="Medical IoT summary metrics"
+      >
+        <MetricCard
+          label="Devices online"
+          value={String(onlineCount)}
+          hint="Reporting healthy connectivity"
+          tone="good"
+        />
         <MetricCard
           label="Critical"
           value={String(criticalCount)}
@@ -275,7 +412,12 @@ export default function MedicalIotDashboard() {
           hint="Devices at or below 20%"
           tone={lowBattery > 0 ? 'warning' : 'good'}
         />
-        <MetricCard label="Total devices" value={String(devices.length)} hint="Registered in current scan" tone="neutral" />
+        <MetricCard
+          label="Total devices"
+          value={String(devices.length)}
+          hint="Registered in current scan"
+          tone="neutral"
+        />
       </div>
 
       <div className="medical-iot-page__layout">
@@ -285,7 +427,11 @@ export default function MedicalIotDashboard() {
             role="group"
             aria-label="Medical IoT device position map — contains selectable device markers"
           >
-            <svg viewBox="0 0 100 100" className="medical-iot-map-canvas__svg" preserveAspectRatio="xMidYMid meet">
+            <svg
+              viewBox="0 0 100 100"
+              className="medical-iot-map-canvas__svg"
+              preserveAspectRatio="xMidYMid meet"
+            >
               {gridLines.map((line, index) => (
                 <line
                   key={`grid-${index}`}
@@ -321,7 +467,9 @@ export default function MedicalIotDashboard() {
                     }}
                   >
                     <circle r="2.2" fill={MARKER_FILL[tone]} />
-                    <text x="2.8" y="1">{marker.id}</text>
+                    <text x="2.8" y="1">
+                      {marker.id}
+                    </text>
                   </g>
                 );
               })}
@@ -329,11 +477,14 @@ export default function MedicalIotDashboard() {
           </div>
           {selectedDevice ? (
             <p className="medical-iot-page__map-state">
-              <strong>{selectedDevice.name}</strong> — {selectedDevice.room} · {selectedDevice.status}
+              <strong>{selectedDevice.name}</strong> — {selectedDevice.room} ·{' '}
+              {selectedDevice.status}
               {selectedDevice.alarms > 0 ? ` · ${selectedDevice.alarms} alarms` : ''}
             </p>
           ) : (
-            <p className="medical-iot-page__map-state">Select a device marker or roster row to inspect telemetry context.</p>
+            <p className="medical-iot-page__map-state">
+              Select a device marker or roster row to inspect telemetry context.
+            </p>
           )}
         </section>
 
@@ -417,7 +568,9 @@ export default function MedicalIotDashboard() {
             key={id}
             type="button"
             className={filter === id ? 'is-active' : undefined}
-            {...((filter === id) ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
+            {...(filter === id
+              ? { 'aria-pressed': 'true' as const }
+              : { 'aria-pressed': 'false' as const })}
             onClick={() => setFilter(id)}
           >
             {label}

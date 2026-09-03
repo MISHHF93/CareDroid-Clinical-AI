@@ -212,9 +212,7 @@ export function getWalkthroughActiveCensus() {
 }
 
 export function getMaxWhiteboardVisibleCards() {
-  return isPractitionerCleanupEnabled()
-    ? PRACTITIONER_CLEANUP.maxWhiteboardVisibleCards
-    : 24;
+  return isPractitionerCleanupEnabled() ? PRACTITIONER_CLEANUP.maxWhiteboardVisibleCards : 24;
 }
 
 export function getCopilotRecommendationLimit() {
@@ -302,7 +300,9 @@ export function shouldSuppressWhiteboardNativeAiPanels() {
 }
 
 export function shouldSuppressWhiteboardDiagnosticDashboard() {
-  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressWhiteboardDiagnosticDashboard;
+  return (
+    isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressWhiteboardDiagnosticDashboard
+  );
 }
 
 export function shouldSuppressWhiteboardWhoNextPanel() {
@@ -330,7 +330,9 @@ export function shouldSuppressPatientCardNativeAiBadges() {
 }
 
 export function shouldSuppressPatientCardDataQualitySignals() {
-  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressPatientCardDataQualitySignals;
+  return (
+    isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressPatientCardDataQualitySignals
+  );
 }
 
 export function shouldSuppressAnalyticsPlatformLayers() {
@@ -354,7 +356,9 @@ export function shouldSuppressWhiteboardAwarenessSubtitle() {
 }
 
 export function shouldSuppressWhiteboardCommunicationPanel() {
-  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressWhiteboardCommunicationPanel;
+  return (
+    isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressWhiteboardCommunicationPanel
+  );
 }
 
 export function shouldSuppressWhiteboardRoleStrips() {
@@ -378,7 +382,9 @@ export function shouldSuppressReceptionIntroDescription() {
 }
 
 export function shouldSuppressReceptionStatusMessagingStrip() {
-  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressReceptionStatusMessagingStrip;
+  return (
+    isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressReceptionStatusMessagingStrip
+  );
 }
 
 export function shouldSuppressReceptionProcessEducation() {
@@ -442,19 +448,29 @@ export function shouldSuppressDepartmentPulseStaffPanel() {
 }
 
 export function shouldSuppressEmergencySettingsAuditSections() {
-  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressEmergencySettingsAuditSections;
+  return (
+    isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressEmergencySettingsAuditSections
+  );
 }
 
 export function shouldSuppressEmergencySettingsGovernanceSections() {
-  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressEmergencySettingsGovernanceSections;
+  return (
+    isPractitionerCleanupEnabled() &&
+    PRACTITIONER_CLEANUP.suppressEmergencySettingsGovernanceSections
+  );
 }
 
 export function shouldSuppressEmergencySettingsScreenModes() {
-  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressEmergencySettingsScreenModes;
+  return (
+    isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressEmergencySettingsScreenModes
+  );
 }
 
 export function shouldSuppressEmergencySettingsWalkthroughDetail() {
-  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressEmergencySettingsWalkthroughDetail;
+  return (
+    isPractitionerCleanupEnabled() &&
+    PRACTITIONER_CLEANUP.suppressEmergencySettingsWalkthroughDetail
+  );
 }
 
 export function shouldSuppressReceptionTriageRuleBuilder() {
@@ -466,11 +482,15 @@ export function shouldSuppressSmartIntakeHeroDescription() {
 }
 
 export function shouldSuppressSmartIntakeVerificationWarnings() {
-  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressSmartIntakeVerificationWarnings;
+  return (
+    isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressSmartIntakeVerificationWarnings
+  );
 }
 
 export function shouldSuppressSmartIntakeVerificationAuditLog() {
-  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressSmartIntakeVerificationAuditLog;
+  return (
+    isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressSmartIntakeVerificationAuditLog
+  );
 }
 
 export function shouldSuppressAnalyticsDescriptions() {
@@ -486,11 +506,15 @@ export function shouldSuppressAnalyticsSecondaryCharts() {
 }
 
 export function shouldSuppressCalculatorHubHeroDescription() {
-  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressCalculatorHubHeroDescription;
+  return (
+    isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressCalculatorHubHeroDescription
+  );
 }
 
 export function shouldSuppressCalculatorHubCardDescriptions() {
-  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressCalculatorHubCardDescriptions;
+  return (
+    isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressCalculatorHubCardDescriptions
+  );
 }
 
 export function shouldCompactCalculatorHubPatientBar() {
@@ -498,7 +522,9 @@ export function shouldCompactCalculatorHubPatientBar() {
 }
 
 export function shouldSuppressPatientRoomDoorSignDuplicate() {
-  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressPatientRoomDoorSignDuplicate;
+  return (
+    isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressPatientRoomDoorSignDuplicate
+  );
 }
 
 export function shouldSuppressEdDataSourceBanner() {
@@ -522,7 +548,9 @@ export function shouldSuppressEmergencyRouteMetrics() {
 }
 
 export function shouldSuppressReceptionPatientAnswersPanel() {
-  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressReceptionPatientAnswersPanel;
+  return (
+    isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressReceptionPatientAnswersPanel
+  );
 }
 
 export function shouldForceSlimReceptionDeskForAllRoles() {
@@ -534,7 +562,5 @@ export function shouldForceCompactOperationalStrip() {
 }
 
 export function getMaxPrimaryWhiteboardStats() {
-  return isPractitionerCleanupEnabled()
-    ? PRACTITIONER_CLEANUP.maxPrimaryWhiteboardStats
-    : null;
+  return isPractitionerCleanupEnabled() ? PRACTITIONER_CLEANUP.maxPrimaryWhiteboardStats : null;
 }

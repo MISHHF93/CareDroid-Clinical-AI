@@ -32,13 +32,21 @@ function patient(overrides: Partial<Patient> = {}): Patient {
 
 describe('sortWhiteboardPatients', () => {
   it('sorts waiting patients by longest wait before priority', () => {
-    const p2Short = patient({ id: 'p2-short', priority: Priority.P2, arrivalTime: isoMinutesAgo(20) });
-    const p4Long = patient({ id: 'p4-long', priority: Priority.P4, arrivalTime: isoMinutesAgo(90), flags: [PatientFlag.LongWait] });
+    const p2Short = patient({
+      id: 'p2-short',
+      priority: Priority.P2,
+      arrivalTime: isoMinutesAgo(20),
+    });
+    const p4Long = patient({
+      id: 'p4-long',
+      priority: Priority.P4,
+      arrivalTime: isoMinutesAgo(90),
+      flags: [PatientFlag.LongWait],
+    });
 
-    expect([p2Short, p4Long].sort((a, b) => sortWhiteboardPatients(a, b, now)).map((entry) => entry.id)).toEqual([
-      'p4-long',
-      'p2-short',
-    ]);
+    expect(
+      [p2Short, p4Long].sort((a, b) => sortWhiteboardPatients(a, b, now)).map((entry) => entry.id),
+    ).toEqual(['p4-long', 'p2-short']);
   });
 
   it('sorts by normalized arrival acuity level when arrival block is present', () => {
@@ -73,19 +81,27 @@ describe('sortWhiteboardPatients', () => {
       },
     });
 
-    expect([p4, p2].sort((a, b) => sortWhiteboardPatients(a, b, now)).map((entry) => entry.id)).toEqual([
-      'p2-arrival',
-      'p4-arrival',
-    ]);
+    expect(
+      [p4, p2].sort((a, b) => sortWhiteboardPatients(a, b, now)).map((entry) => entry.id),
+    ).toEqual(['p2-arrival', 'p4-arrival']);
   });
 
   it('keeps priority ordering for non-waiting comparisons', () => {
-    const p1Assessment = patient({ id: 'p1-assessment', state: PatientState.Assessment, priority: Priority.P1 });
-    const p4Waiting = patient({ id: 'p4-waiting', priority: Priority.P4, arrivalTime: isoMinutesAgo(90) });
+    const p1Assessment = patient({
+      id: 'p1-assessment',
+      state: PatientState.Assessment,
+      priority: Priority.P1,
+    });
+    const p4Waiting = patient({
+      id: 'p4-waiting',
+      priority: Priority.P4,
+      arrivalTime: isoMinutesAgo(90),
+    });
 
-    expect([p4Waiting, p1Assessment].sort((a, b) => sortWhiteboardPatients(a, b, now)).map((entry) => entry.id)).toEqual([
-      'p1-assessment',
-      'p4-waiting',
-    ]);
+    expect(
+      [p4Waiting, p1Assessment]
+        .sort((a, b) => sortWhiteboardPatients(a, b, now))
+        .map((entry) => entry.id),
+    ).toEqual(['p1-assessment', 'p4-waiting']);
   });
 });

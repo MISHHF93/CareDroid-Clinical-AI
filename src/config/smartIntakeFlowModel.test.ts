@@ -36,7 +36,12 @@ describe('smartIntakeFlowModel', () => {
     const decisions = buildAutoApprovedFieldDecisions(
       [
         { field: 'firstName', extracted: 'Mei', existing: 'Mei', status: 'verified' },
-        { field: 'phone', extracted: '416-555-0134', existing: '416-555-0177', status: 'conflicting' },
+        {
+          field: 'phone',
+          extracted: '416-555-0134',
+          existing: '416-555-0177',
+          status: 'conflicting',
+        },
       ],
       null,
     );

@@ -28,7 +28,7 @@ describe('PR8 calculator utilities', () => {
         feverHistory: false,
         absenceOfCough: true,
         ageBand: '45_plus',
-      })
+      }),
     ).toBe(4);
     expect(interpretCentorMcisaac(4)?.severity).toBe('warning');
   });
@@ -41,19 +41,21 @@ describe('PR8 calculator utilities', () => {
         station: 3,
         consistency: 2,
         position: 2,
-      })
+      }),
     ).toBe(13);
     expect(interpretBishopScore(8)?.label).toMatch(/Favourable/i);
     expect(interpretBishopScore(8)?.riskCategory).toBe('favourable');
     expect(interpretBishopScore(4)?.riskCategory).toBe('unfavourable');
-    expect(calculateBradenScore({
-      sensoryPerception: 1,
-      moisture: 1,
-      activity: 1,
-      mobility: 1,
-      nutrition: 1,
-      frictionShear: 1,
-    })).toBe(6);
+    expect(
+      calculateBradenScore({
+        sensoryPerception: 1,
+        moisture: 1,
+        activity: 1,
+        mobility: 1,
+        nutrition: 1,
+        frictionShear: 1,
+      }),
+    ).toBe(6);
     expect(interpretBradenScore(6)?.severity).toBe('critical');
     expect(interpretBradenScore(6)?.riskCategory).toBe('high');
   });
@@ -66,7 +68,7 @@ describe('PR8 calculator utilities', () => {
         grimace: 2,
         activity: 2,
         respiration: 2,
-      })
+      }),
     ).toBe(10);
     expect(interpretApgarScore(10)?.severity).toBe('normal');
     expect(interpretApgarScore(10)?.riskCategory).toBe('reassuring');
@@ -79,7 +81,7 @@ describe('PR8 calculator utilities', () => {
         ivHeparinLock: 20,
         gait: 20,
         mentalStatus: 15,
-      })
+      }),
     ).toBe(125);
     expect(interpretMorseFallScore(125)?.severity).toBe('critical');
     expect(interpretMorseFallScore(125)?.riskCategory).toBe('high');
@@ -89,9 +91,22 @@ describe('PR8 calculator utilities', () => {
   it('scores Ranson and BISAP', () => {
     expect(
       calculateRansonScore(
-        { ageOver55: true, wbcOver16000: true, glucoseOver200: false, ldhOver350: false, astOver250: false },
-        { hematocritDrop10: true, bunRise5: true, calciumBelow8: false, pao2Below60: false, baseDeficitOver4: false, fluidSequestration6L: false }
-      )
+        {
+          ageOver55: true,
+          wbcOver16000: true,
+          glucoseOver200: false,
+          ldhOver350: false,
+          astOver250: false,
+        },
+        {
+          hematocritDrop10: true,
+          bunRise5: true,
+          calciumBelow8: false,
+          pao2Below60: false,
+          baseDeficitOver4: false,
+          fluidSequestration6L: false,
+        },
+      ),
     ).toBe(4);
     expect(interpretRansonScore(4)?.severity).toBe('warning');
     expect(
@@ -101,14 +116,19 @@ describe('PR8 calculator utilities', () => {
         sirsPresent: true,
         ageOver60: false,
         pleuralEffusion: false,
-      })
+      }),
     ).toBe(3);
     expect(interpretBisapScore(3)?.severity).toBe('warning');
     expect(interpretBisapScore(3)?.riskCategory).toBe('moderate');
   });
 
   it('computes FIB-4 and Framingham risk', () => {
-    const fib4 = calculateFib4({ ageYears: 50, astUPerL: 40, altUPerL: 30, platelets10e9PerL: 200 });
+    const fib4 = calculateFib4({
+      ageYears: 50,
+      astUPerL: 40,
+      altUPerL: 30,
+      platelets10e9PerL: 200,
+    });
     expect(fib4).toBeGreaterThan(0);
     expect(interpretFib4(fib4, 50)?.referenceLine).toMatch(/FIB-4/i);
     expect(interpretFib4(fib4, 50)?.riskCategory).toBe('indeterminate');
@@ -123,6 +143,8 @@ describe('PR8 calculator utilities', () => {
     });
     if (!framingham) throw new Error('expected framingham to be defined');
     expect(framingham.tenYearRiskPct).toBeGreaterThan(0);
-    expect(interpretFraminghamRisk(framingham.tenYearRiskPct)?.referenceLine).toMatch(/coronary heart disease/i);
+    expect(interpretFraminghamRisk(framingham.tenYearRiskPct)?.referenceLine).toMatch(
+      /coronary heart disease/i,
+    );
   });
 });

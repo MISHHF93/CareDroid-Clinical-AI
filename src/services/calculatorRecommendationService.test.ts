@@ -78,7 +78,9 @@ describe('calculatorRecommendationService — canonical recognizeComplaint() fal
 
   it('does not duplicate a rule the direct keyword match already found', () => {
     const result = recommendCalculators({ chiefComplaint: 'chest pain' });
-    const chestPainMatches = result.matchedContexts.filter((context) => context.id === 'chest-pain');
+    const chestPainMatches = result.matchedContexts.filter(
+      (context) => context.id === 'chest-pain',
+    );
     expect(chestPainMatches).toHaveLength(1);
   });
 

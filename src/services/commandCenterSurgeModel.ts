@@ -55,10 +55,14 @@ export function buildCommandCenterSurgeSnapshot(input: {
   const patients = input.patients || [];
   const rooms = input.rooms || [];
   const boardingCount = patients.filter(
-    (patient) => patient.state === PatientState.Admission || patient.flags.includes('PendingAdmission' as never),
+    (patient) =>
+      patient.state === PatientState.Admission ||
+      patient.flags.includes('PendingAdmission' as never),
   ).length;
   const waitingCount = patients.filter((patient) => patient.state === PatientState.Waiting).length;
-  const inboundEms = (input.emsArrivals || []).filter((arrival) => arrival.status === 'Inbound').length;
+  const inboundEms = (input.emsArrivals || []).filter(
+    (arrival) => arrival.status === 'Inbound',
+  ).length;
   const offloadDelayCount = input.offloadDelayCount ?? 0;
 
   const zoneMap = new Map<string, { occupied: number; total: number; label: string }>();

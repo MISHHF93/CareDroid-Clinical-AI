@@ -6,10 +6,7 @@
  * Terminal and expired proposals disable actions instead of hiding what
  * happened.
  */
-import {
-  isTerminalProposalState,
-  type AIActionProposal,
-} from '../../contracts/interactiveAi';
+import { isTerminalProposalState, type AIActionProposal } from '../../contracts/interactiveAi';
 import './ActionProposalCard.css';
 
 export type ActionProposalCardProps = {
@@ -171,10 +168,7 @@ export function ActionProposalCard({
           >
             Approve
             {proposal.requiredPermission ? (
-              <span className="cd-proposal__perm">
-                {' '}
-                (requires {proposal.requiredPermission})
-              </span>
+              <span className="cd-proposal__perm"> (requires {proposal.requiredPermission})</span>
             ) : null}
           </button>
           <button

@@ -271,9 +271,15 @@ describe('WorkspaceContext backend context', () => {
       });
 
     const contextFor = (workspaceKey: string) => ({
-      workspace: buildIcuWorkspace({ workspaceKey, type: workspaceKey, id: `workspace-${workspaceKey}` }),
+      workspace: buildIcuWorkspace({
+        workspaceKey,
+        type: workspaceKey,
+        id: `workspace-${workspaceKey}`,
+      }),
       workspaceState: {
-        workspaces: [buildIcuWorkspace({ workspaceKey, type: workspaceKey, id: `workspace-${workspaceKey}` })],
+        workspaces: [
+          buildIcuWorkspace({ workspaceKey, type: workspaceKey, id: `workspace-${workspaceKey}` }),
+        ],
         memberships: [],
         activeWorkspaceId: `workspace-${workspaceKey}`,
         recentWorkspaceIds: [],
@@ -323,7 +329,12 @@ describe('WorkspaceContext backend context', () => {
       new Response(
         JSON.stringify({
           workspace: { id: 'workspace-icu', workspaceKey: 'icu', type: 'icu', name: 'ICU' },
-          workspaceState: { workspaces: [], memberships: [], activeWorkspaceId: null, recentWorkspaceIds: [] },
+          workspaceState: {
+            workspaces: [],
+            memberships: [],
+            activeWorkspaceId: null,
+            recentWorkspaceIds: [],
+          },
           effectivePermissions: [],
           visibleAssetIds: [],
           entitledPackIds: [],

@@ -5,11 +5,17 @@ import { PLATFORM_CONSOLE_ROUTES } from '../config/platformConsoleRoutes';
 
 const lazyRoute = lazyWithRetry;
 const lazyNamed = (loader: () => Promise<Record<string, unknown>>, exportName: string) =>
-  lazyRoute(() => loader().then((module) => ({ default: module[exportName] as ComponentType<unknown> })));
+  lazyRoute(() =>
+    loader().then((module) => ({ default: module[exportName] as ComponentType<unknown> })),
+  );
 
-const ClinicalDecisionSupportPage = lazyRoute(() => import('../pages/clinical/ClinicalDecisionSupport'));
+const ClinicalDecisionSupportPage = lazyRoute(
+  () => import('../pages/clinical/ClinicalDecisionSupport'),
+);
 const ResearchEvidenceHubPage = lazyRoute(() => import('../pages/clinical/ResearchEvidenceHub'));
-const ClinicalKnowledgeGraphPage = lazyRoute(() => import('../pages/clinical/ClinicalKnowledgeGraph'));
+const ClinicalKnowledgeGraphPage = lazyRoute(
+  () => import('../pages/clinical/ClinicalKnowledgeGraph'),
+);
 const ArtifactsPage = lazyRoute(() => import('../pages/governance/Artifacts'));
 const MemoryDashboardPage = lazyRoute(() => import('../pages/ai/MemoryDashboard'));
 const CostAnalyticsDashboardPage = lazyRoute(() => import('../pages/ai/CostAnalyticsDashboard'));
@@ -21,10 +27,18 @@ const EducationHubPage = lazyRoute(() => import('../pages/clinical/EducationHub'
 const CardiologyDashboardPage = lazyRoute(() => import('../pages/clinical/CardiologyDashboard'));
 const NephrologyDashboardPage = lazyRoute(() => import('../pages/clinical/NephrologyDashboard'));
 const NeurologyDashboardDeptPage = lazyRoute(() => import('../pages/clinical/NeurologyDashboard'));
-const GastroenterologyDashboardPage = lazyRoute(() => import('../pages/clinical/GastroenterologyDashboard'));
-const EndocrinologyDashboardPage = lazyRoute(() => import('../pages/clinical/EndocrinologyDashboard'));
-const PediatricsObgynDashboardPage = lazyRoute(() => import('../pages/clinical/PediatricsObgynDashboard'));
-const PsychiatryDashboardDeptPage = lazyRoute(() => import('../pages/clinical/PsychiatryDashboard'));
+const GastroenterologyDashboardPage = lazyRoute(
+  () => import('../pages/clinical/GastroenterologyDashboard'),
+);
+const EndocrinologyDashboardPage = lazyRoute(
+  () => import('../pages/clinical/EndocrinologyDashboard'),
+);
+const PediatricsObgynDashboardPage = lazyRoute(
+  () => import('../pages/clinical/PediatricsObgynDashboard'),
+);
+const PsychiatryDashboardDeptPage = lazyRoute(
+  () => import('../pages/clinical/PsychiatryDashboard'),
+);
 const PulmonologyDashboardPage = lazyRoute(() => import('../pages/clinical/PulmonologyDashboard'));
 const Medical3DViewerPage = lazyRoute(() => import('../pages/clinical/Medical3DViewer'));
 const AnalyticsDashboardPage = lazyRoute(() => import('../pages/analytics/AnalyticsDashboard'));
@@ -35,7 +49,9 @@ const FeatureFlagCenterPage = lazyRoute(() => import('../pages/saas/FeatureFlagC
 const DependencyMapPage = lazyRoute(() => import('../pages/governance/DependencyMap'));
 const DependencyGraphPage = lazyRoute(() => import('../pages/governance/DependencyGraph'));
 const DataLineageExplorerPage = lazyRoute(() => import('../pages/governance/DataLineageExplorer'));
-const PlatformSelfDiagnosticsPage = lazyRoute(() => import('../pages/platform/PlatformSelfDiagnostics'));
+const PlatformSelfDiagnosticsPage = lazyRoute(
+  () => import('../pages/platform/PlatformSelfDiagnostics'),
+);
 
 const DepartmentIntelligencePage = lazyNamed(
   () => import('../pages/platform/DepartmentIntelligence'),
@@ -65,7 +81,9 @@ const OrganizationDashboardPage = lazyNamed(
   () => import('../pages/organization/OrganizationPages'),
   'OrganizationDashboard',
 );
-const OrganizationOnboardingPage = lazyRoute(() => import('../pages/organization/OrganizationOnboarding'));
+const OrganizationOnboardingPage = lazyRoute(
+  () => import('../pages/organization/OrganizationOnboarding'),
+);
 const WorkspaceDependencyGraphPage = lazyNamed(
   () => import('../pages/platform/WorkspaceDependencyGraph'),
   'WorkspaceDependencyGraphPage',
@@ -74,7 +92,10 @@ const WorkflowMiningEnginePage = lazyNamed(
   () => import('../pages/platform/WorkflowMiningEngine'),
   'WorkflowMiningEnginePage',
 );
-const WorkflowBuilderPage = lazyNamed(() => import('../pages/platform/WorkflowBuilder'), 'WorkflowBuilderPage');
+const WorkflowBuilderPage = lazyNamed(
+  () => import('../pages/platform/WorkflowBuilder'),
+  'WorkflowBuilderPage',
+);
 const HealthcareKnowledgeHubPage = lazyNamed(
   () => import('../pages/platform/HealthcareKnowledgeHub'),
   'HealthcareKnowledgeHubPage',
@@ -95,9 +116,13 @@ const CareDroidBusinessBrainPage = lazyNamed(
   () => import('../pages/platform/BusinessBrain'),
   'CareDroidBusinessBrainPage',
 );
-const ExecutiveCommandCenterPage = lazyRoute(() => import('../pages/executive/ExecutiveCommandCenter'));
+const ExecutiveCommandCenterPage = lazyRoute(
+  () => import('../pages/executive/ExecutiveCommandCenter'),
+);
 const CommandDashboardPage = lazyRoute(() => import('../pages/executive/CommandDashboard'));
-const AiCommandCenterDashboardPage = lazyRoute(() => import('../pages/ai/AiCommandCenterDashboard'));
+const AiCommandCenterDashboardPage = lazyRoute(
+  () => import('../pages/ai/AiCommandCenterDashboard'),
+);
 const PredictiveAnalyticsDashboardPage = lazyRoute(
   () => import('../pages/analytics/PredictiveAnalyticsDashboard'),
 );

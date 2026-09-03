@@ -27,20 +27,32 @@ const AUTOMATION_CATEGORY_MAP = Object.freeze({
 });
 
 const ROI_ESTIMATE_MAP = Object.freeze({
-  'emergency-automated-triage-matrix': 'Save 6-10 minutes per triage review by routing complaint, vitals, and calculators together.',
-  'emergency-referral-routing': 'Reduce consult coordination delay by 15-25 minutes per referral packet.',
-  'emergency-surge-staffing': 'Improve surge response by surfacing staffing and boarding pressure before queues peak.',
-  'emergency-simulation-academy': 'Reduce training prep time with targeted simulations from live ED workflow gaps.',
-  'emergency-medical-iot-monitoring': 'Reduce equipment downtime and missed telemetry checks through device queue visibility.',
-  'emergency-documentation-integrity': 'Recover documentation time by flagging missing facts before signature or export.',
-  'emergency-rag-evidence-retrieval': 'Reduce manual protocol search by routing complaint intent to evidence and workflows.',
-  'emergency-virtual-ed': 'Prepare ED intake earlier by turning remote/EMS context into arrival-ready packets.',
-  'emergency-discharge-summary-drafting': 'Save 8-12 minutes per reviewed discharge or admission summary draft.',
-  'emergency-prior-authorization': 'Reduce payer packet preparation time for admission, imaging, transfer, or follow-up services.',
+  'emergency-automated-triage-matrix':
+    'Save 6-10 minutes per triage review by routing complaint, vitals, and calculators together.',
+  'emergency-referral-routing':
+    'Reduce consult coordination delay by 15-25 minutes per referral packet.',
+  'emergency-surge-staffing':
+    'Improve surge response by surfacing staffing and boarding pressure before queues peak.',
+  'emergency-simulation-academy':
+    'Reduce training prep time with targeted simulations from live ED workflow gaps.',
+  'emergency-medical-iot-monitoring':
+    'Reduce equipment downtime and missed telemetry checks through device queue visibility.',
+  'emergency-documentation-integrity':
+    'Recover documentation time by flagging missing facts before signature or export.',
+  'emergency-rag-evidence-retrieval':
+    'Reduce manual protocol search by routing complaint intent to evidence and workflows.',
+  'emergency-virtual-ed':
+    'Prepare ED intake earlier by turning remote/EMS context into arrival-ready packets.',
+  'emergency-discharge-summary-drafting':
+    'Save 8-12 minutes per reviewed discharge or admission summary draft.',
+  'emergency-prior-authorization':
+    'Reduce payer packet preparation time for admission, imaging, transfer, or follow-up services.',
 });
 
 function buildMarketplaceModule(automation) {
-  const enabled = automation.status === AUTOMATION_STATUSES.ACTIVE || automation.status === AUTOMATION_STATUSES.DEMO;
+  const enabled =
+    automation.status === AUTOMATION_STATUSES.ACTIVE ||
+    automation.status === AUTOMATION_STATUSES.DEMO;
   const disabled = automation.status === AUTOMATION_STATUSES.DISABLED;
 
   return Object.freeze({
@@ -53,7 +65,8 @@ function buildMarketplaceModule(automation) {
     status: automation.status,
     subscriptionTier: automation.subscriptionTier,
     workspaceVisibility: Object.freeze(automation.workspaceVisibility || []),
-    roiEstimate: ROI_ESTIMATE_MAP[automation.automationId] || 'ROI estimate pending buyer workflow discovery.',
+    roiEstimate:
+      ROI_ESTIMATE_MAP[automation.automationId] || 'ROI estimate pending buyer workflow discovery.',
     riskLevel: automation.riskLevel,
     humanReviewRequired: automation.humanReviewRequired,
     readiness: automation.readiness || null,
@@ -77,7 +90,7 @@ export const EdAutomationMarketplace = Object.freeze({
           disabledCount: categoryModules.filter((module) => module.disabled).length,
           modules: Object.freeze(categoryModules),
         });
-      })
+      }),
     );
   },
 
@@ -87,7 +100,9 @@ export const EdAutomationMarketplace = Object.freeze({
       totalModules: modules.length,
       enabledModules: modules.filter((module) => module.enabled).length,
       disabledModules: modules.filter((module) => module.disabled).length,
-      subscriptionTiers: Object.freeze([...new Set(modules.map((module) => module.subscriptionTier))]),
+      subscriptionTiers: Object.freeze([
+        ...new Set(modules.map((module) => module.subscriptionTier)),
+      ]),
       categories: ED_AUTOMATION_MARKETPLACE_CATEGORIES.length,
       reviewRequired: modules.filter((module) => module.humanReviewRequired).length,
     });

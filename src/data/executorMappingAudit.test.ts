@@ -20,13 +20,15 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const registrySource = readFileSync(
   join(
     __dirname,
-    '../../backend/src/modules/medical-control-plane/tool-orchestrator/tool-orchestrator.registry.ts'
+    '../../backend/src/modules/medical-control-plane/tool-orchestrator/tool-orchestrator.registry.ts',
   ),
-  'utf8'
+  'utf8',
 );
 
 function parseBackendRegistered() {
-  const block = registrySource.match(/REGISTERED_EXECUTOR_TOOL_IDS\s*=\s*\[([\s\S]*?)\]\s*as const/);
+  const block = registrySource.match(
+    /REGISTERED_EXECUTOR_TOOL_IDS\s*=\s*\[([\s\S]*?)\]\s*as const/,
+  );
   if (!block) throw new Error('expected REGISTERED_EXECUTOR_TOOL_IDS block to match');
   return [...block[1].matchAll(/'([^']+)'/g)].map((m) => m[1]).sort();
 }
@@ -44,7 +46,9 @@ function parseBackendRegistryMap() {
 }
 
 function parseBackendUnsupported() {
-  const block = registrySource.match(/NLU_TOOL_IDS_WITHOUT_EXECUTOR\s*=\s*\[([\s\S]*?)\]\s*as const/);
+  const block = registrySource.match(
+    /NLU_TOOL_IDS_WITHOUT_EXECUTOR\s*=\s*\[([\s\S]*?)\]\s*as const/,
+  );
   if (!block) throw new Error('expected NLU_TOOL_IDS_WITHOUT_EXECUTOR block to match');
   return [...block[1].matchAll(/'([^']+)'/g)].map((m) => m[1]).sort();
 }
@@ -98,7 +102,9 @@ describe('executorMappingAudit — frontend ? backend', () => {
   it('e2eRegressionChecklist.ts cites the current registered-executor count, not a stale one', async () => {
     const { E2E_REGRESSION_CHECKLIST } = await import('./e2eRegressionChecklist');
     const realCount = parseBackendRegistered().length;
-    const contractDriftGroup = E2E_REGRESSION_CHECKLIST.find((group) => group.id === 'contract-drift');
+    const contractDriftGroup = E2E_REGRESSION_CHECKLIST.find(
+      (group) => group.id === 'contract-drift',
+    );
     const executorCheck = contractDriftGroup?.checks.find((check) =>
       check.includes('REGISTERED_EXECUTOR_TOOL_IDS'),
     );

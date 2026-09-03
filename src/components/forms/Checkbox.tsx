@@ -3,9 +3,9 @@ import './Checkbox.css';
 
 /**
  * Checkbox Component
- * 
+ *
  * Single checkbox with label and description
- * 
+ *
  * @param {string} id - Input id for label association
  * @param {string} label - Label text
  * @param {string} description - Optional description below label
@@ -38,7 +38,7 @@ export const Checkbox = ({
           onChange={(e) => onChange(e.target.checked)}
           disabled={disabled}
           required={required}
-           invalid={error}
+          invalid={error}
           aria-describedby={description ? `${id}-desc` : undefined}
         />
         <label htmlFor={id} className="checkbox-label">
@@ -94,9 +94,7 @@ export const CheckboxGroup = ({
             {label}
             {required && <span className="checkbox-required">*</span>}
           </span>
-          {description && (
-            <span className="checkbox-group-description">{description}</span>
-          )}
+          {description && <span className="checkbox-group-description">{description}</span>}
         </div>
       )}
 
@@ -147,9 +145,7 @@ export const Toggle = ({
       <label htmlFor={id} className="toggle-label">
         <span className="toggle-text">
           <span className="toggle-label-text">{label}</span>
-          {description && (
-            <span className="toggle-description">{description}</span>
-          )}
+          {description && <span className="toggle-description">{description}</span>}
         </span>
         <span className="toggle-switch">
           <span className="toggle-slider"></span>

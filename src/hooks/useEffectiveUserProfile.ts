@@ -6,10 +6,7 @@ import {
   type ResolvedUserProfile,
   type UserProfileAccessSummary,
 } from '../config/userProfileCatalog';
-import {
-  resolveUserProfileCopy,
-  type ProfileCopyStack,
-} from '../config/userProfileCopyModel';
+import { resolveUserProfileCopy, type ProfileCopyStack } from '../config/userProfileCopyModel';
 import { EMERGENCY_ROLE_IDS } from '../config/emergencyRolePermissions';
 
 const KNOWN_EMERGENCY_ROLE_IDS = new Set<string>(Object.values(EMERGENCY_ROLE_IDS));
@@ -38,9 +35,7 @@ export function useEffectiveUserProfile(): EffectiveUserProfileState {
       ? resolveUserProfileFromSaasRole(apiEffective.saasRole || saasRole)
       : resolveUserProfileFromSaasRole(saasRole);
 
-    const accessSummary =
-      apiSummary ||
-      buildUserProfileAccessSummary(effectiveProfile.saasRole);
+    const accessSummary = apiSummary || buildUserProfileAccessSummary(effectiveProfile.saasRole);
 
     // HEAL-323: saasProfile.role can hold a real EMERGENCY_ROLE_ID directly
     // (HEAL-195 made this dynamic -- e.g. 'charge_nurse' for the switched
@@ -83,7 +78,12 @@ export function useEffectiveUserProfile(): EffectiveUserProfileState {
       profileCopy,
       canPersonalizeTools: true,
     };
-  }, [account?.role, operationalProfile?.accessSummary, operationalProfile?.effectiveProfile, saasProfile?.role]);
+  }, [
+    account?.role,
+    operationalProfile?.accessSummary,
+    operationalProfile?.effectiveProfile,
+    saasProfile?.role,
+  ]);
 }
 
 export default useEffectiveUserProfile;

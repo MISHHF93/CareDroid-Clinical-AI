@@ -1,8 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import {
-  deriveCapacityCrisisState,
-  type CapacityCrisisState,
-} from '../engine/capacityEngine';
+import { deriveCapacityCrisisState, type CapacityCrisisState } from '../engine/capacityEngine';
 import { dispatchAlert } from '../engine/alertEngine';
 import { confirmCareDroidAction } from '../services/careDroidInteractionFeedback';
 import { invokeUnifiedAiRequest } from '../services/careDroidUnifiedAiNode';
@@ -55,7 +52,10 @@ function responseText(value: unknown): string {
   return String(data.response || data.message || data.content || data.text || '');
 }
 
-function buildAiRequestSnapshot(crisis: CapacityCrisisState, capacity: CapacitySnapshot): AiRequestSnapshot {
+function buildAiRequestSnapshot(
+  crisis: CapacityCrisisState,
+  capacity: CapacitySnapshot,
+): AiRequestSnapshot {
   const snapshot = {
     capacity,
     scoreBreakdown: crisis.factors,
@@ -164,18 +164,18 @@ export default function CapacityCrisisMode({
     setAiSuggestion('');
 
     invokeUnifiedAiRequest({
-        capabilityId: 'analyticsExplanation',
-        platformServiceId: 'analyticsExplanation',
-        requestType: 'CAPACITY_CRISIS',
-        systemPrompt: aiRequest.systemPrompt,
-        messages: [{ role: 'user', content: aiRequest.userMessage }],
-        message: aiRequest.userMessage,
-        maxTokens: 260,
-        tools: [],
-        context: aiRequest.context,
-        domain: 'operational_awareness',
-        sourceScreen: 'capacity_crisis_mode',
-      })
+      capabilityId: 'analyticsExplanation',
+      platformServiceId: 'analyticsExplanation',
+      requestType: 'CAPACITY_CRISIS',
+      systemPrompt: aiRequest.systemPrompt,
+      messages: [{ role: 'user', content: aiRequest.userMessage }],
+      message: aiRequest.userMessage,
+      maxTokens: 260,
+      tools: [],
+      context: aiRequest.context,
+      domain: 'operational_awareness',
+      sourceScreen: 'capacity_crisis_mode',
+    })
       .then((response) => {
         if (cancelled) return;
         const text = responseText(response.content) || responseText(response.data);
@@ -185,7 +185,8 @@ export default function CapacityCrisisMode({
         );
       })
       .catch(() => {
-        if (!cancelled) setAiError('AI suggestion unavailable. Use deterministic crisis actions above.');
+        if (!cancelled)
+          setAiError('AI suggestion unavailable. Use deterministic crisis actions above.');
       })
       .finally(() => {
         if (!cancelled) setAiLoading(false);
@@ -321,9 +322,15 @@ export default function CapacityCrisisMode({
           <header className="capacity-crisis-drawer__header">
             <div>
               <span>Capacity Crisis Mode</span>
-              <h2>{crisis.band} · {crisis.score}/100</h2>
+              <h2>
+                {crisis.band} · {crisis.score}/100
+              </h2>
             </div>
-            <button type="button" onClick={() => setDrawerOpen(false)} aria-label="Close capacity crisis actions">
+            <button
+              type="button"
+              onClick={() => setDrawerOpen(false)}
+              aria-label="Close capacity crisis actions"
+            >
               Close
             </button>
           </header>
@@ -336,7 +343,9 @@ export default function CapacityCrisisMode({
                   <article key={factor.id} className="capacity-crisis-factor">
                     <div>
                       <strong>{factor.detail}</strong>
-                      <span>{factor.source === 'snapshot' ? 'Snapshot deduction' : 'Approximation'}</span>
+                      <span>
+                        {factor.source === 'snapshot' ? 'Snapshot deduction' : 'Approximation'}
+                      </span>
                     </div>
                     <div className="capacity-crisis-factor__bar" aria-hidden>
                       <span style={{ width: `${factor.percent}%` }} />
@@ -362,7 +371,8 @@ export default function CapacityCrisisMode({
                   {crisis.boardingPatients.map((item) => (
                     <article key={item.patient.id} className="capacity-crisis-row">
                       <span>
-                        {item.name} | {item.targetDepartment} | boarding {formatDuration(item.boardingMinutes)}
+                        {item.name} | {item.targetDepartment} | boarding{' '}
+                        {formatDuration(item.boardingMinutes)}
                       </span>
                       <button
                         type="button"
@@ -422,7 +432,9 @@ export default function CapacityCrisisMode({
 
             <section className="capacity-crisis-section">
               <h3>AI suggestion — requires physician review</h3>
-              <p>{aiLoading ? 'Requesting capacity crisis suggestion...' : aiError || aiSuggestion}</p>
+              <p>
+                {aiLoading ? 'Requesting capacity crisis suggestion...' : aiError || aiSuggestion}
+              </p>
             </section>
 
             <section className="capacity-crisis-section">

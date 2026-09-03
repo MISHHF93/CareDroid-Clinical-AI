@@ -62,12 +62,9 @@ class NotificationService {
 
     try {
       // Load user preferences
-      const response = await fetch(
-        `${this.apiBaseUrl}/notifications/preferences`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const response = await fetch(`${this.apiBaseUrl}/notifications/preferences`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       if (response.ok) {
         const prefs = await response.json();
@@ -249,7 +246,9 @@ class NotificationService {
       const fallback = makeNotificationSendDisabledResponse(channel);
       await recordAutomationBlocked({
         triggerFired: 'Queue-style notification send requested',
-        conditionsEvaluated: [{ label: 'Notification send-channel backend capability enabled', result: false }],
+        conditionsEvaluated: [
+          { label: 'Notification send-channel backend capability enabled', result: false },
+        ],
         actionSelected: `Send notification through ${channel}`,
         toolCalled: 'notification-queue',
         backendEndpoint: `/api/notifications/send/${channel}`,
@@ -266,17 +265,14 @@ class NotificationService {
 
     const payload = this.buildChannelPayload(channel, notification);
 
-    const response = await fetch(
-      `${this.apiBaseUrl}/notifications/send/${channel}`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.token}`,
-        },
-        body: JSON.stringify(payload),
-      }
-    );
+    const response = await fetch(`${this.apiBaseUrl}/notifications/send/${channel}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.token}`,
+      },
+      body: JSON.stringify(payload),
+    });
 
     if (!response.ok) {
       throw new Error(`Channel ${channel} returned ${response.status}`);
@@ -342,23 +338,22 @@ class NotificationService {
    * Format cost alert message
    */
   formatCostAlertMessage(notification) {
-    const { alertType, toolId, currentCost, limitCost, percentage } =
-      notification;
+    const { alertType, toolId, currentCost, limitCost, percentage } = notification;
 
     switch (alertType) {
       case 'APPROACHING':
         return `Tool ${toolId} cost is approaching limit: $${currentCost.toFixed(
-          2
+          2,
         )} / $${limitCost.toFixed(2)} (${percentage}%)`;
 
       case 'EXCEEDED':
         return `?? Tool ${toolId} cost has exceeded limit: $${currentCost.toFixed(
-          2
+          2,
         )} / $${limitCost.toFixed(2)} (${percentage}%)`;
 
       case 'CRITICAL':
         return `?? CRITICAL: Tool ${toolId} cost is critically high: $${currentCost.toFixed(
-          2
+          2,
         )} / $${limitCost.toFixed(2)} (${percentage}%)`;
 
       default:
@@ -393,17 +388,14 @@ class NotificationService {
    */
   async updatePreferences(newPreferences) {
     try {
-      const response = await fetch(
-        `${this.apiBaseUrl}/notifications/preferences`,
-        {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${this.token}`,
-          },
-          body: JSON.stringify(newPreferences),
-        }
-      );
+      const response = await fetch(`${this.apiBaseUrl}/notifications/preferences`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.token}`,
+        },
+        body: JSON.stringify(newPreferences),
+      });
 
       if (response.ok) {
         this.preferences = { ...this.preferences, ...newPreferences };

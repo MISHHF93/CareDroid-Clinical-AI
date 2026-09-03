@@ -64,7 +64,8 @@ export const ADMIN_OPS_SECTIONS: readonly AdminOpsSection[] = Object.freeze([
   {
     id: 'team',
     title: 'Team & invitations',
-    description: 'Invite clinicians, assign roles, and review membership for the emergency department.',
+    description:
+      'Invite clinicians, assign roles, and review membership for the emergency department.',
     primaryLink: {
       route: `${CANONICAL_ROUTES.adminOperations}/team`,
       label: 'Open team management →',
@@ -92,10 +93,7 @@ export const ADMIN_OPS_SECTIONS: readonly AdminOpsSection[] = Object.freeze([
 ]);
 
 function sectionRoutes(section: AdminOpsSection): string[] {
-  return [
-    section.primaryLink.route,
-    ...(section.secondaryLinks?.map((link) => link.route) || []),
-  ];
+  return [section.primaryLink.route, ...(section.secondaryLinks?.map((link) => link.route) || [])];
 }
 
 export function isAdminOpsSectionVisible(saasRole: string, section: AdminOpsSection): boolean {

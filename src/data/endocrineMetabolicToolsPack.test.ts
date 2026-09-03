@@ -53,7 +53,9 @@ describe('Endocrine and Metabolic Tools Pack', () => {
       expect(calculatorSlug).toBeTruthy();
       expect(builtinSlugs.has(calculatorSlug)).toBe(true);
       expect(smokeSlugs.has(calculatorSlug)).toBe(true);
-      expect(CALCULATOR_ROUTE_DEFS.some((route) => route.calculatorSlug === calculatorSlug)).toBe(true);
+      expect(CALCULATOR_ROUTE_DEFS.some((route) => route.calculatorSlug === calculatorSlug)).toBe(
+        true,
+      );
     }
   });
 
@@ -79,16 +81,23 @@ describe('Endocrine and Metabolic Tools Pack', () => {
       expect(KNOWN_TOOL_AREA_PATHS).toContain(launch.path);
       expect(launch.chatSeed).toMatch(/backend|telemetry|monitoring|analytics/i);
       expect(launch.chatSeed).toMatch(/clinical decision support/i);
-      expect(launch.chatSeed).not.toMatch(/recommend insulin dose|calculate insulin dose|autonomous pump/i);
+      expect(launch.chatSeed).not.toMatch(
+        /recommend insulin dose|calculate insulin dose|autonomous pump/i,
+      );
     }
   });
 
   it('keeps the pack out of insulin and medication dosing automation', () => {
     for (const id of ALL_PACK_IDS) {
       const launch = resolveCatalogLaunch(id);
-      const copy = `${launch.chatSeed || ''} ${clinicalIntentToolsById[id]?.description || ''}`.toLowerCase();
-      expect(copy).not.toMatch(/automated insulin dosing|calculate insulin dose|recommend insulin dose|autonomous pump/i);
-      expect(copy).toMatch(/decision support|does not recommend|do not recommend|no .*dosing|not .*dosing/i);
+      const copy =
+        `${launch.chatSeed || ''} ${clinicalIntentToolsById[id]?.description || ''}`.toLowerCase();
+      expect(copy).not.toMatch(
+        /automated insulin dosing|calculate insulin dose|recommend insulin dose|autonomous pump/i,
+      );
+      expect(copy).toMatch(
+        /decision support|does not recommend|do not recommend|no .*dosing|not .*dosing/i,
+      );
     }
   });
 });

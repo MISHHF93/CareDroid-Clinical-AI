@@ -33,10 +33,7 @@ export default function WhiteboardOperationalIconStrip({
 
   return (
     <div
-      className={[
-        'wb-op-icon-strip',
-        compact ? 'wb-op-icon-strip--compact' : '',
-      ]
+      className={['wb-op-icon-strip', compact ? 'wb-op-icon-strip--compact' : '']
         .filter(Boolean)
         .join(' ')}
       aria-label="Operational status icons"

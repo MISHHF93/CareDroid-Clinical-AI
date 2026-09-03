@@ -1,9 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Activity, AlertTriangle, ArrowUpRight, CheckCircle2, Circle } from 'lucide-react';
-import {
-  buildPlatformIntelligenceAssessment,
-} from '../../config/platformIntelligenceModel';
+import { buildPlatformIntelligenceAssessment } from '../../config/platformIntelligenceModel';
 import { PLATFORM_INTELLIGENCE_PROVENANCE } from '../../config/platformIntelligenceRegistry';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import './PlatformIntelligenceHub.css';
@@ -83,9 +81,9 @@ export default function PlatformIntelligenceHub() {
           </strong>{' '}
           ({livePercent}%) score from an audit or inventory outside the module, so they move when
           the platform moves. The other <strong>{summary.registryModuleCount}</strong> score
-          themselves from lists maintained inside the model file — a real curated inventory, but
-          a document rather than a measurement of this deployment, and several of them rate
-          themselves 100. Every card below is tagged.
+          themselves from lists maintained inside the model file — a real curated inventory, but a
+          document rather than a measurement of this deployment, and several of them rate themselves
+          100. Every card below is tagged.
         </p>
       </section>
 

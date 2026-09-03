@@ -2,7 +2,10 @@ import { describe, expect, it, vi, afterEach } from 'vitest';
 import * as cleanupConfig from './practitionerCleanup.config';
 import { EMERGENCY_ROLE_IDS } from './emergencyRolePermissions';
 import { CARE_DROID_SCREEN_MODES } from './careDroidScreenModes';
-import { getPractitionerSurfaceVisibility, practitionerShows } from './practitionerSurfaceVisibility';
+import {
+  getPractitionerSurfaceVisibility,
+  practitionerShows,
+} from './practitionerSurfaceVisibility';
 
 describe('practitionerSurfaceVisibility', () => {
   afterEach(() => {
@@ -10,7 +13,9 @@ describe('practitionerSurfaceVisibility', () => {
   });
 
   it('returns full visibility when pilot cleanup is off', () => {
-    vi.spyOn(cleanupConfig, 'isPractitionerCleanupEnabled').mockReturnValue(false as unknown as true);
+    vi.spyOn(cleanupConfig, 'isPractitionerCleanupEnabled').mockReturnValue(
+      false as unknown as true,
+    );
     const surfaces = getPractitionerSurfaceVisibility();
     expect(surfaces.active).toBe(false);
     expect(surfaces.whiteboard.showRoleStrips).toBe(true);

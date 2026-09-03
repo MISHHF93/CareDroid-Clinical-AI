@@ -1,7 +1,4 @@
-import {
-  getDemoLiveStateDescription,
-  getDemoLiveStateLabel,
-} from '../utils/demoLiveState';
+import { getDemoLiveStateDescription, getDemoLiveStateLabel } from '../utils/demoLiveState';
 import Alert from './ui/Alert';
 import './StateSourceNotice.css';
 
@@ -9,7 +6,7 @@ const AlertAny = Alert as any;
 
 export default function StateSourceNotice({
   title = 'Source state',
-  states = ([] as any[]),
+  states = [] as any[],
   details,
   className = '',
 }) {

@@ -1,9 +1,4 @@
-import {
-  NEWS2_ITEMS,
-  scoreNews2,
-  news2Response,
-  type NEWS2Values,
-} from '../utils/news2';
+import { NEWS2_ITEMS, scoreNews2, news2Response, type NEWS2Values } from '../utils/news2';
 import type { AnyCalculatorResult, CalculatorValidationResult } from './types';
 
 export const NEWS2_META = {

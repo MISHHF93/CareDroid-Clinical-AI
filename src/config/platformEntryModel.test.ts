@@ -44,8 +44,6 @@ describe('platformEntryModel', () => {
     // roleClusterNav.config.test.ts for the underlying precedence bug this
     // guards (getHomeRouteForRole() never returns falsy, so a naive `||`
     // chain past it is dead code).
-    expect(resolveClinicalHomeRoute('triage_nurse')).toBe(
-      '/emergency/queues?queue=pretriage',
-    );
+    expect(resolveClinicalHomeRoute('triage_nurse')).toBe('/emergency/queues?queue=pretriage');
   });
 });

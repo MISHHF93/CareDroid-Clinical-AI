@@ -30,7 +30,14 @@ function buildPatient(overrides: Partial<Patient> = {}): Patient {
     vitalsUpdatedAt: '2026-06-20T08:40:00.000Z',
     flags: [PatientFlag.HighRisk],
     notes: [],
-    timeline: [{ id: 'evt-1', type: 'OrderPlaced', timestamp: '2026-06-20T08:50:00.000Z', to: PatientState.Waiting }],
+    timeline: [
+      {
+        id: 'evt-1',
+        type: 'OrderPlaced',
+        timestamp: '2026-06-20T08:50:00.000Z',
+        to: PatientState.Waiting,
+      },
+    ],
     ...overrides,
   };
 }
@@ -71,8 +78,18 @@ describe('waitingRoomSafetyBoardModel', () => {
       deriveTestWaitingStatus(
         buildPatient({
           timeline: [
-            { id: 'evt-1', type: 'OrderPlaced', timestamp: '2026-06-20T08:50:00.000Z', to: PatientState.Waiting },
-            { id: 'evt-2', type: 'ResultReceived', timestamp: '2026-06-20T09:00:00.000Z', to: PatientState.Waiting },
+            {
+              id: 'evt-1',
+              type: 'OrderPlaced',
+              timestamp: '2026-06-20T08:50:00.000Z',
+              to: PatientState.Waiting,
+            },
+            {
+              id: 'evt-2',
+              type: 'ResultReceived',
+              timestamp: '2026-06-20T09:00:00.000Z',
+              to: PatientState.Waiting,
+            },
           ],
         }),
       ).label,

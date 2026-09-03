@@ -3,7 +3,10 @@
  * Import from here instead of scattering across 50+ config modules.
  */
 export { CANONICAL_ROUTES } from './routes.config';
-export { EMERGENCY_OS_API_ENDPOINTS, ACTIVE_EMERGENCY_OS_API_ENDPOINT_KEYS } from '../services/emergencyOsApi';
+export {
+  EMERGENCY_OS_API_ENDPOINTS,
+  ACTIVE_EMERGENCY_OS_API_ENDPOINT_KEYS,
+} from '../services/emergencyOsApi';
 export {
   WORKFLOW_AUTOMATION_DOMAINS,
   WORKFLOW_AUTOMATION_TRIGGER_EVENTS,
@@ -20,7 +23,10 @@ export {
   ADMINISTRATIVE_AUTOMATION_SAFETY_STATEMENT,
 } from './administrativeAutomationCatalog';
 export { ED_JOURNEY_PHASES, ED_OPERATING_SURFACES } from './edOperatingSurface.config';
-export { listHospitalDepartments, resolvePatientJourneyPosition } from './hospitalOperatingSystemModel';
+export {
+  listHospitalDepartments,
+  resolvePatientJourneyPosition,
+} from './hospitalOperatingSystemModel';
 export { EMERGENCY_OS_BRANDING } from './emergencyOsBranding.config';
 
 export {

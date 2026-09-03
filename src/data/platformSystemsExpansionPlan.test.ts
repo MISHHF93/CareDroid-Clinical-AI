@@ -23,9 +23,9 @@ describe('platform systems expansion plan metadata', () => {
     expect(new Set(ids).size).toBe(ids.length);
 
     for (const [pack, count] of Object.entries(EXPECTED_PACK_COUNTS)) {
-      expect(PLATFORM_SYSTEM_CAPABILITIES.filter((capability) => capability.pack === pack)).toHaveLength(
-        count
-      );
+      expect(
+        PLATFORM_SYSTEM_CAPABILITIES.filter((capability) => capability.pack === pack),
+      ).toHaveLength(count);
     }
   });
 
@@ -53,7 +53,7 @@ describe('platform systems expansion plan metadata', () => {
 
   it('marks the production-blocking blind spots as P0 capabilities', () => {
     const p0Ids = PLATFORM_SYSTEM_CAPABILITIES.filter(
-      (capability) => capability.criticality === 'P0'
+      (capability) => capability.criticality === 'P0',
     ).map((capability) => capability.id);
 
     expect(p0Ids).toEqual(
@@ -69,7 +69,7 @@ describe('platform systems expansion plan metadata', () => {
         'audit-trail-spine',
         'deployment-observability',
         'source-provenance',
-      ])
+      ]),
     );
   });
 
@@ -97,10 +97,10 @@ describe('platform systems expansion plan metadata', () => {
   it('resolves both exact and patient-scoped routes back to capabilities', () => {
     expect(getPlatformSystemCapabilityByPath('/integrations/fhir')?.id).toBe('fhir-connector');
     expect(getPlatformSystemCapabilityByPath('/patients/demo-123/workspace')?.id).toBe(
-      'patient-workspace'
+      'patient-workspace',
     );
     expect(getPlatformSystemCapabilityByPath('/patients/demo-123/labs/import')?.id).toBe(
-      'lab-result-import'
+      'lab-result-import',
     );
     expect(getPlatformSystemCapabilityByPath('/review/clinical')?.id).toBe('human-review-queue');
     expect(getPlatformSystemCapabilityByPath('/ai-governance')?.id).toBe('ai-governance');
@@ -108,10 +108,11 @@ describe('platform systems expansion plan metadata', () => {
     expect(getPlatformSystemCapabilityByPath('/security')?.id).toBe('ai-security');
     expect(getPlatformSystemCapabilityByPath('/governance/ai-security')?.id).toBe('ai-security');
     expect(getPlatformSystemCapabilityByPath('/human-review')?.id).toBe('human-review-queue');
-    expect(getPlatformSystemCapabilityByPath('/system-health')?.id).toBe('deployment-observability');
+    expect(getPlatformSystemCapabilityByPath('/system-health')?.id).toBe(
+      'deployment-observability',
+    );
     expect(getPlatformSystemCapabilityByPath('/operations/observability')?.id).toBe(
-      'deployment-observability'
+      'deployment-observability',
     );
   });
 });
-

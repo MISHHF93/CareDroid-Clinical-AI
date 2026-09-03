@@ -3,7 +3,10 @@ import {
   assessPatientDataQualityRisks,
   summarizeDataQualityRisks,
 } from '../config/dataQualityModel';
-import { discoverDuplicatePatientPairs, type DuplicatePatientPair } from '../utils/patientDuplicateDetection';
+import {
+  discoverDuplicatePatientPairs,
+  type DuplicatePatientPair,
+} from '../utils/patientDuplicateDetection';
 
 export type DataQualityRisk = ReturnType<typeof assessPatientDataQualityRisks>[number];
 

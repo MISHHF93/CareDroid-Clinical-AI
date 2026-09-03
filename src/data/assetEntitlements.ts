@@ -45,7 +45,10 @@ export function getPlatformEntitlementContext() {
 }
 
 export function isPlatformEntitlementsEnabled() {
-  if (typeof window !== 'undefined' && (window as any).__CAREDROID_PLATFORM_ENTITLEMENTS__ === false) {
+  if (
+    typeof window !== 'undefined' &&
+    (window as any).__CAREDROID_PLATFORM_ENTITLEMENTS__ === false
+  ) {
     return false;
   }
   return FEATURE_FLAGS.platformEntitlements !== false;
@@ -89,7 +92,10 @@ export function filterToolsByEntitlements(tools, context = cachedEntitlementCont
     if (!entitled.has(id)) return false;
     if (effectivePacks?.length) {
       const packId = tool.packId || tool.assetPackId || tool.category;
-      if (packId && !effectivePacks.some((pack) => String(packId).includes(pack) || pack === packId)) {
+      if (
+        packId &&
+        !effectivePacks.some((pack) => String(packId).includes(pack) || pack === packId)
+      ) {
         return false;
       }
     }
@@ -97,7 +103,10 @@ export function filterToolsByEntitlements(tools, context = cachedEntitlementCont
   });
 }
 
-export function resolveWorkspaceEnabledAssetIds(enabledToolIds = [] as any[], legacyAliases: any = {}) {
+export function resolveWorkspaceEnabledAssetIds(
+  enabledToolIds = [] as any[],
+  legacyAliases: any = {},
+) {
   const resolved = new Set();
   for (const legacyId of enabledToolIds) {
     const aliases = legacyAliases[legacyId] || [legacyId];
@@ -106,7 +115,11 @@ export function resolveWorkspaceEnabledAssetIds(enabledToolIds = [] as any[], le
   return [...resolved];
 }
 
-export function isLaunchAllowedForWorkspace(toolId, enabledToolIds = [] as any[], legacyAliases: any = {}) {
+export function isLaunchAllowedForWorkspace(
+  toolId,
+  enabledToolIds = [] as any[],
+  legacyAliases: any = {},
+) {
   if (!enabledToolIds?.length) return true;
   const resolved = resolveWorkspaceEnabledAssetIds(enabledToolIds, legacyAliases);
   return resolved.includes(toolId);

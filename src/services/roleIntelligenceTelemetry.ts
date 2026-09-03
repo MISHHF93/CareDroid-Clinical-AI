@@ -41,7 +41,13 @@ export function trackRoleAssetUsage(plan, { profile, source, eventType, metadata
   trackRoleEvent(ROLE_INTELLIGENCE_SIGNALS.ASSET_USAGE, payload);
 }
 
-export function trackRoleSearchBehavior({ search, resultCount, filter, profile, source }: any = {}) {
+export function trackRoleSearchBehavior({
+  search,
+  resultCount,
+  filter,
+  profile,
+  source,
+}: any = {}) {
   const payload = {
     ...buildSafeSearchBehaviorPayload({ search, resultCount, filter, profile }),
     source: source || 'search',
@@ -50,7 +56,13 @@ export function trackRoleSearchBehavior({ search, resultCount, filter, profile, 
   trackRoleEvent(ROLE_INTELLIGENCE_SIGNALS.SEARCH_BEHAVIOR, payload);
 }
 
-export function trackRoleAiRequest({ profile, agentId, toolId, source, route = '/assistant' }: any = {}) {
+export function trackRoleAiRequest({
+  profile,
+  agentId,
+  toolId,
+  source,
+  route = '/assistant',
+}: any = {}) {
   trackRoleEvent(ROLE_INTELLIGENCE_SIGNALS.AI_REQUEST, {
     ...buildRoleTelemetryContext(profile),
     agentId: safeId(agentId),

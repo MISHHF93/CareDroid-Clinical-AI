@@ -74,7 +74,7 @@ describe('CustomerSuccessDashboard', () => {
     render(
       <BrowserRouter>
         <CustomerSuccessDashboard />
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     // Page title is registered into the shell chrome (useRouteChromeRegistration)

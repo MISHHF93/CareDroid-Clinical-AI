@@ -22,7 +22,8 @@ function DecisionSupportNotice({ children }) {
   return (
     <div className="calc-timi-disclaimer calc-has-bled-disclaimer" role="note">
       <p className="calc-ds-lead">
-        <strong>Decision support only.</strong> Neurologic emergencies require urgent local pathways first.
+        <strong>Decision support only.</strong> Neurologic emergencies require urgent local pathways
+        first.
       </p>
       <p className="calc-disclaimer-detail">{children}</p>
       <p className="calc-disclaimer-detail">{urgencyText}</p>
@@ -200,7 +201,7 @@ function NeurologyCalculator({ config, onResultChange }) {
                   value={form[field.name]}
                   onChange={update}
                 />
-              )
+              ),
             )}
           </div>
           <div className="calc-actions">
@@ -237,9 +238,12 @@ const configBySlug = {
   'hunt-hess-scale': {
     slug: 'hunt-hess-scale',
     title: 'Hunt-Hess Scale',
-    notice: 'Aneurysmal SAH severity documentation only; neurosurgical and emergency pathways take priority.',
+    notice:
+      'Aneurysmal SAH severity documentation only; neurosurgical and emergency pathways take priority.',
     initial: { grade: '' },
-    fields: [{ name: 'grade', label: 'Clinical grade', type: 'select', options: HUNT_HESS_GRADE_OPTIONS }],
+    fields: [
+      { name: 'grade', label: 'Clinical grade', type: 'select', options: HUNT_HESS_GRADE_OPTIONS },
+    ],
     compute: computeHuntHessScale,
     emptyText: 'Select the Hunt-Hess clinical grade.',
     primaryLabel: 'Hunt-Hess',
@@ -248,14 +252,31 @@ const configBySlug = {
   'ich-score': {
     slug: 'ich-score',
     title: 'ICH Score',
-    notice: 'Intracerebral hemorrhage severity context only; do not delay imaging, BP pathway, or neurosurgical review.',
-    initial: { age: '', gcs: '', volumeMl: '', intraventricularHemorrhage: '', infratentorialOrigin: '' },
+    notice:
+      'Intracerebral hemorrhage severity context only; do not delay imaging, BP pathway, or neurosurgical review.',
+    initial: {
+      age: '',
+      gcs: '',
+      volumeMl: '',
+      intraventricularHemorrhage: '',
+      infratentorialOrigin: '',
+    },
     fields: [
       { name: 'age', label: 'Age (years)', min: 0, max: 120, step: '1' },
       { name: 'gcs', label: 'GCS', min: 3, max: 15, step: '1' },
       { name: 'volumeMl', label: 'ICH volume (mL)', min: 0, max: 300 },
-      { name: 'intraventricularHemorrhage', label: 'Intraventricular hemorrhage', type: 'select', options: yesNoOptions },
-      { name: 'infratentorialOrigin', label: 'Infratentorial origin', type: 'select', options: yesNoOptions },
+      {
+        name: 'intraventricularHemorrhage',
+        label: 'Intraventricular hemorrhage',
+        type: 'select',
+        options: yesNoOptions,
+      },
+      {
+        name: 'infratentorialOrigin',
+        label: 'Infratentorial origin',
+        type: 'select',
+        options: yesNoOptions,
+      },
     ],
     compute: computeIchScore,
     emptyText: 'Enter age, GCS, hematoma volume, IVH status, and origin.',
@@ -265,13 +286,24 @@ const configBySlug = {
   'four-score': {
     slug: 'four-score',
     title: 'FOUR Score',
-    notice: 'Coma exam documentation only; airway, ventilation, and neurocritical-care review take priority.',
+    notice:
+      'Coma exam documentation only; airway, ventilation, and neurocritical-care review take priority.',
     initial: { eye: '', motor: '', brainstem: '', respiration: '' },
     fields: [
       { name: 'eye', label: 'Eye response', type: 'select', options: FOUR_SCORE_OPTIONS.eye },
       { name: 'motor', label: 'Motor response', type: 'select', options: FOUR_SCORE_OPTIONS.motor },
-      { name: 'brainstem', label: 'Brainstem reflexes', type: 'select', options: FOUR_SCORE_OPTIONS.brainstem },
-      { name: 'respiration', label: 'Respiration', type: 'select', options: FOUR_SCORE_OPTIONS.respiration },
+      {
+        name: 'brainstem',
+        label: 'Brainstem reflexes',
+        type: 'select',
+        options: FOUR_SCORE_OPTIONS.brainstem,
+      },
+      {
+        name: 'respiration',
+        label: 'Respiration',
+        type: 'select',
+        options: FOUR_SCORE_OPTIONS.respiration,
+      },
     ],
     compute: computeFourScore,
     emptyText: 'Select eye, motor, brainstem, and respiratory components.',
@@ -283,7 +315,9 @@ const configBySlug = {
     title: 'Modified Rankin Scale',
     notice: 'Global disability documentation only; not an acute treatment or disposition decision.',
     initial: { score: '' },
-    fields: [{ name: 'score', label: 'mRS level', type: 'select', options: MODIFIED_RANKIN_OPTIONS }],
+    fields: [
+      { name: 'score', label: 'mRS level', type: 'select', options: MODIFIED_RANKIN_OPTIONS },
+    ],
     compute: computeModifiedRankinScale,
     emptyText: 'Select the modified Rankin Scale level.',
     primaryLabel: 'mRS',
@@ -292,7 +326,8 @@ const configBySlug = {
   'nihss-summary-view': {
     slug: 'nihss-summary-view',
     title: 'NIHSS Summary View',
-    notice: 'Stroke exam summary only; activate stroke pathways and imaging immediately when indicated.',
+    notice:
+      'Stroke exam summary only; activate stroke pathways and imaging immediately when indicated.',
     initial: Object.fromEntries(Object.keys(NIHSS_SUMMARY_OPTIONS).map((key) => [key, ''])),
     fields: Object.entries(NIHSS_SUMMARY_OPTIONS).map(([name, options]) => ({
       name,
@@ -308,12 +343,23 @@ const configBySlug = {
   'pediatric-gcs': {
     slug: 'pediatric-gcs',
     title: 'Pediatric GCS',
-    notice: 'Pediatric consciousness documentation only; urgent pediatric, trauma, seizure, airway, or hypoglycemia pathways take priority.',
+    notice:
+      'Pediatric consciousness documentation only; urgent pediatric, trauma, seizure, airway, or hypoglycemia pathways take priority.',
     initial: { eye: '', verbal: '', motor: '' },
     fields: [
       { name: 'eye', label: 'Eye opening', type: 'select', options: PEDIATRIC_GCS_OPTIONS.eye },
-      { name: 'verbal', label: 'Verbal response', type: 'select', options: PEDIATRIC_GCS_OPTIONS.verbal },
-      { name: 'motor', label: 'Motor response', type: 'select', options: PEDIATRIC_GCS_OPTIONS.motor },
+      {
+        name: 'verbal',
+        label: 'Verbal response',
+        type: 'select',
+        options: PEDIATRIC_GCS_OPTIONS.verbal,
+      },
+      {
+        name: 'motor',
+        label: 'Motor response',
+        type: 'select',
+        options: PEDIATRIC_GCS_OPTIONS.motor,
+      },
     ],
     compute: computePediatricGcs,
     emptyText: 'Select eye, verbal, and motor responses.',
@@ -323,7 +369,9 @@ const configBySlug = {
 };
 
 export function HuntHessScaleCalculator({ onResultChange }) {
-  return <NeurologyCalculator config={configBySlug['hunt-hess-scale']} onResultChange={onResultChange} />;
+  return (
+    <NeurologyCalculator config={configBySlug['hunt-hess-scale']} onResultChange={onResultChange} />
+  );
 }
 
 export function IchScoreCalculator({ onResultChange }) {
@@ -331,18 +379,31 @@ export function IchScoreCalculator({ onResultChange }) {
 }
 
 export function FourScoreCalculator({ onResultChange }) {
-  return <NeurologyCalculator config={configBySlug['four-score']} onResultChange={onResultChange} />;
+  return (
+    <NeurologyCalculator config={configBySlug['four-score']} onResultChange={onResultChange} />
+  );
 }
 
 export function ModifiedRankinScaleCalculator({ onResultChange }) {
-  return <NeurologyCalculator config={configBySlug['modified-rankin-scale']} onResultChange={onResultChange} />;
+  return (
+    <NeurologyCalculator
+      config={configBySlug['modified-rankin-scale']}
+      onResultChange={onResultChange}
+    />
+  );
 }
 
 export function NihssSummaryViewCalculator({ onResultChange }) {
-  return <NeurologyCalculator config={configBySlug['nihss-summary-view']} onResultChange={onResultChange} />;
+  return (
+    <NeurologyCalculator
+      config={configBySlug['nihss-summary-view']}
+      onResultChange={onResultChange}
+    />
+  );
 }
 
 export function PediatricGcsCalculator({ onResultChange }) {
-  return <NeurologyCalculator config={configBySlug['pediatric-gcs']} onResultChange={onResultChange} />;
+  return (
+    <NeurologyCalculator config={configBySlug['pediatric-gcs']} onResultChange={onResultChange} />
+  );
 }
-

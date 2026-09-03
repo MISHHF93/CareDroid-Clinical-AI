@@ -29,7 +29,7 @@ export function usePatientWorkflow(patientId?: string | null): PatientWorkflowVi
   const patients = useEmergencyStore((state) => state.patients);
 
   return useMemo(() => {
-    const patient = patientId ? patients.find((entry) => entry.id === patientId) ?? null : null;
+    const patient = patientId ? (patients.find((entry) => entry.id === patientId) ?? null) : null;
     if (!patient) {
       return Object.freeze({
         patient: null,

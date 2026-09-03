@@ -60,7 +60,7 @@ describe('Hospital operations wiring', () => {
     expect(appSource).toContain('renderOperationsFleetConsoleRoutes');
 
     const redirectsByPath = Object.fromEntries(
-      LEGACY_EMERGENCY_ROUTE_REDIRECTS.map((redirect) => [redirect.path, redirect.to])
+      LEGACY_EMERGENCY_ROUTE_REDIRECTS.map((redirect) => [redirect.path, redirect.to]),
     );
     expect(redirectsByPath['/hospital-map']).toBeUndefined();
     expect(redirectsByPath['/devices']).toBeUndefined();
@@ -106,6 +106,8 @@ describe('Hospital operations wiring', () => {
 
     const dashboard = getCommandDashboardModel();
     expect(dashboard.panels.fleetOperations.map((tool) => tool.id)).toContain(REGISTRY.hospitalMap);
-    expect(dashboard.panels.medicalIot.map((tool) => tool.id)).toContain(REGISTRY.telemetryMonitoring);
+    expect(dashboard.panels.medicalIot.map((tool) => tool.id)).toContain(
+      REGISTRY.telemetryMonitoring,
+    );
   });
 });

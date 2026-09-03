@@ -208,7 +208,7 @@ export class AnalyticsService {
         if (PRIVACY_BLOCKLIST.has(key)) return false;
         if (['parameters', 'properties'].includes(key)) return false;
         return ['string', 'number', 'boolean'].includes(typeof value) || value == null;
-      })
+      }),
     );
   }
 

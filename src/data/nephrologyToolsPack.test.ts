@@ -80,9 +80,14 @@ describe('Nephrology Clinical Tools Pack', () => {
   it('keeps nephrology pack out of medication dosing automation', () => {
     for (const id of ALL_PACK_IDS) {
       const launch = resolveCatalogLaunch(id);
-      const copy = `${launch.chatSeed || ''} ${clinicalIntentToolsById[id]?.description || ''}`.toLowerCase();
-      expect(copy).not.toMatch(/automated dose calculation|patient-specific dose calculator|calculate mg\/kg/i);
-      expect(copy).toMatch(/decision support|not medication dosing automation|do not recommend|do not change/i);
+      const copy =
+        `${launch.chatSeed || ''} ${clinicalIntentToolsById[id]?.description || ''}`.toLowerCase();
+      expect(copy).not.toMatch(
+        /automated dose calculation|patient-specific dose calculator|calculate mg\/kg/i,
+      );
+      expect(copy).toMatch(
+        /decision support|not medication dosing automation|do not recommend|do not change/i,
+      );
     }
   });
 });

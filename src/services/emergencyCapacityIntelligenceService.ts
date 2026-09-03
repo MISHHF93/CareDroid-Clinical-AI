@@ -102,7 +102,14 @@ export function getCapacityScore(capacityState = DEFAULT_EMERGENCY_CAPACITY_STAT
   const censusPressure = Math.max(0, state.currentCensus - state.occupiedSpaces) * 1.2;
   const dischargeRelief = state.dischargeCandidates * 1.5;
 
-  return clampScore(occupancyPercent * 0.55 + admissionPressure + boardingPressure + emsPressure + censusPressure - dischargeRelief);
+  return clampScore(
+    occupancyPercent * 0.55 +
+      admissionPressure +
+      boardingPressure +
+      emsPressure +
+      censusPressure -
+      dischargeRelief,
+  );
 }
 
 export function getCapacityRiskLevel(scoreOrState: any = DEFAULT_EMERGENCY_CAPACITY_STATE) {
@@ -120,8 +127,8 @@ export function getCapacitySignals(capacityState = DEFAULT_EMERGENCY_CAPACITY_ST
       Object.freeze({
         ...definition,
         value: state[definition.id],
-      })
-    )
+      }),
+    ),
   );
 }
 
@@ -140,8 +147,9 @@ export function getCapacityRecommendations(capacityState = DEFAULT_EMERGENCY_CAP
         category: 'overloaded queues',
         priority: riskLevel,
         rationale: `${occupancyPercent}% occupancy with ${state.availableSpaces} available spaces indicates constrained ED throughput.`,
-        action: 'Review waiting, triage, admission, discharge, and EMS queues for immediate human-owned decompression steps.',
-      })
+        action:
+          'Review waiting, triage, admission, discharge, and EMS queues for immediate human-owned decompression steps.',
+      }),
     );
   }
 
@@ -153,8 +161,9 @@ export function getCapacityRecommendations(capacityState = DEFAULT_EMERGENCY_CAP
         category: 'bottlenecks',
         priority: riskLevel,
         rationale: `${state.boardingPatients} boarding patients are consuming ED capacity.`,
-        action: 'Coordinate inpatient bed placement, charge nurse review, and operations escalation.',
-      })
+        action:
+          'Coordinate inpatient bed placement, charge nurse review, and operations escalation.',
+      }),
     );
   }
 
@@ -166,8 +175,9 @@ export function getCapacityRecommendations(capacityState = DEFAULT_EMERGENCY_CAP
         category: 'bottlenecks',
         priority: riskLevel,
         rationale: `${state.pendingAdmissions} pending admissions are delaying capacity recovery.`,
-        action: 'Review admission queue blockers and prepare handoff summaries for receiving units.',
-      })
+        action:
+          'Review admission queue blockers and prepare handoff summaries for receiving units.',
+      }),
     );
   }
 
@@ -180,7 +190,7 @@ export function getCapacityRecommendations(capacityState = DEFAULT_EMERGENCY_CAP
         priority: riskLevel,
         rationale: `${state.emsArrivals} EMS arrivals may increase near-term demand.`,
         action: 'Review pre-arrival handoffs, open treatment spaces, and alert triage leadership.',
-      })
+      }),
     );
   }
 
@@ -192,8 +202,9 @@ export function getCapacityRecommendations(capacityState = DEFAULT_EMERGENCY_CAP
         category: 'discharge opportunities',
         priority: 'Yellow',
         rationale: `${state.dischargeCandidates} discharge candidates can release capacity after review.`,
-        action: 'Prioritize discharge summaries, follow-up instructions, and final clinician review.',
-      })
+        action:
+          'Prioritize discharge summaries, follow-up instructions, and final clinician review.',
+      }),
     );
   }
 
@@ -205,8 +216,9 @@ export function getCapacityRecommendations(capacityState = DEFAULT_EMERGENCY_CAP
         category: 'bottlenecks',
         priority: riskLevel,
         rationale: 'Capacity posture is stable.',
-        action: 'Continue monitoring census, spaces, admissions, EMS arrivals, and discharge candidates.',
-      })
+        action:
+          'Continue monitoring census, spaces, admissions, EMS arrivals, and discharge candidates.',
+      }),
     );
   }
 
@@ -232,9 +244,13 @@ export function getCapacityDashboard(capacityState = DEFAULT_EMERGENCY_CAPACITY_
     signals: getCapacitySignals(state),
     recommendations,
     recommendationCategories: Object.freeze({
-      dischargeOpportunities: Object.freeze(recommendations.filter((item) => item.category === 'discharge opportunities')),
+      dischargeOpportunities: Object.freeze(
+        recommendations.filter((item) => item.category === 'discharge opportunities'),
+      ),
       bottlenecks: Object.freeze(recommendations.filter((item) => item.category === 'bottlenecks')),
-      overloadedQueues: Object.freeze(recommendations.filter((item) => item.category === 'overloaded queues')),
+      overloadedQueues: Object.freeze(
+        recommendations.filter((item) => item.category === 'overloaded queues'),
+      ),
     }),
     summary:
       `${riskLevel} capacity posture with ${state.currentCensus} current census, ` +

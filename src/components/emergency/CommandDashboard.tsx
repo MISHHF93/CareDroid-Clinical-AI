@@ -54,7 +54,8 @@ export type CommandDashboardProps = {
  */
 const COMMAND_DASHBOARD_PREDICTION_TRUTH_LABEL: AiTruthLabelInfo = {
   state: 'Manual',
-  sourceContext: 'Deterministic logistic-formula heuristic over live snapshot data, not a trained model.',
+  sourceContext:
+    'Deterministic logistic-formula heuristic over live snapshot data, not a trained model.',
   reviewRequired: true,
 };
 
@@ -111,11 +112,7 @@ function ZoneOccupancyRow({ zone }: { zone: ZoneBedOccupancy }) {
       <strong>
         {zone.occupied}/{zone.total} beds
       </strong>
-      <div
-        className="command-dashboard__zone-bar"
-        role="presentation"
-        aria-hidden="true"
-      >
+      <div className="command-dashboard__zone-bar" role="presentation" aria-hidden="true">
         <span style={{ width: `${zone.occupancyPercent}%` }} />
       </div>
       <small>{zone.occupancyPercent}% occupied</small>
@@ -200,11 +197,7 @@ function AiDecisionSupportQueue({
       <ul className="command-dashboard__ai-list">
         {recommendations.map((item) => (
           <li key={String(item.data.id)}>
-            <AIRecommendationCard
-              response={item}
-              title="Command center recommendation"
-              compact
-            />
+            <AIRecommendationCard response={item} title="Command center recommendation" compact />
           </li>
         ))}
       </ul>
@@ -246,7 +239,8 @@ export default function CommandDashboard({
   const breachedTimers = useMemo(
     () =>
       activeResponseTimers.filter(
-        (timer) => Boolean(timer.breachAt) || timer.phase === 'breach' || timer.phase === 'breach_resolved',
+        (timer) =>
+          Boolean(timer.breachAt) || timer.phase === 'breach' || timer.phase === 'breach_resolved',
       ),
     [activeResponseTimers],
   );
@@ -263,11 +257,14 @@ export default function CommandDashboard({
           flags: patient.flags.map((flag) => String(flag)),
         })),
         criticalPatients: patients
-          .filter((patient) =>
-            ['P1', 'P2'].includes(String(patient.priority)) ||
-            patient.flags.some((flag) =>
-              ['HighRisk', 'DeteriorationRisk', 'SepsisAlert', 'StrokeCode'].includes(String(flag)),
-            ),
+          .filter(
+            (patient) =>
+              ['P1', 'P2'].includes(String(patient.priority)) ||
+              patient.flags.some((flag) =>
+                ['HighRisk', 'DeteriorationRisk', 'SepsisAlert', 'StrokeCode'].includes(
+                  String(flag),
+                ),
+              ),
           )
           .map((patient) => ({
             id: patient.id,
@@ -299,7 +296,11 @@ export default function CommandDashboard({
         <div className="command-dashboard__meta">
           <span>{snapshot.summaryLine}</span>
           <time dateTime={snapshot.updatedAt}>
-            Updated {new Date(snapshot.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            Updated{' '}
+            {new Date(snapshot.updatedAt).toLocaleTimeString([], {
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
           </time>
         </div>
       </header>
@@ -336,7 +337,8 @@ export default function CommandDashboard({
             // and can't be safely string-parsed for a name the way a structured
             // `patientLabel` field can -- fail closed, same as HEAL-209.
             <p className="command-dashboard__redacted-notice">
-              Patient-specific details are hidden for this role. A role with patient access can view specifics.
+              Patient-specific details are hidden for this role. A role with patient access can view
+              specifics.
             </p>
           )}
         </section>
@@ -345,7 +347,10 @@ export default function CommandDashboard({
       <AiDecisionSupportQueue snapshot={snapshot} canViewPatients={canViewPatients} />
 
       {snapshot.prolongedStayAlerts?.length ? (
-        <section className="command-dashboard__pending-beds" aria-label="Prolonged stay risk alerts">
+        <section
+          className="command-dashboard__pending-beds"
+          aria-label="Prolonged stay risk alerts"
+        >
           <h3>Prolonged ED stay risk</h3>
           <AiTruthLabel {...COMMAND_DASHBOARD_PREDICTION_TRUTH_LABEL} compact />
           <ul>
@@ -363,7 +368,10 @@ export default function CommandDashboard({
       ) : null}
 
       {snapshot.orientationPredictions?.length ? (
-        <section className="command-dashboard__activations" aria-label="Post-ED orientation predictions">
+        <section
+          className="command-dashboard__activations"
+          aria-label="Post-ED orientation predictions"
+        >
           <h3>Post-ED orientation</h3>
           <AiTruthLabel {...COMMAND_DASHBOARD_PREDICTION_TRUTH_LABEL} compact />
           <ul>
@@ -398,11 +406,17 @@ export default function CommandDashboard({
       ) : null}
 
       {snapshot.resourceActivations.length ? (
-        <section className="command-dashboard__activations" aria-label="Pre-arrival resource activations">
+        <section
+          className="command-dashboard__activations"
+          aria-label="Pre-arrival resource activations"
+        >
           <h3>Resource activations</h3>
           <ul>
             {snapshot.resourceActivations.map((activation) => (
-              <li key={activation.id} className={`command-dashboard__activation--${activation.severity}`}>
+              <li
+                key={activation.id}
+                className={`command-dashboard__activation--${activation.severity}`}
+              >
                 <strong>{activation.title}</strong>
                 <span>{activation.summary}</span>
                 <small>{activation.chargeNurseAction}</small>
@@ -416,9 +430,7 @@ export default function CommandDashboard({
         <p className="command-dashboard__timer-status" role="status" aria-live="polite">
           3-minute response: {activeResponseTimers.length} active timer
           {activeResponseTimers.length === 1 ? '' : 's'}
-          {breachedTimers.length > 0
-            ? ` · ${breachedTimers.length} breached`
-            : ''}
+          {breachedTimers.length > 0 ? ` · ${breachedTimers.length} breached` : ''}
         </p>
       ) : null}
 
@@ -447,7 +459,9 @@ export default function CommandDashboard({
             ))}
           </ul>
         ) : (
-          <p className="command-dashboard__empty">No room zones are configured on the whiteboard yet.</p>
+          <p className="command-dashboard__empty">
+            No room zones are configured on the whiteboard yet.
+          </p>
         )}
       </section>
     </section>

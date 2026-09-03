@@ -23,19 +23,24 @@ const copilotPanelCss = readFileSync(
 // exists any more -- it was dead CSS from before the quick-command UI was
 // rewritten, deleted alongside this test's fix), so its scrollable-results
 // contract is checked against the component source directly, below.
-const commandPaletteSource = readFileSync(join(__dirname, '../components/CommandPalette.tsx'), 'utf8');
+const commandPaletteSource = readFileSync(
+  join(__dirname, '../components/CommandPalette.tsx'),
+  'utf8',
+);
 const drawerCss = readFileSync(join(__dirname, '../components/ui/Drawer.css'), 'utf8');
 const buttonCss = readFileSync(join(__dirname, '../components/ui/button.css'), 'utf8');
 const dashboardVisualizationsCss = readFileSync(
   join(__dirname, '../components/dashboard/DashboardVisualizations.css'),
-  'utf8'
+  'utf8',
 );
 const disclaimerCss = readFileSync(
   join(__dirname, '../components/clinical/ClinicalDecisionSupportDisclaimer.css'),
-  'utf8'
+  'utf8',
 );
 
-const REQUIRED_RESPONSIVE_VIEWPORT_WIDTHS = Object.freeze([320, 360, 390, 412, 430, 768, 1024, 1280, 1440]);
+const REQUIRED_RESPONSIVE_VIEWPORT_WIDTHS = Object.freeze([
+  320, 360, 390, 412, 430, 768, 1024, 1280, 1440,
+]);
 
 describe('responsive-ux.css — global normalization', () => {
   it('is imported from the design-system entry after design-tokens.css', () => {
@@ -95,7 +100,9 @@ describe('responsive-ux.css — global normalization', () => {
     // Split into overflow-x: clip / overflow-y: auto (blocks horizontal
     // bleed while still scrolling vertically) — a real improvement over the
     // shorthand this assertion originally checked for.
-    expect(appShellCss).toMatch(/\.app-shell-main-content\s*\{[\s\S]*overflow-x:\s*clip[\s\S]*overflow-y:\s*auto/);
+    expect(appShellCss).toMatch(
+      /\.app-shell-main-content\s*\{[\s\S]*overflow-x:\s*clip[\s\S]*overflow-y:\s*auto/,
+    );
     expect(copilotPanelCss).toMatch(/\.ed-copilot-panel\s*\{[\s\S]*overflow:\s*hidden/);
     expect(indexCss).toMatch(/\.app-local-scroll-y\s*\{[\s\S]*overflow-y:\s*auto/);
     expect(indexCss).toMatch(/\.app-local-scroll-x\s*\{[\s\S]*overflow-x:\s*auto/);
@@ -110,7 +117,9 @@ describe('responsive-ux.css — global normalization', () => {
 
   it('keeps overlay bodies locally scrollable without becoming page scroll owners', () => {
     expect(commandPaletteSource).toMatch(/results:\s*\{[\s\S]*overflowY:\s*'auto'/);
-    expect(mobileFirstRecoveryCss).toMatch(/\.quick-command-results[\s\S]*overscroll-behavior:\s*contain/);
+    expect(mobileFirstRecoveryCss).toMatch(
+      /\.quick-command-results[\s\S]*overscroll-behavior:\s*contain/,
+    );
     expect(drawerCss).toMatch(/\.drawer-body\s*\{[\s\S]*overflow-y:\s*auto/);
     expect(drawerCss).toMatch(/\.drawer-body\s*\{[\s\S]*overflow-x:\s*clip/);
   });
@@ -123,10 +132,10 @@ describe('responsive-ux.css — global normalization', () => {
 
   it('enforces mobile touch targets on primary buttons and form controls', () => {
     expect(responsiveUxCss).toMatch(
-      /@media \(max-width: 640px\)[\s\S]*min-height:\s*var\(--app-min-touch-target/
+      /@media \(max-width: 640px\)[\s\S]*min-height:\s*var\(--app-min-touch-target/,
     );
     expect(responsiveUxCss).toMatch(
-      /\.calc-input-field[\s\S]*min-height:\s*var\(--app-min-touch-target/
+      /\.calc-input-field[\s\S]*min-height:\s*var\(--app-min-touch-target/,
     );
   });
 
@@ -142,7 +151,7 @@ describe('responsive-ux.css — global normalization', () => {
 
   it('compacts callouts on mobile without removing them', () => {
     expect(responsiveUxCss).toMatch(
-      /@media \(max-width: 640px\)[\s\S]*\.clinical-ds-disclaimer[\s\S]*--app-callout-padding-compact/
+      /@media \(max-width: 640px\)[\s\S]*\.clinical-ds-disclaimer[\s\S]*--app-callout-padding-compact/,
     );
     expect(responsiveUxCss).toMatch(/\.calc-interpretation-box[\s\S]*overflow-wrap:\s*break-word/);
   });
@@ -170,7 +179,9 @@ describe('responsive-ux.css — global normalization', () => {
   });
 
   it('codifies the requested mobile, tablet, and desktop viewport matrix', () => {
-    expect(REQUIRED_RESPONSIVE_VIEWPORT_WIDTHS).toEqual([320, 360, 390, 412, 430, 768, 1024, 1280, 1440]);
+    expect(REQUIRED_RESPONSIVE_VIEWPORT_WIDTHS).toEqual([
+      320, 360, 390, 412, 430, 768, 1024, 1280, 1440,
+    ]);
   });
 
   it('keeps operational tables and fixed-width panels locally scrollable', () => {
@@ -203,7 +214,7 @@ describe('responsive UX — component baselines', () => {
   it('dashboard visualization grids collapse before phone widths and hide chart overflow locally', () => {
     expect(dashboardVisualizationsCss).toMatch(/\.dashboard-visual-grid[\s\S]*minmax\(0,\s*1fr\)/);
     expect(dashboardVisualizationsCss).toMatch(
-      /@media \(max-width:\s*860px\)[\s\S]*grid-template-columns:\s*1fr/
+      /@media \(max-width:\s*860px\)[\s\S]*grid-template-columns:\s*1fr/,
     );
     expect(dashboardVisualizationsCss).toMatch(/\.dashboard-chart[\s\S]*overflow:\s*hidden/);
   });

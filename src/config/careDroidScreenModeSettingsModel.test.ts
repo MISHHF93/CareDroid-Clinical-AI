@@ -53,10 +53,7 @@ describe('careDroidScreenModeSettingsModel', () => {
 
   it('coerces disallowed screen modes to an enabled fallback for the role', () => {
     const settings = normalizeCareDroidScreenModeSettings({
-      enabledScreenModes: [
-        CARE_DROID_SCREEN_MODES.reception,
-        CARE_DROID_SCREEN_MODES.triage,
-      ],
+      enabledScreenModes: [CARE_DROID_SCREEN_MODES.reception, CARE_DROID_SCREEN_MODES.triage],
       allowedRolesByScreenMode: {
         [CARE_DROID_SCREEN_MODES.reception]: [EMERGENCY_ROLE_ID.registrationClerk],
         [CARE_DROID_SCREEN_MODES.triage]: [EMERGENCY_ROLE_ID.triageNurse],
@@ -64,15 +61,11 @@ describe('careDroidScreenModeSettingsModel', () => {
     });
 
     expect(
-      coerceScreenModeForRole(
-        CARE_DROID_SCREEN_MODES.triage,
-        EMERGENCY_ROLE_ID.registrationClerk,
-        {
-          allowedRolesByScreenMode: settings.allowedRolesByScreenMode,
-          enabledScreenModes: settings.enabledScreenModes,
-          defaultScreenMode: settings.defaultScreenMode,
-        },
-      ),
+      coerceScreenModeForRole(CARE_DROID_SCREEN_MODES.triage, EMERGENCY_ROLE_ID.registrationClerk, {
+        allowedRolesByScreenMode: settings.allowedRolesByScreenMode,
+        enabledScreenModes: settings.enabledScreenModes,
+        defaultScreenMode: settings.defaultScreenMode,
+      }),
     ).toBe(CARE_DROID_SCREEN_MODES.reception);
   });
 
@@ -88,8 +81,8 @@ describe('careDroidScreenModeSettingsModel', () => {
       },
     });
 
-    expect(resolveConfiguredScreenModeKpiIds(CARE_DROID_SCREEN_MODES.publicWaiting, settings)).toEqual(
-      ['crowd-level'],
-    );
+    expect(
+      resolveConfiguredScreenModeKpiIds(CARE_DROID_SCREEN_MODES.publicWaiting, settings),
+    ).toEqual(['crowd-level']);
   });
 });

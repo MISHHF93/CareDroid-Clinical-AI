@@ -22,10 +22,19 @@ import {
 } from '../config/trackMindWorkspaceModel';
 import { resolveTrackMindKpisForRole } from '../config/trackMindKpiPolicy';
 import { resolveTrackMindNotificationChannels } from '../config/trackMindNotificationPolicy';
-import { canViewTrackMindPrivacyScope, canViewTrackMindSensitivity } from '../config/trackMindPrivacyScope';
-import { canViewTrackMindAuditArtifact, canExportTrackMindAudit } from '../config/trackMindAuditVisibility';
+import {
+  canViewTrackMindPrivacyScope,
+  canViewTrackMindSensitivity,
+} from '../config/trackMindPrivacyScope';
+import {
+  canViewTrackMindAuditArtifact,
+  canExportTrackMindAudit,
+} from '../config/trackMindAuditVisibility';
 import { canAccessTrackMindEntityCapability } from '../config/trackMindEntityVisibility';
-import type { TrackMindEntityCapability, TrackMindEntityId } from '../config/trackMindEntityVisibility';
+import type {
+  TrackMindEntityCapability,
+  TrackMindEntityId,
+} from '../config/trackMindEntityVisibility';
 import type { TrackMindPrivacyScope } from '../config/trackMindPrivacyScope';
 import type { TrackMindAuditArtifact } from '../config/trackMindAuditVisibility';
 
@@ -35,21 +44,16 @@ export function useTrackMindRolePermissions() {
   const role = useMemo(() => resolveTrackMindRoleId(user), [user]);
   const roleDefinition = useMemo(() => getTrackMindRoleDefinition(role), [role]);
   const workspace = useMemo(() => getTrackMindWorkspaceDefinition(role), [role]);
-  const permissionContext = useMemo(
-    () => buildTrackMindRoleContext(role),
-    [role],
-  );
+  const permissionContext = useMemo(() => buildTrackMindRoleContext(role), [role]);
   const landingRoute = useMemo(() => resolveTrackMindRoleLandingRoute(role), [role]);
 
   const can = useCallback(
-    (permission: string) =>
-      hasTrackMindActionPermission(role, permission, {}, permissionContext),
+    (permission: string) => hasTrackMindActionPermission(role, permission, {}, permissionContext),
     [permissionContext, role],
   );
 
   const canMutate = useCallback(
-    (permission: string) =>
-      canPerformTrackMindMutation(role, permission, {}, permissionContext),
+    (permission: string) => canPerformTrackMindMutation(role, permission, {}, permissionContext),
     [permissionContext, role],
   );
 
@@ -66,7 +70,8 @@ export function useTrackMindRolePermissions() {
       allowedPermissions: listTrackMindPermissionsForRole(role),
       demoRoles: getTrackMindDemoRoles(),
       permissionContext,
-      canAccessRoute: (path: string) => canAccessTrackMindSurface(role, path, {}, permissionContext),
+      canAccessRoute: (path: string) =>
+        canAccessTrackMindSurface(role, path, {}, permissionContext),
       nearestRoute: (path: string) => getNearestTrackMindRoute(role, path),
       can,
       canMutate,
@@ -74,9 +79,11 @@ export function useTrackMindRolePermissions() {
       quickActions: filterWorkspaceQuickActions(role, can),
       kpiPermissionKeys: filterWorkspaceKpiKeys(role, can),
       notificationChannels: resolveTrackMindNotificationChannels(role, can),
-      canViewPrivacyScope: (scope: TrackMindPrivacyScope) => canViewTrackMindPrivacyScope(role, scope),
+      canViewPrivacyScope: (scope: TrackMindPrivacyScope) =>
+        canViewTrackMindPrivacyScope(role, scope),
       canViewSensitivity: (sensitivity: string) => canViewTrackMindSensitivity(role, sensitivity),
-      canViewAuditArtifact: (artifact: TrackMindAuditArtifact) => canViewTrackMindAuditArtifact(role, artifact),
+      canViewAuditArtifact: (artifact: TrackMindAuditArtifact) =>
+        canViewTrackMindAuditArtifact(role, artifact),
       canExportAudit: () => canExportTrackMindAudit(role, can),
       canEntity: (entity: TrackMindEntityId, capability: TrackMindEntityCapability) =>
         canAccessTrackMindEntityCapability(role, entity, capability),

@@ -5,7 +5,10 @@ import { CategoryBarChart } from '../../components/dashboard/DashboardCharts';
 import { GraphicIconBadge } from '../../components/graphics/CdlGraphicKit';
 import OperationsLiveSnapshotPanel from '../../components/operations/OperationsLiveSnapshotPanel';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
-import { buildCommandDashboardModel, COMMAND_DASHBOARD_PROMPTS } from '../../data/commandDashboardModel';
+import {
+  buildCommandDashboardModel,
+  COMMAND_DASHBOARD_PROMPTS,
+} from '../../data/commandDashboardModel';
 import { useOperationsHubLiveFeeds } from '../../hooks/useOperationsHubLiveFeeds';
 import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import '../../components/operations/OperationsLiveSnapshotPanel.css';
@@ -34,7 +37,11 @@ function ToolPanel({
       <p>{description}</p>
       <div className="command-dashboard-page__tool-grid">
         {tools.map((tool) => (
-          <Link key={tool.id} to={tool.path || CANONICAL_ROUTES.tools} className="command-dashboard-page__tool-link">
+          <Link
+            key={tool.id}
+            to={tool.path || CANONICAL_ROUTES.tools}
+            className="command-dashboard-page__tool-link"
+          >
             <strong>{tool.name}</strong>
             <span>{tool.description || tool.category || tool.id}</span>
           </Link>
@@ -54,13 +61,20 @@ export default function CommandDashboard() {
   });
 
   return (
-    <main className="command-dashboard-page command-dashboard" aria-label="CareDroid command dashboard">
+    <main
+      className="command-dashboard-page command-dashboard"
+      aria-label="CareDroid command dashboard"
+    >
       <header className="command-dashboard-page__header">
         <div className="command-dashboard-page__title-row">
           <GraphicIconBadge iconKey="layout-dashboard" accent="brand" size="md" />
           <div>
-            <p className="command-dashboard-page-title-text" data-testid="cd-page-title-text">CareDroid Command Center</p>
-            <p>Platform inventory, operational launch points, and governed assistant quick starts.</p>
+            <p className="command-dashboard-page-title-text" data-testid="cd-page-title-text">
+              CareDroid Command Center
+            </p>
+            <p>
+              Platform inventory, operational launch points, and governed assistant quick starts.
+            </p>
           </div>
         </div>
         <div className="command-dashboard-page__actions">
@@ -69,10 +83,29 @@ export default function CommandDashboard() {
         </div>
       </header>
 
-      <div className="command-dashboard-page__metrics" role="group" aria-label="Command dashboard summary metrics">
-        <MetricCard label="Total tools" value={String(model.stats.totalTools)} hint="User-facing inventory" tone="neutral" />
-        <MetricCard label="Calculators" value={String(model.stats.calculators)} hint="Severity and dosing workflows" tone="neutral" />
-        <MetricCard label="AI tools" value={String(model.stats.aiTools)} hint="Assistant-guided and backend-backed" tone="neutral" />
+      <div
+        className="command-dashboard-page__metrics"
+        role="group"
+        aria-label="Command dashboard summary metrics"
+      >
+        <MetricCard
+          label="Total tools"
+          value={String(model.stats.totalTools)}
+          hint="User-facing inventory"
+          tone="neutral"
+        />
+        <MetricCard
+          label="Calculators"
+          value={String(model.stats.calculators)}
+          hint="Severity and dosing workflows"
+          tone="neutral"
+        />
+        <MetricCard
+          label="AI tools"
+          value={String(model.stats.aiTools)}
+          hint="Assistant-guided and backend-backed"
+          tone="neutral"
+        />
         <MetricCard
           label="Backend-backed"
           value={String(model.stats.backendBacked)}

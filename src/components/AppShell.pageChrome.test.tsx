@@ -86,7 +86,10 @@ const CONSOLE_REGISTRY_FIXTURES: Array<{ name: string; paths: string[] }> = [
   { name: 'governance', paths: GOVERNANCE_WORKSPACE_ROUTES.map((r) => r.path) },
   { name: 'admin', paths: adminWorkspacePaths },
   { name: 'training', paths: TRAINING_CONSOLE_ROUTES.map((r) => r.path) },
-  { name: 'tools', paths: [...TOOLS_AI_PAGE_ROUTES, ...TOOLS_SHORTCUT_PAGE_ROUTES].map((r) => r.path) },
+  {
+    name: 'tools',
+    paths: [...TOOLS_AI_PAGE_ROUTES, ...TOOLS_SHORTCUT_PAGE_ROUTES].map((r) => r.path),
+  },
   { name: 'profile', paths: PROFILE_CONSOLE_ROUTES.map((r) => r.path) },
   {
     name: 'public (in-shell only)',
@@ -111,11 +114,14 @@ describe('console route chrome (all 8 console route trees)', () => {
   });
 
   for (const registry of CONSOLE_REGISTRY_FIXTURES) {
-    it.each(registry.paths)(`resolveConsoleWorkspaceEntry resolves a real label for ${registry.name} %s`, (path) => {
-      const entry = resolveConsoleWorkspaceEntry(path);
-      expect(entry?.label).toBeTruthy();
-      expect(entry?.subtitle).toBeTruthy();
-    });
+    it.each(registry.paths)(
+      `resolveConsoleWorkspaceEntry resolves a real label for ${registry.name} %s`,
+      (path) => {
+        const entry = resolveConsoleWorkspaceEntry(path);
+        expect(entry?.label).toBeTruthy();
+        expect(entry?.subtitle).toBeTruthy();
+      },
+    );
   }
 
   it('resolves sub-paths under a /* wildcard entry, not just the exact registered paths', () => {

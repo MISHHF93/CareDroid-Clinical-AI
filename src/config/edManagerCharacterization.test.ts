@@ -8,10 +8,7 @@ import {
   ROLE_PERMISSION_GRANTS,
 } from './emergencyPermissionRegistry';
 import { EMERGENCY_ROLE_ID } from './emergencyRoleScreenMatrix';
-import {
-  NEST_PERMISSION,
-  resolveNestMappingForEmergencyRole,
-} from './emergencyNestPermissionMap';
+import { NEST_PERMISSION, resolveNestMappingForEmergencyRole } from './emergencyNestPermissionMap';
 
 describe('ED Manager characterization', () => {
   const role = EMERGENCY_ROLE_ID.edManager;

@@ -17,7 +17,8 @@ import './DependencyMap.css';
 
 const DEPENDENCY_MAP_ROUTE_CHROME = Object.freeze({
   title: 'Platform Wiring Map',
-  subtitle: 'Route, inventory, API client, backend endpoint, service, and executor dependency chains.',
+  subtitle:
+    'Route, inventory, API client, backend endpoint, service, and executor dependency chains.',
 });
 
 export default function DependencyMap() {
@@ -26,7 +27,10 @@ export default function DependencyMap() {
   useRouteChromeRegistration(DEPENDENCY_MAP_ROUTE_CHROME);
   const map = useMemo(() => buildDependencyMap(), []);
   const issueChart = useMemo(() => buildDependencyIssueChart(map.issueCounts), [map.issueCounts]);
-  const executorChart = useMemo(() => buildDependencyExecutorChart(map.dependencies), [map.dependencies]);
+  const executorChart = useMemo(
+    () => buildDependencyExecutorChart(map.dependencies),
+    [map.dependencies],
+  );
 
   return (
     <main className="dependency-map-page" aria-label="Platform wiring map">
@@ -34,8 +38,13 @@ export default function DependencyMap() {
         <div className="dependency-map-page__title-row">
           <GraphicIconBadge iconKey="route" accent="brand" size="md" />
           <div>
-            <p className="dependency-map-page__title-text" data-testid="cd-page-title-text">Platform Wiring Map</p>
-            <p>Route, inventory, API client, backend endpoint, service, and executor dependency chains.</p>
+            <p className="dependency-map-page__title-text" data-testid="cd-page-title-text">
+              Platform Wiring Map
+            </p>
+            <p>
+              Route, inventory, API client, backend endpoint, service, and executor dependency
+              chains.
+            </p>
           </div>
         </div>
         <div className="dependency-map-page__actions">
@@ -48,14 +57,37 @@ export default function DependencyMap() {
 
       <StateSourceNotice
         title="Dependency map source state"
-        states={[DEMO_LIVE_STATES.DEMO, DEMO_LIVE_STATES.LOCAL_ONLY, DEMO_LIVE_STATES.BACKEND_UNAVAILABLE]}
+        states={[
+          DEMO_LIVE_STATES.DEMO,
+          DEMO_LIVE_STATES.LOCAL_ONLY,
+          DEMO_LIVE_STATES.BACKEND_UNAVAILABLE,
+        ]}
         details="Derived from canonical tool inventory, frontend API call inventory, and backend HTTP route inventory."
       />
 
-      <div className="dependency-map-page__metrics" role="group" aria-label="Dependency map summary metrics">
-        <MetricCard label="Dependencies" value={String(map.summary.dependencies)} hint="Inventory wiring rows" tone="neutral" />
-        <MetricCard label="Routes" value={String(map.summary.routes)} hint="Canonical route nodes" tone="neutral" />
-        <MetricCard label="Backend endpoints" value={String(map.summary.backendEndpoints)} hint="HTTP route inventory" tone="neutral" />
+      <div
+        className="dependency-map-page__metrics"
+        role="group"
+        aria-label="Dependency map summary metrics"
+      >
+        <MetricCard
+          label="Dependencies"
+          value={String(map.summary.dependencies)}
+          hint="Inventory wiring rows"
+          tone="neutral"
+        />
+        <MetricCard
+          label="Routes"
+          value={String(map.summary.routes)}
+          hint="Canonical route nodes"
+          tone="neutral"
+        />
+        <MetricCard
+          label="Backend endpoints"
+          value={String(map.summary.backendEndpoints)}
+          hint="HTTP route inventory"
+          tone="neutral"
+        />
         <MetricCard
           label="Issues"
           value={String(map.summary.issues)}
@@ -97,7 +129,9 @@ export default function DependencyMap() {
         <div className="dependency-map-page__issues">
           {map.issues.slice(0, 12).map((issue) => (
             <article key={issue.id} className="dependency-map-page__issue">
-              <span className={`dependency-map-page__pill dependency-map-page__pill--${dependencyIssueTone(issue.severity)}`}>
+              <span
+                className={`dependency-map-page__pill dependency-map-page__pill--${dependencyIssueTone(issue.severity)}`}
+              >
                 {issue.type.replace(/-/g, ' ')}
               </span>
               <strong>{issue.title}</strong>
@@ -109,7 +143,11 @@ export default function DependencyMap() {
 
       <section className="dependency-map-page__panel" aria-label="Wired dependencies">
         <h2>Wired dependencies</h2>
-        <div className="dependency-map-page__table" role="table" aria-label="Wired dependencies table">
+        <div
+          className="dependency-map-page__table"
+          role="table"
+          aria-label="Wired dependencies table"
+        >
           <div className="dependency-map-page__table-head" role="row">
             <span role="columnheader">Capability</span>
             <span role="columnheader">Route</span>

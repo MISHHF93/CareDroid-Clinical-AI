@@ -15,12 +15,18 @@ import {
   AI_PALETTE_COMMANDS,
   resetAiPaletteCommandStateForTests,
 } from '../services/interactiveAi/aiCommandRegistry';
-import { COMMAND_PALETTE_HIGH_VALUE_ACTION_IDS, COMMAND_PALETTE_SUPPRESSED_ROUTE_IDS } from '../config/commandPaletteHighValueModel';
+import {
+  COMMAND_PALETTE_HIGH_VALUE_ACTION_IDS,
+  COMMAND_PALETTE_SUPPRESSED_ROUTE_IDS,
+} from '../config/commandPaletteHighValueModel';
 import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
 import { presentEmergencyRoleAction } from '../config/emergencyRoleActionMatrix';
 import { EMERGENCY_ROLE_ID } from '../config/emergencyRoleScreenMatrix';
 import { CANONICAL_ROUTES } from '../config/routes.config';
-import { EMERGENCY_OS_ROUTE_COMMANDS, EMERGENCY_OS_TOOL_COMMANDS } from '../config/commandPalette.config';
+import {
+  EMERGENCY_OS_ROUTE_COMMANDS,
+  EMERGENCY_OS_TOOL_COMMANDS,
+} from '../config/commandPalette.config';
 import { PatientState, Priority, type Patient } from '../types/emergency';
 
 function command(
@@ -236,7 +242,9 @@ describe('CommandPalette helpers', () => {
       canOpenPatients: false,
       patients: [patient],
       query: 'avery',
-      navigate: vi.fn() as unknown as Parameters<typeof computeGatedPaletteSearchResults>[0]['navigate'],
+      navigate: vi.fn() as unknown as Parameters<
+        typeof computeGatedPaletteSearchResults
+      >[0]['navigate'],
       referrals: [],
       emsArrivals: [],
       queues: [],
@@ -264,7 +272,9 @@ describe('CommandPalette helpers', () => {
       canOpenPatients: true,
       patients: [patient],
       query: 'avery',
-      navigate: vi.fn() as unknown as Parameters<typeof computeGatedPaletteSearchResults>[0]['navigate'],
+      navigate: vi.fn() as unknown as Parameters<
+        typeof computeGatedPaletteSearchResults
+      >[0]['navigate'],
       referrals: [],
       emsArrivals: [],
       queues: [],

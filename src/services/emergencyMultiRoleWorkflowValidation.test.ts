@@ -2,10 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { PatientState, Priority, type CapacitySnapshot, type Patient } from '../types/emergency';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import { CARE_DROID_SCREEN_MODES } from '../config/careDroidScreenModes';
-import {
-  EMERGENCY_ROLE_ID,
-  resolveEmergencyScreenMode,
-} from '../config/emergencyRoleScreenMatrix';
+import { EMERGENCY_ROLE_ID, resolveEmergencyScreenMode } from '../config/emergencyRoleScreenMatrix';
 import {
   buildScreenModeKpiSnapshot,
   resolveChargeNurseStripMetricIds,
@@ -27,10 +24,7 @@ import {
   selectPhysicianOperationalStrip,
   shouldShowPhysicianOperationalStrip,
 } from '../components/whiteboard/physicianWorkflowModel';
-import {
-  matchesWhiteboardQueueFilter,
-  WHITEBOARD_QUEUE_FILTER,
-} from './queueAssignment';
+import { matchesWhiteboardQueueFilter, WHITEBOARD_QUEUE_FILTER } from './queueAssignment';
 import { resolvePatientExperienceStatus } from './patientExperienceStatus';
 import { resolvePatientWaitingRoomMessage } from './waitingRoomStatusMessaging';
 import { assertWaitingRoomMessagingIsPhiSafe } from './waitingRoomStatusMessaging';
@@ -125,7 +119,9 @@ describe('emergencyMultiRoleWorkflowValidation', () => {
     expect(receptionQueues.counts.awaitingVerification).toBe(1);
     expect(receptionQueues.counts.awaitingTriage).toBe(0);
     expect(resolvePatientExperienceStatus(registered).id).toBe('registered');
-    expect(resolveOperationalPresentation(CARE_DROID_SCREEN_MODES.reception).emphasis).toBe('speed');
+    expect(resolveOperationalPresentation(CARE_DROID_SCREEN_MODES.reception).emphasis).toBe(
+      'speed',
+    );
 
     const receptionMetrics = selectReceptionOperationalStripMetrics([registered], 0, {
       metricIds: resolveReceptionStripMetricIds(CARE_DROID_SCREEN_MODES.reception) || [],
@@ -145,7 +141,9 @@ describe('emergencyMultiRoleWorkflowValidation', () => {
       now: NOW,
     });
     expect(triageMetrics.find((metric) => metric.id === 'triage-pending')?.value).toBe(1);
-    expect(resolveOperationalPresentation(CARE_DROID_SCREEN_MODES.triage).emphasis).toBe('assessment');
+    expect(resolveOperationalPresentation(CARE_DROID_SCREEN_MODES.triage).emphasis).toBe(
+      'assessment',
+    );
 
     expect(matchesWhiteboardQueueFilter(triageQueued, WHITEBOARD_QUEUE_FILTER.triage)).toBe(true);
 
@@ -172,21 +170,27 @@ describe('emergencyMultiRoleWorkflowValidation', () => {
         roleId: EMERGENCY_ROLE_ID.chargeNurse,
       }),
     ).toBe(true);
-    expect(resolveOperationalPresentation(CARE_DROID_SCREEN_MODES.chargeNurse).emphasis).toBe('flow');
+    expect(resolveOperationalPresentation(CARE_DROID_SCREEN_MODES.chargeNurse).emphasis).toBe(
+      'flow',
+    );
 
     const physicianMetrics = selectPhysicianOperationalStrip({
       patients: [waiting],
       physicianStaffId: 'physician-1',
       now: NOW,
     });
-    expect(physicianMetrics.find((metric) => metric.id === 'provider-awaiting')?.value).toBeGreaterThan(0);
+    expect(
+      physicianMetrics.find((metric) => metric.id === 'provider-awaiting')?.value,
+    ).toBeGreaterThan(0);
     expect(
       shouldShowPhysicianOperationalStrip({
         screenMode: CARE_DROID_SCREEN_MODES.physician,
         roleId: EMERGENCY_ROLE_ID.physician,
       }),
     ).toBe(true);
-    expect(resolveOperationalPresentation(CARE_DROID_SCREEN_MODES.physician).emphasis).toBe('patient');
+    expect(resolveOperationalPresentation(CARE_DROID_SCREEN_MODES.physician).emphasis).toBe(
+      'patient',
+    );
   });
 
   it('surfaces throughput metrics for the department manager and PHI-safe public messaging', () => {
@@ -214,9 +218,9 @@ describe('emergencyMultiRoleWorkflowValidation', () => {
     expect(managerKpis.kpiIds).toEqual(
       resolveScreenModeKpiIds(CARE_DROID_SCREEN_MODES.commandCenter),
     );
-    expect(resolveCommandCenterMetricIds(CARE_DROID_SCREEN_MODES.commandCenter)?.length).toBeGreaterThan(
-      0,
-    );
+    expect(
+      resolveCommandCenterMetricIds(CARE_DROID_SCREEN_MODES.commandCenter)?.length,
+    ).toBeGreaterThan(0);
     expect(managerKpis.kpis.length).toBeGreaterThan(0);
     expect(resolveOperationalPresentation(CARE_DROID_SCREEN_MODES.commandCenter).emphasis).toBe(
       'throughput',
@@ -244,12 +248,12 @@ describe('emergencyMultiRoleWorkflowValidation', () => {
     expect(serialized).not.toContain('Chest pressure');
     expect(assertWaitingRoomMessagingIsPhiSafe(publicSnapshot.statusMessaging)).toBe(true);
     expect(publicSnapshot.statusMessaging.statusLines.length).toBeGreaterThan(0);
-    expect(publicSnapshot.statusMessaging.advisories.some((line) => line.id === 'symptom-escalation')).toBe(
-      true,
-    );
-    expect(resolvePublicWaitingKpiWidgets(CARE_DROID_SCREEN_MODES.publicWaiting)?.length).toBeGreaterThan(
-      0,
-    );
+    expect(
+      publicSnapshot.statusMessaging.advisories.some((line) => line.id === 'symptom-escalation'),
+    ).toBe(true);
+    expect(
+      resolvePublicWaitingKpiWidgets(CARE_DROID_SCREEN_MODES.publicWaiting)?.length,
+    ).toBeGreaterThan(0);
     expect(isPublicDisplayScreenMode(CARE_DROID_SCREEN_MODES.publicWaiting)).toBe(true);
     expect(resolveOperationalPresentation(CARE_DROID_SCREEN_MODES.publicWaiting).emphasis).toBe(
       'reassuring',

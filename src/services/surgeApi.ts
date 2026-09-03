@@ -11,7 +11,11 @@ async function guardedJson(path, options: any = {}) {
   try {
     const { response, data } = await apiFetchJson(path, options);
     if (!response.ok) {
-      return { ok: false, data: null, message: data?.error || data?.message || getApiErrorMessage(null, response) };
+      return {
+        ok: false,
+        data: null,
+        message: data?.error || data?.message || getApiErrorMessage(null, response),
+      };
     }
     return { ok: true, data, message: data?.message || '' };
   } catch (error: any) {

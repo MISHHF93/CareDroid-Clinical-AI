@@ -7,7 +7,9 @@ import * as lazy from './lazySpecialtyCalculators';
 
 describe('lazySpecialtyCalculators', () => {
   it('exports a large set of specialty calculator lazy components', () => {
-    const keys = Object.keys(lazy).filter((k) => typeof (lazy as any)[k] === 'object' || typeof (lazy as any)[k] === 'function');
+    const keys = Object.keys(lazy).filter(
+      (k) => typeof (lazy as any)[k] === 'object' || typeof (lazy as any)[k] === 'function',
+    );
     expect(keys.length).toBeGreaterThanOrEqual(40);
     // Spot-check major families
     expect(lazy.ApacheIICalculator).toBeTruthy();

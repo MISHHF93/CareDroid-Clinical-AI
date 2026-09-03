@@ -115,7 +115,8 @@ function byId(items, id) {
 }
 
 export function buildAutomationRule({ templateId, triggerId, conditionId, actionId }: any = {}) {
-  const template = AUTOMATION_TEMPLATES.find((item) => item.id === templateId) || AUTOMATION_TEMPLATES[0];
+  const template =
+    AUTOMATION_TEMPLATES.find((item) => item.id === templateId) || AUTOMATION_TEMPLATES[0];
   const trigger = byId(AUTOMATION_TRIGGERS, triggerId || template.triggerId);
   const condition = byId(AUTOMATION_CONDITIONS, conditionId || template.conditionId);
   const action = byId(AUTOMATION_ACTIONS, actionId || template.actionId);

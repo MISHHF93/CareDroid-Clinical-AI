@@ -142,7 +142,10 @@ function attachmentSizeLabel(size: number): string {
 function attachmentPromptSummary(attachments: CopilotAttachment[]): string {
   if (!attachments.length) return '';
   return attachments
-    .map((attachment) => `${attachment.name} (${attachment.type || 'unknown type'}, ${attachmentSizeLabel(attachment.size)})`)
+    .map(
+      (attachment) =>
+        `${attachment.name} (${attachment.type || 'unknown type'}, ${attachmentSizeLabel(attachment.size)})`,
+    )
     .join('; ');
 }
 
@@ -156,15 +159,14 @@ function attachmentTextForPrompt(attachments: CopilotAttachment[]): string {
   const withText = attachments.filter((attachment) => attachment.textContent);
   if (!withText.length) return '';
   return withText
-    .map(
-      (attachment) =>
-        [
-          `--- ${attachment.name} ---`,
-          attachment.textContent,
-          attachment.textTruncated ? '[truncated]' : null,
-        ]
-          .filter(Boolean)
-          .join('\n'),
+    .map((attachment) =>
+      [
+        `--- ${attachment.name} ---`,
+        attachment.textContent,
+        attachment.textTruncated ? '[truncated]' : null,
+      ]
+        .filter(Boolean)
+        .join('\n'),
     )
     .join('\n\n');
 }
@@ -233,7 +235,10 @@ function formatPressure(value: string): string {
   return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
-function mergeActiveAlerts(alerts: Alert[], centralSnapshot: CareDroidCentralNodeSnapshot): Alert[] {
+function mergeActiveAlerts(
+  alerts: Alert[],
+  centralSnapshot: CareDroidCentralNodeSnapshot,
+): Alert[] {
   const byId = new Map<string, Alert>();
   for (const alert of [...centralSnapshot.operationalAlerts, ...alerts]) {
     if (!alert.dismissed) byId.set(alert.id, alert);
@@ -309,7 +314,11 @@ function buildDepartmentPrompt({
   const highRiskPatients = activePatients.filter(isHighRiskPatient);
   const reassessmentQueue = activePatients.filter(isReassessmentDue);
   const activeAlerts = mergeActiveAlerts(alerts, centralSnapshot);
-  const longWaitAttention = formatLongWaitAttentionForCopilot(activePatients, new Date(), emergencySettings);
+  const longWaitAttention = formatLongWaitAttentionForCopilot(
+    activePatients,
+    new Date(),
+    emergencySettings,
+  );
   const queueHealth = Array.isArray(centralSnapshot.queueHealth) ? centralSnapshot.queueHealth : [];
   const breachedQueues = queueHealth.filter((queue) => queue.breached);
   const bottleneckRegistry = centralSnapshot.bottleneckRegistry;
@@ -356,10 +365,12 @@ ${attachmentText}`
     activeBottlenecks.length
       ? [
           'Active bottleneck details:',
-          ...activeBottlenecks.slice(0, 5).map(
-            (event) =>
-              `- ${event.severity} ${event.category}: ${event.title}; service ${event.serviceName}; owner ${event.ownerRole}; fallback ${event.fallbackAction}`,
-          ),
+          ...activeBottlenecks
+            .slice(0, 5)
+            .map(
+              (event) =>
+                `- ${event.severity} ${event.category}: ${event.title}; service ${event.serviceName}; owner ${event.ownerRole}; fallback ${event.fallbackAction}`,
+            ),
         ].join('\n')
       : null,
     `Reassessment queue count: ${centralSnapshot.reassessmentStatus.due}; overdue ${centralSnapshot.reassessmentStatus.overdue}`,
@@ -372,13 +383,19 @@ ${attachmentText}`
     }),
     '',
     'Active high risk patients:',
-    highRiskPatients.length ? highRiskPatients.map((patient) => `- ${summarizePatient(patient)}`).join('\n') : '- None',
+    highRiskPatients.length
+      ? highRiskPatients.map((patient) => `- ${summarizePatient(patient)}`).join('\n')
+      : '- None',
     '',
     'Reassessment queue:',
-    reassessmentQueue.length ? reassessmentQueue.map((patient) => `- ${summarizePatient(patient)}`).join('\n') : '- None',
+    reassessmentQueue.length
+      ? reassessmentQueue.map((patient) => `- ${summarizePatient(patient)}`).join('\n')
+      : '- None',
     '',
     'Active alerts:',
-    activeAlerts.length ? activeAlerts.map((alert) => `- ${formatAlert(alert)}`).join('\n') : '- None',
+    activeAlerts.length
+      ? activeAlerts.map((alert) => `- ${formatAlert(alert)}`).join('\n')
+      : '- None',
     '',
     'Operational intelligence snapshot:',
     `- Mode: ${intelligenceSnapshot.mode}`,
@@ -403,11 +420,13 @@ ${attachmentText}`
     aiChiefVisibleScenarios?.length
       ? `AI Chief alert scenarios visible to this role: ${aiChiefVisibleScenarios.join(', ')}. Route recommendations to suggested owners; escalation roles apply when unacknowledged.`
       : null,
-  ].filter((line): line is string => Boolean(line)).join('\n');
+  ]
+    .filter((line): line is string => Boolean(line))
+    .join('\n');
 }
 
 function extractResponseText(data: unknown): string {
-  const payload = data && typeof data === 'object' ? data as Record<string, unknown> : {};
+  const payload = data && typeof data === 'object' ? (data as Record<string, unknown>) : {};
   const response = payload.response;
   if (typeof response === 'string' && response.trim()) return response;
   const message = payload.message;
@@ -501,7 +520,9 @@ export function CopilotPanel() {
   const centralSnapshot = aiChiefOrchestrator.centralSnapshot;
   const intelligenceSnapshot = aiChiefOrchestrator.intelligenceSnapshot;
   const aiChiefSnapshot = aiChiefOrchestrator.snapshot;
-  const knowledgeGraphContext = useUnifiedApplicationKnowledgeGraph({ selectedPatientId }).copilotContext;
+  const knowledgeGraphContext = useUnifiedApplicationKnowledgeGraph({
+    selectedPatientId,
+  }).copilotContext;
   const { saasRole, profileCopy } = useEffectiveUserProfile();
   const copilotChrome = useMemo(() => resolveCopilotChromeLabels(profileCopy), [profileCopy]);
   const emergencyRole = useEmergencyRolePermissions();
@@ -686,12 +707,16 @@ export function CopilotPanel() {
   }, []);
 
   useEffect(() => {
-    window.dispatchEvent(
-      new CustomEvent('ed:copilot-tab-changed', { detail: { tab: activeTab } }),
-    );
+    window.dispatchEvent(new CustomEvent('ed:copilot-tab-changed', { detail: { tab: activeTab } }));
   }, [activeTab]);
-  const highRiskCount = useMemo(() => activePatients.filter(isHighRiskPatient).length, [activePatients]);
-  const reassessmentCount = useMemo(() => activePatients.filter(isReassessmentDue).length, [activePatients]);
+  const highRiskCount = useMemo(
+    () => activePatients.filter(isHighRiskPatient).length,
+    [activePatients],
+  );
+  const reassessmentCount = useMemo(
+    () => activePatients.filter(isReassessmentDue).length,
+    [activePatients],
+  );
   const activeOperationalAlerts = useMemo(
     () => mergeActiveAlerts(alerts, centralSnapshot),
     [alerts, centralSnapshot],
@@ -733,7 +758,10 @@ export function CopilotPanel() {
     {
       label: 'Bottlenecks',
       value: `${centralSnapshot.bottleneckRegistry.analytics.activeCount}`,
-      detail: centralSnapshot.bottleneckRegistry.threeMinuteRiskProjection.status.replace(/_/g, ' '),
+      detail: centralSnapshot.bottleneckRegistry.threeMinuteRiskProjection.status.replace(
+        /_/g,
+        ' ',
+      ),
     },
   ];
 
@@ -763,12 +791,15 @@ export function CopilotPanel() {
     attachmentsRef.current = attachments;
   }, [attachments]);
 
-  useEffect(() => () => {
-    attachmentsRef.current.forEach((attachment) => {
-      if (attachment.previewUrl) URL.revokeObjectURL(attachment.previewUrl);
-    });
-    speechRecognitionRef.current?.abort?.();
-  }, []);
+  useEffect(
+    () => () => {
+      attachmentsRef.current.forEach((attachment) => {
+        if (attachment.previewUrl) URL.revokeObjectURL(attachment.previewUrl);
+      });
+      speechRecognitionRef.current?.abort?.();
+    },
+    [],
+  );
 
   const addAttachments = async (files: FileList | null) => {
     const picked = Array.from(files || []);
@@ -887,9 +918,7 @@ export function CopilotPanel() {
     }));
     const promptText =
       text ||
-      (attachmentSummary
-        ? `Review attached clinical image metadata: ${attachmentSummary}`
-        : '');
+      (attachmentSummary ? `Review attached clinical image metadata: ${attachmentSummary}` : '');
     if ((!promptText && !submittedAttachments.length) || loading) return;
 
     const staffMessage: CopilotMessage = {
@@ -935,10 +964,15 @@ export function CopilotPanel() {
       actorStaffId: 'current-user',
       source: COPILOT_PLATFORM.outputs.workflowSource,
       metadata: {
-        unifiedChannel: resolveUnifiedChannelFromRole(String(emergencyRole.role || saasRole || ''), 'api'),
+        unifiedChannel: resolveUnifiedChannelFromRole(
+          String(emergencyRole.role || saasRole || ''),
+          'api',
+        ),
         promptLength: promptText.length,
         multimodalAttachmentCount: submittedAttachments.length,
-        multimodalAttachmentTypes: submittedAttachments.map((attachment) => attachment.type).join(', '),
+        multimodalAttachmentTypes: submittedAttachments
+          .map((attachment) => attachment.type)
+          .join(', '),
         multimodalSafetyBoundary:
           submittedAttachments.length > 0
             ? 'Images are browser-preview metadata only until a reviewed vision model contract is connected.'
@@ -981,7 +1015,7 @@ export function CopilotPanel() {
     try {
       const requestMessages = [
         ...history.map((message) => ({
-          role: message.role === 'staff' ? 'user' as const : 'assistant' as const,
+          role: message.role === 'staff' ? ('user' as const) : ('assistant' as const),
           content: message.content,
         })),
         { role: 'user' as const, content: promptText },
@@ -1030,7 +1064,8 @@ export function CopilotPanel() {
             bottleneckRegistry: {
               activeBottlenecks: centralSnapshot.bottleneckRegistry.activeBottlenecks,
               serviceHealth: centralSnapshot.bottleneckRegistry.serviceHealth,
-              threeMinuteRiskProjection: centralSnapshot.bottleneckRegistry.threeMinuteRiskProjection,
+              threeMinuteRiskProjection:
+                centralSnapshot.bottleneckRegistry.threeMinuteRiskProjection,
               rootCauseSummary: centralSnapshot.bottleneckRegistry.rootCauseSummary,
             },
             reassessmentStatus: centralSnapshot.reassessmentStatus,
@@ -1064,7 +1099,9 @@ export function CopilotPanel() {
       }
 
       const responseText =
-        typeof response.content === 'string' ? response.content : extractResponseText(response.data);
+        typeof response.content === 'string'
+          ? response.content
+          : extractResponseText(response.data);
       const responsePayload =
         response.data && typeof response.data === 'object'
           ? (response.data as Record<string, unknown>)
@@ -1082,7 +1119,7 @@ export function CopilotPanel() {
       const responseSource =
         typeof (responsePayload.provenance as { responseSource?: unknown })?.responseSource ===
         'string'
-          ? ((responsePayload.provenance as { responseSource: string }).responseSource)
+          ? (responsePayload.provenance as { responseSource: string }).responseSource
           : undefined;
       await streamIntoMessage(accountable.content || responseText, assistantId, setMessages);
       setMessages((current) =>
@@ -1172,9 +1209,7 @@ export function CopilotPanel() {
       />
       <div className="ed-copilot-panel__identity">
         <span>{copilotChrome.productName}</span>
-        {copilotSurfaces.showSafetyBadge ? (
-          <strong>{SAFETY_BOUNDED_ASSISTANT_LABEL}</strong>
-        ) : null}
+        {copilotSurfaces.showSafetyBadge ? <strong>{SAFETY_BOUNDED_ASSISTANT_LABEL}</strong> : null}
       </div>
       {copilotSurfaces.showStatusStrip ? (
         <div className="ed-copilot-panel__status-strip" aria-label="Department snapshot">
@@ -1215,13 +1250,11 @@ export function CopilotPanel() {
             {message.role === 'copilot' && message.accountable ? (
               <AccountableRecommendationCard recommendation={message.accountable} compact />
             ) : (
-              message.content || (message.role === 'copilot' && loading ? <TypingIndicator /> : null)
+              message.content ||
+              (message.role === 'copilot' && loading ? <TypingIndicator /> : null)
             )}
             {message.role === 'copilot' && message.aiFoundation ? (
-              <AiRouteMetadata
-                aiFoundation={message.aiFoundation}
-                aiGateway={message.aiGateway}
-              />
+              <AiRouteMetadata aiFoundation={message.aiFoundation} aiGateway={message.aiGateway} />
             ) : null}
             {message.role === 'copilot' &&
             !message.accountable &&
@@ -1238,10 +1271,14 @@ export function CopilotPanel() {
                 compact
               />
             ) : null}
-            {message.role === 'copilot' && message.id !== 'copilot-welcome' && message.aiFoundation ? (
+            {message.role === 'copilot' &&
+            message.id !== 'copilot-welcome' &&
+            message.aiFoundation ? (
               <AiFeedbackControl
                 runId={
-                  typeof message.aiFoundation.runId === 'string' ? message.aiFoundation.runId : undefined
+                  typeof message.aiFoundation.runId === 'string'
+                    ? message.aiFoundation.runId
+                    : undefined
                 }
                 capabilityId={
                   typeof message.aiFoundation.capabilityId === 'string'
@@ -1313,23 +1350,25 @@ export function CopilotPanel() {
             {copilotRecommendations
               .slice(0, COPILOT_PLATFORM.ui.contextRecommendationPreviewLimit)
               .map((recommendation) => (
-              <button
-                key={recommendation.id}
-                type="button"
-                className="ed-copilot-panel__recommendation"
-                data-domain={recommendation.domain}
-                data-severity={recommendation.severity}
-                title={recommendation.detail}
-                onClick={() => openRecommendation(recommendation.route)}
-                disabled={loading}
-              >
-                <span>{recommendation.domain}</span>
-                <strong>{recommendation.action}</strong>
-              </button>
-            ))}
+                <button
+                  key={recommendation.id}
+                  type="button"
+                  className="ed-copilot-panel__recommendation"
+                  data-domain={recommendation.domain}
+                  data-severity={recommendation.severity}
+                  title={recommendation.detail}
+                  onClick={() => openRecommendation(recommendation.route)}
+                  disabled={loading}
+                >
+                  <span>{recommendation.domain}</span>
+                  <strong>{recommendation.action}</strong>
+                </button>
+              ))}
           </div>
         ) : (
-          <p className="ed-copilot-panel__recommendations-empty">No department actions flagged right now.</p>
+          <p className="ed-copilot-panel__recommendations-empty">
+            No department actions flagged right now.
+          </p>
         )}
         <div className="ed-copilot-panel__awareness-grid">
           {awarenessCards.map((card) => (
@@ -1376,7 +1415,12 @@ export function CopilotPanel() {
           </button>
         ) : null}
         {quickActions.slice(0, quickActionLimit).map((action) => (
-          <button key={action} type="button" onClick={() => sendQuickAction(action)} disabled={loading}>
+          <button
+            key={action}
+            type="button"
+            onClick={() => sendQuickAction(action)}
+            disabled={loading}
+          >
             {action}
           </button>
         ))}
@@ -1385,26 +1429,30 @@ export function CopilotPanel() {
       {copilotSurfaces.showOrchestrationActions &&
       selectedPatient &&
       (patientOrchestration?.prioritizedRecommendations?.length ?? 0) > 0 ? (
-        <div className="ed-copilot-panel__tool-actions" role="toolbar" aria-label="Patient tool shortcuts">
+        <div
+          className="ed-copilot-panel__tool-actions"
+          role="toolbar"
+          aria-label="Patient tool shortcuts"
+        >
           {(patientOrchestration?.prioritizedRecommendations ?? [])
             .slice(0, COPILOT_PLATFORM.ui.orchestrationActionPreviewLimit)
             .map((recommendation) => (
-            <button
-              key={recommendation.id}
-              type="button"
-              onClick={() =>
-                launchOrchestrationRecommendation({
-                  patientId: selectedPatient.id,
-                  recommendation,
-                })
-              }
-              disabled={loading || recommendation.completed}
-              data-copilot-tool-action={recommendation.toolId}
-              aria-label={`Open ${recommendation.label} for selected patient`}
-            >
-              {recommendation.label}
-            </button>
-          ))}
+              <button
+                key={recommendation.id}
+                type="button"
+                onClick={() =>
+                  launchOrchestrationRecommendation({
+                    patientId: selectedPatient.id,
+                    recommendation,
+                  })
+                }
+                disabled={loading || recommendation.completed}
+                data-copilot-tool-action={recommendation.toolId}
+                aria-label={`Open ${recommendation.label} for selected patient`}
+              >
+                {recommendation.label}
+              </button>
+            ))}
         </div>
       ) : null}
 
@@ -1441,7 +1489,10 @@ export function CopilotPanel() {
         </div>
       ) : null}
 
-      <form onSubmit={submitMessage} className="ed-copilot-panel__composer ed-copilot-panel__composer--raised">
+      <form
+        onSubmit={submitMessage}
+        className="ed-copilot-panel__composer ed-copilot-panel__composer--raised"
+      >
         {copilotSurfaces.showMultimodalInput ? (
           <div
             className="ed-copilot-panel__composer-tools"
@@ -1450,7 +1501,10 @@ export function CopilotPanel() {
             <input
               ref={fileInputRef}
               type="file"
-              accept={[`${COPILOT_PLATFORM.inputs.multimodal.acceptedMimePrefix}*`, ...ACCEPTED_TEXT_EXTENSIONS].join(',')}
+              accept={[
+                `${COPILOT_PLATFORM.inputs.multimodal.acceptedMimePrefix}*`,
+                ...ACCEPTED_TEXT_EXTENSIONS,
+              ].join(',')}
               multiple
               className="ed-copilot-panel__file-input"
               onChange={(event) => void addAttachments(event.target.files)}
@@ -1522,11 +1576,7 @@ export function CopilotPanel() {
       tabs.push({ id: 'safety', label: 'Safety' });
     }
     return tabs;
-  }, [
-    contextBadgeCount,
-    copilotSurfaces.showContextTab,
-    copilotSurfaces.showSafetyTab,
-  ]);
+  }, [contextBadgeCount, copilotSurfaces.showContextTab, copilotSurfaces.showSafetyTab]);
 
   useEffect(() => {
     if (!copilotTabs.some((tab) => tab.id === activeTab)) {

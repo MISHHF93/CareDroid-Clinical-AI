@@ -61,9 +61,9 @@ const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
 const patternsSource = readFileSync(
   join(
     __dirname,
-    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts'
+    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts',
   ),
-  'utf8'
+  'utf8',
 );
 const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.tsx'), 'utf8');
 
@@ -124,10 +124,13 @@ describe('PR-FLEET consistency — registry IDs and archived routes', () => {
     expect(appSource).not.toContain(`path: '/tools/calculators/${id}'`);
   });
 
-  it.each(PR_FLEET_TIER_B_IDS)('%s has no dedicated /fleet or /tools/calculators/<id> App route', (id) => {
-    expect(appSource).not.toContain(`path: '/tools/calculators/${id}'`);
-    expect(appSource).not.toContain(`path: '/fleet/${id}'`);
-  });
+  it.each(PR_FLEET_TIER_B_IDS)(
+    '%s has no dedicated /fleet or /tools/calculators/<id> App route',
+    (id) => {
+      expect(appSource).not.toContain(`path: '/tools/calculators/${id}'`);
+      expect(appSource).not.toContain(`path: '/fleet/${id}'`);
+    },
+  );
 });
 
 describe('PR-FLEET consistency — NLU and orchestrator maps', () => {
@@ -183,7 +186,7 @@ describe('PR-FLEET consistency — aliases (no orphans or conflicts)', () => {
     for (const [alias, canonical] of PR_FLEET_ALL_ALIAS_PAIRS) {
       if (targetByAlias.has(alias) && targetByAlias.get(alias) !== canonical) {
         throw new Error(
-          `Conflicting PR-FLEET alias "${alias}": ${targetByAlias.get(alias)} vs ${canonical}`
+          `Conflicting PR-FLEET alias "${alias}": ${targetByAlias.get(alias)} vs ${canonical}`,
         );
       }
       targetByAlias.set(alias, canonical);
@@ -255,7 +258,9 @@ describe('PR-FLEET consistency — launch behavior', () => {
     expect(NLU_TO_REGISTRY_ID.dispatch).toBe('dispatch-ai');
     expect(resolveRegistryId('dispatch')).toBe('dispatch-ai');
     expect(
-      PR_FLEET_REQUIRED_NLU_ALIAS_PAIRS.some(([alias, canonical]) => alias === 'dispatch' && canonical === 'dispatch-ai')
+      PR_FLEET_REQUIRED_NLU_ALIAS_PAIRS.some(
+        ([alias, canonical]) => alias === 'dispatch' && canonical === 'dispatch-ai',
+      ),
     ).toBe(true);
   });
 });
@@ -282,7 +287,7 @@ describe('PR-FLEET consistency — resolveCatalogLaunch', () => {
       expect(fromAlias.registryId).toBe(canonical);
       expect(fromAlias.path).toBe(fromCanonical.path);
       expect(fromAlias.chatSeed).toBe(fromCanonical.chatSeed);
-    }
+    },
   );
 });
 
@@ -303,14 +308,11 @@ describe('PR-FLEET consistency — catalog rows and discovery', () => {
     expect(row.category).toBe('fleet');
   });
 
-  it.each(PR_FLEET_CATALOG_SEARCH_QUERIES)(
-    'catalog search "%s" finds %s',
-    (canonical, query) => {
-      const rows = getMedicalToolsCatalogRows();
-      const hits = catalogRowsMatchingQuery(rows, query);
-      expect(hits.some((r) => r.primaryId === canonical)).toBe(true);
-    }
-  );
+  it.each(PR_FLEET_CATALOG_SEARCH_QUERIES)('catalog search "%s" finds %s', (canonical, query) => {
+    const rows = getMedicalToolsCatalogRows();
+    const hits = catalogRowsMatchingQuery(rows, query);
+    expect(hits.some((r) => r.primaryId === canonical)).toBe(true);
+  });
 
   it.each(PR_FLEET_TOOL_IDS)('discovery merges %s at least once', (id) => {
     const merged = getAllDiscoveredTools();
@@ -321,7 +323,9 @@ describe('PR-FLEET consistency — catalog rows and discovery', () => {
 
 describe('PR-FLEET consistency — sidebar visibility', () => {
   it('lists each fleet tool exactly once in toolRegistry', () => {
-    const rows = toolRegistry.filter((t) => (PR_FLEET_TOOL_IDS as readonly string[]).includes(t.id));
+    const rows = toolRegistry.filter((t) =>
+      (PR_FLEET_TOOL_IDS as readonly string[]).includes(t.id),
+    );
     expect(rows).toHaveLength(PR_FLEET_TOOL_IDS.length);
     for (const id of PR_FLEET_TOOL_IDS) {
       expect(toolRegistryById[id]?.id).toBe(id);

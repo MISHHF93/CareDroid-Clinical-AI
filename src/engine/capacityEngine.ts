@@ -13,7 +13,6 @@ import {
 import { calculateEmergencyOsCapacity } from '../../lib/emergency-os/logic';
 import { hasPatientFlag as patientHasFlag } from '../utils/patientVitals';
 
-
 type CrisisBand = 'Orange' | 'Red';
 type TimestampSource = 'timeline' | 'lastAssessedTime' | 'arrivalTime' | 'unknown';
 
@@ -77,14 +76,12 @@ export type CapacityCrisisInput = {
 export function calculateCapacity(): CapacitySnapshot {
   const { patients, rooms, thresholds } = useEmergencyStore.getState();
 
-  const total = patients.filter(p =>
-    ![PatientState.Discharge].includes(p.state)).length;
-  const boarding = patients.filter(p =>
-    p.state === PatientState.Admission).length;
+  const total = patients.filter((p) => ![PatientState.Discharge].includes(p.state)).length;
+  const boarding = patients.filter((p) => p.state === PatientState.Admission).length;
   const reassessmentDue = patients.filter((p) =>
-    hasPatientFlag(p, PatientFlag.ReassessmentDue)).length;
-  const occupied = rooms.filter(r =>
-    r.status === 'Occupied').length;
+    hasPatientFlag(p, PatientFlag.ReassessmentDue),
+  ).length;
+  const occupied = rooms.filter((r) => r.status === 'Occupied').length;
   const maxRooms = rooms.length || 15;
   const result = calculateEmergencyOsCapacity({
     totalPatients: total,
@@ -93,7 +90,8 @@ export function calculateCapacity(): CapacitySnapshot {
     boardingCount: boarding,
     reassessmentDue,
     waitingCount: patients.filter((patient) => patient.state === PatientState.Waiting).length,
-    dischargeReadyCount: patients.filter((patient) => patient.state === PatientState.Disposition).length,
+    dischargeReadyCount: patients.filter((patient) => patient.state === PatientState.Disposition)
+      .length,
     criticalEmsInboundCount: patients.filter(
       (patient) =>
         hasPatientFlag(patient, PatientFlag.EMSArrival) &&
@@ -130,7 +128,9 @@ export function calculateCapacity(): CapacitySnapshot {
   };
 }
 
-export function isCapacityCrisis(capacity?: Pick<CapacitySnapshot, 'band' | 'riskLevel'> | null): boolean {
+export function isCapacityCrisis(
+  capacity?: Pick<CapacitySnapshot, 'band' | 'riskLevel'> | null,
+): boolean {
   return crisisBand(capacity) !== null;
 }
 
@@ -144,10 +144,17 @@ export function deriveCapacityCrisisState(input: CapacityCrisisInput = {}): Capa
   const boardingPatients = deriveBoardingPatients(patients, referrals, now);
   const dischargeReady = deriveDischargeReadyPatients(patients, now);
   const reassessmentQueue = Math.max(
-    numericCapacityValue(capacity, ['reassessmentQueueLength', 'reassessmentDueCount', 'reassessmentDue']),
+    numericCapacityValue(capacity, [
+      'reassessmentQueueLength',
+      'reassessmentDueCount',
+      'reassessmentDue',
+    ]),
     patients.filter((patient) => hasPatientFlag(patient, PatientFlag.ReassessmentDue)).length,
   );
-  const criticalEmsInbound = deriveCriticalEmsInbound(input.emsArrivals || [], input.emsIncomingPatients || []);
+  const criticalEmsInbound = deriveCriticalEmsInbound(
+    input.emsArrivals || [],
+    input.emsIncomingPatients || [],
+  );
   const factors = deriveCapacityCrisisBreakdown({
     capacity,
     patients,
@@ -195,17 +202,25 @@ export function deriveCapacityCrisisBreakdown(input: {
   const rooms = input.rooms || [];
   const boardingCount = input.boardingPatients?.length ?? patients.filter(isBoardingPatient).length;
   const dischargeReadyCount =
-    input.dischargeReady?.length ?? patients.filter((patient) => patient.state === PatientState.Disposition).length;
+    input.dischargeReady?.length ??
+    patients.filter((patient) => patient.state === PatientState.Disposition).length;
   const reassessmentQueue =
-    input.reassessmentQueue ?? Math.max(numericCapacityValue(capacity, ['reassessmentDueCount', 'reassessmentDue']), 0);
+    input.reassessmentQueue ??
+    Math.max(numericCapacityValue(capacity, ['reassessmentDueCount', 'reassessmentDue']), 0);
   const criticalEmsCount =
-    input.criticalEmsInbound?.length ?? numericCapacityValue(capacity, ['incomingEMSCriticalCount']);
+    input.criticalEmsInbound?.length ??
+    numericCapacityValue(capacity, ['incomingEMSCriticalCount']);
   const occupancyPct = occupancyPercent(capacity, rooms);
   const { thresholds } = useEmergencyStore.getState();
   const occupancyOrangePct = thresholds.capacityOrangePct * 100;
 
   const fallbackFactors: CapacityCrisisFactor[] = [
-    buildFactor('boarding', 'Boarding', `${boardingCount} patient${boardingCount === 1 ? '' : 's'}`, boardingCount * 8),
+    buildFactor(
+      'boarding',
+      'Boarding',
+      `${boardingCount} patient${boardingCount === 1 ? '' : 's'}`,
+      boardingCount * 8,
+    ),
     buildFactor(
       'occupancy',
       'Room occupancy',
@@ -224,12 +239,7 @@ export function deriveCapacityCrisisBreakdown(input: {
       `${dischargeReadyCount} discharge-ready`,
       dischargeReadyCount * 5,
     ),
-    buildFactor(
-      'ems',
-      'Critical EMS inbound',
-      `${criticalEmsCount} inbound`,
-      criticalEmsCount * 6,
-    ),
+    buildFactor('ems', 'Critical EMS inbound', `${criticalEmsCount} inbound`, criticalEmsCount * 6),
   ];
 
   return fallbackFactors.map((factor) => mergeSnapshotDeduction(factor, capacity));
@@ -247,7 +257,7 @@ export function startCapacityEngine() {
     if (snapshot.band === 'Orange' || snapshot.band === 'Red') {
       dispatchAlert({
         id: 'cap-' + Date.now(),
-        severity: snapshot.band === 'Red' ? 'Critical':'Warning',
+        severity: snapshot.band === 'Red' ? 'Critical' : 'Warning',
         title: 'Capacity ' + snapshot.band,
         message: `Score ${snapshot.score} — ${snapshot.band} zone`,
         source: 'capacity-engine',
@@ -258,12 +268,18 @@ export function startCapacityEngine() {
   return window.setInterval(update, 30000);
 }
 
-function crisisBand(capacity?: Pick<CapacitySnapshot, 'band' | 'riskLevel'> | null): CrisisBand | null {
+function crisisBand(
+  capacity?: Pick<CapacitySnapshot, 'band' | 'riskLevel'> | null,
+): CrisisBand | null {
   const band = capacity?.band || capacity?.riskLevel;
   return band === 'Orange' || band === 'Red' ? band : null;
 }
 
-function deriveBoardingPatients(patients: Patient[], referrals: Referral[], now: Date): CapacityCrisisBoardingPatient[] {
+function deriveBoardingPatients(
+  patients: Patient[],
+  referrals: Referral[],
+  now: Date,
+): CapacityCrisisBoardingPatient[] {
   return patients.filter(isBoardingPatient).map((patient) => {
     const timestamp = latestStateTimestamp(patient, PatientState.Admission);
     return {
@@ -276,7 +292,10 @@ function deriveBoardingPatients(patients: Patient[], referrals: Referral[], now:
   });
 }
 
-function deriveDischargeReadyPatients(patients: Patient[], now: Date): CapacityCrisisDischargePatient[] {
+function deriveDischargeReadyPatients(
+  patients: Patient[],
+  now: Date,
+): CapacityCrisisDischargePatient[] {
   return patients
     .filter((patient) => patient.state === PatientState.Disposition)
     .map((patient) => {
@@ -293,26 +312,40 @@ function deriveDischargeReadyPatients(patients: Patient[], now: Date): CapacityC
 }
 
 function isBoardingPatient(patient: Patient): boolean {
-  return patient.state === PatientState.Admission || hasPatientFlag(patient, PatientFlag.PendingAdmission);
+  return (
+    patient.state === PatientState.Admission ||
+    hasPatientFlag(patient, PatientFlag.PendingAdmission)
+  );
 }
 
 function hasPatientFlag(patient: Patient, flag: PatientFlag): boolean {
   return patientHasFlag(patient, flag);
 }
 
-function latestStateTimestamp(patient: Patient, state: PatientState): { value: string; source: TimestampSource } {
+function latestStateTimestamp(
+  patient: Patient,
+  state: PatientState,
+): { value: string; source: TimestampSource } {
   const timelineEvent = [...(patient.timeline || [])].reverse().find((event) => {
     const metadataToState = event.metadata?.toState;
-    return event.to === state || event.toState === state || metadataToState === state || event.summary?.includes(state);
+    return (
+      event.to === state ||
+      event.toState === state ||
+      metadataToState === state ||
+      event.summary?.includes(state)
+    );
   });
   if (timelineEvent?.timestamp) return { value: timelineEvent.timestamp, source: 'timeline' };
-  if (patient.lastAssessedTime) return { value: patient.lastAssessedTime, source: 'lastAssessedTime' };
+  if (patient.lastAssessedTime)
+    return { value: patient.lastAssessedTime, source: 'lastAssessedTime' };
   if (patient.arrivalTime) return { value: patient.arrivalTime, source: 'arrivalTime' };
   return { value: new Date(0).toISOString(), source: 'unknown' };
 }
 
 function patientDisplayName(patient: Patient): string {
-  return patient.name || [patient.firstName, patient.lastName].filter(Boolean).join(' ') || patient.id;
+  return (
+    patient.name || [patient.firstName, patient.lastName].filter(Boolean).join(' ') || patient.id
+  );
 }
 
 function targetDepartment(patient: Patient, referrals: Referral[]): string {
@@ -338,19 +371,36 @@ function deriveCriticalEmsInbound(
   const arrivals = emsArrivals
     .filter((arrival) => isActiveCriticalEms(arrival))
     .map((arrival) => ({
-      id: String(arrival.id || arrival.unitId || `ems-${arrival.unitName || arrival.unitNumber || 'arrival'}`),
+      id: String(
+        arrival.id ||
+          arrival.unitId ||
+          `ems-${arrival.unitName || arrival.unitNumber || 'arrival'}`,
+      ),
       label: String(arrival.unitName || arrival.unitNumber || arrival.id || 'EMS inbound'),
       etaMinutes: numberValue(arrival.eta ?? arrival.etaMinutes),
-      complaint: String(arrival.chiefComplaint || arrival.prearrivalComplaint || arrival.complaint || 'Complaint unavailable'),
+      complaint: String(
+        arrival.chiefComplaint ||
+          arrival.prearrivalComplaint ||
+          arrival.complaint ||
+          'Complaint unavailable',
+      ),
       severity: String(arrival.severity || arrival.priority || arrival.acuity || 'Critical'),
     }));
   const incoming = emsIncomingPatients
     .filter((arrival) => isActiveCriticalEms(arrival))
     .map((arrival, index) => ({
       id: String(arrival.id || `ems-incoming-${index}`),
-      label: String(arrival.unitName || arrival.unitNumber || arrival.callSign || arrival.id || 'EMS inbound'),
+      label: String(
+        arrival.unitName || arrival.unitNumber || arrival.callSign || arrival.id || 'EMS inbound',
+      ),
       etaMinutes: numberValue(arrival.eta ?? arrival.etaMinutes ?? arrival.etaMins),
-      complaint: String(arrival.chiefComplaint || arrival.prearrivalComplaint || arrival.complaint || arrival.reason || 'Complaint unavailable'),
+      complaint: String(
+        arrival.chiefComplaint ||
+          arrival.prearrivalComplaint ||
+          arrival.complaint ||
+          arrival.reason ||
+          'Complaint unavailable',
+      ),
       severity: String(arrival.severity || arrival.priority || arrival.acuity || 'Critical'),
     }));
 
@@ -359,7 +409,9 @@ function deriveCriticalEmsInbound(
 
 function isActiveCriticalEms(arrival: Record<string, unknown>): boolean {
   const status = String(arrival.status || 'Inbound');
-  const severity = String(arrival.severity || arrival.priority || arrival.acuity || '').toLowerCase();
+  const severity = String(
+    arrival.severity || arrival.priority || arrival.acuity || '',
+  ).toLowerCase();
   const isActive = ACTIVE_CRITICAL_EMS_STATUSES.has(status);
   const isCritical =
     severity === 'critical' ||
@@ -386,7 +438,10 @@ function occupancyPercent(capacity: CapacitySnapshot | null | undefined, rooms: 
   return 0;
 }
 
-function numericCapacityValue(capacity: CapacitySnapshot | null | undefined, keys: Array<keyof CapacitySnapshot>): number {
+function numericCapacityValue(
+  capacity: CapacitySnapshot | null | undefined,
+  keys: Array<keyof CapacitySnapshot>,
+): number {
   for (const key of keys) {
     const value = capacity?.[key];
     if (typeof value === 'number' && Number.isFinite(value)) return value;
@@ -420,7 +475,10 @@ function buildFactor(
   };
 }
 
-function mergeSnapshotDeduction(factor: CapacityCrisisFactor, capacity?: CapacitySnapshot | null): CapacityCrisisFactor {
+function mergeSnapshotDeduction(
+  factor: CapacityCrisisFactor,
+  capacity?: CapacitySnapshot | null,
+): CapacityCrisisFactor {
   const deduction = capacity?.deductions?.find((item) =>
     `${item.id} ${item.label}`.toLowerCase().includes(factor.id === 'ems' ? 'ems' : factor.id),
   );

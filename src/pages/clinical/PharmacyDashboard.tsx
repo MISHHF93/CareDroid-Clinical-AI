@@ -22,8 +22,13 @@ export default function PharmacyDashboard() {
         <div className="pharmacy-page__title-row">
           <GraphicIconBadge iconKey="pharmacy" accent="brand" size="md" />
           <div>
-            <p className="pharmacy-page-title-text" data-testid="cd-page-title-text">Pharmacy</p>
-            <p>Medication safety review for this organization — drug-interaction and allergy cross-reactivity checking.</p>
+            <p className="pharmacy-page-title-text" data-testid="cd-page-title-text">
+              Pharmacy
+            </p>
+            <p>
+              Medication safety review for this organization — drug-interaction and allergy
+              cross-reactivity checking.
+            </p>
           </div>
         </div>
         <div className="pharmacy-page__actions">

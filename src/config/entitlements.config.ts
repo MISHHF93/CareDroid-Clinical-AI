@@ -56,10 +56,7 @@ export const ENTITLEMENT_REGISTRY = Object.freeze([
     requiredPackIds: ['research-education'],
   },
   {
-    assetIds: [
-      'automation-news2-clinician-notification',
-      'automation-potassium-lab-workflow',
-    ],
+    assetIds: ['automation-news2-clinician-notification', 'automation-potassium-lab-workflow'],
     category: ENTITLEMENT_CATEGORIES.AUTOMATIONS,
     featureFlagId: 'clinical-tools-core',
     requiredPlan: SUBSCRIPTION_TIERS.PROFESSIONAL,
@@ -73,10 +70,7 @@ export const ENTITLEMENT_REGISTRY = Object.freeze([
     requiredPackIds: ['medical-iot-pack'],
   },
   {
-    assetIds: [
-      'automation-audit-event-review',
-      'automation-integration-unsupported-labeling',
-    ],
+    assetIds: ['automation-audit-event-review', 'automation-integration-unsupported-labeling'],
     category: ENTITLEMENT_CATEGORIES.AUTOMATIONS,
     featureFlagId: 'ai-governance-center',
     requiredPlan: SUBSCRIPTION_TIERS.INSTITUTIONAL,
@@ -97,7 +91,13 @@ export const ENTITLEMENT_REGISTRY = Object.freeze([
     requiredPackIds: ['hospital-operations'],
   },
   {
-    assetIds: ['fleet-dashboard', 'fleet-live-map', 'route-optimizer', 'predictive-maintenance', 'dispatch-ai'],
+    assetIds: [
+      'fleet-dashboard',
+      'fleet-live-map',
+      'route-optimizer',
+      'predictive-maintenance',
+      'dispatch-ai',
+    ],
     category: ENTITLEMENT_CATEGORIES.FLEET,
     featureFlagId: 'fleet-command',
     requiredPlan: SUBSCRIPTION_TIERS.PROFESSIONAL,
@@ -130,7 +130,14 @@ export const ENTITLEMENT_REGISTRY = Object.freeze([
     requiredPackIds: ['emergency-department-pack'],
   },
   {
-    assetIds: ['agent-clinical', 'agent-operations', 'agent-lab', 'agent-fleet', 'agent-education', 'agent-research'],
+    assetIds: [
+      'agent-clinical',
+      'agent-operations',
+      'agent-lab',
+      'agent-fleet',
+      'agent-education',
+      'agent-research',
+    ],
     category: ENTITLEMENT_CATEGORIES.AI_AGENTS,
     featureFlagId: 'ai-clinical-copilot',
     requiredPlan: SUBSCRIPTION_TIERS.PROFESSIONAL,

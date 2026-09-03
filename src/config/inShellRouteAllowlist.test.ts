@@ -28,12 +28,10 @@ describe('inShellRouteAllowlist', () => {
     expect(isInShellRoute(path)).toBe(true);
   });
 
-  it.each([
-    '/cosmos',
-    '/surveillance',
-    '/digital-twin',
-    '/vehicle',
-  ])('does not treat retired extension %s as in-shell', (path) => {
-    expect(isInShellRoute(path)).toBe(false);
-  });
+  it.each(['/cosmos', '/surveillance', '/digital-twin', '/vehicle'])(
+    'does not treat retired extension %s as in-shell',
+    (path) => {
+      expect(isInShellRoute(path)).toBe(false);
+    },
+  );
 });

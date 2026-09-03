@@ -3,8 +3,19 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import NEWS2 from './NEWS2';
 import { hasPatientFlag, useEmergencyStore } from '../../store/emergencyStore';
-import { PatientFlag, PatientState, Priority, type Patient, type Vitals } from '../../types/emergency';
-import { calculateNews2FromVitals, news2Response, scoreNews2, valueFromVitals } from '../../utils/news2';
+import {
+  PatientFlag,
+  PatientState,
+  Priority,
+  type Patient,
+  type Vitals,
+} from '../../types/emergency';
+import {
+  calculateNews2FromVitals,
+  news2Response,
+  scoreNews2,
+  valueFromVitals,
+} from '../../utils/news2';
 
 vi.mock('sonner', () => ({
   toast: Object.assign(vi.fn(), {
@@ -57,23 +68,26 @@ function seedPatient() {
 }
 
 function seedHighRiskPatient() {
-  useEmergencyStore.setState({
-    ...originalState,
-    patients: [
-      {
-        ...patient,
-        vitals: [
-          {
-            ...stableVitals,
-            rr: 30,
-            spo2: 90,
-            sbp: 86,
-          },
-        ],
-      },
-    ],
-    alerts: [],
-  }, true);
+  useEmergencyStore.setState(
+    {
+      ...originalState,
+      patients: [
+        {
+          ...patient,
+          vitals: [
+            {
+              ...stableVitals,
+              rr: 30,
+              spo2: 90,
+              sbp: 86,
+            },
+          ],
+        },
+      ],
+      alerts: [],
+    },
+    true,
+  );
 }
 
 describe('NEWS2 calculator and auto scoring', () => {

@@ -8,7 +8,12 @@ import { listActionProposalsApi } from './actionProposalApi';
 import { listWorkflowAiCards } from './workflowAiCards';
 import { countInboxComments, getInboxAssignment } from './inboxCollaboration';
 
-export type InboxItemKind = 'proposal' | 'workflow_card' | 'human_review' | 'failed_action' | 'draft';
+export type InboxItemKind =
+  | 'proposal'
+  | 'workflow_card'
+  | 'human_review'
+  | 'failed_action'
+  | 'draft';
 
 export type InteractionInboxItem = {
   id: string;

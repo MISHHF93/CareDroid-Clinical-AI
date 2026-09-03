@@ -66,13 +66,7 @@ class ExportService {
     this.registerTemplate('budget_analysis', {
       name: 'Budget Analysis Report',
       description: 'Budget utilization and forecasting',
-      metrics: [
-        'budgetUtilization',
-        'costTrends',
-        'projectedCosts',
-        'riskAssessment',
-        'alerts',
-      ],
+      metrics: ['budgetUtilization', 'costTrends', 'projectedCosts', 'riskAssessment', 'alerts'],
       formats: ['csv', 'pdf', 'xlsx'],
     });
 
@@ -148,17 +142,14 @@ class ExportService {
         },
       };
 
-      const response = await fetch(
-        `${this.apiBaseUrl}/exports/pdf`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${this.token}`,
-          },
-          body: JSON.stringify(payload),
-        }
-      );
+      const response = await fetch(`${this.apiBaseUrl}/exports/pdf`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.token}`,
+        },
+        body: JSON.stringify(payload),
+      });
 
       if (!response.ok) {
         throw new Error(`PDF export failed: ${response.status}`);
@@ -199,17 +190,14 @@ class ExportService {
         },
       };
 
-      const response = await fetch(
-        `${this.apiBaseUrl}/exports/excel`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${this.token}`,
-          },
-          body: JSON.stringify(payload),
-        }
-      );
+      const response = await fetch(`${this.apiBaseUrl}/exports/excel`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.token}`,
+        },
+        body: JSON.stringify(payload),
+      });
 
       if (!response.ok) {
         throw new Error(`Excel export failed: ${response.status}`);
@@ -268,30 +256,28 @@ class ExportService {
         endpoint: '/api/reports/generate',
       });
       const filename = `${templateId}-${Date.now()}.json`;
-      return this.downloadFile(JSON.stringify((fallback.data as any)?.report, null, 2), filename, 'application/json');
+      return this.downloadFile(
+        JSON.stringify((fallback.data as any)?.report, null, 2),
+        filename,
+        'application/json',
+      );
     }
 
     try {
-
-      const response = await fetch(
-        `${this.apiBaseUrl}/reports/generate`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${this.token}`,
-          },
-          body: JSON.stringify(payload),
-        }
-      );
+      const response = await fetch(`${this.apiBaseUrl}/reports/generate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.token}`,
+        },
+        body: JSON.stringify(payload),
+      });
 
       if (!response.ok) {
         throw new Error(`Report generation failed: ${response.status}`);
       }
 
-      const filename = `${templateId}-${Date.now()}.${this.getExtension(
-        format
-      )}`;
+      const filename = `${templateId}-${Date.now()}.${this.getExtension(format)}`;
       const blob = await response.blob();
       return this.downloadBlob(blob, filename);
     } catch (error: any) {
@@ -340,17 +326,14 @@ class ExportService {
     }
 
     try {
-      const response = await fetch(
-        `${this.apiBaseUrl}/reports/schedule`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${this.token}`,
-          },
-          body: JSON.stringify(scheduledReport),
-        }
-      );
+      const response = await fetch(`${this.apiBaseUrl}/reports/schedule`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.token}`,
+        },
+        body: JSON.stringify(scheduledReport),
+      });
 
       if (!response.ok) {
         throw new Error(`Schedule creation failed: ${response.status}`);
@@ -382,8 +365,7 @@ class ExportService {
         nextRun.setDate(nextRun.getDate() + 1);
         break;
       case 'weekly': {
-        const daysUntilDay =
-          ((schedule.dayOfWeek || 0) - nextRun.getDay() + 7) % 7;
+        const daysUntilDay = ((schedule.dayOfWeek || 0) - nextRun.getDay() + 7) % 7;
         nextRun.setDate(nextRun.getDate() + (daysUntilDay || 7));
         break;
       }
@@ -427,20 +409,15 @@ class ExportService {
     }
 
     try {
-      const response = await fetch(
-        `${this.apiBaseUrl}/reports/schedule/${reportId}`,
-        {
-          method: 'DELETE',
-          headers: {
-            Authorization: `Bearer ${this.token}`,
-          },
-        }
-      );
+      const response = await fetch(`${this.apiBaseUrl}/reports/schedule/${reportId}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+        },
+      });
 
       if (response.ok) {
-        this.scheduledReports = this.scheduledReports.filter(
-          (r) => r.id !== reportId
-        );
+        this.scheduledReports = this.scheduledReports.filter((r) => r.id !== reportId);
         return true;
       }
     } catch (error: any) {
@@ -464,9 +441,7 @@ class ExportService {
     }
 
     const headers = Object.keys(data[0]);
-    const csvHeaders = headers
-      .map((h) => `"${h}"`)
-      .join(',');
+    const csvHeaders = headers.map((h) => `"${h}"`).join(',');
 
     const csvRows = data
       .map((row) =>
@@ -481,7 +456,7 @@ class ExportService {
             }
             return value;
           })
-          .join(',')
+          .join(','),
       )
       .join('\n');
 
@@ -533,8 +508,7 @@ class ExportService {
       queueLength: this.exportQueue.length,
       templatesCount: this.reportTemplates.size,
       scheduledReportsCount: this.scheduledReports.length,
-      activeSchedules: this.scheduledReports.filter((r) => r.status === 'active')
-        .length,
+      activeSchedules: this.scheduledReports.filter((r) => r.status === 'active').length,
     };
   }
 }

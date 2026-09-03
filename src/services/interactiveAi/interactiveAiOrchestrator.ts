@@ -56,8 +56,7 @@ export async function runInteractiveAssist(
   input: InteractiveAssistRequest,
 ): Promise<InteractiveAssistResult> {
   const ids = createClientIds();
-  const channel =
-    input.channel || resolveUnifiedChannelFromRole(input.role, 'api');
+  const channel = input.channel || resolveUnifiedChannelFromRole(input.role, 'api');
   const controller = createStreamProgressController({
     requestId: ids.requestId,
     correlationId: ids.correlationId,
@@ -205,7 +204,9 @@ export async function runInteractiveAssist(
 
     let proposal: AIActionProposal | undefined;
     if (shouldOfferFollowUpProposal(input.query, channel)) {
-      proposal = await createActionProposalApi(buildFollowUpProposal(ids, input, channel, accountable));
+      proposal = await createActionProposalApi(
+        buildFollowUpProposal(ids, input, channel, accountable),
+      );
       controller.advance(
         'awaiting_human_approval',
         'Optional follow-up action proposed — human approval required',
@@ -233,7 +234,10 @@ export async function runInteractiveAssist(
     const message = error instanceof Error ? error.message : String(error);
     controller.fail(message);
     const accountable = accountableFromGatewayPayload(
-      { content: `Assist unavailable: ${message}`, safety: { status: 'degraded', reasons: [message] } },
+      {
+        content: `Assist unavailable: ${message}`,
+        safety: { status: 'degraded', reasons: [message] },
+      },
       message,
     );
     return {
@@ -254,10 +258,7 @@ export function triggerWorkflowCard(event: WorkflowTriggerEvent): WorkflowAiCard
   return buildWorkflowAiCard(event);
 }
 
-function buildPrompts(
-  channel: string,
-  input: InteractiveAssistRequest,
-): SuggestedPrompt[] {
+function buildPrompts(channel: string, input: InteractiveAssistRequest): SuggestedPrompt[] {
   const ctx: SuggestedPromptContext = {
     channel,
     role: input.role,
@@ -265,8 +266,7 @@ function buildPrompts(
     hasPatient: Boolean(input.patientId),
     hasEmsArrival: channel === 'ems',
     hasOcrJob: input.contextItems?.some((c) => c.kind === 'ocr_extraction'),
-    missingRegistrationFields:
-      channel === 'reception' ? ['insurance', 'next_of_kin'] : undefined,
+    missingRegistrationFields: channel === 'reception' ? ['insurance', 'next_of_kin'] : undefined,
   };
   return getSuggestedPrompts(ctx);
 }

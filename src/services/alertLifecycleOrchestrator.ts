@@ -6,10 +6,7 @@
  * into the unified emergency store without duplicate messages.
  */
 
-import {
-  resolveAlertLifecycle,
-  type AlertLifecycleState,
-} from '../config/alertLifecycleModel';
+import { resolveAlertLifecycle, type AlertLifecycleState } from '../config/alertLifecycleModel';
 import {
   classifyOperationalAlert,
   shouldToastOperationalAlert,
@@ -203,7 +200,10 @@ export function ingestRealtimeAlertPayload(payload: unknown): Alert | null {
     payload && typeof payload === 'object' && !Array.isArray(payload)
       ? (payload as Record<string, unknown>)
       : {};
-  const nested = (record.payload || record.data || record.alert || record) as Record<string, unknown>;
+  const nested = (record.payload || record.data || record.alert || record) as Record<
+    string,
+    unknown
+  >;
 
   const title = String(nested.title || nested.headline || nested.subject || '').trim();
   const message = String(
@@ -214,14 +214,15 @@ export function ingestRealtimeAlertPayload(payload: unknown): Alert | null {
   return prepareUnifiedAlert({
     id: String(nested.id || nested.alertId || ''),
     type: String(nested.type || nested.alertType || nested.category || 'System'),
-    severity:
-      String(nested.severity || nested.priority || nested.level || 'Info')
-        .toLowerCase()
-        .includes('crit')
-        ? 'Critical'
-        : String(nested.severity || '').toLowerCase().includes('warn')
-          ? 'Warning'
-          : 'Info',
+    severity: String(nested.severity || nested.priority || nested.level || 'Info')
+      .toLowerCase()
+      .includes('crit')
+      ? 'Critical'
+      : String(nested.severity || '')
+            .toLowerCase()
+            .includes('warn')
+        ? 'Warning'
+        : 'Info',
     title: title || 'CareDroid alert',
     message: message || title,
     patientId: String(nested.patientId || nested.patient_id || '') || undefined,
@@ -282,39 +283,44 @@ export function ingestNotificationStreamEvent(notification: Record<string, unkno
   const message = String(notification.body || notification.message || title).trim();
   if (!title && !message) return null;
 
-  const severityRaw = String(notification.severity || notification.priority || notification.type || '')
-    .toLowerCase();
+  const severityRaw = String(
+    notification.severity || notification.priority || notification.type || '',
+  ).toLowerCase();
 
   return prepareUnifiedAlert({
     id: String(notification.id || notification.notificationId || ''),
     type: String(notification.alertType || notification.category || 'System'),
-    severity: severityRaw.includes('crit') || severityRaw === 'error'
-      ? 'Critical'
-      : severityRaw.includes('warn')
-        ? 'Warning'
-        : 'Info',
+    severity:
+      severityRaw.includes('crit') || severityRaw === 'error'
+        ? 'Critical'
+        : severityRaw.includes('warn')
+          ? 'Warning'
+          : 'Info',
     title: title || 'Notification',
     message,
     patientId: String(notification.patientId || '') || undefined,
     dismissed: Boolean(notification.dismissed),
     source: 'notification-stream',
     metadata: {
-      notificationType:
-        notification.type != null ? String(notification.type) : null,
+      notificationType: notification.type != null ? String(notification.type) : null,
       streamEvent: true,
     },
   });
 }
 
 export function ingestUnifiedAlert(alert: Alert, actor: AlertActor = {}): string {
-  const prepared = alert.metadata?.orchestratorVersion
-    ? alert
-    : prepareUnifiedAlert(alert);
+  const prepared = alert.metadata?.orchestratorVersion ? alert : prepareUnifiedAlert(alert);
   useEmergencyStore.getState().ingestPreparedAlert(prepared);
-  recordLifecycleAudit(prepared.id, 'created', prepared.source || 'alert-lifecycle-orchestrator', actor, {
-    severity: prepared.severity,
-    ownerRole: prepared.ownerRole,
-  });
+  recordLifecycleAudit(
+    prepared.id,
+    'created',
+    prepared.source || 'alert-lifecycle-orchestrator',
+    actor,
+    {
+      severity: prepared.severity,
+      ownerRole: prepared.ownerRole,
+    },
+  );
   return prepared.id;
 }
 
@@ -429,11 +435,17 @@ export async function transitionAlertLifecycle(
     ].slice(0, 200),
   }));
 
-  recordLifecycleAudit(alertId, auditAction, actor.sourceScreen || 'alert-lifecycle-orchestrator', actor, {
-    reason: options.reason,
-    ownerRole: nextAlert.ownerRole,
-    escalationRole: nextAlert.escalationRole,
-  });
+  recordLifecycleAudit(
+    alertId,
+    auditAction,
+    actor.sourceScreen || 'alert-lifecycle-orchestrator',
+    actor,
+    {
+      reason: options.reason,
+      ownerRole: nextAlert.ownerRole,
+      escalationRole: nextAlert.escalationRole,
+    },
+  );
 
   return nextAlert;
 }
@@ -517,9 +529,14 @@ export function checkUnacknowledgedAlertEscalations(now = new Date()): string[] 
         patientId: alert.patientId,
         alertId: alert.id,
         title: `Unacknowledged critical alert escalated — ${alert.title || 'Waiting room safety'}`,
-        message: alert.message || 'A critical alert went unacknowledged for 3 minutes and was auto-escalated.',
+        message:
+          alert.message ||
+          'A critical alert went unacknowledged for 3 minutes and was auto-escalated.',
       }).catch((error) => {
-        logger.warn('[alertLifecycleOrchestrator] Failed to send waiting-room escalation notification', error);
+        logger.warn(
+          '[alertLifecycleOrchestrator] Failed to send waiting-room escalation notification',
+          error,
+        );
       });
     }
   }

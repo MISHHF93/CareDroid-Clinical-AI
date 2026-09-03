@@ -67,7 +67,10 @@ describe('ROUTE_RECORDS drift guard', () => {
           ),
       ).map((record) => `${record.id} → ${(record as { componentKey?: string }).componentKey}`);
 
-      expect(phantoms, 'ROUTE_RECORDS entries claiming active with nonexistent components (set status to future or remove)').toEqual([]);
+      expect(
+        phantoms,
+        'ROUTE_RECORDS entries claiming active with nonexistent components (set status to future or remove)',
+      ).toEqual([]);
     },
     HEAVY_SCAN_TIMEOUT_MS,
   );
@@ -78,6 +81,9 @@ describe('ROUTE_RECORDS drift guard', () => {
       (record) => record.status === 'future' && canonicalPaths.has(record.path),
     ).map((record) => `${record.id} (${record.path})`);
 
-    expect(staleFutures, 'ROUTE_RECORDS entries claiming future for live canonical routes (set status to active)').toEqual([]);
+    expect(
+      staleFutures,
+      'ROUTE_RECORDS entries claiming future for live canonical routes (set status to active)',
+    ).toEqual([]);
   });
 });

@@ -12,7 +12,13 @@ export const SCORE_ALIASES: Record<string, string[]> = {
   phq9: ['phq9', 'phq-9'],
   'ciwa-ar': ['ciwa', 'ciwa-ar', 'ciwaar'],
   'columbia-suicide-severity-workflow': ['columbia', 'cssrs', 'c-ssrs', 'suicide'],
-  'pediatric-dose-safety-checker': ['pediatric', 'pediatricdrug', 'pediatricdose', 'pediatricdosing', 'dose'],
+  'pediatric-dose-safety-checker': [
+    'pediatric',
+    'pediatricdrug',
+    'pediatricdose',
+    'pediatricdosing',
+    'dose',
+  ],
   perc: ['perc'],
   gcs: ['gcs'],
   'revised-trauma-score': ['revisedtrauma', 'rts', 'trauma'],
@@ -23,10 +29,14 @@ export const SCORE_ALIASES: Record<string, string[]> = {
 };
 
 function normalize(value: unknown): string {
-  return String(value ?? '').toLowerCase().replace(/[^a-z0-9]+/g, '');
+  return String(value ?? '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '');
 }
 
-function metadataSearchable(metadata: Record<string, string | number | boolean | null | undefined> = {}): string {
+function metadataSearchable(
+  metadata: Record<string, string | number | boolean | null | undefined> = {},
+): string {
   return normalize(
     [
       metadata.scoreId,

@@ -29,7 +29,13 @@ describe('CareDroid MVP services', () => {
     expect(reassessment.queue.items.length).toBeGreaterThan(0);
     expect(ems.metrics.waitingHandoffs).toBeGreaterThan(0);
     expect(resources.resources.map((resource) => resource.label)).toEqual(
-      expect.arrayContaining(['Rooms', 'Stretchers', 'Monitors', 'Telemetry Units', 'Infusion Pumps'])
+      expect.arrayContaining([
+        'Rooms',
+        'Stretchers',
+        'Monitors',
+        'Telemetry Units',
+        'Infusion Pumps',
+      ]),
     );
     expect(escalations.escalations.length).toBeGreaterThan(0);
     expect(kpis.metricById).toEqual(
@@ -47,10 +53,16 @@ describe('CareDroid MVP services', () => {
           longestActiveDuration: expect.any(Number),
         }),
         emsOffload: expect.objectContaining({ label: 'EMS Offload' }),
-      })
+      }),
     );
     expect(simulations.scenarios.map((scenario) => scenario.scenarioName)).toEqual(
-      expect.arrayContaining(['Mass Casualty', 'Sepsis Surge', 'Stroke Surge', 'EMS Overload', 'Boarding Crisis'])
+      expect.arrayContaining([
+        'Mass Casualty',
+        'Sepsis Surge',
+        'Stroke Surge',
+        'EMS Overload',
+        'Boarding Crisis',
+      ]),
     );
     expect(demo.metrics.patientCount).toBeGreaterThanOrEqual(100);
     expect(demo.labels).toEqual(expect.arrayContaining(['Demo data', 'No live integration']));

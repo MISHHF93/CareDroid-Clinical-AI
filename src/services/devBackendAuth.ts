@@ -175,7 +175,13 @@ async function resolveDevBackendSession({
   timeoutMs?: number;
   roleProfileId?: string;
 } = {}) {
-  if (!isDev) return { token: readStoredToken(), source: 'production' as string, status: undefined as number | undefined, error: undefined as string | undefined };
+  if (!isDev)
+    return {
+      token: readStoredToken(),
+      source: 'production' as string,
+      status: undefined as number | undefined,
+      error: undefined as string | undefined,
+    };
 
   const existingToken = readStoredToken();
   if (!force && hasUsableDevSession(existingToken)) {

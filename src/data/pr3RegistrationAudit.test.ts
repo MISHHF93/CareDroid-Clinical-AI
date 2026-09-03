@@ -72,12 +72,7 @@ const PR3_CHAT_CONFIGS_BY_ID = {
 describe('PR3 registration audit — canonical ID alignment', () => {
   it('keeps PR3_CALCULATOR_REGISTRY_IDS frozen and ordered', () => {
     expect(Object.isFrozen(PR3_CALCULATOR_REGISTRY_IDS)).toBe(true);
-    expect([...PR3_TOOL_IDS]).toEqual([
-      'grace-acs',
-      'nihss',
-      'canadian-c-spine',
-      'ottawa-ankle',
-    ]);
+    expect([...PR3_TOOL_IDS]).toEqual(['grace-acs', 'nihss', 'canadian-c-spine', 'ottawa-ankle']);
     expect([...PR3_TIER_B_CHAT_CALCULATOR_IDS]).toEqual([...PR3_TOOL_IDS]);
   });
 
@@ -91,7 +86,7 @@ describe('PR3 registration audit — canonical ID alignment', () => {
     // grace-acs and canadian-c-spine are real registerTool() backend executors, so
     // backendExecutable is true for them; nihss/ottawa-ankle have no backend executor.
     expect(nlu?.backendExecutable).toBe(
-      (ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS as readonly string[]).includes(id)
+      (ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS as readonly string[]).includes(id),
     );
 
     expect(builtinUiCalculators.some((c) => c.id === id)).toBe(false);
@@ -141,7 +136,7 @@ describe('PR3 registration audit — NLU, backend keywords, aliases', () => {
     'NLU_TO_REGISTRY_ID maps catalog alias "%s" → %s',
     (alias, canonical) => {
       expect(NLU_TO_REGISTRY_ID[alias]).toBe(canonical);
-    }
+    },
   );
 
   it.each(PR3_ALL_ALIAS_PAIRS)('resolveRegistryId("%s") → %s', (alias, canonical) => {
@@ -172,7 +167,7 @@ describe('PR3 registration audit — NLU, backend keywords, aliases', () => {
     (id) => {
       const keywords = extractToolPatternKeywords(patternsSource, id).map((k) => aliasToSlug(k));
       const requiredForTool = PR3_REQUIRED_NLU_ALIAS_PAIRS.filter(([, c]) => c === id).map(
-        ([a]) => a
+        ([a]) => a,
       );
       for (const phrase of requiredForTool) {
         const slug = aliasToSlug(phrase);
@@ -180,10 +175,10 @@ describe('PR3 registration audit — NLU, backend keywords, aliases', () => {
         const inBackend = keywords.includes(slug) || keywords.includes(aliasToSlug(phrase));
         expect(
           inNluMap || inBackend,
-          `alias "${phrase}" for ${id} missing from NLU_TO_REGISTRY_ID and backend keywords`
+          `alias "${phrase}" for ${id} missing from NLU_TO_REGISTRY_ID and backend keywords`,
         ).toBe(true);
       }
-    }
+    },
   );
 
   it('separates NIHSS stroke scale from Canadian C-Spine rule aliases', () => {
@@ -203,14 +198,16 @@ describe('PR3 registration audit — discovery and catalog', () => {
       if (!row) throw new Error(`missing toolIdAliases id ${aliasId}`);
       expect(row.mapsTo).toBe(canonical);
       expect(NLU_TO_REGISTRY_ID[aliasId]).toBe(canonical);
-    }
+    },
   );
 
   it.each(PR3_TOOL_IDS)('merged discovery includes canonical row for %s', (id) => {
     const hits = getAllDiscoveredTools().filter((r) => r.id === id);
     expect(hits.length).toBe(1);
     expect(hits[0].path).toBe(PR3_HUB_PATH);
-    const blob = [hits[0].source, ...(hits[0].sources || []), hits[0].notes].filter(Boolean).join(' ');
+    const blob = [hits[0].source, ...(hits[0].sources || []), hits[0].notes]
+      .filter(Boolean)
+      .join(' ');
     expect(blob).toMatch(/toolRegistry|clinicalIntentToolCatalog|tool\.patterns|chatAssisted/i);
   });
 
@@ -225,7 +222,7 @@ describe('PR3 registration audit — discovery and catalog', () => {
     // grace-acs and canadian-c-spine are real registerTool() backend executors, so
     // backendExecutor is true for them; nihss/ottawa-ankle have no backend executor.
     expect(row.backendExecutor).toBe(
-      (ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS as readonly string[]).includes(id)
+      (ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS as readonly string[]).includes(id),
     );
     expect(row.chatSeed).toBe(clinicalIntentToolsById[id]?.chatSeed);
   });
@@ -233,7 +230,7 @@ describe('PR3 registration audit — discovery and catalog', () => {
   it.each(PR3_CATALOG_SEARCH_QUERIES)('catalog search finds %s for "%s"', (registryId, query) => {
     const rows = catalogRowsMatchingQuery(getMedicalToolsCatalogRows(), query);
     expect(rows.some((r) => r.primaryId === registryId || r.sidebarToolId === registryId)).toBe(
-      true
+      true,
     );
   });
 
@@ -249,7 +246,9 @@ describe('PR3 registration audit — discovery and catalog', () => {
 
 describe('PR3 registration audit — sidebar, hub launch, chat seeds', () => {
   it('lists each PR3 tool exactly once in toolRegistry (sidebar visibility)', () => {
-    const pr3InRegistry = toolRegistry.filter((t) => (PR3_TOOL_IDS as readonly string[]).includes(t.id));
+    const pr3InRegistry = toolRegistry.filter((t) =>
+      (PR3_TOOL_IDS as readonly string[]).includes(t.id),
+    );
     expect(pr3InRegistry).toHaveLength(PR3_TOOL_IDS.length);
     for (const id of PR3_TOOL_IDS) {
       expect(getToolIcon(id)).toBeTruthy();
@@ -281,7 +280,7 @@ describe('PR3 registration audit — sidebar, hub launch, chat seeds', () => {
       expect(fromAlias.registryId).toBe(canonical);
       expect(fromAlias.chatSeed).toBe(fromCanonical.chatSeed);
       expect(fromAlias.chatSeed?.length).toBeGreaterThan(50);
-    }
+    },
   );
 
   it('places PR3 tools in clinical hub groups', () => {
@@ -290,15 +289,13 @@ describe('PR3 registration audit — sidebar, hub launch, chat seeds', () => {
       expect(grouped.has(id)).toBe(true);
     }
     expect(CHAT_ASSISTED_HUB_GROUPS.find((g) => g.groupId === 'cardiac')?.toolIds).toContain(
-      'grace-acs'
+      'grace-acs',
     );
     expect(CHAT_ASSISTED_HUB_GROUPS.find((g) => g.groupId === 'neurology')?.toolIds).toContain(
-      'nihss'
+      'nihss',
     );
     const trauma = CHAT_ASSISTED_HUB_GROUPS.find((g) => g.groupId === 'trauma');
-    expect(trauma?.toolIds).toEqual(
-      expect.arrayContaining(['canadian-c-spine', 'ottawa-ankle'])
-    );
+    expect(trauma?.toolIds).toEqual(expect.arrayContaining(['canadian-c-spine', 'ottawa-ankle']));
   });
 
   it('matches Tier-B NLU chatSeed to chatAssisted config', () => {
@@ -327,7 +324,9 @@ describe('PR3 registration audit — no orphaned registry entries', () => {
   });
 
   it('has no duplicate toolIdAliases.id entries among PR3-targeting rows', () => {
-    const pr3AliasRows = toolIdAliases.filter((a) => (PR3_TOOL_IDS as readonly string[]).includes(a.mapsTo));
+    const pr3AliasRows = toolIdAliases.filter((a) =>
+      (PR3_TOOL_IDS as readonly string[]).includes(a.mapsTo),
+    );
     const ids = pr3AliasRows.map((a) => a.id);
     expect(new Set(ids).size).toBe(ids.length);
   });

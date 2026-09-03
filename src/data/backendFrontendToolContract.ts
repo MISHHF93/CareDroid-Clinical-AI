@@ -6,10 +6,7 @@
  */
 
 import toolRegistry, { toolRegistryById } from './toolRegistry';
-import {
-  builtinUiCalculators,
-  clinicalIntentTools,
-} from './clinicalIntentToolCatalog';
+import { builtinUiCalculators, clinicalIntentTools } from './clinicalIntentToolCatalog';
 import { resolveCatalogLaunch } from './clinicalCatalogWiring';
 import {
   NLU_PROFILE_TOOL_IDS,
@@ -21,10 +18,7 @@ import {
 import { getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
 import { getAllDiscoveredTools, phantomToolReferences } from './sourceCodeToolDiscovery';
 import { isOrchestratorPostExecutable } from './unsupportedOrchestratorTools';
-import {
-  TEST_COVERAGE_BY_REGISTRY_ID,
-  tierForRegistryId,
-} from './e2eToolValidationMatrix';
+import { TEST_COVERAGE_BY_REGISTRY_ID, tierForRegistryId } from './e2eToolValidationMatrix';
 import { buildFrontendRenderingRow } from './frontendRenderingInventory';
 import { PR_FLEET_TOOL_SPECS } from './prFleetTestConstants';
 import { readToolPatternsSource } from './clinicalToolAliasSync';
@@ -134,14 +128,12 @@ function catalogRowFor(nluToolId, registryId) {
       r.primaryId === nluToolId ||
       r.id === nluToolId ||
       r.sidebarToolId === registryId ||
-      r.id === registryId
+      r.id === registryId,
   );
 }
 
 function discoveryHas(id) {
-  return getAllDiscoveredTools().some(
-    (r) => r.id === id || r.mapsTo === id || r.registryId === id
-  );
+  return getAllDiscoveredTools().some((r) => r.id === id || r.mapsTo === id || r.registryId === id);
 }
 
 function patternFor(nluToolId, patterns) {
@@ -162,7 +154,8 @@ function testFilesFor(registryId, nluToolId) {
 function resolveComponent(registryId, nluToolId, builtinSlug) {
   if (REGISTRY_COMPONENT[registryId]) return REGISTRY_COMPONENT[registryId];
   if (NLU_PAGE_COMPONENT[nluToolId]) return NLU_PAGE_COMPONENT[nluToolId];
-  if (FLEET_TIER_A(registryId)) return `src/pages/fleet/${PR_FLEET_TOOL_SPECS[registryId]?.appComponent}.jsx`;
+  if (FLEET_TIER_A(registryId))
+    return `src/pages/fleet/${PR_FLEET_TOOL_SPECS[registryId]?.appComponent}.jsx`;
   if (builtinSlug) {
     return `src/pages/tools/Calculators.jsx (case '${builtinSlug}')`;
   }
@@ -250,8 +243,7 @@ export function deriveContractStatus(row) {
 }
 
 function buildRowFromNlu(nlu, patterns) {
-  const registryId =
-    nlu.sidebarToolId || ORCHESTRATOR_TO_REGISTRY_ID[nlu.toolId] || nlu.toolId;
+  const registryId = nlu.sidebarToolId || ORCHESTRATOR_TO_REGISTRY_ID[nlu.toolId] || nlu.toolId;
   const inventoryRecord = resolveToolInventoryRecord(nlu.toolId);
   const reg = toolRegistryById[registryId];
   const launch = resolveCatalogLaunch(nlu.toolId);
@@ -260,7 +252,7 @@ function buildRowFromNlu(nlu, patterns) {
       c.id === registryId ||
       c.orchestratorId === nlu.toolId ||
       (nlu.toolId === 'cha2ds2vasc-calculator' && c.id === 'chads2vasc') ||
-      (nlu.toolId === 'sofa-calculator' && c.id === 'sofa')
+      (nlu.toolId === 'sofa-calculator' && c.id === 'sofa'),
   );
   const builtinSlug = builtin?.id ?? null;
   /** POST execute applies only when this NLU id is registered — not sibling profiles on the same page. */
@@ -298,7 +290,9 @@ function buildRowFromNlu(nlu, patterns) {
     tier: inventoryRecord?.tier || tierForRegistryId(registryId),
     notes: [
       api.note,
-      nlu.backendExecutable && !postExecutor ? 'NLU backendExecutable flag (chat routing only)' : null,
+      nlu.backendExecutable && !postExecutor
+        ? 'NLU backendExecutable flag (chat routing only)'
+        : null,
       builtinSlug ? `Calculator slug: ${builtinSlug}` : null,
       launch.path !== (nlu.path || reg?.path) ? `Launch nav may use ${launch.path}` : null,
     ]
@@ -317,10 +311,10 @@ function buildRowFromRegistryOnly(registryId, patterns) {
   const inventoryRecord = resolveToolInventoryRecord(registryId);
   const launch = resolveCatalogLaunch(registryId);
   const nlus = clinicalIntentTools.filter(
-    (t) => t.sidebarToolId === registryId || t.toolId === registryId
+    (t) => t.sidebarToolId === registryId || t.toolId === registryId,
   );
   const builtin = builtinUiCalculators.find(
-    (c) => c.id === reg?.initialCalc || c.id === registryId
+    (c) => c.id === reg?.initialCalc || c.id === registryId,
   );
 
   const row = {
@@ -360,7 +354,7 @@ function buildRowFromRegistryOnly(registryId, patterns) {
     const api = apiBlock(
       REGISTRY_ID_TO_ORCHESTRATOR_TOOL[registryId],
       registryId,
-      row.backendExecutor === 'yes'
+      row.backendExecutor === 'yes',
     );
     row.apiEndpoint = api.endpoint;
     row.requestDto = api.dto || '—';
@@ -463,7 +457,7 @@ export function buildBackendFrontendContractRows() {
 
   for (const reg of toolRegistry) {
     const hasNlu = clinicalIntentTools.some(
-      (t) => t.sidebarToolId === reg.id || t.toolId === reg.id
+      (t) => t.sidebarToolId === reg.id || t.toolId === reg.id,
     );
     if (!hasNlu) {
       rows.push(buildRowFromRegistryOnly(reg.id, patterns));
@@ -554,7 +548,7 @@ const CONTRACT_COLUMNS = [
 
 export function formatBackendFrontendContractMarkdown(
   rows = buildBackendFrontendContractRows(),
-  gaps = getContractGaps(rows)
+  gaps = getContractGaps(rows),
 ) {
   const generatedAt = new Date().toISOString();
   const statusCounts = rows.reduce((acc, r) => {
@@ -601,7 +595,7 @@ export function formatBackendFrontendContractMarkdown(
     'Only these NLU ids have `registerTool()` in `tool-orchestrator.service.ts`:',
     '',
     ...ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS.map(
-      (id) => `- \`${id}\` → ${EXECUTOR_API[id]?.endpoint ?? 'POST /api/tools/:id/execute'}`
+      (id) => `- \`${id}\` → ${EXECUTOR_API[id]?.endpoint ?? 'POST /api/tools/:id/execute'}`,
     ),
     '',
     'Chat NLU for other tools: `chat.service.ts` → `handleClinicalTool` → `NotFoundException` → general AI fallback (no structured executor).',
@@ -664,7 +658,7 @@ export function formatBackendFrontendContractMarkdown(
     '```',
     '',
     'Drift gates: `npm run test:alias-sync`, `npm run test:executor-mapping`, `npm run test:e2e-matrix`.',
-    ''
+    '',
   );
 
   return lines.join('\n');

@@ -159,13 +159,13 @@ const isGeneratedLongWaitFlag = (flag: PatientFlag | PatientFlagRecord | string)
     getPatientFlagType(flag) === PatientFlag.ReassessmentDue) &&
   isLongWaitRescueReason(typeof flag === 'string' ? '' : flag.reason || '');
 
-export function ensureReminderReassessmentFlags(
-  patients: Patient[],
-  now = new Date(),
-): Patient[] {
+export function ensureReminderReassessmentFlags(patients: Patient[], now = new Date()): Patient[] {
   let changed = false;
   const nextPatients = patients.map((patient) => {
-    if (!hasDueReassessmentReminder(patient, now) || hasPatientFlag(patient, PatientFlag.ReassessmentDue)) {
+    if (
+      !hasDueReassessmentReminder(patient, now) ||
+      hasPatientFlag(patient, PatientFlag.ReassessmentDue)
+    ) {
       return patient;
     }
     changed = true;
@@ -194,7 +194,7 @@ export function ensureReminderReassessmentFlags(
       ],
     };
   });
-  return changed ? nextPatients as import('../types/emergency').Patient[] : patients;
+  return changed ? (nextPatients as import('../types/emergency').Patient[]) : patients;
 }
 
 export function ensureLongWaitRescueFlags(patients: Patient[], now = new Date()): Patient[] {
@@ -231,8 +231,12 @@ export function ensureLongWaitRescueFlags(patients: Patient[], now = new Date())
         currentManagedFlags.some(
           (flag) =>
             getPatientFlagType(flag) === expected.type &&
-            (typeof flag === 'string' ? false : (flag as unknown as { reason?: string }).reason === expected.reason) &&
-            (typeof flag === 'string' ? true : (flag as unknown as { severity?: string }).severity === expected.severity),
+            (typeof flag === 'string'
+              ? false
+              : (flag as unknown as { reason?: string }).reason === expected.reason) &&
+            (typeof flag === 'string'
+              ? true
+              : (flag as unknown as { severity?: string }).severity === expected.severity),
         ),
       );
     if (isCurrent) return patient;
@@ -240,10 +244,13 @@ export function ensureLongWaitRescueFlags(patients: Patient[], now = new Date())
     changed = true;
     return {
       ...patient,
-      flags: [...patient.flags.filter((flag) => !isGeneratedLongWaitFlag(flag)), ...expectedFlags] as import('../types/emergency').PatientFlag[],
+      flags: [
+        ...patient.flags.filter((flag) => !isGeneratedLongWaitFlag(flag)),
+        ...expectedFlags,
+      ] as import('../types/emergency').PatientFlag[],
     };
   });
-  return changed ? nextPatients as import('../types/emergency').Patient[] : patients;
+  return changed ? (nextPatients as import('../types/emergency').Patient[]) : patients;
 }
 
 export const REASSESSMENT_MANAGED_FLAG_TYPES = new Set([
@@ -283,26 +290,28 @@ export function buildReassessmentQueueItems(patients: Patient[]) {
           patient.vitalsUpdatedAt || latestVitals?.recordedAt || patient.arrivalTime,
         ),
         reasons: reassessmentFlags.map((flag) =>
-          typeof flag === 'string' ? flag : (flag as unknown as { reason?: string }).reason || getPatientFlagType(flag),
+          typeof flag === 'string'
+            ? flag
+            : (flag as unknown as { reason?: string }).reason || getPatientFlagType(flag),
         ),
         flaggedAt:
           (typeof reassessmentFlags[0] === 'string'
             ? undefined
-            : (reassessmentFlags[0] as unknown as { detectedAt?: string })?.detectedAt) || new Date().toISOString(),
+            : (reassessmentFlags[0] as unknown as { detectedAt?: string })?.detectedAt) ||
+          new Date().toISOString(),
         longWaitPhase: longWait.phase,
       };
     })
-    .sort(
-      (a, b) => {
-        const aEscalated = a.reasons.some((reason) => /manual escalation/i.test(reason));
-        const bEscalated = b.reasons.some((reason) => /manual escalation/i.test(reason));
-        if (aEscalated !== bEscalated) return aEscalated ? -1 : 1;
-        return (
-          ((LONG_WAIT_PHASE_RANK as Record<string, number>)[b.longWaitPhase] || 0) - ((LONG_WAIT_PHASE_RANK as Record<string, number>)[a.longWaitPhase] || 0) ||
-          new Date(b.flaggedAt).getTime() - new Date(a.flaggedAt).getTime()
-        );
-      },
-    );
+    .sort((a, b) => {
+      const aEscalated = a.reasons.some((reason) => /manual escalation/i.test(reason));
+      const bEscalated = b.reasons.some((reason) => /manual escalation/i.test(reason));
+      if (aEscalated !== bEscalated) return aEscalated ? -1 : 1;
+      return (
+        ((LONG_WAIT_PHASE_RANK as Record<string, number>)[b.longWaitPhase] || 0) -
+          ((LONG_WAIT_PHASE_RANK as Record<string, number>)[a.longWaitPhase] || 0) ||
+        new Date(b.flaggedAt).getTime() - new Date(a.flaggedAt).getTime()
+      );
+    });
 }
 
 type OperationalStateSlice = {
@@ -317,7 +326,11 @@ export function buildUpdateAlertsPatch(state: {
   referrals: import('../types/emergency').Referral[];
   emsArrivals: import('../types/emergency').EMSArrival[];
   capacity: import('../types/emergency').CapacitySnapshot;
-  queues: Array<import('../types/emergency').Queue | import('../types/emergency').QueueSummary | Record<string, unknown>>;
+  queues: Array<
+    | import('../types/emergency').Queue
+    | import('../types/emergency').QueueSummary
+    | Record<string, unknown>
+  >;
   bottleneckAlert?: import('../types/emergency').BottleneckAlert | null;
   alerts: Alert[];
 }): Partial<OperationalStateSlice> {
@@ -331,7 +344,9 @@ export function buildUpdateAlertsPatch(state: {
     const record = queue as Record<string, unknown>;
     return {
       id: String(record.id || record.type || 'queue'),
-      type: String(record.type || record.label || 'Queue') as import('../types/emergency').QueueType,
+      type: String(
+        record.type || record.label || 'Queue',
+      ) as import('../types/emergency').QueueType,
       name: String(record.name || record.label || record.type || 'Queue'),
       patientIds: Array.isArray(record.patientIds) ? record.patientIds.map(String) : [],
       targetWaitMinutes: Number(record.targetWaitMinutes ?? record.targetMinutes ?? 30),
@@ -437,7 +452,11 @@ export function buildEscalatePatientPatch(
     'No bed';
   const patientLabel = patient.name || `${patient.firstName} ${patient.lastName}`.trim();
   const nextFlags = [
-    createPatientFlag(PatientFlag.HighRisk, { reason, severity: 'Critical', detectedAt: timestamp }),
+    createPatientFlag(PatientFlag.HighRisk, {
+      reason,
+      severity: 'Critical',
+      detectedAt: timestamp,
+    }),
     createPatientFlag(PatientFlag.DeteriorationRisk, {
       reason,
       severity: 'Critical',
@@ -475,9 +494,11 @@ export function buildEscalatePatientPatch(
     flags: [
       ...current.flags.filter(
         (flag) =>
-          ![PatientFlag.HighRisk, PatientFlag.DeteriorationRisk, PatientFlag.ReassessmentDue].includes(
-            getPatientFlagType(flag),
-          ),
+          ![
+            PatientFlag.HighRisk,
+            PatientFlag.DeteriorationRisk,
+            PatientFlag.ReassessmentDue,
+          ].includes(getPatientFlagType(flag)),
       ),
       ...nextFlags,
     ] as import('../types/emergency').PatientFlag[],
@@ -532,19 +553,27 @@ export function buildCancelEscalationPatch(
     ...current,
     flags: current.flags.filter(
       (flag) =>
-        ![PatientFlag.HighRisk, PatientFlag.DeteriorationRisk, PatientFlag.ReassessmentDue].includes(
-          getPatientFlagType(flag),
-        ),
+        ![
+          PatientFlag.HighRisk,
+          PatientFlag.DeteriorationRisk,
+          PatientFlag.ReassessmentDue,
+        ].includes(getPatientFlagType(flag)),
     ),
     timeline: [
       ...current.timeline,
-      makeEvent(current.id, 'ESCALATION_CANCELLED', `Escalation cancelled by ${staffName}.`, timestamp, {
-        by: input.staffId,
-        actorStaffId: input.staffId,
-        staffId: input.staffId,
-        reason: 'Manual cancellation',
-        metadata: { reason: 'Manual cancellation', staffName },
-      }),
+      makeEvent(
+        current.id,
+        'ESCALATION_CANCELLED',
+        `Escalation cancelled by ${staffName}.`,
+        timestamp,
+        {
+          by: input.staffId,
+          actorStaffId: input.staffId,
+          staffId: input.staffId,
+          reason: 'Manual cancellation',
+          metadata: { reason: 'Manual cancellation', staffName },
+        },
+      ),
     ],
   }));
 
@@ -595,15 +624,22 @@ export function buildAddVitalsPatch(
   }));
   const criticalAlerts = vitalsAlerts.filter((alert) => alert.severity === 'critical');
   const warningAlerts = vitalsAlerts.filter((alert) => alert.severity === 'warning');
-  const criticalSummary = criticalAlerts.map((alert) => `${alert.vital} ${alert.value}${alert.unit}`).join(', ');
-  const warningSummary = warningAlerts.map((alert) => `${alert.vital} ${alert.value}${alert.unit}`).join(', ');
-  const criticalReason = criticalSummary ? `Critical vitals: ${criticalSummary}` : 'Critical vitals';
+  const criticalSummary = criticalAlerts
+    .map((alert) => `${alert.vital} ${alert.value}${alert.unit}`)
+    .join(', ');
+  const warningSummary = warningAlerts
+    .map((alert) => `${alert.vital} ${alert.value}${alert.unit}`)
+    .join(', ');
+  const criticalReason = criticalSummary
+    ? `Critical vitals: ${criticalSummary}`
+    : 'Critical vitals';
   const warningReason = warningSummary ? `Abnormal vitals: ${warningSummary}` : 'Abnormal vitals';
   const news2 = calculateNews2FromVitals(nextVitals);
 
   // Recording vitals IS the reassessment: any active reminder already due (or inside
   // the warning window) is satisfied by this recheck and must not keep alerting.
-  const completionCutoffMs = new Date(timestamp).getTime() + REASSESSMENT_REMINDER_WARNING_WINDOW_MS;
+  const completionCutoffMs =
+    new Date(timestamp).getTime() + REASSESSMENT_REMINDER_WARNING_WINDOW_MS;
   const completedReminderIds = new Set(
     (patient.reassessmentReminders || [])
       .filter((reminder) => {
@@ -819,7 +855,8 @@ export function buildAddVitalsPatch(
             staffId: nextVitals.recordedBy,
             metadata: {
               flag: flagType,
-              reason: VITALS_RECHECK_FLAG_RESOLUTION_REASONS[flagType] || 'Resolved by vitals recheck.',
+              reason:
+                VITALS_RECHECK_FLAG_RESOLUTION_REASONS[flagType] || 'Resolved by vitals recheck.',
             },
           }),
         ),

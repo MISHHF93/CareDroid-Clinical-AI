@@ -1,7 +1,10 @@
 import type { Patient } from '../../types/emergency';
 import usePatientOrchestration from '../../hooks/usePatientOrchestration';
 import { useEmergencyStore } from '../../store/emergencyStore';
-import { launchOrchestrationMoreTools, launchOrchestrationRecommendation } from '../../services/orchestrationToolLaunch';
+import {
+  launchOrchestrationMoreTools,
+  launchOrchestrationRecommendation,
+} from '../../services/orchestrationToolLaunch';
 import { HUMAN_REVIEW_DISCLAIMER } from '../../lib/ai/safety/policy';
 import './orchestration.css';
 
@@ -57,7 +60,9 @@ export function RecommendedToolsStrip({ patient }: RecommendedToolsStripProps) {
         </button>
       </div>
       {orchestration.complaintRoute?.safetyStatement ? (
-        <p className="patient-orchestration__meta">{orchestration.complaintRoute.safetyStatement}</p>
+        <p className="patient-orchestration__meta">
+          {orchestration.complaintRoute.safetyStatement}
+        </p>
       ) : null}
       <p className="patient-orchestration__disclaimer">{HUMAN_REVIEW_DISCLAIMER}</p>
     </section>

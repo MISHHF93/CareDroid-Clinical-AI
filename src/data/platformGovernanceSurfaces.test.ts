@@ -91,7 +91,8 @@ describe('platformGovernanceSurfaces', () => {
       owner: 'Clinical Informatics',
       knownLimitations: ['Requires human review on all clinical outputs (provenance contract).'],
       expiresAt: '2027-07-11',
-      retirementPlan: 'Rotate to next approved model via registry entry + canary; never silent swap.',
+      retirementPlan:
+        'Rotate to next approved model via registry entry + canary; never silent swap.',
     };
 
     const cards = buildModelInventoryCards([rawModel]);
@@ -105,7 +106,8 @@ describe('platformGovernanceSurfaces', () => {
       regulatoryClass: 'informational_cds',
       owner: 'Clinical Informatics',
       expiresAt: '2027-07-11',
-      retirementPlan: 'Rotate to next approved model via registry entry + canary; never silent swap.',
+      retirementPlan:
+        'Rotate to next approved model via registry entry + canary; never silent swap.',
     });
     expect(cards[0].limitations).toEqual([
       'Requires human review on all clinical outputs (provenance contract).',

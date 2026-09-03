@@ -15,8 +15,12 @@ const RiskFactorsList = ({ factors = [] as any[] }) => {
     if (typeof factor === 'string') {
       return {
         label: factor,
-        severity: factor.includes('critical') || factor.includes('≥ 13') ? 'critical' : 
-                 factor.includes('elevated') || factor.includes('abnormal') ? 'high' : 'moderate'
+        severity:
+          factor.includes('critical') || factor.includes('≥ 13')
+            ? 'critical'
+            : factor.includes('elevated') || factor.includes('abnormal')
+              ? 'high'
+              : 'moderate',
       };
     }
     return factor;

@@ -93,13 +93,33 @@ export const SURVEILLANCE_NEXUS_ROUTES: readonly SurveillanceNexusRouteLink[] = 
 ]);
 
 export const SURVEILLANCE_KPI_ARTIFACTS = Object.freeze([
-  { id: 'cameras_online', label: 'Cameras online', permission: SURVEILLANCE_PERMISSION_KEYS.kpiView },
-  { id: 'iot_online', label: 'IoT devices online', permission: SURVEILLANCE_PERMISSION_KEYS.kpiView },
+  {
+    id: 'cameras_online',
+    label: 'Cameras online',
+    permission: SURVEILLANCE_PERMISSION_KEYS.kpiView,
+  },
+  {
+    id: 'iot_online',
+    label: 'IoT devices online',
+    permission: SURVEILLANCE_PERMISSION_KEYS.kpiView,
+  },
   { id: 'zones_covered', label: 'Mapped zones', permission: SURVEILLANCE_PERMISSION_KEYS.kpiView },
   { id: 'open_alerts', label: 'Open alerts', permission: SURVEILLANCE_PERMISSION_KEYS.kpiView },
-  { id: 'health_score', label: 'Platform health score', permission: SURVEILLANCE_PERMISSION_KEYS.healthView },
-  { id: 'welfare_safe_zones', label: 'Welfare-safe zones', permission: TRACKMIND_PERMISSION_KEYS.kpiWelfareView },
-  { id: 'raceday_ready', label: 'Race-day readiness', permission: TRACKMIND_PERMISSION_KEYS.kpiRaceDayView },
+  {
+    id: 'health_score',
+    label: 'Platform health score',
+    permission: SURVEILLANCE_PERMISSION_KEYS.healthView,
+  },
+  {
+    id: 'welfare_safe_zones',
+    label: 'Welfare-safe zones',
+    permission: TRACKMIND_PERMISSION_KEYS.kpiWelfareView,
+  },
+  {
+    id: 'raceday_ready',
+    label: 'Race-day readiness',
+    permission: TRACKMIND_PERMISSION_KEYS.kpiRaceDayView,
+  },
 ]);
 
 export const SURVEILLANCE_APPROVAL_DOMAINS = Object.freeze([
@@ -198,10 +218,15 @@ const SAAS_TO_SURVEILLANCE_ROLE: Readonly<Record<string, string>> = Object.freez
   'compliance-officer': 'compliance_officer',
 });
 
-export function resolveSurveillancePermissionsForRole(role: string | null | undefined): readonly string[] {
+export function resolveSurveillancePermissionsForRole(
+  role: string | null | undefined,
+): readonly string[] {
   const raw = String(role || 'generic_staff').trim();
   const normalized = raw.replace(/-/g, '_');
-  const mapped = SAAS_TO_SURVEILLANCE_ROLE[raw] || SAAS_TO_SURVEILLANCE_ROLE[normalized.replace(/_/g, '-')] || normalized;
+  const mapped =
+    SAAS_TO_SURVEILLANCE_ROLE[raw] ||
+    SAAS_TO_SURVEILLANCE_ROLE[normalized.replace(/_/g, '-')] ||
+    normalized;
   return SURVEILLANCE_ROLE_PERMISSION_GRANTS[mapped] || [];
 }
 

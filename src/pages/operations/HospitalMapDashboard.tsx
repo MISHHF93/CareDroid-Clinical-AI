@@ -21,15 +21,79 @@ interface BedUnit {
 }
 
 const DEMO_UNITS: BedUnit[] = [
-  { id: 'ed', name: 'Emergency Department', total: 32, occupied: 26, available: 6, boarding: 4, status: 'yellow' },
+  {
+    id: 'ed',
+    name: 'Emergency Department',
+    total: 32,
+    occupied: 26,
+    available: 6,
+    boarding: 4,
+    status: 'yellow',
+  },
   { id: 'icu', name: 'ICU', total: 16, occupied: 14, available: 2, boarding: 2, status: 'red' },
-  { id: 'stepdown', name: 'Step-Down / PCU', total: 24, occupied: 18, available: 6, boarding: 0, status: 'green' },
-  { id: 'med-surg-a', name: 'Med-Surg A', total: 30, occupied: 22, available: 8, boarding: 1, status: 'green' },
-  { id: 'med-surg-b', name: 'Med-Surg B', total: 30, occupied: 28, available: 2, boarding: 0, status: 'red' },
-  { id: 'obs', name: 'Observation', total: 18, occupied: 12, available: 6, boarding: 0, status: 'green' },
-  { id: 'pediatrics', name: 'Pediatrics', total: 20, occupied: 9, available: 11, boarding: 0, status: 'green' },
-  { id: 'psych', name: 'Behavioral Health', total: 14, occupied: 13, available: 1, boarding: 3, status: 'red' },
-  { id: 'or', name: 'Operating Rooms', total: 10, occupied: 6, available: 4, boarding: 0, status: 'yellow' },
+  {
+    id: 'stepdown',
+    name: 'Step-Down / PCU',
+    total: 24,
+    occupied: 18,
+    available: 6,
+    boarding: 0,
+    status: 'green',
+  },
+  {
+    id: 'med-surg-a',
+    name: 'Med-Surg A',
+    total: 30,
+    occupied: 22,
+    available: 8,
+    boarding: 1,
+    status: 'green',
+  },
+  {
+    id: 'med-surg-b',
+    name: 'Med-Surg B',
+    total: 30,
+    occupied: 28,
+    available: 2,
+    boarding: 0,
+    status: 'red',
+  },
+  {
+    id: 'obs',
+    name: 'Observation',
+    total: 18,
+    occupied: 12,
+    available: 6,
+    boarding: 0,
+    status: 'green',
+  },
+  {
+    id: 'pediatrics',
+    name: 'Pediatrics',
+    total: 20,
+    occupied: 9,
+    available: 11,
+    boarding: 0,
+    status: 'green',
+  },
+  {
+    id: 'psych',
+    name: 'Behavioral Health',
+    total: 14,
+    occupied: 13,
+    available: 1,
+    boarding: 3,
+    status: 'red',
+  },
+  {
+    id: 'or',
+    name: 'Operating Rooms',
+    total: 10,
+    occupied: 6,
+    available: 4,
+    boarding: 0,
+    status: 'yellow',
+  },
 ];
 
 const DEMO_CAPACITY = {
@@ -84,7 +148,10 @@ function UnitRow({ unit }: { unit: BedUnit }) {
 
       <div className="hospital-map-page__occupancy">
         <div className="hospital-map-page__occupancy-track">
-          <div className="hospital-map-page__occupancy-fill" style={{ width: `${pct}%`, background: color }} />
+          <div
+            className="hospital-map-page__occupancy-fill"
+            style={{ width: `${pct}%`, background: color }}
+          />
         </div>
         <span>{pct}%</span>
       </div>
@@ -138,7 +205,9 @@ export default function HospitalMapDashboard() {
       setCapacity(
         (capResult as any).ok && (capResult as any).data ? (capResult as any).data : DEMO_CAPACITY,
       );
-      setHistory((histResult as any).ok && (histResult as any).data ? (histResult as any).data : []);
+      setHistory(
+        (histResult as any).ok && (histResult as any).data ? (histResult as any).data : [],
+      );
       setSurge((surgeResult as any).ok ? (surgeResult as any).data : null);
       setMapResult(hospitalMapResult);
       setLast(new Date());
@@ -172,10 +241,15 @@ export default function HospitalMapDashboard() {
   // its legacy score-threshold coloring since it has no band.
   const scoreColor = capacityBand
     ? BAND_COLOR[capacityBand] || BAND_COLOR.Green
-    : capacityScore < 60 ? '#b91c1c' : capacityScore < 78 ? '#b45309' : '#15803d';
+    : capacityScore < 60
+      ? '#b91c1c'
+      : capacityScore < 78
+        ? '#b45309'
+        : '#15803d';
   const scoreSubLabel = capacityBand
     ? `${capacityBand} pressure`
-    : capacity?.label ?? (capacityScore < 60 ? 'Critical' : capacityScore < 78 ? 'Elevated' : 'Normal');
+    : (capacity?.label ??
+      (capacityScore < 60 ? 'Critical' : capacityScore < 78 ? 'Elevated' : 'Normal'));
 
   return (
     <main className="hospital-map-page">
@@ -183,12 +257,18 @@ export default function HospitalMapDashboard() {
         <div className="hospital-map-page__title-row">
           <GraphicIconBadge iconKey="layout-dashboard" accent="brand" size="md" />
           <div>
-            <p className="hospital-map-page__title-text" data-testid="cd-page-title-text">Hospital Map</p>
-            <p>Real-time capacity, boarding, diversion status, and floor-plan device intelligence.</p>
+            <p className="hospital-map-page__title-text" data-testid="cd-page-title-text">
+              Hospital Map
+            </p>
+            <p>
+              Real-time capacity, boarding, diversion status, and floor-plan device intelligence.
+            </p>
           </div>
         </div>
         <div className="hospital-map-page__actions">
-          {diversion ? <span className="hospital-map-page__diversion">Diversion active</span> : null}
+          {diversion ? (
+            <span className="hospital-map-page__diversion">Diversion active</span>
+          ) : null}
           {capacity?.source === 'demo' ? (
             <span className="hospital-map-page__demo-badge">Demo data</span>
           ) : null}
@@ -199,7 +279,10 @@ export default function HospitalMapDashboard() {
       </header>
 
       <section className="hospital-map-page__kpis" aria-label="Hospital capacity summary">
-        <article className="hospital-map-page__score" style={{ borderColor: `${scoreColor}44`, borderLeftColor: scoreColor }}>
+        <article
+          className="hospital-map-page__score"
+          style={{ borderColor: `${scoreColor}44`, borderLeftColor: scoreColor }}
+        >
           <span className="hospital-map-page__kpi-label">Capacity score</span>
           <strong style={{ color: scoreColor }}>
             {capacityScore}
@@ -220,7 +303,9 @@ export default function HospitalMapDashboard() {
         </article>
         <article className="hospital-map-page__kpi">
           <span className="hospital-map-page__kpi-label">Available</span>
-          <strong className={availableBeds < 10 ? 'is-critical' : 'is-good'}>{availableBeds}</strong>
+          <strong className={availableBeds < 10 ? 'is-critical' : 'is-good'}>
+            {availableBeds}
+          </strong>
           <span className="hospital-map-page__kpi-sub">beds open now</span>
         </article>
         <article className="hospital-map-page__kpi">
@@ -230,7 +315,11 @@ export default function HospitalMapDashboard() {
         </article>
         <article className="hospital-map-page__kpi">
           <span className="hospital-map-page__kpi-label">Units critical</span>
-          <strong className={units.filter((unit) => unit.status === 'red').length > 0 ? 'is-critical' : 'is-good'}>
+          <strong
+            className={
+              units.filter((unit) => unit.status === 'red').length > 0 ? 'is-critical' : 'is-good'
+            }
+          >
             {units.filter((unit) => unit.status === 'red').length}
           </strong>
           <span className="hospital-map-page__kpi-sub">at full capacity</span>
@@ -254,8 +343,8 @@ export default function HospitalMapDashboard() {
         </div>
         {unitsAreIllustrative ? (
           <p className="hospital-map-page__table-note">
-            Illustrative unit breakdown — CareDroid does not yet track per-ward bed counts.
-            The department-level totals above are live.
+            Illustrative unit breakdown — CareDroid does not yet track per-ward bed counts. The
+            department-level totals above are live.
           </p>
         ) : null}
         {units.map((unit) => (
@@ -273,7 +362,10 @@ export default function HospitalMapDashboard() {
               <div key={point.timestamp || point.label} className="hospital-map-page__history-row">
                 <span>{point.label}</span>
                 <div className="hospital-map-page__occupancy-track">
-                  <div className="hospital-map-page__occupancy-fill" style={{ width: `${score}%`, background: color }} />
+                  <div
+                    className="hospital-map-page__occupancy-fill"
+                    style={{ width: `${score}%`, background: color }}
+                  />
                 </div>
                 <strong style={{ color }}>{point.score ?? '—'}</strong>
               </div>

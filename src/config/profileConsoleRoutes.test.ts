@@ -37,8 +37,14 @@ describe('profileConsoleRoutes', () => {
   it('preserves profile notification redirects', () => {
     expect(PROFILE_CONSOLE_REDIRECT_ROUTES).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ path: '/profile-settings', to: CANONICAL_ROUTES.profileSettings }),
-        expect.objectContaining({ path: CANONICAL_ROUTES.notifications, to: '/notification-preferences' }),
+        expect.objectContaining({
+          path: '/profile-settings',
+          to: CANONICAL_ROUTES.profileSettings,
+        }),
+        expect.objectContaining({
+          path: CANONICAL_ROUTES.notifications,
+          to: '/notification-preferences',
+        }),
       ]),
     );
   });

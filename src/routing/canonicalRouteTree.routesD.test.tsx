@@ -13,15 +13,19 @@ describe('canonical route tree — copilot aliases', () => {
     useEmergencyStore.setState(originalEmergencyState, true);
   });
 
-  it('/emergency/copilot redirects to the docked whiteboard copilot surface', async () => {
-    render(<AppRouteHarness initialPath="/emergency/copilot" />);
+  it(
+    '/emergency/copilot redirects to the docked whiteboard copilot surface',
+    async () => {
+      render(<AppRouteHarness initialPath="/emergency/copilot" />);
 
-    await waitFor(
-      () => expect(screen.getByTestId('location')).toHaveTextContent('/emergency/whiteboard'),
-      { timeout: ROUTE_LOAD_TIMEOUT },
-    );
-    expect(screen.queryByText('Access denied')).toBeNull();
-  }, ROUTE_LOAD_TIMEOUT);
+      await waitFor(
+        () => expect(screen.getByTestId('location')).toHaveTextContent('/emergency/whiteboard'),
+        { timeout: ROUTE_LOAD_TIMEOUT },
+      );
+      expect(screen.queryByText('Access denied')).toBeNull();
+    },
+    ROUTE_LOAD_TIMEOUT,
+  );
 
   it.each(['/assistant', '/chat', '/ai', '/copilot'])(
     '%s redirects to the docked Emergency Copilot experience',

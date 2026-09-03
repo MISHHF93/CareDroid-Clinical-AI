@@ -38,16 +38,19 @@ describe('ED staff Collaboration Hub wiring', () => {
     for (const view of listCuratedEdStaffRoleViews()) {
       const ids = getVisibleNavigation(view.emergencyRoleId).map((item) => item.id);
       expect(ids, view.label).toContain('collaboration');
-      expect(canAccessEmergencyRoute(view.emergencyRoleId, CANONICAL_ROUTES.emergencyCollaboration)).toBe(
-        true,
-      );
+      expect(
+        canAccessEmergencyRoute(view.emergencyRoleId, CANONICAL_ROUTES.emergencyCollaboration),
+      ).toBe(true);
     }
   });
 
   it('public waiting wall is not treated as ED staff collaboration', () => {
     expect(edStaffShouldSeeCollaboration(EMERGENCY_ROLE_IDS.publicDisplay)).toBe(false);
     expect(
-      canAccessEmergencyRoute(EMERGENCY_ROLE_IDS.publicDisplay, CANONICAL_ROUTES.emergencyCollaboration),
+      canAccessEmergencyRoute(
+        EMERGENCY_ROLE_IDS.publicDisplay,
+        CANONICAL_ROUTES.emergencyCollaboration,
+      ),
     ).toBe(false);
   });
 
@@ -84,8 +87,12 @@ describe('ED staff Collaboration Hub wiring', () => {
 
   it('demo journey includes Collaboration Hub for ED staff walkthrough', () => {
     const views = listCuratedDemoRoleViews();
-    expect(views.some((v) => v.description.toLowerCase().includes('channel') || v.copilotHint.includes('Collaboration'))).toBe(
-      true,
-    );
+    expect(
+      views.some(
+        (v) =>
+          v.description.toLowerCase().includes('channel') ||
+          v.copilotHint.includes('Collaboration'),
+      ),
+    ).toBe(true);
   });
 });

@@ -198,12 +198,12 @@ describe('medical theme full-scale audit', () => {
     // against in CSS (HEAL-212/214/317), just never checked here.
     const medicalThemeConstants = tokenFiles[10];
     for (const token of [
-      'surfacePage: \'var(--app-bg,',
-      'surfaceCard: \'var(--app-panel-bg,',
-      'surfaceMuted: \'var(--app-surface-muted,',
-      'ink: \'var(--app-fg,',
-      'inkMuted: \'var(--app-fg-muted,',
-      'accent: \'var(--app-accent,',
+      "surfacePage: 'var(--app-bg,",
+      "surfaceCard: 'var(--app-panel-bg,",
+      "surfaceMuted: 'var(--app-surface-muted,",
+      "ink: 'var(--app-fg,",
+      "inkMuted: 'var(--app-fg-muted,",
+      "accent: 'var(--app-accent,",
     ]) {
       expect(medicalThemeConstants).toContain(token);
     }

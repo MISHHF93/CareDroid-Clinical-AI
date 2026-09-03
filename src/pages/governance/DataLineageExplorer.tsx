@@ -11,7 +11,10 @@ import {
   filterDataLineageFlows,
 } from '../../data/dataLineageExplorer';
 import { DEMO_LIVE_STATES } from '../../utils/demoLiveState';
-import { buildLineageCategoryChart, buildLineageStageChart } from '../../utils/platformSaasChartModel';
+import {
+  buildLineageCategoryChart,
+  buildLineageStageChart,
+} from '../../utils/platformSaasChartModel';
 import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import './DataLineageExplorer.css';
 
@@ -19,7 +22,8 @@ const LINEAGE_CATEGORIES = ['all', 'AI extension', 'Calculator', 'AI workflow', 
 
 const DATA_LINEAGE_ROUTE_CHROME = Object.freeze({
   title: 'Data Lineage Explorer',
-  subtitle: 'Transparent Input → AI → Tool → Backend → Output flows with transformations and retention notes.',
+  subtitle:
+    'Transparent Input → AI → Tool → Backend → Output flows with transformations and retention notes.',
 });
 
 export default function DataLineageExplorer() {
@@ -42,8 +46,13 @@ export default function DataLineageExplorer() {
         <div className="data-lineage-page__title-row">
           <GraphicIconBadge iconKey="report" accent="brand" size="md" />
           <div>
-            <p className="data-lineage-page__title-text" data-testid="cd-page-title-text">Data Lineage Explorer</p>
-            <p>Transparent Input → AI → Tool → Backend → Output flows with transformations and retention notes.</p>
+            <p className="data-lineage-page__title-text" data-testid="cd-page-title-text">
+              Data Lineage Explorer
+            </p>
+            <p>
+              Transparent Input → AI → Tool → Backend → Output flows with transformations and
+              retention notes.
+            </p>
           </div>
         </div>
         <div className="data-lineage-page__actions">
@@ -60,16 +69,49 @@ export default function DataLineageExplorer() {
         details="Demo lineage traces from inventory, API inventories, and AI workflow contracts. PHI and raw prompts are excluded from retained metadata."
       />
 
-      <div className="data-lineage-page__metrics" role="group" aria-label="Data lineage summary metrics">
-        <MetricCard label="Flows" value={String(lineage.summary.flows)} hint="Traceable journeys" tone="neutral" />
-        <MetricCard label="Results" value={String(filteredFlows.length)} hint="Matching search/category filters" tone="neutral" />
-        <MetricCard label="Transformations" value={String(lineage.summary.transformations)} hint="Stage steps" tone="neutral" />
-        <MetricCard label="Models" value={String(lineage.summary.models)} hint="AI touchpoints" tone="warning" />
-        <MetricCard label="Backend calls" value={String(lineage.summary.backendTouchpoints)} hint="API-backed flows" tone="neutral" />
+      <div
+        className="data-lineage-page__metrics"
+        role="group"
+        aria-label="Data lineage summary metrics"
+      >
+        <MetricCard
+          label="Flows"
+          value={String(lineage.summary.flows)}
+          hint="Traceable journeys"
+          tone="neutral"
+        />
+        <MetricCard
+          label="Results"
+          value={String(filteredFlows.length)}
+          hint="Matching search/category filters"
+          tone="neutral"
+        />
+        <MetricCard
+          label="Transformations"
+          value={String(lineage.summary.transformations)}
+          hint="Stage steps"
+          tone="neutral"
+        />
+        <MetricCard
+          label="Models"
+          value={String(lineage.summary.models)}
+          hint="AI touchpoints"
+          tone="warning"
+        />
+        <MetricCard
+          label="Backend calls"
+          value={String(lineage.summary.backendTouchpoints)}
+          hint="API-backed flows"
+          tone="neutral"
+        />
       </div>
 
       <div className="data-lineage-page__charts">
-        <VisualizationPanel title="Flow categories" description="AI extensions, calculators, workflows, and simulations." badge="Categories">
+        <VisualizationPanel
+          title="Flow categories"
+          description="AI extensions, calculators, workflows, and simulations."
+          badge="Categories"
+        >
           <CategoryBarChart
             data={categoryChart}
             title="Flow categories"
@@ -77,7 +119,11 @@ export default function DataLineageExplorer() {
             emptyMessage="Category chart appears when lineage flows are registered."
           />
         </VisualizationPanel>
-        <VisualizationPanel title="Stage coverage" description="Input, AI, tool, backend, and output stage counts." badge="Stages">
+        <VisualizationPanel
+          title="Stage coverage"
+          description="Input, AI, tool, backend, and output stage counts."
+          badge="Stages"
+        >
           <CategoryBarChart
             data={stageChart}
             title="Stage coverage"

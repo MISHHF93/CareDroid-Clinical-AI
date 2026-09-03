@@ -5,10 +5,7 @@ import {
   listUserProfileCatalogOptions,
   USER_PROFILE_CATALOG,
 } from '../../config/userProfileCatalog';
-import {
-  ED_WORKFLOW_LANES,
-  listEdAssignableCatalogRoles,
-} from '../../config/platformEntryModel';
+import { ED_WORKFLOW_LANES, listEdAssignableCatalogRoles } from '../../config/platformEntryModel';
 import { listEdWorkflowAzSteps } from '../../config/edWorkflowIntegrationModel';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { getEmergencyRoleHomeRoute } from '../../config/emergencyRolePermissions';
@@ -20,8 +17,7 @@ export default function EdStaffWorkflowAdmin() {
   const catalogRoleOptions = useMemo(
     () =>
       listUserProfileCatalogOptions({
-        organizationType:
-          entitlementContext?.organization?.organizationType || 'hospital',
+        organizationType: entitlementContext?.organization?.organizationType || 'hospital',
         entitledPackIds: entitlementContext?.entitledPackIds || [],
       }),
     [entitlementContext],

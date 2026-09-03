@@ -16,7 +16,11 @@ describe('ClinicalIntentRouter', () => {
       'Abdominal Pain',
       'Psychiatric Crisis',
     ]);
-    expect(CLINICAL_INTENT_ROUTES.every((route) => route.navigationSteps === COMPLAINT_FIRST_NAVIGATION_STEPS)).toBe(true);
+    expect(
+      CLINICAL_INTENT_ROUTES.every(
+        (route) => route.navigationSteps === COMPLAINT_FIRST_NAVIGATION_STEPS,
+      ),
+    ).toBe(true);
   });
 
   it('routes complaints to workflows and surfaced calculators without manual search', () => {
@@ -26,14 +30,14 @@ describe('ClinicalIntentRouter', () => {
         navigationMode: 'complaint-first',
         calculators: [expect.objectContaining({ label: 'HEART' })],
         workflows: ['ACS Workflow'],
-      })
+      }),
     );
     expect(routeClinicalIntent('facial droop')).toEqual(
       expect.objectContaining({
         complaint: 'Stroke Symptoms',
         calculators: [expect.objectContaining({ label: 'NIHSS' })],
         workflows: ['Stroke Workflow'],
-      })
+      }),
     );
     expect(routeClinicalIntent('possible sepsis')).toEqual(
       expect.objectContaining({
@@ -43,14 +47,14 @@ describe('ClinicalIntentRouter', () => {
           expect.objectContaining({ label: 'NEWS2' }),
         ],
         workflows: ['Sepsis Workflow'],
-      })
+      }),
     );
     expect(routeClinicalIntent('trauma activation')).toEqual(
       expect.objectContaining({
         complaint: 'Trauma',
         workflows: ['Trauma Pathway'],
         protocols: expect.arrayContaining(['Trauma Pathway']),
-      })
+      }),
     );
     expect(routeClinicalIntent('abdominal pain with vomiting')).toEqual(
       expect.objectContaining({
@@ -60,7 +64,7 @@ describe('ClinicalIntentRouter', () => {
           expect.objectContaining({ label: 'Ranson Criteria' }),
           expect.objectContaining({ label: 'BISAP' }),
         ]),
-      })
+      }),
     );
     expect(routeClinicalIntent('suicidal ideation')).toEqual(
       expect.objectContaining({
@@ -70,7 +74,7 @@ describe('ClinicalIntentRouter', () => {
           expect.objectContaining({ label: 'C-SSRS' }),
           expect.objectContaining({ label: 'PHQ-9' }),
         ]),
-      })
+      }),
     );
   });
 
@@ -87,7 +91,7 @@ describe('ClinicalIntentRouter', () => {
         referrals: expect.any(Array),
         aiCopilot: 'ED AI Copilot',
         simulations: expect.any(Array),
-      })
+      }),
     );
     expect(route.navigationFlow.map((step) => step.step)).toEqual(COMPLAINT_FIRST_NAVIGATION_STEPS);
     expect(route.simulations).toEqual(expect.arrayContaining(['ACS chest pain simulation']));
@@ -114,13 +118,19 @@ describe('ClinicalIntentRouter — canonical recognizeComplaint() fallback (2026
 
   it('routes "difficulty breathing" (a phrasing the alias list never had) to the respiratory workflow', () => {
     expect(routeClinicalIntent('difficulty breathing')).toEqual(
-      expect.objectContaining({ complaint: 'Shortness of Breath', workflows: ['Respiratory Workflow'] }),
+      expect.objectContaining({
+        complaint: 'Shortness of Breath',
+        workflows: ['Respiratory Workflow'],
+      }),
     );
   });
 
   it('routes "stomach pain" (a lay term the alias list never had) to the abdominal-pain workflow via the general concept', () => {
     expect(routeClinicalIntent('stomach pain')).toEqual(
-      expect.objectContaining({ complaint: 'Abdominal Pain', workflows: ['Abdominal Pain Workflow'] }),
+      expect.objectContaining({
+        complaint: 'Abdominal Pain',
+        workflows: ['Abdominal Pain Workflow'],
+      }),
     );
   });
 

@@ -47,10 +47,15 @@ function ThreeMinuteMissionBar() {
 
       <ol className="three-minute-mission-bar__missions">
         {snapshot.activeMissions.slice(0, 3).map((mission) => (
-          <li key={mission.missionId} className={`three-minute-mission-bar__mission three-minute-mission-bar__mission--${mission.phase}`}>
+          <li
+            key={mission.missionId}
+            className={`three-minute-mission-bar__mission three-minute-mission-bar__mission--${mission.phase}`}
+          >
             <div className="three-minute-mission-bar__mission-main">
               <span className="three-minute-mission-bar__subject">{mission.subjectLabel}</span>
-              <span className="three-minute-mission-bar__trigger">{mission.trigger.replace(/_/g, ' ')}</span>
+              <span className="three-minute-mission-bar__trigger">
+                {mission.trigger.replace(/_/g, ' ')}
+              </span>
               <ThreeMinuteTimer startTime={mission.startedAt} compact />
               <span className="three-minute-mission-bar__owner">Owner: {mission.ownerRole}</span>
             </div>
@@ -77,7 +82,10 @@ function ThreeMinuteMissionBar() {
                 className="three-minute-mission-bar__btn three-minute-mission-bar__btn--primary"
                 aria-label={`Acknowledge mission for ${mission.subjectLabel}`}
                 onClick={() =>
-                  missionState.acknowledgeMission(mission.missionId, resolveOperationalActorId(user))
+                  missionState.acknowledgeMission(
+                    mission.missionId,
+                    resolveOperationalActorId(user),
+                  )
                 }
               >
                 Acknowledge

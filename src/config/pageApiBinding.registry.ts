@@ -53,7 +53,11 @@ export const PAGE_API_BINDINGS: readonly PageApiBinding[] = Object.freeze([
       E.operationalIntelligenceAlerts,
       E.centralNodeSnapshot,
     ],
-    capabilities: ['emergencyCentralNode', 'emergencyOperationalAnalytics', 'emergencyOperatingSurfaces'],
+    capabilities: [
+      'emergencyCentralNode',
+      'emergencyOperationalAnalytics',
+      'emergencyOperatingSurfaces',
+    ],
   }),
   Object.freeze({
     pageId: 'whiteboard',
@@ -81,7 +85,11 @@ export const PAGE_API_BINDINGS: readonly PageApiBinding[] = Object.freeze([
     path: CANONICAL_ROUTES.emergencyHandoffs,
     mode: 'wired',
     endpoints: [`${EMERGENCY_OS_API_ENDPOINTS.operatingSurface}/handoffs`],
-    capabilities: ['emergencyHandoffsView', 'emergencyOperatingSurfaces', 'emergencyWorkflowOrchestration'],
+    capabilities: [
+      'emergencyHandoffsView',
+      'emergencyOperatingSurfaces',
+      'emergencyWorkflowOrchestration',
+    ],
   }),
   Object.freeze({
     pageId: 'reports',
@@ -117,9 +125,14 @@ export const PAGE_API_BINDINGS: readonly PageApiBinding[] = Object.freeze([
     pageId: 'executive',
     path: CANONICAL_ROUTES.executive,
     mode: 'redirect',
-    endpoints: [`${E.operatingSurface}/command-center`, E.analytics, E.operationalIntelligenceSnapshot],
+    endpoints: [
+      `${E.operatingSurface}/command-center`,
+      E.analytics,
+      E.operationalIntelligenceSnapshot,
+    ],
     capabilities: ['emergencyOperationalAnalytics', 'emergencyOperatingSurfaces'],
-    notes: 'Redirects to Hospital Command Center (?view=executive) with progressive disclosure lens.',
+    notes:
+      'Redirects to Hospital Command Center (?view=executive) with progressive disclosure lens.',
   }),
   Object.freeze({
     pageId: 'alerts',

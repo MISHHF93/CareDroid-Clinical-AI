@@ -12,12 +12,21 @@ const medicalTypeLayerCss = readFileSync(join(__dirname, 'medical-type-layer.css
 const textNormalizationCss = readFileSync(join(__dirname, 'text-normalization.css'), 'utf8');
 const medicalCardLayerCss = readFileSync(join(__dirname, 'medical-card-layer.css'), 'utf8');
 const cardContrastCss = readFileSync(join(__dirname, 'card-contrast-normalization.css'), 'utf8');
-const profileSurfaceCss = readFileSync(join(__dirname, 'profile-surface-normalization.css'), 'utf8');
+const profileSurfaceCss = readFileSync(
+  join(__dirname, 'profile-surface-normalization.css'),
+  'utf8',
+);
 const themeBridgeCss = readFileSync(join(__dirname, 'theme-legacy-bridge.css'), 'utf8');
 const appShellCss = readFileSync(join(srcRoot, 'components/app-shell.css'), 'utf8');
-const commandDashboardCss = readFileSync(join(srcRoot, 'components/emergency/CommandDashboard.css'), 'utf8');
+const commandDashboardCss = readFileSync(
+  join(srcRoot, 'components/emergency/CommandDashboard.css'),
+  'utf8',
+);
 const profilePageCss = readFileSync(join(srcRoot, 'pages/Profile.css'), 'utf8');
-const chartCss = readFileSync(join(srcRoot, 'components/dashboard/DashboardVisualizations.css'), 'utf8');
+const chartCss = readFileSync(
+  join(srcRoot, 'components/dashboard/DashboardVisualizations.css'),
+  'utf8',
+);
 const toolsOverviewCss = readFileSync(join(srcRoot, 'pages/tools/ToolsOverview.css'), 'utf8');
 const toolPageLayoutCss = readFileSync(join(srcRoot, 'pages/tools/ToolPageLayout.css'), 'utf8');
 const calculatorsCss = readFileSync(join(srcRoot, 'pages/tools/Calculators.css'), 'utf8');
@@ -29,19 +38,28 @@ const alertCss = readFileSync(join(srcRoot, 'components/ui/Alert.css'), 'utf8');
 const platformEntryCss = readFileSync(join(srcRoot, 'pages/PlatformEntryHub.css'), 'utf8');
 const settingsCss = readFileSync(join(srcRoot, 'pages/Settings.css'), 'utf8');
 const teamMgmtCss = readFileSync(join(srcRoot, 'pages/team/TeamManagement.css'), 'utf8');
-const notificationCss = readFileSync(join(srcRoot, 'components/notifications/NotificationToast.css'), 'utf8');
-const toolPreflightCss = readFileSync(join(srcRoot, 'components/clinical/ToolPreflightStatus.css'), 'utf8');
+const notificationCss = readFileSync(
+  join(srcRoot, 'components/notifications/NotificationToast.css'),
+  'utf8',
+);
+const toolPreflightCss = readFileSync(
+  join(srcRoot, 'components/clinical/ToolPreflightStatus.css'),
+  'utf8',
+);
 
-const LEGACY_NEON_PATTERN =
-  /rgba\(0,\s*255,\s*136|#ff6b6b|#ff5252|#8ed8ff|rgba\(79,\s*70,\s*229/;
+const LEGACY_NEON_PATTERN = /rgba\(0,\s*255,\s*136|#ff6b6b|#ff5252|#8ed8ff|rgba\(79,\s*70,\s*229/;
 
 describe('theme color system revamp', () => {
   it('defines the standard medical root palette on every color layer', () => {
     // --app-* light-theme tokens now resolve through --medical-* (see file's
     // own header comment: "Color alignment") rather than repeating literal
     // hex values -- the fallback values below are still the source of truth.
-    expect(themeTokensCss).toMatch(/html,\s*html\[data-theme='light'\][\s\S]*--app-bg:\s*var\(--medical-canvas,\s*#f6f9fc\)/);
-    expect(themeTokensCss).toMatch(/html,\s*html\[data-theme='light'\][\s\S]*--app-surface-1:\s*var\(--medical-white,\s*#ffffff\)/);
+    expect(themeTokensCss).toMatch(
+      /html,\s*html\[data-theme='light'\][\s\S]*--app-bg:\s*var\(--medical-canvas,\s*#f6f9fc\)/,
+    );
+    expect(themeTokensCss).toMatch(
+      /html,\s*html\[data-theme='light'\][\s\S]*--app-surface-1:\s*var\(--medical-white,\s*#ffffff\)/,
+    );
     // Dark mode is now a real, shipped feature (ThemeToggle + persisted
     // preference) -- see medicalThemeAudit.test.ts for the dark-block audit.
     expect(themeTokensCss).toMatch(/html\[data-theme='dark'\]\s*\{/);
@@ -58,7 +76,9 @@ describe('theme color system revamp', () => {
     expect(medicalTypeLayerCss).toContain('--medical-text-heading:');
     expect(medicalTypeLayerCss).toContain('--medical-text-link:');
     expect(medicalTypeLayerCss).toContain('--medical-status-critical-text:');
-    expect(textNormalizationCss).toContain(':is(.app-shell, .emergency-app-shell) :is(h1, h2, h3, h4, h5, h6)');
+    expect(textNormalizationCss).toContain(
+      ':is(.app-shell, .emergency-app-shell) :is(h1, h2, h3, h4, h5, h6)',
+    );
     expect(textNormalizationCss).toContain('.clinical-calculator-modal');
     expect(textNormalizationCss).toContain('var(--medical-text-link)');
   });
@@ -73,9 +93,15 @@ describe('theme color system revamp', () => {
   });
 
   it('uses the CCDS Primary Clinical Blue as the medical product accent across the standard theme', () => {
-    expect(themeTokensCss).toMatch(/html,\s*html\[data-theme='light'\][\s\S]*--app-accent:\s*var\(--medical-accent,\s*#075985\)/);
-    expect(themeTokensCss).toMatch(/html,\s*html\[data-theme='light'\][\s\S]*--app-accent-interactive:\s*var\(--medical-accent,\s*#075985\)/);
-    expect(themeTokensCss).toMatch(/html,\s*html\[data-theme='light'\][\s\S]*--app-link-fg:\s*var\(--medical-accent-hover,\s*#054364\)/);
+    expect(themeTokensCss).toMatch(
+      /html,\s*html\[data-theme='light'\][\s\S]*--app-accent:\s*var\(--medical-accent,\s*#075985\)/,
+    );
+    expect(themeTokensCss).toMatch(
+      /html,\s*html\[data-theme='light'\][\s\S]*--app-accent-interactive:\s*var\(--medical-accent,\s*#075985\)/,
+    );
+    expect(themeTokensCss).toMatch(
+      /html,\s*html\[data-theme='light'\][\s\S]*--app-link-fg:\s*var\(--medical-accent-hover,\s*#054364\)/,
+    );
     expect(medicalTypeLayerCss).toContain('--medical-text-link: var(--medical-sky-700)');
   });
 

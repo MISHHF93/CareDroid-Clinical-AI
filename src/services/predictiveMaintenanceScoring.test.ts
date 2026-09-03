@@ -159,7 +159,7 @@ describe('predictiveMaintenanceScoring', () => {
   it('falls back to rules when AI engine has no provider', () => {
     const result = scorePredictiveMaintenance(
       { vehicleAgeYears: 8, mileage: 90_000 },
-      { engine: SCORING_ENGINE_AI }
+      { engine: SCORING_ENGINE_AI },
     );
 
     expect(result.engine).toBe(SCORING_ENGINE_AI);
@@ -182,7 +182,7 @@ describe('predictiveMaintenanceScoring', () => {
           contributingFactors: [],
           engine: SCORING_ENGINE_AI,
         }),
-      }
+      },
     );
 
     expect(result.maintenanceRiskScore).toBe(42);

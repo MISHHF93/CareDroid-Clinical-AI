@@ -22,7 +22,7 @@ describe('toolRegistry', () => {
     expect(String(tool.category || '').trim().length).toBeGreaterThan(0);
     expect(
       tool.path || tool.panelTool,
-      `${id} must define path or panelTool for launch`
+      `${id} must define path or panelTool for launch`,
     ).toBeTruthy();
   });
 

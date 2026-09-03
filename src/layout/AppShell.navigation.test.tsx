@@ -174,9 +174,7 @@ describe('AppShell navigation surfaces', () => {
 
   it('keeps nav items projected from the canonical unified config', () => {
     expect(navigationConfig).toContain('export const APP_SHELL_NAV_ITEMS');
-    expect(navigationConfig).toContain(
-      "from './unified-navigation.config'",
-    );
+    expect(navigationConfig).toContain("from './unified-navigation.config'");
     expect(appShellSource).not.toContain('SIDEBAR_ICON_COMPONENTS');
     expect(APP_SHELL_NAV_ITEMS.map((item) => item.featureGate)).toEqual(
       PILOT_SIDEBAR_ITEMS.map((item) => item.featureGate),

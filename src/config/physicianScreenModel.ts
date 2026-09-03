@@ -170,7 +170,9 @@ export function resolvePhysicianScreenCapabilities(
   const showDispositionBoarders = showWidget(PHYSICIAN_SCREEN_WIDGETS.dispositionBoarders);
   const showPatientJourneyTimeline = showWidget(PHYSICIAN_SCREEN_WIDGETS.patientJourneyTimeline);
   const showCopilotActions = showWidget(PHYSICIAN_SCREEN_WIDGETS.copilotActions);
-  const showComplaintWorkflowLaunchers = showWidget(PHYSICIAN_SCREEN_WIDGETS.complaintWorkflowLaunchers);
+  const showComplaintWorkflowLaunchers = showWidget(
+    PHYSICIAN_SCREEN_WIDGETS.complaintWorkflowLaunchers,
+  );
   const showOperationalStrip = showWidget(PHYSICIAN_SCREEN_WIDGETS.operationalStrip);
 
   const visibleOperationalSurfaces = [

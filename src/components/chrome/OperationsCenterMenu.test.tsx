@@ -43,7 +43,16 @@ vi.mock('../emergency/WorkflowAutomationCommandBar', () => ({
   default: () => <div data-testid="stub-workflow-bar">Workflow content</div>,
 }));
 
-function baseCounts(overrides: { critical?: number; watch?: number; breach?: number; unacked?: number; pending?: number; workflowCritical?: number } = {}) {
+function baseCounts(
+  overrides: {
+    critical?: number;
+    watch?: number;
+    breach?: number;
+    unacked?: number;
+    pending?: number;
+    workflowCritical?: number;
+  } = {},
+) {
   aiChiefMock.mockReturnValue({
     criticalDomainCount: overrides.critical ?? 0,
     watchDomainCount: overrides.watch ?? 0,
@@ -91,7 +100,9 @@ describe('OperationsCenterMenu', () => {
     baseCounts({ critical: 1, breach: 2, workflowCritical: 1 });
     renderMenu();
 
-    const trigger = screen.getByRole('button', { name: 'Operations center, 4 items need attention' });
+    const trigger = screen.getByRole('button', {
+      name: 'Operations center, 4 items need attention',
+    });
     expect(trigger).toHaveClass('operations-center-menu__trigger--critical');
     expect(screen.getByText('4')).toBeInTheDocument();
   });

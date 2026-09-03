@@ -13,7 +13,12 @@ vi.mock('./useEdOperatingSurface', () => ({
     primaryDecision: 'Assign unit',
     defaultNextAction: 'Dispatch unit',
     threeMinuteRelevant: true,
-    situationBrief: { status: 'ok', attention: 'none', owner: 'Dispatcher', nextAction: 'Dispatch' },
+    situationBrief: {
+      status: 'ok',
+      attention: 'none',
+      owner: 'Dispatcher',
+      nextAction: 'Dispatch',
+    },
     topActionLabel: 'Dispatch',
     topActionRoute: '/emergency/dispatch',
     isEmergencyRoute: true,

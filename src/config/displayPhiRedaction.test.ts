@@ -26,7 +26,9 @@ const patient = {
   arrivalTime: '2026-06-20T10:00:00.000Z',
   chiefComplaint: 'Chest pain',
   flags: [],
-  notes: [{ id: 'n1', text: 'Patient anxious in waiting room', timestamp: '2026-06-20T10:05:00.000Z' }],
+  notes: [
+    { id: 'n1', text: 'Patient anxious in waiting room', timestamp: '2026-06-20T10:05:00.000Z' },
+  ],
   timeline: [],
 } as unknown as Patient;
 
@@ -39,11 +41,14 @@ describe('displayPhiRedaction', () => {
   });
 
   it('rejects serialized payloads that contain PHI tokens', () => {
-    expect(assertDisplayPayloadIsPhiSafe({ label: 'Busy' }, collectDisplayPhiTokens([patient]))).toBe(
-      true,
-    );
     expect(
-      assertDisplayPayloadIsPhiSafe({ label: 'Waiting for Avery' }, collectDisplayPhiTokens([patient])),
+      assertDisplayPayloadIsPhiSafe({ label: 'Busy' }, collectDisplayPhiTokens([patient])),
+    ).toBe(true);
+    expect(
+      assertDisplayPayloadIsPhiSafe(
+        { label: 'Waiting for Avery' },
+        collectDisplayPhiTokens([patient]),
+      ),
     ).toBe(false);
   });
 

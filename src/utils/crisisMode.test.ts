@@ -27,7 +27,12 @@ describe('deriveCrisisModeState', () => {
         }),
         patient('ready', PatientState.Disposition),
       ],
-      reassessmentQueue: [{ patientId: 'a' }, { patientId: 'b' }, { patientId: 'c' }, { patientId: 'd' }],
+      reassessmentQueue: [
+        { patientId: 'a' },
+        { patientId: 'b' },
+        { patientId: 'c' },
+        { patientId: 'd' },
+      ],
       emsArrivals: [
         {
           id: 'ems-1',
@@ -56,7 +61,7 @@ describe('deriveCrisisModeState', () => {
     expect(
       deriveCrisisModeState({
         capacity: { riskLevel: 'Yellow', score: 82 },
-      }).active
+      }).active,
     ).toBe(false);
   });
 });

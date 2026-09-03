@@ -57,7 +57,8 @@ export default function OperationsLiveSnapshotPanel({
         <div>
           <h2>Operations live snapshot</h2>
           <p>
-            Hospital capacity, device telemetry, fleet readiness, and alert queue from the latest scan.
+            Hospital capacity, device telemetry, fleet readiness, and alert queue from the latest
+            scan.
             {lastRefreshed ? ` Updated ${lastRefreshed.toLocaleTimeString()}.` : ''}
           </p>
         </div>
@@ -72,7 +73,11 @@ export default function OperationsLiveSnapshotPanel({
         </div>
       </div>
 
-      <div className="operations-live-snapshot__metrics" role="group" aria-label="Operations live summary metrics">
+      <div
+        className="operations-live-snapshot__metrics"
+        role="group"
+        aria-label="Operations live summary metrics"
+      >
         {summaryMetrics.map((row) => (
           <MetricCard
             key={row.id}

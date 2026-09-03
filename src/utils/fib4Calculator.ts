@@ -45,7 +45,8 @@ export function calculateFib4(inputs) {
  * @param {number} ageYears
  */
 export function interpretFib4(fib4, ageYears) {
-  if (!Number.isFinite(fib4) || fib4 <= 0 || !Number.isFinite(ageYears) || ageYears <= 0) return null;
+  if (!Number.isFinite(fib4) || fib4 <= 0 || !Number.isFinite(ageYears) || ageYears <= 0)
+    return null;
 
   const riskCategory = fib4RiskCategoryFromIndex(fib4, ageYears);
   if (!riskCategory) return null;
@@ -141,7 +142,9 @@ export function validateFib4Inputs(raw) {
   const plt = Number(raw.platelets10e9PerL);
 
   if (!Number.isFinite(age) || age < FIB4_LIMITS.ageYears.min || age > FIB4_LIMITS.ageYears.max) {
-    errors.push(`Enter age between ${FIB4_LIMITS.ageYears.min} and ${FIB4_LIMITS.ageYears.max} years.`);
+    errors.push(
+      `Enter age between ${FIB4_LIMITS.ageYears.min} and ${FIB4_LIMITS.ageYears.max} years.`,
+    );
   }
   if (!Number.isFinite(ast) || ast <= FIB4_LIMITS.astUPerL.min || ast > FIB4_LIMITS.astUPerL.max) {
     errors.push(`Enter AST between 1 and ${FIB4_LIMITS.astUPerL.max} U/L.`);
@@ -155,7 +158,7 @@ export function validateFib4Inputs(raw) {
     plt > FIB4_LIMITS.platelets10e9PerL.max
   ) {
     errors.push(
-      `Enter platelet count between 1 and ${FIB4_LIMITS.platelets10e9PerL.max} (×10?/L).`
+      `Enter platelet count between 1 and ${FIB4_LIMITS.platelets10e9PerL.max} (×10?/L).`,
     );
   }
 

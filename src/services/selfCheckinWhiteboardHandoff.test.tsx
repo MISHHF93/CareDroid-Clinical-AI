@@ -63,9 +63,13 @@ describe('selfCheckinWhiteboardHandoff', () => {
       { now: CHECKIN_TIME, patientId: 'self-arrival-test-1' },
     );
 
-    const outcome = await completeSelfCheckinWhiteboardHandoff(useEmergencyStore.getState(), result, {
-      actorName: 'self-arrival',
-    });
+    const outcome = await completeSelfCheckinWhiteboardHandoff(
+      useEmergencyStore.getState(),
+      result,
+      {
+        actorName: 'self-arrival',
+      },
+    );
     const handoff = outcome.handoff;
 
     expect(outcome.backendSynced).toBe(true);
@@ -146,12 +150,18 @@ describe('selfCheckinWhiteboardHandoff', () => {
       { now: CHECKIN_TIME, patientId: 'self-arrival-test-3' },
     );
 
-    const outcome = await completeSelfCheckinWhiteboardHandoff(useEmergencyStore.getState(), result, {
-      actorName: 'self-arrival',
-    });
+    const outcome = await completeSelfCheckinWhiteboardHandoff(
+      useEmergencyStore.getState(),
+      result,
+      {
+        actorName: 'self-arrival',
+      },
+    );
 
     expect(outcome.backendSynced).toBe(false);
-    const patient = useEmergencyStore.getState().patients.find((entry) => entry.id === 'self-arrival-test-3');
+    const patient = useEmergencyStore
+      .getState()
+      .patients.find((entry) => entry.id === 'self-arrival-test-3');
     expect(patient).toMatchObject({ handoffSyncPending: true });
   });
 });

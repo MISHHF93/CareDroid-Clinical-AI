@@ -74,7 +74,10 @@ export function resolveSmartIntakeStartStep({
   return SMART_INTAKE_STEP_INDEX.start;
 }
 
-export function resolveSmartIntakeContinueStep(activeStep, { verificationComplete = false }: any = {}) {
+export function resolveSmartIntakeContinueStep(
+  activeStep,
+  { verificationComplete = false }: any = {},
+) {
   if (activeStep <= SMART_INTAKE_STEP_INDEX.start) return SMART_INTAKE_STEP_INDEX.capture;
   if (activeStep === SMART_INTAKE_STEP_INDEX.capture) return SMART_INTAKE_STEP_INDEX.match;
   if (activeStep === SMART_INTAKE_STEP_INDEX.ocr) return SMART_INTAKE_STEP_INDEX.match;
@@ -109,7 +112,8 @@ export function buildAutoApprovedFieldDecisions(fields = [] as any[], boardPatie
     dateOfBirth: boardPatient?.dob,
     sex: boardPatient?.sex,
     phone: boardPatient?.phone || boardPatient?.mobilePhone,
-    healthCardNumber: boardPatient?.healthCardNumber || boardPatient?.healthCard || boardPatient?.mrn,
+    healthCardNumber:
+      boardPatient?.healthCardNumber || boardPatient?.healthCard || boardPatient?.mrn,
     address: boardPatient?.address,
   };
 
@@ -158,7 +162,9 @@ export function measureSmartIntakePath({
     : SMART_INTAKE_CLICK_BUDGET.baselineStepNavigation;
   const ocrTransitionClicks = skipsOcrTransition ? 0 : 1;
   const conflictingReviewClicks = conflictingFieldCount * perFieldClicks;
-  const matchingBulkClicks = usesBulkApprove ? 1 : (reviewFieldCount - conflictingFieldCount) * perFieldClicks;
+  const matchingBulkClicks = usesBulkApprove
+    ? 1
+    : (reviewFieldCount - conflictingFieldCount) * perFieldClicks;
   const finalizeClicks = SMART_INTAKE_CLICK_BUDGET.baselineFinalize;
 
   const clicks =
@@ -175,10 +181,7 @@ export function measureSmartIntakePath({
     : SMART_INTAKE_INTERNAL_STEPS.length;
 
   const frictionScore = Math.round(
-    clicks * 0.45 +
-      transitions * 4 +
-      conflictingFieldCount * 6 +
-      (path === 'baseline' ? 12 : 0),
+    clicks * 0.45 + transitions * 4 + conflictingFieldCount * 6 + (path === 'baseline' ? 12 : 0),
   );
 
   return {
@@ -214,7 +217,9 @@ export function auditSmartIntakeFlow() {
     clickReduction: baseline.clicks - optimized.clicks,
     transitionReduction: baseline.transitions - optimized.transitions,
     frictionReduction: baseline.frictionScore - optimized.frictionScore,
-    passesAudit: optimized.clicks <= baseline.clicks * 0.55 && optimized.frictionScore < baseline.frictionScore,
+    passesAudit:
+      optimized.clicks <= baseline.clicks * 0.55 &&
+      optimized.frictionScore < baseline.frictionScore,
   };
 }
 

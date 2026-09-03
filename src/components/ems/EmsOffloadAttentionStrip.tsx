@@ -13,10 +13,10 @@ function PhaseLabel({ phase }) {
 }
 
 export default function EmsOffloadAttentionStrip({
-  emsArrivals = ([] as any[]),
-  patients = ([] as any[]),
-  staff = ([] as any[]),
-  rooms = ([] as any[]),
+  emsArrivals = [] as any[],
+  patients = [] as any[],
+  staff = [] as any[],
+  rooms = [] as any[],
   offloadTargetMinutes = 15,
   onSelectPatient,
   onSelectArrival,
@@ -55,7 +55,11 @@ export default function EmsOffloadAttentionStrip({
             <small>Awaiting</small>
           </span>
           {snapshot.averageOffloadMinutes ? (
-            <span data-tone={snapshot.averageOffloadMinutes >= offloadTargetMinutes ? 'critical' : 'watch'}>
+            <span
+              data-tone={
+                snapshot.averageOffloadMinutes >= offloadTargetMinutes ? 'critical' : 'watch'
+              }
+            >
               <strong>{snapshot.averageOffloadMinutes}m</strong>
               <small>Avg offload</small>
             </span>
@@ -68,7 +72,11 @@ export default function EmsOffloadAttentionStrip({
           ) : null}
         </div>
         {onOpenTracker ? (
-          <button type="button" className="ems-offload-attention-strip__open" onClick={onOpenTracker}>
+          <button
+            type="button"
+            className="ems-offload-attention-strip__open"
+            onClick={onOpenTracker}
+          >
             Open tracker
           </button>
         ) : null}

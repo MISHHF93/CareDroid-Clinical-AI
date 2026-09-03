@@ -134,10 +134,30 @@ export const ENTERPRISE_METADATA_SCHEMA = Object.freeze([
   Object.freeze({ field: 'createdAt', type: 'datetime', required: true, domains: ['all'] }),
   Object.freeze({ field: 'updatedAt', type: 'datetime', required: true, domains: ['all'] }),
   Object.freeze({ field: 'classification', type: 'enum', required: true, domains: ['all'] }),
-  Object.freeze({ field: 'retentionPolicy', type: 'string', required: false, domains: ['patient', 'audit'] }),
-  Object.freeze({ field: 'welfareTier', type: 'enum', required: false, domains: ['equine', 'welfare'] }),
-  Object.freeze({ field: 'complianceTag', type: 'string[]', required: false, domains: ['policy', 'audit'] }),
-  Object.freeze({ field: 'sourceSystem', type: 'string', required: false, domains: ['integration', 'dataset'] }),
+  Object.freeze({
+    field: 'retentionPolicy',
+    type: 'string',
+    required: false,
+    domains: ['patient', 'audit'],
+  }),
+  Object.freeze({
+    field: 'welfareTier',
+    type: 'enum',
+    required: false,
+    domains: ['equine', 'welfare'],
+  }),
+  Object.freeze({
+    field: 'complianceTag',
+    type: 'string[]',
+    required: false,
+    domains: ['policy', 'audit'],
+  }),
+  Object.freeze({
+    field: 'sourceSystem',
+    type: 'string',
+    required: false,
+    domains: ['integration', 'dataset'],
+  }),
 ]);
 
 export function assessEnterpriseMetadata() {
@@ -161,17 +181,67 @@ export function assessEnterpriseMetadata() {
 export function assessDataCatalog() {
   const apiCount = BACKEND_HTTP_ROUTES.length;
   const catalog = Object.freeze([
-    Object.freeze({ id: 'DS-001', type: 'dataset', name: 'Patient arrivals', domain: 'operations', discoverable: true }),
-    Object.freeze({ id: 'DS-002', type: 'dataset', name: 'Queue metrics', domain: 'operations', discoverable: true }),
-    Object.freeze({ id: 'DS-003', type: 'dataset', name: 'Usage events', domain: 'saas', discoverable: true }),
-    Object.freeze({ id: 'DS-004', type: 'dataset', name: 'Audit logs', domain: 'compliance', discoverable: true }),
-    Object.freeze({ id: 'ENT-001', type: 'entity', name: 'Organization', domain: 'tenant', discoverable: true }),
-    Object.freeze({ id: 'ENT-002', type: 'entity', name: 'Platform asset', domain: 'catalog', discoverable: true }),
-    Object.freeze({ id: 'API-001', type: 'api', name: 'CareDroid API', domain: 'clinical', discoverable: true, endpointCount: 24 }),
-    Object.freeze({ id: 'API-002', type: 'api', name: 'Platform assets API', domain: 'commercial', discoverable: true, endpointCount: 18 }),
+    Object.freeze({
+      id: 'DS-001',
+      type: 'dataset',
+      name: 'Patient arrivals',
+      domain: 'operations',
+      discoverable: true,
+    }),
+    Object.freeze({
+      id: 'DS-002',
+      type: 'dataset',
+      name: 'Queue metrics',
+      domain: 'operations',
+      discoverable: true,
+    }),
+    Object.freeze({
+      id: 'DS-003',
+      type: 'dataset',
+      name: 'Usage events',
+      domain: 'saas',
+      discoverable: true,
+    }),
+    Object.freeze({
+      id: 'DS-004',
+      type: 'dataset',
+      name: 'Audit logs',
+      domain: 'compliance',
+      discoverable: true,
+    }),
+    Object.freeze({
+      id: 'ENT-001',
+      type: 'entity',
+      name: 'Organization',
+      domain: 'tenant',
+      discoverable: true,
+    }),
+    Object.freeze({
+      id: 'ENT-002',
+      type: 'entity',
+      name: 'Platform asset',
+      domain: 'catalog',
+      discoverable: true,
+    }),
+    Object.freeze({
+      id: 'API-001',
+      type: 'api',
+      name: 'CareDroid API',
+      domain: 'clinical',
+      discoverable: true,
+      endpointCount: 24,
+    }),
+    Object.freeze({
+      id: 'API-002',
+      type: 'api',
+      name: 'Platform assets API',
+      domain: 'commercial',
+      discoverable: true,
+      endpointCount: 18,
+    }),
   ]);
   const discoverable = catalog.filter((item) => item.discoverable).length;
-  const score = clampScore(discoverable / catalog.length * 70 + Math.min(30, apiCount / 20));
+  const score = clampScore((discoverable / catalog.length) * 70 + Math.min(30, apiCount / 20));
 
   return moduleResult(
     PLATFORM_INTELLIGENCE_MODULE.DATA_CATALOG,
@@ -222,10 +292,30 @@ export function assessDataLineage() {
 
 export function assessKpiIntelligence(_signals = {} as any) {
   const recommendations = Object.freeze([
-    Object.freeze({ id: 'KR-001', kpi: 'Reception registration', signal: 'above cohort p75', action: 'Maintain express-register workflow' }),
-    Object.freeze({ id: 'KR-002', kpi: 'Data quality risks', signal: 'duplicate rate elevated', action: 'Enable duplicate review banner' }),
-    Object.freeze({ id: 'KR-003', kpi: 'Customer health', signal: 'watch band', action: 'Schedule CS enablement call' }),
-    Object.freeze({ id: 'KR-004', kpi: 'Feature utilization', signal: 'below target', action: 'Target smart intake and shift handoff' }),
+    Object.freeze({
+      id: 'KR-001',
+      kpi: 'Reception registration',
+      signal: 'above cohort p75',
+      action: 'Maintain express-register workflow',
+    }),
+    Object.freeze({
+      id: 'KR-002',
+      kpi: 'Data quality risks',
+      signal: 'duplicate rate elevated',
+      action: 'Enable duplicate review banner',
+    }),
+    Object.freeze({
+      id: 'KR-003',
+      kpi: 'Customer health',
+      signal: 'watch band',
+      action: 'Schedule CS enablement call',
+    }),
+    Object.freeze({
+      id: 'KR-004',
+      kpi: 'Feature utilization',
+      signal: 'below target',
+      action: 'Target smart intake and shift handoff',
+    }),
   ]);
   const anomalyReadiness = Object.freeze({
     telemetryIngest: true,
@@ -244,7 +334,11 @@ export function assessKpiIntelligence(_signals = {} as any) {
       kpi('recommendations', 'Active recommendations', recommendations.length, 3),
       kpi('anomaly-readiness', 'Anomaly readiness fields', 4, 4),
     ],
-    { recommendations, anomalyReadiness, disclaimer: 'Readiness structures — not autonomous anomaly detection' },
+    {
+      recommendations,
+      anomalyReadiness,
+      disclaimer: 'Readiness structures — not autonomous anomaly detection',
+    },
   );
 }
 
@@ -274,12 +368,22 @@ export function assessOperationalIntelligenceGraph() {
       kpi('graph-nodes', 'Graph node types', nodes.length, 5),
       kpi('graph-edges', 'Graph edges', edges.length, 4),
     ],
-    { nodes, edges, querySurfaces: ['Operational history', 'Queue audit', 'Copilot recommendations'] },
+    {
+      nodes,
+      edges,
+      querySurfaces: ['Operational history', 'Queue audit', 'Copilot recommendations'],
+    },
   );
 }
 
 export function assessCrossDomainAnalytics() {
-  const domains = Object.freeze(['operations', 'compliance', 'equine_welfare', 'finance', 'security']);
+  const domains = Object.freeze([
+    'operations',
+    'compliance',
+    'equine_welfare',
+    'finance',
+    'security',
+  ]);
   const maturity = auditTrackMindMaturity();
   const domainScores = domains.map((d) => maturity.scores.dimensions[d]?.score ?? 55);
   const avg = domainScores.reduce((s, v) => s + v, 0) / domains.length;
@@ -295,20 +399,44 @@ export function assessCrossDomainAnalytics() {
     ],
     {
       domains: domains.map((id, i) => Object.freeze({ id, score: domainScores[i] })),
-      analyticsViews: ['TrackMind maturity radar', 'Enterprise platform modules', 'Customer success KPIs'],
+      analyticsViews: [
+        'TrackMind maturity radar',
+        'Enterprise platform modules',
+        'Customer success KPIs',
+      ],
     },
   );
 }
 
 export function assessForecastingReadiness() {
   const structures = Object.freeze([
-    Object.freeze({ id: 'FC-001', name: 'Arrival volume forecast slot', status: 'schema-ready', implemented: false }),
-    Object.freeze({ id: 'FC-002', name: 'Capacity band projection slot', status: 'schema-ready', implemented: false }),
-    Object.freeze({ id: 'FC-003', name: 'Renewal risk projection slot', status: 'schema-ready', implemented: false }),
-    Object.freeze({ id: 'FC-004', name: 'Welfare incident trend slot', status: 'planned', implemented: false }),
+    Object.freeze({
+      id: 'FC-001',
+      name: 'Arrival volume forecast slot',
+      status: 'schema-ready',
+      implemented: false,
+    }),
+    Object.freeze({
+      id: 'FC-002',
+      name: 'Capacity band projection slot',
+      status: 'schema-ready',
+      implemented: false,
+    }),
+    Object.freeze({
+      id: 'FC-003',
+      name: 'Renewal risk projection slot',
+      status: 'schema-ready',
+      implemented: false,
+    }),
+    Object.freeze({
+      id: 'FC-004',
+      name: 'Welfare incident trend slot',
+      status: 'planned',
+      implemented: false,
+    }),
   ]);
   const ready = structures.filter((s) => s.status === 'schema-ready').length;
-  const score = clampScore(ready / structures.length * 100);
+  const score = clampScore((ready / structures.length) * 100);
 
   return moduleResult(
     PLATFORM_INTELLIGENCE_MODULE.FORECASTING_READINESS,
@@ -328,13 +456,40 @@ export function assessForecastingReadiness() {
 
 export function assessReportingStudio() {
   const templates = Object.freeze([
-    Object.freeze({ id: 'RPT-001', name: 'Shift handoff summary', format: 'pdf', configurable: true }),
-    Object.freeze({ id: 'RPT-002', name: 'Customer success executive brief', format: 'pdf', configurable: true }),
-    Object.freeze({ id: 'RPT-003', name: 'TrackMind maturity export', format: 'json', configurable: true }),
-    Object.freeze({ id: 'RPT-004', name: 'Regulatory evidence pack', format: 'zip', configurable: true }),
-    Object.freeze({ id: 'RPT-005', name: 'Cross-domain KPI workbook', format: 'xlsx', configurable: true }),
+    Object.freeze({
+      id: 'RPT-001',
+      name: 'Shift handoff summary',
+      format: 'pdf',
+      configurable: true,
+    }),
+    Object.freeze({
+      id: 'RPT-002',
+      name: 'Customer success executive brief',
+      format: 'pdf',
+      configurable: true,
+    }),
+    Object.freeze({
+      id: 'RPT-003',
+      name: 'TrackMind maturity export',
+      format: 'json',
+      configurable: true,
+    }),
+    Object.freeze({
+      id: 'RPT-004',
+      name: 'Regulatory evidence pack',
+      format: 'zip',
+      configurable: true,
+    }),
+    Object.freeze({
+      id: 'RPT-005',
+      name: 'Cross-domain KPI workbook',
+      format: 'xlsx',
+      configurable: true,
+    }),
   ]);
-  const score = clampScore(templates.filter((t) => t.configurable).length / templates.length * 100);
+  const score = clampScore(
+    (templates.filter((t) => t.configurable).length / templates.length) * 100,
+  );
 
   return moduleResult(
     PLATFORM_INTELLIGENCE_MODULE.REPORTING_STUDIO,
@@ -390,14 +545,39 @@ function buildRepresentativeCustomerDashboard(dashboard = null as any) {
       assetUsage: {
         value: 286,
         topAssets: [
-          { id: 'whiteboard', label: 'Emergency Whiteboard', count: 48, route: '/emergency/whiteboard' },
-          { id: 'reception', label: 'Reception workspace', count: 44, route: '/emergency/reception' },
+          {
+            id: 'whiteboard',
+            label: 'Emergency Whiteboard',
+            count: 48,
+            route: '/emergency/whiteboard',
+          },
+          {
+            id: 'reception',
+            label: 'Reception workspace',
+            count: 44,
+            route: '/emergency/reception',
+          },
           { id: 'copilot', label: 'ED Copilot', count: 31, route: '/emergency/copilot' },
           { id: 'smart-intake', label: 'Smart Intake', count: 28, route: '/emergency/intake' },
-          { id: 'queue-intelligence', label: 'Queue Intelligence', count: 27, route: '/emergency/queues' },
+          {
+            id: 'queue-intelligence',
+            label: 'Queue Intelligence',
+            count: 27,
+            route: '/emergency/queues',
+          },
           { id: 'shift-handoff', label: 'Shift Handoff', count: 24, route: '/emergency/shift' },
-          { id: 'data-quality', label: 'Data Quality Surfacing', count: 22, route: '/emergency/reception?panel=data-quality' },
-          { id: 'reassessment', label: 'Reassessment Workflow', count: 21, route: '/emergency/reassessment' },
+          {
+            id: 'data-quality',
+            label: 'Data Quality Surfacing',
+            count: 22,
+            route: '/emergency/reception?panel=data-quality',
+          },
+          {
+            id: 'reassessment',
+            label: 'Reassessment Workflow',
+            count: 21,
+            route: '/emergency/reassessment',
+          },
           { id: 'ems-panel', label: 'EMS Pre-arrival', count: 19, route: '/emergency/ems' },
           { id: 'command-palette', label: 'Command Palette', count: 18, route: '/command-palette' },
         ],
@@ -409,7 +589,12 @@ function buildRepresentativeCustomerDashboard(dashboard = null as any) {
     }),
     signals: [
       { id: 'adoption', label: 'Adoption', status: 'healthy', message: '84% asset coverage.' },
-      { id: 'feature-breadth', label: 'Feature breadth', status: 'healthy', message: 'Core ED workflows have active utilization.' },
+      {
+        id: 'feature-breadth',
+        label: 'Feature breadth',
+        status: 'healthy',
+        message: 'Core ED workflows have active utilization.',
+      },
     ],
   });
 }
@@ -457,7 +642,12 @@ export function assessTrackHealth(signals = {} as any) {
       kpi('welfare-health', 'Equine welfare domain', welfare, 55),
     ],
     {
-      trackSignals: Object.freeze(['Whiteboard load', 'Reassessment compliance', 'Welfare checklist', 'EMS offload']),
+      trackSignals: Object.freeze([
+        'Whiteboard load',
+        'Reassessment compliance',
+        'Welfare checklist',
+        'EMS offload',
+      ]),
       maturityLevel: maturity.scores.level,
       route: '/emergency/whiteboard',
     },
@@ -483,12 +673,23 @@ export function assessExecutiveCockpit(context = {} as any) {
     'Executive cockpit',
     score,
     [
-      kpi('enterprise-readiness', 'Enterprise platform score', enterprise.assessment.overallScore, 75),
+      kpi(
+        'enterprise-readiness',
+        'Enterprise platform score',
+        enterprise.assessment.overallScore,
+        75,
+      ),
       kpi('maturity-score', 'TrackMind maturity', maturity.scores.overall, 65),
       kpi('customer-health', 'Customer health', cs.summary.healthScore, 75),
     ],
     {
-      consolidatedPanels: Object.freeze(['Risk register', 'Renewal readiness', 'Portfolio health', 'ESG summary', 'Platform convergence']),
+      consolidatedPanels: Object.freeze([
+        'Risk register',
+        'Renewal readiness',
+        'Portfolio health',
+        'ESG summary',
+        'Platform convergence',
+      ]),
       route: '/executive',
       refreshCadence: 'real-time + daily rollup',
     },
@@ -497,8 +698,20 @@ export function assessExecutiveCockpit(context = {} as any) {
 
 export function assessFederationIntelligence() {
   const federations = Object.freeze([
-    Object.freeze({ id: 'FED-001', name: 'Regional circuit', tracks: 8, avgHealth: 76, status: 'healthy' }),
-    Object.freeze({ id: 'FED-002', name: 'Training grounds network', tracks: 4, avgHealth: 68, status: 'watch' }),
+    Object.freeze({
+      id: 'FED-001',
+      name: 'Regional circuit',
+      tracks: 8,
+      avgHealth: 76,
+      status: 'healthy',
+    }),
+    Object.freeze({
+      id: 'FED-002',
+      name: 'Training grounds network',
+      tracks: 4,
+      avgHealth: 68,
+      status: 'watch',
+    }),
   ]);
   const totalTracks = federations.reduce((s, f) => s + f.tracks, 0);
   const avgHealth = federations.reduce((s, f) => s + f.avgHealth * f.tracks, 0) / totalTracks;
@@ -539,7 +752,12 @@ export function assessSaasOperations(context = {} as any) {
     ],
     {
       subscriptions: Object.freeze(['Enterprise', 'Professional']),
-      usageSignals: Object.freeze(['Usage events', 'Audit events', 'Active users', 'Asset launches']),
+      usageSignals: Object.freeze([
+        'Usage events',
+        'Audit events',
+        'Active users',
+        'Asset launches',
+      ]),
       route: '/saas-health',
     },
   );
@@ -552,7 +770,9 @@ export function assessIntegrationGovernance() {
     (audit.byStatus?.implemented || 0) +
     (audit.byStatus?.verified || 0) +
     (audit.byStatus?.partial || 0);
-  const score = clampScore(surfaceCount > 0 ? Math.min(100, (covered / surfaceCount) * 100 + 20) : 55);
+  const score = clampScore(
+    surfaceCount > 0 ? Math.min(100, (covered / surfaceCount) * 100 + 20) : 55,
+  );
 
   return moduleResult(
     PLATFORM_INTELLIGENCE_MODULE.INTEGRATION_GOVERNANCE,
@@ -592,17 +812,42 @@ export function assessApiGovernance() {
       kpi('controllers', 'Controller owners', controllers.size, 20),
       kpi('versioned-routes', 'Versioned routes', versioned, 5),
     ],
-    { lifecycle, routeInventory: routes.length, ownership: 'Controller-level', docsRoute: '/api/docs' },
+    {
+      lifecycle,
+      routeInventory: routes.length,
+      ownership: 'Controller-level',
+      docsRoute: '/api/docs',
+    },
   );
 }
 
 export function assessPlatformObservability() {
   const pillars = Object.freeze([
-    Object.freeze({ id: 'logs', label: 'Logs', status: 'partial', surfaces: ['audit_logs', 'workflow_logs'] }),
-    Object.freeze({ id: 'metrics', label: 'Metrics', status: 'partial', surfaces: ['usage_events', 'saas_health'] }),
+    Object.freeze({
+      id: 'logs',
+      label: 'Logs',
+      status: 'partial',
+      surfaces: ['audit_logs', 'workflow_logs'],
+    }),
+    Object.freeze({
+      id: 'metrics',
+      label: 'Metrics',
+      status: 'partial',
+      surfaces: ['usage_events', 'saas_health'],
+    }),
     Object.freeze({ id: 'traces', label: 'Traces', status: 'planned', surfaces: ['datadog-apm'] }),
-    Object.freeze({ id: 'audits', label: 'Audits', status: 'active', surfaces: ['operational_audit', 'governance_registry'] }),
-    Object.freeze({ id: 'alerts', label: 'Alerts', status: 'active', surfaces: ['alert_rules', 'reassessment_strips'] }),
+    Object.freeze({
+      id: 'audits',
+      label: 'Audits',
+      status: 'active',
+      surfaces: ['operational_audit', 'governance_registry'],
+    }),
+    Object.freeze({
+      id: 'alerts',
+      label: 'Alerts',
+      status: 'active',
+      surfaces: ['alert_rules', 'reassessment_strips'],
+    }),
   ]);
   const active = pillars.filter((p) => p.status === 'active').length;
   const partial = pillars.filter((p) => p.status === 'partial').length;
@@ -634,9 +879,31 @@ export const TECHNICAL_DEBT_REGISTRY: readonly TechnicalDebtItem[] = Object.free
   // ED patient/board state (Nest in-memory vs Mongoose, TD-006) is a
   // separate, still-open migration from workflow log durability, which
   // TD-004 below covers -- the two used to be bundled in one summary.
-  Object.freeze({ id: 'TD-001', area: 'backend', summary: 'ED patient persistence migration active (dual in-memory/Mongoose planes, see TD-006)', priority: 'P0', effort: 'high', status: 'mitigating' }),
-  Object.freeze({ id: 'TD-002', area: 'security', summary: 'Emergency API auth guards applied to active Nest emergency controllers', priority: 'P0', effort: 'medium', status: 'resolved' }),
-  Object.freeze({ id: 'TD-003', area: 'frontend', summary: 'Large App shell coupling reduced through route-tree extraction and lazy route smoke coverage', priority: 'P2', effort: 'high', status: 'mitigating' }),
+  Object.freeze({
+    id: 'TD-001',
+    area: 'backend',
+    summary: 'ED patient persistence migration active (dual in-memory/Mongoose planes, see TD-006)',
+    priority: 'P0',
+    effort: 'high',
+    status: 'mitigating',
+  }),
+  Object.freeze({
+    id: 'TD-002',
+    area: 'security',
+    summary: 'Emergency API auth guards applied to active Nest emergency controllers',
+    priority: 'P0',
+    effort: 'medium',
+    status: 'resolved',
+  }),
+  Object.freeze({
+    id: 'TD-003',
+    area: 'frontend',
+    summary:
+      'Large App shell coupling reduced through route-tree extraction and lazy route smoke coverage',
+    priority: 'P2',
+    effort: 'high',
+    status: 'mitigating',
+  }),
   // Verified 2026-08-27: WorkflowActionLogEntry's durable journal
   // (Cycle 92/HEAL-252) already existed with a working write-through/
   // rehydrate cycle, but every real call site omitted metadata.tenantId,
@@ -644,18 +911,41 @@ export const TECHNICAL_DEBT_REGISTRY: readonly TechnicalDebtItem[] = Object.free
   // fixed by threading the patient/task's own organizationId through all
   // 10 call sites (emergency-os.services.ts x7, emergency-os.controller.ts,
   // emergency-os.upgrade-harness.service.ts, care-operations.service.ts x2).
-  Object.freeze({ id: 'TD-004', area: 'auditability', summary: 'Workflow logs are durably persisted and now tenant-partitioned via metadata.tenantId', priority: 'P1', effort: 'medium', status: 'resolved' }),
+  Object.freeze({
+    id: 'TD-004',
+    area: 'auditability',
+    summary: 'Workflow logs are durably persisted and now tenant-partitioned via metadata.tenantId',
+    priority: 'P1',
+    effort: 'medium',
+    status: 'resolved',
+  }),
   // Verified 2026-08-27 directly against integrationStatusRegistry.ts --
   // INTEGRATION_STATUS already has 3 distinct tiers (placeholder/partial/
   // implemented) consistently applied across all 26 registry entries; the
   // distinction this item describes is already in place, not in progress.
-  Object.freeze({ id: 'TD-005', area: 'integrations', summary: 'Connector registry now distinguishes implemented, partial, and roadmap surfaces', priority: 'P1', effort: 'high', status: 'resolved' }),
-  Object.freeze({ id: 'TD-006', area: 'architecture', summary: 'Dual persistence planes', priority: 'P1', effort: 'high', status: 'open' }),
+  Object.freeze({
+    id: 'TD-005',
+    area: 'integrations',
+    summary: 'Connector registry now distinguishes implemented, partial, and roadmap surfaces',
+    priority: 'P1',
+    effort: 'high',
+    status: 'resolved',
+  }),
+  Object.freeze({
+    id: 'TD-006',
+    area: 'architecture',
+    summary: 'Dual persistence planes',
+    priority: 'P1',
+    effort: 'high',
+    status: 'open',
+  }),
 ]);
 
 export function assessTechnicalDebtRegistry() {
   const open = TECHNICAL_DEBT_REGISTRY.filter((d) => d.status === 'open').length;
-  const openP0 = TECHNICAL_DEBT_REGISTRY.filter((d) => d.priority === 'P0' && d.status === 'open').length;
+  const openP0 = TECHNICAL_DEBT_REGISTRY.filter(
+    (d) => d.priority === 'P0' && d.status === 'open',
+  ).length;
   const mitigating = TECHNICAL_DEBT_REGISTRY.filter((d) => d.status === 'mitigating').length;
   const score = clampScore(100 - open * 8 - openP0 * 10 - mitigating * 2);
 
@@ -668,7 +958,10 @@ export function assessTechnicalDebtRegistry() {
       kpi('open-debt', 'Open items', open, 3, { max: true }),
       kpi('p0-debt', 'Open P0 items', openP0, 0, { max: true }),
     ],
-    { registry: TECHNICAL_DEBT_REGISTRY, remediationPlans: TECHNICAL_DEBT_REGISTRY.filter((d) => d.status !== 'resolved') },
+    {
+      registry: TECHNICAL_DEBT_REGISTRY,
+      remediationPlans: TECHNICAL_DEBT_REGISTRY.filter((d) => d.status !== 'resolved'),
+    },
   );
 }
 
@@ -687,23 +980,86 @@ export function assessPlatformConvergence(signals = {} as any) {
   );
 
   const gaps = Object.freeze([
-    Object.freeze({ id: 'GAP-001', domain: 'architecture', summary: 'Architecture score vs implementation parity', severity: 'high', score: production.scores.dimensions.architecture?.score ?? 62 }),
-    Object.freeze({ id: 'GAP-002', domain: 'business', summary: 'Customer health vs renewal readiness alignment', severity: 'medium', score: customerAlignment }),
-    Object.freeze({ id: 'GAP-003', domain: 'operations', summary: 'Survivability KPIs vs whiteboard load', severity: 'medium', score: maturity.scores.dimensions.operations?.score ?? 68 }),
-    Object.freeze({ id: 'GAP-004', domain: 'governance', summary: 'Certification evidence vs audit durability', severity: 'high', score: debt.score }),
-    Object.freeze({ id: 'GAP-005', domain: 'platform', summary: 'Enterprise module readiness dispersion', severity: 'medium', score: enterprise.assessment.overallScore }),
+    Object.freeze({
+      id: 'GAP-001',
+      domain: 'architecture',
+      summary: 'Architecture score vs implementation parity',
+      severity: 'high',
+      score: production.scores.dimensions.architecture?.score ?? 62,
+    }),
+    Object.freeze({
+      id: 'GAP-002',
+      domain: 'business',
+      summary: 'Customer health vs renewal readiness alignment',
+      severity: 'medium',
+      score: customerAlignment,
+    }),
+    Object.freeze({
+      id: 'GAP-003',
+      domain: 'operations',
+      summary: 'Survivability KPIs vs whiteboard load',
+      severity: 'medium',
+      score: maturity.scores.dimensions.operations?.score ?? 68,
+    }),
+    Object.freeze({
+      id: 'GAP-004',
+      domain: 'governance',
+      summary: 'Certification evidence vs audit durability',
+      severity: 'high',
+      score: debt.score,
+    }),
+    Object.freeze({
+      id: 'GAP-005',
+      domain: 'platform',
+      summary: 'Enterprise module readiness dispersion',
+      severity: 'medium',
+      score: enterprise.assessment.overallScore,
+    }),
   ]);
 
   const correctiveActions = Object.freeze([
-    Object.freeze({ id: 'CA-001', gap: 'GAP-001', action: 'Complete org-scoped emergency settings convergence', priority: 'P0', owner: 'Platform engineering' }),
-    Object.freeze({ id: 'CA-002', gap: 'GAP-002', action: 'Close customer success enablement queue items before renewal', priority: 'P1', owner: 'Customer success' }),
-    Object.freeze({ id: 'CA-003', gap: 'GAP-003', action: 'Apply whiteboard density mitigations under stress load', priority: 'P1', owner: 'Operations UX' }),
-    Object.freeze({ id: 'CA-004', gap: 'GAP-004', action: 'Persist workflow logs and partition by tenant', priority: 'P0', owner: 'Backend platform' }),
-    Object.freeze({ id: 'CA-005', gap: 'GAP-005', action: 'Raise lowest enterprise modules to developing threshold', priority: 'P2', owner: 'Program management' }),
+    Object.freeze({
+      id: 'CA-001',
+      gap: 'GAP-001',
+      action: 'Complete org-scoped emergency settings convergence',
+      priority: 'P0',
+      owner: 'Platform engineering',
+    }),
+    Object.freeze({
+      id: 'CA-002',
+      gap: 'GAP-002',
+      action: 'Close customer success enablement queue items before renewal',
+      priority: 'P1',
+      owner: 'Customer success',
+    }),
+    Object.freeze({
+      id: 'CA-003',
+      gap: 'GAP-003',
+      action: 'Apply whiteboard density mitigations under stress load',
+      priority: 'P1',
+      owner: 'Operations UX',
+    }),
+    Object.freeze({
+      id: 'CA-004',
+      gap: 'GAP-004',
+      action: 'Persist workflow logs and partition by tenant',
+      priority: 'P0',
+      owner: 'Backend platform',
+    }),
+    Object.freeze({
+      id: 'CA-005',
+      gap: 'GAP-005',
+      action: 'Raise lowest enterprise modules to developing threshold',
+      priority: 'P2',
+      owner: 'Program management',
+    }),
   ]);
 
   const avgGap = gaps.reduce((s, g) => s + g.score, 0) / gaps.length;
-  const score = clampScore(avgGap * 0.6 + (100 - debt.artifacts.registry.filter((d) => d.status === 'open').length * 8) * 0.4);
+  const score = clampScore(
+    avgGap * 0.6 +
+      (100 - debt.artifacts.registry.filter((d) => d.status === 'open').length * 8) * 0.4,
+  );
 
   return moduleResult(
     PLATFORM_INTELLIGENCE_MODULE.PLATFORM_CONVERGENCE,
@@ -714,24 +1070,33 @@ export function assessPlatformConvergence(signals = {} as any) {
       kpi('corrective-actions', 'Corrective actions', correctiveActions.length, 4),
       kpi('convergence-score', 'Convergence score', score, 70),
     ],
-    { gaps, correctiveActions, architectureVsBusinessDelta: Math.abs((production.scores.overall ?? 65) - enterprise.assessment.overallScore) },
+    {
+      gaps,
+      correctiveActions,
+      architectureVsBusinessDelta: Math.abs(
+        (production.scores.overall ?? 65) - enterprise.assessment.overallScore,
+      ),
+    },
   );
 }
 
 const MODULE_ASSESSORS = Object.freeze({
   [PLATFORM_INTELLIGENCE_MODULE.UNIFIED_ARTIFACT_REGISTRY]: () => assessUnifiedArtifactRegistry(),
-  [PLATFORM_INTELLIGENCE_MODULE.ARTIFACT_RELATIONSHIP_MAPPING]: () => assessArtifactRelationshipMapping(),
+  [PLATFORM_INTELLIGENCE_MODULE.ARTIFACT_RELATIONSHIP_MAPPING]: () =>
+    assessArtifactRelationshipMapping(),
   [PLATFORM_INTELLIGENCE_MODULE.ENTERPRISE_METADATA]: () => assessEnterpriseMetadata(),
   [PLATFORM_INTELLIGENCE_MODULE.DATA_CATALOG]: () => assessDataCatalog(),
   [PLATFORM_INTELLIGENCE_MODULE.DATA_LINEAGE]: () => assessDataLineage(),
   [PLATFORM_INTELLIGENCE_MODULE.KPI_INTELLIGENCE]: (ctx, sig) => assessKpiIntelligence(sig),
-  [PLATFORM_INTELLIGENCE_MODULE.OPERATIONAL_INTELLIGENCE_GRAPH]: () => assessOperationalIntelligenceGraph(),
+  [PLATFORM_INTELLIGENCE_MODULE.OPERATIONAL_INTELLIGENCE_GRAPH]: () =>
+    assessOperationalIntelligenceGraph(),
   [PLATFORM_INTELLIGENCE_MODULE.CROSS_DOMAIN_ANALYTICS]: () => assessCrossDomainAnalytics(),
   [PLATFORM_INTELLIGENCE_MODULE.FORECASTING_READINESS]: () => assessForecastingReadiness(),
   [PLATFORM_INTELLIGENCE_MODULE.REPORTING_STUDIO]: () => assessReportingStudio(),
   [PLATFORM_INTELLIGENCE_MODULE.TENANT_HEALTH]: (ctx) => assessTenantHealth(ctx),
   [PLATFORM_INTELLIGENCE_MODULE.TRACK_HEALTH]: (ctx, sig) => assessTrackHealth(sig),
-  [PLATFORM_INTELLIGENCE_MODULE.EXECUTIVE_COCKPIT]: (ctx, sig) => assessExecutiveCockpit({ ...ctx, signals: sig }),
+  [PLATFORM_INTELLIGENCE_MODULE.EXECUTIVE_COCKPIT]: (ctx, sig) =>
+    assessExecutiveCockpit({ ...ctx, signals: sig }),
   [PLATFORM_INTELLIGENCE_MODULE.FEDERATION_INTELLIGENCE]: () => assessFederationIntelligence(),
   [PLATFORM_INTELLIGENCE_MODULE.SAAS_OPERATIONS]: (ctx) => assessSaasOperations(ctx),
   [PLATFORM_INTELLIGENCE_MODULE.INTEGRATION_GOVERNANCE]: () => assessIntegrationGovernance(),

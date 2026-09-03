@@ -14,10 +14,17 @@ import './Competencies.css';
 export default function Competencies() {
   useRouteChromeRegistration({ title: 'Competency Platform' });
   const snapshot = useMemo(
-    () => buildCompetencyCredentialingSnapshot({ role: 'medical student', specialty: 'medical education' }),
+    () =>
+      buildCompetencyCredentialingSnapshot({
+        role: 'medical student',
+        specialty: 'medical education',
+      }),
     [],
   );
-  const statusChart = useMemo(() => buildCompetencyStatusChart(snapshot.competencyRecords), [snapshot.competencyRecords]);
+  const statusChart = useMemo(
+    () => buildCompetencyStatusChart(snapshot.competencyRecords),
+    [snapshot.competencyRecords],
+  );
 
   return (
     <main className="competencies-page" aria-label="Competency platform">
@@ -25,8 +32,13 @@ export default function Competencies() {
         <div className="competencies-page__title-row">
           <GraphicIconBadge iconKey="shield-check" accent="brand" size="md" />
           <div>
-            <p className="competencies-page__title-text" data-testid="cd-page-title-text">Competency Platform</p>
-            <p>Simulation completion, skill progress, training gaps, and recommended practice actions.</p>
+            <p className="competencies-page__title-text" data-testid="cd-page-title-text">
+              Competency Platform
+            </p>
+            <p>
+              Simulation completion, skill progress, training gaps, and recommended practice
+              actions.
+            </p>
           </div>
         </div>
         <div className="competencies-page__actions">
@@ -43,7 +55,11 @@ export default function Competencies() {
         details={snapshot.safetyLabel}
       />
 
-      <div className="competencies-page__metrics" role="group" aria-label="Competency summary metrics">
+      <div
+        className="competencies-page__metrics"
+        role="group"
+        aria-label="Competency summary metrics"
+      >
         <MetricCard
           label="Simulation completion"
           value={`${snapshot.summary.simulationCompletion}%`}
@@ -91,8 +107,12 @@ export default function Competencies() {
               <article key={record.id} className="competencies-page__record">
                 <strong>{record.title}</strong>
                 <span>{record.domain}</span>
-                <span>{record.progress}% · {record.status}</span>
-                <span className={`competencies-page__status competencies-page__status--${competencyStatusTone(record.status)}`}>
+                <span>
+                  {record.progress}% · {record.status}
+                </span>
+                <span
+                  className={`competencies-page__status competencies-page__status--${competencyStatusTone(record.status)}`}
+                >
                   {record.evidence}
                 </span>
               </article>

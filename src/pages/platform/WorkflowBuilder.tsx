@@ -28,10 +28,12 @@ export function WorkflowBuilderPage() {
   // actually computed from defaultDeadlineMinutes, so it would silently go stale the next time
   // that config changed. Filters out null (some actions have no SLA deadline).
   const avgDeadlineMinutes = useMemo(() => {
-    const values = COMMAND_CENTER_WORKFLOW_ACTIONS.map((action) => action.defaultDeadlineMinutes).filter(
-      (minutes): minutes is number => minutes != null,
-    );
-    return values.length ? Math.round(values.reduce((sum, minutes) => sum + minutes, 0) / values.length) : null;
+    const values = COMMAND_CENTER_WORKFLOW_ACTIONS.map(
+      (action) => action.defaultDeadlineMinutes,
+    ).filter((minutes): minutes is number => minutes != null);
+    return values.length
+      ? Math.round(values.reduce((sum, minutes) => sum + minutes, 0) / values.length)
+      : null;
   }, []);
 
   return (
@@ -40,8 +42,12 @@ export function WorkflowBuilderPage() {
         <div className="workflow-builder-page__title-row">
           <GraphicIconBadge iconKey="journey" accent="brand" size="md" />
           <div>
-            <p className="workflow-builder-page-title-text" data-testid="cd-page-title-text">Workflows</p>
-            <p>Operational command-center actions, journey templates, and automation launch points.</p>
+            <p className="workflow-builder-page-title-text" data-testid="cd-page-title-text">
+              Workflows
+            </p>
+            <p>
+              Operational command-center actions, journey templates, and automation launch points.
+            </p>
           </div>
         </div>
         <div className="workflow-builder-page__actions">
@@ -58,10 +64,31 @@ export function WorkflowBuilderPage() {
         details="Demo operational workflow catalog from command-center actions with mining journey templates for protocol and triage flows."
       />
 
-      <div className="workflow-builder-page__metrics" role="group" aria-label="Workflow builder summary metrics">
-        <MetricCard label="Actions" value={String(actionCount)} hint="Command-center workflows" tone="neutral" />
-        <MetricCard label="Journeys" value={String(journeyCount)} hint="Mining templates" tone="neutral" />
-        <MetricCard label="Critical" value={String(COMMAND_CENTER_WORKFLOW_ACTIONS.filter((a) => a.tone === 'critical').length)} hint="Priority actions" tone="critical" />
+      <div
+        className="workflow-builder-page__metrics"
+        role="group"
+        aria-label="Workflow builder summary metrics"
+      >
+        <MetricCard
+          label="Actions"
+          value={String(actionCount)}
+          hint="Command-center workflows"
+          tone="neutral"
+        />
+        <MetricCard
+          label="Journeys"
+          value={String(journeyCount)}
+          hint="Mining templates"
+          tone="neutral"
+        />
+        <MetricCard
+          label="Critical"
+          value={String(
+            COMMAND_CENTER_WORKFLOW_ACTIONS.filter((a) => a.tone === 'critical').length,
+          )}
+          hint="Priority actions"
+          tone="critical"
+        />
         <MetricCard
           label="Avg deadline"
           value={avgDeadlineMinutes != null ? `${avgDeadlineMinutes}m` : '—'}
@@ -71,7 +98,11 @@ export function WorkflowBuilderPage() {
       </div>
 
       <div className="workflow-builder-page__charts">
-        <VisualizationPanel title="Action priority" description="Ranked operational workflow priority from command center." badge="Priority">
+        <VisualizationPanel
+          title="Action priority"
+          description="Ranked operational workflow priority from command center."
+          badge="Priority"
+        >
           <CategoryBarChart
             data={priorityChart}
             title="Action priority"
@@ -94,12 +125,16 @@ export function WorkflowBuilderPage() {
             <div key={action.id} className="workflow-builder-page__table-row" role="row">
               <span role="cell">
                 <Link to={action.route}>{action.label}</Link>
-                <span className={`workflow-builder-page__pill workflow-builder-page__pill--${WORKFLOW_TONE_CLASS[action.tone] || 'neutral'}`}>
+                <span
+                  className={`workflow-builder-page__pill workflow-builder-page__pill--${WORKFLOW_TONE_CLASS[action.tone] || 'neutral'}`}
+                >
                   P{action.priority}
                 </span>
               </span>
               <span role="cell">{action.owner}</span>
-              <span role="cell">{action.defaultDeadlineMinutes ? `${action.defaultDeadlineMinutes}m` : '—'}</span>
+              <span role="cell">
+                {action.defaultDeadlineMinutes ? `${action.defaultDeadlineMinutes}m` : '—'}
+              </span>
               <span role="cell">{action.nextAction}</span>
             </div>
           ))}
@@ -107,7 +142,11 @@ export function WorkflowBuilderPage() {
       </section>
 
       {WORKFLOW_MINING_JOURNEYS.map((journey) => (
-        <section key={journey.id} className="workflow-builder-page__panel" aria-label={journey.title}>
+        <section
+          key={journey.id}
+          className="workflow-builder-page__panel"
+          aria-label={journey.title}
+        >
           <div className="workflow-builder-page__panel-head">
             <div>
               <h2>{journey.title}</h2>

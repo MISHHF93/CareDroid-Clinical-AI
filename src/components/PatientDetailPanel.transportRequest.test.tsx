@@ -43,7 +43,11 @@ vi.mock('../hooks/useEmergencyOs', () => ({
 // `useEmergencyStore` singleton.
 const emergencyRoleMock = vi.hoisted(() => {
   const { withEmergencyRoleMock } = require('../test/permissiveEmergencyRoleMock.ts');
-  return withEmergencyRoleMock({ role: 'physician', roleLabel: 'Physician', switchDemoRole: vi.fn() });
+  return withEmergencyRoleMock({
+    role: 'physician',
+    roleLabel: 'Physician',
+    switchDemoRole: vi.fn(),
+  });
 });
 
 vi.mock('../hooks/useEmergencyRolePermissions', () => ({

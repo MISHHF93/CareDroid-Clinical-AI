@@ -88,7 +88,9 @@ describe('CIWAAr calculator', () => {
     seedPatient();
     render(<CIWAAr patientId={patient.id} onClose={onClose} />);
 
-    fireEvent.change(screen.getByLabelText('Tremor (arms extended, fingers spread)'), { target: { value: '7' } });
+    fireEvent.change(screen.getByLabelText('Tremor (arms extended, fingers spread)'), {
+      target: { value: '7' },
+    });
     fireEvent.change(screen.getByLabelText('Anxiety'), { target: { value: '7' } });
     fireEvent.change(screen.getByLabelText('Agitation'), { target: { value: '7' } });
 
@@ -106,7 +108,9 @@ describe('CIWAAr calculator', () => {
 
     await user.click(screen.getByRole('button', { name: /save to patient/i }));
 
-    const savedPatient = useEmergencyStore.getState().patients.find((candidate) => candidate.id === patient.id);
+    const savedPatient = useEmergencyStore
+      .getState()
+      .patients.find((candidate) => candidate.id === patient.id);
     expect(savedPatient?.notes).toEqual(
       expect.arrayContaining([
         expect.objectContaining({

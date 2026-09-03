@@ -9,19 +9,18 @@ export default function SelfArrivalCheckIn() {
   const [handoff, setHandoff] = useState<IntakeHandoffResult | null>(null);
 
   const handleComplete = async (result: SelfCheckinBuildResult) => {
-    const outcome = await completeSelfCheckinWhiteboardHandoff(useEmergencyStore.getState(), result, {
-      actorName: 'self-arrival',
-    });
+    const outcome = await completeSelfCheckinWhiteboardHandoff(
+      useEmergencyStore.getState(),
+      result,
+      {
+        actorName: 'self-arrival',
+      },
+    );
     setHandoff(outcome.handoff);
     return { ok: outcome.backendSynced };
   };
 
   return (
-    <SelfCheckin
-      kioskMode
-      onComplete={handleComplete}
-      handoff={handoff}
-      showStaffHandoffLink
-    />
+    <SelfCheckin kioskMode onComplete={handleComplete} handoff={handoff} showStaffHandoffLink />
   );
 }

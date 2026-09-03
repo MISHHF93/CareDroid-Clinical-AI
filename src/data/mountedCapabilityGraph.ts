@@ -16,7 +16,10 @@ import {
 } from './toolInventory';
 
 const uniq = (values) => [...new Set(values.flat().filter(Boolean))];
-const norm = (value) => String(value || '').trim().toLowerCase();
+const norm = (value) =>
+  String(value || '')
+    .trim()
+    .toLowerCase();
 const hasAny = (haystack, needles) => needles.some((needle) => haystack.includes(needle));
 
 export const MOUNTED_CAPABILITY_GRAPH_VERSION = 1;
@@ -135,20 +138,72 @@ export const SAAS_PRODUCTS = Object.freeze([
 ]);
 
 export const ASSET_PACKS = Object.freeze([
-  Object.freeze({ id: 'core-platform', name: 'Core Platform', workspaceIds: ['clinical', 'operations'] }),
-  Object.freeze({ id: 'ai-workflow-pack', name: 'AI Workflow Pack', workspaceIds: ['assistant', 'ai-workflow'] }),
-  Object.freeze({ id: 'emergency-medicine', name: 'Emergency Medicine Pack', workspaceIds: ['emergency', 'clinical'] }),
-  Object.freeze({ id: 'emergency-department-pack', name: 'Emergency Department Pack', workspaceIds: ['emergency'] }),
+  Object.freeze({
+    id: 'core-platform',
+    name: 'Core Platform',
+    workspaceIds: ['clinical', 'operations'],
+  }),
+  Object.freeze({
+    id: 'ai-workflow-pack',
+    name: 'AI Workflow Pack',
+    workspaceIds: ['assistant', 'ai-workflow'],
+  }),
+  Object.freeze({
+    id: 'emergency-medicine',
+    name: 'Emergency Medicine Pack',
+    workspaceIds: ['emergency', 'clinical'],
+  }),
+  Object.freeze({
+    id: 'emergency-department-pack',
+    name: 'Emergency Department Pack',
+    workspaceIds: ['emergency'],
+  }),
   Object.freeze({ id: 'icu-pack', name: 'ICU Pack', workspaceIds: ['icu', 'clinical'] }),
-  Object.freeze({ id: 'cardiology-pack', name: 'Cardiology Pack', workspaceIds: ['cardiology', 'clinical'] }),
-  Object.freeze({ id: 'laboratory-intelligence', name: 'Laboratory Intelligence Pack', workspaceIds: ['laboratory'] }),
-  Object.freeze({ id: 'medical-iot-pack', name: 'Medical IoT Pack', workspaceIds: ['medical-iot', 'operations'] }),
-  Object.freeze({ id: 'fleet-logistics', name: 'Fleet Logistics Pack', workspaceIds: ['fleet', 'operations'] }),
-  Object.freeze({ id: 'hospital-operations', name: 'Hospital Operations Pack', workspaceIds: ['operations'] }),
-  Object.freeze({ id: 'digital-twin-pack', name: 'Digital Twin Pack', workspaceIds: ['operations', 'maps'] }),
-  Object.freeze({ id: 'simulation-training-pack', name: 'Simulation Training Pack', workspaceIds: ['education', 'simulation'] }),
-  Object.freeze({ id: 'governance-compliance-pack', name: 'Governance Compliance Pack', workspaceIds: ['governance', 'audit'] }),
-  Object.freeze({ id: 'research-education', name: 'Research Education Pack', workspaceIds: ['research', 'education'] }),
+  Object.freeze({
+    id: 'cardiology-pack',
+    name: 'Cardiology Pack',
+    workspaceIds: ['cardiology', 'clinical'],
+  }),
+  Object.freeze({
+    id: 'laboratory-intelligence',
+    name: 'Laboratory Intelligence Pack',
+    workspaceIds: ['laboratory'],
+  }),
+  Object.freeze({
+    id: 'medical-iot-pack',
+    name: 'Medical IoT Pack',
+    workspaceIds: ['medical-iot', 'operations'],
+  }),
+  Object.freeze({
+    id: 'fleet-logistics',
+    name: 'Fleet Logistics Pack',
+    workspaceIds: ['fleet', 'operations'],
+  }),
+  Object.freeze({
+    id: 'hospital-operations',
+    name: 'Hospital Operations Pack',
+    workspaceIds: ['operations'],
+  }),
+  Object.freeze({
+    id: 'digital-twin-pack',
+    name: 'Digital Twin Pack',
+    workspaceIds: ['operations', 'maps'],
+  }),
+  Object.freeze({
+    id: 'simulation-training-pack',
+    name: 'Simulation Training Pack',
+    workspaceIds: ['education', 'simulation'],
+  }),
+  Object.freeze({
+    id: 'governance-compliance-pack',
+    name: 'Governance Compliance Pack',
+    workspaceIds: ['governance', 'audit'],
+  }),
+  Object.freeze({
+    id: 'research-education',
+    name: 'Research Education Pack',
+    workspaceIds: ['research', 'education'],
+  }),
 ]);
 
 export const CANONICAL_WORKSPACE_IDS = Object.freeze([
@@ -190,7 +245,7 @@ const CAPABILITY_PACK_OVERRIDES = Object.freeze({
   'route-optimizer': ['fleet-logistics'],
   'predictive-maintenance': ['fleet-logistics', 'medical-iot-pack'],
   'dispatch-ai': ['fleet-logistics', 'ai-workflow-pack'],
-  'laboratory': ['laboratory-intelligence'],
+  laboratory: ['laboratory-intelligence'],
   'laboratory-dashboard': ['laboratory-intelligence'],
   'lab-interp': ['laboratory-intelligence'],
   'abg-interpreter': ['laboratory-intelligence'],
@@ -227,18 +282,22 @@ export function normalizeAssetPackId(packId) {
 }
 
 export function normalizeAssetPackIds(packIds = [] as any[]) {
-  return (uniq(packIds.flat().map(normalizeAssetPackId)).filter((id) => PACK_BY_ID.has(id as any))) as any[];
+  return uniq(packIds.flat().map(normalizeAssetPackId)).filter((id) =>
+    PACK_BY_ID.has(id as any),
+  ) as any[];
 }
 
 export function productIdsForPackIds(packIds = [] as any[]) {
-  return uniq(normalizeAssetPackIds(packIds).flatMap((packId) => PRODUCT_IDS_BY_PACK_ID[packId] || []));
+  return uniq(
+    normalizeAssetPackIds(packIds).flatMap((packId) => PRODUCT_IDS_BY_PACK_ID[packId] || []),
+  );
 }
 
 export function workspaceIdsForPackIds(packIds = [] as any[]) {
   return uniq(
     normalizeAssetPackIds(packIds)
       .flatMap((packId) => PACK_BY_ID.get(packId)?.workspaceIds || [])
-      .map((id) => (id === 'iot' || id === 'hospital-operations' ? 'operations' : id))
+      .map((id) => (id === 'iot' || id === 'hospital-operations' ? 'operations' : id)),
   );
 }
 
@@ -257,20 +316,47 @@ function inferredPackIdsForCapability(tool) {
       ...(tool.workspaceTags || []),
       ...(tool.nluProfileIds || []),
       ...(tool.aliases || []),
-    ].join(' ')
+    ].join(' '),
   );
 
   const packs = [] as any[];
-  if (hasAny(text, ['assistant', 'ai', 'scribe', 'summary', 'differential', 'order set', 'timeline'])) {
+  if (
+    hasAny(text, ['assistant', 'ai', 'scribe', 'summary', 'differential', 'order set', 'timeline'])
+  ) {
     packs.push('ai-workflow-pack', 'core-platform');
   }
-  if (hasAny(text, ['qsofa', 'news2', 'sofa', 'nihss', 'stroke', 'trauma', 'emergency', 'sepsis', 'triage'])) {
+  if (
+    hasAny(text, [
+      'qsofa',
+      'news2',
+      'sofa',
+      'nihss',
+      'stroke',
+      'trauma',
+      'emergency',
+      'sepsis',
+      'triage',
+    ])
+  ) {
     packs.push('emergency-medicine', 'emergency-department-pack');
   }
   if (hasAny(text, ['icu', 'critical', 'ventilator', 'rox', 'oxygenation', 'apache'])) {
     packs.push('icu-pack');
   }
-  if (hasAny(text, ['cardio', 'heart', 'stemi', 'acs', 'timi', 'grace', 'ecg', 'atrial', 'chads', 'has-bled'])) {
+  if (
+    hasAny(text, [
+      'cardio',
+      'heart',
+      'stemi',
+      'acs',
+      'timi',
+      'grace',
+      'ecg',
+      'atrial',
+      'chads',
+      'has-bled',
+    ])
+  ) {
     packs.push('cardiology-pack');
   }
   if (hasAny(text, ['lab', 'abg', 'pharmacy', 'drug', 'medication', 'dose', 'antibiotic'])) {
@@ -282,13 +368,45 @@ function inferredPackIdsForCapability(tool) {
   if (hasAny(text, ['fleet', 'dispatch', 'route optimizer', 'predictive maintenance', 'eta'])) {
     packs.push('fleet-logistics');
   }
-  if (hasAny(text, ['hospital map', 'digital twin', 'operations', 'capacity', 'occupancy', 'incident', 'asset tracking', 'live map'])) {
+  if (
+    hasAny(text, [
+      'hospital map',
+      'digital twin',
+      'operations',
+      'capacity',
+      'occupancy',
+      'incident',
+      'asset tracking',
+      'live map',
+    ])
+  ) {
     packs.push('hospital-operations', 'digital-twin-pack');
   }
-  if (hasAny(text, ['simulation', 'scenario', 'competenc', 'credential', 'education', 'training', 'debrief'])) {
+  if (
+    hasAny(text, [
+      'simulation',
+      'scenario',
+      'competenc',
+      'credential',
+      'education',
+      'training',
+      'debrief',
+    ])
+  ) {
     packs.push('simulation-training-pack');
   }
-  if (hasAny(text, ['governance', 'security', 'audit', 'regulatory', 'privacy', 'system health', 'lineage', 'feature flag'])) {
+  if (
+    hasAny(text, [
+      'governance',
+      'security',
+      'audit',
+      'regulatory',
+      'privacy',
+      'system health',
+      'lineage',
+      'feature flag',
+    ])
+  ) {
     packs.push('governance-compliance-pack');
   }
   if (hasAny(text, ['research', 'evidence', 'guideline', 'rag', 'knowledge graph'])) {
@@ -307,14 +425,26 @@ function mountedPackIdsForTool(tool, contextPackIds = [] as any[]) {
 }
 
 function normalizeDemoLiveStatus(tool, backendSupport) {
-  if (backendSupport === SUPPORT_STATUSES.UNSUPPORTED || tool.executorStatus === TOOL_EXECUTOR_STATUS.UNSUPPORTED) {
+  if (
+    backendSupport === SUPPORT_STATUSES.UNSUPPORTED ||
+    tool.executorStatus === TOOL_EXECUTOR_STATUS.UNSUPPORTED
+  ) {
     return SUPPORT_STATUSES.UNSUPPORTED;
   }
-  if (tool.launchType === TOOL_LAUNCH_TYPES.BACKEND_BACKED && tool.executorStatus === TOOL_EXECUTOR_STATUS.REGISTERED) {
+  if (
+    tool.launchType === TOOL_LAUNCH_TYPES.BACKEND_BACKED &&
+    tool.executorStatus === TOOL_EXECUTOR_STATUS.REGISTERED
+  ) {
     return SUPPORT_STATUSES.LIVE;
   }
   if (tool.launchType === TOOL_LAUNCH_TYPES.CHAT_ASSISTED) return SUPPORT_STATUSES.DEMO_READY;
-  if ([TOOL_LAUNCH_TYPES.LOCAL_ONLY, TOOL_LAUNCH_TYPES.FLEET_LOCAL, TOOL_LAUNCH_TYPES.IOT_LOCAL].includes(tool.launchType)) {
+  if (
+    [
+      TOOL_LAUNCH_TYPES.LOCAL_ONLY,
+      TOOL_LAUNCH_TYPES.FLEET_LOCAL,
+      TOOL_LAUNCH_TYPES.IOT_LOCAL,
+    ].includes(tool.launchType)
+  ) {
     return SUPPORT_STATUSES.LIVE;
   }
   if (backendSupport === SUPPORT_STATUSES.BACKEND_BACKED) return SUPPORT_STATUSES.DEMO;
@@ -323,7 +453,8 @@ function normalizeDemoLiveStatus(tool, backendSupport) {
 
 function backendSupportForTool(tool) {
   if (tool.executorStatus === TOOL_EXECUTOR_STATUS.UNSUPPORTED) return SUPPORT_STATUSES.UNSUPPORTED;
-  if (tool.executorStatus === TOOL_EXECUTOR_STATUS.REGISTERED) return SUPPORT_STATUSES.BACKEND_BACKED;
+  if (tool.executorStatus === TOOL_EXECUTOR_STATUS.REGISTERED)
+    return SUPPORT_STATUSES.BACKEND_BACKED;
   if (tool.endpoint) {
     const capability = tool.auditRefs?.capability || tool.capability;
     const capabilityStatus = capability ? getBackendCapabilityStatus(capability) : null;
@@ -332,7 +463,13 @@ function backendSupportForTool(tool) {
     return SUPPORT_STATUSES.BACKEND_BACKED;
   }
   if (tool.launchType === TOOL_LAUNCH_TYPES.CHAT_ASSISTED) return SUPPORT_STATUSES.AI_ASSISTED;
-  if ([TOOL_LAUNCH_TYPES.LOCAL_ONLY, TOOL_LAUNCH_TYPES.FLEET_LOCAL, TOOL_LAUNCH_TYPES.IOT_LOCAL].includes(tool.launchType)) {
+  if (
+    [
+      TOOL_LAUNCH_TYPES.LOCAL_ONLY,
+      TOOL_LAUNCH_TYPES.FLEET_LOCAL,
+      TOOL_LAUNCH_TYPES.IOT_LOCAL,
+    ].includes(tool.launchType)
+  ) {
     return SUPPORT_STATUSES.LOCAL_DETERMINISTIC;
   }
   return SUPPORT_STATUSES.FRONTEND_ONLY;
@@ -340,14 +477,41 @@ function backendSupportForTool(tool) {
 
 function routeSurface(route) {
   if (!route) return null;
-  if (route.startsWith('/fleet') || ['/operations', '/hospital-map', '/medical-iot', '/devices', '/live-map', '/digital-twin'].includes(route)) {
+  if (
+    route.startsWith('/fleet') ||
+    [
+      '/operations',
+      '/hospital-map',
+      '/medical-iot',
+      '/devices',
+      '/live-map',
+      '/digital-twin',
+    ].includes(route)
+  ) {
     return 'operations';
   }
-  if (route.startsWith('/tools') || ['/protocols', '/research', '/documentation', '/knowledge-graph', '/simulation', '/laboratory', '/3d-viewer'].includes(route)) {
+  if (
+    route.startsWith('/tools') ||
+    [
+      '/protocols',
+      '/research',
+      '/documentation',
+      '/knowledge-graph',
+      '/simulation',
+      '/laboratory',
+      '/3d-viewer',
+    ].includes(route)
+  ) {
     return 'tools';
   }
   if (route.startsWith('/profile')) return 'profile';
-  if (route.startsWith('/settings') || route.includes('admin') || route.includes('governance') || route.includes('security') || route.includes('audit')) {
+  if (
+    route.startsWith('/settings') ||
+    route.includes('admin') ||
+    route.includes('governance') ||
+    route.includes('security') ||
+    route.includes('audit')
+  ) {
     return 'advanced';
   }
   return 'dashboard';
@@ -388,7 +552,8 @@ export function buildMountedCapability(tool, contextPackIds = [] as any[]) {
     capabilityId: tool.id,
     assetId: tool.id,
     title: tool.label || tool.name || tool.id,
-    description: tool.description || tool.safetyCopy || tool.notes || 'Mounted CareDroid platform capability.',
+    description:
+      tool.description || tool.safetyCopy || tool.notes || 'Mounted CareDroid platform capability.',
     productIds,
     packIds,
     workspaceIds,
@@ -421,12 +586,14 @@ export function buildMountedCapabilityGraph({
 }: any = {}) {
   const registryById = new Map(registryProjection.map((tool) => [tool.id, tool]));
   const capabilities = tools.map((tool) =>
-    buildMountedCapability({ ...tool, ...(registryById.get(tool.id) as any), id: tool.id })
+    buildMountedCapability({ ...tool, ...(registryById.get(tool.id) as any), id: tool.id }),
   );
   return Object.freeze({
     version: MOUNTED_CAPABILITY_GRAPH_VERSION,
     capabilities: Object.freeze(capabilities),
-    byId: Object.freeze(Object.fromEntries(capabilities.map((capability) => [capability.capabilityId, capability]))),
+    byId: Object.freeze(
+      Object.fromEntries(capabilities.map((capability) => [capability.capabilityId, capability])),
+    ),
     products: SAAS_PRODUCTS,
     packs: ASSET_PACKS,
     routes: ROUTE_RECORDS,

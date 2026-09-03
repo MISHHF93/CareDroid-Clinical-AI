@@ -83,10 +83,16 @@ export function inferAiMaturity(input: {
   }
   if (input.modelOrEngine?.includes('local')) return 'degraded';
   if (input.evidenceKinds?.includes('deterministic_calculator')) return 'deterministic';
-  if (input.evidenceKinds?.includes('retrieved_chunk') || input.evidenceKinds?.includes('knowledge_registry')) {
+  if (
+    input.evidenceKinds?.includes('retrieved_chunk') ||
+    input.evidenceKinds?.includes('knowledge_registry')
+  ) {
     return 'rag-grounded';
   }
-  if (input.modelOrEngine?.includes('offline-fixture') || input.modelOrEngine?.includes('measured')) {
+  if (
+    input.modelOrEngine?.includes('offline-fixture') ||
+    input.modelOrEngine?.includes('measured')
+  ) {
     return 'measured';
   }
   return 'heuristic';

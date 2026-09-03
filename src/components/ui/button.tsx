@@ -36,7 +36,8 @@ const Button = ({
   const reasonId = useId();
   const isDisabled = Boolean(disabled || loading);
   const showReason = isDisabled && Boolean(disabledReason);
-  const describedBy = [ariaDescribedBy, showReason ? reasonId : null].filter(Boolean).join(' ') || undefined;
+  const describedBy =
+    [ariaDescribedBy, showReason ? reasonId : null].filter(Boolean).join(' ') || undefined;
 
   const getClassName = () => {
     const variants: Record<string, string> = {
@@ -51,7 +52,13 @@ const Button = ({
       md: 'btn-md',
       lg: 'btn-lg',
     };
-    return ['btn', variants[variant] || variants.primary, sizes[size], compact ? 'btn-compact' : '', className]
+    return [
+      'btn',
+      variants[variant] || variants.primary,
+      sizes[size],
+      compact ? 'btn-compact' : '',
+      className,
+    ]
       .filter(Boolean)
       .join(' ');
   };

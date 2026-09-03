@@ -39,10 +39,7 @@ import { BACKEND_HTTP_ROUTES, findBackendRoute } from './backendHttpRouteInvento
 import { PLATFORM_SYSTEM_CAPABILITIES, PLATFORM_SYSTEM_CAPABILITY_BY_ID } from './platformSystems';
 import { enrichToolWithSegmentation } from './profileToolSegmentation';
 import { buildPluginInventoryRecords, PLUGIN_REGISTRY } from './pluginRegistry';
-import {
-  filterToolsByEntitlements,
-  getPlatformEntitlementContext,
-} from './assetEntitlements';
+import { filterToolsByEntitlements, getPlatformEntitlementContext } from './assetEntitlements';
 
 export const TOOL_INVENTORY_VERSION = 1;
 
@@ -62,7 +59,7 @@ const CLINICAL_TIER_C_WORKFLOW_REGISTRY_ID_SET = new Set(CLINICAL_TIER_C_WORKFLO
 const FLEET_TIER_A_REGISTRY_ID_SET = new Set(FLEET_TIER_A_REGISTRY_IDS);
 const FLEET_TIER_B_CHAT_REGISTRY_ID_SET = new Set(FLEET_TIER_B_CHAT_REGISTRY_IDS);
 const HOSPITAL_OPERATIONS_TIER_B_CHAT_REGISTRY_ID_SET = new Set(
-  HOSPITAL_OPERATIONS_TIER_B_CHAT_REGISTRY_IDS
+  HOSPITAL_OPERATIONS_TIER_B_CHAT_REGISTRY_IDS,
 );
 const LIVE_TRACKING_MAP_REGISTRY_ID_SET = new Set(LIVE_TRACKING_MAP_REGISTRY_IDS);
 const MEDICAL_IOT_REGISTRY_ID_SET = new Set(MEDICAL_IOT_REGISTRY_IDS);
@@ -179,37 +176,46 @@ const AMBIENT_SCRIBE_DTO = Object.freeze({
 
 const GUIDELINE_RAG_DTO = Object.freeze({
   requestDto: 'GuidelineRagQueryDto (`query`, `specialty?`, `topK?`, `minScore?`)',
-  responseDto: 'GuidelineRagResponseDto (`runId`, `summary`, `citations`, `sources`, `explainability`)',
+  responseDto:
+    'GuidelineRagResponseDto (`runId`, `summary`, `citations`, `sources`, `explainability`)',
 });
 
 const DIFFERENTIAL_AI_DTO = Object.freeze({
   requestDto: 'DifferentialAiRequestDto (`symptoms`, `labs?`, `history?`, `demographics?`)',
-  responseDto: 'DifferentialAiResponseDto (`runId`, `rankedDifferentials`, `suggestedCalculators`, `explainability`)',
+  responseDto:
+    'DifferentialAiResponseDto (`runId`, `rankedDifferentials`, `suggestedCalculators`, `explainability`)',
 });
 
 const TIMELINE_AI_DTO = Object.freeze({
   requestDto: 'TimelineAiRequestDto (`patientContext?`, `encounters`, `focus?`)',
-  responseDto: 'TimelineAiResponseDto (`runId`, `timeline`, `trends`, `abnormalProgression`, `safety`)',
+  responseDto:
+    'TimelineAiResponseDto (`runId`, `timeline`, `trends`, `abnormalProgression`, `safety`)',
 });
 
 const PATIENT_SUMMARY_AI_DTO = Object.freeze({
-  requestDto: 'PatientSummaryAiRequestDto (`patientContext?`, `problems?`, `medications?`, `labs?`, `alerts?`, `riskFactors?`, `notes?`)',
-  responseDto: 'PatientSummaryAiResponseDto (`runId`, `activeProblems`, `medications`, `recentLabs`, `alerts`, `riskFactors`, `safety`)',
+  requestDto:
+    'PatientSummaryAiRequestDto (`patientContext?`, `problems?`, `medications?`, `labs?`, `alerts?`, `riskFactors?`, `notes?`)',
+  responseDto:
+    'PatientSummaryAiResponseDto (`runId`, `activeProblems`, `medications`, `recentLabs`, `alerts`, `riskFactors`, `safety`)',
 });
 
 const ORDER_SET_AI_DTO = Object.freeze({
-  requestDto: 'OrderSetAiRequestDto (`clinicalScenario`, `diagnosis?`, `patientContext?`, `constraints?`)',
-  responseDto: 'OrderSetAiResponseDto (`runId`, `orderBundles`, `protocolPathways`, `explainability`, `safety`)',
+  requestDto:
+    'OrderSetAiRequestDto (`clinicalScenario`, `diagnosis?`, `patientContext?`, `constraints?`)',
+  responseDto:
+    'OrderSetAiResponseDto (`runId`, `orderBundles`, `protocolPathways`, `explainability`, `safety`)',
 });
 
 const AI_EXPLAINABILITY_DTO = Object.freeze({
   requestDto: 'AiExplainabilityQueryDto (`toolId?`, `clinicalQuestion?`, `limit?`)',
-  responseDto: 'AiExplainabilityResponseDto (`runId`, `confidence`, `source`, `reasoning`, `toolChain`, `executionLogs`)',
+  responseDto:
+    'AiExplainabilityResponseDto (`runId`, `confidence`, `source`, `reasoning`, `toolChain`, `executionLogs`)',
 });
 
 const CLINICAL_AUDIT_DTO = Object.freeze({
   requestDto: 'ClinicalAuditQueryDto (`action?`, `limit?`)',
-  responseDto: 'ClinicalAuditResponseDto (`runId`, `summary`, `toolChain`, `executionLogs`, `safety`)',
+  responseDto:
+    'ClinicalAuditResponseDto (`runId`, `summary`, `toolChain`, `executionLogs`, `safety`)',
 });
 
 export const TOOL_PERMISSION_LOGIC = Object.freeze({
@@ -455,10 +461,12 @@ function normalizeCategory(value) {
 
 function presentationCategory(value) {
   const category = String(value || 'Other').toLowerCase();
-  if (category === 'diagnostic' || category === 'checker' || category === 'interpreter') return 'Diagnostic';
+  if (category === 'diagnostic' || category === 'checker' || category === 'interpreter')
+    return 'Diagnostic';
   if (category === 'calculator') return 'Calculator';
   if (category === 'reference' || category === 'protocol') return 'Reference';
-  if (category === 'simulation' || category === 'education & simulation') return 'Education & Simulation';
+  if (category === 'simulation' || category === 'education & simulation')
+    return 'Education & Simulation';
   if (category === 'laboratory') return 'Laboratory';
   if (category === 'visualization') return 'Visualization';
   if (category === 'fleet') return 'Fleet';
@@ -518,7 +526,8 @@ function launchTypeForTier(tier, hasExecutor) {
   if (tier === 'C') return TOOL_LAUNCH_TYPES.CLINICAL_PAGE;
   if (tier === 'ai-system') return TOOL_LAUNCH_TYPES.CLINICAL_PAGE;
   if (tier === 'A') return TOOL_LAUNCH_TYPES.LOCAL_ONLY;
-  if (tier === 'B' || tier === 'fleet-B' || tier === 'hospital-ops-B') return TOOL_LAUNCH_TYPES.CHAT_ASSISTED;
+  if (tier === 'B' || tier === 'fleet-B' || tier === 'hospital-ops-B')
+    return TOOL_LAUNCH_TYPES.CHAT_ASSISTED;
   if (tier === 'clinical-page') return TOOL_LAUNCH_TYPES.CLINICAL_PAGE;
   if (tier === 'fleet-A') return TOOL_LAUNCH_TYPES.FLEET_LOCAL;
   if (tier === 'live-map') return TOOL_LAUNCH_TYPES.HOSPITAL_LOCAL;
@@ -633,8 +642,10 @@ function surfaceForRecord(record) {
   if (record.launchType === TOOL_LAUNCH_TYPES.CHAT_ASSISTED) return TOOL_SURFACES.CHAT_ASSISTED;
   if (record.launchType === TOOL_LAUNCH_TYPES.FLEET_LOCAL) return TOOL_SURFACES.FLEET_PAGE;
   if (record.launchType === TOOL_LAUNCH_TYPES.IOT_LOCAL) return TOOL_SURFACES.IOT_DASHBOARD;
-  if (record.launchType === TOOL_LAUNCH_TYPES.HOSPITAL_LOCAL) return TOOL_SURFACES.HOSPITAL_OPERATIONS;
-  if (record.calculatorSlug || isCalculatorCategory(record.category)) return TOOL_SURFACES.CALCULATOR_FORM;
+  if (record.launchType === TOOL_LAUNCH_TYPES.HOSPITAL_LOCAL)
+    return TOOL_SURFACES.HOSPITAL_OPERATIONS;
+  if (record.calculatorSlug || isCalculatorCategory(record.category))
+    return TOOL_SURFACES.CALCULATOR_FORM;
   return TOOL_SURFACES.TOOL_PAGE;
 }
 
@@ -660,7 +671,9 @@ const ADMIN_ONLY_PERMISSIONS = new Set([
 ]);
 
 function isAdminOnlyPermissionPolicy(permissionPolicy) {
-  return (permissionPolicy?.permissions || []).some((permission) => ADMIN_ONLY_PERMISSIONS.has(permission));
+  return (permissionPolicy?.permissions || []).some((permission) =>
+    ADMIN_ONLY_PERMISSIONS.has(permission),
+  );
 }
 
 function lifecycleStateForRecord({
@@ -721,7 +734,9 @@ function userFacingRecordFromCanonical(record) {
       ...(record.nluProfileIds || []),
       ...(record.aliases || []),
       record.orchestratorToolId,
-    ]).join(' ').toLowerCase(),
+    ])
+      .join(' ')
+      .toLowerCase(),
     surface,
     tier: record.tier,
     launchType: record.launchType,
@@ -819,9 +834,12 @@ function resolveRegistryPackId(registryId, category) {
   if (normalizedCategory.includes('cardio')) return 'cardiology';
   if (normalizedCategory.includes('pharm')) return 'pharmacy';
   if (normalizedCategory.includes('lab')) return 'laboratory';
-  if (normalizedCategory.includes('simulation') || normalizedCategory.includes('education')) return 'education';
-  if (normalizedCategory.includes('governance') || normalizedCategory.includes('audit')) return 'governance';
-  if (normalizedCategory.includes('iot') || normalizedCategory.includes('device')) return 'medical-iot';
+  if (normalizedCategory.includes('simulation') || normalizedCategory.includes('education'))
+    return 'education';
+  if (normalizedCategory.includes('governance') || normalizedCategory.includes('audit'))
+    return 'governance';
+  if (normalizedCategory.includes('iot') || normalizedCategory.includes('device'))
+    return 'medical-iot';
   if (normalizedCategory.includes('emergency') || normalizedCategory.includes('critical')) {
     return 'emergency-clinical';
   }
@@ -841,7 +859,7 @@ function buildRecordFromRegistry(registryId, patternByToolId) {
   const calculator = calculatorForRegistry(registryId, registryEntry);
   const orchestratorToolId = REGISTRY_ID_TO_ORCHESTRATOR_TOOL[registryId] || null;
   const hasExecutor = Boolean(
-    orchestratorToolId && ORCHESTRATOR_REGISTERED_NLU_TOOL_ID_SET.has(orchestratorToolId)
+    orchestratorToolId && ORCHESTRATOR_REGISTERED_NLU_TOOL_ID_SET.has(orchestratorToolId),
   );
   const launchType = launchTypeForTier(tier, hasExecutor);
   const route =
@@ -886,11 +904,11 @@ function buildRecordFromRegistry(registryId, patternByToolId) {
                   ? AI_EXPLAINABILITY_DTO
                   : registryId === REGISTRY.clinicalAudit
                     ? CLINICAL_AUDIT_DTO
-      : orchestratorToolId
-        ? EXECUTOR_DTO
-        : endpoint === '/api/chat/message'
-          ? CHAT_DTO
-          : ({} as any);
+                    : orchestratorToolId
+                      ? EXECUTOR_DTO
+                      : endpoint === '/api/chat/message'
+                        ? CHAT_DTO
+                        : ({} as any);
   const catalogVisible = true;
   const sidebarVisible = Boolean(registryEntry);
   const status = sourceStatusFor({ catalogVisible, sidebarVisible, component, route });
@@ -909,10 +927,14 @@ function buildRecordFromRegistry(registryId, patternByToolId) {
     permissionPolicy,
     catalogVisible,
     sidebarVisible,
-    category: normalizeCategory(registryEntry?.category || primaryNlu?.category || pattern?.category),
+    category: normalizeCategory(
+      registryEntry?.category || primaryNlu?.category || pattern?.category,
+    ),
     tier,
   });
-  const category = normalizeCategory(registryEntry?.category || primaryNlu?.category || pattern?.category);
+  const category = normalizeCategory(
+    registryEntry?.category || primaryNlu?.category || pattern?.category,
+  );
   const packId = resolveRegistryPackId(registryId, category);
 
   return {
@@ -961,7 +983,9 @@ function buildRecordFromRegistry(registryId, patternByToolId) {
           ? 'medium'
           : 'low',
     notes: unique([
-      primaryNlu?.backendExecutable && !hasExecutor ? 'backendExecutable indicates NLU/chat routing only' : null,
+      primaryNlu?.backendExecutable && !hasExecutor
+        ? 'backendExecutable indicates NLU/chat routing only'
+        : null,
       usePlatformCapability
         ? `Platform endpoint ${platformCapability.method || 'GET'} ${platformCapability.endpoint}`
         : null,
@@ -1044,7 +1068,9 @@ function buildPlatformRecord({
 
 function buildPlatformRecords() {
   const toolsList = FRONTEND_API_CALLS.find((call) => call.id === 'tools-list');
-  const executorCatalog = BACKEND_HTTP_ROUTES.find((route) => route.path === '/api/tools/catalog/executors');
+  const executorCatalog = BACKEND_HTTP_ROUTES.find(
+    (route) => route.path === '/api/tools/catalog/executors',
+  );
   return [
     buildPlatformRecord({
       id: 'tools-list-api',
@@ -1071,7 +1097,7 @@ function buildPlatformRecords() {
       notes: 'Capability-gated frontend call; no Nest route today.',
     }),
     ...PLATFORM_SYSTEM_CAPABILITIES.filter(
-      (capability) => !ALL_REGISTRY_TOOL_ID_ORDER.has(capability.id as any)
+      (capability) => !ALL_REGISTRY_TOOL_ID_ORDER.has(capability.id as any),
     ).map((capability) =>
       buildPlatformRecord({
         id: capability.id,
@@ -1091,11 +1117,13 @@ function buildPlatformRecords() {
         safetyCopy: capability.summary,
         chatSeed: capability.chatSeed || null,
         testCoverage: capability.testCoverage as string[],
-        riskLevel: capability.permissionPolicy?.permissions?.includes('READ_PHI') ? 'high' : 'medium',
+        riskLevel: capability.permissionPolicy?.permissions?.includes('READ_PHI')
+          ? 'high'
+          : 'medium',
         notes: capability.safetyCopy,
         catalogVisible: true,
         sourceKind: 'platform',
-      })
+      }),
     ),
   ];
 }
@@ -1103,7 +1131,7 @@ function buildPlatformRecords() {
 export function buildCanonicalToolInventory() {
   const { byToolId: patternByToolId } = getPatternMaps();
   const records: any[] = ALL_REGISTRY_TOOL_IDS.map((registryId) =>
-    buildRecordFromRegistry(registryId, patternByToolId)
+    buildRecordFromRegistry(registryId, patternByToolId),
   );
 
   records.push(...buildPlatformRecords());
@@ -1205,7 +1233,7 @@ export function getSidebarToolRegistryProjection(records = getCanonicalToolInven
     .sort(
       (a, b) =>
         (ALL_REGISTRY_TOOL_ID_ORDER.get(a.id) ?? Number.MAX_SAFE_INTEGER) -
-        (ALL_REGISTRY_TOOL_ID_ORDER.get(b.id) ?? Number.MAX_SAFE_INTEGER)
+        (ALL_REGISTRY_TOOL_ID_ORDER.get(b.id) ?? Number.MAX_SAFE_INTEGER),
     );
   if (records === cachedInventory) {
     cachedSidebarToolRegistryProjection = projection;
@@ -1217,49 +1245,55 @@ export function getUserFacingToolRegistryProjection(records = getCanonicalToolIn
   if (records === cachedInventory && cachedUserFacingToolRegistryProjection) {
     return cachedUserFacingToolRegistryProjection;
   }
-  const projection = getUserFacingToolInventory(records).map((record) => {
-    const legacy = record.legacy || {};
-    const category = legacy.category || record.presentationCategory;
-    const packId = record.packId || record.assetPackId || resolveRegistryPackId(record.id, category);
-    return enrichToolWithSegmentation({
-      ...legacy,
-      id: record.id,
-      name: record.label || legacy.name || record.id,
-      path: record.route || record.navigationPath || legacy.path || TOOL_LAUNCH_PATHS.toolsOverview,
-      color: legacy.color || DEFAULT_COLOR_BY_CATEGORY[category] || DEFAULT_COLOR_BY_CATEGORY.Other,
-      description: record.description || legacy.description || 'Clinical decision support tool',
-      shortcut: legacy.shortcut || null,
-      category,
-      packId,
-      assetPackId: packId,
-      features: legacy.features || [],
-      useCases: legacy.useCases || [],
-      panelTool:
-        legacy.panelTool ||
-        (record.calculatorSlug && record.id !== REGISTRY.calculatorsHub ? REGISTRY.calculatorsHub : undefined),
-      initialCalc: legacy.initialCalc || record.calculatorSlug || undefined,
-      canonicalInventoryId: record.id,
-      launchType: record.launchType,
-      surface: record.surface,
-      tier: record.tier,
-      nluToolId: record.nluToolId,
-      executorStatus: record.executorStatus,
-      lifecycleState: record.lifecycleState,
-      lifecycleLabel: TOOL_LIFECYCLE_LABELS[record.lifecycleState] || 'Active',
-      permissionPolicy: record.permissionPolicy,
-      aliases: record.aliases || [],
-      endpoint: record.endpoint,
-      clinicalRiskLevel: record.riskLevel,
-      userCatalogVisible: record.userCatalogVisible,
-      workspaceFilterable: record.workspaceFilterable,
-      favoriteable: record.favoriteable,
-      searchText: record.searchText,
-    });
-  })
+  const projection = getUserFacingToolInventory(records)
+    .map((record) => {
+      const legacy = record.legacy || {};
+      const category = legacy.category || record.presentationCategory;
+      const packId =
+        record.packId || record.assetPackId || resolveRegistryPackId(record.id, category);
+      return enrichToolWithSegmentation({
+        ...legacy,
+        id: record.id,
+        name: record.label || legacy.name || record.id,
+        path:
+          record.route || record.navigationPath || legacy.path || TOOL_LAUNCH_PATHS.toolsOverview,
+        color:
+          legacy.color || DEFAULT_COLOR_BY_CATEGORY[category] || DEFAULT_COLOR_BY_CATEGORY.Other,
+        description: record.description || legacy.description || 'Clinical decision support tool',
+        shortcut: legacy.shortcut || null,
+        category,
+        packId,
+        assetPackId: packId,
+        features: legacy.features || [],
+        useCases: legacy.useCases || [],
+        panelTool:
+          legacy.panelTool ||
+          (record.calculatorSlug && record.id !== REGISTRY.calculatorsHub
+            ? REGISTRY.calculatorsHub
+            : undefined),
+        initialCalc: legacy.initialCalc || record.calculatorSlug || undefined,
+        canonicalInventoryId: record.id,
+        launchType: record.launchType,
+        surface: record.surface,
+        tier: record.tier,
+        nluToolId: record.nluToolId,
+        executorStatus: record.executorStatus,
+        lifecycleState: record.lifecycleState,
+        lifecycleLabel: TOOL_LIFECYCLE_LABELS[record.lifecycleState] || 'Active',
+        permissionPolicy: record.permissionPolicy,
+        aliases: record.aliases || [],
+        endpoint: record.endpoint,
+        clinicalRiskLevel: record.riskLevel,
+        userCatalogVisible: record.userCatalogVisible,
+        workspaceFilterable: record.workspaceFilterable,
+        favoriteable: record.favoriteable,
+        searchText: record.searchText,
+      });
+    })
     .sort(
       (a, b) =>
         (ALL_REGISTRY_TOOL_ID_ORDER.get(a.id) ?? Number.MAX_SAFE_INTEGER) -
-        (ALL_REGISTRY_TOOL_ID_ORDER.get(b.id) ?? Number.MAX_SAFE_INTEGER)
+        (ALL_REGISTRY_TOOL_ID_ORDER.get(b.id) ?? Number.MAX_SAFE_INTEGER),
     );
   if (records === cachedInventory) {
     cachedUserFacingToolRegistryProjection = projection;
@@ -1269,7 +1303,7 @@ export function getUserFacingToolRegistryProjection(records = getCanonicalToolIn
 
 export function getEntitlementFilteredUserFacingToolRegistryProjection(
   records = getCanonicalToolInventory(),
-  context = getPlatformEntitlementContext()
+  context = getPlatformEntitlementContext(),
 ) {
   return filterToolsByEntitlements(getUserFacingToolRegistryProjection(records), context);
 }
@@ -1289,7 +1323,9 @@ export function findInventoryRecordsByEndpoint(endpoint, records = getCanonicalT
 
 export function inventoryEndpointExists(record) {
   if (!record.endpoint || record.endpoint === '/api/chat/message') return true;
-  return Boolean(findBackendRoute('GET', record.endpoint) || findBackendRoute('POST', record.endpoint));
+  return Boolean(
+    findBackendRoute('GET', record.endpoint) || findBackendRoute('POST', record.endpoint),
+  );
 }
 
 export function getCanonicalToolInventoryDocument(records = getCanonicalToolInventory()) {
@@ -1353,7 +1389,7 @@ export function formatCanonicalToolInventoryMarkdown(doc = getCanonicalToolInven
 
   for (const record of doc.records) {
     lines.push(
-      `| ${mdCell(record.id)} | ${mdCell(record.label)} | ${mdCell(record.category)} | ${mdCell(record.tier)} | ${mdCell(record.launchType)} | ${mdCell(record.route)} | ${mdCell(record.component)} | ${mdCell(record.nluToolId)} | ${mdCell(record.executorStatus)} | ${mdCell(record.endpoint)} | ${mdCell(record.apiClient)} |`
+      `| ${mdCell(record.id)} | ${mdCell(record.label)} | ${mdCell(record.category)} | ${mdCell(record.tier)} | ${mdCell(record.launchType)} | ${mdCell(record.route)} | ${mdCell(record.component)} | ${mdCell(record.nluToolId)} | ${mdCell(record.executorStatus)} | ${mdCell(record.endpoint)} | ${mdCell(record.apiClient)} |`,
     );
   }
 

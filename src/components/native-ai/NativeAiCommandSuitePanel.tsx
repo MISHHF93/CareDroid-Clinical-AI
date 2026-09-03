@@ -17,7 +17,13 @@ import './native-ai-dashboard-theme.css';
 
 type NativeAiCommandSuitePanelProps = {
   patients: Patient[];
-  rooms?: Array<{ id: string; status?: string; type?: string; patientId?: string; currentPatientId?: string | null }>;
+  rooms?: Array<{
+    id: string;
+    status?: string;
+    type?: string;
+    patientId?: string;
+    currentPatientId?: string | null;
+  }>;
   capacity?: { band?: string; occupancyPercent?: number };
   onSelectPatient?: (patientId: string) => void;
   thresholds?: Partial<NativeAiThresholdConfig>;
@@ -47,20 +53,28 @@ export default function NativeAiCommandSuitePanel({
         prolongedStayAlertThreshold: localThresholds.prolongedStayAlertPercent,
         now: new Date(),
       }),
-    [localThresholds.admissionAlertPercent, localThresholds.prolongedStayAlertPercent, patients, rooms],
+    [
+      localThresholds.admissionAlertPercent,
+      localThresholds.prolongedStayAlertPercent,
+      patients,
+      rooms,
+    ],
   );
 
   const occupancyPercent =
     capacity?.occupancyPercent ??
     (rooms.length
       ? Math.round(
-          (rooms.filter((room) => room.status === 'Occupied' || room.patientId || room.currentPatientId).length /
+          (rooms.filter(
+            (room) => room.status === 'Occupied' || room.patientId || room.currentPatientId,
+          ).length /
             rooms.length) *
             100,
         )
       : 0);
 
-  const prolongedStayBreached = snapshot.prolongedStayAlerts.length >= localThresholds.highProlongedStayPatientCount;
+  const prolongedStayBreached =
+    snapshot.prolongedStayAlerts.length >= localThresholds.highProlongedStayPatientCount;
   const occupancyBreached = occupancyPercent >= localThresholds.occupancyAlertPercent;
 
   const handlePatientSelect = (patientId: string) => {
@@ -73,7 +87,10 @@ export default function NativeAiCommandSuitePanel({
   };
 
   return (
-    <section className={['native-ai-command-suite', className].filter(Boolean).join(' ')} aria-label="Native AI command suite">
+    <section
+      className={['native-ai-command-suite', className].filter(Boolean).join(' ')}
+      aria-label="Native AI command suite"
+    >
       <header className="native-ai-command-suite__header">
         <div>
           <p className="native-ai-command-suite__eyebrow">Native AI · Command suite</p>
@@ -93,7 +110,9 @@ export default function NativeAiCommandSuitePanel({
         </div>
         {(prolongedStayBreached || occupancyBreached) && (
           <div className="native-ai-command-suite__alert-banner" role="status">
-            {occupancyBreached ? `Occupancy ${occupancyPercent}% exceeds ${localThresholds.occupancyAlertPercent}% threshold. ` : ''}
+            {occupancyBreached
+              ? `Occupancy ${occupancyPercent}% exceeds ${localThresholds.occupancyAlertPercent}% threshold. `
+              : ''}
             {prolongedStayBreached
               ? `${snapshot.prolongedStayAlerts.length} patients exceed prolonged-stay risk threshold.`
               : ''}
@@ -101,7 +120,10 @@ export default function NativeAiCommandSuitePanel({
         )}
       </header>
 
-      <div className="native-ai-command-suite__thresholds" aria-label="Charge nurse ML alert thresholds">
+      <div
+        className="native-ai-command-suite__thresholds"
+        aria-label="Charge nurse ML alert thresholds"
+      >
         <label>
           Admission alert %
           <input
@@ -112,7 +134,8 @@ export default function NativeAiCommandSuitePanel({
             onChange={(event) =>
               setLocalThresholds((current) => ({
                 ...current,
-                admissionAlertPercent: Number(event.target.value) || DEFAULT_NATIVE_AI_THRESHOLDS.admissionAlertPercent,
+                admissionAlertPercent:
+                  Number(event.target.value) || DEFAULT_NATIVE_AI_THRESHOLDS.admissionAlertPercent,
               }))
             }
           />
@@ -128,7 +151,8 @@ export default function NativeAiCommandSuitePanel({
               setLocalThresholds((current) => ({
                 ...current,
                 prolongedStayAlertPercent:
-                  Number(event.target.value) || DEFAULT_NATIVE_AI_THRESHOLDS.prolongedStayAlertPercent,
+                  Number(event.target.value) ||
+                  DEFAULT_NATIVE_AI_THRESHOLDS.prolongedStayAlertPercent,
               }))
             }
           />
@@ -160,7 +184,8 @@ export default function NativeAiCommandSuitePanel({
               setLocalThresholds((current) => ({
                 ...current,
                 highProlongedStayPatientCount:
-                  Number(event.target.value) || DEFAULT_NATIVE_AI_THRESHOLDS.highProlongedStayPatientCount,
+                  Number(event.target.value) ||
+                  DEFAULT_NATIVE_AI_THRESHOLDS.highProlongedStayPatientCount,
               }))
             }
           />

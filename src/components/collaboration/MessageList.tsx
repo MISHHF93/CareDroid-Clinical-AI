@@ -28,7 +28,13 @@ function formatTime(iso: string): string {
   }
 }
 
-export function MessageList({ messages, currentUserId, onReact, onDelete, onReply }: MessageListProps) {
+export function MessageList({
+  messages,
+  currentUserId,
+  onReact,
+  onDelete,
+  onReply,
+}: MessageListProps) {
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -72,11 +78,19 @@ export function MessageList({ messages, currentUserId, onReact, onDelete, onRepl
                       {emoji}
                     </button>
                   ))}
-                  <button type="button" className="cd-collab-message__action-text" onClick={() => onReply(message)}>
+                  <button
+                    type="button"
+                    className="cd-collab-message__action-text"
+                    onClick={() => onReply(message)}
+                  >
                     Reply
                   </button>
                   {isMine && (
-                    <button type="button" className="cd-collab-message__action-text" onClick={() => onDelete(message.id)}>
+                    <button
+                      type="button"
+                      className="cd-collab-message__action-text"
+                      onClick={() => onDelete(message.id)}
+                    >
                       Delete
                     </button>
                   )}

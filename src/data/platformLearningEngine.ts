@@ -17,23 +17,73 @@ export const PLATFORM_LEARNING_SUGGESTION_TYPES = Object.freeze({
 
 export const DEMO_PLATFORM_LEARNING_SIGNALS = Object.freeze({
   successfulWorkflows: [
-    { id: 'workflow-sepsis', workflowId: 'sepsis-escalation', label: 'Sepsis escalation', count: 18, route: '/workflows' },
-    { id: 'workflow-chest-pain', workflowId: 'chest-pain', label: 'Chest pain workflow', count: 11, route: '/workflows' },
+    {
+      id: 'workflow-sepsis',
+      workflowId: 'sepsis-escalation',
+      label: 'Sepsis escalation',
+      count: 18,
+      route: '/workflows',
+    },
+    {
+      id: 'workflow-chest-pain',
+      workflowId: 'chest-pain',
+      label: 'Chest pain workflow',
+      count: 11,
+      route: '/workflows',
+    },
   ],
   successfulSimulations: [
-    { id: 'simulation-sepsis', scenarioId: 'sepsis-deterioration', label: 'Sepsis Deterioration', count: 13, route: '/simulation/sepsis-deterioration' },
+    {
+      id: 'simulation-sepsis',
+      scenarioId: 'sepsis-deterioration',
+      label: 'Sepsis Deterioration',
+      count: 13,
+      route: '/simulation/sepsis-deterioration',
+    },
   ],
   commonSearches: [
     { id: 'search-sepsis', category: 'sepsis', resultCount: 6, count: 24, route: '/tools' },
-    { id: 'search-maps', category: 'operations maps', resultCount: 3, count: 15, route: '/operations' },
+    {
+      id: 'search-maps',
+      category: 'operations maps',
+      resultCount: 3,
+      count: 15,
+      route: '/operations',
+    },
   ],
   abandonedPages: [
-    { id: 'abandoned-ai-models', route: '/ai-models', label: 'AI Models', views: 16, completedActions: 1 },
-    { id: 'abandoned-plugins', route: '/plugins', label: 'Plugins', views: 10, completedActions: 0 },
+    {
+      id: 'abandoned-ai-models',
+      route: '/ai-models',
+      label: 'AI Models',
+      views: 16,
+      completedActions: 1,
+    },
+    {
+      id: 'abandoned-plugins',
+      route: '/plugins',
+      label: 'Plugins',
+      views: 10,
+      completedActions: 0,
+    },
   ],
   failedLaunches: [
-    { id: 'failed-lab', assetId: 'lab-interp', label: 'Lab Interpreter', route: '/tools/lab-interpreter', count: 5, reason: 'backend-timeout' },
-    { id: 'failed-workflow-ai', assetId: 'workflow-builder-ai', label: 'Workflow Builder AI', route: '/tools/workflow-builder-ai', count: 3, reason: 'permission-or-route-blocked' },
+    {
+      id: 'failed-lab',
+      assetId: 'lab-interp',
+      label: 'Lab Interpreter',
+      route: '/tools/lab-interpreter',
+      count: 5,
+      reason: 'backend-timeout',
+    },
+    {
+      id: 'failed-workflow-ai',
+      assetId: 'workflow-builder-ai',
+      label: 'Workflow Builder AI',
+      route: '/tools/workflow-builder-ai',
+      count: 3,
+      reason: 'permission-or-route-blocked',
+    },
   ],
 });
 
@@ -60,7 +110,17 @@ function priorityFromImpact(impact) {
   return 'low';
 }
 
-function suggestion({ id, type, title, rationale, route, impact, confidence, sourceSignals, metadata }) {
+function suggestion({
+  id,
+  type,
+  title,
+  rationale,
+  route,
+  impact,
+  confidence,
+  sourceSignals,
+  metadata,
+}) {
   return {
     id,
     type,
@@ -87,8 +147,14 @@ function normalizeLearningSignals(signals: any = {}) {
 
 function signalTotals(signals) {
   return {
-    successfulWorkflows: signals.successfulWorkflows.reduce((sum, item) => sum + toCount(item.count, 1), 0),
-    successfulSimulations: signals.successfulSimulations.reduce((sum, item) => sum + toCount(item.count, 1), 0),
+    successfulWorkflows: signals.successfulWorkflows.reduce(
+      (sum, item) => sum + toCount(item.count, 1),
+      0,
+    ),
+    successfulSimulations: signals.successfulSimulations.reduce(
+      (sum, item) => sum + toCount(item.count, 1),
+      0,
+    ),
     commonSearches: signals.commonSearches.reduce((sum, item) => sum + toCount(item.count, 1), 0),
     abandonedPages: signals.abandonedPages.reduce((sum, item) => sum + toCount(item.views, 1), 0),
     failedLaunches: signals.failedLaunches.reduce((sum, item) => sum + toCount(item.count, 1), 0),
@@ -251,7 +317,9 @@ export function buildPlatformLearningEngine({
     ...buildDiscoverySuggestions({ signals }),
     ...buildMergeSuggestions({ analytics }),
     ...buildHideSuggestions({ analytics }),
-  ].sort((a, b) => b.impact - a.impact || b.confidence - a.confidence || a.title.localeCompare(b.title));
+  ].sort(
+    (a, b) => b.impact - a.impact || b.confidence - a.confidence || a.title.localeCompare(b.title),
+  );
 
   const totals = signalTotals(signals);
   const byType = Object.values(PLATFORM_LEARNING_SUGGESTION_TYPES).map((type) => ({

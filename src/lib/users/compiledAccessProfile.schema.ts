@@ -35,10 +35,9 @@ export const compiledAccessProfileSchema = z
         emergencyRoleId: z.string().optional(),
       })
       .loose()
-      .refine(
-        (role) => Boolean(role.hospitalRole?.trim() || role.emergencyRoleId?.trim()),
-        { message: 'role must carry hospitalRole or emergencyRoleId' },
-      ),
+      .refine((role) => Boolean(role.hospitalRole?.trim() || role.emergencyRoleId?.trim()), {
+        message: 'role must carry hospitalRole or emergencyRoleId',
+      }),
     // canAccessRoute branches on `'navigationAccess' in profile` and then
     // reads routeAccess/permissions unguarded, so a profile carrying the key
     // but not the arrays takes the "already compiled" path and throws on

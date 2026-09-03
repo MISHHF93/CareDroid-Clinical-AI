@@ -8,13 +8,16 @@ import {
 } from '../services/hospitalOperatingSystemService';
 import { isBackendKnownOffline } from '../services/backendReachability';
 
-export type HospitalOperatingSystemHook = HospitalOperatingContext & Readonly<{
-  backendSnapshot: unknown | null;
-  backendLoading: boolean;
-  backendError: string | null;
-}>;
+export type HospitalOperatingSystemHook = HospitalOperatingContext &
+  Readonly<{
+    backendSnapshot: unknown | null;
+    backendLoading: boolean;
+    backendError: string | null;
+  }>;
 
-export function useHospitalOperatingSystem(options: { syncBackend?: boolean } = {}): HospitalOperatingSystemHook {
+export function useHospitalOperatingSystem(
+  options: { syncBackend?: boolean } = {},
+): HospitalOperatingSystemHook {
   const { pathname } = useLocation();
   const patients = useEmergencyStore((state) => state.patients);
   const staff = useEmergencyStore((state) => state.staff);
@@ -42,7 +45,8 @@ export function useHospitalOperatingSystem(options: { syncBackend?: boolean } = 
   const [backendError, setBackendError] = useState<string | null>(null);
 
   const apiSurfaceId = context.snapshot.apiSurfaceId;
-  const shouldSync = options.syncBackend !== false && Boolean(apiSurfaceId) && !isBackendKnownOffline();
+  const shouldSync =
+    options.syncBackend !== false && Boolean(apiSurfaceId) && !isBackendKnownOffline();
 
   useEffect(() => {
     if (!shouldSync || !apiSurfaceId) {

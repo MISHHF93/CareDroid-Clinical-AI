@@ -66,7 +66,9 @@ function buildPlatformAiModelRegistry() {
         purpose: service.purpose,
         input: `Governed ${service.name} request with tenant, role, workspace, and safety context.`,
         output: 'Structured or conversational AI output routed through CareDroidUnifiedAINode.',
-        artifactDependencies: PLATFORM_SERVICE_DEPENDENCIES[serviceId] || [REGISTRY.aiCommandCenter],
+        artifactDependencies: PLATFORM_SERVICE_DEPENDENCIES[serviceId] || [
+          REGISTRY.aiCommandCenter,
+        ],
         status: service.status,
         costProfile: service.provider === 'local' ? 'local-only' : 'metered-generation',
         riskLevel: service.riskLevel,
@@ -86,9 +88,11 @@ export const AI_INFRASTRUCTURE_MODEL_REGISTRY = Object.freeze([
   Object.freeze({
     modelId: 'ai-gateway',
     name: 'AI Gateway',
-    purpose: 'Routes governed AI requests across assistant, RAG, tool, memory, cost, and evaluation services.',
+    purpose:
+      'Routes governed AI requests across assistant, RAG, tool, memory, cost, and evaluation services.',
     input: 'Clinical or operational request with tenant, role, workspace, and safety context.',
-    output: 'Routed AI response plan with safety scope, model class, tool options, and audit metadata.',
+    output:
+      'Routed AI response plan with safety scope, model class, tool options, and audit metadata.',
     artifactDependencies: [REGISTRY.aiGateway, REGISTRY.aiCommandCenter, REGISTRY.aiEvaluation],
     status: 'active',
     costProfile: 'metered-router',
@@ -117,7 +121,8 @@ export const AI_INFRASTRUCTURE_MODEL_REGISTRY = Object.freeze([
     modelId: 'rag-evidence-engine',
     name: 'RAG Evidence Engine',
     purpose: 'Retrieves and cites clinical evidence for assistant and guideline workflows.',
-    input: 'Clinical query, specialty, patient-safe context, retrieval constraints, and source filters.',
+    input:
+      'Clinical query, specialty, patient-safe context, retrieval constraints, and source filters.',
     output: 'Cited evidence summary with source snippets and confidence metadata.',
     artifactDependencies: [REGISTRY.aiRag, REGISTRY.guidelineRag, REGISTRY.researchEvidenceHub],
     status: 'active',
@@ -131,10 +136,15 @@ export const AI_INFRASTRUCTURE_MODEL_REGISTRY = Object.freeze([
   Object.freeze({
     modelId: 'tool-calling',
     name: 'Tool Calling',
-    purpose: 'Maps assistant intents to deterministic tools, calculators, executors, or guided-chat fallbacks.',
+    purpose:
+      'Maps assistant intents to deterministic tools, calculators, executors, or guided-chat fallbacks.',
     input: 'NLU intent, normalized tool id, parameters, role, workspace, and entitlement context.',
     output: 'Tool launch, executor request, validation result, or guarded fallback prompt.',
-    artifactDependencies: [REGISTRY.aiToolCalling, REGISTRY.calculatorRecommenderAi, REGISTRY.sofaScore],
+    artifactDependencies: [
+      REGISTRY.aiToolCalling,
+      REGISTRY.calculatorRecommenderAi,
+      REGISTRY.sofaScore,
+    ],
     status: 'active',
     costProfile: 'low',
     riskLevel: 'high',
@@ -146,9 +156,11 @@ export const AI_INFRASTRUCTURE_MODEL_REGISTRY = Object.freeze([
   Object.freeze({
     modelId: 'artifact-resonance',
     name: 'Artifact Resonance',
-    purpose: 'Finds related artifacts and recommendations using local metadata features and text similarity.',
+    purpose:
+      'Finds related artifacts and recommendations using local metadata features and text similarity.',
     input: 'Artifact id, role, workspace, pack id, or normalized text query.',
-    output: 'Related artifacts, orphan/duplicate/missing-metadata findings, and recommendation scores.',
+    output:
+      'Related artifacts, orphan/duplicate/missing-metadata findings, and recommendation scores.',
     artifactDependencies: ['caredroid_artifacts.csv', 'caredroid_artifact_features.csv'],
     status: 'local-ready',
     costProfile: 'local-only',
@@ -161,10 +173,15 @@ export const AI_INFRASTRUCTURE_MODEL_REGISTRY = Object.freeze([
   Object.freeze({
     modelId: 'simulation-tutor',
     name: 'Simulation Tutor',
-    purpose: 'Guides simulation scenarios, debriefing, competency review, and education recommendations.',
+    purpose:
+      'Guides simulation scenarios, debriefing, competency review, and education recommendations.',
     input: 'Scenario state, learner role, decisions, vitals, labs, and competency objectives.',
     output: 'Tutor hints, debrief feedback, competency gaps, and next practice recommendations.',
-    artifactDependencies: [REGISTRY.simulationSuite, REGISTRY.scenarioPlayer, REGISTRY.debriefDashboard],
+    artifactDependencies: [
+      REGISTRY.simulationSuite,
+      REGISTRY.scenarioPlayer,
+      REGISTRY.debriefDashboard,
+    ],
     status: 'demo-ready',
     costProfile: 'local-demo-plus-ai',
     riskLevel: 'medium',
@@ -177,7 +194,8 @@ export const AI_INFRASTRUCTURE_MODEL_REGISTRY = Object.freeze([
     modelId: 'cost-optimizer',
     name: 'Cost Optimizer',
     purpose: 'Summarizes AI spend, token usage, tool cost, and routing opportunities.',
-    input: 'Usage events, model class, execution cost, route, workspace, and tenant budget thresholds.',
+    input:
+      'Usage events, model class, execution cost, route, workspace, and tenant budget thresholds.',
     output: 'Cost trends, optimization suggestions, and budget risk signals.',
     artifactDependencies: [REGISTRY.aiCostOptimization, REGISTRY.aiCommandCenter],
     status: 'active',
@@ -206,8 +224,10 @@ export const AI_INFRASTRUCTURE_MODEL_REGISTRY = Object.freeze([
   Object.freeze({
     modelId: 'evaluation',
     name: 'Evaluation',
-    purpose: 'Tracks model quality, hallucination risk, retrieval quality, latency, cost, and tool success.',
-    input: 'Evaluation run, dataset label, model candidate, retrieval result, tool result, and user feedback.',
+    purpose:
+      'Tracks model quality, hallucination risk, retrieval quality, latency, cost, and tool success.',
+    input:
+      'Evaluation run, dataset label, model candidate, retrieval result, tool result, and user feedback.',
     output: 'Quality metrics, benchmark trends, issue flags, and readiness evidence.',
     artifactDependencies: [REGISTRY.aiEvaluation, REGISTRY.aiCommandCenter],
     status: 'active',

@@ -95,7 +95,8 @@ export const CUSTOMER_KNOWLEDGE_BASE_ARTICLES = Object.freeze([
     id: 'integrations-request-connectors',
     category: 'integrations',
     title: 'Request And Track Integrations',
-    summary: 'Use tenant administration to request EHR, SSO, lab, imaging, and device integrations.',
+    summary:
+      'Use tenant administration to request EHR, SSO, lab, imaging, and device integrations.',
     content:
       'Integrations are organization-scoped. Request connectors from Tenant Admin or Customer Portal, then track readiness and status. Common connectors include FHIR, HL7, SSO, PACS, labs, LMS, and device telemetry.',
     steps: [
@@ -127,7 +128,8 @@ export const CUSTOMER_KNOWLEDGE_BASE_ARTICLES = Object.freeze([
     id: 'troubleshooting-tenant-context',
     category: 'troubleshooting',
     title: 'Fix Tenant Context Issues',
-    summary: 'Resolve missing organization, workspace, or role context before loading gated features.',
+    summary:
+      'Resolve missing organization, workspace, or role context before loading gated features.',
     content:
       'If a page says tenant context is required, refresh the tenant context, confirm you are a member of the organization, and verify your active workspace. Tenant isolation blocks access without an organization and workspace context.',
     steps: [
@@ -143,7 +145,8 @@ export const CUSTOMER_KNOWLEDGE_BASE_ARTICLES = Object.freeze([
     id: 'troubleshooting-feature-access',
     category: 'troubleshooting',
     title: 'Understand Locked Or Hidden Features',
-    summary: 'Features can be hidden by flags, subscriptions, asset packs, role profile, or workspace entitlements.',
+    summary:
+      'Features can be hidden by flags, subscriptions, asset packs, role profile, or workspace entitlements.',
     content:
       'If a feature is unavailable, check feature flags, subscription plan, asset pack entitlement, workspace tools, and role profile permissions. Admins can adjust rollout in Feature Flags and product access in Tenant Admin.',
     steps: [

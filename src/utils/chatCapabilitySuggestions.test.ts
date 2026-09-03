@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { BACKEND_API_CAPABILITIES } from '../config/backendApiCapabilities';
 import { BACKEND_HTTP_ROUTES } from '../data/backendHttpRouteInventory';
-import { getBackendBackedToolInventory, getUserFacingToolRegistryProjection } from '../data/toolInventory';
+import {
+  getBackendBackedToolInventory,
+  getUserFacingToolRegistryProjection,
+} from '../data/toolInventory';
 import { buildUserToolProfile } from '../data/profileToolSegmentation';
 import {
   CHAT_SENSITIVE_CONFIRMATIONS,
@@ -20,7 +23,9 @@ describe('chat capability suggestions', () => {
   it('shows only registered POST tool executors as executable suggestions', () => {
     const suggestions = getChatCapabilitySuggestions({ hasPermission: allowAll });
     const executorSuggestions = suggestions.filter((suggestion) => suggestion.kind === 'executor');
-    const inventoryExecutorIds = new Set(getBackendBackedToolInventory().map((record) => record.id));
+    const inventoryExecutorIds = new Set(
+      getBackendBackedToolInventory().map((record) => record.id),
+    );
 
     // The registry now has ~37 real registered executors -- far more than the
     // shared top-10 suggestion budget -- so only a ranked subset surfaces by
@@ -32,7 +37,9 @@ describe('chat capability suggestions', () => {
     for (const suggestion of executorSuggestions) {
       expect(inventoryExecutorIds.has(suggestion.toolId)).toBe(true);
     }
-    expect(executorSuggestions.every((suggestion) => suggestion.source.includes('/api/tools'))).toBe(true);
+    expect(
+      executorSuggestions.every((suggestion) => suggestion.source.includes('/api/tools')),
+    ).toBe(true);
   });
 
   it('hides tool executor suggestions when execution capability is disabled', () => {
@@ -50,7 +57,7 @@ describe('chat capability suggestions', () => {
       getChatCapabilitySuggestions({
         capabilities: { ...BACKEND_API_CAPABILITIES, notificationsRest: false },
         hasPermission: allowAll,
-      })
+      }),
     );
 
     expect(enabled).toContain('notification-preferences');
@@ -63,13 +70,13 @@ describe('chat capability suggestions', () => {
       getChatCapabilitySuggestions({
         capabilities: { ...BACKEND_API_CAPABILITIES, complianceExport: false },
         hasPermission: allowAll,
-      })
+      }),
     );
     const routeMissing = suggestionIds(
       getChatCapabilitySuggestions({
         routes: withoutRoutes(['/api/compliance/export']),
         hasPermission: allowAll,
-      })
+      }),
     );
 
     expect(enabled).toContain('data-export');
@@ -79,12 +86,14 @@ describe('chat capability suggestions', () => {
 
   it('requires audit permission and route before showing audit suggestions', () => {
     const enabled = suggestionIds(getChatCapabilitySuggestions({ hasPermission: allowAll }));
-    const permissionDenied = suggestionIds(getChatCapabilitySuggestions({ hasPermission: denyAll }));
+    const permissionDenied = suggestionIds(
+      getChatCapabilitySuggestions({ hasPermission: denyAll }),
+    );
     const routeMissing = suggestionIds(
       getChatCapabilitySuggestions({
         routes: withoutRoutes(['/api/audit/logs']),
         hasPermission: allowAll,
-      })
+      }),
     );
 
     expect(enabled).toContain('audit-logs');
@@ -102,7 +111,7 @@ describe('chat capability suggestions', () => {
           '/api/subscriptions/portal',
         ]),
         hasPermission: allowAll,
-      })
+      }),
     );
 
     expect(enabled).toContain('billing-account');
@@ -133,7 +142,7 @@ describe('chat capability suggestions', () => {
           source: 'search-first-index',
           path: '/protocols?pathway=sepsis',
         }),
-      ])
+      ]),
     );
 
     const operationsSuggestions = getChatCapabilitySuggestions({
@@ -149,7 +158,7 @@ describe('chat capability suggestions', () => {
           source: 'search-first-index',
           path: '/workflow-mining',
         }),
-      ])
+      ]),
     );
   });
 
@@ -186,9 +195,11 @@ describe('chat capability suggestions', () => {
     const suggestions = getChatCapabilitySuggestions({ hasPermission: allowAll, profileContext });
 
     expect(suggestions.map((suggestion) => suggestion.toolId)).toEqual(
-      expect.arrayContaining(['has-bled', 'grace-acs'])
+      expect.arrayContaining(['has-bled', 'grace-acs']),
     );
-    expect(suggestions.find((suggestion) => suggestion.toolId === 'has-bled')?.source).toBe('profile-tool-graph');
+    expect(suggestions.find((suggestion) => suggestion.toolId === 'has-bled')?.source).toBe(
+      'profile-tool-graph',
+    );
   });
 
   it('adds Did you know CareDroid discovery prompts for profile-aware chat', () => {
@@ -209,8 +220,14 @@ describe('chat capability suggestions', () => {
       tools: getUserFacingToolRegistryProjection(),
     });
 
-    expect(suggestions.some((suggestion) => suggestion.label.startsWith('Did you know CareDroid can also'))).toBe(true);
-    expect(suggestions.some((suggestion) => suggestion.source.startsWith('capability-discovery:'))).toBe(true);
+    expect(
+      suggestions.some((suggestion) =>
+        suggestion.label.startsWith('Did you know CareDroid can also'),
+      ),
+    ).toBe(true);
+    expect(
+      suggestions.some((suggestion) => suggestion.source.startsWith('capability-discovery:')),
+    ).toBe(true);
   });
 
   it('uses stroke context as an AI launcher for neuro tools and workspace', () => {
@@ -220,16 +237,31 @@ describe('chat capability suggestions', () => {
       tools: getUserFacingToolRegistryProjection(),
     });
 
-    expect(suggestions.slice(0, 4).map((suggestion) => suggestion.toolId || suggestion.label)).toEqual(
-      expect.arrayContaining(['nihss', 'abcd2', 'stroke-workflow-assistant', 'Neurology Workspace'])
+    expect(
+      suggestions.slice(0, 4).map((suggestion) => suggestion.toolId || suggestion.label),
+    ).toEqual(
+      expect.arrayContaining([
+        'nihss',
+        'abcd2',
+        'stroke-workflow-assistant',
+        'Neurology Workspace',
+      ]),
     );
-    expect(suggestions.find((suggestion) => suggestion.label === 'Neurology Workspace')?.path).toBe('/workspace/neurology');
+    expect(suggestions.find((suggestion) => suggestion.label === 'Neurology Workspace')?.path).toBe(
+      '/workspace/neurology',
+    );
   });
 
   it('uses chest pain context as an AI launcher for ACS tools and cardiology workspace', () => {
     const profileContext = buildUserToolProfile({
       user: { role: 'cardiologist' },
-      toolPreferences: { favorites: [], pinned: [], recentTools: [], hiddenTools: [], profileSettings: { role: 'cardiologist' } },
+      toolPreferences: {
+        favorites: [],
+        pinned: [],
+        recentTools: [],
+        hiddenTools: [],
+        profileSettings: { role: 'cardiologist' },
+      },
     });
     const suggestions = getChatCapabilitySuggestions({
       input: 'chest pain',
@@ -240,8 +272,15 @@ describe('chat capability suggestions', () => {
       tools: getUserFacingToolRegistryProjection(),
     });
 
-    expect(suggestions.slice(0, 4).map((suggestion) => suggestion.toolId || suggestion.label)).toEqual(
-      expect.arrayContaining(['heart-score', 'timi-ua-nstemi', 'acs-workflow-assistant', 'Cardiology Workspace'])
+    expect(
+      suggestions.slice(0, 4).map((suggestion) => suggestion.toolId || suggestion.label),
+    ).toEqual(
+      expect.arrayContaining([
+        'heart-score',
+        'timi-ua-nstemi',
+        'acs-workflow-assistant',
+        'Cardiology Workspace',
+      ]),
     );
     expect(suggestions[0].toolId).toBe('heart-score');
   });
@@ -254,9 +293,9 @@ describe('chat capability suggestions', () => {
       tools: getUserFacingToolRegistryProjection(),
     });
 
-    expect(suggestions.slice(0, 3).map((suggestion) => suggestion.toolId || suggestion.label)).toEqual(
-      expect.arrayContaining(['rox-index', 'pao2-fio2-ratio', 'Respiratory Workspace'])
-    );
+    expect(
+      suggestions.slice(0, 3).map((suggestion) => suggestion.toolId || suggestion.label),
+    ).toEqual(expect.arrayContaining(['rox-index', 'pao2-fio2-ratio', 'Respiratory Workspace']));
   });
 
   it('filters profile-aware suggestions through the SaaS compiler for registration-clerk', () => {

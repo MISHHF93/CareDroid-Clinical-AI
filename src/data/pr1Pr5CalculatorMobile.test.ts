@@ -22,7 +22,10 @@ const mobilePrCss = readFileSync(join(__dirname, '../styles/calculators-mobile-p
 const mobileFirstCss = readFileSync(join(__dirname, '../styles/mobile-first-layout.css'), 'utf8');
 const calculatorsJsx = readFileSync(join(__dirname, '../pages/tools/Calculators.tsx'), 'utf8');
 const pr4aJsx = readFileSync(join(__dirname, '../pages/tools/pr4aCalculators.tsx'), 'utf8');
-const mentalJsx = readFileSync(join(__dirname, '../pages/tools/mentalHealthCalculators.tsx'), 'utf8');
+const mentalJsx = readFileSync(
+  join(__dirname, '../pages/tools/mentalHealthCalculators.tsx'),
+  'utf8',
+);
 
 /** Registry ids ? built-in form slugs for PR1–PR5 Tier-A forms */
 export const PR1_PR5_TIER_A_FORM_SLUGS = Object.freeze([
@@ -41,9 +44,7 @@ export const PR1_PR5_TIER_A_FORM_SLUGS = Object.freeze([
   'gad7',
 ]);
 
-const PR1_PR5_CHAT_HUB_REGISTRY_IDS = Object.freeze([
-  ...PR3_TIER_B_CHAT_CALCULATOR_IDS,
-]);
+const PR1_PR5_CHAT_HUB_REGISTRY_IDS = Object.freeze([...PR3_TIER_B_CHAT_CALCULATOR_IDS]);
 
 describe('PR1–PR5 inventory', () => {
   it('lists thirteen Tier-A form slugs for PR1, PR2, PR4A, PR5', () => {
@@ -71,7 +72,7 @@ describe('calculators-mobile-pr.css — phone layout', () => {
 
   it('collapses input grids to one column at mobile breakpoint', () => {
     expect(mobilePrCss).toMatch(
-      /@media \(max-width: 767px\)[\s\S]*\.calc-input-grid--responsive[\s\S]*grid-template-columns:\s*minmax\(0,\s*1fr\)/
+      /@media \(max-width: 767px\)[\s\S]*\.calc-input-grid--responsive[\s\S]*grid-template-columns:\s*minmax\(0,\s*1fr\)/,
     );
   });
 
@@ -102,7 +103,7 @@ describe('calculators-mobile-pr.css — phone layout', () => {
 describe('PR1–PR5 — split form + overflow (shared shell)', () => {
   it('uses mobile-first single-column calculator-interface by default', () => {
     expect(mobileFirstCss).toMatch(
-      /\.calculator-interface[\s\S]*grid-template-columns:\s*minmax\(0,\s*1fr\)/
+      /\.calculator-interface[\s\S]*grid-template-columns:\s*minmax\(0,\s*1fr\)/,
     );
   });
 
@@ -116,17 +117,22 @@ describe('PR1–PR5 — module hooks', () => {
   it.each(['qsofa', 'news2', 'child-pugh', 'has-bled', 'meld', 'timi-ua-nstemi'])(
     'Calculators.jsx implements %s with reset and disclaimers',
     (slug) => {
-      expect(calculatorsJsx).toContain(`calculator-interface--${slug === 'timi-ua-nstemi' ? 'timi' : slug === 'meld-na' ? 'meld' : slug}`);
+      expect(calculatorsJsx).toContain(
+        `calculator-interface--${slug === 'timi-ua-nstemi' ? 'timi' : slug === 'meld-na' ? 'meld' : slug}`,
+      );
       expect(calculatorsJsx).toMatch(/aria-label="Reset /);
       expect(calculatorsJsx).toContain('calc-reset-btn');
-    }
+    },
   );
 
-  it.each(['ascvd-risk', 'ckd-staging', 'stop-bang', 'audit-c'])('pr4a exposes %s form shell', (slug) => {
-    expect(pr4aJsx).toContain(`calculator-interface--${slug}`);
-    expect(pr4aJsx).toContain('calc-reset-btn');
-    expect(pr4aJsx).toContain('CalcDecisionSupportLead');
-  });
+  it.each(['ascvd-risk', 'ckd-staging', 'stop-bang', 'audit-c'])(
+    'pr4a exposes %s form shell',
+    (slug) => {
+      expect(pr4aJsx).toContain(`calculator-interface--${slug}`);
+      expect(pr4aJsx).toContain('calc-reset-btn');
+      expect(pr4aJsx).toContain('CalcDecisionSupportLead');
+    },
+  );
 
   it.each(['phq9', 'gad7'])('mental health exposes %s form shell', (slug) => {
     expect(mentalJsx).toContain(`calculator-interface--${slug}`);

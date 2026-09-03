@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { BottleneckList, BottleneckImpactCard, RootCauseSummaryPanel } from './BottleneckPanels';
-import type { BottleneckEvent, BottleneckRegistrySnapshot } from '../../services/bottleneckRegistry';
+import type {
+  BottleneckEvent,
+  BottleneckRegistrySnapshot,
+} from '../../services/bottleneckRegistry';
 
 // HEAL-209: EmergencySettings.tsx (it_admin's own default landing page --
 // EMERGENCY_ROLE_DEFINITIONS.itAdmin explicitly excludes every patient
@@ -76,7 +79,8 @@ describe('BottleneckImpactCard PHI gate (HEAL-209)', () => {
     // live on it_admin's Settings page after the title-only fix shipped.
     const event = patientEvent({
       title: 'Critical alert unacknowledged',
-      description: 'Deterioration risk flagged: Sarah Okafor has a deterioration risk flag and should be surfaced for reassessment review.',
+      description:
+        'Deterioration risk flagged: Sarah Okafor has a deterioration risk flag and should be surfaced for reassessment review.',
     });
     render(<BottleneckImpactCard event={event} />);
     expect(screen.queryByText(/Sarah Okafor/)).toBeNull();
@@ -109,7 +113,12 @@ describe('RootCauseSummaryPanel PHI gate (HEAL-209)', () => {
       // Pre-baked exactly like bottleneckRegistry.ts's own construction --
       // unredacted, since the registry itself has no role context.
       rootCauseSummary: events.map((e) => `${e.serviceName}: ${e.title}`).join(' | '),
-      analytics: { activeCount: events.length, criticalCount: 0, averageServiceLatencyMs: 0, threeMinuteTargetBreachesByCause: {} },
+      analytics: {
+        activeCount: events.length,
+        criticalCount: 0,
+        averageServiceLatencyMs: 0,
+        threeMinuteTargetBreachesByCause: {},
+      },
     } as BottleneckRegistrySnapshot;
   }
 

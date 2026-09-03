@@ -20,16 +20,16 @@ const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
 const patternsSource = readFileSync(
   join(
     __dirname,
-    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts'
+    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts',
   ),
-  'utf8'
+  'utf8',
 );
 
 describe('ASCVD risk calculator wiring (ascvd-risk)', () => {
   it('exports a frozen PR4A Tier-A audit list', () => {
     expect(Object.isFrozen(PR4A_TIER_A_CALCULATOR_REGISTRY_IDS)).toBe(true);
     expect([...PR4A_TIER_A_CALCULATOR_REGISTRY_IDS]).toEqual(
-      expect.arrayContaining(['ascvd-risk'])
+      expect.arrayContaining(['ascvd-risk']),
     );
   });
 

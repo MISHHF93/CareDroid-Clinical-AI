@@ -45,7 +45,9 @@ describe('ResourceActivationStrip', () => {
 
   it('renders nothing (no orphaned truth label) when no activation is derived', () => {
     const { container } = render(
-      <ResourceActivationStrip arrival={buildArrival({ chiefComplaint: '', prearrivalComplaint: '' })} />,
+      <ResourceActivationStrip
+        arrival={buildArrival({ chiefComplaint: '', prearrivalComplaint: '' })}
+      />,
     );
 
     expect(container).toBeEmptyDOMElement();

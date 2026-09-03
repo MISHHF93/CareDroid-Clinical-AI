@@ -27,7 +27,10 @@ function stateRank(state) {
  * @param {T[]} patients
  * @param {number} [max]
  */
-export function capPatientsForPractitionerView(patients, max = PRACTITIONER_WALKTHROUGH_ACTIVE_CENSUS) {
+export function capPatientsForPractitionerView(
+  patients,
+  max = PRACTITIONER_WALKTHROUGH_ACTIVE_CENSUS,
+) {
   if (!isPractitionerCleanupEnabled() || patients.length <= max) {
     return patients;
   }
@@ -70,6 +73,9 @@ export function capPatientsForPractitionerView(patients, max = PRACTITIONER_WALK
  * @param {T[]} patients
  * @param {number} [max]
  */
-export function shapePractitionerSeedPatients(patients, max = PRACTITIONER_WALKTHROUGH_ACTIVE_CENSUS) {
+export function shapePractitionerSeedPatients(
+  patients,
+  max = PRACTITIONER_WALKTHROUGH_ACTIVE_CENSUS,
+) {
   return capPatientsForPractitionerView(dedupePatientsByMrn(patients), max);
 }

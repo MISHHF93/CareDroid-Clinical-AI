@@ -15,8 +15,17 @@ import { ottawaAnkleChatConfig } from './chatAssistedCalculators/ottawaAnkle';
 import { nihssChatConfig } from './chatAssistedCalculators/nihss';
 import { interpretGraceAcsRisk, computeGraceAcsRisk } from '../utils/graceAcsCalculator';
 import { interpretNihssSeverity } from '../utils/nihssCalculator';
-import { applyCanadianCSpineRule, evaluateCcrHighRisk, evaluateCcrLowRisk, interpretCanadianCSpine } from '../utils/canadianCSpineCalculator';
-import { applyOttawaAnkleFootRules, interpretOttawaAnkleFootRules, ottawaApplicabilityWarnings } from '../utils/ottawaAnkleCalculator';
+import {
+  applyCanadianCSpineRule,
+  evaluateCcrHighRisk,
+  evaluateCcrLowRisk,
+  interpretCanadianCSpine,
+} from '../utils/canadianCSpineCalculator';
+import {
+  applyOttawaAnkleFootRules,
+  interpretOttawaAnkleFootRules,
+  ottawaApplicabilityWarnings,
+} from '../utils/ottawaAnkleCalculator';
 
 const CERTAINTY_PATTERN =
   /\b(confirmed|definitely|diagnosis established|rule out pe|ruled out|excluded pe|pe is absent)\b/i;
@@ -129,7 +138,7 @@ describe('PR3 UX & clinical safety — Ottawa Ankle interpretation', () => {
         tendernessFifthMetatarsalBase: false,
         unableToBearWeightBothTimes: false,
       },
-      { applicabilityWarnings: warnings, rulesApplicable: false }
+      { applicabilityWarnings: warnings, rulesApplicable: false },
     );
     const i = interpretOttawaAnkleFootRules(result);
     if (!i) throw new Error('expected interpretOttawaAnkleFootRules to return a result');

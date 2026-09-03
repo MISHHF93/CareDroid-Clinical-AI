@@ -44,9 +44,7 @@ export function useEmergencyDeviceContext(): EmergencyDeviceContextState {
 
   const deviceContextId = useMemo(() => {
     void storedRevision;
-    return (
-      parseEmergencyDeviceContextParam(deviceParam) || readStoredEmergencyDeviceContext()
-    );
+    return parseEmergencyDeviceContextParam(deviceParam) || readStoredEmergencyDeviceContext();
   }, [deviceParam, storedRevision]);
 
   const definition = useMemo(

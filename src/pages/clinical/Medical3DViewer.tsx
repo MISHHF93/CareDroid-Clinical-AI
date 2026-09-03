@@ -22,7 +22,9 @@ const MARKER_FILL: Record<string, string> = {
 
 export default function Medical3DViewer() {
   useRouteChromeRegistration({ title: '3D Viewer' });
-  const [selectedModelId, setSelectedModelId] = useState<string | null>(DEMO_ANATOMY_MODELS[0]?.id ?? null);
+  const [selectedModelId, setSelectedModelId] = useState<string | null>(
+    DEMO_ANATOMY_MODELS[0]?.id ?? null,
+  );
 
   const models = DEMO_ANATOMY_MODELS;
   const selectedModel = models.find((model) => model.id === selectedModelId) || null;
@@ -40,8 +42,13 @@ export default function Medical3DViewer() {
         <div className="medical-3d-page__title-row">
           <GraphicIconBadge iconKey="layout-dashboard" accent="brand" size="md" />
           <div>
-            <p className="medical-3d-page-title-text" data-testid="cd-page-title-text">3D Viewer</p>
-            <p>Asset-safe anatomy model shell with demo markers — no committed Three.js or DICOM viewer.</p>
+            <p className="medical-3d-page-title-text" data-testid="cd-page-title-text">
+              3D Viewer
+            </p>
+            <p>
+              Asset-safe anatomy model shell with demo markers — no committed Three.js or DICOM
+              viewer.
+            </p>
           </div>
         </div>
         <div className="medical-3d-page__actions">
@@ -65,9 +72,24 @@ export default function Medical3DViewer() {
       />
 
       <div className="medical-3d-page__metrics" role="group" aria-label="3D viewer summary metrics">
-        <MetricCard label="Models" value={String(availability.total)} hint="Registered demo markers" tone="neutral" />
-        <MetricCard label="Available" value={String(availability.available)} hint="Ready for inspection" tone="good" />
-        <MetricCard label="Demo shells" value={String(availability.demo)} hint="Training placeholders" tone="warning" />
+        <MetricCard
+          label="Models"
+          value={String(availability.total)}
+          hint="Registered demo markers"
+          tone="neutral"
+        />
+        <MetricCard
+          label="Available"
+          value={String(availability.available)}
+          hint="Ready for inspection"
+          tone="good"
+        />
+        <MetricCard
+          label="Demo shells"
+          value={String(availability.demo)}
+          hint="Training placeholders"
+          tone="warning"
+        />
         <MetricCard
           label="Restricted"
           value={String(availability.restricted)}
@@ -88,9 +110,33 @@ export default function Medical3DViewer() {
           >
             <rect x="0" y="0" width="100" height="100" fill="var(--app-surface-muted, #f1f5f9)" />
             <ellipse cx="50" cy="22" rx="12" ry="14" fill="var(--app-chart-3)" opacity="0.35" />
-            <rect x="38" y="34" width="24" height="34" rx="8" fill="var(--app-chart-1)" opacity="0.25" />
-            <rect x="34" y="68" width="10" height="24" rx="4" fill="var(--app-chart-4)" opacity="0.25" />
-            <rect x="56" y="68" width="10" height="24" rx="4" fill="var(--app-chart-4)" opacity="0.25" />
+            <rect
+              x="38"
+              y="34"
+              width="24"
+              height="34"
+              rx="8"
+              fill="var(--app-chart-1)"
+              opacity="0.25"
+            />
+            <rect
+              x="34"
+              y="68"
+              width="10"
+              height="24"
+              rx="4"
+              fill="var(--app-chart-4)"
+              opacity="0.25"
+            />
+            <rect
+              x="56"
+              y="68"
+              width="10"
+              height="24"
+              rx="4"
+              fill="var(--app-chart-4)"
+              opacity="0.25"
+            />
             {models.map((model) => {
               const tone = modelStatusTone(model.status);
               const selected = model.id === selectedModelId;
@@ -114,7 +160,9 @@ export default function Medical3DViewer() {
                     role="button"
                     tabIndex={0}
                     aria-label={`${model.label}, ${modelStatusLabel(model.status)}`}
-                    {...((selected) ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
+                    {...(selected
+                      ? { 'aria-pressed': 'true' as const }
+                      : { 'aria-pressed': 'false' as const })}
                   />
                 </g>
               );
@@ -124,7 +172,9 @@ export default function Medical3DViewer() {
             <div className="medical-3d-page__selection">
               <strong>{selectedModel.label}</strong>
               <span>{selectedModel.category}</span>
-              <span className={`medical-3d-page__status medical-3d-page__status--${modelStatusTone(selectedModel.status)}`}>
+              <span
+                className={`medical-3d-page__status medical-3d-page__status--${modelStatusTone(selectedModel.status)}`}
+              >
                 {modelStatusLabel(selectedModel.status)}
               </span>
             </div>
@@ -140,11 +190,15 @@ export default function Medical3DViewer() {
                 type="button"
                 className={`medical-3d-page__roster-item${model.id === selectedModelId ? ' is-selected' : ''}`}
                 onClick={() => setSelectedModelId(model.id)}
-                {...((model.id === selectedModelId) ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
+                {...(model.id === selectedModelId
+                  ? { 'aria-pressed': 'true' as const }
+                  : { 'aria-pressed': 'false' as const })}
               >
                 <strong>{model.label}</strong>
                 <span>{model.category}</span>
-                <span className={`medical-3d-page__status medical-3d-page__status--${modelStatusTone(model.status)}`}>
+                <span
+                  className={`medical-3d-page__status medical-3d-page__status--${modelStatusTone(model.status)}`}
+                >
                   {modelStatusLabel(model.status)}
                 </span>
               </button>

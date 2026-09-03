@@ -231,7 +231,10 @@ describe('Reception prompt → open catalog (desk assist)', () => {
 
 function viNavigate() {
   const calls: string[] = [];
-  return Object.assign((path: string) => {
-    calls.push(path);
-  }, { calls });
+  return Object.assign(
+    (path: string) => {
+      calls.push(path);
+    },
+    { calls },
+  );
 }

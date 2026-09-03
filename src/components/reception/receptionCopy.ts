@@ -44,7 +44,8 @@ export const RECEPTION_COPY = Object.freeze({
   artifactPicker: {
     eyebrow: 'Document capture',
     title: 'What are you capturing?',
-    description: 'Choose the document type so CareDroid extracts the right fields for staff review.',
+    description:
+      'Choose the document type so CareDroid extracts the right fields for staff review.',
   },
   queues: {
     sectionTitle: 'Arrivals & waiting lists',
@@ -95,7 +96,8 @@ export const RECEPTION_COPY = Object.freeze({
     whatNext: 'What happens next?',
     nextCheckpoint: 'Next checkpoint',
     contactOverdue: 'Staff contact is overdue for this patient.',
-    selectPatientHint: 'Select a patient from the queue to see personalized answers and highlight their step.',
+    selectPatientHint:
+      'Select a patient from the queue to see personalized answers and highlight their step.',
     openPatient: 'Open patient chart',
   }),
   arrivalControl: Object.freeze({
@@ -173,12 +175,7 @@ export const RECEPTION_COPY = Object.freeze({
     backToReception: 'Back to Reception',
     aiHelp: 'Get help',
     aiHelpLoading: 'Getting help…',
-    steps: Object.freeze([
-      'Document & details',
-      'Find match',
-      'Confirm fields',
-      'Finish',
-    ]),
+    steps: Object.freeze(['Document & details', 'Find match', 'Confirm fields', 'Finish']),
   },
   header: {
     register: 'Register',
@@ -222,7 +219,8 @@ export const RECEPTION_COPY = Object.freeze({
     submitSuccess: 'Escalation sent',
     submitError: 'Could not send escalation — try again.',
     confirmationTitle: 'Nurse team notified',
-    confirmationBody: 'You can stay on reception. Triage and charge nurse will respond from their workflow.',
+    confirmationBody:
+      'You can stay on reception. Triage and charge nurse will respond from their workflow.',
     flagAnother: 'Flag another concern',
   }),
 });

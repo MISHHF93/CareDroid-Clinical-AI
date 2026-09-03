@@ -126,16 +126,22 @@ export function applyCanadianCSpineRule(input) {
 export function ccrApplicabilityWarnings(applicability: any = {}) {
   const warnings = [] as any[];
   if (applicability.gcs15AndStable === false) {
-    warnings.push('Patient is not alert and stable (GCS 15) — Canadian C-Spine Rule is not applicable.');
+    warnings.push(
+      'Patient is not alert and stable (GCS 15) — Canadian C-Spine Rule is not applicable.',
+    );
   }
   if (applicability.bluntTraumaContext === false) {
     warnings.push('No blunt trauma context — confirm indication for CCR.');
   }
   if (applicability.unreliableExamOrIntoxication) {
-    warnings.push('Unreliable examination or intoxication — do not use CCR; pursue full trauma evaluation.');
+    warnings.push(
+      'Unreliable examination or intoxication — do not use CCR; pursue full trauma evaluation.',
+    );
   }
   if (applicability.pediatricUnder16) {
-    warnings.push('Age under 16 — pediatric cervical spine rules may differ; CCR validation is primarily in adults.');
+    warnings.push(
+      'Age under 16 — pediatric cervical spine rules may differ; CCR validation is primarily in adults.',
+    );
   }
   return warnings;
 }
@@ -153,7 +159,8 @@ export function interpretCanadianCSpine(result, opts: any = {}) {
   const hasApplicabilityBlock = applicabilityWarnings.length > 0;
 
   const branchInterpretation = {
-    'high-risk': 'At least one high-risk factor is present — cervical spine imaging is indicated by the Canadian C-Spine Rule.',
+    'high-risk':
+      'At least one high-risk factor is present — cervical spine imaging is indicated by the Canadian C-Spine Rule.',
     'not-all-low-risk':
       'Not all low-risk criteria are met — cervical spine imaging is indicated by the Canadian C-Spine Rule.',
     'rom-fail':

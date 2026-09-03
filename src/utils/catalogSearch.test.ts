@@ -23,13 +23,13 @@ describe('catalogSearch', () => {
   it('finds tools by NLU alias phrases', () => {
     const rows = getMedicalToolsCatalogRows();
     expect(catalogRowsMatchingQuery(rows, 'pe-score').some((r) => r.primaryId === 'wells-pe')).toBe(
-      true
+      true,
     );
     expect(
-      catalogRowsMatchingQuery(rows, 'depression screen').some((r) => r.primaryId === 'phq9')
+      catalogRowsMatchingQuery(rows, 'depression screen').some((r) => r.primaryId === 'phq9'),
     ).toBe(true);
     expect(
-      catalogRowsMatchingQuery(rows, 'anxiety screen').some((r) => r.primaryId === 'gad7')
+      catalogRowsMatchingQuery(rows, 'anxiety screen').some((r) => r.primaryId === 'gad7'),
     ).toBe(true);
   });
 
@@ -102,9 +102,9 @@ describe('catalogSearch', () => {
   it('textMatchesCatalogQuery resolves NLU/registry alias ids', () => {
     const terms = getSearchTermsForCatalogIds('sofa-calculator');
     expect(terms).toContain('sofa-score');
-    expect(
-      textMatchesCatalogQuery('SOFA Score', 'sofa-score', { ids: ['sofa-calculator'] })
-    ).toBe(true);
+    expect(textMatchesCatalogQuery('SOFA Score', 'sofa-score', { ids: ['sofa-calculator'] })).toBe(
+      true,
+    );
   });
 
   it('validateMedicalCatalogRow passes for every medical index row', () => {
@@ -128,7 +128,12 @@ describe('catalogSearch', () => {
 
   it('matches discovered scan rows by alias terms', () => {
     const rows = getAllDiscoveredTools();
-    expect(matchesDiscoveredRow(rows.find((r) => r.id === 'wells-pe'), 'pe-score')).toBe(true);
+    expect(
+      matchesDiscoveredRow(
+        rows.find((r) => r.id === 'wells-pe'),
+        'pe-score',
+      ),
+    ).toBe(true);
   });
 
   it('does not mark informational phantom tools launchable', () => {

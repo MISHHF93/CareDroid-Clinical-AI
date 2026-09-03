@@ -7,10 +7,7 @@ import { AriaInvalidInput, AriaInvalidSelect } from '../../components/a11y/AriaI
 import { useEffect, useRef, useState } from 'react';
 import { computeAscvdPceResult } from '../../utils/ascvdPceCalculator';
 import { computeCkdStagingResult } from '../../utils/ckdStagingCalculator';
-import {
-  STOP_BANG_CRITERIA_META,
-  computeStopBangResult,
-} from '../../utils/stopBangCalculator';
+import { STOP_BANG_CRITERIA_META, computeStopBangResult } from '../../utils/stopBangCalculator';
 import {
   AUDIT_C_BINGE_OPTIONS,
   AUDIT_C_DRINKS_PER_DAY_OPTIONS,
@@ -42,9 +39,9 @@ function CalcDecisionSupportLead() {
 function CalcResultSafetyFooter() {
   return (
     <SharedCalcResultSafetyFooter>
-      Output reflects the values you entered and may omit important clinical context. Do not treat this screen as
-      definitive proof of illness severity, eligibility, or treatment requirement, and do not use it alone to rule
-      in or rule out a diagnosis.
+      Output reflects the values you entered and may omit important clinical context. Do not treat
+      this screen as definitive proof of illness severity, eligibility, or treatment requirement,
+      and do not use it alone to rule in or rule out a diagnosis.
     </SharedCalcResultSafetyFooter>
   );
 }
@@ -109,7 +106,7 @@ export function AscvdRiskCalculator({ onResultChange }) {
               riskCategory: result.riskCategory,
               severity: result.severity,
             }
-          : null
+          : null,
       );
     }
   }, [onResultChange, result]);
@@ -131,7 +128,7 @@ export function AscvdRiskCalculator({ onResultChange }) {
       diabetes,
       smoker,
     });
-    setValidationErrors(out.ok ? [] : (out.errors || []));
+    setValidationErrors(out.ok ? [] : out.errors || []);
     setResult(out.ok ? out : null);
     if (!out.ok) focusFirstFieldById(['ascvd-age', 'ascvd-sex', 'ascvd-race', 'ascvd-total-chol']);
   };
@@ -174,9 +171,9 @@ export function AscvdRiskCalculator({ onResultChange }) {
             Use as decision-support for clinician-patient discussions.
           </p>
           <p className="calc-disclaimer-detail">
-            <strong>Primary prevention context:</strong> PCE estimates 10-year risk of first hard ASCVD event in adults
-            aged 40–79. Does not recommend statins or other therapies — use with ACC/AHA prevention guidance and shared
-            decision-making.
+            <strong>Primary prevention context:</strong> PCE estimates 10-year risk of first hard
+            ASCVD event in adults aged 40–79. Does not recommend statins or other therapies — use
+            with ACC/AHA prevention guidance and shared decision-making.
           </p>
         </div>
 
@@ -197,7 +194,9 @@ export function AscvdRiskCalculator({ onResultChange }) {
               role="alert"
               aria-live="assertive"
             >
-              <p className="calc-validation-errors-title">Correct the following before calculating:</p>
+              <p className="calc-validation-errors-title">
+                Correct the following before calculating:
+              </p>
               <ul>
                 {validationErrors.map((err) => (
                   <li key={err}>{err}</li>
@@ -207,7 +206,10 @@ export function AscvdRiskCalculator({ onResultChange }) {
           ) : null}
 
           <fieldset className="calc-meld-fieldset calc-has-bled-fieldset">
-            <legend className="calc-timi-legend calc-has-bled-legend" id="ascvd-demographics-legend">
+            <legend
+              className="calc-timi-legend calc-has-bled-legend"
+              id="ascvd-demographics-legend"
+            >
               Demographics and risk factors
             </legend>
 
@@ -225,7 +227,7 @@ export function AscvdRiskCalculator({ onResultChange }) {
                 value={ageYears}
                 onChange={(e) => setAgeYears(e.target.value)}
                 aria-required="true"
-                 invalid={fieldInvalid(!ageYears.trim())}
+                invalid={fieldInvalid(!ageYears.trim())}
                 aria-describedby={ascvdAgeHelpId}
                 inputMode="numeric"
               />
@@ -244,7 +246,7 @@ export function AscvdRiskCalculator({ onResultChange }) {
                 value={sex}
                 onChange={(e) => setSex(e.target.value)}
                 aria-required="true"
-                 invalid={fieldInvalid(!sex)}
+                invalid={fieldInvalid(!sex)}
               >
                 <option value="">Select…</option>
                 <option value="female">Female</option>
@@ -262,7 +264,7 @@ export function AscvdRiskCalculator({ onResultChange }) {
                 value={race}
                 onChange={(e) => setRace(e.target.value)}
                 aria-required="true"
-                 invalid={fieldInvalid(!race)}
+                invalid={fieldInvalid(!race)}
               >
                 <option value="">Select…</option>
                 <option value="white">White</option>
@@ -285,7 +287,7 @@ export function AscvdRiskCalculator({ onResultChange }) {
                   value={totalCholesterol}
                   onChange={(e) => setTotalCholesterol(e.target.value)}
                   aria-required="true"
-                   invalid={fieldInvalid(!totalCholesterol.trim())}
+                  invalid={fieldInvalid(!totalCholesterol.trim())}
                   inputMode="decimal"
                 />
                 <select
@@ -314,7 +316,7 @@ export function AscvdRiskCalculator({ onResultChange }) {
                   value={hdlCholesterol}
                   onChange={(e) => setHdlCholesterol(e.target.value)}
                   aria-required="true"
-                   invalid={fieldInvalid(!hdlCholesterol.trim())}
+                  invalid={fieldInvalid(!hdlCholesterol.trim())}
                   inputMode="decimal"
                 />
                 <select
@@ -343,7 +345,7 @@ export function AscvdRiskCalculator({ onResultChange }) {
                 value={systolicBpMmHg}
                 onChange={(e) => setSystolicBpMmHg(e.target.value)}
                 aria-required="true"
-                 invalid={fieldInvalid(!systolicBpMmHg.trim())}
+                invalid={fieldInvalid(!systolicBpMmHg.trim())}
                 inputMode="numeric"
               />
             </div>
@@ -395,11 +397,20 @@ export function AscvdRiskCalculator({ onResultChange }) {
           </fieldset>
 
           <div className="calc-actions">
-            <button type="submit" className="calc-calculate-btn" aria-label="Calculate ASCVD 10-year risk">
+            <button
+              type="submit"
+              className="calc-calculate-btn"
+              aria-label="Calculate ASCVD 10-year risk"
+            >
               <NavIcon icon={CHROME_ICONS.calculator} size={20} aria-hidden />
               Calculate ASCVD risk
             </button>
-            <button type="button" className="calc-reset-btn" onClick={reset} aria-label="Reset ASCVD form">
+            <button
+              type="button"
+              className="calc-reset-btn"
+              onClick={reset}
+              aria-label="Reset ASCVD form"
+            >
               Reset
             </button>
           </div>
@@ -497,7 +508,7 @@ export function CkdStagingCalculator({ onResultChange }) {
               prognosticRisk: result.prognosticRisk,
               severity: result.severity,
             }
-          : null
+          : null,
       );
     }
   }, [onResultChange, result]);
@@ -515,7 +526,7 @@ export function CkdStagingCalculator({ onResultChange }) {
       urineAcr: urineAcr === '' ? NaN : Number(urineAcr),
       acrUnit,
     });
-    setValidationErrors(out.ok ? [] : (out.errors || []));
+    setValidationErrors(out.ok ? [] : out.errors || []);
     setResult(out.ok ? out : null);
     if (!out.ok) focusFirstFieldById(['ckd-age', 'ckd-sex', 'ckd-creatinine', 'ckd-acr']);
   };
@@ -553,8 +564,9 @@ export function CkdStagingCalculator({ onResultChange }) {
             Use as decision-support for clinician-patient discussions.
           </p>
           <p className="calc-disclaimer-detail">
-            <strong>KDIGO staging context:</strong> CKD is defined by kidney damage or GFR &lt;60 for ≥3 months. A
-            single eGFR and ACR do not establish chronicity. Does not recommend dialysis or specific drug therapy.
+            <strong>KDIGO staging context:</strong> CKD is defined by kidney damage or GFR &lt;60
+            for ≥3 months. A single eGFR and ACR do not establish chronicity. Does not recommend
+            dialysis or specific drug therapy.
           </p>
         </div>
 
@@ -575,7 +587,9 @@ export function CkdStagingCalculator({ onResultChange }) {
               role="alert"
               aria-live="assertive"
             >
-              <p className="calc-validation-errors-title">Correct the following before calculating:</p>
+              <p className="calc-validation-errors-title">
+                Correct the following before calculating:
+              </p>
               <ul>
                 {validationErrors.map((err) => (
                   <li key={err}>{err}</li>
@@ -603,7 +617,7 @@ export function CkdStagingCalculator({ onResultChange }) {
                 value={ageYears}
                 onChange={(e) => setAgeYears(e.target.value)}
                 aria-required="true"
-                 invalid={fieldInvalid(!ageYears.trim())}
+                invalid={fieldInvalid(!ageYears.trim())}
                 inputMode="numeric"
               />
             </div>
@@ -618,7 +632,7 @@ export function CkdStagingCalculator({ onResultChange }) {
                 value={sex}
                 onChange={(e) => setSex(e.target.value)}
                 aria-required="true"
-                 invalid={fieldInvalid(!sex)}
+                invalid={fieldInvalid(!sex)}
               >
                 <option value="">Select…</option>
                 <option value="female">Female</option>
@@ -640,7 +654,7 @@ export function CkdStagingCalculator({ onResultChange }) {
                   value={serumCreatinine}
                   onChange={(e) => setSerumCreatinine(e.target.value)}
                   aria-required="true"
-                   invalid={fieldInvalid(!serumCreatinine.trim())}
+                  invalid={fieldInvalid(!serumCreatinine.trim())}
                   inputMode="decimal"
                 />
                 <select
@@ -669,7 +683,7 @@ export function CkdStagingCalculator({ onResultChange }) {
                   value={urineAcr}
                   onChange={(e) => setUrineAcr(e.target.value)}
                   aria-required="true"
-                   invalid={fieldInvalid(!urineAcr.trim())}
+                  invalid={fieldInvalid(!urineAcr.trim())}
                   inputMode="decimal"
                 />
                 <select
@@ -686,11 +700,20 @@ export function CkdStagingCalculator({ onResultChange }) {
           </fieldset>
 
           <div className="calc-actions">
-            <button type="submit" className="calc-calculate-btn" aria-label="Calculate CKD stage and prognostic risk">
+            <button
+              type="submit"
+              className="calc-calculate-btn"
+              aria-label="Calculate CKD stage and prognostic risk"
+            >
               <NavIcon icon={CHROME_ICONS.calculator} size={20} aria-hidden />
               Calculate CKD staging
             </button>
-            <button type="button" className="calc-reset-btn" onClick={reset} aria-label="Reset CKD staging form">
+            <button
+              type="button"
+              className="calc-reset-btn"
+              onClick={reset}
+              aria-label="Reset CKD staging form"
+            >
               Reset
             </button>
           </div>
@@ -803,7 +826,7 @@ export function CkdStagingCalculator({ onResultChange }) {
 
 export function StopBangCalculator({ onResultChange }) {
   const [inputs, setInputs] = useState(() =>
-    Object.fromEntries(STOP_BANG_CRITERIA_META.map((row) => [row.key, false]))
+    Object.fromEntries(STOP_BANG_CRITERIA_META.map((row) => [row.key, false])),
   );
   const [result, setResult] = useState<any>(null);
   const resultsRef = useRef(null);
@@ -817,7 +840,7 @@ export function StopBangCalculator({ onResultChange }) {
               osaRiskCategory: result.osaRiskCategory,
               severity: result.severity,
             }
-          : null
+          : null,
       );
     }
   }, [onResultChange, result]);
@@ -855,8 +878,9 @@ export function StopBangCalculator({ onResultChange }) {
         <div className="calc-timi-disclaimer calc-has-bled-disclaimer" role="note">
           <CalcDecisionSupportLead />
           <p className="calc-disclaimer-detail">
-            <strong>Screening tool only.</strong> STOP-Bang estimates risk of moderate-to-severe obstructive sleep
-            apnea. It does not diagnose OSA and does not recommend CPAP, surgery, or other therapies.
+            <strong>Screening tool only.</strong> STOP-Bang estimates risk of moderate-to-severe
+            obstructive sleep apnea. It does not diagnose OSA and does not recommend CPAP, surgery,
+            or other therapies.
           </p>
         </div>
 
@@ -873,7 +897,11 @@ export function StopBangCalculator({ onResultChange }) {
             <legend className="calc-has-bled-legend" id="stop-bang-criteria-legend">
               STOP-Bang criteria (check all that apply)
             </legend>
-            <div className="calc-has-bled-criteria" role="group" aria-labelledby="stop-bang-criteria-legend">
+            <div
+              className="calc-has-bled-criteria"
+              role="group"
+              aria-labelledby="stop-bang-criteria-legend"
+            >
               {STOP_BANG_CRITERIA_META.map((row) => {
                 const id = `stop-bang-${row.key}`;
                 const helpId = `${id}-help`;
@@ -903,11 +931,20 @@ export function StopBangCalculator({ onResultChange }) {
           </fieldset>
 
           <div className="calc-actions">
-            <button type="submit" className="calc-calculate-btn" aria-label="Calculate STOP-Bang score">
+            <button
+              type="submit"
+              className="calc-calculate-btn"
+              aria-label="Calculate STOP-Bang score"
+            >
               <NavIcon icon={CHROME_ICONS.calculator} size={20} aria-hidden />
               Calculate STOP-Bang
             </button>
-            <button type="button" className="calc-reset-btn" onClick={reset} aria-label="Reset STOP-Bang form">
+            <button
+              type="button"
+              className="calc-reset-btn"
+              onClick={reset}
+              aria-label="Reset STOP-Bang form"
+            >
               Reset
             </button>
           </div>
@@ -1015,7 +1052,7 @@ const AUDIT_C_QUESTIONS = [
 
 export function AuditCCalculator({ onResultChange }) {
   const [responses, setResponses] = useState(() =>
-    Object.fromEntries(AUDIT_C_QUESTIONS.map((q) => [q.key, '']))
+    Object.fromEntries(AUDIT_C_QUESTIONS.map((q) => [q.key, ''])),
   );
   const [validationErrors, setValidationErrors] = useState<any[]>([]);
   const [result, setResult] = useState<any>(null);
@@ -1030,7 +1067,7 @@ export function AuditCCalculator({ onResultChange }) {
               screeningResult: result.screeningResult,
               severity: result.severity,
             }
-          : null
+          : null,
       );
     }
   }, [onResultChange, result]);
@@ -1041,7 +1078,7 @@ export function AuditCCalculator({ onResultChange }) {
 
   const runCalculate = () => {
     const out = computeAuditCResult(responses);
-    setValidationErrors(out.ok ? [] : (out.errors || []));
+    setValidationErrors(out.ok ? [] : out.errors || []);
     setResult(out.ok ? out : null);
     if (!out.ok) {
       const missing = AUDIT_C_QUESTIONS.find((q) => responses[q.key] === '');
@@ -1077,9 +1114,10 @@ export function AuditCCalculator({ onResultChange }) {
         <div className="calc-timi-disclaimer calc-has-bled-disclaimer" role="note">
           <CalcDecisionSupportLead />
           <p className="calc-disclaimer-detail">
-            <strong>Screening only.</strong> AUDIT-C is a brief alcohol consumption screen (0–12). Apply sex-specific
-            positive thresholds (≥{AUDIT_C_WOMEN_POSITIVE_THRESHOLD} women, ≥{AUDIT_C_MEN_POSITIVE_THRESHOLD} men). It
-            does not diagnose alcohol use disorder or provide withdrawal-management advice.
+            <strong>Screening only.</strong> AUDIT-C is a brief alcohol consumption screen (0–12).
+            Apply sex-specific positive thresholds (≥{AUDIT_C_WOMEN_POSITIVE_THRESHOLD} women, ≥
+            {AUDIT_C_MEN_POSITIVE_THRESHOLD} men). It does not diagnose alcohol use disorder or
+            provide withdrawal-management advice.
           </p>
         </div>
 
@@ -1125,11 +1163,14 @@ export function AuditCCalculator({ onResultChange }) {
                   </label>
                   <AriaInvalidSelect
                     id={id}
-                    className={fieldClass('calc-select-field', fieldInvalid(responses[item.key] === ''))}
+                    className={fieldClass(
+                      'calc-select-field',
+                      fieldInvalid(responses[item.key] === ''),
+                    )}
                     value={responses[item.key]}
                     onChange={(e) => setItem(item.key, e.target.value)}
                     aria-required="true"
-                     invalid={fieldInvalid(responses[item.key] === '')}
+                    invalid={fieldInvalid(responses[item.key] === '')}
                     aria-describedby={hasValidationErrors ? validationSummaryId : undefined}
                   >
                     <option value="">Select…</option>
@@ -1145,11 +1186,20 @@ export function AuditCCalculator({ onResultChange }) {
           </fieldset>
 
           <div className="calc-actions">
-            <button type="submit" className="calc-calculate-btn" aria-label="Calculate AUDIT-C score">
+            <button
+              type="submit"
+              className="calc-calculate-btn"
+              aria-label="Calculate AUDIT-C score"
+            >
               <NavIcon icon={CHROME_ICONS.calculator} size={20} aria-hidden />
               Calculate AUDIT-C
             </button>
-            <button type="button" className="calc-reset-btn" onClick={reset} aria-label="Reset AUDIT-C form">
+            <button
+              type="button"
+              className="calc-reset-btn"
+              onClick={reset}
+              aria-label="Reset AUDIT-C form"
+            >
               Reset
             </button>
           </div>

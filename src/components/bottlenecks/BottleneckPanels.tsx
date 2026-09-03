@@ -53,14 +53,13 @@ export function BottleneckSeverityBadge({ severity }: { severity: BottleneckSeve
   );
 }
 
-export function ThreeMinuteRiskIndicator({
-  registry,
-}: {
-  registry: BottleneckRegistrySnapshot;
-}) {
+export function ThreeMinuteRiskIndicator({ registry }: { registry: BottleneckRegistrySnapshot }) {
   const risk = registry.threeMinuteRiskProjection;
   return (
-    <article className={`bottleneck-risk bottleneck-risk--${risk.status}`} aria-label="Three-minute risk projection">
+    <article
+      className={`bottleneck-risk bottleneck-risk--${risk.status}`}
+      aria-label="Three-minute risk projection"
+    >
       <span>3-minute target</span>
       <strong>{risk.status.replace(/_/g, ' ')}</strong>
       <small>{risk.summary}</small>
@@ -113,7 +112,8 @@ export function ServiceHealthCard({
       {!compact ? (
         <>
           <small>
-            {service.latencyMs ?? 0}ms latency · {Math.round((service.errorRate ?? 0) * 100)}% errors
+            {service.latencyMs ?? 0}ms latency · {Math.round((service.errorRate ?? 0) * 100)}%
+            errors
           </small>
           <small>{service.fallbackAvailable ? 'Fallback available' : 'Fallback missing'}</small>
         </>
@@ -121,7 +121,8 @@ export function ServiceHealthCard({
         <details className="service-health-card__details">
           <summary>Technical details</summary>
           <small>
-            {service.latencyMs ?? 0}ms latency · {Math.round((service.errorRate ?? 0) * 100)}% errors
+            {service.latencyMs ?? 0}ms latency · {Math.round((service.errorRate ?? 0) * 100)}%
+            errors
           </small>
           <small>{service.fallbackAvailable ? 'Fallback available' : 'Fallback missing'}</small>
         </details>
@@ -148,7 +149,9 @@ export function BottleneckImpactCard({
       <p>{description}</p>
       <small>
         Owner: {event.ownerRole.replace(/_/g, ' ')}
-        {event.responseDeadline ? ` · deadline ${new Date(event.responseDeadline).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : ''}
+        {event.responseDeadline
+          ? ` · deadline ${new Date(event.responseDeadline).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+          : ''}
       </small>
     </article>
   );
@@ -164,7 +167,9 @@ export function BottleneckList({
   canViewPatients?: boolean;
 }) {
   if (!events.length) {
-    return <p className="bottleneck-list__empty">No active workflow or service bottlenecks detected.</p>;
+    return (
+      <p className="bottleneck-list__empty">No active workflow or service bottlenecks detected.</p>
+    );
   }
 
   return (
@@ -197,11 +202,17 @@ export function RootCauseSummaryPanel({
   const summary = registry.activeBottlenecks.some((event) => event.affectedPatientId)
     ? registry.activeBottlenecks
         .slice(0, 3)
-        .map((event) => `${event.serviceName}: ${redactBottleneckContentForRole(event, canViewPatients).title}`)
+        .map(
+          (event) =>
+            `${event.serviceName}: ${redactBottleneckContentForRole(event, canViewPatients).title}`,
+        )
         .join(' | ') || registry.rootCauseSummary
     : registry.rootCauseSummary;
   return (
-    <section className="root-cause-summary-panel" aria-label="AI Chief bottleneck root cause summary">
+    <section
+      className="root-cause-summary-panel"
+      aria-label="AI Chief bottleneck root cause summary"
+    >
       <header>
         <span>AI Chief</span>
         <h3>Root Cause Summary</h3>
@@ -213,11 +224,7 @@ export function RootCauseSummaryPanel({
   );
 }
 
-export function ServiceDependencyMap({
-  services,
-}: {
-  services: ServiceHealth[];
-}) {
+export function ServiceDependencyMap({ services }: { services: ServiceHealth[] }) {
   return (
     <section className="service-dependency-map" aria-label="Service dependency map">
       {services.slice(0, 6).map((service) => (
@@ -235,7 +242,10 @@ export function BottleneckCommandPanel({
   canViewPatients?: boolean;
 }) {
   return (
-    <section className="bottleneck-command-panel" aria-label="Service health and active bottlenecks">
+    <section
+      className="bottleneck-command-panel"
+      aria-label="Service health and active bottlenecks"
+    >
       <header>
         <div>
           <span>Service Health</span>
@@ -257,4 +267,3 @@ export function BottleneckCommandPanel({
     </section>
   );
 }
-

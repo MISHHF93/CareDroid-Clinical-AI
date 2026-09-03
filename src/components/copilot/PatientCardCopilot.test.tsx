@@ -58,7 +58,10 @@ describe('PatientCardCopilot', () => {
     seedPatient();
     render(<PatientCardCopilot patient={patient} />, { wrapper: MemoryRouter });
     expect(screen.getByRole('heading', { name: /Jordan Reyes/ })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Collapse' })).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByRole('button', { name: 'Collapse' })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    );
   });
 
   it('collapses and re-expands, toggling aria-expanded and hiding the body', async () => {
@@ -67,11 +70,17 @@ describe('PatientCardCopilot', () => {
     render(<PatientCardCopilot patient={patient} />, { wrapper: MemoryRouter });
 
     await user.click(screen.getByRole('button', { name: 'Collapse' }));
-    expect(screen.getByRole('button', { name: 'Expand' })).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.getByRole('button', { name: 'Expand' })).toHaveAttribute(
+      'aria-expanded',
+      'false',
+    );
     expect(screen.queryByLabelText('Patient Copilot message')).not.toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: 'Expand' }));
-    expect(screen.getByRole('button', { name: 'Collapse' })).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByRole('button', { name: 'Collapse' })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    );
     expect(screen.getByLabelText('Patient Copilot message')).toBeInTheDocument();
   });
 
@@ -79,9 +88,13 @@ describe('PatientCardCopilot', () => {
     seedPatient();
     render(<PatientCardCopilot patient={patient} />, { wrapper: MemoryRouter });
     expect(
-      screen.getByRole('button', { name: "Summarize this patient's current status based on the provided data." }),
+      screen.getByRole('button', {
+        name: "Summarize this patient's current status based on the provided data.",
+      }),
     ).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Recommend clinical tools for this case' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Recommend clinical tools for this case' }),
+    ).toBeInTheDocument();
   });
 
   it('sends a composer message, disables Send while awaiting a reply, and calls the AI service scoped to this patient', async () => {

@@ -21,7 +21,7 @@ describe('competencyCredentialingCatalog', () => {
         'CME progress',
         'Training status',
         'Competency gaps',
-      ])
+      ]),
     );
     expect(DEMO_COMPETENCY_RECORDS.some((record) => record.type === 'simulation')).toBe(true);
     expect(DEMO_COMPETENCY_RECORDS.some((record) => record.type === 'skill')).toBe(true);

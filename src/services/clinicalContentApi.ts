@@ -139,7 +139,11 @@ export async function fetchDrugCategories() {
     if (!response.ok) {
       return { ok: false, categories: [], error: getApiErrorMessage(null, response) };
     }
-    const categories = Array.isArray(data) ? data : Array.isArray(data?.categories) ? data.categories : [];
+    const categories = Array.isArray(data)
+      ? data
+      : Array.isArray(data?.categories)
+        ? data.categories
+        : [];
     return { ok: true, categories };
   } catch (error: any) {
     reportApiError({

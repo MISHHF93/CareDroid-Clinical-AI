@@ -10,14 +10,7 @@ import {
   type CigGraphSnapshot,
   type FeEmergencyBoardSource,
 } from '../../lib/cig';
-import type {
-  Alert,
-  EMSArrival,
-  Patient,
-  QueueSummary,
-  Room,
-  Staff,
-} from '../types/emergency';
+import type { Alert, EMSArrival, Patient, QueueSummary, Room, Staff } from '../types/emergency';
 
 export type BuildCigFromEmergencyBoardInput = {
   tenantId?: string | null;

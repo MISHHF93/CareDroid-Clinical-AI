@@ -94,8 +94,16 @@ describe('chargeNurseWorkflowModel', () => {
 
     expect(metrics.some((metric) => metric.id === 'waiting-count')).toBe(true);
     expect(metrics.some((metric) => metric.id === 'triage-awaiting')).toBe(true);
-    expect(metrics.filter((metric) => metric.surface === CHARGE_NURSE_SCREEN_WIDGETS.providerWaitBreaches)).toHaveLength(5);
-    expect(metrics.filter((metric) => metric.surface === CHARGE_NURSE_SCREEN_WIDGETS.emsOffloadAggregate)).toHaveLength(4);
+    expect(
+      metrics.filter(
+        (metric) => metric.surface === CHARGE_NURSE_SCREEN_WIDGETS.providerWaitBreaches,
+      ),
+    ).toHaveLength(5);
+    expect(
+      metrics.filter(
+        (metric) => metric.surface === CHARGE_NURSE_SCREEN_WIDGETS.emsOffloadAggregate,
+      ),
+    ).toHaveLength(4);
     expect(metrics.map((metric) => metric.surface)).toEqual([
       ...Array(5).fill(CHARGE_NURSE_SCREEN_WIDGETS.triageBreach),
       CHARGE_NURSE_SCREEN_WIDGETS.queueHealth,
@@ -148,6 +156,10 @@ describe('chargeNurseWorkflowModel', () => {
       },
     });
 
-    expect(metrics.map((metric) => metric.id)).toEqual(['waiting-count', 'reassessments', 'offload-delays']);
+    expect(metrics.map((metric) => metric.id)).toEqual([
+      'waiting-count',
+      'reassessments',
+      'offload-delays',
+    ]);
   });
 });

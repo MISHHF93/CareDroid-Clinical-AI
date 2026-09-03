@@ -8,7 +8,10 @@ import {
 
 describe('platformGovernanceChartModel', () => {
   it('builds governance panel charts from demo surfaces', () => {
-    const view = buildPlatformGovernanceSurfaceView({ surface: 'ai-security', pathname: '/security' });
+    const view = buildPlatformGovernanceSurfaceView({
+      surface: 'ai-security',
+      pathname: '/security',
+    });
     const chart = buildGovernancePanelChart(view.panels);
 
     expect(chart.length).toBeGreaterThan(0);

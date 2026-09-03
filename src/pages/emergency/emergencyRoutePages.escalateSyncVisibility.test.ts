@@ -18,7 +18,7 @@ describe('emergencyRoutePages escalate-badge unsynced visibility', () => {
 
   it('reads unsyncedPatientIds from the store', () => {
     expect(source).toContain(
-      "const unsyncedPatientIds = useEmergencyStore((state) => state.unsyncedPatientIds);",
+      'const unsyncedPatientIds = useEmergencyStore((state) => state.unsyncedPatientIds);',
     );
   });
 

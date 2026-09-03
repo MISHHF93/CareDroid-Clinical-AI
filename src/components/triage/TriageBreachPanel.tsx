@@ -5,7 +5,11 @@ import {
 } from '../../services/triageBreachVisibilityModel';
 import './TriageBreachBadge.css';
 
-export default function TriageBreachPanel({ patients = [] as any[], settings = null, className = '' }) {
+export default function TriageBreachPanel({
+  patients = [] as any[],
+  settings = null,
+  className = '',
+}) {
   const visibility = useMemo(
     () =>
       buildTriageBreachVisibilitySnapshot(patients, {

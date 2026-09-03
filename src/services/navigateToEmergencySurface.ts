@@ -10,25 +10,22 @@ import { NAVIGATION_ITEMS } from '../config/unified-navigation.config';
 import { navigateProfileAware } from '../navigation/profileRouteLaunch';
 import { buildReceptionDeepLink } from '../utils/receptionQueryParams';
 
-const FRONT_DOOR_REDIRECT_ROLES = new Set([
-  'registration_clerk',
-  'triage_nurse',
-]);
+const FRONT_DOOR_REDIRECT_ROLES = new Set(['registration_clerk', 'triage_nurse']);
 
 export function shouldRedirectEmergencySurface(surfaceId, role) {
   if (!isReceptionFirstUxEnabled()) return false;
-  const normalizedRole = String(role || '').trim().toLowerCase();
+  const normalizedRole = String(role || '')
+    .trim()
+    .toLowerCase();
 
   switch (surfaceId) {
     case 'intake':
       return (
-        RECEPTION_FIRST_UX.redirectStandaloneIntake &&
-        FRONT_DOOR_REDIRECT_ROLES.has(normalizedRole)
+        RECEPTION_FIRST_UX.redirectStandaloneIntake && FRONT_DOOR_REDIRECT_ROLES.has(normalizedRole)
       );
     case 'queues':
       return (
-        RECEPTION_FIRST_UX.redirectStandaloneQueues &&
-        FRONT_DOOR_REDIRECT_ROLES.has(normalizedRole)
+        RECEPTION_FIRST_UX.redirectStandaloneQueues && FRONT_DOOR_REDIRECT_ROLES.has(normalizedRole)
       );
     case 'patients':
       return (
@@ -55,20 +52,32 @@ export function resolveEmergencySurfacePath(surfaceId, options: any = {}) {
     return surface.canonicalRoute;
   }
 
-  if (surfaceId === 'patients' && isReceptionFirstUxEnabled() && prefersReceptionForPatientSearch(role)) {
+  if (
+    surfaceId === 'patients' &&
+    isReceptionFirstUxEnabled() &&
+    prefersReceptionForPatientSearch(role)
+  ) {
     return buildReceptionDeepLink({
       patientId: options.patientId,
       query: options.query,
     });
   }
 
-  if (surfaceId === 'intake' && isReceptionFirstUxEnabled() && RECEPTION_FIRST_UX.redirectStandaloneIntake) {
+  if (
+    surfaceId === 'intake' &&
+    isReceptionFirstUxEnabled() &&
+    RECEPTION_FIRST_UX.redirectStandaloneIntake
+  ) {
     if (prefersReceptionForPatientCreate(role)) {
       return getReceptionEmbeddedIntakePath(options.intakeOptions || {});
     }
   }
 
-  if (surfaceId === 'queues' && isReceptionFirstUxEnabled() && RECEPTION_FIRST_UX.redirectStandaloneQueues) {
+  if (
+    surfaceId === 'queues' &&
+    isReceptionFirstUxEnabled() &&
+    RECEPTION_FIRST_UX.redirectStandaloneQueues
+  ) {
     return buildReceptionDeepLink({
       queue: options.queue || 'pretriage',
       patientId: options.patientId,

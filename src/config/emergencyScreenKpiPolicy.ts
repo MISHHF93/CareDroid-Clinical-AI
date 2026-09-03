@@ -226,32 +226,30 @@ export const EMERGENCY_SCREEN_KPI_POLICY: Readonly<
 });
 
 /** Reception operational strip metric ids (receptionQueueModel). */
-export const RECEPTION_KPI_TO_STRIP_ID: Readonly<
-  Partial<Record<EmergencyScreenKpiId, string>>
-> = Object.freeze({
-  'arrivals-today': 'arrivals-today',
-  'awaiting-verification': 'awaiting-verification',
-  'awaiting-triage': 'awaiting-triage',
-  'longest-untriaged-wait': 'door-to-triage',
-  'triage-breach-approaching': 'triage-breach-risk',
-  'triage-breached': 'triage-breached',
-  'rapid-review-flags': 'rapid-review',
-  'queue-size': 'queue-size',
-  'ems-inbound': 'ems-inbound',
-  'crowd-level': 'crowd-level',
-});
+export const RECEPTION_KPI_TO_STRIP_ID: Readonly<Partial<Record<EmergencyScreenKpiId, string>>> =
+  Object.freeze({
+    'arrivals-today': 'arrivals-today',
+    'awaiting-verification': 'awaiting-verification',
+    'awaiting-triage': 'awaiting-triage',
+    'longest-untriaged-wait': 'door-to-triage',
+    'triage-breach-approaching': 'triage-breach-risk',
+    'triage-breached': 'triage-breached',
+    'rapid-review-flags': 'rapid-review',
+    'queue-size': 'queue-size',
+    'ems-inbound': 'ems-inbound',
+    'crowd-level': 'crowd-level',
+  });
 
 /** Triage operational strip metric ids (triageWorkflowModel). */
-export const TRIAGE_KPI_TO_STRIP_ID: Readonly<
-  Partial<Record<EmergencyScreenKpiId, string>>
-> = Object.freeze({
-  'triage-pending': 'triage-pending',
-  'longest-untriaged-wait': 'longest-untriaged-wait',
-  'triage-breach-approaching': 'triage-breach-approaching',
-  'triage-breached': 'triage-breached',
-  'rapid-review-flags': 'rapid-review-flags',
-  'ems-handoffs-pending': 'ems-handoffs-pending',
-});
+export const TRIAGE_KPI_TO_STRIP_ID: Readonly<Partial<Record<EmergencyScreenKpiId, string>>> =
+  Object.freeze({
+    'triage-pending': 'triage-pending',
+    'longest-untriaged-wait': 'longest-untriaged-wait',
+    'triage-breach-approaching': 'triage-breach-approaching',
+    'triage-breached': 'triage-breached',
+    'rapid-review-flags': 'rapid-review-flags',
+    'ems-handoffs-pending': 'ems-handoffs-pending',
+  });
 
 /** Charge nurse strip metric ids (chargeNurseWorkflowModel). */
 export const CHARGE_NURSE_KPI_TO_STRIP_METRIC_ID: Readonly<
@@ -319,15 +317,14 @@ export const CHARGE_NURSE_KPI_TO_DEPARTMENT_METRIC_ID: Readonly<
 });
 
 /** Physician operational strip metric ids (physicianWorkflowModel). */
-export const PHYSICIAN_KPI_TO_STRIP_ID: Readonly<
-  Partial<Record<EmergencyScreenKpiId, string>>
-> = Object.freeze({
-  'awaiting-clinician': 'provider-awaiting',
-  'longest-provider-wait': 'longest-provider-wait',
-  'average-provider-wait': 'average-provider-wait',
-  'provider-wait-approaching': 'provider-approaching',
-  'provider-wait-breached': 'provider-breached',
-});
+export const PHYSICIAN_KPI_TO_STRIP_ID: Readonly<Partial<Record<EmergencyScreenKpiId, string>>> =
+  Object.freeze({
+    'awaiting-clinician': 'provider-awaiting',
+    'longest-provider-wait': 'longest-provider-wait',
+    'average-provider-wait': 'average-provider-wait',
+    'provider-wait-approaching': 'provider-approaching',
+    'provider-wait-breached': 'provider-breached',
+  });
 
 /** Physician strip widget surfaces. */
 export const PHYSICIAN_KPI_TO_STRIP_SURFACE: Readonly<
@@ -340,14 +337,13 @@ export const PHYSICIAN_KPI_TO_STRIP_SURFACE: Readonly<
   'provider-wait-breached': PHYSICIAN_SCREEN_WIDGETS.providerWaitBreaches,
 });
 
-export const PUBLIC_WAITING_KPI_TO_WIDGET: Readonly<
-  Partial<Record<EmergencyScreenKpiId, string>>
-> = Object.freeze({
-  'average-wait-range': PUBLIC_WAITING_SCREEN_WIDGETS.waitRange,
-  'crowd-level': PUBLIC_WAITING_SCREEN_WIDGETS.crowdLevel,
-  'ems-crowding-impact': PUBLIC_WAITING_SCREEN_WIDGETS.emsCrowdingImpact,
-  'process-stage-messaging': PUBLIC_WAITING_SCREEN_WIDGETS.careProcessStages,
-});
+export const PUBLIC_WAITING_KPI_TO_WIDGET: Readonly<Partial<Record<EmergencyScreenKpiId, string>>> =
+  Object.freeze({
+    'average-wait-range': PUBLIC_WAITING_SCREEN_WIDGETS.waitRange,
+    'crowd-level': PUBLIC_WAITING_SCREEN_WIDGETS.crowdLevel,
+    'ems-crowding-impact': PUBLIC_WAITING_SCREEN_WIDGETS.emsCrowdingImpact,
+    'process-stage-messaging': PUBLIC_WAITING_SCREEN_WIDGETS.careProcessStages,
+  });
 
 export const PUBLIC_WAITING_KPI_TO_SECONDARY_WIDGET: Readonly<
   Partial<Record<EmergencyScreenKpiId, string>>
@@ -362,9 +358,7 @@ export const COMMAND_CENTER_KPI_TO_WIDGET: Readonly<
     COMMAND_CENTER_SCREEN_WIDGETS.triageAwaiting,
     COMMAND_CENTER_SCREEN_WIDGETS.avgWaitTriage,
   ]),
-  'longest-untriaged-wait': Object.freeze([
-    COMMAND_CENTER_SCREEN_WIDGETS.longestUntriagedWait,
-  ]),
+  'longest-untriaged-wait': Object.freeze([COMMAND_CENTER_SCREEN_WIDGETS.longestUntriagedWait]),
   'triage-breach-approaching': Object.freeze([
     COMMAND_CENTER_SCREEN_WIDGETS.triageApproachingBreach,
   ]),
@@ -374,18 +368,12 @@ export const COMMAND_CENTER_KPI_TO_WIDGET: Readonly<
     COMMAND_CENTER_SCREEN_WIDGETS.providerAwaiting,
     COMMAND_CENTER_SCREEN_WIDGETS.avgWaitProvider,
   ]),
-  'longest-provider-wait': Object.freeze([
-    COMMAND_CENTER_SCREEN_WIDGETS.longestProviderWait,
-  ]),
-  'average-provider-wait': Object.freeze([
-    COMMAND_CENTER_SCREEN_WIDGETS.avgWaitProvider,
-  ]),
+  'longest-provider-wait': Object.freeze([COMMAND_CENTER_SCREEN_WIDGETS.longestProviderWait]),
+  'average-provider-wait': Object.freeze([COMMAND_CENTER_SCREEN_WIDGETS.avgWaitProvider]),
   'provider-wait-approaching': Object.freeze([
     COMMAND_CENTER_SCREEN_WIDGETS.providerApproachingBreach,
   ]),
-  'provider-wait-breached': Object.freeze([
-    COMMAND_CENTER_SCREEN_WIDGETS.providerBreached,
-  ]),
+  'provider-wait-breached': Object.freeze([COMMAND_CENTER_SCREEN_WIDGETS.providerBreached]),
   throughput: Object.freeze([
     COMMAND_CENTER_SCREEN_WIDGETS.arrivalsByHour,
     COMMAND_CENTER_SCREEN_WIDGETS.waitingCount,
@@ -622,9 +610,10 @@ export function resolveHeaderOperationalMetricKeys(
   );
 }
 
-export function filterOperationalMetricsByScreenMode<
-  T extends { key: string },
->(metrics: T[] = [], screenMode: CareDroidScreenMode): T[] {
+export function filterOperationalMetricsByScreenMode<T extends { key: string }>(
+  metrics: T[] = [],
+  screenMode: CareDroidScreenMode,
+): T[] {
   const allowedKeys = resolveHeaderOperationalMetricKeys(screenMode);
   if (!allowedKeys?.length) return metrics;
   const allowed = new Set(allowedKeys);
@@ -638,12 +627,14 @@ function localDateKey(value: Date | string = new Date()): string {
 }
 
 /** Lightweight triage KPI resolver for strip/header contexts. */
-export function buildTriageKpiValues(input: {
-  patients?: Patient[];
-  emsArrivals?: EMSArrival[];
-  settings?: Record<string, unknown> | null;
-  now?: Date;
-} = {}): Record<
+export function buildTriageKpiValues(
+  input: {
+    patients?: Patient[];
+    emsArrivals?: EMSArrival[];
+    settings?: Record<string, unknown> | null;
+    now?: Date;
+  } = {},
+): Record<
   | 'triage-pending'
   | 'longest-untriaged-wait'
   | 'triage-breach-approaching'
@@ -692,7 +683,12 @@ export function buildTriageKpiValues(input: {
     },
     'triage-breached': {
       value: visibility.breachedCount,
-      tone: visibility.breachedCount >= 3 ? 'critical' : visibility.breachedCount ? 'warning' : 'stable',
+      tone:
+        visibility.breachedCount >= 3
+          ? 'critical'
+          : visibility.breachedCount
+            ? 'warning'
+            : 'stable',
       detail: visibility.breachedCount
         ? `Longest ${visibility.summary.longestElapsedLabel}`
         : `Target ${visibility.summary.targetMinutes}m`,
@@ -711,11 +707,13 @@ export function buildTriageKpiValues(input: {
 }
 
 /** Lightweight provider-wait KPI resolver for strip/header contexts. */
-export function buildProviderWaitKpiValues(input: {
-  patients?: Patient[];
-  settings?: Record<string, unknown> | null;
-  now?: Date;
-} = {}): Record<
+export function buildProviderWaitKpiValues(
+  input: {
+    patients?: Patient[];
+    settings?: Record<string, unknown> | null;
+    now?: Date;
+  } = {},
+): Record<
   | 'awaiting-clinician'
   | 'longest-provider-wait'
   | 'average-provider-wait'
@@ -769,7 +767,12 @@ export function buildProviderWaitKpiValues(input: {
     },
     'provider-wait-breached': {
       value: visibility.breachedCount,
-      tone: visibility.breachedCount >= 3 ? 'critical' : visibility.breachedCount ? 'warning' : 'stable',
+      tone:
+        visibility.breachedCount >= 3
+          ? 'critical'
+          : visibility.breachedCount
+            ? 'warning'
+            : 'stable',
       detail: visibility.breachedCount
         ? `Longest ${visibility.summary.longestElapsedLabel}`
         : `Default target ${visibility.summary.defaultTargetMinutes}m`,
@@ -1107,7 +1110,11 @@ export function buildScreenModeKpiSnapshot(input: {
         id: 'longest-untriaged-wait',
         label: 'Longest untriaged wait',
         value: triageVisibility.longestUntriagedWaitLabel,
-        tone: triageVisibility.breachedCount ? 'critical' : triageVisibility.approachingBreachCount ? 'warning' : 'stable',
+        tone: triageVisibility.breachedCount
+          ? 'critical'
+          : triageVisibility.approachingBreachCount
+            ? 'warning'
+            : 'stable',
         source: 'triageBreachVisibility.longestUntriagedWait',
       },
       'triage-breach-approaching': {

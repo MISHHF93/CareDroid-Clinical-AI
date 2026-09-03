@@ -38,7 +38,9 @@ const DOMAIN_LABELS: Record<WorkflowAutomationItem['domain'], string> = {
   ai_recommendations: 'AI recommendations',
 };
 
-function readAiDecision(task: { proposedPayload?: Readonly<Record<string, unknown>> } | undefined): AiDecisionPayload | null {
+function readAiDecision(
+  task: { proposedPayload?: Readonly<Record<string, unknown>> } | undefined,
+): AiDecisionPayload | null {
   const decision = task?.proposedPayload?.aiDecision;
   if (!decision || typeof decision !== 'object') return null;
   return decision as AiDecisionPayload;
@@ -56,7 +58,8 @@ function readField(data: Readonly<Record<string, unknown>> | undefined, keys: st
 }
 
 function AiDecisionBlock({ decision }: { decision: AiDecisionPayload }) {
-  const triageLevel = readField(decision.triage?.data, ['recommendedTriageLevel', 'triageLevel']) ||
+  const triageLevel =
+    readField(decision.triage?.data, ['recommendedTriageLevel', 'triageLevel']) ||
     readField(decision.data, ['riskLevel', 'recommendedTriageLevel']);
   const severity = readField(decision.critical?.data, ['severity', 'riskLevel']);
   const missingFields = decision.intake?.data?.missingFields;
@@ -143,9 +146,7 @@ function AiDecisionBlock({ decision }: { decision: AiDecisionPayload }) {
         ) : null}
       </dl>
       {decision.intent ? (
-        <p className="automation-review__ai-intent">
-          Intent: {decision.intent.replace(/_/g, ' ')}
-        </p>
+        <p className="automation-review__ai-intent">Intent: {decision.intent.replace(/_/g, ' ')}</p>
       ) : null}
     </div>
   );
@@ -298,8 +299,9 @@ export function AdministrativeAutomationReviewPanel() {
           <div>
             <strong>Unified workflow automation</strong>
             <p className="automation-review__lead">
-              {workflow.pendingCount} pending review · reception, intake, triage, routing, notifications,
-              documentation, handoffs, staff assignments, analytics, reporting, and AI recommendations
+              {workflow.pendingCount} pending review · reception, intake, triage, routing,
+              notifications, documentation, handoffs, staff assignments, analytics, reporting, and
+              AI recommendations
             </p>
           </div>
         </div>
@@ -333,7 +335,9 @@ export function AdministrativeAutomationReviewPanel() {
       </div>
 
       {workflow.pendingItems.length === 0 ? (
-        <p className="automation-review__empty">No workflow automations awaiting clinician review.</p>
+        <p className="automation-review__empty">
+          No workflow automations awaiting clinician review.
+        </p>
       ) : (
         <ul className="automation-review__list">
           {workflow.pendingItems.slice(0, 8).map((item) => (

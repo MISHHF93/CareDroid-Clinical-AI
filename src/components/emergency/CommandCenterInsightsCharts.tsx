@@ -38,7 +38,9 @@ export default function CommandCenterInsightsCharts({
         <GraphicIconBadge iconKey="chart-bar" accent="brand" size="md" />
         <div>
           <h3>Throughput visuals</h3>
-          <p>Charted arrivals, compliance, and live metric signals for faster situational awareness.</p>
+          <p>
+            Charted arrivals, compliance, and live metric signals for faster situational awareness.
+          </p>
         </div>
       </div>
 

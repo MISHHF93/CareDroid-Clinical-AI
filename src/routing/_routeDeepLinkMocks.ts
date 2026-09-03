@@ -11,7 +11,8 @@ vi.mock('../components/AppShell', async () => {
   const { Outlet, useLocation, useNavigate } = await import('react-router-dom');
   const { RouteChromeProvider } = await import('../contexts/RouteChromeContext');
   const { HelpHubProvider } = await import('../contexts/HelpHubContext');
-  const { PractitionerVisibilityProvider } = await import('../contexts/PractitionerVisibilityContext');
+  const { PractitionerVisibilityProvider } =
+    await import('../contexts/PractitionerVisibilityContext');
   const { NotificationShellProvider } = await import('../contexts/NotificationShellContext');
   const { ConfirmDialogProvider } = await import('../components/ui/ConfirmDialogProvider');
   const { CANONICAL_ROUTES } = await import('../config/routes.config');

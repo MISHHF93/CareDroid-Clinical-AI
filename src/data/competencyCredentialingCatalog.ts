@@ -96,14 +96,19 @@ export const DEMO_CREDENTIAL_RECORDS = Object.freeze([
 ]);
 
 function normalize(value) {
-  return String(value || '').trim().toLowerCase();
+  return String(value || '')
+    .trim()
+    .toLowerCase();
 }
 
 function percent(value) {
   return Math.max(0, Math.min(100, Math.round(value)));
 }
 
-export function buildCompetencyCredentialingSnapshot({ role = 'medical student', specialty = 'medical education' }: any = {}) {
+export function buildCompetencyCredentialingSnapshot({
+  role = 'medical student',
+  specialty = 'medical education',
+}: any = {}) {
   const normalizedRole = normalize(role);
   const isOperations = normalizedRole.includes('operations') || normalizedRole.includes('fleet');
   const isBiomedical = normalizedRole.includes('biomedical');
@@ -113,13 +118,23 @@ export function buildCompetencyCredentialingSnapshot({ role = 'medical student',
       ? ['Device alarm failure handoff', 'Telemetry reliability documentation']
       : ['Critical lab escalation speed', 'Closed-loop communication under time pressure'];
 
-  const simulationRecords = DEMO_COMPETENCY_RECORDS.filter((record) => record.type === 'simulation');
+  const simulationRecords = DEMO_COMPETENCY_RECORDS.filter(
+    (record) => record.type === 'simulation',
+  );
   const skillRecords = DEMO_COMPETENCY_RECORDS.filter((record) => record.type === 'skill');
-  const completedCompetencies = DEMO_COMPETENCY_RECORDS.filter((record) => record.status === 'completed').length;
-  const activeCredentials = DEMO_CREDENTIAL_RECORDS.filter((record) => record.status === 'active').length;
-  const cmeCreditsEarned = DEMO_CREDENTIAL_RECORDS.reduce((total, record) => total + record.credits, 0);
+  const completedCompetencies = DEMO_COMPETENCY_RECORDS.filter(
+    (record) => record.status === 'completed',
+  ).length;
+  const activeCredentials = DEMO_CREDENTIAL_RECORDS.filter(
+    (record) => record.status === 'active',
+  ).length;
+  const cmeCreditsEarned = DEMO_CREDENTIAL_RECORDS.reduce(
+    (total, record) => total + record.credits,
+    0,
+  );
   const averageProgress =
-    DEMO_COMPETENCY_RECORDS.reduce((total, record) => total + record.progress, 0) / DEMO_COMPETENCY_RECORDS.length;
+    DEMO_COMPETENCY_RECORDS.reduce((total, record) => total + record.progress, 0) /
+    DEMO_COMPETENCY_RECORDS.length;
 
   return {
     sourceStatus: 'demo-local-state',
@@ -130,10 +145,14 @@ export function buildCompetencyCredentialingSnapshot({ role = 'medical student',
     },
     summary: {
       simulationCompletion: percent(
-        (simulationRecords.filter((record) => record.status === 'completed').length / simulationRecords.length) * 100
+        (simulationRecords.filter((record) => record.status === 'completed').length /
+          simulationRecords.length) *
+          100,
       ),
       skillCompletion: percent(
-        (skillRecords.filter((record) => record.status === 'completed').length / skillRecords.length) * 100
+        (skillRecords.filter((record) => record.status === 'completed').length /
+          skillRecords.length) *
+          100,
       ),
       completedCompetencies,
       totalCompetencies: DEMO_COMPETENCY_RECORDS.length,

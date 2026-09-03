@@ -120,7 +120,7 @@ export function computePregnancyDueDate(raw) {
       edd: formatIsoDate(edd),
       anchorLabel,
       score: formatIsoDate(edd),
-    }
+    },
   );
 }
 
@@ -135,9 +135,14 @@ export function computeGestationalAge(raw) {
   const edd = parseIsoDate(dueDateResult.edd);
   const remainingDays = diffDays(asOfDate!, edd!);
   const gestationalAge = formatGestationalAge(280 - remainingDays);
-  if (!gestationalAge) return { ok: false as const, errors: ['Unable to compute gestational age.'] };
+  if (!gestationalAge)
+    return { ok: false as const, errors: ['Unable to compute gestational age.'] };
   const severity =
-    gestationalAge.totalDays < 259 ? 'warning' : gestationalAge.totalDays > 294 ? 'warning' : 'normal';
+    gestationalAge.totalDays < 259
+      ? 'warning'
+      : gestationalAge.totalDays > 294
+        ? 'warning'
+        : 'normal';
 
   return result(
     `Gestational age ${gestationalAge.label}`,
@@ -153,13 +158,20 @@ export function computeGestationalAge(raw) {
         assessmentDate: formatIsoDate(asOfDate),
         datingMethod: dueDateResult.anchorLabel,
       },
-    }
+    },
   );
 }
 
 function pediatricBpThresholds(ageYears) {
   if (ageYears >= 13) {
-    return { elevatedSbp: 120, elevatedDbp: 80, stage1Sbp: 130, stage1Dbp: 80, stage2Sbp: 140, stage2Dbp: 90 };
+    return {
+      elevatedSbp: 120,
+      elevatedDbp: 80,
+      stage1Sbp: 130,
+      stage1Dbp: 80,
+      stage2Sbp: 140,
+      stage2Dbp: 90,
+    };
   }
   const age = Math.max(1, Math.min(12, ageYears));
   const elevatedSbp = 95 + age * 2;
@@ -179,10 +191,14 @@ export function computePediatricBpPercentile(raw) {
   const systolic = toNumber(raw.systolic);
   const diastolic = toNumber(raw.diastolic);
   const errors = [] as any[];
-  if (!Number.isFinite(ageYears) || ageYears < 1 || ageYears > 17) errors.push('Enter age from 1 to 17 years.');
-  if (!Number.isFinite(systolic) || systolic < 40 || systolic > 260) errors.push('Enter systolic BP from 40 to 260 mmHg.');
-  if (!Number.isFinite(diastolic) || diastolic < 20 || diastolic > 160) errors.push('Enter diastolic BP from 20 to 160 mmHg.');
-  if (!['female', 'male'].includes(raw.sex)) errors.push('Select sex assigned at birth for source-table context.');
+  if (!Number.isFinite(ageYears) || ageYears < 1 || ageYears > 17)
+    errors.push('Enter age from 1 to 17 years.');
+  if (!Number.isFinite(systolic) || systolic < 40 || systolic > 260)
+    errors.push('Enter systolic BP from 40 to 260 mmHg.');
+  if (!Number.isFinite(diastolic) || diastolic < 20 || diastolic > 160)
+    errors.push('Enter diastolic BP from 20 to 160 mmHg.');
+  if (!['female', 'male'].includes(raw.sex))
+    errors.push('Select sex assigned at birth for source-table context.');
   if (errors.length) return { ok: false as const, errors };
 
   const thresholds = pediatricBpThresholds(ageYears);
@@ -213,7 +229,7 @@ export function computePediatricBpPercentile(raw) {
         diastolic,
         screeningThresholds: thresholds,
       },
-    }
+    },
   );
 }
 
@@ -232,7 +248,11 @@ export function computeFentonGrowthChartHelper(raw) {
   const lengthPercentile = toNumber(raw.lengthPercentile);
   const headPercentile = toNumber(raw.headCircumferencePercentile);
   const errors = [] as any[];
-  if (!Number.isFinite(gestationalAgeWeeks) || gestationalAgeWeeks < 22 || gestationalAgeWeeks > 50) {
+  if (
+    !Number.isFinite(gestationalAgeWeeks) ||
+    gestationalAgeWeeks < 22 ||
+    gestationalAgeWeeks > 50
+  ) {
     errors.push('Enter gestational/postmenstrual age from 22 to 50 weeks.');
   }
   const entries: [string, number][] = [
@@ -241,7 +261,8 @@ export function computeFentonGrowthChartHelper(raw) {
     ['head circumference', headPercentile],
   ];
   for (const [label, value] of entries) {
-    if (!Number.isFinite(value) || value < 0 || value > 100) errors.push(`Enter ${label} percentile from 0 to 100.`);
+    if (!Number.isFinite(value) || value < 0 || value > 100)
+      errors.push(`Enter ${label} percentile from 0 to 100.`);
   }
   if (errors.length) return { ok: false as const, errors };
 
@@ -251,9 +272,17 @@ export function computeFentonGrowthChartHelper(raw) {
     headCircumference: classifyGrowthPercentile(headPercentile),
   };
   const severities = Object.values(classifications).map((row) => row?.severity);
-  const severity = severities.includes('critical') ? 'critical' : severities.includes('warning') ? 'warning' : 'normal';
+  const severity = severities.includes('critical')
+    ? 'critical'
+    : severities.includes('warning')
+      ? 'warning'
+      : 'normal';
   const label =
-    weightPercentile < 10 ? 'Small-for-gestational-age weight band' : weightPercentile > 90 ? 'Large-for-gestational-age weight band' : 'Appropriate-for-gestational-age weight band';
+    weightPercentile < 10
+      ? 'Small-for-gestational-age weight band'
+      : weightPercentile > 90
+        ? 'Large-for-gestational-age weight band'
+        : 'Appropriate-for-gestational-age weight band';
 
   return result(
     label,
@@ -268,7 +297,7 @@ export function computeFentonGrowthChartHelper(raw) {
         length: classifications.length?.label,
         headCircumference: classifications.headCircumference?.label,
       },
-    }
+    },
   );
 }
 
@@ -277,10 +306,18 @@ export function computeNeonatalBilirubinRiskHelper(raw) {
   const bilirubin = toNumber(raw.bilirubin);
   const gestationalAgeWeeks = toNumber(raw.gestationalAgeWeeks);
   const errors = [] as any[];
-  if (!Number.isFinite(ageHours) || ageHours < 0 || ageHours > 336) errors.push('Enter age from 0 to 336 hours.');
-  if (!Number.isFinite(bilirubin) || bilirubin < 0 || bilirubin > 50) errors.push('Enter bilirubin from 0 to 50 mg/dL.');
-  if (!Number.isFinite(gestationalAgeWeeks) || gestationalAgeWeeks < 35 || gestationalAgeWeeks > 44) {
-    errors.push('Enter gestational age from 35 to 44 weeks for AAP 2022 term/late-preterm context.');
+  if (!Number.isFinite(ageHours) || ageHours < 0 || ageHours > 336)
+    errors.push('Enter age from 0 to 336 hours.');
+  if (!Number.isFinite(bilirubin) || bilirubin < 0 || bilirubin > 50)
+    errors.push('Enter bilirubin from 0 to 50 mg/dL.');
+  if (
+    !Number.isFinite(gestationalAgeWeeks) ||
+    gestationalAgeWeeks < 35 ||
+    gestationalAgeWeeks > 44
+  ) {
+    errors.push(
+      'Enter gestational age from 35 to 44 weeks for AAP 2022 term/late-preterm context.',
+    );
   }
   if (!['yes', 'no'].includes(raw.neurotoxicityRiskFactors)) {
     errors.push('Select whether neurotoxicity risk factors are present.');
@@ -312,7 +349,7 @@ export function computeNeonatalBilirubinRiskHelper(raw) {
         gestationalAgeWeeks,
         neurotoxicityRiskFactors: riskFactors ? 'present' : 'not selected',
       },
-    }
+    },
   );
 }
 
@@ -322,12 +359,15 @@ export function computePediatricDoseSafetyCheckerPlaceholder(raw) {
   const governedProtocol = raw.governedProtocol || '';
   const errors = [] as any[];
   if (!medicationName) errors.push('Enter medication name or class for documentation context.');
-  if (!Number.isFinite(weightKg) || weightKg <= 0 || weightKg > 250) errors.push('Enter weight from >0 to 250 kg.');
-  if (!['yes', 'no'].includes(governedProtocol)) errors.push('Select whether a governed dosing protocol is available.');
+  if (!Number.isFinite(weightKg) || weightKg <= 0 || weightKg > 250)
+    errors.push('Enter weight from >0 to 250 kg.');
+  if (!['yes', 'no'].includes(governedProtocol))
+    errors.push('Select whether a governed dosing protocol is available.');
   if (errors.length) return { ok: false as const, errors };
 
   const severity = governedProtocol === 'yes' ? 'warning' : 'critical';
-  const label = governedProtocol === 'yes' ? 'Protocol-governed review required' : 'Dose calculation blocked';
+  const label =
+    governedProtocol === 'yes' ? 'Protocol-governed review required' : 'Dose calculation blocked';
 
   return {
     ok: true as const,

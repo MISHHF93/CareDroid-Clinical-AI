@@ -52,7 +52,11 @@ describe('publicWaitingDisplayModel', () => {
         state: PatientState.Waiting,
         arrivalTime: '2026-06-20T07:00:00.000Z',
       }),
-      buildPatient({ id: 't1', state: PatientState.Triage, arrivalTime: '2026-06-20T09:30:00.000Z' }),
+      buildPatient({
+        id: 't1',
+        state: PatientState.Triage,
+        arrivalTime: '2026-06-20T09:30:00.000Z',
+      }),
       buildPatient({ id: 'r1', state: PatientState.Registration }),
     ];
     const snapshot = buildPublicWaitingDisplaySnapshot({
@@ -88,9 +92,9 @@ describe('publicWaitingDisplayModel', () => {
     expect(snapshot.processEducation.steps[6]?.label).toBe('Discharge / Admission');
     expect(snapshot.guidanceMessages.length).toBeGreaterThan(0);
     expect(snapshot.statusMessaging.statusLines.length).toBeGreaterThan(0);
-    expect(snapshot.statusMessaging.advisories.some((line) => line.id === 'symptom-escalation')).toBe(
-      true,
-    );
+    expect(
+      snapshot.statusMessaging.advisories.some((line) => line.id === 'symptom-escalation'),
+    ).toBe(true);
     expect(snapshot.escalationMessage).toBe(PUBLIC_WAITING_ESCALATION_MESSAGE);
   });
 

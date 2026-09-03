@@ -33,7 +33,9 @@ export default function PatientRoomDisplay() {
     return (
       <section className="patient-room-display patient-room-display--empty" role="status">
         <h1>Patient room display</h1>
-        <p>Select a patient with <code>?patientId=</code> to show the in-room whiteboard.</p>
+        <p>
+          Select a patient with <code>?patientId=</code> to show the in-room whiteboard.
+        </p>
       </section>
     );
   }
@@ -42,7 +44,10 @@ export default function PatientRoomDisplay() {
     const roomPatient =
       patient ||
       patients.find(
-        (entry) => entry.roomId === room.id || entry.id === room.patientId || entry.id === room.currentPatientId,
+        (entry) =>
+          entry.roomId === room.id ||
+          entry.id === room.patientId ||
+          entry.id === room.currentPatientId,
       ) ||
       null;
     return (

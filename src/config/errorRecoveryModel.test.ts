@@ -27,8 +27,6 @@ describe('errorRecoveryModel', () => {
         new TypeError("Cannot read properties of undefined (reading 'status')"),
         'Smart Intake session',
       ),
-    ).toBe(
-      'Server unavailable. Your Smart Intake session are preserved here. Request failed',
-    );
+    ).toBe('Server unavailable. Your Smart Intake session are preserved here. Request failed');
   });
 });

@@ -39,9 +39,6 @@ describe('triageWorkflowModel', () => {
     const metrics = selectTriageOperationalStripMetrics(patients, [], {
       metricIds: ['triage-pending', 'ems-handoffs-pending'],
     });
-    expect(metrics.map((metric) => metric.id)).toEqual([
-      'triage-pending',
-      'ems-handoffs-pending',
-    ]);
+    expect(metrics.map((metric) => metric.id)).toEqual(['triage-pending', 'ems-handoffs-pending']);
   });
 });

@@ -25,16 +25,18 @@ describe('screenDensityModeModel', () => {
   });
 
   it('enables safety flags on triage medium density but not reception simple mode', () => {
-    expect(resolveScreenDensityProfile(CARE_DROID_SCREEN_MODES.triage).patientCard.showSafetyFlags).toBe(
-      true,
-    );
+    expect(
+      resolveScreenDensityProfile(CARE_DROID_SCREEN_MODES.triage).patientCard.showSafetyFlags,
+    ).toBe(true);
     expect(
       resolveScreenDensityProfile(CARE_DROID_SCREEN_MODES.reception).patientCard.showSafetyFlags,
     ).toBe(false);
   });
 
   it('uses operational patient cards for charge nurse and clinical cards for physician', () => {
-    expect(resolvePatientCardDensityVariant(CARE_DROID_SCREEN_MODES.chargeNurse)).toBe('operational');
+    expect(resolvePatientCardDensityVariant(CARE_DROID_SCREEN_MODES.chargeNurse)).toBe(
+      'operational',
+    );
     expect(resolvePatientCardDensityVariant(CARE_DROID_SCREEN_MODES.physician)).toBe('clinical');
     expect(resolvePatientCardDensityVariant(CARE_DROID_SCREEN_MODES.reception)).toBe('simple');
   });
@@ -44,7 +46,8 @@ describe('screenDensityModeModel', () => {
       resolveScreenDensityProfile(CARE_DROID_SCREEN_MODES.commandCenter).whiteboard.maxVisibleCards,
     ).toBeNull();
     expect(
-      resolveScreenDensityProfile(CARE_DROID_SCREEN_MODES.publicWaiting).patientCard.showQueueReason,
+      resolveScreenDensityProfile(CARE_DROID_SCREEN_MODES.publicWaiting).patientCard
+        .showQueueReason,
     ).toBe(false);
   });
 

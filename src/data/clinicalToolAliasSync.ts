@@ -59,7 +59,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export const TOOL_PATTERNS_PATH = join(
   __dirname,
-  '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts'
+  '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts',
 );
 
 /** Phantom / cost-tracking ids that must never map to a launchable registry via NLU_TO_REGISTRY_ID. */
@@ -97,17 +97,20 @@ export const ALLOWED_BACKEND_KEYWORD_COLLISIONS = Object.freeze([
   {
     keyword: 'stroke',
     toolIds: ['has-bled', 'nihss', 'cha2ds2vasc-calculator'],
-    reason: 'optional parameter / stroke scale; disambiguation prefers NIHSS when stroke scale phrased',
+    reason:
+      'optional parameter / stroke scale; disambiguation prefers NIHSS when stroke scale phrased',
   },
   {
     keyword: 'cardiac risk',
     toolIds: ['ascvd-risk', 'heart-score'],
-    reason: 'shared discovery phrase; downstream launcher disambiguates by explicit ASCVD vs HEART context',
+    reason:
+      'shared discovery phrase; downstream launcher disambiguates by explicit ASCVD vs HEART context',
   },
   {
     keyword: 'cardiac risk calculator',
     toolIds: ['ascvd-risk', 'heart-score'],
-    reason: 'shared discovery phrase; downstream launcher disambiguates by explicit ASCVD vs HEART context',
+    reason:
+      'shared discovery phrase; downstream launcher disambiguates by explicit ASCVD vs HEART context',
   },
 ]);
 
@@ -138,7 +141,7 @@ export const AUDITED_CLINICAL_REGISTRY_IDS = Object.freeze([
 export const CHAT_ASSISTED_NLU_TOOL_IDS = Object.freeze([
   ...NLU_HUB_ONLY_PROFILE_TOOL_IDS,
   ...clinicalIntentTools
-    .filter((t) => CLINICAL_TIER_B_CHAT_REGISTRY_IDS.includes(t.sidebarToolId || t.toolId as any))
+    .filter((t) => CLINICAL_TIER_B_CHAT_REGISTRY_IDS.includes(t.sidebarToolId || (t.toolId as any)))
     .map((t) => t.toolId),
   REGISTRY.dispatchAi,
 ]);
@@ -246,7 +249,7 @@ function normalizeMetadataString(value) {
  */
 export function buildMetadataParityReport(patternsSource = readToolPatternsSource()) {
   const backendById = new Map(
-    parseClinicalToolPatternRecords(patternsSource).map((r) => [r.toolId, r])
+    parseClinicalToolPatternRecords(patternsSource).map((r) => [r.toolId, r]),
   );
   const mismatches = [] as any[];
   for (const row of clinicalIntentTools) {
@@ -296,7 +299,8 @@ export function buildChatAssistedBackendCoverageReport(patternsSource = readTool
     }
     const matches = spec.backendKeywords.some(
       (kw) =>
-        normalizeAliasKey(kw) === normalizeAliasKey(alias) || aliasToSlug(kw) === aliasToSlug(alias)
+        normalizeAliasKey(kw) === normalizeAliasKey(alias) ||
+        aliasToSlug(kw) === aliasToSlug(alias),
     );
     if (!matches) {
       gaps.push({ alias, nluToolId, reason: 'chat config alias missing from backend keywords' });
@@ -359,7 +363,11 @@ export function buildClinicalToolAliasSyncReport(options: any = {}) {
     } else if (actual !== registryId && slugActual === registryId) {
       // phrase missing but slug ok — report as partial
       if (actual === undefined) {
-        missingCatalogAliases.push({ alias, expected: registryId, note: 'slug present, phrase missing' });
+        missingCatalogAliases.push({
+          alias,
+          expected: registryId,
+          note: 'slug present, phrase missing',
+        });
       }
     } else if (actual !== registryId) {
       wrongCatalogTargets.push({ alias, expected: registryId, actual });
@@ -370,7 +378,7 @@ export function buildClinicalToolAliasSyncReport(options: any = {}) {
     if (pattern && !BROAD_CATALOG_ALIASES.includes(alias)) {
       const phrase = normalizeAliasKey(alias);
       const matchesBackend = pattern.keywords.some(
-        (kw) => normalizeAliasKey(kw) === phrase || aliasToSlug(kw) === slug
+        (kw) => normalizeAliasKey(kw) === phrase || aliasToSlug(kw) === slug,
       );
       if (!matchesBackend && !aliasToSlug(alias).includes(nluToolId)) {
         missingBackendKeywordCoverage.push({
@@ -433,7 +441,11 @@ export function buildClinicalToolAliasSyncReport(options: any = {}) {
       (lower.includes('emergency') || lower.includes('trauma') || lower.includes('abc ')) &&
       mentalHealthRegistry.has(registryId)
     ) {
-      highRiskMisroutes.push({ alias, registryId, reason: 'emergency/trauma phrase → mental health tool' });
+      highRiskMisroutes.push({
+        alias,
+        registryId,
+        reason: 'emergency/trauma phrase → mental health tool',
+      });
     }
     if (lower.includes('pulmonary embolism') && registryId === REGISTRY.phq9) {
       highRiskMisroutes.push({ alias, registryId, reason: 'PE phrase → PHQ-9' });
@@ -465,7 +477,11 @@ export function buildClinicalToolAliasSyncReport(options: any = {}) {
         lower.startsWith('abc ') ||
         lower === 'abc'
       ) {
-        unsafeBackendKeywordRoutes.push({ toolId, keyword: kw, reason: 'emergency term on mental health tool' });
+        unsafeBackendKeywordRoutes.push({
+          toolId,
+          keyword: kw,
+          reason: 'emergency term on mental health tool',
+        });
       }
     }
   }

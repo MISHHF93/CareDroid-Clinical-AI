@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { PatientState, Priority, type Patient } from '../types/emergency';
-import {
-  buildEncounterLinkageMetadata,
-  readIntakeEncounterChain,
-} from './intakeEncounterChain';
+import { buildEncounterLinkageMetadata, readIntakeEncounterChain } from './intakeEncounterChain';
 import { ensureEncounterAfterIntake, getExistingEncounterId } from './intakeEncounter';
 import { completeIntakeHandoff } from './receptionHandoff';
 
@@ -62,7 +59,9 @@ describe('intake encounter chain', () => {
     ];
     const store = {
       patients,
-      emergencySettings: { intakeSettings: { autoAssignTriageQueue: true, autoCreateEncounter: true } },
+      emergencySettings: {
+        intakeSettings: { autoAssignTriageQueue: true, autoCreateEncounter: true },
+      },
       updatePatient: (patientId: string, patch: Partial<Patient>) => {
         const index = patients.findIndex((entry) => entry.id === patientId);
         if (index >= 0) patients[index] = { ...patients[index], ...patch };
@@ -89,7 +88,9 @@ describe('intake encounter chain', () => {
     const patients: Patient[] = [{ ...patient, timeline: [] }];
     const store = {
       patients,
-      emergencySettings: { intakeSettings: { autoAssignTriageQueue: true, autoCreateEncounter: true } },
+      emergencySettings: {
+        intakeSettings: { autoAssignTriageQueue: true, autoCreateEncounter: true },
+      },
       updatePatient: (patientId: string, patch: Partial<Patient>) => {
         const index = patients.findIndex((entry) => entry.id === patientId);
         if (index >= 0) patients[index] = { ...patients[index], ...patch };

@@ -32,7 +32,9 @@ describe('trackMindRoleCatalog', () => {
 
   it('normalizes legacy aliases', () => {
     expect(normalizeTrackMindRoleId('platform-admin')).toBe(TRACKMIND_ROLE_ID.platformSuperAdmin);
-    expect(normalizeTrackMindRoleId('compliance-officer')).toBe(TRACKMIND_ROLE_ID.complianceOfficer);
+    expect(normalizeTrackMindRoleId('compliance-officer')).toBe(
+      TRACKMIND_ROLE_ID.complianceOfficer,
+    );
     expect(normalizeTrackMindRoleId('fleet-operator')).toBe(TRACKMIND_ROLE_ID.facilitiesManager);
   });
 });
@@ -59,9 +61,9 @@ describe('trackMind permission matrix completeness', () => {
   });
 
   it('allows stewards into workspace but not platform admin', () => {
-    expect(canAccessTrackMindRoute(TRACKMIND_ROLE_ID.steward, CANONICAL_ROUTES.trackMindWorkspace)).toBe(
-      true,
-    );
+    expect(
+      canAccessTrackMindRoute(TRACKMIND_ROLE_ID.steward, CANONICAL_ROUTES.trackMindWorkspace),
+    ).toBe(true);
     expect(canAccessTrackMindRoute(TRACKMIND_ROLE_ID.steward, CANONICAL_ROUTES.platformAdmin)).toBe(
       false,
     );
@@ -102,7 +104,9 @@ describe('trackMind privacy and audit governance', () => {
     const can = (permission: string) =>
       hasTrackMindPermission(TRACKMIND_ROLE_ID.auditorRegulator, permission);
     expect(canExportTrackMindAudit(TRACKMIND_ROLE_ID.auditorRegulator, can)).toBe(true);
-    expect(canViewTrackMindAuditArtifact(TRACKMIND_ROLE_ID.auditorRegulator, 'compliance')).toBe(true);
+    expect(canViewTrackMindAuditArtifact(TRACKMIND_ROLE_ID.auditorRegulator, 'compliance')).toBe(
+      true,
+    );
   });
 
   it('blocks executive read-only from veterinary write entity capability', () => {
@@ -131,9 +135,9 @@ describe('trackMind approval authority', () => {
   it('blocks generic staff from approval decisions', () => {
     const can = (permission: string) =>
       hasTrackMindPermission(TRACKMIND_ROLE_ID.genericStaff, permission);
-    expect(canPerformTrackMindApprovalCapability(TRACKMIND_ROLE_ID.genericStaff, 'approve', can)).toBe(
-      false,
-    );
+    expect(
+      canPerformTrackMindApprovalCapability(TRACKMIND_ROLE_ID.genericStaff, 'approve', can),
+    ).toBe(false);
   });
 });
 
@@ -169,8 +173,8 @@ describe('trackMind user role resolution', () => {
   it('lists allowed routes per role', () => {
     const routes = listTrackMindRoutesForRole(TRACKMIND_ROLE_ID.dataAnalyticsUser);
     expect(routes).toContain(CANONICAL_ROUTES.platformIntelligence);
-    expect(canAccessTrackMindSurface(TRACKMIND_ROLE_ID.dataAnalyticsUser, CANONICAL_ROUTES.audit)).toBe(
-      false,
-    );
+    expect(
+      canAccessTrackMindSurface(TRACKMIND_ROLE_ID.dataAnalyticsUser, CANONICAL_ROUTES.audit),
+    ).toBe(false);
   });
 });

@@ -22,7 +22,11 @@ function matchesConsolePrefix(pathname: string, prefix: string) {
 }
 
 function hasDedicatedInShellRoute(pathname: string) {
-  const normalized = String(pathname || '/').split('?')[0].split('#')[0].replace(/\/+$/, '') || '/';
+  const normalized =
+    String(pathname || '/')
+      .split('?')[0]
+      .split('#')[0]
+      .replace(/\/+$/, '') || '/';
 
   if (isGovernanceWorkspacePath(normalized)) {
     return true;

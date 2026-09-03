@@ -65,7 +65,9 @@ export function assertPr4aDiscoveryCanonical(id, { getAllDiscoveredTools }) {
   const hits = getAllDiscoveredTools().filter((r) => r.id === id);
   expect(hits, `discovery duplicates for ${id}`).toHaveLength(1);
   expect(hits[0].path).toBe(PR4A_ROUTE_BY_REGISTRY_ID[id]);
-  const blob = [hits[0].source, ...(hits[0].sources || []), hits[0].notes].filter(Boolean).join(' ');
+  const blob = [hits[0].source, ...(hits[0].sources || []), hits[0].notes]
+    .filter(Boolean)
+    .join(' ');
   expect(blob).toMatch(/toolRegistry|clinicalIntentToolCatalog|tool\.patterns|NLU/i);
 }
 
@@ -119,18 +121,18 @@ export function assertPr4aFullyWired(id, ctx) {
   expect(ctx.clinicalIntentToolsById[id], `orphan NLU: ${id}`).toBeTruthy();
   expect(
     ctx.nluCalculatorHubOnly.some((h) => h.toolId === id),
-    `${id} must not be hub-only (Tier-A dedicated form)`
+    `${id} must not be hub-only (Tier-A dedicated form)`,
   ).toBe(false);
   expect(
     ctx.getMedicalToolsCatalogRows().some((r) => r.primaryId === id),
-    `orphan catalog: ${id}`
+    `orphan catalog: ${id}`,
   ).toBe(true);
   expect(
     ctx.getAllDiscoveredTools().some((r) => r.id === id),
-    `orphan discovery: ${id}`
+    `orphan discovery: ${id}`,
   ).toBe(true);
   expect(
     ctx.builtinUiCalculators.some((c) => c.id === id),
-    `orphan builtin: ${id}`
+    `orphan builtin: ${id}`,
   ).toBe(true);
 }

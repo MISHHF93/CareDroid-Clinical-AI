@@ -56,9 +56,10 @@ export function buildPreArrivalNotificationFromArrival(
         ]
           .filter(Boolean)
           .join(' · '),
-        assessment: [vitalsSummary, arrival.severity ? `Severity: ${arrival.severity}` : null]
-          .filter(Boolean)
-          .join(' · ') || 'Assessment pending',
+        assessment:
+          [vitalsSummary, arrival.severity ? `Severity: ${arrival.severity}` : null]
+            .filter(Boolean)
+            .join(' · ') || 'Assessment pending',
         recommendation: arrival.criticalChecklist?.title || 'Standard ED reception',
       },
       source: 'integration',

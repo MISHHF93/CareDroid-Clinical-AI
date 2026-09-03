@@ -22,8 +22,7 @@ export function resolveReceptionDeskUi({ role, isReceptionRoute = false, screenM
   return {
     enabled,
     slim,
-    inlineQuickIntake:
-      enabled && (RECEPTION_DESK_UI as any).inlineQuickIntakeForSlim !== false,
+    inlineQuickIntake: enabled && (RECEPTION_DESK_UI as any).inlineQuickIntakeForSlim !== false,
     /** Single attention strip + interactive queue (always on when desk enabled). */
     attentionStrip: enabled,
     taskSheet: enabled,

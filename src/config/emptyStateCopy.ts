@@ -67,7 +67,8 @@ export const EMPTY_STATE_COPY = Object.freeze({
   commandPalette: {
     noResults: {
       title: 'No matching commands or records',
-      guidance: 'Use quick actions above, or search patients, encounters, referrals, EMS, and queues.',
+      guidance:
+        'Use quick actions above, or search patients, encounters, referrals, EMS, and queues.',
       nextSteps: ['Try patient name or MRN', 'Type register, intake, whiteboard, or EMS'],
     },
   },
@@ -112,7 +113,8 @@ export const EMPTY_STATE_COPY = Object.freeze({
   shift: {
     empty: {
       title: 'Shift summary will populate as patients move',
-      guidance: 'Volume, queue breaches, and LWBS metrics compute from active board data during the shift.',
+      guidance:
+        'Volume, queue breaches, and LWBS metrics compute from active board data during the shift.',
       status: 'No elevated handoff signals yet.',
       nextSteps: [
         'Register or convert arrivals from Reception.',

@@ -116,11 +116,18 @@ describe('PatientDetailPanel: patient-scoped draft state does not survive a pati
 
   it('clears an in-progress note draft when the selected patient changes', async () => {
     const patientA = makePatient();
-    const patientB = makePatient({ id: 'patient-b', mrn: 'ED-SWITCH-B', firstName: 'Jordan', lastName: 'Lee' });
+    const patientB = makePatient({
+      id: 'patient-b',
+      mrn: 'ED-SWITCH-B',
+      firstName: 'Jordan',
+      lastName: 'Lee',
+    });
     renderWithPatients([patientA, patientB], patientA.id);
 
     const noteField = await screen.findByPlaceholderText('Add Note');
-    fireEvent.change(noteField, { target: { value: 'Confidential note meant for Alex Rivera only' } });
+    fireEvent.change(noteField, {
+      target: { value: 'Confidential note meant for Alex Rivera only' },
+    });
 
     act(() => {
       useEmergencyStore.getState().selectPatient(patientB.id);
@@ -131,7 +138,12 @@ describe('PatientDetailPanel: patient-scoped draft state does not survive a pati
 
   it('resets the flag-to-add selection and closes the assign-staff/room action mode on switch', async () => {
     const patientA = makePatient();
-    const patientB = makePatient({ id: 'patient-b', mrn: 'ED-SWITCH-B', firstName: 'Jordan', lastName: 'Lee' });
+    const patientB = makePatient({
+      id: 'patient-b',
+      mrn: 'ED-SWITCH-B',
+      firstName: 'Jordan',
+      lastName: 'Lee',
+    });
     renderWithPatients([patientA, patientB], patientA.id);
 
     fireEvent.click(screen.getByRole('button', { name: /assign staff/i }));

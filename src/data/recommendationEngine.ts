@@ -36,7 +36,9 @@ function unique(values) {
 }
 
 function normalizeText(value) {
-  return String(value || '').trim().toLowerCase();
+  return String(value || '')
+    .trim()
+    .toLowerCase();
 }
 
 function textIncludesAny(text, terms) {
@@ -69,7 +71,13 @@ function itemText(item: any = {}) {
   ].join(' ');
 }
 
-function signalTerms({ profile, workspace, organization, searchSignals, memoryFabricContext }: any = {}) {
+function signalTerms({
+  profile,
+  workspace,
+  organization,
+  searchSignals,
+  memoryFabricContext,
+}: any = {}) {
   const commonSearches = [
     ...(memoryFabricContext?.organizationMemory?.commonSearches || []),
     ...(memoryFabricContext?.userMemory?.commonSearches || []),
@@ -89,11 +97,16 @@ function signalTerms({ profile, workspace, organization, searchSignals, memoryFa
     organization?.name,
     organization?.type,
     organization?.organizationType,
-    ...commonSearches.map((entry) => entry?.filter || entry?.category || entry?.tag || entry?.title),
+    ...commonSearches.map(
+      (entry) => entry?.filter || entry?.category || entry?.tag || entry?.title,
+    ),
   ]);
 }
 
-function scoreItem(item, { profile, terms, recentAssetIds, pinnedAssetIds, completedSimulationIds, workflowIds }) {
+function scoreItem(
+  item,
+  { profile, terms, recentAssetIds, pinnedAssetIds, completedSimulationIds, workflowIds },
+) {
   const text = itemText(item);
   const reasons = [] as any[];
   let score = 20;
@@ -108,7 +121,10 @@ function scoreItem(item, { profile, terms, recentAssetIds, pinnedAssetIds, compl
     score += 18;
     reasons.push(`${profile.specialty} specialty fit`);
   }
-  if (profile?.workspaceLabel && textIncludesAny(text, [profile.workspaceLabel, profile.workspace])) {
+  if (
+    profile?.workspaceLabel &&
+    textIncludesAny(text, [profile.workspaceLabel, profile.workspace])
+  ) {
     score += 14;
     reasons.push('Active workspace fit');
   }
@@ -155,9 +171,7 @@ function buildRecommendation(type, item, scoring, sourceSignals = [] as any[]) {
 }
 
 function sortAndLimit(items, limit) {
-  return items
-    .sort((a, b) => b.score - a.score || a.title.localeCompare(b.title))
-    .slice(0, limit);
+  return items.sort((a, b) => b.score - a.score || a.title.localeCompare(b.title)).slice(0, limit);
 }
 
 function normalizeProductRows(productRows = [] as any[]) {
@@ -241,7 +255,8 @@ export function buildRecommendationEngineContext({
 
   return {
     profile,
-    workspace: activeWorkspace || workspaceContext?.activeWorkspace || platformContext?.workspace || {},
+    workspace:
+      activeWorkspace || workspaceContext?.activeWorkspace || platformContext?.workspace || {},
     organization: organization || platformContext?.organization || {},
     terms: signalTerms({
       profile,
@@ -260,7 +275,9 @@ export function buildRecommendationEngineContext({
     ]),
     workflowIds: unique([
       ...(behavior.workflowIds || []),
-      ...(memoryFabricContext?.userMemory?.savedWorkflows || []).map((workflow) => workflow.workflowId || workflow.id),
+      ...(memoryFabricContext?.userMemory?.savedWorkflows || []).map(
+        (workflow) => workflow.workflowId || workflow.id,
+      ),
     ]),
   };
 }
@@ -292,7 +309,11 @@ export function buildRecommendations({
   const grouped: any = {
     tools: sortAndLimit(
       visibleTools.map((tool) =>
-        buildRecommendation('tools', tool, scoreItem(tool, baseScoringInput), ['role', 'workspace', 'asset-usage']),
+        buildRecommendation('tools', tool, scoreItem(tool, baseScoringInput), [
+          'role',
+          'workspace',
+          'asset-usage',
+        ]),
       ),
       limitPerGroup,
     ),
@@ -355,7 +376,9 @@ export function buildRecommendations({
     profile: ctx.profile,
     summary: {
       total: all.length,
-      groups: Object.fromEntries(RECOMMENDATION_GROUPS.map((group) => [group.id, grouped[group.id].length])),
+      groups: Object.fromEntries(
+        RECOMMENDATION_GROUPS.map((group) => [group.id, grouped[group.id].length]),
+      ),
       topScore: (all[0] as any)?.score || 0,
     },
     groups: grouped,

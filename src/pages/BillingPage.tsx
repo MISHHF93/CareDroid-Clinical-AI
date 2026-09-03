@@ -128,7 +128,9 @@ export default function BillingPage() {
             <Card key={plan.id} className="commercial-card">
               <h2>{plan.name}</h2>
               <p className="commercial-subtitle">{plan.description}</p>
-              <strong>{plan.priceMonthly === null ? 'Custom pricing' : `$${plan.priceMonthly}/mo`}</strong>
+              <strong>
+                {plan.priceMonthly === null ? 'Custom pricing' : `$${plan.priceMonthly}/mo`}
+              </strong>
               <ul className="commercial-compact-list">
                 {(plan.features || []).map((feature) => (
                   <li key={feature}>{feature}</li>

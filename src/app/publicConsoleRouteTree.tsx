@@ -8,7 +8,9 @@ import {
 
 const lazyRoute = lazyWithRetry;
 const lazyNamed = (loader: () => Promise<Record<string, unknown>>, exportName: string) =>
-  lazyRoute(() => loader().then((module) => ({ default: module[exportName] as ComponentType<unknown> })));
+  lazyRoute(() =>
+    loader().then((module) => ({ default: module[exportName] as ComponentType<unknown> })),
+  );
 
 const VersionPage = lazyRoute(() => import('../pages/Version'));
 const HelpCenterPage = lazyRoute(() => import('../pages/HelpCenter'));
@@ -16,9 +18,15 @@ const AppNavigatorPage = lazyRoute(() => import('../pages/AppNavigator'));
 const GdprNoticePage = lazyRoute(() => import('../pages/GDPRNotice'));
 const HipaaNoticePage = lazyRoute(() => import('../pages/HIPAANotice'));
 const PrivacyPolicyPage = lazyNamed(() => import('../pages/legal/PrivacyPolicy'), 'PrivacyPolicy');
-const TermsOfServicePage = lazyNamed(() => import('../pages/legal/TermsOfService'), 'TermsOfService');
+const TermsOfServicePage = lazyNamed(
+  () => import('../pages/legal/TermsOfService'),
+  'TermsOfService',
+);
 const ConsentFlowPage = lazyNamed(() => import('../pages/legal/ConsentFlow'), 'ConsentFlow');
-const ConsentHistoryPage = lazyNamed(() => import('../pages/legal/ConsentHistory'), 'ConsentHistory');
+const ConsentHistoryPage = lazyNamed(
+  () => import('../pages/legal/ConsentHistory'),
+  'ConsentHistory',
+);
 
 const PUBLIC_CONSOLE_PAGE_COMPONENTS = Object.freeze({
   version: VersionPage,

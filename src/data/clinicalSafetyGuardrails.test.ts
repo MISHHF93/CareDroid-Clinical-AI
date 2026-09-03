@@ -77,7 +77,7 @@ describe('clinicalSafetyGuardrails — PE / ACS', () => {
       const seed = resolveCatalogLaunch(id).chatSeed || '';
       expect(seed).not.toMatch(SAFETY_AUDIT_PATTERNS.PE_ACS_CERTAINTY_FORBIDDEN_RE);
       expect(seed).toMatch(SAFETY_AUDIT_PATTERNS.PE_ACS_GUARDRAIL_RE);
-    }
+    },
   );
 });
 
@@ -93,7 +93,9 @@ describe('clinicalSafetyGuardrails — anticoagulation', () => {
     const block = src.slice(src.indexOf('CHA2DS2-VASc Calculator'));
     expect(block).not.toMatch(/Anticoagulation strongly recommended/);
     expect(block).not.toMatch(/No anticoagulation recommended/);
-    expect(block).toMatch(/does not recommend for or against|does not direct anticoagulant|not a directive to start/i);
+    expect(block).toMatch(
+      /does not recommend for or against|does not direct anticoagulant|not a directive to start/i,
+    );
   });
 });
 
@@ -107,7 +109,7 @@ describe('clinicalSafetyGuardrails — fleet / dispatch', () => {
         expect(seed).not.toMatch(SAFETY_AUDIT_PATTERNS.FLEET_AUTO_FORBIDDEN_RE);
         expect(seed).toMatch(SAFETY_AUDIT_PATTERNS.FLEET_GUARDRAIL_RE);
       }
-    }
+    },
   );
 
   it('fleet dashboard surfaces operational decision-support disclaimer', () => {
@@ -116,14 +118,13 @@ describe('clinicalSafetyGuardrails — fleet / dispatch', () => {
 });
 
 describe('clinicalSafetyGuardrails — AI documentation', () => {
-  it.each([
-    'differential-diagnosis',
-    'antibiotic-guide',
-    'protocol-lookup',
-  ])('%s chat seed requires human review framing', (toolId) => {
-    const seed = clinicalIntentTools.find((t) => t.toolId === toolId)?.chatSeed || '';
-    expect(seed).toMatch(SAFETY_AUDIT_PATTERNS.AI_DOC_RE);
-  });
+  it.each(['differential-diagnosis', 'antibiotic-guide', 'protocol-lookup'])(
+    '%s chat seed requires human review framing',
+    (toolId) => {
+      const seed = clinicalIntentTools.find((t) => t.toolId === toolId)?.chatSeed || '';
+      expect(seed).toMatch(SAFETY_AUDIT_PATTERNS.AI_DOC_RE);
+    },
+  );
 
   it('ToolPageLayout includes decision-support disclaimer component', () => {
     const src = readSrc('src/pages/tools/ToolPageLayout.tsx');
@@ -146,7 +147,7 @@ describe('clinicalSafetyGuardrails — Tier B hub tools', () => {
     (registryId) => {
       const seed = resolveCatalogLaunch(registryId).chatSeed || '';
       expect(SAFETY_AUDIT_PATTERNS.DECISION_SUPPORT_RE.test(seed)).toBe(true);
-    }
+    },
   );
 });
 
@@ -156,7 +157,7 @@ describe('clinicalSafetyGuardrails — PR3 stroke and trauma', () => {
     (id) => {
       const seed = resolveCatalogLaunch(id).chatSeed || '';
       expect(SAFETY_AUDIT_PATTERNS.URGENT_CARE_RE.test(seed)).toBe(true);
-    }
+    },
   );
 
   it.each(['grace-acs', 'nihss'])('%s avoids diagnostic certainty phrasing', (id) => {
@@ -223,7 +224,7 @@ describe('clinicalSafetyGuardrails — catalog launch seeds', () => {
     NLU_PROFILE_TOOL_IDS.filter((id) => {
       const seed = resolveCatalogLaunch(id).chatSeed;
       return Boolean(seed);
-    })
+    }),
   )('%s launch seed passes audit', (toolId) => {
     const seed = resolveCatalogLaunch(toolId).chatSeed || '';
     expect(SAFETY_AUDIT_PATTERNS.DECISION_SUPPORT_RE.test(seed)).toBe(true);

@@ -25,9 +25,7 @@ describe('WorkspaceContext', () => {
     localStorage.clear();
   });
 
-  const wrapper = ({ children }) => (
-    <WorkspaceProvider>{children}</WorkspaceProvider>
-  );
+  const wrapper = ({ children }) => <WorkspaceProvider>{children}</WorkspaceProvider>;
 
   describe('initialization', () => {
     it('should initialize with default workspaces', () => {
@@ -35,8 +33,8 @@ describe('WorkspaceContext', () => {
 
       expect(result.current.workspaces).toBeInstanceOf(Array);
       expect(result.current.workspaces.length).toBeGreaterThan(0);
-      
-      const emergency = result.current.workspaces.find(w => w.id === 'emergency');
+
+      const emergency = result.current.workspaces.find((w) => w.id === 'emergency');
       expect(emergency).toBeDefined();
       expect(emergency.name).toBe('Emergency');
     });
@@ -50,20 +48,23 @@ describe('WorkspaceContext', () => {
     it('should load persisted workspaces from localStorage', () => {
       const customWorkspaces = [
         { id: 'icu', name: 'ICU', toolIds: ['tool1', 'tool2'] },
-        { id: 'emergency', name: 'Emergency', toolIds: ['tool1'], color: '#ef4444', icon: 'Siren' }
+        { id: 'emergency', name: 'Emergency', toolIds: ['tool1'], color: '#ef4444', icon: 'Siren' },
       ];
 
-      localStorage.setItem('careDroid.workspaces.v1', JSON.stringify({
-        workspaces: customWorkspaces,
-        activeWorkspaceId: 'emergency'
-      }));
+      localStorage.setItem(
+        'careDroid.workspaces.v1',
+        JSON.stringify({
+          workspaces: customWorkspaces,
+          activeWorkspaceId: 'emergency',
+        }),
+      );
 
       const { result } = renderHook(() => useWorkspace(), { wrapper });
 
       expect(result.current.workspaces.length).toBeGreaterThanOrEqual(2);
       expect(result.current.activeWorkspaceId).toBe('emergency');
-      
-      const emergencyWs = result.current.workspaces.find(w => w.id === 'emergency');
+
+      const emergencyWs = result.current.workspaces.find((w) => w.id === 'emergency');
       expect(emergencyWs.color).toBe('#ef4444');
       expect(emergencyWs.icon).toBe('Siren');
     });
@@ -78,7 +79,7 @@ describe('WorkspaceContext', () => {
         name: 'My Custom Workspace',
         toolIds: ['drug-checker', 'lab-interpreter'],
         color: 'var(--accent-1)',
-        icon: 'Hospital'
+        icon: 'Hospital',
       };
 
       act(() => {
@@ -94,7 +95,7 @@ describe('WorkspaceContext', () => {
       const newWorkspace = {
         id: 'test-workspace',
         name: 'Test Workspace',
-        toolIds: ['tool1']
+        toolIds: ['tool1'],
       };
 
       act(() => {
@@ -133,7 +134,7 @@ describe('WorkspaceContext', () => {
       const newWorkspace = {
         id: 'test-ws',
         name: 'Original Name',
-        toolIds: ['tool1']
+        toolIds: ['tool1'],
       };
 
       act(() => {
@@ -143,11 +144,11 @@ describe('WorkspaceContext', () => {
       act(() => {
         result.current.updateWorkspace('test-ws', {
           name: 'Updated Name',
-          toolIds: ['tool1', 'tool2']
+          toolIds: ['tool1', 'tool2'],
         });
       });
 
-      const updated = result.current.workspaces.find(w => w.id === 'test-ws');
+      const updated = result.current.workspaces.find((w) => w.id === 'test-ws');
       expect(updated.name).toBe('Updated Name');
       expect(updated.toolIds).toEqual(['tool1', 'tool2']);
     });
@@ -167,8 +168,8 @@ describe('WorkspaceContext', () => {
         result.current.updateWorkspace('ws1', { name: 'Modified WS1' });
       });
 
-      const ws1Updated = result.current.workspaces.find(w => w.id === 'ws1');
-      const ws2Unchanged = result.current.workspaces.find(w => w.id === 'ws2');
+      const ws1Updated = result.current.workspaces.find((w) => w.id === 'ws1');
+      const ws2Unchanged = result.current.workspaces.find((w) => w.id === 'ws2');
 
       expect(ws1Updated.name).toBe('Modified WS1');
       expect(ws2Unchanged.name).toBe('Workspace 2');
@@ -186,7 +187,7 @@ describe('WorkspaceContext', () => {
       if (!saved) throw new Error('expected workspace state to be persisted');
       const parsed = JSON.parse(saved);
 
-      const updated = parsed.workspaces.find(w => w.id === 'test');
+      const updated = parsed.workspaces.find((w) => w.id === 'test');
       expect(updated.name).toBe('Updated Test');
     });
   });
@@ -261,7 +262,7 @@ describe('WorkspaceContext', () => {
       if (!saved) throw new Error('expected workspace state to be persisted');
       const parsed = JSON.parse(saved);
 
-      const removed = parsed.workspaces.find(w => w.id === 'remove-me');
+      const removed = parsed.workspaces.find((w) => w.id === 'remove-me');
       expect(removed).toBeUndefined();
     });
   });
@@ -318,14 +319,14 @@ describe('WorkspaceContext', () => {
       const emergencyWorkspace = {
         id: 'emergency-custom',
         name: 'Emergency',
-        toolIds: ['abc-assessment', 'trauma-score', 'vitals-monitor']
+        toolIds: ['abc-assessment', 'trauma-score', 'vitals-monitor'],
       };
 
       act(() => {
         result.current.addWorkspace(emergencyWorkspace);
       });
 
-      const workspace = result.current.workspaces.find(w => w.id === 'emergency-custom');
+      const workspace = result.current.workspaces.find((w) => w.id === 'emergency-custom');
       expect(workspace.toolIds).toHaveLength(3);
       expect(workspace.toolIds).toContain('abc-assessment');
     });
@@ -336,14 +337,14 @@ describe('WorkspaceContext', () => {
       const emptyWorkspace = {
         id: 'empty',
         name: 'Empty Workspace',
-        toolIds: []
+        toolIds: [],
       };
 
       act(() => {
         result.current.addWorkspace(emptyWorkspace);
       });
 
-      const workspace = result.current.workspaces.find(w => w.id === 'empty');
+      const workspace = result.current.workspaces.find((w) => w.id === 'empty');
       expect(workspace.toolIds).toEqual([]);
     });
   });
@@ -356,14 +357,14 @@ describe('WorkspaceContext', () => {
         id: 'colored',
         name: 'Colored Workspace',
         toolIds: [],
-        color: '#ef4444'
+        color: '#ef4444',
       };
 
       act(() => {
         result.current.addWorkspace(coloredWorkspace);
       });
 
-      const workspace = result.current.workspaces.find(w => w.id === 'colored');
+      const workspace = result.current.workspaces.find((w) => w.id === 'colored');
       expect(workspace.color).toBe('#ef4444');
     });
 
@@ -374,14 +375,14 @@ describe('WorkspaceContext', () => {
         id: 'icon-ws',
         name: 'Icon Workspace',
         toolIds: [],
-        icon: 'Rocket'
+        icon: 'Rocket',
       };
 
       act(() => {
         result.current.addWorkspace(iconWorkspace);
       });
 
-      const workspace = result.current.workspaces.find(w => w.id === 'icon-ws');
+      const workspace = result.current.workspaces.find((w) => w.id === 'icon-ws');
       expect(workspace.icon).toBe('Rocket');
     });
 
@@ -393,14 +394,14 @@ describe('WorkspaceContext', () => {
         name: 'Fully Customized',
         toolIds: ['tool1'],
         color: '#a855f7',
-        icon: 'Dna'
+        icon: 'Dna',
       };
 
       act(() => {
         result.current.addWorkspace(customWorkspace);
       });
 
-      const workspace = result.current.workspaces.find(w => w.id === 'full-custom');
+      const workspace = result.current.workspaces.find((w) => w.id === 'full-custom');
       expect(workspace.color).toBe('#a855f7');
       expect(workspace.icon).toBe('Dna');
       expect(workspace.toolIds).toEqual(['tool1']);

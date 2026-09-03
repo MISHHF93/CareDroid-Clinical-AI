@@ -19,11 +19,13 @@ describe('ToolNotFound fallback', () => {
     render(
       <MemoryRouter initialEntries={['/tools/calculators/not-a-real-calc']}>
         <ToolNotFound toolId="not-a-real-calc" title="Calculator not found" />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     expect(screen.getByRole('alert')).toHaveTextContent(/not-a-real-calc/i);
     expect(screen.getByRole('link', { name: /all tools/i })).toHaveAttribute('href', '/tools');
-    expect(screen.queryByRole('link', { name: /developer catalog \/ source audit/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('link', { name: /developer catalog \/ source audit/i }),
+    ).not.toBeInTheDocument();
   });
 });

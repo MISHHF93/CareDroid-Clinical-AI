@@ -25,10 +25,7 @@ export default function FitToWaitClassificationSelect({
 
   return (
     <div
-      className={[
-        'fit-to-wait-select',
-        compact ? 'fit-to-wait-select--compact' : '',
-      ]
+      className={['fit-to-wait-select', compact ? 'fit-to-wait-select--compact' : '']
         .filter(Boolean)
         .join(' ')}
     >

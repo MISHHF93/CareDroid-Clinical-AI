@@ -110,7 +110,9 @@ describe('navigation <-> PERMISSION_ROUTE_MAP invariants', () => {
       for (const item of items as Array<NavItem & { requireAllPermissions?: boolean }>) {
         if (!item.requireAllPermissions) continue;
         const permissions = permissionsFor(item);
-        const uncovered = permissions.filter((permission) => !PERMISSION_ROUTE_MAP[permission]?.length);
+        const uncovered = permissions.filter(
+          (permission) => !PERMISSION_ROUTE_MAP[permission]?.length,
+        );
         if (uncovered.length) {
           failures.push(
             `${item.id || item.path}: requireAllPermissions is true but [${uncovered.join(', ')}] ` +
@@ -127,7 +129,9 @@ describe('navigation <-> PERMISSION_ROUTE_MAP invariants', () => {
     for (const [permission, routes] of Object.entries(PERMISSION_ROUTE_MAP)) {
       routes.forEach((route, index) => {
         if (typeof route !== 'string' || !route.trim() || !route.startsWith('/')) {
-          failures.push(`PERMISSION_ROUTE_MAP.${permission}[${index}] is not a valid path: ${JSON.stringify(route)}`);
+          failures.push(
+            `PERMISSION_ROUTE_MAP.${permission}[${index}] is not a valid path: ${JSON.stringify(route)}`,
+          );
         }
       });
     }

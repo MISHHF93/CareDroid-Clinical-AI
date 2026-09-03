@@ -1,7 +1,11 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import BillingPage from './BillingPage';
-import { createCheckoutSession, createCustomerPortalSession, fetchBillingOverview } from '../services/subscriptionApi';
+import {
+  createCheckoutSession,
+  createCustomerPortalSession,
+  fetchBillingOverview,
+} from '../services/subscriptionApi';
 
 vi.mock('../services/subscriptionApi', () => ({
   fetchBillingOverview: vi.fn(),
@@ -18,7 +22,13 @@ const mockBilling = {
   status: 'active',
   plans: [
     { id: 'growth', name: 'Growth', description: 'Growth plan', priceMonthly: 299, features: [] },
-    { id: 'enterprise', name: 'Enterprise', description: 'Enterprise plan', priceMonthly: null, features: [] },
+    {
+      id: 'enterprise',
+      name: 'Enterprise',
+      description: 'Enterprise plan',
+      priceMonthly: null,
+      features: [],
+    },
   ],
 };
 
@@ -47,7 +57,13 @@ describe('BillingPage', () => {
 
   it('calls createCustomerPortalSession exactly once even when "Open billing portal" is clicked twice rapidly', async () => {
     vi.mocked(createCustomerPortalSession).mockImplementation(
-      () => new Promise((resolve) => setTimeout(() => resolve({ ok: true, data: { url: 'https://billing.example/portal' } } as any), 30)),
+      () =>
+        new Promise((resolve) =>
+          setTimeout(
+            () => resolve({ ok: true, data: { url: 'https://billing.example/portal' } } as any),
+            30,
+          ),
+        ),
     );
 
     render(<BillingPage />);
@@ -65,7 +81,13 @@ describe('BillingPage', () => {
 
   it('calls createCheckoutSession exactly once for a tier even when "Select" is clicked twice rapidly, and blocks switching tiers mid-flight', async () => {
     vi.mocked(createCheckoutSession).mockImplementation(
-      () => new Promise((resolve) => setTimeout(() => resolve({ ok: true, data: { url: 'https://billing.example/checkout' } } as any), 30)),
+      () =>
+        new Promise((resolve) =>
+          setTimeout(
+            () => resolve({ ok: true, data: { url: 'https://billing.example/checkout' } } as any),
+            30,
+          ),
+        ),
     );
 
     render(<BillingPage />);

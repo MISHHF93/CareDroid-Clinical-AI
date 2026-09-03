@@ -93,7 +93,12 @@ export default function ReceptionEscalationPanel({
   };
 
   return (
-    <div className="reception-escalation-panel" role="dialog" aria-modal="true" aria-labelledby="reception-escalation-title">
+    <div
+      className="reception-escalation-panel"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="reception-escalation-title"
+    >
       <button
         type="button"
         className="reception-escalation-panel__backdrop"
@@ -103,7 +108,9 @@ export default function ReceptionEscalationPanel({
       <section className="reception-escalation-panel__sheet">
         <header className="reception-escalation-panel__header">
           <div>
-            <p className="reception-escalation-panel__eyebrow">{RECEPTION_COPY.escalation.eyebrow}</p>
+            <p className="reception-escalation-panel__eyebrow">
+              {RECEPTION_COPY.escalation.eyebrow}
+            </p>
             <h2 id="reception-escalation-title">{RECEPTION_COPY.escalation.title}</h2>
             <p>{RECEPTION_COPY.escalation.description}</p>
           </div>
@@ -181,7 +188,11 @@ export default function ReceptionEscalationPanel({
             </label>
 
             <div className="reception-escalation-panel__actions">
-              <button type="button" className="reception-escalation-panel__secondary" onClick={onClose}>
+              <button
+                type="button"
+                className="reception-escalation-panel__secondary"
+                onClick={onClose}
+              >
                 Cancel
               </button>
               <button
@@ -189,7 +200,9 @@ export default function ReceptionEscalationPanel({
                 className="reception-escalation-panel__primary"
                 disabled={!reasonId || submitting}
               >
-                {submitting ? RECEPTION_COPY.escalation.submitting : RECEPTION_COPY.escalation.submit}
+                {submitting
+                  ? RECEPTION_COPY.escalation.submitting
+                  : RECEPTION_COPY.escalation.submit}
               </button>
             </div>
           </form>

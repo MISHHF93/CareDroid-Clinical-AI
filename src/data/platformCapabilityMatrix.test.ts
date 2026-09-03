@@ -34,7 +34,9 @@ function routePathMatches(routePath, concretePath) {
 describe('platform capability matrix', () => {
   const routePaths = buildRouteHealthGraph().routes.map((route) => route.path);
   const inventoryIds = new Set(getCanonicalToolInventory().map((record) => record.id));
-  const platformCapabilityIds = new Set(PLATFORM_SYSTEM_CAPABILITIES.map((capability) => capability.id));
+  const platformCapabilityIds = new Set(
+    PLATFORM_SYSTEM_CAPABILITIES.map((capability) => capability.id),
+  );
   const dashboardIds = new Set(PLATFORM_DASHBOARDS.map((dashboard) => dashboard.id));
 
   it('keeps every matrix row complete and traceable end-to-end', () => {
@@ -44,32 +46,46 @@ describe('platform capability matrix', () => {
 
     for (const row of platformCapabilityMatrix) {
       expect(Object.values(PLATFORM_CAPABILITY_MATRIX_STATUSES)).toContain(row.status);
-      expect(routePaths.some((routePath) => routePathMatches(routePath, row.frontendRoute)), row.id).toBe(
-        true
-      );
+      expect(
+        routePaths.some((routePath) => routePathMatches(routePath, row.frontendRoute)),
+        row.id,
+      ).toBe(true);
       const { method, path } = endpointParts(row.apiEndpoint);
       expect(findBackendRoute(method, path), `${row.id} ${row.apiEndpoint}`).toBeTruthy();
       expect(
         inventoryIds.has(row.inventoryEntry) ||
           platformCapabilityIds.has(row.inventoryEntry) ||
           dashboardIds.has(row.inventoryEntry) ||
-          ['dashboard', 'assistant', 'timeline', 'search', 'notifications', 'workspaces', 'system-health', 'workflow-builder', 'digital-twin'].includes(row.inventoryEntry),
-        `${row.id} inventory entry ${row.inventoryEntry}`
+          [
+            'dashboard',
+            'assistant',
+            'timeline',
+            'search',
+            'notifications',
+            'workspaces',
+            'system-health',
+            'workflow-builder',
+            'digital-twin',
+          ].includes(row.inventoryEntry),
+        `${row.id} inventory entry ${row.inventoryEntry}`,
       ).toBe(true);
     }
   });
 
   it('represents every platform dashboard and every platform system capability', () => {
     for (const dashboard of PLATFORM_DASHBOARDS) {
-      expect(platformCapabilityMatrix.some((row) => row.id === dashboard.id), dashboard.id).toBe(true);
+      expect(
+        platformCapabilityMatrix.some((row) => row.id === dashboard.id),
+        dashboard.id,
+      ).toBe(true);
     }
 
     for (const capability of PLATFORM_SYSTEM_CAPABILITIES) {
       expect(
         platformCapabilityMatrix.some(
-          (row) => row.id === capability.id || row.inventoryEntry === capability.id
+          (row) => row.id === capability.id || row.inventoryEntry === capability.id,
         ),
-        capability.id
+        capability.id,
       ).toBe(true);
     }
   });
@@ -99,8 +115,12 @@ describe('platform capability matrix', () => {
     const markdown = formatPlatformCapabilityMatrixDocument();
 
     expect(markdown).toContain('# Platform Capability Matrix');
-    expect(markdown).toContain('| Capability | Frontend Route | Inventory Entry | AI Launch Alias | Backend Service | API Endpoint | Test Coverage | Status |');
+    expect(markdown).toContain(
+      '| Capability | Frontend Route | Inventory Entry | AI Launch Alias | Backend Service | API Endpoint | Test Coverage | Status |',
+    );
     expect(markdown).toContain('| Hospital Map | `/hospital-map` | `hospital-map` | "show map" |');
-    expect(markdown).toContain('- Every row has capability, route, inventory entry, AI alias, backend service, endpoint, tests, and status: pass');
+    expect(markdown).toContain(
+      '- Every row has capability, route, inventory entry, AI alias, backend service, endpoint, tests, and status: pass',
+    );
   });
 });

@@ -33,7 +33,8 @@ export const RECEPTION_SKILLS: Readonly<Record<ReceptionSkillId, ReceptionSkillD
       id: 'lookup_before_create',
       label: 'Find before create',
       clerkBehavior: 'Search name, date of birth, or health card before opening a new chart.',
-      trainingHint: 'Most return visits already have a record. Search first — it is faster than re-typing.',
+      trainingHint:
+        'Most return visits already have a record. Search first — it is faster than re-typing.',
       surgeCritical: true,
     },
     rapid_walk_in: {
@@ -47,7 +48,8 @@ export const RECEPTION_SKILLS: Readonly<Record<ReceptionSkillId, ReceptionSkillD
       id: 'crash_registration',
       label: 'Crash / unknown',
       clerkBehavior: 'When the patient is critical or unknown, send to the nurse immediately.',
-      trainingHint: 'Chief complaint or red flags only. Identity can be completed after care starts.',
+      trainingHint:
+        'Chief complaint or red flags only. Identity can be completed after care starts.',
       surgeCritical: true,
     },
     identity_ocr_review: {
@@ -68,7 +70,8 @@ export const RECEPTION_SKILLS: Readonly<Record<ReceptionSkillId, ReceptionSkillD
       id: 'ems_convert',
       label: 'Convert ambulance arrival',
       clerkBehavior: 'Turn an arrived EMS unit into a patient on the verification list.',
-      trainingHint: 'Use pre-arrival data; do not re-interview the crew for fields you already have.',
+      trainingHint:
+        'Use pre-arrival data; do not re-interview the crew for fields you already have.',
       surgeCritical: true,
     },
     admin_defer: {
@@ -89,7 +92,8 @@ export const RECEPTION_SKILLS: Readonly<Record<ReceptionSkillId, ReceptionSkillD
       id: 'language_access',
       label: 'Language access',
       clerkBehavior: 'Capture preferred language and whether an interpreter is needed.',
-      trainingHint: 'Triage and treatment quality depend on language access from the first contact.',
+      trainingHint:
+        'Triage and treatment quality depend on language access from the first contact.',
       surgeCritical: false,
     },
     interrupt_resume: {
@@ -163,7 +167,14 @@ export type ReceptionNextBestAction = {
   title: string;
   detail: string;
   tone: 'critical' | 'warning' | 'info' | 'neutral';
-  primaryCta?: 'lookup' | 'route' | 'crash' | 'resolve_duplicate' | 'ems' | 'resume_draft' | 'clear_shift';
+  primaryCta?:
+    | 'lookup'
+    | 'route'
+    | 'crash'
+    | 'resolve_duplicate'
+    | 'ems'
+    | 'resume_draft'
+    | 'clear_shift';
 };
 
 function hasSkill(skillIds: readonly ReceptionSkillId[], id: ReceptionSkillId): boolean {
@@ -197,7 +208,8 @@ export function resolveReceptionNextBestAction(
     return {
       skillId: 'duplicate_resolution',
       title: 'Likely existing chart',
-      detail: 'Confirm with the patient whether this is a return visit before creating a new record.',
+      detail:
+        'Confirm with the patient whether this is a return visit before creating a new record.',
       tone: 'warning',
       primaryCta: 'resolve_duplicate',
     };
@@ -261,7 +273,8 @@ export function resolveReceptionNextBestAction(
     return {
       skillId: 'shift_clearance',
       title: 'Lists are growing',
-      detail: 'Work ID-check and waiting-for-nurse lists so nothing is left hanging for the next shift.',
+      detail:
+        'Work ID-check and waiting-for-nurse lists so nothing is left hanging for the next shift.',
       tone: 'warning',
       primaryCta: 'clear_shift',
     };

@@ -98,8 +98,12 @@ function parseSex(text: string): string | undefined {
 function parseNames(text: string): Pick<IdArtifactDemographics, 'firstName' | 'lastName'> {
   const result: Pick<IdArtifactDemographics, 'firstName' | 'lastName'> = {};
 
-  const first = text.match(/\b(?:first\s*name|given\s*name|prénom)\s*[-:]\s*([A-Za-z][A-Za-z' -]{0,40})\b/i);
-  const last = text.match(/\b(?:last\s*name|surname|family\s*name|nom)\s*[-:]\s*([A-Za-z][A-Za-z' -]{0,40})\b/i);
+  const first = text.match(
+    /\b(?:first\s*name|given\s*name|prénom)\s*[-:]\s*([A-Za-z][A-Za-z' -]{0,40})\b/i,
+  );
+  const last = text.match(
+    /\b(?:last\s*name|surname|family\s*name|nom)\s*[-:]\s*([A-Za-z][A-Za-z' -]{0,40})\b/i,
+  );
   if (first) result.firstName = titleCaseName(first[1].trim());
   if (last) result.lastName = titleCaseName(last[1].trim());
   if (result.firstName && result.lastName) return result;
@@ -118,7 +122,9 @@ function parseNames(text: string): Pick<IdArtifactDemographics, 'firstName' | 'l
   return result;
 }
 
-function parseIdentifiers(text: string): Pick<IdArtifactDemographics, 'healthCardNumber' | 'mrn' | 'documentNumber'> {
+function parseIdentifiers(
+  text: string,
+): Pick<IdArtifactDemographics, 'healthCardNumber' | 'mrn' | 'documentNumber'> {
   const healthCard = text.match(
     /\b(?:health\s*card|hcn|ohip|ramq|phn|health\s*#)\s*[-#:]?\s*([A-Z0-9][-A-Z0-9 ]{4,})\b/i,
   );
@@ -142,8 +148,7 @@ export function inferTextHintsFromFilename(filename: string): string {
 
   if (!base) return '';
 
-  const blood =
-    base.match(/\b(AB|A|B|O)([+-])\b/i) || base.match(/(?:^|\s)(AB|A|B|O)([+-])$/i);
+  const blood = base.match(/\b(AB|A|B|O)([+-])\b/i) || base.match(/(?:^|\s)(AB|A|B|O)([+-])$/i);
   const isoDob = base.match(/\b([0-9]{4}-[0-9]{2}-[0-9]{2})\b/);
   const slashDob = base.match(/\b([0-9]{1,2}[/.-][0-9]{1,2}[/.-][0-9]{2,4})\b/);
 
@@ -201,7 +206,9 @@ export function parseIdArtifactText(text = ''): IdArtifactDemographics {
   const bloodType = parseBloodType(normalized);
   if (bloodType) demographics.bloodType = bloodType;
 
-  const nationality = normalized.match(/\b(?:nationality|citizen(?:ship)?)\s*[-:]\s*([A-Za-z][A-Za-z ]{2,30})\b/i);
+  const nationality = normalized.match(
+    /\b(?:nationality|citizen(?:ship)?)\s*[-:]\s*([A-Za-z][A-Za-z ]{2,30})\b/i,
+  );
   if (nationality?.[1]) demographics.nationality = titleCaseName(nationality[1].trim());
 
   const expiry = normalized.match(

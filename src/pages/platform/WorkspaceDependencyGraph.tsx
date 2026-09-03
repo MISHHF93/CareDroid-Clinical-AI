@@ -19,7 +19,10 @@ export function WorkspaceDependencyGraphPage() {
   useRouteChromeRegistration({ title: 'Workspace Dependency Graph' });
   const graph = useMemo(() => buildWorkspaceDependencyGraph(), []);
   const typeChart = useMemo(() => buildWorkspaceDependencyTypeChart(graph.edges), [graph.edges]);
-  const strengthChart = useMemo(() => buildWorkspaceDependencyStrengthChart(graph.edges), [graph.edges]);
+  const strengthChart = useMemo(
+    () => buildWorkspaceDependencyStrengthChart(graph.edges),
+    [graph.edges],
+  );
 
   return (
     <main className="workspace-graph-page" aria-label="Workspace dependency graph">
@@ -27,7 +30,9 @@ export function WorkspaceDependencyGraphPage() {
         <div className="workspace-graph-page__title-row">
           <GraphicIconBadge iconKey="layout-dashboard" accent="brand" size="md" />
           <div>
-            <p className="workspace-graph-page-title-text" data-testid="cd-page-title-text">Workspace Dependency Graph</p>
+            <p className="workspace-graph-page-title-text" data-testid="cd-page-title-text">
+              Workspace Dependency Graph
+            </p>
             <p>Cross-workspace handoffs, signals, workflows, and operational dependencies.</p>
           </div>
         </div>
@@ -45,20 +50,43 @@ export function WorkspaceDependencyGraphPage() {
         details="Demo cross-workspace edges from canonical workspace registry with clinical and operational handoff evidence."
       />
 
-      <div className="workspace-graph-page__metrics" role="group" aria-label="Workspace dependency summary metrics">
-        <MetricCard label="Workspaces" value={String(graph.summary.workspaceCount)} hint="Linked nodes" tone="neutral" />
-        <MetricCard label="Dependencies" value={String(graph.summary.dependencyCount)} hint="Directed edges" tone="neutral" />
+      <div
+        className="workspace-graph-page__metrics"
+        role="group"
+        aria-label="Workspace dependency summary metrics"
+      >
+        <MetricCard
+          label="Workspaces"
+          value={String(graph.summary.workspaceCount)}
+          hint="Linked nodes"
+          tone="neutral"
+        />
+        <MetricCard
+          label="Dependencies"
+          value={String(graph.summary.dependencyCount)}
+          hint="Directed edges"
+          tone="neutral"
+        />
         <MetricCard
           label="High strength"
           value={String(graph.summary.highStrengthDependencyCount)}
           hint="Strength ≥ 85"
           tone="good"
         />
-        <MetricCard label="Chains" value={String(graph.summary.chainCount)} hint="Multi-hop paths" tone="neutral" />
+        <MetricCard
+          label="Chains"
+          value={String(graph.summary.chainCount)}
+          hint="Multi-hop paths"
+          tone="neutral"
+        />
       </div>
 
       <div className="workspace-graph-page__charts">
-        <VisualizationPanel title="Dependency types" description="Handoff, signal, workflow, and operational dependency mix." badge="Types">
+        <VisualizationPanel
+          title="Dependency types"
+          description="Handoff, signal, workflow, and operational dependency mix."
+          badge="Types"
+        >
           <CategoryBarChart
             data={typeChart.filter((row) => row.value > 0)}
             title="Dependency types"
@@ -66,7 +94,11 @@ export function WorkspaceDependencyGraphPage() {
             emptyMessage="Type chart appears when workspace edges are registered."
           />
         </VisualizationPanel>
-        <VisualizationPanel title="Edge strength" description="Dependency strength scores across workspace pairs." badge="Strength">
+        <VisualizationPanel
+          title="Edge strength"
+          description="Dependency strength scores across workspace pairs."
+          badge="Strength"
+        >
           <CategoryBarChart
             data={strengthChart}
             title="Edge strength"
@@ -90,7 +122,11 @@ export function WorkspaceDependencyGraphPage() {
 
       <section className="workspace-graph-page__panel" aria-label="Workspace dependencies">
         <h2>Workspace edges</h2>
-        <div className="workspace-graph-page__table" role="table" aria-label="Workspace dependency edges">
+        <div
+          className="workspace-graph-page__table"
+          role="table"
+          aria-label="Workspace dependency edges"
+        >
           <div className="workspace-graph-page__table-head" role="row">
             <span role="columnheader">Source</span>
             <span role="columnheader">Target</span>
@@ -104,7 +140,9 @@ export function WorkspaceDependencyGraphPage() {
               <span role="cell">{edge.targetLabel}</span>
               <span role="cell">{edge.type.replace(/-/g, ' ')}</span>
               <span role="cell">
-                <span className={`workspace-graph-page__pill workspace-graph-page__pill--${workspaceDependencyStrengthTone(edge.strength)}`}>
+                <span
+                  className={`workspace-graph-page__pill workspace-graph-page__pill--${workspaceDependencyStrengthTone(edge.strength)}`}
+                >
                   {edge.strength}
                 </span>
               </span>

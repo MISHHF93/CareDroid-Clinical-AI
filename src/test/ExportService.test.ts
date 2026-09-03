@@ -213,9 +213,9 @@ describe('ExportService', () => {
         end: new Date('2024-01-31'),
       };
 
-      await expect(
-        service.generateReport('invalid-template', dateRange)
-      ).rejects.toThrow('Template not found');
+      await expect(service.generateReport('invalid-template', dateRange)).rejects.toThrow(
+        'Template not found',
+      );
     });
 
     it('should reject unsupported format', async () => {
@@ -226,9 +226,9 @@ describe('ExportService', () => {
         end: new Date('2024-01-31'),
       };
 
-      await expect(
-        service.generateReport('cost_summary', dateRange, 'xml')
-      ).rejects.toThrow('Format not supported');
+      await expect(service.generateReport('cost_summary', dateRange, 'xml')).rejects.toThrow(
+        'Format not supported',
+      );
     });
   });
 
@@ -270,7 +270,7 @@ describe('ExportService', () => {
         'cost_summary',
         { frequency: 'daily', time: '09:00' },
         ['user@example.com'],
-        'pdf'
+        'pdf',
       );
 
       expect(scheduled).toHaveProperty('id');
@@ -318,11 +318,9 @@ describe('ExportService', () => {
         }),
       } as unknown as Response);
 
-      await service.scheduleReport(
-        'cost_summary',
-        { frequency: 'daily', time: '09:00' },
-        ['user@example.com']
-      );
+      await service.scheduleReport('cost_summary', { frequency: 'daily', time: '09:00' }, [
+        'user@example.com',
+      ]);
 
       const reports = service.getScheduledReports();
 
@@ -337,11 +335,9 @@ describe('ExportService', () => {
         }),
       } as unknown as Response);
 
-      await service.scheduleReport(
-        'cost_summary',
-        { frequency: 'daily', time: '09:00' },
-        ['user@example.com']
-      );
+      await service.scheduleReport('cost_summary', { frequency: 'daily', time: '09:00' }, [
+        'user@example.com',
+      ]);
 
       const reports = service.getScheduledReports('cost_summary');
 
@@ -354,11 +350,9 @@ describe('ExportService', () => {
         json: async () => ({ id: 'scheduled-123' }),
       } as unknown as Response);
 
-      await service.scheduleReport(
-        'cost_summary',
-        { frequency: 'daily', time: '09:00' },
-        ['user@example.com']
-      );
+      await service.scheduleReport('cost_summary', { frequency: 'daily', time: '09:00' }, [
+        'user@example.com',
+      ]);
 
       vi.mocked(global.fetch).mockResolvedValueOnce({
         ok: true,

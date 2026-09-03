@@ -72,17 +72,38 @@ export function computeCageResult(raw) {
       components: answers,
       safetyAlert:
         'Assess intoxication, withdrawal risk, co-ingestions, trauma, pregnancy, and immediate safety using local protocols when clinically relevant.',
-    }
+    },
   );
 }
 
 export function computeMmseResult(raw) {
   const errors = [] as any[];
   const domains = {
-    orientationTime: requireIntegerRange(raw, 'orientationTime', 'orientation to time', 0, 5, errors),
-    orientationPlace: requireIntegerRange(raw, 'orientationPlace', 'orientation to place', 0, 5, errors),
+    orientationTime: requireIntegerRange(
+      raw,
+      'orientationTime',
+      'orientation to time',
+      0,
+      5,
+      errors,
+    ),
+    orientationPlace: requireIntegerRange(
+      raw,
+      'orientationPlace',
+      'orientation to place',
+      0,
+      5,
+      errors,
+    ),
     registration: requireIntegerRange(raw, 'registration', 'registration', 0, 3, errors),
-    attentionCalculation: requireIntegerRange(raw, 'attentionCalculation', 'attention/calculation', 0, 5, errors),
+    attentionCalculation: requireIntegerRange(
+      raw,
+      'attentionCalculation',
+      'attention/calculation',
+      0,
+      5,
+      errors,
+    ),
     recall: requireIntegerRange(raw, 'recall', 'recall', 0, 3, errors),
     language: requireIntegerRange(raw, 'language', 'language', 0, 8, errors),
     visuospatial: requireIntegerRange(raw, 'visuospatial', 'visuospatial copying', 0, 1, errors),
@@ -108,21 +129,44 @@ export function computeMmseResult(raw) {
       components: domains,
       safetyAlert:
         'Acute confusion, rapidly changing mental status, intoxication, trauma, infection, hypoxia, or neurologic deficit requires urgent medical evaluation before routine cognitive screening.',
-    }
+    },
   );
 }
 
 export function computeMocaPlaceholderWorkflow(raw) {
   const errors = [] as any[];
-  const officialFormAvailable = requireYesNo(raw, 'officialFormAvailable', 'whether the official MoCA form is available', errors);
-  const trainedAdministrator = requireYesNo(raw, 'trainedAdministrator', 'whether a trained administrator will perform the MoCA', errors);
-  const accommodationsReviewed = requireYesNo(raw, 'accommodationsReviewed', 'whether language, vision, hearing, motor, and education context was reviewed', errors);
-  const humanReviewPlan = requireYesNo(raw, 'humanReviewPlan', 'whether clinician review is planned', errors);
+  const officialFormAvailable = requireYesNo(
+    raw,
+    'officialFormAvailable',
+    'whether the official MoCA form is available',
+    errors,
+  );
+  const trainedAdministrator = requireYesNo(
+    raw,
+    'trainedAdministrator',
+    'whether a trained administrator will perform the MoCA',
+    errors,
+  );
+  const accommodationsReviewed = requireYesNo(
+    raw,
+    'accommodationsReviewed',
+    'whether language, vision, hearing, motor, and education context was reviewed',
+    errors,
+  );
+  const humanReviewPlan = requireYesNo(
+    raw,
+    'humanReviewPlan',
+    'whether clinician review is planned',
+    errors,
+  );
   if (errors.length) return { ok: false as const, errors };
 
-  const blocked = officialFormAvailable === 'no' || trainedAdministrator === 'no' || humanReviewPlan === 'no';
+  const blocked =
+    officialFormAvailable === 'no' || trainedAdministrator === 'no' || humanReviewPlan === 'no';
   return result(
-    blocked ? 'MoCA workflow blocked pending governance' : 'MoCA workflow ready for governed administration',
+    blocked
+      ? 'MoCA workflow blocked pending governance'
+      : 'MoCA workflow ready for governed administration',
     blocked
       ? 'This placeholder does not administer or score MoCA. Use the official MoCA instrument, required permissions/training, validated language version, and clinician review before documenting results.'
       : 'Proceed only with the official MoCA workflow and clinician review. This placeholder does not display items, calculate a score, diagnose cognitive impairment, or recommend treatment.',
@@ -130,15 +174,30 @@ export function computeMocaPlaceholderWorkflow(raw) {
     'Nasreddine ZS, et al. The Montreal Cognitive Assessment, MoCA: a brief screening tool for mild cognitive impairment. J Am Geriatr Soc. 2005;53(4):695-699.',
     {
       score: blocked ? 'blocked' : 'ready',
-      components: { officialFormAvailable, trainedAdministrator, accommodationsReviewed, humanReviewPlan },
-    }
+      components: {
+        officialFormAvailable,
+        trainedAdministrator,
+        accommodationsReviewed,
+        humanReviewPlan,
+      },
+    },
   );
 }
 
 export function computePcl5Result(raw) {
   const errors = [] as any[];
-  const eventCriterionReviewed = requireYesNo(raw, 'eventCriterionReviewed', 'whether trauma exposure context was reviewed', errors);
-  const currentSafetyConcern = requireYesNo(raw, 'currentSafetyConcern', 'whether current self-harm, suicidal ideation, or danger is present', errors);
+  const eventCriterionReviewed = requireYesNo(
+    raw,
+    'eventCriterionReviewed',
+    'whether trauma exposure context was reviewed',
+    errors,
+  );
+  const currentSafetyConcern = requireYesNo(
+    raw,
+    'currentSafetyConcern',
+    'whether current self-harm, suicidal ideation, or danger is present',
+    errors,
+  );
   const items: any = {};
   for (let i = 1; i <= 20; i += 1) {
     items[`q${i}`] = requireIntegerRange(raw, `q${i}`, `PCL-5 item ${i}`, 0, 4, errors);
@@ -166,22 +225,33 @@ export function computePcl5Result(raw) {
       components: { eventCriterionReviewed, currentSafetyConcern },
       itemScores: items,
       safetyAlert: crisisSensitive ? CRISIS_SENSITIVE_SAFETY_MESSAGE : null,
-    }
+    },
   );
 }
 
 export function computeMdqResult(raw) {
   const errors = [] as any[];
   const symptomCount = requireIntegerRange(raw, 'symptomCount', 'MDQ symptom count', 0, 13, errors);
-  const samePeriod = requireYesNo(raw, 'samePeriod', 'whether symptoms occurred during the same period', errors);
+  const samePeriod = requireYesNo(
+    raw,
+    'samePeriod',
+    'whether symptoms occurred during the same period',
+    errors,
+  );
   const impairment = raw.impairment;
   if (!['none', 'minor', 'moderate', 'serious'].includes(impairment)) {
     errors.push('Select level of functional impairment.');
   }
-  const urgentSafetyConcern = requireYesNo(raw, 'urgentSafetyConcern', 'whether psychosis, unsafe behavior, suicidal ideation, or danger is present', errors);
+  const urgentSafetyConcern = requireYesNo(
+    raw,
+    'urgentSafetyConcern',
+    'whether psychosis, unsafe behavior, suicidal ideation, or danger is present',
+    errors,
+  );
   if (errors.length) return { ok: false as const, errors };
 
-  const positive = symptomCount >= 7 && samePeriod === 'yes' && ['moderate', 'serious'].includes(impairment);
+  const positive =
+    symptomCount >= 7 && samePeriod === 'yes' && ['moderate', 'serious'].includes(impairment);
   const crisisSensitive = urgentSafetyConcern === 'yes';
   return result(
     crisisSensitive
@@ -198,7 +268,7 @@ export function computeMdqResult(raw) {
       crisisSensitive,
       components: { symptomCount, samePeriod, impairment, urgentSafetyConcern },
       safetyAlert: crisisSensitive ? CRISIS_SENSITIVE_SAFETY_MESSAGE : null,
-    }
+    },
   );
 }
 
@@ -208,11 +278,23 @@ export function computeEpworthSleepinessResult(raw) {
   for (let i = 1; i <= 8; i += 1) {
     items[`q${i}`] = requireIntegerRange(raw, `q${i}`, `Epworth situation ${i}`, 0, 3, errors);
   }
-  const safetySensitiveActivity = requireYesNo(raw, 'safetySensitiveActivity', 'whether safety-sensitive sleepiness is present', errors);
+  const safetySensitiveActivity = requireYesNo(
+    raw,
+    'safetySensitiveActivity',
+    'whether safety-sensitive sleepiness is present',
+    errors,
+  );
   if (errors.length) return { ok: false as const, errors };
 
   const score = Object.values(items).reduce<number>((sum, value) => sum + (value as number), 0);
-  const severity = safetySensitiveActivity === 'yes' ? 'critical' : score >= 16 ? 'warning' : score >= 11 ? 'warning' : 'normal';
+  const severity =
+    safetySensitiveActivity === 'yes'
+      ? 'critical'
+      : score >= 16
+        ? 'warning'
+        : score >= 11
+          ? 'warning'
+          : 'normal';
   const label =
     score >= 16
       ? `Epworth very elevated sleepiness range (${score}/24)`
@@ -233,17 +315,37 @@ export function computeEpworthSleepinessResult(raw) {
         safetySensitiveActivity === 'yes'
           ? 'Sleepiness during driving, operating machinery, clinical duties, or other safety-sensitive activity requires prompt human review and local safety policy.'
           : null,
-    }
+    },
   );
 }
 
 export function computeColumbiaSuicideSeverityWorkflow(raw) {
   const errors = [] as any[];
   const ideation = requireYesNo(raw, 'ideation', 'whether suicidal ideation is disclosed', errors);
-  const intentOrPlan = requireYesNo(raw, 'intentOrPlan', 'whether suicidal intent or plan is disclosed', errors);
-  const behavior = requireYesNo(raw, 'behavior', 'whether recent suicidal behavior or preparatory behavior is disclosed', errors);
-  const currentUnsafe = requireYesNo(raw, 'currentUnsafe', 'whether the person cannot be kept safe right now', errors);
-  const directHumanReview = requireYesNo(raw, 'directHumanReview', 'whether direct human review is arranged', errors);
+  const intentOrPlan = requireYesNo(
+    raw,
+    'intentOrPlan',
+    'whether suicidal intent or plan is disclosed',
+    errors,
+  );
+  const behavior = requireYesNo(
+    raw,
+    'behavior',
+    'whether recent suicidal behavior or preparatory behavior is disclosed',
+    errors,
+  );
+  const currentUnsafe = requireYesNo(
+    raw,
+    'currentUnsafe',
+    'whether the person cannot be kept safe right now',
+    errors,
+  );
+  const directHumanReview = requireYesNo(
+    raw,
+    'directHumanReview',
+    'whether direct human review is arranged',
+    errors,
+  );
   if (errors.length) return { ok: false as const, errors };
 
   const crisisSensitive = [ideation, intentOrPlan, behavior, currentUnsafe].includes('yes');
@@ -251,7 +353,9 @@ export function computeColumbiaSuicideSeverityWorkflow(raw) {
   const severity = crisisSensitive || reviewGap ? 'critical' : 'warning';
 
   return result(
-    crisisSensitive ? 'Columbia suicide severity workflow: immediate safety review' : 'Columbia suicide severity workflow: continue clinician review',
+    crisisSensitive
+      ? 'Columbia suicide severity workflow: immediate safety review'
+      : 'Columbia suicide severity workflow: continue clinician review',
     'This is a workflow entry for suicide-risk documentation and routing, not an official C-SSRS administration or score. Any ideation, intent, plan, behavior, inability to maintain safety, or missing direct review requires urgent local safety workflow.',
     severity,
     'Posner K, et al. The Columbia-Suicide Severity Rating Scale: initial validity and internal consistency findings. Am J Psychiatry. 2011;168(12):1266-1277.',
@@ -260,6 +364,6 @@ export function computeColumbiaSuicideSeverityWorkflow(raw) {
       crisisSensitive,
       components: { ideation, intentOrPlan, behavior, currentUnsafe, directHumanReview },
       safetyAlert: CRISIS_SENSITIVE_SAFETY_MESSAGE,
-    }
+    },
   );
 }

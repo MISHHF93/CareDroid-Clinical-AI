@@ -23,9 +23,9 @@ describe('clinicOnboardingModel', () => {
     const report = simulateClinicOnboarding();
     expect(report.organization.organizationType).toBe('clinic');
     expect(report.summary.completeSteps).toBeGreaterThanOrEqual(4);
-    expect(report.steps.find((step) => step.id === CLINIC_ONBOARDING_STEP_IDS.THRESHOLDS)?.status).toBe(
-      'complete',
-    );
+    expect(
+      report.steps.find((step) => step.id === CLINIC_ONBOARDING_STEP_IDS.THRESHOLDS)?.status,
+    ).toBe('complete');
   });
 
   it('flags friction when emergency OS is not provisioned', () => {

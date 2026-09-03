@@ -41,8 +41,8 @@ function DecisionSupportNotice({ children }) {
   return (
     <div className="calc-timi-disclaimer calc-has-bled-disclaimer" role="note">
       <p className="calc-ds-lead">
-        <strong>Decision support only.</strong> Does not establish a diagnosis, rule out disease with certainty,
-        recommend treatment, or replace clinician judgment.
+        <strong>Decision support only.</strong> Does not establish a diagnosis, rule out disease
+        with certainty, recommend treatment, or replace clinician judgment.
       </p>
       <p className="calc-disclaimer-detail">{children}</p>
     </div>
@@ -156,10 +156,18 @@ function CalculatorShell({
             <section className={`calc-interpretation-box ${severity}`}>
               <h3 className="calc-interpretation-title">{titleText}</h3>
               <p>{result.interpretation}</p>
-              {result.safetyDisclaimer ? <p className="calc-disclaimer-detail">{result.safetyDisclaimer}</p> : null}
-              {result.disclaimer ? <p className="calc-disclaimer-detail">{result.disclaimer}</p> : null}
-              {result.pathwayDisclaimer ? <p className="calc-disclaimer-detail">{result.pathwayDisclaimer}</p> : null}
-              {result.referenceLine ? <p className="calc-reference-line">{result.referenceLine}</p> : null}
+              {result.safetyDisclaimer ? (
+                <p className="calc-disclaimer-detail">{result.safetyDisclaimer}</p>
+              ) : null}
+              {result.disclaimer ? (
+                <p className="calc-disclaimer-detail">{result.disclaimer}</p>
+              ) : null}
+              {result.pathwayDisclaimer ? (
+                <p className="calc-disclaimer-detail">{result.pathwayDisclaimer}</p>
+              ) : null}
+              {result.referenceLine ? (
+                <p className="calc-reference-line">{result.referenceLine}</p>
+              ) : null}
             </section>
             <p className="calc-result-safety-footer" role="note">
               Output reflects the values entered and may omit important clinical context.
@@ -222,7 +230,14 @@ export function WellsPeCalculator({ onResultChange }) {
           <button type="submit" className="calc-calculate-btn">
             Calculate Wells PE
           </button>
-          <button type="button" className="calc-reset-btn" onClick={() => { setInputs(initial()); setResult(null); }}>
+          <button
+            type="button"
+            className="calc-reset-btn"
+            onClick={() => {
+              setInputs(initial());
+              setResult(null);
+            }}
+          >
             Reset
           </button>
         </div>
@@ -240,7 +255,9 @@ export function PercCalculator({ onResultChange }) {
   const calculate = (event) => {
     event.preventDefault();
     const evaluation = evaluatePerc(inputs);
-    const interpretation = interpretPerc(evaluation, { lowPretestProbabilityAcknowledged: lowPretest });
+    const interpretation = interpretPerc(evaluation, {
+      lowPretestProbabilityAcknowledged: lowPretest,
+    });
     setResult(interpretation ? { ...interpretation, ...evaluation } : null);
   };
 
@@ -252,7 +269,9 @@ export function PercCalculator({ onResultChange }) {
       result={result}
       emptyText="Confirm low pre-test probability and PERC criteria."
       scoreLabel="PERC status"
-      scoreDisplay={result ? (result.satisfied ? 'Satisfied' : `${result.unmetKeys.length} unmet`) : ''}
+      scoreDisplay={
+        result ? (result.satisfied ? 'Satisfied' : `${result.unmetKeys.length} unmet`) : ''
+      }
       onResultChange={onResultChange}
     >
       <form className="calc-pr1-form" onSubmit={calculate}>
@@ -287,7 +306,15 @@ export function PercCalculator({ onResultChange }) {
           <button type="submit" className="calc-calculate-btn">
             Calculate PERC
           </button>
-          <button type="button" className="calc-reset-btn" onClick={() => { setInputs(initial()); setLowPretest(false); setResult(null); }}>
+          <button
+            type="button"
+            className="calc-reset-btn"
+            onClick={() => {
+              setInputs(initial());
+              setLowPretest(false);
+              setResult(null);
+            }}
+          >
             Reset
           </button>
         </div>
@@ -339,19 +366,57 @@ export function GraceAcsCalculator({ onResultChange }) {
       <form className="calc-pr1-form" onSubmit={calculate}>
         <ValidationErrors errors={errors} />
         <div className="calc-input-grid">
-          <NumberField slug="grace-acs" name="ageYears" label="Age (years)" value={values.ageYears} onChange={update} min="18" max="120" />
-          <NumberField slug="grace-acs" name="heartRateBpm" label="Heart rate (bpm)" value={values.heartRateBpm} onChange={update} min="20" max="300" />
-          <NumberField slug="grace-acs" name="systolicBpMmHg" label="Systolic BP (mmHg)" value={values.systolicBpMmHg} onChange={update} min="50" max="300" />
-          <NumberField slug="grace-acs" name="creatinineMgDl" label="Creatinine (mg/dL)" value={values.creatinineMgDl} onChange={update} min="0.1" max="25" />
+          <NumberField
+            slug="grace-acs"
+            name="ageYears"
+            label="Age (years)"
+            value={values.ageYears}
+            onChange={update}
+            min="18"
+            max="120"
+          />
+          <NumberField
+            slug="grace-acs"
+            name="heartRateBpm"
+            label="Heart rate (bpm)"
+            value={values.heartRateBpm}
+            onChange={update}
+            min="20"
+            max="300"
+          />
+          <NumberField
+            slug="grace-acs"
+            name="systolicBpMmHg"
+            label="Systolic BP (mmHg)"
+            value={values.systolicBpMmHg}
+            onChange={update}
+            min="50"
+            max="300"
+          />
+          <NumberField
+            slug="grace-acs"
+            name="creatinineMgDl"
+            label="Creatinine (mg/dL)"
+            value={values.creatinineMgDl}
+            onChange={update}
+            min="0.1"
+            max="25"
+          />
           <div className="calc-input-group">
-            <label className="calc-input-label" htmlFor="grace-acs-killipClass">Killip class</label>
+            <label className="calc-input-label" htmlFor="grace-acs-killipClass">
+              Killip class
+            </label>
             <select
               id="grace-acs-killipClass"
               className="calc-input-field"
               value={values.killipClass}
               onChange={(event) => update('killipClass', event.target.value)}
             >
-              {['I', 'II', 'III', 'IV'].map((item) => <option key={item} value={item}>{item}</option>)}
+              {['I', 'II', 'III', 'IV'].map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
             </select>
           </div>
         </div>
@@ -372,8 +437,19 @@ export function GraceAcsCalculator({ onResultChange }) {
           ))}
         </fieldset>
         <div className="calc-actions">
-          <button type="submit" className="calc-calculate-btn">Calculate GRACE ACS</button>
-          <button type="button" className="calc-reset-btn" onClick={() => { setResult(null); setErrors([]); }}>Clear Result</button>
+          <button type="submit" className="calc-calculate-btn">
+            Calculate GRACE ACS
+          </button>
+          <button
+            type="button"
+            className="calc-reset-btn"
+            onClick={() => {
+              setResult(null);
+              setErrors([]);
+            }}
+          >
+            Clear Result
+          </button>
         </div>
       </form>
     </CalculatorShell>
@@ -415,26 +491,51 @@ export function NihssCalculator({ onResultChange }) {
         <ValidationErrors errors={errors} />
         <div className="calc-input-grid">
           {NIHSS_ITEM_META.map((item) => {
-            const options = Array.from({ length: item.max - item.min + 1 }, (_, index) => item.min + index);
+            const options = Array.from(
+              { length: item.max - item.min + 1 },
+              (_, index) => item.min + index,
+            );
             return (
               <div className="calc-input-group" key={item.key}>
-                <label className="calc-input-label" htmlFor={`nihss-${item.key}`}>{item.label}</label>
+                <label className="calc-input-label" htmlFor={`nihss-${item.key}`}>
+                  {item.label}
+                </label>
                 <select
                   id={`nihss-${item.key}`}
                   className="calc-input-field"
                   value={scores[item.key]}
-                  onChange={(event) => setScores((prev) => ({ ...prev, [item.key]: event.target.value }))}
+                  onChange={(event) =>
+                    setScores((prev) => ({ ...prev, [item.key]: event.target.value }))
+                  }
                 >
-                  {options.map((value) => <option key={value} value={value}>{value}</option>)}
-                  {item.untestableCode !== null ? <option value={item.untestableCode}>{item.untestableCode} - untestable</option> : null}
+                  {options.map((value) => (
+                    <option key={value} value={value}>
+                      {value}
+                    </option>
+                  ))}
+                  {item.untestableCode !== null ? (
+                    <option value={item.untestableCode}>{item.untestableCode} - untestable</option>
+                  ) : null}
                 </select>
               </div>
             );
           })}
         </div>
         <div className="calc-actions">
-          <button type="submit" className="calc-calculate-btn">Calculate NIHSS</button>
-          <button type="button" className="calc-reset-btn" onClick={() => { setScores(initial()); setResult(null); setErrors([]); }}>Reset</button>
+          <button type="submit" className="calc-calculate-btn">
+            Calculate NIHSS
+          </button>
+          <button
+            type="button"
+            className="calc-reset-btn"
+            onClick={() => {
+              setScores(initial());
+              setResult(null);
+              setErrors([]);
+            }}
+          >
+            Reset
+          </button>
         </div>
       </form>
     </CalculatorShell>
@@ -446,7 +547,10 @@ export function CanadianCSpineCalculator({ onResultChange }) {
   const lowInitial = () => resetObject(CCR_LOW_RISK_META.map((item) => item.key));
   const [highRisk, setHighRisk] = useState(highInitial);
   const [lowRisk, setLowRisk] = useState(lowInitial);
-  const [rotation, setRotation] = useState({ activeRotationLeft45: false, activeRotationRight45: false });
+  const [rotation, setRotation] = useState({
+    activeRotationLeft45: false,
+    activeRotationRight45: false,
+  });
   const [applicability, setApplicability] = useState({
     gcs15AndStable: true,
     bluntTraumaContext: true,
@@ -475,7 +579,9 @@ export function CanadianCSpineCalculator({ onResultChange }) {
       result={result}
       emptyText="Complete high-risk, low-risk, and active rotation checks."
       scoreLabel="CCR output"
-      scoreDisplay={result ? (result.imagingIndicatedByRule ? 'Imaging indicated' : 'Not indicated') : ''}
+      scoreDisplay={
+        result ? (result.imagingIndicatedByRule ? 'Imaging indicated' : 'Not indicated') : ''
+      }
       onResultChange={onResultChange}
     >
       <form className="calc-pr1-form" onSubmit={calculate}>
@@ -487,24 +593,69 @@ export function CanadianCSpineCalculator({ onResultChange }) {
             ['unreliableExamOrIntoxication', 'Unreliable exam or intoxication'],
             ['pediatricUnder16', 'Age under 16'],
           ].map(([key, label]) => (
-            <CheckboxField key={key} slug="canadian-c-spine" item={{ key, label }} checked={applicability[key]} onChange={(name, checked) => setApplicability((prev) => ({ ...prev, [name]: checked }))} />
+            <CheckboxField
+              key={key}
+              slug="canadian-c-spine"
+              item={{ key, label }}
+              checked={applicability[key]}
+              onChange={(name, checked) =>
+                setApplicability((prev) => ({ ...prev, [name]: checked }))
+              }
+            />
           ))}
         </fieldset>
         <fieldset className="calc-timi-criteria">
           <legend>High-risk factors</legend>
-          {CCR_HIGH_RISK_META.map((item) => <CheckboxField key={item.key} slug="canadian-c-spine" item={item} checked={highRisk[item.key]} onChange={(key, value) => setHighRisk((prev) => ({ ...prev, [key]: value }))} />)}
+          {CCR_HIGH_RISK_META.map((item) => (
+            <CheckboxField
+              key={item.key}
+              slug="canadian-c-spine"
+              item={item}
+              checked={highRisk[item.key]}
+              onChange={(key, value) => setHighRisk((prev) => ({ ...prev, [key]: value }))}
+            />
+          ))}
         </fieldset>
         <fieldset className="calc-timi-criteria">
           <legend>Low-risk criteria and active rotation</legend>
-          {CCR_LOW_RISK_META.map((item) => <CheckboxField key={item.key} slug="canadian-c-spine" item={item} checked={lowRisk[item.key]} onChange={(key, value) => setLowRisk((prev) => ({ ...prev, [key]: value }))} />)}
+          {CCR_LOW_RISK_META.map((item) => (
+            <CheckboxField
+              key={item.key}
+              slug="canadian-c-spine"
+              item={item}
+              checked={lowRisk[item.key]}
+              onChange={(key, value) => setLowRisk((prev) => ({ ...prev, [key]: value }))}
+            />
+          ))}
           {[
             ['activeRotationLeft45', 'Can actively rotate neck 45° left'],
             ['activeRotationRight45', 'Can actively rotate neck 45° right'],
-          ].map(([key, label]) => <CheckboxField key={key} slug="canadian-c-spine" item={{ key, label }} checked={rotation[key]} onChange={(name, checked) => setRotation((prev) => ({ ...prev, [name]: checked }))} />)}
+          ].map(([key, label]) => (
+            <CheckboxField
+              key={key}
+              slug="canadian-c-spine"
+              item={{ key, label }}
+              checked={rotation[key]}
+              onChange={(name, checked) => setRotation((prev) => ({ ...prev, [name]: checked }))}
+            />
+          ))}
         </fieldset>
         <div className="calc-actions">
-          <button type="submit" className="calc-calculate-btn">Calculate Canadian C-Spine</button>
-          <button type="button" className="calc-reset-btn" onClick={() => { setHighRisk(highInitial()); setLowRisk(lowInitial()); setRotation({ activeRotationLeft45: false, activeRotationRight45: false }); setResult(null); }}>Reset</button>
+          <button type="submit" className="calc-calculate-btn">
+            Calculate Canadian C-Spine
+          </button>
+          <button
+            type="button"
+            className="calc-reset-btn"
+            onClick={() => {
+              setHighRisk(highInitial());
+              setLowRisk(lowInitial());
+              setRotation({ activeRotationLeft45: false, activeRotationRight45: false });
+              setResult(null);
+            }}
+          >
+            Reset
+          </button>
         </div>
       </form>
     </CalculatorShell>
@@ -512,15 +663,16 @@ export function CanadianCSpineCalculator({ onResultChange }) {
 }
 
 export function OttawaAnkleCalculator({ onResultChange }) {
-  const examInitial = () => resetObject([
-    'painMalleolarZone',
-    'tendernessLateralMalleolus',
-    'tendernessMedialMalleolus',
-    'painMidfootZone',
-    'tendernessNavicular',
-    'tendernessFifthMetatarsalBase',
-    'unableToBearWeightBothTimes',
-  ]);
+  const examInitial = () =>
+    resetObject([
+      'painMalleolarZone',
+      'tendernessLateralMalleolus',
+      'tendernessMedialMalleolus',
+      'painMidfootZone',
+      'tendernessNavicular',
+      'tendernessFifthMetatarsalBase',
+      'unableToBearWeightBothTimes',
+    ]);
   const [exam, setExam] = useState(examInitial);
   const [applicability, setApplicability] = useState({
     acuteAnkleFootInjury: true,
@@ -535,8 +687,8 @@ export function OttawaAnkleCalculator({ onResultChange }) {
     event.preventDefault();
     const hardStop = Boolean(
       applicability.neurovascularCompromise ||
-        applicability.openFractureOrGrossDeformity ||
-        applicability.severeTraumaOrMultisystem
+      applicability.openFractureOrGrossDeformity ||
+      applicability.severeTraumaOrMultisystem,
     );
     const applied = applyOttawaAnkleFootRules(exam, {
       applicabilityWarnings: ottawaApplicabilityWarnings(applicability),
@@ -554,7 +706,11 @@ export function OttawaAnkleCalculator({ onResultChange }) {
       result={result}
       emptyText="Complete ankle, foot, and weight-bearing findings."
       scoreLabel="Ottawa output"
-      scoreDisplay={result ? `${result.ankleRadiographIndicated ? 'Ankle x-ray' : 'No ankle x-ray'} / ${result.footRadiographIndicated ? 'Foot x-ray' : 'No foot x-ray'}` : ''}
+      scoreDisplay={
+        result
+          ? `${result.ankleRadiographIndicated ? 'Ankle x-ray' : 'No ankle x-ray'} / ${result.footRadiographIndicated ? 'Foot x-ray' : 'No foot x-ray'}`
+          : ''
+      }
       onResultChange={onResultChange}
     >
       <form className="calc-pr1-form" onSubmit={calculate}>
@@ -566,7 +722,17 @@ export function OttawaAnkleCalculator({ onResultChange }) {
             ['openFractureOrGrossDeformity', 'Open fracture or gross deformity'],
             ['severeTraumaOrMultisystem', 'Severe or multisystem trauma'],
             ['pediatricUnder18', 'Age under 18'],
-          ].map(([key, label]) => <CheckboxField key={key} slug="ottawa-ankle" item={{ key, label }} checked={applicability[key]} onChange={(name, checked) => setApplicability((prev) => ({ ...prev, [name]: checked }))} />)}
+          ].map(([key, label]) => (
+            <CheckboxField
+              key={key}
+              slug="ottawa-ankle"
+              item={{ key, label }}
+              checked={applicability[key]}
+              onChange={(name, checked) =>
+                setApplicability((prev) => ({ ...prev, [name]: checked }))
+              }
+            />
+          ))}
         </fieldset>
         <fieldset className="calc-timi-criteria">
           <legend>Exam findings</legend>
@@ -577,12 +743,34 @@ export function OttawaAnkleCalculator({ onResultChange }) {
             ['painMidfootZone', 'Pain in midfoot zone'],
             ['tendernessNavicular', 'Tenderness at navicular'],
             ['tendernessFifthMetatarsalBase', 'Tenderness base of fifth metatarsal'],
-            ['unableToBearWeightBothTimes', 'Unable to bear weight for 4 steps immediately and now'],
-          ].map(([key, label]) => <CheckboxField key={key} slug="ottawa-ankle" item={{ key, label }} checked={exam[key]} onChange={(name, checked) => setExam((prev) => ({ ...prev, [name]: checked }))} />)}
+            [
+              'unableToBearWeightBothTimes',
+              'Unable to bear weight for 4 steps immediately and now',
+            ],
+          ].map(([key, label]) => (
+            <CheckboxField
+              key={key}
+              slug="ottawa-ankle"
+              item={{ key, label }}
+              checked={exam[key]}
+              onChange={(name, checked) => setExam((prev) => ({ ...prev, [name]: checked }))}
+            />
+          ))}
         </fieldset>
         <div className="calc-actions">
-          <button type="submit" className="calc-calculate-btn">Calculate Ottawa Ankle</button>
-          <button type="button" className="calc-reset-btn" onClick={() => { setExam(examInitial()); setResult(null); }}>Reset</button>
+          <button type="submit" className="calc-calculate-btn">
+            Calculate Ottawa Ankle
+          </button>
+          <button
+            type="button"
+            className="calc-reset-btn"
+            onClick={() => {
+              setExam(examInitial());
+              setResult(null);
+            }}
+          >
+            Reset
+          </button>
         </div>
       </form>
     </CalculatorShell>
@@ -618,11 +806,36 @@ export function NexusCSpineCalculator({ onResultChange }) {
       <form className="calc-pr1-form" onSubmit={calculate}>
         <fieldset className="calc-timi-criteria">
           <legend>NEXUS criteria</legend>
-          {NEXUS_CRITERIA_META.map((item) => <CheckboxField key={item.key} slug="nexus-cspine" item={item} checked={inputs[item.key]} onChange={(key, checked) => setInputs((prev) => ({ ...prev, [key]: checked }))} />)}
+          {NEXUS_CRITERIA_META.map((item) => (
+            <CheckboxField
+              key={item.key}
+              slug="nexus-cspine"
+              item={item}
+              checked={inputs[item.key]}
+              onChange={(key, checked) => setInputs((prev) => ({ ...prev, [key]: checked }))}
+            />
+          ))}
         </fieldset>
         <div className="calc-actions">
-          <button type="submit" className="calc-calculate-btn">Calculate NEXUS C-Spine</button>
-          <button type="button" className="calc-reset-btn" onClick={() => { setInputs({ midlineTenderness: false, intoxication: false, neurologicDeficit: false, distractingInjury: false, normalAlertness: true }); setResult(null); }}>Reset</button>
+          <button type="submit" className="calc-calculate-btn">
+            Calculate NEXUS C-Spine
+          </button>
+          <button
+            type="button"
+            className="calc-reset-btn"
+            onClick={() => {
+              setInputs({
+                midlineTenderness: false,
+                intoxication: false,
+                neurologicDeficit: false,
+                distractingInjury: false,
+                normalAlertness: true,
+              });
+              setResult(null);
+            }}
+          >
+            Reset
+          </button>
         </div>
       </form>
     </CalculatorShell>
@@ -658,9 +871,22 @@ export function PecarnHeadCalculator({ onResultChange }) {
     >
       <form className="calc-pr1-form" onSubmit={calculate}>
         <div className="calc-input-group">
-          <label className="calc-input-label" htmlFor="pecarn-head-ageCategory">Age group</label>
-          <select id="pecarn-head-ageCategory" className="calc-input-field" value={inputs.ageCategory} onChange={(event) => setInputs((prev) => ({ ...prev, ageCategory: event.target.value }))}>
-            {PECARN_AGE_CATEGORIES.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}
+          <label className="calc-input-label" htmlFor="pecarn-head-ageCategory">
+            Age group
+          </label>
+          <select
+            id="pecarn-head-ageCategory"
+            className="calc-input-field"
+            value={inputs.ageCategory}
+            onChange={(event) =>
+              setInputs((prev) => ({ ...prev, ageCategory: event.target.value }))
+            }
+          >
+            {PECARN_AGE_CATEGORIES.map((item) => (
+              <option key={item.value} value={item.value}>
+                {item.label}
+              </option>
+            ))}
           </select>
         </div>
         <fieldset className="calc-timi-criteria">
@@ -671,11 +897,37 @@ export function PecarnHeadCalculator({ onResultChange }) {
             ['vomiting', 'Vomiting'],
             ['severeMechanism', 'Severe mechanism'],
             ['skullFractureSigns', 'Palpable/basilar skull fracture signs'],
-          ].map(([key, label]) => <CheckboxField key={key} slug="pecarn-head" item={{ key, label }} checked={inputs[key]} onChange={(name, checked) => setInputs((prev) => ({ ...prev, [name]: checked }))} />)}
+          ].map(([key, label]) => (
+            <CheckboxField
+              key={key}
+              slug="pecarn-head"
+              item={{ key, label }}
+              checked={inputs[key]}
+              onChange={(name, checked) => setInputs((prev) => ({ ...prev, [name]: checked }))}
+            />
+          ))}
         </fieldset>
         <div className="calc-actions">
-          <button type="submit" className="calc-calculate-btn">Calculate PECARN Head</button>
-          <button type="button" className="calc-reset-btn" onClick={() => { setInputs({ ageCategory: 'under_2', alteredMentalStatus: false, lossOfConsciousness: false, vomiting: false, severeMechanism: false, skullFractureSigns: false }); setResult(null); }}>Reset</button>
+          <button type="submit" className="calc-calculate-btn">
+            Calculate PECARN Head
+          </button>
+          <button
+            type="button"
+            className="calc-reset-btn"
+            onClick={() => {
+              setInputs({
+                ageCategory: 'under_2',
+                alteredMentalStatus: false,
+                lossOfConsciousness: false,
+                vomiting: false,
+                severeMechanism: false,
+                skullFractureSigns: false,
+              });
+              setResult(null);
+            }}
+          >
+            Reset
+          </button>
         </div>
       </form>
     </CalculatorShell>

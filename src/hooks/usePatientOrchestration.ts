@@ -34,15 +34,15 @@ function mergeOrchestrationContexts(
     ...local,
     sourceState: remote.sourceState === 'live' ? 'live' : local.sourceState,
     blockedReasons: { ...remote.blockedReasons, ...local.blockedReasons },
-    workflowActions: local.workflowActions.length ? local.workflowActions : remote.workflowActions ?? [],
-    prioritizedRecommendations:
-      remote.prioritizedRecommendations?.length
-        ? remote.prioritizedRecommendations
-        : local.prioritizedRecommendations ?? [],
-    secondaryRecommendations:
-      remote.secondaryRecommendations?.length
-        ? remote.secondaryRecommendations
-        : local.secondaryRecommendations ?? [],
+    workflowActions: local.workflowActions.length
+      ? local.workflowActions
+      : (remote.workflowActions ?? []),
+    prioritizedRecommendations: remote.prioritizedRecommendations?.length
+      ? remote.prioritizedRecommendations
+      : (local.prioritizedRecommendations ?? []),
+    secondaryRecommendations: remote.secondaryRecommendations?.length
+      ? remote.secondaryRecommendations
+      : (local.secondaryRecommendations ?? []),
   };
 }
 
@@ -101,14 +101,7 @@ export function usePatientOrchestration(
     });
 
     return mergeOrchestrationContexts(localContext, remoteContext);
-  }, [
-    patient,
-    referrals,
-    staff,
-    role,
-    websocket?.connected,
-    remoteContext,
-  ]);
+  }, [patient, referrals, staff, role, websocket?.connected, remoteContext]);
 }
 
 export default usePatientOrchestration;

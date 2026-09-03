@@ -68,7 +68,10 @@ export function deriveWhiteboardOperationalEvents(
     }
   });
 
-  if (!automationEvents.some((timer) => timer.id === 'mse-due') && hasPatientFlag(patient, PatientFlag.PsychAlert)) {
+  if (
+    !automationEvents.some((timer) => timer.id === 'mse-due') &&
+    hasPatientFlag(patient, PatientFlag.PsychAlert)
+  ) {
     icon('mse-due', 'Mental status review');
   }
 
@@ -81,7 +84,10 @@ export function deriveWhiteboardOperationalEvents(
     icon('nurse-review-required');
   }
 
-  if (patient.state === PatientState.Admission || hasPatientFlag(patient, PatientFlag.PendingAdmission)) {
+  if (
+    patient.state === PatientState.Admission ||
+    hasPatientFlag(patient, PatientFlag.PendingAdmission)
+  ) {
     icon('boarding');
     icon('awaiting-bed');
   }
@@ -123,7 +129,10 @@ export function deriveWhiteboardOperationalEvents(
 
   const pendingDocReview = countPendingReviewArtifacts(patient.documentArtifacts);
   if (pendingDocReview > 0) {
-    icon('document-review-pending', `${pendingDocReview} artifact${pendingDocReview === 1 ? '' : 's'} pending review`);
+    icon(
+      'document-review-pending',
+      `${pendingDocReview} artifact${pendingDocReview === 1 ? '' : 's'} pending review`,
+    );
   }
 
   if (patient.source === 'voice-interview' && patient.triagePending) {

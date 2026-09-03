@@ -51,9 +51,7 @@ export function resolvePatientWorkflowRoute(
 ): string {
   const base = resolveWorkflowRouteForState(patient.state, patient.id);
   const encounterId =
-    options.encounterId ??
-    (patient as Patient & { encounterId?: string }).encounterId ??
-    null;
+    options.encounterId ?? (patient as Patient & { encounterId?: string }).encounterId ?? null;
   return appendPatientWorkflowContext(base, {
     patientId: patient.id,
     encounterId,

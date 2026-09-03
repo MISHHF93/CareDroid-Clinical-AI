@@ -167,12 +167,15 @@ export default function SelfCheckin({
   if (checkInFailed) {
     return (
       <main className={rootClassName} aria-labelledby="self-checkin-title">
-        <section className="self-checkin__confirmation self-checkin__confirmation--error" role="alert">
+        <section
+          className="self-checkin__confirmation self-checkin__confirmation--error"
+          role="alert"
+        >
           <h2 id="self-checkin-title">We couldn&apos;t finish your check-in</h2>
           <p>
-            Your information was not saved. Please see the front desk so a staff member can
-            complete your check-in directly -- don&apos;t wait in the seating area for your name to
-            be called.
+            Your information was not saved. Please see the front desk so a staff member can complete
+            your check-in directly -- don&apos;t wait in the seating area for your name to be
+            called.
           </p>
         </section>
       </main>
@@ -185,8 +188,8 @@ export default function SelfCheckin({
         <section className="self-checkin__confirmation" role="status">
           <h2 id="self-checkin-title">You are checked in</h2>
           <p>
-            Please take a seat in the waiting area. A nurse will review your information and call you
-            for triage.
+            Please take a seat in the waiting area. A nurse will review your information and call
+            you for triage.
           </p>
           <dl className="self-checkin__review-list">
             <div>
@@ -234,7 +237,9 @@ export default function SelfCheckin({
       <header className="self-checkin__hero">
         <span>CareDroid digital front door</span>
         <h1 id="self-checkin-title">Emergency self check-in</h1>
-        <p>Four quick steps — usually under two minutes. A nurse confirms everything before triage.</p>
+        <p>
+          Four quick steps — usually under two minutes. A nurse confirms everything before triage.
+        </p>
       </header>
 
       {integrationMessage ? (
@@ -347,7 +352,8 @@ export default function SelfCheckin({
             <section className="self-checkin__preview" aria-live="polite">
               <h3>Provisional routing (staff will confirm)</h3>
               <p>
-                <strong>{triagePreview.esiLabel}</strong> · Suggested area: <strong>{laneLabel}</strong>
+                <strong>{triagePreview.esiLabel}</strong> · Suggested area:{' '}
+                <strong>{laneLabel}</strong>
               </p>
               <p>{triagePreview.reason}</p>
             </section>

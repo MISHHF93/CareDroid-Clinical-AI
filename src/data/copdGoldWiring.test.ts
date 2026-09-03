@@ -22,9 +22,9 @@ const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
 const patternsSource = readFileSync(
   join(
     __dirname,
-    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts'
+    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts',
   ),
-  'utf8'
+  'utf8',
 );
 
 describe('COPD GOLD (Tier B chat-assisted) wiring', () => {
@@ -77,7 +77,7 @@ describe('COPD GOLD (Tier B chat-assisted) wiring', () => {
       expect(launch.path).toBe(PR6_HUB_PATH);
       expect(launch.registryId).toBe(canonical);
       expect(launch.chatSeed).toBe(copdGoldChatConfig.chatSeed);
-    }
+    },
   );
 
   it('resolves hyphenated discovery aliases', () => {

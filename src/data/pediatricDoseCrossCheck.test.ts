@@ -26,7 +26,8 @@ function checkerPerKgDose(name: string): number {
   if (!drug) throw new Error(`Pediatric Dose Safety Checker table has no entry named "${name}"`);
   const text = drug.calc(10);
   const match = text.match(/^([\d.]+)(?:-([\d.]+))?/);
-  if (!match) throw new Error(`Could not parse a numeric per-kg dose out of "${text}" for "${name}"`);
+  if (!match)
+    throw new Error(`Could not parse a numeric per-kg dose out of "${text}" for "${name}"`);
   return Number(match[2] ?? match[1]) / 10;
 }
 
@@ -49,8 +50,12 @@ describe('pediatricDoseCrossCheck', () => {
   it('re-derives, from the two live dosing tables themselves, exactly the set of drugs this module flags as discrepant', () => {
     // This is the actual regression guard: if a future edit to either table changes a
     // per-kg dose, this recomputes the real numeric gap rather than trusting stale notes.
-    const calcIdToName = Object.fromEntries(Object.entries(CALC_NAME_TO_ID).map(([name, id]) => [id, name]));
-    const checkerIdToName = Object.fromEntries(Object.entries(CHECKER_NAME_TO_ID).map(([name, id]) => [id, name]));
+    const calcIdToName = Object.fromEntries(
+      Object.entries(CALC_NAME_TO_ID).map(([name, id]) => [id, name]),
+    );
+    const checkerIdToName = Object.fromEntries(
+      Object.entries(CHECKER_NAME_TO_ID).map(([name, id]) => [id, name]),
+    );
     const linkedIds = Object.keys(calcIdToName).filter((id) => id in checkerIdToName);
 
     const actuallyDiscrepantIds = linkedIds.filter((id) => {

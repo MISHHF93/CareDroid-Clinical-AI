@@ -30,10 +30,7 @@ import {
   KNOWN_TOOL_AREA_PATHS,
   matchCalculatorRoute,
 } from './e2eToolValidationMatrix';
-import {
-  CALCULATOR_ROUTE_DEFS,
-  isKnownToolAreaPath,
-} from '../routes/clinicalToolRoutes';
+import { CALCULATOR_ROUTE_DEFS, isKnownToolAreaPath } from '../routes/clinicalToolRoutes';
 import { flattenManualQaChecklist } from './e2eManualQaChecklist';
 import { flattenRegressionChecklist } from './e2eRegressionChecklist';
 
@@ -44,9 +41,9 @@ function parseBackendExecutorIds() {
   const src = readFileSync(
     join(
       __dirname,
-      '../../backend/src/modules/medical-control-plane/tool-orchestrator/tool-orchestrator.registry.ts'
+      '../../backend/src/modules/medical-control-plane/tool-orchestrator/tool-orchestrator.registry.ts',
     ),
-    'utf8'
+    'utf8',
   );
   const block = src.match(/REGISTERED_EXECUTOR_TOOL_IDS\s*=\s*\[([\s\S]*?)\]\s*as const/);
   if (!block) return [];
@@ -63,9 +60,14 @@ describe('e2e validation matrix document', () => {
 
   it('matrix validation passes with no wiring issues', () => {
     const result = runMatrixValidation();
-    expect(result.ok, JSON.stringify(result.findings.filter((f) => f.issues.length), null, 2)).toBe(
-      true
-    );
+    expect(
+      result.ok,
+      JSON.stringify(
+        result.findings.filter((f) => f.issues.length),
+        null,
+        2,
+      ),
+    ).toBe(true);
   });
 
   it('documents NLU profile count aligned with clinicalIntentTools', () => {
@@ -94,7 +96,7 @@ describe('e2e matrix — per-registry row facts', () => {
       expect(row.accessModes).toContain('tier-c-executor');
       expect(row.backendPostExecutor).toBe(true);
       expect(ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS).toContain(row.orchestratorToolId);
-    }
+    },
   );
 
   it('sofa-score is Tier C executor and retains Tier A form access', () => {
@@ -134,7 +136,7 @@ describe('e2e matrix — route validity', () => {
 describe('e2e matrix — catalog discovery', () => {
   it('catalog rows cover every registry id except hub-only duplicates', () => {
     const catalogRegistryIds = new Set(
-      getMedicalToolsCatalogRows().map((r) => r.sidebarToolId || r.id)
+      getMedicalToolsCatalogRows().map((r) => r.sidebarToolId || r.id),
     );
     for (const id of ALL_REGISTRY_TOOL_IDS) {
       expect(catalogRegistryIds.has(id), `catalog missing ${id}`).toBe(true);
@@ -144,7 +146,7 @@ describe('e2e matrix — catalog discovery', () => {
   it('every Tier A/B registry row reports catalog presence in matrix', () => {
     const inventory = buildE2eToolInventory();
     const tierAB = inventory.filter(
-      (r) => r.kind === 'registry' && ['A', 'B', 'fleet-B'].includes(r.tier)
+      (r) => r.kind === 'registry' && ['A', 'B', 'fleet-B'].includes(r.tier),
     );
     for (const row of tierAB) {
       expect(row.catalogPresence, row.id).toBe(true);
@@ -174,9 +176,12 @@ describe('e2e matrix — NLU resolution', () => {
 });
 
 describe('e2e matrix — launch behavior', () => {
-  it.each(ALL_REGISTRY_TOOL_IDS)('resolveCatalogLaunch(%s) matches expectedLaunchPath', (registryId) => {
-    expect(assertLaunchPathMatchesRoute(registryId)).toBe(true);
-  });
+  it.each(ALL_REGISTRY_TOOL_IDS)(
+    'resolveCatalogLaunch(%s) matches expectedLaunchPath',
+    (registryId) => {
+      expect(assertLaunchPathMatchesRoute(registryId)).toBe(true);
+    },
+  );
 
   it('dispatch-ai launch has no orchestrator executor', () => {
     const launch = resolveCatalogLaunch('dispatch-ai');
@@ -190,7 +195,7 @@ describe('e2e matrix — launch behavior', () => {
     (registryId) => {
       const launch = resolveCatalogLaunch(registryId);
       expect(launch.orchestratorTool).toBe(REGISTRY_ID_TO_ORCHESTRATOR_TOOL[registryId]);
-    }
+    },
   );
 });
 
@@ -211,7 +216,10 @@ describe('e2e matrix — backend executor mappings', () => {
       .filter((r) => r.backendPostExecutor)
       .map((r) => r.id);
     for (const id of postRegistry) {
-      expect(declaredKeys.has(id), `${id} flagged backendPostExecutor but missing from REGISTRY_ID_TO_ORCHESTRATOR_TOOL`).toBe(true);
+      expect(
+        declaredKeys.has(id),
+        `${id} flagged backendPostExecutor but missing from REGISTRY_ID_TO_ORCHESTRATOR_TOOL`,
+      ).toBe(true);
     }
   });
 

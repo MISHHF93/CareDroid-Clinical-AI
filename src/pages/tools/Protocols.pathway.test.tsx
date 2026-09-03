@@ -20,7 +20,7 @@ function renderProtocols() {
   return render(
     <MemoryRouter initialEntries={['/protocols']}>
       <Protocols />
-    </MemoryRouter>
+    </MemoryRouter>,
   );
 }
 
@@ -37,15 +37,20 @@ describe('Protocols pathway library', () => {
   it('renders protocol viewer with categories, version history, calculators, and simulations', async () => {
     renderProtocols();
 
-    expect(screen.getByRole('heading', { name: /protocol and clinical pathway library/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /protocol and clinical pathway library/i }),
+    ).toBeInTheDocument();
     expect(screen.getAllByRole('button', { name: /sepsis management/i }).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/linked calculators/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/linked simulations/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/version history/i).length).toBeGreaterThan(0);
-    expect(screen.getByRole('link', { name: /qsofa/i })).toHaveAttribute('href', '/tools/calculators/qsofa');
+    expect(screen.getByRole('link', { name: /qsofa/i })).toHaveAttribute(
+      'href',
+      '/tools/calculators/qsofa',
+    );
     expect(screen.getByRole('link', { name: /sepsis deterioration simulation/i })).toHaveAttribute(
       'href',
-      '/simulation/sepsis-deterioration'
+      '/simulation/sepsis-deterioration',
     );
 
     await waitFor(() => {
@@ -61,7 +66,7 @@ describe('Protocols pathway library', () => {
     expect(screen.getByRole('heading', { name: /dka management pathway/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /anion gap/i })).toHaveAttribute(
       'href',
-      '/tools/calculators/anion-gap'
+      '/tools/calculators/anion-gap',
     );
 
     fireEvent.click(screen.getByRole('button', { name: /generate ai explanation/i }));
@@ -71,9 +76,11 @@ describe('Protocols pathway library', () => {
         expect.objectContaining({
           tool: 'protocols',
           message: expect.stringMatching(/DKA Management Pathway/i),
-        })
+        }),
       );
     });
-    expect(await screen.findByText(/ai explanation for selected protocol pathway/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/ai explanation for selected protocol pathway/i),
+    ).toBeInTheDocument();
   });
 });

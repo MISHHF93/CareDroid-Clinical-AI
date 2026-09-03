@@ -11,17 +11,25 @@ export type UseUnifiedOperationalIntelligenceOptions = Readonly<{
 }>;
 
 /** Canonical unified operational intelligence hook — composes operationalIntelligenceCore only. */
-export function useUnifiedOperationalIntelligence(options: UseUnifiedOperationalIntelligenceOptions = {}) {
+export function useUnifiedOperationalIntelligence(
+  options: UseUnifiedOperationalIntelligenceOptions = {},
+) {
   const operationalIntelligence = useOperationalIntelligenceCore({
     screenMode: options.screenMode,
     realtime: options.realtime ?? false,
   });
   const patientFlowSnapshot = useEmergencyStore((state) => state.patientFlowSnapshot);
-  const administrativeAutomationQueue = useEmergencyStore((state) => state.administrativeAutomationQueue);
-  const storedUnifiedSnapshot = useUnifiedOperationalIntelligenceStore((state) => state.unifiedSnapshot);
+  const administrativeAutomationQueue = useEmergencyStore(
+    (state) => state.administrativeAutomationQueue,
+  );
+  const storedUnifiedSnapshot = useUnifiedOperationalIntelligenceStore(
+    (state) => state.unifiedSnapshot,
+  );
   const backendSnapshot = useUnifiedOperationalIntelligenceStore((state) => state.backendSnapshot);
   const source = useUnifiedOperationalIntelligenceStore((state) => state.source);
-  const lastBackendEventType = useUnifiedOperationalIntelligenceStore((state) => state.lastBackendEventType);
+  const lastBackendEventType = useUnifiedOperationalIntelligenceStore(
+    (state) => state.lastBackendEventType,
+  );
   const refreshError = useUnifiedOperationalIntelligenceStore((state) => state.refreshError);
   const isRefreshing = useUnifiedOperationalIntelligenceStore((state) => state.isRefreshing);
   const lastRefreshedAt = useUnifiedOperationalIntelligenceStore((state) => state.lastRefreshedAt);
@@ -58,8 +66,12 @@ export function useUnifiedOperationalIntelligence(options: UseUnifiedOperational
         intelligenceSnapshot: operationalIntelligence.snapshot,
         centralSnapshot: operationalIntelligence.centralSnapshot,
         topInsight: unifiedSnapshot.insights[0] ?? null,
-        criticalDomainCount: unifiedSnapshot.domainStatuses.filter((domain) => domain.status === 'critical').length,
-        watchDomainCount: unifiedSnapshot.domainStatuses.filter((domain) => domain.status === 'watch').length,
+        criticalDomainCount: unifiedSnapshot.domainStatuses.filter(
+          (domain) => domain.status === 'critical',
+        ).length,
+        watchDomainCount: unifiedSnapshot.domainStatuses.filter(
+          (domain) => domain.status === 'watch',
+        ).length,
         source,
         refresh: operationalIntelligence.refresh,
         refreshError: refreshError || operationalIntelligence.refreshError,

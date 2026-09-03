@@ -23,7 +23,12 @@ export function parseInsuranceArtifactText(text = ''): ClinicalArtifactData {
   return Object.fromEntries(
     Object.entries({
       payerName: labeled(normalized, ['payer', 'insurance', 'carrier', 'plan name']),
-      memberId: labeled(normalized, ['member id', 'member number', 'subscriber id', 'policy number']),
+      memberId: labeled(normalized, [
+        'member id',
+        'member number',
+        'subscriber id',
+        'policy number',
+      ]),
       groupId: labeled(normalized, ['group id', 'group number', 'group no']),
       subscriberName: labeled(normalized, ['subscriber', 'member name', 'insured name']),
     }).filter(([, value]) => value),
@@ -81,7 +86,11 @@ export function parseReferralArtifactText(text = ''): ClinicalArtifactData {
   const normalized = String(text || '');
   return Object.fromEntries(
     Object.entries({
-      chiefComplaint: labeled(normalized, ['chief complaint', 'reason for referral', 'presenting complaint']),
+      chiefComplaint: labeled(normalized, [
+        'chief complaint',
+        'reason for referral',
+        'presenting complaint',
+      ]),
       diagnoses: labeled(normalized, ['diagnosis', 'diagnoses', 'impression']),
       medications: labeled(normalized, ['medications', 'medication', 'current meds']),
       allergies: labeled(normalized, ['allergies', 'allergy']),
@@ -99,7 +108,11 @@ export function parseDischargeArtifactText(text = ''): ClinicalArtifactData {
       allergies: labeled(normalized, ['allergies', 'allergy']),
       recommendations: labeled(normalized, ['recommendation', 'recommendations']),
       recentEncounter: labeled(normalized, ['recent encounter', 'admission', 'discharged from']),
-      followUpInstructions: labeled(normalized, ['follow up', 'follow-up', 'followup instructions']),
+      followUpInstructions: labeled(normalized, [
+        'follow up',
+        'follow-up',
+        'followup instructions',
+      ]),
     }).filter(([, value]) => value),
   ) as ClinicalArtifactData;
 }

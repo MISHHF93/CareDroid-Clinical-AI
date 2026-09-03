@@ -26,7 +26,7 @@ function formatMetric(key, value) {
 function stageIndex(stageId, pipeline) {
   return Math.max(
     0,
-    pipeline.findIndex((stage) => stage.id === stageId)
+    pipeline.findIndex((stage) => stage.id === stageId),
   );
 }
 
@@ -97,7 +97,7 @@ export default function TrainingDashboard() {
   const activeStage = latestRun ? stageIndex(latestRun.currentStage, pipeline) : 0;
   const progress = useMemo(
     () => Math.round(((activeStage + 1) / pipeline.length) * 100),
-    [activeStage, pipeline.length]
+    [activeStage, pipeline.length],
   );
 
   const handleCreateRun = async () => {
@@ -129,7 +129,12 @@ export default function TrainingDashboard() {
       description="Track LLM application engineering: prompt versioning, RAG corpus quality, intent-routing metrics, safety evals, and deployment gates. Primary models are hosted (Claude via API); NLU intent routing retrains via backend npm run nlu:pipeline."
       leadingIcon={<NavIcon icon={CHROME_ICONS.brain} size={30} />}
       actions={
-        <button type="button" className="cd-btn cd-btn--primary cd-btn--sm" onClick={handleCreateRun} disabled={creating}>
+        <button
+          type="button"
+          className="cd-btn cd-btn--primary cd-btn--sm"
+          onClick={handleCreateRun}
+          disabled={creating}
+        >
           {creating ? 'Queueing...' : 'Queue training run'}
         </button>
       }
@@ -137,7 +142,9 @@ export default function TrainingDashboard() {
         operationalSummary: (
           <>
             {notice ? (
-              <p className="training-notice cdl-ai-panel cd-info-notice cd-info-notice--ai">{notice}</p>
+              <p className="training-notice cdl-ai-panel cd-info-notice cd-info-notice--ai">
+                {notice}
+              </p>
             ) : null}
             <p
               className={`training-notice cdl-ai-panel cd-info-notice ${promotionEligible ? 'cd-info-notice--ai' : 'cd-info-notice--warning'}`}
@@ -149,7 +156,11 @@ export default function TrainingDashboard() {
           </>
         ),
         analytics: (
-          <DashboardGrid variant="metrics" className="training-metrics" aria-label="Evaluation metrics">
+          <DashboardGrid
+            variant="metrics"
+            className="training-metrics"
+            aria-label="Evaluation metrics"
+          >
             <MetricCard
               label="Accuracy"
               value={formatMetric('accuracy', metrics.accuracy)}
@@ -174,7 +185,9 @@ export default function TrainingDashboard() {
                 <div>
                   <h2>Pipeline Progress</h2>
                   <p>
-                    {loading ? 'Loading pipeline state...' : `${progress}% through latest tracked run`}
+                    {loading
+                      ? 'Loading pipeline state...'
+                      : `${progress}% through latest tracked run`}
                   </p>
                 </div>
                 <span>{latestRun?.status || 'ready'}</span>

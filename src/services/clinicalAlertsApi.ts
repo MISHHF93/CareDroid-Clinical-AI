@@ -33,7 +33,11 @@ async function requestJson(path, options: any = {}) {
     });
     const data = await parseApiResponse(response, { fallback: {} });
     if (!response.ok) {
-      return { ok: false as const, data: null, message: data?.message || getApiErrorMessage(null, response) };
+      return {
+        ok: false as const,
+        data: null,
+        message: data?.message || getApiErrorMessage(null, response),
+      };
     }
     return { ok: true as const, data, message: '' };
   } catch (error: any) {

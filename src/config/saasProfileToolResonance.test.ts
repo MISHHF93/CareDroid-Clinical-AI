@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { resolveSaasToolResonance, resolveSaasToolSegmentationRole } from './saasProfileToolResonance';
+import {
+  resolveSaasToolResonance,
+  resolveSaasToolSegmentationRole,
+} from './saasProfileToolResonance';
 
 describe('saasProfileToolResonance', () => {
   it('maps registration clerk to front-desk resonance without clinical access', () => {

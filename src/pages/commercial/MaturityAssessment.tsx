@@ -94,7 +94,9 @@ export function MaturityAssessmentPage() {
         <div className="commercial-page__title-row">
           <GraphicIconBadge iconKey="shield-check" accent="brand" size="md" />
           <div>
-            <p className="commercial-page-title-text" data-testid="cd-page-title-text">Hospital Maturity Assessment</p>
+            <p className="commercial-page-title-text" data-testid="cd-page-title-text">
+              Hospital Maturity Assessment
+            </p>
             <p>Digital, AI, interoperability, simulation, IoT, and governance readiness scoring.</p>
           </div>
         </div>
@@ -116,7 +118,11 @@ export function MaturityAssessmentPage() {
       />
 
       {!submitted ? (
-        <form className="commercial-page__form" onSubmit={handleSubmit} aria-label="Maturity questionnaire">
+        <form
+          className="commercial-page__form"
+          onSubmit={handleSubmit}
+          aria-label="Maturity questionnaire"
+        >
           {questionnaire.questions.map((question) => (
             <div key={question.id} className="commercial-page__question">
               <label htmlFor={`maturity-${question.id}`}>{question.question}</label>
@@ -149,7 +155,11 @@ export function MaturityAssessmentPage() {
       ) : (
         assessment && (
           <>
-            <div className="commercial-page__metrics" role="group" aria-label="Maturity assessment summary metrics">
+            <div
+              className="commercial-page__metrics"
+              role="group"
+              aria-label="Maturity assessment summary metrics"
+            >
               <MetricCard
                 label="Readiness score"
                 value={String(assessment.hospitalReadinessScore)}
@@ -192,7 +202,11 @@ export function MaturityAssessmentPage() {
             </div>
 
             {assessment.dimensions.map((dimension) => (
-              <section key={dimension.id} className="commercial-page__panel" aria-label={dimension.label}>
+              <section
+                key={dimension.id}
+                className="commercial-page__panel"
+                aria-label={dimension.label}
+              >
                 <div className="commercial-page__panel-head">
                   <div>
                     <h2>{dimension.label}</h2>
@@ -215,12 +229,19 @@ export function MaturityAssessmentPage() {
             <section className="commercial-page__panel" aria-label="Recommended next steps">
               <h2>Recommended next steps</h2>
               <div className="commercial-page__table" role="table">
-                <div className="commercial-page__table-head commercial-page__table-row--two-col" role="row">
+                <div
+                  className="commercial-page__table-head commercial-page__table-row--two-col"
+                  role="row"
+                >
                   <span role="columnheader">Category</span>
                   <span role="columnheader">Recommendations</span>
                 </div>
                 {Object.entries(assessment.recommendations).map(([category, items]) => (
-                  <div key={category} className="commercial-page__table-row commercial-page__table-row--two-col" role="row">
+                  <div
+                    key={category}
+                    className="commercial-page__table-row commercial-page__table-row--two-col"
+                    role="row"
+                  >
                     <span role="cell">{category.replace(/_/g, ' ')}</span>
                     <span role="cell">{items.join(' · ')}</span>
                   </div>

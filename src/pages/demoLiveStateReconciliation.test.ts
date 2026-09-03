@@ -89,7 +89,9 @@ describe('demo/live state reconciliation coverage', () => {
       './clinical/Medical3DViewer.tsx',
       './analytics/PredictiveAnalyticsDashboard.tsx',
       './platform/PlatformGovernanceWorkspace.tsx',
-    ].map(readPage).join('\n');
+    ]
+      .map(readPage)
+      .join('\n');
 
     expect(source).toContain('DEMO_LIVE_STATES.BACKEND_UNAVAILABLE');
     expect(source).toContain('DEMO_LIVE_STATES.UNSUPPORTED');

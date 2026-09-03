@@ -18,7 +18,9 @@ describe('offlineMode catalog snapshots', () => {
       OFFLINE_CATALOG_KINDS.PROTOCOLS,
     ]);
     expect(snapshots.every((snapshot) => snapshot.count > 0)).toBe(true);
-    expect(snapshots.every((snapshot) => snapshot.items.every((item) => item.offlineReady))).toBe(true);
+    expect(snapshots.every((snapshot) => snapshot.items.every((item) => item.offlineReady))).toBe(
+      true,
+    );
   });
 
   it('labels stale catalogs and summarizes offline readiness', () => {
@@ -39,7 +41,7 @@ describe('offlineMode catalog snapshots', () => {
           cachedAt: stale,
         },
       ],
-      now
+      now,
     );
 
     expect(summary.totalItems).toBe(3);

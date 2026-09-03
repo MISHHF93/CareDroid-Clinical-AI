@@ -111,9 +111,7 @@ function SelectDimensionCalculator({
   }, [result]);
 
   const runCalculate = () => {
-    const numeric = Object.fromEntries(
-      Object.entries(inputs).map(([k, v]) => [k, Number(v)])
-    );
+    const numeric = Object.fromEntries(Object.entries(inputs).map(([k, v]) => [k, Number(v)]));
     const total = calculate(numeric);
     const interp = interpret(total);
     if (!interp) {
@@ -161,9 +159,7 @@ function SelectDimensionCalculator({
             {dimensionsMeta.map((dim) => {
               const id = `${slug}-${dim.key}`;
               const selected = dim.options.find((o) => String(o.value) === inputs[dim.key]);
-              const selectAriaLabel = selected
-                ? `${dim.label}: ${selected.label}`
-                : dim.label;
+              const selectAriaLabel = selected ? `${dim.label}: ${selected.label}` : dim.label;
               return (
                 <div key={dim.key} className="calc-form-group calc-timi-row">
                   <label htmlFor={id} className="calc-label">
@@ -197,7 +193,12 @@ function SelectDimensionCalculator({
               <NavIcon icon={CHROME_ICONS.calculator} size={20} aria-hidden />
               Calculate
             </button>
-            <button type="button" className="calc-reset-btn" onClick={reset} aria-label={resetButtonLabel}>
+            <button
+              type="button"
+              className="calc-reset-btn"
+              onClick={reset}
+              aria-label={resetButtonLabel}
+            >
               Reset
             </button>
           </div>
@@ -230,7 +231,9 @@ function SelectDimensionCalculator({
               ) : null}
               <div className="calc-interpretation-text">{result.riskBand}</div>
               {result.maceContext ? (
-                <div className="calc-interpretation-text calc-interpretation-text--secondary">{result.maceContext}</div>
+                <div className="calc-interpretation-text calc-interpretation-text--secondary">
+                  {result.maceContext}
+                </div>
               ) : null}
               {result.strepProbability ? (
                 <div className="calc-interpretation-text calc-interpretation-text--secondary">
@@ -249,7 +252,9 @@ function SelectDimensionCalculator({
               ) : null}
               <div className="calc-interpretation-text">{result.interpretation}</div>
               {result.disclaimer ? (
-                <div className="calc-interpretation-text calc-interpretation-text--secondary">{result.disclaimer}</div>
+                <div className="calc-interpretation-text calc-interpretation-text--secondary">
+                  {result.disclaimer}
+                </div>
               ) : null}
             </CalcInterpretationRegion>
             <div className="calc-references">
@@ -291,7 +296,7 @@ function CriterionCheckboxCalculator({
   const icon = getCalculatorSubIcon(slug);
   const resultsRef = useRef(null);
   const [inputs, setInputs] = useState(() =>
-    Object.fromEntries(criteriaMeta.map((r) => [r.key, false]))
+    Object.fromEntries(criteriaMeta.map((r) => [r.key, false])),
   );
   const [extra, setExtra] = useState(extraFields?.initialState ?? {});
   const [result, setResult] = useState<any>(null);
@@ -384,7 +389,12 @@ function CriterionCheckboxCalculator({
               <NavIcon icon={CHROME_ICONS.calculator} size={20} aria-hidden />
               Calculate
             </button>
-            <button type="button" className="calc-reset-btn" onClick={reset} aria-label={resetButtonLabel}>
+            <button
+              type="button"
+              className="calc-reset-btn"
+              onClick={reset}
+              aria-label={resetButtonLabel}
+            >
               Reset
             </button>
           </div>
@@ -632,7 +642,7 @@ export function ApgarScoreCalculator({ onResultChange }) {
               severity: result.severity5,
               riskCategory: result.riskCategory,
             }
-          : null
+          : null,
       );
     }
   }, [onResultChange, result]);
@@ -645,9 +655,7 @@ export function ApgarScoreCalculator({ onResultChange }) {
     APGAR_COMPONENTS_META.map((comp) => {
       const id = `${prefix}-${comp.key}`;
       const selected = comp.options.find((o) => String(o.value) === inputs[comp.key]);
-      const selectAriaLabel = selected
-        ? `${comp.label}: ${selected.label}`
-        : comp.label;
+      const selectAriaLabel = selected ? `${comp.label}: ${selected.label}` : comp.label;
       return (
         <div key={comp.key} className="calc-form-group calc-timi-row">
           <label htmlFor={id} className="calc-label">
@@ -830,9 +838,11 @@ export function RansonCriteriaCalculator({ onResultChange }) {
   const icon = getCalculatorSubIcon(slug);
   const resultsRef = useRef(null);
   const [admission, setAdmission] = useState(() =>
-    Object.fromEntries(RANSON_ADMISSION_META.map((r) => [r.key, false]))
+    Object.fromEntries(RANSON_ADMISSION_META.map((r) => [r.key, false])),
   );
-  const [at48h, setAt48h] = useState(() => Object.fromEntries(RANSON_AT_48H_META.map((r) => [r.key, false])));
+  const [at48h, setAt48h] = useState(() =>
+    Object.fromEntries(RANSON_AT_48H_META.map((r) => [r.key, false])),
+  );
   const [result, setResult] = useState<any>(null);
 
   useEffect(() => {
@@ -886,11 +896,15 @@ export function RansonCriteriaCalculator({ onResultChange }) {
         >
           <fieldset className="calc-timi-fieldset">
             <legend className="calc-timi-legend">At admission (0–5)</legend>
-            <div className="calc-timi-criteria">{renderGroup(RANSON_ADMISSION_META, admission, setAdmission, 'ranson-adm')}</div>
+            <div className="calc-timi-criteria">
+              {renderGroup(RANSON_ADMISSION_META, admission, setAdmission, 'ranson-adm')}
+            </div>
           </fieldset>
           <fieldset className="calc-timi-fieldset">
             <legend className="calc-timi-legend">At 48 hours (0–6)</legend>
-            <div className="calc-timi-criteria">{renderGroup(RANSON_AT_48H_META, at48h, setAt48h, 'ranson-48')}</div>
+            <div className="calc-timi-criteria">
+              {renderGroup(RANSON_AT_48H_META, at48h, setAt48h, 'ranson-48')}
+            </div>
           </fieldset>
           <div className="calc-actions">
             <button type="submit" className="calc-calculate-btn">
@@ -945,7 +959,7 @@ export function Fib4Calculator({ onResultChange }) {
       onResultChange(
         result
           ? { fib4: result.index, severity: result.severity, riskCategory: result.riskCategory }
-          : null
+          : null,
       );
     }
   }, [onResultChange, result]);
@@ -955,7 +969,12 @@ export function Fib4Calculator({ onResultChange }) {
   }, [result]);
 
   const runCalculate = () => {
-    const { valid, errors } = validateFib4Inputs({ ageYears, astUPerL, altUPerL, platelets10e9PerL });
+    const { valid, errors } = validateFib4Inputs({
+      ageYears,
+      astUPerL,
+      altUPerL,
+      platelets10e9PerL,
+    });
     setValidationErrors(errors);
     if (!valid) {
       setResult(null);
@@ -1171,7 +1190,7 @@ export function FraminghamRiskCalculator({ onResultChange }) {
               severity: result.severity,
               totalPoints: result.totalPoints,
             }
-          : null
+          : null,
       );
     }
   }, [onResultChange, result]);
@@ -1219,7 +1238,8 @@ export function FraminghamRiskCalculator({ onResultChange }) {
         <div className="calc-timi-disclaimer calc-has-bled-disclaimer" role="note">
           <CalcDecisionSupportLead />
           <p className="calc-disclaimer-detail">
-            ATP III Framingham hard CHD risk (Wilson et al.) — alternative to ASCVD PCE; ages 30–74 only.
+            ATP III Framingham hard CHD risk (Wilson et al.) — alternative to ASCVD PCE; ages 30–74
+            only.
           </p>
         </div>
         <form
@@ -1344,7 +1364,9 @@ export function FraminghamRiskCalculator({ onResultChange }) {
             <div className={`calc-score-display ${result.severity}`}>
               <div className="calc-score-label">10-year hard CHD risk</div>
               <div className="calc-score-value">{result.tenYearRiskPct}%</div>
-              <div className="calc-score-interpretation">{result.totalPoints} Framingham points</div>
+              <div className="calc-score-interpretation">
+                {result.totalPoints} Framingham points
+              </div>
             </div>
             <CalcInterpretationRegion
               headingId="framingham-interpretation"

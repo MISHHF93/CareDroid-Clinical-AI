@@ -16,7 +16,7 @@ export function validateLazyModule(moduleValue) {
 
   if (!isValidComponent) {
     const error = new Error(
-      `Lazy-loaded route module is missing a valid default export. Exports: ${describeExports(moduleValue)}.`
+      `Lazy-loaded route module is missing a valid default export. Exports: ${describeExports(moduleValue)}.`,
     );
     error.name = 'InvalidLazyRouteModuleError';
     throw error;
@@ -52,6 +52,6 @@ export function lazyWithRetry(importFn) {
         }
         sessionStorage.removeItem(CHUNK_RETRY_KEY);
         throw err;
-      })
+      }),
   );
 }

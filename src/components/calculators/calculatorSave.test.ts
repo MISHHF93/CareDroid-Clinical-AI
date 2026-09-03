@@ -52,7 +52,9 @@ describe('saveCalculatorResult', () => {
 
     expect(saved).toBe(true);
 
-    const patient = useEmergencyStore.getState().patients.find((candidate) => candidate.id === 'patient-score-test');
+    const patient = useEmergencyStore
+      .getState()
+      .patients.find((candidate) => candidate.id === 'patient-score-test');
     expect(patient).toBeTruthy();
 
     const note = patient?.notes.at(-1);
@@ -81,7 +83,9 @@ describe('saveCalculatorResult', () => {
       fields: {},
     });
 
-    const patient = useEmergencyStore.getState().patients.find((candidate) => candidate.id === 'patient-score-test');
+    const patient = useEmergencyStore
+      .getState()
+      .patients.find((candidate) => candidate.id === 'patient-score-test');
     expect(patient).toBeTruthy();
     if (!patient) return;
 
@@ -100,7 +104,9 @@ describe('saveCalculatorResult', () => {
       fields: {},
     });
 
-    const patient = useEmergencyStore.getState().patients.find((candidate) => candidate.id === 'patient-score-test');
+    const patient = useEmergencyStore
+      .getState()
+      .patients.find((candidate) => candidate.id === 'patient-score-test');
     expect(patient?.flags.includes(PatientFlag.ScoreReassessmentRecommended)).toBe(false);
   });
 });

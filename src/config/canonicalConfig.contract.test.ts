@@ -55,7 +55,7 @@ describe('canonical configuration contract', () => {
     expect(ROUTE_ALIAS_GROUPS.organizationPacks.aliases).toBe(ORGANIZATION_PACKS_ROUTE_ALIASES);
     expect(new Set(AUTH_PATH_ALIASES).size).toBe(AUTH_PATH_ALIASES.length);
     expect(new Set(PROTECTED_ROUTE_ALIAS_REDIRECTS.map((entry) => entry.path)).size).toBe(
-      PROTECTED_ROUTE_ALIAS_REDIRECTS.length
+      PROTECTED_ROUTE_ALIAS_REDIRECTS.length,
     );
 
     expect(appSource).toContain("from '../config/routes.config'");
@@ -99,7 +99,7 @@ describe('canonical configuration contract', () => {
     expect(ROUTE_RECORDS_BY_ID.calculators.path).toBe('/emergency/tools');
     expect(ROUTE_RECORDS_BY_ID.assetPacks.path).toBe('/asset-packs');
     expect((ROUTE_RECORDS_BY_ID.assetPacks as { componentKey?: string }).componentKey).toBe(
-      'PackMarketplace'
+      'PackMarketplace',
     );
     expect(ROUTE_RECORDS_BY_ID.organizationPacks.path).toBe('/settings/organization/packs');
     expect(ROUTE_RECORDS_BY_ID.organizationPacks.aliases).toBe(ORGANIZATION_PACKS_ROUTE_ALIASES);
@@ -108,10 +108,10 @@ describe('canonical configuration contract', () => {
         expect.objectContaining({ path: '/home', to: '/emergency/reception', routeId: 'startup' }),
         expect.objectContaining({ path: '/chat', to: '/emergency/copilot', routeId: 'assistant' }),
         expect.objectContaining({ path: '/automation', to: '/workflows', routeId: 'workflows' }),
-      ])
+      ]),
     );
     expect(PROTECTED_ROUTE_ALIAS_REDIRECTS).not.toEqual(
-      expect.arrayContaining([expect.objectContaining({ path: '/asset-packs' })])
+      expect.arrayContaining([expect.objectContaining({ path: '/asset-packs' })]),
     );
   });
 
@@ -158,7 +158,7 @@ describe('canonical configuration contract', () => {
         '/human-review',
         '/assets',
         '/settings/organization/packs',
-      ])
+      ]),
     );
     expect(getRouteAliasTarget('/audit-logs')).toBe('/audit');
   });
@@ -202,12 +202,7 @@ describe('canonical configuration contract', () => {
   });
 
   it('normalizes frontend environment config and deployment metadata', () => {
-    expect(SUPPORTED_APP_ENVIRONMENTS).toEqual([
-      'local',
-      'development',
-      'staging',
-      'production',
-    ]);
+    expect(SUPPORTED_APP_ENVIRONMENTS).toEqual(['local', 'development', 'staging', 'production']);
     expect(normalizeAppEnvironment('dev')).toBe('development');
     expect(normalizeAppEnvironment('prod')).toBe('production');
     expect(normalizeAppEnvironment('staging')).toBe('staging');
@@ -218,7 +213,7 @@ describe('canonical configuration contract', () => {
         id: expect.any(String),
         commit: expect.any(String),
         branch: expect.any(String),
-      })
+      }),
     );
   });
 
@@ -233,6 +228,6 @@ describe('canonical configuration contract', () => {
     expect(LAYOUT_SCROLL_CONTRACT.normalPagesCreateViewportScrollShells).toBe(false);
     expect(read('components/AppShell.tsx')).toContain("from '../config/");
     expect(read('components/app-shell.css')).toContain('.app-shell-main-content');
-    expect(read('components/AppShell.tsx')).toContain("./app-shell.css");
+    expect(read('components/AppShell.tsx')).toContain('./app-shell.css');
   });
 });

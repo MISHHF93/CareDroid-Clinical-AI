@@ -15,7 +15,14 @@ const SORTABLE_COLUMNS: SortableColumn[] = [
   { id: 'patient', label: 'Patient' },
 ];
 
-const STATIC_COLUMNS = ['Age / Sex', 'Arrival', 'Chief complaint', 'Wait', 'Reassess', 'State'] as const;
+const STATIC_COLUMNS = [
+  'Age / Sex',
+  'Arrival',
+  'Chief complaint',
+  'Wait',
+  'Reassess',
+  'State',
+] as const;
 
 const SORTABLE_TAIL: SortableColumn[] = [
   { id: 'wait', label: 'Wait' },
@@ -97,9 +104,7 @@ export default function WhiteboardPatientRowHeader({
       ))}
       <span className="whiteboard-patient-row-header__cell">{STATIC_COLUMNS[0]}</span>
       <span className="whiteboard-patient-row-header__cell">{STATIC_COLUMNS[1]}</span>
-      <span
-        className="whiteboard-patient-row-header__cell whiteboard-patient-row-header__cell--complaint"
-      >
+      <span className="whiteboard-patient-row-header__cell whiteboard-patient-row-header__cell--complaint">
         {STATIC_COLUMNS[2]}
       </span>
       {SORTABLE_TAIL.map((column) => (

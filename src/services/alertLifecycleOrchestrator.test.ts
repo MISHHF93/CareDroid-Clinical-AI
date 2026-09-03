@@ -213,8 +213,9 @@ describe('alertLifecycleOrchestrator', () => {
       sourceScreen: 'test',
     });
 
-    const latestUpdater = (useEmergencyStore.setState as unknown as { mock: { calls: unknown[][] } })
-      .mock.calls.at(-1)?.[0] as (state: { alerts: unknown[]; workflowLogs: unknown[] }) => {
+    const latestUpdater = (
+      useEmergencyStore.setState as unknown as { mock: { calls: unknown[][] } }
+    ).mock.calls.at(-1)?.[0] as (state: { alerts: unknown[]; workflowLogs: unknown[] }) => {
       alerts: Array<{ id: string; acknowledgedByStaffId?: string; acknowledgedByRole?: string }>;
     };
     const result = latestUpdater({ alerts: [alertBefore], workflowLogs: [] });
@@ -281,12 +282,8 @@ describe('alertLifecycleOrchestrator', () => {
     ]);
 
     expect(prepared[0].metadata?.orchestratorVersion).toBeTruthy();
-    expect(() =>
-      syncDerivedAlertsLifecycle([], prepared, 'test-sync'),
-    ).not.toThrow();
-    expect(() =>
-      syncDerivedAlertsLifecycle(prepared, [], 'test-sync'),
-    ).not.toThrow();
+    expect(() => syncDerivedAlertsLifecycle([], prepared, 'test-sync')).not.toThrow();
+    expect(() => syncDerivedAlertsLifecycle(prepared, [], 'test-sync')).not.toThrow();
   });
 
   it('sends a real out-of-band notification when auto-escalating an unacknowledged critical alert (2026-08-08)', async () => {

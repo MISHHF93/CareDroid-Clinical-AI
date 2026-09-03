@@ -10,9 +10,7 @@ import { CANONICAL_ROUTES, ROUTE_ALIAS_GROUPS } from '../config/routes.config';
 import { TOOL_LAUNCH_PATHS } from './clinicalToolIdContract';
 import { AUTH_CONFIG } from '../config/auth.config';
 import { CALCULATOR_ROUTE_DEFS } from '../routes/clinicalToolRoutes';
-import {
-  PRIMARY_SIDEBAR_NAV_ITEMS,
-} from '../config/navigation.config';
+import { PRIMARY_SIDEBAR_NAV_ITEMS } from '../config/navigation.config';
 import { CARE_WORKSPACES } from '../config/workspace.config';
 import {
   ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS,
@@ -52,7 +50,10 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
     duplicates: [
       {
         name: 'Canonical route map vs tool launch paths',
-        instances: ['routes.config.js → CANONICAL_ROUTES', 'clinicalToolIdContract.js → TOOL_LAUNCH_PATHS'],
+        instances: [
+          'routes.config.js → CANONICAL_ROUTES',
+          'clinicalToolIdContract.js → TOOL_LAUNCH_PATHS',
+        ],
         overlap: pathOverlap(CANONICAL_ROUTES, TOOL_LAUNCH_PATHS).length,
         risk: 'Drift when adding fleet/simulation paths to one file only',
         action: 'done',
@@ -92,7 +93,10 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
       },
       {
         name: 'Workflow surfaces',
-        instances: ['/automation → WorkflowAutomationBuilder', '/workflows → WorkflowBuilderPage (PlatformOS)'],
+        instances: [
+          '/automation → WorkflowAutomationBuilder',
+          '/workflows → WorkflowBuilderPage (PlatformOS)',
+        ],
         overlap: 2,
         risk: 'Two workflow UIs under different nav ids',
         action: 'done',
@@ -101,7 +105,11 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
       },
       {
         name: 'Operations entry points',
-        instances: ['/operations', '/operations-center', 'WORKSPACE_ROUTE_SHORTCUTS.commandCenter → /dashboard'],
+        instances: [
+          '/operations',
+          '/operations-center',
+          'WORKSPACE_ROUTE_SHORTCUTS.commandCenter → /dashboard',
+        ],
         overlap: 3,
         risk: 'Ops vs command center naming confusion',
         action: 'legacy',
@@ -158,11 +166,15 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
       },
       {
         name: 'Tool list in sidebar',
-        instances: ['sidebarToolPresentation.ts', 'historical getSidebarToolRegistryProjection in tests'],
+        instances: [
+          'sidebarToolPresentation.ts',
+          'historical getSidebarToolRegistryProjection in tests',
+        ],
         overlap: null,
         risk: 'Tests may reference removed sidebar tool partition API',
         action: 'legacy',
-        recommendation: 'Canonical tool sidebar data: getUserFacingToolRegistryProjection + sidebarToolPresentation.',
+        recommendation:
+          'Canonical tool sidebar data: getUserFacingToolRegistryProjection + sidebarToolPresentation.',
       },
     ],
   },
@@ -170,7 +182,8 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
     id: 'navigation',
     title: 'Navigation',
     canonical: '`src/config/unified-navigation.config.ts` (`NAVIGATION_ITEMS`)',
-    secondary: '`src/config/navigation.config.ts` (compat projections: APP_SHELL_NAV_ITEMS, sidebar buckets)',
+    secondary:
+      '`src/config/navigation.config.ts` (compat projections: APP_SHELL_NAV_ITEMS, sidebar buckets)',
     duplicates: [
       {
         name: 'Primary nav vs quick command',
@@ -233,7 +246,7 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
         risk: 'Different filters for same ids',
         action: 'done',
         recommendation:
-          'Done: getSidebarToolRegistryProjection is already @deprecated and already delegates to getUserFacingToolRegistryProjection internally (src/data/toolInventory.tsx). getCatalogToolInventory is not actually a competing catalog implementation -- it is one of four parallel raw-canonical-record stat counters (alongside getFrontendVisibleToolInventory, getSidebarToolInventory, getBackendBackedToolInventory) that all feed getCanonicalToolInventoryDocument() summary counts consistently off canonical record flags, deliberately not the enriched user-facing projection. The real catalog UI (src/pages/tools/ToolsOverview.tsx) already imports and calls getUserFacingToolRegistryProjection directly, confirmed by grep -- forcing getCatalogToolInventory through the projection would break the stat family\'s internal consistency, not fix a live drift risk.',
+          "Done: getSidebarToolRegistryProjection is already @deprecated and already delegates to getUserFacingToolRegistryProjection internally (src/data/toolInventory.tsx). getCatalogToolInventory is not actually a competing catalog implementation -- it is one of four parallel raw-canonical-record stat counters (alongside getFrontendVisibleToolInventory, getSidebarToolInventory, getBackendBackedToolInventory) that all feed getCanonicalToolInventoryDocument() summary counts consistently off canonical record flags, deliberately not the enriched user-facing projection. The real catalog UI (src/pages/tools/ToolsOverview.tsx) already imports and calls getUserFacingToolRegistryProjection directly, confirmed by grep -- forcing getCatalogToolInventory through the projection would break the stat family's internal consistency, not fix a live drift risk.",
       },
       {
         name: 'Backend tools API',
@@ -282,7 +295,11 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
       },
       {
         name: 'Route registration',
-        instances: ['CALCULATOR_ROUTE_DEFS', 'Calculators hub route /tools/calculators', 'App wildcard tools routes'],
+        instances: [
+          'CALCULATOR_ROUTE_DEFS',
+          'Calculators hub route /tools/calculators',
+          'App wildcard tools routes',
+        ],
         overlap: CALCULATOR_ROUTE_DEFS.length,
         risk: 'Hub-only tools lack dedicated App route (by design)',
         action: 'legacy',
@@ -307,7 +324,10 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
       },
       {
         name: 'Platform dashboard registry',
-        instances: ['platformOperatingSystem.js PLATFORM_DASHBOARDS', 'commandDashboardModel widgets'],
+        instances: [
+          'platformOperatingSystem.js PLATFORM_DASHBOARDS',
+          'commandDashboardModel widgets',
+        ],
         overlap: null,
         risk: 'Demo OS dashboards vs command dashboard tiles',
         action: 'done',
@@ -339,7 +359,8 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
     id: 'auth-configs',
     title: 'Auth configs',
     canonical: '`src/config/auth.config.ts` + `src/config/routes.config.ts` (auth paths)',
-    secondary: '`src/config/api.config.ts` (endpoints), `env.config.js` + `featureFlags.config.js` (gates)',
+    secondary:
+      '`src/config/api.config.ts` (endpoints), `env.config.js` + `featureFlags.config.js` (gates)',
     duplicates: [
       {
         name: 'Auth path aliases',
@@ -356,11 +377,16 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
         overlap: 2,
         risk: 'Stale sessions after key migration',
         action: 'legacy',
-        recommendation: 'Canonical: AUTH_CONFIG.tokenStorageKey; read legacy once on boot then migrate.',
+        recommendation:
+          'Canonical: AUTH_CONFIG.tokenStorageKey; read legacy once on boot then migrate.',
       },
       {
         name: 'Demo/dev auth',
-        instances: ['auth.config demo getters', 'featureFlags enableDevAuthBypass', 'devAuthBypass.js'],
+        instances: [
+          'auth.config demo getters',
+          'featureFlags enableDevAuthBypass',
+          'devAuthBypass.js',
+        ],
         overlap: 3,
         risk: 'Bypass enabled via multiple flags',
         action: 'done',
@@ -372,7 +398,8 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
   {
     id: 'workspace-configs',
     title: 'Workspace configs',
-    canonical: 'Backend `GET/POST /api/workspaces` + `enabledToolIds` / `enabledModules` (tenant authority)',
+    canonical:
+      'Backend `GET/POST /api/workspaces` + `enabledToolIds` / `enabledModules` (tenant authority)',
     secondary: null,
     duplicates: [
       {
@@ -402,7 +429,11 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
       },
       {
         name: 'Workspace route shortcuts',
-        instances: ['WORKSPACE_ROUTE_SHORTCUTS', 'CANONICAL_ROUTES', 'PRIMARY_NAV_ITEMS.matchPaths'],
+        instances: [
+          'WORKSPACE_ROUTE_SHORTCUTS',
+          'CANONICAL_ROUTES',
+          'PRIMARY_NAV_ITEMS.matchPaths',
+        ],
         overlap: null,
         risk: 'Same path in three configs',
         action: 'done',
@@ -420,7 +451,11 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
     duplicates: [
       {
         name: 'Dual registry (tools vs assets)',
-        instances: ['toolInventory.js user-facing launch rows', 'SEED_PLATFORM_ASSETS', 'assetInventory.js mounted projection'],
+        instances: [
+          'toolInventory.js user-facing launch rows',
+          'SEED_PLATFORM_ASSETS',
+          'assetInventory.js mounted projection',
+        ],
         overlap: null,
         risk: 'Manual projection drift if backend seed and frontend launch metadata diverge',
         action: 'wire',
@@ -429,7 +464,12 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
       },
       {
         name: 'Frontend projections',
-        instances: ['assetInventory.ts', 'assetAccess.ts', 'assetEntitlements.ts', 'buildAssetRegistry() demo'],
+        instances: [
+          'assetInventory.ts',
+          'assetAccess.ts',
+          'assetEntitlements.ts',
+          'buildAssetRegistry() demo',
+        ],
         overlap: null,
         risk: 'Projection must continue to include pack/product/workspace/role metadata for every user-facing asset',
         action: 'done',
@@ -477,7 +517,11 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
       },
       {
         name: 'Registry id vs executor id',
-        instances: ['sofa-score (registry)', 'sofa-calculator (executor)', 'drug-check / drug-interactions'],
+        instances: [
+          'sofa-score (registry)',
+          'sofa-calculator (executor)',
+          'drug-check / drug-interactions',
+        ],
         overlap: REGISTRY_ID_TO_ORCHESTRATOR_TOOL_COUNT(),
         risk: 'Inventory TOOL_EXECUTOR_STATUS.REGISTERED uses registry id',
         action: 'done',
@@ -486,7 +530,10 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
       },
       {
         name: 'NLU catalog postExecutable flags',
-        instances: ['clinicalIntentToolCatalog postExecutable', 'ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS'],
+        instances: [
+          'clinicalIntentToolCatalog postExecutable',
+          'ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS',
+        ],
         overlap: null,
         risk: 'Catalog claims executable without backend registerTool()',
         action: 'done',
@@ -512,7 +559,12 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
       },
       {
         name: 'Design token split',
-        instances: ['theme.tokens.ts', 'layout/designTokens.ts', 'caredroidDesignLanguage.ts', 'designSystem.ts'],
+        instances: [
+          'theme.tokens.ts',
+          'layout/designTokens.ts',
+          'caredroidDesignLanguage.ts',
+          'designSystem.ts',
+        ],
         overlap: 4,
         risk: 'Token drift across CSS and programmatic consumers',
         action: 'done',
@@ -550,7 +602,7 @@ export function buildDuplicateSystemReport() {
   const appPaths = parseAppPaths();
   const canonicalPaths = Object.values(CANONICAL_ROUTES);
   const notInCanonical = appPaths.filter(
-    (p) => !canonicalPaths.includes(p as any) && !p.includes(':') && !p.startsWith('/tools/')
+    (p) => !canonicalPaths.includes(p as any) && !p.includes(':') && !p.startsWith('/tools/'),
   );
 
   return {
@@ -642,7 +694,7 @@ export function formatDuplicateSystemAuditMarkdown(report = buildDuplicateSystem
     for (const d of section.duplicates) {
       const instances = Array.isArray(d.instances) ? d.instances.join('; ') : d.instances;
       lines.push(
-        `| ${escapeCell(d.name)} | ${escapeCell(instances)} | ${escapeCell(d.risk)} | ${escapeCell(d.action)} | ${escapeCell(d.recommendation)} |`
+        `| ${escapeCell(d.name)} | ${escapeCell(instances)} | ${escapeCell(d.risk)} | ${escapeCell(d.action)} | ${escapeCell(d.recommendation)} |`,
       );
     }
     lines.push('');
@@ -664,7 +716,7 @@ export function formatDuplicateSystemAuditMarkdown(report = buildDuplicateSystem
       report.appPathsNotInCanonical.map((p) => `- \`${p}\``).join('\n'),
       '',
       '_Many are dynamic tool routes, org/commercial pages, or profile subpaths — extend CANONICAL_ROUTES or document as extensions._',
-      ''
+      '',
     );
   }
 
@@ -683,7 +735,7 @@ export function formatDuplicateSystemAuditMarkdown(report = buildDuplicateSystem
     '- Related: [orphan-detection-report.md](./orphan-detection-report.md), [saas-compliance-audit.md](./saas-compliance-audit.md)',
     '- Contract tests: `src/config/canonicalConfig.contract.test.ts`, `src/data/executorMappingAudit.test.ts`',
     '- Generator: `src/data/duplicateSystemAudit.ts`',
-    ''
+    '',
   );
 
   return lines.join('\n');

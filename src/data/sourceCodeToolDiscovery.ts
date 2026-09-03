@@ -16,10 +16,7 @@ import {
   platformFeatures,
 } from './platformCapabilitiesCatalog';
 import { emergencyPatternGroups } from './emergencyPatternCatalog';
-import {
-  offlineClinicalFeatures,
-  workspaceTemplateCatalog,
-} from './clinicalCatalogWiring';
+import { offlineClinicalFeatures, workspaceTemplateCatalog } from './clinicalCatalogWiring';
 import {
   MEDICAL_EXPANSION_CATEGORY_PACKS,
   ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS,
@@ -125,7 +122,11 @@ export const marketingOnlyMentions = [] as any[];
 
 /** ID aliases (same capability, different string in tests vs registry) */
 export const toolIdAliases = [
-  { id: 'drug-checker', mapsTo: 'drug-check', source: 'CostTrackingContext, advancedRecommendationService' },
+  {
+    id: 'drug-checker',
+    mapsTo: 'drug-check',
+    source: 'CostTrackingContext, advancedRecommendationService',
+  },
   {
     id: 'drug-interaction-checker',
     mapsTo: 'drug-check',
@@ -154,11 +155,23 @@ export const toolIdAliases = [
   { id: 'sepsis-bedside-score', mapsTo: 'qsofa', source: 'NLU alias — sepsis bedside score' },
   { id: 'q-sofa', mapsTo: 'qsofa', source: 'NLU alias — q sofa' },
   { id: 'news-2', mapsTo: 'news2', source: 'NLU alias — news 2' },
-  { id: 'national-early-warning-score', mapsTo: 'news2', source: 'NLU alias — national early warning score' },
+  {
+    id: 'national-early-warning-score',
+    mapsTo: 'news2',
+    source: 'NLU alias — national early warning score',
+  },
   { id: 'early-warning-score', mapsTo: 'news2', source: 'NLU alias — early warning score' },
   { id: 'deterioration-score', mapsTo: 'news2', source: 'NLU alias — deterioration score' },
-  { id: 'apache-ii', mapsTo: 'apache2-calculator', source: 'Emergency critical care calculator route alias' },
-  { id: 'curb-65', mapsTo: 'curb65-calculator', source: 'Emergency critical care calculator route alias' },
+  {
+    id: 'apache-ii',
+    mapsTo: 'apache2-calculator',
+    source: 'Emergency critical care calculator route alias',
+  },
+  {
+    id: 'curb-65',
+    mapsTo: 'curb65-calculator',
+    source: 'Emergency critical care calculator route alias',
+  },
   { id: 'gcs', mapsTo: 'gcs-calculator', source: 'Emergency critical care calculator route alias' },
   { id: 'mews', mapsTo: 'mews', source: 'Emergency critical care calculator' },
   {
@@ -177,7 +190,11 @@ export const toolIdAliases = [
     mapsTo: 'has-bled',
     source: 'NLU alias — anticoagulation bleeding risk',
   },
-  { id: 'sofa_calculator', mapsTo: 'sofa-calculator', source: 'ai.service.ts OpenAI function name' },
+  {
+    id: 'sofa_calculator',
+    mapsTo: 'sofa-calculator',
+    source: 'ai.service.ts OpenAI function name',
+  },
   { id: 'calculator', mapsTo: 'calculators', source: 'advancedRecommendationService intent map' },
   { id: 'memory', mapsTo: 'ai-memory', source: 'legacy /memory route alias for AI Memory' },
   { id: 'ai-governance-center', mapsTo: 'ai-governance', source: 'AI governance dashboard alias' },
@@ -209,14 +226,30 @@ export const toolIdAliases = [
   { id: 'timi-score', mapsTo: 'timi-ua-nstemi', source: 'NLU alias — timi score' },
   { id: 'timi-acs', mapsTo: 'timi-ua-nstemi', source: 'NLU alias — timi acs' },
   { id: 'timi-nstemi', mapsTo: 'timi-ua-nstemi', source: 'NLU alias — timi nstemi' },
-  { id: 'timi-unstable-angina', mapsTo: 'timi-ua-nstemi', source: 'NLU alias — timi unstable angina' },
+  {
+    id: 'timi-unstable-angina',
+    mapsTo: 'timi-ua-nstemi',
+    source: 'NLU alias — timi unstable angina',
+  },
   { id: 'wells-pe-score', mapsTo: 'wells-pe', source: 'NLU alias — wells pe / pe score' },
-  { id: 'pulmonary-embolism-wells', mapsTo: 'wells-pe', source: 'NLU alias — pulmonary embolism wells' },
-  { id: 'wells-pulmonary-embolism', mapsTo: 'wells-pe', source: 'NLU alias — wells pulmonary embolism' },
+  {
+    id: 'pulmonary-embolism-wells',
+    mapsTo: 'wells-pe',
+    source: 'NLU alias — pulmonary embolism wells',
+  },
+  {
+    id: 'wells-pulmonary-embolism',
+    mapsTo: 'wells-pe',
+    source: 'NLU alias — wells pulmonary embolism',
+  },
   { id: 'pe-score', mapsTo: 'wells-pe', source: 'NLU alias — pe score (Wells PE context)' },
   { id: 'perc-rule', mapsTo: 'perc', source: 'NLU alias — perc rule' },
   { id: 'pe-rule-out', mapsTo: 'perc', source: 'NLU alias — pe rule out' },
-  { id: 'pulmonary-embolism-rule-out', mapsTo: 'perc', source: 'NLU alias — pulmonary embolism rule out' },
+  {
+    id: 'pulmonary-embolism-rule-out',
+    mapsTo: 'perc',
+    source: 'NLU alias — pulmonary embolism rule out',
+  },
   { id: 'grace-score', mapsTo: 'grace-acs', source: 'NLU alias — grace score' },
   { id: 'grace-acs-risk', mapsTo: 'grace-acs', source: 'NLU alias — grace acs risk' },
   { id: 'acs-mortality-risk', mapsTo: 'grace-acs', source: 'NLU alias — acs mortality risk' },
@@ -233,9 +266,17 @@ export const toolIdAliases = [
   },
   { id: 'stroke-scale', mapsTo: 'nihss', source: 'NLU alias — stroke scale' },
   { id: 'stroke-severity-score', mapsTo: 'nihss', source: 'NLU alias — stroke severity score' },
-  { id: 'canadian-c-spine-rule', mapsTo: 'canadian-c-spine', source: 'NLU alias — canadian c-spine rule' },
+  {
+    id: 'canadian-c-spine-rule',
+    mapsTo: 'canadian-c-spine',
+    source: 'NLU alias — canadian c-spine rule',
+  },
   { id: 'c-spine-rule', mapsTo: 'canadian-c-spine', source: 'NLU alias — c spine rule' },
-  { id: 'cervical-spine-rule', mapsTo: 'canadian-c-spine', source: 'NLU alias — cervical spine rule' },
+  {
+    id: 'cervical-spine-rule',
+    mapsTo: 'canadian-c-spine',
+    source: 'NLU alias — cervical spine rule',
+  },
   {
     id: 'neck-trauma-imaging-rule',
     mapsTo: 'canadian-c-spine',
@@ -243,16 +284,28 @@ export const toolIdAliases = [
   },
   { id: 'ottawa-ankle-rule', mapsTo: 'ottawa-ankle', source: 'NLU alias — ottawa ankle rule' },
   { id: 'ankle-xray-rule', mapsTo: 'ottawa-ankle', source: 'NLU alias — ankle xray rule' },
-  { id: 'ankle-injury-imaging', mapsTo: 'ottawa-ankle', source: 'NLU alias — ankle injury imaging' },
+  {
+    id: 'ankle-injury-imaging',
+    mapsTo: 'ottawa-ankle',
+    source: 'NLU alias — ankle injury imaging',
+  },
   { id: 'foot-xray-rule', mapsTo: 'ottawa-ankle', source: 'NLU alias — foot xray rule' },
   { id: 'pecarn-head', mapsTo: 'pecarn-head', source: 'NLU — PECARN pediatric head injury' },
   { id: 'pecarn-head-injury', mapsTo: 'pecarn-head', source: 'NLU alias — pecarn head injury' },
-  { id: 'pediatric-head-ct-rule', mapsTo: 'pecarn-head', source: 'NLU alias — pediatric head ct rule' },
+  {
+    id: 'pediatric-head-ct-rule',
+    mapsTo: 'pecarn-head',
+    source: 'NLU alias — pediatric head ct rule',
+  },
   { id: 'child-head-trauma-ct', mapsTo: 'pecarn-head', source: 'NLU alias — child head trauma ct' },
   { id: 'nexus-cspine', mapsTo: 'nexus-cspine', source: 'NLU — NEXUS C-Spine rule' },
   { id: 'nexus-c-spine-rule', mapsTo: 'nexus-cspine', source: 'NLU alias — nexus c-spine rule' },
   { id: 'nexus-criteria', mapsTo: 'nexus-cspine', source: 'NLU alias — nexus criteria' },
-  { id: 'cervical-spine-nexus', mapsTo: 'nexus-cspine', source: 'NLU alias — cervical spine nexus' },
+  {
+    id: 'cervical-spine-nexus',
+    mapsTo: 'nexus-cspine',
+    source: 'NLU alias — cervical spine nexus',
+  },
   { id: 'abcd2', mapsTo: 'abcd2', source: 'NLU — ABCD² TIA stroke risk' },
   { id: 'abcd2-score', mapsTo: 'abcd2', source: 'NLU alias — abcd2 score' },
   { id: 'tia-stroke-risk', mapsTo: 'abcd2', source: 'NLU alias — tia stroke risk' },
@@ -282,7 +335,11 @@ export const toolIdAliases = [
   { id: 'framingham-score', mapsTo: 'framingham-risk', source: 'NLU alias — framingham score' },
   { id: 'ckd-stage', mapsTo: 'ckd-staging', source: 'NLU alias — ckd stage' },
   { id: 'kidney-stage', mapsTo: 'ckd-staging', source: 'NLU alias — kidney stage' },
-  { id: 'kidney-disease-staging', mapsTo: 'ckd-staging', source: 'NLU alias — kidney disease staging' },
+  {
+    id: 'kidney-disease-staging',
+    mapsTo: 'ckd-staging',
+    source: 'NLU alias — kidney disease staging',
+  },
   { id: 'gfr-stage', mapsTo: 'ckd-staging', source: 'NLU alias — gfr stage' },
   { id: 'albuminuria-stage', mapsTo: 'ckd-staging', source: 'NLU alias — albuminuria stage' },
   { id: 'stop-bang', mapsTo: 'stop-bang', source: 'NLU alias — stop bang' },
@@ -296,7 +353,11 @@ export const toolIdAliases = [
   { id: 'phq9', mapsTo: 'phq9', source: 'NLU alias — phq9' },
   { id: 'phq-9', mapsTo: 'phq9', source: 'NLU alias — phq-9' },
   { id: 'depression-screen', mapsTo: 'phq9', source: 'NLU alias — depression screen' },
-  { id: 'depression-questionnaire', mapsTo: 'phq9', source: 'NLU alias — depression questionnaire' },
+  {
+    id: 'depression-questionnaire',
+    mapsTo: 'phq9',
+    source: 'NLU alias — depression questionnaire',
+  },
   { id: 'mood-screen', mapsTo: 'phq9', source: 'NLU alias — mood screen' },
   { id: 'gad7', mapsTo: 'gad7', source: 'NLU alias — gad7' },
   { id: 'gad-7', mapsTo: 'gad7', source: 'NLU alias — gad-7' },
@@ -378,7 +439,8 @@ export const clientClinicalCapabilities = [
     status: 'client',
     category: 'clinical',
     path: '/tools',
-    notes: 'computeRiskScore(), categorizeRiskSeverity() — used by ToolPageLayout on all tool pages.',
+    notes:
+      'computeRiskScore(), categorizeRiskSeverity() — used by ToolPageLayout on all tool pages.',
   },
   {
     id: 'generate-clinical-alerts',
@@ -880,7 +942,11 @@ export function getSourceCodeDiscoverySummary() {
 }
 
 export const SOURCE_SCAN_LOCATIONS = [
-  { label: 'NLU clinical tools', path: 'backend/.../tool.patterns.ts', count: clinicalIntentTools.length },
+  {
+    label: 'NLU clinical tools',
+    path: 'backend/.../tool.patterns.ts',
+    count: clinicalIntentTools.length,
+  },
   {
     label: 'Backend executors',
     path: 'backend/.../tool-orchestrator/',
@@ -892,17 +958,49 @@ export const SOURCE_SCAN_LOCATIONS = [
     count: builtinUiCalculators.length,
   },
   { label: 'Sidebar registry', path: 'src/data/toolRegistry.ts', count: toolRegistry.length },
-  { label: 'Emergency NLU patterns', path: 'src/data/emergencyPatternCatalog.ts', count: emergencyPatternGroups.length },
-  { label: 'Phantom / roadmap IDs', path: 'CostTrackingContext, advancedRecommendationService', count: truePhantomToolReferences.length },
-  { label: 'API-only source-audit IDs', path: 'backend route exposure policy', count: apiOnlyToolReferences.length },
-  { label: 'Alias-only source-audit IDs', path: 'CostTrackingContext, OfflineProvider', count: aliasOnlyToolReferences.length },
-  { label: 'Client clinical helpers', path: 'riskScoring.js, clinicalInsights.js, ToolVisualization.jsx', count: clientClinicalCapabilities.length },
-  { label: 'Orchestrator API endpoints', path: 'tool-orchestrator.controller.ts', count: orchestratorApiCapabilities.length },
-  { label: 'Platform features', path: 'src/data/featureInventory.ts', count: platformFeatures.length },
+  {
+    label: 'Emergency NLU patterns',
+    path: 'src/data/emergencyPatternCatalog.ts',
+    count: emergencyPatternGroups.length,
+  },
+  {
+    label: 'Phantom / roadmap IDs',
+    path: 'CostTrackingContext, advancedRecommendationService',
+    count: truePhantomToolReferences.length,
+  },
+  {
+    label: 'API-only source-audit IDs',
+    path: 'backend route exposure policy',
+    count: apiOnlyToolReferences.length,
+  },
+  {
+    label: 'Alias-only source-audit IDs',
+    path: 'CostTrackingContext, OfflineProvider',
+    count: aliasOnlyToolReferences.length,
+  },
+  {
+    label: 'Client clinical helpers',
+    path: 'riskScoring.js, clinicalInsights.js, ToolVisualization.jsx',
+    count: clientClinicalCapabilities.length,
+  },
+  {
+    label: 'Orchestrator API endpoints',
+    path: 'tool-orchestrator.controller.ts',
+    count: orchestratorApiCapabilities.length,
+  },
+  {
+    label: 'Platform features',
+    path: 'src/data/featureInventory.ts',
+    count: platformFeatures.length,
+  },
   {
     label: 'Category packs 2-10',
     path: 'src/data/clinicalToolIdContract.ts',
     count: MEDICAL_EXPANSION_CATEGORY_PACKS.length,
   },
-  { label: 'ID aliases', path: 'sourceCodeToolDiscovery.toolIdAliases', count: toolIdAliases.length },
+  {
+    label: 'ID aliases',
+    path: 'sourceCodeToolDiscovery.toolIdAliases',
+    count: toolIdAliases.length,
+  },
 ];

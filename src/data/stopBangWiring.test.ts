@@ -20,9 +20,9 @@ const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
 const patternsSource = readFileSync(
   join(
     __dirname,
-    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts'
+    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts',
   ),
-  'utf8'
+  'utf8',
 );
 
 describe('STOP-Bang calculator wiring (stop-bang)', () => {
@@ -85,7 +85,10 @@ describe('STOP-Bang calculator wiring (stop-bang)', () => {
   });
 
   it('includes Calculators.jsx switch case for stop-bang', () => {
-    const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.tsx'), 'utf8');
+    const calculatorsSource = readFileSync(
+      join(__dirname, '../pages/tools/Calculators.tsx'),
+      'utf8',
+    );
     expect(calculatorsSource).toContain("case 'stop-bang':");
     expect(calculatorsSource).toContain('StopBangCalculator');
   });

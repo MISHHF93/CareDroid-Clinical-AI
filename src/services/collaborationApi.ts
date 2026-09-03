@@ -1,5 +1,8 @@
 import { apiFetch, getApiErrorMessage, getStoredAccessToken, parseApiResponse } from './apiClient';
-import { isBackendCapabilityEnabled, UNSUPPORTED_CAPABILITY_MESSAGE } from '../config/backendApiCapabilities';
+import {
+  isBackendCapabilityEnabled,
+  UNSUPPORTED_CAPABILITY_MESSAGE,
+} from '../config/backendApiCapabilities';
 import {
   normalizeChannelListPayload,
   normalizeMessageListPayload,
@@ -115,7 +118,9 @@ export async function fetchMessages(
   if (query.threadRootId) params.set('threadRootId', query.threadRootId);
   const qs = params.toString();
   const result = await guarded('Message history', () =>
-    requestJson(`/api/collaboration/channels/${encodeURIComponent(channelId)}/messages${qs ? `?${qs}` : ''}`),
+    requestJson(
+      `/api/collaboration/channels/${encodeURIComponent(channelId)}/messages${qs ? `?${qs}` : ''}`,
+    ),
   );
   if (!result.ok) return result as any;
   return { ok: true, data: normalizeMessageListPayload(result.data), message: '' };
@@ -205,7 +210,10 @@ export function markChannelRead(channelId: string, lastReadMessageId: string) {
   );
 }
 
-export function updateChannelMembership(channelId: string, payload: { notificationPreference?: string }) {
+export function updateChannelMembership(
+  channelId: string,
+  payload: { notificationPreference?: string },
+) {
   return guarded('Notification preference', () =>
     requestJson(`/api/collaboration/channels/${encodeURIComponent(channelId)}/membership`, {
       method: 'PATCH',

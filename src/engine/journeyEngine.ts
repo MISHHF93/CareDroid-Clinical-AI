@@ -81,12 +81,15 @@ export function assertLegalTransition(patient: Patient, targetState: PatientStat
   const nextStates = getNextStates(patient.state);
 
   if (patient.state === targetState) {
-    throw new PatientJourneyTransitionError(`${patientName(patient)} is already in ${targetState}.`, {
-      patientId: patient.id,
-      fromState: patient.state,
-      toState: targetState,
-      validNextStates: nextStates,
-    });
+    throw new PatientJourneyTransitionError(
+      `${patientName(patient)} is already in ${targetState}.`,
+      {
+        patientId: patient.id,
+        fromState: patient.state,
+        toState: targetState,
+        validNextStates: nextStates,
+      },
+    );
   }
 
   if (!isLegalTransition(patient.state, targetState)) {

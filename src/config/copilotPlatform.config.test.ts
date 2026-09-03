@@ -21,7 +21,9 @@ describe('copilotPlatform.config', () => {
   it('wires API inputs and outputs to emergency copilot routes', () => {
     expect(COPILOT_PLATFORM.api.chatMessage).toBe('/api/emergency/copilot/message');
     expect(COPILOT_PLATFORM.api.runtimeContext).toBe('/api/emergency/copilot');
-    expect(COPILOT_PLATFORM.outputs.navigationRoutes.toolsHub).toBe(CANONICAL_ROUTES.emergencyTools);
+    expect(COPILOT_PLATFORM.outputs.navigationRoutes.toolsHub).toBe(
+      CANONICAL_ROUTES.emergencyTools,
+    );
   });
 
   it('lists operational quick actions and tool launch events', () => {
@@ -45,14 +47,16 @@ describe('copilotPlatform.config', () => {
     expect(contract.outputs.channelCount).toBeGreaterThan(8);
     expect(contract.quickActions.operational.length).toBe(7);
     expect(contract.limits.maxQuickActions).toBeGreaterThan(0);
-    expect(resolveCopilotRuntimeLimits().maxRecommendations).toBe(contract.limits.maxRecommendations);
+    expect(resolveCopilotRuntimeLimits().maxRecommendations).toBe(
+      contract.limits.maxRecommendations,
+    );
   });
 
   it('formats compact and full welcome messages', () => {
     expect(getCopilotWelcomeMessage(true)).toContain('Ask about patients');
     expect(getCopilotWelcomeMessage(false)).toContain('CareDroid Copilot is ready');
-    expect(getCopilotWelcomeMessage(false, { copilotIntro: 'Document triage findings.' } as any)).toContain(
-      'Document triage findings',
-    );
+    expect(
+      getCopilotWelcomeMessage(false, { copilotIntro: 'Document triage findings.' } as any),
+    ).toContain('Document triage findings');
   });
 });

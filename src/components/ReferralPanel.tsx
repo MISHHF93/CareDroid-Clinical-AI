@@ -22,8 +22,8 @@ import './ReferralPanel.css';
 
 const ACTIVE_STATES = new Set(
   Object.values(PatientState).filter(
-    (state) => state !== PatientState.Discharge && state !== PatientState.Deceased
-  )
+    (state) => state !== PatientState.Discharge && state !== PatientState.Deceased,
+  ),
 );
 
 const REFERRAL_STATUSES = [
@@ -73,7 +73,13 @@ function patientName(patient) {
 }
 
 function patientSearchText(patient) {
-  return [patient.firstName, patient.lastName, patient.mrn, patient.chiefComplaint, patient.complaintCategory]
+  return [
+    patient.firstName,
+    patient.lastName,
+    patient.mrn,
+    patient.chiefComplaint,
+    patient.complaintCategory,
+  ]
     .filter(Boolean)
     .join(' ')
     .toLowerCase();
@@ -143,7 +149,17 @@ function statusLabel(status) {
   return STATUS_LABEL[status] || status;
 }
 
-function ReferralRow({ referral, patient, now, note, onNoteChange, onStatusChange, onSelectPatient, canUpdateWorkflow, statusChangePending }) {
+function ReferralRow({
+  referral,
+  patient,
+  now,
+  note,
+  onNoteChange,
+  onStatusChange,
+  onSelectPatient,
+  canUpdateWorkflow,
+  statusChangePending,
+}) {
   const elapsed = formatElapsed(elapsedMinutes(referral.requestedAt, now));
   const needsResponseNote = referral.status === 'Sent';
 
@@ -159,7 +175,9 @@ function ReferralRow({ referral, patient, now, note, onNoteChange, onStatusChang
         <span>{referral.reason}</span>
       </div>
 
-      <span className={`referral-row__urgency referral-row__urgency--${urgencyTone(referral.urgency)}`}>
+      <span
+        className={`referral-row__urgency referral-row__urgency--${urgencyTone(referral.urgency)}`}
+      >
         {referral.urgency}
       </span>
 
@@ -168,7 +186,9 @@ function ReferralRow({ referral, patient, now, note, onNoteChange, onStatusChang
         {elapsed}
       </time>
 
-      <span className={`referral-row__status referral-row__status--${referral.status.toLowerCase()}`}>
+      <span
+        className={`referral-row__status referral-row__status--${referral.status.toLowerCase()}`}
+      >
         {statusLabel(referral.status)}
       </span>
 
@@ -206,7 +226,11 @@ function ReferralRow({ referral, patient, now, note, onNoteChange, onStatusChang
           ) : null}
 
           {referral.status === 'Draft' ? (
-            <button type="button" onClick={() => onStatusChange(referral.id, 'Sent')} disabled={statusChangePending}>
+            <button
+              type="button"
+              onClick={() => onStatusChange(referral.id, 'Sent')}
+              disabled={statusChangePending}
+            >
               <Send size={14} aria-hidden />
               Send
             </button>
@@ -235,7 +259,11 @@ function ReferralRow({ referral, patient, now, note, onNoteChange, onStatusChang
           ) : null}
 
           {referral.status === 'Acknowledged' ? (
-            <button type="button" onClick={() => onStatusChange(referral.id, 'Accepted')} disabled={statusChangePending}>
+            <button
+              type="button"
+              onClick={() => onStatusChange(referral.id, 'Accepted')}
+              disabled={statusChangePending}
+            >
               <CheckCircle2 size={14} aria-hidden />
               Accept
             </button>
@@ -344,18 +372,20 @@ export default function ReferralPanel() {
       patients
         .filter((patient) => ACTIVE_STATES.has(patient.state as any))
         .sort((a, b) => patientName(a).localeCompare(patientName(b))),
-    [patients]
+    [patients],
   );
 
   const selectedPatient = useMemo(
     () => patients.find((patient) => patient.id === form.patientId),
-    [form.patientId, patients]
+    [form.patientId, patients],
   );
 
   const filteredPatients = useMemo(() => {
     const query = patientQuery.trim().toLowerCase();
     if (!query) return activePatients.slice(0, 6);
-    return activePatients.filter((patient) => patientSearchText(patient).includes(query)).slice(0, 8);
+    return activePatients
+      .filter((patient) => patientSearchText(patient).includes(query))
+      .slice(0, 8);
   }, [activePatients, patientQuery]);
 
   const groupedReferrals = useMemo(
@@ -364,9 +394,13 @@ export default function ReferralPanel() {
         status,
         referrals: referrals
           .filter((referral) => referral.status === status)
-          .sort((a, b) => new Date((b as any).requestedAt).getTime() - new Date((a as any).requestedAt).getTime()),
+          .sort(
+            (a, b) =>
+              new Date((b as any).requestedAt).getTime() -
+              new Date((a as any).requestedAt).getTime(),
+          ),
       })),
-    [referrals]
+    [referrals],
   );
 
   const awareness = useMemo(() => summarizeReferralAwareness(referrals), [referrals]);
@@ -440,7 +474,10 @@ export default function ReferralPanel() {
     const payload = {
       patientId: selectedPatient.id,
       requestingStaffId:
-        selectedPatient.assignedStaffId || activeShift.chargeStaffId || staff[0]?.id || 'system-referrals',
+        selectedPatient.assignedStaffId ||
+        activeShift.chargeStaffId ||
+        staff[0]?.id ||
+        'system-referrals',
       targetDepartment: form.targetDepartment,
       urgency: form.urgency,
       reason: form.reason.trim(),
@@ -465,7 +502,7 @@ export default function ReferralPanel() {
         setBackendStatus(
           result.ok
             ? 'Referral saved to CareDroid.'
-            : 'Referral saved for this shift. Live sync is pending.'
+            : 'Referral saved for this shift. Live sync is pending.',
         );
       })
       .catch(() => {
@@ -491,7 +528,9 @@ export default function ReferralPanel() {
     if (statusChangeInFlightRef.current) return;
     statusChangeInFlightRef.current = true;
     const referral = referrals.find((item) => item.id === referralId);
-    const isTransfer = referral?.workflow === 'Transfer' || ['TransferRequested', 'TransportArranged', 'PatientDeparted'].includes(status);
+    const isTransfer =
+      referral?.workflow === 'Transfer' ||
+      ['TransferRequested', 'TransportArranged', 'PatientDeparted'].includes(status);
     if ((isTransfer && !canManageTransfer) || (!isTransfer && !canManageReferral)) {
       setBackendStatus(`${emergencyRole.roleLabel} cannot update this workflow.`);
       statusChangeInFlightRef.current = false;
@@ -513,12 +552,12 @@ export default function ReferralPanel() {
         setBackendStatus(
           result.ok
             ? `${isTransfer ? 'Transfer workflow' : 'Referral status'} synced to CareDroid.`
-            : `${isTransfer ? 'Transfer' : 'Referral'} updated for this shift. Live sync is pending.`
+            : `${isTransfer ? 'Transfer' : 'Referral'} updated for this shift. Live sync is pending.`,
         );
       })
       .catch(() => {
         setBackendStatus(
-          `${isTransfer ? 'Transfer' : 'Referral'} updated for this shift. Live sync is pending.`
+          `${isTransfer ? 'Transfer' : 'Referral'} updated for this shift. Live sync is pending.`,
         );
       })
       .finally(() => {
@@ -547,52 +586,52 @@ export default function ReferralPanel() {
   // chrome model, but wasteful and a hazard for any future registration model).
   const headerActions = useMemo(
     () => (
-    <>
-      {referralPresentation.visible ? (
-        <button
-          type="button"
-          className="referral-panel__action-btn"
-          disabled={!canManageReferral}
-          title={
-            canManageReferral
-              ? 'Create a new referral'
-              : `${emergencyRole.roleLabel} cannot create referrals`
-          }
-          onClick={() => {
-            if (!canManageReferral) return;
-            setForm((current) => ({ ...current, workflow: 'Referral' }));
-            setFormOpen((open) => !open);
-          }}
-        >
-          <FilePlus2 size={16} aria-hidden />
-          New Referral
-        </button>
-      ) : null}
-      {transferPresentation.visible ? (
-        <button
-          type="button"
-          className="referral-panel__action-btn"
-          disabled={!canManageTransfer}
-          title={
-            canManageTransfer
-              ? 'Create a new transfer request'
-              : `${emergencyRole.roleLabel} cannot create transfers`
-          }
-          onClick={() => {
-            if (!canManageTransfer) return;
-            setForm((current) => ({
-              ...current,
-              workflow: 'Transfer',
-              targetDepartment: 'Other',
-              urgency: 'Urgent',
-            }));
-            setFormOpen(true);
-          }}
-        >
-          New Transfer
-        </button>
-      ) : null}
-    </>
+      <>
+        {referralPresentation.visible ? (
+          <button
+            type="button"
+            className="referral-panel__action-btn"
+            disabled={!canManageReferral}
+            title={
+              canManageReferral
+                ? 'Create a new referral'
+                : `${emergencyRole.roleLabel} cannot create referrals`
+            }
+            onClick={() => {
+              if (!canManageReferral) return;
+              setForm((current) => ({ ...current, workflow: 'Referral' }));
+              setFormOpen((open) => !open);
+            }}
+          >
+            <FilePlus2 size={16} aria-hidden />
+            New Referral
+          </button>
+        ) : null}
+        {transferPresentation.visible ? (
+          <button
+            type="button"
+            className="referral-panel__action-btn"
+            disabled={!canManageTransfer}
+            title={
+              canManageTransfer
+                ? 'Create a new transfer request'
+                : `${emergencyRole.roleLabel} cannot create transfers`
+            }
+            onClick={() => {
+              if (!canManageTransfer) return;
+              setForm((current) => ({
+                ...current,
+                workflow: 'Transfer',
+                targetDepartment: 'Other',
+                urgency: 'Urgent',
+              }));
+              setFormOpen(true);
+            }}
+          >
+            New Transfer
+          </button>
+        ) : null}
+      </>
     ),
     // setForm/setFormOpen are stable useState setters, deliberately omitted.
     [
@@ -613,249 +652,257 @@ export default function ReferralPanel() {
       actions={headerActions}
     >
       <div className="referral-panel__content">
-      <EdDataSourceBanner
-        envelope={referralsModule.data}
-        loading={referralsModule.loading}
-        error={referralsModule.error}
-        activeScenarioId={activeScenarioId}
-        compact
-      />
-
-      {referralsModule.loading && !referrals.length ? (
-        <p className="referral-panel__backend-status" role="status">
-          Loading CareDroid referrals...
-        </p>
-      ) : null}
-      {referralsModule.error ? (
-        // HEAL-274: this banner previously had no retry affordance at all --
-        // unlike the whiteboard page's onRetry/retryLabel="Refresh board"
-        // pattern (index.tsx), a slow/failed referral fetch left staff with
-        // no way to re-trigger it short of a full page reload.
-        <ToolApiErrorBanner
-          message={`${referralsModule.error.replace(/\.+\s*$/, '')}. Showing the last local referral queue; confirm live referral status before external handoff.`}
-          onRetry={() => void referralsModule.refresh()}
-          retryLabel="Retry referral sync"
+        <EdDataSourceBanner
+          envelope={referralsModule.data}
+          loading={referralsModule.loading}
+          error={referralsModule.error}
+          activeScenarioId={activeScenarioId}
+          compact
         />
-      ) : null}
-      <div className="referral-panel__metrics" aria-label="Referral metrics">
-        <div>
-          <span>Active</span>
-          <strong>{metrics.active}</strong>
-        </div>
-        <div>
-          <span>Pending</span>
-          <strong>{metrics.pending}</strong>
-        </div>
-        <div>
-          <span>Delayed</span>
-          <strong>{metrics.delayed}</strong>
-        </div>
-        <div>
-          <span>Emergent</span>
-          <strong>{metrics.emergent}</strong>
-        </div>
-      </div>
 
-      <OperationalHistoryPanel
-        logs={workflowLogs}
-        title="Referral history"
-        description="Referral creation and status changes from workflow audit data."
-        domains={[OPERATIONAL_AUDIT_DOMAIN.REFERRAL]}
-        limit={8}
-      />
-
-      {statusFilter ? (
-        <p className="referral-panel__backend-status" role="status">
-          Showing {statusFilter} referrals from whiteboard awareness.
-        </p>
-      ) : null}
-
-      {backendStatus || backendPending ? (
-        backendStatus?.includes('failed') ? (
-          <p className="referral-panel__backend-status" role="alert">
-            {backendPending ? 'Syncing referral workflow with backend...' : backendStatus}
-          </p>
-        ) : (
+        {referralsModule.loading && !referrals.length ? (
           <p className="referral-panel__backend-status" role="status">
-            {backendPending ? 'Syncing referral workflow with backend...' : backendStatus}
+            Loading CareDroid referrals...
           </p>
-        )
-      ) : null}
-
-      {formOpen ? (
-        <form className="referral-form" onSubmit={(event) => event.preventDefault()}>
-          <div className="referral-form__header">
-            <div>
-              <span>{form.workflow === 'Transfer' ? 'New Transfer' : 'New Referral'}</span>
-              <h2>{form.workflow === 'Transfer' ? 'Inter-Facility Transfer' : 'Consult Request'}</h2>
-            </div>
-            <button type="button" onClick={() => setFormOpen(false)}>
-              Close
-            </button>
+        ) : null}
+        {referralsModule.error ? (
+          // HEAL-274: this banner previously had no retry affordance at all --
+          // unlike the whiteboard page's onRetry/retryLabel="Refresh board"
+          // pattern (index.tsx), a slow/failed referral fetch left staff with
+          // no way to re-trigger it short of a full page reload.
+          <ToolApiErrorBanner
+            message={`${referralsModule.error.replace(/\.+\s*$/, '')}. Showing the last local referral queue; confirm live referral status before external handoff.`}
+            onRetry={() => void referralsModule.refresh()}
+            retryLabel="Retry referral sync"
+          />
+        ) : null}
+        <div className="referral-panel__metrics" aria-label="Referral metrics">
+          <div>
+            <span>Active</span>
+            <strong>{metrics.active}</strong>
           </div>
-
-          <label className="referral-form__search">
-            Patient selector
-            <div>
-              <Search size={15} aria-hidden />
-              <input
-                type="search"
-                value={patientQuery}
-                placeholder="Search active patients by name, MRN, complaint..."
-                onChange={(event) => setPatientQuery(event.target.value)}
-              />
-            </div>
-          </label>
-
-          <div className="referral-form__patient-results" aria-label="Active patient search results">
-            {filteredPatients.length ? (
-              filteredPatients.map((patient) => (
-                <button
-                  key={patient.id}
-                  type="button"
-                  className={patient.id === form.patientId ? 'referral-form__patient--selected' : ''}
-                  onClick={() => selectFormPatient(patient)}
-                >
-                  <strong>{patientName(patient)}</strong>
-                  <span>
-                    {patient.mrn} · {patient.chiefComplaint}
-                  </span>
-                </button>
-              ))
-            ) : (
-              <p className="referral-form__empty">No active patients match this search.</p>
-            )}
+          <div>
+            <span>Pending</span>
+            <strong>{metrics.pending}</strong>
           </div>
-
-          <div className="referral-form__grid">
-            <label>
-              Target department
-              <select
-                value={form.targetDepartment}
-                onChange={(event) =>
-                  setForm((current) => ({ ...current, targetDepartment: event.target.value }))
-                }
-              >
-                {TARGET_DEPARTMENTS.map((department) => (
-                  <option key={department} value={department}>
-                    {department}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label>
-              Urgency
-              <select
-                value={form.urgency}
-                onChange={(event) => setForm((current) => ({ ...current, urgency: event.target.value }))}
-              >
-                {URGENCIES.map((urgency) => (
-                  <option key={urgency} value={urgency}>
-                    {urgency}
-                  </option>
-                ))}
-              </select>
-            </label>
+          <div>
+            <span>Delayed</span>
+            <strong>{metrics.delayed}</strong>
           </div>
+          <div>
+            <span>Emergent</span>
+            <strong>{metrics.emergent}</strong>
+          </div>
+        </div>
 
-          <label>
-            Reason
-            <input
-              type="text"
-              value={form.reason}
-              placeholder="Clinical reason for referral"
-              onChange={(event) => setForm((current) => ({ ...current, reason: event.target.value }))}
-            />
-          </label>
+        <OperationalHistoryPanel
+          logs={workflowLogs}
+          title="Referral history"
+          description="Referral creation and status changes from workflow audit data."
+          domains={[OPERATIONAL_AUDIT_DOMAIN.REFERRAL]}
+          limit={8}
+        />
 
-          <label>
-            Clinical summary
-            <textarea
-              value={form.clinicalSummary}
-              placeholder="Select a patient to auto-populate from complaint and vitals."
-              onChange={(event) =>
-                setForm((current) => ({ ...current, clinicalSummary: event.target.value }))
-              }
-            />
-          </label>
+        {statusFilter ? (
+          <p className="referral-panel__backend-status" role="status">
+            Showing {statusFilter} referrals from whiteboard awareness.
+          </p>
+        ) : null}
 
-          <div className="referral-form__actions">
-            {formError ? <p role="alert">{formError}</p> : null}
-            <button
-              type="button"
-              onClick={() => {
-                if (!canUpdateWorkflow) {
-                  setFormError(`${emergencyRole.roleLabel} cannot update referral forms.`);
-                  return;
-                }
-                if (!selectedPatient) {
-                  setFormError('Select a patient to auto-fill a clinical summary.');
-                  return;
-                }
-                setFormError('');
-                setForm((current) => ({ ...current, clinicalSummary: buildClinicalSummary(selectedPatient) }));
-              }}
-            >
-              Auto-fill summary
-            </button>
-            {form.workflow === 'Referral' ? (
-              <button type="button" onClick={() => submitReferral('Draft')} disabled={backendPending || !canManageReferral}>
-                Save Draft
+        {backendStatus || backendPending ? (
+          backendStatus?.includes('failed') ? (
+            <p className="referral-panel__backend-status" role="alert">
+              {backendPending ? 'Syncing referral workflow with backend...' : backendStatus}
+            </p>
+          ) : (
+            <p className="referral-panel__backend-status" role="status">
+              {backendPending ? 'Syncing referral workflow with backend...' : backendStatus}
+            </p>
+          )
+        ) : null}
+
+        {formOpen ? (
+          <form className="referral-form" onSubmit={(event) => event.preventDefault()}>
+            <div className="referral-form__header">
+              <div>
+                <span>{form.workflow === 'Transfer' ? 'New Transfer' : 'New Referral'}</span>
+                <h2>
+                  {form.workflow === 'Transfer' ? 'Inter-Facility Transfer' : 'Consult Request'}
+                </h2>
+              </div>
+              <button type="button" onClick={() => setFormOpen(false)}>
+                Close
               </button>
-            ) : null}
-            {form.workflow === 'Transfer' ? (
-              <button type="button" className="referral-form__send" onClick={() => submitReferral('TransferRequested')} disabled={backendPending || !canManageTransfer}>
-                Request Transfer
-              </button>
-            ) : (
-              <button type="button" className="referral-form__send" onClick={() => submitReferral('Sent')} disabled={backendPending || !canManageReferral}>
-                <Send size={14} aria-hidden />
-                {backendPending ? 'Sending...' : 'Send Referral'}
-              </button>
-            )}
-          </div>
-        </form>
-      ) : null}
-
-      <div className="referral-panel__groups">
-        {!referrals.length ? (
-          <p className="referral-group__empty">No active referrals in the current CareDroid workflow state.</p>
-        ) : statusFilter && awareness.grouped[statusFilter]?.length ? (
-          <section className="referral-group" aria-labelledby={`referrals-filter-${statusFilter}`}>
-            <div className="referral-group__heading">
-              <h2 id={`referrals-filter-${statusFilter}`}>{statusLabel(statusFilter)} referrals</h2>
-              <span>{awareness.grouped[statusFilter].length}</span>
             </div>
-            <div className="referral-group__rows">
-              {awareness.grouped[statusFilter].map((referral) => (
-                <ReferralRow
-                  key={referral.id}
-                  referral={referral}
-                  patient={patients.find((patient) => patient.id === referral.patientId)}
-                  now={now}
-                  note={responseNotes[referral.id] || ''}
-                  onNoteChange={(referralId, value) =>
-                    setResponseNotes((current) => ({ ...current, [referralId]: value }))
-                  }
-                  onStatusChange={handleStatusChange}
-                  onSelectPatient={handleSelectPatient}
-                  canUpdateWorkflow={canUpdateWorkflow}
-                  statusChangePending={backendPending}
+
+            <label className="referral-form__search">
+              Patient selector
+              <div>
+                <Search size={15} aria-hidden />
+                <input
+                  type="search"
+                  value={patientQuery}
+                  placeholder="Search active patients by name, MRN, complaint..."
+                  onChange={(event) => setPatientQuery(event.target.value)}
                 />
-              ))}
-            </div>
-          </section>
-        ) : groupedReferrals.map((group) => (
-          <section key={group.status} className="referral-group" aria-labelledby={`referrals-${group.status}`}>
-            <div className="referral-group__heading">
-              <h2 id={`referrals-${group.status}`}>{statusLabel(group.status)}</h2>
-              <span>{group.referrals.length}</span>
+              </div>
+            </label>
+
+            <div
+              className="referral-form__patient-results"
+              aria-label="Active patient search results"
+            >
+              {filteredPatients.length ? (
+                filteredPatients.map((patient) => (
+                  <button
+                    key={patient.id}
+                    type="button"
+                    className={
+                      patient.id === form.patientId ? 'referral-form__patient--selected' : ''
+                    }
+                    onClick={() => selectFormPatient(patient)}
+                  >
+                    <strong>{patientName(patient)}</strong>
+                    <span>
+                      {patient.mrn} · {patient.chiefComplaint}
+                    </span>
+                  </button>
+                ))
+              ) : (
+                <p className="referral-form__empty">No active patients match this search.</p>
+              )}
             </div>
 
-            <div className="referral-group__rows">
-              {group.referrals.length ? (
-                group.referrals.map((referral) => (
+            <div className="referral-form__grid">
+              <label>
+                Target department
+                <select
+                  value={form.targetDepartment}
+                  onChange={(event) =>
+                    setForm((current) => ({ ...current, targetDepartment: event.target.value }))
+                  }
+                >
+                  {TARGET_DEPARTMENTS.map((department) => (
+                    <option key={department} value={department}>
+                      {department}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label>
+                Urgency
+                <select
+                  value={form.urgency}
+                  onChange={(event) =>
+                    setForm((current) => ({ ...current, urgency: event.target.value }))
+                  }
+                >
+                  {URGENCIES.map((urgency) => (
+                    <option key={urgency} value={urgency}>
+                      {urgency}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+
+            <label>
+              Reason
+              <input
+                type="text"
+                value={form.reason}
+                placeholder="Clinical reason for referral"
+                onChange={(event) =>
+                  setForm((current) => ({ ...current, reason: event.target.value }))
+                }
+              />
+            </label>
+
+            <label>
+              Clinical summary
+              <textarea
+                value={form.clinicalSummary}
+                placeholder="Select a patient to auto-populate from complaint and vitals."
+                onChange={(event) =>
+                  setForm((current) => ({ ...current, clinicalSummary: event.target.value }))
+                }
+              />
+            </label>
+
+            <div className="referral-form__actions">
+              {formError ? <p role="alert">{formError}</p> : null}
+              <button
+                type="button"
+                onClick={() => {
+                  if (!canUpdateWorkflow) {
+                    setFormError(`${emergencyRole.roleLabel} cannot update referral forms.`);
+                    return;
+                  }
+                  if (!selectedPatient) {
+                    setFormError('Select a patient to auto-fill a clinical summary.');
+                    return;
+                  }
+                  setFormError('');
+                  setForm((current) => ({
+                    ...current,
+                    clinicalSummary: buildClinicalSummary(selectedPatient),
+                  }));
+                }}
+              >
+                Auto-fill summary
+              </button>
+              {form.workflow === 'Referral' ? (
+                <button
+                  type="button"
+                  onClick={() => submitReferral('Draft')}
+                  disabled={backendPending || !canManageReferral}
+                >
+                  Save Draft
+                </button>
+              ) : null}
+              {form.workflow === 'Transfer' ? (
+                <button
+                  type="button"
+                  className="referral-form__send"
+                  onClick={() => submitReferral('TransferRequested')}
+                  disabled={backendPending || !canManageTransfer}
+                >
+                  Request Transfer
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="referral-form__send"
+                  onClick={() => submitReferral('Sent')}
+                  disabled={backendPending || !canManageReferral}
+                >
+                  <Send size={14} aria-hidden />
+                  {backendPending ? 'Sending...' : 'Send Referral'}
+                </button>
+              )}
+            </div>
+          </form>
+        ) : null}
+
+        <div className="referral-panel__groups">
+          {!referrals.length ? (
+            <p className="referral-group__empty">
+              No active referrals in the current CareDroid workflow state.
+            </p>
+          ) : statusFilter && awareness.grouped[statusFilter]?.length ? (
+            <section
+              className="referral-group"
+              aria-labelledby={`referrals-filter-${statusFilter}`}
+            >
+              <div className="referral-group__heading">
+                <h2 id={`referrals-filter-${statusFilter}`}>
+                  {statusLabel(statusFilter)} referrals
+                </h2>
+                <span>{awareness.grouped[statusFilter].length}</span>
+              </div>
+              <div className="referral-group__rows">
+                {awareness.grouped[statusFilter].map((referral) => (
                   <ReferralRow
                     key={referral.id}
                     referral={referral}
@@ -870,14 +917,49 @@ export default function ReferralPanel() {
                     canUpdateWorkflow={canUpdateWorkflow}
                     statusChangePending={backendPending}
                   />
-                ))
-              ) : (
-                <p className="referral-group__empty">No {group.status.toLowerCase()} referrals.</p>
-              )}
-            </div>
-          </section>
-        ))}
-      </div>
+                ))}
+              </div>
+            </section>
+          ) : (
+            groupedReferrals.map((group) => (
+              <section
+                key={group.status}
+                className="referral-group"
+                aria-labelledby={`referrals-${group.status}`}
+              >
+                <div className="referral-group__heading">
+                  <h2 id={`referrals-${group.status}`}>{statusLabel(group.status)}</h2>
+                  <span>{group.referrals.length}</span>
+                </div>
+
+                <div className="referral-group__rows">
+                  {group.referrals.length ? (
+                    group.referrals.map((referral) => (
+                      <ReferralRow
+                        key={referral.id}
+                        referral={referral}
+                        patient={patients.find((patient) => patient.id === referral.patientId)}
+                        now={now}
+                        note={responseNotes[referral.id] || ''}
+                        onNoteChange={(referralId, value) =>
+                          setResponseNotes((current) => ({ ...current, [referralId]: value }))
+                        }
+                        onStatusChange={handleStatusChange}
+                        onSelectPatient={handleSelectPatient}
+                        canUpdateWorkflow={canUpdateWorkflow}
+                        statusChangePending={backendPending}
+                      />
+                    ))
+                  ) : (
+                    <p className="referral-group__empty">
+                      No {group.status.toLowerCase()} referrals.
+                    </p>
+                  )}
+                </div>
+              </section>
+            ))
+          )}
+        </div>
       </div>
     </EmergencyRoutePage>
   );

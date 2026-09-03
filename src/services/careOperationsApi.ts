@@ -65,11 +65,14 @@ export async function transitionCareTask(
   status: CareTaskStatus,
 ): Promise<{ ok: boolean; task: CareTask | null; message: string }> {
   const jsonHeaders = { 'content-type': 'application/json' };
-  const result = await guardedJson(`/api/emergency/care-operations/inbox/${encodeURIComponent(id)}`, {
-    method: 'PATCH',
-    headers: jsonHeaders,
-    body: JSON.stringify({ status }),
-  });
+  const result = await guardedJson(
+    `/api/emergency/care-operations/inbox/${encodeURIComponent(id)}`,
+    {
+      method: 'PATCH',
+      headers: jsonHeaders,
+      body: JSON.stringify({ status }),
+    },
+  );
   const task = (result.data ?? null) as CareTask | null;
   return { ok: result.ok, task, message: result.message };
 }

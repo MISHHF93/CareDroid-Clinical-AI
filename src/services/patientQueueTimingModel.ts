@@ -76,7 +76,10 @@ function mapTone(value: string | undefined): PatientQueueTimingTone {
   return 'neutral';
 }
 
-function buildRemainingLabel(remainingMinutes: number | null, overdueMinutes: number | null): string {
+function buildRemainingLabel(
+  remainingMinutes: number | null,
+  overdueMinutes: number | null,
+): string {
   if (overdueMinutes != null && overdueMinutes > 0) {
     return `${formatDuration(overdueMinutes)} overdue`;
   }
@@ -120,7 +123,9 @@ function fromProviderScenario(
   if (!snapshot) return null;
 
   const overdueMinutes =
-    snapshot.phase === 'breached' ? Math.max(0, snapshot.elapsedMinutes - snapshot.targetMinutes) : null;
+    snapshot.phase === 'breached'
+      ? Math.max(0, snapshot.elapsedMinutes - snapshot.targetMinutes)
+      : null;
   const remainingLabel = buildRemainingLabel(snapshot.remainingMinutes, overdueMinutes);
   const compactLabel = `${snapshot.elapsedLabel} · ${remainingLabel}`;
 
@@ -157,7 +162,8 @@ function fromReassessmentScenario(
     ? timer.overdueLabel || buildRemainingLabel(null, timer.minutesOverdue)
     : timer.dueInLabel || buildRemainingLabel(timer.minutesUntilDue, null);
   const elapsedMinutes = timer.triageAgeMinutes ?? timer.arrivalAgeMinutes ?? 0;
-  const elapsedLabel = timer.triageAgeLabel || timer.arrivalAgeLabel || formatDuration(elapsedMinutes);
+  const elapsedLabel =
+    timer.triageAgeLabel || timer.arrivalAgeLabel || formatDuration(elapsedMinutes);
   const compactLabel = `${elapsedLabel} · ${remainingLabel}`;
 
   return {
@@ -170,7 +176,13 @@ function fromReassessmentScenario(
     remainingMinutes: timer.minutesUntilDue,
     remainingLabel,
     targetMinutes: timer.intervalMinutes,
-    tone: timer.isOverdue ? 'critical' : timer.tone === 'critical' ? 'critical' : timer.tone === 'watch' ? 'watch' : 'neutral',
+    tone: timer.isOverdue
+      ? 'critical'
+      : timer.tone === 'critical'
+        ? 'critical'
+        : timer.tone === 'watch'
+          ? 'watch'
+          : 'neutral',
     compactLabel,
     rowLabel: compactLabel,
     staffDetail: `Reassessment ${remainingLabel.toLowerCase()} · last vitals ${timer.lastVitalsAgeLabel} ago`,
@@ -179,7 +191,8 @@ function fromReassessmentScenario(
 
 function fromActiveCareScenario(patient: Patient, now: Date): PatientQueueTimingSnapshot | null {
   if (!ACTIVE_STATES.has(patient.state)) return null;
-  if (patient.state === PatientState.Discharge || patient.state === PatientState.Deceased) return null;
+  if (patient.state === PatientState.Discharge || patient.state === PatientState.Deceased)
+    return null;
 
   const anchor = patient.triageTime || patient.arrivalTime;
   const elapsedMinutes = minutesSince(anchor, now);
@@ -255,7 +268,10 @@ export function buildQueueTimingSummary(
     onlineCount += 1;
     if (timing.tone === 'critical' || timing.remainingLabel.includes('overdue')) {
       breachedCount += 1;
-    } else if (timing.tone === 'watch' || (timing.remainingMinutes != null && timing.remainingMinutes <= 10)) {
+    } else if (
+      timing.tone === 'watch' ||
+      (timing.remainingMinutes != null && timing.remainingMinutes <= 10)
+    ) {
       dueSoonCount += 1;
     }
   }

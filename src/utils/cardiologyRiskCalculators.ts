@@ -41,7 +41,7 @@ export const CHADS2_CRITERIA_META = Object.freeze([
 export function calculateChads2Score(inputs) {
   return CHADS2_CRITERIA_META.reduce(
     (total, criterion) => total + (inputs?.[criterion.key] ? criterion.points : 0),
-    0
+    0,
   );
 }
 
@@ -183,7 +183,11 @@ export function computeReynoldsRiskHelper(inputs) {
   const points =
     (ageYears >= 65 ? 3 : ageYears >= 55 ? 2 : 1) +
     (systolicBpMmHg >= 160 ? 3 : systolicBpMmHg >= 140 ? 2 : systolicBpMmHg >= 120 ? 1 : 0) +
-    (totalCholesterolMgDl / Math.max(hdlCholesterolMgDl, 1) >= 6 ? 2 : totalCholesterolMgDl / hdlCholesterolMgDl >= 4 ? 1 : 0) +
+    (totalCholesterolMgDl / Math.max(hdlCholesterolMgDl, 1) >= 6
+      ? 2
+      : totalCholesterolMgDl / hdlCholesterolMgDl >= 4
+        ? 1
+        : 0) +
     (hsCrpMgL >= 3 ? 2 : hsCrpMgL >= 1 ? 1 : 0) +
     (inputs.smoker ? 2 : 0) +
     (inputs.parentalMiBefore60 ? 1 : 0) +
@@ -251,19 +255,25 @@ export function interpretReynoldsRiskHelper(result) {
 export function validateReynoldsInputs(raw) {
   const errors = [] as any[];
   const age = Number(raw.ageYears);
-  if (!Number.isFinite(age) || age < 45 || age > 80) errors.push('Age must be 45-80 years for this helper.');
+  if (!Number.isFinite(age) || age < 45 || age > 80)
+    errors.push('Age must be 45-80 years for this helper.');
   if (!raw.sex) errors.push('Select sex.');
   const sbp = Number(raw.systolicBpMmHg);
   const tc = Number(raw.totalCholesterolMgDl);
   const hdl = Number(raw.hdlCholesterolMgDl);
   const crp = Number(raw.hsCrpMgL);
-  if (!Number.isFinite(sbp) || sbp < 80 || sbp > 250) errors.push('Enter systolic BP between 80 and 250 mmHg.');
-  if (!Number.isFinite(tc) || tc < 100 || tc > 400) errors.push('Enter total cholesterol between 100 and 400 mg/dL.');
-  if (!Number.isFinite(hdl) || hdl < 20 || hdl > 120) errors.push('Enter HDL cholesterol between 20 and 120 mg/dL.');
-  if (!Number.isFinite(crp) || crp < 0.1 || crp > 50) errors.push('Enter hs-CRP between 0.1 and 50 mg/L.');
+  if (!Number.isFinite(sbp) || sbp < 80 || sbp > 250)
+    errors.push('Enter systolic BP between 80 and 250 mmHg.');
+  if (!Number.isFinite(tc) || tc < 100 || tc > 400)
+    errors.push('Enter total cholesterol between 100 and 400 mg/dL.');
+  if (!Number.isFinite(hdl) || hdl < 20 || hdl > 120)
+    errors.push('Enter HDL cholesterol between 20 and 120 mg/dL.');
+  if (!Number.isFinite(crp) || crp < 0.1 || crp > 50)
+    errors.push('Enter hs-CRP between 0.1 and 50 mg/L.');
   if (raw.diabetes) {
     const hba1c = Number(raw.hba1cPct);
-    if (!Number.isFinite(hba1c) || hba1c < 4 || hba1c > 15) errors.push('Enter HbA1c between 4% and 15%.');
+    if (!Number.isFinite(hba1c) || hba1c < 4 || hba1c > 15)
+      errors.push('Enter HbA1c between 4% and 15%.');
   }
   return errors;
 }
@@ -344,10 +354,14 @@ export function validateHcmSuddenDeathRiskInputs(raw) {
   const wall = Number(raw.maxWallThicknessMm);
   const la = Number(raw.leftAtriumDiameterMm);
   const gradient = Number(raw.maxLvotGradientMmHg);
-  if (!Number.isFinite(age) || age < 16 || age > 100) errors.push('Enter age between 16 and 100 years.');
-  if (!Number.isFinite(wall) || wall < 10 || wall > 50) errors.push('Enter max wall thickness between 10 and 50 mm.');
-  if (!Number.isFinite(la) || la < 20 || la > 80) errors.push('Enter left atrial diameter between 20 and 80 mm.');
-  if (!Number.isFinite(gradient) || gradient < 0 || gradient > 250) errors.push('Enter max LVOT gradient between 0 and 250 mmHg.');
+  if (!Number.isFinite(age) || age < 16 || age > 100)
+    errors.push('Enter age between 16 and 100 years.');
+  if (!Number.isFinite(wall) || wall < 10 || wall > 50)
+    errors.push('Enter max wall thickness between 10 and 50 mm.');
+  if (!Number.isFinite(la) || la < 20 || la > 80)
+    errors.push('Enter left atrial diameter between 20 and 80 mm.');
+  if (!Number.isFinite(gradient) || gradient < 0 || gradient > 250)
+    errors.push('Enter max LVOT gradient between 0 and 250 mmHg.');
   return errors;
 }
 

@@ -115,4 +115,6 @@ export const WorkspaceContextEnvelopeContractSchema = z.object({
   recommendations: z.array(z.record(z.string(), z.any())).default([]),
   workspaceTypes: z.array(z.string()).default([]),
 });
-export type WorkspaceContextEnvelopeContract = z.infer<typeof WorkspaceContextEnvelopeContractSchema>;
+export type WorkspaceContextEnvelopeContract = z.infer<
+  typeof WorkspaceContextEnvelopeContractSchema
+>;

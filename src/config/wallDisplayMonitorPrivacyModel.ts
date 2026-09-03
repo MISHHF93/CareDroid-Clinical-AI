@@ -81,11 +81,7 @@ function bucketLongestWait(value: string | number): string {
   const match = value.match(/(\d+)h(?:\s+(\d+)m)?|(\d+)m/);
   if (!match) return value;
   const hours = match[1] ? Number(match[1]) : 0;
-  const minutes = match[2]
-    ? Number(match[2])
-    : match[3]
-      ? Number(match[3])
-      : 0;
+  const minutes = match[2] ? Number(match[2]) : match[3] ? Number(match[3]) : 0;
   const totalMinutes = hours * 60 + minutes;
   if (totalMinutes < 30) return 'Under 30 min';
   if (totalMinutes < 60) return '30–60 min';
@@ -135,7 +131,9 @@ export function normalizeWallDisplayMonitorPrivacy(
   value: unknown,
   fallback: WallDisplayMonitorPrivacy = WALL_DISPLAY_MONITOR_PRIVACY.operational,
 ): WallDisplayMonitorPrivacy {
-  const normalized = String(value || '').trim().toLowerCase();
+  const normalized = String(value || '')
+    .trim()
+    .toLowerCase();
   return PRIVACY_MODE_ALIASES[normalized] || fallback;
 }
 

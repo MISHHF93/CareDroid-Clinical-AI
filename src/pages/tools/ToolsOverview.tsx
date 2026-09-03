@@ -120,8 +120,20 @@ const TOOL_FILTER_OPTIONS = Object.freeze([
   { value: 'recent', label: 'Recent' },
 ]);
 
-const COMMON_TOOL_FILTER_VALUES = new Set(['recommended', 'all', 'calculator', 'ai-workflows', 'operations']);
-const PILOT_TOOL_FILTER_VALUES = new Set(['recommended', 'all', 'calculator', 'clinical-tools', 'ai-workflows']);
+const COMMON_TOOL_FILTER_VALUES = new Set([
+  'recommended',
+  'all',
+  'calculator',
+  'ai-workflows',
+  'operations',
+]);
+const PILOT_TOOL_FILTER_VALUES = new Set([
+  'recommended',
+  'all',
+  'calculator',
+  'clinical-tools',
+  'ai-workflows',
+]);
 const TOOL_FILTER_OPTION_VALUES = new Set(TOOL_FILTER_OPTIONS.map((option) => option.value));
 
 function normalizeSearch(value) {
@@ -198,7 +210,7 @@ function matchesToolFilter(tool, filter) {
   }
   if (filter === 'governance') {
     return /audit|governance|privacy|regulatory|compliance/i.test(
-      `${tool.name} ${tool.description} ${tool.category}`
+      `${tool.name} ${tool.description} ${tool.category}`,
     );
   }
   if (filter === 'calculator') {
@@ -212,7 +224,7 @@ function matchesToolFilter(tool, filter) {
       ['Calculator', 'Diagnostic', 'Reference', 'Clinical'].includes(tool.category) ||
       tool.category === 'Diagnostic' ||
       /diagnos|differential|triage|risk|score|protocol|drug|lab|clinical/i.test(
-        `${tool.name} ${tool.description} ${tool.path}`
+        `${tool.name} ${tool.description} ${tool.path}`,
       )
     );
   }
@@ -222,7 +234,7 @@ function matchesToolFilter(tool, filter) {
       tool.launchType === 'chat-assisted' ||
       tool.launchType === 'backend-backed' ||
       /ai|assistant|workflow|scribe|summary|order set|timeline/i.test(
-        `${tool.name} ${tool.description}`
+        `${tool.name} ${tool.description}`,
       )
     );
   }
@@ -240,7 +252,7 @@ function matchesToolFilter(tool, filter) {
       ['Fleet', 'IoT', 'Hospital Operations'].includes(tool.category) ||
       ['fleet-page', 'iot-dashboard', 'hospital-operations'].includes(tool.surface) ||
       /fleet|operations|dispatch|device|hospital map|live map|digital twin/i.test(
-        `${tool.name} ${tool.description}`
+        `${tool.name} ${tool.description}`,
       )
     );
   }
@@ -259,8 +271,7 @@ function primaryActionLabel(tool) {
     return 'Admin only';
   if (tool.surface === 'chat-assisted' || tool.launchType === 'chat-assisted')
     return 'Ask Assistant';
-  if (tool.category === 'Calculator' || tool.surface === 'calculator-form')
-    return 'Open';
+  if (tool.category === 'Calculator' || tool.surface === 'calculator-form') return 'Open';
   if (
     ['fleet-page', 'iot-dashboard', 'hospital-operations'].includes(tool.surface) ||
     ['Fleet', 'IoT', 'Hospital Operations'].includes(tool.category)
@@ -281,9 +292,11 @@ function lifecycleLabel(tool) {
 function accessRestrictionCopy(tool) {
   if (
     !tool.accessState ||
-    [ASSET_ACCESS_STATES.ALLOWED, ASSET_ACCESS_STATES.BETA, ASSET_ACCESS_STATES.EXPERIMENTAL].includes(
-      tool.accessState
-    )
+    [
+      ASSET_ACCESS_STATES.ALLOWED,
+      ASSET_ACCESS_STATES.BETA,
+      ASSET_ACCESS_STATES.EXPERIMENTAL,
+    ].includes(tool.accessState)
   )
     return '';
   if (tool.accessState === ASSET_ACCESS_STATES.DISABLED) {
@@ -342,7 +355,10 @@ function resolveActiveTool(tools, queryValue) {
   if (!normalized) return null;
   const exactTool = tools.find((tool) => toolIdentityValues(tool).includes(normalized));
   if (exactTool) return exactTool;
-  const slug = normalized.replace(/^\/+|\/+$/g, '').split('/').pop();
+  const slug = normalized
+    .replace(/^\/+|\/+$/g, '')
+    .split('/')
+    .pop();
   if (slug && slug !== normalized) {
     const slugTool = tools.find((tool) => toolIdentityValues(tool).includes(slug));
     if (slugTool) return slugTool;
@@ -383,19 +399,24 @@ function executionModeForTool(tool, executorCatalog) {
   const registeredExecutorIds = new Set(executorCatalog?.registeredExecutorToolIds || []);
   const unsupportedExecutorIds = new Set(
     (executorCatalog?.unsupportedTools || []).flatMap((entry) =>
-      [entry?.registryId, entry?.nluToolId, entry?.toolId].filter(Boolean)
-    )
+      [entry?.registryId, entry?.nluToolId, entry?.toolId].filter(Boolean),
+    ),
   );
-  const markedUnsupported = unsupportedExecutorIds.has(tool.id) || unsupportedExecutorIds.has(tool.nluToolId);
+  const markedUnsupported =
+    unsupportedExecutorIds.has(tool.id) || unsupportedExecutorIds.has(tool.nluToolId);
 
   if (tool.launchType === TOOL_LAUNCH_TYPES.CHAT_ASSISTED || tool.surface === 'chat-assisted') {
     return {
       label: 'Copilot-guided, human-reviewed',
-      detail: 'Launches Copilot with a guarded clinical decision-support prompt. Human review is required before action.',
+      detail:
+        'Launches Copilot with a guarded clinical decision-support prompt. Human review is required before action.',
       tone: 'chat',
     };
   }
-  if (!markedUnsupported && (tool.executorStatus === 'registered' || (executorId && registeredExecutorIds.has(executorId)))) {
+  if (
+    !markedUnsupported &&
+    (tool.executorStatus === 'registered' || (executorId && registeredExecutorIds.has(executorId)))
+  ) {
     return {
       label: isCalculatorTool(tool) ? 'Server-validated calculator' : 'Uses server validation',
       detail: executorId
@@ -404,23 +425,31 @@ function executionModeForTool(tool, executorCatalog) {
       tone: 'server',
     };
   }
-  if (tool.executorStatus === 'platform' || (tool.endpoint && tool.launchType === TOOL_LAUNCH_TYPES.BACKEND_BACKED)) {
+  if (
+    tool.executorStatus === 'platform' ||
+    (tool.endpoint && tool.launchType === TOOL_LAUNCH_TYPES.BACKEND_BACKED)
+  ) {
     return {
       label: 'Platform service',
-      detail: tool.endpoint ? `Uses ${tool.endpoint}.` : 'Uses a platform API client when launched.',
+      detail: tool.endpoint
+        ? `Uses ${tool.endpoint}.`
+        : 'Uses a platform API client when launched.',
       tone: 'platform',
     };
   }
   if (isCalculatorTool(tool)) {
     return {
       label: 'Runs in this browser',
-      detail: 'Runs in the browser with the built-in calculator form; no fake backend executor is called.',
+      detail:
+        'Runs in the browser with the built-in calculator form; no fake backend executor is called.',
       tone: 'local',
     };
   }
   return {
     label: 'Catalog launch',
-    detail: tool.endpoint ? `Connected endpoint: ${tool.endpoint}.` : 'Launches through the Medical Tools catalog.',
+    detail: tool.endpoint
+      ? `Connected endpoint: ${tool.endpoint}.`
+      : 'Launches through the Medical Tools catalog.',
     tone: 'catalog',
   };
 }
@@ -453,20 +482,15 @@ class ActiveToolSurfaceErrorBoundary extends Component<any, any> {
   }
 }
 
-function ActiveToolSurface({
-  tool,
-  executorCatalog,
-  onClose,
-  onAssistantLaunch,
-  onToolLaunch,
-}) {
+function ActiveToolSurface({ tool, executorCatalog, onClose, onAssistantLaunch, onToolLaunch }) {
   if (!tool) return null;
 
   const executionMode = executionModeForTool(tool, executorCatalog);
   const embeddedComponent = EMBEDDED_TOOL_COMPONENTS[tool.id];
   const calculatorId = tool.calculatorSlug || (tool.id !== 'calculators' ? tool.id : '');
   const accessible = isToolAccessible(tool);
-  const chatAssisted = tool.launchType === TOOL_LAUNCH_TYPES.CHAT_ASSISTED || tool.surface === 'chat-assisted';
+  const chatAssisted =
+    tool.launchType === TOOL_LAUNCH_TYPES.CHAT_ASSISTED || tool.surface === 'chat-assisted';
 
   let body: any = null;
   if (!accessible) {
@@ -483,22 +507,14 @@ function ActiveToolSurface({
       <div className="tools-active-surface__fallback">
         <strong className="tools-active-surface__fallback-title">{tool.label || tool.name}</strong>
         <p>{tool.description}</p>
-        <button
-          type="button"
-          className="btn-open-tool"
-          onClick={() => onAssistantLaunch(tool)}
-        >
+        <button type="button" className="btn-open-tool" onClick={() => onAssistantLaunch(tool)}>
           Ask Assistant
         </button>
       </div>
     );
   } else if (isCalculatorTool(tool)) {
     body = (
-      <EmbeddedCalculators
-        embedded
-        initialCalculatorId={calculatorId}
-        onCloseEmbedded={onClose}
-      />
+      <EmbeddedCalculators embedded initialCalculatorId={calculatorId} onCloseEmbedded={onClose} />
     );
   } else if (embeddedComponent) {
     const Component = embeddedComponent;
@@ -508,11 +524,7 @@ function ActiveToolSurface({
       <div className="tools-active-surface__fallback">
         <strong className="tools-active-surface__fallback-title">{tool.label || tool.name}</strong>
         <p>{tool.description}</p>
-        <button
-          type="button"
-          className="btn-open-tool"
-          onClick={() => onToolLaunch(tool)}
-        >
+        <button type="button" className="btn-open-tool" onClick={() => onToolLaunch(tool)}>
           Open from catalog
         </button>
       </div>
@@ -534,7 +546,9 @@ function ActiveToolSurface({
           Back to catalog
         </button>
       </header>
-      <Suspense fallback={<div className="tools-active-surface__loading">Loading tool surface...</div>}>
+      <Suspense
+        fallback={<div className="tools-active-surface__loading">Loading tool surface...</div>}
+      >
         <ActiveToolSurfaceErrorBoundary
           key={tool.id}
           toolName={tool.label || tool.name || 'This tool'}
@@ -554,7 +568,10 @@ function UnknownActiveToolSurface({ requestedTool, onClose }) {
         <div>
           <span className="tools-execution-badge tools-execution-badge--catalog">Not found</span>
           <h2>Tool not found</h2>
-          <p>No Medical Tools entry matches “{requestedTool}”. Check the spelling or search the catalog below.</p>
+          <p>
+            No Medical Tools entry matches “{requestedTool}”. Check the spelling or search the
+            catalog below.
+          </p>
         </div>
         <button type="button" className="tools-active-surface__close" onClick={onClose}>
           Back to catalog
@@ -574,14 +591,12 @@ const ToolsOverview = () => {
   const requestedSearch = searchParams.get('q') || searchParams.get('search') || '';
   const requestedSource = searchParams.get('source');
   const requestedOpenTool =
-    searchParams.get('open') ||
-    searchParams.get('tool') ||
-    searchParams.get('calc') ||
-    '';
-  const routeDefaultFilter = location.pathname === CANONICAL_ROUTES.calculators ? 'calculator' : 'recommended';
+    searchParams.get('open') || searchParams.get('tool') || searchParams.get('calc') || '';
+  const routeDefaultFilter =
+    location.pathname === CANONICAL_ROUTES.calculators ? 'calculator' : 'recommended';
   const [search, setSearch] = useState(requestedSearch);
   const [toolFilter, setToolFilter] = useState(
-    TOOL_FILTER_OPTION_VALUES.has(requestedFilter) ? requestedFilter : routeDefaultFilter
+    TOOL_FILTER_OPTION_VALUES.has(requestedFilter) ? requestedFilter : routeDefaultFilter,
   );
   const [executorCatalog, setExecutorCatalog] = useState({
     registeredExecutorToolIds: [],
@@ -592,7 +607,7 @@ const ToolsOverview = () => {
 
   useEffect(() => {
     setToolFilter(
-      TOOL_FILTER_OPTION_VALUES.has(requestedFilter) ? requestedFilter : routeDefaultFilter
+      TOOL_FILTER_OPTION_VALUES.has(requestedFilter) ? requestedFilter : routeDefaultFilter,
     );
   }, [requestedFilter, routeDefaultFilter]);
 
@@ -613,7 +628,10 @@ const ToolsOverview = () => {
         });
         return;
       }
-      setExecutorCatalog((previous) => ({ ...previous, error: result.error || 'Tool catalog unavailable' }));
+      setExecutorCatalog((previous) => ({
+        ...previous,
+        error: result.error || 'Tool catalog unavailable',
+      }));
     });
     return () => {
       alive = false;
@@ -676,15 +694,16 @@ const ToolsOverview = () => {
       visibleAssetIds,
       workspaceContextActive,
       workspaceState,
-    ]
+    ],
   );
-  const accessRole = saasProfile?.role || platformContext?.membership?.role || account?.role || user?.role;
+  const accessRole =
+    saasProfile?.role || platformContext?.membership?.role || account?.role || user?.role;
 
   const allToolsWithAccess = useMemo(() => {
-    const projected = FEATURE_FLAGS.platformEntitlements
-      && platformContext
-      ? getAssetAwareToolProjection(accessContext, accessRole)
-      : getUserFacingToolRegistryProjection();
+    const projected =
+      FEATURE_FLAGS.platformEntitlements && platformContext
+        ? getAssetAwareToolProjection(accessContext, accessRole)
+        : getUserFacingToolRegistryProjection();
     const locallyHidden = new Set([
       ...(hiddenTools || []),
       ...(preferences?.toolPreferences?.hiddenAssetIds || []),
@@ -695,12 +714,21 @@ const ToolsOverview = () => {
       const isHidden = locallyHidden.has(tool.id);
       return {
         ...tool,
-        accessState: isHidden ? ASSET_ACCESS_STATES.HIDDEN : tool.accessState || ASSET_ACCESS_STATES.ALLOWED,
+        accessState: isHidden
+          ? ASSET_ACCESS_STATES.HIDDEN
+          : tool.accessState || ASSET_ACCESS_STATES.ALLOWED,
         accessLabel: isHidden ? 'Hidden' : tool.accessLabel || 'Available',
         isLaunchable: isHidden ? false : tool.isLaunchable !== false,
       };
     });
-  }, [accessContext, accessRole, hiddenTools, platformContext, preferences?.toolPreferences, saasProfile?.hiddenAssets]);
+  }, [
+    accessContext,
+    accessRole,
+    hiddenTools,
+    platformContext,
+    preferences?.toolPreferences,
+    saasProfile?.hiddenAssets,
+  ]);
 
   const compiledProfile = useMemo(
     () =>
@@ -730,19 +758,23 @@ const ToolsOverview = () => {
 
   const toolById = useMemo(
     () => Object.fromEntries(allToolsWithAccess.map((tool) => [tool.id, tool])),
-    [allToolsWithAccess]
+    [allToolsWithAccess],
   );
   const localActiveWorkspace = useMemo(
     () => workspaces.find((workspace) => workspace.id === activeWorkspaceId),
-    [activeWorkspaceId, workspaces]
+    [activeWorkspaceId, workspaces],
   );
   const workspaceExperience = useMemo(
-    () => getWorkspaceExperienceProfile(workspaceContextActive || activeWorkspace || localActiveWorkspace),
-    [activeWorkspace, localActiveWorkspace, workspaceContextActive]
+    () =>
+      getWorkspaceExperienceProfile(
+        workspaceContextActive || activeWorkspace || localActiveWorkspace,
+      ),
+    [activeWorkspace, localActiveWorkspace, workspaceContextActive],
   );
   const isBackendWorkspaceContext = Boolean(workspaceContext?.workspace);
   const isAllToolsWorkspace =
-    activeWorkspaceId === 'all' || (!isBackendWorkspaceContext && !localActiveWorkspace?.toolIds?.length);
+    activeWorkspaceId === 'all' ||
+    (!isBackendWorkspaceContext && !localActiveWorkspace?.toolIds?.length);
   const profile = useMemo(
     () =>
       buildUserToolProfile({
@@ -750,7 +782,9 @@ const ToolsOverview = () => {
         user,
         preferences,
         activeWorkspace: workspaceContextActive || activeWorkspace || localActiveWorkspace,
-        activeWorkspaceId: isAllToolsWorkspace ? 'all' : workspaceState?.activeWorkspaceId || activeWorkspaceId,
+        activeWorkspaceId: isAllToolsWorkspace
+          ? 'all'
+          : workspaceState?.activeWorkspaceId || activeWorkspaceId,
         toolPreferences,
         permissions: workspaceState?.effectivePermissions || [],
       }),
@@ -766,7 +800,7 @@ const ToolsOverview = () => {
       workspaceContextActive,
       workspaceState?.activeWorkspaceId,
       workspaceState?.effectivePermissions,
-    ]
+    ],
   );
   const roleIntelligenceProfile = useMemo(
     () =>
@@ -794,7 +828,7 @@ const ToolsOverview = () => {
       user,
       workspaceContextActive,
       workspaceState,
-    ]
+    ],
   );
   const profileToolGraph = useMemo(
     () => ({
@@ -826,7 +860,7 @@ const ToolsOverview = () => {
   }, [roleIntelligenceProfile, tools, workspaceRecommendations]);
   const recommendedIds = useMemo(
     () => roleAssetRecommendations.map((recommendation) => recommendation.id),
-    [roleAssetRecommendations]
+    [roleAssetRecommendations],
   );
   const accessGroups = useMemo(
     () =>
@@ -835,7 +869,7 @@ const ToolsOverview = () => {
         recent: recentTools,
         recommendedIds,
       }),
-    [allToolsWithAccess, favorites, recentTools, recommendedIds]
+    [allToolsWithAccess, favorites, recentTools, recommendedIds],
   );
   const allToolIds = useMemo(() => tools.map((tool) => tool.id), [tools]);
   const workspaceToolIds = useMemo(
@@ -843,11 +877,11 @@ const ToolsOverview = () => {
       visibleAssetIds?.length
         ? visibleAssetIds
         : isAllToolsWorkspace
-        ? allToolIds
-        : localActiveWorkspace
-          ? localActiveWorkspace.toolIds || []
-          : allToolIds,
-    [localActiveWorkspace, allToolIds, isAllToolsWorkspace, visibleAssetIds]
+          ? allToolIds
+          : localActiveWorkspace
+            ? localActiveWorkspace.toolIds || []
+            : allToolIds,
+    [localActiveWorkspace, allToolIds, isAllToolsWorkspace, visibleAssetIds],
   );
   const workspaceToolIdSet = useMemo(() => new Set(workspaceToolIds), [workspaceToolIds]);
   const workspaceInventoryCount = useMemo(
@@ -855,7 +889,7 @@ const ToolsOverview = () => {
       isAllToolsWorkspace
         ? tools.length
         : tools.filter((tool) => workspaceToolIdSet.has(tool.id)).length,
-    [isAllToolsWorkspace, tools, workspaceToolIdSet]
+    [isAllToolsWorkspace, tools, workspaceToolIdSet],
   );
   const pinnedToolIdSet = useMemo(() => new Set(pinned), [pinned]);
   const favoriteToolIdSet = useMemo(() => new Set(favorites), [favorites]);
@@ -878,21 +912,21 @@ const ToolsOverview = () => {
       ].includes(toolFilter)
         ? tools
         : filterToolsForProfileGraph(profileToolGraph, toolFilter),
-    [profileToolGraph, toolFilter, tools]
+    [profileToolGraph, toolFilter, tools],
   );
   const workspaceTools = useMemo(
     () =>
       profileFilteredTools.filter((tool) => {
         return isAllToolsWorkspace || workspaceToolIdSet.has(tool.id);
       }),
-    [isAllToolsWorkspace, profileFilteredTools, toolFilter, workspaceToolIdSet]
+    [isAllToolsWorkspace, profileFilteredTools, toolFilter, workspaceToolIdSet],
   );
   const workspaceRecommendedTools = useMemo(
     () =>
       profileToolGraph.recommendedTools.filter(
-        (tool) => isAllToolsWorkspace || workspaceToolIdSet.has(tool.id)
+        (tool) => isAllToolsWorkspace || workspaceToolIdSet.has(tool.id),
       ),
-    [isAllToolsWorkspace, profileToolGraph.recommendedTools, workspaceToolIdSet]
+    [isAllToolsWorkspace, profileToolGraph.recommendedTools, workspaceToolIdSet],
   );
   const searchQuery = normalizeSearch(search);
   const searchTokens = useMemo(() => searchQuery.split(/\s+/).filter(Boolean), [searchQuery]);
@@ -901,7 +935,7 @@ const ToolsOverview = () => {
       recentTools
         .map((toolId) => toolById[toolId])
         .filter((tool) => tool && (isAllToolsWorkspace || workspaceToolIdSet.has(tool.id))),
-    [isAllToolsWorkspace, recentTools, toolById, workspaceToolIdSet]
+    [isAllToolsWorkspace, recentTools, toolById, workspaceToolIdSet],
   );
   const handleWorkspaceChange = async (workspaceId) => {
     await switchWorkspace(workspaceId);
@@ -910,7 +944,8 @@ const ToolsOverview = () => {
   const filteredTools = useMemo(() => {
     let base = workspaceTools;
     if (toolFilter === 'recommended') base = workspaceRecommendedTools;
-    else if (toolFilter === 'all') base = isAllToolsWorkspace ? accessGroups.permitted : workspaceTools;
+    else if (toolFilter === 'all')
+      base = isAllToolsWorkspace ? accessGroups.permitted : workspaceTools;
     else if (toolFilter === 'favorites') base = accessGroups.favorites;
     else if (toolFilter === 'recent') base = recentToolItems;
 
@@ -932,7 +967,7 @@ const ToolsOverview = () => {
   const activeToolRequest = requestedOpenTool || requestedSearch;
   const activeTool = useMemo(
     () => resolveActiveTool(allToolsWithAccess, activeToolRequest),
-    [activeToolRequest, allToolsWithAccess, filteredTools]
+    [activeToolRequest, allToolsWithAccess, filteredTools],
   );
   const requestedActiveToolMissing = Boolean(requestedOpenTool && !activeTool);
 
@@ -996,14 +1031,14 @@ const ToolsOverview = () => {
     recordToolAccess(tool.id);
     trackRoleAssetUsage(
       { registryId: tool.id, mode: 'chat-assisted', pathname: CANONICAL_ROUTES.emergencyCopilot },
-      { profile: roleIntelligenceProfile, source: 'tools-overview-assistant' }
+      { profile: roleIntelligenceProfile, source: 'tools-overview-assistant' },
     );
     selectTool(tool.id);
     setActiveTool(tool.id);
     addMessage(
       launch.chatSeed ||
         `Help me use ${tool.name} as clinical decision support only. Ask for any context needed before recommending next steps.`,
-      'user'
+      'user',
     );
     navigateProfileAware(navigate, CANONICAL_ROUTES.emergencyCopilot, {
       emergencyRole,
@@ -1029,7 +1064,9 @@ const ToolsOverview = () => {
   const visibleToolFilterValues = PILOT_CUSTOMER_MODE.enabled
     ? PILOT_TOOL_FILTER_VALUES
     : COMMON_TOOL_FILTER_VALUES;
-  const filterTabs = TOOL_FILTER_OPTIONS.filter((option) => visibleToolFilterValues.has(option.value));
+  const filterTabs = TOOL_FILTER_OPTIONS.filter((option) =>
+    visibleToolFilterValues.has(option.value),
+  );
   const emptyStateCopy =
     hiddenTools.length > 0
       ? 'No tools match this view. Some tools are hidden by your preferences; restore them from Profile > Tool preferences or switch filters.'
@@ -1049,16 +1086,22 @@ const ToolsOverview = () => {
     'Calculators, clinical tools, and human-reviewed AI workflows for case review.';
 
   return (
-    <div className={`tools-overview${PILOT_CUSTOMER_MODE.enabled ? ' tools-overview--compact' : ''}`}>
+    <div
+      className={`tools-overview${PILOT_CUSTOMER_MODE.enabled ? ' tools-overview--compact' : ''}`}
+    >
       <CareDroidPage
         eyebrow="Clinical decision support"
-        title={roleIntelligenceProfile.toolsTitle || workspaceExperience.toolsTitle || 'Medical Tools'}
-        description={surfaces.tools.showOverviewContextRow ? toolsDescription : CAREDROID_PRODUCT.safetyShort}
+        title={
+          roleIntelligenceProfile.toolsTitle || workspaceExperience.toolsTitle || 'Medical Tools'
+        }
+        description={
+          surfaces.tools.showOverviewContextRow ? toolsDescription : CAREDROID_PRODUCT.safetyShort
+        }
         leadingIcon={<NavIcon icon={CHROME_ICONS.tools} size={24} />}
         className="tools-overview-shell"
         contentClassName="tools-overview-shell__content"
       >
-          {surfaces.tools.showOverviewContextRow ? (
+        {surfaces.tools.showOverviewContextRow ? (
           <div className="tools-overview-context-row">
             <div className="tools-workspace-os" aria-label="Active workspace operating mode">
               <strong>{workspaceExperience.operatingLabel}</strong>
@@ -1071,9 +1114,12 @@ const ToolsOverview = () => {
               <span>{workspaceRecommendedTools.length} recommended</span>
             </div>
           </div>
-          ) : null}
-          {surfaces.tools.showOverviewExecutionLegend ? (
-          <details className="tools-execution-legend tools-execution-legend--compact" aria-label="Technical and medical execution modes">
+        ) : null}
+        {surfaces.tools.showOverviewExecutionLegend ? (
+          <details
+            className="tools-execution-legend tools-execution-legend--compact"
+            aria-label="Technical and medical execution modes"
+          >
             <summary>How tools run</summary>
             <div className="tools-execution-legend__body">
               <p>Each mode connects the technical path to the medical safety boundary.</p>
@@ -1089,39 +1135,39 @@ const ToolsOverview = () => {
               </div>
             </div>
           </details>
-          ) : null}
-          <div className="tools-workspace">
-            <label htmlFor="workspaceSelect">Workspace</label>
-            <select
-              id="workspaceSelect"
-              value={activeWorkspaceId}
-              onChange={(e) => {
-                void handleWorkspaceChange(e.target.value);
-              }}
-            >
-              {workspaces.map((workspace) => (
-                <option key={workspace.id} value={workspace.id}>
-                  {workspace.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div
-            className="tools-discovery-controls"
-            role="search"
-            aria-label="Search and filter all tools"
+        ) : null}
+        <div className="tools-workspace">
+          <label htmlFor="workspaceSelect">Workspace</label>
+          <select
+            id="workspaceSelect"
+            value={activeWorkspaceId}
+            onChange={(e) => {
+              void handleWorkspaceChange(e.target.value);
+            }}
           >
-            <label className="tools-search-field">
-              <span>Search tools</span>
-              <input
-                type="search"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Try pe-score, bleeding risk, kidney function…"
-                aria-label="Search all tools"
-              />
-            </label>
-            {!PILOT_CUSTOMER_MODE.enabled ? (
+            {workspaces.map((workspace) => (
+              <option key={workspace.id} value={workspace.id}>
+                {workspace.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div
+          className="tools-discovery-controls"
+          role="search"
+          aria-label="Search and filter all tools"
+        >
+          <label className="tools-search-field">
+            <span>Search tools</span>
+            <input
+              type="search"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Try pe-score, bleeding risk, kidney function…"
+              aria-label="Search all tools"
+            />
+          </label>
+          {!PILOT_CUSTOMER_MODE.enabled ? (
             <label className="tools-filter-field">
               <span>Filter</span>
               <select
@@ -1136,23 +1182,25 @@ const ToolsOverview = () => {
                 ))}
               </select>
             </label>
-            ) : null}
-          </div>
-          <div className="tools-filter-tabs" role="group" aria-label="Tool category filters">
-            {filterTabs.map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                {...((toolFilter === option.value) ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
-                aria-label={option.value === 'all' ? 'All' : option.label}
-                className={`tools-filter-tab${toolFilter === option.value ? ' tools-filter-tab--active' : ''}`}
-                onClick={() => setToolFilter(option.value)}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
-          {surfaces.tools.showOverviewHeaderStats ? (
+          ) : null}
+        </div>
+        <div className="tools-filter-tabs" role="group" aria-label="Tool category filters">
+          {filterTabs.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              {...(toolFilter === option.value
+                ? { 'aria-pressed': 'true' as const }
+                : { 'aria-pressed': 'false' as const })}
+              aria-label={option.value === 'all' ? 'All' : option.label}
+              className={`tools-filter-tab${toolFilter === option.value ? ' tools-filter-tab--active' : ''}`}
+              onClick={() => setToolFilter(option.value)}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+        {surfaces.tools.showOverviewHeaderStats ? (
           <div className="header-stats">
             <div className="stat">
               <span className="stat-number">{profileToolGraph.counts.visible}</span>
@@ -1173,358 +1221,378 @@ const ToolsOverview = () => {
               <span className="stat-label">Recommended</span>
             </div>
           </div>
-          ) : null}
+        ) : null}
 
-      {activeTool ? (
-        <ActiveToolSurface
-          tool={activeTool}
-          executorCatalog={executorCatalog}
-          onClose={closeActiveTool}
-          onAssistantLaunch={handleAssistantLaunch}
-          onToolLaunch={handleToolClick}
-        />
-      ) : null}
+        {activeTool ? (
+          <ActiveToolSurface
+            tool={activeTool}
+            executorCatalog={executorCatalog}
+            onClose={closeActiveTool}
+            onAssistantLaunch={handleAssistantLaunch}
+            onToolLaunch={handleToolClick}
+          />
+        ) : null}
 
-      {requestedActiveToolMissing ? (
-        <UnknownActiveToolSurface requestedTool={requestedOpenTool} onClose={closeActiveTool} />
-      ) : null}
+        {requestedActiveToolMissing ? (
+          <UnknownActiveToolSurface requestedTool={requestedOpenTool} onClose={closeActiveTool} />
+        ) : null}
 
-      {showCalculatorHub ? (
-        <section
-          className="tools-calculator-surface"
-          aria-label="Clinical calculator launch surface"
-        >
-          <ClinicalCalculatorHub />
-        </section>
-      ) : null}
-
-      <section className="tools-recent" aria-labelledby="tools-workflow-stitch-title">
-        <div className="tools-recent-header">
-          <h2 id="tools-workflow-stitch-title" className="tools-recent-title">
-            <span className="tools-recent-title-icon" aria-hidden>
-              <NavIcon icon={CHROME_ICONS.clipboardList} size={22} />
-            </span>
-            <span>Continue into workflow</span>
-          </h2>
-          <p>Turn the current tool context into a workflow, result trail, or recommendation path.</p>
-        </div>
-        <div className="tools-recent-list">
-          <button
-            type="button"
-            className="tools-recent-card"
-            onClick={() =>
-              navigateProfileAware(
-                navigate,
-                `${CANONICAL_ROUTES.emergencyTools}?source=workflows&filter=ai-workflows`,
-                { emergencyRole, saasRole: roleProfile?.id || saasProfile?.role, context: accessContext },
-              )
-            }
+        {showCalculatorHub ? (
+          <section
+            className="tools-calculator-surface"
+            aria-label="Clinical calculator launch surface"
           >
-            <span className="tools-recent-icon" aria-hidden>
-              <NavIcon icon={CHROME_ICONS.clipboardList} size={22} />
-            </span>
-            <div className="tools-recent-info">
-              <span className="tools-recent-name">Build workflow</span>
-              <span className="tools-recent-category">Use selected tools as workflow blocks</span>
-            </div>
-            <span className="tools-recent-action">Continue →</span>
-          </button>
-          <button
-            type="button"
-            className="tools-recent-card"
-            onClick={() =>
-              navigateProfileAware(
-                navigate,
-                `${CANONICAL_ROUTES.emergencyTools}?source=recommendations&filter=recommended`,
-                { emergencyRole, saasRole: roleProfile?.id || saasProfile?.role, context: accessContext },
-              )
-            }
-          >
-            <span className="tools-recent-icon" aria-hidden>
-              <NavIcon icon={CHROME_ICONS.sparkles} size={22} />
-            </span>
-            <div className="tools-recent-info">
-              <span className="tools-recent-name">Recommended next action</span>
-              <span className="tools-recent-category">Pick the next best route from this context</span>
-            </div>
-            <span className="tools-recent-action">Open →</span>
-          </button>
-        </div>
-      </section>
+            <ClinicalCalculatorHub />
+          </section>
+        ) : null}
 
-      {recentToolItems.length > 0 && (
-        <div className="tools-recent">
+        <section className="tools-recent" aria-labelledby="tools-workflow-stitch-title">
           <div className="tools-recent-header">
-            <h2 className="tools-recent-title">
+            <h2 id="tools-workflow-stitch-title" className="tools-recent-title">
               <span className="tools-recent-title-icon" aria-hidden>
-                <NavIcon icon={CHROME_ICONS.clock} size={22} />
+                <NavIcon icon={CHROME_ICONS.clipboardList} size={22} />
               </span>
-              <span>Recent Tools</span>
+              <span>Continue into workflow</span>
             </h2>
-            <p>Pick up where you left off with your most used tools.</p>
+            <p>
+              Turn the current tool context into a workflow, result trail, or recommendation path.
+            </p>
           </div>
           <div className="tools-recent-list">
-            {recentToolItems.slice(0, 3).map((tool) => (
-              <button type="button"
- key={tool.id}
- className="tools-recent-card"
- onClick={() => handleToolClick(tool)}
-
- >
-                <span className="tools-recent-icon" aria-hidden>
-                  <NavIcon icon={getToolIcon(tool.id)} size={22} />
+            <button
+              type="button"
+              className="tools-recent-card"
+              onClick={() =>
+                navigateProfileAware(
+                  navigate,
+                  `${CANONICAL_ROUTES.emergencyTools}?source=workflows&filter=ai-workflows`,
+                  {
+                    emergencyRole,
+                    saasRole: roleProfile?.id || saasProfile?.role,
+                    context: accessContext,
+                  },
+                )
+              }
+            >
+              <span className="tools-recent-icon" aria-hidden>
+                <NavIcon icon={CHROME_ICONS.clipboardList} size={22} />
+              </span>
+              <div className="tools-recent-info">
+                <span className="tools-recent-name">Build workflow</span>
+                <span className="tools-recent-category">Use selected tools as workflow blocks</span>
+              </div>
+              <span className="tools-recent-action">Continue →</span>
+            </button>
+            <button
+              type="button"
+              className="tools-recent-card"
+              onClick={() =>
+                navigateProfileAware(
+                  navigate,
+                  `${CANONICAL_ROUTES.emergencyTools}?source=recommendations&filter=recommended`,
+                  {
+                    emergencyRole,
+                    saasRole: roleProfile?.id || saasProfile?.role,
+                    context: accessContext,
+                  },
+                )
+              }
+            >
+              <span className="tools-recent-icon" aria-hidden>
+                <NavIcon icon={CHROME_ICONS.sparkles} size={22} />
+              </span>
+              <div className="tools-recent-info">
+                <span className="tools-recent-name">Recommended next action</span>
+                <span className="tools-recent-category">
+                  Pick the next best route from this context
                 </span>
-                <div className="tools-recent-info">
-                  <span className="tools-recent-name">{tool.name}</span>
-                  <span className="tools-recent-category">{tool.category}</span>
-                </div>
-                <span className="tools-recent-action">{primaryActionLabel(tool)} →</span>
-              </button>
-            ))}
+              </div>
+              <span className="tools-recent-action">Open →</span>
+            </button>
           </div>
-        </div>
-      )}
+        </section>
 
-      {showWorkspaceEmpty ? (
-        <div className="tools-recent">
-          <div className="tools-recent-header">
-            <h2 className="tools-recent-title">No tools in this workspace</h2>
-            <p>This workspace does not include any launchable tools from the current inventory.</p>
-          </div>
-          <button
-            type="button"
-            className="btn-open-tool"
-            onClick={() => setActiveWorkspaceId('all')}
-          >
-            Show all tools →
-          </button>
-        </div>
-      ) : showSearchEmpty ? (
-        <div className="tools-recent" role="status">
-          <div className="tools-recent-header">
-            <h2 className="tools-recent-title">No matching tools</h2>
-            <p>{emptyStateCopy}</p>
-          </div>
-          <button
-            type="button"
-            className="btn-open-tool"
-            onClick={clearSearchAndFilters}
-          >
-            Clear search and filters →
-          </button>
-        </div>
-      ) : (
-        <div className="tools-grid">
-          {orderedTools.map((tool) => {
-            const executionMode = executionModeForTool(tool, executorCatalog);
-            return (
-              <div
-                key={tool.id}
-                data-tool-id={tool.id}
-                className="tool-card-large"
-                {...((tool.isLaunchable === false) ? { 'aria-disabled': 'true' as const } : { 'aria-disabled': 'false' as const })}
-              >
-              <div className="tool-card-header">
-                <div className="tool-icon">
-                  <span aria-hidden>
-                    <NavIcon icon={getToolIcon(tool.id)} size={28} />
+        {recentToolItems.length > 0 && (
+          <div className="tools-recent">
+            <div className="tools-recent-header">
+              <h2 className="tools-recent-title">
+                <span className="tools-recent-title-icon" aria-hidden>
+                  <NavIcon icon={CHROME_ICONS.clock} size={22} />
+                </span>
+                <span>Recent Tools</span>
+              </h2>
+              <p>Pick up where you left off with your most used tools.</p>
+            </div>
+            <div className="tools-recent-list">
+              {recentToolItems.slice(0, 3).map((tool) => (
+                <button
+                  type="button"
+                  key={tool.id}
+                  className="tools-recent-card"
+                  onClick={() => handleToolClick(tool)}
+                >
+                  <span className="tools-recent-icon" aria-hidden>
+                    <NavIcon icon={getToolIcon(tool.id)} size={22} />
                   </span>
-                </div>
-                <div className="tool-meta">
-                  <h3>{tool.name}</h3>
-                  <span className="tool-category">{tool.category}</span>
-                  <span
-                    className={`tool-category tool-category--lifecycle tool-category--lifecycle-${tool.lifecycleState}`}
-                  >
-                    {lifecycleLabel(tool)}
-                  </span>
-                  {tool.accessLabel ? (
-                    <span
-                      className={`tool-category tool-category--access tool-category--access-${tool.accessState}`}
+                  <div className="tools-recent-info">
+                    <span className="tools-recent-name">{tool.name}</span>
+                    <span className="tools-recent-category">{tool.category}</span>
+                  </div>
+                  <span className="tools-recent-action">{primaryActionLabel(tool)} →</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {showWorkspaceEmpty ? (
+          <div className="tools-recent">
+            <div className="tools-recent-header">
+              <h2 className="tools-recent-title">No tools in this workspace</h2>
+              <p>
+                This workspace does not include any launchable tools from the current inventory.
+              </p>
+            </div>
+            <button
+              type="button"
+              className="btn-open-tool"
+              onClick={() => setActiveWorkspaceId('all')}
+            >
+              Show all tools →
+            </button>
+          </div>
+        ) : showSearchEmpty ? (
+          <div className="tools-recent" role="status">
+            <div className="tools-recent-header">
+              <h2 className="tools-recent-title">No matching tools</h2>
+              <p>{emptyStateCopy}</p>
+            </div>
+            <button type="button" className="btn-open-tool" onClick={clearSearchAndFilters}>
+              Clear search and filters →
+            </button>
+          </div>
+        ) : (
+          <div className="tools-grid">
+            {orderedTools.map((tool) => {
+              const executionMode = executionModeForTool(tool, executorCatalog);
+              return (
+                <div
+                  key={tool.id}
+                  data-tool-id={tool.id}
+                  className="tool-card-large"
+                  {...(tool.isLaunchable === false
+                    ? { 'aria-disabled': 'true' as const }
+                    : { 'aria-disabled': 'false' as const })}
+                >
+                  <div className="tool-card-header">
+                    <div className="tool-icon">
+                      <span aria-hidden>
+                        <NavIcon icon={getToolIcon(tool.id)} size={28} />
+                      </span>
+                    </div>
+                    <div className="tool-meta">
+                      <h3>{tool.name}</h3>
+                      <span className="tool-category">{tool.category}</span>
+                      <span
+                        className={`tool-category tool-category--lifecycle tool-category--lifecycle-${tool.lifecycleState}`}
+                      >
+                        {lifecycleLabel(tool)}
+                      </span>
+                      {tool.accessLabel ? (
+                        <span
+                          className={`tool-category tool-category--access tool-category--access-${tool.accessState}`}
+                        >
+                          {tool.accessLabel}
+                        </span>
+                      ) : null}
+                      <span
+                        className={`tools-execution-badge tools-execution-badge--${executionMode.tone}`}
+                      >
+                        {executionMode.label}
+                      </span>
+                      {tool.surface === 'chat-assisted' ? (
+                        <span className="tool-category tool-category--guided">Guided</span>
+                      ) : null}
+                      {recommendedIds.includes(tool.id) ? (
+                        <span className="tool-category tool-category--guided">
+                          Recommended for {roleIntelligenceProfile.roleLabel}
+                        </span>
+                      ) : null}
+                      {tool.restrictionReason ? (
+                        <span className="tool-category tool-category--restricted">
+                          {tool.restrictionReason}
+                        </span>
+                      ) : null}
+                    </div>
+                    <div className="tool-card-actions">
+                      <button
+                        type="button"
+                        className={`tool-card-action ${favoriteToolIdSet.has(tool.id) ? 'active' : ''}`}
+                        title={
+                          favoriteToolIdSet.has(tool.id)
+                            ? 'Remove from favorites'
+                            : 'Add to favorites'
+                        }
+                        aria-label={`${favoriteToolIdSet.has(tool.id) ? 'Remove' : 'Add'} ${tool.name} ${favoriteToolIdSet.has(tool.id) ? 'from' : 'to'} favorites`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleFavorite(tool.id);
+                        }}
+                      >
+                        <NavIcon
+                          icon={CHROME_ICONS.star}
+                          size={16}
+                          fill={favoriteToolIdSet.has(tool.id) ? 'currentColor' : 'none'}
+                          aria-hidden
+                        />
+                      </button>
+                      <button
+                        type="button"
+                        className={`tool-card-action ${pinnedToolIdSet.has(tool.id) ? 'active' : ''}`}
+                        title={pinnedToolIdSet.has(tool.id) ? 'Unpin tool' : 'Pin tool'}
+                        aria-label={`${pinnedToolIdSet.has(tool.id) ? 'Unpin' : 'Pin'} ${tool.name}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          togglePinned(tool.id);
+                        }}
+                      >
+                        <NavIcon icon={CHROME_ICONS.pin} size={16} aria-hidden />
+                      </button>
+                      <button
+                        type="button"
+                        className={`tool-card-action ${hiddenToolIdSet.has(tool.id) ? 'active' : ''}`}
+                        title={
+                          hiddenToolIdSet.has(tool.id)
+                            ? 'Show tool by default'
+                            : 'Hide from default views'
+                        }
+                        aria-label={`${hiddenToolIdSet.has(tool.id) ? 'Show' : 'Hide'} ${tool.name} by default`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleHidden(tool.id);
+                        }}
+                      >
+                        <NavIcon icon={CHROME_ICONS.close} size={16} aria-hidden />
+                      </button>
+                      <div className="tool-shortcut">
+                        {tool.shortcut ? tool.shortcut.replace('Ctrl+', '⌘') : 'Open'}
+                      </div>
+                    </div>
+                  </div>
+
+                  <p className="tool-description">{tool.description}</p>
+                  {tool.restrictionReason || tool.isLaunchable === false ? (
+                    <p className="tool-restriction-note">
+                      Unavailable: {tool.restrictionReason || accessRestrictionCopy(tool)}
+                    </p>
+                  ) : null}
+
+                  <div className="tool-features">
+                    <h4>Key Features:</h4>
+                    <ul>
+                      {(tool.features || []).slice(0, 3).map((feature, idx) => (
+                        <li key={idx}>
+                          <span className="feature-icon" aria-hidden>
+                            <NavIcon icon={CHROME_ICONS.check} size={14} />
+                          </span>
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="tool-use-cases">
+                    <h4>Use Cases:</h4>
+                    <div className="use-cases-tags">
+                      {tool.useCases.slice(0, 3).map((useCase, idx) => (
+                        <span key={idx} className="use-case-tag">
+                          {useCase}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="tool-actions">
+                    <button
+                      type="button"
+                      className="btn-open-tool"
+                      disabled={Boolean(tool.restrictionReason) || tool.isLaunchable === false}
+                      aria-label={`${primaryActionLabel(tool)} ${tool.name}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleToolClick(tool);
+                      }}
                     >
-                      {tool.accessLabel}
-                    </span>
-                  ) : null}
-                  <span className={`tools-execution-badge tools-execution-badge--${executionMode.tone}`}>
-                    {executionMode.label}
-                  </span>
-                  {tool.surface === 'chat-assisted' ? (
-                    <span className="tool-category tool-category--guided">Guided</span>
-                  ) : null}
-                  {recommendedIds.includes(tool.id) ? (
-                    <span className="tool-category tool-category--guided">
-                      Recommended for {roleIntelligenceProfile.roleLabel}
-                    </span>
-                  ) : null}
-                  {tool.restrictionReason ? (
-                    <span className="tool-category tool-category--restricted">
-                      {tool.restrictionReason}
-                    </span>
-                  ) : null}
-                </div>
-                <div className="tool-card-actions">
-                  <button type="button"
- className={`tool-card-action ${favoriteToolIdSet.has(tool.id) ? 'active' : ''}`}
- title={
- favoriteToolIdSet.has(tool.id) ? 'Remove from favorites' : 'Add to favorites'
- }
- aria-label={`${favoriteToolIdSet.has(tool.id) ? 'Remove' : 'Add'} ${tool.name} ${favoriteToolIdSet.has(tool.id) ? 'from' : 'to'} favorites`}
- onClick={(e) => {
- e.stopPropagation();
- toggleFavorite(tool.id);
- }}
-
- >
-                    <NavIcon
-                      icon={CHROME_ICONS.star}
-                      size={16}
-                      fill={favoriteToolIdSet.has(tool.id) ? 'currentColor' : 'none'}
-                      aria-hidden
-                    />
-                  </button>
-                  <button type="button"
- className={`tool-card-action ${pinnedToolIdSet.has(tool.id) ? 'active' : ''}`}
- title={pinnedToolIdSet.has(tool.id) ? 'Unpin tool' : 'Pin tool'}
- aria-label={`${pinnedToolIdSet.has(tool.id) ? 'Unpin' : 'Pin'} ${tool.name}`}
- onClick={(e) => {
- e.stopPropagation();
- togglePinned(tool.id);
- }}
-
- >
-                    <NavIcon icon={CHROME_ICONS.pin} size={16} aria-hidden />
-                  </button>
-                  <button type="button"
- className={`tool-card-action ${hiddenToolIdSet.has(tool.id) ? 'active' : ''}`}
- title={
- hiddenToolIdSet.has(tool.id)
- ? 'Show tool by default'
- : 'Hide from default views'
- }
- aria-label={`${hiddenToolIdSet.has(tool.id) ? 'Show' : 'Hide'} ${tool.name} by default`}
- onClick={(e) => {
- e.stopPropagation();
- toggleHidden(tool.id);
- }}
-
- >
-                    <NavIcon icon={CHROME_ICONS.close} size={16} aria-hidden />
-                  </button>
-                  <div className="tool-shortcut">
-                    {tool.shortcut ? tool.shortcut.replace('Ctrl+', '⌘') : 'Open'}
+                      {primaryActionLabel(tool)} →
+                    </button>
+                    {hasMeaningfulAssistantAction(tool) &&
+                    !tool.restrictionReason &&
+                    tool.isLaunchable !== false ? (
+                      <button
+                        type="button"
+                        className="btn-chat-tool"
+                        aria-label={`Ask Assistant about ${tool.name}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAssistantLaunch(tool);
+                        }}
+                      >
+                        Ask Assistant
+                      </button>
+                    ) : null}
                   </div>
                 </div>
-              </div>
+              );
+            })}
+          </div>
+        )}
 
-              <p className="tool-description">{tool.description}</p>
-              {tool.restrictionReason || tool.isLaunchable === false ? (
-                <p className="tool-restriction-note">
-                  Unavailable: {tool.restrictionReason || accessRestrictionCopy(tool)}
+        {!PILOT_CUSTOMER_MODE.enabled ? (
+          <div className="tools-tips">
+            <h2 className="tools-tips-title">
+              <NavIcon icon={CHROME_ICONS.lightbulb} size={28} />
+              How to act
+            </h2>
+            <div className="tips-grid">
+              <div className="tip-card">
+                <span className="tip-icon" aria-hidden>
+                  <NavIcon icon={CHROME_ICONS.checkCircle} size={32} />
+                </span>
+                <h3>Choose an action</h3>
+                <p>Start from a card instead of learning route names or command phrasing.</p>
+              </div>
+              <div className="tip-card">
+                <span className="tip-icon" aria-hidden>
+                  <NavIcon icon={CHROME_ICONS.messageCircle} size={32} />
+                </span>
+                <h3>Ask Assistant</h3>
+                <p>
+                  Send context to Assistant when you want guidance, preview, or confirmation before
+                  acting.
                 </p>
-              ) : null}
-
-              <div className="tool-features">
-                <h4>Key Features:</h4>
-                <ul>
-                  {(tool.features || []).slice(0, 3).map((feature, idx) => (
-                    <li key={idx}>
-                      <span className="feature-icon" aria-hidden>
-                        <NavIcon icon={CHROME_ICONS.check} size={14} />
-                      </span>
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
               </div>
-
-              <div className="tool-use-cases">
-                <h4>Use Cases:</h4>
-                <div className="use-cases-tags">
-                  {tool.useCases.slice(0, 3).map((useCase, idx) => (
-                    <span key={idx} className="use-case-tag">
-                      {useCase}
-                    </span>
-                  ))}
-                </div>
+              <div className="tip-card">
+                <span className="tip-icon" aria-hidden>
+                  <NavIcon icon={CHROME_ICONS.download} size={32} />
+                </span>
+                <h3>Verify results</h3>
+                <p>
+                  Outputs remain attached to the session so you can review, edit, share, or retry.
+                </p>
               </div>
-
-              <div className="tool-actions">
-                <button type="button"
-                  className="btn-open-tool"
-                  disabled={Boolean(tool.restrictionReason) || tool.isLaunchable === false}
-                  aria-label={`${primaryActionLabel(tool)} ${tool.name}`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleToolClick(tool);
-                  }}
-                >
-                  {primaryActionLabel(tool)} →
-                </button>
-                {hasMeaningfulAssistantAction(tool) &&
-                !tool.restrictionReason &&
-                tool.isLaunchable !== false ? (
-                  <button type="button"
-                    className="btn-chat-tool"
-                    aria-label={`Ask Assistant about ${tool.name}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleAssistantLaunch(tool);
-                    }}
-                  >
-                    Ask Assistant
-                  </button>
-                ) : null}
+              <div className="tip-card">
+                <span className="tip-icon" aria-hidden>
+                  <NavIcon icon={CHROME_ICONS.bot} size={32} />
+                </span>
+                <h3>Power stays underneath</h3>
+                <p>
+                  Existing backend commands and deterministic executors still run behind the simpler
+                  surface.
+                </p>
               </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {!PILOT_CUSTOMER_MODE.enabled ? (
-      <div className="tools-tips">
-        <h2 className="tools-tips-title">
-          <NavIcon icon={CHROME_ICONS.lightbulb} size={28} />
-          How to act
-        </h2>
-        <div className="tips-grid">
-          <div className="tip-card">
-            <span className="tip-icon" aria-hidden>
-              <NavIcon icon={CHROME_ICONS.checkCircle} size={32} />
-            </span>
-            <h3>Choose an action</h3>
-            <p>Start from a card instead of learning route names or command phrasing.</p>
+            </div>
           </div>
-          <div className="tip-card">
-            <span className="tip-icon" aria-hidden>
-              <NavIcon icon={CHROME_ICONS.messageCircle} size={32} />
-            </span>
-            <h3>Ask Assistant</h3>
-            <p>
-              Send context to Assistant when you want guidance, preview, or confirmation before
-              acting.
-            </p>
-          </div>
-          <div className="tip-card">
-            <span className="tip-icon" aria-hidden>
-              <NavIcon icon={CHROME_ICONS.download} size={32} />
-            </span>
-            <h3>Verify results</h3>
-            <p>Outputs remain attached to the session so you can review, edit, share, or retry.</p>
-          </div>
-          <div className="tip-card">
-            <span className="tip-icon" aria-hidden>
-              <NavIcon icon={CHROME_ICONS.bot} size={32} />
-            </span>
-            <h3>Power stays underneath</h3>
-            <p>
-              Existing backend commands and deterministic executors still run behind the simpler
-              surface.
-            </p>
-          </div>
-        </div>
-      </div>
-      ) : null}
+        ) : null}
       </CareDroidPage>
     </div>
   );

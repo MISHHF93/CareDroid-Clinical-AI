@@ -19,7 +19,11 @@ describe('complianceApi', () => {
   });
 
   it('posts to /api/compliance/consent', async () => {
-    vi.mocked(apiFetch).mockResolvedValueOnce({ ok: true, status: 200, _json: { success: true } } as any);
+    vi.mocked(apiFetch).mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      _json: { success: true },
+    } as any);
 
     const result = await updateConsentPreference('data_processing', true);
 
@@ -34,7 +38,11 @@ describe('complianceApi', () => {
   });
 
   it('recordConsentPreferences batches supported types', async () => {
-    vi.mocked(apiFetch).mockResolvedValue({ ok: true, status: 200, _json: { success: true } } as any);
+    vi.mocked(apiFetch).mockResolvedValue({
+      ok: true,
+      status: 200,
+      _json: { success: true },
+    } as any);
 
     const result = await recordConsentPreferences({
       dataProcessing: true,
@@ -46,7 +54,11 @@ describe('complianceApi', () => {
   });
 
   it('posts to /api/compliance/export for data export requests', async () => {
-    vi.mocked(apiFetch).mockResolvedValueOnce({ ok: true, status: 200, _json: { exportId: 'exp-1' } } as any);
+    vi.mocked(apiFetch).mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      _json: { exportId: 'exp-1' },
+    } as any);
 
     const result = await requestComplianceDataExport();
 

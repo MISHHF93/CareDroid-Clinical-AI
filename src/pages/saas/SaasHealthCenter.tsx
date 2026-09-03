@@ -44,7 +44,10 @@ function HealthCheckRow({ check }: { check: PlatformHealthCheck }) {
   return (
     <Surface as="article" tone="nested" className="saas-health-check-row">
       <div className="saas-health-check-row__main">
-        <span className={`saas-health-check-row__dot saas-health-check-row__dot--${tone}`} aria-hidden />
+        <span
+          className={`saas-health-check-row__dot saas-health-check-row__dot--${tone}`}
+          aria-hidden
+        />
         <div>
           <strong>{check.label}</strong>
           {check.summary ? <p>{check.summary}</p> : null}
@@ -77,7 +80,9 @@ export default function SaasHealthCenter() {
   const [bundle, setBundle] = useState<UnifiedPlatformHealthBundle | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [observabilityHealth, setObservabilityHealth] = useState<ObservabilityHealthProbe | null>(null);
+  const [observabilityHealth, setObservabilityHealth] = useState<ObservabilityHealthProbe | null>(
+    null,
+  );
   const [serverDiagnostics, setServerDiagnostics] = useState<Record<string, unknown> | null>(null);
 
   const load = useCallback(async () => {
@@ -121,9 +126,12 @@ export default function SaasHealthCenter() {
     () =>
       (bundle?.registry.services || [])
         .filter((service) =>
-          ['SaaS Health API', 'System Health Service', 'AI Chief Orchestrator', 'Alert Lifecycle Orchestrator'].includes(
-            service.serviceName,
-          ),
+          [
+            'SaaS Health API',
+            'System Health Service',
+            'AI Chief Orchestrator',
+            'Alert Lifecycle Orchestrator',
+          ].includes(service.serviceName),
         )
         .slice(0, 6),
     [bundle?.registry.services],
@@ -139,7 +147,10 @@ export default function SaasHealthCenter() {
       description="What is happening across CareDroid platform services, who owns each check, and what needs attention before clinical workflows degrade."
       actions={
         <ActionRow align="end">
-          <Link className="saas-health-link cd-btn cd-btn--secondary cd-btn--sm" to="/system-health">
+          <Link
+            className="saas-health-link cd-btn cd-btn--secondary cd-btn--sm"
+            to="/system-health"
+          >
             Deployment observability
           </Link>
           <Button variant="primary" size="sm" loading={loading} onClick={load}>
@@ -151,7 +162,10 @@ export default function SaasHealthCenter() {
         operationalSummary: (
           <>
             {loading && !bundle ? (
-              <LoadingState title="Loading platform health" description="Probing SaaS health and service registry." />
+              <LoadingState
+                title="Loading platform health"
+                description="Probing SaaS health and service registry."
+              />
             ) : null}
             {health ? (
               <Surface
@@ -184,9 +198,24 @@ export default function SaasHealthCenter() {
         ),
         analytics: summary ? (
           <DashboardGrid variant="summary" className="saas-health-metrics">
-            <MetricCard label="Healthy" value={summary.healthy ?? 0} tone="healthy" helper="Checks passing" />
-            <MetricCard label="Attention" value={summary.warning ?? 0} tone="attention" helper="Guarded or degraded" />
-            <MetricCard label="Critical" value={summary.critical ?? 0} tone="critical" helper="Requires IT action" />
+            <MetricCard
+              label="Healthy"
+              value={summary.healthy ?? 0}
+              tone="healthy"
+              helper="Checks passing"
+            />
+            <MetricCard
+              label="Attention"
+              value={summary.warning ?? 0}
+              tone="attention"
+              helper="Guarded or degraded"
+            />
+            <MetricCard
+              label="Critical"
+              value={summary.critical ?? 0}
+              tone="critical"
+              helper="Requires IT action"
+            />
             <MetricCard
               label="Active bottlenecks"
               value={bottlenecks?.analytics.activeCount ?? 0}
@@ -221,49 +250,55 @@ export default function SaasHealthCenter() {
             ) : null}
           </>
         ),
-        supportingContext: registryServices.length > 0 ? (
-          <DashboardSection
-            className="saas-health-section"
-            title="Canonical service registry"
-            titleId="saas-health-registry-title"
-            description="Integrated services consumed by this health surface — no parallel health APIs."
-          >
-            <ul className="saas-health-service-list">
-              {registryServices.map((service) => (
-                <ServiceRegistryRow key={service.serviceName} service={service} />
-              ))}
-            </ul>
-          </DashboardSection>
-        ) : null,
+        supportingContext:
+          registryServices.length > 0 ? (
+            <DashboardSection
+              className="saas-health-section"
+              title="Canonical service registry"
+              titleId="saas-health-registry-title"
+              description="Integrated services consumed by this health surface — no parallel health APIs."
+            >
+              <ul className="saas-health-service-list">
+                {registryServices.map((service) => (
+                  <ServiceRegistryRow key={service.serviceName} service={service} />
+                ))}
+              </ul>
+            </DashboardSection>
+          ) : null,
         history: bundle ? (
           <>
-          <DashboardSection
-            className="saas-health-section"
-            title="Observability diagnostics"
-            titleId="saas-health-observability-title"
-            description="Workflow traces, slow API calls, and error telemetry for administrator triage."
-          >
-            <OperationalDiagnosticsPanel
-              client={clientDiagnostics}
-              server={serverDiagnostics}
-              observabilityHealth={observabilityHealth}
-              serviceHealth={bottlenecks?.serviceHealth || []}
-            />
-          </DashboardSection>
-          <DashboardSection
-            className="saas-health-section"
-            title="Health endpoints"
-            titleId="saas-health-endpoints-title"
-          >
-            <DashboardGrid className="saas-health-endpoint-grid">
-              {Object.entries(bundle.registry.endpoints).map(([key, path]) => (
-                <Surface as="article" tone="nested" key={key} className="saas-health-endpoint-card cd-surface-card">
-                  <h3>{path}</h3>
-                  <p>{key}</p>
-                </Surface>
-              ))}
-            </DashboardGrid>
-          </DashboardSection>
+            <DashboardSection
+              className="saas-health-section"
+              title="Observability diagnostics"
+              titleId="saas-health-observability-title"
+              description="Workflow traces, slow API calls, and error telemetry for administrator triage."
+            >
+              <OperationalDiagnosticsPanel
+                client={clientDiagnostics}
+                server={serverDiagnostics}
+                observabilityHealth={observabilityHealth}
+                serviceHealth={bottlenecks?.serviceHealth || []}
+              />
+            </DashboardSection>
+            <DashboardSection
+              className="saas-health-section"
+              title="Health endpoints"
+              titleId="saas-health-endpoints-title"
+            >
+              <DashboardGrid className="saas-health-endpoint-grid">
+                {Object.entries(bundle.registry.endpoints).map(([key, path]) => (
+                  <Surface
+                    as="article"
+                    tone="nested"
+                    key={key}
+                    className="saas-health-endpoint-card cd-surface-card"
+                  >
+                    <h3>{path}</h3>
+                    <p>{key}</p>
+                  </Surface>
+                ))}
+              </DashboardGrid>
+            </DashboardSection>
           </>
         ) : null,
       }}

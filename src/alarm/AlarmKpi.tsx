@@ -1,9 +1,5 @@
 import React from 'react';
-import {
-  type AlarmSeverity,
-  resolveAlarmSeverity,
-  shouldPulse,
-} from './types';
+import { type AlarmSeverity, resolveAlarmSeverity, shouldPulse } from './types';
 
 export type AlarmKpiProps = {
   severity?: AlarmSeverity | string;
@@ -45,8 +41,7 @@ export function AlarmKpi({
   const shared = {
     className: classes,
     'data-severity': resolved,
-    'data-alarm':
-      resolved === 'urgent' ? 'warning' : resolved === 'ai' ? 'info' : resolved,
+    'data-alarm': resolved === 'urgent' ? 'warning' : resolved === 'ai' ? 'info' : resolved,
     onClick,
   } as const;
 
@@ -72,7 +67,9 @@ export function AlarmKpi({
       <span className="cdl-alarm-kpi__label alarm-kpi__label">
         <span className="alarm-kpi__label-text">{label}</span>
         {badge != null && badge !== false ? (
-          <span className="cdl-alarm-kpi__badge alarm-kpi__badge alarm-kpi__badge--inline">{badge}</span>
+          <span className="cdl-alarm-kpi__badge alarm-kpi__badge alarm-kpi__badge--inline">
+            {badge}
+          </span>
         ) : null}
       </span>
     </Comp>

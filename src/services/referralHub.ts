@@ -128,7 +128,8 @@ export const DEMO_REFERRAL_FIXTURES = Object.freeze([
     elapsedMinutes: 44,
     requestedBy: 'ED physician',
     reason: 'Admission review for worsening respiratory status',
-    handoffSummary: 'NEWS2, oxygen requirement, and boarding pressure context ready for ICU review.',
+    handoffSummary:
+      'NEWS2, oxygen requirement, and boarding pressure context ready for ICU review.',
   }),
   Object.freeze({
     id: 'REF-1008',
@@ -143,12 +144,16 @@ export const DEMO_REFERRAL_FIXTURES = Object.freeze([
   }),
 ]);
 
-const STAGE_BY_ID = Object.freeze(Object.fromEntries(REFERRAL_FLOW_STAGES.map((stage) => [stage.id, stage])));
+const STAGE_BY_ID = Object.freeze(
+  Object.fromEntries(REFERRAL_FLOW_STAGES.map((stage) => [stage.id, stage])),
+);
 const PRIORITY_WEIGHT = Object.freeze({ low: 1, medium: 2, high: 3, critical: 4 });
 
 function normalizeReferral(referral: any = {}) {
   const stage = STAGE_BY_ID[referral.stage] ? referral.stage : 'request';
-  const department = REFERRAL_DEPARTMENTS.includes(referral.department) ? referral.department : 'Other';
+  const department = REFERRAL_DEPARTMENTS.includes(referral.department)
+    ? referral.department
+    : 'Other';
 
   return Object.freeze({
     id: referral.id || 'REF-UNKNOWN',
@@ -201,7 +206,9 @@ export const ReferralHub = Object.freeze({
     const normalized = this.getReferrals(referrals);
     return Object.freeze(
       REFERRAL_DEPARTMENTS.map((department) => {
-        const departmentReferrals = normalized.filter((referral) => referral.department === department);
+        const departmentReferrals = normalized.filter(
+          (referral) => referral.department === department,
+        );
         const delayed = departmentReferrals.filter(isDelayed);
         const oldest = departmentReferrals[0] || null;
         return Object.freeze({
@@ -210,11 +217,14 @@ export const ReferralHub = Object.freeze({
           delayedCount: delayed.length,
           oldestReferral: oldest,
           averageElapsedMinutes: departmentReferrals.length
-            ? Math.round(departmentReferrals.reduce((sum, referral) => sum + referral.elapsedMinutes, 0) / departmentReferrals.length)
+            ? Math.round(
+                departmentReferrals.reduce((sum, referral) => sum + referral.elapsedMinutes, 0) /
+                  departmentReferrals.length,
+              )
             : 0,
           referrals: Object.freeze(departmentReferrals),
         });
-      })
+      }),
     );
   },
 
@@ -228,7 +238,10 @@ export const ReferralHub = Object.freeze({
       accepted: normalized.filter((referral) => referral.stage === 'accepted').length,
       closed: normalized.filter((referral) => referral.stage === 'closed').length,
       averageElapsedMinutes: normalized.length
-        ? Math.round(normalized.reduce((sum, referral) => sum + referral.elapsedMinutes, 0) / normalized.length)
+        ? Math.round(
+            normalized.reduce((sum, referral) => sum + referral.elapsedMinutes, 0) /
+              normalized.length,
+          )
         : 0,
     });
   },
@@ -248,8 +261,8 @@ export const ReferralHub = Object.freeze({
             elapsedMinutes: referral.elapsedMinutes,
             delayMinutes: delayMinutes(referral),
             reason: `${referral.department} referral has been in ${referral.stageLabel} for ${referral.elapsedMinutes} minutes.`,
-          })
-        )
+          }),
+        ),
     );
   },
 
@@ -263,9 +276,10 @@ export const ReferralHub = Object.freeze({
           title: `Review delayed ${delay.department} referral`,
           priority: delay.priority,
           rationale: delay.reason,
-          action: 'Confirm assigned staff, missing data, department queue state, and next review step.',
-        })
-      )
+          action:
+            'Confirm assigned staff, missing data, department queue state, and next review step.',
+        }),
+      ),
     );
   },
 

@@ -14,11 +14,7 @@ export default function CommandCenterSurgePanel({
 
   return (
     <section
-      className={[
-        'command-center-surge',
-        `command-center-surge--${snapshot.level}`,
-        className,
-      ]
+      className={['command-center-surge', `command-center-surge--${snapshot.level}`, className]
         .filter(Boolean)
         .join(' ')}
       aria-label="Department surge status"

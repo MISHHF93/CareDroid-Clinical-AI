@@ -8,7 +8,15 @@ type CenterProps = {
   children?: React.ReactNode;
 } & React.HTMLAttributes<HTMLElement>;
 
-export function Center({ vertical, maxWidth, as: Tag = 'div', className, children, style, ...props }: CenterProps) {
+export function Center({
+  vertical,
+  maxWidth,
+  as: Tag = 'div',
+  className,
+  children,
+  style,
+  ...props
+}: CenterProps) {
   return (
     <Tag
       className={['cd-center', className ?? ''].filter(Boolean).join(' ')}

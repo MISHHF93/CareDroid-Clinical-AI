@@ -57,9 +57,9 @@ export function classifyReferralBucket(referral) {
   return null;
 }
 
-export function summarizeReferralAwareness(referrals = ([] as any[])) {
+export function summarizeReferralAwareness(referrals = [] as any[]) {
   const buckets = { pending: 0, accepted: 0, delayed: 0 };
-  const grouped = { pending: ([] as any[]), accepted: ([] as any[]), delayed: ([] as any[]) };
+  const grouped = { pending: [] as any[], accepted: [] as any[], delayed: [] as any[] };
 
   referrals.forEach((referral) => {
     const bucket = classifyReferralBucket(referral);

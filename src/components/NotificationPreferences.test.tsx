@@ -115,7 +115,9 @@ describe('NotificationPreferences', () => {
     fireEvent.keyDown(document, { key: 'Escape' });
 
     await waitFor(() =>
-      expect(screen.queryByRole('dialog', { name: /remove notification device/i })).not.toBeInTheDocument(),
+      expect(
+        screen.queryByRole('dialog', { name: /remove notification device/i }),
+      ).not.toBeInTheDocument(),
     );
     expect(NotificationService.removeDevice).not.toHaveBeenCalled();
   });
@@ -131,7 +133,9 @@ describe('NotificationPreferences', () => {
     fireEvent.click(dialog.parentElement as HTMLElement);
 
     await waitFor(() =>
-      expect(screen.queryByRole('dialog', { name: /remove notification device/i })).not.toBeInTheDocument(),
+      expect(
+        screen.queryByRole('dialog', { name: /remove notification device/i }),
+      ).not.toBeInTheDocument(),
     );
     expect(NotificationService.removeDevice).not.toHaveBeenCalled();
   });

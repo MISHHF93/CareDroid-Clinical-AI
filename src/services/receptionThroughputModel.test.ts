@@ -21,7 +21,11 @@ describe('receptionThroughputModel', () => {
   });
 
   it('measures clicks, screens, and timing for harmonized express path', () => {
-    const day = simulateReceptionDay({ profile: 'harmonized', patientCount: 1, mix: { expressRegister: 1 } });
+    const day = simulateReceptionDay({
+      profile: 'harmonized',
+      patientCount: 1,
+      mix: { expressRegister: 1 },
+    });
     expect(day.averages.clicksPerRegistration).toBe(3);
     expect(day.averages.screensVisited).toBe(2);
     expect(day.averages.timeToCreateEncounterMs).toBeGreaterThan(0);

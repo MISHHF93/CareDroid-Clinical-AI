@@ -115,7 +115,8 @@ export const ProductCatalogApi = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
-    if (!response.ok) throw new Error(`Hospital solution recommendation failed (${response.status})`);
+    if (!response.ok)
+      throw new Error(`Hospital solution recommendation failed (${response.status})`);
     return response.json();
   },
 
@@ -164,7 +165,7 @@ export const ProductCatalogApi = {
   async getOrganizationValueTracking(organizationId, period = 'month') {
     const qs = period ? `?period=${encodeURIComponent(period)}` : '';
     const response = await apiFetch(
-      `/api/organizations/${encodeURIComponent(organizationId)}/value-tracking${qs}`
+      `/api/organizations/${encodeURIComponent(organizationId)}/value-tracking${qs}`,
     );
     if (!response.ok) throw new Error(`Value tracking failed (${response.status})`);
     return response.json();
@@ -181,14 +182,11 @@ export const ProductCatalogApi = {
   },
 
   async requestIntegration(organizationId, integrationSlug) {
-    const response = await apiFetch(
-      `/api/organizations/${organizationId}/integrations/request`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ integrationSlug }),
-      }
-    );
+    const response = await apiFetch(`/api/organizations/${organizationId}/integrations/request`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ integrationSlug }),
+    });
     if (!response.ok) throw new Error(`Request integration failed (${response.status})`);
     return response.json();
   },

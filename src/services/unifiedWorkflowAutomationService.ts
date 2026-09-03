@@ -273,13 +273,16 @@ function dedupeWorkflowItems(items: WorkflowAutomationItem[]): WorkflowAutomatio
 function estimateClicksSaved(items: readonly WorkflowAutomationItem[]): number {
   return items.reduce((total, item) => {
     if (item.source === 'admin_automation' && item.status === 'pending_review') return total + 3;
-    if (item.source === 'three_minute_mission' && item.oneClickAction === 'acknowledge') return total + 2;
+    if (item.source === 'three_minute_mission' && item.oneClickAction === 'acknowledge')
+      return total + 2;
     if (item.source === 'ai_chief') return total + 1;
     return total;
   }, 0);
 }
 
-function buildDomainCounts(items: readonly WorkflowAutomationItem[]): Record<WorkflowAutomationDomain, number> {
+function buildDomainCounts(
+  items: readonly WorkflowAutomationItem[],
+): Record<WorkflowAutomationDomain, number> {
   const counts = { ...EMPTY_DOMAIN_COUNTS };
   for (const item of items) {
     counts[item.domain] += 1;
@@ -287,7 +290,9 @@ function buildDomainCounts(items: readonly WorkflowAutomationItem[]): Record<Wor
   return counts;
 }
 
-function buildSourceCounts(items: readonly WorkflowAutomationItem[]): Record<WorkflowAutomationSource, number> {
+function buildSourceCounts(
+  items: readonly WorkflowAutomationItem[],
+): Record<WorkflowAutomationSource, number> {
   const counts = { ...EMPTY_SOURCE_COUNTS };
   for (const item of items) {
     counts[item.source] += 1;
@@ -308,7 +313,9 @@ export function buildUnifiedWorkflowAutomationSnapshot(
   const missionSnapshot = buildThreeMinuteMissionSnapshot();
 
   const adminLinkedPatients = new Set(
-    pendingAdminTasks.map((task) => task.patientId).filter((patientId): patientId is string => Boolean(patientId)),
+    pendingAdminTasks
+      .map((task) => task.patientId)
+      .filter((patientId): patientId is string => Boolean(patientId)),
   );
   const nowIso = now.toISOString();
   const patients = input.patients || [];
@@ -330,7 +337,9 @@ export function buildUnifiedWorkflowAutomationSnapshot(
   ];
 
   const sorted = sortWorkflowItems(dedupeWorkflowItems(items));
-  const pendingReview = sorted.filter((item) => item.status === 'pending_review' || item.status === 'active').length;
+  const pendingReview = sorted.filter(
+    (item) => item.status === 'pending_review' || item.status === 'active',
+  ).length;
   const critical = sorted.filter((item) => item.priority === 'critical').length;
 
   return Object.freeze({

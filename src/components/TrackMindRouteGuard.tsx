@@ -46,9 +46,6 @@ export default function TrackMindRouteGuard({ path, children }) {
 export function TrackMindDefaultRedirect() {
   const trackMindRole = useTrackMindRolePermissions();
   return (
-    <Navigate
-      to={trackMindRole.landingRoute || CANONICAL_ROUTES.trackMindWorkspace}
-      replace
-    />
+    <Navigate to={trackMindRole.landingRoute || CANONICAL_ROUTES.trackMindWorkspace} replace />
   );
 }

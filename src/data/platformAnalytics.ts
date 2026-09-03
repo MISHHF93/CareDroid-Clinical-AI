@@ -38,24 +38,49 @@ export const DEMO_PLATFORM_TELEMETRY_EVENTS = Object.freeze([
   { eventType: 'calculator_usage', toolId: 'qsofa', count: 31, day: '2026-05-25' },
   { eventType: 'calculator_usage', toolId: 'news2', count: 27, day: '2026-05-26' },
   { eventType: 'ai_launch', toolId: 'clinical-decision-support', count: 22, day: '2026-05-26' },
-  { eventType: 'ai_launch', toolId: 'clinical-documentation-assistant', count: 18, day: '2026-05-27' },
+  {
+    eventType: 'ai_launch',
+    toolId: 'clinical-documentation-assistant',
+    count: 18,
+    day: '2026-05-27',
+  },
   { eventType: 'simulation_completion', toolId: 'simulation-suite', count: 13, day: '2026-05-27' },
-  { eventType: 'simulation_completion', toolId: 'simulation-outcomes', count: 9, day: '2026-05-28' },
-  { eventType: 'dashboard_activity', toolId: 'digital-operations-center', count: 16, day: '2026-05-28' },
-  { eventType: 'dashboard_activity', toolId: 'predictive-analytics-dashboard', count: 14, day: '2026-05-29' },
+  {
+    eventType: 'simulation_completion',
+    toolId: 'simulation-outcomes',
+    count: 9,
+    day: '2026-05-28',
+  },
+  {
+    eventType: 'dashboard_activity',
+    toolId: 'digital-operations-center',
+    count: 16,
+    day: '2026-05-28',
+  },
+  {
+    eventType: 'dashboard_activity',
+    toolId: 'predictive-analytics-dashboard',
+    count: 14,
+    day: '2026-05-29',
+  },
   { eventType: 'workflow_usage', toolId: 'research-evidence-hub', count: 11, day: '2026-05-29' },
   { eventType: 'workflow_usage', toolId: 'protocols', count: 21, day: '2026-05-30' },
   { eventType: 'search_activity', toolId: 'tools-overview', count: 34, day: '2026-05-30' },
 ]);
 
 function normalizeEventType(type) {
-  const normalized = String(type || '').trim().toLowerCase().replace(/[-\s]+/g, '_');
+  const normalized = String(type || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[-\s]+/g, '_');
   if (Object.values(PLATFORM_ANALYTICS_EVENT_TYPES).includes(normalized as any)) return normalized;
   return PLATFORM_ANALYTICS_EVENT_TYPES.TOOL_USAGE;
 }
 
 function normalizeToolId(toolId) {
-  return String(toolId || 'unknown-tool').trim().toLowerCase();
+  return String(toolId || 'unknown-tool')
+    .trim()
+    .toLowerCase();
 }
 
 function dayBucket(timestampOrDay) {
@@ -76,7 +101,22 @@ export function sanitizeTelemetryEvent(event: any = {}) {
 
   for (const key of Object.keys(event)) {
     if (PRIVACY_BLOCKLIST.has(key)) continue;
-    if (['eventType', 'eventName', 'event', 'toolId', 'toolType', 'count', 'day', 'timestamp', 'surface', 'category', 'parameters'].includes(key)) continue;
+    if (
+      [
+        'eventType',
+        'eventName',
+        'event',
+        'toolId',
+        'toolType',
+        'count',
+        'day',
+        'timestamp',
+        'surface',
+        'category',
+        'parameters',
+      ].includes(key)
+    )
+      continue;
     if (['string', 'number', 'boolean'].includes(typeof event[key])) {
       safe[key] = event[key];
     }
@@ -96,7 +136,7 @@ function eventsFromToolResults(toolResults = [] as any[]) {
       toolId: result.toolType || result.toolId,
       timestamp: result.createdAt || result.timestamp,
       count: 1,
-    })
+    }),
   );
 }
 
@@ -117,11 +157,31 @@ function classifyTool(tool) {
     .join(' ')
     .toLowerCase();
 
-  if (tool?.presentationCategory === 'Calculator' || tool?.category === 'Calculator' || haystack.includes('calculator')) return 'calculator';
+  if (
+    tool?.presentationCategory === 'Calculator' ||
+    tool?.category === 'Calculator' ||
+    haystack.includes('calculator')
+  )
+    return 'calculator';
   if (haystack.includes('simulation')) return 'simulation';
-  if (haystack.includes('dashboard') || haystack.includes('command center') || haystack.includes('operations')) return 'dashboard';
-  if (haystack.includes('workflow') || haystack.includes('protocol') || haystack.includes('documentation')) return 'workflow';
-  if (haystack.includes('ai') || haystack.includes('assistant') || tool?.launchType === 'chat-assisted') return 'ai';
+  if (
+    haystack.includes('dashboard') ||
+    haystack.includes('command center') ||
+    haystack.includes('operations')
+  )
+    return 'dashboard';
+  if (
+    haystack.includes('workflow') ||
+    haystack.includes('protocol') ||
+    haystack.includes('documentation')
+  )
+    return 'workflow';
+  if (
+    haystack.includes('ai') ||
+    haystack.includes('assistant') ||
+    tool?.launchType === 'chat-assisted'
+  )
+    return 'ai';
   return 'tool';
 }
 
@@ -177,7 +237,10 @@ function decideToolAction(tool, usage, medianUsage) {
   const category = classifyTool(tool);
   if (usage === 0) return PLATFORM_ANALYTICS_DECISIONS.HIDE;
   if (usage >= Math.max(12, medianUsage * 2)) return PLATFORM_ANALYTICS_DECISIONS.PROMOTE;
-  if (usage <= Math.max(2, medianUsage * 0.25) && ['workflow', 'dashboard', 'ai'].includes(category)) {
+  if (
+    usage <= Math.max(2, medianUsage * 0.25) &&
+    ['workflow', 'dashboard', 'ai'].includes(category)
+  ) {
     return PLATFORM_ANALYTICS_DECISIONS.MERGE;
   }
   if (usage <= Math.max(4, medianUsage * 0.5)) return PLATFORM_ANALYTICS_DECISIONS.IMPROVE;
@@ -259,7 +322,8 @@ export function buildPlatformAnalytics({
       orphanToolCount: orphanTools.length,
       activeUsers: metrics?.dailyActiveUsers ?? null,
       searchEvents:
-        engagement.find((item) => item.eventType === PLATFORM_ANALYTICS_EVENT_TYPES.SEARCH_ACTIVITY)?.count || 0,
+        engagement.find((item) => item.eventType === PLATFORM_ANALYTICS_EVENT_TYPES.SEARCH_ACTIVITY)
+          ?.count || 0,
     },
     usageRows,
     topUsed,

@@ -88,7 +88,9 @@ function formatDate(value) {
 }
 
 function formatNotificationType(type) {
-  return String(type || 'notification').replace(/[_-]/g, ' ').toLowerCase();
+  return String(type || 'notification')
+    .replace(/[_-]/g, ' ')
+    .toLowerCase();
 }
 
 function NotificationPreferences() {
@@ -119,19 +121,20 @@ function NotificationPreferences() {
 
   const unreadLabel = useMemo(
     () => `${unreadCount} unread notification${unreadCount === 1 ? '' : 's'}`,
-    [unreadCount]
+    [unreadCount],
   );
 
   const loadNotificationData = useCallback(async () => {
     setLoading(true);
     setStatus({ type: '', message: '' });
 
-    const [preferencesResult, unreadResult, notificationsResult, devicesResult] = await Promise.allSettled([
-      NotificationService.getPreferences(),
-      NotificationService.getUnreadCount(),
-      NotificationService.fetchNotificationHistory(10),
-      NotificationService.fetchDevices(),
-    ]);
+    const [preferencesResult, unreadResult, notificationsResult, devicesResult] =
+      await Promise.allSettled([
+        NotificationService.getPreferences(),
+        NotificationService.getUnreadCount(),
+        NotificationService.fetchNotificationHistory(10),
+        NotificationService.fetchDevices(),
+      ]);
 
     if (preferencesResult.status === 'fulfilled') {
       setPreferences({
@@ -153,7 +156,7 @@ function NotificationPreferences() {
     }
 
     const firstError = [preferencesResult, unreadResult, notificationsResult, devicesResult].find(
-      (result) => result.status === 'rejected'
+      (result) => result.status === 'rejected',
     );
     if (firstError) {
       setStatus({
@@ -218,7 +221,10 @@ function NotificationPreferences() {
       setNotifications((current) => current.map((notification) => ({ ...notification, readAt })));
       setStatus({ type: 'success', message: 'All notifications marked as read.' });
     } catch (error: any) {
-      setStatus({ type: 'error', message: error.message || 'Failed to mark notifications as read.' });
+      setStatus({
+        type: 'error',
+        message: error.message || 'Failed to mark notifications as read.',
+      });
     } finally {
       setMarkingAllRead(false);
     }
@@ -235,7 +241,10 @@ function NotificationPreferences() {
       setConfirmDevice(null);
       setStatus({ type: 'success', message: 'Notification device removed.' });
     } catch (error: any) {
-      setStatus({ type: 'error', message: error.message || 'Failed to remove notification device.' });
+      setStatus({
+        type: 'error',
+        message: error.message || 'Failed to remove notification device.',
+      });
     } finally {
       setRemovingDeviceId(null);
     }
@@ -246,7 +255,9 @@ function NotificationPreferences() {
       <div className="preferences-header">
         <p className="preferences-eyebrow">Notifications</p>
         <h2>Notification Preferences</h2>
-        <p>Manage unread state, delivery channels, and devices through protected notification APIs.</p>
+        <p>
+          Manage unread state, delivery channels, and devices through protected notification APIs.
+        </p>
       </div>
 
       {status.message && (
@@ -262,7 +273,12 @@ function NotificationPreferences() {
               <h3>Unread Notifications</h3>
               <p className="section-help">Count is loaded from the protected unread-count route.</p>
             </div>
-            <button type="button" className="secondary-btn" onClick={loadNotificationData} disabled={loading}>
+            <button
+              type="button"
+              className="secondary-btn"
+              onClick={loadNotificationData}
+              disabled={loading}
+            >
               Refresh
             </button>
           </div>
@@ -290,14 +306,18 @@ function NotificationPreferences() {
                   className={`notification-recent-item${notification.readAt ? '' : ' notification-recent-item--unread'}`}
                 >
                   <div>
-                    <strong>{notification.title || formatNotificationType(notification.type)}</strong>
+                    <strong>
+                      {notification.title || formatNotificationType(notification.type)}
+                    </strong>
                     <p>{notification.body || 'No message body provided.'}</p>
                   </div>
                   <span>{notification.readAt ? 'Read' : 'Unread'}</span>
                 </article>
               ))
             ) : (
-              <p className="empty-note">{loading ? 'Loading notifications...' : 'No notifications returned yet.'}</p>
+              <p className="empty-note">
+                {loading ? 'Loading notifications...' : 'No notifications returned yet.'}
+              </p>
             )}
           </div>
         </section>
@@ -306,13 +326,25 @@ function NotificationPreferences() {
           <div className="notification-section-header">
             <div>
               <h3>Delivery Channels</h3>
-              <p className="section-help">These settings control delivery eligibility; they do not create scheduled reminders.</p>
+              <p className="section-help">
+                These settings control delivery eligibility; they do not create scheduled reminders.
+              </p>
             </div>
             <div className="bulk-preference-actions">
-              <button type="button" className="secondary-btn" onClick={() => handleToggleAll(true)} disabled={saving}>
+              <button
+                type="button"
+                className="secondary-btn"
+                onClick={() => handleToggleAll(true)}
+                disabled={saving}
+              >
                 Enable all
               </button>
-              <button type="button" className="secondary-btn secondary-btn--danger" onClick={() => handleToggleAll(false)} disabled={saving}>
+              <button
+                type="button"
+                className="secondary-btn secondary-btn--danger"
+                onClick={() => handleToggleAll(false)}
+                disabled={saving}
+              >
                 Disable all
               </button>
             </div>
@@ -331,7 +363,8 @@ function NotificationPreferences() {
         <section className="preferences-section">
           <h3>Notification Types</h3>
           <p className="section-help">
-            Medication and appointment reminders are preferences only. This page does not create scheduled reminders because no scheduler creation API is exposed here.
+            Medication and appointment reminders are preferences only. This page does not create
+            scheduled reminders because no scheduler creation API is exposed here.
           </p>
 
           {TYPE_PREFERENCES.map((item) => (
@@ -381,7 +414,9 @@ function NotificationPreferences() {
           <div className="notification-section-header">
             <div>
               <h3>Registered Devices</h3>
-              <p className="section-help">Devices are listed from the protected notification device route.</p>
+              <p className="section-help">
+                Devices are listed from the protected notification device route.
+              </p>
             </div>
             <span className="device-count">{devices.length} active</span>
           </div>
@@ -420,7 +455,9 @@ function NotificationPreferences() {
               ))
             ) : (
               <p className="empty-note">
-                {loading ? 'Loading registered devices...' : 'No push notification devices are registered.'}
+                {loading
+                  ? 'Loading registered devices...'
+                  : 'No push notification devices are registered.'}
               </p>
             )}
           </div>
@@ -428,7 +465,12 @@ function NotificationPreferences() {
       </div>
 
       <div className="preferences-footer">
-        <button type="button" className="save-btn" onClick={handleSave} disabled={saving || loading}>
+        <button
+          type="button"
+          className="save-btn"
+          onClick={handleSave}
+          disabled={saving || loading}
+        >
           {saving ? 'Saving...' : 'Save Preferences'}
         </button>
       </div>
@@ -450,14 +492,24 @@ function NotificationPreferences() {
             <h3 id="remove-device-title">Remove notification device?</h3>
             <p>
               This stops push notifications from being sent to{' '}
-              <strong>{confirmDevice.deviceModel || confirmDevice.platform || 'this device'}</strong>. You can register
-              it again later from the same device.
+              <strong>
+                {confirmDevice.deviceModel || confirmDevice.platform || 'this device'}
+              </strong>
+              . You can register it again later from the same device.
             </p>
             <div className="notification-confirm-actions">
-              <button type="button" className="secondary-btn" onClick={() => setConfirmDevice(null)}>
+              <button
+                type="button"
+                className="secondary-btn"
+                onClick={() => setConfirmDevice(null)}
+              >
                 Cancel
               </button>
-              <button type="button" className="save-btn save-btn--danger" onClick={handleRemoveDevice}>
+              <button
+                type="button"
+                className="save-btn save-btn--danger"
+                onClick={handleRemoveDevice}
+              >
                 Remove device
               </button>
             </div>

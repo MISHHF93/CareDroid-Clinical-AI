@@ -1,8 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  applyLiveMetricsToSurfaces,
-  buildLiveSurfaceMetrics,
-} from './operationsHubLiveMetrics';
+import { applyLiveMetricsToSurfaces, buildLiveSurfaceMetrics } from './operationsHubLiveMetrics';
 
 describe('operationsHubLiveMetrics', () => {
   it('builds hospital map metrics from capacity and map snapshot', () => {

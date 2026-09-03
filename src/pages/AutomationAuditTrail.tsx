@@ -31,7 +31,13 @@ function ConditionList({ conditions }) {
     <ul className="automation-audit-conditions" aria-label="Conditions evaluated">
       {conditions.map((condition) => (
         <li key={condition.label}>
-          <span className={condition.result ? 'condition-dot condition-dot--pass' : 'condition-dot condition-dot--fail'} />
+          <span
+            className={
+              condition.result
+                ? 'condition-dot condition-dot--pass'
+                : 'condition-dot condition-dot--fail'
+            }
+          />
           {condition.label}: {condition.result ? 'passed' : 'failed'}
         </li>
       ))}
@@ -80,14 +86,20 @@ function AuditEntryCard({ entry }) {
         </div>
         <div>
           <span>Reviewer</span>
-          <strong>{entry.reviewer.required ? entry.reviewer.name || 'Required' : 'Not required'}</strong>
+          <strong>
+            {entry.reviewer.required ? entry.reviewer.name || 'Required' : 'Not required'}
+          </strong>
         </div>
       </section>
 
       <ConditionList conditions={entry.conditionsEvaluated} />
 
-      {entry.reason ? <p className="automation-audit-note">Blocked reason: {entry.reason}</p> : null}
-      {entry.error ? <p className="automation-audit-note automation-audit-note--error">Error: {entry.error}</p> : null}
+      {entry.reason ? (
+        <p className="automation-audit-note">Blocked reason: {entry.reason}</p>
+      ) : null}
+      {entry.error ? (
+        <p className="automation-audit-note automation-audit-note--error">Error: {entry.error}</p>
+      ) : null}
       <p className="automation-audit-ai">{entry.aiInvolvement.summary}</p>
     </article>
   );
@@ -105,7 +117,7 @@ export default function AutomationAuditTrail() {
   const [tenantId, setTenantId] = useState(tenants[0]?.id || '');
   const entries = useMemo(
     () => (tenantId ? allEntries.filter((entry) => entry.tenant.id === tenantId) : allEntries),
-    [allEntries, tenantId]
+    [allEntries, tenantId],
   );
   const summary = useMemo(() => summarizeAutomationAuditTrail(entries), [entries]);
 
@@ -125,7 +137,9 @@ export default function AutomationAuditTrail() {
 
       setAllEntries(fallbackEntries);
       setAuditSource('local');
-      setAuditError(result.message || 'Automation audit API is unavailable; showing local fallback entries.');
+      setAuditError(
+        result.message || 'Automation audit API is unavailable; showing local fallback entries.',
+      );
     }
 
     loadAuditEntries();
@@ -144,7 +158,9 @@ export default function AutomationAuditTrail() {
       <header className="automation-audit-hero">
         <div>
           <p className="automation-audit-eyebrow">Automation Audit Trail</p>
-          <p className="automation-audit-title-text" data-testid="cd-page-title-text">Automation Audit</p>
+          <p className="automation-audit-title-text" data-testid="cd-page-title-text">
+            Automation Audit
+          </p>
           <p>
             Tenant-scoped record of every automation trigger, condition decision, selected action,
             AI/tool involvement, endpoint, outcome, timestamp, and reviewer requirement.
@@ -164,10 +180,20 @@ export default function AutomationAuditTrail() {
 
       <section className="automation-audit-policy" role="note">
         <strong>No invisible automation</strong>
-        <span>Failed automations log errors, blocked automations log reasons, and entries are tenant-scoped.</span>
+        <span>
+          Failed automations log errors, blocked automations log reasons, and entries are
+          tenant-scoped.
+        </span>
       </section>
-      <section className={`automation-audit-source automation-audit-source--${auditSource}`} role="status">
-        <strong>{auditSource === 'backend' ? 'Backend audit persistence active' : 'Local audit fallback active'}</strong>
+      <section
+        className={`automation-audit-source automation-audit-source--${auditSource}`}
+        role="status"
+      >
+        <strong>
+          {auditSource === 'backend'
+            ? 'Backend audit persistence active'
+            : 'Local audit fallback active'}
+        </strong>
         <span>
           {auditError ||
             'Automation audit entries are loaded from the tenant-scoped backend audit endpoint.'}
@@ -205,7 +231,9 @@ export default function AutomationAuditTrail() {
         {entries.length ? (
           entries.map((entry) => <AuditEntryCard key={entry.id} entry={entry} />)
         ) : (
-          <p className="automation-audit-empty">No automation audit entries exist for this tenant.</p>
+          <p className="automation-audit-empty">
+            No automation audit entries exist for this tenant.
+          </p>
         )}
       </section>
     </section>

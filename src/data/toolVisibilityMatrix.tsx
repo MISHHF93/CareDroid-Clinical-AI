@@ -10,10 +10,7 @@ import { toolRegistryById } from './toolRegistry';
 import { builtinUiCalculators, clinicalIntentTools } from './clinicalIntentToolCatalog';
 import { getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
 import { getAllDiscoveredTools } from './sourceCodeToolDiscovery';
-import {
-  resolveCatalogLaunch,
-  resolveNavigationPathForLaunch,
-} from './clinicalCatalogWiring';
+import { resolveCatalogLaunch, resolveNavigationPathForLaunch } from './clinicalCatalogWiring';
 import {
   ALL_REGISTRY_TOOL_IDS,
   BUILTIN_CALC_ID_TO_REGISTRY_ID,
@@ -45,8 +42,8 @@ const REGISTRY_ID_TO_BUILTIN_SLUG = Object.freeze(
   Object.fromEntries(
     Object.entries(BUILTIN_CALC_ID_TO_REGISTRY_ID)
       .filter(([slug]) => slug !== 'egfr')
-      .map(([slug, registryId]) => [registryId, slug])
-  )
+      .map(([slug, registryId]) => [registryId, slug]),
+  ),
 );
 
 const HUB_GROUP_TOOL_IDS = new Set(CHAT_ASSISTED_HUB_GROUPS.flatMap((g) => g.toolIds));
@@ -63,12 +60,13 @@ const REGISTRY_PAGE_COMPONENT = Object.freeze({
 
 const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
 const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.tsx'), 'utf8');
-const toolsOverviewSource = readFileSync(join(__dirname, '../pages/tools/ToolsOverview.tsx'), 'utf8');
+const toolsOverviewSource = readFileSync(
+  join(__dirname, '../pages/tools/ToolsOverview.tsx'),
+  'utf8',
+);
 
 function readPatternIds() {
-  return new Set(
-    parseClinicalToolPatternRecords(readToolPatternsSource()).map((r) => r.toolId)
-  );
+  return new Set(parseClinicalToolPatternRecords(readToolPatternsSource()).map((r) => r.toolId));
 }
 
 function catalogHasId(id) {
@@ -81,7 +79,7 @@ function discoveryHasId(id) {
   const reg = ORCHESTRATOR_TO_REGISTRY_ID[id] || id;
   ids.add(reg);
   return getAllDiscoveredTools().some(
-    (row) => ids.has(row.id) || ids.has(row.mapsTo) || row.registryId === reg
+    (row) => ids.has(row.id) || ids.has(row.mapsTo) || row.registryId === reg,
   );
 }
 
@@ -146,7 +144,8 @@ function resolveFrontendComponent(registryId, tier, builtinSlug, canonicalId) {
 function rendersInUi(row) {
   const { tier, calculatorSlug, registryId, canonicalId } = row;
   if (tier === 'A') return calculatorsSwitchExists(calculatorSlug);
-  if (tier === 'C') return Boolean(REGISTRY_PAGE_COMPONENT[registryId] || calculatorSlug === 'sofa');
+  if (tier === 'C')
+    return Boolean(REGISTRY_PAGE_COMPONENT[registryId] || calculatorSlug === 'sofa');
   if (tier === 'B' || tier === 'fleet-B') return hubCardExists(registryId);
   if (tier === 'clinical-page' || tier === 'fleet-A') return Boolean(row.frontendComponent);
   if (tier === 'hub') return calculatorsSource.includes('CALCULATORS');
@@ -189,8 +188,7 @@ function buildVisibilityRow(canonicalId, opts: any = {}) {
     (toolRegistryById[canonicalId] ? canonicalId : ORCHESTRATOR_TO_REGISTRY_ID[canonicalId]) ??
     null;
   const reg = registryId ? toolRegistryById[registryId] : null;
-  const nlu =
-    opts.nluRow ?? clinicalIntentTools.find((t) => t.toolId === canonicalId) ?? null;
+  const nlu = opts.nluRow ?? clinicalIntentTools.find((t) => t.toolId === canonicalId) ?? null;
   const tier =
     opts.tier ??
     inventoryRecord?.tier ??
@@ -204,19 +202,17 @@ function buildVisibilityRow(canonicalId, opts: any = {}) {
     (registryId ? REGISTRY_ID_TO_BUILTIN_SLUG[registryId] : null) ??
     (builtinUiCalculators.some((c) => c.id === canonicalId) ? canonicalId : null);
 
-  const route = inventoryRecord?.route ?? reg?.path ?? nlu?.path ?? resolveCatalogLaunch(canonicalId).path;
+  const route =
+    inventoryRecord?.route ?? reg?.path ?? nlu?.path ?? resolveCatalogLaunch(canonicalId).path;
   const dedicatedRegistryEntry = Boolean(toolRegistryById[canonicalId]);
   const sidebarVisible = inventoryRecord?.sidebarVisible ?? dedicatedRegistryEntry;
   const nluProfiles = registryId
-    ? clinicalIntentTools.filter(
-        (t) => t.sidebarToolId === registryId || t.toolId === registryId
-      )
+    ? clinicalIntentTools.filter((t) => t.sidebarToolId === registryId || t.toolId === registryId)
     : nlu
       ? [nlu]
       : [];
   const nluProfileExists =
-    nluProfiles.length > 0 ||
-    (registryId && KEYWORD_ROUTED_REGISTRY_IDS.includes(registryId));
+    nluProfiles.length > 0 || (registryId && KEYWORD_ROUTED_REGISTRY_IDS.includes(registryId));
   const patternIds = readPatternIds();
   const backendPatternExists =
     patternIds.has(canonicalId) ||
@@ -228,16 +224,11 @@ function buildVisibilityRow(canonicalId, opts: any = {}) {
   const backendExecutorExists =
     inventoryRecord?.executorStatus === TOOL_EXECUTOR_STATUS.REGISTERED ||
     isOrchestratorPostExecutable(canonicalId) ||
-    (canonicalId === registryId &&
-      primaryNlu &&
-      isOrchestratorPostExecutable(primaryNlu));
+    (canonicalId === registryId && primaryNlu && isOrchestratorPostExecutable(primaryNlu));
 
-  const frontendComponent = inventoryRecord?.component || resolveFrontendComponent(
-    registryId || canonicalId,
-    tier,
-    builtinSlug,
-    canonicalId
-  );
+  const frontendComponent =
+    inventoryRecord?.component ||
+    resolveFrontendComponent(registryId || canonicalId, tier, builtinSlug, canonicalId);
   const routeExists = appRouteRegistered(route, registryId, builtinSlug);
 
   const row = {
@@ -249,14 +240,14 @@ function buildVisibilityRow(canonicalId, opts: any = {}) {
       nlu?.toolName ??
       builtinUiCalculators.find((c) => c.id === builtinSlug)?.name ??
       canonicalId,
-    category: inventoryRecord?.category ?? normalizeCategory(reg?.category ?? nlu?.category ?? 'tool'),
+    category:
+      inventoryRecord?.category ?? normalizeCategory(reg?.category ?? nlu?.category ?? 'tool'),
     tier: formatTierLabel(tier),
     route: route || '—',
     calculatorSlug: builtinSlug || '—',
     registryEntryExists: dedicatedRegistryEntry,
     catalogEntryExists: catalogHasId(canonicalId) || (registryId && catalogHasId(registryId)),
-    discoveryEntryExists:
-      discoveryHasId(canonicalId) || (registryId && discoveryHasId(registryId)),
+    discoveryEntryExists: discoveryHasId(canonicalId) || (registryId && discoveryHasId(registryId)),
     sidebarVisible,
     nluProfileExists,
     backendPatternExists,
@@ -319,7 +310,12 @@ function deriveStatus(row, { tier, routeExists, catalogLaunchDiffers }) {
   if (!row.registryEntryExists && NLU_HUB_ONLY_PROFILE_TOOL_IDS.includes(row.canonicalId)) {
     return row.rendersInUi ? 'hidden by layout' : 'registry missing';
   }
-  if (tier === 'nlu-profile' && !row.registryEntryExists && row.rendersInUi && row.launchPathWorks) {
+  if (
+    tier === 'nlu-profile' &&
+    !row.registryEntryExists &&
+    row.rendersInUi &&
+    row.launchPathWorks
+  ) {
     return 'hidden by layout';
   }
   if (!row.launchPathWorks) return 'broken launch';
@@ -386,7 +382,7 @@ export function buildToolVisibilityMatrix() {
         nluRow: nlu,
         displayName: nlu.toolName,
         notes: isPrimary ? '' : `Secondary NLU profile; sidebar registry: ${registryId}`,
-      })
+      }),
     );
     seenCanonical.add(nlu.toolId);
   }
@@ -396,7 +392,7 @@ export function buildToolVisibilityMatrix() {
     rows.push(
       buildVisibilityRow(registryId, {
         notes: 'Keyword-routed in NLU; no dedicated clinicalIntentTools row',
-      })
+      }),
     );
     seenCanonical.add(registryId);
   }
@@ -406,10 +402,13 @@ export function buildToolVisibilityMatrix() {
 
 export function getToolVisibilityMatrixDocument() {
   const rows = buildToolVisibilityMatrix();
-  const statusCounts = rows.reduce((acc, row) => {
-    acc[row.currentStatus] = (acc[row.currentStatus] || 0) + 1;
-    return acc;
-  }, ({} as Record<string, number>));
+  const statusCounts = rows.reduce(
+    (acc, row) => {
+      acc[row.currentStatus] = (acc[row.currentStatus] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
 
   return {
     version: 1,
@@ -497,7 +496,7 @@ export function formatToolVisibilityMatrixMarkdown(doc = getToolVisibilityMatrix
 
   for (const row of rows) {
     lines.push(
-      `| ${row.canonicalId} | ${row.displayName} | ${row.category} | ${row.tier} | ${row.route} | ${row.calculatorSlug} | ${yesNo(row.registryEntryExists)} | ${yesNo(row.catalogEntryExists)} | ${yesNo(row.discoveryEntryExists)} | ${yesNo(row.sidebarVisible)} | ${yesNo(row.nluProfileExists)} | ${yesNo(row.backendPatternExists)} | ${yesNo(row.backendExecutorExists)} | ${yesNo(row.frontendComponentExists)} | ${yesNo(row.rendersInUi)} | ${yesNo(row.launchPathWorks)} | ${row.currentStatus} |`
+      `| ${row.canonicalId} | ${row.displayName} | ${row.category} | ${row.tier} | ${row.route} | ${row.calculatorSlug} | ${yesNo(row.registryEntryExists)} | ${yesNo(row.catalogEntryExists)} | ${yesNo(row.discoveryEntryExists)} | ${yesNo(row.sidebarVisible)} | ${yesNo(row.nluProfileExists)} | ${yesNo(row.backendPatternExists)} | ${yesNo(row.backendExecutorExists)} | ${yesNo(row.frontendComponentExists)} | ${yesNo(row.rendersInUi)} | ${yesNo(row.launchPathWorks)} | ${row.currentStatus} |`,
     );
   }
 
@@ -522,7 +521,7 @@ export function formatToolVisibilityMatrixMarkdown(doc = getToolVisibilityMatrix
     '```',
     '',
     'See also: `docs/e2e-tool-validation-matrix.md`, `docs/backend-frontend-tool-contract.md`, `docs/tool-render-execute-matrix.md`.',
-    ''
+    '',
   );
 
   return lines.join('\n');

@@ -26,9 +26,7 @@ export type IntakeEncounterStore = Pick<
   'patients' | 'emergencySettings' | 'updatePatient' | 'recordWorkflowAction'
 >;
 
-export function isAutoCreateEncounterEnabled(
-  settings?: IntakeEncounterSettings | null,
-): boolean {
+export function isAutoCreateEncounterEnabled(settings?: IntakeEncounterSettings | null): boolean {
   return settings?.intakeSettings?.autoCreateEncounter !== false;
 }
 

@@ -1,6 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
 import { PatientFlag, PatientState, Priority, type Alert, type Patient } from '../types/emergency';
-import { hasLongWaitAlertForBucket, longWaitAlertBucket, syncReassessmentDueFlag } from './reassessmentEngine';
+import {
+  hasLongWaitAlertForBucket,
+  longWaitAlertBucket,
+  syncReassessmentDueFlag,
+} from './reassessmentEngine';
 
 function alert(overrides: Partial<Alert> = {}): Alert {
   return {
@@ -82,21 +86,39 @@ describe('syncReassessmentDueFlag', () => {
    * uses for the identical "hasn't been actively seen yet" concept.
    */
   it('does NOT clear ReassessmentDue when a patient moves from Arrival straight to Triage', () => {
-    const patient = buildPatient({ state: PatientState.Triage, flags: [PatientFlag.ReassessmentDue] });
+    const patient = buildPatient({
+      state: PatientState.Triage,
+      flags: [PatientFlag.ReassessmentDue],
+    });
     const addFlag = vi.fn();
     const removeFlag = vi.fn();
 
-    syncReassessmentDueFlag(patient, new Date('2026-06-20T08:21:00.000Z'), undefined as any, addFlag, removeFlag);
+    syncReassessmentDueFlag(
+      patient,
+      new Date('2026-06-20T08:21:00.000Z'),
+      undefined as any,
+      addFlag,
+      removeFlag,
+    );
 
     expect(removeFlag).not.toHaveBeenCalled();
   });
 
   it('still clears ReassessmentDue once the patient reaches active clinical care (Assessment)', () => {
-    const patient = buildPatient({ state: PatientState.Assessment, flags: [PatientFlag.ReassessmentDue] });
+    const patient = buildPatient({
+      state: PatientState.Assessment,
+      flags: [PatientFlag.ReassessmentDue],
+    });
     const addFlag = vi.fn();
     const removeFlag = vi.fn();
 
-    syncReassessmentDueFlag(patient, new Date('2026-06-20T09:00:00.000Z'), undefined as any, addFlag, removeFlag);
+    syncReassessmentDueFlag(
+      patient,
+      new Date('2026-06-20T09:00:00.000Z'),
+      undefined as any,
+      addFlag,
+      removeFlag,
+    );
 
     expect(removeFlag).toHaveBeenCalledWith(patient.id, PatientFlag.ReassessmentDue);
   });
@@ -105,10 +127,20 @@ describe('syncReassessmentDueFlag', () => {
     const addFlag = vi.fn();
     const removeFlag = vi.fn();
 
-    for (const state of [PatientState.Disposition, PatientState.Admission, PatientState.Discharge]) {
+    for (const state of [
+      PatientState.Disposition,
+      PatientState.Admission,
+      PatientState.Discharge,
+    ]) {
       removeFlag.mockClear();
       const patient = buildPatient({ state, flags: [PatientFlag.ReassessmentDue] });
-      syncReassessmentDueFlag(patient, new Date('2026-06-20T09:00:00.000Z'), undefined as any, addFlag, removeFlag);
+      syncReassessmentDueFlag(
+        patient,
+        new Date('2026-06-20T09:00:00.000Z'),
+        undefined as any,
+        addFlag,
+        removeFlag,
+      );
       expect(removeFlag).toHaveBeenCalledWith(patient.id, PatientFlag.ReassessmentDue);
     }
   });
@@ -118,7 +150,13 @@ describe('syncReassessmentDueFlag', () => {
     const addFlag = vi.fn();
     const removeFlag = vi.fn();
 
-    syncReassessmentDueFlag(patient, new Date('2026-06-20T08:21:00.000Z'), undefined as any, addFlag, removeFlag);
+    syncReassessmentDueFlag(
+      patient,
+      new Date('2026-06-20T08:21:00.000Z'),
+      undefined as any,
+      addFlag,
+      removeFlag,
+    );
 
     expect(addFlag).not.toHaveBeenCalled();
     expect(removeFlag).not.toHaveBeenCalled();

@@ -40,32 +40,33 @@ export type PediatricDoseDiscrepancy = {
   note: string;
 };
 
-export const KNOWN_PEDIATRIC_DOSE_DISCREPANCIES: readonly PediatricDoseDiscrepancy[] = Object.freeze([
-  {
-    id: 'rocuronium',
-    calcName: 'Rocuronium',
-    calcDose: '1.2 mg/kg',
-    checkerName: 'Rocuronium',
-    checkerDose: '1 mg/kg',
-    note: '20% difference in RSI paralysis dose between this app’s two pediatric drug references.',
-  },
-  {
-    id: 'dextrose-d10w',
-    calcName: 'Dextrose 10%',
-    calcDose: '2 mL/kg',
-    checkerName: 'Glucose (D10W)',
-    checkerDose: '5 mL/kg',
-    note: '2.5x difference in D10W volume for hypoglycemia between this app’s two pediatric drug references.',
-  },
-  {
-    id: 'ns-bolus-sepsis',
-    calcName: 'NS bolus (sepsis)',
-    calcDose: '10 mL/kg, capped at 500 mL total',
-    checkerName: 'Fluid bolus',
-    checkerDose: '10-20 mL/kg, no stated cap',
-    note: 'Up to 2.4x difference in shock/sepsis fluid-bolus volume (and disagreement on whether an upper safety cap exists) between this app’s two pediatric drug references.',
-  },
-]);
+export const KNOWN_PEDIATRIC_DOSE_DISCREPANCIES: readonly PediatricDoseDiscrepancy[] =
+  Object.freeze([
+    {
+      id: 'rocuronium',
+      calcName: 'Rocuronium',
+      calcDose: '1.2 mg/kg',
+      checkerName: 'Rocuronium',
+      checkerDose: '1 mg/kg',
+      note: '20% difference in RSI paralysis dose between this app’s two pediatric drug references.',
+    },
+    {
+      id: 'dextrose-d10w',
+      calcName: 'Dextrose 10%',
+      calcDose: '2 mL/kg',
+      checkerName: 'Glucose (D10W)',
+      checkerDose: '5 mL/kg',
+      note: '2.5x difference in D10W volume for hypoglycemia between this app’s two pediatric drug references.',
+    },
+    {
+      id: 'ns-bolus-sepsis',
+      calcName: 'NS bolus (sepsis)',
+      calcDose: '10 mL/kg, capped at 500 mL total',
+      checkerName: 'Fluid bolus',
+      checkerDose: '10-20 mL/kg, no stated cap',
+      note: 'Up to 2.4x difference in shock/sepsis fluid-bolus volume (and disagreement on whether an upper safety cap exists) between this app’s two pediatric drug references.',
+    },
+  ]);
 
 /**
  * Canonical ids present on both calculators. Exported (not just used internally) so the
@@ -93,7 +94,9 @@ export function pediatricDoseCrossCheckWarning(drugName: string): PediatricDoseD
 }
 
 /** For the Pediatric Dose Safety Checker tool page: same lookup, keyed by its own drug names. */
-export function pediatricDoseCheckerCrossCheckWarning(drugName: string): PediatricDoseDiscrepancy | null {
+export function pediatricDoseCheckerCrossCheckWarning(
+  drugName: string,
+): PediatricDoseDiscrepancy | null {
   const id = CHECKER_NAME_TO_ID[drugName];
   if (!id) return null;
   return KNOWN_PEDIATRIC_DOSE_DISCREPANCIES.find((entry) => entry.id === id) ?? null;

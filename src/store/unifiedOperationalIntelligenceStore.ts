@@ -24,8 +24,8 @@ type UnifiedOperationalIntelligenceStoreState = Readonly<{
   markRefreshed: () => void;
 }>;
 
-export const useUnifiedOperationalIntelligenceStore = create<UnifiedOperationalIntelligenceStoreState>()(
-  (set) => ({
+export const useUnifiedOperationalIntelligenceStore =
+  create<UnifiedOperationalIntelligenceStoreState>()((set) => ({
     backendSnapshot: null,
     unifiedSnapshot: null,
     source: 'degraded',
@@ -40,8 +40,7 @@ export const useUnifiedOperationalIntelligenceStore = create<UnifiedOperationalI
     setRefreshError: (message) => set({ refreshError: message }),
     setIsRefreshing: (value) => set({ isRefreshing: value }),
     markRefreshed: () => set({ lastRefreshedAt: new Date().toISOString() }),
-  }),
-);
+  }));
 
 export function getUnifiedOperationalIntelligenceStoreState() {
   return useUnifiedOperationalIntelligenceStore.getState();

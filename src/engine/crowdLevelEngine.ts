@@ -233,8 +233,7 @@ export function buildCrowdLevelSnapshot(input: CrowdLevelInput = {}): CrowdLevel
     (waitingPatients.length
       ? Math.round(
           waitingPatients.reduce(
-            (sum, patient) =>
-              sum + minutesSince(patient.triageTime || patient.arrivalTime, now),
+            (sum, patient) => sum + minutesSince(patient.triageTime || patient.arrivalTime, now),
             0,
           ) / waitingPatients.length,
         )
@@ -243,8 +242,7 @@ export function buildCrowdLevelSnapshot(input: CrowdLevelInput = {}): CrowdLevel
   const longestWaitMinutes =
     capacity?.longestWaitMinutes ??
     waitingPatients.reduce(
-      (max, patient) =>
-        Math.max(max, minutesSince(patient.triageTime || patient.arrivalTime, now)),
+      (max, patient) => Math.max(max, minutesSince(patient.triageTime || patient.arrivalTime, now)),
       0,
     );
 
@@ -256,10 +254,7 @@ export function buildCrowdLevelSnapshot(input: CrowdLevelInput = {}): CrowdLevel
     emsAwareness.inboundCount ??
     0;
   const emsOffloadDelays =
-    input.emsOffloadDelays ??
-    emsAwareness.delayedOffloadCount ??
-    emsAwareness.awaitingHandoff ??
-    0;
+    input.emsOffloadDelays ?? emsAwareness.delayedOffloadCount ?? emsAwareness.awaitingHandoff ?? 0;
 
   const capacityBand = capacity?.band || 'Green';
   const capacityScore = capacity?.score ?? null;

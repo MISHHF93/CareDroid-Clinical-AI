@@ -17,9 +17,15 @@ function Probe() {
       <span data-testid="pinned">{pinned.join(',')}</span>
       <span data-testid="hidden">{hiddenTools.join(',')}</span>
       <span data-testid="specialty">{profileSettings.specialty || ''}</span>
-      <button type="button" onClick={() => togglePinned('heart-score')}>pin</button>
-      <button type="button" onClick={() => toggleHidden('fleet-command')}>hide</button>
-      <button type="button" onClick={() => updateProfileSettings({ specialty: 'cardiology' })}>specialty</button>
+      <button type="button" onClick={() => togglePinned('heart-score')}>
+        pin
+      </button>
+      <button type="button" onClick={() => toggleHidden('fleet-command')}>
+        hide
+      </button>
+      <button type="button" onClick={() => updateProfileSettings({ specialty: 'cardiology' })}>
+        specialty
+      </button>
     </div>
   );
 }
@@ -33,7 +39,7 @@ describe('ToolPreferencesContext profile segmentation settings', () => {
     const { unmount } = render(
       <ToolPreferencesProvider>
         <Probe />
-      </ToolPreferencesProvider>
+      </ToolPreferencesProvider>,
     );
 
     fireEvent.click(screen.getByRole('button', { name: 'pin' }));
@@ -48,7 +54,7 @@ describe('ToolPreferencesContext profile segmentation settings', () => {
     render(
       <ToolPreferencesProvider>
         <Probe />
-      </ToolPreferencesProvider>
+      </ToolPreferencesProvider>,
     );
 
     expect(screen.getByTestId('pinned')).toHaveTextContent('heart-score');
@@ -60,7 +66,7 @@ describe('ToolPreferencesContext profile segmentation settings', () => {
     render(
       <ToolPreferencesProvider>
         <Probe />
-      </ToolPreferencesProvider>
+      </ToolPreferencesProvider>,
     );
 
     fireEvent.click(screen.getByRole('button', { name: 'hide' }));

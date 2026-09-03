@@ -66,14 +66,16 @@ describe('pediatricsObgynCalculators', () => {
 
   it('rejects invalid dating, BP, and bilirubin inputs', () => {
     expect(computePregnancyDueDate({ method: 'lmp', lmpDate: 'bad-date' }).ok).toBe(false);
-    expect(computePediatricBpPercentile({ ageYears: 0, sex: '', systolic: '', diastolic: '' }).ok).toBe(false);
+    expect(
+      computePediatricBpPercentile({ ageYears: 0, sex: '', systolic: '', diastolic: '' }).ok,
+    ).toBe(false);
     expect(
       computeNeonatalBilirubinRiskHelper({
         ageHours: 400,
         bilirubin: 60,
         gestationalAgeWeeks: 30,
         neurotoxicityRiskFactors: '',
-      }).errors.length
+      }).errors.length,
     ).toBeGreaterThan(0);
   });
 });

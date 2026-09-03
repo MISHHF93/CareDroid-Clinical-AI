@@ -37,12 +37,12 @@ describe('userProfileCatalog', () => {
         { roles: { emergencyRoleMapping: { nurse: 'charge_nurse' } } },
       ),
     ).toBe(EMERGENCY_ROLE_IDS.chargeNurse);
-    expect(
-      resolveEffectiveEmergencyRole({ profile: { roleProfileId: 'nurse' } }, {}),
-    ).toBe(EMERGENCY_ROLE_IDS.triageNurse);
+    expect(resolveEffectiveEmergencyRole({ profile: { roleProfileId: 'nurse' } }, {})).toBe(
+      EMERGENCY_ROLE_IDS.triageNurse,
+    );
   });
 
-  it('prefers a user\'s own specific emergency role over the catalog\'s generic saasRole default (HEAL-336)', () => {
+  it("prefers a user's own specific emergency role over the catalog's generic saasRole default (HEAL-336)", () => {
     // charge_nurse and triage_nurse both normalize to the generic 'nurse'
     // saasRole (HEAL-323), whose catalog entry defaults to triage_nurse --
     // but a user who already carries a specific, valid emergency role of

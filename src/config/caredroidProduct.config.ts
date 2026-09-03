@@ -27,8 +27,7 @@ export const CAREDROID_PRODUCT = Object.freeze({
     'One journey from call or walk-in through reception, triage, diagnostics, treatment, disposition, and reporting — every surface shows state, owner, and next action.',
   copilotIntro:
     'CareDroid Copilot supports routing, context, evidence, and workflow prompts without making autonomous clinical decisions.',
-  copilotRole:
-    'Embedded CareDroid Copilot workflow layer — not an autonomous clinician.',
+  copilotRole: 'Embedded CareDroid Copilot workflow layer — not an autonomous clinician.',
   /** One Screen, One Decision — each surface optimizes for a single primary decision. */
   oneScreenOneDecision:
     'Every screen helps the user make one primary decision quickly. Secondary information is available but must not compete with the primary task.',

@@ -3,7 +3,10 @@ import {
   SIMULATION_CATEGORIES,
   SIMULATION_SCENARIOS,
 } from '../data/medicalSimulationCatalog';
-import { DEMO_COMPETENCY_RECORDS, DEMO_CREDENTIAL_RECORDS } from '../data/competencyCredentialingCatalog';
+import {
+  DEMO_COMPETENCY_RECORDS,
+  DEMO_CREDENTIAL_RECORDS,
+} from '../data/competencyCredentialingCatalog';
 
 export type SimulationChartDatum = Readonly<{ name: string; value: number }>;
 
@@ -29,9 +32,7 @@ export function buildScenarioDifficultyChart(
     acc[key] = (acc[key] || 0) + 1;
     return acc;
   }, {});
-  return order
-    .filter((name) => counts[name])
-    .map((name) => ({ name, value: counts[name] }));
+  return order.filter((name) => counts[name]).map((name) => ({ name, value: counts[name] }));
 }
 
 export function buildOutcomesTrendChart(
@@ -47,7 +48,10 @@ export function buildSafetyTrendChart(
 }
 
 export function buildCompetencyCoverageChart(
-  coverage: readonly { competency: string; coverage: number }[] = DEMO_SIMULATION_OUTCOMES.competencyCoverage,
+  coverage: readonly {
+    competency: string;
+    coverage: number;
+  }[] = DEMO_SIMULATION_OUTCOMES.competencyCoverage,
 ): SimulationChartDatum[] {
   return coverage.map((row) => ({ name: row.competency, value: row.coverage }));
 }
@@ -76,7 +80,8 @@ export function buildCredentialStatusChart(
 
 export function competencyStatusTone(status: string): 'good' | 'warning' | 'critical' | 'neutral' {
   if (status === 'completed' || status === 'active') return 'good';
-  if (status === 'in-progress' || status === 'needs-practice' || status === 'renewal-due') return 'warning';
+  if (status === 'in-progress' || status === 'needs-practice' || status === 'renewal-due')
+    return 'warning';
   return 'neutral';
 }
 

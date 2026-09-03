@@ -1,13 +1,26 @@
-import { PatientFlag, PatientState, Priority, type Alert, type Patient, type Referral } from '../types/emergency';
+import {
+  PatientFlag,
+  PatientState,
+  Priority,
+  type Alert,
+  type Patient,
+  type Referral,
+} from '../types/emergency';
 import type { EmergencyStoreState } from '../store/emergencyStore';
-import { buildArrivalControlSummary, type ArrivalControlSummary } from '../services/arrivalControlLayer';
+import {
+  buildArrivalControlSummary,
+  type ArrivalControlSummary,
+} from '../services/arrivalControlLayer';
 import {
   buildEmsOffloadTrackerSummary,
   emsOffloadMetricTone,
   formatEmsOffloadOperationalValue,
   type EmsOffloadTrackerSummary,
 } from '../services/emsOffloadTracker';
-import { summarizeTriageBreachBoard, type TriageBreachBoardSummary } from '../services/triageBreachTimer';
+import {
+  summarizeTriageBreachBoard,
+  type TriageBreachBoardSummary,
+} from '../services/triageBreachTimer';
 import {
   summarizeProviderWaitBreachBoard,
   type ProviderWaitBreachBoardSummary,
@@ -261,7 +274,9 @@ function formatWaitMinutes(minutes: number): string {
 }
 
 function patientDisplayName(patient: Patient): string {
-  return `${patient.firstName || ''} ${patient.lastName || ''}`.trim() || patient.name || patient.mrn;
+  return (
+    `${patient.firstName || ''} ${patient.lastName || ''}`.trim() || patient.name || patient.mrn
+  );
 }
 
 function patientFlags(patient: Patient): string[] {
@@ -312,11 +327,15 @@ function activePatients(source: CareDroidCentralNodeSource): Patient[] {
   // (critical patients, reassessment due, etc.) despite no longer being on
   // the board in any actionable sense.
   return source.patients.filter(
-    (patient) => patient.state !== PatientState.Discharge && patient.state !== PatientState.Deceased,
+    (patient) =>
+      patient.state !== PatientState.Discharge && patient.state !== PatientState.Deceased,
   );
 }
 
-function toPatientReference(patient: Patient, referrals: Referral[] = []): CareDroidPatientReference {
+function toPatientReference(
+  patient: Patient,
+  referrals: Referral[] = [],
+): CareDroidPatientReference {
   const experience = resolvePatientExperienceStatus(patient, { referrals });
   return {
     id: patient.id,
@@ -436,7 +455,9 @@ function buildQueueHealth(source: CareDroidCentralNodeSource) {
       id: 'reassessment',
       label: 'Reassessment',
       targetMinutes: 30,
-      patients: patients.filter((patient) => patientFlags(patient).includes(PatientFlag.ReassessmentDue)),
+      patients: patients.filter((patient) =>
+        patientFlags(patient).includes(PatientFlag.ReassessmentDue),
+      ),
     },
   ];
 
@@ -457,7 +478,9 @@ function buildQueueHealth(source: CareDroidCentralNodeSource) {
   });
 }
 
-function buildOperationalSummary(snapshot: Omit<CareDroidCentralNodeSnapshot, 'operationalSummary'>) {
+function buildOperationalSummary(
+  snapshot: Omit<CareDroidCentralNodeSnapshot, 'operationalSummary'>,
+) {
   return {
     generatedAt: snapshot.generatedAt,
     metrics: [
@@ -473,7 +496,9 @@ function buildOperationalSummary(snapshot: Omit<CareDroidCentralNodeSnapshot, 'o
         label: 'Waiting',
         value: snapshot.currentDepartmentStatus.waitingPatients,
         source: `${CARE_DROID_CENTRAL_NODE_ID}.queueHealth`,
-        tone: snapshot.currentDepartmentStatus.waitingPatients ? ('warning' as const) : ('success' as const),
+        tone: snapshot.currentDepartmentStatus.waitingPatients
+          ? ('warning' as const)
+          : ('success' as const),
       },
       {
         key: 'longestWait' as const,
@@ -542,10 +567,13 @@ function buildOperationalSummary(snapshot: Omit<CareDroidCentralNodeSnapshot, 'o
       {
         key: 'arrivalControlPending' as const,
         label: 'Arrival Pipeline',
-        value: snapshot.arrivalControlSummary.triagePending + snapshot.arrivalControlSummary.awaitingRegistration,
+        value:
+          snapshot.arrivalControlSummary.triagePending +
+          snapshot.arrivalControlSummary.awaitingRegistration,
         source: `${CARE_DROID_CENTRAL_NODE_ID}.arrivalControlSummary`,
         tone:
-          snapshot.arrivalControlSummary.triagePending + snapshot.arrivalControlSummary.awaitingRegistration
+          snapshot.arrivalControlSummary.triagePending +
+          snapshot.arrivalControlSummary.awaitingRegistration
             ? ('warning' as const)
             : ('success' as const),
       },
@@ -695,9 +723,7 @@ function normalizeBackendAlerts(value: unknown, fallback: Alert[], generatedAt: 
       createdAt: stringOr(alert.createdAt, generatedAt),
       dismissed: Boolean(alert.dismissed),
       source: stringOr(alert.source, 'emergency-os-backend'),
-      metadata: isRecord(alert.metadata)
-        ? (alert.metadata as Alert['metadata'])
-        : undefined,
+      metadata: isRecord(alert.metadata) ? (alert.metadata as Alert['metadata']) : undefined,
     };
   });
   return alerts.length ? alerts : fallback;
@@ -708,20 +734,25 @@ function normalizeBackendTenantSettings(
   fallback: CareDroidCentralNodeSnapshot['tenantSettings'],
 ): CareDroidCentralNodeSnapshot['tenantSettings'] {
   if (!isRecord(value)) return fallback;
-  const defaultScreenMode = CARE_DROID_SCREEN_MODE_CONFIG[value.defaultScreenMode as CareDroidScreenMode]
+  const defaultScreenMode = CARE_DROID_SCREEN_MODE_CONFIG[
+    value.defaultScreenMode as CareDroidScreenMode
+  ]
     ? (value.defaultScreenMode as CareDroidScreenMode)
     : fallback.defaultScreenMode;
   const enabledScreenModes = Array.isArray(value.enabledScreenModes)
     ? value.enabledScreenModes.filter(
         (mode): mode is CareDroidScreenMode =>
-          typeof mode === 'string' && Boolean(CARE_DROID_SCREEN_MODE_CONFIG[mode as CareDroidScreenMode]),
+          typeof mode === 'string' &&
+          Boolean(CARE_DROID_SCREEN_MODE_CONFIG[mode as CareDroidScreenMode]),
       )
     : fallback.enabledScreenModes;
 
   return {
     tenantName: stringOr(value.tenantName, fallback.tenantName),
     defaultScreenMode,
-    enabledScreenModes: enabledScreenModes.length ? enabledScreenModes : fallback.enabledScreenModes,
+    enabledScreenModes: enabledScreenModes.length
+      ? enabledScreenModes
+      : fallback.enabledScreenModes,
     readOnlyDisplayMode:
       typeof value.readOnlyDisplayMode === 'boolean'
         ? value.readOnlyDisplayMode
@@ -755,7 +786,8 @@ function normalizeBackendModuleStatuses(
     return {
       id,
       label: stringOr(module.label, fallbackModule?.label || id),
-      enabled: typeof module.enabled === 'boolean' ? module.enabled : Boolean(fallbackModule?.enabled),
+      enabled:
+        typeof module.enabled === 'boolean' ? module.enabled : Boolean(fallbackModule?.enabled),
     };
   });
   if (normalizedModules.length) return normalizedModules;
@@ -775,8 +807,16 @@ function applyBackendCentralNodePayload(
   if (!backend) return snapshot;
 
   const { payload, generatedAt } = backend;
-  const capacityStatus = normalizeBackendCapacity(payload.capacityStatus, snapshot.capacityStatus, generatedAt);
-  const operationalAlerts = normalizeBackendAlerts(payload.operationalAlerts, snapshot.operationalAlerts, generatedAt);
+  const capacityStatus = normalizeBackendCapacity(
+    payload.capacityStatus,
+    snapshot.capacityStatus,
+    generatedAt,
+  );
+  const operationalAlerts = normalizeBackendAlerts(
+    payload.operationalAlerts,
+    snapshot.operationalAlerts,
+    generatedAt,
+  );
   const emsInbound = finiteNumber(payload.emsInbound, snapshot.emsPressure.inbound);
   const criticalInbound = finiteNumber(
     isRecord(payload.capacityStatus) ? payload.capacityStatus.criticalEmsInboundCount : undefined,
@@ -798,9 +838,18 @@ function applyBackendCentralNodePayload(
     },
     currentDepartmentStatus: {
       ...snapshot.currentDepartmentStatus,
-      patientsToday: finiteNumber(payload.patientsToday, snapshot.currentDepartmentStatus.patientsToday),
-      activePatients: finiteNumber(payload.activePatients, snapshot.currentDepartmentStatus.activePatients),
-      waitingPatients: finiteNumber(payload.waitingPatients, snapshot.currentDepartmentStatus.waitingPatients),
+      patientsToday: finiteNumber(
+        payload.patientsToday,
+        snapshot.currentDepartmentStatus.patientsToday,
+      ),
+      activePatients: finiteNumber(
+        payload.activePatients,
+        snapshot.currentDepartmentStatus.activePatients,
+      ),
+      waitingPatients: finiteNumber(
+        payload.waitingPatients,
+        snapshot.currentDepartmentStatus.waitingPatients,
+      ),
       longestWait: finiteNumber(payload.longestWait, snapshot.currentDepartmentStatus.longestWait),
       averageWait: finiteNumber(payload.averageWait, snapshot.currentDepartmentStatus.averageWait),
       capacityBand: String(capacityStatus.band),
@@ -877,10 +926,10 @@ export function buildCareDroidCentralNodeSnapshot(
   ).length;
   const screenMode = resolveScreenMode(source, roleContext, options.screenMode, options.pathname);
   const screenConfig = CARE_DROID_SCREEN_MODE_CONFIG[screenMode];
-  const enabledModes = source.emergencySettings.enabledScreenModes?.filter(
-    (mode): mode is CareDroidScreenMode =>
+  const enabledModes =
+    source.emergencySettings.enabledScreenModes?.filter((mode): mode is CareDroidScreenMode =>
       Boolean(CARE_DROID_SCREEN_MODE_CONFIG[mode as CareDroidScreenMode]),
-  ) || CARE_DROID_SCREEN_MODE_OPTIONS;
+    ) || CARE_DROID_SCREEN_MODE_OPTIONS;
   const lastSyncedAt = source.websocket.lastEventAt || source.websocket.updatedAt || null;
   const baseSnapshot: Omit<CareDroidCentralNodeSnapshot, 'operationalSummary'> = {
     node: CARE_DROID_CENTRAL_NODE_ID,
@@ -896,18 +945,23 @@ export function buildCareDroidCentralNodeSnapshot(
         (source.backendAvailable ? 'Central node synced.' : 'Local snapshot active.'),
     },
     currentDepartmentStatus: {
-      patientsToday: source.patients.filter((patient) => localDateKey(patient.arrivalTime) === localDateKey())
-        .length,
+      patientsToday: source.patients.filter(
+        (patient) => localDateKey(patient.arrivalTime) === localDateKey(),
+      ).length,
       activePatients: active.length,
       waitingPatients: waiting.length,
       longestWait: waits.reduce((max, wait) => Math.max(max, wait), 0),
-      averageWait: waits.length ? Math.round(waits.reduce((sum, wait) => sum + wait, 0) / waits.length) : 0,
+      averageWait: waits.length
+        ? Math.round(waits.reduce((sum, wait) => sum + wait, 0) / waits.length)
+        : 0,
       capacityBand: source.capacity.band,
       activeAlerts: departmentAlerts.length,
     },
     activePatientFlow: {
       patients: active.map((patient) => toPatientReference(patient, source.referrals)),
-      criticalPatients: active.filter(isHighRisk).map((patient) => toPatientReference(patient, source.referrals)),
+      criticalPatients: active
+        .filter(isHighRisk)
+        .map((patient) => toPatientReference(patient, source.referrals)),
     },
     queueHealth: buildQueueHealth(source),
     emsPressure: {
@@ -955,16 +1009,17 @@ export function buildCareDroidCentralNodeSnapshot(
     },
     tenantSettings: {
       tenantName: source.emergencySettings.tenantName,
-      defaultScreenMode:
-        (CARE_DROID_SCREEN_MODE_CONFIG[
-          source.emergencySettings.defaultScreenMode as CareDroidScreenMode
-        ]
-          ? (source.emergencySettings.defaultScreenMode as CareDroidScreenMode)
-          : CARE_DROID_SCREEN_MODES.chargeNurse),
+      defaultScreenMode: CARE_DROID_SCREEN_MODE_CONFIG[
+        source.emergencySettings.defaultScreenMode as CareDroidScreenMode
+      ]
+        ? (source.emergencySettings.defaultScreenMode as CareDroidScreenMode)
+        : CARE_DROID_SCREEN_MODES.chargeNurse,
       enabledScreenModes: enabledModes,
       readOnlyDisplayMode: Boolean(source.emergencySettings.readOnlyDisplayMode),
       commandCenterMode: Boolean(source.emergencySettings.commandCenterMode),
-      wallDisplayRefreshInterval: Number(source.emergencySettings.wallDisplayRefreshInterval || 30000),
+      wallDisplayRefreshInterval: Number(
+        source.emergencySettings.wallDisplayRefreshInterval || 30000,
+      ),
       wallDisplayMonitorPrivacy: normalizeWallDisplayMonitorPrivacy(
         source.emergencySettings.wallDisplayMonitorPrivacy,
       ),
@@ -1001,7 +1056,9 @@ export function buildCareDroidCentralNodeSnapshot(
       capacityStatus: source.capacity,
       operationalAlerts: activeAlerts,
       activePatients: active.map((patient) => toPatientReference(patient, source.referrals)),
-      criticalPatients: active.filter(isHighRisk).map((patient) => toPatientReference(patient, source.referrals)),
+      criticalPatients: active
+        .filter(isHighRisk)
+        .map((patient) => toPatientReference(patient, source.referrals)),
       sync: {
         status: source.websocket.status || (source.backendAvailable ? 'connected' : 'local'),
         source: options.source || 'store',

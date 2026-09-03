@@ -2,10 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import GuidelineRag from './GuidelineRag';
-import {
-  mockConversationValue,
-  mockToolPreferencesValue,
-} from '../../test/testRenderUtils';
+import { mockConversationValue, mockToolPreferencesValue } from '../../test/testRenderUtils';
 import { queryGuidelineEvidence } from '../../services/clinicalIntelligenceApi';
 
 vi.mock('./ToolPageLayout.css', () => ({}));
@@ -81,8 +78,12 @@ describe('GuidelineRag', () => {
   it('renders guardrails that avoid unsupported medical claims', () => {
     renderPage();
 
-    expect(screen.getByRole('heading', { name: /guideline retrieval \+ evidence engine/i })).toBeInTheDocument();
-    expect(screen.getByText(/summaries are generated only from retrieved guideline passages/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /guideline retrieval \+ evidence engine/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/summaries are generated only from retrieved guideline passages/i),
+    ).toBeInTheDocument();
     expect(screen.getByText(/unsupported medical claims/i)).toBeInTheDocument();
   });
 
@@ -108,7 +109,9 @@ describe('GuidelineRag', () => {
       );
     });
 
-    expect(await screen.findByText(/Guidelines recommend prompt antimicrobial therapy/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/Guidelines recommend prompt antimicrobial therapy/i),
+    ).toBeInTheDocument();
     expect(screen.getAllByText(/Sepsis Guideline/i).length).toBeGreaterThan(0);
     expect(screen.getByText(/chunk 2/i)).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /explainability/i })).toBeInTheDocument();

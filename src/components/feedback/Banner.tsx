@@ -11,7 +11,14 @@ type BannerProps = {
   children?: React.ReactNode;
 } & React.HTMLAttributes<HTMLDivElement>;
 
-export function Banner({ tone = 'info', icon, action, className, children, ...props }: BannerProps) {
+export function Banner({
+  tone = 'info',
+  icon,
+  action,
+  className,
+  children,
+  ...props
+}: BannerProps) {
   return (
     <div
       role="status"

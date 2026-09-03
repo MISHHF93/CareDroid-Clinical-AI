@@ -38,7 +38,7 @@ describe('PR1 coverage — catalog & discovery', () => {
     const rows = getMedicalToolsCatalogRows();
     const summary = getMedicalCatalogSummary();
     const pr1Primaries = new Set(
-      rows.filter((r) => PR1_CALCULATOR_REGISTRY_IDS.includes(r.primaryId)).map((r) => r.primaryId)
+      rows.filter((r) => PR1_CALCULATOR_REGISTRY_IDS.includes(r.primaryId)).map((r) => r.primaryId),
     );
     expect(pr1Primaries.size).toBe(PR1_CALCULATOR_REGISTRY_IDS.length);
     expect(summary.total).toBeGreaterThanOrEqual(clinicalIntentTools.length);
@@ -71,7 +71,13 @@ describe('PR1 coverage — NLU aliases & resolveCatalogLaunch', () => {
   });
 
   it('returns empty launch for falsy or unknown ids without throwing', () => {
-    const empty = { path: null, registryId: null, chatSeed: null, orchestratorTool: null, openLabel: 'Try in chat' };
+    const empty = {
+      path: null,
+      registryId: null,
+      chatSeed: null,
+      orchestratorTool: null,
+      openLabel: 'Try in chat',
+    };
     expect(resolveCatalogLaunch('')).toEqual(empty);
     expect(resolveCatalogLaunch(null)).toEqual(empty);
     const unknown = resolveCatalogLaunch('not-a-real-tool-id-xyz');

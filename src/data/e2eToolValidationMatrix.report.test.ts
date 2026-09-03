@@ -33,8 +33,8 @@ describe('e2eToolValidationMatrix report', () => {
         `E2E matrix validation failed (${validation.failing} rows): ${JSON.stringify(
           validation.findings.filter((f) => f.issues.length),
           null,
-          2
-        )}`
+          2,
+        )}`,
       );
     }
   });

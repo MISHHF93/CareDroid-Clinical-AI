@@ -20,7 +20,8 @@ export const PATIENT_JOURNEY_STATES = Object.freeze([
   Object.freeze({
     id: 'waiting',
     label: 'Waiting',
-    description: 'Patients waiting for assessment, orders, results, reassessment, or disposition movement.',
+    description:
+      'Patients waiting for assessment, orders, results, reassessment, or disposition movement.',
     targetMinutes: 30,
   }),
   Object.freeze({
@@ -44,25 +45,29 @@ export const PATIENT_JOURNEY_STATES = Object.freeze([
   Object.freeze({
     id: 'reassessment',
     label: 'Reassessment',
-    description: 'Clinical reassessment after treatment, results, monitoring changes, or new risk signals.',
+    description:
+      'Clinical reassessment after treatment, results, monitoring changes, or new risk signals.',
     targetMinutes: 30,
   }),
   Object.freeze({
     id: 'disposition',
     label: 'Disposition',
-    description: 'Referral, consult, observation, transfer, admission, discharge, or follow-up routing.',
+    description:
+      'Referral, consult, observation, transfer, admission, discharge, or follow-up routing.',
     targetMinutes: 45,
   }),
   Object.freeze({
     id: 'admission',
     label: 'Admission',
-    description: 'Admission handoff, bed assignment, prior authorization support, and inpatient transition.',
+    description:
+      'Admission handoff, bed assignment, prior authorization support, and inpatient transition.',
     targetMinutes: 60,
   }),
   Object.freeze({
     id: 'discharge',
     label: 'Discharge',
-    description: 'Discharge instructions, summary drafting, medication context, and release readiness.',
+    description:
+      'Discharge instructions, summary drafting, medication context, and release readiness.',
     targetMinutes: 45,
   }),
   Object.freeze({
@@ -73,10 +78,12 @@ export const PATIENT_JOURNEY_STATES = Object.freeze([
   }),
 ]);
 
-export const PATIENT_JOURNEY_STATE_IDS = Object.freeze(PATIENT_JOURNEY_STATES.map((state) => state.id));
+export const PATIENT_JOURNEY_STATE_IDS = Object.freeze(
+  PATIENT_JOURNEY_STATES.map((state) => state.id),
+);
 
 export const PATIENT_JOURNEY_STATE_BY_ID = Object.freeze(
-  Object.fromEntries(PATIENT_JOURNEY_STATES.map((state) => [state.id, state]))
+  Object.fromEntries(PATIENT_JOURNEY_STATES.map((state) => [state.id, state])),
 );
 
 const STATE_ALIASES = Object.freeze({
@@ -92,18 +99,78 @@ const STATE_ALIASES = Object.freeze({
 });
 
 export const DEFAULT_JOURNEY_STATE_LOAD = Object.freeze({
-  arrival: Object.freeze({ activePatients: 4, waitingPatients: 2, medianMinutes: 7, highRiskPatients: 1 }),
-  registration: Object.freeze({ activePatients: 7, waitingPatients: 3, medianMinutes: 12, highRiskPatients: 0 }),
-  triage: Object.freeze({ activePatients: 9, waitingPatients: 5, medianMinutes: 18, highRiskPatients: 4 }),
-  waiting: Object.freeze({ activePatients: 18, waitingPatients: 12, medianMinutes: 46, highRiskPatients: 3 }),
-  assessment: Object.freeze({ activePatients: 11, waitingPatients: 4, medianMinutes: 38, highRiskPatients: 4 }),
-  orders: Object.freeze({ activePatients: 8, waitingPatients: 3, medianMinutes: 26, highRiskPatients: 1 }),
-  results: Object.freeze({ activePatients: 10, waitingPatients: 6, medianMinutes: 68, highRiskPatients: 2 }),
-  reassessment: Object.freeze({ activePatients: 6, waitingPatients: 3, medianMinutes: 34, highRiskPatients: 2 }),
-  disposition: Object.freeze({ activePatients: 8, waitingPatients: 5, medianMinutes: 55, highRiskPatients: 1 }),
-  admission: Object.freeze({ activePatients: 5, waitingPatients: 4, medianMinutes: 80, highRiskPatients: 1 }),
-  discharge: Object.freeze({ activePatients: 6, waitingPatients: 2, medianMinutes: 40, highRiskPatients: 0 }),
-  'follow-up': Object.freeze({ activePatients: 3, waitingPatients: 1, medianMinutes: 95, highRiskPatients: 0 }),
+  arrival: Object.freeze({
+    activePatients: 4,
+    waitingPatients: 2,
+    medianMinutes: 7,
+    highRiskPatients: 1,
+  }),
+  registration: Object.freeze({
+    activePatients: 7,
+    waitingPatients: 3,
+    medianMinutes: 12,
+    highRiskPatients: 0,
+  }),
+  triage: Object.freeze({
+    activePatients: 9,
+    waitingPatients: 5,
+    medianMinutes: 18,
+    highRiskPatients: 4,
+  }),
+  waiting: Object.freeze({
+    activePatients: 18,
+    waitingPatients: 12,
+    medianMinutes: 46,
+    highRiskPatients: 3,
+  }),
+  assessment: Object.freeze({
+    activePatients: 11,
+    waitingPatients: 4,
+    medianMinutes: 38,
+    highRiskPatients: 4,
+  }),
+  orders: Object.freeze({
+    activePatients: 8,
+    waitingPatients: 3,
+    medianMinutes: 26,
+    highRiskPatients: 1,
+  }),
+  results: Object.freeze({
+    activePatients: 10,
+    waitingPatients: 6,
+    medianMinutes: 68,
+    highRiskPatients: 2,
+  }),
+  reassessment: Object.freeze({
+    activePatients: 6,
+    waitingPatients: 3,
+    medianMinutes: 34,
+    highRiskPatients: 2,
+  }),
+  disposition: Object.freeze({
+    activePatients: 8,
+    waitingPatients: 5,
+    medianMinutes: 55,
+    highRiskPatients: 1,
+  }),
+  admission: Object.freeze({
+    activePatients: 5,
+    waitingPatients: 4,
+    medianMinutes: 80,
+    highRiskPatients: 1,
+  }),
+  discharge: Object.freeze({
+    activePatients: 6,
+    waitingPatients: 2,
+    medianMinutes: 40,
+    highRiskPatients: 0,
+  }),
+  'follow-up': Object.freeze({
+    activePatients: 3,
+    waitingPatients: 1,
+    medianMinutes: 95,
+    highRiskPatients: 0,
+  }),
 });
 
 function normalizeStateId(stateId) {
@@ -119,13 +186,18 @@ function getValidStateId(stateId) {
 
 function getAutomationJourneyStates(automation: any = {}) {
   const candidateStates =
-    automation.patientJourneyStates || automation.journeyStages || automation.requiredWorkflows || [];
+    automation.patientJourneyStates ||
+    automation.journeyStages ||
+    automation.requiredWorkflows ||
+    [];
 
   return [...new Set(candidateStates.map(getValidStateId).filter(Boolean))];
 }
 
 function buildAutomationCoverage(automations = [] as any[]) {
-  const coverage = Object.fromEntries(PATIENT_JOURNEY_STATE_IDS.map((stateId) => [stateId, [] as any[]]));
+  const coverage = Object.fromEntries(
+    PATIENT_JOURNEY_STATE_IDS.map((stateId) => [stateId, [] as any[]]),
+  );
 
   for (const automation of automations) {
     for (const stateId of getAutomationJourneyStates(automation)) {
@@ -164,7 +236,8 @@ export function transitionPatientState(patientJourney: any = {}, nextStateId, op
     throw new Error(`Unknown patient journey state: ${nextStateId}`);
   }
 
-  const previousState = getValidStateId(patientJourney.currentState || options.currentState) || null;
+  const previousState =
+    getValidStateId(patientJourney.currentState || options.currentState) || null;
   const transitionedAt = options.transitionedAt || new Date().toISOString();
   const transitionEvent = Object.freeze({
     from: previousState,
@@ -204,7 +277,7 @@ export function getPatientJourney(options: any = {}) {
       },
       automations: Object.freeze(automationCoverage[state.id]),
       automationCount: automationCoverage[state.id].length,
-    })
+    }),
   );
 }
 
@@ -219,14 +292,20 @@ export function getJourneyBottlenecks(options: any = {}) {
     const highRiskPatients = metrics.highRiskPatients || 0;
     const overTargetMinutes = Math.max(0, medianMinutes - state.targetMinutes);
     const isBottleneck =
-      overTargetMinutes > 0 || waitingPatients >= 5 || activePatients >= 10 || highRiskPatients >= 3;
+      overTargetMinutes > 0 ||
+      waitingPatients >= 5 ||
+      activePatients >= 10 ||
+      highRiskPatients >= 3;
 
     if (!isBottleneck) return null;
 
     return Object.freeze({
       stateId: state.id,
       label: state.label,
-      severity: overTargetMinutes >= 20 || waitingPatients >= 10 || highRiskPatients >= 3 ? 'high' : 'medium',
+      severity:
+        overTargetMinutes >= 20 || waitingPatients >= 10 || highRiskPatients >= 3
+          ? 'high'
+          : 'medium',
       reason:
         overTargetMinutes > 0
           ? `${state.label} median time is ${overTargetMinutes} minutes over target.`
@@ -260,7 +339,9 @@ export function getJourneyMetrics(options: any = {}) {
     bottleneckCount: bottlenecks.length,
     automationCount: automations.length,
     statesWithAutomation,
-    automationCoveragePercent: Math.round((statesWithAutomation / PATIENT_JOURNEY_STATES.length) * 100),
+    automationCoveragePercent: Math.round(
+      (statesWithAutomation / PATIENT_JOURNEY_STATES.length) * 100,
+    ),
   });
 }
 
@@ -275,7 +356,7 @@ export function getJourneyRecommendations(options: any = {}) {
       priority: bottleneck.severity,
       rationale: bottleneck.reason,
       action: `Open ${bottleneck.label.toLowerCase()} queue and route attached automations for human review.`,
-    })
+    }),
   );
 
   for (const state of journey.filter((item) => item.automationCount === 0)) {
@@ -287,7 +368,7 @@ export function getJourneyRecommendations(options: any = {}) {
         priority: 'medium',
         rationale: `${state.label} has no attached CareDroid automation.`,
         action: 'Attach at least one review-bound automation to this journey state.',
-      })
+      }),
     );
   }
 

@@ -21,7 +21,8 @@ export default function ClinicalDecisionSupport() {
   const calculatorInventory = useMemo(
     () =>
       getUserFacingToolRegistryProjection().filter(
-        (tool) => tool.category === 'Calculator' || String(tool.path || '').includes('/calculators/'),
+        (tool) =>
+          tool.category === 'Calculator' || String(tool.path || '').includes('/calculators/'),
       ),
     [],
   );
@@ -46,8 +47,13 @@ export default function ClinicalDecisionSupport() {
         <div className="cds-page__title-row">
           <GraphicIconBadge iconKey="activity" accent="brand" size="md" />
           <div>
-            <p className="cds-page-title-text" data-testid="cd-page-title-text">Clinical Decision Support Engine</p>
-            <p>Symptom-driven risk signals, calculator recommendations, labs, imaging, and escalation framing.</p>
+            <p className="cds-page-title-text" data-testid="cd-page-title-text">
+              Clinical Decision Support Engine
+            </p>
+            <p>
+              Symptom-driven risk signals, calculator recommendations, labs, imaging, and escalation
+              framing.
+            </p>
           </div>
         </div>
         <div className="cds-page__actions">
@@ -71,7 +77,12 @@ export default function ClinicalDecisionSupport() {
           hint="Highest matched signal"
           tone={riskLevelTone(plan.riskLevel)}
         />
-        <MetricCard label="Signals" value={String(plan.signals.length)} hint="Matched risk patterns" tone="neutral" />
+        <MetricCard
+          label="Signals"
+          value={String(plan.signals.length)}
+          hint="Matched risk patterns"
+          tone="neutral"
+        />
         <MetricCard
           label="Calculators"
           value={String(plan.calculatorRecommendations.length)}
@@ -98,7 +109,11 @@ export default function ClinicalDecisionSupport() {
       </section>
 
       <div className="cds-page__charts">
-        <VisualizationPanel title="Matched signal risk" description="Risk weight of detected clinical signal patterns." badge="Signals">
+        <VisualizationPanel
+          title="Matched signal risk"
+          description="Risk weight of detected clinical signal patterns."
+          badge="Signals"
+        >
           <CategoryBarChart
             data={riskChart}
             title="Matched signal risk"
@@ -111,7 +126,8 @@ export default function ClinicalDecisionSupport() {
           <ul className="cds-page__list">
             {plan.signals.map((signal) => (
               <li key={signal.id}>
-                <strong>{signal.label}</strong> — {signal.risk} ({signal.matchedKeywords.join(', ')})
+                <strong>{signal.label}</strong> — {signal.risk} ({signal.matchedKeywords.join(', ')}
+                )
               </li>
             ))}
           </ul>
@@ -133,13 +149,29 @@ export default function ClinicalDecisionSupport() {
         <section className="cds-page__panel" aria-label="Workflow labs imaging escalation">
           <h2>Workflow, labs, imaging, escalation</h2>
           <h3>Workflows</h3>
-          <ul>{plan.workflowRecommendations.map((item) => <li key={item}>{item}</li>)}</ul>
+          <ul>
+            {plan.workflowRecommendations.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
           <h3>Labs</h3>
-          <ul>{plan.labRecommendations.map((item) => <li key={item}>{item}</li>)}</ul>
+          <ul>
+            {plan.labRecommendations.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
           <h3>Imaging</h3>
-          <ul>{plan.imagingRecommendations.map((item) => <li key={item}>{item}</li>)}</ul>
+          <ul>
+            {plan.imagingRecommendations.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
           <h3>Escalation</h3>
-          <ul>{plan.escalationSuggestions.map((item) => <li key={item}>{item}</li>)}</ul>
+          <ul>
+            {plan.escalationSuggestions.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
         </section>
       </div>
 

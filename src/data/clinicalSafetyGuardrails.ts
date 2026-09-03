@@ -25,7 +25,8 @@ export const GUARDRAIL_CHECKLIST = Object.freeze([
   },
   {
     id: 'mental-health-crisis',
-    requirement: 'PHQ-9/GAD-7 include crisis-sensitive handling (988 / urgent evaluation pathways).',
+    requirement:
+      'PHQ-9/GAD-7 include crisis-sensitive handling (988 / urgent evaluation pathways).',
     surfaces: ['clinicalIntentTools phq9/gad7', 'mentalHealthCalculators.jsx'],
   },
   {
@@ -95,7 +96,8 @@ const FLEET_GUARDRAIL_RE =
 const AI_DOC_RE =
   /human review|qualified (healthcare )?professional|clinician review|not a substitute|decision support only/i;
 
-const DOSE_FORBIDDEN_RE = /\b\d+(\.\d+)?\s*mg\s*\/\s*kg\b|weight-based\s+dose|calculate\s+the\s+dose\s+in\s+mg/i;
+const DOSE_FORBIDDEN_RE =
+  /\b\d+(\.\d+)?\s*mg\s*\/\s*kg\b|weight-based\s+dose|calculate\s+the\s+dose\s+in\s+mg/i;
 
 const APPEND_BLOCKS = Object.freeze({
   decisionSupport:
@@ -166,7 +168,11 @@ function profilesForTool(row) {
   const fromMap = TOOL_SAFETY_PROFILES[row.toolId] || TOOL_SAFETY_PROFILES[row.sidebarToolId] || [];
   const profiles = new Set(fromMap);
   if (row.category === 'fleet') profiles.add('fleet');
-  if (row.category === 'protocol' || row.toolId?.includes('diagnosis') || row.toolId?.includes('antibiotic')) {
+  if (
+    row.category === 'protocol' ||
+    row.toolId?.includes('diagnosis') ||
+    row.toolId?.includes('antibiotic')
+  ) {
     profiles.add('aiDocumentation');
   }
   if (row.chatSeed && !profiles.size) profiles.add('calculator');
@@ -258,7 +264,8 @@ export function auditChatSeed(row) {
   }
 
   if (
-    (profiles.includes('traumaStroke') || ['nihss', 'acls-protocol', 'atls-protocol'].includes(row.toolId)) &&
+    (profiles.includes('traumaStroke') ||
+      ['nihss', 'acls-protocol', 'atls-protocol'].includes(row.toolId)) &&
     !URGENT_CARE_RE.test(seed)
   ) {
     issues.push({ code: 'missing-urgent-care-warning', severity: 'critical' });
@@ -318,7 +325,8 @@ export function runClinicalSafetyComplianceAudit(tools) {
       toolsWithChatSeed: chatSeedFindings.length,
       passing: chatSeedFindings.length - failures.length,
       failing: failures.length,
-      criticalIssues: failures.flatMap((f) => f.issues.filter((i) => i.severity === 'critical')).length,
+      criticalIssues: failures.flatMap((f) => f.issues.filter((i) => i.severity === 'critical'))
+        .length,
     },
     chatSeedFindings,
     risks: failures.map((f) => ({
@@ -447,7 +455,9 @@ export function runUiSurfaceSafetyAudit(readFile) {
         surfaceId: rule.surfaceId,
         path: rule.path,
         ok: false,
-        issues: [{ code: 'file-missing', severity: 'critical', detail: `Could not read ${rule.path}` }],
+        issues: [
+          { code: 'file-missing', severity: 'critical', detail: `Could not read ${rule.path}` },
+        ],
       };
     }
     return auditUiSurfaceContent({ ...rule, content });
@@ -458,7 +468,8 @@ export function runUiSurfaceSafetyAudit(readFile) {
     surfacesAudited: findings.length,
     passing: findings.length - failures.length,
     failing: failures.length,
-    criticalIssues: failures.flatMap((f) => f.issues.filter((i) => i.severity === 'critical')).length,
+    criticalIssues: failures.flatMap((f) => f.issues.filter((i) => i.severity === 'critical'))
+      .length,
     findings,
     risks: failures.map((f) => ({
       surfaceId: f.surfaceId,
@@ -501,7 +512,10 @@ export function auditToolMetadata(row) {
     if (!FLEET_GUARDRAIL_RE.test(text) && !/decision support/i.test(text)) {
       issues.push({ code: 'missing-fleet-metadata-framing', severity: 'medium' });
     }
-  } else if (!DECISION_SUPPORT_RE.test(text) && !/educational|context-dependent|interaction/i.test(text)) {
+  } else if (
+    !DECISION_SUPPORT_RE.test(text) &&
+    !/educational|context-dependent|interaction/i.test(text)
+  ) {
     issues.push({ code: 'missing-metadata-decision-support', severity: 'medium' });
   }
 
@@ -536,7 +550,7 @@ export function runProductionSafetyComplianceAudit(options) {
     chatAudit.summary.criticalIssues +
     (uiAudit?.criticalIssues || 0) +
     [...metadataFailures, ...launchFailures].flatMap((f) =>
-      f.issues.filter((i) => i.severity === 'critical')
+      f.issues.filter((i) => i.severity === 'critical'),
     ).length;
 
   const totalFailing =
@@ -545,8 +559,7 @@ export function runProductionSafetyComplianceAudit(options) {
     metadataFailures.length +
     launchFailures.length;
 
-  const riskLevel =
-    criticalIssues > 0 ? 'high' : totalFailing > 0 ? 'medium' : 'low';
+  const riskLevel = criticalIssues > 0 ? 'high' : totalFailing > 0 ? 'medium' : 'low';
 
   return {
     generatedAt: new Date().toISOString(),

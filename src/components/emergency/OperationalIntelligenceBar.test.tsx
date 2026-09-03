@@ -101,11 +101,15 @@ describe('OperationalIntelligenceBar', () => {
     expect(screen.getByText('1 critical domain')).toBeInTheDocument();
   });
 
-  it('falls back to the unified hook\'s top insight when AI Chief has no risk or recommendation', () => {
+  it("falls back to the unified hook's top insight when AI Chief has no risk or recommendation", () => {
     aiChiefMock.mockReturnValue(baseAiChief());
     unifiedMock.mockReturnValue({
       ...buildUnified(),
-      topInsight: { summary: 'Congestion building in triage', title: 'Triage congestion rising', route: '/emergency/triage' },
+      topInsight: {
+        summary: 'Congestion building in triage',
+        title: 'Triage congestion rising',
+        route: '/emergency/triage',
+      },
     });
 
     renderBar();

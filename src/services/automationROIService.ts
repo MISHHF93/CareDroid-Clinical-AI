@@ -100,7 +100,7 @@ function scoreProfile({ timeSaved, clicksReduced, queueImpact, throughputImpact,
       clicksReducedScore * 0.15 +
       queueImpactScore * 0.25 +
       throughputImpactScore * 0.2 +
-      adoptionScore * 0.1
+      adoptionScore * 0.1,
   );
 }
 
@@ -134,7 +134,9 @@ function buildProfile(module, queueById, kpiById) {
   };
   const throughputImpact = {
     kpiId: baseline.kpiId,
-    estimatedMinutesReduced: Math.round(Math.min(kpi.value || baseline.runs * 2, baseline.runs * 2)),
+    estimatedMinutesReduced: Math.round(
+      Math.min(kpi.value || baseline.runs * 2, baseline.runs * 2),
+    ),
     source: 'EmergencyKPILayer demo KPI snapshot',
   };
   const adoption = {
@@ -143,7 +145,8 @@ function buildProfile(module, queueById, kpiById) {
     adoptionRate,
     repeatUseRate: boundedPercent(adoptionRate * 0.68),
   };
-  const status = module.subscriptionTier === 'enterprise' ? 'roadmap' : module.enabled ? 'core' : 'expansion';
+  const status =
+    module.subscriptionTier === 'enterprise' ? 'roadmap' : module.enabled ? 'core' : 'expansion';
 
   return Object.freeze({
     automationId: module.automationId,
@@ -159,7 +162,8 @@ function buildProfile(module, queueById, kpiById) {
     adoption: Object.freeze(adoption),
     valueScore: scoreProfile({ timeSaved, clicksReduced, queueImpact, throughputImpact, adoption }),
     roiEstimate: module.roiEstimate,
-    safetyStatement: 'ROI measures workflow value only; every automation output remains human-reviewed.',
+    safetyStatement:
+      'ROI measures workflow value only; every automation output remains human-reviewed.',
   });
 }
 
@@ -172,7 +176,7 @@ export const AutomationROIService = Object.freeze({
     const profiles = Object.freeze(
       marketplace.modules
         .map((module) => buildProfile(module, queueById, kpiLayer.metricById))
-        .sort((a, b) => b.valueScore - a.valueScore)
+        .sort((a, b) => b.valueScore - a.valueScore),
     );
 
     return Object.freeze({
@@ -184,13 +188,31 @@ export const AutomationROIService = Object.freeze({
         automationsTracked: profiles.length,
         totalRuns: profiles.reduce((sum, profile) => sum + profile.runs, 0),
         adoptedAutomations: profiles.filter((profile) => profile.adoptionRate >= 50).length,
-        estimatedMinutesSaved: profiles.reduce((sum, profile) => sum + profile.timeSaved.totalMinutes, 0),
-        estimatedClicksReduced: profiles.reduce((sum, profile) => sum + profile.clicksReduced.totalClicks, 0),
-        queueMinutesReduced: profiles.reduce((sum, profile) => sum + profile.queueImpact.estimatedMinutesReduced, 0),
-        throughputMinutesReduced: profiles.reduce((sum, profile) => sum + profile.throughputImpact.estimatedMinutesReduced, 0),
+        estimatedMinutesSaved: profiles.reduce(
+          (sum, profile) => sum + profile.timeSaved.totalMinutes,
+          0,
+        ),
+        estimatedClicksReduced: profiles.reduce(
+          (sum, profile) => sum + profile.clicksReduced.totalClicks,
+          0,
+        ),
+        queueMinutesReduced: profiles.reduce(
+          (sum, profile) => sum + profile.queueImpact.estimatedMinutesReduced,
+          0,
+        ),
+        throughputMinutesReduced: profiles.reduce(
+          (sum, profile) => sum + profile.throughputImpact.estimatedMinutesReduced,
+          0,
+        ),
       }),
       automations: profiles,
-      metricDefinitions: Object.freeze(['time saved', 'clicks reduced', 'queue impact', 'throughput impact', 'adoption']),
+      metricDefinitions: Object.freeze([
+        'time saved',
+        'clicks reduced',
+        'queue impact',
+        'throughput impact',
+        'adoption',
+      ]),
       safetyStatement:
         'Automation ROI measures workflow value only. It does not validate autonomous clinical, referral, discharge, admission, or escalation decisions.',
     });

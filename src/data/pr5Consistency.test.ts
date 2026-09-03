@@ -43,18 +43,18 @@ const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
 const patternsSource = readFileSync(
   join(
     __dirname,
-    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts'
+    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts',
   ),
-  'utf8'
+  'utf8',
 );
 const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.tsx'), 'utf8');
 const mentalHealthCalculatorsSource = readFileSync(
   join(__dirname, '../pages/tools/mentalHealthCalculators.tsx'),
-  'utf8'
+  'utf8',
 );
 const lazySpecialtyCalculatorsSource = readFileSync(
   join(__dirname, '../pages/tools/lazySpecialtyCalculators.tsx'),
-  'utf8'
+  'utf8',
 );
 
 describe('PR5 consistency — centralized audit lists', () => {
@@ -110,7 +110,7 @@ describe('PR5 consistency — aliases', () => {
     for (const [alias, canonical] of PR5_ALL_ALIAS_PAIRS) {
       if (targetByAlias.has(alias) && targetByAlias.get(alias) !== canonical) {
         throw new Error(
-          `Conflicting PR5 alias "${alias}": ${targetByAlias.get(alias)} vs ${canonical}`
+          `Conflicting PR5 alias "${alias}": ${targetByAlias.get(alias)} vs ${canonical}`,
         );
       }
       targetByAlias.set(alias, canonical);
@@ -197,7 +197,9 @@ describe('PR5 consistency — resolveCatalogLaunch, routes, sidebar', () => {
   });
 
   it('lists each PR5 tool exactly once in toolRegistry (sidebar visibility)', () => {
-    const pr5Rows = toolRegistry.filter((t) => (PR5_CALCULATOR_REGISTRY_IDS as readonly string[]).includes(t.id));
+    const pr5Rows = toolRegistry.filter((t) =>
+      (PR5_CALCULATOR_REGISTRY_IDS as readonly string[]).includes(t.id),
+    );
     expect(pr5Rows).toHaveLength(PR5_CALCULATOR_REGISTRY_IDS.length);
     for (const id of PR5_CALCULATOR_REGISTRY_IDS) {
       expect(getToolIcon(id)).toBeTruthy();

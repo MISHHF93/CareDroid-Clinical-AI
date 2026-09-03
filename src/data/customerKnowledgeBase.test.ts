@@ -19,9 +19,9 @@ describe('customerKnowledgeBase', () => {
     ]);
 
     for (const category of KNOWLEDGE_BASE_CATEGORIES) {
-      expect(CUSTOMER_KNOWLEDGE_BASE_ARTICLES.some((article) => article.category === category)).toBe(
-        true,
-      );
+      expect(
+        CUSTOMER_KNOWLEDGE_BASE_ARTICLES.some((article) => article.category === category),
+      ).toBe(true);
     }
   });
 

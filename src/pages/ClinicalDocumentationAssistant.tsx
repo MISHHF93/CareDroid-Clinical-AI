@@ -27,7 +27,11 @@ function getAssistantResponseText(response) {
 }
 
 function downloadTextFile({ filename, content }) {
-  if (typeof window === 'undefined' || typeof document === 'undefined' || !window.URL?.createObjectURL) {
+  if (
+    typeof window === 'undefined' ||
+    typeof document === 'undefined' ||
+    !window.URL?.createObjectURL
+  ) {
     return false;
   }
 
@@ -90,7 +94,11 @@ export default function ClinicalDocumentationAssistant() {
       } as any);
 
       if (!response?.ok) {
-        throw new Error(response?.data?.message || (response as any)?.message || 'Unable to generate documentation.');
+        throw new Error(
+          response?.data?.message ||
+            (response as any)?.message ||
+            'Unable to generate documentation.',
+        );
       }
 
       setDraftText(getAssistantResponseText(response) || buildLocalDocumentationDraft(payload));
@@ -114,12 +122,17 @@ export default function ClinicalDocumentationAssistant() {
     setExportStatus(
       downloaded
         ? `Exported ${exportData.filename}. Review before chart upload.`
-        : `Export ready: ${exportData.filename}. Review before chart upload.`
+        : `Export ready: ${exportData.filename}. Review before chart upload.`,
     );
   };
 
   const clear = () => {
-    setForm({ encounterTitle: '', patientContext: '', encounterDetails: '', clinicianInstructions: '' } as any);
+    setForm({
+      encounterTitle: '',
+      patientContext: '',
+      encounterDetails: '',
+      clinicianInstructions: '',
+    } as any);
     setDraftText('');
     setExportPreview(null);
     setExportStatus('');
@@ -142,7 +155,8 @@ export default function ClinicalDocumentationAssistant() {
           </p>
           <p>
             Draft SOAP notes, H&P notes, progress notes, discharge summaries, consultation notes,
-            procedure notes, encounter summaries, and patient instructions with explicit export support.
+            procedure notes, encounter summaries, and patient instructions with explicit export
+            support.
           </p>
         </div>
         <div className="documentation-assistant-hero__actions">
@@ -175,7 +189,9 @@ export default function ClinicalDocumentationAssistant() {
           <article className="documentation-assistant-card">
             <strong>{selectedNoteType.exportTitle} sections</strong>
             <ul className="documentation-assistant-section-list">
-              {selectedNoteType.sections.map((section) => <li key={section}>{section}</li>)}
+              {selectedNoteType.sections.map((section) => (
+                <li key={section}>{section}</li>
+              ))}
             </ul>
           </article>
 

@@ -1,9 +1,5 @@
 import { ROUTE_RECORDS } from '../config/routes.config';
-import {
-  ASSET_PACKS,
-  SAAS_PRODUCTS,
-  buildAssetInventoryProjection,
-} from './assetInventory';
+import { ASSET_PACKS, SAAS_PRODUCTS, buildAssetInventoryProjection } from './assetInventory';
 import { buildArtifactCatalog } from './artifactIntelligence';
 import { getAiModelRegistry } from './aiModelRegistry';
 import { MARKETPLACE_ITEMS } from './marketplaceCatalog';
@@ -47,7 +43,7 @@ function splitValues(value) {
       .split('|')
       .map((part) => part.trim())
       .filter(Boolean)
-      .filter((part) => part !== UNKNOWN)
+      .filter((part) => part !== UNKNOWN),
   );
 }
 
@@ -82,7 +78,11 @@ function normalizeText(value) {
 }
 
 function tokenize(value) {
-  return new Set(normalizeText(value).split(' ').filter((token) => token.length > 2));
+  return new Set(
+    normalizeText(value)
+      .split(' ')
+      .filter((token) => token.length > 2),
+  );
 }
 
 function jaccardSimilarity(left, right) {
@@ -98,7 +98,9 @@ function safeTags(...values) {
 }
 
 function firstKnown(...values) {
-  return values.find((value) => value !== undefined && value !== null && value !== '' && value !== UNKNOWN);
+  return values.find(
+    (value) => value !== undefined && value !== null && value !== '' && value !== UNKNOWN,
+  );
 }
 
 function marketplaceType(category) {
@@ -176,8 +178,14 @@ function aiAgentNode(agentId) {
 
 function nodeIdForArtifact(artifact) {
   const type = artifactType(artifact);
-  if (type === 'pack') return packNode(firstKnown(splitValues(artifact.assetPack)[0], artifact.artifactId.replace(/^pack-/, '')));
-  if (type === 'product') return productNode(firstKnown(splitValues(artifact.product)[0], artifact.artifactId.replace(/^product-/, '')));
+  if (type === 'pack')
+    return packNode(
+      firstKnown(splitValues(artifact.assetPack)[0], artifact.artifactId.replace(/^pack-/, '')),
+    );
+  if (type === 'product')
+    return productNode(
+      firstKnown(splitValues(artifact.product)[0], artifact.artifactId.replace(/^product-/, '')),
+    );
   if (type === 'route') return routeNode(firstKnown(artifact.route, artifact.artifactId));
   if (type === 'workflow') return workflowNode(artifact.artifactId);
   if (type === 'simulation') return simulationNode(artifact.artifactId);
@@ -270,7 +278,8 @@ export class ArtifactKnowledgeGraphService {
     };
 
     const addEdge = (source, target, type, rationale, metadata: any = {}) => {
-      if (!source || !target || source === target || !nodes.has(source) || !nodes.has(target)) return null;
+      if (!source || !target || source === target || !nodes.has(source) || !nodes.has(target))
+        return null;
       if (!ARTIFACT_KNOWLEDGE_GRAPH_RELATIONSHIPS.includes(type)) return null;
       const id = `${source}|${type}|${target}`;
       if (!edges.has(id)) {
@@ -362,13 +371,23 @@ export class ArtifactKnowledgeGraphService {
           summary: `${titleize(workspaceId)} workspace coverage from asset pack metadata.`,
           tags: ['workspace'],
         });
-        addEdge(packNode(pack.id), workspaceNode(workspaceId), 'RECOMMENDED_FOR', `${pack.name} is available in the ${titleize(workspaceId)} workspace.`);
+        addEdge(
+          packNode(pack.id),
+          workspaceNode(workspaceId),
+          'RECOMMENDED_FOR',
+          `${pack.name} is available in the ${titleize(workspaceId)} workspace.`,
+        );
       }
     }
 
     for (const product of this.products) {
       for (const packId of product.packIds || []) {
-        addEdge(packNode(packId), productNode(product.id), 'PART_OF', `${titleize(packId)} composes ${product.name}.`);
+        addEdge(
+          packNode(packId),
+          productNode(product.id),
+          'PART_OF',
+          `${titleize(packId)} composes ${product.name}.`,
+        );
       }
     }
 
@@ -381,7 +400,14 @@ export class ArtifactKnowledgeGraphService {
         path: asset.route,
         sourceId: asset.id,
         summary: asset.description || `${asset.title || asset.id} is a mounted CareDroid asset.`,
-        tags: safeTags(asset.assetType, asset.category, asset.packIds, asset.productIds, asset.workspaceIds, asset.roleIds),
+        tags: safeTags(
+          asset.assetType,
+          asset.category,
+          asset.packIds,
+          asset.productIds,
+          asset.workspaceIds,
+          asset.roleIds,
+        ),
         metadata: asset,
       });
 
@@ -395,20 +421,31 @@ export class ArtifactKnowledgeGraphService {
           summary: `${titleize(packId)} asset pack.`,
           tags: ['pack'],
         });
-        addEdge(currentAssetNode, packNode(packId), 'BELONGS_TO', `${asset.title || asset.id} belongs to ${titleize(packId)}.`);
+        addEdge(
+          currentAssetNode,
+          packNode(packId),
+          'BELONGS_TO',
+          `${asset.title || asset.id} belongs to ${titleize(packId)}.`,
+        );
       }
 
       for (const productId of asset.productIds || []) {
         addNode({
           id: productNode(productId),
           type: 'product',
-          label: this.products.find((product) => product.id === productId)?.name || titleize(productId),
+          label:
+            this.products.find((product) => product.id === productId)?.name || titleize(productId),
           path: '/products',
           sourceId: productId,
           summary: `${titleize(productId)} product.`,
           tags: ['product'],
         });
-        addEdge(currentAssetNode, productNode(productId), 'PART_OF', `${asset.title || asset.id} is packaged into ${titleize(productId)}.`);
+        addEdge(
+          currentAssetNode,
+          productNode(productId),
+          'PART_OF',
+          `${asset.title || asset.id} is packaged into ${titleize(productId)}.`,
+        );
       }
 
       for (const workspaceId of asset.workspaceIds || asset.access?.workspaceIds || []) {
@@ -420,7 +457,12 @@ export class ArtifactKnowledgeGraphService {
           summary: `${titleize(workspaceId)} workspace.`,
           tags: ['workspace'],
         });
-        addEdge(currentAssetNode, workspaceNode(workspaceId), 'RECOMMENDED_FOR', `${asset.title || asset.id} is recommended for the ${titleize(workspaceId)} workspace.`);
+        addEdge(
+          currentAssetNode,
+          workspaceNode(workspaceId),
+          'RECOMMENDED_FOR',
+          `${asset.title || asset.id} is recommended for the ${titleize(workspaceId)} workspace.`,
+        );
       }
 
       for (const roleId of asset.roleIds || asset.access?.roleIds || []) {
@@ -432,7 +474,12 @@ export class ArtifactKnowledgeGraphService {
           summary: `${titleize(roleId)} role profile.`,
           tags: ['role'],
         });
-        addEdge(currentAssetNode, roleNode(roleId), 'RECOMMENDED_FOR', `${asset.title || asset.id} is recommended for ${titleize(roleId)} users.`);
+        addEdge(
+          currentAssetNode,
+          roleNode(roleId),
+          'RECOMMENDED_FOR',
+          `${asset.title || asset.id} is recommended for ${titleize(roleId)} users.`,
+        );
       }
 
       for (const organizationType of asset.access?.organizationTypes || []) {
@@ -444,7 +491,12 @@ export class ArtifactKnowledgeGraphService {
           summary: `${titleize(organizationType)} organization context.`,
           tags: ['organization'],
         });
-        addEdge(currentAssetNode, organizationNode(organizationType), 'RECOMMENDED_FOR', `${asset.title || asset.id} is available to ${titleize(organizationType)} organizations.`);
+        addEdge(
+          currentAssetNode,
+          organizationNode(organizationType),
+          'RECOMMENDED_FOR',
+          `${asset.title || asset.id} is available to ${titleize(organizationType)} organizations.`,
+        );
       }
 
       if (asset.route) {
@@ -457,7 +509,12 @@ export class ArtifactKnowledgeGraphService {
           summary: `Launch route for ${asset.title || asset.id}.`,
           tags: ['route'],
         });
-        addEdge(currentAssetNode, routeNode(asset.route), 'LAUNCHED_FROM', `${asset.title || asset.id} launches from ${asset.route}.`);
+        addEdge(
+          currentAssetNode,
+          routeNode(asset.route),
+          'LAUNCHED_FROM',
+          `${asset.title || asset.id} launches from ${asset.route}.`,
+        );
       }
 
       for (const dependency of [
@@ -466,7 +523,12 @@ export class ArtifactKnowledgeGraphService {
         ...(asset.evidence?.tests || []),
       ]) {
         const target = mapDependencyToNode(dependency);
-        addEdge(currentAssetNode, target, 'DEPENDS_ON', `${asset.title || asset.id} depends on ${dependency}.`);
+        addEdge(
+          currentAssetNode,
+          target,
+          'DEPENDS_ON',
+          `${asset.title || asset.id} depends on ${dependency}.`,
+        );
       }
     }
 
@@ -480,7 +542,14 @@ export class ArtifactKnowledgeGraphService {
         path: artifact.route !== UNKNOWN ? artifact.route : '',
         sourceId: artifact.artifactId,
         summary: artifact.description,
-        tags: safeTags(artifact.type, artifact.category, artifact.tags, artifact.workspace, artifact.assetPack, artifact.product),
+        tags: safeTags(
+          artifact.type,
+          artifact.category,
+          artifact.tags,
+          artifact.workspace,
+          artifact.assetPack,
+          artifact.product,
+        ),
         metadata: artifact,
       });
 
@@ -494,20 +563,31 @@ export class ArtifactKnowledgeGraphService {
           summary: `${titleize(packId)} asset pack.`,
           tags: ['pack'],
         });
-        addEdge(currentNodeId, packNode(packId), currentType === 'pack' ? 'PART_OF' : 'BELONGS_TO', `${artifact.name} is mapped to ${titleize(packId)}.`);
+        addEdge(
+          currentNodeId,
+          packNode(packId),
+          currentType === 'pack' ? 'PART_OF' : 'BELONGS_TO',
+          `${artifact.name} is mapped to ${titleize(packId)}.`,
+        );
       }
 
       for (const productId of splitValues(artifact.product)) {
         addNode({
           id: productNode(productId),
           type: 'product',
-          label: this.products.find((product) => product.id === productId)?.name || titleize(productId),
+          label:
+            this.products.find((product) => product.id === productId)?.name || titleize(productId),
           path: '/products',
           sourceId: productId,
           summary: `${titleize(productId)} product.`,
           tags: ['product'],
         });
-        addEdge(currentNodeId, productNode(productId), currentType === 'product' ? 'PART_OF' : 'PART_OF', `${artifact.name} is part of ${titleize(productId)}.`);
+        addEdge(
+          currentNodeId,
+          productNode(productId),
+          currentType === 'product' ? 'PART_OF' : 'PART_OF',
+          `${artifact.name} is part of ${titleize(productId)}.`,
+        );
       }
 
       for (const workspaceId of splitValues(artifact.workspace)) {
@@ -519,7 +599,12 @@ export class ArtifactKnowledgeGraphService {
           summary: `${titleize(workspaceId)} workspace.`,
           tags: ['workspace'],
         });
-        addEdge(currentNodeId, workspaceNode(workspaceId), 'RECOMMENDED_FOR', `${artifact.name} is recommended for ${titleize(workspaceId)}.`);
+        addEdge(
+          currentNodeId,
+          workspaceNode(workspaceId),
+          'RECOMMENDED_FOR',
+          `${artifact.name} is recommended for ${titleize(workspaceId)}.`,
+        );
       }
 
       for (const roleId of splitValues(artifact.roles)) {
@@ -531,7 +616,12 @@ export class ArtifactKnowledgeGraphService {
           summary: `${titleize(roleId)} role profile.`,
           tags: ['role'],
         });
-        addEdge(currentNodeId, roleNode(roleId), 'RECOMMENDED_FOR', `${artifact.name} is recommended for ${titleize(roleId)}.`);
+        addEdge(
+          currentNodeId,
+          roleNode(roleId),
+          'RECOMMENDED_FOR',
+          `${artifact.name} is recommended for ${titleize(roleId)}.`,
+        );
       }
 
       for (const organizationType of splitValues(artifact.organizationTypes)) {
@@ -543,7 +633,12 @@ export class ArtifactKnowledgeGraphService {
           summary: `${titleize(organizationType)} organization context.`,
           tags: ['organization'],
         });
-        addEdge(currentNodeId, organizationNode(organizationType), 'RECOMMENDED_FOR', `${artifact.name} is available to ${titleize(organizationType)} organizations.`);
+        addEdge(
+          currentNodeId,
+          organizationNode(organizationType),
+          'RECOMMENDED_FOR',
+          `${artifact.name} is available to ${titleize(organizationType)} organizations.`,
+        );
       }
 
       if (artifact.route && artifact.route !== UNKNOWN) {
@@ -556,12 +651,22 @@ export class ArtifactKnowledgeGraphService {
           summary: `Launch route ${artifact.route}.`,
           tags: ['route'],
         });
-        addEdge(currentNodeId, routeNode(artifact.route), 'LAUNCHED_FROM', `${artifact.name} launches from ${artifact.route}.`);
+        addEdge(
+          currentNodeId,
+          routeNode(artifact.route),
+          'LAUNCHED_FROM',
+          `${artifact.name} launches from ${artifact.route}.`,
+        );
       }
 
       for (const dependency of splitValues(artifact.dependencies)) {
         const target = mapDependencyToNode(dependency);
-        addEdge(currentNodeId, target, currentType === 'ai-agent' ? 'USES' : 'DEPENDS_ON', `${artifact.name} depends on ${dependency}.`);
+        addEdge(
+          currentNodeId,
+          target,
+          currentType === 'ai-agent' ? 'USES' : 'DEPENDS_ON',
+          `${artifact.name} depends on ${dependency}.`,
+        );
       }
     }
 
@@ -598,14 +703,24 @@ export class ArtifactKnowledgeGraphService {
           summary: `Marketplace launch route ${item.route}.`,
           tags: ['route'],
         });
-        addEdge(id, routeNode(item.route), 'LAUNCHED_FROM', `${item.title} launches from ${item.route}.`);
+        addEdge(
+          id,
+          routeNode(item.route),
+          'LAUNCHED_FROM',
+          `${item.title} launches from ${item.route}.`,
+        );
       }
       for (const tag of item.tags || []) {
         const matchingWorkspace = [...nodes.values()].find(
-          (node) => node.type === 'workspace' && normalizeText(node.label) === normalizeText(tag)
+          (node) => node.type === 'workspace' && normalizeText(node.label) === normalizeText(tag),
         );
         if (matchingWorkspace) {
-          addEdge(id, matchingWorkspace.id, 'RECOMMENDED_FOR', `${item.title} is recommended for ${matchingWorkspace.label}.`);
+          addEdge(
+            id,
+            matchingWorkspace.id,
+            'RECOMMENDED_FOR',
+            `${item.title} is recommended for ${matchingWorkspace.label}.`,
+          );
         }
       }
     }
@@ -632,7 +747,12 @@ export class ArtifactKnowledgeGraphService {
           summary: `AI model route ${model.route}.`,
           tags: ['route'],
         });
-        addEdge(id, routeNode(model.route), 'LAUNCHED_FROM', `${model.name} launches from ${model.route}.`);
+        addEdge(
+          id,
+          routeNode(model.route),
+          'LAUNCHED_FROM',
+          `${model.name} launches from ${model.route}.`,
+        );
       }
       for (const dependency of model.artifactDependencies || []) {
         const target = mapDependencyToNode(dependency);
@@ -642,8 +762,12 @@ export class ArtifactKnowledgeGraphService {
 
     this.addSimilarityEdges(nodes, addEdge);
 
-    const graphNodes = [...nodes.values()].sort((a, b) => a.type.localeCompare(b.type) || a.label.localeCompare(b.label));
-    const graphEdges = [...edges.values()].sort((a, b) => a.type.localeCompare(b.type) || a.source.localeCompare(b.source));
+    const graphNodes = [...nodes.values()].sort(
+      (a, b) => a.type.localeCompare(b.type) || a.label.localeCompare(b.label),
+    );
+    const graphEdges = [...edges.values()].sort(
+      (a, b) => a.type.localeCompare(b.type) || a.source.localeCompare(b.source),
+    );
     const connectedNodeIds = new Set(graphEdges.flatMap((edge) => [edge.source, edge.target]));
     const assetNodeIds = this.assets.map((asset) => assetNode(asset.id));
     const orphanAssetIds = assetNodeIds.filter((id) => !connectedNodeIds.has(id));
@@ -670,7 +794,7 @@ export class ArtifactKnowledgeGraphService {
 
   addSimilarityEdges(nodes, addEdge) {
     const candidates = [...nodes.values()].filter((node) =>
-      ['asset', 'workflow', 'simulation', 'ai-agent', 'integration'].includes(node.type)
+      ['asset', 'workflow', 'simulation', 'ai-agent', 'integration'].includes(node.type),
     );
 
     for (const source of candidates) {
@@ -690,7 +814,7 @@ export class ArtifactKnowledgeGraphService {
             target.id,
             'SIMILAR_TO',
             `${source.label} is similar to ${target.label} based on shared metadata.`,
-            { score: Number(score.toFixed(3)) }
+            { score: Number(score.toFixed(3)) },
           );
         });
     }
@@ -758,7 +882,9 @@ export class ArtifactKnowledgeGraphService {
     const tagRecommendations = graph.nodes
       .filter((node) => node.id !== selected.id)
       .map((node) => {
-        const overlap = (node.tags || []).filter((tag) => selectedTags.has(normalizeText(tag))).length;
+        const overlap = (node.tags || []).filter((tag) =>
+          selectedTags.has(normalizeText(tag)),
+        ).length;
         return {
           node,
           relationship: 'RECOMMENDED_FOR',
@@ -779,12 +905,19 @@ export class ArtifactKnowledgeGraphService {
       .slice(0, limit);
   }
 
-  buildSnapshot({ query = '', type = 'all', relationship = 'all', selectedNodeId, nodeLimit = 48 }: any = {}) {
+  buildSnapshot({
+    query = '',
+    type = 'all',
+    relationship = 'all',
+    selectedNodeId,
+    nodeLimit = 48,
+  }: any = {}) {
     const graph = this.getGraph();
     const normalizedQuery = normalizeText(query);
     const nodes = graph.nodes.filter((node) => {
       const matchesType = type === 'all' || node.type === type;
-      const matchesQuery = !normalizedQuery || normalizeText(searchableNodeText(node)).includes(normalizedQuery);
+      const matchesQuery =
+        !normalizedQuery || normalizeText(searchableNodeText(node)).includes(normalizedQuery);
       return matchesType && matchesQuery;
     });
     const visibleNodes = nodes.slice(0, nodeLimit);
@@ -793,10 +926,13 @@ export class ArtifactKnowledgeGraphService {
       (edge) =>
         visibleNodeIds.has(edge.source) &&
         visibleNodeIds.has(edge.target) &&
-        (relationship === 'all' || edge.type === relationship)
+        (relationship === 'all' || edge.type === relationship),
     );
     const selectedNode =
-      graph.nodes.find((node) => node.id === selectedNodeId) || visibleNodes[0] || graph.nodes[0] || null;
+      graph.nodes.find((node) => node.id === selectedNodeId) ||
+      visibleNodes[0] ||
+      graph.nodes[0] ||
+      null;
 
     return {
       ...graph,
@@ -815,14 +951,14 @@ export class ArtifactKnowledgeGraphService {
           ...counts,
           [nodeType]: graph.nodes.filter((node) => node.type === nodeType).length,
         }),
-        {}
+        {},
       ),
       relationshipCounts: ARTIFACT_KNOWLEDGE_GRAPH_RELATIONSHIPS.reduce(
         (counts, relationshipType) => ({
           ...counts,
           [relationshipType]: graph.edges.filter((edge) => edge.type === relationshipType).length,
         }),
-        {}
+        {},
       ),
     };
   }

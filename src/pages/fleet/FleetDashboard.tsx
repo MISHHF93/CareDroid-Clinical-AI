@@ -78,7 +78,8 @@ export default function FleetDashboard() {
     useMemo(
       () => ({
         title: 'Fleet Command Dashboard',
-        subtitle: 'Live fleet telemetry, utilization signals, and governed dispatch decision support.',
+        subtitle:
+          'Live fleet telemetry, utilization signals, and governed dispatch decision support.',
       }),
       [],
     ),
@@ -168,7 +169,9 @@ export default function FleetDashboard() {
       <header className="fleet-dashboard__header">
         <GraphicIconBadge iconKey="ems" accent="brand" size="md" />
         <div>
-          <p className="fleet-dashboard__title-text" data-testid="cd-page-title-text">Fleet Command Dashboard</p>
+          <p className="fleet-dashboard__title-text" data-testid="cd-page-title-text">
+            Fleet Command Dashboard
+          </p>
           <p>Live fleet telemetry, utilization signals, and governed dispatch decision support.</p>
         </div>
       </header>
@@ -216,12 +219,18 @@ export default function FleetDashboard() {
                 <h2 id="fleet-summary-title">Fleet summary</h2>
                 <p>
                   Demo telemetry from {summary.source || 'mock feed'}
-                  {summary.updatedAt ? ` · updated ${new Date(summary.updatedAt).toLocaleString()}` : ''}
+                  {summary.updatedAt
+                    ? ` · updated ${new Date(summary.updatedAt).toLocaleString()}`
+                    : ''}
                 </p>
               </div>
             </div>
 
-            <div className="fleet-dashboard__metrics" role="group" aria-label="Fleet summary metrics">
+            <div
+              className="fleet-dashboard__metrics"
+              role="group"
+              aria-label="Fleet summary metrics"
+            >
               <article className="fleet-dashboard__metric">
                 <span>Active</span>
                 <strong>{summary.activeVehicles ?? 0}</strong>
@@ -253,7 +262,11 @@ export default function FleetDashboard() {
 
           <section className="fleet-dashboard__section" aria-label="Fleet operational charts">
             <div className="dashboard-visual-grid fleet-dashboard__grid">
-              <VisualizationPanel title="Fleet status mix" description="Active, available, and maintenance distribution." badge="Status">
+              <VisualizationPanel
+                title="Fleet status mix"
+                description="Active, available, and maintenance distribution."
+                badge="Status"
+              >
                 <CategoryBarChart
                   data={statusChart}
                   title="Fleet status mix"
@@ -261,7 +274,11 @@ export default function FleetDashboard() {
                   emptyMessage="Status distribution will appear when vehicles report telemetry."
                 />
               </VisualizationPanel>
-              <VisualizationPanel title="Utilization load" description="Per-vehicle utilization percentages." badge="Load">
+              <VisualizationPanel
+                title="Utilization load"
+                description="Per-vehicle utilization percentages."
+                badge="Load"
+              >
                 <CategoryBarChart
                   data={utilizationChart}
                   title="Utilization load"
@@ -269,7 +286,11 @@ export default function FleetDashboard() {
                   emptyMessage="Utilization chart will populate when dispatch load is available."
                 />
               </VisualizationPanel>
-              <VisualizationPanel title="Maintenance risk" description="Relative maintenance review pressure by unit." badge="Risk">
+              <VisualizationPanel
+                title="Maintenance risk"
+                description="Relative maintenance review pressure by unit."
+                badge="Risk"
+              >
                 <CategoryBarChart
                   data={maintenanceChart}
                   title="Maintenance risk"
@@ -277,7 +298,11 @@ export default function FleetDashboard() {
                   emptyMessage="Maintenance risk chart will populate when vehicle health data syncs."
                 />
               </VisualizationPanel>
-              <VisualizationPanel title="ETA trend" description="Estimated arrival minutes for active routes." badge="ETA">
+              <VisualizationPanel
+                title="ETA trend"
+                description="Estimated arrival minutes for active routes."
+                badge="ETA"
+              >
                 <CategoryBarChart
                   data={etaChart}
                   title="ETA trend"
@@ -360,19 +385,30 @@ export default function FleetDashboard() {
               <GraphicIconBadge iconKey="ed-copilot" accent="brand" size="sm" />
               <div>
                 <h2 id="fleet-ai-title">Fleet AI modules</h2>
-                <p>Governed unified-AI services for EMS pre-arrival and edge ambulance workflows.</p>
+                <p>
+                  Governed unified-AI services for EMS pre-arrival and edge ambulance workflows.
+                </p>
               </div>
             </div>
             <div className="fleet-dashboard__ai-links">
               {FLEET_AI_CAPABILITIES.map((capability) => (
-                <Link key={capability.platformServiceId} to={capability.route} className="fleet-dashboard__ai-link">
+                <Link
+                  key={capability.platformServiceId}
+                  to={capability.route}
+                  className="fleet-dashboard__ai-link"
+                >
                   <strong>{capability.name}</strong>
                   <span>{capability.purpose}</span>
                 </Link>
               ))}
             </div>
             <div className="fleet-dashboard__metrics">
-              <MetricCard label="Live map" value="Open" hint="Vehicle positions and active routes" tone="neutral" />
+              <MetricCard
+                label="Live map"
+                value="Open"
+                hint="Vehicle positions and active routes"
+                tone="neutral"
+              />
               <MetricCard
                 label="Route optimizer"
                 value="Review"

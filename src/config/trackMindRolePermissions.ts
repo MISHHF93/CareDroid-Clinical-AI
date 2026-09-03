@@ -37,12 +37,18 @@ export {
   isTrackMindReadOnlyRole,
 } from './trackMindRoleCatalog';
 
-const TRACKMIND_PROTECTED_ROUTES = Object.freeze(
-  Object.keys(TRACKMIND_ROUTE_PERMISSION_MAP),
-);
+const TRACKMIND_PROTECTED_ROUTES = Object.freeze(Object.keys(TRACKMIND_ROUTE_PERMISSION_MAP));
 
 export function resolveTrackMindRoleId(
-  user: { trackMindRole?: string; role?: string; profile?: { trackMindRole?: string; roleProfileId?: string; role?: string }; roleProfileId?: string } | null | undefined,
+  user:
+    | {
+        trackMindRole?: string;
+        role?: string;
+        profile?: { trackMindRole?: string; roleProfileId?: string; role?: string };
+        roleProfileId?: string;
+      }
+    | null
+    | undefined,
   settings?: { trackMindRole?: string; roleOverrides?: Record<string, string> } | null,
 ): TrackMindRoleId {
   const catalogRole = resolveCatalogTrackMindRole(user, settings || {});
@@ -51,10 +57,7 @@ export function resolveTrackMindRoleId(
   const override = settings?.trackMindRole || settings?.roleOverrides?.trackMind;
   if (override) return normalizeTrackMindRoleId(override);
   const fromUser =
-    user?.trackMindRole ||
-    user?.profile?.trackMindRole ||
-    user?.profile?.role ||
-    user?.role;
+    user?.trackMindRole || user?.profile?.trackMindRole || user?.profile?.role || user?.role;
   return normalizeTrackMindRoleId(fromUser);
 }
 

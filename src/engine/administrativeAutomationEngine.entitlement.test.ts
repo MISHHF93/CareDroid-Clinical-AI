@@ -92,6 +92,8 @@ describe('administrativeAutomationEngine entitlement filtering', () => {
     await runAdministrativeAutomationTick(new Date('2026-07-01T12:00:00.000Z'));
 
     const queue = useEmergencyStore.getState().administrativeAutomationQueue;
-    expect(queue.some((task) => task.automationId === 'emergency-queue-routing-assistant')).toBe(true);
+    expect(queue.some((task) => task.automationId === 'emergency-queue-routing-assistant')).toBe(
+      true,
+    );
   });
 });

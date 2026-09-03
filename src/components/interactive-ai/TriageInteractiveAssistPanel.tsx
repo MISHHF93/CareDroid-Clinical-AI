@@ -40,7 +40,8 @@ export function TriageInteractiveAssistPanel({
         },
         {
           kind: 'calculator_opportunity',
-          summary: 'A deterministic calculator may apply. Suggest selection only; never invent scores.',
+          summary:
+            'A deterministic calculator may apply. Suggest selection only; never invent scores.',
           urgency: 'info',
           patientId,
         },

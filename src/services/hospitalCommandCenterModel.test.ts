@@ -174,7 +174,9 @@ describe('hospitalCommandCenterModel', () => {
     });
 
     expect(snapshot.metrics.find((metric) => metric.id === 'waiting-patients')?.value).toBe(4);
-    expect(snapshot.metrics.find((metric) => metric.id === 'department-occupancy')?.value).toBe('82%');
+    expect(snapshot.metrics.find((metric) => metric.id === 'department-occupancy')?.value).toBe(
+      '82%',
+    );
     expect(snapshot.metrics.find((metric) => metric.id === 'ems-arrivals')?.value).toBe(3);
     expect(snapshot.metrics.find((metric) => metric.id === 'unresolved-alerts')?.value).toBe(5);
     expect(snapshot.metrics.find((metric) => metric.id === 'ai-recommendations')?.value).toBe(2);

@@ -5,10 +5,7 @@ import { getPublicWaitingDisplayPath } from '../config/publicWaitingScreenModel'
 import { countPageRebuildByStatus } from '../config/pageRebuildRegistry';
 import { PAGE_REBUILD_STATUS } from '../config/pageUxContract';
 import { resolveAdminHomeRoute } from '../config/platformEntryModel';
-import {
-  DEMO_PERSONA,
-  getDemoPersonaHeadline,
-} from '../config/demoPersonaModel';
+import { DEMO_PERSONA, getDemoPersonaHeadline } from '../config/demoPersonaModel';
 import { listEdWorkflowAzSteps } from '../config/edWorkflowIntegrationModel';
 import useEdWorkflowIntegration from '../hooks/useEdWorkflowIntegration';
 import useProfileSwitcherVisibility from '../hooks/useProfileSwitcherVisibility';
@@ -35,8 +32,8 @@ export default function PlatformEntryHub() {
     >
       {surfaces.chrome.showEntryHubBackendSync ? (
         <p className="platform-entry__sync" role="status">
-          Profile API {edContext.backendSync.profileWired ? 'connected' : 'offline'} · Emergency reads{' '}
-          {edContext.backendSync.emergencyReadWired ? 'via /api/emergency' : 'local'} ·{' '}
+          Profile API {edContext.backendSync.profileWired ? 'connected' : 'offline'} · Emergency
+          reads {edContext.backendSync.emergencyReadWired ? 'via /api/emergency' : 'local'} ·{' '}
           {edContext.backendSync.persistenceMode.replace('-', ' ')}
         </p>
       ) : null}
@@ -75,7 +72,9 @@ export default function PlatformEntryHub() {
 
         <Link className="platform-entry__card" to={clinicalHome}>
           <h2>Clinical workspace</h2>
-          <p>Open the emergency workspace matched to your current demo role and assigned profile.</p>
+          <p>
+            Open the emergency workspace matched to your current demo role and assigned profile.
+          </p>
           <span className="platform-entry__cta">Open clinical home →</span>
         </Link>
 
@@ -90,7 +89,9 @@ export default function PlatformEntryHub() {
 
         <Link className="platform-entry__card platform-entry__card--display" to={waitingRoomPath}>
           <h2>Waiting room display</h2>
-          <p>PHI-safe wall board for posted waiting-room screens — wait ranges and crowd level only.</p>
+          <p>
+            PHI-safe wall board for posted waiting-room screens — wait ranges and crowd level only.
+          </p>
           <span className="platform-entry__cta">Open public display →</span>
         </Link>
       </div>

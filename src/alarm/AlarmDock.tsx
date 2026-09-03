@@ -52,9 +52,7 @@ export function AlarmDock({
           message={item.message || item.recommendedAction}
           acknowledged={item.acknowledged}
           actions={
-            item.actions || [
-              { id: 'acknowledge', label: 'Acknowledge', variant: 'primary' },
-            ]
+            item.actions || [{ id: 'acknowledge', label: 'Acknowledge', variant: 'primary' }]
           }
           onAction={(actionId) => onAction?.(item.id, actionId)}
         />

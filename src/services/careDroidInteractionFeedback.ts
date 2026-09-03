@@ -11,8 +11,9 @@ import {
 
 type ConfirmResolver = (confirmed: boolean) => void;
 
-let confirmRequestHandler: ((options: ConfirmActionOptions, resolve: ConfirmResolver) => void) | null =
-  null;
+let confirmRequestHandler:
+  | ((options: ConfirmActionOptions, resolve: ConfirmResolver) => void)
+  | null = null;
 
 export function registerConfirmDialogHandler(
   handler: (options: ConfirmActionOptions, resolve: ConfirmResolver) => void,
@@ -25,7 +26,9 @@ export function registerConfirmDialogHandler(
   };
 }
 
-function toneToSonner(tone: ActionFeedbackTone): 'success' | 'error' | 'info' | 'warning' | 'loading' {
+function toneToSonner(
+  tone: ActionFeedbackTone,
+): 'success' | 'error' | 'info' | 'warning' | 'loading' {
   return tone;
 }
 

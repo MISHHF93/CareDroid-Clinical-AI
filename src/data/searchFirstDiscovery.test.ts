@@ -1,8 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  buildSearchFirstDiscoveryEntries,
-  buildSearchFirstResults,
-} from './searchFirstDiscovery';
+import { buildSearchFirstDiscoveryEntries, buildSearchFirstResults } from './searchFirstDiscovery';
 import { getPilotCustomerNavigationItems } from '../config/unified-navigation.config';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 
@@ -12,9 +9,7 @@ describe('search-first discovery index', () => {
   it('indexes every primary CareDroid route as a searchable destination', () => {
     const entries = buildSearchFirstDiscoveryEntries();
     const emergencyOsPaths = new Set(
-      entries
-        .filter((entry) => entry.category === 'emergency-os')
-        .map((entry) => entry.path)
+      entries.filter((entry) => entry.category === 'emergency-os').map((entry) => entry.path),
     );
 
     // EMERGENCY_OS_DESTINATIONS is a curated subset tagged category
@@ -26,8 +21,12 @@ describe('search-first discovery index', () => {
     }
     expect(buildSearchFirstResults({ query: 'tools calculators scores' })).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ kind: 'destination', sourceId: 'emergency-tools', path: '/emergency/tools' }),
-      ])
+        expect.objectContaining({
+          kind: 'destination',
+          sourceId: 'emergency-tools',
+          path: '/emergency/tools',
+        }),
+      ]),
     );
   });
 
@@ -42,12 +41,12 @@ describe('search-first discovery index', () => {
     expect(buildSearchFirstResults({ query: 'analytics throughput' })).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ sourceId: 'emergency-analytics', path: '/emergency/analytics' }),
-      ])
+      ]),
     );
     expect(buildSearchFirstResults({ query: 'settings thresholds' })).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ sourceId: 'emergency-settings', path: '/emergency/settings' }),
-      ])
+      ]),
     );
   });
 
@@ -67,20 +66,30 @@ describe('search-first discovery index', () => {
         'operation',
         'commercial',
         'workspace',
-      ])
+      ]),
     );
   });
 
   it('finds workflow and simulation results by natural language query', () => {
-    expect(buildSearchFirstResults({ query: 'sepsis escalation workflow', includePlatformCatalog: true })).toEqual(
+    expect(
+      buildSearchFirstResults({
+        query: 'sepsis escalation workflow',
+        includePlatformCatalog: true,
+      }),
+    ).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ kind: 'workflow', sourceId: 'sepsis-escalation' }),
-      ])
+      ]),
     );
-    expect(buildSearchFirstResults({ query: 'sepsis deterioration simulation', includePlatformCatalog: true })).toEqual(
+    expect(
+      buildSearchFirstResults({
+        query: 'sepsis deterioration simulation',
+        includePlatformCatalog: true,
+      }),
+    ).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ kind: 'simulation', sourceId: 'sepsis-deterioration' }),
-      ])
+      ]),
     );
   });
 
@@ -99,39 +108,52 @@ describe('search-first discovery index', () => {
     expect(emergencyResults).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ kind: 'workspace', sourceId: 'emergency' }),
-      ])
+      ]),
     );
     expect(iotResults).not.toEqual(
       expect.arrayContaining([
         expect.objectContaining({ kind: 'workspace', sourceId: 'medical-iot' }),
-      ])
+      ]),
     );
   });
 
   it('finds protocols, AI agents, and automation templates from one search index', () => {
-    expect(buildSearchFirstResults({ query: 'sepsis management lactate pathway', includePlatformCatalog: true })).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ kind: 'protocol', sourceId: 'sepsis' }),
-      ])
+    expect(
+      buildSearchFirstResults({
+        query: 'sepsis management lactate pathway',
+        includePlatformCatalog: true,
+      }),
+    ).toEqual(
+      expect.arrayContaining([expect.objectContaining({ kind: 'protocol', sourceId: 'sepsis' })]),
     );
-    expect(buildSearchFirstResults({ query: 'clinical copilot agent', includePlatformCatalog: true })).toEqual(
+    expect(
+      buildSearchFirstResults({ query: 'clinical copilot agent', includePlatformCatalog: true }),
+    ).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ kind: 'ai-agent', sourceId: 'agent-clinical-copilot' }),
-      ])
+      ]),
     );
-    expect(buildSearchFirstResults({ query: 'fleet dispatch maintenance map', includePlatformCatalog: true })).not.toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ kind: 'operation', sourceId: 'fleet' }),
-      ])
+    expect(
+      buildSearchFirstResults({
+        query: 'fleet dispatch maintenance map',
+        includePlatformCatalog: true,
+      }),
+    ).not.toEqual(
+      expect.arrayContaining([expect.objectContaining({ kind: 'operation', sourceId: 'fleet' })]),
     );
-    expect(buildSearchFirstResults({ query: 'automated triage matrix vitals chief complaint', includePlatformCatalog: true })).toEqual(
+    expect(
+      buildSearchFirstResults({
+        query: 'automated triage matrix vitals chief complaint',
+        includePlatformCatalog: true,
+      }),
+    ).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           kind: 'automation',
           sourceId: 'emergency-automated-triage-matrix',
           path: '/workspace/emergency/automations',
         }),
-      ])
+      ]),
     );
   });
 
@@ -139,32 +161,40 @@ describe('search-first discovery index', () => {
     expect(buildSearchFirstResults({ query: 'global search' })).not.toEqual(
       expect.arrayContaining([
         expect.objectContaining({ kind: 'destination', sourceId: 'search', path: '/search' }),
-      ])
+      ]),
     );
     expect(buildSearchFirstResults({ query: 'recommendations' })).not.toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ kind: 'destination', sourceId: 'recommendations', path: '/recommendations' }),
-      ])
+        expect.objectContaining({
+          kind: 'destination',
+          sourceId: 'recommendations',
+          path: '/recommendations',
+        }),
+      ]),
     );
     expect(buildSearchFirstResults({ query: 'billing usage subscription' })).not.toEqual(
       expect.arrayContaining([
         expect.objectContaining({ kind: 'destination', sourceId: 'billing', path: '/billing' }),
-      ])
+      ]),
     );
     expect(
       buildSearchFirstResults({
         query: 'billing usage subscription',
         navigationPermissions: ['MANAGE_SUBSCRIPTIONS'],
-      })
+      }),
     ).not.toEqual(
       expect.arrayContaining([
         expect.objectContaining({ kind: 'destination', sourceId: 'billing', path: '/billing' }),
-      ])
+      ]),
     );
     expect(buildSearchFirstResults({ query: 'workflow mining journeys' })).not.toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ kind: 'destination', sourceId: 'workflow-mining', path: '/workflow-mining' }),
-      ])
+        expect.objectContaining({
+          kind: 'destination',
+          sourceId: 'workflow-mining',
+          path: '/workflow-mining',
+        }),
+      ]),
     );
   });
 
@@ -180,38 +210,57 @@ describe('search-first discovery index', () => {
     // registry only ever surfaces to a real user when includePlatformCatalog:true,
     // which no live caller ever passes (only tests) -- so these were dormant, not an
     // active user-facing dead link, but still confirmed-dead data worth removing.
-    expect(buildSearchFirstResults({ query: 'fhir patient integration', includePlatformCatalog: true })).toEqual(
+    expect(
+      buildSearchFirstResults({ query: 'fhir patient integration', includePlatformCatalog: true }),
+    ).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           kind: 'commercial',
           sourceId: 'integration-fhir',
           path: '/integrations-marketplace?category=fhir',
         }),
-      ])
+      ]),
     );
-    expect(buildSearchFirstResults({ query: 'automation analytics human overrides', includePlatformCatalog: true })).toEqual(
+    expect(
+      buildSearchFirstResults({
+        query: 'automation analytics human overrides',
+        includePlatformCatalog: true,
+      }),
+    ).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           kind: 'commercial',
           sourceId: 'automation-analytics',
           path: '/automation-analytics',
         }),
-      ])
+      ]),
     );
-    expect(buildSearchFirstResults({ query: 'customer success renewal readiness', includePlatformCatalog: true })).toEqual(
+    expect(
+      buildSearchFirstResults({
+        query: 'customer success renewal readiness',
+        includePlatformCatalog: true,
+      }),
+    ).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           kind: 'commercial',
           sourceId: 'customer-success',
           path: CANONICAL_ROUTES.customerSuccess,
         }),
-      ])
+      ]),
     );
     expect(
-      buildSearchFirstResults({ query: 'products specialties care pathways agents outcomes value tracking solution builder', includePlatformCatalog: true }),
+      buildSearchFirstResults({
+        query: 'products specialties care pathways agents outcomes value tracking solution builder',
+        includePlatformCatalog: true,
+      }),
     ).not.toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ sourceId: expect.stringMatching(/^(products|specialties|care-pathways|agents|outcomes|value-tracking|integration-readiness|solution-builder|specialty-emergency|specialty-cardiology|specialty-laboratory|pathway-sepsis|pathway-stroke)$/) }),
+        expect.objectContaining({
+          sourceId: expect.stringMatching(
+            /^(products|specialties|care-pathways|agents|outcomes|value-tracking|integration-readiness|solution-builder|specialty-emergency|specialty-cardiology|specialty-laboratory|pathway-sepsis|pathway-stroke)$/,
+          ),
+        }),
       ]),
     );
   });

@@ -4,7 +4,9 @@ export function minutesAgo(referenceDate, minutes) {
 
 function roomSummary(room, devices, alerts) {
   const roomDevices = devices.filter((device) => device.roomId === room.id);
-  const alertCount = alerts.filter((alert) => alert.roomId === room.id && alert.status === 'active').length;
+  const alertCount = alerts.filter(
+    (alert) => alert.roomId === room.id && alert.status === 'active',
+  ).length;
   return {
     ...room,
     deviceCount: roomDevices.length,
@@ -35,28 +37,145 @@ export function buildDemoHospitalMapSnapshot(referenceDate = new Date()) {
 
   const units = [
     { id: 'icu', floorId: 'floor-2', name: 'ICU', type: 'critical-care', shortCode: 'ICU' },
-    { id: 'ed', floorId: 'floor-2', name: 'Emergency Department', type: 'emergency', shortCode: 'ED' },
-    { id: 'med-surg', floorId: 'floor-3', name: 'Medical-Surgical Unit', type: 'ward', shortCode: 'MS' },
+    {
+      id: 'ed',
+      floorId: 'floor-2',
+      name: 'Emergency Department',
+      type: 'emergency',
+      shortCode: 'ED',
+    },
+    {
+      id: 'med-surg',
+      floorId: 'floor-3',
+      name: 'Medical-Surgical Unit',
+      type: 'ward',
+      shortCode: 'MS',
+    },
   ];
 
   const rooms = [
-    { id: 'icu-12', floorId: 'floor-2', unitId: 'icu', roomNumber: 'ICU-12', x: 84, y: 82, width: 210, height: 145 },
-    { id: 'icu-14', floorId: 'floor-2', unitId: 'icu', roomNumber: 'ICU-14', x: 326, y: 82, width: 210, height: 145 },
-    { id: 'icu-15', floorId: 'floor-2', unitId: 'icu', roomNumber: 'ICU-15', x: 568, y: 82, width: 210, height: 145 },
-    { id: 'ed-4', floorId: 'floor-2', unitId: 'ed', roomNumber: 'ED-4', x: 84, y: 350, width: 210, height: 145 },
-    { id: 'ed-6', floorId: 'floor-2', unitId: 'ed', roomNumber: 'ED-6', x: 326, y: 350, width: 210, height: 145 },
-    { id: 'ms-210', floorId: 'floor-3', unitId: 'med-surg', roomNumber: '210', x: 84, y: 82, width: 210, height: 145 },
-    { id: 'ms-212', floorId: 'floor-3', unitId: 'med-surg', roomNumber: '212', x: 326, y: 82, width: 210, height: 145 },
+    {
+      id: 'icu-12',
+      floorId: 'floor-2',
+      unitId: 'icu',
+      roomNumber: 'ICU-12',
+      x: 84,
+      y: 82,
+      width: 210,
+      height: 145,
+    },
+    {
+      id: 'icu-14',
+      floorId: 'floor-2',
+      unitId: 'icu',
+      roomNumber: 'ICU-14',
+      x: 326,
+      y: 82,
+      width: 210,
+      height: 145,
+    },
+    {
+      id: 'icu-15',
+      floorId: 'floor-2',
+      unitId: 'icu',
+      roomNumber: 'ICU-15',
+      x: 568,
+      y: 82,
+      width: 210,
+      height: 145,
+    },
+    {
+      id: 'ed-4',
+      floorId: 'floor-2',
+      unitId: 'ed',
+      roomNumber: 'ED-4',
+      x: 84,
+      y: 350,
+      width: 210,
+      height: 145,
+    },
+    {
+      id: 'ed-6',
+      floorId: 'floor-2',
+      unitId: 'ed',
+      roomNumber: 'ED-6',
+      x: 326,
+      y: 350,
+      width: 210,
+      height: 145,
+    },
+    {
+      id: 'ms-210',
+      floorId: 'floor-3',
+      unitId: 'med-surg',
+      roomNumber: '210',
+      x: 84,
+      y: 82,
+      width: 210,
+      height: 145,
+    },
+    {
+      id: 'ms-212',
+      floorId: 'floor-3',
+      unitId: 'med-surg',
+      roomNumber: '212',
+      x: 326,
+      y: 82,
+      width: 210,
+      height: 145,
+    },
   ];
 
   const beds = [
-    { id: 'bed-icu-12-a', roomId: 'icu-12', label: 'Bed 12A', status: 'occupied', patientLabel: 'Patient A' },
-    { id: 'bed-icu-14-a', roomId: 'icu-14', label: 'Bed 14A', status: 'occupied', patientLabel: 'Patient B' },
-    { id: 'bed-icu-15-a', roomId: 'icu-15', label: 'Bed 15A', status: 'occupied', patientLabel: 'Patient C' },
-    { id: 'bed-ed-4-a', roomId: 'ed-4', label: 'Bed ED-4A', status: 'occupied', patientLabel: 'Patient D' },
-    { id: 'bed-ed-6-a', roomId: 'ed-6', label: 'Bed ED-6A', status: 'available', patientLabel: 'Unassigned' },
-    { id: 'bed-ms-210-a', roomId: 'ms-210', label: 'Bed 210A', status: 'occupied', patientLabel: 'Patient E' },
-    { id: 'bed-ms-212-a', roomId: 'ms-212', label: 'Bed 212A', status: 'cleaning', patientLabel: 'Unassigned' },
+    {
+      id: 'bed-icu-12-a',
+      roomId: 'icu-12',
+      label: 'Bed 12A',
+      status: 'occupied',
+      patientLabel: 'Patient A',
+    },
+    {
+      id: 'bed-icu-14-a',
+      roomId: 'icu-14',
+      label: 'Bed 14A',
+      status: 'occupied',
+      patientLabel: 'Patient B',
+    },
+    {
+      id: 'bed-icu-15-a',
+      roomId: 'icu-15',
+      label: 'Bed 15A',
+      status: 'occupied',
+      patientLabel: 'Patient C',
+    },
+    {
+      id: 'bed-ed-4-a',
+      roomId: 'ed-4',
+      label: 'Bed ED-4A',
+      status: 'occupied',
+      patientLabel: 'Patient D',
+    },
+    {
+      id: 'bed-ed-6-a',
+      roomId: 'ed-6',
+      label: 'Bed ED-6A',
+      status: 'available',
+      patientLabel: 'Unassigned',
+    },
+    {
+      id: 'bed-ms-210-a',
+      roomId: 'ms-210',
+      label: 'Bed 210A',
+      status: 'occupied',
+      patientLabel: 'Patient E',
+    },
+    {
+      id: 'bed-ms-212-a',
+      roomId: 'ms-212',
+      label: 'Bed 212A',
+      status: 'cleaning',
+      patientLabel: 'Unassigned',
+    },
   ];
 
   const devices = [
@@ -225,16 +344,106 @@ export function buildDemoHospitalMapSnapshot(referenceDate = new Date()) {
   ];
 
   const telemetry = [
-    { id: 'hr-spo2-icu-12', deviceId: 'spo2-icu-12', parameter: 'heart-rate', label: 'Heart rate', value: 118, unit: 'bpm', status: 'abnormal', timestamp: minutesAgo(referenceDate, 3) },
-    { id: 'spo2-icu-12-reading', deviceId: 'spo2-icu-12', parameter: 'spo2', label: 'SpO2', value: 91, unit: '%', status: 'abnormal', timestamp: minutesAgo(referenceDate, 3) },
-    { id: 'bp-ed-4-reading', deviceId: 'bp-ed-4', parameter: 'blood-pressure', label: 'Blood pressure', value: '168/94', unit: 'mmHg', status: 'stale', timestamp: minutesAgo(referenceDate, 22) },
-    { id: 'rr-vent-icu-12', deviceId: 'vent-icu-12', parameter: 'respiratory-rate', label: 'Respiratory rate', value: 22, unit: 'breaths/min', status: 'normal', timestamp: generatedAt },
-    { id: 'temp-icu-14', deviceId: 'pump-icu-14', parameter: 'temperature', label: 'Temperature', value: 37.9, unit: 'C', status: 'warning', timestamp: minutesAgo(referenceDate, 5) },
-    { id: 'glucose-ms-210-reading', deviceId: 'glucose-ms-210', parameter: 'glucose', label: 'Glucose', value: 64, unit: 'mg/dL', status: 'warning', timestamp: minutesAgo(referenceDate, 9) },
-    { id: 'ecg-icu-15-status', deviceId: 'ecg-icu-15', parameter: 'ecg-status', label: 'ECG status', value: 'Disconnected', unit: 'lead state', status: 'offline', timestamp: minutesAgo(referenceDate, 54) },
-    { id: 'oxygen-vent-icu-12', deviceId: 'vent-icu-12', parameter: 'oxygen-flow', label: 'Oxygen flow', value: 4, unit: 'L/min', status: 'normal', timestamp: generatedAt },
-    { id: 'pump-icu-14-state', deviceId: 'pump-icu-14', parameter: 'infusion-pump-state', label: 'Infusion pump state', value: 'Running', unit: 'pump state', status: 'warning', timestamp: minutesAgo(referenceDate, 5) },
-    { id: 'vent-icu-12-state', deviceId: 'vent-icu-12', parameter: 'ventilator-state', label: 'Ventilator state', value: 'Assist control', unit: 'mode', status: 'normal', timestamp: generatedAt },
+    {
+      id: 'hr-spo2-icu-12',
+      deviceId: 'spo2-icu-12',
+      parameter: 'heart-rate',
+      label: 'Heart rate',
+      value: 118,
+      unit: 'bpm',
+      status: 'abnormal',
+      timestamp: minutesAgo(referenceDate, 3),
+    },
+    {
+      id: 'spo2-icu-12-reading',
+      deviceId: 'spo2-icu-12',
+      parameter: 'spo2',
+      label: 'SpO2',
+      value: 91,
+      unit: '%',
+      status: 'abnormal',
+      timestamp: minutesAgo(referenceDate, 3),
+    },
+    {
+      id: 'bp-ed-4-reading',
+      deviceId: 'bp-ed-4',
+      parameter: 'blood-pressure',
+      label: 'Blood pressure',
+      value: '168/94',
+      unit: 'mmHg',
+      status: 'stale',
+      timestamp: minutesAgo(referenceDate, 22),
+    },
+    {
+      id: 'rr-vent-icu-12',
+      deviceId: 'vent-icu-12',
+      parameter: 'respiratory-rate',
+      label: 'Respiratory rate',
+      value: 22,
+      unit: 'breaths/min',
+      status: 'normal',
+      timestamp: generatedAt,
+    },
+    {
+      id: 'temp-icu-14',
+      deviceId: 'pump-icu-14',
+      parameter: 'temperature',
+      label: 'Temperature',
+      value: 37.9,
+      unit: 'C',
+      status: 'warning',
+      timestamp: minutesAgo(referenceDate, 5),
+    },
+    {
+      id: 'glucose-ms-210-reading',
+      deviceId: 'glucose-ms-210',
+      parameter: 'glucose',
+      label: 'Glucose',
+      value: 64,
+      unit: 'mg/dL',
+      status: 'warning',
+      timestamp: minutesAgo(referenceDate, 9),
+    },
+    {
+      id: 'ecg-icu-15-status',
+      deviceId: 'ecg-icu-15',
+      parameter: 'ecg-status',
+      label: 'ECG status',
+      value: 'Disconnected',
+      unit: 'lead state',
+      status: 'offline',
+      timestamp: minutesAgo(referenceDate, 54),
+    },
+    {
+      id: 'oxygen-vent-icu-12',
+      deviceId: 'vent-icu-12',
+      parameter: 'oxygen-flow',
+      label: 'Oxygen flow',
+      value: 4,
+      unit: 'L/min',
+      status: 'normal',
+      timestamp: generatedAt,
+    },
+    {
+      id: 'pump-icu-14-state',
+      deviceId: 'pump-icu-14',
+      parameter: 'infusion-pump-state',
+      label: 'Infusion pump state',
+      value: 'Running',
+      unit: 'pump state',
+      status: 'warning',
+      timestamp: minutesAgo(referenceDate, 5),
+    },
+    {
+      id: 'vent-icu-12-state',
+      deviceId: 'vent-icu-12',
+      parameter: 'ventilator-state',
+      label: 'Ventilator state',
+      value: 'Assist control',
+      unit: 'mode',
+      status: 'normal',
+      timestamp: generatedAt,
+    },
   ];
 
   const alerts = [
@@ -309,19 +518,56 @@ export function buildDemoHospitalMapSnapshot(referenceDate = new Date()) {
   ];
 
   const maintenanceRecords = [
-    { id: 'maint-pump-icu-14', deviceId: 'pump-icu-14', type: 'preventive-maintenance', status: 'due-soon', dueAt: minutesAgo(referenceDate, -1440), notes: 'Inspect battery health before next shift.' },
-    { id: 'maint-glucose-ms-210', deviceId: 'glucose-ms-210', type: 'calibration', status: 'overdue', dueAt: minutesAgo(referenceDate, 240), notes: 'Calibration overdue in demo registry.' },
+    {
+      id: 'maint-pump-icu-14',
+      deviceId: 'pump-icu-14',
+      type: 'preventive-maintenance',
+      status: 'due-soon',
+      dueAt: minutesAgo(referenceDate, -1440),
+      notes: 'Inspect battery health before next shift.',
+    },
+    {
+      id: 'maint-glucose-ms-210',
+      deviceId: 'glucose-ms-210',
+      type: 'calibration',
+      status: 'overdue',
+      dueAt: minutesAgo(referenceDate, 240),
+      notes: 'Calibration overdue in demo registry.',
+    },
   ];
 
   const locationEvents = [
-    { id: 'loc-spo2-icu-12', deviceId: 'spo2-icu-12', roomId: 'icu-12', observedAt: minutesAgo(referenceDate, 3), source: 'Demo coordinate', confidence: 0.95 },
-    { id: 'loc-pump-icu-14', deviceId: 'pump-icu-14', roomId: 'icu-14', observedAt: minutesAgo(referenceDate, 5), source: 'Demo coordinate', confidence: 0.91 },
-    { id: 'loc-ecg-icu-15', deviceId: 'ecg-icu-15', roomId: 'icu-15', observedAt: minutesAgo(referenceDate, 54), source: 'Demo coordinate', confidence: 0.73 },
+    {
+      id: 'loc-spo2-icu-12',
+      deviceId: 'spo2-icu-12',
+      roomId: 'icu-12',
+      observedAt: minutesAgo(referenceDate, 3),
+      source: 'Demo coordinate',
+      confidence: 0.95,
+    },
+    {
+      id: 'loc-pump-icu-14',
+      deviceId: 'pump-icu-14',
+      roomId: 'icu-14',
+      observedAt: minutesAgo(referenceDate, 5),
+      source: 'Demo coordinate',
+      confidence: 0.91,
+    },
+    {
+      id: 'loc-ecg-icu-15',
+      deviceId: 'ecg-icu-15',
+      roomId: 'icu-15',
+      observedAt: minutesAgo(referenceDate, 54),
+      source: 'Demo coordinate',
+      confidence: 0.73,
+    },
   ];
 
   const devicesWithAlerts = devices.map((device) => ({
     ...device,
-    activeAlerts: alerts.filter((alert) => alert.deviceId === device.id && alert.status === 'active'),
+    activeAlerts: alerts.filter(
+      (alert) => alert.deviceId === device.id && alert.status === 'active',
+    ),
     telemetry: telemetry.filter((reading) => reading.deviceId === device.id),
   }));
 

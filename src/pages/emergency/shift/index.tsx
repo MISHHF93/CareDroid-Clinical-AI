@@ -59,7 +59,10 @@ function CapacityBar({ totals }: { totals: ShiftSummary['capacity']['totals'] })
       {totals.map((item) => (
         <div key={item.band} className="shift-summary__capacity-row">
           <span>{item.band}</span>
-          <div className="shift-summary__capacity-track" aria-label={`${item.band} ${item.minutes} minutes`}>
+          <div
+            className="shift-summary__capacity-track"
+            aria-label={`${item.band} ${item.minutes} minutes`}
+          >
             <div
               className={`shift-summary__capacity-fill shift-summary__capacity-fill--${item.band.toLowerCase()}`}
               style={{ width: `${Math.max(item.percent, item.minutes > 0 ? 4 : 0)}%` }}
@@ -114,7 +117,21 @@ export default function EmergencyShiftSummaryPage() {
         emergencySettings,
         now,
       }),
-    [activeShift, alerts, capacity, capacityHistory, emergencySettings, emsArrivals, emsIncomingPatients, emsUnits, now, patients, referrals, staff, workflowLogs],
+    [
+      activeShift,
+      alerts,
+      capacity,
+      capacityHistory,
+      emergencySettings,
+      emsArrivals,
+      emsIncomingPatients,
+      emsUnits,
+      now,
+      patients,
+      referrals,
+      staff,
+      workflowLogs,
+    ],
   );
 
   const triggerHandoffBrief = () => {
@@ -126,7 +143,9 @@ export default function EmergencyShiftSummaryPage() {
     window.dispatchEvent(new CustomEvent('c16:generate-handoff-brief', { detail }));
     document.dispatchEvent(new CustomEvent('generate-shift-handoff-brief', { detail }));
     setHandoffStatus('Handoff brief requested from C16 using the current shift summary.');
-    document.getElementById('shift-handoff-generator')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document
+      .getElementById('shift-handoff-generator')
+      ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   const showSecondarySections = surfaces.shift.showSecondarySections;
@@ -143,7 +162,11 @@ export default function EmergencyShiftSummaryPage() {
           : undefined
       }
       actions={
-        <button type="button" className="shift-summary__handoff cd-btn cd-btn--primary cd-btn--sm" onClick={triggerHandoffBrief}>
+        <button
+          type="button"
+          className="shift-summary__handoff cd-btn cd-btn--primary cd-btn--sm"
+          onClick={triggerHandoffBrief}
+        >
           Generate Handoff Brief
         </button>
       }
@@ -165,22 +188,29 @@ export default function EmergencyShiftSummaryPage() {
               compact
               className="shift-summary__data-source"
             />
-            <section className="shift-summary__header-card cdl-surface cdl-surface--operational-status" aria-label="Shift header">
-        <div>
-          <span>Shift start</span>
-          <strong>{formatClock(summary.shift.startTime)}</strong>
-          <small>{new Date(summary.shift.startTime).toLocaleString()}</small>
-        </div>
-        <div>
-          <span>Duration</span>
-          <strong className="shift-summary__mono">{formatHHMM(summary.shift.durationMinutes)}</strong>
-          <small>Running timer</small>
-        </div>
-        <div>
-          <span>Staff on duty</span>
-          <strong>{summary.shift.staffOnDuty.length}</strong>
-          <small>{summary.shift.staffOnDuty.join(', ') || 'No on-shift staff recorded'}</small>
-        </div>
+            <section
+              className="shift-summary__header-card cdl-surface cdl-surface--operational-status"
+              aria-label="Shift header"
+            >
+              <div>
+                <span>Shift start</span>
+                <strong>{formatClock(summary.shift.startTime)}</strong>
+                <small>{new Date(summary.shift.startTime).toLocaleString()}</small>
+              </div>
+              <div>
+                <span>Duration</span>
+                <strong className="shift-summary__mono">
+                  {formatHHMM(summary.shift.durationMinutes)}
+                </strong>
+                <small>Running timer</small>
+              </div>
+              <div>
+                <span>Staff on duty</span>
+                <strong>{summary.shift.staffOnDuty.length}</strong>
+                <small>
+                  {summary.shift.staffOnDuty.join(', ') || 'No on-shift staff recorded'}
+                </small>
+              </div>
             </section>
             {handoffStatus ? <p className="shift-summary__status">{handoffStatus}</p> : null}
           </>
@@ -203,23 +233,59 @@ export default function EmergencyShiftSummaryPage() {
             <Section title="Volume Metrics">
               <div className="shift-summary__stat-grid">
                 <StatTile label="Patients seen" value={summary.volume.patientsSeen} tone="blue" />
-                <StatTile label="Discharged this shift" value={summary.volume.discharged} tone="green" />
-                <StatTile label="Admitted this shift" value={summary.volume.admitted} tone="yellow" />
+                <StatTile
+                  label="Discharged this shift"
+                  value={summary.volume.discharged}
+                  tone="green"
+                />
+                <StatTile
+                  label="Admitted this shift"
+                  value={summary.volume.admitted}
+                  tone="yellow"
+                />
                 <StatTile label="Currently active" value={summary.volume.active} tone="blue" />
-                <StatTile label="Left without being seen" value={summary.volume.lwbs} tone={summary.volume.lwbs > 0 ? 'red' : 'neutral'} />
+                <StatTile
+                  label="Left without being seen"
+                  value={summary.volume.lwbs}
+                  tone={summary.volume.lwbs > 0 ? 'red' : 'neutral'}
+                />
               </div>
             </Section>
-            <Section title="Time Metrics" description="Averages are computed from patient arrival and timeline timestamps.">
+            <Section
+              title="Time Metrics"
+              description="Averages are computed from patient arrival and timeline timestamps."
+            >
               <div className="shift-summary__stat-grid shift-summary__stat-grid--four">
-                <StatTile label="Avg door-to-triage" value={formatMinutes(summary.timeMetrics.avgDoorToTriageMinutes)} mono />
-                <StatTile label="Avg door-to-provider" value={formatMinutes(summary.timeMetrics.avgDoorToProviderMinutes)} mono />
-                <StatTile label="Avg length of stay" value={formatMinutes(summary.timeMetrics.avgLengthOfStayMinutes)} mono />
-                <StatTile label="Longest wait this shift" value={formatMinutes(summary.timeMetrics.longestWaitMinutes)} mono tone="yellow" />
+                <StatTile
+                  label="Avg door-to-triage"
+                  value={formatMinutes(summary.timeMetrics.avgDoorToTriageMinutes)}
+                  mono
+                />
+                <StatTile
+                  label="Avg door-to-provider"
+                  value={formatMinutes(summary.timeMetrics.avgDoorToProviderMinutes)}
+                  mono
+                />
+                <StatTile
+                  label="Avg length of stay"
+                  value={formatMinutes(summary.timeMetrics.avgLengthOfStayMinutes)}
+                  mono
+                />
+                <StatTile
+                  label="Longest wait this shift"
+                  value={formatMinutes(summary.timeMetrics.longestWaitMinutes)}
+                  mono
+                  tone="yellow"
+                />
               </div>
             </Section>
             <Section
               title="Queue Performance"
-              description={showSecondarySections ? 'Breaches use CTAS target minutes by patient priority.' : undefined}
+              description={
+                showSecondarySections
+                  ? 'Breaches use CTAS target minutes by patient priority.'
+                  : undefined
+              }
             >
               <div className="shift-summary__table-wrap">
                 <table className="shift-summary__table cd-data-table">
@@ -238,9 +304,15 @@ export default function EmergencyShiftSummaryPage() {
                         <tr key={queue.queue}>
                           <td>{queue.queue}</td>
                           <td>{queue.patients}</td>
-                          <td className="shift-summary__mono">{formatMinutes(queue.avgWaitMinutes)}</td>
-                          <td className="shift-summary__mono">{formatMinutes(queue.maxWaitMinutes)}</td>
-                          <td className={queue.breaches > 0 ? 'shift-summary__breach' : undefined}>{queue.breaches}</td>
+                          <td className="shift-summary__mono">
+                            {formatMinutes(queue.avgWaitMinutes)}
+                          </td>
+                          <td className="shift-summary__mono">
+                            {formatMinutes(queue.maxWaitMinutes)}
+                          </td>
+                          <td className={queue.breaches > 0 ? 'shift-summary__breach' : undefined}>
+                            {queue.breaches}
+                          </td>
                         </tr>
                       ))
                     ) : (
@@ -256,11 +328,27 @@ export default function EmergencyShiftSummaryPage() {
         ),
         analytics: showSecondarySections ? (
           <>
-            <Section title="LWBS Safety Metrics" description="Computed from CTAS wait targets and LongWait/LWBSRisk flags.">
+            <Section
+              title="LWBS Safety Metrics"
+              description="Computed from CTAS wait targets and LongWait/LWBSRisk flags."
+            >
               <div className="shift-summary__stat-grid shift-summary__stat-grid--four">
-                <StatTile label="Long wait events" value={summary.longWait.longWaitEvents} tone="yellow" />
-                <StatTile label="LWBS risk events" value={summary.longWait.lwbsRiskEvents} tone={summary.longWait.lwbsRiskEvents > 0 ? 'red' : 'neutral'} />
-                <StatTile label="Max wait this shift" value={formatMinutes(summary.longWait.maxWaitMinutes)} mono tone="yellow" />
+                <StatTile
+                  label="Long wait events"
+                  value={summary.longWait.longWaitEvents}
+                  tone="yellow"
+                />
+                <StatTile
+                  label="LWBS risk events"
+                  value={summary.longWait.lwbsRiskEvents}
+                  tone={summary.longWait.lwbsRiskEvents > 0 ? 'red' : 'neutral'}
+                />
+                <StatTile
+                  label="Max wait this shift"
+                  value={formatMinutes(summary.longWait.maxWaitMinutes)}
+                  mono
+                  tone="yellow"
+                />
                 <StatTile
                   label="Patients exceeding CTAS target"
                   value={`${summary.longWait.exceedingTargetCount} (${summary.longWait.exceedingTargetPercent}%)`}
@@ -268,7 +356,10 @@ export default function EmergencyShiftSummaryPage() {
                 />
               </div>
             </Section>
-            <Section title="Capacity Events Timeline" description="Band changes are sourced from store capacity history.">
+            <Section
+              title="Capacity Events Timeline"
+              description="Band changes are sourced from store capacity history."
+            >
               <div className="shift-summary__capacity-layout">
                 <div className="shift-summary__timeline">
                   {summary.capacity.events.length ? (
@@ -302,26 +393,32 @@ export default function EmergencyShiftSummaryPage() {
                   <span>Clinical scores run</span>
                   <strong>
                     {summary.clinical.scores.length
-                      ? summary.clinical.scores.map((score) => `${score.type} ${score.count}`).join(' | ')
+                      ? summary.clinical.scores
+                          .map((score) => `${score.type} ${score.count}`)
+                          .join(' | ')
                       : 'None found'}
                   </strong>
                 </article>
                 <article>
                   <span>Protocols activated</span>
                   <strong>
-                    STEMI {summary.clinical.protocols.stemi} | Sepsis {summary.clinical.protocols.sepsis} | Stroke {summary.clinical.protocols.stroke}
+                    STEMI {summary.clinical.protocols.stemi} | Sepsis{' '}
+                    {summary.clinical.protocols.sepsis} | Stroke {summary.clinical.protocols.stroke}
                   </strong>
                 </article>
                 <article>
                   <span>Referrals</span>
                   <strong>
-                    Sent {summary.clinical.referrals.sent} | Accepted {summary.clinical.referrals.accepted} | Declined {summary.clinical.referrals.declined}
+                    Sent {summary.clinical.referrals.sent} | Accepted{' '}
+                    {summary.clinical.referrals.accepted} | Declined{' '}
+                    {summary.clinical.referrals.declined}
                   </strong>
                 </article>
                 <article>
                   <span>Reassessments</span>
                   <strong>
-                    Flagged {summary.clinical.reassessments.flagged} | Completed {summary.clinical.reassessments.completed}
+                    Flagged {summary.clinical.reassessments.flagged} | Completed{' '}
+                    {summary.clinical.reassessments.completed}
                   </strong>
                 </article>
               </div>
@@ -329,8 +426,16 @@ export default function EmergencyShiftSummaryPage() {
             <Section title="EMS Summary">
               <div className="shift-summary__stat-grid shift-summary__stat-grid--four">
                 <StatTile label="Units received" value={summary.ems.unitsReceived} tone="blue" />
-                <StatTile label="Avg offload time" value={formatMinutes(summary.ems.avgOffloadMinutes)} mono />
-                <StatTile label="Critical arrivals" value={summary.ems.criticalArrivals} tone={summary.ems.criticalArrivals > 0 ? 'red' : 'neutral'} />
+                <StatTile
+                  label="Avg offload time"
+                  value={formatMinutes(summary.ems.avgOffloadMinutes)}
+                  mono
+                />
+                <StatTile
+                  label="Critical arrivals"
+                  value={summary.ems.criticalArrivals}
+                  tone={summary.ems.criticalArrivals > 0 ? 'red' : 'neutral'}
+                />
                 <StatTile
                   label={`EMS pressure peak at ${formatClock(summary.ems.pressurePeak.time)}`}
                   value={summary.ems.pressurePeak.score}
@@ -347,7 +452,10 @@ export default function EmergencyShiftSummaryPage() {
               <HandoffBriefGenerator />
             </section>
             {summary.limitations.length ? (
-              <aside className="shift-summary__limitations cdl-surface cdl-surface--inactive" aria-label="Data limitations">
+              <aside
+                className="shift-summary__limitations cdl-surface cdl-surface--inactive"
+                aria-label="Data limitations"
+              >
                 <strong>Data fallbacks</strong>
                 <ul>
                   {summary.limitations.map((limitation) => (

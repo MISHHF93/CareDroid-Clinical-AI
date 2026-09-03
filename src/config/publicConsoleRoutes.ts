@@ -18,15 +18,53 @@ export type PublicConsoleRedirectRoute = {
  * Operational privacy/consent workspaces remain under governanceConsoleRoutes.
  */
 export const PUBLIC_CONSOLE_ROUTES = Object.freeze<PublicConsoleRoute[]>([
-  { path: CANONICAL_ROUTES.version, label: 'Build version', componentKey: 'version', outsideShell: true },
-  { path: CANONICAL_ROUTES.helpCenter, label: 'Help center', componentKey: 'helpCenter', outsideShell: true },
+  {
+    path: CANONICAL_ROUTES.version,
+    label: 'Build version',
+    componentKey: 'version',
+    outsideShell: true,
+  },
+  {
+    path: CANONICAL_ROUTES.helpCenter,
+    label: 'Help center',
+    componentKey: 'helpCenter',
+    outsideShell: true,
+  },
   { path: CANONICAL_ROUTES.appNavigator, label: 'App navigator', componentKey: 'appNavigator' },
-  { path: CANONICAL_ROUTES.legalPrivacyPolicy, label: 'Privacy policy', componentKey: 'privacyPolicy', outsideShell: true },
-  { path: CANONICAL_ROUTES.legalTerms, label: 'Terms of service', componentKey: 'termsOfService', outsideShell: true },
-  { path: CANONICAL_ROUTES.legalGdpr, label: 'GDPR notice', componentKey: 'gdprNotice', outsideShell: true },
-  { path: CANONICAL_ROUTES.legalHipaa, label: 'HIPAA notice', componentKey: 'hipaaNotice', outsideShell: true },
-  { path: CANONICAL_ROUTES.onboardingConsent, label: 'Consent onboarding', componentKey: 'consentFlow' },
-  { path: CANONICAL_ROUTES.consentHistory, label: 'Consent history', componentKey: 'consentHistory' },
+  {
+    path: CANONICAL_ROUTES.legalPrivacyPolicy,
+    label: 'Privacy policy',
+    componentKey: 'privacyPolicy',
+    outsideShell: true,
+  },
+  {
+    path: CANONICAL_ROUTES.legalTerms,
+    label: 'Terms of service',
+    componentKey: 'termsOfService',
+    outsideShell: true,
+  },
+  {
+    path: CANONICAL_ROUTES.legalGdpr,
+    label: 'GDPR notice',
+    componentKey: 'gdprNotice',
+    outsideShell: true,
+  },
+  {
+    path: CANONICAL_ROUTES.legalHipaa,
+    label: 'HIPAA notice',
+    componentKey: 'hipaaNotice',
+    outsideShell: true,
+  },
+  {
+    path: CANONICAL_ROUTES.onboardingConsent,
+    label: 'Consent onboarding',
+    componentKey: 'consentFlow',
+  },
+  {
+    path: CANONICAL_ROUTES.consentHistory,
+    label: 'Consent history',
+    componentKey: 'consentHistory',
+  },
 ]);
 
 /** Short public aliases documented in segmentInventory and .env examples. */

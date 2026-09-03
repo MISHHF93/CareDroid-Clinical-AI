@@ -16,11 +16,7 @@ import { CHROME_ICONS, getToolIcon } from '../../navigation/iconRegistry';
 import ClinicalDecisionSupportDisclaimer from '../../components/clinical/ClinicalDecisionSupportDisclaimer';
 import { AiTruthLabel } from '../../components/ai/AiTruthLabel';
 import { useNotificationActions } from '../../hooks/useNotificationActions';
-import {
-  ActionRow,
-  CareDroidPage,
-  Surface,
-} from '../../components/ui/CareDroidPrimitives';
+import { ActionRow, CareDroidPage, Surface } from '../../components/ui/CareDroidPrimitives';
 import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
 import './ToolPageLayout.css';
 
@@ -74,7 +70,12 @@ const CLINICAL_INTELLIGENCE_DETERMINISTIC_TOOL_IDS = new Set([
   'patient-summary-ai',
   'timeline-ai',
 ]);
-const FLEET_TOOL_IDS = new Set(['route-optimizer', 'predictive-maintenance', 'fleet-command', 'dispatch-ai']);
+const FLEET_TOOL_IDS = new Set([
+  'route-optimizer',
+  'predictive-maintenance',
+  'fleet-command',
+  'dispatch-ai',
+]);
 
 function disclaimerVariantForTool(toolId) {
   if (toolId === 'drug-check') return 'drug-interaction';
@@ -167,10 +168,8 @@ const ToolPageLayout = ({
   }, [recordToolAccess, tool]);
 
   const handleAcknowledgeAlert = (alertId) => {
-    setClinicalAlerts(alerts =>
-      alerts.map(alert =>
-        alert.id === alertId ? { ...alert, acknowledged: true } : alert
-      )
+    setClinicalAlerts((alerts) =>
+      alerts.map((alert) => (alert.id === alertId ? { ...alert, acknowledged: true } : alert)),
     );
   };
 
@@ -195,10 +194,7 @@ const ToolPageLayout = ({
 
     try {
       await navigator.clipboard.writeText(url);
-      success(
-        'Local session link copied',
-        'It opens on this browser profile for 30 days.',
-      );
+      success('Local session link copied', 'It opens on this browser profile for 30 days.');
     } catch (_error: any) {
       window.prompt('Copy this link to share:', url);
     }
@@ -208,32 +204,36 @@ const ToolPageLayout = ({
     <ActionRow align="end" className="tool-header-actions">
       {actions}
       {results && (
-        <button type="button"
- className="btn-share-tool btn-share-tool--with-icon"
- onClick={() => setShowShareModal(true)}
- title="Export or share your results"
- 
- >
+        <button
+          type="button"
+          className="btn-share-tool btn-share-tool--with-icon"
+          onClick={() => setShowShareModal(true)}
+          title="Export or share your results"
+        >
           <NavIcon icon={CHROME_ICONS.upload} size={16} aria-hidden />
           <span>Share Results</span>
         </button>
       )}
       {surfaces.tools.showShareLocalSession ? (
-        <button
-          className="btn-share-tool"
-          onClick={handleShareSession}
-          type="button"
-        >
+        <button className="btn-share-tool" onClick={handleShareSession} type="button">
           Share Local Session
         </button>
       ) : null}
       {embedded ? (
-        <button type="button" className="btn-back-to-tools btn-back-to-tools--with-icon" onClick={() => onCloseEmbedded?.()}>
+        <button
+          type="button"
+          className="btn-back-to-tools btn-back-to-tools--with-icon"
+          onClick={() => onCloseEmbedded?.()}
+        >
           <NavIcon icon={CHROME_ICONS.close} size={16} aria-hidden />
           <span>Close panel</span>
         </button>
       ) : (
-        <button type="button" className="btn-back-to-tools btn-back-to-tools--with-icon" onClick={() => profileNavigate('/tools')}>
+        <button
+          type="button"
+          className="btn-back-to-tools btn-back-to-tools--with-icon"
+          onClick={() => profileNavigate('/tools')}
+        >
           <NavIcon icon={CHROME_ICONS.arrowLeft} size={16} aria-hidden />
           <span>Tools</span>
         </button>
@@ -261,14 +261,22 @@ const ToolPageLayout = ({
     >
       {!embedded && surfaces.tools.showPageBreadcrumbs ? (
         <div className="tool-breadcrumb">
-          <button type="button" onClick={() => profileNavigate('/dashboard')} className="breadcrumb-link">
+          <button
+            type="button"
+            onClick={() => profileNavigate('/dashboard')}
+            className="breadcrumb-link"
+          >
             <span className="breadcrumb-link-inner">
               <NavIcon icon={CHROME_ICONS.message} size={16} decorative />
               <span>Whiteboard</span>
             </span>
           </button>
           <span className="breadcrumb-separator">›</span>
-          <button type="button" onClick={() => profileNavigate('/tools')} className="breadcrumb-link">
+          <button
+            type="button"
+            onClick={() => profileNavigate('/tools')}
+            className="breadcrumb-link"
+          >
             <span className="breadcrumb-link-inner">
               <NavIcon icon={CHROME_ICONS.tools} size={16} decorative />
               <span>Tools</span>
@@ -280,12 +288,10 @@ const ToolPageLayout = ({
       ) : null}
 
       {surfaces.tools.showPageMetaBadges ? (
-      <div className="tool-header-meta tool-header-meta--shell">
-        <span className="tool-category-badge">
-          {tool.category}
-        </span>
-        {tool.shortcut ? <span className="tool-shortcut-badge">Quick access</span> : null}
-      </div>
+        <div className="tool-header-meta tool-header-meta--shell">
+          <span className="tool-category-badge">{tool.category}</span>
+          {tool.shortcut ? <span className="tool-shortcut-badge">Quick access</span> : null}
+        </div>
       ) : null}
 
       {/* Tool Content */}
@@ -296,10 +302,14 @@ const ToolPageLayout = ({
       </Surface>
 
       {surfaces.tools.showClinicalIntelligencePanel && (clinicalInsights || riskData) && (
-        <Surface className={`clinical-insights-panel severity-${(riskData?.severity || clinicalInsights?.severity)}`}>
+        <Surface
+          className={`clinical-insights-panel severity-${riskData?.severity || clinicalInsights?.severity}`}
+        >
           <div className="clinical-insights-header">
             <h3>Clinical Intelligence</h3>
-            <span className={`clinical-insights-badge ${riskData?.severity || clinicalInsights?.severity}`}>
+            <span
+              className={`clinical-insights-badge ${riskData?.severity || clinicalInsights?.severity}`}
+            >
               {String(riskData?.severity || clinicalInsights?.severity || '').toUpperCase()}
             </span>
           </div>
@@ -340,7 +350,7 @@ const ToolPageLayout = ({
               ]}
               recommendations={[
                 'Review the flagged result(s) for data-entry or measurement error.',
-                'Correlate with the patient\'s clinical presentation before acting on this value.',
+                "Correlate with the patient's clinical presentation before acting on this value.",
                 'Consider repeat testing or re-measurement if clinically indicated.',
               ]}
               onDismiss={handleDismissAnomaly}
@@ -357,9 +367,7 @@ const ToolPageLayout = ({
                   alert={alert}
                   onAcknowledge={handleAcknowledgeAlert}
                   onDismiss={() => {
-                    setClinicalAlerts(alerts =>
-                      alerts.filter(a => a.id !== alert.id)
-                    );
+                    setClinicalAlerts((alerts) => alerts.filter((a) => a.id !== alert.id));
                   }}
                 />
               ))}

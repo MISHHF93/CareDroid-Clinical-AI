@@ -67,12 +67,12 @@ export function resolveTrackMindRoleHomeNavId(role: string | null | undefined): 
 }
 
 export function resolveTrackMindRoleIdFromUser(
-  user: { trackMindRole?: string; role?: string; profile?: { trackMindRole?: string; role?: string } } | null | undefined,
+  user:
+    | { trackMindRole?: string; role?: string; profile?: { trackMindRole?: string; role?: string } }
+    | null
+    | undefined,
 ): TrackMindRoleId {
   const candidate =
-    user?.trackMindRole ||
-    user?.profile?.trackMindRole ||
-    user?.profile?.role ||
-    user?.role;
+    user?.trackMindRole || user?.profile?.trackMindRole || user?.profile?.role || user?.role;
   return normalizeTrackMindRoleId(candidate);
 }

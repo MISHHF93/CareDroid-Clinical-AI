@@ -14,29 +14,49 @@ import {
 
 describe('meldCalculator', () => {
   it('floors bilirubin, INR, and creatinine at 1.0 mg/dL equivalent', () => {
-    const c = applyMeldLabClamps({ bilirubinMgDl: 0.5, inr: 0.9, creatinineMgDl: 0.4, onDialysis: false });
+    const c = applyMeldLabClamps({
+      bilirubinMgDl: 0.5,
+      inr: 0.9,
+      creatinineMgDl: 0.4,
+      onDialysis: false,
+    });
     expect(c.bilirubinMgDl).toBe(1);
     expect(c.inr).toBe(1);
     expect(c.creatinineMgDl).toBe(1);
   });
 
   it('caps creatinine at 4.0 and uses 4.0 on dialysis', () => {
-    expect(applyMeldLabClamps({ bilirubinMgDl: 2, inr: 1.2, creatinineMgDl: 8, onDialysis: false }).creatinineMgDl).toBe(
-      4
-    );
     expect(
-      applyMeldLabClamps({ bilirubinMgDl: 2, inr: 1.2, creatinineMgDl: 1.5, onDialysis: true }).creatinineMgDl
+      applyMeldLabClamps({ bilirubinMgDl: 2, inr: 1.2, creatinineMgDl: 8, onDialysis: false })
+        .creatinineMgDl,
+    ).toBe(4);
+    expect(
+      applyMeldLabClamps({ bilirubinMgDl: 2, inr: 1.2, creatinineMgDl: 1.5, onDialysis: true })
+        .creatinineMgDl,
     ).toBe(4);
   });
 
   it('calculates baseline MELD for minimum labs (score 6)', () => {
-    expect(calculateMeldScore({ bilirubinMgDl: 1, inr: 1, creatinineMgDl: 1, onDialysis: false })).toBe(6);
+    expect(
+      calculateMeldScore({ bilirubinMgDl: 1, inr: 1, creatinineMgDl: 1, onDialysis: false }),
+    ).toBe(6);
   });
 
   it('increases MELD with worsening labs', () => {
-    const low = calculateMeldScore({ bilirubinMgDl: 1, inr: 1, creatinineMgDl: 1, onDialysis: false });
-    const high = calculateMeldScore({ bilirubinMgDl: 3, inr: 2, creatinineMgDl: 3, onDialysis: false });
-    if (low === null || high === null) throw new Error('expected calculateMeldScore to return a number');
+    const low = calculateMeldScore({
+      bilirubinMgDl: 1,
+      inr: 1,
+      creatinineMgDl: 1,
+      onDialysis: false,
+    });
+    const high = calculateMeldScore({
+      bilirubinMgDl: 3,
+      inr: 2,
+      creatinineMgDl: 3,
+      onDialysis: false,
+    });
+    if (low === null || high === null)
+      throw new Error('expected calculateMeldScore to return a number');
     expect(high).toBeGreaterThan(low);
     expect(high).toBeLessThanOrEqual(40);
   });
@@ -81,7 +101,7 @@ describe('meldCalculator', () => {
         onDialysis: false,
         sodium: '125',
       },
-      { includeMeldNa: true }
+      { includeMeldNa: true },
     );
     expect(r.ok).toBe(true);
     if (!r.ok) throw new Error('expected computeMeldResult to succeed');
@@ -100,7 +120,7 @@ describe('meldCalculator', () => {
         creatinineUnit: 'mg_dl',
         onDialysis: false,
       },
-      { requireSodium: true }
+      { requireSodium: true },
     );
     expect(v.ok).toBe(false);
     expect(v.errors.some((e) => e.includes('sodium'))).toBe(true);
@@ -211,7 +231,8 @@ describe('meldCalculator', () => {
     expect(lowCrNoDialysis.ok).toBe(true);
     expect(lowCrDialysis.ok).toBe(true);
     expect(crFour.ok).toBe(true);
-    if (!lowCrDialysis.ok || !crFour.ok) throw new Error('expected computeMeldResult calls to succeed');
+    if (!lowCrDialysis.ok || !crFour.ok)
+      throw new Error('expected computeMeldResult calls to succeed');
     expect(lowCrDialysis.meld).toBe(crFour.meld);
     expect(lowCrDialysis.clamped?.creatinineMgDl).toBe(4);
   });
@@ -227,7 +248,7 @@ describe('meldCalculator', () => {
         onDialysis: false,
         sodium: '125',
       },
-      { includeMeldNa: true }
+      { includeMeldNa: true },
     );
     expect(out.ok).toBe(true);
     if (!out.ok) throw new Error('expected computeMeldResult to succeed');

@@ -86,7 +86,15 @@ function resolvePermissionLevel(
     'racetrack-admin',
   ]);
   if (adminRoles.has(saasRole)) return 'admin';
-  if (['fleet-operator', 'biomedical-engineer', 'lab-technician', 'race-day-operations-manager', 'steward'].includes(saasRole)) {
+  if (
+    [
+      'fleet-operator',
+      'biomedical-engineer',
+      'lab-technician',
+      'race-day-operations-manager',
+      'steward',
+    ].includes(saasRole)
+  ) {
     return 'operations';
   }
   if (saasRole === 'researcher' || saasRole === 'educator') return 'research';
@@ -95,7 +103,9 @@ function resolvePermissionLevel(
   return 'clinician';
 }
 
-export function resolveSaasToolSegmentationRole(saasRole: string | null | undefined): SaasToolSegmentationRole {
+export function resolveSaasToolSegmentationRole(
+  saasRole: string | null | undefined,
+): SaasToolSegmentationRole {
   const normalized = normalizeSaasRole(saasRole);
   return SAAS_TO_SEGMENTATION[normalized] || 'medical student';
 }
@@ -109,7 +119,17 @@ export function resolveSaasToolResonance(saasRole: string | null | undefined): S
   });
   const segmentationRole = resolveSaasToolSegmentationRole(normalized);
   const permissionLevel = resolvePermissionLevel(normalized, segmentationRole);
-  const clinicalAccess = !['fleet-operator', 'biomedical-engineer', 'lab-technician', 'racetrack-admin', 'race-day-operations-manager', 'steward', 'compliance-officer', 'auditor-regulator'].includes(normalized) || normalized === 'registration-clerk';
+  const clinicalAccess =
+    ![
+      'fleet-operator',
+      'biomedical-engineer',
+      'lab-technician',
+      'racetrack-admin',
+      'race-day-operations-manager',
+      'steward',
+      'compliance-officer',
+      'auditor-regulator',
+    ].includes(normalized) || normalized === 'registration-clerk';
   const operationsAccess =
     permissionLevel === 'admin' ||
     permissionLevel === 'operations' ||
@@ -118,7 +138,11 @@ export function resolveSaasToolResonance(saasRole: string | null | undefined): S
   const toolsTitle =
     normalized === 'registration-clerk'
       ? 'Front-desk tools'
-      : normalized.startsWith('race') || normalized.includes('track') || normalized === 'steward' || normalized === 'veterinarian' || normalized === 'equine-welfare-officer'
+      : normalized.startsWith('race') ||
+          normalized.includes('track') ||
+          normalized === 'steward' ||
+          normalized === 'veterinarian' ||
+          normalized === 'equine-welfare-officer'
         ? 'TrackMind operations tools'
         : normalized === 'fleet-operator'
           ? 'Fleet operations tools'
@@ -131,7 +155,8 @@ export function resolveSaasToolResonance(saasRole: string | null | undefined): S
   return Object.freeze({
     saasRole: normalized,
     segmentationRole,
-    defaultWorkspace: SAAS_DEFAULT_WORKSPACE[normalized] || catalog.allowedWorkspaces[0] || 'emergency',
+    defaultWorkspace:
+      SAAS_DEFAULT_WORKSPACE[normalized] || catalog.allowedWorkspaces[0] || 'emergency',
     toolsTitle,
     toolsSubtitle,
     operationsEyebrow: profileCopy.workspaceEyebrow,

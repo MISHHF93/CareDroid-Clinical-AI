@@ -166,8 +166,7 @@ export function computeAscvdPceTenYearRisk(inputs) {
   const modelKey = resolvePceModelKey(inputs.race, inputs.sex);
   const model = PCE_MODELS[modelKey];
   const individualSum = computeLinearPredictorSum(model, inputs);
-  const riskFraction =
-    1 - Math.pow(model.baselineSurvival, Math.exp(individualSum - model.mean));
+  const riskFraction = 1 - Math.pow(model.baselineSurvival, Math.exp(individualSum - model.mean));
   const riskPct = Math.max(0, Math.min(100, riskFraction * 100));
 
   return {
@@ -293,14 +292,12 @@ export function interpretAscvdTenYearRisk(tenYearRiskPct, opts: any = {}) {
   };
 
   const preventionGuidance = {
-    low:
-      'Discuss heart-healthy lifestyle habits and periodic reassessment of risk factors. PCE estimates population-based atherosclerotic cardiovascular disease risk — it does not diagnose existing disease.',
+    low: 'Discuss heart-healthy lifestyle habits and periodic reassessment of risk factors. PCE estimates population-based atherosclerotic cardiovascular disease risk — it does not diagnose existing disease.',
     borderline:
       'Suitable for shared decision-making about risk factors and whether additional risk refinement (e.g. coronary artery calcium, family history) may inform prevention discussions per institutional pathways. This tool does not recommend starting or withholding statin therapy.',
     intermediate:
       'Elevated estimated risk warrants structured clinician–patient discussion of lifestyle modification and whether further risk assessment is appropriate per ACC/AHA prevention guidance and local policy. Avoid using this percentage alone to mandate treatment.',
-    high:
-      'High estimated 10-year risk supports intensive discussion of risk-factor modification and guideline-concordant prevention pathways with the treating clinician. This output is decision support for discussion — not a treatment prescription.',
+    high: 'High estimated 10-year risk supports intensive discussion of risk-factor modification and guideline-concordant prevention pathways with the treating clinician. This output is decision support for discussion — not a treatment prescription.',
   };
 
   const severity =
@@ -313,8 +310,7 @@ export function interpretAscvdTenYearRisk(tenYearRiskPct, opts: any = {}) {
     tenYearRiskPct,
     interpretation: `Estimated 10-year ASCVD risk ˜ ${tenYearRiskPct.toFixed(1)}% (${categoryLabels[category].toLowerCase()}).${usesOtherRaceNote}`,
     preventionDiscussion: preventionGuidance[category],
-    clinicianPatientDisclaimer:
-      'Use as decision-support for clinician-patient discussions.',
+    clinicianPatientDisclaimer: 'Use as decision-support for clinician-patient discussions.',
     safetyDisclaimer:
       'Pooled Cohort Equations estimate 10-year risk of first hard ASCVD event in primary prevention populations aged 40–79. They do not diagnose coronary artery disease, do not replace clinical judgment, and must not be used alone to rule in or rule out cardiovascular disease.',
     pathwayDisclaimer:

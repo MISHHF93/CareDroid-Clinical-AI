@@ -50,7 +50,8 @@ function normalizeDepartment(department) {
   }
   return {
     id: department?.id || slug(department?.name || department?.departmentId),
-    name: department?.name || department?.label || titleize(department?.id || department?.departmentId),
+    name:
+      department?.name || department?.label || titleize(department?.id || department?.departmentId),
     source: department?.source || 'tenant-administration',
     metadata: department,
   };
@@ -59,9 +60,13 @@ function normalizeDepartment(department) {
 function normalizeWorkspace(workspace) {
   return {
     id: workspace?.id || workspace?.workspaceKey || slug(workspace?.name),
-    name: workspace?.name || workspace?.branding?.displayName || titleize(workspace?.workspaceKey || workspace?.id),
+    name:
+      workspace?.name ||
+      workspace?.branding?.displayName ||
+      titleize(workspace?.workspaceKey || workspace?.id),
     path: workspace?.path || (workspace?.id ? `/workspace/${workspace.id}` : ''),
-    enabledToolIds: workspace?.enabledToolIds || workspace?.toolIds || workspace?.settings?.enabledToolIds || [],
+    enabledToolIds:
+      workspace?.enabledToolIds || workspace?.toolIds || workspace?.settings?.enabledToolIds || [],
     source: workspace?.source || 'workspace-context',
     metadata: workspace,
   };
@@ -84,7 +89,14 @@ function normalizePack(pack, enabledPackIds = new Set()) {
 function normalizeUsageRows(rows = [] as any[]) {
   return asArray(rows).map((row) => ({
     id: row?.id || row?.assetId || row?.packId || row?.resource || slug(row?.label || row?.name),
-    label: row?.label || row?.name || row?.packName || row?.resource || row?.id || row?.packId || 'Unknown',
+    label:
+      row?.label ||
+      row?.name ||
+      row?.packName ||
+      row?.resource ||
+      row?.id ||
+      row?.packId ||
+      'Unknown',
     count: metricValue(row),
     route: row?.route || row?.metadata?.route || '',
     metadata: row?.metadata || row,
@@ -117,7 +129,14 @@ function buildMissingPackRecommendations({ packs, organizationType, workspaces }
       const workspaceFit =
         pack.workspaceIds.length === 0 ||
         pack.workspaceIds.some((workspaceId) => workspaceIds.has(slug(workspaceId)));
-      const score = Number((0.45 + (orgFit ? 0.25 : 0) + (workspaceFit ? 0.2 : 0) + Math.min(pack.assetCount, 10) / 100).toFixed(2));
+      const score = Number(
+        (
+          0.45 +
+          (orgFit ? 0.25 : 0) +
+          (workspaceFit ? 0.2 : 0) +
+          Math.min(pack.assetCount, 10) / 100
+        ).toFixed(2),
+      );
       return recommendation(
         `missing-pack-${pack.id}`,
         'missing-packs',
@@ -130,7 +149,7 @@ function buildMissingPackRecommendations({ packs, organizationType, workspaces }
           confidence: Math.min(score, 0.95),
           source: 'pack-gap-analysis',
           metadata: { packId: pack.id },
-        }
+        },
       );
     })
     .sort((a, b) => b.confidence - a.confidence)
@@ -151,8 +170,8 @@ function buildUnderusedAssetRecommendations(underusedAssets) {
         confidence: (asset.count || 0) === 0 ? 0.9 : 0.78,
         source: 'underused-assets',
         metadata: asset,
-      }
-    )
+      },
+    ),
   );
 }
 
@@ -171,7 +190,7 @@ function buildWorkflowRecommendations({ workflowsCompleted, activeWorkspaces, de
         priority: 'high',
         confidence: 0.84,
         source: 'workflow-completion-gap',
-      }
+      },
     ),
   ];
 }
@@ -179,7 +198,7 @@ function buildWorkflowRecommendations({ workflowsCompleted, activeWorkspaces, de
 function buildSimulationRecommendations({ simulationsCompleted, workspaces, departments }) {
   if (simulationsCompleted > 0) return [];
   const hasEducationWorkspace = workspaces.some((workspace) =>
-    /education|simulation|training/i.test(`${workspace.id} ${workspace.name}`)
+    /education|simulation|training/i.test(`${workspace.id} ${workspace.name}`),
   );
   return [
     recommendation(
@@ -193,7 +212,7 @@ function buildSimulationRecommendations({ simulationsCompleted, workspaces, depa
         priority: hasEducationWorkspace ? 'medium' : 'high',
         confidence: hasEducationWorkspace ? 0.78 : 0.86,
         source: 'simulation-completion-gap',
-      }
+      },
     ),
   ];
 }
@@ -205,7 +224,9 @@ function buildAutomationRecommendations({ dashboardEngagement, topAssets, assetU
     recommendation(
       'automation-opportunity-primary',
       'automation-opportunities',
-      repeatedAsset ? `Automate follow-up for ${repeatedAsset.label}` : 'Create organization automation',
+      repeatedAsset
+        ? `Automate follow-up for ${repeatedAsset.label}`
+        : 'Create organization automation',
       repeatedAsset
         ? `${repeatedAsset.label} is a repeated usage signal that can drive automation, task routing, or dashboard follow-up.`
         : 'Dashboard engagement is low, so automation can surface next-best tasks without requiring manual monitoring.',
@@ -216,7 +237,7 @@ function buildAutomationRecommendations({ dashboardEngagement, topAssets, assetU
         confidence: repeatedAsset ? 0.82 : 0.74,
         source: 'behavior-adaptation',
         metadata: repeatedAsset || {},
-      }
+      },
     ),
   ];
 }
@@ -235,12 +256,18 @@ function buildAiRecommendations({ aiUsage, defaultAiAgentId }) {
         priority: 'medium',
         confidence: 0.76,
         source: 'ai-usage-gap',
-      }
+      },
     ),
   ];
 }
 
-function buildAdaptationSignals({ adoptionScore, healthScore, recommendations, activeWorkspace, organizationType }) {
+function buildAdaptationSignals({
+  adoptionScore,
+  healthScore,
+  recommendations,
+  activeWorkspace,
+  organizationType,
+}) {
   const highPriority = recommendations.filter((item) => item.priority === 'high');
   return [
     {
@@ -271,7 +298,8 @@ function buildAdaptationSignals({ adoptionScore, healthScore, recommendations, a
       id: 'next-best-actions',
       label: 'Next best actions',
       value: `${highPriority.length || recommendations.length} adaptive recommendations`,
-      rationale: 'Recommendations are derived from usage, adoption, pack coverage, workspace, and customer success signals.',
+      rationale:
+        'Recommendations are derived from usage, adoption, pack coverage, workspace, and customer success signals.',
     },
   ];
 }
@@ -302,7 +330,7 @@ export function buildOrganizationIntelligenceProfile({
       analytics?.enabledPackIds,
       analytics?.dashboards?.adoption?.packAdoption?.map((pack) => pack.id || pack.packId),
       customerSuccess?.metrics?.adoption?.enabledPackIds,
-    ])
+    ]),
   );
   const availablePacks = [
     ...(platformContext.availablePacks || []),
@@ -315,9 +343,15 @@ export function buildOrganizationIntelligenceProfile({
   });
   (analytics?.dimensions?.packUsage || analytics?.packAdoption || []).forEach((pack) => {
     const normalized = normalizePack(pack, enabledPackIds);
-    packMap.set(normalized.id, { ...(packMap.get(normalized.id) || {}), ...normalized, usage: metricValue(pack) });
+    packMap.set(normalized.id, {
+      ...(packMap.get(normalized.id) || {}),
+      ...normalized,
+      usage: metricValue(pack),
+    });
   });
-  const packs = [...packMap.values()].sort((a, b) => Number(b.enabled) - Number(a.enabled) || a.name.localeCompare(b.name));
+  const packs = [...packMap.values()].sort(
+    (a, b) => Number(b.enabled) - Number(a.enabled) || a.name.localeCompare(b.name),
+  );
 
   const departments = [
     ...(tenantAdministration?.departments || []),
@@ -328,8 +362,12 @@ export function buildOrganizationIntelligenceProfile({
     ...(workspaceContext.workspaces || []),
     ...(userIdentity.workspaceState?.workspaces || []),
   ].map(normalizeWorkspace);
-  const uniqueDepartments = [...new Map(departments.map((department) => [department.id, department])).values()];
-  const uniqueWorkspaces = [...new Map(workspaces.map((workspace) => [workspace.id, workspace])).values()];
+  const uniqueDepartments = [
+    ...new Map(departments.map((department) => [department.id, department])).values(),
+  ];
+  const uniqueWorkspaces = [
+    ...new Map(workspaces.map((workspace) => [workspace.id, workspace])).values(),
+  ];
   const activeWorkspace =
     workspaceContext.activeWorkspace ||
     uniqueWorkspaces.find((workspace) => workspace.id === workspaceContext.activeWorkspaceId) ||
@@ -339,20 +377,32 @@ export function buildOrganizationIntelligenceProfile({
   const dashboards = analytics?.dashboards || {};
   const dimensions = analytics?.dimensions || {};
   const customerMetrics = customerSuccess?.metrics || {};
-  const assetUsage = normalizeUsageRows(dimensions.assetUsage || customerMetrics.assetUsage?.topAssets || []);
+  const assetUsage = normalizeUsageRows(
+    dimensions.assetUsage || customerMetrics.assetUsage?.topAssets || [],
+  );
   const aiUsageRows = normalizeUsageRows(dimensions.aiUsage || []);
   const packUsage = normalizeUsageRows(dimensions.packUsage || analytics?.packAdoption || []);
   const workspaceUsage = normalizeUsageRows(dimensions.workspaceUsage || []);
   const underusedAssets = normalizeUsageRows(dashboards.underusedAssets || []);
-  const topAssets = normalizeUsageRows(dashboards.topAssets || customerMetrics.assetUsage?.topAssets || analytics?.topTools || []);
+  const topAssets = normalizeUsageRows(
+    dashboards.topAssets || customerMetrics.assetUsage?.topAssets || analytics?.topTools || [],
+  );
 
   const adoptionScore = safePercent(
-    dashboards.adoption?.adoptionScore ?? customerMetrics.adoption?.value ?? analytics?.adoptionScore
+    dashboards.adoption?.adoptionScore ??
+      customerMetrics.adoption?.value ??
+      analytics?.adoptionScore,
   );
   const healthScore = safePercent(customerSuccess?.health?.score ?? adoptionScore);
-  const aiUsage = dashboards.engagement?.aiUsageCount ?? customerMetrics.aiUsage?.value ?? analytics?.aiSessionCount ?? 0;
+  const aiUsage =
+    dashboards.engagement?.aiUsageCount ??
+    customerMetrics.aiUsage?.value ??
+    analytics?.aiSessionCount ??
+    0;
   const simulationsCompleted =
-    dashboards.engagement?.simulationCompletionCount ?? customerMetrics.simulationsCompleted?.value ?? 0;
+    dashboards.engagement?.simulationCompletionCount ??
+    customerMetrics.simulationsCompleted?.value ??
+    0;
   const workflowsCompleted = customerMetrics.workflowsCompleted?.value ?? 0;
   const dashboardEngagement = dashboards.engagement?.dashboardEngagementCount ?? 0;
 
@@ -401,7 +451,9 @@ export function buildOrganizationIntelligenceProfile({
         tenantAdministration?.profile?.tenantId ||
         organization.slug ||
         UNKNOWN,
-      healthStatus: customerSuccess?.health?.status || (healthScore >= 75 ? 'healthy' : healthScore >= 50 ? 'watch' : 'at-risk'),
+      healthStatus:
+        customerSuccess?.health?.status ||
+        (healthScore >= 75 ? 'healthy' : healthScore >= 50 ? 'watch' : 'at-risk'),
       retentionRisk: customerSuccess?.health?.retentionRisk || UNKNOWN,
     },
     departments: uniqueDepartments,
@@ -416,7 +468,9 @@ export function buildOrganizationIntelligenceProfile({
       topAssets,
       underusedAssets,
       totals: {
-        assetUsage: customerMetrics.assetUsage?.value ?? assetUsage.reduce((total, row) => total + row.count, 0),
+        assetUsage:
+          customerMetrics.assetUsage?.value ??
+          assetUsage.reduce((total, row) => total + row.count, 0),
         aiUsage,
         simulationsCompleted,
         workflowsCompleted,
@@ -426,9 +480,14 @@ export function buildOrganizationIntelligenceProfile({
     },
     adoption: {
       score: adoptionScore,
-      enabledPackCount: dashboards.adoption?.enabledPackCount ?? customerMetrics.adoption?.enabledPackCount ?? enabledPackIds.size,
-      enabledAssetCount: dashboards.adoption?.enabledAssetCount ?? customerMetrics.adoption?.enabledAssetCount ?? 0,
-      totalAssetCount: dashboards.adoption?.totalAssetCount ?? customerMetrics.adoption?.totalAssetCount ?? 0,
+      enabledPackCount:
+        dashboards.adoption?.enabledPackCount ??
+        customerMetrics.adoption?.enabledPackCount ??
+        enabledPackIds.size,
+      enabledAssetCount:
+        dashboards.adoption?.enabledAssetCount ?? customerMetrics.adoption?.enabledAssetCount ?? 0,
+      totalAssetCount:
+        dashboards.adoption?.totalAssetCount ?? customerMetrics.adoption?.totalAssetCount ?? 0,
       healthScore,
       healthStatus: customerSuccess?.health?.status || 'needs-data',
       retentionRisk: customerSuccess?.health?.retentionRisk || UNKNOWN,

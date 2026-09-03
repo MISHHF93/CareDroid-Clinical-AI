@@ -102,9 +102,10 @@ describe('motion token sourcing', () => {
       }
     }
 
-    expect(offenders, `looping indicators with a hand-picked tempo:\n${offenders.join('\n')}`).toEqual(
-      [],
-    );
+    expect(
+      offenders,
+      `looping indicators with a hand-picked tempo:\n${offenders.join('\n')}`,
+    ).toEqual([]);
   });
 
   it('keeps the reduced-motion collapse with the scale that owns the values', () => {

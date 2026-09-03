@@ -19,7 +19,8 @@ const Protocols = ({ embedded = false, onCloseEmbedded }: any = {}) => {
     name: 'Protocol and Clinical Pathway Library',
     path: '/protocols',
     color: '#A8E6CF',
-    description: 'Evidence-based protocol viewer with calculators, simulations, version history, and AI explanation',
+    description:
+      'Evidence-based protocol viewer with calculators, simulations, version history, and AI explanation',
     shortcut: 'Ctrl+4',
     category: 'Reference',
   };
@@ -64,10 +65,13 @@ const Protocols = ({ embedded = false, onCloseEmbedded }: any = {}) => {
   const filteredProtocols = useMemo(() => {
     const matches = searchProtocolPathways(query);
     if (selectedCategory === 'all') return matches;
-    return matches.filter((protocol) => protocol.category.toLowerCase() === selectedCategory.toLowerCase());
+    return matches.filter(
+      (protocol) => protocol.category.toLowerCase() === selectedCategory.toLowerCase(),
+    );
   }, [query, selectedCategory]);
   const selectedProtocol =
-    PROTOCOL_PATHWAYS.find((protocol) => protocol.id === selectedProtocolId) || PROTOCOL_PATHWAYS[0];
+    PROTOCOL_PATHWAYS.find((protocol) => protocol.id === selectedProtocolId) ||
+    PROTOCOL_PATHWAYS[0];
 
   const selectProtocol = (protocol) => {
     setSelectedProtocolId(protocol.id);
@@ -95,7 +99,9 @@ const Protocols = ({ embedded = false, onCloseEmbedded }: any = {}) => {
     setAiExplanation('');
     try {
       const { ok, data } = await (sendClinicalChatMessage as any)({
-        message: protocol ? buildProtocolAiPrompt(protocol) : `Explain this clinical protocol: ${label}`,
+        message: protocol
+          ? buildProtocolAiPrompt(protocol)
+          : `Explain this clinical protocol: ${label}`,
         tool: 'protocols',
       });
 
@@ -105,7 +111,8 @@ const Protocols = ({ embedded = false, onCloseEmbedded }: any = {}) => {
       setAiExplanation(data.response || data.message || 'No protocol explanation returned.');
     } catch (err: any) {
       setError(
-        err.message || 'Unable to explain protocol. Check your connection or try chat from the dashboard.'
+        err.message ||
+          'Unable to explain protocol. Check your connection or try chat from the dashboard.',
       );
     } finally {
       setLoading(false);
@@ -113,15 +120,23 @@ const Protocols = ({ embedded = false, onCloseEmbedded }: any = {}) => {
   };
 
   return (
-    <ToolPageLayout tool={toolConfig} embedded={embedded} onCloseEmbedded={onCloseEmbedded} results={aiExplanation as any}>
+    <ToolPageLayout
+      tool={toolConfig}
+      embedded={embedded}
+      onCloseEmbedded={onCloseEmbedded}
+      results={aiExplanation as any}
+    >
       <div className="simple-tool-page-inner protocol-library">
         <section className="protocol-library__hero" aria-labelledby="protocol-library-title">
           <div>
-            <p className="protocol-library__eyebrow">Clinical decision support only - verify local policy</p>
+            <p className="protocol-library__eyebrow">
+              Clinical decision support only - verify local policy
+            </p>
             <h2 id="protocol-library-title">Protocol and Clinical Pathway Library</h2>
             <p>
               Browse sepsis, ACS, stroke, trauma, DKA, respiratory failure, and pediatric fever
-              pathways with linked calculators, linked simulations, version history, and AI explanation.
+              pathways with linked calculators, linked simulations, version history, and AI
+              explanation.
             </p>
           </div>
           <div className="protocol-library__hero-actions">
@@ -137,7 +152,9 @@ const Protocols = ({ embedded = false, onCloseEmbedded }: any = {}) => {
         />
 
         <div className="protocol-library__search">
-          <p className="protocol-library__search-helper">Search for a protocol or use quick launch below.</p>
+          <p className="protocol-library__search-helper">
+            Search for a protocol or use quick launch below.
+          </p>
           <input
             type="text"
             className="simple-tool-search-input"
@@ -146,7 +163,11 @@ const Protocols = ({ embedded = false, onCloseEmbedded }: any = {}) => {
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleQuickLaunch()}
           />
-          <button type="button" className="protocol-library__ai-button" onClick={() => handleAiExplanation()}>
+          <button
+            type="button"
+            className="protocol-library__ai-button"
+            onClick={() => handleAiExplanation()}
+          >
             Explain with AI
           </button>
         </div>
@@ -226,7 +247,9 @@ const Protocols = ({ embedded = false, onCloseEmbedded }: any = {}) => {
             <div className="protocol-library__section">
               <h4>Protocol steps</h4>
               <ol>
-                {selectedProtocol.steps.map((step) => <li key={step}>{step}</li>)}
+                {selectedProtocol.steps.map((step) => (
+                  <li key={step}>{step}</li>
+                ))}
               </ol>
             </div>
 
@@ -234,13 +257,17 @@ const Protocols = ({ embedded = false, onCloseEmbedded }: any = {}) => {
               <div className="protocol-library__section">
                 <h4>Indications</h4>
                 <ul>
-                  {selectedProtocol.indications.map((item) => <li key={item}>{item}</li>)}
+                  {selectedProtocol.indications.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
                 </ul>
               </div>
               <div className="protocol-library__section">
                 <h4>Escalation red flags</h4>
                 <ul>
-                  {selectedProtocol.redFlags.map((item) => <li key={item}>{item}</li>)}
+                  {selectedProtocol.redFlags.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
                 </ul>
               </div>
             </div>
@@ -250,7 +277,9 @@ const Protocols = ({ embedded = false, onCloseEmbedded }: any = {}) => {
                 <h4>Linked calculators</h4>
                 <div className="protocol-library__links">
                   {selectedProtocol.linkedCalculators.map((calculator) => (
-                    <Link key={calculator.id} to={calculator.path}>{calculator.label}</Link>
+                    <Link key={calculator.id} to={calculator.path}>
+                      {calculator.label}
+                    </Link>
                   ))}
                 </div>
               </div>
@@ -258,7 +287,9 @@ const Protocols = ({ embedded = false, onCloseEmbedded }: any = {}) => {
                 <h4>Linked simulations</h4>
                 <div className="protocol-library__links">
                   {selectedProtocol.linkedSimulations.map((simulation) => (
-                    <Link key={simulation.id} to={simulation.path}>{simulation.label}</Link>
+                    <Link key={simulation.id} to={simulation.path}>
+                      {simulation.label}
+                    </Link>
                   ))}
                 </div>
               </div>
@@ -272,7 +303,11 @@ const Protocols = ({ embedded = false, onCloseEmbedded }: any = {}) => {
               ) : aiExplanation ? (
                 <div className="simple-tool-result-panel">{aiExplanation}</div>
               ) : (
-                <button type="button" className="protocol-library__ai-button" onClick={() => handleAiExplanation()}>
+                <button
+                  type="button"
+                  className="protocol-library__ai-button"
+                  onClick={() => handleAiExplanation()}
+                >
                   Generate AI explanation
                 </button>
               )}

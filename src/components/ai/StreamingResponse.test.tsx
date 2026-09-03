@@ -1,9 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import {
-  AI_STREAM_STATES,
-  streamStateLabel,
-} from '../../contracts/interactiveAi';
+import { AI_STREAM_STATES, streamStateLabel } from '../../contracts/interactiveAi';
 import { StreamingResponse } from './StreamingResponse';
 
 describe('StreamingResponse', () => {
@@ -25,9 +22,7 @@ describe('StreamingResponse', () => {
 
   it('offers cancel while active and hides it once terminal', () => {
     const onCancel = vi.fn();
-    const { rerender } = render(
-      <StreamingResponse phase="executing_tools" onCancel={onCancel} />,
-    );
+    const { rerender } = render(<StreamingResponse phase="executing_tools" onCancel={onCancel} />);
     screen.getByTestId('stream-cancel').click();
     expect(onCancel).toHaveBeenCalledTimes(1);
 

@@ -31,7 +31,11 @@ describe('canonical route tree — intake, capacity, queues', () => {
     // default findByRole timeout to resolve, so use the shared ROUTE_LOAD_TIMEOUT.
     const main = await screen.findByRole('main', {}, { timeout: ROUTE_LOAD_TIMEOUT });
     expect(
-      await screen.findByRole('heading', { name: 'Flow & Capacity' }, { timeout: ROUTE_LOAD_TIMEOUT }),
+      await screen.findByRole(
+        'heading',
+        { name: 'Flow & Capacity' },
+        { timeout: ROUTE_LOAD_TIMEOUT },
+      ),
     ).toBeInTheDocument();
     // The shell heading now resolves as soon as the chrome registers, which is
     // EARLIER than the lazy page body -- so wait on a page-owned element too,
@@ -51,7 +55,11 @@ describe('canonical route tree — intake, capacity, queues', () => {
     // default findByRole timeout.
     const main = await screen.findByRole('main', {}, { timeout: ROUTE_LOAD_TIMEOUT });
     expect(
-      await screen.findByRole('heading', { name: 'Department Queues' }, { timeout: ROUTE_LOAD_TIMEOUT }),
+      await screen.findByRole(
+        'heading',
+        { name: 'Department Queues' },
+        { timeout: ROUTE_LOAD_TIMEOUT },
+      ),
     ).toBeInTheDocument();
     expect(screen.getAllByText('Waiting').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Triage').length).toBeGreaterThan(0);

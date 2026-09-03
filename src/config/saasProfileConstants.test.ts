@@ -31,7 +31,7 @@ describe('normalizeSaasRole', () => {
     expect(normalizeSaasRole('medical-student')).toBe('student');
   });
 
-  it('is case- and whitespace-insensitive (HEAL-203, mirrors the backend copy\'s Cycle 220 regression)', () => {
+  it("is case- and whitespace-insensitive (HEAL-203, mirrors the backend copy's Cycle 220 regression)", () => {
     // This frontend mirror never received the backend's own case/whitespace
     // fix -- every comparison here was a strict `===` against a lowercase
     // literal, so a differently-cased role from profileRouteLaunch.ts's

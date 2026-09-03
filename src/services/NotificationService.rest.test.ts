@@ -80,9 +80,9 @@ describe('NotificationService REST methods — real parseApiResponse behavior', 
 
   it('updatePreferences rejects with the friendly HTML-fallback message', async () => {
     apiFetch.mockResolvedValue(htmlFallbackResponse('/api/notifications/preferences'));
-    await expect(
-      NotificationService.updatePreferences({ emailEnabled: false }),
-    ).rejects.toThrow(/API returned an HTML page instead of JSON/i);
+    await expect(NotificationService.updatePreferences({ emailEnabled: false })).rejects.toThrow(
+      /API returned an HTML page instead of JSON/i,
+    );
   });
 
   it('getPreferences still returns real parsed JSON on a genuine success response', async () => {
@@ -96,7 +96,11 @@ describe('NotificationService REST methods — real parseApiResponse behavior', 
 
   it('getPreferences surfaces a real backend error message on a non-HTML failure response', async () => {
     apiFetch.mockResolvedValue(
-      jsonResponse({ message: 'Preferences record not found.' }, '/api/notifications/preferences', 404),
+      jsonResponse(
+        { message: 'Preferences record not found.' },
+        '/api/notifications/preferences',
+        404,
+      ),
     );
     await expect(NotificationService.getPreferences()).rejects.toThrow(
       'Preferences record not found.',

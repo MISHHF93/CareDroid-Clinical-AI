@@ -39,10 +39,7 @@ describe('resolveActiveNavigationItemId', () => {
 
   it('maps embedded intake routes to Reception when intake is hidden', () => {
     const adminItems = NAVIGATION_ITEMS.filter((item) => item.id !== 'intake');
-    const activeId = resolveActiveNavigationItemId(
-      adminItems,
-      CANONICAL_ROUTES.emergencyIntake,
-    );
+    const activeId = resolveActiveNavigationItemId(adminItems, CANONICAL_ROUTES.emergencyIntake);
     expect(activeId).toBe('reception');
   });
 });

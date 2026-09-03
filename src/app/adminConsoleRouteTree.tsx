@@ -10,12 +10,17 @@ import {
 
 const lazyRoute = lazyWithRetry;
 const lazyNamed = (loader: () => Promise<Record<string, unknown>>, exportName: string) =>
-  lazyRoute(() => loader().then((module) => ({ default: module[exportName] as ComponentType<unknown> })));
+  lazyRoute(() =>
+    loader().then((module) => ({ default: module[exportName] as ComponentType<unknown> })),
+  );
 
 const AdminOperationsShell = lazyRoute(() => import('../components/admin/AdminOperationsShell'));
 const AdminOperationsHomePage = lazyRoute(() => import('../pages/admin/AdminOperationsHome'));
 const EdStaffWorkflowAdminPage = lazyRoute(() => import('../pages/admin/EdStaffWorkflowAdmin'));
-const TeamManagementPage = lazyNamed(() => import('../pages/team/TeamManagement'), 'TeamManagement');
+const TeamManagementPage = lazyNamed(
+  () => import('../pages/team/TeamManagement'),
+  'TeamManagement',
+);
 const TenantAdministrationCenterPage = lazyNamed(
   () => import('../pages/organization/OrganizationPages'),
   'TenantAdministrationCenter',

@@ -19,4 +19,7 @@
  * handlers, decorative-only search/notifications) that duplicated — with far
  * less functionality — what AppShell.tsx already does for real.
  */
-export { AppShell as ApplicationShell, type AppShellProps as ApplicationShellProps } from '../../components/AppShell';
+export {
+  AppShell as ApplicationShell,
+  type AppShellProps as ApplicationShellProps,
+} from '../../components/AppShell';

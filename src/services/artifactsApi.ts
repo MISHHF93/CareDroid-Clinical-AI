@@ -34,7 +34,7 @@ const localCanonicalArtifacts = buildArtifactCatalog();
 export const ARTIFACT_TYPE_OPTIONS = Object.freeze(
   [...new Set(localCanonicalArtifacts.map((artifact) => artifact.type))]
     .sort()
-    .map((value) => ({ value, label: displayLabel(value) }))
+    .map((value) => ({ value, label: displayLabel(value) })),
 );
 
 export const LOCAL_ARTIFACTS = Object.freeze(localCanonicalArtifacts.map(toDisplayArtifact));
@@ -66,7 +66,11 @@ async function requestJson(path, options: any = {}) {
     });
     const data = await parseApiResponse(response, { fallback: {} });
     if (!response.ok) {
-      return { ok: false, data: null, message: data?.message || getApiErrorMessage(null, response) };
+      return {
+        ok: false,
+        data: null,
+        message: data?.message || getApiErrorMessage(null, response),
+      };
     }
     return { ok: true, data, message: '' };
   } catch (error: any) {

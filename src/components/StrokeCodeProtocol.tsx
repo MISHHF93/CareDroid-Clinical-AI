@@ -44,7 +44,13 @@ type TpaCriterion = {
   label: string;
 };
 
-const STROKE_TIMELINE_STEPS: StrokeTimelineStepId[] = ['Arrive', 'CT Ord', 'CT Done', 'Decision', 'tPA'];
+const STROKE_TIMELINE_STEPS: StrokeTimelineStepId[] = [
+  'Arrive',
+  'CT Ord',
+  'CT Done',
+  'Decision',
+  'tPA',
+];
 
 export const TPA_INCLUDE_CRITERIA: TpaCriterion[] = [
   { id: 'ischemic-confirmed', label: 'Ischemic stroke confirmed (no hemorrhage on CT)' },
@@ -64,7 +70,8 @@ export const TPA_EXCLUDE_CRITERIA: TpaCriterion[] = [
 ];
 
 const activationNotePattern = /^Stroke Code activated at (\S+) by (.+)$/i;
-const stepNotePattern = /^Stroke Code (Arrive|CT Ord|CT Done|Decision|tPA): completed at (\S+) by (.+)$/i;
+const stepNotePattern =
+  /^Stroke Code (Arrive|CT Ord|CT Done|Decision|tPA): completed at (\S+) by (.+)$/i;
 
 function noteText(note: Note): string {
   return String(note.text || note.body || '').trim();
@@ -75,7 +82,10 @@ function isValidIso(value?: string): value is string {
 }
 
 function normalizeSearchText(value: unknown): string {
-  return String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  return String(value || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
 }
 
 function routeLooksStroke(route: ComplaintRoute | null): boolean {
@@ -92,12 +102,18 @@ function routeLooksStroke(route: ComplaintRoute | null): boolean {
   return routeText.includes('stroke') || route.scoreIds.includes('nihss');
 }
 
-export function isStrokeComplaint(patient: Pick<Patient, 'chiefComplaint' | 'complaint' | 'complaintCategory'>): boolean {
-  const routedByComplaint = routeLooksStroke(routeComplaint(patient.chiefComplaint || patient.complaint || ''));
+export function isStrokeComplaint(
+  patient: Pick<Patient, 'chiefComplaint' | 'complaint' | 'complaintCategory'>,
+): boolean {
+  const routedByComplaint = routeLooksStroke(
+    routeComplaint(patient.chiefComplaint || patient.complaint || ''),
+  );
   const routedByCategory = routeLooksStroke(routeComplaint(patient.complaintCategory || ''));
   if (routedByComplaint || routedByCategory) return true;
 
-  const text = normalizeSearchText([patient.chiefComplaint, patient.complaint, patient.complaintCategory].join(' '));
+  const text = normalizeSearchText(
+    [patient.chiefComplaint, patient.complaint, patient.complaintCategory].join(' '),
+  );
   return [
     /\bstroke\b/,
     /\bcva\b/,
@@ -123,7 +139,10 @@ export function parseStrokeCodeNotes(notes: Note[]): ParsedStrokeCodeState {
       const text = noteText(note);
       const activationMatch = text.match(activationNotePattern);
       if (activationMatch && isValidIso(activationMatch[1])) {
-        if (!state.activatedAt || new Date(activationMatch[1]).getTime() >= new Date(state.activatedAt).getTime()) {
+        if (
+          !state.activatedAt ||
+          new Date(activationMatch[1]).getTime() >= new Date(state.activatedAt).getTime()
+        ) {
           state.activatedAt = activationMatch[1];
           state.activatedBy = activationMatch[2];
         }
@@ -134,7 +153,10 @@ export function parseStrokeCodeNotes(notes: Note[]): ParsedStrokeCodeState {
       if (stepMatch && isValidIso(stepMatch[2])) {
         const step = stepMatch[1] as StrokeTimelineStepId;
         const existing = state.steps[step];
-        if (!existing || new Date(stepMatch[2]).getTime() >= new Date(existing.completedAt).getTime()) {
+        if (
+          !existing ||
+          new Date(stepMatch[2]).getTime() >= new Date(existing.completedAt).getTime()
+        ) {
           state.steps[step] = {
             completedAt: stepMatch[2],
             by: stepMatch[3],
@@ -189,17 +211,23 @@ export function getTpaEligibilityResult(
 }
 
 function patientName(patient: Patient): string {
-  return `${patient.firstName || ''} ${patient.lastName || ''}`.trim() || patient.name || patient.mrn;
+  return (
+    `${patient.firstName || ''} ${patient.lastName || ''}`.trim() || patient.name || patient.mrn
+  );
 }
 
 function roomName(patient: Patient, rooms: Room[]): string {
-  const room = rooms.find((candidate) => candidate.id === patient.roomId || candidate.patientId === patient.id);
+  const room = rooms.find(
+    (candidate) => candidate.id === patient.roomId || candidate.patientId === patient.id,
+  );
   return room?.name || patient.location || patient.roomId || 'Unassigned';
 }
 
 function formatClock(value?: string): string {
   if (!isValidIso(value)) return '--';
-  return new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit' }).format(new Date(value));
+  return new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit' }).format(
+    new Date(value),
+  );
 }
 
 function toneColor(tone: DtnClassification['tone'] | TpaEligibilityResult['tone']): string {
@@ -211,7 +239,12 @@ function toneColor(tone: DtnClassification['tone'] | TpaEligibilityResult['tone'
 function buttonStyle(variant: 'primary' | 'secondary' | 'danger' = 'secondary') {
   return {
     border: variant === 'primary' ? 'none' : '1px solid #e0f2fe',
-    background: variant === 'primary' ? MEDICAL_THEME.accent : variant === 'danger' ? '#7F1D1D' : 'transparent',
+    background:
+      variant === 'primary'
+        ? MEDICAL_THEME.accent
+        : variant === 'danger'
+          ? '#7F1D1D'
+          : 'transparent',
     color: 'var(--medical-ink, #111827)',
     borderRadius: 10,
     padding: '8px 10px',
@@ -275,10 +308,14 @@ export default function StrokeCodeProtocol({
   const active = hasPatientFlag(patient, PatientFlag.StrokeCode);
   const parsedState = useMemo(() => parseStrokeCodeNotes(patient.notes || []), [patient.notes]);
   const actorStaffId = patient.assignedStaffId || staff[0]?.id || 'current-staff';
-  const actorLabel = staff.find((member: Staff) => member.id === actorStaffId)?.name || actorStaffId;
-  const arrivalTime = parsedState.steps.Arrive?.completedAt || patient.arrivalTime || parsedState.activatedAt;
+  const actorLabel =
+    staff.find((member: Staff) => member.id === actorStaffId)?.name || actorStaffId;
+  const arrivalTime =
+    parsedState.steps.Arrive?.completedAt || patient.arrivalTime || parsedState.activatedAt;
   const tpaTime = parsedState.steps.tPA?.completedAt;
-  const dtnMinutes = tpaTime ? minutesBetween(arrivalTime, tpaTime) : minutesBetween(arrivalTime, new Date(now).toISOString());
+  const dtnMinutes = tpaTime
+    ? minutesBetween(arrivalTime, tpaTime)
+    : minutesBetween(arrivalTime, new Date(now).toISOString());
   const dtnClassification = typeof dtnMinutes === 'number' ? classifyDtn(dtnMinutes) : null;
   const runningTone = typeof dtnMinutes === 'number' && dtnMinutes >= 50 ? 'red' : 'yellow';
   const eligibilityResult = getTpaEligibilityResult(includeChecked, excludeChecked);
@@ -305,7 +342,11 @@ export default function StrokeCodeProtocol({
   const recordStep = (step: StrokeTimelineStepId) => {
     if (!canWriteNote) return;
     const timestamp = new Date().toISOString();
-    addNote(patient.id, `Stroke Code ${step}: completed at ${timestamp} by ${actorLabel}`, actorStaffId);
+    addNote(
+      patient.id,
+      `Stroke Code ${step}: completed at ${timestamp} by ${actorLabel}`,
+      actorStaffId,
+    );
   };
 
   if (!active && !strokeRouteMatch) {
@@ -315,10 +356,16 @@ export default function StrokeCodeProtocol({
           Stroke Protocol
         </h3>
         <p className="scp-manual-desc">
-          Manual physician activation is available for concerning neurologic presentations not matched by the complaint router.
+          Manual physician activation is available for concerning neurologic presentations not
+          matched by the complaint router.
         </p>
         <div className="u-flex-wrap u-gap-8">
-          <button type="button" style={buttonStyle('primary')} disabled={!canManageFlags || !canWriteNote} onClick={activateStrokeCode}>
+          <button
+            type="button"
+            style={buttonStyle('primary')}
+            disabled={!canManageFlags || !canWriteNote}
+            onClick={activateStrokeCode}
+          >
             Activate Stroke Code
           </button>
           <button type="button" style={buttonStyle()} onClick={() => onOpenCalculator?.('nihss')}>
@@ -337,16 +384,26 @@ export default function StrokeCodeProtocol({
             ⚡ Stroke Protocol — Activate Code?
           </h3>
           <p className="scp-pending-desc">
-            Complaint routing matched stroke workflow or NIHSS guidance. Activation still requires clinician confirmation.
+            Complaint routing matched stroke workflow or NIHSS guidance. Activation still requires
+            clinician confirmation.
           </p>
           <div className="scp-button-row">
-            <button type="button" style={buttonStyle('primary')} disabled={!canManageFlags || !canWriteNote} onClick={activateStrokeCode}>
+            <button
+              type="button"
+              style={buttonStyle('primary')}
+              disabled={!canManageFlags || !canWriteNote}
+              onClick={activateStrokeCode}
+            >
               Activate Stroke Code
             </button>
             <button type="button" style={buttonStyle()} onClick={() => onOpenCalculator?.('nihss')}>
               NIHSS
             </button>
-            <button type="button" style={buttonStyle()} onClick={() => setCincinnatiOpen((open) => !open)}>
+            <button
+              type="button"
+              style={buttonStyle()}
+              onClick={() => setCincinnatiOpen((open) => !open)}
+            >
               Cincinnati Screen
             </button>
           </div>
@@ -359,7 +416,8 @@ export default function StrokeCodeProtocol({
                 Stroke Code Active
               </h3>
               <p className="scp-active-subtext">
-                Activated {formatClock(parsedState.activatedAt)} by {parsedState.activatedBy || 'unknown staff'}
+                Activated {formatClock(parsedState.activatedAt)} by{' '}
+                {parsedState.activatedBy || 'unknown staff'}
               </p>
             </div>
             <div className="scp-target-badge">60min target</div>
@@ -372,9 +430,10 @@ export default function StrokeCodeProtocol({
               <div className="scp-timeline-target-label">+60min</div>
               <div className="scp-timeline-steps-grid">
                 {STROKE_TIMELINE_STEPS.map((step, index) => {
-                  const stepState = step === 'Arrive' && !parsedState.steps.Arrive && patient.arrivalTime
-                    ? { completedAt: patient.arrivalTime, by: 'arrival record' }
-                    : parsedState.steps[step];
+                  const stepState =
+                    step === 'Arrive' && !parsedState.steps.Arrive && patient.arrivalTime
+                      ? { completedAt: patient.arrivalTime, by: 'arrival record' }
+                      : parsedState.steps[step];
                   const previousStep = STROKE_TIMELINE_STEPS[index - 1];
                   const previousTime =
                     previousStep === 'Arrive' && !parsedState.steps.Arrive
@@ -382,10 +441,16 @@ export default function StrokeCodeProtocol({
                       : previousStep
                         ? parsedState.steps[previousStep]?.completedAt
                         : undefined;
-                  const duration = stepState ? minutesBetween(previousTime, stepState.completedAt) : null;
-                  const isCurrent = !stepState && STROKE_TIMELINE_STEPS.slice(0, index).every((candidate) =>
-                    candidate === 'Arrive' ? Boolean(parsedState.steps.Arrive || patient.arrivalTime) : Boolean(parsedState.steps[candidate]),
-                  );
+                  const duration = stepState
+                    ? minutesBetween(previousTime, stepState.completedAt)
+                    : null;
+                  const isCurrent =
+                    !stepState &&
+                    STROKE_TIMELINE_STEPS.slice(0, index).every((candidate) =>
+                      candidate === 'Arrive'
+                        ? Boolean(parsedState.steps.Arrive || patient.arrivalTime)
+                        : Boolean(parsedState.steps[candidate]),
+                    );
 
                   return (
                     <button
@@ -413,7 +478,11 @@ export default function StrokeCodeProtocol({
                           height: 20,
                           borderRadius: 999,
                           border: `2px solid ${stepState ? '#10B981' : isCurrent ? MEDICAL_THEME.accent : MEDICAL_THEME.inkMuted}`,
-                          background: stepState ? '#10B981' : isCurrent ? MEDICAL_THEME.accent : MEDICAL_THEME.ink,
+                          background: stepState
+                            ? '#10B981'
+                            : isCurrent
+                              ? MEDICAL_THEME.accent
+                              : MEDICAL_THEME.ink,
                           display: 'grid',
                           placeItems: 'center',
                           fontSize: 12,
@@ -423,7 +492,9 @@ export default function StrokeCodeProtocol({
                       </span>
                       <strong className="u-fs-11">{step}</strong>
                       <span className="scp-step-time">{formatClock(stepState?.completedAt)}</span>
-                      {duration !== null ? <span className="scp-step-duration">+{duration}min</span> : null}
+                      {duration !== null ? (
+                        <span className="scp-step-duration">+{duration}min</span>
+                      ) : null}
                     </button>
                   );
                 })}
@@ -441,7 +512,9 @@ export default function StrokeCodeProtocol({
             }}
           >
             {tpaTime && dtnClassification && dtnMinutes !== null ? (
-              <div style={{ color: toneColor(dtnClassification.tone), fontWeight: 800, fontSize: 13 }}>
+              <div
+                style={{ color: toneColor(dtnClassification.tone), fontWeight: 800, fontSize: 13 }}
+              >
                 DTN: {dtnMinutes}min · {dtnClassification.message}
               </div>
             ) : (
@@ -476,13 +549,17 @@ export default function StrokeCodeProtocol({
               title="Include criteria"
               criteria={TPA_INCLUDE_CRITERIA}
               values={includeChecked}
-              onChange={(id, value) => setIncludeChecked((current) => ({ ...current, [id]: value }))}
+              onChange={(id, value) =>
+                setIncludeChecked((current) => ({ ...current, [id]: value }))
+              }
             />
             <CheckboxGroup
               title="Exclude criteria"
               criteria={TPA_EXCLUDE_CRITERIA}
               values={excludeChecked}
-              onChange={(id, value) => setExcludeChecked((current) => ({ ...current, [id]: value }))}
+              onChange={(id, value) =>
+                setExcludeChecked((current) => ({ ...current, [id]: value }))
+              }
             />
             <div
               style={{

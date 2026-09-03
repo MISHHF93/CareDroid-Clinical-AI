@@ -33,7 +33,10 @@ export const DEFAULT_PROHIBITED_ACTION_COPY =
   'Do not use in place of a validated clinical score, and do not act on this without clinician confirmation.';
 
 const STATE_META: Record<AiTruthLabelState, { label: string; hint: string }> = {
-  Live: { label: 'Live', hint: 'Backed by a currently running model or rules engine on real input.' },
+  Live: {
+    label: 'Live',
+    hint: 'Backed by a currently running model or rules engine on real input.',
+  },
   Manual: {
     label: 'Manual',
     hint: 'Deterministic or rule-based logic written by engineers — not a trained model.',
@@ -42,7 +45,10 @@ const STATE_META: Record<AiTruthLabelState, { label: string; hint: string }> = {
     label: 'Stale',
     hint: 'Was live but the data path is degraded, partial, or not currently authoritative.',
   },
-  Demo: { label: 'Demo', hint: 'Sample, simulated, or placeholder output — not real patient inference.' },
+  Demo: {
+    label: 'Demo',
+    hint: 'Sample, simulated, or placeholder output — not real patient inference.',
+  },
 };
 
 /**
@@ -120,9 +126,7 @@ export function fromEnhancementMaturity(
 export function fromAiChiefRecommendation(recommendation: {
   modelOrRuleId: string;
 }): AiTruthLabelInfo {
-  const backedByTrainedModel = /nlu-classifier|artifact-router/i.test(
-    recommendation.modelOrRuleId,
-  );
+  const backedByTrainedModel = /nlu-classifier|artifact-router/i.test(recommendation.modelOrRuleId);
 
   return {
     state: backedByTrainedModel ? 'Live' : 'Manual',
@@ -206,7 +210,8 @@ export function hospitalCommandCenterRecommendationsTruthLabel(): AiTruthLabelIn
 export function continuousPatientFlowRecommendationsTruthLabel(): AiTruthLabelInfo {
   return {
     state: 'Manual',
-    sourceContext: 'Continuous patient flow engine — deterministic bottleneck/guidance rules, not a trained model',
+    sourceContext:
+      'Continuous patient flow engine — deterministic bottleneck/guidance rules, not a trained model',
     reviewRequired: true,
   };
 }
@@ -232,7 +237,8 @@ export const NATIVE_AI_TRIAGE_RATIONALE_MARKER = 'Native AI expert system sugges
 export function nativeAiTriageBridgeTruthLabel(): AiTruthLabelInfo {
   return {
     state: 'Manual',
-    sourceContext: 'Native-AI expert-system triage signal — rule-based inference, not a trained model',
+    sourceContext:
+      'Native-AI expert-system triage signal — rule-based inference, not a trained model',
     reviewRequired: true,
   };
 }
@@ -249,7 +255,8 @@ export function nativeAiTriageBridgeTruthLabel(): AiTruthLabelInfo {
 export function triageAssistSuggestionTruthLabel(): AiTruthLabelInfo {
   return {
     state: 'Manual',
-    sourceContext: 'Rule-based triage suggestion (priority/streaming-lane heuristics), not a trained model.',
+    sourceContext:
+      'Rule-based triage suggestion (priority/streaming-lane heuristics), not a trained model.',
     reviewRequired: true,
   };
 }
@@ -391,7 +398,8 @@ export function patientDuplicateMatchTruthLabel(): AiTruthLabelInfo {
 export function bottleneckRootCauseSummaryTruthLabel(): AiTruthLabelInfo {
   return {
     state: 'Manual',
-    sourceContext: 'AI Chief root cause summary -- top-3 active-bottleneck aggregation, not a trained model',
+    sourceContext:
+      'AI Chief root cause summary -- top-3 active-bottleneck aggregation, not a trained model',
     reviewRequired: true,
   };
 }
@@ -408,7 +416,8 @@ export function bottleneckRootCauseSummaryTruthLabel(): AiTruthLabelInfo {
 export function operationalIntelligenceAiChiefTruthLabel(): AiTruthLabelInfo {
   return {
     state: 'Manual',
-    sourceContext: 'AI Chief operational risk/recommendation engine -- rule-based, not a trained model',
+    sourceContext:
+      'AI Chief operational risk/recommendation engine -- rule-based, not a trained model',
     reviewRequired: true,
   };
 }
@@ -470,10 +479,7 @@ export function AiTruthLabel({
         </span>
       ) : null}
       {!compact ? (
-        <span
-          className="cd-ai-truth-label__prohibited"
-          data-testid="ai-truth-label-prohibited"
-        >
+        <span className="cd-ai-truth-label__prohibited" data-testid="ai-truth-label-prohibited">
           {resolvedProhibitedCopy}
         </span>
       ) : null}

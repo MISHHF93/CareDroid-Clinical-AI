@@ -15,7 +15,11 @@ export function isEmsRole(roleId) {
   return roleId === EMERGENCY_ROLE_IDS.emsUser;
 }
 
-export function shouldShowEmsOperationalStrip({ screenMode, roleId, displayMode = false }: any = {}) {
+export function shouldShowEmsOperationalStrip({
+  screenMode,
+  roleId,
+  displayMode = false,
+}: any = {}) {
   if (displayMode) return false;
   return screenMode === CARE_DROID_SCREEN_MODES.ems || isEmsRole(roleId);
 }

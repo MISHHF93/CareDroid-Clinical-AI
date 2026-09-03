@@ -63,7 +63,10 @@ function severityToTone(severity: Alert['severity'] | string | undefined): Recep
  * frozen "0:00", which is why a batch of them looks like duplicated, meaningless
  * notifications rather than distinct, informative escalations.
  */
-function formatElapsedSinceEscalation(alert: Alert, now: number): { label: string; breached: boolean } {
+function formatElapsedSinceEscalation(
+  alert: Alert,
+  now: number,
+): { label: string; breached: boolean } {
   const firedAt = String(alert.createdAt || '');
   const fired = new Date(firedAt).getTime();
   if (!Number.isFinite(fired)) return { label: 'Escalated', breached: true };
@@ -107,7 +110,9 @@ export function buildReceptionAttentionSnapshot(
     if (isReceptionEscalationAlert(alert)) continue;
     const timer = formatTimerFromAlert(alert, now);
     const source =
-      String(alert.source || '') === 'three-minute-timer-engine' ? 'three-minute' : 'critical-intake';
+      String(alert.source || '') === 'three-minute-timer-engine'
+        ? 'three-minute'
+        : 'critical-intake';
     rows.push({
       id: `crit-${alert.id}`,
       patientId: alert.patientId,
@@ -173,11 +178,7 @@ export function buildReceptionAttentionSnapshot(
   };
 }
 
-export type ReceptionQueueRowAction =
-  | 'complete_id'
-  | 'escalate'
-  | 'handoff'
-  | 'select';
+export type ReceptionQueueRowAction = 'complete_id' | 'escalate' | 'handoff' | 'select';
 
 export type ReceptionQueueRowModel = {
   patientId: string;

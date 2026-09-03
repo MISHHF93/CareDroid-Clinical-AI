@@ -15,7 +15,9 @@ describe('AiFeedbackControl', () => {
   });
 
   it('submits HELPFUL directly and shows a confirmation', async () => {
-    const spy = vi.spyOn(aiFeedbackApi, 'submitAiFeedback').mockResolvedValue({ ok: true, message: '' });
+    const spy = vi
+      .spyOn(aiFeedbackApi, 'submitAiFeedback')
+      .mockResolvedValue({ ok: true, message: '' });
 
     render(<AiFeedbackControl runId="run-1" capabilityId="clinical-chat" />);
     await userEvent.click(screen.getByRole('button', { name: 'Helpful' }));
@@ -30,7 +32,9 @@ describe('AiFeedbackControl', () => {
   });
 
   it('reveals refinement categories on "not helpful" rather than submitting immediately', async () => {
-    const spy = vi.spyOn(aiFeedbackApi, 'submitAiFeedback').mockResolvedValue({ ok: true, message: '' });
+    const spy = vi
+      .spyOn(aiFeedbackApi, 'submitAiFeedback')
+      .mockResolvedValue({ ok: true, message: '' });
 
     render(<AiFeedbackControl runId="run-1" />);
     await userEvent.click(screen.getByRole('button', { name: /not helpful/i }));
@@ -41,7 +45,9 @@ describe('AiFeedbackControl', () => {
   });
 
   it('submits a specific refinement rating (e.g. UNSAFE_CONCERN) when chosen', async () => {
-    const spy = vi.spyOn(aiFeedbackApi, 'submitAiFeedback').mockResolvedValue({ ok: true, message: '' });
+    const spy = vi
+      .spyOn(aiFeedbackApi, 'submitAiFeedback')
+      .mockResolvedValue({ ok: true, message: '' });
 
     render(<AiFeedbackControl runId="run-1" />);
     await userEvent.click(screen.getByRole('button', { name: /not helpful/i }));
@@ -54,7 +60,9 @@ describe('AiFeedbackControl', () => {
   });
 
   it('lets the user add an optional comment before submitting "Other"', async () => {
-    const spy = vi.spyOn(aiFeedbackApi, 'submitAiFeedback').mockResolvedValue({ ok: true, message: '' });
+    const spy = vi
+      .spyOn(aiFeedbackApi, 'submitAiFeedback')
+      .mockResolvedValue({ ok: true, message: '' });
 
     render(<AiFeedbackControl runId="run-1" />);
     await userEvent.click(screen.getByRole('button', { name: /not helpful/i }));

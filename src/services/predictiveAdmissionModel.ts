@@ -44,11 +44,12 @@ export function assessPatientAdmissionProbability(input: {
     consultPending,
   });
   const threshold = input.alertThreshold ?? ADMISSION_PROBABILITY_ALERT_THRESHOLD;
-  const blendedScore = Math.round((result.score * 0.55 + nativeMl.probabilityPercent * 0.45));
+  const blendedScore = Math.round(result.score * 0.55 + nativeMl.probabilityPercent * 0.45);
 
   return {
     patientId: input.patient.id,
-    patientLabel: `${input.patient.firstName} ${input.patient.lastName}`.trim() || input.patient.mrn,
+    patientLabel:
+      `${input.patient.firstName} ${input.patient.lastName}`.trim() || input.patient.mrn,
     probabilityPercent: blendedScore,
     admitScore: probabilityToAdmitScore(blendedScore),
     admitScoreMax: 10,
@@ -67,7 +68,10 @@ export function scanPatientsForAdmissionAlerts(
 ): PatientAdmissionAssessment[] {
   const threshold = options.alertThreshold ?? ADMISSION_PROBABILITY_ALERT_THRESHOLD;
   return patients
-    .filter((patient) => patient.state !== PatientState.Discharge && patient.state !== PatientState.Deceased)
+    .filter(
+      (patient) =>
+        patient.state !== PatientState.Discharge && patient.state !== PatientState.Deceased,
+    )
     .map((patient) =>
       assessPatientAdmissionProbability({
         patient,

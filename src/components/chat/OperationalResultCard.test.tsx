@@ -20,18 +20,18 @@ describe('OperationalResultCard', () => {
             },
           }}
         />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
-    const actions = screen.getByText(/next best actions/i).closest('.operational-result-card__section');
+    const actions = screen
+      .getByText(/next best actions/i)
+      .closest('.operational-result-card__section');
     if (!actions) throw new Error('expected next best actions section to render');
-    expect(within(actions as HTMLElement).getByRole('link', { name: /review detailed output/i })).toHaveAttribute(
-      'href',
-      '/timeline'
-    );
-    expect(within(actions as HTMLElement).getByRole('link', { name: /open recommended next actions/i })).toHaveAttribute(
-      'href',
-      '/recommendations'
-    );
+    expect(
+      within(actions as HTMLElement).getByRole('link', { name: /review detailed output/i }),
+    ).toHaveAttribute('href', '/timeline');
+    expect(
+      within(actions as HTMLElement).getByRole('link', { name: /open recommended next actions/i }),
+    ).toHaveAttribute('href', '/recommendations');
   });
 });

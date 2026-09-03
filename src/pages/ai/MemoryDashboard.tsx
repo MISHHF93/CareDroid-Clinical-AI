@@ -5,7 +5,10 @@ import { GraphicIconBadge } from '../../components/graphics/CdlGraphicKit';
 import StateSourceNotice from '../../components/StateSourceNotice';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { DEMO_LIVE_STATES } from '../../utils/demoLiveState';
-import { DEMO_MEMORY_ACTIVITY, DEMO_MEMORY_WORKFLOWS } from '../../utils/clinicalInsightsChartModel';
+import {
+  DEMO_MEMORY_ACTIVITY,
+  DEMO_MEMORY_WORKFLOWS,
+} from '../../utils/clinicalInsightsChartModel';
 import { fetchMemoryDashboard } from '../../services/memoryApi';
 import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import './MemoryDashboard.css';
@@ -41,7 +44,14 @@ export default function MemoryDashboard() {
   const [fromApi, setFromApi] = useState(false);
   const [message, setMessage] = useState('');
   const [activity, setActivity] = useState<
-    readonly { id: string; label?: string; title?: string; detail?: string; time?: string; occurredAt?: string }[]
+    readonly {
+      id: string;
+      label?: string;
+      title?: string;
+      detail?: string;
+      time?: string;
+      occurredAt?: string;
+    }[]
   >([]);
   const [workflows, setWorkflows] = useState<
     readonly { id: string; label?: string; title?: string; status?: string }[]
@@ -75,7 +85,9 @@ export default function MemoryDashboard() {
         <div className="memory-page__title-row">
           <GraphicIconBadge iconKey="activity" accent="brand" size="md" />
           <div>
-            <p className="memory-dashboard-title-text" data-testid="cd-page-title-text">Memory Dashboard</p>
+            <p className="memory-dashboard-title-text" data-testid="cd-page-title-text">
+              Memory Dashboard
+            </p>
             <p>Short-term assistant context, saved workflows, and recent clinical tool activity.</p>
           </div>
         </div>
@@ -92,16 +104,45 @@ export default function MemoryDashboard() {
         states={
           fromApi
             ? [DEMO_LIVE_STATES.DEMO, DEMO_LIVE_STATES.LIVE]
-            : [DEMO_LIVE_STATES.DEMO, DEMO_LIVE_STATES.LOCAL_ONLY, DEMO_LIVE_STATES.BACKEND_UNAVAILABLE]
+            : [
+                DEMO_LIVE_STATES.DEMO,
+                DEMO_LIVE_STATES.LOCAL_ONLY,
+                DEMO_LIVE_STATES.BACKEND_UNAVAILABLE,
+              ]
         }
-        details={message || (fromApi ? 'Memory fabric connected.' : 'Demo memory fabric with local fallback activity.')}
+        details={
+          message ||
+          (fromApi
+            ? 'Memory fabric connected.'
+            : 'Demo memory fabric with local fallback activity.')
+        }
       />
 
       <div className="memory-page__metrics" role="group" aria-label="Memory summary metrics">
-        <MetricCard label="Recent activity" value={String(activity.length)} hint="Tool and session events" tone="neutral" />
-        <MetricCard label="Saved workflows" value={String(savedCount)} hint="Pinned or saved flows" tone="good" />
-        <MetricCard label="Source" value={fromApi ? 'API' : 'Local'} hint="Latest memory scan" tone={fromApi ? 'good' : 'warning'} />
-        <MetricCard label="Status" value={loading ? 'Loading' : 'Ready'} hint="Dashboard state" tone="neutral" />
+        <MetricCard
+          label="Recent activity"
+          value={String(activity.length)}
+          hint="Tool and session events"
+          tone="neutral"
+        />
+        <MetricCard
+          label="Saved workflows"
+          value={String(savedCount)}
+          hint="Pinned or saved flows"
+          tone="good"
+        />
+        <MetricCard
+          label="Source"
+          value={fromApi ? 'API' : 'Local'}
+          hint="Latest memory scan"
+          tone={fromApi ? 'good' : 'warning'}
+        />
+        <MetricCard
+          label="Status"
+          value={loading ? 'Loading' : 'Ready'}
+          hint="Dashboard state"
+          tone="neutral"
+        />
       </div>
 
       <div className="memory-page__panels">

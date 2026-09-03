@@ -66,7 +66,11 @@ function formatClock(iso?: string | null): string {
   return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 }
 
-function minutesBetween(start?: string | null, end?: string | null, now = Date.now()): number | null {
+function minutesBetween(
+  start?: string | null,
+  end?: string | null,
+  now = Date.now(),
+): number | null {
   if (!start) return null;
   const startMs = new Date(start).getTime();
   const endMs = end ? new Date(end).getTime() : now;
@@ -79,17 +83,18 @@ function roomLabel(rooms: RoomLike[], roomId?: string | null): string | null {
   return rooms.find((room) => room.id === roomId)?.name || roomId;
 }
 
-function staffLabel(staff: Staff[], staffId?: string | null, fallback?: string | null): string | null {
+function staffLabel(
+  staff: Staff[],
+  staffId?: string | null,
+  fallback?: string | null,
+): string | null {
   if (fallback?.trim()) return fallback.trim();
   if (!staffId) return null;
   const member = staff.find((entry) => entry.id === staffId);
   return member?.displayName || member?.name || staffId;
 }
 
-function deriveTriageHandoffStart(
-  arrival: EMSArrival,
-  patient?: Patient | null,
-): string | null {
+function deriveTriageHandoffStart(arrival: EMSArrival, patient?: Patient | null): string | null {
   if (arrival.handoffStartedAt) return arrival.handoffStartedAt;
   if (patient?.firstContactAt) return patient.firstContactAt;
   if (patient?.triageTime) return patient.triageTime;
@@ -110,7 +115,10 @@ function deriveReceivingArea(
   patient: Patient | undefined,
   rooms: RoomLike[],
 ): string | null {
-  const checklist = resolveAmbulanceHandoffChecklist(arrival, { patient, rooms: rooms as unknown as any[] });
+  const checklist = resolveAmbulanceHandoffChecklist(arrival, {
+    patient,
+    rooms: rooms as unknown as any[],
+  });
   if (checklist.patientDestination !== 'pending') {
     return formatAmbulanceHandoffDestination(checklist);
   }
@@ -175,7 +183,7 @@ export function buildEmsOffloadTrackerRow(
     : undefined;
   const phase = resolvePhase(arrival, now);
   const dispatchEtaMinutes =
-    phase === 'inbound' ? minutesRemaining(arrival, now) : arrival.eta ?? null;
+    phase === 'inbound' ? minutesRemaining(arrival, now) : (arrival.eta ?? null);
   const dispatchEtaLabel =
     phase === 'inbound'
       ? formatEta(dispatchEtaMinutes ?? 0, arrival.status)
@@ -185,11 +193,7 @@ export function buildEmsOffloadTrackerRow(
   const ambulanceArrivalTime = arrival.arrivedAt || null;
   const triageHandoffStart = deriveTriageHandoffStart(arrival, patient);
   const handoffCompleteTime = arrival.handoffCompletedAt || null;
-  const offloadDelayMinutes = minutesBetween(
-    ambulanceArrivalTime,
-    handoffCompleteTime,
-    now,
-  );
+  const offloadDelayMinutes = minutesBetween(ambulanceArrivalTime, handoffCompleteTime, now);
   const targetMinutes = options.offloadTargetMinutes ?? 15;
   const tone = resolveOffloadTone(offloadDelayMinutes, targetMinutes, phase, dispatchEtaMinutes);
 
@@ -210,7 +214,11 @@ export function buildEmsOffloadTrackerRow(
     handoffCompleteLabel: formatClock(handoffCompleteTime),
     offloadDelayMinutes,
     offloadDelayLabel:
-      offloadDelayMinutes !== null ? `${offloadDelayMinutes}m` : phase === 'inbound' ? '—' : 'Pending',
+      offloadDelayMinutes !== null
+        ? `${offloadDelayMinutes}m`
+        : phase === 'inbound'
+          ? '—'
+          : 'Pending',
     assignedReceivingArea: deriveReceivingArea(arrival, patient, rooms),
     handoffOwner: deriveHandoffOwner(arrival, patient, staff),
     tone,
@@ -231,7 +239,9 @@ export function buildEmsOffloadTrackerSummary(
   const now = options.now ?? Date.now();
   const targetMinutes = options.offloadTargetMinutes ?? 15;
   const rows = activeArrivals(emsArrivals)
-    .map((arrival) => buildEmsOffloadTrackerRow(arrival, { ...options, now, offloadTargetMinutes: targetMinutes }))
+    .map((arrival) =>
+      buildEmsOffloadTrackerRow(arrival, { ...options, now, offloadTargetMinutes: targetMinutes }),
+    )
     .sort((left, right) => {
       const leftDelay = left.offloadDelayMinutes ?? -1;
       const rightDelay = right.offloadDelayMinutes ?? -1;
@@ -343,7 +353,11 @@ export function normalizeEmsArrivalOffloadPatch(
   const nextStatus = patch.status ?? arrival.status;
   const normalized: Partial<EMSArrival> = { ...patch };
 
-  if ((nextStatus === 'Arrived' || nextStatus === 'Handoff') && !arrival.arrivedAt && !patch.arrivedAt) {
+  if (
+    (nextStatus === 'Arrived' || nextStatus === 'Handoff') &&
+    !arrival.arrivedAt &&
+    !patch.arrivedAt
+  ) {
     normalized.arrivedAt = now;
   }
   if (
@@ -400,7 +414,8 @@ export function mergeEmsArrivalHydration(
       preparedRoomId: local.preparedRoomId ?? arrival.preparedRoomId,
       criticalChecklist: local.criticalChecklist ?? arrival.criticalChecklist,
       handoffSummary: local.handoffSummary ?? arrival.handoffSummary,
-      ambulanceHandoffChecklist: local.ambulanceHandoffChecklist ?? arrival.ambulanceHandoffChecklist,
+      ambulanceHandoffChecklist:
+        local.ambulanceHandoffChecklist ?? arrival.ambulanceHandoffChecklist,
       handoffClose: local.handoffClose ?? arrival.handoffClose,
     };
   });

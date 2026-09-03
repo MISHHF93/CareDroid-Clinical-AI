@@ -95,9 +95,7 @@ function isActivePatient(patient: Patient): boolean {
 
 function isHighRiskPatient(patient: Patient): boolean {
   return (
-    patient.priority === Priority.P1 ||
-    patient.priority === Priority.P2 ||
-    patient.flags.length > 0
+    patient.priority === Priority.P1 || patient.priority === Priority.P2 || patient.flags.length > 0
   );
 }
 
@@ -111,7 +109,9 @@ function eventAfter(patient: Patient, shiftStartMs: number, matcher: RegExp): bo
   return patient.timeline.some((event) => {
     const eventMs = new Date(event.timestamp).getTime();
     if (!Number.isFinite(eventMs) || eventMs < shiftStartMs) return false;
-    return matcher.test(`${event.type || ''} ${event.summary || ''} ${event.toState || event.to || ''}`);
+    return matcher.test(
+      `${event.type || ''} ${event.summary || ''} ${event.toState || event.to || ''}`,
+    );
   });
 }
 
@@ -162,7 +162,8 @@ export function buildHandoffContext({
   const admittedCount = patients.filter(
     (patient) =>
       patient.state === PatientState.Admission &&
-      (isInShift(patient, shiftStartMs) || eventAfter(patient, shiftStartMs, /admission|admitted/i)),
+      (isInShift(patient, shiftStartMs) ||
+        eventAfter(patient, shiftStartMs, /admission|admitted/i)),
   ).length;
 
   return {
@@ -184,7 +185,10 @@ export function buildHandoffContext({
       // high-risk patients, never the actual nursing narrative behind them -- a real oncoming
       // nurse needs the "why", not just the "what." Same recent-notes-only shape already trusted
       // for AI context in patientJourneyAiDecisionService.ts (last 3, text-or-body).
-      recentNotes: (patient.notes ?? []).slice(-3).map((note) => note.text || note.body).filter(Boolean),
+      recentNotes: (patient.notes ?? [])
+        .slice(-3)
+        .map((note) => note.text || note.body)
+        .filter(Boolean),
     })),
     pendingActions: [
       ...referrals.filter((referral) => referral.status === 'Sent'),
@@ -419,7 +423,8 @@ export default function HandoffBriefGenerator() {
         now: new Date(),
       });
       const response = await invokeUnifiedAiHandoffBrief(buildHandoffBriefRequest(context));
-      if (!response.ok) throw new Error(`Handoff brief request failed with status ${response.status}`);
+      if (!response.ok)
+        throw new Error(`Handoff brief request failed with status ${response.status}`);
       setBriefText(responseText(response));
     } catch {
       setBriefError('Unable to generate handoff brief. Check the connection and try again.');
@@ -450,7 +455,11 @@ export default function HandoffBriefGenerator() {
   };
 
   return (
-    <section id="shift-handoff-generator" className="handoff-brief-generator" aria-label="Generate handoff brief">
+    <section
+      id="shift-handoff-generator"
+      className="handoff-brief-generator"
+      aria-label="Generate handoff brief"
+    >
       <style>{COMPONENT_STYLES}</style>
       <div className="handoff-brief-generator__header">
         <div>

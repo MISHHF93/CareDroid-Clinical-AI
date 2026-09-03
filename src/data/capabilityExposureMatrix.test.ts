@@ -67,15 +67,17 @@ describe('capabilityExposureMatrix', () => {
 
     expect(endpointRows).toHaveLength(BACKEND_HTTP_ROUTES.length);
     expect(endpointRows.map((row) => row.commandOrApiRoute)).toContain('POST /api/chat/message');
-    expect(endpointRows.map((row) => row.commandOrApiRoute)).toContain('POST /api/tools/:id/execute');
+    expect(endpointRows.map((row) => row.commandOrApiRoute)).toContain(
+      'POST /api/tools/:id/execute',
+    );
   });
 
   it('prioritizes corrected exposure fixes instead of already-shipped outreach', () => {
     const profile = capabilityExposureMatrix.find(
-      (row) => row.capability === 'Profile read and update'
+      (row) => row.capability === 'Profile read and update',
     );
     const outreach = capabilityExposureMatrix.find(
-      (row) => row.capability === 'Guided outreach and follow-up planning'
+      (row) => row.capability === 'Guided outreach and follow-up planning',
     );
     expect(profile).toMatchObject({
       commandOrApiRoute: 'GET/PATCH /api/users/profile',
@@ -83,7 +85,9 @@ describe('capabilityExposureMatrix', () => {
       frontendRouteStatus: 'protected',
       surfaceType: 'visible-ui',
     });
-    expect(profile.currentFrontendSurface).toMatch(/Profile\.jsx and Settings render backend-backed profile/i);
+    expect(profile.currentFrontendSurface).toMatch(
+      /Profile\.jsx and Settings render backend-backed profile/i,
+    );
     expect(outreach).toMatchObject({
       commandOrApiRoute: 'POST /api/chat/message',
       exposureStatus: 'exposed',
@@ -99,10 +103,10 @@ describe('capabilityExposureMatrix', () => {
       capability: 'Classify and contain public/unsupported visible surfaces',
     });
     expect(recommendedCapabilityBuildOrder.map((row) => row.capability)).not.toContain(
-      'Guided outreach and follow-up planning'
+      'Guided outreach and follow-up planning',
     );
     expect(recommendedCapabilityBuildOrder.map((row) => row.capability)).not.toContain(
-      'Profile read and update'
+      'Profile read and update',
     );
     expect(recommendedCapabilityBuildOrder.map((row) => row.capability)).toEqual([
       'Classify and contain public/unsupported visible surfaces',
@@ -117,7 +121,7 @@ describe('capabilityExposureMatrix', () => {
 
   it('uses exact registered executor route patterns instead of concrete shorthand only', () => {
     const executors = capabilityExposureMatrix.find(
-      (row) => row.capability === 'Registered clinical tool executors'
+      (row) => row.capability === 'Registered clinical tool executors',
     );
 
     expect(executors).toMatchObject({
@@ -140,7 +144,9 @@ describe('capabilityExposureMatrix', () => {
       exposureStatus: 'unsafe/unclear',
       riskLevel: 'high',
     });
-    expect(rowsByCapability.get('Fleet operations command, maintenance, and route planning')).toMatchObject({
+    expect(
+      rowsByCapability.get('Fleet operations command, maintenance, and route planning'),
+    ).toMatchObject({
       frontendRouteStatus: 'protected',
       surfaceType: 'frontend-only',
       exposureStatus: 'frontend-only',
@@ -173,11 +179,13 @@ describe('capabilityExposureMatrix', () => {
         'Team invite/edit/delete',
         'Fleet dispatch mutation',
         'Backend cost authority',
-      ])
+      ]),
     );
 
     for (const item of unsupportedWorkflowDecisions) {
-      expect(item.reason).toMatch(/No backend|not API-backed|no general connector|no .*route|no .*controller|mock or client-only|no durable Nest cost API|requires configured credentials/i);
+      expect(item.reason).toMatch(
+        /No backend|not API-backed|no general connector|no .*route|no .*controller|mock or client-only|no durable Nest cost API|requires configured credentials/i,
+      );
     }
   });
 
@@ -188,40 +196,48 @@ describe('capabilityExposureMatrix', () => {
       const row = rowsByCapability.get(guard.capability);
       expect(row, `missing capability row for ${guard.workflow}`).toBeTruthy();
       expect(row.exposureStatus, `${guard.workflow} must not be fully exposed`).not.toBe('exposed');
-      expect(row.recommendedFrontendMechanism).toMatch(/intentionally unavailable|coming later|do not build|defer|preferences only|auth integrations only/i);
+      expect(row.recommendedFrontendMechanism).toMatch(
+        /intentionally unavailable|coming later|do not build|defer|preferences only|auth integrations only/i,
+      );
 
       const matchingBackendRoutes = BACKEND_HTTP_ROUTES.filter((route) =>
-        guard.blockedApiPattern.test(route.path)
+        guard.blockedApiPattern.test(route.path),
       );
       expect(
         matchingBackendRoutes,
-        `${guard.workflow} gained backend routes; update the guard with real model/execution validation before exposing UI.`
+        `${guard.workflow} gained backend routes; update the guard with real model/execution validation before exposing UI.`,
       ).toEqual([]);
 
       const matchingFrontendCalls = FRONTEND_API_CALLS.filter((call) =>
-        guard.blockedApiPattern.test(call.path)
+        guard.blockedApiPattern.test(call.path),
       );
       const unexpectedCalls = matchingFrontendCalls.filter(
-        (call) => !guard.allowedFrontendIds.includes(call.id)
+        (call) => !guard.allowedFrontendIds.includes(call.id),
       );
       expect(
         unexpectedCalls,
-        `${guard.workflow} added frontend API calls without a real backend workflow.`
+        `${guard.workflow} added frontend API calls without a real backend workflow.`,
       ).toEqual([]);
 
       for (const allowed of matchingFrontendCalls.filter((call) =>
-        guard.allowedFrontendIds.includes(call.id)
+        guard.allowedFrontendIds.includes(call.id),
       )) {
         expect(allowed.capability, `${allowed.id} must be capability-gated`).toBeTruthy();
-        if (!allowed.capability) throw new Error(`expected capability to be defined for ${allowed.id}`);
-        expect(BACKEND_API_CAPABILITIES[allowed.capability], `${allowed.id} gate must stay disabled`).toBe(false);
+        if (!allowed.capability)
+          throw new Error(`expected capability to be defined for ${allowed.id}`);
+        expect(
+          BACKEND_API_CAPABILITIES[allowed.capability],
+          `${allowed.id} gate must stay disabled`,
+        ).toBe(false);
         expect(allowed.notes || '').toMatch(/No route|gated off/i);
       }
     }
   });
 
   it('documents unavailable workflows as unavailable, coming later, or preference-only rather than functional', () => {
-    const decisionsByWorkflow = new Map(unsupportedWorkflowDecisions.map((item) => [item.workflow, item]));
+    const decisionsByWorkflow = new Map(
+      unsupportedWorkflowDecisions.map((item) => [item.workflow, item]),
+    );
 
     expect(decisionsByWorkflow.get('Pipeline updates')).toMatchObject({
       decision: 'Do not expose',
@@ -229,19 +245,25 @@ describe('capabilityExposureMatrix', () => {
     expect(decisionsByWorkflow.get('Publishing/content scheduling')).toMatchObject({
       decision: 'Do not expose',
     });
-    expect(decisionsByWorkflow.get('Connector management')?.decision).toMatch(/FHIR\/HL7 integration/i);
+    expect(decisionsByWorkflow.get('Connector management')?.decision).toMatch(
+      /FHIR\/HL7 integration/i,
+    );
     expect(decisionsByWorkflow.get('Reminder creation')?.decision).toMatch(/preferences only/i);
 
     const matrixCopy = capabilityExposureMatrix
       .filter((row) => FAKE_WORKFLOW_GUARDS.some((guard) => guard.capability === row.capability))
-      .map((row) => [
-        row.currentFrontendSurface,
-        row.userFacingProblem,
-        row.recommendedFrontendMechanism,
-      ].join(' '));
+      .map((row) =>
+        [row.currentFrontendSurface, row.userFacingProblem, row.recommendedFrontendMechanism].join(
+          ' ',
+        ),
+      );
 
-    expect(matrixCopy.join(' ')).toMatch(/intentionally unavailable|coming later|preferences only|auth integrations only/i);
-    expect(matrixCopy.join(' ')).not.toMatch(/ready to use|fully functional|create scheduled reminder|publish now|connect any/i);
+    expect(matrixCopy.join(' ')).toMatch(
+      /intentionally unavailable|coming later|preferences only|auth integrations only/i,
+    );
+    expect(matrixCopy.join(' ')).not.toMatch(
+      /ready to use|fully functional|create scheduled reminder|publish now|connect any/i,
+    );
   });
 
   it('does not track a native Android duplicate contract', () => {

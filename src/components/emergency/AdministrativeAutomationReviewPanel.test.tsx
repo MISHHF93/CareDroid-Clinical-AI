@@ -120,8 +120,9 @@ const overriddenTask: AdministrativeAutomationTask = {
 };
 
 vi.mock('../../store/emergencyStore', () => ({
-  useEmergencyStore: (selector: (state: { administrativeAutomationQueue: AdministrativeAutomationTask[] }) => unknown) =>
-    selector({ administrativeAutomationQueue: [aiTask, overriddenTask] }),
+  useEmergencyStore: (
+    selector: (state: { administrativeAutomationQueue: AdministrativeAutomationTask[] }) => unknown,
+  ) => selector({ administrativeAutomationQueue: [aiTask, overriddenTask] }),
 }));
 
 vi.mock('../../contexts/UserContext', () => ({

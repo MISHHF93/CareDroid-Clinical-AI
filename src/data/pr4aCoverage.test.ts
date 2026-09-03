@@ -47,9 +47,9 @@ const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
 const patternsSource = readFileSync(
   join(
     __dirname,
-    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts'
+    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts',
   ),
-  'utf8'
+  'utf8',
 );
 
 function countPatternOccurrences(needle) {
@@ -60,17 +60,14 @@ describe('PR4A coverage — registry inclusion', () => {
   it('freezes the four PR4A Tier-A registry ids', () => {
     expect(Object.isFrozen(PR4A_TIER_A_CALCULATOR_REGISTRY_IDS)).toBe(true);
     expect(Object.isFrozen(PR4A_CALCULATOR_REGISTRY_IDS)).toBe(true);
-    expect([...PR4A_TOOL_IDS]).toEqual([
-      'ascvd-risk',
-      'ckd-staging',
-      'stop-bang',
-      'audit-c',
-    ]);
+    expect([...PR4A_TOOL_IDS]).toEqual(['ascvd-risk', 'ckd-staging', 'stop-bang', 'audit-c']);
     expect([...PR4A_TIER_A_CALCULATOR_REGISTRY_IDS]).toEqual([...PR4A_CALCULATOR_REGISTRY_IDS]);
   });
 
   it('includes each PR4A tool exactly once in toolRegistry with calculator panel', () => {
-    const pr4aRows = toolRegistry.filter((t) => (PR4A_TOOL_IDS as readonly string[]).includes(t.id));
+    const pr4aRows = toolRegistry.filter((t) =>
+      (PR4A_TOOL_IDS as readonly string[]).includes(t.id),
+    );
     expect(pr4aRows).toHaveLength(PR4A_TOOL_IDS.length);
     for (const id of PR4A_TOOL_IDS) {
       const reg = toolRegistryById[id];
@@ -119,7 +116,10 @@ describe('PR4A coverage — catalog inclusion', () => {
     const rows = getMedicalToolsCatalogRows();
     for (const [id, query] of PR4A_CATALOG_SEARCH_QUERIES) {
       const hits = catalogRowsMatchingQuery(rows, query);
-      expect(hits.some((r) => r.primaryId === id), `search "${query}" → ${id}`).toBe(true);
+      expect(
+        hits.some((r) => r.primaryId === id),
+        `search "${query}" → ${id}`,
+      ).toBe(true);
     }
   });
 
@@ -127,7 +127,7 @@ describe('PR4A coverage — catalog inclusion', () => {
     const rows = getMedicalToolsCatalogRows();
     const summary = getMedicalCatalogSummary();
     const pr4aPrimaries = new Set(
-      rows.filter((r) => PR4A_TOOL_IDS.includes(r.primaryId)).map((r) => r.primaryId)
+      rows.filter((r) => PR4A_TOOL_IDS.includes(r.primaryId)).map((r) => r.primaryId),
     );
     expect(pr4aPrimaries.size).toBe(PR4A_TOOL_IDS.length);
     expect(summary.total).toBeGreaterThanOrEqual(clinicalIntentTools.length);
@@ -140,7 +140,9 @@ describe('PR4A coverage — discovery inclusion', () => {
     for (const id of PR4A_TOOL_IDS) {
       const hits = merged.filter((r) => r.id === id);
       expect(hits.length, `discovery duplicates for ${id}`).toBe(1);
-      const blob = [hits[0].source, ...(hits[0].sources || []), hits[0].notes].filter(Boolean).join(' ');
+      const blob = [hits[0].source, ...(hits[0].sources || []), hits[0].notes]
+        .filter(Boolean)
+        .join(' ');
       expect(blob).toMatch(/toolRegistry|clinicalIntentToolCatalog|tool\.patterns|NLU/i);
     }
   });

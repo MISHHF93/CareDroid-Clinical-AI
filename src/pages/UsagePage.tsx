@@ -53,7 +53,7 @@ export default function UsagePage() {
         }
         setMetering(meteringResult.ok ? meteringResult.data : null);
         setIsLoading(false);
-      }
+      },
     );
     return () => {
       cancelled = true;
@@ -108,7 +108,7 @@ export default function UsagePage() {
                   {meter.limit === null
                     ? `Unlimited ${meter.unit}`
                     : `${formatNumber(meter.remaining)} ${meter.unit} remaining of ${formatNumber(
-                        meter.limit
+                        meter.limit,
                       )}`}
                 </p>
               </Card>

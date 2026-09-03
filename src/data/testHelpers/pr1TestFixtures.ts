@@ -27,7 +27,7 @@ export const QSOFA_SCORE_PERMUTATIONS = Object.freeze(
       }
     }
     return rows;
-  })()
+  })(),
 );
 
 /** qSOFA interpretation severity by aggregate score */
@@ -44,7 +44,7 @@ export const HAS_BLED_SEVERITY_BY_SCORE = Object.freeze(
     score,
     severity: score >= 3 ? 'critical' : 'normal',
     elevated: score >= 3,
-  }))
+  })),
 );
 
 /** Child-Pugh class and severity for each valid total 5–15 */
@@ -58,7 +58,7 @@ export const CHILD_PUGH_CLASS_BY_TOTAL = Object.freeze(
       return { total, childPughClass: 'B', severity: 'warning' };
     }
     return { total, childPughClass: 'C', severity: 'critical' };
-  })
+  }),
 );
 
 /** Class boundary totals (inclusive ranges) */

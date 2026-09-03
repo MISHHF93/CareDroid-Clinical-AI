@@ -78,11 +78,7 @@ describe('waitingRoomDeteriorationWatch', () => {
     expect(snapshot?.advisoryOnly).toBe(true);
     expect(snapshot?.level).toBe('urgent-review');
     expect(snapshot?.factors.map((factor) => factor.id)).toEqual(
-      expect.arrayContaining([
-        'overdue-vitals',
-        'high-risk-complaint',
-        'ems-intake-observation',
-      ]),
+      expect.arrayContaining(['overdue-vitals', 'high-risk-complaint', 'ems-intake-observation']),
     );
   });
 
@@ -122,7 +118,9 @@ describe('waitingRoomDeteriorationWatch', () => {
           highRiskComplaintFlags: [],
           flags: [],
           complaintCategory: 'General',
-          reassessmentReminders: [{ id: 'r-ok', status: 'pending', dueAt: '2026-06-20T10:45:00.000Z' }],
+          reassessmentReminders: [
+            { id: 'r-ok', status: 'pending', dueAt: '2026-06-20T10:45:00.000Z' },
+          ],
         }),
       ],
       { now: STABLE_NOW },

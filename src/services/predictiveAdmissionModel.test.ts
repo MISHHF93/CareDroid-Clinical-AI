@@ -39,12 +39,20 @@ describe('predictiveAdmissionModel', () => {
   it('flags high admission probability patients', () => {
     const assessment = assessPatientAdmissionProbability({ patient: patient() });
     expect(assessment.admitScore).toBeGreaterThanOrEqual(5);
-    expect(assessment.thresholdBreached).toBe(assessment.probabilityPercent >= ADMISSION_PROBABILITY_ALERT_THRESHOLD);
+    expect(assessment.thresholdBreached).toBe(
+      assessment.probabilityPercent >= ADMISSION_PROBABILITY_ALERT_THRESHOLD,
+    );
   });
 
   it('returns elevated patients sorted by probability', () => {
     const alerts = scanPatientsForAdmissionAlerts([
-      patient({ id: 'low', priority: Priority.P4, chiefComplaint: 'Sore throat', age: 20, flags: [] }),
+      patient({
+        id: 'low',
+        priority: Priority.P4,
+        chiefComplaint: 'Sore throat',
+        age: 20,
+        flags: [],
+      }),
       patient({ id: 'high', state: PatientState.Admission, flags: [PatientFlag.PendingAdmission] }),
     ]);
     expect(alerts[0]?.patientId).toBe('high');

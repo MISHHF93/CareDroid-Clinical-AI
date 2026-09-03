@@ -96,7 +96,15 @@ export function useOperationalIntelligenceCore(options: UseOperationalIntelligen
         workflowLogs,
         backendSnapshot,
       }),
-    [backendSnapshot, centralNode.snapshot, emergencySettings.tenantName, oiSettings, patients, referrals, workflowLogs],
+    [
+      backendSnapshot,
+      centralNode.snapshot,
+      emergencySettings.tenantName,
+      oiSettings,
+      patients,
+      referrals,
+      workflowLogs,
+    ],
   );
 
   const refresh = useCallback(async () => {

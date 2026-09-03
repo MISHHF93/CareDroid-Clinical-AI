@@ -48,11 +48,7 @@ describe('commandPaletteHighValueModel', () => {
   });
 
   it('selects high-value commands in canonical order', () => {
-    const commands = [
-      command('open-ems'),
-      command('create-patient'),
-      command('start-intake'),
-    ];
+    const commands = [command('open-ems'), command('create-patient'), command('start-intake')];
     expect(selectHighValuePaletteCommands(commands).map((entry) => entry.id)).toEqual([
       'create-patient',
       'start-intake',

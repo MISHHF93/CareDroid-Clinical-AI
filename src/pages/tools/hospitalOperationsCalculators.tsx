@@ -10,7 +10,15 @@ import {
   calculateTurnaroundTime,
 } from '../../utils/hospitalOperationsCalculators';
 
-function CalculatorShell({ slug, title, result, emptyText, children, onResultChange, resultPayload }) {
+function CalculatorShell({
+  slug,
+  title,
+  result,
+  emptyText,
+  children,
+  onResultChange,
+  resultPayload,
+}) {
   const icon = getCalculatorSubIcon(slug);
   const resultsRef = useRef<any>(null);
 
@@ -30,8 +38,9 @@ function CalculatorShell({ slug, title, result, emptyText, children, onResultCha
         <CalcPanelTitle icon={icon}>{title}</CalcPanelTitle>
         <div className="calc-timi-disclaimer calc-has-bled-disclaimer" role="note">
           <p className="calc-ds-lead">
-            <strong>Operations support only.</strong> Human approval is required for resource moves, staffing changes,
-            dispatch actions, admissions, transfers, and incident command decisions.
+            <strong>Operations support only.</strong> Human approval is required for resource moves,
+            staffing changes, dispatch actions, admissions, transfers, and incident command
+            decisions.
           </p>
           <p className="calc-disclaimer-detail">{HOSPITAL_OPERATIONS_CALCULATOR_DISCLAIMER}</p>
         </div>
@@ -65,7 +74,8 @@ function CalculatorShell({ slug, title, result, emptyText, children, onResultCha
               ))}
             </section>
             <p className="calc-result-safety-footer" role="note">
-              Demo/planning output only. Confirm all values against source systems before operational action.
+              Demo/planning output only. Confirm all values against source systems before
+              operational action.
             </p>
           </>
         ) : (
@@ -81,7 +91,16 @@ function CalculatorShell({ slug, title, result, emptyText, children, onResultCha
   );
 }
 
-function NumberField({ id, label, value, onChange, min = '0', max = undefined as any, step = '1', required = true }) {
+function NumberField({
+  id,
+  label,
+  value,
+  onChange,
+  min = '0',
+  max = undefined as any,
+  step = '1',
+  required = true,
+}) {
   return (
     <div className="calc-form-group">
       <label htmlFor={id} className="calc-label">
@@ -122,7 +141,7 @@ export function BedOccupancyCalculator({ onResultChange }) {
               `Usable bed denominator: ${next.usableBeds} of ${next.totalBeds} total beds.`,
             ],
           }
-        : null
+        : null,
     );
   };
 
@@ -133,17 +152,41 @@ export function BedOccupancyCalculator({ onResultChange }) {
       result={result}
       emptyText="Enter occupied, total, and blocked beds."
       onResultChange={onResultChange}
-      resultPayload={(r) => ({ occupancyPercent: r.occupancyPercent, availableBeds: r.availableBeds, severity: r.severity })}
+      resultPayload={(r) => ({
+        occupancyPercent: r.occupancyPercent,
+        availableBeds: r.availableBeds,
+        severity: r.severity,
+      })}
     >
       <form className="calc-pr1-form" onSubmit={calculate}>
         <div className="calc-form-grid">
-          <NumberField id="bed-occupied" label="Occupied beds" value={occupiedBeds} onChange={setOccupiedBeds} />
-          <NumberField id="bed-total" label="Total beds" value={totalBeds} onChange={setTotalBeds} min="1" />
-          <NumberField id="bed-blocked" label="Blocked beds" value={blockedBeds} onChange={setBlockedBeds} />
+          <NumberField
+            id="bed-occupied"
+            label="Occupied beds"
+            value={occupiedBeds}
+            onChange={setOccupiedBeds}
+          />
+          <NumberField
+            id="bed-total"
+            label="Total beds"
+            value={totalBeds}
+            onChange={setTotalBeds}
+            min="1"
+          />
+          <NumberField
+            id="bed-blocked"
+            label="Blocked beds"
+            value={blockedBeds}
+            onChange={setBlockedBeds}
+          />
         </div>
         <div className="calc-actions">
-          <button type="submit" className="calc-calculate-btn">Calculate Occupancy</button>
-          <button type="button" className="calc-reset-btn" onClick={() => setResult(null)}>Clear result</button>
+          <button type="submit" className="calc-calculate-btn">
+            Calculate Occupancy
+          </button>
+          <button type="button" className="calc-reset-btn" onClick={() => setResult(null)}>
+            Clear result
+          </button>
         </div>
       </form>
     </CalculatorShell>
@@ -170,7 +213,7 @@ export function StaffingRatioCalculator({ onResultChange }) {
               `${next.staffDelta >= 0 ? 'Surplus vs target' : 'Gap vs target'}: ${Math.abs(next.staffDelta)} staff member(s).`,
             ],
           }
-        : null
+        : null,
     );
   };
 
@@ -181,17 +224,44 @@ export function StaffingRatioCalculator({ onResultChange }) {
       result={result}
       emptyText="Enter census, available staff, and target ratio."
       onResultChange={onResultChange}
-      resultPayload={(r) => ({ patientsPerStaff: r.patientsPerStaff, targetStaff: r.targetStaff, staffDelta: r.staffDelta, severity: r.severity })}
+      resultPayload={(r) => ({
+        patientsPerStaff: r.patientsPerStaff,
+        targetStaff: r.targetStaff,
+        staffDelta: r.staffDelta,
+        severity: r.severity,
+      })}
     >
       <form className="calc-pr1-form" onSubmit={calculate}>
         <div className="calc-form-grid">
-          <NumberField id="staff-patients" label="Patient count" value={patientCount} onChange={setPatientCount} />
-          <NumberField id="staff-count" label="Available staff" value={staffCount} onChange={setStaffCount} min="1" />
-          <NumberField id="staff-target" label="Target patients per staff" value={targetPatientsPerStaff} onChange={setTargetPatientsPerStaff} min="0.1" step="0.1" />
+          <NumberField
+            id="staff-patients"
+            label="Patient count"
+            value={patientCount}
+            onChange={setPatientCount}
+          />
+          <NumberField
+            id="staff-count"
+            label="Available staff"
+            value={staffCount}
+            onChange={setStaffCount}
+            min="1"
+          />
+          <NumberField
+            id="staff-target"
+            label="Target patients per staff"
+            value={targetPatientsPerStaff}
+            onChange={setTargetPatientsPerStaff}
+            min="0.1"
+            step="0.1"
+          />
         </div>
         <div className="calc-actions">
-          <button type="submit" className="calc-calculate-btn">Calculate Staffing Ratio</button>
-          <button type="button" className="calc-reset-btn" onClick={() => setResult(null)}>Clear result</button>
+          <button type="submit" className="calc-calculate-btn">
+            Calculate Staffing Ratio
+          </button>
+          <button type="button" className="calc-reset-btn" onClick={() => setResult(null)}>
+            Clear result
+          </button>
         </div>
       </form>
     </CalculatorShell>
@@ -226,7 +296,7 @@ export function TurnaroundTimeCalculator({ onResultChange }) {
               `Variance: ${next.varianceMinutes > 0 ? '+' : ''}${next.varianceMinutes} min.`,
             ],
           }
-        : null
+        : null,
     );
   };
 
@@ -237,19 +307,58 @@ export function TurnaroundTimeCalculator({ onResultChange }) {
       result={result}
       emptyText="Enter workflow segments and a target time."
       onResultChange={onResultChange}
-      resultPayload={(r) => ({ totalMinutes: r.totalMinutes, varianceMinutes: r.varianceMinutes, severity: r.severity })}
+      resultPayload={(r) => ({
+        totalMinutes: r.totalMinutes,
+        varianceMinutes: r.varianceMinutes,
+        severity: r.severity,
+      })}
     >
       <form className="calc-pr1-form" onSubmit={calculate}>
         <div className="calc-form-grid">
-          <NumberField id="tat-assign" label="Request to assign (min)" value={requestToAssignMinutes} onChange={setRequestToAssignMinutes} step="0.5" />
-          <NumberField id="tat-travel" label="Travel / locate (min)" value={travelMinutes} onChange={setTravelMinutes} step="0.5" />
-          <NumberField id="tat-service" label="Service / turnover (min)" value={serviceMinutes} onChange={setServiceMinutes} step="0.5" />
-          <NumberField id="tat-cleanup" label="Cleanup / ready time (min)" value={cleanupMinutes} onChange={setCleanupMinutes} step="0.5" />
-          <NumberField id="tat-target" label="Target (min)" value={targetMinutes} onChange={setTargetMinutes} min="1" step="0.5" />
+          <NumberField
+            id="tat-assign"
+            label="Request to assign (min)"
+            value={requestToAssignMinutes}
+            onChange={setRequestToAssignMinutes}
+            step="0.5"
+          />
+          <NumberField
+            id="tat-travel"
+            label="Travel / locate (min)"
+            value={travelMinutes}
+            onChange={setTravelMinutes}
+            step="0.5"
+          />
+          <NumberField
+            id="tat-service"
+            label="Service / turnover (min)"
+            value={serviceMinutes}
+            onChange={setServiceMinutes}
+            step="0.5"
+          />
+          <NumberField
+            id="tat-cleanup"
+            label="Cleanup / ready time (min)"
+            value={cleanupMinutes}
+            onChange={setCleanupMinutes}
+            step="0.5"
+          />
+          <NumberField
+            id="tat-target"
+            label="Target (min)"
+            value={targetMinutes}
+            onChange={setTargetMinutes}
+            min="1"
+            step="0.5"
+          />
         </div>
         <div className="calc-actions">
-          <button type="submit" className="calc-calculate-btn">Calculate Turnaround</button>
-          <button type="button" className="calc-reset-btn" onClick={() => setResult(null)}>Clear result</button>
+          <button type="submit" className="calc-calculate-btn">
+            Calculate Turnaround
+          </button>
+          <button type="button" className="calc-reset-btn" onClick={() => setResult(null)}>
+            Clear result
+          </button>
         </div>
       </form>
     </CalculatorShell>
@@ -282,7 +391,7 @@ export function ResourceUtilizationIndexCalculator({ onResultChange }) {
               `Included signals: ${next.inputs.map((row) => row.label).join(', ')}.`,
             ],
           }
-        : null
+        : null,
     );
   };
 
@@ -297,14 +406,42 @@ export function ResourceUtilizationIndexCalculator({ onResultChange }) {
     >
       <form className="calc-pr1-form" onSubmit={calculate}>
         <div className="calc-form-grid">
-          <NumberField id="rui-bed" label="Bed utilization (%)" value={bedUtilizationPercent} onChange={setBedUtilizationPercent} max="150" />
-          <NumberField id="rui-staff" label="Staff utilization (%)" value={staffUtilizationPercent} onChange={setStaffUtilizationPercent} max="150" />
-          <NumberField id="rui-device" label="Device utilization (%)" value={deviceUtilizationPercent} onChange={setDeviceUtilizationPercent} max="150" />
-          <NumberField id="rui-fleet" label="Fleet utilization (%)" value={fleetUtilizationPercent} onChange={setFleetUtilizationPercent} max="150" />
+          <NumberField
+            id="rui-bed"
+            label="Bed utilization (%)"
+            value={bedUtilizationPercent}
+            onChange={setBedUtilizationPercent}
+            max="150"
+          />
+          <NumberField
+            id="rui-staff"
+            label="Staff utilization (%)"
+            value={staffUtilizationPercent}
+            onChange={setStaffUtilizationPercent}
+            max="150"
+          />
+          <NumberField
+            id="rui-device"
+            label="Device utilization (%)"
+            value={deviceUtilizationPercent}
+            onChange={setDeviceUtilizationPercent}
+            max="150"
+          />
+          <NumberField
+            id="rui-fleet"
+            label="Fleet utilization (%)"
+            value={fleetUtilizationPercent}
+            onChange={setFleetUtilizationPercent}
+            max="150"
+          />
         </div>
         <div className="calc-actions">
-          <button type="submit" className="calc-calculate-btn">Calculate Utilization Index</button>
-          <button type="button" className="calc-reset-btn" onClick={() => setResult(null)}>Clear result</button>
+          <button type="submit" className="calc-calculate-btn">
+            Calculate Utilization Index
+          </button>
+          <button type="button" className="calc-reset-btn" onClick={() => setResult(null)}>
+            Clear result
+          </button>
         </div>
       </form>
     </CalculatorShell>

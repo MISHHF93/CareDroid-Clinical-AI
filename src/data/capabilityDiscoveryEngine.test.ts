@@ -49,11 +49,13 @@ describe('capabilityDiscoveryEngine', () => {
       recentToolIds,
     });
     const underused = discovery.sections.find(
-      (section) => section.id === DISCOVERY_SECTION_IDS.UNDERUSED_TOOLS
+      (section) => section.id === DISCOVERY_SECTION_IDS.UNDERUSED_TOOLS,
     );
     if (!underused) throw new Error('expected underused section to be defined');
 
-    expect(underused.items.map((item) => item.id)).not.toEqual(expect.arrayContaining(recentToolIds));
+    expect(underused.items.map((item) => item.id)).not.toEqual(
+      expect.arrayContaining(recentToolIds),
+    );
   });
 
   it('creates Did you know assistant prompts from discovery data', () => {

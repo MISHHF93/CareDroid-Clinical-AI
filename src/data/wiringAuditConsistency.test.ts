@@ -50,18 +50,18 @@ const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
 const patternsSource = readFileSync(
   join(
     __dirname,
-    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts'
+    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts',
   ),
-  'utf8'
+  'utf8',
 );
 const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.tsx'), 'utf8');
 const mentalHealthSource = readFileSync(
   join(__dirname, '../pages/tools/mentalHealthCalculators.tsx'),
-  'utf8'
+  'utf8',
 );
 const lazySpecialtyCalculatorsSource = readFileSync(
   join(__dirname, '../pages/tools/lazySpecialtyCalculators.tsx'),
-  'utf8'
+  'utf8',
 );
 const _hubIdx = appSource.indexOf("path: '/tools/calculators', element:");
 
@@ -107,9 +107,12 @@ describe('Wiring audit — registry IDs and route slugs', () => {
     expect(appSource).toContain('<Route path="/tools/*" element={<ToolsRedirect />} />');
   });
 
-  it.each(WIRING_AUDIT_TIER_B_IDS)('%s has no dedicated /tools/calculators/<id> App route', (id) => {
-    expect(appSource).not.toContain(`path: '/tools/calculators/${id}'`);
-  });
+  it.each(WIRING_AUDIT_TIER_B_IDS)(
+    '%s has no dedicated /tools/calculators/<id> App route',
+    (id) => {
+      expect(appSource).not.toContain(`path: '/tools/calculators/${id}'`);
+    },
+  );
 });
 
 describe('Wiring audit — NLU IDs and orchestrator maps', () => {
@@ -142,9 +145,7 @@ describe('Wiring audit — hub-only vs Tier-A form wiring', () => {
     // Lazy-loaded via lazySpecialtyCalculators.tsx rather than imported directly.
     expect(calculatorsSource).toContain("} from './lazySpecialtyCalculators'");
     expect(lazySpecialtyCalculatorsSource).toContain("import('./mentalHealthCalculators')");
-    expect(mentalHealthSource).toMatch(
-      id === 'phq9' ? /Phq9Calculator/ : /Gad7Calculator/
-    );
+    expect(mentalHealthSource).toMatch(id === 'phq9' ? /Phq9Calculator/ : /Gad7Calculator/);
   });
 
   it.each(WIRING_AUDIT_TIER_B_IDS)('%s is hub-only with chat hub group', (id) => {
@@ -181,7 +182,7 @@ describe('Wiring audit — duplicate aliases', () => {
     for (const [alias, canonical] of WIRING_AUDIT_ALL_ALIAS_PAIRS) {
       if (targetByAlias.has(alias) && targetByAlias.get(alias) !== canonical) {
         throw new Error(
-          `Conflicting alias "${alias}": ${targetByAlias.get(alias)} vs ${canonical}`
+          `Conflicting alias "${alias}": ${targetByAlias.get(alias)} vs ${canonical}`,
         );
       }
       targetByAlias.set(alias, canonical);
@@ -228,7 +229,7 @@ describe('Wiring audit — resolveCatalogLaunch', () => {
       expect(fromAlias.chatSeed).toBe(fromCanonical.chatSeed);
       expect(fromAlias.openLabel).toBe(fromCanonical.openLabel);
       expect(resolveNavigationPathForLaunch(fromAlias)).toBe(spec.navigationPath);
-    }
+    },
   );
 
   it('returns empty launch for unknown ids', () => {
@@ -261,7 +262,10 @@ describe('Wiring audit — catalog rows and discovery', () => {
     const rows = getMedicalToolsCatalogRows();
     for (const [canonical, query] of spec.catalogSearchQueries) {
       const hits = catalogRowsMatchingQuery(rows, query);
-      expect(hits.some((r) => r.primaryId === canonical), `search "${query}"`).toBe(true);
+      expect(
+        hits.some((r) => r.primaryId === canonical),
+        `search "${query}"`,
+      ).toBe(true);
     }
   });
 
@@ -269,7 +273,9 @@ describe('Wiring audit — catalog rows and discovery', () => {
     const merged = getAllDiscoveredTools();
     const hits = merged.filter((r) => r.id === id);
     expect(hits).toHaveLength(1);
-    const blob = [hits[0].source, ...(hits[0].sources || []), hits[0].notes].filter(Boolean).join(' ');
+    const blob = [hits[0].source, ...(hits[0].sources || []), hits[0].notes]
+      .filter(Boolean)
+      .join(' ');
     expect(blob).toMatch(/toolRegistry|clinicalIntentToolCatalog|tool\.patterns|NLU/i);
   });
 });
@@ -295,10 +301,10 @@ describe('Wiring audit — Tier-B chat config exports', () => {
     expect(copdGoldChatConfig.toolId).toBe('copd-gold');
     expect(romeIvIbsChatConfig.toolId).toBe('rome-iv-ibs');
     expect(clinicalIntentTools.find((t) => t.toolId === copdGoldChatConfig.toolId)?.chatSeed).toBe(
-      copdGoldChatConfig.chatSeed
+      copdGoldChatConfig.chatSeed,
     );
     expect(clinicalIntentTools.find((t) => t.toolId === romeIvIbsChatConfig.toolId)?.chatSeed).toBe(
-      romeIvIbsChatConfig.chatSeed
+      romeIvIbsChatConfig.chatSeed,
     );
   });
 });

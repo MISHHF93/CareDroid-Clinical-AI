@@ -39,7 +39,9 @@ describe('Psychiatry and Screening Tools Pack', () => {
       expect(calculatorSlug).toBeTruthy();
       expect(builtinSlugs.has(calculatorSlug)).toBe(true);
       expect(smokeSlugs.has(calculatorSlug)).toBe(true);
-      expect(CALCULATOR_ROUTE_DEFS.some((route) => route.calculatorSlug === calculatorSlug)).toBe(true);
+      expect(CALCULATOR_ROUTE_DEFS.some((route) => route.calculatorSlug === calculatorSlug)).toBe(
+        true,
+      );
     }
   });
 

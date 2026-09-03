@@ -52,7 +52,7 @@ const { freshSummary, staleSummary } = vi.hoisted(() => {
       ...baseSummary,
       staleCount: 1,
       entries: baseSummary.entries.map((entry) =>
-        entry.kind === 'protocols' ? { ...entry, stale: true } : entry
+        entry.kind === 'protocols' ? { ...entry, stale: true } : entry,
       ),
     },
   };
@@ -105,11 +105,11 @@ describe('OfflineProvider', () => {
     render(
       <OfflineProvider>
         <div>CareDroid route content</div>
-      </OfflineProvider>
+      </OfflineProvider>,
     );
 
     expect(await screen.findByRole('alert', { name: /offline mode status/i })).toHaveTextContent(
-      /offline mode/i
+      /offline mode/i,
     );
     const catalogs = screen.getByRole('list', { name: /cached offline catalogs/i });
     expect(within(catalogs).getByText(/cached tools/i)).toBeInTheDocument();
@@ -127,7 +127,7 @@ describe('OfflineProvider', () => {
     render(
       <OfflineProvider>
         <div>CareDroid route content</div>
-      </OfflineProvider>
+      </OfflineProvider>,
     );
 
     await screen.findByRole('alert', { name: /offline mode status/i });
@@ -163,7 +163,11 @@ describe('OfflineProvider', () => {
     let refresh: (() => Promise<any>) | null = null;
     render(
       <OfflineProvider>
-        <RefreshProbe onReady={(fn) => { refresh = fn; }} />
+        <RefreshProbe
+          onReady={(fn) => {
+            refresh = fn;
+          }}
+        />
       </OfflineProvider>,
     );
 
@@ -177,7 +181,10 @@ describe('OfflineProvider', () => {
     vi.mocked(offlineService.cacheOfflineCatalogs).mockImplementationOnce(() => deferredA.promise);
     const refreshA = refresh!();
 
-    vi.mocked(offlineService.cacheOfflineCatalogs).mockResolvedValueOnce({ ...freshSummary, totalItems: 999 });
+    vi.mocked(offlineService.cacheOfflineCatalogs).mockResolvedValueOnce({
+      ...freshSummary,
+      totalItems: 999,
+    });
     const refreshB = refresh!();
     await refreshB;
     await waitFor(() => {

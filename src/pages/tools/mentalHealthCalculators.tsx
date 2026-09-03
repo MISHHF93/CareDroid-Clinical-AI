@@ -10,11 +10,7 @@ import {
   PHQ9_QUESTION9_ELEVATED_THRESHOLD,
   computePhq9Result,
 } from '../../utils/phq9Calculator';
-import {
-  GAD7_ITEMS,
-  GAD7_LIKERT_OPTIONS,
-  computeGad7Result,
-} from '../../utils/gad7Calculator';
+import { GAD7_ITEMS, GAD7_LIKERT_OPTIONS, computeGad7Result } from '../../utils/gad7Calculator';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS, getCalculatorSubIcon } from '../../navigation/iconRegistry';
 import {
@@ -38,9 +34,9 @@ function CalcDecisionSupportLead() {
 function CalcResultSafetyFooter() {
   return (
     <SharedCalcResultSafetyFooter>
-      Output reflects the values you entered and may omit important clinical context. Do not treat this screen as
-      definitive proof of illness severity, eligibility, or treatment requirement, and do not use it alone to rule
-      in or rule out a diagnosis.
+      Output reflects the values you entered and may omit important clinical context. Do not treat
+      this screen as definitive proof of illness severity, eligibility, or treatment requirement,
+      and do not use it alone to rule in or rule out a diagnosis.
     </SharedCalcResultSafetyFooter>
   );
 }
@@ -58,12 +54,15 @@ function likertSelectClassName(hasValidationErrors, value) {
 }
 
 function formDescribedByIds(disclaimerId, validationSummaryId, hasValidationErrors) {
-  return [disclaimerId, hasValidationErrors ? validationSummaryId : null].filter(Boolean).join(' ') || undefined;
+  return (
+    [disclaimerId, hasValidationErrors ? validationSummaryId : null].filter(Boolean).join(' ') ||
+    undefined
+  );
 }
 
 export function Phq9Calculator({ onResultChange }) {
   const [responses, setResponses] = useState(() =>
-    Object.fromEntries(PHQ9_ITEMS.map((item) => [item.key, '']))
+    Object.fromEntries(PHQ9_ITEMS.map((item) => [item.key, ''])),
   );
   const [validationErrors, setValidationErrors] = useState<any[]>([]);
   const [result, setResult] = useState<any>(null);
@@ -79,7 +78,7 @@ export function Phq9Calculator({ onResultChange }) {
               question9Elevated: result.question9Elevated,
               severity: result.severity,
             }
-          : null
+          : null,
       );
     }
   }, [onResultChange, result]);
@@ -90,7 +89,7 @@ export function Phq9Calculator({ onResultChange }) {
 
   const runCalculate = () => {
     const out = computePhq9Result(responses);
-    setValidationErrors(out.ok ? [] : (out.errors || []));
+    setValidationErrors(out.ok ? [] : out.errors || []);
     setResult(out.ok ? out : null);
     if (!out.ok) focusFirstEmptyLikertItem(PHQ9_ITEMS, responses, 'phq9');
   };
@@ -136,7 +135,7 @@ export function Phq9Calculator({ onResultChange }) {
           value={responses[item.key]}
           onChange={(e) => setItem(item.key, e.target.value)}
           aria-required="true"
-           invalid={hasValidationErrors && responses[item.key] === ''}
+          invalid={hasValidationErrors && responses[item.key] === ''}
           aria-describedby={
             [isQ9 ? 'phq9-q9-field-help' : null, hasValidationErrors ? validationSummaryId : null]
               .filter(Boolean)
@@ -157,9 +156,10 @@ export function Phq9Calculator({ onResultChange }) {
         ) : null}
         {isQ9 && q9Live ? (
           <div className="calc-phq9-q9-inline-warning" role="alert" aria-live="assertive">
-            <strong>Question 9 elevated:</strong> Possible self-harm or suicidal ideation reported. Arrange
-            immediate clinical assessment and follow local psychiatric emergency pathways (e.g. crisis line 988
-            in the U.S. when applicable). This tool does not provide emergency care.
+            <strong>Question 9 elevated:</strong> Possible self-harm or suicidal ideation reported.
+            Arrange immediate clinical assessment and follow local psychiatric emergency pathways
+            (e.g. crisis line 988 in the U.S. when applicable). This tool does not provide emergency
+            care.
           </div>
         ) : null}
       </div>
@@ -173,27 +173,37 @@ export function Phq9Calculator({ onResultChange }) {
           <span id={formTitleId}>PHQ-9 (depression symptom screen)</span>
         </CalcPanelTitle>
 
-        <div id={formDisclaimerId} className="calc-timi-disclaimer calc-has-bled-disclaimer" role="note">
+        <div
+          id={formDisclaimerId}
+          className="calc-timi-disclaimer calc-has-bled-disclaimer"
+          role="note"
+        >
           <CalcDecisionSupportLead />
           <p className="calc-disclaimer-detail">
-            <strong>Screening only.</strong> PHQ-9 assesses depressive symptoms over the past two weeks. It does
-            not diagnose depression or any other psychiatric disorder and does not recommend medications or
-            specific therapies.
+            <strong>Screening only.</strong> PHQ-9 assesses depressive symptoms over the past two
+            weeks. It does not diagnose depression or any other psychiatric disorder and does not
+            recommend medications or specific therapies.
           </p>
           <p className="calc-disclaimer-detail">
-            Results require review by a qualified clinician. Follow institutional behavioral health and suicide-risk
-            pathways when indicated.
+            Results require review by a qualified clinician. Follow institutional behavioral health
+            and suicide-risk pathways when indicated.
           </p>
           <p className="calc-disclaimer-detail">
-            If you or someone else is in immediate danger or crisis, contact emergency services (e.g. 911 in the U.S.)
-            or the 988 Suicide &amp; Crisis Lifeline when applicable. This tool does not provide emergency care.
+            If you or someone else is in immediate danger or crisis, contact emergency services
+            (e.g. 911 in the U.S.) or the 988 Suicide &amp; Crisis Lifeline when applicable. This
+            tool does not provide emergency care.
           </p>
         </div>
 
         {q9Live ? (
-          <div className="calc-has-bled-anticoag-warning calc-phq9-q9-form-warning" role="alert" aria-live="assertive">
-            <strong>Question 9 safety:</strong> A non-zero response on self-harm or suicidal ideation requires urgent
-            evaluation before routine disposition. Do not use this screen alone to clear safety concerns.
+          <div
+            className="calc-has-bled-anticoag-warning calc-phq9-q9-form-warning"
+            role="alert"
+            aria-live="assertive"
+          >
+            <strong>Question 9 safety:</strong> A non-zero response on self-harm or suicidal
+            ideation requires urgent evaluation before routine disposition. Do not use this screen
+            alone to clear safety concerns.
           </div>
         ) : null}
 
@@ -201,7 +211,11 @@ export function Phq9Calculator({ onResultChange }) {
           className="calc-pr1-form"
           noValidate
           aria-labelledby={formTitleId}
-          aria-describedby={formDescribedByIds(formDisclaimerId, validationSummaryId, hasValidationErrors)}
+          aria-describedby={formDescribedByIds(
+            formDisclaimerId,
+            validationSummaryId,
+            hasValidationErrors,
+          )}
           onSubmit={(e) => {
             e.preventDefault();
             runCalculate();
@@ -238,7 +252,12 @@ export function Phq9Calculator({ onResultChange }) {
               <NavIcon icon={CHROME_ICONS.calculator} size={20} aria-hidden />
               Calculate PHQ-9
             </button>
-            <button type="button" className="calc-reset-btn" onClick={reset} aria-label="Reset PHQ-9 form">
+            <button
+              type="button"
+              className="calc-reset-btn"
+              onClick={reset}
+              aria-label="Reset PHQ-9 form"
+            >
               Reset
             </button>
           </div>
@@ -257,7 +276,10 @@ export function Phq9Calculator({ onResultChange }) {
         {result ? (
           <>
             {result.question9Elevated ? (
-              <div className="calc-has-bled-anticoag-warning calc-phq9-q9-result-warning" role="alert">
+              <div
+                className="calc-has-bled-anticoag-warning calc-phq9-q9-result-warning"
+                role="alert"
+              >
                 <strong>{result.question9SafetyAlert.headline}</strong>
                 <p>{result.question9SafetyAlert.message}</p>
               </div>
@@ -281,7 +303,10 @@ export function Phq9Calculator({ onResultChange }) {
             </div>
 
             {result.highSymptomEscalation?.warranted ? (
-              <div className="calc-has-bled-anticoag-warning calc-phq9-high-symptom-warning" role="alert">
+              <div
+                className="calc-has-bled-anticoag-warning calc-phq9-high-symptom-warning"
+                role="alert"
+              >
                 <strong>Elevated symptom burden:</strong>
                 <p>{result.highSymptomEscalation.message}</p>
               </div>
@@ -349,7 +374,7 @@ export function Phq9Calculator({ onResultChange }) {
 
 export function Gad7Calculator({ onResultChange }) {
   const [responses, setResponses] = useState(() =>
-    Object.fromEntries(GAD7_ITEMS.map((item) => [item.key, '']))
+    Object.fromEntries(GAD7_ITEMS.map((item) => [item.key, ''])),
   );
   const [validationErrors, setValidationErrors] = useState<any[]>([]);
   const [result, setResult] = useState<any>(null);
@@ -364,7 +389,7 @@ export function Gad7Calculator({ onResultChange }) {
               severityCategory: result.severityCategory,
               severity: result.severity,
             }
-          : null
+          : null,
       );
     }
   }, [onResultChange, result]);
@@ -375,7 +400,7 @@ export function Gad7Calculator({ onResultChange }) {
 
   const runCalculate = () => {
     const out = computeGad7Result(responses);
-    setValidationErrors(out.ok ? [] : (out.errors || []));
+    setValidationErrors(out.ok ? [] : out.errors || []);
     setResult(out.ok ? out : null);
     if (!out.ok) focusFirstEmptyLikertItem(GAD7_ITEMS, responses, 'gad7');
   };
@@ -414,7 +439,7 @@ export function Gad7Calculator({ onResultChange }) {
           value={responses[item.key]}
           onChange={(e) => setItem(item.key, e.target.value)}
           aria-required="true"
-           invalid={hasValidationErrors && responses[item.key] === ''}
+          invalid={hasValidationErrors && responses[item.key] === ''}
           aria-describedby={
             [
               isDistressItem ? 'gad7-q7-field-help' : null,
@@ -433,8 +458,8 @@ export function Gad7Calculator({ onResultChange }) {
         </AriaInvalidSelect>
         {isDistressItem ? (
           <span className="calc-input-help" id="gad7-q7-field-help">
-            High scores may reflect acute fear or panic; follow distress and suicide-risk pathways when clinically
-            indicated.
+            High scores may reflect acute fear or panic; follow distress and suicide-risk pathways
+            when clinically indicated.
           </span>
         ) : null}
       </div>
@@ -448,21 +473,27 @@ export function Gad7Calculator({ onResultChange }) {
           <span id={formTitleId}>GAD-7 (anxiety symptom screen)</span>
         </CalcPanelTitle>
 
-        <div id={formDisclaimerId} className="calc-timi-disclaimer calc-has-bled-disclaimer" role="note">
+        <div
+          id={formDisclaimerId}
+          className="calc-timi-disclaimer calc-has-bled-disclaimer"
+          role="note"
+        >
           <CalcDecisionSupportLead />
           <p className="calc-disclaimer-detail">
-            <strong>Screening only.</strong> GAD-7 assesses anxiety symptoms over the past two weeks. It does not
-            diagnose generalized anxiety disorder or any other psychiatric condition and does not recommend
-            medications or specific therapies.
+            <strong>Screening only.</strong> GAD-7 assesses anxiety symptoms over the past two
+            weeks. It does not diagnose generalized anxiety disorder or any other psychiatric
+            condition and does not recommend medications or specific therapies.
           </p>
           <p className="calc-disclaimer-detail">
-            Results require review by a qualified clinician. Follow institutional behavioral health pathways when
-            indicated. For suicidal thoughts, use suicide-risk protocols (e.g. PHQ-9 question 9 pathways). For acute
-            panic or overwhelming distress, follow local psychiatric emergency pathways.
+            Results require review by a qualified clinician. Follow institutional behavioral health
+            pathways when indicated. For suicidal thoughts, use suicide-risk protocols (e.g. PHQ-9
+            question 9 pathways). For acute panic or overwhelming distress, follow local psychiatric
+            emergency pathways.
           </p>
           <p className="calc-disclaimer-detail">
-            If you or someone else is in immediate danger or crisis, contact emergency services (e.g. 911 in the U.S.)
-            or the 988 Suicide &amp; Crisis Lifeline when applicable. This tool does not provide emergency care.
+            If you or someone else is in immediate danger or crisis, contact emergency services
+            (e.g. 911 in the U.S.) or the 988 Suicide &amp; Crisis Lifeline when applicable. This
+            tool does not provide emergency care.
           </p>
         </div>
 
@@ -470,7 +501,11 @@ export function Gad7Calculator({ onResultChange }) {
           className="calc-pr1-form"
           noValidate
           aria-labelledby={formTitleId}
-          aria-describedby={formDescribedByIds(formDisclaimerId, validationSummaryId, hasValidationErrors)}
+          aria-describedby={formDescribedByIds(
+            formDisclaimerId,
+            validationSummaryId,
+            hasValidationErrors,
+          )}
           onSubmit={(e) => {
             e.preventDefault();
             runCalculate();
@@ -507,7 +542,12 @@ export function Gad7Calculator({ onResultChange }) {
               <NavIcon icon={CHROME_ICONS.calculator} size={20} aria-hidden />
               Calculate GAD-7
             </button>
-            <button type="button" className="calc-reset-btn" onClick={reset} aria-label="Reset GAD-7 form">
+            <button
+              type="button"
+              className="calc-reset-btn"
+              onClick={reset}
+              aria-label="Reset GAD-7 form"
+            >
               Reset
             </button>
           </div>
@@ -537,7 +577,10 @@ export function Gad7Calculator({ onResultChange }) {
             ) : null}
 
             {result.moderateSymptomEscalation?.warranted ? (
-              <div className="calc-has-bled-anticoag-warning calc-gad7-moderate-warning" role="alert">
+              <div
+                className="calc-has-bled-anticoag-warning calc-gad7-moderate-warning"
+                role="alert"
+              >
                 <strong>Moderate symptom burden:</strong>
                 <p>{result.moderateSymptomEscalation.message}</p>
               </div>

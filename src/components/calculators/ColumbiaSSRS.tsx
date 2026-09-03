@@ -19,7 +19,8 @@ type RiskLevel = 'HIGH' | 'MODERATE' | 'LOW' | 'NONE_REPORTED';
 export const IDEATION = [
   {
     id: 'q1',
-    question: '1. Wish to be dead — Have you wished you were dead or wished you could go to sleep and not wake up?',
+    question:
+      '1. Wish to be dead — Have you wished you were dead or wished you could go to sleep and not wake up?',
     stopIfNo: false,
   },
   {
@@ -29,12 +30,14 @@ export const IDEATION = [
   },
   {
     id: 'q3',
-    question: '3. Suicidal ideation with method — Have you been thinking about how you might kill yourself?',
+    question:
+      '3. Suicidal ideation with method — Have you been thinking about how you might kill yourself?',
     stopIfNo: true,
   },
   {
     id: 'q4',
-    question: '4. Suicidal ideation with intent — Have you had these thoughts and had some intention of acting on them?',
+    question:
+      '4. Suicidal ideation with intent — Have you had these thoughts and had some intention of acting on them?',
     stopIfNo: true,
   },
   {
@@ -115,7 +118,9 @@ function visibleIdeationItems(answers: AnswerMap) {
 
 function getStaffId(patient: { assignedStaffId?: string | null } | undefined): string {
   const store = useEmergencyStore.getState();
-  return patient?.assignedStaffId || store.activeShift.chargeStaffId || store.staff[0]?.id || 'system';
+  return (
+    patient?.assignedStaffId || store.activeShift.chargeStaffId || store.staff[0]?.id || 'system'
+  );
 }
 
 function AnswerButtons({
@@ -133,7 +138,9 @@ function AnswerButtons({
         <button
           key={answer}
           type="button"
-          {...((value === answer) ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
+          {...(value === answer
+            ? { 'aria-pressed': 'true' as const }
+            : { 'aria-pressed': 'false' as const })}
           aria-label={`${label} ${answer.toUpperCase()}`}
           onClick={() => onAnswer(answer)}
           style={{
@@ -173,7 +180,9 @@ export default function ColumbiaSSRS({ patientId, onClose }: ColumbiaSSRSProps) 
   const risk = useMemo(() => classifyRisk(answers), [answers]);
   const riskDisplay = RISK_DISPLAY[risk];
   const visibleItems = useMemo(() => visibleIdeationItems(answers), [answers]);
-  const ideationStopped = visibleItems.length < IDEATION.length && visibleItems.some((item) => shouldStopIdeation(item, answers[item.id]));
+  const ideationStopped =
+    visibleItems.length < IDEATION.length &&
+    visibleItems.some((item) => shouldStopIdeation(item, answers[item.id]));
 
   useEffect(() => {
     if (!patientId || !patient || (risk !== 'HIGH' && risk !== 'MODERATE')) return;
@@ -252,9 +261,7 @@ export default function ColumbiaSSRS({ patientId, onClose }: ColumbiaSSRSProps) 
       ref={dialogRef}
     >
       <div className="cssrs-panel">
-        <header
-          className="u-panel-header-row"
-        >
+        <header className="u-panel-header-row">
           <div>
             <h2 id="cssrs-title" className="u-title-18">
               Columbia Suicide Severity Rating Scale
@@ -277,7 +284,8 @@ export default function ColumbiaSSRS({ patientId, onClose }: ColumbiaSSRSProps) 
 
         <div className="u-stack-14">
           <section className="cssrs-disclaimer">
-            This tool is a clinical aid. It does not replace clinical judgment. All results require immediate physician review.
+            This tool is a clinical aid. It does not replace clinical judgment. All results require
+            immediate physician review.
           </section>
 
           <section>
@@ -321,7 +329,9 @@ export default function ColumbiaSSRS({ patientId, onClose }: ColumbiaSSRSProps) 
               padding: 14,
             }}
           >
-            <div style={{ color: riskDisplay.color, fontSize: 14, fontWeight: 800 }}>{riskDisplay.label}</div>
+            <div style={{ color: riskDisplay.color, fontSize: 14, fontWeight: 800 }}>
+              {riskDisplay.label}
+            </div>
           </section>
 
           {patient ? (
@@ -339,13 +349,21 @@ export default function ColumbiaSSRS({ patientId, onClose }: ColumbiaSSRSProps) 
                     <button type="button" onClick={saveAndAlert} className="cssrs-save-alert-btn">
                       Save and Alert
                     </button>
-                    <button type="button" onClick={() => setConfirmingSave(false)} className="cssrs-cancel-btn">
+                    <button
+                      type="button"
+                      onClick={() => setConfirmingSave(false)}
+                      className="cssrs-cancel-btn"
+                    >
                       Cancel
                     </button>
                   </div>
                 </section>
               ) : (
-                <button type="button" onClick={() => setConfirmingSave(true)} className="cssrs-save-btn">
+                <button
+                  type="button"
+                  onClick={() => setConfirmingSave(true)}
+                  className="cssrs-save-btn"
+                >
                   Save to Patient
                 </button>
               )}

@@ -108,5 +108,7 @@ export function intersectProfileAllowedPacks(
   if (!strictEntitlements || !entitledPackIds.length) return allowedPacks;
   const entitled = new Set(entitledPackIds);
   const intersection = allowedPacks.filter((pack) => entitled.has(pack));
-  return intersection.length ? intersection : allowedPacks.filter((pack) => pack === SAAS_ENTITLEMENT_PACKS.CORE);
+  return intersection.length
+    ? intersection
+    : allowedPacks.filter((pack) => pack === SAAS_ENTITLEMENT_PACKS.CORE);
 }

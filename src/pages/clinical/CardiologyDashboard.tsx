@@ -29,7 +29,8 @@ const CARDIOLOGY_CARDS: readonly CardiologyCard[] = [
   {
     to: '/emergency/tools/cardiology/cardiology-command-center',
     title: 'Cardiology command center',
-    description: 'Cardiology queues, telemetry risk, ACS/stroke-adjacent alerts, and pending human review.',
+    description:
+      'Cardiology queues, telemetry risk, ACS/stroke-adjacent alerts, and pending human review.',
   },
   {
     to: '/emergency/tools/cardiology/ecg-interpretation-assistant',
@@ -44,12 +45,14 @@ const CARDIOLOGY_CARDS: readonly CardiologyCard[] = [
   {
     to: '/emergency/tools/cardiology/acs-workflow-assistant',
     title: 'ACS workflow assistant',
-    description: 'ECG, biomarkers, serial reassessment, and risk-score selection (HEART/TIMI/GRACE).',
+    description:
+      'ECG, biomarkers, serial reassessment, and risk-score selection (HEART/TIMI/GRACE).',
   },
   {
     to: '/emergency/tools/cardiology/atrial-fibrillation-assistant',
     title: 'Atrial fibrillation assistant',
-    description: 'Stability review, stroke/bleeding score selection (CHA2DS2-VASc, HAS-BLED), handoff prompts.',
+    description:
+      'Stability review, stroke/bleeding score selection (CHA2DS2-VASc, HAS-BLED), handoff prompts.',
   },
   {
     to: '/emergency/tools/cardiology/heart-failure-assistant',
@@ -82,7 +85,9 @@ export default function CardiologyDashboard() {
         <div className="cardiology-page__title-row">
           <GraphicIconBadge iconKey="cardiology" accent="brand" size="md" />
           <div>
-            <p className="cardiology-page-title-text" data-testid="cd-page-title-text">Cardiology</p>
+            <p className="cardiology-page-title-text" data-testid="cd-page-title-text">
+              Cardiology
+            </p>
             <p>ECG, ACS, arrhythmia, and heart-failure decision support in one place.</p>
           </div>
         </div>

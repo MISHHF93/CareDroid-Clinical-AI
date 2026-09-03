@@ -40,7 +40,15 @@ describe('Reception characterization — URL & intake contracts', () => {
 
   it('keeps intake URL keys stable for session reconstruction', () => {
     expect(RECEPTION_INTAKE_URL_KEYS).toEqual(
-      expect.arrayContaining(['intake', 'autostart', 'step', 'patientId', 'mode', 'emsArrivalId', 'artifactId']),
+      expect.arrayContaining([
+        'intake',
+        'autostart',
+        'step',
+        'patientId',
+        'mode',
+        'emsArrivalId',
+        'artifactId',
+      ]),
     );
   });
 
@@ -141,7 +149,9 @@ describe('Reception characterization — queue movement registry', () => {
     expect(QUEUE_MOVEMENT_REGISTRY.receptionPretriage.id).toBe('pretriage');
     expect(QUEUE_MOVEMENT_REGISTRY.receptionEms.id).toBe('ems');
     expect(QUEUE_MOVEMENT_REGISTRY.receptionEms.enter).toEqual(
-      expect.arrayContaining([expect.stringMatching(/convertEMSArrivalToPatient|enterEmsRegistrationQueue/)]),
+      expect.arrayContaining([
+        expect.stringMatching(/convertEMSArrivalToPatient|enterEmsRegistrationQueue/),
+      ]),
     );
   });
 

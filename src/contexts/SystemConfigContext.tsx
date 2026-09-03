@@ -4,12 +4,19 @@
  * Manages RAG status, session timeouts, AI usage, subscription, tools
  */
 
-import { createContext, useContext, useEffect, useMemo, useRef, useState, useCallback } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useCallback,
+} from 'react';
 import { useUser } from './UserContext';
 import configService from '../services/configService';
 import logger from '../utils/logger';
 import { CONFIG_LOAD_TIMEOUT_MS } from '../config/startupTimeouts';
-
 
 const SystemConfigContext = createContext<any>(null);
 
@@ -146,11 +153,14 @@ export function SystemConfigProvider({ children }) {
       return undefined;
     }
 
-    const interval = setInterval(async () => {
-      const usageRaw = await configService.getAIRemainingQueries();
-      const { value } = stripMeta(usageRaw);
-      if (value) setAiUsage(value);
-    }, 5 * 60 * 1000);
+    const interval = setInterval(
+      async () => {
+        const usageRaw = await configService.getAIRemainingQueries();
+        const { value } = stripMeta(usageRaw);
+        if (value) setAiUsage(value);
+      },
+      5 * 60 * 1000,
+    );
 
     return () => clearInterval(interval);
   }, [configDegraded, isAuthenticated, isUserLoading, loading]);
@@ -172,7 +182,16 @@ export function SystemConfigProvider({ children }) {
       isRagEnabled: systemConfig?.rag?.enabled ?? false,
       sessionConfig: systemConfig?.session,
     }),
-    [systemConfig, aiUsage, availableTools, subscription, loading, error, configDegraded, loadSystemConfig],
+    [
+      systemConfig,
+      aiUsage,
+      availableTools,
+      subscription,
+      loading,
+      error,
+      configDegraded,
+      loadSystemConfig,
+    ],
   );
 
   return <SystemConfigContext.Provider value={value}>{children}</SystemConfigContext.Provider>;

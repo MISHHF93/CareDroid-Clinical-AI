@@ -25,7 +25,9 @@ export default function DataQualityRiskPanel({
     duplicatePairs: [],
   };
 
-  const chips = Object.entries(summary.byCategory || {}).filter(([, count]) => (count as number) > 0);
+  const chips = Object.entries(summary.byCategory || {}).filter(
+    ([, count]) => (count as number) > 0,
+  );
 
   if (!summary.patientsWithRisks && !duplicatePairs.length) {
     if (compact) return null;

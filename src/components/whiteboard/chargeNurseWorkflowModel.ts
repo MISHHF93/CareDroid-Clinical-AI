@@ -8,7 +8,10 @@ import { selectEmsOffloadVisibilityMetrics } from '../../services/emsOffloadVisi
 import { selectWaitingRoomSafetyEscalationMetrics } from '../../services/waitingRoomSafetyEscalationVisibilityModel';
 import { summarizeEmsAwareness } from './emsAwarenessModel';
 import { summarizeReferralAwareness } from './referralAwarenessModel';
-import { buildCrowdLevelSnapshot, crowdLevelToneToOperationalTone } from '../../engine/crowdLevelEngine';
+import {
+  buildCrowdLevelSnapshot,
+  crowdLevelToneToOperationalTone,
+} from '../../engine/crowdLevelEngine';
 
 /** Operational strip surfaces aligned to CHARGE_NURSE_SCREEN widgets. */
 export const CHARGE_NURSE_WORKFLOW_SURFACES = Object.freeze([
@@ -36,7 +39,9 @@ function countBoardingPatients(patients = [] as any[]) {
     (patient) =>
       patient.state === PatientState.Admission ||
       patient.flags?.some((flag) =>
-        typeof flag === 'string' ? flag === PatientFlag.PendingAdmission : flag?.type === PatientFlag.PendingAdmission,
+        typeof flag === 'string'
+          ? flag === PatientFlag.PendingAdmission
+          : flag?.type === PatientFlag.PendingAdmission,
       ),
   ).length;
 }
@@ -54,11 +59,13 @@ function countReassessmentPatients(patients = [] as any[]) {
   ).length;
 }
 
-export function shouldShowChargeNurseOperationalStrip({ screenMode = (undefined as string | undefined), roleId = (undefined as string | undefined), displayMode = false }: any = {}) {
+export function shouldShowChargeNurseOperationalStrip({
+  screenMode = undefined as string | undefined,
+  roleId = undefined as string | undefined,
+  displayMode = false,
+}: any = {}) {
   if (displayMode) return false;
-  return (
-    CHARGE_STRIP_SCREEN_MODES.has(screenMode) || roleId === EMERGENCY_ROLE_IDS.chargeNurse
-  );
+  return CHARGE_STRIP_SCREEN_MODES.has(screenMode) || roleId === EMERGENCY_ROLE_IDS.chargeNurse;
 }
 
 /**
@@ -67,12 +74,12 @@ export function shouldShowChargeNurseOperationalStrip({ screenMode = (undefined 
  * Values prefer central-node snapshot; falls back to live patient board counts.
  */
 export function selectChargeNurseOperationalStrip({
-  patients = ([] as any[]),
+  patients = [] as any[],
   centralSnapshot = null as any,
   activeEmsArrivals = 0,
-  emsArrivals = ([] as any[]),
-  referrals = ([] as any[]),
-  capacity = (undefined as any),
+  emsArrivals = [] as any[],
+  referrals = [] as any[],
+  capacity = undefined as any,
   settings = {} as any,
   visibleSurfaces = null as any,
   kpiMetricIds = null as any,
@@ -86,8 +93,7 @@ export function selectChargeNurseOperationalStrip({
     centralSnapshot?.currentDepartmentStatus?.waitingPatients ??
     patients.filter((patient) => patient.state === PatientState.Waiting).length;
   const triageWaiting = patients.filter(
-    (patient) =>
-      patient.state === PatientState.Triage || patient.state === PatientState.Waiting,
+    (patient) => patient.state === PatientState.Triage || patient.state === PatientState.Waiting,
   ).length;
   const queuePressure = breachedQueues || triageWaiting;
 
@@ -109,8 +115,11 @@ export function selectChargeNurseOperationalStrip({
   const referralsPending =
     centralSnapshot?.referralStatus?.pending ?? referralSummary.buckets.pending ?? 0;
   const offloadTargetMinutes =
-    Number(settings?.thresholds?.emsOffloadTargetMinutes ?? settings?.thresholds?.emsOffloadTargetMin ?? 15) ||
-    15;
+    Number(
+      settings?.thresholds?.emsOffloadTargetMinutes ??
+        settings?.thresholds?.emsOffloadTargetMin ??
+        15,
+    ) || 15;
 
   const crowdLevel = buildCrowdLevelSnapshot({
     patients,
@@ -208,12 +217,7 @@ export function selectChargeNurseOperationalStrip({
       hint: 'Patients in the waiting room queue',
       value: waitingCount,
       surface: CHARGE_NURSE_SCREEN_WIDGETS.queueHealth,
-      tone:
-        waitingCount >= 12
-          ? 'critical'
-          : waitingCount >= 6
-            ? 'warning'
-            : 'neutral',
+      tone: waitingCount >= 12 ? 'critical' : waitingCount >= 6 ? 'warning' : 'neutral',
       whiteboardAction: 'filter-waiting',
       routeKey: 'waiting',
     },

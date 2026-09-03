@@ -26,7 +26,10 @@ export function usePhiAccess() {
   const security = useSecurityAccess();
 
   const defaultStaffId =
-    user?.id || security.compiledProfile?.user?.id || security.emergency.canonicalProfile?.id || 'unknown';
+    user?.id ||
+    security.compiledProfile?.user?.id ||
+    security.emergency.canonicalProfile?.id ||
+    'unknown';
 
   const guardPhiAccess = useCallback(
     (patientId: string, options: PhiAccessAuditOptions = {}): PhiAccessResult => {
@@ -54,7 +57,11 @@ export function usePhiAccess() {
   );
 
   const logPhiMutation = useCallback(
-    (patientId: string, action: Exclude<PhiAccessAction, 'view'>, options: Omit<PhiAccessAuditOptions, 'action'> = {}) => {
+    (
+      patientId: string,
+      action: Exclude<PhiAccessAction, 'view'>,
+      options: Omit<PhiAccessAuditOptions, 'action'> = {},
+    ) => {
       recordPhiAccess({
         patientId,
         action,
@@ -92,14 +99,7 @@ export function usePhiViewAudit(
       source: options.source,
       details: options.details,
     });
-  }, [
-    enabled,
-    options.details,
-    options.source,
-    options.staffId,
-    patientId,
-    phi.guardPhiAccess,
-  ]);
+  }, [enabled, options.details, options.source, options.staffId, patientId, phi.guardPhiAccess]);
 }
 
 export default usePhiAccess;

@@ -2,13 +2,19 @@
  * Shared PR3 audit constants for coverage and consistency tests.
  */
 
-import { graceAcsChatConfig, GRACE_ACS_REQUIRED_NLU_ALIASES } from './chatAssistedCalculators/graceAcs';
+import {
+  graceAcsChatConfig,
+  GRACE_ACS_REQUIRED_NLU_ALIASES,
+} from './chatAssistedCalculators/graceAcs';
 import { nihssChatConfig, NIHSS_REQUIRED_NLU_ALIASES } from './chatAssistedCalculators/nihss';
 import {
   canadianCSpineChatConfig,
   CANADIAN_C_SPINE_REQUIRED_NLU_ALIASES,
 } from './chatAssistedCalculators/canadianCSpine';
-import { ottawaAnkleChatConfig, OTTAWA_ANKLE_REQUIRED_NLU_ALIASES } from './chatAssistedCalculators/ottawaAnkle';
+import {
+  ottawaAnkleChatConfig,
+  OTTAWA_ANKLE_REQUIRED_NLU_ALIASES,
+} from './chatAssistedCalculators/ottawaAnkle';
 import { PR3_CALCULATOR_REGISTRY_IDS } from './clinicalCatalogWiring';
 
 function aliasPairsForTool(aliases, registryId) {
@@ -35,7 +41,7 @@ export const PR3_CHAT_CONFIGS = Object.freeze([
 ]);
 
 export const PR3_CHAT_CONFIG_BY_ID = Object.freeze(
-  Object.fromEntries(PR3_CHAT_CONFIGS.map((cfg) => [cfg.toolId, cfg]))
+  Object.fromEntries(PR3_CHAT_CONFIGS.map((cfg) => [cfg.toolId, cfg])),
 );
 
 /** Product-required NLU / catalog phrases → registry id (derived from chat config modules). */
@@ -99,7 +105,7 @@ export const PR3_ALL_ALIAS_PAIRS = Object.freeze([
 
 /** Tier-B hub path for every PR3 registry id */
 export const PR3_HUB_ROUTE_BY_REGISTRY_ID = Object.freeze(
-  Object.fromEntries(PR3_TOOL_IDS.map((id) => [id, PR3_HUB_PATH]))
+  Object.fromEntries(PR3_TOOL_IDS.map((id) => [id, PR3_HUB_PATH])),
 );
 
 /** [canonicalId, catalog search query] */

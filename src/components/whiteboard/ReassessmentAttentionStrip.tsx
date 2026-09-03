@@ -4,7 +4,7 @@ import ChargeNurseOperationalStrip from './ChargeNurseOperationalStrip';
 import { buildReassessmentAttentionStripMetrics } from './reassessmentVisibilityModel';
 
 export default function ReassessmentAttentionStrip({
-  patients = ([] as any[]),
+  patients = [] as any[],
   onMetricSelect,
   readOnly = false,
 }) {

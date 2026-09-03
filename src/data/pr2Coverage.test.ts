@@ -83,7 +83,7 @@ describe('PR2 coverage — catalog & discovery', () => {
     const rows = getMedicalToolsCatalogRows();
     const summary = getMedicalCatalogSummary();
     const pr2Primaries = new Set(
-      rows.filter((r) => PR2_CALCULATOR_REGISTRY_IDS.includes(r.primaryId)).map((r) => r.primaryId)
+      rows.filter((r) => PR2_CALCULATOR_REGISTRY_IDS.includes(r.primaryId)).map((r) => r.primaryId),
     );
     expect(pr2Primaries.size).toBe(PR2_CALCULATOR_REGISTRY_IDS.length);
     expect(summary.total).toBeGreaterThanOrEqual(clinicalIntentTools.length);
@@ -104,7 +104,9 @@ describe('PR2 coverage — registry mappings', () => {
   });
 
   it('aligns discovery alias mapsTo with NLU_TO_REGISTRY_ID for PR2 aliases', () => {
-    const pr2Aliases = toolIdAliases.filter((a) => PR2_CALCULATOR_REGISTRY_IDS.includes(a.mapsTo as any));
+    const pr2Aliases = toolIdAliases.filter((a) =>
+      PR2_CALCULATOR_REGISTRY_IDS.includes(a.mapsTo as any),
+    );
     expect(pr2Aliases.length).toBeGreaterThan(0);
     for (const { id, mapsTo } of pr2Aliases) {
       expect(NLU_TO_REGISTRY_ID[id]).toBe(mapsTo);

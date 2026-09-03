@@ -1,6 +1,11 @@
 import { useMemo } from 'react';
 import useHospitalOperatingSystem from './useHospitalOperatingSystem';
-import { ED_JOURNEY_PHASES, type EdJourneyPhaseId, type EdOperatingPriority, type EdOperatingSurfaceDefinition } from '../config/edOperatingSurface.config';
+import {
+  ED_JOURNEY_PHASES,
+  type EdJourneyPhaseId,
+  type EdOperatingPriority,
+  type EdOperatingSurfaceDefinition,
+} from '../config/edOperatingSurface.config';
 import type { WorkflowSituationBriefProps } from '../pages/emergency/emergencyRouteShared';
 
 export type EdOperatingSurfaceContext = Readonly<{

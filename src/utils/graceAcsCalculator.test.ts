@@ -72,6 +72,8 @@ describe('graceAcsCalculator', () => {
     expect(interp.label).toMatch(/risk/i);
     expect(interp.safetyDisclaimer).toMatch(/does not confirm or exclude/i);
     expect(interp.pathwayDisclaimer).toMatch(/local acute coronary syndrome protocols/i);
-    expect(interp.interpretation).not.toMatch(/recommend (antiplatelet|anticoagulation|pci|stent)/i);
+    expect(interp.interpretation).not.toMatch(
+      /recommend (antiplatelet|anticoagulation|pci|stent)/i,
+    );
   });
 });

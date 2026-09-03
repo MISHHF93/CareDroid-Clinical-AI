@@ -46,7 +46,8 @@ export default function ReceptionDuplicateConfirm({
         <header className="reception-dupe-confirm__header">
           <h2 id="reception-dupe-title">Possible existing patient</h2>
           <p>
-            A chart looks like a match ({top.matchScore}% — {top.recommendedAction.replace(/_/g, ' ')}
+            A chart looks like a match ({top.matchScore}% —{' '}
+            {top.recommendedAction.replace(/_/g, ' ')}
             ). Confirm with the patient before creating a new record.
           </p>
           <AiTruthLabel {...patientDuplicateMatchTruthLabel()} compact />
@@ -62,7 +63,11 @@ export default function ReceptionDuplicateConfirm({
                   </small>
                   <p className="reception-dupe-confirm__explain">{candidate.explanation}</p>
                 </div>
-                <button type="button" className="reception-dupe-confirm__use" onClick={() => onUseExisting(candidate.patientId)}>
+                <button
+                  type="button"
+                  className="reception-dupe-confirm__use"
+                  onClick={() => onUseExisting(candidate.patientId)}
+                >
                   Use this chart
                 </button>
               </div>

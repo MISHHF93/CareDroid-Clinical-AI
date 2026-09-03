@@ -72,50 +72,305 @@ export const EMERGENCY_PERMISSION_KEYS = Object.freeze({
 
 const K = EMERGENCY_PERMISSION_KEYS;
 
-export const EMERGENCY_PERMISSION_REGISTRY: readonly EmergencyPermissionDefinition[] = Object.freeze([
-  { key: K.patientCreate, category: 'action', label: 'Create patient', description: 'Register new patients and walk-ins.', legacyAliases: ['patient.create'], blockedInPublicDisplay: true, blockedForReadOnlyRole: true },
-  { key: K.patientDemographicsEdit, category: 'action', label: 'Edit demographics', description: 'Update identity and demographic fields during intake.', legacyAliases: ['demographics.edit'], blockedInPublicDisplay: true, blockedForReadOnlyRole: true },
-  { key: K.encounterCreate, category: 'action', label: 'Create encounter', description: 'Open clinical encounters after registration.', legacyAliases: ['encounter.create'], blockedInPublicDisplay: true, blockedForReadOnlyRole: true },
-  { key: K.intakeVerify, category: 'action', label: 'Verify intake', description: 'Complete identity verification and Smart Intake review.', legacyAliases: ['intake.verify'], blockedInPublicDisplay: true },
-  { key: K.triageAssignAcuity, category: 'action', label: 'Assign triage acuity', description: 'Record triage priority and acuity assignment.', legacyAliases: ['triage.manage', 'triage.assign_acuity'], blockedInPublicDisplay: true },
-  { key: K.queueMove, category: 'action', label: 'Move queue', description: 'Advance patients between journey states and queues.', legacyAliases: ['patient.transition', 'queue.move'], blockedInPublicDisplay: true, blockedForReadOnlyRole: true },
-  { key: K.reassessmentComplete, category: 'action', label: 'Complete reassessment', description: 'Clear reassessment tasks and document review.', legacyAliases: ['reassessment.complete'], blockedInPublicDisplay: true },
-  { key: K.vitalsWrite, category: 'action', label: 'Write vitals', description: 'Record patient vital signs.', legacyAliases: ['vitals.write'], blockedInPublicDisplay: true },
-  { key: K.notesWrite, category: 'action', label: 'Write notes', description: 'Add clinical and operational notes.', legacyAliases: ['notes.write'], blockedInPublicDisplay: true },
-  { key: K.flagsManage, category: 'action', label: 'Manage flags', description: 'Add or clear patient safety flags.', legacyAliases: ['flags.manage'], blockedInPublicDisplay: true },
-  { key: K.emsHandoffComplete, category: 'action', label: 'Complete EMS handoff', description: 'Finalize ambulance offload and handoff checklist.', legacyAliases: ['ems.completeHandoff', 'ems.handoff.complete'], blockedInPublicDisplay: true },
-  { key: K.emsPrepareBay, category: 'action', label: 'Prepare EMS bay', description: 'Stage receiving area for inbound EMS.', legacyAliases: ['ems.prepareBay'], blockedInPublicDisplay: true },
-  { key: K.emsConvertArrival, category: 'action', label: 'Convert EMS arrival', description: 'Convert pre-arrival EMS unit to registered patient.', legacyAliases: ['ems.convertArrival'], blockedInPublicDisplay: true },
-  { key: K.emsRequestTransport, category: 'action', label: 'Request emergency transport', description: 'Physician-initiated SIMULATED emergency transport request from a patient chart -- not connected to a real ambulance or dispatch system.', legacyAliases: ['ems.requestTransport'], blockedInPublicDisplay: true, blockedForReadOnlyRole: true },
-  { key: K.referralCreate, category: 'action', label: 'Create referral', description: 'Initiate specialty referrals and consult requests.', legacyAliases: ['referrals.manage', 'referral.create'], blockedInPublicDisplay: true, blockedForReadOnlyRole: true },
-  { key: K.transferManage, category: 'action', label: 'Manage transfers', description: 'Coordinate inter-facility transfers.', legacyAliases: ['transfers.manage'], blockedInPublicDisplay: true },
-  { key: K.capacityManage, category: 'action', label: 'Manage capacity', description: 'Adjust capacity thresholds and surge posture.', legacyAliases: ['capacity.manage'], blockedInPublicDisplay: true },
-  { key: K.boardingManage, category: 'action', label: 'Manage boarding', description: 'Admission boarding workflow controls.', legacyAliases: ['boarding.manage'], blockedInPublicDisplay: true },
-  { key: K.workloadReassign, category: 'action', label: 'Reassign workload', description: 'Shift staff assignments and workload balancing.', legacyAliases: ['workload.reassign'], blockedInPublicDisplay: true },
-  { key: K.patientEscalate, category: 'action', label: 'Escalate patient', description: 'Clinical escalation for deteriorating patients.', legacyAliases: ['patient.escalate'], blockedInPublicDisplay: true },
-  { key: K.receptionEscalate, category: 'action', label: 'Reception escalate', description: 'Front-desk escalation to triage or charge nurse.', legacyAliases: ['reception.escalate'], blockedInPublicDisplay: true },
-  { key: K.patientDischarge, category: 'action', label: 'Discharge patient', description: 'Complete discharge workflow.', legacyAliases: ['patient.discharge'], blockedInPublicDisplay: true, blockedForReadOnlyRole: true },
-  { key: K.patientAssignStaff, category: 'action', label: 'Assign staff', description: 'Assign responsible clinicians to patients.', legacyAliases: ['patient.assignStaff'], blockedInPublicDisplay: true },
-  { key: K.patientAssignRoom, category: 'action', label: 'Assign room', description: 'Assign patient care locations and rooms.', legacyAliases: ['patient.assignRoom'], blockedInPublicDisplay: true },
-  { key: K.copilotUse, category: 'action', label: 'Use copilot', description: 'Access CareDroid Copilot.', legacyAliases: ['copilot.use'] },
-  { key: K.analyticsView, category: 'action', label: 'View analytics', description: 'Open operational analytics surfaces.', legacyAliases: ['analytics.view'] },
-  { key: K.simulationRun, category: 'action', label: 'Run simulation', description: 'Execute ED simulation scenarios.', legacyAliases: ['simulation.run'], blockedInPublicDisplay: true },
-  { key: K.settingsManage, category: 'action', label: 'Manage settings', description: 'Configure tenant CareDroid settings.', legacyAliases: ['settings.manage'], blockedInPublicDisplay: true },
-  { key: K.displayPublicWaitboard, category: 'display', label: 'Public waiting board', description: 'View aggregate public waiting-room wall display.', blockedForReadOnlyRole: false },
-  { key: K.displayPublicPublish, category: 'action', label: 'Publish public display', description: 'Publish or update public waiting-room and hallway wall displays.', legacyAliases: ['display.public.publish'], blockedInPublicDisplay: true },
-  { key: K.displayWhiteboardReadonly, category: 'display', label: 'Read-only whiteboard', description: 'View departmental read-only whiteboard display.', blockedForReadOnlyRole: false },
-  { key: K.screenTriage, category: 'screen', label: 'Triage screen', description: 'Operate triage nurse screen mode.' },
-  { key: K.screenRegistration, category: 'screen', label: 'Registration screen', description: 'Operate reception registration screen mode.' },
-  { key: K.screenChargeNurse, category: 'screen', label: 'Charge nurse screen', description: 'Operate charge nurse command screen mode.' },
-  { key: K.screenPhysician, category: 'screen', label: 'Physician screen', description: 'Operate physician clinical screen mode.' },
-  { key: K.screenEms, category: 'screen', label: 'EMS screen', description: 'Operate EMS handoff screen mode.' },
-  { key: K.screenCommandCenter, category: 'screen', label: 'Command center screen', description: 'Operate department command center display.' },
-  { key: K.screenAdmin, category: 'screen', label: 'Admin screen', description: 'Operate site admin configuration screen mode.' },
-]);
+export const EMERGENCY_PERMISSION_REGISTRY: readonly EmergencyPermissionDefinition[] =
+  Object.freeze([
+    {
+      key: K.patientCreate,
+      category: 'action',
+      label: 'Create patient',
+      description: 'Register new patients and walk-ins.',
+      legacyAliases: ['patient.create'],
+      blockedInPublicDisplay: true,
+      blockedForReadOnlyRole: true,
+    },
+    {
+      key: K.patientDemographicsEdit,
+      category: 'action',
+      label: 'Edit demographics',
+      description: 'Update identity and demographic fields during intake.',
+      legacyAliases: ['demographics.edit'],
+      blockedInPublicDisplay: true,
+      blockedForReadOnlyRole: true,
+    },
+    {
+      key: K.encounterCreate,
+      category: 'action',
+      label: 'Create encounter',
+      description: 'Open clinical encounters after registration.',
+      legacyAliases: ['encounter.create'],
+      blockedInPublicDisplay: true,
+      blockedForReadOnlyRole: true,
+    },
+    {
+      key: K.intakeVerify,
+      category: 'action',
+      label: 'Verify intake',
+      description: 'Complete identity verification and Smart Intake review.',
+      legacyAliases: ['intake.verify'],
+      blockedInPublicDisplay: true,
+    },
+    {
+      key: K.triageAssignAcuity,
+      category: 'action',
+      label: 'Assign triage acuity',
+      description: 'Record triage priority and acuity assignment.',
+      legacyAliases: ['triage.manage', 'triage.assign_acuity'],
+      blockedInPublicDisplay: true,
+    },
+    {
+      key: K.queueMove,
+      category: 'action',
+      label: 'Move queue',
+      description: 'Advance patients between journey states and queues.',
+      legacyAliases: ['patient.transition', 'queue.move'],
+      blockedInPublicDisplay: true,
+      blockedForReadOnlyRole: true,
+    },
+    {
+      key: K.reassessmentComplete,
+      category: 'action',
+      label: 'Complete reassessment',
+      description: 'Clear reassessment tasks and document review.',
+      legacyAliases: ['reassessment.complete'],
+      blockedInPublicDisplay: true,
+    },
+    {
+      key: K.vitalsWrite,
+      category: 'action',
+      label: 'Write vitals',
+      description: 'Record patient vital signs.',
+      legacyAliases: ['vitals.write'],
+      blockedInPublicDisplay: true,
+    },
+    {
+      key: K.notesWrite,
+      category: 'action',
+      label: 'Write notes',
+      description: 'Add clinical and operational notes.',
+      legacyAliases: ['notes.write'],
+      blockedInPublicDisplay: true,
+    },
+    {
+      key: K.flagsManage,
+      category: 'action',
+      label: 'Manage flags',
+      description: 'Add or clear patient safety flags.',
+      legacyAliases: ['flags.manage'],
+      blockedInPublicDisplay: true,
+    },
+    {
+      key: K.emsHandoffComplete,
+      category: 'action',
+      label: 'Complete EMS handoff',
+      description: 'Finalize ambulance offload and handoff checklist.',
+      legacyAliases: ['ems.completeHandoff', 'ems.handoff.complete'],
+      blockedInPublicDisplay: true,
+    },
+    {
+      key: K.emsPrepareBay,
+      category: 'action',
+      label: 'Prepare EMS bay',
+      description: 'Stage receiving area for inbound EMS.',
+      legacyAliases: ['ems.prepareBay'],
+      blockedInPublicDisplay: true,
+    },
+    {
+      key: K.emsConvertArrival,
+      category: 'action',
+      label: 'Convert EMS arrival',
+      description: 'Convert pre-arrival EMS unit to registered patient.',
+      legacyAliases: ['ems.convertArrival'],
+      blockedInPublicDisplay: true,
+    },
+    {
+      key: K.emsRequestTransport,
+      category: 'action',
+      label: 'Request emergency transport',
+      description:
+        'Physician-initiated SIMULATED emergency transport request from a patient chart -- not connected to a real ambulance or dispatch system.',
+      legacyAliases: ['ems.requestTransport'],
+      blockedInPublicDisplay: true,
+      blockedForReadOnlyRole: true,
+    },
+    {
+      key: K.referralCreate,
+      category: 'action',
+      label: 'Create referral',
+      description: 'Initiate specialty referrals and consult requests.',
+      legacyAliases: ['referrals.manage', 'referral.create'],
+      blockedInPublicDisplay: true,
+      blockedForReadOnlyRole: true,
+    },
+    {
+      key: K.transferManage,
+      category: 'action',
+      label: 'Manage transfers',
+      description: 'Coordinate inter-facility transfers.',
+      legacyAliases: ['transfers.manage'],
+      blockedInPublicDisplay: true,
+    },
+    {
+      key: K.capacityManage,
+      category: 'action',
+      label: 'Manage capacity',
+      description: 'Adjust capacity thresholds and surge posture.',
+      legacyAliases: ['capacity.manage'],
+      blockedInPublicDisplay: true,
+    },
+    {
+      key: K.boardingManage,
+      category: 'action',
+      label: 'Manage boarding',
+      description: 'Admission boarding workflow controls.',
+      legacyAliases: ['boarding.manage'],
+      blockedInPublicDisplay: true,
+    },
+    {
+      key: K.workloadReassign,
+      category: 'action',
+      label: 'Reassign workload',
+      description: 'Shift staff assignments and workload balancing.',
+      legacyAliases: ['workload.reassign'],
+      blockedInPublicDisplay: true,
+    },
+    {
+      key: K.patientEscalate,
+      category: 'action',
+      label: 'Escalate patient',
+      description: 'Clinical escalation for deteriorating patients.',
+      legacyAliases: ['patient.escalate'],
+      blockedInPublicDisplay: true,
+    },
+    {
+      key: K.receptionEscalate,
+      category: 'action',
+      label: 'Reception escalate',
+      description: 'Front-desk escalation to triage or charge nurse.',
+      legacyAliases: ['reception.escalate'],
+      blockedInPublicDisplay: true,
+    },
+    {
+      key: K.patientDischarge,
+      category: 'action',
+      label: 'Discharge patient',
+      description: 'Complete discharge workflow.',
+      legacyAliases: ['patient.discharge'],
+      blockedInPublicDisplay: true,
+      blockedForReadOnlyRole: true,
+    },
+    {
+      key: K.patientAssignStaff,
+      category: 'action',
+      label: 'Assign staff',
+      description: 'Assign responsible clinicians to patients.',
+      legacyAliases: ['patient.assignStaff'],
+      blockedInPublicDisplay: true,
+    },
+    {
+      key: K.patientAssignRoom,
+      category: 'action',
+      label: 'Assign room',
+      description: 'Assign patient care locations and rooms.',
+      legacyAliases: ['patient.assignRoom'],
+      blockedInPublicDisplay: true,
+    },
+    {
+      key: K.copilotUse,
+      category: 'action',
+      label: 'Use copilot',
+      description: 'Access CareDroid Copilot.',
+      legacyAliases: ['copilot.use'],
+    },
+    {
+      key: K.analyticsView,
+      category: 'action',
+      label: 'View analytics',
+      description: 'Open operational analytics surfaces.',
+      legacyAliases: ['analytics.view'],
+    },
+    {
+      key: K.simulationRun,
+      category: 'action',
+      label: 'Run simulation',
+      description: 'Execute ED simulation scenarios.',
+      legacyAliases: ['simulation.run'],
+      blockedInPublicDisplay: true,
+    },
+    {
+      key: K.settingsManage,
+      category: 'action',
+      label: 'Manage settings',
+      description: 'Configure tenant CareDroid settings.',
+      legacyAliases: ['settings.manage'],
+      blockedInPublicDisplay: true,
+    },
+    {
+      key: K.displayPublicWaitboard,
+      category: 'display',
+      label: 'Public waiting board',
+      description: 'View aggregate public waiting-room wall display.',
+      blockedForReadOnlyRole: false,
+    },
+    {
+      key: K.displayPublicPublish,
+      category: 'action',
+      label: 'Publish public display',
+      description: 'Publish or update public waiting-room and hallway wall displays.',
+      legacyAliases: ['display.public.publish'],
+      blockedInPublicDisplay: true,
+    },
+    {
+      key: K.displayWhiteboardReadonly,
+      category: 'display',
+      label: 'Read-only whiteboard',
+      description: 'View departmental read-only whiteboard display.',
+      blockedForReadOnlyRole: false,
+    },
+    {
+      key: K.screenTriage,
+      category: 'screen',
+      label: 'Triage screen',
+      description: 'Operate triage nurse screen mode.',
+    },
+    {
+      key: K.screenRegistration,
+      category: 'screen',
+      label: 'Registration screen',
+      description: 'Operate reception registration screen mode.',
+    },
+    {
+      key: K.screenChargeNurse,
+      category: 'screen',
+      label: 'Charge nurse screen',
+      description: 'Operate charge nurse command screen mode.',
+    },
+    {
+      key: K.screenPhysician,
+      category: 'screen',
+      label: 'Physician screen',
+      description: 'Operate physician clinical screen mode.',
+    },
+    {
+      key: K.screenEms,
+      category: 'screen',
+      label: 'EMS screen',
+      description: 'Operate EMS handoff screen mode.',
+    },
+    {
+      key: K.screenCommandCenter,
+      category: 'screen',
+      label: 'Command center screen',
+      description: 'Operate department command center display.',
+    },
+    {
+      key: K.screenAdmin,
+      category: 'screen',
+      label: 'Admin screen',
+      description: 'Operate site admin configuration screen mode.',
+    },
+  ]);
 
-const PERMISSION_BY_KEY = new Map(
-  EMERGENCY_PERMISSION_REGISTRY.map((entry) => [entry.key, entry]),
-);
+const PERMISSION_BY_KEY = new Map(EMERGENCY_PERMISSION_REGISTRY.map((entry) => [entry.key, entry]));
 
 const ALIAS_TO_CANONICAL = new Map<string, string>();
 for (const entry of EMERGENCY_PERMISSION_REGISTRY) {
@@ -171,11 +426,7 @@ export const ROLE_PERMISSION_GRANTS: Record<EmergencyRoleId, readonly string[]> 
    * IT Admin — platform settings only. No patient create/write/PHI clinical actions.
    * Aligns with EMERGENCY_ROLE_DEFINITIONS.itAdmin (metadata-only routes).
    */
-  [EMERGENCY_ROLE_ID.itAdmin]: Object.freeze([
-    K.settingsManage,
-    K.screenAdmin,
-    K.analyticsView,
-  ]),
+  [EMERGENCY_ROLE_ID.itAdmin]: Object.freeze([K.settingsManage, K.screenAdmin, K.analyticsView]),
   [EMERGENCY_ROLE_ID.edManager]: Object.freeze([
     K.queueMove,
     K.reassessmentComplete,
@@ -337,7 +588,9 @@ export type EmergencyPermissionContext = {
   roleReadOnly?: boolean;
 };
 
-export function resolveEmergencyPermissionKey(permission: string | null | undefined): string | null {
+export function resolveEmergencyPermissionKey(
+  permission: string | null | undefined,
+): string | null {
   if (!permission) return null;
   const normalized = String(permission).trim();
   return ALIAS_TO_CANONICAL.get(normalized) || normalized;
@@ -351,7 +604,10 @@ export function getEmergencyPermissionDefinition(
 }
 
 export function normalizeEmergencyRoleId(role: string): EmergencyRoleId {
-  const normalized = String(role || '').trim().toLowerCase().replace(/-/g, '_');
+  const normalized = String(role || '')
+    .trim()
+    .toLowerCase()
+    .replace(/-/g, '_');
   if (normalized === 'public_display' || normalized === 'public_waiting_display') {
     return EMERGENCY_ROLE_ID.publicDisplay;
   }
@@ -374,7 +630,10 @@ function hasOverrideGrant(
   return extra.some((entry) => resolveEmergencyPermissionKey(entry) === key);
 }
 
-function roleGrants(role: string, permissionsOverrides: Record<string, string[]> = {}): Set<string> {
+function roleGrants(
+  role: string,
+  permissionsOverrides: Record<string, string[]> = {},
+): Set<string> {
   const roleId = normalizeEmergencyRoleId(role);
   const base = ROLE_PERMISSION_GRANTS[roleId] || [];
   const extra =

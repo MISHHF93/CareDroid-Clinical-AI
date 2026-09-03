@@ -3,7 +3,14 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import WhiteboardView from './WhiteboardView';
-import { PatientFlag, PatientState, Priority, type Patient, type Room, type Staff } from '../../types/emergency';
+import {
+  PatientFlag,
+  PatientState,
+  Priority,
+  type Patient,
+  type Room,
+  type Staff,
+} from '../../types/emergency';
 import { useEmergencyStore } from '../../store/emergencyStore';
 
 const originalState = useEmergencyStore.getState();
@@ -95,7 +102,9 @@ describe('WhiteboardView', () => {
       </MemoryRouter>,
     );
 
-    expect(screen.getByRole('heading', { name: /emergency department whiteboard/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /emergency department whiteboard/i }),
+    ).toBeInTheDocument();
     expect(screen.getByText(/3 of 3 patients on board/i)).toBeInTheDocument();
     expect(screen.getByText('Sam Lee')).toBeInTheDocument();
     expect(screen.getByText('Tina Nguyen')).toBeInTheDocument();
@@ -132,8 +141,8 @@ describe('WhiteboardView', () => {
 
     const rowHeader = screen.getByRole('row');
     const patientOrder = () =>
-      Array.from(document.querySelectorAll('[data-patient-card-id]')).map(
-        (node) => node.getAttribute('data-patient-card-id'),
+      Array.from(document.querySelectorAll('[data-patient-card-id]')).map((node) =>
+        node.getAttribute('data-patient-card-id'),
       );
 
     expect(patientOrder()).toEqual(['p1', 'p3', 'p2']);

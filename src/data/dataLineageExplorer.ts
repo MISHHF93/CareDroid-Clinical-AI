@@ -42,7 +42,15 @@ function findFrontendCall(endpoint, frontendApiCalls) {
   return frontendApiCalls.find((call) => call.method === method && call.path === path) || null;
 }
 
-function lineageStage({ stage, source, transformations = [] as any[], model = null, calculator = null, timestamp, metadata = {} as any }) {
+function lineageStage({
+  stage,
+  source,
+  transformations = [] as any[],
+  model = null,
+  calculator = null,
+  timestamp,
+  metadata = {} as any,
+}) {
   return {
     stage,
     label: DATA_LINEAGE_STAGE_LABELS[stage],
@@ -173,9 +181,16 @@ export function buildDataLineageExplorer({
       },
       timestamps: { input: iso(0), ai: iso(1), tool: iso(2), backend: iso(3), output: iso(4) },
       transformations: {
-        input: ['Normalize clinical question', 'Remove unsupported PHI fields', 'Attach specialty filter'],
+        input: [
+          'Normalize clinical question',
+          'Remove unsupported PHI fields',
+          'Attach specialty filter',
+        ],
         ai: ['Retrieve guideline snippets', 'Rank evidence by relevance', 'Generate cited summary'],
-        tool: ['Map request to guideline-rag inventory record', 'Apply clinician-review safety copy'],
+        tool: [
+          'Map request to guideline-rag inventory record',
+          'Apply clinician-review safety copy',
+        ],
         backend: ['POST request via clinicalIntelligenceApi', 'Controller validates query DTO'],
         output: ['Return answer with citations', 'Expose confidence and source limitations'],
       },
@@ -220,7 +235,8 @@ export function buildDataLineageExplorer({
       inputSource: 'Clinical scenario, diagnosis context, patient constraints',
       output: {
         source: 'Draft order bundle response',
-        summary: 'Order bundle suggestions, protocol pathways, explainability, and safety warnings.',
+        summary:
+          'Order bundle suggestions, protocol pathways, explainability, and safety warnings.',
         retention: 'Draft only; no orders placed automatically.',
       },
       timestamps: { input: iso(15), ai: iso(16), tool: iso(17), backend: iso(18), output: iso(19) },
@@ -246,7 +262,8 @@ export function buildDataLineageExplorer({
       inputSource: 'Simulation scenario decisions and timestamps',
       output: {
         source: 'Simulation debrief',
-        summary: 'Scenario score, missed actions, linked protocol, and next recommended simulation.',
+        summary:
+          'Scenario score, missed actions, linked protocol, and next recommended simulation.',
         retention: 'Training/debrief record; no patient chart writeback.',
       },
       timestamps: { input: iso(24), ai: iso(25), tool: iso(26), backend: iso(26), output: iso(27) },

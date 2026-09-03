@@ -23,13 +23,16 @@ import { getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
 import { getAllDiscoveredTools, toolIdAliases } from './sourceCodeToolDiscovery';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const fleetDashboardSource = readFileSync(join(__dirname, '../pages/fleet/FleetDashboard.tsx'), 'utf8');
+const fleetDashboardSource = readFileSync(
+  join(__dirname, '../pages/fleet/FleetDashboard.tsx'),
+  'utf8',
+);
 const patternsSource = readFileSync(
   join(
     __dirname,
-    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts'
+    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts',
   ),
-  'utf8'
+  'utf8',
 );
 
 describe('Fleet Command (fleet-command) wiring', () => {
@@ -64,7 +67,9 @@ describe('Fleet Command (fleet-command) wiring', () => {
     expect(fleetDashboardSource).toContain('FleetDashboard');
     // Fleet graduated from a redirected/future module to an active, mounted
     // route — it no longer appears in the non-ED workspace redirect table.
-    expect(NON_ED_WORKSPACE_REDIRECT_ROUTES.some((route) => (route.path as string) === '/fleet/*')).toBe(false);
+    expect(
+      NON_ED_WORKSPACE_REDIRECT_ROUTES.some((route) => (route.path as string) === '/fleet/*'),
+    ).toBe(false);
   });
 
   it('mirrors backend tool.patterns.ts toolId', () => {

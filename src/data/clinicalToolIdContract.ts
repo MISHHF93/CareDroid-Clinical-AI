@@ -963,15 +963,15 @@ export const PSYCHIATRY_SCREENING_TIER_B_CHAT_REGISTRY_IDS = Object.freeze([
 
 export const CLINICAL_TIER_B_CHAT_REGISTRY_IDS = Object.freeze([
   ...PR2_TIER_B_CHAT_CALCULATOR_IDS.filter(
-    (id) => !(SOURCE_BACKED_TIER_A_CALCULATOR_REGISTRY_IDS as unknown as any[]).includes(id)
+    (id) => !(SOURCE_BACKED_TIER_A_CALCULATOR_REGISTRY_IDS as unknown as any[]).includes(id),
   ),
   ...PR3_TIER_B_CHAT_CALCULATOR_IDS.filter(
-    (id) => !(SOURCE_BACKED_TIER_A_CALCULATOR_REGISTRY_IDS as unknown as any[]).includes(id)
+    (id) => !(SOURCE_BACKED_TIER_A_CALCULATOR_REGISTRY_IDS as unknown as any[]).includes(id),
   ),
   ...PR6_TIER_B_CHAT_CALCULATOR_IDS,
   ...PR7_TIER_B_CHAT_CALCULATOR_IDS,
   ...PR9_TIER_B_CHAT_CALCULATOR_IDS.filter(
-    (id) => !(SOURCE_BACKED_TIER_A_CALCULATOR_REGISTRY_IDS as unknown as any[]).includes(id)
+    (id) => !(SOURCE_BACKED_TIER_A_CALCULATOR_REGISTRY_IDS as unknown as any[]).includes(id),
   ),
   ...CARDIOLOGY_TIER_B_CHAT_REGISTRY_IDS,
   ...PULMONOLOGY_TIER_B_CHAT_REGISTRY_IDS,

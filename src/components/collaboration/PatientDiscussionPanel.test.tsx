@@ -69,6 +69,9 @@ describe('PatientDiscussionPanel (HEAL-220)', () => {
     // The panel is still showing patient B's content -- A's stale response
     // must not have overwritten it.
     expect(screen.getByText('Patient B message')).toBeInTheDocument();
-    expect(vi.mocked(collaborationApi.fetchMessages)).not.toHaveBeenCalledWith('channel-a', expect.anything());
+    expect(vi.mocked(collaborationApi.fetchMessages)).not.toHaveBeenCalledWith(
+      'channel-a',
+      expect.anything(),
+    );
   });
 });

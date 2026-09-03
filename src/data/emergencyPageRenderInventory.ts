@@ -241,7 +241,8 @@ export const EMERGENCY_PAGE_RENDER_INVENTORY = Object.freeze([
     navId: 'department_pulse',
     screenshotSlug: '15-department-pulse',
     movementStages: PATIENT_MOVEMENT_STAGES,
-    notes: 'Hidden operational pulse artifact now mounted as a direct AppShell route and command-palette surface.',
+    notes:
+      'Hidden operational pulse artifact now mounted as a direct AppShell route and command-palette surface.',
   }),
   page({
     id: 'shift-summary',
@@ -251,7 +252,8 @@ export const EMERGENCY_PAGE_RENDER_INVENTORY = Object.freeze([
     navId: 'shift_summary',
     screenshotSlug: '16-shift-summary',
     movementStages: PATIENT_MOVEMENT_STAGES,
-    notes: 'Hidden shift handoff artifact now mounted as a direct AppShell route and command-palette surface.',
+    notes:
+      'Hidden shift handoff artifact now mounted as a direct AppShell route and command-palette surface.',
   }),
   page({
     id: 'emergency-analytics',

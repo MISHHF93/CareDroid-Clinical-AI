@@ -11,14 +11,8 @@ import {
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const srcRoot = join(__dirname, '..');
-const designSystemCss = readFileSync(
-  join(__dirname, '../styles/design-system.css'),
-  'utf8',
-);
-const bridgeCss = readFileSync(
-  join(__dirname, '../styles/design-system-bridge.css'),
-  'utf8',
-);
+const designSystemCss = readFileSync(join(__dirname, '../styles/design-system.css'), 'utf8');
+const bridgeCss = readFileSync(join(__dirname, '../styles/design-system-bridge.css'), 'utf8');
 
 function collectSourceFiles(dir: string, out: string[] = []): string[] {
   for (const entry of readdirSync(dir)) {
@@ -75,7 +69,8 @@ describe('designSystem barrel', () => {
       join('config', 'caredroidDesignLanguage.ts'),
       join('layout', 'designTokens.ts'),
     ];
-    const pattern = /from\s+['"][^'"]*(?:theme\.tokens|layout\/designTokens|caredroidDesignLanguage)['"]/;
+    const pattern =
+      /from\s+['"][^'"]*(?:theme\.tokens|layout\/designTokens|caredroidDesignLanguage)['"]/;
     const offenders: string[] = [];
     for (const file of collectSourceFiles(srcRoot)) {
       const relPath = relative(srcRoot, file);

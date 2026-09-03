@@ -11,7 +11,10 @@ import {
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
-const routeTreeSource = readFileSync(join(__dirname, '../app/operationsFleetConsoleRouteTree.tsx'), 'utf8');
+const routeTreeSource = readFileSync(
+  join(__dirname, '../app/operationsFleetConsoleRouteTree.tsx'),
+  'utf8',
+);
 const toolsConfigSource = readFileSync(join(__dirname, './toolsConsoleRoutes.ts'), 'utf8');
 
 describe('operationsFleetConsoleRoutes', () => {
@@ -45,10 +48,14 @@ describe('operationsFleetConsoleRoutes', () => {
   });
 
   it('keeps operations fleet routes out of explicit router and tools shortcuts', () => {
-    expect(appSource).not.toContain('element={<LazyRoute label="Loading Hospital Map..."><HospitalMapDashboard />');
-    expect(appSource).not.toContain('element={<LazyRoute label="Loading Fleet Command..."><FleetDashboard />');
+    expect(appSource).not.toContain(
+      'element={<LazyRoute label="Loading Hospital Map..."><HospitalMapDashboard />',
+    );
+    expect(appSource).not.toContain(
+      'element={<LazyRoute label="Loading Fleet Command..."><FleetDashboard />',
+    );
     expect(appSource).not.toContain('HospitalMapDashboard');
-    expect(toolsConfigSource).not.toContain("path: TOOL_LAUNCH_PATHS.operationsCenter");
+    expect(toolsConfigSource).not.toContain('path: TOOL_LAUNCH_PATHS.operationsCenter');
     expect(toolsConfigSource).not.toContain("path: '/fleet/route-optimizer'");
     expect(toolsConfigSource).not.toContain("path: '/maps'");
   });

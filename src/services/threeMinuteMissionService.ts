@@ -19,7 +19,14 @@ import {
 } from '../engine/threeMinuteTimerEngine';
 import { getThreeMinuteMissionStoreState } from '../store/threeMinuteMissionStore';
 import { useEmergencyStore } from '../store/emergencyStore';
-import { PatientFlag, PatientState, Priority, type Alert, type EMSArrival, type Patient } from '../types/emergency';
+import {
+  PatientFlag,
+  PatientState,
+  Priority,
+  type Alert,
+  type EMSArrival,
+  type Patient,
+} from '../types/emergency';
 
 export type StartThreeMinuteMissionInput = Readonly<{
   trigger: ThreeMinuteMissionTrigger;
@@ -53,19 +60,36 @@ function resolveSubjectLabel(
   return patientId || emsArrivalId || 'Critical case';
 }
 
-function timerToMission(timer: ResponseTimerState, trigger: ThreeMinuteMissionTrigger): ThreeMinuteMission {
+function timerToMission(
+  timer: ResponseTimerState,
+  trigger: ThreeMinuteMissionTrigger,
+): ThreeMinuteMission {
   const definition = getThreeMinuteMissionDefinition(trigger);
   const patientId = timer.patientId.startsWith('ems:') ? undefined : timer.patientId;
   const emsArrivalId = timer.patientId.startsWith('ems:') ? timer.patientId.slice(4) : undefined;
-  const existing = getThreeMinuteMissionStoreState().missions.find((mission) => mission.timerId === timer.timerId);
+  const existing = getThreeMinuteMissionStoreState().missions.find(
+    (mission) => mission.timerId === timer.timerId,
+  );
 
   const tasks = existing?.tasks
     ? existing.tasks.map((task) => {
-        if (timer.acknowledgedAt && (task.id === 'acknowledge' || task.id === 'clinical_response')) {
-          return { ...task, status: 'complete' as const, completedAt: timer.acknowledgedAt, completedBy: timer.acknowledgedBy };
+        if (
+          timer.acknowledgedAt &&
+          (task.id === 'acknowledge' || task.id === 'clinical_response')
+        ) {
+          return {
+            ...task,
+            status: 'complete' as const,
+            completedAt: timer.acknowledgedAt,
+            completedBy: timer.acknowledgedBy,
+          };
         }
         if (timer.escalationHistory.length && task.id === 'notify_department') {
-          return { ...task, status: 'complete' as const, completedAt: timer.escalationHistory[0]?.firedAt };
+          return {
+            ...task,
+            status: 'complete' as const,
+            completedAt: timer.escalationHistory[0]?.firedAt,
+          };
         }
         return task;
       })
@@ -95,7 +119,9 @@ function timerToMission(timer: ResponseTimerState, trigger: ThreeMinuteMissionTr
 }
 
 function inferTriggerFromTimer(timer: ResponseTimerState): ThreeMinuteMissionTrigger {
-  const stored = getThreeMinuteMissionStoreState().missions.find((mission) => mission.timerId === timer.timerId);
+  const stored = getThreeMinuteMissionStoreState().missions.find(
+    (mission) => mission.timerId === timer.timerId,
+  );
   if (stored) return stored.trigger;
   if (timer.patientId.startsWith('ems:')) return 'ems_pre_arrival';
   const store = useEmergencyStore.getState();
@@ -139,7 +165,9 @@ function missionSignature(missions: readonly ThreeMinuteMission[]): string {
  * correct array back from this function every time).
  */
 export function syncThreeMinuteMissionsFromEngine(): readonly ThreeMinuteMission[] {
-  const missions = getAllActiveTimers().map((timer) => timerToMission(timer, inferTriggerFromTimer(timer)));
+  const missions = getAllActiveTimers().map((timer) =>
+    timerToMission(timer, inferTriggerFromTimer(timer)),
+  );
   const store = getThreeMinuteMissionStoreState();
   if (missionSignature(missions) !== missionSignature(store.missions)) {
     // Deferred by a microtask so the write always lands after React finishes
@@ -163,8 +191,11 @@ export function syncThreeMinuteMissionsFromEngine(): readonly ThreeMinuteMission
   return missions;
 }
 
-export function startThreeMinuteMission(input: StartThreeMinuteMissionInput): ThreeMinuteMission | null {
-  const ownerRole = input.ownerRole ?? getThreeMinuteMissionDefinition(input.trigger).defaultOwnerRole;
+export function startThreeMinuteMission(
+  input: StartThreeMinuteMissionInput,
+): ThreeMinuteMission | null {
+  const ownerRole =
+    input.ownerRole ?? getThreeMinuteMissionDefinition(input.trigger).defaultOwnerRole;
   const timerId = startResponseTimer(input.subjectId, input.triggerAlertId, ownerRole);
   const timer = getTimerState(timerId);
   if (!timer) return null;
@@ -194,29 +225,45 @@ export function startThreeMinuteMission(input: StartThreeMinuteMissionInput): Th
 }
 
 export function shouldStartMissionForPatient(patient: Patient): boolean {
-  if (patient.state === PatientState.Discharge || patient.state === PatientState.Deceased) return false;
+  if (patient.state === PatientState.Discharge || patient.state === PatientState.Deceased)
+    return false;
   const isCriticalAcuity = patient.priority === Priority.P1 || patient.priority === Priority.P2;
   const hasRedFlags =
     (patient.highRiskComplaintFlags?.length ?? 0) > 0 ||
     (patient.flags || []).some((flag) =>
-      [PatientFlag.SepsisAlert, PatientFlag.DeteriorationRisk, PatientFlag.HighRisk, PatientFlag.StrokeCode].includes(
-        flag as PatientFlag,
-      ),
+      [
+        PatientFlag.SepsisAlert,
+        PatientFlag.DeteriorationRisk,
+        PatientFlag.HighRisk,
+        PatientFlag.StrokeCode,
+      ].includes(flag as PatientFlag),
     );
-  const inEarlyFlow = [PatientState.Arrival, PatientState.Registration, PatientState.Triage, PatientState.Waiting].includes(
-    patient.state,
-  );
+  const inEarlyFlow = [
+    PatientState.Arrival,
+    PatientState.Registration,
+    PatientState.Triage,
+    PatientState.Waiting,
+  ].includes(patient.state);
   return isCriticalAcuity && inEarlyFlow && (hasRedFlags || Boolean(patient.triagePending));
 }
 
 export function shouldStartMissionForEmsArrival(arrival: EMSArrival): boolean {
   if (arrival.patientId) return false;
   if (['Complete', 'Cancelled'].includes(arrival.status)) return false;
-  return arrival.severity === 'Critical' || arrival.severity === 'High' || Boolean(arrival.criticalChecklist);
+  return (
+    arrival.severity === 'Critical' ||
+    arrival.severity === 'High' ||
+    Boolean(arrival.criticalChecklist)
+  );
 }
 
 export function shouldStartMissionForAlert(alert: Alert): boolean {
-  return Boolean(alert.patientId) && alert.severity === 'Critical' && !alert.dismissed && alert.source !== 'three-minute-timer-engine';
+  return (
+    Boolean(alert.patientId) &&
+    alert.severity === 'Critical' &&
+    !alert.dismissed &&
+    alert.source !== 'three-minute-timer-engine'
+  );
 }
 
 export function acknowledgeThreeMinuteMission(
@@ -224,10 +271,14 @@ export function acknowledgeThreeMinuteMission(
   acknowledgedBy: string,
   options: { acknowledgeLinkedAlert?: boolean } = {},
 ): boolean {
-  const mission = getThreeMinuteMissionStoreState().missions.find((entry) => entry.missionId === missionId);
+  const mission = getThreeMinuteMissionStoreState().missions.find(
+    (entry) => entry.missionId === missionId,
+  );
   if (!mission) return false;
 
-  const subjectId = mission.patientId ?? (mission.emsArrivalId ? emsPreArrivalSubjectId(mission.emsArrivalId) : null);
+  const subjectId =
+    mission.patientId ??
+    (mission.emsArrivalId ? emsPreArrivalSubjectId(mission.emsArrivalId) : null);
   if (!subjectId) return false;
 
   const acknowledged = mission.patientId
@@ -304,7 +355,9 @@ export function hydrateThreeMinuteMissionsFromStore(): void {
   const persisted = getThreeMinuteMissionStoreState().missions;
   for (const mission of persisted) {
     if (mission.acknowledgedAt) continue;
-    const subjectId = mission.patientId ?? (mission.emsArrivalId ? emsPreArrivalSubjectId(mission.emsArrivalId) : null);
+    const subjectId =
+      mission.patientId ??
+      (mission.emsArrivalId ? emsPreArrivalSubjectId(mission.emsArrivalId) : null);
     if (!subjectId) continue;
     if (!getActiveTimerForPatient(subjectId)) {
       startResponseTimer(subjectId, mission.triggerAlertId, mission.ownerRole);
@@ -347,10 +400,13 @@ export function evaluateThreeMinuteTriggers(): void {
     if (getActiveTimerForPatient(patient.id)) continue;
     const alert =
       store.alerts.find(
-        (entry) => entry.patientId === patient.id && entry.severity === 'Critical' && !entry.dismissed,
+        (entry) =>
+          entry.patientId === patient.id && entry.severity === 'Critical' && !entry.dismissed,
       ) ?? ({ id: `critical-patient-${patient.id}` } as Alert);
     startThreeMinuteMission({
-      trigger: patient.flags?.includes(PatientFlag.ReassessmentDue) ? 'reassessment_breach' : 'critical_patient',
+      trigger: patient.flags?.includes(PatientFlag.ReassessmentDue)
+        ? 'reassessment_breach'
+        : 'critical_patient',
       subjectId: patient.id,
       patientId: patient.id,
       triggerAlertId: alert.id,

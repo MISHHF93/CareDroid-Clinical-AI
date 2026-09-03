@@ -163,7 +163,9 @@ export function evaluateClinicOnboardingStep(step, context: any = {}) {
         status = 'complete';
       } else {
         status = 'partial';
-        blockers.push('Queue wait targets remain static in queueAuditModel until org overrides exist');
+        blockers.push(
+          'Queue wait targets remain static in queueAuditModel until org overrides exist',
+        );
       }
       break;
     case CLINIC_ONBOARDING_STEP_IDS.THRESHOLDS:
@@ -251,7 +253,9 @@ export function simulateClinicOnboarding(scenario: any = {}) {
   const frictionPoints = Object.freeze(
     [
       ...new Set(steps.flatMap((step) => step.blockers)),
-      manualSteps ? `${manualSteps} step(s) require manual navigation outside onboarding wizard` : null,
+      manualSteps
+        ? `${manualSteps} step(s) require manual navigation outside onboarding wizard`
+        : null,
       !frictionFlags.storeHydration
         ? 'Emergency store does not hydrate from organization.settings.emergencyOs on login'
         : null,
@@ -283,11 +287,7 @@ export function simulateClinicOnboarding(scenario: any = {}) {
 export function auditClinicOnboardingExposure() {
   return Object.freeze({
     wizardRoute: '/onboarding',
-    postWizardRoutes: Object.freeze([
-      '/tenant-admin',
-      '/emergency/settings',
-      '/emergency/queues',
-    ]),
+    postWizardRoutes: Object.freeze(['/tenant-admin', '/emergency/settings', '/emergency/queues']),
     provisionedDomains: Object.freeze(['thresholds', 'alertRules', 'staff', 'queues', 'roles']),
     manualDomains: Object.freeze(['staff-ui']),
   });

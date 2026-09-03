@@ -47,7 +47,9 @@ describe('WhiteLabelProvider', () => {
   beforeEach(() => {
     document.title = '';
     document.documentElement.removeAttribute('style');
-    document.querySelectorAll('link[data-white-label-favicon="true"]').forEach((node) => node.remove());
+    document
+      .querySelectorAll('link[data-white-label-favicon="true"]')
+      .forEach((node) => node.remove());
   });
 
   it('applies tenant branding to document metadata and CSS variables', async () => {
@@ -63,8 +65,12 @@ describe('WhiteLabelProvider', () => {
 
     await waitFor(() => {
       expect(document.title).toBe('Demo Care');
-      expect(document.documentElement.style.getPropertyValue('--tenant-primary-color')).toBe('#0f766e');
-      expect(document.documentElement.style.getPropertyValue('--tenant-accent-color')).toBe('#2563eb');
+      expect(document.documentElement.style.getPropertyValue('--tenant-primary-color')).toBe(
+        '#0f766e',
+      );
+      expect(document.documentElement.style.getPropertyValue('--tenant-accent-color')).toBe(
+        '#2563eb',
+      );
       expect(document.querySelector('link[data-white-label-favicon="true"]')).toHaveAttribute(
         'href',
         'https://cdn.example.com/favicon.ico',

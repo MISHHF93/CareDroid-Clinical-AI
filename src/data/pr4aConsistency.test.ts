@@ -47,9 +47,9 @@ const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
 const patternsSource = readFileSync(
   join(
     __dirname,
-    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts'
+    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts',
   ),
-  'utf8'
+  'utf8',
 );
 const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.tsx'), 'utf8');
 
@@ -74,7 +74,7 @@ describe('PR4A consistency — centralized audit lists', () => {
 
   it('has no PR4A registry ids outside the audit list (no orphans)', () => {
     const registryPr4a = toolRegistry.filter((t) =>
-      ['ascvd-risk', 'ckd-staging', 'stop-bang', 'audit-c'].includes(t.id)
+      ['ascvd-risk', 'ckd-staging', 'stop-bang', 'audit-c'].includes(t.id),
     );
     expect(registryPr4a.map((t) => t.id).sort()).toEqual([...PR4A_CALCULATOR_REGISTRY_IDS].sort());
   });
@@ -158,10 +158,12 @@ describe('PR4A consistency — aliases and duplicate detection', () => {
   it('covers every PR4A discovery alias in the global alias list', () => {
     for (const aliasId of PR4A_DISCOVERY_ALIAS_IDS) {
       expect(PR4A_CALCULATOR_REGISTRY_IDS).toContain(
-        toolIdAliases.find((a) => a.id === aliasId)?.mapsTo
+        toolIdAliases.find((a) => a.id === aliasId)?.mapsTo,
       );
     }
-    expect(PR4A_DISCOVERY_ALIAS_IDS.length).toBeGreaterThanOrEqual(PR4A_DISCOVERY_ALIAS_PAIRS.length);
+    expect(PR4A_DISCOVERY_ALIAS_IDS.length).toBeGreaterThanOrEqual(
+      PR4A_DISCOVERY_ALIAS_PAIRS.length,
+    );
   });
 
   it('does not map any PR4A alias key to a conflicting registry target', () => {
@@ -209,7 +211,10 @@ describe('PR4A consistency — catalog, discovery, and searchability', () => {
     const rows = getMedicalToolsCatalogRows();
     for (const [id, query] of PR4A_CATALOG_SEARCH_QUERIES) {
       const hits = catalogRowsMatchingQuery(rows, query);
-      expect(hits.some((r) => r.primaryId === id), `search "${query}" → ${id}`).toBe(true);
+      expect(
+        hits.some((r) => r.primaryId === id),
+        `search "${query}" → ${id}`,
+      ).toBe(true);
     }
   });
 
@@ -218,7 +223,9 @@ describe('PR4A consistency — catalog, discovery, and searchability', () => {
     for (const id of PR4A_CALCULATOR_REGISTRY_IDS) {
       const hits = merged.filter((r) => r.id === id);
       expect(hits.length, `discovery duplicates for ${id}`).toBe(1);
-      const blob = [hits[0].source, ...(hits[0].sources || []), hits[0].notes].filter(Boolean).join(' ');
+      const blob = [hits[0].source, ...(hits[0].sources || []), hits[0].notes]
+        .filter(Boolean)
+        .join(' ');
       expect(blob).toMatch(/toolRegistry|clinicalIntentToolCatalog|tool\.patterns|NLU/i);
     }
   });
@@ -227,7 +234,9 @@ describe('PR4A consistency — catalog, discovery, and searchability', () => {
     const rows = getMedicalToolsCatalogRows();
     const summary = getMedicalCatalogSummary();
     const pr4aPrimaries = new Set(
-      rows.filter((r) => PR4A_CALCULATOR_REGISTRY_IDS.includes(r.primaryId)).map((r) => r.primaryId)
+      rows
+        .filter((r) => PR4A_CALCULATOR_REGISTRY_IDS.includes(r.primaryId))
+        .map((r) => r.primaryId),
     );
     expect(pr4aPrimaries.size).toBe(PR4A_CALCULATOR_REGISTRY_IDS.length);
     expect(summary.total).toBeGreaterThanOrEqual(clinicalIntentTools.length);
@@ -284,7 +293,9 @@ describe('PR4A consistency — resolveCatalogLaunch, routes, sidebar, deep links
   });
 
   it('exposes each PR4A registry id exactly once in toolRegistry (sidebar visibility)', () => {
-    const pr4aRows = toolRegistry.filter((t) => (PR4A_CALCULATOR_REGISTRY_IDS as readonly string[]).includes(t.id));
+    const pr4aRows = toolRegistry.filter((t) =>
+      (PR4A_CALCULATOR_REGISTRY_IDS as readonly string[]).includes(t.id),
+    );
     expect(pr4aRows).toHaveLength(PR4A_CALCULATOR_REGISTRY_IDS.length);
     for (const id of PR4A_CALCULATOR_REGISTRY_IDS) {
       const icon = getToolIcon(id);
@@ -313,7 +324,7 @@ describe('PR4A consistency — resolveCatalogLaunch, routes, sidebar, deep links
       const launch = resolveCatalogLaunch(id);
       expect(resolveNavigationPathForLaunch(launch)).toBe(launch.path);
       expect(resolveNavigationPathForLaunch(launch)).not.toBe('/dashboard');
-    }
+    },
   );
 
   it.each(PR4A_CALCULATOR_REGISTRY_IDS)(
@@ -323,6 +334,6 @@ describe('PR4A consistency — resolveCatalogLaunch, routes, sidebar, deep links
       expect(expectedLaunchPath(id)).toBe(path);
       expect(matchCalculatorRoute(path)?.calculatorSlug).toBe(id);
       expect(CALCULATOR_ROUTE_DEFS.find((d) => d.calculatorSlug === id)?.path).toBe(path);
-    }
+    },
   );
 });

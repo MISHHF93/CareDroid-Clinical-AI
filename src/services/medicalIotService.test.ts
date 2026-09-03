@@ -38,13 +38,21 @@ describe('medicalIotService', () => {
           assignedRoom: 'ICU-12',
           activeAlerts: ['Low oxygen saturation'],
         }),
-      ])
+      ]),
     );
     expect(snapshot.vitals.map((vital) => vital.label)).toEqual(
-      expect.arrayContaining(['HR', 'SpO2', 'BP', 'RR', 'Temperature', 'Glucose', 'ECG'])
+      expect.arrayContaining(['HR', 'SpO2', 'BP', 'RR', 'Temperature', 'Glucose', 'ECG']),
     );
     expect(snapshot.trends.map((trend) => trend.parameter)).toEqual(
-      expect.arrayContaining(['hr', 'spo2', 'bp', 'respiratory-rate', 'temperature', 'glucose', 'ecg'])
+      expect.arrayContaining([
+        'hr',
+        'spo2',
+        'bp',
+        'respiratory-rate',
+        'temperature',
+        'glucose',
+        'ecg',
+      ]),
     );
   });
 });
@@ -77,7 +85,10 @@ describe('medicalIotService demo honesty', () => {
   });
 
   it('falls back to clearly flagged local demo telemetry when the backend is unreachable', async () => {
-    vi.mocked(fetchLiveTrackingCapability).mockResolvedValue({ ok: false, unsupported: true } as never);
+    vi.mocked(fetchLiveTrackingCapability).mockResolvedValue({
+      ok: false,
+      unsupported: true,
+    } as never);
 
     const result = await fetchMedicalIotSnapshot();
 

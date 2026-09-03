@@ -27,74 +27,76 @@ export const TRACKMIND_AUDIT_ARTIFACT = Object.freeze({
 export type TrackMindAuditArtifact =
   (typeof TRACKMIND_AUDIT_ARTIFACT)[keyof typeof TRACKMIND_AUDIT_ARTIFACT];
 
-export const TRACKMIND_AUDIT_VISIBILITY: Record<TrackMindAuditArtifact, readonly TrackMindRoleId[]> =
-  Object.freeze({
-    [TRACKMIND_AUDIT_ARTIFACT.operational]: [
-      R.raceDayOperationsManager,
-      R.racetrackAdmin,
-      R.organizationAdmin,
-      R.platformSuperAdmin,
-      R.auditorRegulator,
-      R.executiveLeadership,
-    ],
-    [TRACKMIND_AUDIT_ARTIFACT.stewarding]: [
-      R.steward,
-      R.raceDayOperationsManager,
-      R.racetrackAdmin,
-      R.complianceOfficer,
-      R.auditorRegulator,
-      R.executiveLeadership,
-    ],
-    [TRACKMIND_AUDIT_ARTIFACT.veterinary]: [
-      R.veterinarian,
-      R.equineWelfareOfficer,
-      R.racetrackAdmin,
-      R.auditorRegulator,
-    ],
-    [TRACKMIND_AUDIT_ARTIFACT.welfare]: [
-      R.equineWelfareOfficer,
-      R.veterinarian,
-      R.steward,
-      R.racetrackAdmin,
-      R.auditorRegulator,
-    ],
-    [TRACKMIND_AUDIT_ARTIFACT.security]: [
-      R.securityManager,
-      R.raceDayOperationsManager,
-      R.racetrackAdmin,
-      R.auditorRegulator,
-    ],
-    [TRACKMIND_AUDIT_ARTIFACT.compliance]: [
-      R.complianceOfficer,
-      R.organizationAdmin,
-      R.auditorRegulator,
-      R.platformSuperAdmin,
-    ],
-    [TRACKMIND_AUDIT_ARTIFACT.financial]: [
-      R.financeManager,
-      R.organizationAdmin,
-      R.auditorRegulator,
-      R.executiveLeadership,
-    ],
-    [TRACKMIND_AUDIT_ARTIFACT.approval]: [
-      R.raceDayOperationsManager,
-      R.steward,
-      R.complianceOfficer,
-      R.financeManager,
-      R.organizationAdmin,
-      R.auditorRegulator,
-    ],
-    [TRACKMIND_AUDIT_ARTIFACT.support]: [
-      R.supportInternalOperator,
-      R.platformSuperAdmin,
-      R.auditorRegulator,
-    ],
-    [TRACKMIND_AUDIT_ARTIFACT.platform]: [
-      R.platformSuperAdmin,
-      R.supportInternalOperator,
-      R.auditorRegulator,
-    ],
-  });
+export const TRACKMIND_AUDIT_VISIBILITY: Record<
+  TrackMindAuditArtifact,
+  readonly TrackMindRoleId[]
+> = Object.freeze({
+  [TRACKMIND_AUDIT_ARTIFACT.operational]: [
+    R.raceDayOperationsManager,
+    R.racetrackAdmin,
+    R.organizationAdmin,
+    R.platformSuperAdmin,
+    R.auditorRegulator,
+    R.executiveLeadership,
+  ],
+  [TRACKMIND_AUDIT_ARTIFACT.stewarding]: [
+    R.steward,
+    R.raceDayOperationsManager,
+    R.racetrackAdmin,
+    R.complianceOfficer,
+    R.auditorRegulator,
+    R.executiveLeadership,
+  ],
+  [TRACKMIND_AUDIT_ARTIFACT.veterinary]: [
+    R.veterinarian,
+    R.equineWelfareOfficer,
+    R.racetrackAdmin,
+    R.auditorRegulator,
+  ],
+  [TRACKMIND_AUDIT_ARTIFACT.welfare]: [
+    R.equineWelfareOfficer,
+    R.veterinarian,
+    R.steward,
+    R.racetrackAdmin,
+    R.auditorRegulator,
+  ],
+  [TRACKMIND_AUDIT_ARTIFACT.security]: [
+    R.securityManager,
+    R.raceDayOperationsManager,
+    R.racetrackAdmin,
+    R.auditorRegulator,
+  ],
+  [TRACKMIND_AUDIT_ARTIFACT.compliance]: [
+    R.complianceOfficer,
+    R.organizationAdmin,
+    R.auditorRegulator,
+    R.platformSuperAdmin,
+  ],
+  [TRACKMIND_AUDIT_ARTIFACT.financial]: [
+    R.financeManager,
+    R.organizationAdmin,
+    R.auditorRegulator,
+    R.executiveLeadership,
+  ],
+  [TRACKMIND_AUDIT_ARTIFACT.approval]: [
+    R.raceDayOperationsManager,
+    R.steward,
+    R.complianceOfficer,
+    R.financeManager,
+    R.organizationAdmin,
+    R.auditorRegulator,
+  ],
+  [TRACKMIND_AUDIT_ARTIFACT.support]: [
+    R.supportInternalOperator,
+    R.platformSuperAdmin,
+    R.auditorRegulator,
+  ],
+  [TRACKMIND_AUDIT_ARTIFACT.platform]: [
+    R.platformSuperAdmin,
+    R.supportInternalOperator,
+    R.auditorRegulator,
+  ],
+});
 
 export const TRACKMIND_AUDIT_EXPORT_ROLES: readonly TrackMindRoleId[] = Object.freeze([
   R.platformSuperAdmin,
@@ -119,5 +121,9 @@ export function canExportTrackMindAudit(
 ): boolean {
   const roleId = normalizeTrackMindRoleId(role);
   if (!TRACKMIND_AUDIT_EXPORT_ROLES.includes(roleId)) return false;
-  return hasPermission(K.auditExport) || hasPermission(K.complianceReportExport) || hasPermission(K.securityAuditExport);
+  return (
+    hasPermission(K.auditExport) ||
+    hasPermission(K.complianceReportExport) ||
+    hasPermission(K.securityAuditExport)
+  );
 }

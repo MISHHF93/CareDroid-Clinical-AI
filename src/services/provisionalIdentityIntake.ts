@@ -1,9 +1,4 @@
-import {
-  PatientFlag,
-  PatientState,
-  Priority,
-  type Patient,
-} from '../types/emergency';
+import { PatientFlag, PatientState, Priority, type Patient } from '../types/emergency';
 import type { useEmergencyStore } from '../store/emergencyStore';
 import { completeIntakeHandoff } from './receptionHandoff';
 import { registerArrivalControl } from './arrivalControlLayer';
@@ -25,53 +20,62 @@ export type ProvisionalIdentityProfile = {
   extraFlags: PatientFlag[];
 };
 
-export const PROVISIONAL_IDENTITY_PROFILES: Record<ProvisionalIdentityKind, ProvisionalIdentityProfile> =
-  {
-    unknown: {
-      kind: 'unknown',
-      label: 'Unknown patient',
-      firstName: 'Unknown',
-      lastName: 'Patient',
-      mrnPrefix: 'TEMP-UNK',
-      complaint: 'Unknown identity — clinical care priority',
-      complaintCategory: 'Unknown Intake',
-      priority: Priority.P2,
-      source: 'Unknown',
-      timelineNote: 'Unknown patient registered with deferred identity reconciliation.',
-      extraFlags: [PatientFlag.HighRisk],
-    },
-    temporary: {
-      kind: 'temporary',
-      label: 'Temporary patient',
-      firstName: 'Temporary',
-      lastName: 'Patient',
-      mrnPrefix: 'TEMP',
-      complaint: 'Temporary registration — identity to be reconciled',
-      complaintCategory: 'EMS',
-      priority: Priority.P2,
-      source: 'EMS',
-      timelineNote: 'Temporary patient shell created for EMS or walk-in arrival.',
-      extraFlags: [PatientFlag.EMSArrival],
-    },
-    'identity-pending': {
-      kind: 'identity-pending',
-      label: 'Identity pending',
-      firstName: 'Identity',
-      lastName: 'Pending',
-      mrnPrefix: 'TEMP-ID',
-      complaint: 'Identity verification deferred — intake allowed',
-      complaintCategory: 'Registration',
-      priority: Priority.P3,
-      source: 'WalkIn',
-      timelineNote: 'Patient sent to triage while identity verification remains pending.',
-      extraFlags: [],
-    },
-  };
+export const PROVISIONAL_IDENTITY_PROFILES: Record<
+  ProvisionalIdentityKind,
+  ProvisionalIdentityProfile
+> = {
+  unknown: {
+    kind: 'unknown',
+    label: 'Unknown patient',
+    firstName: 'Unknown',
+    lastName: 'Patient',
+    mrnPrefix: 'TEMP-UNK',
+    complaint: 'Unknown identity — clinical care priority',
+    complaintCategory: 'Unknown Intake',
+    priority: Priority.P2,
+    source: 'Unknown',
+    timelineNote: 'Unknown patient registered with deferred identity reconciliation.',
+    extraFlags: [PatientFlag.HighRisk],
+  },
+  temporary: {
+    kind: 'temporary',
+    label: 'Temporary patient',
+    firstName: 'Temporary',
+    lastName: 'Patient',
+    mrnPrefix: 'TEMP',
+    complaint: 'Temporary registration — identity to be reconciled',
+    complaintCategory: 'EMS',
+    priority: Priority.P2,
+    source: 'EMS',
+    timelineNote: 'Temporary patient shell created for EMS or walk-in arrival.',
+    extraFlags: [PatientFlag.EMSArrival],
+  },
+  'identity-pending': {
+    kind: 'identity-pending',
+    label: 'Identity pending',
+    firstName: 'Identity',
+    lastName: 'Pending',
+    mrnPrefix: 'TEMP-ID',
+    complaint: 'Identity verification deferred — intake allowed',
+    complaintCategory: 'Registration',
+    priority: Priority.P3,
+    source: 'WalkIn',
+    timelineNote: 'Patient sent to triage while identity verification remains pending.',
+    extraFlags: [],
+  },
+};
 
 type ProvisionalIntakeStore = Pick<
   ReturnType<typeof useEmergencyStore.getState>,
-  'addPatient' | 'recordWorkflowAction' | 'patients' | 'emergencySettings' | 'updatePatient'
-  | 'selectPatient' | 'setQueueFilter' | 'movePatientToState' | 'dispatchWebSocketEvent'
+  | 'addPatient'
+  | 'recordWorkflowAction'
+  | 'patients'
+  | 'emergencySettings'
+  | 'updatePatient'
+  | 'selectPatient'
+  | 'setQueueFilter'
+  | 'movePatientToState'
+  | 'dispatchWebSocketEvent'
 >;
 
 function createPatientId(): string {
@@ -107,7 +111,14 @@ export function buildProvisionalPatient(
   const chiefComplaint = overrides.chiefComplaint || profile.complaint;
   const arrivalMode = normalizeProvisionalArrivalMode(profile.source, kind);
   const quickSafetyFlags = flags.filter((flag) =>
-    ['HighRisk', 'StrokeCode', 'SepsisAlert', 'PsychAlert', 'Isolation', 'DeterioratingNeuro'].includes(flag),
+    [
+      'HighRisk',
+      'StrokeCode',
+      'SepsisAlert',
+      'PsychAlert',
+      'Isolation',
+      'DeterioratingNeuro',
+    ].includes(flag),
   ) as import('../types/emergency').QuickSafetyFlag[];
 
   const arrival = buildPatientArrivalRecord({
@@ -189,17 +200,24 @@ export function completeProvisionalIntake(
   const patient = buildProvisionalPatient(kind, options.patientOverrides);
   store.addPatient(patient);
 
-  registerArrivalControl(store as unknown as Parameters<typeof registerArrivalControl>[0], patient.id, {
-    source: 'provisional-intake',
-    destination: 'triage-queue',
-  });
+  registerArrivalControl(
+    store as unknown as Parameters<typeof registerArrivalControl>[0],
+    patient.id,
+    {
+      source: 'provisional-intake',
+      destination: 'triage-queue',
+    },
+  );
 
-  const handoff = completeIntakeHandoff(store as unknown as Parameters<typeof completeIntakeHandoff>[0], {
-    patientId: patient.id,
-    source: 'provisional-intake',
-    actorName: options.actorName,
-    sessionId: options.sessionId,
-  });
+  const handoff = completeIntakeHandoff(
+    store as unknown as Parameters<typeof completeIntakeHandoff>[0],
+    {
+      patientId: patient.id,
+      source: 'provisional-intake',
+      actorName: options.actorName,
+      sessionId: options.sessionId,
+    },
+  );
 
   store.recordWorkflowAction({
     type: 'patient_created',
@@ -222,7 +240,9 @@ export function completeProvisionalIntake(
   };
 }
 
-export function provisionalKindFromIntakeMode(mode?: string | null): ProvisionalIdentityKind | null {
+export function provisionalKindFromIntakeMode(
+  mode?: string | null,
+): ProvisionalIdentityKind | null {
   if (mode === 'unknown') return 'unknown';
   if (mode === 'temporary' || mode === 'ems-prearrival') return 'temporary';
   if (mode === 'identity-pending') return 'identity-pending';

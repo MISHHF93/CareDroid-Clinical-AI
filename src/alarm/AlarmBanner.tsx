@@ -8,7 +8,10 @@ import {
   shouldPulse,
 } from './types';
 
-const ICONS: Record<AlarmSeverity, React.ComponentType<{ size?: number; strokeWidth?: number; className?: string }>> = {
+const ICONS: Record<
+  AlarmSeverity,
+  React.ComponentType<{ size?: number; strokeWidth?: number; className?: string }>
+> = {
   critical: Siren,
   urgent: Flame,
   warning: AlertTriangle,

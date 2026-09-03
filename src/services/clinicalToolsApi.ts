@@ -68,7 +68,10 @@ export function clearClinicalToolsApiCache() {
  * Fetch registered tools from GET /api/tools (or /api/tools/available).
  * @param {{ availableOnly?: boolean, authToken?: string|null }} options
  */
-export async function fetchBackendClinicalTools({ availableOnly = false, authToken = null }: any = {}) {
+export async function fetchBackendClinicalTools({
+  availableOnly = false,
+  authToken = null,
+}: any = {}) {
   if (!isBackendCapabilityEnabled('toolsList')) {
     return { ok: false, tools: [], count: 0, tier: null, error: 'Tool list API is not available.' };
   }
@@ -133,7 +136,11 @@ export async function fetchClinicalToolMetadata(toolId, { authToken = null }: an
       });
       const data = await parseApiResponse(response, { fallback: {} });
       if (!response.ok) {
-        return { ok: false, data: null, error: data?.message || getApiErrorMessage(null, response) };
+        return {
+          ok: false,
+          data: null,
+          error: data?.message || getApiErrorMessage(null, response),
+        };
       }
       return { ok: true, data, error: null };
     } catch (error: any) {
@@ -148,7 +155,11 @@ export async function fetchClinicalToolMetadata(toolId, { authToken = null }: an
  * @param {Record<string, unknown>} parameters
  * @param {{ authToken?: string|null }} options
  */
-export async function validateClinicalTool(toolId, parameters: any = {}, { authToken = null }: any = {}) {
+export async function validateClinicalTool(
+  toolId,
+  parameters: any = {},
+  { authToken = null }: any = {},
+) {
   if (!isBackendCapabilityEnabled('toolsExecute')) {
     return disabledResponse('Tool validation API is not available.');
   }
@@ -190,7 +201,11 @@ export async function fetchToolExecutorCatalog({ authToken = null }: any = {}) {
       });
       const data = await parseApiResponse(response, { fallback: {} });
       if (!response.ok) {
-        return { ok: false, data: null, error: data?.message || getApiErrorMessage(null, response) };
+        return {
+          ok: false,
+          data: null,
+          error: data?.message || getApiErrorMessage(null, response),
+        };
       }
       return { ok: true, data, error: null };
     } catch (error: any) {
@@ -219,7 +234,11 @@ export async function fetchToolStatistics({ authToken = null }: any = {}) {
       });
       const data = await parseApiResponse(response, { fallback: {} });
       if (!response.ok) {
-        return { ok: false, data: null, error: data?.message || getApiErrorMessage(null, response) };
+        return {
+          ok: false,
+          data: null,
+          error: data?.message || getApiErrorMessage(null, response),
+        };
       }
       return { ok: true, data, error: null };
     } catch (error: any) {

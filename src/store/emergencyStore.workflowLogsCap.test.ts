@@ -34,9 +34,7 @@ describe('workflowLogs is capped, not unbounded', () => {
       });
     }
 
-    expect(useEmergencyStore.getState().workflowLogs.length).toBeLessThanOrEqual(
-      MAX_WORKFLOW_LOGS,
-    );
+    expect(useEmergencyStore.getState().workflowLogs.length).toBeLessThanOrEqual(MAX_WORKFLOW_LOGS);
   });
 
   it('hydrateFromApi (via mergeWorkflowLogs) never grows workflowLogs past the cap', () => {
@@ -67,13 +65,11 @@ describe('workflowLogs is capped, not unbounded', () => {
       ],
     });
 
-    expect(useEmergencyStore.getState().workflowLogs.length).toBeLessThanOrEqual(
-      MAX_WORKFLOW_LOGS,
-    );
+    expect(useEmergencyStore.getState().workflowLogs.length).toBeLessThanOrEqual(MAX_WORKFLOW_LOGS);
     // The newest entry (just hydrated) must survive the trim -- the cap
     // keeps the MOST RECENT entries, not an arbitrary prefix.
-    expect(
-      useEmergencyStore.getState().workflowLogs.some((log) => log.id === 'incoming-1'),
-    ).toBe(true);
+    expect(useEmergencyStore.getState().workflowLogs.some((log) => log.id === 'incoming-1')).toBe(
+      true,
+    );
   });
 });

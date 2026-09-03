@@ -117,10 +117,10 @@ export function readIntakeEncounterChain(
     queue: linkedQueue,
     connected: Boolean(
       patient?.id &&
-        resolvedEncounterId &&
-        arrivalReason &&
-        linkedQueue &&
-        encounterEvent?.metadata?.patientId === patient.id,
+      resolvedEncounterId &&
+      arrivalReason &&
+      linkedQueue &&
+      encounterEvent?.metadata?.patientId === patient.id,
     ),
     arrivalControl: patient ? buildArrivalControlSnapshot(patient) : undefined,
   };

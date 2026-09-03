@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { PatientState, Priority, type ActiveShift, type Patient, type Room, type Staff } from '../types/emergency';
+import {
+  PatientState,
+  Priority,
+  type ActiveShift,
+  type Patient,
+  type Room,
+  type Staff,
+} from '../types/emergency';
 import {
   buildDepartmentStaffBarSnapshot,
   buildWorkloadBalanceEntries,
@@ -107,9 +114,9 @@ describe('departmentStaffBarModel', () => {
 
     const physician = snapshot.entries.find((entry) => entry.staffId === 's-md');
     expect(physician?.title).toBe('Attending Physician');
-    expect(physician?.responsibilities.some((item) => item.includes('Resuscitation coverage'))).toBe(
-      true,
-    );
+    expect(
+      physician?.responsibilities.some((item) => item.includes('Resuscitation coverage')),
+    ).toBe(true);
     expect(physician?.patientCount).toBe(1);
 
     expect(snapshot.entries[0]?.staffId).toBe('s-charge');
@@ -163,8 +170,26 @@ describe('buildWorkloadRebalanceSuggestion (HEAL-194)', () => {
 
   it('returns null when no one is above the team average (evenly distributed load)', () => {
     const evenEntries = [
-      { id: 's-a', displayName: 'A', initials: 'A', roleLabel: 'RN', assignedCount: 2, assignedPatients: [], workloadTone: 'blue' as const, workloadPercent: 50 },
-      { id: 's-b', displayName: 'B', initials: 'B', roleLabel: 'RN', assignedCount: 2, assignedPatients: [], workloadTone: 'blue' as const, workloadPercent: 50 },
+      {
+        id: 's-a',
+        displayName: 'A',
+        initials: 'A',
+        roleLabel: 'RN',
+        assignedCount: 2,
+        assignedPatients: [],
+        workloadTone: 'blue' as const,
+        workloadPercent: 50,
+      },
+      {
+        id: 's-b',
+        displayName: 'B',
+        initials: 'B',
+        roleLabel: 'RN',
+        assignedCount: 2,
+        assignedPatients: [],
+        workloadTone: 'blue' as const,
+        workloadPercent: 50,
+      },
     ];
 
     expect(buildWorkloadRebalanceSuggestion(evenEntries)).toBeNull();

@@ -36,9 +36,7 @@ function parseAssetPackMap() {
   const seed = readRepoFile('backend/src/modules/platform-assets/data/platform-asset-seed.data.ts');
   const packByAsset = new Map();
   const packSection = seed.split('export const SEED_ASSET_PACKS')[1] || '';
-  for (const block of packSection.matchAll(
-    /id:\s*'([^']+)'[\s\S]*?assetIds:\s*\[([\s\S]*?)\]/g
-  )) {
+  for (const block of packSection.matchAll(/id:\s*'([^']+)'[\s\S]*?assetIds:\s*\[([\s\S]*?)\]/g)) {
     const packId = block[1];
     const ids = [...block[2].matchAll(/'([^']+)'/g)].map((m) => m[1]);
     for (const assetId of ids) {
@@ -68,7 +66,9 @@ function parseRoleProfileAssetMap() {
   const seed = readRepoFile('backend/src/modules/platform-assets/data/platform-asset-seed.data.ts');
   const roleToAssets = new Map();
   const blocks = seed.split('SEED_ROLE_PROFILES')[1]?.split('];')[0] || '';
-  for (const block of blocks.matchAll(/id:\s*'([^']+)'[\s\S]*?preferredAssetIds:\s*\[([^\]]*)\]/g)) {
+  for (const block of blocks.matchAll(
+    /id:\s*'([^']+)'[\s\S]*?preferredAssetIds:\s*\[([^\]]*)\]/g,
+  )) {
     const roleId = block[1];
     const assets = [...block[2].matchAll(/'([^']+)'/g)].map((m) => m[1]);
     roleToAssets.set(roleId, assets);
@@ -136,17 +136,19 @@ function globHasDedicatedWiring(registryId) {
     (f) =>
       f.endsWith('Wiring.test.js') &&
       (f.toLowerCase().includes(registryId.toLowerCase().slice(0, 8)) ||
-        f.toLowerCase().includes(slug.slice(0, 6)))
+        f.toLowerCase().includes(slug.slice(0, 6))),
   );
 }
 
 function documentationStatus(featureId, packIds) {
   const docs = [] as any[];
-  if (readRepoFile('docs/solution-packs.md').includes(packIds[0] || '')) docs.push('solution-packs.md');
-  if (readRepoFile('docs/commercial-plans.md').includes(featureId)) docs.push('commercial-plans.md');
+  if (readRepoFile('docs/solution-packs.md').includes(packIds[0] || ''))
+    docs.push('solution-packs.md');
+  if (readRepoFile('docs/commercial-plans.md').includes(featureId))
+    docs.push('commercial-plans.md');
   if (readRepoFile('docs/master-implementation-verification.md')) docs.push('platform docs');
   const packDocs = readdirSync(join(REPO_ROOT, 'docs')).filter(
-    (f) => f.endsWith('-pack.md') || f.endsWith('-suite.md')
+    (f) => f.endsWith('-pack.md') || f.endsWith('-suite.md'),
   );
   for (const doc of packDocs) {
     const content = readRepoFile(`docs/${doc}`);
@@ -494,7 +496,9 @@ export function buildFeatureCoverageRows() {
 }
 
 function escapeCell(value) {
-  return String(value ?? '—').replace(/\|/g, '\\|').replace(/\n/g, ' ');
+  return String(value ?? '—')
+    .replace(/\|/g, '\\|')
+    .replace(/\n/g, ' ');
 }
 
 function formatTable(rows) {
@@ -512,10 +516,7 @@ function formatTable(rows) {
     'Test Status',
     'Documentation Status',
   ];
-  const lines = [
-    `| ${header.join(' | ')} |`,
-    `| ${header.map(() => '---').join(' | ')} |`,
-  ];
+  const lines = [`| ${header.join(' | ')} |`, `| ${header.map(() => '---').join(' | ')} |`];
   for (const row of rows) {
     lines.push(
       `| ${[
@@ -533,7 +534,7 @@ function formatTable(rows) {
         row.documentationStatus,
       ]
         .map(escapeCell)
-        .join(' | ')} |`
+        .join(' | ')} |`,
     );
   }
   return lines.join('\n');
@@ -592,9 +593,7 @@ export function getFeatureCoverageDocument() {
           .slice(0, 40)
           .map((r) => `- **${r.feature}** — pack: ${r.packAssignment}`)
           .join('\n') +
-        (gaps.missingDoc.length > 40
-          ? `\n- … and ${gaps.missingDoc.length - 40} more`
-          : '')
+        (gaps.missingDoc.length > 40 ? `\n- … and ${gaps.missingDoc.length - 40} more` : '')
       : '- None flagged',
     '',
     '### Missing asset pack assignments (registry tools)',
@@ -604,9 +603,7 @@ export function getFeatureCoverageDocument() {
           .slice(0, 40)
           .map((r) => `- **${r.feature}** — \`${r.inventoryId}\``)
           .join('\n') +
-        (gaps.missingPack.length > 40
-          ? `\n- … and ${gaps.missingPack.length - 40} more`
-          : '')
+        (gaps.missingPack.length > 40 ? `\n- … and ${gaps.missingPack.length - 40} more` : '')
       : '- None flagged',
     '',
     '### Missing role profile preferred-asset mapping',
@@ -651,7 +648,7 @@ export function getFeatureCoverageDocument() {
     '| Frontend Status | `route`, `component`, `catalogVisible` |',
     '| Test Status | `testCoverage` + `*Wiring.test.js` glob |',
     '| Documentation Status | `docs/*.md` keyword / pack docs |',
-    ''
+    '',
   );
 
   return {

@@ -65,9 +65,7 @@ export function useEmergencyRolePermissions() {
     if (!effective && !access) return user;
 
     const emergencyRoleId =
-      access?.emergencyRole ||
-      effective?.emergencyRoleId ||
-      user?.profile?.roleProfileId;
+      access?.emergencyRole || effective?.emergencyRoleId || user?.profile?.roleProfileId;
     const saasRole = effective?.saasRole || access?.saasRole;
 
     return {
@@ -204,10 +202,12 @@ export function useEmergencyRolePermissions() {
       canAccessRoute: (path) => canAccessCanonicalRoute(compiledProfile, path),
       nearestRoute: (path) => getNearestEmergencyRoute(role, path),
       securityContext,
-      can: (action, context: any = {}) => checkEmergencyPermission(securityContext, action, context),
+      can: (action, context: any = {}) =>
+        checkEmergencyPermission(securityContext, action, context),
       canDisplay: (permission, context: any = {}) =>
         checkEmergencyPermission(securityContext, permission, context),
-      canMutate: (action, context: any = {}) => checkEmergencyMutation(securityContext, action, context),
+      canMutate: (action, context: any = {}) =>
+        checkEmergencyMutation(securityContext, action, context),
       canMutateSurface: (context: any = {}) =>
         !compiledProfile.readOnly &&
         canMutateEmergencySurface(role, { ...permissionContext, ...context }),
@@ -351,7 +351,22 @@ export function useEmergencyRolePermissions() {
         }
       },
     }),
-    [compiledProfile, deviceContext.definition?.label, deviceContext.deviceContextId, deviceContext.isKiosk, emergencySettings, landingRoute, permissionContext, permissionsOverrides, role, roleDefinition, roleSubject, securityContext, setUser, user],
+    [
+      compiledProfile,
+      deviceContext.definition?.label,
+      deviceContext.deviceContextId,
+      deviceContext.isKiosk,
+      emergencySettings,
+      landingRoute,
+      permissionContext,
+      permissionsOverrides,
+      role,
+      roleDefinition,
+      roleSubject,
+      securityContext,
+      setUser,
+      user,
+    ],
   );
 }
 

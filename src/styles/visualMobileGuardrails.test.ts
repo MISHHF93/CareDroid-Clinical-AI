@@ -37,7 +37,9 @@ describe('visual and mobile entropy guardrails', () => {
     expect(css).toMatch(/\.team-management\s*\{[\s\S]*min-height:\s*auto/);
     expect(css).toMatch(/\.user-table-wrapper\s*\{[\s\S]*overflow-x:\s*auto/);
     expect(css).toMatch(/\.user-table\s*\{[\s\S]*min-width:\s*720px/);
-    expect(css).toMatch(/\.edit-user-modal,[\s\S]*\.invite-user-modal\s*\{[\s\S]*max-height:\s*min\(90dvh,\s*calc\(100dvh - 32px\)\)/);
+    expect(css).toMatch(
+      /\.edit-user-modal,[\s\S]*\.invite-user-modal\s*\{[\s\S]*max-height:\s*min\(90dvh,\s*calc\(100dvh - 32px\)\)/,
+    );
   });
 
   it('keeps platform admin scorecards from forcing mobile overflow', () => {

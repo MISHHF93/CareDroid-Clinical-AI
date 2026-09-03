@@ -10,7 +10,11 @@ import { BUILTIN_CALCULATOR_FORM_SMOKE_ROWS } from '../../data/calculatorHubMani
 import { PR1_PR5_TIER_A_FORM_SLUGS } from '../../data/pr1Pr5CalculatorMobile.test';
 import { getCalculatorToolInventory } from '../../data/toolInventory';
 import { CALCULATOR_ROUTE_DEFS } from '../../routes/clinicalToolRoutes';
-import { mockCompactViewport, mockConversationValue, mockToolPreferencesValue } from '../../test/testRenderUtils';
+import {
+  mockCompactViewport,
+  mockConversationValue,
+  mockToolPreferencesValue,
+} from '../../test/testRenderUtils';
 
 /** Avoid jsdom/cssstyle crash on `border-left: 4px solid var(--primary-color)` in ToolPageLayout.css */
 vi.mock('./Calculators.css', () => ({}));
@@ -44,11 +48,14 @@ vi.mock('../../services/clinicalOrchestratorApi', () => ({
 
 vi.mock('../../services/clinicalToolsApi', () => ({
   fetchClinicalToolMetadata: vi.fn((toolId) =>
-    Promise.resolve({ ok: true, data: { id: toolId, name: toolId, parameters: [] } })
+    Promise.resolve({ ok: true, data: { id: toolId, name: toolId, parameters: [] } }),
   ),
   fetchToolStatistics: vi.fn().mockResolvedValue({
     ok: true,
-    data: { totalTools: 3, tools: [{ id: 'sofa-calculator', name: 'SOFA', category: 'calculator' }] },
+    data: {
+      totalTools: 3,
+      tools: [{ id: 'sofa-calculator', name: 'SOFA', category: 'calculator' }],
+    },
   }),
   validateClinicalTool: vi.fn().mockResolvedValue({
     ok: true,
@@ -60,7 +67,7 @@ function renderCalculator(slug) {
   return render(
     <MemoryRouter initialEntries={[`/tools/calculators/${slug}`]}>
       <Calculators initialCalculatorId={slug} />
-    </MemoryRouter>
+    </MemoryRouter>,
   );
 }
 
@@ -68,7 +75,7 @@ async function waitForSofaPreflight(iface, calculatorSlug) {
   if (calculatorSlug !== 'sofa') return;
   await waitFor(() => {
     expect(
-      within(iface).getByText(/missing: at least 1 sofa clinical parameter/i)
+      within(iface).getByText(/missing: at least 1 sofa clinical parameter/i),
     ).toBeInTheDocument();
   });
 }
@@ -83,14 +90,14 @@ describe('Calculators — hub shell', () => {
     render(
       <MemoryRouter initialEntries={['/tools/calculators']}>
         <Calculators />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     expect(
-      await screen.findByRole('heading', { level: 1, name: /medical calculators/i })
+      await screen.findByRole('heading', { level: 1, name: /medical calculators/i }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('heading', { name: /chat-assisted clinical decision support/i })
+      screen.getByRole('heading', { name: /chat-assisted clinical decision support/i }),
     ).toBeInTheDocument();
     expect(screen.getAllByRole('button', { name: /start guided chat/i }).length).toBeGreaterThan(0);
   }, 20000);
@@ -109,19 +116,21 @@ describe('Calculators — Tier-A form sections', () => {
       // Specialty families resolve via React.lazy (Cycle 67); the interface node
       // is not present on the synchronous first render, only after Suspense resolves.
       const iface = await waitFor(() => {
-        const el = container.querySelector(`.${interfaceClass.split(' ')[0]}`) as HTMLElement | null;
+        const el = container.querySelector(
+          `.${interfaceClass.split(' ')[0]}`,
+        ) as HTMLElement | null;
         expect(el).toBeTruthy();
         return el as HTMLElement;
       });
       expect(
         iface.querySelector(
-          '.calc-input-group, .calc-has-bled-fieldset, .calc-timi-criteria, .calc-input-grid, select, input'
-        )
+          '.calc-input-group, .calc-has-bled-fieldset, .calc-timi-criteria, .calc-input-grid, select, input',
+        ),
       ).toBeTruthy();
       expect(within(iface).getByRole('button', { name: /calculate/i })).toBeInTheDocument();
       expect(within(iface).getByText(/decision support only/i)).toBeInTheDocument();
       await waitForSofaPreflight(iface, slug);
-    }
+    },
   );
 
   it('covers every dedicated calculator inventory route with a form smoke row', () => {
@@ -135,7 +144,9 @@ describe('Calculators — Tier-A form sections', () => {
   it.each(CALCULATOR_ROUTE_DEFS)(
     '$path route renders non-empty usable calculator form',
     async ({ path, calculatorSlug }) => {
-      const smokeRow = BUILTIN_CALCULATOR_FORM_SMOKE_ROWS.find((row) => row.slug === calculatorSlug);
+      const smokeRow = BUILTIN_CALCULATOR_FORM_SMOKE_ROWS.find(
+        (row) => row.slug === calculatorSlug,
+      );
       expect(smokeRow, calculatorSlug).toBeTruthy();
       if (!smokeRow) throw new Error(`expected form smoke row for ${calculatorSlug}`);
 
@@ -144,10 +155,12 @@ describe('Calculators — Tier-A form sections', () => {
           <Routes>
             <Route path={path} element={<Calculators initialCalculatorId={calculatorSlug} />} />
           </Routes>
-        </MemoryRouter>
+        </MemoryRouter>,
       );
       const iface = await waitFor(() => {
-        const el = container.querySelector(`.${smokeRow.interfaceClass.split(' ')[0]}`) as HTMLElement | null;
+        const el = container.querySelector(
+          `.${smokeRow.interfaceClass.split(' ')[0]}`,
+        ) as HTMLElement | null;
         expect(el).toBeTruthy();
         return el as HTMLElement;
       });
@@ -155,7 +168,7 @@ describe('Calculators — Tier-A form sections', () => {
       expect(within(iface).getByRole('button', { name: /calculate/i })).toBeInTheDocument();
       expect(iface.querySelector('.calculator-results')).toBeTruthy();
       await waitForSofaPreflight(iface, calculatorSlug);
-    }
+    },
   );
 });
 
@@ -183,6 +196,6 @@ describe('Calculators — compact viewport mock', () => {
         return el as HTMLElement;
       });
       expect(within(root).getByRole('button', { name: /reset/i })).toBeInTheDocument();
-    }
+    },
   );
 });

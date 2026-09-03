@@ -5,7 +5,13 @@
 
 import type { EnhancementMaturity } from './edPlatformEnhancementRegistry';
 
-export type CareStreamingLane = 'resus' | 'majors' | 'minors' | 'utc' | 'fast-track' | 'observation';
+export type CareStreamingLane =
+  | 'resus'
+  | 'majors'
+  | 'minors'
+  | 'utc'
+  | 'fast-track'
+  | 'observation';
 
 export const CARE_STREAMING_LANES: ReadonlyArray<{
   id: CareStreamingLane;
@@ -52,24 +58,132 @@ export const WHITEBOARD_OPERATIONAL_ICONS: Record<
   WhiteboardOperationalEventId,
   WhiteboardOperationalIcon
 > = {
-  'pre-arrival': { id: 'pre-arrival', glyph: '🚑', label: 'Pre-arrival', tone: 'info', title: 'Inbound EMS or call-in with ETA' },
-  'mse-due': { id: 'mse-due', glyph: '🧠', label: 'MSE due', tone: 'warning', title: 'Mental status exam review due' },
-  'nurse-review-required': { id: 'nurse-review-required', glyph: '👩‍⚕️', label: 'Nurse review', tone: 'warning', title: 'Nurse assessment or triage review required' },
-  boarding: { id: 'boarding', glyph: '🛏️', label: 'Boarding', tone: 'flow', title: 'Admitted — awaiting inpatient bed' },
-  'results-pending': { id: 'results-pending', glyph: '🧪', label: 'Results pending', tone: 'warning', title: 'Awaiting critical or pending results' },
-  'awaiting-consult': { id: 'awaiting-consult', glyph: '📞', label: 'Awaiting consult', tone: 'info', title: 'Specialist consult pending' },
-  'awaiting-bed': { id: 'awaiting-bed', glyph: '⏳', label: 'Awaiting bed', tone: 'warning', title: 'Bed assignment or cleaning in progress' },
-  'bed-clean': { id: 'bed-clean', glyph: '✨', label: 'Bed clean', tone: 'neutral', title: 'Treatment space ready' },
-  'bed-dirty': { id: 'bed-dirty', glyph: '🧹', label: 'Bed dirty', tone: 'warning', title: 'Space needs cleaning' },
-  'bed-occupied': { id: 'bed-occupied', glyph: '🔴', label: 'Occupied', tone: 'flow', title: 'Bed occupied' },
-  isolation: { id: 'isolation', glyph: '☣️', label: 'Isolation', tone: 'critical', title: 'Isolation precautions active' },
-  'critical-labs': { id: 'critical-labs', glyph: '⚗️', label: 'Critical labs', tone: 'critical', title: 'Critical laboratory values flagged' },
-  'sepsis-alert': { id: 'sepsis-alert', glyph: '🦠', label: 'Sepsis', tone: 'critical', title: 'Sepsis alert active' },
-  'fall-risk': { id: 'fall-risk', glyph: '⚠️', label: 'Fall risk', tone: 'warning', title: 'Fall risk precautions' },
-  'adta-elevated': { id: 'adta-elevated', glyph: '📈', label: 'ADTA elevated', tone: 'warning', title: 'Anticipated admission score elevated — staff review' },
-  'document-review-pending': { id: 'document-review-pending', glyph: '📄', label: 'Doc review', tone: 'info', title: 'Patient document artifacts pending human review' },
-  'native-ai-routing': { id: 'native-ai-routing', glyph: '🧭', label: 'AI routing', tone: 'info', title: 'Native AI panel-of-experts routing active' },
-  'pre-triage-voice': { id: 'pre-triage-voice', glyph: '🎙️', label: 'Pre-triage', tone: 'warning', title: 'Voice interview pre-triage pending nurse review' },
+  'pre-arrival': {
+    id: 'pre-arrival',
+    glyph: '🚑',
+    label: 'Pre-arrival',
+    tone: 'info',
+    title: 'Inbound EMS or call-in with ETA',
+  },
+  'mse-due': {
+    id: 'mse-due',
+    glyph: '🧠',
+    label: 'MSE due',
+    tone: 'warning',
+    title: 'Mental status exam review due',
+  },
+  'nurse-review-required': {
+    id: 'nurse-review-required',
+    glyph: '👩‍⚕️',
+    label: 'Nurse review',
+    tone: 'warning',
+    title: 'Nurse assessment or triage review required',
+  },
+  boarding: {
+    id: 'boarding',
+    glyph: '🛏️',
+    label: 'Boarding',
+    tone: 'flow',
+    title: 'Admitted — awaiting inpatient bed',
+  },
+  'results-pending': {
+    id: 'results-pending',
+    glyph: '🧪',
+    label: 'Results pending',
+    tone: 'warning',
+    title: 'Awaiting critical or pending results',
+  },
+  'awaiting-consult': {
+    id: 'awaiting-consult',
+    glyph: '📞',
+    label: 'Awaiting consult',
+    tone: 'info',
+    title: 'Specialist consult pending',
+  },
+  'awaiting-bed': {
+    id: 'awaiting-bed',
+    glyph: '⏳',
+    label: 'Awaiting bed',
+    tone: 'warning',
+    title: 'Bed assignment or cleaning in progress',
+  },
+  'bed-clean': {
+    id: 'bed-clean',
+    glyph: '✨',
+    label: 'Bed clean',
+    tone: 'neutral',
+    title: 'Treatment space ready',
+  },
+  'bed-dirty': {
+    id: 'bed-dirty',
+    glyph: '🧹',
+    label: 'Bed dirty',
+    tone: 'warning',
+    title: 'Space needs cleaning',
+  },
+  'bed-occupied': {
+    id: 'bed-occupied',
+    glyph: '🔴',
+    label: 'Occupied',
+    tone: 'flow',
+    title: 'Bed occupied',
+  },
+  isolation: {
+    id: 'isolation',
+    glyph: '☣️',
+    label: 'Isolation',
+    tone: 'critical',
+    title: 'Isolation precautions active',
+  },
+  'critical-labs': {
+    id: 'critical-labs',
+    glyph: '⚗️',
+    label: 'Critical labs',
+    tone: 'critical',
+    title: 'Critical laboratory values flagged',
+  },
+  'sepsis-alert': {
+    id: 'sepsis-alert',
+    glyph: '🦠',
+    label: 'Sepsis',
+    tone: 'critical',
+    title: 'Sepsis alert active',
+  },
+  'fall-risk': {
+    id: 'fall-risk',
+    glyph: '⚠️',
+    label: 'Fall risk',
+    tone: 'warning',
+    title: 'Fall risk precautions',
+  },
+  'adta-elevated': {
+    id: 'adta-elevated',
+    glyph: '📈',
+    label: 'ADTA elevated',
+    tone: 'warning',
+    title: 'Anticipated admission score elevated — staff review',
+  },
+  'document-review-pending': {
+    id: 'document-review-pending',
+    glyph: '📄',
+    label: 'Doc review',
+    tone: 'info',
+    title: 'Patient document artifacts pending human review',
+  },
+  'native-ai-routing': {
+    id: 'native-ai-routing',
+    glyph: '🧭',
+    label: 'AI routing',
+    tone: 'info',
+    title: 'Native AI panel-of-experts routing active',
+  },
+  'pre-triage-voice': {
+    id: 'pre-triage-voice',
+    glyph: '🎙️',
+    label: 'Pre-triage',
+    tone: 'warning',
+    title: 'Voice interview pre-triage pending nurse review',
+  },
 };
 
 export interface OperationalScoreEnvelope<T> {

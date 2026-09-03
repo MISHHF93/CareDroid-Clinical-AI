@@ -3,7 +3,11 @@ import {
   interpretHeartScore,
   validateHeartScoreInputs,
 } from '../utils/heartScoreCalculator';
-import { asCalculatorSeverity, type AnyCalculatorResult, type CalculatorValidationResult } from './types';
+import {
+  asCalculatorSeverity,
+  type AnyCalculatorResult,
+  type CalculatorValidationResult,
+} from './types';
 
 export const HEART_META = {
   id: 'heart' as const,

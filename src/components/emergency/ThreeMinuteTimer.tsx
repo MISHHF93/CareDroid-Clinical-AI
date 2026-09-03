@@ -48,18 +48,32 @@ export default function ThreeMinuteTimer({
   if (compact) {
     return (
       <span
-        className={['three-minute-timer-badge', `three-minute-timer-badge--${tone}`, className].filter(Boolean).join(' ')}
+        className={['three-minute-timer-badge', `three-minute-timer-badge--${tone}`, className]
+          .filter(Boolean)
+          .join(' ')}
         aria-label={`${label}: ${formatElapsed(elapsed)} elapsed${isBreach ? ', target breached' : ''}`}
-        title={isBreach ? '3-minute target breached' : `${formatElapsed(targetSeconds - elapsed)} remaining`}
+        title={
+          isBreach
+            ? '3-minute target breached'
+            : `${formatElapsed(targetSeconds - elapsed)} remaining`
+        }
       >
-        {formatElapsed(elapsed)}{isBreach ? ' !' : ''}
+        {formatElapsed(elapsed)}
+        {isBreach ? ' !' : ''}
       </span>
     );
   }
 
   return (
     <article
-      className={['three-minute-timer', `three-minute-timer--${tone}`, isBreach ? 'three-minute-timer--breach' : '', className].filter(Boolean).join(' ')}
+      className={[
+        'three-minute-timer',
+        `three-minute-timer--${tone}`,
+        isBreach ? 'three-minute-timer--breach' : '',
+        className,
+      ]
+        .filter(Boolean)
+        .join(' ')}
       aria-label={`${label}: ${formatElapsed(elapsed)} elapsed`}
       aria-live="off"
     >

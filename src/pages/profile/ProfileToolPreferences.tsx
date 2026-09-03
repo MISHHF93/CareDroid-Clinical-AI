@@ -30,8 +30,15 @@ export default function ProfileToolPreferences() {
     resetToolRecommendations,
   } = toolPreferences;
   const { user } = useUser();
-  const { account, preferences, activeWorkspace, workspaceState, updateProfile, saasProfile, accessSummary } =
-    useUserIdentity();
+  const {
+    account,
+    preferences,
+    activeWorkspace,
+    workspaceState,
+    updateProfile,
+    saasProfile,
+    accessSummary,
+  } = useUserIdentity();
   const { accessSummary: hookAccessSummary, profileCopy } = useEffectiveUserProfile();
   const { workspaces, activeWorkspaceId, setActiveWorkspaceId } = useWorkspace();
   const tools = useMemo(() => getUserFacingToolRegistryProjection(), []);
@@ -40,7 +47,7 @@ export default function ProfileToolPreferences() {
 
   const localActiveWorkspace = useMemo(
     () => workspaces.find((workspace) => workspace.id === activeWorkspaceId),
-    [activeWorkspaceId, workspaces]
+    [activeWorkspaceId, workspaces],
   );
   const profile = useMemo(
     () =>
@@ -63,7 +70,7 @@ export default function ProfileToolPreferences() {
       user,
       workspaceState?.activeWorkspaceId,
       workspaceState?.effectivePermissions,
-    ]
+    ],
   );
   const resolvedAccessSummary = accessSummary || hookAccessSummary;
   const allowedWorkspaceIds = new Set(resolvedAccessSummary?.allowedWorkspaces || []);
@@ -71,13 +78,13 @@ export default function ProfileToolPreferences() {
     (workspace) => !allowedWorkspaceIds.size || allowedWorkspaceIds.has(workspace.id),
   );
   const { saasRole } = useEffectiveUserProfile();
-  const compiledProfile = useMemo(
-    () => compileUserProfile({ saasRole, tools }),
-    [saasRole, tools],
-  );
+  const compiledProfile = useMemo(() => compileUserProfile({ saasRole, tools }), [saasRole, tools]);
   const graph = useMemo(
     () => ({
-      ...buildProfileToolGraph({ tools: compiledProfile.tools.visible, profile: compiledProfile.segmentationProfile }),
+      ...buildProfileToolGraph({
+        tools: compiledProfile.tools.visible,
+        profile: compiledProfile.segmentationProfile,
+      }),
       visibleTools: compiledProfile.tools.visible,
       recommendedTools: compiledProfile.tools.recommended,
     }),
@@ -141,94 +148,152 @@ export default function ProfileToolPreferences() {
       accessSummary={resolvedAccessSummary}
       profileCopy={profileCopy}
     >
-        <Card>
-          <form className="profile-identity-form" onSubmit={(event) => event.preventDefault()}>
-            <div className="profile-identity-muted">
-              Assigned role: {saasProfile?.role || profile.role} (admin-managed) · default workspace:{' '}
-              {saasProfile?.defaultWorkspace || profileSettings.defaultWorkspace || activeWorkspaceId}
-            </div>
-            <label>
-              Specialty
-              <select value={profileSettings.specialty || profile.specialty} onChange={(event) => updateSetting('specialty', event.target.value)}>
-                {PROFILE_SPECIALTIES.map((specialty) => <option key={specialty} value={specialty}>{specialty}</option>)}
-              </select>
-            </label>
-            <label>
-              Department
-              <select value={profileSettings.department || profile.department} onChange={(event) => updateSetting('department', event.target.value)}>
-                {PROFILE_DEPARTMENTS.map((department) => <option key={department} value={department}>{department}</option>)}
-              </select>
-            </label>
-            <label>
-              Default workspace
-              <select value={profileSettings.defaultWorkspace || activeWorkspaceId} onChange={(event) => updateSetting('defaultWorkspace', event.target.value)}>
-                {filteredWorkspaces.map((workspace) => <option key={workspace.id} value={workspace.id}>{workspace.name}</option>)}
-              </select>
-            </label>
-            <label>
-              Training level
-              <select value={profileSettings.trainingLevel || profile.trainingLevel} onChange={(event) => updateSetting('trainingLevel', event.target.value)}>
-                {PROFILE_TRAINING_LEVELS.map((level) => <option key={level} value={level}>{level}</option>)}
-              </select>
-            </label>
-            <label>
-              Organization type
-              <input value={saasProfile?.organizationType || profile.organizationType || 'hospital'} readOnly />
-            </label>
-            <label>
-              <span>
-                <input
-                  type="checkbox"
-                  checked={Boolean(profileSettings.compactToolView)}
-                  onChange={(event) => updateSetting('compactToolView', event.target.checked)}
-                />{' '}
-                Compact tool view
-              </span>
-            </label>
-            <div className="profile-identity-actions">
-              <button type="button" className="profile-identity-button" onClick={handleReset}>
-                Reset recommendations
-              </button>
-              {status ? <span className="profile-identity-muted">{status}</span> : null}
-            </div>
-          </form>
-        </Card>
+      <Card>
+        <form className="profile-identity-form" onSubmit={(event) => event.preventDefault()}>
+          <div className="profile-identity-muted">
+            Assigned role: {saasProfile?.role || profile.role} (admin-managed) · default workspace:{' '}
+            {saasProfile?.defaultWorkspace || profileSettings.defaultWorkspace || activeWorkspaceId}
+          </div>
+          <label>
+            Specialty
+            <select
+              value={profileSettings.specialty || profile.specialty}
+              onChange={(event) => updateSetting('specialty', event.target.value)}
+            >
+              {PROFILE_SPECIALTIES.map((specialty) => (
+                <option key={specialty} value={specialty}>
+                  {specialty}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Department
+            <select
+              value={profileSettings.department || profile.department}
+              onChange={(event) => updateSetting('department', event.target.value)}
+            >
+              {PROFILE_DEPARTMENTS.map((department) => (
+                <option key={department} value={department}>
+                  {department}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Default workspace
+            <select
+              value={profileSettings.defaultWorkspace || activeWorkspaceId}
+              onChange={(event) => updateSetting('defaultWorkspace', event.target.value)}
+            >
+              {filteredWorkspaces.map((workspace) => (
+                <option key={workspace.id} value={workspace.id}>
+                  {workspace.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Training level
+            <select
+              value={profileSettings.trainingLevel || profile.trainingLevel}
+              onChange={(event) => updateSetting('trainingLevel', event.target.value)}
+            >
+              {PROFILE_TRAINING_LEVELS.map((level) => (
+                <option key={level} value={level}>
+                  {level}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Organization type
+            <input
+              value={saasProfile?.organizationType || profile.organizationType || 'hospital'}
+              readOnly
+            />
+          </label>
+          <label>
+            <span>
+              <input
+                type="checkbox"
+                checked={Boolean(profileSettings.compactToolView)}
+                onChange={(event) => updateSetting('compactToolView', event.target.checked)}
+              />{' '}
+              Compact tool view
+            </span>
+          </label>
+          <div className="profile-identity-actions">
+            <button type="button" className="profile-identity-button" onClick={handleReset}>
+              Reset recommendations
+            </button>
+            {status ? <span className="profile-identity-muted">{status}</span> : null}
+          </div>
+        </form>
+      </Card>
 
-        <section className="profile-identity-card" aria-labelledby="profile-tool-graph-settings-title">
-          <h3 id="profile-tool-graph-settings-title">Profile Tool Graph</h3>
-          <div className="profile-identity-list">
-            <div className="profile-identity-row">
-              <div><strong>{graph.counts.visible}</strong><span>Visible tools</span></div>
-              <div><strong>{graph.counts.recommended}</strong><span>Recommended tools</span></div>
-              <div><strong>{graph.counts.restricted}</strong><span>Restricted tools</span></div>
-              <div><strong>{graph.counts.specialtyCoverage}</strong><span>Specialty coverage</span></div>
+      <section
+        className="profile-identity-card"
+        aria-labelledby="profile-tool-graph-settings-title"
+      >
+        <h3 id="profile-tool-graph-settings-title">Profile Tool Graph</h3>
+        <div className="profile-identity-list">
+          <div className="profile-identity-row">
+            <div>
+              <strong>{graph.counts.visible}</strong>
+              <span>Visible tools</span>
+            </div>
+            <div>
+              <strong>{graph.counts.recommended}</strong>
+              <span>Recommended tools</span>
+            </div>
+            <div>
+              <strong>{graph.counts.restricted}</strong>
+              <span>Restricted tools</span>
+            </div>
+            <div>
+              <strong>{graph.counts.specialtyCoverage}</strong>
+              <span>Specialty coverage</span>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section className="profile-identity-card" aria-labelledby="profile-tool-preference-list-title">
-          <h3 id="profile-tool-preference-list-title">Pin or hide tools</h3>
-          <div className="profile-identity-list">
-            {preferenceRows.map((tool) => (
-              <div key={tool.id} className="profile-identity-row">
-                <div>
-                  <strong>{tool.name}</strong>
-                  <span>
-                    {tool.category} · {hiddenToolSet.has(tool.id) ? 'hidden' : `score ${tool.profileScore}`}
-                  </span>
-                </div>
-                <div className="profile-identity-actions">
-                  <button type="button" className="profile-identity-button" onClick={() => handlePinnedToggle(tool.id)}>
-                    {pinnedToolSet.has(tool.id) ? 'Unpin tool' : 'Pin tool'}
-                  </button>
-                  <button type="button" className="profile-identity-button" onClick={() => handleHiddenToggle(tool.id)}>
-                    {hiddenToolSet.has(tool.id) ? 'Show tool' : 'Hide tool'}
-                  </button>
-                </div>
+      <section
+        className="profile-identity-card"
+        aria-labelledby="profile-tool-preference-list-title"
+      >
+        <h3 id="profile-tool-preference-list-title">Pin or hide tools</h3>
+        <div className="profile-identity-list">
+          {preferenceRows.map((tool) => (
+            <div key={tool.id} className="profile-identity-row">
+              <div>
+                <strong>{tool.name}</strong>
+                <span>
+                  {tool.category} ·{' '}
+                  {hiddenToolSet.has(tool.id) ? 'hidden' : `score ${tool.profileScore}`}
+                </span>
               </div>
-            ))}
-          </div>
-        </section>
+              <div className="profile-identity-actions">
+                <button
+                  type="button"
+                  className="profile-identity-button"
+                  onClick={() => handlePinnedToggle(tool.id)}
+                >
+                  {pinnedToolSet.has(tool.id) ? 'Unpin tool' : 'Pin tool'}
+                </button>
+                <button
+                  type="button"
+                  className="profile-identity-button"
+                  onClick={() => handleHiddenToggle(tool.id)}
+                >
+                  {hiddenToolSet.has(tool.id) ? 'Show tool' : 'Hide tool'}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
     </ProfileSettingsShell>
   );
 }

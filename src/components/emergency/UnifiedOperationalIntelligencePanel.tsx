@@ -32,12 +32,11 @@ export function UnifiedOperationalIntelligencePanel({
   const { unifiedSnapshot, source, isRefreshing, refresh, refreshError, lastRefreshedAt } =
     operationalIntelligence;
 
-  const tone =
-    unifiedSnapshot.domainStatuses.some((domain) => domain.status === 'critical')
-      ? 'critical'
-      : unifiedSnapshot.domainStatuses.some((domain) => domain.status === 'watch')
-        ? 'warning'
-        : 'stable';
+  const tone = unifiedSnapshot.domainStatuses.some((domain) => domain.status === 'critical')
+    ? 'critical'
+    : unifiedSnapshot.domainStatuses.some((domain) => domain.status === 'watch')
+      ? 'warning'
+      : 'stable';
 
   const visibleInsights = unifiedSnapshot.insights.slice(0, maxInsights);
 
@@ -81,7 +80,11 @@ export function UnifiedOperationalIntelligencePanel({
         {unifiedSnapshot.safetyStatement}
       </p>
 
-      <div className="unified-operational-intelligence-panel__metrics" role="status" aria-live="polite">
+      <div
+        className="unified-operational-intelligence-panel__metrics"
+        role="status"
+        aria-live="polite"
+      >
         <span>{unifiedSnapshot.metrics.activePatients} active</span>
         <span>{unifiedSnapshot.metrics.waitingPatients} waiting</span>
         <span>

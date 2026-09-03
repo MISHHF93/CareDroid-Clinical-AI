@@ -65,7 +65,11 @@ async function requestJson(path, options: any = {}) {
     });
     const data = await parseApiResponse(response, { fallback: {} });
     if (!response.ok) {
-      return { ok: false, data: null, message: data?.message || getApiErrorMessage(null, response) };
+      return {
+        ok: false,
+        data: null,
+        message: data?.message || getApiErrorMessage(null, response),
+      };
     }
     return { ok: true, data, message: '' };
   } catch (error: any) {

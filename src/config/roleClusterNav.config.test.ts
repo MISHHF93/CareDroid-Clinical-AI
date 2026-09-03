@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { CANONICAL_ROUTES } from './routes.config';
-import { getHomeRouteForRole, hasExplicitHomeRoute, HOSPITAL_ROLE_HOME_ROUTES } from './roleClusterNav.config';
+import {
+  getHomeRouteForRole,
+  hasExplicitHomeRoute,
+  HOSPITAL_ROLE_HOME_ROUTES,
+} from './roleClusterNav.config';
 
 describe('hasExplicitHomeRoute', () => {
   it('is true for every hospital role with a curated home route, matching getHomeRouteForRole', () => {

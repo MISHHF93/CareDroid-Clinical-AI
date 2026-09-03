@@ -4,7 +4,10 @@ import { RECEPTION_COPY } from './receptionCopy';
 import { summarizeDataQualityRisks } from '../../config/dataQualityModel';
 import { auditReceptionQueues, summarizeQueueAudit } from '../../config/queueAuditModel';
 import { buildArrivalControlSummary } from '../../services/arrivalControlLayer';
-import { buildCrowdLevelSnapshot, crowdLevelToneToOperationalTone } from '../../engine/crowdLevelEngine';
+import {
+  buildCrowdLevelSnapshot,
+  crowdLevelToneToOperationalTone,
+} from '../../engine/crowdLevelEngine';
 import { buildEmsOffloadTrackerSummary } from '../../services/emsOffloadTracker';
 import { summarizeTriageBreachBoard } from '../../services/triageBreachTimer';
 import {
@@ -22,7 +25,9 @@ export function patientLabel(patient) {
 
 export function isEmsRegistrationPatient(patient) {
   return patient.flags?.some((flag) =>
-    typeof flag === 'string' ? flag === PatientFlag.EMSArrival : flag?.type === PatientFlag.EMSArrival,
+    typeof flag === 'string'
+      ? flag === PatientFlag.EMSArrival
+      : flag?.type === PatientFlag.EMSArrival,
   );
 }
 
@@ -41,15 +46,17 @@ function sortByArrivalDesc(left, right) {
   return new Date(right.arrivalTime).getTime() - new Date(left.arrivalTime).getTime();
 }
 
-export function selectReceptionQueues(patients = [] as any[], { limit = RECEPTION_QUEUE_PREVIEW_LIMIT }: any = {}) {
+export function selectReceptionQueues(
+  patients = [] as any[],
+  { limit = RECEPTION_QUEUE_PREVIEW_LIMIT }: any = {},
+) {
   const emsAll = patients.filter(
     (patient) =>
       isEmsRegistrationPatient(patient) &&
       (patient.state === PatientState.Registration || patient.state === PatientState.Arrival),
   );
   const verificationAll = patients.filter(
-    (patient) =>
-      patient.state === PatientState.Registration && !isEmsRegistrationPatient(patient),
+    (patient) => patient.state === PatientState.Registration && !isEmsRegistrationPatient(patient),
   );
   const pretriageAll = patients.filter((patient) => patient.state === PatientState.Triage);
   const rapidReviewAll = patients.filter((patient) => patientNeedsRapidReview(patient));
@@ -132,8 +139,10 @@ export function selectReceptionOperationalStripMetrics(
   const offloadSummary = buildEmsOffloadTrackerSummary(emsArrivals, {
     patients,
     offloadTargetMinutes:
-      Number(settings?.thresholds?.emsOffloadTargetMinutes ?? settings?.emsThresholds?.offloadTargetMinutes) ||
-      15,
+      Number(
+        settings?.thresholds?.emsOffloadTargetMinutes ??
+          settings?.emsThresholds?.offloadTargetMinutes,
+      ) || 15,
   });
   const crowdLevel = buildCrowdLevelSnapshot({
     patients,

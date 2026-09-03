@@ -14,7 +14,7 @@ describe('validateLazyModule', () => {
 
   it('throws a safe diagnostic instead of letting React stringify module namespaces', () => {
     expect(() => validateLazyModule({ NamedOnly: () => null })).toThrow(
-      /missing a valid default export.*NamedOnly/i
+      /missing a valid default export.*NamedOnly/i,
     );
   });
 

@@ -29,8 +29,8 @@ describe('EMSPressureScore', () => {
           estimatedArrivalTime: '2026-06-11T10:12:00.000Z',
           eta: 99,
         },
-        new Date('2026-06-11T10:05:30.000Z')
-      )
+        new Date('2026-06-11T10:05:30.000Z'),
+      ),
     ).toBe(7);
   });
 });

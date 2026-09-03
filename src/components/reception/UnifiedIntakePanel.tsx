@@ -1,5 +1,14 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
-import { AlertTriangle, ChevronDown, ChevronUp, ClipboardCheck, Save, Sparkles, Timer, UserPlus } from 'lucide-react';
+import {
+  AlertTriangle,
+  ChevronDown,
+  ChevronUp,
+  ClipboardCheck,
+  Save,
+  Sparkles,
+  Timer,
+  UserPlus,
+} from 'lucide-react';
 import {
   detectReceptionRedFlags,
   listReceptionRecommendedSafetyFields,
@@ -136,7 +145,9 @@ export default function UnifiedIntakePanel({
       items.push(`Optional before nurse (recommended): ${recommendedSafety.join(', ')}`);
     }
     if (liveRedFlags.length) {
-      items.push(`Confirm red flag${liveRedFlags.length === 1 ? '' : 's'}: ${liveRedFlags.join(', ')}`);
+      items.push(
+        `Confirm red flag${liveRedFlags.length === 1 ? '' : 's'}: ${liveRedFlags.join(', ')}`,
+      );
     }
     return items;
   }, [draft.chiefComplaint, missingCriticalFields, liveRedFlags, recommendedSafety, routeMode]);
@@ -153,7 +164,10 @@ export default function UnifiedIntakePanel({
   }, [draft, liveRedFlags.length, onAiAssistChange]);
 
   useEffect(() => {
-    if (complaintRecognition.confidenceTier !== 'NO_MATCH' && complaintRecognition.confidenceTier !== 'LOW_CONFIDENCE') {
+    if (
+      complaintRecognition.confidenceTier !== 'NO_MATCH' &&
+      complaintRecognition.confidenceTier !== 'LOW_CONFIDENCE'
+    ) {
       return;
     }
     if (!complaintRecognition.normalizedText) return;
@@ -205,7 +219,9 @@ export default function UnifiedIntakePanel({
       {missingCriticalFields.length && phase === UNIFIED_INTAKE_PHASE.critical ? (
         <div className="reception-command-missing" role="status">
           <AlertTriangle size={18} aria-hidden="true" />
-          <span>Missing for {routeMode} route: {missingCriticalFields.join(', ')}.</span>
+          <span>
+            Missing for {routeMode} route: {missingCriticalFields.join(', ')}.
+          </span>
         </div>
       ) : null}
 
@@ -219,7 +235,10 @@ export default function UnifiedIntakePanel({
       ) : null}
 
       {duplicateWarnings.length ? (
-        <div className="reception-command-missing reception-command-missing--duplicate" role="status">
+        <div
+          className="reception-command-missing reception-command-missing--duplicate"
+          role="status"
+        >
           <AlertTriangle size={18} aria-hidden="true" />
           <span>
             Possible existing record{duplicateWarnings.length === 1 ? '' : 's'}:{' '}
@@ -229,7 +248,10 @@ export default function UnifiedIntakePanel({
       ) : null}
 
       <div className="reception-command-grid unified-intake-grid">
-        <section className="reception-command-panel reception-command-panel--span" aria-labelledby="document-scan-title">
+        <section
+          className="reception-command-panel reception-command-panel--span"
+          aria-labelledby="document-scan-title"
+        >
           <div className="reception-command-panel__header">
             <h2 id="document-scan-title">Identity document capture</h2>
           </div>
@@ -242,7 +264,10 @@ export default function UnifiedIntakePanel({
           />
         </section>
 
-        <section className="reception-command-panel reception-command-panel--span" aria-labelledby="arrival-type-title">
+        <section
+          className="reception-command-panel reception-command-panel--span"
+          aria-labelledby="arrival-type-title"
+        >
           <div className="reception-command-panel__header">
             <h2 id="arrival-type-title">Arrival type</h2>
           </div>
@@ -253,7 +278,9 @@ export default function UnifiedIntakePanel({
                 type="button"
                 // eslint-disable-next-line jsx-a11y/role-has-required-aria-props -- aria-checked is always set via the conditional spread below, the linter can't trace it statically
                 role="radio"
-                {...((draft.arrivalType === type.id) ? { 'aria-checked': 'true' as const } : { 'aria-checked': 'false' as const })}
+                {...(draft.arrivalType === type.id
+                  ? { 'aria-checked': 'true' as const }
+                  : { 'aria-checked': 'false' as const })}
                 className={draft.arrivalType === type.id ? 'is-active' : ''}
                 onClick={() => onDraftChange({ arrivalType: type.id })}
               >
@@ -282,14 +309,19 @@ export default function UnifiedIntakePanel({
                 key={chip}
                 type="button"
                 className={`reception-quick-complaints__chip${
-                  String(draft.chiefComplaint || '').toLowerCase().includes(chip.toLowerCase()) ? ' is-active' : ''
+                  String(draft.chiefComplaint || '')
+                    .toLowerCase()
+                    .includes(chip.toLowerCase())
+                    ? ' is-active'
+                    : ''
                 }`}
                 onClick={() => {
                   const current = String(draft.chiefComplaint || '').trim();
                   onDraftChange({
-                    chiefComplaint: current && !current.toLowerCase().includes(chip.toLowerCase())
-                      ? `${current}; ${chip}`
-                      : chip,
+                    chiefComplaint:
+                      current && !current.toLowerCase().includes(chip.toLowerCase())
+                        ? `${current}; ${chip}`
+                        : chip,
                   });
                 }}
               >
@@ -313,7 +345,10 @@ export default function UnifiedIntakePanel({
                   role="status"
                 >
                   {complaintRecognition.confidenceTier === 'NO_MATCH' ? (
-                    <>Not recognized as a standard complaint — original text will be used and flagged for triage review.</>
+                    <>
+                      Not recognized as a standard complaint — original text will be used and
+                      flagged for triage review.
+                    </>
                   ) : (
                     <>
                       Suggested: <strong>{complaintRecognition.canonicalName}</strong>
@@ -338,14 +373,21 @@ export default function UnifiedIntakePanel({
             </label>
             <label className="reception-command-field">
               <span>DOB</span>
-              <input type="date" value={draft.dob} onChange={(event) => onDraftChange({ dob: event.target.value })} />
+              <input
+                type="date"
+                value={draft.dob}
+                onChange={(event) => onDraftChange({ dob: event.target.value })}
+              />
             </label>
             <label className="reception-command-field">
               <span>Consciousness</span>
               <select
                 value={draft.consciousnessStatus}
                 onChange={(event) =>
-                  onDraftChange({ consciousnessStatus: event.target.value as ReceptionIntakeDraft['consciousnessStatus'] })
+                  onDraftChange({
+                    consciousnessStatus: event.target
+                      .value as ReceptionIntakeDraft['consciousnessStatus'],
+                  })
                 }
               >
                 <option value="unknown">Unknown</option>
@@ -360,7 +402,9 @@ export default function UnifiedIntakePanel({
               <select
                 value={draft.breathingStatus}
                 onChange={(event) =>
-                  onDraftChange({ breathingStatus: event.target.value as ReceptionIntakeDraft['breathingStatus'] })
+                  onDraftChange({
+                    breathingStatus: event.target.value as ReceptionIntakeDraft['breathingStatus'],
+                  })
                 }
               >
                 <option value="unknown">Unknown</option>
@@ -375,7 +419,9 @@ export default function UnifiedIntakePanel({
               <select
                 value={draft.visibleDistress}
                 onChange={(event) =>
-                  onDraftChange({ visibleDistress: event.target.value as ReceptionIntakeDraft['visibleDistress'] })
+                  onDraftChange({
+                    visibleDistress: event.target.value as ReceptionIntakeDraft['visibleDistress'],
+                  })
                 }
               >
                 <option value="unknown">Unknown</option>
@@ -477,7 +523,9 @@ export default function UnifiedIntakePanel({
                   <span>Sex if known</span>
                   <select
                     value={draft.sex}
-                    onChange={(event) => onDraftChange({ sex: event.target.value as ReceptionIntakeDraft['sex'] })}
+                    onChange={(event) =>
+                      onDraftChange({ sex: event.target.value as ReceptionIntakeDraft['sex'] })
+                    }
                   >
                     <option value="">Unknown</option>
                     <option value="F">Female</option>
@@ -510,7 +558,8 @@ export default function UnifiedIntakePanel({
                     value={draft.interpreterNeeded || 'unknown'}
                     onChange={(event) =>
                       onDraftChange({
-                        interpreterNeeded: event.target.value as ReceptionIntakeDraft['interpreterNeeded'],
+                        interpreterNeeded: event.target
+                          .value as ReceptionIntakeDraft['interpreterNeeded'],
                       })
                     }
                   >
@@ -549,7 +598,10 @@ export default function UnifiedIntakePanel({
                   <select
                     value={draft.allergiesKnown}
                     onChange={(event) =>
-                      onDraftChange({ allergiesKnown: event.target.value as ReceptionIntakeDraft['allergiesKnown'] })
+                      onDraftChange({
+                        allergiesKnown: event.target
+                          .value as ReceptionIntakeDraft['allergiesKnown'],
+                      })
                     }
                   >
                     <option value="unknown">Unknown</option>
@@ -570,7 +622,10 @@ export default function UnifiedIntakePanel({
                   <select
                     value={draft.medicationsKnown}
                     onChange={(event) =>
-                      onDraftChange({ medicationsKnown: event.target.value as ReceptionIntakeDraft['medicationsKnown'] })
+                      onDraftChange({
+                        medicationsKnown: event.target
+                          .value as ReceptionIntakeDraft['medicationsKnown'],
+                      })
                     }
                   >
                     <option value="unknown">Unknown</option>
@@ -607,7 +662,10 @@ export default function UnifiedIntakePanel({
                   <select
                     value={draft.insuranceStatus}
                     onChange={(event) =>
-                      onDraftChange({ insuranceStatus: event.target.value as ReceptionIntakeDraft['insuranceStatus'] })
+                      onDraftChange({
+                        insuranceStatus: event.target
+                          .value as ReceptionIntakeDraft['insuranceStatus'],
+                      })
                     }
                   >
                     <option value="unknown">Unknown</option>
@@ -621,7 +679,9 @@ export default function UnifiedIntakePanel({
                   <select
                     value={draft.consentStatus}
                     onChange={(event) =>
-                      onDraftChange({ consentStatus: event.target.value as ReceptionIntakeDraft['consentStatus'] })
+                      onDraftChange({
+                        consentStatus: event.target.value as ReceptionIntakeDraft['consentStatus'],
+                      })
                     }
                   >
                     <option value="unknown">Unknown</option>
@@ -635,7 +695,10 @@ export default function UnifiedIntakePanel({
                   <select
                     value={draft.documentStatus}
                     onChange={(event) =>
-                      onDraftChange({ documentStatus: event.target.value as ReceptionIntakeDraft['documentStatus'] })
+                      onDraftChange({
+                        documentStatus: event.target
+                          .value as ReceptionIntakeDraft['documentStatus'],
+                      })
                     }
                     title="Use Check Identity for OCR scan of ID/health card; then create & route"
                   >
@@ -659,9 +722,14 @@ export default function UnifiedIntakePanel({
           )}
         </section>
 
-        <aside className="reception-command-panel reception-command-panel--assist" aria-labelledby="ai-assist-title">
+        <aside
+          className="reception-command-panel reception-command-panel--assist"
+          aria-labelledby="ai-assist-title"
+        >
           <div className="reception-command-panel__header">
-            <h2 id="ai-assist-title">{assistTitle || RECEPTION_COPY.copilot?.title || 'Desk assist'}</h2>
+            <h2 id="ai-assist-title">
+              {assistTitle || RECEPTION_COPY.copilot?.title || 'Desk assist'}
+            </h2>
             <span className="reception-command-chip">{RECEPTION_COPY.copilot.autoUpdated}</span>
           </div>
 
@@ -684,18 +752,26 @@ export default function UnifiedIntakePanel({
           {aiAssist ? (
             <div className="reception-command-ai">
               <AiTruthLabel {...receptionAiIntakeAssistTruthLabel()} compact />
-              <div className={`reception-command-ai__urgency reception-command-ai__urgency--${aiAssist.urgencySuggestion}`}>
+              <div
+                className={`reception-command-ai__urgency reception-command-ai__urgency--${aiAssist.urgencySuggestion}`}
+              >
                 <strong>{aiAssist.urgencySuggestion}</strong>
                 <span>Confidence {Math.round(aiAssist.confidence * 100)}%</span>
               </div>
               <dl>
                 <div>
                   <dt>Missing fields</dt>
-                  <dd>{aiAssist.missingCriticalFields.length ? aiAssist.missingCriticalFields.join(', ') : 'None'}</dd>
+                  <dd>
+                    {aiAssist.missingCriticalFields.length
+                      ? aiAssist.missingCriticalFields.join(', ')
+                      : 'None'}
+                  </dd>
                 </div>
                 <div>
                   <dt>Red flags</dt>
-                  <dd>{aiAssist.redFlags.length ? aiAssist.redFlags.join(', ') : 'None detected'}</dd>
+                  <dd>
+                    {aiAssist.redFlags.length ? aiAssist.redFlags.join(', ') : 'None detected'}
+                  </dd>
                 </div>
                 <div>
                   <dt>Next action</dt>
@@ -712,7 +788,9 @@ export default function UnifiedIntakePanel({
                 <button
                   type="button"
                   className="reception-command-ai-fallback"
-                  onClick={() => onAiAssistChange(runReceptionAiIntakeAssist(draft, { aiUnavailable: true }))}
+                  onClick={() =>
+                    onAiAssistChange(runReceptionAiIntakeAssist(draft, { aiUnavailable: true }))
+                  }
                 >
                   Manual fallback active
                 </button>
@@ -732,7 +810,10 @@ export default function UnifiedIntakePanel({
         {showQueueRail ? alertsRail : null}
       </div>
 
-      <div className="reception-command-actionbar unified-intake-actionbar" aria-label="Unified intake actions">
+      <div
+        className="reception-command-actionbar unified-intake-actionbar"
+        aria-label="Unified intake actions"
+      >
         <button
           type="button"
           className="reception-command-actionbar__secondary unified-intake-actionbar__secondary"
@@ -775,7 +856,7 @@ export default function UnifiedIntakePanel({
                 ? 'Creating patient and routing to triage…'
                 : primaryAction.label
           }
-          aria-disabled={(submitting || !canCreatePatient) ? 'true' : 'false'}
+          aria-disabled={submitting || !canCreatePatient ? 'true' : 'false'}
           onClick={() => {
             if (submitting || !canCreatePatient) return;
             void onRoute();

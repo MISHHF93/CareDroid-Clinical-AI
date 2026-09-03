@@ -56,7 +56,9 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded }: any = {}) => {
   // duplicate/empty entries stay distinct) keeps each row's DOM node,
   // and therefore focus, correctly attached to the same logical entry.
   const nextMedicationIdRef = useRef(1);
-  const [medicationIds, setMedicationIds] = useState(() => [`med-${nextMedicationIdRef.current++}`]);
+  const [medicationIds, setMedicationIds] = useState(() => [
+    `med-${nextMedicationIdRef.current++}`,
+  ]);
   // HEAL-309: allergies previously had nowhere to go in this tool at all -- the
   // checker only ever compared medications against each other, never against
   // what the patient is actually allergic to. Mirrors the medications list's
@@ -78,18 +80,21 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded }: any = {}) => {
     color: '#0ea5e9',
     description: 'Check drug interactions, contraindications, and dosing',
     shortcut: 'Ctrl+1',
-    category: 'Diagnostic'
+    category: 'Diagnostic',
   };
 
   const activeMeds = useMemo(() => medications.map((m) => m.trim()).filter(Boolean), [medications]);
-  const activeAllergies = useMemo(() => allergies.map((a) => a.trim()).filter(Boolean), [allergies]);
+  const activeAllergies = useMemo(
+    () => allergies.map((a) => a.trim()).filter(Boolean),
+    [allergies],
+  );
   const preflightParameters = useMemo(
     () => ({
       medications: activeMeds,
       allergies: activeAllergies,
       severityFilter: 'all',
     }),
-    [activeMeds, activeAllergies]
+    [activeMeds, activeAllergies],
   );
 
   const handleAddMedication = () => {
@@ -180,13 +185,15 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded }: any = {}) => {
       normalized.disclaimer = execution.disclaimer || normalized.disclaimer;
       setResults(normalized);
 
-      offlineService.saveToolResult({
-        userId: user?.id,
-        toolType: toolConfig.id,
-        input: { medications: activeMeds },
-        output: normalized,
-        timestamp: new Date().toISOString(),
-      }).catch(() => {});
+      offlineService
+        .saveToolResult({
+          userId: user?.id,
+          toolType: toolConfig.id,
+          input: { medications: activeMeds },
+          output: normalized,
+          timestamp: new Date().toISOString(),
+        })
+        .catch(() => {});
 
       analyticsService.trackEvent({
         eventName: 'tool_result_saved',
@@ -204,11 +211,16 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded }: any = {}) => {
 
   const getSeverityColor = (severity) => {
     switch (severity) {
-      case 'contraindicated': return '#7F1D1D';
-      case 'major': return '#EF4444';
-      case 'moderate': return '#F59E0B';
-      case 'minor': return '#10B981';
-      default: return MEDICAL_THEME.inkMuted;
+      case 'contraindicated':
+        return '#7F1D1D';
+      case 'major':
+        return '#EF4444';
+      case 'moderate':
+        return '#F59E0B';
+      case 'minor':
+        return '#10B981';
+      default:
+        return MEDICAL_THEME.inkMuted;
     }
   };
 
@@ -233,7 +245,8 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded }: any = {}) => {
                   onChange={(e) => handleMedicationChange(index, e.target.value)}
                 />
                 {medications.length > 1 && (
-                  <button type="button"
+                  <button
+                    type="button"
                     className="btn-remove-med"
                     onClick={() => handleRemoveMedication(index)}
                     title="Remove medication"
@@ -253,8 +266,8 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded }: any = {}) => {
 
           <h2>Patient Allergies (optional)</h2>
           <p className="section-subtitle">
-            Add any documented drug allergies so the checker can flag a medication that
-            cross-reacts with them, not just interactions between the medications themselves
+            Add any documented drug allergies so the checker can flag a medication that cross-reacts
+            with them, not just interactions between the medications themselves
           </p>
 
           <div className="medications-list">
@@ -269,7 +282,8 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded }: any = {}) => {
                   onChange={(e) => handleAllergyChange(index, e.target.value)}
                 />
                 {allergies.length > 1 && (
-                  <button type="button"
+                  <button
+                    type="button"
                     className="btn-remove-med"
                     onClick={() => handleRemoveAllergy(index)}
                     title="Remove allergy"
@@ -300,7 +314,8 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded }: any = {}) => {
           />
 
           <div className="input-actions">
-            <button type="button"
+            <button
+              type="button"
               className="btn-check-interactions"
               onClick={handleCheck}
               disabled={isChecking || !preflightReady}
@@ -335,12 +350,8 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded }: any = {}) => {
                     style={{ '--severity-color': getSeverityColor(interaction.severity) } as any}
                   >
                     <div className="interaction-header">
-                      <span className="severity-badge">
-                        {interaction.severity.toUpperCase()}
-                      </span>
-                      <span className="interacting-drugs">
-                        {interaction.drugs.join(' + ')}
-                      </span>
+                      <span className="severity-badge">{interaction.severity.toUpperCase()}</span>
+                      <span className="interacting-drugs">{interaction.drugs.join(' + ')}</span>
                     </div>
                     <div className="interaction-body">
                       <p className="interaction-description">
@@ -391,7 +402,8 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded }: any = {}) => {
                 <h3 className="result-title">✅ No Major Interactions Detected</h3>
                 <p>The medications checked do not have documented major interactions.</p>
                 <p className="disclaimer">
-                  Note: Always consult drug references and clinical judgment for comprehensive assessment.
+                  Note: Always consult drug references and clinical judgment for comprehensive
+                  assessment.
                 </p>
               </div>
             )}
@@ -405,9 +417,18 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded }: any = {}) => {
             <div className="reference-item">
               <h4>Severity Levels</h4>
               <ul>
-                <li><span className="drug-severity-dot drug-severity-dot--major">●</span> Major: Avoid combination</li>
-                <li><span className="drug-severity-dot drug-severity-dot--moderate">●</span> Moderate: Monitor closely</li>
-                <li><span className="drug-severity-dot drug-severity-dot--minor">●</span> Minor: Usually safe</li>
+                <li>
+                  <span className="drug-severity-dot drug-severity-dot--major">●</span> Major: Avoid
+                  combination
+                </li>
+                <li>
+                  <span className="drug-severity-dot drug-severity-dot--moderate">●</span> Moderate:
+                  Monitor closely
+                </li>
+                <li>
+                  <span className="drug-severity-dot drug-severity-dot--minor">●</span> Minor:
+                  Usually safe
+                </li>
               </ul>
             </div>
             <div className="reference-item">

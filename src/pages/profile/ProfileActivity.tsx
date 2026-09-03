@@ -22,7 +22,10 @@ function ActivityList({ title, items = [] as any[] }) {
       ) : (
         <div className="profile-identity-list">
           {items.map((item) => (
-            <div key={item.id || `${item.label}-${item.occurredAt}`} className="profile-identity-row">
+            <div
+              key={item.id || `${item.label}-${item.occurredAt}`}
+              className="profile-identity-row"
+            >
               <div>
                 <strong>{item.label}</strong>
                 <span>{formatDate(item.occurredAt)}</span>
@@ -60,7 +63,8 @@ export default function ProfileActivity() {
         <Card>
           <h2 className="u-mt-0">Audit Visibility</h2>
           <p className="profile-identity-muted">
-            Compliance-grade audit events remain protected. This page shows only safe current-user summaries.
+            Compliance-grade audit events remain protected. This page shows only safe current-user
+            summaries.
           </p>
           <div className="profile-identity-list">
             {(audit?.recentEvents || []).slice(0, 5).map((event) => (

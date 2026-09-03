@@ -57,7 +57,12 @@ export const RECEPTION_WORKFLOW_PROFILES = Object.freeze({
     emsArrival: Object.freeze({
       id: 'ems-arrival',
       label: 'EMS convert + verify',
-      screens: ['reception', 'reception-ems-tab', 'smart-intake-overlay', 'reception-arrived-banner'],
+      screens: [
+        'reception',
+        'reception-ems-tab',
+        'smart-intake-overlay',
+        'reception-arrived-banner',
+      ],
       clicks: 7,
       fields: 3,
       usesChooser: false,
@@ -238,7 +243,8 @@ function workflowMetrics(workflow, timing = RECEPTION_TIMING_MS) {
     totalRegistrationMs: times.totalMs,
     humanMs: times.humanMs,
     screens: [...workflow.screens],
-    unnecessaryStepsRemoved: workflow.handoffBannerDismiss === false && workflow.usesChooser === false,
+    unnecessaryStepsRemoved:
+      workflow.handoffBannerDismiss === false && workflow.usesChooser === false,
   };
 }
 
@@ -395,7 +401,7 @@ function listHarmonizationWins(baselineProfile, harmonizedProfile, mix, patientC
       summary: 'Express register promoted to primary CTA; N shortcut opens express modal.',
       clicksSaved: baseline.dayTotals.clicks - harmonized.dayTotals.clicks,
       minutesSaved: round(
-        (baseline.dayTotals.registrationMinutes - harmonized.dayTotals.registrationMinutes),
+        baseline.dayTotals.registrationMinutes - harmonized.dayTotals.registrationMinutes,
         1,
       ),
     },
@@ -406,7 +412,8 @@ function listHarmonizationWins(baselineProfile, harmonizedProfile, mix, patientC
     },
     {
       id: 'quick-create-shortcut',
-      summary: 'open-reception-quick-create and ?quickCreate=1 open QuickIntake directly (skip chooser).',
+      summary:
+        'open-reception-quick-create and ?quickCreate=1 open QuickIntake directly (skip chooser).',
       chooserStepsRemoved: 1,
     },
     {

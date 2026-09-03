@@ -34,10 +34,30 @@ describe('registryToolLaunch', () => {
   });
 
   it.each([
-    ['qsofa', 'calculator-route', '/emergency/tools', '?source=calculators&filter=calculator&q=qsofa&open=qsofa'],
-    ['sofa-score', 'calculator-route', '/emergency/tools', '?source=calculators&filter=calculator&q=sofa&open=sofa'],
-    ['drug-check', 'tool-page', '/emergency/tools', '?source=tools&filter=clinical-tools&q=drug-check'],
-    ['fleet-command', 'tool-page', '/emergency/tools', '?source=operations&filter=operations&q=fleet-command'],
+    [
+      'qsofa',
+      'calculator-route',
+      '/emergency/tools',
+      '?source=calculators&filter=calculator&q=qsofa&open=qsofa',
+    ],
+    [
+      'sofa-score',
+      'calculator-route',
+      '/emergency/tools',
+      '?source=calculators&filter=calculator&q=sofa&open=sofa',
+    ],
+    [
+      'drug-check',
+      'tool-page',
+      '/emergency/tools',
+      '?source=tools&filter=clinical-tools&q=drug-check',
+    ],
+    [
+      'fleet-command',
+      'tool-page',
+      '/emergency/tools',
+      '?source=operations&filter=operations&q=fleet-command',
+    ],
   ])('getRegistryToolNavigation(%s) → %s %s', (id, mode, pathname, search) => {
     const plan = getRegistryToolNavigation(id);
     expect(plan.mode).toBe(mode);
@@ -59,23 +79,34 @@ describe('registryToolLaunch', () => {
     expect(plan.pathname).toBe(CANONICAL_ROUTES.emergencyCopilot);
   });
 
-  it.each(NLU_PROFILE_TOOL_IDS)('NLU profile %s resolves via getRegistryToolNavigation', (nluId) => {
-    const plan = getRegistryToolNavigation(nluId);
-    expect(plan.pathname).toBeTruthy();
-    expect(['calculator-route', 'chat-assisted', 'tool-page', 'calculator-hub', 'fallback']).toContain(
-      plan.mode
-    );
-    if (plan.launch.chatSeed && plan.mode === 'chat-assisted') {
-      expect(plan.shouldSeedChat).toBe(true);
-    }
-  });
+  it.each(NLU_PROFILE_TOOL_IDS)(
+    'NLU profile %s resolves via getRegistryToolNavigation',
+    (nluId) => {
+      const plan = getRegistryToolNavigation(nluId);
+      expect(plan.pathname).toBeTruthy();
+      expect([
+        'calculator-route',
+        'chat-assisted',
+        'tool-page',
+        'calculator-hub',
+        'fallback',
+      ]).toContain(plan.mode);
+      if (plan.launch.chatSeed && plan.mode === 'chat-assisted') {
+        expect(plan.shouldSeedChat).toBe(true);
+      }
+    },
+  );
 
   it('covers every toolRegistry path with a known launch mode', () => {
     for (const tool of toolRegistry) {
       const plan = getRegistryToolNavigation(tool.id);
-      expect(['calculator-route', 'chat-assisted', 'tool-page', 'calculator-hub', 'fallback']).toContain(
-        plan.mode
-      );
+      expect([
+        'calculator-route',
+        'chat-assisted',
+        'tool-page',
+        'calculator-hub',
+        'fallback',
+      ]).toContain(plan.mode);
       expect(plan.pathname).toBeTruthy();
     }
   });
@@ -86,12 +117,21 @@ describe('registryToolLaunch', () => {
       const plan = getRegistryToolNavigation(record.id);
       expect(plan.pathname, record.id).toBeTruthy();
       expect(plan.launch, record.id).toBeTruthy();
-      expect(plan.launch.path || plan.launch.chatSeed || record.fallbackRoute, record.id).toBeTruthy();
+      expect(
+        plan.launch.path || plan.launch.chatSeed || record.fallbackRoute,
+        record.id,
+      ).toBeTruthy();
     }
   });
 
   it('does not produce blank launch targets for any user-facing inventory record', () => {
-    const allowedModes = new Set(['calculator-route', 'chat-assisted', 'tool-page', 'calculator-hub', 'fallback']);
+    const allowedModes = new Set([
+      'calculator-route',
+      'chat-assisted',
+      'tool-page',
+      'calculator-hub',
+      'fallback',
+    ]);
 
     for (const record of getUserFacingToolInventory()) {
       const plan = getRegistryToolNavigation(record.id);
@@ -113,16 +153,26 @@ describe('registryToolLaunch', () => {
         expect(plan.search, record.id).toContain('filter=calculator');
       }
 
-      if ([TOOL_SURFACES.TOOL_PAGE, TOOL_SURFACES.FLEET_PAGE, TOOL_SURFACES.HUB].includes(record.surface)) {
+      if (
+        [TOOL_SURFACES.TOOL_PAGE, TOOL_SURFACES.FLEET_PAGE, TOOL_SURFACES.HUB].includes(
+          record.surface,
+        )
+      ) {
         expect(ACTIVE_EMERGENCY_LAUNCH_ROUTES.has(plan.pathname), record.id).toBe(true);
       }
     }
   });
 
   it('resolves launch plans for every command-visible mounted capability', () => {
-    const allowedModes = new Set(['calculator-route', 'chat-assisted', 'tool-page', 'calculator-hub', 'fallback']);
+    const allowedModes = new Set([
+      'calculator-route',
+      'chat-assisted',
+      'tool-page',
+      'calculator-hub',
+      'fallback',
+    ]);
     const launchableCapabilities = getMountedCapabilityGraph().capabilities.filter(
-      (capability) => capability.commandVisible
+      (capability) => capability.commandVisible,
     );
 
     expect(launchableCapabilities.length).toBeGreaterThan(0);
@@ -176,7 +226,7 @@ describe('registryToolLaunch', () => {
     expect(handlers.addMessage).not.toHaveBeenCalled();
     expect(handlers.navigate).toHaveBeenCalledWith(
       { pathname: '/emergency/tools', search: '?entitlement=denied&reason=locked' },
-      { replace: true }
+      { replace: true },
     );
   });
 

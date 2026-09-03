@@ -33,9 +33,7 @@ describe('patientWhiteboardModel', () => {
   });
 
   it('includes discharge instructions for discharge state', () => {
-    const snapshot = buildPatientWhiteboardSnapshot(
-      patient({ state: PatientState.Discharge }),
-    );
+    const snapshot = buildPatientWhiteboardSnapshot(patient({ state: PatientState.Discharge }));
     expect(snapshot.dischargeInstructions.length).toBeGreaterThan(0);
     expect(snapshot.dischargeInstructions.join(' ').toLowerCase()).not.toContain('npo');
   });

@@ -46,7 +46,7 @@ export function buildAccessibilityAudit(sourceSnapshot: any = {}) {
       'Authenticated shell exposes a skip link to main content',
       has(appShellJsx, 'href="#main-content"') && has(appShellCss, '.ed-skip-link:focus'),
       '`AppShell` renders a skip link before navigation.',
-      'Add a visible-on-focus skip link before the sidebar.'
+      'Add a visible-on-focus skip link before the sidebar.',
     ),
     check(
       'keyboard-overlay-escape',
@@ -54,7 +54,7 @@ export function buildAccessibilityAudit(sourceSnapshot: any = {}) {
       'Shell overlays close with Escape',
       /\.key === ['"]Escape['"]/.test(appShellJsx),
       '`AppShell` closes open menus and palettes on Escape.',
-      'Keep Escape handling on AppShell overlays.'
+      'Keep Escape handling on AppShell overlays.',
     ),
     check(
       'screen-reader-icon-buttons',
@@ -64,7 +64,7 @@ export function buildAccessibilityAudit(sourceSnapshot: any = {}) {
         /aria-label=\{`\$\{item\.label\}.*unread/.test(sidebarTsx) &&
         has(sidebarTsx, 'aria-label={copilotChrome.shortName}'),
       'Collapsed rail item, unread-alert badge, and Copilot toggle have explicit dynamic labels.',
-      'Do not rely on `title` as the accessible name for icon-only controls.'
+      'Do not rely on `title` as the accessible name for icon-only controls.',
     ),
     check(
       'screen-reader-status',
@@ -73,7 +73,7 @@ export function buildAccessibilityAudit(sourceSnapshot: any = {}) {
       has(notificationPanelTsx, 'role="dialog"') &&
         has(notificationPanelTsx, 'aria-labelledby="notification-center-title"'),
       'The notification center panel is announced as a labeled dialog when opened.',
-      'Add a screen-reader label to non-text status indicators.'
+      'Add a screen-reader label to non-text status indicators.',
     ),
     check(
       'contrast-theme-tokens',
@@ -83,7 +83,7 @@ export function buildAccessibilityAudit(sourceSnapshot: any = {}) {
         has(themeTokensCss, '--app-focus-ring-aa') &&
         has(themeTokensCss, '--app-accent-contrast'),
       'Light/dark tokens expose foreground, contrast, and focus ring variables.',
-      'Maintain tokenized foreground and focus colors with AA contrast checks.'
+      'Maintain tokenized foreground and focus colors with AA contrast checks.',
     ),
     check(
       'focus-visible-global',
@@ -93,7 +93,7 @@ export function buildAccessibilityAudit(sourceSnapshot: any = {}) {
         has(themeSurfacesCss, 'outline: 3px solid var(--app-focus-ring-aa') &&
         has(themeSurfacesCss, 'outline-offset: 3px'),
       'Global interactive controls use a 3px focus outline plus shadow.',
-      'Use a high-contrast outline with offset for all focusable controls.'
+      'Use a high-contrast outline with offset for all focusable controls.',
     ),
     check(
       'tab-order-no-positive',
@@ -101,7 +101,7 @@ export function buildAccessibilityAudit(sourceSnapshot: any = {}) {
       'Tab order avoids positive tabIndex values',
       !/tabIndex=\{?[1-9]/.test(allSource) && !/tabindex=["']?[1-9]/i.test(allSource),
       'No positive tab index values found in audited sources.',
-      'Use DOM order and `tabIndex={-1}` only for programmatic focus targets.'
+      'Use DOM order and `tabIndex={-1}` only for programmatic focus targets.',
     ),
     check(
       'tab-order-main-target',
@@ -109,7 +109,7 @@ export function buildAccessibilityAudit(sourceSnapshot: any = {}) {
       'Main landmark can receive skip-link focus without entering tab order',
       has(appShellJsx, 'id="main-content"') && has(appShellJsx, 'tabIndex={-1}'),
       '`main#main-content` is a programmatic focus target.',
-      'Add `tabIndex={-1}` to the main landmark.'
+      'Add `tabIndex={-1}` to the main landmark.',
     ),
     check(
       'touch-target-baseline',
@@ -120,7 +120,7 @@ export function buildAccessibilityAudit(sourceSnapshot: any = {}) {
         has(sidebarCss, 'min-height: var(--touch-target-min') &&
         has(responsiveUxCss, 'min-height: var(--app-min-touch-target, 44px)'),
       'Design tokens, responsive UX, and Sidebar nav controls enforce 44px minimum targets.',
-      'Apply the touch target token to primary buttons, nav items, and form controls.'
+      'Apply the touch target token to primary buttons, nav items, and form controls.',
     ),
   ];
 
@@ -136,7 +136,8 @@ export function buildAccessibilityAudit(sourceSnapshot: any = {}) {
     findings: failed,
     categorySummary: Object.values(ACCESSIBILITY_AUDIT_CATEGORIES).map((category) => ({
       category,
-      passed: checks.filter((checkItem) => checkItem.category === category && checkItem.passed).length,
+      passed: checks.filter((checkItem) => checkItem.category === category && checkItem.passed)
+        .length,
       total: checks.filter((checkItem) => checkItem.category === category).length,
     })),
   };
@@ -155,7 +156,9 @@ export function formatAccessibilityReportMarkdown(audit = buildAccessibilityAudi
     '',
     '## Category Summary',
     '',
-    ...audit.categorySummary.map((item) => `- ${item.category}: ${item.passed}/${item.total} checks passing`),
+    ...audit.categorySummary.map(
+      (item) => `- ${item.category}: ${item.passed}/${item.total} checks passing`,
+    ),
     '',
     '## Findings',
     '',

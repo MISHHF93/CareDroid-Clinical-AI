@@ -134,12 +134,18 @@ export function resolveReceptionScreenCapabilities(
     const permission = getScreenModeActionPermission(CARE_DROID_SCREEN_MODES.reception, actionId);
     const matrixAction = resolveReceptionMatrixAction(actionId);
     if (!matrixAction || !permission) {
-      return gateRoleAction(undefined, EMERGENCY_ROLE_ACTIONS.patientCreate, permission || '', input.can);
+      return gateRoleAction(
+        undefined,
+        EMERGENCY_ROLE_ACTIONS.patientCreate,
+        permission || '',
+        input.can,
+      );
     }
     return gateRoleAction(input.presentAction, matrixAction, permission, input.can);
   };
 
-  const canSearchPatients = showWidget(RECEPTION_SCREEN_WIDGETS.patientSearch) &&
+  const canSearchPatients =
+    showWidget(RECEPTION_SCREEN_WIDGETS.patientSearch) &&
     canPerform(RECEPTION_SCREEN_ACTIONS.searchPatients);
   const canCreatePatient = canPerform(RECEPTION_SCREEN_ACTIONS.createPatient);
   const canVerifyIdentity = canPerform(RECEPTION_SCREEN_ACTIONS.verifyIdentity);
@@ -172,7 +178,6 @@ export function resolveReceptionScreenCapabilities(
     canEscalateToNurse,
     canConvertEmsArrival,
     canOpenSmartIntake,
-    showClinicalTriageAssist:
-      !isReceptionScreen && input.can(EMERGENCY_ACTIONS.triage),
+    showClinicalTriageAssist: !isReceptionScreen && input.can(EMERGENCY_ACTIONS.triage),
   };
 }

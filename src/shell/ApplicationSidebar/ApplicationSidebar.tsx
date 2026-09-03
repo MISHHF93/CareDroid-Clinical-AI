@@ -5,4 +5,7 @@
  * (`sidebar-mobile-nav`) — there is no separate MobileNavigation component in
  * this app's real shell.
  */
-export { Sidebar as ApplicationSidebar, type SidebarProps as ApplicationSidebarProps } from '../../components/Sidebar';
+export {
+  Sidebar as ApplicationSidebar,
+  type SidebarProps as ApplicationSidebarProps,
+} from '../../components/Sidebar';

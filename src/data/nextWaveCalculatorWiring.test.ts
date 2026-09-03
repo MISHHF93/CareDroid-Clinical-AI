@@ -12,7 +12,11 @@ import {
 import { resolveCatalogLaunch } from './clinicalCatalogWiring';
 import toolRegistry, { toolRegistryById } from './toolRegistry';
 import { CALCULATOR_INTERFACE_CLASS_BY_SLUG } from './calculatorHubManifest';
-import { CALCULATOR_ROUTE_DEFS, expectedLaunchPath, matchCalculatorRoute } from '../routes/clinicalToolRoutes';
+import {
+  CALCULATOR_ROUTE_DEFS,
+  expectedLaunchPath,
+  matchCalculatorRoute,
+} from '../routes/clinicalToolRoutes';
 
 const PR11_TOOL_IDS = [REGISTRY.shockIndex, REGISTRY.anionGap, REGISTRY.rass];
 // Shock Index and Anion Gap were reconciled onto the real 37-tool backend executor
@@ -39,10 +43,10 @@ describe('next-wave Tier A calculators', () => {
   it('exposes catalog, route, and form smoke hooks reflecting current backend-executor status', () => {
     for (const id of PR11_TOOL_IDS) {
       const builtin = builtinUiCalculators.find((calc) => calc.id === id);
-    if (!builtin) throw new Error('expected builtin calculator entry to exist');
+      if (!builtin) throw new Error('expected builtin calculator entry to exist');
       const registry = toolRegistry.find((tool) => tool.id === id);
       const nlu = clinicalIntentTools.find((tool) => tool.toolId === id);
-    if (!nlu) throw new Error('expected nlu tool entry to exist');
+      if (!nlu) throw new Error('expected nlu tool entry to exist');
       const launch = resolveCatalogLaunch(id);
 
       expect(builtin?.path).toBe(`/tools/calculators/${id}`);

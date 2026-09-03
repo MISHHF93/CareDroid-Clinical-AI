@@ -93,7 +93,8 @@ describe('canonical configuration contract', () => {
   it('registers architecture DUPLICATE artifacts as compat shims', () => {
     const snapshot = buildCanonicalConfigurationAuditSnapshot(readEnvExample());
     const untracked = snapshot.conflicts.filter(
-      (conflict) => conflict.id.startsWith('untracked-duplicate-') && conflict.severity === 'warning',
+      (conflict) =>
+        conflict.id.startsWith('untracked-duplicate-') && conflict.severity === 'warning',
     );
     expect(untracked).toEqual([]);
     expect(snapshot.compatShims.map((entry) => entry.id)).toEqual(
@@ -119,9 +120,9 @@ describe('canonical configuration contract', () => {
     expect(getCanonicalConfigurationEntry('admin-console-routes')?.domain).toBe('routes');
     expect(getCanonicalConfigurationEntry('training-console-routes')?.domain).toBe('routes');
     expect(getCanonicalConfigurationEntry('platform-cohesion')?.layer).toBe('registry');
-    expect(getCanonicalConfigurationEntry('living-documentation-contextual-help')?.exportKeys).toContain(
-      'LIVING_CONTEXTUAL_HELP_ENTRIES',
-    );
+    expect(
+      getCanonicalConfigurationEntry('living-documentation-contextual-help')?.exportKeys,
+    ).toContain('LIVING_CONTEXTUAL_HELP_ENTRIES');
     expect(getCanonicalConfigurationEntry('unified-oi-metric-registry')?.layer).toBe('projection');
   });
 });

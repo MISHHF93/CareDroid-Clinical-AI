@@ -37,12 +37,12 @@ const RECEPTION_FIRST_NAV_ORDER = Object.freeze([
 // Exported for backward compatibility with existing tests.
 const ROLE_NAV_ORDER_OVERRIDES: Readonly<Record<string, readonly string[]>> = Object.freeze({
   ...HOSPITAL_ROLE_NAV_IDS,
-  physician:        HOSPITAL_ROLE_NAV_IDS.emergency_physician,
-  ems_user:         HOSPITAL_ROLE_NAV_IDS.paramedic,
-  ed_manager:       HOSPITAL_ROLE_NAV_IDS.ed_director,
-  admin:            HOSPITAL_ROLE_NAV_IDS.hospital_admin,
+  physician: HOSPITAL_ROLE_NAV_IDS.emergency_physician,
+  ems_user: HOSPITAL_ROLE_NAV_IDS.paramedic,
+  ed_manager: HOSPITAL_ROLE_NAV_IDS.ed_director,
+  admin: HOSPITAL_ROLE_NAV_IDS.hospital_admin,
   read_only_viewer: HOSPITAL_ROLE_NAV_IDS.demo_observer,
-  public_display:   HOSPITAL_ROLE_NAV_IDS.demo_observer,
+  public_display: HOSPITAL_ROLE_NAV_IDS.demo_observer,
 });
 
 // Hiding is now handled entirely by getHiddenNavItemIdsForRole via the cluster allowlist.
@@ -75,14 +75,46 @@ export function sortNavigationItemsForRole(items: readonly any[], role: string):
 
 // Full list of known sidebar item IDs — used to compute the hidden set from a role's allowlist.
 const ALL_KNOWN_NAV_ITEM_IDS: readonly string[] = Object.freeze([
-  'command-center', 'reception', 'whiteboard', 'dispatch', 'ems', 'ed-readiness',
-  'patients', 'queues', 'triage', 'reassessment', 'alerts', 'capacity', 'referrals',
-  'diagnostics', 'handoffs', 'copilot', 'tools', 'analytics', 'reports', 'settings',
-  'pulse', 'shift', 'help', 'admin', 'audit',
-  'intake', 'integrations', 'cosmos', 'platform', 'fleet', 'surveillance',
-  'simulation', 'laboratory', 'knowledge', 'ai-center',
+  'command-center',
+  'reception',
+  'whiteboard',
+  'dispatch',
+  'ems',
+  'ed-readiness',
+  'patients',
+  'queues',
+  'triage',
+  'reassessment',
+  'alerts',
+  'capacity',
+  'referrals',
+  'diagnostics',
+  'handoffs',
+  'copilot',
+  'tools',
+  'analytics',
+  'reports',
+  'settings',
+  'pulse',
+  'shift',
+  'help',
+  'admin',
+  'audit',
+  'intake',
+  'integrations',
+  'cosmos',
+  'platform',
+  'fleet',
+  'surveillance',
+  'simulation',
+  'laboratory',
+  'knowledge',
+  'ai-center',
   // Extended platform pages
-  'hospital-map', 'executive', 'predictive-analytics', 'medical-iot',
+  'hospital-map',
+  'executive',
+  'predictive-analytics',
+  'medical-iot',
 ]);
 
 export function getHiddenNavItemIdsForRole(role: string, options: any = {}): Set<string> {

@@ -17,13 +17,48 @@ import { isOrchestratorPostExecutable } from './unsupportedOrchestratorTools';
 
 /** Internal Nest services (no direct HTTP from SPA). */
 export const BACKEND_INTERNAL_SERVICES = Object.freeze([
-  { symbol: 'RagService', module: 'modules/rag', strategy: 'backend-only', reason: 'Chat retrieval' },
-  { symbol: 'EncryptionService', module: 'modules/encryption', strategy: 'backend-only', reason: 'At-rest crypto' },
-  { symbol: 'CacheService', module: 'modules/cache', strategy: 'backend-only', reason: 'Redis layer' },
-  { symbol: 'EmailService', module: 'modules/email', strategy: 'backend-only', reason: 'Transactional mail' },
-  { symbol: 'EmergencyEscalationService', module: 'emergency-escalation', strategy: 'backend-only', reason: 'Chat pipeline' },
-  { symbol: 'IntentClassifierService', module: 'intent-classifier', strategy: 'backend-only', reason: 'Via POST /api/chat/*' },
-  { symbol: 'ToolOrchestratorService.executeInChat', module: 'tool-orchestrator', strategy: 'backend-only', reason: 'ChatService internal' },
+  {
+    symbol: 'RagService',
+    module: 'modules/rag',
+    strategy: 'backend-only',
+    reason: 'Chat retrieval',
+  },
+  {
+    symbol: 'EncryptionService',
+    module: 'modules/encryption',
+    strategy: 'backend-only',
+    reason: 'At-rest crypto',
+  },
+  {
+    symbol: 'CacheService',
+    module: 'modules/cache',
+    strategy: 'backend-only',
+    reason: 'Redis layer',
+  },
+  {
+    symbol: 'EmailService',
+    module: 'modules/email',
+    strategy: 'backend-only',
+    reason: 'Transactional mail',
+  },
+  {
+    symbol: 'EmergencyEscalationService',
+    module: 'emergency-escalation',
+    strategy: 'backend-only',
+    reason: 'Chat pipeline',
+  },
+  {
+    symbol: 'IntentClassifierService',
+    module: 'intent-classifier',
+    strategy: 'backend-only',
+    reason: 'Via POST /api/chat/*',
+  },
+  {
+    symbol: 'ToolOrchestratorService.executeInChat',
+    module: 'tool-orchestrator',
+    strategy: 'backend-only',
+    reason: 'ChatService internal',
+  },
   {
     symbol: 'FHIRService / MPIService / OCRService / TextMiningService',
     module: 'services + api/smart-intake.routes',
@@ -59,7 +94,7 @@ export function assertNoOrphanedBackendFunctionality() {
     errors.push(
       `Controller routes missing from inventory: ${controllerDiff.missingInInventory
         .map((r) => `${r.method} ${r.path}`)
-        .join(', ')}`
+        .join(', ')}`,
     );
   }
 
@@ -67,7 +102,7 @@ export function assertNoOrphanedBackendFunctionality() {
     errors.push(
       `Inventory routes not found in controllers: ${controllerDiff.missingInControllers
         .map((r) => `${r.method} ${r.path}`)
-        .join(', ')}`
+        .join(', ')}`,
     );
   }
 
@@ -112,7 +147,7 @@ export function formatOrphanedBackendFunctionsMarkdown() {
     '| Route | Controller | Reason |',
     '|-------|------------|--------|',
     ...byStrategy['backend-only'].map(
-      (r) => `| \`${r.key.replace(/^\w+ /, '')}\` | ${r.controller} | ${r.reason} |`
+      (r) => `| \`${r.key.replace(/^\w+ /, '')}\` | ${r.controller} | ${r.reason} |`,
     ),
     '',
     '### Internal services (no HTTP)',
@@ -126,8 +161,7 @@ export function formatOrphanedBackendFunctionsMarkdown() {
     '| Route | Controller | Client hint |',
     '|-------|------------|-------------|',
     ...byStrategy['expose-recommended'].map(
-      (r) =>
-        `| \`${r.key.replace(/^\w+ /, '')}\` | ${r.controller} | ${r.clientHint ?? '—'} |`
+      (r) => `| \`${r.key.replace(/^\w+ /, '')}\` | ${r.controller} | ${r.clientHint ?? '—'} |`,
     ),
     '',
     '## C. Deferred / admin / SSO',
@@ -135,7 +169,7 @@ export function formatOrphanedBackendFunctionsMarkdown() {
     '| Route | Controller | Reason |',
     '|-------|------------|--------|',
     ...byStrategy.deferred.map(
-      (r) => `| \`${r.key.replace(/^\w+ /, '')}\` | ${r.controller} | ${r.reason} |`
+      (r) => `| \`${r.key.replace(/^\w+ /, '')}\` | ${r.controller} | ${r.reason} |`,
     ),
     '',
     '## D. Frontend calls without backend (gated)',
@@ -143,8 +177,7 @@ export function formatOrphanedBackendFunctionsMarkdown() {
     '| ID | Method | Path | Capability | Client |',
     '|----|--------|------|------------|--------|',
     ...gated.map(
-      (c) =>
-        `| ${c.id} | ${c.method} | \`${c.path}\` | ${c.capability ?? '—'} | ${c.client} |`
+      (c) => `| ${c.id} | ${c.method} | \`${c.path}\` | ${c.capability ?? '—'} | ${c.client} |`,
     ),
     '',
     '## E. POST executors',

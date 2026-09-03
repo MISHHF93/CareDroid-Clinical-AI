@@ -50,10 +50,12 @@ describe('RealTimeCostService', () => {
 
       service.handleCostUpdate(update);
 
-      expect(listener).toHaveBeenCalledWith(expect.objectContaining({
-        toolId: 'drug-checker',
-        cost: 25.5,
-      }));
+      expect(listener).toHaveBeenCalledWith(
+        expect.objectContaining({
+          toolId: 'drug-checker',
+          cost: 25.5,
+        }),
+      );
     });
 
     it('should accumulate costs correctly', () => {
@@ -116,10 +118,12 @@ describe('RealTimeCostService', () => {
 
       service.handleCostAlert(alert);
 
-      expect(listener).toHaveBeenCalledWith(expect.objectContaining({
-        type: 'APPROACHING',
-        riskLevel: 'warning',
-      }));
+      expect(listener).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: 'APPROACHING',
+          riskLevel: 'warning',
+        }),
+      );
     });
 
     it('should identify critical alerts', () => {
@@ -136,9 +140,11 @@ describe('RealTimeCostService', () => {
         timestamp: new Date().toISOString(),
       });
 
-      expect(listener).toHaveBeenCalledWith(expect.objectContaining({
-        riskLevel: 'critical',
-      }));
+      expect(listener).toHaveBeenCalledWith(
+        expect.objectContaining({
+          riskLevel: 'critical',
+        }),
+      );
     });
 
     it('should queue multiple alerts', () => {
@@ -239,7 +245,7 @@ describe('RealTimeCostService', () => {
         expect.objectContaining({
           period: '24h',
           topCount: 5,
-        })
+        }),
       );
     });
   });
@@ -289,7 +295,7 @@ describe('RealTimeCostService', () => {
       expect(service.wsManager.sendCostUpdate).toHaveBeenCalledWith(
         'drug-checker',
         50,
-        expect.objectContaining({ userId: 'user-1' })
+        expect.objectContaining({ userId: 'user-1' }),
       );
     });
   });

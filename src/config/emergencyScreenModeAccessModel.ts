@@ -170,10 +170,7 @@ export function resolveAllowedRolesForScreenMode(
   settings: ScreenModeRoleAccessSettings = {},
 ): EmergencyRoleId[] {
   const fallback = buildDefaultAllowedRolesByScreenMode();
-  const normalized = normalizeAllowedRolesByScreenMode(
-    settings.allowedRolesByScreenMode,
-    fallback,
-  );
+  const normalized = normalizeAllowedRolesByScreenMode(settings.allowedRolesByScreenMode, fallback);
   return normalized[screenMode] || [];
 }
 

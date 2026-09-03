@@ -3,10 +3,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, it, expect } from 'vitest';
 import { clinicalIntentTools, nluCalculatorHubOnly } from './clinicalIntentToolCatalog';
-import {
-  nihssChatConfig,
-  NIHSS_REQUIRED_NLU_ALIASES,
-} from './chatAssistedCalculators/nihss';
+import { nihssChatConfig, NIHSS_REQUIRED_NLU_ALIASES } from './chatAssistedCalculators/nihss';
 import {
   resolveCatalogLaunch,
   NLU_TO_REGISTRY_ID,
@@ -23,9 +20,9 @@ const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
 const patternsSource = readFileSync(
   join(
     __dirname,
-    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts'
+    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts',
   ),
-  'utf8'
+  'utf8',
 );
 
 describe('NIHSS (Tier B chat-assisted) wiring', () => {
@@ -69,7 +66,7 @@ describe('NIHSS (Tier B chat-assisted) wiring', () => {
       expect(launch.openLabel).toBe('Start guided chat');
       expect(launch.orchestratorTool).toBeNull();
       expect(launch.chatSeed).toMatch(/NIH Stroke Scale/i);
-    }
+    },
   );
 
   it('resolves discovery slug aliases to nihss', () => {

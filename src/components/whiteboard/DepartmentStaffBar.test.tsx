@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import DepartmentStaffBar from './DepartmentStaffBar';
-import { PatientState, Priority, type ActiveShift, type Patient, type Staff } from '../../types/emergency';
+import {
+  PatientState,
+  Priority,
+  type ActiveShift,
+  type Patient,
+  type Staff,
+} from '../../types/emergency';
 
 const staff: Staff[] = [
   { id: 's-charge', name: 'Owen Clarke', role: 'Charge', status: 'OnShift', active: true },
@@ -41,9 +47,7 @@ const activeShift: ActiveShift = {
 
 describe('DepartmentStaffBar', () => {
   it('renders on-duty clinicians with titles and responsibilities', () => {
-    render(
-      <DepartmentStaffBar staff={staff} patients={patients} activeShift={activeShift} />,
-    );
+    render(<DepartmentStaffBar staff={staff} patients={patients} activeShift={activeShift} />);
 
     expect(
       screen.getByRole('region', { name: /on-duty departmental staff overview/i }),

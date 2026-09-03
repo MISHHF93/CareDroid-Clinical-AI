@@ -33,21 +33,24 @@ function sliceCalculatorComponent(source, componentName) {
 }
 
 describe('PR2 Tier-A calculators — shared accessibility affordances', () => {
-  it.each([...PR2_TIER_A_CALCULATOR_REGISTRY_IDS])('%s uses PR1 result chrome and reset labels', (id) => {
-    const component = PR2_TIER_A_COMPONENTS[id];
-    const ui = sliceCalculatorComponent(calculatorsSource, component);
-    expect(ui).toContain('CalcDecisionSupportLead');
-    expect(ui).toContain('CalcResultSafetyFooter');
-    expect(ui).toContain('CalcInterpretationRegion');
-    expect(ui).toContain('CalcResultsPanel');
-    expect(ui).toContain('scrollCalcResultsIntoView');
-    expect(ui).toContain('resultsRef = useRef');
-    if (id === 'meld' || id === 'meld-na') {
-      expect(ui).toMatch(/aria-label=\{`Reset .+ form`\}/);
-    } else {
-      expect(ui).toMatch(/aria-label="Reset TIMI form"/);
-    }
-  });
+  it.each([...PR2_TIER_A_CALCULATOR_REGISTRY_IDS])(
+    '%s uses PR1 result chrome and reset labels',
+    (id) => {
+      const component = PR2_TIER_A_COMPONENTS[id];
+      const ui = sliceCalculatorComponent(calculatorsSource, component);
+      expect(ui).toContain('CalcDecisionSupportLead');
+      expect(ui).toContain('CalcResultSafetyFooter');
+      expect(ui).toContain('CalcInterpretationRegion');
+      expect(ui).toContain('CalcResultsPanel');
+      expect(ui).toContain('scrollCalcResultsIntoView');
+      expect(ui).toContain('resultsRef = useRef');
+      if (id === 'meld' || id === 'meld-na') {
+        expect(ui).toMatch(/aria-label=\{`Reset .+ form`\}/);
+      } else {
+        expect(ui).toMatch(/aria-label="Reset TIMI form"/);
+      }
+    },
+  );
 
   it('MELD calculator marks invalid numeric fields with calcFieldClass', () => {
     const ui = sliceCalculatorComponent(calculatorsSource, 'MeldCalculator');
@@ -89,7 +92,9 @@ describe('PR2 Tier-B chat-assisted — hub accessibility', () => {
 
   it('chat-assisted cards use aria-label and describedby', () => {
     expect(calculatorsSource).toContain('chatAssistedLaunchAriaLabel');
-    expect(calculatorsSource).toContain('aria-describedby={`calc-chat-assisted-desc-${tool.toolId}`}');
+    expect(calculatorsSource).toContain(
+      'aria-describedby={`calc-chat-assisted-desc-${tool.toolId}`}',
+    );
     expect(calculatorsSource).toContain('calc-chat-assisted-lead');
   });
 });

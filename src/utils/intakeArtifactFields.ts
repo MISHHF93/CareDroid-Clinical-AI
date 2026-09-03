@@ -13,7 +13,9 @@ export { mergeExtractedFieldRows };
 function fieldStatus(extracted: string, existing: string): IdentityExtractedField['status'] {
   if (!extracted) return 'unverified';
   if (!existing) return 'unverified';
-  return extracted.trim().toLowerCase() === existing.trim().toLowerCase() ? 'verified' : 'conflicting';
+  return extracted.trim().toLowerCase() === existing.trim().toLowerCase()
+    ? 'verified'
+    : 'conflicting';
 }
 
 export function clinicalDataToFieldRows(

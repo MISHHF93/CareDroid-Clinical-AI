@@ -25,7 +25,8 @@ describe('AuthPage identifies which fields an auth error refers to', () => {
     const marks = source.match(/\{\.\.\.ariaInvalid\(error\)\}/g) || [];
     expect(marks).toHaveLength(3);
 
-    const described = source.match(/aria-describedby=\{error \? 'auth-page-error' : undefined\}/g) || [];
+    const described =
+      source.match(/aria-describedby=\{error \? 'auth-page-error' : undefined\}/g) || [];
     expect(described).toHaveLength(3);
   });
 

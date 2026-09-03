@@ -3,10 +3,7 @@
  * Node-safe; consumes backend customer-success dashboard payloads and org context.
  */
 
-import {
-  CLINIC_ONBOARDING_STEPS,
-  simulateClinicOnboarding,
-} from './clinicOnboardingModel';
+import { CLINIC_ONBOARDING_STEPS, simulateClinicOnboarding } from './clinicOnboardingModel';
 
 export const CUSTOMER_SUCCESS_CAPABILITY = Object.freeze({
   ONBOARDING: 'onboarding',
@@ -35,18 +32,78 @@ export const CUSTOMER_SUCCESS_KPIS = Object.freeze({
 
 /** High-value platform features tracked for utilization breadth. */
 export const FEATURE_UTILIZATION_REGISTRY = Object.freeze([
-  Object.freeze({ id: 'whiteboard', label: 'Emergency whiteboard', category: 'operations', match: ['whiteboard', 'emergency/whiteboard'] }),
-  Object.freeze({ id: 'reception', label: 'Reception workspace', category: 'operations', match: ['reception', 'arrival'] }),
-  Object.freeze({ id: 'copilot', label: 'ED Copilot', category: 'ai', match: ['copilot', 'assistant', 'chat'] }),
-  Object.freeze({ id: 'smart-intake', label: 'Smart intake', category: 'operations', match: ['smart-intake', 'intake'] }),
-  Object.freeze({ id: 'queue-intelligence', label: 'Queue intelligence', category: 'operations', match: ['queue'] }),
-  Object.freeze({ id: 'shift-handoff', label: 'Shift handoff', category: 'operations', match: ['handoff', 'shift'] }),
-  Object.freeze({ id: 'data-quality', label: 'Data quality surfacing', category: 'quality', match: ['data-quality', 'verification'] }),
-  Object.freeze({ id: 'reassessment', label: 'Reassessment workflow', category: 'clinical', match: ['reassess'] }),
-  Object.freeze({ id: 'ems-panel', label: 'EMS pre-arrival', category: 'operations', match: ['ems'] }),
-  Object.freeze({ id: 'command-palette', label: 'Command palette', category: 'productivity', match: ['command-palette', 'palette'] }),
-  Object.freeze({ id: 'simulation', label: 'Simulation training', category: 'enablement', match: ['simulation'] }),
-  Object.freeze({ id: 'workflow', label: 'Workflow completion', category: 'enablement', match: ['workflow'] }),
+  Object.freeze({
+    id: 'whiteboard',
+    label: 'Emergency whiteboard',
+    category: 'operations',
+    match: ['whiteboard', 'emergency/whiteboard'],
+  }),
+  Object.freeze({
+    id: 'reception',
+    label: 'Reception workspace',
+    category: 'operations',
+    match: ['reception', 'arrival'],
+  }),
+  Object.freeze({
+    id: 'copilot',
+    label: 'ED Copilot',
+    category: 'ai',
+    match: ['copilot', 'assistant', 'chat'],
+  }),
+  Object.freeze({
+    id: 'smart-intake',
+    label: 'Smart intake',
+    category: 'operations',
+    match: ['smart-intake', 'intake'],
+  }),
+  Object.freeze({
+    id: 'queue-intelligence',
+    label: 'Queue intelligence',
+    category: 'operations',
+    match: ['queue'],
+  }),
+  Object.freeze({
+    id: 'shift-handoff',
+    label: 'Shift handoff',
+    category: 'operations',
+    match: ['handoff', 'shift'],
+  }),
+  Object.freeze({
+    id: 'data-quality',
+    label: 'Data quality surfacing',
+    category: 'quality',
+    match: ['data-quality', 'verification'],
+  }),
+  Object.freeze({
+    id: 'reassessment',
+    label: 'Reassessment workflow',
+    category: 'clinical',
+    match: ['reassess'],
+  }),
+  Object.freeze({
+    id: 'ems-panel',
+    label: 'EMS pre-arrival',
+    category: 'operations',
+    match: ['ems'],
+  }),
+  Object.freeze({
+    id: 'command-palette',
+    label: 'Command palette',
+    category: 'productivity',
+    match: ['command-palette', 'palette'],
+  }),
+  Object.freeze({
+    id: 'simulation',
+    label: 'Simulation training',
+    category: 'enablement',
+    match: ['simulation'],
+  }),
+  Object.freeze({
+    id: 'workflow',
+    label: 'Workflow completion',
+    category: 'enablement',
+    match: ['workflow'],
+  }),
 ]);
 
 function clampScore(score) {
@@ -108,7 +165,9 @@ export function buildCommercialOnboardingSteps(context = {} as any) {
     Object.freeze({
       id: 'integrations',
       label: 'Integrations connected or requested',
-      complete: integrations.some((item) => ['enabled', 'requested', 'connected'].includes(item?.status)),
+      complete: integrations.some((item) =>
+        ['enabled', 'requested', 'connected'].includes(item?.status),
+      ),
       route: '/integration-readiness',
     }),
     Object.freeze({
@@ -202,7 +261,11 @@ export function buildAdoptionMetrics(dashboard = {} as any, context = {} as any)
       }).length
     : 0;
   const workspaceAdoptionRate =
-    workspaceCount > 0 ? clampScore((workspaceAdopted / workspaceCount) * 100) : workspaceCount === 0 ? 0 : 100;
+    workspaceCount > 0
+      ? clampScore((workspaceAdopted / workspaceCount) * 100)
+      : workspaceCount === 0
+        ? 0
+        : 100;
 
   return Object.freeze({
     adoptionScore: adoptionValue,
@@ -218,7 +281,9 @@ export function buildAdoptionMetrics(dashboard = {} as any, context = {} as any)
     simulationsCompleted: metricValue(metrics.simulationsCompleted),
     workflowsCompleted: metricValue(metrics.workflowsCompleted),
     underusedProductCount: (metrics.underusedProducts || []).length,
-    zeroUsageProducts: (metrics.underusedProducts || []).filter((product) => product.usageCount === 0).length,
+    zeroUsageProducts: (metrics.underusedProducts || []).filter(
+      (product) => product.usageCount === 0,
+    ).length,
   });
 }
 
@@ -241,7 +306,10 @@ export function buildFeatureUtilization(dashboard = {} as any) {
   const features = FEATURE_UTILIZATION_REGISTRY.map((feature) => {
     const utilized = matchFeatureUtilization(feature, haystack);
     const assetHits = topAssets.filter((asset) =>
-      matchFeatureUtilization(feature, `${asset.id} ${asset.label} ${asset.route || ''}`.toLowerCase()),
+      matchFeatureUtilization(
+        feature,
+        `${asset.id} ${asset.label} ${asset.route || ''}`.toLowerCase(),
+      ),
     );
     return Object.freeze({
       ...feature,
@@ -268,7 +336,12 @@ export function buildFeatureUtilization(dashboard = {} as any) {
   });
 }
 
-export function buildCustomerHealthScore(dashboard = {} as any, onboarding = {} as any, adoption = {} as any, utilization = {} as any) {
+export function buildCustomerHealthScore(
+  dashboard = {} as any,
+  onboarding = {} as any,
+  adoption = {} as any,
+  utilization = {} as any,
+) {
   const backendScore = clampScore(dashboard.health?.score);
   const hasBackend = backendScore > 0;
 
@@ -314,7 +387,11 @@ export function buildCustomerHealthScore(dashboard = {} as any, onboarding = {} 
   });
 }
 
-export function buildSupportTracking(dashboard = {} as any, onboarding = {} as any, health = {} as any) {
+export function buildSupportTracking(
+  dashboard = {} as any,
+  onboarding = {} as any,
+  health = {} as any,
+) {
   const items = [] as any[];
   let ticketCounter = 1;
 
@@ -375,7 +452,8 @@ export function buildSupportTracking(dashboard = {} as any, onboarding = {} as a
         priority: 'critical',
         status: 'escalated',
         subject: 'Retention risk review',
-        summary: 'Customer health score indicates high retention risk — schedule executive check-in.',
+        summary:
+          'Customer health score indicates high retention risk — schedule executive check-in.',
         owner: 'Account management',
         route: '/customer-success',
       }),
@@ -460,7 +538,14 @@ export function buildRenewalReadiness({ health, adoption, onboarding, utilizatio
   });
 }
 
-export function evaluateCustomerSuccessKpis({ onboarding, adoption, utilization, health, support, renewal }) {
+export function evaluateCustomerSuccessKpis({
+  onboarding,
+  adoption,
+  utilization,
+  health,
+  support,
+  renewal,
+}) {
   const evaluations = Object.freeze([
     Object.freeze({
       id: 'onboardingCompletePercent',
@@ -589,14 +674,39 @@ export function auditCustomerSuccessPlatform(options = {} as any) {
       assetUsage: {
         value: 286,
         topAssets: [
-          { id: 'whiteboard', label: 'Emergency Whiteboard', count: 48, route: '/emergency/whiteboard' },
-          { id: 'reception', label: 'Reception workspace', count: 44, route: '/emergency/reception' },
+          {
+            id: 'whiteboard',
+            label: 'Emergency Whiteboard',
+            count: 48,
+            route: '/emergency/whiteboard',
+          },
+          {
+            id: 'reception',
+            label: 'Reception workspace',
+            count: 44,
+            route: '/emergency/reception',
+          },
           { id: 'copilot', label: 'ED Copilot', count: 31, route: '/emergency/copilot' },
           { id: 'smart-intake', label: 'Smart Intake', count: 28, route: '/emergency/intake' },
-          { id: 'queue-intelligence', label: 'Queue Intelligence', count: 27, route: '/emergency/queues' },
+          {
+            id: 'queue-intelligence',
+            label: 'Queue Intelligence',
+            count: 27,
+            route: '/emergency/queues',
+          },
           { id: 'shift-handoff', label: 'Shift Handoff', count: 24, route: '/emergency/shift' },
-          { id: 'data-quality', label: 'Data Quality Surfacing', count: 22, route: '/emergency/reception?panel=data-quality' },
-          { id: 'reassessment', label: 'Reassessment Workflow', count: 21, route: '/emergency/reassessment' },
+          {
+            id: 'data-quality',
+            label: 'Data Quality Surfacing',
+            count: 22,
+            route: '/emergency/reception?panel=data-quality',
+          },
+          {
+            id: 'reassessment',
+            label: 'Reassessment Workflow',
+            count: 21,
+            route: '/emergency/reassessment',
+          },
           { id: 'ems-panel', label: 'EMS Pre-arrival', count: 19, route: '/emergency/ems' },
           { id: 'command-palette', label: 'Command Palette', count: 18, route: '/command-palette' },
           { id: 'qsofa', label: 'qSOFA', count: 24, assetType: 'calculator' },
@@ -609,7 +719,12 @@ export function auditCustomerSuccessPlatform(options = {} as any) {
     }),
     signals: [
       { id: 'adoption', label: 'Adoption', status: 'healthy', message: '84% asset coverage.' },
-      { id: 'feature-breadth', label: 'Feature breadth', status: 'healthy', message: 'Core ED workflows have active utilization.' },
+      {
+        id: 'feature-breadth',
+        label: 'Feature breadth',
+        status: 'healthy',
+        message: 'Core ED workflows have active utilization.',
+      },
     ],
     period: { key: 'month' },
     sources: { usageEvents: 120, auditEvents: 45 },

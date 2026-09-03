@@ -45,8 +45,12 @@ export const AI_CHIEF_ROUTING: Readonly<Record<AlertScenario, AiRecommendationRo
   Object.freeze({
     critical_chest_pain: {
       visibleToRoles: [
-        'triage_nurse', 'charge_nurse', 'emergency_physician', 'attending_physician',
-        'specialist', 'registered_nurse',
+        'triage_nurse',
+        'charge_nurse',
+        'emergency_physician',
+        'attending_physician',
+        'specialist',
+        'registered_nurse',
       ],
       suggestedOwnerRole: 'triage_nurse',
       fallbackOwnerRole: 'charge_nurse',
@@ -57,7 +61,11 @@ export const AI_CHIEF_ROUTING: Readonly<Record<AlertScenario, AiRecommendationRo
 
     stroke_alert: {
       visibleToRoles: [
-        'triage_nurse', 'charge_nurse', 'emergency_physician', 'attending_physician', 'specialist',
+        'triage_nurse',
+        'charge_nurse',
+        'emergency_physician',
+        'attending_physician',
+        'specialist',
       ],
       suggestedOwnerRole: 'charge_nurse',
       fallbackOwnerRole: 'triage_nurse',
@@ -68,7 +76,10 @@ export const AI_CHIEF_ROUTING: Readonly<Record<AlertScenario, AiRecommendationRo
 
     sepsis_alert: {
       visibleToRoles: [
-        'triage_nurse', 'charge_nurse', 'emergency_physician', 'attending_physician',
+        'triage_nurse',
+        'charge_nurse',
+        'emergency_physician',
+        'attending_physician',
         'registered_nurse',
       ],
       suggestedOwnerRole: 'triage_nurse',
@@ -80,7 +91,11 @@ export const AI_CHIEF_ROUTING: Readonly<Record<AlertScenario, AiRecommendationRo
 
     pediatric_emergency: {
       visibleToRoles: [
-        'triage_nurse', 'charge_nurse', 'emergency_physician', 'attending_physician', 'specialist',
+        'triage_nurse',
+        'charge_nurse',
+        'emergency_physician',
+        'attending_physician',
+        'specialist',
       ],
       suggestedOwnerRole: 'triage_nurse',
       fallbackOwnerRole: 'charge_nurse',
@@ -91,8 +106,12 @@ export const AI_CHIEF_ROUTING: Readonly<Record<AlertScenario, AiRecommendationRo
 
     trauma_activation: {
       visibleToRoles: [
-        'triage_nurse', 'charge_nurse', 'emergency_physician', 'attending_physician',
-        'paramedic', 'registered_nurse',
+        'triage_nurse',
+        'charge_nurse',
+        'emergency_physician',
+        'attending_physician',
+        'paramedic',
+        'registered_nurse',
       ],
       suggestedOwnerRole: 'charge_nurse',
       fallbackOwnerRole: 'emergency_physician',
@@ -103,7 +122,10 @@ export const AI_CHIEF_ROUTING: Readonly<Record<AlertScenario, AiRecommendationRo
 
     mental_health_crisis: {
       visibleToRoles: [
-        'triage_nurse', 'charge_nurse', 'emergency_physician', 'social_worker',
+        'triage_nurse',
+        'charge_nurse',
+        'emergency_physician',
+        'social_worker',
         'registered_nurse',
       ],
       suggestedOwnerRole: 'triage_nurse',
@@ -114,9 +136,7 @@ export const AI_CHIEF_ROUTING: Readonly<Record<AlertScenario, AiRecommendationRo
     },
 
     medication_interaction: {
-      visibleToRoles: [
-        'emergency_physician', 'attending_physician', 'pharmacist', 'charge_nurse',
-      ],
+      visibleToRoles: ['emergency_physician', 'attending_physician', 'pharmacist', 'charge_nurse'],
       suggestedOwnerRole: 'pharmacist',
       fallbackOwnerRole: 'charge_nurse',
       escalationRole: 'emergency_physician',
@@ -126,7 +146,10 @@ export const AI_CHIEF_ROUTING: Readonly<Record<AlertScenario, AiRecommendationRo
 
     lab_critical_value: {
       visibleToRoles: [
-        'emergency_physician', 'attending_physician', 'charge_nurse', 'lab_technician',
+        'emergency_physician',
+        'attending_physician',
+        'charge_nurse',
+        'lab_technician',
       ],
       suggestedOwnerRole: 'lab_technician',
       escalationRole: 'patient_flow_coordinator',
@@ -136,9 +159,7 @@ export const AI_CHIEF_ROUTING: Readonly<Record<AlertScenario, AiRecommendationRo
     },
 
     bed_capacity_breach: {
-      visibleToRoles: [
-        'charge_nurse', 'patient_flow_coordinator', 'ed_director', 'hospital_admin',
-      ],
+      visibleToRoles: ['charge_nurse', 'patient_flow_coordinator', 'ed_director', 'hospital_admin'],
       suggestedOwnerRole: 'patient_flow_coordinator',
       escalationRole: 'charge_nurse',
       fallbackOwnerRole: 'hospital_admin',
@@ -147,9 +168,7 @@ export const AI_CHIEF_ROUTING: Readonly<Record<AlertScenario, AiRecommendationRo
     },
 
     triage_breach: {
-      visibleToRoles: [
-        'triage_nurse', 'charge_nurse', 'ed_director',
-      ],
+      visibleToRoles: ['triage_nurse', 'charge_nurse', 'ed_director'],
       suggestedOwnerRole: 'triage_nurse',
       fallbackOwnerRole: 'charge_nurse',
       escalationRole: 'charge_nurse',
@@ -159,7 +178,10 @@ export const AI_CHIEF_ROUTING: Readonly<Record<AlertScenario, AiRecommendationRo
 
     ems_incoming: {
       visibleToRoles: [
-        'paramedic', 'triage_nurse', 'charge_nurse', 'emergency_physician',
+        'paramedic',
+        'triage_nurse',
+        'charge_nurse',
+        'emergency_physician',
         'registration_clerk',
       ],
       suggestedOwnerRole: 'paramedic',
@@ -170,9 +192,7 @@ export const AI_CHIEF_ROUTING: Readonly<Record<AlertScenario, AiRecommendationRo
     },
 
     security_incident: {
-      visibleToRoles: [
-        'security_officer', 'charge_nurse', 'ed_director', 'hospital_admin',
-      ],
+      visibleToRoles: ['security_officer', 'charge_nurse', 'ed_director', 'hospital_admin'],
       suggestedOwnerRole: 'security_officer',
       fallbackOwnerRole: 'charge_nurse',
       escalationRole: 'ed_director',
@@ -208,7 +228,9 @@ export function getCanonicalAiRecommendationRoute(
     escalationUserId:
       compiled && compiled.role.hospitalRole === base.escalationRole ? compiled.user.id : null,
     visibleToUsers:
-      compiled && isAlertVisibleToCompiledProfile(scenario, compiled) ? Object.freeze([compiled.user.id]) : Object.freeze([]),
+      compiled && isAlertVisibleToCompiledProfile(scenario, compiled)
+        ? Object.freeze([compiled.user.id])
+        : Object.freeze([]),
     fallbackOwnerRole: base.fallbackOwnerRole || base.escalationRole,
   });
 }

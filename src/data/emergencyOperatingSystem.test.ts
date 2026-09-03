@@ -36,9 +36,16 @@ describe('emergencyOperatingSystem complaint router', () => {
         workflows: ['ACS Workflow'],
         referrals: ['Cardiology Referral'],
         routingMode: 'complaint-first-workflow-guidance',
-        navigationSteps: ['Complaint', 'Workflow', 'Calculators', 'Protocols', 'Referrals', 'AI Copilot'],
+        navigationSteps: [
+          'Complaint',
+          'Workflow',
+          'Calculators',
+          'Protocols',
+          'Referrals',
+          'AI Copilot',
+        ],
         safetyStatement: expect.stringMatching(/does not diagnose ACS/i),
-      })
+      }),
     );
     expect(routeEmergencyChiefComplaint('facial droop and slurred speech')).toEqual(
       expect.objectContaining({
@@ -46,7 +53,7 @@ describe('emergencyOperatingSystem complaint router', () => {
         calculators: [expect.objectContaining({ label: 'NIHSS' })],
         workflows: ['Stroke Workflow'],
         safetyStatement: expect.stringMatching(/does not diagnose stroke/i),
-      })
+      }),
     );
     expect(routeEmergencyChiefComplaint('possible sepsis')).toEqual(
       expect.objectContaining({
@@ -57,7 +64,7 @@ describe('emergencyOperatingSystem complaint router', () => {
         ],
         workflows: ['Sepsis Workflow'],
         safetyStatement: expect.stringMatching(/does not diagnose sepsis/i),
-      })
+      }),
     );
     expect(routeEmergencyChiefComplaint('dyspnea')).toEqual(
       expect.objectContaining({
@@ -65,7 +72,7 @@ describe('emergencyOperatingSystem complaint router', () => {
         calculators: [expect.objectContaining({ label: 'Wells PE' })],
         protocols: expect.arrayContaining(['Respiratory Protocol']),
         safetyStatement: expect.stringMatching(/does not diagnose PE/i),
-      })
+      }),
     );
     expect(routeEmergencyChiefComplaint('trauma activation')).toEqual(
       expect.objectContaining({
@@ -75,7 +82,7 @@ describe('emergencyOperatingSystem complaint router', () => {
         simulations: expect.arrayContaining(['trauma bay team simulation']),
         referrals: ['Trauma surgery review'],
         safetyStatement: expect.stringMatching(/does not diagnose injuries/i),
-      })
+      }),
     );
     expect(routeEmergencyChiefComplaint('abdominal pain')).toEqual(
       expect.objectContaining({
@@ -84,7 +91,7 @@ describe('emergencyOperatingSystem complaint router', () => {
         calculators: expect.arrayContaining([expect.objectContaining({ label: 'BISAP' })]),
         referrals: ['Surgery or GI referral review'],
         safetyStatement: expect.stringMatching(/does not diagnose surgical abdomen/i),
-      })
+      }),
     );
     expect(routeEmergencyChiefComplaint('psychiatric crisis')).toEqual(
       expect.objectContaining({
@@ -93,7 +100,7 @@ describe('emergencyOperatingSystem complaint router', () => {
         calculators: expect.arrayContaining([expect.objectContaining({ label: 'C-SSRS' })]),
         referrals: ['Psychiatry or crisis team referral'],
         safetyStatement: expect.stringMatching(/does not diagnose/i),
-      })
+      }),
     );
   });
 
@@ -108,7 +115,7 @@ describe('emergencyOperatingSystem complaint router', () => {
         age: 58,
         vitals: 'BP 92/58, HR 124',
         riskFactors: 'diabetes and diaphoresis',
-      }).emergencyRiskProfile
+      }).emergencyRiskProfile,
     ).toEqual(
       expect.objectContaining({
         title: 'Emergency Risk Profile',
@@ -119,16 +126,18 @@ describe('emergencyOperatingSystem complaint router', () => {
           expect.objectContaining({ label: 'Shock Index' }),
         ],
         noDisconnectedCalculators: true,
-      })
+      }),
     );
-    expect(buildDynamicRiskBundle({ chiefComplaint: 'stroke symptoms' }).riskBundle.map((item) => item.label)).toEqual([
-      'NIHSS',
-      'GCS',
-    ]);
-    expect(buildDynamicRiskBundle({ chiefComplaint: 'possible sepsis' }).riskBundle.map((item) => item.label)).toEqual([
-      'qSOFA',
-      'NEWS2',
-    ]);
+    expect(
+      buildDynamicRiskBundle({ chiefComplaint: 'stroke symptoms' }).riskBundle.map(
+        (item) => item.label,
+      ),
+    ).toEqual(['NIHSS', 'GCS']);
+    expect(
+      buildDynamicRiskBundle({ chiefComplaint: 'possible sepsis' }).riskBundle.map(
+        (item) => item.label,
+      ),
+    ).toEqual(['qSOFA', 'NEWS2']);
   });
 
   it('builds explainable ED Copilot workflow guidance without autonomous decisions', () => {
@@ -148,7 +157,7 @@ describe('emergencyOperatingSystem complaint router', () => {
         'aiCopilot',
         'escalationSuggestions',
         'reasoning',
-      ])
+      ]),
     );
 
     const guidance = buildEmergencyCopilotGuidance({
@@ -170,10 +179,12 @@ describe('emergencyOperatingSystem complaint router', () => {
         protocols: expect.arrayContaining(['ACS/chest pain pathway']),
         nextWorkflowStep: expect.stringMatching(/ACS Workflow/i),
         safetyBoundary: expect.stringMatching(/No autonomous diagnosis/i),
-      })
+      }),
     );
     expect(guidance.recommendedTools.map((tool) => tool.label)).toContain('HEART');
-    expect(guidance.escalationSuggestions.join(' ')).toMatch(/verify whether any local escalation threshold/i);
+    expect(guidance.escalationSuggestions.join(' ')).toMatch(
+      /verify whether any local escalation threshold/i,
+    );
     expect(guidance.reasoning.every((reason) => reason.explanation)).toBe(true);
   });
 
@@ -196,7 +207,9 @@ describe('emergencyOperatingSystem complaint router', () => {
       'Simulation completion',
     ]);
     expect(EMERGENCY_ANALYTICS_MVP.roiSummary.valueProof).toMatch(/time saved/i);
-    expect(EMERGENCY_ANALYTICS_MVP.humanReviewStatement).toMatch(/do not score autonomous clinical quality/i);
+    expect(EMERGENCY_ANALYTICS_MVP.humanReviewStatement).toMatch(
+      /do not score autonomous clinical quality/i,
+    );
   });
 
   it('defines a 10-minute hospital onboarding walkthrough for CareDroid', () => {
@@ -218,7 +231,9 @@ describe('emergencyOperatingSystem complaint router', () => {
       '7-9',
       '9-10',
     ]);
-    expect(EMERGENCY_ONBOARDING_EXPERIENCE.walkthrough.at(-1)!.targetRoute).toBe('/emergency/analytics');
+    expect(EMERGENCY_ONBOARDING_EXPERIENCE.walkthrough.at(-1)!.targetRoute).toBe(
+      '/emergency/analytics',
+    );
   });
 
   it('defines a fully labeled Emergency demo tenant for prospect evaluation without integrations', () => {
@@ -228,7 +243,7 @@ describe('emergencyOperatingSystem complaint router', () => {
         tenantName: 'CareDroid Demo Hospital',
         workspaceRoute: '/emergency/whiteboard',
         dataPosture: expect.stringMatching(/No live EHR/i),
-      })
+      }),
     );
 
     const demoCollections = [
@@ -246,7 +261,7 @@ describe('emergencyOperatingSystem complaint router', () => {
           dataLabel: 'Demo data',
           tenantLabel: 'Demo tenant',
           integrationLabel: 'No live integration',
-        })
+        }),
       );
     });
   });
@@ -292,10 +307,14 @@ describe('emergencyOperatingSystem complaint router', () => {
       expect.objectContaining({
         operationalRisk: 'Minimal',
         integrationRequirement: 'No integrations required',
-      })
+      }),
     );
-    expect(EMERGENCY_FIRST_CUSTOMER_DEPLOYMENT.phases.at(-1)!.acceptance).toMatch(/No live writeback/i);
-    expect(EMERGENCY_FIRST_CUSTOMER_DEPLOYMENT.acceptance).toMatch(/without requiring a full hospital-wide deployment/i);
+    expect(EMERGENCY_FIRST_CUSTOMER_DEPLOYMENT.phases.at(-1)!.acceptance).toMatch(
+      /No live writeback/i,
+    );
+    expect(EMERGENCY_FIRST_CUSTOMER_DEPLOYMENT.acceptance).toMatch(
+      /without requiring a full hospital-wide deployment/i,
+    );
   });
 
   it('defines the Emergency Flow Intelligence platform across all 10 solution areas', () => {
@@ -309,7 +328,9 @@ describe('emergencyOperatingSystem complaint router', () => {
       'Disposition',
       'Admission/Discharge',
     ]);
-    expect(EMERGENCY_FLOW_INTELLIGENCE_PLATFORM.solutions.map((solution) => solution.title)).toEqual([
+    expect(
+      EMERGENCY_FLOW_INTELLIGENCE_PLATFORM.solutions.map((solution) => solution.title),
+    ).toEqual([
       'Pre-Hospital Intelligence',
       'EMS-to-ED Handoff',
       'Dynamic Triage',
@@ -325,34 +346,41 @@ describe('emergencyOperatingSystem complaint router', () => {
     expect(EMERGENCY_FLOW_INTELLIGENCE_PLATFORM.dashboardModel.widgets).toHaveLength(10);
     expect(EMERGENCY_FLOW_INTELLIGENCE_PLATFORM.aiModel.agents).toHaveLength(10);
     expect(EMERGENCY_FLOW_INTELLIGENCE_PLATFORM.marketPains).toEqual(
-      expect.arrayContaining(['Too many patients', 'Too much cognitive load'])
+      expect.arrayContaining(['Too many patients', 'Too much cognitive load']),
     );
-    expect(EMERGENCY_FLOW_INTELLIGENCE_PLATFORM.valueDrivers.map((driver) => driver.title)).toEqual([
-      'Throughput',
-      'Capacity',
-      'Coordination',
-      'Cognitive Load',
-    ]);
+    expect(EMERGENCY_FLOW_INTELLIGENCE_PLATFORM.valueDrivers.map((driver) => driver.title)).toEqual(
+      ['Throughput', 'Capacity', 'Coordination', 'Cognitive Load'],
+    );
     expect(EMERGENCY_FLOW_INTELLIGENCE_PLATFORM.operatingPrinciples).toEqual(
-      expect.arrayContaining([expect.stringMatching(/Do not build isolated/i)])
+      expect.arrayContaining([expect.stringMatching(/Do not build isolated/i)]),
     );
-    expect(EMERGENCY_FLOW_INTELLIGENCE_PLATFORM.firstCustomerReadiness.noIntegrationPosture).toMatch(
-      /without ADT, EHR, EMS CAD/i
+    expect(
+      EMERGENCY_FLOW_INTELLIGENCE_PLATFORM.firstCustomerReadiness.noIntegrationPosture,
+    ).toMatch(/without ADT, EHR, EMS CAD/i);
+    expect(EMERGENCY_FLOW_INTELLIGENCE_PLATFORM.integrationPosture).toMatch(
+      /without hospital-wide deployment/i,
     );
-    expect(EMERGENCY_FLOW_INTELLIGENCE_PLATFORM.integrationPosture).toMatch(/without hospital-wide deployment/i);
     expect(EMERGENCY_FLOW_INTELLIGENCE_PLATFORM.saasPackagingModel.productName).toBe(
-      'Emergency Flow Intelligence Platform'
+      'Emergency Flow Intelligence Platform',
     );
-    expect(EMERGENCY_FLOW_INTELLIGENCE_PLATFORM.saasPackagingModel.firstCustomerReadiness.sellableNow).toMatch(
-      /Emergency Flow Starter/i
-    );
-    expect(EMERGENCY_FLOW_INTELLIGENCE_PLATFORM.saasPackagingModel.packages.at(-1)!.solutionIds).toHaveLength(10);
+    expect(
+      EMERGENCY_FLOW_INTELLIGENCE_PLATFORM.saasPackagingModel.firstCustomerReadiness.sellableNow,
+    ).toMatch(/Emergency Flow Starter/i);
+    expect(
+      EMERGENCY_FLOW_INTELLIGENCE_PLATFORM.saasPackagingModel.packages.at(-1)!.solutionIds,
+    ).toHaveLength(10);
     expect(
       EMERGENCY_FLOW_INTELLIGENCE_PLATFORM.automationRegistry.every((automation) =>
-        automation.flowStages.every((stage) => EMERGENCY_FLOW_INTELLIGENCE_PLATFORM.patientFlow.includes(stage))
-      )
+        automation.flowStages.every((stage) =>
+          EMERGENCY_FLOW_INTELLIGENCE_PLATFORM.patientFlow.includes(stage),
+        ),
+      ),
     ).toBe(true);
-    expect(EMERGENCY_FLOW_INTELLIGENCE_PLATFORM.aiModel.safetyBoundary).toMatch(/never makes autonomous/i);
-    expect(EMERGENCY_FLOW_INTELLIGENCE_PLATFORM.acceptance).toMatch(/rather than a collection of calculators/i);
+    expect(EMERGENCY_FLOW_INTELLIGENCE_PLATFORM.aiModel.safetyBoundary).toMatch(
+      /never makes autonomous/i,
+    );
+    expect(EMERGENCY_FLOW_INTELLIGENCE_PLATFORM.acceptance).toMatch(
+      /rather than a collection of calculators/i,
+    );
   });
 });

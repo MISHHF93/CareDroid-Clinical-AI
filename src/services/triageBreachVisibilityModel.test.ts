@@ -25,7 +25,9 @@ describe('triageBreachVisibilityModel', () => {
 
   it('builds visibility snapshot with breach counts and rapid-review flags', () => {
     const snapshot = buildTriageBreachVisibilitySnapshot(patients, {
-      settings: { emergencySettings: { thresholds: { triageTargetMinutes: 10, triageWarningMinutes: 8 } } },
+      settings: {
+        emergencySettings: { thresholds: { triageTargetMinutes: 10, triageWarningMinutes: 8 } },
+      },
     });
 
     expect(snapshot.awaitingTriageCount).toBeGreaterThanOrEqual(2);
@@ -36,7 +38,9 @@ describe('triageBreachVisibilityModel', () => {
 
   it('maps canonical metrics to surface-specific strip ids', () => {
     const triageMetrics = selectTriageBreachVisibilityMetrics(patients, { surface: 'triage' });
-    const receptionMetrics = selectTriageBreachVisibilityMetrics(patients, { surface: 'reception' });
+    const receptionMetrics = selectTriageBreachVisibilityMetrics(patients, {
+      surface: 'reception',
+    });
 
     expect(triageMetrics.map((metric) => metric.id)).toContain('triage-pending');
     expect(triageMetrics.map((metric) => metric.id)).toContain('triage-breach-approaching');

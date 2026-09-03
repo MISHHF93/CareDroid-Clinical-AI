@@ -55,9 +55,7 @@ describe('userProfileCopyModel', () => {
 
   it('assigns every defined function to at least one role profile', () => {
     const assigned = new Set<string>();
-    Object.values(SAAS_ROLE_FUNCTION_IDS).forEach((ids) =>
-      ids.forEach((id) => assigned.add(id)),
-    );
+    Object.values(SAAS_ROLE_FUNCTION_IDS).forEach((ids) => ids.forEach((id) => assigned.add(id)));
     Object.values(EMERGENCY_ROLE_FUNCTION_IDS).forEach((ids) =>
       ids.forEach((id) => assigned.add(id)),
     );

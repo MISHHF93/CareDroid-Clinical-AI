@@ -2,7 +2,11 @@
  * Cross-layer audit — newly shipped clinical calculators (PR8 hardened, PR9 trauma chat, PR10 ABCD²).
  */
 
-import { REGISTRY, PR9_TIER_B_CHAT_CALCULATOR_IDS, PR10_TIER_A_CALCULATOR_REGISTRY_IDS } from './clinicalToolIdContract';
+import {
+  REGISTRY,
+  PR9_TIER_B_CHAT_CALCULATOR_IDS,
+  PR10_TIER_A_CALCULATOR_REGISTRY_IDS,
+} from './clinicalToolIdContract';
 import {
   PR9_ALL_ALIAS_PAIRS,
   PR9_CHAT_CONFIGS,
@@ -98,7 +102,10 @@ export const NEW_CLINICAL_TOOLS_SPECS = Object.freeze({
     openLabel: 'Open',
     navigationPath: '/tools/calculators/abcd2',
     chatSeedPattern: /STEP 0|do not delay urgent|stroke pathways/i,
-    catalogSearchQueries: [['abcd2', 'abcd2'], ['abcd2', 'tia']],
+    catalogSearchQueries: [
+      ['abcd2', 'abcd2'],
+      ['abcd2', 'tia'],
+    ],
   },
   [REGISTRY.bradenScale]: {
     tier: 'A',
@@ -198,4 +205,9 @@ export const NEW_CLINICAL_TOOLS_SPECS = Object.freeze({
   },
 });
 
-export { catalogRowsMatchingQuery, pecarnHeadChatConfig, nexusCSpineChatConfig, PR10_TIER_A_CALCULATOR_REGISTRY_IDS };
+export {
+  catalogRowsMatchingQuery,
+  pecarnHeadChatConfig,
+  nexusCSpineChatConfig,
+  PR10_TIER_A_CALCULATOR_REGISTRY_IDS,
+};

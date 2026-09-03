@@ -54,7 +54,12 @@ export const useToasts = () => {
 function dispatchNotice(notice) {
   return dispatchAlert({
     type: 'System',
-    severity: notice.type === 'critical' || notice.type === 'error' ? 'Critical' : notice.type === 'warning' ? 'Warning' : 'Info',
+    severity:
+      notice.type === 'critical' || notice.type === 'error'
+        ? 'Critical'
+        : notice.type === 'warning'
+          ? 'Warning'
+          : 'Info',
     title: notice.title || notice.message || 'Notification',
     message: notice.message || notice.title || 'Review notification details.',
     actionLabel: notice.action?.label,

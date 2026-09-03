@@ -44,22 +44,32 @@ function result(score, label, interpretation, severity, referenceLine, extra: an
 
 export const HUNT_HESS_GRADE_OPTIONS = Object.freeze([
   { value: '1', points: 1, label: 'Grade I: asymptomatic or mild headache/nuchal rigidity' },
-  { value: '2', points: 2, label: 'Grade II: moderate-severe headache, nuchal rigidity, no deficit except cranial nerve palsy' },
+  {
+    value: '2',
+    points: 2,
+    label:
+      'Grade II: moderate-severe headache, nuchal rigidity, no deficit except cranial nerve palsy',
+  },
   { value: '3', points: 3, label: 'Grade III: drowsiness, confusion, or mild focal deficit' },
-  { value: '4', points: 4, label: 'Grade IV: stupor, moderate-severe hemiparesis, early decerebrate rigidity' },
+  {
+    value: '4',
+    points: 4,
+    label: 'Grade IV: stupor, moderate-severe hemiparesis, early decerebrate rigidity',
+  },
   { value: '5', points: 5, label: 'Grade V: deep coma, decerebrate rigidity, moribund appearance' },
 ]);
 
 export function computeHuntHessScale(raw) {
   const grade = selectedPoints(raw.grade, HUNT_HESS_GRADE_OPTIONS);
-  if (!Number.isFinite(grade)) return { ok: false as const, errors: ['Select the Hunt-Hess clinical grade.'] };
+  if (!Number.isFinite(grade))
+    return { ok: false as const, errors: ['Select the Hunt-Hess clinical grade.'] };
   const severity = grade >= 4 ? 'critical' : grade === 3 ? 'warning' : 'normal';
   return result(
     grade,
     `Hunt-Hess grade ${grade}`,
     'Hunt-Hess summarizes clinical severity in aneurysmal subarachnoid hemorrhage. Use with aneurysm status, neurologic exam, airway/hemodynamics, hydrocephalus, and neurosurgical pathway context.',
     severity,
-    'Hunt WE, Hess RM. Surgical risk as related to time of intervention in the repair of intracranial aneurysms. J Neurosurg. 1968.'
+    'Hunt WE, Hess RM. Surgical risk as related to time of intervention in the repair of intracranial aneurysms. J Neurosurg. 1968.',
   );
 }
 
@@ -70,9 +80,12 @@ export function computeIchScore(raw) {
   const errors = [] as any[];
   if (!Number.isFinite(age) || age < 0 || age > 120) errors.push('Enter age from 0 to 120 years.');
   if (!Number.isFinite(gcs) || gcs < 3 || gcs > 15) errors.push('Enter GCS from 3 to 15.');
-  if (!Number.isFinite(volumeMl) || volumeMl < 0 || volumeMl > 300) errors.push('Enter hematoma volume from 0 to 300 mL.');
-  if (!['yes', 'no'].includes(raw.intraventricularHemorrhage)) errors.push('Select intraventricular hemorrhage status.');
-  if (!['yes', 'no'].includes(raw.infratentorialOrigin)) errors.push('Select infratentorial origin status.');
+  if (!Number.isFinite(volumeMl) || volumeMl < 0 || volumeMl > 300)
+    errors.push('Enter hematoma volume from 0 to 300 mL.');
+  if (!['yes', 'no'].includes(raw.intraventricularHemorrhage))
+    errors.push('Select intraventricular hemorrhage status.');
+  if (!['yes', 'no'].includes(raw.infratentorialOrigin))
+    errors.push('Select infratentorial origin status.');
   if (errors.length) return { ok: false as const, errors };
 
   const gcsPoints = gcs <= 4 ? 2 : gcs <= 12 ? 1 : 0;
@@ -96,7 +109,7 @@ export function computeIchScore(raw) {
         infratentorialPoints,
         agePoints,
       },
-    }
+    },
   );
 }
 
@@ -146,7 +159,7 @@ export function computeFourScore(raw) {
     'FOUR Score documents eye, motor, brainstem reflex, and respiratory pattern findings. Lower scores require urgent bedside context, airway review, and neurocritical-care judgment.',
     severity,
     'Wijdicks EFM, et al. Validation of a new coma scale: The FOUR score. Ann Neurol. 2005.',
-    { components: { eye, motor, brainstem, respiration } }
+    { components: { eye, motor, brainstem, respiration } },
   );
 }
 
@@ -155,21 +168,26 @@ export const MODIFIED_RANKIN_OPTIONS = Object.freeze([
   { value: '1', points: 1, label: '1 no significant disability despite symptoms' },
   { value: '2', points: 2, label: '2 slight disability; independent in own affairs' },
   { value: '3', points: 3, label: '3 moderate disability; needs some help, walks unassisted' },
-  { value: '4', points: 4, label: '4 moderately severe disability; unable to walk or attend bodily needs without help' },
+  {
+    value: '4',
+    points: 4,
+    label: '4 moderately severe disability; unable to walk or attend bodily needs without help',
+  },
   { value: '5', points: 5, label: '5 severe disability; bedridden, incontinent, constant care' },
   { value: '6', points: 6, label: '6 death' },
 ]);
 
 export function computeModifiedRankinScale(raw) {
   const score = selectedPoints(raw.score, MODIFIED_RANKIN_OPTIONS);
-  if (!Number.isFinite(score)) return { ok: false as const, errors: ['Select the modified Rankin Scale level.'] };
+  if (!Number.isFinite(score))
+    return { ok: false as const, errors: ['Select the modified Rankin Scale level.'] };
   const severity = score >= 4 ? 'critical' : score >= 2 ? 'warning' : 'normal';
   return result(
     score,
     `mRS ${score}`,
     'Modified Rankin Scale summarizes global disability after stroke or neurologic illness. It is an outcome description, not an acute treatment or disposition recommendation.',
     severity,
-    'Rankin J. Cerebral vascular accidents in patients over the age of 60. Scott Med J. 1957.'
+    'Rankin J. Cerebral vascular accidents in patients over the age of 60. Scott Med J. 1957.',
   );
 }
 
@@ -267,7 +285,10 @@ export function computeNihssSummaryView(raw) {
   const errors = requireSelections(raw, NIHSS_SUMMARY_OPTIONS);
   if (errors.length) return { ok: false as const, errors };
   const components = Object.fromEntries(
-    Object.entries(NIHSS_SUMMARY_OPTIONS).map(([key, options]) => [key, selectedPoints(raw[key], options)])
+    Object.entries(NIHSS_SUMMARY_OPTIONS).map(([key, options]) => [
+      key,
+      selectedPoints(raw[key], options),
+    ]),
   );
   const score = Object.values(components).reduce((sum, value) => sum + value, 0);
   const severity = score >= 21 ? 'critical' : score >= 5 ? 'warning' : 'normal';
@@ -277,7 +298,7 @@ export function computeNihssSummaryView(raw) {
     'NIHSS summary view documents stroke exam item scores for handoff and serial comparison. It does not diagnose stroke or determine thrombolysis, thrombectomy, imaging, transfer, or disposition.',
     severity,
     'Brott T, et al. Measurements of acute cerebral infarction: a clinical examination scale. Stroke. 1989.',
-    { components }
+    { components },
   );
 }
 
@@ -319,7 +340,6 @@ export function computePediatricGcs(raw) {
     'Pediatric GCS documents consciousness using age-adjusted response descriptions. Interpret with age, airway, sedation, seizure/postictal state, hypoglycemia, trauma, and local pediatric escalation pathways.',
     severity,
     'Teasdale G, Jennett B. Assessment of coma and impaired consciousness. Lancet. 1974; pediatric adaptations are used clinically.',
-    { components: { eye, verbal, motor } }
+    { components: { eye, verbal, motor } },
   );
 }
-

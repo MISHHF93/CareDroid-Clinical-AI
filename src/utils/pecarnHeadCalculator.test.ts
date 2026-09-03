@@ -16,7 +16,9 @@ describe('pecarnHeadCalculator', () => {
     });
     expect(result?.ruleCriteriaMet).toBe(true);
     expect(result?.riskStratum).toBe('higher');
-    expect(result?.triggeredCriteria).toContain('Loss of consciousness (>5 seconds in PECARN <2 years cohort)');
+    expect(result?.triggeredCriteria).toContain(
+      'Loss of consciousness (>5 seconds in PECARN <2 years cohort)',
+    );
   });
 
   it('flags higher-risk when ≥2y vomiting present', () => {

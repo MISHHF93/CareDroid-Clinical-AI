@@ -7,12 +7,7 @@
  * require acknowledgment from a licensed clinician or charge nurse.
  */
 
-import type {
-  StaffAssignment,
-  EntityId,
-  ISODateString,
-  Priority,
-} from '../types/emergency';
+import type { StaffAssignment, EntityId, ISODateString, Priority } from '../types/emergency';
 
 function generateId(prefix: string): string {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -48,7 +43,8 @@ const ROUTING_RULES: Record<RoutingScenario, RoutingRecommendation> = {
     scenario: 'critical_alert',
     primaryRole: 'charge_nurse',
     backupRole: 'emergency_physician',
-    rationale: 'Critical alerts require immediate charge nurse awareness and physician escalation path.',
+    rationale:
+      'Critical alerts require immediate charge nurse awareness and physician escalation path.',
     urgency: 'immediate',
     requiresClinicianReview: true,
   },
@@ -56,7 +52,8 @@ const ROUTING_RULES: Record<RoutingScenario, RoutingRecommendation> = {
     scenario: 'ems_pre_arrival',
     primaryRole: 'triage_nurse',
     backupRole: 'charge_nurse',
-    rationale: 'EMS pre-arrivals need triage nurse review and bed/equipment preparation coordination.',
+    rationale:
+      'EMS pre-arrivals need triage nurse review and bed/equipment preparation coordination.',
     urgency: 'urgent',
     requiresClinicianReview: true,
   },
@@ -64,7 +61,8 @@ const ROUTING_RULES: Record<RoutingScenario, RoutingRecommendation> = {
     scenario: 'triage_backlog',
     primaryRole: 'triage_nurse',
     backupRole: 'charge_nurse',
-    rationale: 'Triage backlog requires additional triage nursing resources or charge nurse reallocation.',
+    rationale:
+      'Triage backlog requires additional triage nursing resources or charge nurse reallocation.',
     urgency: 'urgent',
     requiresClinicianReview: true,
   },
@@ -104,15 +102,14 @@ const ROUTING_RULES: Record<RoutingScenario, RoutingRecommendation> = {
     scenario: 'capacity_surge',
     primaryRole: 'charge_nurse',
     backupRole: 'hospital_admin',
-    rationale: 'Capacity surge requires charge nurse surge protocol activation and admin notification.',
+    rationale:
+      'Capacity surge requires charge nurse surge protocol activation and admin notification.',
     urgency: 'immediate',
     requiresClinicianReview: true,
   },
 };
 
-export function recommendRouting(
-  scenario: RoutingScenario,
-): RoutingRecommendation {
+export function recommendRouting(scenario: RoutingScenario): RoutingRecommendation {
   return ROUTING_RULES[scenario];
 }
 
@@ -169,7 +166,13 @@ export function reassignStaff(
 ): StaffAssignment | null {
   const a = assignments.get(assignmentId);
   if (!a) return null;
-  const updated: StaffAssignment = { ...a, staffId: newStaffId, role: newRole, status: 'reassigned', assignedAt: now() };
+  const updated: StaffAssignment = {
+    ...a,
+    staffId: newStaffId,
+    role: newRole,
+    status: 'reassigned',
+    assignedAt: now(),
+  };
   assignments.set(assignmentId, updated);
   return updated;
 }

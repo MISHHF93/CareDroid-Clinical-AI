@@ -34,7 +34,8 @@ function buildDemoPatients() {
           journeyState: bucket.state,
           journeyLabel: bucket.label,
           acuity: `ESI ${Math.min(5, 2 + ((bucketIndex + index) % 4))}`,
-          arrivalMode: bucket.state === 'ems-prearrival' ? 'EMS' : index % 3 === 0 ? 'Walk-in' : 'Ambulatory',
+          arrivalMode:
+            bucket.state === 'ems-prearrival' ? 'EMS' : index % 3 === 0 ? 'Walk-in' : 'Ambulatory',
           complaint: COMPLAINTS[(bucketIndex + index) % COMPLAINTS.length],
           waitDuration: 8 + bucketIndex * 9 + index * 2,
           riskScore,
@@ -42,8 +43,8 @@ function buildDemoPatients() {
           dispositionState: bucket.state,
           demoLabel: 'Demo data',
         });
-      })
-    )
+      }),
+    ),
   );
 }
 
@@ -54,14 +55,22 @@ export const EmergencyDemoEnvironmentService = Object.freeze({
       id: 'emergency-demo-environment',
       tenantName: 'CareDroid Demo Hospital',
       mode: 'demo',
-      labels: Object.freeze(['Demo data', 'Demo tenant', 'No live integration', 'Sample patient', 'Simulated operational signal']),
+      labels: Object.freeze([
+        'Demo data',
+        'Demo tenant',
+        'No live integration',
+        'Sample patient',
+        'Simulated operational signal',
+      ]),
       patients,
       metrics: Object.freeze({
         patientCount: patients.length,
-        waitingRoomPatients: patients.filter((patient) => patient.journeyState === 'waiting-room').length,
+        waitingRoomPatients: patients.filter((patient) => patient.journeyState === 'waiting-room')
+          .length,
         boardingPatients: patients.filter((patient) => patient.journeyState === 'boarding').length,
         emsPatients: patients.filter((patient) => patient.arrivalMode === 'EMS').length,
-        referralPatients: patients.filter((patient) => patient.journeyState === 'referral-pending').length,
+        referralPatients: patients.filter((patient) => patient.journeyState === 'referral-pending')
+          .length,
         reassessmentNeeded: patients.filter((patient) => patient.reassessmentNeed).length,
       }),
       operationalData: Object.freeze([

@@ -52,7 +52,10 @@ function countdownLabel(arrival: { estimatedArrivalTime: string; eta?: number },
   return `${minutes}:${String(seconds).padStart(2, '0')}`;
 }
 
-function roomName(rooms: ReturnType<typeof useEmergencyStore.getState>['rooms'], roomId?: string | null) {
+function roomName(
+  rooms: ReturnType<typeof useEmergencyStore.getState>['rooms'],
+  roomId?: string | null,
+) {
   return rooms.find((room) => room.id === roomId)?.name || 'Bay pending';
 }
 
@@ -65,15 +68,28 @@ function resolveCurrentStaff({
   staff: ReturnType<typeof useEmergencyStore.getState>['staff'];
   activeShift: ReturnType<typeof useEmergencyStore.getState>['activeShift'];
 }) {
-  const userText = [user?.id, user?.email, user?.name, user?.fullName].filter(Boolean).join(' ').toLowerCase();
+  const userText = [user?.id, user?.email, user?.name, user?.fullName]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
   const matchedStaff = staff.find((member) => {
-    const memberText = [member.id, member.email, member.name, member.displayName, member.firstName, member.lastName]
+    const memberText = [
+      member.id,
+      member.email,
+      member.name,
+      member.displayName,
+      member.firstName,
+      member.lastName,
+    ]
       .filter(Boolean)
       .join(' ')
       .toLowerCase();
-    return userText && memberText && (userText.includes(memberText) || memberText.includes(userText));
+    return (
+      userText && memberText && (userText.includes(memberText) || memberText.includes(userText))
+    );
   });
-  const fallback = matchedStaff || staff.find((member) => member.id === activeShift.chargeStaffId) || staff[0];
+  const fallback =
+    matchedStaff || staff.find((member) => member.id === activeShift.chargeStaffId) || staff[0];
   const staffId = fallback?.id || user?.id || 'staff-unknown';
   const staffName = fallback ? staffDisplayName(fallback) : user?.fullName || user?.name || staffId;
   return { staffId, staffName };
@@ -109,8 +125,12 @@ export default function EmsCriticalArrivalPrep() {
   const rooms = useEmergencyStore((state) => state.rooms);
   const staff = useEmergencyStore((state) => state.staff);
   const activeShift = useEmergencyStore((state) => state.activeShift);
-  const checkCriticalEMSChecklistItem = useEmergencyStore((state) => state.checkCriticalEMSChecklistItem);
-  const completeCriticalEMSChecklist = useEmergencyStore((state) => state.completeCriticalEMSChecklist);
+  const checkCriticalEMSChecklistItem = useEmergencyStore(
+    (state) => state.checkCriticalEMSChecklistItem,
+  );
+  const completeCriticalEMSChecklist = useEmergencyStore(
+    (state) => state.completeCriticalEMSChecklist,
+  );
 
   const arrival = activeCriticalArrivals(emsArrivals)[0];
   const [checklistOpen, setChecklistOpen] = useState(true);
@@ -124,7 +144,9 @@ export default function EmsCriticalArrivalPrep() {
     if (!arrival) return;
     const convertPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.convertEmsArrival);
     if (!convertPresentation.visible || !convertPresentation.enabled) return;
-    const result = convertEmsArrivalForReception(arrival.id, { actorName: emergencyRole.roleLabel });
+    const result = convertEmsArrivalForReception(arrival.id, {
+      actorName: emergencyRole.roleLabel,
+    });
     if (!result.ok) return;
     if (prefersReceptionForPatientCreate(emergencyRole.role)) {
       navigateProfileAware(
@@ -142,11 +164,16 @@ export default function EmsCriticalArrivalPrep() {
 
   if (!arrival) return null;
 
-  const checklist = CRITICAL_CHECKLISTS.find((entry) => entry.type === arrival.criticalChecklist?.type);
+  const checklist = CRITICAL_CHECKLISTS.find(
+    (entry) => entry.type === arrival.criticalChecklist?.type,
+  );
   const items = checklist?.items || [];
   const completedCount = arrival.criticalChecklist?.completions.length || 0;
   const progress = items.length ? Math.round((completedCount / items.length) * 100) : 0;
-  const assignedBay = roomName(rooms, arrival.preparedRoomId || arrival.criticalChecklist?.assignedRoomId);
+  const assignedBay = roomName(
+    rooms,
+    arrival.preparedRoomId || arrival.criticalChecklist?.assignedRoomId,
+  );
   const doctors = physicianList(staff, activeShift);
   const isPrepComplete = Boolean(arrival.criticalChecklist?.completedAt);
   const canMarkPrepComplete = items.length > 0 && completedCount >= items.length;
@@ -190,9 +217,7 @@ export default function EmsCriticalArrivalPrep() {
       <div className="ems-critical-arrival-prep__summary">
         <AlertTriangle size={18} aria-hidden className="ems-critical-arrival-prep__icon" />
         <div className="ems-critical-arrival-prep__copy">
-          <strong>
-            Critical EMS — {arrival.chiefComplaint || arrival.prearrivalComplaint}
-          </strong>
+          <strong>Critical EMS — {arrival.chiefComplaint || arrival.prearrivalComplaint}</strong>
           <span>
             ETA {countdownLabel(arrival, now)} · {assignedBay}
             {isPrepComplete
@@ -213,10 +238,15 @@ export default function EmsCriticalArrivalPrep() {
       </div>
 
       {checklistOpen && !isPrepComplete ? (
-        <div className="ems-critical-arrival-prep__checklist" aria-label={arrival.criticalChecklist?.title}>
+        <div
+          className="ems-critical-arrival-prep__checklist"
+          aria-label={arrival.criticalChecklist?.title}
+        >
           <div className="ems-critical-arrival-prep__checklist-head">
             <div>
-              <span className="ems-critical-arrival-prep__checklist-eyebrow">Critical EMS prep</span>
+              <span className="ems-critical-arrival-prep__checklist-eyebrow">
+                Critical EMS prep
+              </span>
               <h2>{arrival.criticalChecklist?.title}</h2>
               <p>
                 {arrival.unitName} · {assignedBay} · Notify {doctors}
@@ -239,7 +269,8 @@ export default function EmsCriticalArrivalPrep() {
               const completion = arrival.criticalChecklist?.completions.find(
                 (entry) => entry.itemId === item.id,
               );
-              const label = item.id === 'physician-notified' ? `${item.label}: ${doctors}` : item.label;
+              const label =
+                item.id === 'physician-notified' ? `${item.label}: ${doctors}` : item.label;
               return (
                 <label
                   key={item.id}

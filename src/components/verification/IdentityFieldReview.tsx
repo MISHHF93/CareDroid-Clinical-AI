@@ -30,7 +30,10 @@ export default function IdentityFieldReview({
         {fields.map((field) => {
           const tone = fieldDecisionTone(fieldDecisions[field.field] || field.status);
           return (
-            <article key={field.field} className={`identity-field-review__field identity-field-review__field--${tone}`}>
+            <article
+              key={field.field}
+              className={`identity-field-review__field identity-field-review__field--${tone}`}
+            >
               <div>
                 <strong>{field.field}</strong>
                 <span>{field.source}</span>
@@ -47,13 +50,25 @@ export default function IdentityFieldReview({
               </dl>
               <footer>
                 <span>{FIELD_STATUS_LABEL[tone]}</span>
-                <button type="button" onClick={() => onFieldDecision(field.field, 'approved')} disabled={!canVerify}>
+                <button
+                  type="button"
+                  onClick={() => onFieldDecision(field.field, 'approved')}
+                  disabled={!canVerify}
+                >
                   Approve
                 </button>
-                <button type="button" onClick={() => onFieldDecision(field.field, 'edited')} disabled={!canVerify}>
+                <button
+                  type="button"
+                  onClick={() => onFieldDecision(field.field, 'edited')}
+                  disabled={!canVerify}
+                >
                   Mark edited
                 </button>
-                <button type="button" onClick={() => onFieldDecision(field.field, 'rejected')} disabled={!canVerify}>
+                <button
+                  type="button"
+                  onClick={() => onFieldDecision(field.field, 'rejected')}
+                  disabled={!canVerify}
+                >
                   Reject
                 </button>
               </footer>

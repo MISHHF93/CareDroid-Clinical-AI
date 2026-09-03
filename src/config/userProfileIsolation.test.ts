@@ -17,36 +17,35 @@ import {
   isToolAllowedForCompiledProfile,
 } from './userProfileCompiler';
 
-const PROFILE_ROUTE_MATRIX: Readonly<
-  Record<string, { allow: string[]; deny: string[] }>
-> = Object.freeze({
-  'registration-clerk': {
-    allow: [
-      CANONICAL_ROUTES.emergencyReception,
-      CANONICAL_ROUTES.emergencyPatients,
-      CANONICAL_ROUTES.emergencyPulse,
-      CANONICAL_ROUTES.emergencyShift,
-    ],
-    deny: [
-      CANONICAL_ROUTES.emergencyWhiteboard,
-      CANONICAL_ROUTES.emergencyAnalytics,
-      CANONICAL_ROUTES.trackMindWorkspace,
-      CANONICAL_ROUTES.surveillanceNexus,
-    ],
-  },
-  student: {
-    allow: [CANONICAL_ROUTES.emergencyTools, CANONICAL_ROUTES.profile],
-    deny: [CANONICAL_ROUTES.emergencyWhiteboard, CANONICAL_ROUTES.emergencySettings],
-  },
-  steward: {
-    allow: [CANONICAL_ROUTES.trackMindWorkspace],
-    deny: [CANONICAL_ROUTES.emergencyTools, CANONICAL_ROUTES.emergencyWhiteboard],
-  },
-  'hospital-administrator': {
-    allow: [CANONICAL_ROUTES.adminOperations, CANONICAL_ROUTES.emergencyAnalytics],
-    deny: [CANONICAL_ROUTES.trackMindWorkspace],
-  },
-});
+const PROFILE_ROUTE_MATRIX: Readonly<Record<string, { allow: string[]; deny: string[] }>> =
+  Object.freeze({
+    'registration-clerk': {
+      allow: [
+        CANONICAL_ROUTES.emergencyReception,
+        CANONICAL_ROUTES.emergencyPatients,
+        CANONICAL_ROUTES.emergencyPulse,
+        CANONICAL_ROUTES.emergencyShift,
+      ],
+      deny: [
+        CANONICAL_ROUTES.emergencyWhiteboard,
+        CANONICAL_ROUTES.emergencyAnalytics,
+        CANONICAL_ROUTES.trackMindWorkspace,
+        CANONICAL_ROUTES.surveillanceNexus,
+      ],
+    },
+    student: {
+      allow: [CANONICAL_ROUTES.emergencyTools, CANONICAL_ROUTES.profile],
+      deny: [CANONICAL_ROUTES.emergencyWhiteboard, CANONICAL_ROUTES.emergencySettings],
+    },
+    steward: {
+      allow: [CANONICAL_ROUTES.trackMindWorkspace],
+      deny: [CANONICAL_ROUTES.emergencyTools, CANONICAL_ROUTES.emergencyWhiteboard],
+    },
+    'hospital-administrator': {
+      allow: [CANONICAL_ROUTES.adminOperations, CANONICAL_ROUTES.emergencyAnalytics],
+      deny: [CANONICAL_ROUTES.trackMindWorkspace],
+    },
+  });
 
 describe('userProfileIsolation', () => {
   it('keeps student and registration-clerk personas isolated from physician whiteboard routes', () => {
@@ -150,15 +149,25 @@ describe('userProfileIsolation', () => {
   it('compiler enforces registration-clerk route and tool isolation', () => {
     const compiled = compileUserProfile({ saasRole: 'registration-clerk' });
 
-    expect(isRouteAllowedInCompiledProfile(CANONICAL_ROUTES.emergencyReception, compiled)).toBe(true);
+    expect(isRouteAllowedInCompiledProfile(CANONICAL_ROUTES.emergencyReception, compiled)).toBe(
+      true,
+    );
     expect(isRouteAllowedInCompiledProfile(CANONICAL_ROUTES.emergencyWhiteboard, compiled)).toBe(
       false,
     );
     expect(
-      isToolAllowedForCompiledProfile('protocols', { id: 'protocols', packId: 'emergency-clinical' }, 'registration-clerk'),
+      isToolAllowedForCompiledProfile(
+        'protocols',
+        { id: 'protocols', packId: 'emergency-clinical' },
+        'registration-clerk',
+      ),
     ).toBe(false);
     expect(
-      isToolAllowedForCompiledProfile('calculators', { id: 'calculators', packId: 'core-platform' }, 'registration-clerk'),
+      isToolAllowedForCompiledProfile(
+        'calculators',
+        { id: 'calculators', packId: 'core-platform' },
+        'registration-clerk',
+      ),
     ).toBe(true);
   });
 

@@ -9,7 +9,12 @@ vi.mock('../../contexts/UserContext', () => ({
 }));
 
 vi.mock('../../hooks/useNotificationActions', () => ({
-  useNotificationActions: () => ({ warning: vi.fn(), success: vi.fn(), error: vi.fn(), info: vi.fn() }),
+  useNotificationActions: () => ({
+    warning: vi.fn(),
+    success: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+  }),
 }));
 
 vi.mock('../../services/analyticsService', () => ({ default: { track: vi.fn() } }));

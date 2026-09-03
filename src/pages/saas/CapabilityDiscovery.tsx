@@ -14,7 +14,10 @@ import './CapabilityDiscovery.css';
 export default function CapabilityDiscovery() {
   useRouteChromeRegistration({ title: 'Discover CareDroid Capabilities' });
   const [query, setQuery] = useState('');
-  const discovery = useMemo(() => buildCapabilityDiscovery({ recentToolIds: ['qsofa', 'heart-score'] }), []);
+  const discovery = useMemo(
+    () => buildCapabilityDiscovery({ recentToolIds: ['qsofa', 'heart-score'] }),
+    [],
+  );
   const sectionChart = useMemo(() => buildDiscoverySectionChart(discovery), [discovery]);
 
   const filteredSections = useMemo(() => {
@@ -39,8 +42,13 @@ export default function CapabilityDiscovery() {
         <div className="capability-discovery-page__title-row">
           <GraphicIconBadge iconKey="clinical-tools" accent="brand" size="md" />
           <div>
-            <p className="capability-discovery-page-title-text" data-testid="cd-page-title-text">Discover CareDroid Capabilities</p>
-            <p>Profile-aware recommendations for tools, simulations, workflows, and clinical protocols.</p>
+            <p className="capability-discovery-page-title-text" data-testid="cd-page-title-text">
+              Discover CareDroid Capabilities
+            </p>
+            <p>
+              Profile-aware recommendations for tools, simulations, workflows, and clinical
+              protocols.
+            </p>
           </div>
         </div>
         <div className="capability-discovery-page__actions">
@@ -57,11 +65,35 @@ export default function CapabilityDiscovery() {
         details="Demo profile segmentation from tool inventory, simulation catalog, and protocol library — no live personalization backend required."
       />
 
-      <div className="capability-discovery-page__metrics" role="group" aria-label="Discovery summary metrics">
-        <MetricCard label="Total items" value={String(discovery.summary.totalItems)} hint="Across all sections" tone="neutral" />
-        <MetricCard label="Recommended" value={String(discovery.summary.recommended)} hint="Profile matches" tone="good" />
-        <MetricCard label="Underused" value={String(discovery.summary.underused)} hint="Not in recent history" tone="warning" />
-        <MetricCard label="Simulations" value={String(discovery.summary.simulations)} hint="Training scenarios" tone="neutral" />
+      <div
+        className="capability-discovery-page__metrics"
+        role="group"
+        aria-label="Discovery summary metrics"
+      >
+        <MetricCard
+          label="Total items"
+          value={String(discovery.summary.totalItems)}
+          hint="Across all sections"
+          tone="neutral"
+        />
+        <MetricCard
+          label="Recommended"
+          value={String(discovery.summary.recommended)}
+          hint="Profile matches"
+          tone="good"
+        />
+        <MetricCard
+          label="Underused"
+          value={String(discovery.summary.underused)}
+          hint="Not in recent history"
+          tone="warning"
+        />
+        <MetricCard
+          label="Simulations"
+          value={String(discovery.summary.simulations)}
+          hint="Training scenarios"
+          tone="neutral"
+        />
       </div>
 
       <div className="capability-discovery-page__charts">
@@ -113,12 +145,20 @@ export default function CapabilityDiscovery() {
       />
 
       {filteredSections.map((section) => (
-        <section key={section.id} className="capability-discovery-page__panel" aria-label={section.title}>
+        <section
+          key={section.id}
+          className="capability-discovery-page__panel"
+          aria-label={section.title}
+        >
           <h2>{section.title}</h2>
           <p>{section.description}</p>
           <div className="capability-discovery-page__grid">
             {section.items.map((item) => (
-              <Link key={`${section.id}-${item.id}`} to={item.path} className="capability-discovery-page__card">
+              <Link
+                key={`${section.id}-${item.id}`}
+                to={item.path}
+                className="capability-discovery-page__card"
+              >
                 <strong>{item.title}</strong>
                 <span>{item.category}</span>
                 <span>{item.reason}</span>

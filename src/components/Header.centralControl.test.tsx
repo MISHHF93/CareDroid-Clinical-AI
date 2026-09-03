@@ -41,7 +41,9 @@ describe('Header chrome (caredroid-header)', () => {
     expect(
       within(header).getByRole('combobox', { name: /operational search|patient search/i }),
     ).toBeInTheDocument();
-    expect(within(header).getByRole('button', { name: /start a new patient intake/i })).toBeInTheDocument();
+    expect(
+      within(header).getByRole('button', { name: /start a new patient intake/i }),
+    ).toBeInTheDocument();
     expect(within(header).getByRole('button', { name: /Account menu for/i })).toBeInTheDocument();
   });
 
@@ -53,7 +55,9 @@ describe('Header chrome (caredroid-header)', () => {
     // Guide must not appear as a button, link, or labeled control in the top bar
     expect(within(header).queryByRole('button', { name: /^Guide$/i })).toBeNull();
     expect(within(header).queryByRole('link', { name: /^Guide$/i })).toBeNull();
-    expect(within(header).queryByRole('button', { name: /open caredroid guide|process guide/i })).toBeNull();
+    expect(
+      within(header).queryByRole('button', { name: /open caredroid guide|process guide/i }),
+    ).toBeNull();
     expect(within(header).queryByTitle(/process guide/i)).toBeNull();
     expect(within(header).queryByText(/Central Node/i)).toBeNull();
     // Sidebar owns the single Guide entry — header actions are alarms/create/account only
@@ -67,8 +71,8 @@ describe('Header chrome (caredroid-header)', () => {
     const header = screen.getByRole('banner');
     const search = within(header).getByRole('combobox');
     const create = within(header).getByRole('button', { name: /start a new patient intake/i });
-    expect(
-      Boolean(create.compareDocumentPosition(search) & Node.DOCUMENT_POSITION_FOLLOWING),
-    ).toBe(true);
+    expect(Boolean(create.compareDocumentPosition(search) & Node.DOCUMENT_POSITION_FOLLOWING)).toBe(
+      true,
+    );
   });
 });

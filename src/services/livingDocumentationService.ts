@@ -220,7 +220,9 @@ function buildConfigurationEntries(): LivingDocumentationEntry[] {
     label: 'Configuration audit',
     summary: `${audit.registryEntryCount} registry entries, ${audit.envVarCount} env vars, ${audit.conflicts.length} conflicts (${audit.compatShims.length} compat shims).`,
     sourceModule: 'canonicalConfigurationAudit.ts',
-    status: audit.conflicts.some((c) => c.severity === 'error') ? ('partial' as const) : ('active' as const),
+    status: audit.conflicts.some((c) => c.severity === 'error')
+      ? ('partial' as const)
+      : ('active' as const),
   });
 
   return [...registryEntries, ...envEntries, auditSummary];
@@ -291,8 +293,8 @@ export function resolveLivingDocumentationForPath(
 
   if (!architecturePage && !apiBinding && !routeRecord) return null;
 
-  const workflowStep = PATIENT_WORKFLOW_STEPS.find(
-    (step) => normalized.startsWith(step.route.split('?')[0]),
+  const workflowStep = PATIENT_WORKFLOW_STEPS.find((step) =>
+    normalized.startsWith(step.route.split('?')[0]),
   );
 
   const relatedRoutes = ROUTE_RECORDS.filter(
@@ -321,10 +323,11 @@ export function resolveLivingDocumentationForPath(
       ...(architecturePage ? [architecturePage.workflow] : []),
       ...(workflowStep ? [workflowStep.id] : []),
     ]),
-    components: snapshot.sections.components
-      ?.filter((entry) => entry.summary.toLowerCase().includes(architecturePage?.id || ''))
-      .map((entry) => entry.label)
-      .slice(0, 4) || [],
+    components:
+      snapshot.sections.components
+        ?.filter((entry) => entry.summary.toLowerCase().includes(architecturePage?.id || ''))
+        .map((entry) => entry.label)
+        .slice(0, 4) || [],
     relatedRoutes,
   });
 }

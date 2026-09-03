@@ -20,8 +20,7 @@ const SKIP_HANDLER_PATHS = new Set(['*']);
  * @returns {string}
  */
 export function buildEffectiveHttpPath(controllerPrefix, handlerPath, httpMethod = 'GET') {
-  const isAppHealthProbe =
-    !controllerPrefix && handlerPath === 'health' && httpMethod === 'GET';
+  const isAppHealthProbe = !controllerPrefix && handlerPath === 'health' && httpMethod === 'GET';
   if (isAppHealthProbe) {
     return '/health';
   }
@@ -115,10 +114,7 @@ export function scanNestControllerRoutes(rootDir = backendSrc) {
  * @param {{ method: string, path: string }} b
  */
 export function routeKeysEqual(a, b) {
-  return (
-    a.method === b.method &&
-    normalizeRoutePattern(a.path) === normalizeRoutePattern(b.path)
-  );
+  return a.method === b.method && normalizeRoutePattern(a.path) === normalizeRoutePattern(b.path);
 }
 
 /**
@@ -126,13 +122,9 @@ export function routeKeysEqual(a, b) {
  */
 export function compareControllerScanToInventory(
   scanned = scanNestControllerRoutes(),
-  inventory = BACKEND_HTTP_ROUTES
+  inventory = BACKEND_HTTP_ROUTES,
 ) {
-  const missingInInventory = scanned.filter(
-    (s) => !inventory.some((r) => routeKeysEqual(s, r))
-  );
-  const missingInControllers = inventory.filter(
-    (r) => !scanned.some((s) => routeKeysEqual(s, r))
-  );
+  const missingInInventory = scanned.filter((s) => !inventory.some((r) => routeKeysEqual(s, r)));
+  const missingInControllers = inventory.filter((r) => !scanned.some((s) => routeKeysEqual(s, r)));
   return { scanned, missingInInventory, missingInControllers };
 }

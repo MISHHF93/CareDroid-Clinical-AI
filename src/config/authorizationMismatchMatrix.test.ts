@@ -6,7 +6,11 @@ import {
   OPERATIONS_SIDEBAR_NAV_ITEMS,
   SOLUTIONS_SIDEBAR_NAV_ITEMS,
 } from './navigation.config';
-import { USER_PROFILE_CATALOG, resolveUserProfileFromSaasRole, isRouteAllowedForProfile } from './userProfileCatalog';
+import {
+  USER_PROFILE_CATALOG,
+  resolveUserProfileFromSaasRole,
+  isRouteAllowedForProfile,
+} from './userProfileCatalog';
 import { canAccessRoute, compileCareDroidAccessProfile } from '../lib/users/canonicalAccess';
 
 /**
@@ -57,7 +61,11 @@ function collectNavRoutes(): Array<{ id: string; path: string; label: string }> 
       // the reachability matrix rather than via an ever-growing exception
       // list. See navigation.config.ts's NavigationDestinationKind doc.
       if (item.path && item.kind !== 'action' && !seen.has(item.path)) {
-        seen.set(item.path, { id: item.id || item.path, path: item.path, label: item.label || item.id || item.path });
+        seen.set(item.path, {
+          id: item.id || item.path,
+          path: item.path,
+          label: item.label || item.id || item.path,
+        });
       }
     }
   }
@@ -128,7 +136,11 @@ describe('authorization mismatch matrix', () => {
       totalRoutes: routes.length,
       totalCombinations: rows.length,
       classificationTotals: totals,
-      routesNoProfileCanAccess: deniedForEveryone.map((r) => ({ id: r.id, path: r.path, label: r.label })),
+      routesNoProfileCanAccess: deniedForEveryone.map((r) => ({
+        id: r.id,
+        path: r.path,
+        label: r.label,
+      })),
     };
 
     console.log('MATRIX_SUMMARY ' + JSON.stringify(summary, null, 2));

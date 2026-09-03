@@ -22,7 +22,7 @@ describe('heartScoreCalculator', () => {
         age: 2,
         riskFactors: 1,
         troponin: 0,
-      })
+      }),
     ).toBe(4);
   });
 
@@ -68,7 +68,9 @@ describe('heartScoreCalculator', () => {
     for (const score of [2, 5, 9]) {
       const interpretation = interpretHeartScore(score)?.interpretation || '';
       expect(interpretation).not.toMatch(/\b(start|stop|give|prescribe|administer)\b/i);
-      expect(interpretation).not.toMatch(/cardiology review|observation time|invasive strategy|anticoagul/i);
+      expect(interpretation).not.toMatch(
+        /cardiology review|observation time|invasive strategy|anticoagul/i,
+      );
     }
   });
 

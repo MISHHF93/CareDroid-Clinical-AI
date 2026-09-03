@@ -42,13 +42,17 @@ export default function SpecialtyHubLayout({
         <div className="specialty-hub-page__title-row">
           <GraphicIconBadge iconKey={iconKey} accent="brand" size="md" />
           <div>
-            <p className="specialty-hub-page-title-text" data-testid="cd-page-title-text">{title}</p>
+            <p className="specialty-hub-page-title-text" data-testid="cd-page-title-text">
+              {title}
+            </p>
             <p>{description}</p>
           </div>
         </div>
         <div className="specialty-hub-page__actions">
           {actions.map((action) => (
-            <Link key={action.to} to={action.to}>{action.label}</Link>
+            <Link key={action.to} to={action.to}>
+              {action.label}
+            </Link>
           ))}
         </div>
       </header>
@@ -61,7 +65,11 @@ export default function SpecialtyHubLayout({
               {card.tier ? (
                 <span
                   className={`specialty-hub-page__tier specialty-hub-page__tier--${card.tier === 'Tier B' ? 'b' : 'c'}`}
-                  title={card.tier === 'Tier B' ? 'Structured checklist workflow' : 'Monitoring/dashboard concept'}
+                  title={
+                    card.tier === 'Tier B'
+                      ? 'Structured checklist workflow'
+                      : 'Monitoring/dashboard concept'
+                  }
                 >
                   {card.tier}
                 </span>

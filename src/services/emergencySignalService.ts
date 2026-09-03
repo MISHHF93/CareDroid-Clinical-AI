@@ -219,10 +219,9 @@ export function getJourneyMetrics(): JourneyMetrics {
   return {
     activeJourneys: getActiveTraces().length,
     stageDistribution,
-    avgPrehospitalMinutes:
-      prehospitalDurations.length
-        ? Math.round(prehospitalDurations.reduce((a, b) => a + b, 0) / prehospitalDurations.length)
-        : null,
+    avgPrehospitalMinutes: prehospitalDurations.length
+      ? Math.round(prehospitalDurations.reduce((a, b) => a + b, 0) / prehospitalDurations.length)
+      : null,
     breachCount: all.filter((t) => t.threeMinuteBreachOccurred).length,
   };
 }

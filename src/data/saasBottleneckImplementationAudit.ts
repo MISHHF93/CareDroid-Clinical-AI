@@ -61,8 +61,7 @@ function escapeCell(value) {
 function implementationChecks() {
   const packagingAudit = buildProductPackagingAudit();
   const seededAssetsFullyPackaged =
-    packagingAudit.summary.seededAssetCount > 0 &&
-    packagingAudit.summary.nonCompliantAssets === 0;
+    packagingAudit.summary.seededAssetCount > 0 && packagingAudit.summary.nonCompliantAssets === 0;
   const inventoryBackfillComplete = packagingAudit.summary.backendSeedBacklogCount === 0;
 
   const strictBackend = hasAll('backend/src/modules/platform-assets/platform-assets.service.ts', [
@@ -71,23 +70,27 @@ function implementationChecks() {
     'strictEntitlements',
     /!\(strictEntitlements && hasOrganizationScope\)/,
   ]);
-  const strictFrontend = hasAll('src/config/appConfig.ts', [
-    'VITE_STRICT_SAAS_ENTITLEMENTS',
-    'VITE_ASSET_AWARE_NAVIGATION',
-    'VITE_ORG_SCOPED_PLATFORM_READS',
-  ]) && hasAll('src/config/featureFlags.config.ts', [
-    'strictSaasEntitlements',
-    'assetAwareNavigation',
-    'orgScopedPlatformReads',
-  ]);
-  const strictAccessProjection = hasAll('src/data/assetEntitlements.ts', [
-    'isStrictSaasEntitlementsEnabled',
-    'return !isStrictSaasEntitlementsEnabled(context)',
-  ]) && hasAll('src/data/assetAccess.ts', [
-    'isStrictSaasEntitlementsEnabled',
-    'strictEntitlements',
-    "reasons: ['workspace']",
-  ]);
+  const strictFrontend =
+    hasAll('src/config/appConfig.ts', [
+      'VITE_STRICT_SAAS_ENTITLEMENTS',
+      'VITE_ASSET_AWARE_NAVIGATION',
+      'VITE_ORG_SCOPED_PLATFORM_READS',
+    ]) &&
+    hasAll('src/config/featureFlags.config.ts', [
+      'strictSaasEntitlements',
+      'assetAwareNavigation',
+      'orgScopedPlatformReads',
+    ]);
+  const strictAccessProjection =
+    hasAll('src/data/assetEntitlements.ts', [
+      'isStrictSaasEntitlementsEnabled',
+      'return !isStrictSaasEntitlementsEnabled(context)',
+    ]) &&
+    hasAll('src/data/assetAccess.ts', [
+      'isStrictSaasEntitlementsEnabled',
+      'strictEntitlements',
+      "reasons: ['workspace']",
+    ]);
 
   const platformController = 'backend/src/modules/platform-assets/platform-assets.controller.ts';
   const orgScopedReads = hasAll(platformController, [
@@ -101,39 +104,44 @@ function implementationChecks() {
     'req.user.role !== UserRole.ADMIN',
   ]);
 
-  const workspaceAuthority = hasAll('backend/src/modules/workspaces/workspaces.service.ts', [
-    'options: { organizationId?: string | null }',
-    'organizationId: options.organizationId || null',
-  ]) && hasAll('backend/src/modules/organizations/organization-onboarding.service.ts', [
-    'enabledToolIds: ws.enabledToolIds',
-    '{ organizationId: org.id }',
-  ]);
-  const onboardingWorkspaceType = hasAll('src/pages/commercial/CommercialPages.jsx', [
-    "type: 'hospital'",
-    'enabledToolIds',
-  ]) && !has('src/pages/commercial/CommercialPages.jsx', "type: 'clinical'");
+  const workspaceAuthority =
+    hasAll('backend/src/modules/workspaces/workspaces.service.ts', [
+      'options: { organizationId?: string | null }',
+      'organizationId: options.organizationId || null',
+    ]) &&
+    hasAll('backend/src/modules/organizations/organization-onboarding.service.ts', [
+      'enabledToolIds: ws.enabledToolIds',
+      '{ organizationId: org.id }',
+    ]);
+  const onboardingWorkspaceType =
+    hasAll('src/pages/commercial/CommercialPages.jsx', ["type: 'hospital'", 'enabledToolIds']) &&
+    !has('src/pages/commercial/CommercialPages.jsx', "type: 'clinical'");
 
-  const roleSegmentation = hasAll('backend/src/modules/platform-assets/entities/role-profile.entity.ts', [
-    'preferredAssetIds',
-    'hiddenAssetIds',
-    'defaultDashboard',
-    'defaultAiAgentId',
-  ]) && hasAll('backend/src/modules/platform-assets/platform-context.service.ts', [
-    'roleProfile',
-    'defaultAiAgentId',
-    'strictSaasEntitlements',
-  ]);
+  const roleSegmentation =
+    hasAll('backend/src/modules/platform-assets/entities/role-profile.entity.ts', [
+      'preferredAssetIds',
+      'hiddenAssetIds',
+      'defaultDashboard',
+      'defaultAiAgentId',
+    ]) &&
+    hasAll('backend/src/modules/platform-assets/platform-context.service.ts', [
+      'roleProfile',
+      'defaultAiAgentId',
+      'strictSaasEntitlements',
+    ]);
 
-  const productTierPackaging = hasAll('backend/src/modules/product-catalog/entities/product.entity.ts', [
-    'packIds',
-    'highlightAssetIds',
-    'commercialPlanIds',
-  ]) && hasAll('backend/src/modules/product-catalog/entities/commercial-plan.entity.ts', [
-    'includedProductIds',
-    'includedPackIds',
-    'maxPackIds',
-    'pricingTier',
-  ]);
+  const productTierPackaging =
+    hasAll('backend/src/modules/product-catalog/entities/product.entity.ts', [
+      'packIds',
+      'highlightAssetIds',
+      'commercialPlanIds',
+    ]) &&
+    hasAll('backend/src/modules/product-catalog/entities/commercial-plan.entity.ts', [
+      'includedProductIds',
+      'includedPackIds',
+      'maxPackIds',
+      'pricingTier',
+    ]);
 
   const centralizedLaunch = hasAll('src/navigation/registryToolLaunch.ts', [
     'resolveRegistryToolLaunchAccess',
@@ -142,15 +150,13 @@ function implementationChecks() {
     'entitlement=denied',
   ]);
 
-  const tests = hasAll('src/data/assetAccess.test.ts', [
-    'strict SaaS mode',
-    'active workspace',
-  ]) && hasAll('src/data/assetEntitlements.test.ts', [
-    'strict SaaS mode',
-  ]) && hasAll('backend/src/modules/platform-assets/platform-assets.service.spec.ts', [
-    'strict organization entitlements',
-    'narrows entitled assets by workspace scope',
-  ]);
+  const tests =
+    hasAll('src/data/assetAccess.test.ts', ['strict SaaS mode', 'active workspace']) &&
+    hasAll('src/data/assetEntitlements.test.ts', ['strict SaaS mode']) &&
+    hasAll('backend/src/modules/platform-assets/platform-assets.service.spec.ts', [
+      'strict organization entitlements',
+      'narrows entitled assets by workspace scope',
+    ]);
 
   const profileCompiler =
     has('src/config/userProfileCompiler.ts', 'compileUserProfile') &&
@@ -168,7 +174,9 @@ function implementationChecks() {
       'plan-doc',
       'SaaS bottleneck architecture plan exists',
       'Phase 0',
-      statusFromBoolean(has('docs/saas-bottleneck-architecture-plan.md', '# SaaS Bottleneck Architecture Plan')),
+      statusFromBoolean(
+        has('docs/saas-bottleneck-architecture-plan.md', '# SaaS Bottleneck Architecture Plan'),
+      ),
       '`docs/saas-bottleneck-architecture-plan.md`',
       'Keep this focused plan linked from future implementation tickets.',
     ),
@@ -355,9 +363,7 @@ export function formatSaasBottleneckImplementationAuditMarkdown(
   lines.push(
     '- `PARTIAL` means the capability exists but is not complete enough to claim the full plan is implemented.',
   );
-  lines.push(
-    '- `FAIL` means expected implementation evidence was not found in the current tree.',
-  );
+  lines.push('- `FAIL` means expected implementation evidence was not found in the current tree.');
   lines.push('');
   lines.push('## Regenerate');
   lines.push('');
@@ -366,4 +372,3 @@ export function formatSaasBottleneckImplementationAuditMarkdown(
   lines.push('```');
   return lines.join('\n');
 }
-

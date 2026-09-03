@@ -46,12 +46,37 @@ export interface SepsisShiftMetrics {
 }
 
 export const SEP1_BUNDLE: BundleElement[] = [
-  { id: 'cultures', label: 'Blood cultures × 2 drawn', target: 'Before antibiotics', required: true },
+  {
+    id: 'cultures',
+    label: 'Blood cultures × 2 drawn',
+    target: 'Before antibiotics',
+    required: true,
+  },
   { id: 'lactate', label: 'Lactate measured', target: 'Within 3 hours', required: true },
-  { id: 'antibiotics', label: 'Broad-spectrum antibiotics given', target: 'Within 1 hour of recognition', required: true },
-  { id: 'fluids', label: '30 ml/kg IV crystalloid', target: 'If hypotensive or lactate ≥4', required: false },
-  { id: 'vasopressors', label: 'Vasopressors if MAP <65', target: 'If persistent hypotension after fluids', required: false },
-  { id: 'lactate2', label: 'Repeat lactate if initial >2 mmol/L', target: 'Within 6 hours', required: false },
+  {
+    id: 'antibiotics',
+    label: 'Broad-spectrum antibiotics given',
+    target: 'Within 1 hour of recognition',
+    required: true,
+  },
+  {
+    id: 'fluids',
+    label: '30 ml/kg IV crystalloid',
+    target: 'If hypotensive or lactate ≥4',
+    required: false,
+  },
+  {
+    id: 'vasopressors',
+    label: 'Vasopressors if MAP <65',
+    target: 'If persistent hypotension after fluids',
+    required: false,
+  },
+  {
+    id: 'lactate2',
+    label: 'Repeat lactate if initial >2 mmol/L',
+    target: 'Within 6 hours',
+    required: false,
+  },
 ];
 
 const SEP1_NOTE_PATTERN = /^SEP-1\s+(.+?):\s+completed at\s+(.+?)\s+by\s+(.+)$/i;
@@ -63,7 +88,9 @@ function toMs(value?: string): number | null {
   return Number.isFinite(ms) ? ms : null;
 }
 
-function earliestByPriority<T extends { time: string; priority: number }>(candidates: T[]): T | null {
+function earliestByPriority<T extends { time: string; priority: number }>(
+  candidates: T[],
+): T | null {
   if (!candidates.length) return null;
   return [...candidates].sort((a, b) => {
     if (a.priority !== b.priority) return a.priority - b.priority;
@@ -79,7 +106,10 @@ function noteText(note: Note): string {
   return String(note.text || note.body || '');
 }
 
-function metadataString(metadata: Record<string, string | number | boolean | null | undefined> | undefined, key: string): string | null {
+function metadataString(
+  metadata: Record<string, string | number | boolean | null | undefined> | undefined,
+  key: string,
+): string | null {
   const value = metadata?.[key];
   return typeof value === 'string' && toMs(value) !== null ? value : null;
 }
@@ -126,11 +156,18 @@ export function patientHasSepsisAlert(patient: Patient): boolean {
   return (patient.flags as unknown[]).some((flag) => flagType(flag) === PatientFlag.SepsisAlert);
 }
 
-export function buildSep1CompletionNote(elementId: string, completedAt: string, completedBy: string): string {
+export function buildSep1CompletionNote(
+  elementId: string,
+  completedAt: string,
+  completedBy: string,
+): string {
   return `SEP-1 ${elementId}: completed at ${completedAt} by ${completedBy}`;
 }
 
-export function parseSep1CompletionNotes(notes: Note[], bundle: BundleElement[] = SEP1_BUNDLE): BundleCompletionMap {
+export function parseSep1CompletionNotes(
+  notes: Note[],
+  bundle: BundleElement[] = SEP1_BUNDLE,
+): BundleCompletionMap {
   const elementByToken = new Map<string, BundleElement>();
   bundle.forEach((element) => {
     elementByToken.set(normalizeToken(element.id), element);
@@ -173,14 +210,23 @@ export function calculateBundleProgress(
   };
 }
 
-export function deriveSepsisAlertTime(patient: Patient, alerts: Alert[] = []): SepsisAlertTimeResult {
-  const candidates: Array<{ time: string; source: string; isFallback: boolean; priority: number }> = [];
+export function deriveSepsisAlertTime(
+  patient: Patient,
+  alerts: Alert[] = [],
+): SepsisAlertTimeResult {
+  const candidates: Array<{ time: string; source: string; isFallback: boolean; priority: number }> =
+    [];
 
   (patient.flags as unknown[]).forEach((flag) => {
     if (flagType(flag) !== PatientFlag.SepsisAlert) return;
     const detectedAt = flagDetectedAt(flag);
     if (detectedAt) {
-      candidates.push({ time: detectedAt, source: 'flag metadata', isFallback: false, priority: 1 });
+      candidates.push({
+        time: detectedAt,
+        source: 'flag metadata',
+        isFallback: false,
+        priority: 1,
+      });
     }
   });
 
@@ -193,7 +239,12 @@ export function deriveSepsisAlertTime(patient: Patient, alerts: Alert[] = []): S
       SEPSIS_TEXT_PATTERN.test(summary);
 
     if (hasSepsisFlag && toMs(event.timestamp) !== null) {
-      candidates.push({ time: event.timestamp, source: 'patient timeline', isFallback: false, priority: 2 });
+      candidates.push({
+        time: event.timestamp,
+        source: 'patient timeline',
+        isFallback: false,
+        priority: 2,
+      });
     }
   });
 
@@ -201,8 +252,16 @@ export function deriveSepsisAlertTime(patient: Patient, alerts: Alert[] = []): S
     if (alert.patientId !== patient.id) return;
     const metadataFlag = String(alert.metadata?.flag || '');
     const alertText = `${alert.title} ${alert.message} ${alert.type || ''} ${alert.source || ''}`;
-    if ((metadataFlag === PatientFlag.SepsisAlert || SEPSIS_TEXT_PATTERN.test(alertText)) && toMs(alert.createdAt) !== null) {
-      candidates.push({ time: alert.createdAt, source: 'alert record', isFallback: false, priority: 3 });
+    if (
+      (metadataFlag === PatientFlag.SepsisAlert || SEPSIS_TEXT_PATTERN.test(alertText)) &&
+      toMs(alert.createdAt) !== null
+    ) {
+      candidates.push({
+        time: alert.createdAt,
+        source: 'alert record',
+        isFallback: false,
+        priority: 3,
+      });
     }
   });
 
@@ -212,7 +271,12 @@ export function deriveSepsisAlertTime(patient: Patient, alerts: Alert[] = []): S
       metadataString(note.metadata, 'recognitionTime') ||
       metadataString(note.metadata, 'recognizedAt');
     if (recognitionTime) {
-      candidates.push({ time: recognitionTime, source: 'note metadata', isFallback: false, priority: 4 });
+      candidates.push({
+        time: recognitionTime,
+        source: 'note metadata',
+        isFallback: false,
+        priority: 4,
+      });
       return;
     }
 
@@ -220,7 +284,12 @@ export function deriveSepsisAlertTime(patient: Patient, alerts: Alert[] = []): S
     if (!text.startsWith('SEP-1') && SEPSIS_TEXT_PATTERN.test(text)) {
       const timestamp = note.timestamp || note.createdAt;
       if (timestamp && toMs(timestamp) !== null) {
-        candidates.push({ time: timestamp, source: 'clinical note timestamp', isFallback: false, priority: 5 });
+        candidates.push({
+          time: timestamp,
+          source: 'clinical note timestamp',
+          isFallback: false,
+          priority: 5,
+        });
       }
     }
   });
@@ -241,7 +310,10 @@ export function deriveSepsisAlertTime(patient: Patient, alerts: Alert[] = []): S
   };
 }
 
-export function calculateAntibioticTiming(sepsisAlertTime: string, completedAt: string): AntibioticTimingResult | null {
+export function calculateAntibioticTiming(
+  sepsisAlertTime: string,
+  completedAt: string,
+): AntibioticTimingResult | null {
   const startMs = toMs(sepsisAlertTime);
   const completedMs = toMs(completedAt);
   if (startMs === null || completedMs === null || completedMs < startMs) return null;
@@ -273,9 +345,13 @@ export function calculateAntibioticTiming(sepsisAlertTime: string, completedAt: 
   };
 }
 
-export function calculateSepsisShiftMetrics(patients: Patient[], alerts: Alert[] = []): SepsisShiftMetrics {
+export function calculateSepsisShiftMetrics(
+  patients: Patient[],
+  alerts: Alert[] = [],
+): SepsisShiftMetrics {
   const sepsisPatients = patients.filter(patientHasSepsisAlert);
-  const totalRequiredElements = sepsisPatients.length * SEP1_BUNDLE.filter((element) => element.required).length;
+  const totalRequiredElements =
+    sepsisPatients.length * SEP1_BUNDLE.filter((element) => element.required).length;
   let completedRequiredElements = 0;
   const antibioticTimes: number[] = [];
 
@@ -296,7 +372,9 @@ export function calculateSepsisShiftMetrics(patients: Patient[], alerts: Alert[]
       ? Math.round((completedRequiredElements / totalRequiredElements) * 100)
       : 0,
     averageAntibioticMinutes: antibioticTimes.length
-      ? Math.round(antibioticTimes.reduce((sum, minutes) => sum + minutes, 0) / antibioticTimes.length)
+      ? Math.round(
+          antibioticTimes.reduce((sum, minutes) => sum + minutes, 0) / antibioticTimes.length,
+        )
       : null,
     completedRequiredElements,
     totalRequiredElements,
@@ -332,7 +410,8 @@ export default function SepsisBundleTracker({
   const antibioticTiming = completions.antibiotics
     ? calculateAntibioticTiming(recognitionTime.time, completions.antibiotics.completedAt)
     : null;
-  const staffId = patient.assignedStaffId || activeShift.chargeStaffId || staff[0]?.id || 'current-staff';
+  const staffId =
+    patient.assignedStaffId || activeShift.chargeStaffId || staff[0]?.id || 'current-staff';
 
   if (!hasSepsisAlert) return null;
 
@@ -349,14 +428,18 @@ export default function SepsisBundleTracker({
         <div>
           <h3 id="sepsis-bundle-heading">Sepsis Bundle (SEP-1)</h3>
           <p>
-            Recognition time: <time dateTime={recognitionTime.time}>{formatClock(recognitionTime.time)}</time>
+            Recognition time:{' '}
+            <time dateTime={recognitionTime.time}>{formatClock(recognitionTime.time)}</time>
             {recognitionTime.isFallback ? ' (arrival fallback)' : ''}
           </p>
         </div>
         <strong>{progress.percentage}%</strong>
       </div>
 
-      <div className="sepsis-bundle-progress" aria-label={`SEP-1 required progress ${progress.completed} of ${progress.total}`}>
+      <div
+        className="sepsis-bundle-progress"
+        aria-label={`SEP-1 required progress ${progress.completed} of ${progress.total}`}
+      >
         <span style={{ width: `${progress.percentage}%` }} />
       </div>
       <div className="sepsis-bundle-progress__label">
@@ -365,7 +448,10 @@ export default function SepsisBundleTracker({
       </div>
 
       {antibioticTiming ? (
-        <div className="sepsis-bundle-antibiotics" style={{ borderColor: antibioticTiming.color, color: antibioticTiming.color }}>
+        <div
+          className="sepsis-bundle-antibiotics"
+          style={{ borderColor: antibioticTiming.color, color: antibioticTiming.color }}
+        >
           {antibioticTiming.label}
         </div>
       ) : null}
@@ -374,7 +460,9 @@ export default function SepsisBundleTracker({
         {SEP1_BUNDLE.map((element) => {
           const completion = completions[element.id];
           const completedBy = completion?.completedBy;
-          const completedByInitials = completedBy ? initials(staffDisplayName(staff, completedBy)) : '';
+          const completedByInitials = completedBy
+            ? initials(staffDisplayName(staff, completedBy))
+            : '';
 
           return (
             <article
@@ -384,7 +472,9 @@ export default function SepsisBundleTracker({
               <button
                 type="button"
                 className="sepsis-bundle-row__checkbox"
-                aria-label={completion ? `${element.label} completed` : `Mark ${element.label} complete`}
+                aria-label={
+                  completion ? `${element.label} completed` : `Mark ${element.label} complete`
+                }
                 disabled={Boolean(completion) || !canWriteNote}
                 onClick={() => setPendingElement(element)}
               >
@@ -396,7 +486,9 @@ export default function SepsisBundleTracker({
               </div>
               <span className="sepsis-bundle-row__target">{element.target}</span>
               <span className="sepsis-bundle-row__timestamp">
-                {completion ? `${formatClock(completion.completedAt)} ${completedByInitials}` : 'Pending'}
+                {completion
+                  ? `${formatClock(completion.completedAt)} ${completedByInitials}`
+                  : 'Pending'}
               </span>
             </article>
           );
@@ -404,7 +496,12 @@ export default function SepsisBundleTracker({
       </div>
 
       {pendingElement ? (
-        <div className="sepsis-bundle-confirm" role="dialog" aria-modal="false" aria-labelledby="sepsis-bundle-confirm-title">
+        <div
+          className="sepsis-bundle-confirm"
+          role="dialog"
+          aria-modal="false"
+          aria-labelledby="sepsis-bundle-confirm-title"
+        >
           <p id="sepsis-bundle-confirm-title">Mark {pendingElement.label} as complete?</p>
           <div>
             <button type="button" onClick={completePendingElement}>

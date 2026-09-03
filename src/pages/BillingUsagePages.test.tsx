@@ -66,7 +66,14 @@ describe('Billing and usage pages', () => {
       ok: true,
       data: {
         totals: [
-          { eventType: 'ai_call', label: 'AI calls', used: 12, limit: 10000, remaining: 9988, unit: 'call' },
+          {
+            eventType: 'ai_call',
+            label: 'AI calls',
+            used: 12,
+            limit: 10000,
+            remaining: 9988,
+            unit: 'call',
+          },
           {
             eventType: 'calculator_launch',
             label: 'Calculator launches',
@@ -128,7 +135,7 @@ describe('Billing and usage pages', () => {
 
     await waitFor(() => expect(fetchUsageSummary).toHaveBeenCalledWith({ period: 'month' }));
     await waitFor(() =>
-      expect(fetchUsageMeteringFramework).toHaveBeenCalledWith({ period: 'month' })
+      expect(fetchUsageMeteringFramework).toHaveBeenCalledWith({ period: 'month' }),
     );
     expect(screen.getByRole('heading', { name: /^usage$/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /usage metering framework/i })).toBeInTheDocument();

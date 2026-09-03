@@ -41,7 +41,8 @@ function normalizeAutomation(definition) {
     organizationTypes: DEFAULT_ORGANIZATION_TYPES,
     conditions: ['workspace enabled', 'asset entitlement active'],
     actions: [],
-    aiInvolvement: 'AI summarizes context and recommends next actions; automation remains auditable.',
+    aiInvolvement:
+      'AI summarizes context and recommends next actions; automation remains auditable.',
     requiredAI: [],
     requiredAssets: [],
     requiredWorkflows: [],
@@ -86,7 +87,8 @@ export const AUTOMATION_REGISTRY = Object.freeze([
   normalizeAutomation({
     automationId: 'laboratory-abnormal-result-alert',
     title: 'Abnormal Result Alert',
-    description: 'Flags abnormal lab results and recommends interpretation, trend review, and follow-up workflows.',
+    description:
+      'Flags abnormal lab results and recommends interpretation, trend review, and follow-up workflows.',
     type: AUTOMATION_TYPES.LABORATORY,
     workspace: 'laboratory',
     roles: ['lab-technician', 'emergency-physician', 'icu-physician'],
@@ -124,7 +126,8 @@ export const AUTOMATION_REGISTRY = Object.freeze([
   normalizeAutomation({
     automationId: 'laboratory-pending-review-queue',
     title: 'Pending Review Queue',
-    description: 'Builds a review queue for lab findings needing clinician or lab specialist review.',
+    description:
+      'Builds a review queue for lab findings needing clinician or lab specialist review.',
     type: AUTOMATION_TYPES.LABORATORY,
     workspace: 'laboratory',
     trigger: 'Unreviewed abnormal or critical results accumulate',
@@ -158,7 +161,8 @@ export const AUTOMATION_REGISTRY = Object.freeze([
   normalizeAutomation({
     automationId: 'laboratory-lab-trend-monitoring',
     title: 'Lab Trend Monitoring',
-    description: 'Monitors repeated labs for trend changes and recommends reports or follow-up workflows.',
+    description:
+      'Monitors repeated labs for trend changes and recommends reports or follow-up workflows.',
     type: AUTOMATION_TYPES.LABORATORY,
     workspace: 'laboratory',
     trigger: 'Meaningful lab trend detected',
@@ -211,7 +215,8 @@ export const AUTOMATION_REGISTRY = Object.freeze([
   normalizeAutomation({
     automationId: 'medical-iot-telemetry-lost',
     title: 'Telemetry Lost',
-    description: 'Detects lost telemetry and recommends troubleshooting plus operations notification.',
+    description:
+      'Detects lost telemetry and recommends troubleshooting plus operations notification.',
     type: AUTOMATION_TYPES.MEDICAL_IOT,
     workspace: 'medical-iot',
     trigger: 'Telemetry stream disconnected',
@@ -343,7 +348,8 @@ export const AUTOMATION_REGISTRY = Object.freeze([
   normalizeAutomation({
     automationId: 'governance-audit-event-detection',
     title: 'Audit Event Detection',
-    description: 'Detects audit-significant automation, AI, and tool events and creates review tasks.',
+    description:
+      'Detects audit-significant automation, AI, and tool events and creates review tasks.',
     type: AUTOMATION_TYPES.GOVERNANCE,
     workspace: 'governance',
     roles: ['compliance-officer', 'platform-admin'],
@@ -379,7 +385,8 @@ export const AUTOMATION_REGISTRY = Object.freeze([
   normalizeAutomation({
     automationId: 'governance-human-review-required',
     title: 'Human Review Required',
-    description: 'Creates human review queue items when automation or AI recommendations exceed risk thresholds.',
+    description:
+      'Creates human review queue items when automation or AI recommendations exceed risk thresholds.',
     type: AUTOMATION_TYPES.GOVERNANCE,
     workspace: 'governance',
     trigger: 'High-risk automation or AI recommendation detected',
@@ -427,7 +434,9 @@ export const AUTOMATION_REGISTRY = Object.freeze([
 ]);
 
 export const AUTOMATION_REGISTRY_BY_ID = Object.freeze(
-  Object.fromEntries(AUTOMATION_REGISTRY.map((automation) => [automation.automationId, automation]))
+  Object.fromEntries(
+    AUTOMATION_REGISTRY.map((automation) => [automation.automationId, automation]),
+  ),
 );
 
 export const SOLUTION_PACKAGES = Object.freeze([
@@ -435,8 +444,11 @@ export const SOLUTION_PACKAGES = Object.freeze([
     solutionId: 'emergency-department-solution',
     title: 'Emergency Flow Intelligence Platform',
     workspace: 'emergency',
-    description: 'Sellable Emergency Flow Intelligence platform spanning ED throughput, EMS handoff, triage, bed flow, referrals, discharge, equipment, surge, Copilot, and command-center operations.',
-    automationIds: AUTOMATION_REGISTRY.filter((automation) => automation.workspace === 'emergency').map((automation) => automation.automationId),
+    description:
+      'Sellable Emergency Flow Intelligence platform spanning ED throughput, EMS handoff, triage, bed flow, referrals, discharge, equipment, surge, Copilot, and command-center operations.',
+    automationIds: AUTOMATION_REGISTRY.filter(
+      (automation) => automation.workspace === 'emergency',
+    ).map((automation) => automation.automationId),
     aiAgents: ['emergency-copilot'],
     patientJourney: EMERGENCY_PATIENT_JOURNEY.map((stage) => stage.id),
     coreMvpPackage: EMERGENCY_CORE_MVP_PACKAGE,
@@ -451,16 +463,36 @@ export const SOLUTION_PACKAGES = Object.freeze([
       REGISTRY.wellsDvtCalculator,
       REGISTRY.shockIndex,
     ],
-    protocols: ['sepsis pathway', 'stroke pathway', 'chest pain pathway', 'trauma escalation', 'respiratory distress pathway'],
-    simulations: ['sepsis scenario', 'stroke escalation simulation', 'trauma bay drill', 'respiratory distress simulation'],
-    outcomes: ['triage standardization', 'calculator adoption', 'referral throughput', 'documentation readiness', 'AI recommendation review'],
+    protocols: [
+      'sepsis pathway',
+      'stroke pathway',
+      'chest pain pathway',
+      'trauma escalation',
+      'respiratory distress pathway',
+    ],
+    simulations: [
+      'sepsis scenario',
+      'stroke escalation simulation',
+      'trauma bay drill',
+      'respiratory distress simulation',
+    ],
+    outcomes: [
+      'triage standardization',
+      'calculator adoption',
+      'referral throughput',
+      'documentation readiness',
+      'AI recommendation review',
+    ],
   },
   {
     solutionId: 'laboratory-intelligence-solution',
     title: 'Laboratory Intelligence Solution',
     workspace: 'laboratory',
-    description: 'Lab interpretation, abnormal result alerts, trend monitoring, reports, and review workflows.',
-    automationIds: AUTOMATION_REGISTRY.filter((automation) => automation.workspace === 'laboratory').map((automation) => automation.automationId),
+    description:
+      'Lab interpretation, abnormal result alerts, trend monitoring, reports, and review workflows.',
+    automationIds: AUTOMATION_REGISTRY.filter(
+      (automation) => automation.workspace === 'laboratory',
+    ).map((automation) => automation.automationId),
     aiAgents: ['lab-interpretation-agent'],
     reports: ['critical value review', 'lab trend report', 'specimen throughput'],
     analytics: ['abnormal result trends', 'pending review queue', 'specimen delays'],
@@ -470,8 +502,11 @@ export const SOLUTION_PACKAGES = Object.freeze([
     solutionId: 'medical-iot-solution',
     title: 'Medical IoT Solution',
     workspace: 'medical-iot',
-    description: 'Device fleet, telemetry, offline alerts, battery/calibration/maintenance workflows.',
-    automationIds: AUTOMATION_REGISTRY.filter((automation) => automation.workspace === 'medical-iot').map((automation) => automation.automationId),
+    description:
+      'Device fleet, telemetry, offline alerts, battery/calibration/maintenance workflows.',
+    automationIds: AUTOMATION_REGISTRY.filter(
+      (automation) => automation.workspace === 'medical-iot',
+    ).map((automation) => automation.automationId),
     deviceFleet: [REGISTRY.medicalIotDashboard, REGISTRY.deviceFleetManagement],
     telemetry: [REGISTRY.telemetryMonitoring],
     alerts: ['device offline', 'battery low', 'telemetry lost', 'maintenance due'],
@@ -481,20 +516,36 @@ export const SOLUTION_PACKAGES = Object.freeze([
     solutionId: 'fleet-operations-solution',
     title: 'Fleet Operations Solution',
     workspace: 'fleet',
-    description: 'Fleet tracking, dispatch review, route delay alerts, maintenance, and utilization analytics.',
-    automationIds: AUTOMATION_REGISTRY.filter((automation) => automation.workspace === 'fleet').map((automation) => automation.automationId),
+    description:
+      'Fleet tracking, dispatch review, route delay alerts, maintenance, and utilization analytics.',
+    automationIds: AUTOMATION_REGISTRY.filter((automation) => automation.workspace === 'fleet').map(
+      (automation) => automation.automationId,
+    ),
     aiAgents: ['fleet-operations-agent'],
-    assets: [REGISTRY.fleetLiveMap, REGISTRY.routeOptimizer, REGISTRY.predictiveMaintenance, REGISTRY.dispatchAi],
+    assets: [
+      REGISTRY.fleetLiveMap,
+      REGISTRY.routeOptimizer,
+      REGISTRY.predictiveMaintenance,
+      REGISTRY.dispatchAi,
+    ],
     outcomes: ['route visibility', 'dispatch readiness', 'maintenance workflows'],
   },
   {
     solutionId: 'governance-solution',
     title: 'Governance Solution',
     workspace: 'governance',
-    description: 'Audit tasks, security actions, human review, AI risk escalation, and compliance queues.',
-    automationIds: AUTOMATION_REGISTRY.filter((automation) => automation.workspace === 'governance').map((automation) => automation.automationId),
+    description:
+      'Audit tasks, security actions, human review, AI risk escalation, and compliance queues.',
+    automationIds: AUTOMATION_REGISTRY.filter(
+      (automation) => automation.workspace === 'governance',
+    ).map((automation) => automation.automationId),
     aiAgents: ['governance-agent'],
-    assets: [REGISTRY.aiGovernance, REGISTRY.aiSecurity, REGISTRY.clinicalAudit, REGISTRY.aiExplainability],
+    assets: [
+      REGISTRY.aiGovernance,
+      REGISTRY.aiSecurity,
+      REGISTRY.clinicalAudit,
+      REGISTRY.aiExplainability,
+    ],
     outcomes: ['audit readiness', 'security review', 'human review governance'],
   },
   {
@@ -518,7 +569,7 @@ export const SOLUTION_PACKAGES = Object.freeze([
 ]);
 
 export const SOLUTION_PACKAGES_BY_ID = Object.freeze(
-  Object.fromEntries(SOLUTION_PACKAGES.map((solution) => [solution.solutionId, solution]))
+  Object.fromEntries(SOLUTION_PACKAGES.map((solution) => [solution.solutionId, solution])),
 );
 
 export function getAutomationById(automationId) {
@@ -544,8 +595,10 @@ export function getAutomationSolutionPackages() {
 export function summarizeAutomationRegistry(automations = AUTOMATION_REGISTRY) {
   return {
     total: automations.length,
-    active: automations.filter((automation) => automation.status === AUTOMATION_STATUSES.ACTIVE).length,
-    disabled: automations.filter((automation) => automation.status === AUTOMATION_STATUSES.DISABLED).length,
+    active: automations.filter((automation) => automation.status === AUTOMATION_STATUSES.ACTIVE)
+      .length,
+    disabled: automations.filter((automation) => automation.status === AUTOMATION_STATUSES.DISABLED)
+      .length,
     demo: automations.filter((automation) => automation.status === AUTOMATION_STATUSES.DEMO).length,
     humanReviewRequired: automations.filter((automation) => automation.humanReviewRequired).length,
     highRisk: automations.filter((automation) => automation.riskLevel === 'high').length,
@@ -557,7 +610,9 @@ export function buildAutomationAnalyticsSeed(automations = AUTOMATION_REGISTRY) 
   return automations.map((automation, index) => {
     const baseRuns = 18 + index * 3;
     const failures = automation.riskLevel === 'high' ? 2 : 1;
-    const humanOverrides = automation.humanReviewRequired ? Math.max(1, Math.round(baseRuns * 0.12)) : 0;
+    const humanOverrides = automation.humanReviewRequired
+      ? Math.max(1, Math.round(baseRuns * 0.12))
+      : 0;
     return {
       automationId: automation.automationId,
       workspace: automation.workspace,

@@ -12,7 +12,11 @@ import {
   formatBackendExposureReportMarkdown,
   formatEndpointMatrixMarkdown,
 } from './backendFrontendExposure';
-import { formatBackendFrontendContractMarkdown, getContractGaps, buildBackendFrontendContractRows } from './backendFrontendToolContract';
+import {
+  formatBackendFrontendContractMarkdown,
+  getContractGaps,
+  buildBackendFrontendContractRows,
+} from './backendFrontendToolContract';
 import { formatOrphanedBackendFunctionsMarkdown } from './backendOrphanAudit';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -23,36 +27,44 @@ const docsDir = join(__dirname, '../../docs');
 const HEAVY_EXPOSURE_SCAN_TIMEOUT_MS = 480_000;
 
 describe('backendFrontendExposure report', () => {
-  it('scan passes before writing docs', () => {
-    const { ok, errors } = assertExposureScanPasses();
-    expect(errors, errors.join('; ')).toEqual([]);
-    expect(ok).toBe(true);
-  }, HEAVY_EXPOSURE_SCAN_TIMEOUT_MS);
+  it(
+    'scan passes before writing docs',
+    () => {
+      const { ok, errors } = assertExposureScanPasses();
+      expect(errors, errors.join('; ')).toEqual([]);
+      expect(ok).toBe(true);
+    },
+    HEAVY_EXPOSURE_SCAN_TIMEOUT_MS,
+  );
 
-  it('writes exposure and endpoint docs when EXPOSURE_WRITE_DOCS is set', () => {
-    if (!process.env.EXPOSURE_WRITE_DOCS) return;
+  it(
+    'writes exposure and endpoint docs when EXPOSURE_WRITE_DOCS is set',
+    () => {
+      if (!process.env.EXPOSURE_WRITE_DOCS) return;
 
-    const { scan } = assertExposureScanPasses();
-    mkdirSync(docsDir, { recursive: true });
+      const { scan } = assertExposureScanPasses();
+      mkdirSync(docsDir, { recursive: true });
 
-    writeFileSync(
-      join(docsDir, 'backend-exposure-report.md'),
-      `${formatBackendExposureReportMarkdown(scan)}\n`
-    );
-    mkdirSync(join(docsDir, 'architecture'), { recursive: true });
-    writeFileSync(
-      join(docsDir, 'architecture', 'endpoint-to-frontend-matrix.md'),
-      `${formatEndpointMatrixMarkdown(scan)}\n`
-    );
-    writeFileSync(
-      join(docsDir, 'architecture', 'backend-frontend-tool-contract.md'),
-      `${formatBackendFrontendContractMarkdown(buildBackendFrontendContractRows(), getContractGaps())}\n`
-    );
-    writeFileSync(
-      join(docsDir, 'orphaned-backend-functions.md'),
-      `${formatOrphanedBackendFunctionsMarkdown()}\n`
-    );
-  }, HEAVY_EXPOSURE_SCAN_TIMEOUT_MS);
+      writeFileSync(
+        join(docsDir, 'backend-exposure-report.md'),
+        `${formatBackendExposureReportMarkdown(scan)}\n`,
+      );
+      mkdirSync(join(docsDir, 'architecture'), { recursive: true });
+      writeFileSync(
+        join(docsDir, 'architecture', 'endpoint-to-frontend-matrix.md'),
+        `${formatEndpointMatrixMarkdown(scan)}\n`,
+      );
+      writeFileSync(
+        join(docsDir, 'architecture', 'backend-frontend-tool-contract.md'),
+        `${formatBackendFrontendContractMarkdown(buildBackendFrontendContractRows(), getContractGaps())}\n`,
+      );
+      writeFileSync(
+        join(docsDir, 'orphaned-backend-functions.md'),
+        `${formatOrphanedBackendFunctionsMarkdown()}\n`,
+      );
+    },
+    HEAVY_EXPOSURE_SCAN_TIMEOUT_MS,
+  );
   // This test re-runs the same scan as the one above (assertExposureScanPasses
   // is not memoized across `it` blocks) plus 4 more corpus-wide formatters —
   // measured ~57s and still climbing before this fix (Cycle 156), against a

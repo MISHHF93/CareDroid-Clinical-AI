@@ -25,7 +25,10 @@ import {
   type EmergencyDeviceContextId,
 } from './emergencyDeviceContextModel';
 
-export { isPublicDisplayPersona, PUBLIC_DISPLAY_PERSONA_ALIASES } from './emergencyRoleScreenMatrix';
+export {
+  isPublicDisplayPersona,
+  PUBLIC_DISPLAY_PERSONA_ALIASES,
+} from './emergencyRoleScreenMatrix';
 
 export type ResolveRoleLandingInput = {
   role?: string;
@@ -35,7 +38,9 @@ export type ResolveRoleLandingInput = {
   deviceContextId?: EmergencyDeviceContextId | null;
 };
 
-export function resolveRoleLandingScreenMode(input: ResolveRoleLandingInput = {}): CareDroidScreenMode {
+export function resolveRoleLandingScreenMode(
+  input: ResolveRoleLandingInput = {},
+): CareDroidScreenMode {
   const settings = input.emergencySettings || {};
   const enabledModes = settings.enabledScreenModes?.length
     ? settings.enabledScreenModes

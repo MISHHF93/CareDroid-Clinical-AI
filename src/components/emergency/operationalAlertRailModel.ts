@@ -142,8 +142,9 @@ export function buildOperationalAlertMetrics({
       label: 'Capacity',
       value: `${centralSnapshot.capacityStatus.score} ${centralSnapshot.capacityStatus.band}`,
       tone:
-        centralSnapshot.operationalSummary?.metrics?.find((metric) => metric.key === 'capacityScore')
-          ?.tone || capacityTone(centralSnapshot.capacityStatus.band),
+        centralSnapshot.operationalSummary?.metrics?.find(
+          (metric) => metric.key === 'capacityScore',
+        )?.tone || capacityTone(centralSnapshot.capacityStatus.band),
       priority: 0,
     },
     {
@@ -186,9 +187,13 @@ export function buildOperationalAlertMetrics({
       // and could run long, the same cramped-pill mismatch as the Sync pill's
       // "POLLING stale" bug. Freshness alone is the short, sibling-matching
       // value; mode moves into the hover tooltip instead.
-      value: intelligenceSnapshot.dataFreshness.visible ? intelligenceSnapshot.dataFreshness.status : modeLabel,
+      value: intelligenceSnapshot.dataFreshness.visible
+        ? intelligenceSnapshot.dataFreshness.status
+        : modeLabel,
       tone: intelligenceTone(intelligenceSnapshot),
-      hint: [`Mode: ${modeLabel}`, intelligenceSnapshot.disclaimers.operational].filter(Boolean).join('. '),
+      hint: [`Mode: ${modeLabel}`, intelligenceSnapshot.disclaimers.operational]
+        .filter(Boolean)
+        .join('. '),
       priority: 5,
     });
   }

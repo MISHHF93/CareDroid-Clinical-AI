@@ -10,16 +10,15 @@ type UnifiedApplicationKnowledgeGraphStoreState = Readonly<{
   markRefreshed: () => void;
 }>;
 
-export const useUnifiedApplicationKnowledgeGraphStore = create<UnifiedApplicationKnowledgeGraphStoreState>()(
-  (set) => ({
+export const useUnifiedApplicationKnowledgeGraphStore =
+  create<UnifiedApplicationKnowledgeGraphStoreState>()((set) => ({
     snapshot: null,
     lastRefreshedAt: null,
     lastTriggerEvent: undefined,
     setSnapshot: (snapshot) => set({ snapshot }),
     setLastTriggerEvent: (eventType) => set({ lastTriggerEvent: eventType }),
     markRefreshed: () => set({ lastRefreshedAt: new Date().toISOString() }),
-  }),
-);
+  }));
 
 export function getUnifiedApplicationKnowledgeGraphStoreState() {
   return useUnifiedApplicationKnowledgeGraphStore.getState();

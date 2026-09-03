@@ -60,7 +60,7 @@ describe('childPughCalculator', () => {
     'class boundary total $total → $childPughClass',
     ({ total, childPughClass }) => {
       expect(interpretChildPughClass(total)?.childPughClass).toBe(childPughClass);
-    }
+    },
   );
 
   it.each(CHILD_PUGH_CLASS_BY_TOTAL)(
@@ -69,7 +69,7 @@ describe('childPughCalculator', () => {
       const interp = interpretChildPughClass(total);
       expect(interp?.childPughClass).toBe(childPughClass);
       expect(interp?.severity).toBe(severity);
-    }
+    },
   );
 
   it('uses PT prolongation when selected', () => {

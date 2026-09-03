@@ -18,7 +18,7 @@ import {
 
 /** NLU ids with no registerTool() handler (includes dispatch-ai). */
 export const UNSUPPORTED_ORCHESTRATOR_NLU_TOOL_IDS = Object.freeze(
-  NLU_PROFILE_TOOL_IDS.filter((id) => !ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS.includes(id as any))
+  NLU_PROFILE_TOOL_IDS.filter((id) => !ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS.includes(id as any)),
 );
 
 /**
@@ -67,12 +67,11 @@ export function buildUnsupportedOrchestratorToolDocs() {
     else if (FLEET_NLU.has(nluToolId as any)) surface = 'fleet';
     else if (CLINICAL_PAGE_NLU.has(nluToolId as any)) surface = 'clinical-page';
 
-    const reason =
-      OPERATIONS_CHAT_NLU.has(nluToolId as any)
-        ? 'Chat/NLU routing only; no POST /tools/:id/execute handler and no autonomous operations action.'
-        : surface === 'calculator-form'
-          ? 'Deterministic client-side calculator or chat-assisted scoring; no server executor.'
-          : 'Clinical page or chat workflow; no tool-orchestrator registerTool().';
+    const reason = OPERATIONS_CHAT_NLU.has(nluToolId as any)
+      ? 'Chat/NLU routing only; no POST /tools/:id/execute handler and no autonomous operations action.'
+      : surface === 'calculator-form'
+        ? 'Deterministic client-side calculator or chat-assisted scoring; no server executor.'
+        : 'Clinical page or chat workflow; no tool-orchestrator registerTool().';
 
     return {
       nluToolId,
@@ -83,7 +82,9 @@ export function buildUnsupportedOrchestratorToolDocs() {
   });
 }
 
-export const UNSUPPORTED_ORCHESTRATOR_TOOL_DOCS = Object.freeze(buildUnsupportedOrchestratorToolDocs());
+export const UNSUPPORTED_ORCHESTRATOR_TOOL_DOCS = Object.freeze(
+  buildUnsupportedOrchestratorToolDocs(),
+);
 
 /** Quick lookup: is this NLU id POST-executable on the orchestrator? */
 export function isOrchestratorPostExecutable(nluToolId) {

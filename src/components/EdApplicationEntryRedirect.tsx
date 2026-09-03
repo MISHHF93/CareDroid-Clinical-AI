@@ -8,7 +8,11 @@ export default function EdApplicationEntryRedirect() {
   const location = useLocation();
   return (
     <Navigate
-      to={{ pathname: CANONICAL_ROUTES.platformStart, search: location.search, hash: location.hash }}
+      to={{
+        pathname: CANONICAL_ROUTES.platformStart,
+        search: location.search,
+        hash: location.hash,
+      }}
       replace
     />
   );

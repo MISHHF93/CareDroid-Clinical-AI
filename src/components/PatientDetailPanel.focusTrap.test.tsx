@@ -86,7 +86,9 @@ describe('PatientDetailPanel focus trap (HEAL-318)', () => {
     renderPanel(makePatient(), true);
 
     await waitFor(() => {
-      expect(document.activeElement).toBe(screen.getByRole('button', { name: /close patient detail/i }));
+      expect(document.activeElement).toBe(
+        screen.getByRole('button', { name: /close patient detail/i }),
+      );
     });
   });
 
@@ -120,7 +122,9 @@ describe('PatientDetailPanel focus trap (HEAL-318)', () => {
       useEmergencyStore.setState({ selectedPatientId: patient.id });
     });
     await waitFor(() => {
-      expect(document.activeElement).toBe(screen.getByRole('button', { name: /close patient detail/i }));
+      expect(document.activeElement).toBe(
+        screen.getByRole('button', { name: /close patient detail/i }),
+      );
     });
 
     act(() => {

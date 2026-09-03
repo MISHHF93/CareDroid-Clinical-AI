@@ -3,9 +3,7 @@ import { inferAiMaturity } from './AiMaturityBadge';
 
 describe('inferAiMaturity', () => {
   it('labels careDroid heuristic engine', () => {
-    expect(
-      inferAiMaturity({ modelOrEngine: 'careDroidAI-heuristic-node' }),
-    ).toBe('heuristic');
+    expect(inferAiMaturity({ modelOrEngine: 'careDroidAI-heuristic-node' })).toBe('heuristic');
   });
 
   it('labels seed and degraded modes', () => {
@@ -15,8 +13,8 @@ describe('inferAiMaturity', () => {
   });
 
   it('labels RAG-grounded evidence', () => {
-    expect(
-      inferAiMaturity({ evidenceKinds: ['retrieved_chunk', 'knowledge_registry'] }),
-    ).toBe('rag-grounded');
+    expect(inferAiMaturity({ evidenceKinds: ['retrieved_chunk', 'knowledge_registry'] })).toBe(
+      'rag-grounded',
+    );
   });
 });

@@ -19,7 +19,8 @@ import './Operations.css';
 
 const OPERATIONS_HUB_ROUTE_CHROME = Object.freeze({
   title: 'Default Operations',
-  subtitle: 'Unified command surfaces for hospital capacity, device telemetry, fleet, and system health.',
+  subtitle:
+    'Unified command surfaces for hospital capacity, device telemetry, fleet, and system health.',
 });
 
 const SURFACE_ICON: Record<string, string> = {
@@ -103,8 +104,13 @@ export default function Operations() {
         <div className="operations-hub__title-row">
           <GraphicIconBadge iconKey="activity" accent="brand" size="md" />
           <div>
-            <p className="operations-hub__title-text" data-testid="cd-page-title-text">Default Operations</p>
-            <p>Unified command surfaces for hospital capacity, device telemetry, fleet, and system health.</p>
+            <p className="operations-hub__title-text" data-testid="cd-page-title-text">
+              Default Operations
+            </p>
+            <p>
+              Unified command surfaces for hospital capacity, device telemetry, fleet, and system
+              health.
+            </p>
           </div>
         </div>
         <div className="operations-hub__actions">
@@ -127,11 +133,13 @@ export default function Operations() {
       <p className="operations-hub__role">
         <strong>{roleView.label}</strong> — {roleView.focus}
       </p>
-      <p className="operations-hub__focus">
-        Incident focus: {roleView.incidentFocus.join(' · ')}
-      </p>
+      <p className="operations-hub__focus">Incident focus: {roleView.incidentFocus.join(' · ')}</p>
 
-      <div className="operations-hub__metrics" role="group" aria-label="Operations hub summary metrics">
+      <div
+        className="operations-hub__metrics"
+        role="group"
+        aria-label="Operations hub summary metrics"
+      >
         <MetricCard
           label="Surfaces"
           value={String(snapshot.surfaceCount)}
@@ -165,7 +173,11 @@ export default function Operations() {
       <div className="operations-hub__grid">
         {enrichedPrioritySurfaces.map((surface) => (
           <Link key={surface.id} to={surface.path} className="operations-hub__surface">
-            <GraphicIconBadge iconKey={SURFACE_ICON[surface.id] || 'route'} accent="information" size="sm" />
+            <GraphicIconBadge
+              iconKey={SURFACE_ICON[surface.id] || 'route'}
+              accent="information"
+              size="sm"
+            />
             <h2>{surface.title}</h2>
             <p>{surface.summary}</p>
             <div className="operations-hub__surface-meta">

@@ -1,9 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import {
-  calculateCapacity,
-  deriveCapacityCrisisState,
-  isCapacityCrisis,
-} from './capacityEngine';
+import { calculateCapacity, deriveCapacityCrisisState, isCapacityCrisis } from './capacityEngine';
 import { DEFAULT_EMERGENCY_THRESHOLDS, useEmergencyStore } from '../store/emergencyStore';
 import {
   PatientFlag,

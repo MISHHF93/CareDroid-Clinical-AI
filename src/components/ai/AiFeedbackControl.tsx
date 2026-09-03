@@ -51,7 +51,10 @@ export default function AiFeedbackControl({
           submit('OTHER', comment.trim() || undefined);
         }}
       >
-        <label htmlFor={`ai-feedback-comment-${runId}`} className="ai-feedback-control__comment-label">
+        <label
+          htmlFor={`ai-feedback-comment-${runId}`}
+          className="ai-feedback-control__comment-label"
+        >
           What went wrong? (optional)
         </label>
         <textarea
@@ -61,7 +64,10 @@ export default function AiFeedbackControl({
           rows={2}
           className="ai-feedback-control__comment-input"
         />
-        <button type="submit" className="ai-feedback-control__btn ai-feedback-control__btn--primary">
+        <button
+          type="submit"
+          className="ai-feedback-control__btn ai-feedback-control__btn--primary"
+        >
           Submit
         </button>
       </form>
@@ -70,7 +76,11 @@ export default function AiFeedbackControl({
 
   if (stage === 'refining') {
     return (
-      <div className="ai-feedback-control__refine" role="group" aria-label="What was wrong with this response?">
+      <div
+        className="ai-feedback-control__refine"
+        role="group"
+        aria-label="What was wrong with this response?"
+      >
         {REFINEMENT_OPTIONS.map((option) => (
           <button
             key={option.rating}

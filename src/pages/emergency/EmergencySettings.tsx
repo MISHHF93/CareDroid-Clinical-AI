@@ -1,9 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  DEFAULT_EMERGENCY_THRESHOLDS,
-  useEmergencyStore,
-} from '../../store/emergencyStore';
+import { DEFAULT_EMERGENCY_THRESHOLDS, useEmergencyStore } from '../../store/emergencyStore';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { REFRESH_DATASET_TIMEOUT_MS } from '../../config/startupTimeouts';
 import { getApiErrorMessage } from '../../services/apiClient';
@@ -252,14 +249,16 @@ function SettingsField({ label, value, type = 'text', onChange, options = undefi
 }
 
 function governedRuleLabel(ruleGroup) {
-  return {
-    'scenario-selection': 'department operating mode',
-    'patient-intake': 'patient intake',
-    'capacity-thresholds': 'capacity thresholds',
-    'reassessment-rules': 'reassessment rules',
-    'ems-routing': 'EMS routing',
-    'referral-routing': 'referral routing',
-  }[ruleGroup] || ruleGroup.replace(/-/g, ' ');
+  return (
+    {
+      'scenario-selection': 'department operating mode',
+      'patient-intake': 'patient intake',
+      'capacity-thresholds': 'capacity thresholds',
+      'reassessment-rules': 'reassessment rules',
+      'ems-routing': 'EMS routing',
+      'referral-routing': 'referral routing',
+    }[ruleGroup] || ruleGroup.replace(/-/g, ' ')
+  );
 }
 
 export function patientAuditLabel(patientId, patients, canViewPatients = true) {
@@ -289,9 +288,7 @@ export function redactAuditLogForRole(log, canViewPatients) {
 }
 
 function auditDetailSummary(details: any = {}) {
-  const entries = Object.entries(details).filter(
-    ([key]) => !/patientId|staffId|id/i.test(key),
-  );
+  const entries = Object.entries(details).filter(([key]) => !/patientId|staffId|id/i.test(key));
   if (!entries.length) return 'Action metadata recorded';
   return entries
     .slice(0, 3)
@@ -328,12 +325,12 @@ export default function EmergencySettings() {
   const activeScenario = useEmergencyStore((state) => state.activeScenario);
   const setActiveScenario = useEmergencyStore((state) => state.setActiveScenario);
   const auditLog = useEmergencyStore((state) => state.auditLog || []);
-  const thresholds = useEmergencyStore(
-    (state) => state.thresholds || DEFAULT_EMERGENCY_THRESHOLDS,
-  );
+  const thresholds = useEmergencyStore((state) => state.thresholds || DEFAULT_EMERGENCY_THRESHOLDS);
   const setThreshold = useEmergencyStore((state) => state.setThreshold);
   const resetThresholds = useEmergencyStore((state) => state.resetThresholds);
-  const operationalIntelligence = useOperationalIntelligence({ screenMode: 'COMMAND_CENTER_SCREEN' });
+  const operationalIntelligence = useOperationalIntelligence({
+    screenMode: 'COMMAND_CENTER_SCREEN',
+  });
   const bottleneckRegistry = operationalIntelligence.centralSnapshot.bottleneckRegistry;
   const emergencyRole = useEmergencyRolePermissions();
   // HEAL-209: Settings is it_admin's own default landing page, and
@@ -415,7 +412,10 @@ export default function EmergencySettings() {
       ),
       new Promise<never>((_, reject) => {
         window.setTimeout(
-          () => reject(new Error(`CareDroid settings load timed out after ${REFRESH_DATASET_TIMEOUT_MS}ms`)),
+          () =>
+            reject(
+              new Error(`CareDroid settings load timed out after ${REFRESH_DATASET_TIMEOUT_MS}ms`),
+            ),
           REFRESH_DATASET_TIMEOUT_MS,
         );
       }),
@@ -423,9 +423,7 @@ export default function EmergencySettings() {
       .then(({ result, orgEmergencyOs }) => {
         if (cancelled) return;
         if (!result.ok && !orgEmergencyOs) {
-          setError(
-            'Live settings service unavailable. Local settings remain editable.',
-          );
+          setError('Live settings service unavailable. Local settings remain editable.');
           setDraft(mergeSettings(storeSettings));
           return;
         }
@@ -439,9 +437,7 @@ export default function EmergencySettings() {
       })
       .catch(() => {
         if (!cancelled) {
-          setError(
-            'Live settings service unavailable. Local settings remain editable.',
-          );
+          setError('Live settings service unavailable. Local settings remain editable.');
           setDraft(mergeSettings(storeSettings));
         }
       })
@@ -571,12 +567,9 @@ export default function EmergencySettings() {
       ]).then(([registryResult, complianceResult, validationResult]) => {
         if (cancelled) return;
 
-        const registry =
-          registryResult.status === 'fulfilled' ? registryResult.value : null;
-        const compliance =
-          complianceResult.status === 'fulfilled' ? complianceResult.value : null;
-        const validation =
-          validationResult.status === 'fulfilled' ? validationResult.value : null;
+        const registry = registryResult.status === 'fulfilled' ? registryResult.value : null;
+        const compliance = complianceResult.status === 'fulfilled' ? complianceResult.value : null;
+        const validation = validationResult.status === 'fulfilled' ? validationResult.value : null;
 
         if (registry) setAiGovernanceRegistry(registry);
         if (compliance) setAiGovernanceCompliance(compliance);
@@ -619,7 +612,9 @@ export default function EmergencySettings() {
   }, [backendWorkflowLogs, workflowLogs]);
   const visibleAuditLogs = useMemo(
     () =>
-      canViewPatients ? auditLogs : auditLogs.map((log) => redactAuditLogForRole(log, canViewPatients)),
+      canViewPatients
+        ? auditLogs
+        : auditLogs.map((log) => redactAuditLogForRole(log, canViewPatients)),
     [auditLogs, canViewPatients],
   );
   const storeAuditLogs = useMemo(() => {
@@ -711,15 +706,9 @@ export default function EmergencySettings() {
     );
   };
 
-  const screenModeSettings = useMemo(
-    () => normalizeCareDroidScreenModeSettings(draft),
-    [draft],
-  );
+  const screenModeSettings = useMemo(() => normalizeCareDroidScreenModeSettings(draft), [draft]);
 
-  const configurableScreenModes = useMemo(
-    () => listConfigurableScreenModes(draft),
-    [draft],
-  );
+  const configurableScreenModes = useMemo(() => listConfigurableScreenModes(draft), [draft]);
 
   const toggleEnabledScreenMode = (screenModeId, enabled) => {
     const enabledModes = new Set(draft.enabledScreenModes || []);
@@ -878,7 +867,6 @@ export default function EmergencySettings() {
       contentClassName="emergency-settings__content"
       aria-label="CareDroid settings"
     >
-
       {error ? (
         <div className="emergency-settings__banner emergency-settings__banner--error">{error}</div>
       ) : null}
@@ -910,8 +898,8 @@ export default function EmergencySettings() {
             {surfaces.settings.showWalkthroughDetail ? (
               <p>
                 {FIRST_CUSTOMER_DEMO_MODE.tenantName} populates the whiteboard, EMS inbound, waiting
-                and high-risk queues, reassessments, capacity pressure, boarders, analytics KPIs, and
-                ED Copilot context.
+                and high-risk queues, reassessments, capacity pressure, boarders, analytics KPIs,
+                and ED Copilot context.
               </p>
             ) : (
               <p>Load 18 walkthrough patients when the board is empty.</p>
@@ -934,838 +922,898 @@ export default function EmergencySettings() {
       </Section>
 
       {surfaces.settings.showEnterpriseSections ? (
-      <Section
-        id="central-control"
-        title="Central Control Node"
-        subtitle="Central policy owns dashboard decisions and scenario selection. Staff roles contribute unified inputs only unless they are central controllers."
-        action={
-          <button
-            type="button"
-            disabled={savingGroup === 'central'}
-            onClick={() =>
-              saveGroup('central', {
-                centralControl: draft.centralControl,
-              })
-            }
-          >
-            Save Central Node
-          </button>
-        }
-      >
-        <div className="emergency-settings__cards" aria-label="Integration Hub runtime status">
-          <article>
-            <div>
-              <strong>Backend status</strong>
-              <p>
-                {integrationHubStatus === 'loading'
-                  ? 'Loading Integration Hub status...'
-                  : integrationHubStatus === 'error'
-                    ? integrationHubError
-                    : `${integrationSources.length} source(s) reported by ${integrationHubEnvelope?.module || 'Integration Hub'}.`}
-              </p>
-              <small>{integrationHubEnvelope?.source || 'local settings fallback'}</small>
-              <p>
-                <Link to={CANONICAL_ROUTES.integrationHub}>Open Integration Hub dashboard</Link>
-                {' · '}
-                <Link to={CANONICAL_ROUTES.cosmosViewer}>Cosmos Viewer</Link>
-              </p>
-            </div>
-          </article>
-          <article>
-            <div>
-              <strong>Review queue</strong>
-              <p>
-                {integrationReviewQueue.length
-                  ? `${integrationReviewQueue.length} integration review item(s) require staff awareness.`
-                  : 'No integration review items returned.'}
-              </p>
-              <small>
-                {(integrationHubEnvelope?.remainingGaps || ['Live connector credentials remain optional.'])
-                  .slice(0, 1)
-                  .join(' ')}
-              </small>
-            </div>
-          </article>
-        </div>
-        <div className="emergency-settings__grid">
-          <SettingsField
-            type="checkbox"
-            label="Central control enabled"
-            value={draft.centralControl.enabled}
-            onChange={(value) =>
-              updateDraft({ centralControl: { ...draft.centralControl, enabled: value } })
-            }
-          />
-          <SettingsField
-            label="Dashboard authority"
-            value={draft.centralControl.dashboardAuthority}
-            options={[
-              ['central-node', 'Central Node'],
-              ['local-role', 'Local role override'],
-            ]}
-            onChange={(value) =>
-              updateDraft({
-                centralControl: { ...draft.centralControl, dashboardAuthority: value },
-              })
-            }
-          />
-          <SettingsField
-            label="Scenario authority"
-            value={draft.centralControl.scenarioAuthority}
-            options={[
-              ['central-node', 'Central Node'],
-              ['local-role', 'Local role override'],
-            ]}
-            onChange={(value) =>
-              updateDraft({ centralControl: { ...draft.centralControl, scenarioAuthority: value } })
-            }
-          />
-          <SettingsField
-            label="User input mode"
-            value={draft.centralControl.userInputMode}
-            options={[
-              ['central-escalation-input', 'Central escalation input'],
-              ['unified-input-only', 'Unified input only'],
-              ['controller-assisted', 'Controller assisted'],
-            ]}
-            onChange={(value) =>
-              updateDraft({ centralControl: { ...draft.centralControl, userInputMode: value } })
-            }
-          />
-          <SettingsField
-            type="number"
-            label="Dashboard decision interval (seconds)"
-            value={draft.centralControl.dashboardDecisionIntervalSeconds}
-            onChange={(value) =>
-              updateDraft({
-                centralControl: {
-                  ...draft.centralControl,
-                  dashboardDecisionIntervalSeconds: Number(value),
-                },
-              })
-            }
-          />
-          <SettingsField
-            type="number"
-            label="Rules review interval (minutes)"
-            value={draft.centralControl.rulesReviewIntervalMinutes}
-            onChange={(value) =>
-              updateDraft({
-                centralControl: {
-                  ...draft.centralControl,
-                  rulesReviewIntervalMinutes: Number(value),
-                },
-              })
-            }
-          />
-        </div>
-        <div className="emergency-settings__rules" aria-label="Central node governed rule groups">
-          {draft.centralControl.governedRuleGroups.map((ruleGroup) => (
-            <article key={ruleGroup}>
-              <strong>{governedRuleLabel(ruleGroup)}</strong>
-              <small>central policy</small>
-            </article>
-          ))}
-        </div>
-        <div className="emergency-settings__rules" aria-label="Unified input channels">
-          {draft.centralControl.inputChannels.map((channel) => (
-            <article key={channel}>
-              <strong>{channel.replace(/-/g, ' ')}</strong>
-              <small>input only</small>
-            </article>
-          ))}
-        </div>
-        <DeviceContextPanel className="emergency-settings__device-context" />
-      </Section>
-      ) : null}
-
-      {surfaces.settings.showScreenModes ? (
-      <Section
-        id="screen-modes"
-        title="Screen Modes"
-        subtitle="Tenant defaults for CareDroid screen modes, hallway displays, role access, privacy tiers, refresh cadence, and KPI visibility."
-        action={
-          <button
-            type="button"
-            disabled={savingGroup === 'screen-modes'}
-            onClick={() =>
-              saveGroup('screen-modes', {
-                defaultScreenMode: draft.defaultScreenMode,
-                enabledScreenModes: draft.enabledScreenModes,
-                allowedRolesByScreenMode: draft.allowedRolesByScreenMode,
-                publicDisplayPrivacy: draft.publicDisplayPrivacy || 'standard',
-                wallDisplayMonitorPrivacy: draft.wallDisplayMonitorPrivacy,
-                wallDisplayRefreshInterval: draft.wallDisplayRefreshInterval,
-                screenModeKpiVisibility: draft.screenModeKpiVisibility,
-                readOnlyDisplayMode: draft.readOnlyDisplayMode,
-                commandCenterMode: draft.commandCenterMode,
-              })
-            }
-          >
-            Save Screen Modes
-          </button>
-        }
-      >
-        <div className="emergency-settings__grid">
-          <SettingsField
-            label="Default screen mode"
-            value={screenModeSettings.defaultScreenMode}
-            options={listScreenModesForSettings()
-              .filter((mode) => screenModeSettings.enabledScreenModes.includes(mode.id))
-              .map((mode) => [mode.id, mode.label])}
-            onChange={(value) => updateDraft({ defaultScreenMode: value })}
-          />
-          <SettingsField
-            type="number"
-            label="Wall display auto-refresh interval (ms)"
-            value={screenModeSettings.wallDisplayRefreshInterval}
-            onChange={(value) => updateDraft({ wallDisplayRefreshInterval: Number(value) })}
-          />
-          <SettingsField
-            label="Public display privacy level"
-            value={draft.publicDisplayPrivacy || 'standard'}
-            options={PUBLIC_DISPLAY_PRIVACY_OPTIONS.map((option) => [
-              option.id,
-              `${option.label} — ${option.description}`,
-            ])}
-            onChange={(value) => updateDraft({ publicDisplayPrivacy: value })}
-          />
-          <SettingsField
-            label="Read-only whiteboard privacy level"
-            value={draft.wallDisplayMonitorPrivacy || 'operational'}
-            options={WALL_DISPLAY_MONITOR_PRIVACY_OPTIONS.map((option) => [
-              option.id,
-              `${option.label} — ${option.description}`,
-            ])}
-            onChange={(value) => updateDraft({ wallDisplayMonitorPrivacy: value })}
-          />
-          <SettingsField
-            type="checkbox"
-            label="Department display mode"
-            value={draft.commandCenterMode}
-            onChange={(value) => updateDraft({ commandCenterMode: value })}
-          />
-          <SettingsField
-            type="checkbox"
-            label="Read-only display mode"
-            value={draft.readOnlyDisplayMode}
-            onChange={(value) => updateDraft({ readOnlyDisplayMode: value })}
-          />
-        </div>
-        <div className="emergency-settings__rules" aria-label="Enabled screen modes">
-          {listScreenModesForSettings().map((mode) => (
-            <article key={mode.id}>
-              <SettingsField
-                type="checkbox"
-                label={mode.label}
-                value={screenModeSettings.enabledScreenModes.includes(mode.id)}
-                onChange={(enabled) => toggleEnabledScreenMode(mode.id, enabled)}
-              />
-              <small>{mode.id}</small>
-            </article>
-          ))}
-        </div>
-        {configurableScreenModes.map((screenMode) => {
-          const availableKpis = EMERGENCY_SCREEN_KPI_POLICY[screenMode.id] || [];
-          const enabledKpis = new Set(screenMode.kpiIds);
-          const enabledRoles = new Set(screenMode.allowedRoles);
-          return (
-            <div key={screenMode.id} className="emergency-settings__screen-mode-card">
-              <header>
-                <strong>{screenMode.label}</strong>
-                <button type="button" onClick={() => resetScreenModeRoles(screenMode.id)}>
-                  Reset allowed roles
-                </button>
-              </header>
-              <div className="emergency-settings__rules" aria-label={`${screenMode.label} allowed roles`}>
-                {SCREEN_MODE_ROLE_OPTIONS.map((role) => (
-                  <article key={`${screenMode.id}-${role.id}`}>
-                    <SettingsField
-                      type="checkbox"
-                      label={role.label}
-                      value={enabledRoles.has(role.id)}
-                      onChange={(enabled) => toggleAllowedRole(screenMode.id, role.id, enabled)}
-                    />
-                    <small>Allowed role</small>
-                  </article>
-                ))}
+        <Section
+          id="central-control"
+          title="Central Control Node"
+          subtitle="Central policy owns dashboard decisions and scenario selection. Staff roles contribute unified inputs only unless they are central controllers."
+          action={
+            <button
+              type="button"
+              disabled={savingGroup === 'central'}
+              onClick={() =>
+                saveGroup('central', {
+                  centralControl: draft.centralControl,
+                })
+              }
+            >
+              Save Central Node
+            </button>
+          }
+        >
+          <div className="emergency-settings__cards" aria-label="Integration Hub runtime status">
+            <article>
+              <div>
+                <strong>Backend status</strong>
+                <p>
+                  {integrationHubStatus === 'loading'
+                    ? 'Loading Integration Hub status...'
+                    : integrationHubStatus === 'error'
+                      ? integrationHubError
+                      : `${integrationSources.length} source(s) reported by ${integrationHubEnvelope?.module || 'Integration Hub'}.`}
+                </p>
+                <small>{integrationHubEnvelope?.source || 'local settings fallback'}</small>
+                <p>
+                  <Link to={CANONICAL_ROUTES.integrationHub}>Open Integration Hub dashboard</Link>
+                  {' · '}
+                  <Link to={CANONICAL_ROUTES.cosmosViewer}>Cosmos Viewer</Link>
+                </p>
               </div>
-              {availableKpis.length ? (
-                <div
-                  className="emergency-settings__rules"
-                  aria-label={`${screenMode.label} KPI visibility`}
-                >
-                  {availableKpis.map((kpiId) => (
-                    <article key={`${screenMode.id}-${kpiId}`}>
-                      <SettingsField
-                        type="checkbox"
-                        label={EMERGENCY_SCREEN_KPI_LABELS[kpiId] || kpiId}
-                        value={enabledKpis.has(kpiId)}
-                        onChange={(enabled) => toggleScreenModeKpi(screenMode.id, kpiId, enabled)}
-                      />
-                      <small>KPI visibility</small>
-                    </article>
-                  ))}
-                </div>
-              ) : null}
-            </div>
-          );
-        })}
-      </Section>
-      ) : null}
-
-      {surfaces.settings.showAuditSections ? (
-      <>
-      <Section
-        id="workflow-audit"
-        title="Workflow Action Audit"
-        subtitle="Normalized action logs across patient flow, EMS, reassessment, referrals, capacity, Copilot, provincial data, and integrations."
-      >
-        <div className="emergency-settings__audit-summary" aria-label="Workflow audit summary">
-          <strong>{auditLogs.length}</strong>
-          <span>workflow action logs</span>
-          <small>
-            {auditStatus === 'ready'
-              ? 'Workflow audit loaded'
-              : auditStatus === 'loading'
-                ? 'Loading department data...'
-                : 'Local audit log active'}
-          </small>
-        </div>
-        {auditStatus === 'loading' ? (
-          <p className="emergency-settings__audit-state" role="status">
-            Loading department data...
-          </p>
-        ) : null}
-        {auditStatus === 'error' ? (
-          <p
-            className="emergency-settings__audit-state emergency-settings__audit-state--error"
-            role="alert"
-          >
-            {auditError}. Showing local workflow logs.
-          </p>
-        ) : null}
-        {!visibleAuditLogs.length && auditStatus !== 'loading' ? (
-          <p className="emergency-settings__audit-state">No workflow action logs recorded yet.</p>
-        ) : null}
-        {visibleAuditLogs.length ? (
-          <OperationalHistoryPanel
-            logs={visibleAuditLogs}
-            title="Operational history by domain"
-            description="Patient actions, queue moves, reassessments, and referrals from workflow audit data."
-            limit={12}
-          />
-        ) : null}
-        {visibleAuditLogs.length ? (
-          <details className="emergency-settings__audit-details">
-            <summary>Raw workflow log entries</summary>
-            <div className="emergency-settings__audit-list" aria-label="Workflow action audit logs">
-            {visibleAuditLogs.slice(0, 12).map((log) => (
-              <article key={log.id}>
-                <div>
-                  <strong>{log.title || log.type}</strong>
-                  <p>{log.summary}</p>
-                  <small>
-                    {log.source} · {patientAuditLabel(log.patientId, patients, canViewPatients)}
-                  </small>
-                </div>
-                <div>
-                  <span>{log.severity || 'Info'}</span>
-                  <time dateTime={log.timestamp}>{new Date(log.timestamp).toLocaleString()}</time>
-                </div>
+            </article>
+            <article>
+              <div>
+                <strong>Review queue</strong>
+                <p>
+                  {integrationReviewQueue.length
+                    ? `${integrationReviewQueue.length} integration review item(s) require staff awareness.`
+                    : 'No integration review items returned.'}
+                </p>
+                <small>
+                  {(
+                    integrationHubEnvelope?.remainingGaps || [
+                      'Live connector credentials remain optional.',
+                    ]
+                  )
+                    .slice(0, 1)
+                    .join(' ')}
+                </small>
+              </div>
+            </article>
+          </div>
+          <div className="emergency-settings__grid">
+            <SettingsField
+              type="checkbox"
+              label="Central control enabled"
+              value={draft.centralControl.enabled}
+              onChange={(value) =>
+                updateDraft({ centralControl: { ...draft.centralControl, enabled: value } })
+              }
+            />
+            <SettingsField
+              label="Dashboard authority"
+              value={draft.centralControl.dashboardAuthority}
+              options={[
+                ['central-node', 'Central Node'],
+                ['local-role', 'Local role override'],
+              ]}
+              onChange={(value) =>
+                updateDraft({
+                  centralControl: { ...draft.centralControl, dashboardAuthority: value },
+                })
+              }
+            />
+            <SettingsField
+              label="Scenario authority"
+              value={draft.centralControl.scenarioAuthority}
+              options={[
+                ['central-node', 'Central Node'],
+                ['local-role', 'Local role override'],
+              ]}
+              onChange={(value) =>
+                updateDraft({
+                  centralControl: { ...draft.centralControl, scenarioAuthority: value },
+                })
+              }
+            />
+            <SettingsField
+              label="User input mode"
+              value={draft.centralControl.userInputMode}
+              options={[
+                ['central-escalation-input', 'Central escalation input'],
+                ['unified-input-only', 'Unified input only'],
+                ['controller-assisted', 'Controller assisted'],
+              ]}
+              onChange={(value) =>
+                updateDraft({ centralControl: { ...draft.centralControl, userInputMode: value } })
+              }
+            />
+            <SettingsField
+              type="number"
+              label="Dashboard decision interval (seconds)"
+              value={draft.centralControl.dashboardDecisionIntervalSeconds}
+              onChange={(value) =>
+                updateDraft({
+                  centralControl: {
+                    ...draft.centralControl,
+                    dashboardDecisionIntervalSeconds: Number(value),
+                  },
+                })
+              }
+            />
+            <SettingsField
+              type="number"
+              label="Rules review interval (minutes)"
+              value={draft.centralControl.rulesReviewIntervalMinutes}
+              onChange={(value) =>
+                updateDraft({
+                  centralControl: {
+                    ...draft.centralControl,
+                    rulesReviewIntervalMinutes: Number(value),
+                  },
+                })
+              }
+            />
+          </div>
+          <div className="emergency-settings__rules" aria-label="Central node governed rule groups">
+            {draft.centralControl.governedRuleGroups.map((ruleGroup) => (
+              <article key={ruleGroup}>
+                <strong>{governedRuleLabel(ruleGroup)}</strong>
+                <small>central policy</small>
               </article>
             ))}
           </div>
-          </details>
-        ) : null}
-      </Section>
-
-      <Section
-        id="audit-log"
-        title="Audit Log"
-        subtitle="Last 50 local actions with timestamps, patient context, staff attribution, and compact details."
-        action={
-          <button type="button" onClick={exportAuditCsv} disabled={!filteredAuditLogs.length}>
-            Export CSV
-          </button>
-        }
-      >
-        <div className="emergency-settings__inline">
-          <SettingsField
-            label="Action type"
-            value={auditFilters.action}
-            options={[
-              ['all', 'All actions'],
-              ...auditActionOptions.map((action) => [action, action]),
-            ]}
-            onChange={(value) => updateAuditFilter('action', value)}
-          />
-          <SettingsField
-            label="Staff"
-            value={auditFilters.staff}
-            options={[
-              ['all', 'All staff'],
-              ...auditStaffOptions.map((staffId) => [staffId, staffId]),
-            ]}
-            onChange={(value) => updateAuditFilter('staff', value)}
-          />
-          <SettingsField
-            type="datetime-local"
-            label="From"
-            value={auditFilters.from}
-            onChange={(value) => updateAuditFilter('from', value)}
-          />
-          <SettingsField
-            type="datetime-local"
-            label="To"
-            value={auditFilters.to}
-            onChange={(value) => updateAuditFilter('to', value)}
-          />
-        </div>
-        <div
-          className="emergency-settings__audit-table"
-          role="table"
-          aria-label="Local action audit log"
-        >
-          <div role="row" className="emergency-settings__audit-table-head">
-            <span role="columnheader">Time</span>
-            <span role="columnheader">Action</span>
-            <span role="columnheader">Patient</span>
-            <span role="columnheader">Staff</span>
-            <span role="columnheader">Details</span>
+          <div className="emergency-settings__rules" aria-label="Unified input channels">
+            {draft.centralControl.inputChannels.map((channel) => (
+              <article key={channel}>
+                <strong>{channel.replace(/-/g, ' ')}</strong>
+                <small>input only</small>
+              </article>
+            ))}
           </div>
-          {filteredAuditLogs.length ? (
-            filteredAuditLogs.map((log) => (
-              <div role="row" key={log.id}>
-                <time role="cell" dateTime={log.timestamp}>
-                  {new Date(log.timestamp).toLocaleString()}
-                </time>
-                <span role="cell">{log.action}</span>
-                <span role="cell">{patientAuditLabel(log.patientId, patients, canViewPatients)}</span>
-                <span role="cell">{log.staffId || 'system'}</span>
-                <span role="cell">{auditDetailSummary(log.details)}</span>
+          <DeviceContextPanel className="emergency-settings__device-context" />
+        </Section>
+      ) : null}
+
+      {surfaces.settings.showScreenModes ? (
+        <Section
+          id="screen-modes"
+          title="Screen Modes"
+          subtitle="Tenant defaults for CareDroid screen modes, hallway displays, role access, privacy tiers, refresh cadence, and KPI visibility."
+          action={
+            <button
+              type="button"
+              disabled={savingGroup === 'screen-modes'}
+              onClick={() =>
+                saveGroup('screen-modes', {
+                  defaultScreenMode: draft.defaultScreenMode,
+                  enabledScreenModes: draft.enabledScreenModes,
+                  allowedRolesByScreenMode: draft.allowedRolesByScreenMode,
+                  publicDisplayPrivacy: draft.publicDisplayPrivacy || 'standard',
+                  wallDisplayMonitorPrivacy: draft.wallDisplayMonitorPrivacy,
+                  wallDisplayRefreshInterval: draft.wallDisplayRefreshInterval,
+                  screenModeKpiVisibility: draft.screenModeKpiVisibility,
+                  readOnlyDisplayMode: draft.readOnlyDisplayMode,
+                  commandCenterMode: draft.commandCenterMode,
+                })
+              }
+            >
+              Save Screen Modes
+            </button>
+          }
+        >
+          <div className="emergency-settings__grid">
+            <SettingsField
+              label="Default screen mode"
+              value={screenModeSettings.defaultScreenMode}
+              options={listScreenModesForSettings()
+                .filter((mode) => screenModeSettings.enabledScreenModes.includes(mode.id))
+                .map((mode) => [mode.id, mode.label])}
+              onChange={(value) => updateDraft({ defaultScreenMode: value })}
+            />
+            <SettingsField
+              type="number"
+              label="Wall display auto-refresh interval (ms)"
+              value={screenModeSettings.wallDisplayRefreshInterval}
+              onChange={(value) => updateDraft({ wallDisplayRefreshInterval: Number(value) })}
+            />
+            <SettingsField
+              label="Public display privacy level"
+              value={draft.publicDisplayPrivacy || 'standard'}
+              options={PUBLIC_DISPLAY_PRIVACY_OPTIONS.map((option) => [
+                option.id,
+                `${option.label} — ${option.description}`,
+              ])}
+              onChange={(value) => updateDraft({ publicDisplayPrivacy: value })}
+            />
+            <SettingsField
+              label="Read-only whiteboard privacy level"
+              value={draft.wallDisplayMonitorPrivacy || 'operational'}
+              options={WALL_DISPLAY_MONITOR_PRIVACY_OPTIONS.map((option) => [
+                option.id,
+                `${option.label} — ${option.description}`,
+              ])}
+              onChange={(value) => updateDraft({ wallDisplayMonitorPrivacy: value })}
+            />
+            <SettingsField
+              type="checkbox"
+              label="Department display mode"
+              value={draft.commandCenterMode}
+              onChange={(value) => updateDraft({ commandCenterMode: value })}
+            />
+            <SettingsField
+              type="checkbox"
+              label="Read-only display mode"
+              value={draft.readOnlyDisplayMode}
+              onChange={(value) => updateDraft({ readOnlyDisplayMode: value })}
+            />
+          </div>
+          <div className="emergency-settings__rules" aria-label="Enabled screen modes">
+            {listScreenModesForSettings().map((mode) => (
+              <article key={mode.id}>
+                <SettingsField
+                  type="checkbox"
+                  label={mode.label}
+                  value={screenModeSettings.enabledScreenModes.includes(mode.id)}
+                  onChange={(enabled) => toggleEnabledScreenMode(mode.id, enabled)}
+                />
+                <small>{mode.id}</small>
+              </article>
+            ))}
+          </div>
+          {configurableScreenModes.map((screenMode) => {
+            const availableKpis = EMERGENCY_SCREEN_KPI_POLICY[screenMode.id] || [];
+            const enabledKpis = new Set(screenMode.kpiIds);
+            const enabledRoles = new Set(screenMode.allowedRoles);
+            return (
+              <div key={screenMode.id} className="emergency-settings__screen-mode-card">
+                <header>
+                  <strong>{screenMode.label}</strong>
+                  <button type="button" onClick={() => resetScreenModeRoles(screenMode.id)}>
+                    Reset allowed roles
+                  </button>
+                </header>
+                <div
+                  className="emergency-settings__rules"
+                  aria-label={`${screenMode.label} allowed roles`}
+                >
+                  {SCREEN_MODE_ROLE_OPTIONS.map((role) => (
+                    <article key={`${screenMode.id}-${role.id}`}>
+                      <SettingsField
+                        type="checkbox"
+                        label={role.label}
+                        value={enabledRoles.has(role.id)}
+                        onChange={(enabled) => toggleAllowedRole(screenMode.id, role.id, enabled)}
+                      />
+                      <small>Allowed role</small>
+                    </article>
+                  ))}
+                </div>
+                {availableKpis.length ? (
+                  <div
+                    className="emergency-settings__rules"
+                    aria-label={`${screenMode.label} KPI visibility`}
+                  >
+                    {availableKpis.map((kpiId) => (
+                      <article key={`${screenMode.id}-${kpiId}`}>
+                        <SettingsField
+                          type="checkbox"
+                          label={EMERGENCY_SCREEN_KPI_LABELS[kpiId] || kpiId}
+                          value={enabledKpis.has(kpiId)}
+                          onChange={(enabled) => toggleScreenModeKpi(screenMode.id, kpiId, enabled)}
+                        />
+                        <small>KPI visibility</small>
+                      </article>
+                    ))}
+                  </div>
+                ) : null}
               </div>
-            ))
-          ) : (
-            <p className="emergency-settings__audit-state">
-              No local actions match the current filters.
-            </p>
-          )}
-        </div>
-      </Section>
-      </>
+            );
+          })}
+        </Section>
+      ) : null}
+
+      {surfaces.settings.showAuditSections ? (
+        <>
+          <Section
+            id="workflow-audit"
+            title="Workflow Action Audit"
+            subtitle="Normalized action logs across patient flow, EMS, reassessment, referrals, capacity, Copilot, provincial data, and integrations."
+          >
+            <div className="emergency-settings__audit-summary" aria-label="Workflow audit summary">
+              <strong>{auditLogs.length}</strong>
+              <span>workflow action logs</span>
+              <small>
+                {auditStatus === 'ready'
+                  ? 'Workflow audit loaded'
+                  : auditStatus === 'loading'
+                    ? 'Loading department data...'
+                    : 'Local audit log active'}
+              </small>
+            </div>
+            {auditStatus === 'loading' ? (
+              <p className="emergency-settings__audit-state" role="status">
+                Loading department data...
+              </p>
+            ) : null}
+            {auditStatus === 'error' ? (
+              <p
+                className="emergency-settings__audit-state emergency-settings__audit-state--error"
+                role="alert"
+              >
+                {auditError}. Showing local workflow logs.
+              </p>
+            ) : null}
+            {!visibleAuditLogs.length && auditStatus !== 'loading' ? (
+              <p className="emergency-settings__audit-state">
+                No workflow action logs recorded yet.
+              </p>
+            ) : null}
+            {visibleAuditLogs.length ? (
+              <OperationalHistoryPanel
+                logs={visibleAuditLogs}
+                title="Operational history by domain"
+                description="Patient actions, queue moves, reassessments, and referrals from workflow audit data."
+                limit={12}
+              />
+            ) : null}
+            {visibleAuditLogs.length ? (
+              <details className="emergency-settings__audit-details">
+                <summary>Raw workflow log entries</summary>
+                <div
+                  className="emergency-settings__audit-list"
+                  aria-label="Workflow action audit logs"
+                >
+                  {visibleAuditLogs.slice(0, 12).map((log) => (
+                    <article key={log.id}>
+                      <div>
+                        <strong>{log.title || log.type}</strong>
+                        <p>{log.summary}</p>
+                        <small>
+                          {log.source} ·{' '}
+                          {patientAuditLabel(log.patientId, patients, canViewPatients)}
+                        </small>
+                      </div>
+                      <div>
+                        <span>{log.severity || 'Info'}</span>
+                        <time dateTime={log.timestamp}>
+                          {new Date(log.timestamp).toLocaleString()}
+                        </time>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </details>
+            ) : null}
+          </Section>
+
+          <Section
+            id="audit-log"
+            title="Audit Log"
+            subtitle="Last 50 local actions with timestamps, patient context, staff attribution, and compact details."
+            action={
+              <button type="button" onClick={exportAuditCsv} disabled={!filteredAuditLogs.length}>
+                Export CSV
+              </button>
+            }
+          >
+            <div className="emergency-settings__inline">
+              <SettingsField
+                label="Action type"
+                value={auditFilters.action}
+                options={[
+                  ['all', 'All actions'],
+                  ...auditActionOptions.map((action) => [action, action]),
+                ]}
+                onChange={(value) => updateAuditFilter('action', value)}
+              />
+              <SettingsField
+                label="Staff"
+                value={auditFilters.staff}
+                options={[
+                  ['all', 'All staff'],
+                  ...auditStaffOptions.map((staffId) => [staffId, staffId]),
+                ]}
+                onChange={(value) => updateAuditFilter('staff', value)}
+              />
+              <SettingsField
+                type="datetime-local"
+                label="From"
+                value={auditFilters.from}
+                onChange={(value) => updateAuditFilter('from', value)}
+              />
+              <SettingsField
+                type="datetime-local"
+                label="To"
+                value={auditFilters.to}
+                onChange={(value) => updateAuditFilter('to', value)}
+              />
+            </div>
+            <div
+              className="emergency-settings__audit-table"
+              role="table"
+              aria-label="Local action audit log"
+            >
+              <div role="row" className="emergency-settings__audit-table-head">
+                <span role="columnheader">Time</span>
+                <span role="columnheader">Action</span>
+                <span role="columnheader">Patient</span>
+                <span role="columnheader">Staff</span>
+                <span role="columnheader">Details</span>
+              </div>
+              {filteredAuditLogs.length ? (
+                filteredAuditLogs.map((log) => (
+                  <div role="row" key={log.id}>
+                    <time role="cell" dateTime={log.timestamp}>
+                      {new Date(log.timestamp).toLocaleString()}
+                    </time>
+                    <span role="cell">{log.action}</span>
+                    <span role="cell">
+                      {patientAuditLabel(log.patientId, patients, canViewPatients)}
+                    </span>
+                    <span role="cell">{log.staffId || 'system'}</span>
+                    <span role="cell">{auditDetailSummary(log.details)}</span>
+                  </div>
+                ))
+              ) : (
+                <p className="emergency-settings__audit-state">
+                  No local actions match the current filters.
+                </p>
+              )}
+            </div>
+          </Section>
+        </>
       ) : null}
 
       {surfaces.settings.showGovernanceSections ? (
-      <>
-      <Section
-        id="identity"
-        title="Identity and Modules"
-        subtitle="Tenant name, default workspace, and enabled CareDroid modules."
-        action={
-          <button
-            type="button"
-            disabled={savingGroup === 'identity'}
-            onClick={() =>
-              saveGroup('identity', {
-                tenantName: draft.tenantName,
-                defaultWorkspace: draft.defaultWorkspace,
-                enabledModules: draft.enabledModules,
-              })
+        <>
+          <Section
+            id="identity"
+            title="Identity and Modules"
+            subtitle="Tenant name, default workspace, and enabled CareDroid modules."
+            action={
+              <button
+                type="button"
+                disabled={savingGroup === 'identity'}
+                onClick={() =>
+                  saveGroup('identity', {
+                    tenantName: draft.tenantName,
+                    defaultWorkspace: draft.defaultWorkspace,
+                    enabledModules: draft.enabledModules,
+                  })
+                }
+              >
+                Save Identity
+              </button>
             }
           >
-            Save Identity
-          </button>
-        }
-      >
-        <div className="emergency-settings__grid">
-          <SettingsField
-            label="Tenant name"
-            value={draft.tenantName}
-            onChange={(value) => updateDraft({ tenantName: value })}
-          />
-          <SettingsField
-            label="Default workspace"
-            value={draft.defaultWorkspace}
-            options={WORKSPACE_OPTIONS}
-            onChange={(value) => updateDraft({ defaultWorkspace: value })}
-          />
-        </div>
-        <div className="emergency-settings__rules">
-          {draft.enabledModules.map((module) => (
-            <article key={module.id}>
+            <div className="emergency-settings__grid">
+              <SettingsField
+                label="Tenant name"
+                value={draft.tenantName}
+                onChange={(value) => updateDraft({ tenantName: value })}
+              />
+              <SettingsField
+                label="Default workspace"
+                value={draft.defaultWorkspace}
+                options={WORKSPACE_OPTIONS}
+                onChange={(value) => updateDraft({ defaultWorkspace: value })}
+              />
+            </div>
+            <div className="emergency-settings__rules">
+              {draft.enabledModules.map((module) => (
+                <article key={module.id}>
+                  <SettingsField
+                    type="checkbox"
+                    label={module.label}
+                    value={module.enabled}
+                    onChange={(enabled) => updateModule(module.id, enabled)}
+                  />
+                  <small>Configured module</small>
+                </article>
+              ))}
+            </div>
+          </Section>
+
+          <Section
+            id="operational-intelligence"
+            title="Operational Intelligence"
+            subtitle="Always-on advisory layer for capacity, queues, EMS, boarding, data freshness, and model health."
+            action={
+              <button
+                type="button"
+                disabled={savingGroup === 'operational-intelligence'}
+                onClick={() =>
+                  saveGroup('operational-intelligence', {
+                    operationalIntelligenceSettings: draft.operationalIntelligenceSettings,
+                  })
+                }
+              >
+                Save Operational Intelligence
+              </button>
+            }
+          >
+            <p className="emergency-settings__notice">
+              Operational intelligence is advisory. Human review required. This layer does not
+              diagnose, prescribe, triage, discharge, or override staff.
+            </p>
+            <div className="emergency-settings__grid">
               <SettingsField
                 type="checkbox"
-                label={module.label}
-                value={module.enabled}
-                onChange={(enabled) => updateModule(module.id, enabled)}
+                label="Operational intelligence enabled"
+                value={
+                  draft.operationalIntelligenceSettings?.operationalIntelligenceEnabled ?? true
+                }
+                onChange={(value) =>
+                  updateNested(
+                    'operationalIntelligenceSettings',
+                    'operationalIntelligenceEnabled',
+                    value,
+                  )
+                }
               />
-              <small>Configured module</small>
-            </article>
-          ))}
-        </div>
-      </Section>
+              <SettingsField
+                label="Mode"
+                value={
+                  draft.operationalIntelligenceSettings?.operationalIntelligenceMode || 'rule_based'
+                }
+                onChange={(value) =>
+                  updateNested(
+                    'operationalIntelligenceSettings',
+                    'operationalIntelligenceMode',
+                    value,
+                  )
+                }
+              />
+              <SettingsField
+                type="checkbox"
+                label="Model monitoring enabled"
+                value={draft.operationalIntelligenceSettings?.modelMonitoringEnabled ?? true}
+                onChange={(value) =>
+                  updateNested('operationalIntelligenceSettings', 'modelMonitoringEnabled', value)
+                }
+              />
+              <SettingsField
+                type="checkbox"
+                label="Drift monitoring enabled"
+                value={draft.operationalIntelligenceSettings?.driftMonitoringEnabled ?? false}
+                onChange={(value) =>
+                  updateNested('operationalIntelligenceSettings', 'driftMonitoringEnabled', value)
+                }
+              />
+              <SettingsField
+                type="checkbox"
+                label="Recommendations enabled"
+                value={draft.operationalIntelligenceSettings?.recommendationsEnabled ?? true}
+                onChange={(value) =>
+                  updateNested('operationalIntelligenceSettings', 'recommendationsEnabled', value)
+                }
+              />
+              <SettingsField
+                type="checkbox"
+                label="Auto alerting enabled"
+                value={draft.operationalIntelligenceSettings?.autoAlertingEnabled ?? true}
+                onChange={(value) =>
+                  updateNested('operationalIntelligenceSettings', 'autoAlertingEnabled', value)
+                }
+              />
+              <SettingsField
+                type="checkbox"
+                label="Data freshness visible"
+                value={draft.operationalIntelligenceSettings?.dataFreshnessVisible ?? true}
+                onChange={(value) =>
+                  updateNested('operationalIntelligenceSettings', 'dataFreshnessVisible', value)
+                }
+              />
+              <SettingsField
+                type="number"
+                label="Polling interval (ms)"
+                value={
+                  draft.operationalIntelligenceSettings?.operationalIntelligencePollingInterval ??
+                  30000
+                }
+                onChange={(value) =>
+                  updateNested(
+                    'operationalIntelligenceSettings',
+                    'operationalIntelligencePollingInterval',
+                    Number(value),
+                  )
+                }
+              />
+            </div>
+          </Section>
 
-      <Section
-        id="operational-intelligence"
-        title="Operational Intelligence"
-        subtitle="Always-on advisory layer for capacity, queues, EMS, boarding, data freshness, and model health."
-        action={
-          <button
-            type="button"
-            disabled={savingGroup === 'operational-intelligence'}
-            onClick={() =>
-              saveGroup('operational-intelligence', {
-                operationalIntelligenceSettings: draft.operationalIntelligenceSettings,
-              })
+          <Section
+            id="ai"
+            title="AI Settings"
+            subtitle="CareDroid Copilot routing, context, evidence, workflow support, and human-review controls."
+            action={
+              <button
+                type="button"
+                disabled={savingGroup === 'ai'}
+                onClick={() => saveGroup('ai', { aiSettings: draft.aiSettings })}
+              >
+                Save AI
+              </button>
             }
           >
-            Save Operational Intelligence
-          </button>
-        }
-      >
-        <p className="emergency-settings__notice">
-          Operational intelligence is advisory. Human review required. This layer does not diagnose,
-          prescribe, triage, discharge, or override staff.
-        </p>
-        <div className="emergency-settings__grid">
-          <SettingsField
-            type="checkbox"
-            label="Operational intelligence enabled"
-            value={draft.operationalIntelligenceSettings?.operationalIntelligenceEnabled ?? true}
-            onChange={(value) =>
-              updateNested('operationalIntelligenceSettings', 'operationalIntelligenceEnabled', value)
-            }
-          />
-          <SettingsField
-            label="Mode"
-            value={draft.operationalIntelligenceSettings?.operationalIntelligenceMode || 'rule_based'}
-            onChange={(value) =>
-              updateNested('operationalIntelligenceSettings', 'operationalIntelligenceMode', value)
-            }
-          />
-          <SettingsField
-            type="checkbox"
-            label="Model monitoring enabled"
-            value={draft.operationalIntelligenceSettings?.modelMonitoringEnabled ?? true}
-            onChange={(value) =>
-              updateNested('operationalIntelligenceSettings', 'modelMonitoringEnabled', value)
-            }
-          />
-          <SettingsField
-            type="checkbox"
-            label="Drift monitoring enabled"
-            value={draft.operationalIntelligenceSettings?.driftMonitoringEnabled ?? false}
-            onChange={(value) =>
-              updateNested('operationalIntelligenceSettings', 'driftMonitoringEnabled', value)
-            }
-          />
-          <SettingsField
-            type="checkbox"
-            label="Recommendations enabled"
-            value={draft.operationalIntelligenceSettings?.recommendationsEnabled ?? true}
-            onChange={(value) =>
-              updateNested('operationalIntelligenceSettings', 'recommendationsEnabled', value)
-            }
-          />
-          <SettingsField
-            type="checkbox"
-            label="Auto alerting enabled"
-            value={draft.operationalIntelligenceSettings?.autoAlertingEnabled ?? true}
-            onChange={(value) =>
-              updateNested('operationalIntelligenceSettings', 'autoAlertingEnabled', value)
-            }
-          />
-          <SettingsField
-            type="checkbox"
-            label="Data freshness visible"
-            value={draft.operationalIntelligenceSettings?.dataFreshnessVisible ?? true}
-            onChange={(value) =>
-              updateNested('operationalIntelligenceSettings', 'dataFreshnessVisible', value)
-            }
-          />
-          <SettingsField
-            type="number"
-            label="Polling interval (ms)"
-            value={draft.operationalIntelligenceSettings?.operationalIntelligencePollingInterval ?? 30000}
-            onChange={(value) =>
-              updateNested(
-                'operationalIntelligenceSettings',
-                'operationalIntelligencePollingInterval',
-                Number(value),
-              )
-            }
-          />
-        </div>
-      </Section>
+            <div
+              className="emergency-settings__cards"
+              aria-label="Provincial Health runtime status"
+            >
+              <article>
+                <div>
+                  <strong>
+                    Connector status{' '}
+                    <IntegrationStatusBadge status={INTEGRATION_STATUS.PLACEHOLDER} />
+                  </strong>
+                  <p>
+                    {provincialHealthStatus === 'loading'
+                      ? 'Loading Provincial Health status...'
+                      : provincialHealthStatus === 'error'
+                        ? provincialHealthError
+                        : provincialHealthData.connectorStatus || 'Connector status unavailable'}
+                  </p>
+                  <small>
+                    {provincialHealthData.jurisdiction ||
+                      draft.provincialHealthSettings.jurisdiction}
+                  </small>
+                </div>
+              </article>
+              <article>
+                <div>
+                  <strong>Records reviewed</strong>
+                  <p>
+                    {provincialRecords.length
+                      ? `${provincialRecords.length} placeholder record(s) are visible for manual review.`
+                      : 'No provincial records returned.'}
+                  </p>
+                  <small>
+                    {provincialHealthData.disclaimer ||
+                      'External data requires manual review before use.'}
+                  </small>
+                </div>
+              </article>
+            </div>
+            <div className="emergency-settings__grid">
+              <SettingsField
+                type="checkbox"
+                label="AI enabled"
+                value={draft.aiSettings.enabled}
+                onChange={(value) => updateNested('aiSettings', 'enabled', value)}
+              />
+              <SettingsField
+                label="Provider"
+                value={draft.aiSettings.provider}
+                onChange={(value) => updateNested('aiSettings', 'provider', value)}
+              />
+              <SettingsField
+                label="Model"
+                value={draft.aiSettings.model}
+                onChange={(value) => updateNested('aiSettings', 'model', value)}
+              />
+              <SettingsField
+                type="checkbox"
+                label="Triage assist"
+                value={draft.aiSettings.triageAssistEnabled}
+                onChange={(value) => updateNested('aiSettings', 'triageAssistEnabled', value)}
+              />
+              <SettingsField
+                type="checkbox"
+                label="Summarization"
+                value={draft.aiSettings.summarizationEnabled}
+                onChange={(value) => updateNested('aiSettings', 'summarizationEnabled', value)}
+              />
+              <SettingsField
+                type="checkbox"
+                label="Human review required"
+                value={draft.aiSettings.humanReviewRequired}
+                onChange={(value) => updateNested('aiSettings', 'humanReviewRequired', value)}
+              />
+            </div>
+            <div
+              className="emergency-settings__audit-summary"
+              aria-label="AI governance configuration status"
+            >
+              <strong>{aiServiceEntries.length || 0}</strong>
+              <span>governed AI services</span>
+              <small>
+                {aiGovernanceStatus === 'ready'
+                  ? `Backend registry loaded from ${aiGovernanceRegistry?.storageMode || 'governance service'}`
+                  : aiGovernanceStatus === 'loading'
+                    ? 'Loading AI governance registry...'
+                    : aiGovernanceError || 'AI governance registry partially available'}
+              </small>
+            </div>
+            <div className="emergency-settings__cards" aria-label="AI governance registry status">
+              <article>
+                <div>
+                  <strong>Human review coverage</strong>
+                  <p>
+                    {aiHumanReviewCount}/{aiServiceEntries.length || 0} governed services require
+                    human review before clinical or operational action.
+                  </p>
+                  <small>
+                    Required disclaimer: {aiRequiredDisclaimers[0] || 'Human review required'}
+                  </small>
+                </div>
+              </article>
+              <article>
+                <div>
+                  <strong>Blocked autonomous actions</strong>
+                  <p>
+                    {(aiBlockedActions.length
+                      ? aiBlockedActions
+                      : ['diagnose', 'prescribe', 'disposition patients']
+                    )
+                      .slice(0, 4)
+                      .join(', ')}
+                  </p>
+                  <small>
+                    No autonomous diagnosis, prescribing, disposition, or patient matching.
+                  </small>
+                </div>
+              </article>
+              <article>
+                <div>
+                  <strong>Compliance and audit</strong>
+                  <p>
+                    {aiGovernanceCompliance?.totalInteractions ?? 0} audited interactions ·{' '}
+                    {Math.round((aiGovernanceCompliance?.humanReviewRate || 0) * 100)}% human review
+                    rate
+                  </p>
+                  <small>
+                    Storage:{' '}
+                    {aiGovernanceCompliance?.storageMode ||
+                      aiGovernanceRegistry?.storageMode ||
+                      'backend fixture'}
+                  </small>
+                </div>
+              </article>
+              <article>
+                <div>
+                  <strong>Prompt validation</strong>
+                  <p>
+                    {aiValidationIssues.length
+                      ? `${aiValidationIssues.length} prompt issue(s) require review.`
+                      : 'All registered prompt templates validate with required disclaimers.'}
+                  </p>
+                  <small>
+                    {aiGovernanceFrameworks.join(', ') || 'NIST AI RMF, WHO, HIPAA, FDA SaMD'}
+                  </small>
+                </div>
+              </article>
+              <article>
+                <div>
+                  <strong>Copilot runtime config</strong>
+                  <p>
+                    {copilotService.provider || draft.aiSettings.provider} ·{' '}
+                    {copilotService.model || draft.aiSettings.model}
+                  </p>
+                  <small>
+                    {copilotService.auditLevel || 'full'} audit ·{' '}
+                    {copilotService.status || 'settings'} status
+                  </small>
+                </div>
+              </article>
+              <article>
+                <div>
+                  <strong>ML model governance</strong>
+                  <p>
+                    Deterioration: {deteriorationService.status || 'future'} · Federated EMS:{' '}
+                    {federatedEmsService.status || 'future'}
+                  </p>
+                  <small>
+                    {aiStatusCounts.active || 0} active · {aiStatusCounts.future || 0} future ·{' '}
+                    {aiStatusCounts['local-deterministic'] || 0} deterministic
+                  </small>
+                </div>
+              </article>
+            </div>
+          </Section>
 
-      <Section
-        id="ai"
-        title="AI Settings"
-        subtitle="CareDroid Copilot routing, context, evidence, workflow support, and human-review controls."
-        action={
-          <button
-            type="button"
-            disabled={savingGroup === 'ai'}
-            onClick={() => saveGroup('ai', { aiSettings: draft.aiSettings })}
-          >
-            Save AI
-          </button>
-        }
-      >
-        <div className="emergency-settings__cards" aria-label="Provincial Health runtime status">
-          <article>
-            <div>
-              <strong>
-                Connector status{' '}
-                <IntegrationStatusBadge status={INTEGRATION_STATUS.PLACEHOLDER} />
-              </strong>
-              <p>
-                {provincialHealthStatus === 'loading'
-                  ? 'Loading Provincial Health status...'
-                  : provincialHealthStatus === 'error'
-                    ? provincialHealthError
-                    : provincialHealthData.connectorStatus || 'Connector status unavailable'}
-              </p>
-              <small>{provincialHealthData.jurisdiction || draft.provincialHealthSettings.jurisdiction}</small>
-            </div>
-          </article>
-          <article>
-            <div>
-              <strong>Records reviewed</strong>
-              <p>
-                {provincialRecords.length
-                  ? `${provincialRecords.length} placeholder record(s) are visible for manual review.`
-                  : 'No provincial records returned.'}
-              </p>
-              <small>
-                {provincialHealthData.disclaimer || 'External data requires manual review before use.'}
-              </small>
-            </div>
-          </article>
-        </div>
-        <div className="emergency-settings__grid">
-          <SettingsField
-            type="checkbox"
-            label="AI enabled"
-            value={draft.aiSettings.enabled}
-            onChange={(value) => updateNested('aiSettings', 'enabled', value)}
-          />
-          <SettingsField
-            label="Provider"
-            value={draft.aiSettings.provider}
-            onChange={(value) => updateNested('aiSettings', 'provider', value)}
-          />
-          <SettingsField
-            label="Model"
-            value={draft.aiSettings.model}
-            onChange={(value) => updateNested('aiSettings', 'model', value)}
-          />
-          <SettingsField
-            type="checkbox"
-            label="Triage assist"
-            value={draft.aiSettings.triageAssistEnabled}
-            onChange={(value) => updateNested('aiSettings', 'triageAssistEnabled', value)}
-          />
-          <SettingsField
-            type="checkbox"
-            label="Summarization"
-            value={draft.aiSettings.summarizationEnabled}
-            onChange={(value) => updateNested('aiSettings', 'summarizationEnabled', value)}
-          />
-          <SettingsField
-            type="checkbox"
-            label="Human review required"
-            value={draft.aiSettings.humanReviewRequired}
-            onChange={(value) => updateNested('aiSettings', 'humanReviewRequired', value)}
-          />
-        </div>
-        <div className="emergency-settings__audit-summary" aria-label="AI governance configuration status">
-          <strong>{aiServiceEntries.length || 0}</strong>
-          <span>governed AI services</span>
-          <small>
-            {aiGovernanceStatus === 'ready'
-              ? `Backend registry loaded from ${aiGovernanceRegistry?.storageMode || 'governance service'}`
-              : aiGovernanceStatus === 'loading'
-                ? 'Loading AI governance registry...'
-                : aiGovernanceError || 'AI governance registry partially available'}
-          </small>
-        </div>
-        <div className="emergency-settings__cards" aria-label="AI governance registry status">
-          <article>
-            <div>
-              <strong>Human review coverage</strong>
-              <p>
-                {aiHumanReviewCount}/{aiServiceEntries.length || 0} governed services require human
-                review before clinical or operational action.
-              </p>
-              <small>
-                Required disclaimer: {aiRequiredDisclaimers[0] || 'Human review required'}
-              </small>
-            </div>
-          </article>
-          <article>
-            <div>
-              <strong>Blocked autonomous actions</strong>
-              <p>
-                {(aiBlockedActions.length ? aiBlockedActions : ['diagnose', 'prescribe', 'disposition patients'])
-                  .slice(0, 4)
-                  .join(', ')}
-              </p>
-              <small>No autonomous diagnosis, prescribing, disposition, or patient matching.</small>
-            </div>
-          </article>
-          <article>
-            <div>
-              <strong>Compliance and audit</strong>
-              <p>
-                {aiGovernanceCompliance?.totalInteractions ?? 0} audited interactions ·{' '}
-                {Math.round((aiGovernanceCompliance?.humanReviewRate || 0) * 100)}% human review rate
-              </p>
-              <small>
-                Storage: {aiGovernanceCompliance?.storageMode || aiGovernanceRegistry?.storageMode || 'backend fixture'}
-              </small>
-            </div>
-          </article>
-          <article>
-            <div>
-              <strong>Prompt validation</strong>
-              <p>
-                {aiValidationIssues.length
-                  ? `${aiValidationIssues.length} prompt issue(s) require review.`
-                  : 'All registered prompt templates validate with required disclaimers.'}
-              </p>
-              <small>{aiGovernanceFrameworks.join(', ') || 'NIST AI RMF, WHO, HIPAA, FDA SaMD'}</small>
-            </div>
-          </article>
-          <article>
-            <div>
-              <strong>Copilot runtime config</strong>
-              <p>
-                {copilotService.provider || draft.aiSettings.provider} ·{' '}
-                {copilotService.model || draft.aiSettings.model}
-              </p>
-              <small>
-                {copilotService.auditLevel || 'full'} audit · {copilotService.status || 'settings'} status
-              </small>
-            </div>
-          </article>
-          <article>
-            <div>
-              <strong>ML model governance</strong>
-              <p>
-                Deterioration: {deteriorationService.status || 'future'} · Federated EMS:{' '}
-                {federatedEmsService.status || 'future'}
-              </p>
-              <small>
-                {aiStatusCounts.active || 0} active · {aiStatusCounts.future || 0} future ·{' '}
-                {aiStatusCounts['local-deterministic'] || 0} deterministic
-              </small>
-            </div>
-          </article>
-        </div>
-      </Section>
-
-      <Section
-        id="integrations"
-        title="Integration Settings"
-        subtitle="Dispatcher, EMS, EHR, FHIR, HL7, and device telemetry inputs for the shared command center picture."
-        action={
-          <button
-            type="button"
-            disabled={savingGroup === 'integrations'}
-            onClick={() =>
-              saveGroup('integrations', { integrationSettings: draft.integrationSettings })
+          <Section
+            id="integrations"
+            title="Integration Settings"
+            subtitle="Dispatcher, EMS, EHR, FHIR, HL7, and device telemetry inputs for the shared command center picture."
+            action={
+              <button
+                type="button"
+                disabled={savingGroup === 'integrations'}
+                onClick={() =>
+                  saveGroup('integrations', { integrationSettings: draft.integrationSettings })
+                }
+              >
+                Save Integrations
+              </button>
             }
           >
-            Save Integrations
-          </button>
-        }
-      >
-        <IntegrationStatusPanel
-          liveSources={integrationSources}
-          showDetailTable={false}
-          className="emergency-settings__integration-status"
-        />
-        <div className="emergency-settings__grid">
-          <SettingsField
-            type="checkbox"
-            label="EHR enabled"
-            value={draft.integrationSettings.ehrEnabled}
-            onChange={(value) => updateNested('integrationSettings', 'ehrEnabled', value)}
-          />
-          <SettingsField
-            label="FHIR endpoint"
-            value={draft.integrationSettings.fhirEndpoint}
-            onChange={(value) => updateNested('integrationSettings', 'fhirEndpoint', value)}
-          />
-          <SettingsField
-            label="HL7 interface ID"
-            value={draft.integrationSettings.hl7InterfaceId}
-            onChange={(value) => updateNested('integrationSettings', 'hl7InterfaceId', value)}
-          />
-          <SettingsField
-            type="checkbox"
-            label="Device telemetry"
-            value={draft.integrationSettings.deviceTelemetryEnabled}
-            onChange={(value) =>
-              updateNested('integrationSettings', 'deviceTelemetryEnabled', value)
-            }
-          />
-        </div>
-      </Section>
+            <IntegrationStatusPanel
+              liveSources={integrationSources}
+              showDetailTable={false}
+              className="emergency-settings__integration-status"
+            />
+            <div className="emergency-settings__grid">
+              <SettingsField
+                type="checkbox"
+                label="EHR enabled"
+                value={draft.integrationSettings.ehrEnabled}
+                onChange={(value) => updateNested('integrationSettings', 'ehrEnabled', value)}
+              />
+              <SettingsField
+                label="FHIR endpoint"
+                value={draft.integrationSettings.fhirEndpoint}
+                onChange={(value) => updateNested('integrationSettings', 'fhirEndpoint', value)}
+              />
+              <SettingsField
+                label="HL7 interface ID"
+                value={draft.integrationSettings.hl7InterfaceId}
+                onChange={(value) => updateNested('integrationSettings', 'hl7InterfaceId', value)}
+              />
+              <SettingsField
+                type="checkbox"
+                label="Device telemetry"
+                value={draft.integrationSettings.deviceTelemetryEnabled}
+                onChange={(value) =>
+                  updateNested('integrationSettings', 'deviceTelemetryEnabled', value)
+                }
+              />
+            </div>
+          </Section>
 
-      <Section
-        id="provincial-health"
-        title="Provincial Health Settings"
-        subtitle="Provincial connector jurisdiction, lookup mode, and health-card validation."
-        action={
-          <button
-            type="button"
-            disabled={savingGroup === 'provincial'}
-            onClick={() =>
-              saveGroup('provincial', { provincialHealthSettings: draft.provincialHealthSettings })
+          <Section
+            id="provincial-health"
+            title="Provincial Health Settings"
+            subtitle="Provincial connector jurisdiction, lookup mode, and health-card validation."
+            action={
+              <button
+                type="button"
+                disabled={savingGroup === 'provincial'}
+                onClick={() =>
+                  saveGroup('provincial', {
+                    provincialHealthSettings: draft.provincialHealthSettings,
+                  })
+                }
+              >
+                Save Provincial Health
+              </button>
             }
           >
-            Save Provincial Health
-          </button>
-        }
-      >
-        <div className="emergency-settings__grid">
-          <SettingsField
-            type="checkbox"
-            label="Connector enabled"
-            value={draft.provincialHealthSettings.connectorEnabled}
-            onChange={(value) =>
-              updateNested('provincialHealthSettings', 'connectorEnabled', value)
-            }
-          />
-          <SettingsField
-            label="Jurisdiction"
-            value={draft.provincialHealthSettings.jurisdiction}
-            onChange={(value) => updateNested('provincialHealthSettings', 'jurisdiction', value)}
-          />
-          <SettingsField
-            label="Lookup mode"
-            value={draft.provincialHealthSettings.lookupMode}
-            options={[
-              ['manual-review', 'Manual review'],
-              ['verify-only', 'Verify only'],
-              ['auto-lookup', 'Auto lookup'],
-            ]}
-            onChange={(value) => updateNested('provincialHealthSettings', 'lookupMode', value)}
-          />
-          <SettingsField
-            type="checkbox"
-            label="Health-card validation"
-            value={draft.provincialHealthSettings.healthCardValidation}
-            onChange={(value) =>
-              updateNested('provincialHealthSettings', 'healthCardValidation', value)
-            }
-          />
-        </div>
-      </Section>
-      </>
+            <div className="emergency-settings__grid">
+              <SettingsField
+                type="checkbox"
+                label="Connector enabled"
+                value={draft.provincialHealthSettings.connectorEnabled}
+                onChange={(value) =>
+                  updateNested('provincialHealthSettings', 'connectorEnabled', value)
+                }
+              />
+              <SettingsField
+                label="Jurisdiction"
+                value={draft.provincialHealthSettings.jurisdiction}
+                onChange={(value) =>
+                  updateNested('provincialHealthSettings', 'jurisdiction', value)
+                }
+              />
+              <SettingsField
+                label="Lookup mode"
+                value={draft.provincialHealthSettings.lookupMode}
+                options={[
+                  ['manual-review', 'Manual review'],
+                  ['verify-only', 'Verify only'],
+                  ['auto-lookup', 'Auto lookup'],
+                ]}
+                onChange={(value) => updateNested('provincialHealthSettings', 'lookupMode', value)}
+              />
+              <SettingsField
+                type="checkbox"
+                label="Health-card validation"
+                value={draft.provincialHealthSettings.healthCardValidation}
+                onChange={(value) =>
+                  updateNested('provincialHealthSettings', 'healthCardValidation', value)
+                }
+              />
+            </div>
+          </Section>
+        </>
       ) : null}
 
       <Section

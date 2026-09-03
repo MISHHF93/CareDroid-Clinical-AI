@@ -26,9 +26,7 @@ describe('ReassessmentDrawer focus management (HEAL-221)', () => {
     trigger.focus();
     expect(trigger).toHaveFocus();
 
-    const { rerender } = render(
-      <ReassessmentDrawer open count={0} onClose={vi.fn()} />,
-    );
+    const { rerender } = render(<ReassessmentDrawer open count={0} onClose={vi.fn()} />);
     const dialog = await screen.findByRole('dialog');
     expect(dialog).toHaveFocus();
     expect(trigger).not.toHaveFocus();

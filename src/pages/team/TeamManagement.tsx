@@ -81,7 +81,7 @@ export const TeamManagement = () => {
       setLoading(true);
       const { response, data } = await apiFetchJson('/api/team/users', {
         headers: {
-          'Authorization': `Bearer ${getStoredAccessToken() || ''}`,
+          Authorization: `Bearer ${getStoredAccessToken() || ''}`,
         },
       });
 
@@ -103,9 +103,10 @@ export const TeamManagement = () => {
     }
   };
 
-  const filteredUsers = users.filter(user =>
-    user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredUsers = users.filter(
+    (user) =>
+      user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   const sortedUsers = [...filteredUsers].sort((a, b) => {
@@ -122,7 +123,7 @@ export const TeamManagement = () => {
   });
 
   const handleSort = (key) => {
-    setSortConfig(prev => ({
+    setSortConfig((prev) => ({
       key,
       direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc',
     }));
@@ -142,7 +143,7 @@ export const TeamManagement = () => {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${getStoredAccessToken() || ''}`,
+          Authorization: `Bearer ${getStoredAccessToken() || ''}`,
         },
         body: JSON.stringify(updatedUser),
       });
@@ -151,8 +152,8 @@ export const TeamManagement = () => {
         throw new Error('Failed to update user');
       }
 
-      setUsers(prev =>
-        prev.map(u => (u.id === selectedUser.id ? { ...u, ...updatedUser } : u))
+      setUsers((prev) =>
+        prev.map((u) => (u.id === selectedUser.id ? { ...u, ...updatedUser } : u)),
       );
       setShowEditModal(false);
       setSelectedUser(null);
@@ -180,7 +181,7 @@ export const TeamManagement = () => {
       const response = await apiFetch(`/api/team/users/${userId}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${getStoredAccessToken() || ''}`,
+          Authorization: `Bearer ${getStoredAccessToken() || ''}`,
         },
       });
 
@@ -188,7 +189,7 @@ export const TeamManagement = () => {
         throw new Error('Failed to delete user');
       }
 
-      setUsers(prev => prev.filter(u => u.id !== userId));
+      setUsers((prev) => prev.filter((u) => u.id !== userId));
     } catch (err: any) {
       setError(err.message);
       reportApiError({
@@ -211,7 +212,7 @@ export const TeamManagement = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${getStoredAccessToken() || ''}`,
+          Authorization: `Bearer ${getStoredAccessToken() || ''}`,
         },
         body: JSON.stringify({ email: inviteEmail }),
       });
@@ -242,7 +243,8 @@ export const TeamManagement = () => {
           <p className="team-header-content__title-text">Team Management</p>
           <p>Manage team members, roles, and permissions</p>
         </div>
-        <button type="button"
+        <button
+          type="button"
           className="btn-invite"
           onClick={() => {
             if (requireTeamApi()) setShowInviteModal(true);
@@ -257,7 +259,9 @@ export const TeamManagement = () => {
       {error && (
         <div className="team-error">
           <span>{error}</span>
-          <button type="button" onClick={() => setError(null)}>✕</button>
+          <button type="button" onClick={() => setError(null)}>
+            ✕
+          </button>
         </div>
       )}
 
@@ -290,7 +294,9 @@ export const TeamManagement = () => {
         <div className="team-empty">
           <p>No team members found</p>
           {searchQuery && (
-            <button type="button" onClick={() => setSearchQuery('')}>Clear search</button>
+            <button type="button" onClick={() => setSearchQuery('')}>
+              Clear search
+            </button>
           )}
         </div>
       )}
@@ -326,10 +332,10 @@ export const TeamManagement = () => {
 const UserTable = ({ users, sortConfig, onSort, onEdit, onDelete, actionsDisabled = false }) => {
   const getRoleColor = (role) => {
     const colors = {
-      'Admin': { bg: 'var(--app-danger)', text: 'Admin' },
-      'Physician': { bg: 'var(--accent-2)', text: 'Physician' },
-      'Nurse': { bg: 'var(--accent-1)', text: 'Nurse' },
-      'Student': { bg: 'var(--semantic-ai-assistance)', text: 'Student' },
+      Admin: { bg: 'var(--app-danger)', text: 'Admin' },
+      Physician: { bg: 'var(--accent-2)', text: 'Physician' },
+      Nurse: { bg: 'var(--accent-1)', text: 'Nurse' },
+      Student: { bg: 'var(--semantic-ai-assistance)', text: 'Student' },
     };
     return colors[role] || colors['Student'];
   };
@@ -345,16 +351,15 @@ const UserTable = ({ users, sortConfig, onSort, onEdit, onDelete, actionsDisable
 
   const TableHeaderCell = ({ label, sortKey }) => (
     <th>
-      <button type="button"
+      <button
+        type="button"
         className={`table-sort-btn ${sortConfig.key === sortKey ? 'table-sort-active' : ''}`}
         onClick={() => onSort(sortKey)}
         aria-label={`Sort by ${label}`}
       >
         {label}
         {sortConfig.key === sortKey && (
-          <span className="sort-indicator">
-            {sortConfig.direction === 'asc' ? '↑' : '↓'}
-          </span>
+          <span className="sort-indicator">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
         )}
       </button>
     </th>
@@ -374,7 +379,7 @@ const UserTable = ({ users, sortConfig, onSort, onEdit, onDelete, actionsDisable
           </tr>
         </thead>
         <tbody>
-          {users.map(user => (
+          {users.map((user) => (
             <tr key={user.id}>
               <td className="table-name">
                 <div className="user-info">
@@ -392,16 +397,15 @@ const UserTable = ({ users, sortConfig, onSort, onEdit, onDelete, actionsDisable
                 </span>
               </td>
               <td className="table-email">{user.email}</td>
-              <td className="table-date">
-                {new Date(user.joinedDate).toLocaleDateString()}
-              </td>
+              <td className="table-date">{new Date(user.joinedDate).toLocaleDateString()}</td>
               <td className="table-status">
                 <span className="status-indicator" title={user.status}>
                   {getStatusIndicator(user.status)}
                 </span>
               </td>
               <td className="table-actions">
-                <button type="button"
+                <button
+                  type="button"
                   className="action-btn action-edit"
                   onClick={() => onEdit(user)}
                   title="Edit user"
@@ -410,7 +414,8 @@ const UserTable = ({ users, sortConfig, onSort, onEdit, onDelete, actionsDisable
                 >
                   ✎
                 </button>
-                <button type="button"
+                <button
+                  type="button"
                   className="action-btn action-delete"
                   onClick={() => onDelete(user.id)}
                   title="Remove user"
@@ -444,10 +449,10 @@ const EditUserModal = ({ user, onSave, onCancel, disabled = false }) => {
   useModalDialog(dialogRef, { onClose: onCancel });
 
   const roleDefinitions = {
-    'Admin': ['Read All', 'Write All', 'Delete All', 'Manage Users', 'View Audit Logs'],
-    'Physician': ['Read PHI', 'Write Clinical Notes', 'Prescribe Medications', 'Order Tests'],
-    'Nurse': ['Read PHI', 'Update Vitals', 'Document Care', 'Assist Physician'],
-    'Student': ['Read Clinical Scenarios', 'View Guidelines', 'Educational Resources'],
+    Admin: ['Read All', 'Write All', 'Delete All', 'Manage Users', 'View Audit Logs'],
+    Physician: ['Read PHI', 'Write Clinical Notes', 'Prescribe Medications', 'Order Tests'],
+    Nurse: ['Read PHI', 'Update Vitals', 'Document Care', 'Assist Physician'],
+    Student: ['Read Clinical Scenarios', 'View Guidelines', 'Educational Resources'],
   };
 
   const handleSave = async () => {
@@ -478,7 +483,9 @@ const EditUserModal = ({ user, onSave, onCancel, disabled = false }) => {
       >
         <div className="modal-header">
           <h2 id="edit-user-modal-title">Edit User</h2>
-          <button type="button" className="modal-close" onClick={onCancel}>✕</button>
+          <button type="button" className="modal-close" onClick={onCancel}>
+            ✕
+          </button>
         </div>
 
         <div className="modal-body">
@@ -492,16 +499,13 @@ const EditUserModal = ({ user, onSave, onCancel, disabled = false }) => {
 
           <div className="edit-role-section">
             <label htmlFor="role-select">Role</label>
-            <RoleSelector
-              value={role}
-              onChange={setRole}
-            />
+            <RoleSelector value={role} onChange={setRole} />
           </div>
 
           <div className="edit-permissions-section">
             <h4>Permissions for {role}</h4>
             <div className="permissions-list">
-              {roleDefinitions[role]?.map(permission => (
+              {roleDefinitions[role]?.map((permission) => (
                 <div key={permission} className="permission-item">
                   <span className="permission-check">✓</span>
                   <span className="permission-name">{permission}</span>
@@ -512,14 +516,11 @@ const EditUserModal = ({ user, onSave, onCancel, disabled = false }) => {
         </div>
 
         <div className="modal-footer">
-          <button type="button"
-            className="btn-cancel"
-            onClick={onCancel}
-            disabled={saving}
-          >
+          <button type="button" className="btn-cancel" onClick={onCancel} disabled={saving}>
             Cancel
           </button>
-          <button type="button"
+          <button
+            type="button"
             className="btn-save"
             onClick={handleSave}
             disabled={saving || disabled}
@@ -552,7 +553,7 @@ const RoleSelector = ({ value, onChange }) => {
       onChange={(e) => onChange(e.target.value)}
       aria-label="Select user role"
     >
-      {roles.map(role => (
+      {roles.map((role) => (
         <option key={role.id} value={role.id}>
           {role.label} — {role.description}
         </option>
@@ -600,12 +601,15 @@ const InviteUserModal = ({ email, onEmailChange, onInvite, onCancel, disabled = 
       >
         <div className="modal-header">
           <h2 id="invite-user-modal-title">Invite Team Member</h2>
-          <button type="button" className="modal-close" onClick={onCancel}>✕</button>
+          <button type="button" className="modal-close" onClick={onCancel}>
+            ✕
+          </button>
         </div>
 
         <div className="modal-body">
           <p className="invite-description">
-            Send an invitation to join your team. They'll receive an email with a link to create their account.
+            Send an invitation to join your team. They'll receive an email with a link to create
+            their account.
           </p>
 
           <div className="invite-input-group">
@@ -625,14 +629,11 @@ const InviteUserModal = ({ email, onEmailChange, onInvite, onCancel, disabled = 
         </div>
 
         <div className="modal-footer">
-          <button type="button"
-            className="btn-cancel"
-            onClick={onCancel}
-            disabled={loading}
-          >
+          <button type="button" className="btn-cancel" onClick={onCancel} disabled={loading}>
             Cancel
           </button>
-          <button type="button"
+          <button
+            type="button"
             className="btn-invite"
             onClick={handleInvite}
             disabled={!isValidEmail || loading || disabled}

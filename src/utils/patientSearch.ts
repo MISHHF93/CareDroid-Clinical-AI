@@ -91,13 +91,18 @@ export function getPatientSearchFields(patient: PatientSearchSource) {
   const mrn = normalizeText(patient.mrn);
   const dob = String(patient.dob || '').trim();
   const phone = patient.phone || patient.mobilePhone || '';
-  const healthCard =
-    patient.healthCardNumber || patient.healthCard || patient.phn || '';
+  const healthCard = patient.healthCardNumber || patient.healthCard || patient.phn || '';
   const phoneDigits = digitsOnly(phone);
   const healthCardDigits = digitsOnly(healthCard);
   const mrnDigits = digitsOnly(patient.mrn);
   const clinicalText = normalizeText(
-    [patient.chiefComplaint, patient.complaint, patient.complaintCategory, patient.state, patient.priority]
+    [
+      patient.chiefComplaint,
+      patient.complaint,
+      patient.complaintCategory,
+      patient.state,
+      patient.priority,
+    ]
       .filter(Boolean)
       .join(' '),
   );
@@ -114,15 +119,7 @@ export function getPatientSearchFields(patient: PatientSearchSource) {
     healthCardDigits,
     clinicalText,
     lookupText: normalizeText(
-      [
-        displayName,
-        mrn,
-        dob,
-        phone,
-        healthCard,
-        clinicalText,
-        patient.id,
-      ]
+      [displayName, mrn, dob, phone, healthCard, clinicalText, patient.id]
         .filter(Boolean)
         .join(' '),
     ),

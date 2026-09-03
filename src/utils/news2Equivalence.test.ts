@@ -64,7 +64,9 @@ describe('NEWS2 cross-implementation equivalence (utils/news2.ts vs utils/news2C
     const airOption = NEWS2_ITEMS.find((item) => item.id === 'air');
     if (!airOption || !('options' in airOption)) throw new Error('expected air NEWS2 item');
     const airScore = airOption.options.find((option) => option.label === 'Air')?.score;
-    const oxygenScore = airOption.options.find((option) => option.label === 'On supplemental oxygen')?.score;
+    const oxygenScore = airOption.options.find(
+      (option) => option.label === 'On supplemental oxygen',
+    )?.score;
 
     expect(scoreSupplementalOxygen(false)).toBe(airScore);
     expect(scoreSupplementalOxygen(true)).toBe(oxygenScore);
@@ -72,9 +74,14 @@ describe('NEWS2 cross-implementation equivalence (utils/news2.ts vs utils/news2C
 
   it('agrees on the consciousness row (any deviation from Alert scores 3)', () => {
     const consciousnessItem = NEWS2_ITEMS.find((item) => item.id === 'consciousness');
-    if (!consciousnessItem || !('options' in consciousnessItem)) throw new Error('expected consciousness NEWS2 item');
-    const alertScore = consciousnessItem.options.find((option) => option.label === 'Alert (A)')?.score;
-    const confusedScore = consciousnessItem.options.find((option) => option.label === 'Confused (C)')?.score;
+    if (!consciousnessItem || !('options' in consciousnessItem))
+      throw new Error('expected consciousness NEWS2 item');
+    const alertScore = consciousnessItem.options.find(
+      (option) => option.label === 'Alert (A)',
+    )?.score;
+    const confusedScore = consciousnessItem.options.find(
+      (option) => option.label === 'Confused (C)',
+    )?.score;
 
     expect(scoreConsciousness(false)).toBe(alertScore);
     expect(scoreConsciousness(true)).toBe(confusedScore);

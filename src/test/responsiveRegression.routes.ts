@@ -23,30 +23,80 @@ export const CORE_ROUTE_SMOKE = Object.freeze([
     match: 'heading-text',
     heading: /executive command center/i,
   },
-  { id: 'discover', path: '/discover', match: 'heading-text', heading: /discover caredroid capabilities/i },
+  {
+    id: 'discover',
+    path: '/discover',
+    match: 'heading-text',
+    heading: /discover caredroid capabilities/i,
+  },
   { id: 'workflows', path: '/workflows', match: 'heading-text', heading: /^workflows$/i },
   { id: 'operations', path: '/operations', match: 'heading-text', heading: /default operations/i },
   // CareDroidPage-based (HEAL-185): these register their title into the shell chrome instead of
   // rendering their own <h1> -- match on text, not heading role (mirrors PlatformGovernanceWorkspace's
   // established 'heading-text' pattern from HEAL-169).
-  { id: 'tools-overview', path: '/tools', match: 'heading-text', heading: /careDroid tool console/i },
-  { id: 'protocols', path: '/protocols', match: 'heading-text', heading: /protocol and clinical pathway library/i },
-  { id: 'research', path: '/research', match: 'heading-text', heading: /research and evidence hub/i },
+  {
+    id: 'tools-overview',
+    path: '/tools',
+    match: 'heading-text',
+    heading: /careDroid tool console/i,
+  },
+  {
+    id: 'protocols',
+    path: '/protocols',
+    match: 'heading-text',
+    heading: /protocol and clinical pathway library/i,
+  },
+  {
+    id: 'research',
+    path: '/research',
+    match: 'heading-text',
+    heading: /research and evidence hub/i,
+  },
   // 'heading-text', like every other page whose <h1> the shell owns. These smoke
   // tests render the page without the shell, so requiring a level-1 heading here
   // asserted something the page deliberately does not render on its own.
-  { id: 'documentation', path: '/documentation', match: 'heading-text', heading: /clinical documentation assistant/i },
-  { id: 'knowledge-graph', path: '/knowledge-graph', match: 'heading-text', heading: /clinical knowledge graph/i },
-  { id: 'predictive-analytics', path: '/predictive-analytics', match: 'heading-text', heading: /predictive analytics dashboard/i },
+  {
+    id: 'documentation',
+    path: '/documentation',
+    match: 'heading-text',
+    heading: /clinical documentation assistant/i,
+  },
+  {
+    id: 'knowledge-graph',
+    path: '/knowledge-graph',
+    match: 'heading-text',
+    heading: /clinical knowledge graph/i,
+  },
+  {
+    id: 'predictive-analytics',
+    path: '/predictive-analytics',
+    match: 'heading-text',
+    heading: /predictive analytics dashboard/i,
+  },
   {
     id: 'clinical-decision-support',
     path: '/clinical-decision-support',
     match: 'heading-text',
     heading: /clinical decision support engine/i,
   },
-  { id: 'competencies', path: '/competencies', match: 'heading-text', heading: /competency platform/i },
-  { id: 'credentials', path: '/credentials', match: 'heading-text', heading: /credentialing platform/i },
-  { id: 'simulation', path: '/simulation', match: 'heading-text', heading: /medical simulation suite/i },
+  {
+    id: 'competencies',
+    path: '/competencies',
+    match: 'heading-text',
+    heading: /competency platform/i,
+  },
+  {
+    id: 'credentials',
+    path: '/credentials',
+    match: 'heading-text',
+    heading: /credentialing platform/i,
+  },
+  {
+    id: 'simulation',
+    path: '/simulation',
+    match: 'heading-text',
+    heading: /medical simulation suite/i,
+  },
   {
     id: 'simulation-scenario',
     path: '/simulation/sepsis-deterioration',
@@ -63,7 +113,12 @@ export const CORE_ROUTE_SMOKE = Object.freeze([
   { id: '3d-viewer', path: '/3d-viewer', match: 'heading-text', heading: /^3d viewer$/i },
   { id: 'live-map', path: '/live-map', match: 'heading-text', heading: /^live tracking map$/i },
   { id: 'hospital-map', path: '/hospital-map', match: 'heading-text', heading: /^hospital map$/i },
-  { id: 'medical-iot', path: '/medical-iot', match: 'heading-text', heading: /medical iot dashboard/i },
+  {
+    id: 'medical-iot',
+    path: '/medical-iot',
+    match: 'heading-text',
+    heading: /medical iot dashboard/i,
+  },
   { id: 'devices', path: '/devices', match: 'heading-text', heading: /device fleet management/i },
   {
     id: 'clinical-alerts',
@@ -187,14 +242,44 @@ export const CORE_ROUTE_SMOKE = Object.freeze([
     match: 'heading-text',
     heading: /hospital maturity assessment/i,
   },
-  { id: 'feature-flags', path: '/feature-flags', match: 'heading-text', heading: /feature flag center/i },
+  {
+    id: 'feature-flags',
+    path: '/feature-flags',
+    match: 'heading-text',
+    heading: /feature flag center/i,
+  },
   { id: 'plugins', path: '/plugins', match: 'heading-text', heading: /plugin marketplace/i },
-  { id: 'dependency-map', path: '/dependency-map', match: 'heading-text', heading: /platform wiring map/i },
-  { id: 'dependency-graph', path: '/dependency-graph', match: 'heading-text', heading: /asset dependency graph/i },
-  { id: 'data-lineage', path: '/data-lineage', match: 'heading-text', heading: /data lineage explorer/i },
-  { id: 'self-diagnostics', path: '/self-diagnostics', match: 'heading-text', heading: /platform self-diagnostics/i },
+  {
+    id: 'dependency-map',
+    path: '/dependency-map',
+    match: 'heading-text',
+    heading: /platform wiring map/i,
+  },
+  {
+    id: 'dependency-graph',
+    path: '/dependency-graph',
+    match: 'heading-text',
+    heading: /asset dependency graph/i,
+  },
+  {
+    id: 'data-lineage',
+    path: '/data-lineage',
+    match: 'heading-text',
+    heading: /data lineage explorer/i,
+  },
+  {
+    id: 'self-diagnostics',
+    path: '/self-diagnostics',
+    match: 'heading-text',
+    heading: /platform self-diagnostics/i,
+  },
   { id: 'costs', path: '/costs', match: 'heading-text', heading: /cost analytics/i },
-  { id: 'ai-evaluation', path: '/ai-evaluation', match: 'heading-text', heading: /ai evaluation lab/i },
+  {
+    id: 'ai-evaluation',
+    path: '/ai-evaluation',
+    match: 'heading-text',
+    heading: /ai evaluation lab/i,
+  },
   {
     id: 'ai-command-center',
     path: '/ai-command-center',
@@ -365,7 +450,7 @@ export const TIER_A_FORM_SMOKE_SLUGS = Object.freeze([
 /** Every Tier-A path is registered in App routing. */
 export function getAllTierARoutePaths() {
   return CLINICAL_TIER_A_CALCULATOR_REGISTRY_IDS.map(
-    (id) => TIER_A_CALCULATOR_PATH_BY_REGISTRY_ID[id]
+    (id) => TIER_A_CALCULATOR_PATH_BY_REGISTRY_ID[id],
   ).filter(Boolean);
 }
 

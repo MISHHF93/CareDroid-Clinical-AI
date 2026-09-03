@@ -21,9 +21,9 @@ describe('dataLineageExplorer', () => {
       expect(flow.output).toBeTruthy();
       expect(flow.timestamps.firstSeen).toBeTruthy();
       expect(flow.timestamps.completedAt).toBeTruthy();
-      expect(flow.stages.every((stage) => stage.timestamp && stage.transformations.length > 0)).toBe(
-        true
-      );
+      expect(
+        flow.stages.every((stage) => stage.timestamp && stage.transformations.length > 0),
+      ).toBe(true);
     }
   });
 
@@ -31,7 +31,7 @@ describe('dataLineageExplorer', () => {
     const lineage = buildDataLineageExplorer();
 
     expect(filterDataLineageFlows(lineage.flows, 'NEWS2').map((flow) => flow.id)).toContain(
-      'news2-calculator-trace'
+      'news2-calculator-trace',
     );
     expect(filterDataLineageFlows(lineage.flows, '', 'Calculator').map((flow) => flow.id)).toEqual([
       'news2-calculator-trace',

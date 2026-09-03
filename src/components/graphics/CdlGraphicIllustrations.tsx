@@ -31,7 +31,13 @@ export function CdlEmptyIllustration({ variant = 'generic', className = '' }: Il
           <circle cx="36" cy="44" r="10" fill="url(#cdl-illus-accent)" opacity="0.85" />
           <rect x="54" y="36" width="42" height="6" rx="3" fill="currentColor" opacity="0.18" />
           <rect x="54" y="48" width="30" height="6" rx="3" fill="currentColor" opacity="0.12" />
-          <path d="M24 68h72" stroke="url(#cdl-illus-accent)" strokeWidth="3" strokeLinecap="round" opacity="0.5" />
+          <path
+            d="M24 68h72"
+            stroke="url(#cdl-illus-accent)"
+            strokeWidth="3"
+            strokeLinecap="round"
+            opacity="0.5"
+          />
         </>
       ) : null}
       {variant === 'patients' ? (
@@ -50,18 +56,22 @@ export function CdlEmptyIllustration({ variant = 'generic', className = '' }: Il
       ) : null}
       {variant === 'alerts' ? (
         <>
-          <path
-            d="M60 24 L78 64 H42 Z"
-            fill="url(#cdl-illus-accent)"
-            opacity="0.82"
-          />
+          <path d="M60 24 L78 64 H42 Z" fill="url(#cdl-illus-accent)" opacity="0.82" />
           <circle cx="60" cy="58" r="3" fill="#fff" />
           <rect x="30" y="70" width="60" height="6" rx="3" fill="currentColor" opacity="0.14" />
         </>
       ) : null}
       {variant === 'tools' ? (
         <>
-          <rect x="34" y="30" width="52" height="36" rx="8" fill="url(#cdl-illus-accent)" opacity="0.78" />
+          <rect
+            x="34"
+            y="30"
+            width="52"
+            height="36"
+            rx="8"
+            fill="url(#cdl-illus-accent)"
+            opacity="0.78"
+          />
           <rect x="42" y="38" width="18" height="6" rx="2" fill="#fff" opacity="0.9" />
           <rect x="42" y="48" width="28" height="4" rx="2" fill="#fff" opacity="0.55" />
         </>
@@ -83,7 +93,15 @@ export function CdlEmptyIllustration({ variant = 'generic', className = '' }: Il
       ) : null}
       {variant === 'generic' ? (
         <>
-          <rect x="30" y="30" width="60" height="40" rx="10" fill="url(#cdl-illus-accent)" opacity="0.72" />
+          <rect
+            x="30"
+            y="30"
+            width="60"
+            height="40"
+            rx="10"
+            fill="url(#cdl-illus-accent)"
+            opacity="0.72"
+          />
           <circle cx="46" cy="46" r="6" fill="#fff" opacity="0.9" />
           <rect x="56" y="42" width="24" height="4" rx="2" fill="#fff" opacity="0.7" />
           <rect x="56" y="50" width="16" height="4" rx="2" fill="#fff" opacity="0.45" />
@@ -93,10 +111,18 @@ export function CdlEmptyIllustration({ variant = 'generic', className = '' }: Il
   );
 }
 
-export function CdlGraphicMotif({ motif = 'pulse', className = '' }: { motif?: string; className?: string }) {
+export function CdlGraphicMotif({
+  motif = 'pulse',
+  className = '',
+}: {
+  motif?: string;
+  className?: string;
+}) {
   return (
     <svg
-      className={['cdl-graphic-motif', `cdl-graphic-motif--${motif}`, className].filter(Boolean).join(' ')}
+      className={['cdl-graphic-motif', `cdl-graphic-motif--${motif}`, className]
+        .filter(Boolean)
+        .join(' ')}
       viewBox="0 0 48 48"
       aria-hidden
     >

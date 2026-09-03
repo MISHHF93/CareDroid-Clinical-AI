@@ -94,7 +94,10 @@ describe('emergencyDisplayPrivacyPolicy', () => {
 
   it('requires central-node redaction for restricted and minimal read-only whiteboard privacy', () => {
     expect(
-      shouldRedactCentralNodeForDisplayPrivacy(CARE_DROID_SCREEN_MODES.readOnlyWhiteboard, 'minimal'),
+      shouldRedactCentralNodeForDisplayPrivacy(
+        CARE_DROID_SCREEN_MODES.readOnlyWhiteboard,
+        'minimal',
+      ),
     ).toBe(true);
     expect(
       shouldRedactCentralNodeForDisplayPrivacy(

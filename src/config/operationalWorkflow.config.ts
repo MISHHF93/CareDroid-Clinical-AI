@@ -135,7 +135,9 @@ const countByAction = (
     case 'dispatch-echo-delta':
       return Number(context.dispatch?.echoCount || 0) + Number(context.dispatch?.deltaCount || 0);
     case 'ed-readiness-overdue':
-      return Number(context.readiness?.overdueCount || 0) || Number(context.readiness?.pendingCount || 0);
+      return (
+        Number(context.readiness?.overdueCount || 0) || Number(context.readiness?.pendingCount || 0)
+      );
     case 'ack-critical-alerts':
       return Number(
         context.metrics?.unacknowledgedCriticalAlerts ?? context.metrics?.criticalAlerts ?? 0,
@@ -198,4 +200,3 @@ export function buildCommandCenterWorkflowActions(
     .sort((a, b) => Number(b.active) - Number(a.active) || a.priority - b.priority)
     .slice(0, limit);
 }
-

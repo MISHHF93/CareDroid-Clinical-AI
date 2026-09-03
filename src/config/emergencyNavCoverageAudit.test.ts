@@ -2,10 +2,7 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import {
-  auditEmergencyPipelineExposure,
-  auditNavCoverage,
-} from './emergencyPipelineModel';
+import { auditEmergencyPipelineExposure, auditNavCoverage } from './emergencyPipelineModel';
 import { EMERGENCY_OS_ROUTE_COMMANDS } from './commandPalette.config';
 import { PILOT_CUSTOMER_MODE } from './unified-navigation.config';
 

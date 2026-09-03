@@ -1,7 +1,4 @@
-import {
-  AUTOMATION_AUDIT_STATUSES,
-  logAutomationAuditEvent,
-} from '../data/automationAuditTrail';
+import { AUTOMATION_AUDIT_STATUSES, logAutomationAuditEvent } from '../data/automationAuditTrail';
 import { createAutomationAuditEvent } from './automationAuditApi';
 import { getTenantContext } from './tenantContextStore';
 
@@ -15,11 +12,11 @@ function resolveScope(scope: any = {}) {
     user: entity(scope.userId || tenantContext.userId, scope.userName || 'Current user'),
     tenant: entity(
       scope.tenantId || tenantContext.organizationId,
-      scope.tenantName || 'Current tenant'
+      scope.tenantName || 'Current tenant',
     ),
     workspace: entity(
       scope.workspaceId || tenantContext.workspaceId,
-      scope.workspaceName || 'Current workspace'
+      scope.workspaceName || 'Current workspace',
     ),
   };
 }
@@ -41,7 +38,10 @@ export function recordAutomationBlocked(event) {
     conditionsEvaluated: event.conditionsEvaluated || [{ label: event.reason, result: false }],
     actionSelected: event.actionSelected,
     ...scope,
-    aiInvolvement: event.aiInvolvement || { involved: false, summary: 'Rules-only automation gate.' },
+    aiInvolvement: event.aiInvolvement || {
+      involved: false,
+      summary: 'Rules-only automation gate.',
+    },
     toolCalled: event.toolCalled || 'none',
     backendEndpoint: event.backendEndpoint || 'none',
     status: AUTOMATION_AUDIT_STATUSES.BLOCKED,
@@ -54,14 +54,21 @@ export function recordAutomationBlocked(event) {
 export function recordAutomationFailure(event) {
   const scope = resolveScope(event.scope);
   const errorMessage =
-    event.error instanceof Error ? event.error.message : String(event.error || 'Automation failed.');
+    event.error instanceof Error
+      ? event.error.message
+      : String(event.error || 'Automation failed.');
 
   return persistOrFallback({
     triggerFired: event.triggerFired,
-    conditionsEvaluated: event.conditionsEvaluated || [{ label: 'Automation completed successfully', result: false }],
+    conditionsEvaluated: event.conditionsEvaluated || [
+      { label: 'Automation completed successfully', result: false },
+    ],
     actionSelected: event.actionSelected,
     ...scope,
-    aiInvolvement: event.aiInvolvement || { involved: false, summary: 'Rules-only automation path.' },
+    aiInvolvement: event.aiInvolvement || {
+      involved: false,
+      summary: 'Rules-only automation path.',
+    },
     toolCalled: event.toolCalled || 'none',
     backendEndpoint: event.backendEndpoint || 'none',
     status: AUTOMATION_AUDIT_STATUSES.FAILED,

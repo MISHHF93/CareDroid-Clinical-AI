@@ -23,7 +23,12 @@ function listSourceFiles(directory = srcRoot): string[] {
       files.push(...listSourceFiles(fullPath));
       continue;
     }
-    if (entry.isFile() && /\.(ts|tsx)$/.test(entry.name) && !entry.name.endsWith('.test.ts') && !entry.name.endsWith('.test.tsx')) {
+    if (
+      entry.isFile() &&
+      /\.(ts|tsx)$/.test(entry.name) &&
+      !entry.name.endsWith('.test.ts') &&
+      !entry.name.endsWith('.test.tsx')
+    ) {
       files.push(relative(srcRoot, fullPath).replace(/\\/g, '/'));
     }
   }

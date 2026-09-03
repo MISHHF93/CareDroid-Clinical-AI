@@ -3,8 +3,8 @@ import './QueueReasonBadge.css';
 
 export default function QueueReasonBadge({
   patient,
-  referrals = ([] as any[]),
-  staff = ([] as any[]),
+  referrals = [] as any[],
+  staff = [] as any[],
   compact = false,
   showAll = false,
 }) {
@@ -17,7 +17,10 @@ export default function QueueReasonBadge({
 
   if (showAll && reasons.length > 1) {
     return (
-      <span className="queue-reason-badge-group" aria-label={`Queue reasons: ${snapshot.labels.join(', ')}`}>
+      <span
+        className="queue-reason-badge-group"
+        aria-label={`Queue reasons: ${snapshot.labels.join(', ')}`}
+      >
         {reasons.map((reason) => (
           <span
             key={reason.id}
@@ -49,7 +52,12 @@ export default function QueueReasonBadge({
       title={[
         `Queue: ${primaryReason.label}`,
         primaryReason.staffDetail,
-        reasons.length > 1 ? `Also: ${reasons.slice(1).map((reason) => reason.label).join(', ')}` : null,
+        reasons.length > 1
+          ? `Also: ${reasons
+              .slice(1)
+              .map((reason) => reason.label)
+              .join(', ')}`
+          : null,
       ]
         .filter(Boolean)
         .join(' · ')}

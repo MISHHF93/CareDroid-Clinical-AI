@@ -8,7 +8,13 @@ export const DOCUMENTATION_NOTE_TYPES = Object.freeze([
   {
     id: 'history-physical',
     label: 'H&P note',
-    sections: ['Chief concern', 'History of present illness', 'Past history', 'Exam', 'Assessment and plan'],
+    sections: [
+      'Chief concern',
+      'History of present illness',
+      'Past history',
+      'Exam',
+      'Assessment and plan',
+    ],
     exportTitle: 'History and Physical Note',
   },
   {
@@ -20,19 +26,38 @@ export const DOCUMENTATION_NOTE_TYPES = Object.freeze([
   {
     id: 'discharge-summary',
     label: 'Discharge summary',
-    sections: ['Hospital course', 'Discharge diagnoses', 'Medications', 'Follow-up', 'Patient instructions'],
+    sections: [
+      'Hospital course',
+      'Discharge diagnoses',
+      'Medications',
+      'Follow-up',
+      'Patient instructions',
+    ],
     exportTitle: 'Discharge Summary',
   },
   {
     id: 'consultation',
     label: 'Consultation note',
-    sections: ['Reason for consult', 'Focused history', 'Assessment', 'Recommendations', 'Communication'],
+    sections: [
+      'Reason for consult',
+      'Focused history',
+      'Assessment',
+      'Recommendations',
+      'Communication',
+    ],
     exportTitle: 'Consultation Note',
   },
   {
     id: 'procedure',
     label: 'Procedure note',
-    sections: ['Indication', 'Consent', 'Procedure details', 'Findings', 'Complications', 'Post-procedure plan'],
+    sections: [
+      'Indication',
+      'Consent',
+      'Procedure details',
+      'Findings',
+      'Complications',
+      'Post-procedure plan',
+    ],
     exportTitle: 'Procedure Note',
   },
 ]);
@@ -41,7 +66,8 @@ export const DOCUMENTATION_AI_ACTIONS = Object.freeze([
   {
     id: 'draft-note',
     label: 'Draft note',
-    instruction: 'Draft a clinician-review-required note using the selected note type and section structure.',
+    instruction:
+      'Draft a clinician-review-required note using the selected note type and section structure.',
   },
   {
     id: 'summarize-encounter',
@@ -67,11 +93,15 @@ export const DEFAULT_DOCUMENTATION_CONTEXT = Object.freeze({
 });
 
 export function getDocumentationNoteType(noteTypeId) {
-  return DOCUMENTATION_NOTE_TYPES.find((type) => type.id === noteTypeId) || DOCUMENTATION_NOTE_TYPES[0];
+  return (
+    DOCUMENTATION_NOTE_TYPES.find((type) => type.id === noteTypeId) || DOCUMENTATION_NOTE_TYPES[0]
+  );
 }
 
 export function getDocumentationAiAction(actionId) {
-  return DOCUMENTATION_AI_ACTIONS.find((action) => action.id === actionId) || DOCUMENTATION_AI_ACTIONS[0];
+  return (
+    DOCUMENTATION_AI_ACTIONS.find((action) => action.id === actionId) || DOCUMENTATION_AI_ACTIONS[0]
+  );
 }
 
 export function buildDocumentationAssistantPrompt({
@@ -112,7 +142,7 @@ export function buildLocalDocumentationDraft({
     noteType.sections.map((section) => [
       section,
       `${section}: ${encounterDetails || patientContext || 'Add reviewed clinical details before chart use.'}`,
-    ])
+    ]),
   );
 
   if (action.id === 'summarize-encounter') {

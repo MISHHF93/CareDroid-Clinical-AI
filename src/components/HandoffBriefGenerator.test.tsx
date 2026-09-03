@@ -33,7 +33,8 @@ vi.mock('../store/emergencyStore', () => {
   const useEmergencyStoreMock = ((selector: (state: Record<string, unknown>) => unknown) =>
     selector(emergencyStoreMock.state)) as unknown as typeof useEmergencyStore;
 
-  useEmergencyStoreMock.getState = (() => emergencyStoreMock.state) as unknown as typeof useEmergencyStore.getState;
+  useEmergencyStoreMock.getState = (() =>
+    emergencyStoreMock.state) as unknown as typeof useEmergencyStore.getState;
   useEmergencyStoreMock.setState = ((patch: Record<string, unknown>, replace?: boolean) => {
     emergencyStoreMock.state = replace ? patch : { ...emergencyStoreMock.state, ...patch };
   }) as unknown as typeof useEmergencyStore.setState;
@@ -42,10 +43,12 @@ vi.mock('../store/emergencyStore', () => {
 });
 
 function setMockEmergencyStore(patch: Record<string, unknown>, replace = false): void {
-  (useEmergencyStore.setState as unknown as (next: Record<string, unknown>, replace?: boolean) => void)(
-    patch,
-    replace,
-  );
+  (
+    useEmergencyStore.setState as unknown as (
+      next: Record<string, unknown>,
+      replace?: boolean,
+    ) => void
+  )(patch, replace);
 }
 
 const shift: ActiveShift = {
@@ -215,7 +218,11 @@ describe('HandoffBriefGenerator', () => {
         notes: [
           { id: 'n1', body: 'First note.', createdAt: '2026-06-13T15:01:00.000Z' },
           { id: 'n2', body: 'Second note.', createdAt: '2026-06-13T15:02:00.000Z' },
-          { id: 'n3', text: 'Third note (uses text field).', createdAt: '2026-06-13T15:03:00.000Z' },
+          {
+            id: 'n3',
+            text: 'Third note (uses text field).',
+            createdAt: '2026-06-13T15:03:00.000Z',
+          },
           { id: 'n4', body: 'Fourth and most recent note.', createdAt: '2026-06-13T15:04:00.000Z' },
         ],
       }),
@@ -250,7 +257,9 @@ describe('HandoffBriefGenerator', () => {
       now: new Date('2026-06-13T16:00:00.000Z'),
     });
 
-    expect(context.highRiskPatients.every((patient) => patient.recentNotes.length === 0)).toBe(true);
+    expect(context.highRiskPatients.every((patient) => patient.recentNotes.length === 0)).toBe(
+      true,
+    );
   });
 
   it('counts characters and words for generated or edited text', () => {
@@ -273,7 +282,9 @@ describe('HandoffBriefGenerator', () => {
     expect(request.requestType).toBe('HANDOFF_BRIEF');
     expect(request.systemPrompt).toContain('Never fabricate clinical details');
     expect(request.systemPrompt).toContain('SHIFT HANDOFF');
-    expect(request.message).toBe(`Generate a handoff brief from this data:\n${JSON.stringify(context, null, 2)}`);
+    expect(request.message).toBe(
+      `Generate a handoff brief from this data:\n${JSON.stringify(context, null, 2)}`,
+    );
     expect(request.context).toEqual(
       expect.objectContaining({
         aiRequest: expect.objectContaining({

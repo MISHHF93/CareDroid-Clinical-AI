@@ -35,7 +35,13 @@ const DEFAULT_DISCOVERY_PROFILE = Object.freeze({
   department: 'inpatient',
   workspace: 'all',
   permissionLevel: 'learner',
-  permissions: ['USE_CALCULATORS', 'USE_DRUG_CHECKER', 'USE_LAB_INTERPRETER', 'USE_PROTOCOLS', 'USE_AI_CHAT'],
+  permissions: [
+    'USE_CALCULATORS',
+    'USE_DRUG_CHECKER',
+    'USE_LAB_INTERPRETER',
+    'USE_PROTOCOLS',
+    'USE_AI_CHAT',
+  ],
   preferredTools: [],
   recentTools: [],
   pinnedTools: [],
@@ -139,17 +145,15 @@ function buildSimulationItems(profile, limit = 8) {
 }
 
 function buildProtocolItems(profile, limit = 8) {
-  return PROTOCOL_PATHWAYS
-    .slice(0, limit)
-    .map((protocol) => ({
-      id: protocol.id,
-      title: protocol.title,
-      description: protocol.summary,
-      category: protocol.category,
-      path: '/protocols',
-      reason: `${protocol.currentVersion} · ${protocol.linkedCalculators.length} calculators · ${protocol.linkedSimulations.length} simulations`,
-      source: 'protocol-pathway-library',
-    }));
+  return PROTOCOL_PATHWAYS.slice(0, limit).map((protocol) => ({
+    id: protocol.id,
+    title: protocol.title,
+    description: protocol.summary,
+    category: protocol.category,
+    path: '/protocols',
+    reason: `${protocol.currentVersion} · ${protocol.linkedCalculators.length} calculators · ${protocol.linkedSimulations.length} simulations`,
+    source: 'protocol-pathway-library',
+  }));
 }
 
 export function buildCapabilityDiscovery({
@@ -162,7 +166,11 @@ export function buildCapabilityDiscovery({
   const effectiveTools = compiled?.tools.visible?.length ? compiled.tools.visible : tools;
   const effectiveProfile = compiled?.segmentationProfile || profile;
   const graph = buildProfileToolGraph({ tools: effectiveTools, profile: effectiveProfile });
-  const recommendedFromProfile = getProfileAssistantRecommendations(effectiveProfile, effectiveTools, 8)
+  const recommendedFromProfile = getProfileAssistantRecommendations(
+    effectiveProfile,
+    effectiveTools,
+    8,
+  )
     .map((item) => findTool(graph.visibleTools, item.toolId))
     .filter(Boolean)
     .map((tool) => normalizeTool(tool, `${effectiveProfile.role || profile.role} profile match`));
@@ -177,37 +185,37 @@ export function buildCapabilityDiscovery({
       DISCOVERY_SECTION_IDS.NEW_TOOLS,
       'New tools',
       'Recently added CareDroid capabilities you may not have seen yet.',
-      buildNewTools(tools)
+      buildNewTools(tools),
     ),
     makeSection(
       DISCOVERY_SECTION_IDS.RECOMMENDED_TOOLS,
       'Recommended tools',
       'Personalized from your role, specialty, workspace, pinned tools, and recent activity.',
-      recommendedFromProfile
+      recommendedFromProfile,
     ),
     makeSection(
       DISCOVERY_SECTION_IDS.UNDERUSED_TOOLS,
       'Underused tools',
       'Relevant capabilities that are not showing up in your recent tool history.',
-      buildUnderusedTools(graph, recentToolIds)
+      buildUnderusedTools(graph, recentToolIds),
     ),
     makeSection(
       DISCOVERY_SECTION_IDS.SIMULATIONS,
       'Simulations',
       'Training scenarios matched to your clinical or operational profile.',
-      buildSimulationItems(effectiveProfile)
+      buildSimulationItems(effectiveProfile),
     ),
     makeSection(
       DISCOVERY_SECTION_IDS.WORKFLOWS,
       'Workflows',
       'Guided assistants, dashboards, and operational flows that connect multiple platform modules.',
-      workflowTools
+      workflowTools,
     ),
     makeSection(
       DISCOVERY_SECTION_IDS.PROTOCOLS,
       'Protocols',
       'Clinical pathways with linked calculators, simulations, and explanation support.',
-      buildProtocolItems(effectiveProfile)
+      buildProtocolItems(effectiveProfile),
     ),
   ];
 
@@ -217,11 +225,21 @@ export function buildCapabilityDiscovery({
     sections,
     summary: {
       totalItems: sections.reduce((total, section) => total + section.items.length, 0),
-      recommended: sections.find((section) => section.id === DISCOVERY_SECTION_IDS.RECOMMENDED_TOOLS)?.items.length || 0,
-      underused: sections.find((section) => section.id === DISCOVERY_SECTION_IDS.UNDERUSED_TOOLS)?.items.length || 0,
-      simulations: sections.find((section) => section.id === DISCOVERY_SECTION_IDS.SIMULATIONS)?.items.length || 0,
-      workflows: sections.find((section) => section.id === DISCOVERY_SECTION_IDS.WORKFLOWS)?.items.length || 0,
-      protocols: sections.find((section) => section.id === DISCOVERY_SECTION_IDS.PROTOCOLS)?.items.length || 0,
+      recommended:
+        sections.find((section) => section.id === DISCOVERY_SECTION_IDS.RECOMMENDED_TOOLS)?.items
+          .length || 0,
+      underused:
+        sections.find((section) => section.id === DISCOVERY_SECTION_IDS.UNDERUSED_TOOLS)?.items
+          .length || 0,
+      simulations:
+        sections.find((section) => section.id === DISCOVERY_SECTION_IDS.SIMULATIONS)?.items
+          .length || 0,
+      workflows:
+        sections.find((section) => section.id === DISCOVERY_SECTION_IDS.WORKFLOWS)?.items.length ||
+        0,
+      protocols:
+        sections.find((section) => section.id === DISCOVERY_SECTION_IDS.PROTOCOLS)?.items.length ||
+        0,
     },
   };
 }
@@ -255,7 +273,7 @@ export function getCareDroidDidYouKnowSuggestions({
           profile?.role,
           profile?.specialty,
         ],
-      }))
+      })),
     )
     .slice(0, limit);
 }

@@ -39,7 +39,7 @@ describe('emergency critical care calculators', () => {
         respiratoryRate: false,
         bloodPressure: false,
         age65: false,
-      })
+      }),
     ).toBe(2);
     expect(interpretCurb65Score(1).riskCategory).toBe('low');
     expect(interpretCurb65Score(2).riskCategory).toBe('moderate');
@@ -76,7 +76,15 @@ describe('emergency critical care calculators', () => {
   });
 
   it('validates MEWS required fields and computes score ranges', () => {
-    expect(validateMewsInputs({ respiratoryRate: '', heartRate: '', systolicBp: '', temperature: '', avpu: '' }).ok).toBe(false);
+    expect(
+      validateMewsInputs({
+        respiratoryRate: '',
+        heartRate: '',
+        systolicBp: '',
+        temperature: '',
+        avpu: '',
+      }).ok,
+    ).toBe(false);
     const breakdown = computeMewsBreakdown({
       respiratoryRate: 32,
       heartRate: 120,
@@ -111,12 +119,13 @@ describe('emergency critical care calculators', () => {
         respiratory: 1,
         nebulizer: 0,
         vomiting: 0,
-      })
+      }),
     ).toBe(4);
     const pews2 = interpretPewsScore(2);
     const pews3 = interpretPewsScore(3);
     const pews4 = interpretPewsScore(4);
-    if (!pews2 || !pews3 || !pews4) throw new Error('expected interpretPewsScore to return a result');
+    if (!pews2 || !pews3 || !pews4)
+      throw new Error('expected interpretPewsScore to return a result');
     expect(pews2.riskCategory).toBe('low');
     expect(pews3.riskCategory).toBe('medium');
     expect(pews4.warnings.join(' ')).toMatch(/Pediatric caution/i);

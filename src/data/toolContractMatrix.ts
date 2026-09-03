@@ -9,9 +9,7 @@ import {
   deriveContractStatus,
   getContractGaps,
 } from './backendFrontendToolContract';
-import {
-  ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS,
-} from './clinicalToolIdContract';
+import { ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS } from './clinicalToolIdContract';
 import { clinicalIntentTools } from './clinicalIntentToolCatalog';
 import toolRegistry from './toolRegistry';
 import {
@@ -97,7 +95,7 @@ const MATRIX_HEADERS = [
  */
 export function formatToolContractMatrixMarkdown(
   rows = buildToolContractMatrixRows(),
-  gaps = getContractGaps()
+  gaps = getContractGaps(),
 ) {
   const generatedAt = new Date().toISOString();
   const statusCounts = rows.reduce((acc, r) => {
@@ -138,7 +136,7 @@ export function formatToolContractMatrixMarkdown(
     '| Classification | Count |',
     '|----------------|------:|',
     ...Object.values(BACKEND_FRONTEND_CAPABILITY_CLASSIFICATIONS).map(
-      (classification) => `| ${classification} | ${capabilityCounts[classification] ?? 0} |`
+      (classification) => `| ${classification} | ${capabilityCounts[classification] ?? 0} |`,
     ),
     '',
     '## Status definitions',
@@ -154,7 +152,7 @@ export function formatToolContractMatrixMarkdown(
     '## POST executors',
     '',
     ...ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS.map(
-      (id) => `- \`${id}\` → \`POST /api/tools/${id}/execute\``
+      (id) => `- \`${id}\` → \`POST /api/tools/${id}/execute\``,
     ),
     '',
     '## Full matrix',
@@ -178,7 +176,7 @@ export function formatToolContractMatrixMarkdown(
         mdCell(row.dto),
         mdCell(row.apiClient),
         mdCell(row.status),
-      ].join(' | ')} |`
+      ].join(' | ')} |`,
     );
   }
 
@@ -215,7 +213,7 @@ export function formatToolContractMatrixMarkdown(
     'npm run contract:write-docs',
     'npm run test:contract-matrix',
     '```',
-    ''
+    '',
   );
 
   return lines.join('\n');

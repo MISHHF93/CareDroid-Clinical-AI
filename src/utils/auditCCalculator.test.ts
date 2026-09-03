@@ -79,7 +79,8 @@ describe('auditCCalculator — interpretation', () => {
     if (!('totalScore' in out)) throw new Error('expected computeAuditCResult to succeed');
     expect(out.totalScore).toBe(11);
     expect(out.screeningResult).toBe('positive_men');
-    const combined = `${out.screeningDiscussion} ${out.pathwayDisclaimer} ${out.screeningDisclaimer}`.toLowerCase();
+    const combined =
+      `${out.screeningDiscussion} ${out.pathwayDisclaimer} ${out.screeningDisclaimer}`.toLowerCase();
     expect(combined).not.toMatch(/\bdetox\b/);
     expect(combined).not.toMatch(/\bdiagnosed with alcohol use disorder\b/);
     expect(out.screeningDisclaimer).toMatch(/^Screening only\./i);

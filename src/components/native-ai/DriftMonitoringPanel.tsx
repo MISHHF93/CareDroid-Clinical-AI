@@ -62,7 +62,8 @@ function coerceDriftReport(envelope: unknown): DriftReport | null {
       payload.confidenceDistributionShift ?? fallback.confidenceDistributionShift,
     ),
     summary,
-    generatedAt: typeof payload.generatedAt === 'string' ? payload.generatedAt : fallback.generatedAt,
+    generatedAt:
+      typeof payload.generatedAt === 'string' ? payload.generatedAt : fallback.generatedAt,
     alerts,
   };
 }
@@ -93,9 +94,7 @@ export default function DriftMonitoringPanel({ className = '' }: DriftMonitoring
         : buildContinualLearningSummary(),
     );
     setRetrainingAlerts(
-      Array.isArray(payload?.retrainingAlerts)
-        ? payload.retrainingAlerts
-        : listRetrainingAlerts(),
+      Array.isArray(payload?.retrainingAlerts) ? payload.retrainingAlerts : listRetrainingAlerts(),
     );
     setSource(sourceLabel);
     return true;
@@ -148,7 +147,8 @@ export default function DriftMonitoringPanel({ className = '' }: DriftMonitoring
           <p className="drift-monitoring-panel__eyebrow">Continual learning</p>
           <h3>Model Drift Monitoring</h3>
           <p className="drift-monitoring-panel__subtitle">
-            Weekly F1/accuracy evaluation with &gt;5% drop triggering retraining review. Source: {source}.
+            Weekly F1/accuracy evaluation with &gt;5% drop triggering retraining review. Source:{' '}
+            {source}.
           </p>
         </div>
         <button type="button" onClick={handleEvaluate} disabled={evaluating}>
@@ -200,7 +200,9 @@ export default function DriftMonitoringPanel({ className = '' }: DriftMonitoring
                 <li key={alert.id} className={`drift-monitoring-panel__alert--${alert.severity}`}>
                   <strong>{alert.modelId}</strong>
                   <span>{alert.summary}</span>
-                  <small>{alert.severity} · {alert.sourceState}</small>
+                  <small>
+                    {alert.severity} · {alert.sourceState}
+                  </small>
                   <AiTruthLabel
                     {...fromNativeAiSourceState(alert.sourceState, {
                       sourceContext:
@@ -229,7 +231,8 @@ export default function DriftMonitoringPanel({ className = '' }: DriftMonitoring
                   <strong>{alert.modelId}</strong>
                   <span>{alert.reason}</span>
                   <small>
-                    {alert.status} · proposed v{alert.proposedVersion} · rollback v{alert.rollbackVersion}
+                    {alert.status} · proposed v{alert.proposedVersion} · rollback v
+                    {alert.rollbackVersion}
                   </small>
                 </li>
               ))}

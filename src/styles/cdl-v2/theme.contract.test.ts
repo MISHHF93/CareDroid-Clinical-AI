@@ -25,7 +25,7 @@ const REQUIRED = [
 
 describe('CDL v2 theme contract', () => {
   it('loads theme.css in the cdl-v2 entry', () => {
-    expect(indexCss).toContain("theme.css");
+    expect(indexCss).toContain('theme.css');
   });
 
   it('defines dual-mode selectors', () => {
@@ -58,7 +58,9 @@ describe('CDL v2 theme contract', () => {
     expect(themeInit).toContain('caredroid-theme-preference');
     expect(themeInit).toContain('system');
     expect(themeInit).toContain('matchMedia');
-    expect(themeInit).not.toMatch(/const STANDARD_THEME = 'light';\s*\n\s*document\.documentElement\.dataset\.theme = STANDARD_THEME/);
+    expect(themeInit).not.toMatch(
+      /const STANDARD_THEME = 'light';\s*\n\s*document\.documentElement\.dataset\.theme = STANDARD_THEME/,
+    );
   });
 
   it('compat aliases medical/app text to CDL ink', () => {

@@ -76,6 +76,8 @@ describe('wallDisplayMonitorPrivacyModel', () => {
   it('buckets longest wait under minimal privacy', () => {
     const snapshot = applyWallDisplayMonitorPrivacy(baseSnapshot, 'minimal');
     expect(snapshot.metrics.find((metric) => metric.id === 'longest-wait')?.value).toBe('1–2 hr');
-    expect(snapshot.metrics.find((metric) => metric.id === 'capacity-status')?.value).toBe('Orange');
+    expect(snapshot.metrics.find((metric) => metric.id === 'capacity-status')?.value).toBe(
+      'Orange',
+    );
   });
 });

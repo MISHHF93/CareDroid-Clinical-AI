@@ -59,7 +59,11 @@ export type MatchMethod =
   | 'fuzzy'
   | 'none';
 
-export type ConfidenceTier = 'HIGH_CONFIDENCE' | 'MEDIUM_CONFIDENCE' | 'LOW_CONFIDENCE' | 'NO_MATCH';
+export type ConfidenceTier =
+  | 'HIGH_CONFIDENCE'
+  | 'MEDIUM_CONFIDENCE'
+  | 'LOW_CONFIDENCE'
+  | 'NO_MATCH';
 
 export interface ComplaintCandidate {
   conceptId: string;

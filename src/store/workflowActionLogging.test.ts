@@ -114,7 +114,7 @@ describe('CareDroid workflow action logging', () => {
         expect.objectContaining({ type: 'copilot_used' }),
         expect.objectContaining({ type: 'provincial_data_viewed', patientId: patient.id }),
         expect.objectContaining({ type: 'integration_event_received' }),
-      ])
+      ]),
     );
     const patientTimeline = useEmergencyStore
       .getState()
@@ -123,7 +123,7 @@ describe('CareDroid workflow action logging', () => {
       expect.arrayContaining([
         expect.objectContaining({ type: 'patient_created', patientId: patient.id }),
         expect.objectContaining({ type: 'referral_created', patientId: patient.id }),
-      ])
+      ]),
     );
   });
 });

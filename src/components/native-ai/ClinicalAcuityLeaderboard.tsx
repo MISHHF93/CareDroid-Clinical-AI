@@ -40,12 +40,19 @@ export default function ClinicalAcuityLeaderboard({
         <h3>Clinical Acuity Leaderboard</h3>
         <p className="clinical-acuity-leaderboard__subtitle">
           Triage level + admission likelihood + prolonged-stay risk + orientation signal.
-          {dataSource === 'api' ? ' · Backend scores' : dataSource === 'loading' ? ' · Loading…' : ' · Local scores'}
+          {dataSource === 'api'
+            ? ' · Backend scores'
+            : dataSource === 'loading'
+              ? ' · Loading…'
+              : ' · Local scores'}
         </p>
       </header>
 
       <div className="clinical-acuity-leaderboard__table" role="table">
-        <div className="clinical-acuity-leaderboard__row clinical-acuity-leaderboard__row--head" role="row">
+        <div
+          className="clinical-acuity-leaderboard__row clinical-acuity-leaderboard__row--head"
+          role="row"
+        >
           <span role="columnheader">Patient</span>
           <span role="columnheader">Acuity</span>
           <span role="columnheader">Triage</span>

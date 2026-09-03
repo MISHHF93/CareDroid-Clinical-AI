@@ -77,9 +77,8 @@ describe('alarmVisualModel', () => {
   });
 
   it('maps danger/red/band colors and surface helpers', async () => {
-    const { alarmSurfaceClassNames, alarmSeverityBadge, resolveAlarmSeverity } = await import(
-      './alarmVisualModel'
-    );
+    const { alarmSurfaceClassNames, alarmSeverityBadge, resolveAlarmSeverity } =
+      await import('./alarmVisualModel');
     expect(resolveAlarmSeverity('danger')).toBe('critical');
     expect(resolveAlarmSeverity('Red')).toBe('critical');
     expect(resolveAlarmSeverity('Yellow')).toBe('warning');

@@ -13,16 +13,16 @@ function PhaseBadge({ phase }) {
 }
 
 export default function EmsOffloadTrackerPanel({
-  emsArrivals = ([] as any[]),
-  patients = ([] as any[]),
-  staff = ([] as any[]),
-  rooms = ([] as any[]),
+  emsArrivals = [] as any[],
+  patients = [] as any[],
+  staff = [] as any[],
+  rooms = [] as any[],
   offloadTargetMinutes = 15,
   compact = false,
   title = 'EMS Offload Tracker',
   subtitle = 'Dispatch ETA, arrival, triage handoff, offload delay, bay, and owner.',
   onSelectPatient,
-  onSelectArrival = (undefined as any),
+  onSelectArrival = undefined as any,
   className = '',
 }) {
   const summary = useMemo(
@@ -67,7 +67,11 @@ export default function EmsOffloadTrackerPanel({
             {summary.awaitingOffloadCount} awaiting offload
           </span>
           {summary.averageOffloadMinutes ? (
-            <span data-tone={summary.averageOffloadMinutes >= offloadTargetMinutes ? 'critical' : 'watch'}>
+            <span
+              data-tone={
+                summary.averageOffloadMinutes >= offloadTargetMinutes ? 'critical' : 'watch'
+              }
+            >
               Avg {summary.averageOffloadMinutes}m
             </span>
           ) : null}

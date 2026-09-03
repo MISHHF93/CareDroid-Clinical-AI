@@ -2,7 +2,12 @@
  * Canonical color schema registry — single source for TS/TSX inline styles.
  * CSS should prefer --app-* / --medical-* / --semantic-* from design-system.css.
  */
-import { MEDICAL_CARD, MEDICAL_THEME, MEDICAL_TYPE, medicalAccentPanelStyle } from './medicalTheme.constants';
+import {
+  MEDICAL_CARD,
+  MEDICAL_THEME,
+  MEDICAL_TYPE,
+  medicalAccentPanelStyle,
+} from './medicalTheme.constants';
 
 /** CSS custom property names (use in style objects as `var(--app-fg-muted)`). */
 export const COLOR_CSS_VARS = Object.freeze({

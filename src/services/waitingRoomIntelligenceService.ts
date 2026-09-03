@@ -20,13 +20,18 @@ function getRiskState(score) {
 export const WaitingRoomIntelligenceService = Object.freeze({
   getWaitingRoomDashboard(queueState: any = undefined) {
     const queueDashboard = QueueIntelligenceService.getQueueDashboard(queueState);
-    const waitingRoom: any = queueDashboard.queues.find((queue) => queue.id === 'waiting-room') || {};
+    const waitingRoom: any =
+      queueDashboard.queues.find((queue) => queue.id === 'waiting-room') || {};
     const reassessment = ReassessmentAutomationService.getDashboard();
-    const waitPressure = Math.max(0, (waitingRoom.waitTime || 0) - (waitingRoom.targetWaitMinutes || 20)) * 1.6;
+    const waitPressure =
+      Math.max(0, (waitingRoom.waitTime || 0) - (waitingRoom.targetWaitMinutes || 20)) * 1.6;
     const countPressure = (waitingRoom.count || 0) * 1.7;
     const oldestPressure = Math.max(0, (waitingRoom.oldestPatient?.waitMinutes || 0) - 45) * 0.7;
-    const reassessmentPressure = reassessment.metrics.total * 8 + reassessment.metrics.critical * 10;
-    const healthScore = clampScore(countPressure + waitPressure + oldestPressure + reassessmentPressure);
+    const reassessmentPressure =
+      reassessment.metrics.total * 8 + reassessment.metrics.critical * 10;
+    const healthScore = clampScore(
+      countPressure + waitPressure + oldestPressure + reassessmentPressure,
+    );
     const riskState = getRiskState(healthScore);
 
     return Object.freeze({
@@ -61,7 +66,8 @@ export const WaitingRoomIntelligenceService = Object.freeze({
           rationale: `${waitingRoom.count || 0} patients waiting, oldest wait ${
             waitingRoom.oldestPatient?.waitMinutes || 0
           } minutes, ${reassessment.metrics.total} reassessment recommendations.`,
-          action: 'Review waiting-room patient count, stale reassessments, triage pace, and provider queue capacity.',
+          action:
+            'Review waiting-room patient count, stale reassessments, triage pace, and provider queue capacity.',
         }),
       ]),
       sourceState: 'Demo data · No live integration',

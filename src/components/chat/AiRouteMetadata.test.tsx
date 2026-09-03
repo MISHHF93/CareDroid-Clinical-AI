@@ -56,7 +56,7 @@ describe('AiRouteMetadata', () => {
 
   it('does not render when metadata is absent', () => {
     const { container } = render(
-      <AiRouteMetadata {...({} as unknown as React.ComponentProps<typeof AiRouteMetadata>)} />
+      <AiRouteMetadata {...({} as unknown as React.ComponentProps<typeof AiRouteMetadata>)} />,
     );
 
     expect(container).toBeEmptyDOMElement();
@@ -81,7 +81,7 @@ describe('AiRouteMetadata', () => {
             },
           },
         } as unknown as React.ComponentProps<typeof AiRouteMetadata>)}
-      />
+      />,
     );
 
     const panel = screen.getByLabelText(/ai routing metadata/i);

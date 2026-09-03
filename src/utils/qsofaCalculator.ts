@@ -23,9 +23,20 @@ export function calculateQsofaScore(criteria) {
  * @param {{ respiratoryRate: string|number, systolicBloodPressure: string|number, alteredMentation: boolean, gcs: string|number }} raw
  */
 export function qsofaCriteriaFromInputs(raw) {
-  const rr = typeof raw.respiratoryRate === 'string' ? parseFloat(raw.respiratoryRate) : Number(raw.respiratoryRate);
-  const sbp = typeof raw.systolicBloodPressure === 'string' ? parseFloat(raw.systolicBloodPressure) : Number(raw.systolicBloodPressure);
-  const gcsRaw = raw.gcs === '' || raw.gcs === undefined || raw.gcs === null ? null : typeof raw.gcs === 'string' ? parseFloat(raw.gcs) : Number(raw.gcs);
+  const rr =
+    typeof raw.respiratoryRate === 'string'
+      ? parseFloat(raw.respiratoryRate)
+      : Number(raw.respiratoryRate);
+  const sbp =
+    typeof raw.systolicBloodPressure === 'string'
+      ? parseFloat(raw.systolicBloodPressure)
+      : Number(raw.systolicBloodPressure);
+  const gcsRaw =
+    raw.gcs === '' || raw.gcs === undefined || raw.gcs === null
+      ? null
+      : typeof raw.gcs === 'string'
+        ? parseFloat(raw.gcs)
+        : Number(raw.gcs);
 
   const respiratoryRateGte22 = Number.isFinite(rr) && rr >= 22;
   const systolicBpLte100 = Number.isFinite(sbp) && sbp <= 100;
@@ -75,8 +86,12 @@ export function interpretQsofaScore(score) {
  */
 export function validateQsofaInputs(raw) {
   const errors = [] as any[];
-  const rr = typeof raw.respiratoryRate === 'string' ? raw.respiratoryRate.trim() : raw.respiratoryRate;
-  const sbp = typeof raw.systolicBloodPressure === 'string' ? raw.systolicBloodPressure.trim() : raw.systolicBloodPressure;
+  const rr =
+    typeof raw.respiratoryRate === 'string' ? raw.respiratoryRate.trim() : raw.respiratoryRate;
+  const sbp =
+    typeof raw.systolicBloodPressure === 'string'
+      ? raw.systolicBloodPressure.trim()
+      : raw.systolicBloodPressure;
   const gcsStr = raw.gcs === undefined || raw.gcs === null ? '' : String(raw.gcs).trim();
 
   if (rr === '' || Number.isNaN(parseFloat(rr))) {

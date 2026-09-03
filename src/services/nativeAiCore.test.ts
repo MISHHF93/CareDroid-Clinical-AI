@@ -46,9 +46,7 @@ describe('buildNativeAiPatientSnapshot sourceState honesty (2026-08-07, extended
     expect(snapshot.sourceState).toBe('live');
     expect(snapshot.routing.sourceState).toBe('demo');
     expect(snapshot.triageInference.sourceState).toBe('demo');
-    expect(snapshot.specialistInferences.every((entry) => entry.sourceState === 'demo')).toBe(
-      true,
-    );
+    expect(snapshot.specialistInferences.every((entry) => entry.sourceState === 'demo')).toBe(true);
     expect(snapshot.orientation.sourceState).toBe('demo');
     expect(snapshot.prolongedStay.sourceState).toBe('demo');
     expect(snapshot.admissionMl.sourceState).toBe('demo');
@@ -61,9 +59,9 @@ describe('buildNativeAiPatientSnapshot sourceState honesty (2026-08-07, extended
     expect(snapshot.sourceState).toBe('simulated');
     expect(snapshot.routing.sourceState).toBe('simulated');
     expect(snapshot.triageInference.sourceState).toBe('simulated');
-    expect(
-      snapshot.specialistInferences.every((entry) => entry.sourceState === 'simulated'),
-    ).toBe(true);
+    expect(snapshot.specialistInferences.every((entry) => entry.sourceState === 'simulated')).toBe(
+      true,
+    );
     expect(snapshot.orientation.sourceState).toBe('simulated');
     expect(snapshot.prolongedStay.sourceState).toBe('simulated');
     expect(snapshot.admissionMl.sourceState).toBe('simulated');
@@ -76,9 +74,7 @@ describe('buildNativeAiPatientSnapshot sourceState honesty (2026-08-07, extended
     expect(snapshot.sourceState).toBe('shadow');
     expect(snapshot.routing.sourceState).toBe('demo');
     expect(snapshot.triageInference.sourceState).toBe('demo');
-    expect(snapshot.specialistInferences.every((entry) => entry.sourceState === 'demo')).toBe(
-      true,
-    );
+    expect(snapshot.specialistInferences.every((entry) => entry.sourceState === 'demo')).toBe(true);
     expect(snapshot.orientation.sourceState).toBe('demo');
     expect(snapshot.prolongedStay.sourceState).toBe('demo');
     expect(snapshot.admissionMl.sourceState).toBe('demo');

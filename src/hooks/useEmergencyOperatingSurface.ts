@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { fetchEmergencyOperatingSurface, type OperatingSurfaceId } from '../services/emergencyOsApi';
+import {
+  fetchEmergencyOperatingSurface,
+  type OperatingSurfaceId,
+} from '../services/emergencyOsApi';
 import { useEmergencyStore } from '../store/emergencyStore';
 
 export type OperatingSurfaceEnvelope = {
@@ -44,7 +47,9 @@ export default function useEmergencyOperatingSurface(
       setError(null);
     } catch (refreshError: unknown) {
       setApiEnvelope(null);
-      setError(refreshError instanceof Error ? refreshError.message : 'Operating surface unavailable');
+      setError(
+        refreshError instanceof Error ? refreshError.message : 'Operating surface unavailable',
+      );
     } finally {
       setLoading(false);
     }

@@ -8,7 +8,12 @@ import {
 
 const inventory = [
   { id: 'qsofa', name: 'qSOFA', category: 'Calculator', presentationCategory: 'Calculator' },
-  { id: 'documentation', name: 'Documentation', category: 'Reference', launchType: 'clinical-page' },
+  {
+    id: 'documentation',
+    name: 'Documentation',
+    category: 'Reference',
+    launchType: 'clinical-page',
+  },
   { id: 'simulation-suite', name: 'Simulation Suite', category: 'Education & Simulation' },
   { id: 'dashboard-a', name: 'Dashboard A', category: 'Hospital Operations' },
   { id: 'orphan-tool', name: 'Orphan Tool', category: 'Reference' },
@@ -33,7 +38,9 @@ describe('platformAnalytics', () => {
       count: 2,
       day: '2026-05-30',
     });
-    expect(Object.keys(safe)).not.toEqual(expect.arrayContaining(['userId', 'patientId', 'email', 'queryText']));
+    expect(Object.keys(safe)).not.toEqual(
+      expect.arrayContaining(['userId', 'patientId', 'email', 'queryText']),
+    );
   });
 
   it('builds usage dashboards, orphan tools, adoption trends, and feature engagement', () => {
@@ -42,7 +49,12 @@ describe('platformAnalytics', () => {
       events: [
         { eventType: 'calculator_usage', toolId: 'qsofa', count: 10, day: '2026-05-28' },
         { eventType: 'ai_launch', toolId: 'documentation', count: 4, day: '2026-05-29' },
-        { eventType: 'simulation_completion', toolId: 'simulation-suite', count: 3, day: '2026-05-29' },
+        {
+          eventType: 'simulation_completion',
+          toolId: 'simulation-suite',
+          count: 3,
+          day: '2026-05-29',
+        },
         { eventType: 'dashboard_activity', toolId: 'dashboard-a', count: 1, day: '2026-05-30' },
       ],
       searchEvents: [{ toolId: 'qsofa', count: 5, day: '2026-05-30', queryText: 'hidden' }],
@@ -58,7 +70,7 @@ describe('platformAnalytics', () => {
       '2026-05-30',
     ]);
     const searchActivityEvent = analytics.featureEngagement.find(
-      (event) => event.eventType === PLATFORM_ANALYTICS_EVENT_TYPES.SEARCH_ACTIVITY
+      (event) => event.eventType === PLATFORM_ANALYTICS_EVENT_TYPES.SEARCH_ACTIVITY,
     );
     if (!searchActivityEvent) throw new Error('expected a search_activity featureEngagement event');
     expect(searchActivityEvent.count).toBe(5);
@@ -73,7 +85,9 @@ describe('platformAnalytics', () => {
         { eventType: 'dashboard_activity', toolId: 'dashboard-a', count: 6, day: '2026-05-30' },
       ],
     });
-    const decisions = Object.fromEntries(analytics.decisions.map((row) => [row.toolId, row.decision]));
+    const decisions = Object.fromEntries(
+      analytics.decisions.map((row) => [row.toolId, row.decision]),
+    );
 
     expect(decisions.qsofa).toBe(PLATFORM_ANALYTICS_DECISIONS.PROMOTE);
     expect(decisions.documentation).toBe(PLATFORM_ANALYTICS_DECISIONS.MERGE);

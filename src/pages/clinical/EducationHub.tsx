@@ -60,7 +60,9 @@ export default function EducationHub() {
         <div className="education-page__title-row">
           <GraphicIconBadge iconKey="education" accent="brand" size="md" />
           <div>
-            <p className="education-page-title-text" data-testid="cd-page-title-text">Education</p>
+            <p className="education-page-title-text" data-testid="cd-page-title-text">
+              Education
+            </p>
             <p>Training, simulation, competencies, and credentialing in one place.</p>
           </div>
         </div>

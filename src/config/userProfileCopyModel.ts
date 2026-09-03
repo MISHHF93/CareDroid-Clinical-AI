@@ -52,124 +52,125 @@ export type ProfileCopyStack = Readonly<{
   primaryFunctions: readonly ProfileFunctionDefinition[];
 }>;
 
-export const PROFILE_FUNCTION_DEFINITIONS: Readonly<Record<ProfileFunctionId, ProfileFunctionDefinition>> =
-  Object.freeze({
-    'register-patient': {
-      id: 'register-patient',
-      label: 'Register patients',
-      description: 'Walk-in, ambulance, and appointment arrivals with identity capture.',
-    },
-    'verify-identity': {
-      id: 'verify-identity',
-      label: 'Verify identity & documents',
-      description: 'ID check, duplicate review, and registration completion.',
-    },
-    'triage-acuity': {
-      id: 'triage-acuity',
-      label: 'Run triage queues',
-      description: 'Pre-triage lists, breach timers, and acuity assignment.',
-    },
-    'assign-acuity': {
-      id: 'assign-acuity',
-      label: 'Assign acuity & flags',
-      description: 'CTAS level, high-risk complaints, and escalation triggers.',
-    },
-    'manage-waiting-room': {
-      id: 'manage-waiting-room',
-      label: 'Manage waiting room flow',
-      description: 'Fit-to-wait, LWBS risk, deterioration watch, and bed placement.',
-    },
-    reassessment: {
-      id: 'reassessment',
-      label: 'Reassessment timers',
-      description: 'Due/overdue reassessment visibility and nurse contact logging.',
-    },
-    'provider-rounds': {
-      id: 'provider-rounds',
-      label: 'Provider rounds & orders',
-      description: 'Whiteboard review, who-next, vitals, and clinical documentation.',
-    },
-    disposition: {
-      id: 'disposition',
-      label: 'Disposition planning',
-      description: 'Admission, discharge, transfer, and referral coordination.',
-    },
-    'ems-handoff': {
-      id: 'ems-handoff',
-      label: 'EMS offload & handoff',
-      description: 'Ambulance tracker, checklist completion, and reception convert.',
-    },
-    'command-throughput': {
-      id: 'command-throughput',
-      label: 'Command throughput',
-      description: 'Department KPIs, bottlenecks, staffing, and operational moves.',
-    },
-    'capacity-boarding': {
-      id: 'capacity-boarding',
-      label: 'Capacity & boarding',
-      description: 'Bed pressure, boarders, and offload timing.',
-    },
-    'clinical-tools': {
-      id: 'clinical-tools',
-      label: 'Clinical calculators & tools',
-      description: 'Scores, protocols, drug checks, and decision support.',
-    },
-    'copilot-capture': {
-      id: 'copilot-capture',
-      label: 'CareDroid copilot capture',
-      description: 'Voice and text capture of decisions, handoffs, and reassessments.',
-    },
-    'analytics-view': {
-      id: 'analytics-view',
-      label: 'Analytics & reporting',
-      description: 'Shift metrics, throughput analytics, and operational exports.',
-    },
-    'admin-settings': {
-      id: 'admin-settings',
-      label: 'Admin & tenant settings',
-      description: 'Role assignment, workflows, invitations, and tenant configuration.',
-    },
-    'governance-audit': {
-      id: 'governance-audit',
-      label: 'Governance & audit',
-      description: 'Compliance registry, audit logs, and policy oversight.',
-    },
-    'fleet-ops': {
-      id: 'fleet-ops',
-      label: 'Fleet operations',
-      description: 'Vehicle routing, telemetry, and dispatch coordination.',
-    },
-    'lab-tools': {
-      id: 'lab-tools',
-      label: 'Laboratory tools',
-      description: 'Lab interpretation and result workflows.',
-    },
-    'pharmacy-tools': {
-      id: 'pharmacy-tools',
-      label: 'Pharmacy safety tools',
-      description: 'Medication review and pharmacy workspace tools.',
-    },
-    'education-sim': {
-      id: 'education-sim',
-      label: 'Education & simulation',
-      description: 'Learning modules, supervised calculators, and simulation suites.',
-    },
-    'trackmind-ops': {
-      id: 'trackmind-ops',
-      label: 'TrackMind operations',
-      description: 'Race-day, stewarding, welfare, and enterprise intelligence.',
-    },
-    'public-display': {
-      id: 'public-display',
-      label: 'Public waiting display',
-      description: 'Patient-facing queue status without PHI.',
-    },
-    'read-only-board': {
-      id: 'read-only-board',
-      label: 'Read-only operations board',
-      description: 'Hallway monitor for throughput and safety KPIs.',
-    },
-  });
+export const PROFILE_FUNCTION_DEFINITIONS: Readonly<
+  Record<ProfileFunctionId, ProfileFunctionDefinition>
+> = Object.freeze({
+  'register-patient': {
+    id: 'register-patient',
+    label: 'Register patients',
+    description: 'Walk-in, ambulance, and appointment arrivals with identity capture.',
+  },
+  'verify-identity': {
+    id: 'verify-identity',
+    label: 'Verify identity & documents',
+    description: 'ID check, duplicate review, and registration completion.',
+  },
+  'triage-acuity': {
+    id: 'triage-acuity',
+    label: 'Run triage queues',
+    description: 'Pre-triage lists, breach timers, and acuity assignment.',
+  },
+  'assign-acuity': {
+    id: 'assign-acuity',
+    label: 'Assign acuity & flags',
+    description: 'CTAS level, high-risk complaints, and escalation triggers.',
+  },
+  'manage-waiting-room': {
+    id: 'manage-waiting-room',
+    label: 'Manage waiting room flow',
+    description: 'Fit-to-wait, LWBS risk, deterioration watch, and bed placement.',
+  },
+  reassessment: {
+    id: 'reassessment',
+    label: 'Reassessment timers',
+    description: 'Due/overdue reassessment visibility and nurse contact logging.',
+  },
+  'provider-rounds': {
+    id: 'provider-rounds',
+    label: 'Provider rounds & orders',
+    description: 'Whiteboard review, who-next, vitals, and clinical documentation.',
+  },
+  disposition: {
+    id: 'disposition',
+    label: 'Disposition planning',
+    description: 'Admission, discharge, transfer, and referral coordination.',
+  },
+  'ems-handoff': {
+    id: 'ems-handoff',
+    label: 'EMS offload & handoff',
+    description: 'Ambulance tracker, checklist completion, and reception convert.',
+  },
+  'command-throughput': {
+    id: 'command-throughput',
+    label: 'Command throughput',
+    description: 'Department KPIs, bottlenecks, staffing, and operational moves.',
+  },
+  'capacity-boarding': {
+    id: 'capacity-boarding',
+    label: 'Capacity & boarding',
+    description: 'Bed pressure, boarders, and offload timing.',
+  },
+  'clinical-tools': {
+    id: 'clinical-tools',
+    label: 'Clinical calculators & tools',
+    description: 'Scores, protocols, drug checks, and decision support.',
+  },
+  'copilot-capture': {
+    id: 'copilot-capture',
+    label: 'CareDroid copilot capture',
+    description: 'Voice and text capture of decisions, handoffs, and reassessments.',
+  },
+  'analytics-view': {
+    id: 'analytics-view',
+    label: 'Analytics & reporting',
+    description: 'Shift metrics, throughput analytics, and operational exports.',
+  },
+  'admin-settings': {
+    id: 'admin-settings',
+    label: 'Admin & tenant settings',
+    description: 'Role assignment, workflows, invitations, and tenant configuration.',
+  },
+  'governance-audit': {
+    id: 'governance-audit',
+    label: 'Governance & audit',
+    description: 'Compliance registry, audit logs, and policy oversight.',
+  },
+  'fleet-ops': {
+    id: 'fleet-ops',
+    label: 'Fleet operations',
+    description: 'Vehicle routing, telemetry, and dispatch coordination.',
+  },
+  'lab-tools': {
+    id: 'lab-tools',
+    label: 'Laboratory tools',
+    description: 'Lab interpretation and result workflows.',
+  },
+  'pharmacy-tools': {
+    id: 'pharmacy-tools',
+    label: 'Pharmacy safety tools',
+    description: 'Medication review and pharmacy workspace tools.',
+  },
+  'education-sim': {
+    id: 'education-sim',
+    label: 'Education & simulation',
+    description: 'Learning modules, supervised calculators, and simulation suites.',
+  },
+  'trackmind-ops': {
+    id: 'trackmind-ops',
+    label: 'TrackMind operations',
+    description: 'Race-day, stewarding, welfare, and enterprise intelligence.',
+  },
+  'public-display': {
+    id: 'public-display',
+    label: 'Public waiting display',
+    description: 'Patient-facing queue status without PHI.',
+  },
+  'read-only-board': {
+    id: 'read-only-board',
+    label: 'Read-only operations board',
+    description: 'Hallway monitor for throughput and safety KPIs.',
+  },
+});
 
 const fn = (...ids: ProfileFunctionId[]): ProfileFunctionDefinition[] =>
   ids.map((id) => PROFILE_FUNCTION_DEFINITIONS[id]);
@@ -186,11 +187,7 @@ export const SAAS_ROLE_FUNCTION_IDS: Readonly<Record<SaasUserRole, readonly Prof
     ],
     'icu-physician': ['provider-rounds', 'clinical-tools', 'copilot-capture', 'reassessment'],
     cardiologist: ['provider-rounds', 'clinical-tools', 'copilot-capture', 'disposition'],
-    'registration-clerk': [
-      'register-patient',
-      'verify-identity',
-      'ems-handoff',
-    ],
+    'registration-clerk': ['register-patient', 'verify-identity', 'ems-handoff'],
     nurse: [
       'register-patient',
       'verify-identity',
@@ -230,55 +227,59 @@ export const SAAS_ROLE_FUNCTION_IDS: Readonly<Record<SaasUserRole, readonly Prof
     'auditor-regulator': ['read-only-board', 'governance-audit', 'trackmind-ops'],
   });
 
-export const EMERGENCY_ROLE_FUNCTION_IDS: Readonly<
-  Record<string, readonly ProfileFunctionId[]>
-> = Object.freeze({
-  [EMERGENCY_ROLE_IDS.registrationClerk]: [
-    'register-patient',
-    'verify-identity',
-    'ems-handoff',
-    'copilot-capture',
-  ],
-  [EMERGENCY_ROLE_IDS.triageNurse]: [
-    'triage-acuity',
-    'assign-acuity',
-    'register-patient',
-    'reassessment',
-    'copilot-capture',
-  ],
-  [EMERGENCY_ROLE_IDS.chargeNurse]: [
-    'manage-waiting-room',
-    'reassessment',
-    'capacity-boarding',
-    'ems-handoff',
-    'copilot-capture',
-  ],
-  [EMERGENCY_ROLE_IDS.physician]: [
-    'provider-rounds',
-    'disposition',
-    'clinical-tools',
-    'copilot-capture',
-    'reassessment',
-  ],
-  [EMERGENCY_ROLE_IDS.emsUser]: ['ems-handoff', 'register-patient', 'copilot-capture'],
-  [EMERGENCY_ROLE_IDS.dispatcher]: ['register-patient', 'ems-handoff', 'copilot-capture'],
-  [EMERGENCY_ROLE_IDS.emsCoordinator]: ['ems-handoff', 'register-patient', 'analytics-view', 'copilot-capture'],
-  [EMERGENCY_ROLE_IDS.edManager]: [
-    'command-throughput',
-    'capacity-boarding',
-    'analytics-view',
-    'copilot-capture',
-  ],
-  [EMERGENCY_ROLE_IDS.admin]: [
-    'admin-settings',
-    'command-throughput',
-    'governance-audit',
-    'analytics-view',
-  ],
-  [EMERGENCY_ROLE_IDS.itAdmin]: ['admin-settings', 'governance-audit'],
-  [EMERGENCY_ROLE_IDS.readOnlyViewer]: ['read-only-board', 'analytics-view'],
-  [EMERGENCY_ROLE_IDS.publicDisplay]: ['public-display'],
-});
+export const EMERGENCY_ROLE_FUNCTION_IDS: Readonly<Record<string, readonly ProfileFunctionId[]>> =
+  Object.freeze({
+    [EMERGENCY_ROLE_IDS.registrationClerk]: [
+      'register-patient',
+      'verify-identity',
+      'ems-handoff',
+      'copilot-capture',
+    ],
+    [EMERGENCY_ROLE_IDS.triageNurse]: [
+      'triage-acuity',
+      'assign-acuity',
+      'register-patient',
+      'reassessment',
+      'copilot-capture',
+    ],
+    [EMERGENCY_ROLE_IDS.chargeNurse]: [
+      'manage-waiting-room',
+      'reassessment',
+      'capacity-boarding',
+      'ems-handoff',
+      'copilot-capture',
+    ],
+    [EMERGENCY_ROLE_IDS.physician]: [
+      'provider-rounds',
+      'disposition',
+      'clinical-tools',
+      'copilot-capture',
+      'reassessment',
+    ],
+    [EMERGENCY_ROLE_IDS.emsUser]: ['ems-handoff', 'register-patient', 'copilot-capture'],
+    [EMERGENCY_ROLE_IDS.dispatcher]: ['register-patient', 'ems-handoff', 'copilot-capture'],
+    [EMERGENCY_ROLE_IDS.emsCoordinator]: [
+      'ems-handoff',
+      'register-patient',
+      'analytics-view',
+      'copilot-capture',
+    ],
+    [EMERGENCY_ROLE_IDS.edManager]: [
+      'command-throughput',
+      'capacity-boarding',
+      'analytics-view',
+      'copilot-capture',
+    ],
+    [EMERGENCY_ROLE_IDS.admin]: [
+      'admin-settings',
+      'command-throughput',
+      'governance-audit',
+      'analytics-view',
+    ],
+    [EMERGENCY_ROLE_IDS.itAdmin]: ['admin-settings', 'governance-audit'],
+    [EMERGENCY_ROLE_IDS.readOnlyViewer]: ['read-only-board', 'analytics-view'],
+    [EMERGENCY_ROLE_IDS.publicDisplay]: ['public-display'],
+  });
 
 const SAAS_PROFILE_COPY_BASE: Readonly<
   Record<SaasUserRole, Omit<ProfileCopyStack, 'saasRole' | 'emergencyRoleId' | 'primaryFunctions'>>
@@ -286,8 +287,10 @@ const SAAS_PROFILE_COPY_BASE: Readonly<
   'emergency-physician': {
     personaTitle: 'Emergency Physician',
     workspaceEyebrow: 'Clinical provider',
-    workspaceDescription: 'Review patients, document decisions, and plan disposition on the ED whiteboard.',
-    profileShellSubtitle: 'Your assigned physician profile — clinical tools, copilot, and whiteboard access.',
+    workspaceDescription:
+      'Review patients, document decisions, and plan disposition on the ED whiteboard.',
+    profileShellSubtitle:
+      'Your assigned physician profile — clinical tools, copilot, and whiteboard access.',
     copilotIntro: 'Capture differential, orders, and disposition rationale at bedside.',
   },
   'icu-physician': {
@@ -307,8 +310,10 @@ const SAAS_PROFILE_COPY_BASE: Readonly<
   'registration-clerk': {
     personaTitle: ED_PERSONA_LABELS.receptionClerk,
     workspaceEyebrow: 'Front desk',
-    workspaceDescription: 'Registration, identity verification, patient search, and EMS conversion.',
-    profileShellSubtitle: 'Receptionist profile — front-desk workflows without clinical mutation surfaces.',
+    workspaceDescription:
+      'Registration, identity verification, patient search, and EMS conversion.',
+    profileShellSubtitle:
+      'Receptionist profile — front-desk workflows without clinical mutation surfaces.',
     copilotIntro: 'Assist with registration steps and duplicate-patient checks.',
   },
   nurse: {
@@ -426,7 +431,8 @@ const SAAS_PROFILE_COPY_BASE: Readonly<
   'executive-leadership': {
     personaTitle: 'Executive Leadership',
     workspaceEyebrow: 'Executive command',
-    workspaceDescription: 'Executive command center, enterprise intelligence, and throughput analytics.',
+    workspaceDescription:
+      'Executive command center, enterprise intelligence, and throughput analytics.',
     profileShellSubtitle: 'Executive profile — analytics and command center visibility.',
     copilotIntro: 'Summarize enterprise throughput and risk posture.',
   },
@@ -480,7 +486,8 @@ const EMERGENCY_PROFILE_COPY_BASE: Readonly<
   [EMERGENCY_ROLE_IDS.edManager]: {
     personaTitle: ED_PERSONA_LABELS.departmentManager,
     workspaceEyebrow: 'ED command',
-    workspaceDescription: 'Throughput, staffing, boarding, and department-wide situational awareness.',
+    workspaceDescription:
+      'Throughput, staffing, boarding, and department-wide situational awareness.',
     profileShellSubtitle: 'ED manager — command center and operational analytics.',
     copilotIntro: 'Summarize bottlenecks and recommend operational moves.',
   },
@@ -517,14 +524,17 @@ const EMERGENCY_PROFILE_COPY_BASE: Readonly<
     workspaceEyebrow: 'Dispatch console',
     workspaceDescription: '911 call intake, telephone triage, and EMS unit dispatch.',
     profileShellSubtitle: 'Dispatcher — call triage, CAD dispatch, and ED pre-notification.',
-    copilotIntro: 'AI call risk assessment is available for Echo/Delta calls. Dispatcher must confirm.',
+    copilotIntro:
+      'AI call risk assessment is available for Echo/Delta calls. Dispatcher must confirm.',
   },
   [EMERGENCY_ROLE_IDS.emsCoordinator]: {
     personaTitle: 'EMS Coordinator',
     workspaceEyebrow: 'EMS operations',
-    workspaceDescription: 'Coordinate EMS units, relay prehospital data, and manage ED pre-arrival readiness.',
+    workspaceDescription:
+      'Coordinate EMS units, relay prehospital data, and manage ED pre-arrival readiness.',
     profileShellSubtitle: 'EMS coordinator — prehospital operations and pre-arrival handoff.',
-    copilotIntro: 'AI prehospital risk summary assists ED prep. Licensed staff must confirm resource activation.',
+    copilotIntro:
+      'AI prehospital risk summary assists ED prep. Licensed staff must confirm resource activation.',
   },
 });
 
@@ -538,14 +548,14 @@ function resolveFunctionIds(
   return SAAS_ROLE_FUNCTION_IDS[saasRole] || SAAS_ROLE_FUNCTION_IDS.student;
 }
 
-export function resolveUserProfileCopy(input: {
-  saasRole?: string | null;
-  emergencyRoleId?: string | null;
-  accessSummary?: UserProfileAccessSummary | null;
-} = {}): ProfileCopyStack {
-  const summary =
-    input.accessSummary ||
-    buildUserProfileAccessSummary(input.saasRole || 'student');
+export function resolveUserProfileCopy(
+  input: {
+    saasRole?: string | null;
+    emergencyRoleId?: string | null;
+    accessSummary?: UserProfileAccessSummary | null;
+  } = {},
+): ProfileCopyStack {
+  const summary = input.accessSummary || buildUserProfileAccessSummary(input.saasRole || 'student');
   const saasRole = normalizeSaasRole(summary.saasRole || input.saasRole);
   const emergencyRoleId = input.emergencyRoleId
     ? normalizeEmergencyRole(input.emergencyRoleId)
@@ -586,8 +596,8 @@ export function isSaasProfileCopyComplete(): boolean {
 }
 
 export function isEmergencyProfileCopyComplete(): boolean {
-  return Object.values(EMERGENCY_ROLE_IDS).every(
-    (roleId) => Boolean(EMERGENCY_PROFILE_COPY_BASE[roleId]),
+  return Object.values(EMERGENCY_ROLE_IDS).every((roleId) =>
+    Boolean(EMERGENCY_PROFILE_COPY_BASE[roleId]),
   );
 }
 

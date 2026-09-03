@@ -15,19 +15,29 @@ describe('mounted capability graph', () => {
   it('projects every visible capability with complete SaaS mounting metadata', () => {
     expect(graph.capabilities.length).toBeGreaterThan(0);
     expect(new Set(graph.capabilities.map((capability) => capability.capabilityId)).size).toBe(
-      graph.capabilities.length
+      graph.capabilities.length,
     );
 
     for (const capability of graph.capabilities) {
       expect(capability.assetId, capability.capabilityId).toBe(capability.capabilityId);
-      expect(capability.productIds.length, `${capability.capabilityId} productIds`).toBeGreaterThan(0);
+      expect(capability.productIds.length, `${capability.capabilityId} productIds`).toBeGreaterThan(
+        0,
+      );
       expect(capability.packIds.length, `${capability.capabilityId} packIds`).toBeGreaterThan(0);
-      expect(capability.workspaceIds.length, `${capability.capabilityId} workspaceIds`).toBeGreaterThan(0);
+      expect(
+        capability.workspaceIds.length,
+        `${capability.capabilityId} workspaceIds`,
+      ).toBeGreaterThan(0);
       expect(capability.roleIds.length, `${capability.capabilityId} roleIds`).toBeGreaterThan(0);
-      expect(capability.route || capability.commandVisible, `${capability.capabilityId} route/command`).toBeTruthy();
-      expect(capability.aiAliases.length, `${capability.capabilityId} aiAliases`).toBeGreaterThan(0);
+      expect(
+        capability.route || capability.commandVisible,
+        `${capability.capabilityId} route/command`,
+      ).toBeTruthy();
+      expect(capability.aiAliases.length, `${capability.capabilityId} aiAliases`).toBeGreaterThan(
+        0,
+      );
       expect(Object.values(SUPPORT_STATUSES), capability.capabilityId).toContain(
-        capability.demoStatus
+        capability.demoStatus,
       );
     }
   });
@@ -42,7 +52,7 @@ describe('mounted capability graph', () => {
         'research-intelligence',
         'governance-risk',
         'ai-evaluation-lab',
-      ])
+      ]),
     ).toEqual([
       'core-platform',
       'icu-pack',

@@ -8,11 +8,23 @@ import ReferralHub from './referralHub';
 export const EMERGENCY_FLOW_ENGINE_STAGES = Object.freeze([
   Object.freeze({ id: 'arrival', label: 'Arrival', states: Object.freeze(['ems-prearrival']) }),
   Object.freeze({ id: 'triage', label: 'Triage', states: Object.freeze(['triage-queue']) }),
-  Object.freeze({ id: 'waiting', label: 'Waiting', states: Object.freeze(['waiting-room', 'provider-queue']) }),
-  Object.freeze({ id: 'assessment', label: 'Assessment', states: Object.freeze(['active-assessment']) }),
+  Object.freeze({
+    id: 'waiting',
+    label: 'Waiting',
+    states: Object.freeze(['waiting-room', 'provider-queue']),
+  }),
+  Object.freeze({
+    id: 'assessment',
+    label: 'Assessment',
+    states: Object.freeze(['active-assessment']),
+  }),
   Object.freeze({ id: 'orders', label: 'Orders', states: Object.freeze([]) }),
   Object.freeze({ id: 'results', label: 'Results', states: Object.freeze(['results-pending']) }),
-  Object.freeze({ id: 'disposition', label: 'Disposition', states: Object.freeze(['referral-pending', 'boarding', 'discharge-ready']) }),
+  Object.freeze({
+    id: 'disposition',
+    label: 'Disposition',
+    states: Object.freeze(['referral-pending', 'boarding', 'discharge-ready']),
+  }),
 ]);
 
 const STAGE_WAIT_THRESHOLDS = Object.freeze({
@@ -33,7 +45,11 @@ const DETECTION_PRIORITY = Object.freeze({
 });
 
 function patientStage(patient) {
-  return EMERGENCY_FLOW_ENGINE_STAGES.find((stage) => (stage.states as any).includes(patient.journeyState)) || null;
+  return (
+    EMERGENCY_FLOW_ENGINE_STAGES.find((stage) =>
+      (stage.states as any).includes(patient.journeyState),
+    ) || null
+  );
 }
 
 function severityForStage(stageId, waitDuration, riskScore) {
@@ -44,10 +60,21 @@ function severityForStage(stageId, waitDuration, riskScore) {
 }
 
 function normalizePatientId(patientId = '') {
-  return String(patientId).startsWith('ED-') ? String(patientId).replace(/^ED-/, 'DEMO-ED-') : patientId;
+  return String(patientId).startsWith('ED-')
+    ? String(patientId).replace(/^ED-/, 'DEMO-ED-')
+    : patientId;
 }
 
-function flowDetection({ id, type, stage, severity, title, patientId = null as any, reason, nextRecommendedAction }) {
+function flowDetection({
+  id,
+  type,
+  stage,
+  severity,
+  title,
+  patientId = null as any,
+  reason,
+  nextRecommendedAction,
+}) {
   return Object.freeze({
     id,
     type,
@@ -63,9 +90,13 @@ function flowDetection({ id, type, stage, severity, title, patientId = null as a
 function buildStageMetrics(patients) {
   return Object.freeze(
     EMERGENCY_FLOW_ENGINE_STAGES.map((stage) => {
-      const stagePatients = patients.filter((patient) => (stage.states as any).includes(patient.journeyState));
+      const stagePatients = patients.filter((patient) =>
+        (stage.states as any).includes(patient.journeyState),
+      );
       const threshold = STAGE_WAIT_THRESHOLDS[stage.id] || 60;
-      const stalledCount = stagePatients.filter((patient) => patient.waitDuration > threshold).length;
+      const stalledCount = stagePatients.filter(
+        (patient) => patient.waitDuration > threshold,
+      ).length;
       const longestWaitMinutes = stagePatients.length
         ? Math.max(...stagePatients.map((patient) => patient.waitDuration))
         : 0;
@@ -78,7 +109,7 @@ function buildStageMetrics(patients) {
         longestWaitMinutes,
         thresholdMinutes: threshold,
       });
-    })
+    }),
   );
 }
 
@@ -116,12 +147,14 @@ function buildReferralDetections(referralDashboard) {
       id: `${delay.referralId}-flow-delay`,
       type: 'delayed referrals',
       stage: 'Disposition',
-      severity: delay.priority === 'critical' ? 'critical' : delay.priority === 'high' ? 'high' : 'medium',
+      severity:
+        delay.priority === 'critical' ? 'critical' : delay.priority === 'high' ? 'high' : 'medium',
       title: `${delay.department} referral delayed`,
       patientId: normalizePatientId(delay.patientLabel),
       reason: delay.reason,
-      nextRecommendedAction: 'Open ReferralHub, confirm specialty assigned staff, and unblock the oldest delayed referral dependency.',
-    })
+      nextRecommendedAction:
+        'Open ReferralHub, confirm specialty assigned staff, and unblock the oldest delayed referral dependency.',
+    }),
   );
 }
 
@@ -136,14 +169,17 @@ function buildReassessmentDetections(reassessmentDashboard) {
       patientId: normalizePatientId(item.patientId),
       reason: item.triggerReason,
       nextRecommendedAction: item.recommendedAction,
-    })
+    }),
   );
 }
 
 function buildBoardingDetections(boardingDashboard) {
   const detections = [] as any[];
 
-  if ((boardingDashboard.score || 0) >= 70 || (boardingDashboard.metrics?.boardingCount || 0) >= 4) {
+  if (
+    (boardingDashboard.score || 0) >= 70 ||
+    (boardingDashboard.metrics?.boardingCount || 0) >= 4
+  ) {
     detections.push(
       flowDetection({
         id: 'boarding-pressure-flow',
@@ -152,8 +188,9 @@ function buildBoardingDetections(boardingDashboard) {
         severity: (boardingDashboard.score || 0) >= 85 ? 'critical' : 'high',
         title: 'Boarding pressure blocking flow',
         reason: `${boardingDashboard.metrics?.boardingCount || 0} admitted patients boarding; longest boarder ${boardingDashboard.metrics?.longestBoardingMinutes || 0} minutes.`,
-        nextRecommendedAction: 'Open Boarding Intelligence and coordinate bed-management review for longest boarders and pending beds.',
-      })
+        nextRecommendedAction:
+          'Open Boarding Intelligence and coordinate bed-management review for longest boarders and pending beds.',
+      }),
     );
   }
 
@@ -170,7 +207,7 @@ function buildQueueDetections(queueDashboard) {
       title: `${bottleneck.label} bottleneck`,
       reason: bottleneck.reason,
       nextRecommendedAction: `Open ${bottleneck.label} and assign operational staff before downstream flow degrades.`,
-    })
+    }),
   );
 }
 
@@ -178,7 +215,8 @@ function buildNextRecommendedActions(detections) {
   return Object.freeze(
     [...detections]
       .sort((a, b) => {
-        const severityDelta = (DETECTION_PRIORITY[b.severity] || 0) - (DETECTION_PRIORITY[a.severity] || 0);
+        const severityDelta =
+          (DETECTION_PRIORITY[b.severity] || 0) - (DETECTION_PRIORITY[a.severity] || 0);
         if (severityDelta) return severityDelta;
         return a.stage.localeCompare(b.stage);
       })
@@ -193,8 +231,8 @@ function buildNextRecommendedActions(detections) {
           patientId: detection.patientId,
           reason: detection.reason,
           action: detection.nextRecommendedAction,
-        })
-      )
+        }),
+      ),
   );
 }
 
@@ -239,11 +277,17 @@ export const EmergencyFlowEngineService = Object.freeze({
       metrics: Object.freeze({
         monitoredStages: EMERGENCY_FLOW_ENGINE_STAGES.length,
         activeDetections: detections.length,
-        stalledPatients: detections.filter((detection) => detection.type === 'stalled patients').length,
-        delayedReferrals: detections.filter((detection) => detection.type === 'delayed referrals').length,
-        delayedReassessments: detections.filter((detection) => detection.type === 'delayed reassessments').length,
-        excessiveWaits: detections.filter((detection) => detection.type === 'excessive wait times').length,
-        boardingPressure: detections.filter((detection) => detection.type === 'boarding pressure').length,
+        stalledPatients: detections.filter((detection) => detection.type === 'stalled patients')
+          .length,
+        delayedReferrals: detections.filter((detection) => detection.type === 'delayed referrals')
+          .length,
+        delayedReassessments: detections.filter(
+          (detection) => detection.type === 'delayed reassessments',
+        ).length,
+        excessiveWaits: detections.filter((detection) => detection.type === 'excessive wait times')
+          .length,
+        boardingPressure: detections.filter((detection) => detection.type === 'boarding pressure')
+          .length,
       }),
       safetyStatement:
         'Emergency Flow Engine actively guides ED flow with staff-facing recommended actions only. It does not move patients, assign beds, order care, or make autonomous clinical decisions.',
@@ -251,6 +295,8 @@ export const EmergencyFlowEngineService = Object.freeze({
   },
 });
 
-export const getEmergencyFlowEngine = EmergencyFlowEngineService.getFlowEngine.bind(EmergencyFlowEngineService);
+export const getEmergencyFlowEngine = EmergencyFlowEngineService.getFlowEngine.bind(
+  EmergencyFlowEngineService,
+);
 
 export default EmergencyFlowEngineService;

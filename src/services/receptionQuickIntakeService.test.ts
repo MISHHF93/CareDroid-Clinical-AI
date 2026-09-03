@@ -106,7 +106,7 @@ describe('receptionQuickIntakeService', () => {
       },
       { now: '2026-06-20T12:00:00.000Z' },
     );
-    const added: typeof patient[] = [];
+    const added: (typeof patient)[] = [];
     const result = await persistReceptionQuickIntakePatient(
       { patients: [], addPatient: (entry) => added.push(entry), updatePatient: () => undefined },
       patient,

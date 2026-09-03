@@ -1,7 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  CARE_DROID_SCREEN_MODES,
-} from '../central-node/careDroidCentralNode';
+import { CARE_DROID_SCREEN_MODES } from '../central-node/careDroidCentralNode';
 import { resolveWhiteboardDisplayProfile } from './useWhiteboardDisplayMode';
 
 describe('resolveWhiteboardDisplayProfile', () => {

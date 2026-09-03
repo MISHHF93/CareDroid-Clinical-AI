@@ -60,7 +60,8 @@ export const TRACKMIND_ROLE_DOMAIN = Object.freeze({
   limited: 'limited',
 } as const);
 
-export type TrackMindRoleDomain = (typeof TRACKMIND_ROLE_DOMAIN)[keyof typeof TRACKMIND_ROLE_DOMAIN];
+export type TrackMindRoleDomain =
+  (typeof TRACKMIND_ROLE_DOMAIN)[keyof typeof TRACKMIND_ROLE_DOMAIN];
 
 export type TrackMindRoleDefinition = Readonly<{
   id: TrackMindRoleId;
@@ -81,7 +82,8 @@ export const TRACKMIND_ROLE_DEFINITIONS: Record<TrackMindRoleId, TrackMindRoleDe
       id: R.platformSuperAdmin,
       label: 'Platform Super Admin',
       shortLabel: 'Platform Admin',
-      description: 'Global tenant management, module entitlements, platform observability, and support tooling.',
+      description:
+        'Global tenant management, module entitlements, platform observability, and support tooling.',
       domain: TRACKMIND_ROLE_DOMAIN.platformAdmin,
       primaryScope: TRACKMIND_SCOPE.platform,
       readOnly: false,
@@ -91,7 +93,8 @@ export const TRACKMIND_ROLE_DEFINITIONS: Record<TrackMindRoleId, TrackMindRoleDe
       id: R.organizationAdmin,
       label: 'Organization Admin',
       shortLabel: 'Org Admin',
-      description: 'Organization governance, racetrack portfolio, users, roles, and executive dashboards.',
+      description:
+        'Organization governance, racetrack portfolio, users, roles, and executive dashboards.',
       domain: TRACKMIND_ROLE_DOMAIN.governance,
       primaryScope: TRACKMIND_SCOPE.organization,
       readOnly: false,
@@ -111,7 +114,8 @@ export const TRACKMIND_ROLE_DEFINITIONS: Record<TrackMindRoleId, TrackMindRoleDe
       id: R.raceDayOperationsManager,
       label: 'Race-Day Operations Manager',
       shortLabel: 'Race-Day Ops',
-      description: 'Race-day command, readiness, incidents, approvals queue, and live operational timeline.',
+      description:
+        'Race-day command, readiness, incidents, approvals queue, and live operational timeline.',
       domain: TRACKMIND_ROLE_DOMAIN.raceDayOps,
       primaryScope: TRACKMIND_SCOPE.racetrack,
       readOnly: false,
@@ -121,7 +125,8 @@ export const TRACKMIND_ROLE_DEFINITIONS: Record<TrackMindRoleId, TrackMindRoleDe
       id: R.steward,
       label: 'Steward',
       shortLabel: 'Steward',
-      description: 'Steward command center, inquiries, incidents, evidence review, and governed decisions.',
+      description:
+        'Steward command center, inquiries, incidents, evidence review, and governed decisions.',
       domain: TRACKMIND_ROLE_DOMAIN.stewarding,
       primaryScope: TRACKMIND_SCOPE.racetrack,
       readOnly: false,
@@ -131,7 +136,8 @@ export const TRACKMIND_ROLE_DEFINITIONS: Record<TrackMindRoleId, TrackMindRoleDe
       id: R.starterRaceOfficial,
       label: 'Starter / Race Official',
       shortLabel: 'Starter',
-      description: 'Starting gate readiness, race flow indicators, and official race-day status updates.',
+      description:
+        'Starting gate readiness, race flow indicators, and official race-day status updates.',
       domain: TRACKMIND_ROLE_DOMAIN.racingControl,
       primaryScope: TRACKMIND_SCOPE.racetrack,
       readOnly: false,
@@ -141,7 +147,8 @@ export const TRACKMIND_ROLE_DEFINITIONS: Record<TrackMindRoleId, TrackMindRoleDe
       id: R.paddockOfficial,
       label: 'Paddock Official',
       shortLabel: 'Paddock',
-      description: 'Paddock operations, horse arrivals, inspections, readiness checks, and paddock incidents.',
+      description:
+        'Paddock operations, horse arrivals, inspections, readiness checks, and paddock incidents.',
       domain: TRACKMIND_ROLE_DOMAIN.paddock,
       primaryScope: TRACKMIND_SCOPE.racetrack,
       readOnly: false,
@@ -151,7 +158,8 @@ export const TRACKMIND_ROLE_DEFINITIONS: Record<TrackMindRoleId, TrackMindRoleDe
       id: R.equineWelfareOfficer,
       label: 'Equine Welfare Officer',
       shortLabel: 'Welfare',
-      description: 'Welfare observations, horse lifecycle signals, restrictions, and welfare incidents.',
+      description:
+        'Welfare observations, horse lifecycle signals, restrictions, and welfare incidents.',
       domain: TRACKMIND_ROLE_DOMAIN.equineWelfare,
       primaryScope: TRACKMIND_SCOPE.racetrack,
       readOnly: false,
@@ -161,7 +169,8 @@ export const TRACKMIND_ROLE_DEFINITIONS: Record<TrackMindRoleId, TrackMindRoleDe
       id: R.veterinarian,
       label: 'Veterinarian',
       shortLabel: 'Vet',
-      description: 'Veterinary records, examinations, clearance metadata, and privacy-scoped medical data.',
+      description:
+        'Veterinary records, examinations, clearance metadata, and privacy-scoped medical data.',
       domain: TRACKMIND_ROLE_DOMAIN.veterinary,
       primaryScope: TRACKMIND_SCOPE.racetrack,
       readOnly: false,
@@ -171,7 +180,8 @@ export const TRACKMIND_ROLE_DEFINITIONS: Record<TrackMindRoleId, TrackMindRoleDe
       id: R.trainerLiaison,
       label: 'Trainer Liaison / Horse Operations Coordinator',
       shortLabel: 'Horse Ops',
-      description: 'Horse profile operations, trainer assignments, entries, logistics, and transport records.',
+      description:
+        'Horse profile operations, trainer assignments, entries, logistics, and transport records.',
       domain: TRACKMIND_ROLE_DOMAIN.horseOps,
       primaryScope: TRACKMIND_SCOPE.racetrack,
       readOnly: false,
@@ -231,7 +241,8 @@ export const TRACKMIND_ROLE_DEFINITIONS: Record<TrackMindRoleId, TrackMindRoleDe
       id: R.executiveLeadership,
       label: 'Executive / Track Leadership',
       shortLabel: 'Executive',
-      description: 'Executive dashboard, operational KPIs, compliance posture, and federation benchmarking.',
+      description:
+        'Executive dashboard, operational KPIs, compliance posture, and federation benchmarking.',
       domain: TRACKMIND_ROLE_DOMAIN.executive,
       primaryScope: TRACKMIND_SCOPE.organization,
       readOnly: true,
@@ -241,7 +252,8 @@ export const TRACKMIND_ROLE_DEFINITIONS: Record<TrackMindRoleId, TrackMindRoleDe
       id: R.auditorRegulator,
       label: 'Auditor / Regulator / Read-Only Reviewer',
       shortLabel: 'Auditor',
-      description: 'Read-only audit trails, evidence packets, approvals history, and immutable history views.',
+      description:
+        'Read-only audit trails, evidence packets, approvals history, and immutable history views.',
       domain: TRACKMIND_ROLE_DOMAIN.audit,
       primaryScope: TRACKMIND_SCOPE.federation,
       readOnly: true,
@@ -340,14 +352,19 @@ export const TRACKMIND_ROLE_OPTIONS = Object.freeze(
 );
 
 export function normalizeTrackMindRoleId(role: string | null | undefined): TrackMindRoleId {
-  const raw = String(role || '').trim().toLowerCase().replace(/-/g, '_');
+  const raw = String(role || '')
+    .trim()
+    .toLowerCase()
+    .replace(/-/g, '_');
   if (!raw) return R.genericStaff;
   if (raw in TRACKMIND_ROLE_DEFINITIONS) return raw as TrackMindRoleId;
   if (TRACKMIND_ROLE_ALIASES[raw]) return TRACKMIND_ROLE_ALIASES[raw];
   return R.genericStaff;
 }
 
-export function getTrackMindRoleDefinition(role: string | null | undefined): TrackMindRoleDefinition {
+export function getTrackMindRoleDefinition(
+  role: string | null | undefined,
+): TrackMindRoleDefinition {
   return TRACKMIND_ROLE_DEFINITIONS[normalizeTrackMindRoleId(role)];
 }
 

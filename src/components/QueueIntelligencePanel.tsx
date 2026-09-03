@@ -93,15 +93,15 @@ export default function QueueIntelligencePanel({ collapsed, onCollapsedChange })
   }, [queueAuditSnapshot.rows]);
   const storeQueueRows = useMemo(
     () => selectQueuePanelRows({ queues, alerts, patients } as any),
-    [alerts, patients, queues]
+    [alerts, patients, queues],
   );
   const overallHealthScore = useMemo(
     () => selectQueueOverallHealthScore({ queues, alerts, patients } as any),
-    [alerts, patients, queues]
+    [alerts, patients, queues],
   );
   const nextBottleneckAlert = useMemo(
     () => selectQueueBottleneckAlert({ queues, alerts, patients } as any),
-    [alerts, patients, queues]
+    [alerts, patients, queues],
   );
   const activeQueueFilter = useEmergencyStore((state) => state.activeQueueFilter);
   const emergencyAnalytics = useEmergencyStore((state) => state.emergencyAnalytics);
@@ -131,7 +131,7 @@ export default function QueueIntelligencePanel({ collapsed, onCollapsedChange })
               : 'green'),
         };
       }),
-    [edAuditByType, storeQueueRows]
+    [edAuditByType, storeQueueRows],
   );
 
   useEffect(() => {
@@ -184,7 +184,9 @@ export default function QueueIntelligencePanel({ collapsed, onCollapsedChange })
               type="button"
               className={`queue-intel__row${isActive ? ' queue-intel__row--active' : ''}`}
               onClick={() => setQueueFilter(queue.type)}
-              {...((isActive) ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
+              {...(isActive
+                ? { 'aria-pressed': 'true' as const }
+                : { 'aria-pressed': 'false' as const })}
               title={queue.name}
             >
               <span className="queue-intel__icon">
@@ -209,17 +211,22 @@ export default function QueueIntelligencePanel({ collapsed, onCollapsedChange })
       {!collapsed ? (
         <section className="queue-intel__performance" aria-label="Today's queue performance">
           <strong>Today's performance</strong>
-          {((emergencyAnalytics.data as any)?.queuePerformance || []).slice(0, 5).map((queue: any) => (
-            <div key={queue.id || queue.type}>
-              <span>{queue.name || queue.type}</span>
-              <small>
-                Avg {formatWait(queue.avgWaitMinutes)} vs yesterday{' '}
-                {formatWait(queue.yesterdayAvgWaitMinutes)} · {queue.throughputCount} through
-              </small>
-            </div>
-          ))}
+          {((emergencyAnalytics.data as any)?.queuePerformance || [])
+            .slice(0, 5)
+            .map((queue: any) => (
+              <div key={queue.id || queue.type}>
+                <span>{queue.name || queue.type}</span>
+                <small>
+                  Avg {formatWait(queue.avgWaitMinutes)} vs yesterday{' '}
+                  {formatWait(queue.yesterdayAvgWaitMinutes)} · {queue.throughputCount} through
+                </small>
+              </div>
+            ))}
           {!(emergencyAnalytics.data as any)?.queuePerformance?.length ? (
-            <small>No backend queue analytics returned yet. Queue rows are derived from the active CareDroid state.</small>
+            <small>
+              No backend queue analytics returned yet. Queue rows are derived from the active
+              CareDroid state.
+            </small>
           ) : null}
         </section>
       ) : null}

@@ -22,9 +22,9 @@ const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
 const patternsSource = readFileSync(
   join(
     __dirname,
-    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts'
+    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts',
   ),
-  'utf8'
+  'utf8',
 );
 
 describe('Rome IV IBS (Tier B chat-assisted) wiring', () => {
@@ -79,7 +79,7 @@ describe('Rome IV IBS (Tier B chat-assisted) wiring', () => {
       expect(launch.path).toBe(PR7_HUB_PATH);
       expect(launch.registryId).toBe(canonical);
       expect(launch.chatSeed).toBe(romeIvIbsChatConfig.chatSeed);
-    }
+    },
   );
 
   it('resolves hyphenated discovery aliases', () => {

@@ -3,8 +3,8 @@ import { emergencyRoleForStaff } from './emergencyRolePermissions';
 
 const ACTIVE_PATIENT_STATES = new Set(
   Object.values(PatientState).filter(
-    (state) => state !== PatientState.Discharge && state !== PatientState.Deceased
-  )
+    (state) => state !== PatientState.Discharge && state !== PatientState.Deceased,
+  ),
 );
 
 export function staffDisplayName(staff) {
@@ -37,11 +37,15 @@ export function onShiftStaff(staff = [] as any[], activeShift = null as any) {
   const shiftStaffIds = new Set(activeShift?.staffIds || []);
   return staff.filter(
     (member) =>
-      member.status === 'OnShift' && (!shiftStaffIds.size || shiftStaffIds.has(member.id))
+      member.status === 'OnShift' && (!shiftStaffIds.size || shiftStaffIds.has(member.id)),
   );
 }
 
-export function buildStaffWorkloads(staff = [] as any[], patients = [] as any[], activeShift = null) {
+export function buildStaffWorkloads(
+  staff = [] as any[],
+  patients = [] as any[],
+  activeShift = null,
+) {
   const activePatients = patients.filter((patient) => ACTIVE_PATIENT_STATES.has(patient.state));
   const counts = activePatients.reduce((current, patient) => {
     if (!patient.assignedStaffId) return current;
@@ -50,7 +54,9 @@ export function buildStaffWorkloads(staff = [] as any[], patients = [] as any[],
   }, new Map());
 
   return onShiftStaff(staff, activeShift).map((member) => {
-    const assignedPatients = activePatients.filter((patient) => patient.assignedStaffId === member.id);
+    const assignedPatients = activePatients.filter(
+      (patient) => patient.assignedStaffId === member.id,
+    );
     const assignedCount = counts.get(member.id) || 0;
     return {
       ...member,
@@ -82,7 +88,7 @@ export function getStaffRebalanceSuggestion(workloads = [] as any[]) {
 
   const busiest = [...workloads].sort((a, b) => b.assignedCount - a.assignedCount)[0];
   const hasCapacityReceiver = workloads.some(
-    (member) => member.id !== busiest?.id && member.assignedCount <= 3
+    (member) => member.id !== busiest?.id && member.assignedCount <= 3,
   );
   const isTwoTimesAverage = busiest && busiest.assignedCount >= average * 2;
   const isOverloadedWithAvailablePeer =

@@ -36,7 +36,7 @@ describe('stopBangCalculator — scoring', () => {
         snoring: true,
         tiredness: true,
         observedApnea: true,
-      })
+      }),
     ).toBe(3);
   });
 

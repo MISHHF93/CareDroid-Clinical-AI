@@ -87,7 +87,9 @@ describe('ReceptionPatientTaskSheet', () => {
   });
 
   it('hides the escalate action when canEscalate is false', () => {
-    render(<ReceptionPatientTaskSheet patient={basePatient()} {...defaultProps} canEscalate={false} />);
+    render(
+      <ReceptionPatientTaskSheet patient={basePatient()} {...defaultProps} canEscalate={false} />,
+    );
     expect(screen.queryByText('Escalate to nurse')).not.toBeInTheDocument();
   });
 
@@ -117,16 +119,20 @@ describe('ReceptionPatientTaskSheet', () => {
 
   it('HEAL-273: closes on Escape via its own handler, not just a host-page keydown special-case', () => {
     const onClose = vi.fn();
-    render(<ReceptionPatientTaskSheet patient={basePatient()} {...defaultProps} onClose={onClose} />);
+    render(
+      <ReceptionPatientTaskSheet patient={basePatient()} {...defaultProps} onClose={onClose} />,
+    );
 
     fireEvent.keyDown(document, { key: 'Escape' });
 
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  it('HEAL-280: closes on backdrop click, matching CriticalChecklist\'s same-shape panel', () => {
+  it("HEAL-280: closes on backdrop click, matching CriticalChecklist's same-shape panel", () => {
     const onClose = vi.fn();
-    render(<ReceptionPatientTaskSheet patient={basePatient()} {...defaultProps} onClose={onClose} />);
+    render(
+      <ReceptionPatientTaskSheet patient={basePatient()} {...defaultProps} onClose={onClose} />,
+    );
 
     fireEvent.click(screen.getByLabelText('Close patient tasks backdrop'));
 

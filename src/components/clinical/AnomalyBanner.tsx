@@ -21,7 +21,9 @@ const AnomalyBanner = ({ score, types, recommendations, onDismiss }) => {
           <p className="anomaly-score">Anomaly Score: {Math.round(score * 100)}%</p>
         </div>
         {onDismiss && (
-          <button type="button" className="anomaly-close" onClick={onDismiss}>✕</button>
+          <button type="button" className="anomaly-close" onClick={onDismiss}>
+            ✕
+          </button>
         )}
       </div>
 
@@ -30,7 +32,9 @@ const AnomalyBanner = ({ score, types, recommendations, onDismiss }) => {
           <div className="anomaly-label">Type{types.length > 1 ? 's' : ''}:</div>
           <div className="anomaly-type-list">
             {types.map((type) => (
-              <span key={type} className="anomaly-type-badge">{type}</span>
+              <span key={type} className="anomaly-type-badge">
+                {type}
+              </span>
             ))}
           </div>
         </div>

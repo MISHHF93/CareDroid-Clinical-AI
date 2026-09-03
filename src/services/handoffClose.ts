@@ -5,9 +5,9 @@ export function isHandoffCloseComplete(record: HandoffCloseRecord | undefined): 
   if (!record) return false;
   return Boolean(
     record.informationUnderstood &&
-      record.questionsClarified &&
-      record.receivingClinicianName?.trim() &&
-      record.closedAt,
+    record.questionsClarified &&
+    record.receivingClinicianName?.trim() &&
+    record.closedAt,
   );
 }
 

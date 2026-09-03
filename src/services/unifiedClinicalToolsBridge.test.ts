@@ -112,8 +112,10 @@ describe('unifiedClinicalToolsBridge', () => {
     const ids = listReceptionDeskCalculatorIds(profile);
     expect(ids.length).toBeGreaterThan(0);
     expect(ids).toContain('qsofa');
-    expect(resolveReceptionDeskCalculatorIds({
-      emergencyRoleId: EMERGENCY_ROLE_IDS.registrationClerk,
-    }).length).toBeGreaterThan(0);
+    expect(
+      resolveReceptionDeskCalculatorIds({
+        emergencyRoleId: EMERGENCY_ROLE_IDS.registrationClerk,
+      }).length,
+    ).toBeGreaterThan(0);
   });
 });

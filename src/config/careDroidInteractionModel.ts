@@ -45,5 +45,6 @@ export const STANDARD_ACTION_FEEDBACK = Object.freeze({
   actionFailed: 'Action failed',
   continueToTriage: 'Continue to triage',
   openNextStep: 'Open next step',
-  reassigned: (patientName: string, staffName: string) => `${patientName} reassigned to ${staffName}`,
+  reassigned: (patientName: string, staffName: string) =>
+    `${patientName} reassigned to ${staffName}`,
 });

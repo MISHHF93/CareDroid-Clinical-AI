@@ -168,7 +168,9 @@ function isEmsPlaceholderPatient(patient?: Patient | null): boolean {
   return false;
 }
 
-export function parseMedicationsEnRoute(...sources: (string | string[] | undefined | null)[]): string[] {
+export function parseMedicationsEnRoute(
+  ...sources: (string | string[] | undefined | null)[]
+): string[] {
   // Sanitize at the boundary: `EMSArrival.medicationsEnRoute` is typed
   // `string[]`, but real-world/persisted records aren't guaranteed to match
   // that at runtime (e.g. a non-string entry written by an older code path
@@ -176,14 +178,12 @@ export function parseMedicationsEnRoute(...sources: (string | string[] | undefin
   // every page rendering the EMS offload tracker (`entry.trim is not a
   // function`), not just the one malformed record's own detail view.
   const explicit = sources.flatMap((source) =>
-    Array.isArray(source) ? source.filter((entry): entry is string => typeof entry === 'string') : [],
+    Array.isArray(source)
+      ? source.filter((entry): entry is string => typeof entry === 'string')
+      : [],
   );
-  const text = sources
-    .filter((source): source is string => typeof source === 'string')
-    .join(' ');
-  const found = new Set(
-    explicit.map((entry) => entry.trim()).filter(Boolean),
-  );
+  const text = sources.filter((source): source is string => typeof source === 'string').join(' ');
+  const found = new Set(explicit.map((entry) => entry.trim()).filter(Boolean));
 
   for (const { pattern, label } of MEDICATION_PATTERNS) {
     if (pattern.test(text)) found.add(label);
@@ -235,7 +235,10 @@ export function deriveAmbulanceHandoffDestination(
   arrival: EMSArrival,
   patient?: Patient | null,
   rooms: RoomLike[] = [],
-): Pick<AmbulanceHandoffChecklist, 'patientDestination' | 'destinationLabel' | 'destinationRoomId'> {
+): Pick<
+  AmbulanceHandoffChecklist,
+  'patientDestination' | 'destinationLabel' | 'destinationRoomId'
+> {
   const roomId = patient?.roomId || arrival.preparedRoomId;
   const room = roomById(rooms, roomId);
   const locationHint = locationHintDestination(patient?.location);
@@ -486,7 +489,8 @@ export function resolveAmbulanceHandoffChecklist(
     criticalFlags: [
       ...derived.criticalFlags,
       ...(stored.criticalFlags || []).filter(
-        (flag) => flag.source === 'staff' && !derived.criticalFlags.some((entry) => entry.id === flag.id),
+        (flag) =>
+          flag.source === 'staff' && !derived.criticalFlags.some((entry) => entry.id === flag.id),
       ),
     ],
     updatedAt: stored.updatedAt || derived.updatedAt,
@@ -594,7 +598,9 @@ export function ambulanceHandoffChecklistCompletionPercent(
   return Math.round((complete / required.length) * 100);
 }
 
-function identityStepStatus(status: AmbulanceHandoffIdentityStatus): AmbulanceHandoffChecklistStepStatus {
+function identityStepStatus(
+  status: AmbulanceHandoffIdentityStatus,
+): AmbulanceHandoffChecklistStepStatus {
   if (status === 'verified' || status === 'provisional') return 'complete';
   if (status === 'mismatch') return 'warning';
   return 'pending';

@@ -97,15 +97,7 @@ export default function OperationalAlertRail({
         intelligenceSnapshot,
         screenMode,
       }),
-    [
-      centralSnapshot,
-      intelligenceSnapshot,
-      screenMode,
-      syncLabel,
-      syncPulse,
-      syncStale,
-      syncTitle,
-    ],
+    [centralSnapshot, intelligenceSnapshot, screenMode, syncLabel, syncPulse, syncStale, syncTitle],
   );
 
   if (!metrics.length) return null;

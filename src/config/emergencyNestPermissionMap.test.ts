@@ -14,7 +14,9 @@ import { EMERGENCY_PERMISSION_KEYS, ROLE_PERMISSION_GRANTS } from './emergencyPe
 
 describe('emergencyNestPermissionMap', () => {
   it('maps every ROLE_PERMISSION_GRANTS emergency role', () => {
-    for (const role of Object.keys(ROLE_PERMISSION_GRANTS) as (keyof typeof ROLE_PERMISSION_GRANTS)[]) {
+    for (const role of Object.keys(
+      ROLE_PERMISSION_GRANTS,
+    ) as (keyof typeof ROLE_PERMISSION_GRANTS)[]) {
       expect(EMERGENCY_TO_NEST_ROLE_MAP[role]).toBeDefined();
       expect(resolveNestMappingForEmergencyRole(role).nestUserRole).toBeTruthy();
     }

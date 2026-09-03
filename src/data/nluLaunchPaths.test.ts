@@ -82,7 +82,7 @@ describe('nluLaunchPaths — unsupported ids use explicit fallback', () => {
 describe('nluLaunchPaths — contract coverage', () => {
   it('NLU_LAUNCH_EXPECTATIONS covers every profile id', () => {
     expect(NLU_LAUNCH_EXPECTATIONS.map((e) => e.nluToolId).sort()).toEqual(
-      [...NLU_PROFILE_TOOL_IDS].sort()
+      [...NLU_PROFILE_TOOL_IDS].sort(),
     );
   });
 

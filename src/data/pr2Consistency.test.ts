@@ -63,9 +63,9 @@ describe('PR2 consistency — registry, NLU, and builtin alignment', () => {
       if (!nlu) throw new Error(`expected clinicalIntentTools to include ${id}`);
       // timi-ua-nstemi and wells-pe are real registerTool() backend executors, so
       // backendExecutable is true for them; meld/meld-na/perc have no backend executor.
-      const expectedBackendExecutable = (ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS as readonly string[]).includes(
-        id
-      );
+      const expectedBackendExecutable = (
+        ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS as readonly string[]
+      ).includes(id);
       expect(nlu.backendExecutable).toBe(expectedBackendExecutable);
       expect(nlu.sidebarToolId).toBe(id);
     }
@@ -94,7 +94,7 @@ describe('PR2 consistency — registry, NLU, and builtin alignment', () => {
 describe('PR2 consistency — aliases and discovery', () => {
   it('aligns PR2 discovery aliases with NLU_TO_REGISTRY_ID', () => {
     const pr2Aliases = toolIdAliases.filter((a) =>
-      (PR2_CALCULATOR_REGISTRY_IDS as readonly string[]).includes(a.mapsTo)
+      (PR2_CALCULATOR_REGISTRY_IDS as readonly string[]).includes(a.mapsTo),
     );
     expect(pr2Aliases.length).toBeGreaterThan(0);
     for (const { id, mapsTo } of pr2Aliases) {
@@ -110,7 +110,7 @@ describe('PR2 consistency — aliases and discovery', () => {
       const fromCanonical = resolveCatalogLaunch(canonical);
       expect(fromAlias.path).toBe(fromCanonical.path);
       expect(fromAlias.registryId).toBe(canonical);
-    }
+    },
   );
 });
 
@@ -131,7 +131,7 @@ describe('PR2 consistency — catalog, discovery, and searchability', () => {
     const rows = getMedicalToolsCatalogRows();
     const summary = getMedicalCatalogSummary();
     const pr2Primaries = new Set(
-      rows.filter((r) => PR2_CALCULATOR_REGISTRY_IDS.includes(r.primaryId)).map((r) => r.primaryId)
+      rows.filter((r) => PR2_CALCULATOR_REGISTRY_IDS.includes(r.primaryId)).map((r) => r.primaryId),
     );
     expect(pr2Primaries.size).toBe(PR2_CALCULATOR_REGISTRY_IDS.length);
     expect(summary.total).toBeGreaterThanOrEqual(clinicalIntentTools.length);
@@ -141,7 +141,7 @@ describe('PR2 consistency — catalog, discovery, and searchability', () => {
 describe('PR2 consistency — sidebar visibility', () => {
   it('exposes each PR2 registry id exactly once in toolRegistry', () => {
     const pr2Rows = toolRegistry.filter((t) =>
-      (PR2_CALCULATOR_REGISTRY_IDS as readonly string[]).includes(t.id)
+      (PR2_CALCULATOR_REGISTRY_IDS as readonly string[]).includes(t.id),
     );
     expect(pr2Rows).toHaveLength(PR2_CALCULATOR_REGISTRY_IDS.length);
   });

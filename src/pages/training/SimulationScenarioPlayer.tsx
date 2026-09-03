@@ -16,7 +16,8 @@ import './SimulationScenarioPlayer.css';
 export default function SimulationScenarioPlayer() {
   const { scenarioId = 'sepsis-deterioration' } = useParams();
   const scenario = useMemo(
-    () => getSimulationScenarioById(scenarioId) || getSimulationScenarioById('sepsis-deterioration'),
+    () =>
+      getSimulationScenarioById(scenarioId) || getSimulationScenarioById('sepsis-deterioration'),
     [scenarioId],
   );
   useRouteChromeRegistration({ title: scenario?.title ?? 'Simulation Scenario' });
@@ -24,9 +25,7 @@ export default function SimulationScenarioPlayer() {
   const [recordedRunId, setRecordedRunId] = useState<string | null>(null);
   const debrief = useMemo(
     () =>
-      scenario && selectedActions.length
-        ? buildScenarioDebrief(scenario, selectedActions)
-        : null,
+      scenario && selectedActions.length ? buildScenarioDebrief(scenario, selectedActions) : null,
     [scenario, selectedActions],
   );
 
@@ -44,7 +43,9 @@ export default function SimulationScenarioPlayer() {
   if (!scenario) {
     return (
       <main className="scenario-player-page">
-        <p className="scenario-player-page__title-text" data-testid="cd-page-title-text">Simulation Scenario</p>
+        <p className="scenario-player-page__title-text" data-testid="cd-page-title-text">
+          Simulation Scenario
+        </p>
         <p>Scenario not found in demo catalog.</p>
         <Link to={CANONICAL_ROUTES.simulation}>Back to simulation suite</Link>
       </main>
@@ -64,7 +65,9 @@ export default function SimulationScenarioPlayer() {
         <div className="scenario-player-page__title-row">
           <GraphicIconBadge iconKey="activity" accent="brand" size="md" />
           <div>
-            <p className="scenario-player-page__title-text" data-testid="cd-page-title-text">{scenario.title}</p>
+            <p className="scenario-player-page__title-text" data-testid="cd-page-title-text">
+              {scenario.title}
+            </p>
             <p>{scenario.caseStem}</p>
           </div>
         </div>
@@ -81,9 +84,23 @@ export default function SimulationScenarioPlayer() {
         details={scenario.dataMode}
       />
 
-      <div className="scenario-player-page__metrics" role="group" aria-label="Scenario summary metrics">
-        <MetricCard label="Category" value={scenario.category} hint="Training domain" tone="neutral" />
-        <MetricCard label="Difficulty" value={scenario.difficulty} hint="Scenario level" tone="neutral" />
+      <div
+        className="scenario-player-page__metrics"
+        role="group"
+        aria-label="Scenario summary metrics"
+      >
+        <MetricCard
+          label="Category"
+          value={scenario.category}
+          hint="Training domain"
+          tone="neutral"
+        />
+        <MetricCard
+          label="Difficulty"
+          value={scenario.difficulty}
+          hint="Scenario level"
+          tone="neutral"
+        />
         <MetricCard
           label="Duration"
           value={`${scenario.estimatedDurationMinutes}m`}
@@ -113,7 +130,11 @@ export default function SimulationScenarioPlayer() {
               <div key={lab.name} className="scenario-player-page__lab-row">
                 <strong>{lab.name}</strong>
                 <span>{lab.value}</span>
-                <span className={lab.status === 'Critical' || lab.status === 'High' ? 'is-warning' : undefined}>
+                <span
+                  className={
+                    lab.status === 'Critical' || lab.status === 'High' ? 'is-warning' : undefined
+                  }
+                >
                   {lab.status}
                 </span>
               </div>
@@ -133,7 +154,9 @@ export default function SimulationScenarioPlayer() {
                   type="button"
                   className={`scenario-player-page__check${selected ? ' is-selected' : ''}`}
                   onClick={() => toggleAction(action)}
-                  {...((selected) ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
+                  {...(selected
+                    ? { 'aria-pressed': 'true' as const }
+                    : { 'aria-pressed': 'false' as const })}
                 >
                   {action}
                 </button>
@@ -143,7 +166,10 @@ export default function SimulationScenarioPlayer() {
         </section>
       </div>
 
-      <section className="scenario-player-page__panel" aria-label="Decision prompts and integrations">
+      <section
+        className="scenario-player-page__panel"
+        aria-label="Decision prompts and integrations"
+      >
         <h2>Decision prompts</h2>
         <ul className="scenario-player-page__prompts">
           {scenario.decisionPrompts.map((prompt) => (
@@ -160,7 +186,10 @@ export default function SimulationScenarioPlayer() {
       </section>
 
       {debrief ? (
-        <section className="scenario-player-page__panel scenario-player-page__debrief" aria-label="Scenario debrief">
+        <section
+          className="scenario-player-page__panel scenario-player-page__debrief"
+          aria-label="Scenario debrief"
+        >
           <h2>Demo debrief</h2>
           <p>{debrief.summary}</p>
           <div className="scenario-player-page__debrief-grid">
@@ -187,9 +216,12 @@ export default function SimulationScenarioPlayer() {
           <div className="scenario-player-page__debrief-actions">
             {recordedRunId ? (
               <>
-                <span className="scenario-player-page__recorded" data-testid="scenario-run-recorded">
-                  Saved to your local practice history — stored only in this browser, never written to any
-                  patient record or backend.
+                <span
+                  className="scenario-player-page__recorded"
+                  data-testid="scenario-run-recorded"
+                >
+                  Saved to your local practice history — stored only in this browser, never written
+                  to any patient record or backend.
                 </span>
                 <button type="button" onClick={practiceAgain}>
                   Practice again

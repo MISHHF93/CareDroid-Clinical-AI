@@ -9,11 +9,11 @@ export const MELD_TOOL_IDS = Object.freeze([...PR2_MELD_CALCULATOR_REGISTRY_IDS]
 export const MELD_HUB_PATH = '/tools/calculators';
 
 export const MELD_ROUTE_BY_REGISTRY_ID = Object.freeze(
-  Object.fromEntries(MELD_TOOL_IDS.map((id) => [id, `${MELD_HUB_PATH}/${id}`]))
+  Object.fromEntries(MELD_TOOL_IDS.map((id) => [id, `${MELD_HUB_PATH}/${id}`])),
 );
 
 export const MELD_CALC_QUERY_BY_REGISTRY_ID = Object.freeze(
-  Object.fromEntries(MELD_TOOL_IDS.map((id) => [id, `${MELD_HUB_PATH}?calc=${id}`]))
+  Object.fromEntries(MELD_TOOL_IDS.map((id) => [id, `${MELD_HUB_PATH}?calc=${id}`])),
 );
 
 /** Product-required NLU / catalog aliases (space-separated) → registry id */

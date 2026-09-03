@@ -40,27 +40,27 @@ export const MELD_NA_REGRESSION = Object.freeze({
 });
 
 export const TIMI_NONE = Object.freeze(
-  Object.fromEntries(TIMI_UA_NSTEMI_CRITERIA_META.map((r) => [r.key, false]))
+  Object.fromEntries(TIMI_UA_NSTEMI_CRITERIA_META.map((r) => [r.key, false])),
 );
 
 export const TIMI_ALL = Object.freeze(
-  Object.fromEntries(TIMI_UA_NSTEMI_CRITERIA_META.map((r) => [r.key, true]))
+  Object.fromEntries(TIMI_UA_NSTEMI_CRITERIA_META.map((r) => [r.key, true])),
 );
 
 export const WELLS_PE_NONE = Object.freeze(
-  Object.fromEntries(WELLS_PE_CRITERIA_META.map((r) => [r.key, false]))
+  Object.fromEntries(WELLS_PE_CRITERIA_META.map((r) => [r.key, false])),
 );
 
 export const WELLS_PE_ALL = Object.freeze(
-  Object.fromEntries(WELLS_PE_CRITERIA_META.map((r) => [r.key, true]))
+  Object.fromEntries(WELLS_PE_CRITERIA_META.map((r) => [r.key, true])),
 );
 
 export const PERC_ALL_MET = Object.freeze(
-  Object.fromEntries(PERC_CRITERIA_META.map((r) => [r.key, true]))
+  Object.fromEntries(PERC_CRITERIA_META.map((r) => [r.key, true])),
 );
 
 export const PERC_NONE_MET = Object.freeze(
-  Object.fromEntries(PERC_CRITERIA_META.map((r) => [r.key, false]))
+  Object.fromEntries(PERC_CRITERIA_META.map((r) => [r.key, false])),
 );
 
 /** Wells PE score bands for interpretWellsPe */

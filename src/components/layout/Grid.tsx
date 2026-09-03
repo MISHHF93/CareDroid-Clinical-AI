@@ -14,21 +14,36 @@ type GridProps = {
   children?: React.ReactNode;
 } & React.HTMLAttributes<HTMLElement>;
 
-export function Grid({ cols = 12, gap, rowGap, colGap, as: Tag = 'div', className, children, style, ...props }: GridProps) {
+export function Grid({
+  cols = 12,
+  gap,
+  rowGap,
+  colGap,
+  as: Tag = 'div',
+  className,
+  children,
+  style,
+  ...props
+}: GridProps) {
   const isAuto = cols === 'auto';
   const colsVar = isAuto ? undefined : `${cols}`;
-  const gapVar = (n?: SpaceScale) => n === undefined ? undefined : n === 0 ? '0px' : `var(--cd-space-${n})`;
+  const gapVar = (n?: SpaceScale) =>
+    n === undefined ? undefined : n === 0 ? '0px' : `var(--cd-space-${n})`;
 
   return (
     <Tag
-      className={['cd-grid', isAuto ? 'cd-grid--auto' : '', className ?? ''].filter(Boolean).join(' ')}
-      style={{
-        '--grid-cols': colsVar,
-        '--grid-gap': gapVar(gap),
-        '--grid-row-gap': gapVar(rowGap),
-        '--grid-col-gap': gapVar(colGap),
-        ...style,
-      } as React.CSSProperties}
+      className={['cd-grid', isAuto ? 'cd-grid--auto' : '', className ?? '']
+        .filter(Boolean)
+        .join(' ')}
+      style={
+        {
+          '--grid-cols': colsVar,
+          '--grid-gap': gapVar(gap),
+          '--grid-row-gap': gapVar(rowGap),
+          '--grid-col-gap': gapVar(colGap),
+          ...style,
+        } as React.CSSProperties
+      }
       {...props}
     >
       {children}
@@ -46,7 +61,17 @@ type GridItemProps = {
   children?: React.ReactNode;
 } & React.HTMLAttributes<HTMLElement>;
 
-export function GridItem({ colSpan, rowSpan, colStart, rowStart, as: Tag = 'div', className, children, style, ...props }: GridItemProps) {
+export function GridItem({
+  colSpan,
+  rowSpan,
+  colStart,
+  rowStart,
+  as: Tag = 'div',
+  className,
+  children,
+  style,
+  ...props
+}: GridItemProps) {
   return (
     <Tag
       className={['cd-grid-item', className ?? ''].filter(Boolean).join(' ')}

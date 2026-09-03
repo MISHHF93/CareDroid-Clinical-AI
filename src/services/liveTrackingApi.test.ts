@@ -7,7 +7,7 @@ vi.mock('../config/backendApiCapabilities', () => ({
 vi.mock('./apiClient', () => ({
   apiFetchJson: vi.fn(),
   getApiErrorMessage: vi.fn((error, response) =>
-    response ? `status ${response.status}` : error?.message || 'api unavailable'
+    response ? `status ${response.status}` : error?.message || 'api unavailable',
   ),
 }));
 
@@ -36,7 +36,7 @@ describe('liveTrackingApi', () => {
       expect.objectContaining({
         toolCalled: 'disabledCapability',
         reason: 'Backend capability is disabled.',
-      })
+      }),
     );
   });
 
@@ -79,7 +79,7 @@ describe('liveTrackingApi', () => {
       expect.objectContaining({
         toolCalled: 'hospitalMap',
         error: expect.any(Error),
-      })
+      }),
     );
   });
 });

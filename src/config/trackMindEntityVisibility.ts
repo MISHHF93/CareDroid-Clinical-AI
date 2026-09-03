@@ -41,7 +41,13 @@ type EntityCapabilityMap = Record<TrackMindEntityCapability, readonly TrackMindR
 export const TRACKMIND_ENTITY_CAPABILITY_MATRIX: Record<TrackMindEntityId, EntityCapabilityMap> =
   Object.freeze({
     [TRACKMIND_ENTITY.raceDayStatus]: Object.freeze({
-      view: [R.raceDayOperationsManager, R.starterRaceOfficial, R.executiveLeadership, R.racetrackAdmin, R.dataAnalyticsUser],
+      view: [
+        R.raceDayOperationsManager,
+        R.starterRaceOfficial,
+        R.executiveLeadership,
+        R.racetrackAdmin,
+        R.dataAnalyticsUser,
+      ],
       create: [R.raceDayOperationsManager],
       edit: [R.raceDayOperationsManager],
       approve: [R.raceDayOperationsManager, R.steward, R.racetrackAdmin],
@@ -130,9 +136,26 @@ export const TRACKMIND_ENTITY_CAPABILITY_MATRIX: Record<TrackMindEntityId, Entit
     }),
     [TRACKMIND_ENTITY.approvalRequest]: Object.freeze({
       view: Object.values(TRACKMIND_ROLE_ID),
-      create: [R.raceDayOperationsManager, R.steward, R.starterRaceOfficial, R.paddockOfficial, R.equineWelfareOfficer, R.veterinarian, R.trainerLiaison, R.securityManager, R.facilitiesManager],
+      create: [
+        R.raceDayOperationsManager,
+        R.steward,
+        R.starterRaceOfficial,
+        R.paddockOfficial,
+        R.equineWelfareOfficer,
+        R.veterinarian,
+        R.trainerLiaison,
+        R.securityManager,
+        R.facilitiesManager,
+      ],
       edit: [R.raceDayOperationsManager, R.complianceOfficer, R.financeManager],
-      approve: [R.raceDayOperationsManager, R.steward, R.complianceOfficer, R.financeManager, R.organizationAdmin, R.racetrackAdmin],
+      approve: [
+        R.raceDayOperationsManager,
+        R.steward,
+        R.complianceOfficer,
+        R.financeManager,
+        R.organizationAdmin,
+        R.racetrackAdmin,
+      ],
       export: [R.complianceOfficer, R.auditorRegulator],
       admin: [R.organizationAdmin],
     }),
@@ -153,7 +176,13 @@ export const TRACKMIND_ENTITY_CAPABILITY_MATRIX: Record<TrackMindEntityId, Entit
       admin: [R.platformSuperAdmin],
     }),
     [TRACKMIND_ENTITY.surveillanceCamera]: Object.freeze({
-      view: [R.securityManager, R.raceDayOperationsManager, R.facilitiesManager, R.platformSuperAdmin, R.auditorRegulator],
+      view: [
+        R.securityManager,
+        R.raceDayOperationsManager,
+        R.facilitiesManager,
+        R.platformSuperAdmin,
+        R.auditorRegulator,
+      ],
       create: [R.securityManager, R.platformSuperAdmin],
       edit: [R.securityManager, R.platformSuperAdmin],
       approve: [R.securityManager, R.racetrackAdmin],
@@ -161,7 +190,12 @@ export const TRACKMIND_ENTITY_CAPABILITY_MATRIX: Record<TrackMindEntityId, Entit
       admin: [R.platformSuperAdmin],
     }),
     [TRACKMIND_ENTITY.surveillanceIotDevice]: Object.freeze({
-      view: [R.securityManager, R.facilitiesManager, R.raceDayOperationsManager, R.platformSuperAdmin],
+      view: [
+        R.securityManager,
+        R.facilitiesManager,
+        R.raceDayOperationsManager,
+        R.platformSuperAdmin,
+      ],
       create: [R.facilitiesManager, R.securityManager, R.platformSuperAdmin],
       edit: [R.facilitiesManager, R.securityManager],
       approve: [R.facilitiesManager, R.racetrackAdmin],
@@ -169,7 +203,12 @@ export const TRACKMIND_ENTITY_CAPABILITY_MATRIX: Record<TrackMindEntityId, Entit
       admin: [R.platformSuperAdmin],
     }),
     [TRACKMIND_ENTITY.surveillanceZone]: Object.freeze({
-      view: [R.securityManager, R.facilitiesManager, R.equineWelfareOfficer, R.raceDayOperationsManager],
+      view: [
+        R.securityManager,
+        R.facilitiesManager,
+        R.equineWelfareOfficer,
+        R.raceDayOperationsManager,
+      ],
       create: [R.facilitiesManager, R.platformSuperAdmin],
       edit: [R.facilitiesManager, R.securityManager],
       approve: [R.racetrackAdmin],

@@ -3,10 +3,7 @@ import { fireEvent, render, screen, waitFor, within } from '@testing-library/rea
 import { MemoryRouter } from 'react-router-dom';
 import ToolsOverview from './ToolsOverview';
 import { PractitionerVisibilityProvider } from '../../contexts/PractitionerVisibilityContext';
-import {
-  getUserFacingToolRegistryProjection,
-  TOOL_SURFACES,
-} from '../../data/toolInventory';
+import { getUserFacingToolRegistryProjection, TOOL_SURFACES } from '../../data/toolInventory';
 import { phantomToolReferences } from '../../data/sourceCodeToolDiscovery';
 import {
   mockConversationValue,
@@ -147,7 +144,7 @@ function renderOverview(route = '/tools') {
       <PractitionerVisibilityProvider>
         <ToolsOverview />
       </PractitionerVisibilityProvider>
-    </MemoryRouter>
+    </MemoryRouter>,
   );
 }
 
@@ -197,7 +194,7 @@ function matchesToolFilter(record, filter) {
       record.launchType === 'chat-assisted' ||
       record.launchType === 'backend-backed' ||
       /ai|assistant|workflow|scribe|summary|order set|timeline/i.test(
-        `${record.name} ${record.description}`
+        `${record.name} ${record.description}`,
       )
     );
   }
@@ -206,7 +203,7 @@ function matchesToolFilter(record, filter) {
       ['Fleet', 'IoT', 'Hospital Operations'].includes(record.category) ||
       ['fleet-page', 'iot-dashboard', 'hospital-operations'].includes(record.surface) ||
       /fleet|operations|dispatch|device|hospital map|live map|digital twin/i.test(
-        `${record.name} ${record.description}`
+        `${record.name} ${record.description}`,
       )
     );
   }
@@ -258,7 +255,7 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
     showAllTools();
     const userFacing = getUserFacingToolRegistryProjection();
     const renderedIds = [...container.querySelectorAll('[data-tool-id]')].map((node) =>
-      node.getAttribute('data-tool-id')
+      node.getAttribute('data-tool-id'),
     );
 
     expect(renderedIds).toHaveLength(userFacing.length);
@@ -267,8 +264,14 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
       expect(renderedIds, record.id).toContain(record.id);
       const card = toolCard(container, record.id);
       expect(card?.querySelector('h3')?.textContent?.trim().length, record.id).toBeGreaterThan(0);
-      expect(card?.querySelector('.tool-description')?.textContent?.trim().length, record.id).toBeGreaterThan(0);
-      expect(card?.querySelector('.btn-open-tool')?.textContent?.trim().length, record.id).toBeGreaterThan(0);
+      expect(
+        card?.querySelector('.tool-description')?.textContent?.trim().length,
+        record.id,
+      ).toBeGreaterThan(0);
+      expect(
+        card?.querySelector('.btn-open-tool')?.textContent?.trim().length,
+        record.id,
+      ).toBeGreaterThan(0);
     }
     for (const phantom of phantomToolReferences) {
       expect(renderedIds, phantom.id).not.toContain(phantom.id);
@@ -280,8 +283,8 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
     showAllTools();
     const renderedIds = new Set(
       [...container.querySelectorAll('[data-tool-id]')].map((node) =>
-        node.getAttribute('data-tool-id')
-      )
+        node.getAttribute('data-tool-id'),
+      ),
     );
 
     for (const id of [
@@ -306,23 +309,33 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
 
     renderOverview();
 
-    expect(screen.getByRole('heading', { level: 1, name: /medical iot tool console/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 1, name: /medical iot tool console/i }),
+    ).toBeInTheDocument();
     expect(screen.getByText(/medical iot os/i)).toBeInTheDocument();
     expect(screen.getByText(/device telemetry mode is active/i)).toBeInTheDocument();
   });
 
   it('keeps recommended cards scoped to the active workspace inventory', () => {
-    mockWorkspaceValue.workspaces = [{ id: 'emergency', name: 'Emergency', toolIds: ['qsofa'] }] as any;
+    mockWorkspaceValue.workspaces = [
+      { id: 'emergency', name: 'Emergency', toolIds: ['qsofa'] },
+    ] as any;
     mockWorkspaceValue.activeWorkspaceId = 'emergency';
-    mockWorkspaceValue.activeWorkspace = { id: 'emergency', name: 'Emergency', toolIds: ['qsofa'] } as any;
+    mockWorkspaceValue.activeWorkspace = {
+      id: 'emergency',
+      name: 'Emergency',
+      toolIds: ['qsofa'],
+    } as any;
     mockWorkspaceValue.visibleAssetIds = ['qsofa'] as any;
 
     const { container } = renderOverview();
     const renderedIds = [...container.querySelectorAll('[data-tool-id]')].map((node) =>
-      node.getAttribute('data-tool-id')
+      node.getAttribute('data-tool-id'),
     );
 
-    expect(renderedIds.every((id) => (mockWorkspaceValue.visibleAssetIds as any[]).includes(id))).toBe(true);
+    expect(
+      renderedIds.every((id) => (mockWorkspaceValue.visibleAssetIds as any[]).includes(id)),
+    ).toBe(true);
   });
 
   it('stitches tools into workflow and recommendation next actions', () => {
@@ -348,17 +361,21 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
     ['early warning score', 'news2'],
     ['kidney disease staging', 'ckd-staging'],
     ['lab interpreter', 'lab-interp'],
-  ])('finds %s by alias or clinical phrase', (query, expectedId) => {
-    const { container } = renderOverview();
-    showAllTools();
+  ])(
+    'finds %s by alias or clinical phrase',
+    (query, expectedId) => {
+      const { container } = renderOverview();
+      showAllTools();
 
-    fireEvent.change(screen.getByRole('searchbox', { name: /search all tools/i }), {
-      target: { value: query },
-    });
+      fireEvent.change(screen.getByRole('searchbox', { name: /search all tools/i }), {
+        target: { value: query },
+      });
 
-    expect(toolCard(container, expectedId)).toBeTruthy();
-    expect(container.querySelectorAll('[data-tool-id]').length).toBeGreaterThan(0);
-  }, 10000);
+      expect(toolCard(container, expectedId)).toBeTruthy();
+      expect(container.querySelectorAll('[data-tool-id]').length).toBeGreaterThan(0);
+    },
+    10000,
+  );
 
   it.each([
     ['calculator', 'Calculators'],
@@ -370,10 +387,10 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
     selectFilter(filter);
 
     const renderedIds = [...container.querySelectorAll('[data-tool-id]')].map((node) =>
-      node.getAttribute('data-tool-id')
+      node.getAttribute('data-tool-id'),
     );
     const toolById = Object.fromEntries(
-      getUserFacingToolRegistryProjection().map((record) => [record.id, record])
+      getUserFacingToolRegistryProjection().map((record) => [record.id, record]),
     );
 
     expect(renderedIds.length).toBeGreaterThan(0);
@@ -394,31 +411,37 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
   // explicitly the way backendOrphanAudit.test.ts states its own.
   const FULL_CATALOG_RENDER_TIMEOUT_MS = 30_000;
 
-  it('labels execution modes from the executor catalog without promoting unsupported local tools', async () => {
-    const { container } = renderOverview();
-    showAllTools();
+  it(
+    'labels execution modes from the executor catalog without promoting unsupported local tools',
+    async () => {
+      const { container } = renderOverview();
+      showAllTools();
 
-    const legend = screen.getByLabelText(/technical and medical execution modes/i);
-    expect(within(legend).getByText(/how tools run/i)).toBeInTheDocument();
-    expect(within(legend).getByText(/each mode connects the technical path/i)).toBeInTheDocument();
-    expect(within(legend).getByText(/runs in this browser/i)).toBeInTheDocument();
-    expect(within(legend).getByText(/uses server validation/i)).toBeInTheDocument();
-    expect(within(legend).getByText(/copilot-guided, human-reviewed/i)).toBeInTheDocument();
+      const legend = screen.getByLabelText(/technical and medical execution modes/i);
+      expect(within(legend).getByText(/how tools run/i)).toBeInTheDocument();
+      expect(
+        within(legend).getByText(/each mode connects the technical path/i),
+      ).toBeInTheDocument();
+      expect(within(legend).getByText(/runs in this browser/i)).toBeInTheDocument();
+      expect(within(legend).getByText(/uses server validation/i)).toBeInTheDocument();
+      expect(within(legend).getByText(/copilot-guided, human-reviewed/i)).toBeInTheDocument();
 
-    await waitFor(() => {
-      expect(toolCard(container, 'drug-check')).toHaveTextContent(/uses server validation/i);
-    });
+      await waitFor(() => {
+        expect(toolCard(container, 'drug-check')).toHaveTextContent(/uses server validation/i);
+      });
 
-    expect(toolCard(container, 'lab-interp')).toHaveTextContent(/uses server validation/i);
-    expect(toolCard(container, 'qsofa')).toHaveTextContent(/runs in this browser/i);
-    expect(toolCard(container, 'perc')).toHaveTextContent(/copilot-guided, human-reviewed/i);
-    const platformTool = getUserFacingToolRegistryProjection().find(
-      (tool) => tool.executorStatus === 'platform' && toolCard(container, tool.id)
-    );
-    if (platformTool) {
-      expect(toolCard(container, platformTool.id)).toHaveTextContent(/platform service/i);
-    }
-  }, FULL_CATALOG_RENDER_TIMEOUT_MS);
+      expect(toolCard(container, 'lab-interp')).toHaveTextContent(/uses server validation/i);
+      expect(toolCard(container, 'qsofa')).toHaveTextContent(/runs in this browser/i);
+      expect(toolCard(container, 'perc')).toHaveTextContent(/copilot-guided, human-reviewed/i);
+      const platformTool = getUserFacingToolRegistryProjection().find(
+        (tool) => tool.executorStatus === 'platform' && toolCard(container, tool.id),
+      );
+      if (platformTool) {
+        expect(toolCard(container, platformTool.id)).toHaveTextContent(/platform service/i);
+      }
+    },
+    FULL_CATALOG_RENDER_TIMEOUT_MS,
+  );
 
   it('shows a resettable empty state for unmatched search', () => {
     renderOverview();
@@ -433,22 +456,34 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
   }, 10000);
 
   it('renders the active calculator surface from a Medical Tools URL entry', async () => {
-    renderOverview('/emergency/tools?source=calculators&filter=calculator&q=heart&open=heart-score&patientId=patient-123');
+    renderOverview(
+      '/emergency/tools?source=calculators&filter=calculator&q=heart&open=heart-score&patientId=patient-123',
+    );
 
     const activeSurface = screen.getByRole('region', { name: /active medical tools surface/i });
     expect(activeSurface).toBeInTheDocument();
-    expect(within(activeSurface).getByRole('heading', { name: /heart score/i })).toBeInTheDocument();
-    expect(await screen.findByTestId('embedded-calculators')).toHaveTextContent('heart-score:embedded');
+    expect(
+      within(activeSurface).getByRole('heading', { name: /heart score/i }),
+    ).toBeInTheDocument();
+    expect(await screen.findByTestId('embedded-calculators')).toHaveTextContent(
+      'heart-score:embedded',
+    );
     expect(navigateMock).not.toHaveBeenCalled();
   }, 10000);
 
   it('renders a non-calculator active tool surface from a Medical Tools URL entry', async () => {
-    renderOverview('/emergency/tools?source=laboratory&filter=laboratory&q=lab-interp&open=lab-interp');
+    renderOverview(
+      '/emergency/tools?source=laboratory&filter=laboratory&q=lab-interp&open=lab-interp',
+    );
 
     const activeSurface = screen.getByRole('region', { name: /active medical tools surface/i });
-    expect(within(activeSurface).getByRole('heading', { name: /lab interpreter/i })).toBeInTheDocument();
+    expect(
+      within(activeSurface).getByRole('heading', { name: /lab interpreter/i }),
+    ).toBeInTheDocument();
     expect(within(activeSurface).queryByText(/local calculator/i)).toBeNull();
-    expect(await screen.findByTestId('embedded-lab-interpreter')).toHaveTextContent('lab-interp:embedded');
+    expect(await screen.findByTestId('embedded-lab-interpreter')).toHaveTextContent(
+      'lab-interp:embedded',
+    );
     expect(screen.getByText(/continue into workflow/i)).toBeInTheDocument();
   }, 10000);
 
@@ -457,22 +492,31 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
 
     const activeSurface = screen.getByRole('region', { name: /active medical tools surface/i });
     expect(within(activeSurface).getByRole('heading', { name: /perc/i })).toBeInTheDocument();
-    expect(within(activeSurface).getByText(/^copilot-guided, human-reviewed$/i)).toBeInTheDocument();
+    expect(
+      within(activeSurface).getByText(/^copilot-guided, human-reviewed$/i),
+    ).toBeInTheDocument();
 
     fireEvent.click(within(activeSurface).getByRole('button', { name: /ask assistant/i }));
 
     expect(mockToolPreferencesValue.recordToolAccess).toHaveBeenCalledWith('perc');
     expect(mockConversationValue.selectTool).toHaveBeenCalledWith('perc');
     expect(mockConversationValue.setActiveTool).toHaveBeenCalledWith('perc');
-    expect(mockConversationValue.addMessage).toHaveBeenCalledWith(expect.stringMatching(/perc/i), 'user');
+    expect(mockConversationValue.addMessage).toHaveBeenCalledWith(
+      expect.stringMatching(/perc/i),
+      'user',
+    );
     expect(navigateMock).toHaveBeenLastCalledWith('/emergency/copilot', expect.any(Object));
   }, 10000);
 
   it('shows a clear not-found surface for unknown active tool links', () => {
-    renderOverview('/emergency/tools?source=tools&filter=clinical-tools&q=missing-tool&open=missing-tool');
+    renderOverview(
+      '/emergency/tools?source=tools&filter=clinical-tools&q=missing-tool&open=missing-tool',
+    );
 
     const activeSurface = screen.getByRole('region', { name: /active medical tools surface/i });
-    expect(within(activeSurface).getByRole('heading', { name: /tool not found/i })).toBeInTheDocument();
+    expect(
+      within(activeSurface).getByRole('heading', { name: /tool not found/i }),
+    ).toBeInTheDocument();
     expect(screen.queryByTestId('embedded-calculators')).toBeNull();
   });
 
@@ -482,35 +526,50 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
 
     openTool(container, 'qsofa');
     expect(navigateMock).toHaveBeenLastCalledWith(
-      { pathname: '/emergency/tools', search: '?source=calculators&filter=calculator&q=qsofa&open=qsofa&calc=qsofa' },
-      expect.objectContaining({ replace: true })
+      {
+        pathname: '/emergency/tools',
+        search: '?source=calculators&filter=calculator&q=qsofa&open=qsofa&calc=qsofa',
+      },
+      expect.objectContaining({ replace: true }),
     );
 
     openTool(container, 'drug-check');
     expect(navigateMock).toHaveBeenLastCalledWith(
-      { pathname: '/emergency/tools', search: '?source=tools&filter=clinical-tools&q=drug-check&open=drug-check' },
-      expect.objectContaining({ replace: true })
+      {
+        pathname: '/emergency/tools',
+        search: '?source=tools&filter=clinical-tools&q=drug-check&open=drug-check',
+      },
+      expect.objectContaining({ replace: true }),
     );
 
     openTool(container, 'fleet-command');
     expect(navigateMock).toHaveBeenLastCalledWith(
-      { pathname: '/emergency/tools', search: '?source=operations&filter=operations&q=fleet-command&open=fleet-command' },
-      expect.objectContaining({ replace: true })
+      {
+        pathname: '/emergency/tools',
+        search: '?source=operations&filter=operations&q=fleet-command&open=fleet-command',
+      },
+      expect.objectContaining({ replace: true }),
     );
 
     openTool(container, 'calculators');
     expect(navigateMock).toHaveBeenLastCalledWith(
-      { pathname: '/emergency/tools', search: '?source=calculators&filter=calculator&q=calculators&open=calculators' },
-      expect.objectContaining({ replace: true })
+      {
+        pathname: '/emergency/tools',
+        search: '?source=calculators&filter=calculator&q=calculators&open=calculators',
+      },
+      expect.objectContaining({ replace: true }),
     );
 
     openTool(container, 'perc');
-    expect(mockConversationValue.addMessage).toHaveBeenCalledWith(expect.stringMatching(/perc/i), 'user');
+    expect(mockConversationValue.addMessage).toHaveBeenCalledWith(
+      expect.stringMatching(/perc/i),
+      'user',
+    );
     expect(mockConversationValue.selectTool).toHaveBeenCalledWith('perc');
     expect(mockToolPreferencesValue.recordToolAccess).toHaveBeenCalledWith('perc');
     expect(navigateMock).toHaveBeenLastCalledWith(
       { pathname: '/emergency/copilot', search: '' },
-      expect.objectContaining({ replace: true })
+      expect.objectContaining({ replace: true }),
     );
   }, 10000);
 
@@ -529,7 +588,7 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
     expect(mockConversationValue.setActiveTool).toHaveBeenCalledWith('guideline-rag');
     expect(mockConversationValue.addMessage).toHaveBeenCalledWith(
       expect.stringMatching(/clinical decision support/i),
-      'user'
+      'user',
     );
     expect(navigateMock).toHaveBeenLastCalledWith('/emergency/copilot', expect.any(Object));
   }, 10000);

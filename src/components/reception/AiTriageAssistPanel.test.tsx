@@ -13,9 +13,17 @@ vi.mock('../../hooks/useEmergencyRolePermissions', () => ({
   useEmergencyRolePermissions: () => ({ roleLabel: 'Triage Nurse', can: () => true }),
 }));
 vi.mock('../../store/emergencyStore', () => ({
-  useEmergencyStore: Object.assign((selector: (state: any) => unknown) => selector({ patients: [] }), {
-    getState: () => ({ patients: [], selectPatient: vi.fn(), copilotOpen: false, toggleCopilot: vi.fn() }),
-  }),
+  useEmergencyStore: Object.assign(
+    (selector: (state: any) => unknown) => selector({ patients: [] }),
+    {
+      getState: () => ({
+        patients: [],
+        selectPatient: vi.fn(),
+        copilotOpen: false,
+        toggleCopilot: vi.fn(),
+      }),
+    },
+  ),
 }));
 
 function basePatient(overrides: Partial<Patient> = {}): Patient {
@@ -69,7 +77,9 @@ describe('AiTriageAssistPanel', () => {
     // find the specific native-AI-bridge one by its own distinct title text.
     const labels = screen.getAllByTestId('ai-truth-label-chip');
     expect(labels.length).toBe(2);
-    const nativeAiLabel = labels.find((el) => /native-ai expert-system/i.test(el.getAttribute('title') || ''));
+    const nativeAiLabel = labels.find((el) =>
+      /native-ai expert-system/i.test(el.getAttribute('title') || ''),
+    );
     expect(nativeAiLabel).toBeDefined();
     expect(nativeAiLabel).toHaveTextContent('Manual');
   });

@@ -36,9 +36,7 @@ export default function SimulationOutcomes() {
 
   const summary = useMemo(
     () =>
-      hasRealRuns
-        ? computeSimulationOutcomesSummary(runs, SIMULATION_SCENARIOS.length)
-        : null,
+      hasRealRuns ? computeSimulationOutcomesSummary(runs, SIMULATION_SCENARIOS.length) : null,
     [hasRealRuns, runs],
   );
   const trend = useMemo(() => (hasRealRuns ? computeWeeklyTrend(runs) : null), [hasRealRuns, runs]);
@@ -46,7 +44,10 @@ export default function SimulationOutcomes() {
     () => (hasRealRuns ? computeCompetencyCoverage(runs) : null),
     [hasRealRuns, runs],
   );
-  const weakAreas = useMemo(() => (hasRealRuns ? computeWeakAreas(runs) : null), [hasRealRuns, runs]);
+  const weakAreas = useMemo(
+    () => (hasRealRuns ? computeWeakAreas(runs) : null),
+    [hasRealRuns, runs],
+  );
   const recommendedPractice = useMemo(
     () => (hasRealRuns ? computeRecommendedPractice(SIMULATION_SCENARIOS, runs) : null),
     [hasRealRuns, runs],
@@ -72,8 +73,13 @@ export default function SimulationOutcomes() {
         <div className="simulation-outcomes-page__title-row">
           <GraphicIconBadge iconKey="activity" accent="brand" size="md" />
           <div>
-            <p className="simulation-outcomes-page__title-text" data-testid="cd-page-title-text">Simulation Outcomes</p>
-            <p>Completion trends, safety scores, competency coverage, and recommended practice scenarios.</p>
+            <p className="simulation-outcomes-page__title-text" data-testid="cd-page-title-text">
+              Simulation Outcomes
+            </p>
+            <p>
+              Completion trends, safety scores, competency coverage, and recommended practice
+              scenarios.
+            </p>
           </div>
         </div>
         <div className="simulation-outcomes-page__actions">
@@ -106,7 +112,11 @@ export default function SimulationOutcomes() {
         }
       />
 
-      <div className="simulation-outcomes-page__metrics" role="group" aria-label="Simulation outcomes summary metrics">
+      <div
+        className="simulation-outcomes-page__metrics"
+        role="group"
+        aria-label="Simulation outcomes summary metrics"
+      >
         <MetricCard
           label="Completion rate"
           value={`${hasRealRuns ? summary!.completionRate : outcomes.summary.completionRate}%`}
@@ -121,10 +131,14 @@ export default function SimulationOutcomes() {
         />
         <MetricCard
           label="Missed actions"
-          value={String(hasRealRuns ? summary!.missedCriticalActions : outcomes.summary.missedCriticalActions)}
+          value={String(
+            hasRealRuns ? summary!.missedCriticalActions : outcomes.summary.missedCriticalActions,
+          )}
           hint="Across recent runs"
           tone={
-            (hasRealRuns ? summary!.missedCriticalActions : outcomes.summary.missedCriticalActions) > 0
+            (hasRealRuns
+              ? summary!.missedCriticalActions
+              : outcomes.summary.missedCriticalActions) > 0
               ? 'warning'
               : 'good'
           }
@@ -147,7 +161,11 @@ export default function SimulationOutcomes() {
       </div>
 
       <div className="simulation-outcomes-page__charts">
-        <VisualizationPanel title="Weekly completions" description="Demo completion volume by training week." badge="Trend">
+        <VisualizationPanel
+          title="Weekly completions"
+          description="Demo completion volume by training week."
+          badge="Trend"
+        >
           <CategoryBarChart
             data={completionChart}
             title="Weekly completions"
@@ -155,7 +173,11 @@ export default function SimulationOutcomes() {
             emptyMessage="Completion trend appears when outcome history is available."
           />
         </VisualizationPanel>
-        <VisualizationPanel title="Safety trend" description="Average safety score movement across demo weeks." badge="Safety">
+        <VisualizationPanel
+          title="Safety trend"
+          description="Average safety score movement across demo weeks."
+          badge="Safety"
+        >
           <CategoryBarChart
             data={safetyChart}
             title="Safety trend"
@@ -194,14 +216,16 @@ export default function SimulationOutcomes() {
         <section className="simulation-outcomes-page__panel" aria-label="Recommended practice">
           <h2>Recommended practice</h2>
           <div className="simulation-outcomes-page__links">
-            {(hasRealRuns ? recommendedPractice! : outcomes.recommendedPractice).map((scenarioId) => {
-              const scenario = getSimulationScenarioById(scenarioId);
-              return (
-                <Link key={scenarioId} to={`${CANONICAL_ROUTES.simulation}/${scenarioId}`}>
-                  {scenario?.title || scenarioId}
-                </Link>
-              );
-            })}
+            {(hasRealRuns ? recommendedPractice! : outcomes.recommendedPractice).map(
+              (scenarioId) => {
+                const scenario = getSimulationScenarioById(scenarioId);
+                return (
+                  <Link key={scenarioId} to={`${CANONICAL_ROUTES.simulation}/${scenarioId}`}>
+                    {scenario?.title || scenarioId}
+                  </Link>
+                );
+              },
+            )}
           </div>
         </section>
       </div>

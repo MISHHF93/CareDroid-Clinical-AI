@@ -67,4 +67,3 @@ export function isGovernanceWorkspacePath(pathname: string) {
   if (GOVERNANCE_WORKSPACE_EXACT_PATHS.has(normalized)) return true;
   return GOVERNANCE_WORKSPACE_PREFIXES.some((prefix) => normalized.startsWith(prefix));
 }
-

@@ -5,10 +5,7 @@ import { CategoryBarChart } from '../../components/dashboard/DashboardCharts';
 import { GraphicIconBadge } from '../../components/graphics/CdlGraphicKit';
 import StateSourceNotice from '../../components/StateSourceNotice';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
-import {
-  LOCAL_EVALUATION_DASHBOARD,
-  fetchEvaluationDashboard,
-} from '../../services/evaluationApi';
+import { LOCAL_EVALUATION_DASHBOARD, fetchEvaluationDashboard } from '../../services/evaluationApi';
 import { DEMO_LIVE_STATES } from '../../utils/demoLiveState';
 import {
   buildEvaluationLatencyChart,
@@ -43,7 +40,9 @@ export default function AiEvaluationDashboard() {
       if (!active) return;
       setFromApi(Boolean(result.ok));
       setMessage(result.message || '');
-      setDashboard((result.data as typeof LOCAL_EVALUATION_DASHBOARD) || LOCAL_EVALUATION_DASHBOARD);
+      setDashboard(
+        (result.data as typeof LOCAL_EVALUATION_DASHBOARD) || LOCAL_EVALUATION_DASHBOARD,
+      );
       setLoading(false);
     })();
     return () => {
@@ -51,16 +50,26 @@ export default function AiEvaluationDashboard() {
     };
   }, []);
 
-  const qualityChart = useMemo(() => buildEvaluationQualityChart(dashboard.trends), [dashboard.trends]);
-  const latencyChart = useMemo(() => buildEvaluationLatencyChart(dashboard.trends), [dashboard.trends]);
+  const qualityChart = useMemo(
+    () => buildEvaluationQualityChart(dashboard.trends),
+    [dashboard.trends],
+  );
+  const latencyChart = useMemo(
+    () => buildEvaluationLatencyChart(dashboard.trends),
+    [dashboard.trends],
+  );
   const metrics = dashboard.aggregateMetrics || LOCAL_EVALUATION_DASHBOARD.aggregateMetrics;
-  const honesty = (dashboard as { honesty?: {
-    aggregateIsSeedOnly?: boolean;
-    measuredRunCount?: number;
-    seedRunCount?: number;
-    measuredSource?: string;
-    guidance?: string;
-  } }).honesty;
+  const honesty = (
+    dashboard as {
+      honesty?: {
+        aggregateIsSeedOnly?: boolean;
+        measuredRunCount?: number;
+        seedRunCount?: number;
+        measuredSource?: string;
+        guidance?: string;
+      };
+    }
+  ).honesty;
   const seedOnly =
     honesty?.aggregateIsSeedOnly !== false &&
     !(typeof honesty?.measuredRunCount === 'number' && honesty.measuredRunCount > 0);
@@ -77,7 +86,9 @@ export default function AiEvaluationDashboard() {
         <div className="ai-eval-page__title-row">
           <GraphicIconBadge iconKey="shield-check" accent="brand" size="md" />
           <div>
-            <p className="ai-eval-page__title-text" data-testid="cd-page-title-text">AI Evaluation Lab</p>
+            <p className="ai-eval-page__title-text" data-testid="cd-page-title-text">
+              AI Evaluation Lab
+            </p>
             <p>
               Offline safety gates and benchmark trends. Seed demo metrics are labeled and must not
               be used for model promotion.
@@ -98,7 +109,11 @@ export default function AiEvaluationDashboard() {
             ? seedOnly
               ? [DEMO_LIVE_STATES.DEMO, DEMO_LIVE_STATES.LIVE]
               : [DEMO_LIVE_STATES.LIVE]
-            : [DEMO_LIVE_STATES.DEMO, DEMO_LIVE_STATES.LOCAL_ONLY, DEMO_LIVE_STATES.BACKEND_UNAVAILABLE]
+            : [
+                DEMO_LIVE_STATES.DEMO,
+                DEMO_LIVE_STATES.LOCAL_ONLY,
+                DEMO_LIVE_STATES.BACKEND_UNAVAILABLE,
+              ]
         }
         details={
           message ||
@@ -129,11 +144,17 @@ export default function AiEvaluationDashboard() {
         ) : null}
       </section>
 
-      <div className="ai-eval-page__metrics" role="group" aria-label="AI evaluation summary metrics">
+      <div
+        className="ai-eval-page__metrics"
+        role="group"
+        aria-label="AI evaluation summary metrics"
+      >
         <MetricCard
           label="Model quality"
           value={`${Math.round((metrics.modelQuality || 0) * 100)}%`}
-          hint={seedOnly ? 'SEED DEMO — not for promotion' : 'Aggregate quality (measured preferred)'}
+          hint={
+            seedOnly ? 'SEED DEMO — not for promotion' : 'Aggregate quality (measured preferred)'
+          }
           tone={seedOnly ? 'warning' : 'good'}
         />
         <MetricCard
@@ -205,7 +226,9 @@ export default function AiEvaluationDashboard() {
               <strong>{benchmark.label || benchmark.metricId}</strong>
               <span>Observed: {benchmark.observedLabel || benchmark.observed}</span>
               <span>Benchmark: {benchmark.benchmarkLabel}</span>
-              {seedOnly ? <span className="ai-eval-page__seed-tag">May be seed-influenced</span> : null}
+              {seedOnly ? (
+                <span className="ai-eval-page__seed-tag">May be seed-influenced</span>
+              ) : null}
             </article>
           ))}
         </div>

@@ -1,8 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  WORKFLOW_MINING_SIGNAL_TYPES,
-  buildWorkflowMiningReport,
-} from './workflowMiningEngine';
+import { WORKFLOW_MINING_SIGNAL_TYPES, buildWorkflowMiningReport } from './workflowMiningEngine';
 
 describe('workflowMiningEngine', () => {
   it('represents all workflow mining signal types', () => {

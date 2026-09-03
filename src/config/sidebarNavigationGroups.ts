@@ -29,8 +29,8 @@ const GROUP_LABELS: Readonly<Record<string, SidebarGroupId>> = Object.freeze({
   Administration: 'Administration',
   Help: 'Help',
   // Legacy route.config aliases
-  'AI': 'Intelligence',
-  'Admin': 'Administration',
+  AI: 'Intelligence',
+  Admin: 'Administration',
 });
 
 const NAV_ID_GROUP_OVERRIDES: Readonly<Record<string, SidebarGroupId>> = Object.freeze({

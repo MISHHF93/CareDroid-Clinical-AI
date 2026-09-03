@@ -74,11 +74,8 @@ describe('assetEntitlements', () => {
     // backend source rather than trusting a second hand-typed copy, so a future edit to
     // one side without the other fails this test instead of silently drifting.
     const backendSource = readFileSync(
-      join(
-        __dirname,
-        '../../backend/src/modules/platform-assets/data/platform-asset-seed.data.ts'
-      ),
-      'utf8'
+      join(__dirname, '../../backend/src/modules/platform-assets/data/platform-asset-seed.data.ts'),
+      'utf8',
     );
     const backendAliases = parseAliasBlock(backendSource);
     expect(Object.keys(backendAliases).length).toBeGreaterThan(0);

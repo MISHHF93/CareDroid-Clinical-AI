@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { AccountableRecommendationCard } from './AccountableRecommendationCard';
-import { createAccountableRecommendation, createAiUnavailableAbstention } from '../../contracts/accountableAi';
+import {
+  createAccountableRecommendation,
+  createAiUnavailableAbstention,
+} from '../../contracts/accountableAi';
 
 describe('AccountableRecommendationCard', () => {
   it('renders evidence, model, prompt version, and AI badge for ok assist', () => {

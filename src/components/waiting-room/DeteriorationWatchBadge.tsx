@@ -6,7 +6,7 @@ import './DeteriorationWatchBadge.css';
 
 export default function DeteriorationWatchBadge({
   patient,
-  emsArrivals = ([] as any[]),
+  emsArrivals = [] as any[],
   vitalsStaleMinutes = undefined,
   now = undefined,
   compact = false,

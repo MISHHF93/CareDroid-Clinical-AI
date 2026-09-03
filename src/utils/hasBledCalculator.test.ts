@@ -5,10 +5,7 @@ import {
   interpretHasBled,
   sumHasBledScore,
 } from './hasBledCalculator';
-import {
-  HAS_BLED_NONE,
-  HAS_BLED_SEVERITY_BY_SCORE,
-} from '../data/testHelpers/pr1TestFixtures';
+import { HAS_BLED_NONE, HAS_BLED_SEVERITY_BY_SCORE } from '../data/testHelpers/pr1TestFixtures';
 
 const none = HAS_BLED_NONE;
 
@@ -40,7 +37,7 @@ describe('hasBledCalculator', () => {
       } else {
         expect(interp?.interpretation).toMatch(/below 3/i);
       }
-    }
+    },
   );
 
   it('calculateHasBledScore counts a subset of factors', () => {

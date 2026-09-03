@@ -22,80 +22,83 @@ const PATIENT_ID = 'pt-reassess-chain';
 const REMINDER_ID = 'rem-chain-1';
 
 function seedWaitingPatientWithOverdueReassessment() {
-  useEmergencyStore.setState((state) => ({
-    ...state,
-    patients: [
-      ...state.patients.filter((patient) => patient.id !== PATIENT_ID),
-      {
-        id: PATIENT_ID,
-        mrn: 'ED-500001',
-        firstName: 'Nora',
-        lastName: 'Okafor',
-        name: 'Nora Okafor',
-        dob: '1980-02-02',
-        age: 46,
-        sex: 'Female',
-        arrivalTime: new Date(Date.now() - 90 * 60_000).toISOString(),
-        triageTime: new Date(Date.now() - 80 * 60_000).toISOString(),
-        chiefComplaint: 'Abdominal pain',
-        complaintCategory: 'Gastrointestinal',
-        state: PatientState.Waiting,
-        priority: Priority.P3,
-        vitals: [
+  useEmergencyStore.setState(
+    (state) =>
+      ({
+        ...state,
+        patients: [
+          ...state.patients.filter((patient) => patient.id !== PATIENT_ID),
           {
-            hr: 88,
-            sbp: 124,
-            dbp: 78,
-            spo2: 97,
-            temp: 36.8,
-            rr: 16,
-            gcs: 15,
-            pain: 4,
-            recordedAt: new Date(Date.now() - 75 * 60_000).toISOString(),
+            id: PATIENT_ID,
+            mrn: 'ED-500001',
+            firstName: 'Nora',
+            lastName: 'Okafor',
+            name: 'Nora Okafor',
+            dob: '1980-02-02',
+            age: 46,
+            sex: 'Female',
+            arrivalTime: new Date(Date.now() - 90 * 60_000).toISOString(),
+            triageTime: new Date(Date.now() - 80 * 60_000).toISOString(),
+            chiefComplaint: 'Abdominal pain',
+            complaintCategory: 'Gastrointestinal',
+            state: PatientState.Waiting,
+            priority: Priority.P3,
+            vitals: [
+              {
+                hr: 88,
+                sbp: 124,
+                dbp: 78,
+                spo2: 97,
+                temp: 36.8,
+                rr: 16,
+                gcs: 15,
+                pain: 4,
+                recordedAt: new Date(Date.now() - 75 * 60_000).toISOString(),
+              },
+            ],
+            assignedStaffId: 'staff-aisha-thompson',
+            roomId: null,
+            // Record-style flag, as created by the operational-sync layer.
+            flags: [
+              {
+                type: PatientFlag.ReassessmentDue,
+                reason: 'Scheduled recheck reminder due',
+                severity: 'Warning',
+                detectedAt: new Date(Date.now() - 40 * 60_000).toISOString(),
+              },
+            ],
+            timeline: [],
+            notes: [],
+            reassessmentReminders: [
+              {
+                id: REMINDER_ID,
+                patientId: PATIENT_ID,
+                status: 'pending',
+                dueAt: new Date(Date.now() - 30 * 60_000).toISOString(),
+                scheduledBy: 'staff-aisha-thompson',
+                note: 'q30min abdominal pain recheck',
+              },
+            ],
+            vitalsAlerts: [],
           },
         ],
-        assignedStaffId: 'staff-aisha-thompson',
-        roomId: null,
-        // Record-style flag, as created by the operational-sync layer.
-        flags: [
+        alerts: [
+          ...state.alerts,
           {
-            type: PatientFlag.ReassessmentDue,
-            reason: 'Scheduled recheck reminder due',
-            severity: 'Warning',
-            detectedAt: new Date(Date.now() - 40 * 60_000).toISOString(),
-          },
-        ],
-        timeline: [],
-        notes: [],
-        reassessmentReminders: [
-          {
-            id: REMINDER_ID,
+            id: `alert-reassessment-reminder-overdue-${REMINDER_ID}`,
+            type: 'Reassessment',
+            severity: 'Critical',
+            title: 'Reassessment overdue — Nora Okafor',
+            message: 'Scheduled recheck overdue.',
             patientId: PATIENT_ID,
-            status: 'pending',
-            dueAt: new Date(Date.now() - 30 * 60_000).toISOString(),
-            scheduledBy: 'staff-aisha-thompson',
-            note: 'q30min abdominal pain recheck',
+            reminderId: REMINDER_ID,
+            createdAt: new Date(Date.now() - 20 * 60_000).toISOString(),
+            dismissed: false,
+            source: 'reassessment-timer-engine',
           },
         ],
-        vitalsAlerts: [],
-      },
-    ],
-    alerts: [
-      ...state.alerts,
-      {
-        id: `alert-reassessment-reminder-overdue-${REMINDER_ID}`,
-        type: 'Reassessment',
-        severity: 'Critical',
-        title: 'Reassessment overdue — Nora Okafor',
-        message: 'Scheduled recheck overdue.',
-        patientId: PATIENT_ID,
-        reminderId: REMINDER_ID,
-        createdAt: new Date(Date.now() - 20 * 60_000).toISOString(),
-        dismissed: false,
-        source: 'reassessment-timer-engine',
-      },
-    ],
-  }) as never);
+      }) as never,
+  );
 }
 
 function getPatient() {
@@ -208,38 +211,43 @@ describe('reassessment completion propagation chain', () => {
 
     const news2Alert = useEmergencyStore
       .getState()
-      .alerts.find((alert) => alert.source === 'news2-auto-score' && alert.patientId === PATIENT_ID);
+      .alerts.find(
+        (alert) => alert.source === 'news2-auto-score' && alert.patientId === PATIENT_ID,
+      );
     expect(news2Alert).toBeTruthy();
     expect(news2Alert?.title).toMatch(/NEWS2/);
   });
 
   it('clears DeteriorationRisk and ScoreReassessmentRecommended when the fresh reading is clean (HEAL-054)', () => {
     seedWaitingPatientWithOverdueReassessment();
-    useEmergencyStore.setState((state) => ({
-      ...state,
-      patients: state.patients.map((patient) =>
-        patient.id === PATIENT_ID
-          ? {
-              ...patient,
-              flags: [
-                ...patient.flags,
-                {
-                  type: PatientFlag.DeteriorationRisk,
-                  reason: 'Critical vitals: SpO2 88%',
-                  severity: 'Critical',
-                  detectedAt: new Date(Date.now() - 50 * 60_000).toISOString(),
-                },
-                {
-                  type: PatientFlag.ScoreReassessmentRecommended,
-                  reason: 'Critical vitals: SpO2 88%',
-                  severity: 'Critical',
-                  detectedAt: new Date(Date.now() - 50 * 60_000).toISOString(),
-                },
-              ],
-            }
-          : patient,
-      ),
-    }) as never);
+    useEmergencyStore.setState(
+      (state) =>
+        ({
+          ...state,
+          patients: state.patients.map((patient) =>
+            patient.id === PATIENT_ID
+              ? {
+                  ...patient,
+                  flags: [
+                    ...patient.flags,
+                    {
+                      type: PatientFlag.DeteriorationRisk,
+                      reason: 'Critical vitals: SpO2 88%',
+                      severity: 'Critical',
+                      detectedAt: new Date(Date.now() - 50 * 60_000).toISOString(),
+                    },
+                    {
+                      type: PatientFlag.ScoreReassessmentRecommended,
+                      reason: 'Critical vitals: SpO2 88%',
+                      severity: 'Critical',
+                      detectedAt: new Date(Date.now() - 50 * 60_000).toISOString(),
+                    },
+                  ],
+                }
+              : patient,
+          ),
+        }) as never,
+    );
 
     useEmergencyStore.getState().addVitals(PATIENT_ID, NORMAL_VITALS);
 
@@ -260,25 +268,28 @@ describe('reassessment completion propagation chain', () => {
 
   it('keeps DeteriorationRisk when the fresh reading still meets deterioration criteria, even without a critical per-vital alert', () => {
     seedWaitingPatientWithOverdueReassessment();
-    useEmergencyStore.setState((state) => ({
-      ...state,
-      patients: state.patients.map((patient) =>
-        patient.id === PATIENT_ID
-          ? {
-              ...patient,
-              flags: [
-                ...patient.flags,
-                {
-                  type: PatientFlag.DeteriorationRisk,
-                  reason: 'Critical vitals: SpO2 88%',
-                  severity: 'Critical',
-                  detectedAt: new Date(Date.now() - 50 * 60_000).toISOString(),
-                },
-              ],
-            }
-          : patient,
-      ),
-    }) as never);
+    useEmergencyStore.setState(
+      (state) =>
+        ({
+          ...state,
+          patients: state.patients.map((patient) =>
+            patient.id === PATIENT_ID
+              ? {
+                  ...patient,
+                  flags: [
+                    ...patient.flags,
+                    {
+                      type: PatientFlag.DeteriorationRisk,
+                      reason: 'Critical vitals: SpO2 88%',
+                      severity: 'Critical',
+                      detectedAt: new Date(Date.now() - 50 * 60_000).toISOString(),
+                    },
+                  ],
+                }
+              : patient,
+          ),
+        }) as never,
+    );
 
     // HR 125 meets the shared deterioration criteria (hr > 120).
     useEmergencyStore.getState().addVitals(PATIENT_ID, { ...NORMAL_VITALS, hr: 125 });
@@ -299,31 +310,42 @@ describe('reassessment completion propagation chain', () => {
 
   it('never auto-clears any escalation-pinned flag while a manual escalation is active, and clears again once cancelled', () => {
     seedWaitingPatientWithOverdueReassessment();
-    useEmergencyStore.setState((state) => ({
-      ...state,
-      patients: state.patients.map((patient) =>
-        patient.id === PATIENT_ID
-          ? {
-              ...patient,
-              flags: [
-                ...patient.flags,
-                { type: PatientFlag.DeteriorationRisk, reason: 'Manual escalation', severity: 'Critical' },
-                { type: PatientFlag.ScoreReassessmentRecommended, reason: 'Manual escalation', severity: 'Critical' },
-              ],
-              timeline: [
-                ...(patient.timeline || []),
-                {
-                  id: 'evt-esc-1',
-                  patientId: PATIENT_ID,
-                  type: 'ESCALATION',
-                  timestamp: new Date(Date.now() - 10 * 60_000).toISOString(),
-                  summary: 'Manual escalation by charge nurse.',
-                },
-              ],
-            }
-          : patient,
-      ),
-    }) as never);
+    useEmergencyStore.setState(
+      (state) =>
+        ({
+          ...state,
+          patients: state.patients.map((patient) =>
+            patient.id === PATIENT_ID
+              ? {
+                  ...patient,
+                  flags: [
+                    ...patient.flags,
+                    {
+                      type: PatientFlag.DeteriorationRisk,
+                      reason: 'Manual escalation',
+                      severity: 'Critical',
+                    },
+                    {
+                      type: PatientFlag.ScoreReassessmentRecommended,
+                      reason: 'Manual escalation',
+                      severity: 'Critical',
+                    },
+                  ],
+                  timeline: [
+                    ...(patient.timeline || []),
+                    {
+                      id: 'evt-esc-1',
+                      patientId: PATIENT_ID,
+                      type: 'ESCALATION',
+                      timestamp: new Date(Date.now() - 10 * 60_000).toISOString(),
+                      summary: 'Manual escalation by charge nurse.',
+                    },
+                  ],
+                }
+              : patient,
+          ),
+        }) as never,
+    );
 
     useEmergencyStore.getState().addVitals(PATIENT_ID, NORMAL_VITALS);
 
@@ -334,26 +356,29 @@ describe('reassessment completion propagation chain', () => {
 
     // Cancel the escalation (timeline event, as cancelEscalation records) and
     // recheck again: automatic clearing applies once the human override ends.
-    useEmergencyStore.setState((state) => ({
-      ...state,
-      patients: state.patients.map((entry) =>
-        entry.id === PATIENT_ID
-          ? {
-              ...entry,
-              timeline: [
-                ...(entry.timeline || []),
-                {
-                  id: 'evt-esc-cancel-1',
-                  patientId: PATIENT_ID,
-                  type: 'ESCALATION_CANCELLED',
-                  timestamp: new Date().toISOString(),
-                  summary: 'Escalation cancelled by charge nurse.',
-                },
-              ],
-            }
-          : entry,
-      ),
-    }) as never);
+    useEmergencyStore.setState(
+      (state) =>
+        ({
+          ...state,
+          patients: state.patients.map((entry) =>
+            entry.id === PATIENT_ID
+              ? {
+                  ...entry,
+                  timeline: [
+                    ...(entry.timeline || []),
+                    {
+                      id: 'evt-esc-cancel-1',
+                      patientId: PATIENT_ID,
+                      type: 'ESCALATION_CANCELLED',
+                      timestamp: new Date().toISOString(),
+                      summary: 'Escalation cancelled by charge nurse.',
+                    },
+                  ],
+                }
+              : entry,
+          ),
+        }) as never,
+    );
     useEmergencyStore.getState().addVitals(PATIENT_ID, {
       ...NORMAL_VITALS,
       recordedAt: new Date().toISOString(),

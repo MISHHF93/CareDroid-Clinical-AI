@@ -14,10 +14,7 @@ export function useLivingDocumentation() {
     [pathname, snapshot],
   );
 
-  const contextualHelp = useMemo(
-    () => resolveLivingContextualHelpForPath(pathname),
-    [pathname],
-  );
+  const contextualHelp = useMemo(() => resolveLivingContextualHelpForPath(pathname), [pathname]);
 
   return useMemo(
     () =>

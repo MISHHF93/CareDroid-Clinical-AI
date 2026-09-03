@@ -16,7 +16,9 @@ type CtasSettings = {
   };
 };
 
-export function resolveCtasTargetMinutes(settingsOrTargets: CtasSettings | Partial<Record<Priority, number>> = {}): Record<Priority, number> {
+export function resolveCtasTargetMinutes(
+  settingsOrTargets: CtasSettings | Partial<Record<Priority, number>> = {},
+): Record<Priority, number> {
   const settings = settingsOrTargets as CtasSettings;
   let source: Partial<Record<Priority, number>> = {};
   if (settings.ctasThresholds) {
@@ -32,7 +34,10 @@ export function resolveCtasTargetMinutes(settingsOrTargets: CtasSettings | Parti
   return Object.fromEntries(
     Object.values(Priority).map((priority) => {
       const configured = Number(source?.[priority]);
-      return [priority, Number.isFinite(configured) && configured >= 0 ? configured : CTAS_TARGET_MINUTES[priority]];
+      return [
+        priority,
+        Number.isFinite(configured) && configured >= 0 ? configured : CTAS_TARGET_MINUTES[priority],
+      ];
     }),
   ) as Record<Priority, number>;
 }

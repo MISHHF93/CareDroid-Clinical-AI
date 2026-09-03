@@ -43,7 +43,11 @@ export default function TriageBreachStrip({
     [context, patients],
   );
 
-  if (!alwaysShowWhenActive && !snapshot.summary.breachRiskCount && !snapshot.summary.breachedCount) {
+  if (
+    !alwaysShowWhenActive &&
+    !snapshot.summary.breachRiskCount &&
+    !snapshot.summary.breachedCount
+  ) {
     return null;
   }
   if (alwaysShowWhenActive && !hasTriageBreachVisibilityActivity(visibility)) {
@@ -63,9 +67,9 @@ export default function TriageBreachStrip({
         <p className="triage-breach-strip__eyebrow">Arrival to triage</p>
         <h3>Triage breach timer</h3>
         <p className="triage-breach-strip__subtitle">
-          Door-to-triage elapsed time against site thresholds — {snapshot.summary.breachedCount} breached ·{' '}
-          {snapshot.summary.breachRiskCount} approaching · {visibility.rapidReviewFlags} rapid-review · target{' '}
-          {snapshot.summary.targetMinutes}m
+          Door-to-triage elapsed time against site thresholds — {snapshot.summary.breachedCount}{' '}
+          breached · {snapshot.summary.breachRiskCount} approaching · {visibility.rapidReviewFlags}{' '}
+          rapid-review · target {snapshot.summary.targetMinutes}m
         </p>
       </header>
       <div className="triage-breach-strip__counts">

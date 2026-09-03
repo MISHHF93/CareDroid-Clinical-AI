@@ -19,7 +19,9 @@ describe('next-wave calculator utilities', () => {
       anionGap: 12,
       correctedAnionGap: null,
     });
-    expect(calculateAnionGap({ sodium: 140, chloride: 100, bicarbonate: 18, albumin: 2.4 })).toEqual({
+    expect(
+      calculateAnionGap({ sodium: 140, chloride: 100, bicarbonate: 18, albumin: 2.4 }),
+    ).toEqual({
       anionGap: 22,
       correctedAnionGap: 26,
     });

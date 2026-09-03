@@ -7,7 +7,10 @@ import { TRAINING_CONSOLE_ROUTE_PATHS, TRAINING_CONSOLE_ROUTES } from './trainin
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
-const routeTreeSource = readFileSync(join(__dirname, '../app/trainingConsoleRouteTree.tsx'), 'utf8');
+const routeTreeSource = readFileSync(
+  join(__dirname, '../app/trainingConsoleRouteTree.tsx'),
+  'utf8',
+);
 
 describe('trainingConsoleRoutes', () => {
   it('covers simulation and credentialing surfaces', () => {
@@ -35,7 +38,9 @@ describe('trainingConsoleRoutes', () => {
   });
 
   it('keeps training routes out of explicit router mounts', () => {
-    expect(appSource).not.toContain('element={<LazyRoute label="Loading Medical Simulation Suite..."><MedicalSimulationSuite />');
+    expect(appSource).not.toContain(
+      'element={<LazyRoute label="Loading Medical Simulation Suite..."><MedicalSimulationSuite />',
+    );
     expect(appSource).not.toContain('MedicalSimulationSuite');
     expect(appSource).not.toContain('SimulationScenarioPlayer');
   });

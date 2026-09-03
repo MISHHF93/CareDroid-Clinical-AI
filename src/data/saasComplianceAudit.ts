@@ -6,10 +6,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import {
-  getUserFacingToolInventory,
-  TOOL_LIFECYCLE_STATES,
-} from './toolInventory';
+import { getUserFacingToolInventory, TOOL_LIFECYCLE_STATES } from './toolInventory';
 import { buildAssetInventoryProjection } from './assetInventory';
 import { enrichToolWithSegmentation } from './profileToolSegmentation';
 
@@ -29,7 +26,8 @@ const CHARTER_RULES = [
   {
     id: 'everything-is-asset',
     label: 'Everything is an asset',
-    detail: 'Every shipped surface maps to a canonical `platform_assets` row (or explicit product/integration asset type).',
+    detail:
+      'Every shipped surface maps to a canonical `platform_assets` row (or explicit product/integration asset type).',
   },
   {
     id: 'asset-in-pack',
@@ -39,17 +37,20 @@ const CHARTER_RULES = [
   {
     id: 'tenant-assignable',
     label: 'Every asset can be assigned to a tenant',
-    detail: 'Asset is reachable via `organization_entitlements` through at least one pack with `organizationTypes`.',
+    detail:
+      'Asset is reachable via `organization_entitlements` through at least one pack with `organizationTypes`.',
   },
   {
     id: 'workspace-assignable',
     label: 'Every asset can be assigned to a workspace',
-    detail: 'Workspace can scope the asset via `enabledToolIds`, `LEGACY_TOOL_ID_ALIASES`, or `workspaceTags`.',
+    detail:
+      'Workspace can scope the asset via `enabledToolIds`, `LEGACY_TOOL_ID_ALIASES`, or `workspaceTags`.',
   },
   {
     id: 'role-assignable',
     label: 'Every asset can be assigned to a role',
-    detail: 'Role profile or `intendedRoles` / `roleProfiles` on the asset supports entitlement filtering.',
+    detail:
+      'Role profile or `intendedRoles` / `roleProfiles` on the asset supports entitlement filtering.',
   },
   {
     id: 'governance-metadata',
@@ -59,7 +60,8 @@ const CHARTER_RULES = [
   {
     id: 'lifecycle-status',
     label: 'Every asset has lifecycle status',
-    detail: '`lifecycle` on platform asset (`draft|beta|active|deprecated|archived`) or inventory `lifecycleState`.',
+    detail:
+      '`lifecycle` on platform asset (`draft|beta|active|deprecated|archived`) or inventory `lifecycleState`.',
   },
 ];
 
@@ -188,7 +190,9 @@ function governanceFromMountedAsset(asset) {
 
 function hasCompleteGovernance(governance) {
   if (!governance || typeof governance !== 'object') return false;
-  return GOVERNANCE_REQUIRED_KEYS.every((key) => governance[key] !== undefined && governance[key] !== '');
+  return GOVERNANCE_REQUIRED_KEYS.every(
+    (key) => governance[key] !== undefined && governance[key] !== '',
+  );
 }
 
 function workspaceAssignable(assetId, legacyTargets) {
@@ -199,7 +203,13 @@ function workspaceAssignable(assetId, legacyTargets) {
 
 function supplementalSurfaces() {
   return [
-    { id: 'dashboard', route: '/dashboard', label: 'Command Whiteboard', kind: 'Whiteboard', inventoryId: 'dashboard' },
+    {
+      id: 'dashboard',
+      route: '/dashboard',
+      label: 'Command Whiteboard',
+      kind: 'Whiteboard',
+      inventoryId: 'dashboard',
+    },
     { id: 'digital-twin', route: '/digital-twin', label: 'Digital Twin', kind: 'Whiteboard' },
     { id: 'hospital-map', route: '/hospital-map', label: 'Hospital Map', kind: 'Map' },
     { id: 'medical-iot', route: '/medical-iot', label: 'Medical IoT Dashboard', kind: 'IoT' },
@@ -209,12 +219,42 @@ function supplementalSurfaces() {
     { id: '3d-viewer', route: '/3d-viewer', label: '3D Medical Viewer', kind: '3D Viewer' },
     { id: 'workflows', route: '/workflows', label: 'Workflow Builder', kind: 'Workflow' },
     { id: 'products-catalog', route: '/products', label: 'Product Catalog', kind: 'Commercial' },
-    { id: 'integrations-marketplace', route: '/integrations-marketplace', label: 'Integration Marketplace', kind: 'Commercial' },
-    { id: 'configuration-studio', route: '/configuration-studio', label: 'Configuration Studio', kind: 'Organization' },
-    { id: 'organization-dashboard', route: '/organization', label: 'Organization Dashboard', kind: 'Organization' },
-    { id: 'asset-packs-marketplace', route: '/settings/organization/packs', label: 'Asset Pack Marketplace', kind: 'Organization' },
-    { id: 'platform-analytics', route: '/platform-analytics', label: 'Platform Analytics', kind: 'Analytics' },
-    { id: 'onboarding-wizard', route: '/onboarding', label: 'Organization Onboarding', kind: 'Organization' },
+    {
+      id: 'integrations-marketplace',
+      route: '/integrations-marketplace',
+      label: 'Integration Marketplace',
+      kind: 'Commercial',
+    },
+    {
+      id: 'configuration-studio',
+      route: '/configuration-studio',
+      label: 'Configuration Studio',
+      kind: 'Organization',
+    },
+    {
+      id: 'organization-dashboard',
+      route: '/organization',
+      label: 'Organization Dashboard',
+      kind: 'Organization',
+    },
+    {
+      id: 'asset-packs-marketplace',
+      route: '/settings/organization/packs',
+      label: 'Asset Pack Marketplace',
+      kind: 'Organization',
+    },
+    {
+      id: 'platform-analytics',
+      route: '/platform-analytics',
+      label: 'Platform Analytics',
+      kind: 'Analytics',
+    },
+    {
+      id: 'onboarding-wizard',
+      route: '/onboarding',
+      label: 'Organization Onboarding',
+      kind: 'Organization',
+    },
     { id: 'welcome', route: '/welcome', label: 'User Welcome', kind: 'Onboarding' },
   ];
 }
@@ -229,7 +269,8 @@ function supplementalPackIds(surface) {
   if (text.includes('simulation')) return ['simulation-training-pack'];
   if (text.includes('laboratory')) return ['laboratory-intelligence'];
   if (text.includes('governance') || text.includes('audit')) return ['governance-compliance-pack'];
-  if (text.includes('digital') || text.includes('map')) return ['hospital-operations', 'digital-twin-pack'];
+  if (text.includes('digital') || text.includes('map'))
+    return ['hospital-operations', 'digital-twin-pack'];
   return ['core-platform'];
 }
 
@@ -315,7 +356,9 @@ function evaluateRow(params) {
     layer: layer || 'inventory',
     lifecycle: lifecycle || '—',
     lifecycleSource: lifecycleSource || '—',
-    governance: hasCompleteGovernance(governance) ? 'Complete (seed template)' : 'Missing / partial',
+    governance: hasCompleteGovernance(governance)
+      ? 'Complete (seed template)'
+      : 'Missing / partial',
     isPlatformAsset: isPlatformAsset ? 'Yes' : 'No',
     violations,
     violationRules: violations.map((v) => v.rule),
@@ -362,16 +405,20 @@ export function buildSaasComplianceRows() {
         assetId,
         packIds,
         isPlatformAsset,
-        governance: governanceFromMountedAsset(mountedAsset) || (isPlatformAsset ? seedGovernance : null),
+        governance:
+          governanceFromMountedAsset(mountedAsset) || (isPlatformAsset ? seedGovernance : null),
         lifecycle: mountedAsset?.lifecycle || record.lifecycleState || TOOL_LIFECYCLE_STATES.ACTIVE,
-        lifecycleSource: mountedAsset ? 'assetInventory.mountedProjection' : 'toolInventory.lifecycleState',
+        lifecycleSource: mountedAsset
+          ? 'assetInventory.mountedProjection'
+          : 'toolInventory.lifecycleState',
         roleAssignableExplicit,
         legacyTargets,
-        workspaceNote: mountedAsset?.workspaceIds?.length || legacyTargets.has(assetId)
-          ? null
-          : 'Assignable by direct `enabledToolIds` match (implicit)',
+        workspaceNote:
+          mountedAsset?.workspaceIds?.length || legacyTargets.has(assetId)
+            ? null
+            : 'Assignable by direct `enabledToolIds` match (implicit)',
         layer: 'tool-registry',
-      })
+      }),
     );
 
     if (isPlatformAsset && orgMeta && !packIds.length) {
@@ -405,7 +452,7 @@ export function buildSaasComplianceRows() {
         roleAssignableExplicit: true,
         legacyTargets,
         layer: 'ai-agent',
-      })
+      }),
     );
   }
 
@@ -420,14 +467,21 @@ export function buildSaasComplianceRows() {
         inventoryId: sup.inventoryId || sup.id,
         assetId: mountedAsset?.id || sup.id,
         packIds,
-        isPlatformAsset: isPlatformAsset || Boolean(mountedAsset) || sup.kind === 'Organization' || sup.kind === 'Commercial',
+        isPlatformAsset:
+          isPlatformAsset ||
+          Boolean(mountedAsset) ||
+          sup.kind === 'Organization' ||
+          sup.kind === 'Commercial',
         governance: governanceFromMountedAsset(mountedAsset) || seedGovernance,
         lifecycle: mountedAsset?.lifecycle || 'active',
         lifecycleSource: mountedAsset ? 'assetInventory.mountedProjection' : 'system-route-purpose',
-        roleAssignableExplicit: Boolean(mountedAsset?.roleIds?.length) || rolePreferred.has(sup.id) || sup.kind === 'Organization',
+        roleAssignableExplicit:
+          Boolean(mountedAsset?.roleIds?.length) ||
+          rolePreferred.has(sup.id) ||
+          sup.kind === 'Organization',
         legacyTargets,
         layer: sup.kind,
-      })
+      }),
     );
   }
 
@@ -447,7 +501,9 @@ function summarizeViolations(rows) {
 }
 
 function escapeCell(value) {
-  return String(value ?? '—').replace(/\|/g, '\\|').replace(/\n/g, ' ');
+  return String(value ?? '—')
+    .replace(/\|/g, '\\|')
+    .replace(/\n/g, ' ');
 }
 
 export function getSaasComplianceDocument() {
@@ -472,9 +528,7 @@ export function getSaasComplianceDocument() {
     '',
     '### Charter rules verified',
     '',
-    ...CHARTER_RULES.map(
-      (r, i) => `${i + 1}. **${r.label}** — ${r.detail}`
-    ),
+    ...CHARTER_RULES.map((r, i) => `${i + 1}. **${r.label}** — ${r.detail}`),
     '',
     '## Executive summary',
     '',
@@ -506,10 +560,13 @@ export function getSaasComplianceDocument() {
     sections.push(
       affected
         .slice(0, 35)
-        .map((r) => `- **${r.feature}** (\`${r.assetId}\`, ${r.route}) — ${r.violations.find((v) => v.rule === rule.id)?.message}`)
+        .map(
+          (r) =>
+            `- **${r.feature}** (\`${r.assetId}\`, ${r.route}) — ${r.violations.find((v) => v.rule === rule.id)?.message}`,
+        )
         .join('\n'),
       affected.length > 35 ? `\n- … and ${affected.length - 35} more` : '',
-      ''
+      '',
     );
   }
 
@@ -532,9 +589,7 @@ export function getSaasComplianceDocument() {
     '',
   );
 
-  const seedNoPack = rows.filter(
-    (r) => r.isPlatformAsset === 'Yes' && r.packAssignment === '—'
-  );
+  const seedNoPack = rows.filter((r) => r.isPlatformAsset === 'Yes' && r.packAssignment === '—');
   sections.push(
     seedNoPack.length
       ? seedNoPack.map((r) => `- \`${r.assetId}\` — ${r.feature}`).join('\n')
@@ -560,7 +615,7 @@ export function getSaasComplianceDocument() {
         row.violationRules.length ? row.violationRules.join('; ') : '—',
       ]
         .map(escapeCell)
-        .join(' | ')} |`
+        .join(' | ')} |`,
     );
   }
 
@@ -577,7 +632,7 @@ export function getSaasComplianceDocument() {
     '| `src/data/profileToolSegmentation.ts` | Role visibility heuristics |',
     '| `src/data/assetInventory.ts` | Mounted frontend asset projection with pack/product/workspace/role/execution/governance metadata |',
     '| `docs/feature-coverage-matrix.md` | Related coverage audit |',
-    ''
+    '',
   );
 
   return {

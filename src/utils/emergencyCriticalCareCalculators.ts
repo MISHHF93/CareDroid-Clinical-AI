@@ -278,7 +278,9 @@ export function interpretGcsScore(score) {
       label: 'Severe impairment range',
       interpretation:
         'GCS 3-8 is commonly categorized as severe traumatic brain injury/marked impaired consciousness context. Escalate urgently when clinically indicated.',
-      warnings: ['Airway, trauma, tox/metabolic, and neurologic emergencies require immediate clinical evaluation.'],
+      warnings: [
+        'Airway, trauma, tox/metabolic, and neurologic emergencies require immediate clinical evaluation.',
+      ],
       referenceLine,
     };
   }
@@ -299,7 +301,9 @@ export function interpretGcsScore(score) {
     label: 'Mild/no impairment range',
     interpretation:
       'GCS 13-15 is commonly categorized as mild impairment/no major depression of consciousness on this scale. It does not rule out serious pathology.',
-    warnings: ['Normal or near-normal GCS does not exclude intracranial injury or evolving deterioration.'],
+    warnings: [
+      'Normal or near-normal GCS does not exclude intracranial injury or evolving deterioration.',
+    ],
     referenceLine,
   };
 }
@@ -318,7 +322,9 @@ export function interpretCurb65Score(score) {
       label: 'High severity range',
       interpretation:
         'CURB-65 score 3-5 is a high-severity range in validation/guideline use and should prompt urgent senior review and site-of-care assessment.',
-      warnings: ['CURB-65 does not diagnose pneumonia and does not replace sepsis or respiratory failure pathways.'],
+      warnings: [
+        'CURB-65 does not diagnose pneumonia and does not replace sepsis or respiratory failure pathways.',
+      ],
       referenceLine,
     };
   }
@@ -329,7 +335,9 @@ export function interpretCurb65Score(score) {
       label: 'Moderate severity range',
       interpretation:
         'CURB-65 score 2 is an intermediate range; clinical review and local CAP pathways determine monitoring and disposition.',
-      warnings: ['Use alongside oxygenation, comorbidities, social context, imaging, and lab findings.'],
+      warnings: [
+        'Use alongside oxygenation, comorbidities, social context, imaging, and lab findings.',
+      ],
       referenceLine,
     };
   }
@@ -339,7 +347,9 @@ export function interpretCurb65Score(score) {
     label: 'Lower severity range',
     interpretation:
       'CURB-65 score 0-1 is a lower severity range in the original rule, but does not by itself determine outpatient care.',
-    warnings: ['Low CURB-65 does not rule out deterioration, sepsis, hypoxemia, or need for admission.'],
+    warnings: [
+      'Low CURB-65 does not rule out deterioration, sepsis, hypoxemia, or need for admission.',
+    ],
     referenceLine,
   };
 }
@@ -354,15 +364,26 @@ export function calculateApacheIIScore(inputs) {
   const gcsContribution = 15 - gcs;
   return {
     total: selected + renalAdjustment + gcsContribution,
-    acutePhysiology: selected + renalAdjustment + gcsContribution - (toNumber(inputs.age) ?? 0) - (toNumber(inputs.chronicHealth) ?? 0),
+    acutePhysiology:
+      selected +
+      renalAdjustment +
+      gcsContribution -
+      (toNumber(inputs.age) ?? 0) -
+      (toNumber(inputs.chronicHealth) ?? 0),
     gcsContribution,
     renalAdjustment,
   };
 }
 
 export function validateApacheIIInputs(inputs) {
-  const labelByKey = Object.fromEntries(APACHE_II_COMPONENTS_META.map((row) => [row.key, row.label]));
-  const required = validateRequiredSelections(inputs, APACHE_II_COMPONENTS_META.map((row) => row.key), labelByKey);
+  const labelByKey = Object.fromEntries(
+    APACHE_II_COMPONENTS_META.map((row) => [row.key, row.label]),
+  );
+  const required = validateRequiredSelections(
+    inputs,
+    APACHE_II_COMPONENTS_META.map((row) => row.key),
+    labelByKey,
+  );
   const errors = [...required.errors];
   const gcs = toNumber(inputs.gcs);
   if (gcs === null) errors.push('Enter Glasgow Coma Scale total.');
@@ -380,7 +401,9 @@ export function interpretApacheIIScore(score) {
       label: 'Very high severity score',
       interpretation:
         'APACHE II score >=30 is a very high severity range. Original mortality prediction is diagnosis-specific and not a standalone bedside disposition rule.',
-      warnings: ['Do not use APACHE II alone for individual prognosis, code status, ICU triage, or treatment decisions.'],
+      warnings: [
+        'Do not use APACHE II alone for individual prognosis, code status, ICU triage, or treatment decisions.',
+      ],
       referenceLine,
     };
   }
@@ -448,7 +471,8 @@ export function validateMewsInputs(raw) {
   for (const [key, label, min, max] of ranges) {
     const value = toNumber(raw[key]);
     if (value === null) errors.push(`Enter ${label}.`);
-    else if (value < min || value > max) errors.push(`${label} should be between ${min} and ${max}.`);
+    else if (value < min || value > max)
+      errors.push(`${label} should be between ${min} and ${max}.`);
   }
   if (toNumber(raw.avpu) === null) errors.push('Select AVPU consciousness level.');
   return { ok: errors.length === 0, errors };
@@ -468,7 +492,9 @@ export function interpretMewsScore(score) {
       label: 'High MEWS range',
       interpretation:
         'MEWS >=5 is commonly treated as a high early-warning range requiring urgent clinical review per local escalation policy.',
-      warnings: ['MEWS does not diagnose sepsis, shock, respiratory failure, or any specific condition.'],
+      warnings: [
+        'MEWS does not diagnose sepsis, shock, respiratory failure, or any specific condition.',
+      ],
       referenceLine,
     };
   }
@@ -479,7 +505,9 @@ export function interpretMewsScore(score) {
       label: 'Moderate MEWS range',
       interpretation:
         'MEWS 3-4 suggests increased deterioration concern and should prompt reassessment and escalation according to local policy.',
-      warnings: ['Single abnormal vital signs may still require urgent action even if total score is lower.'],
+      warnings: [
+        'Single abnormal vital signs may still require urgent action even if total score is lower.',
+      ],
       referenceLine,
     };
   }
@@ -533,7 +561,9 @@ export function interpretRevisedTraumaScore(weighted) {
       label: 'Very low RTS',
       interpretation:
         'Weighted RTS below 4 indicates very severe physiologic derangement in trauma scoring context.',
-      warnings: ['Trauma resuscitation and transfer decisions must follow local trauma-system protocols.'],
+      warnings: [
+        'Trauma resuscitation and transfer decisions must follow local trauma-system protocols.',
+      ],
       referenceLine,
     };
   }
@@ -544,7 +574,9 @@ export function interpretRevisedTraumaScore(weighted) {
       label: 'Low RTS',
       interpretation:
         'Weighted RTS below 6 indicates high physiologic concern and should be interpreted with mechanism and injuries.',
-      warnings: ['RTS is not a substitute for primary survey, imaging, or trauma team activation criteria.'],
+      warnings: [
+        'RTS is not a substitute for primary survey, imaging, or trauma team activation criteria.',
+      ],
       referenceLine,
     };
   }
@@ -571,7 +603,10 @@ export function interpretRevisedTraumaScore(weighted) {
 }
 
 export function calculatePewsScore(inputs) {
-  return sumSelectedPoints(inputs, PEWS_DIMENSIONS_META.map((row) => row.key));
+  return sumSelectedPoints(
+    inputs,
+    PEWS_DIMENSIONS_META.map((row) => row.key),
+  );
 }
 
 export function interpretPewsScore(score) {

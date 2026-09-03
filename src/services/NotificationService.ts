@@ -1,10 +1,16 @@
 /**
  * NotificationService
- * 
+ *
  * Service for managing notification-related API calls and browser notifications
  */
 
-import { apiFetch, buildStreamUrl, getApiErrorMessage, getStoredAccessToken, parseApiResponse } from './apiClient';
+import {
+  apiFetch,
+  buildStreamUrl,
+  getApiErrorMessage,
+  getStoredAccessToken,
+  parseApiResponse,
+} from './apiClient';
 import { AUTH_CONFIG } from '../config/auth.config';
 import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
 import appConfig from '../config/appConfig';
@@ -72,7 +78,7 @@ export const NotificationService = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authToken}`,
+          Authorization: `Bearer ${authToken}`,
         },
         body: JSON.stringify(payload),
       });
@@ -108,7 +114,7 @@ export const NotificationService = {
     try {
       const response = await apiFetch(`/api/notifications?limit=${limit}`, {
         headers: {
-          'Authorization': `Bearer ${getStoredAccessToken()}`,
+          Authorization: `Bearer ${getStoredAccessToken()}`,
         },
       });
       const data = await parseApiResponse(response, { fallback: {} });
@@ -131,7 +137,7 @@ export const NotificationService = {
     try {
       const response = await apiFetch('/api/notifications/unread/count', {
         headers: {
-          'Authorization': `Bearer ${getStoredAccessToken()}`,
+          Authorization: `Bearer ${getStoredAccessToken()}`,
         },
       });
       const data = await parseApiResponse(response, { fallback: {} });
@@ -155,7 +161,7 @@ export const NotificationService = {
       const response = await apiFetch('/api/notifications/read-all', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${getStoredAccessToken()}`,
+          Authorization: `Bearer ${getStoredAccessToken()}`,
         },
       });
       const data = await parseApiResponse(response, { fallback: {} });
@@ -178,7 +184,7 @@ export const NotificationService = {
     try {
       const response = await apiFetch('/api/notifications/devices', {
         headers: {
-          'Authorization': `Bearer ${getStoredAccessToken()}`,
+          Authorization: `Bearer ${getStoredAccessToken()}`,
         },
       });
       const data = await parseApiResponse(response, { fallback: {} });
@@ -203,12 +209,15 @@ export const NotificationService = {
     }
 
     try {
-      const response = await apiFetch(`/api/notifications/devices/${encodeURIComponent(deviceIdentifier)}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${getStoredAccessToken()}`,
+      const response = await apiFetch(
+        `/api/notifications/devices/${encodeURIComponent(deviceIdentifier)}`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${getStoredAccessToken()}`,
+          },
         },
-      });
+      );
 
       if (!response.ok) {
         const data = await parseApiResponse(response, { fallback: {} });
@@ -230,7 +239,7 @@ export const NotificationService = {
       const response = await apiFetch(`/api/notifications/${notificationId}/read`, {
         method: 'PATCH',
         headers: {
-          'Authorization': `Bearer ${getStoredAccessToken()}`,
+          Authorization: `Bearer ${getStoredAccessToken()}`,
         },
       });
       const data = await parseApiResponse(response, { fallback: {} });
@@ -254,7 +263,7 @@ export const NotificationService = {
       const response = await apiFetch(`/api/notifications/${notificationId}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${getStoredAccessToken()}`,
+          Authorization: `Bearer ${getStoredAccessToken()}`,
         },
       });
 
@@ -276,7 +285,7 @@ export const NotificationService = {
     try {
       const response = await apiFetch('/api/notifications/preferences', {
         headers: {
-          'Authorization': `Bearer ${getStoredAccessToken()}`,
+          Authorization: `Bearer ${getStoredAccessToken()}`,
         },
       });
       const data = await parseApiResponse(response, { fallback: {} });
@@ -301,7 +310,7 @@ export const NotificationService = {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${getStoredAccessToken()}`,
+          Authorization: `Bearer ${getStoredAccessToken()}`,
         },
         body: JSON.stringify(preferences),
       });
@@ -327,7 +336,7 @@ export const NotificationService = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${getStoredAccessToken()}`,
+          Authorization: `Bearer ${getStoredAccessToken()}`,
         },
         body: JSON.stringify({ enabled: Boolean(enabled) }),
       });
@@ -351,11 +360,15 @@ export const NotificationService = {
     if (!isBackendCapabilityEnabled('notificationStream')) {
       logger.info('Notification stream API not available — skipping SSE subscription');
       const unavailableResponse = makeNotificationStreamDisabledResponse();
-      const error: any = new Error('Real-time notification stream is not available on this server.');
+      const error: any = new Error(
+        'Real-time notification stream is not available on this server.',
+      );
       error.unavailableResponse = unavailableResponse;
       void recordAutomationBlocked({
         triggerFired: 'Notification stream subscription requested',
-        conditionsEvaluated: [{ label: 'Notification stream backend capability enabled', result: false }],
+        conditionsEvaluated: [
+          { label: 'Notification stream backend capability enabled', result: false },
+        ],
         actionSelected: 'Subscribe to real-time notification stream',
         toolCalled: 'notifications',
         backendEndpoint: '/api/notifications/stream',
@@ -372,20 +385,20 @@ export const NotificationService = {
     }
 
     const token = getStoredAccessToken();
-    
-    const eventSource = new EventSource(
-      buildStreamUrl(`/api/notifications/stream?token=${token}`)
-    );
+
+    const eventSource = new EventSource(buildStreamUrl(`/api/notifications/stream?token=${token}`));
 
     eventSource.onmessage = (event) => {
       try {
         const notification = JSON.parse(event.data);
-        void import('./alertLifecycleOrchestrator').then(({ ingestNotificationStreamEvent, ingestUnifiedAlert }) => {
-          const unified = ingestNotificationStreamEvent(notification);
-          if (unified) {
-            ingestUnifiedAlert(unified, { sourceScreen: 'notification-stream' });
-          }
-        });
+        void import('./alertLifecycleOrchestrator').then(
+          ({ ingestNotificationStreamEvent, ingestUnifiedAlert }) => {
+            const unified = ingestNotificationStreamEvent(notification);
+            if (unified) {
+              ingestUnifiedAlert(unified, { sourceScreen: 'notification-stream' });
+            }
+          },
+        );
         onNotification(notification);
       } catch (error: any) {
         logger.error('Error parsing notification', { error });
@@ -419,7 +432,7 @@ export const NotificationService = {
       const response = await apiFetch('/api/notifications/test', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${getStoredAccessToken()}`,
+          Authorization: `Bearer ${getStoredAccessToken()}`,
         },
       });
 

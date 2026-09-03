@@ -131,9 +131,7 @@ export type ExperimentalEngineEnv = {
  * Dev default: ON (so local ED demos retain automation labs).
  * Override with VITE_ENABLE_EXPERIMENTAL_SHELL_ENGINES=true|false.
  */
-export function resolveExperimentalShellEnginesEnabled(
-  env: ExperimentalEngineEnv = {},
-): boolean {
+export function resolveExperimentalShellEnginesEnabled(env: ExperimentalEngineEnv = {}): boolean {
   const explicit = String(env.VITE_ENABLE_EXPERIMENTAL_SHELL_ENGINES ?? '')
     .trim()
     .toLowerCase();
@@ -157,12 +155,7 @@ export function isExperimentalShellEngineRuntimeEnabled(): boolean {
 /** True when this catalog engine may start given capability flags + prod gate. */
 export function shouldStartShellEngine(
   engineId: string,
-  capabilities: Partial<
-    Record<
-      NonNullable<ShellEngineDefinition['capabilityFlag']>,
-      boolean
-    >
-  >,
+  capabilities: Partial<Record<NonNullable<ShellEngineDefinition['capabilityFlag']>, boolean>>,
   options: { experimentalEnabled?: boolean } = {},
 ): boolean {
   const engine = getShellEngine(engineId);
@@ -178,9 +171,7 @@ export function shouldStartShellEngine(
  * Copy for StateSourceNotice when surfaces consume session engines.
  * Does not claim multi-user live durability.
  */
-export function buildSessionEngineSourceDetails(
-  engineIds?: readonly string[],
-): string {
+export function buildSessionEngineSourceDetails(engineIds?: readonly string[]): string {
   const engines = engineIds?.length
     ? engineIds.map((id) => getShellEngine(id)).filter(Boolean)
     : listAuthoritativeSessionEngines();

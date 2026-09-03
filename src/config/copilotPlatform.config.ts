@@ -21,7 +21,10 @@ import {
   PRACTITIONER_COPILOT_ORCHESTRATION_LIMIT,
 } from './practitionerCleanup.constants';
 import { HUMAN_REVIEW_DISCLAIMER } from '../lib/ai/safety/policy';
-import { COPILOT_RECOMMENDATION_DOMAIN, COPILOT_DOMAIN_PRIORITY } from './copilotRecommendationModel';
+import {
+  COPILOT_RECOMMENDATION_DOMAIN,
+  COPILOT_DOMAIN_PRIORITY,
+} from './copilotRecommendationModel';
 import { getProfileCopilotWelcomeMessage } from './profileDesignLanguage.config';
 import type { ProfileCopyStack } from './userProfileCopyModel';
 
@@ -253,7 +256,8 @@ export const COPILOT_PLATFORM = Object.freeze({
     ]),
     fallbackUnavailable:
       'CareDroid Copilot unavailable - check connection. Continue clinical review with human oversight.',
-    backendContextDegraded: 'Using local board data — live Copilot context is temporarily unavailable.',
+    backendContextDegraded:
+      'Using local board data — live Copilot context is temporarily unavailable.',
   }),
 } as const);
 

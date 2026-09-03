@@ -10,7 +10,7 @@ import logger from '../../utils/logger';
 
 /**
  * ConsentFlow Component
- * 
+ *
  * In-app consent collection for HIPAA, privacy policy, and terms
  * REQUIRED before user can access clinical tools
  * Tracks consent in audit log
@@ -29,16 +29,16 @@ export const ConsentFlow = ({ onComplete }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleConsentChange = (key, checked) => {
-    setConsents(prev => ({ ...prev, [key]: checked }));
+    setConsents((prev) => ({ ...prev, [key]: checked }));
     // Clear error when user checks the box
     if (checked && errors[key]) {
-      setErrors(prev => ({ ...prev, [key]: null }));
+      setErrors((prev) => ({ ...prev, [key]: null }));
     }
   };
 
   const validateConsents = () => {
     const newErrors: any = {};
-    
+
     // Required consents
     if (!consents.hipaa) {
       newErrors.hipaa = 'HIPAA authorization is required to use CareDroid';
@@ -56,7 +56,7 @@ export const ConsentFlow = ({ onComplete }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateConsents()) {
       return;
     }
@@ -99,9 +99,11 @@ export const ConsentFlow = ({ onComplete }) => {
     <div className="consent-flow">
       <div className="consent-container">
         <div className="consent-header">
-          <p className="consent-header__title-text" data-testid="cd-page-title-text">Privacy & Consent</p>
+          <p className="consent-header__title-text" data-testid="cd-page-title-text">
+            Privacy & Consent
+          </p>
           <p className="consent-intro">
-            Before you can use CareDroid, we need your consent to collect and process Protected 
+            Before you can use CareDroid, we need your consent to collect and process Protected
             Health Information (PHI) in compliance with HIPAA regulations.
           </p>
         </div>
@@ -115,8 +117,8 @@ export const ConsentFlow = ({ onComplete }) => {
             </div>
             <div className="consent-content">
               <p>
-                I authorize CareDroid to use and disclose my Protected Health Information (PHI) 
-                for the purpose of providing clinical decision support services.
+                I authorize CareDroid to use and disclose my Protected Health Information (PHI) for
+                the purpose of providing clinical decision support services.
               </p>
               <div className="consent-details">
                 <h4>What PHI May Be Used:</h4>
@@ -135,7 +137,10 @@ export const ConsentFlow = ({ onComplete }) => {
                 </ul>
                 <h4>Your Rights:</h4>
                 <ul>
-                  <li>You may revoke this authorization at any time by contacting <a href="mailto:privacy@caredroid.ai">privacy@caredroid.ai</a></li>
+                  <li>
+                    You may revoke this authorization at any time by contacting{' '}
+                    <a href="mailto:privacy@caredroid.ai">privacy@caredroid.ai</a>
+                  </li>
                   <li>Revocation will not affect actions already taken</li>
                   <li>After revocation, you will not be able to use CareDroid's clinical tools</li>
                 </ul>
@@ -160,8 +165,11 @@ export const ConsentFlow = ({ onComplete }) => {
             </div>
             <div className="consent-content">
               <p>
-                Please review our <a href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a> to 
-                understand how we collect, use, and protect your information.
+                Please review our{' '}
+                <a href="/privacy" target="_blank" rel="noopener noreferrer">
+                  Privacy Policy
+                </a>{' '}
+                to understand how we collect, use, and protect your information.
               </p>
               <Checkbox
                 id="consent-privacy"
@@ -183,13 +191,16 @@ export const ConsentFlow = ({ onComplete }) => {
             </div>
             <div className="consent-content">
               <p>
-                Please review our <a href="/terms" target="_blank" rel="noopener noreferrer">Terms of Service</a> including 
-                our medical disclaimer and acceptable use policy.
+                Please review our{' '}
+                <a href="/terms" target="_blank" rel="noopener noreferrer">
+                  Terms of Service
+                </a>{' '}
+                including our medical disclaimer and acceptable use policy.
               </p>
               <div className="consent-warning">
                 <p>
-                  <strong>⚠️ Important:</strong> CareDroid is a decision support tool only. 
-                  It is NOT a substitute for professional medical judgment.
+                  <strong>⚠️ Important:</strong> CareDroid is a decision support tool only. It is
+                  NOT a substitute for professional medical judgment.
                 </p>
               </div>
               <Checkbox
@@ -212,8 +223,9 @@ export const ConsentFlow = ({ onComplete }) => {
             </div>
             <div className="consent-content">
               <p>
-                Help us improve CareDroid by allowing us to use anonymized, de-identified data 
-                for research and AI model training. <strong>No PHI or personal information will be included.</strong>
+                Help us improve CareDroid by allowing us to use anonymized, de-identified data for
+                research and AI model training.{' '}
+                <strong>No PHI or personal information will be included.</strong>
               </p>
               <Checkbox
                 id="consent-data-sharing"
@@ -234,7 +246,7 @@ export const ConsentFlow = ({ onComplete }) => {
             </div>
             <div className="consent-content">
               <p>
-                Receive updates about new features, clinical guidelines, and educational content. 
+                Receive updates about new features, clinical guidelines, and educational content.
                 You can unsubscribe at any time.
               </p>
               <Checkbox
@@ -249,11 +261,7 @@ export const ConsentFlow = ({ onComplete }) => {
           </div>
 
           {/* Submit Error */}
-          {errors.submit && (
-            <div className="consent-error-global">
-              {errors.submit}
-            </div>
-          )}
+          {errors.submit && <div className="consent-error-global">{errors.submit}</div>}
 
           {/* Actions */}
           <div className="consent-actions">
@@ -265,17 +273,13 @@ export const ConsentFlow = ({ onComplete }) => {
             >
               Cancel
             </button>
-            <button
-              type="submit"
-              className="btn-consent-primary"
-              disabled={isSubmitting}
-            >
+            <button type="submit" className="btn-consent-primary" disabled={isSubmitting}>
               {isSubmitting ? 'Recording Consent...' : 'Accept and Continue'}
             </button>
           </div>
 
           <p className="consent-footer-note">
-            This consent will be recorded with a timestamp, your IP address, and user information 
+            This consent will be recorded with a timestamp, your IP address, and user information
             for our audit log as required by HIPAA.
           </p>
         </form>

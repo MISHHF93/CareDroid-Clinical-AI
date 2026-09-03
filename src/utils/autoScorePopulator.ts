@@ -8,17 +8,49 @@ const RISK_FACTOR_KEYWORDS = [
   },
   { id: 'smoker', pattern: /\b(smoker|smoking|tobacco)\b/i, label: 'smoker' },
   { id: 'obesity', pattern: /\b(obesity|obese|bmi\s*[3-9]\d)\b/i, label: 'obesity' },
-  { id: 'family-history', pattern: /\b(family history|fhx|father|mother|sibling).{0,32}\b(cad|mi|acs|heart)\b/i, label: 'family history' },
+  {
+    id: 'family-history',
+    pattern: /\b(family history|fhx|father|mother|sibling).{0,32}\b(cad|mi|acs|heart)\b/i,
+    label: 'family history',
+  },
 ];
 
 const NIHSS_NOTE_PATTERNS = [
-  { fieldId: 'motorLeft', pattern: /\b(left).{0,24}\b(weak|weakness|drift|paresis|paralysis)\b/i, label: 'left limb weakness documented' },
-  { fieldId: 'motorRight', pattern: /\b(right).{0,24}\b(weak|weakness|drift|paresis|paralysis)\b/i, label: 'right limb weakness documented' },
-  { fieldId: 'facial', pattern: /\b(facial droop|face droop|facial palsy)\b/i, label: 'facial droop documented' },
-  { fieldId: 'language', pattern: /\b(aphasia|word finding|expressive language)\b/i, label: 'language deficit documented' },
-  { fieldId: 'dysarthria', pattern: /\b(dysarthria|slurred speech)\b/i, label: 'dysarthria documented' },
-  { fieldId: 'gaze', pattern: /\b(gaze deviation|forced gaze)\b/i, label: 'gaze finding documented' },
-  { fieldId: 'visual', pattern: /\b(visual field|hemianopia|vision loss)\b/i, label: 'visual field finding documented' },
+  {
+    fieldId: 'motorLeft',
+    pattern: /\b(left).{0,24}\b(weak|weakness|drift|paresis|paralysis)\b/i,
+    label: 'left limb weakness documented',
+  },
+  {
+    fieldId: 'motorRight',
+    pattern: /\b(right).{0,24}\b(weak|weakness|drift|paresis|paralysis)\b/i,
+    label: 'right limb weakness documented',
+  },
+  {
+    fieldId: 'facial',
+    pattern: /\b(facial droop|face droop|facial palsy)\b/i,
+    label: 'facial droop documented',
+  },
+  {
+    fieldId: 'language',
+    pattern: /\b(aphasia|word finding|expressive language)\b/i,
+    label: 'language deficit documented',
+  },
+  {
+    fieldId: 'dysarthria',
+    pattern: /\b(dysarthria|slurred speech)\b/i,
+    label: 'dysarthria documented',
+  },
+  {
+    fieldId: 'gaze',
+    pattern: /\b(gaze deviation|forced gaze)\b/i,
+    label: 'gaze finding documented',
+  },
+  {
+    fieldId: 'visual',
+    pattern: /\b(visual field|hemianopia|vision loss)\b/i,
+    label: 'visual field finding documented',
+  },
 ];
 
 function textBlob(...parts) {
@@ -84,7 +116,11 @@ function parseUpperReference(referenceRange) {
 function latestTroponin(labs = [] as any[]) {
   return [...labs]
     .filter((lab) => /troponin/i.test([lab.name, lab.label, lab.code].filter(Boolean).join(' ')))
-    .sort((a, b) => (new Date(b.resultedAt || b.recordedAt || b.createdAt || 0) as any) - (new Date(a.resultedAt || a.recordedAt || a.createdAt || 0) as any))[0];
+    .sort(
+      (a, b) =>
+        (new Date(b.resultedAt || b.recordedAt || b.createdAt || 0) as any) -
+        (new Date(a.resultedAt || a.recordedAt || a.createdAt || 0) as any),
+    )[0];
 }
 
 function troponinToHeartPoints(lab) {
@@ -108,10 +144,20 @@ function buildHeartPrefill(patient, chartData: any = {}) {
   const agePoints = ageToHeartPoints(patient?.age);
   if (agePoints !== null) {
     values.age = agePoints;
-    fields.age = createField(agePoints, `Age ${patient.age}`, 'prefilled', 'Auto-filled from patient age');
+    fields.age = createField(
+      agePoints,
+      `Age ${patient.age}`,
+      'prefilled',
+      'Auto-filled from patient age',
+    );
   }
 
-  const riskText = textBlob(patient?.medicationHistory, patient?.notes, chartData.medications, chartData.documents);
+  const riskText = textBlob(
+    patient?.medicationHistory,
+    patient?.notes,
+    chartData.medications,
+    chartData.documents,
+  );
   const matchedRiskFactors = RISK_FACTOR_KEYWORDS.filter((risk) => risk.pattern.test(riskText));
   if (matchedRiskFactors.length) {
     const riskPoints = Math.min(2, matchedRiskFactors.length);
@@ -120,7 +166,7 @@ function buildHeartPrefill(patient, chartData: any = {}) {
       riskPoints,
       matchedRiskFactors.map((risk) => risk.label).join(', '),
       'prefilled',
-      `${matchedRiskFactors.length} risk factor${matchedRiskFactors.length === 1 ? '' : 's'} found in chart text`
+      `${matchedRiskFactors.length} risk factor${matchedRiskFactors.length === 1 ? '' : 's'} found in chart text`,
     );
   }
 
@@ -134,7 +180,7 @@ function buildHeartPrefill(patient, chartData: any = {}) {
         troponin.unit || ''
       }${troponin.referenceRange ? `, ref ${troponin.referenceRange}` : ''}`.trim(),
       'prefilled',
-      'Auto-filled from lab result and reference range'
+      'Auto-filled from lab result and reference range',
     );
   }
 
@@ -147,7 +193,11 @@ function buildHeartPrefill(patient, chartData: any = {}) {
 function buildQsofaPrefill(patient) {
   const values: any = {};
   const fields: any = {
-    alteredMentation: createField('', 'Physician mentation assessment required', 'requires-assessment'),
+    alteredMentation: createField(
+      '',
+      'Physician mentation assessment required',
+      'requires-assessment',
+    ),
   };
   const requiresAssessment = ['alteredMentation'];
   if (typeof patient?.vitals?.rr === 'number') {
@@ -168,16 +218,27 @@ function buildNihssPrefill(patient, chartData: any = {}) {
   NIHSS_NOTE_PATTERNS.forEach((match) => {
     if (!match.pattern.test(noteText)) return;
     values[match.fieldId] = 1;
-    fields[match.fieldId] = createField(1, match.label, 'needs-confirmation', 'Confirm documented objective finding');
+    fields[match.fieldId] = createField(
+      1,
+      match.label,
+      'needs-confirmation',
+      'Confirm documented objective finding',
+    );
   });
 
   return buildResult('nihss', 'NIHSS', values, fields, []);
 }
 
 function buildResult(calculatorId, label, values, fields, requiresAssessment) {
-  const populatedCount = Object.values(fields).filter((field: any) => field.status === 'prefilled').length;
-  const assessmentCount = Object.values(fields).filter((field: any) => field.status === 'requires-assessment').length;
-  const confirmationCount = Object.values(fields).filter((field: any) => field.status === 'needs-confirmation').length;
+  const populatedCount = Object.values(fields).filter(
+    (field: any) => field.status === 'prefilled',
+  ).length;
+  const assessmentCount = Object.values(fields).filter(
+    (field: any) => field.status === 'requires-assessment',
+  ).length;
+  const confirmationCount = Object.values(fields).filter(
+    (field: any) => field.status === 'needs-confirmation',
+  ).length;
   return {
     calculatorId,
     label,

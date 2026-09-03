@@ -201,7 +201,9 @@ export function buildEmsArrivalFromPreArrivalForm(
       `${unitName} inbound`,
       chiefComplaint,
       input.framework === 'mist' && input.mist.signs ? `Signs: ${input.mist.signs}` : null,
-      input.framework === 'sbar' && input.sbar.assessment ? `Assessment: ${input.sbar.assessment}` : null,
+      input.framework === 'sbar' && input.sbar.assessment
+        ? `Assessment: ${input.sbar.assessment}`
+        : null,
     ]
       .filter(Boolean)
       .join(' · '),

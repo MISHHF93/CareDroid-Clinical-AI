@@ -125,7 +125,7 @@ export function findClinicalIntentProfile({ toolId, registryId }) {
   }
   if (registryId) {
     const byRegistry = clinicalIntentTools.find(
-      (t) => t.toolId === registryId || t.sidebarToolId === registryId
+      (t) => t.toolId === registryId || t.sidebarToolId === registryId,
     );
     if (byRegistry) return byRegistry;
   }
@@ -166,8 +166,7 @@ function launchFromNlu(nlu) {
     (hubOnly || registryId === REGISTRY.calculatorsHub ? CALCULATORS_HUB_PATH : null);
 
   const rawSeed =
-    nlu.chatSeed ||
-    `Help me use the ${nlu.toolName}. ${nlu.description || ''}`.trim();
+    nlu.chatSeed || `Help me use the ${nlu.toolName}. ${nlu.description || ''}`.trim();
   const chatSeed = buildGuardedChatSeed({
     toolId: nlu.toolId,
     sidebarToolId: registryId,
@@ -182,13 +181,9 @@ function launchFromNlu(nlu) {
     orchestratorTool: resolveOrchestratorToolForLaunch(
       nlu.toolId,
       registryId,
-      Boolean(nlu.backendExecutable)
+      Boolean(nlu.backendExecutable),
     ),
-    openLabel: isCalculatorsHubPath(path)
-      ? 'Start guided chat'
-      : path
-        ? 'Open'
-        : 'Try in chat',
+    openLabel: isCalculatorsHubPath(path) ? 'Start guided chat' : path ? 'Open' : 'Try in chat',
   };
 }
 
@@ -207,7 +202,7 @@ function launchFromBuiltinCalc(calc) {
     orchestratorTool: resolveOrchestratorToolForLaunch(
       calc.orchestratorId,
       registryId,
-      calc.orchestratorId ? isOrchestratorPostExecutable(calc.orchestratorId) : false
+      calc.orchestratorId ? isOrchestratorPostExecutable(calc.orchestratorId) : false,
     ),
     openLabel: 'Open calculator',
   };
@@ -234,7 +229,9 @@ function launchFromInventoryRecord(record) {
   return {
     path:
       record.launchType === TOOL_LAUNCH_TYPES.CHAT_ASSISTED &&
-      (!record.route || String(record.route).startsWith(`${CALCULATORS_HUB_PATH}/`) || isCalculatorsHubPath(record.route))
+      (!record.route ||
+        String(record.route).startsWith(`${CALCULATORS_HUB_PATH}/`) ||
+        isCalculatorsHubPath(record.route))
         ? CALCULATORS_HUB_PATH
         : record.route,
     registryId: record.sidebarVisible ? record.id : record.id || null,
@@ -249,9 +246,7 @@ function launchFromRegistry(registryEntry, registryId) {
     findClinicalIntentProfile({ registryId } as any) ||
     (() => {
       const primaryNlu = registryToPrimaryNluToolId(registryId);
-      return primaryNlu
-        ? findClinicalIntentProfile({ toolId: primaryNlu, registryId })
-        : null;
+      return primaryNlu ? findClinicalIntentProfile({ toolId: primaryNlu, registryId }) : null;
     })();
   if (nlu) {
     return launchFromNlu(nlu);
@@ -353,7 +348,7 @@ export function resolveCatalogLaunch(id) {
 export const NLU_HUB_ONLY_TOOL_IDS = Object.freeze(
   nluCalculatorHubOnly
     .map((row) => row.toolId)
-    .filter((toolId) => !BUILTIN_CALC_ID_TO_REGISTRY_ID[toolId])
+    .filter((toolId) => !BUILTIN_CALC_ID_TO_REGISTRY_ID[toolId]),
 );
 
 /** Workspace presets used by workspace-aware catalog tests. */

@@ -170,7 +170,7 @@ function buildBenchmarks(metrics) {
 }
 
 const aggregateMetrics = Object.freeze(
-  Object.fromEntries(EVALUATION_METRICS.map((metric) => [metric.id, averageMetric(metric.id)]))
+  Object.fromEntries(EVALUATION_METRICS.map((metric) => [metric.id, averageMetric(metric.id)])),
 );
 
 const LOCAL_RUN_METADATA = [
@@ -216,7 +216,7 @@ function averageMetrics(rows) {
     EVALUATION_METRICS.map((metric) => [
       metric.id,
       rows.reduce((total, row) => total + Number(row.metrics?.[metric.id] || 0), 0) / rows.length,
-    ])
+    ]),
   );
 }
 
@@ -237,7 +237,8 @@ function buildComparisonRows(runs, dimension, key) {
         runCount: rows.length,
         sampleCount: rows.reduce((total, row) => total + row.sampleCount, 0),
         metrics,
-        benchmarkPassRate: benchmarks.filter((benchmark) => benchmark.passed).length / benchmarks.length,
+        benchmarkPassRate:
+          benchmarks.filter((benchmark) => benchmark.passed).length / benchmarks.length,
       };
     })
     .sort((a, b) => b.metrics.modelQuality - a.metrics.modelQuality || b.runCount - a.runCount);
@@ -274,7 +275,9 @@ export const LOCAL_EVALUATION_DASHBOARD = Object.freeze({
   trends: LOCAL_TREND_METRICS.map((metrics, index) => ({
     label: `Run ${index + 1}`,
     runId: `local-evaluation-run-${index + 1}`,
-    evaluatedAt: new Date(Date.now() - (LOCAL_TREND_METRICS.length - index) * 7 * 24 * 60 * 60 * 1000).toISOString(),
+    evaluatedAt: new Date(
+      Date.now() - (LOCAL_TREND_METRICS.length - index) * 7 * 24 * 60 * 60 * 1000,
+    ).toISOString(),
     metrics,
   })),
   benchmarks: buildBenchmarks(aggregateMetrics),

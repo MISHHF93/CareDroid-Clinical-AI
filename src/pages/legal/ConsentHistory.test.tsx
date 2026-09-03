@@ -49,7 +49,10 @@ describe('ConsentHistory', () => {
 
   it('renders the error state without crashing when the fetch itself fails', async () => {
     vi.mocked(isBackendCapabilityEnabled).mockReturnValue(true);
-    vi.mocked(fetchConsentStatus).mockResolvedValue({ ok: false, message: 'Network unreachable' } as any);
+    vi.mocked(fetchConsentStatus).mockResolvedValue({
+      ok: false,
+      message: 'Network unreachable',
+    } as any);
 
     renderConsentHistory();
 

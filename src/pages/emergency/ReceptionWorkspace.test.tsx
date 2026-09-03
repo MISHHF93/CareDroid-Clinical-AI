@@ -5,10 +5,19 @@ import { describe, expect, it } from 'vitest';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const receptionSource = readFileSync(join(__dirname, 'ReceptionWorkspace.tsx'), 'utf8');
-const unifiedIntakeSource = readFileSync(join(__dirname, '../../components/reception/UnifiedIntakePanel.tsx'), 'utf8');
-const orchestratorSource = readFileSync(join(__dirname, '../../services/receptionIntakeOrchestrator.ts'), 'utf8');
+const unifiedIntakeSource = readFileSync(
+  join(__dirname, '../../components/reception/UnifiedIntakePanel.tsx'),
+  'utf8',
+);
+const orchestratorSource = readFileSync(
+  join(__dirname, '../../services/receptionIntakeOrchestrator.ts'),
+  'utf8',
+);
 const navSource = readFileSync(join(__dirname, '../../config/roleClusterNav.config.ts'), 'utf8');
-const permissionsSource = readFileSync(join(__dirname, '../../config/emergencyRolePermissions.ts'), 'utf8');
+const permissionsSource = readFileSync(
+  join(__dirname, '../../config/emergencyRolePermissions.ts'),
+  'utf8',
+);
 const appSource = readFileSync(join(__dirname, '../../app/router.tsx'), 'utf8');
 
 describe('Reception front door wiring', () => {
@@ -30,10 +39,7 @@ describe('Reception front door wiring', () => {
   });
 
   it('create-patient surface uses CDL dual-mode theme (not forced chalk white)', () => {
-    const theme = readFileSync(
-      join(__dirname, '../../styles/reception-desk-theme.css'),
-      'utf8',
-    );
+    const theme = readFileSync(join(__dirname, '../../styles/reception-desk-theme.css'), 'utf8');
     const chooserCss = readFileSync(
       join(__dirname, '../../components/reception/PreparePatientChooser.css'),
       'utf8',
@@ -42,7 +48,9 @@ describe('Reception front door wiring', () => {
     expect(theme).toContain('--cdl-brand-600');
     expect(theme).toContain("html[data-theme='dark']");
     // Legacy theme forced pure white on every panel/button — must not return
-    expect(theme).not.toMatch(/\.reception-workspace\s+\[class\*="card"\][\s\S]{0,80}background:\s*#ffffff/);
+    expect(theme).not.toMatch(
+      /\.reception-workspace\s+\[class\*="card"\][\s\S]{0,80}background:\s*#ffffff/,
+    );
     expect(chooserCss).toContain('--cdl-surface-card');
     expect(chooserCss).toContain('--cdl-info-bg');
   });
@@ -94,8 +102,12 @@ describe('Reception front door wiring', () => {
   });
 
   it('does not duplicate Preferred language / Interpreter needed fields across intake phases', () => {
-    const languageFieldCount = (unifiedIntakeSource.match(/<span>Preferred language<\/span>/g) || []).length;
-    const interpreterFieldCount = (unifiedIntakeSource.match(/<span>Interpreter needed<\/span>/g) || []).length;
+    const languageFieldCount = (
+      unifiedIntakeSource.match(/<span>Preferred language<\/span>/g) || []
+    ).length;
+    const interpreterFieldCount = (
+      unifiedIntakeSource.match(/<span>Interpreter needed<\/span>/g) || []
+    ).length;
     expect(languageFieldCount).toBe(1);
     expect(interpreterFieldCount).toBe(1);
   });

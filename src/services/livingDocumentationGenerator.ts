@@ -33,24 +33,38 @@ function sectionScopeNote(section: LivingDocumentationSection): string | null {
 }
 
 function formatEntryMarkdown(entry: LivingDocumentationEntry): string {
-  const lines = [`### ${entry.label}`, '', entry.summary, '', `- **Source:** \`${entry.sourceModule}\``];
+  const lines = [
+    `### ${entry.label}`,
+    '',
+    entry.summary,
+    '',
+    `- **Source:** \`${entry.sourceModule}\``,
+  ];
   if (entry.route) lines.push(`- **Route:** \`${entry.route}\``);
   if (entry.helpTopicId) lines.push(`- **Help topic:** \`${entry.helpTopicId}\``);
   if (entry.status) lines.push(`- **Status:** ${entry.status}`);
   if (entry.endpoints?.length) {
-    lines.push(`- **Endpoints:** ${entry.endpoints.map((endpoint) => `\`${endpoint}\``).join(', ')}`);
+    lines.push(
+      `- **Endpoints:** ${entry.endpoints.map((endpoint) => `\`${endpoint}\``).join(', ')}`,
+    );
   }
   if (entry.permissions?.length) {
-    lines.push(`- **Permissions:** ${entry.permissions.map((permission) => `\`${permission}\``).join(', ')}`);
+    lines.push(
+      `- **Permissions:** ${entry.permissions.map((permission) => `\`${permission}\``).join(', ')}`,
+    );
   }
   if (entry.roles?.length) {
     lines.push(`- **Roles:** ${entry.roles.map((role) => `\`${role}\``).join(', ')}`);
   }
   if (entry.workflows?.length) {
-    lines.push(`- **Workflows:** ${entry.workflows.map((workflow) => `\`${workflow}\``).join(', ')}`);
+    lines.push(
+      `- **Workflows:** ${entry.workflows.map((workflow) => `\`${workflow}\``).join(', ')}`,
+    );
   }
   if (entry.components?.length) {
-    lines.push(`- **Components:** ${entry.components.map((component) => `\`${component}\``).join(', ')}`);
+    lines.push(
+      `- **Components:** ${entry.components.map((component) => `\`${component}\``).join(', ')}`,
+    );
   }
   lines.push('');
   return lines.join('\n');

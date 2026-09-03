@@ -9,7 +9,10 @@ import { describe, it, expect } from 'vitest';
 import toolRegistry from '../data/toolRegistry';
 import { builtinUiCalculators } from '../data/clinicalIntentToolCatalog';
 import { resolveCatalogLaunch } from '../data/clinicalCatalogWiring';
-import { PR_FLEET_ALL_REGISTRY_IDS, PR_FLEET_TIER_A_REGISTRY_IDS } from '../data/clinicalToolIdContract';
+import {
+  PR_FLEET_ALL_REGISTRY_IDS,
+  PR_FLEET_TIER_A_REGISTRY_IDS,
+} from '../data/clinicalToolIdContract';
 import { PR_FLEET_TOOL_SPECS } from '../data/prFleetTestConstants';
 import {
   CALCULATOR_ROUTE_DEFS,
@@ -79,16 +82,19 @@ describe('clinicalToolRoutes — archived registry inventory', () => {
     expect(defPaths.sort()).toEqual([...new Set(builtinPaths)].sort());
   });
 
-  it.each(REQUIRED_CALCULATOR_PATHS)('calculator %s remains in archived inventory, not App routes', (path) => {
-    const slug = path.split('/').pop();
-    const def = CALCULATOR_ROUTE_DEFS.find((d) => d.path === path);
-    expect(def?.calculatorSlug).toBe(slug);
-    expect(appSource).not.toContain('CALCULATOR_ROUTE_DEFS.map');
-    expect(appSource).not.toContain("path: '/tools/calculators/:slug'");
-    expect(appSource).not.toContain('path="/tools/calculators/:slug"');
-    expect(appSource).toContain('path="/tools/*"');
-    expect(appSource).toContain('CANONICAL_ROUTES.emergencyWhiteboard');
-  });
+  it.each(REQUIRED_CALCULATOR_PATHS)(
+    'calculator %s remains in archived inventory, not App routes',
+    (path) => {
+      const slug = path.split('/').pop();
+      const def = CALCULATOR_ROUTE_DEFS.find((d) => d.path === path);
+      expect(def?.calculatorSlug).toBe(slug);
+      expect(appSource).not.toContain('CALCULATOR_ROUTE_DEFS.map');
+      expect(appSource).not.toContain("path: '/tools/calculators/:slug'");
+      expect(appSource).not.toContain('path="/tools/calculators/:slug"');
+      expect(appSource).toContain('path="/tools/*"');
+      expect(appSource).toContain('CANONICAL_ROUTES.emergencyWhiteboard');
+    },
+  );
 
   it('matches calculator slugs for deep links', () => {
     for (const path of REQUIRED_CALCULATOR_PATHS) {
@@ -119,10 +125,13 @@ describe('clinicalToolRoutes — archived registry inventory', () => {
     expect(expectedLaunchPath('dispatch-ai')).toBe('/tools/calculators');
   });
 
-  it.each(PR_FLEET_TIER_A_REGISTRY_IDS)('fleet Tier A %s launch path matches PR_FLEET_TOOL_SPECS', (id) => {
-    expect(expectedLaunchPath(id)).toBe(PR_FLEET_TOOL_SPECS[id].routePath);
-    expect(resolveCatalogLaunch(id).path).toBe(PR_FLEET_TOOL_SPECS[id].routePath);
-  });
+  it.each(PR_FLEET_TIER_A_REGISTRY_IDS)(
+    'fleet Tier A %s launch path matches PR_FLEET_TOOL_SPECS',
+    (id) => {
+      expect(expectedLaunchPath(id)).toBe(PR_FLEET_TOOL_SPECS[id].routePath);
+      expect(resolveCatalogLaunch(id).path).toBe(PR_FLEET_TOOL_SPECS[id].routePath);
+    },
+  );
 
   it('registers tools and fleet catch-all fallbacks', () => {
     expect(KNOWN_TOOL_AREA_PATHS.some((path) => path.startsWith('/tools/'))).toBe(true);

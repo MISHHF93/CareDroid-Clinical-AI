@@ -13,10 +13,7 @@ export default function PilotExtensionRouteGuard({ children }: PilotExtensionRou
   if (redirectTo) {
     const [pathname, hash = ''] = redirectTo.split('#');
     return (
-      <Navigate
-        to={{ pathname, hash: hash ? `#${hash}` : '', search: location.search }}
-        replace
-      />
+      <Navigate to={{ pathname, hash: hash ? `#${hash}` : '', search: location.search }} replace />
     );
   }
 

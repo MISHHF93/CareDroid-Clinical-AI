@@ -61,7 +61,9 @@ describe('dependencyMap', () => {
     const issues = detectDependencyIssues({
       dependencies,
       routeNodes: [{ id: 'unwired', path: '/unwired', inventoryLinks: 0 }],
-      frontendApiCalls: [{ id: 'missing', method: 'POST', path: '/api/missing', client: 'missingApi.js' }],
+      frontendApiCalls: [
+        { id: 'missing', method: 'POST', path: '/api/missing', client: 'missingApi.js' },
+      ],
       backendRoutes: [
         { method: 'GET', path: '/api/wired', controller: 'DemoController' },
         { method: 'GET', path: '/api/orphan', controller: 'OrphanController' },
@@ -74,7 +76,7 @@ describe('dependencyMap', () => {
         DEPENDENCY_ISSUE_TYPES.ORPHAN_BACKEND,
         DEPENDENCY_ISSUE_TYPES.BROKEN_DEPENDENCY,
         DEPENDENCY_ISSUE_TYPES.DUPLICATE_DEPENDENCY,
-      ])
+      ]),
     );
   });
 });

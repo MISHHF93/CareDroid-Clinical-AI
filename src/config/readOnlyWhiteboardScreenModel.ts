@@ -115,7 +115,9 @@ export function resolveReadOnlyWhiteboardScreenCapabilities(
   const showReferralsPending = showWidget(READ_ONLY_WHITEBOARD_SCREEN_WIDGETS.referralsPending);
   const showCapacityStatus = showWidget(READ_ONLY_WHITEBOARD_SCREEN_WIDGETS.capacityStatus);
 
-  const visibleMetricIds = READ_ONLY_WHITEBOARD_METRIC_IDS.filter((metricId) => showWidget(metricId));
+  const visibleMetricIds = READ_ONLY_WHITEBOARD_METRIC_IDS.filter((metricId) =>
+    showWidget(metricId),
+  );
 
   const visibleOperationalSurfaces = [
     showWaitingCount ? READ_ONLY_WHITEBOARD_SCREEN_WIDGETS.waitingCount : null,

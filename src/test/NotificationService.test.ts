@@ -19,7 +19,7 @@ describe('NotificationService', () => {
       Promise.resolve({
         ok: true,
         json: async () => ({ messageId: 'test' }),
-      })
+      }),
     ) as unknown as typeof fetch;
   });
 
@@ -41,32 +41,19 @@ describe('NotificationService', () => {
 
       await service.sendCostAlert('drug-checker', 800, 1000, 'APPROACHING');
 
-      expect(queueSpy).toHaveBeenCalledWith(expect.objectContaining({
-        type: 'COST_ALERT',
-        alertType: 'APPROACHING',
-        toolId: 'drug-checker',
-      }));
+      expect(queueSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: 'COST_ALERT',
+          alertType: 'APPROACHING',
+          toolId: 'drug-checker',
+        }),
+      );
     });
 
     it('should detect alert severity levels', async () => {
-      await service.sendCostAlert(
-        'tool1',
-        800,
-        1000,
-        'APPROACHING'
-      );
-      await service.sendCostAlert(
-        'tool2',
-        1200,
-        1000,
-        'EXCEEDED'
-      );
-      await service.sendCostAlert(
-        'tool3',
-        2500,
-        1000,
-        'CRITICAL'
-      );
+      await service.sendCostAlert('tool1', 800, 1000, 'APPROACHING');
+      await service.sendCostAlert('tool2', 1200, 1000, 'EXCEEDED');
+      await service.sendCostAlert('tool3', 2500, 1000, 'CRITICAL');
 
       expect(service.notificationQueue).toHaveLength(3);
       expect(service.notificationQueue[0].alertType).toBe('APPROACHING');
@@ -151,7 +138,7 @@ describe('NotificationService', () => {
         Promise.resolve({
           ok: true,
           json: async () => ({}),
-        })
+        }),
       ) as unknown as typeof fetch;
 
       const success = await service.updatePreferences({
@@ -207,10 +194,7 @@ describe('NotificationService', () => {
     it('should format recommendation message', () => {
       const notification = {
         reason: 'cost_saving',
-        recommendations: [
-          { name: 'Tool 1' },
-          { name: 'Tool 2' },
-        ],
+        recommendations: [{ name: 'Tool 1' }, { name: 'Tool 2' }],
       };
 
       const message = service.formatRecommendationMessage(notification);

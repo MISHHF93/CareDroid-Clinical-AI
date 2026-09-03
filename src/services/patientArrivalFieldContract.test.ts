@@ -132,7 +132,20 @@ describe('patientArrivalFieldContract', () => {
 
   it('flags incomplete arrival records', () => {
     const incomplete = mergePatientWithArrival(
-      { id: 'bad-1', mrn: 'BAD', firstName: 'Bad', lastName: 'Record', dob: '', age: 0, sex: 'Other', complaintCategory: 'Other', vitals: [], flags: [], notes: [], timeline: [] },
+      {
+        id: 'bad-1',
+        mrn: 'BAD',
+        firstName: 'Bad',
+        lastName: 'Record',
+        dob: '',
+        age: 0,
+        sex: 'Other',
+        complaintCategory: 'Other',
+        vitals: [],
+        flags: [],
+        notes: [],
+        timeline: [],
+      },
       buildPatientArrivalRecord({
         arrivalMode: 'walk-in',
         chiefComplaint: '',

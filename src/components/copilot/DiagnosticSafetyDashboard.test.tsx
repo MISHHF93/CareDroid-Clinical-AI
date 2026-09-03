@@ -28,7 +28,9 @@ function patient(overrides: Partial<Patient> = {}): Patient {
 describe('DiagnosticSafetyDashboard', () => {
   it('renders each patient with their MRN, priority, and risk score', () => {
     render(<DiagnosticSafetyDashboard patients={[patient()]} />);
-    expect(screen.getByRole('heading', { name: 'Diagnostic Safety Dashboard' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Diagnostic Safety Dashboard' }),
+    ).toBeInTheDocument();
     expect(screen.getByText('Sam Lee')).toBeInTheDocument();
     expect(screen.getByText(/ED-1/)).toBeInTheDocument();
   });
@@ -50,7 +52,9 @@ describe('DiagnosticSafetyDashboard', () => {
 
   it('renders an empty list without crashing when there are no patients', () => {
     render(<DiagnosticSafetyDashboard patients={[]} />);
-    expect(screen.getByRole('heading', { name: 'Diagnostic Safety Dashboard' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Diagnostic Safety Dashboard' }),
+    ).toBeInTheDocument();
     expect(screen.getByRole('list')).toBeEmptyDOMElement();
   });
 

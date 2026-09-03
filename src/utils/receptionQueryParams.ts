@@ -22,8 +22,7 @@ export function readPatientRouteContext(searchParams) {
     contextPatientId,
     queuePatientId,
     arrivedPatientId,
-    focusPatientId:
-      queuePatientId || contextPatientId || arrivedPatientId || '',
+    focusPatientId: queuePatientId || contextPatientId || arrivedPatientId || '',
   };
 }
 

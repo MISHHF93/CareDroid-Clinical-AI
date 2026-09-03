@@ -3,16 +3,18 @@
  * Keeps Calculators.jsx, routes, and tests aligned — no calculator only "under the skin."
  */
 
-import { builtinUiCalculators, clinicalIntentTools, nluCalculatorHubOnly } from './clinicalIntentToolCatalog';
+import {
+  builtinUiCalculators,
+  clinicalIntentTools,
+  nluCalculatorHubOnly,
+} from './clinicalIntentToolCatalog';
 import { NLU_HUB_ONLY_PROFILE_TOOL_IDS } from './clinicalToolIdContract';
 import { CHAT_ASSISTED_HUB_GROUPS } from './chatAssistedHubGroups';
 import { getCalculatorRouteBySlug } from '../routes/clinicalToolRoutes';
 import { getCalculatorToolInventory, TOOL_SURFACES } from './toolInventory';
 
 /** Every built-in form slug implemented in CalculatorInterface. */
-export const BUILTIN_CALCULATOR_SWITCH_SLUGS = Object.freeze(
-  builtinUiCalculators.map((c) => c.id)
-);
+export const BUILTIN_CALCULATOR_SWITCH_SLUGS = Object.freeze(builtinUiCalculators.map((c) => c.id));
 const BUILTIN_CALCULATOR_SWITCH_SLUG_SET = new Set(BUILTIN_CALCULATOR_SWITCH_SLUGS);
 
 /**
@@ -136,12 +138,14 @@ export const HUB_CHAT_ASSISTED_TOOL_IDS = Object.freeze([
 export function getHubChatAssistedTools() {
   const idSet = new Set(HUB_CHAT_ASSISTED_TOOL_IDS);
   const calculatorRecords = getCalculatorToolInventory().filter(
-    (record) => record.surface === TOOL_SURFACES.CHAT_ASSISTED
+    (record) => record.surface === TOOL_SURFACES.CHAT_ASSISTED,
   );
   const dedicatedToolIds = new Set(
     getCalculatorToolInventory()
       .filter((record) => record.hasDedicatedForm)
-      .flatMap((record) => [record.id, record.nluToolId, ...(record.nluProfileIds || [])].filter(Boolean))
+      .flatMap((record) =>
+        [record.id, record.nluToolId, ...(record.nluProfileIds || [])].filter(Boolean),
+      ),
   );
   const hubRowsById = new Map(nluCalculatorHubOnly.map((tool) => [tool.toolId, tool]));
   const rowsByToolId = new Map();
@@ -161,7 +165,12 @@ export function getHubChatAssistedTools() {
   }
 
   for (const tool of nluCalculatorHubOnly) {
-    if (tool.toolId === 'dispatch-ai' || rowsByToolId.has(tool.toolId) || dedicatedToolIds.has(tool.toolId)) continue;
+    if (
+      tool.toolId === 'dispatch-ai' ||
+      rowsByToolId.has(tool.toolId) ||
+      dedicatedToolIds.has(tool.toolId)
+    )
+      continue;
     rowsByToolId.set(tool.toolId, {
       ...tool,
       description:
@@ -180,9 +189,11 @@ export function getHubChatAssistedTools() {
  * @returns {Array<{ id: string, name: string, description: string, category: string, route: string, calcQuery: string }>}
  */
 export function buildBuiltinHubCalculatorCards() {
-  const dedicatedCalculatorRecords = getCalculatorToolInventory().filter((record) => record.hasDedicatedForm);
+  const dedicatedCalculatorRecords = getCalculatorToolInventory().filter(
+    (record) => record.hasDedicatedForm,
+  );
   const recordBySlug = Object.fromEntries(
-    dedicatedCalculatorRecords.map((record) => [record.calculatorSlug, record])
+    dedicatedCalculatorRecords.map((record) => [record.calculatorSlug, record]),
   );
   return builtinUiCalculators.map((calc) => {
     const record = recordBySlug[calc.id];
@@ -214,7 +225,7 @@ export const BUILTIN_CALCULATOR_FORM_SMOKE_ROWS = Object.freeze(
     slug,
     route: builtinUiCalculators.find((c) => c.id === slug)?.path,
     interfaceClass: resolveCalculatorInterfaceClass(slug),
-  }))
+  })),
 );
 
 /**
@@ -239,7 +250,8 @@ export function getBuiltinCalculatorRouteDef(slug) {
  */
 export function getHubChatToolMeta(toolId) {
   const inventoryRecord = getCalculatorToolInventory().find(
-    (record) => record.id === toolId || record.nluToolId === toolId || record.nluProfileIds?.includes(toolId)
+    (record) =>
+      record.id === toolId || record.nluToolId === toolId || record.nluProfileIds?.includes(toolId),
   );
   const hubRow = nluCalculatorHubOnly.find((t) => t.toolId === toolId);
   const intent = clinicalIntentTools.find((t) => t.toolId === toolId);

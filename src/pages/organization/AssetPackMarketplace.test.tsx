@@ -70,10 +70,12 @@ describe('PackMarketplace', () => {
     render(
       <MemoryRouter>
         <PackMarketplace />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
-    expect(await screen.findByRole('heading', { name: /emergency department pack/i })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: /emergency department pack/i }),
+    ).toBeInTheDocument();
     expect(screen.getByText(/Core Platform missing/i)).toBeInTheDocument();
     expect(screen.getByText('ED Physician')).toBeInTheDocument();
     expect(screen.getByText('qSOFA')).toBeInTheDocument();
@@ -84,13 +86,16 @@ describe('PackMarketplace', () => {
     render(
       <MemoryRouter>
         <PackMarketplace />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     fireEvent.click(await screen.findByRole('button', { name: /enable pack/i }));
 
     await waitFor(() => {
-      expect(PlatformAssetsApi.installPack).toHaveBeenCalledWith('org-1', 'emergency-department-pack');
+      expect(PlatformAssetsApi.installPack).toHaveBeenCalledWith(
+        'org-1',
+        'emergency-department-pack',
+      );
     });
   });
 });

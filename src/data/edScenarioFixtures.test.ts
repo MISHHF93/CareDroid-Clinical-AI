@@ -24,7 +24,7 @@ const REQUESTED_SCENARIO_IDS = [
 describe('ED scenario fixtures', () => {
   it('defines the requested scenario catalog', () => {
     expect(ED_SCENARIO_DEMO_MODES.map((scenario) => scenario.id)).toEqual(
-      expect.arrayContaining(REQUESTED_SCENARIO_IDS)
+      expect.arrayContaining(REQUESTED_SCENARIO_IDS),
     );
   });
 
@@ -39,7 +39,9 @@ describe('ED scenario fixtures', () => {
       expect(fixture.capacity.score).toBeGreaterThanOrEqual(0);
       expect(fixture.capacity.band).toMatch(/Green|Yellow|Orange|Red/);
       expect(fixture.boarding).toEqual(expect.objectContaining({ patients: expect.any(Array) }));
-      expect(fixture.reassessment).toEqual(expect.objectContaining({ patients: expect.any(Array) }));
+      expect(fixture.reassessment).toEqual(
+        expect.objectContaining({ patients: expect.any(Array) }),
+      );
       expect(fixture.analytics.operationalCommand.dailyVolume.length).toBe(7);
       expect(fixture.analytics.operationalCommand.hourlyArrivals.length).toBe(24);
       expect(fixture.copilotContext).toEqual(
@@ -47,7 +49,7 @@ describe('ED scenario fixtures', () => {
           scenarioId: id,
           patientCount: fixture.patients.length,
           capacity: fixture.capacity,
-        })
+        }),
       );
     });
   });
@@ -67,35 +69,49 @@ describe('ED scenario fixtures', () => {
     const fixture = buildEdScenarioFixture(FIRST_CUSTOMER_DEMO_MODE.id, {
       now: new Date('2026-06-13T09:00:00-04:00'),
     });
-    const whiteboard = buildEmergencyScenarioModuleEnvelope('whiteboard', FIRST_CUSTOMER_DEMO_MODE.id);
+    const whiteboard = buildEmergencyScenarioModuleEnvelope(
+      'whiteboard',
+      FIRST_CUSTOMER_DEMO_MODE.id,
+    );
     const queues = buildEmergencyScenarioModuleEnvelope('queues', FIRST_CUSTOMER_DEMO_MODE.id);
     const copilot = buildEmergencyScenarioModuleEnvelope('copilot', FIRST_CUSTOMER_DEMO_MODE.id);
-    const analytics = buildEmergencyScenarioModuleEnvelope('analytics', FIRST_CUSTOMER_DEMO_MODE.id);
+    const analytics = buildEmergencyScenarioModuleEnvelope(
+      'analytics',
+      FIRST_CUSTOMER_DEMO_MODE.id,
+    );
     const rootState = buildRootEmergencyScenarioState(FIRST_CUSTOMER_DEMO_MODE.id);
 
     expect((fixture as unknown as { patientVolumePerDay: number }).patientVolumePerDay).toBe(100);
     expect(fixture.patients).toHaveLength(18);
-    expect(fixture.patients.filter((patient) => patient.state === 'Waiting').length).toBeGreaterThanOrEqual(4);
+    expect(
+      fixture.patients.filter((patient) => patient.state === 'Waiting').length,
+    ).toBeGreaterThanOrEqual(4);
     expect(
       fixture.patients.filter(
         (patient) =>
           patient.state === 'Waiting' &&
-          (patient.priority === 'P1' || patient.priority === 'P2' || patient.flags.includes('HighRisk'))
-      ).length
+          (patient.priority === 'P1' ||
+            patient.priority === 'P2' ||
+            patient.flags.includes('HighRisk')),
+      ).length,
     ).toBeGreaterThanOrEqual(2);
     expect(fixture.reassessment.patients.length).toBeGreaterThanOrEqual(3);
     expect(fixture.boarding.patients.length).toBeGreaterThanOrEqual(3);
-    expect(fixture.emsArrivals.filter((arrival) => arrival.status === 'Inbound').length).toBeGreaterThanOrEqual(2);
+    expect(
+      fixture.emsArrivals.filter((arrival) => arrival.status === 'Inbound').length,
+    ).toBeGreaterThanOrEqual(2);
     expect(fixture.capacity.band).toMatch(/Orange|Red/);
 
     expect(whiteboard.data.patients).toHaveLength(18);
-    expect(queues.data.queues.some((queue) => queue.label === 'High-risk waiting patients')).toBe(true);
+    expect(queues.data.queues.some((queue) => queue.label === 'High-risk waiting patients')).toBe(
+      true,
+    );
     expect(copilot.data.promptContext).toEqual(
       expect.objectContaining({
         patientCount: 18,
         emsInboundCount: expect.any(Number),
         safetyBoundary: expect.stringMatching(/Walkthrough data only/i),
-      })
+      }),
     );
     expect(analytics.data.operationalCommand.dailyVolume.at(-1).count).toBe(100);
     expect(rootState.patients).toHaveLength(100);
@@ -104,7 +120,7 @@ describe('ED scenario fixtures', () => {
         active: true,
         id: FIRST_CUSTOMER_DEMO_MODE.id,
         patientVolumePerDay: 100,
-      })
+      }),
     );
   });
 
@@ -151,7 +167,7 @@ describe('ED scenario fixtures', () => {
           status: 'Active',
           chargeStaffId: expect.any(String),
           staffIds: expect.arrayContaining([expect.any(String)]),
-        })
+        }),
       );
       // ActiveShift (types/emergency.ts) declares `label`, not `name` -- a
       // real regression slipped this exact field-name mismatch in once
@@ -162,7 +178,9 @@ describe('ED scenario fixtures', () => {
       expect(typeof state.activeShift.label).toBe('string');
       expect(state.activeShift.label.length).toBeGreaterThan(0);
       expect((state.activeShift as any).name).toBeUndefined();
-      expect(state.staff.some((member: any) => member.id === state.activeShift.chargeStaffId)).toBe(true);
+      expect(state.staff.some((member: any) => member.id === state.activeShift.chargeStaffId)).toBe(
+        true,
+      );
     });
   });
 
@@ -171,7 +189,7 @@ describe('ED scenario fixtures', () => {
     const conflict = buildEdScenarioFixture('provincial-data-conflict');
 
     expect(unknown.unknownIntake).toEqual(
-      expect.objectContaining({ active: true, temporaryMrn: expect.stringMatching(/^TEMP-/) })
+      expect.objectContaining({ active: true, temporaryMrn: expect.stringMatching(/^TEMP-/) }),
     );
     expect(unknown.patients.some((patient) => patient.flags.includes('EMSArrival'))).toBe(true);
     expect(conflict.provincialHealth.connectorStatus).toBe('conflict-review');

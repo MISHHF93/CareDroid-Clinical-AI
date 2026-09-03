@@ -1,4 +1,8 @@
-import { PLATFORM_DASHBOARDS, PLATFORM_TIMELINE_EVENTS, PLATFORM_WORKFLOWS } from './platformOperatingSystem';
+import {
+  PLATFORM_DASHBOARDS,
+  PLATFORM_TIMELINE_EVENTS,
+  PLATFORM_WORKFLOWS,
+} from './platformOperatingSystem';
 import { MARKETPLACE_ITEMS } from './marketplaceCatalog';
 import { buildEnterpriseReadinessModel } from './enterpriseReadiness';
 
@@ -61,7 +65,9 @@ export function buildSaasOperatingSystemModel(context: any = {}) {
   const effectiveProducts = asList(products).length
     ? asList(products)
     : asList(platformContext.assignedProducts);
-  const effectivePacks = asList(packs).length ? asList(packs) : asList(platformContext.entitledPacks);
+  const effectivePacks = asList(packs).length
+    ? asList(packs)
+    : asList(platformContext.entitledPacks);
   const assetCount = countFromContext(
     assets,
     uniqueCount(platformContext.entitledAssetIds || platformContext.enabledAssetIds),
@@ -88,13 +94,16 @@ export function buildSaasOperatingSystemModel(context: any = {}) {
     Boolean(tenantContext.role || platformContext.roleProfile),
     Boolean(effectiveSubscription?.tier || effectiveSubscription?.plan),
   ].filter(Boolean).length;
-  const healthScore = Math.round((enterpriseReadiness.readinessScore + tenantCompleteness * 25) / 2);
+  const healthScore = Math.round(
+    (enterpriseReadiness.readinessScore + tenantCompleteness * 25) / 2,
+  );
 
   const chain = SAAS_OPERATING_SYSTEM_CHAIN.map((id) => {
     const conceptMap = {
       organization: {
         label: 'Organization',
-        value: effectiveOrganization?.name || tenantContext.organizationName || 'Current organization',
+        value:
+          effectiveOrganization?.name || tenantContext.organizationName || 'Current organization',
         route: '/organization',
       },
       subscription: {
@@ -145,10 +154,12 @@ export function buildSaasOperatingSystemModel(context: any = {}) {
     {
       id: 'organization',
       title: 'Organization Overview',
-      metric: effectiveOrganization?.name || tenantContext.organizationName || 'Current organization',
+      metric:
+        effectiveOrganization?.name || tenantContext.organizationName || 'Current organization',
       detail: `Tenant ${tenantContext.organizationId || effectiveOrganization?.id || 'pending'} with ${workspaceCount} workspaces and ${userCount} known users.`,
       route: '/customer-portal',
-      status: tenantContext.organizationId || effectiveOrganization?.id ? 'Configured' : 'Needs setup',
+      status:
+        tenantContext.organizationId || effectiveOrganization?.id ? 'Configured' : 'Needs setup',
     },
     {
       id: 'products',
@@ -178,7 +189,8 @@ export function buildSaasOperatingSystemModel(context: any = {}) {
       id: 'tenant',
       title: 'Tenant Overview',
       metric: `${tenantCompleteness}/4`,
-      detail: 'Organization, workspace, role, and subscription context are used to configure the tenant.',
+      detail:
+        'Organization, workspace, role, and subscription context are used to configure the tenant.',
       route: '/tenant-admin',
       status: tenantCompleteness >= 3 ? 'Configured' : 'Needs setup',
     },

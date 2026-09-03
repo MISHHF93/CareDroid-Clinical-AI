@@ -1,4 +1,14 @@
-import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
 import { useLocation, useNavigate, type To } from 'react-router-dom';
 import CareDroidToastHost from './CareDroidToastHost';
 import { ConfirmDialogProvider } from './ui/ConfirmDialogProvider';
@@ -144,13 +154,15 @@ export const EMERGENCY_OS_PAGE_TITLES: Record<string, string> = {
 /** Exported for AppShell.pageChrome.test.tsx's registry-drift guard only. */
 export const EMERGENCY_OS_PAGE_SUBTITLES: Record<string, string> = {
   '/emergency': 'Patient flow, capacity, EMS, and reassessment status.',
-  [CANONICAL_ROUTES.emergencyWhiteboard]: 'Operational awareness after reception prepares each patient card.',
+  [CANONICAL_ROUTES.emergencyWhiteboard]:
+    'Operational awareness after reception prepares each patient card.',
   [CANONICAL_ROUTES.emergencyCommandCenter]:
     'Real-time ED operational awareness — actionable metrics, critical actions, bottlenecks, and compliance.',
   [CANONICAL_ROUTES.emergencyJourney]:
     'Real-time ED operational awareness — actionable metrics, critical actions, bottlenecks, and compliance.',
   [CANONICAL_ROUTES.emergencyPatients]: 'Active patient census and patient detail timeline.',
-  [CANONICAL_ROUTES.emergencyEms]: 'Inbound EMS coordination, offload pressure, and handoff actions.',
+  [CANONICAL_ROUTES.emergencyEms]:
+    'Inbound EMS coordination, offload pressure, and handoff actions.',
   [CANONICAL_ROUTES.emergencyIntake]: 'Identity verification and patient creation workflow.',
   [CANONICAL_ROUTES.emergencyReception]: EMERGENCY_OS_BRANDING.receptionSummary,
   [CANONICAL_ROUTES.emergencyQueues]: 'Queue bottlenecks and queue-level operating metrics.',
@@ -172,19 +184,28 @@ export const EMERGENCY_OS_PAGE_SUBTITLES: Record<string, string> = {
   // that page doesn't have. Found via a route-collision trace, not visually.
   '/settings': 'Billing, compliance exports, audit log, and tenant identity administration.',
   [CANONICAL_ROUTES.emergencySettings]: 'Tenant, module, AI, integration, and threshold controls.',
-  [CANONICAL_ROUTES.emergencyDispatch]: 'Emergency call intake, CAD unit dispatch, and ED pre-alert coordination.',
-  [CANONICAL_ROUTES.emergencyEdReadiness]: 'Bay and room readiness plans, equipment checks, and pre-arrival preparation.',
-  [CANONICAL_ROUTES.emergencyCollaboration]: 'Real-time department channels for cross-role coordination and handoff messaging.',
+  [CANONICAL_ROUTES.emergencyDispatch]:
+    'Emergency call intake, CAD unit dispatch, and ED pre-alert coordination.',
+  [CANONICAL_ROUTES.emergencyEdReadiness]:
+    'Bay and room readiness plans, equipment checks, and pre-arrival preparation.',
+  [CANONICAL_ROUTES.emergencyCollaboration]:
+    'Real-time department channels for cross-role coordination and handoff messaging.',
   [CANONICAL_ROUTES.emergencyDocumentation]:
     'Draft SOAP notes, progress notes, discharge summaries, and consultation notes with clinician review before export.',
-  [CANONICAL_ROUTES.emergencyDiagnostics]: 'Lab, imaging, pharmacy, and consult orders — STAT priority and result tracking.',
-  [CANONICAL_ROUTES.emergencyHandoffs]: 'Disposition, admission, and EMS handoff documentation and staff assignment.',
-  [CANONICAL_ROUTES.emergencyReports]: '3-minute response compliance, analytics, and shift-summary reporting surfaces.',
+  [CANONICAL_ROUTES.emergencyDiagnostics]:
+    'Lab, imaging, pharmacy, and consult orders — STAT priority and result tracking.',
+  [CANONICAL_ROUTES.emergencyHandoffs]:
+    'Disposition, admission, and EMS handoff documentation and staff assignment.',
+  [CANONICAL_ROUTES.emergencyReports]:
+    '3-minute response compliance, analytics, and shift-summary reporting surfaces.',
   [CANONICAL_ROUTES.emergencyAlerts]:
     'Review, acknowledge, and resolve operational and clinical alerts — one lifecycle, role-aware delivery.',
-  [CANONICAL_ROUTES.emergencyHelp]: 'Role-based process guidance, downtime procedures, and shortcuts reference.',
-  [CANONICAL_ROUTES.emergencyPulse]: 'Live department vital signs — active patients, capacity score, and the attention list.',
-  [CANONICAL_ROUTES.emergencyShift]: 'Shift timer, volume and time metrics, and queue performance for the active shift.',
+  [CANONICAL_ROUTES.emergencyHelp]:
+    'Role-based process guidance, downtime procedures, and shortcuts reference.',
+  [CANONICAL_ROUTES.emergencyPulse]:
+    'Live department vital signs — active patients, capacity score, and the attention list.',
+  [CANONICAL_ROUTES.emergencyShift]:
+    'Shift timer, volume and time metrics, and queue performance for the active shift.',
   [CANONICAL_ROUTES.adminOperations]:
     'Role assignments, workflow previews, team invites, and tenant policies.',
   [CANONICAL_ROUTES.trainingDashboard]:
@@ -211,7 +232,10 @@ type ConsoleWorkspaceEntry = { path: string; label: string };
 
 const ADMIN_WORKSPACE_ROUTES: ConsoleWorkspaceEntry[] = ADMIN_CONSOLE_CHILD_ROUTES.filter(
   (route) => route.path,
-).map((route) => ({ path: `${CANONICAL_ROUTES.adminOperations}/${route.path}`, label: route.label }));
+).map((route) => ({
+  path: `${CANONICAL_ROUTES.adminOperations}/${route.path}`,
+  label: route.label,
+}));
 
 /** Clinical specialty/department dashboards that live in PLATFORM_CONSOLE_ROUTES for routing convenience but need their own subtitle, not the platform-admin one. */
 const CLINICAL_SPECIALTY_CONSOLE_ROUTE_PATHS: string[] = [
@@ -233,7 +257,10 @@ const CLINICAL_SPECIALTY_CONSOLE_ROUTE_PATHS: string[] = [
   CANONICAL_ROUTES.medical3dViewer,
 ];
 
-const CONSOLE_WORKSPACE_GROUPS: Array<{ routes: readonly ConsoleWorkspaceEntry[]; subtitle: string }> = [
+const CONSOLE_WORKSPACE_GROUPS: Array<{
+  routes: readonly ConsoleWorkspaceEntry[];
+  subtitle: string;
+}> = [
   {
     routes: GOVERNANCE_WORKSPACE_ROUTES,
     subtitle:
@@ -276,7 +303,8 @@ const CONSOLE_WORKSPACE_GROUPS: Array<{ routes: readonly ConsoleWorkspaceEntry[]
         (path) => route.path === path || route.path === `${path}/*`,
       ),
     ),
-    subtitle: 'Specialty and department clinical dashboards — tools, protocols, and decision support by service line.',
+    subtitle:
+      'Specialty and department clinical dashboards — tools, protocols, and decision support by service line.',
   },
   {
     routes: PLATFORM_CONSOLE_ROUTES,
@@ -432,12 +460,9 @@ function AppShellFrame({ children }: AppShellProps) {
   const isEmergencyBoardRoute =
     location.pathname === CANONICAL_ROUTES.emergencyWhiteboard ||
     location.pathname === '/emergency';
-  const isPublicWaitingKiosk =
-    screenCapabilities.isPublicDisplay && isEmergencyBoardRoute;
+  const isPublicWaitingKiosk = screenCapabilities.isPublicDisplay && isEmergencyBoardRoute;
   const isReadOnlyWhiteboardKiosk =
-    screenCapabilities.isWallKiosk &&
-    !screenCapabilities.isPublicDisplay &&
-    isEmergencyBoardRoute;
+    screenCapabilities.isWallKiosk && !screenCapabilities.isPublicDisplay && isEmergencyBoardRoute;
   // Patient-facing self check-in kiosk -- was rendering with the full internal
   // staff console (Sidebar nav, Critical Alerts count, Copilot, Settings, live
   // header pills) with no kiosk-mode suppression at all, since isEmergencyBoardRoute
@@ -507,14 +532,15 @@ function AppShellFrame({ children }: AppShellProps) {
         matchesNavigationPath(location.pathname, item.path),
     );
     const title = EMERGENCY_OS_PAGE_TITLES[location.pathname];
-    const labelFromTitle = title?.includes(' - ')
-      ? title.split(' - ').slice(1).join(' - ')
-      : title;
+    const labelFromTitle = title?.includes(' - ') ? title.split(' - ').slice(1).join(' - ') : title;
     const consoleWorkspaceEntry = resolveConsoleWorkspaceEntry(location.pathname);
 
     return {
       label:
-        labelFromTitle || consoleWorkspaceEntry?.label || activeItem?.label || EMERGENCY_OS_BRANDING.productName,
+        labelFromTitle ||
+        consoleWorkspaceEntry?.label ||
+        activeItem?.label ||
+        EMERGENCY_OS_BRANDING.productName,
       subtitle:
         EMERGENCY_OS_PAGE_SUBTITLES[location.pathname] ||
         consoleWorkspaceEntry?.subtitle ||
@@ -537,19 +563,21 @@ function AppShellFrame({ children }: AppShellProps) {
       void import('../pages/emergency/ReceptionWorkspace');
     }
     let stopObservabilityHeartbeat: (() => void) | undefined;
-    void import('../services/observabilityService').then(({ default: observabilityService }) => {
-      if (cancelled) return;
-      stopObservabilityHeartbeat = observabilityService.startDiagnosticsHeartbeat(120_000);
-      observabilityService.recordEvent({
-        category: 'health',
-        name: 'app_shell_mounted',
-        severity: 'info',
-        source: 'AppShell',
-        metadata: { route: location.pathname },
+    void import('../services/observabilityService')
+      .then(({ default: observabilityService }) => {
+        if (cancelled) return;
+        stopObservabilityHeartbeat = observabilityService.startDiagnosticsHeartbeat(120_000);
+        observabilityService.recordEvent({
+          category: 'health',
+          name: 'app_shell_mounted',
+          severity: 'info',
+          source: 'AppShell',
+          metadata: { route: location.pathname },
+        });
+      })
+      .catch((error) => {
+        console.error('[AppShell] observabilityService initialization failed:', error);
       });
-    }).catch((error) => {
-      console.error('[AppShell] observabilityService initialization failed:', error);
-    });
     void (async () => {
       const session = await ensureDevBackendSession();
       // A successful ensureDevBackendSession() already proves the backend is
@@ -643,7 +671,9 @@ function AppShellFrame({ children }: AppShellProps) {
       console.info(
         '[AppShell] experimental engines',
         experimentalEnginesEnabled ? 'ON' : 'OFF',
-        listExperimentalShellEngines().map((e) => e.id).join(','),
+        listExperimentalShellEngines()
+          .map((e) => e.id)
+          .join(','),
       );
     }
 
@@ -697,21 +727,23 @@ function AppShellFrame({ children }: AppShellProps) {
       : undefined;
     const alertsInterval = window.setInterval(() => {
       useEmergencyStore.getState().updateAlerts();
-      void import('../services/alertLifecycleOrchestrator').then(({ checkUnacknowledgedAlertEscalations }) =>
-        checkUnacknowledgedAlertEscalations(),
-      ).catch((error) => {
-        console.error('[AppShell] checkUnacknowledgedAlertEscalations failed:', error);
-      });
+      void import('../services/alertLifecycleOrchestrator')
+        .then(({ checkUnacknowledgedAlertEscalations }) => checkUnacknowledgedAlertEscalations())
+        .catch((error) => {
+          console.error('[AppShell] checkUnacknowledgedAlertEscalations failed:', error);
+        });
     }, 30_000);
 
     if (simulationModeActive) {
-      void import('../engine/simulation').then((simulation) => {
-        if (cancelled) return;
-        simulation.startSimulation();
-        stopSimulation = simulation.stopSimulation;
-      }).catch((error) => {
-        console.error('[AppShell] simulation start failed:', error);
-      });
+      void import('../engine/simulation')
+        .then((simulation) => {
+          if (cancelled) return;
+          simulation.startSimulation();
+          stopSimulation = simulation.stopSimulation;
+        })
+        .catch((error) => {
+          console.error('[AppShell] simulation start failed:', error);
+        });
     }
 
     return () => {
@@ -1122,7 +1154,13 @@ function AppShellFrame({ children }: AppShellProps) {
 
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
-  }, [canUseCopilot, emergencyRole, location.pathname, profileNavigate, screenCapabilities.showReassessAction]);
+  }, [
+    canUseCopilot,
+    emergencyRole,
+    location.pathname,
+    profileNavigate,
+    screenCapabilities.showReassessAction,
+  ]);
 
   useEffect(() => {
     const openPalette = () => setShowPalette(true);
@@ -1153,7 +1191,14 @@ function AppShellFrame({ children }: AppShellProps) {
   useEffect(() => {
     const openTools = (event: Event) => {
       const detail =
-        (event as CustomEvent<{ filter?: string; query?: string; source?: string; patientId?: string }>).detail || {};
+        (
+          event as CustomEvent<{
+            filter?: string;
+            query?: string;
+            source?: string;
+            patientId?: string;
+          }>
+        ).detail || {};
       const target = resolveClinicalToolLaunchTarget({
         emergencyRoleId: emergencyRole.role,
         canAccessToolsRoute: emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyTools),
@@ -1216,7 +1261,9 @@ function AppShellFrame({ children }: AppShellProps) {
       case 'FIND_PATIENT':
         if (action.patientId) selectPatient(action.patientId);
         else if (action.value)
-          profileNavigate(`${CANONICAL_ROUTES.emergencyPatients}?q=${encodeURIComponent(action.value)}`);
+          profileNavigate(
+            `${CANONICAL_ROUTES.emergencyPatients}?q=${encodeURIComponent(action.value)}`,
+          );
         else profileNavigate(CANONICAL_ROUTES.emergencyPatients);
         break;
       case 'OPEN_REFERRAL': {
@@ -1304,7 +1351,9 @@ function AppShellFrame({ children }: AppShellProps) {
           {useWallKioskChrome ? (
             <header className="emergency-wall-kiosk-header">
               <strong>{screenCapabilities.label}</strong>
-              <span className="emergency-wall-kiosk-header__safety">{EMERGENCY_OS_BRANDING.safetyLine}</span>
+              <span className="emergency-wall-kiosk-header__safety">
+                {EMERGENCY_OS_BRANDING.safetyLine}
+              </span>
             </header>
           ) : isPublicWaitingKiosk || isReadOnlyWhiteboardKiosk || isSelfArrivalKiosk ? null : (
             <>
@@ -1358,11 +1407,11 @@ function AppShellFrame({ children }: AppShellProps) {
         </RouteChromeProvider>
       </div>
       {!screenCapabilities.isRegistrationScreen && !useKioskShell ? (
-      <ErrorBoundary fallbackText="PatientDetailPanel encountered an error. Refresh to reload.">
-        <Suspense fallback={null}>
-          <PatientDetailPanel />
-        </Suspense>
-      </ErrorBoundary>
+        <ErrorBoundary fallbackText="PatientDetailPanel encountered an error. Refresh to reload.">
+          <Suspense fallback={null}>
+            <PatientDetailPanel />
+          </Suspense>
+        </ErrorBoundary>
       ) : null}
       {canUseCopilot && !useKioskShell && !hiddenOnReception && copilotOpen ? (
         <ErrorBoundary
@@ -1376,9 +1425,7 @@ function AppShellFrame({ children }: AppShellProps) {
         </ErrorBoundary>
       ) : null}
       <ErrorBoundary fallbackText="Critical broadcast overlay encountered an error.">
-        <Suspense fallback={null}>
-
-        </Suspense>
+        <Suspense fallback={null}></Suspense>
       </ErrorBoundary>
       {showReassessmentDrawer &&
       screenCapabilities.showReassessAction &&

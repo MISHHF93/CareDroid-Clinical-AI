@@ -70,7 +70,7 @@ export function Button({
       type={type}
       className={classes}
       disabled={isDisabled}
-      aria-busy={(loading || undefined) ? 'true' : 'false'}
+      aria-busy={loading || undefined ? 'true' : 'false'}
       {...props}
     >
       {loading && <ButtonSpinner />}

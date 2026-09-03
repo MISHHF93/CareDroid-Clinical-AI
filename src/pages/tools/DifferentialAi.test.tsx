@@ -2,10 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import DifferentialAi from './DifferentialAi';
-import {
-  mockConversationValue,
-  mockToolPreferencesValue,
-} from '../../test/testRenderUtils';
+import { mockConversationValue, mockToolPreferencesValue } from '../../test/testRenderUtils';
 import { generateDifferentialAi } from '../../services/clinicalIntelligenceApi';
 
 vi.mock('./ToolPageLayout.css', () => ({}));
@@ -71,7 +68,9 @@ describe('DifferentialAi', () => {
   it('renders decision-support-only safety copy', () => {
     renderPage();
 
-    expect(screen.getByRole('heading', { name: /differential diagnosis assistant/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /differential diagnosis assistant/i }),
+    ).toBeInTheDocument();
     // 2 "decision support only" disclaimers legitimately coexist on this page:
     // ToolPageLayout's shared, tool-wide compliance boilerplate (aria-label
     // "Clinical decision support disclaimer") and this page's own more specific
@@ -107,7 +106,9 @@ describe('DifferentialAi', () => {
       );
     });
 
-    expect(await screen.findByRole('heading', { name: /acute coronary syndrome/i })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: /acute coronary syndrome/i }),
+    ).toBeInTheDocument();
     expect(screen.getByText(/Supporting evidence:/i)).toBeInTheDocument();
     expect(screen.getByText(/HEART score/i)).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /explainability/i })).toBeInTheDocument();

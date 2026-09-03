@@ -29,10 +29,7 @@ export default function SkeletonLoader({ variant = 'panel', rows = 3 }: Skeleton
         className={`skeleton-grid${variant === 'whiteboard' ? ' skeleton-grid--whiteboard' : ''}`}
       >
         {Array.from({ length: cardCount }).map((_, index) => (
-          <div
-            key={index}
-            className={`skeleton-card${isTallCard ? ' skeleton-card--tall' : ''}`}
-          >
+          <div key={index} className={`skeleton-card${isTallCard ? ' skeleton-card--tall' : ''}`}>
             <div className="skeleton-shimmer skeleton-line--title" />
             <div className="skeleton-shimmer skeleton-line--subtitle" />
             <div className="skeleton-stats-row">

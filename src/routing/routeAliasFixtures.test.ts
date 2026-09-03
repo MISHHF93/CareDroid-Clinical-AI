@@ -13,14 +13,38 @@ describe('Medical Tools route alias fixtures', () => {
     ['/tools/catalog/', '/emergency/tools?source=catalog&filter=all'],
     ['/all-tools', '/emergency/tools?source=all-tools&filter=all'],
     ['/clinical-tools', '/emergency/tools?source=clinical-tools&filter=clinical-tools'],
-    ['/tools/calculator/qsofa/', '/emergency/tools?source=calculators&filter=calculator&q=qsofa&open=qsofa'],
-    ['/scores/has-bled', '/emergency/tools?source=calculators&filter=calculator&q=has-bled&open=has-bled'],
-    ['/tools/quick%20sofa', '/emergency/tools?source=tools&filter=clinical-tools&q=qsofa&open=qsofa'],
-    ['/fleet/route-optimizer', '/emergency/tools?source=operations&filter=operations&q=route-optimizer&open=route-optimizer'],
-    ['/operations/route%20optimizer', '/emergency/tools?source=operations&filter=operations&q=route-optimizer&open=route-optimizer'],
-    ['/digital-twin', '/emergency/tools?source=operations&filter=operations&q=digital-twin&open=digital-twin'],
-    ['/pharmacy/drug-interactions', '/emergency/tools?source=clinical-tools&filter=clinical-tools&q=drug-check&open=drug-check'],
-    ['/radiology/chest-xray', '/emergency/tools?source=workflows&filter=ai-workflows&q=guideline-rag&open=guideline-rag'],
+    [
+      '/tools/calculator/qsofa/',
+      '/emergency/tools?source=calculators&filter=calculator&q=qsofa&open=qsofa',
+    ],
+    [
+      '/scores/has-bled',
+      '/emergency/tools?source=calculators&filter=calculator&q=has-bled&open=has-bled',
+    ],
+    [
+      '/tools/quick%20sofa',
+      '/emergency/tools?source=tools&filter=clinical-tools&q=qsofa&open=qsofa',
+    ],
+    [
+      '/fleet/route-optimizer',
+      '/emergency/tools?source=operations&filter=operations&q=route-optimizer&open=route-optimizer',
+    ],
+    [
+      '/operations/route%20optimizer',
+      '/emergency/tools?source=operations&filter=operations&q=route-optimizer&open=route-optimizer',
+    ],
+    [
+      '/digital-twin',
+      '/emergency/tools?source=operations&filter=operations&q=digital-twin&open=digital-twin',
+    ],
+    [
+      '/pharmacy/drug-interactions',
+      '/emergency/tools?source=clinical-tools&filter=clinical-tools&q=drug-check&open=drug-check',
+    ],
+    [
+      '/radiology/chest-xray',
+      '/emergency/tools?source=workflows&filter=ai-workflows&q=guideline-rag&open=guideline-rag',
+    ],
     ['/automation', '/workflows'],
     ['/automation-analytics', '/workflows'],
     ['/simulation', '/simulation'],

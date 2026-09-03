@@ -35,7 +35,16 @@ function CalcResultSafetyFooter() {
   );
 }
 
-function CalculatorShell({ slug, title, disclaimer, children, result, emptyText, onResultChange, resultPayload }) {
+function CalculatorShell({
+  slug,
+  title,
+  disclaimer,
+  children,
+  result,
+  emptyText,
+  onResultChange,
+  resultPayload,
+}) {
   const icon = getCalculatorSubIcon(slug);
   const resultsRef = useRef<any>(null);
 
@@ -114,7 +123,7 @@ export function ShockIndexCalculator({ onResultChange }) {
             scoreLabel: 'Shock index',
             scoreDisplay: (value as any).toFixed(2),
           }
-        : null
+        : null,
     );
   };
 
@@ -132,7 +141,11 @@ export function ShockIndexCalculator({ onResultChange }) {
       result={result}
       emptyText="Enter heart rate and systolic blood pressure"
       onResultChange={onResultChange}
-      resultPayload={(r) => ({ shockIndex: r.value, severity: r.severity, riskCategory: r.riskCategory })}
+      resultPayload={(r) => ({
+        shockIndex: r.value,
+        severity: r.severity,
+        riskCategory: r.riskCategory,
+      })}
     >
       <form className="calc-pr1-form" onSubmit={calculate}>
         <div className="calc-form-grid">
@@ -199,10 +212,11 @@ export function AnionGapCalculator({ onResultChange }) {
         ? {
             ...interp,
             ...gap,
-            scoreLabel: gap.correctedAnionGap !== null ? 'Albumin-corrected anion gap' : 'Anion gap',
+            scoreLabel:
+              gap.correctedAnionGap !== null ? 'Albumin-corrected anion gap' : 'Anion gap',
             scoreDisplay: `${interpretedValue} mEq/L`,
           }
-        : null
+        : null,
     );
   };
 
@@ -235,25 +249,53 @@ export function AnionGapCalculator({ onResultChange }) {
             <label htmlFor="anion-gap-na" className="calc-label">
               Sodium (mEq/L)
             </label>
-            <input id="anion-gap-na" type="number" className="calc-input" value={sodium} onChange={(e) => setSodium(e.target.value)} required />
+            <input
+              id="anion-gap-na"
+              type="number"
+              className="calc-input"
+              value={sodium}
+              onChange={(e) => setSodium(e.target.value)}
+              required
+            />
           </div>
           <div className="calc-form-group">
             <label htmlFor="anion-gap-cl" className="calc-label">
               Chloride (mEq/L)
             </label>
-            <input id="anion-gap-cl" type="number" className="calc-input" value={chloride} onChange={(e) => setChloride(e.target.value)} required />
+            <input
+              id="anion-gap-cl"
+              type="number"
+              className="calc-input"
+              value={chloride}
+              onChange={(e) => setChloride(e.target.value)}
+              required
+            />
           </div>
           <div className="calc-form-group">
             <label htmlFor="anion-gap-hco3" className="calc-label">
               Bicarbonate / CO2 (mEq/L)
             </label>
-            <input id="anion-gap-hco3" type="number" className="calc-input" value={bicarbonate} onChange={(e) => setBicarbonate(e.target.value)} required />
+            <input
+              id="anion-gap-hco3"
+              type="number"
+              className="calc-input"
+              value={bicarbonate}
+              onChange={(e) => setBicarbonate(e.target.value)}
+              required
+            />
           </div>
           <div className="calc-form-group">
             <label htmlFor="anion-gap-albumin" className="calc-label">
               Albumin (g/dL, optional)
             </label>
-            <input id="anion-gap-albumin" type="number" step="0.1" className="calc-input" value={albumin} onChange={(e) => setAlbumin(e.target.value)} />
+            <input
+              id="anion-gap-albumin"
+              type="number"
+              step="0.1"
+              className="calc-input"
+              value={albumin}
+              onChange={(e) => setAlbumin(e.target.value)}
+            />
           </div>
         </div>
         <div className="calc-actions">
@@ -283,7 +325,7 @@ export function RassCalculator({ onResultChange }) {
             scoreLabel: 'RASS',
             scoreDisplay: String(interp.score),
           }
-        : null
+        : null,
     );
   };
 
@@ -307,7 +349,12 @@ export function RassCalculator({ onResultChange }) {
           <label htmlFor="rass-score" className="calc-label">
             Observed RASS level
           </label>
-          <select id="rass-score" className="calc-select" value={score} onChange={(e) => setScore(e.target.value)}>
+          <select
+            id="rass-score"
+            className="calc-select"
+            value={score}
+            onChange={(e) => setScore(e.target.value)}
+          >
             {RASS_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}

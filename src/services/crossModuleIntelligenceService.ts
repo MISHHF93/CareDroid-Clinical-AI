@@ -135,7 +135,9 @@ function scenarioEvidence(pattern) {
       scenario.category,
       scenario.specialty,
       ...(scenario.requiredTools || []),
-      ...(scenario.integrations || []).map((integration) => `${integration.label} ${integration.path} ${integration.toolId}`),
+      ...(scenario.integrations || []).map(
+        (integration) => `${integration.label} ${integration.path} ${integration.toolId}`,
+      ),
     ]
       .join(' ')
       .toLowerCase();
@@ -159,9 +161,15 @@ function buildDefaultLinks() {
   const labScenarios = scenarioEvidence(/laboratory|lab|lactate|troponin|creatinine/);
   const viewerScenarios = scenarioEvidence(/3d viewer|anatomy|viewer|stroke|trauma/);
   const iotScenarios = scenarioEvidence(/iot|device|telemetry|alarm|hospital map/);
-  const labEvidence = labScenarios.length ? labScenarios : ['Sepsis Deterioration', 'Abnormal lab escalation'];
-  const viewerEvidence = viewerScenarios.length ? viewerScenarios : ['Stroke Alert', 'Trauma Triage'];
-  const iotEvidence = iotScenarios.length ? iotScenarios : ['Device alarm failure', 'Respiratory failure'];
+  const labEvidence = labScenarios.length
+    ? labScenarios
+    : ['Sepsis Deterioration', 'Abnormal lab escalation'];
+  const viewerEvidence = viewerScenarios.length
+    ? viewerScenarios
+    : ['Stroke Alert', 'Trauma Triage'];
+  const iotEvidence = iotScenarios.length
+    ? iotScenarios
+    : ['Device alarm failure', 'Respiratory failure'];
   const protocolRows = protocolEvidence();
   const calculatorRows = calculatorEvidence();
 
@@ -170,7 +178,8 @@ function buildDefaultLinks() {
       source: 'simulation',
       target: 'laboratory',
       relationship: 'scenario-data',
-      rationale: 'Simulation scenarios include lab panels, abnormal values, and lab dashboard launch points.',
+      rationale:
+        'Simulation scenarios include lab panels, abnormal values, and lab dashboard launch points.',
       evidence: labEvidence,
       score: 82 + Math.min(labEvidence.length, 8),
     }),
@@ -178,15 +187,22 @@ function buildDefaultLinks() {
       source: 'laboratory',
       target: 'medical-3d-viewer',
       relationship: 'diagnostic-context',
-      rationale: 'Lab interpretation often benefits from anatomy, organ, or radiology-volume review before debrief.',
-      evidence: ['Lactate escalation', 'Troponin trend', 'Stroke anatomy review', ...viewerEvidence],
+      rationale:
+        'Lab interpretation often benefits from anatomy, organ, or radiology-volume review before debrief.',
+      evidence: [
+        'Lactate escalation',
+        'Troponin trend',
+        'Stroke anatomy review',
+        ...viewerEvidence,
+      ],
       score: 78,
     }),
     link({
       source: 'simulation',
       target: 'medical-3d-viewer',
       relationship: 'training-context',
-      rationale: 'Scenario objectives can jump directly into anatomy review for stroke, trauma, and procedural learning.',
+      rationale:
+        'Scenario objectives can jump directly into anatomy review for stroke, trauma, and procedural learning.',
       evidence: viewerEvidence,
       score: 76 + Math.min(viewerEvidence.length, 8),
     }),
@@ -194,7 +210,8 @@ function buildDefaultLinks() {
       source: 'hospital-map',
       target: 'fleet',
       relationship: 'location-to-movement',
-      rationale: 'Operational location context should connect to fleet routing, dispatch, and movement surfaces.',
+      rationale:
+        'Operational location context should connect to fleet routing, dispatch, and movement surfaces.',
       evidence: ['Hospital Map', 'Fleet Map', 'Live Tracking Map'],
       score: 86,
     }),
@@ -202,7 +219,8 @@ function buildDefaultLinks() {
       source: 'fleet',
       target: 'medical-iot',
       relationship: 'movement-to-telemetry',
-      rationale: 'Fleet operations and device telemetry share status, freshness, alert, and maintenance context.',
+      rationale:
+        'Fleet operations and device telemetry share status, freshness, alert, and maintenance context.',
       evidence: ['Fleet routes', 'Device status', 'Medical IoT alerts', ...iotEvidence],
       score: 84,
     }),
@@ -210,7 +228,8 @@ function buildDefaultLinks() {
       source: 'hospital-map',
       target: 'medical-iot',
       relationship: 'location-to-telemetry',
-      rationale: 'Hospital rooms and beds should expose associated devices, vitals, freshness, and alerts.',
+      rationale:
+        'Hospital rooms and beds should expose associated devices, vitals, freshness, and alerts.',
       evidence: ['Room devices', 'Bed telemetry', 'Device alerts', ...iotEvidence],
       score: 88,
     }),
@@ -218,7 +237,8 @@ function buildDefaultLinks() {
       source: 'protocols',
       target: 'calculators',
       relationship: 'pathway-to-risk-score',
-      rationale: 'Clinical pathways already reference calculators for risk framing and severity scoring.',
+      rationale:
+        'Clinical pathways already reference calculators for risk framing and severity scoring.',
       evidence: protocolRows,
       score: 86 + Math.min(protocolRows.length, 8),
     }),
@@ -226,7 +246,8 @@ function buildDefaultLinks() {
       source: 'calculators',
       target: 'ai-agents',
       relationship: 'score-to-ai-support',
-      rationale: 'Calculator output can move into AI-assisted explanation, tutoring, documentation, and next-action support.',
+      rationale:
+        'Calculator output can move into AI-assisted explanation, tutoring, documentation, and next-action support.',
       evidence: calculatorRows,
       score: 82 + Math.min(calculatorRows.length, 8),
     }),
@@ -234,7 +255,8 @@ function buildDefaultLinks() {
       source: 'protocols',
       target: 'ai-agents',
       relationship: 'pathway-explanation',
-      rationale: 'Protocols can request AI explanation while keeping clinical decision support limits visible.',
+      rationale:
+        'Protocols can request AI explanation while keeping clinical decision support limits visible.',
       evidence: PROTOCOL_PATHWAYS.map((protocol) => protocol.title).slice(0, 8),
       score: 83,
     }),
@@ -285,7 +307,9 @@ export class CrossModuleIntelligenceService {
       ...pathway,
       modules: pathway.moduleIds.map((candidateId) => this.modules[candidateId]).filter(Boolean),
       links: this.links.filter(
-        (relationship) => pathway.moduleIds.includes(relationship.source) && pathway.moduleIds.includes(relationship.target),
+        (relationship) =>
+          pathway.moduleIds.includes(relationship.source) &&
+          pathway.moduleIds.includes(relationship.target),
       ),
     };
   }
@@ -302,7 +326,9 @@ export class CrossModuleIntelligenceService {
 
   buildCrossModuleHubSnapshot() {
     const modules = this.getModules();
-    const connectedModuleIds = new Set(this.links.flatMap((relationship) => [relationship.source, relationship.target]));
+    const connectedModuleIds = new Set(
+      this.links.flatMap((relationship) => [relationship.source, relationship.target]),
+    );
     const pathwayRows = this.pathways.map((pathway) => this.getModulePathway(pathway.moduleIds[0]));
     return {
       generatedAt: new Date().toISOString(),

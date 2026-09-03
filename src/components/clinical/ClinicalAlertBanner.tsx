@@ -8,7 +8,7 @@ const ClinicalAlertBanner = ({ alert, onAcknowledge, onDismiss }) => {
       critical: '🔴',
       high: '🟠',
       warning: '🟡',
-      info: '🔵'
+      info: '🔵',
     };
     return icons[severity] || '🔵';
   };
@@ -21,9 +21,7 @@ const ClinicalAlertBanner = ({ alert, onAcknowledge, onDismiss }) => {
         <span className="alert-icon">{getSeverityIcon(alert.severity)}</span>
         <div className="alert-content-wrapper">
           <div className="alert-title">{alert.title || 'Clinical Alert'}</div>
-          {alert.description && (
-            <div className="alert-description">{alert.description}</div>
-          )}
+          {alert.description && <div className="alert-description">{alert.description}</div>}
           {alert.findings && alert.findings.length > 0 && (
             <div className="alert-findings">
               <span className="findings-label">Key Findings:</span>
@@ -36,7 +34,9 @@ const ClinicalAlertBanner = ({ alert, onAcknowledge, onDismiss }) => {
           )}
         </div>
         {onDismiss && (
-          <button type="button" className="alert-close" onClick={onDismiss} title="Dismiss">✕</button>
+          <button type="button" className="alert-close" onClick={onDismiss} title="Dismiss">
+            ✕
+          </button>
         )}
       </div>
 
@@ -56,13 +56,12 @@ const ClinicalAlertBanner = ({ alert, onAcknowledge, onDismiss }) => {
 
       <div className="alert-footer">
         {alert.timestamp && (
-          <span className="alert-timestamp">
-            {new Date(alert.timestamp).toLocaleString()}
-          </span>
+          <span className="alert-timestamp">{new Date(alert.timestamp).toLocaleString()}</span>
         )}
         <div className="alert-actions">
           {onAcknowledge && !isAcknowledged && (
-            <button type="button" 
+            <button
+              type="button"
               className="alert-action-btn acknowledge"
               onClick={() => onAcknowledge(alert.id)}
               title="Mark as acknowledged"
@@ -70,9 +69,7 @@ const ClinicalAlertBanner = ({ alert, onAcknowledge, onDismiss }) => {
               Acknowledge
             </button>
           )}
-          {isAcknowledged && (
-            <span className="alert-acknowledged">✓ Acknowledged</span>
-          )}
+          {isAcknowledged && <span className="alert-acknowledged">✓ Acknowledged</span>}
         </div>
       </div>
     </div>

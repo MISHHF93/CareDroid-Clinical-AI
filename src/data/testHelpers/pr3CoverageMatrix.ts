@@ -66,7 +66,9 @@ export function assertPr3DiscoveryCanonical(id, { getAllDiscoveredTools }) {
   const hits = getAllDiscoveredTools().filter((r) => r.id === id);
   expect(hits, `discovery duplicates for ${id}`).toHaveLength(1);
   expect(hits[0].path).toBe(PR3_HUB_PATH);
-  const blob = [hits[0].source, ...(hits[0].sources || []), hits[0].notes].filter(Boolean).join(' ');
+  const blob = [hits[0].source, ...(hits[0].sources || []), hits[0].notes]
+    .filter(Boolean)
+    .join(' ');
   expect(blob).toMatch(/toolRegistry|clinicalIntentToolCatalog|tool\.patterns|chatAssisted/i);
 }
 
@@ -112,14 +114,14 @@ export function assertPr3FullyWired(id, ctx) {
   expect(ctx.clinicalIntentToolsById[id], `orphan NLU: ${id}`).toBeTruthy();
   expect(
     ctx.nluCalculatorHubOnly.some((h) => h.toolId === id),
-    `orphan hub-only: ${id}`
+    `orphan hub-only: ${id}`,
   ).toBe(true);
   expect(
     ctx.getMedicalToolsCatalogRows().some((r) => r.primaryId === id),
-    `orphan catalog: ${id}`
+    `orphan catalog: ${id}`,
   ).toBe(true);
   expect(
     ctx.getAllDiscoveredTools().some((r) => r.id === id),
-    `orphan discovery: ${id}`
+    `orphan discovery: ${id}`,
   ).toBe(true);
 }

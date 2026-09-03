@@ -1,7 +1,10 @@
 import appConfig from './appConfig';
 
 const injectedBuildInfo: any =
-  typeof (globalThis as any).__CARE_BUILD_INFO__ === 'undefined' || !(globalThis as any).__CARE_BUILD_INFO__ ? {} : (globalThis as any).__CARE_BUILD_INFO__;
+  typeof (globalThis as any).__CARE_BUILD_INFO__ === 'undefined' ||
+  !(globalThis as any).__CARE_BUILD_INFO__
+    ? {}
+    : (globalThis as any).__CARE_BUILD_INFO__;
 
 const normalizeValue = (value, fallback = 'unknown') => {
   const nextValue = String(value || '').trim();
@@ -25,7 +28,7 @@ export const buildInfo = Object.freeze({
   branch: normalizeValue(injectedBuildInfo.branch, appConfig.app?.deployment?.branch || 'unknown'),
   environment: normalizeValue(
     injectedBuildInfo.environment,
-    appConfig.app?.environment || 'unknown'
+    appConfig.app?.environment || 'unknown',
   ),
   deploymentUrl: normalizeValue(injectedBuildInfo.deploymentUrl, ''),
   deploymentId: normalizeValue(injectedBuildInfo.deploymentId, appConfig.app?.deployment?.id || ''),

@@ -40,9 +40,7 @@ export type SecurityAccessContext = Readonly<{
   readOnly?: boolean;
 }>;
 
-function resolveCompiledProfile(
-  ctx: SecurityAccessContext,
-): CompiledCareDroidAccessProfile | null {
+function resolveCompiledProfile(ctx: SecurityAccessContext): CompiledCareDroidAccessProfile | null {
   if (ctx.compiledProfile?.user) return ctx.compiledProfile;
   return null;
 }
@@ -135,10 +133,7 @@ export function canAccessRoute(ctx: SecurityAccessContext, path: string): boolea
   );
 }
 
-export function canMutateEmergency(
-  ctx: SecurityAccessContext,
-  emergencyKey: string,
-): boolean {
+export function canMutateEmergency(ctx: SecurityAccessContext, emergencyKey: string): boolean {
   if (ctx.readOnly) return false;
   const profile = resolveCompiledProfile(ctx);
   if (profile && !canMutateWithCompiledProfile(profile, emergencyKey)) return false;
@@ -237,13 +232,13 @@ export function isPublicApiPath(path: string): boolean {
   return PUBLIC_API_PATTERNS.some((pattern) => pattern.test(apiPath));
 }
 
-export function buildSecurityContextFromUser(user: Record<string, unknown> | null | undefined): SecurityAccessContext {
+export function buildSecurityContextFromUser(
+  user: Record<string, unknown> | null | undefined,
+): SecurityAccessContext {
   if (!user) return {};
   const compiled =
     (user.compiledAccessProfile as CompiledCareDroidAccessProfile | undefined) ||
-    (user.caredroidProfile
-      ? compileCareDroidAccessProfile(user.caredroidProfile as any)
-      : null);
+    (user.caredroidProfile ? compileCareDroidAccessProfile(user.caredroidProfile as any) : null);
 
   return {
     compiledProfile: compiled,

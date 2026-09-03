@@ -23,7 +23,12 @@ describe('neurologyCalculators', () => {
       infratentorialOrigin: 'no',
     });
     expect(ich.score).toBe(4);
-    expect(ich.components).toMatchObject({ gcsPoints: 1, volumePoints: 1, ivhPoints: 1, agePoints: 1 });
+    expect(ich.components).toMatchObject({
+      gcsPoints: 1,
+      volumePoints: 1,
+      ivhPoints: 1,
+      agePoints: 1,
+    });
 
     const four = computeFourScore({ eye: '4', motor: '4', brainstem: '4', respiration: '4' });
     expect(four.score).toBe(16);
@@ -60,7 +65,9 @@ describe('neurologyCalculators', () => {
   });
 
   it('rejects incomplete or implausible inputs', () => {
-    expect(computeFourScore({ eye: '4', motor: '', brainstem: '4', respiration: '4' }).ok).toBe(false);
+    expect(computeFourScore({ eye: '4', motor: '', brainstem: '4', respiration: '4' }).ok).toBe(
+      false,
+    );
     expect(
       computeIchScore({
         age: 140,
@@ -68,8 +75,7 @@ describe('neurologyCalculators', () => {
         volumeMl: -1,
         intraventricularHemorrhage: '',
         infratentorialOrigin: 'no',
-      }).errors.length
+      }).errors.length,
     ).toBeGreaterThan(0);
   });
 });
-

@@ -85,8 +85,7 @@ export function computeChildPughBreakdown(raw) {
   const inrRaw = toNum(raw.inr);
   const ptRaw = toNum(raw.ptProlongationSec);
 
-  const bilirubinMgDl =
-    raw.bilirubinUnit === 'umol_l' ? bilirubinUmolLToMgDl(biliRaw) : biliRaw;
+  const bilirubinMgDl = raw.bilirubinUnit === 'umol_l' ? bilirubinUmolLToMgDl(biliRaw) : biliRaw;
   const albuminGdl = raw.albuminUnit === 'g_l' ? albuminGlToGdl(albRaw) : albRaw;
 
   const bilirubin = scoreChildPughBilirubinMgDl(bilirubinMgDl);
@@ -199,8 +198,12 @@ export function validateChildPughInputs(raw) {
   }
 
   if (raw.coagulationMode === 'pt') {
-    const pt = typeof raw.ptProlongationSec === 'string' ? raw.ptProlongationSec.trim() : raw.ptProlongationSec;
-    if (pt === '' || Number.isNaN(parseFloat(pt))) errors.push('Enter PT prolongation (seconds above control).');
+    const pt =
+      typeof raw.ptProlongationSec === 'string'
+        ? raw.ptProlongationSec.trim()
+        : raw.ptProlongationSec;
+    if (pt === '' || Number.isNaN(parseFloat(pt)))
+      errors.push('Enter PT prolongation (seconds above control).');
     else {
       const n = parseFloat(pt);
       if (n < 0 || n > 80) errors.push('PT prolongation should be between 0 and 80 seconds.');

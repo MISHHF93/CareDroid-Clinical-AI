@@ -39,9 +39,7 @@ const FUNCTION_AI_SERVICE_IDS: Readonly<Partial<Record<ProfileFunctionId, readon
   });
 
 const registryByServiceId = Object.freeze(
-  Object.fromEntries(
-    PLATFORM_AI_MODEL_REGISTRY.map((model) => [model.platformServiceId, model]),
-  ),
+  Object.fromEntries(PLATFORM_AI_MODEL_REGISTRY.map((model) => [model.platformServiceId, model])),
 );
 
 export function resolveProfileAiCapabilities(

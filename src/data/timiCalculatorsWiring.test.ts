@@ -34,9 +34,9 @@ const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculato
 const patternsSource = readFileSync(
   join(
     __dirname,
-    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts'
+    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts',
   ),
-  'utf8'
+  'utf8',
 );
 
 describe('TIMI UA/NSTEMI calculator wiring', () => {
@@ -107,7 +107,7 @@ describe('TIMI UA/NSTEMI calculator wiring', () => {
     (alias, canonical) => {
       expect(NLU_TO_REGISTRY_ID[alias]).toBe(canonical);
       expect(resolveRegistryId(alias)).toBe(canonical);
-    }
+    },
   );
 
   it('registers CalculatorInterface case and route defs deep link', () => {
@@ -121,7 +121,7 @@ describe('TIMI UA/NSTEMI calculator wiring', () => {
     expect(matchCalculatorRoute(TIMI_ROUTE)?.calculatorSlug).toBe(TIMI_REGISTRY_ID);
     expect(expectedLaunchPath(TIMI_REGISTRY_ID)).toBe(TIMI_ROUTE);
     expect(CALCULATOR_ROUTE_DEFS.find((d) => d.calculatorSlug === TIMI_REGISTRY_ID)?.path).toBe(
-      TIMI_ROUTE
+      TIMI_ROUTE,
     );
   });
 
@@ -131,7 +131,7 @@ describe('TIMI UA/NSTEMI calculator wiring', () => {
       const rows = getMedicalToolsCatalogRows();
       const hits = catalogRowsMatchingQuery(rows, query);
       expect(hits.some((r) => r.primaryId === primaryId)).toBe(true);
-    }
+    },
   );
 
   it('lists timi-ua-nstemi in toolRegistry export', () => {

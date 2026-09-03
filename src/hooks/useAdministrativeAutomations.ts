@@ -36,13 +36,18 @@ export function useAdministrativeAutomations() {
         overridden: queue.filter((task) => task.status === 'overridden').length,
         byCategory: {
           patient_routing: queue.filter((task) => task.category === 'patient_routing').length,
-          documentation_handoff: queue.filter((task) => task.category === 'documentation_handoff').length,
+          documentation_handoff: queue.filter((task) => task.category === 'documentation_handoff')
+            .length,
           ai_patient_summary: queue.filter((task) => task.category === 'ai_patient_summary').length,
           triage_preparation: queue.filter((task) => task.category === 'triage_preparation').length,
-          department_notification: queue.filter((task) => task.category === 'department_notification').length,
+          department_notification: queue.filter(
+            (task) => task.category === 'department_notification',
+          ).length,
           staff_assignment: queue.filter((task) => task.category === 'staff_assignment').length,
-          queue_prioritization: queue.filter((task) => task.category === 'queue_prioritization').length,
-          escalation_workflow: queue.filter((task) => task.category === 'escalation_workflow').length,
+          queue_prioritization: queue.filter((task) => task.category === 'queue_prioritization')
+            .length,
+          escalation_workflow: queue.filter((task) => task.category === 'escalation_workflow')
+            .length,
         },
       },
       safetyStatement:
@@ -70,7 +75,9 @@ export function useAdministrativeAutomations() {
   }, [backendAvailable, refreshLocal]);
 
   const review = useCallback(
-    async (input: Omit<ReviewAdministrativeAutomationInput, 'actorStaffId'> & { actorStaffId?: string }) => {
+    async (
+      input: Omit<ReviewAdministrativeAutomationInput, 'actorStaffId'> & { actorStaffId?: string },
+    ) => {
       const actorStaffId = input.actorStaffId || activeShift.chargeStaffId || 'charge-nurse';
       const payload = { ...input, actorStaffId };
       if (backendAvailable) {

@@ -19,19 +19,47 @@ export function evaluateVitalsAlerts(nextVitals: any = {}, previousVitals: any =
 
   if (isNumber(spo2)) {
     if (spo2 < 88) {
-      alerts.push(alertFor({ severity: 'critical', vital: 'SpO2', value: spo2, unit: '%', reason: `SpO2 ${spo2}%` }));
+      alerts.push(
+        alertFor({
+          severity: 'critical',
+          vital: 'SpO2',
+          value: spo2,
+          unit: '%',
+          reason: `SpO2 ${spo2}%`,
+        }),
+      );
     } else if (spo2 <= 93) {
-      alerts.push(alertFor({ severity: 'warning', vital: 'SpO2', value: spo2, unit: '%', reason: `SpO2 ${spo2}%` }));
+      alerts.push(
+        alertFor({
+          severity: 'warning',
+          vital: 'SpO2',
+          value: spo2,
+          unit: '%',
+          reason: `SpO2 ${spo2}%`,
+        }),
+      );
     } else if (spo2 <= 95) {
-      alerts.push(alertFor({ severity: 'watch', vital: 'SpO2', value: spo2, unit: '%', reason: `SpO2 ${spo2}%` }));
+      alerts.push(
+        alertFor({
+          severity: 'watch',
+          vital: 'SpO2',
+          value: spo2,
+          unit: '%',
+          reason: `SpO2 ${spo2}%`,
+        }),
+      );
     }
   }
 
   if (isNumber(hr)) {
     if (hr < 40 || hr > 150) {
-      alerts.push(alertFor({ severity: 'critical', vital: 'HR', value: hr, unit: 'bpm', reason: `HR ${hr}` }));
+      alerts.push(
+        alertFor({ severity: 'critical', vital: 'HR', value: hr, unit: 'bpm', reason: `HR ${hr}` }),
+      );
     } else if ((hr >= 40 && hr <= 50) || (hr >= 120 && hr <= 150)) {
-      alerts.push(alertFor({ severity: 'warning', vital: 'HR', value: hr, unit: 'bpm', reason: `HR ${hr}` }));
+      alerts.push(
+        alertFor({ severity: 'warning', vital: 'HR', value: hr, unit: 'bpm', reason: `HR ${hr}` }),
+      );
     }
   }
 
@@ -42,9 +70,25 @@ export function evaluateVitalsAlerts(nextVitals: any = {}, previousVitals: any =
     // or a fat-finger typo (e.g. "1800" for "180"): any sbp > 200 fell
     // through both branches with zero alert, however extreme.
     if (sbp < 80 || sbp > 200) {
-      alerts.push(alertFor({ severity: 'critical', vital: 'SBP', value: sbp, unit: 'mmHg', reason: `SBP ${sbp}` }));
+      alerts.push(
+        alertFor({
+          severity: 'critical',
+          vital: 'SBP',
+          value: sbp,
+          unit: 'mmHg',
+          reason: `SBP ${sbp}`,
+        }),
+      );
     } else if ((sbp >= 80 && sbp <= 90) || (sbp >= 180 && sbp <= 200)) {
-      alerts.push(alertFor({ severity: 'warning', vital: 'SBP', value: sbp, unit: 'mmHg', reason: `SBP ${sbp}` }));
+      alerts.push(
+        alertFor({
+          severity: 'warning',
+          vital: 'SBP',
+          value: sbp,
+          unit: 'mmHg',
+          reason: `SBP ${sbp}`,
+        }),
+      );
     }
   }
 
@@ -56,12 +100,20 @@ export function evaluateVitalsAlerts(nextVitals: any = {}, previousVitals: any =
         value: gcs,
         unit: '',
         reason: `GCS dropped from ${previousGcs} to ${gcs} - deteriorating neuro`,
-      })
+      }),
     );
   }
 
   if (isNumber(temp) && (temp > 38.5 || temp < 35)) {
-    alerts.push(alertFor({ severity: 'warning', vital: 'Temp', value: temp, unit: 'C', reason: `Temp ${temp}C` }));
+    alerts.push(
+      alertFor({
+        severity: 'warning',
+        vital: 'Temp',
+        value: temp,
+        unit: 'C',
+        reason: `Temp ${temp}C`,
+      }),
+    );
   }
 
   return alerts;
@@ -70,7 +122,7 @@ export function evaluateVitalsAlerts(nextVitals: any = {}, previousVitals: any =
 export function activeVitalsAlerts(patient, severities = ['critical', 'warning', 'watch']) {
   const allowed = new Set(severities);
   return (patient?.vitalsAlerts || []).filter(
-    (alert) => alert.status === VITALS_ALERT_ACTIVE_STATUS && allowed.has(alert.severity)
+    (alert) => alert.status === VITALS_ALERT_ACTIVE_STATUS && allowed.has(alert.severity),
   );
 }
 
@@ -87,7 +139,8 @@ export function formatActiveVitalsForCopilot(patients = [] as any[]) {
     const severity = critical.length ? 'critical' : 'warning';
     const formattedVitals = alerts.map(formatVitalsAlert).join(', ');
     const location = patient.location || patient.roomId || 'No bed';
-    const bedLabel = /^bed\b/i.test(String(location)) || location === 'No bed' ? location : `Bed ${location}`;
+    const bedLabel =
+      /^bed\b/i.test(String(location)) || location === 'No bed' ? location : `Bed ${location}`;
     const name = patient.name || [patient.firstName, patient.lastName].filter(Boolean).join(' ');
     return [`ALERT: ${name} ${bedLabel} has ${severity} vitals: ${formattedVitals}`];
   });

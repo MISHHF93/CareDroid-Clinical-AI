@@ -60,7 +60,10 @@ vi.mock('../engine/unifiedApplicationKnowledgeGraphEngine', () => ({
   startUnifiedApplicationKnowledgeGraphEngine: vi.fn(() => vi.fn()),
   handleUnifiedApplicationKnowledgeGraphBackendEvent: vi.fn(),
 }));
-vi.mock('../engine/simulation', () => ({ startSimulation: vi.fn(() => [9]), stopSimulation: vi.fn() }));
+vi.mock('../engine/simulation', () => ({
+  startSimulation: vi.fn(() => [9]),
+  stopSimulation: vi.fn(),
+}));
 vi.mock('../services/backendReachability', () => ({
   probeBackendReachability: vi.fn().mockResolvedValue(true),
   isBackendKnownOffline: vi.fn().mockReturnValue(false),
@@ -70,7 +73,8 @@ vi.mock('../services/devBackendSession', () => ({
 }));
 
 vi.mock('./ReassessmentDrawer', () => ({
-  default: ({ open }: { open: boolean }) => (open ? <div data-testid="reassessment-drawer-open" /> : null),
+  default: ({ open }: { open: boolean }) =>
+    open ? <div data-testid="reassessment-drawer-open" /> : null,
   isPatientFlaggedForReassessment: () => false,
 }));
 vi.mock('./PatientDetailPanel', () => ({ default: () => null }));
@@ -137,7 +141,9 @@ async function renderShellAndPressR() {
       </AppShell>
     </MemoryRouter>,
   );
-  await waitFor(() => expect(useEmergencyStore.getState().initializeFromBackend).toHaveBeenCalled());
+  await waitFor(() =>
+    expect(useEmergencyStore.getState().initializeFromBackend).toHaveBeenCalled(),
+  );
   fireEvent.keyDown(document, { key: 'r' });
 }
 

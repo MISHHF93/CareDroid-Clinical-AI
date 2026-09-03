@@ -77,7 +77,9 @@ export function CollaborationHub() {
       message: 'Desk demo mode — sign in for live team channels.',
       updatedAt: new Date().toISOString(),
     });
-    setStatusMessage('Showing desk demo channels for your profile. Sign in for live collaboration.');
+    setStatusMessage(
+      'Showing desk demo channels for your profile. Sign in for live collaboration.',
+    );
     return seed;
   }, [
     emergencyRole,

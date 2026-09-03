@@ -41,20 +41,26 @@ describe('CEDS token mirror stays in sync with cdl-v2 CSS', () => {
 
   it('every font-weight in the TS mirror matches its --cdl-font-* declaration', () => {
     for (const [name, weight] of Object.entries(CDL_FONT_WEIGHT)) {
-      expect(tokensCss, `--cdl-font-${name}`).toMatch(new RegExp(`--cdl-font-${name}:\\s*${weight}`));
+      expect(tokensCss, `--cdl-font-${name}`).toMatch(
+        new RegExp(`--cdl-font-${name}:\\s*${weight}`),
+      );
     }
   });
 
   it('every radius step in the TS mirror matches its --cdl-radius-* declaration', () => {
     for (const [step, px] of Object.entries(CDL_RADIUS_PX)) {
       const expected = step === 'full' ? '9999px' : `${px}px`;
-      expect(tokensCss, `--cdl-radius-${step}`).toMatch(new RegExp(`--cdl-radius-${step}:\\s*${expected}`));
+      expect(tokensCss, `--cdl-radius-${step}`).toMatch(
+        new RegExp(`--cdl-radius-${step}:\\s*${expected}`),
+      );
     }
   });
 
   it('every duration step in the TS mirror matches its --cdl-duration-* declaration', () => {
     for (const [step, ms] of Object.entries(CDL_DURATION_MS)) {
-      expect(tokensCss, `--cdl-duration-${step}`).toMatch(new RegExp(`--cdl-duration-${step}:\\s*${ms}ms`));
+      expect(tokensCss, `--cdl-duration-${step}`).toMatch(
+        new RegExp(`--cdl-duration-${step}:\\s*${ms}ms`),
+      );
     }
   });
 
@@ -97,9 +103,15 @@ describe('CEDS token mirror stays in sync with cdl-v2 CSS', () => {
   });
 
   it('the standardized card dimension tokens exist in tokens.css and back a real .cdl-card--workflow rule', () => {
-    expect(tokensCss).toMatch(new RegExp(`--cdl-card-min-width:\\s*${CDL_CARD_DIMENSIONS.minWidthPx}px`));
-    expect(tokensCss).toMatch(new RegExp(`--cdl-card-max-width:\\s*${CDL_CARD_DIMENSIONS.maxWidthPx}px`));
-    expect(tokensCss).toMatch(new RegExp(`--cdl-card-min-height:\\s*${CDL_CARD_DIMENSIONS.minHeightPx}px`));
+    expect(tokensCss).toMatch(
+      new RegExp(`--cdl-card-min-width:\\s*${CDL_CARD_DIMENSIONS.minWidthPx}px`),
+    );
+    expect(tokensCss).toMatch(
+      new RegExp(`--cdl-card-max-width:\\s*${CDL_CARD_DIMENSIONS.maxWidthPx}px`),
+    );
+    expect(tokensCss).toMatch(
+      new RegExp(`--cdl-card-min-height:\\s*${CDL_CARD_DIMENSIONS.minHeightPx}px`),
+    );
     expect(cardsCss).toContain('.cdl-card--workflow');
     expect(cardsCss).toContain('min-width: var(--cdl-card-min-width)');
   });

@@ -89,8 +89,7 @@ export function recordPhiAccess(request: PhiAccessRequest): void {
 
 export function canViewPatientPhi(context: SecurityAccessContext): boolean {
   return (
-    canAccessPhi(context, 'view') ||
-    checkPermission(context, BACKEND_PERMISSION_KEYS.READ_PHI)
+    canAccessPhi(context, 'view') || checkPermission(context, BACKEND_PERMISSION_KEYS.READ_PHI)
   );
 }
 

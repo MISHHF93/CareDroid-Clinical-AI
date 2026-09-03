@@ -178,16 +178,25 @@ function readTimelineState(event: JourneyEvent): PatientState | null {
 
 export function resolveWorkflowStateForPatient(patient: Patient): PatientJourneyStateId {
   if (hasPatientFlag(patient, PatientFlag.ReassessmentDue)) return 'reassessment';
-  if (patient.state === PatientState.Disposition && hasPatientFlag(patient, PatientFlag.PendingAdmission)) {
+  if (
+    patient.state === PatientState.Disposition &&
+    hasPatientFlag(patient, PatientFlag.PendingAdmission)
+  ) {
     return 'admission';
   }
   if (patient.state === PatientState.Discharge) {
-    return patient.timeline?.some((event) => event.type === 'FollowUpScheduled') ? 'follow-up' : 'discharge';
+    return patient.timeline?.some((event) => event.type === 'FollowUpScheduled')
+      ? 'follow-up'
+      : 'discharge';
   }
   return PATIENT_STATE_TO_WORKFLOW[patient.state] || 'waiting';
 }
 
-export function resolveStageEnteredAt(patient: Patient, workflowStateId: PatientJourneyStateId, now: Date): string {
+export function resolveStageEnteredAt(
+  patient: Patient,
+  workflowStateId: PatientJourneyStateId,
+  now: Date,
+): string {
   const timeline = [...(patient.timeline || [])].reverse();
   for (const event of timeline) {
     const toState = readTimelineState(event);
@@ -198,7 +207,10 @@ export function resolveStageEnteredAt(patient: Patient, workflowStateId: Patient
 
   if (workflowStateId === 'triage' && patient.triageTime) return patient.triageTime;
   if (workflowStateId === 'assessment' && patient.lastAssessedTime) return patient.lastAssessedTime;
-  if (workflowStateId === 'registration' && (patient as Patient & { registrationTime?: string }).registrationTime) {
+  if (
+    workflowStateId === 'registration' &&
+    (patient as Patient & { registrationTime?: string }).registrationTime
+  ) {
     return (patient as Patient & { registrationTime?: string }).registrationTime!;
   }
   return patient.arrivalTime || now.toISOString();
@@ -242,14 +254,20 @@ function bottleneckForPatient(
     };
   }
 
-  if (stageWaitMinutes >= targetMinutes * 2 || (isHighAcuity && stageWaitMinutes >= targetMinutes * 1.25)) {
+  if (
+    stageWaitMinutes >= targetMinutes * 2 ||
+    (isHighAcuity && stageWaitMinutes >= targetMinutes * 1.25)
+  ) {
     return {
       status: 'overload',
       reason: `${PATIENT_JOURNEY_STATE_BY_ID[workflowStateId].label} exceeded operational threshold by ${overTarget}m.`,
     };
   }
 
-  if (stageWaitMinutes >= targetMinutes * 1.5 || (isHighAcuity && stageWaitMinutes >= targetMinutes)) {
+  if (
+    stageWaitMinutes >= targetMinutes * 1.5 ||
+    (isHighAcuity && stageWaitMinutes >= targetMinutes)
+  ) {
     return {
       status: 'congestion',
       reason: `${PATIENT_JOURNEY_STATE_BY_ID[workflowStateId].label} running ${overTarget}m over target.`,
@@ -266,14 +284,18 @@ function bottleneckForPatient(
   return { status: 'clear', reason: null };
 }
 
-function severityFromBottleneck(status: PatientFlowBottleneckStatus): 'watch' | 'warning' | 'critical' {
+function severityFromBottleneck(
+  status: PatientFlowBottleneckStatus,
+): 'watch' | 'warning' | 'critical' {
   if (status === 'overload' || status === 'handoff-delay') return 'critical';
   if (status === 'congestion') return 'warning';
   if (status === 'watch') return 'watch';
   return 'watch';
 }
 
-function detectionTypeForBottleneck(status: PatientFlowBottleneckStatus): PatientFlowDetectionType | null {
+function detectionTypeForBottleneck(
+  status: PatientFlowBottleneckStatus,
+): PatientFlowDetectionType | null {
   if (status === 'handoff-delay') return 'delayed_handoff';
   if (status === 'overload') return 'department_overload';
   if (status === 'congestion') return 'department_congestion';
@@ -335,9 +357,7 @@ function median(values: number[]): number {
   if (!values.length) return 0;
   const sorted = [...values].sort((left, right) => left - right);
   const mid = Math.floor(sorted.length / 2);
-  return sorted.length % 2 === 0
-    ? Math.round((sorted[mid - 1] + sorted[mid]) / 2)
-    : sorted[mid];
+  return sorted.length % 2 === 0 ? Math.round((sorted[mid - 1] + sorted[mid]) / 2) : sorted[mid];
 }
 
 function buildDepartmentSnapshots(
@@ -356,7 +376,8 @@ function buildDepartmentSnapshots(
       stagePatients.length >= 10 ||
       medianWaitMinutes > targetMinutes * 1.5 ||
       stagePatients.some(
-        (entry) => entry.bottleneckStatus === 'overload' || entry.bottleneckStatus === 'handoff-delay',
+        (entry) =>
+          entry.bottleneckStatus === 'overload' || entry.bottleneckStatus === 'handoff-delay',
       );
 
     let bottleneckStatus: PatientFlowBottleneckStatus = 'clear';
@@ -452,7 +473,10 @@ function buildAiRecommendations(
         patientId: entry.patientId,
         stageId: entry.workflowStateId,
         action: entry.predictedNextStep || 'Review patient workflow',
-        rationale: entry.aiRecommendation || entry.bottleneckReason || 'Continuous flow monitoring flagged this patient.',
+        rationale:
+          entry.aiRecommendation ||
+          entry.bottleneckReason ||
+          'Continuous flow monitoring flagged this patient.',
         priority:
           entry.bottleneckStatus === 'overload' || entry.bottleneckStatus === 'handoff-delay'
             ? 'high'
@@ -468,7 +492,8 @@ export function buildContinuousPatientFlowSnapshot(
 ): ContinuousPatientFlowSnapshot {
   const now = input.now || new Date();
   const activePatients = (input.patients || []).filter(
-    (patient) => patient.state !== PatientState.Discharge && patient.state !== PatientState.Deceased,
+    (patient) =>
+      patient.state !== PatientState.Discharge && patient.state !== PatientState.Deceased,
   );
   const patientSnapshots = activePatients
     .map((patient) => buildPatientFlowPatientSnapshot(patient, { ...input, now }))
@@ -495,7 +520,10 @@ export function buildContinuousPatientFlowSnapshot(
   });
 }
 
-export function flowAlertBucket(waitMins: number, intervalMinutes = FLOW_ALERT_DEDUPE_MINUTES): number {
+export function flowAlertBucket(
+  waitMins: number,
+  intervalMinutes = FLOW_ALERT_DEDUPE_MINUTES,
+): number {
   return Math.floor(Math.max(0, waitMins) / intervalMinutes);
 }
 
@@ -546,7 +574,12 @@ function notifyDetections(
     const bucket = flowAlertBucket(status.waitMinutesExact);
     const detectionId = `long-wait-flow-${patient.id}`;
     if (hasFlowAlertForDetection(alerts, detectionId, bucket)) continue;
-    if (status.phase === 'warning' && snapshot.patients.some((entry) => entry.patientId === patient.id && entry.bottleneckStatus !== 'clear')) {
+    if (
+      status.phase === 'warning' &&
+      snapshot.patients.some(
+        (entry) => entry.patientId === patient.id && entry.bottleneckStatus !== 'clear',
+      )
+    ) {
       continue;
     }
     dispatchAlert({
@@ -568,8 +601,15 @@ function notifyDetections(
 }
 
 export function runContinuousPatientFlowTick(now = new Date()): ContinuousPatientFlowSnapshot {
-  const { patients, staff, referrals, capacity, alerts, emergencySettings, setPatientFlowSnapshot } =
-    useEmergencyStore.getState();
+  const {
+    patients,
+    staff,
+    referrals,
+    capacity,
+    alerts,
+    emergencySettings,
+    setPatientFlowSnapshot,
+  } = useEmergencyStore.getState();
 
   const snapshot = buildContinuousPatientFlowSnapshot({
     patients,

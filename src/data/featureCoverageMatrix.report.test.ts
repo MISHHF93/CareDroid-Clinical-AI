@@ -41,7 +41,7 @@ describe('featureCoverageMatrix report', () => {
     mkdirSync(docsDir, { recursive: true });
     writeFileSync(
       join(docsDir, 'feature-coverage-matrix.md'),
-      `${formatFeatureCoverageMatrixMarkdown(doc)}\n`
+      `${formatFeatureCoverageMatrixMarkdown(doc)}\n`,
     );
     expect(existsSync(join(docsDir, 'feature-coverage-matrix.md'))).toBe(true);
   });

@@ -17,53 +17,65 @@ describe('canonical route tree — shell and workspace', () => {
     useEmergencyStore.setState(originalEmergencyState, true);
   });
 
-  it('keeps primary shell controls and representative sidebar links exposed', async () => {
-    renderRoute('/emergency/whiteboard');
+  it(
+    'keeps primary shell controls and representative sidebar links exposed',
+    async () => {
+      renderRoute('/emergency/whiteboard');
 
-    expect(await screen.findByTestId('location')).toHaveTextContent('/emergency/whiteboard');
-    expect(
-      await screen.findByRole('button', { name: /\+ Central Intake/i }, { timeout: ROUTE_LOAD_TIMEOUT }),
-    ).toBeEnabled();
+      expect(await screen.findByTestId('location')).toHaveTextContent('/emergency/whiteboard');
+      expect(
+        await screen.findByRole(
+          'button',
+          { name: /\+ Central Intake/i },
+          { timeout: ROUTE_LOAD_TIMEOUT },
+        ),
+      ).toBeEnabled();
 
-    const desktopNavigation = screen.getByRole('navigation', {
-      name: 'Emergency desktop navigation',
-    });
-    expect(within(desktopNavigation).getByRole('link', { name: 'Analytics' })).toHaveAttribute(
-      'href',
-      '/emergency/analytics',
-    );
-    expect(within(desktopNavigation).getByRole('link', { name: 'Settings' })).toHaveAttribute(
-      'href',
-      '/emergency/settings',
-    );
-
-    for (const label of ['Medical Tools', 'Patients', 'Queues']) {
-      const item = PILOT_VISIBLE_NAVIGATION_ITEMS.find((navItem) => navItem.label === label);
-      expect(item, label).toBeTruthy();
-      if (!item) throw new Error(`expected navigation item for ${label} to exist`);
-      expect(within(desktopNavigation).getByRole('link', { name: label })).toHaveAttribute(
+      const desktopNavigation = screen.getByRole('navigation', {
+        name: 'Emergency desktop navigation',
+      });
+      expect(within(desktopNavigation).getByRole('link', { name: 'Analytics' })).toHaveAttribute(
         'href',
-        item.path,
+        '/emergency/analytics',
       );
-    }
-  }, ROUTE_LOAD_TIMEOUT);
+      expect(within(desktopNavigation).getByRole('link', { name: 'Settings' })).toHaveAttribute(
+        'href',
+        '/emergency/settings',
+      );
 
-  it('routes /workspace without an access-denied or error surface for clinical profiles', async () => {
-    renderRoute('/workspace');
+      for (const label of ['Medical Tools', 'Patients', 'Queues']) {
+        const item = PILOT_VISIBLE_NAVIGATION_ITEMS.find((navItem) => navItem.label === label);
+        expect(item, label).toBeTruthy();
+        if (!item) throw new Error(`expected navigation item for ${label} to exist`);
+        expect(within(desktopNavigation).getByRole('link', { name: label })).toHaveAttribute(
+          'href',
+          item.path,
+        );
+      }
+    },
+    ROUTE_LOAD_TIMEOUT,
+  );
 
-    const location = await screen.findByTestId('location');
-    expect([
-      '/workspace',
-      '/emergency/whiteboard',
-      '/emergency/reception',
-      '/emergency/settings',
-      '/start',
-    ]).toContain(location.textContent.split('?')[0]);
-    expect(screen.getByRole('main')).toBeInTheDocument();
-    expect(screen.queryByText('Access denied')).toBeNull();
-    expect(screen.queryByText('CareDroid page unavailable')).toBeNull();
-    expect(screen.queryByText(/unexpected error/i)).toBeNull();
-  }, ROUTE_LOAD_TIMEOUT);
+  it(
+    'routes /workspace without an access-denied or error surface for clinical profiles',
+    async () => {
+      renderRoute('/workspace');
+
+      const location = await screen.findByTestId('location');
+      expect([
+        '/workspace',
+        '/emergency/whiteboard',
+        '/emergency/reception',
+        '/emergency/settings',
+        '/start',
+      ]).toContain(location.textContent.split('?')[0]);
+      expect(screen.getByRole('main')).toBeInTheDocument();
+      expect(screen.queryByText('Access denied')).toBeNull();
+      expect(screen.queryByText('CareDroid page unavailable')).toBeNull();
+      expect(screen.queryByText(/unexpected error/i)).toBeNull();
+    },
+    ROUTE_LOAD_TIMEOUT,
+  );
 
   it('redirects legacy /emergency/simulation into the simulation suite', async () => {
     renderRoute('/emergency/simulation');

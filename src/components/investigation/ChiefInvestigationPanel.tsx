@@ -24,7 +24,10 @@ const FINDING_STATE_LABELS: Record<InvestigationFindingState, string> = {
   REQUIRES_HUMAN_REVIEW: 'Requires human review',
 };
 
-const FINDING_STATE_TONE: Record<InvestigationFindingState, 'success' | 'warning' | 'critical' | 'info'> = {
+const FINDING_STATE_TONE: Record<
+  InvestigationFindingState,
+  'success' | 'warning' | 'critical' | 'info'
+> = {
   SUPPORTED: 'success',
   PARTIALLY_SUPPORTED: 'warning',
   INSUFFICIENT_DATA: 'info',
@@ -43,10 +46,7 @@ const STEP_STATUS_TONE: Record<string, 'success' | 'warning' | 'critical' | 'inf
 
 function FindingStateChip({ state }: { state: InvestigationFindingState }) {
   return (
-    <span
-      className="chief-investigation-panel__chip"
-      data-tone={FINDING_STATE_TONE[state]}
-    >
+    <span className="chief-investigation-panel__chip" data-tone={FINDING_STATE_TONE[state]}>
       {FINDING_STATE_LABELS[state]}
     </span>
   );
@@ -131,7 +131,11 @@ export default function ChiefInvestigationPanel({
               >
                 {loading ? 'Investigating…' : 'Investigate deterioration'}
               </button>
-              {error ? <p className="chief-investigation-panel__error" role="alert">{error}</p> : null}
+              {error ? (
+                <p className="chief-investigation-panel__error" role="alert">
+                  {error}
+                </p>
+              ) : null}
             </div>
           ) : (
             <div className="chief-investigation-panel__result">
@@ -139,7 +143,11 @@ export default function ChiefInvestigationPanel({
                 <div className="chief-investigation-panel__result-meta">
                   <span>Plan {run.planVersion}</span>
                   <span>·</span>
-                  <span>{run.autonomyLevelUsed === 'LEVEL_2_PREPARE' ? 'Observe + prepare' : 'Observe only'}</span>
+                  <span>
+                    {run.autonomyLevelUsed === 'LEVEL_2_PREPARE'
+                      ? 'Observe + prepare'
+                      : 'Observe only'}
+                  </span>
                   <span>·</span>
                   <span>{new Date(run.createdAt).toLocaleTimeString()}</span>
                 </div>
@@ -164,7 +172,10 @@ export default function ChiefInvestigationPanel({
 
               <div className="chief-investigation-panel__findings">
                 {run.findings.map((finding, index) => (
-                  <article key={`${finding.state}-${index}`} className="chief-investigation-panel__finding">
+                  <article
+                    key={`${finding.state}-${index}`}
+                    className="chief-investigation-panel__finding"
+                  >
                     <div className="chief-investigation-panel__finding-head">
                       <FindingStateChip state={finding.state} />
                     </div>
@@ -217,7 +228,11 @@ export default function ChiefInvestigationPanel({
                   Refresh
                 </button>
               </div>
-              {error ? <p className="chief-investigation-panel__error" role="alert">{error}</p> : null}
+              {error ? (
+                <p className="chief-investigation-panel__error" role="alert">
+                  {error}
+                </p>
+              ) : null}
             </div>
           )}
         </div>

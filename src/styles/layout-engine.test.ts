@@ -17,7 +17,7 @@ describe('layout-engine.css', () => {
   it('owns shell gutters and a single content max width', () => {
     expect(layoutEngineCss).toContain('--app-layout-content-max');
     expect(layoutEngineCss).toMatch(
-      /\.emergency-app-shell \.app-shell-main-content\s*\{[\s\S]*padding-inline:\s*var\(--app-layout-page-gutter-inline\)/
+      /\.emergency-app-shell \.app-shell-main-content\s*\{[\s\S]*padding-inline:\s*var\(--app-layout-page-gutter-inline\)/,
     );
   });
 
@@ -35,7 +35,7 @@ describe('layout-engine.css', () => {
 
   it('caps the header topbar to the same content-max as the page below it', () => {
     expect(layoutEngineCss).toMatch(
-      /\.caredroid-header--compact \.caredroid-header__topbar\s*\{[\s\S]*max-width:\s*var\(--app-layout-content-max\)[\s\S]*margin-inline:\s*auto/
+      /\.caredroid-header--compact \.caredroid-header__topbar\s*\{[\s\S]*max-width:\s*var\(--app-layout-content-max\)[\s\S]*margin-inline:\s*auto/,
     );
   });
 });
@@ -45,13 +45,17 @@ describe('app-shell.css — route scrollport', () => {
     // The shorthand `overflow: auto` was later split into `overflow-x: clip` +
     // `overflow-y: auto` — a real improvement (blocks horizontal bleed while
     // still scrolling vertically), not a regression of this assertion's intent.
-    expect(appShellCss).toMatch(/\.app-shell-main-content\s*\{[\s\S]*overflow-x:\s*clip[\s\S]*overflow-y:\s*auto/);
+    expect(appShellCss).toMatch(
+      /\.app-shell-main-content\s*\{[\s\S]*overflow-x:\s*clip[\s\S]*overflow-y:\s*auto/,
+    );
     // `.app-shell-main-content > *` only sets `min-width: 0; max-width: 100%;`
     // — a narrow flex/grid child-overflow guard (its own comment: "Nested page
     // roots should grow with content, not trap a second viewport"), not the
     // height/overflow-based nested-viewport hack this test originally guarded
     // against. Confirmed via `git log -p` this rule carries no scroll/height
     // properties of its own.
-    expect(appShellCss).toMatch(/\.app-shell-main-content > \*\s*\{\s*min-width:\s*0;\s*max-width:\s*100%;\s*\}/);
+    expect(appShellCss).toMatch(
+      /\.app-shell-main-content > \*\s*\{\s*min-width:\s*0;\s*max-width:\s*100%;\s*\}/,
+    );
   });
 });

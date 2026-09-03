@@ -10,7 +10,11 @@ async function guardedJson(capability, path, options: any = {}) {
     const response = await apiFetch(path, options);
     const data = await parseApiResponse(response, { fallback: {} });
     if (!response.ok) {
-      return { ok: false, data: null, message: data?.message || getApiErrorMessage(null, response) };
+      return {
+        ok: false,
+        data: null,
+        message: data?.message || getApiErrorMessage(null, response),
+      };
     }
     return { ok: true, data, message: data?.message || '' };
   } catch (error: any) {
@@ -29,7 +33,7 @@ export function persistEmergencyReferral(referral) {
 export function fetchEmergencyReferralHistory(patientId) {
   return guardedJson(
     'emergencyReferralHistory',
-    `/api/emergency/patients/${encodeURIComponent(patientId)}/referrals`
+    `/api/emergency/patients/${encodeURIComponent(patientId)}/referrals`,
   );
 }
 
@@ -50,7 +54,7 @@ export function updateEmergencyTransferWorkflow(referralId, status, responseNote
     {
       method: 'PATCH',
       body: JSON.stringify(body),
-    }
+    },
   );
 }
 
@@ -74,7 +78,7 @@ export function updateEmergencyEmsStatus(emsUnitId, status, etaMinutes) {
       method: 'PATCH',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ status, eta_minutes: etaMinutes }),
-    }
+    },
   );
 }
 
@@ -86,7 +90,7 @@ export function confirmEmergencyEmsArrival(emsUnitId, arrivalDetails: any = {}) 
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify(arrivalDetails),
-    }
+    },
   );
 }
 

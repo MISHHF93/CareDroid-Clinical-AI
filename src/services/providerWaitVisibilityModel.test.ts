@@ -34,8 +34,12 @@ describe('providerWaitVisibilityModel', () => {
   });
 
   it('maps canonical metrics to surface-specific strip ids', () => {
-    const physicianMetrics = selectProviderWaitVisibilityMetrics(patients, { surface: 'physician' });
-    const commandMetrics = selectProviderWaitVisibilityMetrics(patients, { surface: 'commandCenter' });
+    const physicianMetrics = selectProviderWaitVisibilityMetrics(patients, {
+      surface: 'physician',
+    });
+    const commandMetrics = selectProviderWaitVisibilityMetrics(patients, {
+      surface: 'commandCenter',
+    });
 
     expect(physicianMetrics.map((metric) => metric.id)).toContain('provider-awaiting');
     expect(physicianMetrics.map((metric) => metric.id)).toContain('provider-approaching');

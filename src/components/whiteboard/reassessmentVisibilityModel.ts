@@ -99,7 +99,8 @@ function normalizeFlagType(flag) {
 
 export function patientMatchesReassessmentAttention(patient) {
   if (!patient) return false;
-  if (patient.state === PatientState.Discharge || patient.state === PatientState.Deceased) return false;
+  if (patient.state === PatientState.Discharge || patient.state === PatientState.Deceased)
+    return false;
   return (patient.flags ?? []).some((flag) =>
     REASSESSMENT_ATTENTION_FLAGS.includes(normalizeFlagType(flag)),
   );
@@ -115,7 +116,10 @@ export function countCriticalReassessmentPatients(patients = [] as any[]) {
   ).length;
 }
 
-export function shouldShowReassessmentAttentionStrip({ displayMode = false, attentionCount = 0 }: any = {}) {
+export function shouldShowReassessmentAttentionStrip({
+  displayMode = false,
+  attentionCount = 0,
+}: any = {}) {
   return !displayMode && attentionCount > 0;
 }
 
@@ -159,7 +163,9 @@ export function buildReassessmentAttentionStripMetrics(patients = [] as any[]) {
     );
   }
 
-  const overdueTimers = buildWaitingPatientReassessmentTimers(patients).filter((timer) => timer.isOverdue);
+  const overdueTimers = buildWaitingPatientReassessmentTimers(patients).filter(
+    (timer) => timer.isOverdue,
+  );
   if (overdueTimers.length > 0) {
     (metrics as any[]).unshift(
       Object.freeze({

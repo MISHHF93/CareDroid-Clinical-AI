@@ -26,7 +26,9 @@ type RuleContext = {
 };
 
 function normalizeText(value: string | undefined): string {
-  return String(value || '').trim().toLowerCase();
+  return String(value || '')
+    .trim()
+    .toLowerCase();
 }
 
 function includesAny(text: string, needles: string[]): string | null {
@@ -104,7 +106,12 @@ export function evaluatePreArrivalActivationRules(
   ]);
   if (unstableSigns) matchedRules.push(`signs:${unstableSigns}`);
 
-  const criticalComplaint = includesAny(complaint, ['chest pain', 'stroke', 'unresponsive', 'major trauma']);
+  const criticalComplaint = includesAny(complaint, [
+    'chest pain',
+    'stroke',
+    'unresponsive',
+    'major trauma',
+  ]);
   if (criticalComplaint) matchedRules.push(`complaint:${criticalComplaint}`);
 
   if (normalizeText(context.severity) === 'critical') {
@@ -130,7 +137,8 @@ export function evaluatePreArrivalActivationRules(
   const now = options.now || new Date();
   let type: PreArrivalActivationType = 'trauma-team';
   let title = 'Trauma Team Activation';
-  let chargeNurseAction = 'Review bed capacity and notify trauma team lead for pending bed assignment.';
+  let chargeNurseAction =
+    'Review bed capacity and notify trauma team lead for pending bed assignment.';
   if (!traumaMechanism && criticalComplaint === 'chest pain') {
     type = 'cardiac-alert';
     title = 'Cardiac Alert';
@@ -182,7 +190,9 @@ export function evaluateEmsArrivalActivation(
   });
 }
 
-export function scanEmsArrivalsForActivations(arrivals: EMSArrival[] = []): PreArrivalActivationAlert[] {
+export function scanEmsArrivalsForActivations(
+  arrivals: EMSArrival[] = [],
+): PreArrivalActivationAlert[] {
   return arrivals
     .filter((arrival) => arrival.status === 'Inbound' || arrival.status === 'Arrived')
     .map((arrival) => evaluateEmsArrivalActivation(arrival))

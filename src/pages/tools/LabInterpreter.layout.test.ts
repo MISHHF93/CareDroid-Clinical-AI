@@ -21,10 +21,10 @@ describe('LabInterpreter.css layout', () => {
 
   it('stacks patient context and entry form below 768px', () => {
     expect(css).toMatch(
-      /@media \(max-width: 768px\)[\s\S]*\.patient-context[\s\S]*grid-template-columns:\s*1fr/
+      /@media \(max-width: 768px\)[\s\S]*\.patient-context[\s\S]*grid-template-columns:\s*1fr/,
     );
     expect(css).toMatch(
-      /@media \(max-width: 768px\)[\s\S]*\.lab-entry-form[\s\S]*grid-template-columns:\s*1fr/
+      /@media \(max-width: 768px\)[\s\S]*\.lab-entry-form[\s\S]*grid-template-columns:\s*1fr/,
     );
   });
 

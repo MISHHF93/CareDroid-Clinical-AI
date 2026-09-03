@@ -133,12 +133,14 @@ export default function ToolPreflightStatus({
 
   const requiredStatus = useMemo(
     () => normalizeRequiredInputs(remoteState.metadata, requiredInputs),
-    [remoteState.metadata, requiredInputs]
+    [remoteState.metadata, requiredInputs],
   );
-  const missingLocalInputs = requiredStatus.filter((input) => input.source === 'local' && !input.present);
+  const missingLocalInputs = requiredStatus.filter(
+    (input) => input.source === 'local' && !input.present,
+  );
   const remoteAvailable = Boolean(executableToolId && !remoteState.loading && remoteState.metadata);
   const registeredInStats = Boolean(
-    remoteState.stats?.tools?.some((tool) => tool.id === executableToolId)
+    remoteState.stats?.tools?.some((tool) => tool.id === executableToolId),
   );
   const validationReady =
     !validationState.loading &&
@@ -172,9 +174,13 @@ export default function ToolPreflightStatus({
       <div className="tool-preflight__grid">
         <div className="tool-preflight__item">
           <span className="tool-preflight__label">Availability</span>
-          <strong>{remoteAvailable ? 'Available' : remoteState.loading ? 'Checking...' : 'Unavailable'}</strong>
+          <strong>
+            {remoteAvailable ? 'Available' : remoteState.loading ? 'Checking...' : 'Unavailable'}
+          </strong>
           {registeredInStats && <small>Registered in tool statistics</small>}
-          {remoteState.metadataError && <small className="tool-preflight__error">{remoteState.metadataError}</small>}
+          {remoteState.metadataError && (
+            <small className="tool-preflight__error">{remoteState.metadataError}</small>
+          )}
           {!registeredInStats && remoteState.statsError && (
             <small className="tool-preflight__muted">{remoteState.statsError}</small>
           )}
@@ -201,13 +207,11 @@ export default function ToolPreflightStatus({
         <div className="tool-preflight__item">
           <span className="tool-preflight__label">Validation readiness</span>
           <strong>
-            {validationState.loading
-              ? 'Checking...'
-              : validationReady
-                ? 'Ready'
-                : 'Not ready'}
+            {validationState.loading ? 'Checking...' : validationReady ? 'Ready' : 'Not ready'}
           </strong>
-          {validationState.resolvedToolId && <small>Executor: {validationState.resolvedToolId}</small>}
+          {validationState.resolvedToolId && (
+            <small>Executor: {validationState.resolvedToolId}</small>
+          )}
         </div>
       </div>
 
@@ -222,7 +226,10 @@ export default function ToolPreflightStatus({
             </div>
           ))}
           {validationState.errors.map((item) => (
-            <div key={`error-${item}`} className="tool-preflight__warning tool-preflight__warning--error">
+            <div
+              key={`error-${item}`}
+              className="tool-preflight__warning tool-preflight__warning--error"
+            >
               {item}
             </div>
           ))}

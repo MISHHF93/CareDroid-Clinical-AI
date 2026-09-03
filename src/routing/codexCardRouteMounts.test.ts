@@ -78,11 +78,14 @@ describe('Codex issue card route mounts', () => {
   });
 
   it('keeps legacy card destinations wired through profile and in-shell redirect tables', () => {
-    ['/profile/activity', '/profile/preferences', '/profile/security', '/profile/workspaces'].forEach(
-      (path) => {
-        expect(PROFILE_CONSOLE_ROUTE_PATHS, path).toContain(path);
-      },
-    );
+    [
+      '/profile/activity',
+      '/profile/preferences',
+      '/profile/security',
+      '/profile/workspaces',
+    ].forEach((path) => {
+      expect(PROFILE_CONSOLE_ROUTE_PATHS, path).toContain(path);
+    });
 
     expect(PROFILE_CONSOLE_REDIRECT_ROUTES).toEqual(
       expect.arrayContaining([

@@ -21,8 +21,12 @@ describe('receptionQueryParams', () => {
   });
 
   it('falls back to context then handoff for focus', () => {
-    expect(readPatientRouteContext(new URLSearchParams('patientId=p-ctx')).focusPatientId).toBe('p-ctx');
-    expect(readPatientRouteContext(new URLSearchParams('arrived=p-arr')).focusPatientId).toBe('p-arr');
+    expect(readPatientRouteContext(new URLSearchParams('patientId=p-ctx')).focusPatientId).toBe(
+      'p-ctx',
+    );
+    expect(readPatientRouteContext(new URLSearchParams('arrived=p-arr')).focusPatientId).toBe(
+      'p-arr',
+    );
   });
 
   it('clears a single patient route param', () => {
@@ -61,9 +65,7 @@ describe('receptionQueryParams', () => {
   });
 
   it('builds reception deep links for context and queue intents', () => {
-    expect(buildReceptionDeepLink({ patientId: 'p-1' })).toBe(
-      '/emergency/reception?patientId=p-1',
-    );
+    expect(buildReceptionDeepLink({ patientId: 'p-1' })).toBe('/emergency/reception?patientId=p-1');
     expect(buildReceptionDeepLink({ queue: 'pretriage', patientId: 'p-2' })).toBe(
       '/emergency/reception?queue=pretriage&patient=p-2',
     );

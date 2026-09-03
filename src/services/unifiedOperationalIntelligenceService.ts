@@ -33,7 +33,8 @@ const DOMAIN_LABELS = Object.freeze(
 function severityFromBand(band: string): UnifiedOperationalIntelligenceInsight['severity'] {
   const normalized = band.toLowerCase();
   if (normalized === 'critical' || normalized === 'red') return 'critical';
-  if (normalized === 'warning' || normalized === 'orange' || normalized === 'yellow') return 'warning';
+  if (normalized === 'warning' || normalized === 'orange' || normalized === 'yellow')
+    return 'warning';
   return 'info';
 }
 
@@ -63,7 +64,9 @@ function mapBackendAnomalies(
       title: anomaly.title,
       summary: anomaly.message,
       severity: severityFromAnomaly(anomaly.severity),
-      ownerRole: listUnifiedOperationalIntelligenceDomains().find((entry) => entry.id === domain)?.ownerRole || 'ed_manager',
+      ownerRole:
+        listUnifiedOperationalIntelligenceDomains().find((entry) => entry.id === domain)
+          ?.ownerRole || 'ed_manager',
       reasonCodes: Object.freeze(anomaly.reasonCodes || []),
       confidence: 0.9,
       humanReviewRequired: true as const,
@@ -189,7 +192,12 @@ function mapDegradedPatientFlowInsights(
       type,
       title: detection.title,
       summary: detection.message,
-      severity: detection.severity === 'critical' ? 'critical' : detection.severity === 'warning' ? 'warning' : 'info',
+      severity:
+        detection.severity === 'critical'
+          ? 'critical'
+          : detection.severity === 'warning'
+            ? 'warning'
+            : 'info',
       route: CANONICAL_ROUTES.emergencyCommandCenter,
       patientId: detection.patientId,
       ownerRole: detection.ownerRole,
@@ -290,7 +298,9 @@ function insightPriority(insight: UnifiedOperationalIntelligenceInsight): number
   return severityRank[insight.severity] * 10 + typeRank[insight.type];
 }
 
-function sortInsights(insights: UnifiedOperationalIntelligenceInsight[]): UnifiedOperationalIntelligenceInsight[] {
+function sortInsights(
+  insights: UnifiedOperationalIntelligenceInsight[],
+): UnifiedOperationalIntelligenceInsight[] {
   return [...insights].sort((left, right) => insightPriority(left) - insightPriority(right));
 }
 
@@ -351,7 +361,8 @@ export function buildUnifiedOperationalIntelligenceSnapshot(
     aiRecommendationCount: insights.filter(
       (insight) => insight.type === 'recommendation' || insight.type === 'intervention',
     ).length,
-    congestionPredictions: insights.filter((insight) => insight.type === 'congestion_prediction').length,
+    congestionPredictions: insights.filter((insight) => insight.type === 'congestion_prediction')
+      .length,
   });
 
   return Object.freeze({

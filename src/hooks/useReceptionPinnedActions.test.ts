@@ -37,7 +37,9 @@ describe('useReceptionPinnedActions', () => {
     act(() => result.current.setPinnedQueueTab('verification'));
     unmount();
 
-    expect(JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}')).toEqual({ pinnedQueueTab: 'verification' });
+    expect(JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}')).toEqual({
+      pinnedQueueTab: 'verification',
+    });
 
     const { result: fresh } = renderHook(() => useReceptionPinnedActions());
     expect(fresh.current.pinnedQueueTab).toBe('verification');

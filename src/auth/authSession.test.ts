@@ -57,9 +57,9 @@ describe('authSession', () => {
   });
 
   it('reports "real" only when the stored user is marked real AND the token is a genuine JWT', () => {
-    expect(
-      deriveAuthMode({ id: 'user-1', authMode: 'real' }, 'header.payload.signature'),
-    ).toBe('real');
+    expect(deriveAuthMode({ id: 'user-1', authMode: 'real' }, 'header.payload.signature')).toBe(
+      'real',
+    );
     // real authMode but no usable token yet -- not real until both agree
     expect(deriveAuthMode({ id: 'user-1', authMode: 'real' }, 'dev-bypass-token')).toBe(
       'open-access',
@@ -71,7 +71,10 @@ describe('authSession', () => {
     // HEAL-347.16: distinct from 'local-dev-demo' -- only AuthPage.tsx's
     // explicit bypass button ever stamps this marker.
     expect(
-      deriveAuthMode({ id: 'demo-user', authMode: 'explicit-dev-bypass' }, 'header.payload.signature'),
+      deriveAuthMode(
+        { id: 'demo-user', authMode: 'explicit-dev-bypass' },
+        'header.payload.signature',
+      ),
     ).toBe('explicit-dev-bypass');
   });
 });

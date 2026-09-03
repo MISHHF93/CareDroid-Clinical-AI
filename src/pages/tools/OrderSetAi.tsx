@@ -14,7 +14,8 @@ const TOOL_CONFIG = {
 };
 
 const INITIAL_FORM = {
-  clinicalScenario: 'Suspected sepsis with hypotension, fever, elevated lactate, and pneumonia source concern.',
+  clinicalScenario:
+    'Suspected sepsis with hypotension, fever, elevated lactate, and pneumonia source concern.',
   diagnosis: 'Sepsis / pneumonia',
   patientContext: 'CKD stage 3 and penicillin allergy.',
   constraints: 'Renal dosing, allergy review, local antimicrobial stewardship pathway.',
@@ -67,8 +68,8 @@ export default function OrderSetAi({ embedded = false, onCloseEmbedded }: any = 
         <section className="simple-tool-result-panel" role="note">
           <h2>Review Required</h2>
           <p>
-            No autonomous order placement. Order Set AI suggests bundles and protocol pathways only; a
-            licensed clinician must review, edit, enter, and sign any orders.
+            No autonomous order placement. Order Set AI suggests bundles and protocol pathways only;
+            a licensed clinician must review, edit, enter, and sign any orders.
           </p>
         </section>
 
@@ -121,7 +122,12 @@ export default function OrderSetAi({ embedded = false, onCloseEmbedded }: any = 
             />
 
             <div className="tool-form-actions">
-              <button type="button" className="diagnosis-primary-btn" onClick={handleGenerate} disabled={loading}>
+              <button
+                type="button"
+                className="diagnosis-primary-btn"
+                onClick={handleGenerate}
+                disabled={loading}
+              >
                 {loading ? 'Generating suggestions...' : 'Suggest order bundles'}
               </button>
               <button type="button" className="btn-diagnosis-secondary" onClick={clear}>
@@ -130,14 +136,19 @@ export default function OrderSetAi({ embedded = false, onCloseEmbedded }: any = 
             </div>
           </section>
 
-          <section className="diagnosis-panel diagnosis-panel--scroll" aria-labelledby="order-set-output">
+          <section
+            className="diagnosis-panel diagnosis-panel--scroll"
+            aria-labelledby="order-set-output"
+          >
             <h2 id="order-set-output">Suggested Bundles</h2>
             <ApiStateBanner error={error} onRetry={handleGenerate} />
 
             {loading ? (
               <div className="tool-loading-state" aria-busy="true">
                 <div className="simple-tool-spinner diagnosis-spinner" />
-                <p className="tool-loading-state__message">Matching protocols and bundle suggestions...</p>
+                <p className="tool-loading-state__message">
+                  Matching protocols and bundle suggestions...
+                </p>
               </div>
             ) : result ? (
               <div className="diagnosis-results-body">
@@ -176,7 +187,8 @@ export default function OrderSetAi({ embedded = false, onCloseEmbedded }: any = 
                     <ul>
                       {result.protocolPathways.map((pathway) => (
                         <li key={pathway.id}>
-                          <strong>{pathway.name}</strong>: {pathway.trigger} Steps: {pathway.steps.join(' ')}
+                          <strong>{pathway.name}</strong>: {pathway.trigger} Steps:{' '}
+                          {pathway.steps.join(' ')}
                         </li>
                       ))}
                     </ul>
@@ -191,10 +203,12 @@ export default function OrderSetAi({ embedded = false, onCloseEmbedded }: any = 
                     <strong>Method:</strong> {result.explainability?.method}
                   </p>
                   <p>
-                    <strong>Matched signals:</strong> {(result.explainability?.matchedSignals || []).join(', ')}
+                    <strong>Matched signals:</strong>{' '}
+                    {(result.explainability?.matchedSignals || []).join(', ')}
                   </p>
                   <p>
-                    <strong>Limitations:</strong> {(result.explainability?.limitations || []).join(' ')}
+                    <strong>Limitations:</strong>{' '}
+                    {(result.explainability?.limitations || []).join(' ')}
                   </p>
                 </section>
 
@@ -208,7 +222,8 @@ export default function OrderSetAi({ embedded = false, onCloseEmbedded }: any = 
                     {result.safety?.autonomousOrderPlacement ? 'Allowed' : 'Blocked'}
                   </p>
                   <p>
-                    <strong>Blocked actions:</strong> {(result.safety?.blockedActions || []).join(', ')}
+                    <strong>Blocked actions:</strong>{' '}
+                    {(result.safety?.blockedActions || []).join(', ')}
                   </p>
                   <ul>
                     {(result.safety?.warnings || []).map((warning) => (

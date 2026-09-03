@@ -98,7 +98,8 @@ describe('phq9Calculator — interpretation guardrails', () => {
     if (!out.ok) throw new Error('expected computePhq9Result to succeed');
     expect(out.totalScore).toBe(27);
     expect(out.severityCategory).toBe('severe');
-    const combined = `${out.screeningDiscussion} ${out.screeningDisclaimer} ${out.pathwayDisclaimer} ${out.clinicianReviewDisclaimer}`.toLowerCase();
+    const combined =
+      `${out.screeningDiscussion} ${out.screeningDisclaimer} ${out.pathwayDisclaimer} ${out.clinicianReviewDisclaimer}`.toLowerCase();
     expect(combined).not.toMatch(/\bdiagnosed with depression\b/);
     expect(combined).not.toMatch(/\bstart (an )?antidepressant\b/);
     expect(combined).not.toMatch(/\bprescribe\b/);

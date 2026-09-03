@@ -22,14 +22,20 @@ export const LONG_WAIT_CRITICAL_REASON = 'Critical wait time breach';
 export const LONG_WAIT_LWBS_REASON = 'LWBS risk from extended wait';
 
 function patientName(patient) {
-  return patient?.name || [patient?.firstName, patient?.lastName].filter(Boolean).join(' ') || 'Unknown patient';
+  return (
+    patient?.name ||
+    [patient?.firstName, patient?.lastName].filter(Boolean).join(' ') ||
+    'Unknown patient'
+  );
 }
 
 function targetSource(settingsOrTargets: any = {}) {
-  return settingsOrTargets.ctasThresholds ||
+  return (
+    settingsOrTargets.ctasThresholds ||
     settingsOrTargets.thresholds?.ctasTargets ||
     settingsOrTargets.thresholds?.ctasThresholds ||
-    settingsOrTargets;
+    settingsOrTargets
+  );
 }
 
 function patientFlags(patient) {
@@ -52,7 +58,7 @@ export function resolveCtasTargets(settingsOrTargets: any = {}) {
       const configured = Number(source?.[priority]);
       const fallback = CTAS_TARGETS[priority];
       return [priority, Number.isFinite(configured) && configured >= 0 ? configured : fallback];
-    })
+    }),
   );
 }
 
@@ -123,7 +129,9 @@ export function longWaitStatus(patient, now = new Date(), settingsOrTargets: any
 }
 
 export function isLongWaitRescueReason(reason = '') {
-  return [LONG_WAIT_REASSESSMENT_REASON, LONG_WAIT_CRITICAL_REASON, LONG_WAIT_LWBS_REASON].includes(reason);
+  return [LONG_WAIT_REASSESSMENT_REASON, LONG_WAIT_CRITICAL_REASON, LONG_WAIT_LWBS_REASON].includes(
+    reason,
+  );
 }
 
 export function longWaitSeverityForPhase(phase) {
@@ -137,33 +145,52 @@ export function longWaitSortWeight(patient, now = new Date(), settingsOrTargets:
   return LONG_WAIT_PHASE_RANK[status.phase] || 0;
 }
 
-export function getLongWaitPatients(patients = [] as any[], now = new Date(), settingsOrTargets: any = {}) {
+export function getLongWaitPatients(
+  patients = [] as any[],
+  now = new Date(),
+  settingsOrTargets: any = {},
+) {
   return patients
     .map((patient) => ({ patient, status: longWaitStatus(patient, now, settingsOrTargets) }))
     .filter((entry) => entry.status.phase !== 'none')
     .sort(
       (a, b) =>
         (LONG_WAIT_PHASE_RANK[b.status.phase] || 0) - (LONG_WAIT_PHASE_RANK[a.status.phase] || 0) ||
-        b.status.waitMinutes - a.status.waitMinutes
+        b.status.waitMinutes - a.status.waitMinutes,
     );
 }
 
-export function getLongestWaitingPatient(patients = [] as any[], now = new Date(), settingsOrTargets: any = {}) {
+export function getLongestWaitingPatient(
+  patients = [] as any[],
+  now = new Date(),
+  settingsOrTargets: any = {},
+) {
   return getLongWaitPatients(patients, now, settingsOrTargets)[0] || null;
 }
 
-export function formatLongWaitForCopilot(patients = [] as any[], now = new Date(), settingsOrTargets: any = {}) {
+export function formatLongWaitForCopilot(
+  patients = [] as any[],
+  now = new Date(),
+  settingsOrTargets: any = {},
+) {
   return getLongWaitPatients(patients, now, settingsOrTargets)
     .filter((entry) => entry.status.phase === 'critical' || entry.status.phase === 'lwbs')
     .map(
       ({ patient, status }) =>
-        `WAIT ALERT: ${patientName(patient)} has been waiting ${status.waitMinutes}min (${patient.priority} limit: ${status.thresholdMinutes}min)`
+        `WAIT ALERT: ${patientName(patient)} has been waiting ${status.waitMinutes}min (${patient.priority} limit: ${status.thresholdMinutes}min)`,
     );
 }
 
-export function formatLongWaitAttentionForCopilot(patients = [] as any[], now = new Date(), settingsOrTargets: any = {}) {
+export function formatLongWaitAttentionForCopilot(
+  patients = [] as any[],
+  now = new Date(),
+  settingsOrTargets: any = {},
+) {
   const longest = patients
-    .filter((patient) => patient?.state !== PatientState.Discharge && hasFlag(patient, PatientFlag.LongWait))
+    .filter(
+      (patient) =>
+        patient?.state !== PatientState.Discharge && hasFlag(patient, PatientFlag.LongWait),
+    )
     .map((patient) => ({ patient, status: longWaitStatus(patient, now, settingsOrTargets) }))
     .sort((a, b) => b.status.waitMinutes - a.status.waitMinutes)[0];
   if (!longest) return '';
@@ -172,22 +199,35 @@ export function formatLongWaitAttentionForCopilot(patients = [] as any[], now = 
   return `ATTENTION: Longest waiting patient — ${patientName(patient)}, ${status.waitMinutes}min, ${patient.priority}, ${patient.chiefComplaint || patient.complaintCategory || 'Complaint pending'}`;
 }
 
-export function formatLongestWaitBroadcast(patients = [] as any[], now = new Date(), settingsOrTargets: any = {}) {
+export function formatLongestWaitBroadcast(
+  patients = [] as any[],
+  now = new Date(),
+  settingsOrTargets: any = {},
+) {
   const longest = getLongestWaitingPatient(patients, now, settingsOrTargets);
   if (!longest) return '';
   const { patient, status } = longest;
   return `Longest waiting patient: ${patientName(patient)} ${status.waitMinutes} min · ${patient.priority} · ${patient.chiefComplaint || patient.complaintCategory}`;
 }
 
-export function longWaitShiftMetrics(patients = [] as any[], now = new Date(), settingsOrTargets: any = {}) {
-  const entries = patients.map((patient) => ({ patient, status: longWaitStatus(patient, now, settingsOrTargets) }));
+export function longWaitShiftMetrics(
+  patients = [] as any[],
+  now = new Date(),
+  settingsOrTargets: any = {},
+) {
+  const entries = patients.map((patient) => ({
+    patient,
+    status: longWaitStatus(patient, now, settingsOrTargets),
+  }));
   const waitingEntries = entries.filter((entry) => entry.patient?.state === PatientState.Waiting);
-  const exceedingTargetCount = waitingEntries.filter((entry) => entry.status.waitMinutesExact >= entry.status.thresholdMinutes).length;
+  const exceedingTargetCount = waitingEntries.filter(
+    (entry) => entry.status.waitMinutesExact >= entry.status.thresholdMinutes,
+  ).length;
   const longWaitEvents = entries.filter(
-    (entry) => hasFlag(entry.patient, PatientFlag.LongWait) || entry.status.phase !== 'none'
+    (entry) => hasFlag(entry.patient, PatientFlag.LongWait) || entry.status.phase !== 'none',
   ).length;
   const lwbsRiskEvents = entries.filter(
-    (entry) => hasFlag(entry.patient, PatientFlag.LWBSRisk) || entry.status.phase === 'lwbs'
+    (entry) => hasFlag(entry.patient, PatientFlag.LWBSRisk) || entry.status.phase === 'lwbs',
   ).length;
 
   return {

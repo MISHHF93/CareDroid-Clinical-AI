@@ -205,5 +205,3 @@ export const DEFAULT_OPERATIONAL_INTELLIGENCE_SETTINGS: OperationalIntelligenceS
   dataFreshnessVisible: true,
   operationalIntelligencePollingInterval: 30000,
 };
-
-

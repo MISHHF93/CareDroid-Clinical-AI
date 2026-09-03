@@ -63,10 +63,16 @@ export default function ReceptionOperationalRail({
 
   return (
     <aside
-      data-testid="reception-operational-rail" className="reception-operational-rail" aria-label="Reception operations">
+      data-testid="reception-operational-rail"
+      className="reception-operational-rail"
+      aria-label="Reception operations"
+    >
       <ReceptionAttentionStrip snapshot={attention} onSelectRow={onAttentionSelect} />
 
-      <section className="reception-command-panel reception-operational-rail__panel" aria-labelledby="queue-title">
+      <section
+        className="reception-command-panel reception-operational-rail__panel"
+        aria-labelledby="queue-title"
+      >
         <div className="reception-command-panel__header">
           <h2 id="queue-title">Waiting list</h2>
           <span className="reception-command-chip">{queue.length}</span>
@@ -101,7 +107,9 @@ export default function ReceptionOperationalRail({
                   >
                     <span className="reception-queue-row__who">
                       <strong>{patientDisplayName(patient)}</strong>
-                      <small title={patient.chiefComplaint || patient.complaint || 'Complaint pending'}>
+                      <small
+                        title={patient.chiefComplaint || patient.complaint || 'Complaint pending'}
+                      >
                         {patient.chiefComplaint || patient.complaint || 'Complaint pending'}
                       </small>
                     </span>
@@ -123,7 +131,9 @@ export default function ReceptionOperationalRail({
                   <button
                     type="button"
                     className={`reception-queue-row__cta${
-                      model.primaryAction === 'escalate' ? ' reception-queue-row__cta--critical' : ''
+                      model.primaryAction === 'escalate'
+                        ? ' reception-queue-row__cta--critical'
+                        : ''
                     }`}
                     onClick={(event) => {
                       event.stopPropagation();

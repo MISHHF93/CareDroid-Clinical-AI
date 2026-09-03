@@ -36,7 +36,11 @@ import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermission
 import { usePhiViewAudit } from '../hooks/usePhiAccess';
 import { useUpgradeHarnessPatientFlow } from '../hooks/useEmergencyOs';
 import { usePatientTimelineContext } from '../hooks/usePatientTimelineContext';
-import { advancePatientJourneyState, dischargePatientSafely, getDefaultNextPatientState } from '../services/queueAssignment';
+import {
+  advancePatientJourneyState,
+  dischargePatientSafely,
+  getDefaultNextPatientState,
+} from '../services/queueAssignment';
 import usePatientWorkflow from '../hooks/usePatientWorkflow';
 import useProfileNavigate from '../hooks/useProfileNavigate';
 import { notifyPatientStepAdvanced } from '../services/workflowNavigationFeedback';
@@ -69,7 +73,10 @@ import {
   type WaitingRoomCommunicationKind,
 } from '../services/waitingRoomCommunicationLog';
 import DataQualityRiskPanel from './dataQuality/DataQualityRiskPanel';
-import { buildDataQualitySnapshot, getPatientDataQualityRisks } from '../services/dataQualityDiscovery';
+import {
+  buildDataQualitySnapshot,
+  getPatientDataQualityRisks,
+} from '../services/dataQualityDiscovery';
 import ReassessmentTimerPanel from './reassessment/ReassessmentTimerPanel';
 import { selectReassessmentTimerForPatient } from '../engine/reassessmentTimerEngine';
 import RecommendedToolsStrip from './orchestration/RecommendedToolsStrip';
@@ -247,7 +254,10 @@ function workflowLogKeys(log: WorkflowActionLog, patientId: string): string[] {
   return keys;
 }
 
-function mergePatientWorkflowLogs(patientId: string, ...groups: WorkflowActionLog[][]): WorkflowActionLog[] {
+function mergePatientWorkflowLogs(
+  patientId: string,
+  ...groups: WorkflowActionLog[][]
+): WorkflowActionLog[] {
   const merged: WorkflowActionLog[] = [];
   const seenKeys = new Set<string>();
 
@@ -258,9 +268,7 @@ function mergePatientWorkflowLogs(patientId: string, ...groups: WorkflowActionLo
     keys.forEach((key) => seenKeys.add(key));
   });
 
-  return merged.sort(
-    (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
-  );
+  return merged.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 }
 
 function journeyTimestamp(patient: Patient, state: PatientState): string | undefined {
@@ -295,7 +303,10 @@ function patientFlagKey(flag: unknown): string {
   return String(flag);
 }
 
-function findUpgradeSignal(signals: UpgradeHarnessSignal[], capability: string): UpgradeHarnessSignal | null {
+function findUpgradeSignal(
+  signals: UpgradeHarnessSignal[],
+  capability: string,
+): UpgradeHarnessSignal | null {
   return signals.find((signal) => signal.capability === capability) || null;
 }
 
@@ -308,13 +319,18 @@ function stringArray(value: unknown): string[] {
 }
 
 function formatConfidence(value?: number): string {
-  return typeof value === 'number' ? `${Math.round(value * 100)}% confidence` : 'confidence pending';
+  return typeof value === 'number'
+    ? `${Math.round(value * 100)}% confidence`
+    : 'confidence pending';
 }
 
 function formatSignalMeta(signal?: UpgradeHarnessSignal | null): string {
   if (!signal) return 'review_required';
-  const review = signal.audit?.reviewRequired ? 'review required' : signal.safety?.status || 'pilot';
-  const provider = signal.provenance?.provider || signal.provenance?.generatedBy || 'deterministic provider';
+  const review = signal.audit?.reviewRequired
+    ? 'review required'
+    : signal.safety?.status || 'pilot';
+  const provider =
+    signal.provenance?.provider || signal.provenance?.generatedBy || 'deterministic provider';
   return `${review} | ${formatConfidence(signal.confidence)} | ${provider}`;
 }
 
@@ -349,7 +365,11 @@ function vitalSeverity(label: string, value?: number): 'critical' | 'warning' | 
 function trendArrow(label: string, current?: number, previous?: number): VitalTrend | null {
   if (current === undefined || previous === undefined) return null;
   const diff = current - previous;
-  const stable: VitalTrend = { symbol: '→', color: MEDICAL_THEME.inkSubtle, label: `${label} stable` };
+  const stable: VitalTrend = {
+    symbol: '→',
+    color: MEDICAL_THEME.inkSubtle,
+    label: `${label} stable`,
+  };
 
   if (label === 'HR') {
     if (diff > 10) return { symbol: '↑', color: '#EF4444', label: 'HR trending up' };
@@ -372,14 +392,23 @@ function trendArrow(label: string, current?: number, previous?: number): VitalTr
 
   if (label === 'Temp') {
     if (diff > 0.5) return { symbol: '↑', color: '#F59E0B', label: 'Temperature trending up' };
-    if (diff < -0.5) return { symbol: '↓', color: MEDICAL_THEME.accent, label: 'Temperature trending down' };
+    if (diff < -0.5)
+      return { symbol: '↓', color: MEDICAL_THEME.accent, label: 'Temperature trending down' };
     return stable;
   }
 
   return null;
 }
 
-function TooltipRow({ label, value, color }: { label: string; value: string | number; color: string }) {
+function TooltipRow({
+  label,
+  value,
+  color,
+}: {
+  label: string;
+  value: string | number;
+  color: string;
+}) {
   return (
     <div className="patient-detail-vitals-tooltip__row" style={{ color }}>
       <span>{label}</span>
@@ -402,7 +431,11 @@ function VitalsTooltip({
     <div className="patient-detail-vitals-tooltip">
       <div className="patient-detail-vitals-tooltip__time">{point.time}</div>
       <TooltipRow label="HR" value={point.hr ?? '--'} color={vitalTone('HR', point.hr)} />
-      <TooltipRow label="BP" value={`${point.sbp ?? '--'}/${point.dbp ?? '--'}`} color={vitalTone('SBP', point.sbp)} />
+      <TooltipRow
+        label="BP"
+        value={`${point.sbp ?? '--'}/${point.dbp ?? '--'}`}
+        color={vitalTone('SBP', point.sbp)}
+      />
       <TooltipRow label="SpO2" value={point.spo2 ?? '--'} color={vitalTone('SpO2', point.spo2)} />
       <TooltipRow label="Temp" value={point.temp ?? '--'} color={vitalTone('Temp', point.temp)} />
       <TooltipRow label="RR" value={point.rr ?? '--'} color={vitalTone('RR', point.rr)} />
@@ -492,8 +525,16 @@ function VitalsHistoryChart({ vitals, staff }: { vitals: Vitals[]; staff: Staff[
                   axisLine={{ stroke: '#e0f2fe' }}
                   width={36}
                 />
-                <Tooltip content={<VitalsTooltip />} cursor={{ stroke: '#e0f2fe', strokeDasharray: '3 3' }} />
-                <ReferenceLine y={94} stroke={MEDICAL_THEME.accent} strokeDasharray="4 4" strokeOpacity={0.45} />
+                <Tooltip
+                  content={<VitalsTooltip />}
+                  cursor={{ stroke: '#e0f2fe', strokeDasharray: '3 3' }}
+                />
+                <ReferenceLine
+                  y={94}
+                  stroke={MEDICAL_THEME.accent}
+                  strokeDasharray="4 4"
+                  strokeOpacity={0.45}
+                />
                 <ReferenceLine y={100} stroke="#EF4444" strokeDasharray="4 4" strokeOpacity={0.4} />
                 <ReferenceLine y={90} stroke="#F59E0B" strokeDasharray="4 4" strokeOpacity={0.45} />
                 {vitalsLineConfig.map((line) => (
@@ -512,7 +553,10 @@ function VitalsHistoryChart({ vitals, staff }: { vitals: Vitals[]; staff: Staff[
               </LineChart>
             </ResponsiveContainer>
           </div>
-          <div className="patient-detail-vitals-trend__legend" aria-label="Toggle vitals trend lines">
+          <div
+            className="patient-detail-vitals-trend__legend"
+            aria-label="Toggle vitals trend lines"
+          >
             {vitalsLineConfig.map((line) => (
               <button
                 key={line.key}
@@ -609,7 +653,10 @@ function parseVitals(form: VitalsForm, recordedBy: string): Vitals {
 
 function Badge({ children, color }: { children: string; color: string }) {
   return (
-    <span className="patient-detail-panel__badge" style={{ '--badge-accent': color } as CSSProperties}>
+    <span
+      className="patient-detail-panel__badge"
+      style={{ '--badge-accent': color } as CSSProperties}
+    >
       {children}
     </span>
   );
@@ -676,13 +723,14 @@ export default function PatientDetailPanel() {
   const [pediatricDrugCalcOpen, setPediatricDrugCalcOpen] = useState(false);
   const [criticalChecklistOpen, setCriticalChecklistOpen] = useState(false);
   const [activeCriticalChecklist, setActiveCriticalChecklist] = useState<Checklist | null>(null);
-  const [criticalChecklistTitleHint, setCriticalChecklistTitleHint] = useState<string | undefined>();
+  const [criticalChecklistTitleHint, setCriticalChecklistTitleHint] = useState<
+    string | undefined
+  >();
   const [autoOpenedChecklistKey, setAutoOpenedChecklistKey] = useState('');
   const [suggestedScores, setSuggestedScores] = useState<string[]>([]);
   const [showTransportRequestForm, setShowTransportRequestForm] = useState(false);
-  const [transportRequestForm, setTransportRequestForm] = useState<TransportRequestForm>(
-    emptyTransportRequestForm,
-  );
+  const [transportRequestForm, setTransportRequestForm] =
+    useState<TransportRequestForm>(emptyTransportRequestForm);
   const [transportRequestSubmitting, setTransportRequestSubmitting] = useState(false);
   const [transportRequestError, setTransportRequestError] = useState('');
   const [transportRequestResult, setTransportRequestResult] =
@@ -807,18 +855,21 @@ export default function PatientDetailPanel() {
     setIdentityReconcileError('');
     setIdentityReconcileResult(null);
   }, [selectedPatient?.id]);
-  const openCalculatorHub = useCallback((calculatorId: string) => {
-    if (!selectedPatientId) return;
-    const params = new URLSearchParams({
-      source: 'calculators',
-      filter: 'calculator',
-      q: calculatorId,
-      patientId: selectedPatientId,
-    });
-    const nextUrl = `${CANONICAL_ROUTES.emergencyTools}?${params.toString()}`;
-    window.history.pushState(null, '', nextUrl);
-    window.dispatchEvent(new PopStateEvent('popstate'));
-  }, [selectedPatientId]);
+  const openCalculatorHub = useCallback(
+    (calculatorId: string) => {
+      if (!selectedPatientId) return;
+      const params = new URLSearchParams({
+        source: 'calculators',
+        filter: 'calculator',
+        q: calculatorId,
+        patientId: selectedPatientId,
+      });
+      const nextUrl = `${CANONICAL_ROUTES.emergencyTools}?${params.toString()}`;
+      window.history.pushState(null, '', nextUrl);
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    },
+    [selectedPatientId],
+  );
   const timelineContextState = usePatientTimelineContext(selectedPatientId);
   const knowledgeGraph = useUnifiedApplicationKnowledgeGraph({ selectedPatientId });
   const patientWorkflowLogs = useMemo(() => {
@@ -892,10 +943,7 @@ export default function PatientDetailPanel() {
     [upgradePatientFlowEnvelope],
   );
   const upgradeFlowCards = useMemo(() => {
-    const modularSignal = findUpgradeSignal(
-      upgradeFlowSignals,
-      'modular_mixed_pathology_units',
-    );
+    const modularSignal = findUpgradeSignal(upgradeFlowSignals, 'modular_mixed_pathology_units');
     const vvtSignal = findUpgradeSignal(upgradeFlowSignals, 'virtual_visit_track');
     const splitFlowSignal = findUpgradeSignal(upgradeFlowSignals, 'nurse_led_split_flow');
     const wearableSignal = findUpgradeSignal(upgradeFlowSignals, 'wearable_iomt_processing');
@@ -954,7 +1002,9 @@ export default function PatientDetailPanel() {
     }
 
     const route = routeComplaint(selectedPatient.chiefComplaint);
-    setSuggestedScores(route && !hasRunScores(selectedPatient, route.scoreIds) ? route.scoreIds : []);
+    setSuggestedScores(
+      route && !hasRunScores(selectedPatient, route.scoreIds) ? route.scoreIds : [],
+    );
   }, [selectedPatient]);
 
   // HEAL-318: this panel had zero focus management -- opening it never moved focus
@@ -1034,7 +1084,9 @@ export default function PatientDetailPanel() {
       selectedPatient.source === 'EMS' ||
       hasPatientFlagValue(selectedPatient, PatientFlag.EMSArrival) ||
       Boolean(selectedPatient.emsArrival || selectedPatient.emsUnitId);
-    const isCriticalArrival = selectedPatient.emsArrival?.severity === 'Critical' || selectedPatient.priority === Priority.P1;
+    const isCriticalArrival =
+      selectedPatient.emsArrival?.severity === 'Critical' ||
+      selectedPatient.priority === Priority.P1;
     if (!isEmsPatient || !isCriticalArrival) return;
 
     const matches = findMatchingChecklists(selectedPatient);
@@ -1122,16 +1174,34 @@ export default function PatientDetailPanel() {
   }
 
   const currentStateIndex = patientStateOrder.indexOf(selectedPatient.state);
-  const patientVitals: Vitals[] = Array.isArray(selectedPatient.vitals) ? selectedPatient.vitals : [];
+  const patientVitals: Vitals[] = Array.isArray(selectedPatient.vitals)
+    ? selectedPatient.vitals
+    : [];
   const vitalsHistory = [...patientVitals].reverse();
   const latestVitals = vitalsHistory[0];
   const previousVitals = vitalsHistory[1];
   const latestVitalEntries: Array<{ label: string; value?: number; trend?: VitalTrend | null }> = [
-    { label: 'HR', value: latestVitals?.hr, trend: trendArrow('HR', latestVitals?.hr, previousVitals?.hr) },
-    { label: 'SBP', value: latestVitals?.sbp, trend: trendArrow('SBP', latestVitals?.sbp, previousVitals?.sbp) },
+    {
+      label: 'HR',
+      value: latestVitals?.hr,
+      trend: trendArrow('HR', latestVitals?.hr, previousVitals?.hr),
+    },
+    {
+      label: 'SBP',
+      value: latestVitals?.sbp,
+      trend: trendArrow('SBP', latestVitals?.sbp, previousVitals?.sbp),
+    },
     { label: 'DBP', value: latestVitals?.dbp },
-    { label: 'SpO2', value: latestVitals?.spo2, trend: trendArrow('SpO2', latestVitals?.spo2, previousVitals?.spo2) },
-    { label: 'Temp', value: latestVitals?.temp, trend: trendArrow('Temp', latestVitals?.temp, previousVitals?.temp) },
+    {
+      label: 'SpO2',
+      value: latestVitals?.spo2,
+      trend: trendArrow('SpO2', latestVitals?.spo2, previousVitals?.spo2),
+    },
+    {
+      label: 'Temp',
+      value: latestVitals?.temp,
+      trend: trendArrow('Temp', latestVitals?.temp, previousVitals?.temp),
+    },
     { label: 'RR', value: latestVitals?.rr },
     { label: 'GCS', value: latestVitals?.gcs },
     { label: 'Pain', value: latestVitals?.pain },
@@ -1334,9 +1404,7 @@ export default function PatientDetailPanel() {
   };
 
   const panelSwipeStyle: CSSProperties | undefined =
-    swipeOffset > 0
-      ? { transform: `translateY(${swipeOffset}px)`, transition: 'none' }
-      : undefined;
+    swipeOffset > 0 ? { transform: `translateY(${swipeOffset}px)`, transition: 'none' } : undefined;
 
   return (
     // This panel already contains Tab and Shift+Tab (see the focus effect above),
@@ -1396,7 +1464,8 @@ export default function PatientDetailPanel() {
                 Not yet saved to server
               </div>
             ) : null}
-            {selectedPatient.state === PatientState.Waiting || selectedPatient.state === PatientState.Triage ? (
+            {selectedPatient.state === PatientState.Waiting ||
+            selectedPatient.state === PatientState.Triage ? (
               <div className="patient-detail-panel__header-slot">
                 <WaitingRoomCommunicationBadge
                   patient={selectedPatient}
@@ -1432,10 +1501,7 @@ export default function PatientDetailPanel() {
               showAll
             />
           ) : null}
-          <DeteriorationWatchBadge
-            patient={selectedPatient}
-            emsArrivals={emsArrivals}
-          />
+          <DeteriorationWatchBadge patient={selectedPatient} emsArrivals={emsArrivals} />
         </div>
       </header>
 
@@ -1452,156 +1518,168 @@ export default function PatientDetailPanel() {
           resolved to a Copilot quick-action button instead. A clinician's note click could
           silently hit the wrong control. Moving this content out from under the header
           fixes the overlap; nothing below was reordered, duplicated, or removed. */}
-        {/* HEAL-188: allergies/medications previously existed only as free text inside the
+      {/* HEAL-188: allergies/medications previously existed only as free text inside the
             reception/self-arrival intake note, invisible to any other role opening this same
             chart -- now reads the structured fields those intake paths populate. Placed right
             under the header badges (before any other section) since a missed allergy is a
             direct patient-safety risk, not just a documentation gap. */}
-        {selectedPatient.allergies?.length ? (
-          <div className="patient-detail-panel__allergy-banner" role="alert">
-            <strong>Allergies:</strong> {selectedPatient.allergies.join(', ')}
-          </div>
-        ) : null}
-        {selectedPatient.medications?.length ? (
-          <div className="patient-detail-panel__medications-banner">
-            <strong>Current medications:</strong> {selectedPatient.medications.join(', ')}
-          </div>
-        ) : null}
+      {selectedPatient.allergies?.length ? (
+        <div className="patient-detail-panel__allergy-banner" role="alert">
+          <strong>Allergies:</strong> {selectedPatient.allergies.join(', ')}
+        </div>
+      ) : null}
+      {selectedPatient.medications?.length ? (
+        <div className="patient-detail-panel__medications-banner">
+          <strong>Current medications:</strong> {selectedPatient.medications.join(', ')}
+        </div>
+      ) : null}
 
-        {/* HEAL-189: EMS crew handoff notes and the receiving clinician's closing notes were
+      {/* HEAL-189: EMS crew handoff notes and the receiving clinician's closing notes were
             captured (AmbulanceHandoffChecklist.handoffNotes / HandoffCloseRecord.notes) but never
             surfaced anywhere on the patient's own chart -- only visible by navigating back to the
             EMS pipeline/handoff screens the receiving team had already left. */}
-        {selectedPatient.emsArrival?.ambulanceHandoffChecklist?.handoffNotes ||
-        selectedPatient.emsArrival?.handoffClose?.notes ? (
-          <div className="patient-detail-panel__ems-handoff-notes">
-            <strong>EMS handoff notes:</strong>
-            {selectedPatient.emsArrival.ambulanceHandoffChecklist?.handoffNotes ? (
-              <p>{selectedPatient.emsArrival.ambulanceHandoffChecklist.handoffNotes}</p>
-            ) : null}
-            {selectedPatient.emsArrival.handoffClose?.notes ? (
-              <p>
-                Receiving clinician
-                {selectedPatient.emsArrival.handoffClose.closedByStaffName
-                  ? ` (${selectedPatient.emsArrival.handoffClose.closedByStaffName})`
-                  : ''}
-                : {selectedPatient.emsArrival.handoffClose.notes}
-              </p>
-            ) : null}
-          </div>
-        ) : null}
-
-        <WhatHappensNextPanel
-          patient={selectedPatient}
-          referrals={referrals}
-          staff={staff}
-        />
-
-        <div className="patient-detail-panel__orchestration-cluster">
-          <SavedClinicalScoresStrip patient={selectedPatient} />
-          <RecommendedToolsStrip patient={selectedPatient} />
+      {selectedPatient.emsArrival?.ambulanceHandoffChecklist?.handoffNotes ||
+      selectedPatient.emsArrival?.handoffClose?.notes ? (
+        <div className="patient-detail-panel__ems-handoff-notes">
+          <strong>EMS handoff notes:</strong>
+          {selectedPatient.emsArrival.ambulanceHandoffChecklist?.handoffNotes ? (
+            <p>{selectedPatient.emsArrival.ambulanceHandoffChecklist.handoffNotes}</p>
+          ) : null}
+          {selectedPatient.emsArrival.handoffClose?.notes ? (
+            <p>
+              Receiving clinician
+              {selectedPatient.emsArrival.handoffClose.closedByStaffName
+                ? ` (${selectedPatient.emsArrival.handoffClose.closedByStaffName})`
+                : ''}
+              : {selectedPatient.emsArrival.handoffClose.notes}
+            </p>
+          ) : null}
         </div>
+      ) : null}
 
-        <PatientCardCopilot patient={selectedPatient} />
+      <WhatHappensNextPanel patient={selectedPatient} referrals={referrals} staff={staff} />
 
-        <ChiefInvestigationPanel patient={selectedPatient} />
+      <div className="patient-detail-panel__orchestration-cluster">
+        <SavedClinicalScoresStrip patient={selectedPatient} />
+        <RecommendedToolsStrip patient={selectedPatient} />
+      </div>
 
-        {/* HEAL-191: previously rendered far below (after Journey Timeline, Patient Timeline,
+      <PatientCardCopilot patient={selectedPatient} />
+
+      <ChiefInvestigationPanel patient={selectedPatient} />
+
+      {/* HEAL-191: previously rendered far below (after Journey Timeline, Patient Timeline,
             Data Quality, Waiting Room Communication, Operational History, and Discussion Panel) --
             a clinician using the AI triage-assist tool immediately below had to scroll past 6
             unrelated sections to see the vitals that decision should be grounded in. Moved up next
             to the triage-acuity decision UI itself; same section, same data, same controls --
             position only, nothing duplicated or removed. */}
-        <section className="patient-detail-panel__section">
-          <div className="patient-detail-panel__section-header">
-            <div>
-              <h3 className="patient-detail-panel__section-title patient-detail-panel__section-title--flush">Latest Vitals</h3>
-              {latestVitals ? (
-                <p className="patient-detail-panel__section-lead">
-                  Recorded {formatTime(latestVitals.recordedAt)}
-                  {latestVitals.recordedBy ? ` · ${staffName(staff, latestVitals.recordedBy)}` : ''}
-                </p>
-              ) : null}
-            </div>
-            {vitalsPresentation.visible ? (
-            <FieldButton disabled={!canWriteVitals} onClick={() => setShowVitalsForm((open) => !open)}>Add Vitals</FieldButton>
+      <section className="patient-detail-panel__section">
+        <div className="patient-detail-panel__section-header">
+          <div>
+            <h3 className="patient-detail-panel__section-title patient-detail-panel__section-title--flush">
+              Latest Vitals
+            </h3>
+            {latestVitals ? (
+              <p className="patient-detail-panel__section-lead">
+                Recorded {formatTime(latestVitals.recordedAt)}
+                {latestVitals.recordedBy ? ` · ${staffName(staff, latestVitals.recordedBy)}` : ''}
+              </p>
             ) : null}
           </div>
+          {vitalsPresentation.visible ? (
+            <FieldButton
+              disabled={!canWriteVitals}
+              onClick={() => setShowVitalsForm((open) => !open)}
+            >
+              Add Vitals
+            </FieldButton>
+          ) : null}
+        </div>
 
-          <div className="patient-detail-vitals-grid">
-            {latestVitalEntries.map(({ label, value, trend }) => {
-              const numericValue = typeof value === 'number' ? value : undefined;
-              const severity = vitalSeverity(String(label), numericValue);
-              return (
-                <div key={label} className="patient-detail-vital-tile">
-                  <div className="patient-detail-vital-tile__label">{label}</div>
-                  <div
-                    className={`patient-detail-vital-tile__value${severity ? ` patient-detail-vital-tile__value--${severity}` : ''}`}
-                    style={{
-                      color: vitalTone(String(label), numericValue),
-                    }}
-                  >
-                    <span>{value ?? '--'}</span>
-                    {severity ? (
-                      <span
-                        className={`patient-detail-vital-tile__severity patient-detail-vital-tile__severity--${severity}`}
-                        aria-label={severity}
-                        title={severity === 'critical' ? 'Critical value' : 'Abnormal value'}
-                      >
-                        {severity === 'critical' ? '⚠ Critical' : '⚠ Abnormal'}
-                      </span>
-                    ) : null}
-                    {trend ? (
-                      <span
-                        aria-label={trend.label}
-                        title={trend.label}
-                        className="patient-detail-vital-tile__trend"
-                        style={{ color: trend.color }}
-                      >
-                        {trend.symbol}
-                      </span>
-                    ) : null}
-                  </div>
+        <div className="patient-detail-vitals-grid">
+          {latestVitalEntries.map(({ label, value, trend }) => {
+            const numericValue = typeof value === 'number' ? value : undefined;
+            const severity = vitalSeverity(String(label), numericValue);
+            return (
+              <div key={label} className="patient-detail-vital-tile">
+                <div className="patient-detail-vital-tile__label">{label}</div>
+                <div
+                  className={`patient-detail-vital-tile__value${severity ? ` patient-detail-vital-tile__value--${severity}` : ''}`}
+                  style={{
+                    color: vitalTone(String(label), numericValue),
+                  }}
+                >
+                  <span>{value ?? '--'}</span>
+                  {severity ? (
+                    <span
+                      className={`patient-detail-vital-tile__severity patient-detail-vital-tile__severity--${severity}`}
+                      aria-label={severity}
+                      title={severity === 'critical' ? 'Critical value' : 'Abnormal value'}
+                    >
+                      {severity === 'critical' ? '⚠ Critical' : '⚠ Abnormal'}
+                    </span>
+                  ) : null}
+                  {trend ? (
+                    <span
+                      aria-label={trend.label}
+                      title={trend.label}
+                      className="patient-detail-vital-tile__trend"
+                      style={{ color: trend.color }}
+                    >
+                      {trend.symbol}
+                    </span>
+                  ) : null}
                 </div>
-              );
-            })}
-          </div>
+              </div>
+            );
+          })}
+        </div>
 
-          <VitalsHistoryChart vitals={vitalsHistory} staff={staff} />
+        <VitalsHistoryChart vitals={vitalsHistory} staff={staff} />
 
-          {showVitalsForm && canWriteVitals ? (
-            <form onSubmit={submitVitals} className="patient-detail-vitals-form">
-              {Object.keys(emptyVitalsForm).map((key) => (
-                <input
-                  key={key}
-                  aria-label={key.toUpperCase()}
-                  placeholder={key.toUpperCase()}
-                  value={vitalsForm[key as keyof VitalsForm]}
-                  onChange={(event) => setVitalsForm((form) => ({ ...form, [key]: event.target.value }))}
-                  className="patient-detail-vitals-form__input"
-                />
-              ))}
-              <button type="submit" className="patient-detail-panel__field-btn patient-detail-panel__field-btn--primary patient-detail-vitals-form__submit">
-                Save Vitals
-              </button>
-            </form>
-          ) : null}
-        </section>
-
-        {selectedPatient.state === PatientState.Triage ? (
-          <div className="patient-detail-panel__header-slot">
-            <AiTriageAssistPanel patient={selectedPatient} />
-          </div>
+        {showVitalsForm && canWriteVitals ? (
+          <form onSubmit={submitVitals} className="patient-detail-vitals-form">
+            {Object.keys(emptyVitalsForm).map((key) => (
+              <input
+                key={key}
+                aria-label={key.toUpperCase()}
+                placeholder={key.toUpperCase()}
+                value={vitalsForm[key as keyof VitalsForm]}
+                onChange={(event) =>
+                  setVitalsForm((form) => ({ ...form, [key]: event.target.value }))
+                }
+                className="patient-detail-vitals-form__input"
+              />
+            ))}
+            <button
+              type="submit"
+              className="patient-detail-panel__field-btn patient-detail-panel__field-btn--primary patient-detail-vitals-form__submit"
+            >
+              Save Vitals
+            </button>
+          </form>
         ) : null}
+      </section>
 
-        <div className="patient-detail-panel__action-row">
-          {!isSepsisChecklistBlocked ? (
-            <FieldButton onClick={openManualChecklist}>Open Checklist</FieldButton>
-          ) : null}
-          {transitionPresentation.visible ? (
+      {selectedPatient.state === PatientState.Triage ? (
+        <div className="patient-detail-panel__header-slot">
+          <AiTriageAssistPanel patient={selectedPatient} />
+        </div>
+      ) : null}
+
+      <div className="patient-detail-panel__action-row">
+        {!isSepsisChecklistBlocked ? (
+          <FieldButton onClick={openManualChecklist}>Open Checklist</FieldButton>
+        ) : null}
+        {transitionPresentation.visible ? (
           <FieldButton
             className="patient-detail-panel__field-btn--push-end"
-            title={canTransition ? 'Move to the next patient state' : `${emergencyRole.roleLabel} cannot move patient state`}
+            title={
+              canTransition
+                ? 'Move to the next patient state'
+                : `${emergencyRole.roleLabel} cannot move patient state`
+            }
             onClick={async () => {
               const nextState = getDefaultNextPatientState(selectedPatient);
               if (!nextState || !canTransition) return;
@@ -1618,7 +1696,8 @@ export default function PatientDetailPanel() {
               // handles keeps its existing no-confirmation behavior.
               if (nextState === PatientState.Discharge) {
                 const patientLabel =
-                  `${selectedPatient.firstName} ${selectedPatient.lastName}`.trim() || selectedPatient.mrn;
+                  `${selectedPatient.firstName} ${selectedPatient.lastName}`.trim() ||
+                  selectedPatient.mrn;
                 const confirmed = await confirmCareDroidAction({
                   title: 'Discharge patient?',
                   message: `${patientLabel} will be marked discharged.`,
@@ -1636,8 +1715,10 @@ export default function PatientDetailPanel() {
                     : 'Advanced from patient detail panel',
               });
               const patientName =
-                [selectedPatient.firstName, selectedPatient.lastName].filter(Boolean).join(' ').trim() ||
-                selectedPatient.mrn;
+                [selectedPatient.firstName, selectedPatient.lastName]
+                  .filter(Boolean)
+                  .join(' ')
+                  .trim() || selectedPatient.mrn;
               notifyPatientStepAdvanced(patientName, nextState, {
                 nextRoute: patientWorkflow.nextRoute ?? undefined,
                 onNavigate: profileNavigate,
@@ -1647,8 +1728,8 @@ export default function PatientDetailPanel() {
           >
             {patientWorkflow.primaryAction || 'Move to next step'}
           </FieldButton>
-          ) : null}
-        </div>
+        ) : null}
+      </div>
 
       <section className="patient-detail-panel__section">
         <h3 className="patient-detail-panel__section-title">Journey Timeline</h3>
@@ -1669,13 +1750,17 @@ export default function PatientDetailPanel() {
                   <div
                     className={[
                       'patient-detail-journey__dot',
-                      current ? 'patient-detail-timeline-dot--current patient-detail-journey__dot--active' : '',
+                      current
+                        ? 'patient-detail-timeline-dot--current patient-detail-journey__dot--active'
+                        : '',
                       completed ? 'patient-detail-journey__dot--complete' : '',
                     ]
                       .filter(Boolean)
                       .join(' ')}
                   />
-                  <div className={`patient-detail-journey__label${current ? ' patient-detail-journey__label--current' : ''}`}>
+                  <div
+                    className={`patient-detail-journey__label${current ? ' patient-detail-journey__label--current' : ''}`}
+                  >
                     {state}
                   </div>
                   {timestamp ? (
@@ -1703,14 +1788,20 @@ export default function PatientDetailPanel() {
       <section className="patient-detail-panel__section" aria-labelledby="patient-timeline-heading">
         <div className="patient-detail-panel__section-header">
           <div>
-            <h3 id="patient-timeline-heading" className="patient-detail-panel__section-title patient-detail-panel__section-title--flush">
+            <h3
+              id="patient-timeline-heading"
+              className="patient-detail-panel__section-title patient-detail-panel__section-title--flush"
+            >
               Patient Timeline
             </h3>
             <p className="patient-detail-panel__section-lead">
-              Intake, journey, triage, queue, reassessment, EMS, referral, boarding, discharge, AI, and provincial events.
+              Intake, journey, triage, queue, reassessment, EMS, referral, boarding, discharge, AI,
+              and provincial events.
             </p>
           </div>
-          <span className="patient-detail-panel__section-meta">{patientTimeline.length} events</span>
+          <span className="patient-detail-panel__section-meta">
+            {patientTimeline.length} events
+          </span>
         </div>
 
         {timelineContextState.loading ? (
@@ -1728,7 +1819,10 @@ export default function PatientDetailPanel() {
         {patientTimeline.length ? (
           <ol className="patient-timeline-list" aria-label="Patient timeline events">
             {patientTimeline.map((item) => (
-              <li key={`${item.id}-${item.category}`} className={`patient-timeline-item patient-timeline-item--${item.category}`}>
+              <li
+                key={`${item.id}-${item.category}`}
+                className={`patient-timeline-item patient-timeline-item--${item.category}`}
+              >
                 <div className="patient-timeline-item__marker" aria-hidden />
                 <div className="patient-timeline-item__body">
                   <div className="patient-timeline-item__header">
@@ -1746,7 +1840,9 @@ export default function PatientDetailPanel() {
             ))}
           </ol>
         ) : (
-          <div className="patient-timeline-empty">No patient timeline events are available yet.</div>
+          <div className="patient-timeline-empty">
+            No patient timeline events are available yet.
+          </div>
         )}
       </section>
 
@@ -1762,7 +1858,11 @@ export default function PatientDetailPanel() {
                 step: 'verify',
                 patient: selectedPatient.id,
               });
-              window.history.pushState(null, '', `${CANONICAL_ROUTES.emergencyReception}?${params}`);
+              window.history.pushState(
+                null,
+                '',
+                `${CANONICAL_ROUTES.emergencyReception}?${params}`,
+              );
               window.dispatchEvent(new PopStateEvent('popstate'));
             }}
             onCaptureComplaint={() => selectPatient(selectedPatient.id)}
@@ -1778,7 +1878,13 @@ export default function PatientDetailPanel() {
           staff={staff}
           limit={10}
           readOnly={!canWriteNote}
-          onRecordCommunication={async ({ kind, summary }: { kind: WaitingRoomCommunicationKind; summary: string }) => {
+          onRecordCommunication={async ({
+            kind,
+            summary,
+          }: {
+            kind: WaitingRoomCommunicationKind;
+            summary: string;
+          }) => {
             recordWaitingRoomCommunication({
               kind,
               patientId: selectedPatient.id,
@@ -1853,10 +1959,17 @@ export default function PatientDetailPanel() {
             aria-label="Flag to add"
           >
             {Object.values(PatientFlag).map((flag) => (
-              <option key={flag} value={flag}>{flag}</option>
+              <option key={flag} value={flag}>
+                {flag}
+              </option>
             ))}
           </select>
-          <FieldButton disabled={!canManageFlags} onClick={() => addFlag(selectedPatient.id, flagToAdd)}>Add Flag</FieldButton>
+          <FieldButton
+            disabled={!canManageFlags}
+            onClick={() => addFlag(selectedPatient.id, flagToAdd)}
+          >
+            Add Flag
+          </FieldButton>
         </div>
       </section>
 
@@ -1875,7 +1988,9 @@ export default function PatientDetailPanel() {
           {sortedNotes.map((note) => (
             <div key={note.id} className="patient-detail-note-row">
               <div className="patient-detail-note-row__header">
-                <span>{initials(staffName(staff, note.authorId || note.authorStaffId || 'system'))}</span>
+                <span>
+                  {initials(staffName(staff, note.authorId || note.authorStaffId || 'system'))}
+                </span>
                 <span>{formatTime(note.timestamp)}</span>
               </div>
               <div className="patient-detail-note-row__body">{note.text || note.body}</div>
@@ -1918,7 +2033,9 @@ export default function PatientDetailPanel() {
                 Requested by {transportRequestResult.requestedByName || 'you'} on{' '}
                 {formatTime(transportRequestResult.requestedAt)} · Urgency{' '}
                 {transportRequestResult.urgency} · Reason: {transportRequestResult.reason}
-                {transportRequestResult.location ? ` · Location: ${transportRequestResult.location}` : ''}
+                {transportRequestResult.location
+                  ? ` · Location: ${transportRequestResult.location}`
+                  : ''}
               </p>
               <p role="note" className="patient-detail-transport-request__disclaimer">
                 {transportRequestResult.disclaimer}
@@ -2014,8 +2131,8 @@ export default function PatientDetailPanel() {
           <h3 className="patient-detail-panel__section-title">Resolve Patient Identity</h3>
           <p role="note" className="patient-detail-identity-reconcile__disclaimer">
             This chart is registered under a provisional identity. Confirming replaces it with a
-            real, verified identity you enter below -- the previous provisional name and MRN stay
-            on the chart as a permanent record, never discarded. Nothing here is guessed or
+            real, verified identity you enter below -- the previous provisional name and MRN stay on
+            the chart as a permanent record, never discarded. Nothing here is guessed or
             auto-filled; every field must be entered by you.
           </p>
 
@@ -2024,9 +2141,10 @@ export default function PatientDetailPanel() {
               <strong>Patient Identity Reconciled</strong>
               <p>
                 Previously "{identityReconcileResult.previousFirstName}{' '}
-                {identityReconcileResult.previousLastName}" (MRN {identityReconcileResult.previousMrn}
-                ) -- now confirmed as "{identityReconcileResult.firstName}{' '}
-                {identityReconcileResult.lastName}" (MRN {identityReconcileResult.mrn}).
+                {identityReconcileResult.previousLastName}" (MRN{' '}
+                {identityReconcileResult.previousMrn}) -- now confirmed as "
+                {identityReconcileResult.firstName} {identityReconcileResult.lastName}" (MRN{' '}
+                {identityReconcileResult.mrn}).
               </p>
               <FieldButton onClick={() => setIdentityReconcileResult(null)}>Dismiss</FieldButton>
             </div>
@@ -2120,7 +2238,9 @@ export default function PatientDetailPanel() {
                 >
                   {identityReconcileSubmitting ? 'Reconciling…' : 'Confirm Identity'}
                 </button>
-                <FieldButton onClick={() => setShowIdentityReconcileForm(false)}>Cancel</FieldButton>
+                <FieldButton onClick={() => setShowIdentityReconcileForm(false)}>
+                  Cancel
+                </FieldButton>
               </div>
             </form>
           ) : (
@@ -2150,7 +2270,9 @@ export default function PatientDetailPanel() {
             >
               <option value="">Choose staff</option>
               {staff.map((member) => (
-                <option key={member.id} value={member.id}>{member.name}</option>
+                <option key={member.id} value={member.id}>
+                  {member.name}
+                </option>
               ))}
             </select>
           ) : null}
@@ -2168,11 +2290,12 @@ export default function PatientDetailPanel() {
             >
               <option value="">Choose room</option>
               {rooms.map((room: Room) => (
-                <option key={room.id} value={room.id}>{room.name} ({room.status})</option>
+                <option key={room.id} value={room.id}>
+                  {room.name} ({room.status})
+                </option>
               ))}
             </select>
           ) : null}
-
         </section>
       ) : null}
 
@@ -2208,37 +2331,60 @@ export default function PatientDetailPanel() {
       <div className="patient-detail-panel__footer">
         <div className="patient-detail-panel__footer-actions">
           {assignStaffPresentation.visible ? (
-          <FieldButton disabled={!canAssignStaff} onClick={() => setActionMode(actionMode === 'staff' ? null : 'staff')}>Assign Staff</FieldButton>
+            <FieldButton
+              disabled={!canAssignStaff}
+              onClick={() => setActionMode(actionMode === 'staff' ? null : 'staff')}
+            >
+              Assign Staff
+            </FieldButton>
           ) : null}
           {assignRoomPresentation.visible ? (
-          <FieldButton disabled={!canAssignRoom} onClick={() => setActionMode(actionMode === 'room' ? null : 'room')}>Assign Room</FieldButton>
+            <FieldButton
+              disabled={!canAssignRoom}
+              onClick={() => setActionMode(actionMode === 'room' ? null : 'room')}
+            >
+              Assign Room
+            </FieldButton>
           ) : null}
           {escalatePresentation.visible ? (
-          <FieldButton disabled={!canEscalate} onClick={() => void confirmEscalatePatient()}>Escalate</FieldButton>
+            <FieldButton disabled={!canEscalate} onClick={() => void confirmEscalatePatient()}>
+              Escalate
+            </FieldButton>
           ) : null}
           {dischargePresentation.visible ? (
-          <FieldButton disabled={!canDischarge} onClick={() => void confirmDischargePatient()}>Discharge</FieldButton>
+            <FieldButton disabled={!canDischarge} onClick={() => void confirmDischargePatient()}>
+              Discharge
+            </FieldButton>
           ) : null}
         </div>
       </div>
       {heartScoreOpen ? (
         <ErrorBoundary fallbackText="Calculator modal encountered an error. Refresh to reload.">
-          <Suspense fallback={<div className="patient-detail-panel__loading">Loading calculator...</div>}>
+          <Suspense
+            fallback={<div className="patient-detail-panel__loading">Loading calculator...</div>}
+          >
             <HEARTScore patientId={selectedPatient.id} onClose={() => setHeartScoreOpen(false)} />
           </Suspense>
         </ErrorBoundary>
       ) : null}
       {qsofaOpen ? (
         <ErrorBoundary fallbackText="Calculator modal encountered an error. Refresh to reload.">
-          <Suspense fallback={<div className="patient-detail-panel__loading">Loading calculator...</div>}>
+          <Suspense
+            fallback={<div className="patient-detail-panel__loading">Loading calculator...</div>}
+          >
             <QSOFA patientId={selectedPatient.id} onClose={() => setQsofaOpen(false)} />
           </Suspense>
         </ErrorBoundary>
       ) : null}
       {pediatricDrugCalcOpen ? (
         <ErrorBoundary fallbackText="Calculator modal encountered an error. Refresh to reload.">
-          <Suspense fallback={<div className="patient-detail-panel__loading">Loading calculator...</div>}>
-            <PediatricDrugCalc patientId={selectedPatient.id} onClose={() => setPediatricDrugCalcOpen(false)} />
+          <Suspense
+            fallback={<div className="patient-detail-panel__loading">Loading calculator...</div>}
+          >
+            <PediatricDrugCalc
+              patientId={selectedPatient.id}
+              onClose={() => setPediatricDrugCalcOpen(false)}
+            />
           </Suspense>
         </ErrorBoundary>
       ) : null}

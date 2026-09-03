@@ -69,10 +69,12 @@ describe('WorkloadBalancePanel', () => {
         currentStaffProfile={{ id: 'charge-rn', displayName: 'Charge RN' }}
         onClose={vi.fn()}
         onAssignStaff={onAssignStaff}
-      />
+      />,
     );
 
-    expect(screen.getByText(/Imbalance detected - Dr. Okonkwo has 6 patients/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Imbalance detected - Dr. Okonkwo has 6 patients/i),
+    ).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: /Dr. Okonkwo/i }));
     fireEvent.click(screen.getByRole('button', { name: /Reassign/i }));
@@ -88,7 +90,7 @@ describe('WorkloadBalancePanel', () => {
         fromStaffName: 'Dr. Okonkwo',
         toStaffName: 'Dr. Singh',
         reason: 'Workload balance panel reassignment',
-      })
+      }),
     );
     expect(mocks.showActionSuccess).toHaveBeenCalledWith(
       'Test pt-overload-1 reassigned',
@@ -108,7 +110,7 @@ describe('WorkloadBalancePanel', () => {
         currentStaffProfile={{ id: 'charge-rn', displayName: 'Charge RN' }}
         onClose={vi.fn()}
         onAssignStaff={vi.fn()}
-      />
+      />,
     );
 
     fireEvent.click(screen.getByRole('button', { name: /Suggest rebalance/i }));
@@ -132,7 +134,7 @@ describe('WorkloadBalancePanel', () => {
         currentStaffProfile={{ id: 'charge-rn', displayName: 'Charge RN' }}
         onClose={vi.fn()}
         onAssignStaff={vi.fn()}
-      />
+      />,
     );
 
     fireEvent.click(screen.getByRole('button', { name: /Suggest rebalance/i }));
@@ -169,7 +171,7 @@ describe('WorkloadBalancePanel', () => {
         currentStaffProfile={{ id: 'charge-rn', displayName: 'Charge RN' }}
         onClose={vi.fn()}
         onAssignStaff={vi.fn()}
-      />
+      />,
     );
 
     fireEvent.click(screen.getByRole('button', { name: /Suggest rebalance/i }));

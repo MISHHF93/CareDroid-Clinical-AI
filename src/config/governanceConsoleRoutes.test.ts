@@ -12,7 +12,10 @@ import { shouldSuppressPlatformSystemStub } from './platformStubPolicy';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
-const routeTreeSource = readFileSync(join(__dirname, '../app/governanceConsoleRouteTree.tsx'), 'utf8');
+const routeTreeSource = readFileSync(
+  join(__dirname, '../app/governanceConsoleRouteTree.tsx'),
+  'utf8',
+);
 
 describe('governanceConsoleRoutes', () => {
   it('covers high-traffic governance and P0 platform paths', () => {
@@ -63,10 +66,12 @@ describe('governanceConsoleRoutes', () => {
   });
 
   it('keeps governance workspace routes out of explicit router mounts', () => {
-    expect(appSource).not.toContain("path={CANONICAL_ROUTES.audit}");
-    expect(appSource).not.toContain("path={CANONICAL_ROUTES.security}");
-    expect(appSource).not.toContain("path={CANONICAL_ROUTES.aiGovernance}");
-    expect(appSource).not.toContain('element={<LazyRoute label="Loading governance workspace..."><PlatformGovernanceWorkspace />');
+    expect(appSource).not.toContain('path={CANONICAL_ROUTES.audit}');
+    expect(appSource).not.toContain('path={CANONICAL_ROUTES.security}');
+    expect(appSource).not.toContain('path={CANONICAL_ROUTES.aiGovernance}');
+    expect(appSource).not.toContain(
+      'element={<LazyRoute label="Loading governance workspace..."><PlatformGovernanceWorkspace />',
+    );
     expect(appSource).toContain('shouldSuppressPlatformSystemStub');
   });
 

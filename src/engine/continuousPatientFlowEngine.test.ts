@@ -65,7 +65,9 @@ describe('continuousPatientFlowEngine', () => {
     });
 
     const snapshot = buildPatientFlowPatientSnapshot(patient, {
-      staff: [{ id: 's1', name: 'Dr. Patel', role: 'MD', status: 'Available' as any, active: true }],
+      staff: [
+        { id: 's1', name: 'Dr. Patel', role: 'MD', status: 'Available' as any, active: true },
+      ],
       now: new Date(),
     });
 
@@ -94,7 +96,7 @@ describe('continuousPatientFlowEngine', () => {
             timestamp: new Date(Date.now() - 70 * 60000).toISOString(),
             summary: 'Waiting',
             to: PatientState.Waiting,
-          metadata: { toState: PatientState.Waiting },
+            metadata: { toState: PatientState.Waiting },
           },
         ],
       }),

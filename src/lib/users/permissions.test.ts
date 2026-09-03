@@ -32,34 +32,52 @@ describe('ROLE_PERMISSIONS', () => {
   });
 
   it('registration_clerk cannot override AI or create orders', () => {
-    expect(hasCareDroidPermission('registration_clerk', CAREDROID_PERMISSIONS.TRIAGE_OVERRIDE_AI)).toBe(false);
-    expect(hasCareDroidPermission('registration_clerk', CAREDROID_PERMISSIONS.ORDERS_CREATE)).toBe(false);
-    expect(hasCareDroidPermission('registration_clerk', CAREDROID_PERMISSIONS.PATIENT_DISCHARGE)).toBe(false);
+    expect(
+      hasCareDroidPermission('registration_clerk', CAREDROID_PERMISSIONS.TRIAGE_OVERRIDE_AI),
+    ).toBe(false);
+    expect(hasCareDroidPermission('registration_clerk', CAREDROID_PERMISSIONS.ORDERS_CREATE)).toBe(
+      false,
+    );
+    expect(
+      hasCareDroidPermission('registration_clerk', CAREDROID_PERMISSIONS.PATIENT_DISCHARGE),
+    ).toBe(false);
   });
 
   it('registration_clerk can read and create patients', () => {
-    expect(hasCareDroidPermission('registration_clerk', CAREDROID_PERMISSIONS.PATIENT_READ)).toBe(true);
-    expect(hasCareDroidPermission('registration_clerk', CAREDROID_PERMISSIONS.PATIENT_CREATE)).toBe(true);
+    expect(hasCareDroidPermission('registration_clerk', CAREDROID_PERMISSIONS.PATIENT_READ)).toBe(
+      true,
+    );
+    expect(hasCareDroidPermission('registration_clerk', CAREDROID_PERMISSIONS.PATIENT_CREATE)).toBe(
+      true,
+    );
   });
 
   it('triage_nurse can override AI but cannot configure it', () => {
-    expect(hasCareDroidPermission('triage_nurse', CAREDROID_PERMISSIONS.TRIAGE_OVERRIDE_AI)).toBe(true);
+    expect(hasCareDroidPermission('triage_nurse', CAREDROID_PERMISSIONS.TRIAGE_OVERRIDE_AI)).toBe(
+      true,
+    );
     expect(hasCareDroidPermission('triage_nurse', CAREDROID_PERMISSIONS.AI_CONFIGURE)).toBe(false);
   });
 
   it('emergency_physician can discharge patients', () => {
-    expect(hasCareDroidPermission('emergency_physician', CAREDROID_PERMISSIONS.PATIENT_DISCHARGE)).toBe(true);
+    expect(
+      hasCareDroidPermission('emergency_physician', CAREDROID_PERMISSIONS.PATIENT_DISCHARGE),
+    ).toBe(true);
   });
 
   it('it_admin has settings and users permissions but not clinical permissions', () => {
     expect(hasCareDroidPermission('it_admin', CAREDROID_PERMISSIONS.SETTINGS_UPDATE)).toBe(true);
     expect(hasCareDroidPermission('it_admin', CAREDROID_PERMISSIONS.USERS_CREATE)).toBe(true);
     expect(hasCareDroidPermission('it_admin', CAREDROID_PERMISSIONS.PATIENT_DISCHARGE)).toBe(false);
-    expect(hasCareDroidPermission('it_admin', CAREDROID_PERMISSIONS.TRIAGE_OVERRIDE_AI)).toBe(false);
+    expect(hasCareDroidPermission('it_admin', CAREDROID_PERMISSIONS.TRIAGE_OVERRIDE_AI)).toBe(
+      false,
+    );
   });
 
   it('pharmacist can review medication but cannot create orders', () => {
-    expect(hasCareDroidPermission('pharmacist', CAREDROID_PERMISSIONS.MEDICATION_REVIEW)).toBe(true);
+    expect(hasCareDroidPermission('pharmacist', CAREDROID_PERMISSIONS.MEDICATION_REVIEW)).toBe(
+      true,
+    );
     expect(hasCareDroidPermission('pharmacist', CAREDROID_PERMISSIONS.ORDERS_CREATE)).toBe(false);
   });
 
@@ -71,14 +89,24 @@ describe('ROLE_PERMISSIONS', () => {
 
 describe('document/OCR intake permissions', () => {
   it('registration_clerk can capture and review documents', () => {
-    expect(hasCareDroidPermission('registration_clerk', CAREDROID_PERMISSIONS.DOCUMENT_CAPTURE)).toBe(true);
-    expect(hasCareDroidPermission('registration_clerk', CAREDROID_PERMISSIONS.DOCUMENT_REVIEW)).toBe(true);
+    expect(
+      hasCareDroidPermission('registration_clerk', CAREDROID_PERMISSIONS.DOCUMENT_CAPTURE),
+    ).toBe(true);
+    expect(
+      hasCareDroidPermission('registration_clerk', CAREDROID_PERMISSIONS.DOCUMENT_REVIEW),
+    ).toBe(true);
   });
 
   it('clinical roles can review extracted document fields', () => {
-    expect(hasCareDroidPermission('triage_nurse', CAREDROID_PERMISSIONS.DOCUMENT_REVIEW)).toBe(true);
-    expect(hasCareDroidPermission('registered_nurse', CAREDROID_PERMISSIONS.DOCUMENT_REVIEW)).toBe(true);
-    expect(hasCareDroidPermission('emergency_physician', CAREDROID_PERMISSIONS.DOCUMENT_REVIEW)).toBe(true);
+    expect(hasCareDroidPermission('triage_nurse', CAREDROID_PERMISSIONS.DOCUMENT_REVIEW)).toBe(
+      true,
+    );
+    expect(hasCareDroidPermission('registered_nurse', CAREDROID_PERMISSIONS.DOCUMENT_REVIEW)).toBe(
+      true,
+    );
+    expect(
+      hasCareDroidPermission('emergency_physician', CAREDROID_PERMISSIONS.DOCUMENT_REVIEW),
+    ).toBe(true);
   });
 
   it('paramedic can capture EMS paperwork but cannot review clinical extraction', () => {
@@ -94,7 +122,9 @@ describe('document/OCR intake permissions', () => {
 
   it('demo_observer has read-only document access', () => {
     expect(hasCareDroidPermission('demo_observer', CAREDROID_PERMISSIONS.DOCUMENT_READ)).toBe(true);
-    expect(hasCareDroidPermission('demo_observer', CAREDROID_PERMISSIONS.DOCUMENT_CAPTURE)).toBe(false);
+    expect(hasCareDroidPermission('demo_observer', CAREDROID_PERMISSIONS.DOCUMENT_CAPTURE)).toBe(
+      false,
+    );
   });
 });
 

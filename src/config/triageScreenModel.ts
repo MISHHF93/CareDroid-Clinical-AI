@@ -88,7 +88,10 @@ export function getTriagePendingQueuePath(patientId?: string | null): string {
   return `${CANONICAL_ROUTES.emergencyReception}?${params.toString()}`;
 }
 
-export function getTriageWhiteboardPath(patientId?: string | null, encounterId?: string | null): string {
+export function getTriageWhiteboardPath(
+  patientId?: string | null,
+  encounterId?: string | null,
+): string {
   const params = new URLSearchParams();
   if (patientId) params.set('patient', patientId);
   if (encounterId) params.set('encounter', encounterId);
@@ -156,8 +159,7 @@ export function resolveTriageScreenCapabilities(
     canMoveQueue,
     canAcceptEmsHandoff,
     canOpenTriageQueue,
-    showAiTriageAssist:
-      showWidget(TRIAGE_SCREEN_WIDGETS.aiTriageAssist) && canAssignAcuity,
+    showAiTriageAssist: showWidget(TRIAGE_SCREEN_WIDGETS.aiTriageAssist) && canAssignAcuity,
     showClinicalTriageAssist: isTriageScreen && canAssignAcuity,
     showWaitingRoomSafetyBoard: showWidget(TRIAGE_SCREEN_WIDGETS.waitingRoomSafetyBoard),
     showWaitingRoomSafetyEscalation: showWidget(TRIAGE_SCREEN_WIDGETS.waitingRoomSafetyEscalation),

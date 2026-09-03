@@ -29,15 +29,15 @@ export default function PatientExperienceStatusStrip({
           <p className="patient-experience-strip__eyebrow">Patient experience layer</p>
           <h3>Understandable status map</h3>
           <p className="patient-experience-strip__subtitle">
-            Staff view mapping journey and queue states to patient-safe process labels — no public PHI.
+            Staff view mapping journey and queue states to patient-safe process labels — no public
+            PHI.
           </p>
         </div>
       </header>
       <div className="patient-experience-strip__counts">
         {summary.statusLines.map((line) => {
           const samplePatient = patients.find(
-            (patient) =>
-              resolvePatientExperienceStatus(patient, { referrals }).id === line.id,
+            (patient) => resolvePatientExperienceStatus(patient, { referrals }).id === line.id,
           );
           return (
             <div key={line.id} className="patient-experience-strip__count" data-tone={line.tone}>

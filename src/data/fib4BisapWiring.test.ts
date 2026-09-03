@@ -20,12 +20,15 @@ const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
 const patternsSource = readFileSync(
   join(
     __dirname,
-    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts'
+    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts',
   ),
-  'utf8'
+  'utf8',
 );
 const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.tsx'), 'utf8');
-const pr8Source = readFileSync(join(__dirname, '../pages/tools/pr8ClinicalBatchCalculators.tsx'), 'utf8');
+const pr8Source = readFileSync(
+  join(__dirname, '../pages/tools/pr8ClinicalBatchCalculators.tsx'),
+  'utf8',
+);
 const fib4UtilSource = readFileSync(join(__dirname, '../utils/fib4Calculator.ts'), 'utf8');
 const bisapUtilSource = readFileSync(join(__dirname, '../utils/bisapScoreCalculator.ts'), 'utf8');
 

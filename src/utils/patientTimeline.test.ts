@@ -92,7 +92,9 @@ describe('buildPatientTimeline', () => {
         },
       ],
       emsArrivals: [{ patient: { id: patient.id }, handoffStatus: 'pre-arrival' }],
-      referrals: [{ patient: { id: patient.id }, specialty: 'Cardiology', status: 'review-needed' }],
+      referrals: [
+        { patient: { id: patient.id }, specialty: 'Cardiology', status: 'review-needed' },
+      ],
       boardingPatients: [{ id: patient.id }],
       provincialRecords: [{ patientId: patient.id, mrn: patient.mrn }],
     });

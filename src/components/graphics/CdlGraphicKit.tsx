@@ -43,7 +43,6 @@ import {
 } from '../../config/cdlGraphicModel';
 import './CdlGraphicKit.css';
 
-
 const GRAPHIC_ICON_MAP: Record<string, LucideIcon> = {
   activity: Activity,
   alert: AlertTriangle,
@@ -185,7 +184,15 @@ export function MetricGraphicCard({
         <GraphicIconBadge iconKey={resolvedIcon} accent={accent} size="md" />
         <span className="cdl-metric-graphic-card__ring" aria-hidden>
           <svg viewBox="0 0 36 36">
-            <circle cx="18" cy="18" r="15" fill="none" stroke="currentColor" strokeWidth="2" opacity="0.12" />
+            <circle
+              cx="18"
+              cy="18"
+              r="15"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              opacity="0.12"
+            />
             <circle
               cx="18"
               cy="18"
@@ -201,8 +208,12 @@ export function MetricGraphicCard({
           </svg>
         </span>
       </div>
-      <strong className="emergency-route-metric-card__value cdl-metric-graphic-card__value">{value}</strong>
-      <span className="emergency-route-metric-card__label cdl-metric-graphic-card__label">{label}</span>
+      <strong className="emergency-route-metric-card__value cdl-metric-graphic-card__value">
+        {value}
+      </strong>
+      <span className="emergency-route-metric-card__label cdl-metric-graphic-card__label">
+        {label}
+      </span>
       {barWidth != null ? (
         <div className="cdl-metric-graphic-card__bar" aria-hidden>
           <span style={{ width: `${barWidth}%` }} />
@@ -244,7 +255,16 @@ type PatientAcuityRingProps = {
 
 export function PatientAcuityRing({ priority, label, className = '' }: PatientAcuityRingProps) {
   const color = PRIORITY_RING_COLORS[priority] || PRIORITY_RING_COLORS.P3;
-  const fill = priority === 'P1' ? 92 : priority === 'P2' ? 78 : priority === 'P3' ? 62 : priority === 'P4' ? 48 : 36;
+  const fill =
+    priority === 'P1'
+      ? 92
+      : priority === 'P2'
+        ? 78
+        : priority === 'P3'
+          ? 62
+          : priority === 'P4'
+            ? 48
+            : 36;
 
   return (
     <span
@@ -253,7 +273,15 @@ export function PatientAcuityRing({ priority, label, className = '' }: PatientAc
       aria-hidden
     >
       <svg viewBox="0 0 44 44" className="cdl-patient-acuity-ring__svg">
-        <circle cx="22" cy="22" r="18" fill="none" stroke="currentColor" strokeWidth="3" opacity="0.14" />
+        <circle
+          cx="22"
+          cy="22"
+          r="18"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="3"
+          opacity="0.14"
+        />
         <circle
           cx="22"
           cy="22"
@@ -279,15 +307,16 @@ type EmsUnitTrackGraphicProps = {
   className?: string;
 };
 
-export function EmsUnitTrackGraphic({ status, unitId, breach = false, className = '' }: EmsUnitTrackGraphicProps) {
+export function EmsUnitTrackGraphic({
+  status,
+  unitId,
+  breach = false,
+  className = '',
+}: EmsUnitTrackGraphicProps) {
   const progress = resolveEmsPhaseProgress(status);
   return (
     <div
-      className={[
-        'cdl-ems-unit-track',
-        breach ? 'cdl-ems-unit-track--breach' : '',
-        className,
-      ]
+      className={['cdl-ems-unit-track', breach ? 'cdl-ems-unit-track--breach' : '', className]
         .filter(Boolean)
         .join(' ')}
       role="progressbar"
@@ -299,10 +328,17 @@ export function EmsUnitTrackGraphic({ status, unitId, breach = false, className 
       <div className="cdl-ems-unit-track__rail" aria-hidden>
         <span className="cdl-ems-unit-track__fill" style={{ width: `${progress}%` }} />
         {[15, 35, 55, 80, 100].map((mark) => (
-          <span key={mark} className={`cdl-ems-unit-track__mark cdl-ems-unit-track__mark--${mark}`} />
+          <span
+            key={mark}
+            className={`cdl-ems-unit-track__mark cdl-ems-unit-track__mark--${mark}`}
+          />
         ))}
       </div>
-      <GraphicIconBadge iconKey="ems" accent={breach ? 'critical' : progress >= 80 ? 'action' : 'information'} size="sm" />
+      <GraphicIconBadge
+        iconKey="ems"
+        accent={breach ? 'critical' : progress >= 80 ? 'action' : 'information'}
+        size="sm"
+      />
     </div>
   );
 }
@@ -326,7 +362,9 @@ export function CommandMetricGraphicCard({
 }: CommandMetricGraphicCardProps) {
   const iconKey = resolveCommandMetricGraphicKey(id);
   const numericValue = typeof value === 'number' ? value : parseFloat(String(value));
-  const progress = Number.isFinite(numericValue) ? Math.min(100, numericValue * (numericValue <= 1 ? 100 : 1)) : 55;
+  const progress = Number.isFinite(numericValue)
+    ? Math.min(100, numericValue * (numericValue <= 1 ? 100 : 1))
+    : 55;
 
   return (
     <Link
@@ -341,7 +379,11 @@ export function CommandMetricGraphicCard({
         .join(' ')}
     >
       <div className="cdl-command-metric-card__header">
-        <GraphicIconBadge iconKey={iconKey} accent={tone === 'critical' ? 'critical' : tone === 'warning' ? 'warning' : 'information'} size="sm" />
+        <GraphicIconBadge
+          iconKey={iconKey}
+          accent={tone === 'critical' ? 'critical' : tone === 'warning' ? 'warning' : 'information'}
+          size="sm"
+        />
         <svg viewBox="0 0 40 40" className="cdl-command-metric-card__spark" aria-hidden>
           <polyline
             points="4,32 12,24 18,28 26,14 36,18"
@@ -408,7 +450,9 @@ export function CommandActionGraphicCard({
         />
         <div className="emergency-command-action__header">
           <strong>{label}</strong>
-          <span className="emergency-command-action__count cdl-command-action-card__count">{count}</span>
+          <span className="emergency-command-action__count cdl-command-action-card__count">
+            {count}
+          </span>
         </div>
       </div>
       <p>{reason}</p>
@@ -446,7 +490,11 @@ const RECEPTION_FLOW_ICONS: Record<string, string> = {
 
 export function ReceptionFlowGraphic({ steps, className = '' }: ReceptionFlowGraphicProps) {
   return (
-    <div className={['cdl-reception-flow-graphic', className].filter(Boolean).join(' ')} role="img" aria-label="Reception intake flow">
+    <div
+      className={['cdl-reception-flow-graphic', className].filter(Boolean).join(' ')}
+      role="img"
+      aria-label="Reception intake flow"
+    >
       {steps.map((step, index) => (
         <div
           key={step.id}
@@ -479,7 +527,12 @@ type EmsOffloadGaugeProps = {
   className?: string;
 };
 
-export function EmsOffloadGauge({ minutes, targetMinutes, breachCount = 0, className = '' }: EmsOffloadGaugeProps) {
+export function EmsOffloadGauge({
+  minutes,
+  targetMinutes,
+  breachCount = 0,
+  className = '',
+}: EmsOffloadGaugeProps) {
   const progress = Math.min(100, Math.round((minutes / Math.max(targetMinutes, 1)) * 100));
   const breach = progress > 100 || breachCount > 0;
 
@@ -496,7 +549,15 @@ export function EmsOffloadGauge({ minutes, targetMinutes, breachCount = 0, class
       title={breachCount ? `${breachCount} crews over ${targetMinutes} minutes` : undefined}
     >
       <svg viewBox="0 0 48 48" className="cdl-ems-offload-gauge__ring" aria-hidden>
-        <circle cx="24" cy="24" r="18" fill="none" stroke="currentColor" strokeWidth="3" opacity="0.15" />
+        <circle
+          cx="24"
+          cy="24"
+          r="18"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="3"
+          opacity="0.15"
+        />
         <circle
           cx="24"
           cy="24"

@@ -38,7 +38,10 @@ export default function IntegrationHubPage() {
       description="Connector status, review queue, and recent interoperability events."
       actions={
         <div className="integration-hub-page__actions">
-          <Link className="cd-btn cd-btn--secondary cd-btn--sm" to={CANONICAL_ROUTES.emergencySettings}>
+          <Link
+            className="cd-btn cd-btn--secondary cd-btn--sm"
+            to={CANONICAL_ROUTES.emergencySettings}
+          >
             Emergency Settings
           </Link>
           <button
@@ -86,47 +89,49 @@ export default function IntegrationHubPage() {
               </article>
               <article className="cd-surface-card">
                 <strong>Recent events</strong>
-                <p>{recentEvents.length ? `${recentEvents.length} event(s) loaded.` : 'No events yet.'}</p>
+                <p>
+                  {recentEvents.length
+                    ? `${recentEvents.length} event(s) loaded.`
+                    : 'No events yet.'}
+                </p>
               </article>
             </div>
           </>
         ),
         activeWork: (
           <section className="integration-hub-page__section" aria-label="Integration sources">
-        <h2>Sources</h2>
-        {sources.length ? (
-          <table className="integration-hub-page__table">
-            <thead>
-              <tr>
-                <th>Source</th>
-                <th>Status</th>
-                <th>Last event</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sources.map((source) => (
-                <tr key={String(source.id)}>
-                  <td>{sourceLabel(source)}</td>
-                  <td>
-                    <IntegrationStatusBadge
-                      status={
-                        mapLiveSourceStatusToNormalized(source.status) || 'placeholder'
-                      }
-                    />
-                    <small className="integration-hub-page__status-detail">
-                      {String(source.status || 'unknown')}
-                    </small>
-                  </td>
-                  <td>
-                    {source.lastEventAt ? String(source.lastEventAt) : 'No events recorded'}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <p className="integration-hub-page__empty">No integration sources returned.</p>
-        )}
+            <h2>Sources</h2>
+            {sources.length ? (
+              <table className="integration-hub-page__table">
+                <thead>
+                  <tr>
+                    <th>Source</th>
+                    <th>Status</th>
+                    <th>Last event</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sources.map((source) => (
+                    <tr key={String(source.id)}>
+                      <td>{sourceLabel(source)}</td>
+                      <td>
+                        <IntegrationStatusBadge
+                          status={mapLiveSourceStatusToNormalized(source.status) || 'placeholder'}
+                        />
+                        <small className="integration-hub-page__status-detail">
+                          {String(source.status || 'unknown')}
+                        </small>
+                      </td>
+                      <td>
+                        {source.lastEventAt ? String(source.lastEventAt) : 'No events recorded'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <p className="integration-hub-page__empty">No integration sources returned.</p>
+            )}
           </section>
         ),
         supportingContext: gaps.length ? (
@@ -141,43 +146,44 @@ export default function IntegrationHubPage() {
         ) : null,
         history: (
           <section className="integration-hub-page__section" aria-label="Recent integration events">
-        <h2>Recent events</h2>
-        {recentEvents.length ? (
-          <table className="integration-hub-page__table">
-            <thead>
-              <tr>
-                <th>Family</th>
-                <th>Type</th>
-                <th>Status</th>
-                <th>Received</th>
-                <th>Error</th>
-              </tr>
-            </thead>
-            <tbody>
-              {recentEvents.slice(0, 12).map((event) => {
-                const processingStatus = String(event.processingStatus || event.status || '');
-                const failed = processingStatus.toLowerCase() === 'failed';
-                return (
-                  <tr key={String(event.id || `${event.family}-${event.receivedAt}`)}>
-                    <td>{String(event.family || '—')}</td>
-                    <td>{String(event.eventType || '—')}</td>
-                    <td>{processingStatus || '—'}</td>
-                    <td>{String(event.receivedAt || '—')}</td>
-                    <td>
-                      {failed
-                        ? String(event.error || 'Failed — no error detail recorded')
-                        : '—'}
-                    </td>
+            <h2>Recent events</h2>
+            {recentEvents.length ? (
+              <table className="integration-hub-page__table">
+                <thead>
+                  <tr>
+                    <th>Family</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Received</th>
+                    <th>Error</th>
                   </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        ) : (
-          <p className="integration-hub-page__empty">
-            No persisted interoperability events yet. Ingest via POST /api/interoperability/events.
-          </p>
-        )}
+                </thead>
+                <tbody>
+                  {recentEvents.slice(0, 12).map((event) => {
+                    const processingStatus = String(event.processingStatus || event.status || '');
+                    const failed = processingStatus.toLowerCase() === 'failed';
+                    return (
+                      <tr key={String(event.id || `${event.family}-${event.receivedAt}`)}>
+                        <td>{String(event.family || '—')}</td>
+                        <td>{String(event.eventType || '—')}</td>
+                        <td>{processingStatus || '—'}</td>
+                        <td>{String(event.receivedAt || '—')}</td>
+                        <td>
+                          {failed
+                            ? String(event.error || 'Failed — no error detail recorded')
+                            : '—'}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            ) : (
+              <p className="integration-hub-page__empty">
+                No persisted interoperability events yet. Ingest via POST
+                /api/interoperability/events.
+              </p>
+            )}
           </section>
         ),
       }}

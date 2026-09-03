@@ -116,7 +116,9 @@ describe('buildCopilotPatientArtifactContext', () => {
 
     const context = buildCopilotPatientArtifactContext(patient, null);
     expect(context?.documentArtifacts).toBeTruthy();
-    expect((context?.documentArtifacts as { pendingReviewCount?: number })?.pendingReviewCount).toBe(1);
+    expect(
+      (context?.documentArtifacts as { pendingReviewCount?: number })?.pendingReviewCount,
+    ).toBe(1);
   });
 });
 
@@ -155,7 +157,10 @@ describe('scopeCopilotPatientArtifactContextForRole', () => {
 
   it('strips clinical-judgment fields but keeps identity/complaint/state for non-clinical roles', () => {
     const context = buildCopilotPatientArtifactContext(patient, null);
-    const scoped = scopeCopilotPatientArtifactContextForRole(context, false) as Record<string, unknown>;
+    const scoped = scopeCopilotPatientArtifactContextForRole(context, false) as Record<
+      string,
+      unknown
+    >;
 
     expect(scoped.vitals).toBeNull();
     expect(scoped.recentNotes).toEqual([]);

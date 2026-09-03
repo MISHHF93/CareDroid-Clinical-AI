@@ -5,8 +5,14 @@ import {
   REGISTRY,
   REGISTRY_ID_TO_ORCHESTRATOR_TOOL,
 } from '../data/clinicalToolIdContract';
-import { getBackendBackedToolInventory, getUserFacingToolRegistryProjection } from '../data/toolInventory';
-import { buildProfileToolGraph, getProfileAssistantRecommendations } from '../data/profileToolSegmentation';
+import {
+  getBackendBackedToolInventory,
+  getUserFacingToolRegistryProjection,
+} from '../data/toolInventory';
+import {
+  buildProfileToolGraph,
+  getProfileAssistantRecommendations,
+} from '../data/profileToolSegmentation';
 import { compileUserProfile } from '../config/userProfileCompiler';
 import { getCareDroidDidYouKnowSuggestions } from '../data/capabilityDiscoveryEngine';
 import { buildSearchFirstResults } from '../data/searchFirstDiscovery';
@@ -50,7 +56,7 @@ const ENTERPRISE_PLATFORM_SUGGESTIONS = Object.freeze([
 
 function getExecutorInventoryRecords() {
   return getBackendBackedToolInventory().filter((record) =>
-    ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS.includes(record.orchestratorToolId)
+    ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS.includes(record.orchestratorToolId),
   );
 }
 
@@ -70,7 +76,9 @@ function textMatches(input, terms) {
 
 function scoreSuggestion(input, suggestion) {
   if (!input?.trim()) return suggestion.defaultRank;
-  return textMatches(input, suggestion.keywords) ? suggestion.defaultRank - 100 : suggestion.defaultRank;
+  return textMatches(input, suggestion.keywords)
+    ? suggestion.defaultRank - 100
+    : suggestion.defaultRank;
 }
 
 const CONTEXT_AWARE_LAUNCHER_INTENTS = Object.freeze([
@@ -93,18 +101,29 @@ const CONTEXT_AWARE_LAUNCHER_INTENTS = Object.freeze([
       id: 'cardiology-workspace',
       label: 'Cardiology Workspace',
       path: '/workspace/cardiology',
-      description: 'Open a cardiology workspace for ACS risk, ECG, troponin, and cardiac workflows.',
+      description:
+        'Open a cardiology workspace for ACS risk, ECG, troponin, and cardiac workflows.',
     },
   },
   {
     id: 'ventilator',
-    terms: ['ventilator', 'ventilation', 'intubated', 'ards', 'hypoxemia', 'fio2', 'p/f ratio', 'pf ratio'],
+    terms: [
+      'ventilator',
+      'ventilation',
+      'intubated',
+      'ards',
+      'hypoxemia',
+      'fio2',
+      'p/f ratio',
+      'pf ratio',
+    ],
     toolIds: [REGISTRY.roxIndex, REGISTRY.pao2Fio2Ratio],
     workspace: {
       id: 'respiratory-workspace',
       label: 'Respiratory Workspace',
       path: '/workspace/respiratory',
-      description: 'Open a respiratory workspace for ventilator, oxygenation, ROX, and P/F ratio support.',
+      description:
+        'Open a respiratory workspace for ventilator, oxygenation, ROX, and P/F ratio support.',
     },
   },
 ]);
@@ -113,7 +132,14 @@ function findTool(tools, toolId) {
   return tools.find((tool) => tool.id === toolId);
 }
 
-function toolSuggestionFromIntent({ tool, intent, index, recentToolIds, workspaceContext, profileGraph }) {
+function toolSuggestionFromIntent({
+  tool,
+  intent,
+  index,
+  recentToolIds,
+  workspaceContext,
+  profileGraph,
+}) {
   const graphTool = profileGraph?.visibleTools?.find((candidate) => candidate.id === tool.id);
   if (profileGraph && !graphTool) return null;
   const sourceTool = graphTool || tool;
@@ -123,7 +149,9 @@ function toolSuggestionFromIntent({ tool, intent, index, recentToolIds, workspac
     sourceTool.workspaceTags?.includes(workspaceContext.activeWorkspaceId)
       ? -6
       : 0;
-  const profileBoost = sourceTool.profileScore ? Math.min(18, Math.max(0, Math.round(sourceTool.profileScore / 12))) : 0;
+  const profileBoost = sourceTool.profileScore
+    ? Math.min(18, Math.max(0, Math.round(sourceTool.profileScore / 12)))
+    : 0;
 
   return {
     id: `intent-${intent.id}-${tool.id}`,
@@ -164,7 +192,9 @@ function getContextAwareLauncherSuggestions({
   recentToolIds = [] as any[],
 }) {
   if (!input?.trim()) return [];
-  const matchedIntents = CONTEXT_AWARE_LAUNCHER_INTENTS.filter((intent) => textMatches(input, intent.terms));
+  const matchedIntents = CONTEXT_AWARE_LAUNCHER_INTENTS.filter((intent) =>
+    textMatches(input, intent.terms),
+  );
   if (!matchedIntents.length) return [];
 
   const compiled = saasRole ? compileUserProfile({ saasRole, tools }) : null;
@@ -212,7 +242,13 @@ function getWorkspaceContextSuggestions({ tools, workspaceContext, recentToolIds
       icon: getToolIcon(tool.id),
       source: 'workspace-context',
       defaultRank: -12 + index + (recentToolIds.includes(tool.id) ? -4 : 0),
-      keywords: [workspaceContext?.label, workspaceContext?.workspaceKey, tool.id, tool.name, tool.category],
+      keywords: [
+        workspaceContext?.label,
+        workspaceContext?.workspaceKey,
+        tool.id,
+        tool.name,
+        tool.category,
+      ],
     }));
 }
 
@@ -337,8 +373,10 @@ export const CHAT_SENSITIVE_CONFIRMATIONS = Object.freeze({
   'follow-up-planning': {
     title: 'Confirm follow-up planning',
     sensitivity: 'PHI-sensitive workflow',
-    whatWillHappen: 'Chat will open a guided planner and may use visible clinical context in a protected draft.',
-    affectedData: 'User-entered patient context, follow-up reason, timing, and any visible Chat context you choose to include.',
+    whatWillHappen:
+      'Chat will open a guided planner and may use visible clinical context in a protected draft.',
+    affectedData:
+      'User-entered patient context, follow-up reason, timing, and any visible Chat context you choose to include.',
     reversible: 'Yes. This creates a draft only and does not send, schedule, or document outreach.',
     authRequirement: 'Requires authenticated access to protected Chat.',
   },
@@ -354,25 +392,34 @@ export const CHAT_SENSITIVE_CONFIRMATIONS = Object.freeze({
   'data-export': {
     title: 'Confirm compliance export',
     sensitivity: 'Compliance export',
-    whatWillHappen: 'Chat will open Settings so you can start the supported compliance export workflow.',
+    whatWillHappen:
+      'Chat will open Settings so you can start the supported compliance export workflow.',
     affectedData: 'Account and compliance data included by the backend export endpoint.',
-    reversible: 'Not fully reversible once an export is generated or downloaded. Handle exported data securely.',
+    reversible:
+      'Not fully reversible once an export is generated or downloaded. Handle exported data securely.',
     authRequirement: 'Requires authenticated account access. Backend export guards still apply.',
   },
   'notification-preferences': {
     title: 'Confirm notification settings',
     sensitivity: 'Notification bulk-action surface',
-    whatWillHappen: 'Chat will open notification preferences, where bulk toggles can affect notification delivery.',
-    affectedData: 'Notification preferences, device tokens, unread state, and test notification actions.',
-    reversible: 'Usually reversible by changing preferences again. Sent test notifications cannot be recalled.',
-    authRequirement: 'Requires authenticated account access. Backend notification guards still apply.',
+    whatWillHappen:
+      'Chat will open notification preferences, where bulk toggles can affect notification delivery.',
+    affectedData:
+      'Notification preferences, device tokens, unread state, and test notification actions.',
+    reversible:
+      'Usually reversible by changing preferences again. Sent test notifications cannot be recalled.',
+    authRequirement:
+      'Requires authenticated account access. Backend notification guards still apply.',
   },
   'billing-account': {
     title: 'Confirm billing access',
     sensitivity: 'Billing action surface',
-    whatWillHappen: 'Chat will open Settings for subscription status, checkout, and customer portal actions.',
-    affectedData: 'Subscription tier, checkout session, customer portal, and billing account state.',
-    reversible: 'Billing changes may not be immediately reversible and can require portal or support follow-up.',
+    whatWillHappen:
+      'Chat will open Settings for subscription status, checkout, and customer portal actions.',
+    affectedData:
+      'Subscription tier, checkout session, customer portal, and billing account state.',
+    reversible:
+      'Billing changes may not be immediately reversible and can require portal or support follow-up.',
     authRequirement: `May require ${Permission.MANAGE_SUBSCRIPTIONS} or billing-owner privileges. Backend billing guards still apply.`,
   },
 });
@@ -411,9 +458,11 @@ export function getChatCapabilitySuggestions({
     suggestions.push(suggestion);
   });
 
-  getWorkspaceContextSuggestions({ tools, workspaceContext, recentToolIds }).forEach((suggestion) => {
-    suggestions.push(suggestion);
-  });
+  getWorkspaceContextSuggestions({ tools, workspaceContext, recentToolIds }).forEach(
+    (suggestion) => {
+      suggestions.push(suggestion);
+    },
+  );
 
   getSearchFirstCapabilitySuggestions({
     input,
@@ -425,77 +474,86 @@ export function getChatCapabilitySuggestions({
   });
 
   if (capabilityEnabled(capabilities, 'chatMessage')) {
-    suggestions.push(withConfirmation({
-      id: 'follow-up-planning',
-      label: 'Plan follow-up',
-      description: 'Draft a follow-up or outreach plan for clinician review; no message is sent.',
-      kind: 'workflow',
-      action: 'openOutreachPlanner',
-      icon: CHROME_ICONS.messageCircle,
-      source: 'POST /api/chat/message',
-      defaultRank: 10,
-      keywords: ['follow', 'outreach', 'reminder', 'message', 'discharge'],
-    }));
+    suggestions.push(
+      withConfirmation({
+        id: 'follow-up-planning',
+        label: 'Plan follow-up',
+        description: 'Draft a follow-up or outreach plan for clinician review; no message is sent.',
+        kind: 'workflow',
+        action: 'openOutreachPlanner',
+        icon: CHROME_ICONS.messageCircle,
+        source: 'POST /api/chat/message',
+        defaultRank: 10,
+        keywords: ['follow', 'outreach', 'reminder', 'message', 'discharge'],
+      }),
+    );
   }
 
   if (
     capabilityEnabled(capabilities, 'toolsExecute') &&
     capabilityEnabled(capabilities, 'toolsList')
   ) {
-    getExecutorInventoryRecords().map(makeExecutorSuggestion).filter(Boolean).forEach((suggestion) => {
-      suggestions.push(suggestion);
-    });
+    getExecutorInventoryRecords()
+      .map(makeExecutorSuggestion)
+      .filter(Boolean)
+      .forEach((suggestion) => {
+        suggestions.push(suggestion);
+      });
   }
 
-  if (
-    hasPermission(Permission.VIEW_AUDIT_LOGS) &&
-    routeExists(routes, 'GET', '/api/audit/logs')
-  ) {
-    suggestions.push(withConfirmation({
-      id: 'audit-logs',
-      label: 'Review audit logs',
-      description: 'Open the protected audit log surface.',
-      kind: 'route',
-      path: '/audit',
-      icon: CHROME_ICONS.clipboardList,
-      source: 'GET /api/audit/logs',
-      defaultRank: 60,
-      keywords: ['audit', 'log', 'phi', 'access', 'integrity'],
-    }));
+  if (hasPermission(Permission.VIEW_AUDIT_LOGS) && routeExists(routes, 'GET', '/api/audit/logs')) {
+    suggestions.push(
+      withConfirmation({
+        id: 'audit-logs',
+        label: 'Review audit logs',
+        description: 'Open the protected audit log surface.',
+        kind: 'route',
+        path: '/audit',
+        icon: CHROME_ICONS.clipboardList,
+        source: 'GET /api/audit/logs',
+        defaultRank: 60,
+        keywords: ['audit', 'log', 'phi', 'access', 'integrity'],
+      }),
+    );
   }
 
   if (
     capabilityEnabled(capabilities, 'complianceExport') &&
     routeExists(routes, 'POST', '/api/compliance/export')
   ) {
-    suggestions.push(withConfirmation({
-      id: 'data-export',
-      label: 'Request data export',
-      description: 'Open privacy settings for the supported compliance export workflow.',
-      kind: 'route',
-      path: '/settings',
-      icon: CHROME_ICONS.download,
-      source: 'POST /api/compliance/export',
-      defaultRank: 65,
-      keywords: ['export', 'data', 'privacy', 'gdpr', 'compliance'],
-    }));
+    suggestions.push(
+      withConfirmation({
+        id: 'data-export',
+        label: 'Request data export',
+        description: 'Open privacy settings for the supported compliance export workflow.',
+        kind: 'route',
+        path: '/settings',
+        icon: CHROME_ICONS.download,
+        source: 'POST /api/compliance/export',
+        defaultRank: 65,
+        keywords: ['export', 'data', 'privacy', 'gdpr', 'compliance'],
+      }),
+    );
   }
 
   if (
     capabilityEnabled(capabilities, 'notificationsRest') &&
     routeExists(routes, 'GET', '/api/notifications/preferences')
   ) {
-    suggestions.push(withConfirmation({
-      id: 'notification-preferences',
-      label: 'Notification settings',
-      description: 'Open notification preferences, devices, unread state, and test notification actions.',
-      kind: 'route',
-      path: '/notifications',
-      icon: CHROME_ICONS.bell,
-      source: 'GET/PATCH /api/notifications/*',
-      defaultRank: 70,
-      keywords: ['notification', 'alert', 'device', 'preference', 'push'],
-    }));
+    suggestions.push(
+      withConfirmation({
+        id: 'notification-preferences',
+        label: 'Notification settings',
+        description:
+          'Open notification preferences, devices, unread state, and test notification actions.',
+        kind: 'route',
+        path: '/notifications',
+        icon: CHROME_ICONS.bell,
+        source: 'GET/PATCH /api/notifications/*',
+        defaultRank: 70,
+        keywords: ['notification', 'alert', 'device', 'preference', 'push'],
+      }),
+    );
   }
 
   if (
@@ -503,17 +561,20 @@ export function getChatCapabilitySuggestions({
     routeExists(routes, 'GET', '/api/subscriptions/plans') &&
     routeExists(routes, 'POST', '/api/subscriptions/portal')
   ) {
-    suggestions.push(withConfirmation({
-      id: 'billing-account',
-      label: 'Billing and account',
-      description: 'Open Settings for subscription status, checkout, and customer portal actions.',
-      kind: 'route',
-      path: '/settings',
-      icon: CHROME_ICONS.circleDollar,
-      source: 'GET/POST /api/subscriptions/*',
-      defaultRank: 80,
-      keywords: ['billing', 'subscription', 'plan', 'checkout', 'account', 'portal'],
-    }));
+    suggestions.push(
+      withConfirmation({
+        id: 'billing-account',
+        label: 'Billing and account',
+        description:
+          'Open Settings for subscription status, checkout, and customer portal actions.',
+        kind: 'route',
+        path: '/settings',
+        icon: CHROME_ICONS.circleDollar,
+        source: 'GET/POST /api/subscriptions/*',
+        defaultRank: 80,
+        keywords: ['billing', 'subscription', 'plan', 'checkout', 'account', 'portal'],
+      }),
+    );
   }
 
   if (routeExists(routes, 'GET', '/api/users/profile')) {
@@ -547,14 +608,16 @@ export function getChatCapabilitySuggestions({
   });
 
   if (effectiveProfile) {
-    getProfileAssistantRecommendations(effectiveProfile, effectiveTools, 4).forEach((item, index) => {
-      suggestions.push({
-        ...item,
-        icon: getToolIcon(item.toolId),
-        defaultRank: 72 + index,
-        keywords: [item.label, item.toolId, effectiveProfile.role, effectiveProfile.specialty],
-      });
-    });
+    getProfileAssistantRecommendations(effectiveProfile, effectiveTools, 4).forEach(
+      (item, index) => {
+        suggestions.push({
+          ...item,
+          icon: getToolIcon(item.toolId),
+          defaultRank: 72 + index,
+          keywords: [item.label, item.toolId, effectiveProfile.role, effectiveProfile.specialty],
+        });
+      },
+    );
 
     getCareDroidDidYouKnowSuggestions({
       profile: effectiveProfile,
@@ -579,7 +642,7 @@ export function getChatCapabilitySuggestions({
         if (!current || suggestion.defaultRank < current.defaultRank) acc.set(key, suggestion);
         return acc;
       }, new Map())
-      .values()
+      .values(),
   );
 
   return deduped

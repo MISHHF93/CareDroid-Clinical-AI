@@ -25,7 +25,10 @@ export const LocalTerminologyProvider: TerminologyProvider = Object.freeze({
   getConceptById: (id: string) => getComplaintConceptById(id),
 });
 
-function unavailableProvider(sourceSystem: TerminologySourceSystem, reason: string): TerminologyProvider {
+function unavailableProvider(
+  sourceSystem: TerminologySourceSystem,
+  reason: string,
+): TerminologyProvider {
   return Object.freeze({
     sourceSystem,
     available: false,

@@ -217,11 +217,15 @@ export function completeIntakeHandoff(
     note: `First contact at intake handoff (${source}).`,
   });
 
-  stampArrivalControlLayer(store as unknown as Parameters<typeof stampArrivalControlLayer>[0], patientId, {
-    triagePending: true,
-    registrationStatus: 'complete',
-    queueDestination: 'triage-queue',
-  });
+  stampArrivalControlLayer(
+    store as unknown as Parameters<typeof stampArrivalControlLayer>[0],
+    patientId,
+    {
+      triagePending: true,
+      registrationStatus: 'complete',
+      queueDestination: 'triage-queue',
+    },
+  );
 
   const patientAfterStamp = store.patients.find((entry) => entry.id === patientId);
   if (patientAfterStamp) {
@@ -289,12 +293,17 @@ export function completeIntakeHandoff(
           store.updatePatient(patientId, {
             triageAssist: backendAssist,
             triageAssistGeneratedAt: backendAssist.generatedAt,
-            ...(({ handoffSyncPending: false, handoffSyncError: undefined } as unknown) as Partial<import('../types/emergency').Patient>),
+            ...({ handoffSyncPending: false, handoffSyncError: undefined } as unknown as Partial<
+              import('../types/emergency').Patient
+            >),
           });
         }
       })
       .catch((error) => {
-        store.updatePatient(patientId, ({ handoffSyncPending: true, handoffSyncError: formatSyncRecoveryMessage(error) } as unknown) as Partial<import('../types/emergency').Patient>);
+        store.updatePatient(patientId, {
+          handoffSyncPending: true,
+          handoffSyncError: formatSyncRecoveryMessage(error),
+        } as unknown as Partial<import('../types/emergency').Patient>);
       });
   }
 
@@ -310,7 +319,10 @@ export function completeIntakeHandoff(
       triageAssist,
       triageAssistGeneratedAt: triageAssist.generatedAt,
     }).catch((error) => {
-      store.updatePatient(patientId, ({ handoffSyncPending: true, handoffSyncError: formatSyncRecoveryMessage(error) } as unknown) as Partial<import('../types/emergency').Patient>);
+      store.updatePatient(patientId, {
+        handoffSyncPending: true,
+        handoffSyncError: formatSyncRecoveryMessage(error),
+      } as unknown as Partial<import('../types/emergency').Patient>);
     });
   }
 
@@ -318,13 +330,15 @@ export function completeIntakeHandoff(
     isBackendCapabilityEnabled('emergencyTriageAssist') ||
     isBackendCapabilityEnabled('emergencyReceptionHandoff');
 
-  void import('./emergencyCareJourneyOrchestrator').then(({ onPatientArrivalAtReception, onRapidIntakeCompleted }) => {
-    onPatientArrivalAtReception(patientId, { actorName });
-    const latest = store.patients.find((entry) => entry.id === patientId);
-    if (latest) {
-      onRapidIntakeCompleted(latest, { actorName });
-    }
-  });
+  void import('./emergencyCareJourneyOrchestrator').then(
+    ({ onPatientArrivalAtReception, onRapidIntakeCompleted }) => {
+      onPatientArrivalAtReception(patientId, { actorName });
+      const latest = store.patients.find((entry) => entry.id === patientId);
+      if (latest) {
+        onRapidIntakeCompleted(latest, { actorName });
+      }
+    },
+  );
 
   const result = {
     receptionPath: `${CANONICAL_ROUTES.emergencyReception}?arrived=${encodeURIComponent(patientId)}`,

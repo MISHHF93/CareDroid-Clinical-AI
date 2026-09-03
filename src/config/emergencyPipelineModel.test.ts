@@ -20,15 +20,17 @@ describe('emergencyPipelineModel', () => {
   });
 
   it('resolves pipeline stage from reception query params', () => {
-    expect(resolvePipelineStageFromSearchParams({ get: (key) => (key === 'express' ? '1' : '') })).toBe(
-      'register',
-    );
-    expect(resolvePipelineStageFromSearchParams({ get: (key) => (key === 'queue' ? 'verification' : '') })).toBe(
-      'verify',
-    );
-    expect(resolvePipelineStageFromSearchParams({ get: (key) => (key === 'queue' ? 'pretriage' : '') })).toBe(
-      'handoff',
-    );
+    expect(
+      resolvePipelineStageFromSearchParams({ get: (key) => (key === 'express' ? '1' : '') }),
+    ).toBe('register');
+    expect(
+      resolvePipelineStageFromSearchParams({
+        get: (key) => (key === 'queue' ? 'verification' : ''),
+      }),
+    ).toBe('verify');
+    expect(
+      resolvePipelineStageFromSearchParams({ get: (key) => (key === 'queue' ? 'pretriage' : '') }),
+    ).toBe('handoff');
   });
 
   it('registers pulse and shift surfaces', () => {

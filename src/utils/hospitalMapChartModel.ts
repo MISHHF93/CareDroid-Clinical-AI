@@ -32,7 +32,10 @@ export function buildUnitOccupancyChart(
     .filter((row) => row.value >= 0);
 }
 
-export function resolveRoomTone(deviceCount: number, alertCount: number): HospitalRoomMarker['tone'] {
+export function resolveRoomTone(
+  deviceCount: number,
+  alertCount: number,
+): HospitalRoomMarker['tone'] {
   if (alertCount > 0) return 'critical';
   if (deviceCount > 2) return 'warning';
   if (deviceCount > 0) return 'good';

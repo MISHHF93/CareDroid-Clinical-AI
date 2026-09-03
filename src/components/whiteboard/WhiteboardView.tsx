@@ -49,10 +49,7 @@ function WhiteboardView({
 }: WhiteboardViewProps) {
   const [filters, setFilters] = useState<WhiteboardViewFilters>(DEFAULT_WHITEBOARD_VIEW_FILTERS);
 
-  const zoneOptions = useMemo(
-    () => buildWhiteboardZoneOptions(patients, rooms),
-    [patients, rooms],
-  );
+  const zoneOptions = useMemo(() => buildWhiteboardZoneOptions(patients, rooms), [patients, rooms]);
 
   const roomOptions = useMemo(
     () => buildWhiteboardRoomOptions(patients, rooms, filters.zoneId),

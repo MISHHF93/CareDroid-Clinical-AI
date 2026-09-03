@@ -68,7 +68,13 @@ type BuildAiChiefOrchestrationOptions = Readonly<{
   emsArrivals?: EMSArrival[];
   capacity?: CapacitySnapshot;
   referrals?: Referral[];
-  workflowLogs?: Array<{ id: string; type: string; summary: string; timestamp: string; source: string }>;
+  workflowLogs?: Array<{
+    id: string;
+    type: string;
+    summary: string;
+    timestamp: string;
+    source: string;
+  }>;
   emergencySettings?: Record<string, unknown>;
   backendOperationalIntelligence?: OperationalIntelligenceSnapshot | null;
   selectedPatientId?: string | null;
@@ -82,7 +88,9 @@ const DEFAULT_CENTRAL_NODE_ROLE = Object.freeze({
   allowedRoutes: [] as string[],
 });
 
-function buildCentralNodeSource(options: BuildAiChiefOrchestrationOptions): CareDroidCentralNodeSource {
+function buildCentralNodeSource(
+  options: BuildAiChiefOrchestrationOptions,
+): CareDroidCentralNodeSource {
   return {
     patients: options.patients ?? [],
     staff: options.staff ?? [],
@@ -100,7 +108,8 @@ function buildCentralNodeSource(options: BuildAiChiefOrchestrationOptions): Care
       status: 'recorded' as const,
       metadata: {},
     })),
-    emergencySettings: (options.emergencySettings as CareDroidCentralNodeSource['emergencySettings']) ?? {},
+    emergencySettings:
+      (options.emergencySettings as CareDroidCentralNodeSource['emergencySettings']) ?? {},
     websocket: {
       connected: false,
       status: 'disconnected',
@@ -117,16 +126,15 @@ function buildCentralNodeSource(options: BuildAiChiefOrchestrationOptions): Care
     whiteboardSearchQuery: '',
     loading: false,
     backendAvailable: false,
-    capacity:
-      options.capacity ?? {
-        band: 'Green',
-        score: 80,
-        totalPatients: 0,
-        occupiedRooms: 0,
-        boardingCount: 0,
-        reassessmentDue: 0,
-        updatedAt: new Date().toISOString(),
-      },
+    capacity: options.capacity ?? {
+      band: 'Green',
+      score: 80,
+      totalPatients: 0,
+      occupiedRooms: 0,
+      boardingCount: 0,
+      reassessmentDue: 0,
+      updatedAt: new Date().toISOString(),
+    },
     ...options.centralNodeSource,
   };
 }
@@ -152,7 +160,8 @@ function buildPatientContexts(
   selectedPatientId?: string | null,
 ): readonly AiChiefPatientContextSummary[] {
   const active = patients.filter(
-    (patient) => patient.state !== PatientState.Discharge && patient.state !== PatientState.Deceased,
+    (patient) =>
+      patient.state !== PatientState.Discharge && patient.state !== PatientState.Deceased,
   );
 
   const prioritized = [...active].sort((left, right) => {
@@ -279,7 +288,12 @@ function mapBottleneckRisks(
       domain: 'bottlenecks' as const,
       title: bottleneck.title,
       summary: bottleneck.description,
-      severity: bottleneck.severity === 'critical' ? 'critical' : bottleneck.severity === 'high' ? 'warning' : 'info',
+      severity:
+        bottleneck.severity === 'critical'
+          ? 'critical'
+          : bottleneck.severity === 'high'
+            ? 'warning'
+            : 'info',
       reasonCodes: Object.freeze([bottleneck.category, bottleneck.serviceName]),
       route: CANONICAL_ROUTES.emergencyCommandCenter,
       patientId: bottleneck.affectedPatientId,
@@ -333,9 +347,15 @@ function deriveDomainStatuses(
       );
       let status: AiChiefDomainStatus = 'healthy';
       if (domainRisks.some((risk) => risk.severity === 'critical')) status = 'critical';
-      else if (domainRisks.length || domainRecommendations.some((r) => r.priority === 'P0' || r.priority === 'P1')) {
+      else if (
+        domainRisks.length ||
+        domainRecommendations.some((r) => r.priority === 'P0' || r.priority === 'P1')
+      ) {
         status = 'watch';
-      } else if (domain.id === 'department_capacity' && (metrics.capacityBand === 'Red' || metrics.capacityBand === 'Orange')) {
+      } else if (
+        domain.id === 'department_capacity' &&
+        (metrics.capacityBand === 'Red' || metrics.capacityBand === 'Orange')
+      ) {
         status = 'watch';
       } else if (domain.id === 'ems_arrivals' && metrics.inboundEms > 0) {
         status = 'watch';
@@ -419,13 +439,15 @@ export function buildAiChiefOrchestrationSnapshot(
     bottlenecks: bottleneckSnapshot,
   });
 
-  const recommendations = Object.freeze([
-    ...mapWorkflowActions(workflowActions),
-    ...mapOperationalIntelligenceRecommendations(operationalIntelligence),
-  ].sort((left, right) => {
-    const order = { P0: 0, P1: 1, P2: 2, P3: 3 };
-    return order[left.priority] - order[right.priority];
-  }));
+  const recommendations = Object.freeze(
+    [
+      ...mapWorkflowActions(workflowActions),
+      ...mapOperationalIntelligenceRecommendations(operationalIntelligence),
+    ].sort((left, right) => {
+      const order = { P0: 0, P1: 1, P2: 2, P3: 3 };
+      return order[left.priority] - order[right.priority];
+    }),
+  );
 
   const risks = Object.freeze([
     ...mapAlertRisks(alerts),
@@ -442,7 +464,9 @@ export function buildAiChiefOrchestrationSnapshot(
     capacityBand: hospitalOs.metrics.capacityBand,
     threeMinuteBreaches: hospitalOs.metrics.threeMinuteBreaches,
     activeBottlenecks: bottleneckSnapshot.analytics.activeCount,
-    degradedServices: bottleneckSnapshot.serviceHealth.filter((service) => service.status === 'degraded').length,
+    degradedServices: bottleneckSnapshot.serviceHealth.filter(
+      (service) => service.status === 'degraded',
+    ).length,
     reassessmentsDue: centralSnapshot.reassessmentStatus.due,
     boardingPatients: centralSnapshot.boardingStatus.boarders,
   });

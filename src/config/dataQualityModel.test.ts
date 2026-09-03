@@ -69,13 +69,16 @@ describe('dataQualityModel', () => {
   });
 
   it('summarizes department-level risk counts', () => {
-    const summary = summarizeDataQualityRisks([completePatient, {
-      ...completePatient,
-      id: 'p-gap',
-      chiefComplaint: '',
-      mrn: 'TEMP-ID-222222',
-      flags: ['IdentityPending'],
-    }]);
+    const summary = summarizeDataQualityRisks([
+      completePatient,
+      {
+        ...completePatient,
+        id: 'p-gap',
+        chiefComplaint: '',
+        mrn: 'TEMP-ID-222222',
+        flags: ['IdentityPending'],
+      },
+    ]);
 
     expect(summary.activePatientCount).toBe(2);
     expect(summary.patientsWithRisks).toBeGreaterThan(0);

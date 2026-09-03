@@ -100,15 +100,24 @@ const MODULE_ROLE_FIXTURES: Readonly<Record<FeatureModuleId, readonly string[]>>
 });
 
 const ROOT_PAGE_OWNER_RULES: Readonly<Record<string, OwnerRule>> = Object.freeze({
-  AutomationAuditTrail: owner('platform', 'Root audit trail belongs to the platform governance module.'),
+  AutomationAuditTrail: owner(
+    'platform',
+    'Root audit trail belongs to the platform governance module.',
+  ),
   BillingPage: owner('platform', 'Billing is a platform/account surface.'),
   ClinicalAlertsPage: owner('command', 'Clinical alerts are command-center operational signals.'),
-  ClinicalDocumentationAssistant: owner('copilot', 'Documentation assistant is an AI/copilot workflow.'),
+  ClinicalDocumentationAssistant: owner(
+    'copilot',
+    'Documentation assistant is an AI/copilot workflow.',
+  ),
   GDPRNotice: owner('platform', 'GDPR notice is a platform legal/compliance surface.'),
   HelpCenter: owner('platform', 'General help is a platform support surface.'),
   HIPAANotice: owner('platform', 'HIPAA notice is a platform privacy/compliance surface.'),
   NotificationPreferences: owner('settings', 'Notification preferences are settings-owned.'),
-  Patients: owner('whiteboard', 'Root patients page maps to the ED whiteboard/patient board surface.'),
+  Patients: owner(
+    'whiteboard',
+    'Root patients page maps to the ED whiteboard/patient board surface.',
+  ),
   Profile: owner('auth', 'Profile pages belong to identity and account workflows.'),
   ProfileSettings: owner('auth', 'Profile settings belong to identity and account workflows.'),
   Settings: owner('settings', 'Root settings page belongs to the settings module.'),
@@ -135,15 +144,18 @@ const DIRECTORY_OWNER_RULES: Readonly<Record<string, OwnerRule>> = Object.freeze
   saas: owner('platform', 'SaaS operations pages are platform surfaces.'),
   settings: owner('settings', 'Settings pages are owned by the settings module.'),
   team: owner('team', 'Team pages are owned by the team module.'),
-  tools: owner('tools', 'Clinical tool pages are owned by the tools module unless calculator-specific.'),
-  training: owner('platform', 'Training pages are platform education surfaces until a dedicated module is activated.'),
+  tools: owner(
+    'tools',
+    'Clinical tool pages are owned by the tools module unless calculator-specific.',
+  ),
+  training: owner(
+    'platform',
+    'Training pages are platform education surfaces until a dedicated module is activated.',
+  ),
 });
 
 export const PAGE_INVENTORY_FILE_PATHS = Object.freeze(
-  Object.keys(PAGE_FILE_MODULES)
-    .map(normalizePageGlobPath)
-    .filter(isInventoryPageFile)
-    .sort(),
+  Object.keys(PAGE_FILE_MODULES).map(normalizePageGlobPath).filter(isInventoryPageFile).sort(),
 );
 
 export const PAGE_DISPOSITION_FIXTURES = Object.freeze(
@@ -159,7 +171,9 @@ export function getPageInventorySummary(fixtures = PAGE_DISPOSITION_FIXTURES) {
     total: fixtures.length,
     sourceFiles: fixtures.filter((fixture) => fixture.fileRole !== 'support-style').length,
     styleFiles: fixtures.filter((fixture) => fixture.fileRole === 'support-style').length,
-    toolsInventoryFiles: fixtures.filter((fixture) => fixture.sourceFile.startsWith('src/pages/tools/')).length,
+    toolsInventoryFiles: fixtures.filter((fixture) =>
+      fixture.sourceFile.startsWith('src/pages/tools/'),
+    ).length,
     toolsSourceFiles: fixtures.filter(
       (fixture) =>
         fixture.sourceFile.startsWith('src/pages/tools/') && fixture.fileRole !== 'support-style',
@@ -224,9 +238,17 @@ function deriveOwnerRule(sourceFile: string): OwnerRule {
   }
 
   if (lower.startsWith('src/pages/emergency/')) {
-    if (lower.includes('/shift/')) return owner('shift', 'Emergency shift pages are owned by the shift module.');
-    if (lower.includes('reception') || lower.includes('smartintake') || lower.includes('selfarrival')) {
-      return owner('reception', 'Emergency intake and reception pages are owned by the reception module.');
+    if (lower.includes('/shift/'))
+      return owner('shift', 'Emergency shift pages are owned by the shift module.');
+    if (
+      lower.includes('reception') ||
+      lower.includes('smartintake') ||
+      lower.includes('selfarrival')
+    ) {
+      return owner(
+        'reception',
+        'Emergency intake and reception pages are owned by the reception module.',
+      );
     }
     if (lower.includes('dispatch') || lower.includes('ems')) {
       return owner('ems', 'Emergency dispatch and EMS pages are owned by the EMS module.');
@@ -235,10 +257,16 @@ function deriveOwnerRule(sourceFile: string): OwnerRule {
       return owner('calculators', 'Emergency calculator hubs are owned by the calculators module.');
     }
     if (lower.includes('analytics') || lower.includes('pulse')) {
-      return owner('command', 'Emergency analytics and pulse pages are owned by the command module.');
+      return owner(
+        'command',
+        'Emergency analytics and pulse pages are owned by the command module.',
+      );
     }
     if (lower.includes('settings') || lower.includes('help')) {
-      return owner('settings', 'Emergency settings and help pages are owned by settings/support surfaces.');
+      return owner(
+        'settings',
+        'Emergency settings and help pages are owned by settings/support surfaces.',
+      );
     }
     return owner('whiteboard', 'Emergency core pages default to the whiteboard module.');
   }
@@ -247,7 +275,10 @@ function deriveOwnerRule(sourceFile: string): OwnerRule {
     return DIRECTORY_OWNER_RULES[directory];
   }
 
-  return ROOT_PAGE_OWNER_RULES[basename] || owner('platform', 'Unscoped root page defaults to platform ownership.');
+  return (
+    ROOT_PAGE_OWNER_RULES[basename] ||
+    owner('platform', 'Unscoped root page defaults to platform ownership.')
+  );
 }
 
 function deriveDisposition(

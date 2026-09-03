@@ -32,38 +32,45 @@ export const useNotificationActions = () => {
     /**
      * Add a success notification (green check)
      */
-    success: (title, message, action = null) => dispatchNotificationAlert('success', title, message, action),
+    success: (title, message, action = null) =>
+      dispatchNotificationAlert('success', title, message, action),
 
     /**
      * Add an error notification (red X)
      */
-    error: (title, message, action = null) => dispatchNotificationAlert('error', title, message, action),
+    error: (title, message, action = null) =>
+      dispatchNotificationAlert('error', title, message, action),
 
     /**
      * Add a warning notification (orange caution)
      */
-    warning: (title, message, action = null) => dispatchNotificationAlert('warning', title, message, action),
+    warning: (title, message, action = null) =>
+      dispatchNotificationAlert('warning', title, message, action),
 
     /**
      * Add an info notification (blue i)
      */
-    info: (title, message, action = null) => dispatchNotificationAlert('info', title, message, action),
+    info: (title, message, action = null) =>
+      dispatchNotificationAlert('info', title, message, action),
 
     /**
      * Add a critical notification (red emergency banner)
      * These persist until manually removed and show with high prominence
      */
-    critical: (title, message, action = null) => dispatchNotificationAlert('critical', title, message, action),
+    critical: (title, message, action = null) =>
+      dispatchNotificationAlert('critical', title, message, action),
 
     /**
      * Add an update/product notification
      */
-    update: (title, message, action = null) => dispatchNotificationAlert('info', title, message, action),
+    update: (title, message, action = null) =>
+      dispatchNotificationAlert('info', title, message, action),
 
     /**
      * Add an announcement notification
      */
-    announcement: (title, message, action = null) => dispatchNotificationAlert('info', title, message, action),
+    announcement: (title, message, action = null) =>
+      dispatchNotificationAlert('info', title, message, action),
 
     /**
      * Remove a notification by ID

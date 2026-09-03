@@ -51,8 +51,7 @@ export function resolveWhiteboardDisplayProfile(options: {
   const refreshIntervalMs = resolveDisplayRefreshIntervalMs(options.screenMode, {
     wallDisplayRefreshInterval: options.wallDisplayRefreshInterval,
   });
-  const autoRefresh =
-    DISPLAY_AUTO_REFRESH_SCREEN_MODES.has(options.screenMode) || isDisplayMode;
+  const autoRefresh = DISPLAY_AUTO_REFRESH_SCREEN_MODES.has(options.screenMode) || isDisplayMode;
 
   return {
     isDisplayMode,
@@ -81,43 +80,40 @@ export function useWhiteboardDisplayMode(): WhiteboardDisplayProfile {
     DISPLAY_QUERY_MODES.waitingRoom.includes(displayParam) ||
     deviceContext.isKiosk;
 
-  return useMemo(
-    () => {
-      const profile = resolveWhiteboardDisplayProfile({
-        screenMode,
-        wallDisplayRefreshInterval,
-        displayQueryReadOnly,
-      });
-      const displayContext = {
-        screenMode,
-        displayParam,
-        readOnlyDisplayMode: profile.isDisplayMode || deviceContext.isReadOnlyWall,
-      };
-      return {
-        ...profile,
-        isDisplayMode: profile.isDisplayMode || deviceContext.isKiosk,
-        canMutate:
-          !deviceContext.isKiosk &&
-          !isPublicDisplayContext(displayContext) &&
-          !isReadOnlyOperationalContext(displayContext),
-        autoRefresh:
-          profile.autoRefresh ||
-          DISPLAY_AUTO_REFRESH_SCREEN_MODES.has(screenMode) ||
-          deviceContext.isKiosk,
-        refreshIntervalMs: resolveDisplayRefreshIntervalMs(screenMode, {
-          wallDisplayRefreshInterval,
-        }),
-      };
-    },
-    [
-      deviceContext.isKiosk,
-      deviceContext.isReadOnlyWall,
-      displayParam,
-      displayQueryReadOnly,
+  return useMemo(() => {
+    const profile = resolveWhiteboardDisplayProfile({
       screenMode,
       wallDisplayRefreshInterval,
-    ],
-  );
+      displayQueryReadOnly,
+    });
+    const displayContext = {
+      screenMode,
+      displayParam,
+      readOnlyDisplayMode: profile.isDisplayMode || deviceContext.isReadOnlyWall,
+    };
+    return {
+      ...profile,
+      isDisplayMode: profile.isDisplayMode || deviceContext.isKiosk,
+      canMutate:
+        !deviceContext.isKiosk &&
+        !isPublicDisplayContext(displayContext) &&
+        !isReadOnlyOperationalContext(displayContext),
+      autoRefresh:
+        profile.autoRefresh ||
+        DISPLAY_AUTO_REFRESH_SCREEN_MODES.has(screenMode) ||
+        deviceContext.isKiosk,
+      refreshIntervalMs: resolveDisplayRefreshIntervalMs(screenMode, {
+        wallDisplayRefreshInterval,
+      }),
+    };
+  }, [
+    deviceContext.isKiosk,
+    deviceContext.isReadOnlyWall,
+    displayParam,
+    displayQueryReadOnly,
+    screenMode,
+    wallDisplayRefreshInterval,
+  ]);
 }
 
 export default useWhiteboardDisplayMode;

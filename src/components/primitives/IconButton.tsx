@@ -32,13 +32,7 @@ export function IconButton({
     .join(' ');
 
   return (
-    <button
-      type={type}
-      className={classes}
-      aria-label={label}
-      disabled={disabled}
-      {...props}
-    >
+    <button type={type} className={classes} aria-label={label} disabled={disabled} {...props}>
       <span className="cd-icon-btn__icon" aria-hidden="true">
         {icon}
       </span>

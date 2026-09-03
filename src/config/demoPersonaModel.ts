@@ -45,20 +45,23 @@ export const CURATED_DEMO_ROLE_VIEWS: readonly DemoRoleView[] = Object.freeze([
     sceneLabel: 'Reception-first intake',
     description:
       'First resolution at the front desk — registration, verification, pretriage handoff, and Reception team chat.',
-    copilotHint: 'Log arrival details, escalate critically, and notify triage via Collaboration Hub.',
+    copilotHint:
+      'Log arrival details, escalate critically, and notify triage via Collaboration Hub.',
   },
   {
     emergencyRoleId: EMERGENCY_ROLE_IDS.triageNurse,
     label: 'Triage & acuity',
     sceneLabel: 'Triage queue',
     description: 'Pre-triage queues, acuity assignment, and the Triage staff channel.',
-    copilotHint: 'Document triage findings and coordinate with reception/charge in Collaboration Hub.',
+    copilotHint:
+      'Document triage findings and coordinate with reception/charge in Collaboration Hub.',
   },
   {
     emergencyRoleId: EMERGENCY_ROLE_IDS.chargeNurse,
     label: 'Charge / flow control',
     sceneLabel: 'Charge nurse whiteboard',
-    description: 'Bed flow, waiting-room safety, reassessment visibility, and Charge Nurses channel.',
+    description:
+      'Bed flow, waiting-room safety, reassessment visibility, and Charge Nurses channel.',
     copilotHint: 'Flag breaches and align the floor via Collaboration Hub.',
   },
   {
@@ -93,7 +96,8 @@ export const CURATED_DEMO_ROLE_VIEWS: readonly DemoRoleView[] = Object.freeze([
     emergencyRoleId: EMERGENCY_ROLE_IDS.readOnlyViewer,
     label: 'Ops wall display',
     sceneLabel: 'Read-only departmental board',
-    description: 'Hallway monitor for throughput KPIs — can open Collaboration Hub read-only for briefings.',
+    description:
+      'Hallway monitor for throughput KPIs — can open Collaboration Hub read-only for briefings.',
     copilotHint: 'Walk leadership through situational awareness; open ED channel if needed.',
   },
 ]);
@@ -125,7 +129,8 @@ export const DEMO_JOURNEY_STEPS: readonly DemoJourneyStep[] = Object.freeze([
     id: 'reception',
     letter: 'C',
     title: 'Walk the reception desk',
-    summary: 'Start at registration clerk — first resolution, arrival intake, and escalation paths.',
+    summary:
+      'Start at registration clerk — first resolution, arrival intake, and escalation paths.',
     emergencyRoleId: EMERGENCY_ROLE_IDS.registrationClerk,
   },
   {
@@ -270,7 +275,9 @@ export function applyDemoRoleView(
   nextEmergencyRoleId: string,
 ): DemoUserRecord {
   const role = normalizeEmergencyRole(nextEmergencyRoleId);
-  const base = isDemoPersonaUser(user) ? { ...buildOpenAccessDemoUser(role), ...user } : buildOpenAccessDemoUser(role);
+  const base = isDemoPersonaUser(user)
+    ? { ...buildOpenAccessDemoUser(role), ...user }
+    : buildOpenAccessDemoUser(role);
   const profile = {
     ...((base.profile as DemoUserRecord) || {}),
     roleProfileId: role,
@@ -398,7 +405,9 @@ export function enrichDemoIdentityFallback(
     ((user?.caredroidProfile as DemoUserRecord | undefined)?.saasRole as string | undefined) ||
     resolveSaasRoleFromUser(user as Parameters<typeof resolveSaasRoleFromUser>[0]);
   const localSaasRole = resolveSaasRoleAlias(declaredLocalRole);
-  const fallbackRole = (fallback.saasProfile as DemoUserRecord | undefined)?.role as string | undefined;
+  const fallbackRole = (fallback.saasProfile as DemoUserRecord | undefined)?.role as
+    | string
+    | undefined;
   const fallbackSaasRole = resolveSaasRoleAlias(fallbackRole);
   const sessionOverridesFallback =
     localSaasRole !== null && fallbackSaasRole !== null && localSaasRole !== fallbackSaasRole;

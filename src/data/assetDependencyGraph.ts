@@ -131,7 +131,9 @@ export function buildLocalAssetDependencyGraph({
 
   const routes = new Set(chains.map((chain) => chain.route).filter(Boolean));
   const backendServices = new Set(chains.flatMap((chain) => chain.backendServices));
-  const integrations = new Set(chains.flatMap((chain) => chain.integrations.map((item) => item.id)));
+  const integrations = new Set(
+    chains.flatMap((chain) => chain.integrations.map((item) => item.id)),
+  );
 
   return {
     generatedAt: new Date(0).toISOString(),

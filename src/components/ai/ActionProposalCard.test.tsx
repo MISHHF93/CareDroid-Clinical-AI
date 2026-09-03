@@ -40,7 +40,9 @@ describe('ActionProposalCard', () => {
     );
     expect(screen.getByTestId('proposal-arguments')).toHaveTextContent('"patientId": "P-1"');
     expect(screen.getByTestId('proposal-risk')).toHaveTextContent(/moderate risk/i);
-    expect(screen.getByTestId('proposal-rollback')).toHaveTextContent(/Not automatically reversible/);
+    expect(screen.getByTestId('proposal-rollback')).toHaveTextContent(
+      /Not automatically reversible/,
+    );
     expect(screen.getByText(/Model: claude-sonnet-4-6/)).toBeInTheDocument();
     expect(screen.getByText(/Prompt: ed-copilot@1.0.0/)).toBeInTheDocument();
     expect(screen.getByTestId('proposal-expiry')).toHaveTextContent(/Approval window closes/);

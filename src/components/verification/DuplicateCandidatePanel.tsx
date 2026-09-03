@@ -14,17 +14,23 @@ export default function DuplicateCandidatePanel({
 }) {
   if (!candidates.length) {
     return (
-      <section className={`duplicate-candidate-panel${compact ? ' duplicate-candidate-panel--compact' : ''}`}>
+      <section
+        className={`duplicate-candidate-panel${compact ? ' duplicate-candidate-panel--compact' : ''}`}
+      >
         <header>
           <h3>{title}</h3>
           <p>{description}</p>
         </header>
-        <p className="duplicate-candidate-panel__empty">No duplicate candidates for current identity evidence.</p>
+        <p className="duplicate-candidate-panel__empty">
+          No duplicate candidates for current identity evidence.
+        </p>
       </section>
     );
   }
 
-  const selectedCandidate = candidates.find((candidate) => candidate.patientId === selectedCandidateId);
+  const selectedCandidate = candidates.find(
+    (candidate) => candidate.patientId === selectedCandidateId,
+  );
 
   return (
     <section
@@ -51,7 +57,9 @@ export default function DuplicateCandidatePanel({
                 ]
                   .filter(Boolean)
                   .join(' ')}
-                onClick={selectable ? () => (onSelectCandidate as any)(candidate.patientId) : undefined}
+                onClick={
+                  selectable ? () => (onSelectCandidate as any)(candidate.patientId) : undefined
+                }
               >
                 <div>
                   <strong>{candidate.displayName}</strong>
@@ -88,8 +96,8 @@ export default function DuplicateCandidatePanel({
           <AlertTriangle size={16} aria-hidden />
           <p>
             {selectedCandidate.displayName} is recommended for{' '}
-            <strong>{duplicateActionLabel(selectedCandidate.recommendedAction)}</strong>. Manual review
-            is required before linking.
+            <strong>{duplicateActionLabel(selectedCandidate.recommendedAction)}</strong>. Manual
+            review is required before linking.
           </p>
         </div>
       ) : null}

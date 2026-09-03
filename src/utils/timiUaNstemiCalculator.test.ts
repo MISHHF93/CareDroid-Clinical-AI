@@ -29,7 +29,12 @@ describe('timiUaNstemiCalculator', () => {
   });
 
   it('sums one point per criterion', () => {
-    const partial = { ...none, age65OrOlder: true, stDeviation: true, elevatedCardiacMarkers: true };
+    const partial = {
+      ...none,
+      age65OrOlder: true,
+      stDeviation: true,
+      elevatedCardiacMarkers: true,
+    };
     const b = computeTimiBreakdown(partial);
     expect(sumTimiScore(b)).toBe(3);
     expect(calculateTimiUaNstemiScore(partial)).toBe(3);

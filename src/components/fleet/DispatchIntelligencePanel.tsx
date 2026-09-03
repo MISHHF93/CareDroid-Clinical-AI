@@ -33,10 +33,7 @@ export default function DispatchIntelligencePanel({
   const navigate = useNavigate();
   const { addMessage } = useConversation();
 
-  const queue = useMemo(
-    () => buildDispatchPriorityQueue(vehicles, alerts),
-    [alerts, vehicles],
-  );
+  const queue = useMemo(() => buildDispatchPriorityQueue(vehicles, alerts), [alerts, vehicles]);
   const loadChart = useMemo(() => buildDispatchLoadChart(queue), [queue]);
   const dispatchLaunch = resolveCatalogLaunch('dispatch-ai');
 
@@ -104,14 +101,16 @@ export default function DispatchIntelligencePanel({
               </article>
             ))
           ) : (
-            <p className="dispatch-intelligence__empty">No dispatch queue rows in the current snapshot.</p>
+            <p className="dispatch-intelligence__empty">
+              No dispatch queue rows in the current snapshot.
+            </p>
           )}
         </div>
       </div>
 
       <p className="dispatch-intelligence__safety">
-        Dispatch Intelligence does not auto-assign vehicles or change live routes. Human dispatchers must approve
-        every assignment.
+        Dispatch Intelligence does not auto-assign vehicles or change live routes. Human dispatchers
+        must approve every assignment.
       </p>
 
       <div className="dispatch-intelligence__actions">

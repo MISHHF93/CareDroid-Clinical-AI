@@ -5,13 +5,15 @@ export const FRONTEND_OS_FLOW = Object.freeze([
     id: 'app-shell',
     label: 'AppShell',
     path: CANONICAL_ROUTES.dashboard,
-    description: 'One authenticated shell owns chrome, workspace context, search, and command launch.',
+    description:
+      'One authenticated shell owns chrome, workspace context, search, and command launch.',
   }),
   Object.freeze({
     id: 'workspace',
     label: 'CareDroid',
     path: CANONICAL_ROUTES.emergencyWhiteboard,
-    description: 'CareDroid sets the operating mode, recommendations, copilot context, and patient flow.',
+    description:
+      'CareDroid sets the operating mode, recommendations, copilot context, and patient flow.',
   }),
   Object.freeze({
     id: 'dashboard',

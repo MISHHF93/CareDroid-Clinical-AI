@@ -386,13 +386,17 @@ vi.mock('../services/platformAssetsApi', async (importOriginal) => {
         },
       }),
       getTenantAdministration: vi.fn().mockResolvedValue({
-        profile: { id: 'org-route-smoke', name: 'Route Smoke Hospital', organizationType: 'hospital' },
+        profile: {
+          id: 'org-route-smoke',
+          name: 'Route Smoke Hospital',
+          organizationType: 'hospital',
+        },
         departments: ['emergency'],
         workspaces: [{ id: 'emergency', name: 'Emergency', enabledToolIds: ['qsofa'] }],
       }),
-      listMarketplacePacks: vi.fn().mockResolvedValue([
-        { id: 'core-platform', name: 'Core Platform', assetIds: ['qsofa'] },
-      ]),
+      listMarketplacePacks: vi
+        .fn()
+        .mockResolvedValue([{ id: 'core-platform', name: 'Core Platform', assetIds: ['qsofa'] }]),
     },
   };
 });
@@ -792,7 +796,7 @@ const RESPONSIVE_MATRIX_ROUTE_IDS = new Set([
   'fleet-command',
 ]);
 const RESPONSIVE_MATRIX_ROUTES = CORE_ROUTE_SMOKE.filter((route) =>
-  RESPONSIVE_MATRIX_ROUTE_IDS.has(route.id)
+  RESPONSIVE_MATRIX_ROUTE_IDS.has(route.id),
 );
 
 function setViewportWidth(width) {
@@ -870,7 +874,7 @@ describe('Route pages smoke — non-empty render', () => {
 
       expectNonEmptyPage(container);
     },
-    15_000
+    15_000,
   );
 });
 
@@ -879,7 +883,9 @@ describe('Route pages smoke — non-empty render', () => {
  * 'calculators-library-filter', which renders 250+ tool cards and takes 80s+ in jsdom regardless of
  * timeout — needs the Playwright/axe-core suite (e2e/a11y.spec.mjs) for real-browser coverage instead.
  */
-const A11Y_SMOKE_ROUTES = CORE_ROUTE_SMOKE.filter((route) => route.id !== 'calculators-library-filter');
+const A11Y_SMOKE_ROUTES = CORE_ROUTE_SMOKE.filter(
+  (route) => route.id !== 'calculators-library-filter',
+);
 
 describe('Route pages smoke — accessibility (axe, WCAG 2.1 A/AA)', () => {
   beforeEach(async () => {
@@ -915,17 +921,17 @@ describe('Route pages smoke — accessibility (axe, WCAG 2.1 A/AA)', () => {
       });
 
       const seriousOrCritical = results.violations.filter(
-        (v) => v.impact === 'serious' || v.impact === 'critical'
+        (v) => v.impact === 'serious' || v.impact === 'critical',
       );
 
       expect(
         seriousOrCritical,
         seriousOrCritical
           .map((v) => `${v.id} (${v.impact}, ${v.nodes.length} node(s)): ${v.help} — ${v.helpUrl}`)
-          .join('\n')
+          .join('\n'),
       ).toEqual([]);
     },
-    30_000
+    30_000,
   );
 });
 
@@ -959,7 +965,7 @@ describe('Route pages smoke — light and dark theme render', () => {
           await findHeadingTextMatch(route.heading);
         } else {
           expect(
-            await screen.findByRole('heading', { level: 1, name: route.heading })
+            await screen.findByRole('heading', { level: 1, name: route.heading }),
           ).toBeInTheDocument();
         }
 
@@ -968,7 +974,7 @@ describe('Route pages smoke — light and dark theme render', () => {
         unmount();
       }
     },
-    20_000
+    20_000,
   );
 });
 
@@ -1003,7 +1009,7 @@ describe('Route pages smoke — compact viewport (no crash)', () => {
 
       expectNonEmptyPage(container);
     },
-    15_000
+    15_000,
   );
 });
 
@@ -1036,7 +1042,7 @@ describe('Route pages smoke — requested responsive matrix', () => {
           await findHeadingTextMatch(route.heading);
         } else {
           expect(
-            await screen.findByRole('heading', { level: 1, name: route.heading })
+            await screen.findByRole('heading', { level: 1, name: route.heading }),
           ).toBeInTheDocument();
         }
 
@@ -1044,7 +1050,7 @@ describe('Route pages smoke — requested responsive matrix', () => {
         unmount();
       }
     },
-    45_000
+    45_000,
   );
 });
 
@@ -1068,11 +1074,11 @@ describe('Route pages smoke — calculator forms', () => {
               element={<Calculators initialCalculatorId={slug} />}
             />
           </Routes>
-        </MemoryRouter>
+        </MemoryRouter>,
       );
 
       expect(
-        await screen.findByRole('heading', { level: 1, name: /medical calculators/i })
+        await screen.findByRole('heading', { level: 1, name: /medical calculators/i }),
       ).toBeInTheDocument();
       // Specialty families resolve via React.lazy (Cycle 67); wait for Suspense
       // to settle before asserting on the interface node.
@@ -1081,6 +1087,6 @@ describe('Route pages smoke — calculator forms', () => {
       });
       expectNonEmptyPage(container);
     },
-    15_000
+    15_000,
   );
 });

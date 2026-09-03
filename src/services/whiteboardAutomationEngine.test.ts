@@ -51,7 +51,9 @@ describe('whiteboardAutomationEngine', () => {
     const snapshot = evaluateWhiteboardAutomation(patient(), now);
 
     expect(snapshot.displayState).toBe('MSE Due');
-    expect(snapshot.events.find((event) => event.id === 'mse-due')?.overdueMinutes).toBeGreaterThan(0);
+    expect(snapshot.events.find((event) => event.id === 'mse-due')?.overdueMinutes).toBeGreaterThan(
+      0,
+    );
   });
 
   it('flags awaiting nurse review when reassessment escalation is active', () => {
@@ -166,7 +168,12 @@ describe('whiteboardAutomationEngine', () => {
       state: PatientState.Orders,
       chiefComplaint: 'Chest pain',
       timeline: [
-        { id: 'order-1', type: 'OrderPlaced', timestamp: '2026-06-24T09:00:00.000Z', to: PatientState.Orders },
+        {
+          id: 'order-1',
+          type: 'OrderPlaced',
+          timestamp: '2026-06-24T09:00:00.000Z',
+          to: PatientState.Orders,
+        },
         {
           id: 'result-1',
           type: 'ResultReceived',

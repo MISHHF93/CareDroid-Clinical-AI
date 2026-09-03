@@ -55,9 +55,7 @@ function compareField(
   const incomingDigits = digitsOnly(String(incomingValue));
   const normalizedMatch =
     normalize(patientValue) === normalize(incomingValue) ||
-    (patientDigits.length >= 4 &&
-      incomingDigits.length >= 4 &&
-      patientDigits === incomingDigits);
+    (patientDigits.length >= 4 && incomingDigits.length >= 4 && patientDigits === incomingDigits);
   if (normalizedMatch) {
     matchedFields.push(field);
     onMatch();
@@ -106,9 +104,16 @@ export function scorePatientDuplicate(
       score += 16;
     },
   );
-  compareField('dateOfBirth', patient.dob, demographics.dateOfBirth, matchedFields, conflictingFields, () => {
-    score += 25;
-  });
+  compareField(
+    'dateOfBirth',
+    patient.dob,
+    demographics.dateOfBirth,
+    matchedFields,
+    conflictingFields,
+    () => {
+      score += 25;
+    },
+  );
   compareField('phone', patient.phone, demographics.phone, matchedFields, conflictingFields, () => {
     score += 12;
   });
@@ -119,8 +124,7 @@ export function scorePatientDuplicate(
     score += 35;
   });
 
-  const healthCard =
-    patient.healthCardNumber || patient.healthCard || patient.phn || '';
+  const healthCard = patient.healthCardNumber || patient.healthCard || patient.phn || '';
   compareField(
     'healthCardNumber',
     healthCard,

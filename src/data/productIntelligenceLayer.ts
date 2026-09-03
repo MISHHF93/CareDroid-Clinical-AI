@@ -117,7 +117,9 @@ function calculateEngagementScore(product) {
 
 function calculateRoi(product) {
   const netValue = product.estimatedValue - product.implementationCost;
-  const roiRatio = product.implementationCost ? product.estimatedValue / product.implementationCost : 0;
+  const roiRatio = product.implementationCost
+    ? product.estimatedValue / product.implementationCost
+    : 0;
   const roiScore = clampScore((netValue / Math.max(product.implementationCost, 1)) * 45 + 50);
   return {
     estimatedValue: product.estimatedValue,
@@ -168,7 +170,9 @@ function buildProductRecord(product) {
   };
 }
 
-export function buildProductIntelligenceLayer({ products = PRODUCT_INTELLIGENCE_PRODUCTS }: any = {}) {
+export function buildProductIntelligenceLayer({
+  products = PRODUCT_INTELLIGENCE_PRODUCTS,
+}: any = {}) {
   const productRecords = products.map(buildProductRecord);
 
   return {
@@ -180,8 +184,14 @@ export function buildProductIntelligenceLayer({ products = PRODUCT_INTELLIGENCE_
       averageRoi: average(productRecords.map((product) => product.roi.score)),
       averageHealth: average(productRecords.map((product) => product.health.score)),
       averageEngagement: average(productRecords.map((product) => product.engagement.score)),
-      totalEstimatedValue: productRecords.reduce((sum, product) => sum + product.roi.estimatedValue, 0),
-      totalImplementationCost: productRecords.reduce((sum, product) => sum + product.roi.implementationCost, 0),
+      totalEstimatedValue: productRecords.reduce(
+        (sum, product) => sum + product.roi.estimatedValue,
+        0,
+      ),
+      totalImplementationCost: productRecords.reduce(
+        (sum, product) => sum + product.roi.implementationCost,
+        0,
+      ),
     },
   };
 }

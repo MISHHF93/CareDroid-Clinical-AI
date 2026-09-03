@@ -71,8 +71,7 @@ export function normalizePredictiveMaintenanceInput(input: any = {}) {
   const mileage = toOptionalNumber(input.mileage);
 
   return {
-    vehicleAgeYears:
-      vehicleAgeYears != null && vehicleAgeYears < 0 ? null : vehicleAgeYears,
+    vehicleAgeYears: vehicleAgeYears != null && vehicleAgeYears < 0 ? null : vehicleAgeYears,
     mileage: mileage != null && mileage < 0 ? null : mileage,
     monthsSinceLastService: (() => {
       const n = toOptionalNumber(input.monthsSinceLastService);
@@ -96,9 +95,17 @@ export function normalizePredictiveMaintenanceInput(input: any = {}) {
 function buildInspectionWindows(riskBand, normalized) {
   const templates = {
     critical: [
-      { daysFromNow: 0, priority: 'urgent', reason: 'Critical maintenance risk — schedule immediate inspection' },
+      {
+        daysFromNow: 0,
+        priority: 'urgent',
+        reason: 'Critical maintenance risk — schedule immediate inspection',
+      },
       { daysFromNow: 3, priority: 'high', reason: 'Follow-up systems check after urgent service' },
-      { daysFromNow: 14, priority: 'medium', reason: 'Verify corrective actions and clear diagnostic codes' },
+      {
+        daysFromNow: 14,
+        priority: 'medium',
+        reason: 'Verify corrective actions and clear diagnostic codes',
+      },
     ],
     high: [
       { daysFromNow: 7, priority: 'high', reason: 'Elevated wear and fault indicators' },

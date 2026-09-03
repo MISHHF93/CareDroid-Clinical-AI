@@ -16,22 +16,23 @@ export type HospitalCommandMetricId =
   | 'unresolved-alerts'
   | 'three-minute-compliance';
 
-export const HOSPITAL_COMMAND_ACTIONABLE_METRICS: readonly HospitalCommandMetricId[] = Object.freeze([
-  'department-occupancy',
-  'waiting-patients',
-  'critical-patients',
-  'avg-wait-time',
-  'length-of-stay',
-  'doctors-available',
-  'nurses-available',
-  'bed-capacity',
-  'ems-arrivals',
-  'ambulance-eta',
-  'service-bottlenecks',
-  'ai-recommendations',
-  'unresolved-alerts',
-  'three-minute-compliance',
-]);
+export const HOSPITAL_COMMAND_ACTIONABLE_METRICS: readonly HospitalCommandMetricId[] =
+  Object.freeze([
+    'department-occupancy',
+    'waiting-patients',
+    'critical-patients',
+    'avg-wait-time',
+    'length-of-stay',
+    'doctors-available',
+    'nurses-available',
+    'bed-capacity',
+    'ems-arrivals',
+    'ambulance-eta',
+    'service-bottlenecks',
+    'ai-recommendations',
+    'unresolved-alerts',
+    'three-minute-compliance',
+  ]);
 
 /** Role-ordered metric ids — first items are highest priority for that role. */
 export const HOSPITAL_COMMAND_ROLE_METRICS: Readonly<
@@ -110,8 +111,7 @@ export function resolveHospitalCommandMetricsForRole(
   role: string | null | undefined,
   limit = 12,
 ): readonly HospitalCommandMetricId[] {
-  const ordered =
-    (role && HOSPITAL_COMMAND_ROLE_METRICS[role]) || DEFAULT_ROLE_METRICS;
+  const ordered = (role && HOSPITAL_COMMAND_ROLE_METRICS[role]) || DEFAULT_ROLE_METRICS;
   return ordered.slice(0, limit);
 }
 

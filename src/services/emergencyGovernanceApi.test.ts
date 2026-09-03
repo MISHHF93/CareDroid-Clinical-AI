@@ -31,8 +31,16 @@ describe('emergencyGovernanceApi', () => {
     await fetchEmergencyGovernanceViolations(5);
     await validateEmergencyGovernancePrompts();
 
-    expect(apiFetchJson).toHaveBeenNthCalledWith(1, '/api/emergency/governance/registry', expect.any(Object));
-    expect(apiFetchJson).toHaveBeenNthCalledWith(2, '/api/emergency/governance/safety-rules', expect.any(Object));
+    expect(apiFetchJson).toHaveBeenNthCalledWith(
+      1,
+      '/api/emergency/governance/registry',
+      expect.any(Object),
+    );
+    expect(apiFetchJson).toHaveBeenNthCalledWith(
+      2,
+      '/api/emergency/governance/safety-rules',
+      expect.any(Object),
+    );
     expect(apiFetchJson).toHaveBeenNthCalledWith(
       3,
       '/api/emergency/governance/compliance?days=14',

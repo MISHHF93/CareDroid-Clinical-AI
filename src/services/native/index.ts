@@ -1,5 +1,9 @@
 export { biometric } from './biometric';
-export type { BiometricAvailability, BiometricAuthResult, BiometricPromptOptions } from './biometric';
+export type {
+  BiometricAvailability,
+  BiometricAuthResult,
+  BiometricPromptOptions,
+} from './biometric';
 
 export { voiceInput } from './voiceInput';
 export type { VoiceResult } from './voiceInput';

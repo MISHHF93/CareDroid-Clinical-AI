@@ -42,7 +42,9 @@ describe('unifiedOperationalIntelligence contract', () => {
       'patient_flow_updated',
     ] as const) {
       expect(UNIFIED_OPERATIONAL_INTELLIGENCE_TRIGGER_EVENTS).toContain(eventType);
-      handleUnifiedOperationalIntelligenceBackendEvent(eventType, { tenantId: 'CareDroid Emergency Department' });
+      handleUnifiedOperationalIntelligenceBackendEvent(eventType, {
+        tenantId: 'CareDroid Emergency Department',
+      });
       scheduleUnifiedOperationalIntelligenceRefresh(eventType);
     }
   });

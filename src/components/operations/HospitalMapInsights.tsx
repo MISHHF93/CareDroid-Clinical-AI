@@ -118,30 +118,29 @@ export default function HospitalMapInsights({
   });
 
   const floorRooms = useMemo(
-    () => (snapshot?.rooms || []).filter((room) => !activeFloorId || room.floorId === activeFloorId),
+    () =>
+      (snapshot?.rooms || []).filter((room) => !activeFloorId || room.floorId === activeFloorId),
     [activeFloorId, snapshot?.rooms],
   );
   const roomMarkers = useMemo(() => buildRoomMarkers(floorRooms), [floorRooms]);
   const floorDevices = useMemo(
     () =>
       (snapshot?.devices || []).filter(
-        (device) =>
-          !activeFloorId ||
-          floorRooms.some((room) => room.id === device.roomId),
+        (device) => !activeFloorId || floorRooms.some((room) => room.id === device.roomId),
       ),
     [activeFloorId, floorRooms, snapshot?.devices],
   );
   const deviceMarkers = useMemo(() => buildDeviceMarkers(floorDevices), [floorDevices]);
-  const occupancyChart = useMemo(
-    () => buildUnitOccupancyChart(capacityUnits),
-    [capacityUnits],
-  );
+  const occupancyChart = useMemo(() => buildUnitOccupancyChart(capacityUnits), [capacityUnits]);
   const summary = useMemo(
     () => (snapshot ? summarizeHospitalMapSnapshot(snapshot) : null),
     [snapshot],
   );
   const activeAlerts = useMemo(
-    () => (snapshot?.alerts || []).filter((alert) => (alert.status || 'active') === 'active').slice(0, 6),
+    () =>
+      (snapshot?.alerts || [])
+        .filter((alert) => (alert.status || 'active') === 'active')
+        .slice(0, 6),
     [snapshot?.alerts],
   );
 
@@ -149,8 +148,7 @@ export default function HospitalMapInsights({
     ? [DEMO_LIVE_STATES.DEMO, DEMO_LIVE_STATES.BACKEND_UNAVAILABLE, DEMO_LIVE_STATES.UNSUPPORTED]
     : [DEMO_LIVE_STATES.DEMO, DEMO_LIVE_STATES.UNSUPPORTED];
 
-  const viewBox =
-    floors.find((floor) => floor.id === activeFloorId)?.viewBox || '0 0 1000 620';
+  const viewBox = floors.find((floor) => floor.id === activeFloorId)?.viewBox || '0 0 1000 620';
 
   return (
     <section className="hospital-map-insights" aria-label="Hospital floor plan insights">
@@ -169,8 +167,17 @@ export default function HospitalMapInsights({
       />
 
       {summary ? (
-        <div className="hospital-map-insights__metrics" role="group" aria-label="Hospital map summary metrics">
-          <MetricCard label="Rooms" value={String(summary.rooms)} hint="Mapped rooms in snapshot" tone="neutral" />
+        <div
+          className="hospital-map-insights__metrics"
+          role="group"
+          aria-label="Hospital map summary metrics"
+        >
+          <MetricCard
+            label="Rooms"
+            value={String(summary.rooms)}
+            hint="Mapped rooms in snapshot"
+            tone="neutral"
+          />
           <MetricCard
             label="Devices"
             value={String(summary.devices)}
@@ -193,7 +200,10 @@ export default function HospitalMapInsights({
       ) : null}
 
       <div className="hospital-map-insights__layout">
-        <section className="hospital-map-insights__map-shell" aria-label="Hospital floor plan canvas">
+        <section
+          className="hospital-map-insights__map-shell"
+          aria-label="Hospital floor plan canvas"
+        >
           {floors.length > 1 ? (
             <div
               className="hospital-map-insights__floor-tabs"
@@ -208,7 +218,9 @@ export default function HospitalMapInsights({
                   role="tab"
                   tabIndex={floorTabs.tabIndexFor(floor.id)}
                   onKeyDown={floorTabs.onKeyDown}
-                  {...((floor.id === activeFloorId) ? { 'aria-selected': 'true' as const } : { 'aria-selected': 'false' as const })}
+                  {...(floor.id === activeFloorId
+                    ? { 'aria-selected': 'true' as const }
+                    : { 'aria-selected': 'false' as const })}
                   className={floor.id === activeFloorId ? 'is-active' : undefined}
                   onClick={() => setSelectedFloorId(floor.id)}
                 >
@@ -223,7 +235,11 @@ export default function HospitalMapInsights({
             role="img"
             aria-label="Hospital floor plan with rooms and devices"
           >
-            <svg viewBox={viewBox} className="hospital-map-insights__svg" preserveAspectRatio="xMidYMid meet">
+            <svg
+              viewBox={viewBox}
+              className="hospital-map-insights__svg"
+              preserveAspectRatio="xMidYMid meet"
+            >
               {roomMarkers.map((room) => (
                 <g key={room.id}>
                   <rect
@@ -236,10 +252,18 @@ export default function HospitalMapInsights({
                     stroke={ROOM_STROKE[room.tone]}
                     strokeWidth="2"
                   />
-                  <text x={room.x + 12} y={room.y + 22} className="hospital-map-insights__room-label">
+                  <text
+                    x={room.x + 12}
+                    y={room.y + 22}
+                    className="hospital-map-insights__room-label"
+                  >
                     {room.label}
                   </text>
-                  <text x={room.x + 12} y={room.y + 40} className="hospital-map-insights__room-meta">
+                  <text
+                    x={room.x + 12}
+                    y={room.y + 40}
+                    className="hospital-map-insights__room-meta"
+                  >
                     {room.deviceCount} devices · {room.alertCount} alerts
                   </text>
                 </g>
@@ -292,7 +316,9 @@ export default function HospitalMapInsights({
                 </article>
               ))
             ) : (
-              <p className="hospital-map-insights__empty">No active device alerts in the current snapshot.</p>
+              <p className="hospital-map-insights__empty">
+                No active device alerts in the current snapshot.
+              </p>
             )}
           </div>
 

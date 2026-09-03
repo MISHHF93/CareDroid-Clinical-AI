@@ -17,12 +17,9 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const calculatorsCss = readFileSync(join(__dirname, 'Calculators.css'), 'utf8');
 const mobileFirstCss = readFileSync(
   join(__dirname, '../../styles/mobile-first-layout.css'),
-  'utf8'
+  'utf8',
 );
-const mobilePrCss = readFileSync(
-  join(__dirname, '../../styles/calculators-mobile-pr.css'),
-  'utf8'
-);
+const mobilePrCss = readFileSync(join(__dirname, '../../styles/calculators-mobile-pr.css'), 'utf8');
 const calculatorsJsx = readFileSync(join(__dirname, 'Calculators.tsx'), 'utf8');
 const calculatorPrimitivesJsx = readFileSync(join(__dirname, 'calculatorPrimitives.tsx'), 'utf8');
 const pr4aJsx = readFileSync(join(__dirname, 'pr4aCalculators.tsx'), 'utf8');
@@ -60,9 +57,11 @@ describe('Tier-A calculator inventory', () => {
 });
 
 describe('Calculators.jsx — Tier-A interface hooks', () => {
-  it.each(TIER_A_INTERFACE_MODIFIERS.filter((id) =>
-    ['qsofa', 'news2', 'child-pugh', 'has-bled', 'meld', 'timi'].includes(id)
-  ))('declares calculator-interface--%s', (slug) => {
+  it.each(
+    TIER_A_INTERFACE_MODIFIERS.filter((id) =>
+      ['qsofa', 'news2', 'child-pugh', 'has-bled', 'meld', 'timi'].includes(id),
+    ),
+  )('declares calculator-interface--%s', (slug) => {
     expect(calculatorsJsx).toContain(`calculator-interface--${slug}`);
   });
 
@@ -80,7 +79,7 @@ describe('PR4A & mental health calculator modules', () => {
     'pr4aCalculators exposes calculator-interface--%s',
     (slug) => {
       expect(pr4aJsx).toContain(`calculator-interface--${slug}`);
-    }
+    },
   );
 
   it.each(['phq9', 'gad7'])('mentalHealthCalculators exposes calculator-interface--%s', (slug) => {
@@ -95,31 +94,31 @@ describe('PR4A & mental health calculator modules', () => {
 describe('Calculators.css — responsive layout', () => {
   it('defaults calculator interface to one column (mobile-first)', () => {
     expect(mobileFirstCss).toMatch(
-      /\.calculator-interface[\s\S]*grid-template-columns:\s*minmax\(0,\s*1fr\)/
+      /\.calculator-interface[\s\S]*grid-template-columns:\s*minmax\(0,\s*1fr\)/,
     );
     expect(mobileFirstCss).toMatch(
-      /@media \(min-width: 1024px\)[\s\S]*\.calculator-interface[\s\S]*minmax\(0,\s*1fr\) minmax\(0,\s*1fr\)/
+      /@media \(min-width: 1024px\)[\s\S]*\.calculator-interface[\s\S]*minmax\(0,\s*1fr\) minmax\(0,\s*1fr\)/,
     );
     expect(calculatorsCss).not.toMatch(
-      /\.calculator-interface\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s*minmax\(0,\s*1fr\)/
+      /\.calculator-interface\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s*minmax\(0,\s*1fr\)/,
     );
   });
 
   it('collapses calc-input-grid to one column on mobile', () => {
     expect(calculatorsCss).toMatch(
-      /\.calc-input-grid--responsive[\s\S]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*220px\)/
+      /\.calc-input-grid--responsive[\s\S]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*220px\)/,
     );
     expect(calculatorsCss).toMatch(
-      /@media \(max-width: 640px\)[\s\S]*\.calc-input-grid--responsive[\s\S]*grid-template-columns:\s*1fr/
+      /@media \(max-width: 640px\)[\s\S]*\.calc-input-grid--responsive[\s\S]*grid-template-columns:\s*1fr/,
     );
   });
 
   it('stacks action buttons and enforces touch targets on mobile', () => {
     expect(calculatorsCss).toMatch(
-      /@media \(max-width: 640px\)[\s\S]*\.calc-actions[\s\S]*flex-direction:\s*column/
+      /@media \(max-width: 640px\)[\s\S]*\.calc-actions[\s\S]*flex-direction:\s*column/,
     );
     expect(calculatorsCss).toMatch(
-      /@media \(max-width: 640px\)[\s\S]*\.calc-calculate-btn[\s\S]*min-height:\s*var\(--touch-target-min\)/
+      /@media \(max-width: 640px\)[\s\S]*\.calc-calculate-btn[\s\S]*min-height:\s*var\(--touch-target-min\)/,
     );
   });
 
@@ -149,10 +148,10 @@ describe('Calculators.css — responsive layout', () => {
 
   it('stacks unit rows and full-width selects on mobile', () => {
     expect(calculatorsCss).toMatch(
-      /@media \(max-width: 640px\)[\s\S]*\.calc-input-row--with-unit[\s\S]*flex-direction:\s*column/
+      /@media \(max-width: 640px\)[\s\S]*\.calc-input-row--with-unit[\s\S]*flex-direction:\s*column/,
     );
     expect(calculatorsCss).toMatch(
-      /@media \(max-width: 640px\)[\s\S]*\.calc-select-field[\s\S]*min-height:\s*var\(--touch-target-min\)/
+      /@media \(max-width: 640px\)[\s\S]*\.calc-select-field[\s\S]*min-height:\s*var\(--touch-target-min\)/,
     );
   });
 
@@ -168,13 +167,17 @@ describe('Calculators.css — responsive typography & touch', () => {
   });
 
   it('enforces minimum touch height on primary form controls', () => {
-    expect(calculatorsCss).toMatch(/\.calc-input-field[\s\S]*min-height:\s*var\(--touch-target-min\)/);
-    expect(calculatorsCss).toMatch(/\.calc-calculate-btn[\s\S]*min-height:\s*var\(--touch-target-min\)/);
+    expect(calculatorsCss).toMatch(
+      /\.calc-input-field[\s\S]*min-height:\s*var\(--touch-target-min\)/,
+    );
+    expect(calculatorsCss).toMatch(
+      /\.calc-calculate-btn[\s\S]*min-height:\s*var\(--touch-target-min\)/,
+    );
   });
 
   it('compacts callouts on mobile without removing them', () => {
     expect(calculatorsCss).toMatch(
-      /@media \(max-width: 640px\)[\s\S]*\.calc-qsofa-disclaimer[\s\S]*font-size:\s*12px/
+      /@media \(max-width: 640px\)[\s\S]*\.calc-qsofa-disclaimer[\s\S]*font-size:\s*12px/,
     );
   });
 
@@ -194,7 +197,7 @@ describe('PR1–PR5 mobile stylesheet', () => {
 
   it('keeps reset buttons full-width on phones', () => {
     expect(mobilePrCss).toMatch(
-      /@media \(max-width: 767px\)[\s\S]*\.calc-reset-btn[\s\S]*width:\s*100%/
+      /@media \(max-width: 767px\)[\s\S]*\.calc-reset-btn[\s\S]*width:\s*100%/,
     );
   });
 
@@ -204,8 +207,12 @@ describe('PR1–PR5 mobile stylesheet', () => {
   });
 
   it('prevents TIMI-style fieldsets and selects from overflowing phones', () => {
-    expect(mobilePrCss).toMatch(/\.calc-pr1-form,[\s\S]*\.calc-timi-fieldset[\s\S]*min-inline-size:\s*0/);
-    expect(mobilePrCss).toMatch(/\.calc-timi-fieldset,[\s\S]*\.calc-meld-fieldset[\s\S]*width:\s*100%/);
+    expect(mobilePrCss).toMatch(
+      /\.calc-pr1-form,[\s\S]*\.calc-timi-fieldset[\s\S]*min-inline-size:\s*0/,
+    );
+    expect(mobilePrCss).toMatch(
+      /\.calc-timi-fieldset,[\s\S]*\.calc-meld-fieldset[\s\S]*width:\s*100%/,
+    );
     expect(mobilePrCss).toMatch(/\.calc-timi-row select[\s\S]*max-width:\s*100%/);
   });
 });

@@ -105,7 +105,13 @@ export const ED_OPERATING_SURFACES: readonly EdOperatingSurfaceDefinition[] = Ob
     surfaceId: 'ems',
     label: 'EMS Pipeline',
     phaseId: 'pre-arrival',
-    journeyStageIds: ['ambulance-dispatch', 'ems-en-route', 'ems-arrival-scene', 'prehospital-care', 'hospital-pre-arrival'],
+    journeyStageIds: [
+      'ambulance-dispatch',
+      'ems-en-route',
+      'ems-arrival-scene',
+      'prehospital-care',
+      'hospital-pre-arrival',
+    ],
     ownerRole: 'EMS coordinator',
     priority: 'P0',
     primaryDecision: 'Confirm inbound handoff and offload readiness',
@@ -395,7 +401,9 @@ const ROUTE_PREFIX_SURFACE: readonly Readonly<{ prefix: string; surfaceId: strin
     { prefix: CANONICAL_ROUTES.dashboard, surfaceId: 'command-center' },
   ]);
 
-export function resolveEdOperatingSurfaceFromPath(pathname: string): EdOperatingSurfaceDefinition | null {
+export function resolveEdOperatingSurfaceFromPath(
+  pathname: string,
+): EdOperatingSurfaceDefinition | null {
   const normalized = pathname.split('?')[0].replace(/\/+$/, '') || '/';
   const pipelineSurface = getEmergencySurface(normalized);
   if (pipelineSurface?.id && SURFACE_BY_ID[pipelineSurface.id]) {

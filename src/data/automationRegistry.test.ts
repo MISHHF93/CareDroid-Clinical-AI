@@ -33,7 +33,7 @@ describe('automationRegistry', () => {
           subscriptionTier: expect.any(String),
           status: expect.any(String),
           workspaceVisibility: expect.any(Array),
-        })
+        }),
       );
     }
   });
@@ -48,7 +48,7 @@ describe('automationRegistry', () => {
         'Governance Solution',
         'Research Solution',
         'Education Solution',
-      ])
+      ]),
     );
   });
 
@@ -65,13 +65,23 @@ describe('automationRegistry', () => {
         'Virtual ED',
         'Discharge Summary Drafting',
         'Prior Authorization',
-      ])
+      ]),
     );
-    expect(getWorkspaceAutomations('laboratory').map((automation) => automation.title)).toContain('Critical Value Notification');
-    expect(getWorkspaceAutomations('medical-iot').map((automation) => automation.title)).toContain('Telemetry Lost');
-    expect(getWorkspaceAutomations('fleet').map((automation) => automation.title)).toContain('Dispatch Queue');
-    expect(getWorkspaceAutomations('governance').map((automation) => automation.title)).toContain('AI Risk Escalation');
-    expect(getAutomationById('emergency-automated-triage-matrix').outputs).toContain('risk profile');
+    expect(getWorkspaceAutomations('laboratory').map((automation) => automation.title)).toContain(
+      'Critical Value Notification',
+    );
+    expect(getWorkspaceAutomations('medical-iot').map((automation) => automation.title)).toContain(
+      'Telemetry Lost',
+    );
+    expect(getWorkspaceAutomations('fleet').map((automation) => automation.title)).toContain(
+      'Dispatch Queue',
+    );
+    expect(getWorkspaceAutomations('governance').map((automation) => automation.title)).toContain(
+      'AI Risk Escalation',
+    );
+    expect(getAutomationById('emergency-automated-triage-matrix').outputs).toContain(
+      'risk profile',
+    );
     expect(getWorkspaceAutomations('emergency')).toHaveLength(10);
   });
 
@@ -79,13 +89,15 @@ describe('automationRegistry', () => {
     for (const automation of getWorkspaceAutomations('emergency')) {
       expect(automation.readiness).toEqual(
         expect.objectContaining({
-          classification: expect.stringMatching(/Ready to sell|Needs wiring|Needs integration|Future roadmap/),
+          classification: expect.stringMatching(
+            /Ready to sell|Needs wiring|Needs integration|Future roadmap/,
+          ),
           standaloneViability: expect.stringMatching(/yes|partial|no/),
           requiresEhrAccess: expect.any(Boolean),
           requiresIntegration: expect.any(Boolean),
           buyerPersonas: expect.arrayContaining([expect.any(String)]),
           firstCustomerNote: expect.any(String),
-        })
+        }),
       );
     }
   });
@@ -94,18 +106,25 @@ describe('automationRegistry', () => {
     for (const automation of getWorkspaceAutomations('emergency')) {
       expect(automation.patientJourneyStates.length).toBeGreaterThan(0);
       expect(automation.requiredWorkflows).toEqual(automation.patientJourneyStates);
-      expect(automation.patientJourneyStates.every((stateId) => PATIENT_JOURNEY_STATE_IDS.includes(stateId))).toBe(true);
+      expect(
+        automation.patientJourneyStates.every((stateId) =>
+          PATIENT_JOURNEY_STATE_IDS.includes(stateId),
+        ),
+      ).toBe(true);
     }
   });
 
   it('packages the emergency department solution into product tiers', () => {
     const emergency = getAutomationSolutionPackages().find(
-      (solution) => solution.solutionId === 'emergency-department-solution'
+      (solution) => solution.solutionId === 'emergency-department-solution',
     );
     if (!emergency) throw new Error('expected emergency-department-solution to exist');
-    if (!emergency.products) throw new Error('expected emergency-department-solution to have products');
-    if (!emergency.coreMvpPackage) throw new Error('expected emergency-department-solution to have coreMvpPackage');
-    if (!emergency.optionalAddOns) throw new Error('expected emergency-department-solution to have optionalAddOns');
+    if (!emergency.products)
+      throw new Error('expected emergency-department-solution to have products');
+    if (!emergency.coreMvpPackage)
+      throw new Error('expected emergency-department-solution to have coreMvpPackage');
+    if (!emergency.optionalAddOns)
+      throw new Error('expected emergency-department-solution to have optionalAddOns');
 
     expect(emergency.patientJourney).toEqual([
       'arrival',
@@ -126,7 +145,9 @@ describe('automationRegistry', () => {
       'Emergency Flow Professional',
       'Emergency Flow Enterprise',
     ]);
-    const starterCapabilityLabels = emergency.coreMvpPackage.includedCapabilities.map((capability) => capability.label);
+    const starterCapabilityLabels = emergency.coreMvpPackage.includedCapabilities.map(
+      (capability) => capability.label,
+    );
     expect(starterCapabilityLabels).toHaveLength(16);
     expect(starterCapabilityLabels).toEqual(
       expect.arrayContaining([
@@ -146,13 +167,15 @@ describe('automationRegistry', () => {
         'Protocol Retrieval',
         'Workflow Guidance',
         'Emergency Whiteboard',
-      ])
+      ]),
     );
-    expect(emergency.products.find((product) => product.title === 'Emergency Flow Starter')).toEqual(
+    expect(
+      emergency.products.find((product) => product.title === 'Emergency Flow Starter'),
+    ).toEqual(
       expect.objectContaining({
         mvpPackageId: 'emergency-core-mvp',
         automationIds: ['emergency-automated-triage-matrix'],
-      })
+      }),
     );
     expect(emergency.optionalAddOns.map((addOn) => addOn.title)).toEqual(
       expect.arrayContaining([
@@ -164,10 +187,10 @@ describe('automationRegistry', () => {
         'Medical IoT Monitoring',
         'Virtual ED',
         'Prior Authorization',
-      ])
+      ]),
     );
     expect(emergency.analyticsEvents).toEqual(
-      expect.arrayContaining(['assessments_completed', 'calculators_used', 'workflow_launches'])
+      expect.arrayContaining(['assessments_completed', 'calculators_used', 'workflow_launches']),
     );
   });
 
@@ -176,7 +199,7 @@ describe('automationRegistry', () => {
 
     expect(summary.total).toBeGreaterThanOrEqual(25);
     expect(summary.workspaces).toEqual(
-      expect.arrayContaining(['emergency', 'laboratory', 'medical-iot', 'fleet', 'governance'])
+      expect.arrayContaining(['emergency', 'laboratory', 'medical-iot', 'fleet', 'governance']),
     );
     expect(summary.humanReviewRequired).toBeGreaterThan(0);
   });

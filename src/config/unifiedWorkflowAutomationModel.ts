@@ -241,7 +241,9 @@ const DOMAIN_BY_ID = Object.freeze(
   Object.fromEntries(WORKFLOW_AUTOMATION_DOMAINS.map((domain) => [domain.id, domain])),
 ) as Record<WorkflowAutomationDomain, WorkflowAutomationDomainDefinition>;
 
-export function getWorkflowAutomationDomain(id: WorkflowAutomationDomain): WorkflowAutomationDomainDefinition {
+export function getWorkflowAutomationDomain(
+  id: WorkflowAutomationDomain,
+): WorkflowAutomationDomainDefinition {
   return DOMAIN_BY_ID[id];
 }
 
@@ -261,7 +263,9 @@ export function resolvePrimaryDomainForAutomationCategory(
   return resolveDomainsForAutomationCategory(category)[0];
 }
 
-export function isWorkflowAutomationTriggerEvent(eventType: string): eventType is WorkflowAutomationTriggerEvent {
+export function isWorkflowAutomationTriggerEvent(
+  eventType: string,
+): eventType is WorkflowAutomationTriggerEvent {
   return (WORKFLOW_AUTOMATION_TRIGGER_EVENTS as readonly string[]).includes(eventType);
 }
 

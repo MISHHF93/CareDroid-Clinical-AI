@@ -1,9 +1,5 @@
 import { forwardRef } from 'react';
-import type {
-  InputHTMLAttributes,
-  SelectHTMLAttributes,
-  TextareaHTMLAttributes,
-} from 'react';
+import type { InputHTMLAttributes, SelectHTMLAttributes, TextareaHTMLAttributes } from 'react';
 
 type InvalidFlag = { invalid?: boolean };
 

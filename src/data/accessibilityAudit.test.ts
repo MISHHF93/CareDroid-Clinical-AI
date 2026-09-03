@@ -36,7 +36,9 @@ describe('Accessibility audit — WCAG AA contracts', () => {
   });
 
   it('generates a markdown accessibility report from the audit results', () => {
-    const report = formatAccessibilityReportMarkdown(buildAccessibilityAudit(buildCurrentSourceSnapshot()));
+    const report = formatAccessibilityReportMarkdown(
+      buildAccessibilityAudit(buildCurrentSourceSnapshot()),
+    );
 
     expect(report).toContain('# Accessibility Report');
     expect(report).toContain('Target: WCAG AA');

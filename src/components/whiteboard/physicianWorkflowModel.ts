@@ -137,8 +137,8 @@ export function isPhysicianRole(roleId) {
 }
 
 export function shouldShowPhysicianOperationalStrip({
-  screenMode = (undefined as string | undefined),
-  roleId = (undefined as string | undefined),
+  screenMode = undefined as string | undefined,
+  roleId = undefined as string | undefined,
   displayMode = false,
 }: any = {}) {
   if (displayMode) return false;
@@ -237,14 +237,15 @@ export function selectPhysicianOperationalStrip({
 }
 
 export function resolvePatientCardWorkflowProfile({
-  roleId = (undefined as string | undefined),
-  screenMode = (undefined as string | undefined),
+  roleId = undefined as string | undefined,
+  screenMode = undefined as string | undefined,
   displayMode = false,
   canMutateWhiteboard = false,
   isRegistrationClerk = false,
 }: any = {}) {
   if (displayMode) return 'none';
-  if (screenMode === CARE_DROID_SCREEN_MODES.physician || isPhysicianRole(roleId)) return 'physician';
+  if (screenMode === CARE_DROID_SCREEN_MODES.physician || isPhysicianRole(roleId))
+    return 'physician';
   if (canMutateWhiteboard && !isRegistrationClerk) return 'charge';
   return 'none';
 }

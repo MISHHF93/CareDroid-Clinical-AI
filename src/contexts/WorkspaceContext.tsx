@@ -1,4 +1,12 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   CARE_WORKSPACES,
   DEFAULT_CARE_WORKSPACE_ID,
@@ -8,7 +16,10 @@ import {
 import { mergeWorkspacesWithRegistry } from '../data/sidebarToolPresentation';
 import { getUserFacingToolRegistryProjection } from '../data/toolInventory';
 import { apiFetch, getApiErrorMessage, parseApiResponse } from '../services/apiClient';
-import { WorkspaceContextEnvelopeContractSchema, WorkspaceContractSchema } from '../types/workspaceContracts';
+import {
+  WorkspaceContextEnvelopeContractSchema,
+  WorkspaceContractSchema,
+} from '../types/workspaceContracts';
 import logger from '../utils/logger';
 import { useUser } from './UserContext';
 
@@ -101,7 +112,9 @@ export const WorkspaceProvider = ({ children }) => {
   const { authToken, isAuthenticated, isLoading: isUserLoading, user } = useUser();
   const [clientProfile, setClientProfile] = useState(() => readLocalClientProfile());
   const [workspaceContext, setWorkspaceContext] = useState<any>(null);
-  const [workspaces, setWorkspaces] = useState(() => defaultWorkspaces(readLocalClientProfile(), user?.role));
+  const [workspaces, setWorkspaces] = useState(() =>
+    defaultWorkspaces(readLocalClientProfile(), user?.role),
+  );
   const [activeWorkspaceId, setActiveWorkspaceId] = useState(DEFAULT_CARE_WORKSPACE_ID);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -114,7 +127,11 @@ export const WorkspaceProvider = ({ children }) => {
         if (Array.isArray(parsed.workspaces) && parsed.workspaces.length > 0) {
           const defaults = defaultWorkspaces(clientProfile, user?.role);
           setWorkspaces(mergeWorkspacesWithRegistry(parsed.workspaces, defaults));
-          const nextActive = parsed.activeWorkspaceId || clientProfile?.defaultWorkspace || defaults[0]?.id || DEFAULT_CARE_WORKSPACE_ID;
+          const nextActive =
+            parsed.activeWorkspaceId ||
+            clientProfile?.defaultWorkspace ||
+            defaults[0]?.id ||
+            DEFAULT_CARE_WORKSPACE_ID;
           setActiveWorkspaceId(nextActive);
         }
       }
@@ -125,10 +142,7 @@ export const WorkspaceProvider = ({ children }) => {
 
   useEffect(() => {
     try {
-      localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify({ workspaces, activeWorkspaceId })
-      );
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ workspaces, activeWorkspaceId }));
     } catch (error: any) {
       logger.warn('Failed to persist workspaces', { error });
     }
@@ -142,11 +156,12 @@ export const WorkspaceProvider = ({ children }) => {
       setActiveWorkspaceId((current) =>
         nextWorkspaces.some((workspace) => workspace.id === current)
           ? current
-          : profile?.defaultWorkspace || nextWorkspaces[0]?.id || DEFAULT_CARE_WORKSPACE_ID
+          : profile?.defaultWorkspace || nextWorkspaces[0]?.id || DEFAULT_CARE_WORKSPACE_ID,
       );
     };
 
-    const handleClientProfileChanged = (event) => applyClientProfile(event.detail || readLocalClientProfile());
+    const handleClientProfileChanged = (event) =>
+      applyClientProfile(event.detail || readLocalClientProfile());
     window.addEventListener('careDroid:clientProfileChanged', handleClientProfileChanged);
 
     const nextProfile = readLocalClientProfile();
@@ -154,78 +169,86 @@ export const WorkspaceProvider = ({ children }) => {
       applyClientProfile(nextProfile);
     }
 
-    return () => window.removeEventListener('careDroid:clientProfileChanged', handleClientProfileChanged);
+    return () =>
+      window.removeEventListener('careDroid:clientProfileChanged', handleClientProfileChanged);
   }, [clientProfile, user?.role]);
 
-  const applyBackendContext = useCallback((context) => {
-    if (!context?.workspace) return null;
+  const applyBackendContext = useCallback(
+    (context) => {
+      if (!context?.workspace) return null;
 
-    // Trust-boundary validation (2026-08-08): the backend previously had two
-    // different serializers producing genuinely different shapes for the same
-    // Workspace entity (WorkspacesService.serializeWorkspace() vs.
-    // WorkspaceContextService.buildContext()) -- see
-    // backend/src/modules/workspaces/workspace.contracts.ts for the full
-    // history. Both are now required to conform to WorkspaceContractSchema.
-    // Validating here means a future regression on either side surfaces as a
-    // logged contract violation instead of silently reintroducing dead
-    // fallback branches on the frontend (the old code checked
-    // `workspace.displayName`/`workspace.label`/top-level `workspace.workspaceKey`
-    // -- fields the real backend response never actually populated).
-    const envelopeResult = WorkspaceContextEnvelopeContractSchema.safeParse(context);
-    if (!envelopeResult.success) {
-      logger.warn('Workspace context response violated the canonical contract', {
-        issues: envelopeResult.error.issues.slice(0, 10),
-      });
-    }
-    const validatedContext = envelopeResult.success ? envelopeResult.data : context;
-
-    const backendWorkspaces = validatedContext.workspaceState?.workspaces || [];
-    const fallbackById = Object.fromEntries(defaultWorkspaces(null, user?.role).map((workspace) => [workspace.id, workspace]));
-    const normalizedWorkspaces = backendWorkspaces.map((workspace) => {
-      const workspaceResult = WorkspaceContractSchema.safeParse(workspace);
-      if (!workspaceResult.success) {
-        logger.warn('A workspace in workspaceState.workspaces violated the canonical contract', {
-          workspaceId: workspace?.id,
-          issues: workspaceResult.error.issues.slice(0, 10),
+      // Trust-boundary validation (2026-08-08): the backend previously had two
+      // different serializers producing genuinely different shapes for the same
+      // Workspace entity (WorkspacesService.serializeWorkspace() vs.
+      // WorkspaceContextService.buildContext()) -- see
+      // backend/src/modules/workspaces/workspace.contracts.ts for the full
+      // history. Both are now required to conform to WorkspaceContractSchema.
+      // Validating here means a future regression on either side surfaces as a
+      // logged contract violation instead of silently reintroducing dead
+      // fallback branches on the frontend (the old code checked
+      // `workspace.displayName`/`workspace.label`/top-level `workspace.workspaceKey`
+      // -- fields the real backend response never actually populated).
+      const envelopeResult = WorkspaceContextEnvelopeContractSchema.safeParse(context);
+      if (!envelopeResult.success) {
+        logger.warn('Workspace context response violated the canonical contract', {
+          issues: envelopeResult.error.issues.slice(0, 10),
         });
       }
-      // Once validated, every field below is guaranteed present (backend always
-      // populates them -- serializeWorkspace() falls back to workspaceSettingsForType()
-      // internally, so a real workspace type never has empty assistantContext/
-      // shortcuts/enabledToolIds). Local CARE_WORKSPACES fallback is now only a
-      // defensive net for the case validation itself failed (a malformed
-      // response), not routine per-field reconciliation.
-      const validated = workspaceResult.success ? workspaceResult.data : null;
-      const workspaceKey = validated?.workspaceKey || workspace.type || workspace.workspaceKey;
-      const fallback = fallbackById[workspaceKey] || {};
-      return {
-        ...fallback,
-        ...workspace,
-        id: workspaceKey,
-        workspaceKey,
-        backendWorkspaceId: validated?.id || workspace.id,
-        name: validated?.name || fallback.name,
-        path: validated?.routePath || `/workspace/${workspaceKey}`,
-        assistantContext: validated?.assistantContext || fallback.assistantContext,
-        shortcuts: validated?.shortcuts || fallback.shortcuts || [],
-        toolIds: validated?.enabledToolIds || fallback.toolIds || [],
-        workspaceProfile: validated?.workspaceProfile || fallback.workspaceProfile || null,
-        defaultDashboardWidgets: validated?.defaultDashboardWidgets || fallback.defaultDashboardWidgets || [],
-        defaultFilters: validated?.defaultFilters || fallback.defaultFilters || {},
-        restrictedAssets: validated?.restrictedAssets || fallback.restrictedAssets || [],
-      };
-    });
-    const merged = mergeWorkspacesWithRegistry(normalizedWorkspaces, defaultWorkspaces());
-    // The raw entity `id` (a UUID) must never be used as a fallback here -- it
-    // can never match activeWorkspaceId, which is always a workspaceKey-shaped
-    // string (e.g. "emergency"). Removed as a real, if practically unreachable,
-    // latent bug alongside the dead-field cleanup above.
-    const activeWorkspaceId = validatedContext.workspace.workspaceKey || validatedContext.workspace.type;
-    setWorkspaces(merged);
-    setActiveWorkspaceId(activeWorkspaceId || DEFAULT_CARE_WORKSPACE_ID);
-    setWorkspaceContext(validatedContext);
-    return validatedContext;
-  }, [user?.role]);
+      const validatedContext = envelopeResult.success ? envelopeResult.data : context;
+
+      const backendWorkspaces = validatedContext.workspaceState?.workspaces || [];
+      const fallbackById = Object.fromEntries(
+        defaultWorkspaces(null, user?.role).map((workspace) => [workspace.id, workspace]),
+      );
+      const normalizedWorkspaces = backendWorkspaces.map((workspace) => {
+        const workspaceResult = WorkspaceContractSchema.safeParse(workspace);
+        if (!workspaceResult.success) {
+          logger.warn('A workspace in workspaceState.workspaces violated the canonical contract', {
+            workspaceId: workspace?.id,
+            issues: workspaceResult.error.issues.slice(0, 10),
+          });
+        }
+        // Once validated, every field below is guaranteed present (backend always
+        // populates them -- serializeWorkspace() falls back to workspaceSettingsForType()
+        // internally, so a real workspace type never has empty assistantContext/
+        // shortcuts/enabledToolIds). Local CARE_WORKSPACES fallback is now only a
+        // defensive net for the case validation itself failed (a malformed
+        // response), not routine per-field reconciliation.
+        const validated = workspaceResult.success ? workspaceResult.data : null;
+        const workspaceKey = validated?.workspaceKey || workspace.type || workspace.workspaceKey;
+        const fallback = fallbackById[workspaceKey] || {};
+        return {
+          ...fallback,
+          ...workspace,
+          id: workspaceKey,
+          workspaceKey,
+          backendWorkspaceId: validated?.id || workspace.id,
+          name: validated?.name || fallback.name,
+          path: validated?.routePath || `/workspace/${workspaceKey}`,
+          assistantContext: validated?.assistantContext || fallback.assistantContext,
+          shortcuts: validated?.shortcuts || fallback.shortcuts || [],
+          toolIds: validated?.enabledToolIds || fallback.toolIds || [],
+          workspaceProfile: validated?.workspaceProfile || fallback.workspaceProfile || null,
+          defaultDashboardWidgets:
+            validated?.defaultDashboardWidgets || fallback.defaultDashboardWidgets || [],
+          defaultFilters: validated?.defaultFilters || fallback.defaultFilters || {},
+          restrictedAssets: validated?.restrictedAssets || fallback.restrictedAssets || [],
+        };
+      });
+      const merged = mergeWorkspacesWithRegistry(normalizedWorkspaces, defaultWorkspaces());
+      // The raw entity `id` (a UUID) must never be used as a fallback here -- it
+      // can never match activeWorkspaceId, which is always a workspaceKey-shaped
+      // string (e.g. "emergency"). Removed as a real, if practically unreachable,
+      // latent bug alongside the dead-field cleanup above.
+      const activeWorkspaceId =
+        validatedContext.workspace.workspaceKey || validatedContext.workspace.type;
+      setWorkspaces(merged);
+      setActiveWorkspaceId(activeWorkspaceId || DEFAULT_CARE_WORKSPACE_ID);
+      setWorkspaceContext(validatedContext);
+      return validatedContext;
+    },
+    [user?.role],
+  );
 
   // HEAL-234: refreshWorkspaceContext's own async body (2 sequential
   // awaits: apiFetch then parseApiResponse, before applyBackendContext
@@ -295,8 +318,8 @@ export const WorkspaceProvider = ({ children }) => {
   const updateWorkspace = (workspaceId, updates) => {
     setWorkspaces((prev) =>
       prev.map((workspace) =>
-        workspace.id === workspaceId ? { ...workspace, ...updates } : workspace
-      )
+        workspace.id === workspaceId ? { ...workspace, ...updates } : workspace,
+      ),
     );
   };
 
@@ -313,7 +336,7 @@ export const WorkspaceProvider = ({ children }) => {
         (workspace) =>
           workspace.id === workspaceId ||
           workspace.workspaceKey === workspaceId ||
-          workspace.backendWorkspaceId === workspaceId
+          workspace.backendWorkspaceId === workspaceId,
       );
       if (!target) {
         const resolvedWorkspaceId = workspaceId || DEFAULT_CARE_WORKSPACE_ID;
@@ -329,13 +352,14 @@ export const WorkspaceProvider = ({ children }) => {
         // stale workspace's data while activeWorkspaceId already reports the
         // new one.
         const localMatch = defaultWorkspaces(clientProfile, user?.role).find(
-          (workspace) => workspace.id === resolvedWorkspaceId || workspace.workspaceKey === resolvedWorkspaceId
+          (workspace) =>
+            workspace.id === resolvedWorkspaceId || workspace.workspaceKey === resolvedWorkspaceId,
         );
         setActiveWorkspaceId(resolvedWorkspaceId);
         setWorkspaceContext(null);
         if (localMatch) {
           setWorkspaces((prev) =>
-            prev.some((workspace) => workspace.id === localMatch.id) ? prev : [...prev, localMatch]
+            prev.some((workspace) => workspace.id === localMatch.id) ? prev : [...prev, localMatch],
           );
         }
         return { ok: true, data: null, source: 'local' };
@@ -344,7 +368,7 @@ export const WorkspaceProvider = ({ children }) => {
       const targetWorkspaceId = target.workspaceKey || target.id;
       setActiveWorkspaceId(targetWorkspaceId);
       setWorkspaceContext((current) =>
-        workspaceContextMatchesActive(current, targetWorkspaceId) ? current : null
+        workspaceContextMatchesActive(current, targetWorkspaceId) ? current : null,
       );
       if (!target.backendWorkspaceId || (!isAuthenticated && !authToken)) {
         return { ok: true, data: null, source: 'local' };
@@ -370,16 +394,18 @@ export const WorkspaceProvider = ({ children }) => {
         return { ok: false, message };
       }
     },
-    [authToken, isAuthenticated, refreshWorkspaceContext, workspaces, clientProfile, user?.role]
+    [authToken, isAuthenticated, refreshWorkspaceContext, workspaces, clientProfile, user?.role],
   );
 
   const activeWorkspace = useMemo(
-    () => workspaces.find((workspace) => workspace.id === activeWorkspaceId) || workspaces[0] || null,
-    [activeWorkspaceId, workspaces]
+    () =>
+      workspaces.find((workspace) => workspace.id === activeWorkspaceId) || workspaces[0] || null,
+    [activeWorkspaceId, workspaces],
   );
   const activeWorkspaceContext = useMemo(
-    () => (workspaceContextMatchesActive(workspaceContext, activeWorkspaceId) ? workspaceContext : null),
-    [activeWorkspaceId, workspaceContext]
+    () =>
+      workspaceContextMatchesActive(workspaceContext, activeWorkspaceId) ? workspaceContext : null,
+    [activeWorkspaceId, workspaceContext],
   );
 
   const value = useMemo(
@@ -401,13 +427,25 @@ export const WorkspaceProvider = ({ children }) => {
       // the real WorkspaceProfile fields are `recommendedAIAgents`/
       // `recommendedAssetPacks`, confirmed in workspace-taxonomy.ts), fixed
       // alongside this pass.
-      assistantContext: activeWorkspaceContext?.workspace?.assistantContext || activeWorkspace?.assistantContext || '',
+      assistantContext:
+        activeWorkspaceContext?.workspace?.assistantContext ||
+        activeWorkspace?.assistantContext ||
+        '',
       shortcuts: activeWorkspaceContext?.workspace?.shortcuts || activeWorkspace?.shortcuts || [],
-      workspaceProfile: activeWorkspaceContext?.workspace?.workspaceProfile || activeWorkspace?.workspaceProfile || null,
+      workspaceProfile:
+        activeWorkspaceContext?.workspace?.workspaceProfile ||
+        activeWorkspace?.workspaceProfile ||
+        null,
       defaultDashboardWidgets:
-        activeWorkspaceContext?.workspace?.defaultDashboardWidgets || activeWorkspace?.defaultDashboardWidgets || [],
-      defaultFilters: activeWorkspaceContext?.workspace?.defaultFilters || activeWorkspace?.defaultFilters || {},
-      restrictedAssets: activeWorkspaceContext?.workspace?.restrictedAssets || activeWorkspace?.restrictedAssets || [],
+        activeWorkspaceContext?.workspace?.defaultDashboardWidgets ||
+        activeWorkspace?.defaultDashboardWidgets ||
+        [],
+      defaultFilters:
+        activeWorkspaceContext?.workspace?.defaultFilters || activeWorkspace?.defaultFilters || {},
+      restrictedAssets:
+        activeWorkspaceContext?.workspace?.restrictedAssets ||
+        activeWorkspace?.restrictedAssets ||
+        [],
       recommendedAIAgents:
         activeWorkspaceContext?.workspace?.workspaceProfile?.recommendedAIAgents ||
         activeWorkspace?.workspaceProfile?.recommendedAIAgents ||
@@ -439,7 +477,7 @@ export const WorkspaceProvider = ({ children }) => {
       refreshWorkspaceContext,
       switchWorkspace,
       workspaces,
-    ]
+    ],
   );
 
   return <WorkspaceContext.Provider value={value}>{children}</WorkspaceContext.Provider>;

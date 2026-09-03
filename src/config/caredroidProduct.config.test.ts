@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { CAREDROID_PRODUCT } from './caredroidProduct.config';
 import { EMERGENCY_OS_BRANDING } from './emergencyOsBranding.config';
 
-const LEGACY_PRODUCT_NAMES = /Emergency OS|AIIOS|Clinical AI|CareDroid Clinical|Clinical OS|CareDroid-Clinical-AI/i;
+const LEGACY_PRODUCT_NAMES =
+  /Emergency OS|AIIOS|Clinical AI|CareDroid Clinical|Clinical OS|CareDroid-Clinical-AI/i;
 
 describe('caredroidProduct identity', () => {
   it('uses CareDroid as the sole external product name', () => {

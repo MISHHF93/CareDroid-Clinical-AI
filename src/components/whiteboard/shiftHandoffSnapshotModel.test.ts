@@ -21,10 +21,12 @@ describe('shiftHandoffSnapshotModel', () => {
     expect(shouldShowShiftHandoffStrip({ roleId: EMERGENCY_ROLE_IDS.physician })).toBe(true);
     expect(shouldShowShiftHandoffStrip({ roleId: EMERGENCY_ROLE_IDS.chargeNurse })).toBe(true);
     expect(shouldShowShiftHandoffStrip({ roleId: EMERGENCY_ROLE_IDS.triageNurse })).toBe(true);
-    expect(shouldShowShiftHandoffStrip({ roleId: EMERGENCY_ROLE_IDS.registrationClerk })).toBe(false);
-    expect(shouldShowShiftHandoffStrip({ roleId: EMERGENCY_ROLE_IDS.physician, displayMode: true })).toBe(
+    expect(shouldShowShiftHandoffStrip({ roleId: EMERGENCY_ROLE_IDS.registrationClerk })).toBe(
       false,
     );
+    expect(
+      shouldShowShiftHandoffStrip({ roleId: EMERGENCY_ROLE_IDS.physician, displayMode: true }),
+    ).toBe(false);
   });
 
   it('builds five shift metrics with plain labels', () => {

@@ -105,9 +105,9 @@ describe('PatientDetailPanel vitals-entry numeric validation (HEAL-230)', () => 
     fireEvent.click(screen.getByRole('button', { name: /save vitals/i }));
 
     await vi.waitFor(() => {
-      expect(hasPatientFlag(useEmergencyStore.getState().patients[0], PatientFlag.ReassessmentDue)).toBe(
-        true,
-      );
+      expect(
+        hasPatientFlag(useEmergencyStore.getState().patients[0], PatientFlag.ReassessmentDue),
+      ).toBe(true);
     });
   });
 

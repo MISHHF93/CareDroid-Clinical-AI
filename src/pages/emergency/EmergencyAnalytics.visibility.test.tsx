@@ -67,7 +67,9 @@ describe('EmergencyAnalytics visibility', () => {
       </MemoryRouter>,
     );
 
-    expect(await screen.findByRole('heading', { name: 'Department Analytics' })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: 'Department Analytics' }),
+    ).toBeInTheDocument();
     expect(container.querySelector('.emergency-analytics__kpi-strip')).toBeTruthy();
     expect(screen.queryByText('Hourly Arrival Heatmap')).not.toBeInTheDocument();
     expect(screen.queryByText('Top Chief Complaints')).not.toBeInTheDocument();

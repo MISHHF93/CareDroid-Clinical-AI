@@ -85,7 +85,9 @@ export async function fetchBillingOverview() {
 
 export async function fetchUsageSummary({ period = 'month' }: any = {}) {
   try {
-    const response = await apiFetch(`/api/subscriptions/usage?period=${encodeURIComponent(period)}`);
+    const response = await apiFetch(
+      `/api/subscriptions/usage?period=${encodeURIComponent(period)}`,
+    );
     const data = await parseJson(response, null);
     if (!response.ok) {
       return disabled(data?.message || getApiErrorMessage(null, response));
@@ -99,7 +101,7 @@ export async function fetchUsageSummary({ period = 'month' }: any = {}) {
 export async function fetchUsageMeteringFramework({ period = 'month' }: any = {}) {
   try {
     const response = await apiFetch(
-      `/api/subscriptions/usage/metering?period=${encodeURIComponent(period)}`
+      `/api/subscriptions/usage/metering?period=${encodeURIComponent(period)}`,
     );
     const data = await parseJson(response, null);
     if (!response.ok) {

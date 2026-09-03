@@ -17,14 +17,12 @@ export function buildCopilotPatientArtifactContext(
 
   const vitals = latestPatientVitals(patient);
   const savedScores = formatScoresForCopilot(patient);
-  const recentNotes = (patient.notes || [])
-    .slice(-getCopilotRecentNotesLimit())
-    .map((note) => ({
-      id: note.id,
-      content: note.text || note.body || '',
-      createdAt: note.createdAt,
-      authorStaffId: note.authorStaffId,
-    }));
+  const recentNotes = (patient.notes || []).slice(-getCopilotRecentNotesLimit()).map((note) => ({
+    id: note.id,
+    content: note.text || note.body || '',
+    createdAt: note.createdAt,
+    authorStaffId: note.authorStaffId,
+  }));
 
   return {
     patientId: patient.id,
@@ -62,12 +60,12 @@ export function buildCopilotPatientArtifactContext(
           recommendations: (orchestration.prioritizedRecommendations ?? [])
             .slice(0, getCopilotOrchestrationRecLimit())
             .map((rec) => ({
-            toolId: rec.toolId,
-            label: rec.label,
-            launchKind: rec.launchKind,
-            reason: rec.reason,
-            completed: rec.completed,
-          })),
+              toolId: rec.toolId,
+              label: rec.label,
+              launchKind: rec.launchKind,
+              reason: rec.reason,
+              completed: rec.completed,
+            })),
         }
       : null,
     documentArtifacts: patient.documentArtifacts?.length
@@ -159,7 +157,9 @@ export function buildCalculatorCopilotSeed(
       : null,
     savedScores ? `Recent saved scores: ${savedScores}.` : null,
     missingScores,
-    orchestration?.complaintRoute?.guidance ? `Pathway guidance: ${orchestration.complaintRoute.guidance}` : null,
+    orchestration?.complaintRoute?.guidance
+      ? `Pathway guidance: ${orchestration.complaintRoute.guidance}`
+      : null,
     'Ask for any missing context before suggesting next steps. Staff confirmation required.',
   ]
     .filter(Boolean)

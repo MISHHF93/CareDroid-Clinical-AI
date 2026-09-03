@@ -182,7 +182,10 @@ const HOSPITAL_PROFILE_SCREEN_MODES: Readonly<Record<string, CareDroidScreenMode
 });
 
 export function getDefaultScreenModeForRole(role: string): CareDroidScreenMode {
-  const normalized = String(role || '').trim().toLowerCase().replace(/-/g, '_');
+  const normalized = String(role || '')
+    .trim()
+    .toLowerCase()
+    .replace(/-/g, '_');
   const mode =
     HOSPITAL_PROFILE_SCREEN_MODES[normalized] ||
     DEFAULT_SCREEN_MODE_BY_ROLE[normalized as EmergencyRoleId] ||
@@ -196,7 +199,10 @@ export function resolveRouteScreenMode(
   settings: EmergencyScreenSettings = {},
   queueParam?: string | null,
 ): CareDroidScreenMode | null {
-  const normalized = String(role || '').trim().toLowerCase().replace(/-/g, '_');
+  const normalized = String(role || '')
+    .trim()
+    .toLowerCase()
+    .replace(/-/g, '_');
   const triageCapableRoles = new Set<string>([
     EMERGENCY_ROLE_ID.triageNurse,
     EMERGENCY_ROLE_ID.chargeNurse,
@@ -215,7 +221,9 @@ export function resolveRouteScreenMode(
     pathname === CANONICAL_ROUTES.emergencyReception ||
     pathname === CANONICAL_ROUTES.emergencyIntake
   ) {
-    const queue = String(queueParam || '').trim().toLowerCase();
+    const queue = String(queueParam || '')
+      .trim()
+      .toLowerCase();
     if (queue === 'pretriage' && triageCapableRoles.has(normalized as EmergencyRoleId)) {
       return CARE_DROID_SCREEN_MODES.triage;
     }
@@ -230,7 +238,10 @@ export function resolveRouteScreenMode(
   }
 
   if (pathname === CANONICAL_ROUTES.emergencySettings) {
-    const normalized = String(role || '').trim().toLowerCase().replace(/-/g, '_');
+    const normalized = String(role || '')
+      .trim()
+      .toLowerCase()
+      .replace(/-/g, '_');
     if (normalized === EMERGENCY_ROLE_ID.admin || normalized === EMERGENCY_ROLE_ID.edManager) {
       return CARE_DROID_SCREEN_MODES.admin;
     }
@@ -241,7 +252,10 @@ export function resolveRouteScreenMode(
   }
 
   if (pathname === CANONICAL_ROUTES.emergencyWhiteboard || pathname === '/emergency') {
-    const normalized = String(role || '').trim().toLowerCase().replace(/-/g, '_');
+    const normalized = String(role || '')
+      .trim()
+      .toLowerCase()
+      .replace(/-/g, '_');
     if (settings.commandCenterMode) {
       if (
         normalized === EMERGENCY_ROLE_ID.edManager ||
@@ -267,7 +281,9 @@ export function resolveRouteScreenMode(
 /**
  * Unified screen-mode resolver — used by route hooks and central-node snapshot builder.
  */
-export function resolveEmergencyScreenMode(input: ResolveEmergencyScreenModeInput): CareDroidScreenMode {
+export function resolveEmergencyScreenMode(
+  input: ResolveEmergencyScreenModeInput,
+): CareDroidScreenMode {
   const settings = input.emergencySettings || {};
   const enabledModes = settings.enabledScreenModes?.length
     ? settings.enabledScreenModes
@@ -347,7 +363,10 @@ export function shouldUseMinimalAppChrome(screenMode: CareDroidScreenMode): bool
 }
 
 export function getPersonaLabelForRole(role: string): string {
-  const normalized = String(role || '').trim().toLowerCase().replace(/-/g, '_');
+  const normalized = String(role || '')
+    .trim()
+    .toLowerCase()
+    .replace(/-/g, '_');
   switch (normalized) {
     case EMERGENCY_ROLE_ID.registrationClerk:
       return ED_PERSONA_LABELS.receptionClerk;

@@ -28,14 +28,17 @@ function stringifyValue(value) {
 }
 
 function summarizeInputs(parameters) {
-  const entries = Object.entries(parameters || {}).filter(([, value]) => value != null && value !== '');
+  const entries = Object.entries(parameters || {}).filter(
+    ([, value]) => value != null && value !== '',
+  );
   return entries.slice(0, 6);
 }
 
 function inferStatus(result) {
   const errors = asArray(result?.errors);
   const warnings = asArray(result?.warnings);
-  if (result?.setupRequired || result?.unsupported || result?.errorCode === 'UNSUPPORTED_TOOL') return 'needs setup';
+  if (result?.setupRequired || result?.unsupported || result?.errorCode === 'UNSUPPORTED_TOOL')
+    return 'needs setup';
   if (result?.success === false || errors.length > 0) return 'failed';
   if (warnings.length > 0) return 'warning';
   return 'success';
@@ -76,7 +79,9 @@ function summarizeOutput(toolResult, status) {
 
   if (typeof data.summary === 'string') return data.summary;
   if (result.message) return result.message;
-  return status === 'success' ? 'The operation completed successfully.' : 'Review the detailed result below.';
+  return status === 'success'
+    ? 'The operation completed successfully.'
+    : 'Review the detailed result below.';
 }
 
 function nextBestActions(status, followUpSuggestions) {
@@ -100,10 +105,7 @@ function nextBestActions(status, followUpSuggestions) {
     ];
   }
   if (status === 'needs setup') {
-    return [
-      { label: 'Open settings', path: '/settings' },
-      'Retry after setup is complete.',
-    ];
+    return [{ label: 'Open settings', path: '/settings' }, 'Retry after setup is complete.'];
   }
   return [
     { label: 'Review detailed output', path: '/timeline' },
@@ -130,10 +132,13 @@ export default function OperationalResultCard({
   const status = inferStatus(result);
   const inputEntries = summarizeInputs(parameters || toolResult.parameters || result.parameters);
   const canRetryOrEdit = typeof onRetry === 'function' || typeof onEdit === 'function';
-  const sourceLabel = source || (toolResult.toolId ? `POST /api/tools/${toolResult.toolId}/execute` : null);
+  const sourceLabel =
+    source || (toolResult.toolId ? `POST /api/tools/${toolResult.toolId}/execute` : null);
 
   return (
-    <section className={`operational-result-card operational-result-card--${status.replace(' ', '-')}`}>
+    <section
+      className={`operational-result-card operational-result-card--${status.replace(' ', '-')}`}
+    >
       <header className="operational-result-card__header">
         <span className="operational-result-card__icon" aria-hidden>
           <NavIcon icon={getToolIcon(toolResult.toolId)} size={18} />
@@ -144,7 +149,9 @@ export default function OperationalResultCard({
             {toolResult.toolName || toolResult.toolId || 'Tool result'}
           </h3>
         </div>
-        <span className={`operational-result-card__status operational-result-card__status--${status.replace(' ', '-')}`}>
+        <span
+          className={`operational-result-card__status operational-result-card__status--${status.replace(' ', '-')}`}
+        >
           {status}
         </span>
       </header>

@@ -18,7 +18,7 @@ describe('inventory synchronization audit', () => {
     const catalogIds = idSet(rows.flatMap((row) => [row.id, row.primaryId, row.sidebarToolId]));
     const sourceDiscoveryIds = idSet(getAllDiscoveredTools().map((tool) => tool.id));
     const backendPatternIds = idSet(
-      parseClinicalToolPatterns(readToolPatternsSource()).map((pattern) => pattern.toolId)
+      parseClinicalToolPatterns(readToolPatternsSource()).map((pattern) => pattern.toolId),
     );
 
     for (const id of intentIds) {
@@ -31,7 +31,9 @@ describe('inventory synchronization audit', () => {
   });
 
   it('ensures every sidebar tool is represented by catalog/discovery launch surfaces', () => {
-    const catalogIds = idSet(getMedicalToolsCatalogRows().flatMap((row) => [row.id, row.primaryId, row.sidebarToolId]));
+    const catalogIds = idSet(
+      getMedicalToolsCatalogRows().flatMap((row) => [row.id, row.primaryId, row.sidebarToolId]),
+    );
     const sourceDiscoveryIds = idSet(getAllDiscoveredTools().map((tool) => tool.id));
 
     for (const tool of toolRegistry) {

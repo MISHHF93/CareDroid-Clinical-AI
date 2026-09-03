@@ -154,7 +154,7 @@ class OfflineService {
 
       if (toolType) {
         const results = await query.toArray();
-        return results.filter(r => r.toolType === toolType);
+        return results.filter((r) => r.toolType === toolType);
       }
 
       return await query.reverse().toArray();
@@ -220,16 +220,13 @@ class OfflineService {
    */
   async getCachedKnowledge(query) {
     try {
-      const results = await db.knowledgeCache
-        .where('query')
-        .equals(query.toLowerCase())
-        .toArray();
+      const results = await db.knowledgeCache.where('query').equals(query.toLowerCase()).toArray();
 
       if (results.length === 0) return null;
 
       // Find most recent non-expired result
       const now = new Date();
-      const validResults = results.filter(r => new Date(r.expiresAt) > now);
+      const validResults = results.filter((r) => new Date(r.expiresAt) > now);
 
       if (validResults.length === 0) return null;
 
@@ -248,13 +245,10 @@ class OfflineService {
   async cleanupExpiredCache() {
     try {
       const now = new Date().toISOString();
-      const expired = await db.knowledgeCache
-        .where('expiresAt')
-        .below(now)
-        .toArray();
+      const expired = await db.knowledgeCache.where('expiresAt').below(now).toArray();
 
       if (expired.length > 0) {
-        const expiredIds = expired.map(item => item.id);
+        const expiredIds = expired.map((item) => item.id);
         await db.knowledgeCache.bulkDelete(expiredIds);
         logger.info(`Cleaned up ${expired.length} expired cache entries`);
       }
@@ -288,12 +282,7 @@ class OfflineService {
    */
   async getNotifications(userId, limit = 50) {
     try {
-      return await db.notifications
-        .where('userId')
-        .equals(userId)
-        .reverse()
-        .limit(limit)
-        .toArray();
+      return await db.notifications.where('userId').equals(userId).reverse().limit(limit).toArray();
     } catch (error: any) {
       logger.error('Failed to get notifications', { error });
       return [];
@@ -338,7 +327,9 @@ class OfflineService {
     try {
       const snapshots = buildOfflineCatalogSnapshots(now).map((snapshot) => ({
         ...snapshot,
-        staleAt: new Date(new Date(snapshot.cachedAt).getTime() + OFFLINE_CACHE_TTL_MS).toISOString(),
+        staleAt: new Date(
+          new Date(snapshot.cachedAt).getTime() + OFFLINE_CACHE_TTL_MS,
+        ).toISOString(),
         synced: true,
       }));
 
@@ -401,10 +392,16 @@ class OfflineService {
       // even though the field is indexed. `.filter()` scans in JS instead of using the
       // index, which is fine at this table's size and works for any value type.
       const messages = await db.messages.filter((item: any) => item.synced === false).toArray();
-      const conversations = await db.conversations.filter((item: any) => item.synced === false).toArray();
-      const toolResults = await db.toolResults.filter((item: any) => item.synced === false).toArray();
+      const conversations = await db.conversations
+        .filter((item: any) => item.synced === false)
+        .toArray();
+      const toolResults = await db.toolResults
+        .filter((item: any) => item.synced === false)
+        .toArray();
       const auditLogs = await db.auditLogs.filter((item: any) => item.synced === false).toArray();
-      const notifications = await db.notifications.filter((item: any) => item.synced === false).toArray();
+      const notifications = await db.notifications
+        .filter((item: any) => item.synced === false)
+        .toArray();
 
       return {
         messages,
@@ -412,8 +409,12 @@ class OfflineService {
         toolResults,
         auditLogs,
         notifications,
-        total: messages.length + conversations.length + toolResults.length + 
-               auditLogs.length + notifications.length,
+        total:
+          messages.length +
+          conversations.length +
+          toolResults.length +
+          auditLogs.length +
+          notifications.length,
       };
     } catch (error: any) {
       logger.error('Failed to get unsynced items', { error });
@@ -461,8 +462,14 @@ class OfflineService {
         notifications: notificationCount,
         auditLogs: auditLogCount,
         offlineCatalogs: offlineCatalogCount,
-        total: messageCount + conversationCount + toolResultCount + 
-               cacheCount + notificationCount + auditLogCount + offlineCatalogCount,
+        total:
+          messageCount +
+          conversationCount +
+          toolResultCount +
+          cacheCount +
+          notificationCount +
+          auditLogCount +
+          offlineCatalogCount,
       };
     } catch (error: any) {
       logger.error('Failed to get storage stats', { error });

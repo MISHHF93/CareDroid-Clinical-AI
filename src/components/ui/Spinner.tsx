@@ -2,18 +2,13 @@ import './Spinner.css';
 
 /**
  * Loading Spinner Component
- * 
+ *
  * A simple, accessible loading spinner with multiple size options
  * @param {('sm'|'md'|'lg'|'xl')} size - Spinner size
  * @param {('accent'|'white'|'muted')} color - Spinner color variant
  * @param {string} className - Additional CSS classes
  */
-export const Spinner = ({ 
-  size = 'md', 
-  color = 'accent',
-  className = '',
-  ...props 
-}) => {
+export const Spinner = ({ size = 'md', color = 'accent', className = '', ...props }) => {
   return (
     <div
       className={`spinner spinner-${size} spinner-${color} ${className}`}

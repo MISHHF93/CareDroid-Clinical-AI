@@ -36,9 +36,9 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const patternsSource = readFileSync(
   join(
     __dirname,
-    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts'
+    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts',
   ),
-  'utf8'
+  'utf8',
 );
 
 const PR3_DISCOVERY_BY_CANONICAL = Object.freeze(
@@ -46,8 +46,8 @@ const PR3_DISCOVERY_BY_CANONICAL = Object.freeze(
     PR3_CALCULATOR_REGISTRY_IDS.map((id) => [
       id,
       PR3_DISCOVERY_ALIAS_PAIRS.filter(([, c]) => c === id).map(([a]) => a),
-    ])
-  )
+    ]),
+  ),
 );
 
 describe('PR3 launch audit — ten-dimension matrix', () => {
@@ -131,18 +131,24 @@ describe('PR3 launch audit — ten-dimension matrix', () => {
       expect(launch.registryId).toBe(registryId);
       expect(launch.path).toBe(PR3_HUB_PATH);
       expect(launch.chatSeed).toBeTruthy();
-    }
+    },
   );
 
   it('has no PR3 registry ids outside the frozen audit list', () => {
     const hubPr3 = toolRegistry
-      .filter((t) => t.path === PR3_HUB_PATH && (PR3_CALCULATOR_REGISTRY_IDS as readonly string[]).includes(t.id))
+      .filter(
+        (t) =>
+          t.path === PR3_HUB_PATH &&
+          (PR3_CALCULATOR_REGISTRY_IDS as readonly string[]).includes(t.id),
+      )
       .map((t) => t.id);
     expect(hubPr3.sort()).toEqual([...PR3_CALCULATOR_REGISTRY_IDS].sort());
   });
 
   it('has no NLU calculator profiles for PR3 ids that cannot resolveRegistryId', () => {
-    const pr3Nlu = clinicalIntentTools.filter((t) => (PR3_CALCULATOR_REGISTRY_IDS as readonly string[]).includes(t.toolId));
+    const pr3Nlu = clinicalIntentTools.filter((t) =>
+      (PR3_CALCULATOR_REGISTRY_IDS as readonly string[]).includes(t.toolId),
+    );
     expect(pr3Nlu).toHaveLength(PR3_CALCULATOR_REGISTRY_IDS.length);
     for (const row of pr3Nlu) {
       expect(resolveRegistryId(row.toolId)).toBe(row.toolId);
@@ -151,7 +157,7 @@ describe('PR3 launch audit — ten-dimension matrix', () => {
 
   it('does not expose catalog primary rows without hub launch path', () => {
     const rows = getMedicalToolsCatalogRows().filter((r) =>
-      PR3_CALCULATOR_REGISTRY_IDS.includes(r.primaryId)
+      PR3_CALCULATOR_REGISTRY_IDS.includes(r.primaryId),
     );
     for (const row of rows) {
       const launch = resolveCatalogLaunch(row.primaryId);

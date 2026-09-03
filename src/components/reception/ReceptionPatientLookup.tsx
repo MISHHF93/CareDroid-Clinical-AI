@@ -70,7 +70,10 @@ export default function ReceptionPatientLookup({
         </p>
       ) : null}
       {isPatientSearchQueryReady(query) && results.length === 0 ? (
-        <p className="reception-patient-lookup__status reception-patient-lookup__status--empty" role="status">
+        <p
+          className="reception-patient-lookup__status reception-patient-lookup__status--empty"
+          role="status"
+        >
           No matching charts.
           {onCreateNew ? (
             <button
@@ -116,7 +119,9 @@ export default function ReceptionPatientLookup({
                     </small>
                   ) : null}
                 </span>
-                <span className="reception-patient-lookup__match">{matchKind.replace(/-/g, ' ')}</span>
+                <span className="reception-patient-lookup__match">
+                  {matchKind.replace(/-/g, ' ')}
+                </span>
               </button>
             </li>
           ))}

@@ -38,23 +38,17 @@ export default function ShellRouteTab({ title, subtitle }: ShellRouteTabProps) {
               {breadcrumbs.map((crumb, index) => (
                 <li key={`${crumb}-${index}`}>
                   {crumb}
-                  {index < breadcrumbs.length - 1 ? (
-                    <span aria-hidden="true"> › </span>
-                  ) : null}
+                  {index < breadcrumbs.length - 1 ? <span aria-hidden="true"> › </span> : null}
                 </li>
               ))}
             </ol>
           </nav>
         ) : null}
         <h1 className="app-chrome-context__h1">{resolvedTitle}</h1>
-        {resolvedSubtitle ? (
-          <p className="app-chrome-context__sub">{resolvedSubtitle}</p>
-        ) : null}
+        {resolvedSubtitle ? <p className="app-chrome-context__sub">{resolvedSubtitle}</p> : null}
       </div>
 
-      <div className="app-chrome-context__aside">
-        {pageActions}
-      </div>
+      <div className="app-chrome-context__aside">{pageActions}</div>
     </div>
   );
 }

@@ -8,7 +8,15 @@ import {
 
 describe('pageApiBinding.registry', () => {
   it('marks formerly local-only ED surfaces as wired through operating snapshots', () => {
-    for (const pageId of ['dispatch', 'diagnostics', 'handoffs', 'reports', 'pulse', 'shift', 'ed-readiness']) {
+    for (const pageId of [
+      'dispatch',
+      'diagnostics',
+      'handoffs',
+      'reports',
+      'pulse',
+      'shift',
+      'ed-readiness',
+    ]) {
       expect(getPageApiBinding(pageId)?.mode).toBe('wired');
     }
     expect(listLocalOnlyPageBindings()).toEqual([]);

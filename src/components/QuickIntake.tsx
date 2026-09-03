@@ -240,7 +240,10 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
     // or general (non-flag) complaint is still captured for staff review rather than
     // silently dropped, without duplicating the high-risk box's own signal.
     if (detectedComplaintFlags.length) return;
-    if (complaintRecognition.confidenceTier !== 'NO_MATCH' && complaintRecognition.confidenceTier !== 'LOW_CONFIDENCE') {
+    if (
+      complaintRecognition.confidenceTier !== 'NO_MATCH' &&
+      complaintRecognition.confidenceTier !== 'LOW_CONFIDENCE'
+    ) {
       return;
     }
     if (!complaintRecognition.normalizedText) return;
@@ -293,15 +296,15 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
       ? [{ ...vitals, recordedAt: now, recordedBy: 'intake' }]
       : [];
     const safetyFlags: import('../types/emergency').QuickSafetyFlag[] =
-      priority === Priority.P1 || priority === Priority.P2 ? [PatientFlag.HighRisk as import('../types/emergency').QuickSafetyFlag] : [];
-    const complaintPatch = buildHighRiskComplaintPatch(
-      {
-        chiefComplaint: complaint.trim() || complaintCategory || 'Unspecified complaint',
-        complaintCategory: complaintCategory || 'Other',
-        state: PatientState.Triage,
-        triagePending: undefined,
-      },
-    );
+      priority === Priority.P1 || priority === Priority.P2
+        ? [PatientFlag.HighRisk as import('../types/emergency').QuickSafetyFlag]
+        : [];
+    const complaintPatch = buildHighRiskComplaintPatch({
+      chiefComplaint: complaint.trim() || complaintCategory || 'Unspecified complaint',
+      complaintCategory: complaintCategory || 'Other',
+      state: PatientState.Triage,
+      triagePending: undefined,
+    });
     const complaintText = complaint.trim() || complaintCategory || 'Unspecified complaint';
     const intakeState = PatientState.Triage;
     const arrival = buildPatientArrivalRecord({
@@ -450,7 +453,6 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
       role="dialog"
       aria-modal="true"
       aria-labelledby="quick-intake-title"
-
     >
       <style>
         {`
@@ -511,14 +513,8 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
         `}
       </style>
       {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- a <form> is a real interactive element; onKeyDown handles Escape-to-cancel/Enter-to-submit shortcuts */}
-      <form
-        className="quick-intake-modal qi-modal"
-        onSubmit={submit}
-        onKeyDown={handleKeyDown}
-      >
-        <header
-          className="u-panel-header-row"
-        >
+      <form className="quick-intake-modal qi-modal" onSubmit={submit} onKeyDown={handleKeyDown}>
+        <header className="u-panel-header-row">
           <div>
             <h2 id="quick-intake-title" className="u-title-18-750">
               {copy.title}
@@ -540,15 +536,12 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
         <div className="quick-intake-grid qi-grid">
           <section className="u-flex-col-gap-12">
             {copy.showCentralBanner ? (
-            <div aria-label="Central node input mode" className="qi-central-banner">
-              {centralControl.label} receives this as {centralControl.inputProfile.label}.
-              Escalation path: {centralControl.inputProfile.escalationPath.replace(/-/g, ' ')}.
-            </div>
+              <div aria-label="Central node input mode" className="qi-central-banner">
+                {centralControl.label} receives this as {centralControl.inputProfile.label}.
+                Escalation path: {centralControl.inputProfile.escalationPath.replace(/-/g, ' ')}.
+              </div>
             ) : null}
-            <div
-              className="quick-intake-category-grid u-grid-2"
-
-            >
+            <div className="quick-intake-category-grid u-grid-2">
               {CATEGORY_BUTTONS.map((category) => {
                 const active = complaintCategory === category.label;
                 return (
@@ -595,14 +588,16 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
                   role="status"
                 >
                   {complaintRecognition.confidenceTier === 'NO_MATCH' ? (
-                    <>Not recognized as a standard complaint — original text kept, flagged for triage review.</>
+                    <>
+                      Not recognized as a standard complaint — original text kept, flagged for
+                      triage review.
+                    </>
                   ) : (
                     <>
                       Recognized: <strong>{complaintRecognition.canonicalName}</strong>
                       {complaintRecognition.confidenceTier !== 'HIGH_CONFIDENCE'
                         ? ` (${complaintRecognition.confidenceTier === 'MEDIUM_CONFIDENCE' ? 'medium' : 'low'} confidence)`
-                        : ''}
-                      {' '}
+                        : ''}{' '}
                       <AiTruthLabel {...recognizeComplaintTruthLabel()} compact />
                     </>
                   )}
@@ -612,15 +607,10 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
 
             {protocols.length ? (
               <div aria-label="Suggested protocols" className="qi-protocols-box">
-                <div className="qi-label-sm-mb8">
-                  Suggested protocols
-                </div>
+                <div className="qi-label-sm-mb8">Suggested protocols</div>
                 <div className="u-flex-wrap u-gap-8">
                   {protocols.map((protocol) => (
-                    <span
-                      key={protocol}
-                      className="qi-protocol-badge"
-                    >
+                    <span key={protocol} className="qi-protocol-badge">
                       {protocol}
                     </span>
                   ))}
@@ -634,10 +624,7 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
                 </div>
                 <div className="u-flex-wrap u-gap-8">
                   {detectedComplaintFlags.map((flag) => (
-                    <span
-                      key={flag.id}
-                      className="qi-flag-badge"
-                    >
+                    <span key={flag.id} className="qi-flag-badge">
                       {flag.label}
                     </span>
                   ))}
@@ -672,9 +659,7 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
             </div>
 
             <label className="u-flex-col-gap-5">
-              <span className="qi-label-sm">
-                DOB {dob ? `(Age ${age})` : ''}
-              </span>
+              <span className="qi-label-sm">DOB {dob ? `(Age ${age})` : ''}</span>
               <input
                 type="date"
                 value={dob}
@@ -685,9 +670,7 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
             </label>
 
             <div>
-              <div className="qi-label-sm-mb5">
-                Sex
-              </div>
+              <div className="qi-label-sm-mb5">Sex</div>
               <div className="qi-grid-3">
                 {(['M', 'F', 'Other'] as Sex[]).map((candidate) => (
                   <button
@@ -697,7 +680,8 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
                     style={{
                       border: sex === candidate ? '1px solid #0ea5e9' : '1px solid #e0f2fe',
                       borderRadius: 10,
-                      background: sex === candidate ? 'rgba(14, 165, 233, 0.12)' : MEDICAL_THEME.surfaceCard,
+                      background:
+                        sex === candidate ? 'rgba(14, 165, 233, 0.12)' : MEDICAL_THEME.surfaceCard,
                       color: 'var(--medical-ink, #111827)',
                       padding: '8px 6px',
                       cursor: 'pointer',
@@ -721,9 +705,7 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
             </label>
 
             <div>
-              <div className="qi-label-sm-mb5">
-                Vitals
-              </div>
+              <div className="qi-label-sm-mb5">Vitals</div>
               <div className="qi-grid-4">
                 {(
                   [
@@ -750,9 +732,7 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
           </section>
         </div>
 
-        <footer
-          className="quick-intake-footer qi-footer"
-        >
+        <footer className="quick-intake-footer qi-footer">
           <div className="qi-priority-wrap">
             <button
               type="button"

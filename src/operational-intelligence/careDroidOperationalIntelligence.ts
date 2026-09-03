@@ -108,7 +108,8 @@ function buildDegradedOperationalIntelligenceSnapshot({
       featureDistributionShift: false,
       predictionDistributionShift: false,
       confidenceDistributionShift: false,
-      summary: 'Backend operational intelligence unavailable. Displaying central-node context only.',
+      summary:
+        'Backend operational intelligence unavailable. Displaying central-node context only.',
       generatedAt,
     },
     dataFreshness: {
@@ -138,8 +139,12 @@ function buildDegradedOperationalIntelligenceSnapshot({
       activeAlerts: centralSnapshot.currentDepartmentStatus.activeAlerts,
       dataFreshnessStatus,
       humanReviewRequired: true,
-      whatHappensNextReassessmentDue: summarizeWhatHappensNextBoard(patients, { referrals })['reassessment-due'],
-      whatHappensNextTriageNeeded: summarizeWhatHappensNextBoard(patients, { referrals })['triage-needed'],
+      whatHappensNextReassessmentDue: summarizeWhatHappensNextBoard(patients, { referrals })[
+        'reassessment-due'
+      ],
+      whatHappensNextTriageNeeded: summarizeWhatHappensNextBoard(patients, { referrals })[
+        'triage-needed'
+      ],
     },
   };
 }

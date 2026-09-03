@@ -12,18 +12,20 @@ import {
 
 const BASE = '/api/sentinel';
 
-export type SentinelApiResult<T> = Readonly<{
-  ok: true;
-  data: T;
-  message: string;
-  sentinelEnabled: boolean;
-  generatedAt: string;
-}> | Readonly<{
-  ok: false;
-  message: string;
-  unsupported?: boolean;
-  status?: number;
-}>;
+export type SentinelApiResult<T> =
+  | Readonly<{
+      ok: true;
+      data: T;
+      message: string;
+      sentinelEnabled: boolean;
+      generatedAt: string;
+    }>
+  | Readonly<{
+      ok: false;
+      message: string;
+      unsupported?: boolean;
+      status?: number;
+    }>;
 
 async function sentinelFetch<T>(
   capability: string,

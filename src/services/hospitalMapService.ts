@@ -50,11 +50,12 @@ export function summarizeHospitalMapSnapshot(snapshot) {
     beds: snapshot?.beds?.length || 0,
     devices: devices.length,
     offline: devices.filter((device) => device.status === 'offline').length,
-    stale: devices.filter((device) => device.freshness === 'stale' || device.status === 'stale').length,
+    stale: devices.filter((device) => device.freshness === 'stale' || device.status === 'stale')
+      .length,
     lowBattery: devices.filter((device) => Number(device.battery) < 20).length,
     activeAlerts: alerts.filter((alert) => alert.status === 'active').length,
     maintenanceDue: devices.filter((device) =>
-      ['due-soon', 'overdue'].includes(device.maintenanceStatus)
+      ['due-soon', 'overdue'].includes(device.maintenanceStatus),
     ).length,
     calibrationOverdue: devices.filter((device) => device.calibrationStatus === 'overdue').length,
   };
@@ -86,7 +87,8 @@ function normalizeTelemetry(device) {
 
 function normalizeAlert(alert, deviceById) {
   const device = deviceById[alert.deviceId] || {};
-  const triggeredAt = alert.triggeredAt || alert.timestamp || alert.lastObservedAt || device.lastSeenAt || null;
+  const triggeredAt =
+    alert.triggeredAt || alert.timestamp || alert.lastObservedAt || device.lastSeenAt || null;
   return {
     ...alert,
     deviceName: alert.deviceName || device.name || alert.source || 'Unknown device',
@@ -102,7 +104,7 @@ function normalizeAlert(alert, deviceById) {
 function normalizeDevice(device, alerts) {
   const location = device.location || {};
   const activeAlerts = alerts.filter(
-    (alert) => alert.deviceId === device.id && (alert.status || 'active') === 'active'
+    (alert) => alert.deviceId === device.id && (alert.status || 'active') === 'active',
   );
   return {
     ...device,
@@ -124,7 +126,7 @@ function normalizeDevice(device, alerts) {
 function normalizeRoom(room, devices, alerts) {
   const roomDevices = devices.filter((device) => device.roomId === room.id);
   const activeAlertCount = alerts.filter(
-    (alert) => alert.roomId === room.id && (alert.status || 'active') === 'active'
+    (alert) => alert.roomId === room.id && (alert.status || 'active') === 'active',
   ).length;
   return {
     ...room,

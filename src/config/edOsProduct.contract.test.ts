@@ -9,10 +9,7 @@ import {
   DEFAULT_ED_PAGE_UX_CONTRACT,
   PUBLIC_DISPLAY_UX_CONTRACT,
 } from './pageUxContract';
-import {
-  PAGE_REBUILD_REGISTRY,
-  getNextPageRebuildTarget,
-} from './pageRebuildRegistry';
+import { PAGE_REBUILD_REGISTRY, getNextPageRebuildTarget } from './pageRebuildRegistry';
 import { UNIFIED_OPERATIONAL_METRICS } from './unifiedOperationalIntelligence.registry';
 import { CAREDROID_PRODUCT } from './caredroidProduct.config';
 import { getCommandCenterAuthorityPath } from './commandCenterScreenModel';

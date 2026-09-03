@@ -14,7 +14,9 @@ function readStored(): ReceptionPinnedActionsState {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return DEFAULT_STATE;
     const parsed = JSON.parse(raw);
-    return { pinnedQueueTab: typeof parsed?.pinnedQueueTab === 'string' ? parsed.pinnedQueueTab : null };
+    return {
+      pinnedQueueTab: typeof parsed?.pinnedQueueTab === 'string' ? parsed.pinnedQueueTab : null,
+    };
   } catch (error) {
     logger.warn('Failed to read reception pinned actions', { error });
     return DEFAULT_STATE;

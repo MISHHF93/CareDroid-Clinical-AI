@@ -19,7 +19,7 @@ describe('BoardingIntelligenceEngine', () => {
         longestBoardingMinutes: expect.any(Number),
         pendingBeds: expect.any(Number),
         bedPressure: BED_PRESSURE_LEVELS.HIGH,
-      })
+      }),
     );
     expect(metrics.boardingCount).toBeGreaterThan(0);
   });
@@ -33,7 +33,7 @@ describe('BoardingIntelligenceEngine', () => {
       expect.objectContaining({
         patientLabel: expect.any(String),
         pendingBedType: expect.any(String),
-      })
+      }),
     );
   });
 
@@ -48,7 +48,7 @@ describe('BoardingIntelligenceEngine', () => {
         expect.objectContaining({ id: 'boarding-count-escalation' }),
         expect.objectContaining({ id: 'longest-boarder-review' }),
         expect.objectContaining({ id: 'pending-bed-pressure' }),
-      ])
+      ]),
     );
   });
 
@@ -67,8 +67,10 @@ describe('BoardingIntelligenceEngine', () => {
         boarders: expect.any(Array),
         longestBoarders: expect.any(Array),
         safetyStatement: expect.stringMatching(/human-reviewed/i),
-      })
+      }),
     );
-    expect(BoardingIntelligenceEngine.getBoardingDashboard().longestBoarders.length).toBeGreaterThan(0);
+    expect(
+      BoardingIntelligenceEngine.getBoardingDashboard().longestBoarders.length,
+    ).toBeGreaterThan(0);
   });
 });

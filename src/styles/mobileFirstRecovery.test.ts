@@ -27,10 +27,10 @@ describe('mobile-first recovery layer', () => {
     expect(recoveryCss).toContain('@media (max-width: 900px)');
     expect(recoveryCss).toMatch(/\.app-shell-main-content[\s\S]*overflow-y:\s*auto/);
     expect(recoveryCss).toMatch(
-      /\.app-shell-page-body:not\(\.app-shell-page-body--conversation\)[\s\S]*overflow-y:\s*visible/
+      /\.app-shell-page-body:not\(\.app-shell-page-body--conversation\)[\s\S]*overflow-y:\s*visible/,
     );
     expect(recoveryCss.replaceAll(':not(.app-shell-page-body--conversation)', '')).not.toMatch(
-      /\.app-shell-page-body--conversation[\s\S]*overflow-y:\s*visible/
+      /\.app-shell-page-body--conversation[\s\S]*overflow-y:\s*visible/,
     );
   });
 
@@ -77,7 +77,7 @@ describe('mobile-first recovery layer', () => {
 
   it('neutralizes sticky detail panels on mobile while allowing local table scroll', () => {
     expect(recoveryCss).toMatch(
-      /\.app-shell :is\(\.hospital-map-detail, \.fleet-map-detail, \.artifacts-detail\)[\s\S]*position:\s*static/
+      /\.app-shell :is\(\.hospital-map-detail, \.fleet-map-detail, \.artifacts-detail\)[\s\S]*position:\s*static/,
     );
     expect(recoveryCss).toMatch(
       /:is\(\s*table[\s\S]*\.user-table\s*\)[\s\S]*min-width:\s*max-content/,

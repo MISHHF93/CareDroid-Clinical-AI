@@ -108,7 +108,8 @@ const PRESENTATION_BY_MODE: Readonly<
     stripAriaLabel: 'Charge nurse flow metrics',
     pageEyebrow: 'Department flow',
     pageTitle: 'Department Whiteboard',
-    pageSubtitle: 'Waiting volume, provider breaches, reassessments, capacity, and offload pressure.',
+    pageSubtitle:
+      'Waiting volume, provider breaches, reassessments, capacity, and offload pressure.',
     emptyHint: 'No flow signals need charge nurse attention right now.',
     density: 'compact',
   }),
@@ -153,7 +154,8 @@ const PRESENTATION_BY_MODE: Readonly<
     stripAriaLabel: 'Department wall metrics',
     pageEyebrow: 'Department status',
     pageTitle: 'Emergency Department Status',
-    pageSubtitle: 'Live departmental metrics for wall display — aggregate counts only, no patient identifiers.',
+    pageSubtitle:
+      'Live departmental metrics for wall display — aggregate counts only, no patient identifiers.',
     density: 'wall',
     showStripEmptyState: false,
   }),

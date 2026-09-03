@@ -42,7 +42,10 @@ export function deriveResourceActivations(
     .join(' ')
     .toLowerCase();
 
-  if (arrival.criticalChecklist?.type === 'stemi' || /\b(stemi|st elevation|acs|mi)\b/i.test(complaint)) {
+  if (
+    arrival.criticalChecklist?.type === 'stemi' ||
+    /\b(stemi|st elevation|acs|mi)\b/i.test(complaint)
+  ) {
     pushActivation(activations, seen, {
       type: 'stemi',
       label: ACTIVATION_LABELS.stemi,
@@ -66,7 +69,10 @@ export function deriveResourceActivations(
     });
   }
 
-  if (arrival.criticalChecklist?.type === 'trauma' || /\b(trauma|mvc|gsw|penetrating|fall from)\b/i.test(complaint)) {
+  if (
+    arrival.criticalChecklist?.type === 'trauma' ||
+    /\b(trauma|mvc|gsw|penetrating|fall from)\b/i.test(complaint)
+  ) {
     // HEAL-179: this branch previously only looked at complaint text (arrival.severity /
     // "unstable"|"hemorrhage"|"airway" keywords) to pick level-1 vs level-2, even though the
     // sibling respiratory-failure branch above already reads real arrival.vitals.spo2 for its
@@ -88,7 +94,9 @@ export function deriveResourceActivations(
         ? 'trauma-level-1'
         : 'trauma-level-2';
     const baseConfidence = arrival.criticalChecklist?.type === 'trauma' ? 0.9 : 0.78;
-    const rationale = [`Trauma mechanism: ${arrival.mechanismOfInjury || 'documented in complaint'}`];
+    const rationale = [
+      `Trauma mechanism: ${arrival.mechanismOfInjury || 'documented in complaint'}`,
+    ];
     if (hemodynamicallyUnstable) rationale.push(`Hypotensive on arrival (SBP ${sbp} mmHg)`);
     if (severeHeadInjury) rationale.push(`Severe head injury on arrival (GCS ${gcs})`);
     pushActivation(activations, seen, {
@@ -146,7 +154,10 @@ export function deriveResourceActivations(
   });
 }
 
-export function syncResourceActivationsForArrival(arrival: EMSArrival, patient?: Patient | null): EMSArrival {
+export function syncResourceActivationsForArrival(
+  arrival: EMSArrival,
+  patient?: Patient | null,
+): EMSArrival {
   return {
     ...arrival,
     resourceActivations: deriveResourceActivations(arrival, patient),

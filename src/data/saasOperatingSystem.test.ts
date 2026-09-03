@@ -1,8 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  SAAS_OPERATING_SYSTEM_CHAIN,
-  buildSaasOperatingSystemModel,
-} from './saasOperatingSystem';
+import { SAAS_OPERATING_SYSTEM_CHAIN, buildSaasOperatingSystemModel } from './saasOperatingSystem';
 
 describe('saasOperatingSystem', () => {
   it('defines the required SaaS concept chain', () => {

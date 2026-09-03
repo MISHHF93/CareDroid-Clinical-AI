@@ -72,7 +72,9 @@ describe('PediatricDrugCalc', () => {
     await user.type(screen.getByPlaceholderText('Enter weight in kg'), '20');
     await user.click(screen.getByRole('button', { name: /save to patient/i }));
 
-    const savedPatient = useEmergencyStore.getState().patients.find((candidate) => candidate.id === patient.id);
+    const savedPatient = useEmergencyStore
+      .getState()
+      .patients.find((candidate) => candidate.id === patient.id);
     expect(savedPatient?.notes).toEqual(
       expect.arrayContaining([
         expect.objectContaining({

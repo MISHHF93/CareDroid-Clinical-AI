@@ -83,7 +83,7 @@ describe('emergencyRoleScreenMatrix', () => {
     ).toBe(CARE_DROID_SCREEN_MODES.triage);
   });
 
-  it('forces non-ED department pages to a no-pills mode for every visiting role (regression: was falling through to the visiting role\'s own unrelated default)', () => {
+  it("forces non-ED department pages to a no-pills mode for every visiting role (regression: was falling through to the visiting role's own unrelated default)", () => {
     expect(
       resolveEmergencyScreenMode({
         pathname: CANONICAL_ROUTES.laboratory,
@@ -113,9 +113,9 @@ describe('emergencyRoleScreenMatrix', () => {
   });
 
   it('uses command center on analytics route', () => {
-    expect(resolveRouteScreenMode(CANONICAL_ROUTES.emergencyAnalytics, EMERGENCY_ROLE_ID.edManager)).toBe(
-      CARE_DROID_SCREEN_MODES.commandCenter,
-    );
+    expect(
+      resolveRouteScreenMode(CANONICAL_ROUTES.emergencyAnalytics, EMERGENCY_ROLE_ID.edManager),
+    ).toBe(CARE_DROID_SCREEN_MODES.commandCenter);
   });
 
   it('respects enabledScreenModes tenant filter', () => {

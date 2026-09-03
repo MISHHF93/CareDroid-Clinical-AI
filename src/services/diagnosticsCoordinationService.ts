@@ -40,7 +40,10 @@ export function createDiagnosticOrder(params: DiagnosticOrderParams): Diagnostic
   };
   orders.set(order.id, order);
   void import('./emergencyCareJourneyOrchestrator').then(({ onDiagnosticsOrdered }) =>
-    onDiagnosticsOrdered(params.patientId, { actorId: params.orderedBy, actorRole: 'emergency_physician' }),
+    onDiagnosticsOrdered(params.patientId, {
+      actorId: params.orderedBy,
+      actorRole: 'emergency_physician',
+    }),
   );
   return order;
 }
@@ -165,7 +168,8 @@ export type DiagnosticsSummary = {
 export function getDiagnosticsSummary(): DiagnosticsSummary {
   const all = [...orders.values()].filter((o) => o.status !== 'cancelled');
   const pending = (type: DiagnosticOrder['type']) =>
-    all.filter((o) => o.type === type && (o.status === 'ordered' || o.status === 'in_progress')).length;
+    all.filter((o) => o.type === type && (o.status === 'ordered' || o.status === 'in_progress'))
+      .length;
 
   return {
     totalOrders: all.length,

@@ -64,33 +64,37 @@ export default function WhiteboardOpsDetailStrip({
 
   return (
     <section className="whiteboard-ops-detail-strip" aria-label="Operational detail">
-      {expanded ? (<button
-        type="button"
-        className="whiteboard-ops-detail-strip__toggle"
-        aria-expanded="true"
-        onClick={() => setExpanded((current) => !current)}
-      >
-        <span className="whiteboard-ops-detail-strip__title">Ops detail</span>
-        <span className="whiteboard-ops-detail-strip__summary">
-          {summaryParts.join(' · ') || `${signalCount} operational signals`}
-        </span>
-        <span className="whiteboard-ops-detail-strip__chevron" aria-hidden="true">
-          {expanded ? '▾' : '▸'}
-        </span>
-      </button>) : (<button
-        type="button"
-        className="whiteboard-ops-detail-strip__toggle"
-        aria-expanded="false"
-        onClick={() => setExpanded((current) => !current)}
-      >
-        <span className="whiteboard-ops-detail-strip__title">Ops detail</span>
-        <span className="whiteboard-ops-detail-strip__summary">
-          {summaryParts.join(' · ') || `${signalCount} operational signals`}
-        </span>
-        <span className="whiteboard-ops-detail-strip__chevron" aria-hidden="true">
-          {expanded ? '▾' : '▸'}
-        </span>
-      </button>)}
+      {expanded ? (
+        <button
+          type="button"
+          className="whiteboard-ops-detail-strip__toggle"
+          aria-expanded="true"
+          onClick={() => setExpanded((current) => !current)}
+        >
+          <span className="whiteboard-ops-detail-strip__title">Ops detail</span>
+          <span className="whiteboard-ops-detail-strip__summary">
+            {summaryParts.join(' · ') || `${signalCount} operational signals`}
+          </span>
+          <span className="whiteboard-ops-detail-strip__chevron" aria-hidden="true">
+            {expanded ? '▾' : '▸'}
+          </span>
+        </button>
+      ) : (
+        <button
+          type="button"
+          className="whiteboard-ops-detail-strip__toggle"
+          aria-expanded="false"
+          onClick={() => setExpanded((current) => !current)}
+        >
+          <span className="whiteboard-ops-detail-strip__title">Ops detail</span>
+          <span className="whiteboard-ops-detail-strip__summary">
+            {summaryParts.join(' · ') || `${signalCount} operational signals`}
+          </span>
+          <span className="whiteboard-ops-detail-strip__chevron" aria-hidden="true">
+            {expanded ? '▾' : '▸'}
+          </span>
+        </button>
+      )}
 
       {expanded ? (
         <div className="whiteboard-ops-detail-strip__panels">

@@ -1,4 +1,9 @@
-import { useCallback, useRef, type KeyboardEvent as ReactKeyboardEvent, type RefObject } from 'react';
+import {
+  useCallback,
+  useRef,
+  type KeyboardEvent as ReactKeyboardEvent,
+  type RefObject,
+} from 'react';
 
 /**
  * Keyboard behaviour for a WAI-ARIA tab list.

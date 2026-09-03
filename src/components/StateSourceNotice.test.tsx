@@ -15,7 +15,7 @@ describe('StateSourceNotice', () => {
           DEMO_LIVE_STATES.UNSUPPORTED,
         ]}
         details="Test source details."
-      />
+      />,
     );
 
     const notice = screen.getByRole('note', { name: /demo\/live source state/i });

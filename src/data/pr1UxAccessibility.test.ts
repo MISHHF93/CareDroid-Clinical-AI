@@ -15,7 +15,10 @@ import { interpretHasBled } from '../utils/hasBledCalculator';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.tsx'), 'utf8');
 const calculatorsCss = readFileSync(join(__dirname, '../pages/tools/Calculators.css'), 'utf8');
-const calculatorPrimitivesSource = readFileSync(join(__dirname, '../pages/tools/calculatorPrimitives.tsx'), 'utf8');
+const calculatorPrimitivesSource = readFileSync(
+  join(__dirname, '../pages/tools/calculatorPrimitives.tsx'),
+  'utf8',
+);
 
 const CERTAINTY_PATTERN =
   /\b(definitely has|confirmed diagnosis|diagnosis established|rules out|ruled out|diagnostic certainty)\b/i;
@@ -41,16 +44,19 @@ function sliceCalculatorComponent(source, componentName) {
 }
 
 describe('PR1 calculators — shared accessibility affordances', () => {
-  it.each([...PR1_CALCULATOR_REGISTRY_IDS])('%s exposes decision-support lead and safety footer', (id) => {
-    const ui = sliceCalculatorComponent(calculatorsSource, PR1_COMPONENTS[id]);
-    expect(ui).toContain('CalcDecisionSupportLead');
-    expect(ui).toContain('CalcResultSafetyFooter');
-    expect(ui).toContain('CalcInterpretationRegion');
-    expect(ui).toContain('CalcResultsPanel');
-    expect(ui).toContain('scrollCalcResultsIntoView');
-    expect(ui).toContain('resultsRef = useRef');
-    expect(ui).toMatch(/aria-label="Reset .+ form"/);
-  });
+  it.each([...PR1_CALCULATOR_REGISTRY_IDS])(
+    '%s exposes decision-support lead and safety footer',
+    (id) => {
+      const ui = sliceCalculatorComponent(calculatorsSource, PR1_COMPONENTS[id]);
+      expect(ui).toContain('CalcDecisionSupportLead');
+      expect(ui).toContain('CalcResultSafetyFooter');
+      expect(ui).toContain('CalcInterpretationRegion');
+      expect(ui).toContain('CalcResultsPanel');
+      expect(ui).toContain('scrollCalcResultsIntoView');
+      expect(ui).toContain('resultsRef = useRef');
+      expect(ui).toMatch(/aria-label="Reset .+ form"/);
+    },
+  );
 
   it.each(['qsofa', 'news2', 'child-pugh'])('%s marks invalid numeric fields', (id) => {
     const ui = sliceCalculatorComponent(calculatorsSource, PR1_COMPONENTS[id]);

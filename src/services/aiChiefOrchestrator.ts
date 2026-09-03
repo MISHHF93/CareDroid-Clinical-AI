@@ -119,17 +119,35 @@ const BOTTLENECK_ENRICHED_INTENTS = new Set<CareDroidAIIntent>([
 
 const ALERT_SCENARIO_TERMS: ReadonlyArray<{ scenario: AlertScenario; terms: string[] }> = [
   { scenario: 'critical_chest_pain', terms: ['chest pain', 'cardiac', 'mi', 'myocardial'] },
-  { scenario: 'stroke_alert', terms: ['stroke', 'facial droop', 'slurred speech', 'one-sided weakness'] },
+  {
+    scenario: 'stroke_alert',
+    terms: ['stroke', 'facial droop', 'slurred speech', 'one-sided weakness'],
+  },
   { scenario: 'sepsis_alert', terms: ['sepsis', 'septic', 'fever', 'infection'] },
   { scenario: 'pediatric_emergency', terms: ['pediatric', 'infant', 'child', 'neonate'] },
   { scenario: 'trauma_activation', terms: ['trauma', 'major trauma', 'mvc', 'gunshot', 'stab'] },
-  { scenario: 'mental_health_crisis', terms: ['suicidal', 'self harm', 'psychosis', 'behavioral crisis'] },
-  { scenario: 'medication_interaction', terms: ['medication interaction', 'drug interaction', 'polypharmacy'] },
+  {
+    scenario: 'mental_health_crisis',
+    terms: ['suicidal', 'self harm', 'psychosis', 'behavioral crisis'],
+  },
+  {
+    scenario: 'medication_interaction',
+    terms: ['medication interaction', 'drug interaction', 'polypharmacy'],
+  },
   { scenario: 'lab_critical_value', terms: ['critical lab', 'critical value', 'critical result'] },
-  { scenario: 'bed_capacity_breach', terms: ['bed capacity', 'boarding', 'capacity breach', 'no beds'] },
-  { scenario: 'triage_breach', terms: ['triage breach', 'three minute', '3-minute', 'wait breach'] },
+  {
+    scenario: 'bed_capacity_breach',
+    terms: ['bed capacity', 'boarding', 'capacity breach', 'no beds'],
+  },
+  {
+    scenario: 'triage_breach',
+    terms: ['triage breach', 'three minute', '3-minute', 'wait breach'],
+  },
   { scenario: 'ems_incoming', terms: ['ems inbound', 'ems incoming', 'pre-arrival', 'prearrival'] },
-  { scenario: 'security_incident', terms: ['security', 'violence', 'weapon', 'aggressive patient'] },
+  {
+    scenario: 'security_incident',
+    terms: ['security', 'violence', 'weapon', 'aggressive patient'],
+  },
 ];
 
 export function resolveAIChiefDomain(intent: CareDroidAIIntent): AIChiefDomain {
@@ -188,7 +206,9 @@ export function enrichStructuredRequest(
   const snapshot =
     request.bottleneckSnapshot ||
     options.bottleneckSnapshot ||
-    (BOTTLENECK_ENRICHED_INTENTS.has(request.intent) ? buildBottleneckRegistrySnapshot() : undefined);
+    (BOTTLENECK_ENRICHED_INTENTS.has(request.intent)
+      ? buildBottleneckRegistrySnapshot()
+      : undefined);
 
   const enrichedInput: Record<string, unknown> = { ...request.input };
 
@@ -254,7 +274,9 @@ function auditStructuredInteraction(
 ): void {
   const event = buildAIAuditEvent({
     userId: String(request.context?.tenant?.userId || request.context?.userRole || 'unknown'),
-    tenantId: String(request.context?.tenant?.organizationId || request.context?.organizationId || 'care-droid'),
+    tenantId: String(
+      request.context?.tenant?.organizationId || request.context?.organizationId || 'care-droid',
+    ),
     module: 'ai_chief_orchestrator',
     action: `structured:${request.intent}`,
     patientId: readPatientId(request.input),
@@ -341,7 +363,9 @@ export async function requestAiChiefStructured(
     async () => {
       const prepared = enrichStructuredRequest(request);
       const scenario = request.alertScenario || inferAlertScenario(prepared.input, prepared.intent);
-      const route = scenario ? getCanonicalAiRecommendationRoute(scenario, request.profile) : undefined;
+      const route = scenario
+        ? getCanonicalAiRecommendationRoute(scenario, request.profile)
+        : undefined;
 
       const response = await transportCareDroidAINode(prepared, options);
       const routed = applyAlertRoutingToResponse(response, scenario, request.profile);
@@ -365,46 +389,46 @@ export async function requestAiChiefConversational(
       metadata: { requestType: request.requestType },
     },
     async () => {
-  const domain = request.domain || conversationalDomain(request.requestType);
-  const enriched: AIRequest = {
-    ...request,
-    context: buildUnifiedAiNodeContext({
-      ...(isRecord(request.context) ? request.context : {}),
-      aiChief: {
-        orchestratorVersion: AI_CHIEF_ORCHESTRATOR_VERSION,
-        domain,
-        sourceScreen: request.sourceScreen || 'ai_chief_orchestrator',
-      },
-    }),
-  };
+      const domain = request.domain || conversationalDomain(request.requestType);
+      const enriched: AIRequest = {
+        ...request,
+        context: buildUnifiedAiNodeContext({
+          ...(isRecord(request.context) ? request.context : {}),
+          aiChief: {
+            orchestratorVersion: AI_CHIEF_ORCHESTRATOR_VERSION,
+            domain,
+            sourceScreen: request.sourceScreen || 'ai_chief_orchestrator',
+          },
+        }),
+      };
 
-  try {
-    const response = await callAI(enriched, runtime);
-    auditConversationalInteraction(request, response);
-    return response;
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    auditConversationalInteraction(
-      request,
-      {
-        ok: false,
-        status: 0,
-        content: '',
-        data: {},
-        toolCalls: [],
-        usage: {
-          inputTokens: 0,
-          outputTokens: 0,
-          totalTokens: 0,
-          cacheReadInputTokens: 0,
-          cacheCreationInputTokens: 0,
-        },
-        requestType: request.requestType,
-      },
-      message,
-    );
-    throw error;
-  }
+      try {
+        const response = await callAI(enriched, runtime);
+        auditConversationalInteraction(request, response);
+        return response;
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        auditConversationalInteraction(
+          request,
+          {
+            ok: false,
+            status: 0,
+            content: '',
+            data: {},
+            toolCalls: [],
+            usage: {
+              inputTokens: 0,
+              outputTokens: 0,
+              totalTokens: 0,
+              cacheReadInputTokens: 0,
+              cacheCreationInputTokens: 0,
+            },
+            requestType: request.requestType,
+          },
+          message,
+        );
+        throw error;
+      }
     },
   );
 }
@@ -414,7 +438,11 @@ function conversationalDomain(requestType: AIRequestType): AIChiefDomain {
   if (requestType === 'INTAKE_SUGGESTION' || requestType === 'INTAKE_SUGGEST') return 'intake';
   if (requestType === 'TRIAGE_ASSIST') return 'triage';
   if (requestType === 'CLINICAL_SUMMARY') return 'summaries';
-  if (requestType === 'SHIFT_SUMMARY' || requestType === 'CAPACITY_CRISIS' || requestType === 'STAFF_BALANCE') {
+  if (
+    requestType === 'SHIFT_SUMMARY' ||
+    requestType === 'CAPACITY_CRISIS' ||
+    requestType === 'STAFF_BALANCE'
+  ) {
     return 'operational_awareness';
   }
   return 'copilot_chat';
@@ -446,9 +474,7 @@ export async function requestAiChiefCopilotQuery(
   });
 
   if (!response?.ok) {
-    throw new Error(
-      `AI Chief copilot query failed with status ${response?.status ?? 'unknown'}`,
-    );
+    throw new Error(`AI Chief copilot query failed with status ${response?.status ?? 'unknown'}`);
   }
 
   const responseText =

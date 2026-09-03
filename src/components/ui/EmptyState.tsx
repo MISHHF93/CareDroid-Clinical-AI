@@ -2,7 +2,7 @@ import './EmptyState.css';
 
 /**
  * Empty State Component
- * 
+ *
  * Displays when there's no data to show (empty lists, search results, etc.)
  * @param {string} icon - Icon/emoji to display
  * @param {string} title - Main heading text
@@ -25,9 +25,7 @@ export const EmptyState = ({
       <div className="empty-state-icon">{icon}</div>
       <div className="empty-state-content">
         <h3 className="empty-state-title">{title}</h3>
-        {description && (
-          <p className="empty-state-description">{description}</p>
-        )}
+        {description && <p className="empty-state-description">{description}</p>}
         {action && <div className="empty-state-action">{action}</div>}
       </div>
     </div>
@@ -103,20 +101,18 @@ export const EmptyAuditLogs = () => {
 /**
  * Error state (for when data fetch fails)
  */
-export const ErrorState = ({ 
-  title = 'Something went wrong', 
+export const ErrorState = ({
+  title = 'Something went wrong',
   description = 'Unable to load data. Please try again.',
   onRetry,
-  className = ''
+  className = '',
 }) => {
   return (
     <div className={`empty-state error-state ${className}`}>
       <div className="empty-state-icon">⚠️</div>
       <div className="empty-state-content">
         <h3 className="empty-state-title">{title}</h3>
-        {description && (
-          <p className="empty-state-description">{description}</p>
-        )}
+        {description && <p className="empty-state-description">{description}</p>}
         {onRetry && (
           <div className="empty-state-action">
             <button type="button" className="btn-secondary" onClick={onRetry}>

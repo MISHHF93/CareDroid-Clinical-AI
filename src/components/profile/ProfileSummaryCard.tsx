@@ -9,7 +9,10 @@ import './ProfileSummaryCard.css';
 function initials(name = '') {
   const parts = name.trim().split(/\s+/).filter(Boolean);
   if (parts.length === 0) return 'U';
-  return parts.slice(0, 2).map((part) => part[0]?.toUpperCase()).join('');
+  return parts
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join('');
 }
 
 export default function ProfileSummaryCard({ compact = false }) {
@@ -20,7 +23,8 @@ export default function ProfileSummaryCard({ compact = false }) {
   const specialty = account?.specialty || account?.profession || 'Clinical user';
   const organization = account?.organization || account?.department || 'No organization set';
   const role = account?.role || 'No role set';
-  const workspaceName = activeWorkspace?.branding?.displayName || activeWorkspace?.name || 'Personal workspace';
+  const workspaceName =
+    activeWorkspace?.branding?.displayName || activeWorkspace?.name || 'Personal workspace';
 
   return (
     <Card className={`profile-summary-card${compact ? ' profile-summary-card--compact' : ''}`}>
@@ -39,7 +43,9 @@ export default function ProfileSummaryCard({ compact = false }) {
           <span>{workspaceName}</span>
           {activeWorkspace?.type ? <strong>{activeWorkspace.type}</strong> : null}
         </div>
-        {isLoading ? <span className="profile-summary-card__status">{identityCopy.syncingLabel}</span> : null}
+        {isLoading ? (
+          <span className="profile-summary-card__status">{identityCopy.syncingLabel}</span>
+        ) : null}
       </div>
       <Link to="/profile/workspaces" className="profile-summary-card__link">
         {identityCopy.switchWorkspaceLabel}

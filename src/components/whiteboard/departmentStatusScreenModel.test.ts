@@ -87,7 +87,9 @@ describe('departmentStatusScreenModel', () => {
     expect(snapshot.metrics.find((metric) => metric.id === 'triage-breached')).toBeTruthy();
     expect(snapshot.metrics.find((metric) => metric.id === 'waiting-count')?.value).toBe(2);
     expect(snapshot.metrics.find((metric) => metric.id === 'longest-wait')?.value).toBe('3h');
-    expect(snapshot.metrics.find((metric) => metric.id === 'capacity-status')?.value).toBe('78 · Orange');
+    expect(snapshot.metrics.find((metric) => metric.id === 'capacity-status')?.value).toBe(
+      '78 · Orange',
+    );
     expect(snapshot.summaryLine).toContain('2 waiting');
   });
 
@@ -110,7 +112,9 @@ describe('departmentStatusScreenModel', () => {
     });
 
     const filtered = filterDepartmentStatusSnapshot(snapshot, READ_ONLY_WHITEBOARD_METRIC_IDS);
-    expect(filtered.metrics.map((metric) => metric.id)).toEqual([...READ_ONLY_WHITEBOARD_METRIC_IDS]);
+    expect(filtered.metrics.map((metric) => metric.id)).toEqual([
+      ...READ_ONLY_WHITEBOARD_METRIC_IDS,
+    ]);
     expect(filtered.metrics.find((metric) => metric.id === 'triage-breached')).toBeUndefined();
     expect(filtered.metrics.find((metric) => metric.id === 'lwbs-elevated')).toBeUndefined();
     expect(filtered.summaryLine).toContain('1 waiting');

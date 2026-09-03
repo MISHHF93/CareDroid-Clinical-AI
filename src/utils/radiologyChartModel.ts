@@ -10,12 +10,54 @@ export type RadiologyStudyRow = Readonly<{
 }>;
 
 export const DEMO_RADIOLOGY_STUDIES: RadiologyStudyRow[] = [
-  { id: 'rad-001', study: 'CT Head w/o contrast', modality: 'CT', status: 'critical', patient: 'Bay 3', orderedAt: '9m ago' },
-  { id: 'rad-002', study: 'CXR portable', modality: 'X-ray', status: 'preliminary', patient: 'ICU-12', orderedAt: '22m ago' },
-  { id: 'rad-003', study: 'CT C-spine', modality: 'CT', status: 'finalized', patient: 'OBS-2', orderedAt: '38m ago' },
-  { id: 'rad-004', study: 'RUQ ultrasound', modality: 'Ultrasound', status: 'pending_read', patient: 'Bay 7', orderedAt: '14m ago' },
-  { id: 'rad-005', study: 'MRI brain w/ contrast', modality: 'MRI', status: 'pending_read', patient: 'Med-Surg B', orderedAt: '51m ago' },
-  { id: 'rad-006', study: 'CT chest/abd/pelvis', modality: 'CT', status: 'preliminary', patient: 'ICU-14', orderedAt: '33m ago' },
+  {
+    id: 'rad-001',
+    study: 'CT Head w/o contrast',
+    modality: 'CT',
+    status: 'critical',
+    patient: 'Bay 3',
+    orderedAt: '9m ago',
+  },
+  {
+    id: 'rad-002',
+    study: 'CXR portable',
+    modality: 'X-ray',
+    status: 'preliminary',
+    patient: 'ICU-12',
+    orderedAt: '22m ago',
+  },
+  {
+    id: 'rad-003',
+    study: 'CT C-spine',
+    modality: 'CT',
+    status: 'finalized',
+    patient: 'OBS-2',
+    orderedAt: '38m ago',
+  },
+  {
+    id: 'rad-004',
+    study: 'RUQ ultrasound',
+    modality: 'Ultrasound',
+    status: 'pending_read',
+    patient: 'Bay 7',
+    orderedAt: '14m ago',
+  },
+  {
+    id: 'rad-005',
+    study: 'MRI brain w/ contrast',
+    modality: 'MRI',
+    status: 'pending_read',
+    patient: 'Med-Surg B',
+    orderedAt: '51m ago',
+  },
+  {
+    id: 'rad-006',
+    study: 'CT chest/abd/pelvis',
+    modality: 'CT',
+    status: 'preliminary',
+    patient: 'ICU-14',
+    orderedAt: '33m ago',
+  },
 ];
 
 export function buildRadiologyStatusChart(

@@ -47,10 +47,7 @@ describe('resolveAssignedCareTeamNames', () => {
 
   it('resolves the assigned staff member by id', () => {
     const staff = [staffMember({ id: 'nurse-1', name: 'Alex Chen' })];
-    const result = resolveAssignedCareTeamNames(
-      patient({ assignedStaffId: 'nurse-1' }),
-      staff,
-    );
+    const result = resolveAssignedCareTeamNames(patient({ assignedStaffId: 'nurse-1' }), staff);
     expect(result).toEqual(['Alex Chen']);
   });
 

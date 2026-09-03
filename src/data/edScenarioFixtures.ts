@@ -12,43 +12,50 @@ export const ED_SCENARIO_DEMO_MODES = Object.freeze([
     id: 'normal-day',
     label: 'Normal day',
     shortLabel: 'Normal',
-    description: 'Balanced ED flow with a small waiting room, no capacity crisis, and routine reassessments.',
+    description:
+      'Balanced ED flow with a small waiting room, no capacity crisis, and routine reassessments.',
   },
   {
     id: 'high-volume-day',
     label: 'High-volume day',
     shortLabel: 'High volume',
-    description: 'Peak arrivals with growing waits, fuller rooms, and several medium-acuity handoffs.',
+    description:
+      'Peak arrivals with growing waits, fuller rooms, and several medium-acuity handoffs.',
   },
   {
     id: 'ems-surge',
     label: 'EMS surge',
     shortLabel: 'EMS surge',
-    description: 'Multiple inbound and recently arrived EMS patients competing for resus and assessment capacity.',
+    description:
+      'Multiple inbound and recently arrived EMS patients competing for resus and assessment capacity.',
   },
   {
     id: 'boarding-crisis',
     label: 'Boarding crisis',
     shortLabel: 'Boarding',
-    description: 'Admitted patients are occupying ED rooms while inpatient beds remain unavailable.',
+    description:
+      'Admitted patients are occupying ED rooms while inpatient beds remain unavailable.',
   },
   {
     id: 'reassessment-backlog',
     label: 'Reassessment backlog',
     shortLabel: 'Reassessments',
-    description: 'Several waiting and treatment patients are overdue for reassessment after vitals or wait changes.',
+    description:
+      'Several waiting and treatment patients are overdue for reassessment after vitals or wait changes.',
   },
   {
     id: 'capacity-red',
     label: 'Capacity red',
     shortLabel: 'Capacity red',
-    description: 'The department is over target occupancy with blocked rooms, boarders, and EMS pressure.',
+    description:
+      'The department is over target occupancy with blocked rooms, boarders, and EMS pressure.',
   },
   {
     id: 'multiple-high-risk-waiting',
     label: 'Multiple high-risk waiting patients',
     shortLabel: 'High-risk wait',
-    description: 'Several P1/P2 or flagged patients remain in the waiting room and need command attention.',
+    description:
+      'Several P1/P2 or flagged patients remain in the waiting room and need command attention.',
   },
   {
     id: FIRST_CUSTOMER_DEMO_MODE.id,
@@ -61,13 +68,15 @@ export const ED_SCENARIO_DEMO_MODES = Object.freeze([
     id: 'unknown-patient-intake',
     label: 'Unknown patient intake',
     shortLabel: 'Unknown intake',
-    description: 'A critical unknown patient arrives by EMS with temporary registration and identity reconciliation pending.',
+    description:
+      'A critical unknown patient arrives by EMS with temporary registration and identity reconciliation pending.',
   },
   {
     id: 'provincial-data-conflict',
     label: 'Provincial data conflict',
     shortLabel: 'Data conflict',
-    description: 'Provincial medication/allergy data conflicts with local intake and requires human reconciliation.',
+    description:
+      'Provincial medication/allergy data conflicts with local intake and requires human reconciliation.',
   },
 ]);
 
@@ -76,11 +85,46 @@ export const DEFAULT_ED_SCENARIO_ID = 'normal-day';
 const SCENARIO_BY_ID = new Map(ED_SCENARIO_DEMO_MODES.map((scenario) => [scenario.id, scenario]));
 
 const STAFF = Object.freeze([
-  { id: 's1', name: 'Dr. Priya Nair', role: 'MD', roleLabel: 'Attending Physician', status: 'OnShift', active: true },
-  { id: 's2', name: 'Maya Thompson', role: 'TriageNurse', roleLabel: 'Triage Nurse', status: 'OnShift', active: true },
-  { id: 's3', name: 'Owen Clarke', role: 'Charge', roleLabel: 'Charge Nurse', status: 'OnShift', active: true },
-  { id: 's4', name: 'Leo Fraser', role: 'RN', roleLabel: 'Staff Nurse', status: 'OnShift', active: true },
-  { id: 's5', name: 'Dr. Hana Patel', role: 'MD', roleLabel: 'Attending Physician', status: 'OnShift', active: true },
+  {
+    id: 's1',
+    name: 'Dr. Priya Nair',
+    role: 'MD',
+    roleLabel: 'Attending Physician',
+    status: 'OnShift',
+    active: true,
+  },
+  {
+    id: 's2',
+    name: 'Maya Thompson',
+    role: 'TriageNurse',
+    roleLabel: 'Triage Nurse',
+    status: 'OnShift',
+    active: true,
+  },
+  {
+    id: 's3',
+    name: 'Owen Clarke',
+    role: 'Charge',
+    roleLabel: 'Charge Nurse',
+    status: 'OnShift',
+    active: true,
+  },
+  {
+    id: 's4',
+    name: 'Leo Fraser',
+    role: 'RN',
+    roleLabel: 'Staff Nurse',
+    status: 'OnShift',
+    active: true,
+  },
+  {
+    id: 's5',
+    name: 'Dr. Hana Patel',
+    role: 'MD',
+    roleLabel: 'Attending Physician',
+    status: 'OnShift',
+    active: true,
+  },
 ]);
 
 function clone(value) {
@@ -141,7 +185,10 @@ function patient(input, now) {
     sex: input.sex || 'F',
     arrivalTime: minutesAgo(input.arrivalMinutes, now),
     triageTime: minutesAgo(Math.max(1, input.arrivalMinutes - 8), now),
-    lastAssessedTime: minutesAgo(Math.max(1, input.lastAssessedMinutes ?? input.arrivalMinutes - 12), now),
+    lastAssessedTime: minutesAgo(
+      Math.max(1, input.lastAssessedMinutes ?? input.arrivalMinutes - 12),
+      now,
+    ),
     chiefComplaint: input.chiefComplaint,
     complaintCategory: input.complaintCategory,
     state: input.state,
@@ -152,7 +199,15 @@ function patient(input, now) {
     roomId: input.roomId || null,
     notes: input.notes || [],
     timeline: input.timeline || [
-      event(patientId, input.state, Math.max(1, input.arrivalMinutes - 5), input.timelineNote || `${input.state} workflow started.`, 'Arrival', input.assignedStaffId || 's3', now),
+      event(
+        patientId,
+        input.state,
+        Math.max(1, input.arrivalMinutes - 5),
+        input.timelineNote || `${input.state} workflow started.`,
+        'Arrival',
+        input.assignedStaffId || 's3',
+        now,
+      ),
     ],
   };
 }
@@ -207,7 +262,16 @@ const BASE_PATIENTS = Object.freeze([
     flags: ['DeteriorationRisk', 'ReassessmentDue'],
     assignedStaffId: 's1',
     roomId: 'r2',
-    vitals: vital(22, { hr: 118, sbp: 88, dbp: 54, spo2: 94, temp: 38.9, rr: 22, gcs: 13, pain: 3 }),
+    vitals: vital(22, {
+      hr: 118,
+      sbp: 88,
+      dbp: 54,
+      spo2: 94,
+      temp: 38.9,
+      rr: 22,
+      gcs: 13,
+      pain: 3,
+    }),
     timelineNote: 'Lactate resulted; sepsis bundle review required.',
   },
   {
@@ -390,8 +454,18 @@ const EXTRA_PATIENTS = Object.freeze({
     flags: ['EMSArrival', 'HighRisk', 'DeteriorationRisk', 'ReassessmentDue'],
     assignedStaffId: 's3',
     roomId: 'r1',
-    vitals: vital(4, { hr: 132, sbp: 92, dbp: 58, spo2: 89, rr: 30, gcs: 9, pain: 0, recordedBy: 'ems' }),
-    timelineNote: 'Temporary identity created; registration and clinical team reconciling identity.',
+    vitals: vital(4, {
+      hr: 132,
+      sbp: 92,
+      dbp: 58,
+      spo2: 89,
+      rr: 30,
+      gcs: 9,
+      pain: 0,
+      recordedBy: 'ems',
+    }),
+    timelineNote:
+      'Temporary identity created; registration and clinical team reconciling identity.',
   },
   provincialConflict: {
     id: 'pt-data-conflict',
@@ -409,7 +483,8 @@ const EXTRA_PATIENTS = Object.freeze({
     assignedStaffId: 's5',
     roomId: 'r9',
     vitals: vital(18, { hr: 104, sbp: 134, dbp: 78, temp: 38.4, pain: 6 }),
-    timelineNote: 'Provincial profile conflicts with local allergy list; pharmacist review requested.',
+    timelineNote:
+      'Provincial profile conflicts with local allergy list; pharmacist review requested.',
   },
 });
 
@@ -419,7 +494,14 @@ const SCENARIO_PATIENT_KEYS = Object.freeze({
   'ems-surge': ['elderlyFall', 'strokeWaiting'],
   'boarding-crisis': ['boarderCopd', 'boarderChf', 'gastro'],
   'reassessment-backlog': ['gastro', 'elderlyFall', 'dkaWaiting'],
-  'capacity-red': ['gastro', 'elderlyFall', 'strokeWaiting', 'dkaWaiting', 'boarderCopd', 'boarderChf'],
+  'capacity-red': [
+    'gastro',
+    'elderlyFall',
+    'strokeWaiting',
+    'dkaWaiting',
+    'boarderCopd',
+    'boarderChf',
+  ],
   'multiple-high-risk-waiting': ['elderlyFall', 'strokeWaiting', 'dkaWaiting'],
   'unknown-patient-intake': ['unknown', 'elderlyFall'],
   'provincial-data-conflict': ['provincialConflict', 'gastro'],
@@ -432,17 +514,23 @@ function scenarioPatients(id, now) {
 
   if (id === 'reassessment-backlog') {
     patients = patients.map((row) =>
-      ['pt-asthma', 'pt-abdo', 'pt-sepsis', 'pt-gastro', 'pt-elderly-fall', 'pt-dka-wait'].includes(row.id)
+      ['pt-asthma', 'pt-abdo', 'pt-sepsis', 'pt-gastro', 'pt-elderly-fall', 'pt-dka-wait'].includes(
+        row.id,
+      )
         ? { ...row, flags: Array.from(new Set([...row.flags, 'ReassessmentDue'])) }
-        : row
+        : row,
     );
   }
 
   if (id === 'boarding-crisis' || id === 'capacity-red') {
     patients = patients.map((row) =>
       row.id === 'pt-psych-boarder'
-        ? { ...row, state: 'Admission', flags: Array.from(new Set([...row.flags, 'PendingAdmission'])) }
-        : row
+        ? {
+            ...row,
+            state: 'Admission',
+            flags: Array.from(new Set([...row.flags, 'PendingAdmission'])),
+          }
+        : row,
     );
   }
 
@@ -467,8 +555,12 @@ function buildRooms(patients, id) {
     ['r14', 'Waiting Area A', 'Waiting'],
     ['r15', 'Waiting Area B', 'Waiting'],
   ];
-  const patientByRoom = new Map(patients.filter((row) => row.roomId).map((row) => [row.roomId, row.id]));
-  const blocked = new Set(['capacity-red', 'boarding-crisis'].includes(id) ? ['r6', 'r10', 'r13'] : ['r10']);
+  const patientByRoom = new Map(
+    patients.filter((row) => row.roomId).map((row) => [row.roomId, row.id]),
+  );
+  const blocked = new Set(
+    ['capacity-red', 'boarding-crisis'].includes(id) ? ['r6', 'r10', 'r13'] : ['r10'],
+  );
   return roomDefs.map(([roomId, name, type]) => {
     const patientId = patientByRoom.get(roomId);
     return {
@@ -483,13 +575,28 @@ function buildRooms(patients, id) {
 
 function buildCapacity(patients, rooms, emsArrivals) {
   const occupiedRooms = rooms.filter((room) => room.status === 'Occupied').length;
-  const boardingCount = patients.filter((row) => row.state === 'Admission' || row.flags.includes('PendingAdmission')).length;
+  const boardingCount = patients.filter(
+    (row) => row.state === 'Admission' || row.flags.includes('PendingAdmission'),
+  ).length;
   const reassessmentDue = patients.filter((row) => row.flags.includes('ReassessmentDue')).length;
   const blockedRooms = rooms.filter((room) => room.status === 'Blocked').length;
   const waitingCount = patients.filter((row) => row.state === 'Waiting').length;
-  const criticalEMS = emsArrivals.filter((arrival) => arrival.severity === 'Critical' && arrival.status !== 'Complete').length;
-  const pressure = Math.min(100, Math.round((occupiedRooms / rooms.length) * 56 + boardingCount * 7 + reassessmentDue * 4 + blockedRooms * 6 + waitingCount * 3 + criticalEMS * 5));
-  const band = pressure >= 84 ? 'Red' : pressure >= 68 ? 'Orange' : pressure >= 48 ? 'Yellow' : 'Green';
+  const criticalEMS = emsArrivals.filter(
+    (arrival) => arrival.severity === 'Critical' && arrival.status !== 'Complete',
+  ).length;
+  const pressure = Math.min(
+    100,
+    Math.round(
+      (occupiedRooms / rooms.length) * 56 +
+        boardingCount * 7 +
+        reassessmentDue * 4 +
+        blockedRooms * 6 +
+        waitingCount * 3 +
+        criticalEMS * 5,
+    ),
+  );
+  const band =
+    pressure >= 84 ? 'Red' : pressure >= 68 ? 'Orange' : pressure >= 48 ? 'Yellow' : 'Green';
   return {
     score: pressure,
     band,
@@ -502,7 +609,10 @@ function buildCapacity(patients, rooms, emsArrivals) {
 }
 
 function emsArrival(input, now = new Date()) {
-  const estimatedArrivalTime = input.status === 'Inbound' ? minutesFromNow(input.eta, now) : minutesAgo(input.arrivedAgo || 6, now);
+  const estimatedArrivalTime =
+    input.status === 'Inbound'
+      ? minutesFromNow(input.eta, now)
+      : minutesAgo(input.arrivedAgo || 6, now);
   return {
     id: input.id,
     patientId: input.patientId,
@@ -531,76 +641,104 @@ function emsArrival(input, now = new Date()) {
 
 function buildEmsArrivals(id, patients, now) {
   const base = [
-    emsArrival({
-      id: 'ems-cardiac-501',
-      unitId: 'EMS-501',
-      unitName: 'Medic 501',
-      patientAge: 58,
-      patientSex: 'Male',
-      chiefComplaint: 'Crushing chest pain with diaphoresis',
-      vitals: vital(2, { hr: 118, sbp: 164, dbp: 94, spo2: 95, rr: 24, pain: 8, recordedBy: 'ems' }, now),
-      eta: 14,
-      severity: 'High',
-      status: 'Inbound',
-      priority: 'P2',
-      notes: 'Aspirin given by crew; ECG transmitted with anterior changes.',
-      preparedRoomId: 'r1',
-    }, now),
+    emsArrival(
+      {
+        id: 'ems-cardiac-501',
+        unitId: 'EMS-501',
+        unitName: 'Medic 501',
+        patientAge: 58,
+        patientSex: 'Male',
+        chiefComplaint: 'Crushing chest pain with diaphoresis',
+        vitals: vital(
+          2,
+          { hr: 118, sbp: 164, dbp: 94, spo2: 95, rr: 24, pain: 8, recordedBy: 'ems' },
+          now,
+        ),
+        eta: 14,
+        severity: 'High',
+        status: 'Inbound',
+        priority: 'P2',
+        notes: 'Aspirin given by crew; ECG transmitted with anterior changes.',
+        preparedRoomId: 'r1',
+      },
+      now,
+    ),
   ];
 
   if (id === 'ems-surge' || id === 'capacity-red' || id === 'unknown-patient-intake') {
     base.push(
-      emsArrival({
-        id: 'ems-stroke-214',
-        unitId: 'EMS-214',
-        unitName: 'Medic 214',
-        patientAge: 71,
-        patientSex: 'Female',
-        chiefComplaint: 'Possible stroke, last known well 35 minutes',
-        vitals: vital(1, { hr: 108, sbp: 190, dbp: 104, spo2: 95, gcs: 12, recordedBy: 'ems' }, now),
-        eta: 6,
-        severity: 'Critical',
-        status: 'Inbound',
-        priority: 'P1',
-        notes: 'Stroke alert requested; CT and resus notified.',
-        preparedRoomId: 'r2',
-      }, now),
-      emsArrival({
-        id: 'ems-resp-612',
-        unitId: 'EMS-612',
-        unitName: 'Medic 612',
-        patientAge: 66,
-        patientSex: 'Male',
-        chiefComplaint: 'Severe shortness of breath on CPAP',
-        vitals: vital(12, { hr: 124, sbp: 156, dbp: 88, spo2: 88, rr: 32, pain: 4, recordedBy: 'ems' }, now),
-        severity: 'High',
-        status: 'Arrived',
-        priority: 'P2',
-        arrivedAgo: 18,
-        notes: 'Crew waiting for monitored bay; offload target breached.',
-      }, now)
+      emsArrival(
+        {
+          id: 'ems-stroke-214',
+          unitId: 'EMS-214',
+          unitName: 'Medic 214',
+          patientAge: 71,
+          patientSex: 'Female',
+          chiefComplaint: 'Possible stroke, last known well 35 minutes',
+          vitals: vital(
+            1,
+            { hr: 108, sbp: 190, dbp: 104, spo2: 95, gcs: 12, recordedBy: 'ems' },
+            now,
+          ),
+          eta: 6,
+          severity: 'Critical',
+          status: 'Inbound',
+          priority: 'P1',
+          notes: 'Stroke alert requested; CT and resus notified.',
+          preparedRoomId: 'r2',
+        },
+        now,
+      ),
+      emsArrival(
+        {
+          id: 'ems-resp-612',
+          unitId: 'EMS-612',
+          unitName: 'Medic 612',
+          patientAge: 66,
+          patientSex: 'Male',
+          chiefComplaint: 'Severe shortness of breath on CPAP',
+          vitals: vital(
+            12,
+            { hr: 124, sbp: 156, dbp: 88, spo2: 88, rr: 32, pain: 4, recordedBy: 'ems' },
+            now,
+          ),
+          severity: 'High',
+          status: 'Arrived',
+          priority: 'P2',
+          arrivedAgo: 18,
+          notes: 'Crew waiting for monitored bay; offload target breached.',
+        },
+        now,
+      ),
     );
   }
 
   const unknown = patients.find((row) => row.id === 'pt-unknown');
   if (unknown) {
     base.push(
-      emsArrival({
-        id: 'ems-unknown-9931',
-        patientId: unknown.id,
-        unitId: 'EMS-993',
-        unitName: 'Medic 993',
-        patientAge: unknown.age,
-        patientSex: 'Unknown',
-        chiefComplaint: 'Unknown identity, reduced LOC after being found down',
-        vitals: vital(4, { hr: 132, sbp: 92, dbp: 58, spo2: 89, rr: 30, gcs: 9, recordedBy: 'ems' }, now),
-        severity: 'Critical',
-        status: 'Handoff',
-        priority: 'P1',
-        arrivedAgo: 8,
-        notes: 'No wallet or health card; temporary MRN created.',
-        preparedRoomId: 'r1',
-      }, now)
+      emsArrival(
+        {
+          id: 'ems-unknown-9931',
+          patientId: unknown.id,
+          unitId: 'EMS-993',
+          unitName: 'Medic 993',
+          patientAge: unknown.age,
+          patientSex: 'Unknown',
+          chiefComplaint: 'Unknown identity, reduced LOC after being found down',
+          vitals: vital(
+            4,
+            { hr: 132, sbp: 92, dbp: 58, spo2: 89, rr: 30, gcs: 9, recordedBy: 'ems' },
+            now,
+          ),
+          severity: 'Critical',
+          status: 'Handoff',
+          priority: 'P1',
+          arrivedAgo: 8,
+          notes: 'No wallet or health card; temporary MRN created.',
+          preparedRoomId: 'r1',
+        },
+        now,
+      ),
     );
   }
 
@@ -614,12 +752,20 @@ function buildQueueRows(patients, now) {
     ['Assessment', 'Assessment', 30, (row) => row.state === 'Assessment'],
     ['Orders', 'Orders', 45, (row) => row.state === 'Orders'],
     ['Results', 'Results', 60, (row) => row.state === 'Results'],
-    ['Admission', 'Admission', 120, (row) => row.state === 'Admission' || row.flags.includes('PendingAdmission')],
+    [
+      'Admission',
+      'Admission',
+      120,
+      (row) => row.state === 'Admission' || row.flags.includes('PendingAdmission'),
+    ],
     ['Reassessment', 'Reassessment', 30, (row) => row.flags.includes('ReassessmentDue')],
   ];
   return queueDefs.map(([id, label, targetMinutes, predicate]) => {
     const queuedPatients = patients.filter(predicate);
-    const oldestWaitMinutes = queuedPatients.reduce((max, row) => Math.max(max, waitMinutes(row, now)), 0);
+    const oldestWaitMinutes = queuedPatients.reduce(
+      (max, row) => Math.max(max, waitMinutes(row, now)),
+      0,
+    );
     return {
       id: `queue-${String(id).toLowerCase()}`,
       type: id,
@@ -634,9 +780,14 @@ function buildQueueRows(patients, now) {
       oldestWaitMinutes,
       longestWaitMinutes: oldestWaitMinutes,
       averageWaitMinutes: queuedPatients.length
-        ? Math.round(queuedPatients.reduce((sum, row) => sum + waitMinutes(row, now), 0) / queuedPatients.length)
+        ? Math.round(
+            queuedPatients.reduce((sum, row) => sum + waitMinutes(row, now), 0) /
+              queuedPatients.length,
+          )
         : 0,
-      criticalCount: queuedPatients.filter((row) => row.priority === 'P1' || row.priority === 'P2' || row.flags.includes('HighRisk')).length,
+      criticalCount: queuedPatients.filter(
+        (row) => row.priority === 'P1' || row.priority === 'P2' || row.flags.includes('HighRisk'),
+      ).length,
       breached: oldestWaitMinutes > targetMinutes,
       updatedAt: now.toISOString(),
     };
@@ -664,7 +815,8 @@ function buildAlerts(patients, capacity, emsArrivals, scenario, now) {
       id: `alert-${scenario.id}-capacity-red`,
       severity: 'Critical',
       title: 'Capacity red',
-      message: 'Department capacity is red; review boarders, blocked rooms, EMS arrivals, and discharge opportunities.',
+      message:
+        'Department capacity is red; review boarders, blocked rooms, EMS arrivals, and discharge opportunities.',
       createdAt: minutesAgo(3, now),
       dismissed: false,
     });
@@ -683,12 +835,23 @@ function buildAlerts(patients, capacity, emsArrivals, scenario, now) {
 }
 
 function buildAnalytics(patients, queues, capacity, scenario, now) {
-  const topComplaints = [...patients.reduce((counts, row) => {
-    counts.set(row.complaintCategory, (counts.get(row.complaintCategory) || 0) + 1);
-    return counts;
-  }, new Map())].map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count);
+  const topComplaints = [
+    ...patients.reduce((counts, row) => {
+      counts.set(row.complaintCategory, (counts.get(row.complaintCategory) || 0) + 1);
+      return counts;
+    }, new Map()),
+  ]
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count);
 
-  const arrivalMultiplier = scenario.id === 'high-volume-day' ? 2 : scenario.id === 'ems-surge' ? 1.7 : scenario.id === 'normal-day' ? 0.8 : 1.3;
+  const arrivalMultiplier =
+    scenario.id === 'high-volume-day'
+      ? 2
+      : scenario.id === 'ems-surge'
+        ? 1.7
+        : scenario.id === 'normal-day'
+          ? 0.8
+          : 1.3;
   return {
     source: 'scenario-fixture',
     generatedAt: now.toISOString(),
@@ -703,16 +866,31 @@ function buildAnalytics(patients, queues, capacity, scenario, now) {
     })),
     operationalCommand: {
       dailyVolume: Array.from({ length: 7 }, (_, index) => ({
-        date: new Date(now.getTime() - (6 - index) * 86_400_000).toLocaleDateString([], { month: 'short', day: 'numeric' }),
+        date: new Date(now.getTime() - (6 - index) * 86_400_000).toLocaleDateString([], {
+          month: 'short',
+          day: 'numeric',
+        }),
         count: Math.max(4, Math.round((patients.length + index - 2) * arrivalMultiplier)),
       })),
       hourlyArrivals: Array.from({ length: 24 }, (_, hour) => ({
         hour: `${String(hour).padStart(2, '0')}:00`,
-        count: hour >= 9 && hour <= 21 ? Math.max(0, Math.round((hour % 4) * arrivalMultiplier + (scenario.id === 'ems-surge' ? 1 : 0))) : 0,
+        count:
+          hour >= 9 && hour <= 21
+            ? Math.max(
+                0,
+                Math.round((hour % 4) * arrivalMultiplier + (scenario.id === 'ems-surge' ? 1 : 0)),
+              )
+            : 0,
       })),
       waitTrend: Array.from({ length: 7 }, (_, index) => ({
-        date: new Date(now.getTime() - (6 - index) * 86_400_000).toLocaleDateString([], { month: 'short', day: 'numeric' }),
-        avgWaitMinutes: Math.max(8, Math.round((queues[0]?.averageWaitMinutes || 20) * (0.7 + index * 0.06))),
+        date: new Date(now.getTime() - (6 - index) * 86_400_000).toLocaleDateString([], {
+          month: 'short',
+          day: 'numeric',
+        }),
+        avgWaitMinutes: Math.max(
+          8,
+          Math.round((queues[0]?.averageWaitMinutes || 20) * (0.7 + index * 0.06)),
+        ),
       })),
       topComplaints,
     },
@@ -742,7 +920,10 @@ function buildProvincialHealth(id, patients) {
       {
         patientId: conflictPatient?.id || 'pt-data-conflict',
         mrn: conflictPatient?.mrn || 'ED-400114',
-        medications: ['Provincial: warfarin active', 'Local intake: patient reports no anticoagulants'],
+        medications: [
+          'Provincial: warfarin active',
+          'Local intake: patient reports no anticoagulants',
+        ],
         allergies: ['Provincial: cefazolin anaphylaxis', 'Local intake: no known drug allergies'],
         conflict: true,
         requiredAction: 'Human reconciliation before medication decisions.',
@@ -753,7 +934,13 @@ function buildProvincialHealth(id, patients) {
 
 function buildCopilotContext(patients, capacity, emsArrivals, queues, scenario, provincialHealth) {
   const activePatients = patients.filter((row) => row.state !== 'Discharge');
-  const highRiskPatients = activePatients.filter((row) => row.priority === 'P1' || row.priority === 'P2' || row.flags.includes('HighRisk') || row.flags.includes('DeteriorationRisk'));
+  const highRiskPatients = activePatients.filter(
+    (row) =>
+      row.priority === 'P1' ||
+      row.priority === 'P2' ||
+      row.flags.includes('HighRisk') ||
+      row.flags.includes('DeteriorationRisk'),
+  );
   const reassessmentQueue = activePatients.filter((row) => row.flags.includes('ReassessmentDue'));
   return {
     scenarioId: scenario.id,
@@ -763,7 +950,9 @@ function buildCopilotContext(patients, capacity, emsArrivals, queues, scenario, 
     capacity,
     emsInboundCount: emsArrivals.filter((arrival) => arrival.status === 'Inbound').length,
     reassessmentQueueCount: reassessmentQueue.length,
-    boardingCount: activePatients.filter((row) => row.state === 'Admission' || row.flags.includes('PendingAdmission')).length,
+    boardingCount: activePatients.filter(
+      (row) => row.state === 'Admission' || row.flags.includes('PendingAdmission'),
+    ).length,
     queueSummary: queues.map((queue) => `${queue.label}: ${queue.count}`).join(', '),
     dataConflictCount: provincialHealth.records.filter((record) => record.conflict).length,
     focus: scenario.description,
@@ -784,9 +973,18 @@ export function buildEdScenarioFixture(scenarioId = DEFAULT_ED_SCENARIO_ID, opti
   const provincialHealth = buildProvincialHealth(scenario!.id, patients);
   const analytics = buildAnalytics(patients, queues, capacity, scenario, now);
   const reassessmentPatients = patients.filter((row) => row.flags.includes('ReassessmentDue'));
-  const boardingPatients = patients.filter((row) => row.state === 'Admission' || row.flags.includes('PendingAdmission'));
+  const boardingPatients = patients.filter(
+    (row) => row.state === 'Admission' || row.flags.includes('PendingAdmission'),
+  );
   const alerts = buildAlerts(patients, capacity, emsArrivals, scenario, now);
-  const copilotContext = buildCopilotContext(patients, capacity, emsArrivals, queues, scenario, provincialHealth);
+  const copilotContext = buildCopilotContext(
+    patients,
+    capacity,
+    emsArrivals,
+    queues,
+    scenario,
+    provincialHealth,
+  );
 
   return {
     ...scenario,
@@ -807,13 +1005,23 @@ export function buildEdScenarioFixture(scenarioId = DEFAULT_ED_SCENARIO_ID, opti
     capacity,
     reassessment: {
       patients: reassessmentPatients,
-      overdueCount: reassessmentPatients.filter((row) => waitMinutes(row, now) > 45 || row.priority === 'P1').length,
-      nextAction: reassessmentPatients[0] ? `Reassess ${reassessmentPatients[0].firstName} ${reassessmentPatients[0].lastName}` : 'Review queue',
+      overdueCount: reassessmentPatients.filter(
+        (row) => waitMinutes(row, now) > 45 || row.priority === 'P1',
+      ).length,
+      nextAction: reassessmentPatients[0]
+        ? `Reassess ${reassessmentPatients[0].firstName} ${reassessmentPatients[0].lastName}`
+        : 'Review queue',
     },
     boarding: {
       patients: boardingPatients,
-      longestBoardingMinutes: boardingPatients.reduce((max, row) => Math.max(max, waitMinutes(row, now)), 0),
-      escalation: boardingPatients.length >= 3 ? 'Escalate bed management and inpatient flow lead.' : 'Monitor admitted patients.',
+      longestBoardingMinutes: boardingPatients.reduce(
+        (max, row) => Math.max(max, waitMinutes(row, now)),
+        0,
+      ),
+      escalation:
+        boardingPatients.length >= 3
+          ? 'Escalate bed management and inpatient flow lead.'
+          : 'Monitor admitted patients.',
     },
     analytics,
     provincialHealth,
@@ -880,7 +1088,8 @@ function buildFirstCustomerEdScenarioFixture(now) {
     unknownIntake: {
       active: false,
       temporaryMrn: null,
-      requiredAction: 'Load the department walkthrough dataset for deterministic customer walkthroughs.',
+      requiredAction:
+        'Load the department walkthrough dataset for deterministic customer walkthroughs.',
     },
   };
 }
@@ -889,7 +1098,7 @@ export function getInitialEdScenarioId() {
   if (typeof window === 'undefined') return DEFAULT_ED_SCENARIO_ID;
   try {
     const stored = window.localStorage.getItem(STORAGE_KEY);
-    return SCENARIO_BY_ID.has(stored as any) ? stored as any : DEFAULT_ED_SCENARIO_ID;
+    return SCENARIO_BY_ID.has(stored as any) ? (stored as any) : DEFAULT_ED_SCENARIO_ID;
   } catch {
     return DEFAULT_ED_SCENARIO_ID;
   }
@@ -898,7 +1107,10 @@ export function getInitialEdScenarioId() {
 export function persistEdScenarioId(scenarioId) {
   if (typeof window === 'undefined') return;
   try {
-    window.localStorage.setItem(STORAGE_KEY, SCENARIO_BY_ID.has(scenarioId) ? scenarioId : DEFAULT_ED_SCENARIO_ID);
+    window.localStorage.setItem(
+      STORAGE_KEY,
+      SCENARIO_BY_ID.has(scenarioId) ? scenarioId : DEFAULT_ED_SCENARIO_ID,
+    );
   } catch {
     // Non-browser test environments can reject localStorage access.
   }
@@ -908,7 +1120,10 @@ export function getEdScenarioMeta(scenarioId) {
   return SCENARIO_BY_ID.get(scenarioId) || SCENARIO_BY_ID.get(DEFAULT_ED_SCENARIO_ID);
 }
 
-export function buildEmergencyScenarioModuleEnvelope(moduleName, scenarioId = getInitialEdScenarioId() as any) {
+export function buildEmergencyScenarioModuleEnvelope(
+  moduleName,
+  scenarioId = getInitialEdScenarioId() as any,
+) {
   const scenario = buildEdScenarioFixture(scenarioId);
   const dataByModule = {
     whiteboard: {
@@ -926,20 +1141,34 @@ export function buildEmergencyScenarioModuleEnvelope(moduleName, scenarioId = ge
         row.timeline.map((item) => ({
           ...item,
           patientName: `${row.firstName} ${row.lastName}`,
-        }))
+        })),
       ),
       stateCounts: scenario.patients.reduce((counts, row) => {
         counts[row.state] = (counts[row.state] || 0) + 1;
         return counts;
       }, {}),
     },
-    ems: { scenario, arrivals: scenario.emsArrivals, units: scenario.emsUnits, patients: scenario.patients.filter((row) => row.flags.includes('EMSArrival')) },
+    ems: {
+      scenario,
+      arrivals: scenario.emsArrivals,
+      units: scenario.emsUnits,
+      patients: scenario.patients.filter((row) => row.flags.includes('EMSArrival')),
+    },
     queues: { scenario, queues: scenario.queues },
     reassessment: { scenario, ...scenario.reassessment },
-    capacity: { scenario, capacity: scenario.capacity, rooms: scenario.rooms, recommendations: capacityRecommendations(scenario) },
+    capacity: {
+      scenario,
+      capacity: scenario.capacity,
+      rooms: scenario.rooms,
+      recommendations: capacityRecommendations(scenario),
+    },
     boarding: { scenario, ...scenario.boarding },
     provincialHealth: { scenario, ...scenario.provincialHealth },
-    copilot: { scenario, promptContext: scenario.copilotContext, quickActions: ['Who needs attention?', 'Capacity status', 'EMS update', 'Reassessment queue'] },
+    copilot: {
+      scenario,
+      promptContext: scenario.copilotContext,
+      quickActions: ['Who needs attention?', 'Capacity status', 'EMS update', 'Reassessment queue'],
+    },
     analytics: scenario.analytics,
   };
 
@@ -954,11 +1183,23 @@ export function buildEmergencyScenarioModuleEnvelope(moduleName, scenarioId = ge
 
 function capacityRecommendations(scenario) {
   const recommendations = [] as any[];
-  if (scenario.capacity.band === 'Red') recommendations.push('Open escalation huddle for bed management, charge nurse, and physician lead.');
-  if (scenario.boarding.patients.length) recommendations.push('Prioritize admitted boarders for inpatient handoff and hallway safety review.');
-  if (scenario.emsArrivals.some((arrival) => arrival.status === 'Inbound')) recommendations.push('Reserve resus or monitored bay for inbound EMS acuity.');
-  if (scenario.reassessment.patients.length) recommendations.push('Assign a nurse to clear overdue reassessment flags before new low-acuity tasks.');
-  return recommendations.length ? recommendations : ['Continue routine flow monitoring and reassessment cadence.'];
+  if (scenario.capacity.band === 'Red')
+    recommendations.push(
+      'Open escalation huddle for bed management, charge nurse, and physician lead.',
+    );
+  if (scenario.boarding.patients.length)
+    recommendations.push(
+      'Prioritize admitted boarders for inpatient handoff and hallway safety review.',
+    );
+  if (scenario.emsArrivals.some((arrival) => arrival.status === 'Inbound'))
+    recommendations.push('Reserve resus or monitored bay for inbound EMS acuity.');
+  if (scenario.reassessment.patients.length)
+    recommendations.push(
+      'Assign a nurse to clear overdue reassessment flags before new low-acuity tasks.',
+    );
+  return recommendations.length
+    ? recommendations
+    : ['Continue routine flow monitoring and reassessment cadence.'];
 }
 
 export function buildSrcEmergencyScenarioState(scenarioId = getInitialEdScenarioId() as any) {
@@ -1027,18 +1268,24 @@ export function buildSrcEmergencyScenarioState(scenarioId = getInitialEdScenario
 }
 
 function rootFlag(flag, detectedAt) {
-  const severity = flag === 'DeteriorationRisk' || flag === 'HighRisk' ? 'Critical' : flag === 'PendingAdmission' || flag === 'EMSArrival' ? 'Info' : 'Warning';
+  const severity =
+    flag === 'DeteriorationRisk' || flag === 'HighRisk'
+      ? 'Critical'
+      : flag === 'PendingAdmission' || flag === 'EMSArrival'
+        ? 'Info'
+        : 'Warning';
   return {
     type: flag,
-    reason: {
-      ReassessmentDue: 'Scenario reassessment due',
-      DeteriorationRisk: 'Scenario deterioration risk',
-      LongWait: 'Scenario long wait',
-      HighRisk: 'Scenario high-risk flag',
-      PendingAdmission: 'Scenario admission pending',
-      EMSArrival: 'Scenario EMS arrival',
-      Isolation: 'Scenario isolation precautions',
-    }[flag] || 'Scenario flag',
+    reason:
+      {
+        ReassessmentDue: 'Scenario reassessment due',
+        DeteriorationRisk: 'Scenario deterioration risk',
+        LongWait: 'Scenario long wait',
+        HighRisk: 'Scenario high-risk flag',
+        PendingAdmission: 'Scenario admission pending',
+        EMSArrival: 'Scenario EMS arrival',
+        Isolation: 'Scenario isolation precautions',
+      }[flag] || 'Scenario flag',
     detectedAt,
     severity,
   };
@@ -1126,10 +1373,19 @@ export function buildRootEmergencyScenarioState(scenarioId = getInitialEdScenari
     firstName: member.name.split(' ')[0],
     lastName: member.name.split(' ').slice(1).join(' ') || member.role,
     name: member.name,
-    role: member.role === 'Charge' ? 'ChargeNurse' : member.role === 'MD' ? 'Attending' : member.role === 'RN' ? 'Nurse' : 'Technician',
+    role:
+      member.role === 'Charge'
+        ? 'ChargeNurse'
+        : member.role === 'MD'
+          ? 'Attending'
+          : member.role === 'RN'
+            ? 'Nurse'
+            : 'Technician',
     status: 'OnShift',
     shiftId: `shift-${scenario.id}`,
-    assignedPatientIds: rootPatients.filter((patient) => patient.assignedStaffId === rootStaffId(member.id)).map((patient) => patient.id),
+    assignedPatientIds: rootPatients
+      .filter((patient) => patient.assignedStaffId === rootStaffId(member.id))
+      .map((patient) => patient.id),
   }));
   const rootRooms = scenario.rooms.map((room) => ({
     id: rootRoomId(room.id),
@@ -1141,7 +1397,10 @@ export function buildRootEmergencyScenarioState(scenarioId = getInitialEdScenari
   }));
   const rootEmsArrivals = scenario.emsArrivals.map((arrival) => ({
     ...arrival,
-    patientSex: arrival.patientSex === 'Male' || arrival.patientSex === 'Female' ? arrival.patientSex : 'Unknown',
+    patientSex:
+      arrival.patientSex === 'Male' || arrival.patientSex === 'Female'
+        ? arrival.patientSex
+        : 'Unknown',
     vitals: toRootVitals(arrival.vitals),
     preparedRoomId: arrival.preparedRoomId ? rootRoomId(arrival.preparedRoomId) : undefined,
   }));

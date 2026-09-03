@@ -183,8 +183,16 @@ vi.mock('../../services/emergencyOsApi', async (importOriginal) => {
 describe('EmergencySettings', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(fetchOrganizationEmergencyOsSettings).mockResolvedValue({ ok: false, data: null, message: '' });
-    vi.mocked(fetchEmergencyOsSettings).mockResolvedValue({ ok: true, data: { data: mockSettings }, message: '' });
+    vi.mocked(fetchOrganizationEmergencyOsSettings).mockResolvedValue({
+      ok: false,
+      data: null,
+      message: '',
+    });
+    vi.mocked(fetchEmergencyOsSettings).mockResolvedValue({
+      ok: true,
+      data: { data: mockSettings },
+      message: '',
+    });
     vi.mocked(saveOrganizationEmergencyOsSettings).mockImplementation((patch: any) =>
       Promise.resolve({
         ok: true,
@@ -317,9 +325,7 @@ describe('EmergencySettings', () => {
       </MemoryRouter>,
     );
 
-    expect(
-      await screen.findByRole('heading', { name: 'CareDroid Settings' }),
-    ).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'CareDroid Settings' })).toBeInTheDocument();
     expect(screen.queryByText('Identity and Modules')).not.toBeInTheDocument();
     expect(screen.queryByText('AI Settings')).not.toBeInTheDocument();
     expect(screen.queryByText('Integration Settings')).not.toBeInTheDocument();
@@ -392,7 +398,9 @@ describe('EmergencySettings', () => {
     }
 
     const deferredCapacity = deferred<any>();
-    vi.mocked(saveOrganizationEmergencyOsSettings).mockImplementationOnce(() => deferredCapacity.promise);
+    vi.mocked(saveOrganizationEmergencyOsSettings).mockImplementationOnce(
+      () => deferredCapacity.promise,
+    );
 
     render(
       <MemoryRouter>
@@ -425,7 +433,9 @@ describe('EmergencySettings', () => {
     // capacity-related fields, not a stale snapshot of every other group.
     deferredCapacity.resolve({
       ok: true,
-      data: { data: { capacityThresholds: { ...mockSettings.capacityThresholds, warningPercent: 76 } } },
+      data: {
+        data: { capacityThresholds: { ...mockSettings.capacityThresholds, warningPercent: 76 } },
+      },
       message: '',
     });
 

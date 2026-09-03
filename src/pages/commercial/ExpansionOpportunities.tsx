@@ -14,7 +14,10 @@ import './CommercialIntelligence.css';
 export function CustomerExpansionOpportunitiesPage() {
   useRouteChromeRegistration({ title: 'Expansion Opportunities' });
   const expansion = useMemo(() => buildCustomerExpansionOpportunities(), []);
-  const scoreChart = useMemo(() => buildExpansionScoreChart(expansion.segments), [expansion.segments]);
+  const scoreChart = useMemo(
+    () => buildExpansionScoreChart(expansion.segments),
+    [expansion.segments],
+  );
 
   return (
     <main className="commercial-page" aria-label="Expansion opportunities">
@@ -22,8 +25,12 @@ export function CustomerExpansionOpportunitiesPage() {
         <div className="commercial-page__title-row">
           <GraphicIconBadge iconKey="send" accent="brand" size="md" />
           <div>
-            <p className="commercial-page-title-text" data-testid="cd-page-title-text">Expansion Opportunities</p>
-            <p>Upsell, cross-sell, and evaluation motions with evidence-backed pack recommendations.</p>
+            <p className="commercial-page-title-text" data-testid="cd-page-title-text">
+              Expansion Opportunities
+            </p>
+            <p>
+              Upsell, cross-sell, and evaluation motions with evidence-backed pack recommendations.
+            </p>
           </div>
         </div>
         <div className="commercial-page__actions">
@@ -40,15 +47,44 @@ export function CustomerExpansionOpportunitiesPage() {
       />
 
       <div className="commercial-page__metrics" role="group" aria-label="Expansion summary metrics">
-        <MetricCard label="Segments" value={String(expansion.summary.customerSegmentCount)} hint="Customer profiles" tone="neutral" />
-        <MetricCard label="Opportunities" value={String(expansion.summary.opportunityCount)} hint="Pack recommendations" tone="neutral" />
-        <MetricCard label="High confidence" value={String(expansion.summary.highConfidenceCount)} hint="Score ≥ 85" tone="good" />
-        <MetricCard label="Unique packs" value={String(expansion.summary.recommendedPackCount)} hint="Recommended adds" tone="neutral" />
+        <MetricCard
+          label="Segments"
+          value={String(expansion.summary.customerSegmentCount)}
+          hint="Customer profiles"
+          tone="neutral"
+        />
+        <MetricCard
+          label="Opportunities"
+          value={String(expansion.summary.opportunityCount)}
+          hint="Pack recommendations"
+          tone="neutral"
+        />
+        <MetricCard
+          label="High confidence"
+          value={String(expansion.summary.highConfidenceCount)}
+          hint="Score ≥ 85"
+          tone="good"
+        />
+        <MetricCard
+          label="Unique packs"
+          value={String(expansion.summary.recommendedPackCount)}
+          hint="Recommended adds"
+          tone="neutral"
+        />
       </div>
 
       <div className="commercial-page__charts">
-        <VisualizationPanel title="Opportunity scores" description="Recommended pack expansion scores by segment." badge="Scores">
-          <CategoryBarChart data={scoreChart} title="Opportunity scores" color="var(--app-chart-1)" emptyMessage="Score chart appears when opportunities are registered." />
+        <VisualizationPanel
+          title="Opportunity scores"
+          description="Recommended pack expansion scores by segment."
+          badge="Scores"
+        >
+          <CategoryBarChart
+            data={scoreChart}
+            title="Opportunity scores"
+            color="var(--app-chart-1)"
+            emptyMessage="Score chart appears when opportunities are registered."
+          />
         </VisualizationPanel>
       </div>
 
@@ -68,7 +104,9 @@ export function CustomerExpansionOpportunitiesPage() {
                 <span role="cell">{opportunity.recommendedPack}</span>
                 <span role="cell">{opportunity.motion}</span>
                 <span role="cell">
-                  <span className={`commercial-page__pill commercial-page__pill--${expansionBandTone(opportunity.band.id)}`}>
+                  <span
+                    className={`commercial-page__pill commercial-page__pill--${expansionBandTone(opportunity.band.id)}`}
+                  >
                     {opportunity.score}
                   </span>
                 </span>

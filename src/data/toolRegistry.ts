@@ -1338,8 +1338,7 @@ const toolRegistry = [
     path: '/tools/calculators',
     panelTool: 'calculators',
     color: '#5BA4CF',
-    description:
-      'Pulmonary Embolism Rule-out Criteria with a source-backed calculator form',
+    description: 'Pulmonary Embolism Rule-out Criteria with a source-backed calculator form',
     shortcut: 'Ctrl+Shift+P',
     category: 'Calculator',
     features: [
@@ -2162,7 +2161,11 @@ const toolRegistry = [
     description:
       'Pediatric ED emergency drug quick-reference with weight or age-estimated dosing table and verification prompts',
     category: 'Calculator',
-    features: ['Weight/age estimate', 'Emergency drug dose table', 'Independent verification prompts'],
+    features: [
+      'Weight/age estimate',
+      'Emergency drug dose table',
+      'Independent verification prompts',
+    ],
     useCases: [
       'Pediatric resuscitation reference',
       'Broselow-style fallback when measured weight unavailable',
@@ -2611,7 +2614,8 @@ const toolRegistry = [
     name: 'Protocol and Clinical Pathway Library',
     path: '/protocols',
     color: '#A8E6CF',
-    description: 'Protocol viewer with version history, AI explanation, linked calculators, and linked simulations',
+    description:
+      'Protocol viewer with version history, AI explanation, linked calculators, and linked simulations',
     shortcut: 'Ctrl+8',
     category: 'Calculator',
     features: [
@@ -4057,7 +4061,11 @@ const toolRegistry = [
       'Safety score',
       'Kirkpatrick learning level',
     ],
-    useCases: ['Open competency dashboard', 'Show simulation competency', 'Review learner progress'],
+    useCases: [
+      'Open competency dashboard',
+      'Show simulation competency',
+      'Review learner progress',
+    ],
   },
   {
     id: 'laboratory-dashboard',
@@ -4075,12 +4083,7 @@ const toolRegistry = [
       'Reference ranges',
       'Chemistry, hematology, microbiology, urinalysis panels',
     ],
-    useCases: [
-      'Open laboratory',
-      'Show lab dashboard',
-      'Interpret labs',
-      'Review abnormal labs',
-    ],
+    useCases: ['Open laboratory', 'Show lab dashboard', 'Interpret labs', 'Review abnormal labs'],
   },
   {
     id: 'medical-3d-viewer',
@@ -4107,10 +4110,13 @@ const toolRegistry = [
   },
 ];
 
-export const toolRegistryById = toolRegistry.reduce((acc, tool) => {
-  acc[tool.id] = tool;
-  return acc;
-}, {} as Record<string, (typeof toolRegistry)[number]>);
+export const toolRegistryById = toolRegistry.reduce(
+  (acc, tool) => {
+    acc[tool.id] = tool;
+    return acc;
+  },
+  {} as Record<string, (typeof toolRegistry)[number]>,
+);
 
 export const getToolById = (toolId) => toolRegistryById[toolId] || null;
 

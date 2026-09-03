@@ -83,7 +83,8 @@ export const FEATURE_FLAG_REGISTRY = Object.freeze([
     owner: 'CareDroid',
     route: '/documentation',
     assetIds: ['ambient-scribe', 'clinical-documentation-assistant', 'order-set-ai'],
-    description: 'AI-assisted note drafting, summarization, patient instructions, and export readiness.',
+    description:
+      'AI-assisted note drafting, summarization, patient instructions, and export readiness.',
     rolloutNotes: 'Beta because generated documentation requires clinician review.',
   },
   {
@@ -94,7 +95,8 @@ export const FEATURE_FLAG_REGISTRY = Object.freeze([
     owner: 'Education',
     route: '/simulation',
     assetIds: ['simulation-suite', 'scenario-player', 'simulation-outcomes'],
-    description: 'Scenario player, competency links, debriefing, and simulation completion tracking.',
+    description:
+      'Scenario player, competency links, debriefing, and simulation completion tracking.',
     rolloutNotes: 'Beta rollout for training teams before organization-wide launch.',
   },
   {
@@ -127,7 +129,8 @@ export const FEATURE_FLAG_REGISTRY = Object.freeze([
     owner: 'Operations',
     route: '/fleet/command',
     assetIds: ['fleet-dashboard', 'fleet-live-map', 'route-optimizer', 'dispatch-ai'],
-    description: 'Fleet operations, command dashboards, dispatch context, and operational visibility.',
+    description:
+      'Fleet operations, command dashboards, dispatch context, and operational visibility.',
     rolloutNotes: 'Default-on for operations roles.',
   },
   {
@@ -198,8 +201,10 @@ export const FEATURE_FLAG_REGISTRY = Object.freeze([
       'command-predictive-alerts',
       'predictive-analytics-dashboard',
     ],
-    description: 'Heuristic admission scoring, journey prediction, and command-center proactive alerts.',
-    rolloutNotes: 'Requires analytics pack entitlement and charge/physician roles for staff surfaces.',
+    description:
+      'Heuristic admission scoring, journey prediction, and command-center proactive alerts.',
+    rolloutNotes:
+      'Requires analytics pack entitlement and charge/physician roles for staff surfaces.',
   },
   {
     id: 'patient-experience-pack',
@@ -246,7 +251,7 @@ export function buildFeatureFlagStateMap(overrides: any = {}) {
     FEATURE_FLAG_REGISTRY.map((flag) => [
       flag.id,
       normalizeFeatureFlagState(overrides[flag.id] || flag.defaultState),
-    ])
+    ]),
   );
 }
 
@@ -265,21 +270,31 @@ export function summarizeFeatureFlags(stateMap = buildFeatureFlagStateMap()) {
     ...flag,
     state: normalizeFeatureFlagState(stateMap[flag.id] || flag.defaultState),
   }));
-  const stateCounts = Object.values(FEATURE_FLAG_STATES).reduce<Record<string, number>>((acc, state) => {
-    acc[state] = flags.filter((flag) => flag.state === state).length;
-    return acc;
-  }, {});
-  const categoryCounts = Object.values(FEATURE_FLAG_CATEGORIES).reduce<Record<string, number>>((acc, category) => {
-    acc[category] = flags.filter((flag) => flag.category === category).length;
-    return acc;
-  }, {});
+  const stateCounts = Object.values(FEATURE_FLAG_STATES).reduce<Record<string, number>>(
+    (acc, state) => {
+      acc[state] = flags.filter((flag) => flag.state === state).length;
+      return acc;
+    },
+    {},
+  );
+  const categoryCounts = Object.values(FEATURE_FLAG_CATEGORIES).reduce<Record<string, number>>(
+    (acc, category) => {
+      acc[category] = flags.filter((flag) => flag.category === category).length;
+      return acc;
+    },
+    {},
+  );
 
   return {
     total: flags.length,
     stateCounts,
     categoryCounts,
     liveRolloutCount: flags.filter((flag) =>
-      [FEATURE_FLAG_STATES.ENABLED, FEATURE_FLAG_STATES.BETA, FEATURE_FLAG_STATES.EXPERIMENTAL].includes(flag.state)
+      [
+        FEATURE_FLAG_STATES.ENABLED,
+        FEATURE_FLAG_STATES.BETA,
+        FEATURE_FLAG_STATES.EXPERIMENTAL,
+      ].includes(flag.state),
     ).length,
     unavailableCount: flags.filter((flag) =>
       [
@@ -287,18 +302,16 @@ export function summarizeFeatureFlags(stateMap = buildFeatureFlagStateMap()) {
         FEATURE_FLAG_STATES.LOCKED,
         FEATURE_FLAG_STATES.SUBSCRIPTION_REQUIRED,
         FEATURE_FLAG_STATES.ADMIN_ONLY,
-      ].includes(flag.state)
+      ].includes(flag.state),
     ).length,
     hiddenOrDisabledCount: flags.filter((flag) =>
-      [FEATURE_FLAG_STATES.DISABLED, FEATURE_FLAG_STATES.LOCKED].includes(flag.state)
+      [FEATURE_FLAG_STATES.DISABLED, FEATURE_FLAG_STATES.LOCKED].includes(flag.state),
     ).length,
   };
 }
 
 export function shouldExposeDemoAuthFlag() {
   return Boolean(
-    FEATURE_FLAGS.enableDemoMode ||
-      FEATURE_FLAGS.enableDevAuthBypass ||
-      FEATURE_FLAGS.showDemoAuth
+    FEATURE_FLAGS.enableDemoMode || FEATURE_FLAGS.enableDevAuthBypass || FEATURE_FLAGS.showDemoAuth,
   );
 }

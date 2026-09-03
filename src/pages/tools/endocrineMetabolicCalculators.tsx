@@ -16,8 +16,8 @@ function DecisionSupportNotice({ children }) {
   return (
     <div className="calc-timi-disclaimer calc-has-bled-disclaimer" role="note">
       <p className="calc-ds-lead">
-        <strong>Decision support only.</strong> No insulin or medication dosing automation; follow local endocrine
-        and metabolic protocols.
+        <strong>Decision support only.</strong> No insulin or medication dosing automation; follow
+        local endocrine and metabolic protocols.
       </p>
       <p className="calc-disclaimer-detail">{children}</p>
     </div>
@@ -105,8 +105,8 @@ function ResultPanel({ config, result }) {
         <p className="calc-reference-line">{result.referenceLine}</p>
       </section>
       <p className="calc-result-safety-footer" role="note">
-        Output reflects entered values and may omit important endocrine, metabolic, assay, nutrition, and acuity
-        context.
+        Output reflects entered values and may omit important endocrine, metabolic, assay,
+        nutrition, and acuity context.
       </p>
     </>
   ) : (
@@ -186,7 +186,7 @@ function EndocrineMetabolicCalculator({ config, onResultChange }) {
                   value={form[field.name]}
                   onChange={update}
                 />
-              )
+              ),
             )}
           </div>
           <div className="calc-actions">
@@ -243,7 +243,8 @@ const CONFIGS = {
   'homa-ir': {
     slug: 'homa-ir',
     title: 'HOMA-IR',
-    notice: 'Insulin resistance estimate only; does not diagnose diabetes or recommend insulin or medication changes.',
+    notice:
+      'Insulin resistance estimate only; does not diagnose diabetes or recommend insulin or medication changes.',
     initial: { fastingGlucose: '', glucoseUnit: 'mg_dl', fastingInsulinUiuMl: '' },
     fields: [
       { name: 'fastingGlucose', label: 'Fasting glucose', min: 20, max: 2000 },
@@ -290,8 +291,17 @@ const CONFIGS = {
   'serum-osmolality': {
     slug: 'serum-osmolality',
     title: 'Serum Osmolality',
-    notice: 'Calculated osmolality support only; compare with measured osmolality and tonicity when available.',
-    initial: { sodium: '', glucose: '', glucoseUnit: 'mg_dl', bun: '', bunUnit: 'mg_dl', ethanol: '0', ethanolUnit: 'mg_dl' },
+    notice:
+      'Calculated osmolality support only; compare with measured osmolality and tonicity when available.',
+    initial: {
+      sodium: '',
+      glucose: '',
+      glucoseUnit: 'mg_dl',
+      bun: '',
+      bunUnit: 'mg_dl',
+      ethanol: '0',
+      ethanolUnit: 'mg_dl',
+    },
     fields: [
       { name: 'sodium', label: 'Sodium (mEq/L)', min: 90, max: 190 },
       { name: 'glucose', label: 'Glucose', min: 20, max: 2000 },
@@ -340,8 +350,16 @@ const CONFIGS = {
   'adjusted-body-weight': {
     slug: 'adjusted-body-weight',
     title: 'Adjusted Body Weight',
-    notice: 'Adjusted body weight estimate only; not medication, insulin, nutrition, or fluid dosing automation.',
-    initial: { sex: '', height: '', heightUnit: 'cm', actualWeight: '', weightUnit: 'kg', correctionFactor: '0.4' },
+    notice:
+      'Adjusted body weight estimate only; not medication, insulin, nutrition, or fluid dosing automation.',
+    initial: {
+      sex: '',
+      height: '',
+      heightUnit: 'cm',
+      actualWeight: '',
+      weightUnit: 'kg',
+      correctionFactor: '0.4',
+    },
     fields: [
       { name: 'sex', label: 'Sex', type: 'select', options: sexOptions },
       { name: 'height', label: 'Height', min: 48, max: 96 },
@@ -360,7 +378,8 @@ const CONFIGS = {
       },
     ],
     compute: computeAdjustedBodyWeight,
-    emptyText: 'Enter sex, height, actual weight, and correction factor to estimate adjusted body weight.',
+    emptyText:
+      'Enter sex, height, actual weight, and correction factor to estimate adjusted body weight.',
     primaryLabel: 'AdjBW',
     primaryValue: (result) => `${result.adjustedBodyWeightKg} kg`,
   },
@@ -371,8 +390,20 @@ const CONFIGS = {
     initial: { sex: '', waist: '', hip: '' },
     fields: [
       { name: 'sex', label: 'Sex', type: 'select', options: sexOptions },
-      { name: 'waist', label: 'Waist circumference', min: 20, max: 250, help: 'Use the same unit as hip.' },
-      { name: 'hip', label: 'Hip circumference', min: 20, max: 250, help: 'Use the same unit as waist.' },
+      {
+        name: 'waist',
+        label: 'Waist circumference',
+        min: 20,
+        max: 250,
+        help: 'Use the same unit as hip.',
+      },
+      {
+        name: 'hip',
+        label: 'Hip circumference',
+        min: 20,
+        max: 250,
+        help: 'Use the same unit as waist.',
+      },
     ],
     compute: computeWaistHipRatio,
     emptyText: 'Enter waist and hip circumferences to calculate the ratio.',
@@ -382,15 +413,27 @@ const CONFIGS = {
 };
 
 export function HomaIrCalculator({ onResultChange }) {
-  return <EndocrineMetabolicCalculator config={CONFIGS['homa-ir']} onResultChange={onResultChange} />;
+  return (
+    <EndocrineMetabolicCalculator config={CONFIGS['homa-ir']} onResultChange={onResultChange} />
+  );
 }
 
 export function CorrectedCalciumCalculator({ onResultChange }) {
-  return <EndocrineMetabolicCalculator config={CONFIGS['corrected-calcium']} onResultChange={onResultChange} />;
+  return (
+    <EndocrineMetabolicCalculator
+      config={CONFIGS['corrected-calcium']}
+      onResultChange={onResultChange}
+    />
+  );
 }
 
 export function SerumOsmolalityCalculator({ onResultChange }) {
-  return <EndocrineMetabolicCalculator config={CONFIGS['serum-osmolality']} onResultChange={onResultChange} />;
+  return (
+    <EndocrineMetabolicCalculator
+      config={CONFIGS['serum-osmolality']}
+      onResultChange={onResultChange}
+    />
+  );
 }
 
 export function BsaCalculator({ onResultChange }) {
@@ -398,13 +441,28 @@ export function BsaCalculator({ onResultChange }) {
 }
 
 export function IdealBodyWeightCalculator({ onResultChange }) {
-  return <EndocrineMetabolicCalculator config={CONFIGS['ideal-body-weight']} onResultChange={onResultChange} />;
+  return (
+    <EndocrineMetabolicCalculator
+      config={CONFIGS['ideal-body-weight']}
+      onResultChange={onResultChange}
+    />
+  );
 }
 
 export function AdjustedBodyWeightCalculator({ onResultChange }) {
-  return <EndocrineMetabolicCalculator config={CONFIGS['adjusted-body-weight']} onResultChange={onResultChange} />;
+  return (
+    <EndocrineMetabolicCalculator
+      config={CONFIGS['adjusted-body-weight']}
+      onResultChange={onResultChange}
+    />
+  );
 }
 
 export function WaistHipRatioCalculator({ onResultChange }) {
-  return <EndocrineMetabolicCalculator config={CONFIGS['waist-hip-ratio']} onResultChange={onResultChange} />;
+  return (
+    <EndocrineMetabolicCalculator
+      config={CONFIGS['waist-hip-ratio']}
+      onResultChange={onResultChange}
+    />
+  );
 }

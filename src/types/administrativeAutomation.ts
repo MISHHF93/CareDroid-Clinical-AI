@@ -45,11 +45,7 @@ export type AdministrativeAutomationTask = Readonly<{
   route?: string;
 }>;
 
-export type AdministrativeAutomationReviewDecision =
-  | 'approve'
-  | 'modify'
-  | 'override'
-  | 'dismiss';
+export type AdministrativeAutomationReviewDecision = 'approve' | 'modify' | 'override' | 'dismiss';
 
 export type AdministrativeAutomationSnapshot = Readonly<{
   engineId: 'unified-clinical-workflow-orchestrator';

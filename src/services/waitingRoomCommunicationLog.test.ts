@@ -145,8 +145,14 @@ describe('waitingRoomCommunicationLog', () => {
 
   it('summarizes stale and overdue communication counts for the board', () => {
     const patients = [
-      buildPatient({ id: 'fresh', notes: [{ id: 'n1', text: 'Checked in', timestamp: '2026-06-20T09:50:00.000Z' }] }),
-      buildPatient({ id: 'stale', notes: [{ id: 'n2', text: 'Checked in', timestamp: '2026-06-20T09:20:00.000Z' }] }),
+      buildPatient({
+        id: 'fresh',
+        notes: [{ id: 'n1', text: 'Checked in', timestamp: '2026-06-20T09:50:00.000Z' }],
+      }),
+      buildPatient({
+        id: 'stale',
+        notes: [{ id: 'n2', text: 'Checked in', timestamp: '2026-06-20T09:20:00.000Z' }],
+      }),
       buildPatient({ id: 'none', notes: [] }),
     ];
 

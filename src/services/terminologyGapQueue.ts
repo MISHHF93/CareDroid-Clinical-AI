@@ -14,7 +14,11 @@
  * so a future backend sync can map 1:1 onto it.
  */
 
-import type { ComplaintCandidate, ComplaintRecognitionResult, ConfidenceTier } from '../data/clinicalTerminology/clinicalConceptTypes';
+import type {
+  ComplaintCandidate,
+  ComplaintRecognitionResult,
+  ConfidenceTier,
+} from '../data/clinicalTerminology/clinicalConceptTypes';
 
 export type TerminologyGapReviewStatus = 'open' | 'reviewed' | 'mapped' | 'dismissed';
 
@@ -69,7 +73,10 @@ function createGapId(now: string): string {
  * Matches on normalizedText so "SOB variant" typos don't fragment into many rows.
  */
 export function recordTerminologyGap(
-  result: Pick<ComplaintRecognitionResult, 'rawText' | 'normalizedText' | 'alternativeCandidates' | 'confidenceTier'>,
+  result: Pick<
+    ComplaintRecognitionResult,
+    'rawText' | 'normalizedText' | 'alternativeCandidates' | 'confidenceTier'
+  >,
   now: string = new Date().toISOString(),
 ): TerminologyGapEvent | null {
   const gapTiers: ConfidenceTier[] = ['NO_MATCH', 'LOW_CONFIDENCE'];
@@ -113,14 +120,19 @@ export function listTerminologyGaps(
 
 export function resolveTerminologyGap(
   gapId: string,
-  resolution: { resolvedConceptId: string | null; reviewedBy: string; reviewStatus?: TerminologyGapReviewStatus },
+  resolution: {
+    resolvedConceptId: string | null;
+    reviewedBy: string;
+    reviewStatus?: TerminologyGapReviewStatus;
+  },
 ): TerminologyGapEvent | null {
   const queue = readQueue();
   const entry = queue.find((candidate) => candidate.id === gapId);
   if (!entry) return null;
   entry.resolvedConceptId = resolution.resolvedConceptId;
   entry.reviewedBy = resolution.reviewedBy;
-  entry.reviewStatus = resolution.reviewStatus || (resolution.resolvedConceptId ? 'mapped' : 'reviewed');
+  entry.reviewStatus =
+    resolution.reviewStatus || (resolution.resolvedConceptId ? 'mapped' : 'reviewed');
   writeQueue(queue);
   return entry;
 }

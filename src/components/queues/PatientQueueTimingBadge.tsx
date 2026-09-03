@@ -4,7 +4,7 @@ import './PatientQueueTimingBadge.css';
 
 export default function PatientQueueTimingBadge({
   patient,
-  settings = (undefined as any),
+  settings = undefined as any,
   now = undefined as Date | undefined,
   layout = 'inline',
   showScenario = false,
@@ -23,10 +23,7 @@ export default function PatientQueueTimingBadge({
 
   return (
     <span
-      className={[
-        'patient-queue-timing',
-        layout === 'row' ? 'patient-queue-timing--row' : '',
-      ]
+      className={['patient-queue-timing', layout === 'row' ? 'patient-queue-timing--row' : '']
         .filter(Boolean)
         .join(' ')}
       title={timing.staffDetail}

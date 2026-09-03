@@ -13,7 +13,11 @@ function formatShiftStart(activeShift) {
 }
 
 function patientName(patient) {
-  return patient?.name || [patient?.firstName, patient?.lastName].filter(Boolean).join(' ') || 'Unknown patient';
+  return (
+    patient?.name ||
+    [patient?.firstName, patient?.lastName].filter(Boolean).join(' ') ||
+    'Unknown patient'
+  );
 }
 
 function patientComplaint(patient) {
@@ -80,7 +84,8 @@ function parseSuggestionResponse(text, localSuggestions) {
           patientName: item.patientName || fallback?.patientName,
           fromStaffName: item.fromStaffName || fallback?.fromStaffName,
           toStaffName: item.toStaffName || fallback?.toStaffName,
-          reason: item.reason || fallback?.reason || item.rationale || 'Suggested workload rebalance.',
+          reason:
+            item.reason || fallback?.reason || item.rationale || 'Suggested workload rebalance.',
         };
       })
       .filter((item) => item.patientId && item.toStaffId)
@@ -130,8 +135,6 @@ export default function WorkloadBalancePanel({
     });
   };
 
-
-
   const reassignPatient = (patient, fromStaff, toStaffId) => {
     if (!toStaffId || toStaffId === fromStaff.id) return;
     const toStaff = workloads.find((member) => member.id === toStaffId);
@@ -152,7 +155,9 @@ export default function WorkloadBalancePanel({
   const applySuggestion = (suggestion) => {
     const fromStaff = workloads.find((member) => member.id === suggestion.fromStaffId);
     const toStaff = workloads.find((member) => member.id === suggestion.toStaffId);
-    const patient = fromStaff?.assignedPatients?.find((candidate) => candidate.id === suggestion.patientId);
+    const patient = fromStaff?.assignedPatients?.find(
+      (candidate) => candidate.id === suggestion.patientId,
+    );
     if (!fromStaff || !toStaff || !patient) return;
     reassignPatient(patient, fromStaff, toStaff.id);
     setAiSuggestions((current) => current.filter((item) => item.id !== suggestion.id));
@@ -232,7 +237,8 @@ export default function WorkloadBalancePanel({
         {rebalanceSuggestion ? (
           <section className="workload-balance-panel__imbalance" role="status">
             <strong>
-              Imbalance detected - {rebalanceSuggestion.name} has {rebalanceSuggestion.assignedCount} patients vs team average of {teamAverage}
+              Imbalance detected - {rebalanceSuggestion.name} has{' '}
+              {rebalanceSuggestion.assignedCount} patients vs team average of {teamAverage}
             </strong>
             <button type="button" onClick={suggestRebalance} disabled={aiStatus === 'loading'}>
               {aiStatus === 'loading' ? 'Building suggestions...' : 'Suggest rebalance'}
@@ -248,7 +254,10 @@ export default function WorkloadBalancePanel({
         ) : null}
 
         {aiSuggestions.length ? (
-          <section className="workload-balance-panel__suggestions" aria-label="Rebalance suggestions">
+          <section
+            className="workload-balance-panel__suggestions"
+            aria-label="Rebalance suggestions"
+          >
             <h3>
               {suggestionsSource === 'ai'
                 ? 'AI suggestions - requires review'
@@ -258,7 +267,9 @@ export default function WorkloadBalancePanel({
               <article key={suggestion.id}>
                 <div>
                   <strong>{suggestion.patientName || 'Patient'}</strong>
-                  <span>{suggestion.fromStaffName} to {suggestion.toStaffName}: {suggestion.reason}</span>
+                  <span>
+                    {suggestion.fromStaffName} to {suggestion.toStaffName}: {suggestion.reason}
+                  </span>
                 </div>
                 <button type="button" onClick={() => applySuggestion(suggestion)}>
                   Apply
@@ -273,51 +284,63 @@ export default function WorkloadBalancePanel({
             const expanded = expandedStaffIds.has(member.id);
             return (
               <article key={member.id} className="workload-staff-row">
-                {expanded ? (<button
-                  type="button"
-                  className="workload-staff-row__summary"
-                  onClick={() => toggleExpanded(member.id)}
-                  aria-expanded="true"
-                >
-                  {member.avatarUrl ? (
-                    <img src={member.avatarUrl} alt="" loading="lazy" />
-                  ) : (
-                    <span className="workload-staff-row__avatar">{member.initials}</span>
-                  )}
-                  <span className="workload-staff-row__identity">
-                    <strong>{member.displayName}</strong>
-                    <small>{member.roleLabel}</small>
-                  </span>
-                  <strong className="workload-staff-row__count">{member.assignedCount}</strong>
-                  <span
-                    className={`workload-staff-row__bar workload-staff-row__bar--${member.workloadTone}`}
-                    aria-label={`${member.assignedCount} assigned patients`}
+                {expanded ? (
+                  <button
+                    type="button"
+                    className="workload-staff-row__summary"
+                    onClick={() => toggleExpanded(member.id)}
+                    aria-expanded="true"
                   >
-                    <span style={{ width: `${member.assignedCount === 0 ? 0 : Math.max(16, member.workloadPercent)}%` }} />
-                  </span>
-                </button>) : (<button
-                  type="button"
-                  className="workload-staff-row__summary"
-                  onClick={() => toggleExpanded(member.id)}
-                  aria-expanded="false"
-                >
-                  {member.avatarUrl ? (
-                    <img src={member.avatarUrl} alt="" loading="lazy" />
-                  ) : (
-                    <span className="workload-staff-row__avatar">{member.initials}</span>
-                  )}
-                  <span className="workload-staff-row__identity">
-                    <strong>{member.displayName}</strong>
-                    <small>{member.roleLabel}</small>
-                  </span>
-                  <strong className="workload-staff-row__count">{member.assignedCount}</strong>
-                  <span
-                    className={`workload-staff-row__bar workload-staff-row__bar--${member.workloadTone}`}
-                    aria-label={`${member.assignedCount} assigned patients`}
+                    {member.avatarUrl ? (
+                      <img src={member.avatarUrl} alt="" loading="lazy" />
+                    ) : (
+                      <span className="workload-staff-row__avatar">{member.initials}</span>
+                    )}
+                    <span className="workload-staff-row__identity">
+                      <strong>{member.displayName}</strong>
+                      <small>{member.roleLabel}</small>
+                    </span>
+                    <strong className="workload-staff-row__count">{member.assignedCount}</strong>
+                    <span
+                      className={`workload-staff-row__bar workload-staff-row__bar--${member.workloadTone}`}
+                      aria-label={`${member.assignedCount} assigned patients`}
+                    >
+                      <span
+                        style={{
+                          width: `${member.assignedCount === 0 ? 0 : Math.max(16, member.workloadPercent)}%`,
+                        }}
+                      />
+                    </span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    className="workload-staff-row__summary"
+                    onClick={() => toggleExpanded(member.id)}
+                    aria-expanded="false"
                   >
-                    <span style={{ width: `${member.assignedCount === 0 ? 0 : Math.max(16, member.workloadPercent)}%` }} />
-                  </span>
-                </button>)}
+                    {member.avatarUrl ? (
+                      <img src={member.avatarUrl} alt="" loading="lazy" />
+                    ) : (
+                      <span className="workload-staff-row__avatar">{member.initials}</span>
+                    )}
+                    <span className="workload-staff-row__identity">
+                      <strong>{member.displayName}</strong>
+                      <small>{member.roleLabel}</small>
+                    </span>
+                    <strong className="workload-staff-row__count">{member.assignedCount}</strong>
+                    <span
+                      className={`workload-staff-row__bar workload-staff-row__bar--${member.workloadTone}`}
+                      aria-label={`${member.assignedCount} assigned patients`}
+                    >
+                      <span
+                        style={{
+                          width: `${member.assignedCount === 0 ? 0 : Math.max(16, member.workloadPercent)}%`,
+                        }}
+                      />
+                    </span>
+                  </button>
+                )}
 
                 {expanded ? (
                   <div className="workload-staff-row__patients">
@@ -326,7 +349,9 @@ export default function WorkloadBalancePanel({
                         <article key={patient.id} className="workload-patient-row">
                           <div>
                             <strong>{patientName(patient)}</strong>
-                            <span>{patientComplaint(patient)} - {patient.state}</span>
+                            <span>
+                              {patientComplaint(patient)} - {patient.state}
+                            </span>
                           </div>
                           {activeReassignPatientId === patient.id ? (
                             <label>
@@ -334,9 +359,13 @@ export default function WorkloadBalancePanel({
                               <select
                                 ref={focusOnMount}
                                 defaultValue=""
-                                onChange={(event) => reassignPatient(patient, member, event.target.value)}
+                                onChange={(event) =>
+                                  reassignPatient(patient, member, event.target.value)
+                                }
                               >
-                                <option value="" disabled>Select staff</option>
+                                <option value="" disabled>
+                                  Select staff
+                                </option>
                                 {workloads
                                   .filter((candidate) => candidate.id !== member.id)
                                   .map((candidate) => (
@@ -351,7 +380,10 @@ export default function WorkloadBalancePanel({
                               </select>
                             </label>
                           ) : (
-                            <button type="button" onClick={() => setActiveReassignPatientId(patient.id)}>
+                            <button
+                              type="button"
+                              onClick={() => setActiveReassignPatientId(patient.id)}
+                            >
                               Reassign
                             </button>
                           )}
@@ -372,8 +404,6 @@ export default function WorkloadBalancePanel({
           })}
         </section>
       </div>
-
-
     </aside>
   );
 }

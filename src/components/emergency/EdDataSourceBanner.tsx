@@ -1,7 +1,4 @@
-import {
-  resolveEdDataSourcePresentation,
-  type EdDataSourceInput,
-} from '../../utils/edDataSource';
+import { resolveEdDataSourcePresentation, type EdDataSourceInput } from '../../utils/edDataSource';
 import { useSimulationMode } from '../../contexts/SimulationModeContext';
 import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
 import './EdDataSourceBanner.css';

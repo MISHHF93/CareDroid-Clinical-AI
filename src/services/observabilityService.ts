@@ -359,7 +359,9 @@ class ObservabilityService {
         }),
       });
     } catch (error: unknown) {
-      this.pendingEvents = [...batch, ...this.pendingEvents].slice(-OBSERVABILITY_EVENT_BUFFER_LIMIT);
+      this.pendingEvents = [...batch, ...this.pendingEvents].slice(
+        -OBSERVABILITY_EVENT_BUFFER_LIMIT,
+      );
       logger.debug('Observability flush deferred', {
         error: error instanceof Error ? error.message : String(error),
       });
@@ -391,7 +393,4 @@ registerApiTelemetryHooks({
   recordApiTiming: (input) => observabilityService.recordApiTiming(input),
 });
 export default observabilityService;
-export {
-  observabilityService,
-  ObservabilityService,
-};
+export { observabilityService, ObservabilityService };

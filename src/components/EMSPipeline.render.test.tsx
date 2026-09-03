@@ -225,7 +225,9 @@ describe('EMSPipeline render', () => {
     expect(countBadge?.textContent).toBe('1');
     // The actual HEAL-276 guarantee: the two widgets that read the same
     // emsArrivals array must never disagree.
-    expect(calculateEMSPressureScore([CONVERTED_BUT_NOT_COMPLETED_ARRIVAL]).awaitingHandoff).toBe(1);
+    expect(calculateEMSPressureScore([CONVERTED_BUT_NOT_COMPLETED_ARRIVAL]).awaitingHandoff).toBe(
+      1,
+    );
   });
 
   it('the "Complete Handoff" button is reachable for a converted-but-not-yet-completed arrival (the bug this fix resolves)', () => {

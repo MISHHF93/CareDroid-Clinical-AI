@@ -69,7 +69,7 @@ describe('AssetLifecycleAdmin', () => {
     render(
       <MemoryRouter>
         <AssetLifecycleAdmin />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     // Page title is registered into the shell chrome (useRouteChromeRegistration)

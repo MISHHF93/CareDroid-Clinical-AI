@@ -31,8 +31,9 @@ export function dispatchAlert(input: AlertInput): string {
     source: input.source || 'alert-engine',
   });
 
-  const alert = useEmergencyStore.getState().alerts.find((entry) => entry.id === alertId)
-    || prepareUnifiedAlert({
+  const alert =
+    useEmergencyStore.getState().alerts.find((entry) => entry.id === alertId) ||
+    prepareUnifiedAlert({
       ...input,
       id: alertId,
       createdAt: input.createdAt || new Date().toISOString(),
@@ -50,9 +51,7 @@ export function dispatchAlert(input: AlertInput): string {
 export const dispatch = dispatchAlert;
 
 export function dispatchCriticalVitalsAlerts(patient: Patient): string[] {
-  const latestVitals = Array.isArray(patient.vitals)
-    ? patient.vitals.at(-1)
-    : patient.vitals;
+  const latestVitals = Array.isArray(patient.vitals) ? patient.vitals.at(-1) : patient.vitals;
   if (!latestVitals) return [];
 
   const findings = [

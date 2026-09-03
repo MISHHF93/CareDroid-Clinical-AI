@@ -43,11 +43,11 @@ export const CKD_EGFR_FIXTURES = Object.freeze([
 ]);
 
 export const STOP_BANG_ALL_FALSE = Object.freeze(
-  Object.fromEntries(STOP_BANG_CRITERIA_META.map((r) => [r.key, false]))
+  Object.fromEntries(STOP_BANG_CRITERIA_META.map((r) => [r.key, false])),
 );
 
 export const STOP_BANG_ALL_TRUE = Object.freeze(
-  Object.fromEntries(STOP_BANG_CRITERIA_META.map((r) => [r.key, true]))
+  Object.fromEntries(STOP_BANG_CRITERIA_META.map((r) => [r.key, true])),
 );
 
 export const STOP_BANG_BAND_FIXTURES = Object.freeze([

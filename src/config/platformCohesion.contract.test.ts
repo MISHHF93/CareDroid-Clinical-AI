@@ -40,7 +40,9 @@ describe('platform cohesion contract', () => {
     expect(router).toContain('OUTSIDE_SHELL_ROUTE_REDIRECTS.map');
     const routes = readSource('src/config/routes.config.ts');
     expect(routes).toContain('[CANONICAL_ROUTES.automation, CANONICAL_ROUTES.workflows]');
-    expect(routes).toContain('[CANONICAL_ROUTES.documentation, CANONICAL_ROUTES.emergencyDocumentation]');
+    expect(routes).toContain(
+      '[CANONICAL_ROUTES.documentation, CANONICAL_ROUTES.emergencyDocumentation]',
+    );
   });
 
   it('routes PermissionGate through useSecurityAccess', () => {
@@ -57,7 +59,9 @@ describe('platform cohesion contract', () => {
   it('keeps UserContext free of inline role-permission maps', () => {
     const userContext = readSource('src/contexts/UserContext.tsx');
     expect(userContext).not.toContain('const RolePermissions');
-    expect(userContext).toContain("export { Permission } from '../config/backendPermissionCatalog'");
+    expect(userContext).toContain(
+      "export { Permission } from '../config/backendPermissionCatalog'",
+    );
     expect(userContext).toContain('checkSecurityPermission');
   });
 

@@ -98,7 +98,10 @@ export default function DiagnosticSafetyDashboard({
               <p className="diagnostic-safety-dashboard__meta">{entry.chiefComplaint}</p>
               <div className="diagnostic-safety-dashboard__drivers">
                 {(entry.riskDrivers ?? []).map((driver) => (
-                  <span key={`${entry.patientId}-${driver}`} className="diagnostic-safety-dashboard__driver">
+                  <span
+                    key={`${entry.patientId}-${driver}`}
+                    className="diagnostic-safety-dashboard__driver"
+                  >
                     {driver}
                   </span>
                 ))}

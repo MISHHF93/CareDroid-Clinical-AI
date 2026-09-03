@@ -21,7 +21,9 @@ function buildMetric({
   const medianValue = Number(median ?? numericValue);
   const p90Value = Number(p90 ?? Math.round(numericValue * 1.25));
   const longestValue = Number(longestActiveDuration ?? Math.round(numericValue * 1.5));
-  const compliance = target ? Math.max(0, Math.min(100, Math.round((target / Math.max(numericValue, 1)) * 100))) : null;
+  const compliance = target
+    ? Math.max(0, Math.min(100, Math.round((target / Math.max(numericValue, 1)) * 100)))
+    : null;
   return Object.freeze({
     metricId,
     label,
@@ -177,7 +179,9 @@ export const EmergencyKPILayerService = Object.freeze({
       id: 'EmergencyKPILayer',
       label: 'Emergency KPI Layer',
       metrics,
-      metricById: Object.freeze(Object.fromEntries(metrics.map((metric) => [metric.metricId, metric]))),
+      metricById: Object.freeze(
+        Object.fromEntries(metrics.map((metric) => [metric.metricId, metric])),
+      ),
       sourceState:
         sentinelState === 'live'
           ? 'Live Sentinel overlay + ED demo sources'

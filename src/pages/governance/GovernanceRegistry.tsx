@@ -59,8 +59,12 @@ export default function GovernanceRegistry() {
         <div className="governance-registry-page__title-row">
           <GraphicIconBadge iconKey="shield-check" accent="brand" size="md" />
           <div>
-            <p className="governance-registry-page__title-text" data-testid="cd-page-title-text">Platform Governance Registry</p>
-            <p>Stewardship metadata, risk classification, audit requirements, and review schedules.</p>
+            <p className="governance-registry-page__title-text" data-testid="cd-page-title-text">
+              Platform Governance Registry
+            </p>
+            <p>
+              Stewardship metadata, risk classification, audit requirements, and review schedules.
+            </p>
           </div>
         </div>
         <div className="governance-registry-page__actions">
@@ -81,8 +85,17 @@ export default function GovernanceRegistry() {
         details="Loads governed asset rows from platform assets API with local inventory fallback when backend is unavailable."
       />
 
-      <div className="governance-registry-page__metrics" role="group" aria-label="Governance registry summary metrics">
-        <MetricCard label="Total assets" value={String(registry.summary.totalAssets)} hint="Registry rows" tone="neutral" />
+      <div
+        className="governance-registry-page__metrics"
+        role="group"
+        aria-label="Governance registry summary metrics"
+      >
+        <MetricCard
+          label="Total assets"
+          value={String(registry.summary.totalAssets)}
+          hint="Registry rows"
+          tone="neutral"
+        />
         <MetricCard
           label="Complete"
           value={String(registry.summary.complete)}
@@ -131,8 +144,14 @@ export default function GovernanceRegistry() {
 
       <section className="governance-registry-page__panel" aria-label="Governed assets">
         <h2>Governed assets</h2>
-        <p>Owner, steward, approver, evidence source, and review cadence for platform capabilities.</p>
-        <div className="governance-registry-page__table" role="table" aria-label="Governed assets table">
+        <p>
+          Owner, steward, approver, evidence source, and review cadence for platform capabilities.
+        </p>
+        <div
+          className="governance-registry-page__table"
+          role="table"
+          aria-label="Governed assets table"
+        >
           <div className="governance-registry-page__table-head" role="row">
             <span role="columnheader">Asset</span>
             <span role="columnheader">Owner</span>

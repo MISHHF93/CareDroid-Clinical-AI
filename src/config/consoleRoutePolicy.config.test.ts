@@ -17,7 +17,12 @@ describe('consoleRoutePolicy.config', () => {
   it('declares mounted console families', () => {
     const ids = CONSOLE_ROUTE_POLICIES.map((policy) => policy.id);
     expect(ids).toEqual(
-      expect.arrayContaining(['operations-fleet', 'platform-intelligence', 'governance', 'clinical-tools']),
+      expect.arrayContaining([
+        'operations-fleet',
+        'platform-intelligence',
+        'governance',
+        'clinical-tools',
+      ]),
     );
   });
 });

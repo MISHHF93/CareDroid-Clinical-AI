@@ -49,7 +49,11 @@ vi.mock('../../contexts/UserIdentityContext', () => ({
 
 describe('ProfileWorkspaces', () => {
   it('renders workspace switching and effective permissions', async () => {
-    render(<MemoryRouter><ProfileWorkspaces /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <ProfileWorkspaces />
+      </MemoryRouter>,
+    );
 
     expect(screen.getByRole('heading', { name: /workspaces/i })).toBeInTheDocument();
     expect(screen.getAllByText('Hospital Operations').length).toBeGreaterThan(0);

@@ -43,103 +43,140 @@ export type PersonaUxProfile = Readonly<{
   primaryConcerns: readonly string[];
 }>;
 
-export const PERSONA_UX_PROFILES: Readonly<Partial<Record<HospitalRole, PersonaUxProfile>>> = Object.freeze({
-  emergency_physician: {
-    role: 'emergency_physician',
-    label: 'Emergency Physician',
-    cognitivePriority: 'time-critical-triage',
-    informationDensity: 'compact',
-    aiInteractionStyle: 'concise-clinical',
-    primaryConcerns: ['acuity/breach status across assigned patients', 'orders pending action', 'diagnostic results ready for review'],
-  },
-  attending_physician: {
-    role: 'attending_physician',
-    label: 'Attending Physician',
-    cognitivePriority: 'time-critical-triage',
-    informationDensity: 'compact',
-    aiInteractionStyle: 'concise-clinical',
-    primaryConcerns: ['department-wide acuity', 'resident/consult handoffs', 'disposition-pending patients'],
-  },
-  resident_physician: {
-    role: 'resident_physician',
-    label: 'Resident Physician',
-    cognitivePriority: 'patient-safety-verification',
-    informationDensity: 'standard',
-    aiInteractionStyle: 'guided-workflow',
-    primaryConcerns: ['assigned patient list', 'orders requiring co-sign', 'evidence/citation support for differentials'],
-  },
-  charge_nurse: {
-    role: 'charge_nurse',
-    label: 'Charge Nurse',
-    cognitivePriority: 'operational-oversight',
-    informationDensity: 'standard',
-    aiInteractionStyle: 'operational-summary',
-    primaryConcerns: ['bed/room availability', 'staffing load balance', 'escalations and breach timers department-wide'],
-  },
-  triage_nurse: {
-    role: 'triage_nurse',
-    label: 'Triage Nurse',
-    cognitivePriority: 'time-critical-triage',
-    informationDensity: 'compact',
-    aiInteractionStyle: 'guided-workflow',
-    primaryConcerns: ['incoming/waiting queue by acuity', 'reassessment timers', 'high-risk complaint flags'],
-  },
-  registered_nurse: {
-    role: 'registered_nurse',
-    label: 'Registered Nurse',
-    cognitivePriority: 'patient-safety-verification',
-    informationDensity: 'standard',
-    aiInteractionStyle: 'guided-workflow',
-    primaryConcerns: ['assigned patient vitals/tasks', 'medication administration windows', 'reassessment due'],
-  },
-  paramedic: {
-    role: 'paramedic',
-    label: 'EMS / Paramedic',
-    cognitivePriority: 'time-critical-triage',
-    informationDensity: 'compact',
-    aiInteractionStyle: 'guided-workflow',
-    primaryConcerns: ['pre-arrival notification status', 'handoff checklist', 'receiving bay readiness'],
-  },
-  dispatcher: {
-    role: 'dispatcher',
-    label: 'EMS Dispatcher',
-    cognitivePriority: 'operational-oversight',
-    informationDensity: 'standard',
-    aiInteractionStyle: 'operational-summary',
-    primaryConcerns: ['unit availability and ETA', 'diversion status', 'offload pressure across sites'],
-  },
-  registration_clerk: {
-    role: 'registration_clerk',
-    label: 'Registration Clerk',
-    // ED desk under load is interruption-driven speed + safety signaling, not form completeness.
-    cognitivePriority: 'time-critical-triage',
-    informationDensity: 'compact',
-    aiInteractionStyle: 'guided-workflow',
-    primaryConcerns: [
-      'find existing patient before create',
-      'door-to-nurse handoff speed',
-      'crash/unknown pathway',
-      'identity verification without blocking care',
-      'escalation when red flags present',
-    ],
-  },
-  hospital_admin: {
-    role: 'hospital_admin',
-    label: 'Hospital Administrator',
-    cognitivePriority: 'operational-oversight',
-    informationDensity: 'spacious',
-    aiInteractionStyle: 'operational-summary',
-    primaryConcerns: ['department throughput trends', 'staffing and capacity forecasts', 'compliance/audit posture'],
-  },
-  it_admin: {
-    role: 'it_admin',
-    label: 'IT Administrator',
-    cognitivePriority: 'operational-oversight',
-    informationDensity: 'standard',
-    aiInteractionStyle: 'operational-summary',
-    primaryConcerns: ['system health/observability', 'integration status', 'access/audit logs'],
-  },
-});
+export const PERSONA_UX_PROFILES: Readonly<Partial<Record<HospitalRole, PersonaUxProfile>>> =
+  Object.freeze({
+    emergency_physician: {
+      role: 'emergency_physician',
+      label: 'Emergency Physician',
+      cognitivePriority: 'time-critical-triage',
+      informationDensity: 'compact',
+      aiInteractionStyle: 'concise-clinical',
+      primaryConcerns: [
+        'acuity/breach status across assigned patients',
+        'orders pending action',
+        'diagnostic results ready for review',
+      ],
+    },
+    attending_physician: {
+      role: 'attending_physician',
+      label: 'Attending Physician',
+      cognitivePriority: 'time-critical-triage',
+      informationDensity: 'compact',
+      aiInteractionStyle: 'concise-clinical',
+      primaryConcerns: [
+        'department-wide acuity',
+        'resident/consult handoffs',
+        'disposition-pending patients',
+      ],
+    },
+    resident_physician: {
+      role: 'resident_physician',
+      label: 'Resident Physician',
+      cognitivePriority: 'patient-safety-verification',
+      informationDensity: 'standard',
+      aiInteractionStyle: 'guided-workflow',
+      primaryConcerns: [
+        'assigned patient list',
+        'orders requiring co-sign',
+        'evidence/citation support for differentials',
+      ],
+    },
+    charge_nurse: {
+      role: 'charge_nurse',
+      label: 'Charge Nurse',
+      cognitivePriority: 'operational-oversight',
+      informationDensity: 'standard',
+      aiInteractionStyle: 'operational-summary',
+      primaryConcerns: [
+        'bed/room availability',
+        'staffing load balance',
+        'escalations and breach timers department-wide',
+      ],
+    },
+    triage_nurse: {
+      role: 'triage_nurse',
+      label: 'Triage Nurse',
+      cognitivePriority: 'time-critical-triage',
+      informationDensity: 'compact',
+      aiInteractionStyle: 'guided-workflow',
+      primaryConcerns: [
+        'incoming/waiting queue by acuity',
+        'reassessment timers',
+        'high-risk complaint flags',
+      ],
+    },
+    registered_nurse: {
+      role: 'registered_nurse',
+      label: 'Registered Nurse',
+      cognitivePriority: 'patient-safety-verification',
+      informationDensity: 'standard',
+      aiInteractionStyle: 'guided-workflow',
+      primaryConcerns: [
+        'assigned patient vitals/tasks',
+        'medication administration windows',
+        'reassessment due',
+      ],
+    },
+    paramedic: {
+      role: 'paramedic',
+      label: 'EMS / Paramedic',
+      cognitivePriority: 'time-critical-triage',
+      informationDensity: 'compact',
+      aiInteractionStyle: 'guided-workflow',
+      primaryConcerns: [
+        'pre-arrival notification status',
+        'handoff checklist',
+        'receiving bay readiness',
+      ],
+    },
+    dispatcher: {
+      role: 'dispatcher',
+      label: 'EMS Dispatcher',
+      cognitivePriority: 'operational-oversight',
+      informationDensity: 'standard',
+      aiInteractionStyle: 'operational-summary',
+      primaryConcerns: [
+        'unit availability and ETA',
+        'diversion status',
+        'offload pressure across sites',
+      ],
+    },
+    registration_clerk: {
+      role: 'registration_clerk',
+      label: 'Registration Clerk',
+      // ED desk under load is interruption-driven speed + safety signaling, not form completeness.
+      cognitivePriority: 'time-critical-triage',
+      informationDensity: 'compact',
+      aiInteractionStyle: 'guided-workflow',
+      primaryConcerns: [
+        'find existing patient before create',
+        'door-to-nurse handoff speed',
+        'crash/unknown pathway',
+        'identity verification without blocking care',
+        'escalation when red flags present',
+      ],
+    },
+    hospital_admin: {
+      role: 'hospital_admin',
+      label: 'Hospital Administrator',
+      cognitivePriority: 'operational-oversight',
+      informationDensity: 'spacious',
+      aiInteractionStyle: 'operational-summary',
+      primaryConcerns: [
+        'department throughput trends',
+        'staffing and capacity forecasts',
+        'compliance/audit posture',
+      ],
+    },
+    it_admin: {
+      role: 'it_admin',
+      label: 'IT Administrator',
+      cognitivePriority: 'operational-oversight',
+      informationDensity: 'standard',
+      aiInteractionStyle: 'operational-summary',
+      primaryConcerns: ['system health/observability', 'integration status', 'access/audit logs'],
+    },
+  });
 
 export function getPersonaUxProfile(role: HospitalRole): PersonaUxProfile | undefined {
   return PERSONA_UX_PROFILES[role];

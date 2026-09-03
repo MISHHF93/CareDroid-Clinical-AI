@@ -11,17 +11,13 @@ describe('liveTrackingMapModel', () => {
       buildFleetTrackingMarkers([
         { id: 'VH-1', label: 'Van 1', status: 'active', mapPosition: { x: 10, y: 20 } },
       ]),
-    ).toEqual([
-      expect.objectContaining({ id: 'fleet-VH-1', layer: 'fleet', x: 10, y: 20 }),
-    ]);
+    ).toEqual([expect.objectContaining({ id: 'fleet-VH-1', layer: 'fleet', x: 10, y: 20 })]);
 
     expect(
       buildIotTrackingMarkers([
         { id: 'dev-1', name: 'Monitor', status: 'online', location: { x: 30, y: 40 } },
       ]),
-    ).toEqual([
-      expect.objectContaining({ id: 'iot-dev-1', layer: 'iot', x: 30, y: 40 }),
-    ]);
+    ).toEqual([expect.objectContaining({ id: 'iot-dev-1', layer: 'iot', x: 30, y: 40 })]);
   });
 
   it('filters markers by layer and status', () => {
@@ -42,7 +38,13 @@ describe('liveTrackingMapModel', () => {
   // doubled its status word (e.g. "occupied · occupied").
   it('fleet subtitle does not repeat the status the UI already renders separately', () => {
     const [marker] = buildFleetTrackingMarkers([
-      { id: 'VH-1', label: 'Van 101', status: 'occupied', destination: 'CareDroid North Clinic', etaMinutes: 18 },
+      {
+        id: 'VH-1',
+        label: 'Van 101',
+        status: 'occupied',
+        destination: 'CareDroid North Clinic',
+        etaMinutes: 18,
+      },
     ]);
     expect(marker.subtitle).toBe('CareDroid North Clinic · ETA 18m');
     expect(marker.subtitle.startsWith(marker.status)).toBe(false);

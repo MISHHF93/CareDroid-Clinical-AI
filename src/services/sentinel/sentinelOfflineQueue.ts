@@ -70,10 +70,7 @@ export function clearSentinelOfflineAction(id: string): void {
 
 export async function flushSentinelOfflineQueue(handlers: {
   acknowledgeAlarm: (alarmId: string, reason?: string) => Promise<{ ok: boolean }>;
-  reviewAi: (
-    id: string,
-    status: 'accepted' | 'rejected' | 'modified',
-  ) => Promise<{ ok: boolean }>;
+  reviewAi: (id: string, status: 'accepted' | 'rejected' | 'modified') => Promise<{ ok: boolean }>;
 }): Promise<{ flushed: number; remaining: number }> {
   const queue = readQueue();
   let flushed = 0;

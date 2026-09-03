@@ -74,7 +74,8 @@ export function computeEgfrCkdEpi2021(raw) {
   const errors = [] as any[];
   if (!inRange(ageYears, 18, 120)) errors.push('Enter age from 18 to 120 years.');
   if (!['female', 'male'].includes(sex)) errors.push('Select sex.');
-  if (!inRange(serumCreatinineMgDl, 0.2, 25)) errors.push('Enter serum creatinine in a plausible adult range.');
+  if (!inRange(serumCreatinineMgDl, 0.2, 25))
+    errors.push('Enter serum creatinine in a plausible adult range.');
   if (errors.length) return { ok: false as const, errors };
 
   const isFemale = sex === 'female';
@@ -98,7 +99,8 @@ export function computeEgfrCkdEpi2021(raw) {
     label: `CKD-EPI 2021 ${(gfr as any).label}`,
     interpretation:
       'Race-free CKD-EPI 2021 estimates GFR from age, sex, and serum creatinine. Interpret trends, chronicity, body habitus, pregnancy status, and measured GFR indications with clinician review.',
-    referenceLine: 'Inker LA, et al. N Engl J Med. 2021;385:1737-1749. CKD-EPI 2021 creatinine equation.',
+    referenceLine:
+      'Inker LA, et al. N Engl J Med. 2021;385:1737-1749. CKD-EPI 2021 creatinine equation.',
     disclaimer: `${NEPHROLOGY_SAFETY_DISCLAIMER} eGFR does not diagnose AKI or CKD by itself and does not automate renal medication dose adjustment.`,
   };
 }
@@ -112,15 +114,24 @@ export function computeCreatinineClearanceCockcroftGault(raw) {
   if (!inRange(ageYears, 18, 120)) errors.push('Enter age from 18 to 120 years.');
   if (!['female', 'male'].includes(sex)) errors.push('Select sex.');
   if (!inRange(weightKg, 20, 350)) errors.push('Enter weight from 20 to 350 kg.');
-  if (!inRange(serumCreatinineMgDl, 0.2, 25)) errors.push('Enter serum creatinine in a plausible adult range.');
+  if (!inRange(serumCreatinineMgDl, 0.2, 25))
+    errors.push('Enter serum creatinine in a plausible adult range.');
   if (errors.length) return { ok: false as const, errors };
 
   const sexFactor = sex === 'female' ? 0.85 : 1;
-  const creatinineClearanceMlMin = round(((140 - ageYears) * weightKg * sexFactor) / (72 * serumCreatinineMgDl), 1);
+  const creatinineClearanceMlMin = round(
+    ((140 - ageYears) * weightKg * sexFactor) / (72 * serumCreatinineMgDl),
+    1,
+  );
   return {
     ok: true as const,
     creatinineClearanceMlMin,
-    severity: creatinineClearanceMlMin < 15 ? 'critical' : creatinineClearanceMlMin < 45 ? 'warning' : 'normal',
+    severity:
+      creatinineClearanceMlMin < 15
+        ? 'critical'
+        : creatinineClearanceMlMin < 45
+          ? 'warning'
+          : 'normal',
     label: 'Cockcroft-Gault creatinine clearance estimate',
     interpretation:
       'Cockcroft-Gault estimates creatinine clearance using age, weight, sex, and serum creatinine. Weight selection can materially change the result; verify local policy and clinical context.',
@@ -137,12 +148,18 @@ export function computeFeNa(raw) {
   const errors = [] as any[];
   if (!inRange(serumSodium, 90, 190)) errors.push('Enter serum sodium from 90 to 190 mEq/L.');
   if (!inRange(urineSodium, 0, 300)) errors.push('Enter urine sodium from 0 to 300 mEq/L.');
-  if (!inRange(serumCreatinineMgDl, 0.2, 25)) errors.push('Enter serum creatinine in a plausible range.');
-  if (!inRange(urineCreatinineMgDl, 1, 5000)) errors.push('Enter urine creatinine in a plausible range.');
+  if (!inRange(serumCreatinineMgDl, 0.2, 25))
+    errors.push('Enter serum creatinine in a plausible range.');
+  if (!inRange(urineCreatinineMgDl, 1, 5000))
+    errors.push('Enter urine creatinine in a plausible range.');
   if (errors.length) return { ok: false as const, errors };
 
-  const fractionalExcretionPct = round((urineSodium * serumCreatinineMgDl * 100) / (serumSodium * urineCreatinineMgDl), 2);
-  const riskBand = fractionalExcretionPct < 1 ? 'low' : fractionalExcretionPct > 2 ? 'high' : 'intermediate';
+  const fractionalExcretionPct = round(
+    (urineSodium * serumCreatinineMgDl * 100) / (serumSodium * urineCreatinineMgDl),
+    2,
+  );
+  const riskBand =
+    fractionalExcretionPct < 1 ? 'low' : fractionalExcretionPct > 2 ? 'high' : 'intermediate';
   return {
     ok: true as const,
     fractionalExcretionPct,
@@ -151,7 +168,8 @@ export function computeFeNa(raw) {
     label: `FeNa ${fractionalExcretionPct}%`,
     interpretation:
       'FeNa is a urine electrolyte pattern adjunct in selected AKI contexts. Diuretics, CKD, contrast exposure, sepsis, rhabdomyolysis, and non-oliguric states can make thresholds unreliable.',
-    referenceLine: 'FeNa = (urine sodium x serum creatinine) / (serum sodium x urine creatinine) x 100.',
+    referenceLine:
+      'FeNa = (urine sodium x serum creatinine) / (serum sodium x urine creatinine) x 100.',
     disclaimer: `${NEPHROLOGY_SAFETY_DISCLAIMER} FeNa does not diagnose AKI etiology and does not recommend fluids, diuretics, or dialysis.`,
   };
 }
@@ -163,12 +181,18 @@ export function computeFeUrea(raw) {
   const urineCreatinineMgDl = toCreatinineMgDl(raw.urineCreatinine, raw.urineCreatinineUnit);
   const errors = [] as any[];
   if (!inRange(bunMgDl, 1, 300)) errors.push('Enter BUN in a plausible range.');
-  if (!inRange(urineUreaNitrogenMgDl, 1, 5000)) errors.push('Enter urine urea nitrogen in a plausible range.');
-  if (!inRange(serumCreatinineMgDl, 0.2, 25)) errors.push('Enter serum creatinine in a plausible range.');
-  if (!inRange(urineCreatinineMgDl, 1, 5000)) errors.push('Enter urine creatinine in a plausible range.');
+  if (!inRange(urineUreaNitrogenMgDl, 1, 5000))
+    errors.push('Enter urine urea nitrogen in a plausible range.');
+  if (!inRange(serumCreatinineMgDl, 0.2, 25))
+    errors.push('Enter serum creatinine in a plausible range.');
+  if (!inRange(urineCreatinineMgDl, 1, 5000))
+    errors.push('Enter urine creatinine in a plausible range.');
   if (errors.length) return { ok: false as const, errors };
 
-  const fractionalExcretionPct = round((urineUreaNitrogenMgDl * serumCreatinineMgDl * 100) / (bunMgDl * urineCreatinineMgDl), 1);
+  const fractionalExcretionPct = round(
+    (urineUreaNitrogenMgDl * serumCreatinineMgDl * 100) / (bunMgDl * urineCreatinineMgDl),
+    1,
+  );
   const riskBand = fractionalExcretionPct < 35 ? 'low' : 'not_low';
   return {
     ok: true as const,
@@ -178,7 +202,8 @@ export function computeFeUrea(raw) {
     label: `FeUrea ${fractionalExcretionPct}%`,
     interpretation:
       'FeUrea can support AKI pattern review when diuretics limit FeNa interpretation, but performance varies by population and timing.',
-    referenceLine: 'FeUrea = (urine urea nitrogen x serum creatinine) / (BUN x urine creatinine) x 100.',
+    referenceLine:
+      'FeUrea = (urine urea nitrogen x serum creatinine) / (BUN x urine creatinine) x 100.',
     disclaimer: `${NEPHROLOGY_SAFETY_DISCLAIMER} FeUrea does not diagnose AKI etiology and does not recommend fluids, diuretics, or dialysis.`,
   };
 }
@@ -223,7 +248,8 @@ export function computeBunCreatinineRatio(raw) {
   const serumCreatinineMgDl = toCreatinineMgDl(raw.serumCreatinine, raw.creatinineUnit);
   const errors = [] as any[];
   if (!inRange(bunMgDl, 1, 300)) errors.push('Enter BUN in a plausible range.');
-  if (!inRange(serumCreatinineMgDl, 0.2, 25)) errors.push('Enter serum creatinine in a plausible range.');
+  if (!inRange(serumCreatinineMgDl, 0.2, 25))
+    errors.push('Enter serum creatinine in a plausible range.');
   if (errors.length) return { ok: false as const, errors };
 
   const ratio = round(bunMgDl / serumCreatinineMgDl, 1);
@@ -255,11 +281,17 @@ export function computeCorrectedSodium(raw) {
     ok: true as const,
     correctedSodium,
     glucoseMgDl: round(glucoseMgDl, 1),
-    severity: correctedSodium < 125 || correctedSodium > 155 ? 'critical' : correctedSodium < 135 || correctedSodium > 145 ? 'warning' : 'normal',
+    severity:
+      correctedSodium < 125 || correctedSodium > 155
+        ? 'critical'
+        : correctedSodium < 135 || correctedSodium > 145
+          ? 'warning'
+          : 'normal',
     label: `Corrected sodium ${correctedSodium} mEq/L`,
     interpretation:
       'Corrected sodium estimates sodium after accounting for hyperglycemia-related water shift. Use measured osmolality, tonicity, symptoms, and rate of change for clinical decisions.',
-    referenceLine: 'Common correction factors add 1.6 or 2.4 mEq/L sodium per 100 mg/dL glucose above 100 mg/dL.',
+    referenceLine:
+      'Common correction factors add 1.6 or 2.4 mEq/L sodium per 100 mg/dL glucose above 100 mg/dL.',
     disclaimer: `${NEPHROLOGY_SAFETY_DISCLAIMER} Does not recommend hypertonic saline, insulin, free water, or correction rates.`,
   };
 }
@@ -268,11 +300,13 @@ export function computeFreeWaterDeficit(raw) {
   const sodium = toNumber(raw.sodium);
   const weightKg = toNumber(raw.weightKg);
   const tbwFactor = toNumber(raw.tbwFactor);
-  const targetSodium = raw.targetSodium === '' || raw.targetSodium === undefined ? 140 : toNumber(raw.targetSodium);
+  const targetSodium =
+    raw.targetSodium === '' || raw.targetSodium === undefined ? 140 : toNumber(raw.targetSodium);
   const errors = [] as any[];
   if (!inRange(sodium, 120, 190)) errors.push('Enter sodium from 120 to 190 mEq/L.');
   if (!inRange(weightKg, 1, 350)) errors.push('Enter weight from 1 to 350 kg.');
-  if (!inRange(tbwFactor, 0.35, 0.7)) errors.push('Select total body water factor from 0.35 to 0.70.');
+  if (!inRange(tbwFactor, 0.35, 0.7))
+    errors.push('Select total body water factor from 0.35 to 0.70.');
   if (!inRange(targetSodium, 130, 145)) errors.push('Enter target sodium from 130 to 145 mEq/L.');
   if (errors.length) return { ok: false as const, errors };
 
@@ -300,10 +334,14 @@ export function computeOsmolalGap(raw) {
   if (!inRange(glucoseMgDl, 20, 2000)) errors.push('Enter glucose in a plausible range.');
   if (!inRange(bunMgDl, 1, 300)) errors.push('Enter BUN in a plausible range.');
   if (!inRange(ethanolMgDl, 0, 600)) errors.push('Enter ethanol from 0 to 600 mg/dL or leave 0.');
-  if (!inRange(measuredOsmolality, 200, 450)) errors.push('Enter measured osmolality from 200 to 450 mOsm/kg.');
+  if (!inRange(measuredOsmolality, 200, 450))
+    errors.push('Enter measured osmolality from 200 to 450 mOsm/kg.');
   if (errors.length) return { ok: false as const, errors };
 
-  const calculatedOsmolality = round(2 * sodium + glucoseMgDl / 18 + bunMgDl / 2.8 + ethanolMgDl / 3.7, 1);
+  const calculatedOsmolality = round(
+    2 * sodium + glucoseMgDl / 18 + bunMgDl / 2.8 + ethanolMgDl / 3.7,
+    1,
+  );
   const osmolalGap = round(measuredOsmolality - calculatedOsmolality, 1);
   return {
     ok: true as const,

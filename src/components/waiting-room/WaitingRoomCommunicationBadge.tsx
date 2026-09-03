@@ -3,8 +3,8 @@ import './WaitingRoomCommunicationBadge.css';
 
 export default function WaitingRoomCommunicationBadge({
   patient,
-  workflowLogs = ([] as any[]),
-  staff = ([] as any[]),
+  workflowLogs = [] as any[],
+  staff = [] as any[],
   now = undefined,
   compact = false,
 }) {

@@ -242,9 +242,7 @@ export function summarizeInteractionRecords(
     disabledWithoutReason: Object.freeze(
       records.filter(
         (r) =>
-          r.isDisabled &&
-          !r.hasDisabledReason &&
-          r.class !== INTERACTION_CLASSES.DISABLED_REASONED,
+          r.isDisabled && !r.hasDisabledReason && r.class !== INTERACTION_CLASSES.DISABLED_REASONED,
       ),
     ),
     filesScanned,
@@ -256,7 +254,8 @@ export const INTENTIONAL_DISABLED_CONTROLS = Object.freeze([
   Object.freeze({
     id: 'whiteboard-new-order',
     label: 'New Order',
-    reason: 'Order entry API is not mounted; control stays disabled until backend order endpoint ships.',
+    reason:
+      'Order entry API is not mounted; control stays disabled until backend order endpoint ships.',
     surfaces: Object.freeze(['/emergency/whiteboard']),
   }),
   Object.freeze({

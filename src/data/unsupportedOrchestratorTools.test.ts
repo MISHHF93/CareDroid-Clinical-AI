@@ -12,7 +12,7 @@ import {
 describe('unsupportedOrchestratorTools', () => {
   it('covers every NLU profile except registered executors', () => {
     const expected = NLU_PROFILE_TOOL_IDS.filter(
-      (id) => !ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS.includes(id as any)
+      (id) => !ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS.includes(id as any),
     );
     expect([...UNSUPPORTED_ORCHESTRATOR_NLU_TOOL_IDS].sort()).toEqual([...expected].sort());
   });

@@ -4,7 +4,9 @@ import userEvent from '@testing-library/user-event';
 import ReceptionAttentionStrip from './ReceptionAttentionStrip';
 import type { ReceptionAttentionRow, ReceptionAttentionSnapshot } from './receptionAttentionModel';
 
-function row(partial: Partial<ReceptionAttentionRow> & Pick<ReceptionAttentionRow, 'id' | 'title'>): ReceptionAttentionRow {
+function row(
+  partial: Partial<ReceptionAttentionRow> & Pick<ReceptionAttentionRow, 'id' | 'title'>,
+): ReceptionAttentionRow {
   return {
     detail: 'Detail text',
     tone: 'warning',
@@ -30,7 +32,13 @@ describe('ReceptionAttentionStrip', () => {
       count: 2,
       criticalCount: 1,
       rows: [
-        row({ id: 'r1', title: 'Critical response', detail: '3-minute response active', tone: 'critical', timerLabel: '1:45' }),
+        row({
+          id: 'r1',
+          title: 'Critical response',
+          detail: '3-minute response active',
+          tone: 'critical',
+          timerLabel: '1:45',
+        }),
         row({ id: 'r2', title: 'Escalation raised', detail: 'Nurse notified', tone: 'warning' }),
       ],
     };
@@ -73,7 +81,15 @@ describe('ReceptionAttentionStrip', () => {
     const snapshot: ReceptionAttentionSnapshot = {
       count: 1,
       criticalCount: 1,
-      rows: [row({ id: 'r1', title: 'Breached timer', tone: 'critical', breached: true, timerLabel: '0:00' })],
+      rows: [
+        row({
+          id: 'r1',
+          title: 'Breached timer',
+          tone: 'critical',
+          breached: true,
+          timerLabel: '0:00',
+        }),
+      ],
     };
     render(<ReceptionAttentionStrip snapshot={snapshot} onSelectRow={vi.fn()} />);
 

@@ -56,7 +56,12 @@ describe('canonical AI client', () => {
     apiClientMocks.apiFetch.mockResolvedValue(new Response('{}', { status: 200 }));
     apiClientMocks.parseApiResponse.mockResolvedValue({ response: 'Ready for human review.' });
 
-    const cases = ['INTAKE_SUGGESTION', 'CLINICAL_SUMMARY', 'SHIFT_SUMMARY', 'COPILOT_CHAT'] as const;
+    const cases = [
+      'INTAKE_SUGGESTION',
+      'CLINICAL_SUMMARY',
+      'SHIFT_SUMMARY',
+      'COPILOT_CHAT',
+    ] as const;
 
     for (const requestType of cases) {
       await callAI({

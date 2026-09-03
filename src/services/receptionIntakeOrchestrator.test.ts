@@ -89,9 +89,8 @@ describe('receptionIntakeOrchestrator', () => {
     // import of the engine, so the debounce can be re-armed after the flush
     // above drains. Let the macrotask queue turn over first, then cancel.
     await new Promise((resolve) => setTimeout(resolve, 0));
-    const { cancelWorkflowAutomationRefresh } = await import(
-      '../engine/unifiedWorkflowAutomationEngine'
-    );
+    const { cancelWorkflowAutomationRefresh } =
+      await import('../engine/unifiedWorkflowAutomationEngine');
     cancelWorkflowAutomationRefresh();
   });
 
@@ -159,7 +158,9 @@ describe('receptionIntakeOrchestrator', () => {
       { actorName: 'Reception Clerk', now: '2026-06-29T12:10:00.000Z' },
     );
 
-    const patient = useEmergencyStore.getState().patients.find((entry) => entry.id === result.patientId);
+    const patient = useEmergencyStore
+      .getState()
+      .patients.find((entry) => entry.id === result.patientId);
     expect(patient?.firstName).toBe('Unknown');
     expect(patient?.registrationStatus).toBe('provisional');
     expect(patient?.flags).toContain(PatientFlag.IdentityPending);
@@ -178,7 +179,9 @@ describe('receptionIntakeOrchestrator', () => {
         { actorName: 'Reception Clerk', now: '2026-08-12T12:00:00.000Z' },
       );
 
-      const patient = useEmergencyStore.getState().patients.find((entry) => entry.id === result.patientId);
+      const patient = useEmergencyStore
+        .getState()
+        .patients.find((entry) => entry.id === result.patientId);
       expect(patient?.allergies).toEqual(['Penicillin', 'Latex', 'Shellfish']);
       expect(patient?.medications).toEqual(['Metformin', 'Lisinopril']);
     });
@@ -194,7 +197,9 @@ describe('receptionIntakeOrchestrator', () => {
         { actorName: 'Reception Clerk', now: '2026-08-12T12:05:00.000Z' },
       );
 
-      const patient = useEmergencyStore.getState().patients.find((entry) => entry.id === result.patientId);
+      const patient = useEmergencyStore
+        .getState()
+        .patients.find((entry) => entry.id === result.patientId);
       expect(patient?.allergies).toEqual([]);
       expect(patient?.medications).toEqual([]);
     });
@@ -205,7 +210,9 @@ describe('receptionIntakeOrchestrator', () => {
         now: '2026-08-12T12:10:00.000Z',
       });
 
-      const patient = useEmergencyStore.getState().patients.find((entry) => entry.id === result.patientId);
+      const patient = useEmergencyStore
+        .getState()
+        .patients.find((entry) => entry.id === result.patientId);
       expect(patient?.allergies).toEqual([]);
       expect(patient?.medications).toEqual([]);
     });
@@ -262,7 +269,10 @@ describe('receptionIntakeOrchestrator', () => {
     it('raises confidence for each matched red flag, independent of the completeness penalty', () => {
       const noFlags = runReceptionAiIntakeAssist(baseDraft());
       const oneFlag = runReceptionAiIntakeAssist(
-        baseDraft({ chiefComplaint: 'Chest pain radiating to left arm', redFlagSymptoms: ['Chest pain'] }),
+        baseDraft({
+          chiefComplaint: 'Chest pain radiating to left arm',
+          redFlagSymptoms: ['Chest pain'],
+        }),
       );
 
       expect(oneFlag.redFlags.length).toBeGreaterThanOrEqual(1);
@@ -311,7 +321,9 @@ describe('receptionIntakeOrchestrator', () => {
     // A generic sync failure (network down, no HTTP status) must NOT be
     // mistaken for a backend-detected duplicate -- see the dedicated
     // duplicate-flagging test below.
-    expect(useEmergencyStore.getState().patients[0].flags).not.toContain(PatientFlag.PossibleDuplicate);
+    expect(useEmergencyStore.getState().patients[0].flags).not.toContain(
+      PatientFlag.PossibleDuplicate,
+    );
   });
 
   it('HEAL follow-up: flags the local record as a possible duplicate, distinctly from a generic sync failure, when the backend duplicate guard blocks the create sync', async () => {
@@ -370,7 +382,10 @@ describe('receptionIntakeOrchestrator', () => {
 
   it('blocks reception clinical override attempts', () => {
     expect(
-      assertReceptionMutationAllowed(EMERGENCY_ROLE_IDS.registrationClerk, EMERGENCY_ACTIONS.triage),
+      assertReceptionMutationAllowed(
+        EMERGENCY_ROLE_IDS.registrationClerk,
+        EMERGENCY_ACTIONS.triage,
+      ),
     ).toEqual(
       expect.objectContaining({
         allowed: false,
@@ -393,14 +408,17 @@ describe('receptionIntakeOrchestrator', () => {
   });
 
   it('merges OCR-extracted identity fields into the reception draft without overwriting complaint', () => {
-    const merged = applyExtractedFieldsToReceptionDraft(baseDraft({ chiefComplaint: 'Abdominal pain' }), [
-      { field: 'firstName', value: 'Jordan', status: 'accepted' },
-      { field: 'lastName', value: 'Lee', status: 'accepted' },
-      { field: 'dateOfBirth', value: '1990-04-12', status: 'accepted' },
-      { field: 'sex', value: 'F', status: 'accepted' },
-      { field: 'phone', value: '555-9999', status: 'edited', editedValue: '555-1111' },
-      { field: 'healthCardNumber', value: 'HC-123', status: 'accepted' },
-    ]);
+    const merged = applyExtractedFieldsToReceptionDraft(
+      baseDraft({ chiefComplaint: 'Abdominal pain' }),
+      [
+        { field: 'firstName', value: 'Jordan', status: 'accepted' },
+        { field: 'lastName', value: 'Lee', status: 'accepted' },
+        { field: 'dateOfBirth', value: '1990-04-12', status: 'accepted' },
+        { field: 'sex', value: 'F', status: 'accepted' },
+        { field: 'phone', value: '555-9999', status: 'edited', editedValue: '555-1111' },
+        { field: 'healthCardNumber', value: 'HC-123', status: 'accepted' },
+      ],
+    );
     expect(merged.chiefComplaint).toBe('Abdominal pain');
     expect(merged.firstName).toBe('Jordan');
     expect(merged.lastName).toBe('Lee');
@@ -421,14 +439,24 @@ describe('receptionIntakeOrchestrator', () => {
     );
     expect(result.patientId).toBeTruthy();
     expect(result.backendSyncStatus).toBe('synced');
-    expect(useEmergencyStore.getState().patients.some((entry) => entry.id === result.patientId)).toBe(true);
+    expect(
+      useEmergencyStore.getState().patients.some((entry) => entry.id === result.patientId),
+    ).toBe(true);
   });
 
   it('resolves a single primary action label for critical arrivals', () => {
     const action = resolveUnifiedIntakePrimaryAction(
-      baseDraft({ chiefComplaint: 'Not breathing', breathingStatus: 'not-breathing', painLevel: 10 }),
+      baseDraft({
+        chiefComplaint: 'Not breathing',
+        breathingStatus: 'not-breathing',
+        painLevel: 10,
+      }),
       runReceptionAiIntakeAssist(
-        baseDraft({ chiefComplaint: 'Not breathing', breathingStatus: 'not-breathing', painLevel: 10 }),
+        baseDraft({
+          chiefComplaint: 'Not breathing',
+          breathingStatus: 'not-breathing',
+          painLevel: 10,
+        }),
       ),
     );
     expect(action.startsThreeMinuteResponse).toBe(true);
@@ -475,18 +503,22 @@ describe('receptionIntakeOrchestrator', () => {
 
     it('still recognizes "Seizure" and "Unconscious" — categories only in the local list, not the canonical registry', async () => {
       const { detectReceptionRedFlags } = await import('./receptionIntakeOrchestrator');
-      expect(detectReceptionRedFlags(baseDraft({ chiefComplaint: 'Seizure witnessed' }))).toContain('Seizure');
-      expect(detectReceptionRedFlags(baseDraft({ chiefComplaint: 'Found unconscious' }))).toContain('Unconscious');
+      expect(detectReceptionRedFlags(baseDraft({ chiefComplaint: 'Seizure witnessed' }))).toContain(
+        'Seizure',
+      );
+      expect(detectReceptionRedFlags(baseDraft({ chiefComplaint: 'Found unconscious' }))).toContain(
+        'Unconscious',
+      );
     });
 
     it('picks up canonical-registry-only synonyms (stroke FAST-positive, anaphylaxis epipen) the local list never had', async () => {
       const { detectReceptionRedFlags } = await import('./receptionIntakeOrchestrator');
-      expect(detectReceptionRedFlags(baseDraft({ chiefComplaint: 'facial droop, slurred speech' }))).toContain(
-        'Stroke symptoms',
-      );
-      expect(detectReceptionRedFlags(baseDraft({ chiefComplaint: 'used epipen for allergic reaction' }))).toContain(
-        'Anaphylaxis concern',
-      );
+      expect(
+        detectReceptionRedFlags(baseDraft({ chiefComplaint: 'facial droop, slurred speech' })),
+      ).toContain('Stroke symptoms');
+      expect(
+        detectReceptionRedFlags(baseDraft({ chiefComplaint: 'used epipen for allergic reaction' })),
+      ).toContain('Anaphylaxis concern');
     });
 
     it('bumps suggested priority to P2 for a SOB-only complaint via runReceptionAiIntakeAssist (previously fell through to P3/standard)', async () => {
@@ -558,7 +590,9 @@ describe('receptionIntakeOrchestrator', () => {
 
       // Force the second create's MRN generation to always collide with the
       // first patient's real, already-on-the-board MRN.
-      const randomSpy = vi.spyOn(Math, 'random').mockReturnValue(randomFractionFor(collidingDigits));
+      const randomSpy = vi
+        .spyOn(Math, 'random')
+        .mockReturnValue(randomFractionFor(collidingDigits));
 
       const second = await createPatientAndRouteFromReception(
         baseDraft({ firstName: 'Other', lastName: 'Person' }),

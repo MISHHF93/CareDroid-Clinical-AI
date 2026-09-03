@@ -1,7 +1,11 @@
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
 import { formatSyncRecoveryMessage } from '../config/errorRecoveryModel';
-import { EMERGENCY_ACTIONS, EMERGENCY_ROLE_IDS, normalizeEmergencyRole } from '../config/emergencyRolePermissions';
+import {
+  EMERGENCY_ACTIONS,
+  EMERGENCY_ROLE_IDS,
+  normalizeEmergencyRole,
+} from '../config/emergencyRolePermissions';
 import { startResponseTimer } from '../engine/threeMinuteTimerEngine';
 import { useEmergencyStore } from '../store/emergencyStore';
 import {
@@ -17,10 +21,7 @@ import {
   type QuickSafetyFlag,
   type Sex,
 } from '../types/emergency';
-import {
-  calculateAgeFromDob,
-  type ReceptionQuickIntakeInput,
-} from './receptionQuickIntakeService';
+import { calculateAgeFromDob, type ReceptionQuickIntakeInput } from './receptionQuickIntakeService';
 import { buildPatientArrivalRecord, syncPatientFromArrival } from './patientArrivalModel';
 import { serializePatientForBackendApi } from './patientArrivalBackendSync';
 import { completeReceptionHandoff } from './receptionHandoff';
@@ -236,7 +237,8 @@ export async function flushReceptionIntakeBackgroundWork(): Promise<void> {
 
 export function generateCollisionSafeReceptionMrn(existingPatients: Patient[] = []): string {
   const MAX_ATTEMPTS = 5;
-  const isTaken = (candidate: string) => existingPatients.some((patient) => patient.mrn === candidate);
+  const isTaken = (candidate: string) =>
+    existingPatients.some((patient) => patient.mrn === candidate);
   for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt += 1) {
     const candidate = `ED-${Math.floor(100000 + Math.random() * 900000)}`;
     if (!isTaken(candidate)) return candidate;
@@ -248,7 +250,9 @@ function unique(values: Array<string | null | undefined>): string[] {
   return [...new Set(values.map((value) => String(value || '').trim()).filter(Boolean))];
 }
 
-export function mapReceptionArrivalTypeToArrivalMode(arrivalType: ReceptionArrivalType): ArrivalMode {
+export function mapReceptionArrivalTypeToArrivalMode(
+  arrivalType: ReceptionArrivalType,
+): ArrivalMode {
   if (arrivalType === 'ambulance-arrival' || arrivalType === 'ems-prearrival') return 'EMS';
   if (arrivalType === 'transfer') return 'transfer';
   if (arrivalType === 'referral') return 'referral';
@@ -296,12 +300,12 @@ export function detectReceptionRedFlags(draft: ReceptionIntakeDraft): string[] {
   // everywhere else in the app (whiteboard, notification center, quick intake). Merging
   // in the canonical detector's matches closes that gap without dropping this list's
   // own unique categories.
-  const legacyTextMatches = HIGH_RISK_TERMS
-    .filter(({ term }) => complaint.includes(term))
-    .map(({ flag }) => flag);
-  const canonicalTextMatches = detectHighRiskComplaintFlags({ complaint: draft.chiefComplaint }).map(
-    (record) => record.label,
+  const legacyTextMatches = HIGH_RISK_TERMS.filter(({ term }) => complaint.includes(term)).map(
+    ({ flag }) => flag,
   );
+  const canonicalTextMatches = detectHighRiskComplaintFlags({
+    complaint: draft.chiefComplaint,
+  }).map((record) => record.label);
   const detected = [...legacyTextMatches, ...canonicalTextMatches];
 
   if (draft.consciousnessStatus === 'unresponsive') detected.push('Unconscious');
@@ -329,9 +333,7 @@ export function resolveReceptionRouteValidationMode(
   options: { urgency?: 'critical' | 'high' | 'standard' | null } = {},
 ): ReceptionRouteValidationMode {
   const redFlags = detectReceptionRedFlags(draft);
-  const urgency =
-    options.urgency ||
-    runReceptionAiIntakeAssist(draft).urgencySuggestion;
+  const urgency = options.urgency || runReceptionAiIntakeAssist(draft).urgencySuggestion;
   if (urgency === 'critical' || redFlags.length >= 2) return 'crash';
   if (urgency === 'high' || redFlags.length >= 1) return 'rapid';
   return 'standard';
@@ -395,19 +397,29 @@ export function listReceptionRecommendedSafetyFields(draft: ReceptionIntakeDraft
 
 function resolvePriority(redFlags: string[], draft: ReceptionIntakeDraft): Priority {
   const critical = redFlags.some((flag) =>
-    /not breathing|unconscious|stroke|severe visible distress|collapse|severe bleeding|anaphylaxis/i.test(flag),
+    /not breathing|unconscious|stroke|severe visible distress|collapse|severe bleeding|anaphylaxis/i.test(
+      flag,
+    ),
   );
   const severeChestPain =
     redFlags.some((flag) => /chest|pressure/i.test(flag)) && Number(draft.painLevel) >= 7;
   if (critical) return Priority.P1;
   if (severeChestPain) return Priority.P1;
-  if (redFlags.length || draft.arrivalType === 'ambulance-arrival' || draft.arrivalType === 'ems-prearrival') {
+  if (
+    redFlags.length ||
+    draft.arrivalType === 'ambulance-arrival' ||
+    draft.arrivalType === 'ems-prearrival'
+  ) {
     return Priority.P2;
   }
   return Priority.P3;
 }
 
-function suggestedQuestions(draft: ReceptionIntakeDraft, redFlags: string[], missing: string[]): string[] {
+function suggestedQuestions(
+  draft: ReceptionIntakeDraft,
+  redFlags: string[],
+  missing: string[],
+): string[] {
   const questions: string[] = [];
   if (redFlags.some((flag) => /chest|pressure/i.test(flag))) {
     questions.push('When did the chest pain start, and does it radiate to the arm, jaw, or back?');
@@ -422,8 +434,10 @@ function suggestedQuestions(draft: ReceptionIntakeDraft, redFlags: string[], mis
     questions.push('Has there been fever, confusion, rash, or recent infection?');
   }
   if (missing.includes('allergies')) questions.push('Any known allergies?');
-  if (!String(draft.contactCallback || '').trim()) questions.push('Is there a callback number or support person available?');
-  if (!questions.length) questions.push('Any allergies, current medications, or recent deterioration while waiting?');
+  if (!String(draft.contactCallback || '').trim())
+    questions.push('Is there a callback number or support person available?');
+  if (!questions.length)
+    questions.push('Any allergies, current medications, or recent deterioration while waiting?');
   return questions.slice(0, 4);
 }
 
@@ -435,7 +449,11 @@ export function runReceptionAiIntakeAssist(
   const redFlags = detectReceptionRedFlags(draft);
   const suggestedPriority = resolvePriority(redFlags, draft);
   const urgencySuggestion =
-    suggestedPriority === Priority.P1 ? 'critical' : suggestedPriority === Priority.P2 ? 'high' : 'standard';
+    suggestedPriority === Priority.P1
+      ? 'critical'
+      : suggestedPriority === Priority.P2
+        ? 'high'
+        : 'standard';
   const mode =
     urgencySuggestion === 'critical' || redFlags.length >= 2
       ? 'crash'
@@ -477,7 +495,10 @@ export function runReceptionAiIntakeAssist(
       ? 0.42
       : Math.max(
           0.35,
-          Math.min(0.94, 0.6 + redFlags.length * 0.08 - Math.min(0.24, missingCriticalFields.length * 0.04)),
+          Math.min(
+            0.94,
+            0.6 + redFlags.length * 0.08 - Math.min(0.24, missingCriticalFields.length * 0.04),
+          ),
         ),
     safetyNotice: options.aiUnavailable
       ? 'Desk assist is unavailable. Manual intake fallback is active; clinical staff must review.'
@@ -490,19 +511,23 @@ export function runReceptionAiIntakeAssist(
 
 function buildFlagRecords(redFlags: string[], now: string): HighRiskComplaintFlagRecord[] {
   return redFlags.map((flag) => ({
-    id: flag.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') as HighRiskComplaintFlagRecord['id'],
+    id: flag
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '') as HighRiskComplaintFlagRecord['id'],
     label: flag,
     detectedAt: now,
     source: 'staff-selected',
   }));
 }
 
-function patientFlagsFromDraft(
-  draft: ReceptionIntakeDraft,
-  redFlags: string[],
-): PatientFlag[] {
+function patientFlagsFromDraft(draft: ReceptionIntakeDraft, redFlags: string[]): PatientFlag[] {
   const flags = redFlags
-    .map((flag) => FLAG_TO_PATIENT_FLAG[flag] || (flag === 'Altered mental status' ? PatientFlag.DeteriorationRisk : null))
+    .map(
+      (flag) =>
+        FLAG_TO_PATIENT_FLAG[flag] ||
+        (flag === 'Altered mental status' ? PatientFlag.DeteriorationRisk : null),
+    )
     .filter((flag): flag is PatientFlag => Boolean(flag));
   if (draft.arrivalType === 'ambulance-arrival' || draft.arrivalType === 'ems-prearrival') {
     flags.push(PatientFlag.EMSArrival);
@@ -611,10 +636,13 @@ function buildReceptionPatient(
       suggestedAt: aiAssist.generatedAt,
       suggestionSource: 'triage-assist',
     },
-    queueDestination: priority === Priority.P1 || priority === Priority.P2 ? 'rapid-review' : 'verification',
+    queueDestination:
+      priority === Priority.P1 || priority === Priority.P2 ? 'rapid-review' : 'verification',
     triagePending: priority === Priority.P1 || priority === Priority.P2,
     registrationStatus:
-      firstName === 'Unknown' || draft.documentStatus === 'missing' || draft.insuranceStatus === 'missing'
+      firstName === 'Unknown' ||
+      draft.documentStatus === 'missing' ||
+      draft.insuranceStatus === 'missing'
         ? 'provisional'
         : 'in-progress',
     waitingRoomStatus: 'registered',
@@ -749,7 +777,9 @@ function notifyCriticalReceptionStaff(
 
 export function canReceptionPerformClinicalOverride(role: string | null | undefined): boolean {
   const normalized = normalizeEmergencyRole(role);
-  return normalized !== EMERGENCY_ROLE_IDS.registrationClerk && normalized !== 'emergency_receptionist';
+  return (
+    normalized !== EMERGENCY_ROLE_IDS.registrationClerk && normalized !== 'emergency_receptionist'
+  );
 }
 
 export function assertReceptionMutationAllowed(
@@ -759,11 +789,16 @@ export function assertReceptionMutationAllowed(
   const normalized = normalizeEmergencyRole(role);
   if (
     normalized === EMERGENCY_ROLE_IDS.registrationClerk &&
-    [EMERGENCY_ACTIONS.triage, EMERGENCY_ACTIONS.manageFlags, EMERGENCY_ACTIONS.dischargePatient].includes(action as any)
+    [
+      EMERGENCY_ACTIONS.triage,
+      EMERGENCY_ACTIONS.manageFlags,
+      EMERGENCY_ACTIONS.dischargePatient,
+    ].includes(action as any)
   ) {
     return {
       allowed: false,
-      reason: 'Reception can capture intake and escalate, but cannot assign final triage, edit diagnosis, or resolve clinical alerts.',
+      reason:
+        'Reception can capture intake and escalate, but cannot assign final triage, edit diagnosis, or resolve clinical alerts.',
     };
   }
   return { allowed: true };
@@ -881,16 +916,13 @@ export async function createPatientAndRouteFromReception(
     Boolean(options.confirmDuplicateOverride),
   );
   if (backendSync.status === 'synced') {
-    useEmergencyStore.getState().updatePatient(
-      enrichedPatient.id,
-      {
-        handoffSyncPending: false,
-        handoffSyncError: undefined,
-        ...(backendSync.backendPatientId && backendSync.backendPatientId !== enrichedPatient.id
-          ? { backendPatientId: backendSync.backendPatientId }
-          : {}),
-      } as unknown as Partial<Patient>,
-    );
+    useEmergencyStore.getState().updatePatient(enrichedPatient.id, {
+      handoffSyncPending: false,
+      handoffSyncError: undefined,
+      ...(backendSync.backendPatientId && backendSync.backendPatientId !== enrichedPatient.id
+        ? { backendPatientId: backendSync.backendPatientId }
+        : {}),
+    } as unknown as Partial<Patient>);
   } else if (backendSync.status === 'failed') {
     // A backend-detected duplicate must never look like an ordinary sync
     // hiccup: the local record already exists on the board (local-first
@@ -899,18 +931,19 @@ export async function createPatientAndRouteFromReception(
     // backend's own duplicate index. PatientFlag.PossibleDuplicate reuses
     // PatientCard's existing flag-badge rendering rather than inventing a
     // new UI surface -- never auto-resolved, always a human review.
-    useEmergencyStore.getState().updatePatient(
-      enrichedPatient.id,
-      {
-        handoffSyncPending: true,
-        handoffSyncError: backendSync.duplicateBlocked
-          ? 'Backend flagged this as a possible duplicate patient — needs reception review before continuing.'
-          : backendSync.error,
-        ...(backendSync.duplicateBlocked
-          ? { flags: Array.from(new Set([...(enrichedPatient.flags || []), PatientFlag.PossibleDuplicate])) }
-          : {}),
-      } as unknown as Partial<Patient>,
-    );
+    useEmergencyStore.getState().updatePatient(enrichedPatient.id, {
+      handoffSyncPending: true,
+      handoffSyncError: backendSync.duplicateBlocked
+        ? 'Backend flagged this as a possible duplicate patient — needs reception review before continuing.'
+        : backendSync.error,
+      ...(backendSync.duplicateBlocked
+        ? {
+            flags: Array.from(
+              new Set([...(enrichedPatient.flags || []), PatientFlag.PossibleDuplicate]),
+            ),
+          }
+        : {}),
+    } as unknown as Partial<Patient>);
   }
 
   const afterCreate = useEmergencyStore.getState();
@@ -924,7 +957,12 @@ export async function createPatientAndRouteFromReception(
     actorName,
     timestamp: now,
     source: 'reception-intake-orchestrator',
-    severity: aiAssist.urgencySuggestion === 'critical' ? 'Critical' : aiAssist.urgencySuggestion === 'high' ? 'Warning' : 'Info',
+    severity:
+      aiAssist.urgencySuggestion === 'critical'
+        ? 'Critical'
+        : aiAssist.urgencySuggestion === 'high'
+          ? 'Warning'
+          : 'Info',
     metadata: {
       arrivalType: intakeDraft.arrivalType,
       missingCriticalFields: aiAssist.missingCriticalFields.join(', '),
@@ -943,7 +981,9 @@ export async function createPatientAndRouteFromReception(
   });
 
   if (enrichedPatient.registrationStatus === 'provisional') {
-    const latestPatient = useEmergencyStore.getState().patients.find((entry) => entry.id === enrichedPatient.id);
+    const latestPatient = useEmergencyStore
+      .getState()
+      .patients.find((entry) => entry.id === enrichedPatient.id);
     useEmergencyStore.getState().updatePatient(enrichedPatient.id, {
       registrationStatus: 'provisional',
       arrival: latestPatient?.arrival
@@ -1001,18 +1041,23 @@ export async function createPatientAndRouteFromReception(
         scheduleWorkflowAutomationRefresh('patient_created'),
       )
       .catch((error) => {
-        console.error('[ReceptionIntakeOrchestrator] scheduleWorkflowAutomationRefresh failed:', error);
+        console.error(
+          '[ReceptionIntakeOrchestrator] scheduleWorkflowAutomationRefresh failed:',
+          error,
+        );
       }),
   );
 
   const latestPatient =
-    useEmergencyStore.getState().patients.find((entry) => entry.id === enrichedPatient.id) || enrichedPatient;
+    useEmergencyStore.getState().patients.find((entry) => entry.id === enrichedPatient.id) ||
+    enrichedPatient;
 
   return {
     patient: {
       ...latestPatient,
       state: PatientState.Triage,
-      registrationStatus: enrichedPatient.registrationStatus === 'provisional' ? 'provisional' : 'complete',
+      registrationStatus:
+        enrichedPatient.registrationStatus === 'provisional' ? 'provisional' : 'complete',
       queueDestination: 'triage-queue',
       triagePending: true,
     },
@@ -1025,7 +1070,9 @@ export async function createPatientAndRouteFromReception(
     profileRoute: `${CANONICAL_ROUTES.emergencyPatients}?patientId=${encodeURIComponent(enrichedPatient.id)}`,
     missingCriticalFields: aiAssist.missingCriticalFields,
     redFlags: aiAssist.redFlags,
-    clinicalOverrideBlocked: !canReceptionPerformClinicalOverride(EMERGENCY_ROLE_IDS.registrationClerk),
+    clinicalOverrideBlocked: !canReceptionPerformClinicalOverride(
+      EMERGENCY_ROLE_IDS.registrationClerk,
+    ),
     backendSyncStatus: backendSync.status,
     backendSyncError: backendSync.error,
     backendPatientId: backendSync.backendPatientId,
@@ -1092,14 +1139,16 @@ export function enrichIntakeDraftCriticalDefaults(
   const consciousnessStatus =
     draft.consciousnessStatus && draft.consciousnessStatus !== 'unknown'
       ? draft.consciousnessStatus
-      : redFlags.some((flag) => /unconscious|altered mental/i.test(flag)) || safetyFlags.includes(PatientFlag.DeterioratingNeuro)
+      : redFlags.some((flag) => /unconscious|altered mental/i.test(flag)) ||
+          safetyFlags.includes(PatientFlag.DeterioratingNeuro)
         ? 'confused'
         : 'alert';
 
   const breathingStatus =
     draft.breathingStatus && draft.breathingStatus !== 'unknown'
       ? draft.breathingStatus
-      : redFlags.some((flag) => /not breathing|labored|shortness/i.test(flag)) || /breath|sob|dyspnea/.test(complaint)
+      : redFlags.some((flag) => /not breathing|labored|shortness/i.test(flag)) ||
+          /breath|sob|dyspnea/.test(complaint)
         ? 'short-of-breath'
         : 'normal';
 
@@ -1122,9 +1171,7 @@ export function enrichIntakeDraftCriticalDefaults(
       : draft.painLevel;
 
   const estimatedAge =
-    draft.dob || normalizeAge(draft.estimatedAge)
-      ? draft.estimatedAge
-      : draft.estimatedAge || 30;
+    draft.dob || normalizeAge(draft.estimatedAge) ? draft.estimatedAge : draft.estimatedAge || 30;
 
   return {
     ...draft,
@@ -1236,7 +1283,8 @@ export function resolveUnifiedIntakePrimaryAction(
   draft: ReceptionIntakeDraft,
   aiAssist: ReceptionAiIntakeAssist | null,
 ): { label: string; startsThreeMinuteResponse: boolean; tone: 'critical' | 'primary' } {
-  const urgency = aiAssist?.urgencySuggestion || runReceptionAiIntakeAssist(draft).urgencySuggestion;
+  const urgency =
+    aiAssist?.urgencySuggestion || runReceptionAiIntakeAssist(draft).urgencySuggestion;
   if (urgency === 'critical') {
     return {
       label: 'Start 3-minute response & route',
@@ -1245,9 +1293,17 @@ export function resolveUnifiedIntakePrimaryAction(
     };
   }
   if (urgency === 'high') {
-    return { label: 'Create & route to priority triage', startsThreeMinuteResponse: false, tone: 'primary' };
+    return {
+      label: 'Create & route to priority triage',
+      startsThreeMinuteResponse: false,
+      tone: 'primary',
+    };
   }
-  return { label: 'Create patient & route to triage', startsThreeMinuteResponse: false, tone: 'primary' };
+  return {
+    label: 'Create patient & route to triage',
+    startsThreeMinuteResponse: false,
+    tone: 'primary',
+  };
 }
 
 function intakeFieldName(row: IntakeFieldLike): string {
@@ -1261,7 +1317,9 @@ function intakeFieldValue(row: IntakeFieldLike): string {
 }
 
 /** Normalize OCR / verification fields into SmartIntakeFieldRow for draft mapping. */
-export function mapOcrOrExtractedFieldsToSmartIntakeRows(fields: IntakeFieldLike[] = []): SmartIntakeFieldRow[] {
+export function mapOcrOrExtractedFieldsToSmartIntakeRows(
+  fields: IntakeFieldLike[] = [],
+): SmartIntakeFieldRow[] {
   return fields
     .map((row) => ({
       field: intakeFieldName(row),

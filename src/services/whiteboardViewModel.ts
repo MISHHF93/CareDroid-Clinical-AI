@@ -18,16 +18,17 @@ export type WhiteboardQuickFilter =
   | 'boarding'
   | 'reassess';
 
-export type WhiteboardSortColumn =
-  | 'triage'
-  | 'patient'
-  | 'wait'
-  | 'reassess'
-  | 'state';
+export type WhiteboardSortColumn = 'triage' | 'patient' | 'wait' | 'reassess' | 'state';
 
 export type WhiteboardSortDirection = 'asc' | 'desc';
 
-export type WhiteboardZoneId = 'all' | 'resus' | 'treatment' | 'isolation' | 'waiting' | 'unassigned';
+export type WhiteboardZoneId =
+  | 'all'
+  | 'resus'
+  | 'treatment'
+  | 'isolation'
+  | 'waiting'
+  | 'unassigned';
 
 export type WhiteboardViewFilters = {
   quickFilter: WhiteboardQuickFilter;
@@ -269,7 +270,14 @@ export function buildWhiteboardRoomOptions(
     { id: 'all', label: 'All rooms', zoneId: 'all', count: patients.length },
     ...roomOptions,
     ...(unassignedCount > 0 || zoneId === 'all' || zoneId === 'unassigned'
-      ? [{ id: 'unassigned', label: 'No room', zoneId: 'unassigned' as const, count: unassignedCount }]
+      ? [
+          {
+            id: 'unassigned',
+            label: 'No room',
+            zoneId: 'unassigned' as const,
+            count: unassignedCount,
+          },
+        ]
       : []),
   ];
 }

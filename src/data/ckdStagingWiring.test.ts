@@ -20,9 +20,9 @@ const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
 const patternsSource = readFileSync(
   join(
     __dirname,
-    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts'
+    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts',
   ),
-  'utf8'
+  'utf8',
 );
 
 describe('CKD staging calculator wiring (ckd-staging)', () => {
@@ -89,7 +89,7 @@ describe('CKD staging calculator wiring (ckd-staging)', () => {
     expect(ids).toContain('albuminuria-stage');
   });
 
-    it('registers calculator routes in App.jsx via CALCULATOR_ROUTE_DEFS before hub', () => {
+  it('registers calculator routes in App.jsx via CALCULATOR_ROUTE_DEFS before hub', () => {
     assertAppCalculatorRouteWiring(appSource, ['ckd-staging']);
   });
 

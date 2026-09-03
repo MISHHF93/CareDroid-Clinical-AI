@@ -61,10 +61,12 @@ describe('patientDuplicateDetection', () => {
     ).toBe('p10');
     expect(findDuplicateCandidatesFromQuery([existing], 'Mei Li')[0]?.patientId).toBe('p10');
     expect(
-      findDuplicateCandidates(
-        [existing],
-        { firstName: 'Mei', lastName: 'Li', dateOfBirth: '1991-06-18', healthCardNumber: 'HC-9922-441' },
-      )[0]?.patientId,
+      findDuplicateCandidates([existing], {
+        firstName: 'Mei',
+        lastName: 'Li',
+        dateOfBirth: '1991-06-18',
+        healthCardNumber: 'HC-9922-441',
+      })[0]?.patientId,
     ).toBe('p10');
   });
 });

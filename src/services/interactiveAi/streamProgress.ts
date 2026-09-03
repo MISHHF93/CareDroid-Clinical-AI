@@ -80,8 +80,7 @@ export function createStreamProgressController(input: {
     },
     cancel: () => emit('cancelled', 'Generation cancelled by user', undefined, false),
     fail: (message) => emit('failed', message, undefined, false),
-    complete: (message) =>
-      emit('completed', message || streamStateLabel('completed'), 100, false),
+    complete: (message) => emit('completed', message || streamStateLabel('completed'), 100, false),
     subscribe: (listener) => {
       listeners.add(listener);
       return () => listeners.delete(listener);

@@ -76,8 +76,8 @@ export default function EnterpriseOperatingPlatformHub() {
             {liveCount} of {total} modules
           </strong>{' '}
           ({livePercent}%) score from an audit outside the module, so they move when the platform
-          moves. The other <strong>{registryCount}</strong> score a list maintained inside the
-          model file — a real curated inventory, but a document rather than a measurement of this
+          moves. The other <strong>{registryCount}</strong> score a list maintained inside the model
+          file — a real curated inventory, but a document rather than a measurement of this
           deployment. Every card below is tagged.
         </p>
       </section>
@@ -156,7 +156,11 @@ export default function EnterpriseOperatingPlatformHub() {
             <ul className="eop-hub__kpis">
               {module.assessment.kpis.map((entry) => (
                 <li key={entry.id} data-passes={entry.passes ? 'true' : 'false'}>
-                  {entry.passes ? <CheckCircle2 aria-hidden="true" /> : <Circle aria-hidden="true" />}
+                  {entry.passes ? (
+                    <CheckCircle2 aria-hidden="true" />
+                  ) : (
+                    <Circle aria-hidden="true" />
+                  )}
                   <span>{entry.label}</span>
                   <em>
                     {entry.value}

@@ -1,6 +1,10 @@
 import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { MetricCard, MiniSparkline, VisualizationPanel } from '../dashboard/DashboardVisualizations';
+import {
+  MetricCard,
+  MiniSparkline,
+  VisualizationPanel,
+} from '../dashboard/DashboardVisualizations';
 import { CategoryBarChart, DistributionDonutChart } from '../dashboard/DashboardCharts';
 import { GraphicIconBadge } from '../graphics/CdlGraphicKit';
 import { resolveProfileAiCapabilities } from '../../config/profileAiCapabilities.config';
@@ -64,10 +68,7 @@ export default function ProfileInsightsPanel({
     () => buildCompetencyBreakdownChart(competencySummary || {}),
     [competencySummary],
   );
-  const aiCapabilities = useMemo(
-    () => resolveProfileAiCapabilities(profileCopy, 6),
-    [profileCopy],
-  );
+  const aiCapabilities = useMemo(() => resolveProfileAiCapabilities(profileCopy, 6), [profileCopy]);
 
   return (
     <section className="profile-insights-panel" aria-label="Profile insights and AI capabilities">
@@ -83,7 +84,12 @@ export default function ProfileInsightsPanel({
       </div>
 
       <div className="profile-insights-panel__metrics">
-        <MetricCard label="Audit events" value={String(activityTotal)} hint="Personal audit trail" tone="neutral" />
+        <MetricCard
+          label="Audit events"
+          value={String(activityTotal)}
+          hint="Personal audit trail"
+          tone="neutral"
+        />
         <MetricCard
           label="AI modules"
           value={String(aiCapabilities.length)}

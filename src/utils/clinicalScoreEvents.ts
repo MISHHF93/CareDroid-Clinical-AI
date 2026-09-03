@@ -36,9 +36,11 @@ export function scoreRiskTone(band = '') {
 export function normalizeSavedScoreEvent(event) {
   if (!isScoreTimelineEvent(event)) return null;
   const metadata = event.metadata || {};
-  const label = valueFromMetadata(metadata, ['scoreLabel', 'toolName', 'label', 'calculatorLabel']) || 'Score';
+  const label =
+    valueFromMetadata(metadata, ['scoreLabel', 'toolName', 'label', 'calculatorLabel']) || 'Score';
   const result = valueFromMetadata(metadata, ['scoreTotal', 'result', 'total', 'value']);
-  const band = valueFromMetadata(metadata, ['band', 'riskBand', 'interpretation', 'severity']) || '';
+  const band =
+    valueFromMetadata(metadata, ['band', 'riskBand', 'interpretation', 'severity']) || '';
   const staffId =
     event.staffId ||
     event.actorStaffId ||
@@ -94,6 +96,9 @@ export function formatScoresForCopilot(patient, now = new Date()) {
   const scores = getRecentSavedScores(patient, now);
   if (!scores.length) return '';
   return scores
-    .map((score) => `${score.shortLabel}=${score.result ?? '--'} (${score.band || 'band unknown'}, ${formatScoreAge(score.timestamp, now)})`)
+    .map(
+      (score) =>
+        `${score.shortLabel}=${score.result ?? '--'} (${score.band || 'band unknown'}, ${formatScoreAge(score.timestamp, now)})`,
+    )
     .join(', ');
 }

@@ -39,7 +39,9 @@ function applyDomTheme(theme: 'light' | 'dark') {
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [preference, setPreferenceState] = useState<ThemePreference>(loadPreference);
-  const [resolvedTheme, setResolved] = useState<'light' | 'dark'>(() => resolveTheme(loadPreference()));
+  const [resolvedTheme, setResolved] = useState<'light' | 'dark'>(() =>
+    resolveTheme(loadPreference()),
+  );
 
   const setPreference = useCallback((pref: ThemePreference) => {
     setPreferenceState(pref);

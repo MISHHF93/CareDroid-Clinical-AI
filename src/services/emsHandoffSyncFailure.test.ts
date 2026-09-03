@@ -20,14 +20,22 @@ describe('reportEmsHandoffSyncFailure', () => {
 
   it('records the miss to the automation audit trail with the real endpoint and error', () => {
     const error = new Error('network down');
-    reportEmsHandoffSyncFailure({ arrivalId: 'ems-1', patientId: 'p-1', unitName: 'Medic 7', error });
+    reportEmsHandoffSyncFailure({
+      arrivalId: 'ems-1',
+      patientId: 'p-1',
+      unitName: 'Medic 7',
+      error,
+    });
 
     expect(recordAutomationFailureMock).toHaveBeenCalledTimes(1);
     const call = recordAutomationFailureMock.mock.calls[0][0];
     expect(call.backendEndpoint).toBe('/api/emergency/ems/handoff');
     expect(call.toolCalled).toBe('ems-handoff-persist');
     expect(call.error).toBe(error);
-    expect(call.aiInvolvement).toEqual({ involved: false, summary: 'Rules-only handoff persistence.' });
+    expect(call.aiInvolvement).toEqual({
+      involved: false,
+      summary: 'Rules-only handoff persistence.',
+    });
     expect(call.conditionsEvaluated[0].label).toContain('ems-1');
     expect(call.conditionsEvaluated[0].label).toContain('p-1');
     expect(call.conditionsEvaluated[0].result).toBe(false);

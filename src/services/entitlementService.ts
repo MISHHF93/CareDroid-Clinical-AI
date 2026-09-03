@@ -9,7 +9,11 @@ import { getFeatureFlagForAsset, resolveFeatureFlagState } from './featureFlagSe
 
 const ADMIN_ROLES = new Set(['admin', 'owner']);
 
-export function resolveEntitlementDecision(tool: any = {}, context: any = {}, userRole = 'student') {
+export function resolveEntitlementDecision(
+  tool: any = {},
+  context: any = {},
+  userRole = 'student',
+) {
   const assetId = tool.id || tool.canonicalInventoryId;
   const serverDecision = context?.assetAccessDecisions?.[assetId];
   if (serverDecision) {
@@ -52,7 +56,10 @@ export function resolveEntitlementDecision(tool: any = {}, context: any = {}, us
   }
 
   const role = userRole || context?.membership?.role || context?.tenant?.role;
-  if ((rule?.adminOnly || rolloutState === FEATURE_FLAG_STATES.ADMIN_ONLY) && !ADMIN_ROLES.has(role)) {
+  if (
+    (rule?.adminOnly || rolloutState === FEATURE_FLAG_STATES.ADMIN_ONLY) &&
+    !ADMIN_ROLES.has(role)
+  ) {
     return {
       ...base,
       state: ENTITLEMENT_ACCESS_STATES.ADMIN_ONLY,
@@ -72,7 +79,10 @@ export function resolveEntitlementDecision(tool: any = {}, context: any = {}, us
     SUBSCRIPTION_TIERS.FREE;
   if (
     hasOrganization &&
-    !subscriptionMeetsRequirement(currentPlan as any, (rule?.requiredPlan || SUBSCRIPTION_TIERS.FREE) as any)
+    !subscriptionMeetsRequirement(
+      currentPlan as any,
+      (rule?.requiredPlan || SUBSCRIPTION_TIERS.FREE) as any,
+    )
   ) {
     return subscriptionDecision(base, 'subscription-required');
   }

@@ -64,9 +64,7 @@ export default function SidebarNotificationPanel() {
             <div>
               <h2 id="notification-center-title">Alerts</h2>
               <p>
-                {unreadAlertCount
-                  ? `${unreadAlertCount} need review`
-                  : 'No priority items unread'}
+                {unreadAlertCount ? `${unreadAlertCount} need review` : 'No priority items unread'}
               </p>
             </div>
           </div>

@@ -61,7 +61,9 @@ import { ReceptionFlowGraphic } from '../../components/graphics/CdlGraphicKit';
 import { showActionError, showActionSuccess } from '../../services/careDroidInteractionFeedback';
 import { STANDARD_ACTION_FEEDBACK } from '../../config/careDroidInteractionModel';
 import { notifyWorkflowHandoffComplete } from '../../services/workflowNavigationFeedback';
-import ReceptionHeader, { ReceptionHeaderActionButton } from '../../components/reception/ReceptionHeader';
+import ReceptionHeader, {
+  ReceptionHeaderActionButton,
+} from '../../components/reception/ReceptionHeader';
 import ReceptionPageLayout, {
   ReceptionContentSection,
   ReceptionCard,
@@ -110,13 +112,20 @@ type SmartIntakeSession = {
 type QueueTabId = 'ems' | 'verification' | 'pretriage';
 
 function patientDisplayName(patient: Patient): string {
-  return [patient.firstName, patient.lastName].filter(Boolean).join(' ').trim() || patient.name || patient.mrn;
+  return (
+    [patient.firstName, patient.lastName].filter(Boolean).join(' ').trim() ||
+    patient.name ||
+    patient.mrn
+  );
 }
 
 function isReceptionQueuePatient(patient: Patient): boolean {
-  return [PatientState.Arrival, PatientState.Registration, PatientState.Triage, PatientState.Waiting].includes(
-    patient.state,
-  );
+  return [
+    PatientState.Arrival,
+    PatientState.Registration,
+    PatientState.Triage,
+    PatientState.Waiting,
+  ].includes(patient.state);
 }
 
 function isHighRiskPatient(patient: Patient): boolean {
@@ -206,7 +215,9 @@ function Stepper({
     {
       id: 'critical',
       label: 'Life-critical info',
-      complete: validateReceptionMinimumCriticalData(draft).length === 0 || detectReceptionRedFlags(draft).length > 0,
+      complete:
+        validateReceptionMinimumCriticalData(draft).length === 0 ||
+        detectReceptionRedFlags(draft).length > 0,
     },
     { id: 'ai', label: 'AI assist', complete: Boolean(aiAssist) },
     { id: 'route', label: 'Route to nurse', complete: Boolean(result) },
@@ -215,21 +226,21 @@ function Stepper({
   return (
     <div className="reception-command-stepper-shell">
       <ReceptionFlowGraphic steps={steps} className="reception-command-stepper-shell__graphic" />
-    <ol className="reception-command-stepper" aria-label="Reception intake progress">
-      {steps.map((step) => (
-        <li
-          key={step.id}
-          className={`reception-command-stepper__item${step.complete ? ' reception-command-stepper__item--complete' : ''}`}
-        >
-          <span>{step.label}</span>
-        </li>
-      ))}
-      {criticalStarted ? (
-        <li className="reception-command-stepper__item reception-command-stepper__item--critical">
-          <span>3-minute response active</span>
-        </li>
-      ) : null}
-    </ol>
+      <ol className="reception-command-stepper" aria-label="Reception intake progress">
+        {steps.map((step) => (
+          <li
+            key={step.id}
+            className={`reception-command-stepper__item${step.complete ? ' reception-command-stepper__item--complete' : ''}`}
+          >
+            <span>{step.label}</span>
+          </li>
+        ))}
+        {criticalStarted ? (
+          <li className="reception-command-stepper__item reception-command-stepper__item--critical">
+            <span>3-minute response active</span>
+          </li>
+        ) : null}
+      </ol>
     </div>
   );
 }
@@ -273,11 +284,15 @@ export default function ReceptionWorkspace() {
   const [showChooser, setShowChooser] = useState(false);
   const [smartIntakeSession, setSmartIntakeSession] = useState<SmartIntakeSession | null>(null);
   const [escalationDialogOpen, setEscalationDialogOpen] = useState(false);
-  const [escalationReasonId, setEscalationReasonId] = useState<ReceptionEscalationReasonId | null>(null);
+  const [escalationReasonId, setEscalationReasonId] = useState<ReceptionEscalationReasonId | null>(
+    null,
+  );
   const [patientDetailOpen, setPatientDetailOpen] = useState(false);
   const [assistOpen, setAssistOpen] = useState(false);
   const [duplicateConfirmOpen, setDuplicateConfirmOpen] = useState(false);
-  const [pendingRouteOptions, setPendingRouteOptions] = useState<{ aiUnavailable?: boolean } | null>(null);
+  const [pendingRouteOptions, setPendingRouteOptions] = useState<{
+    aiUnavailable?: boolean;
+  } | null>(null);
   const [hasSavedDraft, setHasSavedDraft] = useState(false);
   const [shiftClearanceOpen, setShiftClearanceOpen] = useState(false);
 
@@ -310,19 +325,29 @@ export default function ReceptionWorkspace() {
   }, []);
 
   const saveDraft = useCallback(() => {
-    const storedDraft = { ...draft, id: draft.id || `draft-${Date.now()}`, savedAt: new Date().toISOString() };
+    const storedDraft = {
+      ...draft,
+      id: draft.id || `draft-${Date.now()}`,
+      savedAt: new Date().toISOString(),
+    };
     window.sessionStorage?.setItem('caredroid:reception-draft', JSON.stringify(storedDraft));
     setDraft(storedDraft);
     setHasSavedDraft(true);
     showActionSuccess(STANDARD_ACTION_FEEDBACK.draftSaved);
   }, [draft]);
 
-  const focusQueueTab = useCallback((tab: QueueTabId) => {
-    setActiveQueueTab(tab);
-    const next = new URLSearchParams(searchParams);
-    next.set('queue', tab === 'ems' ? 'ems' : tab === 'verification' ? 'verification' : 'pretriage');
-    setSearchParams(next, { replace: true });
-  }, [searchParams, setSearchParams]);
+  const focusQueueTab = useCallback(
+    (tab: QueueTabId) => {
+      setActiveQueueTab(tab);
+      const next = new URLSearchParams(searchParams);
+      next.set(
+        'queue',
+        tab === 'ems' ? 'ems' : tab === 'verification' ? 'verification' : 'pretriage',
+      );
+      setSearchParams(next, { replace: true });
+    },
+    [searchParams, setSearchParams],
+  );
 
   const receptionCapabilities = useMemo(
     () =>
@@ -343,7 +368,10 @@ export default function ReceptionWorkspace() {
     user?.email ||
     'Reception Desk';
   const canCreatePatient = emergencyRole.canMutate(EMERGENCY_ACTIONS.createPatient);
-  const clinicalOverride = assertReceptionMutationAllowed(emergencyRole.role, EMERGENCY_ACTIONS.triage);
+  const clinicalOverride = assertReceptionMutationAllowed(
+    emergencyRole.role,
+    EMERGENCY_ACTIONS.triage,
+  );
   const missingCriticalFields = validateReceptionMinimumCriticalData(draft);
   const liveRedFlags = detectReceptionRedFlags(draft);
   const duplicateCandidates = useMemo(
@@ -378,13 +406,11 @@ export default function ReceptionWorkspace() {
 
   const receptionQueueAll = useMemo(
     () =>
-      patients
-        .filter(isReceptionQueuePatient)
-        .sort((left, right) => {
-          const riskDelta = Number(isHighRiskPatient(right)) - Number(isHighRiskPatient(left));
-          if (riskDelta) return riskDelta;
-          return waitMinutes(right) - waitMinutes(left);
-        }),
+      patients.filter(isReceptionQueuePatient).sort((left, right) => {
+        const riskDelta = Number(isHighRiskPatient(right)) - Number(isHighRiskPatient(left));
+        if (riskDelta) return riskDelta;
+        return waitMinutes(right) - waitMinutes(left);
+      }),
     [patients],
   );
 
@@ -404,11 +430,15 @@ export default function ReceptionWorkspace() {
   );
 
   const selectedPatient = useMemo(
-    () => (selectedPatientId ? patients.find((patient) => patient.id === selectedPatientId) || null : null),
+    () =>
+      selectedPatientId
+        ? patients.find((patient) => patient.id === selectedPatientId) || null
+        : null,
     [patients, selectedPatientId],
   );
 
-  const emptyQueueMessage = RECEPTION_COPY.queues.empty[activeQueueTab] || 'No patients in this list.';
+  const emptyQueueMessage =
+    RECEPTION_COPY.queues.empty[activeQueueTab] || 'No patients in this list.';
 
   const openSmartIntake = useCallback(
     (session: SmartIntakeSession = { autostart: true }) => {
@@ -419,10 +449,13 @@ export default function ReceptionWorkspace() {
     [receptionCapabilities.canOpenSmartIntake],
   );
 
-  const openEscalationDialog = useCallback((reasonId: ReceptionEscalationReasonId | null = null) => {
-    setEscalationReasonId(reasonId);
-    setEscalationDialogOpen(true);
-  }, []);
+  const openEscalationDialog = useCallback(
+    (reasonId: ReceptionEscalationReasonId | null = null) => {
+      setEscalationReasonId(reasonId);
+      setEscalationDialogOpen(true);
+    },
+    [],
+  );
 
   const openPatientTask = useCallback(
     (patientId: string) => {
@@ -489,7 +522,10 @@ export default function ReceptionWorkspace() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      const isInput = e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLSelectElement;
+      const isInput =
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement ||
+        e.target instanceof HTMLSelectElement;
       if (isInput) return;
 
       if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
@@ -501,16 +537,43 @@ export default function ReceptionWorkspace() {
         saveDraft();
       }
       if (e.key === 'Escape') {
-        if (duplicateConfirmOpen) { setDuplicateConfirmOpen(false); setPendingRouteOptions(null); return; }
-        if (shiftClearanceOpen) { setShiftClearanceOpen(false); return; }
-        if (smartIntakeSession) { setSmartIntakeSession(null); clearIntakeQueryParams(); return; }
-        if (showChooser) { setShowChooser(false); return; }
-        if (escalationDialogOpen) { setEscalationDialogOpen(false); setEscalationReasonId(null); return; }
-        if (patientDetailOpen) { setPatientDetailOpen(false); return; }
+        if (duplicateConfirmOpen) {
+          setDuplicateConfirmOpen(false);
+          setPendingRouteOptions(null);
+          return;
+        }
+        if (shiftClearanceOpen) {
+          setShiftClearanceOpen(false);
+          return;
+        }
+        if (smartIntakeSession) {
+          setSmartIntakeSession(null);
+          clearIntakeQueryParams();
+          return;
+        }
+        if (showChooser) {
+          setShowChooser(false);
+          return;
+        }
+        if (escalationDialogOpen) {
+          setEscalationDialogOpen(false);
+          setEscalationReasonId(null);
+          return;
+        }
+        if (patientDetailOpen) {
+          setPatientDetailOpen(false);
+          return;
+        }
       }
-      if (e.key === '1' && !e.ctrlKey && !e.metaKey) { focusQueueTab('ems'); }
-      if (e.key === '2' && !e.ctrlKey && !e.metaKey) { focusQueueTab('verification'); }
-      if (e.key === '3' && !e.ctrlKey && !e.metaKey) { focusQueueTab('pretriage'); }
+      if (e.key === '1' && !e.ctrlKey && !e.metaKey) {
+        focusQueueTab('ems');
+      }
+      if (e.key === '2' && !e.ctrlKey && !e.metaKey) {
+        focusQueueTab('verification');
+      }
+      if (e.key === '3' && !e.ctrlKey && !e.metaKey) {
+        focusQueueTab('pretriage');
+      }
     };
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
@@ -554,7 +617,9 @@ export default function ReceptionWorkspace() {
         : null);
     return resolveReceptionNextBestAction({
       hasDraftComplaint: Boolean(String(draft.chiefComplaint || '').trim()),
-      hasDraftIdentity: Boolean(String(draft.firstName || '').trim() || String(draft.lastName || '').trim() || draft.dob),
+      hasDraftIdentity: Boolean(
+        String(draft.firstName || '').trim() || String(draft.lastName || '').trim() || draft.dob,
+      ),
       hasSavedDraft,
       redFlagCount: liveRedFlags.length,
       urgency,
@@ -584,7 +649,8 @@ export default function ReceptionWorkspace() {
   ]);
 
   useEffect(() => {
-    const patientId = searchParams.get('patientId') || searchParams.get('patient') || searchParams.get('arrived');
+    const patientId =
+      searchParams.get('patientId') || searchParams.get('patient') || searchParams.get('arrived');
     if (patientId) selectPatient(patientId);
     const queueParam = searchParams.get('queue') || searchParams.get('filter');
     if (queueParam) setActiveQueueTab(mapQueueParamToTab(queueParam));
@@ -653,7 +719,8 @@ export default function ReceptionWorkspace() {
     try {
       const routeResult = await createPatientAndRouteFromReception(draft, {
         actorName: currentUserName,
-        actorStaffId: emergencyRole.canonicalProfile?.employeeId || emergencyRole.canonicalProfile?.id,
+        actorStaffId:
+          emergencyRole.canonicalProfile?.employeeId || emergencyRole.canonicalProfile?.id,
         aiUnavailable: options.aiUnavailable,
         confirmDuplicateOverride: Boolean(options.confirmDuplicateOverride),
       });
@@ -809,9 +876,13 @@ export default function ReceptionWorkspace() {
       return;
     }
     if (cta === 'resolve_duplicate') {
-      const candidates = scanReceptionDraftDuplicates(draft, patients).filter((c) => c.matchScore >= 65);
+      const candidates = scanReceptionDraftDuplicates(draft, patients).filter(
+        (c) => c.matchScore >= 65,
+      );
       if (candidates.length === 0) {
-        showActionSuccess('No strong matches — search by name or health card, then create if needed.');
+        showActionSuccess(
+          'No strong matches — search by name or health card, then create if needed.',
+        );
         lookupInputRef.current?.focus();
         return;
       }
@@ -822,7 +893,9 @@ export default function ReceptionWorkspace() {
       focusQueueTab('ems');
       window.requestAnimationFrame(() => {
         document
-          .querySelector<HTMLElement>('.reception-operational-rail, [data-testid="reception-operational-rail"]')
+          .querySelector<HTMLElement>(
+            '.reception-operational-rail, [data-testid="reception-operational-rail"]',
+          )
           ?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
       });
       return;
@@ -869,9 +942,7 @@ export default function ReceptionWorkspace() {
       const targets = buildReceptionEscalationTargetsLabel(
         record.notifyTargets || reason?.notifyTargets || [],
       );
-      showActionSuccess(
-        `Escalation sent · Notified: ${targets || 'Triage nurse · Charge nurse'}`,
-      );
+      showActionSuccess(`Escalation sent · Notified: ${targets || 'Triage nurse · Charge nurse'}`);
     } else {
       showActionError('Escalation failed', 'Could not raise the reception escalation alert.');
     }
@@ -887,33 +958,30 @@ export default function ReceptionWorkspace() {
 
   return (
     <div className="reception-front-door reception-workspace">
-    <ReceptionPageLayout
-      header={
-        <ReceptionHeader
-          metrics={[
-            {
-              label: RECEPTION_COPY.metrics.queueSize,
-              value: receptionQueueAll.length,
-              tone: 'neutral',
-            },
-            {
-              label: 'Draft flags',
-              value: liveRedFlags.length + missingCriticalFields.length,
-              tone:
-                liveRedFlags.length || missingCriticalFields.length ? 'warning' : 'neutral',
-            },
-          ]}
-          situation={{
-            status: `${receptionQueueAll.length} patient${receptionQueueAll.length === 1 ? '' : 's'} in reception`,
-            attention:
-              attention.count
+      <ReceptionPageLayout
+        header={
+          <ReceptionHeader
+            metrics={[
+              {
+                label: RECEPTION_COPY.metrics.queueSize,
+                value: receptionQueueAll.length,
+                tone: 'neutral',
+              },
+              {
+                label: 'Draft flags',
+                value: liveRedFlags.length + missingCriticalFields.length,
+                tone: liveRedFlags.length || missingCriticalFields.length ? 'warning' : 'neutral',
+              },
+            ]}
+            situation={{
+              status: `${receptionQueueAll.length} patient${receptionQueueAll.length === 1 ? '' : 's'} in reception`,
+              attention: attention.count
                 ? `${attention.count} item${attention.count === 1 ? '' : 's'} need attention`
                 : liveRedFlags.length
                   ? `${liveRedFlags.length} red flag${liveRedFlags.length === 1 ? '' : 's'} in draft`
                   : 'No critical arrivals flagged',
-            owner: `${currentUserName} · ${emergencyRole.roleLabel || 'Registration Clerk'}`,
-            nextAction:
-              result
+              owner: `${currentUserName} · ${emergencyRole.roleLabel || 'Registration Clerk'}`,
+              nextAction: result
                 ? RECEPTION_COPY.workspace.registerNext
                 : smartIntakeSession
                   ? 'Complete identity check, then confirm routing'
@@ -924,405 +992,416 @@ export default function ReceptionWorkspace() {
                         ? `Complete ${missingCriticalFields.length} required field${missingCriticalFields.length === 1 ? '' : 's'}`
                         : 'Route patient to triage queue'
                       : RECEPTION_COPY.workspace.registerWalkIn,
-            tone: situationTone,
-          }}
-          primaryActions={
-            receptionDesk.enabled ? (
-              <>
-                <ReceptionHeaderActionButton
-                  primary
-                  onClick={resetForNextPatient}
-                  title="Start a new walk-in intake (Ctrl+N). Complete fields, then Create & route."
-                >
-                  New walk-in
-                </ReceptionHeaderActionButton>
-                {(criticalNeeded || liveRedFlags.length >= 2) && canCreatePatient ? (
+              tone: situationTone,
+            }}
+            primaryActions={
+              receptionDesk.enabled ? (
+                <>
                   <ReceptionHeaderActionButton
-                    onClick={() => void handleProvisionalUnknown()}
-                    disabled={provisionalUnknownSubmitting}
-                    title="Crash / unknown pathway — send to nurse without full identity"
+                    primary
+                    onClick={resetForNextPatient}
+                    title="Start a new walk-in intake (Ctrl+N). Complete fields, then Create & route."
                   >
-                    Send unknown / crash
+                    New walk-in
                   </ReceptionHeaderActionButton>
-                ) : null}
-                <ReceptionHeaderActionButton
-                  onClick={() => openSmartIntake({ step: 'capture', autostart: true })}
-                >
-                  Check Identity
-                </ReceptionHeaderActionButton>
-                <ReceptionHeaderActionButton
-                  onClick={() => setShowChooser(true)}
-                >
-                  Other Arrivals
-                </ReceptionHeaderActionButton>
-                {receptionDesk.canUseRegistrationSkills ? (
+                  {(criticalNeeded || liveRedFlags.length >= 2) && canCreatePatient ? (
+                    <ReceptionHeaderActionButton
+                      onClick={() => void handleProvisionalUnknown()}
+                      disabled={provisionalUnknownSubmitting}
+                      title="Crash / unknown pathway — send to nurse without full identity"
+                    >
+                      Send unknown / crash
+                    </ReceptionHeaderActionButton>
+                  ) : null}
                   <ReceptionHeaderActionButton
-                    onClick={() => setShiftClearanceOpen(true)}
-                    title="Review EMS, ID-check, and waiting-for-nurse lists before you leave"
+                    onClick={() => openSmartIntake({ step: 'capture', autostart: true })}
                   >
-                    Shift clearance
+                    Check Identity
                   </ReceptionHeaderActionButton>
-                ) : null}
-                {receptionCapabilities.canEscalateToNurse && (
-                  <ReceptionHeaderActionButton
-                    onClick={() => openEscalationDialog(null)}
-                  >
-                    Escalate to Nurse
+                  <ReceptionHeaderActionButton onClick={() => setShowChooser(true)}>
+                    Other Arrivals
                   </ReceptionHeaderActionButton>
-                )}
-                {!receptionDesk.showInlineCopilot && receptionDesk.canUseRegistrationSkills ? (
-                  <ReceptionHeaderActionButton
-                    onClick={() => setAssistOpen(true)}
-                    title="Open reception assist — prompts can open pages and tools"
-                  >
-                    Desk assist
-                  </ReceptionHeaderActionButton>
-                ) : null}
-              </>
-            ) : null
-          }
-          queueTabs={[
-            {
-              id: 'ems',
-              label: 'EMS',
-              count: filterQueueByTab(receptionQueueAll, 'ems').length,
-              active: activeQueueTab === 'ems',
-              onClick: () => focusQueueTab('ems'),
-            },
-            {
-              id: 'verification',
-              label: 'Verification',
-              count: filterQueueByTab(receptionQueueAll, 'verification').length,
-              active: activeQueueTab === 'verification',
-              onClick: () => focusQueueTab('verification'),
-            },
-            {
-              id: 'pretriage',
-              label: 'Pre-Triage',
-              count: filterQueueByTab(receptionQueueAll, 'pretriage').length,
-              active: activeQueueTab === 'pretriage',
-              onClick: () => focusQueueTab('pretriage'),
-            },
-          ]}
-        />
-      }
-      mainContent={
-        <>
-          <EdDataSourceBanner
-            envelope={null}
-            loading={backendLoading}
-            error={backendError}
-            backendAvailable={backendAvailable}
-            activeScenarioId={activeScenarioId}
+                  {receptionDesk.canUseRegistrationSkills ? (
+                    <ReceptionHeaderActionButton
+                      onClick={() => setShiftClearanceOpen(true)}
+                      title="Review EMS, ID-check, and waiting-for-nurse lists before you leave"
+                    >
+                      Shift clearance
+                    </ReceptionHeaderActionButton>
+                  ) : null}
+                  {receptionCapabilities.canEscalateToNurse && (
+                    <ReceptionHeaderActionButton onClick={() => openEscalationDialog(null)}>
+                      Escalate to Nurse
+                    </ReceptionHeaderActionButton>
+                  )}
+                  {!receptionDesk.showInlineCopilot && receptionDesk.canUseRegistrationSkills ? (
+                    <ReceptionHeaderActionButton
+                      onClick={() => setAssistOpen(true)}
+                      title="Open reception assist — prompts can open pages and tools"
+                    >
+                      Desk assist
+                    </ReceptionHeaderActionButton>
+                  ) : null}
+                </>
+              ) : null
+            }
+            queueTabs={[
+              {
+                id: 'ems',
+                label: 'EMS',
+                count: filterQueueByTab(receptionQueueAll, 'ems').length,
+                active: activeQueueTab === 'ems',
+                onClick: () => focusQueueTab('ems'),
+              },
+              {
+                id: 'verification',
+                label: 'Verification',
+                count: filterQueueByTab(receptionQueueAll, 'verification').length,
+                active: activeQueueTab === 'verification',
+                onClick: () => focusQueueTab('verification'),
+              },
+              {
+                id: 'pretriage',
+                label: 'Pre-Triage',
+                count: filterQueueByTab(receptionQueueAll, 'pretriage').length,
+                active: activeQueueTab === 'pretriage',
+                onClick: () => focusQueueTab('pretriage'),
+              },
+            ]}
           />
-          <EmsCriticalArrivalPrep />
-          <ReceptionContentSection>
-            <Stepper draft={draft} aiAssist={aiAssist} result={result} />
-
-            {hasSavedDraft && !String(draft.chiefComplaint || '').trim() && !result ? (
-              <div className="reception-command-missing" role="status">
-                <span>
-                  Interrupted registration draft restored.{' '}
-                  <button
-                    type="button"
-                    className="reception-linkish"
-                    onClick={() =>
-                      document.querySelector<HTMLTextAreaElement>('.reception-front-door textarea')?.focus()
-                    }
-                  >
-                    Resume intake
-                  </button>
-                </span>
-              </div>
-            ) : null}
-
-            {!clinicalOverride.allowed ? (
-              <div className="reception-command-guardrail" role="note">
-                <ShieldCheck size={18} aria-hidden="true" />
-                <span>{clinicalOverride.reason}</span>
-              </div>
-            ) : null}
-
-            {receptionDesk.canUseRegistrationSkills ? (
-              <ReceptionSkillStrip action={nextBestAction} onPrimary={handleSkillCta} />
-            ) : null}
-
-            {receptionDesk.lookupBeforeCreateDefault && receptionDesk.canUseRegistrationSkills ? (
-              <ReceptionPatientLookup
-                patients={patients}
-                inputRef={lookupInputRef}
-                disabled={submitting}
-                onSelectExisting={(patientId) => {
-                  selectPatient(patientId);
-                  setPatientDetailOpen(true);
-                  showActionSuccess('Existing chart selected — complete ID or hand off from the task sheet.');
-                }}
-                onCreateNew={resetForNextPatient}
-              />
-            ) : null}
-
-            <ReceptionCard padding="normal">
-              <UnifiedIntakePanel
-                draft={draft}
-                onDraftChange={updateDraft}
-                aiAssist={aiAssist}
-                onAiAssistChange={setAiAssist}
-                result={result}
-                canCreatePatient={canCreatePatient && receptionDesk.canUseRegistrationSkills}
-                submitting={submitting}
-                onSaveDraft={saveDraft}
-                onRoute={createAndRoute}
-                onReset={resetForNextPatient}
-                showQueueRail={false}
-                actorName={currentUserName}
-                patientId={selectedPatientId || undefined}
-                duplicateWarnings={duplicateWarnings}
-                assistTitle={
-                  receptionDesk.labelAssistAsDeskNotAi
-                    ? 'Desk assist (rules)'
-                    : RECEPTION_COPY.copilot?.title || 'Desk assist'
-                }
-              />
-            </ReceptionCard>
-
-          </ReceptionContentSection>
-
-          {/* Nested escalation strip removed — single attention surface lives in sidebar.
-              Optional non-slim: compact quick flags only (no second attention list). */}
-          {receptionCapabilities.canEscalateToNurse &&
-          receptionDesk.showNestedEscalationQuickActions ? (
+        }
+        mainContent={
+          <>
+            <EdDataSourceBanner
+              envelope={null}
+              loading={backendLoading}
+              error={backendError}
+              backendAvailable={backendAvailable}
+              activeScenarioId={activeScenarioId}
+            />
+            <EmsCriticalArrivalPrep />
             <ReceptionContentSection>
-              <ReceptionEscalationQuickActions
-                defaultPatientId={selectedPatientId}
-                actorStaffId={emergencyRole.canonicalProfile?.employeeId || emergencyRole.canonicalProfile?.id}
-                actorName={currentUserName}
-                onSubmit={submitEscalation}
-                onOpenDetail={(reasonId: ReceptionEscalationReasonId | null) => openEscalationDialog(reasonId)}
-                className="reception-front-door__escalation-quick-actions"
-              />
+              <Stepper draft={draft} aiAssist={aiAssist} result={result} />
+
+              {hasSavedDraft && !String(draft.chiefComplaint || '').trim() && !result ? (
+                <div className="reception-command-missing" role="status">
+                  <span>
+                    Interrupted registration draft restored.{' '}
+                    <button
+                      type="button"
+                      className="reception-linkish"
+                      onClick={() =>
+                        document
+                          .querySelector<HTMLTextAreaElement>('.reception-front-door textarea')
+                          ?.focus()
+                      }
+                    >
+                      Resume intake
+                    </button>
+                  </span>
+                </div>
+              ) : null}
+
+              {!clinicalOverride.allowed ? (
+                <div className="reception-command-guardrail" role="note">
+                  <ShieldCheck size={18} aria-hidden="true" />
+                  <span>{clinicalOverride.reason}</span>
+                </div>
+              ) : null}
+
+              {receptionDesk.canUseRegistrationSkills ? (
+                <ReceptionSkillStrip action={nextBestAction} onPrimary={handleSkillCta} />
+              ) : null}
+
+              {receptionDesk.lookupBeforeCreateDefault && receptionDesk.canUseRegistrationSkills ? (
+                <ReceptionPatientLookup
+                  patients={patients}
+                  inputRef={lookupInputRef}
+                  disabled={submitting}
+                  onSelectExisting={(patientId) => {
+                    selectPatient(patientId);
+                    setPatientDetailOpen(true);
+                    showActionSuccess(
+                      'Existing chart selected — complete ID or hand off from the task sheet.',
+                    );
+                  }}
+                  onCreateNew={resetForNextPatient}
+                />
+              ) : null}
+
+              <ReceptionCard padding="normal">
+                <UnifiedIntakePanel
+                  draft={draft}
+                  onDraftChange={updateDraft}
+                  aiAssist={aiAssist}
+                  onAiAssistChange={setAiAssist}
+                  result={result}
+                  canCreatePatient={canCreatePatient && receptionDesk.canUseRegistrationSkills}
+                  submitting={submitting}
+                  onSaveDraft={saveDraft}
+                  onRoute={createAndRoute}
+                  onReset={resetForNextPatient}
+                  showQueueRail={false}
+                  actorName={currentUserName}
+                  patientId={selectedPatientId || undefined}
+                  duplicateWarnings={duplicateWarnings}
+                  assistTitle={
+                    receptionDesk.labelAssistAsDeskNotAi
+                      ? 'Desk assist (rules)'
+                      : RECEPTION_COPY.copilot?.title || 'Desk assist'
+                  }
+                />
+              </ReceptionCard>
             </ReceptionContentSection>
-          ) : null}
-        </>
-      }
-      sidebar={
-        <>
-          <ReceptionOperationalRail
-            queue={receptionQueue}
-            attention={attention}
-            selectedPatient={selectedPatient}
-            onSelectPatient={openPatientTask}
-            onAttentionSelect={handleAttentionSelect}
-            onRowAction={handleQueueRowAction}
-            patientDisplayName={patientDisplayName}
-            queueStatus={queueStatus}
-            nextStep={nextStep}
-            waitMinutes={waitMinutes}
-            isHighRiskPatient={isHighRiskPatient}
-            activeQueueTab={RECEPTION_COPY.queues.tabs[activeQueueTab]}
-            emptyQueueMessage={emptyQueueMessage}
-          />
-          {receptionDesk.showInlineCopilot || assistOpen ? (
-            <div className="reception-interactive-ai">
-              <InteractiveAIWorkspace
-                role={emergencyRole.role || 'registration_clerk'}
-                userId={emergencyRole.canonicalProfile?.id}
-                organizationId={emergencyRole.canonicalProfile?.organizationId}
-                patientId={selectedPatient?.id}
-                pageId="reception_workspace"
-                channel="reception"
-                purpose="reception_interactive_assist"
-                title="Reception Copilot"
-                permissions={['use_ai_chat', 'view_phi', 'view_operations']}
-                seedTriggers={[
-                  {
-                    kind: 'incomplete_registration',
-                    summary: 'Check missing registration fields before triage handoff.',
-                    urgency: 'attention',
-                  },
-                  {
-                    kind: 'new_ocr_document',
-                    summary: 'Review OCR confidence before committing document fields.',
-                    urgency: 'info',
-                  },
-                ]}
-              />
+
+            {/* Nested escalation strip removed — single attention surface lives in sidebar.
+              Optional non-slim: compact quick flags only (no second attention list). */}
+            {receptionCapabilities.canEscalateToNurse &&
+            receptionDesk.showNestedEscalationQuickActions ? (
+              <ReceptionContentSection>
+                <ReceptionEscalationQuickActions
+                  defaultPatientId={selectedPatientId}
+                  actorStaffId={
+                    emergencyRole.canonicalProfile?.employeeId || emergencyRole.canonicalProfile?.id
+                  }
+                  actorName={currentUserName}
+                  onSubmit={submitEscalation}
+                  onOpenDetail={(reasonId: ReceptionEscalationReasonId | null) =>
+                    openEscalationDialog(reasonId)
+                  }
+                  className="reception-front-door__escalation-quick-actions"
+                />
+              </ReceptionContentSection>
+            ) : null}
+          </>
+        }
+        sidebar={
+          <>
+            <ReceptionOperationalRail
+              queue={receptionQueue}
+              attention={attention}
+              selectedPatient={selectedPatient}
+              onSelectPatient={openPatientTask}
+              onAttentionSelect={handleAttentionSelect}
+              onRowAction={handleQueueRowAction}
+              patientDisplayName={patientDisplayName}
+              queueStatus={queueStatus}
+              nextStep={nextStep}
+              waitMinutes={waitMinutes}
+              isHighRiskPatient={isHighRiskPatient}
+              activeQueueTab={RECEPTION_COPY.queues.tabs[activeQueueTab]}
+              emptyQueueMessage={emptyQueueMessage}
+            />
+            {receptionDesk.showInlineCopilot || assistOpen ? (
+              <div className="reception-interactive-ai">
+                <InteractiveAIWorkspace
+                  role={emergencyRole.role || 'registration_clerk'}
+                  userId={emergencyRole.canonicalProfile?.id}
+                  organizationId={emergencyRole.canonicalProfile?.organizationId}
+                  patientId={selectedPatient?.id}
+                  pageId="reception_workspace"
+                  channel="reception"
+                  purpose="reception_interactive_assist"
+                  title="Reception Copilot"
+                  permissions={['use_ai_chat', 'view_phi', 'view_operations']}
+                  seedTriggers={[
+                    {
+                      kind: 'incomplete_registration',
+                      summary: 'Check missing registration fields before triage handoff.',
+                      urgency: 'attention',
+                    },
+                    {
+                      kind: 'new_ocr_document',
+                      summary: 'Review OCR confidence before committing document fields.',
+                      urgency: 'info',
+                    },
+                  ]}
+                />
+              </div>
+            ) : (
+              <button
+                type="button"
+                className="reception-assist-toggle"
+                onClick={() => setAssistOpen(true)}
+              >
+                Open assist
+              </button>
+            )}
+          </>
+        }
+        footer={
+          result ? (
+            <div
+              className="reception-command-selected reception-command-selected--floating"
+              role="status"
+            >
+              <strong>Routed: {patientDisplayName(result.patient)}</strong>
+              <button
+                type="button"
+                className="reception-command-selected__primary"
+                onClick={() => profileNavigate(result.nextRoute)}
+              >
+                Continue to triage
+              </button>
+              <button type="button" onClick={() => profileNavigate(result.profileRoute)}>
+                <FolderOpen size={16} aria-hidden="true" />
+                {RECEPTION_COPY.workspace.openPatientCard}
+              </button>
+              <button type="button" onClick={resetForNextPatient}>
+                {RECEPTION_COPY.workspace.registerNext}
+              </button>
             </div>
-          ) : (
-            <button
-              type="button"
-              className="reception-assist-toggle"
-              onClick={() => setAssistOpen(true)}
-            >
-              Open assist
-            </button>
+          ) : null
+        }
+      >
+        {showChooser ? (
+          <PreparePatientChooser
+            onClose={() => setShowChooser(false)}
+            onManual={() => {
+              setShowChooser(false);
+              resetForNextPatient();
+            }}
+            onScan={() => openSmartIntake({ step: 'capture', autostart: true })}
+            onSmartIntake={() => openSmartIntake({ autostart: true })}
+            onQuickCreate={() => {
+              setShowChooser(false);
+              resetForNextPatient();
+              updateDraft({ arrivalType: 'walk-in', chiefComplaint: '' });
+            }}
+            onUnknown={() => void handleProvisionalUnknown()}
+          />
+        ) : null}
+
+        <ReceptionDuplicateConfirm
+          open={duplicateConfirmOpen}
+          candidates={scanReceptionDraftDuplicates(draft, patients).filter(
+            (c) => c.matchScore >= 65,
           )}
-        </>
-      }
-      footer={
-        result ? (
-          <div className="reception-command-selected reception-command-selected--floating" role="status">
-            <strong>Routed: {patientDisplayName(result.patient)}</strong>
-            <button
-              type="button"
-              className="reception-command-selected__primary"
-              onClick={() => profileNavigate(result.nextRoute)}
-            >
-              Continue to triage
-            </button>
-            <button type="button" onClick={() => profileNavigate(result.profileRoute)}>
-              <FolderOpen size={16} aria-hidden="true" />
-              {RECEPTION_COPY.workspace.openPatientCard}
-            </button>
-            <button type="button" onClick={resetForNextPatient}>
-              {RECEPTION_COPY.workspace.registerNext}
-            </button>
-          </div>
-        ) : null
-      }
-    >
-      {showChooser ? (
-        <PreparePatientChooser
-          onClose={() => setShowChooser(false)}
-          onManual={() => {
-            setShowChooser(false);
-            resetForNextPatient();
+          onCancel={() => {
+            setDuplicateConfirmOpen(false);
+            setPendingRouteOptions(null);
           }}
-          onScan={() => openSmartIntake({ step: 'capture', autostart: true })}
-          onSmartIntake={() => openSmartIntake({ autostart: true })}
-          onQuickCreate={() => {
-            setShowChooser(false);
-            resetForNextPatient();
-            updateDraft({ arrivalType: 'walk-in', chiefComplaint: '' });
+          onUseExisting={(patientId) => {
+            setDuplicateConfirmOpen(false);
+            setPendingRouteOptions(null);
+            selectPatient(patientId);
+            setPatientDetailOpen(true);
+            showActionSuccess('Using existing chart — no new patient created.');
           }}
-          onUnknown={() => void handleProvisionalUnknown()}
-        />
-      ) : null}
-
-      <ReceptionDuplicateConfirm
-        open={duplicateConfirmOpen}
-        candidates={scanReceptionDraftDuplicates(draft, patients).filter(
-          (c) => c.matchScore >= 65,
-        )}
-        onCancel={() => {
-          setDuplicateConfirmOpen(false);
-          setPendingRouteOptions(null);
-        }}
-        onUseExisting={(patientId) => {
-          setDuplicateConfirmOpen(false);
-          setPendingRouteOptions(null);
-          selectPatient(patientId);
-          setPatientDetailOpen(true);
-          showActionSuccess('Using existing chart — no new patient created.');
-        }}
-        onCreateAnyway={() => {
-          setDuplicateConfirmOpen(false);
-          void executeCreateAndRoute({ ...(pendingRouteOptions || {}), confirmDuplicateOverride: true });
-        }}
-      />
-
-      <ReceptionShiftClearance
-        open={shiftClearanceOpen}
-        emsCount={filterQueueByTab(receptionQueueAll, 'ems').length}
-        verificationCount={filterQueueByTab(receptionQueueAll, 'verification').length}
-        pretriageCount={filterQueueByTab(receptionQueueAll, 'pretriage').length}
-        verificationPatients={filterQueueByTab(receptionQueueAll, 'verification')}
-        patientDisplayName={patientDisplayName}
-        onClose={() => setShiftClearanceOpen(false)}
-        onJumpTab={(tab) => {
-          setShiftClearanceOpen(false);
-          focusQueueTab(tab);
-        }}
-        onOpenPatient={(patientId) => {
-          setShiftClearanceOpen(false);
-          openPatientTask(patientId);
-        }}
-        onRecordShiftNote={() => {
-          useEmergencyStore.getState().recordWorkflowAction({
-            type: 'integration_event_received',
-            title: 'Reception shift handoff',
-            summary: `${currentUserName} recorded end-of-shift clearance: EMS ${filterQueueByTab(receptionQueueAll, 'ems').length}, ID-check ${filterQueueByTab(receptionQueueAll, 'verification').length}, waiting-for-nurse ${filterQueueByTab(receptionQueueAll, 'pretriage').length}.`,
-            actorName: currentUserName,
-            source: 'reception-shift-clearance',
-            severity: 'Info',
-            metadata: {
-              ems: filterQueueByTab(receptionQueueAll, 'ems').length,
-              verification: filterQueueByTab(receptionQueueAll, 'verification').length,
-              pretriage: filterQueueByTab(receptionQueueAll, 'pretriage').length,
-            },
-          });
-          setShiftClearanceOpen(false);
-          showActionSuccess('Shift handoff note recorded for the next clerk.');
-        }}
-      />
-
-      <ReceptionSmartIntakeOverlay
-        session={smartIntakeSession}
-        onClose={() => {
-          setSmartIntakeSession(null);
-          clearIntakeQueryParams();
-        }}
-        onHandoffComplete={handleSmartIntakeHandoff}
-      />
-
-      <ReceptionEscalationPanel
-        open={escalationDialogOpen}
-        patients={receptionQueueAll}
-        defaultPatientId={selectedPatientId}
-        initialReasonId={escalationReasonId}
-        actorStaffId={emergencyRole.canonicalProfile?.employeeId || emergencyRole.canonicalProfile?.id}
-        actorName={currentUserName}
-        onClose={() => {
-          setEscalationDialogOpen(false);
-          setEscalationReasonId(null);
-        }}
-        onSubmit={submitEscalation}
-      />
-
-      {patientDetailOpen && selectedPatient ? (
-        <ReceptionPatientTaskSheet
-          patient={selectedPatient}
-          displayName={patientDisplayName(selectedPatient)}
-          statusLabel={queueStatus(selectedPatient)}
-          nextStepLabel={nextStep(selectedPatient)}
-          ownerLabel={ownerRole(selectedPatient)}
-          waitMinutes={waitMinutes(selectedPatient)}
-          isHighRisk={isHighRiskPatient(selectedPatient)}
-          canEscalate={receptionCapabilities.canEscalateToNurse}
-          canSmartIntake={receptionCapabilities.canOpenSmartIntake}
-          onClose={() => setPatientDetailOpen(false)}
-          onCompleteId={() => {
-            openSmartIntake({
-              step: 'capture',
-              patientId: selectedPatient.id,
-              autostart: true,
+          onCreateAnyway={() => {
+            setDuplicateConfirmOpen(false);
+            void executeCreateAndRoute({
+              ...(pendingRouteOptions || {}),
+              confirmDuplicateOverride: true,
             });
           }}
-          onEscalate={() => openEscalationDialog('urgent-triage-attention')}
-          onHandoff={() => {
-            try {
-              completeIntakeHandoff(useEmergencyStore.getState(), {
-                patientId: selectedPatient.id,
-                source: 'reception',
-                actorName: currentUserName,
-              });
-              showActionSuccess(RECEPTION_COPY.workspace.sentToTriage);
-              focusQueueTab('pretriage');
-              setPatientDetailOpen(false);
-            } catch (error) {
-              showActionError(
-                'Handoff failed',
-                error instanceof Error ? error.message : 'Unable to hand off patient.',
-              );
-            }
-          }}
-          onOpenFullRecord={() =>
-            profileNavigate(
-              `${CANONICAL_ROUTES.emergencyPatients}?patientId=${encodeURIComponent(selectedPatient.id)}`,
-            )
-          }
         />
-      ) : null}
-    </ReceptionPageLayout>
+
+        <ReceptionShiftClearance
+          open={shiftClearanceOpen}
+          emsCount={filterQueueByTab(receptionQueueAll, 'ems').length}
+          verificationCount={filterQueueByTab(receptionQueueAll, 'verification').length}
+          pretriageCount={filterQueueByTab(receptionQueueAll, 'pretriage').length}
+          verificationPatients={filterQueueByTab(receptionQueueAll, 'verification')}
+          patientDisplayName={patientDisplayName}
+          onClose={() => setShiftClearanceOpen(false)}
+          onJumpTab={(tab) => {
+            setShiftClearanceOpen(false);
+            focusQueueTab(tab);
+          }}
+          onOpenPatient={(patientId) => {
+            setShiftClearanceOpen(false);
+            openPatientTask(patientId);
+          }}
+          onRecordShiftNote={() => {
+            useEmergencyStore.getState().recordWorkflowAction({
+              type: 'integration_event_received',
+              title: 'Reception shift handoff',
+              summary: `${currentUserName} recorded end-of-shift clearance: EMS ${filterQueueByTab(receptionQueueAll, 'ems').length}, ID-check ${filterQueueByTab(receptionQueueAll, 'verification').length}, waiting-for-nurse ${filterQueueByTab(receptionQueueAll, 'pretriage').length}.`,
+              actorName: currentUserName,
+              source: 'reception-shift-clearance',
+              severity: 'Info',
+              metadata: {
+                ems: filterQueueByTab(receptionQueueAll, 'ems').length,
+                verification: filterQueueByTab(receptionQueueAll, 'verification').length,
+                pretriage: filterQueueByTab(receptionQueueAll, 'pretriage').length,
+              },
+            });
+            setShiftClearanceOpen(false);
+            showActionSuccess('Shift handoff note recorded for the next clerk.');
+          }}
+        />
+
+        <ReceptionSmartIntakeOverlay
+          session={smartIntakeSession}
+          onClose={() => {
+            setSmartIntakeSession(null);
+            clearIntakeQueryParams();
+          }}
+          onHandoffComplete={handleSmartIntakeHandoff}
+        />
+
+        <ReceptionEscalationPanel
+          open={escalationDialogOpen}
+          patients={receptionQueueAll}
+          defaultPatientId={selectedPatientId}
+          initialReasonId={escalationReasonId}
+          actorStaffId={
+            emergencyRole.canonicalProfile?.employeeId || emergencyRole.canonicalProfile?.id
+          }
+          actorName={currentUserName}
+          onClose={() => {
+            setEscalationDialogOpen(false);
+            setEscalationReasonId(null);
+          }}
+          onSubmit={submitEscalation}
+        />
+
+        {patientDetailOpen && selectedPatient ? (
+          <ReceptionPatientTaskSheet
+            patient={selectedPatient}
+            displayName={patientDisplayName(selectedPatient)}
+            statusLabel={queueStatus(selectedPatient)}
+            nextStepLabel={nextStep(selectedPatient)}
+            ownerLabel={ownerRole(selectedPatient)}
+            waitMinutes={waitMinutes(selectedPatient)}
+            isHighRisk={isHighRiskPatient(selectedPatient)}
+            canEscalate={receptionCapabilities.canEscalateToNurse}
+            canSmartIntake={receptionCapabilities.canOpenSmartIntake}
+            onClose={() => setPatientDetailOpen(false)}
+            onCompleteId={() => {
+              openSmartIntake({
+                step: 'capture',
+                patientId: selectedPatient.id,
+                autostart: true,
+              });
+            }}
+            onEscalate={() => openEscalationDialog('urgent-triage-attention')}
+            onHandoff={() => {
+              try {
+                completeIntakeHandoff(useEmergencyStore.getState(), {
+                  patientId: selectedPatient.id,
+                  source: 'reception',
+                  actorName: currentUserName,
+                });
+                showActionSuccess(RECEPTION_COPY.workspace.sentToTriage);
+                focusQueueTab('pretriage');
+                setPatientDetailOpen(false);
+              } catch (error) {
+                showActionError(
+                  'Handoff failed',
+                  error instanceof Error ? error.message : 'Unable to hand off patient.',
+                );
+              }
+            }}
+            onOpenFullRecord={() =>
+              profileNavigate(
+                `${CANONICAL_ROUTES.emergencyPatients}?patientId=${encodeURIComponent(selectedPatient.id)}`,
+              )
+            }
+          />
+        ) : null}
+      </ReceptionPageLayout>
     </div>
   );
 }

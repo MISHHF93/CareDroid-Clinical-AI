@@ -6,8 +6,7 @@ import { CANONICAL_ROUTES } from './routes.config';
 import type { ResponseTimerPhase } from '../engine/threeMinuteTimerEngine';
 
 export const THREE_MINUTE_MISSION_TARGET_SECONDS = 180;
-export const THREE_MINUTE_MISSION_PRINCIPLE =
-  'It takes 3 minutes to save someone\'s life.';
+export const THREE_MINUTE_MISSION_PRINCIPLE = "It takes 3 minutes to save someone's life.";
 
 export type ThreeMinuteMissionTrigger =
   | 'critical_alert'
@@ -68,7 +67,11 @@ export const THREE_MINUTE_MISSION_DEFINITIONS = Object.freeze([
       { id: 'acknowledge', label: 'Acknowledge inbound unit', ownerRole: 'charge_nurse' },
       { id: 'assign_owner', label: 'Assign receiving team', ownerRole: 'charge_nurse' },
       { id: 'clinical_response', label: 'Prepare bay and equipment', ownerRole: 'triage_nurse' },
-      { id: 'notify_department', label: 'Notify receiving departments', ownerRole: 'ems_coordinator' },
+      {
+        id: 'notify_department',
+        label: 'Notify receiving departments',
+        ownerRole: 'ems_coordinator',
+      },
     ]),
   }),
   Object.freeze({
@@ -137,7 +140,9 @@ const DEFINITION_BY_TRIGGER = Object.freeze(
   Object.fromEntries(THREE_MINUTE_MISSION_DEFINITIONS.map((def) => [def.trigger, def])),
 ) as Record<ThreeMinuteMissionTrigger, ThreeMinuteMissionDefinition>;
 
-export function getThreeMinuteMissionDefinition(trigger: ThreeMinuteMissionTrigger): ThreeMinuteMissionDefinition {
+export function getThreeMinuteMissionDefinition(
+  trigger: ThreeMinuteMissionTrigger,
+): ThreeMinuteMissionDefinition {
   return DEFINITION_BY_TRIGGER[trigger];
 }
 

@@ -8,10 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, it, expect } from 'vitest';
 import { toolRegistryById } from './toolRegistry';
 import { clinicalIntentTools, builtinUiCalculators } from './clinicalIntentToolCatalog';
-import {
-  resolveCatalogLaunch,
-  PR5_CALCULATOR_REGISTRY_IDS,
-} from './clinicalCatalogWiring';
+import { resolveCatalogLaunch, PR5_CALCULATOR_REGISTRY_IDS } from './clinicalCatalogWiring';
 import { getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
 import { PR5_ALL_ALIAS_PAIRS, PR5_TOOL_IDS } from './pr5TestConstants';
 
@@ -19,9 +16,9 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const patternsSource = readFileSync(
   join(
     __dirname,
-    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts'
+    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts',
   ),
-  'utf8'
+  'utf8',
 );
 
 describe('PR5 coverage — tool id matrix', () => {

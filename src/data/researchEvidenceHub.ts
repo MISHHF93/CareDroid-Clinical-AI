@@ -18,7 +18,8 @@ export const LITERATURE_LIBRARY = Object.freeze([
     studyType: 'Systematic review',
     population: 'Adults with suspected sepsis or septic shock',
     evidenceLevel: 'Moderate certainty',
-    summary: 'Earlier recognition, lactate review, cultures, antibiotics, fluids, and reassessment are associated with safer escalation workflows.',
+    summary:
+      'Earlier recognition, lactate review, cultures, antibiotics, fluids, and reassessment are associated with safer escalation workflows.',
     linkedProtocolIds: ['sepsis'],
     linkedSimulationIds: ['sepsis-deterioration', 'abnormal-lab-escalation'],
     citations: ['demo-sepsis-review-2026', 'demo-surviving-sepsis-2025'],
@@ -31,7 +32,8 @@ export const LITERATURE_LIBRARY = Object.freeze([
     studyType: 'Prospective cohort',
     population: 'Emergency department adults with possible ACS',
     evidenceLevel: 'Moderate certainty',
-    summary: 'Serial ECG/troponin review with structured risk tools improves documentation and helps identify patients needing cardiology escalation.',
+    summary:
+      'Serial ECG/troponin review with structured risk tools improves documentation and helps identify patients needing cardiology escalation.',
     linkedProtocolIds: ['acs'],
     linkedSimulationIds: ['chest-pain-acs'],
     citations: ['demo-acs-cohort-2025'],
@@ -44,7 +46,8 @@ export const LITERATURE_LIBRARY = Object.freeze([
     studyType: 'Quality improvement study',
     population: 'Patients activated through stroke alert pathways',
     evidenceLevel: 'Low to moderate certainty',
-    summary: 'Clear last-known-well capture, glucose checks, and imaging coordination reduce avoidable delays in time-sensitive stroke workflows.',
+    summary:
+      'Clear last-known-well capture, glucose checks, and imaging coordination reduce avoidable delays in time-sensitive stroke workflows.',
     linkedProtocolIds: ['stroke'],
     linkedSimulationIds: ['stroke-alert'],
     citations: ['demo-stroke-workflow-2025'],
@@ -57,7 +60,8 @@ export const LITERATURE_LIBRARY = Object.freeze([
     studyType: 'Narrative review',
     population: 'Adults with hypoxemic or hypercapnic respiratory failure',
     evidenceLevel: 'Consensus-informed',
-    summary: 'Work of breathing, mentation, ABG/VBG trend, and oxygen delivery changes should be reviewed together rather than by oxygen saturation alone.',
+    summary:
+      'Work of breathing, mentation, ABG/VBG trend, and oxygen delivery changes should be reviewed together rather than by oxygen saturation alone.',
     linkedProtocolIds: ['respiratory-failure'],
     linkedSimulationIds: ['respiratory-failure'],
     citations: ['demo-respiratory-review-2026'],
@@ -328,7 +332,7 @@ export function buildGuidelineComparisonPrompt(guidelines = GUIDELINE_LIBRARY.sl
     'Compare these guideline summaries and identify agreement, differences, and implementation notes.',
     ...guidelines.map(
       (guideline) =>
-        `${guideline.title} (${guideline.version}): ${guideline.keyRecommendations.join('; ')}`
+        `${guideline.title} (${guideline.version}): ${guideline.keyRecommendations.join('; ')}`,
     ),
     'Return concise bullets and state that source verification is required.',
   ].join('\n');

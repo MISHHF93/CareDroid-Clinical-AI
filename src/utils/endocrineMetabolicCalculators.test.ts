@@ -29,7 +29,7 @@ describe('endocrineMetabolicCalculators', () => {
         calciumUnit: 'mg_dl',
         albumin: 2,
         albuminUnit: 'g_dl',
-      }).correctedCalciumMgDl
+      }).correctedCalciumMgDl,
     ).toBe(9.6);
 
     expect(
@@ -41,7 +41,7 @@ describe('endocrineMetabolicCalculators', () => {
         bunUnit: 'mg_dl',
         ethanol: 0,
         ethanolUnit: 'mg_dl',
-      }).calculatedOsmolality
+      }).calculatedOsmolality,
     ).toBe(290);
   });
 
@@ -52,7 +52,7 @@ describe('endocrineMetabolicCalculators', () => {
         weightUnit: 'kg',
         height: 170,
         heightUnit: 'cm',
-      }).bmi
+      }).bmi,
     ).toBe(24.2);
 
     expect(
@@ -61,7 +61,7 @@ describe('endocrineMetabolicCalculators', () => {
         weightUnit: 'kg',
         height: 170,
         heightUnit: 'cm',
-      }).bsaM2
+      }).bsaM2,
     ).toBe(1.82);
 
     const ibw = computeIdealBodyWeight({ sex: 'male', height: 70, heightUnit: 'in' });

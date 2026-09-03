@@ -31,7 +31,7 @@ export const CALCULATOR_ROUTE_DEFS = Object.freeze(
       calculatorSlug: tool.calculatorSlug,
       name: tool.label,
     }))
-    .sort((a, b) => b.path.length - a.path.length)
+    .sort((a, b) => b.path.length - a.path.length),
 );
 
 export const LEGACY_CALCULATOR_ROUTE_ALIASES = Object.freeze([
@@ -43,7 +43,13 @@ export const LEGACY_CALCULATOR_ROUTE_ALIASES = Object.freeze([
 
 /** Registry tool paths under /tools and /fleet (includes hub + fleet pages). */
 export const REGISTRY_TOOL_PATHS = Object.freeze(
-  [...new Set(getFrontendVisibleToolInventory().map((t) => t.route).filter(Boolean))].sort()
+  [
+    ...new Set(
+      getFrontendVisibleToolInventory()
+        .map((t) => t.route)
+        .filter(Boolean),
+    ),
+  ].sort(),
 );
 
 /** All tool-area paths that should resolve to a real screen (not dashboard fallback). */
@@ -148,11 +154,7 @@ export function resolveToolsAreaRedirect(pathname) {
   if (!launch?.path && !launch?.chatSeed && !registryId) return null;
 
   // Unknown tool-shaped slugs: show ToolNotFound on the hub, do not bounce to dashboard.
-  if (
-    !registryId &&
-    launch.path === CATALOG_UNKNOWN_TOOL_LAUNCH.path &&
-    !launch.registryId
-  ) {
+  if (!registryId && launch.path === CATALOG_UNKNOWN_TOOL_LAUNCH.path && !launch.registryId) {
     return null;
   }
 

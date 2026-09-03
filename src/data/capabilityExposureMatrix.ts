@@ -162,300 +162,391 @@ function withExposureMetadata(row) {
   });
 }
 
-export const capabilityExposureMatrix = Object.freeze([
-  {
-    capability: 'Auth, registration, session, OAuth, magic link',
-    backendSourceFile: 'backend/src/modules/auth/auth.controller.ts',
-    commandOrApiRoute: 'POST/GET /api/auth/*',
-    currentFrontendSurface: 'Auth.jsx, AuthCallback.jsx',
-    exposureStatus: 'exposed',
-    userFacingProblem: 'Core access is visible; SSO placeholder routes remain deferred.',
-    recommendedFrontendMechanism: 'Keep current auth surfaces; do not expose callback-only routes as app actions.',
-    riskLevel: 'high',
-  },
-  {
-    capability: 'Profile read and update',
-    backendSourceFile: 'backend/src/modules/users/users.controller.ts',
-    commandOrApiRoute: 'GET/PATCH /api/users/profile',
-    currentFrontendSurface: 'UserContext.jsx and syncService.js fetch profile; Profile.jsx and Settings render backend-backed profile/account state.',
-    exposureStatus: 'exposed',
-    userFacingProblem: 'Profile read/update is now visible; keep role changes governed by backend membership/RBAC rather than local editable fields.',
-    recommendedFrontendMechanism: 'Keep the backend-backed profile edit form with validation, permission errors, and result state.',
-    riskLevel: 'medium',
-  },
-  {
-    capability: 'Two-factor authentication',
-    backendSourceFile: 'backend/src/modules/two-factor/two-factor.controller.ts',
-    commandOrApiRoute: 'GET/POST/DELETE /api/two-factor/*',
-    currentFrontendSurface: 'TwoFactorSetup.jsx, TwoFactorSettings.jsx, Auth.jsx challenge flow',
-    exposureStatus: 'exposed',
-    userFacingProblem: 'Setup and disable are visible; verify endpoint is correctly login-internal.',
-    recommendedFrontendMechanism: 'Keep as-is; preserve auth guard and challenge-only verify path.',
-    riskLevel: 'high',
-  },
-  {
-    capability: 'Biometric enrollment and device management',
-    backendSourceFile: 'backend/src/modules/auth/biometric.controller.ts',
-    commandOrApiRoute: 'POST/GET/DELETE /api/auth/biometric/*',
-    currentFrontendSurface: 'BiometricSetup.jsx covers enroll, verify, config, stats, disable.',
-    exposureStatus: 'partially exposed',
-    userFacingProblem: 'Availability probing and hard delete device are backend-supported but not obvious in the UI.',
-    recommendedFrontendMechanism: 'Device list card with availability state, disable, delete confirmation, and result state.',
-    riskLevel: 'high',
-  },
-  {
-    capability: 'Protected clinical chat, RAG, and intent classification',
-    backendSourceFile: 'backend/src/modules/chat/chat.controller.ts; backend/src/modules/chat/chat.service.ts',
-    commandOrApiRoute: 'POST /api/chat/message; POST /api/chat/intent-classify',
-    currentFrontendSurface: 'ChatInterface.jsx, clinicalChatService.js, tool recommendations',
-    exposureStatus: 'exposed',
-    userFacingProblem: 'Main Chat path is visible and protected; users should not need command syntax.',
-    recommendedFrontendMechanism: 'Continue adding guided cards and drawers that submit normal Chat prompts.',
-    riskLevel: 'high',
-  },
-  {
-    capability: 'Guided outreach and follow-up planning',
-    backendSourceFile: 'backend/src/modules/chat/chat.controller.ts; backend/src/modules/chat/chat.service.ts',
-    commandOrApiRoute: 'POST /api/chat/message',
-    currentFrontendSurface: 'ChatInterface.jsx protected outreach drawer with target, reason, timing, context, preview, confirm, and Chat handoff.',
-    exposureStatus: 'exposed',
-    userFacingProblem: 'Guided outreach is now visible and Chat-backed; keep clear that no message is sent or scheduled.',
-    recommendedFrontendMechanism: 'Keep current protected Chat-backed outreach drawer and verification copy.',
-    riskLevel: 'medium',
-  },
-  {
-    capability: 'Suggest next clinical action and vitals analysis',
-    backendSourceFile: 'backend/src/modules/chat/chat.controller.ts',
-    commandOrApiRoute: 'POST /api/chat/suggest-action; POST /api/chat/analyze-vitals',
-    currentFrontendSurface: 'No clear user-facing form; vitals call is only referenced by capability docs.',
-    exposureStatus: 'hidden',
-    userFacingProblem: 'Backend can suggest next steps and classify vitals, but users cannot provide structured context outside Chat.',
-    recommendedFrontendMechanism: 'Small vitals/context action card with preview and Chat handoff; avoid patient-specific mutation.',
-    riskLevel: 'medium',
-  },
-  {
-    capability: '3D chat experiment',
-    backendSourceFile: 'backend/src/modules/chat/chat.controller.ts',
-    commandOrApiRoute: 'POST /api/chat/message-3d',
-    currentFrontendSurface: 'Catalog/platform capability docs only; no executable 3D chat UI.',
-    exposureStatus: 'hidden',
-    userFacingProblem: 'Experimental route is backend-supported and documented, but not part of an executable user workflow.',
-    recommendedFrontendMechanism: 'Keep deferred until a real 3D surface exists; do not expose as a fake card.',
-    riskLevel: 'medium',
-  },
-  {
-    capability: 'Registered clinical tool executors',
-    backendSourceFile: 'backend/src/modules/medical-control-plane/tool-orchestrator/*',
-    commandOrApiRoute: 'POST /api/tools/:id/execute for sofa-calculator, drug-interactions, lab-interpreter; POST /api/tools/execute; POST /api/tools/results',
-    currentFrontendSurface: 'Calculators.jsx, DrugChecker.jsx, LabInterpreter.jsx, Chat tool routing',
-    exposureStatus: 'exposed',
-    userFacingProblem: 'The three real executors have visible forms and still work through Chat.',
-    recommendedFrontendMechanism: 'Keep dedicated forms plus Chat; do not create executor UI for unsupported NLU-only tools.',
-    riskLevel: 'high',
-  },
-  {
-    capability: 'Tool metadata, validation, executor catalog, and statistics',
-    backendSourceFile: 'backend/src/modules/medical-control-plane/tool-orchestrator/tool-orchestrator.controller.ts',
-    commandOrApiRoute: 'GET /api/tools; GET /api/tools/available; GET /api/tools/statistics; GET /api/tools/catalog/executors; GET /api/tools/:id; POST /api/tools/:id/validate',
-    currentFrontendSurface: 'ClinicalToolCatalog.jsx visibly uses GET /api/tools; clinicalToolsApi.js supports metadata, validation, executor catalog, and statistics but pages do not consume those helpers.',
-    exposureStatus: 'partially exposed',
-    userFacingProblem: 'Users get forms, but validation preview and backend availability are not consistently surfaced before execution.',
-    recommendedFrontendMechanism: 'Inline preflight validation and compact executor status strip inside tool pages.',
-    riskLevel: 'medium',
-  },
-  {
-    capability: 'Clinical drugs and protocols content',
-    backendSourceFile: 'backend/src/modules/clinical/drug.controller.ts; backend/src/modules/clinical/protocol.controller.ts',
-    commandOrApiRoute: 'GET/POST/PUT/DELETE /api/drugs; /api/protocols',
-    currentFrontendSurface: 'Protocols.jsx reads GET /api/protocols list; clinicalContentApi.js covers protocol detail and drug list/category/detail helpers, with local pathway rendering as the active UI.',
-    exposureStatus: 'partially exposed',
-    userFacingProblem: 'Protocol lookup is visible; drug reference reads are service-only, and CRUD is rightly hidden without an admin workflow.',
-    recommendedFrontendMechanism: 'Add drug detail drawers when the drug reference page is promoted; keep create/update/delete admin-only until roles and review flow exist.',
-    riskLevel: 'high',
-  },
-  {
-    capability: 'Shared tool session and result surfaces',
-    backendSourceFile: 'No backend route found for shared sessions/results; frontend shared session store and gated export/share helpers.',
-    commandOrApiRoute: 'Public SPA route /shared/tools/:shareId; gated frontend-only POST /api/tools/share-results capability is false; result links now use the mounted /shared/tools/:shareId local-session route.',
-    currentFrontendSurface: 'ToolPageLayout.jsx Share Local Session button, SharedToolSession.jsx public route, ToolResultShare.jsx local link/export modal.',
-    exposureStatus: 'unsafe/unclear',
-    userFacingProblem: 'Protected tool workflows can create public-looking share URLs that are backed by same-browser local storage only.',
-    recommendedFrontendMechanism: 'Classify public share as explicit public surface; align generated routes, expiry/privacy copy, and backend capability gate before expanding sharing.',
-    riskLevel: 'high',
-  },
-  {
-    capability: 'Audit logs, PHI access, integrity, and sync',
-    backendSourceFile: 'backend/src/modules/audit/audit.controller.ts',
-    commandOrApiRoute: 'GET/POST /api/audit/*',
-    currentFrontendSurface: 'Settings, Profile.jsx, auditApi.js, and syncService.js cover personal logs, statistics, integrity, and sync.',
-    exposureStatus: 'partially exposed',
-    userFacingProblem: 'General audit is visible; my-logs and PHI access have no obvious role-aware entry point.',
-    recommendedFrontendMechanism: 'User activity card in Profile and compliance-officer-only PHI access CTA.',
-    riskLevel: 'high',
-  },
-  {
-    capability: 'Compliance consent, export, and account deletion',
-    backendSourceFile: 'backend/src/modules/compliance/compliance.controller.ts',
-    commandOrApiRoute: 'GET/POST /api/compliance/consent; POST /api/compliance/export; DELETE /api/compliance/delete-account',
-    currentFrontendSurface: 'ConsentFlow.jsx covers consent; Settings privacy cards call complianceApi.js for export and delete-account flows.',
-    exposureStatus: 'partially exposed',
-    userFacingProblem: 'Privacy rights exist in backend; export and deletion are guided but still have minimal preview/result state detail.',
-    recommendedFrontendMechanism: 'Keep Settings privacy cards wired and add richer export status/detail when the backend returns downloadable artifacts.',
-    riskLevel: 'high',
-  },
-  {
-    capability: 'Notifications, preferences, devices, unread state',
-    backendSourceFile: 'backend/src/modules/notifications/notification.controller.ts',
-    commandOrApiRoute: 'GET/PATCH/POST/DELETE /api/notifications/*',
-    currentFrontendSurface: '/notifications mounts backend-wired NotificationPreferences.jsx with unread count, read-all, device cards, device removal confirmation, and preference clarity.',
-    exposureStatus: 'exposed',
-    userFacingProblem: 'Notification controls need to remain explicit that delivery preferences do not create scheduled reminders.',
-    recommendedFrontendMechanism: 'Keep notification bulk actions and device/preference summary cards backed only by existing notification routes.',
-    riskLevel: 'medium',
-  },
-  {
-    capability: 'Analytics events, metrics, crashes, and client health',
-    backendSourceFile: 'backend/src/modules/analytics/analytics.controller.ts',
-    commandOrApiRoute: 'POST /api/analytics/events; GET /api/analytics/metrics; POST /api/crashes; POST /api/health',
-    currentFrontendSurface: 'AnalyticsDashboard.jsx, analyticsService.ts, ErrorBoundary.jsx',
-    exposureStatus: 'partially exposed',
-    userFacingProblem: 'Metrics are visible; event/crash ingestion and health pings are intentionally background capabilities.',
-    recommendedFrontendMechanism: 'Keep ingestion internal; add diagnostics status only if support needs it.',
-    riskLevel: 'medium',
-  },
-  {
-    capability: 'AI direct query, structured output, usage, and remaining queries',
-    backendSourceFile: 'backend/src/modules/ai/ai.controller.ts',
-    commandOrApiRoute: 'POST /api/ai/query; POST /api/ai/structured; GET /api/ai/usage; GET /api/ai/remaining-queries',
-    currentFrontendSurface: 'Chat invokes AI indirectly; configService reads remaining queries.',
-    exposureStatus: 'partially exposed',
-    userFacingProblem: 'Direct AI APIs are hidden behind Chat; usage is not presented as a clear account meter.',
-    recommendedFrontendMechanism: 'Settings usage card for GET usage/remaining; keep direct query APIs internal to Chat.',
-    riskLevel: 'medium',
-  },
-  {
-    capability: 'Billing plans, current subscription, checkout, portal',
-    backendSourceFile: 'backend/src/modules/subscriptions/subscriptions.controller.ts',
-    commandOrApiRoute: 'GET/POST /api/subscriptions/*',
-    currentFrontendSurface: 'Settings Billing card reads current subscription and backend plans, then starts checkout or customer portal sessions through subscriptionApi.js.',
-    exposureStatus: 'exposed',
-    userFacingProblem: 'Billing UI must remain backend-data-only and avoid invented pricing or plan capability claims.',
-    recommendedFrontendMechanism: 'Keep Settings billing card with checkout/portal buttons, auth empty state, and payment-state handling.',
-    riskLevel: 'high',
-  },
-  {
-    capability: 'Cost analytics and live cost tracking',
-    backendSourceFile: 'No backend cost route found; frontend RealTimeCostService remains client-side only.',
-    commandOrApiRoute: 'Protected SPA routes /analytics and /costs; WebSocket/client context only in current frontend.',
-    currentFrontendSurface: 'AnalyticsDashboard.jsx and CostAnalyticsDashboard.jsx are protected by VIEW_ANALYTICS.',
-    exposureStatus: 'frontend-only',
-    userFacingProblem: 'Cost analytics are visible to analytics users, but they are not backed by a verified Nest cost API.',
-    recommendedFrontendMechanism: 'Keep as client/runtime analytics until a durable cost API exists; label data source and avoid implying backend billing authority.',
-    riskLevel: 'medium',
-  },
-  {
-    capability: 'Metrics scrape, encryption, key rotation, cache, RAG internals, email',
-    backendSourceFile: 'backend/src/modules/metrics; encryption; cache; rag; email',
-    commandOrApiRoute: 'GET /api/metrics plus internal services',
-    currentFrontendSurface: 'None, except Chat results from RAG and ops scrape.',
-    exposureStatus: 'internal',
-    userFacingProblem: 'These are platform internals, not user workflows.',
-    recommendedFrontendMechanism: 'Document as not user-facing; do not expose operational controls in the SPA.',
-    riskLevel: 'high',
-  },
-  {
-    capability: 'Pipeline updates',
-    backendSourceFile: 'No pipeline route/model found in this workspace.',
-    commandOrApiRoute: 'None',
-    currentFrontendSurface: 'None',
-    exposureStatus: 'hidden',
-    userFacingProblem: 'Requested BrandOps workflow is not actually supported by this backend.',
-    recommendedFrontendMechanism: 'Document as intentionally unavailable / coming later; do not build UI until a real backend model/API exists.',
-    riskLevel: 'high',
-  },
-  {
-    capability: 'Publishing and content scheduling',
-    backendSourceFile: 'No publishing route/model found; notification scheduling is a service stub, not a queue-backed API.',
-    commandOrApiRoute: 'None',
-    currentFrontendSurface: 'None',
-    exposureStatus: 'hidden',
-    userFacingProblem: 'Scheduling UI would imply execution that the backend does not currently support.',
-    recommendedFrontendMechanism: 'Document as intentionally unavailable / coming later; do not build fake scheduler UI; only expose notification preferences that exist.',
-    riskLevel: 'high',
-  },
-  {
-    capability: 'Integrations and connectors',
-    backendSourceFile: 'backend/src/modules/platform-systems/platform-systems.controller.ts',
-    commandOrApiRoute: 'GET/POST /api/integrations/fhir/*; GET/POST /api/integrations/hl7/*',
-    currentFrontendSurface: 'PlatformSystemPage.jsx renders FHIR/HL7 connection status and demo contract execution.',
-    exposureStatus: 'exposed',
-    userFacingProblem: 'Real EHR connectivity still requires credentials and environment-specific validation.',
-    recommendedFrontendMechanism: 'Keep the protected integrations shell with demo/unsupported labels until live FHIR/HL7 credentials are configured.',
-    riskLevel: 'medium',
-  },
-  {
-    capability: 'Reminders and scheduler',
-    backendSourceFile: 'backend/src/modules/notifications/*; backend/src/app.module.ts',
-    commandOrApiRoute: 'Notification preferences API; ScheduleModule enabled',
-    currentFrontendSurface: 'Notification preferences',
-    exposureStatus: 'partially exposed',
-    userFacingProblem: 'Medication and appointment reminder preferences exist, but creating scheduled reminders is not an API-backed workflow.',
-    recommendedFrontendMechanism: 'Expose preferences only; document reminder creation as coming later until scheduled notification persistence and delivery exist.',
-    riskLevel: 'high',
-  },
-  {
-    capability: 'Workspace configuration',
-    backendSourceFile: 'No backend workspace route; frontend WorkspaceContext uses localStorage.',
-    commandOrApiRoute: 'Local frontend state only',
-    currentFrontendSurface: 'AppShell workspace navigation and local workspace context',
-    exposureStatus: 'exposed',
-    userFacingProblem: 'Workspace customization is available locally but not server-synced.',
-    recommendedFrontendMechanism: 'Keep local workspace UX; label as device-local if persistence expectations matter.',
-    riskLevel: 'low',
-  },
-  {
-    capability: 'Fleet operations command, maintenance, and route planning',
-    backendSourceFile: 'No backend fleet route found; frontend fleet pages and deterministic/mock services only.',
-    commandOrApiRoute: 'Protected SPA routes /fleet/command, /fleet/predictive-maintenance, /fleet/route-optimizer; no Nest API route.',
-    currentFrontendSurface: 'FleetDashboard.jsx uses mock telemetry; PredictiveMaintenance.jsx and RouteOptimizer.jsx use client-side deterministic engines.',
-    exposureStatus: 'frontend-only',
-    userFacingProblem: 'Fleet tools are visible and protected, but current data/actions are mock or client-only and do not operate a backend fleet system.',
-    recommendedFrontendMechanism: 'Keep decision-support disclaimers and mock/client labels; do not add dispatch mutations until real fleet APIs exist.',
-    riskLevel: 'medium',
-  },
-  {
-    capability: 'Clinical alerts management',
-    backendSourceFile: 'backend/src/modules/clinical-alerts/*; backendApiCapabilities.clinicalAlerts is demo.',
-    commandOrApiRoute: 'Protected SPA route /clinical/alerts; GET /api/clinical/alerts; POST /api/clinical/alerts/:id/acknowledge|dismiss. Stream remains disabled.',
-    currentFrontendSurface: 'ClinicalAlertsPage.jsx loads demo-backed alerts and keeps local fallback.',
-    exposureStatus: 'partially exposed',
-    userFacingProblem: 'Alerts management has a backend workflow contract, but the current alert source is demo-backed rather than connected to a live clinical alarm source.',
-    recommendedFrontendMechanism: 'Keep demo/source labeling and do not present as a bedside alarm source until a real alert feed and streaming contract exist.',
-    riskLevel: 'high',
-  },
-  {
-    capability: 'Team management',
-    backendSourceFile: 'No backend team controller found; backendApiCapabilities.teamManagement is false.',
-    commandOrApiRoute: 'Protected + MANAGE_USERS SPA route /team; gated frontend calls GET/PUT/DELETE /api/team/users and POST /api/team/invite.',
-    currentFrontendSurface: 'TeamManagement.jsx visible behind MANAGE_USERS but API is disabled by capability gate.',
-    exposureStatus: 'unsafe/unclear',
-    userFacingProblem: 'Admin team management UI exists without a supported backend contract.',
-    recommendedFrontendMechanism: 'Keep capability gate and unsupported state; do not enable invite/edit/delete until backend team APIs and audit semantics exist.',
-    riskLevel: 'high',
-  },
-].map(withExposureMetadata));
+export const capabilityExposureMatrix = Object.freeze(
+  [
+    {
+      capability: 'Auth, registration, session, OAuth, magic link',
+      backendSourceFile: 'backend/src/modules/auth/auth.controller.ts',
+      commandOrApiRoute: 'POST/GET /api/auth/*',
+      currentFrontendSurface: 'Auth.jsx, AuthCallback.jsx',
+      exposureStatus: 'exposed',
+      userFacingProblem: 'Core access is visible; SSO placeholder routes remain deferred.',
+      recommendedFrontendMechanism:
+        'Keep current auth surfaces; do not expose callback-only routes as app actions.',
+      riskLevel: 'high',
+    },
+    {
+      capability: 'Profile read and update',
+      backendSourceFile: 'backend/src/modules/users/users.controller.ts',
+      commandOrApiRoute: 'GET/PATCH /api/users/profile',
+      currentFrontendSurface:
+        'UserContext.jsx and syncService.js fetch profile; Profile.jsx and Settings render backend-backed profile/account state.',
+      exposureStatus: 'exposed',
+      userFacingProblem:
+        'Profile read/update is now visible; keep role changes governed by backend membership/RBAC rather than local editable fields.',
+      recommendedFrontendMechanism:
+        'Keep the backend-backed profile edit form with validation, permission errors, and result state.',
+      riskLevel: 'medium',
+    },
+    {
+      capability: 'Two-factor authentication',
+      backendSourceFile: 'backend/src/modules/two-factor/two-factor.controller.ts',
+      commandOrApiRoute: 'GET/POST/DELETE /api/two-factor/*',
+      currentFrontendSurface: 'TwoFactorSetup.jsx, TwoFactorSettings.jsx, Auth.jsx challenge flow',
+      exposureStatus: 'exposed',
+      userFacingProblem:
+        'Setup and disable are visible; verify endpoint is correctly login-internal.',
+      recommendedFrontendMechanism:
+        'Keep as-is; preserve auth guard and challenge-only verify path.',
+      riskLevel: 'high',
+    },
+    {
+      capability: 'Biometric enrollment and device management',
+      backendSourceFile: 'backend/src/modules/auth/biometric.controller.ts',
+      commandOrApiRoute: 'POST/GET/DELETE /api/auth/biometric/*',
+      currentFrontendSurface: 'BiometricSetup.jsx covers enroll, verify, config, stats, disable.',
+      exposureStatus: 'partially exposed',
+      userFacingProblem:
+        'Availability probing and hard delete device are backend-supported but not obvious in the UI.',
+      recommendedFrontendMechanism:
+        'Device list card with availability state, disable, delete confirmation, and result state.',
+      riskLevel: 'high',
+    },
+    {
+      capability: 'Protected clinical chat, RAG, and intent classification',
+      backendSourceFile:
+        'backend/src/modules/chat/chat.controller.ts; backend/src/modules/chat/chat.service.ts',
+      commandOrApiRoute: 'POST /api/chat/message; POST /api/chat/intent-classify',
+      currentFrontendSurface: 'ChatInterface.jsx, clinicalChatService.js, tool recommendations',
+      exposureStatus: 'exposed',
+      userFacingProblem:
+        'Main Chat path is visible and protected; users should not need command syntax.',
+      recommendedFrontendMechanism:
+        'Continue adding guided cards and drawers that submit normal Chat prompts.',
+      riskLevel: 'high',
+    },
+    {
+      capability: 'Guided outreach and follow-up planning',
+      backendSourceFile:
+        'backend/src/modules/chat/chat.controller.ts; backend/src/modules/chat/chat.service.ts',
+      commandOrApiRoute: 'POST /api/chat/message',
+      currentFrontendSurface:
+        'ChatInterface.jsx protected outreach drawer with target, reason, timing, context, preview, confirm, and Chat handoff.',
+      exposureStatus: 'exposed',
+      userFacingProblem:
+        'Guided outreach is now visible and Chat-backed; keep clear that no message is sent or scheduled.',
+      recommendedFrontendMechanism:
+        'Keep current protected Chat-backed outreach drawer and verification copy.',
+      riskLevel: 'medium',
+    },
+    {
+      capability: 'Suggest next clinical action and vitals analysis',
+      backendSourceFile: 'backend/src/modules/chat/chat.controller.ts',
+      commandOrApiRoute: 'POST /api/chat/suggest-action; POST /api/chat/analyze-vitals',
+      currentFrontendSurface:
+        'No clear user-facing form; vitals call is only referenced by capability docs.',
+      exposureStatus: 'hidden',
+      userFacingProblem:
+        'Backend can suggest next steps and classify vitals, but users cannot provide structured context outside Chat.',
+      recommendedFrontendMechanism:
+        'Small vitals/context action card with preview and Chat handoff; avoid patient-specific mutation.',
+      riskLevel: 'medium',
+    },
+    {
+      capability: '3D chat experiment',
+      backendSourceFile: 'backend/src/modules/chat/chat.controller.ts',
+      commandOrApiRoute: 'POST /api/chat/message-3d',
+      currentFrontendSurface: 'Catalog/platform capability docs only; no executable 3D chat UI.',
+      exposureStatus: 'hidden',
+      userFacingProblem:
+        'Experimental route is backend-supported and documented, but not part of an executable user workflow.',
+      recommendedFrontendMechanism:
+        'Keep deferred until a real 3D surface exists; do not expose as a fake card.',
+      riskLevel: 'medium',
+    },
+    {
+      capability: 'Registered clinical tool executors',
+      backendSourceFile: 'backend/src/modules/medical-control-plane/tool-orchestrator/*',
+      commandOrApiRoute:
+        'POST /api/tools/:id/execute for sofa-calculator, drug-interactions, lab-interpreter; POST /api/tools/execute; POST /api/tools/results',
+      currentFrontendSurface:
+        'Calculators.jsx, DrugChecker.jsx, LabInterpreter.jsx, Chat tool routing',
+      exposureStatus: 'exposed',
+      userFacingProblem: 'The three real executors have visible forms and still work through Chat.',
+      recommendedFrontendMechanism:
+        'Keep dedicated forms plus Chat; do not create executor UI for unsupported NLU-only tools.',
+      riskLevel: 'high',
+    },
+    {
+      capability: 'Tool metadata, validation, executor catalog, and statistics',
+      backendSourceFile:
+        'backend/src/modules/medical-control-plane/tool-orchestrator/tool-orchestrator.controller.ts',
+      commandOrApiRoute:
+        'GET /api/tools; GET /api/tools/available; GET /api/tools/statistics; GET /api/tools/catalog/executors; GET /api/tools/:id; POST /api/tools/:id/validate',
+      currentFrontendSurface:
+        'ClinicalToolCatalog.jsx visibly uses GET /api/tools; clinicalToolsApi.js supports metadata, validation, executor catalog, and statistics but pages do not consume those helpers.',
+      exposureStatus: 'partially exposed',
+      userFacingProblem:
+        'Users get forms, but validation preview and backend availability are not consistently surfaced before execution.',
+      recommendedFrontendMechanism:
+        'Inline preflight validation and compact executor status strip inside tool pages.',
+      riskLevel: 'medium',
+    },
+    {
+      capability: 'Clinical drugs and protocols content',
+      backendSourceFile:
+        'backend/src/modules/clinical/drug.controller.ts; backend/src/modules/clinical/protocol.controller.ts',
+      commandOrApiRoute: 'GET/POST/PUT/DELETE /api/drugs; /api/protocols',
+      currentFrontendSurface:
+        'Protocols.jsx reads GET /api/protocols list; clinicalContentApi.js covers protocol detail and drug list/category/detail helpers, with local pathway rendering as the active UI.',
+      exposureStatus: 'partially exposed',
+      userFacingProblem:
+        'Protocol lookup is visible; drug reference reads are service-only, and CRUD is rightly hidden without an admin workflow.',
+      recommendedFrontendMechanism:
+        'Add drug detail drawers when the drug reference page is promoted; keep create/update/delete admin-only until roles and review flow exist.',
+      riskLevel: 'high',
+    },
+    {
+      capability: 'Shared tool session and result surfaces',
+      backendSourceFile:
+        'No backend route found for shared sessions/results; frontend shared session store and gated export/share helpers.',
+      commandOrApiRoute:
+        'Public SPA route /shared/tools/:shareId; gated frontend-only POST /api/tools/share-results capability is false; result links now use the mounted /shared/tools/:shareId local-session route.',
+      currentFrontendSurface:
+        'ToolPageLayout.jsx Share Local Session button, SharedToolSession.jsx public route, ToolResultShare.jsx local link/export modal.',
+      exposureStatus: 'unsafe/unclear',
+      userFacingProblem:
+        'Protected tool workflows can create public-looking share URLs that are backed by same-browser local storage only.',
+      recommendedFrontendMechanism:
+        'Classify public share as explicit public surface; align generated routes, expiry/privacy copy, and backend capability gate before expanding sharing.',
+      riskLevel: 'high',
+    },
+    {
+      capability: 'Audit logs, PHI access, integrity, and sync',
+      backendSourceFile: 'backend/src/modules/audit/audit.controller.ts',
+      commandOrApiRoute: 'GET/POST /api/audit/*',
+      currentFrontendSurface:
+        'Settings, Profile.jsx, auditApi.js, and syncService.js cover personal logs, statistics, integrity, and sync.',
+      exposureStatus: 'partially exposed',
+      userFacingProblem:
+        'General audit is visible; my-logs and PHI access have no obvious role-aware entry point.',
+      recommendedFrontendMechanism:
+        'User activity card in Profile and compliance-officer-only PHI access CTA.',
+      riskLevel: 'high',
+    },
+    {
+      capability: 'Compliance consent, export, and account deletion',
+      backendSourceFile: 'backend/src/modules/compliance/compliance.controller.ts',
+      commandOrApiRoute:
+        'GET/POST /api/compliance/consent; POST /api/compliance/export; DELETE /api/compliance/delete-account',
+      currentFrontendSurface:
+        'ConsentFlow.jsx covers consent; Settings privacy cards call complianceApi.js for export and delete-account flows.',
+      exposureStatus: 'partially exposed',
+      userFacingProblem:
+        'Privacy rights exist in backend; export and deletion are guided but still have minimal preview/result state detail.',
+      recommendedFrontendMechanism:
+        'Keep Settings privacy cards wired and add richer export status/detail when the backend returns downloadable artifacts.',
+      riskLevel: 'high',
+    },
+    {
+      capability: 'Notifications, preferences, devices, unread state',
+      backendSourceFile: 'backend/src/modules/notifications/notification.controller.ts',
+      commandOrApiRoute: 'GET/PATCH/POST/DELETE /api/notifications/*',
+      currentFrontendSurface:
+        '/notifications mounts backend-wired NotificationPreferences.jsx with unread count, read-all, device cards, device removal confirmation, and preference clarity.',
+      exposureStatus: 'exposed',
+      userFacingProblem:
+        'Notification controls need to remain explicit that delivery preferences do not create scheduled reminders.',
+      recommendedFrontendMechanism:
+        'Keep notification bulk actions and device/preference summary cards backed only by existing notification routes.',
+      riskLevel: 'medium',
+    },
+    {
+      capability: 'Analytics events, metrics, crashes, and client health',
+      backendSourceFile: 'backend/src/modules/analytics/analytics.controller.ts',
+      commandOrApiRoute:
+        'POST /api/analytics/events; GET /api/analytics/metrics; POST /api/crashes; POST /api/health',
+      currentFrontendSurface: 'AnalyticsDashboard.jsx, analyticsService.ts, ErrorBoundary.jsx',
+      exposureStatus: 'partially exposed',
+      userFacingProblem:
+        'Metrics are visible; event/crash ingestion and health pings are intentionally background capabilities.',
+      recommendedFrontendMechanism:
+        'Keep ingestion internal; add diagnostics status only if support needs it.',
+      riskLevel: 'medium',
+    },
+    {
+      capability: 'AI direct query, structured output, usage, and remaining queries',
+      backendSourceFile: 'backend/src/modules/ai/ai.controller.ts',
+      commandOrApiRoute:
+        'POST /api/ai/query; POST /api/ai/structured; GET /api/ai/usage; GET /api/ai/remaining-queries',
+      currentFrontendSurface: 'Chat invokes AI indirectly; configService reads remaining queries.',
+      exposureStatus: 'partially exposed',
+      userFacingProblem:
+        'Direct AI APIs are hidden behind Chat; usage is not presented as a clear account meter.',
+      recommendedFrontendMechanism:
+        'Settings usage card for GET usage/remaining; keep direct query APIs internal to Chat.',
+      riskLevel: 'medium',
+    },
+    {
+      capability: 'Billing plans, current subscription, checkout, portal',
+      backendSourceFile: 'backend/src/modules/subscriptions/subscriptions.controller.ts',
+      commandOrApiRoute: 'GET/POST /api/subscriptions/*',
+      currentFrontendSurface:
+        'Settings Billing card reads current subscription and backend plans, then starts checkout or customer portal sessions through subscriptionApi.js.',
+      exposureStatus: 'exposed',
+      userFacingProblem:
+        'Billing UI must remain backend-data-only and avoid invented pricing or plan capability claims.',
+      recommendedFrontendMechanism:
+        'Keep Settings billing card with checkout/portal buttons, auth empty state, and payment-state handling.',
+      riskLevel: 'high',
+    },
+    {
+      capability: 'Cost analytics and live cost tracking',
+      backendSourceFile:
+        'No backend cost route found; frontend RealTimeCostService remains client-side only.',
+      commandOrApiRoute:
+        'Protected SPA routes /analytics and /costs; WebSocket/client context only in current frontend.',
+      currentFrontendSurface:
+        'AnalyticsDashboard.jsx and CostAnalyticsDashboard.jsx are protected by VIEW_ANALYTICS.',
+      exposureStatus: 'frontend-only',
+      userFacingProblem:
+        'Cost analytics are visible to analytics users, but they are not backed by a verified Nest cost API.',
+      recommendedFrontendMechanism:
+        'Keep as client/runtime analytics until a durable cost API exists; label data source and avoid implying backend billing authority.',
+      riskLevel: 'medium',
+    },
+    {
+      capability: 'Metrics scrape, encryption, key rotation, cache, RAG internals, email',
+      backendSourceFile: 'backend/src/modules/metrics; encryption; cache; rag; email',
+      commandOrApiRoute: 'GET /api/metrics plus internal services',
+      currentFrontendSurface: 'None, except Chat results from RAG and ops scrape.',
+      exposureStatus: 'internal',
+      userFacingProblem: 'These are platform internals, not user workflows.',
+      recommendedFrontendMechanism:
+        'Document as not user-facing; do not expose operational controls in the SPA.',
+      riskLevel: 'high',
+    },
+    {
+      capability: 'Pipeline updates',
+      backendSourceFile: 'No pipeline route/model found in this workspace.',
+      commandOrApiRoute: 'None',
+      currentFrontendSurface: 'None',
+      exposureStatus: 'hidden',
+      userFacingProblem: 'Requested BrandOps workflow is not actually supported by this backend.',
+      recommendedFrontendMechanism:
+        'Document as intentionally unavailable / coming later; do not build UI until a real backend model/API exists.',
+      riskLevel: 'high',
+    },
+    {
+      capability: 'Publishing and content scheduling',
+      backendSourceFile:
+        'No publishing route/model found; notification scheduling is a service stub, not a queue-backed API.',
+      commandOrApiRoute: 'None',
+      currentFrontendSurface: 'None',
+      exposureStatus: 'hidden',
+      userFacingProblem:
+        'Scheduling UI would imply execution that the backend does not currently support.',
+      recommendedFrontendMechanism:
+        'Document as intentionally unavailable / coming later; do not build fake scheduler UI; only expose notification preferences that exist.',
+      riskLevel: 'high',
+    },
+    {
+      capability: 'Integrations and connectors',
+      backendSourceFile: 'backend/src/modules/platform-systems/platform-systems.controller.ts',
+      commandOrApiRoute: 'GET/POST /api/integrations/fhir/*; GET/POST /api/integrations/hl7/*',
+      currentFrontendSurface:
+        'PlatformSystemPage.jsx renders FHIR/HL7 connection status and demo contract execution.',
+      exposureStatus: 'exposed',
+      userFacingProblem:
+        'Real EHR connectivity still requires credentials and environment-specific validation.',
+      recommendedFrontendMechanism:
+        'Keep the protected integrations shell with demo/unsupported labels until live FHIR/HL7 credentials are configured.',
+      riskLevel: 'medium',
+    },
+    {
+      capability: 'Reminders and scheduler',
+      backendSourceFile: 'backend/src/modules/notifications/*; backend/src/app.module.ts',
+      commandOrApiRoute: 'Notification preferences API; ScheduleModule enabled',
+      currentFrontendSurface: 'Notification preferences',
+      exposureStatus: 'partially exposed',
+      userFacingProblem:
+        'Medication and appointment reminder preferences exist, but creating scheduled reminders is not an API-backed workflow.',
+      recommendedFrontendMechanism:
+        'Expose preferences only; document reminder creation as coming later until scheduled notification persistence and delivery exist.',
+      riskLevel: 'high',
+    },
+    {
+      capability: 'Workspace configuration',
+      backendSourceFile: 'No backend workspace route; frontend WorkspaceContext uses localStorage.',
+      commandOrApiRoute: 'Local frontend state only',
+      currentFrontendSurface: 'AppShell workspace navigation and local workspace context',
+      exposureStatus: 'exposed',
+      userFacingProblem: 'Workspace customization is available locally but not server-synced.',
+      recommendedFrontendMechanism:
+        'Keep local workspace UX; label as device-local if persistence expectations matter.',
+      riskLevel: 'low',
+    },
+    {
+      capability: 'Fleet operations command, maintenance, and route planning',
+      backendSourceFile:
+        'No backend fleet route found; frontend fleet pages and deterministic/mock services only.',
+      commandOrApiRoute:
+        'Protected SPA routes /fleet/command, /fleet/predictive-maintenance, /fleet/route-optimizer; no Nest API route.',
+      currentFrontendSurface:
+        'FleetDashboard.jsx uses mock telemetry; PredictiveMaintenance.jsx and RouteOptimizer.jsx use client-side deterministic engines.',
+      exposureStatus: 'frontend-only',
+      userFacingProblem:
+        'Fleet tools are visible and protected, but current data/actions are mock or client-only and do not operate a backend fleet system.',
+      recommendedFrontendMechanism:
+        'Keep decision-support disclaimers and mock/client labels; do not add dispatch mutations until real fleet APIs exist.',
+      riskLevel: 'medium',
+    },
+    {
+      capability: 'Clinical alerts management',
+      backendSourceFile:
+        'backend/src/modules/clinical-alerts/*; backendApiCapabilities.clinicalAlerts is demo.',
+      commandOrApiRoute:
+        'Protected SPA route /clinical/alerts; GET /api/clinical/alerts; POST /api/clinical/alerts/:id/acknowledge|dismiss. Stream remains disabled.',
+      currentFrontendSurface:
+        'ClinicalAlertsPage.jsx loads demo-backed alerts and keeps local fallback.',
+      exposureStatus: 'partially exposed',
+      userFacingProblem:
+        'Alerts management has a backend workflow contract, but the current alert source is demo-backed rather than connected to a live clinical alarm source.',
+      recommendedFrontendMechanism:
+        'Keep demo/source labeling and do not present as a bedside alarm source until a real alert feed and streaming contract exist.',
+      riskLevel: 'high',
+    },
+    {
+      capability: 'Team management',
+      backendSourceFile:
+        'No backend team controller found; backendApiCapabilities.teamManagement is false.',
+      commandOrApiRoute:
+        'Protected + MANAGE_USERS SPA route /team; gated frontend calls GET/PUT/DELETE /api/team/users and POST /api/team/invite.',
+      currentFrontendSurface:
+        'TeamManagement.jsx visible behind MANAGE_USERS but API is disabled by capability gate.',
+      exposureStatus: 'unsafe/unclear',
+      userFacingProblem: 'Admin team management UI exists without a supported backend contract.',
+      recommendedFrontendMechanism:
+        'Keep capability gate and unsupported state; do not enable invite/edit/delete until backend team APIs and audit semantics exist.',
+      riskLevel: 'high',
+    },
+  ].map(withExposureMetadata),
+);
 
 export const recommendedCapabilityBuildOrder = Object.freeze([
   {
     rank: 1,
     capability: 'Classify and contain public/unsupported visible surfaces',
-    mechanism: 'Explicit matrix rows, unsupported banners/gates, public share route alignment, and data-source labels for shared tools, clinical alerts, team, fleet, and cost analytics.',
-    reason: 'Prevents users from mistaking public, mock-only, or frontend-only surfaces for supported backend workflows.',
+    mechanism:
+      'Explicit matrix rows, unsupported banners/gates, public share route alignment, and data-source labels for shared tools, clinical alerts, team, fleet, and cost analytics.',
+    reason:
+      'Prevents users from mistaking public, mock-only, or frontend-only surfaces for supported backend workflows.',
   },
   {
     rank: 2,
     capability: 'Notification preferences and inbox actions',
-    mechanism: 'Wire preferences to GET/PATCH first, then add unread/read-all/toggle-all/device summary actions.',
+    mechanism:
+      'Wire preferences to GET/PATCH first, then add unread/read-all/toggle-all/device summary actions.',
     reason: 'The UI is visible today but local-only despite supported backend notification APIs.',
   },
   {
@@ -485,7 +576,8 @@ export const recommendedCapabilityBuildOrder = Object.freeze([
   {
     rank: 7,
     capability: 'Clinical content reference expansion',
-    mechanism: 'Drug reference page plus protocol category/detail drawers; keep CRUD admin-deferred.',
+    mechanism:
+      'Drug reference page plus protocol category/detail drawers; keep CRUD admin-deferred.',
     reason: 'Read APIs exist, while content mutation requires roles and review workflow.',
   },
 ]);
@@ -499,32 +591,38 @@ export const unsupportedWorkflowDecisions = Object.freeze([
   {
     workflow: 'Publishing/content scheduling',
     decision: 'Do not expose',
-    reason: 'No backend publishing model/API; notification scheduling is not exposed as a durable user workflow.',
+    reason:
+      'No backend publishing model/API; notification scheduling is not exposed as a durable user workflow.',
   },
   {
     workflow: 'Connector management',
     decision: 'Expose only demo-safe FHIR/HL7 integration contracts',
-    reason: 'Platform systems now provide protected demo connector contracts; real EHR/FHIR/HL7 writeback still requires configured credentials and validation.',
+    reason:
+      'Platform systems now provide protected demo connector contracts; real EHR/FHIR/HL7 writeback still requires configured credentials and validation.',
   },
   {
     workflow: 'Reminder creation',
     decision: 'Expose preferences only',
-    reason: 'Reminder preference fields exist; scheduled reminder creation and delivery are not API-backed.',
+    reason:
+      'Reminder preference fields exist; scheduled reminder creation and delivery are not API-backed.',
   },
   {
     workflow: 'Clinical alerts backend actions',
     decision: 'Expose demo-backed list/ack/dismiss only',
-    reason: 'ClinicalAlertsPage now has Nest routes for workflow validation, but live alarm streaming is not API-backed and source integration remains disabled.',
+    reason:
+      'ClinicalAlertsPage now has Nest routes for workflow validation, but live alarm streaming is not API-backed and source integration remains disabled.',
   },
   {
     workflow: 'Team invite/edit/delete',
     decision: 'Keep capability-gated unsupported state',
-    reason: 'TeamManagement is visible behind MANAGE_USERS, but no backend team controller/API exists.',
+    reason:
+      'TeamManagement is visible behind MANAGE_USERS, but no backend team controller/API exists.',
   },
   {
     workflow: 'Fleet dispatch mutation',
     decision: 'Keep decision-support only',
-    reason: 'Fleet pages are protected and visible, but telemetry, route optimization, and maintenance scoring are mock or client-only.',
+    reason:
+      'Fleet pages are protected and visible, but telemetry, route optimization, and maintenance scoring are mock or client-only.',
   },
   {
     workflow: 'Backend cost authority',
@@ -540,8 +638,10 @@ export function listCapabilityEndpointRows() {
     commandOrApiRoute: `${route.method} ${route.path}`,
     currentFrontendSurface: 'See frontendApiCallsInventory.js and backendRouteExposurePolicy.js',
     exposureStatus: 'exposed',
-    userFacingProblem: route.notes || 'Endpoint is tracked in the canonical backend route inventory.',
-    recommendedFrontendMechanism: 'Use route inventory and policy to decide whether this endpoint is wired, internal, deferred, or expose-recommended.',
+    userFacingProblem:
+      route.notes || 'Endpoint is tracked in the canonical backend route inventory.',
+    recommendedFrontendMechanism:
+      'Use route inventory and policy to decide whether this endpoint is wired, internal, deferred, or expose-recommended.',
     riskLevel: 'medium',
   }));
 }

@@ -21,7 +21,10 @@ export function ClinicalExecutorFeedback({
   if (loading) {
     return (
       <div className="clinical-executor-feedback clinical-executor-feedback--loading" role="status">
-        <span className="clinical-executor-feedback__icon clinical-executor-feedback__icon--spin" aria-hidden>
+        <span
+          className="clinical-executor-feedback__icon clinical-executor-feedback__icon--spin"
+          aria-hidden
+        >
           <NavIcon icon={CHROME_ICONS.loader} size={20} />
         </span>
         <span>Running on server…</span>

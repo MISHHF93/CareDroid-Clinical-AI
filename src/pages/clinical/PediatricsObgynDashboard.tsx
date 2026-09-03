@@ -11,55 +11,64 @@ const CARDS = [
   {
     to: '/emergency/tools/pediatrics/pediatric-command-center',
     title: 'Pediatric command center',
-    description: 'PEWS/deterioration, sepsis context, BP screening, growth trends, unresolved review items.',
+    description:
+      'PEWS/deterioration, sepsis context, BP screening, growth trends, unresolved review items.',
     tier: 'Tier C' as const,
   },
   {
     to: '/emergency/tools/pediatrics/pediatric-sepsis-assistant',
     title: 'Pediatric sepsis assistant',
-    description: 'Infection concern, age-adjusted vitals, perfusion, mental status, labs, and missing data.',
+    description:
+      'Infection concern, age-adjusted vitals, perfusion, mental status, labs, and missing data.',
     tier: 'Tier B' as const,
   },
   {
     to: '/emergency/tools/pediatrics/pregnancy-workflow-assistant',
     title: 'Pregnancy workflow assistant',
-    description: 'Gestational age, dating, maternal symptoms, fetal movement, bleeding/fluid context, labs, handoff.',
+    description:
+      'Gestational age, dating, maternal symptoms, fetal movement, bleeding/fluid context, labs, handoff.',
     tier: 'Tier B' as const,
   },
   {
     to: '/emergency/tools/pediatrics/neonatal-assessment-assistant',
     title: 'Neonatal assessment assistant',
-    description: 'Apgar, temperature, feeding, glucose, bilirubin, growth percentiles, screenings, and red flags.',
+    description:
+      'Apgar, temperature, feeding, glucose, bilirubin, growth percentiles, screenings, and red flags.',
     tier: 'Tier B' as const,
   },
   {
     to: '/emergency/tools/pediatrics/ob-triage-assistant',
     title: 'OB triage assistant',
-    description: 'Symptoms, gestational age, fetal concerns, bleeding, fluid leakage, contractions, severe features.',
+    description:
+      'Symptoms, gestational age, fetal concerns, bleeding, fluid leakage, contractions, severe features.',
     tier: 'Tier B' as const,
   },
   {
     to: '/emergency/tools/pediatrics/neonatal-dashboard',
     title: 'Neonatal dashboard',
-    description: 'Vitals, feeding, weight, bilirubin, growth, screening, data freshness, and review queues.',
+    description:
+      'Vitals, feeding, weight, bilirubin, growth, screening, data freshness, and review queues.',
     tier: 'Tier C' as const,
   },
   {
     to: '/emergency/tools/pediatrics/maternal-monitoring-dashboard',
     title: 'Maternal monitoring dashboard',
-    description: 'Vitals, symptoms, labs, fetal context, postpartum/antepartum status, and review queues.',
+    description:
+      'Vitals, symptoms, labs, fetal context, postpartum/antepartum status, and review queues.',
     tier: 'Tier C' as const,
   },
   {
     to: '/emergency/tools/pediatrics/growth-trend-analytics',
     title: 'Growth trend analytics',
-    description: 'Serial anthropometrics, percentile changes, corrected age context, and measurement quality.',
+    description:
+      'Serial anthropometrics, percentile changes, corrected age context, and measurement quality.',
     tier: 'Tier C' as const,
   },
   {
     to: '/emergency/tools/pediatrics/perinatal-risk-dashboard',
     title: 'Perinatal risk dashboard',
-    description: 'Maternal, fetal, delivery, neonatal, bilirubin/growth follow-up, and handoff queues.',
+    description:
+      'Maternal, fetal, delivery, neonatal, bilirubin/growth follow-up, and handoff queues.',
     tier: 'Tier C' as const,
   },
 ];

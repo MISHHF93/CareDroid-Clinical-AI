@@ -55,7 +55,9 @@ export type LivingDocumentationSnapshot = Readonly<{
   engineId: 'living-documentation';
   generatedAt: string;
   sourceRevision: string;
-  sections: Readonly<Partial<Record<LivingDocumentationSection, readonly LivingDocumentationEntry[]>>>;
+  sections: Readonly<
+    Partial<Record<LivingDocumentationSection, readonly LivingDocumentationEntry[]>>
+  >;
   metrics: Readonly<{
     routes: number;
     apis: number;
@@ -93,53 +95,56 @@ export const LIVING_DOCUMENTATION_SECTIONS: readonly LivingDocumentationSection[
 ]);
 
 /** Static docs superseded by generated living documentation. */
-export const SUPERSEDED_STATIC_DOCUMENTATION: readonly SupersededDocumentationRecord[] = Object.freeze([
-  Object.freeze({
-    path: 'docs/specs/page-map.md',
-    replacedBy: 'docs/generated/routes.md',
-    reason: 'Route records now derive from src/config/routes.config.ts and caredroidPageArchitecture.config.ts',
-  }),
-  Object.freeze({
-    path: 'docs/specs/role-permission-map.md',
-    replacedBy: 'docs/generated/permissions.md',
-    reason: 'Permissions derive from emergencyPermissionRegistry.ts',
-  }),
-  Object.freeze({
-    path: 'docs/architecture/endpoint-to-frontend-matrix.md',
-    replacedBy: 'docs/generated/apis.md',
-    reason: 'API bindings derive from pageApiBinding.registry.ts and emergencyOsApi.ts',
-  }),
-  Object.freeze({
-    path: 'docs/specs/ai-chief-spec.md',
-    replacedBy: 'docs/generated/ai-capabilities.md',
-    reason: 'AI Chief domains derive from aiChiefOrchestrationModel.ts',
-  }),
-  Object.freeze({
-    path: 'docs/workflows/patient-journey.md',
-    replacedBy: 'docs/generated/workflows.md',
-    reason: 'Workflow steps derive from unifiedPatientWorkflowModel.ts',
-  }),
-  Object.freeze({
-    path: 'docs/services/service-catalog.md',
-    replacedBy: 'docs/generated/services.md',
-    reason: 'Platform services derive from emergencyPlatform.config.ts',
-  }),
-  Object.freeze({
-    path: 'docs/specs/route-map.md',
-    replacedBy: 'docs/generated/routes.md',
-    reason: 'Runtime routes derive from routes.config.ts and caredroidPageArchitecture.config.ts',
-  }),
-  Object.freeze({
-    path: 'docs/specs/full-emergency-care-journey.md',
-    replacedBy: 'docs/generated/workflows.md',
-    reason: 'Journey phases derive from hospitalOperatingSystemModel and unifiedPatientWorkflowModel',
-  }),
-  Object.freeze({
-    path: 'docs/architecture/endpoint-to-frontend-matrix.md',
-    replacedBy: 'docs/generated/apis.md',
-    reason: 'Endpoint matrix is generated from emergencyOsApi and pageApiBinding.registry',
-  }),
-]);
+export const SUPERSEDED_STATIC_DOCUMENTATION: readonly SupersededDocumentationRecord[] =
+  Object.freeze([
+    Object.freeze({
+      path: 'docs/specs/page-map.md',
+      replacedBy: 'docs/generated/routes.md',
+      reason:
+        'Route records now derive from src/config/routes.config.ts and caredroidPageArchitecture.config.ts',
+    }),
+    Object.freeze({
+      path: 'docs/specs/role-permission-map.md',
+      replacedBy: 'docs/generated/permissions.md',
+      reason: 'Permissions derive from emergencyPermissionRegistry.ts',
+    }),
+    Object.freeze({
+      path: 'docs/architecture/endpoint-to-frontend-matrix.md',
+      replacedBy: 'docs/generated/apis.md',
+      reason: 'API bindings derive from pageApiBinding.registry.ts and emergencyOsApi.ts',
+    }),
+    Object.freeze({
+      path: 'docs/specs/ai-chief-spec.md',
+      replacedBy: 'docs/generated/ai-capabilities.md',
+      reason: 'AI Chief domains derive from aiChiefOrchestrationModel.ts',
+    }),
+    Object.freeze({
+      path: 'docs/workflows/patient-journey.md',
+      replacedBy: 'docs/generated/workflows.md',
+      reason: 'Workflow steps derive from unifiedPatientWorkflowModel.ts',
+    }),
+    Object.freeze({
+      path: 'docs/services/service-catalog.md',
+      replacedBy: 'docs/generated/services.md',
+      reason: 'Platform services derive from emergencyPlatform.config.ts',
+    }),
+    Object.freeze({
+      path: 'docs/specs/route-map.md',
+      replacedBy: 'docs/generated/routes.md',
+      reason: 'Runtime routes derive from routes.config.ts and caredroidPageArchitecture.config.ts',
+    }),
+    Object.freeze({
+      path: 'docs/specs/full-emergency-care-journey.md',
+      replacedBy: 'docs/generated/workflows.md',
+      reason:
+        'Journey phases derive from hospitalOperatingSystemModel and unifiedPatientWorkflowModel',
+    }),
+    Object.freeze({
+      path: 'docs/architecture/endpoint-to-frontend-matrix.md',
+      replacedBy: 'docs/generated/apis.md',
+      reason: 'Endpoint matrix is generated from emergencyOsApi and pageApiBinding.registry',
+    }),
+  ]);
 
 export const LIVING_DOCUMENTATION_CONTRACT = Object.freeze({
   engineId: 'living-documentation',
@@ -196,7 +201,8 @@ export const LIVING_REUSABLE_COMPONENTS = Object.freeze([
     id: 'OperationalIntelligenceBar',
     label: 'Operational intelligence bar',
     path: 'src/components/emergency/OperationalIntelligenceBar.tsx',
-    purpose: 'Continuous monitoring recommendations with explainable rationale, surfaced from the header Operations Center.',
+    purpose:
+      'Continuous monitoring recommendations with explainable rationale, surfaced from the header Operations Center.',
   }),
   Object.freeze({
     id: 'LivingContextualHelpBanner',

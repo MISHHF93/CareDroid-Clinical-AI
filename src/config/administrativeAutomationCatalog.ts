@@ -36,16 +36,17 @@ export const ADMINISTRATIVE_AUTOMATION_CATEGORIES = Object.freeze([
 ] as const satisfies readonly AdministrativeAutomationCategory[]);
 
 /** Entitlement asset ids for administrative automation catalog entries. */
-export const ADMIN_AUTOMATION_ENTITLEMENT_ASSET_MAP: Readonly<Record<string, string>> = Object.freeze({
-  'emergency-queue-routing-assistant': 'agent-operations',
-  'emergency-disposition-handoff-draft': 'agent-clinical',
-  'emergency-copilot-shift-summary': 'agent-clinical',
-  'emergency-automated-triage-matrix': 'agent-clinical',
-  'emergency-capacity-surge-protocol': 'agent-operations',
-  'emergency-staff-routing-assistant': 'agent-operations',
-  'emergency-waiting-room-intelligence': 'agent-operations',
-  'emergency-escalation-engine': 'agent-clinical',
-});
+export const ADMIN_AUTOMATION_ENTITLEMENT_ASSET_MAP: Readonly<Record<string, string>> =
+  Object.freeze({
+    'emergency-queue-routing-assistant': 'agent-operations',
+    'emergency-disposition-handoff-draft': 'agent-clinical',
+    'emergency-copilot-shift-summary': 'agent-clinical',
+    'emergency-automated-triage-matrix': 'agent-clinical',
+    'emergency-capacity-surge-protocol': 'agent-operations',
+    'emergency-staff-routing-assistant': 'agent-operations',
+    'emergency-waiting-room-intelligence': 'agent-operations',
+    'emergency-escalation-engine': 'agent-clinical',
+  });
 
 export function resolveAdminAutomationEntitlementAssetId(automationId: string): string {
   return ADMIN_AUTOMATION_ENTITLEMENT_ASSET_MAP[automationId] || automationId;

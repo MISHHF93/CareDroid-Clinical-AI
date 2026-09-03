@@ -45,7 +45,9 @@ function seedPatient() {
 }
 
 function yesNoButton(question: string, answer: 'YES' | 'NO') {
-  return within(screen.getByText(question).closest('section') as HTMLElement).getByRole('button', { name: new RegExp(answer, 'i') });
+  return within(screen.getByText(question).closest('section') as HTMLElement).getByRole('button', {
+    name: new RegExp(answer, 'i'),
+  });
 }
 
 describe('ColumbiaSSRS calculator', () => {
@@ -67,7 +69,12 @@ describe('ColumbiaSSRS calculator', () => {
     expect(screen.getByText(/1\. Wish to be dead/i)).toBeTruthy();
     expect(screen.queryByText(/2\. Suicidal ideation/i)).toBeNull();
 
-    await user.click(yesNoButton('1. Wish to be dead — Have you wished you were dead or wished you could go to sleep and not wake up?', 'NO'));
+    await user.click(
+      yesNoButton(
+        '1. Wish to be dead — Have you wished you were dead or wished you could go to sleep and not wake up?',
+        'NO',
+      ),
+    );
 
     expect(screen.getByText('Ideation section complete')).toBeTruthy();
     expect(screen.queryByText(/2\. Suicidal ideation/i)).toBeNull();
@@ -82,8 +89,18 @@ describe('ColumbiaSSRS calculator', () => {
 
     render(<ColumbiaSSRS patientId={patient.id} onClose={onClose} />);
 
-    await user.click(yesNoButton('1. Wish to be dead — Have you wished you were dead or wished you could go to sleep and not wake up?', 'YES'));
-    await user.click(yesNoButton('2. Suicidal ideation — Have you had any actual thoughts of killing yourself?', 'YES'));
+    await user.click(
+      yesNoButton(
+        '1. Wish to be dead — Have you wished you were dead or wished you could go to sleep and not wake up?',
+        'YES',
+      ),
+    );
+    await user.click(
+      yesNoButton(
+        '2. Suicidal ideation — Have you had any actual thoughts of killing yourself?',
+        'YES',
+      ),
+    );
 
     expect(screen.getByText(/MODERATE RISK/i)).toBeTruthy();
     expect(useEmergencyStore.getState().alerts).toEqual(

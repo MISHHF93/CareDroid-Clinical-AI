@@ -63,15 +63,21 @@ describe('SepsisBundleTracker helpers', () => {
   });
 
   it('classifies antibiotic timing thresholds from recognition time', () => {
-    expect(calculateAntibioticTiming('2026-06-13T12:00:00.000Z', '2026-06-13T12:45:00.000Z')).toMatchObject({
+    expect(
+      calculateAntibioticTiming('2026-06-13T12:00:00.000Z', '2026-06-13T12:45:00.000Z'),
+    ).toMatchObject({
       minutes: 45,
       status: 'compliant',
     });
-    expect(calculateAntibioticTiming('2026-06-13T12:00:00.000Z', '2026-06-13T13:15:00.000Z')).toMatchObject({
+    expect(
+      calculateAntibioticTiming('2026-06-13T12:00:00.000Z', '2026-06-13T13:15:00.000Z'),
+    ).toMatchObject({
       minutes: 75,
       status: 'borderline',
     });
-    expect(calculateAntibioticTiming('2026-06-13T12:00:00.000Z', '2026-06-13T13:45:00.000Z')).toMatchObject({
+    expect(
+      calculateAntibioticTiming('2026-06-13T12:00:00.000Z', '2026-06-13T13:45:00.000Z'),
+    ).toMatchObject({
       minutes: 105,
       status: 'non-compliant',
     });

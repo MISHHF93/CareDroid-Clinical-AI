@@ -1,9 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import {
-  PERC_CRITERIA_META,
-  evaluatePerc,
-  interpretPerc,
-} from './percCalculator';
+import { PERC_CRITERIA_META, evaluatePerc, interpretPerc } from './percCalculator';
 
 const allMet = Object.fromEntries(PERC_CRITERIA_META.map((r) => [r.key, true]));
 const noneMet = Object.fromEntries(PERC_CRITERIA_META.map((r) => [r.key, false]));

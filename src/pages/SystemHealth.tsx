@@ -81,17 +81,17 @@ export default function SystemHealth() {
 
   const comparison = useMemo(
     () => compareDeploymentCommits(buildInfo.commit, state.backendHealth.gitCommit),
-    [state.backendHealth.gitCommit]
+    [state.backendHealth.gitCommit],
   );
 
   const frontendRows = useMemo(
     () =>
       buildInfoRows.filter((row) =>
         ['App version', 'Commit', 'Environment', 'Build time', 'Vercel env status'].includes(
-          row.label
-        )
+          row.label,
+        ),
       ),
-    []
+    [],
   );
 
   const backendRows = useMemo(
@@ -107,7 +107,7 @@ export default function SystemHealth() {
       { label: 'Backend environment', value: state.backendHealth.vercelEnvironment },
       { label: 'Backend health source', value: state.sourceStatus },
     ],
-    [state.backendHealth, state.loading, state.sourceStatus]
+    [state.backendHealth, state.loading, state.sourceStatus],
   );
 
   const vercelRows = useMemo(
@@ -125,7 +125,7 @@ export default function SystemHealth() {
       { label: 'Deployment ID', value: buildInfo.deploymentId || 'not provided' },
       { label: 'Repository', value: buildInfo.repository || 'not provided' },
     ],
-    []
+    [],
   );
 
   return (
@@ -138,8 +138,8 @@ export default function SystemHealth() {
       description={
         <>
           Confirm that Vercel, the frontend bundle, and the backend are reporting the same source
-          revision as GitHub/local. Compare the frontend commit below with <code>git rev-parse HEAD</code>{' '}
-          locally or the target GitHub commit.
+          revision as GitHub/local. Compare the frontend commit below with{' '}
+          <code>git rev-parse HEAD</code> locally or the target GitHub commit.
         </>
       }
       actions={
@@ -164,62 +164,84 @@ export default function SystemHealth() {
         ),
         activeWork: (
           <>
-            <DashboardSection className="system-health-section" title="Frontend Version Metadata" titleId="frontend-version-title">
+            <DashboardSection
+              className="system-health-section"
+              title="Frontend Version Metadata"
+              titleId="frontend-version-title"
+            >
               <MetadataGrid rows={frontendRows} />
             </DashboardSection>
-            <DashboardSection className="system-health-section" title="Backend Health" titleId="backend-health-title">
+            <DashboardSection
+              className="system-health-section"
+              title="Backend Health"
+              titleId="backend-health-title"
+            >
               <MetadataGrid rows={backendRows} />
             </DashboardSection>
           </>
         ),
         supportingContext: (
-          <DashboardSection className="system-health-section" title="Vercel Environment Status" titleId="vercel-env-title">
+          <DashboardSection
+            className="system-health-section"
+            title="Vercel Environment Status"
+            titleId="vercel-env-title"
+          >
             <MetadataGrid rows={vercelRows} />
           </DashboardSection>
         ),
         history: (
           <>
-          <DashboardSection
-            className="system-health-section"
-            title="Operational diagnostics"
-            titleId="client-observability-title"
-          >
-            <OperationalDiagnosticsPanel
-              client={clientDiagnostics}
-              server={serverDiagnostics}
-              observabilityHealth={observabilityHealth}
-            />
-          </DashboardSection>
-          <DashboardSection className="system-health-section" title="Health Endpoints" titleId="health-endpoints-title">
-            <DashboardGrid className="system-health-endpoint-grid">
-              <article className="cd-surface-card">
-                <h3>/health</h3>
-                <p>{state.backendProbe?.ok ? 'Reachable backend probe.' : 'Probe unavailable.'}</p>
-                <pre>
-                  {JSON.stringify(
-                    state.backendProbe?.data || { status: state.backendProbe?.message || 'checking' },
-                    null,
-                    2
-                  )}
-                </pre>
-              </article>
-              <article className="cd-surface-card">
-                <h3>/api/system-health</h3>
-                <p>
-                  {state.systemHealth?.ok
-                    ? 'Authenticated deployment metadata.'
-                    : 'Authenticated metadata unavailable.'}
-                </p>
-                <pre>
-                  {JSON.stringify(
-                    state.systemHealth?.data || { status: state.systemHealth?.message || 'checking' },
-                    null,
-                    2
-                  )}
-                </pre>
-              </article>
-            </DashboardGrid>
-          </DashboardSection>
+            <DashboardSection
+              className="system-health-section"
+              title="Operational diagnostics"
+              titleId="client-observability-title"
+            >
+              <OperationalDiagnosticsPanel
+                client={clientDiagnostics}
+                server={serverDiagnostics}
+                observabilityHealth={observabilityHealth}
+              />
+            </DashboardSection>
+            <DashboardSection
+              className="system-health-section"
+              title="Health Endpoints"
+              titleId="health-endpoints-title"
+            >
+              <DashboardGrid className="system-health-endpoint-grid">
+                <article className="cd-surface-card">
+                  <h3>/health</h3>
+                  <p>
+                    {state.backendProbe?.ok ? 'Reachable backend probe.' : 'Probe unavailable.'}
+                  </p>
+                  <pre>
+                    {JSON.stringify(
+                      state.backendProbe?.data || {
+                        status: state.backendProbe?.message || 'checking',
+                      },
+                      null,
+                      2,
+                    )}
+                  </pre>
+                </article>
+                <article className="cd-surface-card">
+                  <h3>/api/system-health</h3>
+                  <p>
+                    {state.systemHealth?.ok
+                      ? 'Authenticated deployment metadata.'
+                      : 'Authenticated metadata unavailable.'}
+                  </p>
+                  <pre>
+                    {JSON.stringify(
+                      state.systemHealth?.data || {
+                        status: state.systemHealth?.message || 'checking',
+                      },
+                      null,
+                      2,
+                    )}
+                  </pre>
+                </article>
+              </DashboardGrid>
+            </DashboardSection>
           </>
         ),
       }}

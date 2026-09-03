@@ -118,7 +118,9 @@ function buildRouteNodes(recordsOrRows) {
 
   return Object.entries(CANONICAL_ROUTES).map(([id, path]) => ({
     id,
-    label: ROUTE_LABELS[id] || id.replace(/([A-Z])/g, ' $1').replace(/^./, (value) => value.toUpperCase()),
+    label:
+      ROUTE_LABELS[id] ||
+      id.replace(/([A-Z])/g, ' $1').replace(/^./, (value) => value.toUpperCase()),
     path,
     inventoryLinks: routeCounts.get(path) || 0,
   }));
@@ -162,7 +164,7 @@ export function detectDependencyIssues({
   const contractEndpointKeys = new Set(
     dependencies
       .map((dependency) => dependency.backendEndpoint)
-      .filter((endpoint) => endpoint && endpoint !== '—')
+      .filter((endpoint) => endpoint && endpoint !== '—'),
   );
 
   const orphanUi = routeNodes
@@ -227,15 +229,24 @@ export function buildDependencyMap({
   backendRoutes = BACKEND_HTTP_ROUTES,
   frontendApiCalls = FRONTEND_API_CALLS,
 }: any = {}) {
-  const backendByKey = new Map(backendRoutes.map((route) => [keyFor(route.method, route.path), route]));
+  const backendByKey = new Map(
+    backendRoutes.map((route) => [keyFor(route.method, route.path), route]),
+  );
   const dependencies = contractRows
     ? contractRows.map((row) => makeUiDependency(row, backendByKey))
-    : inventoryRecords.map((record) => makeInventoryDependency(record, backendRoutes, frontendApiCalls));
+    : inventoryRecords.map((record) =>
+        makeInventoryDependency(record, backendRoutes, frontendApiCalls),
+      );
   const routeNodes = buildRouteNodes(contractRows || inventoryRecords);
-  const issues = detectDependencyIssues({ dependencies, routeNodes, frontendApiCalls, backendRoutes });
+  const issues = detectDependencyIssues({
+    dependencies,
+    routeNodes,
+    frontendApiCalls,
+    backendRoutes,
+  });
   const issueCounts = Object.values(DEPENDENCY_ISSUE_TYPES).reduce(
     (acc, type) => ({ ...acc, [type]: issues.filter((issue) => issue.type === type).length }),
-    {}
+    {},
   );
 
   return {
@@ -249,7 +260,9 @@ export function buildDependencyMap({
       frontendApiCalls: frontendApiCalls.length,
       backendEndpoints: backendRoutes.length,
       services: new Set(backendRoutes.map((route) => serviceNameFor(route.controller))).size,
-      executors: dependencies.filter((dependency) => dependency.executor !== '—' && dependency.executor !== 'n/a').length,
+      executors: dependencies.filter(
+        (dependency) => dependency.executor !== '—' && dependency.executor !== 'n/a',
+      ).length,
       issues: issues.length,
     },
   };

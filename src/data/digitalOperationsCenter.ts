@@ -58,7 +58,8 @@ export const OPERATIONS_CENTER_SURFACES = Object.freeze([
     path: CANONICAL_ROUTES.fleetCommand,
     domain: 'Fleet command',
     status: 'demo-fleet-ops',
-    summary: 'Vehicle availability, dispatch readiness, maintenance risk, routes, and live map context.',
+    summary:
+      'Vehicle availability, dispatch readiness, maintenance risk, routes, and live map context.',
     metrics: [
       { label: 'Available vehicles', value: '18' },
       { label: 'Maintenance watch', value: '4' },
@@ -132,16 +133,20 @@ export const OPERATIONS_CENTER_ROLE_PROFILES = Object.freeze({
 function canAccessSurface(surface, role, hasPermission = (_permission?) => false) {
   const roleAllowed = !surface.roles?.length || surface.roles.includes(role);
   const permissionAllowed =
-    !surface.permissions?.length || surface.permissions.some((permission) => hasPermission(permission));
+    !surface.permissions?.length ||
+    surface.permissions.some((permission) => hasPermission(permission));
   return roleAllowed || permissionAllowed;
 }
 
-export function getOperationsCenterRoleView({ role = 'default', hasPermission = () => false }: any = {}) {
+export function getOperationsCenterRoleView({
+  role = 'default',
+  hasPermission = () => false,
+}: any = {}) {
   const normalizedRole = String(role || 'default').toLowerCase();
   const profile =
     OPERATIONS_CENTER_ROLE_PROFILES[normalizedRole] || OPERATIONS_CENTER_ROLE_PROFILES.default;
   const accessibleSurfaces = OPERATIONS_CENTER_SURFACES.filter((surface) =>
-    canAccessSurface(surface, normalizedRole, hasPermission)
+    canAccessSurface(surface, normalizedRole, hasPermission),
   );
   const prioritySurfaces = profile.prioritySurfaceIds
     .map((id) => accessibleSurfaces.find((surface) => surface.id === id))
@@ -158,10 +163,11 @@ export function getOperationsCenterRoleView({ role = 'default', hasPermission = 
 export function getOperationsCenterSnapshot(surfaces = OPERATIONS_CENTER_SURFACES) {
   return {
     sourceStatus: 'demo-operational-command-center',
-    safetyLabel: 'Operational command center - demo state and live routes may differ by backend availability',
+    safetyLabel:
+      'Operational command center - demo state and live routes may differ by backend availability',
     surfaceCount: surfaces.length,
     alertSurfaceCount: surfaces.filter((surface) =>
-      ['hospital-map', 'medical-iot', 'notifications', 'system-health'].includes(surface.id)
+      ['hospital-map', 'medical-iot', 'notifications', 'system-health'].includes(surface.id),
     ).length,
     combinedSurfaceLabels: surfaces.map((surface) => surface.title),
   };
@@ -175,6 +181,6 @@ export function searchOperationsCenterSurfaces(query = '', surfaces = OPERATIONS
     [surface.title, surface.domain, surface.status, surface.summary]
       .join(' ')
       .toLowerCase()
-      .includes(normalizedQuery)
+      .includes(normalizedQuery),
   );
 }

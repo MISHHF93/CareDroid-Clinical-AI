@@ -1,6 +1,6 @@
 /**
  * ToolCard Component Tests
- * 
+ *
  * Tests for ToolCard React component
  * Covers SOFA rendering, drug checker rendering, lab interpreter rendering
  */
@@ -68,7 +68,13 @@ describe('ToolCard Component', () => {
       data: {
         labValues: [
           { name: 'WBC', value: 2.0, unit: 'K/μL', status: 'low', referenceRange: '4.5-11.0' },
-          { name: 'Hemoglobin', value: 14.0, unit: 'g/dL', status: 'normal', referenceRange: '13.5-17.5' },
+          {
+            name: 'Hemoglobin',
+            value: 14.0,
+            unit: 'g/dL',
+            status: 'normal',
+            referenceRange: '13.5-17.5',
+          },
         ],
         summary: {
           total: 2,

@@ -112,7 +112,7 @@ describe('deriveAlerts referral intelligence rules', () => {
         referrals: [referral({ id: 'ref-unacknowledged', urgency: 'Urgent' })],
       },
       [],
-      now
+      now,
     );
 
     expect(alerts).toEqual(
@@ -122,7 +122,7 @@ describe('deriveAlerts referral intelligence rules', () => {
           severity: 'Warning',
           actionType: 'VIEW_PATIENT',
         }),
-      ])
+      ]),
     );
   });
 
@@ -150,7 +150,7 @@ describe('deriveAlerts referral intelligence rules', () => {
         ],
       },
       [],
-      now
+      now,
     );
 
     expect(alerts).toEqual([
@@ -195,7 +195,7 @@ describe('deriveAlerts reassessment reminder rules', () => {
         patients: [reminderPatient],
       },
       [],
-      now
+      now,
     );
 
     // Both reminders belong to the same patient, so triageOperationalAlerts()
@@ -220,7 +220,7 @@ describe('AlertEngine dispatch normalization', () => {
         title: 'Connection warning',
         message: 'Unable to reach chat service.',
       } as unknown as AlertDispatchInput,
-      now
+      now,
     );
 
     expect(alert).toMatchObject({

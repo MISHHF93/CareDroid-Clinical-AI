@@ -11,7 +11,14 @@ type PageContainerProps = {
   children?: React.ReactNode;
 } & React.HTMLAttributes<HTMLElement>;
 
-export function PageContainer({ size = 'default', padded = true, as: Tag = 'div', className, children, ...props }: PageContainerProps) {
+export function PageContainer({
+  size = 'default',
+  padded = true,
+  as: Tag = 'div',
+  className,
+  children,
+  ...props
+}: PageContainerProps) {
   return (
     <Tag
       className={[
@@ -19,7 +26,9 @@ export function PageContainer({ size = 'default', padded = true, as: Tag = 'div'
         `cd-page-container--${size}`,
         padded ? 'cd-page-container--padded' : '',
         className ?? '',
-      ].filter(Boolean).join(' ')}
+      ]
+        .filter(Boolean)
+        .join(' ')}
       {...props}
     >
       {children}

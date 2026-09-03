@@ -11,7 +11,12 @@ import {
   markReady,
   notifyStaff,
 } from '../../services/edReadinessService';
-import { getDiagnosticsBoard, getDiagnosticsSummary, DIAGNOSTIC_TYPE_LABELS, DIAGNOSTIC_PRIORITY_LABELS } from '../../services/diagnosticsCoordinationService';
+import {
+  getDiagnosticsBoard,
+  getDiagnosticsSummary,
+  DIAGNOSTIC_TYPE_LABELS,
+  DIAGNOSTIC_PRIORITY_LABELS,
+} from '../../services/diagnosticsCoordinationService';
 import { getStaffRoutingSummary } from '../../services/staffRoutingService';
 import { getCADSystemSummary } from '../../services/cadIntegrationService';
 import { getAllActiveAssessments } from '../../services/prehospitalAssessmentService';
@@ -37,27 +42,32 @@ const VIEW_COPY: Record<ViewId, { eyebrow: string; title: string; description: s
   journey: {
     eyebrow: 'Command center',
     title: 'Full Emergency-Care Journey',
-    description: 'One operating picture from emergency signal and 911 call through EMS, ED care, disposition, reporting, and analytics feedback.',
+    description:
+      'One operating picture from emergency signal and 911 call through EMS, ED care, disposition, reporting, and analytics feedback.',
   },
   'ed-readiness': {
     eyebrow: 'Pre-arrival',
     title: 'ED Readiness',
-    description: 'Prepare rooms, staff, equipment, specialty teams, lab, radiology, and pharmacy before the patient arrives.',
+    description:
+      'Prepare rooms, staff, equipment, specialty teams, lab, radiology, and pharmacy before the patient arrives.',
   },
   diagnostics: {
     eyebrow: 'Diagnostics',
     title: 'Diagnostics Coordination',
-    description: 'Coordinate lab, imaging, ECG, pharmacy review, and consult workflows from the live ED operating state.',
+    description:
+      'Coordinate lab, imaging, ECG, pharmacy review, and consult workflows from the live ED operating state.',
   },
   handoffs: {
     eyebrow: 'Handoffs',
     title: 'Structured Handoffs',
-    description: 'Track EMS-to-ED, ED-to-department, admission, transfer, and discharge handoff readiness.',
+    description:
+      'Track EMS-to-ED, ED-to-department, admission, transfer, and discharge handoff readiness.',
   },
   reports: {
     eyebrow: 'Reports',
     title: 'Operational Reports',
-    description: 'Review response compliance, bottlenecks, outcomes, safety review signals, and analytics feedback loops.',
+    description:
+      'Review response compliance, bottlenecks, outcomes, safety review signals, and analytics feedback loops.',
   },
 };
 
@@ -71,7 +81,12 @@ const VIEW_STAGE_IDS: Record<ViewId, readonly string[]> = {
 
 // ── Shared card shell ────────────────────────────────────────────────────────
 
-function SectionCard({ title, lead, badge, children }: {
+function SectionCard({
+  title,
+  lead,
+  badge,
+  children,
+}: {
   title: React.ReactNode;
   lead?: string;
   badge?: string | number;
@@ -101,7 +116,15 @@ function StatusChip({ label, status }: { label: string; status: string }) {
   );
 }
 
-function MetricChip({ label, value, warn }: { label: string; value: string | number; warn?: boolean }) {
+function MetricChip({
+  label,
+  value,
+  warn,
+}: {
+  label: string;
+  value: string | number;
+  warn?: boolean;
+}) {
   const warnOn = Boolean(warn && Number(value) > 0);
   return (
     <div className={`fj-metric-chip${warnOn ? ' fj-metric-chip--warn' : ''}`}>
@@ -120,11 +143,7 @@ function ActionToneDot({ tone }: { tone: OperationalWorkflowAction['tone'] }) {
   );
 }
 
-function CommandCenterActionPanel({
-  actions,
-}: {
-  actions: readonly OperationalWorkflowAction[];
-}) {
+function CommandCenterActionPanel({ actions }: { actions: readonly OperationalWorkflowAction[] }) {
   const activeCount = actions.filter((action) => action.active).length;
 
   return (
@@ -172,7 +191,11 @@ function CommandCenterActionPanel({
 
 // ── Journey view ─────────────────────────────────────────────────────────────
 
-function JourneyView({ snapshot }: { snapshot: ReturnType<typeof buildFullEmergencyCareJourneySnapshot> }) {
+function JourneyView({
+  snapshot,
+}: {
+  snapshot: ReturnType<typeof buildFullEmergencyCareJourneySnapshot>;
+}) {
   const cadSummary = snapshot.liveServiceSummaries.cad;
   const prehospitalSummary = snapshot.liveServiceSummaries.prehospital;
   const staffSummary = snapshot.liveServiceSummaries.staffRouting;
@@ -189,7 +212,9 @@ function JourneyView({ snapshot }: { snapshot: ReturnType<typeof buildFullEmerge
     <>
       <article className="emergency-route-card emergency-route-copilot-hint">
         <strong>{snapshot.principle}</strong>
-        <p>{snapshot.mission} {snapshot.safety}</p>
+        <p>
+          {snapshot.mission} {snapshot.safety}
+        </p>
       </article>
 
       <CommandCenterActionPanel actions={commandActions} />
@@ -197,12 +222,20 @@ function JourneyView({ snapshot }: { snapshot: ReturnType<typeof buildFullEmerge
       <SectionCard
         title="3-Minute Response Objective"
         lead="Door-to-action compliance tracked through journey traces and the response timer engine."
-        badge={snapshot.metrics.threeMinuteBreaches ? `${snapshot.metrics.threeMinuteBreaches} breach` : 'on track'}
+        badge={
+          snapshot.metrics.threeMinuteBreaches
+            ? `${snapshot.metrics.threeMinuteBreaches} breach`
+            : 'on track'
+        }
       >
         <div className="u-flex-wrap-gap-10-mt-10">
           <MetricChip label="Active journeys" value={snapshot.metrics.activeJourneyTraces} />
           <MetricChip label="3-min breaches" value={snapshot.metrics.threeMinuteBreaches} warn />
-          <MetricChip label="Unacked critical" value={snapshot.metrics.unacknowledgedCriticalAlerts} warn />
+          <MetricChip
+            label="Unacked critical"
+            value={snapshot.metrics.unacknowledgedCriticalAlerts}
+            warn
+          />
           <MetricChip label="Inbound EMS" value={snapshot.metrics.inboundEms} warn />
         </div>
       </SectionCard>
@@ -213,7 +246,7 @@ function JourneyView({ snapshot }: { snapshot: ReturnType<typeof buildFullEmerge
         badge={snapshot.activeTraces?.length ?? 0}
       >
         {snapshot.activeTraces?.length ? (
-          <div className="emergency-route-stack u-mt-10" >
+          <div className="emergency-route-stack u-mt-10">
             {snapshot.activeTraces.map((trace) => (
               <article key={trace.traceId} className="emergency-route-queue-row">
                 <div className="u-flex-1">
@@ -223,8 +256,9 @@ function JourneyView({ snapshot }: { snapshot: ReturnType<typeof buildFullEmerge
                     {trace.patientId ? ` · Patient ${trace.patientId}` : ''}
                     {trace.emsArrivalId ? ` · EMS ${trace.emsArrivalId}` : ''}
                   </div>
-                  <small className="emergency-route-queue-row__movement u-fs-11" >
-                    {trace.signalCount} signals · started {new Date(trace.startedAt).toLocaleTimeString()}
+                  <small className="emergency-route-queue-row__movement u-fs-11">
+                    {trace.signalCount} signals · started{' '}
+                    {new Date(trace.startedAt).toLocaleTimeString()}
                   </small>
                 </div>
                 <span
@@ -236,9 +270,9 @@ function JourneyView({ snapshot }: { snapshot: ReturnType<typeof buildFullEmerge
             ))}
           </div>
         ) : (
-          <p className="emergency-route-section-card__lead u-mt-10" >
-            No active traces yet. Log a call in the Dispatch Console, dispatch a unit, and route through reception to
-            populate the full emergency care journey.
+          <p className="emergency-route-section-card__lead u-mt-10">
+            No active traces yet. Log a call in the Dispatch Console, dispatch a unit, and route
+            through reception to populate the full emergency care journey.
           </p>
         )}
       </SectionCard>
@@ -255,13 +289,23 @@ function JourneyView({ snapshot }: { snapshot: ReturnType<typeof buildFullEmerge
           <MetricChip label="En route" value={cadSummary.enRouteUnits} warn />
           <MetricChip label="On scene" value={cadSummary.onSceneUnits} />
           <MetricChip label="Transporting" value={cadSummary.transportingUnits} warn />
-          <MetricChip label="Active assessments" value={prehospitalSummary.activeAssessments} warn />
+          <MetricChip
+            label="Active assessments"
+            value={prehospitalSummary.activeAssessments}
+            warn
+          />
           <MetricChip label="Packets transmitted" value={prehospitalSummary.transmittedPackets} />
         </div>
-        <div className="emergency-route-chip-row u-mt-10" >
-          <Link to={CANONICAL_ROUTES.emergencyDispatch} className="emergency-route-action-chip">Dispatch Console</Link>
-          <Link to={CANONICAL_ROUTES.emergencyEms} className="emergency-route-action-chip">EMS Pipeline</Link>
-          <Link to={CANONICAL_ROUTES.emergencyEdReadiness} className="emergency-route-action-chip">ED Readiness</Link>
+        <div className="emergency-route-chip-row u-mt-10">
+          <Link to={CANONICAL_ROUTES.emergencyDispatch} className="emergency-route-action-chip">
+            Dispatch Console
+          </Link>
+          <Link to={CANONICAL_ROUTES.emergencyEms} className="emergency-route-action-chip">
+            EMS Pipeline
+          </Link>
+          <Link to={CANONICAL_ROUTES.emergencyEdReadiness} className="emergency-route-action-chip">
+            ED Readiness
+          </Link>
         </div>
       </SectionCard>
 
@@ -279,11 +323,19 @@ function JourneyView({ snapshot }: { snapshot: ReturnType<typeof buildFullEmerge
           <MetricChip label="STAT orders" value={dxSummary.statOrders} warn />
           <MetricChip label="Capacity" value={snapshot.metrics.capacityBand} />
         </div>
-        <div className="emergency-route-chip-row u-mt-10" >
-          <Link to={CANONICAL_ROUTES.emergencyWhiteboard} className="emergency-route-action-chip">Whiteboard</Link>
-          <Link to={CANONICAL_ROUTES.emergencyQueues} className="emergency-route-action-chip">Patient Queues</Link>
-          <Link to={CANONICAL_ROUTES.emergencyDiagnostics} className="emergency-route-action-chip">Diagnostics</Link>
-          <Link to={CANONICAL_ROUTES.emergencyCopilot} className="emergency-route-action-chip">AI Chief</Link>
+        <div className="emergency-route-chip-row u-mt-10">
+          <Link to={CANONICAL_ROUTES.emergencyWhiteboard} className="emergency-route-action-chip">
+            Whiteboard
+          </Link>
+          <Link to={CANONICAL_ROUTES.emergencyQueues} className="emergency-route-action-chip">
+            Patient Queues
+          </Link>
+          <Link to={CANONICAL_ROUTES.emergencyDiagnostics} className="emergency-route-action-chip">
+            Diagnostics
+          </Link>
+          <Link to={CANONICAL_ROUTES.emergencyCopilot} className="emergency-route-action-chip">
+            AI Chief
+          </Link>
         </div>
       </SectionCard>
 
@@ -293,7 +345,7 @@ function JourneyView({ snapshot }: { snapshot: ReturnType<typeof buildFullEmerge
         lead="Live status for each stage. Click Open to navigate to that stage's surface."
         badge={snapshot.stages.length}
       >
-        <div className="emergency-route-stack u-mt-10" >
+        <div className="emergency-route-stack u-mt-10">
           {snapshot.stages.map((stage) => (
             <article key={stage.id} className="emergency-route-queue-row">
               <div className="u-flex-1">
@@ -303,11 +355,14 @@ function JourneyView({ snapshot }: { snapshot: ReturnType<typeof buildFullEmerge
                 <div className="emergency-route-queue-row__patients fj-caption">
                   {stage.outcome}
                 </div>
-                <small className="emergency-route-queue-row__movement u-fs-11" >
+                <small className="emergency-route-queue-row__movement u-fs-11">
                   {stage.ownerRoles.join(' · ')}
                 </small>
               </div>
-              <Link to={stage.route} className="emergency-route-filter-banner__btn fj-flex-shrink-0">
+              <Link
+                to={stage.route}
+                className="emergency-route-filter-banner__btn fj-flex-shrink-0"
+              >
                 Open
               </Link>
               <span
@@ -329,7 +384,11 @@ function JourneyView({ snapshot }: { snapshot: ReturnType<typeof buildFullEmerge
       >
         <div className="emergency-route-chip-row">
           {snapshot.services.map((service) => (
-            <span key={service.id} className="emergency-route-action-chip" title={service.implementation}>
+            <span
+              key={service.id}
+              className="emergency-route-action-chip"
+              title={service.implementation}
+            >
               {service.label} · {service.reuseStatus}
             </span>
           ))}
@@ -347,10 +406,17 @@ function CreateReadinessPlanForm({ onCreated }: { onCreated: () => void }) {
   const [resources, setResources] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
 
-  const resourceOptions = ['STEMI protocol', 'Stroke protocol', 'Trauma bay', 'Sepsis protocol', 'Airway kit', 'Blood products'];
+  const resourceOptions = [
+    'STEMI protocol',
+    'Stroke protocol',
+    'Trauma bay',
+    'Sepsis protocol',
+    'Airway kit',
+    'Blood products',
+  ];
 
   function toggle(r: string) {
-    setResources((prev) => prev.includes(r) ? prev.filter((x) => x !== r) : [...prev, r]);
+    setResources((prev) => (prev.includes(r) ? prev.filter((x) => x !== r) : [...prev, r]));
   }
 
   function handleSubmit(e: React.FormEvent) {
@@ -375,7 +441,9 @@ function CreateReadinessPlanForm({ onCreated }: { onCreated: () => void }) {
     <form onSubmit={handleSubmit} className="fj-stack-col-10">
       <div className="u-grid-2-gap-10">
         <div>
-          <label className="fj-label-block" htmlFor="fj-bay">Bay / Room</label>
+          <label className="fj-label-block" htmlFor="fj-bay">
+            Bay / Room
+          </label>
           <input
             id="fj-bay"
             className="fj-field-input"
@@ -385,7 +453,9 @@ function CreateReadinessPlanForm({ onCreated }: { onCreated: () => void }) {
           />
         </div>
         <div>
-          <label className="fj-label-block" htmlFor="fj-eta-minutes">ETA (minutes)</label>
+          <label className="fj-label-block" htmlFor="fj-eta-minutes">
+            ETA (minutes)
+          </label>
           <input
             id="fj-eta-minutes"
             className="fj-field-input"
@@ -412,11 +482,7 @@ function CreateReadinessPlanForm({ onCreated }: { onCreated: () => void }) {
           ))}
         </div>
       </div>
-      <button
-        type="submit"
-        disabled={submitting}
-        className="fj-btn-primary"
-      >
+      <button type="submit" disabled={submitting} className="fj-btn-primary">
         Create Readiness Plan
       </button>
     </form>
@@ -426,7 +492,8 @@ function CreateReadinessPlanForm({ onCreated }: { onCreated: () => void }) {
 function ReadinessPlanCard({ plan, onUpdated }: { plan: EDReadinessPlan; onUpdated: () => void }) {
   const checkedItems = plan.equipmentChecklist.filter((e) => e.ready).length;
   const totalItems = plan.equipmentChecklist.length;
-  const overdue = new Date(plan.expectedArrivalAt).getTime() < Date.now() && plan.status === 'pending';
+  const overdue =
+    new Date(plan.expectedArrivalAt).getTime() < Date.now() && plan.status === 'pending';
   const allChecked = checkedItems === totalItems && totalItems > 0;
 
   function handleCheckItem(item: string) {
@@ -491,11 +558,7 @@ function ReadinessPlanCard({ plan, onUpdated }: { plan: EDReadinessPlan; onUpdat
       {plan.status === 'pending' && (
         <div className="fj-row-wrap-8-mt">
           {plan.notifiedStaff.length === 0 && (
-            <button
-              type="button"
-              onClick={handleNotifyStaff}
-              className="fj-btn-outline-accent"
-            >
+            <button type="button" onClick={handleNotifyStaff} className="fj-btn-outline-accent">
               Notify Charge Nurse
             </button>
           )}
@@ -504,7 +567,11 @@ function ReadinessPlanCard({ plan, onUpdated }: { plan: EDReadinessPlan; onUpdat
             onClick={handleMarkReady}
             disabled={!allChecked && totalItems > 0}
             className={`fj-btn-mark-ready${allChecked ? ' fj-btn-mark-ready--enabled' : ''}`}
-            title={allChecked ? 'Mark bay as ready' : `Check all ${totalItems - checkedItems} remaining items first`}
+            title={
+              allChecked
+                ? 'Mark bay as ready'
+                : `Check all ${totalItems - checkedItems} remaining items first`
+            }
           >
             ✓ Mark Bay Ready
           </button>
@@ -564,7 +631,8 @@ function EdReadinessView() {
       {summary.overdueCount > 0 && (
         <div className="fj-critical-panel">
           <strong className="fj-text-critical-13">
-            ⚡ {summary.overdueCount} readiness plan{summary.overdueCount > 1 ? 's' : ''} overdue — patient arrival expected. Check equipment now.
+            ⚡ {summary.overdueCount} readiness plan{summary.overdueCount > 1 ? 's' : ''} overdue —
+            patient arrival expected. Check equipment now.
           </strong>
         </div>
       )}
@@ -574,9 +642,13 @@ function EdReadinessView() {
         <SectionCard
           title="Inbound EMS — Prehospital Alerts"
           lead="Critical flags from active EMS assessments en route. Review and activate ED protocols."
-          badge={activeAssessments.filter((a) => a.traumaActivation || a.strokeAlert || a.stemiAlert || a.sepsisConcern).length}
+          badge={
+            activeAssessments.filter(
+              (a) => a.traumaActivation || a.strokeAlert || a.stemiAlert || a.sepsisConcern,
+            ).length
+          }
         >
-          <div className="emergency-route-stack u-mt-10" >
+          <div className="emergency-route-stack u-mt-10">
             {activeAssessments.map((assessment) => {
               const flags: string[] = [];
               if (assessment.traumaActivation) flags.push('TRAUMA ACTIVATION');
@@ -602,8 +674,9 @@ function EdReadinessView() {
                     )}
                     {assessment.currentVitals && (
                       <div className="fj-caption-11-mt">
-                        Vitals: HR {assessment.currentVitals.hr ?? '?'} · SpO2 {assessment.currentVitals.spo2 ?? '?'}%
-                        · BP {assessment.currentVitals.sbp ?? '?'}/{assessment.currentVitals.dbp ?? '?'}
+                        Vitals: HR {assessment.currentVitals.hr ?? '?'} · SpO2{' '}
+                        {assessment.currentVitals.spo2 ?? '?'}% · BP{' '}
+                        {assessment.currentVitals.sbp ?? '?'}/{assessment.currentVitals.dbp ?? '?'}
                       </div>
                     )}
                     {flags.length > 0 && (
@@ -612,13 +685,21 @@ function EdReadinessView() {
                           type="button"
                           onClick={() => {
                             const resources = flags.map((f) =>
-                              f === 'TRAUMA ACTIVATION' ? 'Trauma bay'
-                              : f === 'STEMI ALERT' ? 'STEMI protocol'
-                              : f === 'STROKE ALERT' ? 'Stroke protocol'
-                              : 'Sepsis protocol',
+                              f === 'TRAUMA ACTIVATION'
+                                ? 'Trauma bay'
+                                : f === 'STEMI ALERT'
+                                  ? 'STEMI protocol'
+                                  : f === 'STROKE ALERT'
+                                    ? 'Stroke protocol'
+                                    : 'Sepsis protocol',
                             );
                             const eta = new Date(Date.now() + 8 * 60_000).toISOString();
-                            createReadinessPlan({ callId: assessment.id, preparedBy: 'charge-nurse-current', expectedArrivalAt: eta, activatedResources: resources });
+                            createReadinessPlan({
+                              callId: assessment.id,
+                              preparedBy: 'charge-nurse-current',
+                              expectedArrivalAt: eta,
+                              activatedResources: resources,
+                            });
                             refresh();
                           }}
                           className="fj-btn-critical"
@@ -654,18 +735,27 @@ function EdReadinessView() {
           >
             {showCreateForm ? 'Cancel' : '+ Create Readiness Plan'}
           </button>
-          <Link to={CANONICAL_ROUTES.emergencyDispatch} className="emergency-route-action-chip u-fs-12" >
+          <Link
+            to={CANONICAL_ROUTES.emergencyDispatch}
+            className="emergency-route-action-chip u-fs-12"
+          >
             Dispatch Console
           </Link>
         </div>
 
         {showCreateForm && (
-          <CreateReadinessPlanForm onCreated={() => { setShowCreateForm(false); refresh(); }} />
+          <CreateReadinessPlanForm
+            onCreated={() => {
+              setShowCreateForm(false);
+              refresh();
+            }}
+          />
         )}
 
         {plans.length === 0 && !showCreateForm ? (
           <p className="fj-caption-13-mt">
-            No active readiness plans. Create a plan manually above, or send a pre-alert from the Dispatch Console.
+            No active readiness plans. Create a plan manually above, or send a pre-alert from the
+            Dispatch Console.
           </p>
         ) : (
           <div className="fj-stack-col-10-mt">
@@ -682,20 +772,25 @@ function EdReadinessView() {
         lead="Real-time EMS unit status from the dispatch system."
         badge={cadSummary.totalUnits}
       >
-        <div className="emergency-route-chip-row u-mt-10" >
+        <div className="emergency-route-chip-row u-mt-10">
           <StatusChip label={`${cadSummary.availableUnits} Available`} status="ready" />
           <StatusChip label={`${cadSummary.enRouteUnits} En Route`} status="active" />
           <StatusChip label={`${cadSummary.transportingUnits} Transporting`} status="active" />
           <StatusChip label={`${cadSummary.onSceneUnits} On Scene`} status="ready" />
         </div>
-        <div className="emergency-route-chip-row u-mt-8" >
-          <Link to={CANONICAL_ROUTES.emergencyDispatch} className="emergency-route-action-chip">Dispatch Console</Link>
-          <Link to={CANONICAL_ROUTES.emergencyEms} className="emergency-route-action-chip">EMS Pipeline</Link>
+        <div className="emergency-route-chip-row u-mt-8">
+          <Link to={CANONICAL_ROUTES.emergencyDispatch} className="emergency-route-action-chip">
+            Dispatch Console
+          </Link>
+          <Link to={CANONICAL_ROUTES.emergencyEms} className="emergency-route-action-chip">
+            EMS Pipeline
+          </Link>
         </div>
       </SectionCard>
 
       <div role="note" className="fj-alert-box">
-        ED Readiness planning is decision support only. Bed assignment, specialty team activation, and equipment preparation require charge nurse or physician authorization.
+        ED Readiness planning is decision support only. Bed assignment, specialty team activation,
+        and equipment preparation require charge nurse or physician authorization.
       </div>
     </>
   );
@@ -744,31 +839,28 @@ function DiagnosticsView() {
       >
         {board.length === 0 ? (
           <p className="fj-caption-13-mt">
-            Order-based diagnostics tracking is not yet built -- there is no clinician-facing way to place a
-            lab, imaging, ECG, or pharmacy order in CareDroid today, so this board can never show real data.
-            The metrics above will always read 0 until order placement is implemented.
+            Order-based diagnostics tracking is not yet built -- there is no clinician-facing way to
+            place a lab, imaging, ECG, or pharmacy order in CareDroid today, so this board can never
+            show real data. The metrics above will always read 0 until order placement is
+            implemented.
           </p>
         ) : (
-          <div className="emergency-route-stack u-mt-10" >
+          <div className="emergency-route-stack u-mt-10">
             {board.map((row) => (
               <article key={row.orderId} className="emergency-route-queue-row">
                 <div className="u-flex-1">
                   <div className="u-flex-center u-gap-8">
-                    <strong className="u-fs-13">
-                      {DIAGNOSTIC_TYPE_LABELS[row.type]}
-                    </strong>
+                    <strong className="u-fs-13">{DIAGNOSTIC_TYPE_LABELS[row.type]}</strong>
                     <span className="fj-priority-badge" data-priority={row.priority}>
                       {DIAGNOSTIC_PRIORITY_LABELS[row.priority]}
                     </span>
                   </div>
                   <div className="fj-caption-12-mt">
-                    Patient {row.patientId.slice(-6)} · {row.targetDepartment}
-                    · Ordered {new Date(row.orderedAt).toLocaleTimeString()}
+                    Patient {row.patientId.slice(-6)} · {row.targetDepartment}· Ordered{' '}
+                    {new Date(row.orderedAt).toLocaleTimeString()}
                   </div>
                   {row.resultSummary && (
-                    <div className="fj-text-ok-12-mt">
-                      Result: {row.resultSummary}
-                    </div>
+                    <div className="fj-text-ok-12-mt">Result: {row.resultSummary}</div>
                   )}
                 </div>
                 <span
@@ -787,16 +879,32 @@ function DiagnosticsView() {
         title="Diagnostic Workflows"
         lead="Navigate to laboratory, imaging, pharmacy, and consult surfaces."
       >
-        <div className="emergency-route-chip-row u-mt-10" >
-          <Link to="/emergency/tools?filter=laboratory&q=lab-interp" className="emergency-route-action-chip">Lab Interpreter</Link>
-          <Link to="/emergency/tools?filter=clinical-tools&q=drug-check" className="emergency-route-action-chip">Drug Checker</Link>
-          <Link to="/emergency/referrals" className="emergency-route-action-chip">Consults</Link>
-          <Link to={CANONICAL_ROUTES.emergencyTools} className="emergency-route-action-chip">All Clinical Tools</Link>
+        <div className="emergency-route-chip-row u-mt-10">
+          <Link
+            to="/emergency/tools?filter=laboratory&q=lab-interp"
+            className="emergency-route-action-chip"
+          >
+            Lab Interpreter
+          </Link>
+          <Link
+            to="/emergency/tools?filter=clinical-tools&q=drug-check"
+            className="emergency-route-action-chip"
+          >
+            Drug Checker
+          </Link>
+          <Link to="/emergency/referrals" className="emergency-route-action-chip">
+            Consults
+          </Link>
+          <Link to={CANONICAL_ROUTES.emergencyTools} className="emergency-route-action-chip">
+            All Clinical Tools
+          </Link>
         </div>
       </SectionCard>
 
       <div role="note" className="fj-alert-box">
-        Diagnostic coordination is decision support only. All orders require physician authorization. Lab, imaging, and pharmacy results require licensed clinician interpretation before clinical action.
+        Diagnostic coordination is decision support only. All orders require physician
+        authorization. Lab, imaging, and pharmacy results require licensed clinician interpretation
+        before clinical action.
       </div>
     </>
   );
@@ -825,7 +933,11 @@ function HandoffsView() {
         <MetricChip label="Disposition patients" value={dispositionPatients.length} />
         <MetricChip label="Pending handoffs" value={pendingHandoffs.length} warn />
         <MetricChip label="EMS handoffs active" value={arrivedEms.length} warn />
-        <MetricChip label="Staff assignments pending" value={staffRouting.pendingAcknowledgement} warn />
+        <MetricChip
+          label="Staff assignments pending"
+          value={staffRouting.pendingAcknowledgement}
+          warn
+        />
       </div>
 
       {arrivedEms.length > 0 && (
@@ -834,19 +946,17 @@ function HandoffsView() {
           lead="Ambulance crews at the ED awaiting patient handoff confirmation."
           badge={arrivedEms.length}
         >
-          <div className="emergency-route-stack u-mt-10" >
+          <div className="emergency-route-stack u-mt-10">
             {arrivedEms.map((arrival) => (
               <article key={arrival.id} className="emergency-route-queue-row">
                 <div className="u-flex-1">
                   <strong className="u-fs-13">{arrival.chiefComplaint}</strong>
                   <div className="fj-caption-12-mt">
-                    Unit: {arrival.unitName} · Age {arrival.patientAge} {arrival.patientSex}
-                    · Severity: {arrival.severity}
+                    Unit: {arrival.unitName} · Age {arrival.patientAge} {arrival.patientSex}·
+                    Severity: {arrival.severity}
                   </div>
                   {arrival.handoffSummary && (
-                    <div className="fj-caption-12-mt">
-                      {arrival.handoffSummary}
-                    </div>
+                    <div className="fj-caption-12-mt">{arrival.handoffSummary}</div>
                   )}
                 </div>
                 <span
@@ -871,7 +981,7 @@ function HandoffsView() {
             No patients currently in disposition or admission state.
           </p>
         ) : (
-          <div className="emergency-route-stack u-mt-10" >
+          <div className="emergency-route-stack u-mt-10">
             {dispositionPatients.map((patient) => (
               <article key={patient.id} className="emergency-route-queue-row">
                 <div className="u-flex-1">
@@ -887,9 +997,7 @@ function HandoffsView() {
                     </div>
                   )}
                 </div>
-                <span
-                  className="emergency-route-queue-row__oldest fj-text-ok"
-                >
+                <span className="emergency-route-queue-row__oldest fj-text-ok">
                   {patient.state}
                 </span>
               </article>
@@ -902,16 +1010,26 @@ function HandoffsView() {
         title="Handoff Tools"
         lead="Generate structured handoff summaries and access shift documentation."
       >
-        <div className="emergency-route-chip-row u-mt-10" >
-          <Link to={CANONICAL_ROUTES.emergencyShift} className="emergency-route-action-chip">Shift Summary</Link>
-          <Link to={CANONICAL_ROUTES.emergencyReferrals} className="emergency-route-action-chip">Referrals</Link>
-          <Link to={CANONICAL_ROUTES.emergencyEms} className="emergency-route-action-chip">EMS Pipeline</Link>
-          <Link to={CANONICAL_ROUTES.emergencyWhiteboard} className="emergency-route-action-chip">Whiteboard</Link>
+        <div className="emergency-route-chip-row u-mt-10">
+          <Link to={CANONICAL_ROUTES.emergencyShift} className="emergency-route-action-chip">
+            Shift Summary
+          </Link>
+          <Link to={CANONICAL_ROUTES.emergencyReferrals} className="emergency-route-action-chip">
+            Referrals
+          </Link>
+          <Link to={CANONICAL_ROUTES.emergencyEms} className="emergency-route-action-chip">
+            EMS Pipeline
+          </Link>
+          <Link to={CANONICAL_ROUTES.emergencyWhiteboard} className="emergency-route-action-chip">
+            Whiteboard
+          </Link>
         </div>
       </SectionCard>
 
       <div role="note" className="fj-alert-box">
-        Handoff summaries are structured decision support. All handoffs require verbal confirmation and clinician sign-off. AI-generated handoff content must be reviewed and accepted by the receiving clinician.
+        Handoff summaries are structured decision support. All handoffs require verbal confirmation
+        and clinician sign-off. AI-generated handoff content must be reviewed and accepted by the
+        receiving clinician.
       </div>
     </>
   );
@@ -919,7 +1037,11 @@ function HandoffsView() {
 
 // ── Reports view ─────────────────────────────────────────────────────────────
 
-function ReportsView({ snapshot }: { snapshot: ReturnType<typeof buildFullEmergencyCareJourneySnapshot> }) {
+function ReportsView({
+  snapshot,
+}: {
+  snapshot: ReturnType<typeof buildFullEmergencyCareJourneySnapshot>;
+}) {
   const bottlenecks = snapshot.liveServiceSummaries.bottlenecks;
   const journeyMetrics = snapshot.liveServiceSummaries.journeyMetrics;
   const staffSummary = snapshot.liveServiceSummaries.staffRouting;
@@ -940,7 +1062,7 @@ function ReportsView({ snapshot }: { snapshot: ReturnType<typeof buildFullEmerge
         title="3-Minute Response Compliance"
         lead="Tracks critical response timer adherence from first emergency signal to clinical action."
       >
-        <div className="emergency-route-stack u-mt-10" >
+        <div className="emergency-route-stack u-mt-10">
           <article className="emergency-route-queue-row">
             <div className="u-flex-1">
               <strong className="u-fs-13">Active Journey Traces</strong>
@@ -948,7 +1070,9 @@ function ReportsView({ snapshot }: { snapshot: ReturnType<typeof buildFullEmerge
                 Patients with an active 3-minute response timer in progress.
               </div>
             </div>
-            <span className="emergency-route-journey-card__count">{journeyMetrics.activeJourneys}</span>
+            <span className="emergency-route-journey-card__count">
+              {journeyMetrics.activeJourneys}
+            </span>
           </article>
           <article className="emergency-route-queue-row">
             <div className="u-flex-1">
@@ -972,15 +1096,13 @@ function ReportsView({ snapshot }: { snapshot: ReturnType<typeof buildFullEmerge
           lead="Detected workflow, operational, or system bottlenecks requiring attention."
           badge={bottlenecks.analytics?.activeCount ?? 0}
         >
-          <div className="emergency-route-stack u-mt-10" >
+          <div className="emergency-route-stack u-mt-10">
             {bottlenecks.activeBottlenecks.slice(0, 8).map((finding) => (
               <article key={finding.id} className="emergency-route-queue-row">
                 <div className="u-flex-1">
                   <div className="u-fs-13">{finding.title}</div>
                   {finding.ownerRole && (
-                    <div className="fj-caption-11">
-                      Owner: {finding.ownerRole}
-                    </div>
+                    <div className="fj-caption-11">Owner: {finding.ownerRole}</div>
                   )}
                 </div>
                 <span
@@ -998,11 +1120,19 @@ function ReportsView({ snapshot }: { snapshot: ReturnType<typeof buildFullEmerge
         title="Analytics & Reporting Surfaces"
         lead="Navigate to full analytics, shift summaries, and AI governance reports."
       >
-        <div className="emergency-route-chip-row u-mt-10" >
-          <Link to={CANONICAL_ROUTES.emergencyAnalytics} className="emergency-route-action-chip">Analytics Dashboard</Link>
-          <Link to={CANONICAL_ROUTES.emergencyShift} className="emergency-route-action-chip">Shift Summary</Link>
-          <Link to={CANONICAL_ROUTES.emergencyAlerts} className="emergency-route-action-chip">Critical Alerts</Link>
-          <Link to={CANONICAL_ROUTES.emergencyCopilot} className="emergency-route-action-chip">AI Chief</Link>
+        <div className="emergency-route-chip-row u-mt-10">
+          <Link to={CANONICAL_ROUTES.emergencyAnalytics} className="emergency-route-action-chip">
+            Analytics Dashboard
+          </Link>
+          <Link to={CANONICAL_ROUTES.emergencyShift} className="emergency-route-action-chip">
+            Shift Summary
+          </Link>
+          <Link to={CANONICAL_ROUTES.emergencyAlerts} className="emergency-route-action-chip">
+            Critical Alerts
+          </Link>
+          <Link to={CANONICAL_ROUTES.emergencyCopilot} className="emergency-route-action-chip">
+            AI Chief
+          </Link>
         </div>
       </SectionCard>
     </>
@@ -1011,7 +1141,11 @@ function ReportsView({ snapshot }: { snapshot: ReturnType<typeof buildFullEmerge
 
 // ── Sticky critical action banner ─────────────────────────────────────────────
 
-function StickyActionBanner({ snapshot }: { snapshot: ReturnType<typeof buildFullEmergencyCareJourneySnapshot> }) {
+function StickyActionBanner({
+  snapshot,
+}: {
+  snapshot: ReturnType<typeof buildFullEmergencyCareJourneySnapshot>;
+}) {
   const dispatch = snapshot.liveServiceSummaries.dispatch;
   const readiness = snapshot.liveServiceSummaries.readiness;
   const metrics = snapshot.metrics;
@@ -1022,11 +1156,23 @@ function StickyActionBanner({ snapshot }: { snapshot: ReturnType<typeof buildFul
 
   const topIssue =
     criticalPending > 0
-      ? { label: `${criticalPending} Echo/Delta call${criticalPending > 1 ? 's' : ''} need dispatch`, route: CANONICAL_ROUTES.emergencyDispatch, action: 'Dispatch Now →' }
+      ? {
+          label: `${criticalPending} Echo/Delta call${criticalPending > 1 ? 's' : ''} need dispatch`,
+          route: CANONICAL_ROUTES.emergencyDispatch,
+          action: 'Dispatch Now →',
+        }
       : readinessOverdue > 0
-        ? { label: `${readinessOverdue} ED readiness plan${readinessOverdue > 1 ? 's' : ''} overdue`, route: CANONICAL_ROUTES.emergencyEdReadiness, action: 'Prepare Bay →' }
+        ? {
+            label: `${readinessOverdue} ED readiness plan${readinessOverdue > 1 ? 's' : ''} overdue`,
+            route: CANONICAL_ROUTES.emergencyEdReadiness,
+            action: 'Prepare Bay →',
+          }
         : unackedAlerts > 0
-          ? { label: `${unackedAlerts} critical alert${unackedAlerts > 1 ? 's' : ''} unacknowledged`, route: CANONICAL_ROUTES.emergencyAlerts, action: 'Acknowledge →' }
+          ? {
+              label: `${unackedAlerts} critical alert${unackedAlerts > 1 ? 's' : ''} unacknowledged`,
+              route: CANONICAL_ROUTES.emergencyAlerts,
+              action: 'Acknowledge →',
+            }
           : null;
 
   if (!topIssue) return null;
@@ -1054,10 +1200,15 @@ const VIEW_SURFACE_MAP: Partial<Record<ViewId, OperatingSurfaceId>> = {
   reports: 'reports',
 };
 
-export default function FullJourneyOperatingPage({ view = 'journey' }: FullJourneyOperatingPageProps) {
+export default function FullJourneyOperatingPage({
+  view = 'journey',
+}: FullJourneyOperatingPageProps) {
   const surfaceId = VIEW_SURFACE_MAP[view];
-  const { loading: apiLoading, error: apiError, envelope: apiEnvelope } =
-    useEmergencyOperatingSurface(surfaceId);
+  const {
+    loading: apiLoading,
+    error: apiError,
+    envelope: apiEnvelope,
+  } = useEmergencyOperatingSurface(surfaceId);
   const patients = useEmergencyStore((state) => state.patients);
   const staff = useEmergencyStore((state) => state.staff);
   const emsArrivals = useEmergencyStore((state) => state.emsArrivals);
@@ -1096,7 +1247,9 @@ export default function FullJourneyOperatingPage({ view = 'journey' }: FullJourn
     ? {
         ...snapshot.metrics,
         inboundEms:
-          typeof apiMetrics.inboundEms === 'number' ? apiMetrics.inboundEms : snapshot.metrics.inboundEms,
+          typeof apiMetrics.inboundEms === 'number'
+            ? apiMetrics.inboundEms
+            : snapshot.metrics.inboundEms,
         criticalAlerts:
           typeof apiMetrics.criticalAlerts === 'number'
             ? apiMetrics.criticalAlerts
@@ -1131,7 +1284,11 @@ export default function FullJourneyOperatingPage({ view = 'journey' }: FullJourn
           { label: 'Inbound EMS', value: metrics.inboundEms, color: '#F59E0B' },
           { label: 'Critical alerts', value: metrics.criticalAlerts, color: '#DC2626' },
           { label: 'Capacity', value: metrics.capacityBand },
-          { label: '3-min breaches', value: metrics.threeMinuteBreaches, color: metrics.threeMinuteBreaches ? '#DC2626' : '#10B981' },
+          {
+            label: '3-min breaches',
+            value: metrics.threeMinuteBreaches,
+            color: metrics.threeMinuteBreaches ? '#DC2626' : '#10B981',
+          },
         ]}
       />
 
@@ -1163,11 +1320,24 @@ export default function FullJourneyOperatingPage({ view = 'journey' }: FullJourn
         lead="AI Chief, Alerts, Analytics, and Help carry the same journey map for decision support and fallback procedures."
       >
         <div className="emergency-route-chip-row">
-          <Link to={CANONICAL_ROUTES.emergencyCopilot} className="emergency-route-action-chip">AI Chief</Link>
-          <Link to={CANONICAL_ROUTES.emergencyAlerts} className="emergency-route-action-chip">Critical Alerts</Link>
-          <Link to={CANONICAL_ROUTES.emergencyAnalytics} className="emergency-route-action-chip">Analytics</Link>
-          <Link to={CANONICAL_ROUTES.emergencyCommandCenter} className="emergency-route-action-chip">Command Center</Link>
-          <Link to={CANONICAL_ROUTES.emergencyHelp} className="emergency-route-action-chip">Help Manual</Link>
+          <Link to={CANONICAL_ROUTES.emergencyCopilot} className="emergency-route-action-chip">
+            AI Chief
+          </Link>
+          <Link to={CANONICAL_ROUTES.emergencyAlerts} className="emergency-route-action-chip">
+            Critical Alerts
+          </Link>
+          <Link to={CANONICAL_ROUTES.emergencyAnalytics} className="emergency-route-action-chip">
+            Analytics
+          </Link>
+          <Link
+            to={CANONICAL_ROUTES.emergencyCommandCenter}
+            className="emergency-route-action-chip"
+          >
+            Command Center
+          </Link>
+          <Link to={CANONICAL_ROUTES.emergencyHelp} className="emergency-route-action-chip">
+            Help Manual
+          </Link>
         </div>
       </SectionCard>
     </EmergencyRoutePage>

@@ -85,8 +85,7 @@ export function calculateMorseFallScore(inputs) {
 export function interpretMorseFallScore(score) {
   if (!Number.isFinite(score) || score < 0 || score > 125) return null;
 
-  const referenceLine =
-    'Morse JM, et al. Predicting patient falls. Am J Nurs. 1989;89(3):334–337.';
+  const referenceLine = 'Morse JM, et al. Predicting patient falls. Am J Nurs. 1989;89(3):334–337.';
 
   const disclaimer = MORSE_FALL_HOSPITAL_DISCLAIMER;
 

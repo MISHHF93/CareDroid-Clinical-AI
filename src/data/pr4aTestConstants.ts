@@ -10,12 +10,12 @@ export const PR4A_TOOL_IDS = Object.freeze([...PR4A_CALCULATOR_REGISTRY_IDS]);
 
 /** Dedicated Tier-A route per registry id */
 export const PR4A_ROUTE_BY_REGISTRY_ID = Object.freeze(
-  Object.fromEntries(PR4A_TOOL_IDS.map((id) => [id, `${PR4A_HUB_PATH}/${id}`]))
+  Object.fromEntries(PR4A_TOOL_IDS.map((id) => [id, `${PR4A_HUB_PATH}/${id}`])),
 );
 
 /** ?calc= deep-link query per registry id */
 export const PR4A_CALC_QUERY_BY_REGISTRY_ID = Object.freeze(
-  Object.fromEntries(PR4A_TOOL_IDS.map((id) => [id, `${PR4A_HUB_PATH}?calc=${id}`]))
+  Object.fromEntries(PR4A_TOOL_IDS.map((id) => [id, `${PR4A_HUB_PATH}?calc=${id}`])),
 );
 
 export const PR4A_EMPTY_LAUNCH = Object.freeze({

@@ -4,7 +4,11 @@ import {
   qsofaCriteriaFromInputs,
   validateQsofaInputs,
 } from '../utils/qsofaCalculator';
-import { asCalculatorSeverity, type AnyCalculatorResult, type CalculatorValidationResult } from './types';
+import {
+  asCalculatorSeverity,
+  type AnyCalculatorResult,
+  type CalculatorValidationResult,
+} from './types';
 
 export const QSOFA_META = {
   id: 'qsofa' as const,

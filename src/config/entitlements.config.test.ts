@@ -20,7 +20,10 @@ describe('entitlements.config', () => {
       'admin-only',
     ]);
     for (const category of Object.values(ENTITLEMENT_CATEGORIES)) {
-      expect(ENTITLEMENT_REGISTRY.some((rule) => rule.category === category), category).toBe(true);
+      expect(
+        ENTITLEMENT_REGISTRY.some((rule) => rule.category === category),
+        category,
+      ).toBe(true);
     }
   });
 

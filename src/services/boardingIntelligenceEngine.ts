@@ -79,7 +79,10 @@ function normalizeBoarder(boarder: any = {}) {
 function normalizeBoardingState(state = DEFAULT_BOARDING_STATE) {
   return Object.freeze({
     pendingBeds: Number(state.pendingBeds || 0),
-    bedPressure: BED_PRESSURE_WEIGHT[state.bedPressure] !== undefined ? state.bedPressure : BED_PRESSURE_LEVELS.MODERATE,
+    bedPressure:
+      BED_PRESSURE_WEIGHT[state.bedPressure] !== undefined
+        ? state.bedPressure
+        : BED_PRESSURE_LEVELS.MODERATE,
     boarders: Object.freeze((state.boarders || []).map(normalizeBoarder)),
   });
 }
@@ -92,14 +95,17 @@ export function getLongestBoarders(state = DEFAULT_BOARDING_STATE, limit = 3) {
   return Object.freeze(
     [...normalizeBoardingState(state).boarders]
       .sort((a, b) => b.boardingMinutes - a.boardingMinutes)
-      .slice(0, limit)
+      .slice(0, limit),
   );
 }
 
 export function getBoardingMetrics(state = DEFAULT_BOARDING_STATE) {
   const normalized = normalizeBoardingState(state);
   const boardingCount = normalized.boarders.length;
-  const totalBoardingMinutes = normalized.boarders.reduce((sum, boarder) => sum + boarder.boardingMinutes, 0);
+  const totalBoardingMinutes = normalized.boarders.reduce(
+    (sum, boarder) => sum + boarder.boardingMinutes,
+    0,
+  );
   const boardingTime = boardingCount ? Math.round(totalBoardingMinutes / boardingCount) : 0;
   const longestBoardingMinutes = boardingCount
     ? Math.max(...normalized.boarders.map((boarder) => boarder.boardingMinutes))
@@ -121,7 +127,7 @@ export function getBoardingRiskScore(state = DEFAULT_BOARDING_STATE) {
       metrics.boardingTime * 0.08 +
       metrics.longestBoardingMinutes * 0.08 +
       metrics.pendingBeds * 3 +
-      (BED_PRESSURE_WEIGHT[metrics.bedPressure] || 0)
+      (BED_PRESSURE_WEIGHT[metrics.bedPressure] || 0),
   );
 }
 
@@ -138,7 +144,7 @@ export function getBoardingRecommendations(state = DEFAULT_BOARDING_STATE) {
         priority: metrics.bedPressure,
         rationale: `${metrics.boardingCount} admitted patients are waiting for beds.`,
         action: 'Coordinate charge nurse, bed management, and inpatient service review.',
-      })
+      }),
     );
   }
 
@@ -150,7 +156,7 @@ export function getBoardingRecommendations(state = DEFAULT_BOARDING_STATE) {
         priority: 'Critical',
         rationale: `${longestBoarders[0]?.patientLabel || 'A patient'} has boarded for ${metrics.longestBoardingMinutes} minutes.`,
         action: 'Prioritize bed assignment blockers for the longest waiting admitted patients.',
-      })
+      }),
     );
   }
 
@@ -161,8 +167,9 @@ export function getBoardingRecommendations(state = DEFAULT_BOARDING_STATE) {
         title: 'Resolve pending beds',
         priority: metrics.bedPressure,
         rationale: `${metrics.pendingBeds} inpatient beds are pending assignment.`,
-        action: 'Review bed type demand, inpatient unit readiness, and discharge-dependent bed availability.',
-      })
+        action:
+          'Review bed type demand, inpatient unit readiness, and discharge-dependent bed availability.',
+      }),
     );
   }
 
@@ -174,7 +181,7 @@ export function getBoardingRecommendations(state = DEFAULT_BOARDING_STATE) {
         priority: metrics.bedPressure,
         rationale: 'Boarding pressure is currently controlled.',
         action: 'Continue monitoring admitted patients waiting for beds.',
-      })
+      }),
     );
   }
 
@@ -188,7 +195,9 @@ export function getBoardingDashboard(state = DEFAULT_BOARDING_STATE) {
   return Object.freeze({
     score: getBoardingRiskScore(normalized as any),
     metrics,
-    boarders: Object.freeze([...normalized.boarders].sort((a, b) => b.boardingMinutes - a.boardingMinutes)),
+    boarders: Object.freeze(
+      [...normalized.boarders].sort((a, b) => b.boardingMinutes - a.boardingMinutes),
+    ),
     longestBoarders: getLongestBoarders(normalized as any),
     recommendations: getBoardingRecommendations(normalized as any),
     safetyStatement:

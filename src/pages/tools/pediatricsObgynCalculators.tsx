@@ -17,11 +17,14 @@ function DecisionSupportNotice({ children, dosingPlaceholder = false }) {
   return (
     <div className="calc-timi-disclaimer calc-has-bled-disclaimer" role="note">
       <p className="calc-ds-lead">
-        <strong>Pediatric/OB decision support only.</strong> Use clinician review and local protocols.
+        <strong>Pediatric/OB decision support only.</strong> Use clinician review and local
+        protocols.
       </p>
       <p className="calc-disclaimer-detail">{children}</p>
       <p className="calc-disclaimer-detail">
-        {dosingPlaceholder ? PEDIATRIC_DOSING_PLACEHOLDER_DISCLAIMER : PEDIATRICS_OBGYN_SAFETY_DISCLAIMER}
+        {dosingPlaceholder
+          ? PEDIATRIC_DOSING_PLACEHOLDER_DISCLAIMER
+          : PEDIATRICS_OBGYN_SAFETY_DISCLAIMER}
       </p>
     </div>
   );
@@ -311,7 +314,9 @@ function estimateWeightFromAge(ageValue, unit) {
 function PediatricEmergencyDrugCalculator({ onResultChange, patientContext = null as any }) {
   const patientAge = (patientContext as any)?.age;
   const [weightKg, setWeightKg] = useState('');
-  const [age, setAge] = useState(patientAge !== null && patientAge !== undefined ? String(patientAge) : '');
+  const [age, setAge] = useState(
+    patientAge !== null && patientAge !== undefined ? String(patientAge) : '',
+  );
   const [ageUnit, setAgeUnit] = useState('years');
   const [result, setResult] = useState<any>(null);
   const [errors, setErrors] = useState<any[]>([]);
@@ -343,7 +348,10 @@ function PediatricEmergencyDrugCalculator({ onResultChange, patientContext = nul
       return;
     }
 
-    const source = Number.isFinite(enteredWeight) && enteredWeight > 0 ? 'entered weight' : 'age-estimated weight';
+    const source =
+      Number.isFinite(enteredWeight) && enteredWeight > 0
+        ? 'entered weight'
+        : 'age-estimated weight';
     const rows = PEDIATRIC_EMERGENCY_DRUGS.map((drug) => ({
       ...drug,
       calculatedDose: drug.calc(effectiveWeight),
@@ -380,8 +388,9 @@ function PediatricEmergencyDrugCalculator({ onResultChange, patientContext = nul
           <span id="pediatric-dose-safety-checker-form-title">Pediatric Dose Safety Checker</span>
         </CalcPanelTitle>
         <DecisionSupportNotice>
-          Weight-based ED reference for common pediatric emergency drugs. Prefer measured weight. If unavailable,
-          age-estimated weight is a fallback and must be checked against local Broselow/length-based systems.
+          Weight-based ED reference for common pediatric emergency drugs. Prefer measured weight. If
+          unavailable, age-estimated weight is a fallback and must be checked against local
+          Broselow/length-based systems.
         </DecisionSupportNotice>
         <form
           className="calc-pr1-form"
@@ -410,7 +419,9 @@ function PediatricEmergencyDrugCalculator({ onResultChange, patientContext = nul
                 inputMode="decimal"
                 placeholder="Preferred"
               />
-              <span className="calc-input-help">Use measured/resuscitation weight whenever available.</span>
+              <span className="calc-input-help">
+                Use measured/resuscitation weight whenever available.
+              </span>
             </div>
             <div className="calc-input-group">
               <label className="calc-input-label" htmlFor="peds-drug-age">
@@ -473,7 +484,11 @@ function PediatricEmergencyDrugCalculator({ onResultChange, patientContext = nul
               <h3 className="calc-interpretation-title">Independent Verification Required</h3>
               <p>{result.recommendation}</p>
             </section>
-            <div className="pediatric-drug-reference-table" role="table" aria-label="Pediatric emergency drug reference">
+            <div
+              className="pediatric-drug-reference-table"
+              role="table"
+              aria-label="Pediatric emergency drug reference"
+            >
               <div role="row" className="pediatric-drug-reference-table__header">
                 <span role="columnheader">Drug</span>
                 <span role="columnheader">Reference dose</span>
@@ -483,28 +498,29 @@ function PediatricEmergencyDrugCalculator({ onResultChange, patientContext = nul
               {result.rows.map((row) => {
                 const crossCheckWarning = pediatricDoseCheckerCrossCheckWarning(row.name);
                 return (
-                <div
-                  key={row.name}
-                  role="row"
-                  className={`pediatric-drug-reference-table__row pediatric-drug-reference-table__row--${row.risk}`}
-                >
-                  <span role="cell">
-                    <strong>{row.name}</strong>
-                    <small>{row.indication}</small>
-                    {crossCheckWarning ? (
-                      <div
-                        className="pediatric-drug-reference-table__cross-check-warning"
-                        role="alert"
-                        title={`Pediatric Drug Calculator (patient-chart modal) lists ${crossCheckWarning.calcName} at ${crossCheckWarning.calcDose} instead. ${crossCheckWarning.note} Verify against institutional protocol before administering.`}
-                      >
-                        ⚠ Conflicts with other in-app reference ({crossCheckWarning.calcDose}) — verify before administering
-                      </div>
-                    ) : null}
-                  </span>
-                  <span role="cell">{row.doseText}</span>
-                  <span role="cell">{row.calculatedDose}</span>
-                  <span role="cell">{row.risk}</span>
-                </div>
+                  <div
+                    key={row.name}
+                    role="row"
+                    className={`pediatric-drug-reference-table__row pediatric-drug-reference-table__row--${row.risk}`}
+                  >
+                    <span role="cell">
+                      <strong>{row.name}</strong>
+                      <small>{row.indication}</small>
+                      {crossCheckWarning ? (
+                        <div
+                          className="pediatric-drug-reference-table__cross-check-warning"
+                          role="alert"
+                          title={`Pediatric Drug Calculator (patient-chart modal) lists ${crossCheckWarning.calcName} at ${crossCheckWarning.calcDose} instead. ${crossCheckWarning.note} Verify against institutional protocol before administering.`}
+                        >
+                          ⚠ Conflicts with other in-app reference ({crossCheckWarning.calcDose}) —
+                          verify before administering
+                        </div>
+                      ) : null}
+                    </span>
+                    <span role="cell">{row.doseText}</span>
+                    <span role="cell">{row.calculatedDose}</span>
+                    <span role="cell">{row.risk}</span>
+                  </div>
                 );
               })}
             </div>
@@ -514,7 +530,9 @@ function PediatricEmergencyDrugCalculator({ onResultChange, patientContext = nul
             <div className="calc-results-empty-icon" aria-hidden>
               <NavIcon icon={getCalculatorSubIcon('pediatric-dose-safety-checker')} size={56} />
             </div>
-            <p>Enter weight or age to generate pediatric emergency drug and fluid bolus references.</p>
+            <p>
+              Enter weight or age to generate pediatric emergency drug and fluid bolus references.
+            </p>
           </div>
         )}
       </div>
@@ -526,7 +544,8 @@ const configBySlug = {
   'gestational-age-calculator': {
     slug: 'gestational-age-calculator',
     title: 'Gestational Age Calculator',
-    notice: 'Calculates gestational age from LMP, conception, or ultrasound dating. Confirm dating hierarchy with obstetric policy.',
+    notice:
+      'Calculates gestational age from LMP, conception, or ultrasound dating. Confirm dating hierarchy with obstetric policy.',
     initial: {
       method: 'lmp',
       lmpDate: '',
@@ -552,7 +571,8 @@ const configBySlug = {
   'pregnancy-due-date-calculator': {
     slug: 'pregnancy-due-date-calculator',
     title: 'Pregnancy Due Date Calculator',
-    notice: 'Estimates due date for documentation. Confirm against ACOG dating criteria and local workflow.',
+    notice:
+      'Estimates due date for documentation. Confirm against ACOG dating criteria and local workflow.',
     initial: {
       method: 'lmp',
       lmpDate: '',
@@ -576,7 +596,8 @@ const configBySlug = {
   'pediatric-bp-percentile': {
     slug: 'pediatric-bp-percentile',
     title: 'Pediatric BP Percentile',
-    notice: 'Screening-band support only. Confirm with correct cuff, repeat manual readings, and AAP source tables.',
+    notice:
+      'Screening-band support only. Confirm with correct cuff, repeat manual readings, and AAP source tables.',
     initial: { ageYears: '', sex: '', systolic: '', diastolic: '' },
     fields: [
       { name: 'ageYears', label: 'Age (years)', min: 1, max: 17, step: '1' },
@@ -599,7 +620,8 @@ const configBySlug = {
   'fenton-growth-chart-helper': {
     slug: 'fenton-growth-chart-helper',
     title: 'Fenton Growth Chart Helper',
-    notice: 'Classifies already-derived Fenton percentiles. Use official charts and neonatal review for decisions.',
+    notice:
+      'Classifies already-derived Fenton percentiles. Use official charts and neonatal review for decisions.',
     initial: {
       gestationalAgeWeeks: '',
       weightPercentile: '',
@@ -607,7 +629,12 @@ const configBySlug = {
       headCircumferencePercentile: '',
     },
     fields: [
-      { name: 'gestationalAgeWeeks', label: 'Gestational/postmenstrual age (weeks)', min: 22, max: 50 },
+      {
+        name: 'gestationalAgeWeeks',
+        label: 'Gestational/postmenstrual age (weeks)',
+        min: 22,
+        max: 50,
+      },
       { name: 'weightPercentile', label: 'Weight percentile from source chart', min: 0, max: 100 },
       { name: 'lengthPercentile', label: 'Length percentile from source chart', min: 0, max: 100 },
       {
@@ -624,7 +651,8 @@ const configBySlug = {
   'neonatal-bilirubin-risk-helper': {
     slug: 'neonatal-bilirubin-risk-helper',
     title: 'Neonatal Bilirubin Risk Helper',
-    notice: 'Prompts AAP 2022 nomogram review. Does not recommend phototherapy, exchange transfusion, or disposition.',
+    notice:
+      'Prompts AAP 2022 nomogram review. Does not recommend phototherapy, exchange transfusion, or disposition.',
     initial: { ageHours: '', bilirubin: '', gestationalAgeWeeks: '', neurotoxicityRiskFactors: '' },
     fields: [
       { name: 'ageHours', label: 'Age at bilirubin measurement (hours)', min: 0, max: 336 },
@@ -648,7 +676,12 @@ const configBySlug = {
     dosingPlaceholder: false,
     initial: { medicationName: '', weightKg: '', governedProtocol: '' },
     fields: [
-      { name: 'medicationName', label: 'Medication or class', type: 'text', placeholder: 'e.g. antibiotic, analgesic' },
+      {
+        name: 'medicationName',
+        label: 'Medication or class',
+        type: 'text',
+        placeholder: 'e.g. antibiotic, analgesic',
+      },
       { name: 'weightKg', label: 'Weight (kg)', min: 0, max: 250 },
       {
         name: 'governedProtocol',
@@ -657,32 +690,66 @@ const configBySlug = {
         options: yesNoOptions,
       },
     ],
-    compute: () => ({ ok: false, errors: ['Use the pediatric emergency drug calculator interface.'] }),
-    emptyText: 'Enter medication context and weight to view safety-check prompts. No dose will be calculated.',
+    compute: () => ({
+      ok: false,
+      errors: ['Use the pediatric emergency drug calculator interface.'],
+    }),
+    emptyText:
+      'Enter medication context and weight to view safety-check prompts. No dose will be calculated.',
     primaryLabel: 'Dose safety status',
   },
 };
 
 export function GestationalAgeCalculator({ onResultChange }) {
-  return <PediatricsObgynCalculator config={configBySlug['gestational-age-calculator']} onResultChange={onResultChange} />;
+  return (
+    <PediatricsObgynCalculator
+      config={configBySlug['gestational-age-calculator']}
+      onResultChange={onResultChange}
+    />
+  );
 }
 
 export function PregnancyDueDateCalculator({ onResultChange }) {
-  return <PediatricsObgynCalculator config={configBySlug['pregnancy-due-date-calculator']} onResultChange={onResultChange} />;
+  return (
+    <PediatricsObgynCalculator
+      config={configBySlug['pregnancy-due-date-calculator']}
+      onResultChange={onResultChange}
+    />
+  );
 }
 
 export function PediatricBpPercentileCalculator({ onResultChange }) {
-  return <PediatricsObgynCalculator config={configBySlug['pediatric-bp-percentile']} onResultChange={onResultChange} />;
+  return (
+    <PediatricsObgynCalculator
+      config={configBySlug['pediatric-bp-percentile']}
+      onResultChange={onResultChange}
+    />
+  );
 }
 
 export function FentonGrowthChartHelper({ onResultChange }) {
-  return <PediatricsObgynCalculator config={configBySlug['fenton-growth-chart-helper']} onResultChange={onResultChange} />;
+  return (
+    <PediatricsObgynCalculator
+      config={configBySlug['fenton-growth-chart-helper']}
+      onResultChange={onResultChange}
+    />
+  );
 }
 
 export function NeonatalBilirubinRiskHelper({ onResultChange }) {
-  return <PediatricsObgynCalculator config={configBySlug['neonatal-bilirubin-risk-helper']} onResultChange={onResultChange} />;
+  return (
+    <PediatricsObgynCalculator
+      config={configBySlug['neonatal-bilirubin-risk-helper']}
+      onResultChange={onResultChange}
+    />
+  );
 }
 
 export function PediatricDoseSafetyChecker({ onResultChange, patientContext = null }) {
-  return <PediatricEmergencyDrugCalculator onResultChange={onResultChange} patientContext={patientContext} />;
+  return (
+    <PediatricEmergencyDrugCalculator
+      onResultChange={onResultChange}
+      patientContext={patientContext}
+    />
+  );
 }

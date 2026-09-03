@@ -6,8 +6,12 @@ import { normalizedCodeIsCoherent, type NormalizedCode } from './patientDocument
 describe('NormalizedCode coherence', () => {
   it('treats a coded entry without a code as incoherent', () => {
     expect(normalizedCodeIsCoherent({ system: 'RXNORM', status: 'coded' })).toBe(false);
-    expect(normalizedCodeIsCoherent({ system: 'RXNORM', status: 'coded', code: '   ' })).toBe(false);
-    expect(normalizedCodeIsCoherent({ system: 'RXNORM', status: 'coded', code: '2047766' })).toBe(true);
+    expect(normalizedCodeIsCoherent({ system: 'RXNORM', status: 'coded', code: '   ' })).toBe(
+      false,
+    );
+    expect(normalizedCodeIsCoherent({ system: 'RXNORM', status: 'coded', code: '2047766' })).toBe(
+      true,
+    );
   });
 
   it('allows an unbound entry to carry a display with no code', () => {

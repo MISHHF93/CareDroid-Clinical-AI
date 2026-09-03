@@ -64,10 +64,7 @@ export type ArrivalControlSummary = {
 export type ArrivalControlStore = {
   patients: Patient[];
   updatePatient: (patientId: string, patch: Partial<Patient>) => void;
-  dispatchWebSocketEvent?: (event: {
-    type: string;
-    payload: Record<string, unknown>;
-  }) => void;
+  dispatchWebSocketEvent?: (event: { type: string; payload: Record<string, unknown> }) => void;
   recordWorkflowAction?: (input: {
     type: string;
     summary: string;
@@ -145,14 +142,16 @@ export function buildArrivalControlFields(
     ]),
   );
   const state = options.state || PatientState.Registration;
-  const registrationStatus: RegistrationStatus =
-    hasFlag({ flags } as Patient, PatientFlag.IdentityPending)
-      ? 'provisional'
-      : state === PatientState.Arrival
-        ? 'pending'
-        : state === PatientState.Registration
-          ? 'in-progress'
-          : 'complete';
+  const registrationStatus: RegistrationStatus = hasFlag(
+    { flags } as Patient,
+    PatientFlag.IdentityPending,
+  )
+    ? 'provisional'
+    : state === PatientState.Arrival
+      ? 'pending'
+      : state === PatientState.Registration
+        ? 'in-progress'
+        : 'complete';
 
   const queueDestination =
     options.queueDestination ||
@@ -184,7 +183,8 @@ export function stampArrivalControlLayer(
 
   const controlFields = buildArrivalControlFields({
     arrivalMode: patch.arrivalMode ?? patient.arrivalMode,
-    presentingComplaint: patch.presentingComplaint ?? patch.chiefComplaint ?? patient.chiefComplaint,
+    presentingComplaint:
+      patch.presentingComplaint ?? patch.chiefComplaint ?? patient.chiefComplaint,
     quickSafetyFlags: patch.quickSafetyFlags,
     state: patch.state ?? patient.state,
     flags: patch.flags ?? patient.flags,
@@ -436,9 +436,7 @@ export function buildArrivalControlSummary(
   };
 }
 
-export function queueDestinationToWhiteboardFilter(
-  destination: QueueDestination,
-): string | null {
+export function queueDestinationToWhiteboardFilter(destination: QueueDestination): string | null {
   if (destination === 'triage-queue' || destination === 'rapid-review') {
     return WHITEBOARD_QUEUE_FILTER.triage;
   }

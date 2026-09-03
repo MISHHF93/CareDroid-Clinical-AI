@@ -16,7 +16,11 @@ describe('surfaceViewsApi', () => {
   it('POSTs to the encoded surface key and returns the previous viewedAt', async () => {
     vi.mocked(apiFetchJson).mockResolvedValue({
       response: { ok: true } as Response,
-      data: { surfaceKey: 'care-operations-inbox', previousViewedAt: '2026-08-20T00:00:00.000Z', viewedAt: '2026-08-20T00:05:00.000Z' },
+      data: {
+        surfaceKey: 'care-operations-inbox',
+        previousViewedAt: '2026-08-20T00:00:00.000Z',
+        viewedAt: '2026-08-20T00:05:00.000Z',
+      },
     });
 
     const result = await touchSurfaceView('care-operations-inbox');
@@ -31,7 +35,11 @@ describe('surfaceViewsApi', () => {
   it('returns null previousViewedAt (not undefined/throw) the first time a surface is touched', async () => {
     vi.mocked(apiFetchJson).mockResolvedValue({
       response: { ok: true } as Response,
-      data: { surfaceKey: 'shift-summary', previousViewedAt: null, viewedAt: '2026-08-20T00:05:00.000Z' },
+      data: {
+        surfaceKey: 'shift-summary',
+        previousViewedAt: null,
+        viewedAt: '2026-08-20T00:05:00.000Z',
+      },
     });
 
     const result = await touchSurfaceView('shift-summary');

@@ -47,7 +47,10 @@ describe('backend unified AI node entry audit', () => {
 
   it('flags administrative automation lib for future AiService node migration', () => {
     const source = readFileSync(
-      path.join(ROOT, 'backend/src/modules/emergency-os/administrative-automation-orchestration.lib.ts'),
+      path.join(
+        ROOT,
+        'backend/src/modules/emergency-os/administrative-automation-orchestration.lib.ts',
+      ),
       'utf8',
     );
     expect(source).toContain("nodeId: 'CareDroidUnifiedAINode'");

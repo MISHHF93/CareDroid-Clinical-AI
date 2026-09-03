@@ -9,10 +9,7 @@ import {
   type CompiledUserProfile,
   type CompileUserProfileInput,
 } from '../config/userProfileCompiler';
-import {
-  canAccessEmergencyRoute,
-  EMERGENCY_ROLE_IDS,
-} from '../config/emergencyRolePermissions';
+import { canAccessEmergencyRoute, EMERGENCY_ROLE_IDS } from '../config/emergencyRolePermissions';
 import { resolveCatalogLaunch } from '../data/clinicalCatalogWiring';
 import {
   getUserFacingToolRegistryProjection,
@@ -207,8 +204,7 @@ export function remapRegistryNavigationForRole(
 ): { pathname: string; search: string } {
   const search = plan.search || '';
   const params = new URLSearchParams(search.startsWith('?') ? search.slice(1) : search);
-  const toolId =
-    context.toolId || params.get('open') || params.get('calc') || params.get('q');
+  const toolId = context.toolId || params.get('open') || params.get('calc') || params.get('q');
   const canAccessCopilot = context.emergencyRoleId
     ? canAccessEmergencyRoute(context.emergencyRoleId, CANONICAL_ROUTES.emergencyCopilot)
     : true;
@@ -253,7 +249,10 @@ export function remapRegistryNavigationForRole(
   const remapped = resolveClinicalToolLaunchTarget({
     emergencyRoleId: context.emergencyRoleId,
     canAccessToolsRoute: context.canAccessToolsRoute,
-    kind: params.get('filter') === 'calculator' || isCalculatorArtifact(toolId) ? 'calculator' : 'tools-hub',
+    kind:
+      params.get('filter') === 'calculator' || isCalculatorArtifact(toolId)
+        ? 'calculator'
+        : 'tools-hub',
     toolId,
     calculatorId: toolId,
     patientId: params.get('patientId'),
@@ -284,9 +283,7 @@ export function listReceptionDeskCalculatorTools(
   ) as ToolInventoryRecord[];
 }
 
-export function listReceptionDeskCalculatorIds(
-  compiled: CompiledUserProfile,
-): string[] {
+export function listReceptionDeskCalculatorIds(compiled: CompiledUserProfile): string[] {
   const ids = new Set<string>();
   for (const tool of listReceptionDeskCalculatorTools(compiled)) {
     const slug = resolveCalculatorSlug(tool.id);
@@ -297,10 +294,12 @@ export function listReceptionDeskCalculatorIds(
   return [...ids];
 }
 
-export function resolveReceptionDeskCalculatorIds(input: {
-  saasRole?: string | null;
-  emergencyRoleId?: string | null;
-} = {}): string[] {
+export function resolveReceptionDeskCalculatorIds(
+  input: {
+    saasRole?: string | null;
+    emergencyRoleId?: string | null;
+  } = {},
+): string[] {
   const profile = getUnifiedClinicalToolsProfile({
     saasRole: input.saasRole || 'student',
     entitlementContext: input.emergencyRoleId

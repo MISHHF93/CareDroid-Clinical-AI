@@ -61,11 +61,7 @@ describe('CopilotRiskLayerPanel', () => {
     });
 
     render(
-      <CopilotRiskLayerPanel
-        activeLayerId="clinical_decision_support"
-        patient={patient}
-        compact
-      />,
+      <CopilotRiskLayerPanel activeLayerId="clinical_decision_support" patient={patient} compact />,
     );
 
     // 'live' sourceState from a heuristic panel/specialist engine must read
@@ -76,7 +72,9 @@ describe('CopilotRiskLayerPanel', () => {
   });
 
   it('renders no truth label when no patient is selected (nothing AI-derived to label)', () => {
-    render(<CopilotRiskLayerPanel activeLayerId="clinical_decision_support" patient={null} compact />);
+    render(
+      <CopilotRiskLayerPanel activeLayerId="clinical_decision_support" patient={null} compact />,
+    );
     expect(screen.queryByTestId('ai-truth-label-chip')).not.toBeInTheDocument();
   });
 });

@@ -26,7 +26,10 @@ function parseNumber(value) {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
-export function normalizeSmartIntakeVitals(vitals = {} as any, recordedAt = new Date().toISOString()) {
+export function normalizeSmartIntakeVitals(
+  vitals = {} as any,
+  recordedAt = new Date().toISOString(),
+) {
   return {
     hr: parseNumber(vitals.hr),
     bpSystolic: parseNumber(vitals.bpSystolic ?? vitals.sbp),
@@ -57,24 +60,29 @@ function createFlag(type, reason, severity, detectedAt) {
   return { type, reason, severity, detectedAt };
 }
 
-export function buildSmartIntakeVerticalSlicePatient({
-  patientId,
-  mrn,
-  identity = {} as any,
-  age = 0,
-  complaintCategory = 'Other',
-  complaintText = 'Smart Intake identity review',
-  vitals = {} as any,
-  selectedPriority = Priority.P3,
-  autoSuggestion = {} as any,
-  triageSuggestion = {} as any,
-  sessionId = null,
-  timestamp = new Date().toISOString(),
-  source = 'Smart Intake',
-} = {} as any) {
+export function buildSmartIntakeVerticalSlicePatient(
+  {
+    patientId,
+    mrn,
+    identity = {} as any,
+    age = 0,
+    complaintCategory = 'Other',
+    complaintText = 'Smart Intake identity review',
+    vitals = {} as any,
+    selectedPriority = Priority.P3,
+    autoSuggestion = {} as any,
+    triageSuggestion = {} as any,
+    sessionId = null,
+    timestamp = new Date().toISOString(),
+    source = 'Smart Intake',
+  } = {} as any,
+) {
   const id = patientId || `smart-intake-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
   const normalizedVitals = normalizeSmartIntakeVitals(vitals, timestamp);
-  const reassessmentNeeded = shouldTriggerSmartIntakeReassessment(selectedPriority, normalizedVitals);
+  const reassessmentNeeded = shouldTriggerSmartIntakeReassessment(
+    selectedPriority,
+    normalizedVitals,
+  );
   const flags = [] as any[];
 
   if (selectedPriority === Priority.P1 || selectedPriority === Priority.P2) {
@@ -83,8 +91,8 @@ export function buildSmartIntakeVerticalSlicePatient({
         'HighRisk',
         `${source} assigned ${selectedPriority} priority.`,
         'Critical',
-        timestamp
-      )
+        timestamp,
+      ),
     );
   }
 
@@ -93,9 +101,11 @@ export function buildSmartIntakeVerticalSlicePatient({
       createFlag(
         'ReassessmentDue',
         `${source} requires reassessment after triage.`,
-        selectedPriority === Priority.P1 || selectedPriority === Priority.P2 ? 'Critical' : 'Warning',
-        timestamp
-      )
+        selectedPriority === Priority.P1 || selectedPriority === Priority.P2
+          ? 'Critical'
+          : 'Warning',
+        timestamp,
+      ),
     );
   }
 
@@ -107,66 +117,66 @@ export function buildSmartIntakeVerticalSlicePatient({
 
   const resolvedComplaint = complaintText.trim() || complaintCategory;
   const timeline = [
-      {
-        id: `evt-${id}-arrival`,
+    {
+      id: `evt-${id}-arrival`,
+      patientId: id,
+      type: 'Arrival',
+      timestamp,
+      summary: `${source} created patient and moved them to ARRIVAL.`,
+      metadata: { sessionId, source: 'smart-intake' },
+    },
+    {
+      id: `evt-${id}-encounter`,
+      patientId: id,
+      type: 'EncounterCreated',
+      timestamp,
+      summary: `Encounter ${encounterId} created from Smart Intake.`,
+      metadata: {
         patientId: id,
-        type: 'Arrival',
-        timestamp,
-        summary: `${source} created patient and moved them to ARRIVAL.`,
-        metadata: { sessionId, source: 'smart-intake' },
+        encounterId,
+        sessionId,
+        arrivalReason: complaintText.trim() || complaintCategory,
+        complaintCategory,
+        queue: 'Triage',
+        intakeSource: 'smart-intake',
       },
-      {
-        id: `evt-${id}-encounter`,
-        patientId: id,
-        type: 'EncounterCreated',
-        timestamp,
-        summary: `Encounter ${encounterId} created from Smart Intake.`,
-        metadata: {
-          patientId: id,
-          encounterId,
-          sessionId,
-          arrivalReason: complaintText.trim() || complaintCategory,
-          complaintCategory,
-          queue: 'Triage',
-          intakeSource: 'smart-intake',
-        },
+    },
+    {
+      id: `evt-${id}-triage`,
+      patientId: id,
+      type: 'StateChange',
+      from: PatientState.Arrival,
+      to: PatientState.Triage,
+      timestamp,
+      summary: `Patient moved from ARRIVAL to TRIAGE with ${selectedPriority} priority.`,
+      metadata: {
+        suggestedPriority,
+        selectedPriority,
+        confidence: autoSuggestion.confidence ?? null,
+        ruleTriggered: autoSuggestion.ruleTriggered || null,
+        suggestionReason: autoSuggestion.reason || null,
+        override,
+        reassessmentNeeded,
+        verticalSlice: 'smart-intake-arrival-triage',
       },
-      {
-        id: `evt-${id}-triage`,
-        patientId: id,
-        type: 'StateChange',
-        from: PatientState.Arrival,
-        to: PatientState.Triage,
-        timestamp,
-        summary: `Patient moved from ARRIVAL to TRIAGE with ${selectedPriority} priority.`,
-        metadata: {
-          suggestedPriority,
-          selectedPriority,
-          confidence: autoSuggestion.confidence ?? null,
-          ruleTriggered: autoSuggestion.ruleTriggered || null,
-          suggestionReason: autoSuggestion.reason || null,
-          override,
-          reassessmentNeeded,
-          verticalSlice: 'smart-intake-arrival-triage',
-        },
-      },
-      ...(override
-        ? [
-            {
-              id: `evt-${id}-triage-override`,
-              patientId: id,
-              type: 'Triage',
-              timestamp,
-              summary: `Priority override applied: ${selectedPriority} selected instead of ${suggestedPriority}.`,
-              metadata: {
-                suggestedPriority,
-                selectedPriority,
-                ruleTriggered: autoSuggestion.ruleTriggered || null,
-                override: true,
-              },
+    },
+    ...(override
+      ? [
+          {
+            id: `evt-${id}-triage-override`,
+            patientId: id,
+            type: 'Triage',
+            timestamp,
+            summary: `Priority override applied: ${selectedPriority} selected instead of ${suggestedPriority}.`,
+            metadata: {
+              suggestedPriority,
+              selectedPriority,
+              ruleTriggered: autoSuggestion.ruleTriggered || null,
+              override: true,
             },
-          ]
-        : []),
+          },
+        ]
+      : []),
   ];
 
   const arrival = buildPatientArrivalRecord({
@@ -198,7 +208,9 @@ export function buildSmartIntakeVerticalSlicePatient({
       sex: identity.sex || 'Unspecified',
       state: PatientState.Triage,
       triageTime: timestamp,
-      lastAssessedTime: Object.values(vitals).some((value) => String(value ?? '').trim()) ? timestamp : null,
+      lastAssessedTime: Object.values(vitals).some((value) => String(value ?? '').trim())
+        ? timestamp
+        : null,
       complaintCategory,
       vitals: [normalizedVitals] as any,
       assignedStaffId: null,

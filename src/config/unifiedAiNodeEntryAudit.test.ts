@@ -3,7 +3,14 @@ import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 const ROOT = process.cwd();
-const SCAN_ROOTS = ['src/components', 'src/pages', 'src/features', 'src/hooks', 'src/store', 'src/services'];
+const SCAN_ROOTS = [
+  'src/components',
+  'src/pages',
+  'src/features',
+  'src/hooks',
+  'src/store',
+  'src/services',
+];
 
 const ALLOWED_AI_CHIEF_IMPORTERS = new Set([
   'src/services/aiChiefOrchestrator.ts',
@@ -60,7 +67,10 @@ describe('unified AI node entry audit', () => {
       }
     }
 
-    expect(violations, `Direct aiChiefOrchestrator imports found:\n${violations.join('\n')}`).toEqual([]);
+    expect(
+      violations,
+      `Direct aiChiefOrchestrator imports found:\n${violations.join('\n')}`,
+    ).toEqual([]);
   });
 
   it('requires service callers to route structured AI through careDroidUnifiedAiNode instead of runCareDroidAI', () => {
@@ -78,7 +88,9 @@ describe('unified AI node entry audit', () => {
       }
     }
 
-    expect(violations, `Direct runCareDroidAI imports found:\n${violations.join('\n')}`).toEqual([]);
+    expect(violations, `Direct runCareDroidAI imports found:\n${violations.join('\n')}`).toEqual(
+      [],
+    );
   });
 
   it('documents unified node API surface on the lite entry module', () => {

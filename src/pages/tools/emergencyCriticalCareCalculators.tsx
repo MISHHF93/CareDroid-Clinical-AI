@@ -36,7 +36,11 @@ import {
 } from '../../utils/emergencyCriticalCareCalculators';
 
 function CalcDecisionSupportLead() {
-  return <SharedCalcDecisionSupportLead>{EMERGENCY_DECISION_SUPPORT_DISCLAIMER}</SharedCalcDecisionSupportLead>;
+  return (
+    <SharedCalcDecisionSupportLead>
+      {EMERGENCY_DECISION_SUPPORT_DISCLAIMER}
+    </SharedCalcDecisionSupportLead>
+  );
 }
 
 function ResultPanel({ title, icon, result, emptyText, renderDetails }) {
@@ -64,9 +68,11 @@ function ResultPanel({ title, icon, result, emptyText, renderDetails }) {
           <section className="calc-interpretation-box warning" aria-label={`${title} warnings`}>
             <h3 className="calc-interpretation-title">Warnings</h3>
             <ul className="calc-breakdown-list">
-              {(result.warnings || ['Clinical decision support only. Not a diagnosis.']).map((warning) => (
-                <li key={warning}>{warning}</li>
-              ))}
+              {(result.warnings || ['Clinical decision support only. Not a diagnosis.']).map(
+                (warning) => (
+                  <li key={warning}>{warning}</li>
+                ),
+              )}
               <li>{EMERGENCY_DECISION_SUPPORT_DISCLAIMER}</li>
             </ul>
           </section>
@@ -89,7 +95,18 @@ function ErrorList({ errors }) {
   return <ValidationErrors errors={errors} />;
 }
 
-function Shell({ slug, title, subtitle, pediatric = false, children, result, emptyText, onResultChange, payload, renderDetails = undefined }: any) {
+function Shell({
+  slug,
+  title,
+  subtitle,
+  pediatric = false,
+  children,
+  result,
+  emptyText,
+  onResultChange,
+  payload,
+  renderDetails = undefined,
+}: any) {
   const icon = getCalculatorSubIcon(slug);
   const resultsRef = useRef(null);
 
@@ -113,7 +130,13 @@ function Shell({ slug, title, subtitle, pediatric = false, children, result, emp
         {children}
       </div>
       <div ref={resultsRef}>
-        <ResultPanel title={title} icon={icon} result={result} emptyText={emptyText} renderDetails={renderDetails} />
+        <ResultPanel
+          title={title}
+          icon={icon}
+          result={result}
+          emptyText={emptyText}
+          renderDetails={renderDetails}
+        />
       </div>
     </div>
   );
@@ -125,7 +148,13 @@ function SelectField({ id, label, value, options, onChange }) {
       <label htmlFor={id} className="calc-label">
         {label}
       </label>
-      <select id={id} className="calc-select" value={value} onChange={(e) => onChange(e.target.value)} required>
+      <select
+        id={id}
+        className="calc-select"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        required
+      >
         <option value="">Select...</option>
         {options.map((option, index) => (
           <option key={`${option.label}-${option.value}-${index}`} value={option.value}>
@@ -183,11 +212,17 @@ function SelectScoreCalculator({
   onResultChange,
   pediatric = false,
 }) {
-  const initial = useMemo(() => Object.fromEntries(fields.map((field) => [field.key, ''])), [fields]);
+  const initial = useMemo(
+    () => Object.fromEntries(fields.map((field) => [field.key, ''])),
+    [fields],
+  );
   const [inputs, setInputs] = useState(initial);
   const [result, setResult] = useState<any>(null);
   const [errors, setErrors] = useState<any[]>([]);
-  const labelByKey = useMemo(() => Object.fromEntries(fields.map((field) => [field.key, field.label])), [fields]);
+  const labelByKey = useMemo(
+    () => Object.fromEntries(fields.map((field) => [field.key, field.label])),
+    [fields],
+  );
 
   const update = (key, value) => setInputs((current) => ({ ...current, [key]: value }));
   const reset = () => {
@@ -198,7 +233,11 @@ function SelectScoreCalculator({
 
   const submit = (event) => {
     event.preventDefault();
-    const validation = validateRequiredSelections(inputs, fields.map((field) => field.key), labelByKey);
+    const validation = validateRequiredSelections(
+      inputs,
+      fields.map((field) => field.key),
+      labelByKey,
+    );
     if (!validation.ok) {
       setErrors(validation.errors);
       setResult(null);
@@ -301,7 +340,9 @@ export function Curb65Calculator({ onResultChange }) {
               <input
                 type="checkbox"
                 checked={inputs[item.key]}
-                onChange={(event) => setInputs((current) => ({ ...current, [item.key]: event.target.checked }))}
+                onChange={(event) =>
+                  setInputs((current) => ({ ...current, [item.key]: event.target.checked }))
+                }
               />
               <span>{item.label}</span>
             </label>
@@ -381,7 +422,14 @@ export function ApacheIICalculator({ onResultChange }) {
               onChange={(value) => update(field.key, value)}
             />
           ))}
-          <NumericField id="apache-ii-gcs" label="Glasgow Coma Scale total" value={inputs.gcs} onChange={(value) => update('gcs', value)} min="3" max="15" />
+          <NumericField
+            id="apache-ii-gcs"
+            label="Glasgow Coma Scale total"
+            value={inputs.gcs}
+            onChange={(value) => update('gcs', value)}
+            min="3"
+            max="15"
+          />
         </div>
         <label className="calc-checkbox-row">
           <input
@@ -444,7 +492,12 @@ export function MewsCalculator({ onResultChange }) {
       result={result}
       emptyText="Enter adult vital signs and AVPU"
       onResultChange={onResultChange}
-      payload={(r) => ({ score: r.total, breakdown: r.breakdown, riskCategory: r.riskCategory, severity: r.severity })}
+      payload={(r) => ({
+        score: r.total,
+        breakdown: r.breakdown,
+        riskCategory: r.riskCategory,
+        severity: r.severity,
+      })}
       renderDetails={() => (
         <div className="calc-breakdown-list" aria-label="MEWS score breakdown">
           {Object.entries(result.breakdown).map(([key, value]) => (
@@ -457,10 +510,39 @@ export function MewsCalculator({ onResultChange }) {
     >
       <form className="calc-pr1-form" onSubmit={submit}>
         <div className="calc-form-grid">
-          <NumericField id="mews-rr" label="Respiratory rate (/min)" value={inputs.respiratoryRate} onChange={(value) => update('respiratoryRate', value)} min="0" max="80" />
-          <NumericField id="mews-hr" label="Heart rate (/min)" value={inputs.heartRate} onChange={(value) => update('heartRate', value)} min="20" max="250" />
-          <NumericField id="mews-sbp" label="Systolic BP (mmHg)" value={inputs.systolicBp} onChange={(value) => update('systolicBp', value)} min="40" max="300" />
-          <NumericField id="mews-temp" label="Temperature (C)" value={inputs.temperature} onChange={(value) => update('temperature', value)} min="30" max="43" step="0.1" />
+          <NumericField
+            id="mews-rr"
+            label="Respiratory rate (/min)"
+            value={inputs.respiratoryRate}
+            onChange={(value) => update('respiratoryRate', value)}
+            min="0"
+            max="80"
+          />
+          <NumericField
+            id="mews-hr"
+            label="Heart rate (/min)"
+            value={inputs.heartRate}
+            onChange={(value) => update('heartRate', value)}
+            min="20"
+            max="250"
+          />
+          <NumericField
+            id="mews-sbp"
+            label="Systolic BP (mmHg)"
+            value={inputs.systolicBp}
+            onChange={(value) => update('systolicBp', value)}
+            min="40"
+            max="300"
+          />
+          <NumericField
+            id="mews-temp"
+            label="Temperature (C)"
+            value={inputs.temperature}
+            onChange={(value) => update('temperature', value)}
+            min="30"
+            max="43"
+            step="0.1"
+          />
           <SelectField
             id="mews-avpu"
             label="AVPU"
@@ -520,7 +602,12 @@ export function RevisedTraumaScoreCalculator({ onResultChange }) {
       result={result}
       emptyText="Enter trauma physiology values"
       onResultChange={onResultChange}
-      payload={(r) => ({ weighted: r.weighted, unweighted: r.unweighted, riskCategory: r.riskCategory, severity: r.severity })}
+      payload={(r) => ({
+        weighted: r.weighted,
+        unweighted: r.unweighted,
+        riskCategory: r.riskCategory,
+        severity: r.severity,
+      })}
       renderDetails={() => (
         <div className="calc-breakdown-list" aria-label="RTS coded component breakdown">
           <div>GCS code: {result.gcsCode}</div>
@@ -532,9 +619,30 @@ export function RevisedTraumaScoreCalculator({ onResultChange }) {
     >
       <form className="calc-pr1-form" onSubmit={submit}>
         <div className="calc-form-grid">
-          <NumericField id="rts-gcs" label="GCS total" value={inputs.gcs} onChange={(value) => update('gcs', value)} min="3" max="15" />
-          <NumericField id="rts-sbp" label="Systolic BP (mmHg)" value={inputs.systolicBp} onChange={(value) => update('systolicBp', value)} min="0" max="300" />
-          <NumericField id="rts-rr" label="Respiratory rate (/min)" value={inputs.respiratoryRate} onChange={(value) => update('respiratoryRate', value)} min="0" max="80" />
+          <NumericField
+            id="rts-gcs"
+            label="GCS total"
+            value={inputs.gcs}
+            onChange={(value) => update('gcs', value)}
+            min="3"
+            max="15"
+          />
+          <NumericField
+            id="rts-sbp"
+            label="Systolic BP (mmHg)"
+            value={inputs.systolicBp}
+            onChange={(value) => update('systolicBp', value)}
+            min="0"
+            max="300"
+          />
+          <NumericField
+            id="rts-rr"
+            label="Respiratory rate (/min)"
+            value={inputs.respiratoryRate}
+            onChange={(value) => update('respiratoryRate', value)}
+            min="0"
+            max="80"
+          />
         </div>
         <ErrorList errors={errors} />
         <CalculatorActions calculateLabel="Calculate Revised Trauma Score" onReset={reset} />

@@ -16,10 +16,7 @@ import {
   resolvePostExecutableNluId,
   runOrchestratorMappingAudit,
 } from './orchestratorMappingAudit';
-import {
-  resolveOrchestratorToolForLaunch,
-  resolveCatalogLaunch,
-} from './clinicalCatalogWiring';
+import { resolveOrchestratorToolForLaunch, resolveCatalogLaunch } from './clinicalCatalogWiring';
 import { isOrchestratorPostExecutable } from './unsupportedOrchestratorTools';
 
 describe('orchestratorMappingHardening — registry ↔ executor', () => {

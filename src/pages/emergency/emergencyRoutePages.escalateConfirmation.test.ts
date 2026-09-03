@@ -26,7 +26,7 @@ describe('emergencyRoutePages escalate-button confirmation (HEAL-227)', () => {
     expect(buttonBlock).toContain('if (!confirmed) return;');
   });
 
-  it('matches the confirmation pattern already used by escalatePatient\'s other real call site', () => {
+  it("matches the confirmation pattern already used by escalatePatient's other real call site", () => {
     const aiPanelSource = readFileSync(
       join(__dirname, '../../components/ai/AiChiefRouteRecommendationsPanel.tsx'),
       'utf8',

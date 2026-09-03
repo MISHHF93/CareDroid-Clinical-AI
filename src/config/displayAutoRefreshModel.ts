@@ -52,7 +52,8 @@ export function resolveDisplayRefreshIntervalMs(
     normalized && settings.screenModeRefreshIntervals
       ? settings.screenModeRefreshIntervals[normalized]
       : null;
-  const candidate = Number(perMode ?? settings.wallDisplayRefreshInterval) || DISPLAY_AUTO_REFRESH_DEFAULT_MS;
+  const candidate =
+    Number(perMode ?? settings.wallDisplayRefreshInterval) || DISPLAY_AUTO_REFRESH_DEFAULT_MS;
   return Math.max(DISPLAY_AUTO_REFRESH_MIN_MS, candidate);
 }
 
@@ -142,9 +143,7 @@ export function buildDisplayRefreshStatus(input: {
   };
 }
 
-export function buildDepartmentStatusFallbackSnapshot(
-  updatedAt: string | null = null,
-): {
+export function buildDepartmentStatusFallbackSnapshot(updatedAt: string | null = null): {
   metrics: Array<{ id: string; label: string; value: string; tone: string; detail: string }>;
   updatedAt: string | null;
   summaryLine: string;
@@ -160,14 +159,21 @@ export function buildDepartmentStatusFallbackSnapshot(
       },
     ],
     updatedAt,
-    summaryLine: 'Live department metrics are temporarily unavailable — staff are restoring the feed.',
+    summaryLine:
+      'Live department metrics are temporarily unavailable — staff are restoring the feed.',
   };
 }
 
-export function buildCommandCenterFallbackSnapshot(
-  updatedAt: string | null = null,
-): {
-  metrics: Array<{ id: string; label: string; value: string; tone: string; detail: string; trendDirection?: string; trendDelta?: string }>;
+export function buildCommandCenterFallbackSnapshot(updatedAt: string | null = null): {
+  metrics: Array<{
+    id: string;
+    label: string;
+    value: string;
+    tone: string;
+    detail: string;
+    trendDirection?: string;
+    trendDelta?: string;
+  }>;
   hourlyArrivals: Array<{ hour: string; count: number }>;
   trendIndicators: [];
   updatedAt: string | null;

@@ -3,10 +3,7 @@ import {
   type EdPlatformEnhancement,
   type EnhancementMaturity,
 } from '../config/edPlatformEnhancementRegistry';
-import {
-  FEATURE_FLAG_REGISTRY,
-  FEATURE_FLAG_CATEGORIES,
-} from '../config/featureFlags.config';
+import { FEATURE_FLAG_REGISTRY, FEATURE_FLAG_CATEGORIES } from '../config/featureFlags.config';
 import {
   CAREDROID_SUITES,
   FEATURE_SUITE_ASSIGNMENTS,
@@ -111,7 +108,9 @@ function suiteEntry(
   const suiteAssignments = Object.values(FEATURE_SUITE_ASSIGNMENTS).filter(
     (assignment) => assignment.suiteId === suite.id,
   );
-  const assignmentMaturity = worstMaturity(suiteAssignments.map((assignment) => assignment.maturity));
+  const assignmentMaturity = worstMaturity(
+    suiteAssignments.map((assignment) => assignment.maturity),
+  );
   const baseStatus = assignmentMaturity
     ? SUITE_MATURITY_TO_TRANSPARENCY[assignmentMaturity]
     : 'partial';

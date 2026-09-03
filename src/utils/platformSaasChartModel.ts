@@ -16,10 +16,16 @@ import { buildCustomerExpansionOpportunities } from '../data/customerExpansionEn
 import { buildHealthcareKnowledgeHub } from '../data/healthcareKnowledgeHub';
 import { buildHospitalReadinessAssessment } from '../data/hospitalReadinessAssessment';
 import { buildProductIntelligenceLayer } from '../data/productIntelligenceLayer';
-import { buildWorkspaceDependencyGraph, WORKSPACE_DEPENDENCY_TYPES } from '../data/crossWorkspaceIntelligence';
+import {
+  buildWorkspaceDependencyGraph,
+  WORKSPACE_DEPENDENCY_TYPES,
+} from '../data/crossWorkspaceIntelligence';
 import { buildDepartmentPerformanceIntelligence } from '../data/departmentPerformanceIntelligence';
 import { buildDependencyMap, DEPENDENCY_ISSUE_TYPES } from '../data/dependencyMap';
-import { buildPlatformSelfDiagnostics, SELF_DIAGNOSTIC_STATUS } from '../data/platformSelfDiagnostics';
+import {
+  buildPlatformSelfDiagnostics,
+  SELF_DIAGNOSTIC_STATUS,
+} from '../data/platformSelfDiagnostics';
 import { buildWorkflowMiningReport } from '../data/workflowMiningEngine';
 import { buildPlatformAnalytics, PLATFORM_ANALYTICS_DECISIONS } from '../data/platformAnalytics';
 import { buildPluginMarketplace } from '../data/pluginMarketplace';
@@ -183,7 +189,9 @@ export function buildLocalGovernanceRegistryFallback(
     };
   });
 
-  const byRiskLevel = countBy(rows, (row) => String((row as { riskLevel?: string }).riskLevel ?? 'unknown'));
+  const byRiskLevel = countBy(rows, (row) =>
+    String((row as { riskLevel?: string }).riskLevel ?? 'unknown'),
+  );
 
   return {
     generatedAt: new Date(0).toISOString(),
@@ -209,9 +217,7 @@ export function buildLocalGovernanceRegistryFallback(
   };
 }
 
-export function decisionTone(
-  decision: string,
-): 'good' | 'warning' | 'critical' | 'neutral' {
+export function decisionTone(decision: string): 'good' | 'warning' | 'critical' | 'neutral' {
   if (decision === PLATFORM_ANALYTICS_DECISIONS.PROMOTE) return 'good';
   if (decision === PLATFORM_ANALYTICS_DECISIONS.HIDE) return 'critical';
   if (
@@ -288,7 +294,9 @@ export function saveFeatureFlagCenterOverrides(overrides: Record<string, string>
   return overrides;
 }
 
-export function buildFeatureFlagCenterView(overrides: Record<string, string> = loadFeatureFlagCenterOverrides()) {
+export function buildFeatureFlagCenterView(
+  overrides: Record<string, string> = loadFeatureFlagCenterOverrides(),
+) {
   const stateMap = buildFeatureFlagStateMap(overrides);
   const flags = FEATURE_FLAG_REGISTRY.map((flag) => ({
     ...flag,
@@ -320,8 +328,10 @@ export function cycleFeatureFlagState(current: string): string {
 
 export function featureFlagStateTone(state: string): 'good' | 'warning' | 'critical' | 'neutral' {
   if (state === FEATURE_FLAG_STATES.ENABLED) return 'good';
-  if (state === FEATURE_FLAG_STATES.BETA || state === FEATURE_FLAG_STATES.EXPERIMENTAL) return 'warning';
-  if (state === FEATURE_FLAG_STATES.DISABLED || state === FEATURE_FLAG_STATES.LOCKED) return 'critical';
+  if (state === FEATURE_FLAG_STATES.BETA || state === FEATURE_FLAG_STATES.EXPERIMENTAL)
+    return 'warning';
+  if (state === FEATURE_FLAG_STATES.DISABLED || state === FEATURE_FLAG_STATES.LOCKED)
+    return 'critical';
   return 'neutral';
 }
 
@@ -334,7 +344,8 @@ export function dependencyIssueTone(severity: string): 'good' | 'warning' | 'cri
 export type AssetDependencyGraphSnapshot = ReturnType<typeof buildLocalAssetDependencyGraph>;
 
 export function buildAssetGraphIssueChart(
-  issueCounts: AssetDependencyGraphSnapshot['issueCounts'] = buildLocalAssetDependencyGraph().issueCounts,
+  issueCounts: AssetDependencyGraphSnapshot['issueCounts'] = buildLocalAssetDependencyGraph()
+    .issueCounts,
 ): PlatformChartDatum[] {
   return Object.entries(issueCounts).map(([name, value]) => ({
     name: name.replace(/-/g, ' '),
@@ -356,7 +367,9 @@ type DataLineageSnapshot = ReturnType<typeof buildDataLineageExplorer>;
 export function buildLineageCategoryChart(
   flows: DataLineageSnapshot['flows'] = buildDataLineageExplorer().flows,
 ): PlatformChartDatum[] {
-  const counts = countBy(flows, (flow) => String((flow as { category?: string }).category ?? 'unknown'));
+  const counts = countBy(flows, (flow) =>
+    String((flow as { category?: string }).category ?? 'unknown'),
+  );
   return chartEntries(counts);
 }
 
@@ -364,7 +377,8 @@ type SelfDiagnosticsSnapshot = ReturnType<typeof buildPlatformSelfDiagnostics>;
 type DepartmentIntelligenceSnapshot = ReturnType<typeof buildDepartmentPerformanceIntelligence>;
 
 export function buildDiagnosticsCategoryChart(
-  categories: SelfDiagnosticsSnapshot['summary']['categories'] = buildPlatformSelfDiagnostics().summary.categories,
+  categories: SelfDiagnosticsSnapshot['summary']['categories'] = buildPlatformSelfDiagnostics()
+    .summary.categories,
 ): PlatformChartDatum[] {
   return categories.map((row) => ({
     name: row.category.replace(/-/g, ' '),
@@ -383,7 +397,8 @@ export function buildDiagnosticsStatusChart(
 }
 
 export function buildDepartmentHealthChart(
-  departments: DepartmentIntelligenceSnapshot['departments'] = buildDepartmentPerformanceIntelligence().departments,
+  departments: DepartmentIntelligenceSnapshot['departments'] = buildDepartmentPerformanceIntelligence()
+    .departments,
 ): PlatformChartDatum[] {
   return departments.map((department) => ({
     name: department.name,
@@ -392,7 +407,8 @@ export function buildDepartmentHealthChart(
 }
 
 export function buildDepartmentOutcomeSourceChart(
-  departments: DepartmentIntelligenceSnapshot['departments'] = buildDepartmentPerformanceIntelligence().departments,
+  departments: DepartmentIntelligenceSnapshot['departments'] = buildDepartmentPerformanceIntelligence()
+    .departments,
 ): PlatformChartDatum[] {
   const counts = countBy(
     departments.flatMap((department) => department.metrics),
@@ -449,7 +465,8 @@ export function buildWorkflowSignalChart(
 }
 
 export function buildWorkflowJourneyChart(
-  journeys: WorkflowMiningSnapshot['mostCommonUserJourneys'] = buildWorkflowMiningReport().mostCommonUserJourneys,
+  journeys: WorkflowMiningSnapshot['mostCommonUserJourneys'] = buildWorkflowMiningReport()
+    .mostCommonUserJourneys,
 ): PlatformChartDatum[] {
   return journeys.map((journey) => ({
     name: journey.title,
@@ -457,7 +474,9 @@ export function buildWorkflowJourneyChart(
   }));
 }
 
-export function workspaceDependencyStrengthTone(strength: number): 'good' | 'warning' | 'critical' | 'neutral' {
+export function workspaceDependencyStrengthTone(
+  strength: number,
+): 'good' | 'warning' | 'critical' | 'neutral' {
   if (strength >= 90) return 'good';
   if (strength >= 80) return 'warning';
   return 'neutral';
@@ -570,7 +589,8 @@ export function buildBusinessBrainDomainChart(
 }
 
 export function buildBusinessBrainRecommendationChart(
-  recommendations: BusinessBrainSnapshot['recommendations'] = buildCareDroidBusinessBrain().recommendations,
+  recommendations: BusinessBrainSnapshot['recommendations'] = buildCareDroidBusinessBrain()
+    .recommendations,
 ): PlatformChartDatum[] {
   return recommendations.map((item) => ({
     name: item.title.length > 28 ? `${item.title.slice(0, 28)}…` : item.title,
@@ -581,7 +601,9 @@ export function buildBusinessBrainRecommendationChart(
 export function buildArtifactTypeChart(
   artifacts: ArtifactCatalog = buildArtifactCatalog(),
 ): PlatformChartDatum[] {
-  const counts = countBy(artifacts, (artifact) => String((artifact as { type?: string }).type ?? 'unknown'));
+  const counts = countBy(artifacts, (artifact) =>
+    String((artifact as { type?: string }).type ?? 'unknown'),
+  );
   return chartEntries(counts)
     .sort((left, right) => right.value - left.value)
     .slice(0, 8);
@@ -628,4 +650,3 @@ export function buildLineageStageChart(
     value: counts[stage] || 0,
   }));
 }
-

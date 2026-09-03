@@ -10,19 +10,21 @@ import {
 describe('operationalAuditModel', () => {
   it('classifies patient, queue, reassessment, and referral logs', () => {
     expect(classifyWorkflowLog({ type: 'patient_created' })).toBe(OPERATIONAL_AUDIT_DOMAIN.PATIENT);
-    expect(classifyWorkflowLog({ type: 'journey_state_changed', metadata: { queue: 'pretriage' } })).toBe(
-      OPERATIONAL_AUDIT_DOMAIN.QUEUE,
-    );
+    expect(
+      classifyWorkflowLog({ type: 'journey_state_changed', metadata: { queue: 'pretriage' } }),
+    ).toBe(OPERATIONAL_AUDIT_DOMAIN.QUEUE);
     expect(classifyWorkflowLog({ type: 'reassessment_completed' })).toBe(
       OPERATIONAL_AUDIT_DOMAIN.REASSESSMENT,
     );
-    expect(classifyWorkflowLog({ type: 'referral_status_changed' })).toBe(OPERATIONAL_AUDIT_DOMAIN.REFERRAL);
+    expect(classifyWorkflowLog({ type: 'referral_status_changed' })).toBe(
+      OPERATIONAL_AUDIT_DOMAIN.REFERRAL,
+    );
   });
 
   it('detects queue workflow logs from source and metadata', () => {
-    expect(isQueueWorkflowLog({ type: 'integration_event_received', source: 'reception.handoff' })).toBe(
-      true,
-    );
+    expect(
+      isQueueWorkflowLog({ type: 'integration_event_received', source: 'reception.handoff' }),
+    ).toBe(true);
     expect(isQueueWorkflowLog({ type: 'clinician_assigned' })).toBe(false);
   });
 
@@ -49,9 +51,13 @@ describe('operationalAuditModel', () => {
       },
     ];
 
-    expect(filterOperationalHistory(logs, { domain: OPERATIONAL_AUDIT_DOMAIN.REFERRAL })).toHaveLength(1);
+    expect(
+      filterOperationalHistory(logs, { domain: OPERATIONAL_AUDIT_DOMAIN.REFERRAL }),
+    ).toHaveLength(1);
     expect(filterOperationalHistory(logs, { patientId: 'p1' })).toHaveLength(2);
-    expect(filterOperationalHistory(logs, { domain: OPERATIONAL_AUDIT_DOMAIN.QUEUE })[0].id).toBe('2');
+    expect(filterOperationalHistory(logs, { domain: OPERATIONAL_AUDIT_DOMAIN.QUEUE })[0].id).toBe(
+      '2',
+    );
   });
 
   it('passes exposure audit for required surfaces', () => {

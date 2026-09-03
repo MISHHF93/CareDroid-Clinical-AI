@@ -29,7 +29,9 @@ describe('customerExpansionEngine', () => {
     );
 
     expect(packs).toEqual(expect.arrayContaining(['Research Pack', 'AI Evaluation Pack']));
-    expect(model.segments[0].opportunities.every((opportunity) => opportunity.evidenceCount > 0)).toBe(true);
+    expect(
+      model.segments[0].opportunities.every((opportunity) => opportunity.evidenceCount > 0),
+    ).toBe(true);
   });
 
   it('assigns opportunity bands from score thresholds', () => {

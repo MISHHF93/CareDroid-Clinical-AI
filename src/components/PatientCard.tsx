@@ -1,4 +1,13 @@
-import { memo, useCallback, useEffect, useMemo, useState, type CSSProperties, type KeyboardEvent, type MouseEvent } from 'react';
+import {
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type CSSProperties,
+  type KeyboardEvent,
+  type MouseEvent,
+} from 'react';
 import {
   Ambulance,
   ArrowRightLeft,
@@ -21,12 +30,13 @@ import {
 import { useEmergencyStore } from '../store/emergencyStore';
 import { isEmergencyOsBoarding } from '../../lib/emergency-os/logic';
 import { CANONICAL_ROUTES } from '../config/routes.config';
-import {
-  EMERGENCY_ACTIONS,
-  EMERGENCY_ROLE_ACTIONS,
-} from '../config/emergencyRolePermissions';
+import { EMERGENCY_ACTIONS, EMERGENCY_ROLE_ACTIONS } from '../config/emergencyRolePermissions';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
-import { advancePatientJourneyState, advancePatientToBoarding, getDefaultNextPatientState } from '../services/queueAssignment';
+import {
+  advancePatientJourneyState,
+  advancePatientToBoarding,
+  getDefaultNextPatientState,
+} from '../services/queueAssignment';
 import { arrivalModeLabel } from '../services/arrivalControlLayer';
 import { normalizePatientArrival, triageAcuityToPriority } from '../services/patientArrivalModel';
 import { recognizeComplaint } from '../data/clinicalTerminology/recognizeComplaint';
@@ -50,7 +60,10 @@ import { isAwaitingTriage } from '../services/triageBreachTimer';
 import { selectReassessmentTimerForPatient } from '../engine/reassessmentTimerEngine';
 import { useThreeMinuteMissionStore } from '../store/threeMinuteMissionStore';
 import { findPatientReferralAwareness } from './whiteboard/referralAwarenessModel';
-import { buildDataQualitySnapshot, getPatientDataQualityRisks } from '../services/dataQualityDiscovery';
+import {
+  buildDataQualitySnapshot,
+  getPatientDataQualityRisks,
+} from '../services/dataQualityDiscovery';
 import useEmergencyDisplayPrivacy from '../hooks/useEmergencyDisplayPrivacy';
 import useScreenDensityMode from '../hooks/useScreenDensityMode';
 
@@ -242,7 +255,9 @@ function getSignalBadges({
       ? { id: 'triage-pending', label: 'Triage pending', tone: 'warning' as const }
       : null,
     isBoarding ? { id: 'boarding', label: 'Boarding', tone: 'flow' as const } : null,
-    hasTransferPending ? { id: 'transfer', label: 'Transfer pending', tone: 'flow' as const } : null,
+    hasTransferPending
+      ? { id: 'transfer', label: 'Transfer pending', tone: 'flow' as const }
+      : null,
     !hasTransferPending && hasReferralPending
       ? {
           id: 'referral',
@@ -332,7 +347,9 @@ function abnormalVitalsSummary({
     spo2Abnormal ? 'oxygen saturation' : '',
     tempAbnormal ? 'temperature' : '',
   ].filter(Boolean);
-  return abnormal.length ? `Abnormal ${abnormal.join(', ')}.` : 'Vitals within displayed thresholds.';
+  return abnormal.length
+    ? `Abnormal ${abnormal.join(', ')}.`
+    : 'Vitals within displayed thresholds.';
 }
 
 function isOpenReferralStatus(status?: string): boolean {
@@ -378,9 +395,10 @@ function PatientCard({
   const cardDensity = screenDensity.patientCard;
   const defaultPrivacyPolicy = useEmergencyDisplayPrivacy();
   const privacyPolicy = privacyPolicyProp ?? defaultPrivacyPolicy;
-  const patient = useEmergencyStore((store) =>
-    store.patients.find((candidate) => candidate.id === patientProp.id)
-  ) || patientProp;
+  const patient =
+    useEmergencyStore((store) =>
+      store.patients.find((candidate) => candidate.id === patientProp.id),
+    ) || patientProp;
   const selectPatient = useEmergencyStore((store) => store.selectPatient);
   const toggleCopilot = useEmergencyStore((store) => store.toggleCopilot);
   const addFlag = useEmergencyStore((store) => store.addFlag);
@@ -397,7 +415,9 @@ function PatientCard({
   const { enabled: nativeAiRoutingEnabled } = useFeature('native_ai_routing');
   const { enabled: nlpTriageExpertEnabled } = useFeature('nlp_triage_expert_system');
   const { enabled: postEdOrientationEnabled } = useFeature('post_ed_orientation');
-  const syncDocumentArtifactsFromPatient = useEmergencyStore((store) => store.syncDocumentArtifactsFromPatient);
+  const syncDocumentArtifactsFromPatient = useEmergencyStore(
+    (store) => store.syncDocumentArtifactsFromPatient,
+  );
   const patientRoom = useMemo(
     () => rooms.find((room) => room.id === patient.roomId) || null,
     [patient.roomId, rooms],
@@ -431,19 +451,22 @@ function PatientCard({
     // route-level Suspense fallback).
     if (patient.documentArtifacts !== undefined) return;
     syncDocumentArtifactsFromPatient(patient.id);
-  }, [documentArtifactsEnabled, patient.documentArtifacts, patient.id, syncDocumentArtifactsFromPatient]);
+  }, [
+    documentArtifactsEnabled,
+    patient.documentArtifacts,
+    patient.id,
+    syncDocumentArtifactsFromPatient,
+  ]);
 
   usePhiViewAudit(patient.id, {
-    enabled: !readOnlyDisplay && privacyPolicy.tier !== 'public' && !privacyPolicy.aggregateMetricsOnly,
+    enabled:
+      !readOnlyDisplay && privacyPolicy.tier !== 'public' && !privacyPolicy.aggregateMetricsOnly,
     source: 'PatientCard',
     staffId: emergencyRole.canonicalProfile?.id,
     details: { layout, workflowProfile },
   });
 
-  const dataQualitySnapshot = useMemo(
-    () => buildDataQualitySnapshot(allPatients),
-    [allPatients],
-  );
+  const dataQualitySnapshot = useMemo(() => buildDataQualitySnapshot(allPatients), [allPatients]);
   const dataQualityRisks = useMemo(
     () =>
       !patientCardSurfaces.showDataQualitySignals
@@ -494,7 +517,8 @@ function PatientCard({
   const hasLongWait = hasPatientFlag(patient, PatientFlag.LongWait);
   const hasLwbsRisk = hasPatientFlag(patient, PatientFlag.LWBSRisk);
   const isBoarding = isEmergencyOsBoarding(patient);
-  const isDischarged = patient.state === PatientState.Discharge || patient.state === PatientState.Deceased;
+  const isDischarged =
+    patient.state === PatientState.Discharge || patient.state === PatientState.Deceased;
   const openReferral = referrals.find(
     (referral) => referral.patientId === patient.id && isOpenReferralStatus(referral.status),
   );
@@ -607,7 +631,11 @@ function PatientCard({
     privacyPolicy.showVitals
       ? abnormalVitalsSummary({ hrAbnormal, bpAbnormal, spo2Abnormal, tempAbnormal })
       : '',
-    hasTransferPending ? 'transfer pending' : hasReferralPending ? referralAwarenessLabel || 'referral pending' : '',
+    hasTransferPending
+      ? 'transfer pending'
+      : hasReferralPending
+        ? referralAwarenessLabel || 'referral pending'
+        : '',
     hasCapacityPressure ? `${capacityBand} capacity pressure` : '',
   ]
     .filter(Boolean)
@@ -616,78 +644,109 @@ function PatientCard({
     if (readOnlyDisplay) return;
     selectPatient(patient.id);
   }, [patient.id, readOnlyDisplay, selectPatient]);
-  const handleTimelineClick = useCallback((event: MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-    selectPatient(patient.id);
-  }, [patient.id, selectPatient]);
-  const handleDetailClick = useCallback((event: MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-    selectPatient(patient.id);
-  }, [patient.id, selectPatient]);
-  const handleMoveNext = useCallback((event: MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-    if (!canMoveNext || !nextState) return;
-    advancePatientJourneyState(patient.id, nextState, {
-      actorId: patient.assignedStaffId || 'whiteboard-command',
-      note:
-        nextState === PatientState.Waiting
-          ? 'Moved from Whiteboard mission control into waiting queue.'
-          : 'Moved from Whiteboard mission control',
-    });
-  }, [canMoveNext, nextState, patient.assignedStaffId, patient.id]);
-  const handleReassessment = useCallback((event: MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-    if (!hasReassessmentDue && !canManageFlags) return;
-    if (!hasReassessmentDue) addFlag(patient.id, PatientFlag.ReassessmentDue);
-    selectPatient(patient.id);
-    document.dispatchEvent(new Event('open-reassessment-drawer'));
-  }, [addFlag, canManageFlags, hasReassessmentDue, patient.id, selectPatient]);
-  const handleReferral = useCallback((event: MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-    if (!canManageReferral || !emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyReferrals)) return;
-    selectPatient(patient.id);
-    const params = new URLSearchParams({ patientId: patient.id, new: '1' });
-    navigateTo(`${CANONICAL_ROUTES.emergencyReferrals}?${params.toString()}`);
-  }, [canManageReferral, emergencyRole, patient.id, selectPatient]);
+  const handleTimelineClick = useCallback(
+    (event: MouseEvent<HTMLButtonElement>) => {
+      event.stopPropagation();
+      selectPatient(patient.id);
+    },
+    [patient.id, selectPatient],
+  );
+  const handleDetailClick = useCallback(
+    (event: MouseEvent<HTMLButtonElement>) => {
+      event.stopPropagation();
+      selectPatient(patient.id);
+    },
+    [patient.id, selectPatient],
+  );
+  const handleMoveNext = useCallback(
+    (event: MouseEvent<HTMLButtonElement>) => {
+      event.stopPropagation();
+      if (!canMoveNext || !nextState) return;
+      advancePatientJourneyState(patient.id, nextState, {
+        actorId: patient.assignedStaffId || 'whiteboard-command',
+        note:
+          nextState === PatientState.Waiting
+            ? 'Moved from Whiteboard mission control into waiting queue.'
+            : 'Moved from Whiteboard mission control',
+      });
+    },
+    [canMoveNext, nextState, patient.assignedStaffId, patient.id],
+  );
+  const handleReassessment = useCallback(
+    (event: MouseEvent<HTMLButtonElement>) => {
+      event.stopPropagation();
+      if (!hasReassessmentDue && !canManageFlags) return;
+      if (!hasReassessmentDue) addFlag(patient.id, PatientFlag.ReassessmentDue);
+      selectPatient(patient.id);
+      document.dispatchEvent(new Event('open-reassessment-drawer'));
+    },
+    [addFlag, canManageFlags, hasReassessmentDue, patient.id, selectPatient],
+  );
+  const handleReferral = useCallback(
+    (event: MouseEvent<HTMLButtonElement>) => {
+      event.stopPropagation();
+      if (!canManageReferral || !emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyReferrals))
+        return;
+      selectPatient(patient.id);
+      const params = new URLSearchParams({ patientId: patient.id, new: '1' });
+      navigateTo(`${CANONICAL_ROUTES.emergencyReferrals}?${params.toString()}`);
+    },
+    [canManageReferral, emergencyRole, patient.id, selectPatient],
+  );
   // PatientRoomDisplay is mounted in router.tsx with no CareDroidRouteGuard — it's
   // an ungated bedside/room-mounted display, not a permissioned in-shell route — so
   // this action stays unconditionally visible like the Timeline button, rather than
   // gating on canAccessRoute (which would always be false: the route has no
   // CANONICAL_ROUTE_MAP entry to grant access from, recreating the orphan bug).
-  const handleRoomDisplay = useCallback((event: MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-    const params = new URLSearchParams({ patientId: patient.id });
-    navigateTo(`${CANONICAL_ROUTES.emergencyPatientRoom}?${params.toString()}`);
-  }, [patient.id]);
-  const handleBoarding = useCallback((event: MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-    if (!canBoardPatient) return;
-    advancePatientToBoarding(patient.id, {
-      actorId: patient.assignedStaffId || 'whiteboard-command',
-      note: 'Boarding launched from Whiteboard mission control',
-    });
-  }, [canBoardPatient, patient.assignedStaffId, patient.id]);
-  const handleDischarge = useCallback((event: MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-    if (!canDischarge || isDischarged) return;
-    selectPatient(patient.id);
-    window.setTimeout(() => document.dispatchEvent(new Event('open-patient-discharge')), 0);
-  }, [canDischarge, isDischarged, patient.id, selectPatient]);
-  const handleCopilot = useCallback((event: MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-    if (!canUseCopilot) return;
-    selectPatient(patient.id);
-    window.dispatchEvent(
-      new CustomEvent('ed:patient-copilot-focus', { detail: { patientId: patient.id } }),
-    );
-    toggleCopilot();
-  }, [canUseCopilot, patient.id, selectPatient, toggleCopilot]);
-  const handleKeyDown = useCallback((event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
+  const handleRoomDisplay = useCallback(
+    (event: MouseEvent<HTMLButtonElement>) => {
+      event.stopPropagation();
+      const params = new URLSearchParams({ patientId: patient.id });
+      navigateTo(`${CANONICAL_ROUTES.emergencyPatientRoom}?${params.toString()}`);
+    },
+    [patient.id],
+  );
+  const handleBoarding = useCallback(
+    (event: MouseEvent<HTMLButtonElement>) => {
+      event.stopPropagation();
+      if (!canBoardPatient) return;
+      advancePatientToBoarding(patient.id, {
+        actorId: patient.assignedStaffId || 'whiteboard-command',
+        note: 'Boarding launched from Whiteboard mission control',
+      });
+    },
+    [canBoardPatient, patient.assignedStaffId, patient.id],
+  );
+  const handleDischarge = useCallback(
+    (event: MouseEvent<HTMLButtonElement>) => {
+      event.stopPropagation();
+      if (!canDischarge || isDischarged) return;
       selectPatient(patient.id);
-    }
-  }, [patient.id, selectPatient]);
+      window.setTimeout(() => document.dispatchEvent(new Event('open-patient-discharge')), 0);
+    },
+    [canDischarge, isDischarged, patient.id, selectPatient],
+  );
+  const handleCopilot = useCallback(
+    (event: MouseEvent<HTMLButtonElement>) => {
+      event.stopPropagation();
+      if (!canUseCopilot) return;
+      selectPatient(patient.id);
+      window.dispatchEvent(
+        new CustomEvent('ed:patient-copilot-focus', { detail: { patientId: patient.id } }),
+      );
+      toggleCopilot();
+    },
+    [canUseCopilot, patient.id, selectPatient, toggleCopilot],
+  );
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent<HTMLDivElement>) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        selectPatient(patient.id);
+      }
+    },
+    [patient.id, selectPatient],
+  );
 
   const reassessmentLabel = hasReassessmentDue
     ? 'Due now'
@@ -739,7 +798,10 @@ function PatientCard({
   if (layout === 'row') {
     const rowBody = (
       <>
-        <div className="patient-card__row-cell patient-card__row-cell--triage patient-card__row-cell--graphic" aria-label={`Triage ${displayPriority}`}>
+        <div
+          className="patient-card__row-cell patient-card__row-cell--triage patient-card__row-cell--graphic"
+          aria-label={`Triage ${displayPriority}`}
+        >
           <PatientAcuityRing priority={displayPriority} className="patient-card__row-acuity-ring" />
           <span className="patient-card__row-triage-label">{priorityLabel}</span>
         </div>
@@ -780,7 +842,10 @@ function PatientCard({
         >
           {truncateComplaint(patientComplaint)}
           {showUnrecognizedComplaintHint ? (
-            <span className="patient-card__complaint-unrecognized" title="Not recognized as a standard complaint — needs triage review">
+            <span
+              className="patient-card__complaint-unrecognized"
+              title="Not recognized as a standard complaint — needs triage review"
+            >
               ⚠ unrecognized
             </span>
           ) : null}
@@ -791,9 +856,7 @@ function PatientCard({
           data-severity={waitStatusSeverity}
         >
           <Clock3 size={14} strokeWidth={1.85} aria-hidden />
-          <span>
-            {queueTiming ? queueTiming.elapsedLabel : `${minutesWaiting}m`}
-          </span>
+          <span>{queueTiming ? queueTiming.elapsedLabel : `${minutesWaiting}m`}</span>
         </div>
 
         <div
@@ -867,7 +930,9 @@ function PatientCard({
       {cardDensity.showLwbsAndDeterioration && patient.state === PatientState.Waiting ? (
         <LwbsRiskBadge
           patient={patient}
-          waitingPatientCount={allPatients.filter((candidate) => candidate.state === PatientState.Waiting).length}
+          waitingPatientCount={
+            allPatients.filter((candidate) => candidate.state === PatientState.Waiting).length
+          }
           compact
         />
       ) : null}
@@ -881,7 +946,9 @@ function PatientCard({
         <AdmissionProbabilityBadge
           patient={patient}
           boardingSignals={boardingSignals}
-          consultPending={patient.state === PatientState.Orders || patient.state === PatientState.Results}
+          consultPending={
+            patient.state === PatientState.Orders || patient.state === PatientState.Results
+          }
           compact
         />
       ) : null}
@@ -891,10 +958,21 @@ function PatientCard({
         <JourneyPredictionBadge patient={patient} boardingSignals={boardingSignals} compact />
       ) : null}
       {cardDensity.showExperienceBadge ? (
-        <PatientExperienceStatusBadge patient={patient} referrals={referrals} compact showStaffDetail />
+        <PatientExperienceStatusBadge
+          patient={patient}
+          referrals={referrals}
+          compact
+          showStaffDetail
+        />
       ) : null}
       {cardDensity.showWhatHappensNext ? (
-        <WhatHappensNextBadge patient={patient} referrals={referrals} staff={staff} compact showGuidance />
+        <WhatHappensNextBadge
+          patient={patient}
+          referrals={referrals}
+          staff={staff}
+          compact
+          showGuidance
+        />
       ) : null}
       {cardDensity.showWhatHappensNext ? <PatientFlowBadge patient={patient} /> : null}
       {cardDensity.showCommunicationBadge && patient.state === PatientState.Waiting ? (
@@ -908,7 +986,9 @@ function PatientCard({
       <WhiteboardOperationalIconStrip
         patient={patient}
         room={patientRoom}
-        consultPending={patient.state === PatientState.Orders || patient.state === PatientState.Results}
+        consultPending={
+          patient.state === PatientState.Orders || patient.state === PatientState.Results
+        }
         resultsPending={patient.state === PatientState.Results}
         boardingSignals={boardingSignals}
         compact
@@ -917,7 +997,7 @@ function PatientCard({
   );
 
   const cardBody = (
-      <>
+    <>
       <div
         className="patient-card__priority-strip"
         aria-label={`${displayPriority} ${priorityLabel}`}
@@ -931,7 +1011,9 @@ function PatientCard({
         <div className="patient-card__identity-main">
           <strong title={patientName}>{patientName}</strong>
           <span>{patientMrn}</span>
-          <span className="patient-card__arrival-mode">{arrivalModeLabel(arrival.arrivalMode)}</span>
+          <span className="patient-card__arrival-mode">
+            {arrivalModeLabel(arrival.arrivalMode)}
+          </span>
         </div>
         {privacyPolicy.showDemographics ? (
           <div className="patient-card__demographics">
@@ -945,7 +1027,10 @@ function PatientCard({
         <div className="patient-card__complaint" title={complaintTooltip}>
           {truncateComplaint(patientComplaint)}
           {showUnrecognizedComplaintHint ? (
-            <span className="patient-card__complaint-unrecognized" title="Not recognized as a standard complaint — needs triage review">
+            <span
+              className="patient-card__complaint-unrecognized"
+              title="Not recognized as a standard complaint — needs triage review"
+            >
               ⚠ unrecognized
             </span>
           ) : null}
@@ -963,53 +1048,58 @@ function PatientCard({
       ) : null}
 
       {cardDensity.showSignalsRow ? (
-      <div className="patient-card__signals cdl-badge-row" aria-label="Patient priority signals">
-        {privacyPolicy.showComplaintFlags ? (
-          <HighRiskComplaintFlagBadge patient={patient} compact />
-        ) : null}
-        {patient.state === PatientState.Waiting ? <FitToWaitBadge patient={patient} compact /> : null}
-        {signalBadges.length ? (
-          <>
-            {signalBadges.slice(0, Math.min(3, maxPatientCardBadges)).map((signal) => (
-              <span
-                key={signal.id}
-                className={`patient-card__signal cdl-badge patient-card__signal--${signal.tone}`}
-                data-tone={signal.tone}
-              >
-                {signal.label}
-              </span>
-            ))}
-            {signalBadges.length > Math.min(3, maxPatientCardBadges) ? (
-              <span
-                className="patient-card__signal patient-card__signal--overflow cdl-badge"
-                data-tone="neutral"
-                title={signalBadges
-                  .slice(Math.min(3, maxPatientCardBadges))
-                  .map((signal) => signal.label)
-                  .join(' · ')}
-              >
-                +{signalBadges.length - Math.min(3, maxPatientCardBadges)}
-              </span>
-            ) : null}
-          </>
-        ) : (
-          <span
-            className="patient-card__signal patient-card__signal--stable cdl-badge"
-            data-tone="ok"
-          >
-            No active risk flags
-          </span>
-        )}
-        {cardDensity.showReassessmentTimer && patient.state === PatientState.Waiting ? (
-          <ReassessmentTimerBadge patient={patient} />
-        ) : null}
-      </div>
+        <div className="patient-card__signals cdl-badge-row" aria-label="Patient priority signals">
+          {privacyPolicy.showComplaintFlags ? (
+            <HighRiskComplaintFlagBadge patient={patient} compact />
+          ) : null}
+          {patient.state === PatientState.Waiting ? (
+            <FitToWaitBadge patient={patient} compact />
+          ) : null}
+          {signalBadges.length ? (
+            <>
+              {signalBadges.slice(0, Math.min(3, maxPatientCardBadges)).map((signal) => (
+                <span
+                  key={signal.id}
+                  className={`patient-card__signal cdl-badge patient-card__signal--${signal.tone}`}
+                  data-tone={signal.tone}
+                >
+                  {signal.label}
+                </span>
+              ))}
+              {signalBadges.length > Math.min(3, maxPatientCardBadges) ? (
+                <span
+                  className="patient-card__signal patient-card__signal--overflow cdl-badge"
+                  data-tone="neutral"
+                  title={signalBadges
+                    .slice(Math.min(3, maxPatientCardBadges))
+                    .map((signal) => signal.label)
+                    .join(' · ')}
+                >
+                  +{signalBadges.length - Math.min(3, maxPatientCardBadges)}
+                </span>
+              ) : null}
+            </>
+          ) : (
+            <span
+              className="patient-card__signal patient-card__signal--stable cdl-badge"
+              data-tone="ok"
+            >
+              No active risk flags
+            </span>
+          )}
+          {cardDensity.showReassessmentTimer && patient.state === PatientState.Waiting ? (
+            <ReassessmentTimerBadge patient={patient} />
+          ) : null}
+        </div>
       ) : null}
 
       {/* Nested badge landfill collapsed — expand only on demand (no nested card chrome) */}
       <details className="patient-card__more-signals">
         <summary className="patient-card__more-signals-summary">More signals</summary>
-        <div className="patient-card__secondary-badges cdl-badge-row" aria-label="Additional patient signals">
+        <div
+          className="patient-card__secondary-badges cdl-badge-row"
+          aria-label="Additional patient signals"
+        >
           {secondaryHeaderBadges}
         </div>
       </details>
@@ -1019,35 +1109,35 @@ function PatientCard({
       ) : null}
 
       {cardDensity.showMetaGrid ? (
-      <div className="patient-card__meta-grid">
-        <div className="patient-card__meta-item">
-          <span>{queueTiming?.isOnline ? 'Queue' : 'Wait'}</span>
-          <strong className="cdl-wait cdl-text-severity" data-severity={waitStatusSeverity}>
-            {queueTiming ? (
-              <>
-                {queueTiming.elapsedLabel}
-                <small className="patient-card__wait-remaining">
-                  {queueTiming.remainingLabel}
-                </small>
-              </>
-            ) : (
-              `${minutesWaiting}m`
-            )}
-          </strong>
+        <div className="patient-card__meta-grid">
+          <div className="patient-card__meta-item">
+            <span>{queueTiming?.isOnline ? 'Queue' : 'Wait'}</span>
+            <strong className="cdl-wait cdl-text-severity" data-severity={waitStatusSeverity}>
+              {queueTiming ? (
+                <>
+                  {queueTiming.elapsedLabel}
+                  <small className="patient-card__wait-remaining">
+                    {queueTiming.remainingLabel}
+                  </small>
+                </>
+              ) : (
+                `${minutesWaiting}m`
+              )}
+            </strong>
+          </div>
+          {privacyPolicy.showRoomAssignment ? (
+            <div className="patient-card__meta-item">
+              <span>Room</span>
+              <strong>{patient.roomId ? patient.roomId.toUpperCase() : 'Unassigned'}</strong>
+            </div>
+          ) : null}
+          {privacyPolicy.showStaffAssignment ? (
+            <div className="patient-card__meta-item">
+              <span>Staff</span>
+              <strong>{staffInitials(assignedStaff?.name)}</strong>
+            </div>
+          ) : null}
         </div>
-        {privacyPolicy.showRoomAssignment ? (
-          <div className="patient-card__meta-item">
-            <span>Room</span>
-            <strong>{patient.roomId ? patient.roomId.toUpperCase() : 'Unassigned'}</strong>
-          </div>
-        ) : null}
-        {privacyPolicy.showStaffAssignment ? (
-          <div className="patient-card__meta-item">
-            <span>Staff</span>
-            <strong>{staffInitials(assignedStaff?.name)}</strong>
-          </div>
-        ) : null}
-      </div>
       ) : null}
 
       {queueTiming?.isOnline ? (
@@ -1066,19 +1156,45 @@ function PatientCard({
           className="patient-card__vitals"
           aria-label={abnormalVitalsSummary({ hrAbnormal, bpAbnormal, spo2Abnormal, tempAbnormal })}
         >
-          <span className={hrAbnormal ? 'patient-card__vital patient-card__vital--critical' : 'patient-card__vital'}>
+          <span
+            className={
+              hrAbnormal
+                ? 'patient-card__vital patient-card__vital--critical'
+                : 'patient-card__vital'
+            }
+          >
             <small>HR</small>
             <strong>{hr ?? '--'}</strong>
           </span>
-          <span className={bpAbnormal ? 'patient-card__vital patient-card__vital--warning' : 'patient-card__vital'}>
+          <span
+            className={
+              bpAbnormal
+                ? 'patient-card__vital patient-card__vital--warning'
+                : 'patient-card__vital'
+            }
+          >
             <small>BP</small>
-            <strong>{sbp ?? '--'}/{dbp ?? '--'}</strong>
+            <strong>
+              {sbp ?? '--'}/{dbp ?? '--'}
+            </strong>
           </span>
-          <span className={spo2Abnormal ? 'patient-card__vital patient-card__vital--critical' : 'patient-card__vital'}>
+          <span
+            className={
+              spo2Abnormal
+                ? 'patient-card__vital patient-card__vital--critical'
+                : 'patient-card__vital'
+            }
+          >
             <small>SpO2</small>
             <strong>{spo2 ?? '--'}%</strong>
           </span>
-          <span className={tempAbnormal ? 'patient-card__vital patient-card__vital--warning patient-card__vital-temp' : 'patient-card__vital patient-card__vital-temp'}>
+          <span
+            className={
+              tempAbnormal
+                ? 'patient-card__vital patient-card__vital--warning patient-card__vital-temp'
+                : 'patient-card__vital patient-card__vital-temp'
+            }
+          >
             <small>Temp</small>
             <strong>{temp ?? '--'}°</strong>
           </span>
@@ -1193,7 +1309,10 @@ function PatientCard({
       </button>
 
       {showWorkflowActions ? (
-        <div className="patient-card__mission-actions" aria-label={`Whiteboard actions for ${patientName}`}>
+        <div
+          className="patient-card__mission-actions"
+          aria-label={`Whiteboard actions for ${patientName}`}
+        >
           <button type="button" onClick={handleDetailClick}>
             {workflowProfile === 'physician' ? 'Review' : 'Open Detail'}
           </button>
@@ -1202,27 +1321,31 @@ function PatientCard({
               type="button"
               onClick={handleMoveNext}
               disabled={!canMoveNext}
-              title={canMoveNext ? `Move to ${nextState}` : 'Queue move unavailable for this patient or role'}
+              title={
+                canMoveNext
+                  ? `Move to ${nextState}`
+                  : 'Queue move unavailable for this patient or role'
+              }
             >
               Move: {nextState}
             </button>
           ) : null}
           {flagsPresentation.visible ? (
-          <button
-            type="button"
-            onClick={handleReassessment}
-            disabled={!hasReassessmentDue && !canManageFlags}
-            className={hasReassessmentDue ? 'patient-card__action--reassess-due' : undefined}
-            title={
-              hasReassessmentDue
-                ? 'Open reassessment task'
-                : canManageFlags
-                  ? 'Flag patient for reassessment'
-                  : 'Reassessment launch unavailable for this role'
-            }
-          >
-            {hasReassessmentDue ? 'Reassess' : '+Reassess'}
-          </button>
+            <button
+              type="button"
+              onClick={handleReassessment}
+              disabled={!hasReassessmentDue && !canManageFlags}
+              className={hasReassessmentDue ? 'patient-card__action--reassess-due' : undefined}
+              title={
+                hasReassessmentDue
+                  ? 'Open reassessment task'
+                  : canManageFlags
+                    ? 'Flag patient for reassessment'
+                    : 'Reassessment launch unavailable for this role'
+              }
+            >
+              {hasReassessmentDue ? 'Reassess' : '+Reassess'}
+            </button>
           ) : null}
           {referralPresentation.visible ? (
             <button
@@ -1245,7 +1368,11 @@ function PatientCard({
               type="button"
               onClick={handleBoarding}
               disabled={!canBoardPatient}
-              title={canBoardPatient ? 'Move patient to boarding/admission state' : 'Boarding action unavailable for this patient or role'}
+              title={
+                canBoardPatient
+                  ? 'Move patient to boarding/admission state'
+                  : 'Boarding action unavailable for this patient or role'
+              }
             >
               {isBoarding ? 'Boarded' : 'Board'}
             </button>
@@ -1289,7 +1416,7 @@ function PatientCard({
           ) : null}
         </div>
       ) : null}
-      </>
+    </>
   );
 
   if (readOnlyDisplay) {

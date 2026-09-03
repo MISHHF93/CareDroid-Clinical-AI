@@ -46,4 +46,3 @@ describe('operational workflow config', () => {
     expect(actions.every((action) => action.route.startsWith('/'))).toBe(true);
   });
 });
-

@@ -35,7 +35,9 @@ import {
  * "chest,   pain!!" and "cant breathe" typed without an apostrophe).
  */
 function matchHighRiskFlags(rawText: string, normalizedText: string): HighRiskComplaintFlagId[] {
-  const lightlyNormalized = String(rawText || '').trim().toLowerCase();
+  const lightlyNormalized = String(rawText || '')
+    .trim()
+    .toLowerCase();
   const matches: HighRiskComplaintFlagId[] = [];
   for (const definition of HIGH_RISK_COMPLAINT_FLAG_DEFINITIONS) {
     const isMatch = definition.keywords.some(
@@ -91,10 +93,26 @@ type ConceptTerm = { term: string; method: MatchMethod; concept: ClinicalConcept
 function allTermsForConcept(concept: ClinicalConcept): ConceptTerm[] {
   const terms: ConceptTerm[] = [
     { term: normalizeComplaintText(concept.canonicalName), method: 'exact', concept },
-    ...concept.synonyms.map((term) => ({ term: normalizeComplaintText(term), method: 'synonym' as MatchMethod, concept })),
-    ...concept.layTerms.map((term) => ({ term: normalizeComplaintText(term), method: 'lay-term' as MatchMethod, concept })),
-    ...concept.abbreviations.map((term) => ({ term: normalizeComplaintText(term), method: 'abbreviation' as MatchMethod, concept })),
-    ...concept.spellingVariants.map((term) => ({ term: normalizeComplaintText(term), method: 'spelling-variant' as MatchMethod, concept })),
+    ...concept.synonyms.map((term) => ({
+      term: normalizeComplaintText(term),
+      method: 'synonym' as MatchMethod,
+      concept,
+    })),
+    ...concept.layTerms.map((term) => ({
+      term: normalizeComplaintText(term),
+      method: 'lay-term' as MatchMethod,
+      concept,
+    })),
+    ...concept.abbreviations.map((term) => ({
+      term: normalizeComplaintText(term),
+      method: 'abbreviation' as MatchMethod,
+      concept,
+    })),
+    ...concept.spellingVariants.map((term) => ({
+      term: normalizeComplaintText(term),
+      method: 'spelling-variant' as MatchMethod,
+      concept,
+    })),
   ];
   return terms.filter((entry) => entry.term.length > 0);
 }
@@ -155,7 +173,10 @@ function dedupeByConcept(candidates: ComplaintCandidate[]): ComplaintCandidate[]
   return [...seen.values()];
 }
 
-function fuzzyMatchGeneralConcepts(normalizedText: string, allTerms: ConceptTerm[]): ComplaintCandidate[] {
+function fuzzyMatchGeneralConcepts(
+  normalizedText: string,
+  allTerms: ConceptTerm[],
+): ComplaintCandidate[] {
   const inputWords = normalizedText.split(' ').filter((word) => word.length >= 4);
   if (!inputWords.length) return [];
 
@@ -164,7 +185,10 @@ function fuzzyMatchGeneralConcepts(normalizedText: string, allTerms: ConceptTerm
     // Whole-phrase fuzzy: catches a typo anywhere in a short canonical phrase.
     if (term.length >= 4) {
       const wholeDistance = levenshteinDistance(normalizedText, term);
-      if (wholeDistance > 0 && wholeDistance <= fuzzyDistanceThreshold(Math.max(normalizedText.length, term.length))) {
+      if (
+        wholeDistance > 0 &&
+        wholeDistance <= fuzzyDistanceThreshold(Math.max(normalizedText.length, term.length))
+      ) {
         results.push({
           conceptId: concept.id,
           canonicalName: concept.canonicalName,
@@ -179,7 +203,10 @@ function fuzzyMatchGeneralConcepts(normalizedText: string, allTerms: ConceptTerm
       if (termWord.length < 4) continue;
       for (const inputWord of inputWords) {
         const distance = levenshteinDistance(inputWord, termWord);
-        if (distance > 0 && distance <= fuzzyDistanceThreshold(Math.max(inputWord.length, termWord.length))) {
+        if (
+          distance > 0 &&
+          distance <= fuzzyDistanceThreshold(Math.max(inputWord.length, termWord.length))
+        ) {
           results.push({
             conceptId: concept.id,
             canonicalName: concept.canonicalName,

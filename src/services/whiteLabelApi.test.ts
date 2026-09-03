@@ -19,9 +19,12 @@ describe('whiteLabelApi', () => {
     localStorage.clear();
     window.history.replaceState({}, '', '/');
     vi.mocked(apiFetch).mockResolvedValue(
-      new Response(JSON.stringify({ tenantId: 'demo-care', branding: { displayName: 'Demo Care' } }), {
-        status: 200,
-      }),
+      new Response(
+        JSON.stringify({ tenantId: 'demo-care', branding: { displayName: 'Demo Care' } }),
+        {
+          status: 200,
+        },
+      ),
     );
   });
 

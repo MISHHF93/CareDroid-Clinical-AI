@@ -60,7 +60,7 @@ describe('frontend rendering inventory — roadmap scope', () => {
     expect(ROADMAP_FRONTEND_REGISTRY_IDS).toHaveLength(25);
     expect(new Set(ROADMAP_FRONTEND_REGISTRY_IDS).size).toBe(25);
     expect([...PR_FLEET_TOOL_IDS].every((id) => ROADMAP_FRONTEND_REGISTRY_IDS.includes(id))).toBe(
-      true
+      true,
     );
   });
 
@@ -74,10 +74,7 @@ describe('frontend rendering inventory — roadmap scope', () => {
 describe('frontend rendering audit — full matrix', () => {
   it('passes with no missing render paths', () => {
     const audit = runFrontendRenderingAudit();
-    expect(
-      audit.ok,
-      formatMissingRenderReport(audit)
-    ).toBe(true);
+    expect(audit.ok, formatMissingRenderReport(audit)).toBe(true);
     expect(audit.failing).toBe(0);
     expect(audit.duplicateIds).toEqual([]);
     expect(audit.routeCollisions).toEqual([]);
@@ -94,28 +91,34 @@ describe('frontend rendering audit — full matrix', () => {
 });
 
 describe('frontend rendering — per-tool layers', () => {
-  it.each(ROADMAP_FRONTEND_REGISTRY_IDS)('%s has registry, catalog, discovery, and launch path', (registryId) => {
-    const row = buildFrontendRenderingRow(registryId);
-    expect(row.layers.registry).toBe(true);
-    expect(row.layers.catalog).toBe(true);
-    expect(row.layers.discovery).toBe(true);
-    expect(row.launchPath).toBeTruthy();
-    expect(validateFrontendRenderingRow(row), registryId).toEqual([]);
-  });
+  it.each(ROADMAP_FRONTEND_REGISTRY_IDS)(
+    '%s has registry, catalog, discovery, and launch path',
+    (registryId) => {
+      const row = buildFrontendRenderingRow(registryId);
+      expect(row.layers.registry).toBe(true);
+      expect(row.layers.catalog).toBe(true);
+      expect(row.layers.discovery).toBe(true);
+      expect(row.launchPath).toBeTruthy();
+      expect(validateFrontendRenderingRow(row), registryId).toEqual([]);
+    },
+  );
 
-  it.each(ROADMAP_TIER_A_IDS)('Tier A %s keeps calculator switch but no active App route', (registryId) => {
-    const row = buildFrontendRenderingRow(registryId);
-    // Tools with a real backend executor (see REGISTRY_ID_TO_ORCHESTRATOR_TOOL) are
-    // reclassified from Tier A to Tier C by tierForRegistryId — tierAFormSwitch is then
-    // null (it's only computed for tier === 'A'), though the builtin calculator form
-    // switch case itself remains registered.
-    const isBackendExecutor = Boolean(REGISTRY_ID_TO_ORCHESTRATOR_TOOL[registryId]);
-    expect(row.tier).toBe(isBackendExecutor ? 'C' : 'A');
-    expect(row.layers.appRoute).toBe(false);
-    expect(row.layers.tierAFormSwitch).toBe(isBackendExecutor ? null : true);
-    expect(row.builtinSlug).toBeTruthy();
-    expect(calculatorsSource).toContain(`case '${row.builtinSlug}':`);
-  });
+  it.each(ROADMAP_TIER_A_IDS)(
+    'Tier A %s keeps calculator switch but no active App route',
+    (registryId) => {
+      const row = buildFrontendRenderingRow(registryId);
+      // Tools with a real backend executor (see REGISTRY_ID_TO_ORCHESTRATOR_TOOL) are
+      // reclassified from Tier A to Tier C by tierForRegistryId — tierAFormSwitch is then
+      // null (it's only computed for tier === 'A'), though the builtin calculator form
+      // switch case itself remains registered.
+      const isBackendExecutor = Boolean(REGISTRY_ID_TO_ORCHESTRATOR_TOOL[registryId]);
+      expect(row.tier).toBe(isBackendExecutor ? 'C' : 'A');
+      expect(row.layers.appRoute).toBe(false);
+      expect(row.layers.tierAFormSwitch).toBe(isBackendExecutor ? null : true);
+      expect(row.builtinSlug).toBeTruthy();
+      expect(calculatorsSource).toContain(`case '${row.builtinSlug}':`);
+    },
+  );
 
   it.each(ROADMAP_TIER_B_IDS)('Tier B %s has hub card and chat seed', (registryId) => {
     const row = buildFrontendRenderingRow(registryId);
@@ -135,12 +138,15 @@ describe('frontend rendering — per-tool layers', () => {
     expect(launch.path).toBe('/tools/calculators');
   });
 
-  it.each(FLEET_TIER_A_REGISTRY_IDS)('fleet Tier A %s remains archived outside active App routes', (registryId) => {
-    const row = buildFrontendRenderingRow(registryId);
-    expect(row.tier).toBe('fleet-A');
-    expect(row.layers.fleetPage).toBe(false);
-    expect(row.route.startsWith('/fleet/')).toBe(true);
-  });
+  it.each(FLEET_TIER_A_REGISTRY_IDS)(
+    'fleet Tier A %s remains archived outside active App routes',
+    (registryId) => {
+      const row = buildFrontendRenderingRow(registryId);
+      expect(row.tier).toBe('fleet-A');
+      expect(row.layers.fleetPage).toBe(false);
+      expect(row.route.startsWith('/fleet/')).toBe(true);
+    },
+  );
 });
 
 describe('frontend rendering — App.jsx routes', () => {
@@ -160,7 +166,7 @@ describe('frontend rendering — App.jsx routes', () => {
     for (const slug of roadmapSlugs) {
       expect(
         CALCULATOR_ROUTE_DEFS.some((d) => d.calculatorSlug === slug),
-        slug
+        slug,
       ).toBe(true);
     }
   });
@@ -177,7 +183,7 @@ describe('frontend rendering — App.jsx routes', () => {
 describe('frontend rendering — catalog launch', () => {
   it.each(ROADMAP_FRONTEND_REGISTRY_IDS)('catalog row for %s resolves launch', (registryId) => {
     const rows = getMedicalToolsCatalogRows().filter(
-      (r) => r.sidebarToolId === registryId || r.id === registryId
+      (r) => r.sidebarToolId === registryId || r.id === registryId,
     );
     expect(rows.length).toBeGreaterThan(0);
     const launch = resolveCatalogLaunch(registryId);
@@ -191,7 +197,7 @@ describe('frontend rendering — sidebar destinations', () => {
     (registryId) => {
       const row = buildFrontendRenderingRow(registryId);
       expect(row.layers.sidebarPath, registryId).toBe(true);
-    }
+    },
   );
 });
 
@@ -203,7 +209,9 @@ describe('frontend rendering — invalid tool fallback', () => {
 
   it('invalid registry id launch still returns hub or fallback path', () => {
     const launch = resolveCatalogLaunch('not-a-real-tool-id-xyz');
-    expect(launch.path === '/tools/calculators' || launch.path === null || launch.path).toBeTruthy();
+    expect(
+      launch.path === '/tools/calculators' || launch.path === null || launch.path,
+    ).toBeTruthy();
   });
 });
 

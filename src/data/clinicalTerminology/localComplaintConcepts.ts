@@ -7,7 +7,10 @@ const PROVENANCE =
   'no licensed CEDIS/SNOMED CT CA/ICD-10-CA source files are present in this repository; ' +
   'these are plain-language local concepts, not authoritative codes.';
 
-function baseConcept(partial: Partial<ClinicalConcept> & Pick<ClinicalConcept, 'id' | 'canonicalName' | 'displayName' | 'category' | 'complaintGroup'>): ClinicalConcept {
+function baseConcept(
+  partial: Partial<ClinicalConcept> &
+    Pick<ClinicalConcept, 'id' | 'canonicalName' | 'displayName' | 'category' | 'complaintGroup'>,
+): ClinicalConcept {
   return {
     type: 'SYMPTOM',
     synonyms: [],
@@ -43,7 +46,15 @@ export const LOCAL_GENERAL_COMPLAINT_CONCEPTS: readonly ClinicalConcept[] = Obje
     displayName: 'Dizziness / lightheadedness',
     category: 'neurologic',
     complaintGroup: 'Neurologic',
-    synonyms: ['dizzy', 'dizziness', 'lightheaded', 'light headed', 'lightheadedness', 'vertigo', 'room spinning'],
+    synonyms: [
+      'dizzy',
+      'dizziness',
+      'lightheaded',
+      'light headed',
+      'lightheadedness',
+      'vertigo',
+      'room spinning',
+    ],
     layTerms: ['woozy', 'feeling faint', 'head spinning'],
   }),
   baseConcept({
@@ -52,7 +63,14 @@ export const LOCAL_GENERAL_COMPLAINT_CONCEPTS: readonly ClinicalConcept[] = Obje
     displayName: 'Abdominal pain (general)',
     category: 'gastrointestinal',
     complaintGroup: 'Gastrointestinal',
-    synonyms: ['abdominal pain', 'abdo pain', 'belly pain', 'stomach pain', 'tummy pain', 'abdominal discomfort'],
+    synonyms: [
+      'abdominal pain',
+      'abdo pain',
+      'belly pain',
+      'stomach pain',
+      'tummy pain',
+      'abdominal discomfort',
+    ],
     abbreviations: ['abdo pain'],
     layTerms: ['stomach ache', 'gut pain'],
   }),
@@ -81,7 +99,13 @@ export const LOCAL_GENERAL_COMPLAINT_CONCEPTS: readonly ClinicalConcept[] = Obje
     displayName: 'Weakness (general)',
     category: 'general',
     complaintGroup: 'Pediatric / General',
-    synonyms: ['weakness', 'general weakness', 'generalized weakness', 'feeling weak', 'weak all over'],
+    synonyms: [
+      'weakness',
+      'general weakness',
+      'generalized weakness',
+      'feeling weak',
+      'weak all over',
+    ],
   }),
   baseConcept({
     id: 'palpitations',
@@ -89,11 +113,21 @@ export const LOCAL_GENERAL_COMPLAINT_CONCEPTS: readonly ClinicalConcept[] = Obje
     displayName: 'Palpitations / irregular heartbeat',
     category: 'cardiovascular',
     complaintGroup: 'Cardiovascular',
-    synonyms: ['palpitations', 'heart racing', 'racing heart', 'irregular heartbeat', 'heart pounding', 'skipped a beat', 'heart fluttering'],
+    synonyms: [
+      'palpitations',
+      'heart racing',
+      'racing heart',
+      'irregular heartbeat',
+      'heart pounding',
+      'skipped a beat',
+      'heart fluttering',
+    ],
   }),
 ]);
 
-function highRiskFlagToConcept(definition: (typeof HIGH_RISK_COMPLAINT_FLAG_DEFINITIONS)[number]): ClinicalConcept {
+function highRiskFlagToConcept(
+  definition: (typeof HIGH_RISK_COMPLAINT_FLAG_DEFINITIONS)[number],
+): ClinicalConcept {
   // The fast-flag registry matches on regex, not a flat synonym list — recognizeComplaint()
   // consults HIGH_RISK_COMPLAINT_FLAG_DEFINITIONS directly for matching, this projection
   // exists only so these categories also appear in concept listings/autocomplete/gap

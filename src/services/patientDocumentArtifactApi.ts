@@ -32,7 +32,8 @@ function localEnvelope(
 ): PatientDocumentArtifactEnvelope {
   const pendingReviewCount = artifacts.filter(
     (artifact) =>
-      artifact.reviewStatus === 'pending_human_review' || artifact.reviewStatus === 'needs_clarification',
+      artifact.reviewStatus === 'pending_human_review' ||
+      artifact.reviewStatus === 'needs_clarification',
   ).length;
 
   return {
@@ -50,7 +51,9 @@ export async function fetchPatientDocumentArtifacts(
 ): Promise<PatientDocumentArtifactEnvelope> {
   try {
     const response = await apiFetch(`/api/emergency/patients/${patientId}/document-artifacts`);
-    const parsed = await (parseApiResponse as (r: Response) => Promise<PatientDocumentArtifactEnvelope>)(response);
+    const parsed = await (
+      parseApiResponse as (r: Response) => Promise<PatientDocumentArtifactEnvelope>
+    )(response);
     if (parsed?.data?.artifacts) return parsed;
   } catch {
     // Expected when backend is unavailable — fall through to empty local envelope.
@@ -64,12 +67,17 @@ export async function extractPatientDocumentArtifacts(
   const local = extractDocumentArtifacts(input);
 
   try {
-    const response = await apiFetch(`/api/emergency/patients/${input.patientId}/document-artifacts/extract`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(input),
-    });
-    const parsed = await (parseApiResponse as (r: Response) => Promise<PatientDocumentArtifactEnvelope>)(response);
+    const response = await apiFetch(
+      `/api/emergency/patients/${input.patientId}/document-artifacts/extract`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(input),
+      },
+    );
+    const parsed = await (
+      parseApiResponse as (r: Response) => Promise<PatientDocumentArtifactEnvelope>
+    )(response);
     if (parsed?.data?.artifacts?.length) return parsed;
   } catch {
     // Expected when backend is unavailable — fall through to local extraction.
@@ -92,7 +100,9 @@ export async function reviewPatientDocumentArtifact(
         body: JSON.stringify(reviewInput),
       },
     );
-    const parsed = await (parseApiResponse as (r: Response) => Promise<PatientDocumentArtifactEnvelope>)(response);
+    const parsed = await (
+      parseApiResponse as (r: Response) => Promise<PatientDocumentArtifactEnvelope>
+    )(response);
     if (parsed?.data?.artifacts) return parsed;
   } catch {
     // Expected when backend is unavailable — fall through to local review.

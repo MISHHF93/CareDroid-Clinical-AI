@@ -83,7 +83,9 @@ describe('unifiedOperationalIntelligenceEngine — 403 back-off (HEAL-100)', () 
     expect(fetchSnapshot).toHaveBeenCalledTimes(1);
 
     // Further realtime events must not queue or trigger another request once denied.
-    engine.handleUnifiedOperationalIntelligenceBackendEvent('journey_state_changed', { patientId: 'p-1' });
+    engine.handleUnifiedOperationalIntelligenceBackendEvent('journey_state_changed', {
+      patientId: 'p-1',
+    });
     await engine.refreshUnifiedOperationalIntelligenceFromBackend('journey_state_changed');
 
     expect(fetchSnapshot).toHaveBeenCalledTimes(1);

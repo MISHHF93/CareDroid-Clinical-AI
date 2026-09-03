@@ -51,9 +51,16 @@ describe('whoNext scoring', () => {
   it('scores priority, wait time, flags, and missing protocol score with top reason factors', () => {
     const result = scoreWhoNextPatient(
       patient({
-        flags: [{ type: 'HighRisk', reason: 'Chest pain', detectedAt: now.toISOString(), severity: 'Critical' }],
+        flags: [
+          {
+            type: 'HighRisk',
+            reason: 'Chest pain',
+            detectedAt: now.toISOString(),
+            severity: 'Critical',
+          },
+        ],
       }),
-      { now }
+      { now },
     );
 
     expect(result.score).toBe(30 + 23 + 15 + 30);
@@ -68,9 +75,21 @@ describe('whoNext scoring', () => {
           id: 'winner',
           firstName: 'Sarah',
           priority: Priority.P2,
-          flags: [{ type: 'ReassessmentDue', reason: 'Overdue', detectedAt: now.toISOString(), severity: 'Warning' }],
+          flags: [
+            {
+              type: 'ReassessmentDue',
+              reason: 'Overdue',
+              detectedAt: now.toISOString(),
+              severity: 'Warning',
+            },
+          ],
         }),
-        patient({ id: 'other-staff', firstName: 'Other', assignedStaffId: 'staff-rn', priority: Priority.P1 }),
+        patient({
+          id: 'other-staff',
+          firstName: 'Other',
+          assignedStaffId: 'staff-rn',
+          priority: Priority.P1,
+        }),
       ],
       rooms: [{ id: 'bed-7', name: 'Bed 7' }],
       staff: [{ id: 'staff-md', role: 'Attending', firstName: 'Priya', lastName: 'Nair' }],
@@ -81,7 +100,7 @@ describe('whoNext scoring', () => {
     expect(recommendation.patient.id).toBe('winner');
     expect((recommendation as { room?: string }).room).toBe('Bed 7');
     expect(formatWhoNextForCopilot(recommendation)).toBe(
-      'Suggested next: Sarah Miller (Bed 7) — P2 priority + reassessment due'
+      'Suggested next: Sarah Miller (Bed 7) — P2 priority + reassessment due',
     );
   });
 
@@ -103,7 +122,14 @@ describe('whoNext scoring', () => {
       patients: [
         {
           ...skipped,
-          flags: [{ type: 'DeteriorationRisk', reason: 'Worse', detectedAt: now.toISOString(), severity: 'Critical' }],
+          flags: [
+            {
+              type: 'DeteriorationRisk',
+              reason: 'Worse',
+              detectedAt: now.toISOString(),
+              severity: 'Critical',
+            },
+          ],
         },
         next,
       ],

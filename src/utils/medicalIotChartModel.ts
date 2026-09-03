@@ -22,12 +22,20 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 export function resolveDeviceCategory(type: string = ''): string {
   const normalized = type.toLowerCase();
-  if (normalized.includes('glucose') || normalized.includes('wearable') || normalized.includes('patch')) {
+  if (
+    normalized.includes('glucose') ||
+    normalized.includes('wearable') ||
+    normalized.includes('patch')
+  ) {
     return 'wearable';
   }
   if (normalized.includes('infusion') || normalized.includes('pump')) return 'infusion';
   if (normalized.includes('ventilat')) return 'ventilator';
-  if (normalized.includes('pulse') || normalized.includes('oximeter') || normalized.includes('monitor')) {
+  if (
+    normalized.includes('pulse') ||
+    normalized.includes('oximeter') ||
+    normalized.includes('monitor')
+  ) {
     return 'monitor';
   }
   if (normalized.includes('imaging') || normalized.includes('radiology')) return 'imaging';

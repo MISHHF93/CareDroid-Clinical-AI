@@ -68,4 +68,3 @@ describe('accountableFromGatewayPayload', () => {
     expect(rec.evidence[0]?.citation).toMatch(/Reception checklist/i);
   });
 });
-

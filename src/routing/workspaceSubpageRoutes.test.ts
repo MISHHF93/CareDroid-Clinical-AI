@@ -22,9 +22,12 @@ describe('workspace subpage routes', () => {
     expect(LEGACY_EMERGENCY_ROUTE_REDIRECTS).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ path: '/workspace/emergency', to: '/emergency/whiteboard' }),
-        expect.objectContaining({ path: '/workspace/emergency/patients', to: '/emergency/patients' }),
+        expect.objectContaining({
+          path: '/workspace/emergency/patients',
+          to: '/emergency/patients',
+        }),
         expect.objectContaining({ path: '/workspace/emergency/queues', to: '/emergency/queues' }),
-      ])
+      ]),
     );
     expect(appSource).toContain('LEGACY_EMERGENCY_ROUTE_REDIRECTS.map(({ path, to }) => (');
     expect(appSource).toContain('path={CANONICAL_ROUTES.workspace}');
@@ -33,7 +36,7 @@ describe('workspace subpage routes', () => {
 
   it('keeps automation analytics unmounted from the active CareDroid app', () => {
     expect(appSource).not.toContain('path={CANONICAL_ROUTES.automationAnalytics}');
-    expect(appSource).not.toContain("path=\"/automation-analytics\"");
+    expect(appSource).not.toContain('path="/automation-analytics"');
     expect(appSource).toMatch(/<Route path="\*"\s+element=\{<EmergencyDefaultRedirect \/>\}/);
   });
 });

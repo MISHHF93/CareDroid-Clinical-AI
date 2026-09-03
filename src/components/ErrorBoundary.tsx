@@ -21,9 +21,7 @@ const getSessionId = () => {
 
 const reportCrash = (error, errorInfo) => {
   const normalizedError =
-    error instanceof Error
-      ? error
-      : new Error(String(error?.message || error || 'Unknown error'));
+    error instanceof Error ? error : new Error(String(error?.message || error || 'Unknown error'));
   crashReportingService.captureException(normalizedError, {
     componentStack: errorInfo?.componentStack || '',
     sessionId: getSessionId(),
@@ -113,7 +111,13 @@ class ErrorBoundary extends Component<any, any> {
         <div className="eb-page">
           <div className="eb-page-content">
             <span className="eb-page-brand" aria-hidden="true">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
                 <path
                   d="M3 12h4l2-6 4 12 2-6h6"
                   stroke="currentColor"
@@ -125,8 +129,8 @@ class ErrorBoundary extends Component<any, any> {
             </span>
             <h1 className="eb-page-title">CareDroid hit a snag</h1>
             <p className="eb-page-desc">
-              This screen ran into an unexpected error and has been automatically reported. Your other
-              work in CareDroid is unaffected — reloading usually resolves it.
+              This screen ran into an unexpected error and has been automatically reported. Your
+              other work in CareDroid is unaffected — reloading usually resolves it.
             </p>
             {showErrorDetails && this.state.error && (
               <details className="eb-details--full-page">

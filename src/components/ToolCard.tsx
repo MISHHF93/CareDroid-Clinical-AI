@@ -10,7 +10,7 @@ import { getToolIcon } from '../navigation/iconRegistry';
 function Notice({ variant, title = undefined as any, children }) {
   return (
     <div className={`tool-card-notice tool-card-notice--${variant}`} role="status">
-      {title && <div className="tool-card-strong u-mb-8" >{title}</div>}
+      {title && <div className="tool-card-strong u-mb-8">{title}</div>}
       {children}
     </div>
   );
@@ -40,11 +40,7 @@ export function ToolResultBody({ toolResult }) {
 
   return (
     <>
-      {interpretation && (
-        <Notice variant={interpVariant}>
-          {interpretation}
-        </Notice>
-      )}
+      {interpretation && <Notice variant={interpVariant}>{interpretation}</Notice>}
 
       {renderToolContent()}
 
@@ -61,7 +57,7 @@ export function ToolResultBody({ toolResult }) {
       {citations && citations.length > 0 && (
         <div className="u-mt-16">
           <hr className="tool-card-divider" />
-          <div className="tool-card-muted u-mb-8" >
+          <div className="tool-card-muted u-mb-8">
             <strong>References:</strong>
           </div>
           <ul className="u-list-tight">
@@ -141,8 +137,7 @@ function renderSofaCalculator(data) {
           <tbody>
             {componentScores.map((row) => {
               const score = row.value;
-              const bg =
-                score === 0 ? '#16a34a' : score <= 2 ? '#ca8a04' : '#dc2626';
+              const bg = score === 0 ? '#16a34a' : score <= 2 ? '#ca8a04' : '#dc2626';
               return (
                 <tr key={row.key}>
                   <td>{row.label}</td>
@@ -320,9 +315,7 @@ function renderLabInterpreter(data) {
               <p className="u-mb-8">{interp.clinicalSignificance}</p>
               {interp.suggestedActions && interp.suggestedActions.length > 0 && (
                 <>
-                  <div className="tool-card-muted u-fs-12" >
-                    Suggested Actions:
-                  </div>
+                  <div className="tool-card-muted u-fs-12">Suggested Actions:</div>
                   <ul className="u-mt-4 u-pl-20 u-fs-12">
                     {interp.suggestedActions.map((action, actionIdx) => (
                       <li key={actionIdx}>{action}</li>
@@ -339,9 +332,7 @@ function renderLabInterpreter(data) {
       {data.labValues && data.labValues.length > 0 && (
         <div className="u-mt-16">
           <hr className="tool-card-divider" />
-          <div className="tool-card-strong u-mb-8" >
-            All Lab Values
-          </div>
+          <div className="tool-card-strong u-mb-8">All Lab Values</div>
           <div className="tool-card-table-wrap">
             <table className="tool-card-table">
               <thead>

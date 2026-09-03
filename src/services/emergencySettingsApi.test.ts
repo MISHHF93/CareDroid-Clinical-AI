@@ -18,7 +18,8 @@ vi.mock('./tenantContextStore', () => ({
   getTenantContext: () => ({ organizationId: 'org-test' }),
 }));
 
-const { fetchEmergencyOsSettings, saveEmergencyOsSettings } = await import('./emergencySettingsApi');
+const { fetchEmergencyOsSettings, saveEmergencyOsSettings } =
+  await import('./emergencySettingsApi');
 
 describe('emergencySettingsApi CareDroid settings contract', () => {
   beforeEach(() => {
@@ -37,7 +38,10 @@ describe('emergencySettingsApi CareDroid settings contract', () => {
     const result = await fetchEmergencyOsSettings();
 
     expect(result.ok).toBe(true);
-    expect(apiFetch).toHaveBeenCalledWith('/api/emergency/settings', expect.objectContaining({ headers: expect.objectContaining({}) }));
+    expect(apiFetch).toHaveBeenCalledWith(
+      '/api/emergency/settings',
+      expect.objectContaining({ headers: expect.objectContaining({}) }),
+    );
   });
 
   it('patches grouped settings and returns the updated envelope', async () => {
@@ -51,7 +55,7 @@ describe('emergencySettingsApi CareDroid settings contract', () => {
         method: 'PATCH',
         body: JSON.stringify(payload),
         headers: expect.objectContaining({ 'Content-Type': 'application/json' }),
-      })
+      }),
     );
   });
 });

@@ -22,9 +22,9 @@ const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
 const patternsSource = readFileSync(
   join(
     __dirname,
-    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts'
+    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts',
   ),
-  'utf8'
+  'utf8',
 );
 const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.tsx'), 'utf8');
 const utilSource = readFileSync(join(__dirname, '../utils/abcd2Calculator.ts'), 'utf8');
@@ -57,7 +57,7 @@ describe('ABCD² score (abcd2) wiring', () => {
     expect(calculatorsSource).toMatch(new RegExp(`case\\s+'${id}'\\s*:`));
     expect(matchCalculatorRoute(`/tools/calculators/${id}`)?.calculatorSlug).toBe(id);
     expect(CALCULATOR_ROUTE_DEFS.find((d) => d.calculatorSlug === id)?.path).toBe(
-      `/tools/calculators/${id}`
+      `/tools/calculators/${id}`,
     );
   });
 

@@ -43,10 +43,7 @@ describe('referralAwarenessModel', () => {
   });
 
   it('builds strip metrics for active referral buckets', () => {
-    const metrics = buildReferralAttentionStripMetrics([
-      { status: 'Sent' },
-      { status: 'Delayed' },
-    ]);
+    const metrics = buildReferralAttentionStripMetrics([{ status: 'Sent' }, { status: 'Delayed' }]);
     expect(metrics.map((metric) => metric.label)).toEqual(['Pending', 'Delayed']);
   });
 });

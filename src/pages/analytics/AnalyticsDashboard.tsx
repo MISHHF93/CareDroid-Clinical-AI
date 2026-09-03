@@ -18,7 +18,8 @@ import './AnalyticsDashboard.css';
 
 const PLATFORM_ANALYTICS_ROUTE_CHROME = Object.freeze({
   title: 'Platform Analytics',
-  subtitle: 'Privacy-safe adoption trends, feature engagement, and inventory stewardship decisions.',
+  subtitle:
+    'Privacy-safe adoption trends, feature engagement, and inventory stewardship decisions.',
 });
 
 export default function AnalyticsDashboard() {
@@ -36,8 +37,12 @@ export default function AnalyticsDashboard() {
         <div className="platform-analytics-page__title-row">
           <GraphicIconBadge iconKey="activity" accent="brand" size="md" />
           <div>
-            <p className="platform-analytics-page__title-text" data-testid="cd-page-title-text">Platform Analytics</p>
-            <p>Privacy-safe adoption trends, feature engagement, and inventory stewardship decisions.</p>
+            <p className="platform-analytics-page__title-text" data-testid="cd-page-title-text">
+              Platform Analytics
+            </p>
+            <p>
+              Privacy-safe adoption trends, feature engagement, and inventory stewardship decisions.
+            </p>
           </div>
         </div>
         <div className="platform-analytics-page__actions">
@@ -51,11 +56,19 @@ export default function AnalyticsDashboard() {
 
       <StateSourceNotice
         title="Platform analytics source state"
-        states={[DEMO_LIVE_STATES.DEMO, DEMO_LIVE_STATES.LOCAL_ONLY, DEMO_LIVE_STATES.BACKEND_UNAVAILABLE]}
+        states={[
+          DEMO_LIVE_STATES.DEMO,
+          DEMO_LIVE_STATES.LOCAL_ONLY,
+          DEMO_LIVE_STATES.BACKEND_UNAVAILABLE,
+        ]}
         details="Aggregated demo telemetry with PHI and identifiers stripped. Falls back to local inventory when backend metrics are unavailable."
       />
 
-      <div className="platform-analytics-page__metrics" role="group" aria-label="Platform analytics summary metrics">
+      <div
+        className="platform-analytics-page__metrics"
+        role="group"
+        aria-label="Platform analytics summary metrics"
+      >
         <MetricCard
           label="Total events"
           value={String(analytics.summary.totalEvents)}
@@ -112,7 +125,11 @@ export default function AnalyticsDashboard() {
       <section className="platform-analytics-page__panel" aria-label="Top used tools">
         <h2>Top used tools</h2>
         <p>Promote, improve, merge, hide, or monitor recommendations derived from median usage.</p>
-        <div className="platform-analytics-page__table" role="table" aria-label="Top used tools table">
+        <div
+          className="platform-analytics-page__table"
+          role="table"
+          aria-label="Top used tools table"
+        >
           <div className="platform-analytics-page__table-head" role="row">
             <span role="columnheader">Tool</span>
             <span role="columnheader">Category</span>
@@ -120,7 +137,8 @@ export default function AnalyticsDashboard() {
             <span role="columnheader">Decision</span>
           </div>
           {analytics.topUsed.map((row) => {
-            const decision = analytics.decisions.find((item) => item.toolId === row.toolId)?.decision || 'monitor';
+            const decision =
+              analytics.decisions.find((item) => item.toolId === row.toolId)?.decision || 'monitor';
             return (
               <div key={row.toolId} className="platform-analytics-page__table-row" role="row">
                 <span role="cell">{row.name}</span>

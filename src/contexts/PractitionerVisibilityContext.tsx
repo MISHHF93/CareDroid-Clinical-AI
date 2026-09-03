@@ -1,9 +1,4 @@
-import {
-  createContext,
-  useContext,
-  useMemo,
-  type ReactNode,
-} from 'react';
+import { createContext, useContext, useMemo, type ReactNode } from 'react';
 import { getPractitionerSurfaceVisibility } from '../config/practitionerSurfaceVisibility';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import useRouteScreenMode from '../hooks/useRouteScreenMode';
@@ -21,13 +16,11 @@ const DEFAULT_CONTEXT: PractitionerVisibilityContextValue = Object.freeze({
 /** Sentinel — hook resolves live surfaces when no provider is mounted (tests, HMR). */
 const UNRESOLVED_SURFACES = Symbol('practitioner-surfaces-unresolved');
 
-const VisibilityContext = createContext<ReturnType<typeof getPractitionerSurfaceVisibility> | typeof UNRESOLVED_SURFACES>(
-  UNRESOLVED_SURFACES,
-);
+const VisibilityContext = createContext<
+  ReturnType<typeof getPractitionerSurfaceVisibility> | typeof UNRESOLVED_SURFACES
+>(UNRESOLVED_SURFACES);
 
-const VisibilityMetaContext = createContext<PractitionerVisibilityContextValue>(
-  DEFAULT_CONTEXT,
-);
+const VisibilityMetaContext = createContext<PractitionerVisibilityContextValue>(DEFAULT_CONTEXT);
 
 export function PractitionerVisibilityProvider({ children }: { children: ReactNode }) {
   const emergencyRole = useEmergencyRolePermissions();
@@ -39,10 +32,7 @@ export function PractitionerVisibilityProvider({ children }: { children: ReactNo
     }),
     [emergencyRole.role, screenMode],
   );
-  const surfaces = useMemo(
-    () => getPractitionerSurfaceVisibility(context),
-    [context],
-  );
+  const surfaces = useMemo(() => getPractitionerSurfaceVisibility(context), [context]);
 
   return (
     <VisibilityMetaContext.Provider value={context}>

@@ -81,4 +81,3 @@ export function useCareDroidAI(initialRequest?: CareDroidAIRequest) {
     reset,
   };
 }
-

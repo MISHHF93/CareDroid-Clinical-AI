@@ -87,10 +87,7 @@ export function getNluLaunchExpectation(nluToolId) {
     };
   }
 
-  if (
-    AI_SYSTEM_REGISTRY_IDS.includes(registryId) &&
-    nlu.path === TOOL_LAUNCH_PATHS.assistant
-  ) {
+  if (AI_SYSTEM_REGISTRY_IDS.includes(registryId) && nlu.path === TOOL_LAUNCH_PATHS.assistant) {
     return {
       nluToolId,
       kind: 'tier-b-chat',
@@ -177,5 +174,5 @@ export function getNluLaunchExpectation(nluToolId) {
 }
 
 export const NLU_LAUNCH_EXPECTATIONS = Object.freeze(
-  NLU_PROFILE_TOOL_IDS.map((id) => getNluLaunchExpectation(id))
+  NLU_PROFILE_TOOL_IDS.map((id) => getNluLaunchExpectation(id)),
 );

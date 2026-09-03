@@ -32,7 +32,7 @@ describe('abcd2Calculator', () => {
         clinicalFeature: 'unilateral_weakness',
         durationBand: 'sixty_plus',
         diabetes: true,
-      })
+      }),
     ).toBe(7);
     expect(interpretAbcd2Score(7)?.riskCategory).toBe('high');
   });

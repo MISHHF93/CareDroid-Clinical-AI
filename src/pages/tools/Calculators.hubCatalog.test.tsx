@@ -14,7 +14,11 @@ import {
 } from '../../data/calculatorHubManifest';
 import { getCalculatorToolInventory } from '../../data/toolInventory';
 import { NLU_HUB_ONLY_PROFILE_TOOL_IDS } from '../../data/clinicalToolIdContract';
-import { mockCompactViewport, mockConversationValue, mockToolPreferencesValue } from '../../test/testRenderUtils';
+import {
+  mockCompactViewport,
+  mockConversationValue,
+  mockToolPreferencesValue,
+} from '../../test/testRenderUtils';
 
 vi.mock('./Calculators.css', () => ({}));
 vi.mock('./ToolPageLayout.css', () => ({}));
@@ -51,11 +55,14 @@ vi.mock('../../services/clinicalOrchestratorApi', () => ({
 
 vi.mock('../../services/clinicalToolsApi', () => ({
   fetchClinicalToolMetadata: vi.fn((toolId) =>
-    Promise.resolve({ ok: true, data: { id: toolId, name: toolId, parameters: [] } })
+    Promise.resolve({ ok: true, data: { id: toolId, name: toolId, parameters: [] } }),
   ),
   fetchToolStatistics: vi.fn().mockResolvedValue({
     ok: true,
-    data: { totalTools: 3, tools: [{ id: 'sofa-calculator', name: 'SOFA', category: 'calculator' }] },
+    data: {
+      totalTools: 3,
+      tools: [{ id: 'sofa-calculator', name: 'SOFA', category: 'calculator' }],
+    },
   }),
   validateClinicalTool: vi.fn().mockResolvedValue({
     ok: true,
@@ -77,7 +84,7 @@ function renderHub() {
   return render(
     <MemoryRouter initialEntries={['/tools/calculators']}>
       <Calculators />
-    </MemoryRouter>
+    </MemoryRouter>,
   );
 }
 
@@ -85,7 +92,7 @@ function renderCalculatorAtPath(path, slug) {
   return render(
     <MemoryRouter initialEntries={[path]}>
       <Calculators initialCalculatorId={slug} />
-    </MemoryRouter>
+    </MemoryRouter>,
   );
 }
 
@@ -124,17 +131,17 @@ describe('Calculators hub catalog', () => {
     await screen.findByRole('heading', { name: /screening & severity \(chat\)/i });
 
     expect(
-      screen.getByRole('button', { name: /start guided chat: wells dvt/i })
+      screen.getByRole('button', { name: /start guided chat: wells dvt/i }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: /start guided chat: hospital command assistant/i })
+      screen.getByRole('button', { name: /start guided chat: hospital command assistant/i }),
     ).toBeInTheDocument();
   });
 
   it('deduplicates calculator-related chat-assisted tools in hub manifest', () => {
     const tools = getHubChatAssistedTools();
     const chatAssistedCalculatorRecords = getCalculatorToolInventory().filter(
-      (record) => record.surface === 'chat-assisted'
+      (record) => record.surface === 'chat-assisted',
     );
     const registryIds = tools.map((tool) => tool.registryId);
     expect(tools.length).toBeGreaterThan(0);
@@ -151,7 +158,9 @@ describe('Calculators hub catalog', () => {
 
   it('renders exactly one hub affordance for every calculator inventory record', async () => {
     const dedicated = getCalculatorToolInventory().filter((record) => record.hasDedicatedForm);
-    const chatAssisted = getCalculatorToolInventory().filter((record) => record.surface === 'chat-assisted');
+    const chatAssisted = getCalculatorToolInventory().filter(
+      (record) => record.surface === 'chat-assisted',
+    );
     renderHub();
     await screen.findByRole('heading', { level: 1, name: /medical calculators/i });
 
@@ -169,10 +178,12 @@ describe('Calculators hub catalog', () => {
     render(
       <MemoryRouter>
         <Calculators initialCalculatorId="zz-hub-unknown-slug-999" />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
-    expect(await screen.findByRole('heading', { name: /calculator not found/i })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: /calculator not found/i }),
+    ).toBeInTheDocument();
     expect(screen.getByText(/zz-hub-unknown-slug-999/i)).toBeInTheDocument();
   });
 });
@@ -204,12 +215,12 @@ describe('Calculators — every built-in slug form shell', () => {
       const scope = within(iface as HTMLElement);
       expect(
         iface.querySelector(
-          '.calc-input-group, .calc-has-bled-fieldset, .calc-timi-criteria, .calc-input-grid, select, input'
-        )
+          '.calc-input-group, .calc-has-bled-fieldset, .calc-timi-criteria, .calc-input-grid, select, input',
+        ),
       ).toBeTruthy();
       expect(scope.getByRole('button', { name: /calculate/i })).toBeInTheDocument();
       expect(scope.getByText(/decision support only/i)).toBeInTheDocument();
       expect(iface.querySelector('.calculator-results')).toBeTruthy();
-    }
+    },
   );
 });

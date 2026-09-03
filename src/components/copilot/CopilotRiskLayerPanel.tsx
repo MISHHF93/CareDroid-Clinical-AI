@@ -68,14 +68,15 @@ export default function CopilotRiskLayerPanel({
             ) : null}
             {!compact ? <small>{layer.disclaimer}</small> : null}
             {layer.id === 'clinical_decision_support' && nativeAiSnapshot ? (
-              <div className="copilot-risk-layer-panel__cds-detail" aria-label="Patient routing signals">
-                {routingSignals.length ? (
-                  <p>{routingSignals.slice(0, 3).join(' · ')}</p>
-                ) : null}
+              <div
+                className="copilot-risk-layer-panel__cds-detail"
+                aria-label="Patient routing signals"
+              >
+                {routingSignals.length ? <p>{routingSignals.slice(0, 3).join(' · ')}</p> : null}
                 {specialistInferences[0] ? (
                   <p>
-                    {specialistInferences[0].specialistLabel}: {specialistInferences[0].prediction} (
-                    {Math.round(specialistInferences[0].confidence * 100)}%)
+                    {specialistInferences[0].specialistLabel}: {specialistInferences[0].prediction}{' '}
+                    ({Math.round(specialistInferences[0].confidence * 100)}%)
                   </p>
                 ) : null}
                 <p>
@@ -94,7 +95,9 @@ export default function CopilotRiskLayerPanel({
         ))}
       </div>
       {compact && !patient ? (
-        <p className="copilot-risk-layer-panel__hint">Select a patient on the board for routing detail.</p>
+        <p className="copilot-risk-layer-panel__hint">
+          Select a patient on the board for routing detail.
+        </p>
       ) : null}
     </section>
   );

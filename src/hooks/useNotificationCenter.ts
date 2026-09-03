@@ -16,9 +16,7 @@ import {
   sortAlertsByClassification,
   triageOperationalAlerts,
 } from '../engine/alertClassificationModel';
-import {
-  buildReassessmentNotificationCenterSnapshot,
-} from '../engine/reassessmentTimerEngine';
+import { buildReassessmentNotificationCenterSnapshot } from '../engine/reassessmentTimerEngine';
 import { buildHighRiskComplaintAlerts } from '../services/highRiskComplaintFlags';
 import { buildLwbsRiskAdvisoryAlerts } from '../services/lwbsRiskLayer';
 import { buildDeteriorationWatchAlerts } from '../services/waitingRoomDeteriorationWatch';
@@ -117,8 +115,7 @@ export function useNotificationCenter() {
         workflowLogs,
         staff,
         alerts,
-        communicationOverdueMinutes:
-          Number(thresholds?.communicationOverdueMinutes ?? 30) || 30,
+        communicationOverdueMinutes: Number(thresholds?.communicationOverdueMinutes ?? 30) || 30,
       }),
     [alerts, patients, staff, thresholds, workflowLogs],
   );
@@ -296,7 +293,8 @@ export function useNotificationCenter() {
     const registrationFiltered = !screenCapabilities.isRegistrationScreen
       ? base
       : base.filter((alert) => {
-          const haystack = `${alert.type || ''} ${alert.title || ''} ${alert.message || ''}`.toLowerCase();
+          const haystack =
+            `${alert.type || ''} ${alert.title || ''} ${alert.message || ''}`.toLowerCase();
           if (
             getAlertClassificationTier(alert) === 'critical' &&
             !/ems|ambulance|pre-arrival|inbound/.test(haystack)
@@ -308,7 +306,12 @@ export function useNotificationCenter() {
     return canViewPatients
       ? registrationFiltered
       : registrationFiltered.map((alert) => redactAlertForRole(alert, canViewPatients));
-  }, [alertTriage, canViewPatients, screenCapabilities.isRegistrationScreen, showInformationalAlerts]);
+  }, [
+    alertTriage,
+    canViewPatients,
+    screenCapabilities.isRegistrationScreen,
+    showInformationalAlerts,
+  ]);
 
   const unreadAlertCount = useMemo(
     () => visibleNotificationAlerts.filter((alert) => isAlertActionable(alert)).length,
@@ -432,8 +435,10 @@ export function useNotificationCenter() {
       if (!alert?.id) return;
 
       const targets = escalationAlertTargets(alert);
-      if (emergencyRole.role === EMERGENCY_ROLE_IDS.triageNurse && !targets.includes('triage')) return;
-      if (emergencyRole.role === EMERGENCY_ROLE_IDS.chargeNurse && !targets.includes('charge')) return;
+      if (emergencyRole.role === EMERGENCY_ROLE_IDS.triageNurse && !targets.includes('triage'))
+        return;
+      if (emergencyRole.role === EMERGENCY_ROLE_IDS.chargeNurse && !targets.includes('charge'))
+        return;
 
       const envelope = resolveOperationalAlertEnvelope(alert);
       if (!envelope.showToast || toastedAlertIdsRef.current.has(alert.id)) return;

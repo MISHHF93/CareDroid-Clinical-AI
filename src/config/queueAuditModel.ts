@@ -161,8 +161,7 @@ export function auditReceptionQueues(patients = [] as any[], { emsInbound = 0 }:
       (patient.state === PATIENT_STATE.Registration || patient.state === PATIENT_STATE.Arrival),
   );
   const verificationPatients = active.filter(
-    (patient) =>
-      patient.state === PATIENT_STATE.Registration && !isEmsRegistrationPatient(patient),
+    (patient) => patient.state === PATIENT_STATE.Registration && !isEmsRegistrationPatient(patient),
   );
   const pretriagePatients = active.filter((patient) => patient.state === PATIENT_STATE.Triage);
 
@@ -211,7 +210,9 @@ export function auditReceptionQueues(patients = [] as any[], { emsInbound = 0 }:
 
 const ED_QUEUE_PREDICATES = {
   'waiting-room': (patient) =>
-    [PATIENT_STATE.Waiting, PATIENT_STATE.Registration, PATIENT_STATE.Arrival].includes(patient.state),
+    [PATIENT_STATE.Waiting, PATIENT_STATE.Registration, PATIENT_STATE.Arrival].includes(
+      patient.state,
+    ),
   'triage-queue': (patient) => patient.state === PATIENT_STATE.Triage,
   'provider-queue': (patient) => patient.state === PATIENT_STATE.Assessment,
   'results-queue': (patient) => patient.state === PATIENT_STATE.Results,
@@ -248,9 +249,10 @@ export function auditEdQueues(
 
     if (definition.id === 'reassessment-queue') {
       const reassessmentOverdue = queuePatients.filter((patient) => {
-        const flaggedAt =
-          patient.lastAssessedTime || patient.triageTime || patient.arrivalTime;
-        return minutesSince(flaggedAt) > definition.targetWaitMinutes + reassessmentOverdueGraceMinutes;
+        const flaggedAt = patient.lastAssessedTime || patient.triageTime || patient.arrivalTime;
+        return (
+          minutesSince(flaggedAt) > definition.targetWaitMinutes + reassessmentOverdueGraceMinutes
+        );
       });
       if (reassessmentOverdue.length) {
         return {
@@ -281,7 +283,10 @@ export function auditAllQueues({
 }: any = {}) {
   const openReferralPatientIds = new Set(
     (referrals || [])
-      .filter((referral) => !['Closed', 'Completed', 'Declined', 'PatientDeparted'].includes(referral.status))
+      .filter(
+        (referral) =>
+          !['Closed', 'Completed', 'Declined', 'PatientDeparted'].includes(referral.status),
+      )
       .map((referral) => referral.patientId)
       .filter(Boolean),
   );

@@ -14,7 +14,7 @@ describe('sharedSessions', () => {
     });
 
     expect(buildSharedSessionUrl(shareId, 'https://app.example')).toBe(
-      `https://app.example/shared/tools/${shareId}`
+      `https://app.example/shared/tools/${shareId}`,
     );
     expect(buildSharedSessionUrl(shareId, 'https://app.example')).not.toContain('/shared-result/');
 

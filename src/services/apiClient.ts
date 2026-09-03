@@ -101,9 +101,12 @@ const isPublicApiPath = (apiPath) => isSecurityPublicApiPath(apiPath);
 // In development, reduce console noise from expected degraded/disabled services and 401s
 // when running with the local dev-stack (many backends features are intentionally off).
 // Disabled in Vitest so auth and offline-intercept behaviour can be unit-tested against real fetch.
-const isDev = !import.meta.env.VITEST &&
+const isDev =
+  !import.meta.env.VITEST &&
   typeof window !== 'undefined' &&
-  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || import.meta?.env?.DEV);
+  (window.location.hostname === 'localhost' ||
+    window.location.hostname === '127.0.0.1' ||
+    import.meta?.env?.DEV);
 
 const looksLikeJwt = (token) => {
   if (!token || typeof token !== 'string') return false;
@@ -180,7 +183,14 @@ function buildDevOfflineJsonBody(path) {
     return { workspaces: [], activeWorkspaceId: null, status: 'dev-offline' };
   }
   if (/\/whiteboard|\/patients|\/reassessment/.test(p)) {
-    return { patients: [], staff: [], rooms: [], alerts: [], workflowLogs: [], status: 'dev-offline' };
+    return {
+      patients: [],
+      staff: [],
+      rooms: [],
+      alerts: [],
+      workflowLogs: [],
+      status: 'dev-offline',
+    };
   }
   if (/\/ems/.test(p)) {
     return { arrivals: [], units: [], patients: [], status: 'dev-offline' };
@@ -313,11 +323,9 @@ const mergeAbortSignals = (timeoutMs, userSignal) => {
     if (userSignal.aborted) {
       controller.abort(userSignal.reason);
     } else {
-      userSignal.addEventListener(
-        'abort',
-        () => controller.abort(userSignal.reason),
-        { once: true },
-      );
+      userSignal.addEventListener('abort', () => controller.abort(userSignal.reason), {
+        once: true,
+      });
     }
   }
 
@@ -435,7 +443,11 @@ export const apiFetch = async (path, options: any = {}) => {
   const response = await performApiFetch(path, options);
   if (
     !isDev ||
-    !isDevSession401RetryEligible(response.status, normalizeApiPath(path), options.__devSessionRetried)
+    !isDevSession401RetryEligible(
+      response.status,
+      normalizeApiPath(path),
+      options.__devSessionRetried,
+    )
   ) {
     return response;
   }
@@ -459,7 +471,10 @@ export class ApiResponseError extends Error {
   url: any;
   contentType: any;
   bodyPreview: any;
-  constructor(message, { status = 0, statusText = '', url = '', contentType = '', bodyPreview = '', cause }: any = {}) {
+  constructor(
+    message,
+    { status = 0, statusText = '', url = '', contentType = '', bodyPreview = '', cause }: any = {},
+  ) {
     super(message, cause ? { cause } : undefined);
     this.name = 'ApiResponseError';
     this.status = status;
@@ -475,7 +490,11 @@ const getBodyPreview = (body = '') => body.replace(/\s+/g, ' ').trim().slice(0, 
 const isProbablyHtml = (body = '', contentType = '') => {
   const normalizedType = contentType.toLowerCase();
   const trimmed = body.trim().toLowerCase();
-  return normalizedType.includes('text/html') || trimmed.startsWith('<!doctype') || trimmed.startsWith('<html');
+  return (
+    normalizedType.includes('text/html') ||
+    trimmed.startsWith('<!doctype') ||
+    trimmed.startsWith('<html')
+  );
 };
 
 export const parseApiResponse = async <T = Record<string, any>>(
@@ -484,12 +503,15 @@ export const parseApiResponse = async <T = Record<string, any>>(
 ): Promise<T> => {
   const fallback = (options.fallback !== undefined ? options.fallback : {}) as T;
   if (!response || typeof response.text !== 'function') {
-    throw new ApiResponseError('The API did not return a valid response. Check backend availability or the request mock.', {
-      status: response?.status || 0,
-      statusText: response?.statusText || '',
-      url: response?.url || '',
-      contentType: '',
-    });
+    throw new ApiResponseError(
+      'The API did not return a valid response. Check backend availability or the request mock.',
+      {
+        status: response?.status || 0,
+        statusText: response?.statusText || '',
+        url: response?.url || '',
+        contentType: '',
+      },
+    );
   }
 
   const contentType = response.headers?.get?.('content-type') || '';

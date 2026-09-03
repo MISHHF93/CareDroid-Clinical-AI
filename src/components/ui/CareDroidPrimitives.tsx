@@ -90,10 +90,16 @@ export function SectionHeader({
   return (
     <header className={['cd-section-header', className].filter(Boolean).join(' ')} {...props}>
       <div className="cd-section-header__main">
-        {leadingIcon ? <span className="cd-section-header__icon" aria-hidden>{leadingIcon}</span> : null}
+        {leadingIcon ? (
+          <span className="cd-section-header__icon" aria-hidden>
+            {leadingIcon}
+          </span>
+        ) : null}
         <div className="cd-section-header__content">
           {eyebrow ? <p className="cd-section-header__eyebrow">{eyebrow}</p> : null}
-          <h2 id={titleId} className="cd-section-header__title">{title}</h2>
+          <h2 id={titleId} className="cd-section-header__title">
+            {title}
+          </h2>
           {description ? <p className="cd-section-header__description">{description}</p> : null}
         </div>
       </div>
@@ -128,7 +134,9 @@ export function DashboardSection({
         className={headerClassName}
       />
       {children ? (
-        <div className={['cd-dashboard-section__content', contentClassName].filter(Boolean).join(' ')}>
+        <div
+          className={['cd-dashboard-section__content', contentClassName].filter(Boolean).join(' ')}
+        >
           {children}
         </div>
       ) : null}
@@ -142,10 +150,18 @@ interface GridProps extends AsProps, HTMLAttributes<HTMLElement> {
   className?: string;
 }
 
-export function DashboardGrid({ children, variant = 'cards', className = '', as: Element = 'div', ...props }: GridProps) {
+export function DashboardGrid({
+  children,
+  variant = 'cards',
+  className = '',
+  as: Element = 'div',
+  ...props
+}: GridProps) {
   return (
     <Element
-      className={['cd-dashboard-grid', `cd-dashboard-grid--${variant}`, className].filter(Boolean).join(' ')}
+      className={['cd-dashboard-grid', `cd-dashboard-grid--${variant}`, className]
+        .filter(Boolean)
+        .join(' ')}
       {...props}
     >
       {children}
@@ -177,9 +193,20 @@ interface StackProps extends AsProps, HTMLAttributes<HTMLElement> {
   className?: string;
 }
 
-export function PageStack({ children, density = 'standard', className = '', as: Element = 'div', ...props }: StackProps) {
+export function PageStack({
+  children,
+  density = 'standard',
+  className = '',
+  as: Element = 'div',
+  ...props
+}: StackProps) {
   return (
-    <Element className={['cd-page-stack', `cd-page-stack--${density}`, className].filter(Boolean).join(' ')} {...props}>
+    <Element
+      className={['cd-page-stack', `cd-page-stack--${density}`, className]
+        .filter(Boolean)
+        .join(' ')}
+      {...props}
+    >
       {children}
     </Element>
   );
@@ -218,9 +245,18 @@ interface ToneProps extends AsProps, HTMLAttributes<HTMLElement> {
   className?: string;
 }
 
-export function Surface({ children, tone = 'default', className = '', as: Element = 'div', ...props }: ToneProps) {
+export function Surface({
+  children,
+  tone = 'default',
+  className = '',
+  as: Element = 'div',
+  ...props
+}: ToneProps) {
   return (
-    <Element className={['cd-surface', `cd-surface--${tone}`, className].filter(Boolean).join(' ')} {...props}>
+    <Element
+      className={['cd-surface', `cd-surface--${tone}`, className].filter(Boolean).join(' ')}
+      {...props}
+    >
       {children}
     </Element>
   );
@@ -232,9 +268,18 @@ interface ActionRowProps extends AsProps, HTMLAttributes<HTMLElement> {
   className?: string;
 }
 
-export function ActionRow({ children, align = 'start', className = '', as: Element = 'div', ...props }: ActionRowProps) {
+export function ActionRow({
+  children,
+  align = 'start',
+  className = '',
+  as: Element = 'div',
+  ...props
+}: ActionRowProps) {
   return (
-    <Element className={['cd-action-row', `cd-action-row--${align}`, className].filter(Boolean).join(' ')} {...props}>
+    <Element
+      className={['cd-action-row', `cd-action-row--${align}`, className].filter(Boolean).join(' ')}
+      {...props}
+    >
       {children}
     </Element>
   );
@@ -246,9 +291,20 @@ interface RatioProps extends AsProps, HTMLAttributes<HTMLElement> {
   className?: string;
 }
 
-export function WorkspaceSplit({ children, ratio = 'balanced', className = '', as: Element = 'div', ...props }: RatioProps) {
+export function WorkspaceSplit({
+  children,
+  ratio = 'balanced',
+  className = '',
+  as: Element = 'div',
+  ...props
+}: RatioProps) {
   return (
-    <Element className={['cd-workspace-split', `cd-workspace-split--${ratio}`, className].filter(Boolean).join(' ')} {...props}>
+    <Element
+      className={['cd-workspace-split', `cd-workspace-split--${ratio}`, className]
+        .filter(Boolean)
+        .join(' ')}
+      {...props}
+    >
       {children}
     </Element>
   );
@@ -260,9 +316,20 @@ interface RailProps extends AsProps, HTMLAttributes<HTMLElement> {
   className?: string;
 }
 
-export function DetailRail({ children, sticky = false, className = '', as: Element = 'aside', ...props }: RailProps) {
+export function DetailRail({
+  children,
+  sticky = false,
+  className = '',
+  as: Element = 'aside',
+  ...props
+}: RailProps) {
   return (
-    <Element className={['cd-detail-rail', sticky ? 'cd-detail-rail--sticky' : '', className].filter(Boolean).join(' ')} {...props}>
+    <Element
+      className={['cd-detail-rail', sticky ? 'cd-detail-rail--sticky' : '', className]
+        .filter(Boolean)
+        .join(' ')}
+      {...props}
+    >
       {children}
     </Element>
   );
@@ -275,12 +342,22 @@ interface CanvasProps extends AsProps, HTMLAttributes<HTMLElement> {
   style?: React.CSSProperties;
 }
 
-export function OverflowCanvas({ children, minWidth, className = '', as: Element = 'div', ...props }: CanvasProps) {
+export function OverflowCanvas({
+  children,
+  minWidth,
+  className = '',
+  as: Element = 'div',
+  ...props
+}: CanvasProps) {
   const style = minWidth
     ? ({ '--cd-overflow-canvas-min-width': minWidth, ...props.style } as React.CSSProperties)
     : props.style;
   return (
-    <Element {...props} className={['cd-overflow-canvas', className].filter(Boolean).join(' ')} style={style}>
+    <Element
+      {...props}
+      className={['cd-overflow-canvas', className].filter(Boolean).join(' ')}
+      style={style}
+    >
       {children}
     </Element>
   );
@@ -339,10 +416,22 @@ export function MetricChip({
   );
 }
 
-export function SurfaceCard({ children, tone = 'default', padding = 'standard', className = '', as: Element = 'div', ...props }: ToneProps & { padding?: string }) {
+export function SurfaceCard({
+  children,
+  tone = 'default',
+  padding = 'standard',
+  className = '',
+  as: Element = 'div',
+  ...props
+}: ToneProps & { padding?: string }) {
   return (
     <Element
-      className={['cd-surface-card', `cd-surface-card--${tone}`, `cd-surface-card--${padding}`, className]
+      className={[
+        'cd-surface-card',
+        `cd-surface-card--${tone}`,
+        `cd-surface-card--${padding}`,
+        className,
+      ]
         .filter(Boolean)
         .join(' ')}
       {...props}
@@ -362,7 +451,15 @@ interface MetricCardProps {
   [key: string]: unknown;
 }
 
-export function MetricCard({ label, value, helper, suffix = '', tone = 'neutral', className = '', ...props }: MetricCardProps) {
+export function MetricCard({
+  label,
+  value,
+  helper,
+  suffix = '',
+  tone = 'neutral',
+  className = '',
+  ...props
+}: MetricCardProps) {
   const severity = resolveAlarmSeverity(tone);
   const badge = alarmSeverityBadge(severity);
   return (
@@ -404,9 +501,22 @@ interface DashboardCardProps {
   [key: string]: unknown;
 }
 
-export function DashboardCard({ title, value, description, meta, actions, children, className = '', ...props }: DashboardCardProps) {
+export function DashboardCard({
+  title,
+  value,
+  description,
+  meta,
+  actions,
+  children,
+  className = '',
+  ...props
+}: DashboardCardProps) {
   return (
-    <Card compact className={['cd-dashboard-card', className].filter(Boolean).join(' ')} {...(props as HTMLAttributes<HTMLDivElement>)}>
+    <Card
+      compact
+      className={['cd-dashboard-card', className].filter(Boolean).join(' ')}
+      {...(props as HTMLAttributes<HTMLDivElement>)}
+    >
       <div className="cd-dashboard-card__header">
         <h3>{title}</h3>
         {meta ? <span className="cd-dashboard-card__meta">{meta}</span> : null}
@@ -470,9 +580,23 @@ interface ToolCardProps {
   [key: string]: unknown;
 }
 
-export function ToolCard({ title, description, badge, meta, actions, children, className = '', ...props }: ToolCardProps) {
+export function ToolCard({
+  title,
+  description,
+  badge,
+  meta,
+  actions,
+  children,
+  className = '',
+  ...props
+}: ToolCardProps) {
   return (
-    <Card compact hover className={['cd-tool-card', className].filter(Boolean).join(' ')} {...(props as HTMLAttributes<HTMLDivElement>)}>
+    <Card
+      compact
+      hover
+      className={['cd-tool-card', className].filter(Boolean).join(' ')}
+      {...(props as HTMLAttributes<HTMLDivElement>)}
+    >
       <div className="cd-tool-card__header">
         <h3>{title}</h3>
         {badge ? <div className="cd-tool-card__badge">{badge}</div> : null}
@@ -494,7 +618,14 @@ interface StatusWidgetProps {
   [key: string]: unknown;
 }
 
-export function StatusWidget({ label, value, status = 'neutral', helper, className = '', ...props }: StatusWidgetProps) {
+export function StatusWidget({
+  label,
+  value,
+  status = 'neutral',
+  helper,
+  className = '',
+  ...props
+}: StatusWidgetProps) {
   const severity = resolveAlarmSeverity(status);
   return (
     <Card
@@ -527,7 +658,12 @@ interface StatusBadgeProps extends HTMLAttributes<HTMLSpanElement> {
   className?: string;
 }
 
-export function StatusBadge({ status = 'neutral', children, className = '', ...props }: StatusBadgeProps) {
+export function StatusBadge({
+  status = 'neutral',
+  children,
+  className = '',
+  ...props
+}: StatusBadgeProps) {
   const toneByStatus: Record<string, string> = {
     live: 'success',
     active: 'success',
@@ -546,7 +682,12 @@ export function StatusBadge({ status = 'neutral', children, className = '', ...p
   };
   const tone = toneByStatus[status] || 'neutral';
   return (
-    <Badge tone={tone} compact className={['cd-status-badge', className].filter(Boolean).join(' ')} {...props}>
+    <Badge
+      tone={tone}
+      compact
+      className={['cd-status-badge', className].filter(Boolean).join(' ')}
+      {...props}
+    >
       {children || status}
     </Badge>
   );
@@ -560,7 +701,13 @@ interface BadgeListProps {
   empty?: React.ReactNode;
 }
 
-export function BadgeList({ items = [] as any[], tone = 'neutral', className = '', itemClassName = '', empty = null }: BadgeListProps) {
+export function BadgeList({
+  items = [] as any[],
+  tone = 'neutral',
+  className = '',
+  itemClassName = '',
+  empty = null,
+}: BadgeListProps) {
   const visibleItems = items.filter(Boolean);
   if (!visibleItems.length) return empty;
   return (
@@ -582,9 +729,20 @@ interface InfoNoticeProps extends HTMLAttributes<HTMLElement> {
   className?: string;
 }
 
-export function InfoNotice({ label, detail, children, tone = 'info', className = '', ...props }: InfoNoticeProps) {
+export function InfoNotice({
+  label,
+  detail,
+  children,
+  tone = 'info',
+  className = '',
+  ...props
+}: InfoNoticeProps) {
   return (
-    <aside className={['cd-info-notice', `cd-info-notice--${tone}`, className].filter(Boolean).join(' ')} role="note" {...props}>
+    <aside
+      className={['cd-info-notice', `cd-info-notice--${tone}`, className].filter(Boolean).join(' ')}
+      role="note"
+      {...props}
+    >
       {label ? <strong>{label}</strong> : null}
       {detail ? <span>{detail}</span> : null}
       {children}
@@ -614,7 +772,11 @@ interface FilterPanelProps extends HTMLAttributes<HTMLElement> {
 
 export function FilterPanel({ children, className = '', ...props }: FilterPanelProps) {
   return (
-    <section className={['cd-filter-panel', className].filter(Boolean).join(' ')} aria-label="Filters" {...props}>
+    <section
+      className={['cd-filter-panel', className].filter(Boolean).join(' ')}
+      aria-label="Filters"
+      {...props}
+    >
       {children}
     </section>
   );
@@ -634,7 +796,14 @@ interface DataTableProps extends TableHTMLAttributes<HTMLTableElement> {
   className?: string;
 }
 
-export function DataTable({ columns = [] as any[], rows = [] as any[], getRowKey, empty = 'No rows available.', className = '', ...props }: DataTableProps) {
+export function DataTable({
+  columns = [] as any[],
+  rows = [] as any[],
+  getRowKey,
+  empty = 'No rows available.',
+  className = '',
+  ...props
+}: DataTableProps) {
   return (
     <div className={['cd-table-wrap', className].filter(Boolean).join(' ')}>
       <table className="cd-data-table" {...props}>
@@ -651,7 +820,11 @@ export function DataTable({ columns = [] as any[], rows = [] as any[], getRowKey
               <tr key={getRowKey ? getRowKey(row, index) : (row.id as React.Key) || index}>
                 {columns.map((column) => (
                   <td key={String(column.key || column.header)}>
-                    {column.render ? column.render(row) : column.key ? String(row[column.key] ?? '') : null}
+                    {column.render
+                      ? column.render(row)
+                      : column.key
+                        ? String(row[column.key] ?? '')
+                        : null}
                   </td>
                 ))}
               </tr>
@@ -673,9 +846,18 @@ interface LoadingStateProps extends HTMLAttributes<HTMLDivElement> {
   className?: string;
 }
 
-export function LoadingState({ title = 'Loading', description, className = '', ...props }: LoadingStateProps) {
+export function LoadingState({
+  title = 'Loading',
+  description,
+  className = '',
+  ...props
+}: LoadingStateProps) {
   return (
-    <div className={['cd-state cd-state--loading', className].filter(Boolean).join(' ')} role="status" {...props}>
+    <div
+      className={['cd-state cd-state--loading', className].filter(Boolean).join(' ')}
+      role="status"
+      {...props}
+    >
       <Spinner size="sm" />
       <div>
         <h3>{title}</h3>
@@ -700,7 +882,11 @@ export function UnsupportedState({
   ...props
 }: UnsupportedStateProps) {
   return (
-    <div className={['cd-state cd-state--unsupported', className].filter(Boolean).join(' ')} role="status" {...props}>
+    <div
+      className={['cd-state cd-state--unsupported', className].filter(Boolean).join(' ')}
+      role="status"
+      {...props}
+    >
       <StatusBadge status="unsupported">Unsupported</StatusBadge>
       <h3>{title}</h3>
       <p>{description}</p>

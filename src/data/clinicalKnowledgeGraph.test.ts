@@ -20,7 +20,10 @@ describe('clinicalKnowledgeGraph', () => {
   it('searches graph nodes and builds visible relationship snapshots', () => {
     const sepsisNodes = searchKnowledgeGraph('sepsis');
     const deviceNodes = searchKnowledgeGraph('', 'device');
-    const snapshot = buildKnowledgeGraphSnapshot({ query: 'sepsis', selectedNodeId: 'protocol-sepsis' });
+    const snapshot = buildKnowledgeGraphSnapshot({
+      query: 'sepsis',
+      selectedNodeId: 'protocol-sepsis',
+    });
 
     expect(sepsisNodes.map((node) => node.id)).toContain('protocol-sepsis');
     expect(deviceNodes.every((node) => node.type === 'device')).toBe(true);
@@ -29,13 +32,15 @@ describe('clinicalKnowledgeGraph', () => {
       snapshot.neighbors.map(({ node }) => {
         if (!node) throw new Error('expected neighbor node to be defined');
         return node.id;
-      })
+      }),
     ).toEqual(expect.arrayContaining(['qsofa', 'lab-lactate', 'simulation-sepsis']));
   });
 
   it('builds AI prompts from selected graph relationships', () => {
     const neighbors = getKnowledgeGraphNeighbors('ai-cds');
-    const prompt = buildKnowledgeGraphAiPrompt(CLINICAL_KNOWLEDGE_GRAPH_NODES.find((node) => node.id === 'ai-cds'));
+    const prompt = buildKnowledgeGraphAiPrompt(
+      CLINICAL_KNOWLEDGE_GRAPH_NODES.find((node) => node.id === 'ai-cds'),
+    );
 
     expect(neighbors.length).toBeGreaterThan(0);
     expect(prompt).toMatch(/Clinical Decision Support Engine/i);

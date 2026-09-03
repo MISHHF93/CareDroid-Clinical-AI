@@ -75,7 +75,8 @@ export function renderToolsConsoleRoutes(LazyRoute: ComponentType<LazyRouteProps
       ))}
 
       {TOOLS_AI_PAGE_ROUTES.map((route) => {
-        const Page = TOOLS_AI_PAGE_COMPONENTS[route.componentKey as keyof typeof TOOLS_AI_PAGE_COMPONENTS];
+        const Page =
+          TOOLS_AI_PAGE_COMPONENTS[route.componentKey as keyof typeof TOOLS_AI_PAGE_COMPONENTS];
         return (
           <Route
             key={route.path}
@@ -91,7 +92,9 @@ export function renderToolsConsoleRoutes(LazyRoute: ComponentType<LazyRouteProps
 
       {TOOLS_SHORTCUT_PAGE_ROUTES.map((route) => {
         const Page =
-          TOOLS_SHORTCUT_PAGE_COMPONENTS[route.componentKey as keyof typeof TOOLS_SHORTCUT_PAGE_COMPONENTS];
+          TOOLS_SHORTCUT_PAGE_COMPONENTS[
+            route.componentKey as keyof typeof TOOLS_SHORTCUT_PAGE_COMPONENTS
+          ];
         return (
           <Route
             key={route.path}

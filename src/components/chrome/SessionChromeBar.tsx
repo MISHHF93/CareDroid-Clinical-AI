@@ -18,7 +18,11 @@ export default function SessionChromeBar() {
   }
 
   return (
-    <div className="session-chrome-bar session-chrome-bar--status-only" role="status" aria-live="polite">
+    <div
+      className="session-chrome-bar session-chrome-bar--status-only"
+      role="status"
+      aria-live="polite"
+    >
       <div className="session-chrome-bar__segments">
         <span className="session-chrome-bar__segment session-chrome-bar__segment--warning">
           <strong>Connection</strong>

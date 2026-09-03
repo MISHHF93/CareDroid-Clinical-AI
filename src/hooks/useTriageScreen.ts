@@ -18,12 +18,7 @@ export function useTriageScreen(): TriageScreenCapabilities {
         role: emergencyRole.role,
         roleLabel: emergencyRole.roleLabel,
       }),
-    [
-      emergencyRole.can,
-      emergencyRole.role,
-      emergencyRole.roleLabel,
-      screenCapabilities.screenMode,
-    ],
+    [emergencyRole.can, emergencyRole.role, emergencyRole.roleLabel, screenCapabilities.screenMode],
   );
 }
 

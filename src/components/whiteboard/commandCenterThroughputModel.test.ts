@@ -33,8 +33,16 @@ describe('commandCenterThroughputModel', () => {
       updatedAt: now.toISOString(),
       patients: [
         buildPatient({ id: 'w1', state: PatientState.Waiting }),
-        buildPatient({ id: 'w2', state: PatientState.Waiting, arrivalTime: '2026-06-20T10:00:00.000Z' }),
-        buildPatient({ id: 't1', state: PatientState.Triage, arrivalTime: '2026-06-20T11:30:00.000Z' }),
+        buildPatient({
+          id: 'w2',
+          state: PatientState.Waiting,
+          arrivalTime: '2026-06-20T10:00:00.000Z',
+        }),
+        buildPatient({
+          id: 't1',
+          state: PatientState.Triage,
+          arrivalTime: '2026-06-20T11:30:00.000Z',
+        }),
       ],
       capacity: {
         score: 82,
@@ -63,7 +71,12 @@ describe('commandCenterThroughputModel', () => {
       bragPeakBand: 'Amber',
       bragDetail: 'Peak crowding expected in 2 hours',
       centralSnapshot: {
-        sync: { source: 'backend-snapshot', lastSyncedAt: now.toISOString(), stale: false, message: 'Synced' },
+        sync: {
+          source: 'backend-snapshot',
+          lastSyncedAt: now.toISOString(),
+          stale: false,
+          message: 'Synced',
+        },
         generatedAt: now.toISOString(),
         currentDepartmentStatus: { waitingPatients: 2, averageWait: 55 },
         capacityStatus: { score: 82, band: 'Orange' },
@@ -84,7 +97,9 @@ describe('commandCenterThroughputModel', () => {
     expect(snapshot.metrics.find((metric) => metric.id === 'provider-breached')).toBeTruthy();
     expect(snapshot.metrics.find((metric) => metric.id === 'waiting-count')?.value).toBe(2);
     expect(snapshot.metrics.find((metric) => metric.id === 'longest-wait')).toBeTruthy();
-    expect(snapshot.metrics.find((metric) => metric.id === 'capacity-score')?.value).toBe('82 · Orange');
+    expect(snapshot.metrics.find((metric) => metric.id === 'capacity-score')?.value).toBe(
+      '82 · Orange',
+    );
     expect(snapshot.metrics.find((metric) => metric.id === 'crowd-level')).toBeTruthy();
     expect(snapshot.metrics.find((metric) => metric.id === 'referrals-backlog')?.value).toBe(1);
     expect(snapshot.crowdingForecast.available).toBe(true);

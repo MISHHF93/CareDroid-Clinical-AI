@@ -1,6 +1,14 @@
 import type { UnifiedApplicationKnowledgeGraphSnapshot } from '../config/unifiedApplicationKnowledgeGraphModel';
 import { buildKnowledgeGraphTimelineItems } from '../services/unifiedApplicationKnowledgeGraphPresentation';
-import type { Alert, JourneyEvent, Patient, PatientFlag, Staff, Vitals, WorkflowActionLog } from '../types/emergency';
+import type {
+  Alert,
+  JourneyEvent,
+  Patient,
+  PatientFlag,
+  Staff,
+  Vitals,
+  WorkflowActionLog,
+} from '../types/emergency';
 
 export type PatientTimelineCategory =
   | 'intake'
@@ -132,22 +140,41 @@ function eventMatchesPatient(event: Record<string, unknown>, patient: Patient): 
     const nested = nestedPatient as Record<string, unknown>;
     return nested.id === patient.id || nested.mrn === patient.mrn;
   }
-  return event.patientId === patient.id || event.mrn === patient.mrn || eventPatientId(event) === patient.id;
+  return (
+    event.patientId === patient.id ||
+    event.mrn === patient.mrn ||
+    eventPatientId(event) === patient.id
+  );
 }
 
-function categoryForJourneyEvent(event: JourneyEvent | Record<string, unknown>): PatientTimelineCategory {
+function categoryForJourneyEvent(
+  event: JourneyEvent | Record<string, unknown>,
+): PatientTimelineCategory {
   const type = String((event as Record<string, unknown>).type || '');
-  const to = String((event as Record<string, unknown>).to || (event as Record<string, unknown>).toState || '');
-  const note = String((event as Record<string, unknown>).note || (event as Record<string, unknown>).summary || '');
+  const to = String(
+    (event as Record<string, unknown>).to || (event as Record<string, unknown>).toState || '',
+  );
+  const note = String(
+    (event as Record<string, unknown>).note || (event as Record<string, unknown>).summary || '',
+  );
   const text = `${type} ${to} ${note}`.toLowerCase();
 
-  if (to === 'Discharge' || type === 'DispositionUpdated' && text.includes('discharge')) return 'discharge';
+  if (to === 'Discharge' || (type === 'DispositionUpdated' && text.includes('discharge')))
+    return 'discharge';
   if (type.includes('RoomAssignment') || type.includes('StaffAssignment')) return 'queue';
   if (type.includes('Vitals') || type.includes('Reassessment')) return 'reassessment';
   if (type.includes('EMS') || text.includes('ems') || text.includes('ambulance')) return 'ems';
-  if (type.includes('Referral') || text.includes('referral') || text.includes('consult')) return 'referral';
-  if (to === 'Admission' || text.includes('boarding') || text.includes('pending admission')) return 'boarding';
-  if (type.includes('ClinicalScore') || type === 'SCORE' || type.includes('Protocol') || text.includes('copilot')) return 'ai-copilot';
+  if (type.includes('Referral') || text.includes('referral') || text.includes('consult'))
+    return 'referral';
+  if (to === 'Admission' || text.includes('boarding') || text.includes('pending admission'))
+    return 'boarding';
+  if (
+    type.includes('ClinicalScore') ||
+    type === 'SCORE' ||
+    type.includes('Protocol') ||
+    text.includes('copilot')
+  )
+    return 'ai-copilot';
   if (to === 'Triage' || type === 'Triage') return 'triage';
   return 'state-transition';
 }
@@ -157,7 +184,8 @@ function journeySummary(event: JourneyEvent | Record<string, unknown>): string {
   if (typeof summary === 'string' && summary) return summary;
   const note = (event as Record<string, unknown>).note;
   if (typeof note === 'string' && note) return note;
-  const from = (event as Record<string, unknown>).from || (event as Record<string, unknown>).fromState;
+  const from =
+    (event as Record<string, unknown>).from || (event as Record<string, unknown>).fromState;
   const to = (event as Record<string, unknown>).to || (event as Record<string, unknown>).toState;
   if (from && to) return `Moved from ${String(from)} to ${String(to)}.`;
   if (to) return `Moved to ${String(to)}.`;
@@ -173,12 +201,18 @@ function mapJourneyEvent(
   const category = categoryForJourneyEvent(event);
   const eventRecord = event as Record<string, unknown>;
   return {
-    id: String(eventRecord.id || `${source}-${patient.id}-${category}-${eventRecord.timestamp || Date.now()}`),
+    id: String(
+      eventRecord.id ||
+        `${source}-${patient.id}-${category}-${eventRecord.timestamp || Date.now()}`,
+    ),
     category,
     label: PATIENT_TIMELINE_CATEGORY_LABELS[category],
     summary: journeySummary(event),
     timestamp: timestampOrFallback(eventRecord.timestamp, patient.arrivalTime),
-    actor: staffLabel(context.staff, String(eventRecord.staffId || eventRecord.actorStaffId || eventRecord.by || '')),
+    actor: staffLabel(
+      context.staff,
+      String(eventRecord.staffId || eventRecord.actorStaffId || eventRecord.by || ''),
+    ),
     source,
     metadata: {
       type: typeof eventRecord.type === 'string' ? eventRecord.type : undefined,
@@ -192,7 +226,8 @@ function categoryForWorkflowLog(log: WorkflowActionLog): PatientTimelineCategory
   if (log.type === 'patient_created') return 'intake';
   if (log.type === 'journey_state_changed') return 'state-transition';
   if (log.type === 'clinician_assigned' || log.type === 'capacity_score_changed') return 'queue';
-  if (log.type === 'reassessment_created' || log.type === 'reassessment_completed') return 'reassessment';
+  if (log.type === 'reassessment_created' || log.type === 'reassessment_completed')
+    return 'reassessment';
   if (log.type === 'ems_arrival_created' || log.type === 'ems_converted_to_patient') return 'ems';
   if (log.type === 'referral_created') return 'referral';
   if (log.type === 'boarding_started') return 'boarding';
@@ -206,15 +241,21 @@ function hasCategory(items: PatientTimelineItem[], category: PatientTimelineCate
 }
 
 function alertSeverity(severity: unknown): PatientTimelineItem['severity'] {
-  return severity === 'Critical' || severity === 'Warning' || severity === 'Info' ? severity : 'Info';
+  return severity === 'Critical' || severity === 'Warning' || severity === 'Info'
+    ? severity
+    : 'Info';
 }
 
-export function buildPatientTimeline(patient: Patient, context: PatientTimelineContext = {}): PatientTimelineItem[] {
+export function buildPatientTimeline(
+  patient: Patient,
+  context: PatientTimelineContext = {},
+): PatientTimelineItem[] {
   const items: PatientTimelineItem[] = [];
   const name = patientName(patient);
   const latestVital = latestVitals(patient);
   const fallbackTimestamp = patient.arrivalTime || new Date(0).toISOString();
-  const triageTimestamp = patient.triageTime || patient.timeline.find((event) => event.to === 'Triage')?.timestamp;
+  const triageTimestamp =
+    patient.triageTime || patient.timeline.find((event) => event.to === 'Triage')?.timestamp;
 
   addItem(items, {
     id: `intake-${patient.id}`,
@@ -243,11 +284,15 @@ export function buildPatientTimeline(patient: Patient, context: PatientTimelineC
     });
   }
 
-  patient.timeline.forEach((event) => addItem(items, mapJourneyEvent(event, patient, context, 'local-patient')));
+  patient.timeline.forEach((event) =>
+    addItem(items, mapJourneyEvent(event, patient, context, 'local-patient')),
+  );
 
   context.backendTimelineEvents
     ?.filter((event) => eventMatchesPatient(event, patient))
-    .forEach((event) => addItem(items, mapJourneyEvent(event, patient, context, 'patient-management')));
+    .forEach((event) =>
+      addItem(items, mapJourneyEvent(event, patient, context, 'patient-management')),
+    );
 
   context.journeyEvents
     ?.filter((event) => eventMatchesPatient(event, patient))
@@ -273,7 +318,12 @@ export function buildPatientTimeline(patient: Patient, context: PatientTimelineC
   if (!hasCategory(items, 'queue')) {
     const queue = context.queues?.find((candidate) => {
       const patients = Array.isArray(candidate.patients) ? candidate.patients : [];
-      return patients.some((row) => row && typeof row === 'object' && eventMatchesPatient(row as Record<string, unknown>, patient));
+      return patients.some(
+        (row) =>
+          row &&
+          typeof row === 'object' &&
+          eventMatchesPatient(row as Record<string, unknown>, patient),
+      );
     });
     addItem(items, {
       id: `queue-${patient.id}`,
@@ -342,7 +392,11 @@ export function buildPatientTimeline(patient: Patient, context: PatientTimelineC
     });
 
   const emsArrival = context.emsArrivals?.find((arrival) => eventMatchesPatient(arrival, patient));
-  if (emsArrival || hasFlag(patient, 'EMSArrival') || /ems|ambulance|pre-arrival/i.test(patient.chiefComplaint)) {
+  if (
+    emsArrival ||
+    hasFlag(patient, 'EMSArrival') ||
+    /ems|ambulance|pre-arrival/i.test(patient.chiefComplaint)
+  ) {
     addItem(items, {
       id: `ems-${patient.id}`,
       category: 'ems',
@@ -372,7 +426,9 @@ export function buildPatientTimeline(patient: Patient, context: PatientTimelineC
     });
   }
 
-  const boardingPatient = context.boardingPatients?.find((candidate) => eventMatchesPatient(candidate, patient));
+  const boardingPatient = context.boardingPatients?.find((candidate) =>
+    eventMatchesPatient(candidate, patient),
+  );
   if (boardingPatient || patient.state === 'Admission' || hasFlag(patient, 'PendingAdmission')) {
     addItem(items, {
       id: `boarding-${patient.id}`,
@@ -391,19 +447,28 @@ export function buildPatientTimeline(patient: Patient, context: PatientTimelineC
       category: 'discharge',
       label: PATIENT_TIMELINE_CATEGORY_LABELS.discharge,
       summary: 'Discharge event recorded for this encounter.',
-      timestamp: patient.timeline.find((event) => event.to === 'Discharge')?.timestamp || fallbackTimestamp,
+      timestamp:
+        patient.timeline.find((event) => event.to === 'Discharge')?.timestamp || fallbackTimestamp,
       source: 'derived',
     });
   }
 
-  if (hasFlag(patient, 'HighRisk') || hasFlag(patient, 'DeteriorationRisk') || hasFlag(patient, 'SepsisAlert')) {
+  if (
+    hasFlag(patient, 'HighRisk') ||
+    hasFlag(patient, 'DeteriorationRisk') ||
+    hasFlag(patient, 'SepsisAlert')
+  ) {
     addItem(items, {
       id: `ai-copilot-${patient.id}`,
       category: 'ai-copilot',
       label: PATIENT_TIMELINE_CATEGORY_LABELS['ai-copilot'],
-      summary: 'Copilot attention signal includes high-risk, sepsis, or deterioration context for human review.',
+      summary:
+        'Copilot attention signal includes high-risk, sepsis, or deterioration context for human review.',
       timestamp: latestVital?.recordedAt || fallbackTimestamp,
-      severity: hasFlag(patient, 'SepsisAlert') || hasFlag(patient, 'DeteriorationRisk') ? 'Critical' : 'Warning',
+      severity:
+        hasFlag(patient, 'SepsisAlert') || hasFlag(patient, 'DeteriorationRisk')
+          ? 'Critical'
+          : 'Warning',
       source: context.copilotContext ? 'emergency-os' : 'derived',
     });
   }
@@ -414,7 +479,9 @@ export function buildPatientTimeline(patient: Patient, context: PatientTimelineC
       const status = String(document.status || '');
       const failed = status === 'failed';
       const applied = Boolean(document.appliedToIntake);
-      const fieldCount = Array.isArray(document.extractedFields) ? document.extractedFields.length : 0;
+      const fieldCount = Array.isArray(document.extractedFields)
+        ? document.extractedFields.length
+        : 0;
       const documentLabel = String(document.documentType || 'document').replace(/_/g, ' ');
       addItem(items, {
         id: `document-${String(document.id || `${patient.id}-${documentLabel}`)}`,
@@ -437,7 +504,9 @@ export function buildPatientTimeline(patient: Patient, context: PatientTimelineC
       });
     });
 
-  const provincialRecord = context.provincialRecords?.find((record) => eventMatchesPatient(record, patient));
+  const provincialRecord = context.provincialRecords?.find((record) =>
+    eventMatchesPatient(record, patient),
+  );
   addItem(items, {
     id: `provincial-health-${patient.id}`,
     category: 'provincial-health',
@@ -453,7 +522,10 @@ export function buildPatientTimeline(patient: Patient, context: PatientTimelineC
   });
 
   if (context.knowledgeGraphSnapshot) {
-    for (const item of buildKnowledgeGraphTimelineItems(patient.id, context.knowledgeGraphSnapshot)) {
+    for (const item of buildKnowledgeGraphTimelineItems(
+      patient.id,
+      context.knowledgeGraphSnapshot,
+    )) {
       addItem(items, item);
     }
   }
@@ -467,6 +539,8 @@ export function buildPatientTimeline(patient: Patient, context: PatientTimelineC
   return [...deduped.values()].sort((a, b) => {
     const timeDelta = timeValue(b.timestamp) - timeValue(a.timestamp);
     if (timeDelta !== 0) return timeDelta;
-    return PATIENT_TIMELINE_CATEGORY_ORDER[a.category] - PATIENT_TIMELINE_CATEGORY_ORDER[b.category];
+    return (
+      PATIENT_TIMELINE_CATEGORY_ORDER[a.category] - PATIENT_TIMELINE_CATEGORY_ORDER[b.category]
+    );
   });
 }

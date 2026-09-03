@@ -96,10 +96,7 @@ describe('useNotificationCenter intelligenceAlerts mapping carries patientId (HE
     // this field, redactAlertForRole (HEAL-215) can never redact a name
     // embedded in one of these alerts' title/message, since it bails out
     // whenever alert.patientId is falsy.
-    const hookSource = readFileSync(
-      join(__dirname, '../hooks/useNotificationCenter.ts'),
-      'utf8',
-    );
+    const hookSource = readFileSync(join(__dirname, '../hooks/useNotificationCenter.ts'), 'utf8');
     const mappingBlock = hookSource.slice(
       hookSource.indexOf('const intelligenceAlerts = useMemo'),
       hookSource.indexOf('[intelligenceSnapshot.alerts]'),

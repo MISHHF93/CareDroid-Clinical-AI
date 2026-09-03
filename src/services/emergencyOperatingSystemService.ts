@@ -33,9 +33,10 @@ import { buildBottleneckRegistrySnapshot } from './bottleneckRegistry';
 import { buildFullEmergencyCareJourneySnapshot } from './fullEmergencyCareJourneyService';
 
 function buildDischargeFlow({ queueDashboard, capacityDashboard, automationMarketplace }) {
-  const dischargeQueue = queueDashboard.queues.find((queue) => queue.id === 'discharge-queue') || null;
+  const dischargeQueue =
+    queueDashboard.queues.find((queue) => queue.id === 'discharge-queue') || null;
   const dischargeModules = automationMarketplace.modules.filter((module) =>
-    module.categories.includes('Discharge')
+    module.categories.includes('Discharge'),
   );
   const dischargeCandidates =
     capacityDashboard.signals.find((signal) => signal.id === 'dischargeCandidates')?.value || 0;
@@ -45,17 +46,23 @@ function buildDischargeFlow({ queueDashboard, capacityDashboard, automationMarke
     dischargeCandidates,
     automations: Object.freeze(dischargeModules),
     recommendations: Object.freeze([
-      ...queueDashboard.recommendations.filter((recommendation) => recommendation.queueId === 'discharge-queue'),
-      ...capacityDashboard.recommendations.filter((recommendation) => recommendation.id === 'discharge-acceleration'),
+      ...queueDashboard.recommendations.filter(
+        (recommendation) => recommendation.queueId === 'discharge-queue',
+      ),
+      ...capacityDashboard.recommendations.filter(
+        (recommendation) => recommendation.id === 'discharge-acceleration',
+      ),
     ]),
   });
 }
 
 export const EmergencyOperatingSystemService = Object.freeze({
   getOperatingSystem(options: any = {}) {
-    const marketplaceAutomations = options.marketplaceAutomations || getWorkspaceAutomations('emergency');
+    const marketplaceAutomations =
+      options.marketplaceAutomations || getWorkspaceAutomations('emergency');
     const automations =
-      options.automations || Object.freeze([...marketplaceAutomations, ...getEmergencyIntakeAutomationFeed()]);
+      options.automations ||
+      Object.freeze([...marketplaceAutomations, ...getEmergencyIntakeAutomationFeed()]);
     const patientJourney = PatientJourneyEngine.getPatientJourney({ automations });
     const patientJourneyEngine = Object.freeze({
       metrics: PatientJourneyEngine.getJourneyMetrics({ automations }),
@@ -77,7 +84,8 @@ export const EmergencyOperatingSystemService = Object.freeze({
     const escalationEngine = EmergencyEscalationEngineService.getEscalationDashboard();
     const kpiLayer = EmergencyKPILayerService.getKpiLayer();
     const simulationScenarios = EmergencySimulationScenariosService.getScenarioDashboard();
-    const automationMarketplace = EdAutomationMarketplace.getMarketplaceDashboard(marketplaceAutomations);
+    const automationMarketplace =
+      EdAutomationMarketplace.getMarketplaceDashboard(marketplaceAutomations);
     const automationRoi = AutomationROIService.getAutomationRoiDashboard(marketplaceAutomations);
     const digitalWhiteboard = EmergencyWhiteboardService.getWhiteboard();
     const knowledgeLayer = EmergencyKnowledgeLayer.getDashboard();
@@ -164,11 +172,14 @@ export const EmergencyOperatingSystemService = Object.freeze({
       leadershipSummary: Object.freeze({
         activePatients: patientJourneyEngine.metrics.activePatients,
         intakeArrivals:
-          intakeOperatingSystem.commandCenter.trackedStates.find((state) => state.id === 'arrivals')?.value || 0,
+          intakeOperatingSystem.commandCenter.trackedStates.find((state) => state.id === 'arrivals')
+            ?.value || 0,
         smartArrivalSummaries:
           intakeOperatingSystem.smartArrival?.generatedSnapshot?.status === 'finalized' ? 1 : 0,
         triageReadyFromIntake:
-          intakeOperatingSystem.commandCenter.trackedStates.find((state) => state.id === 'triage-ready-patients')?.value || 0,
+          intakeOperatingSystem.commandCenter.trackedStates.find(
+            (state) => state.id === 'triage-ready-patients',
+          )?.value || 0,
         registrationCompletionScore: intakeOperatingSystem.registrationCompletionScore.score,
         doorToDirection: patientPath.metrics.doorToDirectionMinutes,
         doorToDirectionCompliance: patientPath.metrics.targetCompliance,
@@ -194,7 +205,8 @@ export const EmergencyOperatingSystemService = Object.freeze({
   },
 });
 
-export const getEmergencyOperatingSystem =
-  EmergencyOperatingSystemService.getOperatingSystem.bind(EmergencyOperatingSystemService);
+export const getEmergencyOperatingSystem = EmergencyOperatingSystemService.getOperatingSystem.bind(
+  EmergencyOperatingSystemService,
+);
 
 export default EmergencyOperatingSystemService;

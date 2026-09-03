@@ -36,7 +36,7 @@ function renderProvider() {
   return render(
     <SystemConfigProvider>
       <ConfigProbe />
-    </SystemConfigProvider>
+    </SystemConfigProvider>,
   );
 }
 
@@ -106,7 +106,10 @@ describe('SystemConfigProvider API polling', () => {
     mockUserState.isAuthenticated = true;
     vi.mocked(configService.getSystemConfig).mockResolvedValue({ rag: { enabled: false } });
     vi.mocked(configService.getAvailableTools).mockResolvedValue({ tools: [] });
-    vi.mocked(configService.getCurrentSubscription).mockResolvedValue({ tier: 'free', status: 'active' });
+    vi.mocked(configService.getCurrentSubscription).mockResolvedValue({
+      tier: 'free',
+      status: 'active',
+    });
     vi.mocked(configService.getAIRemainingQueries).mockResolvedValue({ remaining: 5 });
 
     function deferred<T>() {
@@ -120,7 +123,11 @@ describe('SystemConfigProvider API polling', () => {
     let refresh: (() => Promise<any>) | null = null;
     render(
       <SystemConfigProvider>
-        <RefreshProbe onReady={(fn) => { refresh = fn; }} />
+        <RefreshProbe
+          onReady={(fn) => {
+            refresh = fn;
+          }}
+        />
       </SystemConfigProvider>,
     );
 

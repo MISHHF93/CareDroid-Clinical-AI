@@ -56,11 +56,17 @@ describe('ProfileToolPreferences', () => {
   });
 
   it('allows hidden tools to be restored from profile settings', () => {
-    const hiddenTool = getUserFacingToolRegistryProjection().find((tool) => tool.category === 'Calculator');
+    const hiddenTool = getUserFacingToolRegistryProjection().find(
+      (tool) => tool.category === 'Calculator',
+    );
     if (!hiddenTool) throw new Error('expected a Calculator tool in the registry projection');
     mockToolPreferencesValue.hiddenTools = [hiddenTool.id];
 
-    render(<MemoryRouter><ProfileToolPreferences /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <ProfileToolPreferences />
+      </MemoryRouter>,
+    );
 
     const row = screen.getByText(hiddenTool.name).closest('.profile-identity-row');
     expect(row).toHaveTextContent(/hidden/i);
@@ -69,14 +75,24 @@ describe('ProfileToolPreferences', () => {
   });
 
   it('saves specialty, workspace, and compact view choices', () => {
-    render(<MemoryRouter><ProfileToolPreferences /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <ProfileToolPreferences />
+      </MemoryRouter>,
+    );
 
     fireEvent.change(screen.getByLabelText(/specialty/i), { target: { value: 'cardiology' } });
     fireEvent.change(screen.getByLabelText(/default workspace/i), { target: { value: 'all' } });
     fireEvent.click(screen.getByLabelText(/compact tool view/i));
 
-    expect(mockToolPreferencesValue.updateProfileSettings).toHaveBeenCalledWith({ specialty: 'cardiology' });
-    expect(mockToolPreferencesValue.updateProfileSettings).toHaveBeenCalledWith({ defaultWorkspace: 'all' });
-    expect(mockToolPreferencesValue.updateProfileSettings).toHaveBeenCalledWith({ compactToolView: true });
+    expect(mockToolPreferencesValue.updateProfileSettings).toHaveBeenCalledWith({
+      specialty: 'cardiology',
+    });
+    expect(mockToolPreferencesValue.updateProfileSettings).toHaveBeenCalledWith({
+      defaultWorkspace: 'all',
+    });
+    expect(mockToolPreferencesValue.updateProfileSettings).toHaveBeenCalledWith({
+      compactToolView: true,
+    });
   });
 });

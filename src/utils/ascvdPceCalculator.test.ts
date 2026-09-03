@@ -63,7 +63,12 @@ describe('ascvdPceCalculator — risk categories', () => {
 
 describe('ascvdPceCalculator — validation', () => {
   it('rejects out-of-range age and implausible lipids', () => {
-    const age = validateAscvdPceInputs({ ...TABLE_A_DEMO, ageYears: 35, sex: 'male', race: 'white' });
+    const age = validateAscvdPceInputs({
+      ...TABLE_A_DEMO,
+      ageYears: 35,
+      sex: 'male',
+      race: 'white',
+    });
     expect(age.valid).toBe(false);
     expect(age.errors.some((e) => /40/.test(e))).toBe(true);
 
@@ -102,7 +107,7 @@ describe('ascvdPceCalculator — interpretation', () => {
     expect(out.ok).toBe(true);
     if (!out.ok) throw new Error('expected computeAscvdPceResult to succeed');
     expect(out.clinicianPatientDisclaimer).toBe(
-      'Use as decision-support for clinician-patient discussions.'
+      'Use as decision-support for clinician-patient discussions.',
     );
     expect(out.preventionDiscussion).toBeTruthy();
     expect(out.preventionDiscussion.toLowerCase()).not.toMatch(/\b(start|prescribe|statin dose)\b/);

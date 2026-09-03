@@ -134,14 +134,18 @@ describe('OrganizationIntelligenceProfile', () => {
     render(
       <MemoryRouter>
         <OrganizationIntelligenceProfile />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     // Page title is registered into the shell chrome (useRouteChromeRegistration)
     // rather than rendered as a local heading -- rendered here without a real
     // AppShell/RouteChromeProvider, so it falls back to the sr-equivalent testid.
-    expect(await screen.findByTestId('cd-page-title-text')).toHaveTextContent(/organization intelligence/i);
-    expect(screen.getByText(/Organization Intelligence Profile for Demo Hospital/i)).toBeInTheDocument();
+    expect(await screen.findByTestId('cd-page-title-text')).toHaveTextContent(
+      /organization intelligence/i,
+    );
+    expect(
+      screen.getByText(/Organization Intelligence Profile for Demo Hospital/i),
+    ).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /missing packs/i })).toBeInTheDocument();
     expect(screen.getByText(/Enable Simulation Training Pack/i)).toBeInTheDocument();
     expect(screen.getByText(/Activate Unused Tool/i)).toBeInTheDocument();
@@ -149,7 +153,9 @@ describe('OrganizationIntelligenceProfile', () => {
     expect(screen.getByText(/Schedule simulation practice/i)).toBeInTheDocument();
     expect(screen.getByText(/Automate follow-up for qSOFA/i)).toBeInTheDocument();
     expect(screen.getByText(/Introduce AI assistant workflows/i)).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /platform adaptation signals/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /platform adaptation signals/i }),
+    ).toBeInTheDocument();
     expect(PlatformAssetsApi.getOrganizationAnalytics).toHaveBeenCalledWith('org-1');
     expect(PlatformAssetsApi.getCustomerSuccessDashboard).toHaveBeenCalledWith('org-1', 'month');
     expect(PlatformAssetsApi.getTenantAdministration).toHaveBeenCalledWith('org-1');

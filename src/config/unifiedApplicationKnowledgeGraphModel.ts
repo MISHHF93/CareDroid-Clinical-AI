@@ -104,21 +104,22 @@ export const KNOWLEDGE_GRAPH_ENTITY_TYPES: readonly KnowledgeGraphEntityType[] =
   'operational_event',
 ]);
 
-export const KNOWLEDGE_GRAPH_RELATIONSHIP_TYPES: readonly KnowledgeGraphRelationshipType[] = Object.freeze([
-  'assigned_to',
-  'located_in',
-  'waiting_in',
-  'owns',
-  'affects',
-  'triggered_by',
-  'recommends',
-  'part_of',
-  'depends_on',
-  'connected_to',
-  'escalated_to',
-  'monitored_by',
-  'resulted_in',
-]);
+export const KNOWLEDGE_GRAPH_RELATIONSHIP_TYPES: readonly KnowledgeGraphRelationshipType[] =
+  Object.freeze([
+    'assigned_to',
+    'located_in',
+    'waiting_in',
+    'owns',
+    'affects',
+    'triggered_by',
+    'recommends',
+    'part_of',
+    'depends_on',
+    'connected_to',
+    'escalated_to',
+    'monitored_by',
+    'resulted_in',
+  ]);
 
 export const KNOWLEDGE_GRAPH_ENTITIES = Object.freeze([
   Object.freeze({

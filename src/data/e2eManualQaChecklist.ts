@@ -16,7 +16,8 @@ export const E2E_MANUAL_QA_SECTIONS = Object.freeze([
       {
         id: 'tools-overview',
         steps: 'Navigate to /tools and /tools/catalog.',
-        expected: 'Overview and catalog render; search/filter work; cards open correct routes or chat.',
+        expected:
+          'Overview and catalog render; search/filter work; cards open correct routes or chat.',
       },
     ],
   },
@@ -48,7 +49,8 @@ export const E2E_MANUAL_QA_SECTIONS = Object.freeze([
       {
         id: 'hub-launch',
         steps: 'From catalog, launch Wells PE, PERC, NIHSS, dispatch-ai.',
-        expected: 'Hub or fleet path opens; chat seed pre-filled; orchestrator tool null except Tier C.',
+        expected:
+          'Hub or fleet path opens; chat seed pre-filled; orchestrator tool null except Tier C.',
       },
       {
         id: 'pe-acs-language',
@@ -153,7 +155,7 @@ export function flattenManualQaChecklist() {
       sectionId: section.id,
       sectionTitle: section.title,
       ...item,
-    }))
+    })),
   );
 }
 
@@ -168,7 +170,16 @@ export function formatManualQaMarkdown() {
   for (const section of E2E_MANUAL_QA_SECTIONS) {
     lines.push(`## ${section.title}`, '');
     for (const item of section.items) {
-      lines.push(`### ${item.id}`, '', '**Steps:**', item.steps, '', '**Expected:**', item.expected, '');
+      lines.push(
+        `### ${item.id}`,
+        '',
+        '**Steps:**',
+        item.steps,
+        '',
+        '**Expected:**',
+        item.expected,
+        '',
+      );
     }
   }
   return lines.join('\n');

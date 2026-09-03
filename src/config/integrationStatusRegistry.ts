@@ -75,7 +75,8 @@ export const INTEGRATION_POINT_REGISTRY = Object.freeze([
     status: INTEGRATION_STATUS.PARTIAL,
     capability: 'emergencySmartIntake',
     surfaces: ['SmartIntake'],
-    summary: 'Smart Intake normalizes clinical snapshots and can receive backend-enabled intake payloads; live FHIR subscription remains roadmap.',
+    summary:
+      'Smart Intake normalizes clinical snapshots and can receive backend-enabled intake payloads; live FHIR subscription remains roadmap.',
   },
 
   // —— HL7 ——
@@ -97,7 +98,8 @@ export const INTEGRATION_POINT_REGISTRY = Object.freeze([
     status: INTEGRATION_STATUS.PARTIAL,
     surfaces: ['IntegrationHub'],
     backend: 'integration-event-registry.service.ts',
-    summary: 'ORU-shaped events are represented in the hub registry; production MLLP routing remains incomplete.',
+    summary:
+      'ORU-shaped events are represented in the hub registry; production MLLP routing remains incomplete.',
   },
   {
     id: 'hl7-mllp-listener',
@@ -229,7 +231,11 @@ export const INTEGRATION_POINT_REGISTRY = Object.freeze([
     // DuplicatePatientBanner was deleted (commit d76bd3cc, orphaned reception
     // component cleanup) -- ReceptionDuplicateConfirm.tsx/DuplicateCandidatePanel.tsx
     // are the real, live surfaces that now consume patientDuplicateDetection.ts.
-    surfaces: ['patientDuplicateDetection.ts', 'ReceptionDuplicateConfirm', 'DuplicateCandidatePanel'],
+    surfaces: [
+      'patientDuplicateDetection.ts',
+      'ReceptionDuplicateConfirm',
+      'DuplicateCandidatePanel',
+    ],
     summary: 'Local scoring with health card, name, DOB thresholds.',
   },
   {
@@ -248,7 +254,8 @@ export const INTEGRATION_POINT_REGISTRY = Object.freeze([
     capability: 'emergencySmartIntakeIdentitySession',
     surfaces: ['SmartIntake'],
     backend: 'mpi.service.ts',
-    summary: 'Backend MPI matching service is available for Smart Intake sessions; frontend still retains local duplicate fallback.',
+    summary:
+      'Backend MPI matching service is available for Smart Intake sessions; frontend still retains local duplicate fallback.',
   },
   {
     id: 'backend-ocr-provider',
@@ -258,7 +265,8 @@ export const INTEGRATION_POINT_REGISTRY = Object.freeze([
     capability: 'emergencySmartIntakeIdentitySession',
     surfaces: ['SmartIntake', 'OcrCapturePanel'],
     backend: 'ocr.service.ts',
-    summary: 'OCR normalization service and intake job APIs are present; external vision-provider contract remains incomplete.',
+    summary:
+      'OCR normalization service and intake job APIs are present; external vision-provider contract remains incomplete.',
   },
   {
     id: 'sso-identity-providers',
@@ -284,7 +292,8 @@ export const INTEGRATION_POINT_REGISTRY = Object.freeze([
     capability: 'stripeBilling',
     surfaces: ['BillingPage', 'Settings'],
     backend: 'subscriptions.service.ts',
-    summary: 'Live Stripe checkout, billing-portal, and customer creation via the real Stripe SDK -- not a demo adapter.',
+    summary:
+      'Live Stripe checkout, billing-portal, and customer creation via the real Stripe SDK -- not a demo adapter.',
   },
 ]);
 
@@ -299,12 +308,15 @@ export function normalizeIntegrationStatusLabel(status) {
 }
 
 export function groupIntegrationsByCategory(registry = INTEGRATION_POINT_REGISTRY) {
-  return registry.reduce((groups, point) => {
-    const list = groups[point.category] || [];
-    list.push(point);
-    groups[point.category] = list;
-    return groups;
-  }, /** @type {Record<string, typeof INTEGRATION_POINT_REGISTRY[number][]}> */ ({}));
+  return registry.reduce(
+    (groups, point) => {
+      const list = groups[point.category] || [];
+      list.push(point);
+      groups[point.category] = list;
+      return groups;
+    },
+    /** @type {Record<string, typeof INTEGRATION_POINT_REGISTRY[number][]}> */ {},
+  );
 }
 
 export function summarizeCategoryStatus(points) {
@@ -328,7 +340,7 @@ export function buildIntegrationCategorySummaries(registry = INTEGRATION_POINT_R
         acc[point.status] = (acc[point.status] || 0) + 1;
         return acc;
       },
-      ({} as Record<string, number>),
+      {} as Record<string, number>,
     );
     return {
       category,
@@ -342,7 +354,10 @@ export function buildIntegrationCategorySummaries(registry = INTEGRATION_POINT_R
   });
 }
 
-export function mergeRegistryWithLiveSources(registry = INTEGRATION_POINT_REGISTRY, liveSources = [] as any[]) {
+export function mergeRegistryWithLiveSources(
+  registry = INTEGRATION_POINT_REGISTRY,
+  liveSources = [] as any[],
+) {
   const liveById = new Map(liveSources.map((source) => [String(source.id), source]));
   return registry.map((point) => {
     const live = point.liveSourceId ? liveById.get(point.liveSourceId) : null;
@@ -383,7 +398,7 @@ export function auditIntegrationDiscovery(registry = INTEGRATION_POINT_REGISTRY)
       acc[point.status] = (acc[point.status] || 0) + 1;
       return acc;
     },
-    ({} as Record<string, number>),
+    {} as Record<string, number>,
   );
 
   return {

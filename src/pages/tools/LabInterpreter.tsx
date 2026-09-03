@@ -375,7 +375,12 @@ const LabInterpreter = ({ embedded = false, onCloseEmbedded }: any = {}) => {
 
           {loading ? (
             <div className="lab-results-loading">
-              <ClinicalExecutorFeedback loading={true} error={null} unsupported={false} unsupportedDetail={null} />
+              <ClinicalExecutorFeedback
+                loading={true}
+                error={null}
+                unsupported={false}
+                unsupportedDetail={null}
+              />
             </div>
           ) : error ? (
             <div className="lab-results-error">
@@ -436,15 +441,11 @@ const LabResults = ({ results }) => {
             <div className="lab-stat-label">Total Values</div>
           </div>
           <div className="lab-stat-card">
-            <div className="lab-stat-value lab-stat-value--normal">
-              {summary.normal}
-            </div>
+            <div className="lab-stat-value lab-stat-value--normal">{summary.normal}</div>
             <div className="lab-stat-label">Normal</div>
           </div>
           <div className="lab-stat-card">
-            <div className="lab-stat-value lab-stat-value--abnormal">
-              {summary.abnormal}
-            </div>
+            <div className="lab-stat-value lab-stat-value--abnormal">{summary.abnormal}</div>
             <div className="lab-stat-label">Abnormal</div>
           </div>
           <div className="lab-stat-card critical">
@@ -528,9 +529,7 @@ const LabResults = ({ results }) => {
                       <td className="lab-values-table__value">
                         {lab.value} {lab.unit}
                       </td>
-                      <td className="lab-values-table__range">
-                        {lab.referenceRange}
-                      </td>
+                      <td className="lab-values-table__range">{lab.referenceRange}</td>
                       <td>
                         <span className={`lab-status-badge ${lab.status}`}>
                           {lab.status.replace('-', ' ')}

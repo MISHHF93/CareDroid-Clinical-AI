@@ -16,11 +16,7 @@ export type DepartmentStaffBarProps = {
   className?: string;
 };
 
-function StaffCard({
-  entry,
-}: {
-  entry: DepartmentStaffBarSnapshot['entries'][number];
-}) {
+function StaffCard({ entry }: { entry: DepartmentStaffBarSnapshot['entries'][number] }) {
   return (
     <article
       className={`department-staff-bar__card${entry.isCharge ? ' department-staff-bar__card--charge' : ''}`}
@@ -33,7 +29,10 @@ function StaffCard({
         </div>
         {entry.isCharge ? <span className="department-staff-bar__badge">Charge</span> : null}
       </div>
-      <div className="department-staff-bar__responsibilities" aria-label="Assigned responsibilities">
+      <div
+        className="department-staff-bar__responsibilities"
+        aria-label="Assigned responsibilities"
+      >
         {entry.responsibilities.map((responsibility) => (
           <span key={`${entry.staffId}-${responsibility}`} className="department-staff-bar__chip">
             {responsibility}
@@ -67,11 +66,7 @@ export default function DepartmentStaffBar({
 
   return (
     <section
-      className={[
-        'department-staff-bar',
-        compact ? 'department-staff-bar--compact' : '',
-        className,
-      ]
+      className={['department-staff-bar', compact ? 'department-staff-bar--compact' : '', className]
         .filter(Boolean)
         .join(' ')}
       aria-label="On-duty departmental staff overview"

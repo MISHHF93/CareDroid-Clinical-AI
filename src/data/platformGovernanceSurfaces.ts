@@ -21,7 +21,8 @@ export const PLATFORM_GOVERNANCE_SURFACE_PATTERNS = Object.freeze([
 export const PLATFORM_GOVERNANCE_SURFACE_COPY = Object.freeze({
   governance: {
     title: 'Clinical Governance',
-    summary: 'Production readiness, policy state, release gates, and safety blockers for clinical AI operations.',
+    summary:
+      'Production readiness, policy state, release gates, and safety blockers for clinical AI operations.',
     iconKey: 'shield-check',
   },
   'ai-security': {
@@ -36,12 +37,14 @@ export const PLATFORM_GOVERNANCE_SURFACE_COPY = Object.freeze({
   },
   equity: {
     title: 'Equity Monitoring',
-    summary: 'Cohort coverage, missingness, drift, and bias finding review for clinical AI workflows.',
+    summary:
+      'Cohort coverage, missingness, drift, and bias finding review for clinical AI workflows.',
     iconKey: 'chart-bar',
   },
   validation: {
     title: 'Validation Sandbox',
-    summary: 'Synthetic patient scenarios, validation runs, and release evidence before production activation.',
+    summary:
+      'Synthetic patient scenarios, validation runs, and release evidence before production activation.',
     iconKey: 'reassessment',
   },
   review: {
@@ -51,12 +54,14 @@ export const PLATFORM_GOVERNANCE_SURFACE_COPY = Object.freeze({
   },
   consent: {
     title: 'Consent Center',
-    summary: 'Patient consent scope, revocation state, and PHI access gating for AI and documentation.',
+    summary:
+      'Patient consent scope, revocation state, and PHI access gating for AI and documentation.',
     iconKey: 'shield-check',
   },
   privacy: {
     title: 'Privacy Center',
-    summary: 'Privacy requests, PHI access transparency, export/delete review, and patient data controls.',
+    summary:
+      'Privacy requests, PHI access transparency, export/delete review, and patient data controls.',
     iconKey: 'shield-check',
   },
   audit: {
@@ -71,7 +76,8 @@ export const PLATFORM_GOVERNANCE_SURFACE_COPY = Object.freeze({
   },
   interoperability: {
     title: 'FHIR + HL7 Integration',
-    summary: 'Patient import, observations, medications, labs, encounters, connection states, and source provenance.',
+    summary:
+      'Patient import, observations, medications, labs, encounters, connection states, and source provenance.',
     iconKey: 'route',
   },
 });
@@ -79,42 +85,50 @@ export const PLATFORM_GOVERNANCE_SURFACE_COPY = Object.freeze({
 export const PLATFORM_GOVERNANCE_ENTERPRISE_COPY = Object.freeze({
   '/ai-governance': {
     title: 'AI Governance Center',
-    summary: 'Model inventory, clinical review, risk classification, and release history for governed AI deployment.',
+    summary:
+      'Model inventory, clinical review, risk classification, and release history for governed AI deployment.',
     iconKey: 'shield-check',
   },
   '/security': {
     title: 'LLM Security Dashboard',
-    summary: 'Blocked prompts, security events, warnings, failed tool calls, PHI protection, and tool permission checks.',
+    summary:
+      'Blocked prompts, security events, warnings, failed tool calls, PHI protection, and tool permission checks.',
     iconKey: 'alert',
   },
   '/regulatory': {
     title: 'Regulatory Classification',
-    summary: 'Classify tools as informational, CDS, potential SaMD, workflow, or operational capabilities.',
+    summary:
+      'Classify tools as informational, CDS, potential SaMD, workflow, or operational capabilities.',
     iconKey: 'report',
   },
   '/equity': {
     title: 'Bias And Equity Monitoring',
-    summary: 'Model performance, demographic, language, workflow, specialty, fairness, and drift monitoring.',
+    summary:
+      'Model performance, demographic, language, workflow, specialty, fairness, and drift monitoring.',
     iconKey: 'chart-bar',
   },
   '/human-review': {
     title: 'Human Review Queue',
-    summary: 'AI outputs awaiting review with status, reviewer, comments, and accept/reject workflow.',
+    summary:
+      'AI outputs awaiting review with status, reviewer, comments, and accept/reject workflow.',
     iconKey: 'user-check',
   },
   '/privacy': {
     title: 'Consent + Privacy Center',
-    summary: 'Consent management, retention policy, data export/delete workflows, and audit access.',
+    summary:
+      'Consent management, retention policy, data export/delete workflows, and audit access.',
     iconKey: 'shield-check',
   },
   '/system-health': {
     title: 'Deployment Observability',
-    summary: 'Frontend/backend versions, git commit, build timestamp, API health, environment, and deployment status.',
+    summary:
+      'Frontend/backend versions, git commit, build timestamp, API health, environment, and deployment status.',
     iconKey: 'capacity',
   },
   '/integrations': {
     title: 'FHIR + HL7 Integration',
-    summary: 'Patient import, observations, medications, labs, encounters, connection states, and source provenance.',
+    summary:
+      'Patient import, observations, medications, labs, encounters, connection states, and source provenance.',
     iconKey: 'route',
   },
 });
@@ -213,20 +227,37 @@ const MODEL_INVENTORY_FIELD_NOT_DOCUMENTED = 'Not documented';
 export function buildModelInventoryCards(value: unknown): ModelInventoryCardView[] {
   if (!Array.isArray(value)) return [];
   return value
-    .filter((entry): entry is Record<string, unknown> => Boolean(entry) && typeof entry === 'object')
+    .filter(
+      (entry): entry is Record<string, unknown> => Boolean(entry) && typeof entry === 'object',
+    )
     .map((entry, index) => ({
       modelId: typeof entry.modelId === 'string' ? entry.modelId : `model-${index}`,
-      modelName: typeof entry.modelName === 'string' ? entry.modelName : MODEL_INVENTORY_FIELD_NOT_DOCUMENTED,
+      modelName:
+        typeof entry.modelName === 'string'
+          ? entry.modelName
+          : MODEL_INVENTORY_FIELD_NOT_DOCUMENTED,
       // ModelRegistryService.listModels() puts the real curated modelIdentifier
       // (data/model-registry/entries/*.json's `modelIdentifier` field) into `version`.
-      modelIdentifier: typeof entry.version === 'string' ? entry.version : MODEL_INVENTORY_FIELD_NOT_DOCUMENTED,
-      status: typeof entry.status === 'string' ? entry.status : MODEL_INVENTORY_FIELD_NOT_DOCUMENTED,
-      purpose: typeof entry.purpose === 'string' ? entry.purpose : MODEL_INVENTORY_FIELD_NOT_DOCUMENTED,
-      regulatoryClass: typeof entry.regulatoryClass === 'string' ? entry.regulatoryClass : MODEL_INVENTORY_FIELD_NOT_DOCUMENTED,
+      modelIdentifier:
+        typeof entry.version === 'string' ? entry.version : MODEL_INVENTORY_FIELD_NOT_DOCUMENTED,
+      status:
+        typeof entry.status === 'string' ? entry.status : MODEL_INVENTORY_FIELD_NOT_DOCUMENTED,
+      purpose:
+        typeof entry.purpose === 'string' ? entry.purpose : MODEL_INVENTORY_FIELD_NOT_DOCUMENTED,
+      regulatoryClass:
+        typeof entry.regulatoryClass === 'string'
+          ? entry.regulatoryClass
+          : MODEL_INVENTORY_FIELD_NOT_DOCUMENTED,
       owner: typeof entry.owner === 'string' ? entry.owner : MODEL_INVENTORY_FIELD_NOT_DOCUMENTED,
       limitations: Array.isArray(entry.knownLimitations) ? entry.knownLimitations.map(String) : [],
-      expiresAt: typeof entry.expiresAt === 'string' ? entry.expiresAt : MODEL_INVENTORY_FIELD_NOT_DOCUMENTED,
-      retirementPlan: typeof entry.retirementPlan === 'string' ? entry.retirementPlan : MODEL_INVENTORY_FIELD_NOT_DOCUMENTED,
+      expiresAt:
+        typeof entry.expiresAt === 'string'
+          ? entry.expiresAt
+          : MODEL_INVENTORY_FIELD_NOT_DOCUMENTED,
+      retirementPlan:
+        typeof entry.retirementPlan === 'string'
+          ? entry.retirementPlan
+          : MODEL_INVENTORY_FIELD_NOT_DOCUMENTED,
     }));
 }
 
@@ -237,9 +268,17 @@ export function inferPlatformGovernanceSurface(pathname = ''): PlatformGovernanc
   return (match?.[1] as PlatformGovernanceSurfaceId) || 'governance';
 }
 
-export function resolvePlatformGovernanceCopy(pathname = '', surface: PlatformGovernanceSurfaceId = inferPlatformGovernanceSurface(pathname)) {
+export function resolvePlatformGovernanceCopy(
+  pathname = '',
+  surface: PlatformGovernanceSurfaceId = inferPlatformGovernanceSurface(pathname),
+) {
   return (
-    (PLATFORM_GOVERNANCE_ENTERPRISE_COPY as Record<string, (typeof PLATFORM_GOVERNANCE_SURFACE_COPY)['governance']>)[pathname] ||
+    (
+      PLATFORM_GOVERNANCE_ENTERPRISE_COPY as Record<
+        string,
+        (typeof PLATFORM_GOVERNANCE_SURFACE_COPY)['governance']
+      >
+    )[pathname] ||
     PLATFORM_GOVERNANCE_SURFACE_COPY[surface] ||
     PLATFORM_GOVERNANCE_SURFACE_COPY.governance
   );
@@ -303,12 +342,16 @@ export function buildPlatformGovernanceSurfaceView({
   sourceStatus?: string;
 } = {}) {
   const copy = resolvePlatformGovernanceCopy(pathname, surface);
-  const demoPanels = (DEMO_PANELS_BY_SURFACE as Record<string, Record<string, unknown>>)[surface] || DEMO_PANELS_BY_SURFACE.governance;
+  const demoPanels =
+    (DEMO_PANELS_BY_SURFACE as Record<string, Record<string, unknown>>)[surface] ||
+    DEMO_PANELS_BY_SURFACE.governance;
   const panels =
     apiData?.panels && Object.keys(apiData.panels as object).length
       ? (apiData.panels as Record<string, unknown>)
       : demoPanels;
-  const readiness = (apiData?.readiness as { blocked?: boolean } | undefined) || { blocked: sourceStatus === 'fallback' };
+  const readiness = (apiData?.readiness as { blocked?: boolean } | undefined) || {
+    blocked: sourceStatus === 'fallback',
+  };
   const status = String(apiData?.status || (readiness.blocked ? 'blocked' : 'guarded'));
 
   return {
@@ -320,7 +363,8 @@ export function buildPlatformGovernanceSurfaceView({
         label: 'Source status',
         value: sourceStatus,
         hint: 'Live, demo, or fallback contract state',
-        tone: sourceStatus === 'live' ? 'good' : sourceStatus === 'fallback' ? 'warning' : 'neutral',
+        tone:
+          sourceStatus === 'live' ? 'good' : sourceStatus === 'fallback' ? 'warning' : 'neutral',
       },
       {
         label: 'Readiness',

@@ -1,7 +1,7 @@
 import './OperationalHandoffDomainBar.css';
 
 export default function OperationalHandoffDomainBar({
-  domains = ([] as any[]),
+  domains = [] as any[],
   onMetricSelect,
   readOnly = false,
 }) {

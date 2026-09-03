@@ -13,7 +13,11 @@
  */
 
 import { apiFetchJson, getApiErrorMessage } from '../apiClient';
-import type { AIActionProposal, AiActionProposalState, AiRiskLevel } from '../../contracts/interactiveAi';
+import type {
+  AIActionProposal,
+  AiActionProposalState,
+  AiRiskLevel,
+} from '../../contracts/interactiveAi';
 
 export type CreateActionProposalInput = {
   originatingRequestId: string;

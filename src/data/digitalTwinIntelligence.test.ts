@@ -7,7 +7,9 @@ function buildStressedTwin() {
       sourceLabel: 'Test twin',
       occupancy: { totalBeds: 20, occupiedBeds: 19, criticalBeds: 4 },
       floors: [{ id: 'icu', label: 'ICU', occupancy: 0.96, alerts: 4, devices: 12 }],
-      rooms: [{ id: 'icu-12', label: 'ICU 12', telemetry: 'stale SpO2', patientState: 'high acuity' }],
+      rooms: [
+        { id: 'icu-12', label: 'ICU 12', telemetry: 'stale SpO2', patientState: 'high acuity' },
+      ],
       fleet: [{ id: 'amb-a12', label: 'Ambulance A-12' }],
     },
     hospitalMapSnapshot: {

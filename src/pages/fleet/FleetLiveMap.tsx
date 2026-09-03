@@ -97,7 +97,9 @@ export default function FleetLiveMap() {
       recordToolAccessRef.current('fleet-live-map');
     } catch (loadError) {
       if (loadError instanceof DOMException && loadError.name === 'AbortError') return;
-      setError(loadError instanceof Error ? loadError.message : 'Unable to load fleet map telemetry.');
+      setError(
+        loadError instanceof Error ? loadError.message : 'Unable to load fleet map telemetry.',
+      );
       setSnapshot(null);
     } finally {
       if (!signal?.aborted) {
@@ -122,7 +124,11 @@ export default function FleetLiveMap() {
     if (usedApi) {
       return [DEMO_LIVE_STATES.DEMO, DEMO_LIVE_STATES.UNSUPPORTED];
     }
-    return [DEMO_LIVE_STATES.DEMO, DEMO_LIVE_STATES.BACKEND_UNAVAILABLE, DEMO_LIVE_STATES.UNSUPPORTED];
+    return [
+      DEMO_LIVE_STATES.DEMO,
+      DEMO_LIVE_STATES.BACKEND_UNAVAILABLE,
+      DEMO_LIVE_STATES.UNSUPPORTED,
+    ];
   }, [usedApi]);
 
   const gridLines = useMemo(
@@ -140,8 +146,12 @@ export default function FleetLiveMap() {
         <div className="fleet-live-map-page__title-row">
           <GraphicIconBadge iconKey="ems" accent="brand" size="md" />
           <div>
-            <p className="fleet-live-map-page__title-text" data-testid="cd-page-title-text">Fleet Live Map</p>
-            <p>Demo vehicle positions, active routes, and operational alerts for dispatcher review.</p>
+            <p className="fleet-live-map-page__title-text" data-testid="cd-page-title-text">
+              Fleet Live Map
+            </p>
+            <p>
+              Demo vehicle positions, active routes, and operational alerts for dispatcher review.
+            </p>
           </div>
         </div>
         <div className="fleet-live-map-page__actions">
@@ -174,7 +184,11 @@ export default function FleetLiveMap() {
               role="group"
               aria-label="Fleet vehicle and route map — contains selectable vehicle markers"
             >
-              <svg viewBox="0 0 100 100" className="fleet-live-map-canvas__svg" preserveAspectRatio="xMidYMid meet">
+              <svg
+                viewBox="0 0 100 100"
+                className="fleet-live-map-canvas__svg"
+                preserveAspectRatio="xMidYMid meet"
+              >
                 {gridLines.map((line, index) => (
                   <line
                     key={`grid-${index}`}
@@ -217,7 +231,9 @@ export default function FleetLiveMap() {
                       }}
                     >
                       <circle r="2.4" fill={MARKER_FILL[tone]} />
-                      <text x="3" y="1.2">{vehicle.id}</text>
+                      <text x="3" y="1.2">
+                        {vehicle.id}
+                      </text>
                     </g>
                   );
                 })}
@@ -225,20 +241,27 @@ export default function FleetLiveMap() {
             </div>
             {selectedVehicle ? (
               <p className="fleet-live-map__state">
-                <strong>{selectedVehicle.label}</strong> — {formatVehicleStatus(selectedVehicle.status)}
+                <strong>{selectedVehicle.label}</strong> —{' '}
+                {formatVehicleStatus(selectedVehicle.status)}
                 {selectedVehicle.destination ? ` · ${selectedVehicle.destination}` : ''}
                 {selectedVehicle.etaMinutes != null ? ` · ETA ${selectedVehicle.etaMinutes}m` : ''}
                 {selectedVehicle.speedMph != null ? ` · ${selectedVehicle.speedMph} mph` : ''}
               </p>
             ) : (
-              <p className="fleet-live-map__state">Select a vehicle marker to inspect route context.</p>
+              <p className="fleet-live-map__state">
+                Select a vehicle marker to inspect route context.
+              </p>
             )}
           </section>
 
           <aside className="fleet-live-map__panel" aria-label="Fleet map intelligence">
             <div>
               <h2>Operational summary</h2>
-              <div className="fleet-live-map__metrics" role="group" aria-label="Fleet map summary metrics">
+              <div
+                className="fleet-live-map__metrics"
+                role="group"
+                aria-label="Fleet map summary metrics"
+              >
                 <article className="fleet-live-map__metric">
                   <span>Active units</span>
                   <strong>{String(summary.activeVehicles ?? 0)}</strong>
@@ -303,7 +326,9 @@ export default function FleetLiveMap() {
                     </button>
                   ))
                 ) : (
-                  <p className="fleet-live-map__state">No vehicles are reporting map coordinates.</p>
+                  <p className="fleet-live-map__state">
+                    No vehicles are reporting map coordinates.
+                  </p>
                 )}
               </div>
             </div>

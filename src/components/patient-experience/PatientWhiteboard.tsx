@@ -21,10 +21,7 @@ export default function PatientWhiteboard({
   className = '',
 }: PatientWhiteboardProps) {
   const presentation = resolveOperationalPresentation(CARE_DROID_SCREEN_MODES.publicWaiting);
-  const snapshot = useMemo(
-    () => buildPatientWhiteboardSnapshot(patient, staff),
-    [patient, staff],
-  );
+  const snapshot = useMemo(() => buildPatientWhiteboardSnapshot(patient, staff), [patient, staff]);
 
   return (
     <OperationalPresentationFrame

@@ -32,14 +32,14 @@ const ALARM_OK = 'var(--alarm-ok)';
 
 const toneColor: Record<string, string> = {
   critical: ALARM_CRITICAL,
-  warning:  ALARM_WARNING,
-  good:     ALARM_OK,
-  neutral:  MEDICAL_THEME.inkMuted,
+  warning: ALARM_WARNING,
+  good: ALARM_OK,
+  neutral: MEDICAL_THEME.inkMuted,
 };
 
 const statusColor: Record<string, string> = {
-  healthy:  ALARM_OK,
-  review:   ALARM_WARNING,
+  healthy: ALARM_OK,
+  review: ALARM_WARNING,
   degraded: ALARM_CRITICAL,
 };
 
@@ -58,31 +58,19 @@ function MetricTile({
 }) {
   return (
     <div className="ai-cc-metric-tile">
-      <div className="ai-cc-metric-tile__label">
-        {label}
-      </div>
+      <div className="ai-cc-metric-tile__label">{label}</div>
       <div className="ai-cc-metric-tile__value" style={{ color: accent || MEDICAL_THEME.ink }}>
         {value}
       </div>
-      {sub && (
-        <div className="ai-cc-metric-tile__sub">{sub}</div>
-      )}
+      {sub && <div className="ai-cc-metric-tile__sub">{sub}</div>}
     </div>
   );
 }
 
-function SectionCard({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
+function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="ai-cc-section-card">
-      <h2 className="ai-cc-section-card__title">
-        {title}
-      </h2>
+      <h2 className="ai-cc-section-card__title">{title}</h2>
       {children}
     </div>
   );
@@ -105,15 +93,9 @@ function ExpertRow({
         className="ai-cc-expert-row__dot"
         style={{ background: expert.active ? dot : MEDICAL_THEME.inkDisabled }}
       />
-      <span className="ai-cc-expert-row__label">
-        {expert.label}
-      </span>
+      <span className="ai-cc-expert-row__label">{expert.label}</span>
       <span className="ai-cc-expert-row__specialty">{expert.specialty}</span>
-      {expert.load != null && (
-        <span className="ai-cc-expert-row__load">
-          load {expert.load}%
-        </span>
-      )}
+      {expert.load != null && <span className="ai-cc-expert-row__load">load {expert.load}%</span>}
       {expert.confidence != null && (
         <span
           className="ai-cc-expert-row__confidence"
@@ -139,11 +121,7 @@ function ExpertRow({
 }
 
 function LoadingShell() {
-  return (
-    <div className="ai-cc-loading-shell">
-      Loading AI Command Center…
-    </div>
-  );
+  return <div className="ai-cc-loading-shell">Loading AI Command Center…</div>;
 }
 
 function WarningBanner({ warnings }: { warnings: string[] }) {
@@ -184,11 +162,11 @@ export default function AiCommandCenterDashboard() {
   }, []);
 
   const health = snapshot?.health;
-  const cost   = snapshot?.costMetrics;
-  const rag    = snapshot?.ragMetrics;
-  const mem    = snapshot?.memoryUsage;
-  const tools  = snapshot?.toolUsage;
-  const node   = snapshot?.unifiedNode;
+  const cost = snapshot?.costMetrics;
+  const rag = snapshot?.ragMetrics;
+  const mem = snapshot?.memoryUsage;
+  const tools = snapshot?.toolUsage;
+  const node = snapshot?.unifiedNode;
 
   return (
     <main className="ai-cc-page">
@@ -217,7 +195,8 @@ export default function AiCommandCenterDashboard() {
               {health.label}
             </span>
           )}
-          <button type="button"
+          <button
+            type="button"
             onClick={load}
             disabled={loading}
             className="ai-cc-header__refresh-btn"
@@ -265,13 +244,11 @@ export default function AiCommandCenterDashboard() {
               <div className="ai-cc-metrics-strip ai-cc-metrics-strip--tight">
                 <MetricTile
                   label="Node"
-                  value={node.ready || node.status === 'ready' ? 'Ready' : String(node.status || '—')}
-                  sub={node.nodeId || 'caredroid-unified-ai-node'}
-                  accent={
-                    node.ready || node.status === 'ready'
-                      ? ALARM_OK
-                      : ALARM_WARNING
+                  value={
+                    node.ready || node.status === 'ready' ? 'Ready' : String(node.status || '—')
                   }
+                  sub={node.nodeId || 'caredroid-unified-ai-node'}
+                  accent={node.ready || node.status === 'ready' ? ALARM_OK : ALARM_WARNING}
                 />
                 <MetricTile
                   label="NLU head"
@@ -342,9 +319,7 @@ export default function AiCommandCenterDashboard() {
               value={snapshot?.hallucinationMetrics.label ?? '—'}
               sub={`target ${snapshot?.hallucinationMetrics.benchmark ?? '<= 5%'}`}
               accent={
-                snapshot && snapshot.hallucinationMetrics.rate <= 0.05
-                  ? ALARM_OK
-                  : ALARM_CRITICAL
+                snapshot && snapshot.hallucinationMetrics.rate <= 0.05 ? ALARM_OK : ALARM_CRITICAL
               }
             />
           </div>
@@ -374,9 +349,7 @@ export default function AiCommandCenterDashboard() {
                       <span className="ai-cc-kv-row__value">{value}</span>
                     </div>
                   ))}
-                  <div className="ai-cc-memory-total">
-                    {mem.total} total memory entries
-                  </div>
+                  <div className="ai-cc-memory-total">{mem.total} total memory entries</div>
                 </div>
               ) : (
                 <span className="ai-cc-empty-state">No data</span>
@@ -416,9 +389,7 @@ export default function AiCommandCenterDashboard() {
                       <span className="ai-cc-tool-route-row__label">
                         {String(route).replace(/_/g, ' ')}
                       </span>
-                      <span className="ai-cc-kv-row__value">
-                        {String(count)}
-                      </span>
+                      <span className="ai-cc-kv-row__value">{String(count)}</span>
                     </div>
                   ))}
                   <div className="ai-cc-tool-success-rate">
@@ -456,7 +427,9 @@ export default function AiCommandCenterDashboard() {
               <SectionCard title="Recent Audit">
                 {snapshot.auditLogs.slice(0, 6).map((log: any, i: number) => (
                   <div key={i} className="ai-cc-audit-row">
-                    <strong className="ai-cc-audit-row__action">{log.action ?? log.type ?? 'Event'}</strong>
+                    <strong className="ai-cc-audit-row__action">
+                      {log.action ?? log.type ?? 'Event'}
+                    </strong>
                     {log.resource && ` · ${log.resource}`}
                     {log.timestamp && (
                       <span className="ai-cc-audit-row__timestamp">
@@ -473,9 +446,7 @@ export default function AiCommandCenterDashboard() {
               <SectionCard title="Data Sources">
                 {Object.entries(snapshot.sourceStatus).map(([source, status]) => (
                   <div key={source} className="ai-cc-source-row">
-                    <span className="ai-cc-source-row__label">
-                      {source}
-                    </span>
+                    <span className="ai-cc-source-row__label">{source}</span>
                     <span
                       className="ai-cc-source-row__value"
                       style={{ color: status === 'live' ? ALARM_OK : ALARM_WARNING }}

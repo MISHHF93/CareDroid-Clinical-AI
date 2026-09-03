@@ -10,7 +10,7 @@ describe('dev auth bypass production guard', () => {
   it('defaults on for local dev and allows explicit hosted demo exposure', () => {
     expect(appConfigSource).toContain('VITE_ENABLE_DEV_AUTH_BYPASS');
     expect(appConfigSource).toMatch(
-      /enableDevAuthBypass:\s*toBoolean\(\s*getEnvValue\('VITE_ENABLE_DEV_AUTH_BYPASS', isProductionBuild\(\) \? 'false' : 'true'\)/
+      /enableDevAuthBypass:\s*toBoolean\(\s*getEnvValue\('VITE_ENABLE_DEV_AUTH_BYPASS', isProductionBuild\(\) \? 'false' : 'true'\)/,
     );
     expect(appConfigSource).toContain("isProductionBuild() ? 'false' : 'true'");
     expect(appConfigSource).toContain('VITE_DEMO_MODE');

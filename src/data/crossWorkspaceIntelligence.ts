@@ -64,7 +64,10 @@ function workspaceNode(workspace) {
     label: workspace.label,
     type: workspace.id.includes('iot') || workspace.id === 'fleet' ? 'operational' : 'clinical',
     description: workspace.description,
-    outcomeFocus: workspace.defaultDashboardWidgets?.[0] || workspace.defaultNavigationGroups?.[0] || 'workspace',
+    outcomeFocus:
+      workspace.defaultDashboardWidgets?.[0] ||
+      workspace.defaultNavigationGroups?.[0] ||
+      'workspace',
     primarySignals: [
       ...(workspace.defaultDashboardWidgets || []),
       ...(workspace.defaultAssetPacks || []),

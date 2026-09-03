@@ -26,9 +26,9 @@ const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
 const patternsSource = readFileSync(
   join(
     __dirname,
-    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts'
+    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts',
   ),
-  'utf8'
+  'utf8',
 );
 
 describe('NEXUS C-Spine Rule (Tier B chat-assisted) wiring', () => {
@@ -67,7 +67,7 @@ describe('NEXUS C-Spine Rule (Tier B chat-assisted) wiring', () => {
       expect(launch.registryId).toBe(id);
       expect(launch.openLabel).toBe('Open');
       expect(launch.chatSeed).toMatch(/NEXUS/i);
-    }
+    },
   );
 
   it('resolves discovery slug aliases to nexus-cspine', () => {

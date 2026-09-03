@@ -36,11 +36,11 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
 
 const PRODUCTION_CALCULATOR_PATHS = REQUIRED_PRODUCTION_TOOL_PATHS.filter((p) =>
-  p.startsWith('/tools/calculators')
+  p.startsWith('/tools/calculators'),
 );
 
 const FLEET_PRODUCTION_PATHS = REQUIRED_PRODUCTION_TOOL_PATHS.filter((p) =>
-  p.startsWith('/fleet/')
+  p.startsWith('/fleet/'),
 );
 
 describe('Production routes — archived calculator route inventory', () => {
@@ -52,8 +52,8 @@ describe('Production routes — archived calculator route inventory', () => {
     expect(appSource).not.toContain('path="/tools/calculators/:slug"');
     expect(appSource).toContain('path="/tools/*"');
     expect(appSource).toContain('CANONICAL_ROUTES.emergencyWhiteboard');
-    const requiredCalculatorPaths = REQUIRED_PRODUCTION_TOOL_PATHS.filter((p) =>
-      p.startsWith('/tools/calculators/') && p !== TOOL_LAUNCH_PATHS.calculatorsHub
+    const requiredCalculatorPaths = REQUIRED_PRODUCTION_TOOL_PATHS.filter(
+      (p) => p.startsWith('/tools/calculators/') && p !== TOOL_LAUNCH_PATHS.calculatorsHub,
     );
     expect(CALCULATOR_ROUTE_DEFS.length).toBeGreaterThanOrEqual(requiredCalculatorPaths.length);
     for (const path of requiredCalculatorPaths) {
@@ -99,13 +99,14 @@ describe('Production routes — registry tool paths', () => {
 });
 
 describe('Production routes — calculator slugs', () => {
-  it.each(
-    PRODUCTION_CALCULATOR_PATHS.filter((p) => p !== TOOL_LAUNCH_PATHS.calculatorsHub)
-  )('slug route %s matches builtin calculator', (path) => {
-    const slug = path.split('/').pop();
-    expect(isRegisteredCalculatorSlug(slug)).toBe(true);
-    expect(matchCalculatorRoute(path)?.calculatorSlug).toBe(slug);
-  });
+  it.each(PRODUCTION_CALCULATOR_PATHS.filter((p) => p !== TOOL_LAUNCH_PATHS.calculatorsHub))(
+    'slug route %s matches builtin calculator',
+    (path) => {
+      const slug = path.split('/').pop();
+      expect(isRegisteredCalculatorSlug(slug)).toBe(true);
+      expect(matchCalculatorRoute(path)?.calculatorSlug).toBe(slug);
+    },
+  );
 
   it('every builtinUiCalculators path has an App route via CALCULATOR_ROUTE_DEFS', () => {
     for (const calc of builtinUiCalculators) {
@@ -129,7 +130,7 @@ describe('Production routes — catalog launch targets', () => {
       expect(launch.path).toBeTruthy();
       expect(matchCalculatorRoute(launch.path)).toBeTruthy();
       expect(launch.path).not.toBe(TOOL_LAUNCH_PATHS.calculatorsHub);
-    }
+    },
   );
 
   it.each(CLINICAL_TIER_B_CHAT_REGISTRY_IDS)(
@@ -140,19 +141,22 @@ describe('Production routes — catalog launch targets', () => {
       expect(isKnownToolAreaPath(launch.path)).toBe(true);
       expect(launch.chatSeed?.length).toBeGreaterThan(20);
       expect([launch.path, '/assistant']).toContain(resolveNavigationPathForLaunch(launch));
-    }
+    },
   );
 
-  it.each(PR_FLEET_ALL_REGISTRY_IDS)('fleet %s launch path matches dedicated route', (registryId) => {
-    const launch = resolveCatalogLaunch(registryId);
-    expect(launch.path).toBeTruthy();
-    expect(isKnownToolAreaPath(launch.path)).toBe(true);
-    if (registryId === 'dispatch-ai') {
-      expect(launch.path).toBe(TOOL_LAUNCH_PATHS.calculatorsHub);
-    } else {
-      expect(launch.path).toMatch(/^\/fleet\//);
-    }
-  });
+  it.each(PR_FLEET_ALL_REGISTRY_IDS)(
+    'fleet %s launch path matches dedicated route',
+    (registryId) => {
+      const launch = resolveCatalogLaunch(registryId);
+      expect(launch.path).toBeTruthy();
+      expect(isKnownToolAreaPath(launch.path)).toBe(true);
+      if (registryId === 'dispatch-ai') {
+        expect(launch.path).toBe(TOOL_LAUNCH_PATHS.calculatorsHub);
+      } else {
+        expect(launch.path).toMatch(/^\/fleet\//);
+      }
+    },
+  );
 
   it.each(PRODUCTION_CALCULATOR_PATHS)('catalog resolves slug %s to same path', (path) => {
     const slug = path.split('/').pop();

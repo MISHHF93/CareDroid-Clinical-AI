@@ -2,11 +2,11 @@
  * Permission vocabulary bridge — maps emergency dot, CareDroid colon, and backend RBAC keys.
  */
 
-import { EMERGENCY_PERMISSION_KEYS, resolveEmergencyPermissionKey } from './emergencyPermissionRegistry';
 import {
-  CAREDROID_PERMISSIONS,
-  type CareDroidPermission,
-} from '../lib/users/permissions';
+  EMERGENCY_PERMISSION_KEYS,
+  resolveEmergencyPermissionKey,
+} from './emergencyPermissionRegistry';
+import { CAREDROID_PERMISSIONS, type CareDroidPermission } from '../lib/users/permissions';
 import {
   BACKEND_PERMISSION_KEYS,
   type BackendPermissionKey,
@@ -23,46 +23,47 @@ export type NormalizedPermissionSet = Readonly<{
   backend: readonly BackendPermissionKey[];
 }>;
 
-const EMERGENCY_TO_CAREDROID: Readonly<Record<string, readonly CareDroidPermission[]>> = Object.freeze({
-  [K.patientCreate]: [P.PATIENT_CREATE],
-  [K.patientDemographicsEdit]: [P.PATIENT_UPDATE],
-  [K.patientTransition]: [P.PATIENT_UPDATE],
-  [K.patientAssignStaff]: [P.PATIENT_ASSIGN, P.STAFF_ASSIGN],
-  [K.patientAssignRoom]: [P.PATIENT_ASSIGN],
-  [K.patientEscalate]: [P.TRIAGE_ESCALATE, P.ALERT_ESCALATE],
-  [K.patientDischarge]: [P.PATIENT_DISCHARGE],
-  [K.encounterCreate]: [P.PATIENT_CREATE],
-  [K.intakeVerify]: [P.PATIENT_UPDATE],
-  [K.triageAssignAcuity]: [P.TRIAGE_CREATE, P.TRIAGE_UPDATE],
-  [K.queueMove]: [P.PATIENT_UPDATE],
-  [K.vitalsWrite]: [P.PATIENT_UPDATE],
-  [K.notesWrite]: [P.PATIENT_UPDATE],
-  [K.flagsManage]: [P.PATIENT_UPDATE, P.ALERT_ACKNOWLEDGE],
-  [K.reassessmentComplete]: [P.TRIAGE_UPDATE],
-  [K.emsPrepareBay]: [P.PATIENT_UPDATE],
-  [K.emsConvertArrival]: [P.PATIENT_CREATE],
-  [K.emsHandoffComplete]: [P.PATIENT_UPDATE],
-  [K.referralCreate]: [P.ORDERS_CREATE],
-  [K.transferManage]: [P.PATIENT_ASSIGN],
-  [K.capacityManage]: [P.ANALYTICS_READ, P.SETTINGS_READ],
-  [K.boardingManage]: [P.PATIENT_ASSIGN],
-  [K.workloadReassign]: [P.STAFF_ASSIGN],
-  [K.receptionEscalate]: [P.ALERT_ESCALATE],
-  [K.copilotUse]: [P.AI_REQUEST, P.AI_READ],
-  [K.analyticsView]: [P.ANALYTICS_READ, P.REPORTS_READ],
-  [K.simulationRun]: [P.AI_CONFIGURE],
-  [K.settingsManage]: [P.SETTINGS_UPDATE],
-  [K.displayPublicWaitboard]: [P.ANALYTICS_READ],
-  [K.displayPublicPublish]: [P.SETTINGS_UPDATE],
-  [K.displayWhiteboardReadonly]: [P.PATIENT_READ, P.TRIAGE_READ],
-  [K.screenTriage]: [P.TRIAGE_READ, P.TRIAGE_CREATE],
-  [K.screenRegistration]: [P.PATIENT_CREATE, P.PATIENT_READ],
-  [K.screenChargeNurse]: [P.PATIENT_READ, P.STAFF_ASSIGN],
-  [K.screenPhysician]: [P.PATIENT_READ, P.ORDERS_CREATE],
-  [K.screenEms]: [P.PATIENT_READ, P.PATIENT_CREATE],
-  [K.screenCommandCenter]: [P.ANALYTICS_READ, P.PATIENT_READ],
-  [K.screenAdmin]: [P.SETTINGS_UPDATE, P.USERS_READ],
-});
+const EMERGENCY_TO_CAREDROID: Readonly<Record<string, readonly CareDroidPermission[]>> =
+  Object.freeze({
+    [K.patientCreate]: [P.PATIENT_CREATE],
+    [K.patientDemographicsEdit]: [P.PATIENT_UPDATE],
+    [K.patientTransition]: [P.PATIENT_UPDATE],
+    [K.patientAssignStaff]: [P.PATIENT_ASSIGN, P.STAFF_ASSIGN],
+    [K.patientAssignRoom]: [P.PATIENT_ASSIGN],
+    [K.patientEscalate]: [P.TRIAGE_ESCALATE, P.ALERT_ESCALATE],
+    [K.patientDischarge]: [P.PATIENT_DISCHARGE],
+    [K.encounterCreate]: [P.PATIENT_CREATE],
+    [K.intakeVerify]: [P.PATIENT_UPDATE],
+    [K.triageAssignAcuity]: [P.TRIAGE_CREATE, P.TRIAGE_UPDATE],
+    [K.queueMove]: [P.PATIENT_UPDATE],
+    [K.vitalsWrite]: [P.PATIENT_UPDATE],
+    [K.notesWrite]: [P.PATIENT_UPDATE],
+    [K.flagsManage]: [P.PATIENT_UPDATE, P.ALERT_ACKNOWLEDGE],
+    [K.reassessmentComplete]: [P.TRIAGE_UPDATE],
+    [K.emsPrepareBay]: [P.PATIENT_UPDATE],
+    [K.emsConvertArrival]: [P.PATIENT_CREATE],
+    [K.emsHandoffComplete]: [P.PATIENT_UPDATE],
+    [K.referralCreate]: [P.ORDERS_CREATE],
+    [K.transferManage]: [P.PATIENT_ASSIGN],
+    [K.capacityManage]: [P.ANALYTICS_READ, P.SETTINGS_READ],
+    [K.boardingManage]: [P.PATIENT_ASSIGN],
+    [K.workloadReassign]: [P.STAFF_ASSIGN],
+    [K.receptionEscalate]: [P.ALERT_ESCALATE],
+    [K.copilotUse]: [P.AI_REQUEST, P.AI_READ],
+    [K.analyticsView]: [P.ANALYTICS_READ, P.REPORTS_READ],
+    [K.simulationRun]: [P.AI_CONFIGURE],
+    [K.settingsManage]: [P.SETTINGS_UPDATE],
+    [K.displayPublicWaitboard]: [P.ANALYTICS_READ],
+    [K.displayPublicPublish]: [P.SETTINGS_UPDATE],
+    [K.displayWhiteboardReadonly]: [P.PATIENT_READ, P.TRIAGE_READ],
+    [K.screenTriage]: [P.TRIAGE_READ, P.TRIAGE_CREATE],
+    [K.screenRegistration]: [P.PATIENT_CREATE, P.PATIENT_READ],
+    [K.screenChargeNurse]: [P.PATIENT_READ, P.STAFF_ASSIGN],
+    [K.screenPhysician]: [P.PATIENT_READ, P.ORDERS_CREATE],
+    [K.screenEms]: [P.PATIENT_READ, P.PATIENT_CREATE],
+    [K.screenCommandCenter]: [P.ANALYTICS_READ, P.PATIENT_READ],
+    [K.screenAdmin]: [P.SETTINGS_UPDATE, P.USERS_READ],
+  });
 
 const CAREDROID_TO_BACKEND: Readonly<Record<CareDroidPermission, readonly BackendPermissionKey[]>> =
   Object.freeze({
@@ -142,7 +143,9 @@ function backendFromCaredroid(keys: readonly CareDroidPermission[]): BackendPerm
   return [...merged];
 }
 
-export function normalizePermission(permission: string | null | undefined): NormalizedPermissionSet {
+export function normalizePermission(
+  permission: string | null | undefined,
+): NormalizedPermissionSet {
   const raw = String(permission || '').trim();
   if (!raw) {
     return { emergency: null, caredroid: [], backend: [] };

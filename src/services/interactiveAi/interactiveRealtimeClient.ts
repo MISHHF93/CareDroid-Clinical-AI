@@ -38,10 +38,10 @@ function toTypedEvent(raw: {
       ? (raw.payload as Record<string, unknown>)
       : { value: raw.payload };
 
-  const eventId =
-    String(payload.eventId || payload.id || `${raw.type}-${raw.receivedAt || Date.now()}`);
-  const sequence =
-    typeof payload.sequence === 'number' ? payload.sequence : ++sequenceCounter;
+  const eventId = String(
+    payload.eventId || payload.id || `${raw.type}-${raw.receivedAt || Date.now()}`,
+  );
+  const sequence = typeof payload.sequence === 'number' ? payload.sequence : ++sequenceCounter;
   const occurredAt = String(
     payload.occurredAt || payload.timestamp || raw.receivedAt || new Date().toISOString(),
   );
@@ -51,8 +51,7 @@ function toTypedEvent(raw: {
     topic: raw.type as InteractiveRealtimeTopic | string,
     sequence,
     occurredAt,
-    freshnessMs:
-      typeof payload.freshnessMs === 'number' ? payload.freshnessMs : undefined,
+    freshnessMs: typeof payload.freshnessMs === 'number' ? payload.freshnessMs : undefined,
     tenantId: payload.tenantId ? String(payload.tenantId) : undefined,
     organizationId: payload.organizationId ? String(payload.organizationId) : undefined,
     payload: raw.payload,

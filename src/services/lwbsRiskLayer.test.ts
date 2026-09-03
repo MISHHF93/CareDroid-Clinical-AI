@@ -127,10 +127,10 @@ describe('lwbsRiskLayer', () => {
   });
 
   it('builds attention snapshot for the waiting-room board and other real consumers', () => {
-    const snapshot = buildLwbsRiskAttentionSnapshot(
-      [buildPatient()],
-      { now: STABLE_NOW, waitingPatientCount: 18 },
-    );
+    const snapshot = buildLwbsRiskAttentionSnapshot([buildPatient()], {
+      now: STABLE_NOW,
+      waitingPatientCount: 18,
+    });
 
     expect(snapshot.elevatedAndHighCount).toBeGreaterThan(0);
     expect(snapshot.previewRows[0]?.level).toBe('elevated');

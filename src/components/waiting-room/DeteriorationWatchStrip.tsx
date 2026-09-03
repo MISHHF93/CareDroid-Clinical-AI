@@ -48,7 +48,8 @@ export default function DeteriorationWatchStrip({
           <p className="deterioration-watch-strip__eyebrow">Operational advisory</p>
           <h3>Deterioration watch</h3>
           <p className="deterioration-watch-strip__subtitle">
-            Patients who may need staff re-review based on vitals, reassessment delays, high-risk complaint, and EMS/intake observations — advisory only.
+            Patients who may need staff re-review based on vitals, reassessment delays, high-risk
+            complaint, and EMS/intake observations — advisory only.
           </p>
         </div>
       </header>
@@ -62,7 +63,11 @@ export default function DeteriorationWatchStrip({
               <div key={level.id} className="deterioration-watch-strip__count">
                 <strong>{counts[level.id]}</strong>
                 {samplePatient ? (
-                  <DeteriorationWatchBadge patient={samplePatient} emsArrivals={emsArrivals} compact />
+                  <DeteriorationWatchBadge
+                    patient={samplePatient}
+                    emsArrivals={emsArrivals}
+                    compact
+                  />
                 ) : (
                   <span>{level.label}</span>
                 )}

@@ -196,10 +196,7 @@ describe('emsOffloadTracker', () => {
     // to a real patient / departed) must NOT be zombie-preserved.
     const droppedLocalArrival: EMSArrival = { ...localArrival, id: 'ems-7' };
 
-    const merged = mergeEmsArrivalHydration(
-      [payloadArrival],
-      [localArrival, droppedLocalArrival],
-    );
+    const merged = mergeEmsArrivalHydration([payloadArrival], [localArrival, droppedLocalArrival]);
 
     expect(merged).toHaveLength(1);
     const result = merged[0];

@@ -57,13 +57,24 @@ export type LwbsRiskContext = {
 
 const ADVISORY_LABEL = 'Advisory only — staff review required';
 
-const LEVEL_BY_SCORE: Array<{ min: number; level: LwbsRiskLevel; label: string; shortLabel: string; tone: LwbsRiskTone }> =
-  [
-    { min: 70, level: 'elevated', label: 'Elevated LWBS risk', shortLabel: 'Elevated', tone: 'critical' },
-    { min: 50, level: 'high', label: 'High LWBS risk', shortLabel: 'High', tone: 'watch' },
-    { min: 30, level: 'medium', label: 'Medium LWBS risk', shortLabel: 'Medium', tone: 'info' },
-    { min: 0, level: 'low', label: 'Low LWBS risk', shortLabel: 'Low', tone: 'neutral' },
-  ];
+const LEVEL_BY_SCORE: Array<{
+  min: number;
+  level: LwbsRiskLevel;
+  label: string;
+  shortLabel: string;
+  tone: LwbsRiskTone;
+}> = [
+  {
+    min: 70,
+    level: 'elevated',
+    label: 'Elevated LWBS risk',
+    shortLabel: 'Elevated',
+    tone: 'critical',
+  },
+  { min: 50, level: 'high', label: 'High LWBS risk', shortLabel: 'High', tone: 'watch' },
+  { min: 30, level: 'medium', label: 'Medium LWBS risk', shortLabel: 'Medium', tone: 'info' },
+  { min: 0, level: 'low', label: 'Low LWBS risk', shortLabel: 'Low', tone: 'neutral' },
+];
 
 const LWBS_PRONE_COMPLAINT_CATEGORIES = new Set([
   'Psych',
@@ -85,7 +96,9 @@ function patientDisplayName(patient: Patient): string {
 
 function hasFlag(patient: Patient, flag: PatientFlag): boolean {
   return (patient.flags || []).some((entry) =>
-    typeof entry === 'string' ? entry === flag : (entry as unknown as { type: string })?.type === flag,
+    typeof entry === 'string'
+      ? entry === flag
+      : (entry as unknown as { type: string })?.type === flag,
   );
 }
 
@@ -100,11 +113,7 @@ function resolveLevel(score: number) {
   return LEVEL_BY_SCORE.find((entry) => score >= entry.min) || LEVEL_BY_SCORE.at(-1)!;
 }
 
-function scoreWaitDuration(
-  patient: Patient,
-  context: LwbsRiskContext,
-  now: Date,
-): LwbsRiskFactor {
+function scoreWaitDuration(patient: Patient, context: LwbsRiskContext, now: Date): LwbsRiskFactor {
   const status = longWaitStatus(patient, now, context.settingsOrTargets);
   const threshold = status.thresholdMinutes || 30;
   const waitMinutes = waitMinutesForPatient(patient, now);
@@ -130,7 +139,8 @@ function countOverdueReassessmentSignals(patient: Patient, now: Date): number {
   let count = timer.isOverdue ? 1 : 0;
 
   const overdueReminders = (patient.reassessmentReminders || []).filter(
-    (reminder) => (reminder.status as string) === 'overdue' || (reminder.status as string) === 'missed',
+    (reminder) =>
+      (reminder.status as string) === 'overdue' || (reminder.status as string) === 'missed',
   ).length;
   count = Math.max(count, overdueReminders);
 
@@ -166,7 +176,11 @@ function scoreOverdueReassessment(patient: Patient, now: Date): LwbsRiskFactor {
   };
 }
 
-function scoreLowContactFrequency(patient: Patient, context: LwbsRiskContext, now: Date): LwbsRiskFactor {
+function scoreLowContactFrequency(
+  patient: Patient,
+  context: LwbsRiskContext,
+  now: Date,
+): LwbsRiskFactor {
   const waitMinutes = waitMinutesForPatient(patient, now);
   const nurseContactAt = deriveLastNurseContactTime(patient);
   let contactAgeMinutes = minutesSince(nurseContactAt, now);
@@ -341,9 +355,10 @@ export function buildLwbsRiskAdvisoryAlerts(
       patient,
       snapshot: resolveLwbsRisk(patient, enrichedContext),
     }))
-    .filter(
-      (entry): entry is { patient: Patient; snapshot: LwbsRiskSnapshot } =>
-        Boolean(entry.snapshot && (entry.snapshot.level === 'high' || entry.snapshot.level === 'elevated')),
+    .filter((entry): entry is { patient: Patient; snapshot: LwbsRiskSnapshot } =>
+      Boolean(
+        entry.snapshot && (entry.snapshot.level === 'high' || entry.snapshot.level === 'elevated'),
+      ),
     )
     .sort((left, right) => right.snapshot.score - left.snapshot.score)
     .map(({ patient, snapshot }) => ({
@@ -407,9 +422,8 @@ export function sortPatientsForLwbsRiskAttention(
       patient,
       snapshot: resolveLwbsRisk(patient, enrichedContext),
     }))
-    .filter(
-      (entry): entry is { patient: Patient; snapshot: LwbsRiskSnapshot } =>
-        Boolean(entry.snapshot && shouldSurfaceLwbsRisk(entry.snapshot)),
+    .filter((entry): entry is { patient: Patient; snapshot: LwbsRiskSnapshot } =>
+      Boolean(entry.snapshot && shouldSurfaceLwbsRisk(entry.snapshot)),
     )
     .sort((left, right) => right.snapshot.score - left.snapshot.score)
     .map((entry) => entry.patient);
@@ -424,19 +438,18 @@ export function buildLwbsRiskAttentionSnapshot(
   const enrichedContext = { ...context, waitingPatientCount: waitingCount };
   const counts = summarizeLwbsRiskBoard(patients, enrichedContext);
 
-  const rows = sortPatientsForLwbsRiskAttention(patients, enrichedContext)
-    .map((patient) => {
-      const snapshot = resolveLwbsRisk(patient, enrichedContext)!;
-      return {
-        patientId: patient.id,
-        displayName: lwbsPatientDisplayName(patient),
-        score: snapshot.score,
-        level: snapshot.level,
-        label: snapshot.label,
-        tone: snapshot.tone,
-        factorIds: snapshot.factors.map((factor) => factor.id),
-      };
-    });
+  const rows = sortPatientsForLwbsRiskAttention(patients, enrichedContext).map((patient) => {
+    const snapshot = resolveLwbsRisk(patient, enrichedContext)!;
+    return {
+      patientId: patient.id,
+      displayName: lwbsPatientDisplayName(patient),
+      score: snapshot.score,
+      level: snapshot.level,
+      label: snapshot.label,
+      tone: snapshot.tone,
+      factorIds: snapshot.factors.map((factor) => factor.id),
+    };
+  });
 
   return {
     waitingCount,
@@ -446,4 +459,3 @@ export function buildLwbsRiskAttentionSnapshot(
     previewRows: rows.slice(0, 4),
   };
 }
-

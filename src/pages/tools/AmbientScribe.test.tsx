@@ -2,10 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import AmbientScribe from './AmbientScribe';
-import {
-  mockConversationValue,
-  mockToolPreferencesValue,
-} from '../../test/testRenderUtils';
+import { mockConversationValue, mockToolPreferencesValue } from '../../test/testRenderUtils';
 import { generateAmbientScribeDraft } from '../../services/clinicalIntelligenceApi';
 
 vi.mock('./ToolPageLayout.css', () => ({}));

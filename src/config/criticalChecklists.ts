@@ -102,7 +102,8 @@ export const CRITICAL_CHECKLISTS: CriticalChecklistConfig[] = [
   {
     type: 'ob',
     title: 'OB Emergency Preparation Checklist',
-    match: /\b(obstetric emergency|ob emergency|eclampsia|postpartum hemorrhage|shoulder dystocia|precipitous delivery)\b/i,
+    match:
+      /\b(obstetric emergency|ob emergency|eclampsia|postpartum hemorrhage|shoulder dystocia|precipitous delivery)\b/i,
     items: [
       { id: 'ob-team', label: 'Notify OB team' },
       { id: 'delivery-kit', label: 'Delivery kit and neonatal warmer ready' },
@@ -130,7 +131,8 @@ export const CRITICAL_CHECKLISTS: CriticalChecklistConfig[] = [
   {
     type: 'respiratory-failure',
     title: 'Respiratory Failure Preparation Checklist',
-    match: /\b(respiratory failure|resp arrest|severe respiratory|unable to ventilate|hypoxic respiratory)\b/i,
+    match:
+      /\b(respiratory failure|resp arrest|severe respiratory|unable to ventilate|hypoxic respiratory)\b/i,
     items: [
       { id: 'airway-cart', label: 'Airway cart at bedside' },
       { id: 'bvm', label: 'BVM and suction ready' },
@@ -287,19 +289,38 @@ const CHECKLIST_NOTE_PATTERN =
   /^Critical Checklist \[([^\]]+)] \[([^\]]+)]: completed at (\S+) by (.+?) - (.*)$/;
 
 function normalizedComplaintText(value: string): string {
-  return value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').replace(/\s+/g, ' ').trim();
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 function complaintFrom(input: Patient | string | null | undefined): string {
   if (!input) return '';
   if (typeof input === 'string') return input;
-  return [input.chiefComplaint, input.complaint, input.complaintCategory, input.emsArrival?.prearrivalComplaint]
+  return [
+    input.chiefComplaint,
+    input.complaint,
+    input.complaintCategory,
+    input.emsArrival?.prearrivalComplaint,
+  ]
     .filter(Boolean)
     .join(' ');
 }
 
-function arrivalText(arrival: Pick<EMSArrival, 'chiefComplaint' | 'prearrivalComplaint' | 'notes' | 'mechanismOfInjury'>) {
-  return [arrival.chiefComplaint, arrival.prearrivalComplaint, arrival.mechanismOfInjury, arrival.notes]
+function arrivalText(
+  arrival: Pick<
+    EMSArrival,
+    'chiefComplaint' | 'prearrivalComplaint' | 'notes' | 'mechanismOfInjury'
+  >,
+) {
+  return [
+    arrival.chiefComplaint,
+    arrival.prearrivalComplaint,
+    arrival.mechanismOfInjury,
+    arrival.notes,
+  ]
     .filter(Boolean)
     .join(' ');
 }
@@ -307,12 +328,15 @@ function arrivalText(arrival: Pick<EMSArrival, 'chiefComplaint' | 'prearrivalCom
 function strokeWithinFourHours(text: string) {
   if (!/\b(stroke|cva|facial droop|aphasia|hemiparesis|weakness)\b/i.test(text)) return false;
   return (
-    /\b(onset|last known well|lkw)\b.*\b([0-3]\s*h|[0-3]\s*hour|[0-9]{1,3}\s*min|<\s*4\s*h)/i.test(text) ||
-    /stroke onset\s*<\s*4\s*h/i.test(text)
+    /\b(onset|last known well|lkw)\b.*\b([0-3]\s*h|[0-3]\s*hour|[0-9]{1,3}\s*min|<\s*4\s*h)/i.test(
+      text,
+    ) || /stroke onset\s*<\s*4\s*h/i.test(text)
   );
 }
 
-export function resolveCriticalChecklistConfig(arrival: EMSArrival): CriticalChecklistConfig | null {
+export function resolveCriticalChecklistConfig(
+  arrival: EMSArrival,
+): CriticalChecklistConfig | null {
   const text = arrivalText(arrival);
   if (strokeWithinFourHours(text)) {
     return CRITICAL_CHECKLISTS.find((checklist) => checklist.type === 'stroke') || null;
@@ -339,11 +363,15 @@ export function findMatchingChecklists(input: Patient | string | null | undefine
   if (!complaint) return [];
 
   return CHECKLISTS.filter((checklist) =>
-    checklist.triggerComplaints.some((trigger) => complaint.includes(normalizedComplaintText(trigger))),
+    checklist.triggerComplaints.some((trigger) =>
+      complaint.includes(normalizedComplaintText(trigger)),
+    ),
   );
 }
 
-export function getSingleMatchingChecklist(input: Patient | string | null | undefined): Checklist | null {
+export function getSingleMatchingChecklist(
+  input: Patient | string | null | undefined,
+): Checklist | null {
   const matches = findMatchingChecklists(input);
   return matches.length === 1 ? matches[0] : null;
 }
@@ -360,7 +388,9 @@ export function buildChecklistCompletionNote(completion: ChecklistCompletion): s
   return `${CRITICAL_CHECKLIST_NOTE_PREFIX} [${completion.checklistId}] [${completion.itemId}]: completed at ${completion.checkedAt} by ${completion.checkedBy}${itemText}`;
 }
 
-export function parseChecklistCompletionNote(text: string | null | undefined): ChecklistCompletion | null {
+export function parseChecklistCompletionNote(
+  text: string | null | undefined,
+): ChecklistCompletion | null {
   const match = (text || '').match(CHECKLIST_NOTE_PATTERN);
   if (!match) return null;
 
@@ -374,7 +404,7 @@ export function parseChecklistCompletionNote(text: string | null | undefined): C
 }
 
 export function parseChecklistCompletionsFromNotes(
-  notes: Array<Pick<Note, 'text' | 'body'>>
+  notes: Array<Pick<Note, 'text' | 'body'>>,
 ): ChecklistCompletion[] {
   return notes
     .map((note) => parseChecklistCompletionNote(note.text || note.body))

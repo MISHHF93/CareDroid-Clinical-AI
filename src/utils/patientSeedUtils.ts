@@ -10,7 +10,9 @@
 export function dedupePatientsByMrn(patients) {
   const seen = new Set();
   return patients.filter((patient) => {
-    const key = String(patient.mrn || patient.id || '').trim().toLowerCase();
+    const key = String(patient.mrn || patient.id || '')
+      .trim()
+      .toLowerCase();
     if (!key || seen.has(key)) return false;
     seen.add(key);
     return true;

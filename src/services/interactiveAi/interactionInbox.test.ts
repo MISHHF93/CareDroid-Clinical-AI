@@ -75,8 +75,14 @@ describe('interactionInbox', () => {
     expect(unassigned.commentCount).toBe(0);
 
     assignInboxItem(`card:${card.cardId}`, { userId: 'nurse-1' });
-    addInboxComment(`card:${card.cardId}`, { authorRole: 'triage_nurse', body: 'Looking into this' });
-    addInboxComment(`card:${card.cardId}`, { authorRole: 'triage_nurse', body: 'Escalated to charge' });
+    addInboxComment(`card:${card.cardId}`, {
+      authorRole: 'triage_nurse',
+      body: 'Looking into this',
+    });
+    addInboxComment(`card:${card.cardId}`, {
+      authorRole: 'triage_nurse',
+      body: 'Escalated to charge',
+    });
 
     const [collaborated] = await buildInteractionInbox({ channel: 'triage' });
     expect(collaborated.assignedToUserId).toBe('nurse-1');

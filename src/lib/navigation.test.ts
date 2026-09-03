@@ -20,7 +20,11 @@ import {
 // can create their own organization" design, matching CreateOrganizationDto's
 // sibling POST /organizations endpoint. No frontend permission to require here
 // without contradicting that backend design.
-const ROUTES_WITHOUT_REQUIRED_PERMISSIONS = new Set(['/emergency/help', '/navigator', '/onboarding']);
+const ROUTES_WITHOUT_REQUIRED_PERMISSIONS = new Set([
+  '/emergency/help',
+  '/navigator',
+  '/onboarding',
+]);
 
 describe('ROUTE_ACCESS_CONFIG', () => {
   it('every entry has required fields', () => {

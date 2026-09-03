@@ -35,7 +35,9 @@ const SCORE_NAME_TO_ID: Record<string, string> = {
 };
 
 function patientName(patient?: Patient): string {
-  return patient ? `${patient.firstName || ''} ${patient.lastName || ''}`.trim() || patient.mrn : 'Patient';
+  return patient
+    ? `${patient.firstName || ''} ${patient.lastName || ''}`.trim() || patient.mrn
+    : 'Patient';
 }
 
 export function resolveCalculatorScoreId(scoreName: string, scoreId?: string): string {
@@ -67,7 +69,12 @@ export function saveCalculatorResult(input: CalculatorSaveInput): boolean {
   const patient = store.patients.find((candidate) => candidate.id === input.patientId);
   if (!patient) return false;
 
-  const staffId = input.staffId || patient.assignedStaffId || store.activeShift.chargeStaffId || store.staff[0]?.id || 'system';
+  const staffId =
+    input.staffId ||
+    patient.assignedStaffId ||
+    store.activeShift.chargeStaffId ||
+    store.staff[0]?.id ||
+    'system';
   const scoreId = resolveCalculatorScoreId(input.scoreName, input.scoreId);
 
   const payload: ClinicalScoreSaveInput = {

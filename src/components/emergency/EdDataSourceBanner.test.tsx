@@ -62,7 +62,9 @@ describe('EdDataSourceBanner', () => {
   });
 
   it('renders the error warning when pilot cleanup is fully off too', () => {
-    render(<EdDataSourceBanner envelope={null} loading={false} error="CareDroid backend unavailable." />);
+    render(
+      <EdDataSourceBanner envelope={null} loading={false} error="CareDroid backend unavailable." />,
+    );
 
     expect(screen.getByRole('status')).toHaveTextContent(
       'Department data unavailable — check connection',

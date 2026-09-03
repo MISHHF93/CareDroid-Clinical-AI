@@ -38,12 +38,10 @@ describe('SharedToolSession (HEAL-224)', () => {
         <Routes>
           <Route
             path="/tools/shared/:shareId"
-            element={
-              (() => {
-                expect(getSharedSession).not.toHaveBeenCalled();
-                return <SharedToolSession />;
-              })()
-            }
+            element={(() => {
+              expect(getSharedSession).not.toHaveBeenCalled();
+              return <SharedToolSession />;
+            })()}
           />
         </Routes>
       </MemoryRouter>,

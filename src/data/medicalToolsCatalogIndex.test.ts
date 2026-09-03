@@ -18,8 +18,7 @@ describe('medicalToolsCatalogIndex', () => {
     const ids = new Set(rows.flatMap((r) => [r.primaryId, r.id, r.sidebarToolId].filter(Boolean)));
     for (const tool of toolRegistry) {
       const covered =
-        ids.has(tool.id) ||
-        clinicalIntentTools.some((n) => n.sidebarToolId === tool.id);
+        ids.has(tool.id) || clinicalIntentTools.some((n) => n.sidebarToolId === tool.id);
       expect(covered).toBe(true);
     }
     expect(ids.has('procedures')).toBe(true);

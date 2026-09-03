@@ -155,12 +155,9 @@ export default function HEARTScore({ patientId, onClose }: HEARTScoreProps) {
       role="dialog"
       aria-modal="true"
       aria-labelledby="heart-score-title"
-      
     >
       <div className="clinical-calculator-modal__panel heart-panel">
-        <header
-          className="u-panel-header-row"
-        >
+        <header className="u-panel-header-row">
           <div>
             <h2 id="heart-score-title" className="u-title-18">
               HEART Score
@@ -201,7 +198,9 @@ export default function HEARTScore({ patientId, onClose }: HEARTScoreProps) {
                         setSavedMessage('');
                       }}
                     />
-                    <span>{option.label} ({option.value})</span>
+                    <span>
+                      {option.label} ({option.value})
+                    </span>
                   </label>
                 ))}
               </div>
@@ -218,9 +217,7 @@ export default function HEARTScore({ patientId, onClose }: HEARTScoreProps) {
             }}
           >
             <div style={{ color: result.color, fontSize: 13, fontWeight: 700 }}>{result.band}</div>
-            <div className="u-mono-32">
-              {total}/10
-            </div>
+            <div className="u-mono-32">{total}/10</div>
             <div className="heart-recommendation">{result.recommendation}</div>
           </section>
 

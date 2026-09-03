@@ -111,7 +111,7 @@ export const PR_FLEET_TOOL_SPECS = Object.freeze({
     hubGroupId: null,
     backendHelper: 'preferPredictiveMaintenance',
     catalogSearchQueries: PR_FLEET_CATALOG_SEARCH_QUERIES.filter(
-      ([id]) => id === 'predictive-maintenance'
+      ([id]) => id === 'predictive-maintenance',
     ),
     chatSeedPattern: /Do not auto-schedule/i,
     panelTool: null,
@@ -125,7 +125,9 @@ export const PR_FLEET_TOOL_SPECS = Object.freeze({
     hubOnly: false,
     hubGroupId: null,
     backendHelper: 'preferRouteOptimizer',
-    catalogSearchQueries: PR_FLEET_CATALOG_SEARCH_QUERIES.filter(([id]) => id === 'route-optimizer'),
+    catalogSearchQueries: PR_FLEET_CATALOG_SEARCH_QUERIES.filter(
+      ([id]) => id === 'route-optimizer',
+    ),
     chatSeedPattern: /Do not auto-dispatch/i,
     panelTool: null,
     backendExecutable: false,

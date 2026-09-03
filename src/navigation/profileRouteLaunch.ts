@@ -2,7 +2,10 @@
  * Profile- and entitlement-aware navigation — use instead of raw navigate() for product surfaces.
  */
 import { CANONICAL_ROUTES } from '../config/routes.config';
-import { isRouteAllowedForProfile, resolveUserProfileFromSaasRole } from '../config/userProfileCatalog';
+import {
+  isRouteAllowedForProfile,
+  resolveUserProfileFromSaasRole,
+} from '../config/userProfileCatalog';
 import { resolvePlatformLanding } from '../config/platformEntryModel';
 import {
   getPlatformEntitlementContext,
@@ -94,7 +97,10 @@ export function navigateWithProfileAccess(navigate, to, options: any = {}) {
         pathname: access.redirectTo || CANONICAL_ROUTES.emergencyReception,
         search: `?access=${encodeURIComponent(access.reason || 'denied')}`,
       },
-      { replace: options.replace !== false, state: { accessDenied: access.reason, ...(options.state || {}) } },
+      {
+        replace: options.replace !== false,
+        state: { accessDenied: access.reason, ...(options.state || {}) },
+      },
     );
     return access;
   }
@@ -113,7 +119,11 @@ export function resolveProfileAwareDestination(path, options: any = {}) {
 
   if (emergencyRole?.canAccessRoute) {
     if (emergencyRole.canAccessRoute(permissionPath)) {
-      return { destination: path, allowed: true, access: { allowed: true, reason: null, redirectTo: null } };
+      return {
+        destination: path,
+        allowed: true,
+        access: { allowed: true, reason: null, redirectTo: null },
+      };
     }
     target = emergencyRole.nearestRoute(permissionPath);
   }

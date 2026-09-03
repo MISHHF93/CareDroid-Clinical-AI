@@ -14,7 +14,9 @@ describe('departmentPerformanceIntelligence', () => {
 
   it('generates measurable outcomes for emergency, laboratory, and operations', () => {
     const model = buildDepartmentPerformanceIntelligence();
-    const byId = Object.fromEntries(model.departments.map((department) => [department.id, department]));
+    const byId = Object.fromEntries(
+      model.departments.map((department) => [department.id, department]),
+    );
 
     expect(model.summary.departmentCount).toBe(3);
     expect(model.summary.measurableOutcomeCount).toBeGreaterThanOrEqual(7);
@@ -31,6 +33,8 @@ describe('departmentPerformanceIntelligence', () => {
     expect(byId.operations.metrics.map((metric) => metric.label)).toEqual(
       expect.arrayContaining(['Asset uptime', 'Maintenance workload']),
     );
-    expect(model.departments.every((department) => department.measurableOutcomeCount > 0)).toBe(true);
+    expect(model.departments.every((department) => department.measurableOutcomeCount > 0)).toBe(
+      true,
+    );
   });
 });

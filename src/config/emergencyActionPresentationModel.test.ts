@@ -41,8 +41,10 @@ describe('emergencyActionPresentationModel', () => {
 
   it('keeps settings readonly for manager and allowed for admin', () => {
     expect(
-      presentEmergencyPermission(EMERGENCY_ROLE_ID.edManager, EMERGENCY_PERMISSION_KEYS.settingsManage)
-        .readOnly,
+      presentEmergencyPermission(
+        EMERGENCY_ROLE_ID.edManager,
+        EMERGENCY_PERMISSION_KEYS.settingsManage,
+      ).readOnly,
     ).toBe(true);
     expect(
       presentEmergencyPermission(EMERGENCY_ROLE_ID.admin, EMERGENCY_PERMISSION_KEYS.settingsManage)

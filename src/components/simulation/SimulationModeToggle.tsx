@@ -17,7 +17,7 @@ export default function SimulationModeToggle({ variant = 'header' }: SimulationM
       type="button"
       className={`simulation-mode-toggle simulation-mode-toggle--${variant}`}
       onClick={toggle}
-      {...((active) ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
+      {...(active ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
       title={
         active
           ? 'Simulation mode is on — mock data only. Click to return to live data sources.'

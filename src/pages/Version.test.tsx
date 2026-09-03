@@ -9,7 +9,7 @@ describe('Version page', () => {
     render(
       <MemoryRouter>
         <Version />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     expect(screen.getByRole('heading', { name: /caredroid build version/i })).toBeInTheDocument();

@@ -51,7 +51,10 @@ describe('emergencyPermissionRegistry', () => {
 
   it('grants triage and registration permissions to the right roles', () => {
     expect(
-      hasEmergencyPermission(EMERGENCY_ROLE_ID.triageNurse, EMERGENCY_PERMISSION_KEYS.triageAssignAcuity),
+      hasEmergencyPermission(
+        EMERGENCY_ROLE_ID.triageNurse,
+        EMERGENCY_PERMISSION_KEYS.triageAssignAcuity,
+      ),
     ).toBe(true);
     expect(
       hasEmergencyPermission(
@@ -60,13 +63,22 @@ describe('emergencyPermissionRegistry', () => {
       ),
     ).toBe(true);
     expect(
-      hasEmergencyPermission(EMERGENCY_ROLE_ID.registrationClerk, EMERGENCY_PERMISSION_KEYS.triageAssignAcuity),
+      hasEmergencyPermission(
+        EMERGENCY_ROLE_ID.registrationClerk,
+        EMERGENCY_PERMISSION_KEYS.triageAssignAcuity,
+      ),
     ).toBe(false);
     expect(
-      hasEmergencyPermission(EMERGENCY_ROLE_ID.readOnlyViewer, EMERGENCY_PERMISSION_KEYS.analyticsView),
+      hasEmergencyPermission(
+        EMERGENCY_ROLE_ID.readOnlyViewer,
+        EMERGENCY_PERMISSION_KEYS.analyticsView,
+      ),
     ).toBe(true);
     expect(
-      hasEmergencyPermission(EMERGENCY_ROLE_ID.readOnlyViewer, EMERGENCY_PERMISSION_KEYS.patientCreate),
+      hasEmergencyPermission(
+        EMERGENCY_ROLE_ID.readOnlyViewer,
+        EMERGENCY_PERMISSION_KEYS.patientCreate,
+      ),
     ).toBe(false);
   });
 
@@ -101,7 +113,10 @@ describe('emergencyPermissionRegistry', () => {
 
   it('maps route permissions for sensitive destinations', () => {
     expect(
-      canAccessEmergencyRoutePermission(EMERGENCY_ROLE_ID.admin, CANONICAL_ROUTES.emergencySettings),
+      canAccessEmergencyRoutePermission(
+        EMERGENCY_ROLE_ID.admin,
+        CANONICAL_ROUTES.emergencySettings,
+      ),
     ).toBe(true);
     expect(
       canAccessEmergencyRoutePermission(

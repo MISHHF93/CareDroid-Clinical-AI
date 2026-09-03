@@ -12,12 +12,7 @@
  * DispatchConsole.tsx surfaces both, deliberately never linked to each other.
  */
 
-import type {
-  DispatchAssignment,
-  EntityId,
-  ISODateString,
-  CallPriority,
-} from '../types/emergency';
+import type { DispatchAssignment, EntityId, ISODateString, CallPriority } from '../types/emergency';
 
 export type CADUnitType = 'ALS' | 'BLS' | 'Air' | 'Hazmat' | 'MCI';
 
@@ -67,13 +62,90 @@ function now(): ISODateString {
 }
 
 const cadUnits = new Map<EntityId, CADUnit>([
-  ['unit-a1', { id: 'unit-a1', callSign: 'Medic 1', type: 'ALS', crewSize: 2, baseLocation: 'Station 1 — Downtown', status: 'available', lastUpdatedAt: now() }],
-  ['unit-a2', { id: 'unit-a2', callSign: 'Medic 2', type: 'ALS', crewSize: 2, baseLocation: 'Station 2 — Midtown', status: 'available', lastUpdatedAt: now() }],
-  ['unit-b1', { id: 'unit-b1', callSign: 'EMS 3', type: 'BLS', crewSize: 2, baseLocation: 'Station 3 — Eastside', status: 'available', lastUpdatedAt: now() }],
-  ['unit-b2', { id: 'unit-b2', callSign: 'EMS 4', type: 'BLS', crewSize: 2, baseLocation: 'Station 4 — Westside', status: 'available', lastUpdatedAt: now() }],
-  ['unit-air1', { id: 'unit-air1', callSign: 'Air Med 1', type: 'Air', crewSize: 3, baseLocation: 'Helipad — City General', status: 'available', lastUpdatedAt: now() }],
-  ['unit-haz1', { id: 'unit-haz1', callSign: 'Hazmat 1', type: 'Hazmat', crewSize: 4, baseLocation: 'Station 5 — Industrial', status: 'available', lastUpdatedAt: now() }],
-  ['unit-mci1', { id: 'unit-mci1', callSign: 'MCI Unit 1', type: 'MCI', crewSize: 6, baseLocation: 'Station 6 — North', status: 'available', lastUpdatedAt: now() }],
+  [
+    'unit-a1',
+    {
+      id: 'unit-a1',
+      callSign: 'Medic 1',
+      type: 'ALS',
+      crewSize: 2,
+      baseLocation: 'Station 1 — Downtown',
+      status: 'available',
+      lastUpdatedAt: now(),
+    },
+  ],
+  [
+    'unit-a2',
+    {
+      id: 'unit-a2',
+      callSign: 'Medic 2',
+      type: 'ALS',
+      crewSize: 2,
+      baseLocation: 'Station 2 — Midtown',
+      status: 'available',
+      lastUpdatedAt: now(),
+    },
+  ],
+  [
+    'unit-b1',
+    {
+      id: 'unit-b1',
+      callSign: 'EMS 3',
+      type: 'BLS',
+      crewSize: 2,
+      baseLocation: 'Station 3 — Eastside',
+      status: 'available',
+      lastUpdatedAt: now(),
+    },
+  ],
+  [
+    'unit-b2',
+    {
+      id: 'unit-b2',
+      callSign: 'EMS 4',
+      type: 'BLS',
+      crewSize: 2,
+      baseLocation: 'Station 4 — Westside',
+      status: 'available',
+      lastUpdatedAt: now(),
+    },
+  ],
+  [
+    'unit-air1',
+    {
+      id: 'unit-air1',
+      callSign: 'Air Med 1',
+      type: 'Air',
+      crewSize: 3,
+      baseLocation: 'Helipad — City General',
+      status: 'available',
+      lastUpdatedAt: now(),
+    },
+  ],
+  [
+    'unit-haz1',
+    {
+      id: 'unit-haz1',
+      callSign: 'Hazmat 1',
+      type: 'Hazmat',
+      crewSize: 4,
+      baseLocation: 'Station 5 — Industrial',
+      status: 'available',
+      lastUpdatedAt: now(),
+    },
+  ],
+  [
+    'unit-mci1',
+    {
+      id: 'unit-mci1',
+      callSign: 'MCI Unit 1',
+      type: 'MCI',
+      crewSize: 6,
+      baseLocation: 'Station 6 — North',
+      status: 'available',
+      lastUpdatedAt: now(),
+    },
+  ],
 ]);
 
 const cadEvents: CADEvent[] = [];
@@ -131,7 +203,12 @@ export function cadDispatchUnit(params: {
     status: 'assigned',
   };
 
-  const updatedUnit: CADUnit = { ...unit, status: 'assigned', activeAssignmentId: assignment.id, lastUpdatedAt: now() };
+  const updatedUnit: CADUnit = {
+    ...unit,
+    status: 'assigned',
+    activeAssignmentId: assignment.id,
+    lastUpdatedAt: now(),
+  };
   cadUnits.set(unit.id, updatedUnit);
   assignments.set(assignment.id, assignment);
 
@@ -160,11 +237,15 @@ export function cadUpdateAssignmentStatus(
   const unitEntry = [...cadUnits.values()].find((u) => u.activeAssignmentId === assignmentId);
   if (unitEntry) {
     const unitStatus: CADUnitStatus =
-      status === 'en_route' ? 'en_route'
-      : status === 'on_scene' ? 'on_scene'
-      : status === 'transporting' ? 'transporting'
-      : status === 'at_hospital' ? 'at_hospital'
-      : 'available';
+      status === 'en_route'
+        ? 'en_route'
+        : status === 'on_scene'
+          ? 'on_scene'
+          : status === 'transporting'
+            ? 'transporting'
+            : status === 'at_hospital'
+              ? 'at_hospital'
+              : 'available';
 
     const updatedUnit: CADUnit = {
       ...unitEntry,
@@ -175,11 +256,15 @@ export function cadUpdateAssignmentStatus(
     cadUnits.set(unitEntry.id, updatedUnit);
 
     const eventType: CADEvent['type'] =
-      status === 'en_route' ? 'unit_en_route'
-      : status === 'on_scene' ? 'unit_on_scene'
-      : status === 'transporting' ? 'unit_transporting'
-      : status === 'at_hospital' ? 'unit_at_hospital'
-      : 'unit_available';
+      status === 'en_route'
+        ? 'unit_en_route'
+        : status === 'on_scene'
+          ? 'unit_on_scene'
+          : status === 'transporting'
+            ? 'unit_transporting'
+            : status === 'at_hospital'
+              ? 'unit_at_hospital'
+              : 'unit_available';
 
     cadEvents.push({
       id: generateId('cad-event'),

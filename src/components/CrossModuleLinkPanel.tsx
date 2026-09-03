@@ -20,7 +20,10 @@ export default function CrossModuleLinkPanel({
   if (!relatedModules.length) return null;
 
   return (
-    <section className={`cross-module-panel ${className}`.trim()} aria-label={`${title} cross-module links`}>
+    <section
+      className={`cross-module-panel ${className}`.trim()}
+      aria-label={`${title} cross-module links`}
+    >
       <div className="cross-module-panel__header">
         <div>
           <p className="cross-module-panel__eyebrow">Cross-module intelligence</p>

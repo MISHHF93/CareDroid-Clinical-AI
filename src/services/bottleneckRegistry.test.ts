@@ -58,7 +58,10 @@ describe('CURRENT_SERVICE_MAP', () => {
   it('every entry has a filePath and at least one failure mode', () => {
     for (const entry of CURRENT_SERVICE_MAP) {
       expect(entry.filePath, `${entry.serviceName} must have filePath`).toBeTruthy();
-      expect(entry.failureModes.length, `${entry.serviceName} must have failure modes`).toBeGreaterThan(0);
+      expect(
+        entry.failureModes.length,
+        `${entry.serviceName} must have failure modes`,
+      ).toBeGreaterThan(0);
     }
   });
 });
@@ -73,7 +76,14 @@ describe('detectBottleneckEvents', () => {
     const events = detectBottleneckEvents({
       generatedAt: ISO,
       queueHealth: [
-        { id: 'triage', label: 'Triage Queue', count: 8, oldestWaitMinutes: 45, targetMinutes: 15, breached: true },
+        {
+          id: 'triage',
+          label: 'Triage Queue',
+          count: 8,
+          oldestWaitMinutes: 45,
+          targetMinutes: 15,
+          breached: true,
+        },
       ],
     });
     expect(events.length).toBeGreaterThan(0);
@@ -89,7 +99,14 @@ describe('detectBottleneckEvents', () => {
     const events = detectBottleneckEvents({
       generatedAt: ISO,
       queueHealth: [
-        { id: 'results', label: 'Results Queue', count: 3, oldestWaitMinutes: 40, targetMinutes: 20, breached: true },
+        {
+          id: 'results',
+          label: 'Results Queue',
+          count: 3,
+          oldestWaitMinutes: 40,
+          targetMinutes: 20,
+          breached: true,
+        },
       ],
     });
     const event = events.find((e) => e.id.includes('results'));
@@ -123,7 +140,9 @@ describe('detectBottleneckEvents', () => {
       generatedAt: ISO,
       sync: { stale: true, status: 'local', message: 'Running on local snapshot.' },
     });
-    const event = events.find((e) => e.category === 'saas_backend' && e.serviceName === 'CareDroid Central Node');
+    const event = events.find(
+      (e) => e.category === 'saas_backend' && e.serviceName === 'CareDroid Central Node',
+    );
     expect(event).toBeTruthy();
     expect(event?.fallbackAction).toContain('emergency read-only');
   });
@@ -292,10 +311,12 @@ describe('detectBottleneckEvents', () => {
       ISO,
     );
 
-    expect(events.find((candidate) => candidate.id === 'bn-referral-service-REF-1002')).toBeUndefined();
-    expect(events.some((candidate) => candidate.source === 'ReferralHub.getReferralDashboard')).toBe(
-      false,
-    );
+    expect(
+      events.find((candidate) => candidate.id === 'bn-referral-service-REF-1002'),
+    ).toBeUndefined();
+    expect(
+      events.some((candidate) => candidate.source === 'ReferralHub.getReferralDashboard'),
+    ).toBe(false);
   });
 
   it('sorts events with impactsThreeMinuteTarget=true first', () => {
@@ -396,7 +417,11 @@ describe('buildThreeMinuteRiskProjection', () => {
 
   it('uses the primary event owner role as nextOwnerRole', () => {
     const events = [
-      makeEvent({ severity: 'critical', impactsThreeMinuteTarget: true, ownerRole: 'triage_nurse' }),
+      makeEvent({
+        severity: 'critical',
+        impactsThreeMinuteTarget: true,
+        ownerRole: 'triage_nurse',
+      }),
     ];
     const projection = buildThreeMinuteRiskProjection(events);
     expect(projection.nextOwnerRole).toBe('triage_nurse');
@@ -404,7 +429,11 @@ describe('buildThreeMinuteRiskProjection', () => {
 
   it('includes the primary fallback action', () => {
     const events = [
-      makeEvent({ severity: 'high', impactsThreeMinuteTarget: true, fallbackAction: 'Call code blue.' }),
+      makeEvent({
+        severity: 'high',
+        impactsThreeMinuteTarget: true,
+        fallbackAction: 'Call code blue.',
+      }),
     ];
     const projection = buildThreeMinuteRiskProjection(events);
     expect(projection.fallbackAction).toBe('Call code blue.');
@@ -449,7 +478,9 @@ describe('buildBottleneckRegistrySnapshot', () => {
       reassessmentStatus: { due: 1, overdue: 1 },
     });
     if (snapshot.activeBottlenecks.length > 0) {
-      expect(snapshot.rootCauseSummary).not.toBe('No active service or workflow bottlenecks detected.');
+      expect(snapshot.rootCauseSummary).not.toBe(
+        'No active service or workflow bottlenecks detected.',
+      );
     }
   });
 
@@ -469,7 +500,11 @@ describe('buildBottleneckRegistrySnapshot', () => {
       referralStatus: { pending: 4 },
     });
     const causes = snapshot.analytics.threeMinuteTargetBreachesByCause;
-    if (snapshot.activeBottlenecks.some((e) => e.impactsThreeMinuteTarget && e.category === 'clinical_workflow')) {
+    if (
+      snapshot.activeBottlenecks.some(
+        (e) => e.impactsThreeMinuteTarget && e.category === 'clinical_workflow',
+      )
+    ) {
       expect(causes['clinical_workflow']).toBeGreaterThan(0);
     }
   });
@@ -525,21 +560,22 @@ describe('bottleneckEventsToAlerts', () => {
       'charge_nurse',
       'emergency_physician',
     ]);
-    expect(alerts[0].metadata?.acknowledgementAuthority).toEqual([
-      'triage_nurse',
-      'charge_nurse',
-    ]);
+    expect(alerts[0].metadata?.acknowledgementAuthority).toEqual(['triage_nurse', 'charge_nurse']);
   });
 
   it('includes critical severity events as Critical alerts', () => {
-    const events = [makeEvent({ id: 'bn-critical', severity: 'critical', impactsThreeMinuteTarget: true })];
+    const events = [
+      makeEvent({ id: 'bn-critical', severity: 'critical', impactsThreeMinuteTarget: true }),
+    ];
     const alerts = bottleneckEventsToAlerts(events);
     expect(alerts[0].severity).toBe('Critical');
     expect(alerts[0].autoDismissAfter).toBeUndefined();
   });
 
   it('sets autoDismissAfter=10 for high (non-critical) events', () => {
-    const events = [makeEvent({ id: 'bn-high2', severity: 'high', impactsThreeMinuteTarget: true })];
+    const events = [
+      makeEvent({ id: 'bn-high2', severity: 'high', impactsThreeMinuteTarget: true }),
+    ];
     const alerts = bottleneckEventsToAlerts(events);
     expect(alerts[0].autoDismissAfter).toBe(10);
   });
@@ -566,7 +602,9 @@ describe('bottleneckEventsToAlerts', () => {
   });
 
   it('preserves dismissed state from previous alert', () => {
-    const events = [makeEvent({ id: 'bn-dismissed', severity: 'high', impactsThreeMinuteTarget: true })];
+    const events = [
+      makeEvent({ id: 'bn-dismissed', severity: 'high', impactsThreeMinuteTarget: true }),
+    ];
     const previousAlerts: Alert[] = [
       {
         id: 'alert-bottleneck-event-bn-dismissed',

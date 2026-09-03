@@ -80,19 +80,23 @@ const BASE_BACKEND_ROUTE_EXPOSURE_POLICY = Object.freeze({
 
   'GET /api/profile/me/preferences': {
     strategy: 'deferred',
-    reason: 'ProfilePreferences.tsx reads the combined GET /api/profile/me via UserIdentityContext instead; the dead fetchPreferences() client wrapper was removed from userIdentityApi.ts',
+    reason:
+      'ProfilePreferences.tsx reads the combined GET /api/profile/me via UserIdentityContext instead; the dead fetchPreferences() client wrapper was removed from userIdentityApi.ts',
   },
   'GET /api/profile/me/activity': {
     strategy: 'deferred',
-    reason: 'ProfileActivity.tsx reads the combined GET /api/profile/me via UserIdentityContext instead; the dead fetchActivity() client wrapper was removed from userIdentityApi.ts',
+    reason:
+      'ProfileActivity.tsx reads the combined GET /api/profile/me via UserIdentityContext instead; the dead fetchActivity() client wrapper was removed from userIdentityApi.ts',
   },
   'GET /api/profile/me/security': {
     strategy: 'deferred',
-    reason: 'ProfileSecurity.tsx reads the combined GET /api/profile/me via UserIdentityContext instead; the dead fetchSecurity() client wrapper was removed from userIdentityApi.ts',
+    reason:
+      'ProfileSecurity.tsx reads the combined GET /api/profile/me via UserIdentityContext instead; the dead fetchSecurity() client wrapper was removed from userIdentityApi.ts',
   },
   'GET /api/profile/me/workspaces': {
     strategy: 'deferred',
-    reason: 'ProfileWorkspaces.tsx reads the combined GET /api/profile/me via UserIdentityContext instead; the dead fetchWorkspaces() client wrapper was removed from userIdentityApi.ts',
+    reason:
+      'ProfileWorkspaces.tsx reads the combined GET /api/profile/me via UserIdentityContext instead; the dead fetchWorkspaces() client wrapper was removed from userIdentityApi.ts',
   },
   'GET /api/workspaces': {
     strategy: 'deferred',
@@ -100,7 +104,8 @@ const BASE_BACKEND_ROUTE_EXPOSURE_POLICY = Object.freeze({
   },
   'POST /api/workspaces': {
     strategy: 'deferred',
-    reason: 'The dead createWorkspace() client wrapper was removed from userIdentityApi.ts; no page ever called it',
+    reason:
+      'The dead createWorkspace() client wrapper was removed from userIdentityApi.ts; no page ever called it',
   },
 
   'GET /api/activity/me': { strategy: 'deferred', reason: 'Profile activity dashboard pending' },
@@ -115,15 +120,18 @@ const BASE_BACKEND_ROUTE_EXPOSURE_POLICY = Object.freeze({
 
   'GET /api/personalization/me': {
     strategy: 'deferred',
-    reason: 'The dead fetchPersonalization() client wrapper was removed from userIdentityApi.ts; no page ever called it',
+    reason:
+      'The dead fetchPersonalization() client wrapper was removed from userIdentityApi.ts; no page ever called it',
   },
   'PATCH /api/personalization/me': {
     strategy: 'deferred',
-    reason: 'The dead updatePersonalization() client wrapper was removed from userIdentityApi.ts; no page ever called it',
+    reason:
+      'The dead updatePersonalization() client wrapper was removed from userIdentityApi.ts; no page ever called it',
   },
   'POST /api/personalization/me/saved-prompts': {
     strategy: 'deferred',
-    reason: 'The dead savePrompt() client wrapper was removed from userIdentityApi.ts; no page ever called it',
+    reason:
+      'The dead savePrompt() client wrapper was removed from userIdentityApi.ts; no page ever called it',
   },
   'GET /api/personalization/me/recommendations': {
     strategy: 'deferred',
@@ -164,7 +172,8 @@ const BASE_BACKEND_ROUTE_EXPOSURE_POLICY = Object.freeze({
 
   'POST /api/emergency/digital-twin/organizational/simulate': {
     strategy: 'deferred',
-    reason: 'Research controller; active ED digital twin UI uses the core EmergencyOsController endpoints',
+    reason:
+      'Research controller; active ED digital twin UI uses the core EmergencyOsController endpoints',
   },
   'POST /api/emergency/digital-twin/organizational/synchronize': {
     strategy: 'deferred',
@@ -395,9 +404,10 @@ export const BACKEND_ROUTE_EXPOSURE_POLICY = Object.freeze({
       `${route.method} ${route.path}`,
       {
         strategy: 'deferred',
-        reason: 'Cataloged backend route; frontend exposure is tracked by platform wiring inventory.',
+        reason:
+          'Cataloged backend route; frontend exposure is tracked by platform wiring inventory.',
       },
-    ])
+    ]),
   ),
   ...BASE_BACKEND_ROUTE_EXPOSURE_POLICY,
 });
@@ -411,8 +421,8 @@ export const OPTIONAL_RUNTIME_ROUTE_EXPOSURE_POLICY = Object.freeze(
         reason: `${route.runtime} route mounted only when ${route.mountFlag}=true and MongoDB is configured.`,
         clientHint: route.controller,
       },
-    ])
-  )
+    ]),
+  ),
 );
 
 export function routePolicyKey(method, path) {
@@ -425,8 +435,8 @@ export function routePolicyKey(method, path) {
 export function getBackendOnlyRoutes() {
   const wiredPaths = new Set(
     FRONTEND_API_CALLS.filter((c) => findBackendRoute(c.method, c.path)).map((c) =>
-      routePolicyKey(c.method, findBackendRoute(c.method, c.path)!.path)
-    )
+      routePolicyKey(c.method, findBackendRoute(c.method, c.path)!.path),
+    ),
   );
 
   return BACKEND_HTTP_ROUTES.filter((r) => !wiredPaths.has(routePolicyKey(r.method, r.path)));

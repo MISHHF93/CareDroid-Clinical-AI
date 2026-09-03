@@ -212,12 +212,24 @@ describe('canonical route tree', () => {
     // bare-fallback state above.
     const KNOWN_MISSING_TRACKMIND_PAGES = new Set(['/platform-admin']);
     const { resolveEdExtensionRedirect } = await import('../config/edApplication.config');
-    const { APP_SHELL_NAV_ITEMS, ACCOUNT_UTILITY_NAV_ITEMS, SOLUTIONS_SIDEBAR_NAV_ITEMS, OPERATIONS_SIDEBAR_NAV_ITEMS, ADVANCED_SIDEBAR_NAV_ITEMS } = await import('../config/navigation.config');
-    const navItemArrays = [APP_SHELL_NAV_ITEMS, ACCOUNT_UTILITY_NAV_ITEMS, SOLUTIONS_SIDEBAR_NAV_ITEMS, OPERATIONS_SIDEBAR_NAV_ITEMS, ADVANCED_SIDEBAR_NAV_ITEMS];
+    const {
+      APP_SHELL_NAV_ITEMS,
+      ACCOUNT_UTILITY_NAV_ITEMS,
+      SOLUTIONS_SIDEBAR_NAV_ITEMS,
+      OPERATIONS_SIDEBAR_NAV_ITEMS,
+      ADVANCED_SIDEBAR_NAV_ITEMS,
+    } = await import('../config/navigation.config');
+    const navItemArrays = [
+      APP_SHELL_NAV_ITEMS,
+      ACCOUNT_UTILITY_NAV_ITEMS,
+      SOLUTIONS_SIDEBAR_NAV_ITEMS,
+      OPERATIONS_SIDEBAR_NAV_ITEMS,
+      ADVANCED_SIDEBAR_NAV_ITEMS,
+    ];
     const seenPaths = new Set<string>();
     const shadowed: Array<{ id: string; path: string; shadowTarget: string }> = [];
     for (const items of navItemArrays) {
-      for (const item of (items as Array<{ id?: string; path?: string; kind?: string }>)) {
+      for (const item of items as Array<{ id?: string; path?: string; kind?: string }>) {
         if (!item.path || item.kind === 'action' || seenPaths.has(item.path)) continue;
         seenPaths.add(item.path);
         if (KNOWN_MISSING_TRACKMIND_PAGES.has(item.path)) continue;

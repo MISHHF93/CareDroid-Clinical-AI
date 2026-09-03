@@ -41,7 +41,8 @@ export const CAREDROID_ROLE_DESCRIPTIONS: Readonly<Record<HospitalRole, string>>
   paramedic: 'Pre-arrival handoff, ambulance intake, and EMS coordination.',
   dispatcher: '911 call intake, telephone triage, CAD dispatch, and ED pre-notification.',
   ems_coordinator: 'Prehospital operations, EMS unit coordination, and pre-arrival relay to ED.',
-  registration_clerk: 'Emergency reception, life-critical intake capture, queue handoff, demographics, insurance, and consent.',
+  registration_clerk:
+    'Emergency reception, life-critical intake capture, queue handoff, demographics, insurance, and consent.',
   patient_flow_coordinator: 'Bed management, queue routing, and department coordination.',
   lab_technician: 'Lab order workflow and result documentation.',
   radiology_technician: 'Imaging workflow and result documentation.',
@@ -213,16 +214,26 @@ export function getDashboardWidgets(role: HospitalRole): DashboardWidgets {
 
 export function isReadOnlyRole(role: HospitalRole): boolean {
   const readOnlyRoles: HospitalRole[] = [
-    'demo_observer', 'security_officer', 'social_worker', 'lab_technician',
-    'radiology_technician', 'quality_safety_officer',
+    'demo_observer',
+    'security_officer',
+    'social_worker',
+    'lab_technician',
+    'radiology_technician',
+    'quality_safety_officer',
   ];
   return readOnlyRoles.includes(role);
 }
 
 export function isClinicalRole(role: HospitalRole): boolean {
   const clinicalRoles: HospitalRole[] = [
-    'ed_director', 'charge_nurse', 'triage_nurse', 'registered_nurse',
-    'emergency_physician', 'attending_physician', 'resident_physician', 'specialist',
+    'ed_director',
+    'charge_nurse',
+    'triage_nurse',
+    'registered_nurse',
+    'emergency_physician',
+    'attending_physician',
+    'resident_physician',
+    'specialist',
     'paramedic',
   ];
   return clinicalRoles.includes(role);
@@ -233,9 +244,25 @@ export function isAdminRole(role: HospitalRole): boolean {
 }
 
 export const ALL_CAREDROID_ROLES: readonly HospitalRole[] = Object.freeze([
-  'super_admin', 'hospital_admin', 'ed_director', 'charge_nurse', 'triage_nurse',
-  'registered_nurse', 'emergency_physician', 'attending_physician', 'resident_physician',
-  'specialist', 'paramedic', 'registration_clerk', 'patient_flow_coordinator',
-  'lab_technician', 'radiology_technician', 'pharmacist', 'social_worker',
-  'security_officer', 'it_admin', 'quality_safety_officer', 'demo_observer',
+  'super_admin',
+  'hospital_admin',
+  'ed_director',
+  'charge_nurse',
+  'triage_nurse',
+  'registered_nurse',
+  'emergency_physician',
+  'attending_physician',
+  'resident_physician',
+  'specialist',
+  'paramedic',
+  'registration_clerk',
+  'patient_flow_coordinator',
+  'lab_technician',
+  'radiology_technician',
+  'pharmacist',
+  'social_worker',
+  'security_officer',
+  'it_admin',
+  'quality_safety_officer',
+  'demo_observer',
 ]);

@@ -12,9 +12,7 @@ import {
 
 describe('AiTruthLabel', () => {
   it('renders the state chip, source context, review copy, and prohibited-action copy by default', () => {
-    render(
-      <AiTruthLabel state="Live" sourceContext="Real trained model" reviewRequired />,
-    );
+    render(<AiTruthLabel state="Live" sourceContext="Real trained model" reviewRequired />);
 
     expect(screen.getByTestId('ai-truth-label-chip')).toHaveTextContent('Live');
     expect(screen.getByTestId('ai-truth-label-context')).toHaveTextContent('Real trained model');
@@ -39,16 +37,16 @@ describe('AiTruthLabel', () => {
         prohibitedActionCopy="Custom prohibited sentence."
       />,
     );
-    expect(screen.getByTestId('ai-truth-label-review')).toHaveTextContent('Custom review sentence.');
+    expect(screen.getByTestId('ai-truth-label-review')).toHaveTextContent(
+      'Custom review sentence.',
+    );
     expect(screen.getByTestId('ai-truth-label-prohibited')).toHaveTextContent(
       'Custom prohibited sentence.',
     );
   });
 
   it('in compact mode, hides the visible detail lines but keeps them in the chip tooltip/aria-label', () => {
-    render(
-      <AiTruthLabel state="Demo" sourceContext="Sample data only" reviewRequired compact />,
-    );
+    render(<AiTruthLabel state="Demo" sourceContext="Sample data only" reviewRequired compact />);
     expect(screen.queryByTestId('ai-truth-label-context')).not.toBeInTheDocument();
     expect(screen.queryByTestId('ai-truth-label-review')).not.toBeInTheDocument();
     expect(screen.queryByTestId('ai-truth-label-prohibited')).not.toBeInTheDocument();

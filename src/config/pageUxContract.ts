@@ -23,8 +23,7 @@ export const PAGE_REBUILD_STATUS = Object.freeze({
   deferred: 'deferred',
 } as const);
 
-export type PageRebuildStatus =
-  (typeof PAGE_REBUILD_STATUS)[keyof typeof PAGE_REBUILD_STATUS];
+export type PageRebuildStatus = (typeof PAGE_REBUILD_STATUS)[keyof typeof PAGE_REBUILD_STATUS];
 
 export type PageUxContract = Readonly<{
   /** Layout shell — AppShell, DisplayShell, or AuthShell */

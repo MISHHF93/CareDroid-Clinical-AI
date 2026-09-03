@@ -108,7 +108,9 @@ export default function PatientCardCopilot({
         summaryPrompt.requiredDisclaimer,
         `Selected patient context:\n${patientContextPrompt}`,
         toolRecommendationsPrompt ? `Tool recommendations:\n${toolRecommendationsPrompt}` : null,
-        artifactContext ? `Structured source data:\n${JSON.stringify(artifactContext, null, 2)}` : null,
+        artifactContext
+          ? `Structured source data:\n${JSON.stringify(artifactContext, null, 2)}`
+          : null,
       ]
         .filter(Boolean)
         .join('\n\n');
@@ -119,16 +121,20 @@ export default function PatientCardCopilot({
 
       try {
         const response = await invokeUnifiedAiConversational({
-          capabilityId: trimmed === PATIENT_STATUS_SUMMARY_PROMPT ? 'referralSummarization' : 'copilot',
-          platformServiceId: trimmed === PATIENT_STATUS_SUMMARY_PROMPT ? 'referralSummarization' : 'copilot',
-          requestType: trimmed === PATIENT_STATUS_SUMMARY_PROMPT ? 'CLINICAL_SUMMARY' : 'COPILOT_CHAT',
+          capabilityId:
+            trimmed === PATIENT_STATUS_SUMMARY_PROMPT ? 'referralSummarization' : 'copilot',
+          platformServiceId:
+            trimmed === PATIENT_STATUS_SUMMARY_PROMPT ? 'referralSummarization' : 'copilot',
+          requestType:
+            trimmed === PATIENT_STATUS_SUMMARY_PROMPT ? 'CLINICAL_SUMMARY' : 'COPILOT_CHAT',
           systemPrompt,
           message: trimmed,
           patientId: patient.id,
           sourceScreen: 'patient_card_copilot',
           context: {
             aiRequest: {
-              requestType: trimmed === PATIENT_STATUS_SUMMARY_PROMPT ? 'CLINICAL_SUMMARY' : 'COPILOT_CHAT',
+              requestType:
+                trimmed === PATIENT_STATUS_SUMMARY_PROMPT ? 'CLINICAL_SUMMARY' : 'COPILOT_CHAT',
               patientId: patient.id,
               patientContext: patientContextPrompt,
               complaint: patient.chiefComplaint || patient.complaint,
@@ -151,7 +157,9 @@ export default function PatientCardCopilot({
 
         setMessages((current) =>
           current.map((message) =>
-            message.id === assistantId ? { ...message, content: responseText, truthState } : message,
+            message.id === assistantId
+              ? { ...message, content: responseText, truthState }
+              : message,
           ),
         );
         persistCopilotInteractionSafely({
@@ -177,7 +185,14 @@ export default function PatientCardCopilot({
         setLoading(false);
       }
     },
-    [includeClinicalDetail, loading, orchestration, patient, patientContextPrompt, toolRecommendationsPrompt],
+    [
+      includeClinicalDetail,
+      loading,
+      orchestration,
+      patient,
+      patientContextPrompt,
+      toolRecommendationsPrompt,
+    ],
   );
 
   const onSubmit = (event: FormEvent) => {
@@ -192,23 +207,29 @@ export default function PatientCardCopilot({
           <h3 className="patient-card-copilot__title">
             {EMERGENCY_OS_BRANDING.copilotName} · {patient.firstName} {patient.lastName}
           </h3>
-          <span className="patient-card-copilot__safety-badge">{SAFETY_BOUNDED_ASSISTANT_LABEL}</span>
+          <span className="patient-card-copilot__safety-badge">
+            {SAFETY_BOUNDED_ASSISTANT_LABEL}
+          </span>
         </div>
-        {expanded ? (<button
-          type="button"
-          className="patient-card-copilot__toggle"
-          onClick={() => setExpanded((open) => !open)}
-          aria-expanded="true"
-        >
-          {expanded ? 'Collapse' : 'Expand'}
-        </button>) : (<button
-          type="button"
-          className="patient-card-copilot__toggle"
-          onClick={() => setExpanded((open) => !open)}
-          aria-expanded="false"
-        >
-          {expanded ? 'Collapse' : 'Expand'}
-        </button>)}
+        {expanded ? (
+          <button
+            type="button"
+            className="patient-card-copilot__toggle"
+            onClick={() => setExpanded((open) => !open)}
+            aria-expanded="true"
+          >
+            {expanded ? 'Collapse' : 'Expand'}
+          </button>
+        ) : (
+          <button
+            type="button"
+            className="patient-card-copilot__toggle"
+            onClick={() => setExpanded((open) => !open)}
+            aria-expanded="false"
+          >
+            {expanded ? 'Collapse' : 'Expand'}
+          </button>
+        )}
       </header>
 
       {expanded ? (
@@ -257,9 +278,14 @@ export default function PatientCardCopilot({
           <div className="patient-card-copilot__chat">
             <div className="patient-card-copilot__messages" aria-live="polite">
               {messages.map((message) => (
-                <div key={message.id} className="patient-card-copilot__message" data-role={message.role}>
+                <div
+                  key={message.id}
+                  className="patient-card-copilot__message"
+                  data-role={message.role}
+                >
                   <div className="patient-card-copilot__bubble">
-                    {message.content || (loading && message.role === 'copilot' ? 'Thinking…' : null)}
+                    {message.content ||
+                      (loading && message.role === 'copilot' ? 'Thinking…' : null)}
                   </div>
                   {message.truthState ? (
                     <AiTruthLabel

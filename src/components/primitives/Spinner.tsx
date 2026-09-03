@@ -28,7 +28,9 @@ export function Spinner({ size = 'md', label = 'Loading…', className, ...props
         aria-hidden="true"
       >
         <circle
-          cx="12" cy="12" r="9"
+          cx="12"
+          cy="12"
+          r="9"
           stroke="currentColor"
           strokeWidth="2.5"
           strokeLinecap="round"
@@ -37,7 +39,9 @@ export function Spinner({ size = 'md', label = 'Loading…', className, ...props
           opacity=".25"
         />
         <circle
-          cx="12" cy="12" r="9"
+          cx="12"
+          cy="12"
+          r="9"
           stroke="currentColor"
           strokeWidth="2.5"
           strokeLinecap="round"

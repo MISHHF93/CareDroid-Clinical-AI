@@ -12,7 +12,8 @@ export const KNOWLEDGE_HUB_ITEMS = Object.freeze([
     id: 'protocol-sepsis',
     title: 'Sepsis escalation protocol',
     type: 'protocol',
-    description: 'Evidence-backed recognition, escalation, and treatment timing for sepsis workflows.',
+    description:
+      'Evidence-backed recognition, escalation, and treatment timing for sepsis workflows.',
     route: '/protocols',
     specialties: ['emergency', 'icu'],
     roles: ['clinician', 'nurse'],
@@ -60,7 +61,8 @@ export const KNOWLEDGE_HUB_ITEMS = Object.freeze([
     id: 'ai-guidance-documentation',
     title: 'Clinical documentation AI guidance',
     type: 'ai_guidance',
-    description: 'AI guidance for structured notes, summaries, order sets, and explainable documentation.',
+    description:
+      'AI guidance for structured notes, summaries, order sets, and explainable documentation.',
     route: '/documentation',
     specialties: ['emergency', 'cardiology', 'laboratory'],
     roles: ['clinician', 'nurse'],
@@ -72,25 +74,64 @@ export const KNOWLEDGE_HUB_ITEMS = Object.freeze([
     id: 'documentation-integration-readiness',
     title: 'Integration readiness documentation',
     type: 'documentation',
-    description: 'Operational documentation for FHIR, HL7, identity, lab, and enterprise integration readiness.',
+    description:
+      'Operational documentation for FHIR, HL7, identity, lab, and enterprise integration readiness.',
     route: '/integration-readiness',
     specialties: ['operations', 'governance', 'laboratory'],
     roles: ['administrator', 'operations-leader', 'compliance-leader'],
     workspaces: ['operations', 'governance', 'laboratory'],
     departments: ['operations', 'governance', 'laboratory'],
-    evidence: ['Integration readiness center', 'Governance review', 'Laboratory interface planning'],
+    evidence: [
+      'Integration readiness center',
+      'Governance review',
+      'Laboratory interface planning',
+    ],
   },
 ]);
 
 export const KNOWLEDGE_HUB_FACETS = Object.freeze({
-  specialties: ['emergency', 'icu', 'cardiology', 'laboratory', 'operations', 'education', 'governance'],
-  roles: ['clinician', 'nurse', 'educator', 'administrator', 'operations-leader', 'compliance-leader', 'student'],
-  workspaces: ['emergency', 'icu', 'cardiology', 'laboratory', 'operations', 'simulation', 'education', 'governance'],
-  departments: ['emergency', 'laboratory', 'operations', 'education', 'governance', 'patient-safety'],
+  specialties: [
+    'emergency',
+    'icu',
+    'cardiology',
+    'laboratory',
+    'operations',
+    'education',
+    'governance',
+  ],
+  roles: [
+    'clinician',
+    'nurse',
+    'educator',
+    'administrator',
+    'operations-leader',
+    'compliance-leader',
+    'student',
+  ],
+  workspaces: [
+    'emergency',
+    'icu',
+    'cardiology',
+    'laboratory',
+    'operations',
+    'simulation',
+    'education',
+    'governance',
+  ],
+  departments: [
+    'emergency',
+    'laboratory',
+    'operations',
+    'education',
+    'governance',
+    'patient-safety',
+  ],
 });
 
 function normalize(value) {
-  return String(value || '').trim().toLowerCase();
+  return String(value || '')
+    .trim()
+    .toLowerCase();
 }
 
 function itemMatchesText(item, query) {

@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { PatientFlag, PatientState, Priority, type Patient, type Room, type Staff } from '../types/emergency';
+import {
+  PatientFlag,
+  PatientState,
+  Priority,
+  type Patient,
+  type Room,
+  type Staff,
+} from '../types/emergency';
 import {
   applyWhiteboardViewFilters,
   buildWhiteboardPhysicianOptions,
@@ -203,14 +210,17 @@ describe('whiteboardViewModel', () => {
   });
 
   it('toggles sort direction when the same column is clicked twice', () => {
+    expect(toggleWhiteboardSort({ sortColumn: 'triage', sortDirection: 'asc' }, 'triage')).toEqual({
+      sortColumn: 'triage',
+      sortDirection: 'desc',
+    });
     expect(
-      toggleWhiteboardSort({ sortColumn: 'triage', sortDirection: 'asc' }, 'triage'),
-    ).toEqual({ sortColumn: 'triage', sortDirection: 'desc' });
-    expect(compareWhiteboardColumn(
-      patient({ lastName: 'A' }),
-      patient({ lastName: 'B' }),
-      'patient',
-      'asc',
-    )).toBeLessThan(0);
+      compareWhiteboardColumn(
+        patient({ lastName: 'A' }),
+        patient({ lastName: 'B' }),
+        'patient',
+        'asc',
+      ),
+    ).toBeLessThan(0);
   });
 });

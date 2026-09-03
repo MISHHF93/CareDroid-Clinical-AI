@@ -11,10 +11,7 @@ import {
 import { EMERGENCY_ROLE_ID } from './emergencyRoleScreenMatrix';
 import { EMERGENCY_ACTIONS, EMERGENCY_ROLE_IDS } from './emergencyRolePermissions';
 import { presentEmergencyPermission } from './emergencyActionPresentationModel';
-import {
-  NEST_PERMISSION,
-  resolveNestMappingForEmergencyRole,
-} from './emergencyNestPermissionMap';
+import { NEST_PERMISSION, resolveNestMappingForEmergencyRole } from './emergencyNestPermissionMap';
 import { CARE_DROID_SCREEN_MODES } from './careDroidScreenModes';
 
 const MUTATING_KEYS = [

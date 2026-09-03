@@ -136,7 +136,7 @@ export function interpretPerc(result, opts: any = {}) {
   }
 
   const unmetLabels = PERC_CRITERIA_META.filter((r) => result.unmetKeys.includes(r.key)).map(
-    (r) => r.shortLabel
+    (r) => r.shortLabel,
   );
 
   return {

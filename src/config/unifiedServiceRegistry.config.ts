@@ -33,8 +33,7 @@ export const OBSOLETE_SERVICE_REDIRECTS = Object.freeze({
   'backend/src/modules/ai/foundation/ai-gateway.service.ts':
     'backend/src/modules/ai-gateway/ai-gateway.service.ts',
   'src/pages/executive/ExecutiveCommandCenter.tsx': 'src/pages/emergency/HospitalCommandCenter.tsx',
-  'src/components/emergency/CommandDashboard.tsx':
-    'src/pages/emergency/HospitalCommandCenter.tsx',
+  'src/components/emergency/CommandDashboard.tsx': 'src/pages/emergency/HospitalCommandCenter.tsx',
 } as const);
 
 /** Runtime surfaces that must consume the unified registry snapshot. */
@@ -52,16 +51,31 @@ export const UNIFIED_SERVICE_REGISTRY_CONSUMERS = Object.freeze([
 
 export function inferServiceDomain(filePath: string): ServiceRegistryDomain {
   const path = filePath.toLowerCase();
-  if (path.includes('/ai/') || path.includes('aichief') || path.includes('copilot') || path.includes('native-ai')) {
+  if (
+    path.includes('/ai/') ||
+    path.includes('aichief') ||
+    path.includes('copilot') ||
+    path.includes('native-ai')
+  ) {
     return 'ai';
   }
   if (path.includes('notification') || path.includes('alert')) {
     return 'notification';
   }
-  if (path.includes('interoperab') || path.includes('fhir') || path.includes('ehr') || path.includes('ems')) {
+  if (
+    path.includes('interoperab') ||
+    path.includes('fhir') ||
+    path.includes('ehr') ||
+    path.includes('ems')
+  ) {
     return 'integration';
   }
-  if (path.includes('api') || path.includes('store') || path.includes('config') || path.includes('central-node')) {
+  if (
+    path.includes('api') ||
+    path.includes('store') ||
+    path.includes('config') ||
+    path.includes('central-node')
+  ) {
     return 'platform';
   }
   if (path.includes('clinical') || path.includes('triage') || path.includes('patient')) {

@@ -17,8 +17,11 @@ import { toolRegistryById } from './toolRegistry';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const backendPatternsSource = readFileSync(
-  join(__dirname, '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts'),
-  'utf8'
+  join(
+    __dirname,
+    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts',
+  ),
+  'utf8',
 );
 
 const tierA = [
@@ -113,7 +116,7 @@ describe('Hospital Operations, Medical IoT, and Fleet Tools Pack', () => {
         REGISTRY.incidentCommandCenter,
         REGISTRY.hospitalOperationsCockpit,
         REGISTRY.capacityPredictionEngine,
-      ])
+      ]),
     );
   });
 

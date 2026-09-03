@@ -34,7 +34,7 @@ describe('sidebarToolPresentation', () => {
     const { pinnedTools, favoriteTools, catalogTools } = partitionSidebarTools(
       tools,
       [tools[0].id, tools[1].id],
-      [tools[1].id, tools[2].id]
+      [tools[1].id, tools[2].id],
     );
     expect(pinnedTools.map((t) => t.id)).toEqual([tools[0].id, tools[1].id]);
     expect(favoriteTools.map((t) => t.id)).toEqual([tools[2].id]);
@@ -47,9 +47,7 @@ describe('sidebarToolPresentation', () => {
   it('groups catalog tools by category in stable order', () => {
     const groups = groupSidebarToolsByCategory(sidebarTools);
     expect(groups.map((g) => g.category)).toEqual(
-      SIDEBAR_CATEGORY_ORDER.filter((c) =>
-        sidebarTools.some((t) => t.category === c)
-      )
+      SIDEBAR_CATEGORY_ORDER.filter((c) => sidebarTools.some((t) => t.category === c)),
     );
     const calculatorGroup = groups.find((g) => g.category === 'Calculator');
     expect(calculatorGroup?.tools.some((t) => t.id === 'qsofa')).toBe(true);
@@ -63,7 +61,7 @@ describe('sidebarToolPresentation', () => {
     ];
     const merged = mergeWorkspacesWithRegistry(
       [{ id: 'all', name: 'All Tools', toolIds: ['legacy-only'] }],
-      defaults
+      defaults,
     );
     expect(merged[0].toolIds).toContain('legacy-only');
     expect(merged[0].toolIds).toContain('drug-check');

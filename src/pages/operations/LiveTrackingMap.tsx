@@ -64,7 +64,9 @@ export default function LiveTrackingMap() {
       recordToolAccessRef.current('live-tracking-map');
     } catch (loadError) {
       if (loadError instanceof DOMException && loadError.name === 'AbortError') return;
-      setError(loadError instanceof Error ? loadError.message : 'Unable to load tracking map data.');
+      setError(
+        loadError instanceof Error ? loadError.message : 'Unable to load tracking map data.',
+      );
       setMarkers([]);
     } finally {
       if (!signal?.aborted) setLoading(false);
@@ -97,7 +99,9 @@ export default function LiveTrackingMap() {
         <div className="live-map-page__title-row">
           <GraphicIconBadge iconKey="route" accent="brand" size="md" />
           <div>
-            <p className="live-map-page__title-text" data-testid="cd-page-title-text">Live Tracking Map</p>
+            <p className="live-map-page__title-text" data-testid="cd-page-title-text">
+              Live Tracking Map
+            </p>
             <p>Unified fleet vehicle and Medical IoT marker canvas for operations review.</p>
           </div>
         </div>
@@ -117,7 +121,11 @@ export default function LiveTrackingMap() {
         states={
           usedBackend
             ? [DEMO_LIVE_STATES.DEMO, DEMO_LIVE_STATES.UNSUPPORTED]
-            : [DEMO_LIVE_STATES.DEMO, DEMO_LIVE_STATES.BACKEND_UNAVAILABLE, DEMO_LIVE_STATES.UNSUPPORTED]
+            : [
+                DEMO_LIVE_STATES.DEMO,
+                DEMO_LIVE_STATES.BACKEND_UNAVAILABLE,
+                DEMO_LIVE_STATES.UNSUPPORTED,
+              ]
         }
         details={sourceLabel}
       />
@@ -127,7 +135,9 @@ export default function LiveTrackingMap() {
           <button
             key={value}
             type="button"
-            {...((layer === value) ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
+            {...(layer === value
+              ? { 'aria-pressed': 'true' as const }
+              : { 'aria-pressed': 'false' as const })}
             onClick={() => setLayer(value)}
           >
             {value === 'all' ? 'All layers' : value === 'fleet' ? 'Fleet' : 'Medical IoT'}
@@ -137,7 +147,9 @@ export default function LiveTrackingMap() {
           <button
             key={value}
             type="button"
-            {...((statusFilter === value) ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
+            {...(statusFilter === value
+              ? { 'aria-pressed': 'true' as const }
+              : { 'aria-pressed': 'false' as const })}
             onClick={() => setStatusFilter(value)}
           >
             {value === 'all' ? 'All statuses' : value}
@@ -155,8 +167,16 @@ export default function LiveTrackingMap() {
       {!loading && !error ? (
         <div className="live-map__layout">
           <section className="live-map__map-shell" aria-label="Unified tracking canvas">
-            <div className="live-map-canvas" role="group" aria-label="Fleet and IoT tracking map — contains selectable markers">
-              <svg viewBox="0 0 100 100" className="live-map-canvas__svg" preserveAspectRatio="xMidYMid meet">
+            <div
+              className="live-map-canvas"
+              role="group"
+              aria-label="Fleet and IoT tracking map — contains selectable markers"
+            >
+              <svg
+                viewBox="0 0 100 100"
+                className="live-map-canvas__svg"
+                preserveAspectRatio="xMidYMid meet"
+              >
                 {visibleMarkers.map((marker) => {
                   const selected = marker.id === selectedMarkerId;
                   return (
@@ -177,8 +197,13 @@ export default function LiveTrackingMap() {
                         }
                       }}
                     >
-                      <circle r="2.2" fill={MARKER_FILL[marker.layer === 'fleet' ? 'brand' : 'good']} />
-                      <text x="2.8" y="1">{marker.layer === 'fleet' ? 'F' : 'I'}</text>
+                      <circle
+                        r="2.2"
+                        fill={MARKER_FILL[marker.layer === 'fleet' ? 'brand' : 'good']}
+                      />
+                      <text x="2.8" y="1">
+                        {marker.layer === 'fleet' ? 'F' : 'I'}
+                      </text>
                     </g>
                   );
                 })}

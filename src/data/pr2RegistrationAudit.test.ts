@@ -87,25 +87,28 @@ describe('PR2 registration audit — canonical ID alignment', () => {
     ]);
   });
 
-  it.each(PR2_TIER_A_TOOL_IDS)('%s uses the same id across registry, NLU, builtin slug, and maps', (id) => {
-    const reg = toolRegistryById[id];
-    expect(reg?.id).toBe(id);
+  it.each(PR2_TIER_A_TOOL_IDS)(
+    '%s uses the same id across registry, NLU, builtin slug, and maps',
+    (id) => {
+      const reg = toolRegistryById[id];
+      expect(reg?.id).toBe(id);
 
-    const nlu = clinicalIntentTools.find((t) => t.toolId === id);
-    expect(nlu?.toolId).toBe(id);
-    expect(nlu?.sidebarToolId).toBe(id);
-    // timi-ua-nstemi is a real registerTool() backend executor, so backendExecutable is true;
-    // meld/meld-na have no backend executor.
-    expect(nlu?.backendExecutable).toBe(
-      (ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS as readonly string[]).includes(id)
-    );
+      const nlu = clinicalIntentTools.find((t) => t.toolId === id);
+      expect(nlu?.toolId).toBe(id);
+      expect(nlu?.sidebarToolId).toBe(id);
+      // timi-ua-nstemi is a real registerTool() backend executor, so backendExecutable is true;
+      // meld/meld-na have no backend executor.
+      expect(nlu?.backendExecutable).toBe(
+        (ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS as readonly string[]).includes(id),
+      );
 
-    const builtin = builtinUiCalculators.find((c) => c.id === id);
-    expect(builtin?.id).toBe(id);
+      const builtin = builtinUiCalculators.find((c) => c.id === id);
+      expect(builtin?.id).toBe(id);
 
-    expect(BUILTIN_CALC_ID_TO_REGISTRY_ID[id]).toBe(id);
-    expect(resolveRegistryId(id)).toBe(id);
-  });
+      expect(BUILTIN_CALC_ID_TO_REGISTRY_ID[id]).toBe(id);
+      expect(resolveRegistryId(id)).toBe(id);
+    },
+  );
 
   it.each(PR2_TIER_B_TOOL_IDS)('%s aligns registry, NLU, and hub-only catalog rows', (id) => {
     const reg = toolRegistryById[id];
@@ -120,7 +123,7 @@ describe('PR2 registration audit — canonical ID alignment', () => {
     // wells-pe is a real registerTool() backend executor, so backendExecutable is true;
     // perc has no backend executor.
     expect(nlu?.backendExecutable).toBe(
-      (ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS as readonly string[]).includes(id)
+      (ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS as readonly string[]).includes(id),
     );
 
     expect(builtinUiCalculators.some((c) => c.id === id)).toBe(false);
@@ -138,7 +141,7 @@ describe('PR2 registration audit — routes & path naming', () => {
     expect(clinicalIntentTools.find((t) => t.toolId === id)?.path).toBe(path);
     expect(builtinUiCalculators.find((c) => c.id === id)?.path).toBe(path);
     expect(builtinUiCalculators.find((c) => c.id === id)?.calcQuery).toBe(
-      PR2_CALC_QUERY_BY_REGISTRY_ID[id]
+      PR2_CALC_QUERY_BY_REGISTRY_ID[id],
     );
   });
 
@@ -186,7 +189,7 @@ describe('PR2 registration audit — NLU, backend keywords, aliases', () => {
     'NLU_TO_REGISTRY_ID maps catalog alias "%s" → %s',
     (alias, canonical) => {
       expect(NLU_TO_REGISTRY_ID[alias]).toBe(canonical);
-    }
+    },
   );
 
   it.each(PR2_ALL_ALIAS_PAIRS)('resolveRegistryId("%s") → %s', (alias, canonical) => {
@@ -217,7 +220,7 @@ describe('PR2 registration audit — NLU, backend keywords, aliases', () => {
     (id) => {
       const keywords = extractToolPatternKeywords(patternsSource, id).map((k) => aliasToSlug(k));
       const requiredForTool = PR2_REQUIRED_NLU_ALIAS_PAIRS.filter(([, c]) => c === id).map(
-        ([a]) => a
+        ([a]) => a,
       );
       for (const phrase of requiredForTool) {
         const slug = aliasToSlug(phrase);
@@ -225,10 +228,10 @@ describe('PR2 registration audit — NLU, backend keywords, aliases', () => {
         const inBackend = keywords.includes(slug) || keywords.includes(aliasToSlug(phrase));
         expect(
           inNluMap || inBackend,
-          `alias "${phrase}" for ${id} missing from NLU_TO_REGISTRY_ID and backend keywords`
+          `alias "${phrase}" for ${id} missing from NLU_TO_REGISTRY_ID and backend keywords`,
         ).toBe(true);
       }
-    }
+    },
   );
 
   it('separates Wells PE score aliases from PERC rule-out aliases', () => {
@@ -248,7 +251,7 @@ describe('PR2 registration audit — discovery & catalog', () => {
       if (!row) throw new Error(`missing toolIdAliases id ${aliasId}`);
       expect(row.mapsTo).toBe(canonical);
       expect(NLU_TO_REGISTRY_ID[aliasId]).toBe(canonical);
-    }
+    },
   );
 
   it.each(PR2_TOOL_IDS)('merged discovery includes canonical row for %s', (id) => {
@@ -257,7 +260,9 @@ describe('PR2 registration audit — discovery & catalog', () => {
     const expectedPath =
       PR2_ROUTE_BY_REGISTRY_ID[id] ?? PR2_HUB_ROUTE_BY_REGISTRY_ID[id] ?? PR2_HUB_PATH;
     expect(hits[0].path).toBe(expectedPath);
-    const blob = [hits[0].source, ...(hits[0].sources || []), hits[0].notes].filter(Boolean).join(' ');
+    const blob = [hits[0].source, ...(hits[0].sources || []), hits[0].notes]
+      .filter(Boolean)
+      .join(' ');
     expect(blob).toMatch(/toolRegistry|clinicalIntentToolCatalog|tool\.patterns|chatAssisted/i);
   });
 
@@ -283,14 +288,16 @@ describe('PR2 registration audit — discovery & catalog', () => {
   it.each(PR2_CATALOG_SEARCH_QUERIES)('catalog search finds %s for "%s"', (registryId, query) => {
     const rows = catalogRowsMatchingQuery(getMedicalToolsCatalogRows(), query);
     expect(rows.some((r) => r.primaryId === registryId || r.sidebarToolId === registryId)).toBe(
-      true
+      true,
     );
   });
 });
 
 describe('PR2 registration audit — sidebar, hub launch, deep links', () => {
   it('lists each PR2 tool exactly once in toolRegistry (sidebar visibility)', () => {
-    const pr2InRegistry = toolRegistry.filter((t) => (PR2_TOOL_IDS as readonly string[]).includes(t.id));
+    const pr2InRegistry = toolRegistry.filter((t) =>
+      (PR2_TOOL_IDS as readonly string[]).includes(t.id),
+    );
     expect(pr2InRegistry).toHaveLength(PR2_TOOL_IDS.length);
     for (const id of PR2_TOOL_IDS) {
       expect(getToolIcon(id)).toBeTruthy();
@@ -298,18 +305,21 @@ describe('PR2 registration audit — sidebar, hub launch, deep links', () => {
     }
   });
 
-  it.each(PR2_TIER_A_TOOL_IDS)('resolveCatalogLaunch(%s) opens dedicated route with chat seed', (id) => {
-    const launch = resolveCatalogLaunch(id);
-    expect(launch.path).toBe(PR2_ROUTE_BY_REGISTRY_ID[id]);
-    expect(launch.registryId).toBe(id);
-    expect(launch.path).not.toBe(PR2_HUB_PATH);
-    expect(launch.chatSeed?.length).toBeGreaterThan(20);
-    // timi-ua-nstemi is a real registerTool() backend executor, so orchestratorTool resolves
-    // to its tool id instead of null; meld/meld-na have no backend executor.
-    const expectedOrchestratorTool = REGISTRY_ID_TO_ORCHESTRATOR_TOOL[id] ?? null;
-    expect(launch.orchestratorTool).toBe(expectedOrchestratorTool);
-    expect(launch.openLabel).toBe('Open');
-  });
+  it.each(PR2_TIER_A_TOOL_IDS)(
+    'resolveCatalogLaunch(%s) opens dedicated route with chat seed',
+    (id) => {
+      const launch = resolveCatalogLaunch(id);
+      expect(launch.path).toBe(PR2_ROUTE_BY_REGISTRY_ID[id]);
+      expect(launch.registryId).toBe(id);
+      expect(launch.path).not.toBe(PR2_HUB_PATH);
+      expect(launch.chatSeed?.length).toBeGreaterThan(20);
+      // timi-ua-nstemi is a real registerTool() backend executor, so orchestratorTool resolves
+      // to its tool id instead of null; meld/meld-na have no backend executor.
+      const expectedOrchestratorTool = REGISTRY_ID_TO_ORCHESTRATOR_TOOL[id] ?? null;
+      expect(launch.orchestratorTool).toBe(expectedOrchestratorTool);
+      expect(launch.openLabel).toBe('Open');
+    },
+  );
 
   it.each(PR2_TIER_B_TOOL_IDS)('resolveCatalogLaunch(%s) opens hub with guided chat', (id) => {
     const launch = resolveCatalogLaunch(id);
@@ -332,7 +342,7 @@ describe('PR2 registration audit — sidebar, hub launch, deep links', () => {
       expect(fromAlias.registryId).toBe(fromCanonical.registryId);
       expect(fromAlias.registryId).toBe(canonical);
       expect(fromAlias.chatSeed).toBe(fromCanonical.chatSeed);
-    }
+    },
   );
 
   it('places Wells PE and PERC in the pulmonary embolism hub group', () => {

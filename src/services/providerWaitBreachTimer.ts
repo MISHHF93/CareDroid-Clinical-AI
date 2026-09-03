@@ -3,12 +3,7 @@ import {
   patientHasHighRiskComplaintFlags,
   patientNeedsRapidReview,
 } from './highRiskComplaintFlags';
-import {
-  PatientState,
-  Priority,
-  type Alert,
-  type Patient,
-} from '../types/emergency';
+import { PatientState, Priority, type Alert, type Patient } from '../types/emergency';
 
 export type ProviderWaitBreachPhase = 'on-track' | 'approaching-threshold' | 'breached';
 
@@ -161,9 +156,7 @@ export function resolveProviderWaitBreachSettings(
         ? defaultTargetMinutes
         : DEFAULT_TARGET_MINUTES,
     warningMinutes:
-      Number.isFinite(warningMinutes) && warningMinutes > 0
-        ? warningMinutes
-        : derivedWarning,
+      Number.isFinite(warningMinutes) && warningMinutes > 0 ? warningMinutes : derivedWarning,
     warningRatio: Number.isFinite(warningRatio) ? warningRatio : DEFAULT_WARNING_RATIO,
     ctasTargets: readCtasTargets(nestedThresholds),
     highRiskWaitExceptionsEnabled: Boolean(highRiskWaitExceptionsEnabled),
@@ -191,7 +184,7 @@ export function resolvePatientProviderWaitTargetMinutes(
 ): { targetMinutes: number; warningMinutes: number; highRiskException: boolean } {
   const priorityTarget =
     patient.priority != null
-      ? settings.ctasTargets[patient.priority] ?? settings.defaultTargetMinutes
+      ? (settings.ctasTargets[patient.priority] ?? settings.defaultTargetMinutes)
       : settings.defaultTargetMinutes;
   let targetMinutes = priorityTarget <= 0 ? 1 : priorityTarget;
   const highRiskException = qualifiesHighRiskProviderWaitException(patient, settings);
@@ -205,7 +198,9 @@ export function resolvePatientProviderWaitTargetMinutes(
 
   const derivedWarning = Math.max(1, Math.round(targetMinutes * settings.warningRatio));
   const warningMinutes = Math.min(
-    settings.warningMinutes > 0 ? Math.min(settings.warningMinutes, targetMinutes - 1) : derivedWarning,
+    settings.warningMinutes > 0
+      ? Math.min(settings.warningMinutes, targetMinutes - 1)
+      : derivedWarning,
     Math.max(1, targetMinutes - 1),
   );
 
@@ -223,7 +218,12 @@ function resolvePhase(
   elapsedMinutes: number,
   targetMinutes: number,
   warningMinutes: number,
-): { phase: ProviderWaitBreachPhase; label: string; shortLabel: string; tone: ProviderWaitBreachTone } {
+): {
+  phase: ProviderWaitBreachPhase;
+  label: string;
+  shortLabel: string;
+  tone: ProviderWaitBreachTone;
+} {
   if (elapsedMinutes >= targetMinutes) {
     return {
       phase: 'breached',
@@ -248,10 +248,7 @@ function resolvePhase(
   };
 }
 
-export function resolveTriageToProviderElapsedMinutes(
-  patient: Patient,
-  now = new Date(),
-): number {
+export function resolveTriageToProviderElapsedMinutes(patient: Patient, now = new Date()): number {
   if (!patient.triageTime) return 0;
   if (patient.lastAssessedTime) {
     return minutesSince(patient.triageTime, new Date(patient.lastAssessedTime));
@@ -275,9 +272,7 @@ export function resolveProviderWaitBreachTimer(
     thresholds.warningMinutes,
   );
   const remainingMinutes = Math.max(0, thresholds.targetMinutes - elapsedMinutes);
-  const exceptionNote = thresholds.highRiskException
-    ? ' · high-risk wait exception applied'
-    : '';
+  const exceptionNote = thresholds.highRiskException ? ' · high-risk wait exception applied' : '';
 
   return {
     patientId: patient.id,
@@ -420,9 +415,8 @@ export function sortPatientsForProviderWaitBreachAttention(
       patient,
       snapshot: resolveProviderWaitBreachTimer(patient, context),
     }))
-    .filter(
-      (entry): entry is { patient: Patient; snapshot: ProviderWaitBreachSnapshot } =>
-        Boolean(entry.snapshot && shouldSurfaceProviderWaitBreach(entry.snapshot)),
+    .filter((entry): entry is { patient: Patient; snapshot: ProviderWaitBreachSnapshot } =>
+      Boolean(entry.snapshot && shouldSurfaceProviderWaitBreach(entry.snapshot)),
     )
     .sort(
       (left, right) =>
@@ -519,4 +513,3 @@ export function buildProviderWaitBreachAlerts(
 
   return alerts;
 }
-

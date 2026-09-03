@@ -23,7 +23,11 @@ export type ToolsShortcutPageRoute = {
 
 /** Dedicated AI tool pages (override PlatformSystemPage stubs where real UIs exist). */
 export const TOOLS_AI_PAGE_ROUTES = Object.freeze<ToolsAiPageRoute[]>([
-  { path: '/tools/ambient-scribe', label: 'Ambient Clinical Scribe', componentKey: 'ambientScribe' },
+  {
+    path: '/tools/ambient-scribe',
+    label: 'Ambient Clinical Scribe',
+    componentKey: 'ambientScribe',
+  },
   {
     path: '/tools/calculator-recommender',
     label: 'Calculator Recommendation AI',
@@ -50,7 +54,11 @@ export const TOOLS_AI_PAGE_ROUTES = Object.freeze<ToolsAiPageRoute[]>([
     label: 'Intelligent Order Set Assistant',
     componentKey: 'orderSetAi',
   },
-  { path: '/tools/ai-explainability', label: 'AI Explainability', componentKey: 'aiExplainability' },
+  {
+    path: '/tools/ai-explainability',
+    label: 'AI Explainability',
+    componentKey: 'aiExplainability',
+  },
   { path: '/tools/clinical-audit', label: 'Clinical Audit', componentKey: 'clinicalAudit' },
   { path: '/tools/diagnosis', label: 'Diagnosis Assistant', componentKey: 'diagnosisAssistant' },
   { path: '/tools/procedures', label: 'Procedure Guide', componentKey: 'procedureGuide' },

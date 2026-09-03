@@ -99,33 +99,55 @@ describe('backendApiCapabilities', () => {
     expect(getBackendCapabilityStatus('emergencyCentralNode')).toBe(BACKEND_CAPABILITY_STATUS.DEMO);
     // Corrected 2026-08-09 (HEAL-008): both compute from the same real
     // EmergencyPatientService.listPatients() list -- see backendApiCapabilities.ts's own comments.
-    expect(getBackendCapabilityStatus('emergencyPatientJourney')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
+    expect(getBackendCapabilityStatus('emergencyPatientJourney')).toBe(
+      BACKEND_CAPABILITY_STATUS.REAL,
+    );
     expect(getBackendCapabilityStatus('emergencyQueues')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
     expect(getBackendCapabilityStatus('emergencyBoarding')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
     expect(getBackendCapabilityStatus('emergencyEmsRuntime')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
-    expect(getBackendCapabilityStatus('emergencyOperatingSurfaces')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
+    expect(getBackendCapabilityStatus('emergencyOperatingSurfaces')).toBe(
+      BACKEND_CAPABILITY_STATUS.REAL,
+    );
     expect(getBackendCapabilityStatus('emergencyPatientFlow')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
-    expect(getBackendCapabilityStatus('emergencyReassessment')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
-    expect(getBackendCapabilityStatus('emergencyCopilotRuntime')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
-    expect(getBackendCapabilityStatus('emergencyDepartmentSettings')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
+    expect(getBackendCapabilityStatus('emergencyReassessment')).toBe(
+      BACKEND_CAPABILITY_STATUS.REAL,
+    );
+    expect(getBackendCapabilityStatus('emergencyCopilotRuntime')).toBe(
+      BACKEND_CAPABILITY_STATUS.REAL,
+    );
+    expect(getBackendCapabilityStatus('emergencyDepartmentSettings')).toBe(
+      BACKEND_CAPABILITY_STATUS.REAL,
+    );
     // Correctly still demo -- self-labeled prototype simulation, not a mislabel.
-    expect(getBackendCapabilityStatus('emergencyAdvancedDecisionSupport')).toBe(BACKEND_CAPABILITY_STATUS.DEMO);
+    expect(getBackendCapabilityStatus('emergencyAdvancedDecisionSupport')).toBe(
+      BACKEND_CAPABILITY_STATUS.DEMO,
+    );
     // Corrected 2026-08-09: computes from the real TypeORM patient repository
     // (calculateEmergencyOsCapacity), not a fixture -- see backendApiCapabilities.ts's own comment.
     expect(getBackendCapabilityStatus('emergencyCapacity')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
-    expect(getBackendCapabilityStatus('emergencyIntegrationHub')).toBe(BACKEND_CAPABILITY_STATUS.DEMO);
+    expect(getBackendCapabilityStatus('emergencyIntegrationHub')).toBe(
+      BACKEND_CAPABILITY_STATUS.DEMO,
+    );
     // Create/list/handoff intake path is a real session board mutator (not fixture-only demo).
     expect(getBackendCapabilityStatus('emergencySmartIntake')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
     expect(getBackendCapabilityStatus('emergencyPatients')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
-    expect(getBackendCapabilityStatus('emergencyReceptionSnapshot')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
-    expect(getBackendCapabilityStatus('emergencyReceptionHandoff')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
-    expect(getBackendCapabilityStatus('emergencyReceptionEscalation')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
+    expect(getBackendCapabilityStatus('emergencyReceptionSnapshot')).toBe(
+      BACKEND_CAPABILITY_STATUS.REAL,
+    );
+    expect(getBackendCapabilityStatus('emergencyReceptionHandoff')).toBe(
+      BACKEND_CAPABILITY_STATUS.REAL,
+    );
+    expect(getBackendCapabilityStatus('emergencyReceptionEscalation')).toBe(
+      BACKEND_CAPABILITY_STATUS.REAL,
+    );
     expect(isBackendCapabilityEnabled('emergencyReceptionEscalation')).toBe(true);
     expect(getBackendCapabilityStatus('emergencyOcrIntake')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
     // PATCH /emergency/transfers/:id/status has been a real, DTO-validated
     // route since 2026-08-06 -- this flag was left DISABLED after that fix
     // landed, silently preventing ReferralPanel.tsx from ever calling it.
-    expect(getBackendCapabilityStatus('emergencyTransferWorkflow')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
+    expect(getBackendCapabilityStatus('emergencyTransferWorkflow')).toBe(
+      BACKEND_CAPABILITY_STATUS.REAL,
+    );
     expect(isBackendCapabilityEnabled('emergencyTransferWorkflow')).toBe(true);
     // Corrected 2026-08-09 (HEAL-033): all 7 route through
     // EmergencyOperatingSurfacesService.getSurface(), which derives every
@@ -133,12 +155,18 @@ describe('backendApiCapabilities', () => {
     // workflow-log services -- no fixture/random data. See
     // backendApiCapabilities.ts's own comment for the full trace.
     expect(getBackendCapabilityStatus('emergencyDispatch')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
-    expect(getBackendCapabilityStatus('emergencyDiagnosticsView')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
-    expect(getBackendCapabilityStatus('emergencyHandoffsView')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
+    expect(getBackendCapabilityStatus('emergencyDiagnosticsView')).toBe(
+      BACKEND_CAPABILITY_STATUS.REAL,
+    );
+    expect(getBackendCapabilityStatus('emergencyHandoffsView')).toBe(
+      BACKEND_CAPABILITY_STATUS.REAL,
+    );
     expect(getBackendCapabilityStatus('emergencyReportsView')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
     expect(getBackendCapabilityStatus('emergencyPulseView')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
     expect(getBackendCapabilityStatus('emergencyShiftView')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
-    expect(getBackendCapabilityStatus('emergencyEdReadinessView')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
+    expect(getBackendCapabilityStatus('emergencyEdReadinessView')).toBe(
+      BACKEND_CAPABILITY_STATUS.REAL,
+    );
   });
 
   it('enables read-only live tracking contracts as demo-backed capabilities', () => {

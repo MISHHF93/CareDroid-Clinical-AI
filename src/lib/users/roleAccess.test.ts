@@ -26,8 +26,15 @@ describe('role labels', () => {
 describe('ROLE_TO_EMERGENCY_ROLE', () => {
   it('every CareDroid role maps to a valid emergency role', () => {
     const validEmergencyRoles = [
-      'admin', 'ed_manager', 'charge_nurse', 'triage_nurse', 'physician',
-      'registration_clerk', 'ems_user', 'read_only_viewer', 'public_display',
+      'admin',
+      'ed_manager',
+      'charge_nurse',
+      'triage_nurse',
+      'physician',
+      'registration_clerk',
+      'ems_user',
+      'read_only_viewer',
+      'public_display',
     ];
     for (const role of ALL_CAREDROID_ROLES) {
       expect(validEmergencyRoles).toContain(ROLE_TO_EMERGENCY_ROLE[role]);

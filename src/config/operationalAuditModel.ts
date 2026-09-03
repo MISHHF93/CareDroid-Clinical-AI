@@ -58,7 +58,11 @@ export function isQueueWorkflowLog(log) {
   if (log.type === 'journey_state_changed') return true;
   if (log.type === 'integration_event_received' && metadataValue(log, 'handoff')) return true;
   if (QUEUE_SOURCES.has(log.source)) return true;
-  if (metadataValue(log, 'queue') || metadataValue(log, 'targetState') || metadataValue(log, 'toRoomId')) {
+  if (
+    metadataValue(log, 'queue') ||
+    metadataValue(log, 'targetState') ||
+    metadataValue(log, 'toRoomId')
+  ) {
     return true;
   }
   return false;
@@ -75,7 +79,10 @@ export function classifyWorkflowLog(log) {
   return null;
 }
 
-export function filterOperationalHistory(logs = [] as any[], { domain = null, patientId = null, limit = 12 }: any = {}) {
+export function filterOperationalHistory(
+  logs = [] as any[],
+  { domain = null, patientId = null, limit = 12 }: any = {},
+) {
   const sorted = [...logs].sort(
     (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
   );
@@ -89,12 +96,18 @@ export function filterOperationalHistory(logs = [] as any[], { domain = null, pa
     .slice(0, limit);
 }
 
-export function groupOperationalHistory(logs = [] as any[], { patientId = null, limitPerDomain = 8 }: any = {}) {
+export function groupOperationalHistory(
+  logs = [] as any[],
+  { patientId = null, limitPerDomain = 8 }: any = {},
+) {
   const domains = Object.values(OPERATIONAL_AUDIT_DOMAIN);
-  return domains.reduce((groups, domain) => {
-    groups[domain] = filterOperationalHistory(logs, { domain, patientId, limit: limitPerDomain });
-    return groups;
-  }, ({} as Record<string, unknown[]>));
+  return domains.reduce(
+    (groups, domain) => {
+      groups[domain] = filterOperationalHistory(logs, { domain, patientId, limit: limitPerDomain });
+      return groups;
+    },
+    {} as Record<string, unknown[]>,
+  );
 }
 
 export function summarizeOperationalHistory(logs = [] as any[], { patientId = null }: any = {}) {

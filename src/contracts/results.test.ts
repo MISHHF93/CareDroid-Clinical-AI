@@ -1,7 +1,14 @@
 import { describe, it, expect } from 'vitest';
 import {
-  ok, err, isOk, isErr, assertNever,
-  ErrorCode, resultError, errorToHttpStatus, httpStatusToErrorCode,
+  ok,
+  err,
+  isOk,
+  isErr,
+  assertNever,
+  ErrorCode,
+  resultError,
+  errorToHttpStatus,
+  httpStatusToErrorCode,
   type Result,
 } from './results';
 
@@ -420,7 +427,7 @@ describe('Result contracts', () => {
   describe('result usage patterns', () => {
     it('exhaustive switch on result type', () => {
       const results: Array<Result<number>> = [ok(1), err(resultError(ErrorCode.INTERNAL, 'fail'))];
-      
+
       results.forEach((result) => {
         if (isOk(result)) {
           expect(typeof result.data).toBe('number');

@@ -22,7 +22,13 @@ export default function Badge({
   const resolvedTone = TONES.has(tone) ? tone : 'neutral';
   return (
     <span
-      className={['cd-badge', `cd-badge--${resolvedTone}`, `cd-badge--${size}`, compact ? 'cd-badge--compact' : '', className]
+      className={[
+        'cd-badge',
+        `cd-badge--${resolvedTone}`,
+        `cd-badge--${size}`,
+        compact ? 'cd-badge--compact' : '',
+        className,
+      ]
         .filter(Boolean)
         .join(' ')}
       {...props}

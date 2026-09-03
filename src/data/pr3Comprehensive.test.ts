@@ -106,12 +106,7 @@ export const PR3_COVERAGE_AREA_LABELS = Object.freeze([
 
 describe('PR3 comprehensive — coverage matrix', () => {
   it('targets the four required Tier-B registry ids', () => {
-    expect([...PR3_TOOL_IDS]).toEqual([
-      'grace-acs',
-      'nihss',
-      'canadian-c-spine',
-      'ottawa-ankle',
-    ]);
+    expect([...PR3_TOOL_IDS]).toEqual(['grace-acs', 'nihss', 'canadian-c-spine', 'ottawa-ankle']);
     expect([...PR3_CALCULATOR_REGISTRY_IDS]).toEqual([...PR3_TOOL_IDS]);
     expect([...PR3_TIER_B_CHAT_CALCULATOR_IDS]).toEqual([...PR3_TOOL_IDS]);
   });
@@ -157,7 +152,7 @@ describe('PR3 comprehensive — 2. catalog inclusion', () => {
     // grace-acs and canadian-c-spine are real registerTool() backend executors, so
     // backendExecutor is true; nihss/ottawa-ankle have no backend executor.
     expect(row.backendExecutor).toBe(
-      (ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS as readonly string[]).includes(id)
+      (ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS as readonly string[]).includes(id),
     );
     expect(row.chatSeed?.length).toBeGreaterThan(20);
     expect(row.chatSeed).toBe(clinicalIntentToolsById[id]?.chatSeed);
@@ -166,7 +161,7 @@ describe('PR3 comprehensive — 2. catalog inclusion', () => {
   it.each(PR3_CATALOG_SEARCH_QUERIES)('catalog search "%s" finds %s', (registryId, query) => {
     const hits = catalogRowsMatchingQuery(getMedicalToolsCatalogRows(), query);
     expect(hits.some((r) => r.primaryId === registryId || r.sidebarToolId === registryId)).toBe(
-      true
+      true,
     );
   });
 });
@@ -176,7 +171,9 @@ describe('PR3 comprehensive — 3. discovery inclusion', () => {
     const hits = getAllDiscoveredTools().filter((r) => r.id === id);
     expect(hits).toHaveLength(1);
     expect(hits[0].path).toBe(PR3_HUB_PATH);
-    const blob = [hits[0].source, ...(hits[0].sources || []), hits[0].notes].filter(Boolean).join(' ');
+    const blob = [hits[0].source, ...(hits[0].sources || []), hits[0].notes]
+      .filter(Boolean)
+      .join(' ');
     expect(blob).toMatch(/toolRegistry|clinicalIntentToolCatalog|tool\.patterns|chatAssisted/i);
   });
 
@@ -200,10 +197,13 @@ describe('PR3 comprehensive — 4. NLU alias matching', () => {
     expect(resolveRegistryId(alias)).toBe(canonical);
   });
 
-  it.each(PR3_DISCOVERY_ALIAS_PAIRS)('discovery slug "%s" → %s via NLU map', (aliasId, canonical) => {
-    expect(NLU_TO_REGISTRY_ID[aliasId]).toBe(canonical);
-    expect(resolveRegistryId(aliasId)).toBe(canonical);
-  });
+  it.each(PR3_DISCOVERY_ALIAS_PAIRS)(
+    'discovery slug "%s" → %s via NLU map',
+    (aliasId, canonical) => {
+      expect(NLU_TO_REGISTRY_ID[aliasId]).toBe(canonical);
+      expect(resolveRegistryId(aliasId)).toBe(canonical);
+    },
+  );
 
   it('separates NIHSS stroke scale from Canadian C-Spine aliases', () => {
     expect(NLU_TO_REGISTRY_ID['stroke scale']).toBe('nihss');
@@ -236,13 +236,16 @@ describe('PR3 comprehensive — 5. resolveCatalogLaunch behavior', () => {
       expect(fromAlias.path).toBe(fromCanonical.path);
       expect(fromAlias.registryId).toBe(fromCanonical.registryId);
       expect(fromAlias.chatSeed).toBe(fromCanonical.chatSeed);
-    }
+    },
   );
 
-  it.each(PR3_TOOL_IDS)('resolveNavigationPathForLaunch(%s) opens chat for chat visibility', (id) => {
-    const launch = resolveCatalogLaunch(id);
-    expect(resolveNavigationPathForLaunch(launch)).toBe('/assistant');
-  });
+  it.each(PR3_TOOL_IDS)(
+    'resolveNavigationPathForLaunch(%s) opens chat for chat visibility',
+    (id) => {
+      const launch = resolveCatalogLaunch(id);
+      expect(resolveNavigationPathForLaunch(launch)).toBe('/assistant');
+    },
+  );
 
   it('returns empty launch shape for unknown ids', () => {
     expect(resolveCatalogLaunch('')).toEqual(PR3_EMPTY_LAUNCH);
@@ -263,7 +266,7 @@ describe('PR3 comprehensive — 6. chatSeed presence', () => {
     // grace-acs and canadian-c-spine are real registerTool() backend executors, so
     // backendExecutable is true; nihss/ottawa-ankle have no backend executor.
     expect(nlu?.backendExecutable).toBe(
-      (ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS as readonly string[]).includes(id)
+      (ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS as readonly string[]).includes(id),
     );
     expect(nlu?.chatSeed?.length).toBeGreaterThan(100);
     expect(nlu?.chatSeed).toBe(PR3_CHAT_CONFIG_BY_ID[id].chatSeed);
@@ -299,7 +302,7 @@ describe('PR3 comprehensive — 7. backend alias consistency', () => {
     (id) => {
       const keywords = extractToolPatternKeywords(patternsSource, id).map((k) => aliasToSlug(k));
       const requiredForTool = PR3_REQUIRED_NLU_ALIAS_PAIRS.filter(([, c]) => c === id).map(
-        ([a]) => a
+        ([a]) => a,
       );
       for (const phrase of requiredForTool) {
         const slug = aliasToSlug(phrase);
@@ -307,10 +310,10 @@ describe('PR3 comprehensive — 7. backend alias consistency', () => {
         const inBackend = keywords.includes(slug) || keywords.includes(aliasToSlug(phrase));
         expect(
           inNluMap || inBackend,
-          `alias "${phrase}" for ${id} missing from NLU_TO_REGISTRY_ID and backend keywords`
+          `alias "${phrase}" for ${id} missing from NLU_TO_REGISTRY_ID and backend keywords`,
         ).toBe(true);
       }
-    }
+    },
   );
 });
 
@@ -349,7 +352,9 @@ describe('PR3 comprehensive — 9. duplicate alias detection', () => {
   });
 
   it('does not map PR3 discovery aliases to conflicting mapsTo', () => {
-    const pr3Rows = toolIdAliases.filter((a) => (PR3_TOOL_IDS as readonly string[]).includes(a.mapsTo));
+    const pr3Rows = toolIdAliases.filter((a) =>
+      (PR3_TOOL_IDS as readonly string[]).includes(a.mapsTo),
+    );
     const ids = pr3Rows.map((a) => a.id);
     expect(new Set(ids).size).toBe(ids.length);
     for (const [aliasId, canonical] of PR3_DISCOVERY_ALIAS_PAIRS) {
@@ -370,7 +375,9 @@ describe('PR3 comprehensive — 10. no orphaned tool IDs', () => {
   });
 
   it('does not leave PR3-targeting discovery aliases pointing at missing registry ids', () => {
-    const pr3AliasRows = toolIdAliases.filter((a) => (PR3_TOOL_IDS as readonly string[]).includes(a.mapsTo));
+    const pr3AliasRows = toolIdAliases.filter((a) =>
+      (PR3_TOOL_IDS as readonly string[]).includes(a.mapsTo),
+    );
     for (const { id, mapsTo } of pr3AliasRows) {
       expect(toolRegistryById[mapsTo], `orphan mapsTo for alias ${id}`).toBeTruthy();
       expect(NLU_TO_REGISTRY_ID[id] ?? NLU_TO_REGISTRY_ID[id.replace(/-/g, ' ')]).toBe(mapsTo);
@@ -407,7 +414,7 @@ describe('PR3 comprehensive — client scoring utils smoke', () => {
         'bestLanguage',
         'dysarthria',
         'extinctionInattention',
-      ].map((k) => [k, 0])
+      ].map((k) => [k, 0]),
     );
     const { total } = computeNihssTotal(exam);
     expect(total).toBe(0);
@@ -474,7 +481,7 @@ describe('PR3 comprehensive — per-tool conversational launch', () => {
       const fromAlias = resolveCatalogLaunch(alias);
       expect(fromAlias.registryId).toBe('canadian-c-spine');
       expect(fromAlias.chatSeed).toBe(canonical.chatSeed);
-    }
+    },
   );
 
   it('Ottawa Ankle launch includes hard-stop safety language', () => {

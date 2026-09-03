@@ -31,9 +31,9 @@ function priorityLabel(priority) {
 export default function AiTriageAssistPanel({
   patient,
   compact = false,
-  onEdit = (undefined as any),
-  onDismissed = (undefined as any),
-  onAccepted = (undefined as any),
+  onEdit = undefined as any,
+  onDismissed = undefined as any,
+  onAccepted = undefined as any,
   allowWaitingReview = true,
 }) {
   const triage = useTriageScreen();
@@ -48,7 +48,11 @@ export default function AiTriageAssistPanel({
   const resolvedAssist = useMemo(() => {
     if (!patient || !canReviewTriage) return null;
     if (!isTriageAssistPendingReview(patient) && !allowWaitingReview) return null;
-    if (patient.triageAssist && !patient.triageAssist.dismissedAt && !patient.triageAssist.acceptedAt) {
+    if (
+      patient.triageAssist &&
+      !patient.triageAssist.dismissedAt &&
+      !patient.triageAssist.acceptedAt
+    ) {
       return patient.triageAssist;
     }
     if (!isTriageAssistPendingReview(patient)) return null;
@@ -80,7 +84,12 @@ export default function AiTriageAssistPanel({
   };
 
   const handleDismiss = () => {
-    dismissTriageAssistSuggestion(useEmergencyStore.getState(), patient, assist, emergencyRole.roleLabel);
+    dismissTriageAssistSuggestion(
+      useEmergencyStore.getState(),
+      patient,
+      assist,
+      emergencyRole.roleLabel,
+    );
     onDismissed?.(patient.id);
   };
 
@@ -113,10 +122,7 @@ export default function AiTriageAssistPanel({
 
   return (
     <section
-      className={[
-        'ai-triage-assist',
-        compact ? 'ai-triage-assist--compact' : '',
-      ]
+      className={['ai-triage-assist', compact ? 'ai-triage-assist--compact' : '']
         .filter(Boolean)
         .join(' ')}
       aria-label="Triage assist nurse sign-off"
@@ -140,7 +146,10 @@ export default function AiTriageAssistPanel({
       <div className="ai-triage-assist__overrides">
         <label>
           Confirm or override priority
-          <select value={overridePriority} onChange={(event) => setOverridePriority(event.target.value)}>
+          <select
+            value={overridePriority}
+            onChange={(event) => setOverridePriority(event.target.value)}
+          >
             <option value="">Use suggestion ({assist.suggestedPriority})</option>
             {PRIORITY_OPTIONS.map((option) => (
               <option key={option} value={option}>
@@ -152,7 +161,9 @@ export default function AiTriageAssistPanel({
         <label>
           Confirm or override streaming lane
           <select value={overrideLane} onChange={(event) => setOverrideLane(event.target.value)}>
-            <option value="">Use suggestion ({streamingLaneLabel(String(assist.suggestedQueue))})</option>
+            <option value="">
+              Use suggestion ({streamingLaneLabel(String(assist.suggestedQueue))})
+            </option>
             {CARE_STREAMING_LANES.map((option) => (
               <option key={option.id} value={option.id}>
                 {option.label}
@@ -168,9 +179,7 @@ export default function AiTriageAssistPanel({
         ))}
       </ul>
 
-      {hasNativeAiRationale ? (
-        <AiTruthLabel {...nativeAiTriageBridgeTruthLabel()} compact />
-      ) : null}
+      {hasNativeAiRationale ? <AiTruthLabel {...nativeAiTriageBridgeTruthLabel()} compact /> : null}
 
       {assist.operationalContext?.queuePressure ? (
         <p className="ai-triage-assist__context">
@@ -179,11 +188,16 @@ export default function AiTriageAssistPanel({
       ) : null}
 
       <p className="ai-triage-assist__disclaimer">
-        {assist.disclaimers?.[0] || 'Human review required. Nurse must confirm acuity and streaming before clinical actions.'}
+        {assist.disclaimers?.[0] ||
+          'Human review required. Nurse must confirm acuity and streaming before clinical actions.'}
       </p>
 
       <div className="ai-triage-assist__actions">
-        <button type="button" className="ai-triage-assist__action ai-triage-assist__action--primary" onClick={handleAccept}>
+        <button
+          type="button"
+          className="ai-triage-assist__action ai-triage-assist__action--primary"
+          onClick={handleAccept}
+        >
           Accept &amp; send to queue
         </button>
         <button type="button" className="ai-triage-assist__action" onClick={handleEdit}>
@@ -192,7 +206,11 @@ export default function AiTriageAssistPanel({
         <button type="button" className="ai-triage-assist__action" onClick={handleAskCopilot}>
           Ask Copilot
         </button>
-        <button type="button" className="ai-triage-assist__action ai-triage-assist__action--ghost" onClick={handleDismiss}>
+        <button
+          type="button"
+          className="ai-triage-assist__action ai-triage-assist__action--ghost"
+          onClick={handleDismiss}
+        >
           Dismiss
         </button>
       </div>

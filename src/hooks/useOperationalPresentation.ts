@@ -12,10 +12,7 @@ export function useOperationalPresentation(
   const routeScreenMode = useRouteScreenMode();
   const resolvedScreenMode = screenMode || routeScreenMode;
 
-  return useMemo(
-    () => resolveOperationalPresentation(resolvedScreenMode),
-    [resolvedScreenMode],
-  );
+  return useMemo(() => resolveOperationalPresentation(resolvedScreenMode), [resolvedScreenMode]);
 }
 
 export default useOperationalPresentation;

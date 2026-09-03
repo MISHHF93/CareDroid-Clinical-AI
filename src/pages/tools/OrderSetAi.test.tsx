@@ -2,10 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import OrderSetAi from './OrderSetAi';
-import {
-  mockConversationValue,
-  mockToolPreferencesValue,
-} from '../../test/testRenderUtils';
+import { mockConversationValue, mockToolPreferencesValue } from '../../test/testRenderUtils';
 import { generateOrderSetAi } from '../../services/clinicalIntelligenceApi';
 
 vi.mock('./ToolPageLayout.css', () => ({}));
@@ -87,7 +84,9 @@ describe('OrderSetAi', () => {
   it('renders review-required order set safety copy', () => {
     renderPage();
 
-    expect(screen.getByRole('heading', { name: /intelligent order set assistant/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /intelligent order set assistant/i }),
+    ).toBeInTheDocument();
     expect(screen.getByText(/No autonomous order placement/i)).toBeInTheDocument();
     expect(screen.getByText(/licensed clinician must review/i)).toBeInTheDocument();
   });
@@ -116,7 +115,9 @@ describe('OrderSetAi', () => {
       );
     });
 
-    expect(await screen.findByRole('heading', { name: /sepsis initial evaluation bundle/i })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: /sepsis initial evaluation bundle/i }),
+    ).toBeInTheDocument();
     expect(screen.getByText(/Sepsis bundle principles/i)).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /protocol pathways/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /explainability/i })).toBeInTheDocument();

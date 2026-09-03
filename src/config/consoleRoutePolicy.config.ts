@@ -54,7 +54,11 @@ export const CONSOLE_ROUTE_POLICIES: readonly ConsoleRoutePolicy[] = Object.free
 
 export function shouldFoldIntoToolsConsole(pathname: string): boolean {
   const normalized = pathname.split('?')[0].replace(/\/+$/, '') || '/';
-  if (OPERATIONS_FLEET_CONSOLE_ROUTE_PATHS.some((prefix) => normalized === prefix || normalized.startsWith(`${prefix}/`))) {
+  if (
+    OPERATIONS_FLEET_CONSOLE_ROUTE_PATHS.some(
+      (prefix) => normalized === prefix || normalized.startsWith(`${prefix}/`),
+    )
+  ) {
     return false;
   }
   const toolsPolicy = CONSOLE_ROUTE_POLICIES.find((policy) => policy.id === 'clinical-tools');

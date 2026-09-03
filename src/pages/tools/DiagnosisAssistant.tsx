@@ -52,7 +52,12 @@ const DiagnosisAssistant = ({ embedded = false, onCloseEmbedded }: any = {}) => 
   };
 
   return (
-    <ToolPageLayout tool={toolConfig} embedded={embedded} onCloseEmbedded={onCloseEmbedded} results={results}>
+    <ToolPageLayout
+      tool={toolConfig}
+      embedded={embedded}
+      onCloseEmbedded={onCloseEmbedded}
+      results={results}
+    >
       <div className="diagnosis-tool-grid">
         <div className="diagnosis-panel">
           <h2 className="tool-panel-title">Patient Presentation</h2>

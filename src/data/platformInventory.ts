@@ -40,11 +40,14 @@ import { CALCULATOR_ROUTE_DEFS, KNOWN_TOOL_AREA_PATHS } from '../routes/clinical
 export function getPlatformInventory() {
   const e2e = getE2eValidationMatrixDocument();
   const catalog = getMedicalCatalogSummary();
-  const registryByCategory = toolRegistry.reduce((acc, tool) => {
-    const key = tool.category || 'Other';
-    acc[key] = (acc[key] || 0) + 1;
-    return acc;
-  }, ({} as Record<string, number>));
+  const registryByCategory = toolRegistry.reduce(
+    (acc, tool) => {
+      const key = tool.category || 'Other';
+      acc[key] = (acc[key] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
 
   /** @type {Record<string, { id: string; name: string; route: string | null }[]>} */
   const registryByTier: any = {};
@@ -143,7 +146,16 @@ export function getPlatformInventory() {
       },
       {
         area: 'Public & legal',
-        routes: ['/', '/auth', '/privacy', '/terms', '/gdpr', '/hipaa', '/help', '/shared/tools/:shareId'],
+        routes: [
+          '/',
+          '/auth',
+          '/privacy',
+          '/terms',
+          '/gdpr',
+          '/hipaa',
+          '/help',
+          '/shared/tools/:shareId',
+        ],
       },
     ],
   };
@@ -157,7 +169,10 @@ export function formatPlatformInventoryMarkdown(inv = getPlatformInventory()) {
   const c = inv.counts;
   const tierRows = Object.entries(inv.registryByTier)
     .sort(([a], [b]) => a.localeCompare(b))
-    .map(([tier, tools]) => `| **${tier}** | ${(tools as any[]).length} | ${(tools as any[]).map((t) => t.name).join(', ')} |`)
+    .map(
+      ([tier, tools]) =>
+        `| **${tier}** | ${(tools as any[]).length} | ${(tools as any[]).map((t) => t.name).join(', ')} |`,
+    )
     .join('\n');
 
   const calcList = inv.builtinCalculators

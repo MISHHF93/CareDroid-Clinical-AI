@@ -13,7 +13,8 @@ export const CLINICAL_KNOWLEDGE_GRAPH_NODES = Object.freeze([
     type: 'calculator',
     label: 'qSOFA',
     path: '/tools/calculators/qsofa',
-    summary: 'Bedside sepsis risk context using respiratory rate, systolic blood pressure, and mentation.',
+    summary:
+      'Bedside sepsis risk context using respiratory rate, systolic blood pressure, and mentation.',
     tags: ['sepsis', 'risk stratification', 'deterioration'],
   },
   {
@@ -37,7 +38,8 @@ export const CLINICAL_KNOWLEDGE_GRAPH_NODES = Object.freeze([
     type: 'protocol',
     label: 'Sepsis pathway',
     path: '/protocols',
-    summary: 'Protocol pathway for suspected infection, lactate review, cultures, antimicrobials, fluids, and escalation.',
+    summary:
+      'Protocol pathway for suspected infection, lactate review, cultures, antimicrobials, fluids, and escalation.',
     tags: ['sepsis', 'lactate', 'qsofa'],
   },
   {
@@ -45,7 +47,8 @@ export const CLINICAL_KNOWLEDGE_GRAPH_NODES = Object.freeze([
     type: 'protocol',
     label: 'Stroke alert pathway',
     path: '/protocols',
-    summary: 'Stroke alert pathway for last-known-well, NIHSS, imaging readiness, and neurology escalation.',
+    summary:
+      'Stroke alert pathway for last-known-well, NIHSS, imaging readiness, and neurology escalation.',
     tags: ['stroke', 'nihss', 'imaging'],
   },
   {
@@ -53,7 +56,8 @@ export const CLINICAL_KNOWLEDGE_GRAPH_NODES = Object.freeze([
     type: 'simulation',
     label: 'Sepsis deterioration simulation',
     path: '/simulation/sepsis-deterioration',
-    summary: 'Virtual patient scenario connecting vitals, lactate, antibiotics, escalation, and debrief.',
+    summary:
+      'Virtual patient scenario connecting vitals, lactate, antibiotics, escalation, and debrief.',
     tags: ['sepsis', 'simulation', 'debrief'],
   },
   {
@@ -61,7 +65,8 @@ export const CLINICAL_KNOWLEDGE_GRAPH_NODES = Object.freeze([
     type: 'simulation',
     label: 'Stroke alert simulation',
     path: '/simulation/stroke-alert',
-    summary: 'Simulation scenario for stroke alert coordination, NIHSS documentation, and imaging workflow.',
+    summary:
+      'Simulation scenario for stroke alert coordination, NIHSS documentation, and imaging workflow.',
     tags: ['stroke', 'simulation', 'team communication'],
   },
   {
@@ -69,7 +74,8 @@ export const CLINICAL_KNOWLEDGE_GRAPH_NODES = Object.freeze([
     type: 'laboratory',
     label: 'Lactate',
     path: '/laboratory',
-    summary: 'Critical perfusion and sepsis-trending laboratory value used in escalation workflows.',
+    summary:
+      'Critical perfusion and sepsis-trending laboratory value used in escalation workflows.',
     tags: ['sepsis', 'perfusion', 'critical lab'],
   },
   {
@@ -85,7 +91,8 @@ export const CLINICAL_KNOWLEDGE_GRAPH_NODES = Object.freeze([
     type: 'device',
     label: 'Infusion pump',
     path: '/medical-iot',
-    summary: 'Medication and fluid delivery device connected to safety, alarm, and escalation workflows.',
+    summary:
+      'Medication and fluid delivery device connected to safety, alarm, and escalation workflows.',
     tags: ['device', 'medication safety', 'alarm'],
   },
   {
@@ -93,7 +100,8 @@ export const CLINICAL_KNOWLEDGE_GRAPH_NODES = Object.freeze([
     type: 'device',
     label: 'Bedside monitor',
     path: '/medical-iot',
-    summary: 'Vital-sign telemetry source for deterioration, respiratory failure, and simulation workflows.',
+    summary:
+      'Vital-sign telemetry source for deterioration, respiratory failure, and simulation workflows.',
     tags: ['device', 'vitals', 'telemetry'],
   },
   {
@@ -101,7 +109,8 @@ export const CLINICAL_KNOWLEDGE_GRAPH_NODES = Object.freeze([
     type: 'ai-workflow',
     label: 'Clinical Decision Support Engine',
     path: '/clinical-decision-support',
-    summary: 'AI-assisted recommendation workflow using symptoms, calculators, protocols, labs, imaging, and escalation.',
+    summary:
+      'AI-assisted recommendation workflow using symptoms, calculators, protocols, labs, imaging, and escalation.',
     tags: ['AI workflow', 'recommendations', 'explainability'],
   },
   {
@@ -109,26 +118,97 @@ export const CLINICAL_KNOWLEDGE_GRAPH_NODES = Object.freeze([
     type: 'ai-workflow',
     label: 'Clinical Documentation Assistant',
     path: '/documentation',
-    summary: 'AI documentation workflow for note drafts, encounter summaries, patient instructions, and export.',
+    summary:
+      'AI documentation workflow for note drafts, encounter summaries, patient instructions, and export.',
     tags: ['AI workflow', 'documentation', 'export'],
   },
 ]);
 
 export const CLINICAL_KNOWLEDGE_GRAPH_EDGES = Object.freeze([
-  { source: 'protocol-sepsis', target: 'qsofa', relation: 'uses calculator', rationale: 'Sepsis pathway uses qSOFA for bedside risk context.' },
-  { source: 'protocol-sepsis', target: 'news2', relation: 'uses calculator', rationale: 'Sepsis pathway can use NEWS2 for deterioration escalation.' },
-  { source: 'protocol-sepsis', target: 'lab-lactate', relation: 'requires lab', rationale: 'Lactate trends support perfusion and shock reassessment.' },
-  { source: 'protocol-sepsis', target: 'simulation-sepsis', relation: 'trained by simulation', rationale: 'Simulation rehearses recognition, treatment timing, and escalation.' },
-  { source: 'simulation-sepsis', target: 'device-monitor', relation: 'uses device signal', rationale: 'Simulation vitals are driven by bedside monitoring changes.' },
-  { source: 'simulation-sepsis', target: 'device-infusion-pump', relation: 'uses device workflow', rationale: 'Fluids and medications depend on device safety checks.' },
-  { source: 'protocol-stroke', target: 'nihss', relation: 'uses calculator', rationale: 'NIHSS structures stroke deficit documentation.' },
-  { source: 'protocol-stroke', target: 'simulation-stroke', relation: 'trained by simulation', rationale: 'Simulation rehearses team coordination and imaging readiness.' },
-  { source: 'ai-cds', target: 'protocol-sepsis', relation: 'recommends protocol', rationale: 'CDS can recommend the sepsis pathway when infection signals are present.' },
-  { source: 'ai-cds', target: 'protocol-stroke', relation: 'recommends protocol', rationale: 'CDS can recommend stroke alert workflows when neurologic deficits are present.' },
-  { source: 'ai-cds', target: 'lab-lactate', relation: 'recommends lab', rationale: 'CDS can suggest lactate for suspected infection with deterioration.' },
-  { source: 'ai-cds', target: 'lab-troponin', relation: 'recommends lab', rationale: 'CDS can suggest troponin for ACS-compatible presentations.' },
-  { source: 'ai-documentation', target: 'protocol-sepsis', relation: 'documents pathway', rationale: 'Documentation assistant can summarize pathway-driven encounter decisions.' },
-  { source: 'ai-documentation', target: 'simulation-sepsis', relation: 'documents debrief', rationale: 'Documentation assistant can produce reviewed-required simulation summaries.' },
+  {
+    source: 'protocol-sepsis',
+    target: 'qsofa',
+    relation: 'uses calculator',
+    rationale: 'Sepsis pathway uses qSOFA for bedside risk context.',
+  },
+  {
+    source: 'protocol-sepsis',
+    target: 'news2',
+    relation: 'uses calculator',
+    rationale: 'Sepsis pathway can use NEWS2 for deterioration escalation.',
+  },
+  {
+    source: 'protocol-sepsis',
+    target: 'lab-lactate',
+    relation: 'requires lab',
+    rationale: 'Lactate trends support perfusion and shock reassessment.',
+  },
+  {
+    source: 'protocol-sepsis',
+    target: 'simulation-sepsis',
+    relation: 'trained by simulation',
+    rationale: 'Simulation rehearses recognition, treatment timing, and escalation.',
+  },
+  {
+    source: 'simulation-sepsis',
+    target: 'device-monitor',
+    relation: 'uses device signal',
+    rationale: 'Simulation vitals are driven by bedside monitoring changes.',
+  },
+  {
+    source: 'simulation-sepsis',
+    target: 'device-infusion-pump',
+    relation: 'uses device workflow',
+    rationale: 'Fluids and medications depend on device safety checks.',
+  },
+  {
+    source: 'protocol-stroke',
+    target: 'nihss',
+    relation: 'uses calculator',
+    rationale: 'NIHSS structures stroke deficit documentation.',
+  },
+  {
+    source: 'protocol-stroke',
+    target: 'simulation-stroke',
+    relation: 'trained by simulation',
+    rationale: 'Simulation rehearses team coordination and imaging readiness.',
+  },
+  {
+    source: 'ai-cds',
+    target: 'protocol-sepsis',
+    relation: 'recommends protocol',
+    rationale: 'CDS can recommend the sepsis pathway when infection signals are present.',
+  },
+  {
+    source: 'ai-cds',
+    target: 'protocol-stroke',
+    relation: 'recommends protocol',
+    rationale: 'CDS can recommend stroke alert workflows when neurologic deficits are present.',
+  },
+  {
+    source: 'ai-cds',
+    target: 'lab-lactate',
+    relation: 'recommends lab',
+    rationale: 'CDS can suggest lactate for suspected infection with deterioration.',
+  },
+  {
+    source: 'ai-cds',
+    target: 'lab-troponin',
+    relation: 'recommends lab',
+    rationale: 'CDS can suggest troponin for ACS-compatible presentations.',
+  },
+  {
+    source: 'ai-documentation',
+    target: 'protocol-sepsis',
+    relation: 'documents pathway',
+    rationale: 'Documentation assistant can summarize pathway-driven encounter decisions.',
+  },
+  {
+    source: 'ai-documentation',
+    target: 'simulation-sepsis',
+    relation: 'documents debrief',
+    rationale: 'Documentation assistant can produce reviewed-required simulation summaries.',
+  },
 ]);
 
 export function getKnowledgeGraphNode(nodeId) {
@@ -136,10 +216,14 @@ export function getKnowledgeGraphNode(nodeId) {
 }
 
 export function getKnowledgeGraphNeighbors(nodeId) {
-  return CLINICAL_KNOWLEDGE_GRAPH_EDGES.filter((edge) => edge.source === nodeId || edge.target === nodeId).map((edge) => {
-    const neighborId = edge.source === nodeId ? edge.target : edge.source;
-    return { edge, node: getKnowledgeGraphNode(neighborId) };
-  }).filter((item) => item.node);
+  return CLINICAL_KNOWLEDGE_GRAPH_EDGES.filter(
+    (edge) => edge.source === nodeId || edge.target === nodeId,
+  )
+    .map((edge) => {
+      const neighborId = edge.source === nodeId ? edge.target : edge.source;
+      return { edge, node: getKnowledgeGraphNode(neighborId) };
+    })
+    .filter((item) => item.node);
 }
 
 export function searchKnowledgeGraph(query = '', type = 'all') {
@@ -148,18 +232,26 @@ export function searchKnowledgeGraph(query = '', type = 'all') {
     const typeMatches = type === 'all' || node.type === type;
     const textMatches =
       !normalizedQuery ||
-      [node.label, node.type, node.summary, ...node.tags].join(' ').toLowerCase().includes(normalizedQuery);
+      [node.label, node.type, node.summary, ...node.tags]
+        .join(' ')
+        .toLowerCase()
+        .includes(normalizedQuery);
     return typeMatches && textMatches;
   });
 }
 
-export function buildKnowledgeGraphSnapshot({ query = '', type = 'all', selectedNodeId }: any = {}) {
+export function buildKnowledgeGraphSnapshot({
+  query = '',
+  type = 'all',
+  selectedNodeId,
+}: any = {}) {
   const nodes = searchKnowledgeGraph(query, type);
   const visibleNodeIds = new Set(nodes.map((node) => node.id));
   const edges = CLINICAL_KNOWLEDGE_GRAPH_EDGES.filter(
-    (edge) => visibleNodeIds.has(edge.source) && visibleNodeIds.has(edge.target)
+    (edge) => visibleNodeIds.has(edge.source) && visibleNodeIds.has(edge.target),
   );
-  const selectedNode = getKnowledgeGraphNode(selectedNodeId) || nodes[0] || CLINICAL_KNOWLEDGE_GRAPH_NODES[0];
+  const selectedNode =
+    getKnowledgeGraphNode(selectedNodeId) || nodes[0] || CLINICAL_KNOWLEDGE_GRAPH_NODES[0];
 
   return {
     nodes,
@@ -171,7 +263,7 @@ export function buildKnowledgeGraphSnapshot({ query = '', type = 'all', selected
         ...counts,
         [nodeType]: CLINICAL_KNOWLEDGE_GRAPH_NODES.filter((node) => node.type === nodeType).length,
       }),
-      {}
+      {},
     ),
   };
 }

@@ -184,7 +184,13 @@ const ROLE_DEFAULTS = Object.freeze({
     specialty: 'pharmacy',
     department: 'pharmacy',
     permissionLevel: 'clinician',
-    permissions: ['READ_PHI', 'USE_CALCULATORS', 'USE_DRUG_CHECKER', 'USE_PROTOCOLS', 'USE_AI_CHAT'],
+    permissions: [
+      'READ_PHI',
+      'USE_CALCULATORS',
+      'USE_DRUG_CHECKER',
+      'USE_PROTOCOLS',
+      'USE_AI_CHAT',
+    ],
   },
   'fleet operator': {
     specialty: 'operations',
@@ -240,12 +246,18 @@ function normalizeKey(value) {
 }
 
 function normalizeText(value) {
-  return String(value || '').trim().toLowerCase();
+  return String(value || '')
+    .trim()
+    .toLowerCase();
 }
 
 export function normalizeProfileRole(value) {
   const key = normalizeKey(value);
-  return ROLE_ALIASES[key] || ROLE_ALIASES[normalizeKey(String(value || '').replace(/_/g, ' '))] || 'medical student';
+  return (
+    ROLE_ALIASES[key] ||
+    ROLE_ALIASES[normalizeKey(String(value || '').replace(/_/g, ' '))] ||
+    'medical student'
+  );
 }
 
 export function normalizeSpecialty(value, fallback = 'medical education') {
@@ -260,28 +272,32 @@ function inferRole({ account, user, toolProfileSettings }) {
       account?.profession ||
       user?.profile?.profession ||
       user?.role ||
-      'medical student'
+      'medical student',
   );
 }
 
-export function buildUserToolProfile({
-  account,
-  user,
-  preferences,
-  activeWorkspace,
-  activeWorkspaceId,
-  toolPreferences = {} as any,
-  permissions,
-} = {} as any) {
+export function buildUserToolProfile(
+  {
+    account,
+    user,
+    preferences,
+    activeWorkspace,
+    activeWorkspaceId,
+    toolPreferences = {} as any,
+    permissions,
+  } = {} as any,
+) {
   const toolProfileSettings = toolPreferences.profileSettings || {};
   const preferencesToolPrefs = preferences?.toolPreferences || {};
   const role = inferRole({ account, user, toolProfileSettings });
   const defaults = ROLE_DEFAULTS[role] || ROLE_DEFAULTS['medical student'];
   const specialty = normalizeSpecialty(
     toolProfileSettings.specialty || account?.specialty || user?.profile?.specialty,
-    defaults.specialty
+    defaults.specialty,
   );
-  const department = normalizeText(toolProfileSettings.department || account?.department || defaults.department);
+  const department = normalizeText(
+    toolProfileSettings.department || account?.department || defaults.department,
+  );
   const permissionLevel = toolProfileSettings.permissionLevel || defaults.permissionLevel;
   const workspace =
     toolProfileSettings.defaultWorkspace ||
@@ -297,14 +313,31 @@ export function buildUserToolProfile({
     workspace,
     permissionLevel,
     permissions: unique([...list(permissions), ...list(defaults.permissions)]),
-    preferredTools: unique([...list(toolPreferences.favorites), ...list(preferencesToolPrefs.favoriteToolIds)]),
-    recentTools: unique([...list(toolPreferences.recentTools), ...list(preferencesToolPrefs.recentToolIds)]),
-    pinnedTools: unique([...list(toolPreferences.pinned), ...list(preferencesToolPrefs.pinnedToolIds)]),
-    hiddenTools: unique([...list(toolPreferences.hiddenTools), ...list(preferencesToolPrefs.hiddenToolIds)]),
+    preferredTools: unique([
+      ...list(toolPreferences.favorites),
+      ...list(preferencesToolPrefs.favoriteToolIds),
+    ]),
+    recentTools: unique([
+      ...list(toolPreferences.recentTools),
+      ...list(preferencesToolPrefs.recentToolIds),
+    ]),
+    pinnedTools: unique([
+      ...list(toolPreferences.pinned),
+      ...list(preferencesToolPrefs.pinnedToolIds),
+    ]),
+    hiddenTools: unique([
+      ...list(toolPreferences.hiddenTools),
+      ...list(preferencesToolPrefs.hiddenToolIds),
+    ]),
     clinicalAccess: ['clinician', 'admin', 'learner', 'research'].includes(permissionLevel),
-    operationsAccess: ['operations', 'admin'].includes(permissionLevel) || defaults.permissions?.includes('VIEW_OPERATIONS'),
-    trainingLevel: toolProfileSettings.trainingLevel || (permissionLevel === 'learner' ? 'student' : defaults.permissionLevel),
-    organizationType: toolProfileSettings.organizationType || account?.organizationType || 'hospital',
+    operationsAccess:
+      ['operations', 'admin'].includes(permissionLevel) ||
+      defaults.permissions?.includes('VIEW_OPERATIONS'),
+    trainingLevel:
+      toolProfileSettings.trainingLevel ||
+      (permissionLevel === 'learner' ? 'student' : defaults.permissionLevel),
+    organizationType:
+      toolProfileSettings.organizationType || account?.organizationType || 'hospital',
     compactToolView: Boolean(toolProfileSettings.compactToolView),
   };
 }
@@ -337,17 +370,84 @@ export function deriveToolSegmentationMetadata(tool) {
   const text = toolText(tool);
   const category = normalizeText(tool.category);
   const isCalculator = category === 'calculator' || tool.surface === 'calculator-form';
-  const isFleet = category === 'fleet' || tool.surface === 'fleet-page' || matchesAny(text, ['fleet', 'dispatch', 'route optimizer', 'predictive maintenance']);
-  const isIot = category === 'iot' || tool.surface === 'iot-dashboard' || matchesAny(text, ['iot', 'device', 'telemetry', 'biomedical']);
-  const isOperations = category === 'hospital operations' || tool.surface === 'hospital-operations' || matchesAny(text, ['hospital command', 'operations', 'occupancy', 'resource allocation']);
-  const isSimulation = category === 'education & simulation' || matchesAny(text, ['simulation', 'scenario', 'debrief', 'competency', 'training']);
-  const isAdmin = matchesAny(text, ['governance', 'security', 'audit', 'regulatory', 'privacy', 'observability', 'system health', 'validation']);
-  const isCardiology = matchesAny(text, ['cardio', 'heart', 'acs', 'stemi', 'timi', 'grace', 'chads', 'cha2ds2', 'has-bled', 'ecg', 'atrial', 'arrhythmia']);
-  const isEmergency = matchesAny(text, ['emergency', 'trauma', 'qsofa', 'sofa', 'news2', 'perc', 'wells', 'nihss', 'stroke', 'sepsis', 'heart score']);
-  const isPediatric = matchesAny(text, ['pediatric', 'neonatal', 'child', 'pregnancy', 'ob ', 'obgyn']);
-  const isPharmacy = matchesAny(text, ['drug', 'medication', 'antibiotic', 'pharmac', 'dose', 'dosing']);
+  const isFleet =
+    category === 'fleet' ||
+    tool.surface === 'fleet-page' ||
+    matchesAny(text, ['fleet', 'dispatch', 'route optimizer', 'predictive maintenance']);
+  const isIot =
+    category === 'iot' ||
+    tool.surface === 'iot-dashboard' ||
+    matchesAny(text, ['iot', 'device', 'telemetry', 'biomedical']);
+  const isOperations =
+    category === 'hospital operations' ||
+    tool.surface === 'hospital-operations' ||
+    matchesAny(text, ['hospital command', 'operations', 'occupancy', 'resource allocation']);
+  const isSimulation =
+    category === 'education & simulation' ||
+    matchesAny(text, ['simulation', 'scenario', 'debrief', 'competency', 'training']);
+  const isAdmin = matchesAny(text, [
+    'governance',
+    'security',
+    'audit',
+    'regulatory',
+    'privacy',
+    'observability',
+    'system health',
+    'validation',
+  ]);
+  const isCardiology = matchesAny(text, [
+    'cardio',
+    'heart',
+    'acs',
+    'stemi',
+    'timi',
+    'grace',
+    'chads',
+    'cha2ds2',
+    'has-bled',
+    'ecg',
+    'atrial',
+    'arrhythmia',
+  ]);
+  const isEmergency = matchesAny(text, [
+    'emergency',
+    'trauma',
+    'qsofa',
+    'sofa',
+    'news2',
+    'perc',
+    'wells',
+    'nihss',
+    'stroke',
+    'sepsis',
+    'heart score',
+  ]);
+  const isPediatric = matchesAny(text, [
+    'pediatric',
+    'neonatal',
+    'child',
+    'pregnancy',
+    'ob ',
+    'obgyn',
+  ]);
+  const isPharmacy = matchesAny(text, [
+    'drug',
+    'medication',
+    'antibiotic',
+    'pharmac',
+    'dose',
+    'dosing',
+  ]);
   const isResearch = matchesAny(text, ['research', 'analytics', 'evidence', 'guideline', 'rag']);
-  const isClinicalAi = matchesAny(text, ['ai', 'assistant', 'scribe', 'summary', 'differential', 'order set', 'timeline']);
+  const isClinicalAi = matchesAny(text, [
+    'ai',
+    'assistant',
+    'scribe',
+    'summary',
+    'differential',
+    'order set',
+    'timeline',
+  ]);
 
   const intendedRoles = [] as any[];
   const specialties = [] as any[];
@@ -361,7 +461,11 @@ export function deriveToolSegmentationMetadata(tool) {
     departments.push('administration');
     workspaceTags.push('admin');
     requiredPermissions.push(
-      text.includes('security') ? 'VIEW_AI_SECURITY' : text.includes('governance') ? 'VIEW_GOVERNANCE' : 'VIEW_AUDIT_LOGS'
+      text.includes('security')
+        ? 'VIEW_AI_SECURITY'
+        : text.includes('governance')
+          ? 'VIEW_GOVERNANCE'
+          : 'VIEW_AUDIT_LOGS',
     );
   }
 
@@ -396,7 +500,7 @@ export function deriveToolSegmentationMetadata(tool) {
       'medical student',
       'ICU clinician',
       'biomedical engineer',
-      'fleet operator'
+      'fleet operator',
     );
     specialties.push('emergency medicine', 'critical care', 'medical education', 'operations');
     departments.push('emergency', 'ICU', 'operations', 'biomedical engineering');
@@ -440,9 +544,26 @@ export function deriveToolSegmentationMetadata(tool) {
     workspaceTags.push('research', 'reference');
   }
 
-  if (!intendedRoles.length && (isCalculator || category === 'diagnostic' || category === 'reference' || category === 'clinical ai')) {
-    intendedRoles.push('emergency physician', 'hospitalist', 'nurse', 'ICU clinician', 'medical student');
-    specialties.push('emergency medicine', 'hospital medicine', 'critical care', 'medical education');
+  if (
+    !intendedRoles.length &&
+    (isCalculator ||
+      category === 'diagnostic' ||
+      category === 'reference' ||
+      category === 'clinical ai')
+  ) {
+    intendedRoles.push(
+      'emergency physician',
+      'hospitalist',
+      'nurse',
+      'ICU clinician',
+      'medical student',
+    );
+    specialties.push(
+      'emergency medicine',
+      'hospital medicine',
+      'critical care',
+      'medical education',
+    );
     departments.push('emergency', 'inpatient', 'ICU');
     workspaceTags.push('clinical');
   }
@@ -455,33 +576,52 @@ export function deriveToolSegmentationMetadata(tool) {
   if (category === 'education & simulation') workspaceTags.push('simulation', 'education');
   if (category === 'diagnostic') workspaceTags.push('diagnostic');
   if (isClinicalAi) requiredPermissions.push('USE_AI_CHAT');
-  if (tool.launchType === 'backend-backed' || tool.executorStatus === 'registered') requiredPermissions.push('USE_AI_CHAT');
+  if (tool.launchType === 'backend-backed' || tool.executorStatus === 'registered')
+    requiredPermissions.push('USE_AI_CHAT');
 
   const clinicalRiskLevel =
     tool.clinicalRiskLevel ||
-    (isAdmin || (isClinicalAi && matchesAny(text, ['differential', 'order set', 'summary', 'scribe']))
+    (isAdmin ||
+    (isClinicalAi && matchesAny(text, ['differential', 'order set', 'summary', 'scribe']))
       ? 'high'
       : isCalculator || isClinicalAi || tool.launchType === 'backend-backed'
         ? 'medium'
         : 'low');
-  const requiresHumanReview = clinicalRiskLevel === 'high' || matchesAny(text, ['human review', 'order set', 'differential', 'dispatch']);
-  const hiddenFor = isAdmin ? ['medical student', 'nurse', 'hospitalist', 'cardiologist', 'emergency physician', 'ICU clinician', 'pediatric clinician', 'pharmacist', 'researcher'] : [];
+  const requiresHumanReview =
+    clinicalRiskLevel === 'high' ||
+    matchesAny(text, ['human review', 'order set', 'differential', 'dispatch']);
+  const hiddenFor = isAdmin
+    ? [
+        'medical student',
+        'nurse',
+        'hospitalist',
+        'cardiologist',
+        'emergency physician',
+        'ICU clinician',
+        'pediatric clinician',
+        'pharmacist',
+        'researcher',
+      ]
+    : [];
 
   return {
     intendedRoles: unique(intendedRoles.length ? intendedRoles : PROFILE_ROLES),
     specialties: unique(specialties),
     departments: unique(departments),
     workspaceTags: unique(workspaceTags.length ? workspaceTags : ['clinical']),
-    requiredPermissions: unique([...(tool.permissionPolicy?.permissions || []), ...requiredPermissions]),
+    requiredPermissions: unique([
+      ...(tool.permissionPolicy?.permissions || []),
+      ...requiredPermissions,
+    ]),
     clinicalRiskLevel,
     defaultVisible: !isAdmin,
     recommendedFor: unique([...intendedRoles, ...specialties]),
     hiddenFor,
     requiresBackend: Boolean(
       tool.requiresBackend ||
-        tool.launchType === 'backend-backed' ||
-        tool.executorStatus === 'registered' ||
-        tool.executorStatus === 'platform'
+      tool.launchType === 'backend-backed' ||
+      tool.executorStatus === 'registered' ||
+      tool.executorStatus === 'platform',
     ),
     requiresHumanReview,
   };
@@ -511,9 +651,13 @@ function hasRequiredPermissions(profile, metadata) {
   const required = metadata.requiredPermissions || [];
   if (!required.length) return true;
   const permissionSet = new Set(profile.permissions || []);
-  if (metadata.workspaceTags?.some((tag) => ['fleet', 'operations', 'iot', 'hospital-operations'].includes(tag))) {
+  if (
+    metadata.workspaceTags?.some((tag) =>
+      ['fleet', 'operations', 'iot', 'hospital-operations'].includes(tag),
+    )
+  ) {
     const nonDiscoveryPermissions = required.filter(
-      (permission) => !OPERATIONS_DISCOVERY_PERMISSIONS.has(permission)
+      (permission) => !OPERATIONS_DISCOVERY_PERMISSIONS.has(permission),
     );
     return nonDiscoveryPermissions.every((permission) => permissionSet.has(permission));
   }
@@ -563,7 +707,11 @@ export function scoreToolForProfile(tool, profile) {
   if ((profile.preferredTools || []).includes(tool.id)) score += 45;
   if ((profile.pinnedTools || []).includes(tool.id)) score += 80;
   if ((profile.recentTools || []).slice(0, 6).includes(tool.id)) score += 28;
-  if (metadata.recommendedFor?.includes(profile.role) || metadata.recommendedFor?.includes(profile.specialty)) score += 20;
+  if (
+    metadata.recommendedFor?.includes(profile.role) ||
+    metadata.recommendedFor?.includes(profile.specialty)
+  )
+    score += 20;
   if (metadata.clinicalRiskLevel === 'high' && profile.permissionLevel !== 'admin') score -= 12;
   return score;
 }
@@ -575,15 +723,25 @@ export function buildProfileToolGraph({ tools = [] as any[], profile }) {
     profileScore: scoreToolForProfile(tool, profile),
     restrictionReason: getToolRestrictionReason(tool, profile),
   }));
-  const restrictedTools = scoredTools.filter((tool) => tool.restrictionReason && !profile.hiddenTools?.includes(tool.id));
+  const restrictedTools = scoredTools.filter(
+    (tool) => tool.restrictionReason && !profile.hiddenTools?.includes(tool.id),
+  );
   const visibleTools = scoredTools
     .filter((tool) => !tool.restrictionReason)
     .sort((a, b) => b.profileScore - a.profileScore || a.name.localeCompare(b.name));
   const recommendedTools = visibleTools.filter((tool) => tool.profileScore >= 50).slice(0, 24);
-  const pinnedTools = (profile.pinnedTools || []).map((toolId) => visibleTools.find((tool) => tool.id === toolId)).filter(Boolean);
-  const recentTools = (profile.recentTools || []).map((toolId) => visibleTools.find((tool) => tool.id === toolId)).filter(Boolean);
-  const favoriteTools = (profile.preferredTools || []).map((toolId) => visibleTools.find((tool) => tool.id === toolId)).filter(Boolean);
-  const specialtyTools = visibleTools.filter((tool) => tool.specialties?.includes(profile.specialty));
+  const pinnedTools = (profile.pinnedTools || [])
+    .map((toolId) => visibleTools.find((tool) => tool.id === toolId))
+    .filter(Boolean);
+  const recentTools = (profile.recentTools || [])
+    .map((toolId) => visibleTools.find((tool) => tool.id === toolId))
+    .filter(Boolean);
+  const favoriteTools = (profile.preferredTools || [])
+    .map((toolId) => visibleTools.find((tool) => tool.id === toolId))
+    .filter(Boolean);
+  const specialtyTools = visibleTools.filter((tool) =>
+    tool.specialties?.includes(profile.specialty),
+  );
   const workspaceTools = visibleTools.filter((tool) => {
     if (!profile.workspace || profile.workspace === 'all') return true;
     return (
@@ -629,15 +787,18 @@ export function filterToolsForProfileGraph(graph, filter) {
   if (filter === 'pinned') return graph.pinnedTools;
   if (filter === 'favorites') return graph.favoriteTools;
   if (filter === 'recent') return graph.recentTools;
-  if (filter === 'restricted') return graph.profile.permissionLevel === 'admin' ? graph.restrictedTools : [];
+  if (filter === 'restricted')
+    return graph.profile.permissionLevel === 'admin' ? graph.restrictedTools : [];
   return graph.visibleTools;
 }
 
 function findToolBySeed(tools, seed) {
   const normalizedSeed = normalizeKey(seed);
-  return tools.find((tool) => normalizeKey(tool.id) === normalizedSeed) ||
+  return (
+    tools.find((tool) => normalizeKey(tool.id) === normalizedSeed) ||
     tools.find((tool) => normalizeKey(tool.name).includes(normalizedSeed)) ||
-    tools.find((tool) => toolText(tool).includes(seed.toLowerCase()));
+    tools.find((tool) => toolText(tool).includes(seed.toLowerCase()))
+  );
 }
 
 export function getProfileAssistantRecommendations(profile, tools = [] as any[], limit = 4) {
@@ -645,8 +806,15 @@ export function getProfileAssistantRecommendations(profile, tools = [] as any[],
   const seedIds = PROFILE_ASSISTANT_SEEDS[profile.role] || [];
   const seeded = seedIds.map((seed) => findToolBySeed(segmentedTools, seed)).filter(Boolean);
   const graph = buildProfileToolGraph({ tools: segmentedTools, profile });
-  const recommended = unique([...seeded.map((tool) => tool.id), ...graph.recommendedTools.map((tool) => tool.id)])
-    .map((toolId) => graph.visibleTools.find((tool) => tool.id === toolId) || segmentedTools.find((tool) => tool.id === toolId))
+  const recommended = unique([
+    ...seeded.map((tool) => tool.id),
+    ...graph.recommendedTools.map((tool) => tool.id),
+  ])
+    .map(
+      (toolId) =>
+        graph.visibleTools.find((tool) => tool.id === toolId) ||
+        segmentedTools.find((tool) => tool.id === toolId),
+    )
     .filter(Boolean)
     .filter((tool) => isToolAllowedForProfile(tool, profile))
     .slice(0, limit);

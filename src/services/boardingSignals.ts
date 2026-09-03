@@ -29,7 +29,8 @@ const CACHE_TTL_MS = 60_000;
 // avoids recomputing the DERIVED signal on every render.
 let sharedBoardedListPromise: ReturnType<typeof BoardingApi.fetchBoardedPatients> | null = null;
 let sharedBoardedListCachedAt = 0;
-let sharedBoardedListCache: Awaited<ReturnType<typeof BoardingApi.fetchBoardedPatients>> | null = null;
+let sharedBoardedListCache: Awaited<ReturnType<typeof BoardingApi.fetchBoardedPatients>> | null =
+  null;
 
 async function getSharedBoardedList() {
   const now = Date.now();
@@ -65,9 +66,7 @@ function signalsFromPatient(patient: Patient): BoardingSignals {
   };
 }
 
-export async function fetchBoardingSignalsForPatient(
-  patient: Patient,
-): Promise<BoardingSignals> {
+export async function fetchBoardingSignalsForPatient(patient: Patient): Promise<BoardingSignals> {
   const cached = boardedCache.get(patient.id);
   if (cached && Date.now() - cached.fetchedAt < CACHE_TTL_MS) {
     return cached.signals;
@@ -90,7 +89,8 @@ export async function fetchBoardingSignalsForPatient(
     ? {
         isBoarded: true,
         decisionTracked: true,
-        boardingDurationMinutes: Number(match.boardingDurationMinutes || match.boardMinutes || 0) || undefined,
+        boardingDurationMinutes:
+          Number(match.boardingDurationMinutes || match.boardMinutes || 0) || undefined,
         source: 'live',
         maturity: 'live',
       }

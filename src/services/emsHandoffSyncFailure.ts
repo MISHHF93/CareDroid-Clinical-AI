@@ -26,7 +26,10 @@ export function reportEmsHandoffSyncFailure({
     toolCalled: 'ems-handoff-persist',
     backendEndpoint: '/api/emergency/ems/handoff',
     conditionsEvaluated: [
-      { label: `Arrival ${arrivalId}${patientId ? ` linked to patient ${patientId}` : ' (no linked patient yet)'}`, result: false },
+      {
+        label: `Arrival ${arrivalId}${patientId ? ` linked to patient ${patientId}` : ' (no linked patient yet)'}`,
+        result: false,
+      },
     ],
     aiInvolvement: { involved: false, summary: 'Rules-only handoff persistence.' },
     error,

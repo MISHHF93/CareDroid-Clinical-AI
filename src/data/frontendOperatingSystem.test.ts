@@ -20,9 +20,13 @@ describe('frontend operating system model', () => {
   it('classifies routes into operating-system stages', () => {
     // getFrontendOperatingSystemStage's untyped default (`= CANONICAL_ROUTES.dashboard`)
     // infers a "/dashboard"-only param type; casts exercise the other route classifications.
-    expect(getFrontendOperatingSystemStage('/workspace/emergency' as '/dashboard')).toBe('workspace');
+    expect(getFrontendOperatingSystemStage('/workspace/emergency' as '/dashboard')).toBe(
+      'workspace',
+    );
     expect(getFrontendOperatingSystemStage('/dashboard')).toBe('dashboard');
-    expect(getFrontendOperatingSystemStage('/search?q=sepsis' as '/dashboard')).toBe('asset-launch');
+    expect(getFrontendOperatingSystemStage('/search?q=sepsis' as '/dashboard')).toBe(
+      'asset-launch',
+    );
     expect(getFrontendOperatingSystemStage('/workflows' as '/dashboard')).toBe('workflow');
     expect(getFrontendOperatingSystemStage('/timeline' as '/dashboard')).toBe('result');
   });

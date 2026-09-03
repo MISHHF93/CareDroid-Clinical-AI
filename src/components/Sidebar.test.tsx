@@ -172,7 +172,9 @@ describe('Sidebar unified navigation rendering', () => {
         ),
       ).toBeTruthy();
       expect(
-        within(desktopNav.getByRole('link', { name: 'Whiteboard' })).queryByLabelText(/active alert/),
+        within(desktopNav.getByRole('link', { name: 'Whiteboard' })).queryByLabelText(
+          /active alert/,
+        ),
       ).toBeNull();
     } finally {
       useEmergencyStore.setState({
@@ -280,17 +282,17 @@ describe('Sidebar unified navigation rendering', () => {
 
     fireEvent.click(toggle);
 
-    expect(screen.getByRole('button', { name: 'Expand sidebar' }).getAttribute('aria-pressed')).toBe(
-      'true',
-    );
+    expect(
+      screen.getByRole('button', { name: 'Expand sidebar' }).getAttribute('aria-pressed'),
+    ).toBe('true');
     expect(localStorage.getItem('caredroid-sidebar-collapsed')).toBe('true');
     expect(document.documentElement.dataset.sidebarCollapsed).toBe('true');
     first.unmount();
 
     renderSidebar('admin');
-    expect(screen.getByRole('button', { name: 'Expand sidebar' }).getAttribute('aria-pressed')).toBe(
-      'true',
-    );
+    expect(
+      screen.getByRole('button', { name: 'Expand sidebar' }).getAttribute('aria-pressed'),
+    ).toBe('true');
 
     localStorage.removeItem('caredroid-sidebar-collapsed');
     delete document.documentElement.dataset.sidebarCollapsed;

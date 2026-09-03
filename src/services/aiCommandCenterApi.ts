@@ -141,7 +141,7 @@ function buildExpertRows(costDashboard, evaluationDashboard, evaluationHonesty) 
     // arbitrary offset.
     const confidence = Math.max(
       70,
-      Math.min(99, accuracy + (expert.id === 'guidelines' ? retrieval - 88 : 0))
+      Math.min(99, accuracy + (expert.id === 'guidelines' ? retrieval - 88 : 0)),
     );
 
     return {
@@ -190,7 +190,7 @@ function buildToolUsage(costDashboard, evaluationDashboard) {
     successRate: evaluationDashboard.aggregateMetrics?.toolExecutionSuccess || 0,
     successLabel: formatCommandMetric(
       'toolExecutionSuccess',
-      evaluationDashboard.aggregateMetrics?.toolExecutionSuccess
+      evaluationDashboard.aggregateMetrics?.toolExecutionSuccess,
     ),
   };
 }
@@ -201,12 +201,12 @@ function buildToolCalls(costDashboard) {
   const generatedAt = costDashboard.generatedAt || new Date().toISOString();
 
   return Object.entries(routeCounts)
-    .sort(([, a], [, b]) => Number(b as any || 0) - Number(a as any || 0))
+    .sort(([, a], [, b]) => Number((b as any) || 0) - Number((a as any) || 0))
     .map(([route, count], index) => {
       const complexity =
-        Object.entries(complexityCounts).sort(([, a], [, b]) => Number(b as any || 0) - Number(a as any || 0))[
-          index
-        ]?.[0] || 'mixed';
+        Object.entries(complexityCounts).sort(
+          ([, a], [, b]) => Number((b as any) || 0) - Number((a as any) || 0),
+        )[index]?.[0] || 'mixed';
       return {
         id: `tool-call-${route}`,
         route,
@@ -293,7 +293,7 @@ export async function fetchAiCommandCenterSnapshot() {
   const metrics =
     evaluationDashboard.aggregateMetrics || LOCAL_EVALUATION_DASHBOARD.aggregateMetrics;
   const failedBenchmarks = (evaluationDashboard.benchmarks || []).filter(
-    (benchmark) => !benchmark.passed
+    (benchmark) => !benchmark.passed,
   );
   const warnings = buildWarnings([
     evaluationResult,
@@ -365,7 +365,7 @@ export async function fetchAiCommandCenterSnapshot() {
       groundedAnswers: Math.max(
         0,
         sumCounts(costDashboard.routeCounts) -
-          Number(costDashboard.routeCounts?.lightweight_model || 0)
+          Number(costDashboard.routeCounts?.lightweight_model || 0),
       ),
     },
     memoryUsage: buildMemoryUsage(memoryDashboard),

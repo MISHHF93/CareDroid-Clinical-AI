@@ -11,7 +11,8 @@ export const chatAndAiCapabilities = [
     id: 'chat-message',
     name: 'Clinical chat (RAG + tools)',
     category: 'ai',
-    description: 'POST /api/chat/message — intent routing, emergency detection, tool execution, citations.',
+    description:
+      'POST /api/chat/message — intent routing, emergency detection, tool execution, citations.',
     path: '/assistant',
     chatSeed: null,
     apiPath: 'POST /api/chat/message',
@@ -20,7 +21,8 @@ export const chatAndAiCapabilities = [
     id: 'chat-intent-classify',
     name: 'Intent classifier (NLU)',
     category: 'ai',
-    description: 'POST /api/chat/intent-classify — maps messages to clinical tools and emergencies.',
+    description:
+      'POST /api/chat/intent-classify — maps messages to clinical tools and emergencies.',
     path: '/assistant',
     chatSeed: 'Classify this clinical question and suggest the best tool: ',
     apiPath: 'POST /api/chat/intent-classify',
@@ -31,7 +33,8 @@ export const chatAndAiCapabilities = [
     category: 'ai',
     description: 'POST /api/chat/analyze-vitals — interpret vital sign sets.',
     path: '/assistant',
-    chatSeed: 'Analyze these vitals and flag abnormalities: HR 110, BP 88/52, RR 24, SpO2 91%, temp 38.9°C',
+    chatSeed:
+      'Analyze these vitals and flag abnormalities: HR 110, BP 88/52, RR 24, SpO2 91%, temp 38.9°C',
     apiPath: 'POST /api/chat/analyze-vitals',
   },
   {
@@ -78,7 +81,8 @@ export const clinicalDataApis = [
     id: 'drugs-api',
     name: 'Drug reference database',
     category: 'data',
-    description: 'GET/POST /api/drugs — medication reference records (separate from interaction checker).',
+    description:
+      'GET/POST /api/drugs — medication reference records (separate from interaction checker).',
     path: '/tools/drug-checker',
     chatSeed: 'Look up dosing and reference information for metformin.',
     apiPath: 'GET /api/drugs',

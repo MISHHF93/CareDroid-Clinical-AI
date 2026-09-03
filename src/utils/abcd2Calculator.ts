@@ -153,7 +153,8 @@ export function interpretAbcd2Score(score) {
     high: 'Scores of 6–7 fall in the higher short-term stroke-risk stratum in validation studies. Urgent stroke evaluation pathways may already be indicated by presentation — this score does not replace them.',
   };
 
-  const severity = riskCategory === 'high' ? 'critical' : riskCategory === 'moderate' ? 'warning' : 'normal';
+  const severity =
+    riskCategory === 'high' ? 'critical' : riskCategory === 'moderate' ? 'warning' : 'normal';
 
   return {
     severity,

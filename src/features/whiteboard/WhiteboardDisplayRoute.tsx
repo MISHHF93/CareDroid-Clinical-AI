@@ -78,19 +78,8 @@ export default function WhiteboardDisplayRoute() {
   });
 
   if (view === 'operational') {
-    return (
-      <Navigate
-        to={`${CANONICAL_ROUTES.emergencyWhiteboard}?display=readonly`}
-        replace
-      />
-    );
+    return <Navigate to={`${CANONICAL_ROUTES.emergencyWhiteboard}?display=readonly`} replace />;
   }
 
-  return (
-    <PublicWaitingDisplay
-      kioskMode
-      snapshot={stableSnapshot}
-      refreshStatus={refreshStatus}
-    />
-  );
+  return <PublicWaitingDisplay kioskMode snapshot={stableSnapshot} refreshStatus={refreshStatus} />;
 }

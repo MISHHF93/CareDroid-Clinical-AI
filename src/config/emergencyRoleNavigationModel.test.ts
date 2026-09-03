@@ -68,9 +68,11 @@ describe('emergencyRoleNavigationModel', () => {
         role: roleKey === 'publicDisplay' ? 'public display' : roleKey,
       });
       expect(route).toContain(expectation.routeIncludes);
-      expect(resolveRoleLandingScreenMode({ role: roleKey === 'publicDisplay' ? 'public display' : roleKey })).toBe(
-        expectation.screenMode,
-      );
+      expect(
+        resolveRoleLandingScreenMode({
+          role: roleKey === 'publicDisplay' ? 'public display' : roleKey,
+        }),
+      ).toBe(expectation.screenMode);
     }
   });
 });

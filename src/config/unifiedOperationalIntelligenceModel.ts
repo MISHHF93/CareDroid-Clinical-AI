@@ -215,12 +215,18 @@ export function listUnifiedOperationalIntelligenceBackendEndpoints(): readonly s
   ]);
 }
 
-export function resolveDomainForAnomalyCategory(category: string): UnifiedOperationalIntelligenceDomain {
+export function resolveDomainForAnomalyCategory(
+  category: string,
+): UnifiedOperationalIntelligenceDomain {
   const normalized = category.toLowerCase();
   if (normalized.includes('capacity') || normalized.includes('boarding')) return 'capacity';
   if (normalized.includes('staff') || normalized.includes('routing')) return 'staffing';
   if (normalized.includes('alert')) return 'alerts';
-  if (normalized.includes('service') || normalized.includes('sync') || normalized.includes('health')) {
+  if (
+    normalized.includes('service') ||
+    normalized.includes('sync') ||
+    normalized.includes('health')
+  ) {
     return 'service_health';
   }
   if (normalized.includes('workflow') || normalized.includes('automation')) return 'workflow';

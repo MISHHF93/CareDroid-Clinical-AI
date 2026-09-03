@@ -53,9 +53,9 @@ describe('emergencyDeviceContextModel', () => {
     expect(resolveDeviceContextScreenMode(EMERGENCY_DEVICE_CONTEXT_IDS.wallDisplay)).toBe(
       CARE_DROID_SCREEN_MODES.readOnlyWhiteboard,
     );
-    expect(resolveDeviceContextLandingRoute(EMERGENCY_DEVICE_CONTEXT_IDS.publicWaitingDisplay)).toContain(
-      'display=waiting-room',
-    );
+    expect(
+      resolveDeviceContextLandingRoute(EMERGENCY_DEVICE_CONTEXT_IDS.publicWaitingDisplay),
+    ).toContain('display=waiting-room');
     expect(resolveDeviceContextLandingRoute(EMERGENCY_DEVICE_CONTEXT_IDS.managerLaptop)).toBe(
       CANONICAL_ROUTES.emergencyCommandCenter,
     );

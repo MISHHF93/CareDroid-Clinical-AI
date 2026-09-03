@@ -1,8 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  pendingReminderCountForStaff,
-  reminderStage,
-} from './reassessmentScheduler';
+import { pendingReminderCountForStaff, reminderStage } from './reassessmentScheduler';
 
 describe('reassessmentScheduler', () => {
   it('classifies reminder stages by due time', () => {
@@ -15,8 +12,8 @@ describe('reassessmentScheduler', () => {
           dueAt: '2026-06-11T14:45:00.000Z',
           status: 'pending',
         },
-        now
-      )
+        now,
+      ),
     ).toBe('upcoming');
     expect(
       reminderStage(
@@ -25,8 +22,8 @@ describe('reassessmentScheduler', () => {
           dueAt: '2026-06-11T14:42:00.000Z',
           status: 'pending',
         },
-        now
-      )
+        now,
+      ),
     ).toBe('due');
     expect(
       reminderStage(
@@ -35,8 +32,8 @@ describe('reassessmentScheduler', () => {
           dueAt: '2026-06-11T14:30:00.000Z',
           status: 'pending',
         },
-        now
-      )
+        now,
+      ),
     ).toBe('overdue');
   });
 

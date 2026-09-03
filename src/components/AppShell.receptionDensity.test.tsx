@@ -20,9 +20,7 @@ describe('AppShell reception density', () => {
     expect(shellSource).toMatch(
       /!useKioskShell && !isReceptionSimpleDensity \? <HospitalJourneyCommandBar/,
     );
-    expect(shellSource).toMatch(
-      /!useKioskShell && !isReceptionSimpleDensity \? <SessionChromeBar/,
-    );
+    expect(shellSource).toMatch(/!useKioskShell && !isReceptionSimpleDensity \? <SessionChromeBar/);
   });
 
   it('uses Medical Light page surface tokens in shell CSS', () => {

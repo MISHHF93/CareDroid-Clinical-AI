@@ -49,8 +49,8 @@ export default function OcrCapturePanel({
       <header>
         <h3 id="ocr-capture-panel-title">Document capture &amp; OCR</h3>
         <p>
-          Photograph or upload a document. CareDroid extracts fields for staff review before anything is
-          saved to the chart.
+          Photograph or upload a document. CareDroid extracts fields for staff review before
+          anything is saved to the chart.
           {selectedArtifactLabel ? ` Capturing: ${selectedArtifactLabel}.` : ''}
         </p>
         {jobStatus ? (
@@ -68,7 +68,10 @@ export default function OcrCapturePanel({
 
       {isFailedJob ? (
         <div className="ocr-capture-panel__failed-fallback" role="alert">
-          <p>Document processing failed for this upload. Continue with manual entry — the paste field below still works.</p>
+          <p>
+            Document processing failed for this upload. Continue with manual entry — the paste field
+            below still works.
+          </p>
         </div>
       ) : null}
 
@@ -174,7 +177,11 @@ export default function OcrCapturePanel({
         </section>
       ) : null}
 
-      {uploadStatus ? <p className="ocr-capture-panel__status" role="status">{uploadStatus}</p> : null}
+      {uploadStatus ? (
+        <p className="ocr-capture-panel__status" role="status">
+          {uploadStatus}
+        </p>
+      ) : null}
     </section>
   );
 }

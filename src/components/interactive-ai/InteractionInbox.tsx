@@ -85,7 +85,11 @@ export function InteractionInbox({
   function submitComment(item: InteractionInboxItem) {
     const body = commentDraft.trim();
     if (!body) return;
-    addInboxComment(item.id, { authorUserId: ownerUserId, authorRole: ownerRole || 'unknown', body });
+    addInboxComment(item.id, {
+      authorUserId: ownerUserId,
+      authorRole: ownerRole || 'unknown',
+      body,
+    });
     setCommentDraft('');
     setCollabTick((n) => n + 1);
   }
@@ -133,7 +137,8 @@ export function InteractionInbox({
         <ul className="cd-iaw-inbox__list">
           {items.map((item) => {
             const isExpanded = expandedItemId === item.id;
-            const assignedToMe = Boolean(item.assignedToUserId) && item.assignedToUserId === ownerUserId;
+            const assignedToMe =
+              Boolean(item.assignedToUserId) && item.assignedToUserId === ownerUserId;
             return (
               <li key={item.id}>
                 <button
@@ -215,7 +220,11 @@ export function InteractionInbox({
                         aria-label={`Comment on ${item.title}`}
                         data-testid="inbox-item-comment-input"
                       />
-                      <button type="submit" disabled={!commentDraft.trim()} data-testid="inbox-item-comment-submit">
+                      <button
+                        type="submit"
+                        disabled={!commentDraft.trim()}
+                        data-testid="inbox-item-comment-submit"
+                      >
                         Add comment
                       </button>
                     </form>

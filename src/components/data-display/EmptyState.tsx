@@ -11,11 +11,24 @@ type EmptyStateProps = {
   className?: string;
 } & React.HTMLAttributes<HTMLDivElement>;
 
-export function EmptyState({ icon, title, description, action, className, ...props }: EmptyStateProps) {
+export function EmptyState({
+  icon,
+  title,
+  description,
+  action,
+  className,
+  ...props
+}: EmptyStateProps) {
   const graphic = icon ?? <CdlEmptyIllustration variant={resolveEmptyStateGraphic(title)} />;
   return (
-    <div role="status" className={['cd-empty', 'cd-empty--graphic', className ?? ''].filter(Boolean).join(' ')} {...props}>
-      <span className="cd-empty__icon" aria-hidden="true">{graphic}</span>
+    <div
+      role="status"
+      className={['cd-empty', 'cd-empty--graphic', className ?? ''].filter(Boolean).join(' ')}
+      {...props}
+    >
+      <span className="cd-empty__icon" aria-hidden="true">
+        {graphic}
+      </span>
       <p className="cd-empty__title">{title}</p>
       {description && <p className="cd-empty__description">{description}</p>}
       {action && <div className="cd-empty__action">{action}</div>}

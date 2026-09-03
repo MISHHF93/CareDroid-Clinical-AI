@@ -24,7 +24,8 @@ export function PatientFlowStatusPanel({
   variant = 'card',
   className = '',
 }: PatientFlowStatusPanelProps) {
-  const { snapshot, patientSnapshot, detections, aiRecommendations } = useContinuousPatientFlow(patientId);
+  const { snapshot, patientSnapshot, detections, aiRecommendations } =
+    useContinuousPatientFlow(patientId);
 
   if (!snapshot) {
     return (
@@ -87,8 +88,8 @@ export function PatientFlowStatusPanel({
         <div>
           <strong>Continuous patient flow</strong>
           <p className="patient-flow-status__lead">
-            {snapshot.metrics.trackedPatients} patients tracked · {snapshot.metrics.activeDetections}{' '}
-            active signals
+            {snapshot.metrics.trackedPatients} patients tracked ·{' '}
+            {snapshot.metrics.activeDetections} active signals
           </p>
         </div>
         <Link to={CANONICAL_ROUTES.emergencyQueues} className="patient-flow-status__link">
@@ -105,7 +106,10 @@ export function PatientFlowStatusPanel({
       {topDetections.length > 0 ? (
         <ul className="patient-flow-status__list">
           {topDetections.map((detection) => (
-            <li key={detection.id} className={`patient-flow-status__row patient-flow-status__row--${detection.severity}`}>
+            <li
+              key={detection.id}
+              className={`patient-flow-status__row patient-flow-status__row--${detection.severity}`}
+            >
               <div>
                 <strong>{detection.title}</strong>
                 <p>{detection.message}</p>

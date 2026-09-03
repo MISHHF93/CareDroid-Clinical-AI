@@ -46,7 +46,7 @@ describe('auth canonical flow wiring', () => {
     expect(appSource).toMatch(/<RequireRealSession>\s*<AppShell>/);
   });
 
-  it('recognizes AuthPage.tsx\'s explicit dev-bypass marker, not the ambient auto-bootstrap authMode (HEAL-347.16)', () => {
+  it("recognizes AuthPage.tsx's explicit dev-bypass marker, not the ambient auto-bootstrap authMode (HEAL-347.16)", () => {
     // UserContext.tsx's OWN background bootstrap effect already establishes
     // a 'local-dev-demo' session automatically on every app mount in dev
     // mode, regardless of whether anyone ever clicked the bypass button --
@@ -56,7 +56,9 @@ describe('auth canonical flow wiring', () => {
     // for 'explicit-dev-bypass' specifically -- the marker only
     // AuthPage.tsx's button handler ever stamps -- not 'local-dev-demo'.
     expect(appSource).toContain("authMode === 'explicit-dev-bypass'");
-    expect(appSource).not.toMatch(/isDevBypassSession\s*=\s*isDev\s*&&\s*\(?authMode\s*===\s*'local-dev-demo'/);
+    expect(appSource).not.toMatch(
+      /isDevBypassSession\s*=\s*isDev\s*&&\s*\(?authMode\s*===\s*'local-dev-demo'/,
+    );
   });
 
   it('keeps CareDroid routes inside the AppShell while UserProvider supplies platform access', () => {

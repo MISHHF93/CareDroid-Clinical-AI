@@ -12,12 +12,7 @@ const mockEmergencyRole = vi.hoisted(() => {
       name: 'Route Harness Physician',
       email: 'route.harness@example.com',
     },
-    routeAccess: [
-      '/emergency/whiteboard',
-      '/emergency/reception',
-      '/emergency/ems',
-      '/settings',
-    ],
+    routeAccess: ['/emergency/whiteboard', '/emergency/reception', '/emergency/ems', '/settings'],
     readOnly: false,
     role: { hospitalRole: 'physician' },
   };

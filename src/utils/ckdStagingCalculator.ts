@@ -63,13 +63,7 @@ export function computeCkdEpi2021Egfr(ageYears, sex, serumCreatinineMgDl) {
   const isFemale = sex === 'female';
   const kappa = isFemale ? 0.7 : 0.9;
   const ratio = serumCreatinineMgDl / kappa;
-  const alpha = isFemale
-    ? ratio <= 1
-      ? -0.241
-      : -1.2
-    : ratio <= 1
-      ? -0.302
-      : -1.2;
+  const alpha = isFemale ? (ratio <= 1 ? -0.241 : -1.2) : ratio <= 1 ? -0.302 : -1.2;
   const sexFactor = isFemale ? 1.012 : 1;
   const egfr =
     142 *
@@ -213,7 +207,11 @@ export function validateCkdStagingInputs(raw) {
   if (creatinineUnit === 'mg_dl' && Number.isFinite(scrMgDl) && (scrMgDl < 0.2 || scrMgDl > 25)) {
     errors.push('Serum creatinine should be between 0.2 and 25 mg/dL.');
   }
-  if (creatinineUnit === 'umol_l' && Number.isFinite(serumCreatinine) && (serumCreatinine < 20 || serumCreatinine > 2200)) {
+  if (
+    creatinineUnit === 'umol_l' &&
+    Number.isFinite(serumCreatinine) &&
+    (serumCreatinine < 20 || serumCreatinine > 2200)
+  ) {
     errors.push('Serum creatinine should be between 20 and 2200 µmol/L.');
   }
 
@@ -289,11 +287,15 @@ export function computeCkdStagingResult(raw) {
   const v = validateCkdStagingInputs(raw);
   if (!v.valid) return { ok: false as const, errors: v.errors };
 
-  const { ageYears, sex, serumCreatinineMgDl, urineAcrMgG, creatinineUnit, acrUnit } = v.inputs as any;
+  const { ageYears, sex, serumCreatinineMgDl, urineAcrMgG, creatinineUnit, acrUnit } =
+    v.inputs as any;
   const egfrMlMin = computeCkdEpi2021Egfr(ageYears, sex, serumCreatinineMgDl);
   const gfr = classifyGfrCategory(egfrMlMin);
   const albuminuria = classifyAlbuminuria(urineAcrMgG);
-  const prognosticRisk = combineCkdPrognosticRisk((gfr as any).category, (albuminuria as any).category);
+  const prognosticRisk = combineCkdPrognosticRisk(
+    (gfr as any).category,
+    (albuminuria as any).category,
+  );
   const interp = interpretCkdStaging(egfrMlMin, gfr, albuminuria, prognosticRisk);
 
   return {

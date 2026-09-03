@@ -2,10 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import PatientSummaryAi from './PatientSummaryAi';
-import {
-  mockConversationValue,
-  mockToolPreferencesValue,
-} from '../../test/testRenderUtils';
+import { mockConversationValue, mockToolPreferencesValue } from '../../test/testRenderUtils';
 import { generatePatientSummaryAi } from '../../services/clinicalIntelligenceApi';
 
 vi.mock('./ToolPageLayout.css', () => ({}));
@@ -74,7 +71,14 @@ describe('PatientSummaryAi', () => {
         ],
         explainability: {
           method: 'Structured extraction from submitted chart text.',
-          inputsUsed: ['patientContext', 'problems', 'medications', 'labs', 'alerts', 'riskFactors'],
+          inputsUsed: [
+            'patientContext',
+            'problems',
+            'medications',
+            'labs',
+            'alerts',
+            'riskFactors',
+          ],
           limitations: ['Requires clinician review.'],
         },
         safety: {

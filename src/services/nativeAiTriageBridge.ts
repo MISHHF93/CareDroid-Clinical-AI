@@ -40,11 +40,12 @@ export function enrichTriageAssistWithNativeAi(
       : null,
   ].filter(Boolean) as string[];
 
-  const suggestedPriority = moreUrgentPriority(envelope.suggestedPriority, inference.suggestedPriority);
+  const suggestedPriority = moreUrgentPriority(
+    envelope.suggestedPriority,
+    inference.suggestedPriority,
+  );
   const confidence =
-    inference.confidence >= 0.8 || inference.matchedRules.length > 0
-      ? 'high'
-      : envelope.confidence;
+    inference.confidence >= 0.8 || inference.matchedRules.length > 0 ? 'high' : envelope.confidence;
 
   return {
     ...envelope,

@@ -135,7 +135,8 @@ export function interpretBradenScore(score) {
       riskCategoryLabel: 'Mild pressure-injury risk',
       label: 'Mild pressure-injury risk',
       riskBand: '15–16',
-      interpretation: 'Mild risk stratum — continue standard prevention documentation and reassessment.',
+      interpretation:
+        'Mild risk stratum — continue standard prevention documentation and reassessment.',
       disclaimer,
       referenceLine,
     };
@@ -147,7 +148,8 @@ export function interpretBradenScore(score) {
     riskCategoryLabel: 'Lower pressure-injury risk',
     label: 'Lower pressure-injury risk',
     riskBand: '17–23',
-    interpretation: 'Lower risk stratum — maintain routine prevention and reassess with clinical status changes.',
+    interpretation:
+      'Lower risk stratum — maintain routine prevention and reassess with clinical status changes.',
     disclaimer,
     referenceLine,
   };

@@ -27,7 +27,9 @@ export function ProductIntelligenceLayerPage() {
         <div className="commercial-page__title-row">
           <GraphicIconBadge iconKey="chart-bar" accent="brand" size="md" />
           <div>
-            <p className="commercial-page-title-text" data-testid="cd-page-title-text">Product Intelligence</p>
+            <p className="commercial-page-title-text" data-testid="cd-page-title-text">
+              Product Intelligence
+            </p>
             <p>Product → pack → asset value chains with adoption, engagement, outcomes, and ROI.</p>
           </div>
         </div>
@@ -44,10 +46,29 @@ export function ProductIntelligenceLayerPage() {
         details="Demo product layer with adoption, engagement, outcome, and ROI scoring across emergency, operations, and governance suites."
       />
 
-      <div className="commercial-page__metrics" role="group" aria-label="Product intelligence summary metrics">
-        <MetricCard label="Products" value={String(layer.summary.productCount)} hint="Tracked solutions" tone="neutral" />
-        <MetricCard label="Avg health" value={String(layer.summary.averageHealth)} hint="Composite score" tone="good" />
-        <MetricCard label="Avg ROI" value={String(layer.summary.averageRoi)} hint="Value score" tone="good" />
+      <div
+        className="commercial-page__metrics"
+        role="group"
+        aria-label="Product intelligence summary metrics"
+      >
+        <MetricCard
+          label="Products"
+          value={String(layer.summary.productCount)}
+          hint="Tracked solutions"
+          tone="neutral"
+        />
+        <MetricCard
+          label="Avg health"
+          value={String(layer.summary.averageHealth)}
+          hint="Composite score"
+          tone="good"
+        />
+        <MetricCard
+          label="Avg ROI"
+          value={String(layer.summary.averageRoi)}
+          hint="Value score"
+          tone="good"
+        />
         <MetricCard
           label="Est. value"
           value={`$${(layer.summary.totalEstimatedValue / 1000).toFixed(0)}k`}
@@ -57,11 +78,29 @@ export function ProductIntelligenceLayerPage() {
       </div>
 
       <div className="commercial-page__charts">
-        <VisualizationPanel title="Product health" description="Adoption, engagement, outcomes, and ROI composite." badge="Health">
-          <CategoryBarChart data={healthChart} title="Product health" color="var(--app-chart-1)" emptyMessage="Health chart appears when products are registered." />
+        <VisualizationPanel
+          title="Product health"
+          description="Adoption, engagement, outcomes, and ROI composite."
+          badge="Health"
+        >
+          <CategoryBarChart
+            data={healthChart}
+            title="Product health"
+            color="var(--app-chart-1)"
+            emptyMessage="Health chart appears when products are registered."
+          />
         </VisualizationPanel>
-        <VisualizationPanel title="Adoption scores" description="Pack activation, asset coverage, and department spread." badge="Adoption">
-          <CategoryBarChart data={adoptionChart} title="Adoption scores" color="var(--app-chart-4)" emptyMessage="Adoption chart appears when products are registered." />
+        <VisualizationPanel
+          title="Adoption scores"
+          description="Pack activation, asset coverage, and department spread."
+          badge="Adoption"
+        >
+          <CategoryBarChart
+            data={adoptionChart}
+            title="Adoption scores"
+            color="var(--app-chart-4)"
+            emptyMessage="Adoption chart appears when products are registered."
+          />
         </VisualizationPanel>
       </div>
 
@@ -72,7 +111,9 @@ export function ProductIntelligenceLayerPage() {
               <h2>{product.name}</h2>
               <p>{product.packs.join(' · ')}</p>
             </div>
-            <span className={`commercial-page__pill commercial-page__pill--${productHealthTone(product.health.band.id)}`}>
+            <span
+              className={`commercial-page__pill commercial-page__pill--${productHealthTone(product.health.band.id)}`}
+            >
               {product.health.band.label} · {product.health.score}
             </span>
           </div>

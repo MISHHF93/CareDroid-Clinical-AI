@@ -47,8 +47,8 @@ export default function TimelineAi({ embedded = false, onCloseEmbedded }: any = 
   const updateEncounter = (index, key, value) => {
     setEncounters((current) =>
       current.map((encounter, encounterIndex) =>
-        encounterIndex === index ? { ...encounter, [key]: value } : encounter
-      )
+        encounterIndex === index ? { ...encounter, [key]: value } : encounter,
+      ),
     );
   };
 
@@ -102,8 +102,9 @@ export default function TimelineAi({ embedded = false, onCloseEmbedded }: any = 
         <section className="simple-tool-result-panel" role="note">
           <h2>Clinical Timeline Scope</h2>
           <p>
-            Timeline AI summarizes submitted encounter text, highlights potential trends, and flags abnormal
-            progression for clinician review. It does not modify the chart or replace source record review.
+            Timeline AI summarizes submitted encounter text, highlights potential trends, and flags
+            abnormal progression for clinician review. It does not modify the chart or replace
+            source record review.
           </p>
         </section>
 
@@ -156,7 +157,9 @@ export default function TimelineAi({ embedded = false, onCloseEmbedded }: any = 
                       id={`timeline-type-${index}`}
                       className="diagnosis-field"
                       value={encounter.encounterType}
-                      onChange={(event) => updateEncounter(index, 'encounterType', event.target.value)}
+                      onChange={(event) =>
+                        updateEncounter(index, 'encounterType', event.target.value)
+                      }
                       placeholder="ED, clinic, admission"
                     />
                   </div>
@@ -212,7 +215,11 @@ export default function TimelineAi({ embedded = false, onCloseEmbedded }: any = 
                 </div>
 
                 {encounters.length > 1 ? (
-                  <button type="button" className="btn-diagnosis-secondary" onClick={() => removeEncounter(index)}>
+                  <button
+                    type="button"
+                    className="btn-diagnosis-secondary"
+                    onClick={() => removeEncounter(index)}
+                  >
                     Remove encounter
                   </button>
                 ) : null}
@@ -223,20 +230,30 @@ export default function TimelineAi({ embedded = false, onCloseEmbedded }: any = 
               <button type="button" className="btn-diagnosis-secondary" onClick={addEncounter}>
                 Add encounter
               </button>
-              <button type="button" className="diagnosis-primary-btn" onClick={handleGenerate} disabled={loading}>
+              <button
+                type="button"
+                className="diagnosis-primary-btn"
+                onClick={handleGenerate}
+                disabled={loading}
+              >
                 {loading ? 'Building timeline...' : 'Generate timeline'}
               </button>
             </div>
           </section>
 
-          <section className="diagnosis-panel diagnosis-panel--scroll" aria-labelledby="timeline-output-heading">
+          <section
+            className="diagnosis-panel diagnosis-panel--scroll"
+            aria-labelledby="timeline-output-heading"
+          >
             <h2 id="timeline-output-heading">Timeline Review</h2>
             <ApiStateBanner error={error} onRetry={handleGenerate} />
 
             {loading ? (
               <div className="tool-loading-state" aria-busy="true">
                 <div className="simple-tool-spinner diagnosis-spinner" />
-                <p className="tool-loading-state__message">Summarizing encounters and detecting trends...</p>
+                <p className="tool-loading-state__message">
+                  Summarizing encounters and detecting trends...
+                </p>
               </div>
             ) : result ? (
               <div className="diagnosis-results-body">
@@ -277,7 +294,8 @@ export default function TimelineAi({ embedded = false, onCloseEmbedded }: any = 
                     <ul>
                       {result.trends.map((trend) => (
                         <li key={trend.id}>
-                          <strong>{trend.label}</strong>: {trend.direction} ({trend.evidence.join('; ')})
+                          <strong>{trend.label}</strong>: {trend.direction} (
+                          {trend.evidence.join('; ')})
                         </li>
                       ))}
                     </ul>
@@ -307,7 +325,8 @@ export default function TimelineAi({ embedded = false, onCloseEmbedded }: any = 
                     <strong>Method:</strong> {result.explainability?.method}
                   </p>
                   <p>
-                    <strong>Inputs used:</strong> {(result.explainability?.inputsUsed || []).join(', ')}
+                    <strong>Inputs used:</strong>{' '}
+                    {(result.explainability?.inputsUsed || []).join(', ')}
                   </p>
                   <ul>
                     {(result.safety?.warnings || []).map((warning) => (
@@ -318,7 +337,8 @@ export default function TimelineAi({ embedded = false, onCloseEmbedded }: any = 
               </div>
             ) : (
               <div className="tool-empty-state">
-                Add encounters to render a responsive patient timeline with trends and abnormal progression.
+                Add encounters to render a responsive patient timeline with trends and abnormal
+                progression.
               </div>
             )}
           </section>

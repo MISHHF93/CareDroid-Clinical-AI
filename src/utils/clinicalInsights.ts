@@ -73,7 +73,10 @@ export const buildClinicalInsights = (tool, results) => {
   if (tool?.id === 'lab-interpreter' || tool?.id === 'lab-interp') {
     insights.summary = 'Lab interpretation insights generated.';
     if (criticalValues.length > 0) {
-      pushUnique(insights.recommendations, 'Confirm critical values and evaluate urgent interventions.');
+      pushUnique(
+        insights.recommendations,
+        'Confirm critical values and evaluate urgent interventions.',
+      );
     }
     if (results.interpretations?.length) {
       results.interpretations.forEach((interpretation) => {

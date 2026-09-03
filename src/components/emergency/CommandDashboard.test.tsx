@@ -118,7 +118,9 @@ describe('CommandDashboard', () => {
     expect(screen.getByRole('heading', { name: /bed occupancy by zone/i })).toBeInTheDocument();
     expect(screen.getAllByText(/Resus/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Green|Amber|Red/i).length).toBeGreaterThan(0);
-    expect(screen.getByRole('region', { name: /on-duty departmental staff overview/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('region', { name: /on-duty departmental staff overview/i }),
+    ).toBeInTheDocument();
     expect(screen.getByText('Owen Clarke')).toBeInTheDocument();
   });
 
@@ -156,7 +158,9 @@ describe('CommandDashboard', () => {
       </MemoryRouter>,
     );
 
-    expect(screen.getByRole('region', { name: /ai decision support recommendations/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('region', { name: /ai decision support recommendations/i }),
+    ).toBeInTheDocument();
     expect(screen.getByText(/82% confidence/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /accept/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /modify/i })).toBeInTheDocument();
@@ -284,7 +288,9 @@ describe('CommandDashboard', () => {
     );
 
     expect(screen.queryByText(/Sam Lee/)).not.toBeInTheDocument();
-    expect(screen.getByText(/Patient-specific details are hidden for this role/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Patient-specific details are hidden for this role/),
+    ).toBeInTheDocument();
     expect(screen.getAllByText('Patient').length).toBeGreaterThanOrEqual(3);
   });
 });

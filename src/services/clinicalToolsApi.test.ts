@@ -126,7 +126,10 @@ describe('clinicalToolsApi', () => {
 
   it('fetches executor catalog and tool statistics through guarded clients', async () => {
     vi.mocked(apiFetch)
-      .mockResolvedValueOnce({ ok: true, _json: { registeredExecutorToolIds: ['sofa-calculator'] } } as any)
+      .mockResolvedValueOnce({
+        ok: true,
+        _json: { registeredExecutorToolIds: ['sofa-calculator'] },
+      } as any)
       .mockResolvedValueOnce({ ok: true, _json: { totalTools: 3 } } as any);
 
     await expect(fetchToolExecutorCatalog()).resolves.toMatchObject({
@@ -143,7 +146,9 @@ describe('clinicalToolsApi', () => {
   });
 
   it('does not call validation route when tool execution capability is disabled', async () => {
-    vi.mocked(isBackendCapabilityEnabled).mockImplementation((capability) => capability !== 'toolsExecute');
+    vi.mocked(isBackendCapabilityEnabled).mockImplementation(
+      (capability) => capability !== 'toolsExecute',
+    );
 
     const result = await validateClinicalTool('sofa-calculator', {});
     expect(result.ok).toBe(false);

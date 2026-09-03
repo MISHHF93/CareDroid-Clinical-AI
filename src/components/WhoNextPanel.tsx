@@ -94,7 +94,8 @@ export function getReasonFactors(patient: Patient, now: number): ReasonFactor[] 
   const waitMins = waitMinutes(patient, now);
   const priorityWeight = priorityScore[patient.priority] || 0;
 
-  if (priorityWeight > 0) factors.push({ label: `${patient.priority} priority`, weight: priorityWeight });
+  if (priorityWeight > 0)
+    factors.push({ label: `${patient.priority} priority`, weight: priorityWeight });
   if (waitMins > 45) {
     factors.push({
       label: `Wait ${displayWaitMinutes(patient, now)}min`,
@@ -120,7 +121,11 @@ export function getReasonFactors(patient: Patient, now: number): ReasonFactor[] 
   return factors.sort((a, b) => b.weight - a.weight);
 }
 
-export function hasSnoozeBreakingDeterioration(patient: Patient, snooze: SnoozedPatient, now: number): boolean {
+export function hasSnoozeBreakingDeterioration(
+  patient: Patient,
+  snooze: SnoozedPatient,
+  now: number,
+): boolean {
   const flagsAtSnooze = new Set(snooze.flagsAtSnooze);
   const hasNewCriticalFlag = CRITICAL_SNOOZE_FLAGS.some(
     (flag) => hasPatientFlag(patient, flag) && !flagsAtSnooze.has(flag),
@@ -128,7 +133,9 @@ export function hasSnoozeBreakingDeterioration(patient: Patient, snooze: Snoozed
   const scoreIncrease = scorePatient(patient, now) - snooze.scoreAtSnooze;
   const hasCriticalFlag = CRITICAL_SNOOZE_FLAGS.some((flag) => hasPatientFlag(patient, flag));
 
-  return hasNewCriticalFlag || (hasCriticalFlag && scoreIncrease >= WHO_NEXT_MATERIAL_SCORE_INCREASE);
+  return (
+    hasNewCriticalFlag || (hasCriticalFlag && scoreIncrease >= WHO_NEXT_MATERIAL_SCORE_INCREASE)
+  );
 }
 
 export function isSnoozeActive(patient: Patient, snooze: SnoozedPatient, now: number): boolean {
@@ -159,7 +166,9 @@ export function buildWhoNextRecommendation(
       patient,
       score: scorePatient(patient, now),
       waitMins: displayWaitMinutes(patient, now),
-      reasons: getReasonFactors(patient, now).slice(0, 2).map((factor) => factor.label),
+      reasons: getReasonFactors(patient, now)
+        .slice(0, 2)
+        .map((factor) => factor.label),
     }))
     .sort((a, b) => b.score - a.score);
 
@@ -229,7 +238,13 @@ export default function WhoNextPanel({ mode = 'detail' }: WhoNextPanelProps) {
     if (mode !== 'floating') return undefined;
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key.toLowerCase() !== 'w' || event.altKey || event.ctrlKey || event.metaKey || isTextEntryTarget(event.target)) {
+      if (
+        event.key.toLowerCase() !== 'w' ||
+        event.altKey ||
+        event.ctrlKey ||
+        event.metaKey ||
+        isTextEntryTarget(event.target)
+      ) {
         return;
       }
       event.preventDefault();
@@ -316,31 +331,35 @@ export default function WhoNextPanel({ mode = 'detail' }: WhoNextPanelProps) {
         <div className="wnp-header-row">
           <strong className="wnp-eyebrow">SEE NEXT</strong>
           <div className="wnp-header-actions">
-            {pinned ? (<button
-              type="button"
-              aria-pressed="true"
-              onClick={() => setPinned((current) => !current)}
-              style={{
-                ...buttonStyle,
-                background: pinned ? '#0284c7' : '#f0f9ff',
-                color: pinned ? MEDICAL_THEME.onAccent : MEDICAL_THEME.accent,
-                padding: '5px 8px',
-              }}
-            >
-              {pinned ? 'Pinned' : 'Pin'}
-            </button>) : (<button
-              type="button"
-              aria-pressed="false"
-              onClick={() => setPinned((current) => !current)}
-              style={{
-                ...buttonStyle,
-                background: pinned ? '#0284c7' : '#f0f9ff',
-                color: pinned ? MEDICAL_THEME.onAccent : MEDICAL_THEME.accent,
-                padding: '5px 8px',
-              }}
-            >
-              {pinned ? 'Pinned' : 'Pin'}
-            </button>)}
+            {pinned ? (
+              <button
+                type="button"
+                aria-pressed="true"
+                onClick={() => setPinned((current) => !current)}
+                style={{
+                  ...buttonStyle,
+                  background: pinned ? '#0284c7' : '#f0f9ff',
+                  color: pinned ? MEDICAL_THEME.onAccent : MEDICAL_THEME.accent,
+                  padding: '5px 8px',
+                }}
+              >
+                {pinned ? 'Pinned' : 'Pin'}
+              </button>
+            ) : (
+              <button
+                type="button"
+                aria-pressed="false"
+                onClick={() => setPinned((current) => !current)}
+                style={{
+                  ...buttonStyle,
+                  background: pinned ? '#0284c7' : '#f0f9ff',
+                  color: pinned ? MEDICAL_THEME.onAccent : MEDICAL_THEME.accent,
+                  padding: '5px 8px',
+                }}
+              >
+                {pinned ? 'Pinned' : 'Pin'}
+              </button>
+            )}
             <button
               type="button"
               aria-label="Close see next panel"
@@ -355,12 +374,11 @@ export default function WhoNextPanel({ mode = 'detail' }: WhoNextPanelProps) {
         {recommendation ? (
           <>
             <div className="wnp-patient-line">
-              {patientName(recommendation.patient)} · {patientLocation(recommendation.patient, rooms)} ·{' '}
+              {patientName(recommendation.patient)} ·{' '}
+              {patientLocation(recommendation.patient, rooms)} ·{' '}
               {truncate(recommendation.patient.chiefComplaint, 36)}
             </div>
-            <div className="wnp-detail-parts">
-              {recommendation.detailParts.join(' · ')}
-            </div>
+            <div className="wnp-detail-parts">{recommendation.detailParts.join(' · ')}</div>
             <div className="wnp-reason">
               {recommendation.reason || 'Assigned patient needs review'}
             </div>
@@ -373,7 +391,11 @@ export default function WhoNextPanel({ mode = 'detail' }: WhoNextPanelProps) {
                 Go to Patient
               </button>
               {recommendationNeedsReassessment ? (
-                <button type="button" onClick={openReassessment} className="wnp-btn wnp-btn--reassess">
+                <button
+                  type="button"
+                  onClick={openReassessment}
+                  className="wnp-btn wnp-btn--reassess"
+                >
                   Reassess now
                 </button>
               ) : (

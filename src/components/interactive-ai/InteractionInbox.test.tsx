@@ -1,7 +1,10 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { InteractionInbox } from './InteractionInbox';
-import { buildWorkflowAiCard, clearWorkflowAiCardsForTests } from '../../services/interactiveAi/workflowAiCards';
+import {
+  buildWorkflowAiCard,
+  clearWorkflowAiCardsForTests,
+} from '../../services/interactiveAi/workflowAiCards';
 import { clearInboxCollaborationForTests } from '../../services/interactiveAi/inboxCollaboration';
 
 // InteractionInbox's items now load asynchronously via the real

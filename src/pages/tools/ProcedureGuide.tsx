@@ -49,14 +49,22 @@ const ProcedureGuide = ({ embedded = false, onCloseEmbedded }: any = {}) => {
       }
       setResults(data.response || data.message || 'No procedure content returned.');
     } catch (err: any) {
-      setError(err.message || 'Unable to load procedure guide. Check your connection or try chat from the dashboard.');
+      setError(
+        err.message ||
+          'Unable to load procedure guide. Check your connection or try chat from the dashboard.',
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <ToolPageLayout tool={toolConfig} embedded={embedded} onCloseEmbedded={onCloseEmbedded} results={results}>
+    <ToolPageLayout
+      tool={toolConfig}
+      embedded={embedded}
+      onCloseEmbedded={onCloseEmbedded}
+      results={results}
+    >
       <div className="simple-tool-page-inner">
         <div className="tool-search-block">
           <input

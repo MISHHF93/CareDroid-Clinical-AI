@@ -3,7 +3,10 @@ import { useSearchParams } from 'react-router-dom';
 import { useProfileNavigate } from '../../hooks/useProfileNavigate';
 import { FileScan } from 'lucide-react';
 import { useEmergencyStore } from '../../store/emergencyStore';
-import { EMERGENCY_ACTIONS, prefersReceptionForPatientCreate } from '../../config/emergencyRolePermissions';
+import {
+  EMERGENCY_ACTIONS,
+  prefersReceptionForPatientCreate,
+} from '../../config/emergencyRolePermissions';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { isBackendCapabilityEnabled } from '../../config/backendApiCapabilities';
 import { SMART_INTAKE_DEMO } from '../../data/smartIntakeFixtures';
@@ -191,7 +194,9 @@ export default function SmartIntake({
   const [matchError, setMatchError] = useState('');
   const [ocrUploadStatus, setOcrUploadStatus] = useState('');
   const [isUploadingDocument, setIsUploadingDocument] = useState(false);
-  const [extractedFields, setExtractedFields] = useState(() => [...SMART_INTAKE_DEMO.extractedFields]);
+  const [extractedFields, setExtractedFields] = useState(() => [
+    ...SMART_INTAKE_DEMO.extractedFields,
+  ]);
   const [fieldDecisions, setFieldDecisions] = useState(() =>
     buildAutoApprovedFieldDecisions(SMART_INTAKE_DEMO.extractedFields as any[]),
   );
@@ -224,7 +229,10 @@ export default function SmartIntake({
   const canCreatePatient = createPatientPresentation.enabled;
 
   const boardPatient = useMemo(
-    () => (contextPatientId ? patients.find((candidate) => candidate.id === contextPatientId) || null : null),
+    () =>
+      contextPatientId
+        ? patients.find((candidate) => candidate.id === contextPatientId) || null
+        : null,
     [contextPatientId, patients],
   );
 
@@ -277,7 +285,9 @@ export default function SmartIntake({
         setMatchError('');
       })
       .catch((error) => {
-        setMatchError(`${formatApiRecoveryMessage(error, 'duplicate search')} ${ERROR_RECOVERY_COPY.matchFailed}`);
+        setMatchError(
+          `${formatApiRecoveryMessage(error, 'duplicate search')} ${ERROR_RECOVERY_COPY.matchFailed}`,
+        );
       });
   }, [sessionReady, sessionId, canVerifyIntake, emergencyRole.roleLabel]);
 
@@ -390,7 +400,14 @@ export default function SmartIntake({
         emergencyRole.roleLabel,
       ).catch(() => undefined);
     }
-  }, [fromReception, intakeMode, intakeEmsArrivalId, sessionReady, sessionId, emergencyRole.roleLabel]);
+  }, [
+    fromReception,
+    intakeMode,
+    intakeEmsArrivalId,
+    sessionReady,
+    sessionId,
+    emergencyRole.roleLabel,
+  ]);
 
   const sessionBootstrapped = useRef(false);
   const shouldAutostartSession =
@@ -465,7 +482,10 @@ export default function SmartIntake({
   // `else`/fallback branch below, which never reached this clearing logic
   // before — the original 2026-08-07 fix only patched a branch that is
   // presently unreachable.
-  const clearDemoIdentitySeed = (resolvedSessionId: string | null, { fetchAuditLog = true } = {}) => {
+  const clearDemoIdentitySeed = (
+    resolvedSessionId: string | null,
+    { fetchAuditLog = true } = {},
+  ) => {
     // A real session has none of the demo fixture's canned audit events —
     // replace the seed with the session's real (initially near-empty) audit
     // trail instead of showing fabricated history that never happened.
@@ -548,7 +568,10 @@ export default function SmartIntake({
     // the decision locally either. Track it the same way document-upload
     // events already are, so the audit log a reviewer sees actually
     // reflects what staff did to each field.
-    setIdentityAuditLog((current) => [...current, `${field} ${nextStatus} by ${emergencyRole.roleLabel}`]);
+    setIdentityAuditLog((current) => [
+      ...current,
+      `${field} ${nextStatus} by ${emergencyRole.roleLabel}`,
+    ]);
     if (isBackendCapabilityEnabled('emergencySmartIntakeIdentitySession') && sessionReady) {
       const apiDecision =
         decision === 'edited' ? 'edited' : decision === 'approved' ? 'approved' : 'rejected';
@@ -562,10 +585,15 @@ export default function SmartIntake({
     }
 
     if (ocrJobId && isBackendCapabilityEnabled('emergencyOcrIntake')) {
-      const ocrDecision = decision === 'edited' ? 'edited' : decision === 'approved' ? 'accepted' : 'rejected';
-      void OcrIntakeApi.reviewField(ocrJobId, field, ocrDecision, undefined, emergencyRole.roleLabel).catch(
-        () => undefined,
-      );
+      const ocrDecision =
+        decision === 'edited' ? 'edited' : decision === 'approved' ? 'accepted' : 'rejected';
+      void OcrIntakeApi.reviewField(
+        ocrJobId,
+        field,
+        ocrDecision,
+        undefined,
+        emergencyRole.roleLabel,
+      ).catch(() => undefined);
     }
   };
 
@@ -586,7 +614,10 @@ export default function SmartIntake({
       });
 
       setCapturePreviewDataUrl(captured.dataUrl);
-      const nextFields = mergeExtractedFieldRows(extractedFields as any, captured.extractedFields as any);
+      const nextFields = mergeExtractedFieldRows(
+        extractedFields as any,
+        captured.extractedFields as any,
+      );
       setExtractedFields(nextFields);
       setFieldDecisions(buildAutoApprovedFieldDecisions(nextFields, boardPatient as any));
       setOcrUploadStatus(captured.auditNote);
@@ -641,9 +672,14 @@ export default function SmartIntake({
         sessionId,
         complaint: arrivalContext.arrivalReason,
         actorName: emergencyRole.roleLabel || 'Smart Intake',
-        actorStaffId: emergencyRole.canonicalProfile?.employeeId || emergencyRole.canonicalProfile?.id,
+        actorStaffId:
+          emergencyRole.canonicalProfile?.employeeId || emergencyRole.canonicalProfile?.id,
       });
-      applyIntakeArrivalContext(useEmergencyStore.getState(), routeResult.patientId as any, arrivalContext);
+      applyIntakeArrivalContext(
+        useEmergencyStore.getState(),
+        routeResult.patientId as any,
+        arrivalContext,
+      );
       registerArrivalControl(routeResult.patientId as any, { source: 'smart-intake' });
       selectPatient(routeResult.patientId as any);
       if (documentArtifactsEnabled && supplementalCaptureText.trim()) {
@@ -711,7 +747,11 @@ export default function SmartIntake({
       capacity: whiteboard.capacity || capacity,
     });
     if (patient?.id) {
-      applyIntakeArrivalContext(useEmergencyStore.getState(), patient.id, resolveIntakeArrivalReason());
+      applyIntakeArrivalContext(
+        useEmergencyStore.getState(),
+        patient.id,
+        resolveIntakeArrivalReason(),
+      );
       registerArrivalControl(patient.id, { source: 'smart-intake' });
       selectPatient(patient.id);
       finishIntakeNavigation(patient.id);
@@ -846,7 +886,9 @@ export default function SmartIntake({
         message: [
           `Smart Intake session ${sessionId}.`,
           'Provide verification hints only — do not suggest triage priority or clinical disposition.',
-          missingFields ? `Fields needing review: ${missingFields}.` : 'All demo fields appear captured.',
+          missingFields
+            ? `Fields needing review: ${missingFields}.`
+            : 'All demo fields appear captured.',
           'List 2-3 concise next verification steps for front-desk staff.',
         ].join(' '),
         context: {
@@ -912,9 +954,9 @@ export default function SmartIntake({
   const intakeBody = (
     <>
       {!embedded && !fromReception ? (
-      <div className="smart-intake__status" role="status">
-        <strong>Session:</strong> {sessionId} · {statusMessage}
-      </div>
+        <div className="smart-intake__status" role="status">
+          <strong>Session:</strong> {sessionId} · {statusMessage}
+        </div>
       ) : statusMessage ? (
         <div className="smart-intake__status" role="status">
           {statusMessage}
@@ -922,7 +964,11 @@ export default function SmartIntake({
       ) : null}
       {verifyIntakePresentation.visible ? (
         <div className="smart-intake__ai-hint" data-testid="smart-intake-ai-hint">
-          <button type="button" onClick={() => void requestVerificationHint()} disabled={aiHintLoading}>
+          <button
+            type="button"
+            onClick={() => void requestVerificationHint()}
+            disabled={aiHintLoading}
+          >
             {aiHintLoading
               ? fromReception || embedded
                 ? RECEPTION_COPY.identityCheck.aiHelpLoading
@@ -1012,7 +1058,9 @@ export default function SmartIntake({
         displaySteps={(fromReception || embedded ? SMART_INTAKE_STREAMLINED_STEPS : null) as any}
         mapDisplayStep={(fromReception || embedded ? mapInternalStepToStreamlined : null) as any}
         introTitle={fromReception || embedded ? RECEPTION_COPY.identityCheck.title : undefined}
-        introDescription={fromReception || embedded ? RECEPTION_COPY.identityCheck.description : undefined}
+        introDescription={
+          fromReception || embedded ? RECEPTION_COPY.identityCheck.description : undefined
+        }
         onContinue={handleContinue}
         canContinue={intakeCanContinue}
         continueLabel={
@@ -1048,7 +1096,11 @@ export default function SmartIntake({
           )
         }
         onCreatePatient={() => {
-          const patient = buildSmartIntakePatient(sessionId, 'Smart Intake patient', extractedFields);
+          const patient = buildSmartIntakePatient(
+            sessionId,
+            'Smart Intake patient',
+            extractedFields,
+          );
           completeFinalAction(
             'Create-and-triage intake',
             () =>
@@ -1063,7 +1115,8 @@ export default function SmartIntake({
                     // independent duplicate index can still block a match this
                     // session never locally detected.
                     confirmDuplicateOverride:
-                      (realMatchCandidates[0]?.matchScore ?? 0) >= DUPLICATE_HIGH_CONFIDENCE_THRESHOLD,
+                      (realMatchCandidates[0]?.matchScore ?? 0) >=
+                      DUPLICATE_HIGH_CONFIDENCE_THRESHOLD,
                   }),
             (result) =>
               result
@@ -1108,7 +1161,10 @@ export default function SmartIntake({
             {RECEPTION_COPY.identityCheck.close}
           </button>
         ) : fromReception ? (
-          <button type="button" onClick={() => profileNavigate(CANONICAL_ROUTES.emergencyReception)}>
+          <button
+            type="button"
+            onClick={() => profileNavigate(CANONICAL_ROUTES.emergencyReception)}
+          >
             {RECEPTION_COPY.identityCheck.backToReception}
           </button>
         ) : null}

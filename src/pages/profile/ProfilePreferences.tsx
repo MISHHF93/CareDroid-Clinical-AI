@@ -107,7 +107,10 @@ export default function ProfilePreferences() {
           <form className="profile-identity-form" onSubmit={handleSubmit}>
             <label>
               Theme
-              <select value={form.theme} onChange={(event) => updateField('theme', event.target.value)}>
+              <select
+                value={form.theme}
+                onChange={(event) => updateField('theme', event.target.value)}
+              >
                 <option value="system">System</option>
                 <option value="light">Light</option>
                 <option value="dark">Dark</option>
@@ -115,7 +118,10 @@ export default function ProfilePreferences() {
             </label>
             <label>
               Language
-              <input value={form.language} onChange={(event) => updateField('language', event.target.value)} />
+              <input
+                value={form.language}
+                onChange={(event) => updateField('language', event.target.value)}
+              />
             </label>
             <label>
               Default dashboard
@@ -133,7 +139,10 @@ export default function ProfilePreferences() {
             </label>
             <label>
               AI response style
-              <select value={form.responseStyle} onChange={(event) => updateField('responseStyle', event.target.value)}>
+              <select
+                value={form.responseStyle}
+                onChange={(event) => updateField('responseStyle', event.target.value)}
+              >
                 <option value="concise">Concise</option>
                 <option value="stepwise">Stepwise</option>
                 <option value="evidence_first">Evidence first</option>
@@ -142,7 +151,10 @@ export default function ProfilePreferences() {
             </label>
             <label>
               Citation level
-              <select value={form.citationLevel} onChange={(event) => updateField('citationLevel', event.target.value)}>
+              <select
+                value={form.citationLevel}
+                onChange={(event) => updateField('citationLevel', event.target.value)}
+              >
                 <option value="minimal">Minimal</option>
                 <option value="standard">Standard</option>
                 <option value="full">Full</option>
@@ -150,14 +162,20 @@ export default function ProfilePreferences() {
             </label>
             <label>
               Safety tone
-              <select value={form.safetyTone} onChange={(event) => updateField('safetyTone', event.target.value)}>
+              <select
+                value={form.safetyTone}
+                onChange={(event) => updateField('safetyTone', event.target.value)}
+              >
                 <option value="standard">Standard</option>
                 <option value="strict">Strict</option>
               </select>
             </label>
             <label>
               Density
-              <select value={form.density} onChange={(event) => updateField('density', event.target.value)}>
+              <select
+                value={form.density}
+                onChange={(event) => updateField('density', event.target.value)}
+              >
                 <option value="standard">Standard density</option>
                 <option value="compact">Compact density</option>
               </select>

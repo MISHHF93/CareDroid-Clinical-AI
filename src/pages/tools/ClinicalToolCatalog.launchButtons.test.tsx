@@ -64,7 +64,7 @@ function renderCatalog() {
       <PractitionerVisibilityProvider>
         <ClinicalToolCatalog />
       </PractitionerVisibilityProvider>
-    </MemoryRouter>
+    </MemoryRouter>,
   );
 }
 
@@ -73,53 +73,70 @@ describe('ClinicalToolCatalog — launch buttons', () => {
     navigate.mockClear();
   });
 
-  it('renders catalog search and category quick filters', async () => {
-    const { container } = renderCatalog();
-    // The page's own <h1> became a <p data-testid="cd-page-title-text">
-    // (HEAL: ~58 pages still rendered a raw <h1>, duplicating AppShell's own
-    // route-title <h1>) -- the real heading now lives in AppShell chrome via
-    // useRouteChromeRegistration, which this isolated render doesn't mount.
-    expect(screen.getByTestId('cd-page-title-text')).toHaveTextContent(
-      /developer catalog \/ source audit/i
-    );
-    expect(container.textContent).toMatch(/user-facing tools now live at \/tools/i);
-    expect(screen.getByRole('searchbox', { name: /search developer catalog/i })).toBeInTheDocument();
-    expect(await screen.findByRole('group', { name: /quick category filters/i })).toBeInTheDocument();
-  }, CATALOG_RENDER_TIMEOUT_MS);
+  it(
+    'renders catalog search and category quick filters',
+    async () => {
+      const { container } = renderCatalog();
+      // The page's own <h1> became a <p data-testid="cd-page-title-text">
+      // (HEAL: ~58 pages still rendered a raw <h1>, duplicating AppShell's own
+      // route-title <h1>) -- the real heading now lives in AppShell chrome via
+      // useRouteChromeRegistration, which this isolated render doesn't mount.
+      expect(screen.getByTestId('cd-page-title-text')).toHaveTextContent(
+        /developer catalog \/ source audit/i,
+      );
+      expect(container.textContent).toMatch(/user-facing tools now live at \/tools/i);
+      expect(
+        screen.getByRole('searchbox', { name: /search developer catalog/i }),
+      ).toBeInTheDocument();
+      expect(
+        await screen.findByRole('group', { name: /quick category filters/i }),
+      ).toBeInTheDocument();
+    },
+    CATALOG_RENDER_TIMEOUT_MS,
+  );
 
-  it('shows launch or open actions for launchable medical catalog rows', async () => {
-    renderCatalog();
-    const launchable = getMedicalToolsCatalogRows().filter((row) => row.launchable !== false);
-    expect(launchable.length).toBeGreaterThan(0);
+  it(
+    'shows launch or open actions for launchable medical catalog rows',
+    async () => {
+      renderCatalog();
+      const launchable = getMedicalToolsCatalogRows().filter((row) => row.launchable !== false);
+      expect(launchable.length).toBeGreaterThan(0);
 
-    const medicalHeading = await screen.findByRole('heading', {
-      level: 2,
-      name: /medical tools & calculators/i,
-    });
-    const medicalSection = medicalHeading.closest('.catalog-section--medical');
-    expect(medicalSection).toBeTruthy();
-    if (!medicalSection) throw new Error('expected medical section to be found');
+      const medicalHeading = await screen.findByRole('heading', {
+        level: 2,
+        name: /medical tools & calculators/i,
+      });
+      const medicalSection = medicalHeading.closest('.catalog-section--medical');
+      expect(medicalSection).toBeTruthy();
+      if (!medicalSection) throw new Error('expected medical section to be found');
 
-    const scoped = within(medicalSection as HTMLElement);
-    expect(scoped.getAllByRole('button', { name: /^open$/i }).length).toBeGreaterThan(0);
-    expect(
-      scoped.getAllByRole('button', { name: /^(launch|start guided chat)$/i }).length
-    ).toBeGreaterThan(0);
-  }, CATALOG_RENDER_TIMEOUT_MS);
+      const scoped = within(medicalSection as HTMLElement);
+      expect(scoped.getAllByRole('button', { name: /^open$/i }).length).toBeGreaterThan(0);
+      expect(
+        scoped.getAllByRole('button', { name: /^(launch|start guided chat)$/i }).length,
+      ).toBeGreaterThan(0);
+    },
+    CATALOG_RENDER_TIMEOUT_MS,
+  );
 
-  it('includes Wells PE launch control discoverable by tool name', async () => {
-    renderCatalog();
-    const input = screen.getByRole('searchbox', { name: /search developer catalog/i });
-    fireEvent.change(input, { target: { value: 'pe-score' } });
-    expect((await screen.findAllByText('Wells PE Score')).length).toBeGreaterThan(0);
-    const medicalHeading = screen.getByRole('heading', {
-      level: 2,
-      name: /medical tools & calculators/i,
-    });
-    const medicalSection = medicalHeading.closest('.catalog-section--medical');
-    if (!medicalSection) throw new Error('expected medical section to be found');
-    expect(
-      within(medicalSection as HTMLElement).getAllByRole('button', { name: /start guided chat/i }).length
-    ).toBeGreaterThan(0);
-  }, CATALOG_RENDER_TIMEOUT_MS);
+  it(
+    'includes Wells PE launch control discoverable by tool name',
+    async () => {
+      renderCatalog();
+      const input = screen.getByRole('searchbox', { name: /search developer catalog/i });
+      fireEvent.change(input, { target: { value: 'pe-score' } });
+      expect((await screen.findAllByText('Wells PE Score')).length).toBeGreaterThan(0);
+      const medicalHeading = screen.getByRole('heading', {
+        level: 2,
+        name: /medical tools & calculators/i,
+      });
+      const medicalSection = medicalHeading.closest('.catalog-section--medical');
+      if (!medicalSection) throw new Error('expected medical section to be found');
+      expect(
+        within(medicalSection as HTMLElement).getAllByRole('button', { name: /start guided chat/i })
+          .length,
+      ).toBeGreaterThan(0);
+    },
+    CATALOG_RENDER_TIMEOUT_MS,
+  );
 });

@@ -6,7 +6,7 @@ import './TriageBreachBadge.css';
 
 export default function TriageBreachBadge({
   patient,
-  settings = (undefined as any),
+  settings = undefined as any,
   targetMinutes = undefined,
   warningMinutes = undefined,
   now = undefined,

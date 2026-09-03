@@ -22,20 +22,17 @@ describe('medical simulation catalog', () => {
         'abnormal-lab-escalation',
         'device-alarm-failure',
         'mass-casualty-incident',
-      ])
+      ]),
     );
   });
 
   it('returns role-based scenario recommendations from profile context', () => {
-    expect(getRecommendedSimulationScenarios({ role: 'emergency physician' }).map((item) => item.id)).toEqual([
-      'sepsis-deterioration',
-      'chest-pain-acs',
-      'stroke-alert',
-      'trauma-triage',
-    ]);
-    expect(getRecommendedSimulationScenarios({ role: 'biomedical engineer' }).map((item) => item.id)).toContain(
-      'device-alarm-failure'
-    );
+    expect(
+      getRecommendedSimulationScenarios({ role: 'emergency physician' }).map((item) => item.id),
+    ).toEqual(['sepsis-deterioration', 'chest-pain-acs', 'stroke-alert', 'trauma-triage']);
+    expect(
+      getRecommendedSimulationScenarios({ role: 'biomedical engineer' }).map((item) => item.id),
+    ).toContain('device-alarm-failure');
   });
 
   it('builds a debrief with missed actions and next recommended scenarios', () => {
@@ -44,6 +41,8 @@ describe('medical simulation catalog', () => {
     const debrief = buildScenarioDebrief(scenario, [scenario.criticalActions[0]]);
     expect(debrief.summary).toMatch(/sepsis deterioration completed/i);
     expect(debrief.missedCriticalActions.length).toBeGreaterThan(0);
-    expect(debrief.nextRecommendedScenarios.map((item) => item.id)).toContain('respiratory-failure');
+    expect(debrief.nextRecommendedScenarios.map((item) => item.id)).toContain(
+      'respiratory-failure',
+    );
   });
 });

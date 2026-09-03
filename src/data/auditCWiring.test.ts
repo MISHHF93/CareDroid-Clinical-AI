@@ -20,9 +20,9 @@ const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
 const patternsSource = readFileSync(
   join(
     __dirname,
-    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts'
+    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts',
   ),
-  'utf8'
+  'utf8',
 );
 
 describe('AUDIT-C calculator wiring (audit-c)', () => {
@@ -84,7 +84,10 @@ describe('AUDIT-C calculator wiring (audit-c)', () => {
   });
 
   it('includes Calculators.jsx switch case for audit-c', () => {
-    const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.tsx'), 'utf8');
+    const calculatorsSource = readFileSync(
+      join(__dirname, '../pages/tools/Calculators.tsx'),
+      'utf8',
+    );
     expect(calculatorsSource).toContain("case 'audit-c':");
     expect(calculatorsSource).toContain('AuditCCalculator');
   });

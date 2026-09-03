@@ -162,13 +162,14 @@ const NONE_POLICY: EmergencyDisplayPrivacyPolicy = Object.freeze({
 });
 
 export function pseudonymizePatientId(patientId: string): string {
-  const suffix = String(patientId || '').slice(-4).toUpperCase() || '0000';
+  const suffix =
+    String(patientId || '')
+      .slice(-4)
+      .toUpperCase() || '0000';
   return `Patient ${suffix}`;
 }
 
-export function shouldRedactSensitiveEmergencyData(
-  policy: EmergencyDisplayPrivacyPolicy,
-): boolean {
+export function shouldRedactSensitiveEmergencyData(policy: EmergencyDisplayPrivacyPolicy): boolean {
   return policy.centralNodeRedaction !== 'none';
 }
 

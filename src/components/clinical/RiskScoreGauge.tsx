@@ -9,7 +9,13 @@ type RiskScoreGaugeProps = {
   label?: string;
 };
 
-const RiskScoreGauge = ({ value, category, confidence, size = 'medium', label = 'Risk Score' }: RiskScoreGaugeProps) => {
+const RiskScoreGauge = ({
+  value,
+  category,
+  confidence,
+  size = 'medium',
+  label = 'Risk Score',
+}: RiskScoreGaugeProps) => {
   if (value === undefined || value === null) return null;
 
   const getSeverityColor = (cat) => {
@@ -39,7 +45,7 @@ const RiskScoreGauge = ({ value, category, confidence, size = 'medium', label = 
           />
           {/* Progress arc */}
           <path
-            d={`M 20 100 A 80 80 0 0 1 ${20 + (160 * percentage / 100)} 100`}
+            d={`M 20 100 A 80 80 0 0 1 ${20 + (160 * percentage) / 100} 100`}
             fill="none"
             stroke={getSeverityStrokeColor(severity)}
             strokeWidth="8"
@@ -68,7 +74,7 @@ const getSeverityStrokeColor = (severity) => {
     low: '#52c41a',
     moderate: '#faad14',
     high: '#ff7a45',
-    critical: '#ff4d4f'
+    critical: '#ff4d4f',
   };
   return colors[severity] || colors.low;
 };

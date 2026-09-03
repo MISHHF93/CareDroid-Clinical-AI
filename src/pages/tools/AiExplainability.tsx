@@ -70,8 +70,8 @@ export default function AiExplainability({ embedded = false, onCloseEmbedded }: 
         <section className="simple-tool-result-panel" role="note">
           <h2>Trace Scope</h2>
           <p>
-            AI Explainability displays confidence, source, reasoning, tool chain, and sanitized execution
-            logs. It does not expose raw prompts, transcripts, or patient chart text.
+            AI Explainability displays confidence, source, reasoning, tool chain, and sanitized
+            execution logs. It does not expose raw prompts, transcripts, or patient chart text.
           </p>
         </section>
 
@@ -124,21 +124,27 @@ export default function AiExplainability({ embedded = false, onCloseEmbedded }: 
             </div>
           </section>
 
-          <section className="diagnosis-panel diagnosis-panel--scroll" aria-labelledby="ai-explainability-output">
+          <section
+            className="diagnosis-panel diagnosis-panel--scroll"
+            aria-labelledby="ai-explainability-output"
+          >
             <h2 id="ai-explainability-output">Explainability Trace</h2>
             <ApiStateBanner error={error} onRetry={loadTrace} />
 
             {loading ? (
               <div className="tool-loading-state" aria-busy="true">
                 <div className="simple-tool-spinner diagnosis-spinner" />
-                <p className="tool-loading-state__message">Loading confidence and execution trace...</p>
+                <p className="tool-loading-state__message">
+                  Loading confidence and execution trace...
+                </p>
               </div>
             ) : result ? (
               <div className="diagnosis-results-body">
                 <section className="simple-tool-result-panel">
                   <h3>Confidence</h3>
                   <p>
-                    <strong>{result.confidence?.label}</strong> ({Math.round((result.confidence?.score || 0) * 100)}%)
+                    <strong>{result.confidence?.label}</strong> (
+                    {Math.round((result.confidence?.score || 0) * 100)}%)
                   </p>
                   <p>{result.confidence?.rationale}</p>
                 </section>

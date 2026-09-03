@@ -31,12 +31,11 @@ export type AnticipatedAdmissionResult = {
   envelope: OperationalScoreEnvelope<{ score: number; band: string }>;
 };
 
-function hasPatientFlag(
-  patient: AnticipatedAdmissionInput['patient'],
-  flag: PatientFlag,
-): boolean {
+function hasPatientFlag(patient: AnticipatedAdmissionInput['patient'], flag: PatientFlag): boolean {
   return (patient.flags || []).some((entry) =>
-    typeof entry === 'string' ? entry === flag : (entry as unknown as { type: string })?.type === flag,
+    typeof entry === 'string'
+      ? entry === flag
+      : (entry as unknown as { type: string })?.type === flag,
   );
 }
 
@@ -78,7 +77,11 @@ export function calculateAnticipatedAdmissionScore(
     score += weights.highRiskFlag;
     rationale.push('High-risk flag documented.');
   }
-  if (/\b(chest pain|stroke|sepsis|gi bleed|respiratory failure|fracture)\b/i.test(patient.chiefComplaint || '')) {
+  if (
+    /\b(chest pain|stroke|sepsis|gi bleed|respiratory failure|fracture)\b/i.test(
+      patient.chiefComplaint || '',
+    )
+  ) {
     score += weights.admissionComplaint;
     rationale.push('Admission-associated presenting complaint pattern.');
   }
@@ -117,7 +120,9 @@ export function calculateAnticipatedAdmissionScore(
     envelope: buildOperationalScoreEnvelope({
       value: { score, band },
       maturity,
-      rationale: rationale.length ? rationale : ['Insufficient admission signals — score remains low.'],
+      rationale: rationale.length
+        ? rationale
+        : ['Insufficient admission signals — score remains low.'],
       sourceFields: [
         'state',
         'priority',

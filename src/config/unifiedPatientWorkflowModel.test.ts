@@ -30,7 +30,9 @@ describe('unifiedPatientWorkflowModel', () => {
   it('maps patient states to workflow routes with patient context', () => {
     const triageRoute = resolveWorkflowRouteForState(PatientState.Triage, 'patient-42');
     expect(triageRoute).toContain('patient=patient-42');
-    expect(resolveWorkflowStepForState(PatientState.Assessment)?.ownerRole).toBe('emergency_physician');
+    expect(resolveWorkflowStepForState(PatientState.Assessment)?.ownerRole).toBe(
+      'emergency_physician',
+    );
   });
 
   it('aligns legal FSM transitions with workflow steps', () => {
@@ -41,7 +43,9 @@ describe('unifiedPatientWorkflowModel', () => {
   });
 
   it('estimates click savings across multi-step advancement', () => {
-    expect(estimateWorkflowClicksSaved(PatientState.Arrival, PatientState.Triage)).toBeGreaterThan(0);
+    expect(estimateWorkflowClicksSaved(PatientState.Arrival, PatientState.Triage)).toBeGreaterThan(
+      0,
+    );
     expect(estimateWorkflowClicksSaved(PatientState.Discharge, PatientState.Arrival)).toBe(0);
   });
 

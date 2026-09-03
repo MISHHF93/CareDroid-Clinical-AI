@@ -17,7 +17,12 @@ import {
   type CADUnitType,
 } from '../../services/cadIntegrationService';
 import { createReadinessPlan } from '../../services/edReadinessService';
-import type { EmergencyCall, CallPriority, DispatchAssignment, EMSArrival } from '../../types/emergency';
+import type {
+  EmergencyCall,
+  CallPriority,
+  DispatchAssignment,
+  EMSArrival,
+} from '../../types/emergency';
 import EdDataSourceBanner from '../../components/emergency/EdDataSourceBanner';
 import useEmergencyOperatingSurface from '../../hooks/useEmergencyOperatingSurface';
 import { useEMSIntake } from '../../hooks/useEmergencyOs';
@@ -37,9 +42,11 @@ const CALL_PRIORITY_LABELS: Record<CallPriority, string> = {
 function autoPriority(conscious: boolean, breathing: boolean, complaint: string): CallPriority {
   if (!conscious && !breathing) return 'Echo';
   if (!conscious || !breathing) return 'Delta';
-  const criticalKeywords = /chest pain|stemi|stroke|unresponsive|cardiac arrest|trauma|overdose|sepsis/i;
+  const criticalKeywords =
+    /chest pain|stemi|stroke|unresponsive|cardiac arrest|trauma|overdose|sepsis/i;
   if (criticalKeywords.test(complaint)) return 'Delta';
-  const urgentKeywords = /difficulty breathing|shortness of breath|severe pain|unconscious|syncope|altered/i;
+  const urgentKeywords =
+    /difficulty breathing|shortness of breath|severe pain|unconscious|syncope|altered/i;
   if (urgentKeywords.test(complaint)) return 'Charlie';
   return 'Charlie';
 }
@@ -52,7 +59,15 @@ function PriorityBadge({ priority }: { priority: CallPriority }) {
   );
 }
 
-function SummaryCard({ label, value, highlight }: { label: string; value: number; highlight?: boolean }) {
+function SummaryCard({
+  label,
+  value,
+  highlight,
+}: {
+  label: string;
+  value: number;
+  highlight?: boolean;
+}) {
   return (
     <div
       className={`dispatch-console__summary-card${highlight && value > 0 ? ' dispatch-console__summary-card--highlight' : ''}`}
@@ -105,7 +120,9 @@ function NewCallForm({ onCreated }: { onCreated: (call: EmergencyCall) => void }
   return (
     <form onSubmit={handleSubmit} className="u-flex-col-gap-12">
       <div>
-        <label className="dc-field-label" htmlFor="dispatch-complaint">Chief Complaint *</label>
+        <label className="dc-field-label" htmlFor="dispatch-complaint">
+          Chief Complaint *
+        </label>
         <input
           id="dispatch-complaint"
           className="dc-field-input"
@@ -118,9 +135,7 @@ function NewCallForm({ onCreated }: { onCreated: (call: EmergencyCall) => void }
 
       {/* Auto-priority indicator */}
       {complaint.trim() && (
-        <div
-          className={isPriorityCritical ? "dc-alert-soft" : "dc-success-panel"}
-        >
+        <div className={isPriorityCritical ? 'dc-alert-soft' : 'dc-success-panel'}>
           <span className="dc-muted-strong">Auto-detected priority:</span>
           <PriorityBadge priority={detectedPriority} />
           <span className="dc-muted">— adjust after intake if needed</span>
@@ -128,7 +143,9 @@ function NewCallForm({ onCreated }: { onCreated: (call: EmergencyCall) => void }
       )}
 
       <div>
-        <label className="dc-field-label" htmlFor="dispatch-address">Incident Address *</label>
+        <label className="dc-field-label" htmlFor="dispatch-address">
+          Incident Address *
+        </label>
         <input
           id="dispatch-address"
           className="dc-field-input"
@@ -140,26 +157,55 @@ function NewCallForm({ onCreated }: { onCreated: (call: EmergencyCall) => void }
       </div>
       <div className="u-grid-2-gap-10">
         <div>
-          <label className="dc-field-label" htmlFor="dispatch-caller-name">Caller Name</label>
-          <input id="dispatch-caller-name" className="dc-field-input" value={callerName} onChange={(e) => setCallerName(e.target.value)} placeholder="Optional" />
+          <label className="dc-field-label" htmlFor="dispatch-caller-name">
+            Caller Name
+          </label>
+          <input
+            id="dispatch-caller-name"
+            className="dc-field-input"
+            value={callerName}
+            onChange={(e) => setCallerName(e.target.value)}
+            placeholder="Optional"
+          />
         </div>
         <div>
-          <label className="dc-field-label" htmlFor="dispatch-patient-age">Patient Age</label>
-          <input id="dispatch-patient-age" className="dc-field-input" type="number" value={age} onChange={(e) => setAge(e.target.value)} placeholder="If known" min={0} max={120} />
+          <label className="dc-field-label" htmlFor="dispatch-patient-age">
+            Patient Age
+          </label>
+          <input
+            id="dispatch-patient-age"
+            className="dc-field-input"
+            type="number"
+            value={age}
+            onChange={(e) => setAge(e.target.value)}
+            placeholder="If known"
+            min={0}
+            max={120}
+          />
         </div>
       </div>
       <div className="dc-row-gap-16">
         <label className="u-click-row">
-          <input type="checkbox" checked={conscious} onChange={(e) => setConscious(e.target.checked)} />
+          <input
+            type="checkbox"
+            checked={conscious}
+            onChange={(e) => setConscious(e.target.checked)}
+          />
           Conscious
         </label>
         <label className="u-click-row">
-          <input type="checkbox" checked={breathing} onChange={(e) => setBreathing(e.target.checked)} />
+          <input
+            type="checkbox"
+            checked={breathing}
+            onChange={(e) => setBreathing(e.target.checked)}
+          />
           Breathing
         </label>
         {(!conscious || !breathing) && (
           <span className="dc-critical-12-badge">
-            {!conscious && !breathing ? '⚠ UNCONSCIOUS + NOT BREATHING — Echo priority' : `⚠ ${!conscious ? 'UNCONSCIOUS' : 'NOT BREATHING'} — Delta priority`}
+            {!conscious && !breathing
+              ? '⚠ UNCONSCIOUS + NOT BREATHING — Echo priority'
+              : `⚠ ${!conscious ? 'UNCONSCIOUS' : 'NOT BREATHING'} — Delta priority`}
           </span>
         )}
       </div>
@@ -224,46 +270,47 @@ function CADDispatchPanel({
   const isCritical = call.callPriority === 'Echo' || call.callPriority === 'Delta';
 
   return (
-    <div
-      className={`dc-panel ${isCritical ? "dc-call-card--critical" : ""}`}
-    >
+    <div className={`dc-panel ${isCritical ? 'dc-call-card--critical' : ''}`}>
       <div className="u-flex-center u-gap-8">
         <strong className={isCritical ? 'dc-title-14-critical' : 'dc-title-14'}>
           {isCritical ? '⚡ Dispatch Unit Now' : 'Dispatch Unit'}
         </strong>
         <PriorityBadge priority={call.callPriority} />
-        {isCritical && (
-          <span className="dc-critical-11">
-            3-minute response target
-          </span>
-        )}
+        {isCritical && <span className="dc-critical-11">3-minute response target</span>}
       </div>
 
       <div className="dc-row-gap-12-wrap">
         <label className="u-click-row">
-          <input type="checkbox" checked={requiresALS} onChange={(e) => setRequiresALS(e.target.checked)} />
+          <input
+            type="checkbox"
+            checked={requiresALS}
+            onChange={(e) => setRequiresALS(e.target.checked)}
+          />
           ALS required
         </label>
         <label className="u-click-row">
-          <input type="checkbox" checked={requiresAir} onChange={(e) => setRequiresAir(e.target.checked)} />
+          <input
+            type="checkbox"
+            checked={requiresAir}
+            onChange={(e) => setRequiresAir(e.target.checked)}
+          />
           Air transport
         </label>
       </div>
 
       {availableUnits.length === 0 ? (
         <div className="dc-alert-soft">
-          ⚠ No available {requiresAir ? 'Air' : requiresALS ? 'ALS' : 'BLS'} units — all assigned. Manually assign or request mutual aid.
+          ⚠ No available {requiresAir ? 'Air' : requiresALS ? 'ALS' : 'BLS'} units — all assigned.
+          Manually assign or request mutual aid.
         </div>
       ) : (
         <div>
-          <div className="dc-field-label-mb6">
-            Available units ({availableUnits.length}):
-          </div>
+          <div className="dc-field-label-mb6">Available units ({availableUnits.length}):</div>
           <div className="u-flex-col u-gap-4">
             {availableUnits.map((unit) => (
               <label
                 key={unit.id}
-                className={`dc-unit-option dc-resource-chip ${selectedUnitId === unit.id ? "dc-resource-chip--on" : ""}`}
+                className={`dc-unit-option dc-resource-chip ${selectedUnitId === unit.id ? 'dc-resource-chip--on' : ''}`}
               >
                 <input
                   type="radio"
@@ -282,13 +329,10 @@ function CADDispatchPanel({
         </div>
       )}
 
-      {error && (
-        <div className="dc-alert-soft">
-          {error}
-        </div>
-      )}
+      {error && <div className="dc-alert-soft">{error}</div>}
 
-      <button type="button"
+      <button
+        type="button"
         onClick={handleDispatch}
         disabled={dispatching || availableUnits.length === 0}
         className={`dc-btn-primary${isCritical ? ' dc-btn-primary--critical' : ''}`}
@@ -316,19 +360,28 @@ function EDPreAlertPanel({
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
 
-  const resourceOptions = ['STEMI protocol', 'Stroke protocol', 'Trauma bay', 'Sepsis protocol', 'Airway kit', 'Blood products'];
+  const resourceOptions = [
+    'STEMI protocol',
+    'Stroke protocol',
+    'Trauma bay',
+    'Sepsis protocol',
+    'Airway kit',
+    'Blood products',
+  ];
   const specialtyOptions = ['Cardiology', 'Neurology', 'Trauma surgery', 'Anesthesia', 'Pharmacy'];
 
   function toggleResource(r: string) {
-    setResources((prev) => prev.includes(r) ? prev.filter((x) => x !== r) : [...prev, r]);
+    setResources((prev) => (prev.includes(r) ? prev.filter((x) => x !== r) : [...prev, r]));
   }
   function toggleSpecialty(s: string) {
-    setSpecialtyTeams((prev) => prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]);
+    setSpecialtyTeams((prev) => (prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]));
   }
 
   function handleSendAlert() {
     setSending(true);
-    const eta = new Date(Date.now() + (assignment.estimatedResponseMinutes ?? 8) * 60_000).toISOString();
+    const eta = new Date(
+      Date.now() + (assignment.estimatedResponseMinutes ?? 8) * 60_000,
+    ).toISOString();
     createReadinessPlan({
       callId: call.id,
       linkedEmsArrivalId: call.linkedEmsArrivalId || `ems-${call.id}`,
@@ -349,14 +402,20 @@ function EDPreAlertPanel({
       <div className="dc-success-panel">
         <div className="dc-success-title">✓ ED Pre-Alert Sent</div>
         <div className="dc-muted-12-mt4">
-          ED Readiness plan created. ETA: {assignment.estimatedResponseMinutes} min.
-          Unit: {assignment.unit.callSign}.
+          ED Readiness plan created. ETA: {assignment.estimatedResponseMinutes} min. Unit:{' '}
+          {assignment.unit.callSign}.
         </div>
         <div className="dc-row-gap-8-wrap-mt">
-          <Link to={CANONICAL_ROUTES.emergencyEdReadiness} className="emergency-route-action-chip dc-link-plain">
+          <Link
+            to={CANONICAL_ROUTES.emergencyEdReadiness}
+            className="emergency-route-action-chip dc-link-plain"
+          >
             Open ED Readiness →
           </Link>
-          <Link to={CANONICAL_ROUTES.emergencyEms} className="emergency-route-action-chip dc-link-plain">
+          <Link
+            to={CANONICAL_ROUTES.emergencyEms}
+            className="emergency-route-action-chip dc-link-plain"
+          >
             EMS Pipeline →
           </Link>
         </div>
@@ -369,7 +428,8 @@ function EDPreAlertPanel({
       <div>
         <strong className="dc-title-14">Send Hospital Pre-Alert</strong>
         <div className="dc-muted-12-mt">
-          Unit {assignment.unit.callSign} dispatched · ETA {assignment.estimatedResponseMinutes} min · Notify ED and activate protocols.
+          Unit {assignment.unit.callSign} dispatched · ETA {assignment.estimatedResponseMinutes} min
+          · Notify ED and activate protocols.
         </div>
       </div>
 
@@ -381,7 +441,7 @@ function EDPreAlertPanel({
               key={r}
               type="button"
               onClick={() => toggleResource(r)}
-              className={`dc-resource-chip ${resources.includes(r) ? "dc-resource-chip--on" : ""}`}
+              className={`dc-resource-chip ${resources.includes(r) ? 'dc-resource-chip--on' : ''}`}
             >
               {r}
             </button>
@@ -397,7 +457,7 @@ function EDPreAlertPanel({
               key={s}
               type="button"
               onClick={() => toggleSpecialty(s)}
-              className={`dc-resource-chip ${specialtyTeams.includes(s) ? "dc-resource-chip--on" : ""}`}
+              className={`dc-resource-chip ${specialtyTeams.includes(s) ? 'dc-resource-chip--on' : ''}`}
             >
               {s}
             </button>
@@ -418,7 +478,8 @@ function EDPreAlertPanel({
         />
       </div>
 
-      <button type="button"
+      <button
+        type="button"
         onClick={handleSendAlert}
         disabled={sending}
         className="dc-btn-primary dc-btn-success"
@@ -440,8 +501,11 @@ function CallCard({
   onPriorityChange: (id: string, p: CallPriority) => void;
   onStatusChange: (id: string, s: EmergencyCall['status']) => void;
 }) {
-  const ageMinutes = call.receivedAt ? Math.floor((Date.now() - new Date(call.receivedAt).getTime()) / 60_000) : 0;
-  const isOverTarget = ageMinutes >= 3 && (call.callPriority === 'Echo' || call.callPriority === 'Delta');
+  const ageMinutes = call.receivedAt
+    ? Math.floor((Date.now() - new Date(call.receivedAt).getTime()) / 60_000)
+    : 0;
+  const isOverTarget =
+    ageMinutes >= 3 && (call.callPriority === 'Echo' || call.callPriority === 'Delta');
   const [showDispatch, setShowDispatch] = useState(false);
   const [assignment, setAssignment] = useState<DispatchAssignment | null>(null);
   const [showPreAlert, setShowPreAlert] = useState(false);
@@ -454,24 +518,23 @@ function CallCard({
   }
 
   const needsDispatch = call.status === 'received' || call.status === 'triaged';
-  const isDispatched = call.status === 'dispatched' || call.status === 'ems_en_route' || call.status === 'hospital_notified';
+  const isDispatched =
+    call.status === 'dispatched' ||
+    call.status === 'ems_en_route' ||
+    call.status === 'hospital_notified';
 
   return (
-    <div className={`dc-call-card dispatch-console__call-card${isOverTarget ? ' dispatch-console__call-card--breach' : ''}`}>
+    <div
+      className={`dc-call-card dispatch-console__call-card${isOverTarget ? ' dispatch-console__call-card--breach' : ''}`}
+    >
       <div className="dc-row-between">
         <div>
-          <div className="dc-meta-caps">
-            {call.callNumber}
-          </div>
-          <div className="dc-title-15">
-            {call.chiefComplaint}
-          </div>
+          <div className="dc-meta-caps">{call.callNumber}</div>
+          <div className="dc-title-15">{call.chiefComplaint}</div>
         </div>
         <div className="dc-col-end">
           <PriorityBadge priority={call.callPriority} />
-          <span
-            className={isOverTarget ? "dc-critical-11" : "dc-meta-caps"}
-          >
+          <span className={isOverTarget ? 'dc-critical-11' : 'dc-meta-caps'}>
             {isOverTarget ? `⚠ ${ageMinutes}m — BREACH` : `${ageMinutes}m ago`}
           </span>
         </div>
@@ -488,11 +551,17 @@ function CallCard({
 
       {/* Status pipeline */}
       <div className="dc-row-gap-4-wrap">
-        {(['received', 'dispatched', 'ems_en_route', 'ems_on_scene', 'ems_transporting', 'hospital_notified'] as const).map((s) => (
-          <span
-            key={s}
-            className={`dc-chip ${call.status === s ? "dc-resource-chip--on" : ""}`}
-          >
+        {(
+          [
+            'received',
+            'dispatched',
+            'ems_en_route',
+            'ems_on_scene',
+            'ems_transporting',
+            'hospital_notified',
+          ] as const
+        ).map((s) => (
+          <span key={s} className={`dc-chip ${call.status === s ? 'dc-resource-chip--on' : ''}`}>
             {s.replace(/_/g, ' ')}
           </span>
         ))}
@@ -506,7 +575,9 @@ function CallCard({
           aria-label="Call priority"
         >
           {(Object.keys(CALL_PRIORITY_LABELS) as CallPriority[]).map((p) => (
-            <option key={p} value={p}>{CALL_PRIORITY_LABELS[p]}</option>
+            <option key={p} value={p}>
+              {CALL_PRIORITY_LABELS[p]}
+            </option>
           ))}
         </select>
 
@@ -547,23 +618,31 @@ function CallCard({
         )}
       </div>
 
-      {showDispatch && (
-        <CADDispatchPanel call={call} onDispatched={handleDispatched} />
-      )}
+      {showDispatch && <CADDispatchPanel call={call} onDispatched={handleDispatched} />}
 
       {showPreAlert && (
         <EDPreAlertPanel
           call={call}
-          assignment={assignment || {
-            id: 'manual',
-            callId: call.id,
-            assignedAt: new Date().toISOString(),
-            unit: { id: 'manual', callSign: 'Manual', type: 'ALS', crewSize: 2, baseLocation: '' },
-            dispatchedBy: 'dispatcher-current',
-            estimatedResponseMinutes: 8,
-            status: 'en_route',
+          assignment={
+            assignment || {
+              id: 'manual',
+              callId: call.id,
+              assignedAt: new Date().toISOString(),
+              unit: {
+                id: 'manual',
+                callSign: 'Manual',
+                type: 'ALS',
+                crewSize: 2,
+                baseLocation: '',
+              },
+              dispatchedBy: 'dispatcher-current',
+              estimatedResponseMinutes: 8,
+              status: 'en_route',
+            }
+          }
+          onAlertSent={() => {
+            /* refresh handled by interval */
           }}
-          onAlertSent={() => { /* refresh handled by interval */ }}
         />
       )}
     </div>
@@ -594,7 +673,8 @@ function PhysicianRequestedTransportPanel() {
   useEMSIntake();
   const arrivals = useEmergencyStore((state) => state.emsArrivals) as EMSArrival[];
   const simulatedRequests = arrivals.filter(
-    (arrival) => arrival?.simulated === true || arrival?.requestSource === 'physician_initiated_simulated',
+    (arrival) =>
+      arrival?.simulated === true || arrival?.requestSource === 'physician_initiated_simulated',
   );
 
   if (simulatedRequests.length === 0) return null;
@@ -671,19 +751,31 @@ function CADUnitBoard() {
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function DispatchConsole() {
-  const { loading: apiLoading, error: apiError, envelope: apiEnvelope } =
-    useEmergencyOperatingSurface('dispatch');
+  const {
+    loading: apiLoading,
+    error: apiError,
+    envelope: apiEnvelope,
+  } = useEmergencyOperatingSurface('dispatch');
   const [calls, setCalls] = useState<EmergencyCall[]>([]);
   const [summary, setSummary] = useState<DispatchCallSummary>({
-    total: 0, received: 0, dispatched: 0, enRoute: 0, onScene: 0, transporting: 0, echoCount: 0, deltaCount: 0,
+    total: 0,
+    received: 0,
+    dispatched: 0,
+    enRoute: 0,
+    onScene: 0,
+    transporting: 0,
+    echoCount: 0,
+    deltaCount: 0,
   });
   const [showForm, setShowForm] = useState(false);
 
   const refresh = useCallback(() => {
-    setCalls(getAllActiveCalls().sort((a, b) => {
-      const priorityOrder: CallPriority[] = ['Echo', 'Delta', 'Charlie', 'Bravo', 'Alpha'];
-      return priorityOrder.indexOf(a.callPriority) - priorityOrder.indexOf(b.callPriority);
-    }));
+    setCalls(
+      getAllActiveCalls().sort((a, b) => {
+        const priorityOrder: CallPriority[] = ['Echo', 'Delta', 'Charlie', 'Bravo', 'Alpha'];
+        return priorityOrder.indexOf(a.callPriority) - priorityOrder.indexOf(b.callPriority);
+      }),
+    );
     setSummary(getDispatchSummary());
   }, []);
 
@@ -706,8 +798,8 @@ export default function DispatchConsole() {
 
   function handleStatusChange(id: string, status: EmergencyCall['status']) {
     updateCallStatus(id, status);
-    void import('../../services/emergencyCareJourneyOrchestrator').then(({ onDispatchCallStatusChange }) =>
-      onDispatchCallStatusChange(id, status),
+    void import('../../services/emergencyCareJourneyOrchestrator').then(
+      ({ onDispatchCallStatusChange }) => onDispatchCallStatusChange(id, status),
     );
     refresh();
   }
@@ -737,7 +829,12 @@ export default function DispatchConsole() {
             : showForm
               ? 'Complete call intake form'
               : '+ Log Call when new emergency arrives',
-        tone: criticalPending > 0 ? 'critical' : summary.deltaCount + summary.echoCount > 0 ? 'warning' : 'neutral',
+        tone:
+          criticalPending > 0
+            ? 'critical'
+            : summary.deltaCount + summary.echoCount > 0
+              ? 'warning'
+              : 'neutral',
       }}
       actions={
         <button
@@ -749,15 +846,15 @@ export default function DispatchConsole() {
         </button>
       }
       primaryActions={
-      <div className="dispatch-console__summary-row">
-        <SummaryCard label="Active Calls" value={summary.total} />
-        <SummaryCard label="Echo" value={summary.echoCount} highlight />
-        <SummaryCard label="Delta" value={summary.deltaCount} />
-        <SummaryCard label="Dispatched" value={summary.dispatched} />
-        <SummaryCard label="En Route" value={summary.enRoute} />
-        <SummaryCard label="On Scene" value={summary.onScene} />
-        <SummaryCard label="Transporting" value={summary.transporting} />
-      </div>
+        <div className="dispatch-console__summary-row">
+          <SummaryCard label="Active Calls" value={summary.total} />
+          <SummaryCard label="Echo" value={summary.echoCount} highlight />
+          <SummaryCard label="Delta" value={summary.deltaCount} />
+          <SummaryCard label="Dispatched" value={summary.dispatched} />
+          <SummaryCard label="En Route" value={summary.enRoute} />
+          <SummaryCard label="On Scene" value={summary.onScene} />
+          <SummaryCard label="Transporting" value={summary.transporting} />
+        </div>
       }
     >
       <EdDataSourceBanner
@@ -800,15 +897,13 @@ export default function DispatchConsole() {
         </div>
       )}
 
-      <div
-        role="note"
-        className="dispatch-console__notice dc-muted-12 dc-pad-note"
-      >
-        CareDroid AI is decision support only. All dispatch decisions must be made by licensed dispatchers following
-        local medical protocols. Unit assignment, pre-alert, and ED readiness activation require dispatcher
-        authorization. The CAD unit board and Dispatch Unit action above use a SIMULATED demo unit registry — not
-        connected to a real ambulance, EMS unit, or 911/CAD dispatch system. The physician-requested transport panel
-        above is a separate, also-simulated CareDroid record with the same real-world limitation; the two panels are
+      <div role="note" className="dispatch-console__notice dc-muted-12 dc-pad-note">
+        CareDroid AI is decision support only. All dispatch decisions must be made by licensed
+        dispatchers following local medical protocols. Unit assignment, pre-alert, and ED readiness
+        activation require dispatcher authorization. The CAD unit board and Dispatch Unit action
+        above use a SIMULATED demo unit registry — not connected to a real ambulance, EMS unit, or
+        911/CAD dispatch system. The physician-requested transport panel above is a separate,
+        also-simulated CareDroid record with the same real-world limitation; the two panels are
         never linked to each other.
       </div>
     </EmergencyRoutePage>

@@ -19,10 +19,10 @@ function trendGlyph(direction) {
 
 export default function CommandCenterThroughputScreen({
   snapshot,
-  surgeSnapshot = (null as any),
+  surgeSnapshot = null as any,
   title = 'Department Whiteboard',
   refreshIntervalMs = 30000,
-  refreshStatus = (null as any),
+  refreshStatus = null as any,
   performanceMode = false,
   showTriageAwaiting = true,
   showLongestUntriagedWait = true,
@@ -163,7 +163,10 @@ export default function CommandCenterThroughputScreen({
       ) : null}
 
       {showTrendIndicators && resolvedSnapshot.trendIndicators?.length ? (
-        <section className="command-center-throughput__trends" aria-label="Operational trend indicators">
+        <section
+          className="command-center-throughput__trends"
+          aria-label="Operational trend indicators"
+        >
           <div className="command-center-throughput__section-heading command-center-throughput__section-heading--chart">
             <GraphicIconBadge iconKey="activity" accent="information" size="sm" />
             <div>
@@ -229,7 +232,9 @@ export default function CommandCenterThroughputScreen({
             aria-label="Crowding forecast"
           >
             <h3>Crowding outlook</h3>
-            <strong>{resolvedSnapshot.crowdLevel?.staffLabel ?? resolvedSnapshot.crowdingForecast.label}</strong>
+            <strong>
+              {resolvedSnapshot.crowdLevel?.staffLabel ?? resolvedSnapshot.crowdingForecast.label}
+            </strong>
             <p>{resolvedSnapshot.crowdingForecast.detail}</p>
           </section>
         ) : null}

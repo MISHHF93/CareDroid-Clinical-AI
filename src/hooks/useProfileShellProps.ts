@@ -11,7 +11,8 @@ export type ProfileShellProps = {
 
 export default function useProfileShellProps(): ProfileShellProps {
   const { accessSummary } = useUserIdentity();
-  const { accessSummary: hookAccessSummary, profileCopy: hookProfileCopy } = useEffectiveUserProfile();
+  const { accessSummary: hookAccessSummary, profileCopy: hookProfileCopy } =
+    useEffectiveUserProfile();
   const resolvedAccessSummary = accessSummary || hookAccessSummary;
   const profileCopy =
     hookProfileCopy ||

@@ -41,7 +41,9 @@ describe('receptionUserProfile', () => {
     expect(resolveReceptionArchetypeFromRole('admissions_officer')).toBe('admissions_officer');
     expect(resolveReceptionArchetypeFromRole('patient_access_staff')).toBe('patient_access_staff');
     expect(resolveReceptionArchetypeFromRole('volunteer greeter')).toBe('volunteer_greeter');
-    expect(resolveReceptionArchetypeFromRole('front_desk_coordinator')).toBe('front_desk_coordinator');
+    expect(resolveReceptionArchetypeFromRole('front_desk_coordinator')).toBe(
+      'front_desk_coordinator',
+    );
   });
 
   it('does not map charge_nurse to a registration skill pack via coordinator keyword alone', () => {
@@ -53,7 +55,9 @@ describe('receptionUserProfile', () => {
     const clerk = resolveReceptionProfileForRole('registration_clerk');
     expect(clerk.label).toBe('Registration Clerk');
     expect(clerk.defaultRoute).toContain('reception');
-    expect(clerk.skillIds.map((id) => RECEPTION_SKILLS[id].label).length).toBe(clerk.skillIds.length);
+    expect(clerk.skillIds.map((id) => RECEPTION_SKILLS[id].label).length).toBe(
+      clerk.skillIds.length,
+    );
   });
 
   it('flags reception-facing roles for Profile page skills panel', () => {

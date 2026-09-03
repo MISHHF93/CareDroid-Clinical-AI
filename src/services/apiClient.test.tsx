@@ -77,16 +77,20 @@ describe('parseApiResponse', () => {
   });
 
   it('reports HTML fallback pages as API response errors', async () => {
-    await expect(parseApiResponse(makeResponse('<!DOCTYPE html><html></html>', 'text/html'))).rejects.toBeInstanceOf(
-      ApiResponseError,
-    );
+    await expect(
+      parseApiResponse(makeResponse('<!DOCTYPE html><html></html>', 'text/html')),
+    ).rejects.toBeInstanceOf(ApiResponseError);
   });
 });
 
 describe('getApiErrorMessage', () => {
   it('maps HTTP status codes', () => {
-    expect(getApiErrorMessage(null, { ok: false, status: 401, statusText: 'Unauthorized' })).toMatch(/Sign in/);
-    expect(getApiErrorMessage(null, { ok: false, status: 503, statusText: 'Unavailable' })).toMatch(/unavailable/);
+    expect(
+      getApiErrorMessage(null, { ok: false, status: 401, statusText: 'Unauthorized' }),
+    ).toMatch(/Sign in/);
+    expect(getApiErrorMessage(null, { ok: false, status: 503, statusText: 'Unavailable' })).toMatch(
+      /unavailable/,
+    );
   });
 
   it('maps timeout errors', () => {
@@ -137,8 +141,10 @@ describe('apiFetch timeout', () => {
       ),
     );
 
-    await expect(apiFetch('/api/tenant/runtime-settings', { timeoutMs: 50 })).rejects.toMatchObject({
-      name: 'TimeoutError',
-    });
+    await expect(apiFetch('/api/tenant/runtime-settings', { timeoutMs: 50 })).rejects.toMatchObject(
+      {
+        name: 'TimeoutError',
+      },
+    );
   });
 });

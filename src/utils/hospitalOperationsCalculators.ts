@@ -20,7 +20,11 @@ function utilizationTone(percent) {
 
 export const HOSPITAL_OPERATIONS_CALCULATOR_DISCLAIMER = SUPPORT_ONLY_COPY;
 
-export function calculateBedOccupancy({ occupiedBeds = undefined as any, totalBeds = undefined as any, blockedBeds = 0 }: any = {}) {
+export function calculateBedOccupancy({
+  occupiedBeds = undefined as any,
+  totalBeds = undefined as any,
+  blockedBeds = 0,
+}: any = {}) {
   const occupied = toFiniteNumber(occupiedBeds);
   const total = toFiniteNumber(totalBeds);
   const blocked = toFiniteNumber(blockedBeds) ?? 0;
@@ -50,7 +54,11 @@ export function calculateBedOccupancy({ occupiedBeds = undefined as any, totalBe
   };
 }
 
-export function calculateStaffingRatio({ patientCount = undefined as any, staffCount = undefined as any, targetPatientsPerStaff = 4 }: any = {}) {
+export function calculateStaffingRatio({
+  patientCount = undefined as any,
+  staffCount = undefined as any,
+  targetPatientsPerStaff = 4,
+}: any = {}) {
   const patients = toFiniteNumber(patientCount);
   const staff = toFiniteNumber(staffCount);
   const target = toFiniteNumber(targetPatientsPerStaff) ?? 4;
@@ -58,7 +66,8 @@ export function calculateStaffingRatio({ patientCount = undefined as any, staffC
   const patientsPerStaff = round(patients / staff, 2);
   const targetStaff = Math.ceil(patients / target);
   const staffDelta = staff - targetStaff;
-  const severity = staffDelta < 0 ? (patientsPerStaff >= target * 1.25 ? 'critical' : 'warning') : 'normal';
+  const severity =
+    staffDelta < 0 ? (patientsPerStaff >= target * 1.25 ? 'critical' : 'warning') : 'normal';
   return {
     patientCount: patients,
     staffCount: staff,
@@ -85,12 +94,18 @@ export function calculateTurnaroundTime({
   cleanupMinutes = 0,
   targetMinutes = 60,
 }: any = {}) {
-  const parts = [requestToAssignMinutes, travelMinutes, serviceMinutes, cleanupMinutes].map(toFiniteNumber);
+  const parts = [requestToAssignMinutes, travelMinutes, serviceMinutes, cleanupMinutes].map(
+    toFiniteNumber,
+  );
   const target = toFiniteNumber(targetMinutes) ?? 60;
   if (parts.some((part) => part === null || part! < 0) || target <= 0) return null;
-  const totalMinutes = round(parts.reduce((sum, part) => (sum ?? 0) + (part ?? 0), 0), 1);
+  const totalMinutes = round(
+    parts.reduce((sum, part) => (sum ?? 0) + (part ?? 0), 0),
+    1,
+  );
   const varianceMinutes = round(totalMinutes - target, 1);
-  const severity = varianceMinutes > target * 0.25 ? 'critical' : varianceMinutes > 0 ? 'warning' : 'normal';
+  const severity =
+    varianceMinutes > target * 0.25 ? 'critical' : varianceMinutes > 0 ? 'warning' : 'normal';
   return {
     requestToAssignMinutes: parts[0],
     travelMinutes: parts[1],
@@ -126,9 +141,13 @@ export function calculateResourceUtilizationIndex({
     .map(([label, value]) => ({ label, value: toFiniteNumber(value) }))
     .filter((row) => row.value !== null);
 
-  if (rows.length === 0 || rows.some((row) => (row.value ?? 0) < 0 || (row.value ?? 0) > 150)) return null;
+  if (rows.length === 0 || rows.some((row) => (row.value ?? 0) < 0 || (row.value ?? 0) > 150))
+    return null;
   const index = round(rows.reduce((sum, row) => sum + (row.value ?? 0), 0) / rows.length, 1);
-  const maxDriver = rows.reduce((max, row) => ((row.value ?? 0) > (max.value ?? 0) ? row : max), rows[0]);
+  const maxDriver = rows.reduce(
+    (max, row) => ((row.value ?? 0) > (max.value ?? 0) ? row : max),
+    rows[0],
+  );
   return {
     index,
     inputs: rows,

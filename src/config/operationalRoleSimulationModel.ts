@@ -100,23 +100,24 @@ const ROLE_LABELS: Readonly<Record<SimulatedOperationalRoleId, string>> = Object
   demo_observer: 'Demo Observer',
 });
 
-const WORKFLOW_SPINE_BY_ROLE: Readonly<Record<SimulatedOperationalRoleId, readonly OperationalWorkflowSpinePhase[]>> =
-  Object.freeze({
-    registration_clerk: ['reception'],
-    dispatcher: ['ems', 'reception'],
-    ems_coordinator: ['ems', 'triage', 'flow-coordination'],
-    triage_nurse: ['reception', 'triage', 'clinical-care'],
-    charge_nurse: ['triage', 'clinical-care', 'flow-coordination'],
-    emergency_physician: ['clinical-care', 'diagnostics', 'reporting'],
-    specialist: ['clinical-care', 'diagnostics'],
-    pharmacist: ['diagnostics', 'clinical-care'],
-    radiology_technician: ['diagnostics'],
-    lab_technician: ['diagnostics'],
-    patient_flow_coordinator: ['flow-coordination', 'reporting', 'triage'],
-    hospital_admin: ['flow-coordination', 'reporting'],
-    it_admin: ['reporting'],
-    demo_observer: ['clinical-care'],
-  });
+const WORKFLOW_SPINE_BY_ROLE: Readonly<
+  Record<SimulatedOperationalRoleId, readonly OperationalWorkflowSpinePhase[]>
+> = Object.freeze({
+  registration_clerk: ['reception'],
+  dispatcher: ['ems', 'reception'],
+  ems_coordinator: ['ems', 'triage', 'flow-coordination'],
+  triage_nurse: ['reception', 'triage', 'clinical-care'],
+  charge_nurse: ['triage', 'clinical-care', 'flow-coordination'],
+  emergency_physician: ['clinical-care', 'diagnostics', 'reporting'],
+  specialist: ['clinical-care', 'diagnostics'],
+  pharmacist: ['diagnostics', 'clinical-care'],
+  radiology_technician: ['diagnostics'],
+  lab_technician: ['diagnostics'],
+  patient_flow_coordinator: ['flow-coordination', 'reporting', 'triage'],
+  hospital_admin: ['flow-coordination', 'reporting'],
+  it_admin: ['reporting'],
+  demo_observer: ['clinical-care'],
+});
 
 const SPINE_ROUTE_ANCHORS: Readonly<Record<OperationalWorkflowSpinePhase, string>> = Object.freeze({
   reception: CANONICAL_ROUTES.emergencyReception,
@@ -234,7 +235,9 @@ function resolveVisibleNavRoutes(
   );
 }
 
-export function simulateOperationalRole(profileId: SimulatedOperationalRoleId): OperationalRoleSimulation {
+export function simulateOperationalRole(
+  profileId: SimulatedOperationalRoleId,
+): OperationalRoleSimulation {
   const mapping = getCanonicalRoleMapping(profileId);
   const routePolicy = USER_PROFILE_ROUTE_POLICIES[profileId];
   const homeRoute = getHomeRouteForRole(profileId);
@@ -297,7 +300,9 @@ export function validateOperationalRoleCoherence(profileId: SimulatedOperational
     const anchor = SPINE_ROUTE_ANCHORS[phase];
     const reachable =
       canAccessRoute(compiled, anchor) ||
-      simulation.visibleNavRoutes.some((route) => route === anchor || route.startsWith(`${anchor}/`));
+      simulation.visibleNavRoutes.some(
+        (route) => route === anchor || route.startsWith(`${anchor}/`),
+      );
     if (!reachable) {
       issues.push(`${profileId}: workflow spine phase "${phase}" not reachable via ${anchor}`);
     }
@@ -308,7 +313,9 @@ export function validateOperationalRoleCoherence(profileId: SimulatedOperational
       (route) => route === CANONICAL_ROUTES.emergencySettings,
     );
     if (mutatingRoutes.length > 0 && profileId !== 'it_admin') {
-      issues.push(`${profileId}: read-only persona exposes mutating route ${mutatingRoutes.join(', ')}`);
+      issues.push(
+        `${profileId}: read-only persona exposes mutating route ${mutatingRoutes.join(', ')}`,
+      );
     }
   }
 
@@ -316,7 +323,9 @@ export function validateOperationalRoleCoherence(profileId: SimulatedOperational
     issues.push(`${profileId}: workflow trigger events unavailable`);
   }
 
-  const homeRecord = CANONICAL_ROUTE_MAP.find((record) => record.path === simulation.homeRoute.split('?')[0]);
+  const homeRecord = CANONICAL_ROUTE_MAP.find(
+    (record) => record.path === simulation.homeRoute.split('?')[0],
+  );
   if (homeRecord && !homeRecord.allowedRoles.map((r) => r.replace(/-/g, '_')).includes(profileId)) {
     issues.push(`${profileId}: home route ${simulation.homeRoute} not in allowedRoles`);
   }
@@ -324,7 +333,9 @@ export function validateOperationalRoleCoherence(profileId: SimulatedOperational
   return issues;
 }
 
-export function validateAllOperationalRolesCoherent(): Readonly<Record<SimulatedOperationalRoleId, string[]>> {
+export function validateAllOperationalRolesCoherent(): Readonly<
+  Record<SimulatedOperationalRoleId, string[]>
+> {
   return Object.freeze(
     SIMULATED_OPERATIONAL_ROLE_IDS.reduce(
       (acc, roleId) => {

@@ -18,7 +18,8 @@ export const CUSTOMER_EXPANSION_SEGMENTS = Object.freeze([
     segment: 'Hospital',
     organizationType: 'hospital',
     currentPacks: ['Emergency Pack'],
-    summary: 'Emergency department adoption indicates readiness for critical care and simulation expansion.',
+    summary:
+      'Emergency department adoption indicates readiness for critical care and simulation expansion.',
     opportunities: [
       {
         id: 'hospital-icu-pack',
@@ -37,7 +38,8 @@ export const CUSTOMER_EXPANSION_SEGMENTS = Object.freeze([
         recommendedPack: 'Simulation Pack',
         score: 88,
         motion: COMMERCIAL_MOTIONS.CROSS_SELL,
-        expectedOutcome: 'Convert emergency usage into preparedness, drills, and competency readiness.',
+        expectedOutcome:
+          'Convert emergency usage into preparedness, drills, and competency readiness.',
         evidence: [
           'Emergency workflows benefit from sepsis and deterioration simulation',
           'Simulation readiness is measurable by department',
@@ -51,14 +53,16 @@ export const CUSTOMER_EXPANSION_SEGMENTS = Object.freeze([
     segment: 'University',
     organizationType: 'university',
     currentPacks: ['Education Pack'],
-    summary: 'Education adoption indicates readiness for research workflows and model evaluation programs.',
+    summary:
+      'Education adoption indicates readiness for research workflows and model evaluation programs.',
     opportunities: [
       {
         id: 'university-research-pack',
         recommendedPack: 'Research Pack',
         score: 89,
         motion: COMMERCIAL_MOTIONS.UPSELL,
-        expectedOutcome: 'Expand education usage into research cohorts, evidence review, and study workflows.',
+        expectedOutcome:
+          'Expand education usage into research cohorts, evidence review, and study workflows.',
         evidence: [
           'Education Pack is active',
           'Academic users need research and evidence workflows',
@@ -70,7 +74,8 @@ export const CUSTOMER_EXPANSION_SEGMENTS = Object.freeze([
         recommendedPack: 'AI Evaluation Pack',
         score: 86,
         motion: COMMERCIAL_MOTIONS.EVALUATION,
-        expectedOutcome: 'Enable benchmark labs, model comparison, hallucination checks, and governance evidence.',
+        expectedOutcome:
+          'Enable benchmark labs, model comparison, hallucination checks, and governance evidence.',
         evidence: [
           'Education environments need assessment and benchmarking',
           'AI Evaluation Pack supports faculty-led validation',
@@ -84,14 +89,16 @@ export const CUSTOMER_EXPANSION_SEGMENTS = Object.freeze([
     segment: 'Operations',
     organizationType: 'operations',
     currentPacks: ['Operations Pack'],
-    summary: 'Operations adoption indicates readiness for digital twin, uptime, and maintenance expansion.',
+    summary:
+      'Operations adoption indicates readiness for digital twin, uptime, and maintenance expansion.',
     opportunities: [
       {
         id: 'operations-digital-twin-pack',
         recommendedPack: 'Digital Twin Pack',
         score: 84,
         motion: COMMERCIAL_MOTIONS.CROSS_SELL,
-        expectedOutcome: 'Turn operations usage into enterprise visibility across beds, devices, fleet, and maintenance.',
+        expectedOutcome:
+          'Turn operations usage into enterprise visibility across beds, devices, fleet, and maintenance.',
         evidence: [
           'Operations Pack is active',
           'Asset uptime and maintenance workload are measurable',
@@ -153,12 +160,13 @@ export function buildCustomerExpansionOpportunities({
       opportunityCount: rows.reduce((sum, segment) => sum + segment.opportunityCount, 0),
       highConfidenceCount: rows.reduce(
         (sum, segment) =>
-          sum +
-          segment.opportunities.filter((opportunity) => opportunity.score >= 85).length,
+          sum + segment.opportunities.filter((opportunity) => opportunity.score >= 85).length,
         0,
       ),
       recommendedPackCount: new Set(
-        rows.flatMap((segment) => segment.opportunities.map((opportunity) => opportunity.recommendedPack)),
+        rows.flatMap((segment) =>
+          segment.opportunities.map((opportunity) => opportunity.recommendedPack),
+        ),
       ).size,
     },
   };

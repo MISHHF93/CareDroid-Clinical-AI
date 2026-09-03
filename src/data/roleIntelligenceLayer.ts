@@ -1,5 +1,8 @@
 import { buildProfileToolGraph, buildUserToolProfile } from './profileToolSegmentation';
-import { applySaasResonanceToToolProfile, resolveSaasToolResonance } from '../config/saasProfileToolResonance';
+import {
+  applySaasResonanceToToolProfile,
+  resolveSaasToolResonance,
+} from '../config/saasProfileToolResonance';
 import { compileUserProfile } from '../config/userProfileCompiler';
 
 export const ROLE_INTELLIGENCE_SIGNALS = Object.freeze({
@@ -89,7 +92,16 @@ const ROLE_TERMS = Object.freeze({
     'chads',
     'ecg',
   ],
-  researcher: ['research', 'evidence', 'guideline', 'rag', 'analytics', 'study', 'cohort', 'literature'],
+  researcher: [
+    'research',
+    'evidence',
+    'guideline',
+    'rag',
+    'analytics',
+    'study',
+    'cohort',
+    'literature',
+  ],
   administrator: [
     'admin',
     'governance',
@@ -148,7 +160,9 @@ function normalizeKey(value) {
 }
 
 function normalizeText(value) {
-  return String(value || '').trim().toLowerCase();
+  return String(value || '')
+    .trim()
+    .toLowerCase();
 }
 
 function includesAny(text, terms = [] as any[]) {
@@ -195,7 +209,9 @@ export function normalizeRole(value, fallback = 'medical student') {
 
 export function getRoleDisplayName(role) {
   const normalized = normalizeRole(role);
-  return ROLE_DISPLAY_NAMES[normalized] || normalized.replace(/\b\w/g, (char) => char.toUpperCase());
+  return (
+    ROLE_DISPLAY_NAMES[normalized] || normalized.replace(/\b\w/g, (char) => char.toUpperCase())
+  );
 }
 
 export function buildRoleIntelligenceProfile({
@@ -211,7 +227,8 @@ export function buildRoleIntelligenceProfile({
   platformContext,
   activity,
 }: any = {}) {
-  const saasRoleId = roleProfile?.id || platformContext?.roleProfile?.id || platformContext?.saasRole;
+  const saasRoleId =
+    roleProfile?.id || platformContext?.roleProfile?.id || platformContext?.saasRole;
   const saasResonance = saasRoleId ? resolveSaasToolResonance(saasRoleId) : null;
   const compiledProfile = saasRoleId
     ? compileUserProfile({
@@ -230,8 +247,12 @@ export function buildRoleIntelligenceProfile({
       toolPreferences,
       permissions,
     });
-  const mergedProfile = saasRoleId ? applySaasResonanceToToolProfile(baseProfile, saasRoleId) : baseProfile;
-  const role = normalizeRole(mergedProfile.role || roleProfile?.label || roleProfile?.id || baseProfile.role);
+  const mergedProfile = saasRoleId
+    ? applySaasResonanceToToolProfile(baseProfile, saasRoleId)
+    : baseProfile;
+  const role = normalizeRole(
+    mergedProfile.role || roleProfile?.label || roleProfile?.id || baseProfile.role,
+  );
   const workspaceId =
     activeWorkspace?.id ||
     workspaceState?.activeWorkspaceId ||
@@ -250,7 +271,8 @@ export function buildRoleIntelligenceProfile({
     operationsEyebrow: saasResonance?.operationsEyebrow,
     workspace: workspaceId,
     workspaceId,
-    workspaceLabel: activeWorkspace?.name || platformContext?.workspace?.activeWorkspaceId || workspaceId,
+    workspaceLabel:
+      activeWorkspace?.name || platformContext?.workspace?.activeWorkspaceId || workspaceId,
     entitledAssetIds: platformContext?.entitledAssetIds || [],
     entitledPackIds: platformContext?.entitledPackIds || [],
     defaultAiAgentId: platformContext?.defaultAiAgentId,
@@ -272,7 +294,9 @@ export function buildRoleBehaviorSignals({ activity, toolPreferences, preference
     ),
   );
   const workflowIds = unique(
-    list(activity?.workflowsLaunched || activity?.recentWorkflows).map((item) => item.workflowId || item.id),
+    list(activity?.workflowsLaunched || activity?.recentWorkflows).map(
+      (item) => item.workflowId || item.id,
+    ),
   );
 
   return {
@@ -307,7 +331,9 @@ function scoreEntityForRole(entity, profile, options: any = {}) {
     ...list(entity?.targetRoles),
     ...list(entity?.intendedRoles),
     ...list(entity?.roleAwareness),
-    ...list(entity?.roleMapping).map((roleMapping) => roleMapping.label || roleMapping.roleProfileId),
+    ...list(entity?.roleMapping).map(
+      (roleMapping) => roleMapping.label || roleMapping.roleProfileId,
+    ),
   ].map((value) => normalizeRole(value));
   if (roles.includes(role)) {
     score += 60;
@@ -363,7 +389,11 @@ function scoreEntityForRole(entity, profile, options: any = {}) {
   };
 }
 
-export function getRoleIntelligenceAssetRecommendations({ tools = [] as any[], profile, limit = 12 }: any = {}) {
+export function getRoleIntelligenceAssetRecommendations({
+  tools = [] as any[],
+  profile,
+  limit = 12,
+}: any = {}) {
   const graph = buildProfileToolGraph({ tools, profile });
   return graph.recommendedTools.slice(0, limit).map((tool) => ({
     id: tool.id,
@@ -392,7 +422,11 @@ export function getRoleIntelligencePackRecommendations({
     })
     .sort((a, b) => {
       const installedDelta = Number(Boolean(a.enabled)) - Number(Boolean(b.enabled));
-      return b.roleIntelligence.score - a.roleIntelligence.score || installedDelta || a.name.localeCompare(b.name);
+      return (
+        b.roleIntelligence.score - a.roleIntelligence.score ||
+        installedDelta ||
+        a.name.localeCompare(b.name)
+      );
     })
     .slice(0, limit);
 }
@@ -412,11 +446,18 @@ export function getRoleIntelligenceSimulationRecommendations({
       return { ...scenario, roleIntelligence };
     })
     .filter((scenario) => scenario.roleIntelligence.recommended)
-    .sort((a, b) => b.roleIntelligence.score - a.roleIntelligence.score || a.title.localeCompare(b.title))
+    .sort(
+      (a, b) =>
+        b.roleIntelligence.score - a.roleIntelligence.score || a.title.localeCompare(b.title),
+    )
     .slice(0, limit);
 }
 
-export function getRoleIntelligenceAgentRecommendations({ agents = [] as any[], profile, limit = 4 }: any = {}) {
+export function getRoleIntelligenceAgentRecommendations({
+  agents = [] as any[],
+  profile,
+  limit = 4,
+}: any = {}) {
   const seedIds = ROLE_AGENT_SEEDS[normalizeRole(profile?.role)] || [];
   return list(agents)
     .map((agent) => {
@@ -427,7 +468,10 @@ export function getRoleIntelligenceAgentRecommendations({ agents = [] as any[], 
       return { ...agent, roleIntelligence };
     })
     .filter((agent) => agent.roleIntelligence.recommended)
-    .sort((a, b) => b.roleIntelligence.score - a.roleIntelligence.score || a.title.localeCompare(b.title))
+    .sort(
+      (a, b) =>
+        b.roleIntelligence.score - a.roleIntelligence.score || a.title.localeCompare(b.title),
+    )
     .slice(0, limit);
 }
 

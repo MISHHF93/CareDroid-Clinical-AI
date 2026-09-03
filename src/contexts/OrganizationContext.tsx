@@ -1,4 +1,12 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { PlatformAssetsApi } from '../services/platformAssetsApi';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { useUser } from './UserContext';
@@ -168,7 +176,10 @@ export function OrganizationContextProvider({ children }) {
       }
       const token = ++saveSettingsTokenRef.current;
       try {
-        const nextEngine = await PlatformAssetsApi.updateOrganizationSettings(organizationId, updates);
+        const nextEngine = await PlatformAssetsApi.updateOrganizationSettings(
+          organizationId,
+          updates,
+        );
         if (saveSettingsTokenRef.current !== token) {
           return { ok: false, message: 'Superseded by a newer save.' };
         }
@@ -185,10 +196,11 @@ export function OrganizationContextProvider({ children }) {
         return { ok: false, message };
       }
     },
-    [organization?.id, organizationEngine?.organization?.id, refreshPlatformContext]
+    [organization?.id, organizationEngine?.organization?.id, refreshPlatformContext],
   );
 
-  const fallbackBranding = platformContext?.organization?.branding || organization?.branding || null;
+  const fallbackBranding =
+    platformContext?.organization?.branding || organization?.branding || null;
   const value = useMemo(
     () => ({
       organizationEngine,
@@ -213,7 +225,7 @@ export function OrganizationContextProvider({ children }) {
       organizationEngine,
       refreshOrganizationEngine,
       saveOrganizationSettings,
-    ]
+    ],
   );
 
   return <OrganizationContext.Provider value={value}>{children}</OrganizationContext.Provider>;

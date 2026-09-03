@@ -2,7 +2,10 @@ import { Link, Outlet, useLocation } from 'react-router-dom';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import useEffectiveUserProfile from '../../hooks/useEffectiveUserProfile';
 import { isAdminSaasRole } from '../../config/platformEntryModel';
-import { isRouteAllowedForProfile, resolveUserProfileFromSaasRole } from '../../config/userProfileCatalog';
+import {
+  isRouteAllowedForProfile,
+  resolveUserProfileFromSaasRole,
+} from '../../config/userProfileCatalog';
 import './AdminOperationsShell.css';
 
 const ADMIN_NAV = Object.freeze([

@@ -207,7 +207,9 @@ const FUTURE_MODULE_ACTIONS = Object.freeze([
   EMERGENCY_ACTIONS.viewAiGovernance,
 ]);
 const ALL_ACTIONS = Object.freeze(
-  Object.values(EMERGENCY_ACTIONS).filter((action) => !FUTURE_MODULE_ACTIONS.includes(action as any)),
+  Object.values(EMERGENCY_ACTIONS).filter(
+    (action) => !FUTURE_MODULE_ACTIONS.includes(action as any),
+  ),
 );
 const CLINICAL_VIEW_ROUTES = Object.freeze([
   ROUTES.whiteboard,
@@ -398,7 +400,14 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
     label: EMERGENCY_ROLE_LABELS[EMERGENCY_ROLE_IDS.physician],
     description:
       'Clinical decision role for patient review, state movement, referrals, reassessment, tools, and AI support.',
-    routes: [...CLINICAL_VIEW_ROUTES, ROUTES.reception, ROUTES.ems, ROUTES.intake, ROUTES.copilot, ROUTES.analytics],
+    routes: [
+      ...CLINICAL_VIEW_ROUTES,
+      ROUTES.reception,
+      ROUTES.ems,
+      ROUTES.intake,
+      ROUTES.copilot,
+      ROUTES.analytics,
+    ],
     actions: [
       EMERGENCY_ACTIONS.transitionPatient,
       EMERGENCY_ACTIONS.writeVitals,
@@ -419,7 +428,17 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
     label: EMERGENCY_ROLE_LABELS[EMERGENCY_ROLE_IDS.registrationClerk],
     description:
       'Emergency reception role for fast arrival capture, intake drafts, demographics, queue handoff, and critical staff notification without clinical override authority.',
-    routes: [ROUTES.reception, ROUTES.patients, ROUTES.intake, ROUTES.pulse, ROUTES.shift, ROUTES.alerts, ROUTES.copilot, ROUTES.collaboration, ROUTES.help],
+    routes: [
+      ROUTES.reception,
+      ROUTES.patients,
+      ROUTES.intake,
+      ROUTES.pulse,
+      ROUTES.shift,
+      ROUTES.alerts,
+      ROUTES.copilot,
+      ROUTES.collaboration,
+      ROUTES.help,
+    ],
     actions: [
       EMERGENCY_ACTIONS.createPatient,
       EMERGENCY_ACTIONS.editPatientDemographics,
@@ -436,7 +455,17 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
     label: EMERGENCY_ROLE_LABELS[EMERGENCY_ROLE_IDS.emsUser],
     description:
       'EMS coordination role for inbound units, bay preparation, and handoff completion.',
-    routes: [ROUTES.ems, ROUTES.whiteboard, ROUTES.patients, ROUTES.capacity, ROUTES.tools, ROUTES.platform, ROUTES.alerts, ROUTES.collaboration, ROUTES.help],
+    routes: [
+      ROUTES.ems,
+      ROUTES.whiteboard,
+      ROUTES.patients,
+      ROUTES.capacity,
+      ROUTES.tools,
+      ROUTES.platform,
+      ROUTES.alerts,
+      ROUTES.collaboration,
+      ROUTES.help,
+    ],
     actions: [
       EMERGENCY_ACTIONS.prepareEmsBay,
       EMERGENCY_ACTIONS.convertEmsArrival,
@@ -451,10 +480,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
     description:
       'Emergency call taker and CAD dispatch operator. Receives 911 calls, performs telephone triage, assigns EMS units, and notifies the ED of inbound critical patients.',
     routes: [ROUTES.dispatch, ROUTES.ems, ROUTES.alerts, ROUTES.collaboration, ROUTES.help],
-    actions: [
-      EMERGENCY_ACTIONS.createPatient,
-      EMERGENCY_ACTIONS.prepareEmsBay,
-    ],
+    actions: [EMERGENCY_ACTIONS.createPatient, EMERGENCY_ACTIONS.prepareEmsBay],
     defaultRoute: getDefaultRouteForProfile(EMERGENCY_ROLE_IDS.dispatcher),
   }),
   [EMERGENCY_ROLE_IDS.emsCoordinator]: Object.freeze({
@@ -462,7 +488,18 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
     label: EMERGENCY_ROLE_LABELS[EMERGENCY_ROLE_IDS.emsCoordinator],
     description:
       'EMS operations coordinator who manages unit deployment, prehospital data relay, pre-arrival notifications, and ED readiness handoffs.',
-    routes: [ROUTES.dispatch, ROUTES.ems, ROUTES.edReadiness, ROUTES.whiteboard, ROUTES.capacity, ROUTES.patients, ROUTES.alerts, ROUTES.analytics, ROUTES.collaboration, ROUTES.help],
+    routes: [
+      ROUTES.dispatch,
+      ROUTES.ems,
+      ROUTES.edReadiness,
+      ROUTES.whiteboard,
+      ROUTES.capacity,
+      ROUTES.patients,
+      ROUTES.alerts,
+      ROUTES.analytics,
+      ROUTES.collaboration,
+      ROUTES.help,
+    ],
     actions: [
       EMERGENCY_ACTIONS.createPatient,
       EMERGENCY_ACTIONS.prepareEmsBay,
@@ -824,10 +861,7 @@ export function isTriageScreenMode(screenMode) {
 }
 
 export function getTriagePrimaryLandingPath(role, patientId) {
-  if (
-    normalizeEmergencyRole(role) === EMERGENCY_ROLE_IDS.triageNurse ||
-    isTriageScreenMode(role)
-  ) {
+  if (normalizeEmergencyRole(role) === EMERGENCY_ROLE_IDS.triageNurse || isTriageScreenMode(role)) {
     return getTriagePendingQueuePath(patientId);
   }
   return getEmergencyRoleHomeRoute(role);
@@ -886,7 +920,12 @@ export function getVisibleEmergencyNavigationItems(role, items) {
   });
 }
 
-export function canExecuteEmergencyCommand(role, command, context: any = {}, permissionsOverrides: any = {}) {
+export function canExecuteEmergencyCommand(
+  role,
+  command,
+  context: any = {},
+  permissionsOverrides: any = {},
+) {
   if (!command) return false;
   if (command.requiredAction) {
     const presentation = presentEmergencyRoleAction(

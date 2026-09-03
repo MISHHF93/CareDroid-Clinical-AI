@@ -81,14 +81,16 @@ const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
 const patternsSource = readFileSync(
   join(
     __dirname,
-    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts'
+    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts',
   ),
-  'utf8'
+  'utf8',
 );
 const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.tsx'), 'utf8');
 
 const BACKEND_KEYWORDS_BY_TOOL = Object.freeze(
-  Object.fromEntries(PR_FLEET_TOOL_IDS.map((id) => [id, extractToolPatternKeywords(patternsSource, id)]))
+  Object.fromEntries(
+    PR_FLEET_TOOL_IDS.map((id) => [id, extractToolPatternKeywords(patternsSource, id)]),
+  ),
 );
 
 const mockFetchFleetCommandSnapshot = vi.fn();
@@ -116,7 +118,7 @@ function renderFleetDashboard() {
   return render(
     <MemoryRouter>
       <FleetDashboard />
-    </MemoryRouter>
+    </MemoryRouter>,
   );
 }
 
@@ -136,7 +138,7 @@ describe('1. Fleet dashboard rendering', () => {
 
     expect(screen.getByRole('link', { name: /Skip to main content/i })).toHaveAttribute(
       'href',
-      '#fleet-dashboard-main'
+      '#fleet-dashboard-main',
     );
     // FleetDashboard registers its title into the shell chrome
     // (useRouteChromeRegistration) rather than rendering its own <h1> --
@@ -156,10 +158,14 @@ describe('1. Fleet dashboard rendering', () => {
     expect(within(summaryGroup).getByText('Active')).toBeInTheDocument();
     expect(within(summaryGroup).getByText('Avg utilization')).toBeInTheDocument();
 
-    const vehicleRoster = screen.getByRole('heading', { name: /Vehicle roster/i }).closest('section');
+    const vehicleRoster = screen
+      .getByRole('heading', { name: /Vehicle roster/i })
+      .closest('section');
     expect(vehicleRoster).not.toBeNull();
     expect(within(vehicleRoster as HTMLElement).getByText('Test Van')).toBeInTheDocument();
-    expect(screen.getByRole('region', { name: /Dispatch intelligence review/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('region', { name: /Dispatch intelligence review/i }),
+    ).toBeInTheDocument();
     expect(screen.getAllByText(/Human dispatchers must approve/i).length).toBeGreaterThanOrEqual(1);
   });
 
@@ -183,7 +189,7 @@ describe('1. Fleet dashboard rendering', () => {
             driver: 'Test Driver',
           },
         ],
-      })
+      }),
     );
 
     renderFleetDashboard();
@@ -196,7 +202,7 @@ describe('1. Fleet dashboard rendering', () => {
 
   it('shows empty state when no vehicles report', async () => {
     mockFetchFleetCommandSnapshot.mockResolvedValue(
-      buildFleetDashboardSnapshot({ vehicles: [], summary: { totalVehicles: 0 } })
+      buildFleetDashboardSnapshot({ vehicles: [], summary: { totalVehicles: 0 } }),
     );
     renderFleetDashboard();
     await waitFor(() => {
@@ -213,7 +219,7 @@ describe('1. Fleet dashboard rendering', () => {
       expect(errorPanel).toHaveTextContent(/Telemetry offline/i);
     });
     expect(
-      screen.getByRole('button', { name: /Retry loading fleet telemetry/i })
+      screen.getByRole('button', { name: /Retry loading fleet telemetry/i }),
     ).toBeInTheDocument();
   });
 
@@ -235,7 +241,7 @@ describe('1. Fleet dashboard rendering', () => {
             driver: 'Driver A',
           },
         ],
-      })
+      }),
     );
 
     renderFleetDashboard();
@@ -249,12 +255,9 @@ describe('1. Fleet dashboard rendering', () => {
 });
 
 describe('2. Predictive maintenance scoring', () => {
-  it.each(FLEET_RISK_BAND_BOUNDARIES)(
-    'resolveRiskBand($score) → $band',
-    ({ score, band }) => {
-      expect(resolveRiskBand(score)).toBe(band);
-    }
-  );
+  it.each(FLEET_RISK_BAND_BOUNDARIES)('resolveRiskBand($score) → $band', ({ score, band }) => {
+    expect(resolveRiskBand(score)).toBe(band);
+  });
 
   it('requires at least one substantive field before scoring', () => {
     const normalized = normalizePredictiveMaintenanceInput({});
@@ -337,7 +340,7 @@ describe('3. Route optimization behavior', () => {
       trafficConstraints: { level: 'heavy' },
     });
     expect(heavy.optimizedSequence[0].travelMinutes).toBeGreaterThan(
-      low.optimizedSequence[0].travelMinutes
+      low.optimizedSequence[0].travelMinutes,
     );
   });
 
@@ -345,7 +348,7 @@ describe('3. Route optimization behavior', () => {
     const a = optimizeRoute(FLEET_ROUTE_PRIORITY_INPUT);
     const b = optimizeRoute(FLEET_ROUTE_PRIORITY_INPUT);
     expect(a.optimizedSequence.map((l) => l.destination.id)).toEqual(
-      b.optimizedSequence.map((l) => l.destination.id)
+      b.optimizedSequence.map((l) => l.destination.id),
     );
     expect(a.routeSavings.minutesSaved).toBe(b.routeSavings.minutesSaved);
   });
@@ -393,10 +396,10 @@ describe('4. Dispatch launch behavior', () => {
     'phrase "%s" matches dispatch-ai keywords and disambiguation',
     (phrase) => {
       expect(messageMatchesToolKeywords(phrase, BACKEND_KEYWORDS_BY_TOOL['dispatch-ai'])).toBe(
-        true
+        true,
       );
       expect(messageTriggersBackendDisambiguation(phrase, 'dispatch-ai')).toBe(true);
-    }
+    },
   );
 
   it.each(PR_FLEET_REQUIRED_NLU_ALIAS_PAIRS.filter(([, id]) => id === 'dispatch-ai'))(
@@ -407,7 +410,7 @@ describe('4. Dispatch launch behavior', () => {
       expect(fromAlias.registryId).toBe('dispatch-ai');
       expect(fromAlias.path).toBe(fromCanonical.path);
       expect(fromAlias.chatSeed).toBe(fromCanonical.chatSeed);
-    }
+    },
   );
 
   it('navigates dispatch-ai chat launch to chat (not calculators slug)', () => {
@@ -441,16 +444,15 @@ describe('5. Registry mappings', () => {
     expect(patternsSource).toContain(spec.backendHelper);
   });
 
-  it.each(FLEET_REGISTRY_NLU_PHRASES)(
-    'NLU phrase "%s" resolves to %s',
-    (phrase, canonical) => {
-      expect(NLU_TO_REGISTRY_ID[phrase]).toBe(canonical);
-      expect(resolveRegistryId(phrase)).toBe(canonical);
-    }
-  );
+  it.each(FLEET_REGISTRY_NLU_PHRASES)('NLU phrase "%s" resolves to %s', (phrase, canonical) => {
+    expect(NLU_TO_REGISTRY_ID[phrase]).toBe(canonical);
+    expect(resolveRegistryId(phrase)).toBe(canonical);
+  });
 
   it('lists each fleet tool exactly once in toolRegistry', () => {
-    const fleetRows = toolRegistry.filter((t) => (PR_FLEET_TOOL_IDS as readonly string[]).includes(t.id));
+    const fleetRows = toolRegistry.filter((t) =>
+      (PR_FLEET_TOOL_IDS as readonly string[]).includes(t.id),
+    );
     expect(fleetRows).toHaveLength(PR_FLEET_TOOL_IDS.length);
   });
 
@@ -485,7 +487,10 @@ describe('6. Catalog inclusion', () => {
     const rows = getMedicalToolsCatalogRows();
     for (const [, query] of spec.catalogSearchQueries) {
       const hits = catalogRowsMatchingQuery(rows, query);
-      expect(hits.some((r) => r.primaryId === id), `query "${query}"`).toBe(true);
+      expect(
+        hits.some((r) => r.primaryId === id),
+        `query "${query}"`,
+      ).toBe(true);
     }
   });
 
@@ -520,7 +525,7 @@ describe('7. Discovery inclusion', () => {
     for (const [alias, canonical] of PR_FLEET_ALL_ALIAS_PAIRS) {
       if (targetByAlias.has(alias) && targetByAlias.get(alias) !== canonical) {
         throw new Error(
-          `Conflicting PR-FLEET alias "${alias}": ${targetByAlias.get(alias)} vs ${canonical}`
+          `Conflicting PR-FLEET alias "${alias}": ${targetByAlias.get(alias)} vs ${canonical}`,
         );
       }
       targetByAlias.set(alias, canonical);
@@ -533,7 +538,7 @@ describe('7. Discovery inclusion', () => {
       expect(resolveRegistryId(alias)).toBe(canonical);
       const merged = getAllDiscoveredTools();
       expect(merged.some((r) => r.id === alias || r.id === canonical)).toBe(true);
-    }
+    },
   );
 });
 
@@ -573,7 +578,7 @@ describe('8. Archived route validation', () => {
       const fromCanonical = resolveCatalogLaunch(canonical);
       expect(fromAlias.registryId).toBe(canonical);
       expect(fromAlias.path).toBe(fromCanonical.path);
-    }
+    },
   );
 
   it('returns empty launch for unknown fleet-like ids', () => {

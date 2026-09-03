@@ -21,7 +21,10 @@ import './MedicalSimulationSuite.css';
 export default function MedicalSimulationSuite() {
   useRouteChromeRegistration({ title: 'Medical Simulation Suite' });
   const [query, setQuery] = useState('');
-  const recommended = useMemo(() => getRecommendedSimulationScenarios({ role: 'medical student' }), []);
+  const recommended = useMemo(
+    () => getRecommendedSimulationScenarios({ role: 'medical student' }),
+    [],
+  );
   const categoryChart = useMemo(() => buildScenarioCategoryChart(), []);
   const difficultyChart = useMemo(() => buildScenarioDifficultyChart(), []);
 
@@ -47,8 +50,13 @@ export default function MedicalSimulationSuite() {
         <div className="simulation-suite-page__title-row">
           <GraphicIconBadge iconKey="activity" accent="brand" size="md" />
           <div>
-            <p className="simulation-suite-page__title-text" data-testid="cd-page-title-text">Medical Simulation Suite</p>
-            <p>Virtual patient cases, timed drills, team simulations, and AI-tutor-guided training scenarios.</p>
+            <p className="simulation-suite-page__title-text" data-testid="cd-page-title-text">
+              Medical Simulation Suite
+            </p>
+            <p>
+              Virtual patient cases, timed drills, team simulations, and AI-tutor-guided training
+              scenarios.
+            </p>
           </div>
         </div>
         <div className="simulation-suite-page__actions">
@@ -65,15 +73,43 @@ export default function MedicalSimulationSuite() {
         details="Demo training scenarios with no live patient side effects. Verify institutional competency records separately."
       />
 
-      <div className="simulation-suite-page__metrics" role="group" aria-label="Simulation suite summary metrics">
-        <MetricCard label="Scenarios" value={String(SIMULATION_SCENARIOS.length)} hint="Demo-ready catalog" tone="neutral" />
-        <MetricCard label="Categories" value={String(SIMULATION_CATEGORY_COUNT)} hint="Training domains" tone="neutral" />
-        <MetricCard label="Recommended" value={String(recommended.length)} hint="Role-scoped picks" tone="good" />
-        <MetricCard label="Avg duration" value={`${avgDuration}m`} hint="Estimated session length" tone="neutral" />
+      <div
+        className="simulation-suite-page__metrics"
+        role="group"
+        aria-label="Simulation suite summary metrics"
+      >
+        <MetricCard
+          label="Scenarios"
+          value={String(SIMULATION_SCENARIOS.length)}
+          hint="Demo-ready catalog"
+          tone="neutral"
+        />
+        <MetricCard
+          label="Categories"
+          value={String(SIMULATION_CATEGORY_COUNT)}
+          hint="Training domains"
+          tone="neutral"
+        />
+        <MetricCard
+          label="Recommended"
+          value={String(recommended.length)}
+          hint="Role-scoped picks"
+          tone="good"
+        />
+        <MetricCard
+          label="Avg duration"
+          value={`${avgDuration}m`}
+          hint="Estimated session length"
+          tone="neutral"
+        />
       </div>
 
       <div className="simulation-suite-page__charts">
-        <VisualizationPanel title="Scenario categories" description="Training catalog grouped by clinical domain." badge="Catalog">
+        <VisualizationPanel
+          title="Scenario categories"
+          description="Training catalog grouped by clinical domain."
+          badge="Catalog"
+        >
           <CategoryBarChart
             data={categoryChart.slice(0, 8)}
             title="Scenario categories"
@@ -81,7 +117,11 @@ export default function MedicalSimulationSuite() {
             emptyMessage="Category chart appears when scenarios are registered."
           />
         </VisualizationPanel>
-        <VisualizationPanel title="Difficulty mix" description="Beginner, intermediate, and advanced scenario distribution." badge="Levels">
+        <VisualizationPanel
+          title="Difficulty mix"
+          description="Beginner, intermediate, and advanced scenario distribution."
+          badge="Levels"
+        >
           <CategoryBarChart
             data={difficultyChart}
             title="Difficulty mix"
@@ -109,8 +149,12 @@ export default function MedicalSimulationSuite() {
             className="simulation-suite-page__card"
           >
             <strong>{scenario.title}</strong>
-            <span>{scenario.category} · {scenario.difficulty}</span>
-            <span>{scenario.estimatedDurationMinutes} min · {scenario.type.replace(/-/g, ' ')}</span>
+            <span>
+              {scenario.category} · {scenario.difficulty}
+            </span>
+            <span>
+              {scenario.estimatedDurationMinutes} min · {scenario.type.replace(/-/g, ' ')}
+            </span>
           </Link>
         ))}
       </div>
@@ -126,7 +170,10 @@ export default function MedicalSimulationSuite() {
             >
               <strong>{scenario.title}</strong>
               <span>{scenario.specialty}</span>
-              <span>{scenario.category} · {scenario.difficulty} · {scenario.estimatedDurationMinutes} min</span>
+              <span>
+                {scenario.category} · {scenario.difficulty} · {scenario.estimatedDurationMinutes}{' '}
+                min
+              </span>
             </Link>
           ))
         ) : (

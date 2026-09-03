@@ -39,24 +39,28 @@ describe('pluginMarketplace', () => {
       initial,
       pluginId,
       PLUGIN_MARKETPLACE_ACTIONS.INSTALL,
-      '2026-05-31T00:00:00.000Z'
+      '2026-05-31T00:00:00.000Z',
     );
     expect(installed[pluginId]).toMatchObject({ installed: true, enabled: true });
 
     const disabled = applyPluginMarketplaceAction(
       installed,
       pluginId,
-      PLUGIN_MARKETPLACE_ACTIONS.DISABLE
+      PLUGIN_MARKETPLACE_ACTIONS.DISABLE,
     );
     expect(disabled[pluginId]).toMatchObject({ installed: true, enabled: false });
 
-    const enabled = applyPluginMarketplaceAction(disabled, pluginId, PLUGIN_MARKETPLACE_ACTIONS.ENABLE);
+    const enabled = applyPluginMarketplaceAction(
+      disabled,
+      pluginId,
+      PLUGIN_MARKETPLACE_ACTIONS.ENABLE,
+    );
     expect(enabled[pluginId]).toMatchObject({ installed: true, enabled: true });
 
     const uninstalled = applyPluginMarketplaceAction(
       enabled,
       pluginId,
-      PLUGIN_MARKETPLACE_ACTIONS.UNINSTALL
+      PLUGIN_MARKETPLACE_ACTIONS.UNINSTALL,
     );
     expect(uninstalled[pluginId]).toMatchObject({ installed: false, enabled: false });
   });
@@ -65,7 +69,7 @@ describe('pluginMarketplace', () => {
     const state = applyPluginMarketplaceAction(
       createDefaultPluginMarketplaceState(),
       'plugin-fluid-resuscitation-calculator',
-      PLUGIN_MARKETPLACE_ACTIONS.INSTALL
+      PLUGIN_MARKETPLACE_ACTIONS.INSTALL,
     );
 
     savePluginMarketplaceState(state);

@@ -84,7 +84,9 @@ const SEVERITY_RANK: Record<AlarmSeverity, number> = {
 
 /** Normalize any metric/list tone into a platform alarm severity. */
 export function resolveAlarmSeverity(tone: AlarmToneInput): AlarmSeverity {
-  const t = String(tone || 'neutral').toLowerCase().trim();
+  const t = String(tone || 'neutral')
+    .toLowerCase()
+    .trim();
   if (t === 'critical' || t === 'danger' || t === 'error' || t === 'red' || t === 'severe') {
     return 'critical';
   }

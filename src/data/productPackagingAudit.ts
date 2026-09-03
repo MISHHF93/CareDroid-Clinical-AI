@@ -116,10 +116,10 @@ function parseAssetPacks() {
     const orgTypes = allOrgTypes
       ? ['all']
       : [...body.matchAll(/OrganizationType\.([A-Z_]+)/g)].map((m) =>
-          m[1].toLowerCase().replace(/_/g, '_')
+          m[1].toLowerCase().replace(/_/g, '_'),
         );
     const targetRoles = [...body.matchAll(/targetRoles:\s*\[([^\]]*)\]/g)].flatMap((m) =>
-      [...m[1].matchAll(/'([^']+)'/g)].map((r) => r[1])
+      [...m[1].matchAll(/'([^']+)'/g)].map((r) => r[1]),
     );
     const pack = { id, name, assetIds, organizationTypes: orgTypes, targetRoles };
     packs.push(pack);
@@ -161,7 +161,7 @@ function parseRoleProfiles() {
   const assetToRolePacks = new Map();
   const block = seed.split('SEED_ROLE_PROFILES')[1]?.split('];')[0] || '';
   for (const row of block.matchAll(
-    /id:\s*'([^']+)'[\s\S]*?intendedRoles:\s*\[([^\]]*)\][\s\S]*?preferredAssetIds:\s*\[([^\]]*)\]/g
+    /id:\s*'([^']+)'[\s\S]*?intendedRoles:\s*\[([^\]]*)\][\s\S]*?preferredAssetIds:\s*\[([^\]]*)\]/g,
   )) {
     const id = row[1];
     const intendedRoles = [...row[2].matchAll(/'([^']+)'/g)].map((m) => m[1]);
@@ -180,8 +180,12 @@ function parseSpecialties() {
   const seed = readRepo('backend/src/modules/product-catalog/data/product-catalog-seed.data.ts');
   const specialties = [] as any[];
   const assetToSpecialties = new Map();
-  const section = seed.split('export const SEED_SPECIALTIES')[1]?.split('export const SEED_CARE_PATHWAYS')[0] || '';
-  for (const block of section.matchAll(/id:\s*'([^']+)'[\s\S]*?slug:\s*'([^']+)'[\s\S]*?assetIds:\s*\[([^\]]*)\]/g)) {
+  const section =
+    seed.split('export const SEED_SPECIALTIES')[1]?.split('export const SEED_CARE_PATHWAYS')[0] ||
+    '';
+  for (const block of section.matchAll(
+    /id:\s*'([^']+)'[\s\S]*?slug:\s*'([^']+)'[\s\S]*?assetIds:\s*\[([^\]]*)\]/g,
+  )) {
     const id = block[1];
     const slug = block[2];
     const assetIds = [...block[3].matchAll(/'([^']+)'/g)].map((m) => m[1]);
@@ -199,7 +203,7 @@ function parseProducts() {
   const seed = readRepo('backend/src/modules/product-catalog/data/product-catalog-seed.data.ts');
   const products = [] as any[];
   for (const block of seed.matchAll(
-    /id:\s*'(product-[^']+)'[\s\S]*?slug:\s*'([^']+)'[\s\S]*?packIds:\s*\[([^\]]*)\]/g
+    /id:\s*'(product-[^']+)'[\s\S]*?slug:\s*'([^']+)'[\s\S]*?packIds:\s*\[([^\]]*)\]/g,
   )) {
     products.push({
       id: block[1],
@@ -300,11 +304,14 @@ export function buildProductPackagingAudit() {
     .map((t) => ({ id: t.id, label: t.label, route: t.route, mounted: mountedAssetIds.has(t.id) }));
   const unmountedInventory = backendSeedBacklog.filter((t) => !t.mounted);
   const backendSeedBacklogByRouteGroup = Object.entries(
-    backendSeedBacklog.reduce((acc, tool) => {
-      const group = routeGroupForBacklogTool(tool);
-      acc[group] = (acc[group] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>)
+    backendSeedBacklog.reduce(
+      (acc, tool) => {
+        const group = routeGroupForBacklogTool(tool);
+        acc[group] = (acc[group] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>,
+    ),
   )
     .map(([group, count]) => ({ group, count }))
     .sort((a, b) => b.count - a.count || a.group.localeCompare(b.group));
@@ -326,7 +333,8 @@ export function buildProductPackagingAudit() {
       nonCompliantAssets: nonCompliant.length,
       specialtyGaps: specialtyGaps.length,
       roleGaps: roleGaps.length,
-      frontendMountedRegistryTools: userFacingInventory.filter((t) => mountedAssetIds.has(t.id)).length,
+      frontendMountedRegistryTools: userFacingInventory.filter((t) => mountedAssetIds.has(t.id))
+        .length,
       backendSeedBacklogCount: backendSeedBacklog.length,
       inventoryOnlyCount: unmountedInventory.length,
       solutionPacksDefined: solutionPackChecks.filter((p) => p.packExists).length,
@@ -400,7 +408,7 @@ export function formatProductPackagingAuditMarkdown(audit = buildProductPackagin
 
   for (const row of audit.solutionPackChecks) {
     lines.push(
-      `| ${row.marketingName} | \`${row.packId}\` | \`${row.productSlug}\` | ${row.assetCount} | ${row.productLinksPack ? 'Yes' : 'No'} |`
+      `| ${row.marketingName} | \`${row.packId}\` | \`${row.productSlug}\` | ${row.assetCount} | ${row.productLinksPack ? 'Yes' : 'No'} |`,
     );
   }
 
@@ -421,16 +429,19 @@ export function formatProductPackagingAuditMarkdown(audit = buildProductPackagin
     '| SPA tool launch (pre-asset) | `src/data/toolInventory.js` | Routes, calculators, sidebar |',
     '',
     '## Packaging violations (seeded assets)',
-    ''
+    '',
   );
 
   if (!audit.nonCompliant.length) {
     lines.push('_None — all seeded assets satisfy four dimensions._', '');
   } else {
-    lines.push('| Asset ID | Solution packs | Specialty | Role | Org types | Violations |', '| --- | --- | --- | --- | --- | --- |');
+    lines.push(
+      '| Asset ID | Solution packs | Specialty | Role | Org types | Violations |',
+      '| --- | --- | --- | --- | --- | --- |',
+    );
     for (const row of audit.nonCompliant) {
       lines.push(
-        `| ${escapeCell(row.assetId)} | ${escapeCell(row.solutionPacks)} | ${escapeCell(row.specialtyPacks)} | ${escapeCell(row.rolePacks)} | ${escapeCell(row.organizationTypes)} | ${row.violations.join(', ')} |`
+        `| ${escapeCell(row.assetId)} | ${escapeCell(row.solutionPacks)} | ${escapeCell(row.specialtyPacks)} | ${escapeCell(row.rolePacks)} | ${escapeCell(row.organizationTypes)} | ${row.violations.join(', ')} |`,
       );
     }
     lines.push('');
@@ -462,11 +473,11 @@ export function formatProductPackagingAuditMarkdown(audit = buildProductPackagin
     '## Full seeded asset matrix',
     '',
     '| Asset ID | Solution pack(s) | Specialty pack(s) | Role pack(s) | Organization type(s) | Status |',
-    '| --- | --- | --- | --- | --- | --- |'
+    '| --- | --- | --- | --- | --- | --- |',
   );
   for (const row of audit.assetRows) {
     lines.push(
-      `| ${escapeCell(row.assetId)} | ${escapeCell(row.solutionPacks)} | ${escapeCell(row.specialtyPacks)} | ${escapeCell(row.rolePacks)} | ${escapeCell(row.organizationTypes)} | ${row.compliant ? 'OK' : row.violations.join(', ')} |`
+      `| ${escapeCell(row.assetId)} | ${escapeCell(row.solutionPacks)} | ${escapeCell(row.specialtyPacks)} | ${escapeCell(row.rolePacks)} | ${escapeCell(row.organizationTypes)} | ${row.compliant ? 'OK' : row.violations.join(', ')} |`,
     );
   }
 
@@ -477,7 +488,7 @@ export function formatProductPackagingAuditMarkdown(audit = buildProductPackagin
     '### Backlog by route area',
     '',
     '| Route area | Count |',
-    '| --- | ---: |'
+    '| --- | ---: |',
   );
   for (const row of audit.backendSeedBacklogByRouteGroup) {
     lines.push(`| ${escapeCell(row.group)} | ${row.count} |`);
@@ -488,11 +499,13 @@ export function formatProductPackagingAuditMarkdown(audit = buildProductPackagin
     '### Sample rows',
     '',
     `Total: ${audit.backendSeedBacklogTotal} user-facing tools have frontend mounted asset projection coverage but are not direct backend \`platform_assets\` seed rows.`,
-    ''
+    '',
   );
   if (audit.backendSeedBacklog.length) {
     audit.backendSeedBacklog.forEach((t) => {
-      lines.push(`- **${t.label}** (\`${t.id}\`) — ${t.route || 'no route'}${t.mounted ? ' — mounted projection OK' : ''}`);
+      lines.push(
+        `- **${t.label}** (\`${t.id}\`) — ${t.route || 'no route'}${t.mounted ? ' — mounted projection OK' : ''}`,
+      );
     });
     if (audit.backendSeedBacklogTotal > audit.backendSeedBacklog.length) {
       lines.push(`- … and ${audit.backendSeedBacklogTotal - audit.backendSeedBacklog.length} more`);
@@ -521,7 +534,7 @@ export function formatProductPackagingAuditMarkdown(audit = buildProductPackagin
     '- Validation service: `ProductCatalogValidationService` (post-seed reference checks)',
     '- Related: [solution-packs.md](./solution-packs.md), [saas-compliance-audit.md](./saas-compliance-audit.md)',
     '- Generator: `src/data/productPackagingAudit.ts`',
-    ''
+    '',
   );
 
   return lines.join('\n');

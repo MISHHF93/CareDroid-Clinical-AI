@@ -22,9 +22,7 @@ export function routeStatusColor(status: string): string {
   return 'var(--app-chart-1)';
 }
 
-export function alertSeverityTone(
-  severity: string,
-): 'neutral' | 'warning' | 'critical' {
+export function alertSeverityTone(severity: string): 'neutral' | 'warning' | 'critical' {
   if (severity === 'critical' || severity === 'high') return 'critical';
   if (severity === 'medium') return 'warning';
   return 'neutral';

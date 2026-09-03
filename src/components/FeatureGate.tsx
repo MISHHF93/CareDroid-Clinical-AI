@@ -19,7 +19,9 @@ export default function FeatureGate({
 
   const label = featureDefinition?.label || feature;
   return (
-    <div className={`feature-gate-placeholder${compact ? ' feature-gate-placeholder--compact' : ''}`}>
+    <div
+      className={`feature-gate-placeholder${compact ? ' feature-gate-placeholder--compact' : ''}`}
+    >
       <div>
         <Lock size={16} aria-hidden />
         <strong>{label} — Enable in Settings</strong>

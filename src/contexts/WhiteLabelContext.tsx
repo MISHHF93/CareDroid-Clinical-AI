@@ -36,7 +36,10 @@ function normalizeBranding(input: any = {}) {
   return {
     ...DEFAULT_BRANDING,
     ...Object.fromEntries(
-      Object.entries(input || {}).map(([key, value]) => [key, typeof value === 'string' ? value : value || '']),
+      Object.entries(input || {}).map(([key, value]) => [
+        key,
+        typeof value === 'string' ? value : value || '',
+      ]),
     ),
   };
 }
@@ -88,21 +91,23 @@ export function WhiteLabelProvider({ children }) {
   }, []);
 
   const value = useMemo(() => {
-    const activeBranding = tenantBranding || publicBranding?.branding || publicBranding || DEFAULT_BRANDING;
+    const activeBranding =
+      tenantBranding || publicBranding?.branding || publicBranding || DEFAULT_BRANDING;
     const normalized = normalizeBranding(activeBranding);
     const tenantId = tenant?.tenantId || publicBranding?.tenantId || organization?.slug || '';
-    const organizationName = organization?.name || publicBranding?.organizationName || normalized.displayName;
+    const organizationName =
+      organization?.name || publicBranding?.organizationName || normalized.displayName;
     return {
       branding: normalized,
       tenantId,
       organizationName,
       isWhiteLabeled: Boolean(
         normalized.logoUrl ||
-          normalized.faviconUrl ||
-          normalized.primaryColor ||
-          normalized.accentColor ||
-          normalized.loginTitle ||
-          normalized.dashboardTitle,
+        normalized.faviconUrl ||
+        normalized.primaryColor ||
+        normalized.accentColor ||
+        normalized.loginTitle ||
+        normalized.dashboardTitle,
       ),
     };
   }, [organization?.name, organization?.slug, publicBranding, tenant?.tenantId, tenantBranding]);
@@ -122,12 +127,18 @@ export function WhiteLabelProvider({ children }) {
     const { branding } = value;
     setRootVariable(root, '--tenant-primary-color', branding.primaryColor);
     setRootVariable(root, '--tenant-accent-color', branding.accentColor);
-    setRootVariable(root, '--app-accent-interactive', branding.primaryColor || branding.accentColor);
+    setRootVariable(
+      root,
+      '--app-accent-interactive',
+      branding.primaryColor || branding.accentColor,
+    );
     setRootVariable(root, '--app-accent', branding.accentColor || branding.primaryColor);
     setRootVariable(
       root,
       '--tenant-login-background-image',
-      branding.loginBackgroundImageUrl ? `url(${JSON.stringify(branding.loginBackgroundImageUrl)})` : '',
+      branding.loginBackgroundImageUrl
+        ? `url(${JSON.stringify(branding.loginBackgroundImageUrl)})`
+        : '',
     );
     root.dataset.whiteLabelTheme = branding.theme || 'system';
     document.title = branding.displayName || 'CareDroid';

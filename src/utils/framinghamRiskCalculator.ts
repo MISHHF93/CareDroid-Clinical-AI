@@ -137,8 +137,15 @@ function riskFromTotalPoints(points, sex) {
  * }} inputs
  */
 export function computeFraminghamRisk(inputs) {
-  const { ageYears, sex, totalCholesterolMgDl, hdlCholesterolMgDl, systolicBpMmHg, onHypertensionTreatment, smoker } =
-    inputs;
+  const {
+    ageYears,
+    sex,
+    totalCholesterolMgDl,
+    hdlCholesterolMgDl,
+    systolicBpMmHg,
+    onHypertensionTreatment,
+    smoker,
+  } = inputs;
 
   if (
     !Number.isFinite(ageYears) ||
@@ -160,7 +167,12 @@ export function computeFraminghamRisk(inputs) {
     smoking: smoker ? (sex === 'female' ? 2 : 2) : 0,
   };
 
-  const totalPoints = breakdown.age + breakdown.totalCholesterol + breakdown.hdl + breakdown.systolicBp + breakdown.smoking;
+  const totalPoints =
+    breakdown.age +
+    breakdown.totalCholesterol +
+    breakdown.hdl +
+    breakdown.systolicBp +
+    breakdown.smoking;
   const tenYearRiskPct = riskFromTotalPoints(totalPoints, sex);
 
   let riskCategory = 'low';

@@ -29,17 +29,11 @@ export const DISPLAY_PHI_TEXT_PATTERN = Object.freeze(
   /\b(mrn|dob|ssn|health\s*card|phn|hin)\b|(?:\bMRN[-\s]?\w+\b)|(?:\bHC[-\s]?\d+\b)|(?:\b\d{3}-\d{2}-\d{4}\b)|(?:\b\d{2}\/\d{2}\/\d{4}\b)|(?:\b[A-Z]{2,}-\d{3,}\b)/i,
 );
 
-const STRUCTURAL_PHI_PATTERN = new RegExp(
-  `"(${DISPLAY_PHI_FIELD_KEYS.join('|')})"\\s*:`,
-  'i',
-);
+const STRUCTURAL_PHI_PATTERN = new RegExp(`"(${DISPLAY_PHI_FIELD_KEYS.join('|')})"\\s*:`, 'i');
 
 const MIN_TOKEN_LENGTH = 3;
 
-export function collectDisplayPhiTokens(
-  patients: Patient[] = [],
-  staff: Staff[] = [],
-): string[] {
+export function collectDisplayPhiTokens(patients: Patient[] = [], staff: Staff[] = []): string[] {
   const tokens = new Set<string>();
 
   for (const patient of patients) {
@@ -61,14 +55,18 @@ export function collectDisplayPhiTokens(
     for (const note of patient.notes || []) {
       const noteText = String(note.text || note.body || '').trim();
       if (noteText.length >= MIN_TOKEN_LENGTH) tokens.add(noteText);
-      const author = String((note as unknown as Record<string, unknown>)['authorName'] || note.authorId || '').trim();
+      const author = String(
+        (note as unknown as Record<string, unknown>)['authorName'] || note.authorId || '',
+      ).trim();
       if (author.length >= MIN_TOKEN_LENGTH) tokens.add(author);
     }
 
     for (const event of patient.timeline || []) {
       const summary = String(event.summary || event.note || '').trim();
       if (summary.length >= MIN_TOKEN_LENGTH) tokens.add(summary);
-      const actor = String((event as unknown as Record<string, unknown>)['actorName'] || event.staffId || '').trim();
+      const actor = String(
+        (event as unknown as Record<string, unknown>)['actorName'] || event.staffId || '',
+      ).trim();
       if (actor.length >= MIN_TOKEN_LENGTH) tokens.add(actor);
     }
   }
@@ -97,10 +95,7 @@ export function assertNoPhiTokensInSerializedDisplay(
   return true;
 }
 
-export function assertDisplayPayloadIsPhiSafe(
-  value: unknown,
-  tokens: string[] = [],
-): boolean {
+export function assertDisplayPayloadIsPhiSafe(value: unknown, tokens: string[] = []): boolean {
   return assertNoPhiTokensInSerializedDisplay(JSON.stringify(value), tokens);
 }
 

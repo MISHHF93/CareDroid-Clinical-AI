@@ -2,13 +2,7 @@ import { CANONICAL_ROUTES } from '../config/routes.config';
 import { getReceptionEmbeddedIntakePath } from '../config/emergencyRolePermissions';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { enterEmsRegistrationQueue } from './queueAssignment';
-import {
-  ErrorCode,
-  err,
-  ok,
-  resultError,
-  type Result,
-} from '../contracts/results';
+import { ErrorCode, err, ok, resultError, type Result } from '../contracts/results';
 
 export type ReceptionIntakeSessionOptions = {
   autostart?: boolean;

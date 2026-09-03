@@ -87,23 +87,27 @@ describe('unifiedClinicalWorkflowOrchestrator', () => {
     const assignStaff = vi.fn();
     const addNote = vi.fn();
 
-    const result = reviewAdministrativeAutomationTask(tasks, {
-      taskId: task!.id,
-      decision: 'approve',
-      actorStaffId: 's1',
-      actorName: 'Charge Nurse',
-      executeOnApprove: false,
-    }, {
-      patients: [makePatient()],
-      movePatientToState: vi.fn(),
-      updatePatient: vi.fn(),
-      setQueueFilter: vi.fn(),
-      selectPatient: vi.fn(),
-      recordWorkflowAction,
-      emergencySettings: {} as any,
-      assignStaff,
-      addNote,
-    });
+    const result = reviewAdministrativeAutomationTask(
+      tasks,
+      {
+        taskId: task!.id,
+        decision: 'approve',
+        actorStaffId: 's1',
+        actorName: 'Charge Nurse',
+        executeOnApprove: false,
+      },
+      {
+        patients: [makePatient()],
+        movePatientToState: vi.fn(),
+        updatePatient: vi.fn(),
+        setQueueFilter: vi.fn(),
+        selectPatient: vi.fn(),
+        recordWorkflowAction,
+        emergencySettings: {} as any,
+        assignStaff,
+        addNote,
+      },
+    );
 
     expect(result.task?.status).toBe('approved');
     expect(result.task?.auditTrailId).toBeTruthy();

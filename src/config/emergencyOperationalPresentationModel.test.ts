@@ -8,10 +8,18 @@ import {
 
 describe('emergencyOperationalPresentationModel', () => {
   it('maps each primary screen mode to a role-specific emphasis', () => {
-    expect(resolveOperationalPresentation(CARE_DROID_SCREEN_MODES.reception).emphasis).toBe('speed');
-    expect(resolveOperationalPresentation(CARE_DROID_SCREEN_MODES.triage).emphasis).toBe('assessment');
-    expect(resolveOperationalPresentation(CARE_DROID_SCREEN_MODES.chargeNurse).emphasis).toBe('flow');
-    expect(resolveOperationalPresentation(CARE_DROID_SCREEN_MODES.physician).emphasis).toBe('patient');
+    expect(resolveOperationalPresentation(CARE_DROID_SCREEN_MODES.reception).emphasis).toBe(
+      'speed',
+    );
+    expect(resolveOperationalPresentation(CARE_DROID_SCREEN_MODES.triage).emphasis).toBe(
+      'assessment',
+    );
+    expect(resolveOperationalPresentation(CARE_DROID_SCREEN_MODES.chargeNurse).emphasis).toBe(
+      'flow',
+    );
+    expect(resolveOperationalPresentation(CARE_DROID_SCREEN_MODES.physician).emphasis).toBe(
+      'patient',
+    );
     expect(resolveOperationalPresentation(CARE_DROID_SCREEN_MODES.commandCenter).emphasis).toBe(
       'throughput',
     );
@@ -24,7 +32,9 @@ describe('emergencyOperationalPresentationModel', () => {
     expect(resolveOperationalPresentation(CARE_DROID_SCREEN_MODES.reception).stripLayout).toBe(
       'compact',
     );
-    expect(resolveOperationalPresentation(CARE_DROID_SCREEN_MODES.triage).stripLayout).toBe('compact');
+    expect(resolveOperationalPresentation(CARE_DROID_SCREEN_MODES.triage).stripLayout).toBe(
+      'compact',
+    );
     expect(resolveOperationalPresentation(CARE_DROID_SCREEN_MODES.chargeNurse).stripLayout).toBe(
       'compact',
     );
@@ -47,7 +57,9 @@ describe('emergencyOperationalPresentationModel', () => {
   });
 
   it('derives presentation density from the canonical screen mode registry', () => {
-    expect(resolveOperationalPresentation(CARE_DROID_SCREEN_MODES.commandCenter).density).toBe('wall');
+    expect(resolveOperationalPresentation(CARE_DROID_SCREEN_MODES.commandCenter).density).toBe(
+      'wall',
+    );
     expect(resolveOperationalPresentation(CARE_DROID_SCREEN_MODES.triage).density).toBe('compact');
   });
 });

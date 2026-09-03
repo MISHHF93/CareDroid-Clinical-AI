@@ -35,7 +35,7 @@ describe('EdAutomationMarketplace', () => {
           subscriptionTier: expect.any(String),
           workspaceVisibility: expect.any(Array),
           roiEstimate: expect.any(String),
-        })
+        }),
       );
       expect(module.roiEstimate.length).toBeGreaterThan(12);
     }
@@ -53,7 +53,7 @@ describe('EdAutomationMarketplace', () => {
             title: 'Surge Staffing',
           }),
         ]),
-      })
+      }),
     );
     const emsCategory = categories.find((category) => category.category === 'EMS');
     if (!emsCategory) throw new Error('expected EMS category to exist');
@@ -62,7 +62,7 @@ describe('EdAutomationMarketplace', () => {
         expect.objectContaining({
           title: 'Virtual ED',
         }),
-      ])
+      ]),
     );
     const simulationCategory = categories.find((category) => category.category === 'Simulation');
     if (!simulationCategory) throw new Error('expected Simulation category to exist');
@@ -71,7 +71,7 @@ describe('EdAutomationMarketplace', () => {
         expect.objectContaining({
           title: 'Simulation Academy',
         }),
-      ])
+      ]),
     );
     const analyticsCategory = categories.find((category) => category.category === 'Analytics');
     if (!analyticsCategory) throw new Error('expected Analytics category to exist');
@@ -93,7 +93,7 @@ describe('EdAutomationMarketplace', () => {
           reviewRequired: expect.any(Number),
         }),
         packagingStatement: expect.stringMatching(/sellable SaaS features/i),
-      })
+      }),
     );
   });
 });

@@ -76,7 +76,10 @@ function preserveAlertState(alert: Alert, previousAlerts: Alert[]): Alert {
   };
 }
 
-function makeAlert(input: Partial<Alert> & Pick<Alert, 'id' | 'severity' | 'title' | 'message'>, now: Date): Alert {
+function makeAlert(
+  input: Partial<Alert> & Pick<Alert, 'id' | 'severity' | 'title' | 'message'>,
+  now: Date,
+): Alert {
   return {
     dismissed: false,
     type: 'System',
@@ -114,7 +117,9 @@ export function normalizeAlert(input: AlertDispatchInput, now = new Date()): Ale
 }
 
 export function isDerivedAlertId(alertId: string): boolean {
-  return /^alert-(reassessment|capacity|ems|referral|long-wait|queue|bottleneck|bottleneck-event)-/.test(alertId);
+  return /^alert-(reassessment|capacity|ems|referral|long-wait|queue|bottleneck|bottleneck-event)-/.test(
+    alertId,
+  );
 }
 
 function deriveReassessmentAlerts(patients: Patient[], now: Date): Alert[] {
@@ -392,7 +397,11 @@ function deriveLongWaitAlerts(patients: Patient[], now: Date): Alert[] {
   });
 }
 
-function deriveQueueAlerts(queues: Queue[], bottleneckAlert: BottleneckAlert | null, now: Date): Alert[] {
+function deriveQueueAlerts(
+  queues: Queue[],
+  bottleneckAlert: BottleneckAlert | null,
+  now: Date,
+): Alert[] {
   const alerts = queues
     .filter((queue) => queue.longestWaitMinutes > queue.targetWaitMinutes)
     .map((queue) =>
@@ -400,7 +409,8 @@ function deriveQueueAlerts(queues: Queue[], bottleneckAlert: BottleneckAlert | n
         {
           id: `alert-queue-breach-${queue.type}`,
           type: 'Queue',
-          severity: queue.longestWaitMinutes >= queue.targetWaitMinutes * 2 ? 'Critical' : 'Warning',
+          severity:
+            queue.longestWaitMinutes >= queue.targetWaitMinutes * 2 ? 'Critical' : 'Warning',
           title: `${queue.name} queue breach`,
           message: `Longest wait is ${queue.longestWaitMinutes}m against a ${queue.targetWaitMinutes}m target.`,
           actionLabel: 'Review Queue',

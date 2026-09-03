@@ -1,10 +1,4 @@
-import {
-  PatientFlag,
-  PatientState,
-  Priority,
-  type Alert,
-  type Patient,
-} from '../types/emergency';
+import { PatientFlag, PatientState, Priority, type Alert, type Patient } from '../types/emergency';
 import {
   REASSESSMENT_REMINDER_OVERDUE_MS,
   activeReassessmentReminders,
@@ -92,12 +86,18 @@ export function resolveReassessmentTimerThresholds(
     ...(input.thresholds || {}),
   };
   return {
-    waitTimeWarningMin: Number(merged.waitTimeWarningMin) || DEFAULT_REASSESSMENT_TIMER_THRESHOLDS.waitTimeWarningMin,
-    reassessP1Min: Number(merged.reassessP1Min) || DEFAULT_REASSESSMENT_TIMER_THRESHOLDS.reassessP1Min,
-    reassessP2Min: Number(merged.reassessP2Min) || DEFAULT_REASSESSMENT_TIMER_THRESHOLDS.reassessP2Min,
-    reassessP3Min: Number(merged.reassessP3Min) || DEFAULT_REASSESSMENT_TIMER_THRESHOLDS.reassessP3Min,
-    reassessP4Min: Number(merged.reassessP4Min) || DEFAULT_REASSESSMENT_TIMER_THRESHOLDS.reassessP4Min,
-    reassessP5Min: Number(merged.reassessP5Min) || DEFAULT_REASSESSMENT_TIMER_THRESHOLDS.reassessP5Min,
+    waitTimeWarningMin:
+      Number(merged.waitTimeWarningMin) || DEFAULT_REASSESSMENT_TIMER_THRESHOLDS.waitTimeWarningMin,
+    reassessP1Min:
+      Number(merged.reassessP1Min) || DEFAULT_REASSESSMENT_TIMER_THRESHOLDS.reassessP1Min,
+    reassessP2Min:
+      Number(merged.reassessP2Min) || DEFAULT_REASSESSMENT_TIMER_THRESHOLDS.reassessP2Min,
+    reassessP3Min:
+      Number(merged.reassessP3Min) || DEFAULT_REASSESSMENT_TIMER_THRESHOLDS.reassessP3Min,
+    reassessP4Min:
+      Number(merged.reassessP4Min) || DEFAULT_REASSESSMENT_TIMER_THRESHOLDS.reassessP4Min,
+    reassessP5Min:
+      Number(merged.reassessP5Min) || DEFAULT_REASSESSMENT_TIMER_THRESHOLDS.reassessP5Min,
   };
 }
 
@@ -128,8 +128,7 @@ export function evaluateReassessmentDueFlag(
     (timer.isOverdue ||
       timer.stage === 'due' ||
       timer.stage === 'overdue' ||
-      (timer.lastVitalsAgeMinutes !== null &&
-        timer.lastVitalsAgeMinutes > timer.intervalMinutes));
+      (timer.lastVitalsAgeMinutes !== null && timer.lastVitalsAgeMinutes > timer.intervalMinutes));
   return { timer, shouldFlag };
 }
 
@@ -290,7 +289,8 @@ export function deriveReassessmentSchedule(
 } {
   const resolved = { ...DEFAULT_REASSESSMENT_TIMER_THRESHOLDS, ...thresholds };
   const reminder = activeReassessmentReminders(patient).sort(
-    (left: { dueAt: string }, right: { dueAt: string }) => new Date(left.dueAt).getTime() - new Date(right.dueAt).getTime(),
+    (left: { dueAt: string }, right: { dueAt: string }) =>
+      new Date(left.dueAt).getTime() - new Date(right.dueAt).getTime(),
   )[0];
 
   if (reminder?.dueAt) {
@@ -405,7 +405,8 @@ export function buildReassessmentTimerSnapshot(
   const lastVitalsAgeMinutes = minutesSince(lastVitalsTime, now);
   const lastReassessmentAgeMinutes = minutesSince(lastReassessmentTime, now);
 
-  const isOverdue = stage === 'overdue' || Boolean(patient.flags?.includes(PatientFlag.ReassessmentDue));
+  const isOverdue =
+    stage === 'overdue' || Boolean(patient.flags?.includes(PatientFlag.ReassessmentDue));
   const dueInLabel =
     isOverdue && minutesOverdue !== null
       ? `Overdue ${formatTimerLabel(minutesOverdue)}`
@@ -438,8 +439,7 @@ export function buildReassessmentTimerSnapshot(
     lastVitalsAgeLabel: formatTimerLabel(lastVitalsAgeMinutes),
     lastReassessmentAgeLabel: formatTimerLabel(lastReassessmentAgeMinutes),
     dueInLabel,
-    overdueLabel:
-      isOverdue && minutesOverdue !== null ? formatTimerLabel(minutesOverdue) : null,
+    overdueLabel: isOverdue && minutesOverdue !== null ? formatTimerLabel(minutesOverdue) : null,
     stage,
     isOverdue,
     intervalMinutes: schedule.intervalMinutes,

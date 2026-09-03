@@ -48,7 +48,16 @@ function makePatient(overrides: Partial<Patient> = {}): Patient {
     state: PatientState.Triage,
     priority: Priority.P2,
     vitals: [
-      { hr: 110, sbp: 98, dbp: 62, spo2: 94, temp: 37.6, rr: 22, gcs: 15, recordedAt: '2026-08-13T12:05:00.000Z' },
+      {
+        hr: 110,
+        sbp: 98,
+        dbp: 62,
+        spo2: 94,
+        temp: 37.6,
+        rr: 22,
+        gcs: 15,
+        recordedAt: '2026-08-13T12:05:00.000Z',
+      },
     ],
     flags: [],
     notes: [],

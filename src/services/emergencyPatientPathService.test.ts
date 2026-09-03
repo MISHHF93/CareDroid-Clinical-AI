@@ -17,7 +17,7 @@ describe('EmergencyPatientPathService', () => {
         route: '/workspace/emergency/patient-path',
         sourceState: 'Demo data · No live integration',
         safetyStatement: expect.stringMatching(/does not diagnose, treat, move patients/i),
-      })
+      }),
     );
     expect(dashboard.milestones.map((milestone) => milestone.label)).toEqual([
       'Arrival Signal',
@@ -41,7 +41,7 @@ describe('EmergencyPatientPathService', () => {
         p90DoorToDirectionMinutes: expect.any(Number),
         targetDoorToDirectionMinutes: 10,
         targetCompliance: expect.any(Number),
-      })
+      }),
     );
     expect(dashboard.patients.length).toBeGreaterThanOrEqual(100);
   });
@@ -50,7 +50,9 @@ describe('EmergencyPatientPathService', () => {
     const dashboard = EmergencyPatientPathService.getPatientPathDashboard();
     const chestPain = dashboard.patients.find((patient) => patient.complaint === 'Chest pain');
     const stroke = dashboard.patients.find((patient) => patient.complaint === 'Stroke symptoms');
-    const boarding = dashboard.patients.find((patient) => patient.destination.id === 'inpatient-admission');
+    const boarding = dashboard.patients.find(
+      (patient) => patient.destination.id === 'inpatient-admission',
+    );
 
     expect(chestPain).toEqual(
       expect.objectContaining({
@@ -66,13 +68,17 @@ describe('EmergencyPatientPathService', () => {
           owner: expect.any(String),
         }),
         nextAction: expect.any(String),
-      })
+      }),
     );
     if (!chestPain) throw new Error('expected a Chest pain patient in the demo dashboard');
     if (!stroke) throw new Error('expected a Stroke symptoms patient in the demo dashboard');
     if (!boarding) throw new Error('expected an inpatient-admission patient in the demo dashboard');
-    expect(chestPain.calculators.map((calculator) => calculator.label)).toEqual(expect.arrayContaining(['HEART']));
-    expect(stroke.calculators.map((calculator) => calculator.label)).toEqual(expect.arrayContaining(['NIHSS']));
+    expect(chestPain.calculators.map((calculator) => calculator.label)).toEqual(
+      expect.arrayContaining(['HEART']),
+    );
+    expect(stroke.calculators.map((calculator) => calculator.label)).toEqual(
+      expect.arrayContaining(['NIHSS']),
+    );
     expect(boarding.destination.label).toBe('Inpatient admission');
   });
 
@@ -83,7 +89,7 @@ describe('EmergencyPatientPathService', () => {
     expect(getDoorToDirectionMetrics()).toEqual(
       expect.objectContaining({
         doorToDirectionMinutes: dashboard.metrics.doorToDirectionMinutes,
-      })
+      }),
     );
     expect(getPatientPathForPatient(firstPatient.patientId)).toEqual(firstPatient);
     expect(getPatientPathForPatient('missing-patient')).toBeNull();
@@ -93,7 +99,7 @@ describe('EmergencyPatientPathService', () => {
           title: expect.any(String),
           action: expect.any(String),
         }),
-      ])
+      ]),
     );
   });
 });

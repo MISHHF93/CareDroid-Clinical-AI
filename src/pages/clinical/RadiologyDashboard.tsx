@@ -38,7 +38,9 @@ export default function RadiologyDashboard() {
         <div className="radiology-page__title-row">
           <GraphicIconBadge iconKey="radiology" accent="brand" size="md" />
           <div>
-            <p className="radiology-page-title-text" data-testid="cd-page-title-text">Radiology</p>
+            <p className="radiology-page-title-text" data-testid="cd-page-title-text">
+              Radiology
+            </p>
             <p>Demo study queue and read-status triage cards.</p>
           </div>
         </div>
@@ -52,7 +54,11 @@ export default function RadiologyDashboard() {
 
       <StateSourceNotice
         title="Radiology source state"
-        states={[DEMO_LIVE_STATES.DEMO, DEMO_LIVE_STATES.SIMULATED, DEMO_LIVE_STATES.BACKEND_UNAVAILABLE]}
+        states={[
+          DEMO_LIVE_STATES.DEMO,
+          DEMO_LIVE_STATES.SIMULATED,
+          DEMO_LIVE_STATES.BACKEND_UNAVAILABLE,
+        ]}
         details="Demo study queue. Use the 3D anatomy viewer, or NEXUS/Canadian C-Spine under Tools, for real imaging-decision support."
       />
 
@@ -69,8 +75,18 @@ export default function RadiologyDashboard() {
           hint="Awaiting final read"
           tone={preliminaryCount > 0 ? 'warning' : 'neutral'}
         />
-        <MetricCard label="Pending read" value={String(pendingReadCount)} hint="Not yet reviewed" tone="neutral" />
-        <MetricCard label="Studies" value={String(studies.length)} hint="In current demo queue" tone="neutral" />
+        <MetricCard
+          label="Pending read"
+          value={String(pendingReadCount)}
+          hint="Not yet reviewed"
+          tone="neutral"
+        />
+        <MetricCard
+          label="Studies"
+          value={String(studies.length)}
+          hint="In current demo queue"
+          tone="neutral"
+        />
       </div>
 
       <div className="radiology-page__charts">
@@ -102,7 +118,9 @@ export default function RadiologyDashboard() {
 
       <section className="radiology-page__panel" aria-label="Recent studies">
         <h2>Recent studies</h2>
-        <p>Demo records for training and workflow orientation — not connected to a live PACS/RIS.</p>
+        <p>
+          Demo records for training and workflow orientation — not connected to a live PACS/RIS.
+        </p>
         <div className="radiology-page__table" role="table" aria-label="Recent studies table">
           <div className="radiology-page__table-head" role="row">
             <span role="columnheader">Study</span>
@@ -117,7 +135,10 @@ export default function RadiologyDashboard() {
               <span role="cell">{row.modality}</span>
               <span role="cell">{row.patient}</span>
               <span role="cell">{row.orderedAt}</span>
-              <span role="cell" className={`radiology-page__status radiology-page__status--${radiologyStatusTone(row.status)}`}>
+              <span
+                role="cell"
+                className={`radiology-page__status radiology-page__status--${radiologyStatusTone(row.status)}`}
+              >
                 {row.status.replace('_', ' ')}
               </span>
             </div>

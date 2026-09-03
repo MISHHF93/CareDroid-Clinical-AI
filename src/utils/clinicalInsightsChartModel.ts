@@ -16,7 +16,9 @@ export function buildCdsSignalRiskChart(
   return Object.entries(counts).map(([name, value]) => ({ name, value }));
 }
 
-export function buildResearchSectionChart(snapshot = getResearchHubSnapshot()): InsightChartDatum[] {
+export function buildResearchSectionChart(
+  snapshot = getResearchHubSnapshot(),
+): InsightChartDatum[] {
   return [
     { name: 'Literature', value: snapshot.literatureCount },
     { name: 'Guidelines', value: snapshot.guidelineCount },
@@ -45,7 +47,10 @@ export function buildCostRouteChart(
 }
 
 export function buildEvaluationQualityChart(
-  trends: readonly { label: string; metrics: { modelQuality?: number } }[] = LOCAL_EVALUATION_DASHBOARD.trends,
+  trends: readonly {
+    label: string;
+    metrics: { modelQuality?: number };
+  }[] = LOCAL_EVALUATION_DASHBOARD.trends,
 ): InsightChartDatum[] {
   return trends.map((row) => ({
     name: row.label,
@@ -54,7 +59,10 @@ export function buildEvaluationQualityChart(
 }
 
 export function buildEvaluationLatencyChart(
-  trends: readonly { label: string; metrics: { latencyMs?: number } }[] = LOCAL_EVALUATION_DASHBOARD.trends,
+  trends: readonly {
+    label: string;
+    metrics: { latencyMs?: number };
+  }[] = LOCAL_EVALUATION_DASHBOARD.trends,
 ): InsightChartDatum[] {
   return trends.map((row) => ({
     name: row.label,
@@ -71,9 +79,24 @@ export function riskLevelTone(risk: string): 'good' | 'warning' | 'critical' | '
 }
 
 export const DEMO_MEMORY_ACTIVITY = Object.freeze([
-  { id: 'mem-1', label: 'qSOFA calculator session', detail: 'Sepsis risk context', time: '18m ago' },
-  { id: 'mem-2', label: 'Lab interpreter prompt', detail: 'Critical potassium review', time: '42m ago' },
-  { id: 'mem-3', label: 'Simulation debrief', detail: 'Sepsis deterioration scenario', time: '2h ago' },
+  {
+    id: 'mem-1',
+    label: 'qSOFA calculator session',
+    detail: 'Sepsis risk context',
+    time: '18m ago',
+  },
+  {
+    id: 'mem-2',
+    label: 'Lab interpreter prompt',
+    detail: 'Critical potassium review',
+    time: '42m ago',
+  },
+  {
+    id: 'mem-3',
+    label: 'Simulation debrief',
+    detail: 'Sepsis deterioration scenario',
+    time: '2h ago',
+  },
   { id: 'mem-4', label: 'Protocol library search', detail: 'Stroke alert pathway', time: '4h ago' },
 ]);
 

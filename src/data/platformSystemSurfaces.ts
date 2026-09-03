@@ -33,9 +33,21 @@ const DEMO_VIEWS_BY_CAPABILITY = Object.freeze({
       { name: 'Documentation', value: 79 },
     ],
     rows: [
-      { label: 'Assess acuity', detail: 'Use ED triage context and vitals before tool selection', status: 'draft' },
-      { label: 'Launch qSOFA', detail: 'Bedside calculator with missing-data prompts', status: 'linked' },
-      { label: 'Patient summary AI', detail: 'Draft summary with citations and review gate', status: 'review' },
+      {
+        label: 'Assess acuity',
+        detail: 'Use ED triage context and vitals before tool selection',
+        status: 'draft',
+      },
+      {
+        label: 'Launch qSOFA',
+        detail: 'Bedside calculator with missing-data prompts',
+        status: 'linked',
+      },
+      {
+        label: 'Patient summary AI',
+        detail: 'Draft summary with citations and review gate',
+        status: 'review',
+      },
       { label: 'SOAP draft', detail: 'Unsigned documentation draft only', status: 'blocked' },
     ],
   },
@@ -47,10 +59,26 @@ const DEMO_VIEWS_BY_CAPABILITY = Object.freeze({
       { name: 'Plan', value: 74 },
     ],
     rows: [
-      { label: 'Subjective', detail: 'Chief complaint, HPI, and symptom timeline from verified facts', status: 'draft' },
-      { label: 'Objective', detail: 'Vitals, exam, and imported labs with source labels', status: 'draft' },
-      { label: 'Assessment', detail: 'Problem list with uncertainty and missing-data callouts', status: 'review' },
-      { label: 'Plan', detail: 'Draft plan only — no autonomous orders or signatures', status: 'blocked' },
+      {
+        label: 'Subjective',
+        detail: 'Chief complaint, HPI, and symptom timeline from verified facts',
+        status: 'draft',
+      },
+      {
+        label: 'Objective',
+        detail: 'Vitals, exam, and imported labs with source labels',
+        status: 'draft',
+      },
+      {
+        label: 'Assessment',
+        detail: 'Problem list with uncertainty and missing-data callouts',
+        status: 'review',
+      },
+      {
+        label: 'Plan',
+        detail: 'Draft plan only — no autonomous orders or signatures',
+        status: 'blocked',
+      },
     ],
   },
   'patient-workspace': {
@@ -62,10 +90,26 @@ const DEMO_VIEWS_BY_CAPABILITY = Object.freeze({
       { name: 'Risk history', value: 69 },
     ],
     rows: [
-      { label: 'Context shell', detail: 'Patient imports, source provenance, and missing-data flags', status: 'ready' },
-      { label: 'Timeline live', detail: 'Facts, notes, AI drafts, and tool outputs in one stream', status: 'ready' },
-      { label: 'Summary AI', detail: 'Review-required patient summary with citations', status: 'review' },
-      { label: 'Care plan view', detail: 'Human-authored tasks without autonomous order changes', status: 'ready' },
+      {
+        label: 'Context shell',
+        detail: 'Patient imports, source provenance, and missing-data flags',
+        status: 'ready',
+      },
+      {
+        label: 'Timeline live',
+        detail: 'Facts, notes, AI drafts, and tool outputs in one stream',
+        status: 'ready',
+      },
+      {
+        label: 'Summary AI',
+        detail: 'Review-required patient summary with citations',
+        status: 'review',
+      },
+      {
+        label: 'Care plan view',
+        detail: 'Human-authored tasks without autonomous order changes',
+        status: 'ready',
+      },
     ],
   },
 });
@@ -83,7 +127,9 @@ function statusTone(status: string): 'good' | 'warning' | 'critical' | 'neutral'
   return 'neutral';
 }
 
-function remoteTone(remoteState: Record<string, unknown> | null | undefined): 'good' | 'warning' | 'critical' | 'neutral' {
+function remoteTone(
+  remoteState: Record<string, unknown> | null | undefined,
+): 'good' | 'warning' | 'critical' | 'neutral' {
   const status = String(remoteState?.status || 'demo');
   if (status.includes('available') || status === 'live') return 'good';
   if (status.includes('review')) return 'warning';
@@ -111,7 +157,14 @@ export function buildPlatformSystemSurfaceView({
   const packCapabilities = hubPack
     ? PLATFORM_SYSTEM_CAPABILITIES.filter((item) => item.pack === hubPack)
     : PLATFORM_SYSTEM_CAPABILITIES;
-  const demoView = capability ? (DEMO_VIEWS_BY_CAPABILITY as Record<string, typeof DEMO_VIEWS_BY_CAPABILITY['workflow-builder-ai']>)[capability.id] : null;
+  const demoView = capability
+    ? (
+        DEMO_VIEWS_BY_CAPABILITY as Record<
+          string,
+          (typeof DEMO_VIEWS_BY_CAPABILITY)['workflow-builder-ai']
+        >
+      )[capability.id]
+    : null;
   const iconKey =
     (capability && (ICON_BY_CAPABILITY as Record<string, string>)[capability.id]) ||
     (hubPack && (ICON_BY_PACK as Record<string, string>)[hubPack]) ||
@@ -122,9 +175,12 @@ export function buildPlatformSystemSurfaceView({
     capability?.summary ||
     'Launchable platform systems that add patient context, interoperability, documentation support, auditability, cost controls, and explainability to the tool roadmap.';
 
-  const chart = demoView?.chart ||
+  const chart =
+    demoView?.chart ||
     (hubPack
-      ? packCapabilities.map((item) => ({ name: item.name, value: tierScore(item.tier) })).slice(0, 8)
+      ? packCapabilities
+          .map((item) => ({ name: item.name, value: tierScore(item.tier) }))
+          .slice(0, 8)
       : []);
 
   const rows =
@@ -139,7 +195,9 @@ export function buildPlatformSystemSurfaceView({
     title,
     summary,
     iconKey,
-    eyebrow: capability ? `${capability.pack} · Tier ${capability.tier}` : 'CareDroid platform systems',
+    eyebrow: capability
+      ? `${capability.pack} · Tier ${capability.tier}`
+      : 'CareDroid platform systems',
     chart,
     rows,
     metrics: [
@@ -169,7 +227,9 @@ export function buildPlatformSystemSurfaceView({
       },
     ],
     contract: {
-      endpoint: capability?.endpoint?.replace(':patientId', patientId) || '/api/platform-systems/packs/:pack',
+      endpoint:
+        capability?.endpoint?.replace(':patientId', patientId) ||
+        '/api/platform-systems/packs/:pack',
       method: capability?.method || 'GET',
       requestDto: capability?.requestDto || 'Pack summary DTO',
       responseDto: capability?.responseDto || 'Pack summary DTO',

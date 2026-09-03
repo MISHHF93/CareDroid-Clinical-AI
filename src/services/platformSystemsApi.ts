@@ -39,13 +39,10 @@ export async function fetchPlatformSystemCapability(capabilityId, options: any =
 
 export async function fetchPlatformSystemHub(pack, options: any = {}) {
   try {
-    const response = await apiFetch(
-      `/api/platform-systems/packs/${encodeURIComponent(pack)}`,
-      {
-        method: 'GET',
-        headers: authHeaders(options),
-      }
-    );
+    const response = await apiFetch(`/api/platform-systems/packs/${encodeURIComponent(pack)}`, {
+      method: 'GET',
+      headers: authHeaders(options),
+    });
     const data = await parseApiResponse(response, { fallback: {} });
 
     if (!response.ok) {
@@ -94,4 +91,3 @@ export async function postPlatformSystemContract(endpoint, payload: any = {}, op
     };
   }
 }
-

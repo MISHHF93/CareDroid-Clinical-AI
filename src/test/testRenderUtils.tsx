@@ -49,8 +49,7 @@ export function createMockUserValue(overrides: any = {}) {
     fullName: 'Test Clinician',
   };
 
-  const mergedUser =
-    overrides.user === null ? null : { ...baseUser, ...(overrides.user || {}) };
+  const mergedUser = overrides.user === null ? null : { ...baseUser, ...(overrides.user || {}) };
   const contextOverrides = { ...overrides };
   delete contextOverrides.user;
 

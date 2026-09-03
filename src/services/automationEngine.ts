@@ -8,10 +8,7 @@ import {
   getAutomationById,
   getWorkspaceAutomations,
 } from '../data/automationRegistry';
-import {
-  AUTOMATION_AUDIT_STATUSES,
-  logAutomationAuditEvent,
-} from '../data/automationAuditTrail';
+import { AUTOMATION_AUDIT_STATUSES, logAutomationAuditEvent } from '../data/automationAuditTrail';
 
 function mergeAutomationContext(
   context: AutomationEngineRuntimeContext = {},
@@ -42,8 +39,17 @@ function shouldBlock(automation, context: any = {}) {
     return `Automation "${automation.automationId}" is not entitled for this tenant.`;
   }
   if (automation.subscriptionTier && context.subscriptionTier) {
-    const tierOrder = { free: 0, starter: 1, professional: 2, academic: 2, enterprise: 3, government: 3 };
-    if ((tierOrder[context.subscriptionTier] ?? 0) < (tierOrder[automation.subscriptionTier] ?? 0)) {
+    const tierOrder = {
+      free: 0,
+      starter: 1,
+      professional: 2,
+      academic: 2,
+      enterprise: 3,
+      government: 3,
+    };
+    if (
+      (tierOrder[context.subscriptionTier] ?? 0) < (tierOrder[automation.subscriptionTier] ?? 0)
+    ) {
       return `Requires ${automation.subscriptionTier} subscription.`;
     }
   }
@@ -54,7 +60,11 @@ function shouldBlock(automation, context: any = {}) {
 }
 
 function buildAuditEvent(automation, status, context: any = {}, extra: any = {}) {
-  const patientJourneyStates = automation?.patientJourneyStates || automation?.journeyStages || automation?.requiredWorkflows || [];
+  const patientJourneyStates =
+    automation?.patientJourneyStates ||
+    automation?.journeyStages ||
+    automation?.requiredWorkflows ||
+    [];
 
   return {
     triggerFired: automation?.trigger || 'Automation trigger',
@@ -89,7 +99,11 @@ export const AutomationEngine = {
   evaluateAutomation(automationId, context: any = {}) {
     const runtimeContext = mergeAutomationContext(context);
     const automation = getAutomationById(automationId);
-    const patientJourneyStates = automation?.patientJourneyStates || automation?.journeyStages || automation?.requiredWorkflows || [];
+    const patientJourneyStates =
+      automation?.patientJourneyStates ||
+      automation?.journeyStages ||
+      automation?.requiredWorkflows ||
+      [];
     const blockedReason = shouldBlock(automation, runtimeContext);
     const conditionResults = (automation?.conditions || []).map((condition) => ({
       label: condition,
@@ -132,7 +146,7 @@ export const AutomationEngine = {
     const auditEntry = logAutomationAuditEvent(
       buildAuditEvent(evaluation.automation, evaluation.status, runtimeContext, {
         reason: evaluation.status === AUTOMATION_AUDIT_STATUSES.BLOCKED ? evaluation.reason : '',
-      })
+      }),
     );
     return {
       ...evaluation,
@@ -156,14 +170,25 @@ export const AutomationEngine = {
     );
     return {
       workspaceId,
-      activeAutomations: automations.filter((automation) => automation.status === AUTOMATION_STATUSES.ACTIVE),
-      disabledAutomations: automations.filter((automation) => automation.status === AUTOMATION_STATUSES.DISABLED),
-      demoAutomations: automations.filter((automation) => automation.status === AUTOMATION_STATUSES.DEMO),
-      blockedAutomations: evaluations.filter((evaluation) => !evaluation.ok).map((evaluation) => evaluation.automation),
+      activeAutomations: automations.filter(
+        (automation) => automation.status === AUTOMATION_STATUSES.ACTIVE,
+      ),
+      disabledAutomations: automations.filter(
+        (automation) => automation.status === AUTOMATION_STATUSES.DISABLED,
+      ),
+      demoAutomations: automations.filter(
+        (automation) => automation.status === AUTOMATION_STATUSES.DEMO,
+      ),
+      blockedAutomations: evaluations
+        .filter((evaluation) => !evaluation.ok)
+        .map((evaluation) => evaluation.automation),
       settings: {
-        humanReviewRequired: automations.filter((automation) => automation.humanReviewRequired).length,
+        humanReviewRequired: automations.filter((automation) => automation.humanReviewRequired)
+          .length,
         highRisk: automations.filter((automation) => automation.riskLevel === 'high').length,
-        subscriptionTiers: [...new Set(automations.map((automation) => automation.subscriptionTier))],
+        subscriptionTiers: [
+          ...new Set(automations.map((automation) => automation.subscriptionTier)),
+        ],
       },
     };
   },
@@ -171,6 +196,7 @@ export const AutomationEngine = {
 
 export const evaluateAutomation = AutomationEngine.evaluateAutomation.bind(AutomationEngine);
 export const runAutomation = AutomationEngine.runAutomation.bind(AutomationEngine);
-export const getWorkspaceAutomationState = AutomationEngine.getWorkspaceAutomationState.bind(AutomationEngine);
+export const getWorkspaceAutomationState =
+  AutomationEngine.getWorkspaceAutomationState.bind(AutomationEngine);
 
 export default AutomationEngine;

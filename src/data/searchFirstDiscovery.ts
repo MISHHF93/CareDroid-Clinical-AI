@@ -1,12 +1,19 @@
 import { getActiveWorkspaceRegistry, isFutureWorkspace } from '../config/workspace.config';
-import { QUICK_COMMAND_DESTINATION_ITEMS, canExposeNavigationItem } from '../config/navigation.config';
+import {
+  QUICK_COMMAND_DESTINATION_ITEMS,
+  canExposeNavigationItem,
+} from '../config/navigation.config';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import {
   PILOT_CUSTOMER_MODE,
   getPilotCustomerNavigationItems,
 } from '../config/unified-navigation.config';
 import { buildAssetInventoryProjection } from './assetInventory';
-import { PLATFORM_DASHBOARDS, PLATFORM_NOTIFICATIONS, PLATFORM_WORKFLOWS } from './platformOperatingSystem';
+import {
+  PLATFORM_DASHBOARDS,
+  PLATFORM_NOTIFICATIONS,
+  PLATFORM_WORKFLOWS,
+} from './platformOperatingSystem';
 import { SIMULATION_SCENARIOS } from './medicalSimulationCatalog';
 import { PROTOCOL_PATHWAYS } from './protocolPathwayLibrary';
 import { AI_MODEL_REGISTRY } from './aiModelRegistry';
@@ -27,7 +34,9 @@ function uniqueEntriesByPath(entries) {
   });
 }
 
-const ACTIVE_WORKSPACE_ID_SET = new Set(getActiveWorkspaceRegistry().map((workspace) => workspace.id));
+const ACTIVE_WORKSPACE_ID_SET = new Set(
+  getActiveWorkspaceRegistry().map((workspace) => workspace.id),
+);
 const NON_WORKSPACE_SCOPE_IDS = new Set(['assistant', 'clinical', 'commercial']);
 const FUTURE_MODULE_ROUTE_PREFIXES = Object.freeze([
   '/fleet',
@@ -41,18 +50,24 @@ const FUTURE_MODULE_ROUTE_PREFIXES = Object.freeze([
 function hasActiveWorkspaceScope(entry) {
   const workspaceIds = entry.workspaceIds || [];
   if (!workspaceIds.length) return true;
-  return workspaceIds.some((workspaceId) => ACTIVE_WORKSPACE_ID_SET.has(workspaceId) || NON_WORKSPACE_SCOPE_IDS.has(workspaceId));
+  return workspaceIds.some(
+    (workspaceId) =>
+      ACTIVE_WORKSPACE_ID_SET.has(workspaceId) || NON_WORKSPACE_SCOPE_IDS.has(workspaceId),
+  );
 }
 
 function isFutureModuleRoute(path = '') {
-  return FUTURE_MODULE_ROUTE_PREFIXES.some((prefix) => path === prefix || path.startsWith(`${prefix}/`));
+  return FUTURE_MODULE_ROUTE_PREFIXES.some(
+    (prefix) => path === prefix || path.startsWith(`${prefix}/`),
+  );
 }
 
 const COMMERCIAL_CAPABILITY_GROUPS = Object.freeze([
   {
     id: 'asset-packs',
     title: 'Asset Pack Builder',
-    description: 'Discover sellable asset packs and the products, routes, and assets each pack powers.',
+    description:
+      'Discover sellable asset packs and the products, routes, and assets each pack powers.',
     path: CANONICAL_ROUTES.assetPacks,
     aliases: ['packs', 'asset packs', 'package assets', 'pack builder'],
   },
@@ -92,7 +107,14 @@ const COMMERCIAL_CAPABILITY_GROUPS = Object.freeze([
     description:
       'Prompts 99–116 — benchmarking, franchise readiness, certification, risk, continuity, DR, assets, workforce, training, knowledge, playbooks, decision support, scenarios, strategy, portfolio, governance, ESG, architecture.',
     path: CANONICAL_ROUTES.enterprisePlatform,
-    aliases: ['enterprise platform', 'benchmarking', 'franchise readiness', 'risk register', 'ESG', 'portfolio'],
+    aliases: [
+      'enterprise platform',
+      'benchmarking',
+      'franchise readiness',
+      'risk register',
+      'ESG',
+      'portfolio',
+    ],
   },
   {
     id: 'platform-intelligence',
@@ -100,7 +122,13 @@ const COMMERCIAL_CAPABILITY_GROUPS = Object.freeze([
     description:
       'Prompts 117–136 — artifact registry, lineage, metadata, KPI intelligence, observability, technical debt, platform convergence.',
     path: CANONICAL_ROUTES.platformIntelligence,
-    aliases: ['platform intelligence', 'data catalog', 'data lineage', 'technical debt', 'convergence review'],
+    aliases: [
+      'platform intelligence',
+      'data catalog',
+      'data lineage',
+      'technical debt',
+      'convergence review',
+    ],
   },
   {
     id: 'product-intelligence',
@@ -126,14 +154,21 @@ const COMMERCIAL_CAPABILITY_GROUPS = Object.freeze([
   {
     id: 'automation-analytics',
     title: 'Automation Analytics',
-    description: 'Track solution automation runs, adoption, failures, human overrides, and accepted AI recommendations.',
+    description:
+      'Track solution automation runs, adoption, failures, human overrides, and accepted AI recommendations.',
     path: CANONICAL_ROUTES.automationAnalytics,
-    aliases: ['automation analytics', 'automation adoption', 'solution automation metrics', 'human overrides'],
+    aliases: [
+      'automation analytics',
+      'automation adoption',
+      'solution automation metrics',
+      'human overrides',
+    ],
   },
   {
     id: 'configuration-studio',
     title: 'Configuration Studio',
-    description: 'Open admin tenant configuration for products, packs, workspaces, and enabled capabilities.',
+    description:
+      'Open admin tenant configuration for products, packs, workspaces, and enabled capabilities.',
     path: CANONICAL_ROUTES.configurationStudio,
     aliases: ['configuration', 'tenant configuration', 'configuration studio', 'admin setup'],
   },
@@ -165,7 +200,8 @@ const COMMERCIAL_ROW_LEVEL_ENTRIES = Object.freeze([
   {
     id: 'agent-operations',
     title: 'Operations AI Agent',
-    description: 'Launch the Operations agent for maps, devices, alerts, and workflow coordination.',
+    description:
+      'Launch the Operations agent for maps, devices, alerts, and workflow coordination.',
     path: `${CANONICAL_ROUTES.assistant}?agent=agent-operations`,
     workspaceIds: ['operations', 'medical-iot', 'fleet', 'assistant'],
     aliases: ['operations agent', 'device agent', 'fleet agent'],
@@ -344,18 +380,18 @@ function emergencyOsDestinationEntries() {
     (destination) =>
       !PILOT_CUSTOMER_MODE.enabled || PILOT_EMERGENCY_OS_DESTINATION_PATHS.has(destination.path),
   ).map((destination) => ({
-      id: `emergency-os:${destination.id}`,
-      sourceId: destination.id,
-      kind: 'destination',
-      category: 'emergency-os',
-      type: 'navigation',
-      title: destination.title,
-      label: destination.title,
-      description: `Open ${destination.title} in CareDroid.`,
-      path: destination.path,
-      workspaceIds: ['emergency'],
-      aliases: unique([destination.id, ...(destination.aliases || [])]),
-      assistantPrompt: `Open or explain the ${destination.title} CareDroid workflow.`,
+    id: `emergency-os:${destination.id}`,
+    sourceId: destination.id,
+    kind: 'destination',
+    category: 'emergency-os',
+    type: 'navigation',
+    title: destination.title,
+    label: destination.title,
+    description: `Open ${destination.title} in CareDroid.`,
+    path: destination.path,
+    workspaceIds: ['emergency'],
+    aliases: unique([destination.id, ...(destination.aliases || [])]),
+    assistantPrompt: `Open or explain the ${destination.title} CareDroid workflow.`,
   }));
 }
 
@@ -369,30 +405,34 @@ function navigationDestinationEntries({
       canExposeNavigationItem(destination, {
         permissions: navigationPermissions,
         includeContextual: includeContextualDestinations,
-      })
+      }),
     )
     .filter((destination) => !isFutureModuleRoute(destination.path))
     .map((destination) => ({
-    id: `nav-destination:${destination.id}`,
-    sourceId: destination.id,
-    kind: 'destination',
-    category: 'destination',
-    type: 'navigation',
-    title: destination.label,
-    label: destination.label,
-    description: `Open ${destination.label}.`,
-    path: destination.path,
-    workspaceIds: [],
-    tags: unique([
-      destination.mobileLabel,
-      destination.permission,
-      ...(destination.matchPaths || []),
-      ...(destination.matchPrefixes || []),
-      ...(destination.legacyPaths || []),
-    ]),
-    aliases: unique([destination.id, destination.mobileLabel, ...(NAVIGATION_DESTINATION_ALIASES[destination.id] || [])]),
-    assistantPrompt: `Open or explain where to find ${destination.label}.`,
-  }));
+      id: `nav-destination:${destination.id}`,
+      sourceId: destination.id,
+      kind: 'destination',
+      category: 'destination',
+      type: 'navigation',
+      title: destination.label,
+      label: destination.label,
+      description: `Open ${destination.label}.`,
+      path: destination.path,
+      workspaceIds: [],
+      tags: unique([
+        destination.mobileLabel,
+        destination.permission,
+        ...(destination.matchPaths || []),
+        ...(destination.matchPrefixes || []),
+        ...(destination.legacyPaths || []),
+      ]),
+      aliases: unique([
+        destination.id,
+        destination.mobileLabel,
+        ...(NAVIGATION_DESTINATION_ALIASES[destination.id] || []),
+      ]),
+      assistantPrompt: `Open or explain where to find ${destination.label}.`,
+    }));
 }
 
 function assetEntries(assets = buildAssetInventoryProjection()) {
@@ -409,8 +449,17 @@ function assetEntries(assets = buildAssetInventoryProjection()) {
       description: asset.description,
       path: asset.route || asset.mounting?.navigationPath || '/assets',
       workspaceIds: unique(asset.workspaceIds || asset.access?.workspaceIds),
-      tags: unique([asset.category, asset.assetType, ...(asset.packIds || []), ...(asset.productIds || [])]),
-      aliases: unique([asset.canonicalInventoryId, asset.capabilityId, ...(asset.mounting?.aiAliases || [])]),
+      tags: unique([
+        asset.category,
+        asset.assetType,
+        ...(asset.packIds || []),
+        ...(asset.productIds || []),
+      ]),
+      aliases: unique([
+        asset.canonicalInventoryId,
+        asset.capabilityId,
+        ...(asset.mounting?.aiAliases || []),
+      ]),
       tool: asset.route ? { id: asset.id } : null,
       assistantPrompt: `Help me find and use the ${asset.title} asset in the current workspace.`,
     }));
@@ -428,7 +477,9 @@ function workflowEntries() {
     description: workflow.description,
     path: `/workflows?workflow=${workflow.id}`,
     workspaceIds: workflow.workspaceIds || [],
-    tags: unique((workflow.blocks || []).map((block) => [block.type, block.label, block.toolId, block.path])),
+    tags: unique(
+      (workflow.blocks || []).map((block) => [block.type, block.label, block.toolId, block.path]),
+    ),
     aliases: unique((workflow.blocks || []).map((block) => [block.id, block.label, block.toolId])),
     assistantPrompt: `Help me launch or adapt the ${workflow.name}.`,
   }));
@@ -481,7 +532,11 @@ function protocolEntries() {
     description: pathway.summary || pathway.subtitle,
     path: `/protocols?pathway=${pathway.id}`,
     workspaceIds: unique([
-      pathway.category === 'sepsis' || pathway.category === 'stroke' || pathway.category === 'trauma' ? 'emergency' : null,
+      pathway.category === 'sepsis' ||
+      pathway.category === 'stroke' ||
+      pathway.category === 'trauma'
+        ? 'emergency'
+        : null,
       pathway.category === 'respiratory failure' ? 'icu' : null,
       pathway.category === 'ACS' ? 'cardiology' : null,
       'clinical',
@@ -549,47 +604,62 @@ function marketplaceAgentEntries() {
 
 function workspaceAgentEntries() {
   const entries = getActiveWorkspaceRegistry().flatMap((workspace) =>
-    (workspace.defaultAIAgents || workspace.workspaceProfile?.defaultAIAgents || []).map((agentId) => ({
-      id: `ai-agent:${workspace.id}:${agentId}`,
-      sourceId: agentId,
-      kind: 'ai-agent',
-      category: 'ai-agent',
-      type: 'workspace-agent',
-      title: String(agentId).replace(/-/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase()),
-      label: String(agentId).replace(/-/g, ' '),
-      description: `${workspace.label} workspace AI agent for ${workspace.description}`,
-      path: `/assistant?agent=${agentId}`,
-      workspaceIds: [workspace.id, 'assistant'],
-      tags: unique([workspace.label, workspace.shortLabel, workspace.aiContext, ...(workspace.toolIds || [])]),
-      aliases: [agentId, workspace.id],
-      assistantPrompt: `Use the ${agentId} agent with ${workspace.label} workspace context.`,
-    }))
+    (workspace.defaultAIAgents || workspace.workspaceProfile?.defaultAIAgents || []).map(
+      (agentId) => ({
+        id: `ai-agent:${workspace.id}:${agentId}`,
+        sourceId: agentId,
+        kind: 'ai-agent',
+        category: 'ai-agent',
+        type: 'workspace-agent',
+        title: String(agentId)
+          .replace(/-/g, ' ')
+          .replace(/\b\w/g, (letter) => letter.toUpperCase()),
+        label: String(agentId).replace(/-/g, ' '),
+        description: `${workspace.label} workspace AI agent for ${workspace.description}`,
+        path: `/assistant?agent=${agentId}`,
+        workspaceIds: [workspace.id, 'assistant'],
+        tags: unique([
+          workspace.label,
+          workspace.shortLabel,
+          workspace.aiContext,
+          ...(workspace.toolIds || []),
+        ]),
+        aliases: [agentId, workspace.id],
+        assistantPrompt: `Use the ${agentId} agent with ${workspace.label} workspace context.`,
+      }),
+    ),
   );
   return entries;
 }
 
 function operationEntries() {
-  return OPERATIONS_CENTER_SURFACES.filter((surface) => !isFutureWorkspace(surface.id)).map((surface) => ({
-    id: `operation:${surface.id}`,
-    sourceId: surface.id,
-    kind: 'operation',
-    category: 'operation',
-    type: surface.domain,
-    title: surface.title,
-    label: surface.title,
-    description: surface.summary,
-    path: surface.path,
-    workspaceIds: unique(['operations', surface.id === 'medical-iot' ? 'medical-iot' : null, surface.id === 'fleet' ? 'fleet' : null]),
-    tags: unique([
-      surface.domain,
-      surface.status,
-      ...(surface.roles || []),
-      ...(surface.permissions || []),
-      ...(surface.metrics || []).map((metric) => [metric.label, metric.value]),
-    ]),
-    aliases: [surface.id],
-    assistantPrompt: `Help me inspect the ${surface.title} operation surface.`,
-  }));
+  return OPERATIONS_CENTER_SURFACES.filter((surface) => !isFutureWorkspace(surface.id)).map(
+    (surface) => ({
+      id: `operation:${surface.id}`,
+      sourceId: surface.id,
+      kind: 'operation',
+      category: 'operation',
+      type: surface.domain,
+      title: surface.title,
+      label: surface.title,
+      description: surface.summary,
+      path: surface.path,
+      workspaceIds: unique([
+        'operations',
+        surface.id === 'medical-iot' ? 'medical-iot' : null,
+        surface.id === 'fleet' ? 'fleet' : null,
+      ]),
+      tags: unique([
+        surface.domain,
+        surface.status,
+        ...(surface.roles || []),
+        ...(surface.permissions || []),
+        ...(surface.metrics || []).map((metric) => [metric.label, metric.value]),
+      ]),
+      aliases: [surface.id],
+      assistantPrompt: `Help me inspect the ${surface.title} operation surface.`,
+    }),
+  );
 }
 
 function automationEntries() {
@@ -716,8 +786,13 @@ export function buildSearchFirstDiscoveryEntries({
   }));
 }
 
-export function filterSearchFirstDiscoveryEntries(entries, { query = '', workspaceId = 'all', category = 'all' }: any = {}) {
-  const normalizedQuery = String(query || '').trim().toLowerCase();
+export function filterSearchFirstDiscoveryEntries(
+  entries,
+  { query = '', workspaceId = 'all', category = 'all' }: any = {},
+) {
+  const normalizedQuery = String(query || '')
+    .trim()
+    .toLowerCase();
   const queryTokens = normalizedQuery.split(/\s+/).filter(Boolean);
   const scoreEntry = (entry) => {
     if (!queryTokens.length) return 0;
@@ -737,13 +812,23 @@ export function filterSearchFirstDiscoveryEntries(entries, { query = '', workspa
 
   return entries
     .filter((entry) => workspaceId === 'all' || (entry.workspaceIds || []).includes(workspaceId))
-    .filter((entry) => category === 'all' || entry.category === category || entry.type === category || entry.kind === category)
+    .filter(
+      (entry) =>
+        category === 'all' ||
+        entry.category === category ||
+        entry.type === category ||
+        entry.kind === category,
+    )
     .filter((entry) => {
       if (!queryTokens.length) return true;
       const text = searchDiscoveryText(entry);
       return queryTokens.every((token) => text.includes(token));
     })
-    .sort((a, b) => scoreEntry(b) - scoreEntry(a) || String(a.title || a.label).localeCompare(String(b.title || b.label)));
+    .sort(
+      (a, b) =>
+        scoreEntry(b) - scoreEntry(a) ||
+        String(a.title || a.label).localeCompare(String(b.title || b.label)),
+    );
 }
 
 export function buildSearchFirstResults(options: any = {}) {
@@ -751,8 +836,9 @@ export function buildSearchFirstResults(options: any = {}) {
   return filterSearchFirstDiscoveryEntries(
     buildSearchFirstDiscoveryEntries({
       ...options,
-      includeContextualDestinations: options.includeContextualDestinations ?? Boolean(normalizedQuery),
+      includeContextualDestinations:
+        options.includeContextualDestinations ?? Boolean(normalizedQuery),
     }),
-    options
+    options,
   );
 }

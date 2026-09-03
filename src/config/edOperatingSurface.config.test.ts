@@ -24,9 +24,9 @@ describe('edOperatingSurface.config', () => {
     expect(resolveEdOperatingSurfaceFromPath(CANONICAL_ROUTES.emergencyWhiteboard)?.surfaceId).toBe(
       'whiteboard',
     );
-    expect(resolveEdOperatingSurfaceFromPath(`${CANONICAL_ROUTES.triage}?queue=pretriage`)?.surfaceId).toBe(
-      'triage',
-    );
+    expect(
+      resolveEdOperatingSurfaceFromPath(`${CANONICAL_ROUTES.triage}?queue=pretriage`)?.surfaceId,
+    ).toBe('triage');
     expect(resolveEdOperatingSurfaceFromPath(CANONICAL_ROUTES.dashboard)?.surfaceId).toBe(
       'command-center',
     );

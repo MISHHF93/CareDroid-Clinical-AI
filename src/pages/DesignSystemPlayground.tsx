@@ -1,11 +1,20 @@
-import { useState, type ReactNode, type ComponentType, type ChangeEvent, type FocusEvent, type CSSProperties } from 'react';
+import {
+  useState,
+  type ReactNode,
+  type ComponentType,
+  type ChangeEvent,
+  type FocusEvent,
+  type CSSProperties,
+} from 'react';
 import Button from '../components/ui/button';
 import InputImpl from '../components/ui/input';
 import Card from '../components/ui/card';
 import AlertImpl from '../components/ui/Alert';
 import Badge from '../components/ui/Badge';
 import PageHeaderImpl from '../components/ui/PageHeader';
-import OperationalEmptyStateImpl, { OperationalEmptyAction as OperationalEmptyActionImpl } from '../components/ui/OperationalEmptyState';
+import OperationalEmptyStateImpl, {
+  OperationalEmptyAction as OperationalEmptyActionImpl,
+} from '../components/ui/OperationalEmptyState';
 import { Drawer } from '../components/ui/Drawer';
 import { Spinner, LoadingScreen, LoadingText } from '../components/ui/Spinner';
 import SkeletonLoader from '../components/ui/SkeletonLoader';
@@ -78,7 +87,8 @@ type OperationalEmptyStateProps = {
   className?: string;
   role?: string;
 };
-const OperationalEmptyState = OperationalEmptyStateImpl as ComponentType<OperationalEmptyStateProps>;
+const OperationalEmptyState =
+  OperationalEmptyStateImpl as ComponentType<OperationalEmptyStateProps>;
 
 type OperationalEmptyActionProps = {
   children?: ReactNode;
@@ -86,7 +96,8 @@ type OperationalEmptyActionProps = {
   secondary?: boolean;
   type?: 'button' | 'submit' | 'reset';
 };
-const OperationalEmptyAction = OperationalEmptyActionImpl as ComponentType<OperationalEmptyActionProps>;
+const OperationalEmptyAction =
+  OperationalEmptyActionImpl as ComponentType<OperationalEmptyActionProps>;
 
 /**
  * Item 41 — a developer-facing catalog of CareDroid's real, canonical
@@ -175,7 +186,9 @@ export default function DesignSystemPlayground() {
   return (
     <div className="ds-playground">
       <header className="ds-playground__masthead">
-        <span className="ds-playground__eyebrow">Developer catalog · not a production destination</span>
+        <span className="ds-playground__eyebrow">
+          Developer catalog · not a production destination
+        </span>
         <h1>CareDroid Design System Playground</h1>
         <p>
           Every component below is the real, canonical implementation used across the app — rendered
@@ -217,7 +230,12 @@ export default function DesignSystemPlayground() {
 
       <Section title="Fields" description="src/components/ui/input.tsx">
         <div className="ds-playground__row ds-playground__row--wrap">
-          <Input label="Normal field" placeholder="Type here..." value={inputValue} onChange={(e) => setInputValue(e.target.value)} />
+          <Input
+            label="Normal field"
+            placeholder="Type here..."
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+          />
           <Input label="With error" error="This field is required." defaultValue="Invalid value" />
           <Input label="With success" success="Looks good." defaultValue="Valid value" />
           <Input label="Disabled" disabled defaultValue="Cannot edit" />
@@ -228,21 +246,32 @@ export default function DesignSystemPlayground() {
       <Section title="Cards" description="src/components/ui/card.tsx">
         <div className="ds-playground__row ds-playground__row--wrap">
           <Card style={{ width: 220 }}>Default card</Card>
-          <Card subtle style={{ width: 220 }}>Subtle card</Card>
-          <Card hover style={{ width: 220 }}>Hoverable card</Card>
-          <Card compact style={{ width: 220 }}>Compact card</Card>
+          <Card subtle style={{ width: 220 }}>
+            Subtle card
+          </Card>
+          <Card hover style={{ width: 220 }}>
+            Hoverable card
+          </Card>
+          <Card compact style={{ width: 220 }}>
+            Compact card
+          </Card>
           <Card style={{ width: 220 }}>{LONG_TEXT}</Card>
           <Card style={{ width: 220 }}>{/* deliberately empty -- missing content */}</Card>
         </div>
       </Section>
 
-      <Section title="Statuses" description="src/components/ui/Badge.tsx + src/components/ai/AiTruthLabel.tsx">
+      <Section
+        title="Statuses"
+        description="src/components/ui/Badge.tsx + src/components/ai/AiTruthLabel.tsx"
+      >
         <div className="ds-playground__row">
-          {(['neutral', 'brand', 'info', 'success', 'warning', 'danger'] as const).map((variant) => (
-            <Badge key={variant} variant={variant}>
-              {variant}
-            </Badge>
-          ))}
+          {(['neutral', 'brand', 'info', 'success', 'warning', 'danger'] as const).map(
+            (variant) => (
+              <Badge key={variant} variant={variant}>
+                {variant}
+              </Badge>
+            ),
+          )}
           <Badge variant="danger" dot>
             with dot
           </Badge>
@@ -286,7 +315,10 @@ export default function DesignSystemPlayground() {
         </div>
       </Section>
 
-      <Section title="Patient context" description="src/components/PatientCard.tsx (the real component, real Patient shape)">
+      <Section
+        title="Patient context"
+        description="src/components/PatientCard.tsx (the real component, real Patient shape)"
+      >
         <div className="ds-playground__stack">
           <PatientCard patient={buildPatient()} layout="row" />
           <PatientCard patient={EDGE_CASE_PATIENT} layout="row" />
@@ -300,12 +332,24 @@ export default function DesignSystemPlayground() {
 
       <Section title="Dialogs & drawers" description="src/components/ui/Drawer.tsx">
         <Button onClick={() => setDrawerOpen(true)}>Open drawer</Button>
-        <Drawer isOpen={drawerOpen} onClose={() => setDrawerOpen(false)} title="Example drawer" side="right" size="md">
-          <p>Drawer body content. Escape, overlay click, and focus return all work exactly as in production.</p>
+        <Drawer
+          isOpen={drawerOpen}
+          onClose={() => setDrawerOpen(false)}
+          title="Example drawer"
+          side="right"
+          size="md"
+        >
+          <p>
+            Drawer body content. Escape, overlay click, and focus return all work exactly as in
+            production.
+          </p>
         </Drawer>
       </Section>
 
-      <Section title="Empty, loading & error states" description="src/components/ui/OperationalEmptyState.tsx + Spinner.tsx + SkeletonLoader.tsx">
+      <Section
+        title="Empty, loading & error states"
+        description="src/components/ui/OperationalEmptyState.tsx + Spinner.tsx + SkeletonLoader.tsx"
+      >
         <div className="ds-playground__row ds-playground__row--wrap">
           <Swatch label="Empty state">
             <OperationalEmptyState
@@ -314,7 +358,11 @@ export default function DesignSystemPlayground() {
               guidance="Nothing matches the current filters."
               status="0 records"
               nextSteps={['Clear filters', 'Broaden the date range']}
-              actions={<OperationalEmptyAction onClick={() => setInputValue('')}>Clear filters</OperationalEmptyAction>}
+              actions={
+                <OperationalEmptyAction onClick={() => setInputValue('')}>
+                  Clear filters
+                </OperationalEmptyAction>
+              }
             />
           </Swatch>
           <Swatch label="Spinner">
@@ -330,7 +378,9 @@ export default function DesignSystemPlayground() {
         </Swatch>
         <div className="ds-playground__gap" />
         <Swatch label="Loading screen (full-viewport overlay -- preview only, since the real component is position:fixed)">
-          <Button onClick={() => setLoadingScreenOpen(true)}>Preview full-screen loading state</Button>
+          <Button onClick={() => setLoadingScreenOpen(true)}>
+            Preview full-screen loading state
+          </Button>
         </Swatch>
         {loadingScreenOpen ? (
           <>
@@ -347,7 +397,10 @@ export default function DesignSystemPlayground() {
         ) : null}
       </Section>
 
-      <Section title="Table" description="cd-data-table (used by Shift Summary and other operational pages)">
+      <Section
+        title="Table"
+        description="cd-data-table (used by Shift Summary and other operational pages)"
+      >
         <div className="ds-playground__table-wrap">
           <table className="ds-playground__table cd-data-table">
             <thead>
@@ -382,7 +435,11 @@ export default function DesignSystemPlayground() {
       >
         <div className="ds-playground__row ds-playground__row--wrap">
           {[320, 768, 1440].map((width) => (
-            <div key={width} className="ds-playground__frame" style={{ width: Math.min(width, 360) }}>
+            <div
+              key={width}
+              className="ds-playground__frame"
+              style={{ width: Math.min(width, 360) }}
+            >
               <span className="ds-playground__frame-label">{width}px</span>
               <Card style={{ width: '100%' }}>
                 <strong>Card at {width}px</strong>

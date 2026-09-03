@@ -24,7 +24,13 @@ vi.mock('../../hooks/useEdOperatingSurface', () => ({
   default: () => ({ situationBrief: undefined, phaseId: null, ownerRole: null, priority: null }),
 }));
 vi.mock('../../hooks/usePatientWorkflow', () => ({
-  default: () => ({ hasPatient: false, step: null, ownerRole: null, primaryAction: null, patient: null }),
+  default: () => ({
+    hasPatient: false,
+    step: null,
+    ownerRole: null,
+    primaryAction: null,
+    patient: null,
+  }),
 }));
 vi.mock('../../store/emergencyStore', () => ({
   useEmergencyStore: (selector: any) => selector({ selectedPatientId: null }),
@@ -54,7 +60,7 @@ describe('EmergencyRoutePage — activeWork prop', () => {
     expect(getByText('Real alert list content')).toBeInTheDocument();
   });
 
-  it('still renders content passed via children (every other real page\'s call shape)', () => {
+  it("still renders content passed via children (every other real page's call shape)", () => {
     const { container, getByText } = render(
       <EmergencyRoutePage title="Dispatch Console" situationBrief={{ status: '2 active calls' }}>
         <div className="dispatch-console__body">Real dispatch content</div>

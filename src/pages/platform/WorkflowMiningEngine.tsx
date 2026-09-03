@@ -7,15 +7,24 @@ import StateSourceNotice from '../../components/StateSourceNotice';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { buildWorkflowMiningReport } from '../../data/workflowMiningEngine';
 import { DEMO_LIVE_STATES } from '../../utils/demoLiveState';
-import { buildWorkflowJourneyChart, buildWorkflowSignalChart } from '../../utils/platformSaasChartModel';
+import {
+  buildWorkflowJourneyChart,
+  buildWorkflowSignalChart,
+} from '../../utils/platformSaasChartModel';
 import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import './WorkflowMiningEngine.css';
 
 export function WorkflowMiningEnginePage() {
   useRouteChromeRegistration({ title: 'Workflow Mining' });
   const report = useMemo(() => buildWorkflowMiningReport(), []);
-  const signalChart = useMemo(() => buildWorkflowSignalChart(report.signalCounts), [report.signalCounts]);
-  const journeyChart = useMemo(() => buildWorkflowJourneyChart(report.mostCommonUserJourneys), [report.mostCommonUserJourneys]);
+  const signalChart = useMemo(
+    () => buildWorkflowSignalChart(report.signalCounts),
+    [report.signalCounts],
+  );
+  const journeyChart = useMemo(
+    () => buildWorkflowJourneyChart(report.mostCommonUserJourneys),
+    [report.mostCommonUserJourneys],
+  );
 
   return (
     <main className="workflow-mining-page" aria-label="Workflow mining">
@@ -23,8 +32,13 @@ export function WorkflowMiningEnginePage() {
         <div className="workflow-mining-page__title-row">
           <GraphicIconBadge iconKey="journey" accent="brand" size="md" />
           <div>
-            <p className="workflow-mining-page-title-text" data-testid="cd-page-title-text">Workflow Mining</p>
-            <p>Journey frequency, friction signals, dead ends, unnecessary clicks, and automation recommendations.</p>
+            <p className="workflow-mining-page-title-text" data-testid="cd-page-title-text">
+              Workflow Mining
+            </p>
+            <p>
+              Journey frequency, friction signals, dead ends, unnecessary clicks, and automation
+              recommendations.
+            </p>
           </div>
         </div>
         <div className="workflow-mining-page__actions">
@@ -41,15 +55,43 @@ export function WorkflowMiningEnginePage() {
         details="Demo journey mining from privacy-safe navigation signals — page transitions, AI launches, workflow launches, tool usage, and search behavior."
       />
 
-      <div className="workflow-mining-page__metrics" role="group" aria-label="Workflow mining summary metrics">
-        <MetricCard label="Journeys" value={String(report.summary.journeyCount)} hint="Ranked user paths" tone="neutral" />
-        <MetricCard label="Events" value={String(report.summary.eventCount)} hint="Mining signals" tone="neutral" />
-        <MetricCard label="Friction" value={String(report.summary.frictionCount)} hint="Bottleneck signals" tone="warning" />
-        <MetricCard label="Dead ends" value={String(report.summary.deadEndCount)} hint="Incomplete paths" tone="warning" />
+      <div
+        className="workflow-mining-page__metrics"
+        role="group"
+        aria-label="Workflow mining summary metrics"
+      >
+        <MetricCard
+          label="Journeys"
+          value={String(report.summary.journeyCount)}
+          hint="Ranked user paths"
+          tone="neutral"
+        />
+        <MetricCard
+          label="Events"
+          value={String(report.summary.eventCount)}
+          hint="Mining signals"
+          tone="neutral"
+        />
+        <MetricCard
+          label="Friction"
+          value={String(report.summary.frictionCount)}
+          hint="Bottleneck signals"
+          tone="warning"
+        />
+        <MetricCard
+          label="Dead ends"
+          value={String(report.summary.deadEndCount)}
+          hint="Incomplete paths"
+          tone="warning"
+        />
       </div>
 
       <div className="workflow-mining-page__charts">
-        <VisualizationPanel title="Signal mix" description="Page transitions, AI launches, workflows, tools, and search behavior." badge="Signals">
+        <VisualizationPanel
+          title="Signal mix"
+          description="Page transitions, AI launches, workflows, tools, and search behavior."
+          badge="Signals"
+        >
           <CategoryBarChart
             data={signalChart}
             title="Signal mix"
@@ -57,7 +99,11 @@ export function WorkflowMiningEnginePage() {
             emptyMessage="Signal chart appears when mining events are registered."
           />
         </VisualizationPanel>
-        <VisualizationPanel title="Journey frequency" description="Most common user journeys ranked by occurrence." badge="Journeys">
+        <VisualizationPanel
+          title="Journey frequency"
+          description="Most common user journeys ranked by occurrence."
+          badge="Journeys"
+        >
           <CategoryBarChart
             data={journeyChart}
             title="Journey frequency"
@@ -68,11 +114,17 @@ export function WorkflowMiningEnginePage() {
       </div>
 
       {report.mostCommonUserJourneys.map((journey) => (
-        <section key={journey.id} className="workflow-mining-page__panel" aria-label={journey.title}>
+        <section
+          key={journey.id}
+          className="workflow-mining-page__panel"
+          aria-label={journey.title}
+        >
           <div className="workflow-mining-page__panel-head">
             <div>
               <h2>{journey.title}</h2>
-              <p>{journey.frequency} occurrences · {journey.completionRate}% completion</p>
+              <p>
+                {journey.frequency} occurrences · {journey.completionRate}% completion
+              </p>
             </div>
           </div>
           <ol className="workflow-mining-page__steps">

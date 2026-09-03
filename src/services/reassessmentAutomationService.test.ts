@@ -29,7 +29,7 @@ describe('ReassessmentAutomationService', () => {
             }),
           }),
         ]),
-      })
+      }),
     );
   });
 
@@ -52,7 +52,7 @@ describe('ReassessmentAutomationService', () => {
           riskScoreChanges: expect.any(Number),
           reassessmentIntervalsExceeded: expect.any(Number),
         }),
-      })
+      }),
     );
   });
 });

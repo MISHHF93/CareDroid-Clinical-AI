@@ -18,9 +18,9 @@ describe('roleOperationalDashboardModel', () => {
   it('suppresses department KPIs for physician workflow', () => {
     const focus = resolveRoleOperationalFocus(EMERGENCY_ROLE_IDS.physician);
     expect(focus.suppressSurfaces).toContain('department-kpis');
-    expect(shouldSuppressOperationalSurface('ems-offload-aggregate', EMERGENCY_ROLE_IDS.physician)).toBe(
-      true,
-    );
+    expect(
+      shouldSuppressOperationalSurface('ems-offload-aggregate', EMERGENCY_ROLE_IDS.physician),
+    ).toBe(true);
   });
 
   it('maps registration clerk hospital role to reception surfaces', () => {

@@ -53,7 +53,10 @@ const PARTITIONED_REGISTRY_DOMAINS: ReadonlySet<CanonicalConfigurationDomain> = 
   'feature-flags',
 ]);
 
-function countBy<T extends string>(items: readonly { domain?: T; layer?: T }[], key: 'domain' | 'layer') {
+function countBy<T extends string>(
+  items: readonly { domain?: T; layer?: T }[],
+  key: 'domain' | 'layer',
+) {
   const counts: Record<string, number> = {};
   for (const item of items) {
     const value = item[key];
@@ -128,7 +131,10 @@ export function detectConfigurationConflicts(): readonly ConfigurationConflict[]
 
   for (const [domain, entries] of registryByDomain) {
     const withoutSupersedes = entries.filter((entry) => !entry.supersedes?.length);
-    if (withoutSupersedes.length > 1 && !PARTITIONED_REGISTRY_DOMAINS.has(domain as CanonicalConfigurationDomain)) {
+    if (
+      withoutSupersedes.length > 1 &&
+      !PARTITIONED_REGISTRY_DOMAINS.has(domain as CanonicalConfigurationDomain)
+    ) {
       conflicts.push({
         id: `multi-registry-${domain}`,
         severity: 'warning',

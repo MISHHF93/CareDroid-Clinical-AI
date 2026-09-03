@@ -161,7 +161,9 @@ export function resolveCommandCenterScreenCapabilities(
     const normalized = normalizeCommandCenterWidgetId(widgetId);
     if (
       isPractitionerCleanupEnabled() &&
-      !COMMAND_CENTER_PRIMARY_WIDGETS.includes(normalized as (typeof COMMAND_CENTER_PRIMARY_WIDGETS)[number])
+      !COMMAND_CENTER_PRIMARY_WIDGETS.includes(
+        normalized as (typeof COMMAND_CENTER_PRIMARY_WIDGETS)[number],
+      )
     ) {
       return false;
     }
@@ -171,19 +173,26 @@ export function resolveCommandCenterScreenCapabilities(
   const canPerform = (actionId: string) => {
     if (!isCommandCenterScreen) return false;
     if (!isScreenActionAvailable(CARE_DROID_SCREEN_MODES.commandCenter, actionId)) return false;
-    const permission = getScreenModeActionPermission(CARE_DROID_SCREEN_MODES.commandCenter, actionId);
+    const permission = getScreenModeActionPermission(
+      CARE_DROID_SCREEN_MODES.commandCenter,
+      actionId,
+    );
     if (!permission) return true;
     return input.can(permission);
   };
 
   const showTriageAwaiting = showWidget(COMMAND_CENTER_SCREEN_WIDGETS.triageAwaiting);
   const showLongestUntriagedWait = showWidget(COMMAND_CENTER_SCREEN_WIDGETS.longestUntriagedWait);
-  const showTriageApproachingBreach = showWidget(COMMAND_CENTER_SCREEN_WIDGETS.triageApproachingBreach);
+  const showTriageApproachingBreach = showWidget(
+    COMMAND_CENTER_SCREEN_WIDGETS.triageApproachingBreach,
+  );
   const showTriageBreached = showWidget(COMMAND_CENTER_SCREEN_WIDGETS.triageBreached);
   const showRapidReviewFlags = showWidget(COMMAND_CENTER_SCREEN_WIDGETS.rapidReviewFlags);
   const showProviderAwaiting = showWidget(COMMAND_CENTER_SCREEN_WIDGETS.providerAwaiting);
   const showLongestProviderWait = showWidget(COMMAND_CENTER_SCREEN_WIDGETS.longestProviderWait);
-  const showProviderApproachingBreach = showWidget(COMMAND_CENTER_SCREEN_WIDGETS.providerApproachingBreach);
+  const showProviderApproachingBreach = showWidget(
+    COMMAND_CENTER_SCREEN_WIDGETS.providerApproachingBreach,
+  );
   const showProviderBreached = showWidget(COMMAND_CENTER_SCREEN_WIDGETS.providerBreached);
   const showArrivalsByHour = showWidget(COMMAND_CENTER_SCREEN_WIDGETS.arrivalsByHour);
   const showWaitingCount = showWidget(COMMAND_CENTER_SCREEN_WIDGETS.waitingCount);

@@ -17,21 +17,21 @@ describe('qsofaCalculator', () => {
         respiratoryRateGte22: true,
         systolicBpLte100: false,
         alteredMentationOrGcsLt15: false,
-      })
+      }),
     ).toBe(1);
     expect(
       calculateQsofaScore({
         respiratoryRateGte22: true,
         systolicBpLte100: true,
         alteredMentationOrGcsLt15: true,
-      })
+      }),
     ).toBe(3);
     expect(
       calculateQsofaScore({
         respiratoryRateGte22: false,
         systolicBpLte100: false,
         alteredMentationOrGcsLt15: false,
-      })
+      }),
     ).toBe(0);
   });
 
@@ -77,7 +77,7 @@ describe('qsofaCalculator', () => {
         systolicBloodPressure: '100',
         alteredMentation: false,
         gcs: '',
-      }).ok
+      }).ok,
     ).toBe(false);
     expect(
       validateQsofaInputs({
@@ -85,7 +85,7 @@ describe('qsofaCalculator', () => {
         systolicBloodPressure: '110',
         alteredMentation: true,
         gcs: '',
-      }).ok
+      }).ok,
     ).toBe(true);
     expect(
       validateQsofaInputs({
@@ -93,7 +93,7 @@ describe('qsofaCalculator', () => {
         systolicBloodPressure: '110',
         alteredMentation: false,
         gcs: '10',
-      }).ok
+      }).ok,
     ).toBe(true);
   });
 
@@ -105,23 +105,51 @@ describe('qsofaCalculator', () => {
           respiratoryRateGte22,
           systolicBpLte100,
           alteredMentationOrGcsLt15,
-        })
+        }),
       ).toBe(expected);
-    }
+    },
   );
 
   it.each(QSOFA_INTERPRETATION_BY_SCORE)(
     'interpretQsofaScore($score) → $severity',
     ({ score, severity }) => {
       expect(interpretQsofaScore(score).severity).toBe(severity);
-    }
+    },
   );
 
   it('qsofaCriteriaFromInputs uses inclusive RR ≥22 and SBP ≤100 boundaries', () => {
-    expect(qsofaCriteriaFromInputs({ respiratoryRate: 21, systolicBloodPressure: 120, alteredMentation: false, gcs: '' }).respiratoryRateGte22).toBe(false);
-    expect(qsofaCriteriaFromInputs({ respiratoryRate: 22, systolicBloodPressure: 120, alteredMentation: false, gcs: '' }).respiratoryRateGte22).toBe(true);
-    expect(qsofaCriteriaFromInputs({ respiratoryRate: 18, systolicBloodPressure: 101, alteredMentation: false, gcs: '' }).systolicBpLte100).toBe(false);
-    expect(qsofaCriteriaFromInputs({ respiratoryRate: 18, systolicBloodPressure: 100, alteredMentation: false, gcs: '' }).systolicBpLte100).toBe(true);
+    expect(
+      qsofaCriteriaFromInputs({
+        respiratoryRate: 21,
+        systolicBloodPressure: 120,
+        alteredMentation: false,
+        gcs: '',
+      }).respiratoryRateGte22,
+    ).toBe(false);
+    expect(
+      qsofaCriteriaFromInputs({
+        respiratoryRate: 22,
+        systolicBloodPressure: 120,
+        alteredMentation: false,
+        gcs: '',
+      }).respiratoryRateGte22,
+    ).toBe(true);
+    expect(
+      qsofaCriteriaFromInputs({
+        respiratoryRate: 18,
+        systolicBloodPressure: 101,
+        alteredMentation: false,
+        gcs: '',
+      }).systolicBpLte100,
+    ).toBe(false);
+    expect(
+      qsofaCriteriaFromInputs({
+        respiratoryRate: 18,
+        systolicBloodPressure: 100,
+        alteredMentation: false,
+        gcs: '',
+      }).systolicBpLte100,
+    ).toBe(true);
   });
 
   it('validateQsofaInputs rejects out-of-range vitals and invalid optional GCS', () => {

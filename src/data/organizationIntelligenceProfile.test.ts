@@ -98,7 +98,7 @@ describe('buildOrganizationIntelligenceProfile', () => {
     expect(profile.recommendations.automationOpportunities).toHaveLength(1);
     expect(profile.recommendations.aiAssistOpportunities).toHaveLength(1);
     expect(profile.adaptationSignals.map((signal) => signal.id)).toEqual(
-      expect.arrayContaining(['workspace-focus', 'adoption-posture', 'health-posture'])
+      expect.arrayContaining(['workspace-focus', 'adoption-posture', 'health-posture']),
     );
   });
 });

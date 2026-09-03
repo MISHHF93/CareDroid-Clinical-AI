@@ -27,55 +27,117 @@ export const PATIENT_HANDOFF_ARTIFACTS = Object.freeze([
   Object.freeze({
     id: 'queue-reason-visibility',
     label: 'Queue reason visibility',
-    surfaces: ['QueueReasonBadge', 'QueueReasonAttentionStrip', 'ReceptionWorkQueues', 'ReceptionThroughputAttentionCluster', 'PatientCard', 'queueReasonVisibility.ts'],
-    mechanism: 'resolveQueueReason — awaiting triage, clinician, room, results, referral, admission bed, discharge paperwork, or verification incomplete',
+    surfaces: [
+      'QueueReasonBadge',
+      'QueueReasonAttentionStrip',
+      'ReceptionWorkQueues',
+      'ReceptionThroughputAttentionCluster',
+      'PatientCard',
+      'queueReasonVisibility.ts',
+    ],
+    mechanism:
+      'resolveQueueReason — awaiting triage, clinician, room, results, referral, admission bed, discharge paperwork, or verification incomplete',
   }),
   Object.freeze({
     id: 'lwbs-risk-advisory',
     label: 'LWBS advisory risk layer',
-    surfaces: ['LwbsRiskBadge', 'LwbsRiskStrip', 'ReceptionThroughputAttentionCluster', 'WaitingRoomSafetyBoard', 'Header', 'lwbsRiskLayer.ts'],
-    mechanism: 'resolveLwbsRisk from wait, contact, congestion, and complaint context — advisory only',
+    surfaces: [
+      'LwbsRiskBadge',
+      'LwbsRiskStrip',
+      'ReceptionThroughputAttentionCluster',
+      'WaitingRoomSafetyBoard',
+      'Header',
+      'lwbsRiskLayer.ts',
+    ],
+    mechanism:
+      'resolveLwbsRisk from wait, contact, congestion, and complaint context — advisory only',
   }),
   Object.freeze({
     id: 'deterioration-watch-advisory',
     label: 'Waiting room deterioration watch',
-    surfaces: ['DeteriorationWatchBadge', 'DeteriorationWatchStrip', 'ReceptionThroughputAttentionCluster', 'WaitingRoomSafetyBoard', 'Header', 'waitingRoomDeteriorationWatch.ts'],
-    mechanism: 'resolveDeteriorationWatch from vitals, reassessment, complaint, and EMS/intake context — advisory only',
+    surfaces: [
+      'DeteriorationWatchBadge',
+      'DeteriorationWatchStrip',
+      'ReceptionThroughputAttentionCluster',
+      'WaitingRoomSafetyBoard',
+      'Header',
+      'waitingRoomDeteriorationWatch.ts',
+    ],
+    mechanism:
+      'resolveDeteriorationWatch from vitals, reassessment, complaint, and EMS/intake context — advisory only',
   }),
   Object.freeze({
     id: 'triage-breach-timer',
     label: 'Triage breach timer',
-    surfaces: ['TriageBreachPanel', 'TriageBreachStrip', 'ReceptionWorkQueues', 'ReceptionThroughputAttentionCluster', 'Header', 'EmergencyAnalytics', 'triageBreachTimer.ts'],
+    surfaces: [
+      'TriageBreachPanel',
+      'TriageBreachStrip',
+      'ReceptionWorkQueues',
+      'ReceptionThroughputAttentionCluster',
+      'Header',
+      'EmergencyAnalytics',
+      'triageBreachTimer.ts',
+    ],
     mechanism: 'resolveTriageBreachTimer from arrival-to-triage elapsed time and site thresholds',
   }),
   Object.freeze({
     id: 'provider-wait-breach-timer',
     label: 'Provider wait breach timer',
-    surfaces: ['ProviderWaitBreachPanel', 'ProviderWaitBreachStrip', 'WaitingRoomSafetyBoard', 'chargeNurseWorkflowModel.ts', 'providerWaitBreachTimer.ts'],
-    mechanism: 'resolveProviderWaitBreachTimer from triage-to-provider elapsed time, CTAS thresholds, and high-risk wait exceptions',
+    surfaces: [
+      'ProviderWaitBreachPanel',
+      'ProviderWaitBreachStrip',
+      'WaitingRoomSafetyBoard',
+      'chargeNurseWorkflowModel.ts',
+      'providerWaitBreachTimer.ts',
+    ],
+    mechanism:
+      'resolveProviderWaitBreachTimer from triage-to-provider elapsed time, CTAS thresholds, and high-risk wait exceptions',
   }),
   Object.freeze({
     id: 'waiting-room-communication-log',
     label: 'Waiting-room communication log',
-    surfaces: ['WaitingRoomCommunicationPanel', 'WaitingRoomCommunicationBadge', 'WaitingRoomSafetyBoard', 'PatientDetailPanel', 'waitingRoomCommunicationLog.ts', 'PatientCommunicationStatusPanel', 'patientCommunicationStatus.ts'],
-    mechanism: 'resolveCommunicationRecency from workflow audit logs, notes, and timeline — patient updated, vitals, reassess, delay informed, queue move, escalation',
+    surfaces: [
+      'WaitingRoomCommunicationPanel',
+      'WaitingRoomCommunicationBadge',
+      'WaitingRoomSafetyBoard',
+      'PatientDetailPanel',
+      'waitingRoomCommunicationLog.ts',
+      'PatientCommunicationStatusPanel',
+      'patientCommunicationStatus.ts',
+    ],
+    mechanism:
+      'resolveCommunicationRecency from workflow audit logs, notes, and timeline — patient updated, vitals, reassess, delay informed, queue move, escalation',
   }),
   Object.freeze({
     id: 'reception-escalation-workflow',
     label: 'Reception escalation workflow',
-    surfaces: ['ReceptionEscalationPanel', 'ReceptionEscalationQuickActions', 'ReceptionEscalationAttentionStrip', 'ReceptionWorkspace', 'Header', 'receptionEscalationWorkflow.ts'],
-    mechanism: 'submitReceptionEscalation from reception desk — notifies triage and charge nurse via alert center without leaving reception',
+    surfaces: [
+      'ReceptionEscalationPanel',
+      'ReceptionEscalationQuickActions',
+      'ReceptionEscalationAttentionStrip',
+      'ReceptionWorkspace',
+      'Header',
+      'receptionEscalationWorkflow.ts',
+    ],
+    mechanism:
+      'submitReceptionEscalation from reception desk — notifies triage and charge nurse via alert center without leaving reception',
   }),
   Object.freeze({
     id: 'department-status-screen',
     label: 'Department status screen',
     surfaces: ['DepartmentStatusScreen', 'departmentStatusScreenModel.ts', 'emergency/index'],
-    mechanism: 'buildDepartmentStatusSnapshot for read-only wall display — aggregate metrics without PHI',
+    mechanism:
+      'buildDepartmentStatusSnapshot for read-only wall display — aggregate metrics without PHI',
   }),
   Object.freeze({
     id: 'patient-experience-status',
     label: 'Patient experience status layer',
-    surfaces: ['WaitingRoomStatusMessagingStrip', 'WhatHappensNextBadge', 'PatientExperienceStatusBadge', 'ReceptionWorkspace'],
+    surfaces: [
+      'WaitingRoomStatusMessagingStrip',
+      'WhatHappensNextBadge',
+      'PatientExperienceStatusBadge',
+      'ReceptionWorkspace',
+    ],
     mechanism: 'resolvePatientExperienceStatus from journey + queue states',
   }),
   Object.freeze({
@@ -111,7 +173,14 @@ export const PATIENT_HANDOFF_ARTIFACTS = Object.freeze([
   Object.freeze({
     id: 'reassessment-surfaces',
     label: 'Reassessment attention',
-    surfaces: ['AppShell', 'Header', 'PatientCard', 'CommandPalette', 'CapacityCrisisMode', 'reassessmentAttentionPatients.ts'],
+    surfaces: [
+      'AppShell',
+      'Header',
+      'PatientCard',
+      'CommandPalette',
+      'CapacityCrisisMode',
+      'reassessmentAttentionPatients.ts',
+    ],
     mechanism: 'reassessment drawer + flags',
   }),
 ]);
@@ -127,7 +196,14 @@ export const EMS_HANDOFF_ARTIFACTS = Object.freeze([
   Object.freeze({
     id: 'ems-offload-tracker',
     label: 'EMS offload tracker',
-    surfaces: ['EmsOffloadTrackerPanel', 'EmsOffloadAttentionStrip', 'ReceptionThroughputAttentionCluster', 'EMSPipeline', 'whiteboard', 'Header'],
+    surfaces: [
+      'EmsOffloadTrackerPanel',
+      'EmsOffloadAttentionStrip',
+      'ReceptionThroughputAttentionCluster',
+      'EMSPipeline',
+      'whiteboard',
+      'Header',
+    ],
     mechanism: 'buildEmsOffloadTrackerSummary + destination from handoff checklist',
   }),
   Object.freeze({

@@ -5,7 +5,10 @@ import {
   movePatientToState as moveWithJourneyRules,
 } from '../engine/journeyEngine';
 import { PatientFlag, PatientState, type Patient } from '../types/emergency';
-import { useEmergencyStore, type useEmergencyStore as UseEmergencyStoreType } from '../store/emergencyStore';
+import {
+  useEmergencyStore,
+  type useEmergencyStore as UseEmergencyStoreType,
+} from '../store/emergencyStore';
 import QueueIntelligenceService from './queueIntelligenceService';
 import { getPatientDisplayName } from '../utils/patientSearch';
 import { recordFirstContact, stampArrivalControlLayer } from './arrivalControlLayer';
@@ -146,16 +149,12 @@ export function matchesWhiteboardQueueFilter(
   if (filter === 'results') return patient.state === PatientState.Results;
   if (filter === 'admission' || filter === 'boarding') {
     return (
-      patient.state === PatientState.Admission ||
-      hasFlag(patient, PatientFlag.PendingAdmission)
+      patient.state === PatientState.Admission || hasFlag(patient, PatientFlag.PendingAdmission)
     );
   }
   if (filter === 'referral') return pendingReferralPatientIds.has(patient.id);
   if (filter === 'discharge') {
-    return (
-      patient.state === PatientState.Disposition &&
-      !pendingReferralPatientIds.has(patient.id)
-    );
+    return patient.state === PatientState.Disposition && !pendingReferralPatientIds.has(patient.id);
   }
   if (filter === 'ems') {
     return hasFlag(patient, PatientFlag.EMSArrival) || isPatientInEmsRegistrationQueue(patient);
@@ -173,7 +172,9 @@ export function matchesWhiteboardQueueFilter(
 
 function hasFlag(patient: Patient, flag: PatientFlag): boolean {
   return patient.flags?.some((entry) =>
-    typeof entry === 'string' ? entry === flag : (entry as unknown as { type: string })?.type === flag,
+    typeof entry === 'string'
+      ? entry === flag
+      : (entry as unknown as { type: string })?.type === flag,
   );
 }
 
@@ -187,7 +188,10 @@ export function getDefaultNextPatientState(patient: Patient): PatientState | nul
   if (!nextStates.length) return null;
 
   if (patient.state === PatientState.Disposition) {
-    if (nextStates.includes(PatientState.Admission) && hasFlag(patient, PatientFlag.PendingAdmission)) {
+    if (
+      nextStates.includes(PatientState.Admission) &&
+      hasFlag(patient, PatientFlag.PendingAdmission)
+    ) {
       return PatientState.Admission;
     }
     if (nextStates.includes(PatientState.Discharge)) {
@@ -290,7 +294,6 @@ export function dischargePatientSafely(
   return { ok: true as const, override: true as const };
 }
 
-
 function assignPatientToTriageState(
   store: QueueAssignmentStore,
   patientId: string,
@@ -375,8 +378,7 @@ export function enterTriageQueue(
 
   const staffId = options.actorId || 'queue-assignment';
   const note =
-    options.note ||
-    `Assigned to triage queue${options.source ? ` (${options.source})` : ''}.`;
+    options.note || `Assigned to triage queue${options.source ? ` (${options.source})` : ''}.`;
 
   const transition = assignPatientToTriageState(store, options.patientId, staffId, note);
   if (!transition.ok) {
@@ -389,17 +391,25 @@ export function enterTriageQueue(
     });
   }
 
-  recordFirstContact(store as unknown as Parameters<typeof recordFirstContact>[0], options.patientId, {
-    actorName: options.actorName,
-    source: options.source || 'queue-assignment',
-    note: 'First contact recorded on triage queue entry.',
-  });
+  recordFirstContact(
+    store as unknown as Parameters<typeof recordFirstContact>[0],
+    options.patientId,
+    {
+      actorName: options.actorName,
+      source: options.source || 'queue-assignment',
+      note: 'First contact recorded on triage queue entry.',
+    },
+  );
 
-  stampArrivalControlLayer(store as unknown as Parameters<typeof stampArrivalControlLayer>[0], options.patientId, {
-    triagePending: true,
-    registrationStatus: 'complete',
-    queueDestination: 'triage-queue',
-  });
+  stampArrivalControlLayer(
+    store as unknown as Parameters<typeof stampArrivalControlLayer>[0],
+    options.patientId,
+    {
+      triagePending: true,
+      registrationStatus: 'complete',
+      queueDestination: 'triage-queue',
+    },
+  );
 
   const syncFilter =
     options.syncWhiteboardFilter !== false &&
@@ -484,11 +494,15 @@ export function enterWaitingQueue(
     store.setQueueFilter(WHITEBOARD_QUEUE_FILTER.waiting);
   }
 
-  stampArrivalControlLayer(store as unknown as Parameters<typeof stampArrivalControlLayer>[0], options.patientId, {
-    triagePending: false,
-    registrationStatus: 'complete',
-    queueDestination: 'waiting-room',
-  });
+  stampArrivalControlLayer(
+    store as unknown as Parameters<typeof stampArrivalControlLayer>[0],
+    options.patientId,
+    {
+      triagePending: false,
+      registrationStatus: 'complete',
+      queueDestination: 'waiting-room',
+    },
+  );
 
   store.recordWorkflowAction({
     type: 'journey_state_changed',
@@ -639,8 +653,7 @@ export function buildLiveQueueStateFromPatients(
     'discharge-queue': buildQueueSnapshot(
       active,
       (patient) =>
-        patient.state === PatientState.Disposition &&
-        !openReferralPatientIds.has(patient.id),
+        patient.state === PatientState.Disposition && !openReferralPatientIds.has(patient.id),
       45,
     ),
     'ems-pre-arrival-queue': buildQueueSnapshot(

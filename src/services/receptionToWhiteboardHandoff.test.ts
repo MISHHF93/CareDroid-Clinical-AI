@@ -44,7 +44,13 @@ function buildHandoffStore(initialPatients: Patient[] = []) {
     updateAlerts: () => undefined,
   };
 
-  return { store, patients, websocketEvents, getSelectedPatientId: () => selectedPatientId, getQueueFilter: () => queueFilter };
+  return {
+    store,
+    patients,
+    websocketEvents,
+    getSelectedPatientId: () => selectedPatientId,
+    getQueueFilter: () => queueFilter,
+  };
 }
 
 describe('reception to whiteboard handoff chain', () => {

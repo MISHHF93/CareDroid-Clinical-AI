@@ -17,9 +17,19 @@ describe('workflowAutomationBuilder', () => {
       'Device offline -> Device has assigned owner -> Create maintenance ticket',
       'Abnormal potassium -> Critical result confirmed -> Open laboratory workflow',
     ]);
-    expect(rules.every((rule) => rule.chain.map((step) => step.type).join('|') === 'trigger|condition|action')).toBe(true);
-    expect(rules.every((rule) => rule.executionMode === AUTOMATION_EXECUTION_MODES.DEMO_PREVIEW)).toBe(true);
-    expect(rules.every((rule) => /No automation is saved, scheduled, or executed/i.test(rule.automationOutcome))).toBe(true);
+    expect(
+      rules.every(
+        (rule) => rule.chain.map((step) => step.type).join('|') === 'trigger|condition|action',
+      ),
+    ).toBe(true);
+    expect(
+      rules.every((rule) => rule.executionMode === AUTOMATION_EXECUTION_MODES.DEMO_PREVIEW),
+    ).toBe(true);
+    expect(
+      rules.every((rule) =>
+        /No automation is saved, scheduled, or executed/i.test(rule.automationOutcome),
+      ),
+    ).toBe(true);
   });
 
   it('allows composing a custom rule from selected steps', () => {

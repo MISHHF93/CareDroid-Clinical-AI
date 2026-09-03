@@ -7,7 +7,8 @@ vi.mock('./apiClient', () => ({
   getApiErrorMessage: () => 'API error',
 }));
 
-const { fetchPlatformGovernanceSurface, evaluatePlatformGate } = await import('./platformGovernanceApi');
+const { fetchPlatformGovernanceSurface, evaluatePlatformGate } =
+  await import('./platformGovernanceApi');
 
 describe('platformGovernanceApi', () => {
   beforeEach(() => {
@@ -39,7 +40,11 @@ describe('platformGovernanceApi', () => {
       expect.any(Object),
     );
     expect(apiFetchJson).toHaveBeenNthCalledWith(2, '/api/security/summary', expect.any(Object));
-    expect(apiFetchJson).toHaveBeenNthCalledWith(3, '/api/interoperability/summary', expect.any(Object));
+    expect(apiFetchJson).toHaveBeenNthCalledWith(
+      3,
+      '/api/interoperability/summary',
+      expect.any(Object),
+    );
     expect(apiFetchJson).toHaveBeenNthCalledWith(4, '/api/regulatory/summary', expect.any(Object));
     expect(apiFetchJson).toHaveBeenNthCalledWith(5, '/api/equity/summary', expect.any(Object));
     expect(apiFetchJson).toHaveBeenNthCalledWith(6, '/api/human-review/items', expect.any(Object));
@@ -56,8 +61,16 @@ describe('platformGovernanceApi', () => {
       expect.any(Object),
     );
     expect(apiFetchJson).toHaveBeenNthCalledWith(11, '/api/privacy/requests', expect.any(Object));
-    expect(apiFetchJson).toHaveBeenNthCalledWith(12, '/api/audit/runs/demo-run', expect.any(Object));
-    expect(apiFetchJson).toHaveBeenNthCalledWith(13, '/api/operations/service-health', expect.any(Object));
+    expect(apiFetchJson).toHaveBeenNthCalledWith(
+      12,
+      '/api/audit/runs/demo-run',
+      expect.any(Object),
+    );
+    expect(apiFetchJson).toHaveBeenNthCalledWith(
+      13,
+      '/api/operations/service-health',
+      expect.any(Object),
+    );
   });
 
   it('classifies the interoperability surface as demo, not live, when the backend returns synthetic_ready', async () => {
@@ -73,14 +86,14 @@ describe('platformGovernanceApi', () => {
 
   it('still classifies a real demo status as demo, and a genuinely live status as live', async () => {
     apiFetchJson.mockResolvedValue({ response: { ok: true }, data: { status: 'demo_ready' } });
-    expect((await fetchPlatformGovernanceSurface('governance', '/ai-governance')).sourceStatus).toBe(
-      'demo',
-    );
+    expect(
+      (await fetchPlatformGovernanceSurface('governance', '/ai-governance')).sourceStatus,
+    ).toBe('demo');
 
     apiFetchJson.mockResolvedValue({ response: { ok: true }, data: { status: 'ready' } });
-    expect((await fetchPlatformGovernanceSurface('governance', '/ai-governance')).sourceStatus).toBe(
-      'live',
-    );
+    expect(
+      (await fetchPlatformGovernanceSurface('governance', '/ai-governance')).sourceStatus,
+    ).toBe('live');
   });
 
   it('evaluates platform gates through the enterprise LLM security contract', async () => {

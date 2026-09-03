@@ -37,7 +37,8 @@ export const PROFILE_SHELL_SECTIONS: readonly ProfileShellSection[] = Object.fre
     label: 'Identity',
     path: CANONICAL_ROUTES.profileSettings,
     pageTitle: 'Identity',
-    pageSubtitle: 'Clinical profile and institutional details. Role assignment stays administrator-controlled.',
+    pageSubtitle:
+      'Clinical profile and institutional details. Role assignment stays administrator-controlled.',
   },
   {
     id: 'preferences',
@@ -51,7 +52,8 @@ export const PROFILE_SHELL_SECTIONS: readonly ProfileShellSection[] = Object.fre
     label: 'Tools',
     path: CANONICAL_ROUTES.profileToolPreferences,
     pageTitle: 'Tool preferences',
-    pageSubtitle: 'Pin or hide tools within your assigned role. Workspace access is administrator-controlled.',
+    pageSubtitle:
+      'Pin or hide tools within your assigned role. Workspace access is administrator-controlled.',
   },
   {
     id: 'workspaces',
@@ -95,52 +97,53 @@ export type ProfileOverviewCardCopy = Readonly<{
   badge?: string;
 }>;
 
-export const PROFILE_OVERVIEW_CARDS: Readonly<Record<ProfileOverviewCardId, ProfileOverviewCardCopy>> =
-  Object.freeze({
-    identity: Object.freeze({
-      title: 'Identity snapshot',
-      subtitle: 'Review account details, workspace, and role visibility for your operational profile.',
-    }),
-    recentTools: Object.freeze({
-      title: 'Recent tools',
-      empty: 'No recent tools yet.',
-      ctaLabel: 'View activity',
-      ctaPath: '/profile/activity',
-    }),
-    competency: Object.freeze({
-      title: 'Competency readiness',
-      subtitle: 'Training, credentials, and simulation gaps tracked for your role.',
-      ctaLabel: 'View competencies',
-      ctaPath: '/competencies',
-    }),
-    savedTools: Object.freeze({
-      title: 'Saved tools',
-      empty: 'Favorite or pin tools to save them here.',
-      ctaLabel: 'Tool preferences',
-      ctaPath: CANONICAL_ROUTES.profileToolPreferences,
-    }),
-    preferences: Object.freeze({
-      title: 'Preferences',
-      ctaLabel: 'Edit preferences',
-      ctaPath: '/profile/preferences',
-    }),
-    activity: Object.freeze({
-      title: 'Recent activity',
-      subtitle:
-        'Recent account activity comes from your protected audit log endpoint. Admin-only audit logs remain behind role-based access control.',
-      badge: 'My logs',
-    }),
-    phiVisibility: Object.freeze({
-      title: 'PHI access visibility',
-      subtitle:
-        'PHI-marked events and compliance visibility for roles with audit access.',
-    }),
-    copilot: Object.freeze({
-      title: 'CareDroid Copilot',
-      subtitle: 'Role-aware capture and workflow assistance.',
-      ctaLabel: 'Open CareDroid Copilot',
-    }),
-  });
+export const PROFILE_OVERVIEW_CARDS: Readonly<
+  Record<ProfileOverviewCardId, ProfileOverviewCardCopy>
+> = Object.freeze({
+  identity: Object.freeze({
+    title: 'Identity snapshot',
+    subtitle:
+      'Review account details, workspace, and role visibility for your operational profile.',
+  }),
+  recentTools: Object.freeze({
+    title: 'Recent tools',
+    empty: 'No recent tools yet.',
+    ctaLabel: 'View activity',
+    ctaPath: '/profile/activity',
+  }),
+  competency: Object.freeze({
+    title: 'Competency readiness',
+    subtitle: 'Training, credentials, and simulation gaps tracked for your role.',
+    ctaLabel: 'View competencies',
+    ctaPath: '/competencies',
+  }),
+  savedTools: Object.freeze({
+    title: 'Saved tools',
+    empty: 'Favorite or pin tools to save them here.',
+    ctaLabel: 'Tool preferences',
+    ctaPath: CANONICAL_ROUTES.profileToolPreferences,
+  }),
+  preferences: Object.freeze({
+    title: 'Preferences',
+    ctaLabel: 'Edit preferences',
+    ctaPath: '/profile/preferences',
+  }),
+  activity: Object.freeze({
+    title: 'Recent activity',
+    subtitle:
+      'Recent account activity comes from your protected audit log endpoint. Admin-only audit logs remain behind role-based access control.',
+    badge: 'My logs',
+  }),
+  phiVisibility: Object.freeze({
+    title: 'PHI access visibility',
+    subtitle: 'PHI-marked events and compliance visibility for roles with audit access.',
+  }),
+  copilot: Object.freeze({
+    title: 'CareDroid Copilot',
+    subtitle: 'Role-aware capture and workflow assistance.',
+    ctaLabel: 'Open CareDroid Copilot',
+  }),
+});
 
 export type CopilotChromeLabels = Readonly<{
   productName: string;
@@ -180,9 +183,7 @@ function resolveRoleCopilotIntro(profileCopy?: ProfileCopyStack | null): string 
   return CAREDROID_PRODUCT.copilotIntro;
 }
 
-export function resolveProfileShellSection(
-  sectionId: ProfileShellSectionId,
-): ProfileShellSection {
+export function resolveProfileShellSection(sectionId: ProfileShellSectionId): ProfileShellSection {
   const section = PROFILE_SHELL_SECTIONS.find((item) => item.id === sectionId);
   if (!section) {
     throw new Error(`Unknown profile shell section: ${sectionId}`);
@@ -248,9 +249,7 @@ export function getProfileCopilotWelcomeMessage(
   return compactLayout ? labels.welcomeCompact : labels.welcomeFull;
 }
 
-export function profileHasCopilotCapture(
-  profileCopy?: ProfileCopyStack | null,
-): boolean {
+export function profileHasCopilotCapture(profileCopy?: ProfileCopyStack | null): boolean {
   return (
     profileCopy?.primaryFunctions?.some(
       (fn) => (fn.id as ProfileFunctionId) === 'copilot-capture',

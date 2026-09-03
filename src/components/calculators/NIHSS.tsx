@@ -266,9 +266,7 @@ export default function NIHSS({ patientId, onClose }: NIHSSProps) {
       ref={dialogRef}
     >
       <div className="nihss-panel">
-        <header
-          className="u-panel-header-row"
-        >
+        <header className="u-panel-header-row">
           <div>
             <h2 id="nihss-title" className="u-title-18">
               NIHSS
@@ -336,20 +334,21 @@ export default function NIHSS({ patientId, onClose }: NIHSSProps) {
               padding: 14,
             }}
           >
-            <div style={{ color: severity.color, fontSize: 13, fontWeight: 700 }}>{severity.label}</div>
-            <div className="u-mono-32">
-              {total}/42
+            <div style={{ color: severity.color, fontSize: 13, fontWeight: 700 }}>
+              {severity.label}
             </div>
+            <div className="u-mono-32">{total}/42</div>
           </section>
 
           {NIHSS_ITEMS.map((item) => (
             <fieldset key={item.id} className="nihss-item-fieldset">
-              <legend className="nihss-item-legend">
-                {item.label}
-              </legend>
+              <legend className="nihss-item-legend">{item.label}</legend>
               <div className="nihss-options">
                 {item.options.map((option) => (
-                  <label key={`${item.id}-${option.score}-${option.text}`} className="nihss-option-label">
+                  <label
+                    key={`${item.id}-${option.score}-${option.text}`}
+                    className="nihss-option-label"
+                  >
                     <input
                       type="radio"
                       name={`nihss-${item.id}`}

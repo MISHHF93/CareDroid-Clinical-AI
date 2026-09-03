@@ -70,9 +70,9 @@ const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
 const patternsSource = readFileSync(
   join(
     __dirname,
-    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts'
+    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts',
   ),
-  'utf8'
+  'utf8',
 );
 const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.tsx'), 'utf8');
 const _hubRouteIdx = appSource.indexOf("path: '/tools/calculators', element:");
@@ -89,7 +89,7 @@ describe('1. PHQ-9 scoring', () => {
     'categorizePhq9Severity($score) → $category',
     ({ score, category }) => {
       expect(categorizePhq9Severity(score)).toBe(category);
-    }
+    },
   );
 
   it('computePhq9Result returns exact total and breakdown for a fixed pattern', () => {
@@ -118,7 +118,7 @@ describe('1. PHQ-9 scoring', () => {
   it('sums all-zero and all-three extremes', () => {
     const zeros = buildPhq9Responses({});
     const threes = buildPhq9Responses(
-      Object.fromEntries(['q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'q7', 'q8', 'q9'].map((k) => [k, 3]))
+      Object.fromEntries(['q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'q7', 'q8', 'q9'].map((k) => [k, 3])),
     );
     expect(sumPhq9Score(computePhq9Breakdown(zeros))).toBe(0);
     expect(sumPhq9Score(computePhq9Breakdown(threes))).toBe(27);
@@ -145,7 +145,7 @@ describe('2. GAD-7 scoring', () => {
     'categorizeGad7Severity($score) → $category',
     ({ score, category }) => {
       expect(categorizeGad7Severity(score)).toBe(category);
-    }
+    },
   );
 
   it('computeGad7Result returns exact total for a fixed pattern', () => {
@@ -171,7 +171,7 @@ describe('2. GAD-7 scoring', () => {
   it('sums all-zero and all-three extremes', () => {
     const zeros = buildGad7Responses({});
     const threes = buildGad7Responses(
-      Object.fromEntries(['q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'q7'].map((k) => [k, 3]))
+      Object.fromEntries(['q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'q7'].map((k) => [k, 3])),
     );
     expect(sumGad7Score(computeGad7Breakdown(zeros))).toBe(0);
     expect(sumGad7Score(computeGad7Breakdown(threes))).toBe(21);
@@ -199,7 +199,9 @@ describe('2. GAD-7 scoring', () => {
   });
 
   it('computeGad7Result returns moderate escalation fields for total 12', () => {
-    const out = computeGad7Result(buildGad7Responses({ q1: 2, q2: 2, q3: 2, q4: 2, q5: 2, q6: 1, q7: 1 }));
+    const out = computeGad7Result(
+      buildGad7Responses({ q1: 2, q2: 2, q3: 2, q4: 2, q5: 2, q6: 1, q7: 1 }),
+    );
     expect(out.ok).toBe(true);
     if (!('totalScore' in out)) throw new Error('expected computeGad7Result to succeed');
     expect(out.totalScore).toBe(12);
@@ -265,15 +267,18 @@ describe('4. COPD GOLD launch behavior', () => {
     expect(launch.orchestratorTool).toBeNull();
   });
 
-  it.each(PR6_ALL_ALIAS_PAIRS)('alias "%s" resolves same launch as copd-gold', (alias, expected) => {
-    expect(expected).toBe(canonical);
-    const fromAlias = resolveCatalogLaunch(alias);
-    const fromCanonical = resolveCatalogLaunch(canonical);
-    expect(fromAlias.registryId).toBe(canonical);
-    expect(fromAlias.path).toBe(WIRING_AUDIT_HUB_PATH);
-    expect(fromAlias.path).toBe(fromCanonical.path);
-    expect(fromAlias.chatSeed).toBe(fromCanonical.chatSeed);
-  });
+  it.each(PR6_ALL_ALIAS_PAIRS)(
+    'alias "%s" resolves same launch as copd-gold',
+    (alias, expected) => {
+      expect(expected).toBe(canonical);
+      const fromAlias = resolveCatalogLaunch(alias);
+      const fromCanonical = resolveCatalogLaunch(canonical);
+      expect(fromAlias.registryId).toBe(canonical);
+      expect(fromAlias.path).toBe(WIRING_AUDIT_HUB_PATH);
+      expect(fromAlias.path).toBe(fromCanonical.path);
+      expect(fromAlias.chatSeed).toBe(fromCanonical.chatSeed);
+    },
+  );
 
   it('is hub-only with pulmonary-copd group and no dedicated calculator switch', () => {
     expect(nluCalculatorHubOnly.some((h) => h.toolId === canonical)).toBe(true);
@@ -304,14 +309,17 @@ describe('5. Rome IV IBS launch behavior', () => {
     expect(launch.orchestratorTool).toBeNull();
   });
 
-  it.each(PR7_ALL_ALIAS_PAIRS)('alias "%s" resolves same launch as rome-iv-ibs', (alias, expected) => {
-    expect(expected).toBe(canonical);
-    const fromAlias = resolveCatalogLaunch(alias);
-    const fromCanonical = resolveCatalogLaunch(canonical);
-    expect(fromAlias.registryId).toBe(canonical);
-    expect(fromAlias.path).toBe(fromCanonical.path);
-    expect(fromAlias.chatSeed).toBe(fromCanonical.chatSeed);
-  });
+  it.each(PR7_ALL_ALIAS_PAIRS)(
+    'alias "%s" resolves same launch as rome-iv-ibs',
+    (alias, expected) => {
+      expect(expected).toBe(canonical);
+      const fromAlias = resolveCatalogLaunch(alias);
+      const fromCanonical = resolveCatalogLaunch(canonical);
+      expect(fromAlias.registryId).toBe(canonical);
+      expect(fromAlias.path).toBe(fromCanonical.path);
+      expect(fromAlias.chatSeed).toBe(fromCanonical.chatSeed);
+    },
+  );
 
   it('is hub-only with gastrointestinal group and no dedicated calculator switch', () => {
     expect(nluCalculatorHubOnly.some((h) => h.toolId === canonical)).toBe(true);
@@ -352,14 +360,17 @@ describe('6. Registry mappings', () => {
     expect(audited).toHaveLength(WIRING_AUDIT_ALL_IDS.length);
   });
 
-  it.each(WIRING_AUDIT_TIER_A_IDS)('%s is registered in builtinUiCalculators with matching path', (id) => {
-    const spec = WIRING_AUDIT_TOOL_SPECS[id];
-    const builtin = builtinUiCalculators.find((c) => c.id === id);
-    if (!builtin) throw new Error(`expected builtinUiCalculators to contain ${id}`);
-    expect(builtin.id).toBe(id);
-    expect(builtin.path).toBe(spec.routePath);
-    expect(BUILTIN_CALC_ID_TO_REGISTRY_ID[builtin.id]).toBe(id);
-  });
+  it.each(WIRING_AUDIT_TIER_A_IDS)(
+    '%s is registered in builtinUiCalculators with matching path',
+    (id) => {
+      const spec = WIRING_AUDIT_TOOL_SPECS[id];
+      const builtin = builtinUiCalculators.find((c) => c.id === id);
+      if (!builtin) throw new Error(`expected builtinUiCalculators to contain ${id}`);
+      expect(builtin.id).toBe(id);
+      expect(builtin.path).toBe(spec.routePath);
+      expect(BUILTIN_CALC_ID_TO_REGISTRY_ID[builtin.id]).toBe(id);
+    },
+  );
 
   it.each(WIRING_AUDIT_TIER_B_IDS)('%s is absent from builtinUiCalculators (chat-only)', (id) => {
     expect(builtinUiCalculators.some((c) => c.id === id)).toBe(false);
@@ -386,21 +397,27 @@ describe('7. Catalog inclusion', () => {
     const rows = getMedicalToolsCatalogRows();
     for (const [canonical, query] of spec.catalogSearchQueries) {
       const hits = catalogRowsMatchingQuery(rows, query);
-      expect(hits.some((r) => r.primaryId === canonical), `query "${query}"`).toBe(true);
+      expect(
+        hits.some((r) => r.primaryId === canonical),
+        `query "${query}"`,
+      ).toBe(true);
     }
   });
 
-  it.each(WIRING_AUDIT_ALL_IDS)('clinicalIntentToolsById[%s] matches registry path and seed', (id) => {
-    const spec = WIRING_AUDIT_TOOL_SPECS[id];
-    const intent = clinicalIntentToolsById[id];
-    expect(intent?.toolId).toBe(id);
-    expect(intent?.path).toBe(spec.routePath);
-    expect(intent?.sidebarToolId).toBe(id);
-    expect(intent?.backendExecutable).toBe(false);
-    if (spec.tier === 'B') {
-      expect(intent?.chatSeed).toMatch(spec.chatSeedPattern);
-    }
-  });
+  it.each(WIRING_AUDIT_ALL_IDS)(
+    'clinicalIntentToolsById[%s] matches registry path and seed',
+    (id) => {
+      const spec = WIRING_AUDIT_TOOL_SPECS[id];
+      const intent = clinicalIntentToolsById[id];
+      expect(intent?.toolId).toBe(id);
+      expect(intent?.path).toBe(spec.routePath);
+      expect(intent?.sidebarToolId).toBe(id);
+      expect(intent?.backendExecutable).toBe(false);
+      if (spec.tier === 'B') {
+        expect(intent?.chatSeed).toMatch(spec.chatSeedPattern);
+      }
+    },
+  );
 });
 
 describe('8. Discovery inclusion', () => {
@@ -408,7 +425,9 @@ describe('8. Discovery inclusion', () => {
     const merged = getAllDiscoveredTools();
     const hits = merged.filter((r) => r.id === id);
     expect(hits).toHaveLength(1);
-    const blob = [hits[0].source, ...(hits[0].sources || []), hits[0].notes].filter(Boolean).join(' ');
+    const blob = [hits[0].source, ...(hits[0].sources || []), hits[0].notes]
+      .filter(Boolean)
+      .join(' ');
     expect(blob).toMatch(/toolRegistry|clinicalIntentToolCatalog|tool\.patterns|NLU/i);
   });
 
@@ -427,7 +446,7 @@ describe('8. Discovery inclusion', () => {
     (alias, canonical) => {
       expect(resolveRegistryId(alias)).toBe(canonical);
       expect(resolveCatalogLaunch(alias).registryId).toBe(canonical);
-    }
+    },
   );
 });
 
@@ -441,14 +460,17 @@ describe('9. Route resolution', () => {
     expect(calculatorsSource).toContain(`case '${id}':`);
   });
 
-  it.each(WIRING_AUDIT_TIER_A_IDS)('resolveCatalogLaunch(%s) opens dedicated calculator path', (id) => {
-    const spec = WIRING_AUDIT_TOOL_SPECS[id];
-    const launch = resolveCatalogLaunch(id);
-    expect(launch.path).toBe(spec.routePath);
-    expect(launch.registryId).toBe(id);
-    expect(launch.openLabel).toBe('Open');
-    expect(resolveNavigationPathForLaunch(launch)).toBe(spec.routePath);
-  });
+  it.each(WIRING_AUDIT_TIER_A_IDS)(
+    'resolveCatalogLaunch(%s) opens dedicated calculator path',
+    (id) => {
+      const spec = WIRING_AUDIT_TOOL_SPECS[id];
+      const launch = resolveCatalogLaunch(id);
+      expect(launch.path).toBe(spec.routePath);
+      expect(launch.registryId).toBe(id);
+      expect(launch.openLabel).toBe('Open');
+      expect(resolveNavigationPathForLaunch(launch)).toBe(spec.routePath);
+    },
+  );
 
   it.each(WIRING_AUDIT_TIER_B_IDS)('%s resolves hub path only', (id) => {
     const launch = resolveCatalogLaunch(id);
@@ -465,11 +487,7 @@ describe('9. Route resolution', () => {
 });
 
 describe('10. NLU matching', () => {
-  const allAliasPairs = [
-    ...PR5_ALL_ALIAS_PAIRS,
-    ...PR6_ALL_ALIAS_PAIRS,
-    ...PR7_ALL_ALIAS_PAIRS,
-  ];
+  const allAliasPairs = [...PR5_ALL_ALIAS_PAIRS, ...PR6_ALL_ALIAS_PAIRS, ...PR7_ALL_ALIAS_PAIRS];
 
   it.each(allAliasPairs)('NLU_TO_REGISTRY_ID["%s"] → %s', (alias, canonical) => {
     expect(NLU_TO_REGISTRY_ID[alias]).toBe(canonical);
@@ -481,21 +499,23 @@ describe('10. NLU matching', () => {
     (phrase, canonical) => {
       const keywords = BACKEND_KEYWORDS_BY_TOOL[canonical];
       expect(messageMatchesToolKeywords(phrase, keywords)).toBe(true);
-    }
+    },
   );
 
   it.each(PR6_REQUIRED_NLU_ALIAS_PAIRS)(
     'phrase "%s" matches copd-gold backend keywords',
     (phrase) => {
       expect(messageMatchesToolKeywords(phrase, BACKEND_KEYWORDS_BY_TOOL['copd-gold'])).toBe(true);
-    }
+    },
   );
 
   it.each(PR7_REQUIRED_NLU_ALIAS_PAIRS)(
     'phrase "%s" matches rome-iv-ibs backend keywords',
     (phrase) => {
-      expect(messageMatchesToolKeywords(phrase, BACKEND_KEYWORDS_BY_TOOL['rome-iv-ibs'])).toBe(true);
-    }
+      expect(messageMatchesToolKeywords(phrase, BACKEND_KEYWORDS_BY_TOOL['rome-iv-ibs'])).toBe(
+        true,
+      );
+    },
   );
 
   it.each(WIRING_AUDIT_ALL_IDS)('%s has tool.patterns.ts entry and disambiguation helper', (id) => {
@@ -529,6 +549,6 @@ describe('10. NLU matching', () => {
     (intendedTool, phrase, otherTool) => {
       expect(messageTriggersBackendDisambiguation(phrase, intendedTool)).toBe(false);
       expect(messageMatchesToolKeywords(phrase, BACKEND_KEYWORDS_BY_TOOL[otherTool])).toBe(true);
-    }
+    },
   );
 });

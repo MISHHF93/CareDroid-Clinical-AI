@@ -44,8 +44,12 @@ export const AUDIT_C_BINGE_OPTIONS = [
   { value: 'daily_or_almost_daily', label: 'Daily or almost daily', points: 4 },
 ];
 
-const FREQUENCY_POINTS = Object.fromEntries(AUDIT_C_FREQUENCY_OPTIONS.map((o) => [o.value, o.points]));
-const DRINKS_POINTS = Object.fromEntries(AUDIT_C_DRINKS_PER_DAY_OPTIONS.map((o) => [o.value, o.points]));
+const FREQUENCY_POINTS = Object.fromEntries(
+  AUDIT_C_FREQUENCY_OPTIONS.map((o) => [o.value, o.points]),
+);
+const DRINKS_POINTS = Object.fromEntries(
+  AUDIT_C_DRINKS_PER_DAY_OPTIONS.map((o) => [o.value, o.points]),
+);
 const BINGE_POINTS = Object.fromEntries(AUDIT_C_BINGE_OPTIONS.map((o) => [o.value, o.points]));
 
 export const AUDIT_C_WOMEN_POSITIVE_THRESHOLD = 3;
@@ -66,8 +70,7 @@ export function computeAuditCBreakdown(inputs) {
  * @param {Record<string, number>} breakdown
  */
 export function sumAuditCScore(breakdown) {
-  const total =
-    breakdown.drinkingFrequency + breakdown.drinksPerDay + breakdown.bingeFrequency;
+  const total = breakdown.drinkingFrequency + breakdown.drinksPerDay + breakdown.bingeFrequency;
   if (!Number.isFinite(total) || total < 0 || total > 12) return null;
   return total;
 }
@@ -102,10 +105,8 @@ export function interpretAuditCScore(score) {
   const discussion = {
     negative:
       'A score below sex-specific cutoffs lowers concern for hazardous drinking on this brief screen, but does not exclude alcohol-related harm. Use clinical judgment and local pathways if concerns remain.',
-    positive_women:
-      `A score of ${score} meets the AUDIT-C positive threshold for women (≥${AUDIT_C_WOMEN_POSITIVE_THRESHOLD}). Discuss further assessment (e.g. full AUDIT or structured clinical interview) per institutional guidance. This tool does not diagnose alcohol use disorder.`,
-    positive_men:
-      `A score of ${score} meets the AUDIT-C positive threshold for men (≥${AUDIT_C_MEN_POSITIVE_THRESHOLD}) and for women (≥${AUDIT_C_WOMEN_POSITIVE_THRESHOLD}). Discuss further assessment per institutional guidance. This tool does not diagnose alcohol use disorder.`,
+    positive_women: `A score of ${score} meets the AUDIT-C positive threshold for women (≥${AUDIT_C_WOMEN_POSITIVE_THRESHOLD}). Discuss further assessment (e.g. full AUDIT or structured clinical interview) per institutional guidance. This tool does not diagnose alcohol use disorder.`,
+    positive_men: `A score of ${score} meets the AUDIT-C positive threshold for men (≥${AUDIT_C_MEN_POSITIVE_THRESHOLD}) and for women (≥${AUDIT_C_WOMEN_POSITIVE_THRESHOLD}). Discuss further assessment per institutional guidance. This tool does not diagnose alcohol use disorder.`,
   };
 
   const severity =
@@ -158,8 +159,18 @@ export function validateAuditCInputs(raw) {
   const bingeFrequency = raw.bingeFrequency;
 
   requireOption(drinkingFrequency, AUDIT_C_FREQUENCY_OPTIONS, 'drinking frequency', errors);
-  requireOption(drinksPerDay, AUDIT_C_DRINKS_PER_DAY_OPTIONS, 'typical drinks per drinking day', errors);
-  requireOption(bingeFrequency, AUDIT_C_BINGE_OPTIONS, 'binge drinking frequency (6+ drinks)', errors);
+  requireOption(
+    drinksPerDay,
+    AUDIT_C_DRINKS_PER_DAY_OPTIONS,
+    'typical drinks per drinking day',
+    errors,
+  );
+  requireOption(
+    bingeFrequency,
+    AUDIT_C_BINGE_OPTIONS,
+    'binge drinking frequency (6+ drinks)',
+    errors,
+  );
 
   if (errors.length > 0) {
     return { valid: false, errors };

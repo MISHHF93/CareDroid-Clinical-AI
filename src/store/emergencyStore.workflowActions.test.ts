@@ -107,14 +107,18 @@ describe('emergencyStore EMS arrival conversion', () => {
     useEmergencyStore.getState().convertEMSArrivalToPatient(arrival!.id);
 
     const nextState = useEmergencyStore.getState();
-    const convertedArrival = nextState.emsArrivals.find((candidate) => candidate.id === arrival!.id);
-    const patient = nextState.patients.find((candidate) => candidate.id === convertedArrival?.patientId);
+    const convertedArrival = nextState.emsArrivals.find(
+      (candidate) => candidate.id === arrival!.id,
+    );
+    const patient = nextState.patients.find(
+      (candidate) => candidate.id === convertedArrival?.patientId,
+    );
 
     expect(convertedArrival).toEqual(
       expect.objectContaining({
         status: 'Handoff',
         patientId: expect.any(String),
-      })
+      }),
     );
     // Converted EMS arrivals now land in Registration first (reception-first
     // journey model) rather than jumping straight to Arrival.
@@ -123,7 +127,7 @@ describe('emergencyStore EMS arrival conversion', () => {
         state: PatientState.Registration,
         chiefComplaint: arrival!.chiefComplaint,
         roomId: preparedArrival?.preparedRoomId,
-      })
+      }),
     );
     expect(patient && hasPatientFlag(patient, 'EMSArrival')).toBe(true);
   });
@@ -161,8 +165,12 @@ describe('emergencyStore EMS arrival conversion', () => {
     useEmergencyStore.getState().addEMSArrival(arrival);
 
     const preparedState = useEmergencyStore.getState();
-    const preparedArrival = preparedState.emsArrivals.find((candidate) => candidate.id === arrival.id);
-    const preparedRoom = preparedState.rooms.find((room) => room.id === preparedArrival?.preparedRoomId);
+    const preparedArrival = preparedState.emsArrivals.find(
+      (candidate) => candidate.id === arrival.id,
+    );
+    const preparedRoom = preparedState.rooms.find(
+      (room) => room.id === preparedArrival?.preparedRoomId,
+    );
 
     expect(preparedArrival?.criticalChecklist).toMatchObject({
       type: 'stemi',
@@ -181,9 +189,8 @@ describe('emergencyStore EMS arrival conversion', () => {
     });
 
     expect(
-      useEmergencyStore
-        .getState()
-        .emsArrivals.find((candidate) => candidate.id === arrival.id)?.criticalChecklist?.completions[0]
+      useEmergencyStore.getState().emsArrivals.find((candidate) => candidate.id === arrival.id)
+        ?.criticalChecklist?.completions[0],
     ).toMatchObject({
       itemId: 'activate-cath-lab',
       checkedByStaffName: 'Priya Nair',
@@ -196,9 +203,8 @@ describe('emergencyStore EMS arrival conversion', () => {
     });
 
     expect(
-      useEmergencyStore
-        .getState()
-        .emsArrivals.find((candidate) => candidate.id === arrival.id)?.criticalChecklist
+      useEmergencyStore.getState().emsArrivals.find((candidate) => candidate.id === arrival.id)
+        ?.criticalChecklist,
     ).toMatchObject({
       completedAt: '2026-06-11T21:18:00-04:00',
       completedByStaffName: 'Priya Nair',
@@ -223,7 +229,9 @@ describe('emergencyStore EMS arrival conversion', () => {
         savedToPatientAt: expect.any(String),
       }),
     });
-    expect(patient?.timeline.some((event) => event.type === 'EMSCriticalChecklistSaved')).toBe(true);
+    expect(patient?.timeline.some((event) => event.type === 'EMSCriticalChecklistSaved')).toBe(
+      true,
+    );
   });
 });
 
@@ -334,7 +342,12 @@ describe('first customer walkthrough', () => {
       assignedStaffId: null,
     });
     expect(discharged?.timeline.map((event) => event.to)).toEqual(
-      expect.arrayContaining([PatientState.Waiting, PatientState.Assessment, PatientState.Disposition, PatientState.Discharge])
+      expect.arrayContaining([
+        PatientState.Waiting,
+        PatientState.Assessment,
+        PatientState.Disposition,
+        PatientState.Discharge,
+      ]),
     );
   });
 });
@@ -342,7 +355,9 @@ describe('first customer walkthrough', () => {
 describe('emergencyStore manual escalation', () => {
   it('flags patient, dispatches critical alert, logs timeline, and tops reassessment queue', () => {
     seedPt005WalkthroughFixtures();
-    const patient = useEmergencyStore.getState().patients.find((candidate) => candidate.id === 'pt-005');
+    const patient = useEmergencyStore
+      .getState()
+      .patients.find((candidate) => candidate.id === 'pt-005');
 
     expect(patient).toBeTruthy();
 
@@ -365,7 +380,9 @@ describe('emergencyStore manual escalation', () => {
       by: 'staff-priya-nair',
       reason: 'Manual',
     });
-    expect(activeAlerts.find((alert) => alert.id === `alert-escalation-${patient!.id}`)).toMatchObject({
+    expect(
+      activeAlerts.find((alert) => alert.id === `alert-escalation-${patient!.id}`),
+    ).toMatchObject({
       id: `alert-escalation-${patient!.id}`,
       severity: 'Critical',
       title: 'ESCALATION — Aarav Patel',
@@ -399,7 +416,9 @@ describe('emergencyStore manual escalation', () => {
 
     const state = useEmergencyStore.getState();
     const patient = state.patients.find((candidate) => candidate.id === patientId);
-    const alert = state.alerts.find((candidate) => candidate.id === `alert-escalation-${patientId}`);
+    const alert = state.alerts.find(
+      (candidate) => candidate.id === `alert-escalation-${patientId}`,
+    );
 
     expect(patient && hasPatientFlag(patient, 'HighRisk')).toBe(false);
     expect(patient?.timeline.at(-1)).toMatchObject({
@@ -425,7 +444,9 @@ describe('emergencyStore manual escalation', () => {
       timestamp: '2026-06-11T20:31:00-04:00',
     });
 
-    const patient = useEmergencyStore.getState().patients.find((candidate) => candidate.id === patientId);
+    const patient = useEmergencyStore
+      .getState()
+      .patients.find((candidate) => candidate.id === patientId);
 
     expect(patient && hasPatientFlag(patient, 'HighRisk')).toBe(true);
     expect(patient?.timeline.some((event) => event.type === 'ESCALATION_CANCELLED')).toBe(false);
@@ -518,39 +539,53 @@ describe('emergencyStore staff reassignment', () => {
 describe('emergencyStore room assignment (HEAL-193)', () => {
   function seedRoomAssignmentFixtures() {
     seedPt005WalkthroughFixtures();
-    useEmergencyStore.setState((state) => ({
-      ...state,
-      rooms: [
-        ...state.rooms.filter((room) => !['heal193-target', 'heal193-empty'].includes(room.id)),
-        { id: 'heal193-target', name: 'HEAL-193 Target Room', type: 'Treatment', status: 'Occupied', patientId: 'heal193-occupant' },
-        { id: 'heal193-empty', name: 'HEAL-193 Empty Room', type: 'Treatment', status: 'Available' },
-      ],
-      patients: [
-        ...state.patients.filter((patient) => patient.id !== 'heal193-occupant'),
-        {
-          id: 'heal193-occupant',
-          mrn: 'ED-HEAL193',
-          firstName: 'Prior',
-          lastName: 'Occupant',
-          dob: '1980-01-01',
-          age: 46,
-          sex: 'F',
-          arrivalTime: new Date(Date.now() - 40 * 60_000).toISOString(),
-          chiefComplaint: 'Observation',
-          complaintCategory: 'General',
-          state: PatientState.Treatment,
-          priority: Priority.P3,
-          vitals: [],
-          roomId: 'heal193-target',
-          flags: [],
-          timeline: [],
-          notes: [],
-        },
-      ],
-    }) as any);
+    useEmergencyStore.setState(
+      (state) =>
+        ({
+          ...state,
+          rooms: [
+            ...state.rooms.filter((room) => !['heal193-target', 'heal193-empty'].includes(room.id)),
+            {
+              id: 'heal193-target',
+              name: 'HEAL-193 Target Room',
+              type: 'Treatment',
+              status: 'Occupied',
+              patientId: 'heal193-occupant',
+            },
+            {
+              id: 'heal193-empty',
+              name: 'HEAL-193 Empty Room',
+              type: 'Treatment',
+              status: 'Available',
+            },
+          ],
+          patients: [
+            ...state.patients.filter((patient) => patient.id !== 'heal193-occupant'),
+            {
+              id: 'heal193-occupant',
+              mrn: 'ED-HEAL193',
+              firstName: 'Prior',
+              lastName: 'Occupant',
+              dob: '1980-01-01',
+              age: 46,
+              sex: 'F',
+              arrivalTime: new Date(Date.now() - 40 * 60_000).toISOString(),
+              chiefComplaint: 'Observation',
+              complaintCategory: 'General',
+              state: PatientState.Treatment,
+              priority: Priority.P3,
+              vitals: [],
+              roomId: 'heal193-target',
+              flags: [],
+              timeline: [],
+              notes: [],
+            },
+          ],
+        }) as any,
+    );
   }
 
-  it('clears the displaced patient\'s own roomId when assigned into an already-occupied room', () => {
+  it("clears the displaced patient's own roomId when assigned into an already-occupied room", () => {
     seedRoomAssignmentFixtures();
     const patientId = 'pt-005';
 
@@ -597,7 +632,8 @@ describe('emergencyStore fast referrals', () => {
 
     const state = useEmergencyStore.getState();
     const referral = state.referrals.find(
-      (candidate) => candidate.patientId === patientId && candidate.targetDepartment === 'Cardiology'
+      (candidate) =>
+        candidate.patientId === patientId && candidate.targetDepartment === 'Cardiology',
     );
     const patient = state.patients.find((candidate) => candidate.id === patientId);
     const activeAlerts = selectActiveAlerts(state);
@@ -615,7 +651,9 @@ describe('emergencyStore fast referrals', () => {
         urgency: 'Urgent',
       }),
     });
-    expect(activeAlerts.find((alert) => alert.id === `alert-referral-sent-${referral?.id}`)).toMatchObject({
+    expect(
+      activeAlerts.find((alert) => alert.id === `alert-referral-sent-${referral?.id}`),
+    ).toMatchObject({
       type: 'Referral',
       title: 'Referral sent to Cardiology',
       patientId,
@@ -637,19 +675,26 @@ describe('emergencyStore fast referrals', () => {
 
     const referral = useEmergencyStore
       .getState()
-      .referrals.find((candidate) => candidate.patientId === patientId && candidate.targetDepartment === 'Cardiology');
+      .referrals.find(
+        (candidate) =>
+          candidate.patientId === patientId && candidate.targetDepartment === 'Cardiology',
+      );
 
     useEmergencyStore.setState((state) => ({
       referrals: state.referrals.map((candidate) =>
         candidate.id === referral?.id
           ? { ...candidate, requestedAt: new Date(Date.now() - 31 * 60_000).toISOString() }
-          : candidate
+          : candidate,
       ),
     }));
     useEmergencyStore.getState().updateAlerts();
 
     const activeAlerts = selectActiveAlerts(useEmergencyStore.getState());
-    expect(activeAlerts.find((alert) => alert.id === `alert-referral-critical-unacknowledged-${referral?.id}`)).toMatchObject({
+    expect(
+      activeAlerts.find(
+        (alert) => alert.id === `alert-referral-critical-unacknowledged-${referral?.id}`,
+      ),
+    ).toMatchObject({
       severity: 'Critical',
       message: expect.stringMatching(/without acknowledgement/i),
       patientId,
@@ -660,7 +705,9 @@ describe('emergencyStore fast referrals', () => {
 describe('emergencyStore long wait rescue', () => {
   it('flags a P3 waiting 45 minutes as critical and moves them to the top of reassessment', () => {
     seedPt005WalkthroughFixtures();
-    const basePatient = useEmergencyStore.getState().patients.find((candidate) => candidate.id === 'pt-005');
+    const basePatient = useEmergencyStore
+      .getState()
+      .patients.find((candidate) => candidate.id === 'pt-005');
     expect(basePatient).toBeTruthy();
     const arrivalTime = new Date(Date.now() - 45 * 60_000).toISOString();
     const waitingPatient = {
@@ -692,7 +739,9 @@ describe('emergencyStore long wait rescue', () => {
 
     expect(patient && hasPatientFlag(patient, 'LongWait')).toBe(true);
     expect(patient && hasPatientFlag(patient, 'ReassessmentDue')).toBe(true);
-    expect((patient?.flags as any[])?.find((flag) => flag.type === 'ReassessmentDue')).toMatchObject({
+    expect(
+      (patient?.flags as any[])?.find((flag) => flag.type === 'ReassessmentDue'),
+    ).toMatchObject({
       reason: 'Critical wait time breach',
       severity: 'Critical',
     });
@@ -700,7 +749,9 @@ describe('emergencyStore long wait rescue', () => {
       patientId: waitingPatient.id,
       reasons: expect.arrayContaining(['Critical wait time breach']),
     });
-    expect(activeAlerts.find((alert) => alert.id === `alert-long-wait-critical-${waitingPatient.id}`)).toMatchObject({
+    expect(
+      activeAlerts.find((alert) => alert.id === `alert-long-wait-critical-${waitingPatient.id}`),
+    ).toMatchObject({
       severity: 'Critical',
       title: 'Critical long wait breach',
       patientId: waitingPatient.id,
@@ -750,7 +801,9 @@ describe('emergencyStore reassessment reminders', () => {
     useEmergencyStore.getState().updateAlerts();
     useEmergencyStore.getState().snoozeReassessmentReminder(patientId, reminder!.id, 10);
 
-    let patient = useEmergencyStore.getState().patients.find((candidate) => candidate.id === patientId);
+    let patient = useEmergencyStore
+      .getState()
+      .patients.find((candidate) => candidate.id === patientId);
     expect(patient?.reassessmentReminders?.[0]).toMatchObject({
       id: reminder!.id,
       status: 'snoozed',
@@ -829,7 +882,9 @@ describe('emergencyStore vitals alert pipeline', () => {
       recordedAt: '2026-06-11T21:04:00-04:00',
     });
 
-    let patient = useEmergencyStore.getState().patients.find((candidate) => candidate.id === patientId);
+    let patient = useEmergencyStore
+      .getState()
+      .patients.find((candidate) => candidate.id === patientId);
     const alertId = patient?.vitalsAlerts?.[0]?.id;
 
     expect(alertId).toBeTruthy();

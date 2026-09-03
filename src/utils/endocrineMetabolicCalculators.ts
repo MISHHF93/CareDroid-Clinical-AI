@@ -81,8 +81,10 @@ export function computeHomaIr(raw) {
   const fastingGlucoseMgDl = toGlucoseMgDl(raw.fastingGlucose, raw.glucoseUnit);
   const fastingInsulinUiuMl = toNumber(raw.fastingInsulinUiuMl);
   const errors = [] as any[];
-  if (!inRange(fastingGlucoseMgDl, 40, 600)) errors.push('Enter fasting glucose in a plausible range.');
-  if (!inRange(fastingInsulinUiuMl, 0.2, 300)) errors.push('Enter fasting insulin from 0.2 to 300 uIU/mL.');
+  if (!inRange(fastingGlucoseMgDl, 40, 600))
+    errors.push('Enter fasting glucose in a plausible range.');
+  if (!inRange(fastingInsulinUiuMl, 0.2, 300))
+    errors.push('Enter fasting insulin from 0.2 to 300 uIU/mL.');
   if (errors.length) return { ok: false as const, errors };
 
   const homaIr = round((fastingGlucoseMgDl * fastingInsulinUiuMl) / 405, 2);
@@ -103,8 +105,7 @@ export function computeHomaIr(raw) {
 export function computeCorrectedCalcium(raw) {
   const calciumMgDl =
     raw.calciumUnit === 'mmol_l' ? toNumber(raw.calcium) / 0.2495 : toNumber(raw.calcium);
-  const albuminGdl =
-    raw.albuminUnit === 'g_l' ? toNumber(raw.albumin) / 10 : toNumber(raw.albumin);
+  const albuminGdl = raw.albuminUnit === 'g_l' ? toNumber(raw.albumin) / 10 : toNumber(raw.albumin);
   const errors = [] as any[];
   if (!inRange(calciumMgDl, 4, 18)) errors.push('Enter total calcium in a plausible range.');
   if (!inRange(albuminGdl, 1, 6)) errors.push('Enter albumin from 1 to 6 g/dL or equivalent.');
@@ -116,7 +117,12 @@ export function computeCorrectedCalcium(raw) {
     ok: true as const,
     correctedCalciumMgDl,
     correctedCalciumMmolL,
-    severity: correctedCalciumMgDl < 7 || correctedCalciumMgDl > 12 ? 'critical' : correctedCalciumMgDl < 8.5 || correctedCalciumMgDl > 10.5 ? 'warning' : 'normal',
+    severity:
+      correctedCalciumMgDl < 7 || correctedCalciumMgDl > 12
+        ? 'critical'
+        : correctedCalciumMgDl < 8.5 || correctedCalciumMgDl > 10.5
+          ? 'warning'
+          : 'normal',
     label: `Corrected calcium ${correctedCalciumMgDl} mg/dL`,
     interpretation:
       'Albumin-corrected calcium approximates total calcium when albumin is abnormal. Ionized calcium is preferred when accuracy is critical, especially in critical illness, acid-base disturbances, or major protein abnormalities.',
@@ -137,7 +143,10 @@ export function computeSerumOsmolality(raw) {
   if (!inRange(ethanolMgDl, 0, 600)) errors.push('Enter ethanol from 0 to 600 mg/dL or leave 0.');
   if (errors.length) return { ok: false as const, errors };
 
-  const calculatedOsmolality = round(2 * sodium + glucoseMgDl / 18 + bunMgDl / 2.8 + ethanolMgDl / 3.7, 1);
+  const calculatedOsmolality = round(
+    2 * sodium + glucoseMgDl / 18 + bunMgDl / 2.8 + ethanolMgDl / 3.7,
+    1,
+  );
   return {
     ok: true as const,
     calculatedOsmolality,
@@ -198,7 +207,8 @@ export function computeIdealBodyWeight(raw) {
   const sex = raw.sex;
   const errors = [] as any[];
   if (!['female', 'male'].includes(sex)) errors.push('Select sex for the Devine equation.');
-  if (!inRange(heightCm, 120, 230)) errors.push('Enter adult height from 120 to 230 cm or equivalent.');
+  if (!inRange(heightCm, 120, 230))
+    errors.push('Enter adult height from 120 to 230 cm or equivalent.');
   if (errors.length) return { ok: false as const, errors };
 
   const heightIn = heightCm / IN_TO_CM;
@@ -213,7 +223,8 @@ export function computeIdealBodyWeight(raw) {
     label: `IBW ${idealBodyWeightKg} kg`,
     interpretation:
       'Devine ideal body weight is a height-based reference estimate originally developed for medication context. It does not represent a health target or individualized goal weight.',
-    referenceLine: 'Devine IBW: male 50 kg + 2.3 kg/in over 5 ft; female 45.5 kg + 2.3 kg/in over 5 ft.',
+    referenceLine:
+      'Devine IBW: male 50 kg + 2.3 kg/in over 5 ft; female 45.5 kg + 2.3 kg/in over 5 ft.',
     disclaimer: `${ENDOCRINE_METABOLIC_SAFETY_DISCLAIMER} Does not recommend drug dosing, nutrition targets, weight goals, or treatment plans.`,
   };
 }
@@ -221,15 +232,21 @@ export function computeIdealBodyWeight(raw) {
 export function computeAdjustedBodyWeight(raw) {
   const actualWeightKg = toWeightKg(raw.actualWeight, raw.weightUnit);
   const ibw = computeIdealBodyWeight(raw);
-  const correctionFactor = raw.correctionFactor === '0.25' ? 0.25 : raw.correctionFactor === '0.3' ? 0.3 : 0.4;
+  const correctionFactor =
+    raw.correctionFactor === '0.25' ? 0.25 : raw.correctionFactor === '0.3' ? 0.3 : 0.4;
   const errors = [] as any[];
-  if (!inRange(actualWeightKg, 1, 350)) errors.push('Enter actual weight from 1 to 350 kg or equivalent.');
+  if (!inRange(actualWeightKg, 1, 350))
+    errors.push('Enter actual weight from 1 to 350 kg or equivalent.');
   if (!ibw.ok) errors.push(...(ibw.errors as any[]));
   if (errors.length) return { ok: false as const, errors };
 
   const adjustedBodyWeightKg =
     actualWeightKg > (ibw as any).idealBodyWeightKg
-      ? round((ibw as any).idealBodyWeightKg + correctionFactor * (actualWeightKg - (ibw as any).idealBodyWeightKg), 1)
+      ? round(
+          (ibw as any).idealBodyWeightKg +
+            correctionFactor * (actualWeightKg - (ibw as any).idealBodyWeightKg),
+          1,
+        )
       : round(actualWeightKg, 1);
   return {
     ok: true as const,
@@ -258,8 +275,16 @@ export function computeWaistHipRatio(raw) {
   const ratio = round(waist / hip, 2);
   const riskBand =
     sex === 'male'
-      ? ratio > 1 ? 'high' : ratio >= 0.96 ? 'moderate' : 'lower'
-      : ratio > 0.85 ? 'high' : ratio >= 0.81 ? 'moderate' : 'lower';
+      ? ratio > 1
+        ? 'high'
+        : ratio >= 0.96
+          ? 'moderate'
+          : 'lower'
+      : ratio > 0.85
+        ? 'high'
+        : ratio >= 0.81
+          ? 'moderate'
+          : 'lower';
   return {
     ok: true as const,
     waistHipRatio: ratio,

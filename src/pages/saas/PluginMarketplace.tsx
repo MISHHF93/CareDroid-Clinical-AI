@@ -38,8 +38,12 @@ export default function PluginMarketplace() {
         <div className="plugin-marketplace-page__title-row">
           <GraphicIconBadge iconKey="route" accent="brand" size="md" />
           <div>
-            <p className="plugin-marketplace-page-title-text" data-testid="cd-page-title-text">Plugin Marketplace</p>
-            <p>Install, enable, and validate CareDroid plugins linked to the unified tool inventory.</p>
+            <p className="plugin-marketplace-page-title-text" data-testid="cd-page-title-text">
+              Plugin Marketplace
+            </p>
+            <p>
+              Install, enable, and validate CareDroid plugins linked to the unified tool inventory.
+            </p>
           </div>
         </div>
         <div className="plugin-marketplace-page__actions">
@@ -56,10 +60,29 @@ export default function PluginMarketplace() {
         details="Browser-local install state with unified inventory validation. Plugin registry metadata is demo-sourced."
       />
 
-      <div className="plugin-marketplace-page__metrics" role="group" aria-label="Plugin marketplace summary metrics">
-        <MetricCard label="Total plugins" value={String(marketplace.summary.total)} hint="Registered extensions" tone="neutral" />
-        <MetricCard label="Installed" value={String(marketplace.summary.installed)} hint={`${marketplace.summary.available} available`} tone="good" />
-        <MetricCard label="Enabled" value={String(marketplace.summary.enabled)} hint={`${marketplace.summary.disabled} disabled`} tone="neutral" />
+      <div
+        className="plugin-marketplace-page__metrics"
+        role="group"
+        aria-label="Plugin marketplace summary metrics"
+      >
+        <MetricCard
+          label="Total plugins"
+          value={String(marketplace.summary.total)}
+          hint="Registered extensions"
+          tone="neutral"
+        />
+        <MetricCard
+          label="Installed"
+          value={String(marketplace.summary.installed)}
+          hint={`${marketplace.summary.available} available`}
+          tone="good"
+        />
+        <MetricCard
+          label="Enabled"
+          value={String(marketplace.summary.enabled)}
+          hint={`${marketplace.summary.disabled} disabled`}
+          tone="neutral"
+        />
         <MetricCard
           label="Validation"
           value={marketplace.validation.valid ? 'Valid' : 'Issues'}
@@ -87,16 +110,22 @@ export default function PluginMarketplace() {
           badge="Inventory"
         >
           <p className="plugin-marketplace-page__stat">
-            {marketplace.items.filter((item) => item.inventoryLinked).length} of {marketplace.items.length} plugins
-            linked to inventory records.
+            {marketplace.items.filter((item) => item.inventoryLinked).length} of{' '}
+            {marketplace.items.length} plugins linked to inventory records.
           </p>
         </VisualizationPanel>
       </div>
 
       <section className="plugin-marketplace-page__panel" aria-label="Plugin catalog">
         <h2>Plugin catalog</h2>
-        <p>Install or toggle plugins for your workspace. Changes persist in local browser storage.</p>
-        <div className="plugin-marketplace-page__table" role="table" aria-label="Plugin catalog table">
+        <p>
+          Install or toggle plugins for your workspace. Changes persist in local browser storage.
+        </p>
+        <div
+          className="plugin-marketplace-page__table"
+          role="table"
+          aria-label="Plugin catalog table"
+        >
           <div className="plugin-marketplace-page__table-head" role="row">
             <span role="columnheader">Plugin</span>
             <span role="columnheader">Type</span>
@@ -117,17 +146,26 @@ export default function PluginMarketplace() {
               </span>
               <span role="cell" className="plugin-marketplace-page__actions-cell">
                 {!item.installed ? (
-                  <button type="button" onClick={() => applyAction(item.id, PLUGIN_MARKETPLACE_ACTIONS.INSTALL)}>
+                  <button
+                    type="button"
+                    onClick={() => applyAction(item.id, PLUGIN_MARKETPLACE_ACTIONS.INSTALL)}
+                  >
                     Install
                   </button>
                 ) : null}
                 {item.installed && !item.enabled ? (
-                  <button type="button" onClick={() => applyAction(item.id, PLUGIN_MARKETPLACE_ACTIONS.ENABLE)}>
+                  <button
+                    type="button"
+                    onClick={() => applyAction(item.id, PLUGIN_MARKETPLACE_ACTIONS.ENABLE)}
+                  >
                     Enable
                   </button>
                 ) : null}
                 {item.installed && item.enabled ? (
-                  <button type="button" onClick={() => applyAction(item.id, PLUGIN_MARKETPLACE_ACTIONS.DISABLE)}>
+                  <button
+                    type="button"
+                    onClick={() => applyAction(item.id, PLUGIN_MARKETPLACE_ACTIONS.DISABLE)}
+                  >
                     Disable
                   </button>
                 ) : null}

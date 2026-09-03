@@ -59,7 +59,7 @@ export function createDefaultPluginMarketplaceState(plugins = PLUGIN_REGISTRY) {
 export function normalizePluginMarketplaceState(
   state: any = {},
   plugins = PLUGIN_REGISTRY,
-  now = new Date().toISOString()
+  now = new Date().toISOString(),
 ) {
   const defaults = createDefaultPluginMarketplaceState(plugins);
   return Object.fromEntries(
@@ -74,7 +74,7 @@ export function normalizePluginMarketplaceState(
           updatedAt: incoming.updatedAt || defaults[plugin.id].updatedAt || now,
         },
       ];
-    })
+    }),
   );
 }
 
@@ -82,7 +82,7 @@ export function loadPluginMarketplaceState(plugins = PLUGIN_REGISTRY) {
   if (!storageAvailable()) return createDefaultPluginMarketplaceState(plugins);
   return normalizePluginMarketplaceState(
     parseStoredState(window.localStorage.getItem(PLUGIN_MARKETPLACE_STORAGE_KEY)),
-    plugins
+    plugins,
   );
 }
 
@@ -96,7 +96,7 @@ export function applyPluginMarketplaceAction(
   state,
   pluginId,
   action,
-  now = new Date().toISOString()
+  now = new Date().toISOString(),
 ) {
   if (!Object.values(PLUGIN_MARKETPLACE_ACTIONS).includes(action)) {
     throw new Error(`Unsupported plugin marketplace action: ${action}`);
@@ -203,12 +203,12 @@ export function buildPluginMarketplace({
       valid: invalidCount === 0 && registryValidation.valid,
       invalidCount,
       errors: items.flatMap((item) =>
-        item.validation.errors.map((error) => `${item.name}: ${error}`)
+        item.validation.errors.map((error) => `${item.name}: ${error}`),
       ),
       warnings: [
         ...registryValidation.warnings,
         ...items.flatMap((item) =>
-          item.validation.warnings.map((warning) => `${item.name}: ${warning}`)
+          item.validation.warnings.map((warning) => `${item.name}: ${warning}`),
         ),
       ],
     },

@@ -79,10 +79,7 @@ describe('emsWorkflowModel', () => {
   it('filters strip metrics to visible EMS surfaces', () => {
     const metrics = selectEmsOperationalStrip({
       emsArrivals: [baseArrival],
-      visibleSurfaces: [
-        EMS_SCREEN_WIDGETS.inboundAmbulances,
-        EMS_SCREEN_WIDGETS.emsPressure,
-      ],
+      visibleSurfaces: [EMS_SCREEN_WIDGETS.inboundAmbulances, EMS_SCREEN_WIDGETS.emsPressure],
     });
 
     expect(metrics.map((metric) => metric.surface)).toEqual([

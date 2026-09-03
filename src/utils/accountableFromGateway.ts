@@ -53,16 +53,20 @@ export function accountableFromGatewayPayload(
         : null;
 
   if (nested) {
-    const model = (nested.model && typeof nested.model === 'object'
-      ? nested.model
-      : { provider: 'caredroid', name: 'unknown' }) as {
+    const model = (
+      nested.model && typeof nested.model === 'object'
+        ? nested.model
+        : { provider: 'caredroid', name: 'unknown' }
+    ) as {
       provider?: string;
       name?: string;
       version?: string;
     };
-    const safety = (nested.safety && typeof nested.safety === 'object'
-      ? nested.safety
-      : { status: 'ok', reasons: [] }) as {
+    const safety = (
+      nested.safety && typeof nested.safety === 'object'
+        ? nested.safety
+        : { status: 'ok', reasons: [] }
+    ) as {
       status?: 'ok' | 'abstain' | 'escalate' | 'degraded';
       reasons?: string[];
     };

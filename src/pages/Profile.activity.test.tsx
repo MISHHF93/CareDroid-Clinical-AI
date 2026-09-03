@@ -56,7 +56,7 @@ function renderProfile() {
   return render(
     <MemoryRouter>
       <Profile />
-    </MemoryRouter>
+    </MemoryRouter>,
   );
 }
 
@@ -95,18 +95,23 @@ describe('Profile activity audit visibility', () => {
     });
     expect(fetchMyAuditLogs).toHaveBeenCalledWith(5);
     expect(fetchPhiAccessLogs).not.toHaveBeenCalled();
-    expect(screen.getByText(/does not include direct PHI access-log visibility/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/does not include direct PHI access-log visibility/i),
+    ).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /request audit\/export/i })).toHaveAttribute(
       'href',
-      '/settings'
+      '/settings',
     );
     expect(screen.getByText(/competency posture/i)).toBeInTheDocument();
     expect(screen.getByText(/overall readiness/i)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /view competencies/i })).toHaveAttribute(
       'href',
-      '/competencies'
+      '/competencies',
     );
-    expect(screen.getByRole('link', { name: /credentials/i })).toHaveAttribute('href', '/credentials');
+    expect(screen.getByRole('link', { name: /credentials/i })).toHaveAttribute(
+      'href',
+      '/credentials',
+    );
     expect(screen.queryByRole('link', { name: /audit logs/i })).not.toBeInTheDocument();
   });
 
@@ -139,7 +144,7 @@ describe('Profile activity audit visibility', () => {
     expect(screen.getByText(/2 PHI access events/i)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /open protected audit logs/i })).toHaveAttribute(
       'href',
-      '/audit'
+      '/audit',
     );
     expect(screen.queryByRole('link', { name: /request audit\/export/i })).not.toBeInTheDocument();
   });

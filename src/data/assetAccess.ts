@@ -73,7 +73,9 @@ function getEffectivePermissions(context: any = {}) {
       ...(context?.workspaceState?.effectivePermissions || []),
       ...(context?.effectivePermissions || []),
       ...(context?.permissions || []),
-    ].map(normalizePermission).filter(Boolean)
+    ]
+      .map(normalizePermission)
+      .filter(Boolean),
   );
 }
 
@@ -96,7 +98,8 @@ function hasPermissionPolicyAccess(tool, context) {
   if (!permissions.length) return true;
   const effectivePermissions = getEffectivePermissions(context);
   if (!effectivePermissions.size) return false;
-  if (logic === 'any') return permissions.some((permission) => effectivePermissions.has(permission));
+  if (logic === 'any')
+    return permissions.some((permission) => effectivePermissions.has(permission));
   return permissions.every((permission) => effectivePermissions.has(permission));
 }
 
@@ -131,7 +134,11 @@ function resolveSaasRoleFromContext(context: any = {}, fallback = 'student') {
   );
 }
 
-export function resolveAssetAccessState(tool, context = getPlatformEntitlementContext(), userRole = 'student') {
+export function resolveAssetAccessState(
+  tool,
+  context = getPlatformEntitlementContext(),
+  userRole = 'student',
+) {
   const saasRole = resolveSaasRoleFromContext(context, userRole);
   const assetId = tool.id || tool.canonicalInventoryId;
   const hasOrganization = Boolean(context?.organization?.id);
@@ -149,7 +156,9 @@ export function resolveAssetAccessState(tool, context = getPlatformEntitlementCo
   const entitlementDecision = resolveEntitlementDecision(tool, context, saasRole);
   if (!entitlementDecision.isLaunchable) {
     return {
-      accessState: mapEntitlementState(entitlementDecision.accessState || entitlementDecision.state),
+      accessState: mapEntitlementState(
+        entitlementDecision.accessState || entitlementDecision.state,
+      ),
       reasons: entitlementDecision.reasons || [entitlementDecision.reason].filter(Boolean),
       decision: entitlementDecision,
     };
@@ -164,7 +173,13 @@ export function resolveAssetAccessState(tool, context = getPlatformEntitlementCo
   }
 
   if (ADMIN_ONLY_TOOLS.has(assetId)) {
-    if (!ADMIN_SAAS_ROLES.has(String(saasRole || '').trim().toLowerCase())) {
+    if (
+      !ADMIN_SAAS_ROLES.has(
+        String(saasRole || '')
+          .trim()
+          .toLowerCase(),
+      )
+    ) {
       return { accessState: ASSET_ACCESS_STATES.ADMIN_ONLY, reasons: ['admin-only'] };
     }
   }
@@ -177,7 +192,10 @@ export function resolveAssetAccessState(tool, context = getPlatformEntitlementCo
     return { accessState: ASSET_ACCESS_STATES.BETA, reasons: ['beta'] };
   }
 
-  if (tool.executorStatus === TOOL_EXECUTOR_STATUS.UNSUPPORTED && tool.launchType !== 'calculator') {
+  if (
+    tool.executorStatus === TOOL_EXECUTOR_STATUS.UNSUPPORTED &&
+    tool.launchType !== 'calculator'
+  ) {
     if (hasOrganization) {
       const entitled = new Set(context?.entitledAssetIds || []);
       if ((strictEntitlements || entitled.size) && !entitled.has(assetId)) {
@@ -238,7 +256,8 @@ export function filterVisibleTools(tools, { includeLocked = false, includeDemo =
     if (tool.accessState === ASSET_ACCESS_STATES.REQUIRES_ADMIN) return false;
     if (tool.accessState === ASSET_ACCESS_STATES.ADMIN_ONLY) return false;
     if (!includeLocked && tool.accessState === ASSET_ACCESS_STATES.LOCKED) return false;
-    if (!includeLocked && tool.accessState === ASSET_ACCESS_STATES.SUBSCRIPTION_REQUIRED) return false;
+    if (!includeLocked && tool.accessState === ASSET_ACCESS_STATES.SUBSCRIPTION_REQUIRED)
+      return false;
     if (!includeDemo && tool.accessState === ASSET_ACCESS_STATES.DEMO_ONLY) return false;
     return true;
   });
@@ -249,13 +268,18 @@ export function getAssetAwareToolProjection(context, userRole) {
   return projectToolsWithAccess(tools, context, userRole);
 }
 
-export function groupToolsByAccessView(tools, { favorites = [] as any[], recent = [] as any[], recommendedIds = [] as any[] }: any = {}) {
+export function groupToolsByAccessView(
+  tools,
+  { favorites = [] as any[], recent = [] as any[], recommendedIds = [] as any[] }: any = {},
+) {
   const recSet = new Set(recommendedIds);
   const favSet = new Set(favorites);
   const recentSet = new Set(recent);
 
   return {
-    recommended: tools.filter((t) => recSet.has(t.id) && t.accessState !== ASSET_ACCESS_STATES.HIDDEN),
+    recommended: tools.filter(
+      (t) => recSet.has(t.id) && t.accessState !== ASSET_ACCESS_STATES.HIDDEN,
+    ),
     workspace: tools.filter((t) => t.workspaceFilterable !== false),
     organization: tools.filter(
       (t) =>
@@ -263,13 +287,15 @@ export function groupToolsByAccessView(tools, { favorites = [] as any[], recent 
           ASSET_ACCESS_STATES.LOCKED,
           ASSET_ACCESS_STATES.SUBSCRIPTION_REQUIRED,
           ASSET_ACCESS_STATES.DISABLED,
-        ].includes(t.accessState)
+        ].includes(t.accessState),
     ),
     packs: tools,
     permitted: tools.filter((t) =>
-      [ASSET_ACCESS_STATES.ALLOWED, ASSET_ACCESS_STATES.DEMO_ONLY, ASSET_ACCESS_STATES.RESTRICTED].includes(
-        t.accessState
-      )
+      [
+        ASSET_ACCESS_STATES.ALLOWED,
+        ASSET_ACCESS_STATES.DEMO_ONLY,
+        ASSET_ACCESS_STATES.RESTRICTED,
+      ].includes(t.accessState),
     ),
     favorites: tools.filter((t) => favSet.has(t.id)),
     recent: tools.filter((t) => recentSet.has(t.id)),
@@ -277,7 +303,10 @@ export function groupToolsByAccessView(tools, { favorites = [] as any[], recent 
 }
 
 function mapEntitlementState(state) {
-  if (state === ENTITLEMENT_ACCESS_STATES.ADMIN_ONLY || state === ASSET_ACCESS_STATES.REQUIRES_ADMIN) {
+  if (
+    state === ENTITLEMENT_ACCESS_STATES.ADMIN_ONLY ||
+    state === ASSET_ACCESS_STATES.REQUIRES_ADMIN
+  ) {
     return ASSET_ACCESS_STATES.ADMIN_ONLY;
   }
   return Object.values(ASSET_ACCESS_STATES).includes(state) ? state : ASSET_ACCESS_STATES.ALLOWED;

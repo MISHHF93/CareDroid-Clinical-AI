@@ -13,7 +13,17 @@ type SplitLayoutProps = {
   className?: string;
 } & React.HTMLAttributes<HTMLDivElement>;
 
-export function SplitLayout({ sidebar, main, sidebarWidth, sidebarSide = 'left', gap = 0, collapsed, className, style, ...props }: SplitLayoutProps) {
+export function SplitLayout({
+  sidebar,
+  main,
+  sidebarWidth,
+  sidebarSide = 'left',
+  gap = 0,
+  collapsed,
+  className,
+  style,
+  ...props
+}: SplitLayoutProps) {
   const gapVar = gap === 0 ? '0px' : `var(--cd-space-${gap})`;
   return (
     <div
@@ -22,8 +32,16 @@ export function SplitLayout({ sidebar, main, sidebarWidth, sidebarSide = 'left',
         sidebarSide === 'right' ? 'cd-split--right' : '',
         collapsed ? 'cd-split--collapsed' : '',
         className ?? '',
-      ].filter(Boolean).join(' ')}
-      style={{ '--split-sidebar-width': sidebarWidth, '--split-gap': gapVar, ...style } as React.CSSProperties}
+      ]
+        .filter(Boolean)
+        .join(' ')}
+      style={
+        {
+          '--split-sidebar-width': sidebarWidth,
+          '--split-gap': gapVar,
+          ...style,
+        } as React.CSSProperties
+      }
       {...props}
     >
       {sidebarSide === 'left' ? (

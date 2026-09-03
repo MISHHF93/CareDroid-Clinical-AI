@@ -4,7 +4,8 @@ export const ENTERPRISE_READINESS_DIMENSIONS = Object.freeze([
     label: 'SSO readiness',
     weight: 12,
     baseScore: 72,
-    evidence: 'Enterprise identity supports SAML, OIDC, Azure AD, Okta, and Google Workspace setup.',
+    evidence:
+      'Enterprise identity supports SAML, OIDC, Azure AD, Okta, and Google Workspace setup.',
     nextStep: 'Confirm identity provider metadata, domain mapping, and role claim strategy.',
   },
   {
@@ -12,7 +13,8 @@ export const ENTERPRISE_READINESS_DIMENSIONS = Object.freeze([
     label: 'RBAC readiness',
     weight: 14,
     baseScore: 78,
-    evidence: 'Role-aware permissions and role profiles gate app routes, tools, and administration.',
+    evidence:
+      'Role-aware permissions and role profiles gate app routes, tools, and administration.',
     nextStep: 'Map buyer personas to organization roles and validate least-privilege access.',
   },
   {
@@ -36,7 +38,8 @@ export const ENTERPRISE_READINESS_DIMENSIONS = Object.freeze([
     label: 'Governance readiness',
     weight: 14,
     baseScore: 76,
-    evidence: 'Governance workspaces expose policy state, release gates, human review, and safety findings.',
+    evidence:
+      'Governance workspaces expose policy state, release gates, human review, and safety findings.',
     nextStep: 'Define customer governance owners and clinical policy approval workflow.',
   },
   {
@@ -44,15 +47,18 @@ export const ENTERPRISE_READINESS_DIMENSIONS = Object.freeze([
     label: 'Integration readiness',
     weight: 14,
     baseScore: 74,
-    evidence: 'Integration readiness tracks interoperability, identity, scheduling, and operational connectors.',
-    nextStep: 'Prioritize SSO, FHIR or HL7, and analytics connectors for the sales engineering plan.',
+    evidence:
+      'Integration readiness tracks interoperability, identity, scheduling, and operational connectors.',
+    nextStep:
+      'Prioritize SSO, FHIR or HL7, and analytics connectors for the sales engineering plan.',
   },
   {
     id: 'security',
     label: 'Security readiness',
     weight: 14,
     baseScore: 82,
-    evidence: 'Security surfaces include AI security review, privacy center, regulatory evidence, and access controls.',
+    evidence:
+      'Security surfaces include AI security review, privacy center, regulatory evidence, and access controls.',
     nextStep: 'Prepare security questionnaire evidence and review customer deployment constraints.',
   },
 ]);
@@ -89,7 +95,8 @@ function dimensionSignalScore(dimension, context: any = {}) {
   }
 
   if (dimension.id === 'tenant-isolation') {
-    if (tenantContext?.organizationId || organization?.id || platformContext?.organization?.id) score += 8;
+    if (tenantContext?.organizationId || organization?.id || platformContext?.organization?.id)
+      score += 8;
     if (tenantContext?.workspaceId || platformContext?.activeWorkspace?.id) score += 6;
   }
 
@@ -128,7 +135,8 @@ export function buildEnterpriseReadinessModel(context: any = {}) {
 
   const totalWeight = dimensions.reduce((sum, dimension) => sum + dimension.weight, 0);
   const readinessScore = clampScore(
-    dimensions.reduce((sum, dimension) => sum + dimension.score * dimension.weight, 0) / totalWeight,
+    dimensions.reduce((sum, dimension) => sum + dimension.score * dimension.weight, 0) /
+      totalWeight,
   );
 
   return {

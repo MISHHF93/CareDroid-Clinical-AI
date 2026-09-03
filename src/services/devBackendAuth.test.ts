@@ -248,7 +248,7 @@ describe('devBackendAuth ensureDevBackendSession concurrency (HEAL-347.42)', () 
     expect(forced.token).toBe('header.payload.signature');
   });
 
-  it('does not let an explicit bypass click inherit an unforced caller\'s non-session fallback', async () => {
+  it("does not let an explicit bypass click inherit an unforced caller's non-session fallback", async () => {
     // The join added in HEAL-347.46 assumed the in-flight unforced fetch "is
     // fetching the exact same fresh session a forced call would". When the
     // reachability probe says the backend is unreachable, an UNFORCED call
@@ -282,7 +282,7 @@ describe('devBackendAuth ensureDevBackendSession concurrency (HEAL-347.42)', () 
     expect(forced.token).toBe('header.payload.signature');
   });
 
-  it('does not let a forced caller inherit ANOTHER forced caller\'s failure either', async () => {
+  it("does not let a forced caller inherit ANOTHER forced caller's failure either", async () => {
     // Confirmed live on a cold backend: apiClient's 401-retry fires forced
     // calls on the DEFAULT 4s timeout; the bypass click (20s budget) joined
     // one of those chains via inFlightForcedSession and surfaced its abort at

@@ -16,10 +16,7 @@ export {
   auditIntegrationDiscovery,
 } from './integrationStatusRegistry';
 
-import {
-  BACKEND_CAPABILITY_STATUS,
-  getBackendCapabilityStatus,
-} from './backendApiCapabilities';
+import { BACKEND_CAPABILITY_STATUS, getBackendCapabilityStatus } from './backendApiCapabilities';
 import { INTEGRATION_STATUS } from './integrationStatusRegistry';
 
 export function capabilityRollupStatus(capability) {

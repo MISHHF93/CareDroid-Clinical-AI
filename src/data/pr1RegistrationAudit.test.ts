@@ -63,21 +63,24 @@ function _extractAppCalculatorRoutes(source) {
 }
 
 describe('PR1 registration audit — canonical ID alignment', () => {
-  it.each(PR1_TOOL_IDS)('%s uses the same id across registry, NLU, builtin slug, and maps', (id) => {
-    const reg = toolRegistryById[id];
-    expect(reg?.id).toBe(id);
+  it.each(PR1_TOOL_IDS)(
+    '%s uses the same id across registry, NLU, builtin slug, and maps',
+    (id) => {
+      const reg = toolRegistryById[id];
+      expect(reg?.id).toBe(id);
 
-    const nlu = clinicalIntentTools.find((t) => t.toolId === id);
-    expect(nlu?.toolId).toBe(id);
-    expect(nlu?.sidebarToolId).toBe(id);
+      const nlu = clinicalIntentTools.find((t) => t.toolId === id);
+      expect(nlu?.toolId).toBe(id);
+      expect(nlu?.sidebarToolId).toBe(id);
 
-    const builtin = builtinUiCalculators.find((c) => c.id === id);
-    expect(builtin?.id).toBe(id);
+      const builtin = builtinUiCalculators.find((c) => c.id === id);
+      expect(builtin?.id).toBe(id);
 
-    expect(BUILTIN_CALC_ID_TO_REGISTRY_ID[id]).toBe(id);
-    expect(NLU_TO_REGISTRY_ID[id]).toBe(id);
-    expect(resolveRegistryId(id)).toBe(id);
-  });
+      expect(BUILTIN_CALC_ID_TO_REGISTRY_ID[id]).toBe(id);
+      expect(NLU_TO_REGISTRY_ID[id]).toBe(id);
+      expect(resolveRegistryId(id)).toBe(id);
+    },
+  );
 
   it('keeps PR1_CALCULATOR_REGISTRY_IDS frozen and ordered', () => {
     expect(Object.isFrozen(PR1_CALCULATOR_REGISTRY_IDS)).toBe(true);
@@ -95,7 +98,7 @@ describe('PR1 registration audit — routes & path naming', () => {
     expect(clinicalIntentTools.find((t) => t.toolId === id)?.path).toBe(path);
     expect(builtinUiCalculators.find((c) => c.id === id)?.path).toBe(path);
     expect(builtinUiCalculators.find((c) => c.id === id)?.calcQuery).toBe(
-      PR1_CALC_QUERY_BY_REGISTRY_ID[id]
+      PR1_CALC_QUERY_BY_REGISTRY_ID[id],
     );
   });
 
@@ -131,7 +134,7 @@ describe('PR1 registration audit — NLU, backend keywords, aliases', () => {
     'NLU_TO_REGISTRY_ID maps catalog alias "%s" → %s',
     (alias, canonical) => {
       expect(NLU_TO_REGISTRY_ID[alias]).toBe(canonical);
-    }
+    },
   );
 
   it.each(PR1_ALL_ALIAS_PAIRS)('resolveRegistryId("%s") → %s', (alias, canonical) => {
@@ -160,11 +163,9 @@ describe('PR1 registration audit — NLU, backend keywords, aliases', () => {
   it.each(PR1_TOOL_IDS)(
     'product-required phrases appear in backend keywords or NLU_TO_REGISTRY_ID for %s',
     (id) => {
-      const keywords = extractToolPatternKeywords(patternsSource, id).map((k) =>
-        aliasToSlug(k)
-      );
+      const keywords = extractToolPatternKeywords(patternsSource, id).map((k) => aliasToSlug(k));
       const requiredForTool = PR1_REQUIRED_NLU_ALIAS_PAIRS.filter(([, c]) => c === id).map(
-        ([a]) => a
+        ([a]) => a,
       );
       for (const phrase of requiredForTool) {
         const slug = aliasToSlug(phrase);
@@ -172,10 +173,10 @@ describe('PR1 registration audit — NLU, backend keywords, aliases', () => {
         const inBackend = keywords.includes(slug) || keywords.includes(aliasToSlug(phrase));
         expect(
           inNluMap || inBackend,
-          `alias "${phrase}" for ${id} missing from NLU_TO_REGISTRY_ID and backend keywords`
+          `alias "${phrase}" for ${id} missing from NLU_TO_REGISTRY_ID and backend keywords`,
         ).toBe(true);
       }
-    }
+    },
   );
 });
 
@@ -187,7 +188,7 @@ describe('PR1 registration audit — discovery & catalog', () => {
       expect(row, `missing toolIdAliases id ${aliasId}`).toBeTruthy();
       if (!row) throw new Error(`expected toolIdAliases row for ${aliasId} to exist`);
       expect(row.mapsTo).toBe(canonical);
-    }
+    },
   );
 
   it.each(PR1_TOOL_IDS)('merged discovery includes canonical row for %s', (id) => {
@@ -208,14 +209,16 @@ describe('PR1 registration audit — discovery & catalog', () => {
   it.each(PR1_CATALOG_SEARCH_QUERIES)('catalog search finds %s for "%s"', (registryId, query) => {
     const rows = catalogRowsMatchingQuery(getMedicalToolsCatalogRows(), query);
     expect(rows.some((r) => r.primaryId === registryId || r.sidebarToolId === registryId)).toBe(
-      true
+      true,
     );
   });
 });
 
 describe('PR1 registration audit — sidebar & chat launch', () => {
   it('lists each PR1 tool exactly once in toolRegistry (sidebar visibility)', () => {
-    const pr1InRegistry = toolRegistry.filter((t) => (PR1_TOOL_IDS as readonly string[]).includes(t.id));
+    const pr1InRegistry = toolRegistry.filter((t) =>
+      (PR1_TOOL_IDS as readonly string[]).includes(t.id),
+    );
     expect(pr1InRegistry).toHaveLength(PR1_TOOL_IDS.length);
     for (const id of PR1_TOOL_IDS) {
       expect(toolRegistryById[id].panelTool).toBe('calculators');
@@ -245,15 +248,13 @@ describe('PR1 registration audit — sidebar & chat launch', () => {
       expect(fromAlias.registryId).toBe(fromCanonical.registryId);
       expect(fromAlias.path).toBe(PR1_ROUTE_BY_REGISTRY_ID[canonical]);
       expect(fromAlias.chatSeed).toBe(fromCanonical.chatSeed);
-    }
+    },
   );
 
   it('includes PR1 calculators in hub builtinUiCalculators selection list', () => {
     for (const id of PR1_TOOL_IDS) {
       expect(builtinUiCalculators.some((c) => c.id === id)).toBe(true);
-      expect(calculatorsSource).toMatch(
-        new RegExp(`case\\s+'${id.replace(/-/g, '\\-')}'\\s*:`)
-      );
+      expect(calculatorsSource).toMatch(new RegExp(`case\\s+'${id.replace(/-/g, '\\-')}'\\s*:`));
     }
   });
 });

@@ -2,10 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import DiagnosisAssistant from './DiagnosisAssistant';
-import {
-  mockConversationValue,
-  mockToolPreferencesValue,
-} from '../../test/testRenderUtils';
+import { mockConversationValue, mockToolPreferencesValue } from '../../test/testRenderUtils';
 import { sendClinicalChatMessage } from '../../services/clinicalChatService';
 
 vi.mock('./ToolPageLayout.css', () => ({}));
@@ -41,8 +38,14 @@ describe('DiagnosisAssistant', () => {
 
   it('offers a "Try again" retry action when generation fails, and re-submits the same request on click', async () => {
     vi.mocked(sendClinicalChatMessage)
-      .mockResolvedValueOnce({ ok: false, data: { message: 'Model temporarily unavailable' } } as any)
-      .mockResolvedValueOnce({ ok: true, data: { response: 'Differential: ACS, PE, aortic dissection.' } } as any);
+      .mockResolvedValueOnce({
+        ok: false,
+        data: { message: 'Model temporarily unavailable' },
+      } as any)
+      .mockResolvedValueOnce({
+        ok: true,
+        data: { response: 'Differential: ACS, PE, aortic dissection.' },
+      } as any);
 
     renderPage();
 
@@ -59,7 +62,9 @@ describe('DiagnosisAssistant', () => {
     await waitFor(() => {
       expect(sendClinicalChatMessage).toHaveBeenCalledTimes(2);
     });
-    expect(await screen.findByText(/Differential: ACS, PE, aortic dissection\./)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/Differential: ACS, PE, aortic dissection\./),
+    ).toBeInTheDocument();
     expect(screen.queryByText(/model temporarily unavailable/i)).not.toBeInTheDocument();
   });
 

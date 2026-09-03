@@ -48,7 +48,7 @@ describe('UX Debt Elimination Engine', () => {
         UX_SURFACE_TYPES.MAPS,
         UX_SURFACE_TYPES.CALCULATORS,
         UX_SURFACE_TYPES.DASHBOARDS,
-      ])
+      ]),
     );
   });
 
@@ -91,9 +91,7 @@ describe('UX Debt Elimination Engine', () => {
     } as any);
 
     const classifications = [...new Set(audit.findings.map((finding) => finding.classification))];
-    expect(classifications).toEqual(
-      expect.arrayContaining(Object.values(UX_DEBT_CLASSIFICATIONS))
-    );
+    expect(classifications).toEqual(expect.arrayContaining(Object.values(UX_DEBT_CLASSIFICATIONS)));
     expect(audit.summary.criticalFindings).toBeGreaterThan(0);
     expect(audit.healthScore).toBeLessThan(100);
   });
@@ -106,27 +104,27 @@ describe('UX Debt Elimination Engine', () => {
         expect.objectContaining({
           id: 'conflicting-sidebar-bottom-nav',
         }),
-      ])
+      ]),
     );
     expect(audit.findings).not.toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           id: 'obsolete-bottom-nav-spacing',
         }),
-      ])
+      ]),
     );
     expect(audit.findings).not.toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           id: 'obsolete-quick-command-bottom-nav-offset',
         }),
-      ])
+      ]),
     );
   });
 
   it('formats a UX Debt Report with health, classifications, findings, and automated checks', () => {
     const markdown = formatUxDebtReportMarkdown(
-      buildUxDebtAudit({ sourceSnapshot: currentSourceSnapshot() })
+      buildUxDebtAudit({ sourceSnapshot: currentSourceSnapshot() }),
     );
 
     expect(markdown).toContain('# UX Debt Report');

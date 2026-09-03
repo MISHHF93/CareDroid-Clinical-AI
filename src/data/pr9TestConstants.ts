@@ -23,7 +23,7 @@ export const PR9_TOOL_IDS = Object.freeze([...PR9_CALCULATOR_REGISTRY_IDS]);
 export const PR9_CHAT_CONFIGS = Object.freeze([pecarnHeadChatConfig, nexusCSpineChatConfig]);
 
 export const PR9_CHAT_CONFIG_BY_ID = Object.freeze(
-  Object.fromEntries(PR9_CHAT_CONFIGS.map((cfg) => [cfg.toolId, cfg]))
+  Object.fromEntries(PR9_CHAT_CONFIGS.map((cfg) => [cfg.toolId, cfg])),
 );
 
 export const PR9_REQUIRED_NLU_ALIAS_PAIRS = Object.freeze([
@@ -54,7 +54,7 @@ export const PR9_ALL_ALIAS_PAIRS = Object.freeze([
 ]);
 
 export const PR9_HUB_ROUTE_BY_REGISTRY_ID = Object.freeze(
-  Object.fromEntries(PR9_TOOL_IDS.map((rid) => [rid, PR9_HUB_PATH]))
+  Object.fromEntries(PR9_TOOL_IDS.map((rid) => [rid, PR9_HUB_PATH])),
 );
 
 export const PR9_CATALOG_SEARCH_QUERIES = Object.freeze([

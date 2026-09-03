@@ -79,9 +79,9 @@ describe('PR1 comprehensive — qSOFA scoring & interpretation', () => {
           respiratoryRateGte22,
           systolicBpLte100,
           alteredMentationOrGcsLt15,
-        })
+        }),
       ).toBe(expected);
-    }
+    },
   );
 
   it.each(QSOFA_INTERPRETATION_BY_SCORE)(
@@ -92,7 +92,7 @@ describe('PR1 comprehensive — qSOFA scoring & interpretation', () => {
       if (positiveThreshold) {
         expect(interp.interpretation).toMatch(/≥2|not diagnostic/i);
       }
-    }
+    },
   );
 
   it('end-to-end: valid inputs → criteria → score → interpretation without diagnostic certainty', () => {
@@ -125,7 +125,7 @@ describe('PR1 comprehensive — qSOFA scoring & interpretation', () => {
         systolicBloodPressure: '120',
         alteredMentation: false,
         gcs: '15',
-      }).ok
+      }).ok,
     ).toBe(true);
   });
 });
@@ -198,14 +198,14 @@ describe('PR1 comprehensive — Child-Pugh class boundaries', () => {
       const interp = interpretChildPughClass(total);
       expect(interp?.childPughClass).toBe(childPughClass);
       expect(interp?.severity).toBe(severity);
-    }
+    },
   );
 
   it.each(CHILD_PUGH_CLASS_BOUNDARIES)(
     'class boundary at total $total is $childPughClass',
     ({ total, childPughClass }) => {
       expect(interpretChildPughClass(total)?.childPughClass).toBe(childPughClass);
-    }
+    },
   );
 
   it('computeChildPughBreakdown yields class A minimum score 5', () => {
@@ -247,13 +247,20 @@ describe('PR1 comprehensive — HAS-BLED ≥3 threshold', () => {
       } else {
         expect(interp?.interpretation).toMatch(/below 3/i);
       }
-    }
+    },
   );
 
   it('threshold: score 2 is normal, score 3 is critical', () => {
     expect(interpretHasBled(2)?.severity).toBe('normal');
     expect(interpretHasBled(3)?.severity).toBe('critical');
-    expect(calculateHasBledScore({ ...HAS_BLED_NONE, hypertension: true, renalDysfunction: true, strokeHistory: true })).toBe(3);
+    expect(
+      calculateHasBledScore({
+        ...HAS_BLED_NONE,
+        hypertension: true,
+        renalDysfunction: true,
+        strokeHistory: true,
+      }),
+    ).toBe(3);
   });
 
   it('sumHasBledScore returns null when a factor is not 0 or 1', () => {
@@ -336,20 +343,27 @@ describe('PR1 comprehensive — NLU aliases, routes, resolveCatalogLaunch', () =
       expect(a.path).toBe(c.path);
       expect(a.registryId).toBe(c.registryId);
       expect(a.chatSeed).toBe(c.chatSeed);
-    }
+    },
   );
 
   it.each(PR1_TOOL_IDS)('builtin calc query path for %s', (id) => {
     const builtin = builtinUiCalculators.find((c) => c.id === id);
     expect(builtin?.calcQuery).toBe(PR1_CALC_QUERY_BY_REGISTRY_ID[id]);
     expect(BUILTIN_CALC_ID_TO_REGISTRY_ID[id]).toBe(id);
-    expect(clinicalIntentTools.find((t) => t.toolId === id)?.path).toBe(PR1_ROUTE_BY_REGISTRY_ID[id]);
+    expect(clinicalIntentTools.find((t) => t.toolId === id)?.path).toBe(
+      PR1_ROUTE_BY_REGISTRY_ID[id],
+    );
   });
 
-  it.each(PR1_CATALOG_SEARCH_QUERIES)('catalog search resolves %s via "%s"', (registryId, query) => {
-    const rows = catalogRowsMatchingQuery(getMedicalToolsCatalogRows(), query);
-    expect(rows.some((r) => r.primaryId === registryId || r.sidebarToolId === registryId)).toBe(true);
-  });
+  it.each(PR1_CATALOG_SEARCH_QUERIES)(
+    'catalog search resolves %s via "%s"',
+    (registryId, query) => {
+      const rows = catalogRowsMatchingQuery(getMedicalToolsCatalogRows(), query);
+      expect(rows.some((r) => r.primaryId === registryId || r.sidebarToolId === registryId)).toBe(
+        true,
+      );
+    },
+  );
 
   it('resolveCatalogLaunch returns guarded chat fallback for unknown id', () => {
     const launch = resolveCatalogLaunch('not-a-pr1-tool-xyz');

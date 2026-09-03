@@ -70,9 +70,7 @@ describe('shellEngineCatalog', () => {
   });
 
   it('defaults experimental engines OFF in production', () => {
-    expect(
-      resolveExperimentalShellEnginesEnabled({ PROD: true, MODE: 'production' }),
-    ).toBe(false);
+    expect(resolveExperimentalShellEnginesEnabled({ PROD: true, MODE: 'production' })).toBe(false);
     expect(resolveExperimentalShellEnginesEnabled({ DEV: true })).toBe(true);
     expect(
       resolveExperimentalShellEnginesEnabled({
@@ -94,21 +92,19 @@ describe('shellEngineCatalog', () => {
       showAdministrativeAutomationEngine: true,
       showOperationalIntelligenceEngine: true,
     };
-    expect(shouldStartShellEngine('reassessment', caps, { experimentalEnabled: false })).toBe(
-      true,
-    );
+    expect(shouldStartShellEngine('reassessment', caps, { experimentalEnabled: false })).toBe(true);
     expect(
       shouldStartShellEngine('administrativeAutomation', caps, { experimentalEnabled: false }),
     ).toBe(false);
     expect(
       shouldStartShellEngine('administrativeAutomation', caps, { experimentalEnabled: true }),
     ).toBe(true);
-    expect(
-      shouldStartShellEngine('livingDocumentation', {}, { experimentalEnabled: false }),
-    ).toBe(false);
-    expect(
-      shouldStartShellEngine('livingDocumentation', {}, { experimentalEnabled: true }),
-    ).toBe(true);
+    expect(shouldStartShellEngine('livingDocumentation', {}, { experimentalEnabled: false })).toBe(
+      false,
+    );
+    expect(shouldStartShellEngine('livingDocumentation', {}, { experimentalEnabled: true })).toBe(
+      true,
+    );
     expect(shouldStartShellEngine('alertsPoll', {}, { experimentalEnabled: false })).toBe(true);
   });
 });

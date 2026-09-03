@@ -62,7 +62,13 @@ export type PublicWaitingCareStage = {
 export type PublicWaitingDisplaySnapshot = {
   waitRange: { label: string; value: string; detail: string; disclaimer: string };
   crowdLevel: PublicWaitingCrowdLevel;
-  triageWait: { label: string; value: string; detail: string; available: boolean; disclaimer: string };
+  triageWait: {
+    label: string;
+    value: string;
+    detail: string;
+    available: boolean;
+    disclaimer: string;
+  };
   careStages: PublicWaitingCareStage[];
   processEducation: WaitingRoomProcessEducationSnapshot;
   statusMessaging: WaitingRoomStatusMessagingSnapshot;
@@ -143,8 +149,7 @@ export function buildPublicWaitingDisplaySnapshot(
     (waitingPatients.length
       ? Math.round(
           waitingPatients.reduce(
-            (sum, patient) =>
-              sum + minutesSince(patient.triageTime || patient.arrivalTime, now),
+            (sum, patient) => sum + minutesSince(patient.triageTime || patient.arrivalTime, now),
             0,
           ) / waitingPatients.length,
         )
@@ -153,8 +158,7 @@ export function buildPublicWaitingDisplaySnapshot(
   const longestWait =
     capacity?.longestWaitMinutes ??
     waitingPatients.reduce(
-      (max, patient) =>
-        Math.max(max, minutesSince(patient.triageTime || patient.arrivalTime, now)),
+      (max, patient) => Math.max(max, minutesSince(patient.triageTime || patient.arrivalTime, now)),
       0,
     );
 
@@ -187,8 +191,7 @@ export function buildPublicWaitingDisplaySnapshot(
     Number(arrivalControl.triagePending) || 0,
   );
   const avgTriageWait = computeAverageTriageWaitMinutes(patients, now);
-  const triageWaitAvailable =
-    triagePendingCount > 0 && avgTriageWait !== null && avgTriageWait > 0;
+  const triageWaitAvailable = triagePendingCount > 0 && avgTriageWait !== null && avgTriageWait > 0;
 
   const statusMessaging = buildWaitingRoomStatusMessagingSnapshot({
     patients,

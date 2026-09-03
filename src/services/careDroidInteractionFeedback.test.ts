@@ -6,14 +6,17 @@ import {
 } from './careDroidInteractionFeedback';
 
 vi.mock('sonner', () => ({
-  toast: Object.assign(vi.fn(() => 'toast-1'), {
-    success: vi.fn(() => 'toast-success'),
-    error: vi.fn(() => 'toast-error'),
-    info: vi.fn(() => 'toast-info'),
-    warning: vi.fn(() => 'toast-warning'),
-    loading: vi.fn(() => 'toast-loading'),
-    dismiss: vi.fn(),
-  }),
+  toast: Object.assign(
+    vi.fn(() => 'toast-1'),
+    {
+      success: vi.fn(() => 'toast-success'),
+      error: vi.fn(() => 'toast-error'),
+      info: vi.fn(() => 'toast-info'),
+      warning: vi.fn(() => 'toast-warning'),
+      loading: vi.fn(() => 'toast-loading'),
+      dismiss: vi.fn(),
+    },
+  ),
 }));
 
 describe('careDroidInteractionFeedback', () => {

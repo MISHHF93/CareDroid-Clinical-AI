@@ -16,7 +16,7 @@ describe('First Customer Demo Mode root store activation', () => {
 
     const state = useEmergencyStore.getState();
     const activePatients = state.patients.filter(
-      (patient) => ![PatientState.Discharge, PatientState.Deceased].includes(patient.state)
+      (patient) => ![PatientState.Discharge, PatientState.Deceased].includes(patient.state),
     );
 
     // The demo represents a 100-patient/day department, but only keeps the
@@ -26,7 +26,9 @@ describe('First Customer Demo Mode root store activation', () => {
     expect(state.activeScenarioId).toBe(FIRST_CUSTOMER_DEMO_MODE.id);
     expect(state.patients).toHaveLength(PRACTITIONER_WALKTHROUGH_ACTIVE_CENSUS);
     expect(activePatients).toHaveLength(PRACTITIONER_WALKTHROUGH_ACTIVE_CENSUS);
-    expect(state.emsArrivals.filter((arrival) => arrival.status === 'Inbound').length).toBeGreaterThanOrEqual(4);
+    expect(
+      state.emsArrivals.filter((arrival) => arrival.status === 'Inbound').length,
+    ).toBeGreaterThanOrEqual(4);
     expect(selectReassessmentQueue(state).length).toBeGreaterThanOrEqual(8);
     expect(state.capacity.boardingCount).toBeGreaterThanOrEqual(2);
   });

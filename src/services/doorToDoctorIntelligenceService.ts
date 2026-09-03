@@ -1,10 +1,46 @@
 export const DEFAULT_DOOR_TO_DOCTOR_EVENTS = Object.freeze([
-  Object.freeze({ patientId: 'ED-1042', arrivalTime: 0, triageTime: 18, providerTime: 74, acuity: 'ESI 3' }),
-  Object.freeze({ patientId: 'ED-1038', arrivalTime: 0, triageTime: 12, providerTime: 41, acuity: 'ESI 2' }),
-  Object.freeze({ patientId: 'ED-1027', arrivalTime: 0, triageTime: 22, providerTime: 88, acuity: 'ESI 3' }),
-  Object.freeze({ patientId: 'ED-1019', arrivalTime: 0, triageTime: 28, providerTime: 122, acuity: 'Sepsis review' }),
-  Object.freeze({ patientId: 'ED-1015', arrivalTime: 0, triageTime: 9, providerTime: 34, acuity: 'ESI 2' }),
-  Object.freeze({ patientId: 'ED-1009', arrivalTime: 0, triageTime: 31, providerTime: 67, acuity: 'ESI 4' }),
+  Object.freeze({
+    patientId: 'ED-1042',
+    arrivalTime: 0,
+    triageTime: 18,
+    providerTime: 74,
+    acuity: 'ESI 3',
+  }),
+  Object.freeze({
+    patientId: 'ED-1038',
+    arrivalTime: 0,
+    triageTime: 12,
+    providerTime: 41,
+    acuity: 'ESI 2',
+  }),
+  Object.freeze({
+    patientId: 'ED-1027',
+    arrivalTime: 0,
+    triageTime: 22,
+    providerTime: 88,
+    acuity: 'ESI 3',
+  }),
+  Object.freeze({
+    patientId: 'ED-1019',
+    arrivalTime: 0,
+    triageTime: 28,
+    providerTime: 122,
+    acuity: 'Sepsis review',
+  }),
+  Object.freeze({
+    patientId: 'ED-1015',
+    arrivalTime: 0,
+    triageTime: 9,
+    providerTime: 34,
+    acuity: 'ESI 2',
+  }),
+  Object.freeze({
+    patientId: 'ED-1009',
+    arrivalTime: 0,
+    triageTime: 31,
+    providerTime: 67,
+    acuity: 'ESI 4',
+  }),
 ]);
 
 const TARGETS = Object.freeze({
@@ -48,7 +84,7 @@ export const DoorToDoctorIntelligenceService = Object.freeze({
         (event) =>
           event.doorToTriageMinutes > TARGETS.doorToTriageMinutes ||
           event.triageToProviderMinutes > TARGETS.triageToProviderMinutes ||
-          event.doorToDoctorMinutes > TARGETS.doorToDoctorMinutes
+          event.doorToDoctorMinutes > TARGETS.doorToDoctorMinutes,
       )
       .map((event) =>
         Object.freeze({
@@ -65,10 +101,10 @@ export const DoorToDoctorIntelligenceService = Object.freeze({
             0,
             event.doorToDoctorMinutes - TARGETS.doorToDoctorMinutes,
             event.doorToTriageMinutes - TARGETS.doorToTriageMinutes,
-            event.triageToProviderMinutes - TARGETS.triageToProviderMinutes
+            event.triageToProviderMinutes - TARGETS.triageToProviderMinutes,
           ),
           reason: `${event.patientId} door-to-doctor time is ${event.doorToDoctorMinutes} minutes.`,
-        })
+        }),
       );
     const medianDoorToTriage = median(normalized.map((event) => event.doorToTriageMinutes));
     const medianTriageToProvider = median(normalized.map((event) => event.triageToProviderMinutes));
@@ -96,8 +132,14 @@ export const DoorToDoctorIntelligenceService = Object.freeze({
       delays: Object.freeze(delays),
       bottlenecks: Object.freeze([
         Object.freeze({
-          id: medianDoorToTriage > TARGETS.doorToTriageMinutes ? 'arrival-triage-bottleneck' : 'provider-bottleneck',
-          label: medianDoorToTriage > TARGETS.doorToTriageMinutes ? 'Arrival to triage' : 'Triage to provider',
+          id:
+            medianDoorToTriage > TARGETS.doorToTriageMinutes
+              ? 'arrival-triage-bottleneck'
+              : 'provider-bottleneck',
+          label:
+            medianDoorToTriage > TARGETS.doorToTriageMinutes
+              ? 'Arrival to triage'
+              : 'Triage to provider',
           severity: delays.some((delay) => delay.severity === 'critical') ? 'critical' : 'high',
           reason:
             medianDoorToTriage > TARGETS.doorToTriageMinutes
@@ -106,7 +148,10 @@ export const DoorToDoctorIntelligenceService = Object.freeze({
         }),
       ]),
       staffingPressure: Object.freeze({
-        state: medianTriageToProvider > TARGETS.triageToProviderMinutes ? 'provider pressure' : 'triage pressure',
+        state:
+          medianTriageToProvider > TARGETS.triageToProviderMinutes
+            ? 'provider pressure'
+            : 'triage pressure',
         reason:
           medianTriageToProvider > TARGETS.triageToProviderMinutes
             ? 'Provider starts are lagging behind triage completions.'

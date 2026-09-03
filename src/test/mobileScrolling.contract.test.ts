@@ -48,7 +48,7 @@ describe('mobile scrolling contracts', () => {
 
   it('uses scroll lock only through the active overlay class', () => {
     expect(indexCss).toMatch(
-      /html\.app-scroll-locked,\s*body\.app-scroll-locked[\s\S]*overflow:\s*hidden/
+      /html\.app-scroll-locked,\s*body\.app-scroll-locked[\s\S]*overflow:\s*hidden/,
     );
     expect(copilotPanelCss).toMatch(/\.ed-copilot-panel\s*\{[\s\S]*overflow:\s*hidden/);
   });
@@ -56,13 +56,19 @@ describe('mobile scrolling contracts', () => {
   it('keeps normal pages in the main scrollport while preserving Copilot chat as a local viewport', () => {
     expect(appShellCss).toMatch(/\.emergency-app-shell\s*\{[\s\S]*overflow:\s*hidden/);
     expect(appShellCss).toMatch(/\.emergency-app-shell__main-column\s*\{[\s\S]*overflow:\s*hidden/);
-    expect(appShellCss).toMatch(/\.app-shell-main-content\s*\{[\s\S]*overflow-x:\s*clip[\s\S]*overflow-y:\s*auto/);
+    expect(appShellCss).toMatch(
+      /\.app-shell-main-content\s*\{[\s\S]*overflow-x:\s*clip[\s\S]*overflow-y:\s*auto/,
+    );
     expect(copilotPanelCss).toMatch(/\.ed-copilot-panel\s*\{[\s\S]*overflow:\s*hidden/);
   });
 
   it('keeps the canonical Sidebar and overlays from creating extra page scroll owners', () => {
-    expect(sidebarCss).toMatch(/aside\[aria-label='Emergency navigation'\][\s\S]*position:\s*fixed/);
-    expect(sidebarCss).toMatch(/\.sidebar-nav-item:nth-of-type\(n \+ 6\)\s*\{[\s\S]*display:\s*none/);
+    expect(sidebarCss).toMatch(
+      /aside\[aria-label='Emergency navigation'\][\s\S]*position:\s*fixed/,
+    );
+    expect(sidebarCss).toMatch(
+      /\.sidebar-nav-item:nth-of-type\(n \+ 6\)\s*\{[\s\S]*display:\s*none/,
+    );
     expect(copilotPanelCss).toMatch(/\.ed-copilot-panel\s*\{[\s\S]*overflow:\s*hidden/);
     // CommandPalette.tsx (the current quick-command UI) unmounts entirely when
     // closed (`if (!open) return null`) rather than staying mounted with a CSS
@@ -82,7 +88,9 @@ describe('mobile scrolling contracts', () => {
   });
 
   it('allows tools and calculator pages to grow inside the shared AppShell main region', () => {
-    expect(appShellCss).toMatch(/\.app-shell-main-content\s*\{[\s\S]*overflow-x:\s*clip[\s\S]*overflow-y:\s*auto/);
+    expect(appShellCss).toMatch(
+      /\.app-shell-main-content\s*\{[\s\S]*overflow-x:\s*clip[\s\S]*overflow-y:\s*auto/,
+    );
     expect(layoutVisibilityCss).toMatch(/\.tools-overview[\s\S]*overflow-x:\s*clip/);
     expect(layoutVisibilityCss).toMatch(/\.calculators-content[\s\S]*overflow-x:\s*clip/);
     expect(toolsOverviewCss).not.toMatch(/\.tools-overview\s*\{[^}]*height:\s*100vh/);
@@ -96,6 +104,8 @@ describe('mobile scrolling contracts', () => {
     expect(indexCss).toMatch(/body\s*\{[\s\S]*overflow-x:\s*clip/);
     expect(layoutVisibilityCss).toMatch(/body\s*\{[\s\S]*overflow-x:\s*clip/);
     expect(appShellCss).not.toContain('app-shell-bottom-nav');
-    expect(sidebarCss).toMatch(/@media \(max-width: 768px\)[\s\S]*aside\[aria-label='Emergency navigation'\]/);
+    expect(sidebarCss).toMatch(
+      /@media \(max-width: 768px\)[\s\S]*aside\[aria-label='Emergency navigation'\]/,
+    );
   });
 });

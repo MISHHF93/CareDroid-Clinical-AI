@@ -19,14 +19,25 @@ type ChannelListProps = {
   onSelectChannel: (channelId: string) => void;
 };
 
-export function ChannelList({ channels, activeChannelId, unreadCountForChannel, onSelectChannel }: ChannelListProps) {
+export function ChannelList({
+  channels,
+  activeChannelId,
+  unreadCountForChannel,
+  onSelectChannel,
+}: ChannelListProps) {
   const grouped = groupByType(channels);
 
   return (
     <Stack gap={4} className="cd-collab-channel-list">
       {Object.entries(grouped).map(([type, items]) => (
         <div key={type} className="cd-collab-channel-list__group">
-          <Text as="p" size="xs" weight="semibold" color="secondary" className="cd-collab-channel-list__group-label">
+          <Text
+            as="p"
+            size="xs"
+            weight="semibold"
+            color="secondary"
+            className="cd-collab-channel-list__group-label"
+          >
             {CHANNEL_TYPE_LABEL[type] || type}
           </Text>
           <Stack gap={1}>

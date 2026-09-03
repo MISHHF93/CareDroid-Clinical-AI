@@ -14,8 +14,12 @@ describe('CareDroid scenario store wiring', () => {
     expect(state.activeScenarioId).toBe('ems-surge');
     expect(state.activeScenario.label).toBe('EMS surge');
     expect(state.patients.some((patient) => patient.priority === 'P1')).toBe(true);
-    expect(state.emsArrivals.filter((arrival) => arrival.status === 'Inbound').length).toBeGreaterThan(1);
-    expect(state.queues.some((queue) => queue.label === 'Reassessment' && queue.count > 0)).toBe(true);
+    expect(
+      state.emsArrivals.filter((arrival) => arrival.status === 'Inbound').length,
+    ).toBeGreaterThan(1);
+    expect(state.queues.some((queue) => queue.label === 'Reassessment' && queue.count > 0)).toBe(
+      true,
+    );
     expect(state.scenarioData.copilotContext.emsInboundCount).toBeGreaterThan(1);
   });
 

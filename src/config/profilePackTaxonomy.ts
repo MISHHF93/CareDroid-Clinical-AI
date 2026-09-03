@@ -33,20 +33,21 @@ export const CATALOG_PACK_MATCHERS: Readonly<Record<string, readonly string[]>> 
 });
 
 /** Specialty catalog packs implied by org entitlement packs */
-export const ENTITLEMENT_TO_CATALOG_PACKS: Readonly<Record<string, readonly string[]>> = Object.freeze({
-  [SAAS_ENTITLEMENT_PACKS.CORE]: ['core-platform'],
-  [SAAS_ENTITLEMENT_PACKS.RECEPTION_DESK]: ['core-platform', 'reception-desk'],
-  [SAAS_ENTITLEMENT_PACKS.EMERGENCY_CLINICAL]: ['core-platform', 'emergency-clinical'],
-  [SAAS_ENTITLEMENT_PACKS.HOSPITAL_OPERATIONS]: [
-    'core-platform',
-    'operations',
-    'medical-iot',
-    'fleet',
-    'laboratory',
-  ],
-  [SAAS_ENTITLEMENT_PACKS.TRACKMIND]: ['core-platform', 'trackmind'],
-  [SAAS_ENTITLEMENT_PACKS.PLATFORM_ADMIN]: ['core-platform', 'platform-admin'],
-});
+export const ENTITLEMENT_TO_CATALOG_PACKS: Readonly<Record<string, readonly string[]>> =
+  Object.freeze({
+    [SAAS_ENTITLEMENT_PACKS.CORE]: ['core-platform'],
+    [SAAS_ENTITLEMENT_PACKS.RECEPTION_DESK]: ['core-platform', 'reception-desk'],
+    [SAAS_ENTITLEMENT_PACKS.EMERGENCY_CLINICAL]: ['core-platform', 'emergency-clinical'],
+    [SAAS_ENTITLEMENT_PACKS.HOSPITAL_OPERATIONS]: [
+      'core-platform',
+      'operations',
+      'medical-iot',
+      'fleet',
+      'laboratory',
+    ],
+    [SAAS_ENTITLEMENT_PACKS.TRACKMIND]: ['core-platform', 'trackmind'],
+    [SAAS_ENTITLEMENT_PACKS.PLATFORM_ADMIN]: ['core-platform', 'platform-admin'],
+  });
 
 const STRICT_PACK_ENFORCEMENT_ROLES = new Set([
   'registration-clerk',
@@ -121,8 +122,7 @@ export function toolMatchesProfilePackPolicy(
 
   const allowedPacks = resolveEffectivePacksForProfile(saasRole);
   const packId = resolveToolPackId(tool);
-  const strict =
-    options.strict ?? isStrictPackEnforcementForRole(saasRole);
+  const strict = options.strict ?? isStrictPackEnforcementForRole(saasRole);
 
   if (!packId) {
     return !strict;
@@ -131,7 +131,9 @@ export function toolMatchesProfilePackPolicy(
   return packMatchesAllowedSet(packId, allowedPacks);
 }
 
-export function expandEntitlementPacksToCatalogPacks(entitledPackIds: readonly string[] = []): string[] {
+export function expandEntitlementPacksToCatalogPacks(
+  entitledPackIds: readonly string[] = [],
+): string[] {
   const expanded = new Set<string>();
   for (const packId of entitledPackIds) {
     expanded.add(packId);

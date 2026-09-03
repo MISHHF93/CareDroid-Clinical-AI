@@ -45,7 +45,11 @@ function buildAnalyticsAggregates({ productLayer, expansion, department, workflo
       domain: 'organization_analytics',
       label: 'Organization analytics',
       score: 74,
-      metrics: ['3 customer segments monitored', '2 onboarding risks flagged', '5 adoption signals tracked'],
+      metrics: [
+        '3 customer segments monitored',
+        '2 onboarding risks flagged',
+        '5 adoption signals tracked',
+      ],
     },
     {
       id: 'workspace-analytics',
@@ -63,14 +67,22 @@ function buildAnalyticsAggregates({ productLayer, expansion, department, workflo
       domain: 'asset_analytics',
       label: 'Asset analytics',
       score: 68,
-      metrics: ['4 assets marked underused', '2 merge candidates identified', '11 usage events analyzed'],
+      metrics: [
+        '4 assets marked underused',
+        '2 merge candidates identified',
+        '11 usage events analyzed',
+      ],
     },
     {
       id: 'ai-analytics',
       domain: 'ai_analytics',
       label: 'AI analytics',
       score: 77,
-      metrics: ['780 AI-assisted actions', 'AI governance suite healthy', 'Human review readiness improving'],
+      metrics: [
+        '780 AI-assisted actions',
+        'AI governance suite healthy',
+        'Human review readiness improving',
+      ],
     },
     {
       id: 'automation-analytics',
@@ -88,7 +100,11 @@ function buildAnalyticsAggregates({ productLayer, expansion, department, workflo
       domain: 'simulation_analytics',
       label: 'Simulation analytics',
       score: department.summary.averageHealthScore,
-      metrics: ['Simulation readiness tracked', 'Emergency training gap visible', 'Education pack expansion signal'],
+      metrics: [
+        'Simulation readiness tracked',
+        'Emergency training gap visible',
+        'Education pack expansion signal',
+      ],
     },
   ];
 }
@@ -111,10 +127,17 @@ export function buildCareDroidBusinessBrain() {
   const expansion = buildCustomerExpansionOpportunities();
   const department = buildDepartmentPerformanceIntelligence();
   const workflowMining = buildWorkflowMiningReport();
-  const analytics = buildAnalyticsAggregates({ productLayer, expansion, department, workflowMining });
+  const analytics = buildAnalyticsAggregates({
+    productLayer,
+    expansion,
+    department,
+    workflowMining,
+  });
 
   const topProduct = [...productLayer.products].sort((a, b) => b.health.score - a.health.score)[0];
-  const trainingDepartment = [...department.departments].sort((a, b) => a.healthScore - b.healthScore)[0];
+  const trainingDepartment = [...department.departments].sort(
+    (a, b) => a.healthScore - b.healthScore,
+  )[0];
 
   const recommendations = [
     recommendation({
@@ -135,8 +158,13 @@ export function buildCareDroidBusinessBrain() {
       type: 'pack_to_retire',
       title: 'Retire low-signal legacy protocol pack',
       score: 63,
-      evidence: ['Low outcome contribution', 'Better coverage in Emergency Pack', 'Repeated search-to-protocol friction'],
-      action: 'Deprecate duplicate pack positioning and migrate customers to higher-performing bundles.',
+      evidence: [
+        'Low outcome contribution',
+        'Better coverage in Emergency Pack',
+        'Repeated search-to-protocol friction',
+      ],
+      action:
+        'Deprecate duplicate pack positioning and migrate customers to higher-performing bundles.',
       owners: ['product', 'commercial'],
     }),
     recommendation({
@@ -144,8 +172,13 @@ export function buildCareDroidBusinessBrain() {
       type: 'asset_to_merge',
       title: 'Merge protocol lookup and workflow builder assets',
       score: 72,
-      evidence: ['Workflow builder -> search -> protocol loop repeats', 'Protocol workflow dead ends', 'Unnecessary clicks detected'],
-      action: 'Embed protocol search into workflow builder and consolidate duplicated protocol launch points.',
+      evidence: [
+        'Workflow builder -> search -> protocol loop repeats',
+        'Protocol workflow dead ends',
+        'Unnecessary clicks detected',
+      ],
+      action:
+        'Embed protocol search into workflow builder and consolidate duplicated protocol launch points.',
       owners: ['product', 'design'],
     }),
     recommendation({
@@ -153,8 +186,13 @@ export function buildCareDroidBusinessBrain() {
       type: 'customer_needing_onboarding',
       title: 'Onboard customers with low activation and high expansion fit',
       score: 81,
-      evidence: ['Expansion opportunities exceed current adoption', 'Readiness gaps remain', 'Value tracking not fully activated'],
-      action: 'Schedule guided onboarding for customers with under-activated packs and active expansion signals.',
+      evidence: [
+        'Expansion opportunities exceed current adoption',
+        'Readiness gaps remain',
+        'Value tracking not fully activated',
+      ],
+      action:
+        'Schedule guided onboarding for customers with under-activated packs and active expansion signals.',
       owners: ['customer-success', 'implementation'],
     }),
     recommendation({
@@ -167,7 +205,8 @@ export function buildCareDroidBusinessBrain() {
         `${trainingDepartment.measurableOutcomeCount} measurable outcomes`,
         'Simulation readiness is a recurring training signal',
       ],
-      action: 'Run targeted enablement using simulation, workflow, and calculator adoption evidence.',
+      action:
+        'Run targeted enablement using simulation, workflow, and calculator adoption evidence.',
       owners: ['clinical-education', 'customer-success'],
     }),
   ];

@@ -1,11 +1,5 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
-import {
-  PatientFlag,
-  PatientState,
-  Priority,
-  type Patient,
-  type Room,
-} from '../types/emergency';
+import { PatientFlag, PatientState, Priority, type Patient, type Room } from '../types/emergency';
 import {
   buildOperationalCommandDashboardSnapshot,
   buildZoneBedOccupancy,
@@ -137,7 +131,9 @@ describe('operationalCommandDashboardModel', () => {
     ];
 
     const snapshot = buildOperationalCommandDashboardSnapshot({ patients, rooms });
-    expect(snapshot.metrics.find((metric) => metric.id === 'pending-bed-assignment')?.value).toBeGreaterThan(0);
+    expect(
+      snapshot.metrics.find((metric) => metric.id === 'pending-bed-assignment')?.value,
+    ).toBeGreaterThan(0);
     expect(snapshot.pendingBedAssignments.length).toBeGreaterThan(0);
     expect(snapshot.chargeNurseAlerts[0]).toContain('pending bed assignment');
   });

@@ -126,13 +126,61 @@ export default function ReceptionDocumentCapture({
             const demo = applied.appliedDemographics;
             fieldsForDraft = [
               ...fieldsForDraft,
-              ...(demo.firstName ? [{ field: 'firstName', value: demo.firstName, extracted: demo.firstName, confidence: 1, status: 'accepted' }] : []),
-              ...(demo.lastName ? [{ field: 'lastName', value: demo.lastName, extracted: demo.lastName, confidence: 1, status: 'accepted' }] : []),
-              ...(demo.dateOfBirth
-                ? [{ field: 'dateOfBirth', value: demo.dateOfBirth, extracted: demo.dateOfBirth, confidence: 1, status: 'accepted' }]
+              ...(demo.firstName
+                ? [
+                    {
+                      field: 'firstName',
+                      value: demo.firstName,
+                      extracted: demo.firstName,
+                      confidence: 1,
+                      status: 'accepted',
+                    },
+                  ]
                 : []),
-              ...(demo.sex ? [{ field: 'sex', value: demo.sex, extracted: demo.sex, confidence: 1, status: 'accepted' }] : []),
-              ...(demo.phone ? [{ field: 'phone', value: demo.phone, extracted: demo.phone, confidence: 1, status: 'accepted' }] : []),
+              ...(demo.lastName
+                ? [
+                    {
+                      field: 'lastName',
+                      value: demo.lastName,
+                      extracted: demo.lastName,
+                      confidence: 1,
+                      status: 'accepted',
+                    },
+                  ]
+                : []),
+              ...(demo.dateOfBirth
+                ? [
+                    {
+                      field: 'dateOfBirth',
+                      value: demo.dateOfBirth,
+                      extracted: demo.dateOfBirth,
+                      confidence: 1,
+                      status: 'accepted',
+                    },
+                  ]
+                : []),
+              ...(demo.sex
+                ? [
+                    {
+                      field: 'sex',
+                      value: demo.sex,
+                      extracted: demo.sex,
+                      confidence: 1,
+                      status: 'accepted',
+                    },
+                  ]
+                : []),
+              ...(demo.phone
+                ? [
+                    {
+                      field: 'phone',
+                      value: demo.phone,
+                      extracted: demo.phone,
+                      confidence: 1,
+                      status: 'accepted',
+                    },
+                  ]
+                : []),
               ...(demo.healthCardNumber
                 ? [
                     {
@@ -181,7 +229,9 @@ export default function ReceptionDocumentCapture({
           Document scan (OCR)
         </h3>
         <span className="reception-document-capture__hint">
-          {ocrEnabled ? 'ID · health card · insurance · passport · referral' : 'OCR service unavailable — manual entry only'}
+          {ocrEnabled
+            ? 'ID · health card · insurance · passport · referral'
+            : 'OCR service unavailable — manual entry only'}
         </span>
       </div>
 
@@ -245,10 +295,12 @@ export default function ReceptionDocumentCapture({
       {fieldPreview.length > 0 ? (
         <ul className="reception-document-capture__fields" aria-label="Extracted fields">
           {fieldPreview.map((row) => {
-            const band =
-              row.confidence >= 0.9 ? 'high' : row.confidence >= 0.65 ? 'medium' : 'low';
+            const band = row.confidence >= 0.9 ? 'high' : row.confidence >= 0.65 ? 'medium' : 'low';
             return (
-              <li key={`${row.field}-${row.value}`} className={`reception-document-capture__field is-${band}`}>
+              <li
+                key={`${row.field}-${row.value}`}
+                className={`reception-document-capture__field is-${band}`}
+              >
                 <span className="reception-document-capture__field-name">{row.field}</span>
                 <span className="reception-document-capture__field-value">{row.value}</span>
                 <span className="reception-document-capture__field-conf" title="OCR confidence">

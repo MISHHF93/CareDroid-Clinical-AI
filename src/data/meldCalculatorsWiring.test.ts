@@ -33,9 +33,9 @@ const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculato
 const patternsSource = readFileSync(
   join(
     __dirname,
-    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts'
+    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts',
   ),
-  'utf8'
+  'utf8',
 );
 
 describe('MELD calculator wiring (meld, meld-na)', () => {
@@ -52,14 +52,14 @@ describe('MELD calculator wiring (meld, meld-na)', () => {
       expect(reg.initialCalc).toBe(id);
 
       const nlu = clinicalIntentTools.find((t) => t.toolId === id);
-    if (!nlu) throw new Error('expected nlu tool entry to exist');
+      if (!nlu) throw new Error('expected nlu tool entry to exist');
       expect(nlu, `clinicalIntentTools missing ${id}`).toBeTruthy();
       expect(nlu.path).toBe(`/tools/calculators/${id}`);
       expect(nlu.sidebarToolId).toBe(id);
       expect(nlu.backendExecutable).toBe(false);
 
       const builtin = builtinUiCalculators.find((c) => c.id === id);
-    if (!builtin) throw new Error('expected builtin calculator entry to exist');
+      if (!builtin) throw new Error('expected builtin calculator entry to exist');
       expect(builtin, `builtinUiCalculators missing ${id}`).toBeTruthy();
       expect(builtin.path).toBe(`/tools/calculators/${id}`);
       expect(BUILTIN_CALC_ID_TO_REGISTRY_ID[id]).toBe(id);
@@ -116,7 +116,7 @@ describe('MELD calculator wiring (meld, meld-na)', () => {
     (alias, canonical) => {
       expect(NLU_TO_REGISTRY_ID[alias]).toBe(canonical);
       expect(resolveRegistryId(alias)).toBe(canonical);
-    }
+    },
   );
 
   it.each(MELD_TOOL_IDS)('resolveRegistryId maps canonical id %s', (id) => {
@@ -145,7 +145,7 @@ describe('MELD calculator wiring (meld, meld-na)', () => {
       const rows = getMedicalToolsCatalogRows();
       const hits = catalogRowsMatchingQuery(rows, query);
       expect(hits.some((r) => r.primaryId === primaryId)).toBe(true);
-    }
+    },
   );
 
   it('lists meld and meld-na in toolRegistry export', () => {

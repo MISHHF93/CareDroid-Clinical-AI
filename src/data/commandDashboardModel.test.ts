@@ -29,11 +29,15 @@ describe('command dashboard model', () => {
     expect(model.stats.aiTools).toBeGreaterThan(0);
     expect(model.panels.clinicalTools.map((tool) => tool.id)).toContain(REGISTRY.qsofa);
     expect(model.panels.calculators.map((tool) => tool.id)).toContain(REGISTRY.qsofa);
-    expect(model.panels.referenceGuidelines.map((tool) => tool.id)).toContain(REGISTRY.guidelineRag);
+    expect(model.panels.referenceGuidelines.map((tool) => tool.id)).toContain(
+      REGISTRY.guidelineRag,
+    );
     expect(model.panels.fleetOperations.map((tool) => tool.id)).toContain(REGISTRY.liveTrackingMap);
     expect(model.panels.fleetOperations.map((tool) => tool.id)).toContain(REGISTRY.fleetLiveMap);
     expect(model.panels.fleetOperations.map((tool) => tool.id)).toContain(REGISTRY.fleetCommand);
-    expect(model.panels.fleetOperations.map((tool) => tool.id)).toContain(REGISTRY.deviceFleetManagement);
+    expect(model.panels.fleetOperations.map((tool) => tool.id)).toContain(
+      REGISTRY.deviceFleetManagement,
+    );
     expect(model.panels.medicalIot.map((tool) => tool.id)).toContain(REGISTRY.medicalIotDashboard);
     expect(model.panels.expandedCare.map((tool) => tool.id)).toEqual([
       REGISTRY.competencyPlatform,
@@ -58,8 +62,14 @@ describe('command dashboard model', () => {
   it('derives visualization distributions from unified inventory without duplicate counts', () => {
     const inventory = getUserFacingToolRegistryProjection();
     const model = buildCommandDashboardModel(inventory);
-    const categoryTotal = model.visualizations.categoryDistribution.reduce((sum, item) => sum + item.value, 0);
-    const launchTypeTotal = model.visualizations.launchTypeDistribution.reduce((sum, item) => sum + item.value, 0);
+    const categoryTotal = model.visualizations.categoryDistribution.reduce(
+      (sum, item) => sum + item.value,
+      0,
+    );
+    const launchTypeTotal = model.visualizations.launchTypeDistribution.reduce(
+      (sum, item) => sum + item.value,
+      0,
+    );
 
     expect(categoryTotal).toBe(inventory.length);
     expect(launchTypeTotal).toBe(inventory.length);
@@ -74,7 +84,11 @@ describe('command dashboard model', () => {
       const ids = panel.map((tool) => tool.id);
       expect(new Set(ids).size).toBe(ids.length);
     }
-    expect(model.panels.calculators.every((tool) => tool.category === 'Calculator' || tool.surface === 'calculator-form')).toBe(true);
+    expect(
+      model.panels.calculators.every(
+        (tool) => tool.category === 'Calculator' || tool.surface === 'calculator-form',
+      ),
+    ).toBe(true);
   });
 
   it('keeps curated group ids explicit and registry-backed', () => {
@@ -138,7 +152,11 @@ describe('command dashboard model', () => {
     // catalog-completeness gap than this finding covers, intentionally left open.
     const tools = getUserFacingToolRegistryProjection();
     const model = buildCommandDashboardModel();
-    const allPanelIds = new Set(Object.values(model.panels).flat().map((tool) => tool.id));
+    const allPanelIds = new Set(
+      Object.values(model.panels)
+        .flat()
+        .map((tool) => tool.id),
+    );
     const routeToId: Record<string, string> = {
       '/costs': REGISTRY.aiCostOptimization,
       '/ai-command-center': REGISTRY.aiCommandCenter,
@@ -150,7 +168,10 @@ describe('command dashboard model', () => {
       '/fleet/command': REGISTRY.fleetCommand,
     };
     for (const [route, id] of Object.entries(routeToId)) {
-      expect(tools.some((tool) => tool.path === route || tool.route === route), route).toBe(true);
+      expect(
+        tools.some((tool) => tool.path === route || tool.route === route),
+        route,
+      ).toBe(true);
       expect(allPanelIds, `${route} (${id})`).toContain(id);
     }
   });

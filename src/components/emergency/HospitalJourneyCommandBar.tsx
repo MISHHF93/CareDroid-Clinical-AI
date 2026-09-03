@@ -11,7 +11,11 @@ function HospitalJourneyCommandBar() {
   const surfaces = usePractitionerSurfaceVisibility();
   const hospitalOs = useHospitalOperatingSystem({ syncBackend: false });
 
-  if (!surfaces.emergencyRoutes.showJourneyRail || !hospitalOs.isHospitalRoute || !hospitalOs.phaseId) {
+  if (
+    !surfaces.emergencyRoutes.showJourneyRail ||
+    !hospitalOs.isHospitalRoute ||
+    !hospitalOs.phaseId
+  ) {
     return null;
   }
 
@@ -22,10 +26,7 @@ function HospitalJourneyCommandBar() {
   );
 
   return (
-    <nav
-      className="hospital-journey-command-bar"
-      aria-label="Hospital operating system journey"
-    >
+    <nav className="hospital-journey-command-bar" aria-label="Hospital operating system journey">
       <div className="hospital-journey-command-bar__heading">
         <strong>Patient journey</strong>
         <span>
@@ -68,7 +69,9 @@ function HospitalJourneyCommandBar() {
                 {summary && (summary.activeCount > 0 || summary.stagesAttention > 0) ? (
                   <span className="hospital-journey-command-bar__counts" aria-hidden="true">
                     {summary.activeCount > 0 ? (
-                      <span className="hospital-journey-command-bar__count">{summary.activeCount}</span>
+                      <span className="hospital-journey-command-bar__count">
+                        {summary.activeCount}
+                      </span>
                     ) : null}
                     {summary.stagesAttention > 0 ? (
                       <span className="hospital-journey-command-bar__attention">!</span>

@@ -47,12 +47,11 @@ vi.mock('../contexts/UserIdentityContext', () => ({
   }),
 }));
 
-
 function renderProfileSettings() {
   return render(
     <MemoryRouter>
       <ProfileSettings authToken={mockAuthToken} />
-    </MemoryRouter>
+    </MemoryRouter>,
   );
 }
 
@@ -135,7 +134,7 @@ describe('ProfileSettings operational profile save', () => {
           licenseNumber: 'MD-123',
           country: 'US',
           timezone: 'America/New_York',
-        })
+        }),
       );
     });
     expect(mockSetUser).toHaveBeenCalledWith(
@@ -143,7 +142,7 @@ describe('ProfileSettings operational profile save', () => {
         fullName: 'Dr. Avery Stone',
         institution: 'Metro Hospital',
         profile: expect.objectContaining({ institution: 'Metro Hospital' }),
-      })
+      }),
     );
     expect(screen.getByText(/operational profile saved/i)).toBeInTheDocument();
   });
@@ -164,7 +163,7 @@ describe('ProfileSettings operational profile save', () => {
     expect(mockSetUser).not.toHaveBeenCalled();
     expect(mockError).toHaveBeenCalledWith(
       'Profile save failed',
-      'You do not have permission to access this resource.'
+      'You do not have permission to access this resource.',
     );
   });
 });

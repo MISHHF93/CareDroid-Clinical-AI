@@ -54,8 +54,7 @@ export const nativePreferences = {
   setUserRole: (role: string) => set(KEYS.USER_ROLE, role),
 
   getPushNotificationsEnabled: async () => (await get(KEYS.PUSH_NOTIFICATIONS)) !== 'false',
-  setPushNotificationsEnabled: (enabled: boolean) =>
-    set(KEYS.PUSH_NOTIFICATIONS, String(enabled)),
+  setPushNotificationsEnabled: (enabled: boolean) => set(KEYS.PUSH_NOTIFICATIONS, String(enabled)),
 
   getEmailNotificationsEnabled: async () => (await get(KEYS.EMAIL_NOTIFICATIONS)) !== 'false',
   setEmailNotificationsEnabled: (enabled: boolean) =>

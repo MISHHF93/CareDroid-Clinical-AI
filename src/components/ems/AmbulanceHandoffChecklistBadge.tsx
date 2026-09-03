@@ -31,20 +31,14 @@ export default function AmbulanceHandoffChecklistBadge({
 
   return (
     <span
-      className={[
-        'amb-handoff-badge',
-        compact ? 'amb-handoff-badge--compact' : '',
-        className,
-      ]
+      className={['amb-handoff-badge', compact ? 'amb-handoff-badge--compact' : '', className]
         .filter(Boolean)
         .join(' ')}
       data-tone={tone}
       title={`Handoff ${completion}% · ${formatAmbulanceHandoffDestination(checklist)}`}
     >
       {checklist.handoffAccepted ? 'Handoff accepted' : `Handoff ${completion}%`}
-      {!compact ? (
-        <small>{formatAmbulanceHandoffDestination(checklist)}</small>
-      ) : null}
+      {!compact ? <small>{formatAmbulanceHandoffDestination(checklist)}</small> : null}
     </span>
   );
 }

@@ -3,11 +3,11 @@ import { useUser } from '../contexts/UserContext';
 import type { CareDroidUserProfile } from '../lib/users/userTypes';
 import { DEMO_USERS, getDemoUserById, getDefaultDemoUser } from '../lib/users/demoUsers';
 import { applyDemoRoleView } from '../config/demoPersonaModel';
-import { compileCareDroidAccessProfile, normalizeCareDroidProfile } from '../lib/users/canonicalAccess';
 import {
-  buildSecurityContextFromUser,
-  checkPermission,
-} from '../services/securityAccessService';
+  compileCareDroidAccessProfile,
+  normalizeCareDroidProfile,
+} from '../lib/users/canonicalAccess';
+import { buildSecurityContextFromUser, checkPermission } from '../services/securityAccessService';
 
 const STORAGE_KEY = 'cd_demo_user_id';
 

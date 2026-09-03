@@ -18,7 +18,11 @@ export const DEMO_PREDICTIVE_ANALYTICS_MODELS = Object.freeze([
     horizon: 'Next 6 hours',
     modelStatus: 'demo-model',
     signals: ['NEWS2 trend rising', 'Oxygen requirement increased', 'Tachycardia persistent'],
-    recommendedActions: ['Recheck vitals within 30 minutes', 'Review escalation protocol', 'Consider clinician bedside reassessment'],
+    recommendedActions: [
+      'Recheck vitals within 30 minutes',
+      'Review escalation protocol',
+      'Consider clinician bedside reassessment',
+    ],
     linkedPath: '/clinical-decision-support',
   },
   {
@@ -30,8 +34,16 @@ export const DEMO_PREDICTIVE_ANALYTICS_MODELS = Object.freeze([
     confidence: 0.74,
     horizon: '30 days',
     modelStatus: 'demo-model',
-    signals: ['Recent discharge', 'Comorbidity burden', 'Medication changes pending reconciliation'],
-    recommendedActions: ['Confirm follow-up appointment', 'Review discharge instructions', 'Medication reconciliation before discharge'],
+    signals: [
+      'Recent discharge',
+      'Comorbidity burden',
+      'Medication changes pending reconciliation',
+    ],
+    recommendedActions: [
+      'Confirm follow-up appointment',
+      'Review discharge instructions',
+      'Medication reconciliation before discharge',
+    ],
     linkedPath: '/documentation',
   },
   {
@@ -44,7 +56,11 @@ export const DEMO_PREDICTIVE_ANALYTICS_MODELS = Object.freeze([
     horizon: 'Current encounter',
     modelStatus: 'demo-model',
     signals: ['Suspected infection', 'Lactate elevated', 'qSOFA context positive'],
-    recommendedActions: ['Open sepsis protocol', 'Trend lactate', 'Consider escalation if hypotension persists'],
+    recommendedActions: [
+      'Open sepsis protocol',
+      'Trend lactate',
+      'Consider escalation if hypotension persists',
+    ],
     linkedPath: '/protocols',
   },
   {
@@ -57,7 +73,11 @@ export const DEMO_PREDICTIVE_ANALYTICS_MODELS = Object.freeze([
     horizon: 'Next 12 hours',
     modelStatus: 'demo-model',
     signals: ['Increasing oxygen support', 'Abnormal labs', 'Escalation protocol triggered'],
-    recommendedActions: ['Notify charge nurse', 'Review bed capacity', 'Prepare handoff if escalation criteria persist'],
+    recommendedActions: [
+      'Notify charge nurse',
+      'Review bed capacity',
+      'Prepare handoff if escalation criteria persist',
+    ],
     linkedPath: '/hospital-map',
   },
   {
@@ -70,7 +90,11 @@ export const DEMO_PREDICTIVE_ANALYTICS_MODELS = Object.freeze([
     horizon: 'Next 24 hours',
     modelStatus: 'demo-model',
     signals: ['Battery degradation', 'Telemetry dropouts', 'Recent alarm frequency increased'],
-    recommendedActions: ['Inspect device', 'Check backup availability', 'Review alarm event history'],
+    recommendedActions: [
+      'Inspect device',
+      'Check backup availability',
+      'Review alarm event history',
+    ],
     linkedPath: '/medical-iot',
   },
   {
@@ -83,7 +107,11 @@ export const DEMO_PREDICTIVE_ANALYTICS_MODELS = Object.freeze([
     horizon: 'Next 7 days',
     modelStatus: 'demo-model',
     signals: ['Mileage threshold approaching', 'Delayed service window', 'Fault code trend rising'],
-    recommendedActions: ['Schedule inspection window', 'Review fault codes', 'Check replacement vehicle coverage'],
+    recommendedActions: [
+      'Schedule inspection window',
+      'Review fault codes',
+      'Check replacement vehicle coverage',
+    ],
     linkedPath: '/fleet/predictive-maintenance',
   },
 ]);
@@ -98,7 +126,9 @@ export function resolvePredictiveRiskBand(score) {
 export function buildPredictiveAnalyticsSummary(models = DEMO_PREDICTIVE_ANALYTICS_MODELS) {
   const highestRisk = [...models].sort((a, b) => b.score - a.score)[0];
   const highOrCritical = models.filter((model) => ['high', 'critical'].includes(model.band));
-  const averageScore = Math.round(models.reduce((total, model) => total + model.score, 0) / models.length);
+  const averageScore = Math.round(
+    models.reduce((total, model) => total + model.score, 0) / models.length,
+  );
 
   return {
     sourceStatus: 'demo-models',
@@ -125,7 +155,7 @@ export function searchPredictiveModels(query = '', models = DEMO_PREDICTIVE_ANAL
     ]
       .join(' ')
       .toLowerCase()
-      .includes(normalizedQuery)
+      .includes(normalizedQuery),
   );
 }
 

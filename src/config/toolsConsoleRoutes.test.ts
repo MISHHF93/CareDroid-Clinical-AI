@@ -45,7 +45,10 @@ describe('toolsConsoleRoutes', () => {
     expect(TOOLS_SHORTCUT_PAGE_ROUTES).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ path: '/lab', componentKey: 'laboratoryDashboard' }),
-        expect.objectContaining({ path: TOOL_LAUNCH_PATHS.protocols, componentKey: 'protocolsLibrary' }),
+        expect.objectContaining({
+          path: TOOL_LAUNCH_PATHS.protocols,
+          componentKey: 'protocolsLibrary',
+        }),
       ]),
     );
   });
@@ -82,5 +85,4 @@ describe('toolsConsoleRoutes', () => {
     expect(appSource).not.toContain('<Route path="/fleet/route-optimizer"');
     expect(appSource).not.toContain('<Route path="/maps"');
   });
-
 });

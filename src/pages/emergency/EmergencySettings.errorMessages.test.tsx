@@ -189,9 +189,21 @@ const GENERIC_PROVINCIAL_HEALTH_MESSAGE =
 describe('EmergencySettings error messages (HEAL)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(fetchOrganizationEmergencyOsSettings).mockResolvedValue({ ok: false, data: null, message: '' });
-    vi.mocked(fetchEmergencyOsSettings).mockResolvedValue({ ok: true, data: { data: mockSettings }, message: '' });
-    vi.mocked(saveOrganizationEmergencyOsSettings).mockResolvedValue({ ok: true, data: { data: mockSettings }, message: '' });
+    vi.mocked(fetchOrganizationEmergencyOsSettings).mockResolvedValue({
+      ok: false,
+      data: null,
+      message: '',
+    });
+    vi.mocked(fetchEmergencyOsSettings).mockResolvedValue({
+      ok: true,
+      data: { data: mockSettings },
+      message: '',
+    });
+    vi.mocked(saveOrganizationEmergencyOsSettings).mockResolvedValue({
+      ok: true,
+      data: { data: mockSettings },
+      message: '',
+    });
     vi.mocked(fetchEmergencyWorkflowLogs).mockResolvedValue({ data: { logs: [] } });
     vi.mocked(fetchEmergencyAiGovernanceRegistry).mockResolvedValue({
       services: {},
@@ -239,7 +251,9 @@ describe('EmergencySettings error messages (HEAL)', () => {
       remainingGaps: [],
     });
     vi.mocked(fetchProvincialHealth).mockRejectedValue(
-      new Error('Unable to reach the API. Start the backend with `npm run dev:api` or `npm run dev:fullstack`.'),
+      new Error(
+        'Unable to reach the API. Start the backend with `npm run dev:api` or `npm run dev:fullstack`.',
+      ),
     );
 
     render(

@@ -2,10 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import CalculatorRecommender from './CalculatorRecommender';
-import {
-  mockConversationValue,
-  mockToolPreferencesValue,
-} from '../../test/testRenderUtils';
+import { mockConversationValue, mockToolPreferencesValue } from '../../test/testRenderUtils';
 import { sendClinicalChatMessage } from '../../services/clinicalChatService';
 
 vi.mock('./ToolPageLayout.css', () => ({}));
@@ -54,7 +51,9 @@ describe('CalculatorRecommender', () => {
   it('renders calculator recommendation safety scope', () => {
     renderPage();
 
-    expect(screen.getByRole('heading', { name: /calculator recommendation ai/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /calculator recommendation ai/i }),
+    ).toBeInTheDocument();
     expect(screen.getByText(/suggests existing caredroid calculators only/i)).toBeInTheDocument();
     expect(screen.getByText(/does not diagnose/i)).toBeInTheDocument();
   });
@@ -62,11 +61,15 @@ describe('CalculatorRecommender', () => {
   it('suggests real chest pain calculators from local workflow', () => {
     renderPage();
 
-    fireEvent.change(screen.getByLabelText(/chief complaint/i), { target: { value: 'Chest pain' } });
+    fireEvent.change(screen.getByLabelText(/chief complaint/i), {
+      target: { value: 'Chest pain' },
+    });
     fireEvent.change(screen.getByLabelText(/symptoms/i), {
       target: { value: 'Substernal pressure, diaphoresis, elevated troponin' },
     });
-    fireEvent.change(screen.getByLabelText(/clinical keywords/i), { target: { value: 'ACS NSTEMI' } });
+    fireEvent.change(screen.getByLabelText(/clinical keywords/i), {
+      target: { value: 'ACS NSTEMI' },
+    });
     fireEvent.click(screen.getByRole('button', { name: /suggest tools/i }));
 
     expect(screen.getByRole('heading', { name: /heart score/i })).toBeInTheDocument();
@@ -83,7 +86,9 @@ describe('CalculatorRecommender', () => {
   it('labels "Suggest tools" results as Manual (rule-based), not silently AI-branded', () => {
     renderPage();
 
-    fireEvent.change(screen.getByLabelText(/chief complaint/i), { target: { value: 'Chest pain' } });
+    fireEvent.change(screen.getByLabelText(/chief complaint/i), {
+      target: { value: 'Chest pain' },
+    });
     fireEvent.click(screen.getByRole('button', { name: /suggest tools/i }));
 
     expect(screen.getByRole('heading', { name: /heart score/i })).toBeInTheDocument();
@@ -94,7 +99,9 @@ describe('CalculatorRecommender', () => {
   it('does not show the deterministic "Manual" label for chat-workflow-sourced results (a separate, pre-existing page-level label already discloses the chat path)', async () => {
     renderPage();
 
-    fireEvent.change(screen.getByLabelText(/chief complaint/i), { target: { value: 'Chest pain' } });
+    fireEvent.change(screen.getByLabelText(/chief complaint/i), {
+      target: { value: 'Chest pain' },
+    });
     fireEvent.click(screen.getByRole('button', { name: /start chat workflow/i }));
 
     expect(await screen.findByRole('heading', { name: /heart score/i })).toBeInTheDocument();
@@ -105,7 +112,9 @@ describe('CalculatorRecommender', () => {
   it('starts chat workflow with calculator-recommender-ai tool and feature hints', async () => {
     renderPage();
 
-    fireEvent.change(screen.getByLabelText(/chief complaint/i), { target: { value: 'Chest pain' } });
+    fireEvent.change(screen.getByLabelText(/chief complaint/i), {
+      target: { value: 'Chest pain' },
+    });
     fireEvent.click(screen.getByRole('button', { name: /start chat workflow/i }));
 
     await waitFor(() => {

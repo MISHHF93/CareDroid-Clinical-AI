@@ -98,7 +98,9 @@ export default function RouteOptimizer() {
       <header className="route-optimizer-page__header">
         <GraphicIconBadge iconKey="route" accent="brand" size="md" />
         <div>
-          <p className="route-optimizer-page__title-text" data-testid="cd-page-title-text">Route Optimization</p>
+          <p className="route-optimizer-page__title-text" data-testid="cd-page-title-text">
+            Route Optimization
+          </p>
           <p>Deterministic stop sequencing support for human-reviewed fleet routing.</p>
         </div>
       </header>
@@ -247,7 +249,9 @@ export default function RouteOptimizer() {
               ) : null}
             </>
           ) : (
-            <p className="fleet-safety-notice">Add at least one labeled stop, then run optimization.</p>
+            <p className="fleet-safety-notice">
+              Add at least one labeled stop, then run optimization.
+            </p>
           )}
         </div>
       </div>

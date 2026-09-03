@@ -53,8 +53,14 @@ describe('entitlements registry parity', () => {
       'command-predictive-alerts',
       'predictive-analytics-dashboard',
     ]) {
-      expect(frontendRules.some((rule) => rule.assetIds.includes(assetId)), assetId).toBe(true);
-      expect(backendRules.some((rule) => rule.assetIds.includes(assetId)), assetId).toBe(true);
+      expect(
+        frontendRules.some((rule) => rule.assetIds.includes(assetId)),
+        assetId,
+      ).toBe(true);
+      expect(
+        backendRules.some((rule) => rule.assetIds.includes(assetId)),
+        assetId,
+      ).toBe(true);
     }
   });
 
@@ -65,8 +71,14 @@ describe('entitlements registry parity', () => {
       'pre-arrival-activation',
       'trauma-team-activation',
     ]) {
-      expect(frontendRules.some((rule) => rule.assetIds.includes(assetId)), assetId).toBe(true);
-      expect(backendRules.some((rule) => rule.assetIds.includes(assetId)), assetId).toBe(true);
+      expect(
+        frontendRules.some((rule) => rule.assetIds.includes(assetId)),
+        assetId,
+      ).toBe(true);
+      expect(
+        backendRules.some((rule) => rule.assetIds.includes(assetId)),
+        assetId,
+      ).toBe(true);
     }
   });
 

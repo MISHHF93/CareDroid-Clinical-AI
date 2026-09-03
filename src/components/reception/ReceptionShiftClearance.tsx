@@ -77,7 +77,12 @@ export default function ReceptionShiftClearance({
                 : `${total} patient${total === 1 ? '' : 's'} still need registration follow-up before you leave.`}
             </p>
           </div>
-          <button type="button" className="reception-shift-clearance__close" onClick={onClose} aria-label="Close">
+          <button
+            type="button"
+            className="reception-shift-clearance__close"
+            onClick={onClose}
+            aria-label="Close"
+          >
             <X size={16} />
           </button>
         </header>
@@ -123,7 +128,11 @@ export default function ReceptionShiftClearance({
           <button type="button" className="reception-shift-clearance__secondary" onClick={onClose}>
             Keep working
           </button>
-          <button type="button" className="reception-shift-clearance__primary" onClick={onRecordShiftNote}>
+          <button
+            type="button"
+            className="reception-shift-clearance__primary"
+            onClick={onRecordShiftNote}
+          >
             Record shift handoff note
           </button>
         </footer>

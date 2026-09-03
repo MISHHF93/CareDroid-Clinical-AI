@@ -20,12 +20,23 @@ describe('PatientFlowStatusPanel', () => {
   it('P0.4: labels the fleet-wide "AI operational recommendations" list Manual, not an unlabeled AI claim', () => {
     mockUseContinuousPatientFlow.mockReturnValue({
       snapshot: {
-        metrics: { trackedPatients: 5, activeDetections: 2, congestedDepartments: 1, overloadedDepartments: 0, delayedHandoffs: 0 },
+        metrics: {
+          trackedPatients: 5,
+          activeDetections: 2,
+          congestedDepartments: 1,
+          overloadedDepartments: 0,
+          delayedHandoffs: 0,
+        },
       },
       patientSnapshot: null,
       detections: [],
       aiRecommendations: [
-        { id: 'r1', action: 'Escalate triage', rationale: 'Queue overload detected', priority: 'high' },
+        {
+          id: 'r1',
+          action: 'Escalate triage',
+          rationale: 'Queue overload detected',
+          priority: 'high',
+        },
       ],
     });
 

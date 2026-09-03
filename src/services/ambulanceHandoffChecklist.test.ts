@@ -57,9 +57,9 @@ describe('ambulanceHandoffChecklist', () => {
   });
 
   it('parses explicit medications and administered phrases', () => {
-    expect(parseMedicationsEnRoute(['Morphine 4mg'], 'Administered ondansetron for nausea')).toEqual(
-      expect.arrayContaining(['Morphine 4mg', 'Ondansetron']),
-    );
+    expect(
+      parseMedicationsEnRoute(['Morphine 4mg'], 'Administered ondansetron for nausea'),
+    ).toEqual(expect.arrayContaining(['Morphine 4mg', 'Ondansetron']));
   });
 
   it('does not throw when an explicit medications array contains a non-string entry', () => {
@@ -201,16 +201,19 @@ describe('ambulanceHandoffChecklist', () => {
     // identity/vitals/medications/critical-flags/destination a clinician
     // actually documented during handoff were thrown away and never reached
     // the backend at all.
-    const checklist = mergeAmbulanceHandoffChecklistPatch(buildAmbulanceHandoffChecklist(baseArrival), {
-      handoffAccepted: true,
-      handoffAcceptedAt: '2026-06-20T12:00:00.000Z',
-      // Exactly like the local optimistic store update
-      // (emergencyStore.ts's updateAmbulanceHandoffChecklist), the resolved
-      // checklist itself does carry an acceptor identity by this point --
-      // proving the payload builder strips it, not that it was never set.
-      handoffAcceptedByStaffId: 'staff-should-not-be-sent',
-      handoffAcceptedByStaffName: 'Should Not Be Sent',
-    });
+    const checklist = mergeAmbulanceHandoffChecklistPatch(
+      buildAmbulanceHandoffChecklist(baseArrival),
+      {
+        handoffAccepted: true,
+        handoffAcceptedAt: '2026-06-20T12:00:00.000Z',
+        // Exactly like the local optimistic store update
+        // (emergencyStore.ts's updateAmbulanceHandoffChecklist), the resolved
+        // checklist itself does carry an acceptor identity by this point --
+        // proving the payload builder strips it, not that it was never set.
+        handoffAcceptedByStaffId: 'staff-should-not-be-sent',
+        handoffAcceptedByStaffName: 'Should Not Be Sent',
+      },
+    );
 
     const payload = buildEmsHandoffChecklistSyncPayload(checklist, '2026-06-20T12:00:00.000Z');
 

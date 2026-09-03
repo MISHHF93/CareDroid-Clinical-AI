@@ -10,7 +10,13 @@ type DividerProps = {
 export function Divider({ orientation = 'horizontal', label, className, ...props }: DividerProps) {
   if (label) {
     return (
-      <div className={['cd-divider cd-divider--horizontal cd-divider--labeled', className ?? ''].filter(Boolean).join(' ')} role="separator" {...props}>
+      <div
+        className={['cd-divider cd-divider--horizontal cd-divider--labeled', className ?? '']
+          .filter(Boolean)
+          .join(' ')}
+        role="separator"
+        {...props}
+      >
         <span className="cd-divider__line" aria-hidden="true" />
         <span className="cd-divider__label">{label}</span>
         <span className="cd-divider__line" aria-hidden="true" />

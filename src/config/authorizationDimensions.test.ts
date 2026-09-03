@@ -6,7 +6,11 @@ import {
   OPERATIONS_SIDEBAR_NAV_ITEMS,
   SOLUTIONS_SIDEBAR_NAV_ITEMS,
 } from './navigation.config';
-import { USER_PROFILE_CATALOG, resolveUserProfileFromSaasRole, isRouteAllowedForProfile } from './userProfileCatalog';
+import {
+  USER_PROFILE_CATALOG,
+  resolveUserProfileFromSaasRole,
+  isRouteAllowedForProfile,
+} from './userProfileCatalog';
 import { canAccessRoute, compileCareDroidAccessProfile } from '../lib/users/canonicalAccess';
 
 /**
@@ -66,11 +70,21 @@ describe('authorization dimensions -- independence regression coverage', () => {
     const example = USER_PROFILE_CATALOG.flatMap((entry) => {
       const profile = resolveUserProfileFromSaasRole(entry.saasRole);
       return routes
-        .filter((path) => dimensionA(entry.emergencyRoleId, path) && !isRouteAllowedForProfile(profile, path))
-        .map((path) => ({ saasRole: entry.saasRole, emergencyRoleId: entry.emergencyRoleId, path }));
+        .filter(
+          (path) =>
+            dimensionA(entry.emergencyRoleId, path) && !isRouteAllowedForProfile(profile, path),
+        )
+        .map((path) => ({
+          saasRole: entry.saasRole,
+          emergencyRoleId: entry.emergencyRoleId,
+          path,
+        }));
     })[0];
 
-    expect(example, 'Expected at least one clinical-only-reachable route to exist in the current catalog').toBeDefined();
+    expect(
+      example,
+      'Expected at least one clinical-only-reachable route to exist in the current catalog',
+    ).toBeDefined();
     if (example) {
       // Re-assert directly (not just via the search above) so this test
       // fails on its own if the specific example's behavior regresses.
@@ -96,7 +110,10 @@ describe('authorization dimensions -- independence regression coverage', () => {
     const deniedRoute = routes.find(
       (path) => !dimensionA(null, path) && !isRouteAllowedForProfile(profile, path),
     );
-    expect(deniedRoute, 'Expected at least one route the student profile cannot reach via either dimension').toBeDefined();
+    expect(
+      deniedRoute,
+      'Expected at least one route the student profile cannot reach via either dimension',
+    ).toBeDefined();
   });
 
   it('a public/unauthenticated-style profile cannot gain staff access through either dimension', () => {
@@ -115,7 +132,8 @@ describe('authorization dimensions -- independence regression coverage', () => {
     // roles (which would make every access decision fall through to
     // Dimension B alone, defeating the point of having two dimensions).
     const emptyClinicalAccess = USER_PROFILE_CATALOG.filter(
-      (entry) => entry.emergencyRoleId && !routes.some((path) => dimensionA(entry.emergencyRoleId, path)),
+      (entry) =>
+        entry.emergencyRoleId && !routes.some((path) => dimensionA(entry.emergencyRoleId, path)),
     );
     expect(
       emptyClinicalAccess.map((e) => e.saasRole),

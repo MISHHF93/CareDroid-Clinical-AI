@@ -53,9 +53,9 @@ describe('patientExperienceStatus', () => {
   });
 
   it('maps registration journey states to Registered', () => {
-    expect(resolvePatientExperienceStatus(buildPatient({ state: PatientState.Registration })).id).toBe(
-      'registered',
-    );
+    expect(
+      resolvePatientExperienceStatus(buildPatient({ state: PatientState.Registration })).id,
+    ).toBe('registered');
     expect(
       resolvePatientExperienceStatus(
         buildPatient({
@@ -73,7 +73,11 @@ describe('patientExperienceStatus', () => {
     );
     expect(
       resolvePatientExperienceStatus(
-        buildPatient({ state: PatientState.Registration, triagePending: true, queueDestination: 'rapid-review' }),
+        buildPatient({
+          state: PatientState.Registration,
+          triagePending: true,
+          queueDestination: 'rapid-review',
+        }),
       ).id,
     ).toBe('waiting-for-triage');
   });
@@ -86,7 +90,14 @@ describe('patientExperienceStatus', () => {
       resolvePatientExperienceStatus(
         buildPatient({
           state: PatientState.Orders,
-          timeline: [{ id: 'o1', type: 'OrderPlaced', timestamp: '2026-06-20T09:00:00.000Z', to: PatientState.Orders }],
+          timeline: [
+            {
+              id: 'o1',
+              type: 'OrderPlaced',
+              timestamp: '2026-06-20T09:00:00.000Z',
+              to: PatientState.Orders,
+            },
+          ],
         }),
       ).id,
     ).toBe('tests-in-progress');
@@ -107,14 +118,16 @@ describe('patientExperienceStatus', () => {
     ];
 
     expect(
-      resolvePatientExperienceStatus(buildPatient({ state: PatientState.Assessment }), { referrals }).id,
+      resolvePatientExperienceStatus(buildPatient({ state: PatientState.Assessment }), {
+        referrals,
+      }).id,
     ).toBe('waiting-for-specialist-review');
   });
 
   it('maps disposition and admission states', () => {
-    expect(resolvePatientExperienceStatus(buildPatient({ state: PatientState.Disposition })).id).toBe(
-      'preparing-discharge',
-    );
+    expect(
+      resolvePatientExperienceStatus(buildPatient({ state: PatientState.Disposition })).id,
+    ).toBe('preparing-discharge');
     expect(
       resolvePatientExperienceStatus(
         buildPatient({ state: PatientState.Waiting, flags: [PatientFlag.PendingAdmission] }),

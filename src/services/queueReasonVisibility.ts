@@ -137,7 +137,9 @@ export type QueueReasonSnapshot = {
 
 function hasFlag(patient: Patient, flag: PatientFlag): boolean {
   return (patient.flags || []).some((entry) =>
-    typeof entry === 'string' ? entry === flag : (entry as unknown as { type: string })?.type === flag,
+    typeof entry === 'string'
+      ? entry === flag
+      : (entry as unknown as { type: string })?.type === flag,
   );
 }
 
@@ -153,8 +155,7 @@ export function isInQueueFlow(patient: Patient | null | undefined): boolean {
 
 function activeReferral(patient: Patient, referrals: Referral[] = []): Referral | null {
   const match = referrals.find(
-    (referral) =>
-      referral.patientId === patient.id && classifyReferralBucket(referral) !== null,
+    (referral) => referral.patientId === patient.id && classifyReferralBucket(referral) !== null,
   );
   if (match) return match;
   if (patient.referral && !isClosedReferralStatus(patient.referral.status)) {
@@ -190,9 +191,7 @@ function needsClinicianReview(patient: Patient, now: Date): boolean {
   );
 }
 
-function defaultQueueReason(
-  patient: Patient,
-): { id: QueueReasonId; staffDetail: string } {
+function defaultQueueReason(patient: Patient): { id: QueueReasonId; staffDetail: string } {
   switch (patient.state) {
     case PatientState.Disposition:
       return {
@@ -284,10 +283,7 @@ function detectReasons(
     });
   }
 
-  if (
-    patient.state === PatientState.Admission ||
-    hasFlag(patient, PatientFlag.PendingAdmission)
-  ) {
+  if (patient.state === PatientState.Admission || hasFlag(patient, PatientFlag.PendingAdmission)) {
     reasons.push({
       id: 'admission-bed-pending',
       staffDetail: `Inpatient bed placement · ${patient.state}`,

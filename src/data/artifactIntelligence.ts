@@ -135,7 +135,14 @@ function asArray(value) {
 
 function uniq(values) {
   const source = Array.isArray(values) ? values : [values];
-  return [...new Set(source.flatMap(asArray).map((value) => value.trim()).filter(Boolean))];
+  return [
+    ...new Set(
+      source
+        .flatMap(asArray)
+        .map((value) => value.trim())
+        .filter(Boolean),
+    ),
+  ];
 }
 
 function firstKnown(...values: unknown[]): string {
@@ -144,11 +151,13 @@ function firstKnown(...values: unknown[]): string {
 }
 
 function slug(value) {
-  return String(value || UNKNOWN)
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '') || UNKNOWN;
+  return (
+    String(value || UNKNOWN)
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '') || UNKNOWN
+  );
 }
 
 function normalizeText(value) {
@@ -175,9 +184,14 @@ function riskScore(riskLevel) {
 
 function readinessScore(artifact) {
   let score = TYPE_SCORE[artifact.type] ?? 0.6;
-  if (/backend|api|registered|live|active/.test(`${artifact.backendStatus} ${artifact.status}`)) score += 0.12;
+  if (/backend|api|registered|live|active/.test(`${artifact.backendStatus} ${artifact.status}`))
+    score += 0.12;
   if (/demo|mock/.test(artifact.demoStatus)) score -= 0.12;
-  if (/unsupported|planned/.test(`${artifact.backendStatus} ${artifact.frontendStatus} ${artifact.status}`)) {
+  if (
+    /unsupported|planned/.test(
+      `${artifact.backendStatus} ${artifact.frontendStatus} ${artifact.status}`,
+    )
+  ) {
     score -= 0.24;
   }
   if (artifact.assetPack === UNKNOWN) score -= 0.05;
@@ -263,7 +277,12 @@ function artifactFromAsset(asset) {
       ...(asset.evidence?.sourceFiles || []),
       ...(asset.evidence?.tests || []),
     ],
-    tags: [asset.assetType, asset.category, ...(asset.workspaceIds || []), ...(asset.packIds || [])],
+    tags: [
+      asset.assetType,
+      asset.category,
+      ...(asset.workspaceIds || []),
+      ...(asset.packIds || []),
+    ],
     status: asset.lifecycle,
   });
 }
@@ -349,7 +368,11 @@ function artifactFromPrompt(tool) {
     route: tool.path,
     sourceFile: 'src/data/clinicalIntentToolCatalog.ts',
     frontendStatus: 'assistant-seed',
-    backendStatus: tool.postExecutable ? 'executor-backed' : tool.backendRouted ? 'chat-routed' : 'chat-assisted',
+    backendStatus: tool.postExecutable
+      ? 'executor-backed'
+      : tool.backendRouted
+        ? 'chat-routed'
+        : 'chat-assisted',
     demoStatus: tool.backendExecutable ? 'live-or-local' : 'demo-or-guided',
     assetPack: UNKNOWN,
     product: UNKNOWN,
@@ -376,7 +399,9 @@ function artifactFromPack(pack) {
     backendStatus: 'platform-catalog',
     demoStatus: 'live-or-local',
     assetPack: pack.id,
-    product: SAAS_PRODUCTS.filter((product) => product.packIds.includes(pack.id)).map((product) => product.id),
+    product: SAAS_PRODUCTS.filter((product) => product.packIds.includes(pack.id)).map(
+      (product) => product.id,
+    ),
     workspace: pack.workspaceIds,
     roles: UNKNOWN,
     organizationTypes: 'hospital',
@@ -401,7 +426,9 @@ function artifactFromProduct(product) {
     demoStatus: 'live-or-local',
     assetPack: product.packIds,
     product: product.id,
-    workspace: product.packIds.flatMap((packId) => ASSET_PACKS.find((pack) => pack.id === packId)?.workspaceIds || []),
+    workspace: product.packIds.flatMap(
+      (packId) => ASSET_PACKS.find((pack) => pack.id === packId)?.workspaceIds || [],
+    ),
     roles: UNKNOWN,
     organizationTypes: 'hospital',
     riskLevel: 'medium',
@@ -430,7 +457,11 @@ function artifactFromLocalMlModel(model) {
     organizationTypes: 'hospital',
     riskLevel: 'high',
     description: `${model.purpose}${model.accuracy ? ` (${(model.accuracy * 100).toFixed(1)}% accuracy)` : ''}`,
-    dependencies: [model.classifierPath, model.metricsPath, model.manifestPath || 'backend/ml-services/models/manifest.json'],
+    dependencies: [
+      model.classifierPath,
+      model.metricsPath,
+      model.manifestPath || 'backend/ml-services/models/manifest.json',
+    ],
     tags: ['ai-model', 'local-ml', model.head, model.modelId, model.architecture || 'untrained'],
     embeddingText: `${model.name} ${model.purpose} ${model.head} ${model.route} local trained classifier`,
     status: model.status,
@@ -484,7 +515,12 @@ function artifactFromNluExample(example) {
       'backend/ml-services/models/nlu/classifier.json',
       'backend/ml-services/models/manifest.json',
     ],
-    tags: ['nlu', example.intent, example.split, ...(example.subcategory ? [example.subcategory] : [])],
+    tags: [
+      'nlu',
+      example.intent,
+      example.split,
+      ...(example.subcategory ? [example.subcategory] : []),
+    ],
     embeddingText: `${example.text} ${example.intent} ${example.subcategory || ''} nlu intent routing`,
     status: 'active',
   });
@@ -507,7 +543,11 @@ function artifactFromMedicalKnowledge(doc) {
     roles: 'clinician|nurse|emergency-physician|resident|pharmacist',
     organizationTypes: 'hospital',
     riskLevel: /interaction|sepsis|arrest|critical/i.test(doc.body) ? 'high' : 'medium',
-    description: doc.body.split(/\r?\n/).find((line) => line.trim() && !line.startsWith('#'))?.trim() || doc.title,
+    description:
+      doc.body
+        .split(/\r?\n/)
+        .find((line) => line.trim() && !line.startsWith('#'))
+        ?.trim() || doc.title,
     dependencies: doc.relative,
     tags: ['medical-knowledge', 'rag', 'clinical-reference', slug(doc.fileName)],
     embeddingText: `${doc.title} ${doc.relative} ${doc.body.slice(0, 1600)}`,
@@ -527,7 +567,7 @@ function dedupeArtifacts(artifacts) {
 export function buildArtifactCatalog({ extraArtifacts = [] as any[] }: any = {}) {
   const assets = buildAssetInventoryProjection();
   const ownership = new Map(
-    buildRouteOwnershipProjection({ assets }).map((route) => [route.path, route])
+    buildRouteOwnershipProjection({ assets }).map((route) => [route.path, route]),
   );
   const artifacts = [
     ...assets.map(artifactFromAsset),
@@ -550,7 +590,7 @@ export function validateArtifactCatalog(artifacts = buildArtifactCatalog()) {
   const ids = artifacts.map((artifact) => artifact.artifactId);
   const duplicateIds = ids.filter((id, index) => ids.indexOf(id) !== index);
   const missingRequired = artifacts.filter((artifact) =>
-    ARTIFACT_SCHEMA_FIELDS.some((field) => artifact[field] === undefined || artifact[field] === '')
+    ARTIFACT_SCHEMA_FIELDS.some((field) => artifact[field] === undefined || artifact[field] === ''),
   );
   return {
     ok: duplicateIds.length === 0 && missingRequired.length === 0,
@@ -566,9 +606,12 @@ export function encodeArtifactFeatures(artifacts = buildArtifactCatalog()) {
     tags: artifact.tags,
     typeEncoding: `type:${artifact.type}`,
     roleEncoding: listValue(artifact.roles.split('|').map((role) => `role:${slug(role)}`)),
-    workspaceEncoding: listValue(artifact.workspace.split('|').map((workspace) => `workspace:${slug(workspace)}`)),
+    workspaceEncoding: listValue(
+      artifact.workspace.split('|').map((workspace) => `workspace:${slug(workspace)}`),
+    ),
     packEncoding: listValue(artifact.assetPack.split('|').map((pack) => `pack:${slug(pack)}`)),
-    dependencyCount: artifact.dependencies === UNKNOWN ? 0 : artifact.dependencies.split('|').length,
+    dependencyCount:
+      artifact.dependencies === UNKNOWN ? 0 : artifact.dependencies.split('|').length,
     riskScore: riskScore(artifact.riskLevel),
     readinessScore: readinessScore(artifact),
   }));
@@ -594,7 +637,11 @@ export function buildArtifactTrainingDataset(artifacts = buildArtifactCatalog())
       },
     ];
 
-    if (artifact.type === 'nlu-example' && artifact.description && artifact.description !== UNKNOWN) {
+    if (
+      artifact.type === 'nlu-example' &&
+      artifact.description &&
+      artifact.description !== UNKNOWN
+    ) {
       labels.push({
         inputText: artifact.description,
         labelType: 'intent',
@@ -658,7 +705,11 @@ export function artifactTrainingDatasetToCsv(rows = buildArtifactTrainingDataset
 }
 
 function tokenSet(text) {
-  return new Set(normalizeText(text).split(' ').filter((token) => token.length > 2));
+  return new Set(
+    normalizeText(text)
+      .split(' ')
+      .filter((token) => token.length > 2),
+  );
 }
 
 function jaccardSimilarity(a, b) {
@@ -688,21 +739,27 @@ export class ArtifactResonanceService {
         score: Number(jaccardSimilarity(target.embeddingText, artifact.embeddingText).toFixed(3)),
       }))
       .filter((row) => row.score > 0)
-      .sort((a, b) => b.score - a.score || a.artifact.artifactId.localeCompare(b.artifact.artifactId))
+      .sort(
+        (a, b) => b.score - a.score || a.artifact.artifactId.localeCompare(b.artifact.artifactId),
+      )
       .slice(0, limit);
   }
 
   recommendArtifactsForRole(role, { limit = 12 }: any = {}) {
     const normalized = slug(role);
     return this.artifacts
-      .filter((artifact) => normalizeText(`${artifact.roles} ${artifact.embeddingText}`).includes(normalized))
+      .filter((artifact) =>
+        normalizeText(`${artifact.roles} ${artifact.embeddingText}`).includes(normalized),
+      )
       .slice(0, limit);
   }
 
   recommendArtifactsForWorkspace(workspace, { limit = 12 }: any = {}) {
     const normalized = slug(workspace);
     return this.artifacts
-      .filter((artifact) => normalizeText(`${artifact.workspace} ${artifact.embeddingText}`).includes(normalized))
+      .filter((artifact) =>
+        normalizeText(`${artifact.workspace} ${artifact.embeddingText}`).includes(normalized),
+      )
       .slice(0, limit);
   }
 
@@ -718,7 +775,7 @@ export class ArtifactResonanceService {
       (artifact) =>
         artifact.assetPack === UNKNOWN &&
         artifact.product === UNKNOWN &&
-        !['route', 'api-endpoint', 'document'].includes(artifact.type)
+        !['route', 'api-endpoint', 'document'].includes(artifact.type),
     );
   }
 

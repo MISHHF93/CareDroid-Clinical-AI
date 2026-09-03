@@ -21,7 +21,7 @@ describe('EmergencyFlowEngineService', () => {
           'excessive wait times',
           'boarding pressure',
         ],
-      })
+      }),
     );
     expect(engine.monitoredStages.map((stage) => stage.label)).toEqual([
       'Arrival',
@@ -44,7 +44,7 @@ describe('EmergencyFlowEngineService', () => {
         expect.objectContaining({ type: 'delayed reassessments' }),
         expect.objectContaining({ type: 'excessive wait times' }),
         expect.objectContaining({ type: 'boarding pressure' }),
-      ])
+      ]),
     );
     expect(engine.nextRecommendedActions).toEqual(
       expect.arrayContaining([
@@ -54,7 +54,7 @@ describe('EmergencyFlowEngineService', () => {
           reason: expect.any(String),
           severity: expect.stringMatching(/critical|high|medium|watch/),
         }),
-      ])
+      ]),
     );
     expect(engine.metrics).toEqual(
       expect.objectContaining({
@@ -63,7 +63,7 @@ describe('EmergencyFlowEngineService', () => {
         delayedReferrals: expect.any(Number),
         delayedReassessments: expect.any(Number),
         boardingPressure: expect.any(Number),
-      })
+      }),
     );
   });
 });

@@ -96,12 +96,13 @@ export function hasMissingArrivalReason(patient) {
 export function hasMissingVerification(patient) {
   if (!patient || !isActivePatient(patient)) return false;
 
-  const flags = (patient.flags || []).map((flag) =>
-    typeof flag === 'string' ? flag : flag?.type,
-  );
+  const flags = (patient.flags || []).map((flag) => (typeof flag === 'string' ? flag : flag?.type));
 
   if (flags.includes('IdentityPending')) return true;
-  if (patient.state === 'Registration' && (isProvisionalMrn(patient.mrn) || isPlaceholderPatientName(patient))) {
+  if (
+    patient.state === 'Registration' &&
+    (isProvisionalMrn(patient.mrn) || isPlaceholderPatientName(patient))
+  ) {
     return true;
   }
   if (isProvisionalMrn(patient.mrn) && patient.state !== 'Discharge') return true;
@@ -109,7 +110,10 @@ export function hasMissingVerification(patient) {
   return false;
 }
 
-export function assessPatientDataQualityRisks(patient, { duplicatePatientIds = new Set() }: any = {}) {
+export function assessPatientDataQualityRisks(
+  patient,
+  { duplicatePatientIds = new Set() }: any = {},
+) {
   if (!patient || !isActivePatient(patient)) return [];
 
   const risks = [] as any[];
@@ -163,12 +167,18 @@ export function assessPatientDataQualityRisks(patient, { duplicatePatientIds = n
   return risks;
 }
 
-export function summarizeDataQualityRisks(patients = [] as any[], { duplicatePatientIds = new Set() }: any = {}) {
+export function summarizeDataQualityRisks(
+  patients = [] as any[],
+  { duplicatePatientIds = new Set() }: any = {},
+) {
   const activePatients = patients.filter(isActivePatient);
-  const byCategory = Object.values(DATA_QUALITY_RISK).reduce((counts, category) => {
-    counts[category] = 0;
-    return counts;
-  }, ({} as Record<string, number>));
+  const byCategory = Object.values(DATA_QUALITY_RISK).reduce(
+    (counts, category) => {
+      counts[category] = 0;
+      return counts;
+    },
+    {} as Record<string, number>,
+  );
 
   const byPatient: any = {};
   let totalRisks = 0;
@@ -194,9 +204,15 @@ export function summarizeDataQualityRisks(patients = [] as any[], { duplicatePat
 
 export const DATA_QUALITY_SURFACE_REGISTRY = Object.freeze([
   { id: 'reception-workspace', risks: Object.values(DATA_QUALITY_RISK) },
-  { id: 'reception-queues', risks: ['missing_verification', 'missing_demographics', 'missing_arrival_reason'] },
+  {
+    id: 'reception-queues',
+    risks: ['missing_verification', 'missing_demographics', 'missing_arrival_reason'],
+  },
   { id: 'patient-detail', risks: Object.values(DATA_QUALITY_RISK) },
-  { id: 'patient-card', risks: ['missing_verification', 'missing_arrival_reason', 'duplicate_patient'] },
+  {
+    id: 'patient-card',
+    risks: ['missing_verification', 'missing_arrival_reason', 'duplicate_patient'],
+  },
   { id: 'whiteboard-strip', risks: Object.values(DATA_QUALITY_RISK) },
 ]);
 
@@ -209,7 +225,6 @@ export function auditDataQualityExposure() {
     requiredRisks,
     coveredRisks: [...covered],
     passesAudit:
-      DATA_QUALITY_SURFACE_REGISTRY.length >= 4 &&
-      requiredRisks.every((risk) => covered.has(risk)),
+      DATA_QUALITY_SURFACE_REGISTRY.length >= 4 && requiredRisks.every((risk) => covered.has(risk)),
   };
 }

@@ -3,11 +3,20 @@ import { PatientState } from '../types/emergency';
 const ACTIVE_EMS_STATUSES = new Set(['Inbound', 'Arrived', 'Handoff']);
 
 export function patientDisplayName(patient) {
-  return patient?.name || [patient?.firstName, patient?.lastName].filter(Boolean).join(' ') || 'Unknown patient';
+  return (
+    patient?.name ||
+    [patient?.firstName, patient?.lastName].filter(Boolean).join(' ') ||
+    'Unknown patient'
+  );
 }
 
 export function roomLabel(patient, rooms = [] as any[]) {
-  return patient?.location || rooms.find((room) => room.id === patient?.roomId)?.name || patient?.roomId || 'No bed';
+  return (
+    patient?.location ||
+    rooms.find((room) => room.id === patient?.roomId)?.name ||
+    patient?.roomId ||
+    'No bed'
+  );
 }
 
 export function minutesSince(timestamp, now = new Date()) {
@@ -19,7 +28,9 @@ export function minutesSince(timestamp, now = new Date()) {
 function latestStateTimestamp(patient, state) {
   const match = [...(patient?.timeline || [])]
     .reverse()
-    .find((event) => event.to === state || event.toState === state || event.summary?.includes(state));
+    .find(
+      (event) => event.to === state || event.toState === state || event.summary?.includes(state),
+    );
   return match?.timestamp || patient?.lastAssessedTime || patient?.arrivalTime;
 }
 
@@ -57,7 +68,10 @@ export function deriveCrisisModeState({
       patient,
       name: patientDisplayName(patient),
       room: roomLabel(patient, rooms),
-      dispositionMinutes: minutesSince(latestStateTimestamp(patient, PatientState.Disposition), now),
+      dispositionMinutes: minutesSince(
+        latestStateTimestamp(patient, PatientState.Disposition),
+        now,
+      ),
     }));
   const inboundEms = emsArrivals
     .filter((arrival) => ACTIVE_EMS_STATUSES.has(arrival.status))

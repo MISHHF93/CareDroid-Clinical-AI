@@ -9,16 +9,16 @@ const appShellCss = readFileSync(join(dirname(__dirname), 'components/app-shell.
 const layoutEngineCss = readFileSync(join(__dirname, 'layout-engine.css'), 'utf8');
 const calculatorsCss = readFileSync(
   join(dirname(__dirname), 'pages', 'tools', 'Calculators.css'),
-  'utf8'
+  'utf8',
 );
 
 describe('layout-visibility.css', () => {
   it('allows scroll routes to grow inside page-body scrollport', () => {
     expect(layoutVisibilityCss).toMatch(
-      /\.app-shell-page-body:not\(\.app-shell-page-body--conversation\) > \*[\s\S]*height:\s*auto/
+      /\.app-shell-page-body:not\(\.app-shell-page-body--conversation\) > \*[\s\S]*height:\s*auto/,
     );
     expect(layoutVisibilityCss).toMatch(
-      /\.app-shell-page-body:not\(\.app-shell-page-body--conversation\) > \*[\s\S]*overflow:\s*visible/
+      /\.app-shell-page-body:not\(\.app-shell-page-body--conversation\) > \*[\s\S]*overflow:\s*visible/,
     );
   });
 
@@ -29,14 +29,14 @@ describe('layout-visibility.css', () => {
 
   it('keeps wide tables in local horizontal scroll containers', () => {
     expect(layoutVisibilityCss).toMatch(/\.lab-category-section[\s\S]*overflow-x:\s*auto/);
-    expect(layoutVisibilityCss).toMatch(/\.fleet-data-table-wrap[\s\S]*overscroll-behavior-x:\s*contain/);
+    expect(layoutVisibilityCss).toMatch(
+      /\.fleet-data-table-wrap[\s\S]*overscroll-behavior-x:\s*contain/,
+    );
   });
 
   it('prevents body-level horizontal overflow and unsafe dashboard grids', () => {
     expect(layoutVisibilityCss).toMatch(/body[\s\S]*overflow-x:\s*clip/);
-    expect(layoutVisibilityCss).toMatch(
-      /\.dashboard-grid[\s\S]*minmax\(min\(100%,\s*400px\)/
-    );
+    expect(layoutVisibilityCss).toMatch(/\.dashboard-grid[\s\S]*minmax\(min\(100%,\s*400px\)/);
   });
 
   it('normalizes major route roots and high-risk local scroll wrappers', () => {
@@ -67,7 +67,9 @@ describe('AppShell.css — scroll vs conversation', () => {
     expect(appShellCss).toMatch(/\.emergency-app-shell__main-column\s*\{[\s\S]*overflow:\s*hidden/);
     // Split into overflow-x: clip / overflow-y: auto (a real improvement over
     // the shorthand — blocks horizontal bleed while still scrolling vertically).
-    expect(appShellCss).toMatch(/\.app-shell-main-content\s*\{[\s\S]*overflow-x:\s*clip[\s\S]*overflow-y:\s*auto/);
+    expect(appShellCss).toMatch(
+      /\.app-shell-main-content\s*\{[\s\S]*overflow-x:\s*clip[\s\S]*overflow-y:\s*auto/,
+    );
   });
 });
 
@@ -84,10 +86,10 @@ describe('mobile-first-layout.css', () => {
 
   it('defaults split clinical forms to one column and enhances at 1024px', () => {
     expect(mobileFirstCss).toMatch(
-      /\.calculator-interface[\s\S]*grid-template-columns:\s*minmax\(0,\s*1fr\)/
+      /\.calculator-interface[\s\S]*grid-template-columns:\s*minmax\(0,\s*1fr\)/,
     );
     expect(mobileFirstCss).toMatch(
-      /@media \(min-width: 1024px\)[\s\S]*minmax\(0,\s*1fr\) minmax\(0,\s*1fr\)/
+      /@media \(min-width: 1024px\)[\s\S]*minmax\(0,\s*1fr\) minmax\(0,\s*1fr\)/,
     );
   });
 });
@@ -95,7 +97,7 @@ describe('mobile-first-layout.css', () => {
 describe('Calculators.css — responsive calculator grid', () => {
   it('does not use desktop-first two-column default on calculator-interface', () => {
     expect(calculatorsCss).not.toMatch(
-      /\.calculator-interface\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s*minmax\(0,\s*1fr\)/
+      /\.calculator-interface\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s*minmax\(0,\s*1fr\)/,
     );
   });
 

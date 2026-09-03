@@ -39,7 +39,7 @@ function VitalsRow({ vitals }) {
         {vitalChip(
           'BP',
           vitals.sbp ?? vitals.bpSystolic,
-          vitals.dbp ?? vitals.bpDiastolic ? `/${vitals.dbp ?? vitals.bpDiastolic}` : '',
+          (vitals.dbp ?? vitals.bpDiastolic) ? `/${vitals.dbp ?? vitals.bpDiastolic}` : '',
         )}
       </span>
       <span>{vitalChip('SpO2', vitals.spo2 ?? vitals.oxygenSaturation, '%')}</span>
@@ -99,9 +99,13 @@ export default function AmbulanceHandoffChecklistPanel({
       <header className="amb-handoff-checklist__header">
         <div>
           <h4>Ambulance handoff checklist</h4>
-          <p>{arrival.unitName || arrival.unitId} · {checklist.complaintSummary}</p>
+          <p>
+            {arrival.unitName || arrival.unitId} · {checklist.complaintSummary}
+          </p>
         </div>
-        <span className={`amb-handoff-checklist__status${checklist.handoffAccepted ? ' amb-handoff-checklist__status--done' : ''}`}>
+        <span
+          className={`amb-handoff-checklist__status${checklist.handoffAccepted ? ' amb-handoff-checklist__status--done' : ''}`}
+        >
           {checklist.handoffAccepted ? 'Accepted' : `${completion}% complete`}
         </span>
       </header>
@@ -133,9 +137,7 @@ export default function AmbulanceHandoffChecklistPanel({
             {canEdit ? (
               <select
                 value={checklist.identityStatus}
-                onChange={(event) =>
-                  applyPatch({ identityStatus: event.target.value })
-                }
+                onChange={(event) => applyPatch({ identityStatus: event.target.value })}
                 aria-label="Patient identity"
               >
                 {identityOptions.map(([value, label]) => (
@@ -157,9 +159,7 @@ export default function AmbulanceHandoffChecklistPanel({
               <input
                 type="text"
                 value={checklist.complaintSummary}
-                onChange={(event) =>
-                  applyPatch({ complaintSummary: event.target.value })
-                }
+                onChange={(event) => applyPatch({ complaintSummary: event.target.value })}
                 aria-label="Complaint summary"
               />
             ) : (
@@ -176,9 +176,7 @@ export default function AmbulanceHandoffChecklistPanel({
                 type="checkbox"
                 checked={checklist.vitalsReceived}
                 disabled={!canEdit}
-                onChange={(event) =>
-                  applyPatch({ vitalsReceived: event.target.checked })
-                }
+                onChange={(event) => applyPatch({ vitalsReceived: event.target.checked })}
               />
               {checklist.vitalsReceived ? 'Yes' : 'Pending'}
             </label>
@@ -250,9 +248,7 @@ export default function AmbulanceHandoffChecklistPanel({
                 type="checkbox"
                 checked={checklist.handoffAccepted}
                 disabled={!canEdit}
-                onChange={(event) =>
-                  applyPatch({ handoffAccepted: event.target.checked })
-                }
+                onChange={(event) => applyPatch({ handoffAccepted: event.target.checked })}
               />
               {checklist.handoffAccepted
                 ? `Accepted${checklist.handoffAcceptedByStaffName ? ` by ${checklist.handoffAcceptedByStaffName}` : ''}${
@@ -274,8 +270,7 @@ export default function AmbulanceHandoffChecklistPanel({
                 onChange={(event) =>
                   applyPatch({
                     patientDestination: event.target.value,
-                    destinationLabel:
-                      AMBULANCE_HANDOFF_DESTINATION_LABELS[event.target.value],
+                    destinationLabel: AMBULANCE_HANDOFF_DESTINATION_LABELS[event.target.value],
                   })
                 }
                 aria-label="Patient destination"

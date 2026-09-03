@@ -86,7 +86,7 @@ describe('nephrologyCalculators', () => {
         bunUnit: 'mg_dl',
         serumCreatinine: 1.5,
         creatinineUnit: 'mg_dl',
-      }).ratio
+      }).ratio,
     ).toBe(20);
 
     expect(
@@ -95,7 +95,7 @@ describe('nephrologyCalculators', () => {
         glucose: 500,
         glucoseUnit: 'mg_dl',
         correctionFactor: '1.6',
-      }).correctedSodium
+      }).correctedSodium,
     ).toBe(134.4);
 
     expect(
@@ -104,7 +104,7 @@ describe('nephrologyCalculators', () => {
         weightKg: 70,
         tbwFactor: 0.6,
         targetSodium: 140,
-      }).deficitLiters
+      }).deficitLiters,
     ).toBe(6);
 
     const gap = computeOsmolalGap({

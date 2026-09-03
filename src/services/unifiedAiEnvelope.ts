@@ -78,7 +78,10 @@ export function resolveUnifiedChannelFromRole(
   fallback: CareDroidUnifiedChannel = 'api',
 ): CareDroidUnifiedChannel {
   if (!role) return fallback;
-  const key = role.trim().toLowerCase().replace(/[\s-]+/g, '_');
+  const key = role
+    .trim()
+    .toLowerCase()
+    .replace(/[\s-]+/g, '_');
   return ROLE_CHANNEL[key] || fallback;
 }
 
@@ -96,7 +99,9 @@ export function createClientIds(): { requestId: string; correlationId: string } 
 
 export function buildUnifiedAiRequestEnvelope(
   input: UnifiedEnvelopeBuildInput,
-): { valid: true; request: CareDroidUnifiedAIRequest } | { valid: false; errors: Array<{ field: string; message: string }> } {
+):
+  | { valid: true; request: CareDroidUnifiedAIRequest }
+  | { valid: false; errors: Array<{ field: string; message: string }> } {
   const ids = createClientIds();
   const channelRaw = input.channel || resolveUnifiedChannelFromRole(input.role);
   const taskRaw = input.task || 'answer_question';
@@ -308,7 +313,9 @@ export function attachUnifiedEnvelopeToAiResponse(
 ): AIResponse {
   const accountable = accountableFromUnifiedResponse(envelope);
   const existingData =
-    response.data && typeof response.data === 'object' ? (response.data as Record<string, unknown>) : {};
+    response.data && typeof response.data === 'object'
+      ? (response.data as Record<string, unknown>)
+      : {};
 
   return {
     ...response,

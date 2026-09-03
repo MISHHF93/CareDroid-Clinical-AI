@@ -1,8 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  SELF_DIAGNOSTIC_STATUS,
-  buildPlatformSelfDiagnostics,
-} from './platformSelfDiagnostics';
+import { SELF_DIAGNOSTIC_STATUS, buildPlatformSelfDiagnostics } from './platformSelfDiagnostics';
 
 describe('platformSelfDiagnostics', () => {
   it('builds diagnostics for every requested platform surface with a 0-100 score', () => {
@@ -56,7 +53,11 @@ describe('platformSelfDiagnostics', () => {
 
     expect(diagnostics.healthLabel).toBe('Critical');
     expect(diagnostics.byStatus.critical.map((item) => item.id)).toEqual(
-      expect.arrayContaining(['apis-frontend-backend-match', 'backend-contracts-broken', 'auth-routes'])
+      expect.arrayContaining([
+        'apis-frontend-backend-match',
+        'backend-contracts-broken',
+        'auth-routes',
+      ]),
     );
   });
 });

@@ -91,7 +91,9 @@ export function normalizePublicDisplayPrivacy(
   value: unknown,
   fallback: PublicDisplayPrivacyLevel = PUBLIC_DISPLAY_PRIVACY_LEVEL.standard,
 ): PublicDisplayPrivacyLevel {
-  const normalized = String(value || '').trim().toLowerCase();
+  const normalized = String(value || '')
+    .trim()
+    .toLowerCase();
   if (normalized === PUBLIC_DISPLAY_PRIVACY_LEVEL.minimal) {
     return PUBLIC_DISPLAY_PRIVACY_LEVEL.minimal;
   }

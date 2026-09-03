@@ -23,18 +23,18 @@ describe('it_admin permission contract', () => {
   });
 
   it('can manage settings but cannot create patients or write PHI actions', () => {
-    expect(hasEmergencyPermission(EMERGENCY_ROLE_ID.itAdmin, EMERGENCY_PERMISSION_KEYS.settingsManage)).toBe(
-      true,
-    );
-    expect(hasEmergencyPermission(EMERGENCY_ROLE_ID.itAdmin, EMERGENCY_PERMISSION_KEYS.patientCreate)).toBe(
-      false,
-    );
-    expect(hasEmergencyPermission(EMERGENCY_ROLE_ID.itAdmin, EMERGENCY_PERMISSION_KEYS.intakeVerify)).toBe(
-      false,
-    );
-    expect(hasEmergencyPermission(EMERGENCY_ROLE_ID.itAdmin, EMERGENCY_PERMISSION_KEYS.vitalsWrite)).toBe(
-      false,
-    );
+    expect(
+      hasEmergencyPermission(EMERGENCY_ROLE_ID.itAdmin, EMERGENCY_PERMISSION_KEYS.settingsManage),
+    ).toBe(true);
+    expect(
+      hasEmergencyPermission(EMERGENCY_ROLE_ID.itAdmin, EMERGENCY_PERMISSION_KEYS.patientCreate),
+    ).toBe(false);
+    expect(
+      hasEmergencyPermission(EMERGENCY_ROLE_ID.itAdmin, EMERGENCY_PERMISSION_KEYS.intakeVerify),
+    ).toBe(false);
+    expect(
+      hasEmergencyPermission(EMERGENCY_ROLE_ID.itAdmin, EMERGENCY_PERMISSION_KEYS.vitalsWrite),
+    ).toBe(false);
   });
 
   it('Nest mapping has CONFIGURE_SYSTEM without READ/WRITE PHI', () => {
@@ -43,10 +43,16 @@ describe('it_admin permission contract', () => {
     expect(m.nestPermissions).not.toContain(NEST_PERMISSION.READ_PHI);
     expect(m.nestPermissions).not.toContain(NEST_PERMISSION.WRITE_PHI);
     expect(
-      emergencyRoleSatisfiesNestAction(EMERGENCY_ROLE_ID.itAdmin, EMERGENCY_PERMISSION_KEYS.patientCreate),
+      emergencyRoleSatisfiesNestAction(
+        EMERGENCY_ROLE_ID.itAdmin,
+        EMERGENCY_PERMISSION_KEYS.patientCreate,
+      ),
     ).toBe(false);
     expect(
-      emergencyRoleSatisfiesNestAction(EMERGENCY_ROLE_ID.itAdmin, EMERGENCY_PERMISSION_KEYS.settingsManage),
+      emergencyRoleSatisfiesNestAction(
+        EMERGENCY_ROLE_ID.itAdmin,
+        EMERGENCY_PERMISSION_KEYS.settingsManage,
+      ),
     ).toBe(true);
   });
 });

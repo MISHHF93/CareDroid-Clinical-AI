@@ -44,7 +44,8 @@ export default function WhatHappensNextStrip({
         {visible.map((step) => {
           const samplePatient = patients.find(
             (patient) =>
-              resolveWhatHappensNext(patient, { referrals, staff, now: nowDate })?.stepId === step.id,
+              resolveWhatHappensNext(patient, { referrals, staff, now: nowDate })?.stepId ===
+              step.id,
           );
           return (
             <div key={step.id} className="what-next-strip__count">

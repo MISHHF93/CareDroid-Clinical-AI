@@ -1,8 +1,5 @@
 import { useMemo } from 'react';
-import {
-  resolveEmsScreenCapabilities,
-  type EmsScreenCapabilities,
-} from '../config/emsScreenModel';
+import { resolveEmsScreenCapabilities, type EmsScreenCapabilities } from '../config/emsScreenModel';
 import useScreenModeCapabilities from './useScreenModeCapabilities';
 import { useEmergencyRolePermissions } from './useEmergencyRolePermissions';
 
@@ -18,12 +15,7 @@ export function useEmsScreen(): EmsScreenCapabilities {
         role: emergencyRole.role,
         roleLabel: emergencyRole.roleLabel,
       }),
-    [
-      emergencyRole.can,
-      emergencyRole.role,
-      emergencyRole.roleLabel,
-      screenCapabilities.screenMode,
-    ],
+    [emergencyRole.can, emergencyRole.role, emergencyRole.roleLabel, screenCapabilities.screenMode],
   );
 }
 

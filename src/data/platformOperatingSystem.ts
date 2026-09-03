@@ -23,38 +23,226 @@ function minutesAgo(minutes) {
 }
 
 export const PLATFORM_DASHBOARDS = Object.freeze([
-  { id: 'dashboard', label: 'Command Center', path: '/dashboard', category: 'dashboard', workspaceIds: ['emergency', 'icu', 'operations', 'governance'] },
-  { id: 'assistant', label: 'AI Assistant', path: '/assistant', category: 'dashboard', workspaceIds: CARE_WORKSPACES.map((workspace) => workspace.id) },
-  { id: 'hospital-map', label: 'Hospital Map', path: '/hospital-map', category: 'map', workspaceIds: ['emergency', 'operations', 'medical-iot'] },
-  { id: 'medical-iot', label: 'Medical IoT', path: '/medical-iot', category: 'dashboard', workspaceIds: ['medical-iot', 'operations'] },
-  { id: 'devices', label: 'Device Fleet', path: '/devices', category: 'dashboard', workspaceIds: ['medical-iot', 'operations'] },
-  { id: 'fleet-map', label: 'Fleet Map', path: '/fleet/map', category: 'map', workspaceIds: ['fleet', 'operations'] },
-  { id: 'digital-twin', label: 'Hospital Digital Twin', path: '/digital-twin', category: 'dashboard', workspaceIds: ['operations', 'medical-iot', 'fleet'] },
-  { id: 'timeline', label: 'Clinical Timeline', path: '/timeline', category: 'dashboard', workspaceIds: ['emergency', 'icu', 'research'] },
-  { id: 'workflows', label: 'Workflow Builder', path: '/workflows', category: 'workflow', workspaceIds: ['emergency', 'icu', 'research'] },
-  { id: 'search', label: 'Global Search', path: '/search', category: 'search', workspaceIds: CARE_WORKSPACES.map((workspace) => workspace.id) },
-  { id: 'assets', label: 'Asset Library', path: '/assets', category: 'library', workspaceIds: ['research', 'governance'] },
-  { id: 'system-health', label: 'System Health', path: '/system-health', category: 'admin', workspaceIds: ['governance', 'operations'] },
+  {
+    id: 'dashboard',
+    label: 'Command Center',
+    path: '/dashboard',
+    category: 'dashboard',
+    workspaceIds: ['emergency', 'icu', 'operations', 'governance'],
+  },
+  {
+    id: 'assistant',
+    label: 'AI Assistant',
+    path: '/assistant',
+    category: 'dashboard',
+    workspaceIds: CARE_WORKSPACES.map((workspace) => workspace.id),
+  },
+  {
+    id: 'hospital-map',
+    label: 'Hospital Map',
+    path: '/hospital-map',
+    category: 'map',
+    workspaceIds: ['emergency', 'operations', 'medical-iot'],
+  },
+  {
+    id: 'medical-iot',
+    label: 'Medical IoT',
+    path: '/medical-iot',
+    category: 'dashboard',
+    workspaceIds: ['medical-iot', 'operations'],
+  },
+  {
+    id: 'devices',
+    label: 'Device Fleet',
+    path: '/devices',
+    category: 'dashboard',
+    workspaceIds: ['medical-iot', 'operations'],
+  },
+  {
+    id: 'fleet-map',
+    label: 'Fleet Map',
+    path: '/fleet/map',
+    category: 'map',
+    workspaceIds: ['fleet', 'operations'],
+  },
+  {
+    id: 'digital-twin',
+    label: 'Hospital Digital Twin',
+    path: '/digital-twin',
+    category: 'dashboard',
+    workspaceIds: ['operations', 'medical-iot', 'fleet'],
+  },
+  {
+    id: 'timeline',
+    label: 'Clinical Timeline',
+    path: '/timeline',
+    category: 'dashboard',
+    workspaceIds: ['emergency', 'icu', 'research'],
+  },
+  {
+    id: 'workflows',
+    label: 'Workflow Builder',
+    path: '/workflows',
+    category: 'workflow',
+    workspaceIds: ['emergency', 'icu', 'research'],
+  },
+  {
+    id: 'search',
+    label: 'Global Search',
+    path: '/search',
+    category: 'search',
+    workspaceIds: CARE_WORKSPACES.map((workspace) => workspace.id),
+  },
+  {
+    id: 'assets',
+    label: 'Asset Library',
+    path: '/assets',
+    category: 'library',
+    workspaceIds: ['research', 'governance'],
+  },
+  {
+    id: 'system-health',
+    label: 'System Health',
+    path: '/system-health',
+    category: 'admin',
+    workspaceIds: ['governance', 'operations'],
+  },
 ]);
 
 export const PLATFORM_NOTIFICATIONS = Object.freeze([
-  { id: 'n-ai-1', title: 'AI recommendation needs review', body: 'Differential AI flagged sepsis and PE as competing hypotheses.', type: 'ai', priority: 'high', read: false, archived: false, createdAt: minutesAgo(8), workspaceIds: ['icu', 'emergency'] },
-  { id: 'n-telemetry-1', title: 'Telemetry stale', body: 'ICU-12 monitor has not reported SpO2 for 14 minutes.', type: 'telemetry', priority: 'critical', read: false, archived: false, createdAt: minutesAgo(14), workspaceIds: ['medical-iot', 'operations', 'emergency'] },
-  { id: 'n-fleet-1', title: 'Transport ETA changed', body: 'Ambulance A-12 route delayed by 6 minutes due to diversion.', type: 'fleet', priority: 'medium', read: true, archived: false, createdAt: minutesAgo(22), workspaceIds: ['fleet', 'operations'] },
-  { id: 'n-maint-1', title: 'Maintenance reminder', body: 'Telemetry gateway GW-4 is due for calibration today.', type: 'maintenance', priority: 'medium', read: false, archived: false, createdAt: minutesAgo(46), workspaceIds: ['medical-iot', 'governance'] },
-  { id: 'n-workflow-1', title: 'Chest pain workflow incomplete', body: 'HEART score completed; ECG Assistant and documentation are pending.', type: 'workflow', priority: 'high', read: false, archived: false, createdAt: minutesAgo(65), workspaceIds: ['cardiology', 'emergency'] },
-  { id: 'n-gov-1', title: 'Governance review available', body: 'AI safety policy validation summary is ready for admin review.', type: 'governance', priority: 'low', read: true, archived: false, createdAt: minutesAgo(120), workspaceIds: ['governance', 'research'] },
+  {
+    id: 'n-ai-1',
+    title: 'AI recommendation needs review',
+    body: 'Differential AI flagged sepsis and PE as competing hypotheses.',
+    type: 'ai',
+    priority: 'high',
+    read: false,
+    archived: false,
+    createdAt: minutesAgo(8),
+    workspaceIds: ['icu', 'emergency'],
+  },
+  {
+    id: 'n-telemetry-1',
+    title: 'Telemetry stale',
+    body: 'ICU-12 monitor has not reported SpO2 for 14 minutes.',
+    type: 'telemetry',
+    priority: 'critical',
+    read: false,
+    archived: false,
+    createdAt: minutesAgo(14),
+    workspaceIds: ['medical-iot', 'operations', 'emergency'],
+  },
+  {
+    id: 'n-fleet-1',
+    title: 'Transport ETA changed',
+    body: 'Ambulance A-12 route delayed by 6 minutes due to diversion.',
+    type: 'fleet',
+    priority: 'medium',
+    read: true,
+    archived: false,
+    createdAt: minutesAgo(22),
+    workspaceIds: ['fleet', 'operations'],
+  },
+  {
+    id: 'n-maint-1',
+    title: 'Maintenance reminder',
+    body: 'Telemetry gateway GW-4 is due for calibration today.',
+    type: 'maintenance',
+    priority: 'medium',
+    read: false,
+    archived: false,
+    createdAt: minutesAgo(46),
+    workspaceIds: ['medical-iot', 'governance'],
+  },
+  {
+    id: 'n-workflow-1',
+    title: 'Chest pain workflow incomplete',
+    body: 'HEART score completed; ECG Assistant and documentation are pending.',
+    type: 'workflow',
+    priority: 'high',
+    read: false,
+    archived: false,
+    createdAt: minutesAgo(65),
+    workspaceIds: ['cardiology', 'emergency'],
+  },
+  {
+    id: 'n-gov-1',
+    title: 'Governance review available',
+    body: 'AI safety policy validation summary is ready for admin review.',
+    type: 'governance',
+    priority: 'low',
+    read: true,
+    archived: false,
+    createdAt: minutesAgo(120),
+    workspaceIds: ['governance', 'research'],
+  },
 ]);
 
 export const PLATFORM_TIMELINE_EVENTS = Object.freeze([
-  { id: 'tl-calc-1', kind: 'calculator', title: 'qSOFA calculated', detail: 'qSOFA score 2; sepsis escalation suggested.', timestamp: minutesAgo(6), workspaceIds: ['emergency', 'icu'] },
-  { id: 'tl-ai-1', kind: 'ai', title: 'AI differential updated', detail: 'Assistant generated PE vs sepsis differential with confidence limits.', timestamp: minutesAgo(9), workspaceIds: ['icu', 'research', 'emergency'] },
-  { id: 'tl-device-1', kind: 'device', title: 'Bedside monitor signal dropped', detail: 'ICU-12 device reported weak signal and stale SpO2.', timestamp: minutesAgo(14), workspaceIds: ['medical-iot', 'operations'] },
-  { id: 'tl-telemetry-1', kind: 'telemetry', title: 'Telemetry alert opened', detail: 'HR 128, SpO2 90%, RR 28; alert priority high.', timestamp: minutesAgo(18), workspaceIds: ['medical-iot', 'emergency'] },
-  { id: 'tl-fleet-1', kind: 'fleet', title: 'Fleet route updated', detail: 'Ambulance A-12 reassigned to east bay handoff.', timestamp: minutesAgo(22), workspaceIds: ['fleet', 'operations'] },
-  { id: 'tl-workflow-1', kind: 'workflow', title: 'Chest Pain Workflow launched', detail: 'HEART score block completed; ECG assistant pending.', timestamp: minutesAgo(34), workspaceIds: ['cardiology', 'emergency'] },
-  { id: 'tl-audit-1', kind: 'audit', title: 'Explainability trace viewed', detail: 'Reasoning summary and cited sources reviewed.', timestamp: minutesAgo(44), workspaceIds: ['research', 'governance'] },
-  { id: 'tl-alert-1', kind: 'alert', title: 'Rapid response alert acknowledged', detail: 'Alert marked read by Demo Clinician.', timestamp: minutesAgo(53), workspaceIds: ['emergency', 'operations'] },
+  {
+    id: 'tl-calc-1',
+    kind: 'calculator',
+    title: 'qSOFA calculated',
+    detail: 'qSOFA score 2; sepsis escalation suggested.',
+    timestamp: minutesAgo(6),
+    workspaceIds: ['emergency', 'icu'],
+  },
+  {
+    id: 'tl-ai-1',
+    kind: 'ai',
+    title: 'AI differential updated',
+    detail: 'Assistant generated PE vs sepsis differential with confidence limits.',
+    timestamp: minutesAgo(9),
+    workspaceIds: ['icu', 'research', 'emergency'],
+  },
+  {
+    id: 'tl-device-1',
+    kind: 'device',
+    title: 'Bedside monitor signal dropped',
+    detail: 'ICU-12 device reported weak signal and stale SpO2.',
+    timestamp: minutesAgo(14),
+    workspaceIds: ['medical-iot', 'operations'],
+  },
+  {
+    id: 'tl-telemetry-1',
+    kind: 'telemetry',
+    title: 'Telemetry alert opened',
+    detail: 'HR 128, SpO2 90%, RR 28; alert priority high.',
+    timestamp: minutesAgo(18),
+    workspaceIds: ['medical-iot', 'emergency'],
+  },
+  {
+    id: 'tl-fleet-1',
+    kind: 'fleet',
+    title: 'Fleet route updated',
+    detail: 'Ambulance A-12 reassigned to east bay handoff.',
+    timestamp: minutesAgo(22),
+    workspaceIds: ['fleet', 'operations'],
+  },
+  {
+    id: 'tl-workflow-1',
+    kind: 'workflow',
+    title: 'Chest Pain Workflow launched',
+    detail: 'HEART score block completed; ECG assistant pending.',
+    timestamp: minutesAgo(34),
+    workspaceIds: ['cardiology', 'emergency'],
+  },
+  {
+    id: 'tl-audit-1',
+    kind: 'audit',
+    title: 'Explainability trace viewed',
+    detail: 'Reasoning summary and cited sources reviewed.',
+    timestamp: minutesAgo(44),
+    workspaceIds: ['research', 'governance'],
+  },
+  {
+    id: 'tl-alert-1',
+    kind: 'alert',
+    title: 'Rapid response alert acknowledged',
+    detail: 'Alert marked read by Demo Clinician.',
+    timestamp: minutesAgo(53),
+    workspaceIds: ['emergency', 'operations'],
+  },
 ]);
 
 export const PLATFORM_WORKFLOWS = Object.freeze([
@@ -64,15 +252,24 @@ export const PLATFORM_WORKFLOWS = Object.freeze([
     executionMode: 'demo-preview',
     description: 'HEART, ECG Assistant, ACS Assistant, and documentation in sequence.',
     workspaceIds: ['cardiology', 'emergency'],
-    resultSummary: 'Chest pain workflow preview completed. Review the timeline, then continue with documentation or recommendations.',
+    resultSummary:
+      'Chest pain workflow preview completed. Review the timeline, then continue with documentation or recommendations.',
     recommendedNextActions: [
       { label: 'Review workflow result timeline', path: '/timeline?kind=workflow' },
-      { label: 'Open chest pain recommendations', path: '/recommendations?source=workflow&workflow=chest-pain' },
+      {
+        label: 'Open chest pain recommendations',
+        path: '/recommendations?source=workflow&workflow=chest-pain',
+      },
       { label: 'Ask Assistant for documentation', path: '/assistant' },
     ],
     blocks: [
       { id: 'heart', type: 'calculator', label: 'HEART', toolId: 'heart-score' },
-      { id: 'ecg', type: 'ai-prompt', label: 'ECG Assistant', toolId: 'ecg-interpretation-assistant' },
+      {
+        id: 'ecg',
+        type: 'ai-prompt',
+        label: 'ECG Assistant',
+        toolId: 'ecg-interpretation-assistant',
+      },
       { id: 'acs', type: 'tool', label: 'ACS Assistant', toolId: 'acs-workflow-assistant' },
       { id: 'doc', type: 'tool', label: 'Documentation', toolId: 'ambient-scribe' },
     ],
@@ -83,10 +280,14 @@ export const PLATFORM_WORKFLOWS = Object.freeze([
     executionMode: 'demo-preview',
     description: 'qSOFA, NEWS2, SOFA, antibiotics, fluids, reassessment, and handoff.',
     workspaceIds: ['emergency', 'icu'],
-    resultSummary: 'Sepsis escalation preview completed. Review the result trail and choose the next recommended escalation action.',
+    resultSummary:
+      'Sepsis escalation preview completed. Review the result trail and choose the next recommended escalation action.',
     recommendedNextActions: [
       { label: 'Review sepsis workflow result', path: '/timeline?kind=workflow' },
-      { label: 'Open escalation recommendations', path: '/recommendations?source=workflow&workflow=sepsis-escalation' },
+      {
+        label: 'Open escalation recommendations',
+        path: '/recommendations?source=workflow&workflow=sepsis-escalation',
+      },
       { label: 'Ask Assistant for handoff', path: '/assistant' },
     ],
     blocks: [
@@ -102,10 +303,14 @@ export const PLATFORM_WORKFLOWS = Object.freeze([
     executionMode: 'demo-preview',
     description: 'Telemetry alert, device detail, maintenance note, and assignment review.',
     workspaceIds: ['medical-iot', 'operations', 'governance'],
-    resultSummary: 'Device maintenance preview completed. Review the timeline, then continue to operational recommendations.',
+    resultSummary:
+      'Device maintenance preview completed. Review the timeline, then continue to operational recommendations.',
     recommendedNextActions: [
       { label: 'Review maintenance result timeline', path: '/timeline?kind=workflow' },
-      { label: 'Open operations recommendations', path: '/recommendations?source=workflow&workflow=device-maintenance' },
+      {
+        label: 'Open operations recommendations',
+        path: '/recommendations?source=workflow&workflow=device-maintenance',
+      },
       { label: 'Ask Assistant for maintenance handoff', path: '/assistant' },
     ],
     blocks: [
@@ -122,7 +327,9 @@ export function filterByWorkspace(items, workspaceId) {
 }
 
 export function filterText(items, query) {
-  const normalized = String(query || '').trim().toLowerCase();
+  const normalized = String(query || '')
+    .trim()
+    .toLowerCase();
   if (!normalized) return items;
   return items.filter((item) =>
     [
@@ -144,12 +351,14 @@ export function filterText(items, query) {
       .filter(Boolean)
       .join(' ')
       .toLowerCase()
-      .includes(normalized)
+      .includes(normalized),
   );
 }
 
 function isFutureModuleRoute(path = '') {
-  return FUTURE_MODULE_ROUTE_PREFIXES.some((prefix) => path === prefix || path.startsWith(`${prefix}/`));
+  return FUTURE_MODULE_ROUTE_PREFIXES.some(
+    (prefix) => path === prefix || path.startsWith(`${prefix}/`),
+  );
 }
 
 function hasActiveWorkspaceScope(item, activeWorkspaceIds) {
@@ -158,7 +367,11 @@ function hasActiveWorkspaceScope(item, activeWorkspaceIds) {
   return workspaceIds.some((workspaceId) => activeWorkspaceIds.has(workspaceId));
 }
 
-export function buildGlobalSearchResults({ query = '', workspaceId = 'all', category = 'all' }: any = {}) {
+export function buildGlobalSearchResults({
+  query = '',
+  workspaceId = 'all',
+  category = 'all',
+}: any = {}) {
   const activeWorkspaces = getActiveWorkspaceRegistry();
   const activeWorkspaceIds = new Set(activeWorkspaces.map((workspace) => workspace.id));
   const workspaceItems = activeWorkspaces.map((workspace) => ({
@@ -178,9 +391,11 @@ export function buildGlobalSearchResults({ query = '', workspaceId = 'all', cate
     category: tool.category === 'Calculator' ? 'calculator' : 'tool',
     path: tool.path,
     tool,
-    workspaceIds: activeWorkspaces.filter((workspace) =>
-      buildCareWorkspaceModel(workspace.id).toolEntries.some((entry) => entry.id === tool.id)
-    ).map((workspace) => workspace.id),
+    workspaceIds: activeWorkspaces
+      .filter((workspace) =>
+        buildCareWorkspaceModel(workspace.id).toolEntries.some((entry) => entry.id === tool.id),
+      )
+      .map((workspace) => workspace.id),
   }));
   const dashboardItems = PLATFORM_DASHBOARDS.map((dashboard) => ({
     ...dashboard,
@@ -220,9 +435,12 @@ export function buildGlobalSearchResults({ query = '', workspaceId = 'all', cate
     ...notificationItems,
     ...workflowItems,
     ...assetItems,
-  ].filter((item) => !isFutureModuleRoute(item.path) && hasActiveWorkspaceScope(item, activeWorkspaceIds));
+  ].filter(
+    (item) => !isFutureModuleRoute(item.path) && hasActiveWorkspaceScope(item, activeWorkspaceIds),
+  );
   results = filterByWorkspace(results, workspaceId);
-  if (category !== 'all') results = results.filter((item) => item.category === category || item.type === category);
+  if (category !== 'all')
+    results = results.filter((item) => item.category === category || item.type === category);
   return filterText(results, query).sort((a, b) => String(a.title).localeCompare(String(b.title)));
 }
 
@@ -233,15 +451,52 @@ export function buildDigitalTwinSnapshot() {
     floors: [
       { id: 'icu', label: 'ICU', occupancy: 0.88, alerts: 4, devices: 38, staffing: 'tight' },
       { id: 'ed', label: 'Emergency', occupancy: 0.74, alerts: 3, devices: 29, staffing: 'stable' },
-      { id: 'med-surg', label: 'Med/Surg', occupancy: 0.62, alerts: 1, devices: 44, staffing: 'stable' },
+      {
+        id: 'med-surg',
+        label: 'Med/Surg',
+        occupancy: 0.62,
+        alerts: 1,
+        devices: 44,
+        staffing: 'stable',
+      },
     ],
     rooms: [
-      { id: 'icu-12', label: 'ICU 12', bed: 'Bed A', patientState: 'high acuity', telemetry: 'stale SpO2', device: 'Monitor M-184', fleet: 'No transfer' },
-      { id: 'ed-04', label: 'ED 04', bed: 'Trauma bay', patientState: 'chest pain', telemetry: 'active', device: 'ECG cart E-9', fleet: 'Inbound ETA 8m' },
-      { id: 'ms-21', label: 'MS 21', bed: 'Bed B', patientState: 'stable', telemetry: 'normal', device: 'Infusion P-22', fleet: 'Discharge transport pending' },
+      {
+        id: 'icu-12',
+        label: 'ICU 12',
+        bed: 'Bed A',
+        patientState: 'high acuity',
+        telemetry: 'stale SpO2',
+        device: 'Monitor M-184',
+        fleet: 'No transfer',
+      },
+      {
+        id: 'ed-04',
+        label: 'ED 04',
+        bed: 'Trauma bay',
+        patientState: 'chest pain',
+        telemetry: 'active',
+        device: 'ECG cart E-9',
+        fleet: 'Inbound ETA 8m',
+      },
+      {
+        id: 'ms-21',
+        label: 'MS 21',
+        bed: 'Bed B',
+        patientState: 'stable',
+        telemetry: 'normal',
+        device: 'Infusion P-22',
+        fleet: 'Discharge transport pending',
+      },
     ],
     fleet: [
-      { id: 'amb-a12', label: 'Ambulance A-12', status: 'delayed', eta: '14 min', alert: 'Route diversion' },
+      {
+        id: 'amb-a12',
+        label: 'Ambulance A-12',
+        status: 'delayed',
+        eta: '14 min',
+        alert: 'Route diversion',
+      },
       { id: 'van-03', label: 'Transport Van 03', status: 'available', eta: '5 min', alert: 'None' },
     ],
   };
@@ -264,7 +519,9 @@ export function workspaceFilterSummary(workspaceId) {
     tools: model.toolEntries,
     calculators: model.toolEntries.filter((tool) => tool.category === 'Calculator'),
     dashboards: filterByWorkspace(PLATFORM_DASHBOARDS, workspace.id),
-    maps: filterByWorkspace(PLATFORM_DASHBOARDS, workspace.id).filter((item) => item.category === 'map'),
+    maps: filterByWorkspace(PLATFORM_DASHBOARDS, workspace.id).filter(
+      (item) => item.category === 'map',
+    ),
     notifications: filterByWorkspace(PLATFORM_NOTIFICATIONS, workspace.id),
     workflows: filterByWorkspace(PLATFORM_WORKFLOWS, workspace.id),
   };

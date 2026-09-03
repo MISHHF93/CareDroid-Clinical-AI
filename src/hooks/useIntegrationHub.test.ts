@@ -115,7 +115,13 @@ describe('useIntegrationHub (HEAL)', () => {
     vi.mocked(fetchIntegrationEvents).mockResolvedValue({
       events: [
         { id: 'evt-1', family: 'FHIR', eventType: 'Patient', processingStatus: 'processed' },
-        { id: 'evt-2', family: 'HL7', eventType: 'ADT^A01', processingStatus: 'failed', error: 'boom' },
+        {
+          id: 'evt-2',
+          family: 'HL7',
+          eventType: 'ADT^A01',
+          processingStatus: 'failed',
+          error: 'boom',
+        },
       ],
       count: 2,
     });

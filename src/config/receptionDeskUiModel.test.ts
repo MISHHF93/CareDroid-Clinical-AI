@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { EMERGENCY_ROLE_IDS } from './emergencyRolePermissions';
-import {
-  filterReceptionStripMetrics,
-  resolveReceptionDeskUi,
-} from './receptionDeskUiModel';
+import { filterReceptionStripMetrics, resolveReceptionDeskUi } from './receptionDeskUiModel';
 import { RECEPTION_DESK_UI } from './receptionDeskUi.config';
 
 describe('receptionDeskUiModel', () => {

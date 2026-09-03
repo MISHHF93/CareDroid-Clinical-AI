@@ -11,10 +11,7 @@ import {
   resolveRegistryId,
 } from '../data/clinicalCatalogWiring';
 import { resolveToolInventoryRecord, TOOL_LAUNCH_TYPES } from '../data/toolInventory';
-import {
-  ASSET_ACCESS_STATES,
-  resolveAssetAccessState,
-} from '../data/assetAccess';
+import { ASSET_ACCESS_STATES, resolveAssetAccessState } from '../data/assetAccess';
 import { isToolAllowedForCompiledProfile } from '../config/userProfileCompiler';
 import {
   getCalculatorRouteBySlug,
@@ -24,10 +21,11 @@ import {
 } from '../routes/clinicalToolRoutes';
 import { TOOL_LAUNCH_PATHS } from '../data/clinicalToolIdContract';
 import { CANONICAL_ROUTES } from '../config/routes.config';
+import { getPlatformEntitlementContext } from '../data/assetEntitlements';
 import {
-  getPlatformEntitlementContext,
-} from '../data/assetEntitlements';
-import { trackRoleAssetUsage, trackRoleWorkflowLaunch } from '../services/roleIntelligenceTelemetry';
+  trackRoleAssetUsage,
+  trackRoleWorkflowLaunch,
+} from '../services/roleIntelligenceTelemetry';
 import { navigateProfileAware } from './profileRouteLaunch';
 import { remapRegistryNavigationForRole } from '../services/unifiedClinicalToolsBridge';
 import {
@@ -249,7 +247,8 @@ export function isRegistryToolLaunchAllowed(toolId, context) {
 
 export function resolveRegistryToolLaunchAccess(toolId, context = getPlatformEntitlementContext()) {
   const registryId = resolveRegistryId(toolId) || toolId;
-  const inventoryRecord = resolveToolInventoryRecord(registryId) || resolveToolInventoryRecord(toolId);
+  const inventoryRecord =
+    resolveToolInventoryRecord(registryId) || resolveToolInventoryRecord(toolId);
   const tool = inventoryRecord || { id: registryId, canonicalInventoryId: registryId };
   const userRole =
     context?.roleProfile?.id ||
@@ -263,14 +262,9 @@ export function resolveRegistryToolLaunchAccess(toolId, context = getPlatformEnt
   const access = resolveAssetAccessState(
     { ...tool, id: registryId, canonicalInventoryId: tool.canonicalInventoryId || registryId },
     context,
-    userRole
-  );
-  const compilerAllowed = isToolAllowedForCompiledProfile(
-    registryId,
-    tool,
     userRole,
-    context,
   );
+  const compilerAllowed = isToolAllowedForCompiledProfile(registryId, tool, userRole, context);
   return {
     ...access,
     registryId,
@@ -289,7 +283,7 @@ export function applyRegistryToolLaunch(toolId, handlers) {
   const hasExplicitContext = Object.prototype.hasOwnProperty.call(handlers, 'context');
   const launchAccess = resolveRegistryToolLaunchAccess(
     toolId,
-    hasExplicitContext ? handlers.context : handlers.entitlementContext
+    hasExplicitContext ? handlers.context : handlers.entitlementContext,
   );
   if (!launchAccess.allowed) {
     handlers.navigate?.(
@@ -359,7 +353,10 @@ export function applyRegistryToolLaunch(toolId, handlers) {
     { pathname: plan.pathname, search: plan.search || '' },
     {
       emergencyRoleId,
-      canAccessToolsRoute: canAccessEmergencyRoute(emergencyRoleId, CANONICAL_ROUTES.emergencyTools),
+      canAccessToolsRoute: canAccessEmergencyRoute(
+        emergencyRoleId,
+        CANONICAL_ROUTES.emergencyTools,
+      ),
       toolId: plan.registryId || toolId,
       launchMode: plan.mode,
     },

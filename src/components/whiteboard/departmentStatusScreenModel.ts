@@ -1,4 +1,11 @@
-import { PatientState, type CapacitySnapshot, type EMSArrival, type Patient, type Referral, type Staff } from '../../types/emergency';
+import {
+  PatientState,
+  type CapacitySnapshot,
+  type EMSArrival,
+  type Patient,
+  type Referral,
+  type Staff,
+} from '../../types/emergency';
 import { buildArrivalControlSummary } from '../../services/arrivalControlLayer';
 import { summarizeDeteriorationWatchBoard } from '../../services/waitingRoomDeteriorationWatch';
 import { summarizeLwbsRiskBoard } from '../../services/lwbsRiskLayer';
@@ -76,18 +83,20 @@ function isBoardingPatient(patient: Patient): boolean {
   return patient.state === PatientState.Admission || patient.state === PatientState.Disposition;
 }
 
-export function buildDepartmentStatusSnapshot(input: {
-  patients?: Patient[];
-  capacity?: CapacitySnapshot;
-  emsArrivals?: EMSArrival[];
-  referrals?: Referral[];
-  staff?: Staff[];
-  rooms?: Array<{ id: string }>;
-  now?: Date;
-  updatedAt?: string | null;
-  offloadTargetMinutes?: number;
-  emergencySettings?: Record<string, unknown>;
-} = {}): DepartmentStatusSnapshot {
+export function buildDepartmentStatusSnapshot(
+  input: {
+    patients?: Patient[];
+    capacity?: CapacitySnapshot;
+    emsArrivals?: EMSArrival[];
+    referrals?: Referral[];
+    staff?: Staff[];
+    rooms?: Array<{ id: string }>;
+    now?: Date;
+    updatedAt?: string | null;
+    offloadTargetMinutes?: number;
+    emergencySettings?: Record<string, unknown>;
+  } = {},
+): DepartmentStatusSnapshot {
   const now = input.now || new Date();
   const patients = input.patients || [];
   const capacity = input.capacity;
@@ -124,8 +133,7 @@ export function buildDepartmentStatusSnapshot(input: {
   const topQueueReasonDef = topQueueReason
     ? QUEUE_REASON_DEFINITIONS.find((reason) => reason.id === topQueueReason[0])
     : null;
-  const boarders =
-    capacity?.boardingCount ?? patients.filter(isBoardingPatient).length;
+  const boarders = capacity?.boardingCount ?? patients.filter(isBoardingPatient).length;
   const referralSummary = summarizeReferralAwareness(referrals);
   const referralsPending = referralSummary.buckets.pending;
   const emsAwareness = summarizeEmsAwareness(input.emsArrivals || [], now.getTime(), {
@@ -144,8 +152,7 @@ export function buildDepartmentStatusSnapshot(input: {
   const longestWaitMinutes =
     capacity?.longestWaitMinutes ??
     waitingPatients.reduce(
-      (max, patient) =>
-        Math.max(max, minutesSince(patient.triageTime || patient.arrivalTime, now)),
+      (max, patient) => Math.max(max, minutesSince(patient.triageTime || patient.arrivalTime, now)),
       0,
     );
 
@@ -154,7 +161,12 @@ export function buildDepartmentStatusSnapshot(input: {
       id: 'waiting-count',
       label: 'Waiting',
       value: waitingPatients.length,
-      tone: waitingPatients.length >= 12 ? 'critical' : waitingPatients.length >= 6 ? 'warning' : 'stable',
+      tone:
+        waitingPatients.length >= 12
+          ? 'critical'
+          : waitingPatients.length >= 6
+            ? 'warning'
+            : 'stable',
       detail: 'Patients in the waiting room queue',
     },
     {
@@ -175,14 +187,28 @@ export function buildDepartmentStatusSnapshot(input: {
       id: 'triage-pending',
       label: 'Triage pending',
       value: triagePending,
-      tone: triagePending >= 4 ? 'critical' : triagePending >= 2 ? 'warning' : triagePending ? 'watch' : 'stable',
+      tone:
+        triagePending >= 4
+          ? 'critical'
+          : triagePending >= 2
+            ? 'warning'
+            : triagePending
+              ? 'watch'
+              : 'stable',
       detail: 'Patients awaiting triage nurse review',
     },
     {
       id: 'reassessments-due',
       label: 'Reassessments due',
       value: reassessmentsDue,
-      tone: reassessmentsDue >= 5 ? 'critical' : reassessmentsDue >= 2 ? 'warning' : reassessmentsDue ? 'watch' : 'stable',
+      tone:
+        reassessmentsDue >= 5
+          ? 'critical'
+          : reassessmentsDue >= 2
+            ? 'warning'
+            : reassessmentsDue
+              ? 'watch'
+              : 'stable',
       detail: 'Patients flagged for reassessment',
     },
     {
@@ -228,11 +254,7 @@ export function buildDepartmentStatusSnapshot(input: {
       label: 'Queue pressure',
       value: topQueueReason ? topQueueReason[1] : 0,
       tone:
-        topQueueReason && topQueueReason[1] >= 5
-          ? 'warning'
-          : topQueueReason
-            ? 'watch'
-            : 'stable',
+        topQueueReason && topQueueReason[1] >= 5 ? 'warning' : topQueueReason ? 'watch' : 'stable',
       detail: topQueueReasonDef
         ? `${topQueueReasonDef.label} — aggregate count only`
         : 'No dominant queue reason detected',
@@ -355,9 +377,7 @@ export function filterDepartmentStatusSnapshot(
   const referralsPending = Number(metricValue('referrals-pending') ?? 0);
   const capacityValue = metricValue('capacity-status');
   const capacityBand =
-    capacityValue != null
-      ? String(capacityValue).split('·').pop()?.trim() || ''
-      : '';
+    capacityValue != null ? String(capacityValue).split('·').pop()?.trim() || '' : '';
 
   const summaryLine = [
     waitingCount != null ? `${waitingCount} waiting` : null,

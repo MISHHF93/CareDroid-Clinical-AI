@@ -46,12 +46,12 @@ export default function PublicDisplaySituationBrief({
       <ol className="emergency-route-situation-brief__list emergency-route-situation-brief__list--graphic">
         <SituationGraphicCard id="status" label="Happening now" value={snapshot.summaryLine} />
         <SituationGraphicCard id="attention" label="Needs attention" value={attention} />
+        <SituationGraphicCard id="owner" label="Who can help" value="Front desk and triage staff" />
         <SituationGraphicCard
-          id="owner"
-          label="Who can help"
-          value="Front desk and triage staff"
+          id="nextAction"
+          label="What happens next"
+          value={nextCareStep(snapshot)}
         />
-        <SituationGraphicCard id="nextAction" label="What happens next" value={nextCareStep(snapshot)} />
       </ol>
     </section>
   );

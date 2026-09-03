@@ -1,8 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import {
-  getAutomationAuditEntries,
-  resetAutomationAuditTrail,
-} from '../data/automationAuditTrail';
+import { getAutomationAuditEntries, resetAutomationAuditTrail } from '../data/automationAuditTrail';
 import AutomationEngine from './automationEngine';
 
 describe('AutomationEngine', () => {
@@ -19,9 +16,11 @@ describe('AutomationEngine', () => {
     });
 
     expect(result.ok).toBe(true);
-    expect((result as any).outputs).toEqual(expect.arrayContaining(['risk profile', 'calculator recommendations']));
+    expect((result as any).outputs).toEqual(
+      expect.arrayContaining(['risk profile', 'calculator recommendations']),
+    );
     expect(result.patientJourneyStates).toEqual(
-      expect.arrayContaining(['arrival', 'registration', 'triage', 'waiting', 'assessment'])
+      expect.arrayContaining(['arrival', 'registration', 'triage', 'waiting', 'assessment']),
     );
     expect(result.auditEntry).toEqual(
       expect.objectContaining({
@@ -29,7 +28,7 @@ describe('AutomationEngine', () => {
         status: 'success',
         toolCalled: 'qsofa',
         patientJourneyStates: expect.arrayContaining(['triage', 'assessment']),
-      })
+      }),
     );
     expect(getAutomationAuditEntries()).toHaveLength(1);
   });
@@ -52,9 +51,16 @@ describe('AutomationEngine', () => {
     const state = AutomationEngine.getWorkspaceAutomationState('medical-iot');
 
     expect(state.activeAutomations.map((automation) => automation.title)).toEqual(
-      expect.arrayContaining(['Device Offline', 'Battery Low', 'Telemetry Lost', 'Maintenance Due'])
+      expect.arrayContaining([
+        'Device Offline',
+        'Battery Low',
+        'Telemetry Lost',
+        'Maintenance Due',
+      ]),
     );
-    expect(state.demoAutomations.map((automation) => automation.title)).toContain('Calibration Due');
+    expect(state.demoAutomations.map((automation) => automation.title)).toContain(
+      'Calibration Due',
+    );
     expect(state.settings.highRisk).toBeGreaterThan(0);
   });
 });

@@ -74,8 +74,8 @@ export default function TrackMindMaturityDashboard() {
           <p className="tm-maturity__eyebrow">TrackMind Operating System</p>
           <h1 id="tm-maturity-heading">Maturity assessment</h1>
           <p className="tm-maturity__subtitle">
-            Nine weighted domains scored against the TrackMind maturity framework, blended with
-            your own self-assessment where you provide one.
+            Nine weighted domains scored against the TrackMind maturity framework, blended with your
+            own self-assessment where you provide one.
           </p>
         </div>
         <div className="tm-maturity__score" aria-label="Overall maturity score">
@@ -97,11 +97,11 @@ export default function TrackMindMaturityDashboard() {
           <strong>
             {summary.auditedDomainCount} of {summary.domainCount} domains
           </strong>{' '}
-          ({summary.auditedWeightShare}% of the total weight) are computed from live platform
-          audits and move when the platform moves. The remaining{' '}
-          <strong>{summary.staticDomainCount}</strong> return a fixed placeholder value
-          regardless of platform state, so treat them as a framework default rather than a
-          finding about this deployment. Each domain below is labelled.
+          ({summary.auditedWeightShare}% of the total weight) are computed from live platform audits
+          and move when the platform moves. The remaining{' '}
+          <strong>{summary.staticDomainCount}</strong> return a fixed placeholder value regardless
+          of platform state, so treat them as a framework default rather than a finding about this
+          deployment. Each domain below is labelled.
         </p>
       </section>
 
@@ -129,10 +129,10 @@ export default function TrackMindMaturityDashboard() {
           <ShieldCheck aria-hidden="true" /> Self-assessment
         </h2>
         <p className="tm-maturity__note">
-          Rate each domain as you see it on the ground. An answer is blended 60/40 with the
-          platform score for that domain, so answering changes the numbers above immediately.
-          <strong> Answers are not saved</strong> — there is no maturity-assessment backend yet,
-          so they live only in this tab and are lost on reload.
+          Rate each domain as you see it on the ground. An answer is blended 60/40 with the platform
+          score for that domain, so answering changes the numbers above immediately.
+          <strong> Answers are not saved</strong> — there is no maturity-assessment backend yet, so
+          they live only in this tab and are lost on reload.
         </p>
         <ul className="tm-maturity__questions">
           {TRACKMIND_MATURITY_QUESTIONNAIRE.questions.map((question) => (
@@ -186,9 +186,7 @@ export default function TrackMindMaturityDashboard() {
               <p className="tm-maturity__domain-meta">
                 <ProvenanceTag provenance={dimension.provenance as Provenance} />
                 <span>Weight {dimension.weight}</span>
-                {dimension.questionnaireScore !== null ? (
-                  <span>Includes your answer</span>
-                ) : null}
+                {dimension.questionnaireScore !== null ? <span>Includes your answer</span> : null}
                 {dimension.gapToNextLevel > 0 ? (
                   <span>{dimension.gapToNextLevel} to next level</span>
                 ) : (

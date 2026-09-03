@@ -30,7 +30,15 @@ export const ALARM_SEVERITIES = [
 
 export type AlarmSeverity = (typeof ALARM_SEVERITIES)[number];
 
-export const ALARM_SURFACES = ['dock', 'banner', 'rail', 'toast', 'inline', 'history', 'kpi'] as const;
+export const ALARM_SURFACES = [
+  'dock',
+  'banner',
+  'rail',
+  'toast',
+  'inline',
+  'history',
+  'kpi',
+] as const;
 
 export type AlarmSurface = (typeof ALARM_SURFACES)[number];
 

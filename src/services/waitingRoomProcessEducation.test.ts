@@ -17,7 +17,9 @@ describe('waitingRoomProcessEducation', () => {
       'Treatment / Disposition',
       'Discharge / Admission',
     ]);
-    expect(WAITING_ROOM_PROCESS_EDUCATION_STEPS[0]?.id).toBe(WAITING_ROOM_PROCESS_STEP.REGISTRATION);
+    expect(WAITING_ROOM_PROCESS_EDUCATION_STEPS[0]?.id).toBe(
+      WAITING_ROOM_PROCESS_STEP.REGISTRATION,
+    );
     expect(WAITING_ROOM_PROCESS_EDUCATION_STEPS[6]?.id).toBe(
       WAITING_ROOM_PROCESS_STEP.DISCHARGE_ADMISSION,
     );

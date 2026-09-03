@@ -11,7 +11,10 @@ import {
 describe('administrativeAutomationCatalog parity', () => {
   it('maps every automation category to a platform automation id', () => {
     for (const category of ADMINISTRATIVE_AUTOMATION_CATEGORIES) {
-      expect(CATEGORY_AUTOMATION_IDS[category], `missing automation id for ${category}`).toBeTruthy();
+      expect(
+        CATEGORY_AUTOMATION_IDS[category],
+        `missing automation id for ${category}`,
+      ).toBeTruthy();
     }
   });
 

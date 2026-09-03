@@ -1,8 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  extractWorkflowOrchestrationTasks,
-  unwrapEmergencyEnvelope,
-} from './emergencyApiHelpers';
+import { extractWorkflowOrchestrationTasks, unwrapEmergencyEnvelope } from './emergencyApiHelpers';
 
 describe('emergencyApiHelpers', () => {
   it('unwraps module envelope data', () => {

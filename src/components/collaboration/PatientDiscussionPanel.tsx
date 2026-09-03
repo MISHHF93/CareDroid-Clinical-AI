@@ -49,7 +49,9 @@ export function PatientDiscussionPanel({ patientId }: PatientDiscussionPanelProp
     if (loadTokenRef.current !== token) return;
     if (threadResult.ok && threadResult.data?.id) {
       setChannelId(threadResult.data.id);
-      const messagesResult = await collaborationApi.fetchMessages(threadResult.data.id, { limit: 50 });
+      const messagesResult = await collaborationApi.fetchMessages(threadResult.data.id, {
+        limit: 50,
+      });
       if (loadTokenRef.current !== token) return;
       if (messagesResult.ok && Array.isArray(messagesResult.data)) {
         setMessages(messagesResult.data);
@@ -77,7 +79,12 @@ export function PatientDiscussionPanel({ patientId }: PatientDiscussionPanelProp
       {loading ? (
         /* Spinner renders a <div> internally -- as="p" would be invalid HTML
            nesting (block element inside a paragraph); div is correct here. */
-        <Text as="div" size="xs" color="secondary" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <Text
+          as="div"
+          size="xs"
+          color="secondary"
+          style={{ display: 'flex', alignItems: 'center', gap: 6 }}
+        >
           <Spinner size="sm" />
           Loading discussion…
         </Text>

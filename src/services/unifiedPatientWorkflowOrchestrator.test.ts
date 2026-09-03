@@ -103,9 +103,9 @@ describe('unifiedPatientWorkflowOrchestrator', () => {
     });
 
     expect(events).toContain('journey_state_changed');
-    expect(useEmergencyStore.getState().workflowLogs.some((log) => log.patientId === patient.id)).toBe(
-      true,
-    );
+    expect(
+      useEmergencyStore.getState().workflowLogs.some((log) => log.patientId === patient.id),
+    ).toBe(true);
   });
 
   it('afterPatientWorkflowTransition selects patient and returns next route', () => {

@@ -9,7 +9,8 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock('../services/nativeAiApi', () => ({
-  fetchClinicalAcuityLeaderboard: (...args: unknown[]) => mocks.fetchClinicalAcuityLeaderboard(...args),
+  fetchClinicalAcuityLeaderboard: (...args: unknown[]) =>
+    mocks.fetchClinicalAcuityLeaderboard(...args),
   fetchNativeAiRegistry: () => mocks.fetchNativeAiRegistry(),
   fetchNativeAiDriftEnvelope: () => mocks.fetchNativeAiDriftEnvelope(),
 }));

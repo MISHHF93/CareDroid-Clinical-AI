@@ -31,8 +31,12 @@ export default function ResearchEvidenceHub() {
         <div className="research-hub-page__title-row">
           <GraphicIconBadge iconKey="activity" accent="brand" size="md" />
           <div>
-            <p className="research-hub-title-text" data-testid="cd-page-title-text">Research and Evidence Hub</p>
-            <p>Literature, guidelines, evidence summaries, study tracking, and citation exploration.</p>
+            <p className="research-hub-title-text" data-testid="cd-page-title-text">
+              Research and Evidence Hub
+            </p>
+            <p>
+              Literature, guidelines, evidence summaries, study tracking, and citation exploration.
+            </p>
           </div>
         </div>
         <div className="research-hub-page__actions">
@@ -49,14 +53,42 @@ export default function ResearchEvidenceHub() {
         details={snapshot.safetyLabel}
       />
 
-      <div className="research-hub-page__metrics" role="group" aria-label="Research hub summary metrics">
-        <MetricCard label="Literature" value={String(snapshot.literatureCount)} hint="Demo evidence digests" tone="neutral" />
-        <MetricCard label="Guidelines" value={String(snapshot.guidelineCount)} hint="Summarized pathways" tone="neutral" />
-        <MetricCard label="Summaries" value={String(snapshot.evidenceSummaryCount)} hint="Bottom-line briefs" tone="good" />
-        <MetricCard label="Studies tracked" value={String(snapshot.trackedStudyCount)} hint="Active study tracker" tone="neutral" />
+      <div
+        className="research-hub-page__metrics"
+        role="group"
+        aria-label="Research hub summary metrics"
+      >
+        <MetricCard
+          label="Literature"
+          value={String(snapshot.literatureCount)}
+          hint="Demo evidence digests"
+          tone="neutral"
+        />
+        <MetricCard
+          label="Guidelines"
+          value={String(snapshot.guidelineCount)}
+          hint="Summarized pathways"
+          tone="neutral"
+        />
+        <MetricCard
+          label="Summaries"
+          value={String(snapshot.evidenceSummaryCount)}
+          hint="Bottom-line briefs"
+          tone="good"
+        />
+        <MetricCard
+          label="Studies tracked"
+          value={String(snapshot.trackedStudyCount)}
+          hint="Active study tracker"
+          tone="neutral"
+        />
       </div>
 
-      <VisualizationPanel title="Evidence library sections" description="Volume across literature, guidelines, summaries, studies, and citations." badge="Library">
+      <VisualizationPanel
+        title="Evidence library sections"
+        description="Volume across literature, guidelines, summaries, studies, and citations."
+        badge="Library"
+      >
         <CategoryBarChart
           data={sectionChart}
           title="Evidence library sections"
@@ -82,11 +114,15 @@ export default function ResearchEvidenceHub() {
             return (
               <article key={item.id} className="research-hub-page__card">
                 <strong>{item.title}</strong>
-                <span>{item.source} · {item.year} · {item.evidenceLevel}</span>
+                <span>
+                  {item.source} · {item.year} · {item.evidenceLevel}
+                </span>
                 <p>{item.summary}</p>
                 <div className="research-hub-page__card-links">
                   {links.simulations.map((link) => (
-                    <Link key={link.id} to={link.path}>{link.label}</Link>
+                    <Link key={link.id} to={link.path}>
+                      {link.label}
+                    </Link>
                   ))}
                 </div>
               </article>
@@ -99,7 +135,9 @@ export default function ResearchEvidenceHub() {
           {results.guidelines.slice(0, 3).map((guideline) => (
             <article key={guideline.id} className="research-hub-page__card">
               <strong>{guideline.title}</strong>
-              <span>{guideline.publisher} · {guideline.version}</span>
+              <span>
+                {guideline.publisher} · {guideline.version}
+              </span>
               <ul>
                 {guideline.keyRecommendations.map((rec) => (
                   <li key={rec}>{rec}</li>
@@ -120,7 +158,8 @@ export default function ResearchEvidenceHub() {
 
       {!query ? (
         <p className="research-hub-page__hint">
-          Showing {LITERATURE_LIBRARY.length} literature items, {GUIDELINE_LIBRARY.length} guidelines, and {EVIDENCE_SUMMARIES.length} summaries in demo mode.
+          Showing {LITERATURE_LIBRARY.length} literature items, {GUIDELINE_LIBRARY.length}{' '}
+          guidelines, and {EVIDENCE_SUMMARIES.length} summaries in demo mode.
         </p>
       ) : null}
     </main>

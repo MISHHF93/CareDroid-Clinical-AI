@@ -11,7 +11,7 @@ import logger from '../../utils/logger';
 
 /**
  * ConsentHistory Component
- * 
+ *
  * Displays user's consent history for audit and compliance purposes
  * Shows all consent events with timestamps and IP addresses
  */
@@ -73,12 +73,12 @@ export const ConsentHistory = () => {
           consentDate: row.updatedAt,
           action: row.granted ? 'granted' : 'revoked',
           consents: { [row.key]: row.granted },
-        }))
+        })),
       );
       setNotice(
         !isBackendCapabilityEnabled('consentHistory')
           ? 'Detailed consent event history is not available on the server. Showing current snapshot from GET /api/compliance/consent.'
-          : null
+          : null,
       );
     } catch (err: any) {
       logger.error('Error fetching consent history', { err });
@@ -168,15 +168,17 @@ export const ConsentHistory = () => {
     <div className="consent-history">
       <div className="consent-history-container">
         <div className="consent-history-header">
-          <p className="consent-history-header__title-text" data-testid="cd-page-title-text">Consent History</p>
+          <p className="consent-history-header__title-text" data-testid="cd-page-title-text">
+            Consent History
+          </p>
           {notice && (
             <p className="consent-history-notice" role="status">
               {notice}
             </p>
           )}
           <p className="consent-history-intro">
-            Your complete consent and authorization history as required by HIPAA. 
-            All consent actions are permanently logged for audit purposes.
+            Your complete consent and authorization history as required by HIPAA. All consent
+            actions are permanently logged for audit purposes.
           </p>
         </div>
 
@@ -210,7 +212,9 @@ export const ConsentHistory = () => {
                   {Object.entries(consent.consents || {}).map(([key, value]) => (
                     <div key={key} className="consent-detail-item">
                       <span className="consent-detail-label">{getConsentLabel(key)}:</span>
-                      <span className={`consent-detail-value consent-detail-value-${value ? 'yes' : 'no'}`}>
+                      <span
+                        className={`consent-detail-value consent-detail-value-${value ? 'yes' : 'no'}`}
+                      >
                         {value ? '✓ Accepted' : '✗ Declined'}
                       </span>
                     </div>
@@ -233,8 +237,8 @@ export const ConsentHistory = () => {
           <div className="consent-history-info">
             <h3>About Consent Records</h3>
             <p>
-              As required by HIPAA, we maintain a permanent, tamper-proof audit log of all 
-              consent actions. Records include:
+              As required by HIPAA, we maintain a permanent, tamper-proof audit log of all consent
+              actions. Records include:
             </p>
             <ul>
               <li>Timestamp (with timezone)</li>
@@ -252,7 +256,8 @@ export const ConsentHistory = () => {
             <Link to="/consent" className="btn-consent-secondary">
               Manage Consents
             </Link>
-            <button type="button"
+            <button
+              type="button"
               className="btn-consent-export"
               onClick={() => {
                 // Export consent history as JSON

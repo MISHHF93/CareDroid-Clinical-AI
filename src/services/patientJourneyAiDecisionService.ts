@@ -25,9 +25,9 @@ function readVitals(patient: Patient): Vitals | undefined {
 }
 
 function patientFlags(patient: Patient): string[] {
-  return (patient.flags || []).map((entry) =>
-    typeof entry === 'string' ? entry : (entry as { type?: string })?.type || '',
-  ).filter(Boolean);
+  return (patient.flags || [])
+    .map((entry) => (typeof entry === 'string' ? entry : (entry as { type?: string })?.type || ''))
+    .filter(Boolean);
 }
 
 function symptomList(patient: Patient): string[] {
@@ -73,7 +73,10 @@ export function buildPatientJourneyAiInput(patient: Patient): Record<string, unk
   };
 }
 
-export function buildEmsPrearrivalAiInput(arrival: EMSArrival, patient?: Patient): Record<string, unknown> {
+export function buildEmsPrearrivalAiInput(
+  arrival: EMSArrival,
+  patient?: Patient,
+): Record<string, unknown> {
   const vitals = patient ? readVitals(patient) : undefined;
   return {
     unitName: arrival.unitName,
@@ -128,16 +131,26 @@ async function invokePatientJourneyIntent(
 // single refresh. This cache persists across calls and is keyed by a signature of the
 // exact AI input, so unchanged patients are served from cache instead of re-invoked.
 const DECISION_CACHE_LIMIT = 300;
-const decisionCache = new Map<string, { signature: string; bundle: PatientJourneyAiDecisionBundle }>();
+const decisionCache = new Map<
+  string,
+  { signature: string; bundle: PatientJourneyAiDecisionBundle }
+>();
 // Several independent engines (administrative automation tick, workflow-automation SSE
 // handler, engine_start bootstraps) call evaluatePatientJourneyAiDecisions for the same
 // patient within the same tick. A resolved-value cache alone doesn't stop that: none of
 // the concurrent calls has resolved yet, so they'd all miss the cache and each fire their
 // own 3-4 AI requests. Tracking the in-flight promise lets concurrent callers share the
 // one request instead of stampeding the AI node.
-const inFlightDecisions = new Map<string, { signature: string; promise: Promise<PatientJourneyAiDecisionBundle> }>();
+const inFlightDecisions = new Map<
+  string,
+  { signature: string; promise: Promise<PatientJourneyAiDecisionBundle> }
+>();
 
-function rememberDecision(patientId: string, signature: string, bundle: PatientJourneyAiDecisionBundle): void {
+function rememberDecision(
+  patientId: string,
+  signature: string,
+  bundle: PatientJourneyAiDecisionBundle,
+): void {
   decisionCache.set(patientId, { signature, bundle });
   if (decisionCache.size > DECISION_CACHE_LIMIT) {
     const oldestKey = decisionCache.keys().next().value;
@@ -158,15 +171,21 @@ async function computePatientJourneyAiDecisions(
   ]);
 
   const needsSummary =
-    patient.state !== PatientState.Discharge &&
-    patient.state !== PatientState.Deceased;
+    patient.state !== PatientState.Discharge && patient.state !== PatientState.Deceased;
 
   const summary = needsSummary
-    ? await invokePatientJourneyIntent('patient_summary', {
-        ...input,
-        triageNotes: patient.notes?.slice(-3).map((note) => note.text || note.body).filter(Boolean),
-        medicalHistory: patientFlags(patient),
-      }, context)
+    ? await invokePatientJourneyIntent(
+        'patient_summary',
+        {
+          ...input,
+          triageNotes: patient.notes
+            ?.slice(-3)
+            .map((note) => note.text || note.body)
+            .filter(Boolean),
+          medicalHistory: patientFlags(patient),
+        },
+        context,
+      )
     : undefined;
 
   return {
@@ -210,7 +229,10 @@ export async function evaluatePatientJourneyAiDecisions(
 }
 
 const emsDecisionCache = new Map<string, { signature: string; response: CareDroidAIResponse }>();
-const inFlightEmsDecisions = new Map<string, { signature: string; promise: Promise<CareDroidAIResponse> }>();
+const inFlightEmsDecisions = new Map<
+  string,
+  { signature: string; promise: Promise<CareDroidAIResponse> }
+>();
 
 /** Test helper — clears session caches for patient-journey and EMS pre-arrival AI node calls. */
 export function clearPatientJourneyAiDecisionCache(): void {
@@ -260,7 +282,9 @@ export async function evaluateEmsPrearrivalAiDecision(
   return promise;
 }
 
-export function aiPriorityFromDecisions(bundle: PatientJourneyAiDecisionBundle): 'critical' | 'high' | 'medium' | 'low' {
+export function aiPriorityFromDecisions(
+  bundle: PatientJourneyAiDecisionBundle,
+): 'critical' | 'high' | 'medium' | 'low' {
   const criticalSeverity = String(bundle.critical.data?.severity || '').toLowerCase();
   if (criticalSeverity === 'critical') return 'critical';
   if ((bundle.critical.redFlags || []).length > 0) return 'high';
@@ -282,13 +306,19 @@ export function formatAiDecisionSummary(bundle: PatientJourneyAiDecisionBundle):
     : '';
   const parts = [
     `AI triage advisory: ${triageLevel}.`,
-    redFlags.length ? `Red flags: ${redFlags.join('; ')}.` : 'No critical red flags in submitted data.',
-    missing ? `Registration gaps: ${missing}.` : 'Registration fields appear complete for automated review.',
+    redFlags.length
+      ? `Red flags: ${redFlags.join('; ')}.`
+      : 'No critical red flags in submitted data.',
+    missing
+      ? `Registration gaps: ${missing}.`
+      : 'Registration fields appear complete for automated review.',
     'Licensed clinician must confirm before acuity, routing, or orders change.',
   ];
   return parts.join(' ');
 }
 
 export function hasHighRiskAiSignal(bundle: PatientJourneyAiDecisionBundle): boolean {
-  return aiPriorityFromDecisions(bundle) === 'critical' || aiPriorityFromDecisions(bundle) === 'high';
+  return (
+    aiPriorityFromDecisions(bundle) === 'critical' || aiPriorityFromDecisions(bundle) === 'high'
+  );
 }

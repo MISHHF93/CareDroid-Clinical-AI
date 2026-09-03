@@ -40,7 +40,9 @@ describe('Pediatrics and OB-GYN Clinical Tools Pack', () => {
       expect(calculatorSlug).toBeTruthy();
       expect(builtinSlugs.has(calculatorSlug)).toBe(true);
       expect(smokeSlugs.has(calculatorSlug)).toBe(true);
-      expect(CALCULATOR_ROUTE_DEFS.some((route) => route.calculatorSlug === calculatorSlug)).toBe(true);
+      expect(CALCULATOR_ROUTE_DEFS.some((route) => route.calculatorSlug === calculatorSlug)).toBe(
+        true,
+      );
     }
   });
 
@@ -52,7 +54,9 @@ describe('Pediatrics and OB-GYN Clinical Tools Pack', () => {
       expect(KNOWN_TOOL_AREA_PATHS).toContain(launch.path);
       expect(launch.chatSeed).toMatch(/decision support/i);
       expect(launch.chatSeed).toMatch(/do not (diagnose|recommend|delay)|must not delay/i);
-      expect(launch.chatSeed).not.toMatch(/\b\d+(\.\d+)?\s*mg\/kg|should recommend antibiotics|should recommend delivery/i);
+      expect(launch.chatSeed).not.toMatch(
+        /\b\d+(\.\d+)?\s*mg\/kg|should recommend antibiotics|should recommend delivery/i,
+      );
       expect(launch.orchestratorTool).toBeNull();
       expect(clinicalIntentToolsById[id]).toBeTruthy();
     }
@@ -73,7 +77,8 @@ describe('Pediatrics and OB-GYN Clinical Tools Pack', () => {
 
   it('wires pediatric emergency drug support with verification guardrails', () => {
     const launch = resolveCatalogLaunch(REGISTRY.pediatricDoseSafetyChecker);
-    const copy = `${launch.chatSeed || ''} ${clinicalIntentToolsById[REGISTRY.pediatricDoseSafetyChecker]?.description || ''}`.toLowerCase();
+    const copy =
+      `${launch.chatSeed || ''} ${clinicalIntentToolsById[REGISTRY.pediatricDoseSafetyChecker]?.description || ''}`.toLowerCase();
     expect(copy).toMatch(/pediatric emergency drug|emergency drug/i);
     expect(copy).toMatch(/weight|age-estimated|dosing table|quick reference/i);
     expect(copy).toMatch(/verify|local pediatric|pals|policy/i);

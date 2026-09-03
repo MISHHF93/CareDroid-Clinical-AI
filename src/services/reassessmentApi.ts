@@ -5,13 +5,21 @@ const jsonHeaders = { 'content-type': 'application/json' };
 
 async function guardedJson(path, options: any = {}) {
   if (!isBackendCapabilityEnabled('emergencyReassessment')) {
-    return { ok: false, data: null, message: 'Backend reassessment endpoint is not available yet.' };
+    return {
+      ok: false,
+      data: null,
+      message: 'Backend reassessment endpoint is not available yet.',
+    };
   }
 
   try {
     const { response, data } = await apiFetchJson(path, options);
     if (!response.ok) {
-      return { ok: false, data: null, message: data?.error || data?.message || getApiErrorMessage(null, response) };
+      return {
+        ok: false,
+        data: null,
+        message: data?.error || data?.message || getApiErrorMessage(null, response),
+      };
     }
     return { ok: true, data, message: data?.message || '' };
   } catch (error: any) {

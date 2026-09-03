@@ -59,8 +59,16 @@ describe('inboxCollaboration — assignment', () => {
 
 describe('inboxCollaboration — comments', () => {
   it('adds a comment and lists it back in order', () => {
-    addInboxComment('proposal:p1', { authorUserId: 'user-1', authorRole: 'nurse', body: 'First' }, () => 't1');
-    addInboxComment('proposal:p1', { authorUserId: 'user-2', authorRole: 'physician', body: 'Second' }, () => 't2');
+    addInboxComment(
+      'proposal:p1',
+      { authorUserId: 'user-1', authorRole: 'nurse', body: 'First' },
+      () => 't1',
+    );
+    addInboxComment(
+      'proposal:p1',
+      { authorUserId: 'user-2', authorRole: 'physician', body: 'Second' },
+      () => 't2',
+    );
     const thread = listInboxComments('proposal:p1');
     expect(thread.map((c) => c.body)).toEqual(['First', 'Second']);
     expect(countInboxComments('proposal:p1')).toBe(2);

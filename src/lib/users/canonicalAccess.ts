@@ -210,18 +210,36 @@ export const CANONICAL_ROLE_CATALOG: Readonly<Record<HospitalRole, CanonicalRole
       clinical: true,
       aliases: ['registered-nurse', 'rn', 'nurse'],
     }),
-    emergency_physician: role('emergency_physician', 'physician', 'emergency-physician', 'physician', {
-      clinical: true,
-      aliases: ['emergency-physician', 'doctor', 'md'],
-    }),
-    attending_physician: role('attending_physician', 'physician', 'emergency-physician', 'physician', {
-      clinical: true,
-      aliases: ['attending', 'attending-physician'],
-    }),
-    resident_physician: role('resident_physician', 'physician', 'emergency-physician', 'physician', {
-      clinical: true,
-      aliases: ['resident', 'resident-physician'],
-    }),
+    emergency_physician: role(
+      'emergency_physician',
+      'physician',
+      'emergency-physician',
+      'physician',
+      {
+        clinical: true,
+        aliases: ['emergency-physician', 'doctor', 'md'],
+      },
+    ),
+    attending_physician: role(
+      'attending_physician',
+      'physician',
+      'emergency-physician',
+      'physician',
+      {
+        clinical: true,
+        aliases: ['attending', 'attending-physician'],
+      },
+    ),
+    resident_physician: role(
+      'resident_physician',
+      'physician',
+      'emergency-physician',
+      'physician',
+      {
+        clinical: true,
+        aliases: ['resident', 'resident-physician'],
+      },
+    ),
     specialist: role('specialist', 'physician', 'cardiologist', 'physician', {
       clinical: true,
       aliases: ['consultant', 'specialist-physician'],
@@ -238,24 +256,42 @@ export const CANONICAL_ROLE_CATALOG: Readonly<Record<HospitalRole, CanonicalRole
       dataMinimizationLevel: 'operational',
       aliases: ['ems-coordinator', 'ems-operations-manager'],
     }),
-    registration_clerk: role('registration_clerk', 'registration_clerk', 'registration-clerk', 'student', {
-      dataMinimizationLevel: 'clinical',
-      aliases: ['registration-clerk', 'registrar', 'receptionist'],
-    }),
-    patient_flow_coordinator: role('patient_flow_coordinator', 'ed_manager', 'hospital-administrator', 'admin', {
-      dataMinimizationLevel: 'operational',
-      aliases: ['patient-flow-coordinator', 'flow-coordinator', 'bed-manager'],
-    }),
+    registration_clerk: role(
+      'registration_clerk',
+      'registration_clerk',
+      'registration-clerk',
+      'student',
+      {
+        dataMinimizationLevel: 'clinical',
+        aliases: ['registration-clerk', 'registrar', 'receptionist'],
+      },
+    ),
+    patient_flow_coordinator: role(
+      'patient_flow_coordinator',
+      'ed_manager',
+      'hospital-administrator',
+      'admin',
+      {
+        dataMinimizationLevel: 'operational',
+        aliases: ['patient-flow-coordinator', 'flow-coordinator', 'bed-manager'],
+      },
+    ),
     lab_technician: role('lab_technician', 'read_only_viewer', 'lab-technician', 'student', {
       readOnly: true,
       dataMinimizationLevel: 'clinical',
       aliases: ['lab-technician'],
     }),
-    radiology_technician: role('radiology_technician', 'read_only_viewer', 'lab-technician', 'student', {
-      readOnly: true,
-      dataMinimizationLevel: 'clinical',
-      aliases: ['radiology-technician', 'imaging-technician'],
-    }),
+    radiology_technician: role(
+      'radiology_technician',
+      'read_only_viewer',
+      'lab-technician',
+      'student',
+      {
+        readOnly: true,
+        dataMinimizationLevel: 'clinical',
+        aliases: ['radiology-technician', 'imaging-technician'],
+      },
+    ),
     pharmacist: role('pharmacist', 'read_only_viewer', 'pharmacist', 'nurse', {
       dataMinimizationLevel: 'clinical',
       aliases: ['clinical-pharmacist'],
@@ -265,21 +301,33 @@ export const CANONICAL_ROLE_CATALOG: Readonly<Record<HospitalRole, CanonicalRole
       dataMinimizationLevel: 'clinical',
       aliases: ['social-worker'],
     }),
-    security_officer: role('security_officer', 'read_only_viewer', 'compliance-officer', 'student', {
-      readOnly: true,
-      dataMinimizationLevel: 'metadata_only',
-      aliases: ['security-officer'],
-    }),
+    security_officer: role(
+      'security_officer',
+      'read_only_viewer',
+      'compliance-officer',
+      'student',
+      {
+        readOnly: true,
+        dataMinimizationLevel: 'metadata_only',
+        aliases: ['security-officer'],
+      },
+    ),
     it_admin: role('it_admin', 'it_admin', 'platform-admin', 'admin', {
       admin: true,
       dataMinimizationLevel: 'metadata_only',
       aliases: ['it-admin', 'technical-admin'],
     }),
-    quality_safety_officer: role('quality_safety_officer', 'read_only_viewer', 'compliance-officer', 'admin', {
-      readOnly: true,
-      dataMinimizationLevel: 'audit',
-      aliases: ['quality-safety-officer', 'quality-officer'],
-    }),
+    quality_safety_officer: role(
+      'quality_safety_officer',
+      'read_only_viewer',
+      'compliance-officer',
+      'admin',
+      {
+        readOnly: true,
+        dataMinimizationLevel: 'audit',
+        aliases: ['quality-safety-officer', 'quality-officer'],
+      },
+    ),
     demo_observer: role('demo_observer', 'read_only_viewer', 'demo-observer', 'student', {
       readOnly: true,
       dataMinimizationLevel: 'metadata_only',
@@ -399,7 +447,12 @@ function role(
   emergencyRoleId: string,
   saasRole: string,
   backendRole: BackendUserRole,
-  options: Partial<Omit<CanonicalRoleMapping, 'hospitalRole' | 'emergencyRoleId' | 'saasRole' | 'backendRole' | 'roleProfileId'>> = {},
+  options: Partial<
+    Omit<
+      CanonicalRoleMapping,
+      'hospitalRole' | 'emergencyRoleId' | 'saasRole' | 'backendRole' | 'roleProfileId'
+    >
+  > = {},
 ): CanonicalRoleMapping {
   return Object.freeze({
     hospitalRole,
@@ -418,7 +471,10 @@ function role(
 }
 
 function normalizeAlias(value: string): string {
-  return String(value || '').trim().toLowerCase().replace(/-/g, '_');
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/-/g, '_');
 }
 
 function filterActionsByCareDroidPermissions(
@@ -439,16 +495,24 @@ function unique<T>(values: readonly T[]): readonly T[] {
   return Object.freeze([...new Set(values)]);
 }
 
-function departmentScope(profile: Pick<CareDroidUserProfile, 'departmentId' | 'hospitalSiteId' | 'assignedPatients'>, scope: AccessScope['scope']): AccessScope {
+function departmentScope(
+  profile: Pick<CareDroidUserProfile, 'departmentId' | 'hospitalSiteId' | 'assignedPatients'>,
+  scope: AccessScope['scope'],
+): AccessScope {
   return Object.freeze({
     scope,
     departments: profile.departmentId ? Object.freeze([profile.departmentId]) : undefined,
     sites: profile.hospitalSiteId ? Object.freeze([profile.hospitalSiteId]) : undefined,
-    patientIds: profile.assignedPatients?.length ? Object.freeze([...profile.assignedPatients]) : undefined,
+    patientIds: profile.assignedPatients?.length
+      ? Object.freeze([...profile.assignedPatients])
+      : undefined,
   });
 }
 
-function buildRouteAccess(roleMapping: CanonicalRoleMapping, permissions: readonly string[]): readonly string[] {
+function buildRouteAccess(
+  roleMapping: CanonicalRoleMapping,
+  permissions: readonly string[],
+): readonly string[] {
   const emergencyDefinition = getEmergencyRoleDefinition(roleMapping.emergencyRoleId);
   const emergencyRoutes = emergencyDefinition?.routes || [];
   const permissionRoutes = ALL_CAREDROID_ROUTES.filter((route) => {
@@ -489,15 +553,18 @@ function buildDashboardProfile(role: HospitalRole, defaultRoute: string): Dashbo
 function routeAccessMatches(accessRoute: string, requestedPath: string): boolean {
   const normalizedAccess = normalizeRoutePath(accessRoute);
   const normalizedRequested = normalizeRoutePath(requestedPath);
-  if (normalizedRequested === normalizedAccess || normalizedRequested.startsWith(`${normalizedAccess}/`)) {
+  if (
+    normalizedRequested === normalizedAccess ||
+    normalizedRequested.startsWith(`${normalizedAccess}/`)
+  ) {
     return true;
   }
   const routeRecord = getRouteByPath(normalizedRequested);
   return Boolean(
     routeRecord &&
-      [routeRecord.path, routeRecord.redirectTo, ...(routeRecord.aliases || [])]
-        .filter(Boolean)
-        .some((path) => normalizeRoutePath(path) === normalizedAccess),
+    [routeRecord.path, routeRecord.redirectTo, ...(routeRecord.aliases || [])]
+      .filter(Boolean)
+      .some((path) => normalizeRoutePath(path) === normalizedAccess),
   );
 }
 
@@ -524,25 +591,60 @@ export function getCanonicalRoleMapping(roleLike: unknown): CanonicalRoleMapping
 }
 
 export function normalizeCareDroidProfile(
-  partial: Partial<CareDroidUserProfile> & Pick<CareDroidUserProfile, 'id' | 'employeeId' | 'fullName' | 'preferredName' | 'email' | 'phone' | 'avatarUrl' | 'role' | 'title' | 'department' | 'hospitalSite' | 'cityZone' | 'shiftStatus' | 'shiftStart' | 'shiftEnd' | 'licenseNumber' | 'specialties' | 'availabilityStatus' | 'escalationLevel'>,
+  partial: Partial<CareDroidUserProfile> &
+    Pick<
+      CareDroidUserProfile,
+      | 'id'
+      | 'employeeId'
+      | 'fullName'
+      | 'preferredName'
+      | 'email'
+      | 'phone'
+      | 'avatarUrl'
+      | 'role'
+      | 'title'
+      | 'department'
+      | 'hospitalSite'
+      | 'cityZone'
+      | 'shiftStatus'
+      | 'shiftStart'
+      | 'shiftEnd'
+      | 'licenseNumber'
+      | 'specialties'
+      | 'availabilityStatus'
+      | 'escalationLevel'
+    >,
 ): CareDroidUserProfile {
   const roleMapping = getCanonicalRoleMapping(partial.role);
-  const permissions = unique([...(partial.permissions || []), ...getPermissionsForRole(roleMapping.hospitalRole)]);
+  const permissions = unique([
+    ...(partial.permissions || []),
+    ...getPermissionsForRole(roleMapping.hospitalRole),
+  ]);
   const assignedPatients = Object.freeze([...(partial.assignedPatients || [])]);
   const baseProfile = {
     ...partial,
     organizationId: partial.organizationId || CAREDROID_ORGANIZATION_ID,
     networkId: partial.networkId || CAREDROID_NETWORK_ID,
-    hospitalSiteId: partial.hospitalSiteId || HOSPITAL_SITE_IDS[partial.hospitalSite] || normalizeAlias(partial.hospitalSite),
-    departmentId: partial.departmentId || DEPARTMENT_IDS[partial.department] || normalizeAlias(partial.department),
-    unitId: partial.unitId || `${DEPARTMENT_IDS[partial.department] || normalizeAlias(partial.department)}-unit`,
+    hospitalSiteId:
+      partial.hospitalSiteId ||
+      HOSPITAL_SITE_IDS[partial.hospitalSite] ||
+      normalizeAlias(partial.hospitalSite),
+    departmentId:
+      partial.departmentId ||
+      DEPARTMENT_IDS[partial.department] ||
+      normalizeAlias(partial.department),
+    unitId:
+      partial.unitId ||
+      `${DEPARTMENT_IDS[partial.department] || normalizeAlias(partial.department)}-unit`,
     careTeamIds: Object.freeze([...(partial.careTeamIds || [])]),
     role: roleMapping.hospitalRole,
     emergencyRoleId: partial.emergencyRoleId || roleMapping.emergencyRoleId,
     saasRole: partial.saasRole || roleMapping.saasRole,
     backendRole: partial.backendRole || roleMapping.backendRole,
     roleProfileId: partial.roleProfileId || roleMapping.roleProfileId,
-    credentials: Object.freeze([...(partial.credentials || deriveCredentials(partial, roleMapping))]),
+    credentials: Object.freeze([
+      ...(partial.credentials || deriveCredentials(partial, roleMapping)),
+    ]),
     notificationChannels: Object.freeze([
       ...(partial.notificationChannels || [{ type: 'in_app' as const, value: partial.id }]),
     ]),
@@ -558,7 +660,8 @@ export function normalizeCareDroidProfile(
       (permissions.includes(P.ALERT_ACKNOWLEDGE) && !roleMapping.readOnly),
     canUseAIChief:
       partial.canUseAIChief ??
-      ((permissions.includes(P.AI_REQUEST) || permissions.includes(P.AI_REVIEW)) && !roleMapping.readOnly),
+      ((permissions.includes(P.AI_REQUEST) || permissions.includes(P.AI_REVIEW)) &&
+        !roleMapping.readOnly),
     lastActiveAt: partial.lastActiveAt || new Date().toISOString(),
   } as CareDroidUserProfile;
 
@@ -567,19 +670,32 @@ export function normalizeCareDroidProfile(
     roleMapping.hospitalRole,
     pickDefaultRoute(roleMapping.hospitalRole, routeAccess),
   );
-  const patientScope = partial.patientAccessScope || departmentScope(baseProfile, roleMapping.admin ? 'site' : roleMapping.clinical ? 'department' : 'assigned');
+  const patientScope =
+    partial.patientAccessScope ||
+    departmentScope(
+      baseProfile,
+      roleMapping.admin ? 'site' : roleMapping.clinical ? 'department' : 'assigned',
+    );
 
   return Object.freeze({
     ...baseProfile,
     routeAccess,
     dashboardProfile,
     alertOwnershipScope:
-      partial.alertOwnershipScope || departmentScope(baseProfile, roleMapping.admin ? 'site' : 'department'),
+      partial.alertOwnershipScope ||
+      departmentScope(baseProfile, roleMapping.admin ? 'site' : 'department'),
     aiReviewScope:
-      partial.aiReviewScope || departmentScope(baseProfile, roleMapping.clinical ? 'department' : 'none'),
+      partial.aiReviewScope ||
+      departmentScope(baseProfile, roleMapping.clinical ? 'department' : 'none'),
     patientAccessScope: patientScope,
     auditScope:
-      partial.auditScope || departmentScope(baseProfile, roleMapping.admin || roleMapping.hospitalRole === 'quality_safety_officer' ? 'site' : 'self'),
+      partial.auditScope ||
+      departmentScope(
+        baseProfile,
+        roleMapping.admin || roleMapping.hospitalRole === 'quality_safety_officer'
+          ? 'site'
+          : 'self',
+      ),
   });
 }
 
@@ -595,16 +711,28 @@ function deriveCredentials(
   return roleMapping.admin ? ['Admin'] : [];
 }
 
-export function compileCareDroidAccessProfile(profile: CareDroidUserProfile): CompiledCareDroidAccessProfile {
+export function compileCareDroidAccessProfile(
+  profile: CareDroidUserProfile,
+): CompiledCareDroidAccessProfile {
   const user = normalizeCareDroidProfile(profile);
   const roleMapping = getCanonicalRoleMapping(user.role);
   const permissions = user.permissions;
-  const emergencyDefinitionActions = getEmergencyRoleDefinition(user.emergencyRoleId)?.actions || [];
-  const allowedActions = filterActionsByCareDroidPermissions(emergencyDefinitionActions, permissions);
+  const emergencyDefinitionActions =
+    getEmergencyRoleDefinition(user.emergencyRoleId)?.actions || [];
+  const allowedActions = filterActionsByCareDroidPermissions(
+    emergencyDefinitionActions,
+    permissions,
+  );
   return Object.freeze({
     user,
     role: roleMapping,
-    aliases: unique([user.role, user.emergencyRoleId, user.saasRole, user.backendRole, ...roleMapping.aliases]),
+    aliases: unique([
+      user.role,
+      user.emergencyRoleId,
+      user.saasRole,
+      user.backendRole,
+      ...roleMapping.aliases,
+    ]),
     permissions,
     routeAccess: user.routeAccess,
     navigationAccess: user.routeAccess,
@@ -622,7 +750,10 @@ export function compileCareDroidAccessProfile(profile: CareDroidUserProfile): Co
       canEscalate: permissions.includes(P.ALERT_ESCALATE),
       ownershipScope: user.alertOwnershipScope,
     }),
-    staffAssignmentScope: departmentScope(user, permissions.includes(P.STAFF_ASSIGN) ? 'department' : 'none'),
+    staffAssignmentScope: departmentScope(
+      user,
+      permissions.includes(P.STAFF_ASSIGN) ? 'department' : 'none',
+    ),
     dataAccessScope: user.patientAccessScope,
     readOnly: user.readOnly,
     emergencyAccess: Object.freeze({
@@ -635,7 +766,15 @@ export function compileCareDroidAccessProfile(profile: CareDroidUserProfile): Co
 
 export function canAccessRoute(
   compiledProfile: CompiledCareDroidAccessProfile | CareDroidUserProfile,
-  route: string | { path?: string; route?: string; redirectTo?: string; requiredPermissions?: readonly string[]; readOnlyAllowed?: boolean },
+  route:
+    | string
+    | {
+        path?: string;
+        route?: string;
+        redirectTo?: string;
+        requiredPermissions?: readonly string[];
+        readOnlyAllowed?: boolean;
+      },
 ): boolean {
   const profile =
     'navigationAccess' in compiledProfile
@@ -714,7 +853,10 @@ export function canMutateWithCompiledProfile(
       EMERGENCY_ACTIONS.manageFlags,
     ].includes(action as any)
   ) {
-    return compiledProfile.role.clinical && compiledProfile.emergencyAccess.allowedActions.includes(action);
+    return (
+      compiledProfile.role.clinical &&
+      compiledProfile.emergencyAccess.allowedActions.includes(action)
+    );
   }
   return compiledProfile.emergencyAccess.allowedActions.includes(action);
 }
@@ -755,7 +897,11 @@ export function getCompiledRoleLabel(roleLike: unknown): string {
 }
 
 export function emergencyRoleForHospitalRole(role: HospitalRole): string {
-  return CANONICAL_ROLE_CATALOG[role]?.emergencyRoleId || ROLE_TO_EMERGENCY_ROLE[role] || EMERGENCY_ROLE_IDS.readOnlyViewer;
+  return (
+    CANONICAL_ROLE_CATALOG[role]?.emergencyRoleId ||
+    ROLE_TO_EMERGENCY_ROLE[role] ||
+    EMERGENCY_ROLE_IDS.readOnlyViewer
+  );
 }
 
 export function normalizeCanonicalEmergencyRole(roleLike: unknown): string {

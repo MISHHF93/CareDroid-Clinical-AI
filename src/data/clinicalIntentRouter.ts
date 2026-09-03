@@ -19,15 +19,26 @@ function buildComplaintNavigationFlow(route) {
   return Object.freeze([
     Object.freeze({ step: 'Complaint', label: route.complaint }),
     Object.freeze({ step: 'Workflow', label: route.workflows?.[0] || 'Complaint workflow' }),
-    Object.freeze({ step: 'Calculators', label: joinLabels(route.calculators, 'No calculator required before clinician review') }),
+    Object.freeze({
+      step: 'Calculators',
+      label: joinLabels(route.calculators, 'No calculator required before clinician review'),
+    }),
     Object.freeze({ step: 'Protocols', label: joinLabels(route.protocols, 'Protocol review') }),
-    Object.freeze({ step: 'Referrals', label: joinLabels(route.referrals, 'Referral review if indicated') }),
-    Object.freeze({ step: 'AI Copilot', label: 'ED AI Copilot explains the complaint-specific pathway' }),
+    Object.freeze({
+      step: 'Referrals',
+      label: joinLabels(route.referrals, 'Referral review if indicated'),
+    }),
+    Object.freeze({
+      step: 'AI Copilot',
+      label: 'ED AI Copilot explains the complaint-specific pathway',
+    }),
   ]);
 }
 
 function freezeRoute(route) {
-  const calculators = Object.freeze((route.calculators || []).map((calculator) => Object.freeze(calculator)));
+  const calculators = Object.freeze(
+    (route.calculators || []).map((calculator) => Object.freeze(calculator)),
+  );
   const protocols = Object.freeze(route.protocols || []);
   const workflows = Object.freeze(route.workflows || []);
   const referrals = Object.freeze(route.referrals || []);
@@ -67,7 +78,14 @@ export const CLINICAL_INTENT_ROUTES = Object.freeze([
   freezeRoute({
     routeId: 'chief-complaint-stroke-symptoms',
     complaint: 'Stroke Symptoms',
-    aliases: ['stroke symptoms', 'stroke concern', 'weakness', 'facial droop', 'slurred speech', 'neuro deficit'],
+    aliases: [
+      'stroke symptoms',
+      'stroke concern',
+      'weakness',
+      'facial droop',
+      'slurred speech',
+      'neuro deficit',
+    ],
     calculators: [{ id: REGISTRY.nihss, label: 'NIHSS' }],
     protocols: ['stroke window workflow', 'imaging escalation pathway'],
     workflows: ['Stroke Workflow'],
@@ -81,7 +99,13 @@ export const CLINICAL_INTENT_ROUTES = Object.freeze([
   freezeRoute({
     routeId: 'chief-complaint-sepsis-concern',
     complaint: 'Sepsis Concern',
-    aliases: ['sepsis concern', 'possible sepsis', 'infection', 'fever hypotension', 'tachypnea infection'],
+    aliases: [
+      'sepsis concern',
+      'possible sepsis',
+      'infection',
+      'fever hypotension',
+      'tachypnea infection',
+    ],
     calculators: [
       { id: REGISTRY.qsofa, label: 'qSOFA' },
       { id: REGISTRY.news2, label: 'NEWS2' },
@@ -98,7 +122,14 @@ export const CLINICAL_INTENT_ROUTES = Object.freeze([
   freezeRoute({
     routeId: 'chief-complaint-trauma',
     complaint: 'Trauma',
-    aliases: ['trauma', 'trauma activation', 'mvc', 'fall injury', 'penetrating trauma', 'blunt trauma'],
+    aliases: [
+      'trauma',
+      'trauma activation',
+      'mvc',
+      'fall injury',
+      'penetrating trauma',
+      'blunt trauma',
+    ],
     calculators: [
       { id: REGISTRY.shockIndex, label: 'Shock Index' },
       { id: REGISTRY.revisedTraumaScore, label: 'Revised Trauma Score' },
@@ -129,13 +160,24 @@ export const CLINICAL_INTENT_ROUTES = Object.freeze([
   freezeRoute({
     routeId: 'chief-complaint-abdominal-pain',
     complaint: 'Abdominal Pain',
-    aliases: ['abdominal pain', 'belly pain', 'gi bleed', 'pancreatitis', 'surgical abdomen', 'vomiting'],
+    aliases: [
+      'abdominal pain',
+      'belly pain',
+      'gi bleed',
+      'pancreatitis',
+      'surgical abdomen',
+      'vomiting',
+    ],
     calculators: [
       { id: REGISTRY.ransonCriteria, label: 'Ranson Criteria' },
       { id: REGISTRY.bisapScore, label: 'BISAP' },
       { id: REGISTRY.glasgowBlatchfordScore, label: 'Glasgow-Blatchford' },
     ],
-    protocols: ['Abdominal Pain Pathway', 'GI bleed and pancreatitis review', 'surgical abdomen red flag review'],
+    protocols: [
+      'Abdominal Pain Pathway',
+      'GI bleed and pancreatitis review',
+      'surgical abdomen red flag review',
+    ],
     workflows: ['Abdominal Pain Workflow'],
     simulations: ['abdominal pain escalation simulation'],
     referrals: ['Surgery or GI referral review'],
@@ -173,7 +215,10 @@ export const CLINICAL_INTENT_ROUTES = Object.freeze([
 ]);
 
 function normalizeComplaintText(complaint = '') {
-  return String(complaint).trim().toLowerCase().replace(/[^a-z0-9]+/g, ' ');
+  return String(complaint)
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ');
 }
 
 const ROUTES_BY_ID = new Map(CLINICAL_INTENT_ROUTES.map((route) => [route.routeId, route]));
@@ -207,7 +252,7 @@ export function routeClinicalIntent(complaint = '') {
     candidate.aliases.some((alias) => {
       const normalizedAlias = normalizeComplaintText(alias);
       return normalized.includes(normalizedAlias) || normalizedAlias.includes(normalized);
-    })
+    }),
   );
 
   if (!route) {

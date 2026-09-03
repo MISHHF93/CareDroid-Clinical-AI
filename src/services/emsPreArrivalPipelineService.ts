@@ -17,7 +17,8 @@ export const EMS_PRE_ARRIVAL_WORKFLOW = Object.freeze([
   Object.freeze({
     id: 'risk-profile',
     label: 'Risk Profile',
-    description: 'Risk score bundle summarizes high-risk signals without making autonomous decisions.',
+    description:
+      'Risk score bundle summarizes high-risk signals without making autonomous decisions.',
   }),
   Object.freeze({
     id: 'ed-notification',
@@ -69,7 +70,12 @@ export const DEFAULT_EMS_INCOMING_PATIENTS = Object.freeze([
     }),
     riskScoreBundle: Object.freeze([
       Object.freeze({ id: 'shock-index', label: 'Shock Index', value: '1.28', riskLevel: 'high' }),
-      Object.freeze({ id: 'heart', label: 'HEART context', value: 'Needs ED review', riskLevel: 'medium' }),
+      Object.freeze({
+        id: 'heart',
+        label: 'HEART context',
+        value: 'Needs ED review',
+        riskLevel: 'medium',
+      }),
     ]),
     riskIndicators: Object.freeze(['hypotension', 'tachycardia', 'diaphoresis', 'possible ACS']),
     riskLevel: 'critical',
@@ -92,8 +98,18 @@ export const DEFAULT_EMS_INCOMING_PATIENTS = Object.freeze([
       temperature: '36.9 C',
     }),
     riskScoreBundle: Object.freeze([
-      Object.freeze({ id: 'nihss', label: 'NIHSS context', value: 'Screen positive', riskLevel: 'high' }),
-      Object.freeze({ id: 'stroke-window', label: 'Stroke window', value: 'Under review', riskLevel: 'critical' }),
+      Object.freeze({
+        id: 'nihss',
+        label: 'NIHSS context',
+        value: 'Screen positive',
+        riskLevel: 'high',
+      }),
+      Object.freeze({
+        id: 'stroke-window',
+        label: 'Stroke window',
+        value: 'Under review',
+        riskLevel: 'critical',
+      }),
     ]),
     riskIndicators: Object.freeze(['facial droop', 'speech change', 'stroke window review']),
     riskLevel: 'critical',
@@ -116,8 +132,18 @@ export const DEFAULT_EMS_INCOMING_PATIENTS = Object.freeze([
       temperature: '38.1 C',
     }),
     riskScoreBundle: Object.freeze([
-      Object.freeze({ id: 'news2', label: 'NEWS2 context', value: 'Elevated respiratory risk', riskLevel: 'high' }),
-      Object.freeze({ id: 'wells-pe', label: 'Wells PE context', value: 'Consider review', riskLevel: 'medium' }),
+      Object.freeze({
+        id: 'news2',
+        label: 'NEWS2 context',
+        value: 'Elevated respiratory risk',
+        riskLevel: 'high',
+      }),
+      Object.freeze({
+        id: 'wells-pe',
+        label: 'Wells PE context',
+        value: 'Consider review',
+        riskLevel: 'medium',
+      }),
     ]),
     riskIndicators: Object.freeze(['tachypnea', 'hypoxia', 'fever', 'respiratory distress']),
     riskLevel: 'high',
@@ -232,12 +258,18 @@ export const EmsPreArrivalPipelineService = Object.freeze({
           EMS_HANDOFF_STATUSES.map((status) => [
             status,
             incomingPatients.filter((patient) => patient.handoffStatus === status).length,
-          ])
-        )
+          ]),
+        ),
       ),
-      nextArrival: incomingPatients.length ? incomingPatients.reduce((soonest, patient) => (patient.etaMinutes < soonest.etaMinutes ? patient : soonest)) : null,
+      nextArrival: incomingPatients.length
+        ? incomingPatients.reduce((soonest, patient) =>
+            patient.etaMinutes < soonest.etaMinutes ? patient : soonest,
+          )
+        : null,
       criticalCount: incomingPatients.filter((patient) => patient.riskLevel === 'critical').length,
-      pendingNotifications: incomingPatients.filter((patient) => patient.notificationStatus !== 'sent').length,
+      pendingNotifications: incomingPatients.filter(
+        (patient) => patient.notificationStatus !== 'sent',
+      ).length,
     });
   },
 
@@ -252,16 +284,27 @@ export const EmsPreArrivalPipelineService = Object.freeze({
       averageEtaMinutes: etaValues.length
         ? Math.round(etaValues.reduce((sum, eta) => sum + eta, 0) / etaValues.length)
         : 0,
-      handoffReadyCount: queue.incomingPatients.filter((patient) => patient.handoffSummary && patient.riskScoreBundle.length).length,
-      whiteboardVisibleCount: queue.incomingPatients.filter((patient) => patient.handoffStatus !== 'Arrived').length,
-      journeyAttachmentCount: queue.incomingPatients.filter((patient) => patient.edHandoffSummary?.attachedToPatientJourney).length,
+      handoffReadyCount: queue.incomingPatients.filter(
+        (patient) => patient.handoffSummary && patient.riskScoreBundle.length,
+      ).length,
+      whiteboardVisibleCount: queue.incomingPatients.filter(
+        (patient) => patient.handoffStatus !== 'Arrived',
+      ).length,
+      journeyAttachmentCount: queue.incomingPatients.filter(
+        (patient) => patient.edHandoffSummary?.attachedToPatientJourney,
+      ).length,
     });
   },
 
   getPreArrivalRecommendations(patients = mergedIncomingPatients()) {
     return Object.freeze(
       this.getIncomingPatients(patients)
-        .filter((patient) => patient.riskLevel === 'critical' || patient.notificationStatus !== 'sent' || patient.etaMinutes <= 10)
+        .filter(
+          (patient) =>
+            patient.riskLevel === 'critical' ||
+            patient.notificationStatus !== 'sent' ||
+            patient.etaMinutes <= 10,
+        )
         .map((patient) =>
           Object.freeze({
             id: `${patient.id}-ed-prep`,
@@ -269,9 +312,10 @@ export const EmsPreArrivalPipelineService = Object.freeze({
             title: `Prepare for ${patient.patientLabel}`,
             priority: patient.riskLevel,
             rationale: `${patient.unit} ETA ${patient.etaMinutes} min: ${patient.complaint}.`,
-            action: 'Review EMS handoff, risk score bundle, room readiness, and clinician notification before arrival.',
-          })
-        )
+            action:
+              'Review EMS handoff, risk score bundle, room readiness, and clinician notification before arrival.',
+          }),
+        ),
     );
   },
 
@@ -286,7 +330,9 @@ export const EmsPreArrivalPipelineService = Object.freeze({
       workflow: this.getWorkflow(),
       queue,
       metrics: this.getPreArrivalMetrics(patients),
-      edHandoffSummaries: Object.freeze(queue.incomingPatients.map((patient) => patient.edHandoffSummary)),
+      edHandoffSummaries: Object.freeze(
+        queue.incomingPatients.map((patient) => patient.edHandoffSummary),
+      ),
       recommendations: this.getPreArrivalRecommendations(patients),
       safetyStatement:
         'EMS pre-arrival context supports ED preparation only. Clinicians remain responsible for triage, diagnosis, orders, and disposition.',
@@ -294,15 +340,22 @@ export const EmsPreArrivalPipelineService = Object.freeze({
   },
 });
 
-export const getEmsPreArrivalWorkflow = EmsPreArrivalPipelineService.getWorkflow.bind(EmsPreArrivalPipelineService);
-export const getIncomingPatients = EmsPreArrivalPipelineService.getIncomingPatients.bind(EmsPreArrivalPipelineService);
-export const getPreArrivalQueue = EmsPreArrivalPipelineService.getPreArrivalQueue.bind(EmsPreArrivalPipelineService);
-export const getPreArrivalMetrics = EmsPreArrivalPipelineService.getPreArrivalMetrics.bind(EmsPreArrivalPipelineService);
-export const getPreArrivalRecommendations = EmsPreArrivalPipelineService.getPreArrivalRecommendations.bind(
-  EmsPreArrivalPipelineService
+export const getEmsPreArrivalWorkflow = EmsPreArrivalPipelineService.getWorkflow.bind(
+  EmsPreArrivalPipelineService,
 );
+export const getIncomingPatients = EmsPreArrivalPipelineService.getIncomingPatients.bind(
+  EmsPreArrivalPipelineService,
+);
+export const getPreArrivalQueue = EmsPreArrivalPipelineService.getPreArrivalQueue.bind(
+  EmsPreArrivalPipelineService,
+);
+export const getPreArrivalMetrics = EmsPreArrivalPipelineService.getPreArrivalMetrics.bind(
+  EmsPreArrivalPipelineService,
+);
+export const getPreArrivalRecommendations =
+  EmsPreArrivalPipelineService.getPreArrivalRecommendations.bind(EmsPreArrivalPipelineService);
 export const getPreArrivalDashboard = EmsPreArrivalPipelineService.getPreArrivalDashboard.bind(
-  EmsPreArrivalPipelineService
+  EmsPreArrivalPipelineService,
 );
 
 export default EmsPreArrivalPipelineService;

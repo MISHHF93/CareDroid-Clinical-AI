@@ -115,9 +115,7 @@ describe('emergencyRoleActionMatrix', () => {
 
   it('grants admin full action control', () => {
     for (const actionId of Object.values(EMERGENCY_ROLE_ACTIONS)) {
-      expect(
-        resolveEmergencyRoleActionState(EMERGENCY_ROLE_ID.admin, actionId),
-      ).toBe('allowed');
+      expect(resolveEmergencyRoleActionState(EMERGENCY_ROLE_ID.admin, actionId)).toBe('allowed');
     }
   });
 

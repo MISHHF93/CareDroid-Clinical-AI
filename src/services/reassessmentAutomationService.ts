@@ -97,13 +97,15 @@ function getThresholdSignals(patient) {
       waitingExceeded
         ? `waiting duration ${patient.waitDuration} min exceeds ${patient.waitingThreshold} min threshold`
         : null,
-      riskElevated ? `risk score ${patient.riskScore} meets ${patient.riskThreshold} threshold` : null,
+      riskElevated
+        ? `risk score ${patient.riskScore} meets ${patient.riskThreshold} threshold`
+        : null,
       riskScoreChanged ? `risk score changed +${riskChange} since last assessment` : null,
       abnormalVitals.length ? `abnormal vitals: ${abnormalVitals.join(', ')}` : null,
       reassessmentIntervalExceeded
         ? `reassessment interval ${patient.minutesSinceLastAssessment} min exceeds ${patient.reassessmentIntervalMinutes} min`
         : null,
-    ].filter(Boolean)
+    ].filter(Boolean),
   );
 }
 
@@ -114,10 +116,18 @@ function getTriggerReason(patient) {
 
 function getPriority(patient, triggerReason, thresholdSignals = [] as any[]) {
   if (!triggerReason) return 'normal';
-  if (patient.riskScore >= 85 || patient.waitDuration >= patient.waitingThreshold * 2 || thresholdSignals.length >= 4) {
+  if (
+    patient.riskScore >= 85 ||
+    patient.waitDuration >= patient.waitingThreshold * 2 ||
+    thresholdSignals.length >= 4
+  ) {
     return 'critical';
   }
-  if (patient.riskScore >= patient.riskThreshold || patient.waitDuration >= patient.waitingThreshold + 20 || thresholdSignals.length >= 2) {
+  if (
+    patient.riskScore >= patient.riskThreshold ||
+    patient.waitDuration >= patient.waitingThreshold + 20 ||
+    thresholdSignals.length >= 2
+  ) {
     return 'urgent';
   }
   return 'normal';
@@ -190,7 +200,8 @@ export const ReassessmentAutomationService = Object.freeze({
       items: Object.freeze(items),
       alerts: Object.freeze(items.map((item) => item.alert)),
       thresholds: REASSESSMENT_INTELLIGENCE_THRESHOLDS,
-      preventionGoal: 'Prevent forgotten patients by surfacing Needs Reassessment alerts on the Emergency Whiteboard.',
+      preventionGoal:
+        'Prevent forgotten patients by surfacing Needs Reassessment alerts on the Emergency Whiteboard.',
       sourceState: 'Demo data · No live integration',
       safetyStatement:
         'Reassessment recommendations are operational prompts only. Clinicians remain responsible for reassessment and acuity decisions.',
@@ -207,8 +218,8 @@ export const ReassessmentAutomationService = Object.freeze({
           priority: item.priority,
           rationale: `${item.triggerReason}: ${item.waitDuration} min wait, risk score ${item.riskScore}.`,
           action: item.recommendedAction,
-        })
-      )
+        }),
+      ),
     );
   },
 
@@ -228,7 +239,7 @@ export const ReassessmentAutomationService = Object.freeze({
         abnormalVitals: queue.items.filter((item) => item.abnormalVitals.length).length,
         riskScoreChanges: queue.items.filter((item) => item.riskScoreChange > 0).length,
         reassessmentIntervalsExceeded: queue.items.filter(
-          (item) => item.minutesSinceLastAssessment >= item.reassessmentIntervalMinutes
+          (item) => item.minutesSinceLastAssessment >= item.reassessmentIntervalMinutes,
         ).length,
       }),
     });

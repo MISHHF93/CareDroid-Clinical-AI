@@ -114,7 +114,9 @@ function mapUnifiedOperationalBottlenecks(
 ): readonly HospitalCommandBottleneck[] {
   return Object.freeze(
     snapshot.insights
-      .filter((insight) => insight.type === 'bottleneck' || insight.type === 'congestion_prediction')
+      .filter(
+        (insight) => insight.type === 'bottleneck' || insight.type === 'congestion_prediction',
+      )
       .slice(0, 6)
       .map((insight) =>
         Object.freeze({
@@ -165,23 +167,25 @@ function throughputMetric(
   };
 }
 
-export function buildHospitalCommandCenterSnapshot(input: {
-  patients?: Patient[];
-  staff?: Staff[];
-  alerts?: Alert[];
-  emsArrivals?: EMSArrival[];
-  capacity?: CapacitySnapshot;
-  centralSnapshot?: CareDroidCentralNodeSnapshot;
-  intelligenceSnapshot?: OperationalIntelligenceSnapshot | null;
-  emergencySettings?: Record<string, unknown>;
-  referrals?: Array<{ status?: string }>;
-  hourlyArrivals?: Array<{ hour: string; count: number }>;
-  patientFlowSnapshot?: ContinuousPatientFlowSnapshot | null;
-  administrativeAutomationQueue?: AdministrativeAutomationTask[];
-  knowledgeGraphSummary?: DashboardKnowledgeGraphSummary;
-  unifiedOperationalSnapshot?: UnifiedOperationalIntelligenceSnapshot | null;
-  now?: Date;
-} = {}): HospitalCommandCenterSnapshot {
+export function buildHospitalCommandCenterSnapshot(
+  input: {
+    patients?: Patient[];
+    staff?: Staff[];
+    alerts?: Alert[];
+    emsArrivals?: EMSArrival[];
+    capacity?: CapacitySnapshot;
+    centralSnapshot?: CareDroidCentralNodeSnapshot;
+    intelligenceSnapshot?: OperationalIntelligenceSnapshot | null;
+    emergencySettings?: Record<string, unknown>;
+    referrals?: Array<{ status?: string }>;
+    hourlyArrivals?: Array<{ hour: string; count: number }>;
+    patientFlowSnapshot?: ContinuousPatientFlowSnapshot | null;
+    administrativeAutomationQueue?: AdministrativeAutomationTask[];
+    knowledgeGraphSummary?: DashboardKnowledgeGraphSummary;
+    unifiedOperationalSnapshot?: UnifiedOperationalIntelligenceSnapshot | null;
+    now?: Date;
+  } = {},
+): HospitalCommandCenterSnapshot {
   const now = input.now || new Date();
   const patients = input.patients || [];
   const staff = input.staff || [];
@@ -239,10 +243,8 @@ export function buildHospitalCommandCenterSnapshot(input: {
   const avgLosMinutes =
     activePatients.length > 0
       ? Math.round(
-          activePatients.reduce(
-            (sum, patient) => sum + minutesSince(patient.arrivalTime, now),
-            0,
-          ) / activePatients.length,
+          activePatients.reduce((sum, patient) => sum + minutesSince(patient.arrivalTime, now), 0) /
+            activePatients.length,
         )
       : 0;
 
@@ -258,7 +260,8 @@ export function buildHospitalCommandCenterSnapshot(input: {
   );
 
   const unifiedOperational = input.unifiedOperationalSnapshot;
-  const useBackendOperationalIntelligence = isAuthoritativeUnifiedOperationalSnapshot(unifiedOperational);
+  const useBackendOperationalIntelligence =
+    isAuthoritativeUnifiedOperationalSnapshot(unifiedOperational);
   const unifiedMetrics = useBackendOperationalIntelligence ? unifiedOperational.metrics : null;
 
   const bottleneckFindings = useBackendOperationalIntelligence
@@ -281,7 +284,7 @@ export function buildHospitalCommandCenterSnapshot(input: {
     ? unifiedOperational!.insights.filter(
         (insight) => insight.type === 'bottleneck' || insight.type === 'congestion_prediction',
       ).length
-    : journey.liveServiceSummaries.bottlenecks?.activeBottlenecks?.length ?? 0;
+    : (journey.liveServiceSummaries.bottlenecks?.activeBottlenecks?.length ?? 0);
 
   const flowRecommendations =
     input.patientFlowSnapshot?.aiRecommendations?.slice(0, 5).map((rec) =>
@@ -322,7 +325,7 @@ export function buildHospitalCommandCenterSnapshot(input: {
   const nursesAvailable = countStaffByRoles(staff, NURSE_ROLES);
   const bedCapacityLabel = capacity
     ? `${capacity.occupiedRooms ?? capacity.currentOccupancy ?? 0}/${capacity.maxCapacity ?? capacity.staffedRoomCount ?? '—'}`
-    : throughputMetric(throughput, 'capacity-score')?.value ?? '—';
+    : (throughputMetric(throughput, 'capacity-score')?.value ?? '—');
 
   const triageBreached = throughputMetric(throughput, 'triage-breached');
   const emsInbound = throughputMetric(throughput, 'ems-inbound');
@@ -336,7 +339,7 @@ export function buildHospitalCommandCenterSnapshot(input: {
           ? `${unifiedMetrics.capacityScore}%`
           : occupancyPercent != null
             ? `${occupancyPercent}%`
-            : capacity?.band ?? '—',
+            : (capacity?.band ?? '—'),
       detail: `Capacity band ${unifiedMetrics?.capacityBand ?? capacity?.band ?? journey.metrics.capacityBand}`,
       tone: toneFromCapacityBand(
         unifiedMetrics?.capacityBand ?? capacity?.band ?? journey.metrics.capacityBand,
@@ -395,7 +398,8 @@ export function buildHospitalCommandCenterSnapshot(input: {
       id: 'bed-capacity',
       label: 'Bed capacity',
       value: bedCapacityLabel,
-      detail: throughputMetric(throughput, 'boarding-duration')?.detail || 'Occupied / staffed beds',
+      detail:
+        throughputMetric(throughput, 'boarding-duration')?.detail || 'Occupied / staffed beds',
       tone: toneFromCapacityBand(capacity?.band),
       route: CANONICAL_ROUTES.emergencyCapacity,
     },
@@ -403,7 +407,9 @@ export function buildHospitalCommandCenterSnapshot(input: {
       id: 'ems-arrivals',
       label: 'EMS arrivals',
       value: unifiedMetrics?.inboundEms ?? emsInbound?.value ?? inboundEms.length,
-      detail: emsInbound?.detail || `${unifiedMetrics?.inboundEms ?? inboundEms.length} inbound ambulances`,
+      detail:
+        emsInbound?.detail ||
+        `${unifiedMetrics?.inboundEms ?? inboundEms.length} inbound ambulances`,
       tone:
         (emsInbound?.tone as HospitalCommandTone) ||
         metricTone(unifiedMetrics?.inboundEms ?? inboundEms.length, 2, 4),
@@ -429,9 +435,7 @@ export function buildHospitalCommandCenterSnapshot(input: {
       // badge, and the detail list itself) already uses. Using the same bottleneckCount here
       // keeps all three "how many bottlenecks" surfaces on this screen in agreement.
       value: bottleneckCount,
-      detail:
-        bottleneckFindings[0]?.title ||
-        'No active bottleneck signals',
+      detail: bottleneckFindings[0]?.title || 'No active bottleneck signals',
       tone: metricTone(bottleneckCount, 1, 3),
       route: CANONICAL_ROUTES.emergencyReports,
     },
@@ -439,10 +443,11 @@ export function buildHospitalCommandCenterSnapshot(input: {
       id: 'ai-recommendations',
       label: 'AI recommendations',
       value: unifiedMetrics?.aiRecommendationCount ?? oiRecommendations.length,
-      detail:
-        oiRecommendations[0]?.action ||
-        'CareDroid Copilot — review case-aware suggestions',
-      tone: (unifiedMetrics?.aiRecommendationCount ?? oiRecommendations.length) > 0 ? 'watch' : 'stable',
+      detail: oiRecommendations[0]?.action || 'CareDroid Copilot — review case-aware suggestions',
+      tone:
+        (unifiedMetrics?.aiRecommendationCount ?? oiRecommendations.length) > 0
+          ? 'watch'
+          : 'stable',
       route: CANONICAL_ROUTES.emergencyCopilot,
     },
     {
@@ -456,7 +461,10 @@ export function buildHospitalCommandCenterSnapshot(input: {
     {
       id: 'three-minute-compliance',
       label: '3-minute compliance',
-      value: journey.metrics.threeMinuteBreaches > 0 ? `${journey.metrics.threeMinuteBreaches} breach` : 'On track',
+      value:
+        journey.metrics.threeMinuteBreaches > 0
+          ? `${journey.metrics.threeMinuteBreaches} breach`
+          : 'On track',
       detail: `${journey.metrics.activeJourneyTraces} active traces · ${journey.principle}`,
       tone: journey.metrics.threeMinuteBreaches > 0 ? 'critical' : 'stable',
       route: CANONICAL_ROUTES.emergencyCommandCenter,
@@ -465,10 +473,14 @@ export function buildHospitalCommandCenterSnapshot(input: {
 
   const statusParts: string[] = [];
   if (journey.metrics.threeMinuteBreaches > 0) {
-    statusParts.push(`${journey.metrics.threeMinuteBreaches} three-minute breach${journey.metrics.threeMinuteBreaches === 1 ? '' : 'es'}`);
+    statusParts.push(
+      `${journey.metrics.threeMinuteBreaches} three-minute breach${journey.metrics.threeMinuteBreaches === 1 ? '' : 'es'}`,
+    );
   }
   if (unresolvedClinical.length > 0) {
-    statusParts.push(`${unresolvedClinical.length} unresolved critical alert${unresolvedClinical.length === 1 ? '' : 's'}`);
+    statusParts.push(
+      `${unresolvedClinical.length} unresolved critical alert${unresolvedClinical.length === 1 ? '' : 's'}`,
+    );
   }
   if (waitingPatients.length > 0) {
     statusParts.push(`${waitingPatients.length} waiting`);
@@ -480,9 +492,12 @@ export function buildHospitalCommandCenterSnapshot(input: {
     statusParts.push(`${input.patientFlowSnapshot.metrics.activeDetections} flow signals`);
   }
   const pendingAutomations =
-    input.administrativeAutomationQueue?.filter((task) => task.status === 'pending_review').length || 0;
+    input.administrativeAutomationQueue?.filter((task) => task.status === 'pending_review')
+      .length || 0;
   if (pendingAutomations > 0) {
-    statusParts.push(`${pendingAutomations} automation${pendingAutomations === 1 ? '' : 's'} to review`);
+    statusParts.push(
+      `${pendingAutomations} automation${pendingAutomations === 1 ? '' : 's'} to review`,
+    );
   }
   if (input.knowledgeGraphSummary?.criticalNodes.length) {
     statusParts.push(
@@ -506,7 +521,9 @@ export function buildHospitalCommandCenterSnapshot(input: {
     generatedAt: journey.generatedAt,
     statusLine,
     ownerRole: topAction?.owner || 'Charge nurse',
-    nextAction: topAction?.active ? topAction.nextAction : 'Monitor live metrics and assign next owner',
+    nextAction: topAction?.active
+      ? topAction.nextAction
+      : 'Monitor live metrics and assign next owner',
     tone: overallTone,
     metrics: Object.freeze(metrics),
     bottlenecks: Object.freeze(bottleneckFindings),

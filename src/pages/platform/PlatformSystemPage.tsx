@@ -34,7 +34,8 @@ function capabilityPath(capability: { route: string }, patientId = 'demo-patient
 }
 
 function inferHubPack(pathname: string) {
-  if ((HUB_BY_PATH as Record<string, string>)[pathname]) return (HUB_BY_PATH as Record<string, string>)[pathname];
+  if ((HUB_BY_PATH as Record<string, string>)[pathname])
+    return (HUB_BY_PATH as Record<string, string>)[pathname];
   if (pathname.includes('/workflows')) return PLATFORM_SYSTEM_PACKS.AI_WORKFLOW;
   if (pathname.includes('/documentation')) return PLATFORM_SYSTEM_PACKS.DOCUMENTATION;
   return null;
@@ -132,7 +133,9 @@ export default function PlatformSystemPage({ pack }: { pack?: string }) {
           <GraphicIconBadge iconKey={view.iconKey} accent="brand" size="md" />
           <div>
             <p className="platform-system-page__eyebrow">{view.eyebrow}</p>
-            <p className="platform-system-page-title-text" data-testid="cd-page-title-text">{view.title}</p>
+            <p className="platform-system-page-title-text" data-testid="cd-page-title-text">
+              {view.title}
+            </p>
             <p>{view.summary}</p>
           </div>
         </div>
@@ -154,11 +157,19 @@ export default function PlatformSystemPage({ pack }: { pack?: string }) {
 
       <StateSourceNotice
         title="Platform systems source state"
-        states={[DEMO_LIVE_STATES.DEMO, DEMO_LIVE_STATES.SIMULATED, DEMO_LIVE_STATES.BACKEND_UNAVAILABLE]}
+        states={[
+          DEMO_LIVE_STATES.DEMO,
+          DEMO_LIVE_STATES.SIMULATED,
+          DEMO_LIVE_STATES.BACKEND_UNAVAILABLE,
+        ]}
         details="Platform capability contracts load from backend APIs with demo review-required fallbacks when integrations are unavailable."
       />
 
-      <div className="platform-system-page__metrics" role="group" aria-label="Platform system summary metrics">
+      <div
+        className="platform-system-page__metrics"
+        role="group"
+        aria-label="Platform system summary metrics"
+      >
         {view.metrics.map((metric) => (
           <MetricCard
             key={metric.label}
@@ -199,25 +210,40 @@ export default function PlatformSystemPage({ pack }: { pack?: string }) {
       <section className="platform-system-page__panel" aria-label="Backend contract">
         <h2>Backend contract</h2>
         <div className="platform-system-page__table" role="table">
-          <div className="platform-system-page__table-head platform-system-page__table-row--two-col" role="row">
+          <div
+            className="platform-system-page__table-head platform-system-page__table-row--two-col"
+            role="row"
+          >
             <span role="columnheader">Field</span>
             <span role="columnheader">Value</span>
           </div>
-          <div className="platform-system-page__table-row platform-system-page__table-row--two-col" role="row">
+          <div
+            className="platform-system-page__table-row platform-system-page__table-row--two-col"
+            role="row"
+          >
             <span role="cell">Endpoint</span>
             <span role="cell">{view.contract.endpoint}</span>
           </div>
-          <div className="platform-system-page__table-row platform-system-page__table-row--two-col" role="row">
+          <div
+            className="platform-system-page__table-row platform-system-page__table-row--two-col"
+            role="row"
+          >
             <span role="cell">Method</span>
             <span role="cell">{view.contract.method}</span>
           </div>
-          <div className="platform-system-page__table-row platform-system-page__table-row--two-col" role="row">
+          <div
+            className="platform-system-page__table-row platform-system-page__table-row--two-col"
+            role="row"
+          >
             <span role="cell">DTO</span>
             <span role="cell">
               {view.contract.requestDto} → {view.contract.responseDto}
             </span>
           </div>
-          <div className="platform-system-page__table-row platform-system-page__table-row--two-col" role="row">
+          <div
+            className="platform-system-page__table-row platform-system-page__table-row--two-col"
+            role="row"
+          >
             <span role="cell">Executor</span>
             <span role="cell">{view.contract.executor}</span>
           </div>
@@ -236,7 +262,9 @@ export default function PlatformSystemPage({ pack }: { pack?: string }) {
             <div key={row.label} className="platform-system-page__table-row" role="row">
               <span role="cell">{row.label}</span>
               <span role="cell">
-                <span className={`platform-system-page__pill platform-system-page__pill--${view.statusTone(row.status)}`}>
+                <span
+                  className={`platform-system-page__pill platform-system-page__pill--${view.statusTone(row.status)}`}
+                >
                   {row.status}
                 </span>
               </span>
@@ -246,20 +274,32 @@ export default function PlatformSystemPage({ pack }: { pack?: string }) {
         </div>
       </section>
 
-      <section className="platform-system-page__panel" aria-labelledby="platform-capabilities-title">
+      <section
+        className="platform-system-page__panel"
+        aria-labelledby="platform-capabilities-title"
+      >
         <h2 id="platform-capabilities-title">
           {hubPack ? `${hubPack} capabilities` : 'Platform capabilities'}
         </h2>
-        <p>Every capability has a canonical ID, route, permission policy, API contract, and safety state.</p>
+        <p>
+          Every capability has a canonical ID, route, permission policy, API contract, and safety
+          state.
+        </p>
         <div className="platform-system-page__cards">
           {(packCapabilities.length ? packCapabilities : view.packCapabilities).map((item) => (
-            <Link key={item.id} className="platform-system-page__card" to={capabilityPath(item, patientId)}>
+            <Link
+              key={item.id}
+              className="platform-system-page__card"
+              to={capabilityPath(item, patientId)}
+            >
               <span className="platform-system-page__card-meta">
                 {item.pack} · Tier {item.tier}
               </span>
               <strong>{item.name}</strong>
               <span>{item.summary}</span>
-              <span className={`platform-system-page__pill platform-system-page__pill--${platformSystemScoreTone(tierScore(item.tier))}`}>
+              <span
+                className={`platform-system-page__pill platform-system-page__pill--${platformSystemScoreTone(tierScore(item.tier))}`}
+              >
                 {item.criticality}
               </span>
             </Link>

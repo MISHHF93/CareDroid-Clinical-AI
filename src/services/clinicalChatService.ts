@@ -118,12 +118,13 @@ export async function sendClinicalChatMessage({
       requestType: 'COPILOT_CHAT',
       systemPrompt: '',
       message,
-      messages: Array.isArray(messages) && messages.length
-        ? messages.map((entry) => ({
-            role: entry.role === 'assistant' ? 'assistant' : 'user',
-            content: String(entry.content || ''),
-          }))
-        : [{ role: 'user', content: message }],
+      messages:
+        Array.isArray(messages) && messages.length
+          ? messages.map((entry) => ({
+              role: entry.role === 'assistant' ? 'assistant' : 'user',
+              content: String(entry.content || ''),
+            }))
+          : [{ role: 'user', content: message }],
       patientId,
       encounterId,
       sourceScreen: sourceModule,
@@ -247,7 +248,8 @@ export function normalizeAiFoundationMetadata(metadata: any = {}) {
   const selectedExperts =
     Array.isArray(foundation.selectedExperts) && foundation.selectedExperts.length > 0
       ? foundation.selectedExperts
-      : Array.isArray(metadata.routePlan?.selectedExperts) && metadata.routePlan.selectedExperts.length > 0
+      : Array.isArray(metadata.routePlan?.selectedExperts) &&
+          metadata.routePlan.selectedExperts.length > 0
         ? metadata.routePlan.selectedExperts
         : foundation.selectedExpert
           ? [
@@ -353,7 +355,8 @@ export function mapChatResponseToAssistantMessage(data) {
 
   return {
     role: 'assistant',
-    content: data.response || accountableRecommendation?.content || 'I could not generate a response.',
+    content:
+      data.response || accountableRecommendation?.content || 'I could not generate a response.',
     citations: data.citations || [],
     confidence:
       data.confidence ??

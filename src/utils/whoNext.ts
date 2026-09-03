@@ -3,8 +3,8 @@ import { getSavedScores } from './clinicalScoreEvents';
 
 const ACTIVE_STATES = new Set(
   Object.values(PatientState).filter(
-    (state) => state !== PatientState.Discharge && state !== PatientState.Deceased
-  )
+    (state) => state !== PatientState.Discharge && state !== PatientState.Deceased,
+  ),
 );
 
 const PROTOCOL_CALCULATOR_BY_CATEGORY = {
@@ -26,7 +26,9 @@ function waitMinutes(arrivalTime, now = new Date()) {
 }
 
 function patientName(patient) {
-  return patient?.name || [patient?.firstName, patient?.lastName].filter(Boolean).join(' ') || 'Unknown';
+  return (
+    patient?.name || [patient?.firstName, patient?.lastName].filter(Boolean).join(' ') || 'Unknown'
+  );
 }
 
 export function compactPatientName(patient) {
@@ -36,11 +38,18 @@ export function compactPatientName(patient) {
 }
 
 export function hasPatientFlagLocal(patient, flagType) {
-  return (patient?.flags || []).some((flag) => (typeof flag === 'string' ? flag : flag.type) === flagType);
+  return (patient?.flags || []).some(
+    (flag) => (typeof flag === 'string' ? flag : flag.type) === flagType,
+  );
 }
 
 function roomName(patient, rooms = [] as any[]) {
-  return patient?.location || rooms.find((room) => room.id === patient?.roomId)?.name || patient?.roomId || 'No bed';
+  return (
+    patient?.location ||
+    rooms.find((room) => room.id === patient?.roomId)?.name ||
+    patient?.roomId ||
+    'No bed'
+  );
 }
 
 function protocolCalculatorIds(patient) {
@@ -56,7 +65,9 @@ function hasProtocolScoreMissing(patient) {
     return !savedScores.some((score: any) => {
       const scoreId = String(score.toolId || '').toLowerCase();
       const scoreName = String(score.toolName || '').toLowerCase();
-      return scoreId === calculatorId || scoreId === normalizedId || scoreName.includes(normalizedId);
+      return (
+        scoreId === calculatorId || scoreId === normalizedId || scoreName.includes(normalizedId)
+      );
     });
   });
 }
@@ -85,19 +96,35 @@ function isPhysicianStaff(staff) {
   return /(attending|physician|doctor|resident|consultant|md)/.test(role);
 }
 
-export function resolvePhysicianStaffId({ user = null as any, staff = ([] as any[]), activeShift = {} as any } = {}) {
-  const userText = [user?.id, user?.email, user?.name, user?.fullName].filter(Boolean).join(' ').toLowerCase();
+export function resolvePhysicianStaffId({
+  user = null as any,
+  staff = [] as any[],
+  activeShift = {} as any,
+} = {}) {
+  const userText = [user?.id, user?.email, user?.name, user?.fullName]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
   const directMatch = staff.find((member) => {
-    const memberText = [member.id, member.email, member.name, member.displayName, member.firstName, member.lastName]
+    const memberText = [
+      member.id,
+      member.email,
+      member.name,
+      member.displayName,
+      member.firstName,
+      member.lastName,
+    ]
       .filter(Boolean)
       .join(' ')
       .toLowerCase();
-    return userText && memberText && (userText.includes(memberText) || memberText.includes(userText));
+    return (
+      userText && memberText && (userText.includes(memberText) || memberText.includes(userText))
+    );
   });
   if (directMatch?.id && isPhysicianStaff(directMatch)) return directMatch.id;
 
   const activePhysician = staff.find(
-    (member) => activeShift.staffIds?.includes(member.id) && isPhysicianStaff(member)
+    (member) => activeShift.staffIds?.includes(member.id) && isPhysicianStaff(member),
   );
   return activePhysician?.id || null;
 }
@@ -110,7 +137,10 @@ export function isSnoozed(patient, snoozes = {} as any, now = new Date()) {
   return new Date(snooze.until).getTime() > now.getTime();
 }
 
-export function scoreWhoNextPatient(patient, { now = new Date(), backendDetailsByPatientId = {} as any } = {}) {
+export function scoreWhoNextPatient(
+  patient,
+  { now = new Date(), backendDetailsByPatientId = {} as any } = {},
+) {
   const factors = [] as any[];
   let score = 0;
   const wait = waitMinutes(patient.arrivalTime, now);
@@ -184,9 +214,15 @@ export function getWhoNextRecommendation({
   const departmentEligible = activePatients.filter((patient) => !isSnoozed(patient, snoozes, now));
   const unassignedHighPriority = departmentEligible.filter(
     (patient) =>
-      !patient.assignedStaffId && (patient.priority === Priority.P1 || patient.priority === Priority.P2)
+      !patient.assignedStaffId &&
+      (patient.priority === Priority.P1 || patient.priority === Priority.P2),
   );
-  const candidates = scope === 'assigned' ? assignedEligible : unassignedHighPriority.length ? unassignedHighPriority : departmentEligible;
+  const candidates =
+    scope === 'assigned'
+      ? assignedEligible
+      : unassignedHighPriority.length
+        ? unassignedHighPriority
+        : departmentEligible;
 
   const scored = candidates
     .map((patient) => scoreWhoNextPatient(patient, { now, backendDetailsByPatientId }))
@@ -199,7 +235,8 @@ export function getWhoNextRecommendation({
       score: 0,
       scope,
       physicianStaffId: resolvedPhysicianId,
-      reason: scope === 'assigned' ? 'No assigned active patients' : 'No urgent department patients',
+      reason:
+        scope === 'assigned' ? 'No assigned active patients' : 'No urgent department patients',
     };
   }
 

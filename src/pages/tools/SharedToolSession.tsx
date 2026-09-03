@@ -41,7 +41,9 @@ const SharedToolSession = () => {
         <div className="shared-session-card">
           <h1>Session Not Found</h1>
           <p>This shared session link is invalid or has expired.</p>
-          <button type="button" onClick={() => profileNavigate('/tools')}>Browse Tools</button>
+          <button type="button" onClick={() => profileNavigate('/tools')}>
+            Browse Tools
+          </button>
         </div>
       </div>
     );
@@ -59,23 +61,27 @@ const SharedToolSession = () => {
         </h1>
         <p>{session.toolDescription || 'Shared tool session from CareDroid.'}</p>
         <p>
-          This link is stored locally in the browser that created it. Export results for
-          portable sharing outside this device.
+          This link is stored locally in the browser that created it. Export results for portable
+          sharing outside this device.
         </p>
         <div className="shared-meta">
           <span>Created: {new Date(session.createdAt).toLocaleString()}</span>
-          {session.expiresAt && <span>Expires: {new Date(session.expiresAt).toLocaleDateString()}</span>}
+          {session.expiresAt && (
+            <span>Expires: {new Date(session.expiresAt).toLocaleDateString()}</span>
+          )}
           <span>Tool: {session.toolId}</span>
         </div>
         {session.results && (
-          <pre className="shared-session-results">
-            {JSON.stringify(session.results, null, 2)}
-          </pre>
+          <pre className="shared-session-results">{JSON.stringify(session.results, null, 2)}</pre>
         )}
         <div className="shared-actions">
-          <button type="button" onClick={() => profileNavigate('/dashboard')}>Open Dashboard</button>
+          <button type="button" onClick={() => profileNavigate('/dashboard')}>
+            Open Dashboard
+          </button>
           {tool && (
-            <button type="button" onClick={() => profileNavigate(tool.path)}>Open Tool</button>
+            <button type="button" onClick={() => profileNavigate(tool.path)}>
+              Open Tool
+            </button>
           )}
         </div>
       </div>

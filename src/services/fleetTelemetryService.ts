@@ -244,12 +244,10 @@ function computeSummary(vehicles) {
   const available = vehicles.filter((v) => v.status === 'available').length;
   const occupied = vehicles.filter((v) => v.status === 'occupied').length;
   const inMaintenance = vehicles.filter(
-    (v) => v.status === 'maintenance' || v.maintenanceStatus !== 'ok'
+    (v) => v.status === 'maintenance' || v.maintenanceStatus !== 'ok',
   ).length;
   const utilizationValues = vehicles.map((v) => v.utilizationPercent).filter(Number.isFinite);
-  const etaValues = vehicles
-    .map((v) => v.etaMinutes)
-    .filter((n) => Number.isFinite(n) && n >= 0);
+  const etaValues = vehicles.map((v) => v.etaMinutes).filter((n) => Number.isFinite(n) && n >= 0);
 
   const averageUtilizationPercent =
     utilizationValues.length > 0
@@ -257,7 +255,9 @@ function computeSummary(vehicles) {
       : 0;
 
   const averageEtaMinutes =
-    etaValues.length > 0 ? Math.round(etaValues.reduce((a, b) => a + b, 0) / etaValues.length) : null;
+    etaValues.length > 0
+      ? Math.round(etaValues.reduce((a, b) => a + b, 0) / etaValues.length)
+      : null;
 
   return {
     activeVehicles: active,
@@ -296,14 +296,17 @@ function buildFleetVisualizationData(vehicles) {
   }));
 
   return {
-    statusDistribution: Object.entries(statusDistribution).map(([name, value]) => ({ name, value })),
+    statusDistribution: Object.entries(statusDistribution).map(([name, value]) => ({
+      name,
+      value,
+    })),
     maintenanceRisk,
     etaTrend,
     dispatchLoadTrend,
     routeEfficiency: vehicles.length
       ? Math.round(
           vehicles.reduce((sum, vehicle) => sum + Math.max(0, 100 - (vehicle.etaMinutes || 0)), 0) /
-            vehicles.length
+            vehicles.length,
         )
       : 0,
   };
@@ -330,7 +333,7 @@ export async function fetchFleetCommandSnapshot(options: any = {}) {
           clearTimeout(timer);
           reject(new DOMException('Aborted', 'AbortError'));
         },
-        { once: true }
+        { once: true },
       );
     }
   });
@@ -364,7 +367,8 @@ export async function fetchFleetCommandSnapshot(options: any = {}) {
 function buildFleetLiveSummary(vehicles, routes, alerts) {
   return {
     totalVehicles: vehicles.length,
-    activeVehicles: vehicles.filter((vehicle) => ['active', 'occupied'].includes(vehicle.status)).length,
+    activeVehicles: vehicles.filter((vehicle) => ['active', 'occupied'].includes(vehicle.status))
+      .length,
     availableVehicles: vehicles.filter((vehicle) => vehicle.status === 'available').length,
     staleVehicles: vehicles.filter((vehicle) => vehicle.freshness === 'stale').length,
     offlineVehicles: vehicles.filter((vehicle) => vehicle.freshness === 'offline').length,
@@ -374,7 +378,7 @@ function buildFleetLiveSummary(vehicles, routes, alerts) {
     averageUtilizationPercent: vehicles.length
       ? Math.round(
           vehicles.reduce((sum, vehicle) => sum + (vehicle.utilizationPercent || 0), 0) /
-            vehicles.length
+            vehicles.length,
         )
       : 0,
     averageEtaMinutes: vehicles.some((vehicle) => Number.isFinite(vehicle.etaMinutes))
@@ -382,7 +386,7 @@ function buildFleetLiveSummary(vehicles, routes, alerts) {
           vehicles
             .filter((vehicle) => Number.isFinite(vehicle.etaMinutes))
             .reduce((sum, vehicle) => sum + vehicle.etaMinutes, 0) /
-            vehicles.filter((vehicle) => Number.isFinite(vehicle.etaMinutes)).length
+            vehicles.filter((vehicle) => Number.isFinite(vehicle.etaMinutes)).length,
         )
       : null,
     updatedAt: new Date().toISOString(),
@@ -485,7 +489,7 @@ export async function fetchFleetLiveTrackingSnapshot(options: any = {}) {
           clearTimeout(timer);
           reject(new DOMException('Aborted', 'AbortError'));
         },
-        { once: true }
+        { once: true },
       );
     }
   });

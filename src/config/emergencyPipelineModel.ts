@@ -42,9 +42,7 @@ export const RECEPTION_PIPELINE_STAGES = Object.freeze([
   }),
 ]);
 
-const RECEPTION_ACTIVE_QUERY_PREFIXES = Object.freeze([
-  CANONICAL_ROUTES.emergencyReception,
-]);
+const RECEPTION_ACTIVE_QUERY_PREFIXES = Object.freeze([CANONICAL_ROUTES.emergencyReception]);
 
 export const EMERGENCY_SURFACE_REGISTRY = Object.freeze([
   Object.freeze({
@@ -364,7 +362,9 @@ const SURFACE_BY_ID = Object.freeze(
 );
 
 const SURFACE_BY_ROUTE = Object.freeze(
-  Object.fromEntries(EMERGENCY_SURFACE_REGISTRY.map((surface) => [surface.canonicalRoute, surface])),
+  Object.fromEntries(
+    EMERGENCY_SURFACE_REGISTRY.map((surface) => [surface.canonicalRoute, surface]),
+  ),
 );
 
 const NAV_ID_SET = new Set(
@@ -486,7 +486,9 @@ export function auditNavCoverage(options: any = {}) {
   const paletteNavIds = new Set(
     EMERGENCY_SURFACE_REGISTRY.filter((surface) => surface.sidebarNavId).map((s) => s.sidebarNavId),
   );
-  const navNotInPalette = [...navIds].filter((id) => !paletteNavIds.has(id as any) && id !== 'intake');
+  const navNotInPalette = [...navIds].filter(
+    (id) => !paletteNavIds.has(id as any) && id !== 'intake',
+  );
 
   return Object.freeze({
     covered,

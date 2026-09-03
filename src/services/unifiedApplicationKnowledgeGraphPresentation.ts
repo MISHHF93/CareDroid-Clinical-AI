@@ -25,10 +25,18 @@ export type PatientKnowledgeGraphContext = Readonly<{
 }>;
 
 export type DashboardKnowledgeGraphSummary = Readonly<{
-  topConnectedPatients: readonly Readonly<{ patientId: string; connectionCount: number; label: string }>[];
+  topConnectedPatients: readonly Readonly<{
+    patientId: string;
+    connectionCount: number;
+    label: string;
+  }>[];
   criticalNodes: readonly KnowledgeGraphNode[];
   recentOperationalEvents: readonly KnowledgeGraphNode[];
-  departmentLoad: readonly Readonly<{ departmentId: string; label: string; patientCount: number }>[];
+  departmentLoad: readonly Readonly<{
+    departmentId: string;
+    label: string;
+    patientCount: number;
+  }>[];
   entityCounts: Readonly<Partial<Record<KnowledgeGraphEntityType, number>>>;
 }>;
 
@@ -36,7 +44,11 @@ export type AnalyticsKnowledgeGraphSummary = Readonly<{
   nodeCount: number;
   edgeCount: number;
   entityCounts: Readonly<Partial<Record<KnowledgeGraphEntityType, number>>>;
-  topDepartments: readonly Readonly<{ departmentId: string; label: string; patientCount: number }>[];
+  topDepartments: readonly Readonly<{
+    departmentId: string;
+    label: string;
+    patientCount: number;
+  }>[];
   connectedCriticalSignals: number;
 }>;
 
@@ -104,7 +116,9 @@ export function resolvePatientKnowledgeGraphSubgraph(
 
   const neighbors = Object.freeze([...neighborMap.values()]);
   const pick = (entityType: KnowledgeGraphEntityType) =>
-    Object.freeze(neighbors.filter((entry) => entry.node.entityType === entityType).map((entry) => entry.node));
+    Object.freeze(
+      neighbors.filter((entry) => entry.node.entityType === entityType).map((entry) => entry.node),
+    );
 
   return Object.freeze({
     patientId,
@@ -144,7 +158,9 @@ export function resolveAlertKnowledgeGraphContext(
       neighbors.filter((entry) => entry.node.entityType === 'patient').map((entry) => entry.node),
     ),
     escalatedDepartments: Object.freeze(
-      neighbors.filter((entry) => entry.node.entityType === 'department').map((entry) => entry.node),
+      neighbors
+        .filter((entry) => entry.node.entityType === 'department')
+        .map((entry) => entry.node),
     ),
   });
 }
@@ -245,7 +261,9 @@ export function buildCopilotKnowledgeGraphContext(
     nodeCount: graph.metrics.nodeCount,
     edgeCount: graph.metrics.edgeCount,
     selectedPatientConnections,
-    criticalNodeLabels: Object.freeze(dashboard.criticalNodes.slice(0, 6).map((node) => node.label)),
+    criticalNodeLabels: Object.freeze(
+      dashboard.criticalNodes.slice(0, 6).map((node) => node.label),
+    ),
     recentEventLabels: Object.freeze(
       dashboard.recentOperationalEvents.slice(0, 4).map((node) => node.label),
     ),
@@ -292,7 +310,12 @@ export function buildKnowledgeGraphTimelineItems(
       summary: alert.summary || alert.label,
       timestamp,
       source: 'derived',
-      severity: alert.severity === 'critical' ? 'Critical' : alert.severity === 'warning' ? 'Warning' : 'Info',
+      severity:
+        alert.severity === 'critical'
+          ? 'Critical'
+          : alert.severity === 'warning'
+            ? 'Warning'
+            : 'Info',
       metadata: Object.freeze({
         graphNodeId: alert.id,
         entityType: alert.entityType,
@@ -332,7 +355,10 @@ export function buildKnowledgeGraphTimelineItems(
   return items;
 }
 
-export function resolveKnowledgeGraphNodeLabel(nodeId: string, graph: UnifiedApplicationKnowledgeGraphSnapshot): string {
+export function resolveKnowledgeGraphNodeLabel(
+  nodeId: string,
+  graph: UnifiedApplicationKnowledgeGraphSnapshot,
+): string {
   const parsed = parseKnowledgeGraphNodeId(nodeId);
   const node = graph.nodes.find((entry) => entry.id === nodeId);
   return node?.label || parsed?.sourceId || nodeId;

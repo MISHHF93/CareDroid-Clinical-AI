@@ -5,7 +5,11 @@ import {
 } from '../../services/providerWaitVisibilityModel';
 import './ProviderWaitBreachBadge.css';
 
-export default function ProviderWaitBreachPanel({ patients = [] as any[], settings = null, className = '' }) {
+export default function ProviderWaitBreachPanel({
+  patients = [] as any[],
+  settings = null,
+  className = '',
+}) {
   const visibility = useMemo(
     () =>
       buildProviderWaitVisibilitySnapshot(patients, {

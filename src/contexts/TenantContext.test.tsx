@@ -175,7 +175,11 @@ describe('TenantContextProvider', () => {
     let refresh: (() => Promise<any>) | null = null;
     render(
       <TenantContextProvider>
-        <RefreshProbe onReady={(fn) => { refresh = fn; }} />
+        <RefreshProbe
+          onReady={(fn) => {
+            refresh = fn;
+          }}
+        />
       </TenantContextProvider>,
     );
 

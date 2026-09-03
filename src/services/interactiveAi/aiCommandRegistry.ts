@@ -45,12 +45,14 @@ export const AI_PALETTE_COMMANDS: readonly AiPaletteCommand[] = Object.freeze([
   {
     id: 'ai-reception-missing-info',
     label: 'AI: Find missing registration info',
-    description: 'Review the selected registration for missing information; draft stays review-only.',
+    description:
+      'Review the selected registration for missing information; draft stays review-only.',
     keywords: ['ai', 'missing', 'registration', 'insurance', 'incomplete', 'fields'],
     channel: 'reception',
     requiredPermission: 'use_ai_chat',
     riskLevel: 'moderate',
-    query: 'Review this registration for missing information and prepare a handoff summary for review.',
+    query:
+      'Review this registration for missing information and prepare a handoff summary for review.',
   },
   {
     id: 'ai-reception-handoff-draft',
@@ -105,7 +107,8 @@ export const AI_PALETTE_COMMANDS: readonly AiPaletteCommand[] = Object.freeze([
   {
     id: 'ai-ems-prepare-arrival',
     label: 'AI: Prepare for EMS arrival',
-    description: 'Prepare the department for an inbound EMS arrival and draft the handoff for review.',
+    description:
+      'Prepare the department for an inbound EMS arrival and draft the handoff for review.',
     keywords: ['ai', 'ems', 'prepare', 'arrival', 'inbound', 'handoff'],
     channel: 'ems',
     requiredPermission: 'use_ai_chat',
@@ -218,7 +221,9 @@ export function dispatchAiPaletteCommand(
   const request = buildAiCommandRequest(commandId);
   pendingCommand = { commandId: request.commandId, at: now() };
   if (typeof document !== 'undefined') {
-    document.dispatchEvent(new CustomEvent(AI_COMMAND_EVENT, { detail: { commandId: request.commandId } }));
+    document.dispatchEvent(
+      new CustomEvent(AI_COMMAND_EVENT, { detail: { commandId: request.commandId } }),
+    );
   }
   return request.commandId;
 }

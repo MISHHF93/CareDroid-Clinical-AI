@@ -48,9 +48,9 @@ describe('CareDroid role-based views', () => {
         },
       },
     };
-    expect(
-      resolveEmergencyRoleId({ profile: { roleProfileId: 'nurse' } }, emergencyOs),
-    ).toBe(EMERGENCY_ROLE_IDS.triageNurse);
+    expect(resolveEmergencyRoleId({ profile: { roleProfileId: 'nurse' } }, emergencyOs)).toBe(
+      EMERGENCY_ROLE_IDS.triageNurse,
+    );
     expect(
       resolveEmergencyRoleId({ profile: { roleProfileId: 'clinic-administrator' } }, emergencyOs),
     ).toBe(EMERGENCY_ROLE_IDS.admin);
@@ -94,7 +94,9 @@ describe('CareDroid role-based views', () => {
     // so seeding a genuinely unrecognized role used to silently grant
     // physician-level access instead of the safe default either system
     // resolves an unknown role to elsewhere.
-    expect(normalizeEmergencyRole('totally-unrecognized-xyz')).toBe(EMERGENCY_ROLE_IDS.readOnlyViewer);
+    expect(normalizeEmergencyRole('totally-unrecognized-xyz')).toBe(
+      EMERGENCY_ROLE_IDS.readOnlyViewer,
+    );
     expect(normalizeEmergencyRole('')).toBe(EMERGENCY_ROLE_IDS.readOnlyViewer);
   });
 
@@ -131,7 +133,9 @@ describe('CareDroid role-based views', () => {
     expect(normalizeEmergencyRole('pharmacist')).toBe(EMERGENCY_ROLE_IDS.readOnlyViewer);
     expect(normalizeEmergencyRole('social_worker')).toBe(EMERGENCY_ROLE_IDS.readOnlyViewer);
     expect(normalizeEmergencyRole('security_officer')).toBe(EMERGENCY_ROLE_IDS.readOnlyViewer);
-    expect(normalizeEmergencyRole('quality_safety_officer')).toBe(EMERGENCY_ROLE_IDS.readOnlyViewer);
+    expect(normalizeEmergencyRole('quality_safety_officer')).toBe(
+      EMERGENCY_ROLE_IDS.readOnlyViewer,
+    );
     expect(normalizeEmergencyRole('demo_observer')).toBe(EMERGENCY_ROLE_IDS.readOnlyViewer);
   });
 
@@ -201,10 +205,16 @@ describe('CareDroid role-based views', () => {
     expect(clerkNavIds).not.toContain('platform');
 
     expect(
-      canAccessEmergencyRoute(EMERGENCY_ROLE_IDS.registrationClerk, CANONICAL_ROUTES.emergencyQueues),
+      canAccessEmergencyRoute(
+        EMERGENCY_ROLE_IDS.registrationClerk,
+        CANONICAL_ROUTES.emergencyQueues,
+      ),
     ).toBe(false);
     expect(
-      canAccessEmergencyRoute(EMERGENCY_ROLE_IDS.registrationClerk, CANONICAL_ROUTES.emergencyTools),
+      canAccessEmergencyRoute(
+        EMERGENCY_ROLE_IDS.registrationClerk,
+        CANONICAL_ROUTES.emergencyTools,
+      ),
     ).toBe(false);
     expect(
       canAccessEmergencyRoute(EMERGENCY_ROLE_IDS.registrationClerk, CANONICAL_ROUTES.workspace),
@@ -315,7 +325,9 @@ describe('CareDroid role-based views', () => {
       EMERGENCY_OS_ROUTE_COMMANDS.map((command) => [command.id, command]),
     );
     expect(byId['open-analytics']).toBeDefined();
-    expect(canExecuteEmergencyCommand(EMERGENCY_ROLE_IDS.readOnlyViewer, byId['open-analytics'])).toBe(true);
+    expect(
+      canExecuteEmergencyCommand(EMERGENCY_ROLE_IDS.readOnlyViewer, byId['open-analytics']),
+    ).toBe(true);
     expect(byId['open-settings']).toBeDefined();
     expect(
       canExecuteEmergencyCommand(EMERGENCY_ROLE_IDS.readOnlyViewer, byId['open-settings']),

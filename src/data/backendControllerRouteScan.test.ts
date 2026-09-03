@@ -38,7 +38,7 @@ describe('backendControllerRouteScan', () => {
       expect.arrayContaining([
         expect.objectContaining({ method: 'GET', path: '/api/tools/catalog/executors' }),
         expect.objectContaining({ method: 'POST', path: '/api/tools/:id/execute' }),
-      ])
+      ]),
     );
   });
 

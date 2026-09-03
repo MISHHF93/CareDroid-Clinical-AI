@@ -81,7 +81,12 @@ export function MessageComposer({
           }
         }}
       />
-      <Button variant="primary" size="sm" disabled={disabled || sending || !value.trim()} onClick={() => void handleSend()}>
+      <Button
+        variant="primary"
+        size="sm"
+        disabled={disabled || sending || !value.trim()}
+        onClick={() => void handleSend()}
+      >
         Send
       </Button>
     </div>

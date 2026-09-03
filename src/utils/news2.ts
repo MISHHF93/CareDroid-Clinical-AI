@@ -157,8 +157,14 @@ export function scoreNews2Item(item: NEWS2Item, values: NEWS2Values): number {
   return scoreRange(values[item.id], item.ranges);
 }
 
-export function scoreNews2(values: NEWS2Values): { total: number; itemScores: Record<string, number>; hasSingleRed: boolean } {
-  const itemScores = Object.fromEntries(NEWS2_ITEMS.map((item) => [item.id, scoreNews2Item(item, values)]));
+export function scoreNews2(values: NEWS2Values): {
+  total: number;
+  itemScores: Record<string, number>;
+  hasSingleRed: boolean;
+} {
+  const itemScores = Object.fromEntries(
+    NEWS2_ITEMS.map((item) => [item.id, scoreNews2Item(item, values)]),
+  );
   const total = Object.values(itemScores).reduce((sum, score) => sum + score, 0);
   return {
     total,
@@ -167,7 +173,10 @@ export function scoreNews2(values: NEWS2Values): { total: number; itemScores: Re
   };
 }
 
-export function news2Response(total: number, hasSingleRed = false): {
+export function news2Response(
+  total: number,
+  hasSingleRed = false,
+): {
   band: 'Low' | 'Medium' | 'High';
   recommendation: string;
   color: string;

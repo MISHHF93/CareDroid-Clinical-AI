@@ -56,10 +56,23 @@ export function TrendChart({
       <ResponsiveContainer width="100%" height={220}>
         <LineChart data={data} margin={{ top: 10, right: 14, bottom: 6, left: 0 }}>
           <CartesianGrid stroke="var(--app-panel-border)" strokeDasharray="3 3" vertical={false} />
-          <XAxis dataKey={xKey} tick={AXIS_TICK} tickLine={false} axisLine={false} minTickGap={10} />
+          <XAxis
+            dataKey={xKey}
+            tick={AXIS_TICK}
+            tickLine={false}
+            axisLine={false}
+            minTickGap={10}
+          />
           <YAxis tick={AXIS_TICK} tickLine={false} axisLine={false} width={36} />
           <Tooltip contentStyle={TOOLTIP_STYLE} />
-          <Line type="monotone" dataKey={dataKey} stroke={color} strokeWidth={3} dot={{ r: 3 }} activeDot={{ r: 5 }} />
+          <Line
+            type="monotone"
+            dataKey={dataKey}
+            stroke={color}
+            strokeWidth={3}
+            dot={{ r: 3 }}
+            activeDot={{ r: 5 }}
+          />
         </LineChart>
       </ResponsiveContainer>
     </div>
@@ -95,7 +108,13 @@ export function CategoryBarChart({
             textAnchor="end"
             height={58}
           />
-          <YAxis tick={AXIS_TICK} allowDecimals={false} tickLine={false} axisLine={false} width={34} />
+          <YAxis
+            tick={AXIS_TICK}
+            allowDecimals={false}
+            tickLine={false}
+            axisLine={false}
+            width={34}
+          />
           <Tooltip contentStyle={TOOLTIP_STYLE} />
           <Bar dataKey={dataKey} fill={color} radius={[8, 8, 0, 0]} />
         </BarChart>
@@ -118,11 +137,23 @@ export function DistributionDonutChart({
   if (!isNonEmptyData(data)) return <EmptyChartState message={emptyMessage} />;
 
   return (
-    <div className="dashboard-donut-wrap" role="img" aria-label={title} data-testid="distribution-donut-chart">
+    <div
+      className="dashboard-donut-wrap"
+      role="img"
+      aria-label={title}
+      data-testid="distribution-donut-chart"
+    >
       <div className="dashboard-chart dashboard-chart--donut">
         <ResponsiveContainer width="100%" height={230}>
           <PieChart>
-            <Pie data={data} dataKey={dataKey} nameKey={nameKey} innerRadius="54%" outerRadius="78%" paddingAngle={2}>
+            <Pie
+              data={data}
+              dataKey={dataKey}
+              nameKey={nameKey}
+              innerRadius="54%"
+              outerRadius="78%"
+              paddingAngle={2}
+            >
               {data.map((entry, index) => (
                 <Cell
                   key={entry[nameKey] || index}

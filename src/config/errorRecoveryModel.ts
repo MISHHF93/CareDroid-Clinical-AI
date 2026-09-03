@@ -3,7 +3,8 @@
  */
 
 export const ERROR_RECOVERY_COPY = Object.freeze({
-  intakeForm: 'Your intake form is preserved. Fix the issue below or retry when connectivity returns.',
+  intakeForm:
+    'Your intake form is preserved. Fix the issue below or retry when connectivity returns.',
   validation: 'Correct the highlighted fields — nothing was submitted.',
   syncStale: 'Showing last known data. Refresh to sync with the server.',
   syncFailed: 'Local workflow saved. Backend sync is pending — retry when ready.',

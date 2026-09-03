@@ -1,9 +1,5 @@
 import { deriveTriagePending } from './arrivalControlLayer';
-import {
-  PatientState,
-  type Alert,
-  type Patient,
-} from '../types/emergency';
+import { PatientState, type Alert, type Patient } from '../types/emergency';
 
 export type TriageBreachPhase = 'on-track' | 'breach-risk' | 'breached';
 
@@ -98,7 +94,8 @@ export function resolveTriageBreachSettings(
   );
 
   return {
-    targetMinutes: Number.isFinite(targetMinutes) && targetMinutes > 0 ? targetMinutes : DEFAULT_TARGET_MINUTES,
+    targetMinutes:
+      Number.isFinite(targetMinutes) && targetMinutes > 0 ? targetMinutes : DEFAULT_TARGET_MINUTES,
     warningMinutes:
       Number.isFinite(warningMinutes) && warningMinutes > 0
         ? Math.min(warningMinutes, targetMinutes - 1)
@@ -149,10 +146,7 @@ function resolvePhase(
   };
 }
 
-export function resolveArrivalToTriageElapsedMinutes(
-  patient: Patient,
-  now = new Date(),
-): number {
+export function resolveArrivalToTriageElapsedMinutes(patient: Patient, now = new Date()): number {
   if (patient.triageTime) {
     return minutesSince(patient.arrivalTime, new Date(patient.triageTime));
   }
@@ -303,9 +297,8 @@ export function sortPatientsForTriageBreachAttention(
       patient,
       snapshot: resolveTriageBreachTimer(patient, context),
     }))
-    .filter(
-      (entry): entry is { patient: Patient; snapshot: TriageBreachSnapshot } =>
-        Boolean(entry.snapshot && shouldSurfaceTriageBreach(entry.snapshot)),
+    .filter((entry): entry is { patient: Patient; snapshot: TriageBreachSnapshot } =>
+      Boolean(entry.snapshot && shouldSurfaceTriageBreach(entry.snapshot)),
     )
     .sort(
       (left, right) =>

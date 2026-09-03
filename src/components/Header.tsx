@@ -182,9 +182,7 @@ export function Header() {
   const openSmartIntakeFromSearch = (options: { step?: string; patientId?: string } = {}) => {
     if (!canCreatePatient) return;
     if (isReceptionRoute) {
-      document.dispatchEvent(
-        new CustomEvent('open-reception-smart-intake', { detail: options }),
-      );
+      document.dispatchEvent(new CustomEvent('open-reception-smart-intake', { detail: options }));
       setPatientLookupOpen(false);
       return;
     }
@@ -327,7 +325,10 @@ export function Header() {
       return;
     }
     let cancelled = false;
-    void searchPatientsFromBackend(query, { localPatients: patients, limit: MAX_HEADER_PATIENT_RESULTS })
+    void searchPatientsFromBackend(query, {
+      localPatients: patients,
+      limit: MAX_HEADER_PATIENT_RESULTS,
+    })
       .then((response) => {
         if (cancelled) return;
         const verified = new Set(
@@ -375,7 +376,8 @@ export function Header() {
     };
   }, [lookupResultsOpen, updateLookupPanelPosition]);
 
-  const pilotHeaderMetrics = isPilotStationKpiPolicyActive() && screenCapabilities.showOperationalStrip;
+  const pilotHeaderMetrics =
+    isPilotStationKpiPolicyActive() && screenCapabilities.showOperationalStrip;
 
   return (
     <header
@@ -420,7 +422,10 @@ export function Header() {
 
         <div className="caredroid-header__actions">
           {!isReceptionRoute && (
-            <div className="caredroid-header__primary-actions" aria-label="CareDroid primary actions">
+            <div
+              className="caredroid-header__primary-actions"
+              aria-label="CareDroid primary actions"
+            >
               <button
                 type="button"
                 className="caredroid-header__action caredroid-header__action--primary"
@@ -487,7 +492,8 @@ export function Header() {
                   event.preventDefault();
                   const highlighted = patientLookupResults[lookupActiveIndex];
                   if (highlighted) selectLookupPatient(highlighted.patient.id);
-                  else if (patientLookupResults[0]) selectLookupPatient(patientLookupResults[0].patient.id);
+                  else if (patientLookupResults[0])
+                    selectLookupPatient(patientLookupResults[0].patient.id);
                   else if (firstOperationalHit) handleOpenOperationalHit(firstOperationalHit);
                   else openPatientLookupRoute();
                 }

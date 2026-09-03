@@ -12,33 +12,29 @@ describe('canonical route tree — tools, pulse, shift, analytics, settings', ()
     useEmergencyStore.setState(originalEmergencyState, true);
   });
 
+  it('/emergency/tools renders Medical Tools inside the active shell', async () => {
+    renderRoute('/emergency/tools');
+
+    expect(
+      await screen.findByRole('heading', { level: 1, name: /medical tools/i }, { timeout: 45000 }),
+    ).toBeInTheDocument();
+    expect(await screen.findByRole('link', { name: 'Medical Tools' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+    expect(screen.getByTestId('location')).toHaveTextContent('/emergency/tools');
+  }, 60000);
+
   it(
-    '/emergency/tools renders Medical Tools inside the active shell',
+    '/emergency/pulse renders Department Pulse inside the active shell',
     async () => {
-      renderRoute('/emergency/tools');
+      renderRoute('/emergency/pulse');
 
-      expect(
-        await screen.findByRole(
-          'heading',
-          { level: 1, name: /medical tools/i },
-          { timeout: 45000 },
-        ),
-      ).toBeInTheDocument();
-      expect(await screen.findByRole('link', { name: 'Medical Tools' })).toHaveAttribute(
-        'aria-current',
-        'page',
-      );
-      expect(screen.getByTestId('location')).toHaveTextContent('/emergency/tools');
+      expect(await screen.findByRole('heading', { name: 'Department Pulse' })).toBeInTheDocument();
+      expect(screen.getByTestId('location')).toHaveTextContent('/emergency/pulse');
     },
-    60000,
+    ROUTE_LOAD_TIMEOUT,
   );
-
-  it('/emergency/pulse renders Department Pulse inside the active shell', async () => {
-    renderRoute('/emergency/pulse');
-
-    expect(await screen.findByRole('heading', { name: 'Department Pulse' })).toBeInTheDocument();
-    expect(screen.getByTestId('location')).toHaveTextContent('/emergency/pulse');
-  }, ROUTE_LOAD_TIMEOUT);
 
   it('/emergency/shift renders Shift Summary inside the active shell', async () => {
     renderRoute('/emergency/shift');

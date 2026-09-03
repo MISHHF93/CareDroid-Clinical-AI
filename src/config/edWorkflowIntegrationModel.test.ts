@@ -16,9 +16,9 @@ describe('edWorkflowIntegrationModel', () => {
     expect(steps.find((step) => step.id === 'clinical-startup')?.route).toBe(
       CANONICAL_ROUTES.emergencyReception,
     );
-    expect(steps.some((step) => step.emergencyRoleId === EMERGENCY_ROLE_IDS.registrationClerk)).toBe(
-      true,
-    );
+    expect(
+      steps.some((step) => step.emergencyRoleId === EMERGENCY_ROLE_IDS.registrationClerk),
+    ).toBe(true);
     expect(steps.some((step) => step.emergencyRoleId === EMERGENCY_ROLE_IDS.edManager)).toBe(true);
     expect(steps.find((step) => step.id === 'triage-acuity')?.route).toBe(
       `${CANONICAL_ROUTES.emergencyQueues}?queue=pretriage`,

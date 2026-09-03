@@ -57,33 +57,35 @@ export type PatientJourneyPosition = Readonly<{
   apiEndpoints: readonly string[];
 }>;
 
-const OPERATIONAL_STAGE_TO_JOURNEY_STAGE: Readonly<Record<EdOperationalStage, EmergencyJourneyStageId>> =
-  Object.freeze({
-    arrival: 'patient-arrival',
-    waiting_intake: 'rapid-intake',
-    triage_handoff: 'triage',
-    physician_assessment: 'clinical-action',
-    observation_reassessment: 'treatment-observation',
-    results_review: 'diagnostics',
-    deterioration_concern: 'clinical-action',
-    referral_boarding_transfer: 'disposition',
-    discharge_workflow: 'handoff-reporting',
-  });
+const OPERATIONAL_STAGE_TO_JOURNEY_STAGE: Readonly<
+  Record<EdOperationalStage, EmergencyJourneyStageId>
+> = Object.freeze({
+  arrival: 'patient-arrival',
+  waiting_intake: 'rapid-intake',
+  triage_handoff: 'triage',
+  physician_assessment: 'clinical-action',
+  observation_reassessment: 'treatment-observation',
+  results_review: 'diagnostics',
+  deterioration_concern: 'clinical-action',
+  referral_boarding_transfer: 'disposition',
+  discharge_workflow: 'handoff-reporting',
+});
 
-const PATIENT_STATE_TO_JOURNEY_STAGE: Readonly<Partial<Record<PatientState, EmergencyJourneyStageId>>> =
-  Object.freeze({
-    [PatientState.Arrival]: 'patient-arrival',
-    [PatientState.Registration]: 'rapid-intake',
-    [PatientState.Triage]: 'triage',
-    [PatientState.Waiting]: 'triage',
-    [PatientState.Assessment]: 'clinical-action',
-    [PatientState.Orders]: 'diagnostics',
-    [PatientState.Results]: 'diagnostics',
-    [PatientState.Disposition]: 'disposition',
-    [PatientState.Admission]: 'disposition',
-    [PatientState.Discharge]: 'handoff-reporting',
-    [PatientState.Deceased]: 'outcome-tracking',
-  });
+const PATIENT_STATE_TO_JOURNEY_STAGE: Readonly<
+  Partial<Record<PatientState, EmergencyJourneyStageId>>
+> = Object.freeze({
+  [PatientState.Arrival]: 'patient-arrival',
+  [PatientState.Registration]: 'rapid-intake',
+  [PatientState.Triage]: 'triage',
+  [PatientState.Waiting]: 'triage',
+  [PatientState.Assessment]: 'clinical-action',
+  [PatientState.Orders]: 'diagnostics',
+  [PatientState.Results]: 'diagnostics',
+  [PatientState.Disposition]: 'disposition',
+  [PatientState.Admission]: 'disposition',
+  [PatientState.Discharge]: 'handoff-reporting',
+  [PatientState.Deceased]: 'outcome-tracking',
+});
 
 const STAGE_BY_ID = Object.freeze(
   Object.fromEntries(FULL_EMERGENCY_CARE_JOURNEY.map((stage) => [stage.id, stage])),
@@ -160,7 +162,13 @@ export const HOSPITAL_OPERATING_DEPARTMENTS = Object.freeze([
     id: 'physician',
     label: 'Emergency Physician',
     phaseIds: ['triage-assessment', 'diagnostics-treatment', 'disposition-handoff'],
-    stageIds: ['ai-chief-review', 'clinical-action', 'diagnostics', 'treatment-observation', 'disposition'],
+    stageIds: [
+      'ai-chief-review',
+      'clinical-action',
+      'diagnostics',
+      'treatment-observation',
+      'disposition',
+    ],
   }),
   Object.freeze({
     id: 'diagnostics',
@@ -212,11 +220,15 @@ export function getJourneyStageForPatientState(
   return PATIENT_STATE_TO_JOURNEY_STAGE[state] ?? 'clinical-action';
 }
 
-export function getJourneyStageForOperationalStage(stage: EdOperationalStage): EmergencyJourneyStageId {
+export function getJourneyStageForOperationalStage(
+  stage: EdOperationalStage,
+): EmergencyJourneyStageId {
   return OPERATIONAL_STAGE_TO_JOURNEY_STAGE[stage] ?? 'clinical-action';
 }
 
-export function resolveDepartmentsForStage(stageId: EmergencyJourneyStageId): readonly HospitalDepartmentId[] {
+export function resolveDepartmentsForStage(
+  stageId: EmergencyJourneyStageId,
+): readonly HospitalDepartmentId[] {
   return STAGE_DEPARTMENTS[stageId] ?? ['nursing'];
 }
 
@@ -260,7 +272,9 @@ export function resolveStageBackendEndpoints(stageId: EmergencyJourneyStageId): 
       if (apiSurfaceId) {
         endpoints.add(`${EMERGENCY_OS_API_ENDPOINTS.operatingSurface}/${apiSurfaceId}`);
       }
-      getPageApiBinding(surface.surfaceId)?.endpoints.forEach((endpoint) => endpoints.add(endpoint));
+      getPageApiBinding(surface.surfaceId)?.endpoints.forEach((endpoint) =>
+        endpoints.add(endpoint),
+      );
     });
   }
 

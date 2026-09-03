@@ -60,8 +60,7 @@ function createPollingLoop({ intervalMs, onPoll, onStatus, shouldPoll }: any) {
   let stopped = false;
   let failureCount = 0;
 
-  const nextInterval = () =>
-    Math.min(intervalMs * 2 ** Math.min(failureCount, 3), intervalMs * 8);
+  const nextInterval = () => Math.min(intervalMs * 2 ** Math.min(failureCount, 3), intervalMs * 8);
 
   const runPoll = async () => {
     if (stopped) return;
@@ -181,7 +180,11 @@ function mapRealtimeStatusToHealth(
   return 'degraded';
 }
 
-type RealtimeListener = { onEvent?: (event: any) => void; onStatus?: (status: any) => void; onPoll?: () => any };
+type RealtimeListener = {
+  onEvent?: (event: any) => void;
+  onStatus?: (status: any) => void;
+  onPoll?: () => any;
+};
 
 // Several independent hooks (AppShell, useCareDroidCentralNode, etc.) each called this
 // with their own onEvent/onPoll — every one opened its own EventSource to the same
@@ -207,7 +210,11 @@ export function startEmergencyRealtime(listener: RealtimeListener = {}) {
     };
     sharedRealtimeSession = {
       listeners,
-      teardown: startEmergencyRealtimeSession({ onEvent: fanOutEvent, onStatus: fanOutStatus, onPoll: fanOutPoll }),
+      teardown: startEmergencyRealtimeSession({
+        onEvent: fanOutEvent,
+        onStatus: fanOutStatus,
+        onPoll: fanOutPoll,
+      }),
     };
   }
 

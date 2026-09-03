@@ -6,7 +6,10 @@ const source = readFileSync(join(process.cwd(), 'src/components/CopilotPanel.tsx
 
 describe('Copilot operational awareness wiring', () => {
   it('hides the Copilot tab row when chat is the only active section', () => {
-    const shellSource = readFileSync(join(process.cwd(), 'src/components/copilot/CopilotShell.tsx'), 'utf8');
+    const shellSource = readFileSync(
+      join(process.cwd(), 'src/components/copilot/CopilotShell.tsx'),
+      'utf8',
+    );
     expect(shellSource).toContain('ed-copilot-shell--chat-only');
     expect(shellSource).toContain('tabs.length <= 1');
   });
@@ -18,8 +21,12 @@ describe('Copilot operational awareness wiring', () => {
     expect(source).toContain('copilotSurfaces.showSafetyTab');
     expect(source).toContain('tabs={copilotTabs}');
     expect(source).toContain('chatContent={chatContent}');
-    expect(source).toContain('contextContent={copilotSurfaces.showContextTab ? contextContent : null}');
-    expect(source).toContain('safetyContent={copilotSurfaces.showSafetyTab ? safetyContent : null}');
+    expect(source).toContain(
+      'contextContent={copilotSurfaces.showContextTab ? contextContent : null}',
+    );
+    expect(source).toContain(
+      'safetyContent={copilotSurfaces.showSafetyTab ? safetyContent : null}',
+    );
   });
 
   it('feeds central node pressure, queue, reassessment, and alert context into Copilot', () => {

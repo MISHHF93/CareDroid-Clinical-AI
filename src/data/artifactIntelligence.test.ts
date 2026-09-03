@@ -82,7 +82,9 @@ describe('artifact intelligence pipeline', () => {
 
     expect(features).toHaveLength(artifacts.length);
     expect(labels.length).toBeGreaterThan(artifacts.length);
-    expect(labels.every((label) => Number(label.confidence) > 0 && Number(label.confidence) <= 1)).toBe(true);
+    expect(
+      labels.every((label) => Number(label.confidence) > 0 && Number(label.confidence) <= 1),
+    ).toBe(true);
     expect(labels.some((label) => label.labelType === 'route')).toBe(true);
     expect(labels.some((label) => label.labelType === 'intent')).toBe(true);
   });
@@ -98,7 +100,9 @@ describe('artifact intelligence pipeline', () => {
 
   it('recommends related artifacts and detects orphan, duplicate, and missing metadata findings', () => {
     const service = new ArtifactResonanceService(artifacts);
-    const source = artifacts.find((artifact) => /medical iot|device fleet|hospital map/i.test(artifact.embeddingText));
+    const source = artifacts.find((artifact) =>
+      /medical iot|device fleet|hospital map/i.test(artifact.embeddingText),
+    );
 
     expect(source).toBeTruthy();
     expect(service.findSimilarArtifacts(source.artifactId).length).toBeGreaterThan(0);

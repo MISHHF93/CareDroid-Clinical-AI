@@ -56,8 +56,14 @@ describe('AI_CHIEF_ROUTING', () => {
 
   it('all clinical scenarios require clinician review', () => {
     const clinicalScenarios = [
-      'critical_chest_pain', 'stroke_alert', 'sepsis_alert', 'pediatric_emergency',
-      'trauma_activation', 'mental_health_crisis', 'medication_interaction', 'lab_critical_value',
+      'critical_chest_pain',
+      'stroke_alert',
+      'sepsis_alert',
+      'pediatric_emergency',
+      'trauma_activation',
+      'mental_health_crisis',
+      'medication_interaction',
+      'lab_critical_value',
     ] as const;
     for (const scenario of clinicalScenarios) {
       expect(getAiRecommendationRoute(scenario).requiresClinicianReview).toBe(true);

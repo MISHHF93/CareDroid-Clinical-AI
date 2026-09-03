@@ -83,22 +83,25 @@ describe('PR4A registration audit — canonical ID alignment', () => {
     expect([...PR4A_TIER_A_CALCULATOR_REGISTRY_IDS]).toEqual([...PR4A_CALCULATOR_REGISTRY_IDS]);
   });
 
-  it.each(PR4A_TOOL_IDS)('%s uses the same id across registry, NLU, builtin slug, and maps', (id) => {
-    const reg = toolRegistryById[id];
-    expect(reg?.id).toBe(id);
+  it.each(PR4A_TOOL_IDS)(
+    '%s uses the same id across registry, NLU, builtin slug, and maps',
+    (id) => {
+      const reg = toolRegistryById[id];
+      expect(reg?.id).toBe(id);
 
-    const nlu = clinicalIntentTools.find((t) => t.toolId === id);
-    expect(nlu?.toolId).toBe(id);
-    expect(nlu?.sidebarToolId).toBe(id);
-    expect(clinicalIntentToolsById[id]).toBe(nlu);
-    expect(nlu?.backendExecutable).toBe(false);
+      const nlu = clinicalIntentTools.find((t) => t.toolId === id);
+      expect(nlu?.toolId).toBe(id);
+      expect(nlu?.sidebarToolId).toBe(id);
+      expect(clinicalIntentToolsById[id]).toBe(nlu);
+      expect(nlu?.backendExecutable).toBe(false);
 
-    const builtin = builtinUiCalculators.find((c) => c.id === id);
-    expect(builtin?.id).toBe(id);
+      const builtin = builtinUiCalculators.find((c) => c.id === id);
+      expect(builtin?.id).toBe(id);
 
-    expect(BUILTIN_CALC_ID_TO_REGISTRY_ID[id]).toBe(id);
-    expect(resolveRegistryId(id)).toBe(id);
-  });
+      expect(BUILTIN_CALC_ID_TO_REGISTRY_ID[id]).toBe(id);
+      expect(resolveRegistryId(id)).toBe(id);
+    },
+  );
 
   it('has no PR4A registry rows outside the audit list (no orphans)', () => {
     const pr4aRows = toolRegistry.filter((t) => PR4A_TOOL_IDS.includes(t.id as any));
@@ -116,7 +119,7 @@ describe('PR4A registration audit — routes, deep links, navigation', () => {
     expect(clinicalIntentTools.find((t) => t.toolId === id)?.path).toBe(path);
     expect(builtinUiCalculators.find((c) => c.id === id)?.path).toBe(path);
     expect(builtinUiCalculators.find((c) => c.id === id)?.calcQuery).toBe(
-      PR4A_CALC_QUERY_BY_REGISTRY_ID[id]
+      PR4A_CALC_QUERY_BY_REGISTRY_ID[id],
     );
   });
 
@@ -141,11 +144,14 @@ describe('PR4A registration audit — routes, deep links, navigation', () => {
     expect(calculatorsSource).toMatch(new RegExp(`case\\s+'${id.replace(/-/g, '\\-')}'\\s*:`));
   });
 
-  it.each(PR4A_TOOL_IDS)('resolveNavigationPathForLaunch keeps dedicated path (not dashboard)', (id) => {
-    const launch = resolveCatalogLaunch(id);
-    expect(resolveNavigationPathForLaunch(launch)).toBe(launch.path);
-    expect(resolveNavigationPathForLaunch(launch)).not.toBe('/dashboard');
-  });
+  it.each(PR4A_TOOL_IDS)(
+    'resolveNavigationPathForLaunch keeps dedicated path (not dashboard)',
+    (id) => {
+      const launch = resolveCatalogLaunch(id);
+      expect(resolveNavigationPathForLaunch(launch)).toBe(launch.path);
+      expect(resolveNavigationPathForLaunch(launch)).not.toBe('/dashboard');
+    },
+  );
 
   it.each(PR4A_TOOL_IDS)('resolveCatalogLaunch returns Open label and null orchestrator', (id) => {
     const launch = resolveCatalogLaunch(id);
@@ -168,7 +174,7 @@ describe('PR4A registration audit — NLU, backend, aliases', () => {
     'NLU_TO_REGISTRY_ID maps "%s" → %s',
     (alias, canonical) => {
       expect(NLU_TO_REGISTRY_ID[alias]).toBe(canonical);
-    }
+    },
   );
 
   it.each(PR4A_ALL_ALIAS_PAIRS)('resolveRegistryId("%s") → %s', (alias, canonical) => {
@@ -182,7 +188,7 @@ describe('PR4A registration audit — NLU, backend, aliases', () => {
       const fromCanonical = resolveCatalogLaunch(canonical);
       expect(fromAlias.path).toBe(fromCanonical.path);
       expect(fromAlias.registryId).toBe(canonical);
-    }
+    },
   );
 
   it('has no conflicting duplicate aliases in PR4A_ALL_ALIAS_PAIRS', () => {
@@ -209,7 +215,7 @@ describe('PR4A registration audit — NLU, backend, aliases', () => {
     (id) => {
       const keywords = extractToolPatternKeywords(patternsSource, id).map((k) => aliasToSlug(k));
       const requiredForTool = PR4A_REQUIRED_NLU_ALIAS_PAIRS.filter(([, c]) => c === id).map(
-        ([a]) => a
+        ([a]) => a,
       );
       for (const phrase of requiredForTool) {
         const slug = aliasToSlug(phrase);
@@ -217,7 +223,7 @@ describe('PR4A registration audit — NLU, backend, aliases', () => {
         const inBackend = keywords.includes(slug) || keywords.some((k) => k.includes(slug));
         expect(inNluMap || inBackend, `missing alias coverage for "${phrase}" → ${id}`).toBe(true);
       }
-    }
+    },
   );
 
   it('excludes PR4A tools from chat-only hub list', () => {
@@ -228,15 +234,18 @@ describe('PR4A registration audit — NLU, backend, aliases', () => {
 });
 
 describe('PR4A registration audit — catalog, discovery, sidebar', () => {
-  it.each(PR4A_TOOL_IDS)('%s appears exactly once in medical catalog with uiCalculatorSlug', (id) => {
-    const rows = getMedicalToolsCatalogRows();
-    const matches = rows.filter((r) => r.primaryId === id);
-    expect(matches).toHaveLength(1);
-    expect(matches[0].uiCalculatorSlug).toBe(id);
-    expect(matches[0].pagePath).toBe(PR4A_ROUTE_BY_REGISTRY_ID[id]);
-    expect(matches[0].chatOnlyForm).toBe(false);
-    expect(matches[0].backendExecutor).toBe(false);
-  });
+  it.each(PR4A_TOOL_IDS)(
+    '%s appears exactly once in medical catalog with uiCalculatorSlug',
+    (id) => {
+      const rows = getMedicalToolsCatalogRows();
+      const matches = rows.filter((r) => r.primaryId === id);
+      expect(matches).toHaveLength(1);
+      expect(matches[0].uiCalculatorSlug).toBe(id);
+      expect(matches[0].pagePath).toBe(PR4A_ROUTE_BY_REGISTRY_ID[id]);
+      expect(matches[0].chatOnlyForm).toBe(false);
+      expect(matches[0].backendExecutor).toBe(false);
+    },
+  );
 
   it.each(PR4A_CATALOG_SEARCH_QUERIES)('catalog search "%s" finds %s', (id, query) => {
     const rows = getMedicalToolsCatalogRows();

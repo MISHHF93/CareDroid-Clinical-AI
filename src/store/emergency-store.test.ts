@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { createInitialEmergencyStoreState, DEFAULT_EMERGENCY_THRESHOLDS, useEmergencyStore } from './emergencyStore';
+import {
+  createInitialEmergencyStoreState,
+  DEFAULT_EMERGENCY_THRESHOLDS,
+  useEmergencyStore,
+} from './emergencyStore';
 
 describe('CareDroid store shim', () => {
   it('re-exports the canonical CareDroid store', () => {
@@ -45,7 +49,9 @@ describe('CareDroid store shim', () => {
 
     store.setThreshold('capacityOrangePct', 0.82);
     expect(useEmergencyStore.getState().thresholds.capacityOrangePct).toBe(0.82);
-    expect(useEmergencyStore.getState().emergencySettings.thresholds.capacityOrangePercent).toBe(82);
+    expect(useEmergencyStore.getState().emergencySettings.thresholds.capacityOrangePercent).toBe(
+      82,
+    );
 
     useEmergencyStore.getState().resetThresholds();
     expect(useEmergencyStore.getState().thresholds).toEqual(DEFAULT_EMERGENCY_THRESHOLDS);
@@ -204,7 +210,9 @@ describe('CareDroid store shim', () => {
     expect(next.patients.find((candidate) => candidate.id === patient.id)).toEqual(
       expect.objectContaining({ mrn: 'RT-STATE-1' }),
     );
-    expect(next.referrals.find((referral) => referral.id === 'realtime-referral-created-test')).toEqual(
+    expect(
+      next.referrals.find((referral) => referral.id === 'realtime-referral-created-test'),
+    ).toEqual(
       expect.objectContaining({
         patientId: patient.id,
         status: 'Sent',
@@ -307,7 +315,9 @@ describe('CareDroid store shim', () => {
 
     const next = useEmergencyStore.getState();
     const synced = next.patients.find((candidate) => candidate.id === existing.id);
-    expect(synced?.flags).toEqual(expect.arrayContaining(['HighRisk', 'DeteriorationRisk', 'ReassessmentDue']));
+    expect(synced?.flags).toEqual(
+      expect.arrayContaining(['HighRisk', 'DeteriorationRisk', 'ReassessmentDue']),
+    );
   });
 
   it('applies a referral_status_changed realtime event (cross-tab referral sync) using its referral-wrapped payload', () => {
@@ -388,7 +398,8 @@ describe('CareDroid store shim', () => {
     expect(updatedReferral?.requestingStaffId).toBe('staff-A-requester');
 
     const latestAuditEntry = state.auditLog.find(
-      (entry) => entry.action === 'updateReferralStatus' && entry.details?.referralId === localReferral.id,
+      (entry) =>
+        entry.action === 'updateReferralStatus' && entry.details?.referralId === localReferral.id,
     );
     expect(latestAuditEntry?.staffId).toBe('staff-B-responder');
     expect(latestAuditEntry?.staffId).not.toBe('staff-A-requester');
@@ -396,7 +407,8 @@ describe('CareDroid store shim', () => {
     const latestWorkflowLog = [...state.workflowLogs]
       .reverse()
       .find(
-        (log) => log.type === 'referral_status_changed' && log.metadata?.referralId === localReferral.id,
+        (log) =>
+          log.type === 'referral_status_changed' && log.metadata?.referralId === localReferral.id,
       );
     expect(latestWorkflowLog?.actorStaffId).toBe('staff-B-responder');
     expect(latestWorkflowLog?.actorStaffId).not.toBe('staff-A-requester');
@@ -429,9 +441,7 @@ describe('CareDroid store shim', () => {
     useEmergencyStore.setState((state) => ({
       activeShift: { ...state.activeShift, chargeStaffId: 'staff-B-responder' },
     }));
-    useEmergencyStore
-      .getState()
-      .updateReferralStatus(localReferral.id, 'Accepted');
+    useEmergencyStore.getState().updateReferralStatus(localReferral.id, 'Accepted');
 
     const afterLocalUpdate = useEmergencyStore
       .getState()
@@ -494,9 +504,9 @@ describe('CareDroid store shim', () => {
 
     const next = useEmergencyStore.getState();
     // No phantom entry carrying envelope-level fields.
-    expect(next.emsArrivals.some((arrival) => 'module' in arrival || 'generatedAt' in arrival)).toBe(
-      false,
-    );
+    expect(
+      next.emsArrivals.some((arrival) => 'module' in arrival || 'generatedAt' in arrival),
+    ).toBe(false);
     // The real arrival was applied.
     expect(next.emsArrivals.find((arrival) => arrival.id === 'ems-realtime-sync-test')).toEqual(
       expect.objectContaining({ status: 'Arrived' }),

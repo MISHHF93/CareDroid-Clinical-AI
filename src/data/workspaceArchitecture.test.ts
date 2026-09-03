@@ -53,7 +53,7 @@ describe('workspaceArchitecture', () => {
           subscriptionTier: expect.any(String),
           lifecycleStage: expect.any(String),
           status: expect.any(String),
-        })
+        }),
       );
     }
   });
@@ -76,11 +76,11 @@ describe('workspaceArchitecture', () => {
           lifecycleStage: 'future-module',
           roadmapLabel: 'Future Module',
           availabilityLabel: 'Coming Later',
-        })
+        }),
       );
     }
     expect(getActiveWorkspaceRegistry().map((workspace) => workspace.id)).not.toEqual(
-      expect.arrayContaining(FUTURE_WORKSPACE_IDS as string[])
+      expect.arrayContaining(FUTURE_WORKSPACE_IDS as string[]),
     );
   });
 
@@ -96,7 +96,11 @@ describe('workspaceArchitecture', () => {
       'governance',
       'administration',
     ]);
-    expect(getWorkspacePresetForOrganizationType('ems')).toEqual(['emergency', 'fleet', 'operations']);
+    expect(getWorkspacePresetForOrganizationType('ems')).toEqual([
+      'emergency',
+      'fleet',
+      'operations',
+    ]);
     expect(getWorkspacePresetForOrganizationType('university')).toEqual([
       'education',
       'research',
@@ -137,9 +141,17 @@ describe('workspaceArchitecture', () => {
     const emergency = getCareWorkspaceById('emergency');
     const mode = getWorkspaceFunctionalityMode('emergency');
 
-    expect(emergency.defaultNavigationGroups).toEqual(['whiteboard', 'patients', 'ems', 'operations', 'copilot']);
+    expect(emergency.defaultNavigationGroups).toEqual([
+      'whiteboard',
+      'patients',
+      'ems',
+      'operations',
+      'copilot',
+    ]);
     expect(mode.modeName).toBe('CareDroid');
-    expect(mode.purpose).toMatch(/patient flow, queue flow, EMS flow, capacity flow, and decision support/i);
+    expect(mode.purpose).toMatch(
+      /patient flow, queue flow, EMS flow, capacity flow, and decision support/i,
+    );
     expect(emergency.defaultDashboardWidgets).toEqual([
       'current-patients',
       'waiting-room',
@@ -167,7 +179,7 @@ describe('workspaceArchitecture', () => {
         'automation-roi',
         'director',
         'charge-nurse',
-      ])
+      ]),
     );
     expect(mode.workflows).toContain('EMS pre-arrival pipeline');
     expect(mode.workflows).toContain('capacity intelligence');
@@ -192,14 +204,14 @@ describe('workspaceArchitecture', () => {
         'clinical-documentation-assistant',
         'medical-iot-dashboard',
         'simulation-suite',
-      ])
+      ]),
     );
     expect(routePaths).toEqual(
       expect.arrayContaining([
         '/emergency/copilot',
         '/emergency/whiteboard',
         '/emergency/tools?source=operations&filter=operations&q=live-tracking-map&open=live-tracking-map',
-      ])
+      ]),
     );
   });
 
@@ -217,20 +229,23 @@ describe('workspaceArchitecture', () => {
           'laboratory',
           'simulation',
           'competencies',
-        ].map((id) => [id, WORKSPACE_ROUTE_SHORTCUTS[id].path])
-      )
+        ].map((id) => [id, WORKSPACE_ROUTE_SHORTCUTS[id].path]),
+      ),
     ).toEqual({
       tools: '/emergency/tools?source=catalog&filter=all',
       calculators: '/emergency/tools?source=calculators&filter=calculator',
-      hospitalMap: '/emergency/tools?source=operations&filter=operations&q=hospital-map&open=hospital-map',
+      hospitalMap:
+        '/emergency/tools?source=operations&filter=operations&q=hospital-map&open=hospital-map',
       medicalIot:
         '/emergency/tools?source=operations&filter=operations&q=medical-iot-dashboard&open=medical-iot-dashboard',
       devices:
         '/emergency/tools?source=operations&filter=operations&q=device-fleet-management&open=device-fleet-management',
-      fleetMap: '/emergency/tools?source=operations&filter=operations&q=fleet-live-map&open=fleet-live-map',
+      fleetMap:
+        '/emergency/tools?source=operations&filter=operations&q=fleet-live-map&open=fleet-live-map',
       liveMap:
         '/emergency/tools?source=operations&filter=operations&q=live-tracking-map&open=live-tracking-map',
-      laboratory: '/emergency/tools?source=laboratory&filter=laboratory&q=lab-interp&open=lab-interp',
+      laboratory:
+        '/emergency/tools?source=laboratory&filter=laboratory&q=lab-interp&open=lab-interp',
       simulation: '/simulation',
       competencies: '/competencies',
     });
@@ -244,9 +259,10 @@ describe('workspaceArchitecture', () => {
     const canonicalPaths = Object.values(CANONICAL_ROUTES);
     for (const [id, shortcut] of Object.entries(WORKSPACE_ROUTE_SHORTCUTS)) {
       const base = shortcut.path.split('?')[0];
-      expect(canonicalPaths, `${id} path "${shortcut.path}" must derive from CANONICAL_ROUTES`).toContain(
-        base
-      );
+      expect(
+        canonicalPaths,
+        `${id} path "${shortcut.path}" must derive from CANONICAL_ROUTES`,
+      ).toContain(base);
     }
   });
 
@@ -288,11 +304,13 @@ describe('workspaceArchitecture', () => {
           alerts: expect.any(Array),
           reports: expect.any(Array),
           permissions: expect.any(Array),
-        })
+        }),
       );
-      expect(getWorkspaceSubpageEntries(workspaceId).map((subpage) => subpage.id)).toContain('dashboard');
+      expect(getWorkspaceSubpageEntries(workspaceId).map((subpage) => subpage.id)).toContain(
+        'dashboard',
+      );
       expect(getWorkspaceSubpageById(workspaceId, 'dashboard')).toEqual(
-        expect.objectContaining({ path: `/workspace/${workspaceId}/dashboard` })
+        expect.objectContaining({ path: `/workspace/${workspaceId}/dashboard` }),
       );
     }
   });
@@ -342,22 +360,22 @@ describe('workspaceArchitecture', () => {
           id: 'whiteboard',
           taskLabel: 'Open Emergency Whiteboard',
         }),
-      ])
+      ]),
     );
     expect(getWorkspaceSubpageEntries('emergency').map((subpage) => subpage.group)).toEqual(
-      expect.arrayContaining(['command', 'flow', 'operations', 'clinical', 'proof'])
+      expect.arrayContaining(['command', 'flow', 'operations', 'clinical', 'proof']),
     );
     expect(getWorkspaceSubpageEntries('medical-iot').map((subpage) => subpage.id)).toEqual(
-      expect.arrayContaining(['devices', 'telemetry', 'maintenance'])
+      expect.arrayContaining(['devices', 'telemetry', 'maintenance']),
     );
     expect(getWorkspaceSubpageEntries('fleet').map((subpage) => subpage.id)).toEqual(
-      expect.arrayContaining(['map', 'dispatch', 'maintenance'])
+      expect.arrayContaining(['map', 'dispatch', 'maintenance']),
     );
     expect(getWorkspaceSubpageEntries('laboratory').map((subpage) => subpage.id)).toEqual(
-      expect.arrayContaining(['results', 'specimens', 'trends'])
+      expect.arrayContaining(['results', 'specimens', 'trends']),
     );
     expect(getWorkspaceSubpageEntries('governance').map((subpage) => subpage.id)).toEqual(
-      expect.arrayContaining(['audit', 'security', 'risk', 'reviews'])
+      expect.arrayContaining(['audit', 'security', 'risk', 'reviews']),
     );
   });
 
@@ -367,13 +385,13 @@ describe('workspaceArchitecture', () => {
     const icu = buildCareWorkspaceModel('icu');
 
     expect(emergency.toolEntries.map((tool) => tool.id)).toEqual(
-      expect.arrayContaining(['nihss', 'ecg-interpretation-assistant', 'acs-workflow-assistant'])
+      expect.arrayContaining(['nihss', 'ecg-interpretation-assistant', 'acs-workflow-assistant']),
     );
     expect(cardiology.toolEntries.map((tool) => tool.id)).toEqual(
-      expect.arrayContaining(['heart-score', 'timi-ua-nstemi', 'acs-workflow-assistant'])
+      expect.arrayContaining(['heart-score', 'timi-ua-nstemi', 'acs-workflow-assistant']),
     );
     expect(icu.toolEntries.map((tool) => tool.id)).toEqual(
-      expect.arrayContaining(['rox-index', 'pao2-fio2-ratio', 'ventilator-support-assistant'])
+      expect.arrayContaining(['rox-index', 'pao2-fio2-ratio', 'ventilator-support-assistant']),
     );
   });
 });

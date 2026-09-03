@@ -10,8 +10,14 @@ import {
   buildProviderWaitVisibilitySnapshot,
   hasProviderWaitVisibilityActivity,
 } from '../../services/providerWaitVisibilityModel';
-import { summarizeLwbsRiskBoard, buildLwbsRiskAttentionSnapshot } from '../../services/lwbsRiskLayer';
-import { summarizeDeteriorationWatchBoard, buildDeteriorationWatchAttentionSnapshot } from '../../services/waitingRoomDeteriorationWatch';
+import {
+  summarizeLwbsRiskBoard,
+  buildLwbsRiskAttentionSnapshot,
+} from '../../services/lwbsRiskLayer';
+import {
+  summarizeDeteriorationWatchBoard,
+  buildDeteriorationWatchAttentionSnapshot,
+} from '../../services/waitingRoomDeteriorationWatch';
 import { buildReceptionEscalationAttentionSnapshot } from '../../services/receptionEscalationWorkflow';
 import { buildQueueReasonBoardSummary } from '../../services/queueReasonVisibility';
 import { buildFitToWaitAttentionSnapshot } from '../../services/fitToWaitPathway';
@@ -53,7 +59,8 @@ function pushMetric(
   if (!metric.value) return;
   metrics.push({
     ...metric,
-    priority: metric.priority ?? (metric.tone === 'critical' ? 0 : metric.tone === 'warning' ? 1 : 2),
+    priority:
+      metric.priority ?? (metric.tone === 'critical' ? 0 : metric.tone === 'warning' ? 1 : 2),
   });
 }
 
@@ -136,7 +143,10 @@ export function buildWaitingRoomAlertMetrics({
   });
 
   const deterioration = summarizeDeteriorationWatchBoard(patients, deteriorationContext);
-  const deteriorationSnapshot = buildDeteriorationWatchAttentionSnapshot(patients, deteriorationContext);
+  const deteriorationSnapshot = buildDeteriorationWatchAttentionSnapshot(
+    patients,
+    deteriorationContext,
+  );
   const deteriorationTotal =
     deterioration['urgent-review'] + deterioration['review-needed'] + deterioration.watch;
   pushMetric(metrics, {
@@ -165,7 +175,11 @@ export function buildWaitingRoomAlertMetrics({
     id: 'fit-to-wait',
     label: 'Fit-to-wait review',
     value: fitToWait.needsAttentionCount,
-    tone: fitToWait.immediateRoomCount ? 'critical' : fitToWait.needsAttentionCount ? 'warning' : 'success',
+    tone: fitToWait.immediateRoomCount
+      ? 'critical'
+      : fitToWait.needsAttentionCount
+        ? 'warning'
+        : 'success',
     hint: `${fitToWait.unclassifiedCount} seating review`,
     patientId: fitToWait.previewRows[0]?.patientId,
     priority: fitToWait.immediateRoomCount ? 0 : 2,
@@ -186,7 +200,11 @@ export function buildWaitingRoomAlertMetrics({
     id: 'reception-escalation',
     label: 'Reception escalation',
     value: reception.summary.activeCount,
-    tone: reception.summary.criticalCount ? 'critical' : reception.summary.activeCount ? 'warning' : 'success',
+    tone: reception.summary.criticalCount
+      ? 'critical'
+      : reception.summary.activeCount
+        ? 'warning'
+        : 'success',
     hint: `${reception.summary.triageCount} triage · ${reception.summary.chargeCount} charge`,
     patientId: reception.previewRows[0]?.patientId,
     priority: reception.summary.criticalCount ? 0 : 1,

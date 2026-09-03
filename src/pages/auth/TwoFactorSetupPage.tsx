@@ -69,7 +69,9 @@ export default function TwoFactorSetupPage() {
     if (!result.ok || !result.data) {
       // A wrong code is rejected without enabling anything, so keep the user on
       // this step to retype it rather than sending them back to a fresh secret.
-      setError(result.message || 'That code was not accepted. Check your authenticator and try again.');
+      setError(
+        result.message || 'That code was not accepted. Check your authenticator and try again.',
+      );
       return;
     }
     setBackupCodes(result.data.backupCodes || []);
@@ -108,8 +110,8 @@ export default function TwoFactorSetupPage() {
       <header className="two-factor-page__header">
         <h1 id="two-factor-heading">Two-factor authentication</h1>
         <p>
-          Adds a second step at sign-in using an authenticator app. Required for admin and
-          physician roles wherever your hospital enforces it.
+          Adds a second step at sign-in using an authenticator app. Required for admin and physician
+          roles wherever your hospital enforces it.
         </p>
       </header>
 
@@ -121,14 +123,19 @@ export default function TwoFactorSetupPage() {
 
       {phase === 'loading' ? (
         <p className="two-factor-page__loading" role="status">
-          <Loader2 aria-hidden="true" className="two-factor-page__spin" /> Checking your security settings...
+          <Loader2 aria-hidden="true" className="two-factor-page__spin" /> Checking your security
+          settings...
         </p>
       ) : null}
 
       {phase !== 'loading' && status ? (
         <section className="two-factor-page__status" aria-label="Current status">
           <span className={status.enabled ? 'is-on' : 'is-off'}>
-            {status.enabled ? <ShieldCheck aria-hidden="true" /> : <ShieldAlert aria-hidden="true" />}
+            {status.enabled ? (
+              <ShieldCheck aria-hidden="true" />
+            ) : (
+              <ShieldAlert aria-hidden="true" />
+            )}
             {status.enabled ? 'Enabled' : 'Not enabled'}
           </span>
           {status.enabled ? (
@@ -139,7 +146,9 @@ export default function TwoFactorSetupPage() {
               </div>
               <div>
                 <dt>Last used</dt>
-                <dd>{status.lastUsedAt ? new Date(status.lastUsedAt).toLocaleString() : 'Never'}</dd>
+                <dd>
+                  {status.lastUsedAt ? new Date(status.lastUsedAt).toLocaleString() : 'Never'}
+                </dd>
               </div>
             </dl>
           ) : null}
@@ -147,7 +156,12 @@ export default function TwoFactorSetupPage() {
       ) : null}
 
       {phase === 'idle' && status && !status.enabled ? (
-        <button type="button" className="two-factor-page__primary" onClick={beginEnrollment} disabled={busy}>
+        <button
+          type="button"
+          className="two-factor-page__primary"
+          onClick={beginEnrollment}
+          disabled={busy}
+        >
           <KeyRound aria-hidden="true" /> Set up two-factor authentication
         </button>
       ) : null}

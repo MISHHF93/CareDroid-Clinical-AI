@@ -7,7 +7,9 @@ describe('suiteFeatureEntitlements', () => {
   it('uses defined subscription tiers for every suite feature', () => {
     const validTiers = new Set(Object.values(SUBSCRIPTION_TIERS));
     for (const [featureId, config] of Object.entries(SUITE_FEATURE_ENTITLEMENTS)) {
-      expect(validTiers.has(config.requiredPlan), `${featureId} has invalid requiredPlan`).toBe(true);
+      expect(validTiers.has(config.requiredPlan), `${featureId} has invalid requiredPlan`).toBe(
+        true,
+      );
     }
   });
 

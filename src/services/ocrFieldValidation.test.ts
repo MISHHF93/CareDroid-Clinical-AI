@@ -6,7 +6,9 @@ import {
 } from './ocrFieldValidation';
 import type { OcrExtractedField, OcrJob } from './ocrIntakeApi';
 
-const field = (partial: Partial<OcrExtractedField> & Pick<OcrExtractedField, 'field' | 'value'>): OcrExtractedField => ({
+const field = (
+  partial: Partial<OcrExtractedField> & Pick<OcrExtractedField, 'field' | 'value'>,
+): OcrExtractedField => ({
   confidence: 0.9,
   status: 'pending',
   ...partial,
@@ -42,7 +44,13 @@ describe('ocrFieldValidation', () => {
   it('builds demographics only from accepted/edited identity fields', () => {
     const result = buildAuthoritativeDemographicsFromOcr([
       field({ field: 'firstName', value: 'Ada', status: 'accepted', confidence: 0.9 }),
-      field({ field: 'lastName', value: 'Lovelace', status: 'edited', editedValue: 'Lovelace', confidence: 0.4 }),
+      field({
+        field: 'lastName',
+        value: 'Lovelace',
+        status: 'edited',
+        editedValue: 'Lovelace',
+        confidence: 0.4,
+      }),
       field({ field: 'chiefComplaint', value: 'Chest pain', status: 'accepted', confidence: 0.95 }),
     ]);
     expect(result.ok).toBe(true);

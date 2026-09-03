@@ -1,6 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
 import { UNIFIED_SERVICE_REGISTRY_VERSION } from '../config/unifiedServiceRegistry.config';
-import { fetchUnifiedPlatformHealth, getUnifiedServiceHealthSnapshot } from './unifiedServiceRegistry';
+import {
+  fetchUnifiedPlatformHealth,
+  getUnifiedServiceHealthSnapshot,
+} from './unifiedServiceRegistry';
 
 vi.mock('./saasHealthApi', () => ({
   SAAS_HEALTH_FALLBACK: { status: 'critical', checks: [], summary: { total: 0 } },

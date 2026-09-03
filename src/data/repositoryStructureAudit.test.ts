@@ -21,7 +21,15 @@ import { fileURLToPath } from 'node:url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(__dirname, '../..');
 
-const SKIP_DIRS = new Set(['node_modules', 'dist', 'coverage', 'test-results', 'logs', 'agent-tools', 'terminals']);
+const SKIP_DIRS = new Set([
+  'node_modules',
+  'dist',
+  'coverage',
+  'test-results',
+  'logs',
+  'agent-tools',
+  'terminals',
+]);
 const SOURCE_EXTENSIONS = ['.ts', '.tsx', '.js', '.jsx', '.mjs'];
 
 function findNestedGitDirs(dir: string, depth = 0): string[] {
@@ -42,9 +50,7 @@ function findNestedGitDirs(dir: string, depth = 0): string[] {
 
 // Real production HTTP servers only — test files start throwaway servers for
 // integration tests, which is expected and not a second production backend.
-const ALLOWED_LISTEN_FILES = new Set([
-  'backend/src/main.ts',
-]);
+const ALLOWED_LISTEN_FILES = new Set(['backend/src/main.ts']);
 
 function findStrayListenCalls(dir: string): string[] {
   if (!existsSync(dir)) return [];
@@ -75,7 +81,8 @@ function findStrayListenCalls(dir: string): string[] {
 // shape (index.html / vite.config* / webpack.config*) rather than by name —
 // so a brand-new third frontend dropped in anywhere else gets caught instead
 // of silently passing the way a fixed-path existsSync() check would.
-const FRONTEND_ENTRY_PATTERN = /^(index\.html|vite\.config\.[cm]?[jt]s|webpack\.config\.[cm]?[jt]s)$/;
+const FRONTEND_ENTRY_PATTERN =
+  /^(index\.html|vite\.config\.[cm]?[jt]s|webpack\.config\.[cm]?[jt]s)$/;
 
 function findFrontendEntryPoints(dir: string): string[] {
   if (!existsSync(dir)) return [];

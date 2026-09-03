@@ -46,7 +46,11 @@ export default function ToolsAreaFallback() {
     );
   }
 
-  const areaLabel = isFleetAreaPath(pathname) ? 'Fleet' : isToolsAreaPath(pathname) ? 'Clinical tools' : 'Tools';
+  const areaLabel = isFleetAreaPath(pathname)
+    ? 'Fleet'
+    : isToolsAreaPath(pathname)
+      ? 'Clinical tools'
+      : 'Tools';
 
   return (
     <ToolNotFound

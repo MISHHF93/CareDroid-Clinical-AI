@@ -61,9 +61,9 @@ describe('aiChiefOrchestration contract', () => {
     const snapshot = buildAiChiefOrchestrationSnapshot();
     expect(AI_CHIEF_SAFETY_STATEMENT.replacesClinicianJudgment).toBe(false);
     expect(snapshot.safety.replacesClinicianJudgment).toBe(false);
-    expect(snapshot.recommendations.every((rec) => rec.advisoryOnly && rec.humanReviewRequired)).toBe(
-      true,
-    );
+    expect(
+      snapshot.recommendations.every((rec) => rec.advisoryOnly && rec.humanReviewRequired),
+    ).toBe(true);
     expect(snapshot.patientContexts.every((context) => context.humanReviewRequired)).toBe(true);
   });
 
@@ -95,10 +95,7 @@ describe('aiChiefOrchestration contract', () => {
   });
 
   it('does not start a duplicate emergency realtime session from useCareDroidCentralNode', () => {
-    const source = readFileSync(
-      path.join(ROOT, 'src/hooks/useCareDroidCentralNode.ts'),
-      'utf8',
-    );
+    const source = readFileSync(path.join(ROOT, 'src/hooks/useCareDroidCentralNode.ts'), 'utf8');
     expect(source).not.toContain('startEmergencyRealtime');
     expect(source).toContain('AppShell owns the singleton emergency realtime session');
   });

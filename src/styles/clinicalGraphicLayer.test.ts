@@ -7,13 +7,28 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const designSystemCss = readFileSync(join(__dirname, 'design-system.css'), 'utf8');
 const graphicLayerCss = readFileSync(join(__dirname, 'clinical-graphic-layer.css'), 'utf8');
-const routeSharedSource = readFileSync(join(__dirname, '../pages/emergency/emergencyRouteShared.tsx'), 'utf8');
-const shellRouteTabSource = readFileSync(join(__dirname, '../components/chrome/ShellRouteTab.tsx'), 'utf8');
-const emptyStateSource = readFileSync(join(__dirname, '../components/data-display/EmptyState.tsx'), 'utf8');
+const routeSharedSource = readFileSync(
+  join(__dirname, '../pages/emergency/emergencyRouteShared.tsx'),
+  'utf8',
+);
+const shellRouteTabSource = readFileSync(
+  join(__dirname, '../components/chrome/ShellRouteTab.tsx'),
+  'utf8',
+);
+const emptyStateSource = readFileSync(
+  join(__dirname, '../components/data-display/EmptyState.tsx'),
+  'utf8',
+);
 const patientCardSource = readFileSync(join(__dirname, '../components/PatientCard.tsx'), 'utf8');
 const emsPipelineSource = readFileSync(join(__dirname, '../components/EMSPipeline.tsx'), 'utf8');
-const commandCenterSource = readFileSync(join(__dirname, '../pages/emergency/HospitalCommandCenter.tsx'), 'utf8');
-const receptionSource = readFileSync(join(__dirname, '../pages/emergency/ReceptionWorkspace.tsx'), 'utf8');
+const commandCenterSource = readFileSync(
+  join(__dirname, '../pages/emergency/HospitalCommandCenter.tsx'),
+  'utf8',
+);
+const receptionSource = readFileSync(
+  join(__dirname, '../pages/emergency/ReceptionWorkspace.tsx'),
+  'utf8',
+);
 
 describe('clinical graphic layer', () => {
   it('loads graphic layer after page sweep', () => {

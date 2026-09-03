@@ -4,7 +4,7 @@ import './PatientExperienceStatusBadge.css';
 
 export default function PatientExperienceStatusBadge({
   patient,
-  referrals = ([] as any[]),
+  referrals = [] as any[],
   compact = false,
   showStaffDetail = false,
   audience = undefined,
@@ -13,13 +13,8 @@ export default function PatientExperienceStatusBadge({
 
   const snapshot = resolvePatientExperienceStatus(patient, { referrals });
   const resolvedAudience = audience || (showStaffDetail ? 'staff' : 'patient');
-  const messagingLabel = resolvePatientWaitingRoomMessage(
-    patient,
-    { referrals },
-    resolvedAudience,
-  );
-  const displayLabel =
-    messagingLabel || (compact ? snapshot.shortLabel : snapshot.label);
+  const messagingLabel = resolvePatientWaitingRoomMessage(patient, { referrals }, resolvedAudience);
+  const displayLabel = messagingLabel || (compact ? snapshot.shortLabel : snapshot.label);
 
   return (
     <span
@@ -33,7 +28,9 @@ export default function PatientExperienceStatusBadge({
       title={[
         displayLabel,
         showStaffDetail ? snapshot.staffDetail : null,
-        showStaffDetail ? `Internal state: ${snapshot.internalState}` : 'Patient-safe waiting room status',
+        showStaffDetail
+          ? `Internal state: ${snapshot.internalState}`
+          : 'Patient-safe waiting room status',
       ]
         .filter(Boolean)
         .join(' · ')}

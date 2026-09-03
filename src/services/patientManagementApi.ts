@@ -8,12 +8,15 @@ export const PATIENT_MANAGEMENT_ENDPOINTS = Object.freeze({
   carePlan: (patientId) => `/api/patients/${encodeURIComponent(patientId)}/care-plan`,
   sourceData: (patientId) => `/api/patients/${encodeURIComponent(patientId)}/source-data`,
   reviewItems: (patientId) => `/api/patients/${encodeURIComponent(patientId)}/review-items`,
-  privacyAccessLog: (patientId) => `/api/privacy/patient/${encodeURIComponent(patientId)}/access-log`,
+  privacyAccessLog: (patientId) =>
+    `/api/privacy/patient/${encodeURIComponent(patientId)}/access-log`,
   updatePatient: (patientId) => `/api/patients/${encodeURIComponent(patientId)}`,
   importEhrPatient: '/api/patients/import/ehr',
   importLabs: (patientId) => `/api/patients/${encodeURIComponent(patientId)}/import/labs`,
-  importMedications: (patientId) => `/api/patients/${encodeURIComponent(patientId)}/import/medications`,
-  importObservations: (patientId) => `/api/patients/${encodeURIComponent(patientId)}/import/observations`,
+  importMedications: (patientId) =>
+    `/api/patients/${encodeURIComponent(patientId)}/import/medications`,
+  importObservations: (patientId) =>
+    `/api/patients/${encodeURIComponent(patientId)}/import/observations`,
 });
 
 const PATIENT_READ_ENDPOINTS = Object.freeze([
@@ -50,13 +53,20 @@ function pickFirstArray(...values) {
 }
 
 function normalizeMedication(item, index) {
-  const name = item?.name || item?.medication || item?.drug || item?.display || item?.label || `Medication ${index + 1}`;
+  const name =
+    item?.name ||
+    item?.medication ||
+    item?.drug ||
+    item?.display ||
+    item?.label ||
+    `Medication ${index + 1}`;
   return {
     id: item?.id || item?.medicationId || `med-${index}`,
     name,
     dose: item?.dose || item?.dosage || item?.sig || item?.instructions || '',
     status: item?.status || item?.clinicalStatus || item?.intent || 'recorded',
-    lastUpdated: item?.lastUpdated || item?.recordedAt || item?.effectiveDateTime || item?.date || null,
+    lastUpdated:
+      item?.lastUpdated || item?.recordedAt || item?.effectiveDateTime || item?.date || null,
     source: item?.source || item?.sourceSystem || 'backend',
     raw: item,
   };
@@ -65,11 +75,12 @@ function normalizeMedication(item, index) {
 function normalizeAllergy(item, index) {
   const severity = String(item?.severity || item?.criticality || item?.risk || '').toLowerCase();
   const isCritical = ['critical', 'high', 'severe', 'life-threatening'].some((token) =>
-    severity.includes(token)
+    severity.includes(token),
   );
   return {
     id: item?.id || item?.allergyId || `allergy-${index}`,
-    substance: item?.substance || item?.allergen || item?.name || item?.code || `Allergy ${index + 1}`,
+    substance:
+      item?.substance || item?.allergen || item?.name || item?.code || `Allergy ${index + 1}`,
     reaction: item?.reaction || item?.manifestation || item?.description || '',
     severity: item?.severity || item?.criticality || item?.risk || 'recorded',
     isCritical,
@@ -119,7 +130,8 @@ function normalizeVisit(item, index) {
   return {
     id: item?.id || item?.encounterId || `visit-${index}`,
     date: item?.date || item?.arrivalTime || item?.period?.start || item?.startedAt || null,
-    complaint: item?.complaint || item?.chiefComplaint || item?.reason || item?.diagnosis || 'Visit',
+    complaint:
+      item?.complaint || item?.chiefComplaint || item?.reason || item?.diagnosis || 'Visit',
     disposition: item?.disposition || item?.status || item?.outcome || '',
     location: item?.location || item?.unit || item?.facility || '',
     source: item?.source || item?.sourceSystem || 'backend',
@@ -161,10 +173,18 @@ function normalizeNote(item, index) {
 
 function normalizeOrderStatus(value) {
   const status = String(value || 'pending').toLowerCase();
-  if (['resulted', 'complete', 'completed', 'final', 'reported'].some((token) => status.includes(token))) {
+  if (
+    ['resulted', 'complete', 'completed', 'final', 'reported'].some((token) =>
+      status.includes(token),
+    )
+  ) {
     return 'Resulted';
   }
-  if (['cancelled', 'canceled', 'voided', 'stopped', 'discontinued'].some((token) => status.includes(token))) {
+  if (
+    ['cancelled', 'canceled', 'voided', 'stopped', 'discontinued'].some((token) =>
+      status.includes(token),
+    )
+  ) {
     return 'Cancelled';
   }
   return 'Pending';
@@ -175,7 +195,13 @@ function normalizeOrder(item, index) {
   return {
     id: item?.id || item?.orderId || `order-${index}`,
     type: item?.type || item?.category || item?.service || item?.modality || 'Clinical',
-    name: item?.name || item?.test || item?.medication || item?.study || item?.label || `Order ${index + 1}`,
+    name:
+      item?.name ||
+      item?.test ||
+      item?.medication ||
+      item?.study ||
+      item?.label ||
+      `Order ${index + 1}`,
     orderedBy: item?.orderedBy || item?.requester || item?.clinician || item?.author || 'Backend',
     orderedAt: item?.orderedAt || item?.requestedAt || item?.createdAt || item?.date || null,
     status,
@@ -202,7 +228,9 @@ function normalizeDiagnosis(item, index) {
     status: item?.status || item?.clinicalStatus || item?.verificationStatus || 'recorded',
     confirmed:
       item?.confirmed === true ||
-      String(item?.status || item?.verificationStatus || '').toLowerCase().includes('confirm'),
+      String(item?.status || item?.verificationStatus || '')
+        .toLowerCase()
+        .includes('confirm'),
     recordedAt: item?.recordedAt || item?.onsetDateTime || item?.date || null,
     source: item?.source || item?.sourceSystem || 'backend',
     raw: item,
@@ -223,14 +251,14 @@ function normalizePatientManagementBundle(patientId, payloads) {
     sourceData.medicationStatements,
     summary.medications,
     workspace.medications,
-    carePlan.medications
+    carePlan.medications,
   ).map(normalizeMedication);
 
   const allergies = pickFirstArray(
     sourceData.allergies,
     sourceData.allergyIntolerances,
     summary.allergies,
-    workspace.allergies
+    workspace.allergies,
   ).map(normalizeAllergy);
 
   const labs = pickFirstArray(
@@ -239,7 +267,7 @@ function normalizePatientManagementBundle(patientId, payloads) {
     sourceData.observations?.labs,
     summary.labs,
     summary.labResults,
-    workspace.labs
+    workspace.labs,
   ).map(normalizeLab);
 
   const imaging = pickFirstArray(
@@ -248,7 +276,7 @@ function normalizePatientManagementBundle(patientId, payloads) {
     sourceData.radiology,
     summary.imaging,
     summary.radiology,
-    workspace.imaging
+    workspace.imaging,
   ).map(normalizeImaging);
 
   const visits = pickFirstArray(
@@ -256,14 +284,14 @@ function normalizePatientManagementBundle(patientId, payloads) {
     sourceData.encounters,
     sourceData.previousVisits,
     summary.visits,
-    workspace.previousVisits
+    workspace.previousVisits,
   ).map(normalizeVisit);
 
   const observations = pickFirstArray(
     sourceData.observations,
     sourceData.vitals,
     timeline.observations,
-    timeline.events
+    timeline.events,
   ).map(normalizeObservation);
 
   const documents = pickFirstArray(
@@ -272,7 +300,7 @@ function normalizePatientManagementBundle(patientId, payloads) {
     summary.documents,
     summary.notes,
     reviewItems.items,
-    reviewItems.reviewItems
+    reviewItems.reviewItems,
   ).map(normalizeNote);
 
   const orders = [
@@ -310,7 +338,7 @@ function normalizePatientManagementBundle(patientId, payloads) {
     summary.diagnoses,
     summary.conditions,
     workspace.diagnoses,
-    workspace.conditions
+    workspace.conditions,
   ).map(normalizeDiagnosis);
 
   return {
@@ -397,12 +425,12 @@ export async function fetchPatientManagementBundle(patientId, options: any = {})
     PATIENT_READ_ENDPOINTS.map(async ([key, buildPath]) => {
       const result = await requestJson((buildPath as any)(patientId), options);
       return [key, result];
-    })
+    }),
   );
 
   const results = Object.fromEntries(entries);
   const payloads = Object.fromEntries(
-    entries.map(([key, result]) => [key, (result as any).ok ? (result as any).data : null])
+    entries.map(([key, result]) => [key, (result as any).ok ? (result as any).data : null]),
   );
   const failures = entries.filter(([, result]) => !(result as any).ok);
   const anySuccess = entries.some(([, result]) => (result as any).ok);
@@ -435,11 +463,19 @@ export function importPatientLabs(patientId, payload: any = {}, options: any = {
 }
 
 export function importPatientMedications(patientId, payload: any = {}, options: any = {}) {
-  return postPatientImport(PATIENT_MANAGEMENT_ENDPOINTS.importMedications(patientId), payload, options);
+  return postPatientImport(
+    PATIENT_MANAGEMENT_ENDPOINTS.importMedications(patientId),
+    payload,
+    options,
+  );
 }
 
 export function importPatientObservations(patientId, payload: any = {}, options: any = {}) {
-  return postPatientImport(PATIENT_MANAGEMENT_ENDPOINTS.importObservations(patientId), payload, options);
+  return postPatientImport(
+    PATIENT_MANAGEMENT_ENDPOINTS.importObservations(patientId),
+    payload,
+    options,
+  );
 }
 
 import { patientMatchesSearch } from '../utils/patientSearch';
@@ -448,7 +484,10 @@ function patientMatchesQuery(patient, query) {
   return patientMatchesSearch(patient, query);
 }
 
-export async function searchPatientsFromBackend(query, { localPatients = ([] as any[]), limit = 8 }: any = {}) {
+export async function searchPatientsFromBackend(
+  query,
+  { localPatients = [] as any[], limit = 8 }: any = {},
+) {
   const normalizedQuery = String(query || '').trim();
   if (normalizedQuery.length < 2) {
     return {
@@ -460,7 +499,9 @@ export async function searchPatientsFromBackend(query, { localPatients = ([] as 
     };
   }
 
-  const candidatePatients = localPatients.filter((patient) => patientMatchesQuery(patient, normalizedQuery)).slice(0, limit);
+  const candidatePatients = localPatients
+    .filter((patient) => patientMatchesQuery(patient, normalizedQuery))
+    .slice(0, limit);
 
   if (!candidatePatients.length) {
     return {
@@ -477,7 +518,7 @@ export async function searchPatientsFromBackend(query, { localPatients = ([] as 
     candidatePatients.map(async (patient) => ({
       patient,
       bundle: await fetchPatientManagementBundle(patient.id),
-    }))
+    })),
   );
 
   return {

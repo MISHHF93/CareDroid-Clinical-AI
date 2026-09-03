@@ -42,7 +42,9 @@ function dataOf(value: unknown): Record<string, unknown> {
 
 function arrayOf(value: unknown): Array<Record<string, unknown>> {
   return Array.isArray(value)
-    ? value.filter((item): item is Record<string, unknown> => Boolean(item) && typeof item === 'object')
+    ? value.filter(
+        (item): item is Record<string, unknown> => Boolean(item) && typeof item === 'object',
+      )
     : [];
 }
 
@@ -100,7 +102,11 @@ export function usePatientTimelineContext(patientId: string | null): TimelineCon
       const referrals = dataOf(fulfilledValue(results, 5));
       const provincial = dataOf(fulfilledValue(results, 6));
       const copilot = dataOf(fulfilledValue(results, 7));
-      const patientManagement = fulfilledValue(results, 8) as { ok?: boolean; data?: { timelineEvents?: unknown[] }; error?: string } | null;
+      const patientManagement = fulfilledValue(results, 8) as {
+        ok?: boolean;
+        data?: { timelineEvents?: unknown[] };
+        error?: string;
+      } | null;
       const patientWorkflowLogs = dataOf(fulfilledValue(results, 9));
       const ocrJobs = fulfilledValue(results, 10) as { jobs?: unknown[] } | null;
       const failures = rejectedMessages(results);

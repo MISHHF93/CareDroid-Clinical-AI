@@ -62,7 +62,9 @@ describe('aiChiefOrchestrator', () => {
     expect(inferAlertScenario({ chiefComplaint: 'Chest pain radiating to jaw' })).toBe(
       'critical_chest_pain',
     );
-    expect(inferAlertScenario({ complaint: 'Possible stroke with facial droop' })).toBe('stroke_alert');
+    expect(inferAlertScenario({ complaint: 'Possible stroke with facial droop' })).toBe(
+      'stroke_alert',
+    );
     expect(inferAlertScenario({}, 'ems_prearrival_risk_summary')).toBe('ems_incoming');
   });
 

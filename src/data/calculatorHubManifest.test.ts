@@ -62,7 +62,7 @@ describe('calculatorHubManifest', () => {
   it.each(BUILTIN_CALCULATOR_FORM_SMOKE_ROWS)('$slug has a registered route', ({ slug, route }) => {
     expect(route).toBeTruthy();
     expect(CALCULATOR_ROUTE_DEFS.some((d) => d.calculatorSlug === slug && d.path === route)).toBe(
-      true
+      true,
     );
   });
 

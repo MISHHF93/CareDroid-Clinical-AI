@@ -19,7 +19,10 @@ import { emergencyPatternGroups } from './emergencyPatternCatalog';
 import { resolveCatalogLaunch, NLU_TO_REGISTRY_ID } from './clinicalCatalogWiring';
 import { assertAppCalculatorRouteWiring } from './testHelpers/calculatorRouteAudit';
 
-const appSrc = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../app/router.tsx'), 'utf8');
+const appSrc = readFileSync(
+  join(dirname(fileURLToPath(import.meta.url)), '../app/router.tsx'),
+  'utf8',
+);
 
 /** Keys in CostTrackingContext TOOL_COSTS that are phantom / non-registry tools */
 const COST_TRACKING_EXTRA_TOOL_KEYS = [
@@ -62,14 +65,14 @@ describe('sourceCodeToolDiscovery', () => {
 
   it('separates true phantoms from API-only and alias-only source-audit references', () => {
     expect(truePhantomToolReferences.map((p) => p.id)).toEqual(
-      expect.arrayContaining(['abc-assessment', 'cancer-calculator'])
+      expect.arrayContaining(['abc-assessment', 'cancer-calculator']),
     );
     expect(apiOnlyToolReferences.map((p) => p.id)).toContain('vitals-monitor');
     expect(aliasOnlyToolReferences.map((p) => p.id)).toEqual(
-      expect.arrayContaining(['bleeding-risk', 'medication-checker'])
+      expect.arrayContaining(['bleeding-risk', 'medication-checker']),
     );
     expect(new Set(phantomToolReferences.map((p) => p.sourceScanKind))).toEqual(
-      new Set(['true-phantom', 'api-only', 'alias'])
+      new Set(['true-phantom', 'api-only', 'alias']),
     );
   });
 
@@ -84,9 +87,7 @@ describe('sourceCodeToolDiscovery', () => {
 
   it('mirrors emergency pattern count from catalog file', () => {
     expect(emergencyPatternGroups.length).toBeGreaterThanOrEqual(15);
-    const emergencyRows = getAllDiscoveredTools().filter(
-      (r) => r.status === 'emergency-pattern'
-    );
+    const emergencyRows = getAllDiscoveredTools().filter((r) => r.status === 'emergency-pattern');
     expect(emergencyRows.length).toBe(emergencyPatternGroups.length);
   });
 
@@ -229,20 +230,17 @@ describe('sourceCodeToolDiscovery', () => {
     ['nihss', /NIH Stroke Scale/i, 'stroke scale'],
     ['canadian-c-spine', /Canadian C-Spine Rule/i, 'cervical-spine-rule'],
     ['ottawa-ankle', /Ottawa Ankle Rule/i, 'ankle-injury-imaging'],
-  ])(
-    'resolves PR3 %s as hub-only with guided chatSeed for aliases',
-    (id, seedPattern, alias) => {
-      const launch = resolveCatalogLaunch(id);
-      expect(launch.path).toBe('/tools/calculators');
-      expect(launch.registryId).toBe(id);
-      expect(launch.chatSeed).toMatch(seedPattern);
-      const fromAlias = resolveCatalogLaunch(alias);
-      expect(fromAlias.chatSeed).toBe(launch.chatSeed);
-      const appPath = join(dirname(fileURLToPath(import.meta.url)), '../app/router.tsx');
-      const appSrc = readFileSync(appPath, 'utf8');
-      expect(appSrc).not.toContain(`path: '/tools/calculators/${id}'`);
-    }
-  );
+  ])('resolves PR3 %s as hub-only with guided chatSeed for aliases', (id, seedPattern, alias) => {
+    const launch = resolveCatalogLaunch(id);
+    expect(launch.path).toBe('/tools/calculators');
+    expect(launch.registryId).toBe(id);
+    expect(launch.chatSeed).toMatch(seedPattern);
+    const fromAlias = resolveCatalogLaunch(alias);
+    expect(fromAlias.chatSeed).toBe(launch.chatSeed);
+    const appPath = join(dirname(fileURLToPath(import.meta.url)), '../app/router.tsx');
+    const appSrc = readFileSync(appPath, 'utf8');
+    expect(appSrc).not.toContain(`path: '/tools/calculators/${id}'`);
+  });
 
   it('registers TIMI UA/NSTEMI sidebar entry and App route', () => {
     expect(toolRegistryById['timi-ua-nstemi']?.path).toBe('/tools/calculators/timi-ua-nstemi');

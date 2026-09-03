@@ -23,7 +23,7 @@ vi.mock('../contexts/ThemeContext', () => ({
 }));
 
 vi.mock('../contexts/UserContext', async (importOriginal) => {
-  const actual = await importOriginal() as any;
+  const actual = (await importOriginal()) as any;
   return {
     ...actual,
     useUser: () => mockUserState,
@@ -75,7 +75,7 @@ function renderSettings() {
   return render(
     <MemoryRouter>
       <Settings />
-    </MemoryRouter>
+    </MemoryRouter>,
   );
 }
 
@@ -211,7 +211,7 @@ describe('Settings Billing card', () => {
 
     await waitFor(() => {
       expect(createCheckoutSession).toHaveBeenCalledWith(
-        expect.objectContaining({ tier: 'professional' })
+        expect.objectContaining({ tier: 'professional' }),
       );
     });
     expect(await screen.findByText(/backend did not return a billing url/i)).toBeInTheDocument();
@@ -225,7 +225,7 @@ describe('Settings Billing card', () => {
 
     await waitFor(() => {
       expect(createCustomerPortalSession).toHaveBeenCalledWith(
-        expect.objectContaining({ returnUrl: expect.any(String) })
+        expect.objectContaining({ returnUrl: expect.any(String) }),
       );
     });
   });
@@ -250,7 +250,9 @@ describe('Settings Billing card', () => {
   it('renders enterprise identity provider registry readiness', async () => {
     renderSettings();
 
-    expect(await screen.findByRole('heading', { name: /enterprise identity/i })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: /enterprise identity/i }),
+    ).toBeInTheDocument();
     expect(screen.getByText('Google Workspace')).toBeInTheDocument();
     expect(screen.getByText(/supported · oauth2 · \/api\/auth\/google/i)).toBeInTheDocument();
   });
@@ -259,7 +261,7 @@ describe('Settings Billing card', () => {
     renderSettings();
 
     expect(
-      await screen.findByRole('heading', { name: /tenant data isolation audit/i })
+      await screen.findByRole('heading', { name: /tenant data isolation audit/i }),
     ).toBeInTheDocument();
     expect(screen.getByText('tenant_isolated')).toBeInTheDocument();
     expect(screen.getByText('Audit Logs')).toBeInTheDocument();

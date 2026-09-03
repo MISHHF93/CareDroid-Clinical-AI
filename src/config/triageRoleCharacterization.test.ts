@@ -18,10 +18,7 @@ import {
   NEST_PERMISSION,
 } from './emergencyNestPermissionMap';
 import { CANONICAL_ROUTES } from './routes.config';
-import {
-  TRIAGE_SCREEN_ACTIONS,
-  TRIAGE_SCREEN_WIDGETS,
-} from './triageScreenModel';
+import { TRIAGE_SCREEN_ACTIONS, TRIAGE_SCREEN_WIDGETS } from './triageScreenModel';
 import { QUEUE_MOVEMENT_REGISTRY } from '../services/queueAssignment';
 
 describe('Triage role characterization (Stage I)', () => {

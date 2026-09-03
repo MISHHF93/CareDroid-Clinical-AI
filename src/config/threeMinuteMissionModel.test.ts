@@ -9,7 +9,12 @@ import {
 describe('threeMinuteMissionModel', () => {
   it('defines standardized workflows for all mission triggers', () => {
     expect(THREE_MINUTE_MISSION_DEFINITIONS).toHaveLength(4);
-    for (const trigger of ['critical_alert', 'ems_pre_arrival', 'critical_patient', 'reassessment_breach']) {
+    for (const trigger of [
+      'critical_alert',
+      'ems_pre_arrival',
+      'critical_patient',
+      'reassessment_breach',
+    ]) {
       const definition = getThreeMinuteMissionDefinition(trigger as any);
       expect(definition.tasks).toHaveLength(4);
       expect(definition.aiIntent).toBe('three_minute_response_plan');

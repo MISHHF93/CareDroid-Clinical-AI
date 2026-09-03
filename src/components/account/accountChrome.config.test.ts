@@ -26,11 +26,6 @@ describe('accountChrome.config', () => {
     const admin = resolveAccountMenuDestinations({ showAdmin: true }).map((d) => d.id);
 
     expect(standard).toEqual(['profile-overview', 'profile-settings', 'entry-hub']);
-    expect(admin).toEqual([
-      'profile-overview',
-      'profile-settings',
-      'entry-hub',
-      'admin-console',
-    ]);
+    expect(admin).toEqual(['profile-overview', 'profile-settings', 'entry-hub', 'admin-console']);
   });
 });

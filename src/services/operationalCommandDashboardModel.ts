@@ -101,7 +101,9 @@ function toneForPendingBedAssignment(count: number): OperationalDashboardTone {
   return count > 0 ? 'amber' : 'green';
 }
 
-function toPredictiveBedAlerts(assessments: PatientAdmissionAssessment[]): PredictiveBedAssignmentAlert[] {
+function toPredictiveBedAlerts(
+  assessments: PatientAdmissionAssessment[],
+): PredictiveBedAssignmentAlert[] {
   return assessments.map((assessment) => ({
     patientId: assessment.patientId,
     patientLabel: assessment.patientLabel,
@@ -122,7 +124,8 @@ const ZONE_ORDER = ['resus', 'treatment', 'isolation', 'waiting'] as const;
 
 function activePatients(patients: Patient[]): Patient[] {
   return patients.filter(
-    (patient) => patient.state !== PatientState.Discharge && patient.state !== PatientState.Deceased,
+    (patient) =>
+      patient.state !== PatientState.Discharge && patient.state !== PatientState.Deceased,
   );
 }
 
@@ -191,10 +194,7 @@ function countTodayByState(patients: Patient[], state: PatientState, now: Date):
   const dayKey = now.toISOString().slice(0, 10);
   return patients.filter((patient) => {
     if (patient.state !== state) return false;
-    const referenceTime =
-      patient.updatedAt ||
-      patient.lastAssessedTime ||
-      patient.arrivalTime;
+    const referenceTime = patient.updatedAt || patient.lastAssessedTime || patient.arrivalTime;
     return Boolean(referenceTime && referenceTime.slice(0, 10) === dayKey);
   }).length;
 }
@@ -247,7 +247,10 @@ function toneForAverageWait(minutes: number | null): OperationalDashboardTone {
   return 'green';
 }
 
-function toneForDoctorCoverage(count: number, activePatientCount: number): OperationalDashboardTone {
+function toneForDoctorCoverage(
+  count: number,
+  activePatientCount: number,
+): OperationalDashboardTone {
   if (count === 0 && activePatientCount > 0) return 'red';
   if (activePatientCount >= 30 && count < 3) return 'amber';
   return 'green';
@@ -350,31 +353,33 @@ function buildBottleneckLabel(input: {
   return 'Department flow within green thresholds';
 }
 
-export function buildOperationalCommandDashboardSnapshot(input: {
-  patients?: Patient[];
-  rooms?: Room[];
-  capacity?: CapacitySnapshot;
-  boardingMetrics?: EmergencyBoardingMetrics;
-  emsArrivals?: EMSArrival[];
-  staff?: Staff[];
-  admissionAlertThreshold?: number;
-  prolongedStayAlertThreshold?: number;
-  unifiedOperationalSnapshot?: UnifiedOperationalIntelligenceSnapshot | null;
-  now?: Date;
-} = {}): OperationalCommandDashboardSnapshot {
+export function buildOperationalCommandDashboardSnapshot(
+  input: {
+    patients?: Patient[];
+    rooms?: Room[];
+    capacity?: CapacitySnapshot;
+    boardingMetrics?: EmergencyBoardingMetrics;
+    emsArrivals?: EMSArrival[];
+    staff?: Staff[];
+    admissionAlertThreshold?: number;
+    prolongedStayAlertThreshold?: number;
+    unifiedOperationalSnapshot?: UnifiedOperationalIntelligenceSnapshot | null;
+    now?: Date;
+  } = {},
+): OperationalCommandDashboardSnapshot {
   const now = input.now || new Date();
   const patients = input.patients || [];
   const rooms = input.rooms || [];
   const capacity = input.capacity;
   const staff = input.staff || [];
   const unifiedOperational = input.unifiedOperationalSnapshot;
-  const useBackendOperationalIntelligence = isAuthoritativeUnifiedOperationalSnapshot(unifiedOperational);
+  const useBackendOperationalIntelligence =
+    isAuthoritativeUnifiedOperationalSnapshot(unifiedOperational);
   const unifiedMetrics = useBackendOperationalIntelligence ? unifiedOperational.metrics : null;
 
   const active = activePatients(patients);
   const totalPatients = unifiedMetrics?.activePatients ?? capacity?.totalPatients ?? active.length;
-  const waitingCount =
-    unifiedMetrics?.waitingPatients ?? waitingRoomCount(patients, capacity);
+  const waitingCount = unifiedMetrics?.waitingPatients ?? waitingRoomCount(patients, capacity);
   const boardingCount = boardingPatients(patients, capacity, input.boardingMetrics);
   const avgWait = averageWaitMinutes(patients, now);
   const avgTriage = averageTriageMinutes(patients);
@@ -385,12 +390,26 @@ export function buildOperationalCommandDashboardSnapshot(input: {
   const erOccupancyPercent =
     unifiedMetrics?.capacityScore ??
     capacity?.occupancyPercent ??
-    (maxCapacity > 0 ? Math.round(((capacity?.currentOccupancy ?? occupiedRooms) / maxCapacity) * 100) : null);
+    (maxCapacity > 0
+      ? Math.round(((capacity?.currentOccupancy ?? occupiedRooms) / maxCapacity) * 100)
+      : null);
   // Keep in sync with hospitalCommandCenterModel.ts's DOCTOR_ROLES -- Consultant was
   // missing here, so the same staff roster showed a lower doctor count (and could hit
   // a false "critical" coverage tone) on this dashboard than on the Command Center one.
-  const doctorsOnDuty = countAvailableStaff(staff, ['MD', 'Attending', 'Resident', 'PA', 'Consultant']);
-  const nursesAvailable = countAvailableStaff(staff, ['RN', 'Nurse', 'TriageNurse', 'ChargeNurse', 'Charge']);
+  const doctorsOnDuty = countAvailableStaff(staff, [
+    'MD',
+    'Attending',
+    'Resident',
+    'PA',
+    'Consultant',
+  ]);
+  const nursesAvailable = countAvailableStaff(staff, [
+    'RN',
+    'Nurse',
+    'TriageNurse',
+    'ChargeNurse',
+    'Charge',
+  ]);
   const criticalCount = criticalPatientCount(patients, capacity);
   const admissionsToday =
     capacity?.admissionPendingCount ?? countTodayByState(patients, PatientState.Admission, now);
@@ -408,19 +427,19 @@ export function buildOperationalCommandDashboardSnapshot(input: {
   const prolongedStayAlerts = scanProlongedStayAlerts(patients, {
     alertThreshold: prolongedStayThreshold,
     now: now.getTime(),
-  }).map(
-    (prediction) => {
-      const patient = patients.find((entry) => entry.id === prediction.patientId);
-      return {
-        patientId: prediction.patientId,
-        patientLabel:
-          `${patient?.firstName || ''} ${patient?.lastName || ''}`.trim() || patient?.mrn || prediction.patientId,
-        probabilityPercent: prediction.probabilityPercent,
-        predictedHours: prediction.predictedHours,
-        action: 'Prolonged ED stay risk — initiate bed cleaning / assignment workflow.',
-      };
-    },
-  );
+  }).map((prediction) => {
+    const patient = patients.find((entry) => entry.id === prediction.patientId);
+    return {
+      patientId: prediction.patientId,
+      patientLabel:
+        `${patient?.firstName || ''} ${patient?.lastName || ''}`.trim() ||
+        patient?.mrn ||
+        prediction.patientId,
+      probabilityPercent: prediction.probabilityPercent,
+      predictedHours: prediction.predictedHours,
+      action: 'Prolonged ED stay risk — initiate bed cleaning / assignment workflow.',
+    };
+  });
   const orientationPredictions = active
     .map((patient) => {
       const prediction = predictPostEdOrientation(patient);

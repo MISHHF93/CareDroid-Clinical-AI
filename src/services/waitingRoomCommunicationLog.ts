@@ -109,7 +109,10 @@ function minutesSince(timestamp: string | null | undefined, now: Date): number |
   return Math.max(0, Math.round((now.getTime() - parsed) / 60000));
 }
 
-export function formatCommunicationDuration(minutes: number | null, { unknownLabel = '—' }: any = {}): string {
+export function formatCommunicationDuration(
+  minutes: number | null,
+  { unknownLabel = '—' }: any = {},
+): string {
   if (minutes === null || !Number.isFinite(minutes)) return unknownLabel;
   if (minutes < 1) return '<1m ago';
   if (minutes < 60) return `${minutes}m ago`;
@@ -188,7 +191,9 @@ export function classifyWorkflowCommunicationKind(
   return null;
 }
 
-function classifyTimelineCommunicationKind(event: JourneyEvent): WaitingRoomCommunicationKind | null {
+function classifyTimelineCommunicationKind(
+  event: JourneyEvent,
+): WaitingRoomCommunicationKind | null {
   const type = String(event.type || '');
   if (VITALS_TIMELINE_TYPES.has(type)) return 'vitals-repeated';
   if (REASSESSMENT_TIMELINE_TYPES.has(type)) return 'reassessed';
@@ -399,11 +404,10 @@ export function createWaitingRoomCommunicationLogInput(input: {
 export type WaitingRoomCommunicationLogStore = {
   patients?: Patient[];
   workflowLogs?: WorkflowActionLog[];
-  recordWorkflowAction?: (input: ReturnType<typeof createWaitingRoomCommunicationLogInput>) => WorkflowActionLog;
-  dispatchWebSocketEvent?: (event: {
-    type: string;
-    payload: Record<string, unknown>;
-  }) => void;
+  recordWorkflowAction?: (
+    input: ReturnType<typeof createWaitingRoomCommunicationLogInput>,
+  ) => WorkflowActionLog;
+  dispatchWebSocketEvent?: (event: { type: string; payload: Record<string, unknown> }) => void;
 };
 
 /** Record a staff communication event through workflow audit infrastructure. */
@@ -434,4 +438,3 @@ export function recordWaitingRoomCommunication(
 
   return store.recordWorkflowAction?.(logInput) || null;
 }
-

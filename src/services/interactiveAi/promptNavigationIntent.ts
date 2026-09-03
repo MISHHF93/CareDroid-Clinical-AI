@@ -39,8 +39,7 @@ export type ResolvePromptNavigationOptions = {
   permissions?: readonly string[];
 };
 
-const NAV_VERBS =
-  /\b(open|show|launch|go to|take me to|navigate to|bring up|switch to|pull up)\b/i;
+const NAV_VERBS = /\b(open|show|launch|go to|take me to|navigate to|bring up|switch to|pull up)\b/i;
 
 /** High-value closed catalog — extend carefully; never accept model-invented paths. */
 const CATALOG: readonly PromptNavigationIntent[] = Object.freeze([
@@ -247,7 +246,14 @@ const CATALOG: readonly PromptNavigationIntent[] = Object.freeze([
     path: CANONICAL_ROUTES.emergencyReception,
     panelEvent: 'open-reception-smart-intake',
     panelId: 'reception-ocr',
-    keywords: ['ocr', 'document scan', 'scan document', 'document capture', 'scan id', 'health card scan'],
+    keywords: [
+      'ocr',
+      'document scan',
+      'scan document',
+      'document capture',
+      'scan id',
+      'health card scan',
+    ],
   },
   {
     id: 'panel-reception-lookup',

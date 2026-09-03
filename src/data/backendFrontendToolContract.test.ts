@@ -29,9 +29,9 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const backendRegistrySource = readFileSync(
   join(
     __dirname,
-    '../../backend/src/modules/medical-control-plane/tool-orchestrator/tool-orchestrator.registry.ts'
+    '../../backend/src/modules/medical-control-plane/tool-orchestrator/tool-orchestrator.registry.ts',
   ),
-  'utf8'
+  'utf8',
 );
 let cachedContractRows: ReturnType<typeof buildBackendFrontendContractRows> | null = null;
 
@@ -43,7 +43,9 @@ function getContractRows() {
 }
 
 function parseBackendRegisteredExecutorIds() {
-  const block = backendRegistrySource.match(/REGISTERED_EXECUTOR_TOOL_IDS\s*=\s*\[([\s\S]*?)\]\s*as const/);
+  const block = backendRegistrySource.match(
+    /REGISTERED_EXECUTOR_TOOL_IDS\s*=\s*\[([\s\S]*?)\]\s*as const/,
+  );
   return [...(block?.[1] || '').matchAll(/'([^']+)'/g)].map((match) => match[1]).sort();
 }
 
@@ -52,7 +54,7 @@ describe('backendFrontendToolContract', () => {
     const rows = getContractRows().filter((r) => r.kind === 'nlu');
     const withExecutor = rows.filter((r) => r.backendExecutor === 'yes');
     expect(withExecutor.map((r) => r.canonicalId).sort()).toEqual(
-      [...ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS].sort()
+      [...ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS].sort(),
     );
   });
 
@@ -67,11 +69,13 @@ describe('backendFrontendToolContract', () => {
 
   it('backend-backed user-facing inventory records point to real registered executors', () => {
     for (const record of getUserFacingToolInventory().filter(
-      (tool) => tool.launchType === TOOL_LAUNCH_TYPES.BACKEND_BACKED
+      (tool) => tool.launchType === TOOL_LAUNCH_TYPES.BACKEND_BACKED,
     )) {
       if (record.executorStatus === TOOL_EXECUTOR_STATUS.PLATFORM) {
         expect(record.endpoint, record.id).toMatch(/^\/api\/clinical-intelligence\//);
-        expect(record.auditRefs.apiClient, record.id).toBe('src/services/clinicalIntelligenceApi.ts');
+        expect(record.auditRefs.apiClient, record.id).toBe(
+          'src/services/clinicalIntelligenceApi.ts',
+        );
         continue;
       }
 

@@ -38,17 +38,37 @@ const PLAY_THE_SYSTEM_SCENARIOS = [
       CANONICAL_ROUTES.emergencyEdReadiness,
       CANONICAL_ROUTES.emergencyAlerts,
     ],
-    services: ['DispatchIntakeService', 'CADIntegrationService', 'PreArrivalNotificationService', 'ThreeMinuteResponseService', 'StaffRoutingService'],
+    services: [
+      'DispatchIntakeService',
+      'CADIntegrationService',
+      'PreArrivalNotificationService',
+      'ThreeMinuteResponseService',
+      'StaffRoutingService',
+    ],
   },
   {
     id: 'walk-in-shortness-of-breath-escalation',
-    routes: [CANONICAL_ROUTES.emergencyReception, CANONICAL_ROUTES.emergencyIntake, CANONICAL_ROUTES.emergencyCopilot, CANONICAL_ROUTES.emergencyAlerts],
+    routes: [
+      CANONICAL_ROUTES.emergencyReception,
+      CANONICAL_ROUTES.emergencyIntake,
+      CANONICAL_ROUTES.emergencyCopilot,
+      CANONICAL_ROUTES.emergencyAlerts,
+    ],
     services: ['PatientIntakeService', 'TriageService', 'AIChiefService', 'CriticalAlertService'],
   },
   {
     id: 'ambulance-trauma-charge-routing',
-    routes: [CANONICAL_ROUTES.emergencyEms, CANONICAL_ROUTES.emergencyEdReadiness, CANONICAL_ROUTES.emergencyCommandCenter],
-    services: ['PrehospitalAssessmentService', 'PreArrivalNotificationService', 'EDReadinessService', 'StaffRoutingService'],
+    routes: [
+      CANONICAL_ROUTES.emergencyEms,
+      CANONICAL_ROUTES.emergencyEdReadiness,
+      CANONICAL_ROUTES.emergencyCommandCenter,
+    ],
+    services: [
+      'PrehospitalAssessmentService',
+      'PreArrivalNotificationService',
+      'EDReadinessService',
+      'StaffRoutingService',
+    ],
   },
   {
     id: 'ai-service-unavailable-safe-fallback',
@@ -62,12 +82,25 @@ const PLAY_THE_SYSTEM_SCENARIOS = [
   },
   {
     id: 'lab-radiology-bottleneck-analytics',
-    routes: [CANONICAL_ROUTES.emergencyDiagnostics, CANONICAL_ROUTES.emergencyCopilot, CANONICAL_ROUTES.emergencyAnalytics],
-    services: ['DiagnosticsCoordinationService', 'BottleneckRegistryService', 'AIChiefService', 'AnalyticsService'],
+    routes: [
+      CANONICAL_ROUTES.emergencyDiagnostics,
+      CANONICAL_ROUTES.emergencyCopilot,
+      CANONICAL_ROUTES.emergencyAnalytics,
+    ],
+    services: [
+      'DiagnosticsCoordinationService',
+      'BottleneckRegistryService',
+      'AIChiefService',
+      'AnalyticsService',
+    ],
   },
   {
     id: 'demo-observer-read-only',
-    routes: [CANONICAL_ROUTES.emergencyWhiteboard, CANONICAL_ROUTES.emergencyAnalytics, CANONICAL_ROUTES.emergencyHelp],
+    routes: [
+      CANONICAL_ROUTES.emergencyWhiteboard,
+      CANONICAL_ROUTES.emergencyAnalytics,
+      CANONICAL_ROUTES.emergencyHelp,
+    ],
     services: ['AnalyticsService', 'HelpManualService'],
   },
   {

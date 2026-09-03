@@ -23,9 +23,9 @@ const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
 const patternsSource = readFileSync(
   join(
     __dirname,
-    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts'
+    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts',
   ),
-  'utf8'
+  'utf8',
 );
 
 describe('Ottawa Ankle Rule (Tier B chat-assisted) wiring', () => {
@@ -75,7 +75,7 @@ describe('Ottawa Ankle Rule (Tier B chat-assisted) wiring', () => {
       expect(launch.openLabel).toBe('Start guided chat');
       expect(launch.orchestratorTool).toBeNull();
       expect(launch.chatSeed).toMatch(/Ottawa Ankle Rule/i);
-    }
+    },
   );
 
   it('resolves discovery slug aliases to ottawa-ankle', () => {

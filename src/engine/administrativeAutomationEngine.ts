@@ -4,7 +4,10 @@ import {
 } from '../config/automationEntitlement.config';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { ADMINISTRATIVE_AUTOMATION_SAFETY_STATEMENT } from '../config/administrativeAutomationCatalog';
-import { taskHasAiDecision, taskNeedsAiEnrichment } from '../services/administrativeAutomationAiUtils';
+import {
+  taskHasAiDecision,
+  taskNeedsAiEnrichment,
+} from '../services/administrativeAutomationAiUtils';
 import { enrichAdministrativeAutomationSnapshotWithAi } from '../services/enrichAdministrativeAutomationsWithAi';
 import { buildAdministrativeAutomationSnapshot } from '../services/unifiedClinicalWorkflowOrchestrator';
 import type {
@@ -12,7 +15,14 @@ import type {
   AdministrativeAutomationSnapshot,
   AdministrativeAutomationTask,
 } from '../types/administrativeAutomation';
-import type { Alert, CapacitySnapshot, EMSArrival, Patient, Referral, Staff } from '../types/emergency';
+import type {
+  Alert,
+  CapacitySnapshot,
+  EMSArrival,
+  Patient,
+  Referral,
+  Staff,
+} from '../types/emergency';
 import { startWorkflowTrace } from '../services/observabilityTrace';
 
 export type AdministrativeAutomationEngineInput = Readonly<{

@@ -22,7 +22,12 @@ vi.mock('../../config/backendApiCapabilities', async (importOriginal) => {
 
 function openExportTab() {
   render(
-    <ToolResultShare toolName="SOFA Calculator" toolId="sofa" results={{ score: 4 }} onClose={vi.fn()} />,
+    <ToolResultShare
+      toolName="SOFA Calculator"
+      toolId="sofa"
+      results={{ score: 4 }}
+      onClose={vi.fn()}
+    />,
   );
   fireEvent.click(screen.getByRole('button', { name: /export/i }));
 }

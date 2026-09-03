@@ -5,7 +5,7 @@ import './Drawer.css';
 
 /**
  * Drawer (Side Panel) Component
- * 
+ *
  * Slides in from the side, useful for mobile navigation and detail panels
  * @param {boolean} isOpen - Whether drawer is visible
  * @param {Function} onClose - Callback when drawer should close
@@ -70,7 +70,11 @@ export const Drawer = ({
         {...props}
       >
         <div className="drawer-header">
-          {title && <h2 id="drawer-title" className="drawer-title">{title}</h2>}
+          {title && (
+            <h2 id="drawer-title" className="drawer-title">
+              {title}
+            </h2>
+          )}
           <button
             className="drawer-close"
             onClick={onClose}
@@ -81,18 +85,12 @@ export const Drawer = ({
           </button>
         </div>
 
-        <div className="drawer-body">
-          {children}
-        </div>
+        <div className="drawer-body">{children}</div>
 
-        {footer && (
-          <div className="drawer-footer">
-            {footer}
-          </div>
-        )}
+        {footer && <div className="drawer-footer">{footer}</div>}
       </div>
     </div>,
-    document.body
+    document.body,
   );
 };
 
@@ -101,13 +99,7 @@ export const Drawer = ({
  */
 export const DrawerMenuPanel = ({ isOpen, onClose, children }) => {
   return (
-    <Drawer
-      isOpen={isOpen}
-      onClose={onClose}
-      side="left"
-      size="md"
-      title="Menu"
-    >
+    <Drawer isOpen={isOpen} onClose={onClose} side="left" size="md" title="Menu">
       {children}
     </Drawer>
   );

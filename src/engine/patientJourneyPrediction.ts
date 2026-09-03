@@ -40,10 +40,12 @@ export type PatientJourneyPrediction = {
   thresholdBreached: boolean;
   humanReviewRequired: true;
   keyPredictors: string[];
-  envelope: ReturnType<typeof buildOperationalScoreEnvelope<{
-    admissionProbability: number;
-    prolongedStayRisk: ProlongedStayRisk;
-  }>>;
+  envelope: ReturnType<
+    typeof buildOperationalScoreEnvelope<{
+      admissionProbability: number;
+      prolongedStayRisk: ProlongedStayRisk;
+    }>
+  >;
 };
 
 function latestVitals(patient: JourneyPredictionInput['patient']) {
@@ -144,7 +146,13 @@ export function predictPatientJourney(input: JourneyPredictionInput): PatientJou
 
   const threshold = calibration.alertThreshold ?? DEFAULT_ADTA_CALIBRATION.alertThreshold;
   const admissionBand =
-    admissionScore >= 80 ? 'high' : admissionScore >= threshold ? 'elevated' : admissionScore >= 40 ? 'moderate' : 'low';
+    admissionScore >= 80
+      ? 'high'
+      : admissionScore >= threshold
+        ? 'elevated'
+        : admissionScore >= 40
+          ? 'moderate'
+          : 'low';
   const prolongedStayRisk: ProlongedStayRisk =
     prolongedScore >= 70 ? 'high' : prolongedScore >= 45 ? 'moderate' : 'low';
   const maturity = input.boardingSignals?.maturity === 'live' ? 'live' : 'demo';
@@ -157,12 +165,23 @@ export function predictPatientJourney(input: JourneyPredictionInput): PatientJou
     chestXrayUtilizationProbability: cxrScore,
     thresholdBreached: admissionScore >= threshold,
     humanReviewRequired: true,
-    keyPredictors: predictors.length ? predictors.slice(0, 5) : ['Insufficient signals — low risk default'],
+    keyPredictors: predictors.length
+      ? predictors.slice(0, 5)
+      : ['Insufficient signals — low risk default'],
     envelope: buildOperationalScoreEnvelope({
       value: { admissionProbability: admissionScore, prolongedStayRisk },
       maturity,
       rationale: predictors.length ? predictors : ['Baseline population risk'],
-      sourceFields: ['state', 'priority', 'flags', 'chiefComplaint', 'vitals', 'age', 'source', 'arrivalTime'],
+      sourceFields: [
+        'state',
+        'priority',
+        'flags',
+        'chiefComplaint',
+        'vitals',
+        'age',
+        'source',
+        'arrivalTime',
+      ],
     }),
   };
 }

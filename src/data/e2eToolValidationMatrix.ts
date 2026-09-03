@@ -54,13 +54,33 @@ export const TEST_COVERAGE_BY_REGISTRY_ID = Object.freeze({
   [REGISTRY.calcGfr]: ['clinicalCatalogLaunch.test.ts', 'clinicalToolIdContract.test.ts'],
   [REGISTRY.calcBmi]: ['clinicalCatalogLaunch.test.ts', 'clinicalToolIdContract.test.ts'],
   [REGISTRY.calcChads2vasc]: ['clinicalCatalogLaunch.test.ts', 'clinicalToolIdContract.test.ts'],
-  [REGISTRY.qsofa]: ['pr1Coverage.test.ts', 'pr1CalculatorsWiring.test.ts', 'clinicalCatalogLaunch.test.ts'],
-  [REGISTRY.news2]: ['pr1Coverage.test.ts', 'pr1CalculatorsWiring.test.ts', 'clinicalCatalogLaunch.test.ts'],
+  [REGISTRY.qsofa]: [
+    'pr1Coverage.test.ts',
+    'pr1CalculatorsWiring.test.ts',
+    'clinicalCatalogLaunch.test.ts',
+  ],
+  [REGISTRY.news2]: [
+    'pr1Coverage.test.ts',
+    'pr1CalculatorsWiring.test.ts',
+    'clinicalCatalogLaunch.test.ts',
+  ],
   [REGISTRY.childPugh]: ['pr1Coverage.test.ts', 'clinicalCatalogLaunch.test.ts'],
   [REGISTRY.hasBled]: ['pr1Coverage.test.ts', 'clinicalCatalogLaunch.test.ts'],
-  [REGISTRY.meld]: ['meldCalculatorsWiring.test.ts', 'pr2Comprehensive.test.ts', 'clinicalCatalogLaunch.test.ts'],
-  [REGISTRY.meldNa]: ['meldCalculatorsWiring.test.ts', 'pr2Comprehensive.test.ts', 'clinicalCatalogLaunch.test.ts'],
-  [REGISTRY.timiUaNstemi]: ['timiCalculatorsWiring.test.ts', 'pr2Comprehensive.test.ts', 'clinicalCatalogLaunch.test.ts'],
+  [REGISTRY.meld]: [
+    'meldCalculatorsWiring.test.ts',
+    'pr2Comprehensive.test.ts',
+    'clinicalCatalogLaunch.test.ts',
+  ],
+  [REGISTRY.meldNa]: [
+    'meldCalculatorsWiring.test.ts',
+    'pr2Comprehensive.test.ts',
+    'clinicalCatalogLaunch.test.ts',
+  ],
+  [REGISTRY.timiUaNstemi]: [
+    'timiCalculatorsWiring.test.ts',
+    'pr2Comprehensive.test.ts',
+    'clinicalCatalogLaunch.test.ts',
+  ],
   [REGISTRY.ascvdRisk]: [
     'ascvdRiskWiring.test.ts',
     'ascvdPceCalculator.test.js',
@@ -121,8 +141,18 @@ export const TEST_COVERAGE_BY_REGISTRY_ID = Object.freeze({
     'clinicalToolsComprehensive.test.ts',
     'clinicalCatalogLaunch.test.ts',
   ],
-  [REGISTRY.wellsPe]: ['wellsPeWiring.test.ts', 'pr2Comprehensive.test.ts', 'pr2Coverage.test.ts', 'clinicalCatalogLaunch.test.ts'],
-  [REGISTRY.perc]: ['percWiring.test.ts', 'pr2Comprehensive.test.ts', 'pr2Coverage.test.ts', 'clinicalCatalogLaunch.test.ts'],
+  [REGISTRY.wellsPe]: [
+    'wellsPeWiring.test.ts',
+    'pr2Comprehensive.test.ts',
+    'pr2Coverage.test.ts',
+    'clinicalCatalogLaunch.test.ts',
+  ],
+  [REGISTRY.perc]: [
+    'percWiring.test.ts',
+    'pr2Comprehensive.test.ts',
+    'pr2Coverage.test.ts',
+    'clinicalCatalogLaunch.test.ts',
+  ],
   [REGISTRY.graceAcs]: [
     'graceAcsWiring.test.ts',
     'pr3Comprehensive.test.ts',
@@ -177,9 +207,16 @@ export const TEST_COVERAGE_BY_REGISTRY_ID = Object.freeze({
     'clinicalToolsComprehensive.test.ts',
     'clinicalCatalogLaunch.test.ts',
   ],
-  [REGISTRY.dispatchAi]: ['dispatchAiWiring.test.ts', 'clinicalCatalogLaunch.test.ts', 'prFleetConsistency.test.ts'],
+  [REGISTRY.dispatchAi]: [
+    'dispatchAiWiring.test.ts',
+    'clinicalCatalogLaunch.test.ts',
+    'prFleetConsistency.test.ts',
+  ],
   [REGISTRY.routeOptimizer]: ['routeOptimizerWiring.test.ts', 'prFleetConsistency.test.ts'],
-  [REGISTRY.predictiveMaintenance]: ['predictiveMaintenanceWiring.test.ts', 'prFleetConsistency.test.ts'],
+  [REGISTRY.predictiveMaintenance]: [
+    'predictiveMaintenanceWiring.test.ts',
+    'prFleetConsistency.test.ts',
+  ],
   [REGISTRY.fleetCommand]: ['fleetCommandWiring.test.ts', 'prFleetConsistency.test.ts'],
   [REGISTRY.protocols]: ['clinicalCatalogLaunch.test.ts', 'clinicalToolIdContract.test.ts'],
   [REGISTRY.diagnosis]: ['clinicalCatalogLaunch.test.ts', 'clinicalToolIdContract.test.ts'],
@@ -226,7 +263,7 @@ export function accessModesForRegistry(registryId) {
 
 function nluProfilesForRegistry(registryId) {
   return clinicalIntentTools.filter(
-    (t) => t.sidebarToolId === registryId || t.toolId === registryId
+    (t) => t.sidebarToolId === registryId || t.toolId === registryId,
   );
 }
 
@@ -243,7 +280,7 @@ function discoveryIdsForRegistry(registryId, nluIds) {
 
 function catalogHasRegistry(registryId) {
   return getMedicalToolsCatalogRows().some(
-    (r) => r.sidebarToolId === registryId || r.id === registryId
+    (r) => r.sidebarToolId === registryId || r.id === registryId,
   );
 }
 
@@ -259,7 +296,13 @@ export function buildMatrixRowForRegistry(registryId) {
   const inventoryRecord = resolveToolInventoryRecord(registryId);
   const reg = toolRegistryById[registryId];
   const nlus = nluProfilesForRegistry(registryId);
-  const nluToolIds = [...new Set(inventoryRecord?.nluProfileIds?.length ? inventoryRecord.nluProfileIds : nlus.map((t) => t.toolId))].sort();
+  const nluToolIds = [
+    ...new Set(
+      inventoryRecord?.nluProfileIds?.length
+        ? inventoryRecord.nluProfileIds
+        : nlus.map((t) => t.toolId),
+    ),
+  ].sort();
   const launch = resolveCatalogLaunch(registryId);
   const orchestratorNluId =
     inventoryRecord?.orchestratorToolId ?? REGISTRY_ID_TO_ORCHESTRATOR_TOOL[registryId] ?? null;
@@ -267,7 +310,8 @@ export function buildMatrixRowForRegistry(registryId) {
     inventoryRecord?.executorStatus === TOOL_EXECUTOR_STATUS.REGISTERED ||
     (orchestratorNluId ? isOrchestratorPostExecutable(orchestratorNluId) : false);
   const platformEndpoint =
-    (inventoryRecord?.executorStatus === TOOL_EXECUTOR_STATUS.PLATFORM && Boolean(inventoryRecord?.endpoint)) ||
+    (inventoryRecord?.executorStatus === TOOL_EXECUTOR_STATUS.PLATFORM &&
+      Boolean(inventoryRecord?.endpoint)) ||
     (inventoryRecord?.tier === 'C' && inventoryRecord?.endpoint === '/api/chat/message');
 
   return {
@@ -283,8 +327,8 @@ export function buildMatrixRowForRegistry(registryId) {
     nluToolIds,
     backendPostExecutor: postExecutor,
     backendPlatformEndpoint: platformEndpoint,
-    backendNluExecutable: nluToolIds.some((id) =>
-      clinicalIntentTools.find((t) => t.toolId === id)?.backendExecutable
+    backendNluExecutable: nluToolIds.some(
+      (id) => clinicalIntentTools.find((t) => t.toolId === id)?.backendExecutable,
     ),
     executorStatus: inventoryRecord?.executorStatus ?? null,
     orchestratorToolId: inventoryRecord?.orchestratorToolId ?? launch.orchestratorTool,
@@ -327,10 +371,13 @@ export function buildNluHubOnlyMatrixRows() {
         id: nluId,
         kind: 'nlu-profile',
         registryId,
-        tier: registryId === REGISTRY.calculatorsHub ? 'nlu-hub-only' : tierForRegistryId(registryId),
+        tier:
+          registryId === REGISTRY.calculatorsHub ? 'nlu-hub-only' : tierForRegistryId(registryId),
         route: launch.path,
         registryPresence: Boolean(toolRegistryById[registryId]),
-        catalogPresence: getMedicalToolsCatalogRows().some((r) => r.primaryId === nluId || r.id === nluId),
+        catalogPresence: getMedicalToolsCatalogRows().some(
+          (r) => r.primaryId === nluId || r.id === nluId,
+        ),
         discoveryPresence: getAllDiscoveredTools().some((r) => r.id === nluId),
         nluPresence: true,
         nluToolIds: [nluId],
@@ -357,7 +404,7 @@ export function buildNluHubOnlyMatrixRows() {
 export function buildE2eToolInventory() {
   const registryRows = ALL_REGISTRY_TOOL_IDS.map(buildMatrixRowForRegistry);
   const nluRows = buildNluHubOnlyMatrixRows().filter(
-    (row) => !registryRows.some((r) => r.nluToolIds?.includes(row.id))
+    (row) => !registryRows.some((r) => r.nluToolIds?.includes(row.id)),
   );
   return [...registryRows, ...nluRows].sort((a, b) => a.id.localeCompare(b.id));
 }
@@ -407,7 +454,10 @@ export function validateMatrixRow(row) {
     }
   }
 
-  if (['A', 'B', 'C', 'clinical-page', 'fleet-A', 'fleet-B'].includes(row.tier) && !row.catalogPresence) {
+  if (
+    ['A', 'B', 'C', 'clinical-page', 'fleet-A', 'fleet-B'].includes(row.tier) &&
+    !row.catalogPresence
+  ) {
     issues.push('missing-catalog');
   }
 
@@ -420,11 +470,19 @@ export function validateMatrixRow(row) {
     issues.push('tier-c-without-executor');
   }
 
-  if (row.backendPostExecutor && !ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS.includes(row.orchestratorToolId)) {
+  if (
+    row.backendPostExecutor &&
+    !ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS.includes(row.orchestratorToolId)
+  ) {
     issues.push('invalid-executor-flag');
   }
 
-  if (row.tier === 'B' && row.kind === 'registry' && !row.launch?.hasChatSeed && row.id !== REGISTRY.calculatorsHub) {
+  if (
+    row.tier === 'B' &&
+    row.kind === 'registry' &&
+    !row.launch?.hasChatSeed &&
+    row.id !== REGISTRY.calculatorsHub
+  ) {
     issues.push('tier-b-missing-chat-seed');
   }
 
@@ -529,7 +587,7 @@ export function formatE2eMatrixMarkdown(doc = getE2eValidationMatrixDocument()) 
         ? `${row.testCoverage.length} files`
         : row.testCoverage?.join(', ') || '—';
     lines.push(
-      `| ${row.id} | ${row.tier} | ${row.route || '—'} | ${yesNo(row.registryPresence)} | ${yesNo(row.catalogPresence)} | ${yesNo(row.discoveryPresence)} | ${yesNo(row.nluPresence)}${row.nluPresence && nlu !== row.id ? ` (${nlu})` : ''} | ${yesNo(row.backendPostExecutor)} | ${row.launch?.path || '—'} | ${tests} |`
+      `| ${row.id} | ${row.tier} | ${row.route || '—'} | ${yesNo(row.registryPresence)} | ${yesNo(row.catalogPresence)} | ${yesNo(row.discoveryPresence)} | ${yesNo(row.nluPresence)}${row.nluPresence && nlu !== row.id ? ` (${nlu})` : ''} | ${yesNo(row.backendPostExecutor)} | ${row.launch?.path || '—'} | ${tests} |`,
     );
   }
 
@@ -543,10 +601,16 @@ export function formatE2eMatrixMarkdown(doc = getE2eValidationMatrixDocument()) 
     '```',
     '',
     'See also: `docs/e2e-manual-qa-checklist.md`, `docs/e2e-regression-checklist.md`.',
-    ''
+    '',
   );
 
   return lines.join('\n');
 }
 
-export { KNOWN_TOOL_AREA_PATHS, expectedLaunchPath, matchCalculatorRoute, toolIdAliases, MATRIX_COLUMNS };
+export {
+  KNOWN_TOOL_AREA_PATHS,
+  expectedLaunchPath,
+  matchCalculatorRoute,
+  toolIdAliases,
+  MATRIX_COLUMNS,
+};

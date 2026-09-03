@@ -36,8 +36,7 @@ export function evaluateReceptionRegistrationKpi() {
     targetSeconds: OPERATIONAL_SURVIVABILITY_KPIS.receptionRegistrationSeconds,
     expressWalkInSeconds: expressSeconds,
     weightedAverageSeconds: avgSeconds,
-    passes:
-      expressSeconds <= OPERATIONAL_SURVIVABILITY_KPIS.receptionRegistrationSeconds,
+    passes: expressSeconds <= OPERATIONAL_SURVIVABILITY_KPIS.receptionRegistrationSeconds,
     workflow: 'express-register',
     evidence: compareReceptionProfiles(100).optimizations,
   });

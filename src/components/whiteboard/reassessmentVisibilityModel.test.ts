@@ -43,7 +43,11 @@ describe('reassessmentVisibilityModel', () => {
   });
 
   it('hides attention strip in display mode', () => {
-    expect(shouldShowReassessmentAttentionStrip({ displayMode: true, attentionCount: 3 })).toBe(false);
-    expect(shouldShowReassessmentAttentionStrip({ displayMode: false, attentionCount: 2 })).toBe(true);
+    expect(shouldShowReassessmentAttentionStrip({ displayMode: true, attentionCount: 3 })).toBe(
+      false,
+    );
+    expect(shouldShowReassessmentAttentionStrip({ displayMode: false, attentionCount: 2 })).toBe(
+      true,
+    );
   });
 });

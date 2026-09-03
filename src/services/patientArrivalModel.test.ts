@@ -186,13 +186,11 @@ describe('patientArrivalModel', () => {
   });
 
   it('derives waiting room status from journey state', () => {
+    expect(deriveWaitingRoomStatus(buildPatient({ state: PatientState.Waiting }))).toBe(
+      'waiting-for-clinician',
+    );
     expect(
-      deriveWaitingRoomStatus(buildPatient({ state: PatientState.Waiting })),
-    ).toBe('waiting-for-clinician');
-    expect(
-      deriveWaitingRoomStatus(
-        buildPatient({ state: PatientState.Triage, triagePending: true }),
-      ),
+      deriveWaitingRoomStatus(buildPatient({ state: PatientState.Triage, triagePending: true })),
     ).toBe('waiting-for-triage');
     expect(
       deriveWaitingRoomStatus(

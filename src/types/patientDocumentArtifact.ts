@@ -57,7 +57,12 @@ export type ArtifactReviewStatus =
   | 'rejected'
   | 'needs_clarification';
 
-export type ArtifactSourceStateLabel = 'live' | 'demo' | 'simulated' | 'extracted' | 'staff_entered';
+export type ArtifactSourceStateLabel =
+  | 'live'
+  | 'demo'
+  | 'simulated'
+  | 'extracted'
+  | 'staff_entered';
 
 /**
  * Every producer of this type named a code system and then supplied only free

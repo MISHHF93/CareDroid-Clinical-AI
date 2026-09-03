@@ -91,7 +91,12 @@ describe('operationalAlertRailModel', () => {
       intelligenceSnapshot: {
         enabled: true,
         mode: 'rule_based',
-        dataFreshness: { visible: true, status: 'fresh', lastSyncedAt: '2026-06-24T12:00:00.000Z', ageMinutes: 0 },
+        dataFreshness: {
+          visible: true,
+          status: 'fresh',
+          lastSyncedAt: '2026-06-24T12:00:00.000Z',
+          ageMinutes: 0,
+        },
         anomalies: [],
         disclaimers: { operational: 'Advisory only', clinical: '', externalData: '' },
       },

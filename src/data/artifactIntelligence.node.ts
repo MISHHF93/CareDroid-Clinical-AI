@@ -41,7 +41,10 @@ export function loadNluTrainingExamples() {
   // Only index the master corpus — never re-ingest train/val/test splits (circular leak).
   for (const fileName of ['corpus.jsonl']) {
     const split = fileName.replace('.jsonl', '');
-    const sourceFile = path.join('backend', 'ml-services', 'nlu', 'data', fileName).split(path.sep).join('/');
+    const sourceFile = path
+      .join('backend', 'ml-services', 'nlu', 'data', fileName)
+      .split(path.sep)
+      .join('/');
     for (const [index, row] of readJsonlLines(path.join(nluDataDir, fileName)).entries()) {
       if (!row.text || !row.intent) continue;
       examples.push({

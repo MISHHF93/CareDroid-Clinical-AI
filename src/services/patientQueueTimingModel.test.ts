@@ -52,10 +52,7 @@ describe('patientQueueTimingModel', () => {
   });
 
   it('counts online queue patients', () => {
-    const patients = [
-      buildPatient(),
-      buildPatient({ id: 'ED-2', state: PatientState.Discharge }),
-    ];
+    const patients = [buildPatient(), buildPatient({ id: 'ED-2', state: PatientState.Discharge })];
     expect(countOnlineQueuePatients(patients, { now })).toBe(1);
     expect(buildQueueTimingSummary(patients, { now }).onlineCount).toBe(1);
   });

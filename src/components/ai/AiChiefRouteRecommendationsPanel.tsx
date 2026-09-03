@@ -26,8 +26,13 @@ const TONE_LABELS: Record<AiChiefExplainableRecommendation['tone'], string> = {
 
 const RECOMMENDATION_LIMIT = 8;
 
-function recommendationRequiresEscalation(recommendation: AiChiefExplainableRecommendation): boolean {
-  return Boolean(recommendation.patientId) && /escalat|assign physician|reassess/i.test(recommendation.action);
+function recommendationRequiresEscalation(
+  recommendation: AiChiefExplainableRecommendation,
+): boolean {
+  return (
+    Boolean(recommendation.patientId) &&
+    /escalat|assign physician|reassess/i.test(recommendation.action)
+  );
 }
 
 type AiChiefRouteRecommendationsPanelProps = Readonly<{
@@ -136,8 +141,8 @@ export function AiChiefRouteRecommendationsPanel({
             <p>AI Chief</p>
             <h2>Recommendations</h2>
             <span>
-              {visibleRecommendations.length} active · {criticalVisibleCount} critical · clinician review
-              required
+              {visibleRecommendations.length} active · {criticalVisibleCount} critical · clinician
+              review required
             </span>
           </div>
         </div>
@@ -146,7 +151,7 @@ export function AiChiefRouteRecommendationsPanel({
         </strong>
       </header>
 
-      <div className="cd-ai-panel__list u-grid-gap-8" >
+      <div className="cd-ai-panel__list u-grid-gap-8">
         {visibleRecommendations.map((recommendation) => {
           const isAccepted = accepted.has(recommendation.id);
           const patientLabel = recommendation.patientId
@@ -179,12 +184,14 @@ export function AiChiefRouteRecommendationsPanel({
               <p className="cd-ai-card__primary">{recommendation.rationale}</p>
 
               {patientLabel ? (
-                <p className="emergency-route-muted u-m-0 u-p-0" >
+                <p className="emergency-route-muted u-m-0 u-p-0">
                   Patient:{' '}
                   <button
                     type="button"
                     className="emergency-route-muted cd-ai-panel__patient-link-btn"
-                    onClick={() => recommendation.patientId && selectPatient(recommendation.patientId)}
+                    onClick={() =>
+                      recommendation.patientId && selectPatient(recommendation.patientId)
+                    }
                   >
                     {patientLabel}
                   </button>
@@ -192,7 +199,7 @@ export function AiChiefRouteRecommendationsPanel({
               ) : null}
 
               {recommendation.route ? (
-                <p className="emergency-route-muted u-m-0 u-p-0" >
+                <p className="emergency-route-muted u-m-0 u-p-0">
                   <Link to={recommendation.route}>Open related workflow</Link>
                 </p>
               ) : null}
@@ -200,7 +207,10 @@ export function AiChiefRouteRecommendationsPanel({
               <ClinicalSafetyNotice reviewRequired />
 
               {!isAccepted ? (
-                <div className="cd-ai-actions" aria-label={`${recommendation.action} review actions`}>
+                <div
+                  className="cd-ai-actions"
+                  aria-label={`${recommendation.action} review actions`}
+                >
                   <button
                     type="button"
                     className="cd-ai-actions__button"

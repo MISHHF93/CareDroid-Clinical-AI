@@ -2,12 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import {
-  alarmAriaRole,
-  resolveAlarmSeverity,
-  shouldPulse,
-  ALARM_SEVERITIES,
-} from './types';
+import { alarmAriaRole, resolveAlarmSeverity, shouldPulse, ALARM_SEVERITIES } from './types';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const stylesRoot = join(__dirname, '../styles/cdl-v2');
@@ -50,7 +45,15 @@ describe('CDL v2 alarm system', () => {
   });
 
   it('defines CDL v2 foundation token files', () => {
-    for (const name of ['tokens.css', 'color.css', 'shell.css', 'elevation.css', 'alarm.css', 'compat.css', 'index.css']) {
+    for (const name of [
+      'tokens.css',
+      'color.css',
+      'shell.css',
+      'elevation.css',
+      'alarm.css',
+      'compat.css',
+      'index.css',
+    ]) {
       const css = readFileSync(join(stylesRoot, name), 'utf8');
       expect(css.length).toBeGreaterThan(40);
     }

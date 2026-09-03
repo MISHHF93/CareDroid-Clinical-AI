@@ -152,7 +152,10 @@ describe('RouteChromeContext registration vs navigation reset', () => {
     const appShellSource = readFileSync(join(__dirname, '../components/AppShell.tsx'), 'utf8');
     const resetStart = appShellSource.indexOf('function RouteChromeReset');
     expect(resetStart).toBeGreaterThan(-1);
-    const resetBody = appShellSource.slice(resetStart, appShellSource.indexOf('function AppShellFrame'));
+    const resetBody = appShellSource.slice(
+      resetStart,
+      appShellSource.indexOf('function AppShellFrame'),
+    );
     expect(resetBody).toContain('useLayoutEffect(');
     expect(resetBody).not.toContain('useEffect(');
   });

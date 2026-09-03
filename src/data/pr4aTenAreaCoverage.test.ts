@@ -33,10 +33,7 @@ import {
   matchCalculatorRoute,
   isKnownToolAreaPath,
 } from '../routes/clinicalToolRoutes';
-import {
-  buildClinicalToolAliasSyncReport,
-  TOOL_PATTERNS_PATH,
-} from './clinicalToolAliasSync';
+import { buildClinicalToolAliasSyncReport, TOOL_PATTERNS_PATH } from './clinicalToolAliasSync';
 import {
   aliasToSlug,
   extractToolPatternKeywords,
@@ -98,12 +95,7 @@ export const PR4A_TEN_AREA_LABELS = [
 
 describe('PR4A ten-area coverage — matrix contract', () => {
   it('targets the four required Tier-A registry ids', () => {
-    expect([...PR4A_TOOL_IDS]).toEqual([
-      'ascvd-risk',
-      'ckd-staging',
-      'stop-bang',
-      'audit-c',
-    ]);
+    expect([...PR4A_TOOL_IDS]).toEqual(['ascvd-risk', 'ckd-staging', 'stop-bang', 'audit-c']);
     expect([...PR4A_CALCULATOR_REGISTRY_IDS]).toEqual([...PR4A_TOOL_IDS]);
     expect([...PR4A_TIER_A_CALCULATOR_REGISTRY_IDS]).toEqual([...PR4A_TOOL_IDS]);
   });
@@ -203,18 +195,21 @@ describe('PR4A ten-area — 8. route resolution', () => {
   it.each(PR4A_TOOL_IDS)('CALCULATOR_ROUTE_DEFS includes %s', (id) => {
     const path = PR4A_ROUTE_BY_REGISTRY_ID[id];
     expect(CALCULATOR_ROUTE_DEFS.some((d) => d.calculatorSlug === id && d.path === path)).toBe(
-      true
+      true,
     );
     expect(matchCalculatorRoute(path)?.calculatorSlug).toBe(id);
   });
 
-  it.each(PR4A_TOOL_IDS)('App.jsx mounts calculator routes via CALCULATOR_ROUTE_DEFS for %s', (id) => {
-    const path = PR4A_ROUTE_BY_REGISTRY_ID[id];
-    expect(matchCalculatorRoute(path)?.calculatorSlug).toBe(id);
-    expect(appSource).not.toContain('CALCULATOR_ROUTE_DEFS.map');
-    expect(appSource).not.toContain('<LegacyCalculatorRouteRedirect />');
-    expect(appSource).toContain('<Route path="/tools/*" element={<ToolsRedirect />} />');
-  });
+  it.each(PR4A_TOOL_IDS)(
+    'App.jsx mounts calculator routes via CALCULATOR_ROUTE_DEFS for %s',
+    (id) => {
+      const path = PR4A_ROUTE_BY_REGISTRY_ID[id];
+      expect(matchCalculatorRoute(path)?.calculatorSlug).toBe(id);
+      expect(appSource).not.toContain('CALCULATOR_ROUTE_DEFS.map');
+      expect(appSource).not.toContain('<LegacyCalculatorRouteRedirect />');
+      expect(appSource).toContain('<Route path="/tools/*" element={<ToolsRedirect />} />');
+    },
+  );
 });
 
 describe('PR4A ten-area — backend alias consistency', () => {
@@ -226,10 +221,10 @@ describe('PR4A ten-area — backend alias consistency', () => {
   it('PR4A required catalog aliases pass clinicalToolAliasSync report', () => {
     const report = buildClinicalToolAliasSyncReport({ patternsSource });
     const pr4aMissing = report.missingCatalogAliases.filter((row) =>
-      PR4A_TOOL_IDS.includes(row.expected)
+      PR4A_TOOL_IDS.includes(row.expected),
     );
     const pr4aWrong = report.wrongCatalogTargets.filter((row) =>
-      PR4A_TOOL_IDS.includes(row.expected)
+      PR4A_TOOL_IDS.includes(row.expected),
     );
     expect(pr4aMissing).toEqual([]);
     expect(pr4aWrong).toEqual([]);
@@ -238,7 +233,7 @@ describe('PR4A ten-area — backend alias consistency', () => {
   it.each(PR4A_TOOL_IDS)('required phrases in NLU map or backend keywords for %s', (id) => {
     const keywords = extractToolPatternKeywords(patternsSource, id).map((k) => aliasToSlug(k));
     const requiredForTool = PR4A_REQUIRED_NLU_ALIAS_PAIRS.filter(([, c]) => c === id).map(
-      ([a]) => a
+      ([a]) => a,
     );
     for (const phrase of requiredForTool) {
       const slug = aliasToSlug(phrase);
@@ -275,7 +270,9 @@ describe('PR4A ten-area — 10. edge cases & duplicate detection', () => {
   });
 
   it('PR4A-targeting discovery aliases have unique ids and consistent mapsTo', () => {
-    const pr4aRows = toolIdAliases.filter((a) => (PR4A_TOOL_IDS as readonly string[]).includes(a.mapsTo));
+    const pr4aRows = toolIdAliases.filter((a) =>
+      (PR4A_TOOL_IDS as readonly string[]).includes(a.mapsTo),
+    );
     const ids = pr4aRows.map((a) => a.id);
     expect(new Set(ids).size).toBe(ids.length);
     for (const [aliasId, canonical] of PR4A_DISCOVERY_ALIAS_PAIRS) {
@@ -290,12 +287,17 @@ describe('PR4A ten-area — 10. edge cases & duplicate detection', () => {
 });
 
 describe('PR4A ten-area — no orphaned tool IDs', () => {
-  it.each(PR4A_TOOL_IDS)('%s is wired through registry, NLU, catalog, discovery, and builtin', (id) => {
-    assertPr4aFullyWired(id, WIRING_CTX);
-  });
+  it.each(PR4A_TOOL_IDS)(
+    '%s is wired through registry, NLU, catalog, discovery, and builtin',
+    (id) => {
+      assertPr4aFullyWired(id, WIRING_CTX);
+    },
+  );
 
   it('PR4A-targeting discovery aliases do not point at missing registry ids', () => {
-    const pr4aAliasRows = toolIdAliases.filter((a) => (PR4A_TOOL_IDS as readonly string[]).includes(a.mapsTo));
+    const pr4aAliasRows = toolIdAliases.filter((a) =>
+      (PR4A_TOOL_IDS as readonly string[]).includes(a.mapsTo),
+    );
     for (const { id, mapsTo } of pr4aAliasRows) {
       expect(toolRegistryById[mapsTo], `orphan mapsTo for alias ${id}`).toBeTruthy();
     }

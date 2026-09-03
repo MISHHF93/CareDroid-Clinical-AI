@@ -75,7 +75,10 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
     aiLaunchAlias: 'ask caredroid',
     backendService: 'ChatService',
     apiEndpoint: 'POST /api/chat/message',
-    testCoverage: ['src/data/nluLaunchPaths.test.ts', 'src/utils/chatCapabilitySuggestions.test.ts'],
+    testCoverage: [
+      'src/data/nluLaunchPaths.test.ts',
+      'src/utils/chatCapabilitySuggestions.test.ts',
+    ],
   },
   {
     id: 'hospital-map',
@@ -85,7 +88,10 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
     aiLaunchAlias: 'show map',
     backendService: 'FloorService / RoomService / DeviceLocationService',
     apiEndpoint: 'GET /api/hospital-map/floors',
-    testCoverage: ['src/pages/HospitalMapDashboard.test.jsx', 'src/services/hospitalMapService.test.ts'],
+    testCoverage: [
+      'src/pages/HospitalMapDashboard.test.jsx',
+      'src/services/hospitalMapService.test.ts',
+    ],
     status: PLATFORM_CAPABILITY_MATRIX_STATUSES.DEMO,
   },
   {
@@ -96,7 +102,10 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
     aiLaunchAlias: 'show telemetry',
     backendService: 'TelemetryService / DeviceRegistryService / AlertService',
     apiEndpoint: 'GET /api/telemetry/live',
-    testCoverage: ['src/pages/MedicalIotDashboard.test.jsx', 'src/services/medicalIotService.test.ts'],
+    testCoverage: [
+      'src/pages/MedicalIotDashboard.test.jsx',
+      'src/services/medicalIotService.test.ts',
+    ],
     status: PLATFORM_CAPABILITY_MATRIX_STATUSES.DEMO,
   },
   {
@@ -107,7 +116,10 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
     aiLaunchAlias: 'show devices',
     backendService: 'DeviceRegistryService',
     apiEndpoint: 'GET /api/devices/live',
-    testCoverage: ['src/pages/DeviceFleetManagement.test.jsx', 'src/services/medicalIotService.test.ts'],
+    testCoverage: [
+      'src/pages/DeviceFleetManagement.test.jsx',
+      'src/services/medicalIotService.test.ts',
+    ],
   },
   {
     id: 'live-tracking-map',
@@ -139,7 +151,10 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
     aiLaunchAlias: 'show fleet command',
     backendService: 'FleetService',
     apiEndpoint: 'GET /api/fleet/snapshot',
-    testCoverage: ['src/pages/fleet/FleetDashboard.test.jsx', 'src/data/fleetCommandWiring.test.ts'],
+    testCoverage: [
+      'src/pages/fleet/FleetDashboard.test.jsx',
+      'src/data/fleetCommandWiring.test.ts',
+    ],
   },
   {
     id: 'predictive-maintenance',
@@ -149,7 +164,10 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
     aiLaunchAlias: 'show maintenance risk',
     backendService: 'FleetService',
     apiEndpoint: 'GET /api/fleet/alerts',
-    testCoverage: ['src/pages/fleet/PredictiveMaintenance.test.jsx', 'src/data/predictiveMaintenanceWiring.test.ts'],
+    testCoverage: [
+      'src/pages/fleet/PredictiveMaintenance.test.jsx',
+      'src/data/predictiveMaintenanceWiring.test.ts',
+    ],
   },
   {
     id: 'route-optimizer',
@@ -159,7 +177,10 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
     aiLaunchAlias: 'optimize route',
     backendService: 'VehicleTrackingService',
     apiEndpoint: 'GET /api/fleet/routes/active',
-    testCoverage: ['src/pages/fleet/RouteOptimizer.test.jsx', 'src/services/routeOptimizationService.test.ts'],
+    testCoverage: [
+      'src/pages/fleet/RouteOptimizer.test.jsx',
+      'src/services/routeOptimizationService.test.ts',
+    ],
   },
   {
     id: 'digital-twin',
@@ -189,7 +210,10 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
     aiLaunchAlias: 'build workflow',
     backendService: 'ClinicalIntelligenceService',
     apiEndpoint: 'POST /api/clinical-intelligence/workflow-builder/generate',
-    testCoverage: ['src/test/routePagesSmoke.test.tsx', 'src/data/platformSystemsExpansionPlan.test.ts'],
+    testCoverage: [
+      'src/test/routePagesSmoke.test.tsx',
+      'src/data/platformSystemsExpansionPlan.test.ts',
+    ],
   },
   {
     id: 'search',
@@ -209,7 +233,10 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
     aiLaunchAlias: 'show assets',
     backendService: 'AssetRegistryService / ArtifactsService',
     apiEndpoint: 'GET /api/artifacts',
-    testCoverage: ['backend/src/modules/artifacts/asset-registry.service.spec.ts', 'src/pages/Artifacts.test.jsx'],
+    testCoverage: [
+      'backend/src/modules/artifacts/asset-registry.service.spec.ts',
+      'src/pages/Artifacts.test.jsx',
+    ],
   },
   {
     id: 'notifications',
@@ -239,7 +266,10 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
     aiLaunchAlias: 'show system health',
     backendService: 'ObservabilityService',
     apiEndpoint: 'GET /api/system-health',
-    testCoverage: ['src/services/platformGovernanceApi.test.ts', 'src/test/routePagesSmoke.test.tsx'],
+    testCoverage: [
+      'src/services/platformGovernanceApi.test.ts',
+      'src/test/routePagesSmoke.test.tsx',
+    ],
   },
   {
     id: 'artifacts',
@@ -249,7 +279,10 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
     aiLaunchAlias: 'show artifacts',
     backendService: 'ArtifactsService',
     apiEndpoint: 'GET /api/artifacts',
-    testCoverage: ['src/pages/Artifacts.test.jsx', 'backend/src/modules/artifacts/asset-registry.service.spec.ts'],
+    testCoverage: [
+      'src/pages/Artifacts.test.jsx',
+      'backend/src/modules/artifacts/asset-registry.service.spec.ts',
+    ],
   },
   {
     id: 'memory',
@@ -259,7 +292,10 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
     aiLaunchAlias: 'show memory',
     backendService: 'ShortMemoryService / LongMemoryService / ClinicalMemoryService',
     apiEndpoint: 'GET /api/memory/dashboard',
-    testCoverage: ['src/pages/MemoryDashboard.test.jsx', 'src/data/fullPlatformConsolidation.test.js'],
+    testCoverage: [
+      'src/pages/MemoryDashboard.test.jsx',
+      'src/data/fullPlatformConsolidation.test.js',
+    ],
   },
   {
     id: 'training',
@@ -269,7 +305,10 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
     aiLaunchAlias: 'show training',
     backendService: 'TrainingService',
     apiEndpoint: 'GET /api/training/dashboard',
-    testCoverage: ['src/pages/TrainingDashboard.test.tsx', 'src/data/fullPlatformConsolidation.test.js'],
+    testCoverage: [
+      'src/pages/TrainingDashboard.test.tsx',
+      'src/data/fullPlatformConsolidation.test.js',
+    ],
   },
   {
     id: 'ai-evaluation',
@@ -279,7 +318,10 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
     aiLaunchAlias: 'show evaluations',
     backendService: 'EvaluationService',
     apiEndpoint: 'GET /api/evaluation/dashboard',
-    testCoverage: ['src/pages/AiEvaluationDashboard.test.jsx', 'src/services/evaluationApi.test.ts'],
+    testCoverage: [
+      'src/pages/AiEvaluationDashboard.test.jsx',
+      'src/services/evaluationApi.test.ts',
+    ],
   },
   {
     id: 'ai-command-center',
@@ -289,7 +331,10 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
     aiLaunchAlias: 'show ai command center',
     backendService: 'RoutingOptimizerService',
     apiEndpoint: 'GET /api/cost-optimizer/dashboard',
-    testCoverage: ['src/pages/AiCommandCenterDashboard.test.jsx', 'src/services/aiCommandCenterApi.test.ts'],
+    testCoverage: [
+      'src/pages/AiCommandCenterDashboard.test.jsx',
+      'src/services/aiCommandCenterApi.test.ts',
+    ],
   },
   {
     id: 'costs',
@@ -299,7 +344,10 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
     aiLaunchAlias: 'show costs',
     backendService: 'CostPredictionService / RoutingOptimizerService',
     apiEndpoint: 'GET /api/cost-optimizer/dashboard',
-    testCoverage: ['src/pages/AiCommandCenterDashboard.test.jsx', 'src/services/aiCommandCenterApi.test.ts'],
+    testCoverage: [
+      'src/pages/AiCommandCenterDashboard.test.jsx',
+      'src/services/aiCommandCenterApi.test.ts',
+    ],
   },
 ]);
 
@@ -368,8 +416,8 @@ function normalizeTestCoverage(testCoverage) {
   return [
     ...new Set(
       [...(testCoverage || DEFAULT_PLATFORM_TEST_COVERAGE)].map(
-        (testPath) => TEST_COVERAGE_PATH_ALIASES[testPath] || testPath
-      )
+        (testPath) => TEST_COVERAGE_PATH_ALIASES[testPath] || testPath,
+      ),
     ),
   ];
 }
@@ -382,7 +430,8 @@ function platformSystemToMatrixRow(capability) {
     capability: capability.name,
     frontendRoute: capability.route,
     inventoryEntry: override?.inventoryEntry || capability.id,
-    aiLaunchAlias: override?.aiLaunchAlias || capability.chatSeed || `open ${capability.name.toLowerCase()}`,
+    aiLaunchAlias:
+      override?.aiLaunchAlias || capability.chatSeed || `open ${capability.name.toLowerCase()}`,
     backendService: override?.backendService || backendServiceFor(endpoint),
     apiEndpoint: endpoint,
     testCoverage: normalizeTestCoverage(override?.testCoverage || capability.testCoverage),
@@ -403,7 +452,12 @@ function foundationToMatrixRow(row) {
 }
 
 export function buildPlatformCapabilityMatrix() {
-  const rowsById = new Map(PLATFORM_SYSTEM_CAPABILITIES.map((capability) => [capability.id, platformSystemToMatrixRow(capability)]));
+  const rowsById = new Map(
+    PLATFORM_SYSTEM_CAPABILITIES.map((capability) => [
+      capability.id,
+      platformSystemToMatrixRow(capability),
+    ]),
+  );
   for (const row of FOUNDATION_CAPABILITIES) {
     rowsById.set(row.id, foundationToMatrixRow(row));
   }
@@ -420,7 +474,7 @@ export function buildPlatformCapabilityMatrix() {
         backendService: 'PlatformSystemsService',
         apiEndpoint: 'GET /api/platform-systems/capabilities/:capabilityId',
         testCoverage: DASHBOARD_TEST_COVERAGE,
-      })
+      }),
     );
   }
   return [...rowsById.values()].sort((a, b) => a.capability.localeCompare(b.capability));
@@ -430,7 +484,9 @@ export const platformCapabilityMatrix = Object.freeze(buildPlatformCapabilityMat
 
 export function listMissingPlatformCapabilityTraceability(rows = platformCapabilityMatrix) {
   const inventoryIds = new Set(getCanonicalToolInventory().map((record) => record.id));
-  const platformCapabilityIds = new Set(PLATFORM_SYSTEM_CAPABILITIES.map((capability) => capability.id));
+  const platformCapabilityIds = new Set(
+    PLATFORM_SYSTEM_CAPABILITIES.map((capability) => capability.id),
+  );
   const dashboardIds = new Set(PLATFORM_DASHBOARDS.map((dashboard) => dashboard.id));
 
   return rows.flatMap((row) => {
@@ -448,7 +504,17 @@ export function listMissingPlatformCapabilityTraceability(rows = platformCapabil
       !inventoryIds.has(row.inventoryEntry) &&
       !platformCapabilityIds.has(row.inventoryEntry) &&
       !dashboardIds.has(row.inventoryEntry) &&
-      !['dashboard', 'assistant', 'timeline', 'search', 'notifications', 'workspaces', 'system-health', 'workflow-builder', 'digital-twin'].includes(row.inventoryEntry)
+      ![
+        'dashboard',
+        'assistant',
+        'timeline',
+        'search',
+        'notifications',
+        'workspaces',
+        'system-health',
+        'workflow-builder',
+        'digital-twin',
+      ].includes(row.inventoryEntry)
     ) {
       missing.push('knownInventoryEntry');
     }
@@ -463,8 +529,12 @@ function mdCell(value) {
 
 export function formatPlatformCapabilityMatrixDocument(rows = platformCapabilityMatrix) {
   const missing = listMissingPlatformCapabilityTraceability(rows);
-  const active = rows.filter((row) => row.status === PLATFORM_CAPABILITY_MATRIX_STATUSES.ACTIVE).length;
-  const demo = rows.filter((row) => (row.status as any) === PLATFORM_CAPABILITY_MATRIX_STATUSES.DEMO).length;
+  const active = rows.filter(
+    (row) => row.status === PLATFORM_CAPABILITY_MATRIX_STATUSES.ACTIVE,
+  ).length;
+  const demo = rows.filter(
+    (row) => (row.status as any) === PLATFORM_CAPABILITY_MATRIX_STATUSES.DEMO,
+  ).length;
   const lines = [
     '# Platform Capability Matrix',
     '',
@@ -483,13 +553,15 @@ export function formatPlatformCapabilityMatrixDocument(rows = platformCapability
     '| --- | --- | --- | --- | --- | --- | --- | --- |',
     ...rows.map(
       (row) =>
-        `| ${mdCell(row.capability)} | \`${mdCell(row.frontendRoute)}\` | \`${mdCell(row.inventoryEntry)}\` | "${mdCell(row.aiLaunchAlias)}" | ${mdCell(row.backendService)} | \`${mdCell(row.apiEndpoint)}\` | ${mdCell(row.testCoverage)} | ${mdCell(row.status)} |`
+        `| ${mdCell(row.capability)} | \`${mdCell(row.frontendRoute)}\` | \`${mdCell(row.inventoryEntry)}\` | "${mdCell(row.aiLaunchAlias)}" | ${mdCell(row.backendService)} | \`${mdCell(row.apiEndpoint)}\` | ${mdCell(row.testCoverage)} | ${mdCell(row.status)} |`,
     ),
     '',
     '## Acceptance Gates',
     '',
     `- Every row has capability, route, inventory entry, AI alias, backend service, endpoint, tests, and status: ${missing.length === 0 ? 'pass' : 'fail'}`,
-    `- Every API endpoint resolves to ` + '`BACKEND_HTTP_ROUTES`: ' + `${missing.every((item) => !item.missing.includes('registeredBackendRoute')) ? 'pass' : 'fail'}`,
+    `- Every API endpoint resolves to ` +
+      '`BACKEND_HTTP_ROUTES`: ' +
+      `${missing.every((item) => !item.missing.includes('registeredBackendRoute')) ? 'pass' : 'fail'}`,
     `- Every platform dashboard is represented: ${PLATFORM_DASHBOARDS.every((dashboard) => rows.some((row) => row.id === dashboard.id)) ? 'pass' : 'fail'}`,
     `- Every platform system capability is represented: ${PLATFORM_SYSTEM_CAPABILITIES.every((capability) => rows.some((row) => row.id === capability.id || row.inventoryEntry === capability.id)) ? 'pass' : 'fail'}`,
     '',
@@ -510,10 +582,15 @@ export function platformCapabilityTestFilesExist(rows = platformCapabilityMatrix
   return rows.flatMap((row) =>
     row.testCoverage
       .filter((testPath) => !existsSync(join(repoRoot, testPath)))
-      .map((testPath) => ({ id: row.id, capability: row.capability, testPath }))
+      .map((testPath) => ({ id: row.id, capability: row.capability, testPath })),
   );
 }
 
 export function getPlatformCapabilityById(id) {
-  return platformCapabilityMatrix.find((row) => row.id === id || row.inventoryEntry === id || PLATFORM_SYSTEM_CAPABILITY_BY_ID[id]?.id === row.id);
+  return platformCapabilityMatrix.find(
+    (row) =>
+      row.id === id ||
+      row.inventoryEntry === id ||
+      PLATFORM_SYSTEM_CAPABILITY_BY_ID[id]?.id === row.id,
+  );
 }

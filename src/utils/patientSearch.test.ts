@@ -63,7 +63,13 @@ describe('patientSearch', () => {
   });
 
   it('ranks exact matches ahead of partial matches', () => {
-    const partial = { ...basePatient, id: 'p2', firstName: 'Meiling', lastName: 'Liu', mrn: 'ED-999' };
+    const partial = {
+      ...basePatient,
+      id: 'p2',
+      firstName: 'Meiling',
+      lastName: 'Liu',
+      mrn: 'ED-999',
+    };
     const ranked = rankPatientsBySearch([partial, basePatient], 'Mei Li');
     expect(ranked[0]?.patient.id).toBe('p10');
   });

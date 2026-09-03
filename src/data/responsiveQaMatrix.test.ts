@@ -32,7 +32,9 @@ describe('responsiveQaMatrix', () => {
     expect(MOBILE_WEB_QA_VIEWPORT_WIDTHS).toBe(MOBILE_FIRST_VIEWPORT_WIDTHS);
     expect(RESPONSIVE_QA_VIEWPORTS).toHaveLength(15);
     expect(RESPONSIVE_QA_VIEWPORTS.map((v) => v.width)).toEqual(
-      expect.arrayContaining([320, 360, 375, 390, 412, 430, 480, 600, 768, 1024, 1280, 1440, 1920, 2560, 3440])
+      expect.arrayContaining([
+        320, 360, 375, 390, 412, 430, 480, 600, 768, 1024, 1280, 1440, 1920, 2560, 3440,
+      ]),
     );
     expect(RESPONSIVE_QA_BROWSER_PROJECTS).toHaveLength(4);
     expect(RESPONSIVE_QA_ZOOM_LEVELS).toEqual([80, 90, 100, 110, 125, 150]);
@@ -80,7 +82,7 @@ describe('responsiveQaMatrix', () => {
     const pages = buildResponsiveQaPages();
 
     expect(pages.find((page) => page.id === 'fleet-live-map')?.registryId).toBe(
-      REGISTRY.fleetLiveMap
+      REGISTRY.fleetLiveMap,
     );
 
     for (const page of pages) {

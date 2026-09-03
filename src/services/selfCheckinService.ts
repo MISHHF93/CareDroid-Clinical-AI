@@ -1,12 +1,7 @@
 import { suggestSelfArrivalTriage } from '../engine/selfArrivalTriageEngine';
 import { CARE_STREAMING_LANES } from '../config/edOperationalStandards';
 import { HUMAN_REVIEW_DISCLAIMER } from '../lib/ai/safety/policy';
-import {
-  PatientState,
-  type Note,
-  type Patient,
-  type Sex,
-} from '../types/emergency';
+import { PatientState, type Note, type Patient, type Sex } from '../types/emergency';
 import { buildPatientArrivalRecord, syncPatientFromArrival } from './patientArrivalModel';
 import { calculateAgeFromDob } from './receptionQuickIntakeService';
 
@@ -142,7 +137,8 @@ export async function lookupProvincialHealthRecord(
 ): Promise<ProvincialHealthLookupResult> {
   return {
     status: 'unavailable',
-    message: 'Live health record lookup is not connected on this kiosk yet. Staff will verify your identity at triage.',
+    message:
+      'Live health record lookup is not connected on this kiosk yet. Staff will verify your identity at triage.',
   };
 }
 

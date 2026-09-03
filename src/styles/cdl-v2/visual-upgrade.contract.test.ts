@@ -43,8 +43,8 @@ describe('patient-card pill AA contract', () => {
   it('loads CDL pills stylesheet from package index and re-asserts after design-system', () => {
     const index = readFileSync(join(__dirname, 'index.css'), 'utf8');
     const main = readFileSync(join(root, 'main.tsx'), 'utf8');
-    expect(index).toContain("pills.css");
-    expect(main).toContain("cdl-v2/pills.css");
+    expect(index).toContain('pills.css');
+    expect(main).toContain('cdl-v2/pills.css');
     // pills.css appears after design-system so dual-mode tokens win
     expect(main.indexOf('design-system.css')).toBeLessThan(main.lastIndexOf('cdl-v2/pills.css'));
   });
@@ -74,11 +74,13 @@ describe('patient-card pill AA contract', () => {
     const css = readFileSync(join(root, 'components/PatientCard.css'), 'utf8');
     expect(tsx).toContain('data-tone={signal.tone}');
     expect(tsx).toContain('resolveFlagTone');
-    expect(tsx).toContain("data-tone={tone}");
+    expect(tsx).toContain('data-tone={tone}');
     expect(css).toContain('--cdl-pill-critical-fg');
     expect(css).toContain('--cdl-pill-neutral-fg');
     expect(css).not.toMatch(/\.patient-card__signal--critical[\s\S]{0,120}color:\s*var\(--status-/);
-    expect(css).not.toMatch(/\.patient-card__state-pill[\s\S]{0,200}color:\s*var\(--app-on-solid\)/);
+    expect(css).not.toMatch(
+      /\.patient-card__state-pill[\s\S]{0,200}color:\s*var\(--app-on-solid\)/,
+    );
   });
 
   it('card-surface badges avoid hard-coded light-only #fecaca without dual tokens', () => {
@@ -104,7 +106,9 @@ describe('Profile page migrated to cdl-v2 (Cycle 150)', () => {
 
   it('uses cdl-v2 tokens, not the legacy --medical-*/--app-*/--surface-* family', () => {
     expect(profileCss).toMatch(/--cdl-/);
-    expect(profileCss).not.toMatch(/--medical-|--app-desktop-page-padding|--app-mobile-page-padding|--app-fg-muted|--surface-1|--surface-2|--panel-border|--panel-background|--semantic-attention|--text-color|--text-muted/);
+    expect(profileCss).not.toMatch(
+      /--medical-|--app-desktop-page-padding|--app-mobile-page-padding|--app-fg-muted|--surface-1|--surface-2|--panel-border|--panel-background|--semantic-attention|--text-color|--text-muted/,
+    );
   });
 
   it('has no hardcoded hex/rgba color literals left over from the legacy slate accent', () => {
@@ -117,17 +121,24 @@ describe('Profile page migrated to cdl-v2 (Cycle 150)', () => {
 });
 
 describe('Profile sub-pages migrated to cdl-v2 (Cycle 151)', () => {
-  const identityPagesCss = readFileSync(join(root, 'pages/profile/ProfileIdentityPages.css'), 'utf8');
+  const identityPagesCss = readFileSync(
+    join(root, 'pages/profile/ProfileIdentityPages.css'),
+    'utf8',
+  );
   const settingsCss = readFileSync(join(root, 'pages/ProfileSettings.css'), 'utf8');
 
   it('ProfileIdentityPages.css (shared by Preferences/Tools/Workspaces/Security/Activity) uses cdl-v2 tokens only', () => {
     expect(identityPagesCss).toMatch(/--cdl-/);
-    expect(identityPagesCss).not.toMatch(/--app-fg-muted|--panel-border|--panel-background|--card-background|--text-color|#374151|#07120d/);
+    expect(identityPagesCss).not.toMatch(
+      /--app-fg-muted|--panel-border|--panel-background|--card-background|--text-color|#374151|#07120d/,
+    );
   });
 
   it('fixes the illegible .profile-identity-button (near-black text on dark-slate background)', () => {
     expect(identityPagesCss).not.toMatch(/#07120d/);
-    const buttonRule = identityPagesCss.slice(identityPagesCss.indexOf('.profile-identity-button {'));
+    const buttonRule = identityPagesCss.slice(
+      identityPagesCss.indexOf('.profile-identity-button {'),
+    );
     expect(buttonRule).toContain('background: var(--cdl-info)');
     expect(buttonRule).toContain('color: var(--cdl-ink-inverse)');
   });
@@ -140,20 +151,31 @@ describe('Profile sub-pages migrated to cdl-v2 (Cycle 151)', () => {
 
 describe('KPI/button tone data reaches the displayed value, not just the border (Cycle 152)', () => {
   it('DashboardVisualizations.css: --good/--warning/--critical strong text is recolored, not just the border', () => {
-    const css = readFileSync(join(root, 'components/dashboard/DashboardVisualizations.css'), 'utf8');
+    const css = readFileSync(
+      join(root, 'components/dashboard/DashboardVisualizations.css'),
+      'utf8',
+    );
     expect(css).toContain('.dashboard-metric-card--good strong');
     expect(css).toContain('.dashboard-status-card--good strong');
-    expect(css.slice(css.indexOf('.dashboard-metric-card--good strong'))).toContain('color: var(--app-success)');
+    expect(css.slice(css.indexOf('.dashboard-metric-card--good strong'))).toContain(
+      'color: var(--app-success)',
+    );
     expect(css).toContain('.dashboard-metric-card--warning strong');
-    expect(css.slice(css.indexOf('.dashboard-metric-card--warning strong'))).toContain('color: var(--app-warning)');
+    expect(css.slice(css.indexOf('.dashboard-metric-card--warning strong'))).toContain(
+      'color: var(--app-warning)',
+    );
     expect(css).toContain('.dashboard-metric-card--critical strong');
-    expect(css.slice(css.indexOf('.dashboard-metric-card--critical strong'))).toContain('color: var(--app-danger)');
+    expect(css.slice(css.indexOf('.dashboard-metric-card--critical strong'))).toContain(
+      'color: var(--app-danger)',
+    );
   });
 
   it('TriageBreachBadge.css: critical/watch strip counts recolor the number, not just the border', () => {
     const css = readFileSync(join(root, 'components/triage/TriageBreachBadge.css'), 'utf8');
     expect(css).toContain("[data-tone='critical'] strong");
-    expect(css.slice(css.indexOf("[data-tone='critical'] strong"))).toContain('--cdl-critical-text');
+    expect(css.slice(css.indexOf("[data-tone='critical'] strong"))).toContain(
+      '--cdl-critical-text',
+    );
     expect(css).toContain("[data-tone='watch'] strong");
     expect(css.slice(css.indexOf("[data-tone='watch'] strong"))).toContain('--cdl-warning-text');
   });
@@ -213,14 +235,23 @@ describe('Reception "Waiting list" row layout (Cycle 155)', () => {
   });
 
   it('formats long waits as hours+minutes instead of a raw 3-digit minute count', () => {
-    const tsx = readFileSync(join(root, 'components/reception/ReceptionOperationalRail.tsx'), 'utf8');
+    const tsx = readFileSync(
+      join(root, 'components/reception/ReceptionOperationalRail.tsx'),
+      'utf8',
+    );
     expect(tsx).toContain('function formatWaitDisplay');
     expect(tsx).toMatch(/formatWaitDisplay\(waitMinutes\(patient\)\)/);
   });
 
   it('truncated complaint and status text carry a title tooltip with the full value', () => {
-    const tsx = readFileSync(join(root, 'components/reception/ReceptionOperationalRail.tsx'), 'utf8');
-    const whoBlock = tsx.slice(tsx.indexOf('reception-queue-row__who'), tsx.indexOf('reception-queue-row__meta'));
+    const tsx = readFileSync(
+      join(root, 'components/reception/ReceptionOperationalRail.tsx'),
+      'utf8',
+    );
+    const whoBlock = tsx.slice(
+      tsx.indexOf('reception-queue-row__who'),
+      tsx.indexOf('reception-queue-row__meta'),
+    );
     expect(whoBlock).toContain('title={patient.chiefComplaint');
     const statusBlock = tsx.slice(tsx.indexOf('reception-queue-row__status'));
     expect(statusBlock.slice(0, 120)).toContain('title={queueStatus(patient)}');

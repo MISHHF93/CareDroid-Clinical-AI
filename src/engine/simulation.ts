@@ -1,9 +1,6 @@
 import { isSimulationModeActive } from '../services/simulationModeService';
 import { hasPatientFlag, useEmergencyStore } from '../store/emergencyStore';
-import {
-  getNextStates,
-  movePatientToState as movePatientWithJourneyRules,
-} from './journeyEngine';
+import { getNextStates, movePatientToState as movePatientWithJourneyRules } from './journeyEngine';
 import { runCapacityIntelligence } from './capacityEngine';
 import { runEmergencyReassessment } from './reassessmentEngine';
 import { dispatch as dispatchAlert } from './alertEngine';
@@ -338,21 +335,23 @@ const createJourneyEvent = (
   patientId: string,
   type: JourneyEvent['type'],
   summary: string,
-  extra: Partial<JourneyEvent> = {}
-): JourneyEvent => ({
-  id: `sim-event-${patientId}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-  patientId,
-  type,
-  timestamp: nowIso(),
-  summary,
-  ...extra,
-} as JourneyEvent);
+  extra: Partial<JourneyEvent> = {},
+): JourneyEvent =>
+  ({
+    id: `sim-event-${patientId}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    patientId,
+    type,
+    timestamp: nowIso(),
+    summary,
+    ...extra,
+  }) as JourneyEvent;
 
 const patientDisplayName = (patient: Patient): string => `${patient.firstName} ${patient.lastName}`;
 
 const pickActivePatients = (patients: Patient[]): Patient[] =>
   patients.filter(
-    (patient) => patient.state !== PatientState.Discharge && patient.state !== PatientState.Deceased
+    (patient) =>
+      patient.state !== PatientState.Discharge && patient.state !== PatientState.Deceased,
   );
 
 const nextStateForPatient = (patient: Patient): PatientState | null => {
@@ -370,7 +369,7 @@ const nextStateForPatient = (patient: Patient): PatientState | null => {
 const advanceRandomPatient = (): void => {
   const store = useEmergencyStore.getState();
   const candidates = pickActivePatients(store.patients).filter((patient) =>
-    nextStateForPatient(patient)
+    nextStateForPatient(patient),
   );
   if (!candidates.length) return;
 
@@ -397,7 +396,7 @@ const fluctuate = (
   deltaMax: number,
   min: number,
   max: number,
-  precision = 0
+  precision = 0,
 ): number | null => {
   const numeric = numericVital(value);
   if (numeric === null) return null;
@@ -414,13 +413,10 @@ const fluctuateNumber = (
   deltaMax: number,
   min: number,
   max: number,
-  precision = 0
+  precision = 0,
 ): number => fluctuate(value, deltaMin, deltaMax, min, max, precision) ?? value;
 
-const createVitalsReading = (
-  vitals: Omit<Vitals, 'recordedAt'>,
-  recordedAt: string
-): Vitals => ({
+const createVitalsReading = (vitals: Omit<Vitals, 'recordedAt'>, recordedAt: string): Vitals => ({
   ...vitals,
   recordedAt,
 });
@@ -434,10 +430,17 @@ const numericQueueValue = (value: QueueSummary[keyof QueueSummary]): number | nu
 const addOccasionalAbnormalSignal = (vitals: Vitals): Vitals => {
   if (Math.random() > 0.14) return vitals;
 
-  const abnormalPattern = randomItem(['tachycardia', 'hypoxia', 'fever', 'hypotension', 'hypertension']);
+  const abnormalPattern = randomItem([
+    'tachycardia',
+    'hypoxia',
+    'fever',
+    'hypotension',
+    'hypertension',
+  ]);
   if (abnormalPattern === 'tachycardia') return { ...vitals, hr: randomInt(122, 138) };
   if (abnormalPattern === 'hypoxia') return { ...vitals, spo2: randomInt(90, 93) };
-  if (abnormalPattern === 'fever') return { ...vitals, temp: Number((randomInt(386, 394) / 10).toFixed(1)) };
+  if (abnormalPattern === 'fever')
+    return { ...vitals, temp: Number((randomInt(386, 394) / 10).toFixed(1)) };
   if (abnormalPattern === 'hypotension') return { ...vitals, bpSystolic: randomInt(82, 89) };
   return { ...vitals, bpSystolic: randomInt(181, 198) };
 };
@@ -518,7 +521,7 @@ const createArrivalPatient = (template: ArrivalTemplate): Patient => {
       createJourneyEvent(
         id,
         'Arrival',
-        `${template.firstName} ${template.lastName} arrived for urgent care.`
+        `${template.firstName} ${template.lastName} arrived for urgent care.`,
       ),
     ],
     notes: [],
@@ -572,7 +575,7 @@ const createEMSPreArrival = (template: EMSPreArrivalTemplate): EMSArrival => {
     prearrivalComplaint: template.complaint,
     priority: template.priority,
     notes: `Pre-arrival notification from Toronto Paramedic Services. ETA ${new Date(
-      estimatedArrivalTime
+      estimatedArrivalTime,
     ).toLocaleTimeString([], {
       hour: '2-digit',
       minute: '2-digit',
@@ -605,16 +608,13 @@ const triggerBottleneckAlert = (): void => {
     ? [...queues].sort(
         (a, b) =>
           (numericQueueValue(b.oldestWaitMinutes) ?? 0) -
-          (numericQueueValue(a.oldestWaitMinutes) ?? 0)
+          (numericQueueValue(a.oldestWaitMinutes) ?? 0),
       )[0]
     : null;
   const queueType = queue?.type ?? QueueType.Waiting;
   const patientCount =
     numericQueueValue(queue?.patientCount) ?? numericQueueValue(queue?.count) ?? randomInt(4, 8);
-  const averageWait = Math.max(
-    numericQueueValue(queue?.oldestWaitMinutes) ?? 0,
-    randomInt(32, 58)
-  );
+  const averageWait = Math.max(numericQueueValue(queue?.oldestWaitMinutes) ?? 0, randomInt(32, 58));
 
   dispatchAlert({
     id: `alert-simulation-bottleneck-${queueType}`,
@@ -676,7 +676,11 @@ const triggerDeteriorationSignalAlert = (): void => {
 };
 
 const triggerRandomDemoAlert = (): void => {
-  randomItem([triggerBottleneckAlert, triggerReferralUnacknowledgedAlert, triggerDeteriorationSignalAlert])();
+  randomItem([
+    triggerBottleneckAlert,
+    triggerReferralUnacknowledgedAlert,
+    triggerDeteriorationSignalAlert,
+  ])();
 };
 
 const runFlowTick = (): void => {
@@ -725,7 +729,7 @@ const createSimulationEngine = (): SimulationEngine => {
     flowTimer = window.setInterval(runFlowTick, FLOW_INTERVAL_MS);
     arrivalAndSafetyTimer = window.setInterval(
       runArrivalAndSafetyTick,
-      ARRIVAL_AND_SAFETY_INTERVAL_MS
+      ARRIVAL_AND_SAFETY_INTERVAL_MS,
     );
     emsTimer = window.setInterval(addEMSPreArrivalNotification, EMS_INTERVAL_MS);
     alertTimer = window.setInterval(triggerRandomDemoAlert, ALERT_INTERVAL_MS);

@@ -80,7 +80,9 @@ describe('WhoNextPanel helpers', () => {
     };
 
     expect(isSnoozeActive(stablePatient, snooze, now)).toBe(true);
-    expect(isSnoozeActive(stablePatient, { ...snooze, snoozedAt: now - WHO_NEXT_SNOOZE_TTL_MS }, now)).toBe(false);
+    expect(
+      isSnoozeActive(stablePatient, { ...snooze, snoozedAt: now - WHO_NEXT_SNOOZE_TTL_MS }, now),
+    ).toBe(false);
     expect(isSnoozeActive(patient({ flags: [PatientFlag.SepsisAlert] }), snooze, now)).toBe(false);
   });
 
@@ -101,7 +103,11 @@ describe('WhoNextPanel helpers', () => {
       flagsAtSnooze: [...highestScore.flags],
     };
 
-    expect(buildWhoNextRecommendation([fallback, highestScore], [], now)?.patient.id).toBe(highestScore.id);
-    expect(buildWhoNextRecommendation([fallback, highestScore], [snooze], now)?.patient.id).toBe(fallback.id);
+    expect(buildWhoNextRecommendation([fallback, highestScore], [], now)?.patient.id).toBe(
+      highestScore.id,
+    );
+    expect(buildWhoNextRecommendation([fallback, highestScore], [snooze], now)?.patient.id).toBe(
+      fallback.id,
+    );
   });
 });

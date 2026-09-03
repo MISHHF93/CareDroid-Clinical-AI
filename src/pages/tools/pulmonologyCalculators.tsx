@@ -16,7 +16,8 @@ function DecisionSupportNotice({ children }) {
   return (
     <div className="calc-timi-disclaimer calc-has-bled-disclaimer" role="note">
       <p className="calc-ds-lead">
-        <strong>Decision support only.</strong> Does not diagnose or replace clinician judgment; follow local protocols.
+        <strong>Decision support only.</strong> Does not diagnose or replace clinician judgment;
+        follow local protocols.
       </p>
       <p className="calc-disclaimer-detail">{children}</p>
     </div>
@@ -191,10 +192,22 @@ function PulmonologyCalculator({ config, onResultChange }) {
           <div className="calc-input-grid--responsive">
             {config.fields.map((field) =>
               field.type === 'select' ? (
-                <SelectField key={field.name} slug={config.slug} field={field} value={form[field.name]} onChange={update} />
+                <SelectField
+                  key={field.name}
+                  slug={config.slug}
+                  field={field}
+                  value={form[field.name]}
+                  onChange={update}
+                />
               ) : (
-                <TextField key={field.name} slug={config.slug} field={field} value={form[field.name]} onChange={update} />
-              )
+                <TextField
+                  key={field.name}
+                  slug={config.slug}
+                  field={field}
+                  value={form[field.name]}
+                  onChange={update}
+                />
+              ),
             )}
           </div>
           <CheckboxGroup fields={config.checkboxes || []} form={form} onChange={update} />
@@ -258,12 +271,30 @@ const CONFIGS = {
     slug: 'copd-gold-assessment',
     title: 'COPD GOLD Assessment',
     notice: 'GOLD grouping support only; does not diagnose COPD or recommend inhalers.',
-    initial: { mmrcGrade: '', catScore: '', moderateExacerbations: '', severeExacerbations: '', fev1PctPredicted: '' },
+    initial: {
+      mmrcGrade: '',
+      catScore: '',
+      moderateExacerbations: '',
+      severeExacerbations: '',
+      fev1PctPredicted: '',
+    },
     fields: [
       { name: 'mmrcGrade', label: 'mMRC dyspnea grade', type: 'select', options: mmrcOptions },
       { name: 'catScore', label: 'CAT score (optional if mMRC entered)', min: 0, max: 40 },
-      { name: 'moderateExacerbations', label: 'Moderate exacerbations in past year', min: 0, max: 20, step: 1 },
-      { name: 'severeExacerbations', label: 'Severe exacerbations / hospitalizations', min: 0, max: 20, step: 1 },
+      {
+        name: 'moderateExacerbations',
+        label: 'Moderate exacerbations in past year',
+        min: 0,
+        max: 20,
+        step: 1,
+      },
+      {
+        name: 'severeExacerbations',
+        label: 'Severe exacerbations / hospitalizations',
+        min: 0,
+        max: 20,
+        step: 1,
+      },
       { name: 'fev1PctPredicted', label: 'FEV1 percent predicted (optional)', min: 1, max: 150 },
     ],
     compute: computeCopdGoldAssessment,
@@ -275,7 +306,14 @@ const CONFIGS = {
     slug: 'aa-gradient',
     title: 'A-a Gradient',
     notice: 'ABG oxygenation context only; verify FiO2, altitude, and specimen quality.',
-    initial: { ageYears: '', fio2Pct: '21', pao2MmHg: '', paco2MmHg: '', atmosphericPressureMmHg: '760', respiratoryQuotient: '0.8' },
+    initial: {
+      ageYears: '',
+      fio2Pct: '21',
+      pao2MmHg: '',
+      paco2MmHg: '',
+      atmosphericPressureMmHg: '760',
+      respiratoryQuotient: '0.8',
+    },
     fields: [
       { name: 'ageYears', label: 'Age (years)', min: 0, max: 120 },
       { name: 'fio2Pct', label: 'FiO2 (%)', min: 21, max: 100 },
@@ -292,7 +330,8 @@ const CONFIGS = {
   'pao2-fio2-ratio': {
     slug: 'pao2-fio2-ratio',
     title: 'PaO2/FiO2 Ratio',
-    notice: 'Oxygenation threshold support only; does not diagnose ARDS or set ventilator strategy.',
+    notice:
+      'Oxygenation threshold support only; does not diagnose ARDS or set ventilator strategy.',
     initial: { pao2MmHg: '', fio2Pct: '' },
     fields: [
       { name: 'pao2MmHg', label: 'PaO2 (mmHg)', min: 20, max: 700 },
@@ -306,7 +345,8 @@ const CONFIGS = {
   'rox-index': {
     slug: 'rox-index',
     title: 'ROX Index',
-    notice: 'High-flow oxygen monitoring adjunct only; use serial reassessment and local escalation policy.',
+    notice:
+      'High-flow oxygen monitoring adjunct only; use serial reassessment and local escalation policy.',
     initial: { spo2Pct: '', fio2Pct: '', respiratoryRate: '' },
     fields: [
       { name: 'spo2Pct', label: 'SpO2 (%)', min: 50, max: 100 },
@@ -321,7 +361,8 @@ const CONFIGS = {
   'pneumonia-severity-index': {
     slug: 'pneumonia-severity-index',
     title: 'Pneumonia Severity Index',
-    notice: 'Community-acquired pneumonia risk context only; does not recommend antibiotics or disposition.',
+    notice:
+      'Community-acquired pneumonia risk context only; does not recommend antibiotics or disposition.',
     initial: {
       ageYears: '',
       sex: '',
@@ -346,7 +387,15 @@ const CONFIGS = {
     },
     fields: [
       { name: 'ageYears', label: 'Age (years)', min: 0, max: 120 },
-      { name: 'sex', label: 'Sex', type: 'select', options: [{ value: 'female', label: 'Female' }, { value: 'male', label: 'Male' }] },
+      {
+        name: 'sex',
+        label: 'Sex',
+        type: 'select',
+        options: [
+          { value: 'female', label: 'Female' },
+          { value: 'male', label: 'Male' },
+        ],
+      },
     ],
     checkboxes: [
       ['nursingHomeResident', 'Nursing home resident'],
@@ -376,7 +425,8 @@ const CONFIGS = {
   'asthma-severity-score': {
     slug: 'asthma-severity-score',
     title: 'Asthma Severity Score',
-    notice: 'Acute asthma severity helper only; life-threatening features require immediate local emergency pathways.',
+    notice:
+      'Acute asthma severity helper only; life-threatening features require immediate local emergency pathways.',
     initial: {
       pefPctPersonalBest: '',
       spo2Pct: '',
@@ -389,7 +439,12 @@ const CONFIGS = {
       accessoryMuscleUse: false,
     },
     fields: [
-      { name: 'pefPctPersonalBest', label: 'PEF percent personal best/predicted', min: 0, max: 150 },
+      {
+        name: 'pefPctPersonalBest',
+        label: 'PEF percent personal best/predicted',
+        min: 0,
+        max: 150,
+      },
       { name: 'spo2Pct', label: 'SpO2 (%)', min: 50, max: 100 },
       { name: 'respiratoryRate', label: 'Respiratory rate (/min)', min: 4, max: 80 },
     ],
@@ -413,7 +468,12 @@ export function BodeIndexCalculator({ onResultChange }) {
 }
 
 export function CopdGoldAssessmentCalculator({ onResultChange }) {
-  return <PulmonologyCalculator config={CONFIGS['copd-gold-assessment']} onResultChange={onResultChange} />;
+  return (
+    <PulmonologyCalculator
+      config={CONFIGS['copd-gold-assessment']}
+      onResultChange={onResultChange}
+    />
+  );
 }
 
 export function AaGradientCalculator({ onResultChange }) {
@@ -421,7 +481,9 @@ export function AaGradientCalculator({ onResultChange }) {
 }
 
 export function Pao2Fio2RatioCalculator({ onResultChange }) {
-  return <PulmonologyCalculator config={CONFIGS['pao2-fio2-ratio']} onResultChange={onResultChange} />;
+  return (
+    <PulmonologyCalculator config={CONFIGS['pao2-fio2-ratio']} onResultChange={onResultChange} />
+  );
 }
 
 export function RoxIndexCalculator({ onResultChange }) {
@@ -429,9 +491,19 @@ export function RoxIndexCalculator({ onResultChange }) {
 }
 
 export function PneumoniaSeverityIndexCalculator({ onResultChange }) {
-  return <PulmonologyCalculator config={CONFIGS['pneumonia-severity-index']} onResultChange={onResultChange} />;
+  return (
+    <PulmonologyCalculator
+      config={CONFIGS['pneumonia-severity-index']}
+      onResultChange={onResultChange}
+    />
+  );
 }
 
 export function AsthmaSeverityScoreCalculator({ onResultChange }) {
-  return <PulmonologyCalculator config={CONFIGS['asthma-severity-score']} onResultChange={onResultChange} />;
+  return (
+    <PulmonologyCalculator
+      config={CONFIGS['asthma-severity-score']}
+      onResultChange={onResultChange}
+    />
+  );
 }

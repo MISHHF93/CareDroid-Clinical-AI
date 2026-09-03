@@ -118,19 +118,17 @@ export function getRouteMetadataById(id: string): RouteMetadata | null {
  * Get all route metadata for a specific navigation group.
  */
 export function getRoutesByGroup(group: string): RouteMetadata[] {
-  return CANONICAL_ROUTE_MAP
-    .filter((r) => r.navigationGroup === group)
-    .map((r) => ({
-      id: r.id,
-      path: r.path,
-      title: r.label,
-      description: r.description,
-      breadcrumbs: r.breadcrumbs || [],
-      permissions: r.requiredPermissions || [],
-      roles: r.allowedRoles || [],
-      navigationGroup: r.navigationGroup || '',
-      helpTopicId: r.helpTopicId || '',
-      readOnlyAllowed: r.readOnlyAllowed ?? false,
-      showInNav: r.showInNav ?? true,
-    }));
+  return CANONICAL_ROUTE_MAP.filter((r) => r.navigationGroup === group).map((r) => ({
+    id: r.id,
+    path: r.path,
+    title: r.label,
+    description: r.description,
+    breadcrumbs: r.breadcrumbs || [],
+    permissions: r.requiredPermissions || [],
+    roles: r.allowedRoles || [],
+    navigationGroup: r.navigationGroup || '',
+    helpTopicId: r.helpTopicId || '',
+    readOnlyAllowed: r.readOnlyAllowed ?? false,
+    showInNav: r.showInNav ?? true,
+  }));
 }

@@ -4,13 +4,24 @@ import './Avatar.css';
 type AvatarSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 const AVATAR_COLORS = [
-  'hsl(200 98% 35%)', 'hsl(142 72% 29%)', 'hsl(250 76% 52%)',
-  'hsl(21 90% 45%)',  'hsl(0 72% 42%)',   'hsl(38 92% 38%)',
-  'hsl(215 25% 40%)', 'hsl(199 89% 40%)',
+  'hsl(200 98% 35%)',
+  'hsl(142 72% 29%)',
+  'hsl(250 76% 52%)',
+  'hsl(21 90% 45%)',
+  'hsl(0 72% 42%)',
+  'hsl(38 92% 38%)',
+  'hsl(215 25% 40%)',
+  'hsl(199 89% 40%)',
 ];
 
 function getInitials(name: string): string {
-  return name.trim().split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase();
+  return name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join('')
+    .toUpperCase();
 }
 
 function getColor(name: string): string {
@@ -34,14 +45,11 @@ export function Avatar({ src, name = '', size = 'md', className, ...props }: Ava
 
   const classNames = ['cd-avatar', `cd-avatar--${size}`, className ?? ''].filter(Boolean).join(' ');
   const content = showImage ? (
-    <img
-      className="cd-avatar__img"
-      src={src}
-      alt={name || ''}
-      onError={() => setImgFailed(true)}
-    />
+    <img className="cd-avatar__img" src={src} alt={name || ''} onError={() => setImgFailed(true)} />
   ) : (
-    <span className="cd-avatar__initials" aria-hidden="true">{initials || '?'}</span>
+    <span className="cd-avatar__initials" aria-hidden="true">
+      {initials || '?'}
+    </span>
   );
 
   // Static role only when named (Edge Tools rejects dynamic ARIA roles).
@@ -59,11 +67,7 @@ export function Avatar({ src, name = '', size = 'md', className, ...props }: Ava
     );
   }
   return (
-    <span
-      className={classNames}
-      style={!showImage ? { background: bg } : undefined}
-      {...props}
-    >
+    <span className={classNames} style={!showImage ? { background: bg } : undefined} {...props}>
       {content}
     </span>
   );

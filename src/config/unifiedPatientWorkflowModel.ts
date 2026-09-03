@@ -220,7 +220,10 @@ export function resolveWorkflowRouteForState(state: PatientState, patientId?: st
   return `${base}${separator}patient=${encodeURIComponent(patientId)}`;
 }
 
-export function estimateWorkflowClicksSaved(fromState: PatientState, toState: PatientState): number {
+export function estimateWorkflowClicksSaved(
+  fromState: PatientState,
+  toState: PatientState,
+): number {
   const fromStep = resolveWorkflowStepForState(fromState);
   const toStep = resolveWorkflowStepForState(toState);
   if (!fromStep || !toStep) return 0;

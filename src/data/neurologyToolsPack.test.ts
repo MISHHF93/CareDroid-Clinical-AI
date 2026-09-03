@@ -53,7 +53,9 @@ describe('Neurology Clinical Tools Pack', () => {
       expect(calculatorSlug).toBeTruthy();
       expect(builtinSlugs.has(calculatorSlug)).toBe(true);
       expect(smokeSlugs.has(calculatorSlug)).toBe(true);
-      expect(CALCULATOR_ROUTE_DEFS.some((route) => route.calculatorSlug === calculatorSlug)).toBe(true);
+      expect(CALCULATOR_ROUTE_DEFS.some((route) => route.calculatorSlug === calculatorSlug)).toBe(
+        true,
+      );
     }
   });
 
@@ -63,7 +65,9 @@ describe('Neurology Clinical Tools Pack', () => {
       expect(launch.registryId).toBe(id);
       expect(launch.path).toMatch(/^\/tools\/neurology\//);
       expect(launch.chatSeed).toMatch(/clinical decision support/i);
-      expect(launch.chatSeed).toMatch(/do not (diagnose|recommend|determine|delay)|must not delay/i);
+      expect(launch.chatSeed).toMatch(
+        /do not (diagnose|recommend|determine|delay)|must not delay/i,
+      );
       expect(launch.chatSeed).toMatch(/stroke|seizure|urgent|emergency/i);
       expect(launch.orchestratorTool).toBeNull();
       expect(clinicalIntentToolsById[id]).toBeTruthy();
@@ -79,18 +83,22 @@ describe('Neurology Clinical Tools Pack', () => {
       expect(KNOWN_TOOL_AREA_PATHS).toContain(launch.path);
       expect(launch.chatSeed).toMatch(/dashboard|monitoring|timeline|visibility|operations/i);
       expect(launch.chatSeed).toMatch(/clinical decision support/i);
-      expect(launch.chatSeed).not.toMatch(/will autonomously escalate|should determine thrombolysis|should recommend antiseizure/i);
+      expect(launch.chatSeed).not.toMatch(
+        /will autonomously escalate|should determine thrombolysis|should recommend antiseizure/i,
+      );
     }
   });
 
   it('keeps stroke and seizure workflows from delaying urgent care', () => {
     for (const id of ALL_PACK_IDS) {
       const launch = resolveCatalogLaunch(id);
-      const copy = `${launch.chatSeed || ''} ${clinicalIntentToolsById[id]?.description || ''}`.toLowerCase();
+      const copy =
+        `${launch.chatSeed || ''} ${clinicalIntentToolsById[id]?.description || ''}`.toLowerCase();
       expect(copy).toMatch(/decision support|does not|do not|no autonomous/i);
       expect(copy).toMatch(/do not delay|urgent|emergency|pathway|bedside assessment/i);
-      expect(copy).not.toMatch(/should recommend thrombolysis|should recommend thrombectomy|should recommend antiseizure medication dosing/i);
+      expect(copy).not.toMatch(
+        /should recommend thrombolysis|should recommend thrombectomy|should recommend antiseizure medication dosing/i,
+      );
     }
   });
 });
-

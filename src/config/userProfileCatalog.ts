@@ -10,7 +10,11 @@ import {
   normalizeEmergencyRole,
 } from './emergencyRolePermissions';
 import { listTrackMindRoutesForRole } from './trackMindRolePermissions';
-import { ROLE_PERMISSION_PRESETS, normalizeSaasRole, SAAS_USER_ROLES } from './saasProfileConstants';
+import {
+  ROLE_PERMISSION_PRESETS,
+  normalizeSaasRole,
+  SAAS_USER_ROLES,
+} from './saasProfileConstants';
 import { getPlatformHomeRoute } from './receptionFirstUx.config';
 import {
   isProfileAssignableForOrganization,
@@ -210,7 +214,11 @@ export const PERMISSION_ROUTE_MAP: Record<string, string[]> = Object.freeze({
   // 'VIEW_AUDIT_LOGS' (it's also reachable via CONFIGURE_SYSTEM below, but a
   // role holding only VIEW_AUDIT_LOGS -- exactly what its own nav item
   // requires -- still couldn't reach it directly). Same sweep, 2026-08-21.
-  VIEW_AUDIT_LOGS: [CANONICAL_ROUTES.audit, CANONICAL_ROUTES.automationAudit, CANONICAL_ROUTES.dataLineage],
+  VIEW_AUDIT_LOGS: [
+    CANONICAL_ROUTES.audit,
+    CANONICAL_ROUTES.automationAudit,
+    CANONICAL_ROUTES.dataLineage,
+  ],
   // Broader sweep of the same PERMISSION_ROUTE_MAP-coverage bug (2026-08-21):
   // navigation.config.ts gates 'security' on VIEW_AI_SECURITY (nav shows it
   // to VIEW_AI_SECURITY holders), 'regulatory' on VIEW_REGULATORY, and
@@ -267,7 +275,11 @@ export const PERMISSION_ROUTE_MAP: Record<string, string[]> = Object.freeze({
   VIEW_TRACKMIND_ENTERPRISE: [CANONICAL_ROUTES.enterprisePlatform],
   VIEW_TRACKMIND_INTELLIGENCE: [CANONICAL_ROUTES.platformIntelligence],
   VIEW_ICU: [CANONICAL_ROUTES.emergencyWhiteboard, CANONICAL_ROUTES.emergencyPulse],
-  VIEW_CARDIOLOGY: [CANONICAL_ROUTES.emergencyWhiteboard, CANONICAL_ROUTES.tools, CANONICAL_ROUTES.cardiology],
+  VIEW_CARDIOLOGY: [
+    CANONICAL_ROUTES.emergencyWhiteboard,
+    CANONICAL_ROUTES.tools,
+    CANONICAL_ROUTES.cardiology,
+  ],
   VIEW_PATIENT_CARE: [
     CANONICAL_ROUTES.emergencyReception,
     CANONICAL_ROUTES.emergencyWhiteboard,
@@ -324,25 +336,20 @@ function enrichCatalogEntry(entry: UserProfileCatalogEntry): UserProfileCatalogE
       allowedPacks: [...(entry.toolPolicy?.allowedPacks || ['core-platform'])],
       restrictedToolIds: mergedRestricted,
     }),
-    assignableOrganizationTypes:
-      entry.assignableOrganizationTypes?.length
-        ? entry.assignableOrganizationTypes
-        : defaults.assignableOrganizationTypes,
-    requiredEntitlementPacks:
-      entry.requiredEntitlementPacks?.length
-        ? entry.requiredEntitlementPacks
-        : defaults.requiredEntitlementPacks,
+    assignableOrganizationTypes: entry.assignableOrganizationTypes?.length
+      ? entry.assignableOrganizationTypes
+      : defaults.assignableOrganizationTypes,
+    requiredEntitlementPacks: entry.requiredEntitlementPacks?.length
+      ? entry.requiredEntitlementPacks
+      : defaults.requiredEntitlementPacks,
   });
 }
 
 const CATALOG_BY_ROLE = Object.freeze(
-  (catalogData as UserProfileCatalogEntry[]).reduce(
-    (map, entry) => {
-      map.set(entry.saasRole, enrichCatalogEntry(entry));
-      return map;
-    },
-    new Map<string, UserProfileCatalogEntry>(),
-  ),
+  (catalogData as UserProfileCatalogEntry[]).reduce((map, entry) => {
+    map.set(entry.saasRole, enrichCatalogEntry(entry));
+    return map;
+  }, new Map<string, UserProfileCatalogEntry>()),
 );
 
 export const USER_PROFILE_CATALOG: readonly UserProfileCatalogEntry[] = Object.freeze(
@@ -370,8 +377,9 @@ export function resolveUserProfileFromSaasRole(
 
 export function buildNavigationRoutes(
   entry: UserProfileCatalogEntry,
-  permissionPresets: string[] = ROLE_PERMISSION_PRESETS[entry.saasRole as keyof typeof ROLE_PERMISSION_PRESETS] ||
-    ROLE_PERMISSION_PRESETS.student,
+  permissionPresets: string[] = ROLE_PERMISSION_PRESETS[
+    entry.saasRole as keyof typeof ROLE_PERMISSION_PRESETS
+  ] || ROLE_PERMISSION_PRESETS.student,
 ): string[] {
   const routes = new Set<string>(getBaseProfileRoutes(entry));
 
@@ -395,7 +403,10 @@ export function buildNavigationRoutes(
     routes.add(CANONICAL_ROUTES.adminOperations);
   }
   if (entry.navigationGroups.includes('devices') || entry.navigationGroups.includes('operations')) {
-    if (permissionPresets.includes('VIEW_MEDICAL_IOT') || permissionPresets.includes('VIEW_DEVICES')) {
+    if (
+      permissionPresets.includes('VIEW_MEDICAL_IOT') ||
+      permissionPresets.includes('VIEW_DEVICES')
+    ) {
       routes.add(CANONICAL_ROUTES.surveillanceNexus);
     }
   }
@@ -404,7 +415,10 @@ export function buildNavigationRoutes(
 }
 
 export function resolveEffectiveEmergencyRole(
-  user: { profile?: { roleProfileId?: string }; roleProfileId?: string; role?: string } | null | undefined,
+  user:
+    | { profile?: { roleProfileId?: string }; roleProfileId?: string; role?: string }
+    | null
+    | undefined,
   emergencyOsSettings: { roles?: { emergencyRoleMapping?: Record<string, string> } } = {},
 ): string | null {
   const saasRole = normalizeSaasRole(
@@ -456,12 +470,15 @@ export function resolveEffectiveEmergencyRole(
 }
 
 export function resolveEffectiveTrackMindRole(
-  user: {
-    trackMindRole?: string;
-    role?: string;
-    profile?: { trackMindRole?: string; roleProfileId?: string; role?: string };
-    roleProfileId?: string;
-  } | null | undefined,
+  user:
+    | {
+        trackMindRole?: string;
+        role?: string;
+        profile?: { trackMindRole?: string; roleProfileId?: string; role?: string };
+        roleProfileId?: string;
+      }
+    | null
+    | undefined,
   settings: { trackMindRole?: string; roleOverrides?: Record<string, string> } = {},
 ): string | null {
   const override = settings?.trackMindRole || settings?.roleOverrides?.trackMind;
@@ -483,9 +500,7 @@ export function isRouteAllowedForProfile(
   if (!path) return false;
   const normalizedPath = String(path).split('?')[0];
   const resolved =
-    'navigationRoutes' in profile
-      ? profile
-      : resolveUserProfileFromSaasRole(profile.saasRole);
+    'navigationRoutes' in profile ? profile : resolveUserProfileFromSaasRole(profile.saasRole);
   return resolved.navigationRoutes.some(
     (route) => normalizedPath === route || normalizedPath.startsWith(`${route}/`),
   );
@@ -510,14 +525,14 @@ export function buildUserProfileAccessSummary(
 }
 
 export function listUserProfileCatalogOptions(context: ProfileSegregationContext = {}) {
-  return USER_PROFILE_CATALOG.filter((entry) => isProfileAssignableForOrganization(entry, context)).map(
-    (entry) => ({
-      id: entry.saasRole,
-      label: entry.label,
-      domain: entry.domain,
-      hierarchyLevel: entry.hierarchyLevel,
-    }),
-  );
+  return USER_PROFILE_CATALOG.filter((entry) =>
+    isProfileAssignableForOrganization(entry, context),
+  ).map((entry) => ({
+    id: entry.saasRole,
+    label: entry.label,
+    domain: entry.domain,
+    hierarchyLevel: entry.hierarchyLevel,
+  }));
 }
 
 export function validateHiddenAssetsWithinProfile(
@@ -534,7 +549,11 @@ export function isSaasRoleCatalogComplete(): boolean {
 }
 
 /** Re-export for frontend — mirrors backend saas-profile.constants */
-export { normalizeSaasRole, SAAS_USER_ROLES, ROLE_PERMISSION_PRESETS } from './saasProfileConstants';
+export {
+  normalizeSaasRole,
+  SAAS_USER_ROLES,
+  ROLE_PERMISSION_PRESETS,
+} from './saasProfileConstants';
 
 export const DEFAULT_SCREEN_MODE_BY_SAAS_ROLE = Object.freeze(
   USER_PROFILE_CATALOG.reduce(
@@ -548,7 +567,9 @@ export const DEFAULT_SCREEN_MODE_BY_SAAS_ROLE = Object.freeze(
   ),
 );
 
-export function resolveDefaultScreenModeForSaasRole(role: string | null | undefined): string | null {
+export function resolveDefaultScreenModeForSaasRole(
+  role: string | null | undefined,
+): string | null {
   const entry = CATALOG_BY_ROLE.get(normalizeSaasRole(role));
   return entry?.defaultScreenMode || null;
 }

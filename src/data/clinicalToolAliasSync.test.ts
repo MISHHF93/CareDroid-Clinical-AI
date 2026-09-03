@@ -35,9 +35,7 @@ describe('clinicalToolAliasSync — toolId parity', () => {
     expect(report.idMismatches.missingInFrontend).toEqual([]);
     expect(report.idMismatches.missingInContract).toEqual([]);
     expect(report.backendToolIds).toEqual(sortedUnique([...NLU_PROFILE_TOOL_IDS]));
-    expect(report.frontendToolIds).toEqual(
-      sortedUnique(clinicalIntentTools.map((t) => t.toolId))
-    );
+    expect(report.frontendToolIds).toEqual(sortedUnique(clinicalIntentTools.map((t) => t.toolId)));
   });
 });
 
@@ -56,7 +54,7 @@ describe('clinicalToolAliasSync — catalog aliases (PR1–PR7 + fleet)', () => 
       const slug = NLU_TO_REGISTRY_ID[aliasToSlug(alias)];
       expect(phrase === registryId || slug === registryId).toBe(true);
       expect(resolveRegistryId(alias)).toBe(registryId);
-    }
+    },
   );
 
   it.each(ALL_REQUIRED_CATALOG_ALIAS_PAIRS)(
@@ -68,7 +66,7 @@ describe('clinicalToolAliasSync — catalog aliases (PR1–PR7 + fleet)', () => 
       if (!spec) return;
       if (aliasToSlug(alias) === alias && !alias.includes(' ')) return;
       expect(messageMatchesToolKeywords(alias, spec.backendKeywords)).toBe(true);
-    }
+    },
   );
 });
 
@@ -144,7 +142,12 @@ describe('clinicalToolAliasSync — synchronized alias map', () => {
   });
 
   it('exposes fleet tool keywords in backend patterns', () => {
-    for (const id of ['dispatch-ai', 'route-optimizer', 'predictive-maintenance', 'fleet-command']) {
+    for (const id of [
+      'dispatch-ai',
+      'route-optimizer',
+      'predictive-maintenance',
+      'fleet-command',
+    ]) {
       const keywords = extractToolPatternKeywords(patternsSource, id);
       expect(keywords.length).toBeGreaterThan(3);
     }

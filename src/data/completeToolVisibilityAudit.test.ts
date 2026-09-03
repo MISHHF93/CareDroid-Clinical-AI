@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import toolRegistry from './toolRegistry';
-import {
-  clinicalIntentTools,
-  nluCalculatorHubOnly,
-} from './clinicalIntentToolCatalog';
+import { clinicalIntentTools, nluCalculatorHubOnly } from './clinicalIntentToolCatalog';
 import {
   CLINICAL_TIER_A_CALCULATOR_REGISTRY_IDS,
   ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS,
@@ -17,10 +14,7 @@ import {
   TOOL_LAUNCH_TYPES,
   TOOL_SURFACES,
 } from './toolInventory';
-import {
-  buildBuiltinHubCalculatorCards,
-  getHubChatAssistedTools,
-} from './calculatorHubManifest';
+import { buildBuiltinHubCalculatorCards, getHubChatAssistedTools } from './calculatorHubManifest';
 import { resolveCatalogLaunch } from './clinicalCatalogWiring';
 import { getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
 import { getAllDiscoveredTools, phantomToolReferences } from './sourceCodeToolDiscovery';
@@ -34,7 +28,9 @@ describe('complete calculator and medical-tool visibility audit', () => {
 
     expect(new Set(userFacing.map((record) => record.id)).size).toBe(userFacing.length);
     expect(new Set(calculators.map((record) => record.id)).size).toBe(calculators.length);
-    expect(calculators.every((record) => userFacing.some((tool) => tool.id === record.id))).toBe(true);
+    expect(calculators.every((record) => userFacing.some((tool) => tool.id === record.id))).toBe(
+      true,
+    );
   });
 
   it('represents every registry tool in the user-facing inventory', () => {
@@ -58,7 +54,9 @@ describe('complete calculator and medical-tool visibility audit', () => {
   it('aligns calculator hub cards with dedicated forms and chat-assisted calculator records', () => {
     const calculators = getCalculatorToolInventory();
     const dedicated = calculators.filter((record) => record.hasDedicatedForm);
-    const chatAssisted = calculators.filter((record) => record.surface === TOOL_SURFACES.CHAT_ASSISTED);
+    const chatAssisted = calculators.filter(
+      (record) => record.surface === TOOL_SURFACES.CHAT_ASSISTED,
+    );
     const cards = buildBuiltinHubCalculatorCards();
     const chatCards = getHubChatAssistedTools();
 
@@ -73,7 +71,10 @@ describe('complete calculator and medical-tool visibility audit', () => {
     expect(chatCards.length).toBeGreaterThanOrEqual(chatAssisted.length);
     expect(new Set(chatCards.map((tool) => tool.toolId)).size).toBe(chatCards.length);
     for (const record of chatAssisted) {
-      expect(chatCards.map((tool) => tool.registryId), record.id).toContain(record.id);
+      expect(
+        chatCards.map((tool) => tool.registryId),
+        record.id,
+      ).toContain(record.id);
     }
   });
 
@@ -83,11 +84,19 @@ describe('complete calculator and medical-tool visibility audit', () => {
 
     for (const row of medicalRows.filter((candidate) => candidate.launchable)) {
       const launch = resolveCatalogLaunch(row.primaryId || row.id);
-      const candidateIds = [row.sidebarToolId, row.id, row.primaryId, launch.registryId].filter(Boolean);
+      const candidateIds = [row.sidebarToolId, row.id, row.primaryId, launch.registryId].filter(
+        Boolean,
+      );
       const hasUserFacingRecord = candidateIds.some((id) => userById.has(id));
 
-      expect(row.pagePath || launch.path || launch.chatSeed || row.chatOnRequest, row.primaryId || row.id).toBeTruthy();
-      expect(hasUserFacingRecord || row.chatOnlyForm || row.backendApiIntentOnly, row.primaryId || row.id).toBe(true);
+      expect(
+        row.pagePath || launch.path || launch.chatSeed || row.chatOnRequest,
+        row.primaryId || row.id,
+      ).toBeTruthy();
+      expect(
+        hasUserFacingRecord || row.chatOnlyForm || row.backendApiIntentOnly,
+        row.primaryId || row.id,
+      ).toBe(true);
     }
   });
 
@@ -96,7 +105,7 @@ describe('complete calculator and medical-tool visibility audit', () => {
     const auditOnlyIds = new Set(
       getAuditToolInventory()
         .filter((record) => record.sourceModule === 'platform' && !record.launchable)
-        .map((record) => record.id)
+        .map((record) => record.id),
     );
 
     for (const { id } of phantomToolReferences) {
@@ -111,13 +120,15 @@ describe('complete calculator and medical-tool visibility audit', () => {
 
   it('documents backend-backed records only when the executor is registered', () => {
     const backendBacked = getUserFacingToolInventory().filter(
-      (record) => record.launchType === TOOL_LAUNCH_TYPES.BACKEND_BACKED
+      (record) => record.launchType === TOOL_LAUNCH_TYPES.BACKEND_BACKED,
     );
 
     expect(backendBacked.length).toBeGreaterThan(0);
     for (const record of backendBacked) {
       expect(record.executorStatus, record.id).toBe(TOOL_EXECUTOR_STATUS.REGISTERED);
-      expect(record.orchestratorToolId, record.id).toBe(REGISTRY_ID_TO_ORCHESTRATOR_TOOL[record.id]);
+      expect(record.orchestratorToolId, record.id).toBe(
+        REGISTRY_ID_TO_ORCHESTRATOR_TOOL[record.id],
+      );
       expect(ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS, record.id).toContain(record.orchestratorToolId);
       expect(record.endpoint, record.id).toBe(`/api/tools/${record.orchestratorToolId}/execute`);
     }

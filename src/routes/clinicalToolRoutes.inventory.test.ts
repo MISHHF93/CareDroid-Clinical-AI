@@ -17,15 +17,17 @@ describe('clinical tool routes — unified inventory', () => {
       if (!record.route) continue;
       const normalized = normalizeToolPathname(record.route);
       expect(
-        normalized === '/assistant' || isKnownToolAreaPath(normalized) || Boolean(matchCalculatorRoute(normalized)),
-        record.id
+        normalized === '/assistant' ||
+          isKnownToolAreaPath(normalized) ||
+          Boolean(matchCalculatorRoute(normalized)),
+        record.id,
       ).toBe(true);
     }
   });
 
   it('registers every dedicated calculator route in CALCULATOR_ROUTE_DEFS', () => {
     const calculatorDefsBySlug = new Map(
-      CALCULATOR_ROUTE_DEFS.map((def) => [def.calculatorSlug, def])
+      CALCULATOR_ROUTE_DEFS.map((def) => [def.calculatorSlug, def]),
     );
 
     for (const record of getCalculatorToolInventory().filter((tool) => tool.hasDedicatedForm)) {
@@ -33,7 +35,9 @@ describe('clinical tool routes — unified inventory', () => {
       expect(def, record.id).toBeTruthy();
       if (!def) throw new Error(`expected calculator route def for ${record.id}`);
       expect(def.path, record.id).toBe(record.route);
-      expect(matchCalculatorRoute(record.route)?.calculatorSlug, record.id).toBe(record.calculatorSlug);
+      expect(matchCalculatorRoute(record.route)?.calculatorSlug, record.id).toBe(
+        record.calculatorSlug,
+      );
     }
   });
 

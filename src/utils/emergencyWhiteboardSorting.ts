@@ -1,7 +1,9 @@
 import { PatientState, type Patient } from '../types/emergency';
 import { normalizePatientArrival } from '../services/patientArrivalModel';
 
-export function whiteboardArrivalTimestamp(patient: Pick<Patient, 'arrivalTime' | 'arrival'>): string {
+export function whiteboardArrivalTimestamp(
+  patient: Pick<Patient, 'arrivalTime' | 'arrival'>,
+): string {
   return patient.arrival?.arrivalTimestamp || patient.arrivalTime;
 }
 

@@ -29,7 +29,9 @@ function formatArtifactTime(value?: string): string {
 
 function groupArtifacts(artifacts: PatientDocumentArtifact[]) {
   const clinical = artifacts.filter(
-    (artifact) => !artifact.artifactType.startsWith('COPILOT_') && artifact.artifactType !== 'DOCUMENT_METADATA',
+    (artifact) =>
+      !artifact.artifactType.startsWith('COPILOT_') &&
+      artifact.artifactType !== 'DOCUMENT_METADATA',
   );
   const copilot = artifacts.filter((artifact) => artifact.artifactType.startsWith('COPILOT_'));
   return { clinical, copilot };
@@ -85,14 +87,21 @@ export default function PatientDocumentArtifactsStrip({
           <ul className="patient-doc-artifacts__list">
             {visibleClinical.map((artifact) => (
               <li key={artifact.id} className="patient-doc-artifacts__item">
-                <span className="patient-doc-artifacts__type">{artifactTypeLabel(artifact.artifactType)}:</span>
-                <span className="patient-doc-artifacts__label" title={artifact.sourceText || artifact.label}>
+                <span className="patient-doc-artifacts__type">
+                  {artifactTypeLabel(artifact.artifactType)}:
+                </span>
+                <span
+                  className="patient-doc-artifacts__label"
+                  title={artifact.sourceText || artifact.label}
+                >
                   {artifact.label}
                 </span>
                 <span
                   className={[
                     'patient-doc-artifacts__status',
-                    artifact.reviewStatus === 'accepted' ? 'patient-doc-artifacts__status--confirmed' : '',
+                    artifact.reviewStatus === 'accepted'
+                      ? 'patient-doc-artifacts__status--confirmed'
+                      : '',
                     artifact.reviewStatus === 'pending_human_review'
                       ? 'patient-doc-artifacts__status--pending'
                       : '',
@@ -133,7 +142,10 @@ export default function PatientDocumentArtifactsStrip({
           <span className="patient-doc-artifacts__heading">Copilot Suggestions</span>
           <ul className="patient-doc-artifacts__list">
             {visibleCopilot.map((artifact) => (
-              <li key={artifact.id} className="patient-doc-artifacts__item patient-doc-artifacts__item--copilot">
+              <li
+                key={artifact.id}
+                className="patient-doc-artifacts__item patient-doc-artifacts__item--copilot"
+              >
                 <span className="patient-doc-artifacts__label">{artifact.label}</span>
                 {/* Found 2026-08-08: this badge previously only rendered when
                     safety.isAiDerived was true, and every artifact defaulted

@@ -33,9 +33,11 @@ describe('mounted SaaS asset inventory projection', () => {
       expect(asset.layers.products.length, `${id} layer products`).toBeGreaterThan(0);
       expect(asset.governance.validationStatus, `${id} governance validation`).toBeTruthy();
       expect(asset.execution.supportStatus, `${id} execution support`).toMatch(
-        /backend-backed|local-deterministic|ai-assisted|demo-only|unsupported/
+        /backend-backed|local-deterministic|ai-assisted|demo-only|unsupported/,
       );
-      expect(asset.evidence.backendStatus, `${id} evidence backend`).toBe(asset.execution.supportStatus);
+      expect(asset.evidence.backendStatus, `${id} evidence backend`).toBe(
+        asset.execution.supportStatus,
+      );
     }
   });
 
@@ -67,10 +69,10 @@ describe('mounted SaaS asset inventory projection', () => {
     expect(ownership).toHaveLength(ROUTE_RECORDS.length);
     expect(unowned).toEqual([]);
     expect(ownership.find((route) => route.path === '/hospital-map')?.ownerType).not.toBe(
-      'unowned'
+      'unowned',
     );
     expect(ownership.find((route) => route.path === '/products')?.ownerType).toMatch(
-      /system|documented-system/
+      /system|documented-system/,
     );
   });
 
@@ -88,11 +90,13 @@ describe('mounted SaaS asset inventory projection', () => {
     // routes — require every destination to be a real, mounted route, or a
     // documented legacy redirect, either way.
     expect(
-      [...commandPaths].every((path) => path.startsWith('/emergency/') || knownRoutePaths.has(path))
+      [...commandPaths].every(
+        (path) => path.startsWith('/emergency/') || knownRoutePaths.has(path),
+      ),
     ).toBe(true);
     expect(commandPaths.size).toBe(QUICK_COMMAND_DESTINATION_ITEMS.length);
     expect(new Set(mountedNav.map((item) => `${item.section}:${item.id}`)).size).toBe(
-      mountedNav.length
+      mountedNav.length,
     );
   });
 
@@ -105,7 +109,7 @@ describe('mounted SaaS asset inventory projection', () => {
         'product-simulation-training',
         'product-governance',
         'product-research',
-      ])
+      ]),
     );
     expect(CANONICAL_WORKSPACE_IDS).toEqual(
       expect.arrayContaining([
@@ -117,7 +121,7 @@ describe('mounted SaaS asset inventory projection', () => {
         'medical-iot',
         'education',
         'governance',
-      ])
+      ]),
     );
   });
 });

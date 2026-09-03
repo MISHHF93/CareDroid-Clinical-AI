@@ -44,7 +44,8 @@ export async function fetchServerObservabilityDiagnostics(): Promise<{
       return {
         ok: false,
         data: null,
-        message: (data as { message?: string } | null)?.message || 'Server diagnostics unavailable.',
+        message:
+          (data as { message?: string } | null)?.message || 'Server diagnostics unavailable.',
       };
     }
     return { ok: true, data, message: '' };
@@ -64,12 +65,15 @@ export async function fetchObservabilityPerformance(): Promise<{
 }> {
   try {
     const response = await apiFetch(OBSERVABILITY_CONTRACT.performanceEndpoint);
-    const data = await parseApiResponse<Record<string, unknown> | null>(response, { fallback: null });
+    const data = await parseApiResponse<Record<string, unknown> | null>(response, {
+      fallback: null,
+    });
     if (!response.ok) {
       return {
         ok: false,
         data: null,
-        message: (data as { message?: string } | null)?.message || 'Performance summary unavailable.',
+        message:
+          (data as { message?: string } | null)?.message || 'Performance summary unavailable.',
       };
     }
     return { ok: true, data, message: '' };
@@ -92,8 +96,12 @@ export async function fetchObservabilityTrace(correlationId: string): Promise<{
     return { ok: false, data: null, message: 'Correlation id is required.' };
   }
   try {
-    const response = await apiFetch(`${OBSERVABILITY_CONTRACT.traceEndpoint}/${encodeURIComponent(normalized)}`);
-    const data = await parseApiResponse<Record<string, unknown> | null>(response, { fallback: null });
+    const response = await apiFetch(
+      `${OBSERVABILITY_CONTRACT.traceEndpoint}/${encodeURIComponent(normalized)}`,
+    );
+    const data = await parseApiResponse<Record<string, unknown> | null>(response, {
+      fallback: null,
+    });
     if (!response.ok) {
       return {
         ok: false,

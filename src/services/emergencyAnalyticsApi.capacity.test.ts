@@ -79,7 +79,7 @@ describe('fetchEmergencyCapacityDashboard', () => {
     });
   });
 
-  it('never maps the engine\'s own `units` (measurement-unit labels) onto a hospital-ward breakdown', async () => {
+  it("never maps the engine's own `units` (measurement-unit labels) onto a hospital-ward breakdown", async () => {
     vi.mocked(parseApiResponse).mockResolvedValue({
       data: {
         capacity: {
@@ -100,7 +100,9 @@ describe('fetchEmergencyCapacityDashboard', () => {
 
   it('clamps occupiedRooms so availableBeds is never negative on a malformed payload', async () => {
     vi.mocked(parseApiResponse).mockResolvedValue({
-      data: { capacity: { score: 90, band: 'Red', totalRooms: 10, occupiedRooms: 999, boardingCount: 5 } },
+      data: {
+        capacity: { score: 90, band: 'Red', totalRooms: 10, occupiedRooms: 999, boardingCount: 5 },
+      },
     } as any);
 
     const result = await fetchEmergencyCapacityDashboard();
@@ -120,7 +122,11 @@ describe('fetchEmergencyCapacityDashboard', () => {
   });
 
   it('degrades to ok:false, not fabricated data, on a network/API failure', async () => {
-    vi.mocked(apiFetch).mockResolvedValue({ ok: false, status: 503, headers: new Headers() } as any);
+    vi.mocked(apiFetch).mockResolvedValue({
+      ok: false,
+      status: 503,
+      headers: new Headers(),
+    } as any);
     vi.mocked(parseApiResponse).mockResolvedValue({ message: 'Service unavailable' } as any);
 
     const result = await fetchEmergencyCapacityDashboard();

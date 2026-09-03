@@ -47,12 +47,17 @@ describe('pageDispositionFixture', () => {
 
     expect(tools.length).toBeGreaterThan(0);
     expect(calculators.length).toBeGreaterThan(0);
-    expect([...tools, ...calculators].every((fixture) => fixture.sourceFile.startsWith('src/pages/tools/'))).toBe(
-      false,
-    );
     expect(
-      PAGE_DISPOSITION_FIXTURES.filter((fixture) => fixture.sourceFile.startsWith('src/pages/tools/')).every(
-        (fixture) => fixture.disposition === 'tool-compatibility' || fixture.fileRole !== 'route-source',
+      [...tools, ...calculators].every((fixture) =>
+        fixture.sourceFile.startsWith('src/pages/tools/'),
+      ),
+    ).toBe(false);
+    expect(
+      PAGE_DISPOSITION_FIXTURES.filter((fixture) =>
+        fixture.sourceFile.startsWith('src/pages/tools/'),
+      ).every(
+        (fixture) =>
+          fixture.disposition === 'tool-compatibility' || fixture.fileRole !== 'route-source',
       ),
     ).toBe(true);
   });

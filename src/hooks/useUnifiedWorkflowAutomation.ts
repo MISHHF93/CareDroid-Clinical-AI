@@ -45,7 +45,8 @@ export function useUnifiedWorkflowAutomation(options: { realtime?: boolean } = {
   );
 
   const pendingItems = useMemo(
-    () => snapshot.items.filter((item) => item.status === 'pending_review' || item.status === 'active'),
+    () =>
+      snapshot.items.filter((item) => item.status === 'pending_review' || item.status === 'active'),
     [snapshot.items],
   );
 

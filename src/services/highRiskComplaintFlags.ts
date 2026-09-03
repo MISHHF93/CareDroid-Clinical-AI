@@ -263,9 +263,7 @@ export function detectHighRiskComplaintFlags(input: {
     });
   }
 
-  return Array.from(matches.values()).sort((left, right) =>
-    left.label.localeCompare(right.label),
-  );
+  return Array.from(matches.values()).sort((left, right) => left.label.localeCompare(right.label));
 }
 
 export function mergeHighRiskComplaintFlags(
@@ -294,9 +292,7 @@ export function patientNeedsRapidReview(patient: Patient): boolean {
   return Boolean(patient.triagePending || !patient.triageTime);
 }
 
-export function deriveHighRiskComplaintQueueDestination(
-  patient: Patient,
-): QueueDestination | null {
+export function deriveHighRiskComplaintQueueDestination(patient: Patient): QueueDestination | null {
   if (!patientNeedsRapidReview(patient)) return null;
   if (patient.state === PatientState.Registration || patient.state === PatientState.Arrival) {
     return 'rapid-review';
@@ -354,10 +350,7 @@ export function collectHighRiskComplaintLabels(patient: Patient): string[] {
   }).map((record) => record.label);
 }
 
-export function buildHighRiskComplaintAlerts(
-  patients: Patient[] = [],
-  now = new Date(),
-): Alert[] {
+export function buildHighRiskComplaintAlerts(patients: Patient[] = [], now = new Date()): Alert[] {
   return patients
     .filter((patient) => patientHasHighRiskComplaintFlags(patient))
     .filter(
@@ -376,7 +369,9 @@ export function buildHighRiskComplaintAlerts(
       return {
         id: `high-risk-complaint-${patient.id}`,
         type: 'Clinical',
-        severity: (needsReview ? 'Critical' : 'Warning') as import('../types/emergency').AlertSeverity,
+        severity: (needsReview
+          ? 'Critical'
+          : 'Warning') as import('../types/emergency').AlertSeverity,
         title: needsReview
           ? `Rapid review needed — ${displayName}`
           : `High-risk complaint — ${displayName}`,
@@ -394,7 +389,9 @@ export function buildHighRiskComplaintAlerts(
         },
       };
     })
-    .sort((left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime());
+    .sort(
+      (left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime(),
+    );
 }
 
 export function sortPatientsForRapidReview<T extends Patient>(patients: T[] = []): T[] {
@@ -458,10 +455,7 @@ export type HighRiskComplaintFlagStore = {
     source?: string;
     metadata?: Record<string, unknown>;
   }) => void;
-  dispatchWebSocketEvent?: (event: {
-    type: string;
-    payload: Record<string, unknown>;
-  }) => void;
+  dispatchWebSocketEvent?: (event: { type: string; payload: Record<string, unknown> }) => void;
 };
 
 /**

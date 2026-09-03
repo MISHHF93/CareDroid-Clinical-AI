@@ -13,25 +13,16 @@ type RouteErrorBoundaryProps = {
  * within a route segment without crashing the entire application.
  * Provides route context in the error view for debugging.
  */
-export default function RouteErrorBoundary({
-  children,
-  fallbackTitle,
-}: RouteErrorBoundaryProps) {
+export default function RouteErrorBoundary({ children, fallbackTitle }: RouteErrorBoundaryProps) {
   const location = useLocation();
-  
+
   return (
     <ErrorBoundary
       fallbackRender={({ error, resetErrorBoundary }) => (
         <div role="alert" className="reb-wrapper">
-          <h2 className="reb-title">
-            {fallbackTitle || 'Something went wrong'}
-          </h2>
-          <p className="reb-message">
-            This section encountered an error and could not render.
-          </p>
-          <p className="reb-route">
-            Route: {location.pathname}
-          </p>
+          <h2 className="reb-title">{fallbackTitle || 'Something went wrong'}</h2>
+          <p className="reb-message">This section encountered an error and could not render.</p>
+          <p className="reb-route">Route: {location.pathname}</p>
           {import.meta.env.DEV && error && (
             <details className="reb-details">
               <summary className="reb-summary">Error details</summary>
@@ -42,11 +33,7 @@ export default function RouteErrorBoundary({
               </pre>
             </details>
           )}
-          <button
-            type="button"
-            onClick={resetErrorBoundary}
-            className="reb-retry-btn"
-          >
+          <button type="button" onClick={resetErrorBoundary} className="reb-retry-btn">
             Try again
           </button>
         </div>

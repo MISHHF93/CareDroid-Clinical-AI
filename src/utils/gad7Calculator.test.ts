@@ -64,7 +64,8 @@ describe('gad7Calculator — interpretation guardrails', () => {
     if (!out.ok) throw new Error('expected computeGad7Result to succeed');
     expect(out.totalScore).toBe(21);
     expect(out.severityCategory).toBe('severe');
-    const combined = `${out.screeningDiscussion} ${out.screeningDisclaimer} ${out.safetyDisclaimer} ${out.clinicianReviewDisclaimer}`.toLowerCase();
+    const combined =
+      `${out.screeningDiscussion} ${out.screeningDisclaimer} ${out.safetyDisclaimer} ${out.clinicianReviewDisclaimer}`.toLowerCase();
     expect(combined).not.toMatch(/\bdiagnosed with generalized anxiety\b/);
     expect(combined).not.toMatch(/\bprescribe\b/);
     expect(combined).toMatch(/does not diagnose/);

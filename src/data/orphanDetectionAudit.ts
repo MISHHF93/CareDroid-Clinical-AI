@@ -19,12 +19,21 @@ import {
   ROUTE_ALIAS_REDIRECTS,
   ROUTE_RECORDS,
 } from '../config/routes.config';
-import { PROFILE_CONSOLE_REDIRECT_ROUTES, PROFILE_CONSOLE_ROUTE_PATHS } from '../config/profileConsoleRoutes';
-import { PUBLIC_CONSOLE_REDIRECT_ROUTES, PUBLIC_CONSOLE_ROUTE_PATHS } from '../config/publicConsoleRoutes';
+import {
+  PROFILE_CONSOLE_REDIRECT_ROUTES,
+  PROFILE_CONSOLE_ROUTE_PATHS,
+} from '../config/profileConsoleRoutes';
+import {
+  PUBLIC_CONSOLE_REDIRECT_ROUTES,
+  PUBLIC_CONSOLE_ROUTE_PATHS,
+} from '../config/publicConsoleRoutes';
 import { TOOLS_CONSOLE_ROUTE_PATHS } from '../config/toolsConsoleRoutes';
 import { PLATFORM_CONSOLE_ROUTE_PATHS } from '../config/platformConsoleRoutes';
 import { OPERATIONS_FLEET_CONSOLE_ROUTE_PATHS } from '../config/operationsFleetConsoleRoutes';
-import { ADMIN_CONSOLE_REDIRECT_ROUTES, ADMIN_CONSOLE_ROUTE_PATHS } from '../config/adminConsoleRoutes';
+import {
+  ADMIN_CONSOLE_REDIRECT_ROUTES,
+  ADMIN_CONSOLE_ROUTE_PATHS,
+} from '../config/adminConsoleRoutes';
 import { TRAINING_CONSOLE_ROUTE_PATHS } from '../config/trainingConsoleRoutes';
 import { GOVERNANCE_CONSOLE_ROUTE_PATHS } from '../config/governanceConsoleRoutes';
 import { COMMAND_CENTER_INTELLIGENCE_REDIRECTS } from '../config/hospitalCommandCenterViews.config';
@@ -101,7 +110,16 @@ const EXPECTED_LEGACY_NON_ROUTE_FILES = new Set([
   'src/utils/medical3dViewerModel.ts',
 ]);
 
-const LEGACY_ROUTE_PREFIXES = ['/login', '/signin', '/home', '/chat', '/calculator/', '/medical-simulation', '/lab', '/anatomy-viewer'];
+const LEGACY_ROUTE_PREFIXES = [
+  '/login',
+  '/signin',
+  '/home',
+  '/chat',
+  '/calculator/',
+  '/medical-simulation',
+  '/lab',
+  '/anatomy-viewer',
+];
 
 function readRepoFile(relPath) {
   const full = join(REPO_ROOT, relPath);
@@ -136,7 +154,9 @@ function buildProductionCorpus() {
     // way around — included so those modules aren't misreported as orphaned.
     { dir: join(REPO_ROOT, 'scripts'), extensions: ['.mjs', '.js'] },
   ];
-  const files = dirs.flatMap(({ dir, extensions }) => walkFiles(dir, { extensions, excludeTest: true }));
+  const files = dirs.flatMap(({ dir, extensions }) =>
+    walkFiles(dir, { extensions, excludeTest: true }),
+  );
   return { files, text: files.map((f) => readFileSync(f, 'utf8')).join('\n') };
 }
 
@@ -157,7 +177,9 @@ const CONSOLE_TREE_FILES = Object.freeze([
 function parseAppRoutePaths() {
   const app = readRepoFile('src/app/router.tsx');
   const directPaths = [...app.matchAll(/path:\s*['"]([^'"]+)['"]/g)].map((m) => m[1]);
-  const jsxLiteralPaths = [...app.matchAll(/<Route\b[^>]*\spath=["']([^"']+)["']/g)].map((m) => m[1]);
+  const jsxLiteralPaths = [...app.matchAll(/<Route\b[^>]*\spath=["']([^"']+)["']/g)].map(
+    (m) => m[1],
+  );
   const jsxCanonicalRoutePaths = [...app.matchAll(/path=\{CANONICAL_ROUTES\.([A-Za-z0-9_]+)\}/g)]
     .map((m) => CANONICAL_ROUTES[m[1]])
     .filter(Boolean);
@@ -167,10 +189,10 @@ function parseAppRoutePaths() {
   const nonEdRedirectPaths = app.includes('NON_ED_WORKSPACE_REDIRECT_ROUTES')
     ? NON_ED_WORKSPACE_REDIRECT_ROUTES.map((route) => route.path)
     : [];
-  const generatedAliasPaths = app.includes('ROUTE_ALIAS_REDIRECTS') ||
-    app.includes('PROTECTED_ROUTE_ALIAS_REDIRECTS')
-    ? ROUTE_ALIAS_REDIRECTS.map((entry) => entry.path)
-    : [];
+  const generatedAliasPaths =
+    app.includes('ROUTE_ALIAS_REDIRECTS') || app.includes('PROTECTED_ROUTE_ALIAS_REDIRECTS')
+      ? ROUTE_ALIAS_REDIRECTS.map((entry) => entry.path)
+      : [];
   const legacyEmergencyPaths = app.includes('LEGACY_EMERGENCY_ROUTE_REDIRECTS')
     ? LEGACY_EMERGENCY_ROUTE_REDIRECTS.map((entry) => entry.path)
     : [];
@@ -366,7 +388,12 @@ function normalizeImportToSrcPath(specifier) {
     else if (existsSync(join(REPO_ROOT, `${p}.ts`))) p += '.ts';
     else if (existsSync(join(REPO_ROOT, `${p}.jsx`))) p += '.jsx';
     else if (existsSync(join(REPO_ROOT, `${p}.js`))) p += '.js';
-    else if (existsSync(join(REPO_ROOT, p)) && statSync(join(REPO_ROOT, p)).isDirectory() && existsSync(join(REPO_ROOT, p, 'index.tsx'))) p += '/index.tsx';
+    else if (
+      existsSync(join(REPO_ROOT, p)) &&
+      statSync(join(REPO_ROOT, p)).isDirectory() &&
+      existsSync(join(REPO_ROOT, p, 'index.tsx'))
+    )
+      p += '/index.tsx';
     else p += '.jsx';
   }
   return p.replace(/\\/g, '/');
@@ -399,7 +426,15 @@ function isReferenced(relPath, corpusText, appWiredPaths) {
   return { referenced: false, via: null };
 }
 
-function classifyItem({ referenced, inAppRoutes, inNav, inInventory, isRedirectAlias, mergeId, name }) {
+function classifyItem({
+  referenced,
+  inAppRoutes,
+  inNav,
+  inInventory,
+  isRedirectAlias,
+  mergeId,
+  name,
+}) {
   if (mergeId) return ORPHAN_CLASSIFICATIONS.MERGE;
   if (isRedirectAlias || LEGACY_ROUTE_PREFIXES.some((p) => name?.startsWith?.(p))) {
     return ORPHAN_CLASSIFICATIONS.LEGACY;
@@ -425,12 +460,12 @@ function classifyItem({ referenced, inAppRoutes, inNav, inInventory, isRedirectA
 // missing-registration) gap despite being deliberately unbuilt roadmap
 // items, not accidental omissions. Found 2026-08-26.
 const FUTURE_ROUTE_PATHS: Set<string> = new Set(
-  ROUTE_RECORDS.filter((record) => record.status === 'future').map((record) => record.path)
+  ROUTE_RECORDS.filter((record) => record.status === 'future').map((record) => record.path),
 );
 
 function collectCanonicalNavPaths() {
   const paths: Set<any> = new Set(
-    Object.values(CANONICAL_ROUTES).filter((path) => !FUTURE_ROUTE_PATHS.has(path))
+    Object.values(CANONICAL_ROUTES).filter((path) => !FUTURE_ROUTE_PATHS.has(path)),
   );
   const nav = readRepoFile('src/config/navigation.config.ts');
   for (const m of nav.matchAll(/['"](\/[^'"]+)['"]/g)) {
@@ -512,49 +547,53 @@ function detectOrphanPages(corpus, appImports) {
     extensions: ['.tsx', '.jsx', '.ts', '.js'],
     excludeTest: true,
   });
-  const appWired = new Set(
-    [...appImports].map((spec) => normalizeImportToSrcPath(spec))
-  );
+  const appWired = new Set([...appImports].map((spec) => normalizeImportToSrcPath(spec)));
   const inventoryComponents = new Set(
     getCanonicalToolInventory()
       .map((t) => t.component)
-      .filter(Boolean)
+      .filter(Boolean),
   );
 
-  return pageFiles.map((full) => {
-    const rel = relative(REPO_ROOT, full).replace(/\\/g, '/');
-    const ref = isReferenced(rel, corpus.text, appWired);
-    const inInventory = inventoryComponents.has(rel);
-    const mergeDuplicate = MERGE_DUPLICATES.find((m) => m.duplicate === rel);
-    const mergePrimary = MERGE_DUPLICATES.find((m) => m.primary === rel);
-    if (mergePrimary && appWired.has(rel)) return null;
+  return pageFiles
+    .map((full) => {
+      const rel = relative(REPO_ROOT, full).replace(/\\/g, '/');
+      const ref = isReferenced(rel, corpus.text, appWired);
+      const inInventory = inventoryComponents.has(rel);
+      const mergeDuplicate = MERGE_DUPLICATES.find((m) => m.duplicate === rel);
+      const mergePrimary = MERGE_DUPLICATES.find((m) => m.primary === rel);
+      if (mergePrimary && appWired.has(rel)) return null;
 
-    let classification =
-      classifyItem({
-        referenced: ref.referenced,
-        inAppRoutes: appWired.has(rel),
-        inInventory,
-        mergeId: mergeDuplicate?.id,
-        name: rel,
-      } as any) || (ref.referenced ? null : ORPHAN_CLASSIFICATIONS.QUARANTINE);
+      let classification =
+        classifyItem({
+          referenced: ref.referenced,
+          inAppRoutes: appWired.has(rel),
+          inInventory,
+          mergeId: mergeDuplicate?.id,
+          name: rel,
+        } as any) || (ref.referenced ? null : ORPHAN_CLASSIFICATIONS.QUARANTINE);
 
-    if (mergeDuplicate) classification = ORPHAN_CLASSIFICATIONS.MERGE;
-    if (EXPECTED_LEGACY_NON_ROUTE_FILES.has(rel)) {
-      classification = ORPHAN_CLASSIFICATIONS.LEGACY;
-    }
-    if (!classification) return null;
-    if (appWired.has(rel) && classification === ORPHAN_CLASSIFICATIONS.LEGACY && !mergeDuplicate) {
-      return null;
-    }
+      if (mergeDuplicate) classification = ORPHAN_CLASSIFICATIONS.MERGE;
+      if (EXPECTED_LEGACY_NON_ROUTE_FILES.has(rel)) {
+        classification = ORPHAN_CLASSIFICATIONS.LEGACY;
+      }
+      if (!classification) return null;
+      if (
+        appWired.has(rel) &&
+        classification === ORPHAN_CLASSIFICATIONS.LEGACY &&
+        !mergeDuplicate
+      ) {
+        return null;
+      }
 
-    return {
-      id: rel,
-      path: rel,
-      classification,
-      evidence: ref.referenced ? ref.via : 'No production import path found',
-      domain: domainForPath(rel),
-    };
-  }).filter(Boolean);
+      return {
+        id: rel,
+        path: rel,
+        classification,
+        evidence: ref.referenced ? ref.via : 'No production import path found',
+        domain: domainForPath(rel),
+      };
+    })
+    .filter(Boolean);
 }
 
 function domainForPath(rel) {
@@ -568,18 +607,22 @@ function domainForPath(rel) {
 
 function detectDomainModuleOrphans(corpus, appImports) {
   const domains = {
-    dashboards: walkFiles(join(REPO_ROOT, 'src/pages'), { extensions: ['.tsx', '.jsx'], excludeTest: true }).filter(
-      (f) => /Dashboard/.test(f)
-    ),
-    simulations: walkFiles(join(REPO_ROOT, 'src/pages'), { extensions: ['.tsx', '.jsx'], excludeTest: true }).filter(
-      (f) => /Simulation|MedicalSimulation/.test(f)
-    ),
-    laboratory: walkFiles(join(REPO_ROOT, 'src/pages'), { extensions: ['.tsx', '.jsx'], excludeTest: true }).filter(
-      (f) => /Laboratory|Lab[A-Z]/.test(f)
-    ),
-    viewer3d: walkFiles(join(REPO_ROOT, 'src'), { extensions: ['.tsx', '.jsx', '.ts', '.js', '.css'], excludeTest: true }).filter(
-      (f) => /3[Dd]|Medical3D|SimulationLaboratoryViewer/.test(f)
-    ),
+    dashboards: walkFiles(join(REPO_ROOT, 'src/pages'), {
+      extensions: ['.tsx', '.jsx'],
+      excludeTest: true,
+    }).filter((f) => /Dashboard/.test(f)),
+    simulations: walkFiles(join(REPO_ROOT, 'src/pages'), {
+      extensions: ['.tsx', '.jsx'],
+      excludeTest: true,
+    }).filter((f) => /Simulation|MedicalSimulation/.test(f)),
+    laboratory: walkFiles(join(REPO_ROOT, 'src/pages'), {
+      extensions: ['.tsx', '.jsx'],
+      excludeTest: true,
+    }).filter((f) => /Laboratory|Lab[A-Z]/.test(f)),
+    viewer3d: walkFiles(join(REPO_ROOT, 'src'), {
+      extensions: ['.tsx', '.jsx', '.ts', '.js', '.css'],
+      excludeTest: true,
+    }).filter((f) => /3[Dd]|Medical3D|SimulationLaboratoryViewer/.test(f)),
   };
 
   const appWired = new Set([...appImports].map((spec) => normalizeImportToSrcPath(spec)));
@@ -593,10 +636,10 @@ function detectDomainModuleOrphans(corpus, appImports) {
       const classification = EXPECTED_LEGACY_NON_ROUTE_FILES.has(rel)
         ? ORPHAN_CLASSIFICATIONS.LEGACY
         : ref.referenced
-        ? ORPHAN_CLASSIFICATIONS.WIRE
-        : rel.endsWith('.css')
-          ? ORPHAN_CLASSIFICATIONS.LEGACY
-          : ORPHAN_CLASSIFICATIONS.QUARANTINE;
+          ? ORPHAN_CLASSIFICATIONS.WIRE
+          : rel.endsWith('.css')
+            ? ORPHAN_CLASSIFICATIONS.LEGACY
+            : ORPHAN_CLASSIFICATIONS.QUARANTINE;
       rows.push({
         id: rel,
         domain,
@@ -621,7 +664,9 @@ function detectOrphanComponents(corpus) {
       const ref = isReferenced(rel, corpus.text, new Set());
       if (ref.referenced) return null;
       const baseName = rel.split('/').pop();
-      const inBarrel = corpus.text.includes(`from './charts/${baseName}'`) || corpus.text.includes(`from './data-display/${baseName}'`);
+      const inBarrel =
+        corpus.text.includes(`from './charts/${baseName}'`) ||
+        corpus.text.includes(`from './data-display/${baseName}'`);
       return {
         id: rel,
         path: rel,
@@ -656,12 +701,15 @@ function detectOrphanServices(corpus) {
 
 function detectOrphanExecutors() {
   const registered = getUserFacingToolInventory().filter(
-    (t) => t.executorStatus === TOOL_EXECUTOR_STATUS.REGISTERED
+    (t) => t.executorStatus === TOOL_EXECUTOR_STATUS.REGISTERED,
   );
   const rows = [] as any[];
   for (const tool of registered) {
     const orchId = tool.orchestratorToolId || tool.id;
-    if (!ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS.includes(orchId) && !BACKEND_EXECUTOR_NLU_TOOL_IDS.includes(orchId)) {
+    if (
+      !ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS.includes(orchId) &&
+      !BACKEND_EXECUTOR_NLU_TOOL_IDS.includes(orchId)
+    ) {
       rows.push({
         id: tool.id,
         classification: ORPHAN_CLASSIFICATIONS.WIRE,
@@ -723,10 +771,12 @@ function detectOrphanApis() {
 
   const missingFromInventory = BACKEND_HTTP_ROUTES.filter((r) => {
     return !FRONTEND_API_CALLS.some(
-      (c) => findBackendRoute(c.method, c.path)?.path === r.path && c.method === r.method
+      (c) => findBackendRoute(c.method, c.path)?.path === r.path && c.method === r.method,
     );
   });
-  for (const route of missingFromInventory.filter((r) => r.path.includes('/api/platform') || r.path.includes('/api/products'))) {
+  for (const route of missingFromInventory.filter(
+    (r) => r.path.includes('/api/platform') || r.path.includes('/api/products'),
+  )) {
     const policy = BACKEND_ROUTE_EXPOSURE_POLICY[routePolicyKey(route.method, route.path)];
     const shouldWire = policy?.strategy === 'expose-recommended';
     rows.push({
@@ -769,21 +819,27 @@ function detectOrphanMarkdown(srcCorpus) {
     .map(({ full, rel, text }) => {
       const base = rel.split('/').pop()!;
       if (readme.includes(rel) || readme.includes(base)) return null;
-      if (allDocsBlob.includes(`](${rel})`) || allDocsBlob.includes(`](./${base})`) || srcCorpus.includes(rel)) {
+      if (
+        allDocsBlob.includes(`](${rel})`) ||
+        allDocsBlob.includes(`](./${base})`) ||
+        srcCorpus.includes(rel)
+      ) {
         return null;
       }
       const inbound = docContents.some(
-        (other) => other.full !== full && (other.text.includes(rel) || other.text.includes(base))
+        (other) => other.full !== full && (other.text.includes(rel) || other.text.includes(base)),
       );
       if (inbound) return null;
 
-      const isArchived = ARCHIVED_DOC_PREFIXES.some((p) => rel.startsWith(p)) || EXPECTED_UNLINKED_DOCS.has(rel);
+      const isArchived =
+        ARCHIVED_DOC_PREFIXES.some((p) => rel.startsWith(p)) || EXPECTED_UNLINKED_DOCS.has(rel);
       if (isArchived) {
         return {
           id: rel,
           path: rel,
           classification: ORPHAN_CLASSIFICATIONS.LEGACY,
-          evidence: 'Intentionally archived/unlinked historical record — already reviewed, kept for git history',
+          evidence:
+            'Intentionally archived/unlinked historical record — already reviewed, kept for git history',
         };
       }
 
@@ -798,7 +854,9 @@ function detectOrphanMarkdown(srcCorpus) {
       return {
         id: rel,
         path: rel,
-        classification: isGenerated ? ORPHAN_CLASSIFICATIONS.LEGACY : ORPHAN_CLASSIFICATIONS.QUARANTINE,
+        classification: isGenerated
+          ? ORPHAN_CLASSIFICATIONS.LEGACY
+          : ORPHAN_CLASSIFICATIONS.QUARANTINE,
         evidence: 'No inbound links from README, src, or other docs',
       };
     })
@@ -831,7 +889,10 @@ export function buildOrphanDetectionReport() {
   ];
 
   const byClass = Object.fromEntries(
-    Object.values(ORPHAN_CLASSIFICATIONS).map((c) => [c, all.filter((r) => r.classification === c)])
+    Object.values(ORPHAN_CLASSIFICATIONS).map((c) => [
+      c,
+      all.filter((r) => r.classification === c),
+    ]),
   );
 
   return {
@@ -846,9 +907,7 @@ export function buildOrphanDetectionReport() {
       apis: apis.length,
       markdown: markdown.length,
       appRouteCount: appPaths.length,
-      byClass: Object.fromEntries(
-        Object.entries(byClass).map(([k, v]) => [k, v.length])
-      ),
+      byClass: Object.fromEntries(Object.entries(byClass).map(([k, v]) => [k, v.length])),
     },
     routes,
     pages,
@@ -875,9 +934,7 @@ function formatSection(title, rows, columns) {
     '',
     `| ${header.join(' | ')} |`,
     `| ${header.map(() => '---').join(' | ')} |`,
-    ...rows.map((row) =>
-      `| ${columns.map((c) => escapeCell(row[c.key])).join(' | ')} |`
-    ),
+    ...rows.map((row) => `| ${columns.map((c) => escapeCell(row[c.key])).join(' | ')} |`),
     '',
   ];
   return lines;
@@ -923,9 +980,7 @@ export function formatOrphanDetectionMarkdown(report = buildOrphanDetectionRepor
     '',
     '| ID | Primary | Duplicate | Note |',
     '|----|---------|-----------|------|',
-    ...report.mergeCandidates.map(
-      (m) => `| ${m.id} | ${m.primary} | ${m.duplicate} | ${m.note} |`
-    ),
+    ...report.mergeCandidates.map((m) => `| ${m.id} | ${m.primary} | ${m.duplicate} | ${m.note} |`),
     '',
     '## Critical findings',
     '',
@@ -952,26 +1007,42 @@ export function formatOrphanDetectionMarkdown(report = buildOrphanDetectionRepor
       { key: 'classification', label: 'Class' },
       { key: 'evidence', label: 'Evidence' },
     ]),
-    ...formatSection('Dashboards', report.domainModules.filter((r) => r.domain === 'dashboard'), [
-      { key: 'id', label: 'Module' },
-      { key: 'classification', label: 'Class' },
-      { key: 'evidence', label: 'Evidence' },
-    ]),
-    ...formatSection('Simulations', report.domainModules.filter((r) => r.domain === 'simulation'), [
-      { key: 'id', label: 'Module' },
-      { key: 'classification', label: 'Class' },
-      { key: 'evidence', label: 'Evidence' },
-    ]),
-    ...formatSection('Laboratory modules', report.domainModules.filter((r) => r.domain === 'laboratory'), [
-      { key: 'id', label: 'Module' },
-      { key: 'classification', label: 'Class' },
-      { key: 'evidence', label: 'Evidence' },
-    ]),
-    ...formatSection('3D viewer code', report.domainModules.filter((r) => r.domain === '3d-viewer'), [
-      { key: 'id', label: 'Module' },
-      { key: 'classification', label: 'Class' },
-      { key: 'evidence', label: 'Evidence' },
-    ]),
+    ...formatSection(
+      'Dashboards',
+      report.domainModules.filter((r) => r.domain === 'dashboard'),
+      [
+        { key: 'id', label: 'Module' },
+        { key: 'classification', label: 'Class' },
+        { key: 'evidence', label: 'Evidence' },
+      ],
+    ),
+    ...formatSection(
+      'Simulations',
+      report.domainModules.filter((r) => r.domain === 'simulation'),
+      [
+        { key: 'id', label: 'Module' },
+        { key: 'classification', label: 'Class' },
+        { key: 'evidence', label: 'Evidence' },
+      ],
+    ),
+    ...formatSection(
+      'Laboratory modules',
+      report.domainModules.filter((r) => r.domain === 'laboratory'),
+      [
+        { key: 'id', label: 'Module' },
+        { key: 'classification', label: 'Class' },
+        { key: 'evidence', label: 'Evidence' },
+      ],
+    ),
+    ...formatSection(
+      '3D viewer code',
+      report.domainModules.filter((r) => r.domain === '3d-viewer'),
+      [
+        { key: 'id', label: 'Module' },
+        { key: 'classification', label: 'Class' },
+        { key: 'evidence', label: 'Evidence' },
+      ],
+    ),
     ...formatSection('Orphan services', report.services, [
       { key: 'path', label: 'Service' },
       { key: 'classification', label: 'Class' },
@@ -998,7 +1069,7 @@ export function formatOrphanDetectionMarkdown(report = buildOrphanDetectionRepor
       { key: 'path', label: 'Doc' },
       { key: 'classification', label: 'Class' },
       { key: 'evidence', label: 'Evidence' },
-    ])
+    ]),
   );
   if (report.markdown.length > 60) {
     lines.push(`_… and ${report.markdown.length - 60} more doc files._`, '');
@@ -1010,7 +1081,7 @@ export function formatOrphanDetectionMarkdown(report = buildOrphanDetectionRepor
     '- Prior manual scan: [unwired-orphan-code-scan.md](./unwired-orphan-code-scan.md)',
     '- Backend-only exposure: [orphaned-backend-functions.md](./orphaned-backend-functions.md)',
     '- Generator: `src/data/orphanDetectionAudit.ts`',
-    ''
+    '',
   );
 
   return lines.join('\n');

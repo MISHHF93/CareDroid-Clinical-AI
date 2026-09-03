@@ -39,9 +39,14 @@ describe('canonical route tree — queues params, reassessment, boarding, referr
   it('/emergency/boarding renders boarding and discharge capacity detail', async () => {
     renderRoute('/emergency/boarding');
 
-    await waitFor(() => {
-      expect(screen.getByTestId('location')).toHaveTextContent('/emergency/capacity?view=boarding');
-    }, { timeout: ROUTE_LOAD_TIMEOUT });
+    await waitFor(
+      () => {
+        expect(screen.getByTestId('location')).toHaveTextContent(
+          '/emergency/capacity?view=boarding',
+        );
+      },
+      { timeout: ROUTE_LOAD_TIMEOUT },
+    );
     // One "Flow & Capacity" heading now (the shell chrome route-tab's), so this
     // queries document-wide rather than scoping to <main> to dodge a duplicate.
     // The shell heading resolves before the lazy page body, so the tab -- a
@@ -53,9 +58,13 @@ describe('canonical route tree — queues params, reassessment, boarding, referr
     ).toHaveAttribute('aria-selected', 'true');
   });
 
-  it('/emergency/referrals renders referral candidates from the active patient list', async () => {
-    renderRoute('/emergency/referrals');
+  it(
+    '/emergency/referrals renders referral candidates from the active patient list',
+    async () => {
+      renderRoute('/emergency/referrals');
 
-    expect(await findRouteHeading('Referrals')).toBeInTheDocument();
-  }, ROUTE_LOAD_TIMEOUT);
+      expect(await findRouteHeading('Referrals')).toBeInTheDocument();
+    },
+    ROUTE_LOAD_TIMEOUT,
+  );
 });

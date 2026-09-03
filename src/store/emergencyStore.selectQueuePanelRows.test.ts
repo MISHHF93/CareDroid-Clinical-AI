@@ -17,7 +17,14 @@ describe('selectQueuePanelRows', () => {
   it('reads the real targetMinutes field instead of the nonexistent targetWaitMinutes', () => {
     const [row] = selectQueuePanelRows({
       queues: [
-        { id: 'q1', label: 'Triage', type: 'Triage', count: 2, oldestWaitMinutes: 12, targetMinutes: 10 },
+        {
+          id: 'q1',
+          label: 'Triage',
+          type: 'Triage',
+          count: 2,
+          oldestWaitMinutes: 12,
+          targetMinutes: 10,
+        },
       ],
     } as any);
 
@@ -65,13 +72,20 @@ describe('selectQueuePanelRows', () => {
     expect(underTarget.health).toBe('green');
   });
 
-  it('respects each queue type\'s own target instead of a uniform 30min default', () => {
+  it("respects each queue type's own target instead of a uniform 30min default", () => {
     // A 45min wait against a 120min target (e.g. Discharge) should NOT
     // read as breached, even though the old hardcoded 30min default would
     // have flagged it.
     const [row] = selectQueuePanelRows({
       queues: [
-        { id: 'q1', label: 'Discharge', type: 'Discharge', count: 1, oldestWaitMinutes: 45, targetMinutes: 120 },
+        {
+          id: 'q1',
+          label: 'Discharge',
+          type: 'Discharge',
+          count: 1,
+          oldestWaitMinutes: 45,
+          targetMinutes: 120,
+        },
       ],
     } as any);
 

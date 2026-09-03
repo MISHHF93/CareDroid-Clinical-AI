@@ -45,10 +45,7 @@ function enrichTaskWithBundle(
         intake: bundle.intake.data,
         critical: bundle.critical.data,
         summary: bundle.summary?.data,
-        redFlags: [
-          ...(bundle.critical.redFlags || []),
-          ...(bundle.triage.redFlags || []),
-        ],
+        redFlags: [...(bundle.critical.redFlags || []), ...(bundle.triage.redFlags || [])],
         requiresClinicianReview: true,
       }),
     }),

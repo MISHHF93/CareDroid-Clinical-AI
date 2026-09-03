@@ -2,10 +2,7 @@
  * Single visibility map for practitioner / pilot surfaces.
  * Pages read this once instead of scattering shouldSuppress* calls.
  */
-import {
-  isPractitionerCleanupEnabled,
-  PRACTITIONER_CLEANUP,
-} from './practitionerCleanup.config';
+import { isPractitionerCleanupEnabled, PRACTITIONER_CLEANUP } from './practitionerCleanup.config';
 import { PRACTITIONER_PATIENT_CARD_BADGE_LIMIT } from './practitionerCleanup.constants';
 import {
   applyRoleSurfaceOverrides,
@@ -50,15 +47,15 @@ const FULL_VISIBILITY = Object.freeze({
     showJourneyBadge: true,
     badgeLimit: 2,
   }),
-    copilot: Object.freeze({
-      showContextTab: true,
-      showSafetyTab: true,
-      showStatusStrip: true,
-      showMultimodalInput: true,
-      showOrchestrationActions: true,
-      compactLayout: false,
-      showSafetyBadge: true,
-    }),
+  copilot: Object.freeze({
+    showContextTab: true,
+    showSafetyTab: true,
+    showStatusStrip: true,
+    showMultimodalInput: true,
+    showOrchestrationActions: true,
+    compactLayout: false,
+    showSafetyBadge: true,
+  }),
   profile: Object.freeze({
     showShellEyebrow: true,
     showAccessSummary: true,
@@ -298,8 +295,7 @@ function buildPilotVisibility(context: any = {}) {
     }),
     emergencyRoutes: Object.freeze({
       showDescriptions: !c.suppressEmergencyRouteDescriptions,
-      showMetricCards:
-        !c.suppressEmergencyRouteMetricCards && !c.suppressEmergencyRouteMetrics,
+      showMetricCards: !c.suppressEmergencyRouteMetricCards && !c.suppressEmergencyRouteMetrics,
       showSituationBrief: true,
       showJourneyRail: !c.hidePatientJourneyEngineCard,
       showAiChiefBar: c.showOperationalCommandBars !== false,

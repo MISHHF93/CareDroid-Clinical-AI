@@ -34,10 +34,16 @@ describe('healthcareKnowledgeHub', () => {
     });
 
     expect(emergencyClinicianItems.length).toBeGreaterThan(0);
-    expect(emergencyClinicianItems.every((item) => item.specialties.includes('emergency'))).toBe(true);
+    expect(emergencyClinicianItems.every((item) => item.specialties.includes('emergency'))).toBe(
+      true,
+    );
     expect(emergencyClinicianItems.every((item) => item.roles.includes('clinician'))).toBe(true);
-    expect(emergencyClinicianItems.every((item) => item.workspaces.includes('emergency'))).toBe(true);
-    expect(emergencyClinicianItems.every((item) => item.departments.includes('emergency'))).toBe(true);
+    expect(emergencyClinicianItems.every((item) => item.workspaces.includes('emergency'))).toBe(
+      true,
+    );
+    expect(emergencyClinicianItems.every((item) => item.departments.includes('emergency'))).toBe(
+      true,
+    );
   });
 
   it('searches knowledge text and evidence', () => {

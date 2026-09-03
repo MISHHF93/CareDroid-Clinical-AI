@@ -3,14 +3,15 @@ import { Link } from 'react-router-dom';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { BACKEND_API_CAPABILITY_STATUS } from '../../config/backendApiCapabilities';
 import useEffectiveUserProfile from '../../hooks/useEffectiveUserProfile';
-import {
-  filterAdminOpsLinks,
-  getVisibleAdminOpsSections,
-} from '../../config/adminOperationsModel';
+import { filterAdminOpsLinks, getVisibleAdminOpsSections } from '../../config/adminOperationsModel';
 import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
 
 const SURVEILLANCE_STATUS = [
-  { id: 'surveillanceNexus', label: 'Surveillance nexus API', path: CANONICAL_ROUTES.surveillanceNexus },
+  {
+    id: 'surveillanceNexus',
+    label: 'Surveillance nexus API',
+    path: CANONICAL_ROUTES.surveillanceNexus,
+  },
   { id: 'surveillanceCameras', label: 'Camera registry API' },
   { id: 'surveillanceIotRegistry', label: 'IoT registry API' },
   { id: 'surveillanceHealth', label: 'Health monitoring API' },
@@ -76,7 +77,9 @@ export default function AdminOperationsHome() {
               {SURVEILLANCE_STATUS.map((item) => (
                 <li key={item.id}>
                   <span>{item.label}</span>
-                  <strong>{statusLabel(BACKEND_API_CAPABILITY_STATUS[item.id] || 'disabled')}</strong>
+                  <strong>
+                    {statusLabel(BACKEND_API_CAPABILITY_STATUS[item.id] || 'disabled')}
+                  </strong>
                   {item.path && surveillanceLinks.some((link) => link.route === item.path) ? (
                     <Link to={item.path} className="admin-ops-inline-link">
                       view

@@ -1,8 +1,5 @@
 import ToolApiErrorBanner from './ToolApiErrorBanner';
-import {
-  LoadingState,
-  UnsupportedState,
-} from './ui/CareDroidPrimitives';
+import { LoadingState, UnsupportedState } from './ui/CareDroidPrimitives';
 import './ApiStateBanner.css';
 
 /**

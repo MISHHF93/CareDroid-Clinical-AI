@@ -18,8 +18,8 @@ function DecisionSupportNotice({ children }) {
   return (
     <div className="calc-timi-disclaimer calc-has-bled-disclaimer" role="note">
       <p className="calc-ds-lead">
-        <strong>Decision support only.</strong> Does not diagnose, prescribe fluids, initiate dialysis, or automate
-        medication dosing; follow local protocols.
+        <strong>Decision support only.</strong> Does not diagnose, prescribe fluids, initiate
+        dialysis, or automate medication dosing; follow local protocols.
       </p>
       <p className="calc-disclaimer-detail">{children}</p>
     </div>
@@ -61,7 +61,8 @@ function ResultPanel({ slug, result, emptyText, primaryLabel, primaryValue }) {
         <p className="calc-reference-line">{result.referenceLine}</p>
       </section>
       <p className="calc-result-safety-footer" role="note">
-        Output reflects entered values and may omit important renal, volume, toxicology, and critical-care context.
+        Output reflects entered values and may omit important renal, volume, toxicology, and
+        critical-care context.
       </p>
     </>
   ) : (
@@ -186,7 +187,7 @@ function NephrologyCalculator({ config, onResultChange }) {
                   value={form[field.name]}
                   onChange={update}
                 />
-              )
+              ),
             )}
           </div>
           <div className="calc-actions">
@@ -244,13 +245,19 @@ const CONFIGS = {
   'egfr-ckd-epi': {
     slug: 'egfr-ckd-epi',
     title: 'eGFR CKD-EPI 2021',
-    notice: 'Race-free eGFR estimate only; does not diagnose AKI/CKD or automate renal medication dosing.',
+    notice:
+      'Race-free eGFR estimate only; does not diagnose AKI/CKD or automate renal medication dosing.',
     initial: { ageYears: '', sex: '', serumCreatinine: '', creatinineUnit: 'mg_dl' },
     fields: [
       { name: 'ageYears', label: 'Age (years)', min: 18, max: 120 },
       { name: 'sex', label: 'Sex', type: 'select', options: sexOptions },
       { name: 'serumCreatinine', label: 'Serum creatinine', min: 0.2, max: 25 },
-      { name: 'creatinineUnit', label: 'Creatinine unit', type: 'select', options: creatinineUnitOptions },
+      {
+        name: 'creatinineUnit',
+        label: 'Creatinine unit',
+        type: 'select',
+        options: creatinineUnitOptions,
+      },
     ],
     compute: computeEgfrCkdEpi2021,
     emptyText: 'Enter age, sex, and creatinine to estimate eGFR.',
@@ -260,14 +267,20 @@ const CONFIGS = {
   'creatinine-clearance-cg': {
     slug: 'creatinine-clearance-cg',
     title: 'Creatinine Clearance Cockcroft-Gault',
-    notice: 'Creatinine clearance estimate only; verify weight selection and do not use as automated dosing advice.',
+    notice:
+      'Creatinine clearance estimate only; verify weight selection and do not use as automated dosing advice.',
     initial: { ageYears: '', sex: '', weightKg: '', serumCreatinine: '', creatinineUnit: 'mg_dl' },
     fields: [
       { name: 'ageYears', label: 'Age (years)', min: 18, max: 120 },
       { name: 'sex', label: 'Sex', type: 'select', options: sexOptions },
       { name: 'weightKg', label: 'Weight used for equation (kg)', min: 20, max: 350 },
       { name: 'serumCreatinine', label: 'Serum creatinine', min: 0.2, max: 25 },
-      { name: 'creatinineUnit', label: 'Creatinine unit', type: 'select', options: creatinineUnitOptions },
+      {
+        name: 'creatinineUnit',
+        label: 'Creatinine unit',
+        type: 'select',
+        options: creatinineUnitOptions,
+      },
     ],
     compute: computeCreatinineClearanceCockcroftGault,
     emptyText: 'Enter age, sex, weight, and creatinine to estimate creatinine clearance.',
@@ -277,7 +290,8 @@ const CONFIGS = {
   fena: {
     slug: 'fena',
     title: 'Fractional Excretion of Sodium (FeNa)',
-    notice: 'Urine electrolyte pattern support only; thresholds are unreliable in many AKI contexts.',
+    notice:
+      'Urine electrolyte pattern support only; thresholds are unreliable in many AKI contexts.',
     initial: {
       serumSodium: '',
       urineSodium: '',
@@ -290,9 +304,19 @@ const CONFIGS = {
       { name: 'serumSodium', label: 'Serum sodium (mEq/L)', min: 90, max: 190 },
       { name: 'urineSodium', label: 'Urine sodium (mEq/L)', min: 0, max: 300 },
       { name: 'serumCreatinine', label: 'Serum creatinine', min: 0.2, max: 25 },
-      { name: 'serumCreatinineUnit', label: 'Serum creatinine unit', type: 'select', options: creatinineUnitOptions },
+      {
+        name: 'serumCreatinineUnit',
+        label: 'Serum creatinine unit',
+        type: 'select',
+        options: creatinineUnitOptions,
+      },
       { name: 'urineCreatinine', label: 'Urine creatinine', min: 1, max: 5000 },
-      { name: 'urineCreatinineUnit', label: 'Urine creatinine unit', type: 'select', options: creatinineUnitOptions },
+      {
+        name: 'urineCreatinineUnit',
+        label: 'Urine creatinine unit',
+        type: 'select',
+        options: creatinineUnitOptions,
+      },
     ],
     compute: computeFeNa,
     emptyText: 'Enter serum and urine sodium/creatinine to calculate FeNa.',
@@ -319,9 +343,19 @@ const CONFIGS = {
       { name: 'urineUreaNitrogen', label: 'Urine urea nitrogen', min: 1, max: 5000 },
       { name: 'urineUreaUnit', label: 'Urine urea unit', type: 'select', options: bunUnitOptions },
       { name: 'serumCreatinine', label: 'Serum creatinine', min: 0.2, max: 25 },
-      { name: 'serumCreatinineUnit', label: 'Serum creatinine unit', type: 'select', options: creatinineUnitOptions },
+      {
+        name: 'serumCreatinineUnit',
+        label: 'Serum creatinine unit',
+        type: 'select',
+        options: creatinineUnitOptions,
+      },
       { name: 'urineCreatinine', label: 'Urine creatinine', min: 1, max: 5000 },
-      { name: 'urineCreatinineUnit', label: 'Urine creatinine unit', type: 'select', options: creatinineUnitOptions },
+      {
+        name: 'urineCreatinineUnit',
+        label: 'Urine creatinine unit',
+        type: 'select',
+        options: creatinineUnitOptions,
+      },
     ],
     compute: computeFeUrea,
     emptyText: 'Enter serum and urine urea/creatinine values to calculate FeUrea.',
@@ -331,7 +365,8 @@ const CONFIGS = {
   kfre: {
     slug: 'kfre',
     title: 'Kidney Failure Risk Equation',
-    notice: 'CKD risk estimation only; does not recommend nephrology referral timing, transplant referral, or dialysis.',
+    notice:
+      'CKD risk estimation only; does not recommend nephrology referral timing, transplant referral, or dialysis.',
     initial: { ageYears: '', sex: '', egfrMlMin173: '', acrMgG: '' },
     fields: [
       { name: 'ageYears', label: 'Age (years)', min: 18, max: 120 },
@@ -347,13 +382,19 @@ const CONFIGS = {
   'bun-creatinine-ratio': {
     slug: 'bun-creatinine-ratio',
     title: 'BUN/Creatinine Ratio',
-    notice: 'Nonspecific azotemia pattern support only; does not diagnose volume depletion or GI bleeding.',
+    notice:
+      'Nonspecific azotemia pattern support only; does not diagnose volume depletion or GI bleeding.',
     initial: { bun: '', bunUnit: 'mg_dl', serumCreatinine: '', creatinineUnit: 'mg_dl' },
     fields: [
       { name: 'bun', label: 'BUN / serum urea', min: 1, max: 300 },
       { name: 'bunUnit', label: 'BUN / urea unit', type: 'select', options: bunUnitOptions },
       { name: 'serumCreatinine', label: 'Serum creatinine', min: 0.2, max: 25 },
-      { name: 'creatinineUnit', label: 'Creatinine unit', type: 'select', options: creatinineUnitOptions },
+      {
+        name: 'creatinineUnit',
+        label: 'Creatinine unit',
+        type: 'select',
+        options: creatinineUnitOptions,
+      },
     ],
     compute: computeBunCreatinineRatio,
     emptyText: 'Enter BUN and creatinine to calculate the ratio.',
@@ -387,7 +428,8 @@ const CONFIGS = {
   'free-water-deficit': {
     slug: 'free-water-deficit',
     title: 'Free Water Deficit',
-    notice: 'Volume estimate only; does not prescribe fluid type, route, rate, or monitoring interval.',
+    notice:
+      'Volume estimate only; does not prescribe fluid type, route, rate, or monitoring interval.',
     initial: { sodium: '', weightKg: '', tbwFactor: '', targetSodium: '140' },
     fields: [
       { name: 'sodium', label: 'Serum sodium (mEq/L)', min: 120, max: 190 },
@@ -413,7 +455,8 @@ const CONFIGS = {
   'osmolal-gap': {
     slug: 'osmolal-gap',
     title: 'Osmolal Gap',
-    notice: 'Toxicology and acid-base context only; does not diagnose toxic alcohol ingestion or recommend treatment.',
+    notice:
+      'Toxicology and acid-base context only; does not diagnose toxic alcohol ingestion or recommend treatment.',
     initial: {
       sodium: '',
       glucose: '',
@@ -446,7 +489,12 @@ export function EgfrCkdEpiCalculator({ onResultChange }) {
 }
 
 export function CreatinineClearanceCgCalculator({ onResultChange }) {
-  return <NephrologyCalculator config={CONFIGS['creatinine-clearance-cg']} onResultChange={onResultChange} />;
+  return (
+    <NephrologyCalculator
+      config={CONFIGS['creatinine-clearance-cg']}
+      onResultChange={onResultChange}
+    />
+  );
 }
 
 export function FeNaCalculator({ onResultChange }) {
@@ -462,15 +510,24 @@ export function KfreCalculator({ onResultChange }) {
 }
 
 export function BunCreatinineRatioCalculator({ onResultChange }) {
-  return <NephrologyCalculator config={CONFIGS['bun-creatinine-ratio']} onResultChange={onResultChange} />;
+  return (
+    <NephrologyCalculator
+      config={CONFIGS['bun-creatinine-ratio']}
+      onResultChange={onResultChange}
+    />
+  );
 }
 
 export function CorrectedSodiumCalculator({ onResultChange }) {
-  return <NephrologyCalculator config={CONFIGS['corrected-sodium']} onResultChange={onResultChange} />;
+  return (
+    <NephrologyCalculator config={CONFIGS['corrected-sodium']} onResultChange={onResultChange} />
+  );
 }
 
 export function FreeWaterDeficitCalculator({ onResultChange }) {
-  return <NephrologyCalculator config={CONFIGS['free-water-deficit']} onResultChange={onResultChange} />;
+  return (
+    <NephrologyCalculator config={CONFIGS['free-water-deficit']} onResultChange={onResultChange} />
+  );
 }
 
 export function OsmolalGapCalculator({ onResultChange }) {

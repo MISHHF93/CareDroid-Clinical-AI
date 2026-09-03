@@ -32,19 +32,25 @@ import {
 import { CHAT_ASSISTED_HUB_GROUPS } from './chatAssistedHubGroups';
 import { PR_FLEET_TOOL_SPECS } from './prFleetTestConstants';
 import { tierForRegistryId } from './e2eToolValidationMatrix';
-import {
-  getCalculatorRouteBySlug,
-  isKnownToolAreaPath,
-} from '../routes/clinicalToolRoutes';
+import { getCalculatorRouteBySlug, isKnownToolAreaPath } from '../routes/clinicalToolRoutes';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
 const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.tsx'), 'utf8');
-const toolPageLayoutSource = readFileSync(join(__dirname, '../pages/tools/ToolPageLayout.tsx'), 'utf8');
-const catalogSource = readFileSync(join(__dirname, '../pages/tools/ClinicalToolCatalog.tsx'), 'utf8');
+const toolPageLayoutSource = readFileSync(
+  join(__dirname, '../pages/tools/ToolPageLayout.tsx'),
+  'utf8',
+);
+const catalogSource = readFileSync(
+  join(__dirname, '../pages/tools/ClinicalToolCatalog.tsx'),
+  'utf8',
+);
 const toolNotFoundSource = readFileSync(join(__dirname, '../pages/tools/ToolNotFound.tsx'), 'utf8');
-const toolsOverviewSource = readFileSync(join(__dirname, '../pages/tools/ToolsOverview.tsx'), 'utf8');
+const toolsOverviewSource = readFileSync(
+  join(__dirname, '../pages/tools/ToolsOverview.tsx'),
+  'utf8',
+);
 // Fleet/hospital-ops routes are mounted through a config-driven route tree
 // rather than literal <Route> JSX in router.tsx.
 const operationsFleetConsoleRouteTreeSource = readFileSync(
@@ -94,13 +100,13 @@ export const ROADMAP_PR_SLICE_BY_REGISTRY_ID = Object.freeze(
     [REGISTRY.predictiveMaintenance, 'PR6-fleet'],
     [REGISTRY.routeOptimizer, 'PR6-fleet'],
     [REGISTRY.dispatchAi, 'PR6-fleet'],
-  ])
+  ]),
 );
 
 const REGISTRY_ID_TO_BUILTIN_SLUG = Object.freeze(
   Object.fromEntries(
-    Object.entries(BUILTIN_CALC_ID_TO_REGISTRY_ID).map(([slug, registryId]) => [registryId, slug])
-  )
+    Object.entries(BUILTIN_CALC_ID_TO_REGISTRY_ID).map(([slug, registryId]) => [registryId, slug]),
+  ),
 );
 
 const HUB_GROUP_TOOL_IDS = new Set(CHAT_ASSISTED_HUB_GROUPS.flatMap((g) => g.toolIds));
@@ -115,19 +121,17 @@ function catalogHasRegistry(registryId) {
 function discoveryHasRegistry(registryId) {
   const ids = new Set([registryId]);
   for (const nlu of clinicalIntentTools.filter(
-    (t) => t.sidebarToolId === registryId || t.toolId === registryId
+    (t) => t.sidebarToolId === registryId || t.toolId === registryId,
   )) {
     ids.add(nlu.toolId);
   }
   return discoveredRows().some(
-    (row) => ids.has(row.id) || ids.has(row.mapsTo) || row.registryId === registryId
+    (row) => ids.has(row.id) || ids.has(row.mapsTo) || row.registryId === registryId,
   );
 }
 
 function nluApplies(registryId) {
-  return clinicalIntentTools.some(
-    (t) => t.toolId === registryId || t.sidebarToolId === registryId
-  );
+  return clinicalIntentTools.some((t) => t.toolId === registryId || t.sidebarToolId === registryId);
 }
 
 function appUsesRetiredToolsRedirect() {
@@ -228,21 +232,19 @@ export function buildFrontendRenderingRow(registryId) {
       discovery: discoveryHasRegistry(registryId),
       nlu: nluApplies(registryId),
       catalogLaunchHandler: catalogSource.includes('applyRegistryToolLaunch'),
-      calculatorHub: Boolean(
-        uiCalc || TIER_B_CHAT_CALCULATOR_REGISTRY_IDS.includes(registryId)
-      ),
+      calculatorHub: Boolean(uiCalc || TIER_B_CHAT_CALCULATOR_REGISTRY_IDS.includes(registryId)),
       tierAFormSwitch: tier === 'A' ? calculatorsSwitchRegistered(builtinSlug) : null,
       tierBHubCard: ['B', 'fleet-B'].includes(tier) ? hubCardRegistered(registryId) : null,
       tierBChatSeed:
-        ['B', 'fleet-B'].includes(tier) &&
-        Boolean(launch.chatSeed && launch.chatSeed.length > 20),
+        ['B', 'fleet-B'].includes(tier) && Boolean(launch.chatSeed && launch.chatSeed.length > 20),
       fleetPage: tier === 'fleet-A' ? appRouteRegistered(registryId, null, reg?.path) : null,
       clinicalDisclaimer: ['A', 'B'].includes(tier) ? disclaimerLayerOk(registryId, tier) : null,
       operationalDisclaimer: ['fleet-A', 'fleet-B'].includes(tier)
         ? disclaimerLayerOk(registryId, tier)
         : null,
       toolNotFoundFallback:
-        calculatorsSource.includes('<ToolNotFound') && toolNotFoundSource.includes('resolveCatalogLaunch'),
+        calculatorsSource.includes('<ToolNotFound') &&
+        toolNotFoundSource.includes('resolveCatalogLaunch'),
       mobileSafeLayout:
         catalogSource.includes('clinical-tool-catalog') &&
         (mobileCalculatorCss.includes('min-height: 44px') ||

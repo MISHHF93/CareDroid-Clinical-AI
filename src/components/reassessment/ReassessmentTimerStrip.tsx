@@ -3,7 +3,11 @@ import './ReassessmentTimerStrip.css';
 
 function TimerPill({ label, value, tone = 'neutral', title = undefined as any }) {
   return (
-    <span className="reassessment-timer-strip__pill" data-tone={tone} title={title || `${label}: ${value}`}>
+    <span
+      className="reassessment-timer-strip__pill"
+      data-tone={tone}
+      title={title || `${label}: ${value}`}
+    >
       <small>{label}</small>
       <strong>{value}</strong>
     </span>
@@ -11,11 +15,7 @@ function TimerPill({ label, value, tone = 'neutral', title = undefined as any })
 }
 
 /** Compact unified timer strip for whiteboard cards and safety board rows. */
-export default function ReassessmentTimerStrip({
-  timer,
-  showDueTimes = false,
-  className = '',
-}) {
+export default function ReassessmentTimerStrip({ timer, showDueTimes = false, className = '' }) {
   if (!timer) return null;
 
   return (

@@ -17,10 +17,7 @@ import {
   DESIGN_ELEVATION,
   DESIGN_CARD_PADDING,
 } from '../layout/designTokens';
-import {
-  SIDEBAR_WIDTH_COLLAPSED_PX,
-  SIDEBAR_WIDTH_EXPANDED_PX,
-} from '../layout/breakpoints';
+import { SIDEBAR_WIDTH_COLLAPSED_PX, SIDEBAR_WIDTH_EXPANDED_PX } from '../layout/breakpoints';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const designTokensCss = readFileSync(join(__dirname, 'design-tokens.css'), 'utf8');
@@ -104,7 +101,15 @@ describe('design-tokens.css — semantic token layer', () => {
     ]) {
       expect(designTokensCss).toContain(token);
     }
-    for (const primitive of ['.cd-page', '.cd-card--dashboard', '.cd-card--tool', '.cd-card--calculator', '.cd-empty', '.cd-loading', '.cd-error']) {
+    for (const primitive of [
+      '.cd-page',
+      '.cd-card--dashboard',
+      '.cd-card--tool',
+      '.cd-card--calculator',
+      '.cd-empty',
+      '.cd-loading',
+      '.cd-error',
+    ]) {
       expect(designTokensCss).toContain(primitive);
     }
     expect(DESIGN_CARD_PADDING.calculator).toBe('var(--app-card-padding-calculator)');

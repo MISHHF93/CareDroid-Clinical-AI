@@ -50,7 +50,9 @@ function WorkflowAutomationCommandBar() {
         <strong>Workflow automation</strong>
         <span>{pendingCount} awaiting review</span>
         {criticalCount > 0 ? (
-          <span className="workflow-automation-command-bar__critical">{criticalCount} critical</span>
+          <span className="workflow-automation-command-bar__critical">
+            {criticalCount} critical
+          </span>
         ) : null}
         {clicksSavedEstimate > 0 ? (
           <span className="workflow-automation-command-bar__metric">
@@ -124,7 +126,10 @@ function WorkflowAutomationCommandBar() {
       </ol>
 
       <div className="workflow-automation-command-bar__footer">
-        <Link to={CANONICAL_ROUTES.emergencyCommandCenter} className="workflow-automation-command-bar__btn">
+        <Link
+          to={CANONICAL_ROUTES.emergencyCommandCenter}
+          className="workflow-automation-command-bar__btn"
+        >
           Review all automations
         </Link>
       </div>

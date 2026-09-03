@@ -41,9 +41,7 @@ describe('MemoryDashboard real API data', () => {
       </MemoryRouter>,
     );
 
-    await waitFor(() =>
-      expect(screen.getByText('Real API activity title')).toBeInTheDocument(),
-    );
+    await waitFor(() => expect(screen.getByText('Real API activity title')).toBeInTheDocument());
     expect(screen.getByText('Real API saved workflow title')).toBeInTheDocument();
     // The subtitle must show a real derived value (a formatted timestamp),
     // not fall through to the generic placeholder while real data exists.
@@ -62,9 +60,7 @@ describe('MemoryDashboard real API data', () => {
       </MemoryRouter>,
     );
 
-    await waitFor(() =>
-      expect(screen.getByText('qSOFA calculator session')).toBeInTheDocument(),
-    );
+    await waitFor(() => expect(screen.getByText('qSOFA calculator session')).toBeInTheDocument());
     expect(screen.getByText('Sepsis risk context')).toBeInTheDocument();
     expect(screen.getByText('saved')).toBeInTheDocument();
   });

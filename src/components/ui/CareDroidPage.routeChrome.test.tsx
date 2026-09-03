@@ -24,7 +24,11 @@ import { RouteChromeProvider, useRouteChrome } from '../../contexts/RouteChromeC
 function ChromeSpy() {
   const { chrome } = useRouteChrome();
   return (
-    <div data-testid="chrome-spy" data-title={String(chrome.title ?? '')} data-has-title={String('title' in chrome && chrome.title != null)} />
+    <div
+      data-testid="chrome-spy"
+      data-title={String(chrome.title ?? '')}
+      data-has-title={String('title' in chrome && chrome.title != null)}
+    />
   );
 }
 
@@ -43,7 +47,10 @@ describe('CareDroidPage outside a RouteChromeProvider (isolated render, no shell
   it('falls back to its own visible header instead of silently dropping title/actions (regression: TrainingDashboard "Queue Training" button vanished)', () => {
     const { container } = render(
       <MemoryRouter>
-        <CareDroidPage title="Training Dashboard" actions={<button type="button">Queue Training</button>}>
+        <CareDroidPage
+          title="Training Dashboard"
+          actions={<button type="button">Queue Training</button>}
+        >
           <p>body</p>
         </CareDroidPage>
       </MemoryRouter>,
@@ -98,7 +105,11 @@ describe('CareDroidPage route-chrome registration (HEAL-185)', () => {
         <MemoryRouter>
           <RouteChromeProvider>
             <ChromeSpy />
-            {mounted ? <CareDroidPage title="Training Dashboard"><p>body</p></CareDroidPage> : null}
+            {mounted ? (
+              <CareDroidPage title="Training Dashboard">
+                <p>body</p>
+              </CareDroidPage>
+            ) : null}
           </RouteChromeProvider>
         </MemoryRouter>
       );

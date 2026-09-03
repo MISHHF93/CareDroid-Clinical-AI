@@ -11,7 +11,10 @@ import {
   validateArtifactCatalog,
 } from '../../data/artifactIntelligence';
 import { DEMO_LIVE_STATES } from '../../utils/demoLiveState';
-import { buildArtifactCategoryChart, buildArtifactTypeChart } from '../../utils/platformSaasChartModel';
+import {
+  buildArtifactCategoryChart,
+  buildArtifactTypeChart,
+} from '../../utils/platformSaasChartModel';
 import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import './Artifacts.css';
 
@@ -54,8 +57,13 @@ export default function Artifacts() {
         <div className="artifacts-page__title-row">
           <GraphicIconBadge iconKey="report" accent="brand" size="md" />
           <div>
-            <p className="artifacts-page-title-text" data-testid="cd-page-title-text">CareDroid Artifacts</p>
-            <p>Machine-learning-ready artifact catalog with resonance metadata, validation, and export-ready schema fields.</p>
+            <p className="artifacts-page-title-text" data-testid="cd-page-title-text">
+              CareDroid Artifacts
+            </p>
+            <p>
+              Machine-learning-ready artifact catalog with resonance metadata, validation, and
+              export-ready schema fields.
+            </p>
           </div>
         </div>
         <div className="artifacts-page__actions">
@@ -80,7 +88,11 @@ export default function Artifacts() {
           onChange={(event) => setQuery(event.target.value)}
           aria-label="Search artifacts"
         />
-        <select value={typeFilter} onChange={(event) => setTypeFilter(event.target.value)} aria-label="Filter by type">
+        <select
+          value={typeFilter}
+          onChange={(event) => setTypeFilter(event.target.value)}
+          aria-label="Filter by type"
+        >
           <option value="all">All types</option>
           {typeOptions.map((type) => (
             <option key={type} value={type}>
@@ -90,10 +102,29 @@ export default function Artifacts() {
         </select>
       </div>
 
-      <div className="artifacts-page__metrics" role="group" aria-label="Artifact catalog summary metrics">
-        <MetricCard label="Artifacts" value={String(catalog.length)} hint="Catalog rows" tone="neutral" />
-        <MetricCard label="Types" value={String(typeOptions.length)} hint="Artifact categories" tone="neutral" />
-        <MetricCard label="Orphans" value={String(orphanCount)} hint="Unlinked assets" tone={orphanCount > 0 ? 'warning' : 'good'} />
+      <div
+        className="artifacts-page__metrics"
+        role="group"
+        aria-label="Artifact catalog summary metrics"
+      >
+        <MetricCard
+          label="Artifacts"
+          value={String(catalog.length)}
+          hint="Catalog rows"
+          tone="neutral"
+        />
+        <MetricCard
+          label="Types"
+          value={String(typeOptions.length)}
+          hint="Artifact categories"
+          tone="neutral"
+        />
+        <MetricCard
+          label="Orphans"
+          value={String(orphanCount)}
+          hint="Unlinked assets"
+          tone={orphanCount > 0 ? 'warning' : 'good'}
+        />
         <MetricCard
           label="Validation"
           value={validation.ok ? 'Pass' : 'Review'}
@@ -103,7 +134,11 @@ export default function Artifacts() {
       </div>
 
       <div className="artifacts-page__charts">
-        <VisualizationPanel title="Artifact types" description="Top artifact types across the platform catalog." badge="Types">
+        <VisualizationPanel
+          title="Artifact types"
+          description="Top artifact types across the platform catalog."
+          badge="Types"
+        >
           <CategoryBarChart
             data={typeChart}
             title="Artifact types"
@@ -111,7 +146,11 @@ export default function Artifacts() {
             emptyMessage="Type chart appears when artifacts are registered."
           />
         </VisualizationPanel>
-        <VisualizationPanel title="Artifact categories" description="Top categories by catalog volume." badge="Categories">
+        <VisualizationPanel
+          title="Artifact categories"
+          description="Top categories by catalog volume."
+          badge="Categories"
+        >
           <CategoryBarChart
             data={categoryChart}
             title="Artifact categories"
@@ -125,7 +164,8 @@ export default function Artifacts() {
         <div className="artifacts-page__panel-head">
           <h2>Catalog results</h2>
           <p>
-            Showing {Math.min(filteredArtifacts.length, DISPLAY_LIMIT)} of {filteredArtifacts.length} matches
+            Showing {Math.min(filteredArtifacts.length, DISPLAY_LIMIT)} of{' '}
+            {filteredArtifacts.length} matches
             {duplicateCount > 0 ? ` · ${duplicateCount} duplicate groups detected` : ''}
           </p>
         </div>

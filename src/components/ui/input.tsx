@@ -1,7 +1,7 @@
 import { useId, useState } from 'react';
 import './input.css';
 
-const Input = ({ 
+const Input = ({
   type = 'text',
   label,
   error,
@@ -18,7 +18,7 @@ const Input = ({
   compact = false,
   className,
   style,
-  ...props 
+  ...props
 }) => {
   const generatedId = useId();
   const inputId = id || generatedId;
@@ -51,7 +51,10 @@ const Input = ({
   return (
     <div className="input-wrapper">
       {label && (
-        <label className={`input-label ${isFocused ? 'input-label-focused' : ''}`} htmlFor={inputId}>
+        <label
+          className={`input-label ${isFocused ? 'input-label-focused' : ''}`}
+          htmlFor={inputId}
+        >
           {label}
         </label>
       )}

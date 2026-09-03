@@ -30,12 +30,19 @@ import { navigateToEmergencySurface } from '../services/navigateToEmergencySurfa
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import { MEDICAL_THEME } from '../config/medicalTheme.constants';
 import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
-import { isRouteAllowedForProfile, resolveUserProfileFromSaasRole } from '../config/userProfileCatalog';
+import {
+  isRouteAllowedForProfile,
+  resolveUserProfileFromSaasRole,
+} from '../config/userProfileCatalog';
 import { navigateProfileAware } from '../navigation/profileRouteLaunch';
 import { dispatchOpenHelpHub } from '../contexts/HelpHubContext';
 import type { EmergencyRoleActionPresentation } from '../config/emergencyRoleActionMatrix';
 import type { Patient } from '../types/emergency';
-import { getPatientDisplayName, rankPatientsBySearch, scorePatientSearch } from '../utils/patientSearch';
+import {
+  getPatientDisplayName,
+  rankPatientsBySearch,
+  scorePatientSearch,
+} from '../utils/patientSearch';
 import {
   buildEncounterSearchPath,
   buildEmsCasePath,
@@ -139,7 +146,9 @@ type GroupedResult = {
 };
 
 type PatientLookupFields = Pick<Patient, 'id' | 'firstName' | 'lastName' | 'name' | 'mrn' | 'dob'> &
-  Partial<Pick<Patient, 'chiefComplaint' | 'complaint' | 'complaintCategory' | 'state' | 'priority'>>;
+  Partial<
+    Pick<Patient, 'chiefComplaint' | 'complaint' | 'complaintCategory' | 'state' | 'priority'>
+  >;
 
 type CommandPaletteProps = {
   open: boolean;
@@ -224,11 +233,11 @@ export function matchAndRankCommands(commands: Command[], query: string): Comman
 
 export { getPatientDisplayName } from '../utils/patientSearch';
 
-export function patientNameMatchScore(
-  patient: PatientLookupFields,
-  query: string,
-): number {
-  return scorePatientSearch(patient as unknown as Parameters<typeof scorePatientSearch>[0], query)?.score ?? -1;
+export function patientNameMatchScore(patient: PatientLookupFields, query: string): number {
+  return (
+    scorePatientSearch(patient as unknown as Parameters<typeof scorePatientSearch>[0], query)
+      ?.score ?? -1
+  );
 }
 
 export function searchOperationalEntitiesForPalette(
@@ -251,7 +260,10 @@ export function searchOperationalEntitiesForPalette(
     saasRole?: string;
   },
 ): OperationalEntityResult[] {
-  const groupLabel: Record<Exclude<OperationalSearchEntityType, 'patient'>, OperationalEntityResult['group']> = {
+  const groupLabel: Record<
+    Exclude<OperationalSearchEntityType, 'patient'>,
+    OperationalEntityResult['group']
+  > = {
     encounter: 'Encounters',
     referral: 'Referrals',
     ems: 'EMS',
@@ -287,14 +299,21 @@ export function searchOperationalEntitiesForPalette(
           return;
         }
         if (hit.entityType === 'ems' && hit.emsArrivalId) {
-          navigateProfileAware(navigate, buildEmsCasePath(hit.emsArrivalId), { emergencyRole, saasRole });
-          return;
-        }
-        if (hit.entityType === 'queue') {
-          navigateProfileAware(navigate, buildQueueItemPath(hit.queueType || 'Waiting', hit.patientId), {
+          navigateProfileAware(navigate, buildEmsCasePath(hit.emsArrivalId), {
             emergencyRole,
             saasRole,
           });
+          return;
+        }
+        if (hit.entityType === 'queue') {
+          navigateProfileAware(
+            navigate,
+            buildQueueItemPath(hit.queueType || 'Waiting', hit.patientId),
+            {
+              emergencyRole,
+              saasRole,
+            },
+          );
         }
       },
     }));
@@ -358,15 +377,17 @@ export function searchPatientsByName(
   const normalizedQuery = normalizeSearch(query);
   if (!normalizedQuery) return [];
 
-  return rankPatientsBySearch(patients, normalizedQuery, MAX_PATIENT_RESULTS).map(({ patient }) => ({
-    type: 'patient',
-    id: `patient-${patient.id}`,
-    label: `${getPatientDisplayName(patient)} · ${patient.chiefComplaint || patient.complaint || 'Complaint not set'} · ${patient.state} · ${formatPatientWait(patient, now)}`,
-    description: `Select patient ${patient.mrn}`,
-    group: 'Patients',
-    icon: 'person',
-    action: () => useEmergencyStore.getState().selectPatient(patient.id),
-  }));
+  return rankPatientsBySearch(patients, normalizedQuery, MAX_PATIENT_RESULTS).map(
+    ({ patient }) => ({
+      type: 'patient',
+      id: `patient-${patient.id}`,
+      label: `${getPatientDisplayName(patient)} · ${patient.chiefComplaint || patient.complaint || 'Complaint not set'} · ${patient.state} · ${formatPatientWait(patient, now)}`,
+      description: `Select patient ${patient.mrn}`,
+      group: 'Patients',
+      icon: 'person',
+      action: () => useEmergencyStore.getState().selectPatient(patient.id),
+    }),
+  );
 }
 
 export function readRecentCommandIds(storage: StorageLike | null = getBrowserStorage()): string[] {
@@ -498,7 +519,10 @@ export function resolveCommandActionPresentation(
 }
 
 export function isCommandVisibleForEmergencyRole(
-  command: Pick<CommandWithVisibility, 'id' | 'requiredAction' | 'requiredRoute' | 'hiddenInPilotMode'>,
+  command: Pick<
+    CommandWithVisibility,
+    'id' | 'requiredAction' | 'requiredRoute' | 'hiddenInPilotMode'
+  >,
   emergencyRole: EmergencyCommandPermissions,
   saasRole?: string,
 ): boolean {
@@ -558,10 +582,20 @@ function createHighValueCommands(
         : CANONICAL_ROUTES.emergencyWhiteboard,
       action: () => {
         if (prefersReceptionForPatientCreate(emergencyRole.role)) {
-          navigateWithRoleGuard(navigate, getReceptionPrimaryCreatePath(emergencyRole.role), emergencyRole, saasRole);
+          navigateWithRoleGuard(
+            navigate,
+            getReceptionPrimaryCreatePath(emergencyRole.role),
+            emergencyRole,
+            saasRole,
+          );
           return;
         }
-        navigateWithRoleGuard(navigate, CANONICAL_ROUTES.emergencyWhiteboard, emergencyRole, saasRole);
+        navigateWithRoleGuard(
+          navigate,
+          CANONICAL_ROUTES.emergencyWhiteboard,
+          emergencyRole,
+          saasRole,
+        );
         window.setTimeout(() => dispatchDocumentEvent('open-intake'), 0);
       },
     },
@@ -571,7 +605,15 @@ function createHighValueCommands(
       description: 'Open Smart Intake for walk-in, EMS, or identity verification.',
       shortcut: 'I',
       group: quickGroup,
-      keywords: ['start intake', 'intake', 'smart intake', 'arrival', 'identity', 'registration', 'ocr'],
+      keywords: [
+        'start intake',
+        'intake',
+        'smart intake',
+        'arrival',
+        'identity',
+        'registration',
+        'ocr',
+      ],
       requiredAction: EMERGENCY_ACTIONS.createPatient,
       requiredRoute: prefersReceptionForPatientCreate(emergencyRole.role)
         ? CANONICAL_ROUTES.emergencyReception
@@ -583,10 +625,20 @@ function createHighValueCommands(
             dispatchDocumentEvent('open-reception-intake');
             return;
           }
-          navigateWithRoleGuard(navigate, getReceptionEmbeddedIntakePath(), emergencyRole, saasRole);
+          navigateWithRoleGuard(
+            navigate,
+            getReceptionEmbeddedIntakePath(),
+            emergencyRole,
+            saasRole,
+          );
           return;
         }
-        navigateWithRoleGuard(navigate, CANONICAL_ROUTES.emergencyWhiteboard, emergencyRole, saasRole);
+        navigateWithRoleGuard(
+          navigate,
+          CANONICAL_ROUTES.emergencyWhiteboard,
+          emergencyRole,
+          saasRole,
+        );
         window.setTimeout(() => dispatchDocumentEvent('open-intake'), 0);
       },
     },
@@ -598,7 +650,13 @@ function createHighValueCommands(
       group: quickGroup,
       keywords: ['whiteboard', 'board', 'patient flow', 'operational screen', 'charge nurse'],
       requiredRoute: CANONICAL_ROUTES.emergencyWhiteboard,
-      action: () => navigateWithRoleGuard(navigate, CANONICAL_ROUTES.emergencyWhiteboard, emergencyRole, saasRole),
+      action: () =>
+        navigateWithRoleGuard(
+          navigate,
+          CANONICAL_ROUTES.emergencyWhiteboard,
+          emergencyRole,
+          saasRole,
+        ),
     },
     {
       id: 'open-ems',
@@ -608,7 +666,8 @@ function createHighValueCommands(
       group: quickGroup,
       keywords: ['ems', 'pre-arrival', 'ambulance', 'pipeline', 'inbound'],
       requiredRoute: CANONICAL_ROUTES.emergencyEms,
-      action: () => navigateWithRoleGuard(navigate, CANONICAL_ROUTES.emergencyEms, emergencyRole, saasRole),
+      action: () =>
+        navigateWithRoleGuard(navigate, CANONICAL_ROUTES.emergencyEms, emergencyRole, saasRole),
     },
     {
       id: 'open-reassessment',
@@ -632,7 +691,12 @@ function createHighValueCommands(
       requiredAction: EMERGENCY_ACTIONS.manageReferral,
       requiredRoute: CANONICAL_ROUTES.emergencyReferrals,
       action: () =>
-        navigateWithRoleGuard(navigate, `${CANONICAL_ROUTES.emergencyReferrals}?new=1`, emergencyRole, saasRole),
+        navigateWithRoleGuard(
+          navigate,
+          `${CANONICAL_ROUTES.emergencyReferrals}?new=1`,
+          emergencyRole,
+          saasRole,
+        ),
     },
   ];
 }
@@ -730,12 +794,19 @@ function createCommands(
           isRouteAllowedInCompiledProfile(command.requiredRoute, compiled),
       )
       .map((command) => ({
-      ...command,
-      group: 'Clinical' as const,
-      description: command.description?.replace(' in the active CareDroid shell.', ' in Medical Tools.'),
-    })),
+        ...command,
+        group: 'Clinical' as const,
+        description: command.description?.replace(
+          ' in the active CareDroid shell.',
+          ' in Medical Tools.',
+        ),
+      })),
     ...EMERGENCY_OS_HELP_COMMANDS.map((command) => {
-      const built = command.build() as { type: string; tab?: 'page' | 'role' | 'process' | 'topics' | 'shortcuts'; topicId?: string };
+      const built = command.build() as {
+        type: string;
+        tab?: 'page' | 'role' | 'process' | 'topics' | 'shortcuts';
+        topicId?: string;
+      };
       return {
         id: command.id,
         label: command.label.replace(/^Open /, ''),
@@ -776,9 +847,23 @@ function createCommands(
       label: 'Collaboration Hub',
       description: 'Department channels, patient threads, incidents, and AI Chief recommendations.',
       group: 'Department',
-      keywords: ['chat', 'messages', 'channels', 'collaboration', 'discussion', 'incident', 'mentions'],
+      keywords: [
+        'chat',
+        'messages',
+        'channels',
+        'collaboration',
+        'discussion',
+        'incident',
+        'mentions',
+      ],
       requiredRoute: CANONICAL_ROUTES.emergencyCollaboration,
-      action: () => navigateWithRoleGuard(navigate, CANONICAL_ROUTES.emergencyCollaboration, emergencyRole, saasRole),
+      action: () =>
+        navigateWithRoleGuard(
+          navigate,
+          CANONICAL_ROUTES.emergencyCollaboration,
+          emergencyRole,
+          saasRole,
+        ),
     },
     {
       id: 'toggle-copilot',
@@ -796,7 +881,8 @@ function createCommands(
           {
             id: 'discharge-selected-patient',
             label: 'Discharge Selected Patient',
-            description: 'Open discharge confirmation for the selected patient; no autonomous discharge.',
+            description:
+              'Open discharge confirmation for the selected patient; no autonomous discharge.',
             group: 'Clinical' as const,
             keywords: ['discharge', 'disposition', 'send home', 'close encounter'],
             requiredAction: EMERGENCY_ACTIONS.dischargePatient,
@@ -1055,7 +1141,9 @@ export default function CommandPalette({ open, onClose, onExecute }: CommandPale
                     style={{
                       ...styles.resultItem,
                       ...(active ? styles.resultItemActive : null),
-                      ...(result.type === 'command' && result.disabled ? styles.resultItemDisabled : null),
+                      ...(result.type === 'command' && result.disabled
+                        ? styles.resultItemDisabled
+                        : null),
                     }}
                   >
                     <span
@@ -1101,7 +1189,9 @@ export default function CommandPalette({ open, onClose, onExecute }: CommandPale
                   : 'Your role may not have access to pinned quick actions. Type to search or use the sidebar.'
               }
               nextSteps={
-                normalizeSearch(query) ? EMPTY_STATE_COPY.commandPalette.noResults.nextSteps : ([] as string[])
+                normalizeSearch(query)
+                  ? EMPTY_STATE_COPY.commandPalette.noResults.nextSteps
+                  : ([] as string[])
               }
             />
           ) : null}

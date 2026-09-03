@@ -60,13 +60,9 @@ export async function fetchUnifiedModelHealth(): Promise<UnifiedModelHealth> {
   return parseApiResponse<UnifiedModelHealth>(response, { fallback: null });
 }
 
-export function resolveUnifiedAiCapability(
-  capabilityId: string,
-): UnifiedAiNodeCapability | null {
+export function resolveUnifiedAiCapability(capabilityId: string): UnifiedAiNodeCapability | null {
   return (
-    PLATFORM_AI_SERVICE_NODE_MAP[capabilityId] ||
-    AI_SYSTEM_TOOL_NODE_MAP[capabilityId] ||
-    null
+    PLATFORM_AI_SERVICE_NODE_MAP[capabilityId] || AI_SYSTEM_TOOL_NODE_MAP[capabilityId] || null
   );
 }
 
@@ -88,7 +84,8 @@ function stampUnifiedNodeContext(
 function readRoleFromContext(context: unknown): string | undefined {
   if (!isRecord(context)) return undefined;
   if (typeof context.userRole === 'string') return context.userRole;
-  if (isRecord(context.tenant) && typeof context.tenant.role === 'string') return context.tenant.role;
+  if (isRecord(context.tenant) && typeof context.tenant.role === 'string')
+    return context.tenant.role;
   return undefined;
 }
 

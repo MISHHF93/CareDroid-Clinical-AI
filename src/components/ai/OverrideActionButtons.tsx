@@ -38,7 +38,11 @@ export function OverrideActionButtons({
         <X aria-hidden="true" size={14} />
         <span>{dismissLabel}</span>
       </button>
-      <button type="button" className="cd-ai-actions__button cd-ai-actions__button--escalate" onClick={onEscalate}>
+      <button
+        type="button"
+        className="cd-ai-actions__button cd-ai-actions__button--escalate"
+        onClick={onEscalate}
+      >
         <Siren aria-hidden="true" size={14} />
         <span>{escalateLabel}</span>
       </button>

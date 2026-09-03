@@ -51,7 +51,8 @@ export const MARKETPLACE_ITEMS = Object.freeze([
     id: 'workflow-discharge-readiness',
     category: 'workflows',
     title: 'Discharge Readiness Workflow',
-    summary: 'Coordinates documentation, patient education, medication review, and follow-up tasks.',
+    summary:
+      'Coordinates documentation, patient education, medication review, and follow-up tasks.',
     owner: 'CareDroid Workflow Studio',
     route: '/workflows',
     entitlement: 'workflow-executions',
@@ -101,7 +102,8 @@ export const MARKETPLACE_ITEMS = Object.freeze([
     id: 'agent-clinical-copilot',
     category: 'ai-agents',
     title: 'Clinical Copilot Agent',
-    summary: 'General clinical assistant for explainable reasoning, documentation, and tool routing.',
+    summary:
+      'General clinical assistant for explainable reasoning, documentation, and tool routing.',
     owner: 'CareDroid AI Agents',
     route: '/assistant',
     entitlement: 'ai-requests',
@@ -111,7 +113,8 @@ export const MARKETPLACE_ITEMS = Object.freeze([
     id: 'agent-operations-copilot',
     category: 'ai-agents',
     title: 'Operations Copilot Agent',
-    summary: 'AI support for throughput, incident review, device operations, and command center tasks.',
+    summary:
+      'AI support for throughput, incident review, device operations, and command center tasks.',
     owner: 'CareDroid AI Agents',
     route: '/assistant',
     entitlement: 'ai-requests',
@@ -129,7 +132,8 @@ export const MARKETPLACE_ITEMS = Object.freeze([
     // out everywhere marketplaceCatalog.ts is consumed), but the summary
     // text should never overclaim even while inert, in case a future
     // change makes it reachable.
-    summary: 'Planned connector for FHIR-capable EHR and clinical data sources -- not yet a live integration.',
+    summary:
+      'Planned connector for FHIR-capable EHR and clinical data sources -- not yet a live integration.',
     owner: 'CareDroid Integration Hub',
     route: '/integrations-marketplace',
     entitlement: 'integrations',

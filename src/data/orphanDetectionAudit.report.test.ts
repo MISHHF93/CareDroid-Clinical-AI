@@ -68,18 +68,26 @@ describe('orphanDetectionAudit report', () => {
     expect(classified[ORPHAN_CLASSIFICATIONS.WIRE] ?? 0).toBe(EXPECTED_WIRE_FINDING_COUNT);
   });
 
-  it('scans real .tsx/.ts page, component, and service files, not just legacy .jsx/.js (Cycle 153 — was scanning zero files)', { timeout: 480_000 }, () => {
-    const report = buildOrphanDetectionReport();
-    const allIds = report.all.map((item) => item.id || item.path).filter(Boolean);
-    expect(allIds.some((id) => id.endsWith('.tsx'))).toBe(true);
-  });
+  it(
+    'scans real .tsx/.ts page, component, and service files, not just legacy .jsx/.js (Cycle 153 — was scanning zero files)',
+    { timeout: 480_000 },
+    () => {
+      const report = buildOrphanDetectionReport();
+      const allIds = report.all.map((item) => item.id || item.path).filter(Boolean);
+      expect(allIds.some((id) => id.endsWith('.tsx'))).toBe(true);
+    },
+  );
 
-  it('writes docs/orphan-detection-report.md when ORPHAN_DETECTION_WRITE_DOCS=1', { timeout: 480_000 }, () => {
-    if (!process.env.ORPHAN_DETECTION_WRITE_DOCS) return;
+  it(
+    'writes docs/orphan-detection-report.md when ORPHAN_DETECTION_WRITE_DOCS=1',
+    { timeout: 480_000 },
+    () => {
+      if (!process.env.ORPHAN_DETECTION_WRITE_DOCS) return;
 
-    const markdown = formatOrphanDetectionMarkdown();
-    mkdirSync(docsDir, { recursive: true });
-    writeFileSync(join(docsDir, 'orphan-detection-report.md'), `${markdown}\n`);
-    expect(existsSync(join(docsDir, 'orphan-detection-report.md'))).toBe(true);
-  });
+      const markdown = formatOrphanDetectionMarkdown();
+      mkdirSync(docsDir, { recursive: true });
+      writeFileSync(join(docsDir, 'orphan-detection-report.md'), `${markdown}\n`);
+      expect(existsSync(join(docsDir, 'orphan-detection-report.md'))).toBe(true);
+    },
+  );
 });

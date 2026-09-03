@@ -24,7 +24,10 @@ export default function DeviceContextPanel({ compact = false, className = '' }) 
           ) : null}
         </div>
         {deviceContext.definition ? (
-          <span className="device-context-panel__badge" data-kiosk={deviceContext.isKiosk || undefined}>
+          <span
+            className="device-context-panel__badge"
+            data-kiosk={deviceContext.isKiosk || undefined}
+          >
             {deviceContext.definition.label}
           </span>
         ) : null}
@@ -35,7 +38,7 @@ export default function DeviceContextPanel({ compact = false, className = '' }) 
         <select
           value={deviceContext.deviceContextId || ''}
           onChange={(event) =>
-            deviceContext.setDeviceContext(event.target.value ? event.target.value as any : null)
+            deviceContext.setDeviceContext(event.target.value ? (event.target.value as any) : null)
           }
         >
           <option value="">Follow role and route defaults</option>
@@ -51,8 +54,8 @@ export default function DeviceContextPanel({ compact = false, className = '' }) 
         <p className="device-context-panel__detail">{deviceContext.definition.description}</p>
       ) : (
         <p className="device-context-panel__detail">
-          No workstation binding saved on this device. Choose a context to pin screen mode,
-          landing route, and kiosk behavior locally.
+          No workstation binding saved on this device. Choose a context to pin screen mode, landing
+          route, and kiosk behavior locally.
         </p>
       )}
 

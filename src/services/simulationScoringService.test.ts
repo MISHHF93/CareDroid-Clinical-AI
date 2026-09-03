@@ -144,8 +144,14 @@ describe('simulationScoringService — aggregation', () => {
   it('computeWeeklyTrend buckets runs into rolling weeks ending now', () => {
     const nowMs = Date.parse('2026-07-17T00:00:00.000Z');
     const runs = [
-      run({ completedAt: new Date(nowMs - 1 * 24 * 60 * 60 * 1000).toISOString(), safetyScore: 90 }),
-      run({ completedAt: new Date(nowMs - 10 * 24 * 60 * 60 * 1000).toISOString(), safetyScore: 70 }),
+      run({
+        completedAt: new Date(nowMs - 1 * 24 * 60 * 60 * 1000).toISOString(),
+        safetyScore: 90,
+      }),
+      run({
+        completedAt: new Date(nowMs - 10 * 24 * 60 * 60 * 1000).toISOString(),
+        safetyScore: 70,
+      }),
     ];
     const trend = computeWeeklyTrend(runs, 4, () => nowMs);
     expect(trend).toHaveLength(4);
@@ -179,7 +185,9 @@ describe('simulationScoringService — aggregation', () => {
   });
 
   it('computeRecommendedPractice excludes attempted scenarios and favors weak categories', () => {
-    const runs = [run({ scenarioId: 'sepsis-deterioration', category: 'Emergency', safetyScore: 40 })];
+    const runs = [
+      run({ scenarioId: 'sepsis-deterioration', category: 'Emergency', safetyScore: 40 }),
+    ];
     const recommended = computeRecommendedPractice(SIMULATION_SCENARIOS, runs, 3);
     expect(recommended).not.toContain('sepsis-deterioration');
     expect(recommended.length).toBeGreaterThan(0);

@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { PatientFlag, PatientState, Priority, type Patient, type Referral } from '../types/emergency';
+import {
+  PatientFlag,
+  PatientState,
+  Priority,
+  type Patient,
+  type Referral,
+} from '../types/emergency';
 import {
   WHAT_HAPPENS_NEXT_STEPS,
   buildWhatHappensNextCopilotLines,
@@ -76,20 +82,17 @@ describe('whatHappensNextGuidance', () => {
 
   it('detects referral, admission, and discharge next steps', () => {
     expect(
-      resolveWhatHappensNext(
-        buildPatient({ state: PatientState.Assessment }),
-        {
-          ...testContext,
-          referrals: [
-            {
-              id: 'ref-1',
-              patientId: 'patient-1',
-              status: 'Sent',
-              service: 'Cardiology',
-            } as Referral,
-          ],
-        },
-      )?.stepId,
+      resolveWhatHappensNext(buildPatient({ state: PatientState.Assessment }), {
+        ...testContext,
+        referrals: [
+          {
+            id: 'ref-1',
+            patientId: 'patient-1',
+            status: 'Sent',
+            service: 'Cardiology',
+          } as Referral,
+        ],
+      })?.stepId,
     ).toBe('referral-pending');
 
     expect(
@@ -100,7 +103,8 @@ describe('whatHappensNextGuidance', () => {
     ).toBe('admission-decision-pending');
 
     expect(
-      resolveWhatHappensNext(buildPatient({ state: PatientState.Disposition }), testContext)?.stepId,
+      resolveWhatHappensNext(buildPatient({ state: PatientState.Disposition }), testContext)
+        ?.stepId,
     ).toBe('discharge-workflow-pending');
   });
 
@@ -113,7 +117,9 @@ describe('whatHappensNextGuidance', () => {
       { ...testContext, selectedPatientId: 'patient-1' },
     );
 
-    expect(lines.some((line) => line.includes('Selected patient next step: Test pending'))).toBe(true);
+    expect(lines.some((line) => line.includes('Selected patient next step: Test pending'))).toBe(
+      true,
+    );
     expect(lines.some((line) => line.includes('What happens next queue'))).toBe(true);
   });
 

@@ -10,7 +10,9 @@ vi.mock('../services/emergencyOsApi', () => ({
 }));
 
 vi.mock('../store/emergencyStore', () => ({
-  useEmergencyStore: (selector: (state: { backendAvailable: boolean; capacity: { updatedAt: string } }) => unknown) =>
+  useEmergencyStore: (
+    selector: (state: { backendAvailable: boolean; capacity: { updatedAt: string } }) => unknown,
+  ) =>
     selector({
       backendAvailable: true,
       capacity: { updatedAt: '2026-07-02T11:00:00.000Z' },

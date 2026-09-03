@@ -313,7 +313,9 @@ export default function PreArrivalForm({
             role="tab"
             tabIndex={frameworkTabs.tabIndexFor(id)}
             onKeyDown={frameworkTabs.onKeyDown}
-            {...((form.framework === id) ? { 'aria-selected': 'true' as const } : { 'aria-selected': 'false' as const })}
+            {...(form.framework === id
+              ? { 'aria-selected': 'true' as const }
+              : { 'aria-selected': 'false' as const })}
             className={form.framework === id ? 'is-active' : ''}
             disabled={!canSubmit}
             onClick={() => switchFramework(id as PreArrivalNotificationFramework)}

@@ -91,7 +91,9 @@ describe('PatientCard core whiteboard row', () => {
       </MemoryRouter>,
     );
 
-    const roomDisplayButton = screen.getByRole('button', { name: /open room display for jordan lee/i });
+    const roomDisplayButton = screen.getByRole('button', {
+      name: /open room display for jordan lee/i,
+    });
     fireEvent.click(roomDisplayButton);
 
     expect(window.location.pathname).toBe('/emergency/patient-room');
@@ -150,11 +152,18 @@ describe('PatientCard complaint recognition (2026-08-08)', () => {
     // modified complaint for the render to reflect it.
     const patient = { ...patientWithArrival(), chiefComplaint: 'xyzzy purple wombat requisition' };
     patient.arrival = { ...patient.arrival, chiefComplaint: 'xyzzy purple wombat requisition' };
-    useEmergencyStore.setState({ ...originalState, patients: [patient], selectedPatientId: null }, true);
+    useEmergencyStore.setState(
+      { ...originalState, patients: [patient], selectedPatientId: null },
+      true,
+    );
 
     render(
       <MemoryRouter>
-        <PatientCard patient={patient as never} layout="row" privacyPolicy={FULL_VISIBILITY_POLICY} />
+        <PatientCard
+          patient={patient as never}
+          layout="row"
+          privacyPolicy={FULL_VISIBILITY_POLICY}
+        />
       </MemoryRouter>,
     );
 
@@ -164,7 +173,11 @@ describe('PatientCard complaint recognition (2026-08-08)', () => {
   it('does not show the unrecognized hint for a recognized complaint like the default fixture ("Chest pain")', () => {
     render(
       <MemoryRouter>
-        <PatientCard patient={patientWithArrival() as never} layout="row" privacyPolicy={FULL_VISIBILITY_POLICY} />
+        <PatientCard
+          patient={patientWithArrival() as never}
+          layout="row"
+          privacyPolicy={FULL_VISIBILITY_POLICY}
+        />
       </MemoryRouter>,
     );
 
@@ -176,15 +189,27 @@ describe('PatientCard complaint recognition (2026-08-08)', () => {
       ...patientWithArrival(),
       chiefComplaint: 'xyzzy purple wombat requisition',
       highRiskComplaintFlags: [
-        { id: 'chest-pain' as const, label: 'Chest pain', detectedAt: '2026-06-20T08:00:00.000Z', source: 'staff-selected' as const },
+        {
+          id: 'chest-pain' as const,
+          label: 'Chest pain',
+          detectedAt: '2026-06-20T08:00:00.000Z',
+          source: 'staff-selected' as const,
+        },
       ],
     };
     patient.arrival = { ...patient.arrival, chiefComplaint: 'xyzzy purple wombat requisition' };
-    useEmergencyStore.setState({ ...originalState, patients: [patient], selectedPatientId: null }, true);
+    useEmergencyStore.setState(
+      { ...originalState, patients: [patient], selectedPatientId: null },
+      true,
+    );
 
     render(
       <MemoryRouter>
-        <PatientCard patient={patient as never} layout="row" privacyPolicy={FULL_VISIBILITY_POLICY} />
+        <PatientCard
+          patient={patient as never}
+          layout="row"
+          privacyPolicy={FULL_VISIBILITY_POLICY}
+        />
       </MemoryRouter>,
     );
 
@@ -194,7 +219,10 @@ describe('PatientCard complaint recognition (2026-08-08)', () => {
   it('never computes or shows recognition info when the display privacy policy hides the chief complaint', () => {
     const patient = { ...patientWithArrival(), chiefComplaint: 'xyzzy purple wombat requisition' };
     patient.arrival = { ...patient.arrival, chiefComplaint: 'xyzzy purple wombat requisition' };
-    useEmergencyStore.setState({ ...originalState, patients: [patient], selectedPatientId: null }, true);
+    useEmergencyStore.setState(
+      { ...originalState, patients: [patient], selectedPatientId: null },
+      true,
+    );
     const hiddenPolicy = { ...FULL_VISIBILITY_POLICY, showChiefComplaint: false };
 
     render(

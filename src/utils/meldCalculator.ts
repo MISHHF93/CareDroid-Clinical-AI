@@ -91,10 +91,7 @@ export function calculateMeldNaScore(meldScore, sodiumMmolL) {
   const na = clampMeldSodiumMmolL(sodiumMmolL);
   if (na === null) return null;
 
-  const meldNaRaw =
-    meldForNa +
-    1.32 * (137 - na) -
-    (0.025 * meldForNa + 0.033) * (140 - na);
+  const meldNaRaw = meldForNa + 1.32 * (137 - na) - (0.025 * meldForNa + 0.033) * (140 - na);
 
   const rounded = Math.round(meldNaRaw);
   const withFloor = Math.max(meldScore, rounded);
@@ -215,8 +212,7 @@ export function validateMeldInputs(raw, opts: any = {}) {
   const inrStr = raw.inr === undefined || raw.inr === null ? '' : String(raw.inr).trim();
   const crStr =
     raw.creatinine === undefined || raw.creatinine === null ? '' : String(raw.creatinine).trim();
-  const naStr =
-    raw.sodium === undefined || raw.sodium === null ? '' : String(raw.sodium).trim();
+  const naStr = raw.sodium === undefined || raw.sodium === null ? '' : String(raw.sodium).trim();
 
   if (!biliStr) errors.push('Enter total bilirubin.');
   if (!inrStr) errors.push('Enter INR.');
@@ -243,7 +239,9 @@ export function validateMeldInputs(raw, opts: any = {}) {
   if (naStr && !Number.isFinite(labs.sodiumMmolL)) {
     errors.push('Sodium must be a valid number.');
   } else if (naStr && ((labs.sodiumMmolL as any) < 100 || (labs.sodiumMmolL as any) > 180)) {
-    errors.push('Sodium should be between 100 and 180 mEq/L (values are clamped to 125–140 for MELD-Na).');
+    errors.push(
+      'Sodium should be between 100 and 180 mEq/L (values are clamped to 125–140 for MELD-Na).',
+    );
   }
 
   return { ok: errors.length === 0, errors, labs };
@@ -261,7 +259,8 @@ export function computeMeldResult(raw, opts: any = {}) {
 
   const clamped = applyMeldLabClamps(v.labs);
   const meld = calculateMeldScore(v.labs);
-  if (meld === null) return { ok: false as const, errors: ['Unable to calculate MELD from the values provided.'] };
+  if (meld === null)
+    return { ok: false as const, errors: ['Unable to calculate MELD from the values provided.'] };
 
   let meldNa: any = null;
   let sodiumUsed = null;

@@ -1,6 +1,4 @@
-import {
-  buildReassessmentTimerSnapshot,
-} from '../engine/reassessmentTimerEngine';
+import { buildReassessmentTimerSnapshot } from '../engine/reassessmentTimerEngine';
 import {
   patientHasHighRiskComplaintFlags,
   patientNeedsRapidReview,
@@ -66,13 +64,14 @@ export type WaitingRoomSafetyEscalationContext = {
   communicationOverdueMinutes?: number;
 };
 
-const TRIGGER_LABELS: Readonly<Record<WaitingRoomSafetyEscalationTriggerId, string>> = Object.freeze({
-  'overdue-reassessment': 'Overdue reassessment',
-  'abnormal-vitals': 'Abnormal vitals',
-  'high-risk-complaint': 'High-risk complaint',
-  'long-since-contact': 'Long since contact',
-  'worsening-symptoms': 'Worsening symptoms',
-});
+const TRIGGER_LABELS: Readonly<Record<WaitingRoomSafetyEscalationTriggerId, string>> =
+  Object.freeze({
+    'overdue-reassessment': 'Overdue reassessment',
+    'abnormal-vitals': 'Abnormal vitals',
+    'high-risk-complaint': 'High-risk complaint',
+    'long-since-contact': 'Long since contact',
+    'worsening-symptoms': 'Worsening symptoms',
+  });
 
 export const WAITING_ROOM_SAFETY_ESCALATION_SURFACES = Object.freeze([
   'reception',
@@ -153,15 +152,11 @@ function detectLongSinceContact(
     workflowLogs: context.workflowLogs,
     staff: context.staff,
   });
-  const waitingMinutes =
-    minutesSince(patient.triageTime || patient.arrivalTime, now) ?? 0;
+  const waitingMinutes = minutesSince(patient.triageTime || patient.arrivalTime, now) ?? 0;
   if (communication.minutesSinceContact === null) {
     return waitingMinutes >= overdueMinutes;
   }
-  return (
-    communication.minutesSinceContact >= overdueMinutes ||
-    communication.tone === 'critical'
-  );
+  return communication.minutesSinceContact >= overdueMinutes || communication.tone === 'critical';
 }
 
 function detectWorseningSymptomsReported(

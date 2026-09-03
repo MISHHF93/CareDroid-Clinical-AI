@@ -47,14 +47,17 @@ function getFlagDetectedAt(patient: Patient, flag: PatientFlag): string | null {
       if (entry === flag) return patient.triageTime || patient.arrivalTime || null;
       continue;
     }
-    if ((entry as unknown as { type: string })?.type === flag) return (entry as unknown as { detectedAt?: string }).detectedAt || null;
+    if ((entry as unknown as { type: string })?.type === flag)
+      return (entry as unknown as { detectedAt?: string }).detectedAt || null;
   }
   return null;
 }
 
 function hasFlag(patient: Patient, flag: PatientFlag): boolean {
   return (patient.flags || []).some((entry) =>
-    typeof entry === 'string' ? entry === flag : (entry as unknown as { type: string })?.type === flag,
+    typeof entry === 'string'
+      ? entry === flag
+      : (entry as unknown as { type: string })?.type === flag,
   );
 }
 
@@ -88,8 +91,7 @@ function latestUnreviewedResult(patient: Patient): JourneyEvent | null {
   if (!results.length) return null;
 
   const reviewedAfter = timelineEvents(patient).filter(
-    (event) =>
-      event.type === 'StateChange' && event.metadata?.automation === 'lab-result-reviewed',
+    (event) => event.type === 'StateChange' && event.metadata?.automation === 'lab-result-reviewed',
   );
 
   const latestReview = reviewedAfter.at(-1);
@@ -100,9 +102,7 @@ function latestUnreviewedResult(patient: Patient): JourneyEvent | null {
   if (!latestReview) return candidates[0] || null;
 
   const reviewTime = new Date(latestReview.timestamp).getTime();
-  return (
-    candidates.find((result) => new Date(result.timestamp).getTime() > reviewTime) || null
-  );
+  return candidates.find((result) => new Date(result.timestamp).getTime() > reviewTime) || null;
 }
 
 /**
@@ -169,9 +169,8 @@ function buildTimer(
   triggeredAt?: string,
 ): WhiteboardAutomationTimer {
   const remainingMinutes = minutesUntil(dueAt, now);
-  const overdueMinutes = new Date(dueAt).getTime() <= now.getTime()
-    ? minutesBetween(dueAt, now) || 0
-    : undefined;
+  const overdueMinutes =
+    new Date(dueAt).getTime() <= now.getTime() ? minutesBetween(dueAt, now) || 0 : undefined;
 
   return {
     id,
@@ -269,10 +268,7 @@ export function evaluateWhiteboardAutomation(
         unreviewedResult.timestamp,
       ),
     );
-  } else if (
-    patient.state === PatientState.Results ||
-    pendingResultCount(patient) > 0
-  ) {
+  } else if (patient.state === PatientState.Results || pendingResultCount(patient) > 0) {
     events.push(
       buildTimer(
         'results-review-required',
@@ -290,9 +286,12 @@ export function evaluateWhiteboardAutomation(
     : latestTimelineEvent(patient, ['DispositionUpdated']);
   if (
     diagnosisEvent?.metadata?.diagnosis &&
-    [PatientState.Disposition, PatientState.Assessment, PatientState.Results, PatientState.Orders].includes(
-      patient.state,
-    )
+    [
+      PatientState.Disposition,
+      PatientState.Assessment,
+      PatientState.Results,
+      PatientState.Orders,
+    ].includes(patient.state)
   ) {
     events.push(
       buildTimer(
@@ -428,9 +427,12 @@ function applyAutomatedStateTransitions(
     diagnosis &&
     diagnosisEvent &&
     !hasAutomationHandled(patient, 'diagnosis-to-disposition', diagnosisEvent.id) &&
-    [PatientState.Assessment, PatientState.Orders, PatientState.Results, PatientState.Waiting].includes(
-      nextPatient.state,
-    )
+    [
+      PatientState.Assessment,
+      PatientState.Orders,
+      PatientState.Results,
+      PatientState.Waiting,
+    ].includes(nextPatient.state)
   ) {
     const targetState = PatientState.Disposition;
     if (isLegalTransition(nextPatient.state, targetState)) {

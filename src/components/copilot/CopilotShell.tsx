@@ -44,15 +44,12 @@ export default function CopilotShell({
   };
 
   const copilotTabs = useRovingTabs({
-
     ids: tabs.map((tab) => tab.id),
 
     activeId: activeTab,
 
     onSelect: onTabChange,
-
   });
-
 
   const chatOnly = tabs.length <= 1;
 
@@ -133,10 +130,7 @@ export default function CopilotShell({
             role="tabpanel"
             aria-labelledby={`ed-copilot-tab-${tab.id}`}
             hidden={activeTab !== tab.id}
-            className={[
-              'ed-copilot-shell__panel',
-              `ed-copilot-shell__panel--${tab.id}`,
-            ].join(' ')}
+            className={['ed-copilot-shell__panel', `ed-copilot-shell__panel--${tab.id}`].join(' ')}
           >
             {tabPanels[tab.id]}
           </section>

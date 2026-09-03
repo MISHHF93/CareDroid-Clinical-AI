@@ -19,7 +19,11 @@ import { buildMatrixRowForRegistry, buildE2eToolInventory } from './e2eToolValid
 import { resolveCatalogLaunch } from './clinicalCatalogWiring';
 import { matchCalculatorRoute, isKnownToolAreaPath } from '../routes/clinicalToolRoutes';
 import { isOrchestratorPostExecutable } from './unsupportedOrchestratorTools';
-import { resolveToolInventoryRecord, TOOL_EXECUTOR_STATUS, TOOL_LAUNCH_TYPES } from './toolInventory';
+import {
+  resolveToolInventoryRecord,
+  TOOL_EXECUTOR_STATUS,
+  TOOL_LAUNCH_TYPES,
+} from './toolInventory';
 
 export const EXECUTION_MODES = Object.freeze({
   LOCAL_CALCULATOR: 'local-calculator',
@@ -49,13 +53,11 @@ const builtinSlugByRegistry = Object.freeze(
     builtinUiCalculators
       .filter((c) => c.path)
       .map((c) => {
-        const regEntry = toolRegistry.find(
-          (t) => t.initialCalc === c.id || t.path === c.path
-        );
+        const regEntry = toolRegistry.find((t) => t.initialCalc === c.id || t.path === c.path);
         return [regEntry?.id ?? c.id, c.id];
       })
-      .filter(([regId]) => regId)
-  )
+      .filter(([regId]) => regId),
+  ),
 );
 
 /**
@@ -120,9 +122,7 @@ export function buildChecklistFlags(mode, registryId) {
     tierAResult: mode === EXECUTION_MODES.LOCAL_CALCULATOR,
     tierBChatSeed: mode === EXECUTION_MODES.CHAT_HUB,
     tierCExecutor: mode === EXECUTION_MODES.POST_EXECUTOR,
-    apiGraceful:
-      mode === EXECUTION_MODES.POST_EXECUTOR ||
-      mode === EXECUTION_MODES.CHAT_PAGE,
+    apiGraceful: mode === EXECUTION_MODES.POST_EXECUTOR || mode === EXECUTION_MODES.CHAT_PAGE,
     catalogLaunch: Boolean(launch.path || launch.chatSeed),
     sidebarVisible: Boolean(reg),
     deepLink: Boolean(path),
@@ -204,7 +204,7 @@ export function validateRenderExecuteRow(row) {
   }
   if (
     [EXECUTION_MODES.CHAT_HUB, EXECUTION_MODES.FLEET_LOCAL, EXECUTION_MODES.HUB].includes(
-      row.executionMode
+      row.executionMode,
     ) &&
     row.backendPostExecutor
   ) {
@@ -232,12 +232,7 @@ export function runRenderExecuteValidation() {
 /** Paths for automated page smoke (unique, registered). */
 export function getToolPageSmokeRoutes() {
   const rows = buildRenderExecuteMatrix();
-  const paths = new Set([
-    '/tools',
-    '/tools/catalog',
-    '/tools/calculators',
-    '/assistant',
-  ]);
+  const paths = new Set(['/tools', '/tools/catalog', '/tools/calculators', '/assistant']);
   for (const row of rows) {
     if (row.smokePath && row.checks.routeRenders) paths.add(row.smokePath);
   }
@@ -263,7 +258,12 @@ export function formatRenderExecuteMarkdown() {
   for (const col of RENDER_EXECUTE_CHECK_COLUMNS) {
     lines.push(`- **${col.id}**: ${col.label}`);
   }
-  lines.push('', '## Registered POST executors', '', ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS.map((id) => `- \`${id}\``).join('\n'));
+  lines.push(
+    '',
+    '## Registered POST executors',
+    '',
+    ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS.map((id) => `- \`${id}\``).join('\n'),
+  );
   return lines.join('\n');
 }
 

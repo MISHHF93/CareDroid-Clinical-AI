@@ -65,7 +65,7 @@ describe('routeOptimizationService', () => {
     });
 
     expect(heavy.optimizedSequence[0].travelMinutes).toBeGreaterThan(
-      low.optimizedSequence[0].travelMinutes
+      low.optimizedSequence[0].travelMinutes,
     );
   });
 
@@ -114,7 +114,7 @@ describe('routeOptimizationService', () => {
   it('falls back to sort when graph engine has no provider', () => {
     const result = optimizeRoute(
       { destinations: [{ label: 'A', priority: 'high' }] },
-      { engine: ROUTE_ENGINE_GRAPH }
+      { engine: ROUTE_ENGINE_GRAPH },
     );
 
     expect(result.engine).toBe(ROUTE_ENGINE_GRAPH);
@@ -165,7 +165,7 @@ describe('routeOptimizationService', () => {
     const a = optimizeRoute(input);
     const b = optimizeRoute(input);
     expect(a.optimizedSequence.map((s) => s.destination.label)).toEqual(
-      b.optimizedSequence.map((s) => s.destination.label)
+      b.optimizedSequence.map((s) => s.destination.label),
     );
     expect(a.routeSavings).toEqual(b.routeSavings);
   });
@@ -181,7 +181,7 @@ describe('routeOptimizationService', () => {
           travelEstimates: {},
           routeSavings: { minutesSaved: 99 },
         }),
-      }
+      },
     );
 
     expect(result.routeSavings.minutesSaved).toBe(99);

@@ -33,7 +33,8 @@ const TEMPLATES: SuggestedPrompt[] = [
     id: 'tpl-reception-ocr',
     templateId: 'reception.review_ocr',
     label: 'Review OCR extraction confidence',
-    prompt: 'Summarize OCR fields below confidence threshold and which require manual verification.',
+    prompt:
+      'Summarize OCR fields below confidence threshold and which require manual verification.',
     task: 'extract_document',
     channel: 'reception',
     requiredPermission: 'use_ai_chat',
@@ -43,7 +44,8 @@ const TEMPLATES: SuggestedPrompt[] = [
     id: 'tpl-ems-summarize',
     templateId: 'ems.summarize_report',
     label: 'Summarize this EMS report',
-    prompt: 'Summarize the EMS pre-arrival report for ED preparation. Flag red flags for nurse review.',
+    prompt:
+      'Summarize the EMS pre-arrival report for ED preparation. Flag red flags for nurse review.',
     task: 'prepare_handoff',
     channel: 'ems',
     requiredPermission: 'use_ai_chat',
@@ -63,7 +65,8 @@ const TEMPLATES: SuggestedPrompt[] = [
     id: 'tpl-triage-alert',
     templateId: 'triage.explain_alert',
     label: 'Explain this alert',
-    prompt: 'Explain the current clinical/operational alert, supporting observations, and recommended next review step.',
+    prompt:
+      'Explain the current clinical/operational alert, supporting observations, and recommended next review step.',
     task: 'explain_alert',
     channel: 'triage',
     requiredPermission: 'use_ai_chat',
@@ -93,7 +96,8 @@ const TEMPLATES: SuggestedPrompt[] = [
     id: 'tpl-any-calculator',
     templateId: 'shared.select_calculator',
     label: 'Select an appropriate calculator',
-    prompt: 'Suggest which deterministic clinical calculator may apply and which inputs are required. Do not compute scores yourself.',
+    prompt:
+      'Suggest which deterministic clinical calculator may apply and which inputs are required. Do not compute scores yourself.',
     task: 'select_calculator',
     channel: 'api',
     requiredPermission: 'use_ai_chat',

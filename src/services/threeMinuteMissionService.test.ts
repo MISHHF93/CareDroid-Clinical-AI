@@ -87,6 +87,10 @@ describe('threeMinuteMissionService', () => {
 
     const acknowledged = acknowledgeThreeMinuteMission(mission.missionId, 'nurse-1');
     expect(acknowledged).toBe(true);
-    expect(useThreeMinuteMissionStore.getState().missions.find((entry) => entry.missionId === mission.missionId)).toBeUndefined();
+    expect(
+      useThreeMinuteMissionStore
+        .getState()
+        .missions.find((entry) => entry.missionId === mission.missionId),
+    ).toBeUndefined();
   });
 });

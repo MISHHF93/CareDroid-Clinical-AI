@@ -19,7 +19,7 @@ describe('predictiveAnalyticsDashboard', () => {
       'fleet-maintenance-risk',
     ]);
     expect(DEMO_PREDICTIVE_ANALYTICS_MODELS.map((model) => model.id)).toEqual(
-      expect.arrayContaining([...PREDICTIVE_ANALYTICS_MODEL_TYPES])
+      expect.arrayContaining([...PREDICTIVE_ANALYTICS_MODEL_TYPES]),
     );
   });
 
@@ -36,7 +36,7 @@ describe('predictiveAnalyticsDashboard', () => {
   it('searches models and creates assistant prompts with prediction labels', () => {
     const deviceResults = searchPredictiveModels('battery');
     const prompt = buildPredictiveAnalyticsAiPrompt(
-      DEMO_PREDICTIVE_ANALYTICS_MODELS.find((model) => model.id === 'device-failure-risk')
+      DEMO_PREDICTIVE_ANALYTICS_MODELS.find((model) => model.id === 'device-failure-risk'),
     );
 
     expect(deviceResults.map((model) => model.id)).toContain('device-failure-risk');

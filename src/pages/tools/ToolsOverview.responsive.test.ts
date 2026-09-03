@@ -9,50 +9,52 @@ const toolsOverviewJsx = readFileSync(join(__dirname, 'ToolsOverview.tsx'), 'utf
 
 describe('ToolsOverview responsive layout', () => {
   it('wraps cards and prevents tool metadata overflow', () => {
-    expect(toolsOverviewCss).toMatch(/\.tools-grid[\s\S]*minmax\(min\(100%,\s*var\(--app-grid-card-min-density,\s*240px\)/);
+    expect(toolsOverviewCss).toMatch(
+      /\.tools-grid[\s\S]*minmax\(min\(100%,\s*var\(--app-grid-card-min-density,\s*240px\)/,
+    );
     expect(toolsOverviewCss).toMatch(/\.tool-card-large[\s\S]*min-width:\s*0/);
     expect(toolsOverviewCss).toMatch(/\.tool-meta[\s\S]*min-width:\s*min\(100%,\s*12rem\)/);
   });
 
   it('stacks important launch actions on mobile with touch targets', () => {
     expect(toolsOverviewCss).toMatch(
-      /\.btn-open-tool[\s\S]*min-height:\s*var\(--compact-control-height/
+      /\.btn-open-tool[\s\S]*min-height:\s*var\(--compact-control-height/,
     );
     expect(toolsOverviewCss).toMatch(
-      /\.btn-chat-tool[\s\S]*min-height:\s*var\(--compact-control-height/
+      /\.btn-chat-tool[\s\S]*min-height:\s*var\(--compact-control-height/,
     );
     expect(toolsOverviewCss).toMatch(
-      /@media \(max-width: 768px\)[\s\S]*\.tool-actions[\s\S]*flex-direction:\s*column/
+      /@media \(max-width: 768px\)[\s\S]*\.tool-actions[\s\S]*flex-direction:\s*column/,
     );
   });
 
   it('lets workspace controls wrap at phone widths', () => {
     expect(toolsOverviewCss).toMatch(/\.tools-workspace[\s\S]*flex-wrap:\s*wrap/);
     expect(toolsOverviewCss).toMatch(
-      /@media \(max-width: 640px\)[\s\S]*\.tools-workspace[\s\S]*width:\s*100%/
+      /@media \(max-width: 640px\)[\s\S]*\.tools-workspace[\s\S]*width:\s*100%/,
     );
     expect(toolsOverviewCss).toMatch(/\.tools-workspace select[\s\S]*min-width:\s*0/);
   });
 
   it('keeps search and filter controls touch-friendly at phone widths', () => {
     expect(toolsOverviewCss).toMatch(
-      /\.tools-discovery-controls[\s\S]*grid-template-columns:\s*minmax/
+      /\.tools-discovery-controls[\s\S]*grid-template-columns:\s*minmax/,
     );
     expect(toolsOverviewCss).toMatch(
-      /\.tools-search-field input[\s\S]*min-height:\s*var\(--compact-control-height/
+      /\.tools-search-field input[\s\S]*min-height:\s*var\(--compact-control-height/,
     );
     expect(toolsOverviewCss).toMatch(
-      /\.tools-filter-field select[\s\S]*min-height:\s*var\(--compact-control-height/
+      /\.tools-filter-field select[\s\S]*min-height:\s*var\(--compact-control-height/,
     );
     expect(toolsOverviewCss).toMatch(
-      /@media \(max-width: 768px\)[\s\S]*\.tools-discovery-controls[\s\S]*grid-template-columns:\s*1fr/
+      /@media \(max-width: 768px\)[\s\S]*\.tools-discovery-controls[\s\S]*grid-template-columns:\s*1fr/,
     );
   });
 
   it('keeps profile filters and graph summary mobile friendly', () => {
     expect(toolsOverviewCss).toMatch(/\.tools-filter-tabs[\s\S]*flex-wrap:\s*wrap/);
     expect(toolsOverviewCss).toMatch(
-      /\.tools-filter-tab[\s\S]*min-height:\s*var\(--compact-control-height/
+      /\.tools-filter-tab[\s\S]*min-height:\s*var\(--compact-control-height/,
     );
     expect(toolsOverviewCss).toMatch(/\.tools-profile-summary[\s\S]*flex-wrap:\s*wrap/);
     expect(toolsOverviewJsx).toContain("label: 'Recommended'");

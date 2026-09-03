@@ -23,9 +23,9 @@ const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
 const patternsSource = readFileSync(
   join(
     __dirname,
-    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts'
+    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts',
   ),
-  'utf8'
+  'utf8',
 );
 
 describe('Canadian C-Spine Rule (Tier B chat-assisted) wiring', () => {
@@ -75,7 +75,7 @@ describe('Canadian C-Spine Rule (Tier B chat-assisted) wiring', () => {
       expect(launch.openLabel).toBe('Open');
       expect(launch.orchestratorTool).toBe(id);
       expect(launch.chatSeed).toMatch(/Canadian C-Spine Rule/i);
-    }
+    },
   );
 
   it('resolves discovery slug aliases to canadian-c-spine', () => {

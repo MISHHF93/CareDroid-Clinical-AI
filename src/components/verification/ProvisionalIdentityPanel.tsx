@@ -1,11 +1,7 @@
 import { PROVISIONAL_IDENTITY_PROFILES } from '../../services/provisionalIdentityIntake';
 import './ProvisionalIdentityPanel.css';
 
-export default function ProvisionalIdentityPanel({
-  onStart,
-  disabled = false,
-  compact = false,
-}) {
+export default function ProvisionalIdentityPanel({ onStart, disabled = false, compact = false }) {
   const kinds = ['unknown', 'temporary', 'identity-pending'];
 
   return (

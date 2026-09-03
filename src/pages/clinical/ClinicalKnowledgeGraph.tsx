@@ -33,8 +33,13 @@ export default function ClinicalKnowledgeGraph() {
         <div className="knowledge-graph-page__title-row">
           <GraphicIconBadge iconKey="layout-dashboard" accent="brand" size="md" />
           <div>
-            <p className="knowledge-graph-title-text" data-testid="cd-page-title-text">Clinical Knowledge Graph</p>
-            <p>Relationships across calculators, protocols, simulations, labs, devices, and AI workflows.</p>
+            <p className="knowledge-graph-title-text" data-testid="cd-page-title-text">
+              Clinical Knowledge Graph
+            </p>
+            <p>
+              Relationships across calculators, protocols, simulations, labs, devices, and AI
+              workflows.
+            </p>
           </div>
         </div>
         <div className="knowledge-graph-page__actions">
@@ -51,10 +56,29 @@ export default function ClinicalKnowledgeGraph() {
         details="Demo relationship graph for training and workflow orientation — not a live knowledge base."
       />
 
-      <div className="knowledge-graph-page__metrics" role="group" aria-label="Knowledge graph summary metrics">
-        <MetricCard label="Nodes visible" value={String(snapshot.nodes.length)} hint="Filtered graph nodes" tone="neutral" />
-        <MetricCard label="Edges visible" value={String(snapshot.edges.length)} hint="Active relationships" tone="neutral" />
-        <MetricCard label="Node types" value={String(KNOWLEDGE_GRAPH_NODE_TYPES.length)} hint="Graph taxonomy" tone="neutral" />
+      <div
+        className="knowledge-graph-page__metrics"
+        role="group"
+        aria-label="Knowledge graph summary metrics"
+      >
+        <MetricCard
+          label="Nodes visible"
+          value={String(snapshot.nodes.length)}
+          hint="Filtered graph nodes"
+          tone="neutral"
+        />
+        <MetricCard
+          label="Edges visible"
+          value={String(snapshot.edges.length)}
+          hint="Active relationships"
+          tone="neutral"
+        />
+        <MetricCard
+          label="Node types"
+          value={String(KNOWLEDGE_GRAPH_NODE_TYPES.length)}
+          hint="Graph taxonomy"
+          tone="neutral"
+        />
         <MetricCard
           label="Selected"
           value={snapshot.selectedNode?.label || '—'}
@@ -71,15 +95,25 @@ export default function ClinicalKnowledgeGraph() {
           onChange={(event) => setQuery(event.target.value)}
           aria-label="Search knowledge graph"
         />
-        <select value={type} onChange={(event) => setType(event.target.value)} aria-label="Filter node type">
+        <select
+          value={type}
+          onChange={(event) => setType(event.target.value)}
+          aria-label="Filter node type"
+        >
           <option value="all">All types</option>
           {KNOWLEDGE_GRAPH_NODE_TYPES.map((nodeType) => (
-            <option key={nodeType} value={nodeType}>{nodeType}</option>
+            <option key={nodeType} value={nodeType}>
+              {nodeType}
+            </option>
           ))}
         </select>
       </div>
 
-      <VisualizationPanel title="Node type distribution" description="Visible nodes grouped by graph taxonomy." badge="Types">
+      <VisualizationPanel
+        title="Node type distribution"
+        description="Visible nodes grouped by graph taxonomy."
+        badge="Types"
+      >
         <CategoryBarChart
           data={typeChart}
           title="Node type distribution"
@@ -98,7 +132,9 @@ export default function ClinicalKnowledgeGraph() {
                 type="button"
                 className={`knowledge-graph-page__node${node.id === selectedNodeId ? ' is-selected' : ''}`}
                 onClick={() => setSelectedNodeId(node.id)}
-                {...((node.id === selectedNodeId) ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
+                {...(node.id === selectedNodeId
+                  ? { 'aria-pressed': 'true' as const }
+                  : { 'aria-pressed': 'false' as const })}
               >
                 <strong>{node.label}</strong>
                 <span>{node.type}</span>

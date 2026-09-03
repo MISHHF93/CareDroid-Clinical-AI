@@ -7,10 +7,7 @@
 
 import { CANONICAL_ROUTES } from './routes.config';
 import { EMERGENCY_ACTIONS, EMERGENCY_ROLE_IDS } from './emergencyRolePermissions';
-import {
-  RECEPTION_ARCHETYPE_SKILLS,
-  type ReceptionSkillId,
-} from './receptionSkillModel';
+import { RECEPTION_ARCHETYPE_SKILLS, type ReceptionSkillId } from './receptionSkillModel';
 
 export type ReceptionStaffArchetype =
   | 'registration_clerk'
@@ -156,7 +153,8 @@ export const RECEPTION_USER_PROFILES: Readonly<
   admissions_officer: {
     id: 'admissions_officer',
     label: 'Admissions Officer',
-    description: 'Handles insurance, consent, coverage capture, and administrative completion after initial intake.',
+    description:
+      'Handles insurance, consent, coverage capture, and administrative completion after initial intake.',
     mapsToEmergencyRole: EMERGENCY_ROLE_IDS.registrationClerk,
     responsibilities: [
       'Complete insurance and consent after critical intake',
@@ -287,7 +285,11 @@ export const RECEPTION_USER_PROFILES: Readonly<
       reducedMotionPreferred: false,
       largeTargets: true,
     },
-    operationalMetrics: ['duplicate_review_rate', 'identity_link_rate', 'provisional_clearance_rate'],
+    operationalMetrics: [
+      'duplicate_review_rate',
+      'identity_link_rate',
+      'provisional_clearance_rate',
+    ],
     skillIds: RECEPTION_ARCHETYPE_SKILLS.patient_access_staff,
     personalization: {
       density: 'compact',

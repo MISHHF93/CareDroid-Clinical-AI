@@ -55,11 +55,13 @@ export default function ProfileSettingsShell({
             </span>
             {profileCopy?.primaryFunctions?.length ? (
               <ul className="profile-settings-shell__functions">
-                {profileCopy.primaryFunctions.map((fn: { id: string; label: string; description: string }) => (
-                  <li key={fn.id} title={fn.description}>
-                    {fn.label}
-                  </li>
-                ))}
+                {profileCopy.primaryFunctions.map(
+                  (fn: { id: string; label: string; description: string }) => (
+                    <li key={fn.id} title={fn.description}>
+                      {fn.label}
+                    </li>
+                  ),
+                )}
               </ul>
             ) : null}
           </div>
@@ -70,13 +72,16 @@ export default function ProfileSettingsShell({
         {PROFILE_SHELL_SECTIONS.map((item) => {
           const active =
             location.pathname === item.path ||
-            (item.path !== CANONICAL_ROUTES.profile &&
-              location.pathname.startsWith(item.path));
+            (item.path !== CANONICAL_ROUTES.profile && location.pathname.startsWith(item.path));
           return (
             <Link
               key={item.id}
               to={item.path}
-              className={active ? 'profile-settings-shell__nav-link is-active' : 'profile-settings-shell__nav-link'}
+              className={
+                active
+                  ? 'profile-settings-shell__nav-link is-active'
+                  : 'profile-settings-shell__nav-link'
+              }
               {...(active ? { 'aria-current': 'page' as const } : {})}
             >
               {item.label}

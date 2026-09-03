@@ -37,7 +37,10 @@ export const INITIAL_AUTOMATION_AUDIT_ENTRIES = Object.freeze([
     user: { id: 'user-demo-clinician', name: 'Demo Clinician' },
     tenant: { id: 'tenant-demo-hospital', name: 'Demo Hospital' },
     workspace: { id: 'emergency', name: 'CareDroid' },
-    aiInvolvement: { involved: true, summary: 'AI reviewed deterioration context and suggested NEWS2 escalation.' },
+    aiInvolvement: {
+      involved: true,
+      summary: 'AI reviewed deterioration context and suggested NEWS2 escalation.',
+    },
     toolCalled: 'news2',
     backendEndpoint: '/api/clinical/alerts',
     status: AUTOMATION_AUDIT_STATUSES.SUCCESS,
@@ -74,7 +77,10 @@ export const INITIAL_AUTOMATION_AUDIT_ENTRIES = Object.freeze([
     user: { id: 'user-lab-specialist', name: 'Lab Specialist' },
     tenant: { id: 'tenant-research-clinic', name: 'Research Clinic' },
     workspace: { id: 'laboratory', name: 'Laboratory Workspace' },
-    aiInvolvement: { involved: true, summary: 'AI summarized potassium trend before workflow handoff.' },
+    aiInvolvement: {
+      involved: true,
+      summary: 'AI summarized potassium trend before workflow handoff.',
+    },
     toolCalled: 'lab-interpreter',
     backendEndpoint: '/api/tools/lab-interpreter/execute',
     status: AUTOMATION_AUDIT_STATUSES.FAILED,
@@ -111,14 +117,22 @@ function normalizeConditions(conditionsEvaluated = [] as any[]) {
   return conditionsEvaluated.map((condition) =>
     typeof condition === 'string'
       ? { label: condition, result: true }
-      : { label: condition.label || condition.name || 'Condition', result: Boolean(condition.result) }
+      : {
+          label: condition.label || condition.name || 'Condition',
+          result: Boolean(condition.result),
+        },
   );
 }
 
 function validateAutomationAuditEntry(entry) {
   const missing = REQUIRED_FIELDS.filter((field) => {
     const value = entry[field];
-    return value === undefined || value === null || value === '' || (Array.isArray(value) && value.length === 0);
+    return (
+      value === undefined ||
+      value === null ||
+      value === '' ||
+      (Array.isArray(value) && value.length === 0)
+    );
   });
 
   if (missing.length) {
@@ -147,7 +161,10 @@ export function createAutomationAuditEntry(event) {
     workspace: normalizeEntity(event.workspace, 'unknown-workspace', 'Unknown workspace'),
     aiInvolvement:
       typeof event.aiInvolvement === 'boolean'
-        ? { involved: event.aiInvolvement, summary: event.aiInvolvement ? 'AI-assisted automation.' : 'No AI involvement.' }
+        ? {
+            involved: event.aiInvolvement,
+            summary: event.aiInvolvement ? 'AI-assisted automation.' : 'No AI involvement.',
+          }
         : {
             involved: Boolean(event.aiInvolvement?.involved),
             summary: event.aiInvolvement?.summary || 'No AI involvement.',

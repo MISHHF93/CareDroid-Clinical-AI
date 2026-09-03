@@ -6,7 +6,7 @@ export function NavIcon({
   size,
   className = '',
   decorative = true,
-  label = (undefined as any),
+  label = undefined as any,
   strokeWidth = 2,
   ...rest
 }) {

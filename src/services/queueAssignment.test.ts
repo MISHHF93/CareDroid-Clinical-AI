@@ -152,12 +152,12 @@ describe('queueAssignment', () => {
   });
 
   it('picks journey-legal default next states instead of enum order', () => {
-    expect(
-      getDefaultNextPatientState({ ...triagePatient, state: PatientState.Admission }),
-    ).toBe(PatientState.Discharge);
-    expect(
-      getDefaultNextPatientState({ ...triagePatient, state: PatientState.Disposition }),
-    ).toBe(PatientState.Discharge);
+    expect(getDefaultNextPatientState({ ...triagePatient, state: PatientState.Admission })).toBe(
+      PatientState.Discharge,
+    );
+    expect(getDefaultNextPatientState({ ...triagePatient, state: PatientState.Disposition })).toBe(
+      PatientState.Discharge,
+    );
     expect(
       getDefaultNextPatientState({
         ...triagePatient,
@@ -165,8 +165,8 @@ describe('queueAssignment', () => {
         flags: [PatientFlag.PendingAdmission],
       }),
     ).toBe(PatientState.Admission);
-    expect(
-      getDefaultNextPatientState({ ...triagePatient, state: PatientState.Results }),
-    ).toBe(PatientState.Disposition);
+    expect(getDefaultNextPatientState({ ...triagePatient, state: PatientState.Results })).toBe(
+      PatientState.Disposition,
+    );
   });
 });

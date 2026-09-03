@@ -1,5 +1,9 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
-import { SAAS_HEALTH_FALLBACK, SAAS_HEALTH_ACCESS_RESTRICTED, fetchSaasHealthCenter } from './saasHealthApi';
+import {
+  SAAS_HEALTH_FALLBACK,
+  SAAS_HEALTH_ACCESS_RESTRICTED,
+  fetchSaasHealthCenter,
+} from './saasHealthApi';
 
 vi.mock('./apiClient', () => ({
   apiFetchJson: vi.fn(),
@@ -45,9 +49,7 @@ describe('SAAS_HEALTH_ACCESS_RESTRICTED', () => {
     // falls through healthCheckStatusToWidgetTone's unmapped default (neutral)
     // instead of matching its 'critical'/'failed'/'error' branch.
     expect(SAAS_HEALTH_ACCESS_RESTRICTED.checks).toHaveLength(7);
-    expect(SAAS_HEALTH_ACCESS_RESTRICTED.checks.every((c) => c.status === 'restricted')).toBe(
-      true,
-    );
+    expect(SAAS_HEALTH_ACCESS_RESTRICTED.checks.every((c) => c.status === 'restricted')).toBe(true);
     expect(SAAS_HEALTH_ACCESS_RESTRICTED.checks.every((c) => c.status !== 'critical')).toBe(true);
   });
 

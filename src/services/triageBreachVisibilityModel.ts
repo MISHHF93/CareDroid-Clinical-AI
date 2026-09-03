@@ -215,7 +215,8 @@ export function selectTriageBreachVisibilityMetrics(
     label: METRIC_LABELS[canonicalId],
     value: metricValue(canonicalId, snapshot),
     hint: metricHint(canonicalId, snapshot),
-    queueTab: canonicalId === 'rapid-review-flags' || canonicalId.startsWith('triage') ? 'pretriage' : null,
+    queueTab:
+      canonicalId === 'rapid-review-flags' || canonicalId.startsWith('triage') ? 'pretriage' : null,
     tone: metricTone(canonicalId, snapshot),
   }));
 }
@@ -225,8 +226,8 @@ export function hasTriageBreachVisibilityActivity(
 ): boolean {
   return Boolean(
     snapshot.awaitingTriageCount ||
-      snapshot.approachingBreachCount ||
-      snapshot.breachedCount ||
-      snapshot.rapidReviewFlags,
+    snapshot.approachingBreachCount ||
+    snapshot.breachedCount ||
+    snapshot.rapidReviewFlags,
   );
 }

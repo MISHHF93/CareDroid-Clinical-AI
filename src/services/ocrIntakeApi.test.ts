@@ -26,7 +26,10 @@ describe('ocrIntakeApi', () => {
   });
 
   it('creates an OCR job against the canonical intake route', async () => {
-    const job = await OcrIntakeApi.createJob({ filename: 'health-card.jpg', rawText: 'First name: Jordan' });
+    const job = await OcrIntakeApi.createJob({
+      filename: 'health-card.jpg',
+      rawText: 'First name: Jordan',
+    });
 
     expect(apiFetch).toHaveBeenCalledWith(
       '/api/emergency/intake/ocr-jobs',

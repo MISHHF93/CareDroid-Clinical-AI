@@ -3,7 +3,10 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import { AiChiefRouteRecommendationsPanel } from './AiChiefRouteRecommendationsPanel';
-import { PERMISSIVE_EMERGENCY_ROLE_MOCK, withEmergencyRoleMock } from '../../test/permissiveEmergencyRoleMock';
+import {
+  PERMISSIVE_EMERGENCY_ROLE_MOCK,
+  withEmergencyRoleMock,
+} from '../../test/permissiveEmergencyRoleMock';
 import { EMERGENCY_ACTIONS } from '../../config/emergencyRolePermissions';
 
 // HEAL-347.88: handleAccept now checks emergencyRole.presentAction(EMERGENCY_ACTIONS.
@@ -98,7 +101,9 @@ describe('AiChiefRouteRecommendationsPanel', () => {
       </MemoryRouter>,
     );
 
-    expect(screen.getByRole('region', { name: /ai chief route recommendations/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('region', { name: /ai chief route recommendations/i }),
+    ).toBeInTheDocument();
     expect(screen.getByText('Assign physician to P1 patient')).toBeInTheDocument();
     expect(screen.getByText(/priority 1 patient awaiting assessment/i)).toBeInTheDocument();
     expect(screen.getByRole('note', { name: /ai safety review notice/i })).toBeInTheDocument();
@@ -119,9 +124,8 @@ describe('AiChiefRouteRecommendationsPanel', () => {
 
   it('accepts patient-linked escalation recommendations after confirmation', async () => {
     const user = userEvent.setup();
-    const { confirmCareDroidAction, showActionSuccess } = await import(
-      '../../services/careDroidInteractionFeedback'
-    );
+    const { confirmCareDroidAction, showActionSuccess } =
+      await import('../../services/careDroidInteractionFeedback');
 
     render(
       <MemoryRouter>

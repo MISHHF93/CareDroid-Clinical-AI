@@ -56,7 +56,11 @@ export default function OperationalStrip({
 
   if (!displayMetrics.length) {
     return (
-      <nav className={rootClassName} aria-label={resolvedAriaLabel} data-emphasis={resolvedEmphasis}>
+      <nav
+        className={rootClassName}
+        aria-label={resolvedAriaLabel}
+        data-emphasis={resolvedEmphasis}
+      >
         {showEyebrow ? <span className="operational-strip__eyebrow">{resolvedEyebrow}</span> : null}
         <span
           className="operational-strip__metric operational-strip__metric--clear"
@@ -90,7 +94,11 @@ export default function OperationalStrip({
             onClick={() => interactive && (onMetricSelect as any)?.(metric)}
             disabled={readOnly || !interactive}
             title={[metric.label, metric.hint].filter(Boolean).join(' · ')}
-            aria-label={[metric.label, String(metric.value), severity === 'critical' ? 'critical' : severity === 'warning' ? 'warning' : '']
+            aria-label={[
+              metric.label,
+              String(metric.value),
+              severity === 'critical' ? 'critical' : severity === 'warning' ? 'warning' : '',
+            ]
               .filter(Boolean)
               .join(', ')}
           >

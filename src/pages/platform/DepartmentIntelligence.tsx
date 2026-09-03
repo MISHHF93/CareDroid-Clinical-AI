@@ -18,7 +18,10 @@ import './DepartmentIntelligence.css';
 export function DepartmentIntelligencePage() {
   useRouteChromeRegistration({ title: 'Department Intelligence' });
   const intelligence = useMemo(() => buildDepartmentPerformanceIntelligence(), []);
-  const healthChart = useMemo(() => buildDepartmentHealthChart(intelligence.departments), [intelligence.departments]);
+  const healthChart = useMemo(
+    () => buildDepartmentHealthChart(intelligence.departments),
+    [intelligence.departments],
+  );
   const sourceChart = useMemo(
     () => buildDepartmentOutcomeSourceChart(intelligence.departments),
     [intelligence.departments],
@@ -30,7 +33,9 @@ export function DepartmentIntelligencePage() {
         <div className="department-intelligence-page__title-row">
           <GraphicIconBadge iconKey="chart-bar" accent="brand" size="md" />
           <div>
-            <p className="department-intelligence-page-title-text" data-testid="cd-page-title-text">Department Intelligence</p>
+            <p className="department-intelligence-page-title-text" data-testid="cd-page-title-text">
+              Department Intelligence
+            </p>
             <p>Measurable outcomes across emergency, laboratory, and operations service lines.</p>
           </div>
         </div>
@@ -48,7 +53,11 @@ export function DepartmentIntelligencePage() {
         details="Demo department performance model with workflow, calculator, simulation, turnaround, and uptime outcomes."
       />
 
-      <div className="department-intelligence-page__metrics" role="group" aria-label="Department intelligence summary metrics">
+      <div
+        className="department-intelligence-page__metrics"
+        role="group"
+        aria-label="Department intelligence summary metrics"
+      >
         <MetricCard
           label="Departments"
           value={String(intelligence.summary.departmentCount)}
@@ -76,7 +85,11 @@ export function DepartmentIntelligencePage() {
       </div>
 
       <div className="department-intelligence-page__charts">
-        <VisualizationPanel title="Department health" description="Composite health scores by service line." badge="Health">
+        <VisualizationPanel
+          title="Department health"
+          description="Composite health scores by service line."
+          badge="Health"
+        >
           <CategoryBarChart
             data={healthChart}
             title="Department health"
@@ -99,7 +112,11 @@ export function DepartmentIntelligencePage() {
       </div>
 
       {intelligence.departments.map((department) => (
-        <section key={department.id} className="department-intelligence-page__panel" aria-label={department.name}>
+        <section
+          key={department.id}
+          className="department-intelligence-page__panel"
+          aria-label={department.name}
+        >
           <div className="department-intelligence-page__panel-head">
             <div>
               <h2>{department.name}</h2>
@@ -111,7 +128,11 @@ export function DepartmentIntelligencePage() {
               {department.healthBand.label} · {department.healthScore}
             </span>
           </div>
-          <div className="department-intelligence-page__table" role="table" aria-label={`${department.name} outcomes`}>
+          <div
+            className="department-intelligence-page__table"
+            role="table"
+            aria-label={`${department.name} outcomes`}
+          >
             <div className="department-intelligence-page__table-head" role="row">
               <span role="columnheader">Metric</span>
               <span role="columnheader">Value</span>

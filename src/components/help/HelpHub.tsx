@@ -40,8 +40,7 @@ export default function HelpHub({ variant = 'drawer' }: HelpHubProps) {
   });
   const help = useContextualHelp(state.topicId);
 
-  const activeTopic =
-    (state.topicId ? getManualTopicById(state.topicId) : null) || help.pageTopic;
+  const activeTopic = (state.topicId ? getManualTopicById(state.topicId) : null) || help.pageTopic;
 
   const handleJourneyGo = useCallback(
     (step: (typeof MANUAL_DEMO_JOURNEY)[number]) => {
@@ -82,7 +81,12 @@ export default function HelpHub({ variant = 'drawer' }: HelpHubProps) {
           </p>
         </div>
         {variant === 'drawer' ? (
-          <button type="button" className="help-hub__close" onClick={closeHelp} aria-label="Close guide">
+          <button
+            type="button"
+            className="help-hub__close"
+            onClick={closeHelp}
+            aria-label="Close guide"
+          >
             ×
           </button>
         ) : null}
@@ -103,7 +107,9 @@ export default function HelpHub({ variant = 'drawer' }: HelpHubProps) {
             onKeyDown={helpTabs.onKeyDown}
             className="help-hub__tab"
             data-active={state.tab === tab.id ? 'true' : 'false'}
-            {...((state.tab === tab.id) ? { 'aria-selected': 'true' as const } : { 'aria-selected': 'false' as const })}
+            {...(state.tab === tab.id
+              ? { 'aria-selected': 'true' as const }
+              : { 'aria-selected': 'false' as const })}
             onClick={() => setTab(tab.id)}
           >
             {tab.label}
@@ -126,7 +132,10 @@ export default function HelpHub({ variant = 'drawer' }: HelpHubProps) {
             {activeTopic ? (
               <HelpTopicView topic={activeTopic} onSelectTopic={setTopicId} />
             ) : (
-              <p>No procedure mapped to this screen yet. Try <strong>All topics</strong> or <strong>My role</strong>.</p>
+              <p>
+                No procedure mapped to this screen yet. Try <strong>All topics</strong> or{' '}
+                <strong>My role</strong>.
+              </p>
             )}
           </>
         ) : null}
@@ -204,10 +213,10 @@ export default function HelpHub({ variant = 'drawer' }: HelpHubProps) {
           <div className="help-hub__reference-card">
             <h3>What is actually live</h3>
             <p>
-              Which parts of CareDroid are running for real, which are demonstrations, and
-              which are still planned -- read from the platform&apos;s own enhancement, suite
-              and feature registries rather than maintained by hand. While simulation mode is
-              on, live features are shown as demo, because that is what you are looking at.
+              Which parts of CareDroid are running for real, which are demonstrations, and which are
+              still planned -- read from the platform&apos;s own enhancement, suite and feature
+              registries rather than maintained by hand. While simulation mode is on, live features
+              are shown as demo, because that is what you are looking at.
             </p>
             <PlatformFeatureTransparencyPanel />
           </div>
@@ -244,7 +253,11 @@ export default function HelpHub({ variant = 'drawer' }: HelpHubProps) {
             <ul>
               {help.roleTopics.map((topic) => (
                 <li key={topic.id}>
-                  <button type="button" className="help-topic__related-btn" onClick={() => setTopicId(topic.id)}>
+                  <button
+                    type="button"
+                    className="help-topic__related-btn"
+                    onClick={() => setTopicId(topic.id)}
+                  >
                     {topic.title}
                   </button>
                 </li>
@@ -280,7 +293,11 @@ export default function HelpHub({ variant = 'drawer' }: HelpHubProps) {
                     <strong>{step.title}</strong>
                     <p>{step.summary}</p>
                   </div>
-                  <button type="button" className="help-hub__go-btn" onClick={() => handleJourneyGo(step)}>
+                  <button
+                    type="button"
+                    className="help-hub__go-btn"
+                    onClick={() => handleJourneyGo(step)}
+                  >
                     Go
                   </button>
                 </div>
@@ -292,10 +309,17 @@ export default function HelpHub({ variant = 'drawer' }: HelpHubProps) {
         {state.tab === 'topics' ? (
           state.topicId && getManualTopicById(state.topicId) ? (
             <>
-              <button type="button" className="help-topic__related-btn" onClick={() => setTopicId(null)}>
+              <button
+                type="button"
+                className="help-topic__related-btn"
+                onClick={() => setTopicId(null)}
+              >
                 ← All topics
               </button>
-              <HelpTopicView topic={getManualTopicById(state.topicId)!} onSelectTopic={setTopicId} />
+              <HelpTopicView
+                topic={getManualTopicById(state.topicId)!}
+                onSelectTopic={setTopicId}
+              />
             </>
           ) : (
             <div className="help-hub__topic-list">
@@ -339,7 +363,8 @@ export default function HelpHub({ variant = 'drawer' }: HelpHubProps) {
       <footer className="help-hub__footer">
         <p>
           Press <code>?</code> anywhere to reopen this guide. Living docs:{' '}
-          <code>docs/generated/README.md</code> · procedures: <code>src/config/userManual.config.ts</code>
+          <code>docs/generated/README.md</code> · procedures:{' '}
+          <code>src/config/userManual.config.ts</code>
         </p>
       </footer>
     </div>
@@ -351,7 +376,12 @@ export default function HelpHub({ variant = 'drawer' }: HelpHubProps) {
 
   return (
     <>
-      <button type="button" className="help-hub-backdrop" aria-label="Close guide" onClick={closeHelp} />
+      <button
+        type="button"
+        className="help-hub-backdrop"
+        aria-label="Close guide"
+        onClick={closeHelp}
+      />
       {panel}
     </>
   );

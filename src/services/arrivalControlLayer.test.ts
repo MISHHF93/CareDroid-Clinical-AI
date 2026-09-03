@@ -79,7 +79,10 @@ describe('arrivalControlLayer', () => {
   });
 
   it('derives registration and queue destination for legacy patients', () => {
-    const patient = buildPatient({ state: PatientState.Registration, flags: [PatientFlag.EMSArrival] });
+    const patient = buildPatient({
+      state: PatientState.Registration,
+      flags: [PatientFlag.EMSArrival],
+    });
     expect(deriveRegistrationStatus(patient)).toBe('in-progress');
     expect(deriveQueueDestination(patient)).toBe('ems-registration');
     expect(deriveTriagePending(buildPatient({ state: PatientState.Triage }))).toBe(true);

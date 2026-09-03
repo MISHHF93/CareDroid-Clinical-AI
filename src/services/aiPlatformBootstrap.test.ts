@@ -3,7 +3,10 @@ import { buildDepartmentContext } from '../../lib/ai/contextEngine';
 import { executeEmergencyTool } from '../../lib/ai/toolRegistry';
 import { PatientState, Priority, type Patient } from '../types/emergency';
 import { useEmergencyStore } from '../store/emergencyStore';
-import { bootstrapAiPlatformIntegrations, teardownAiPlatformIntegrations } from './aiPlatformBootstrap';
+import {
+  bootstrapAiPlatformIntegrations,
+  teardownAiPlatformIntegrations,
+} from './aiPlatformBootstrap';
 
 describe('aiPlatformBootstrap', () => {
   beforeEach(() => {

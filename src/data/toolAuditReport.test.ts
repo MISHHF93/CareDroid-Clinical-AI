@@ -28,7 +28,7 @@ describe('tool audit report', () => {
       const repoRoot = join(__dirname, '../..');
       writeFileSync(
         join(repoRoot, 'TOOL_REGISTRY_STATUS.json'),
-        `${JSON.stringify(data, null, 2)}\n`
+        `${JSON.stringify(data, null, 2)}\n`,
       );
       writeFileSync(join(repoRoot, 'TOOL_AUDIT_REPORT.md'), `${formatToolAuditMarkdown(data)}\n`);
     }

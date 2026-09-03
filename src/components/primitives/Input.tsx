@@ -38,7 +38,9 @@ export function Input({
       {label && (
         <label
           htmlFor={id}
-          className={['cd-input-label', required ? 'cd-input-label--required' : ''].filter(Boolean).join(' ')}
+          className={['cd-input-label', required ? 'cd-input-label--required' : '']
+            .filter(Boolean)
+            .join(' ')}
         >
           {label}
         </label>
@@ -51,7 +53,7 @@ export function Input({
         )}
         <AriaInvalidInput
           id={id}
-           invalid={error ? true : undefined}
+          invalid={error ? true : undefined}
           aria-describedby={describedBy}
           aria-required={required ? 'true' : 'false'}
           className={[
@@ -60,7 +62,9 @@ export function Input({
             error ? 'cd-input--error' : '',
             leadingIcon ? 'cd-input--has-leading' : '',
             trailingIcon ? 'cd-input--has-trailing' : '',
-          ].filter(Boolean).join(' ')}
+          ]
+            .filter(Boolean)
+            .join(' ')}
           {...props}
         />
         {trailingIcon && (
@@ -69,8 +73,16 @@ export function Input({
           </span>
         )}
       </div>
-      {hint && !error && <p id={hintId} className="cd-input-hint">{hint}</p>}
-      {error && <p id={errorId} className="cd-input-error" role="alert">{error}</p>}
+      {hint && !error && (
+        <p id={hintId} className="cd-input-hint">
+          {hint}
+        </p>
+      )}
+      {error && (
+        <p id={errorId} className="cd-input-error" role="alert">
+          {error}
+        </p>
+      )}
     </div>
   );
 }

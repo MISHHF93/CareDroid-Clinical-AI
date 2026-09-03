@@ -41,7 +41,16 @@ function splitField(value) {
     .filter(Boolean);
 }
 
-function action({ id, type, title, rationale, route, priority = 'medium', confidence = 0.72, sourceSignals = [] as any[] }) {
+function action({
+  id,
+  type,
+  title,
+  rationale,
+  route,
+  priority = 'medium',
+  confidence = 0.72,
+  sourceSignals = [] as any[],
+}) {
   return {
     id,
     type,
@@ -116,12 +125,17 @@ function topRecommendations(model, limit = 6) {
   return list(model?.all).slice(0, limit);
 }
 
-function topProductSuggestions({ recommendations, productRows, organizationIntelligence }, limit = 6) {
+function topProductSuggestions(
+  { recommendations, productRows, organizationIntelligence },
+  limit = 6,
+) {
   const recommendationProducts = list(recommendations?.groups?.products);
   const orgRecommendations = list(organizationIntelligence?.recommendations).filter((item) =>
     /product|pack|asset|automation/i.test(`${item.category} ${item.title} ${item.rationale}`),
   );
-  const productCandidates = list(productRows).map((row) => row?.product || row).filter(Boolean);
+  const productCandidates = list(productRows)
+    .map((row) => row?.product || row)
+    .filter(Boolean);
   return [
     ...recommendationProducts.map((item) => ({
       id: item.id,
@@ -140,7 +154,8 @@ function topProductSuggestions({ recommendations, productRows, organizationIntel
     ...productCandidates.slice(0, 3).map((product) => ({
       id: product.id || product.slug || product.name,
       title: product.name || product.title,
-      rationale: product.description || product.summary || 'Product candidate from catalog context.',
+      rationale:
+        product.description || product.summary || 'Product candidate from catalog context.',
       route: product.slug ? `/products/${product.slug}` : product.route || '/products',
       source: 'product-catalog',
     })),
@@ -210,7 +225,8 @@ export class CareDroidBrainService {
     orphanReport = null,
   }: any = {}) {
     this.artifacts = artifacts;
-    this.graphService = graphService || (useFullKnowledgeGraph ? createArtifactKnowledgeGraphService() : null);
+    this.graphService =
+      graphService || (useFullKnowledgeGraph ? createArtifactKnowledgeGraphService() : null);
     this.duplicateReport = normalizeDuplicateReport(duplicateReport);
     this.orphanReport = normalizeOrphanReport(orphanReport);
   }
@@ -333,10 +349,23 @@ export class CareDroidBrainService {
     return {
       title: 'Platform Knowledge',
       metrics: [
-        { label: 'Graph nodes', value: graphSnapshot.summary?.nodes || graphSnapshot.nodes?.length || 0 },
-        { label: 'Graph edges', value: graphSnapshot.summary?.edges || graphSnapshot.edges?.length || 0 },
-        { label: 'Duplicate findings', value: this.duplicateReport.summary.duplicateFindings || this.duplicateReport.findings.length },
-        { label: 'Orphan findings', value: this.orphanReport.summary.total || this.orphanReport.findings.length },
+        {
+          label: 'Graph nodes',
+          value: graphSnapshot.summary?.nodes || graphSnapshot.nodes?.length || 0,
+        },
+        {
+          label: 'Graph edges',
+          value: graphSnapshot.summary?.edges || graphSnapshot.edges?.length || 0,
+        },
+        {
+          label: 'Duplicate findings',
+          value:
+            this.duplicateReport.summary.duplicateFindings || this.duplicateReport.findings.length,
+        },
+        {
+          label: 'Orphan findings',
+          value: this.orphanReport.summary.total || this.orphanReport.findings.length,
+        },
       ],
       insights: [
         `Learning engine produced ${learningModel.summary.optimizationSuggestions} optimization suggestions.`,
@@ -345,13 +374,27 @@ export class CareDroidBrainService {
     };
   }
 
-  buildOrganizationKnowledge({ memoryFabricContext, organizationIntelligence, productSuggestions, agentRows }) {
+  buildOrganizationKnowledge({
+    memoryFabricContext,
+    organizationIntelligence,
+    productSuggestions,
+    agentRows,
+  }) {
     return {
       title: 'Organization Knowledge',
       metrics: [
-        { label: 'Accessible assets', value: compactNumber(memoryFabricContext.organizationMemory?.accessibleAssetCount) },
-        { label: 'Enabled packs', value: compactNumber(memoryFabricContext.organizationMemory?.enabledPackCount) },
-        { label: 'Org recommendations', value: list(organizationIntelligence.recommendations).length },
+        {
+          label: 'Accessible assets',
+          value: compactNumber(memoryFabricContext.organizationMemory?.accessibleAssetCount),
+        },
+        {
+          label: 'Enabled packs',
+          value: compactNumber(memoryFabricContext.organizationMemory?.enabledPackCount),
+        },
+        {
+          label: 'Org recommendations',
+          value: list(organizationIntelligence.recommendations).length,
+        },
         { label: 'Product suggestions', value: productSuggestions.length },
         { label: 'AI agents', value: list(agentRows).length },
       ],
@@ -366,8 +409,14 @@ export class CareDroidBrainService {
       metrics: [
         { label: 'Role', value: roleProfile.roleLabel || roleProfile.role || 'Unknown' },
         { label: 'Recommendations', value: recommendationModel.summary?.total || 0 },
-        { label: 'Preferred assets', value: list(memoryFabricContext.roleMemory?.preferredAssetIds).length },
-        { label: 'Recent assets', value: list(memoryFabricContext.userMemory?.recentAssets).length },
+        {
+          label: 'Preferred assets',
+          value: list(memoryFabricContext.roleMemory?.preferredAssetIds).length,
+        },
+        {
+          label: 'Recent assets',
+          value: list(memoryFabricContext.userMemory?.recentAssets).length,
+        },
       ],
       insights: topRecommendations(recommendationModel, 4).map((item) => item.title),
       roleProfile,
@@ -384,8 +433,12 @@ export class CareDroidBrainService {
         { label: 'Graph duplicates', value: graphSnapshot.duplicateGroups?.length || 0 },
       ],
       insights: [
-        ...list(graphSnapshot.orphanNodes).slice(0, 3).map((node) => `Review orphan graph node: ${node.label}`),
-        ...list(graphSnapshot.duplicateGroups).slice(0, 2).map((group) => `Review duplicate group: ${group.label || group.key}`),
+        ...list(graphSnapshot.orphanNodes)
+          .slice(0, 3)
+          .map((node) => `Review orphan graph node: ${node.label}`),
+        ...list(graphSnapshot.duplicateGroups)
+          .slice(0, 2)
+          .map((group) => `Review duplicate group: ${group.label || group.key}`),
       ],
       validation: artifactValidation,
     };
@@ -420,7 +473,8 @@ export class CareDroidBrainService {
     const duplicateFinding = this.duplicateReport.findings[0] ||
       list(graphSnapshot?.duplicateGroups)[0] || {
         title: 'duplicate system scan',
-        recommendation: 'No blocking duplicate groups are currently surfaced by the lightweight Brain scan.',
+        recommendation:
+          'No blocking duplicate groups are currently surfaced by the lightweight Brain scan.',
         action: 'review',
       };
     const orphanFinding = this.orphanReport.findings[0] ||
@@ -440,7 +494,10 @@ export class CareDroidBrainService {
           id: 'brain-recommend-action',
           type: ACTION_TYPES.RECOMMEND_ACTION,
           title: `Review ${topRecommendation.title}`,
-          rationale: topRecommendation.reason || topRecommendation.summary || 'Recommendation engine identified a relevant next action.',
+          rationale:
+            topRecommendation.reason ||
+            topRecommendation.summary ||
+            'Recommendation engine identified a relevant next action.',
           route: topRecommendation.route || '/recommendations',
           priority: 'high',
           confidence: 0.84,
@@ -451,9 +508,15 @@ export class CareDroidBrainService {
           id: 'brain-detect-duplication',
           type: ACTION_TYPES.DETECT_DUPLICATION,
           title: `Resolve duplication: ${
-            duplicateFinding.title || duplicateFinding.label || duplicateFinding[0]?.label || 'duplicate system scan'
+            duplicateFinding.title ||
+            duplicateFinding.label ||
+            duplicateFinding[0]?.label ||
+            'duplicate system scan'
           }`,
-          rationale: duplicateFinding.recommendation || duplicateFinding.risk || 'Duplicate system audit found a competing source of truth.',
+          rationale:
+            duplicateFinding.recommendation ||
+            duplicateFinding.risk ||
+            'Duplicate system audit found a competing source of truth.',
           route: '/dependency-graph',
           priority: duplicateFinding.action === 'merge' ? 'high' : 'medium',
           confidence: 0.78,
@@ -464,7 +527,10 @@ export class CareDroidBrainService {
           id: 'brain-detect-orphan-asset',
           type: ACTION_TYPES.DETECT_ORPHAN_ASSET,
           title: `Review orphan: ${orphanFinding.title || orphanFinding.label || orphanFinding.id}`,
-          rationale: orphanFinding.evidence || orphanFinding.note || 'Orphan detection found an asset or surface that may need wiring.',
+          rationale:
+            orphanFinding.evidence ||
+            orphanFinding.note ||
+            'Orphan detection found an asset or surface that may need wiring.',
           route: '/assets',
           priority: 'medium',
           confidence: 0.76,
@@ -475,7 +541,9 @@ export class CareDroidBrainService {
           id: 'brain-suggest-product',
           type: ACTION_TYPES.SUGGEST_PRODUCT,
           title: `Consider ${productSuggestions[0].title}`,
-          rationale: productSuggestions[0].rationale || 'Product suggestion matched organization and platform context.',
+          rationale:
+            productSuggestions[0].rationale ||
+            'Product suggestion matched organization and platform context.',
           route: productSuggestions[0].route || '/products',
           priority: 'medium',
           confidence: 0.74,
@@ -485,15 +553,20 @@ export class CareDroidBrainService {
         action({
           id: 'brain-optimize-workflow',
           type: ACTION_TYPES.OPTIMIZE_WORKFLOW,
-          title: workflowSuggestion?.title || organizationRecommendation?.title || `Optimize ${automationRules[0].name}`,
+          title:
+            workflowSuggestion?.title ||
+            organizationRecommendation?.title ||
+            `Optimize ${automationRules[0].name}`,
           rationale:
             workflowSuggestion?.rationale ||
             organizationRecommendation?.rationale ||
             automationRules[0].goal ||
             'Automation and learning signals identified a workflow optimization opportunity.',
           route: workflowSuggestion?.route || organizationRecommendation?.route || '/automation',
-          priority: workflowSuggestion?.priority || organizationRecommendation?.priority || 'medium',
-          confidence: workflowSuggestion?.confidence || organizationRecommendation?.confidence || 0.72,
+          priority:
+            workflowSuggestion?.priority || organizationRecommendation?.priority || 'medium',
+          confidence:
+            workflowSuggestion?.confidence || organizationRecommendation?.confidence || 0.72,
           sourceSignals: ['learning-engine', 'automation-builder'],
         }),
     ].filter(Boolean);

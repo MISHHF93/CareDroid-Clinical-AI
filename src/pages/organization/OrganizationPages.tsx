@@ -4,11 +4,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom';
 import Card from '../../components/ui/card';
 import Button from '../../components/ui/button';
-import {
-  ActionRow,
-  DashboardGrid,
-  CareDroidPage,
-} from '../../components/ui/CareDroidPrimitives';
+import { ActionRow, DashboardGrid, CareDroidPage } from '../../components/ui/CareDroidPrimitives';
 import { useOrganizationContext } from '../../contexts/OrganizationContext';
 import { useUserIdentity } from '../../contexts/UserIdentityContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
@@ -67,7 +63,8 @@ function parseJsonField(value, fallback) {
 }
 
 export function OrganizationDashboard() {
-  const { organization, platformContext, entitledPackIds, refreshPlatformContext } = useUserIdentity();
+  const { organization, platformContext, entitledPackIds, refreshPlatformContext } =
+    useUserIdentity();
   const { branding, integrations, subscription, tenant } = useOrganizationContext();
   const [analytics, setAnalytics] = useState<any>(null);
 
@@ -85,7 +82,10 @@ export function OrganizationDashboard() {
       className="org-page"
       contentClassName="cd-page-stack cd-page-stack--compact org-page__content"
       title={organization?.name || 'Organization'}
-      description={organization?.organizationType || 'Configure an organization to unlock pack-based workflows.'}
+      description={
+        organization?.organizationType ||
+        'Configure an organization to unlock pack-based workflows.'
+      }
       actions={
         <ActionRow align="end" className="org-page-actions">
           <Link to="/settings/organization">
@@ -100,7 +100,6 @@ export function OrganizationDashboard() {
         </ActionRow>
       }
     >
-
       <DashboardGrid className="org-grid">
         <Card className="org-card">
           <h2>Enabled packs</h2>
@@ -116,7 +115,8 @@ export function OrganizationDashboard() {
           <h2>Tenant</h2>
           <p>{tenant?.tenantId || organization?.slug || 'No tenant selected'}</p>
           <p className="org-pack-meta">
-            {branding?.displayName || organization?.name || 'CareDroid'} · {tenant?.complianceMode || 'hipaa'}
+            {branding?.displayName || organization?.name || 'CareDroid'} ·{' '}
+            {tenant?.complianceMode || 'hipaa'}
           </p>
         </Card>
 
@@ -145,7 +145,9 @@ export function OrganizationDashboard() {
           <ul>
             {(platformContext?.aiAgents || []).map((agent) => (
               <li key={agent.id}>
-                <Link className="org-card__link" to={`/assistant?agent=${agent.id}`}>{agent.title}</Link>
+                <Link className="org-card__link" to={`/assistant?agent=${agent.id}`}>
+                  {agent.title}
+                </Link>
               </li>
             ))}
           </ul>
@@ -212,7 +214,10 @@ export function OrganizationSettings() {
         if (ctx.roleProfile?.id) setSelectedRoleProfile(ctx.roleProfile.id);
       })
       .catch((error) => {
-        logger.warn('[OrganizationPages] Failed to load platform context; role profile pre-selection skipped', error);
+        logger.warn(
+          '[OrganizationPages] Failed to load platform context; role profile pre-selection skipped',
+          error,
+        );
       });
     PlatformAssetsApi.listRoleProfiles()
       .then(setRoleProfiles)
@@ -239,7 +244,10 @@ export function OrganizationSettings() {
     setCreatingOrganization(true);
     setStatus('Creating…');
     try {
-      const slug = form.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+      const slug = form.name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '');
       await PlatformAssetsApi.createOrganization({
         name: form.name,
         slug: slug || `org-${Date.now()}`,
@@ -311,7 +319,9 @@ export function OrganizationSettings() {
   return (
     <div className="org-page">
       <header className="org-page-header">
-        <p className="org-page-title-text" data-testid="cd-page-title-text">Organization settings</p>
+        <p className="org-page-title-text" data-testid="cd-page-title-text">
+          Organization settings
+        </p>
         <Link to="/organization">← Organization home</Link>
       </header>
 
@@ -341,14 +351,19 @@ export function OrganizationSettings() {
               ))}
             </select>
           </label>
-          <Button onClick={createOrganization} loading={creatingOrganization}>Create organization</Button>
+          <Button onClick={createOrganization} loading={creatingOrganization}>
+            Create organization
+          </Button>
         </Card>
       ) : (
         <Card className="org-card">
           <h2>{organization.name}</h2>
           <label>
             Display name
-            <input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} />
+            <input
+              value={form.name}
+              onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+            />
           </label>
           <label>
             Organization type
@@ -404,13 +419,17 @@ export function OrganizationSettings() {
               <option value="government">Government</option>
             </select>
           </label>
-          <Button onClick={saveOrganization} loading={savingOrganization}>Save organization</Button>
+          <Button onClick={saveOrganization} loading={savingOrganization}>
+            Save organization
+          </Button>
         </Card>
       )}
 
       <Card className="org-card">
         <h2>Integrations</h2>
-        <p className="org-pack-meta">Organization-aware integration state from the tenant engine.</p>
+        <p className="org-pack-meta">
+          Organization-aware integration state from the tenant engine.
+        </p>
         <div className="org-integration-list">
           {integrations.slice(0, 8).map((integration) => (
             <div key={integration.slug} className="org-integration-row">
@@ -429,7 +448,10 @@ export function OrganizationSettings() {
 
       <Card className="org-card">
         <h2>Role profile</h2>
-        <select value={selectedRoleProfile} onChange={(e) => setSelectedRoleProfile(e.target.value)}>
+        <select
+          value={selectedRoleProfile}
+          onChange={(e) => setSelectedRoleProfile(e.target.value)}
+        >
           <option value="">Select role profile</option>
           {roleProfiles.map((profile) => (
             <option key={profile.id} value={profile.id}>
@@ -442,7 +464,9 @@ export function OrganizationSettings() {
             </option>
           ))}
         </select>
-        <Button onClick={saveRoleProfile} loading={savingRoleProfile}>Save role profile</Button>
+        <Button onClick={saveRoleProfile} loading={savingRoleProfile}>
+          Save role profile
+        </Button>
       </Card>
 
       {status && <p className="org-status">{status}</p>}
@@ -509,7 +533,7 @@ export function PackMarketplace() {
         platformContext,
         roleProfile,
       }),
-    [account, activeWorkspace, platformContext, preferences, roleProfile, workspaceState]
+    [account, activeWorkspace, platformContext, preferences, roleProfile, workspaceState],
   );
   const recommendedPacks = useMemo(
     () =>
@@ -519,19 +543,18 @@ export function PackMarketplace() {
         installedPackIds: platformContext?.entitledPackIds || [],
         limit: packs.length || 6,
       }),
-    [packs, platformContext?.entitledPackIds, roleIntelligenceProfile]
+    [packs, platformContext?.entitledPackIds, roleIntelligenceProfile],
   );
   const recommendedPackIds = useMemo(
     () => new Set(recommendedPacks.map((pack) => pack.id)),
-    [recommendedPacks]
+    [recommendedPacks],
   );
   const orderedPacks = useMemo(() => {
     const byId = new Map(recommendedPacks.map((pack) => [pack.id, pack]));
     return [...packs]
       .map((pack) => byId.get(pack.id) || pack)
       .sort((a, b) => {
-        const scoreDelta =
-          (b.roleIntelligence?.score || 0) - (a.roleIntelligence?.score || 0);
+        const scoreDelta = (b.roleIntelligence?.score || 0) - (a.roleIntelligence?.score || 0);
         return scoreDelta || a.name.localeCompare(b.name);
       });
   }, [packs, recommendedPacks]);
@@ -563,7 +586,9 @@ export function PackMarketplace() {
   return (
     <div className="org-page">
       <header className="org-page-header">
-        <p className="org-page-title-text" data-testid="cd-page-title-text">Asset Pack Marketplace</p>
+        <p className="org-page-title-text" data-testid="cd-page-title-text">
+          Asset Pack Marketplace
+        </p>
         <p className="org-page-subtitle">
           Enable clinical, operations, training, governance, and research packs for the active
           organization. Each pack maps assets, dependencies, modules, and target roles.
@@ -589,10 +614,13 @@ export function PackMarketplace() {
                 <div>
                   <h2>{pack.name}</h2>
                   <p className="org-pack-meta">
-                    {pack.includedAssetCount || pack.assetIds?.length || 0} assets · {pack.pricingTier} tier
+                    {pack.includedAssetCount || pack.assetIds?.length || 0} assets ·{' '}
+                    {pack.pricingTier} tier
                   </p>
                 </div>
-                <span className={`org-status-pill org-status-pill--${installed ? 'enabled' : 'available'}`}>
+                <span
+                  className={`org-status-pill org-status-pill--${installed ? 'enabled' : 'available'}`}
+                >
                   {installed ? 'enabled' : 'disabled'}
                 </span>
               </div>
@@ -644,7 +672,10 @@ export function PackMarketplace() {
                   {(pack.includedAssets || []).slice(0, expanded ? 99 : 5).map((asset) => (
                     <li key={asset.id}>
                       <span>{asset.title || asset.id}</span>
-                      <small>{asset.type || asset.category || 'asset'} {asset.route ? `· ${asset.route}` : ''}</small>
+                      <small>
+                        {asset.type || asset.category || 'asset'}{' '}
+                        {asset.route ? `· ${asset.route}` : ''}
+                      </small>
                     </li>
                   ))}
                 </ul>
@@ -653,7 +684,9 @@ export function PackMarketplace() {
                     variant="ghost"
                     onClick={() => setExpandedPackId(expanded ? '' : pack.id)}
                   >
-                    {expanded ? 'Show fewer assets' : `Show all ${pack.includedAssets.length} assets`}
+                    {expanded
+                      ? 'Show fewer assets'
+                      : `Show all ${pack.includedAssets.length} assets`}
                   </Button>
                 )}
               </div>
@@ -688,7 +721,9 @@ export function PackMarketplace() {
                 </div>
               )}
               <Button
-                disabled={!organization?.id || (Boolean(togglingPackId) && togglingPackId !== pack.id)}
+                disabled={
+                  !organization?.id || (Boolean(togglingPackId) && togglingPackId !== pack.id)
+                }
                 loading={togglingPackId === pack.id}
                 onClick={() => togglePack(pack.id, installed)}
               >
@@ -728,7 +763,10 @@ export function PlatformAnalyticsPage() {
     ['Enabled packs', dashboards.adoption?.enabledPackCount ?? analytics?.enabledPackCount ?? 0],
     ['Enabled assets', dashboards.adoption?.enabledAssetCount ?? 0],
     ['Adoption score', `${dashboards.adoption?.adoptionScore ?? 0}%`],
-    ['Launches', dashboards.engagement?.launchCount ?? dashboards.engagement?.totalUsageEvents ?? 0],
+    [
+      'Launches',
+      dashboards.engagement?.launchCount ?? dashboards.engagement?.totalUsageEvents ?? 0,
+    ],
     ['Avg duration', formatDuration(dashboards.engagement?.averageDurationSeconds ?? 0)],
     ['Repeat usage', dashboards.engagement?.repeatUsageCount ?? 0],
     ['Abandonments', dashboards.engagement?.abandonmentCount ?? 0],
@@ -753,7 +791,13 @@ export function PlatformAnalyticsPage() {
                 )}
                 {row.metadata?.reason && <small>{row.metadata.reason}</small>}
               </span>
-              <b>{row.metadata?.usefulnessScore ?? row.count ?? row.events ?? row.status ?? 'enabled'}</b>
+              <b>
+                {row.metadata?.usefulnessScore ??
+                  row.count ??
+                  row.events ??
+                  row.status ??
+                  'enabled'}
+              </b>
             </li>
           ))}
         </ol>
@@ -766,9 +810,12 @@ export function PlatformAnalyticsPage() {
   return (
     <div className="org-page">
       <header className="org-page-header">
-        <p className="org-page-title-text" data-testid="cd-page-title-text">Platform analytics</p>
+        <p className="org-page-title-text" data-testid="cd-page-title-text">
+          Platform analytics
+        </p>
         <p className="org-page-subtitle">
-          Asset utilization intelligence for data-driven promotion, improvement, hiding, and merge decisions.
+          Asset utilization intelligence for data-driven promotion, improvement, hiding, and merge
+          decisions.
         </p>
       </header>
       {analytics ? (
@@ -806,7 +853,10 @@ export function PlatformAnalyticsPage() {
           <div className="org-analytics-section">
             <h2>Top assets</h2>
             <div className="org-grid">
-              {renderMetricList('Most useful assets', dashboards.topAssets || analytics.topTools || [])}
+              {renderMetricList(
+                'Most useful assets',
+                dashboards.topAssets || analytics.topTools || [],
+              )}
             </div>
           </div>
 
@@ -884,7 +934,9 @@ export function CustomerSuccessDashboard() {
     return (
       <div className="org-page">
         <header className="org-page-header">
-          <p className="org-page-title-text" data-testid="cd-page-title-text">Customer Success</p>
+          <p className="org-page-title-text" data-testid="cd-page-title-text">
+            Customer Success
+          </p>
           <p className="org-page-subtitle">Link an organization to view customer health.</p>
         </header>
       </div>
@@ -899,7 +951,9 @@ export function CustomerSuccessDashboard() {
   return (
     <div className="org-page">
       <header className="org-page-header">
-        <p className="org-page-title-text" data-testid="cd-page-title-text">Customer Success</p>
+        <p className="org-page-title-text" data-testid="cd-page-title-text">
+          Customer Success
+        </p>
         <p className="org-page-subtitle">
           Customer health, retention signals, adoption, active users, asset usage, AI usage,
           simulations, workflows, and underused products for {organization.name}.
@@ -927,7 +981,9 @@ export function CustomerSuccessDashboard() {
             <Card className="org-card org-analytics-metric">
               <h2>Health score</h2>
               <p>{dashboard.health?.score || 0}</p>
-              <span className={`org-status-pill org-status-pill--${dashboard.health?.status || 'available'}`}>
+              <span
+                className={`org-status-pill org-status-pill--${dashboard.health?.status || 'available'}`}
+              >
                 {dashboard.health?.status || 'needs-data'}
               </span>
             </Card>
@@ -1130,7 +1186,15 @@ export function OrganizationIntelligenceProfile() {
       customerSuccess,
       tenantAdministration,
     });
-  }, [analytics, customerSuccess, marketplacePacks, organizationContext, tenantAdministration, userIdentity, workspaceContext]);
+  }, [
+    analytics,
+    customerSuccess,
+    marketplacePacks,
+    organizationContext,
+    tenantAdministration,
+    userIdentity,
+    workspaceContext,
+  ]);
 
   const metrics = [
     ['Organization type', profile.organization.organizationType],
@@ -1146,10 +1210,13 @@ export function OrganizationIntelligenceProfile() {
   return (
     <div className="org-page">
       <header className="org-page-header">
-        <p className="org-page-title-text" data-testid="cd-page-title-text">Organization Intelligence</p>
+        <p className="org-page-title-text" data-testid="cd-page-title-text">
+          Organization Intelligence
+        </p>
         <p className="org-page-subtitle">
           Organization Intelligence Profile for {profile.organization.name}: behavior-aware
-          recommendations across packs, assets, AI usage, adoption, workflows, simulations, and automation.
+          recommendations across packs, assets, AI usage, adoption, workflows, simulations, and
+          automation.
         </p>
         <div className="org-page-actions">
           <Link to="/platform-analytics">Platform analytics</Link>
@@ -1158,9 +1225,16 @@ export function OrganizationIntelligenceProfile() {
         </div>
       </header>
 
-      {status && <Card className="org-card"><p>{status}</p></Card>}
+      {status && (
+        <Card className="org-card">
+          <p>{status}</p>
+        </Card>
+      )}
 
-      <section className="org-grid org-analytics-metrics" aria-label="Organization intelligence metrics">
+      <section
+        className="org-grid org-analytics-metrics"
+        aria-label="Organization intelligence metrics"
+      >
         {metrics.map(([label, value]) => (
           <Card key={label} className="org-card org-analytics-metric">
             <h2>{label}</h2>
@@ -1176,9 +1250,12 @@ export function OrganizationIntelligenceProfile() {
             <h2>Identity</h2>
             <p>{profile.organization.name}</p>
             <p className="org-pack-meta">
-              Tenant: {profile.organization.tenantId} · Subscription: {profile.organization.subscriptionTier}
+              Tenant: {profile.organization.tenantId} · Subscription:{' '}
+              {profile.organization.subscriptionTier}
             </p>
-            <span className={`org-status-pill org-status-pill--${profile.organization.healthStatus}`}>
+            <span
+              className={`org-status-pill org-status-pill--${profile.organization.healthStatus}`}
+            >
               {profile.organization.healthStatus}
             </span>
           </Card>
@@ -1190,7 +1267,9 @@ export function OrganizationIntelligenceProfile() {
                   {department.name}
                 </span>
               ))}
-              {!profile.departments.length && <span className="org-chip">No departments synced</span>}
+              {!profile.departments.length && (
+                <span className="org-chip">No departments synced</span>
+              )}
             </div>
           </Card>
           <Card className="org-card">
@@ -1212,7 +1291,9 @@ export function OrganizationIntelligenceProfile() {
                 dimensions.packUsage/packAdoption, a narrower universe than the backend
                 aggregate, so the two counts could silently disagree. */}
             <p>{profile.adoption.enabledPackCount} enabled</p>
-            <p className="org-pack-meta">{profile.packs.filter((pack) => !pack.enabled).length} missing candidates</p>
+            <p className="org-pack-meta">
+              {profile.packs.filter((pack) => !pack.enabled).length} missing candidates
+            </p>
           </Card>
         </div>
       </section>
@@ -1231,11 +1312,26 @@ export function OrganizationIntelligenceProfile() {
         <h2>Adaptive recommendations</h2>
         <div className="org-grid">
           <RecommendationList title="Missing packs" rows={profile.recommendations.missingPacks} />
-          <RecommendationList title="Underused assets" rows={profile.recommendations.underusedAssets} />
-          <RecommendationList title="Workflow opportunities" rows={profile.recommendations.workflowOpportunities} />
-          <RecommendationList title="Simulation opportunities" rows={profile.recommendations.simulationOpportunities} />
-          <RecommendationList title="Automation opportunities" rows={profile.recommendations.automationOpportunities} />
-          <RecommendationList title="AI assist opportunities" rows={profile.recommendations.aiAssistOpportunities} />
+          <RecommendationList
+            title="Underused assets"
+            rows={profile.recommendations.underusedAssets}
+          />
+          <RecommendationList
+            title="Workflow opportunities"
+            rows={profile.recommendations.workflowOpportunities}
+          />
+          <RecommendationList
+            title="Simulation opportunities"
+            rows={profile.recommendations.simulationOpportunities}
+          />
+          <RecommendationList
+            title="Automation opportunities"
+            rows={profile.recommendations.automationOpportunities}
+          />
+          <RecommendationList
+            title="AI assist opportunities"
+            rows={profile.recommendations.aiAssistOpportunities}
+          />
         </div>
       </section>
 
@@ -1281,7 +1377,7 @@ export function AssetLifecycleAdmin() {
 
   const managedAssetCount = useMemo(
     () => assets.filter((asset) => LIFECYCLE_MANAGED_ASSET_TYPES.includes(asset.assetType)).length,
-    [assets]
+    [assets],
   );
 
   const setLifecycle = async (assetId, lifecycle) => {
@@ -1298,7 +1394,9 @@ export function AssetLifecycleAdmin() {
   return (
     <div className="org-page">
       <header className="org-page-header">
-        <p className="org-page-title-text" data-testid="cd-page-title-text">Asset lifecycle</p>
+        <p className="org-page-title-text" data-testid="cd-page-title-text">
+          Asset lifecycle
+        </p>
         <p className="org-page-subtitle">
           Manage draft, beta, active, deprecated, and archived states for tools, calculators,
           simulations, workflows, AI agents, and integrations.
@@ -1389,7 +1487,9 @@ export function DepartmentsPage() {
   return (
     <div className="org-page">
       <header className="org-page-header">
-        <p className="org-page-title-text" data-testid="cd-page-title-text">Departments</p>
+        <p className="org-page-title-text" data-testid="cd-page-title-text">
+          Departments
+        </p>
         <p className="org-page-subtitle">
           Department-to-asset mapping across packs, assets, roles, permissions, and users.
         </p>
@@ -1449,7 +1549,11 @@ export function DepartmentsPage() {
                 {selectedDepartment.assets.map((asset) => (
                   <li key={asset.id}>
                     <span>
-                      {asset.route ? <Link to={asset.route}>{asset.title || asset.id}</Link> : asset.title || asset.id}
+                      {asset.route ? (
+                        <Link to={asset.route}>{asset.title || asset.id}</Link>
+                      ) : (
+                        asset.title || asset.id
+                      )}
                     </span>
                     <small>
                       {asset.assetType} · primary: {asset.primaryDepartment}
@@ -1458,7 +1562,9 @@ export function DepartmentsPage() {
                         : ''}
                     </small>
                     <small>Roles: {(asset.recommendedRoles || []).join(', ') || 'none'}</small>
-                    <small>Permissions: {(asset.requiredPermissions || []).join(', ') || 'none'}</small>
+                    <small>
+                      Permissions: {(asset.requiredPermissions || []).join(', ') || 'none'}
+                    </small>
                   </li>
                 ))}
               </ul>
@@ -1517,9 +1623,12 @@ export function ServiceLinesPage() {
   return (
     <div className="org-page">
       <header className="org-page-header">
-        <p className="org-page-title-text" data-testid="cd-page-title-text">Service Lines</p>
+        <p className="org-page-title-text" data-testid="cd-page-title-text">
+          Service Lines
+        </p>
         <p className="org-page-subtitle">
-          Service Line to Department to Asset Pack to Asset architecture for clinical and operational rollouts.
+          Service Line to Department to Asset Pack to Asset architecture for clinical and
+          operational rollouts.
         </p>
       </header>
 
@@ -1546,8 +1655,8 @@ export function ServiceLinesPage() {
           <Card className="org-card">
             <h2>{selectedServiceLine.name}</h2>
             <p className="org-pack-meta">
-              {selectedServiceLine.departmentCount} departments · {selectedServiceLine.packCount} packs ·{' '}
-              {selectedServiceLine.assetCount} assets
+              {selectedServiceLine.departmentCount} departments · {selectedServiceLine.packCount}{' '}
+              packs · {selectedServiceLine.assetCount} assets
             </p>
           </Card>
 
@@ -1595,10 +1704,15 @@ export function ServiceLinesPage() {
                 {selectedServiceLine.assets.map((asset) => (
                   <li key={asset.id}>
                     <span>
-                      {asset.route ? <Link to={asset.route}>{asset.title || asset.id}</Link> : asset.title || asset.id}
+                      {asset.route ? (
+                        <Link to={asset.route}>{asset.title || asset.id}</Link>
+                      ) : (
+                        asset.title || asset.id
+                      )}
                     </span>
                     <small>
-                      {asset.assetType} · departments: {(asset.departmentIds || []).join(', ') || asset.primaryDepartment}
+                      {asset.assetType} · departments:{' '}
+                      {(asset.departmentIds || []).join(', ') || asset.primaryDepartment}
                     </small>
                     <small>Packs: {(asset.packIds || []).join(', ') || 'none'}</small>
                   </li>
@@ -1675,7 +1789,9 @@ export function TenantAdministrationCenter() {
         .filter((integration) => integration.status === 'enabled')
         .map((integration) => integration.slug)
         .join('\n'),
-      integrationsRequestedText: (result.noCodeConfiguration?.integrationsRequested || []).join('\n'),
+      integrationsRequestedText: (result.noCodeConfiguration?.integrationsRequested || []).join(
+        '\n',
+      ),
       workspacesJson: prettyJson(result.workspaces, []),
       permissionsJson: prettyJson(result.permissions?.overrides, {}),
     });
@@ -1718,7 +1834,10 @@ export function TenantAdministrationCenter() {
       integrations: splitList(form.integrationsText),
       integrationsRequested: splitList(form.integrationsRequestedText),
       workspaceDefaults: parseJsonField(form.workspacesJson, admin?.workspaces || []),
-      permissionsOverrides: parseJsonField(form.permissionsJson, admin?.permissions?.overrides || {}),
+      permissionsOverrides: parseJsonField(
+        form.permissionsJson,
+        admin?.permissions?.overrides || {},
+      ),
     };
     try {
       const result = await PlatformAssetsApi.updateTenantAdministration(organization.id, payload);
@@ -1730,8 +1849,12 @@ export function TenantAdministrationCenter() {
         organizationName: payload.name || organization.name,
         organizationType: payload.organizationType,
         subscriptionPlan: payload.subscription.tier,
-        enabledWorkspaces: workspaceDefaults.map((workspace) => workspace.id || workspace.type).filter(Boolean),
-        enabledAssetPacks: workspaceDefaults.flatMap((workspace) => workspace.enabledAssetPacks || []),
+        enabledWorkspaces: workspaceDefaults
+          .map((workspace) => workspace.id || workspace.type)
+          .filter(Boolean),
+        enabledAssetPacks: workspaceDefaults.flatMap(
+          (workspace) => workspace.enabledAssetPacks || [],
+        ),
         defaultWorkspace: workspaceDefaults[0]?.id || workspaceDefaults[0]?.type || 'emergency',
         roles: (result.users || admin?.users || [])
           .map((user) => user.roleProfileId || user.membershipRole)
@@ -1751,8 +1874,12 @@ export function TenantAdministrationCenter() {
     return (
       <div className="org-page">
         <header className="org-page-header">
-          <p className="org-page-title-text" data-testid="cd-page-title-text">Tenant Administration Center</p>
-          <p className="org-page-subtitle">Create an organization before managing tenant settings.</p>
+          <p className="org-page-title-text" data-testid="cd-page-title-text">
+            Tenant Administration Center
+          </p>
+          <p className="org-page-subtitle">
+            Create an organization before managing tenant settings.
+          </p>
         </header>
       </div>
     );
@@ -1763,7 +1890,9 @@ export function TenantAdministrationCenter() {
   const permissionOverrides = admin?.permissions?.overrides || {};
   const integrations = admin?.integrations || [];
   const workspaceDefaults = parseJsonField(form.workspacesJson, admin?.workspaces || []);
-  const enabledWorkspaceIds = new Set(workspaceDefaults.map((workspace) => workspace.id || workspace.type));
+  const enabledWorkspaceIds = new Set(
+    workspaceDefaults.map((workspace) => workspace.id || workspace.type),
+  );
   const defaultWorkspaceId = workspaceDefaults[0]?.id || workspaceDefaults[0]?.type || '';
   const previewRole = roleProfiles[0]?.id || 'hospital-administrator';
   const updateWorkspaceDefaults = (updater) => {
@@ -1782,22 +1911,27 @@ export function TenantAdministrationCenter() {
   const patchWorkspaceDefault = (workspaceId, patch) => {
     updateWorkspaceDefaults((current) =>
       current.map((workspace) =>
-        (workspace.id || workspace.type) === workspaceId ? { ...workspace, ...patch } : workspace
-      )
+        (workspace.id || workspace.type) === workspaceId ? { ...workspace, ...patch } : workspace,
+      ),
     );
   };
   const setDefaultWorkspace = (workspaceId) => {
     updateWorkspaceDefaults((current) => {
       const target = current.find((workspace) => (workspace.id || workspace.type) === workspaceId);
       if (!target) return current;
-      return [target, ...current.filter((workspace) => (workspace.id || workspace.type) !== workspaceId)];
+      return [
+        target,
+        ...current.filter((workspace) => (workspace.id || workspace.type) !== workspaceId),
+      ];
     });
   };
 
   return (
     <div className="org-page">
       <header className="org-page-header">
-        <p className="org-page-title-text" data-testid="cd-page-title-text">Tenant Administration Center</p>
+        <p className="org-page-title-text" data-testid="cd-page-title-text">
+          Tenant Administration Center
+        </p>
         <p className="org-page-subtitle">
           Tenant-scoped administration for organization profile, departments, workspaces, users,
           roles, permissions, branding, integrations, and subscriptions without code changes.
@@ -1833,7 +1967,10 @@ export function TenantAdministrationCenter() {
           <h2>Organization profile</h2>
           <label>
             Name
-            <input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} />
+            <input
+              value={form.name}
+              onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+            />
           </label>
           <label>
             Type
@@ -1907,7 +2044,10 @@ export function TenantAdministrationCenter() {
           </label>
           <label>
             Theme
-            <select value={form.theme} onChange={(e) => setForm((f) => ({ ...f, theme: e.target.value }))}>
+            <select
+              value={form.theme}
+              onChange={(e) => setForm((f) => ({ ...f, theme: e.target.value }))}
+            >
               <option value="system">System</option>
               <option value="light">Light</option>
               <option value="dark">Dark</option>
@@ -1923,11 +2063,13 @@ export function TenantAdministrationCenter() {
               value={form.subscriptionTier}
               onChange={(e) => setForm((f) => ({ ...f, subscriptionTier: e.target.value }))}
             >
-              {['free', 'starter', 'professional', 'enterprise', 'academic', 'government'].map((tier) => (
-                <option key={tier} value={tier}>
-                  {tier}
-                </option>
-              ))}
+              {['free', 'starter', 'professional', 'enterprise', 'academic', 'government'].map(
+                (tier) => (
+                  <option key={tier} value={tier}>
+                    {tier}
+                  </option>
+                ),
+              )}
             </select>
           </label>
           <p className="org-pack-meta">
@@ -1961,9 +2103,7 @@ export function TenantAdministrationCenter() {
             <input
               value={form.loginBackgroundImageUrl}
               placeholder="https://cdn.example.com/login-background.jpg"
-              onChange={(e) =>
-                setForm((f) => ({ ...f, loginBackgroundImageUrl: e.target.value }))
-              }
+              onChange={(e) => setForm((f) => ({ ...f, loginBackgroundImageUrl: e.target.value }))}
             />
           </label>
         </Card>
@@ -1998,7 +2138,9 @@ export function TenantAdministrationCenter() {
 
         <Card className="org-card org-admin-wide-card">
           <h2>Departments</h2>
-          <p className="org-pack-meta">One department ID per line. These drive tenant-scoped workspaces and configuration.</p>
+          <p className="org-pack-meta">
+            One department ID per line. These drive tenant-scoped workspaces and configuration.
+          </p>
           <textarea
             value={form.departmentsText}
             onChange={(e) => setForm((f) => ({ ...f, departmentsText: e.target.value }))}
@@ -2009,11 +2151,15 @@ export function TenantAdministrationCenter() {
         <Card className="org-card org-admin-wide-card">
           <h2>Role access preview</h2>
           <p className="org-pack-meta">
-            Preview navigation routes, workspaces, and benefits before assigning a canonical SaaS role.
+            Preview navigation routes, workspaces, and benefits before assigning a canonical SaaS
+            role.
           </p>
           <label>
             Canonical role
-            <select value={rolePreviewId} onChange={(event) => setRolePreviewId(event.target.value)}>
+            <select
+              value={rolePreviewId}
+              onChange={(event) => setRolePreviewId(event.target.value)}
+            >
               {catalogRoleOptions.map((role) => (
                 <option key={role.id} value={role.id}>
                   {role.label}
@@ -2042,10 +2188,20 @@ export function TenantAdministrationCenter() {
             {getCanonicalWorkspaceRegistry().map((workspace) => {
               const workspaceId = workspace.workspaceId || workspace.id;
               const enabled = enabledWorkspaceIds.has(workspaceId);
-              const configured = workspaceDefaults.find((item) => (item.id || item.type) === workspaceId) || {};
+              const configured =
+                workspaceDefaults.find((item) => (item.id || item.type) === workspaceId) || {};
               const roleText = (configured.allowedRoles || workspace.allowedRoles || []).join(', ');
-              const packText = (configured.enabledAssetPacks || workspace.defaultAssetPacks || []).join(', ');
-              const previewAllowed = !roleText || roleText.split(',').map((item) => item.trim()).includes(previewRole);
+              const packText = (
+                configured.enabledAssetPacks ||
+                workspace.defaultAssetPacks ||
+                []
+              ).join(', ');
+              const previewAllowed =
+                !roleText ||
+                roleText
+                  .split(',')
+                  .map((item) => item.trim())
+                  .includes(previewRole);
               return (
                 <div key={workspaceId} className="org-integration-row">
                   <span>
@@ -2082,7 +2238,10 @@ export function TenantAdministrationCenter() {
                     )}
                   </span>
                   <span>
-                    <Button variant={enabled ? 'secondary' : 'primary'} onClick={() => toggleWorkspaceEnabled(workspace)}>
+                    <Button
+                      variant={enabled ? 'secondary' : 'primary'}
+                      onClick={() => toggleWorkspaceEnabled(workspace)}
+                    >
                       {enabled ? 'Disable' : 'Enable'}
                     </Button>
                     {enabled && (
@@ -2090,7 +2249,9 @@ export function TenantAdministrationCenter() {
                         {defaultWorkspaceId === workspaceId ? 'Default' : 'Set default'}
                       </Button>
                     )}
-                    <span className={`org-status-pill org-status-pill--${previewAllowed ? 'active' : 'disabled'}`}>
+                    <span
+                      className={`org-status-pill org-status-pill--${previewAllowed ? 'active' : 'disabled'}`}
+                    >
                       {previewAllowed ? 'Role visible' : 'Role hidden'}
                     </span>
                   </span>
@@ -2102,7 +2263,10 @@ export function TenantAdministrationCenter() {
 
         <Card className="org-card org-admin-wide-card">
           <h2>Workspaces</h2>
-          <p className="org-pack-meta">Raw workspace defaults remain available as an escape hatch for advanced tenant configuration.</p>
+          <p className="org-pack-meta">
+            Raw workspace defaults remain available as an escape hatch for advanced tenant
+            configuration.
+          </p>
           <textarea
             value={form.workspacesJson}
             onChange={(e) => setForm((f) => ({ ...f, workspacesJson: e.target.value }))}
@@ -2113,7 +2277,8 @@ export function TenantAdministrationCenter() {
         <Card className="org-card org-admin-wide-card">
           <h2>Permissions</h2>
           <p className="org-pack-meta">
-            Overrides are stored in tenant settings. Catalog contains {admin?.permissions?.catalog?.length || 0} permissions.
+            Overrides are stored in tenant settings. Catalog contains{' '}
+            {admin?.permissions?.catalog?.length || 0} permissions.
           </p>
           <textarea
             value={form.permissionsJson}
@@ -2158,7 +2323,9 @@ export function TenantAdministrationCenter() {
             {roleProfiles.slice(0, 8).map((role) => (
               <li key={role.id}>
                 <span>{role.label}</span>
-                <small>{(role.requiredPermissions || []).join(', ') || 'No explicit permissions'}</small>
+                <small>
+                  {(role.requiredPermissions || []).join(', ') || 'No explicit permissions'}
+                </small>
               </li>
             ))}
           </ul>
@@ -2178,7 +2345,9 @@ export function TenantAdministrationCenter() {
             Requested slugs
             <textarea
               value={form.integrationsRequestedText}
-              onChange={(e) => setForm((f) => ({ ...f, integrationsRequestedText: e.target.value }))}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, integrationsRequestedText: e.target.value }))
+              }
               rows={4}
             />
           </label>

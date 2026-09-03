@@ -27,9 +27,9 @@ const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
 const patternsSource = readFileSync(
   join(
     __dirname,
-    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts'
+    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts',
   ),
-  'utf8'
+  'utf8',
 );
 
 describe('PERC (Tier B chat-assisted) wiring', () => {
@@ -78,7 +78,7 @@ describe('PERC (Tier B chat-assisted) wiring', () => {
       const launch = resolveCatalogLaunch(alias);
       expect(launch.path).toBe(PERC_HUB_PATH);
       expect(launch.registryId).toBe(canonical);
-    }
+    },
   );
 
   it('separates pe-rule-out (PERC) from pe-score (Wells PE) launches', () => {
@@ -118,14 +118,11 @@ describe('PERC (Tier B chat-assisted) wiring', () => {
     expect(peGroup?.lead).toMatch(/do not rule in or rule out/i);
   });
 
-  it.each(PERC_CATALOG_SEARCH_QUERIES)(
-    'catalog search for %s via "%s"',
-    (primaryId, query) => {
-      const rows = getMedicalToolsCatalogRows();
-      const hits = catalogRowsMatchingQuery(rows, query);
-      expect(hits.some((r) => r.primaryId === primaryId)).toBe(true);
-    }
-  );
+  it.each(PERC_CATALOG_SEARCH_QUERIES)('catalog search for %s via "%s"', (primaryId, query) => {
+    const rows = getMedicalToolsCatalogRows();
+    const hits = catalogRowsMatchingQuery(rows, query);
+    expect(hits.some((r) => r.primaryId === primaryId)).toBe(true);
+  });
 
   it('lists perc in toolRegistry export', () => {
     expect(toolRegistry.some((t) => t.id === PERC_REGISTRY_ID)).toBe(true);

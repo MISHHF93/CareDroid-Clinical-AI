@@ -23,7 +23,10 @@ describe('demoPersonaModel', () => {
   });
 
   it('keeps persona identity when switching demo role views', () => {
-    const switched = applyDemoRoleView(buildOpenAccessDemoUser(), EMERGENCY_ROLE_IDS.registrationClerk);
+    const switched = applyDemoRoleView(
+      buildOpenAccessDemoUser(),
+      EMERGENCY_ROLE_IDS.registrationClerk,
+    );
     expect(switched.fullName).toBe('Dr. Cara George');
     expect(switched.role).toBe(EMERGENCY_ROLE_IDS.registrationClerk);
     expect((switched.profile as { roleProfileId?: string }).roleProfileId).toBe(
@@ -117,7 +120,12 @@ describe('demoPersonaModel', () => {
     const demoUser = hydrateStoredDemoUser({ id: 'open-access-user', authMode: 'open-access' });
     const rawBackendProfile = {
       saasProfile: { displayName: 'Dev Clinician', email: 'dev@caredroid.local' },
-      account: { displayName: 'Dev Clinician', email: 'dev@caredroid.local', role: 'physician', verified: true },
+      account: {
+        displayName: 'Dev Clinician',
+        email: 'dev@caredroid.local',
+        role: 'physician',
+        verified: true,
+      },
     };
     const masked = enrichDemoIdentityFallback(demoUser, rawBackendProfile);
     expect((masked.saasProfile as { displayName?: string }).displayName).toBe('Dr. Cara George');
@@ -140,7 +148,10 @@ describe('demoPersonaModel', () => {
       isDevAuthBypass: true,
       // switchDemoRole() sets profile.saasRole directly on `user` as part of the
       // same synchronous update that changes `role` -- this is what should win.
-      profile: { roleProfileId: EMERGENCY_ROLE_IDS.registrationClerk, saasRole: 'registration-clerk' },
+      profile: {
+        roleProfileId: EMERGENCY_ROLE_IDS.registrationClerk,
+        saasRole: 'registration-clerk',
+      },
     };
     // Simulates operationalProfile: a stale snapshot fetched BEFORE the switch,
     // still reflecting the backend dev-session account's original role/name.
@@ -248,13 +259,18 @@ describe('demoPersonaModel', () => {
       authMode: 'open-access',
       role: EMERGENCY_ROLE_IDS.registrationClerk,
     });
-    const fallback = { saasProfile: { role: 'registration-clerk', specialty: 'Reception' }, account: {} };
+    const fallback = {
+      saasProfile: { role: 'registration-clerk', specialty: 'Reception' },
+      account: {},
+    };
 
     const enriched = enrichDemoIdentityFallback(demoUser, fallback);
 
     expect((enriched.saasProfile as { displayName?: string }).displayName).toBe('Dr. Cara George');
     expect((enriched.saasProfile as { specialty?: string }).specialty).toBe(DEMO_PERSONA.specialty);
-    expect((enriched.saasProfile as { department?: string }).department).toBe(DEMO_PERSONA.department);
+    expect((enriched.saasProfile as { department?: string }).department).toBe(
+      DEMO_PERSONA.department,
+    );
   });
 
   it('leaves a real, non-demo user profile untouched', () => {
@@ -268,8 +284,10 @@ describe('demoPersonaModel', () => {
 
   it('curates frontline ED role views for the demo switcher', () => {
     expect(CURATED_DEMO_ROLE_VIEWS.length).toBeGreaterThanOrEqual(8);
-    expect(CURATED_DEMO_ROLE_VIEWS.some((view) => view.emergencyRoleId === DEMO_PERSONA.defaultEmergencyRole)).toBe(
-      true,
-    );
+    expect(
+      CURATED_DEMO_ROLE_VIEWS.some(
+        (view) => view.emergencyRoleId === DEMO_PERSONA.defaultEmergencyRole,
+      ),
+    ).toBe(true);
   });
 });

@@ -35,14 +35,20 @@ describe('long wait rescue helpers', () => {
   it('calculates warning, critical, and LWBS phases from configurable CTAS targets', () => {
     const settings = { ctasThresholds: { [Priority.P3]: 20 } };
 
-    expect(longWaitStatus(patient({ arrivalTime: isoMinutesAgo(20) }), now, settings)).toMatchObject({
+    expect(
+      longWaitStatus(patient({ arrivalTime: isoMinutesAgo(20) }), now, settings),
+    ).toMatchObject({
       phase: 'warning',
       thresholdMinutes: 20,
       criticalAt: 30,
       lwbsAt: 40,
     });
-    expect(longWaitStatus(patient({ arrivalTime: isoMinutesAgo(31) }), now, settings).phase).toBe('critical');
-    expect(longWaitStatus(patient({ arrivalTime: isoMinutesAgo(41) }), now, settings).phase).toBe('lwbs');
+    expect(longWaitStatus(patient({ arrivalTime: isoMinutesAgo(31) }), now, settings).phase).toBe(
+      'critical',
+    );
+    expect(longWaitStatus(patient({ arrivalTime: isoMinutesAgo(41) }), now, settings).phase).toBe(
+      'lwbs',
+    );
   });
 
   it('formats the proactive Copilot attention line for the longest LongWait patient', () => {
@@ -61,7 +67,12 @@ describe('long wait rescue helpers', () => {
     const metrics = longWaitShiftMetrics(
       [
         patient({ id: 'p3', arrivalTime: isoMinutesAgo(45), flags: [PatientFlag.LongWait] }),
-        patient({ id: 'p4', arrivalTime: isoMinutesAgo(130), priority: Priority.P4, flags: [PatientFlag.LWBSRisk] }),
+        patient({
+          id: 'p4',
+          arrivalTime: isoMinutesAgo(130),
+          priority: Priority.P4,
+          flags: [PatientFlag.LWBSRisk],
+        }),
         patient({ id: 'seen', arrivalTime: isoMinutesAgo(200), state: PatientState.Assessment }),
       ],
       now,

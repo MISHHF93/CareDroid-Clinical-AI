@@ -171,9 +171,14 @@ export function sumNews2Score(breakdown) {
  * @param {Record<string, number|null>} breakdown
  */
 export function interpretNews2Risk(total, breakdown) {
-  const hasRed = ['respiratoryRate', 'spo2', 'systolicBp', 'pulse', 'consciousness', 'temperature'].some(
-    (k) => breakdown[k] === 3
-  );
+  const hasRed = [
+    'respiratoryRate',
+    'spo2',
+    'systolicBp',
+    'pulse',
+    'consciousness',
+    'temperature',
+  ].some((k) => breakdown[k] === 3);
 
   const referenceLine =
     'Royal College of Physicians. National Early Warning Score (NEWS) 2 — standard observation chart and escalation thresholds.';
@@ -199,7 +204,8 @@ export function interpretNews2Risk(total, breakdown) {
       label: 'Medium risk band (aggregate)',
       interpretation:
         'Aggregate score 5–6 matches the RCP threshold for urgent clinical review by staff competent in assessment and treatment of acutely ill patients; it does not by itself define a diagnosis.',
-      escalationHint: 'Increase monitoring frequency and arrange urgent ward-based or acute-team review per protocol.',
+      escalationHint:
+        'Increase monitoring frequency and arrange urgent ward-based or acute-team review per protocol.',
       hasRed,
       referenceLine,
     };
@@ -238,8 +244,10 @@ export function interpretNews2Risk(total, breakdown) {
 export function validateNews2Inputs(raw) {
   const errors = [] as any[];
 
-  const rr = typeof raw.respiratoryRate === 'string' ? raw.respiratoryRate.trim() : raw.respiratoryRate;
-  if (rr === '' || Number.isNaN(parseFloat(rr))) errors.push('Enter respiratory rate (breaths/min).');
+  const rr =
+    typeof raw.respiratoryRate === 'string' ? raw.respiratoryRate.trim() : raw.respiratoryRate;
+  if (rr === '' || Number.isNaN(parseFloat(rr)))
+    errors.push('Enter respiratory rate (breaths/min).');
   else {
     const n = parseFloat(rr);
     if (n < 0 || n > 60) errors.push('Respiratory rate should be between 0 and 60.');
@@ -252,11 +260,13 @@ export function validateNews2Inputs(raw) {
     if (n < 70 || n > 100) errors.push('SpO₂ should be between 70 and 100%.');
   }
 
-  const scaleOk = raw.spo2Scale === '1' || raw.spo2Scale === '2' || raw.spo2Scale === 1 || raw.spo2Scale === 2;
+  const scaleOk =
+    raw.spo2Scale === '1' || raw.spo2Scale === '2' || raw.spo2Scale === 1 || raw.spo2Scale === 2;
   if (!scaleOk) errors.push('Select SpO₂ Scale 1 or Scale 2.');
 
   const sbp = typeof raw.systolicBp === 'string' ? raw.systolicBp.trim() : raw.systolicBp;
-  if (sbp === '' || Number.isNaN(parseFloat(sbp))) errors.push('Enter systolic blood pressure (mmHg).');
+  if (sbp === '' || Number.isNaN(parseFloat(sbp)))
+    errors.push('Enter systolic blood pressure (mmHg).');
   else {
     const n = parseFloat(sbp);
     if (n < 50 || n > 280) errors.push('Systolic BP should be between 50 and 280 mmHg.');

@@ -162,7 +162,9 @@ class SyncService {
       } as any);
       await recordAutomationBlocked({
         triggerFired: 'Offline message sync requested',
-        conditionsEvaluated: [{ label: 'Chat persistence backend capability enabled', result: false }],
+        conditionsEvaluated: [
+          { label: 'Chat persistence backend capability enabled', result: false },
+        ],
         actionSelected: 'Sync offline chat messages',
         toolCalled: 'offline-sync',
         backendEndpoint: '/api/chat/messages',
@@ -180,22 +182,19 @@ class SyncService {
 
     for (const message of messages) {
       try {
-        const response = await apiFetch(
-          '/api/chat/messages',
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              conversationId: message.conversationId,
-              content: message.content,
-              role: message.role,
-              timestamp: message.timestamp,
-            }),
-          }
-        );
+        const response = await apiFetch('/api/chat/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            conversationId: message.conversationId,
+            content: message.content,
+            role: message.role,
+            timestamp: message.timestamp,
+          }),
+        });
 
         if (!response.ok) {
           throw new Error(`Failed to sync message: ${response.status}`);
@@ -232,13 +231,19 @@ class SyncService {
     if (conversations.length === 0) return;
     if (!isBackendCapabilityEnabled('chatPersistence')) {
       logger.info('Skipping conversation sync — chat persistence API not available on server');
-      const fallback = makeDisabledCapabilityResponse('chatPersistence', '/api/chat/conversations', {
-        synced: 0,
-        queued: conversations.length,
-      } as any);
+      const fallback = makeDisabledCapabilityResponse(
+        'chatPersistence',
+        '/api/chat/conversations',
+        {
+          synced: 0,
+          queued: conversations.length,
+        } as any,
+      );
       await recordAutomationBlocked({
         triggerFired: 'Offline conversation sync requested',
-        conditionsEvaluated: [{ label: 'Chat persistence backend capability enabled', result: false }],
+        conditionsEvaluated: [
+          { label: 'Chat persistence backend capability enabled', result: false },
+        ],
         actionSelected: 'Sync offline conversations',
         toolCalled: 'offline-sync',
         backendEndpoint: '/api/chat/conversations',
@@ -256,21 +261,18 @@ class SyncService {
 
     for (const conversation of conversations) {
       try {
-        const response = await apiFetch(
-          '/api/chat/conversations',
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              userId: conversation.userId,
-              title: conversation.title,
-              lastMessageAt: conversation.lastMessageAt,
-            }),
-          }
-        );
+        const response = await apiFetch('/api/chat/conversations', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            userId: conversation.userId,
+            title: conversation.title,
+            lastMessageAt: conversation.lastMessageAt,
+          }),
+        });
 
         if (!response.ok) {
           throw new Error(`Failed to sync conversation: ${response.status}`);
@@ -307,7 +309,9 @@ class SyncService {
       logger.info('Skipping tool results sync — tools results API not available on server');
       await recordAutomationBlocked({
         triggerFired: 'Offline tool result sync requested',
-        conditionsEvaluated: [{ label: 'Tool results sync backend capability enabled', result: false }],
+        conditionsEvaluated: [
+          { label: 'Tool results sync backend capability enabled', result: false },
+        ],
         actionSelected: 'Sync offline tool results',
         toolCalled: 'offline-sync',
         backendEndpoint: '/api/tools/results',
@@ -320,22 +324,19 @@ class SyncService {
 
     for (const result of toolResults) {
       try {
-        const response = await apiFetch(
-          '/api/tools/results',
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              toolType: result.toolType,
-              input: result.input,
-              output: result.output,
-              timestamp: result.timestamp,
-            }),
-          }
-        );
+        const response = await apiFetch('/api/tools/results', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            toolType: result.toolType,
+            input: result.input,
+            output: result.output,
+            timestamp: result.timestamp,
+          }),
+        });
 
         if (!response.ok) {
           throw new Error(`Failed to sync tool result: ${response.status}`);
@@ -369,16 +370,13 @@ class SyncService {
       try {
         if (notification.read && notification.serverId) {
           // Mark as read on server
-          const response = await apiFetch(
-            `/api/notifications/${notification.serverId}/read`,
-            {
-              method: 'PATCH',
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
+          const response = await apiFetch(`/api/notifications/${notification.serverId}/read`, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+          });
 
           if (!response.ok) {
             throw new Error(`Failed to mark notification as read: ${response.status}`);
@@ -413,22 +411,19 @@ class SyncService {
 
     for (const log of auditLogs) {
       try {
-        const response = await apiFetch(
-          '/api/audit/sync',
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              action: log.action,
-              resourceType: log.resourceType,
-              resourceId: log.resourceId,
-              timestamp: log.timestamp,
-            }),
-          }
-        );
+        const response = await apiFetch('/api/audit/sync', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            action: log.action,
+            resourceType: log.resourceType,
+            resourceId: log.resourceId,
+            timestamp: log.timestamp,
+          }),
+        });
 
         if (!response.ok) {
           throw new Error(`Failed to sync audit log: ${response.status}`);
@@ -467,10 +462,7 @@ class SyncService {
       if (profileResponse.ok) {
         const profileData = await profileResponse.json();
         if (profileData) {
-          await offlineService.saveUserProfile(
-            profileData.id,
-            profileData
-          );
+          await offlineService.saveUserProfile(profileData.id, profileData);
         }
       }
 

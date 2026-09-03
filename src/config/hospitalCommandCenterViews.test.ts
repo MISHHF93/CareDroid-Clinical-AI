@@ -16,7 +16,9 @@ describe('hospitalCommandCenterViews.config', () => {
   });
 
   it('builds canonical redirect targets with view query params', () => {
-    expect(commandCenterRedirectForView('predictive')).toBe('/emergency/command-center?view=predictive');
+    expect(commandCenterRedirectForView('predictive')).toBe(
+      '/emergency/command-center?view=predictive',
+    );
   });
 
   it('lists legacy paths that funnel into Hospital Command Center', () => {

@@ -32,6 +32,8 @@ describe('unifiedApplicationKnowledgeGraphEngine', () => {
   it('schedules refresh for backend events', () => {
     handleUnifiedApplicationKnowledgeGraphBackendEvent('patient_flow_updated');
     vi.runAllTimers();
-    expect(getUnifiedApplicationKnowledgeGraphStoreState().lastTriggerEvent).toBe('patient_flow_updated');
+    expect(getUnifiedApplicationKnowledgeGraphStoreState().lastTriggerEvent).toBe(
+      'patient_flow_updated',
+    );
   });
 });

@@ -28,7 +28,9 @@ describe('CrossModuleIntelligenceService', () => {
     expect(related.map((module) => module.moduleId)).toEqual(
       expect.arrayContaining(['laboratory', 'medical-3d-viewer']),
     );
-    expect(related.find((module) => module.moduleId === 'laboratory')?.evidenceCount).toBeGreaterThan(0);
+    expect(
+      related.find((module) => module.moduleId === 'laboratory')?.evidenceCount,
+    ).toBeGreaterThan(0);
   });
 
   it('links Hospital Map, Fleet, and Medical IoT operational modules', () => {

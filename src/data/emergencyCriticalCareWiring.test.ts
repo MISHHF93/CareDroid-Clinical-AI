@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { builtinUiCalculators, clinicalIntentTools, nluCalculatorHubOnly } from './clinicalIntentToolCatalog';
+import {
+  builtinUiCalculators,
+  clinicalIntentTools,
+  nluCalculatorHubOnly,
+} from './clinicalIntentToolCatalog';
 import {
   BUILTIN_CALC_ID_TO_REGISTRY_ID,
   CLINICAL_TIER_A_CALCULATOR_REGISTRY_IDS,
@@ -25,7 +29,7 @@ const EMERGENCY_TIER_A = [
 describe('Emergency & Critical Care calculator wiring', () => {
   it('registers missing emergency calculators as Tier A dedicated forms', () => {
     expect([...EMERGENCY_CRITICAL_CARE_TIER_A_CALCULATOR_REGISTRY_IDS]).toEqual(
-      EMERGENCY_TIER_A.map(([registryId]) => registryId)
+      EMERGENCY_TIER_A.map(([registryId]) => registryId),
     );
 
     for (const [registryId, slug] of EMERGENCY_TIER_A) {
@@ -41,9 +45,9 @@ describe('Emergency & Critical Care calculator wiring', () => {
     const hubOnlyIds = new Set(nluCalculatorHubOnly.map((tool) => tool.toolId));
     for (const [registryId, slug] of EMERGENCY_TIER_A) {
       const builtin = builtinUiCalculators.find((calculator) => calculator.id === slug);
-    if (!builtin) throw new Error('expected builtin calculator entry to exist');
+      if (!builtin) throw new Error('expected builtin calculator entry to exist');
       const nlu = clinicalIntentTools.find((tool) => tool.sidebarToolId === registryId);
-    if (!nlu) throw new Error('expected nlu tool entry to exist');
+      if (!nlu) throw new Error('expected nlu tool entry to exist');
       const route = `/tools/calculators/${slug}`;
 
       expect(builtin?.path).toBe(route);

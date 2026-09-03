@@ -2,8 +2,18 @@ import { describe, expect, it } from 'vitest';
 import { buildClinicalDecisionSupportPlan } from './clinicalDecisionSupportEngine';
 
 const calculatorInventory = Object.freeze([
-  { id: 'heart-score', name: 'HEART Score', path: '/tools/calculators/heart-score', category: 'Calculator' },
-  { id: 'timi-ua-nstemi', name: 'TIMI UA/NSTEMI', path: '/tools/calculators/timi-ua-nstemi', category: 'Calculator' },
+  {
+    id: 'heart-score',
+    name: 'HEART Score',
+    path: '/tools/calculators/heart-score',
+    category: 'Calculator',
+  },
+  {
+    id: 'timi-ua-nstemi',
+    name: 'TIMI UA/NSTEMI',
+    path: '/tools/calculators/timi-ua-nstemi',
+    category: 'Calculator',
+  },
   { id: 'qsofa', name: 'qSOFA', path: '/tools/calculators/qsofa', category: 'Calculator' },
   { id: 'news2', name: 'NEWS2', path: '/tools/calculators/news2', category: 'Calculator' },
   { id: 'nihss', name: 'NIHSS', path: '/tools/calculators/nihss', category: 'Calculator' },
@@ -21,9 +31,11 @@ describe('clinicalDecisionSupportEngine', () => {
     });
 
     expect(plan.riskLevel).toBe('high');
-    expect(plan.signals.map((signal) => signal.id)).toEqual(expect.arrayContaining(['acs', 'respiratory']));
+    expect(plan.signals.map((signal) => signal.id)).toEqual(
+      expect.arrayContaining(['acs', 'respiratory']),
+    );
     expect(plan.calculatorRecommendations.map((calculator) => calculator.id)).toEqual(
-      expect.arrayContaining(['heart-score', 'timi-ua-nstemi', 'wells-pe'])
+      expect.arrayContaining(['heart-score', 'timi-ua-nstemi', 'wells-pe']),
     );
     expect(plan.labRecommendations.join(' ')).toMatch(/troponin/i);
     expect(plan.imagingRecommendations.join(' ')).toMatch(/ecg|chest x-ray/i);

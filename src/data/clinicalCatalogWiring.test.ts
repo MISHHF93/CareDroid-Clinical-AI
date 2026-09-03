@@ -39,11 +39,14 @@ describe('clinicalCatalogWiring helpers', () => {
     expect(launch.registryId).toBeNull();
   });
 
-  it.each(ALL_REGISTRY_TOOL_IDS)('resolveCatalogLaunch(%s) returns path or chat seed', (registryId) => {
-    const launch = resolveCatalogLaunch(registryId);
-    expect(launch.path || launch.chatSeed).toBeTruthy();
-    expect(launch.openLabel?.length).toBeGreaterThan(0);
-  });
+  it.each(ALL_REGISTRY_TOOL_IDS)(
+    'resolveCatalogLaunch(%s) returns path or chat seed',
+    (registryId) => {
+      const launch = resolveCatalogLaunch(registryId);
+      expect(launch.path || launch.chatSeed).toBeTruthy();
+      expect(launch.openLabel?.length).toBeGreaterThan(0);
+    },
+  );
 
   it('every frontend-visible inventory record resolves to a structured launch fallback', () => {
     for (const record of getFrontendVisibleToolInventory()) {
@@ -52,7 +55,7 @@ describe('clinicalCatalogWiring helpers', () => {
         expect.objectContaining({
           path: expect.anything(),
           openLabel: expect.any(String),
-        })
+        }),
       );
       expect(launch.path || launch.chatSeed || record.fallbackRoute, record.id).toBeTruthy();
       expect(launch.openLabel.length, record.id).toBeGreaterThan(0);

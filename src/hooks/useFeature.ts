@@ -16,7 +16,7 @@ export function useFeature(featureId) {
       if (!featureId) return Promise.resolve(false);
       return toggleFeature(featureId, nextEnabled);
     },
-    [enabled, featureId, toggleFeature]
+    [enabled, featureId, toggleFeature],
   );
 
   return {

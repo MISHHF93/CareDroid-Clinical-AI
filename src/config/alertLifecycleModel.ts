@@ -37,7 +37,10 @@ export const ALERT_RECORD_CONTRACT = Object.freeze({
 
 /** Maps classification tiers (alertClassificationModel) to lifecycle + primary surface. */
 export const ALERT_TIER_TO_LIFECYCLE: Readonly<
-  Record<string, { state: AlertLifecycleState; semantic: SemanticColorRole; primarySurface: string }>
+  Record<
+    string,
+    { state: AlertLifecycleState; semantic: SemanticColorRole; primarySurface: string }
+  >
 > = Object.freeze({
   critical: Object.freeze({
     state: 'critical',
@@ -105,7 +108,8 @@ export function resolveAlertLifecycle(
     });
   }
 
-  const mapping = ALERT_TIER_TO_LIFECYCLE[classificationTier] || ALERT_TIER_TO_LIFECYCLE.informational;
+  const mapping =
+    ALERT_TIER_TO_LIFECYCLE[classificationTier] || ALERT_TIER_TO_LIFECYCLE.informational;
   return Object.freeze({
     state: mapping.state,
     semantic: mapping.semantic,

@@ -5,9 +5,7 @@ import { useEmergencyStore } from '../store/emergencyStore';
 import useRouteScreenMode from './useRouteScreenMode';
 import useOperationalIntelligenceCore from './useOperationalIntelligenceCore';
 import useAiChiefRouting from './useAiChiefRouting';
-import {
-  buildAiChiefOrchestrationSnapshot,
-} from '../services/aiChiefContinuousMonitoringService';
+import { buildAiChiefOrchestrationSnapshot } from '../services/aiChiefContinuousMonitoringService';
 import {
   requestAiChiefCopilotQuery,
   requestAiChiefStructured,
@@ -88,9 +86,14 @@ export function useAiChiefOrchestrator(options: UseAiChiefOrchestratorOptions = 
   const knowledgeGraphSummary = knowledgeGraphBundle.dashboardSummary;
 
   const topRecommendation = snapshot.recommendations[0] ?? null;
-  const topRisk = snapshot.risks.find((risk) => risk.severity === 'critical') ?? snapshot.risks[0] ?? null;
-  const criticalDomainCount = snapshot.domainStatuses.filter((domain) => domain.status === 'critical').length;
-  const watchDomainCount = snapshot.domainStatuses.filter((domain) => domain.status === 'watch').length;
+  const topRisk =
+    snapshot.risks.find((risk) => risk.severity === 'critical') ?? snapshot.risks[0] ?? null;
+  const criticalDomainCount = snapshot.domainStatuses.filter(
+    (domain) => domain.status === 'critical',
+  ).length;
+  const watchDomainCount = snapshot.domainStatuses.filter(
+    (domain) => domain.status === 'watch',
+  ).length;
 
   const requestStructured = useCallback(
     (request: AIChiefStructuredRequest) => requestAiChiefStructured(request),

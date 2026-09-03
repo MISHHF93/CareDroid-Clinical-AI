@@ -92,9 +92,12 @@ async function requestChiefInvestigationJson(path: string, options: any = {}) {
 }
 
 export const runDeteriorationInvestigation = (patientId: string) =>
-  requestChiefInvestigationJson(`/api/chief-investigation/deterioration/${encodeURIComponent(patientId)}`, {
-    method: 'POST',
-  });
+  requestChiefInvestigationJson(
+    `/api/chief-investigation/deterioration/${encodeURIComponent(patientId)}`,
+    {
+      method: 'POST',
+    },
+  );
 
 export const fetchInvestigationRun = (runId: string) =>
   requestChiefInvestigationJson(`/api/chief-investigation/${encodeURIComponent(runId)}`);

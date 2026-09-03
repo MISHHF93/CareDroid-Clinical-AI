@@ -169,9 +169,7 @@ export function patientNeedsFitToWaitAttention(patient: Patient | null | undefin
   if (patientNeedsFitToWaitReview(patient)) return true;
   const id = resolveFitToWaitClassification(patient)?.id;
   return (
-    id === 'immediate-room-needed' ||
-    id === 'reassessment-required' ||
-    id === 'stretcher-needed'
+    id === 'immediate-room-needed' || id === 'reassessment-required' || id === 'stretcher-needed'
   );
 }
 
@@ -223,7 +221,9 @@ export function buildFitToWaitAttentionRow(patient: Patient): FitToWaitAttention
 }
 
 /** Compact whiteboard / strip snapshot — staff review only, never auto-classified. */
-export function buildFitToWaitAttentionSnapshot(patients: Patient[] = []): FitToWaitAttentionSnapshot {
+export function buildFitToWaitAttentionSnapshot(
+  patients: Patient[] = [],
+): FitToWaitAttentionSnapshot {
   const counts = summarizeFitToWaitBoardCounts(patients);
   const rows = sortPatientsForFitToWaitAttention(patients).map(buildFitToWaitAttentionRow);
 
@@ -234,4 +234,3 @@ export function buildFitToWaitAttentionSnapshot(patients: Patient[] = []): FitTo
     previewRows: rows.slice(0, 4),
   };
 }
-

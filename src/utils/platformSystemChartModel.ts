@@ -6,7 +6,9 @@ export function buildPlatformSystemModuleChart(
   return rows.map((row) => ({ name: row.name, value: row.value }));
 }
 
-export function platformSystemScoreTone(score: number): 'good' | 'warning' | 'critical' | 'neutral' {
+export function platformSystemScoreTone(
+  score: number,
+): 'good' | 'warning' | 'critical' | 'neutral' {
   if (score >= 85) return 'good';
   if (score >= 70) return 'warning';
   return 'neutral';

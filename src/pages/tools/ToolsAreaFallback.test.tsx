@@ -16,7 +16,7 @@ function renderFallback(path) {
         <Route path="/fleet/*" element={<ToolsAreaFallback />} />
         <Route path="/emergency/copilot" element={<div data-testid="copilot-page">Copilot</div>} />
       </Routes>
-    </MemoryRouter>
+    </MemoryRouter>,
   );
 }
 
@@ -25,8 +25,12 @@ describe('ToolsAreaFallback', () => {
     renderFallback('/tools/calculators/unknown-calc-xyz');
     expect(screen.getByRole('alert')).toBeTruthy();
     expect(screen.getByText(/Calculator not found/i)).toBeTruthy();
-    expect(screen.getByText(/unknown-calc-xyz/, { selector: '.tool-not-found-message' })).toBeTruthy();
-    expect(screen.queryByRole('link', { name: /Developer Catalog \/ Source Audit/i })).not.toBeInTheDocument();
+    expect(
+      screen.getByText(/unknown-calc-xyz/, { selector: '.tool-not-found-message' }),
+    ).toBeTruthy();
+    expect(
+      screen.queryByRole('link', { name: /Developer Catalog \/ Source Audit/i }),
+    ).not.toBeInTheDocument();
   });
 
   it('keeps registered calculator subpaths on their canonical route', async () => {

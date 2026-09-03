@@ -38,7 +38,9 @@ describe('researchEvidenceHub', () => {
       label: 'Sepsis Management',
       path: '/protocols',
     });
-    expect(links.simulations.map((link) => link.path)).toContain('/simulation/sepsis-deterioration');
+    expect(links.simulations.map((link) => link.path)).toContain(
+      '/simulation/sepsis-deterioration',
+    );
   });
 
   it('searches research content and builds AI prompts', () => {

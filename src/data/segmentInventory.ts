@@ -144,7 +144,8 @@ export const SEGMENT_INVENTORY = Object.freeze([
       testedBy: 'Route smoke coverage.',
       gaps: ['Public shared sessions are not connected to backend share creation.'],
     }),
-    recoveryBridge: 'Keep public route content direct under AppShell, but add an authenticated share-result creation bridge before promoting shared sessions.',
+    recoveryBridge:
+      'Keep public route content direct under AppShell, but add an authenticated share-result creation bridge before promoting shared sessions.',
   },
   {
     id: 'auth',
@@ -161,18 +162,27 @@ export const SEGMENT_INVENTORY = Object.freeze([
       'src/routing/authPathAliases.js',
       'src/contexts/UserContext.tsx',
     ],
-    backendFiles: ['backend/src/modules/auth', 'backend/src/modules/two-factor', 'backend/src/modules/users'],
+    backendFiles: [
+      'backend/src/modules/auth',
+      'backend/src/modules/two-factor',
+      'backend/src/modules/users',
+    ],
     routes: ['/auth', '/auth-callback', '/auth/callback'],
     canonicalRoute: '/auth',
     navEntry: null,
     inventoryEntry: null,
     apiClients: ['src/services/apiClient.ts'],
     backendEndpoints: ['/api/auth/*', '/api/two-factor/*', '/api/users/profile'],
-    launchBehavior: 'Welcome and auth aliases route to /auth; callback/dev session redirect into protected app.',
+    launchBehavior:
+      'Welcome and auth aliases route to /auth; callback/dev session redirect into protected app.',
     layoutShell: 'AppShell',
     auth: publicOnlyAuth,
     mobile: { readiness: 'responsive auth page', tests: ['src/pages/Auth.devBypass.test.jsx'] },
-    testCoverage: ['src/pages/Auth.devBypass.test.jsx', 'src/App.devBypass.test.jsx', 'backend/src/modules/auth/auth.service.spec.ts'],
+    testCoverage: [
+      'src/pages/Auth.devBypass.test.jsx',
+      'src/App.devBypass.test.jsx',
+      'backend/src/modules/auth/auth.service.spec.ts',
+    ],
     bridges: bridge({
       userReach: 'Welcome CTA or auth aliases.',
       assistant: 'Redirects into /home after auth; no Assistant surface before auth.',
@@ -193,17 +203,29 @@ export const SEGMENT_INVENTORY = Object.freeze([
     frontendOnlyType: null,
     backendOnlyType: null,
     frontendFiles: ['src/pages/CommandDashboard.jsx', 'src/app/router.tsx'],
-    backendFiles: ['backend/src/modules/chat', 'backend/src/modules/medical-control-plane', 'backend/src/modules/rag'],
+    backendFiles: [
+      'backend/src/modules/chat',
+      'backend/src/modules/medical-control-plane',
+      'backend/src/modules/rag',
+    ],
     routes: ['/home', '/dashboard'],
     canonicalRoute: '/dashboard',
     navEntry: 'home',
     inventoryEntry: null,
-    apiClients: ['src/services/clinicalChatService.ts', 'src/services/clinicalToolsApi.ts', 'src/services/clinicalOrchestratorApi.ts'],
+    apiClients: [
+      'src/services/clinicalChatService.ts',
+      'src/services/clinicalToolsApi.ts',
+      'src/services/clinicalOrchestratorApi.ts',
+    ],
     backendEndpoints: ['/api/chat/message', '/api/tools/:id/validate', '/api/tools/:id/execute'],
-    launchBehavior: 'Primary nav and post-auth redirects open /dashboard; cards route to Assistant or tools.',
+    launchBehavior:
+      'Primary nav and post-auth redirects open /dashboard; cards route to Assistant or tools.',
     layoutShell: 'AppShellPage',
     auth: appShellAuth,
-    mobile: { readiness: 'covered', tests: ['src/pages/CommandDashboard.test.jsx', 'src/test/routePagesSmoke.test.tsx'] },
+    mobile: {
+      readiness: 'covered',
+      tests: ['src/pages/CommandDashboard.test.jsx', 'src/test/routePagesSmoke.test.tsx'],
+    },
     testCoverage: ['src/pages/CommandDashboard.test.jsx', 'src/test/routePagesSmoke.test.tsx'],
     bridges: bridge({
       userReach: 'Primary Home nav and auth success.',
@@ -213,31 +235,52 @@ export const SEGMENT_INVENTORY = Object.freeze([
       result: 'Conversation messages, execution cards, and visualizations.',
       safeFailure: 'Chat/network fallback messages.',
       testedBy: 'Command dashboard and route smoke tests.',
-      gaps: ['Legacy Home/Pulse naming should stay canonicalized to Command Center in user-visible copy and tests.'],
+      gaps: [
+        'Legacy Home/Pulse naming should stay canonicalized to Command Center in user-visible copy and tests.',
+      ],
     }),
-    recoveryBridge: 'Keep /home as redirect-only and preserve Command Center naming in route tests.',
+    recoveryBridge:
+      'Keep /home as redirect-only and preserve Command Center naming in route tests.',
   },
   {
     id: 'assistant',
     label: 'AI Assistant',
     area: SEGMENT_AREAS.CORE,
-    purpose: 'Core clinical conversation, NLU routing, tool execution previews, citations, and emergency handling.',
+    purpose:
+      'Core clinical conversation, NLU routing, tool execution previews, citations, and emergency handling.',
     status: SEGMENT_STATUSES.COMPLETE,
     frontendOnlyType: null,
     backendOnlyType: null,
     frontendFiles: ['src/components/CopilotPanel.tsx', 'src/services/clinicalChatService.ts'],
-    backendFiles: ['backend/src/modules/chat', 'backend/src/modules/medical-control-plane', 'backend/src/modules/rag', 'backend/src/modules/ai'],
+    backendFiles: [
+      'backend/src/modules/chat',
+      'backend/src/modules/medical-control-plane',
+      'backend/src/modules/rag',
+      'backend/src/modules/ai',
+    ],
     routes: ['/assistant', '/chat', '/ai', '/copilot'],
     canonicalRoute: '/assistant',
     navEntry: 'assistant',
     inventoryEntry: 'chat-assisted tool records in src/data/toolInventory.js',
     apiClients: ['src/services/clinicalChatService.ts', 'src/services/clinicalOrchestratorApi.ts'],
-    backendEndpoints: ['/api/chat/message', '/api/chat/intent-classify', '/api/chat/suggest-action', '/api/chat/analyze-vitals'],
-    launchBehavior: '/assistant (and the /chat, /ai, /copilot aliases) redirect to the Emergency Copilot workspace; chat-assisted tool seeds land there.',
+    backendEndpoints: [
+      '/api/chat/message',
+      '/api/chat/intent-classify',
+      '/api/chat/suggest-action',
+      '/api/chat/analyze-vitals',
+    ],
+    launchBehavior:
+      '/assistant (and the /chat, /ai, /copilot aliases) redirect to the Emergency Copilot workspace; chat-assisted tool seeds land there.',
     layoutShell: 'AppShellPage conversation mode',
     auth: { ...appShellAuth, permissions: ['USE_AI_CHAT'] },
-    mobile: { readiness: 'covered', tests: ['src/components/CopilotPanel.operationalAwareness.test.ts'] },
-    testCoverage: ['src/components/CopilotPanel.operationalAwareness.test.ts', 'src/services/clinicalChatService.test.ts'],
+    mobile: {
+      readiness: 'covered',
+      tests: ['src/components/CopilotPanel.operationalAwareness.test.ts'],
+    },
+    testCoverage: [
+      'src/components/CopilotPanel.operationalAwareness.test.ts',
+      'src/services/clinicalChatService.test.ts',
+    ],
     bridges: bridge({
       userReach: 'Primary Assistant nav, new conversation, or seeded tool launch.',
       assistant: 'Native segment.',
@@ -248,7 +291,8 @@ export const SEGMENT_INVENTORY = Object.freeze([
       testedBy: 'Chat service and ED Copilot tests.',
       gaps: [],
     }),
-    recoveryBridge: 'Resolved 2026-07-17: /chat, /ai, and /copilot are redirect-only; legacy ChatInterface.tsx (the parallel implementation this note flagged) was confirmed dead — zero production importers — and removed.',
+    recoveryBridge:
+      'Resolved 2026-07-17: /chat, /ai, and /copilot are redirect-only; legacy ChatInterface.tsx (the parallel implementation this note flagged) was confirmed dead — zero production importers — and removed.',
   },
   {
     id: 'tools-overview',
@@ -258,7 +302,11 @@ export const SEGMENT_INVENTORY = Object.freeze([
     status: SEGMENT_STATUSES.COMPLETE,
     frontendOnlyType: null,
     backendOnlyType: null,
-    frontendFiles: ['src/pages/tools/ToolsOverview.tsx', 'src/navigation/registryToolLaunch.ts', 'src/data/toolInventory.js'],
+    frontendFiles: [
+      'src/pages/tools/ToolsOverview.tsx',
+      'src/navigation/registryToolLaunch.ts',
+      'src/data/toolInventory.js',
+    ],
     backendFiles: ['backend/src/modules/medical-control-plane/tool-orchestrator'],
     routes: ['/tools', '/all-tools', '/clinical-tools'],
     canonicalRoute: '/tools',
@@ -266,11 +314,16 @@ export const SEGMENT_INVENTORY = Object.freeze([
     inventoryEntry: 'getUserFacingToolRegistryProjection()',
     apiClients: ['src/services/clinicalToolsApi.ts'],
     backendEndpoints: ['/api/tools', '/api/tools/available', '/api/tools/catalog/executors'],
-    launchBehavior: 'Search/filter/pin/favorite then launch direct routes or seeded Assistant flows.',
+    launchBehavior:
+      'Search/filter/pin/favorite then launch direct routes or seeded Assistant flows.',
     layoutShell: 'AppShellPage',
     auth: appShellAuth,
     mobile: { readiness: 'covered', tests: ['src/pages/tools/ToolsOverview.responsive.test.ts'] },
-    testCoverage: ['src/pages/tools/ToolsOverview.inventory.test.tsx', 'src/pages/tools/ToolsOverview.visibility.test.tsx', 'src/pages/tools/ToolsOverview.responsive.test.ts'],
+    testCoverage: [
+      'src/pages/tools/ToolsOverview.inventory.test.tsx',
+      'src/pages/tools/ToolsOverview.visibility.test.tsx',
+      'src/pages/tools/ToolsOverview.responsive.test.ts',
+    ],
     bridges: bridge({
       userReach: 'Primary Tools nav and sidebar quick action.',
       assistant: 'Assistant launch button and chat-assisted resolver.',
@@ -286,11 +339,15 @@ export const SEGMENT_INVENTORY = Object.freeze([
     id: 'developer-tool-catalog',
     label: 'Developer Tool Catalog and Source Audit',
     area: SEGMENT_AREAS.TOOLS,
-    purpose: 'Permissioned catalog/source audit for tool wiring, executors, aliases, and phantom references.',
+    purpose:
+      'Permissioned catalog/source audit for tool wiring, executors, aliases, and phantom references.',
     status: SEGMENT_STATUSES.HIDDEN,
     frontendOnlyType: null,
     backendOnlyType: null,
-    frontendFiles: ['src/pages/tools/ClinicalToolCatalog.tsx', 'src/data/sourceCodeToolDiscovery.ts'],
+    frontendFiles: [
+      'src/pages/tools/ClinicalToolCatalog.tsx',
+      'src/data/sourceCodeToolDiscovery.ts',
+    ],
     backendFiles: ['backend/src/modules/medical-control-plane/tool-orchestrator'],
     routes: ['/tools/catalog', '/catalog'],
     canonicalRoute: '/tools/catalog',
@@ -298,11 +355,18 @@ export const SEGMENT_INVENTORY = Object.freeze([
     inventoryEntry: 'source discovery and backend/frontend contract inventories',
     apiClients: ['src/services/clinicalToolsApi.ts'],
     backendEndpoints: ['/api/tools/catalog/executors', '/api/tools'],
-    launchBehavior: 'Shown as a permissioned Developer Audit navigation entry for CONFIGURE_SYSTEM users; /catalog redirects.',
+    launchBehavior:
+      'Shown as a permissioned Developer Audit navigation entry for CONFIGURE_SYSTEM users; /catalog redirects.',
     layoutShell: 'AppShellPage',
     auth: { ...appShellAuth, permissions: ['CONFIGURE_SYSTEM'] },
-    mobile: { readiness: 'covered but table-heavy', tests: ['src/pages/tools/ClinicalToolCatalog.responsive.test.ts'] },
-    testCoverage: ['src/pages/tools/ClinicalToolCatalog.launch.test.tsx', 'src/pages/tools/ClinicalToolCatalog.responsive.test.ts'],
+    mobile: {
+      readiness: 'covered but table-heavy',
+      tests: ['src/pages/tools/ClinicalToolCatalog.responsive.test.ts'],
+    },
+    testCoverage: [
+      'src/pages/tools/ClinicalToolCatalog.launch.test.tsx',
+      'src/pages/tools/ClinicalToolCatalog.responsive.test.ts',
+    ],
     bridges: bridge({
       userReach: 'Permissioned Developer Audit primary navigation entry or direct route.',
       assistant: 'Launch buttons can seed Assistant when applicable.',
@@ -311,7 +375,9 @@ export const SEGMENT_INVENTORY = Object.freeze([
       result: 'Audit tables and status badges.',
       safeFailure: 'Backend unavailable state in catalog panels.',
       testedBy: 'Catalog launch and responsive tests.',
-      gaps: ['Developer audit concepts are visually near clinician tools and should stay permissioned.'],
+      gaps: [
+        'Developer audit concepts are visually near clinician tools and should stay permissioned.',
+      ],
     }),
     recoveryBridge: 'Keep admin-only; do not promote source-audit rows to clinician actions.',
   },
@@ -323,7 +389,11 @@ export const SEGMENT_INVENTORY = Object.freeze([
     status: SEGMENT_STATUSES.PARTIALLY_BUILT,
     frontendOnlyType: null,
     backendOnlyType: null,
-    frontendFiles: ['src/pages/tools/Calculators.tsx', 'src/pages/tools/*Calculators.jsx', 'src/data/calculatorHubManifest.ts'],
+    frontendFiles: [
+      'src/pages/tools/Calculators.tsx',
+      'src/pages/tools/*Calculators.jsx',
+      'src/data/calculatorHubManifest.ts',
+    ],
     backendFiles: ['backend/src/modules/medical-control-plane/tool-orchestrator'],
     routes: ['/tools/calculators', '/tools/calculators/:slug', '/tools/calculator/:legacySlug'],
     canonicalRoute: '/tools/calculators',
@@ -334,11 +404,22 @@ export const SEGMENT_INVENTORY = Object.freeze([
     launchBehavior: 'Dedicated calculator routes, hub selection, or chat-assisted Assistant seed.',
     layoutShell: 'AppShellPage',
     auth: appShellAuth,
-    mobile: { readiness: 'covered', tests: ['src/pages/tools/Calculators.responsive.test.ts', 'src/pages/tools/Calculators.formSmoke.test.tsx'] },
-    testCoverage: ['src/pages/tools/Calculators.hubCatalog.test.tsx', 'src/pages/tools/Calculators.formSmoke.test.tsx', 'src/routes/clinicalToolRoutes.production.test.ts'],
+    mobile: {
+      readiness: 'covered',
+      tests: [
+        'src/pages/tools/Calculators.responsive.test.ts',
+        'src/pages/tools/Calculators.formSmoke.test.tsx',
+      ],
+    },
+    testCoverage: [
+      'src/pages/tools/Calculators.hubCatalog.test.tsx',
+      'src/pages/tools/Calculators.formSmoke.test.tsx',
+      'src/routes/clinicalToolRoutes.production.test.ts',
+    ],
     bridges: bridge({
       userReach: 'Tools navigation, calculator hub links, catalog, and direct calculator routes.',
-      assistant: 'Chat-assisted calculators seed Assistant; local results need a stronger return path.',
+      assistant:
+        'Chat-assisted calculators seed Assistant; local results need a stronger return path.',
       tools: 'Native child of Tools.',
       backend: 'SOFA executor only; most forms are local.',
       result: 'Local calculator result panels and optional executor result cards.',
@@ -346,29 +427,50 @@ export const SEGMENT_INVENTORY = Object.freeze([
       testedBy: 'Calculator route, form smoke, and responsive tests.',
       gaps: ['Many calculators are local-only but appear near backend-backed actions.'],
     }),
-    recoveryBridge: 'Badge local-only calculators and add a consistent send-result-to-Assistant bridge.',
+    recoveryBridge:
+      'Badge local-only calculators and add a consistent send-result-to-Assistant bridge.',
   },
   {
     id: 'executor-tools',
     label: 'Backend Executor Tools',
     area: SEGMENT_AREAS.TOOLS,
-    purpose: 'Registered tool-orchestrator actions for SOFA, drug interactions, and lab interpretation.',
+    purpose:
+      'Registered tool-orchestrator actions for SOFA, drug interactions, and lab interpretation.',
     status: SEGMENT_STATUSES.COMPLETE,
     frontendOnlyType: null,
     backendOnlyType: null,
-    frontendFiles: ['src/pages/tools/DrugChecker.tsx', 'src/pages/tools/LabInterpreter.tsx', 'src/pages/tools/Calculators.tsx', 'src/services/clinicalOrchestratorApi.ts'],
-    backendFiles: ['backend/src/modules/medical-control-plane/tool-orchestrator', 'backend/src/modules/medical-control-plane/tool-orchestrator/services'],
+    frontendFiles: [
+      'src/pages/tools/DrugChecker.tsx',
+      'src/pages/tools/LabInterpreter.tsx',
+      'src/pages/tools/Calculators.tsx',
+      'src/services/clinicalOrchestratorApi.ts',
+    ],
+    backendFiles: [
+      'backend/src/modules/medical-control-plane/tool-orchestrator',
+      'backend/src/modules/medical-control-plane/tool-orchestrator/services',
+    ],
     routes: ['/tools/drug-checker', '/tools/lab-interpreter', '/tools/calculators/sofa'],
     canonicalRoute: '/tools/drug-checker',
     navEntry: 'tools',
     inventoryEntry: '`drug-check`, `lab-interp`, `sofa-score` in tool inventory',
     apiClients: ['src/services/clinicalOrchestratorApi.ts', 'src/services/clinicalToolsApi.ts'],
-    backendEndpoints: ['/api/tools/drug-interactions/execute', '/api/tools/lab-interpreter/execute', '/api/tools/sofa-calculator/execute'],
+    backendEndpoints: [
+      '/api/tools/drug-interactions/execute',
+      '/api/tools/lab-interpreter/execute',
+      '/api/tools/sofa-calculator/execute',
+    ],
     launchBehavior: 'Direct tool pages and Assistant execution preview.',
     layoutShell: 'AppShellPage',
     auth: appShellAuth,
-    mobile: { readiness: 'covered through tool route smoke', tests: ['src/test/toolRenderExecuteSmoke.test.tsx'] },
-    testCoverage: ['src/data/executorMappingAudit.test.ts', 'src/services/clinicalOrchestratorApi.test.ts', 'backend/src/modules/medical-control-plane/tool-orchestrator/tool-orchestrator.registry.spec.ts'],
+    mobile: {
+      readiness: 'covered through tool route smoke',
+      tests: ['src/test/toolRenderExecuteSmoke.test.tsx'],
+    },
+    testCoverage: [
+      'src/data/executorMappingAudit.test.ts',
+      'src/services/clinicalOrchestratorApi.test.ts',
+      'backend/src/modules/medical-control-plane/tool-orchestrator/tool-orchestrator.registry.spec.ts',
+    ],
     bridges: bridge({
       userReach: 'Tools, sidebar, direct routes, and Assistant quick actions.',
       assistant: 'Executor preview and result cards.',
@@ -378,7 +480,8 @@ export const SEGMENT_INVENTORY = Object.freeze([
       safeFailure: 'Client-side unsupported guard and backend validation errors.',
       testedBy: 'Executor mapping and API tests.',
     }),
-    recoveryBridge: 'Keep registryId, nluToolId, executorToolId, routePath, and calculatorSlug distinct.',
+    recoveryBridge:
+      'Keep registryId, nluToolId, executorToolId, routePath, and calculatorSlug distinct.',
   },
   {
     id: 'chat-assisted-tools',
@@ -388,8 +491,16 @@ export const SEGMENT_INVENTORY = Object.freeze([
     status: SEGMENT_STATUSES.FRONTEND_ONLY,
     frontendOnlyType: FRONTEND_ONLY_TYPES.LOCAL_ONLY,
     backendOnlyType: null,
-    frontendFiles: ['src/data/clinicalIntentToolCatalog.ts', 'src/data/clinicalCatalogWiring.js', 'src/components/ChatInterface.tsx', 'src/pages/tools/Calculators.tsx'],
-    backendFiles: ['backend/src/modules/medical-control-plane/intent-classifier', 'backend/src/modules/medical-control-plane/tool-orchestrator/tool-orchestrator.registry.ts'],
+    frontendFiles: [
+      'src/data/clinicalIntentToolCatalog.ts',
+      'src/data/clinicalCatalogWiring.js',
+      'src/components/ChatInterface.tsx',
+      'src/pages/tools/Calculators.tsx',
+    ],
+    backendFiles: [
+      'backend/src/modules/medical-control-plane/intent-classifier',
+      'backend/src/modules/medical-control-plane/tool-orchestrator/tool-orchestrator.registry.ts',
+    ],
     routes: ['/assistant', '/tools/calculators'],
     canonicalRoute: '/assistant',
     navEntry: 'assistant',
@@ -399,8 +510,15 @@ export const SEGMENT_INVENTORY = Object.freeze([
     launchBehavior: 'Registry launch resolver seeds guarded prompts into Assistant.',
     layoutShell: 'AppShellPage',
     auth: { ...appShellAuth, permissions: ['USE_AI_CHAT'] },
-    mobile: { readiness: 'inherits ED Copilot coverage', tests: ['src/components/ChatInterface.nlu.test.tsx'] },
-    testCoverage: ['src/data/clinicalCatalogLaunch.test.ts', 'src/navigation/registryToolLaunch.test.ts', 'src/data/nluLaunchPaths.test.ts'],
+    mobile: {
+      readiness: 'inherits ED Copilot coverage',
+      tests: ['src/components/ChatInterface.nlu.test.tsx'],
+    },
+    testCoverage: [
+      'src/data/clinicalCatalogLaunch.test.ts',
+      'src/navigation/registryToolLaunch.test.ts',
+      'src/data/nluLaunchPaths.test.ts',
+    ],
     bridges: bridge({
       userReach: 'Tools, sidebar, catalog, or Assistant prompt.',
       assistant: 'Seeded guarded prompt is the primary UX.',
@@ -411,19 +529,40 @@ export const SEGMENT_INVENTORY = Object.freeze([
       testedBy: 'Launch and NLU path tests.',
       gaps: ['Some records have backend-routed wording that can be confused with POST executors.'],
     }),
-    recoveryBridge: 'Rename backendExecutable semantics to backendRouted in future contracts; reserve postExecutable for registered executors.',
+    recoveryBridge:
+      'Rename backendExecutable semantics to backendRouted in future contracts; reserve postExecutable for registered executors.',
   },
   {
     id: 'clinical-intelligence',
     label: 'Clinical Intelligence Workflows',
     area: SEGMENT_AREAS.TOOLS,
-    purpose: 'Tier C AI forms for scribe, RAG, differential, timeline, patient summary, order set, explainability, and clinical audit.',
+    purpose:
+      'Tier C AI forms for scribe, RAG, differential, timeline, patient summary, order set, explainability, and clinical audit.',
     status: SEGMENT_STATUSES.PARTIALLY_BUILT,
     frontendOnlyType: null,
     backendOnlyType: null,
-    frontendFiles: ['src/pages/tools/*Ai.jsx', 'src/pages/tools/AmbientScribe.tsx', 'src/pages/tools/GuidelineRag.tsx', 'src/pages/tools/ClinicalAudit.tsx', 'src/services/clinicalIntelligenceApi.ts'],
-    backendFiles: ['backend/src/modules/clinical-intelligence', 'backend/src/modules/rag', 'backend/src/modules/audit'],
-    routes: ['/tools/ambient-scribe', '/tools/guideline-rag', '/tools/differential-ai', '/tools/timeline-ai', '/tools/patient-summary-ai', '/tools/order-set-ai', '/tools/ai-explainability', '/tools/clinical-audit'],
+    frontendFiles: [
+      'src/pages/tools/*Ai.jsx',
+      'src/pages/tools/AmbientScribe.tsx',
+      'src/pages/tools/GuidelineRag.tsx',
+      'src/pages/tools/ClinicalAudit.tsx',
+      'src/services/clinicalIntelligenceApi.ts',
+    ],
+    backendFiles: [
+      'backend/src/modules/clinical-intelligence',
+      'backend/src/modules/rag',
+      'backend/src/modules/audit',
+    ],
+    routes: [
+      '/tools/ambient-scribe',
+      '/tools/guideline-rag',
+      '/tools/differential-ai',
+      '/tools/timeline-ai',
+      '/tools/patient-summary-ai',
+      '/tools/order-set-ai',
+      '/tools/ai-explainability',
+      '/tools/clinical-audit',
+    ],
     canonicalRoute: '/tools/guideline-rag',
     navEntry: 'tools',
     inventoryEntry: 'backend-backed clinical intelligence records in toolInventory.js',
@@ -432,8 +571,15 @@ export const SEGMENT_INVENTORY = Object.freeze([
     launchBehavior: 'Direct protected tool forms; patient cards launch patient-related tools.',
     layoutShell: 'AppShellPage + ToolPageLayout',
     auth: { ...appShellAuth, permissions: ['USE_AI_CHAT', 'READ_PHI for PHI workflows'] },
-    mobile: { readiness: 'partially covered', tests: ['src/pages/tools/ToolPages.responsive.test.ts'] },
-    testCoverage: ['src/pages/tools/*Ai.test.jsx', 'src/services/clinicalIntelligenceApi.test.js', 'src/data/backendFrontendExposure.test.ts'],
+    mobile: {
+      readiness: 'partially covered',
+      tests: ['src/pages/tools/ToolPages.responsive.test.ts'],
+    },
+    testCoverage: [
+      'src/pages/tools/*Ai.test.jsx',
+      'src/services/clinicalIntelligenceApi.test.js',
+      'src/data/backendFrontendExposure.test.ts',
+    ],
     bridges: bridge({
       userReach: 'Tools/sidebar and Patients cards.',
       assistant: 'Missing consistent continue-in-Assistant bridge after structured result.',
@@ -444,7 +590,8 @@ export const SEGMENT_INVENTORY = Object.freeze([
       testedBy: 'Per-page tests and backend exposure tests.',
       gaps: ['Patient-context workflows are still /tools pages, not patient workspace panels.'],
     }),
-    recoveryBridge: 'Add reusable result cards and Assistant handoff for every clinical-intelligence output.',
+    recoveryBridge:
+      'Add reusable result cards and Assistant handoff for every clinical-intelligence output.',
   },
   {
     id: 'patients',
@@ -462,11 +609,18 @@ export const SEGMENT_INVENTORY = Object.freeze([
     inventoryEntry: null,
     apiClients: [],
     backendEndpoints: [],
-    launchBehavior: 'Primary nav opens launch cards that route to patient-related clinical intelligence tools.',
+    launchBehavior:
+      'Primary nav opens launch cards that route to patient-related clinical intelligence tools.',
     layoutShell: 'AppShellPage + OperatingWorkspace',
     auth: appShellAuth,
-    mobile: { readiness: 'needs focused mobile proof', tests: ['src/pages/OperatingWorkspace.launch.test.jsx'] },
-    testCoverage: ['src/pages/OperatingWorkspace.launch.test.jsx', 'src/test/routePagesSmoke.test.tsx'],
+    mobile: {
+      readiness: 'needs focused mobile proof',
+      tests: ['src/pages/OperatingWorkspace.launch.test.jsx'],
+    },
+    testCoverage: [
+      'src/pages/OperatingWorkspace.launch.test.jsx',
+      'src/test/routePagesSmoke.test.tsx',
+    ],
     bridges: bridge({
       userReach: 'Direct route and patient-related tool launch cards.',
       assistant: 'Ask Assistant CTA only.',
@@ -477,7 +631,8 @@ export const SEGMENT_INVENTORY = Object.freeze([
       testedBy: 'Operating workspace launch test.',
       gaps: ['No patient list/detail route and no patient-context backend contract.'],
     }),
-    recoveryBridge: 'Add future /patients/:patientId/* routes and embed clinical-intelligence panels with patient context.',
+    recoveryBridge:
+      'Add future /patients/:patientId/* routes and embed clinical-intelligence panels with patient context.',
   },
   {
     id: 'operations',
@@ -495,11 +650,18 @@ export const SEGMENT_INVENTORY = Object.freeze([
     inventoryEntry: null,
     apiClients: [],
     backendEndpoints: ['/api/analytics/metrics', '/api/audit/*'],
-    launchBehavior: 'Dashboard is the canonical operations entrance and opens launch cards for alerts, fleet, analytics, and audit.',
+    launchBehavior:
+      'Dashboard is the canonical operations entrance and opens launch cards for alerts, fleet, analytics, and audit.',
     layoutShell: 'AppShellPage + OperatingWorkspace',
     auth: appShellAuth,
-    mobile: { readiness: 'needs focused mobile proof', tests: ['src/pages/OperatingWorkspace.launch.test.jsx'] },
-    testCoverage: ['src/pages/OperatingWorkspace.launch.test.jsx', 'src/test/routePagesSmoke.test.tsx'],
+    mobile: {
+      readiness: 'needs focused mobile proof',
+      tests: ['src/pages/OperatingWorkspace.launch.test.jsx'],
+    },
+    testCoverage: [
+      'src/pages/OperatingWorkspace.launch.test.jsx',
+      'src/test/routePagesSmoke.test.tsx',
+    ],
     bridges: bridge({
       userReach: 'Primary Dashboard nav and dashboard launch cards.',
       assistant: 'Ask Assistant CTA only.',
@@ -510,7 +672,8 @@ export const SEGMENT_INVENTORY = Object.freeze([
       testedBy: 'Operating workspace launch test.',
       gaps: ['No canonical operations inventory or /api/operations/* module.'],
     }),
-    recoveryBridge: 'Keep /dashboard canonical and classify each subarea before adding operations APIs.',
+    recoveryBridge:
+      'Keep /dashboard canonical and classify each subarea before adding operations APIs.',
   },
   {
     id: 'fleet-operations',
@@ -520,19 +683,41 @@ export const SEGMENT_INVENTORY = Object.freeze([
     status: SEGMENT_STATUSES.STALE_MOCK_ONLY,
     frontendOnlyType: FRONTEND_ONLY_TYPES.LOCAL_ONLY,
     backendOnlyType: null,
-    frontendFiles: ['src/pages/fleet', 'src/services/fleetTelemetryService.ts', 'src/services/routeOptimizationService.ts', 'src/services/predictiveMaintenanceScoring.ts'],
+    frontendFiles: [
+      'src/pages/fleet',
+      'src/services/fleetTelemetryService.ts',
+      'src/services/routeOptimizationService.ts',
+      'src/services/predictiveMaintenanceScoring.ts',
+    ],
     backendFiles: [],
-    routes: ['/fleet/map', '/fleet/command', '/fleet/route-optimizer', '/fleet/predictive-maintenance'],
+    routes: [
+      '/fleet/map',
+      '/fleet/command',
+      '/fleet/route-optimizer',
+      '/fleet/predictive-maintenance',
+    ],
     canonicalRoute: '/fleet/map',
     navEntry: 'operations',
     inventoryEntry: 'fleet-command, route-optimizer, predictive-maintenance',
-    apiClients: ['src/services/fleetTelemetryService.ts', 'src/services/routeOptimizationService.ts', 'src/services/predictiveMaintenanceScoring.ts'],
+    apiClients: [
+      'src/services/fleetTelemetryService.ts',
+      'src/services/routeOptimizationService.ts',
+      'src/services/predictiveMaintenanceScoring.ts',
+    ],
     backendEndpoints: [],
-    launchBehavior: 'Fleet Map nav, dashboard cards, or registry launch open dedicated fleet pages.',
+    launchBehavior:
+      'Fleet Map nav, dashboard cards, or registry launch open dedicated fleet pages.',
     layoutShell: 'AppShellPage main + FleetPageChrome content region',
     auth: appShellAuth,
-    mobile: { readiness: 'covered by shared responsive QA matrix', tests: ['src/data/responsiveQaMatrix.test.ts'] },
-    testCoverage: ['src/data/pr6FleetComprehensive.test.tsx', 'src/data/prFleetConsistency.test.ts', 'src/data/fleetCommandWiring.test.ts'],
+    mobile: {
+      readiness: 'covered by shared responsive QA matrix',
+      tests: ['src/data/responsiveQaMatrix.test.ts'],
+    },
+    testCoverage: [
+      'src/data/pr6FleetComprehensive.test.tsx',
+      'src/data/prFleetConsistency.test.ts',
+      'src/data/fleetCommandWiring.test.ts',
+    ],
     bridges: bridge({
       userReach: 'Fleet Map nav, dashboard cards, Tools fleet category, and direct fleet routes.',
       assistant: 'Dispatch AI is separate; fleet pages do not embed Assistant handoff.',
@@ -543,7 +728,8 @@ export const SEGMENT_INVENTORY = Object.freeze([
       testedBy: 'Fleet route, widget, and responsive tests.',
       gaps: ['Mock/local fleet pages are visually close to live operations.'],
     }),
-    recoveryBridge: 'Badge as local/mock and add future /api/operations/fleet/* only when a real module exists.',
+    recoveryBridge:
+      'Badge as local/mock and add future /api/operations/fleet/* only when a real module exists.',
   },
   {
     id: 'dispatch-ai',
@@ -554,7 +740,9 @@ export const SEGMENT_INVENTORY = Object.freeze([
     frontendOnlyType: FRONTEND_ONLY_TYPES.PLANNED_BACKEND,
     backendOnlyType: null,
     frontendFiles: ['src/data/toolRegistry.ts', 'src/data/clinicalIntentToolCatalog.ts'],
-    backendFiles: ['backend/src/modules/medical-control-plane/tool-orchestrator/tool-orchestrator.registry.ts'],
+    backendFiles: [
+      'backend/src/modules/medical-control-plane/tool-orchestrator/tool-orchestrator.registry.ts',
+    ],
     routes: ['/assistant', '/tools/calculators'],
     canonicalRoute: '/assistant',
     navEntry: 'assistant',
@@ -576,7 +764,8 @@ export const SEGMENT_INVENTORY = Object.freeze([
       testedBy: 'Dispatch wiring tests.',
       gaps: ['Not exposed as an Operations command panel.'],
     }),
-    recoveryBridge: 'Decide between Assistant-only or future /api/operations/dispatch/analyze before adding more UI.',
+    recoveryBridge:
+      'Decide between Assistant-only or future /api/operations/dispatch/analyze before adding more UI.',
   },
   {
     id: 'clinical-alerts',
@@ -605,7 +794,10 @@ export const SEGMENT_INVENTORY = Object.freeze([
     launchBehavior: 'Operations card opens demo-backed alert workflow page.',
     layoutShell: 'AppShellPage + custom ClinicalAlertsPage CSS',
     auth: appShellAuth,
-    mobile: { readiness: 'covered by route smoke matrix', tests: ['src/test/routePagesSmoke.test.tsx'] },
+    mobile: {
+      readiness: 'covered by route smoke matrix',
+      tests: ['src/test/routePagesSmoke.test.tsx'],
+    },
     testCoverage: ['src/test/routePagesSmoke.test.tsx', 'src/data/backendFrontendExposure.test.ts'],
     bridges: bridge({
       userReach: 'Dashboard card, clinical alert route, and direct route.',
@@ -617,40 +809,107 @@ export const SEGMENT_INVENTORY = Object.freeze([
       testedBy: 'Route smoke and backend exposure scan.',
       gaps: ['Demo data source, no live stream, and export button without backend behavior.'],
     }),
-    recoveryBridge: 'Connect real alert feed and stream before presenting as live bedside alarm management.',
+    recoveryBridge:
+      'Connect real alert feed and stream before presenting as live bedside alarm management.',
   },
   {
     id: 'settings-account-security',
     label: 'Settings, Profile, Security, and Notifications',
     area: SEGMENT_AREAS.SETTINGS,
-    purpose: 'Account preferences, profile, billing, privacy, MFA, biometrics, onboarding, and notification preferences.',
+    purpose:
+      'Account preferences, profile, billing, privacy, MFA, biometrics, onboarding, and notification preferences.',
     status: SEGMENT_STATUSES.PARTIALLY_BUILT,
     frontendOnlyType: null,
     backendOnlyType: null,
-    frontendFiles: ['src/pages/Settings.tsx', 'src/pages/Profile.tsx', 'src/pages/ProfileSettings.tsx', 'src/pages/profile/ProfileActivity.tsx', 'src/pages/profile/ProfileWorkspaces.tsx', 'src/pages/profile/ProfileSecurity.tsx', 'src/components/profile/ProfileSummaryCard.tsx', 'src/pages/NotificationPreferences.tsx', 'src/pages/TwoFactorSetup.jsx', 'src/pages/BiometricSetup.jsx', 'src/pages/commercial/CommercialPages.jsx'],
-    backendFiles: ['backend/src/modules/user-profile', 'backend/src/modules/workspaces', 'backend/src/modules/user-activity', 'backend/src/modules/users', 'backend/src/modules/subscriptions', 'backend/src/modules/compliance', 'backend/src/modules/notifications', 'backend/src/modules/two-factor', 'backend/src/modules/auth/biometric.controller.ts'],
-    routes: ['/settings', '/profile', '/profile/settings', '/profile/activity', '/profile/workspaces', '/profile/security', '/profile-settings', '/notifications', '/two-factor-setup', '/biometric-setup', '/onboarding'],
+    frontendFiles: [
+      'src/pages/Settings.tsx',
+      'src/pages/Profile.tsx',
+      'src/pages/ProfileSettings.tsx',
+      'src/pages/profile/ProfileActivity.tsx',
+      'src/pages/profile/ProfileWorkspaces.tsx',
+      'src/pages/profile/ProfileSecurity.tsx',
+      'src/components/profile/ProfileSummaryCard.tsx',
+      'src/pages/NotificationPreferences.tsx',
+      'src/pages/TwoFactorSetup.jsx',
+      'src/pages/BiometricSetup.jsx',
+      'src/pages/commercial/CommercialPages.jsx',
+    ],
+    backendFiles: [
+      'backend/src/modules/user-profile',
+      'backend/src/modules/workspaces',
+      'backend/src/modules/user-activity',
+      'backend/src/modules/users',
+      'backend/src/modules/subscriptions',
+      'backend/src/modules/compliance',
+      'backend/src/modules/notifications',
+      'backend/src/modules/two-factor',
+      'backend/src/modules/auth/biometric.controller.ts',
+    ],
+    routes: [
+      '/settings',
+      '/profile',
+      '/profile/settings',
+      '/profile/activity',
+      '/profile/workspaces',
+      '/profile/security',
+      '/profile-settings',
+      '/notifications',
+      '/two-factor-setup',
+      '/biometric-setup',
+      '/onboarding',
+    ],
     canonicalRoute: '/settings',
     navEntry: 'settings',
     inventoryEntry: null,
-    apiClients: ['src/services/userIdentityApi.ts', 'src/services/subscriptionApi.ts', 'src/services/complianceApi.ts', 'src/services/NotificationService.ts', 'src/services/apiClient.ts'],
-    backendEndpoints: ['/api/profile/me', '/api/profile/me/preferences', '/api/profile/me/activity', '/api/profile/me/workspaces', '/api/profile/me/security', '/api/users/profile', '/api/subscriptions/*', '/api/compliance/*', '/api/notifications/*', '/api/two-factor/*', '/api/auth/biometric/*'],
+    apiClients: [
+      'src/services/userIdentityApi.ts',
+      'src/services/subscriptionApi.ts',
+      'src/services/complianceApi.ts',
+      'src/services/NotificationService.ts',
+      'src/services/apiClient.ts',
+    ],
+    backendEndpoints: [
+      '/api/profile/me',
+      '/api/profile/me/preferences',
+      '/api/profile/me/activity',
+      '/api/profile/me/workspaces',
+      '/api/profile/me/security',
+      '/api/users/profile',
+      '/api/subscriptions/*',
+      '/api/compliance/*',
+      '/api/notifications/*',
+      '/api/two-factor/*',
+      '/api/auth/biometric/*',
+    ],
     launchBehavior: 'Settings nav and direct subroutes open account/security surfaces.',
     layoutShell: 'AppShellPage',
     auth: appShellAuth,
-    mobile: { readiness: 'mixed', tests: ['src/pages/ProfileSettings.test.tsx', 'src/pages/Settings.billing.test.tsx'] },
-    testCoverage: ['src/pages/ProfileSettings.test.tsx', 'src/pages/Settings.billing.test.tsx', 'src/services/complianceApi.test.ts', 'src/services/apiClient.auth.test.ts'],
+    mobile: {
+      readiness: 'mixed',
+      tests: ['src/pages/ProfileSettings.test.tsx', 'src/pages/Settings.billing.test.tsx'],
+    },
+    testCoverage: [
+      'src/pages/ProfileSettings.test.tsx',
+      'src/pages/Settings.billing.test.tsx',
+      'src/services/complianceApi.test.ts',
+      'src/services/apiClient.auth.test.ts',
+    ],
     bridges: bridge({
       userReach: 'Settings nav and direct links.',
       assistant: 'No Assistant handoff.',
       tools: 'No /tools bridge.',
-      backend: 'Profile, preference, workspace, activity, billing, compliance, notifications, MFA, and biometric endpoints.',
-      result: 'Profile summary, workspace switching, safe activity, preferences, forms, drawers, and status messages.',
+      backend:
+        'Profile, preference, workspace, activity, billing, compliance, notifications, MFA, and biometric endpoints.',
+      result:
+        'Profile summary, workspace switching, safe activity, preferences, forms, drawers, and status messages.',
       safeFailure: 'Error/status banners and disabled actions.',
       testedBy: 'Settings/profile/service tests.',
-      gaps: ['Legacy /profile-settings remains as an alias-era route alongside canonical /profile/settings.'],
+      gaps: [
+        'Legacy /profile-settings remains as an alias-era route alongside canonical /profile/settings.',
+      ],
     }),
-    recoveryBridge: 'Keep profile as the canonical user/workspace hub and split privacy, billing, notification, and security records when implementation grows.',
+    recoveryBridge:
+      'Keep profile as the canonical user/workspace hub and split privacy, billing, notification, and security records when implementation grows.',
   },
   {
     id: 'team-admin',
@@ -683,7 +942,8 @@ export const SEGMENT_INVENTORY = Object.freeze([
       testedBy: 'Capability test.',
       gaps: ['Route exists before backend module exists.'],
     }),
-    recoveryBridge: 'Keep hidden/admin-gated or implement a TeamModule before exposing in Settings navigation.',
+    recoveryBridge:
+      'Keep hidden/admin-gated or implement a TeamModule before exposing in Settings navigation.',
   },
   {
     id: 'audit-compliance',
@@ -693,22 +953,38 @@ export const SEGMENT_INVENTORY = Object.freeze([
     status: SEGMENT_STATUSES.PARTIALLY_BUILT,
     frontendOnlyType: null,
     backendOnlyType: null,
-    frontendFiles: ['src/pages/Settings.tsx', 'src/pages/legal/ConsentFlow.tsx', 'src/pages/legal/ConsentHistory.tsx', 'src/services/complianceApi.ts', 'src/services/auditApi.ts'],
+    frontendFiles: [
+      'src/pages/Settings.tsx',
+      'src/pages/legal/ConsentFlow.tsx',
+      'src/pages/legal/ConsentHistory.tsx',
+      'src/services/complianceApi.ts',
+      'src/services/auditApi.ts',
+    ],
     backendFiles: ['backend/src/modules/audit', 'backend/src/modules/compliance'],
     routes: ['/audit', '/consent', '/consent-history'],
     canonicalRoute: '/audit',
     navEntry: 'audit',
     inventoryEntry: 'platform API inventories',
-    apiClients: ['src/services/complianceApi.ts', 'src/services/auditApi.ts', 'src/services/apiClient.ts'],
+    apiClients: [
+      'src/services/complianceApi.ts',
+      'src/services/auditApi.ts',
+      'src/services/apiClient.ts',
+    ],
     backendEndpoints: ['/api/audit/*', '/api/compliance/*'],
-    launchBehavior: 'Operations card opens audit; Settings/privacy drawers and consent subroutes open compliance flows.',
+    launchBehavior:
+      'Operations card opens audit; Settings/privacy drawers and consent subroutes open compliance flows.',
     layoutShell: 'AppShellPage + mixed custom layouts',
     auth: { ...appShellAuth, permissions: ['VIEW_AUDIT_LOGS for audit views'] },
     mobile: { readiness: 'needs mobile proof', tests: ['src/pages/Settings.privacyData.test.tsx'] },
-    testCoverage: ['src/pages/Settings.privacyData.test.tsx', 'src/services/complianceApi.test.ts', 'src/data/backendFrontendExposure.test.ts'],
+    testCoverage: [
+      'src/pages/Settings.privacyData.test.tsx',
+      'src/services/complianceApi.test.ts',
+      'src/data/backendFrontendExposure.test.ts',
+    ],
     bridges: bridge({
       userReach: 'Operations, Settings, or direct routes.',
-      assistant: 'Clinical audit is separate under /tools; platform audit has no Assistant handoff.',
+      assistant:
+        'Clinical audit is separate under /tools; platform audit has no Assistant handoff.',
       tools: 'CareDroid tool audit is in /tools; platform audit is not.',
       backend: 'Audit and compliance controllers.',
       result: 'Tables, integrity status, downloads, and consent state.',
@@ -716,7 +992,8 @@ export const SEGMENT_INVENTORY = Object.freeze([
       testedBy: 'Settings privacy and exposure tests.',
       gaps: ['Clinical audit vs platform audit naming is easy to confuse.'],
     }),
-    recoveryBridge: 'Label clinical AI trace and compliance audit as separate subsegments with distinct routes and docs.',
+    recoveryBridge:
+      'Label clinical AI trace and compliance audit as separate subsegments with distinct routes and docs.',
   },
   {
     id: 'analytics-costs',
@@ -726,19 +1003,36 @@ export const SEGMENT_INVENTORY = Object.freeze([
     status: SEGMENT_STATUSES.PARTIALLY_BUILT,
     frontendOnlyType: null,
     backendOnlyType: null,
-    frontendFiles: ['src/pages/AnalyticsDashboard.jsx', 'src/pages/CostAnalyticsDashboard.jsx', 'src/contexts/CostTrackingContext.tsx', 'src/services/analyticsService.ts'],
+    frontendFiles: [
+      'src/pages/AnalyticsDashboard.jsx',
+      'src/pages/CostAnalyticsDashboard.jsx',
+      'src/contexts/CostTrackingContext.tsx',
+      'src/services/analyticsService.ts',
+    ],
     backendFiles: ['backend/src/modules/analytics', 'backend/src/modules/metrics'],
     routes: ['/analytics', '/costs'],
     canonicalRoute: '/analytics',
     navEntry: null,
     inventoryEntry: 'platform API inventories',
-    apiClients: ['src/services/analyticsService.ts', 'src/services/apiClient.ts', 'src/services/offlineService.ts'],
-    backendEndpoints: ['/api/analytics/metrics', '/api/analytics/events', '/api/crashes', '/api/metrics'],
+    apiClients: [
+      'src/services/analyticsService.ts',
+      'src/services/apiClient.ts',
+      'src/services/offlineService.ts',
+    ],
+    backendEndpoints: [
+      '/api/analytics/metrics',
+      '/api/analytics/events',
+      '/api/crashes',
+      '/api/metrics',
+    ],
     launchBehavior: 'Operations card opens analytics; /costs is direct/permissioned.',
     layoutShell: 'AppShellPage + custom analytics containers',
     auth: { ...appShellAuth, permissions: ['VIEW_ANALYTICS'] },
     mobile: { readiness: 'unknown', tests: [] },
-    testCoverage: ['src/services/configService.test.ts', 'src/data/frontendApiCallsInventory.schedule.test.ts'],
+    testCoverage: [
+      'src/services/configService.test.ts',
+      'src/data/frontendApiCallsInventory.schedule.test.ts',
+    ],
     bridges: bridge({
       userReach: 'Operations card and direct routes.',
       assistant: 'No Assistant handoff.',
@@ -749,29 +1043,47 @@ export const SEGMENT_INVENTORY = Object.freeze([
       testedBy: 'Service/inventory tests; limited page behavior coverage.',
       gaps: ['/costs is route-registered but not visibly bridged from primary navigation.'],
     }),
-    recoveryBridge: 'Add Operations card or Settings billing bridge for /costs if it remains user-facing.',
+    recoveryBridge:
+      'Add Operations card or Settings billing bridge for /costs if it remains user-facing.',
   },
   {
     id: 'notifications-offline',
     label: 'Notifications, Push, Offline, and Sync',
     area: SEGMENT_AREAS.PLATFORM,
-    purpose: 'Notification preferences/devices, app toasts, service workers, offline mode, and sync capabilities.',
+    purpose:
+      'Notification preferences/devices, app toasts, service workers, offline mode, and sync capabilities.',
     status: SEGMENT_STATUSES.FRAGMENTED,
     frontendOnlyType: null,
     backendOnlyType: null,
-    frontendFiles: ['src/services/NotificationService.ts', 'src/contexts/OfflineProvider.tsx', 'src/services/firebaseClient.ts', 'public/sw.js', 'public/firebase-messaging-sw.js'],
+    frontendFiles: [
+      'src/services/NotificationService.ts',
+      'src/contexts/OfflineProvider.tsx',
+      'src/services/firebaseClient.ts',
+      'public/sw.js',
+      'public/firebase-messaging-sw.js',
+    ],
     backendFiles: ['backend/src/modules/notifications', 'backend/src/config/firebase.config.ts'],
     routes: ['/notifications'],
     canonicalRoute: '/notifications',
     navEntry: 'settings',
     inventoryEntry: 'notifications and sync capability flags',
-    apiClients: ['src/services/NotificationService.ts', 'src/services/firebaseClient.ts', 'src/services/syncService.ts'],
+    apiClients: [
+      'src/services/NotificationService.ts',
+      'src/services/firebaseClient.ts',
+      'src/services/syncService.ts',
+    ],
     backendEndpoints: ['/api/notifications/*'],
     launchBehavior: 'Settings route plus app providers/service workers.',
     layoutShell: 'AppShellPage + providers + service workers',
     auth: appShellAuth,
-    mobile: { readiness: 'unclear for push/offline runtime', tests: ['src/services/NotificationService.test.js'] },
-    testCoverage: ['src/services/NotificationService.test.js', 'src/data/backendFrontendExposure.test.ts'],
+    mobile: {
+      readiness: 'unclear for push/offline runtime',
+      tests: ['src/services/NotificationService.test.js'],
+    },
+    testCoverage: [
+      'src/services/NotificationService.test.js',
+      'src/data/backendFrontendExposure.test.ts',
+    ],
     bridges: bridge({
       userReach: 'Settings notifications route, app toasts, browser push registration.',
       assistant: 'No direct Assistant bridge.',
@@ -782,7 +1094,8 @@ export const SEGMENT_INVENTORY = Object.freeze([
       testedBy: 'Service and exposure tests.',
       gaps: ['Duplicate notification service files and service-worker runtime need hardening.'],
     }),
-    recoveryBridge: 'Create one platform notification/sync segment owner and keep unsupported capabilities gated.',
+    recoveryBridge:
+      'Create one platform notification/sync segment owner and keep unsupported capabilities gated.',
   },
   {
     id: 'backend-clinical-content',
@@ -793,7 +1106,10 @@ export const SEGMENT_INVENTORY = Object.freeze([
     frontendOnlyType: null,
     backendOnlyType: BACKEND_ONLY_TYPES.SHOULD_BE_EXPOSED,
     frontendFiles: ['src/services/clinicalContentApi.ts'],
-    backendFiles: ['backend/src/modules/clinical/drug.controller.ts', 'backend/src/modules/clinical/protocol.controller.ts'],
+    backendFiles: [
+      'backend/src/modules/clinical/drug.controller.ts',
+      'backend/src/modules/clinical/protocol.controller.ts',
+    ],
     routes: [],
     canonicalRoute: null,
     navEntry: null,
@@ -804,7 +1120,10 @@ export const SEGMENT_INVENTORY = Object.freeze([
     layoutShell: 'N/A',
     auth: appShellAuth,
     mobile: { ...baseMobile, readiness: 'not UI-specific' },
-    testCoverage: ['src/services/clinicalContentApi.test.ts', 'backend/src/modules/clinical/drug.service.spec.ts'],
+    testCoverage: [
+      'src/services/clinicalContentApi.test.ts',
+      'backend/src/modules/clinical/drug.service.spec.ts',
+    ],
     bridges: bridge({
       userReach: 'Indirectly through clinical tool/reference pages.',
       assistant: 'Assistant can answer references through chat/RAG, not direct CRUD.',
@@ -813,31 +1132,54 @@ export const SEGMENT_INVENTORY = Object.freeze([
       result: 'API JSON for clinical content.',
       safeFailure: 'Feature client errors.',
       testedBy: 'Service/controller tests.',
-      gaps: ['Create/update/delete routes should not be exposed to clinicians without admin UX and permissions.'],
+      gaps: [
+        'Create/update/delete routes should not be exposed to clinicians without admin UX and permissions.',
+      ],
     }),
-    recoveryBridge: 'Expose read-only content through feature clients; reserve CRUD for a future admin segment.',
+    recoveryBridge:
+      'Expose read-only content through feature clients; reserve CRUD for a future admin segment.',
   },
   {
     id: 'backend-ai-rag-metrics',
     label: 'Backend AI, RAG, Metrics, and Observability',
     area: SEGMENT_AREAS.BACKEND,
-    purpose: 'Internal AI query, structured AI, RAG, metrics, Sentry, Datadog, cache, and encryption support.',
+    purpose:
+      'Internal AI query, structured AI, RAG, metrics, Sentry, Datadog, cache, and encryption support.',
     status: SEGMENT_STATUSES.BACKEND_ONLY,
     frontendOnlyType: null,
     backendOnlyType: BACKEND_ONLY_TYPES.INTERNAL,
-    frontendFiles: ['src/services/configService.ts', 'src/services/clinicalChatService.ts', 'src/services/clinicalIntelligenceApi.ts'],
-    backendFiles: ['backend/src/modules/ai', 'backend/src/modules/rag', 'backend/src/modules/metrics', 'backend/src/observability/datadog.ts'],
+    frontendFiles: [
+      'src/services/configService.ts',
+      'src/services/clinicalChatService.ts',
+      'src/services/clinicalIntelligenceApi.ts',
+    ],
+    backendFiles: [
+      'backend/src/modules/ai',
+      'backend/src/modules/rag',
+      'backend/src/modules/metrics',
+      'backend/src/observability/datadog.ts',
+    ],
     routes: [],
     canonicalRoute: null,
     navEntry: null,
     inventoryEntry: 'backend HTTP route inventory',
     apiClients: ['src/services/configService.ts'],
-    backendEndpoints: ['/api/ai/query', '/api/ai/structured', '/api/ai/usage', '/api/ai/remaining-queries', '/api/metrics'],
-    launchBehavior: 'Support APIs behind Assistant, clinical intelligence, config, and observability.',
+    backendEndpoints: [
+      '/api/ai/query',
+      '/api/ai/structured',
+      '/api/ai/usage',
+      '/api/ai/remaining-queries',
+      '/api/metrics',
+    ],
+    launchBehavior:
+      'Support APIs behind Assistant, clinical intelligence, config, and observability.',
     layoutShell: 'N/A',
     auth: appShellAuth,
     mobile: { ...baseMobile, readiness: 'not UI-specific' },
-    testCoverage: ['backend/src/modules/ai/ai.service.spec.ts', 'src/services/configService.test.ts'],
+    testCoverage: [
+      'backend/src/modules/ai/ai.service.spec.ts',
+      'src/services/configService.test.ts',
+    ],
     bridges: bridge({
       userReach: 'No direct product route.',
       assistant: 'Assistant and clinical intelligence consume supporting services.',
@@ -848,17 +1190,25 @@ export const SEGMENT_INVENTORY = Object.freeze([
       testedBy: 'Backend service and config tests.',
       gaps: ['Keep internal endpoints out of clinician navigation.'],
     }),
-    recoveryBridge: 'Keep as internal/supporting; expose only through chat, clinical intelligence, or admin observability if needed.',
+    recoveryBridge:
+      'Keep as internal/supporting; expose only through chat, clinical intelligence, or admin observability if needed.',
   },
   {
     id: 'build-config-docs-tests',
     label: 'Build, Config, Assets, Docs, and Test Systems',
     area: SEGMENT_AREAS.BUILD,
-    purpose: 'Development/build/deploy configuration, public assets, scripts, and generated documentation.',
+    purpose:
+      'Development/build/deploy configuration, public assets, scripts, and generated documentation.',
     status: SEGMENT_STATUSES.COMPLETE,
     frontendOnlyType: null,
     backendOnlyType: null,
-    frontendFiles: ['package.json', 'vite.config.ts', 'vercel.json', 'scripts/validate-assets.mjs', 'public'],
+    frontendFiles: [
+      'package.json',
+      'vite.config.ts',
+      'vercel.json',
+      'scripts/validate-assets.mjs',
+      'public',
+    ],
     backendFiles: ['backend/src/main.ts', 'backend/src/config'],
     routes: [],
     canonicalRoute: null,
@@ -870,7 +1220,11 @@ export const SEGMENT_INVENTORY = Object.freeze([
     layoutShell: 'N/A',
     auth: publicAuth,
     mobile: { ...baseMobile, readiness: 'not UI-specific' },
-    testCoverage: ['scripts/validate-assets.mjs', 'src/build/bundleBudget.test.ts', 'src/data/backendFrontendExposure.test.ts'],
+    testCoverage: [
+      'scripts/validate-assets.mjs',
+      'src/build/bundleBudget.test.ts',
+      'src/data/backendFrontendExposure.test.ts',
+    ],
     bridges: bridge({
       userReach: 'Developer scripts and deployment platforms.',
       assistant: 'No product Assistant bridge.',
@@ -880,7 +1234,8 @@ export const SEGMENT_INVENTORY = Object.freeze([
       safeFailure: 'Asset/env validation failures.',
       testedBy: 'Build, exposure, and asset validation tests.',
     }),
-    recoveryBridge: 'Add production smoke for /api JSON vs SPA fallback when deployment automation is available.',
+    recoveryBridge:
+      'Add production smoke for /api JSON vs SPA fallback when deployment automation is available.',
   },
   {
     id: 'mobile-shell',
@@ -890,7 +1245,13 @@ export const SEGMENT_INVENTORY = Object.freeze([
     status: SEGMENT_STATUSES.PARTIALLY_BUILT,
     frontendOnlyType: null,
     backendOnlyType: null,
-    frontendFiles: ['src/layout/AppShell.tsx', 'src/config/navigation.config.ts', 'src/layout/breakpoints.ts', 'src/index.css', 'src/test/responsiveRegression.routes.ts'],
+    frontendFiles: [
+      'src/layout/AppShell.tsx',
+      'src/config/navigation.config.ts',
+      'src/layout/breakpoints.ts',
+      'src/index.css',
+      'src/test/responsiveRegression.routes.ts',
+    ],
     backendFiles: [],
     routes: [],
     canonicalRoute: null,
@@ -901,8 +1262,20 @@ export const SEGMENT_INVENTORY = Object.freeze([
     launchBehavior: 'Applies to every protected route through AppShell.',
     layoutShell: 'AppShell',
     auth: appShellAuth,
-    mobile: { readiness: 'covered for shell/tools/fleet; weaker elsewhere', tests: ['src/layout/AppShell.layout.test.js', 'src/layout/AppShell.navigation.test.tsx', 'src/test/responsiveRegression.coverage.test.ts'] },
-    testCoverage: ['src/layout/AppShell.layout.test.js', 'src/layout/AppShell.navigation.test.tsx', 'src/test/responsiveRegression.coverage.test.ts', 'src/styles/responsiveUx.test.ts'],
+    mobile: {
+      readiness: 'covered for shell/tools/fleet; weaker elsewhere',
+      tests: [
+        'src/layout/AppShell.layout.test.js',
+        'src/layout/AppShell.navigation.test.tsx',
+        'src/test/responsiveRegression.coverage.test.ts',
+      ],
+    },
+    testCoverage: [
+      'src/layout/AppShell.layout.test.js',
+      'src/layout/AppShell.navigation.test.tsx',
+      'src/test/responsiveRegression.coverage.test.ts',
+      'src/styles/responsiveUx.test.ts',
+    ],
     bridges: bridge({
       userReach: 'All protected routes on compact viewport.',
       assistant: 'Bottom nav includes Assistant.',
@@ -913,7 +1286,8 @@ export const SEGMENT_INVENTORY = Object.freeze([
       testedBy: 'Responsive shell and route coverage tests.',
       gaps: ['Admin/mock pages need stronger actual mobile layout proof.'],
     }),
-    recoveryBridge: 'Add segment-level mobile ownership for audit, analytics, team, alerts, consent, notifications, and settings drawers.',
+    recoveryBridge:
+      'Add segment-level mobile ownership for audit, analytics, team, alerts, consent, notifications, and settings drawers.',
   },
 ]);
 
@@ -932,7 +1306,9 @@ export function resolveSegmentRecord(id, records = SEGMENT_INVENTORY) {
 
 export function getFrontendOnlySegments(records = SEGMENT_INVENTORY) {
   return records.filter((record) =>
-    [SEGMENT_STATUSES.FRONTEND_ONLY, SEGMENT_STATUSES.STALE_MOCK_ONLY].includes(record.status as any)
+    [SEGMENT_STATUSES.FRONTEND_ONLY, SEGMENT_STATUSES.STALE_MOCK_ONLY].includes(
+      record.status as any,
+    ),
   );
 }
 
@@ -962,6 +1338,6 @@ export function getSegmentInventorySummary(records = SEGMENT_INVENTORY) {
       withGaps: 0,
       byStatus: {},
       byArea: {},
-    }
+    },
   );
 }

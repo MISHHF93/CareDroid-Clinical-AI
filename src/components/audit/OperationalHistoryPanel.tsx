@@ -26,8 +26,8 @@ function actorLabel(log) {
 }
 
 export default function OperationalHistoryPanel({
-  logs = ([] as any[]),
-  patientId = (undefined as string | undefined),
+  logs = [] as any[],
+  patientId = undefined as string | undefined,
   title = 'Operational history',
   description = 'Recent workflow actions from the CareDroid audit log.',
   domains = Object.values(OPERATIONAL_AUDIT_DOMAIN),
@@ -59,10 +59,13 @@ export default function OperationalHistoryPanel({
   );
 
   const domainCounts = useMemo(() => {
-    return visibleDomains.reduce((counts, domain) => {
-      counts[domain] = filterOperationalHistory(logs, { domain, patientId, limit: 100 }).length;
-      return counts;
-    }, ({} as Record<string, number>));
+    return visibleDomains.reduce(
+      (counts, domain) => {
+        counts[domain] = filterOperationalHistory(logs, { domain, patientId, limit: 100 }).length;
+        return counts;
+      },
+      {} as Record<string, number>,
+    );
   }, [logs, patientId, visibleDomains]);
 
   return (
@@ -95,7 +98,9 @@ export default function OperationalHistoryPanel({
                 role="tab"
                 tabIndex={tabIndexFor(domain)}
                 onKeyDown={onKeyDown}
-                {...((activeDomain === domain) ? { 'aria-selected': 'true' as const } : { 'aria-selected': 'false' as const })}
+                {...(activeDomain === domain
+                  ? { 'aria-selected': 'true' as const }
+                  : { 'aria-selected': 'false' as const })}
                 className={[
                   'operational-history-panel__tab',
                   activeDomain === domain ? 'operational-history-panel__tab--active' : '',
@@ -128,8 +133,8 @@ export default function OperationalHistoryPanel({
         </ol>
       ) : (
         <p className="operational-history-panel__empty" role="status">
-          No {OPERATIONAL_AUDIT_DOMAIN_LABELS[activeDomain]?.toLowerCase() || 'operational'} recorded
-          yet.
+          No {OPERATIONAL_AUDIT_DOMAIN_LABELS[activeDomain]?.toLowerCase() || 'operational'}{' '}
+          recorded yet.
         </p>
       )}
     </section>

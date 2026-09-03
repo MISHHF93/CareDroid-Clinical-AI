@@ -18,12 +18,7 @@ export function useCommandCenterScreen(): CommandCenterScreenCapabilities {
         role: emergencyRole.role,
         roleLabel: emergencyRole.roleLabel,
       }),
-    [
-      emergencyRole.can,
-      emergencyRole.role,
-      emergencyRole.roleLabel,
-      screenCapabilities.screenMode,
-    ],
+    [emergencyRole.can, emergencyRole.role, emergencyRole.roleLabel, screenCapabilities.screenMode],
   );
 }
 

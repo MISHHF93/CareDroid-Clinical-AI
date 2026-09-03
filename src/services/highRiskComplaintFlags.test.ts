@@ -48,9 +48,9 @@ describe('highRiskComplaintFlags', () => {
 
   it('detects stroke, sepsis, anaphylaxis, and pregnancy flags from keywords', () => {
     expect(
-      detectHighRiskComplaintFlags({ complaint: 'Facial droop and slurred speech since breakfast' }).map(
-        (flag) => flag.id,
-      ),
+      detectHighRiskComplaintFlags({
+        complaint: 'Facial droop and slurred speech since breakfast',
+      }).map((flag) => flag.id),
     ).toContain('stroke-symptoms');
 
     expect(
@@ -66,9 +66,9 @@ describe('highRiskComplaintFlags', () => {
     ).toContain('anaphylaxis-concern');
 
     expect(
-      detectHighRiskComplaintFlags({ complaint: 'Heavy vaginal bleeding at 32 weeks pregnant' }).map(
-        (flag) => flag.id,
-      ),
+      detectHighRiskComplaintFlags({
+        complaint: 'Heavy vaginal bleeding at 32 weeks pregnant',
+      }).map((flag) => flag.id),
     ).toContain('pregnancy-emergency');
   });
 

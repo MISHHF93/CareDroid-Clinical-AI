@@ -1,4 +1,12 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { apiFetch, getApiErrorMessage, parseApiResponse } from '../services/apiClient';
 import {
   clearTenantContext,
@@ -48,7 +56,8 @@ const normalizeTenantContext = (input) => {
     organizationType: context.organizationType || context.organization?.organizationType,
     branding: context.branding || context.organization?.branding || {},
     workspaceId: context.workspaceId || context.workspace?.id || context.activeWorkspace?.id,
-    workspaceName: context.workspaceName || context.workspace?.name || context.activeWorkspace?.name,
+    workspaceName:
+      context.workspaceName || context.workspace?.name || context.activeWorkspace?.name,
     userId: context.userId || context.user?.id,
     role: context.role || context.user?.role,
     subscriptionPlan:
@@ -73,11 +82,11 @@ export function TenantContextProvider({ children }) {
 
   const canUseDemoTenant = Boolean(
     isDevAuthBypass ||
-      user?.isDevAuthBypass ||
-      user?.authMode === 'open-access' ||
-      user?.authMode === 'platform-access' ||
-      user?.authMode === 'local-dev-demo' ||
-      user?.authMode === 'dev-demo'
+    user?.isDevAuthBypass ||
+    user?.authMode === 'open-access' ||
+    user?.authMode === 'platform-access' ||
+    user?.authMode === 'local-dev-demo' ||
+    user?.authMode === 'dev-demo',
   );
 
   const applyTenantContext = useCallback((nextContext) => {
@@ -154,14 +163,7 @@ export function TenantContextProvider({ children }) {
     } finally {
       if (token === refreshTokenRef.current) setIsLoading(false);
     }
-  }, [
-    applyTenantContext,
-    authToken,
-    canUseDemoTenant,
-    isAuthenticated,
-    isUserLoading,
-    user,
-  ]);
+  }, [applyTenantContext, authToken, canUseDemoTenant, isAuthenticated, isUserLoading, user]);
 
   // See UserIdentityContext's refreshIdentity comment / WorkspaceContext's
   // refreshWorkspaceContext comment: depending on [refreshTenantContext] re-ran this
@@ -187,7 +189,7 @@ export function TenantContextProvider({ children }) {
       hasTenantContext: hasRequiredTenantContext(tenantContext),
       refreshTenantContext,
     }),
-    [error, isLoading, isUserLoading, refreshTenantContext, tenantContext]
+    [error, isLoading, isUserLoading, refreshTenantContext, tenantContext],
   );
 
   return <TenantContext.Provider value={value}>{children}</TenantContext.Provider>;

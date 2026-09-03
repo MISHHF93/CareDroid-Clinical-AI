@@ -29,11 +29,13 @@ describe('appShellChromePolicy', () => {
       expect(policy.showInteractiveAppChrome, pathname).toBe(true);
       expect(policy.showSidebar, pathname).toBe(true);
       expect(policy.showWallBrandHeaderOnly, pathname).toBe(false);
-      expect(shouldShowInteractiveAppChrome({
-        pathname,
-        isPublicDisplay: false,
-        isWallKiosk: false,
-      })).toBe(true);
+      expect(
+        shouldShowInteractiveAppChrome({
+          pathname,
+          isPublicDisplay: false,
+          isWallKiosk: false,
+        }),
+      ).toBe(true);
     }
   });
 

@@ -73,15 +73,27 @@ export type EdExtensionRedirect = Readonly<{
  * Non-ED extension paths fold back into the ED application (longest-prefix wins).
  */
 export const ED_EXTENSION_ROUTE_REDIRECTS: readonly EdExtensionRedirect[] = Object.freeze([
-  { prefix: '/dashboard',                 to: CANONICAL_ROUTES.emergencyCommandCenter,   reason: 'legacy-dashboard' },
-  { prefix: '/app',                       to: CANONICAL_ROUTES.emergencyWhiteboard,      reason: 'legacy-app-alias' },
+  { prefix: '/dashboard', to: CANONICAL_ROUTES.emergencyCommandCenter, reason: 'legacy-dashboard' },
+  { prefix: '/app', to: CANONICAL_ROUTES.emergencyWhiteboard, reason: 'legacy-app-alias' },
 
-  { prefix: '/emergency/intake',          to: CANONICAL_ROUTES.emergencyReception,       reason: 'intake-through-reception' },
-  { prefix: '/vehicle',                   to: CANONICAL_ROUTES.emergencyEms,             reason: 'fleet-extension' },
-  { prefix: '/surveillance',              to: CANONICAL_ROUTES.emergencySettings,        reason: 'surveillance-extension' },
-  { prefix: '/cosmos',                    to: CANONICAL_ROUTES.emergencyWhiteboard,      reason: 'cosmos-extension' },
-  { prefix: '/operations-center',         to: CANONICAL_ROUTES.emergencyAnalytics,       reason: 'operations-center' },
-  { prefix: '/platform-admin',            to: CANONICAL_ROUTES.emergencySettings,        reason: 'platform-admin' },
+  {
+    prefix: '/emergency/intake',
+    to: CANONICAL_ROUTES.emergencyReception,
+    reason: 'intake-through-reception',
+  },
+  { prefix: '/vehicle', to: CANONICAL_ROUTES.emergencyEms, reason: 'fleet-extension' },
+  {
+    prefix: '/surveillance',
+    to: CANONICAL_ROUTES.emergencySettings,
+    reason: 'surveillance-extension',
+  },
+  { prefix: '/cosmos', to: CANONICAL_ROUTES.emergencyWhiteboard, reason: 'cosmos-extension' },
+  {
+    prefix: '/operations-center',
+    to: CANONICAL_ROUTES.emergencyAnalytics,
+    reason: 'operations-center',
+  },
+  { prefix: '/platform-admin', to: CANONICAL_ROUTES.emergencySettings, reason: 'platform-admin' },
   // ── Removed redirects (real pages now exist for these paths) ───────────────
   // /enterprise-platform → EnterpriseOperatingPlatformHub. Same exit
   //   condition, same order: page first, then the shadow, then the
@@ -180,7 +192,5 @@ export function resolveEdExtensionRedirect(pathname = ''): string | null {
 export function isEdCoreRoute(pathname = ''): boolean {
   const normalized = pathname.split('?')[0].split('#')[0];
   const corePaths = Object.values(ED_CORE_ROUTES);
-  return corePaths.some(
-    (route) => normalized === route || normalized.startsWith(`${route}/`),
-  );
+  return corePaths.some((route) => normalized === route || normalized.startsWith(`${route}/`));
 }

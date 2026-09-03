@@ -152,7 +152,9 @@ describe('receptionEscalationWorkflow', () => {
 
     expect(filterReceptionEscalationsForRole(alerts, 'triage_nurse')).toHaveLength(1);
     expect(filterReceptionEscalationsForRole(alerts, 'charge_nurse')).toHaveLength(2);
-    expect(buildReceptionEscalationAttentionSnapshot(alerts, { roleId: 'triage_nurse' }).rows).toHaveLength(1);
+    expect(
+      buildReceptionEscalationAttentionSnapshot(alerts, { roleId: 'triage_nurse' }).rows,
+    ).toHaveLength(1);
   });
 
   it('builds reception escalation attention snapshot for the reception-workspace/triage-screen/charge-nurse/whiteboard/notification-center views', () => {

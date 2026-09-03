@@ -1,6 +1,10 @@
 import type { CareDroidUserProfile } from './userTypes';
 import { HOSPITAL_SITES, CITY_ZONES, DEPARTMENTS } from './hospitalNetwork';
-import { getPermissionsForRole, canRoleReceiveCriticalAlerts, canRoleUseAIChief } from './permissions';
+import {
+  getPermissionsForRole,
+  canRoleReceiveCriticalAlerts,
+  canRoleUseAIChief,
+} from './permissions';
 import { normalizeCareDroidProfile } from './canonicalAccess';
 
 const now = new Date().toISOString();
@@ -28,7 +32,7 @@ function makeDemoUser(
       | 'specialties'
       | 'availabilityStatus'
       | 'escalationLevel'
-    >
+    >,
 ): CareDroidUserProfile {
   return normalizeCareDroidProfile({
     ...partial,

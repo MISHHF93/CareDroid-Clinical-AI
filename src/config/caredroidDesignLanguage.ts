@@ -154,7 +154,9 @@ export function resolveCdlSemanticRole(
   fallback: CdlSemanticRole = 'inactive',
 ): CdlSemanticRole {
   if (!tone) return fallback;
-  return CDL_TONE_TO_SEMANTIC[tone] || resolveSemanticColorRole(tone, fallback as SemanticColorRole);
+  return (
+    CDL_TONE_TO_SEMANTIC[tone] || resolveSemanticColorRole(tone, fallback as SemanticColorRole)
+  );
 }
 
 export function cdlSemanticSurfaceClass(role: CdlSemanticRole): string {

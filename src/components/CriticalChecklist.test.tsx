@@ -41,13 +41,15 @@ afterEach(() => {
 
 describe('critical checklist config', () => {
   it('matches critical complaints to configured checklists', () => {
-    expect(findMatchingChecklists('EMS prearrival STEMI, hypotensive').map((checklist) => checklist.id)).toEqual(['stemi']);
-    expect(findMatchingChecklists('Major trauma alert after MVC').map((checklist) => checklist.id)).toEqual([
-      'major-trauma',
-    ]);
-    expect(findMatchingChecklists('Anaphylaxis after bee sting').map((checklist) => checklist.id)).toEqual([
-      'anaphylaxis',
-    ]);
+    expect(
+      findMatchingChecklists('EMS prearrival STEMI, hypotensive').map((checklist) => checklist.id),
+    ).toEqual(['stemi']);
+    expect(
+      findMatchingChecklists('Major trauma alert after MVC').map((checklist) => checklist.id),
+    ).toEqual(['major-trauma']);
+    expect(
+      findMatchingChecklists('Anaphylaxis after bee sting').map((checklist) => checklist.id),
+    ).toEqual(['anaphylaxis']);
   });
 
   it('builds and parses human-readable completion notes', () => {
@@ -123,10 +125,14 @@ describe('CriticalChecklist', () => {
 
     await user.click(screen.getByLabelText(/Prepare ECG machine/i));
 
-    const savedPatient = useEmergencyStore.getState().patients.find((patient) => patient.id === basePatient.id);
+    const savedPatient = useEmergencyStore
+      .getState()
+      .patients.find((patient) => patient.id === basePatient.id);
     const savedText = savedPatient?.notes.at(-1)?.text;
 
-    expect(savedText).toMatch(/^Critical Checklist \[stemi] \[prepare-ecg]: completed at .+ by Dr\. Test - /);
+    expect(savedText).toMatch(
+      /^Critical Checklist \[stemi] \[prepare-ecg]: completed at .+ by Dr\. Test - /,
+    );
     expect(parseChecklistCompletionNote(savedText)).toMatchObject({
       checklistId: 'stemi',
       itemId: 'prepare-ecg',
@@ -158,7 +164,9 @@ describe('CriticalChecklist', () => {
 
     await user.click(checkbox);
 
-    const savedPatient = useEmergencyStore.getState().patients.find((patient) => patient.id === basePatient.id);
+    const savedPatient = useEmergencyStore
+      .getState()
+      .patients.find((patient) => patient.id === basePatient.id);
     expect(savedPatient?.notes).toHaveLength(0);
     expect(checkbox.checked).toBe(false);
   });
@@ -169,7 +177,13 @@ describe('CriticalChecklist', () => {
     const onClose = vi.fn();
 
     render(
-      <CriticalChecklist patient={basePatient} checklist={checklist} open onClose={onClose} currentStaffId="s1" />,
+      <CriticalChecklist
+        patient={basePatient}
+        checklist={checklist}
+        open
+        onClose={onClose}
+        currentStaffId="s1"
+      />,
     );
 
     await user.keyboard('{Escape}');
@@ -182,7 +196,13 @@ describe('CriticalChecklist', () => {
     const onClose = vi.fn();
 
     render(
-      <CriticalChecklist patient={basePatient} checklist={checklist} open onClose={onClose} currentStaffId="s1" />,
+      <CriticalChecklist
+        patient={basePatient}
+        checklist={checklist}
+        open
+        onClose={onClose}
+        currentStaffId="s1"
+      />,
     );
 
     await user.click(screen.getByLabelText('Close checklist backdrop'));
@@ -208,7 +228,13 @@ describe('CriticalChecklist', () => {
     };
 
     render(
-      <CriticalChecklist patient={patient} checklist={checklist} open onClose={() => undefined} currentStaffId="s1" />,
+      <CriticalChecklist
+        patient={patient}
+        checklist={checklist}
+        open
+        onClose={() => undefined}
+        currentStaffId="s1"
+      />,
     );
 
     const checkedText = screen.getByText('Activate cath lab (if applicable)');
@@ -222,7 +248,13 @@ describe('CriticalChecklist', () => {
     const checklist = findChecklistById('stemi') || CHECKLISTS[0];
 
     render(
-      <CriticalChecklist patient={basePatient} checklist={checklist} open onClose={() => undefined} currentStaffId="s1" />,
+      <CriticalChecklist
+        patient={basePatient}
+        checklist={checklist}
+        open
+        onClose={() => undefined}
+        currentStaffId="s1"
+      />,
     );
 
     expect(screen.getByRole('dialog')).toHaveFocus();

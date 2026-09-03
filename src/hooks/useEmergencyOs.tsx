@@ -118,8 +118,7 @@ function normalizeEmsArrivalRecord(arrival: any = {}, index = 0) {
     severity: arrival.severity || 'Moderate',
     status: arrival.status || 'Inbound',
     estimatedArrivalTime:
-      arrival.estimatedArrivalTime ||
-      new Date(Date.now() + Math.max(0, eta) * 60000).toISOString(),
+      arrival.estimatedArrivalTime || new Date(Date.now() + Math.max(0, eta) * 60000).toISOString(),
     chiefComplaint: arrival.chiefComplaint || arrival.prearrivalComplaint || 'EMS pre-arrival',
   };
 }
@@ -128,9 +127,12 @@ function normalizeReferralStatus(status = '') {
   const normalized = String(status).toLowerCase();
   if (normalized.includes('acknowledg')) return 'Acknowledged';
   if (normalized.includes('accepted')) return 'Accepted';
-  if (normalized.includes('transferrequested') || normalized.includes('transfer requested')) return 'TransferRequested';
-  if (normalized.includes('transportarranged') || normalized.includes('transport arranged')) return 'TransportArranged';
-  if (normalized.includes('patientdeparted') || normalized.includes('patient departed')) return 'PatientDeparted';
+  if (normalized.includes('transferrequested') || normalized.includes('transfer requested'))
+    return 'TransferRequested';
+  if (normalized.includes('transportarranged') || normalized.includes('transport arranged'))
+    return 'TransportArranged';
+  if (normalized.includes('patientdeparted') || normalized.includes('patient departed'))
+    return 'PatientDeparted';
   if (normalized.includes('closed') || normalized.includes('complete')) return 'Completed';
   if (normalized.includes('declined')) return 'Declined';
   if (normalized.includes('delay') || normalized.includes('info')) return 'InfoRequested';
@@ -146,7 +148,9 @@ function normalizeReferral(row: any = {}, index = 0) {
     patientId: row.patientId || patient.id,
     targetDepartment: row.targetDepartment || row.specialty || row.department || 'Other',
     service: row.service || row.specialty || row.department || 'Other',
-    urgency: row.urgency || (patient.priority === 'P1' || patient.priority === 'P2' ? 'Emergent' : 'Urgent'),
+    urgency:
+      row.urgency ||
+      (patient.priority === 'P1' || patient.priority === 'P2' ? 'Emergent' : 'Urgent'),
     reason: row.reason || patient.chiefComplaint || 'Specialty review requested.',
     clinicalSummary:
       row.clinicalSummary ||
@@ -216,9 +220,7 @@ function normalizeEmergencyEnvelope(envelope) {
 function pickHydrationPayload(envelope) {
   const data = envelope?.data || {};
   const emsArrivals =
-    data.emsArrivals ||
-    data.inboundEms ||
-    data.arrivals?.map(normalizeEmsArrival);
+    data.emsArrivals || data.inboundEms || data.arrivals?.map(normalizeEmsArrival);
   const referrals = data.referrals?.map(normalizeReferral);
   const workflowLogs = data.workflowLogs || data.logs;
   const emergencySettings =
@@ -242,14 +244,14 @@ function pickHydrationPayload(envelope) {
 function hasHydrationPayload(payload) {
   return Boolean(
     payload.patients ||
-      payload.rooms ||
-      payload.staff ||
-      payload.alerts ||
-      payload.capacity ||
-      payload.emsArrivals ||
-      payload.referrals ||
-      payload.workflowLogs ||
-      payload.emergencySettings
+    payload.rooms ||
+    payload.staff ||
+    payload.alerts ||
+    payload.capacity ||
+    payload.emsArrivals ||
+    payload.referrals ||
+    payload.workflowLogs ||
+    payload.emergencySettings,
   );
 }
 
@@ -260,8 +262,11 @@ function useEmergencyModule(fetcher, scenarioModule: any = undefined) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const scenarioEnvelope = useMemo(
-    () => (scenarioModule && activeScenarioId ? buildEmergencyScenarioModuleEnvelope(scenarioModule, activeScenarioId) : null),
-    [activeScenarioId, scenarioModule]
+    () =>
+      scenarioModule && activeScenarioId
+        ? buildEmergencyScenarioModuleEnvelope(scenarioModule, activeScenarioId)
+        : null,
+    [activeScenarioId, scenarioModule],
   );
 
   // HEAL-249: refresh() is exposed to callers and invoked repeatedly and
@@ -349,13 +354,16 @@ function useEmergencyModule(fetcher, scenarioModule: any = undefined) {
   const isEmpty = useMemo(() => {
     const payload = data?.data;
     if (!payload) return false;
-    return Object.values(payload).every((value: any) => (Array.isArray(value) ? value.length === 0 : value == null));
+    return Object.values(payload).every((value: any) =>
+      Array.isArray(value) ? value.length === 0 : value == null,
+    );
   }, [data]);
 
   return { data, loading, error, isEmpty, refresh };
 }
 
-export const useEmergencyWhiteboard = () => useEmergencyModule(fetchEmergencyWhiteboard, 'whiteboard');
+export const useEmergencyWhiteboard = () =>
+  useEmergencyModule(fetchEmergencyWhiteboard, 'whiteboard');
 export const useEmergencyPatients = () => useEmergencyModule(fetchEmergencyPatients, 'patients');
 export const usePatientJourney = () => useEmergencyModule(fetchPatientJourney, 'journey');
 export const useEMSIntake = () => useEmergencyModule(fetchEMSIntake, 'ems');
@@ -366,8 +374,7 @@ export function useReceptionSnapshotPolling(intervalMs = 15000) {
   const websocketStatus = useEmergencyStore((state) => state.websocket?.status);
   const websocketMode = useEmergencyStore((state) => state.websocket?.mode);
   const realtimeActive =
-    websocketStatus === 'connected' &&
-    (websocketMode === 'sse' || websocketMode === 'websocket');
+    websocketStatus === 'connected' && (websocketMode === 'sse' || websocketMode === 'websocket');
 
   useEffect(() => {
     if (!intervalMs || realtimeActive) return undefined;
@@ -380,11 +387,13 @@ export function useReceptionSnapshotPolling(intervalMs = 15000) {
 }
 export const useSmartIntake = () => useEmergencyModule(fetchSmartIntake);
 export const useEmergencyQueues = () => useEmergencyModule(fetchEmergencyQueues, 'queues');
-export const useReassessmentQueue = () => useEmergencyModule(fetchReassessmentQueue, 'reassessment');
+export const useReassessmentQueue = () =>
+  useEmergencyModule(fetchReassessmentQueue, 'reassessment');
 export const useCapacityStatus = () => useEmergencyModule(fetchCapacityStatus, 'capacity');
 export const useBoardingStatus = () => useEmergencyModule(fetchBoardingStatus, 'boarding');
 export const useReferrals = () => useEmergencyModule(fetchReferrals);
-export const useProvincialHealth = () => useEmergencyModule(fetchProvincialHealth, 'provincialHealth');
+export const useProvincialHealth = () =>
+  useEmergencyModule(fetchProvincialHealth, 'provincialHealth');
 export const useIntegrationHub = () => useEmergencyModule(fetchIntegrationHub);
 export const useEDCopilot = () => useEmergencyModule(fetchEDCopilot, 'copilot');
 export const useEmergencyWorkflowLogs = () => useEmergencyModule(fetchEmergencyWorkflowLogs);
@@ -408,11 +417,12 @@ export const useUpgradeHarnessPatientFlow = (patientId: any = undefined) => {
 export const useUpgradeHarnessClinicalIntelligence = (patientId: any = undefined) => {
   const fetcher = useCallback(
     () => fetchUpgradeHarnessClinicalIntelligence(patientId),
-    [patientId]
+    [patientId],
   );
   return useEmergencyModule(fetcher, undefined);
 };
-export const useUpgradeHarnessAuditSummary = () => useEmergencyModule(fetchUpgradeHarnessAuditSummary);
+export const useUpgradeHarnessAuditSummary = () =>
+  useEmergencyModule(fetchUpgradeHarnessAuditSummary);
 
 function useEmergencyModuleActions(fetcher, actions) {
   const moduleState = useEmergencyModule(fetcher);
@@ -441,9 +451,9 @@ function useEmergencyModuleActions(fetcher, actions) {
               setActionLoading(false);
             }
           },
-        ])
+        ]),
       ),
-    [actions, moduleState]
+    [actions, moduleState],
   );
 
   return {

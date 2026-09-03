@@ -7,22 +7,27 @@ import {
   MetricCard,
   MiniSparkline,
 } from './DashboardVisualizations';
-import {
-  CategoryBarChart,
-  DistributionDonutChart,
-  TrendChart,
-} from './DashboardCharts';
+import { CategoryBarChart, DistributionDonutChart, TrendChart } from './DashboardCharts';
 
 describe('dashboard visualization components', () => {
   it('renders metric cards with accessible values', () => {
-    render(<MetricCard label="Backend-backed" value={12} hint="Executor-backed tools" tone="good" />);
+    render(
+      <MetricCard label="Backend-backed" value={12} hint="Executor-backed tools" tone="good" />,
+    );
 
     expect(screen.getByLabelText(/backend-backed: 12/i)).toBeInTheDocument();
     expect(screen.getByText(/executor-backed tools/i)).toBeInTheDocument();
   });
 
   it('delegates to the canonical CareDroidPrimitives MetricCard, not a local duplicate', () => {
-    render(<MetricCard label="Delegation check" value={7} hint="Should use canonical styling" tone="critical" />);
+    render(
+      <MetricCard
+        label="Delegation check"
+        value={7}
+        hint="Should use canonical styling"
+        tone="critical"
+      />,
+    );
 
     const card = screen.getByLabelText(/delegation check: 7/i);
     expect(card).toHaveClass('cd-metric-card');
@@ -36,7 +41,7 @@ describe('dashboard visualization components', () => {
         <ChartLoadingState label="Loading analytics" />
         <EmptyChartState message="No analytics yet" />
         <ChartErrorState message="Analytics unavailable" />
-      </>
+      </>,
     );
 
     expect(screen.getByText(/loading analytics/i)).toBeInTheDocument();
@@ -54,10 +59,13 @@ describe('dashboard visualization components', () => {
     render(
       <>
         <CategoryBarChart data={[{ name: 'Calculator', value: 5 }]} title="Tool category chart" />
-        <DistributionDonutChart data={[{ name: 'Backend', value: 3 }]} title="Launch distribution chart" />
+        <DistributionDonutChart
+          data={[{ name: 'Backend', value: 3 }]}
+          title="Launch distribution chart"
+        />
         <TrendChart data={[{ label: 'Now', value: 7 }]} title="Usage trend chart" />
         <MiniSparkline points={[1, 2, 3]} label="Mini analytics sparkline" />
-      </>
+      </>,
     );
 
     expect(screen.getByRole('img', { name: /tool category chart/i })).toBeInTheDocument();

@@ -8,7 +8,11 @@ import { fileURLToPath } from 'node:url';
 import { describe, it, expect } from 'vitest';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import toolRegistry, { toolRegistryById } from './toolRegistry';
-import { clinicalIntentTools, builtinUiCalculators, nluCalculatorHubOnly } from './clinicalIntentToolCatalog';
+import {
+  clinicalIntentTools,
+  builtinUiCalculators,
+  nluCalculatorHubOnly,
+} from './clinicalIntentToolCatalog';
 import { CHAT_ASSISTED_HUB_GROUPS } from './chatAssistedHubGroups';
 import {
   REGISTRY,
@@ -42,17 +46,17 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const patternsSource = readFileSync(
   join(
     __dirname,
-    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts'
+    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts',
   ),
-  'utf8'
+  'utf8',
 );
 
 const orchestratorRegistrySource = readFileSync(
   join(
     __dirname,
-    '../../backend/src/modules/medical-control-plane/tool-orchestrator/tool-orchestrator.registry.ts'
+    '../../backend/src/modules/medical-control-plane/tool-orchestrator/tool-orchestrator.registry.ts',
   ),
-  'utf8'
+  'utf8',
 );
 
 function sortedUnique(ids) {
@@ -65,7 +69,7 @@ function patternToolIds() {
 
 function parseBackendRegisteredExecutorIds() {
   const block = orchestratorRegistrySource.match(
-    /REGISTERED_EXECUTOR_TOOL_IDS\s*=\s*\[([\s\S]*?)\]\s*as const/
+    /REGISTERED_EXECUTOR_TOOL_IDS\s*=\s*\[([\s\S]*?)\]\s*as const/,
   );
   if (!block) return [];
   return sortedUnique([...block[1].matchAll(/'([^']+)'/g)].map((m) => m[1]));
@@ -73,7 +77,7 @@ function parseBackendRegisteredExecutorIds() {
 
 function parseBackendRegistryIdToExecutor() {
   const block = orchestratorRegistrySource.match(
-    /REGISTRY_ID_TO_EXECUTOR_TOOL_ID[\s\S]*?=\s*\{([\s\S]*?)\};/
+    /REGISTRY_ID_TO_EXECUTOR_TOOL_ID[\s\S]*?=\s*\{([\s\S]*?)\};/,
   );
   if (!block) return {};
   const map: any = {};
@@ -248,7 +252,10 @@ describe('clinicalToolIdContract — NLU profile drift', () => {
     const coveredIds = new Set([...catalogIds, ...hubOnlyIds, ...groupedChatIds]);
 
     for (const toolId of patternToolIds()) {
-      expect(coveredIds.has(toolId as string), `${toolId} must be launchable through catalog or chat hub`).toBe(true);
+      expect(
+        coveredIds.has(toolId as string),
+        `${toolId} must be launchable through catalog or chat hub`,
+      ).toBe(true);
     }
   });
 

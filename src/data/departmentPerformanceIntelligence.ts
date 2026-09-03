@@ -19,7 +19,8 @@ export const DEPARTMENT_PERFORMANCE_OUTCOMES = Object.freeze([
   {
     id: 'emergency',
     name: 'Emergency',
-    description: 'Clinical readiness across workflow adoption, calculator usage, and simulation preparation.',
+    description:
+      'Clinical readiness across workflow adoption, calculator usage, and simulation preparation.',
     metrics: [
       {
         id: 'emergency-workflow-adoption',
@@ -53,7 +54,8 @@ export const DEPARTMENT_PERFORMANCE_OUTCOMES = Object.freeze([
   {
     id: 'laboratory',
     name: 'Laboratory',
-    description: 'Diagnostic performance across turnaround targets and interpretation assistant use.',
+    description:
+      'Diagnostic performance across turnaround targets and interpretation assistant use.',
     metrics: [
       {
         id: 'laboratory-turnaround',
@@ -78,7 +80,8 @@ export const DEPARTMENT_PERFORMANCE_OUTCOMES = Object.freeze([
   {
     id: 'operations',
     name: 'Operations',
-    description: 'Operational reliability across uptime, fleet, device, and maintenance workload signals.',
+    description:
+      'Operational reliability across uptime, fleet, device, and maintenance workload signals.',
     metrics: [
       {
         id: 'operations-asset-uptime',
@@ -148,12 +151,15 @@ export function buildDepartmentPerformanceIntelligence({
     departments: departmentRows,
     summary: {
       departmentCount: departmentRows.length,
-      averageHealthScore: calculateDepartmentHealthScore(departmentRows.map((row) => ({ score: row.healthScore }))),
+      averageHealthScore: calculateDepartmentHealthScore(
+        departmentRows.map((row) => ({ score: row.healthScore })),
+      ),
       measurableOutcomeCount: departmentRows.reduce(
         (sum, department) => sum + department.measurableOutcomeCount,
         0,
       ),
-      attentionDepartmentCount: departmentRows.filter((department) => department.healthScore < 70).length,
+      attentionDepartmentCount: departmentRows.filter((department) => department.healthScore < 70)
+        .length,
     },
   };
 }

@@ -6,10 +6,10 @@ import {
 import './EmsOffloadAggregateStrip.css';
 
 export default function EmsOffloadAggregateStrip({
-  emsArrivals = ([] as any[]),
-  patients = ([] as any[]),
-  staff = ([] as any[]),
-  rooms = ([] as any[]),
+  emsArrivals = [] as any[],
+  patients = [] as any[],
+  staff = [] as any[],
+  rooms = [] as any[],
   offloadTargetMinutes = 15,
   onOpenTracker,
   className = '',
@@ -54,7 +54,11 @@ export default function EmsOffloadAggregateStrip({
           </p>
         </div>
         {onOpenTracker ? (
-          <button type="button" className="ems-offload-aggregate-strip__open" onClick={onOpenTracker}>
+          <button
+            type="button"
+            className="ems-offload-aggregate-strip__open"
+            onClick={onOpenTracker}
+          >
             Open tracker
           </button>
         ) : null}

@@ -28,7 +28,9 @@ const backendSchemaSource = readFileSync(
 function extractZodObjectFields(source: string, exportedConstName: string): string[] {
   const start = source.indexOf(`export const ${exportedConstName} = z.object({`);
   if (start === -1) {
-    throw new Error(`could not find "export const ${exportedConstName} = z.object({" in backend schema source`);
+    throw new Error(
+      `could not find "export const ${exportedConstName} = z.object({" in backend schema source`,
+    );
   }
   const bodyStart = source.indexOf('{', start);
   let depth = 0;

@@ -89,29 +89,56 @@ describe('ClinicalCalculatorHub R10 consolidation', () => {
       }),
     );
     expect(CALCULATORS.find((calculator) => calculator.id === 'qsofa')).toEqual(
-      expect.objectContaining({ category: 'Sepsis', component: expect.any(Function), timeCritical: true }),
+      expect.objectContaining({
+        category: 'Sepsis',
+        component: expect.any(Function),
+        timeCritical: true,
+      }),
     );
     expect(CALCULATORS.find((calculator) => calculator.id === 'nihss')).toEqual(
       expect.objectContaining({
         category: 'Neuro',
         component: expect.any(Function),
         timeCritical: true,
-        keywords: expect.arrayContaining(['stroke', 'nihss', 'neuro', 'weakness', 'aphasia', 'tpa']),
+        keywords: expect.arrayContaining([
+          'stroke',
+          'nihss',
+          'neuro',
+          'weakness',
+          'aphasia',
+          'tpa',
+        ]),
       }),
     );
-    expect(CALCULATORS.find((calculator) => calculator.id === 'columbia-suicide-severity-workflow')).toEqual(
+    expect(
+      CALCULATORS.find((calculator) => calculator.id === 'columbia-suicide-severity-workflow'),
+    ).toEqual(
       expect.objectContaining({
         category: 'Psych',
         component: expect.any(Function),
         timeCritical: true,
-        keywords: expect.arrayContaining(['suicide', 'cssrs', 'c-ssrs', 'columbia', 'psych', 'self-harm']),
+        keywords: expect.arrayContaining([
+          'suicide',
+          'cssrs',
+          'c-ssrs',
+          'columbia',
+          'psych',
+          'self-harm',
+        ]),
       }),
     );
     expect(CALCULATORS.find((calculator) => calculator.id === 'ciwa-ar')).toEqual(
       expect.objectContaining({
         category: 'Psych',
         component: expect.any(Function),
-        keywords: expect.arrayContaining(['alcohol', 'withdrawal', 'ciwa', 'detox', 'etoh', 'delirium']),
+        keywords: expect.arrayContaining([
+          'alcohol',
+          'withdrawal',
+          'ciwa',
+          'detox',
+          'etoh',
+          'delirium',
+        ]),
       }),
     );
     expect(CALCULATORS.find((calculator) => calculator.id === 'news2')).toEqual(
@@ -147,9 +174,18 @@ describe('ClinicalCalculatorHub R10 consolidation', () => {
   it.each([
     ['/emergency/tools?source=calculators&filter=calculator&q=stroke', /nihss/i],
     ['/emergency/tools?source=calculators&filter=calculator&q=stroke%20scale', /nihss/i],
-    ['/emergency/tools?source=calculators&filter=calculator&calc=ciwa', /ciwa-ar alcohol withdrawal/i],
-    ['/emergency/tools?source=calculators&filter=calculator&tool=cssrs', /columbia suicide severity/i],
-    ['/emergency/tools?source=calculators&filter=calculator&open=c-ssrs', /columbia suicide severity/i],
+    [
+      '/emergency/tools?source=calculators&filter=calculator&calc=ciwa',
+      /ciwa-ar alcohol withdrawal/i,
+    ],
+    [
+      '/emergency/tools?source=calculators&filter=calculator&tool=cssrs',
+      /columbia suicide severity/i,
+    ],
+    [
+      '/emergency/tools?source=calculators&filter=calculator&open=c-ssrs',
+      /columbia suicide severity/i,
+    ],
   ])('resolves calculator URL aliases for %s', (route, expectedDialogName) => {
     renderHub(route);
 
@@ -158,7 +194,9 @@ describe('ClinicalCalculatorHub R10 consolidation', () => {
 
   it('removes alias search params when closing a URL-opened calculator', async () => {
     const user = userEvent.setup();
-    renderHub('/emergency/tools?source=calculators&filter=calculator&q=heart&open=heart-score&patientId=hub-patient-1');
+    renderHub(
+      '/emergency/tools?source=calculators&filter=calculator&q=heart&open=heart-score&patientId=hub-patient-1',
+    );
 
     expect(screen.getByRole('dialog', { name: /heart score/i })).toBeTruthy();
     await user.click(screen.getByRole('button', { name: /close heart score/i }));
@@ -173,7 +211,9 @@ describe('ClinicalCalculatorHub R10 consolidation', () => {
 
   it('does not promote a conflicting known q calculator after closing an explicit open calculator', async () => {
     const user = userEvent.setup();
-    renderHub('/emergency/tools?source=calculators&filter=calculator&q=qsofa&open=heart-score&patientId=hub-patient-1');
+    renderHub(
+      '/emergency/tools?source=calculators&filter=calculator&q=qsofa&open=heart-score&patientId=hub-patient-1',
+    );
 
     expect(screen.getByRole('dialog', { name: /heart score/i })).toBeTruthy();
     await user.click(screen.getByRole('button', { name: /close heart score/i }));
@@ -194,7 +234,10 @@ describe('ClinicalCalculatorHub R10 consolidation', () => {
 
     expect(conversationMock.selectTool).toHaveBeenCalledWith('wells-dvt-calculator');
     expect(conversationMock.setActiveTool).toHaveBeenCalledWith('wells-dvt-calculator');
-    expect(conversationMock.addMessage).toHaveBeenCalledWith(expect.stringMatching(/wells/i), 'user');
+    expect(conversationMock.addMessage).toHaveBeenCalledWith(
+      expect.stringMatching(/wells/i),
+      'user',
+    );
     expect(navigateMock).toHaveBeenCalledWith('/emergency/copilot');
   });
 
@@ -206,7 +249,9 @@ describe('ClinicalCalculatorHub R10 consolidation', () => {
 
     await user.click(screen.getByRole('button', { name: /save to patient/i }));
 
-    const savedPatient = useEmergencyStore.getState().patients.find((candidate) => candidate.id === patient.id);
+    const savedPatient = useEmergencyStore
+      .getState()
+      .patients.find((candidate) => candidate.id === patient.id);
     expect(savedPatient?.notes).toEqual(
       expect.arrayContaining([
         expect.objectContaining({

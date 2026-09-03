@@ -1,6 +1,11 @@
 import { CareDroidPage } from '../../components/ui/CareDroidPrimitives';
 
-export default function CommercialPageShell({ title, subtitle, children = undefined, actions = null }) {
+export default function CommercialPageShell({
+  title,
+  subtitle,
+  children = undefined,
+  actions = null,
+}) {
   return (
     <CareDroidPage
       as="div"

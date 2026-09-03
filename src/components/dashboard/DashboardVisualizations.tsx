@@ -18,7 +18,11 @@ export const CHART_COLORS = Object.freeze([
 
 export function ChartLoadingState({ label = 'Loading chart data' }) {
   return (
-    <div className="dashboard-chart-state dashboard-chart-state--loading" role="status" aria-busy="true">
+    <div
+      className="dashboard-chart-state dashboard-chart-state--loading"
+      role="status"
+      aria-busy="true"
+    >
       {label}
     </div>
   );
@@ -110,8 +114,13 @@ export function MiniSparkline({ points, label = 'Mini trend', color = CHART_COLO
       aria-label={label}
       style={{ color }}
     >
-      <polyline points={path} fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+      <polyline
+        points={path}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="3"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }
-

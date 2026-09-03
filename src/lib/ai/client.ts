@@ -28,7 +28,10 @@ export type AIRequestType =
   | 'STAFF_BALANCE'
   | 'CAPACITY_CRISIS';
 
-type ToolRegistryRequestType = Exclude<AIRequestType, 'INTAKE_SUGGEST' | 'STAFF_BALANCE' | 'CAPACITY_CRISIS'>;
+type ToolRegistryRequestType = Exclude<
+  AIRequestType,
+  'INTAKE_SUGGEST' | 'STAFF_BALANCE' | 'CAPACITY_CRISIS'
+>;
 
 export type Message = {
   role: 'user' | 'assistant';
@@ -206,10 +209,13 @@ function normalizeRequest(request: AIRequest): AIRequest {
   return {
     ...request,
     requestType,
-    messages: messages.length ? messages : [{ role: 'user', content: request.message || 'Continue.' }],
+    messages: messages.length
+      ? messages
+      : [{ role: 'user', content: request.message || 'Continue.' }],
     message: request.message || latestUserMessage?.content || '',
     systemPrompt:
-      request.systemPrompt || buildSystemPrompt(buildDepartmentContext(), toToolRequestType(requestType)),
+      request.systemPrompt ||
+      buildSystemPrompt(buildDepartmentContext(), toToolRequestType(requestType)),
   };
 }
 
@@ -219,12 +225,16 @@ function normalizeRequestType(requestType: AIRequestType): AIRequestType {
 
 function toToolRequestType(requestType: AIRequestType): ToolRegistryRequestType {
   const normalized = normalizeRequestType(requestType);
-  return (normalized === 'STAFF_BALANCE' || normalized === 'CAPACITY_CRISIS' ? 'COPILOT_CHAT' : normalized) as ToolRegistryRequestType;
+  return (
+    normalized === 'STAFF_BALANCE' || normalized === 'CAPACITY_CRISIS' ? 'COPILOT_CHAT' : normalized
+  ) as ToolRegistryRequestType;
 }
 
 function normalizeMessages(messages: Array<{ role: string; content: string }>): Message[] {
   return messages
-    .filter((message) => message?.content && (message.role === 'user' || message.role === 'assistant'))
+    .filter(
+      (message) => message?.content && (message.role === 'user' || message.role === 'assistant'),
+    )
     .map((message) => ({
       role: (message.role === 'assistant' ? 'assistant' : 'user') as Message['role'],
       content: String(message.content),
@@ -250,7 +260,8 @@ async function callBackendAI(request: AIRequest): Promise<AIResponse> {
 
   if (!response || typeof response.text !== 'function') {
     throw new AIError({
-      message: 'The API did not return a valid response. Check backend availability or the request mock.',
+      message:
+        'The API did not return a valid response. Check backend availability or the request mock.',
       code: 'AI_NETWORK_ERROR',
       requestType: request.requestType,
       retryable: true,
@@ -377,7 +388,13 @@ async function callAnthropicAI(
       return {
         ok: true,
         status: response.status,
-        content: createStreamingHandler(response, usage, request, maxTokens, runtime?.metadataLogger),
+        content: createStreamingHandler(
+          response,
+          usage,
+          request,
+          maxTokens,
+          runtime?.metadataLogger,
+        ),
         data: {},
         toolCalls: [],
         usage,
@@ -405,7 +422,7 @@ async function callAnthropicAI(
 }
 
 function readApiKey(): string | undefined {
-  return typeof process !== 'undefined' ? process.env.ANTHROPIC_API_KEY ?? '' : '';
+  return typeof process !== 'undefined' ? (process.env.ANTHROPIC_API_KEY ?? '') : '';
 }
 
 const DEPARTMENT_CONTEXT_SEPARATOR = 'Department context is provided for situational awareness.';
@@ -575,7 +592,8 @@ function applyUsage(target: AIUsage, source: any) {
   target.inputTokens = source.input_tokens ?? target.inputTokens;
   target.outputTokens = source.output_tokens ?? target.outputTokens;
   target.cacheReadInputTokens = source.cache_read_input_tokens ?? target.cacheReadInputTokens;
-  target.cacheCreationInputTokens = source.cache_creation_input_tokens ?? target.cacheCreationInputTokens;
+  target.cacheCreationInputTokens =
+    source.cache_creation_input_tokens ?? target.cacheCreationInputTokens;
   target.totalTokens = target.inputTokens + target.outputTokens;
 }
 
@@ -832,14 +850,16 @@ function buildActionCard(toolCall: ToolCallResult): ActionCard {
     label: action.label,
     description: action.description,
     patientName,
-    warningText:
-      'Requires human confirmation. The AI cannot directly modify CareDroid state.',
+    warningText: 'Requires human confirmation. The AI cannot directly modify CareDroid state.',
     onConfirm: () => applyConfirmedToolAction(action),
     onDismiss: () => removeCard(id),
   };
 }
 
-function buildToolContextMessage(toolName: EmergencyToolName, result: EmergencyToolResult): Message {
+function buildToolContextMessage(
+  toolName: EmergencyToolName,
+  result: EmergencyToolResult,
+): Message {
   return {
     role: 'assistant',
     content: [
@@ -999,7 +1019,12 @@ function extractJsonObjects(text: string): any[] {
   const blocks: string[] = [];
   const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/gi) || [];
   fenced.forEach((block) => {
-    blocks.push(block.replace(/```(?:json)?/i, '').replace(/```$/, '').trim());
+    blocks.push(
+      block
+        .replace(/```(?:json)?/i, '')
+        .replace(/```$/, '')
+        .trim(),
+    );
   });
 
   const loose = text.match(/\{[\s\S]*\}|\[[\s\S]*\]/g) || [];
@@ -1023,7 +1048,11 @@ function classifyDataBlock(data: any): DataBlock['type'] | null {
   if (Array.isArray(data) && data.some((item) => item?.averageWaitMinutes || item?.patientIds)) {
     return 'queue_stats';
   }
-  if (data?.currentOccupancy !== undefined || data?.boardingCount !== undefined || data?.capacity?.score) {
+  if (
+    data?.currentOccupancy !== undefined ||
+    data?.boardingCount !== undefined ||
+    data?.capacity?.score
+  ) {
     return 'capacity_status';
   }
   if (data?.patients && Array.isArray(data.patients)) return 'patient_list';
@@ -1047,7 +1076,9 @@ function resolvePatientName(patientId?: string): string | undefined {
   const result = executeEmergencyTool('get_patient_details', { patientId });
   if (result.ok !== true || result.requiresConfirmation === true) return undefined;
   const patient = result.data;
-  return patient?.name || [patient?.firstName, patient?.lastName].filter(Boolean).join(' ') || patientId;
+  return (
+    patient?.name || [patient?.firstName, patient?.lastName].filter(Boolean).join(' ') || patientId
+  );
 }
 
 function openPatientDetail(patientId: string) {

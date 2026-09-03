@@ -47,11 +47,7 @@ export function StreamingResponse({
 
   return (
     <div
-      className={[
-        'cd-stream',
-        compact ? 'cd-stream--compact' : '',
-        `cd-stream--${tone}`,
-      ]
+      className={['cd-stream', compact ? 'cd-stream--compact' : '', `cd-stream--${tone}`]
         .filter(Boolean)
         .join(' ')}
       data-testid="streaming-response"

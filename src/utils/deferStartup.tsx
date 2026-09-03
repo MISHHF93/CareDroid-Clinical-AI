@@ -18,7 +18,7 @@ export function runWhenIdle(fn, options: any = {}) {
       () => {
         void Promise.resolve(fn()).catch(() => {});
       },
-      { timeout }
+      { timeout },
     );
     return () => window.cancelIdleCallback(id);
   }

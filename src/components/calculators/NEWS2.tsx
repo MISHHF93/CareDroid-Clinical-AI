@@ -63,7 +63,10 @@ export default function NEWS2({ patientId, onClose }: NEWS2Props) {
   useModalDialog(dialogRef, { onClose });
 
   const score = useMemo(() => scoreNews2(values), [values]);
-  const response = useMemo(() => news2Response(score.total, score.hasSingleRed), [score.hasSingleRed, score.total]);
+  const response = useMemo(
+    () => news2Response(score.total, score.hasSingleRed),
+    [score.hasSingleRed, score.total],
+  );
 
   useEffect(() => {
     if (!patientId || !patient || !response.alertSeverity) return;
@@ -149,9 +152,7 @@ export default function NEWS2({ patientId, onClose }: NEWS2Props) {
       ref={dialogRef}
     >
       <div className="news2-panel">
-        <header
-          className="u-panel-header-row"
-        >
+        <header className="u-panel-header-row">
           <div>
             <h2 id="news2-title" className="u-title-18">
               NEWS2 Early Warning Score
@@ -184,14 +185,12 @@ export default function NEWS2({ patientId, onClose }: NEWS2Props) {
               padding: 14,
             }}
           >
-            <div style={{ color: response.color, fontSize: 13, fontWeight: 800 }}>{response.recommendation}</div>
-            <div className="u-mono-32">
-              {score.total}/20
+            <div style={{ color: response.color, fontSize: 13, fontWeight: 800 }}>
+              {response.recommendation}
             </div>
+            <div className="u-mono-32">{score.total}/20</div>
             {score.hasSingleRed ? (
-              <p className="news2-single-red-note">
-                Single parameter scoring 3 detected.
-              </p>
+              <p className="news2-single-red-note">Single parameter scoring 3 detected.</p>
             ) : null}
           </section>
 
@@ -201,7 +200,9 @@ export default function NEWS2({ patientId, onClose }: NEWS2Props) {
               <section key={item.id} className="u-card-border">
                 <label className="u-grid-gap-8">
                   <span className="news2-item-label">{item.label}</span>
-                  {'note' in item && item.note ? <span className="news2-item-note">{item.note}</span> : null}
+                  {'note' in item && item.note ? (
+                    <span className="news2-item-note">{item.note}</span>
+                  ) : null}
                   {item.input === 'number' ? (
                     <input
                       type="number"
@@ -237,7 +238,14 @@ export default function NEWS2({ patientId, onClose }: NEWS2Props) {
                     </select>
                   )}
                 </label>
-                <div style={{ color: currentScore === 3 ? MEDICAL_TYPE.statusCritical : MEDICAL_THEME.inkSubtle, fontSize: 13, marginTop: 8 }}>
+                <div
+                  style={{
+                    color:
+                      currentScore === 3 ? MEDICAL_TYPE.statusCritical : MEDICAL_THEME.inkSubtle,
+                    fontSize: 13,
+                    marginTop: 8,
+                  }}
+                >
                   Score: <strong>{currentScore}</strong>
                   {'unit' in item ? ` ${item.unit}` : ''}
                 </div>

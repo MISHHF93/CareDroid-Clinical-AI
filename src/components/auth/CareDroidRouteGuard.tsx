@@ -37,9 +37,7 @@ export function CareDroidRouteGuard({ children, path }: CareDroidRouteGuardProps
     getUnauthorizedFallback(hospitalRole);
   const roleLabel = access.roleLabel || getRoleLabel(hospitalRole || access.role);
 
-  return (
-    <AccessDeniedPanel roleLabel={roleLabel} fallbackPath={fallbackPath} />
-  );
+  return <AccessDeniedPanel roleLabel={roleLabel} fallbackPath={fallbackPath} />;
 }
 
 export default CareDroidRouteGuard;

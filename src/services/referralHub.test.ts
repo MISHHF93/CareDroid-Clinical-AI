@@ -42,7 +42,7 @@ describe('ReferralHub', () => {
         oldestReferral: expect.objectContaining({
           department: 'Cardiology',
         }),
-      })
+      }),
     );
   });
 
@@ -57,7 +57,7 @@ describe('ReferralHub', () => {
         delayed: delays.length,
         accepted: 1,
         closed: 1,
-      })
+      }),
     );
     expect(delays).toEqual(
       expect.arrayContaining([
@@ -66,7 +66,7 @@ describe('ReferralHub', () => {
           stageLabel: 'Review',
           delayMinutes: expect.any(Number),
         }),
-      ])
+      ]),
     );
   });
 
@@ -88,7 +88,7 @@ describe('ReferralHub', () => {
           }),
         ]),
         safetyStatement: expect.stringMatching(/human-reviewed/i),
-      })
+      }),
     );
     expect(ReferralHub.getReferralDashboard().delays.length).toBeGreaterThan(0);
   });
@@ -132,7 +132,9 @@ describe('ReferralHub', () => {
 
     expect(dashboard.isFixtureData).toBe(false);
     expect(dashboard.sourceState).toBe('live');
-    expect(dashboard.referrals.some((referral) => referral.id === 'ref-real-patient-42')).toBe(true);
+    expect(dashboard.referrals.some((referral) => referral.id === 'ref-real-patient-42')).toBe(
+      true,
+    );
     // The fabricated fixture IDs must never leak into a dashboard built from
     // real data.
     expect(dashboard.referrals.some((referral) => referral.id.startsWith('REF-100'))).toBe(false);

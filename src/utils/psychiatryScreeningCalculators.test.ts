@@ -54,7 +54,9 @@ describe('psychiatry screening calculators', () => {
   });
 
   it('flags PCL-5 current safety concerns as crisis-sensitive', () => {
-    const itemScores = Object.fromEntries(Array.from({ length: 20 }, (_, index) => [`q${index + 1}`, 1]));
+    const itemScores = Object.fromEntries(
+      Array.from({ length: 20 }, (_, index) => [`q${index + 1}`, 1]),
+    );
     const result = computePcl5Result({
       eventCriterionReviewed: 'yes',
       currentSafetyConcern: 'yes',
@@ -81,7 +83,9 @@ describe('psychiatry screening calculators', () => {
   });
 
   it('flags Epworth safety-sensitive sleepiness for human review', () => {
-    const itemScores = Object.fromEntries(Array.from({ length: 8 }, (_, index) => [`q${index + 1}`, index % 2]));
+    const itemScores = Object.fromEntries(
+      Array.from({ length: 8 }, (_, index) => [`q${index + 1}`, index % 2]),
+    );
     const result = computeEpworthSleepinessResult({
       safetySensitiveActivity: 'yes',
       ...itemScores,

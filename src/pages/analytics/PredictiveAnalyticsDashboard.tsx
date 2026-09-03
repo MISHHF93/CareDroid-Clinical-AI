@@ -29,7 +29,11 @@ const BAND_BG: Record<string, string> = {
 
 // ── sub-components ────────────────────────────────────────────────────────────
 
-function SummaryStrip({ summary }: { summary: ReturnType<typeof buildPredictiveAnalyticsSummary> }) {
+function SummaryStrip({
+  summary,
+}: {
+  summary: ReturnType<typeof buildPredictiveAnalyticsSummary>;
+}) {
   return (
     <div className="pad-summary-strip">
       {[
@@ -96,7 +100,7 @@ function ModelCard({
   const [expanded, setExpanded] = useState(false);
   const band = resolvePredictiveRiskBand(model.score);
   const color = BAND_COLOR[band];
-  const bg    = BAND_BG[band];
+  const bg = BAND_BG[band];
 
   return (
     <div
@@ -150,7 +154,8 @@ function ModelCard({
 
       {/* Confidence */}
       <div style={{ fontSize: 12, color: MEDICAL_THEME.inkMuted, marginBottom: expanded ? 12 : 0 }}>
-        Confidence: <strong className="pad-confidence-value">{Math.round(model.confidence * 100)}%</strong>
+        Confidence:{' '}
+        <strong className="pad-confidence-value">{Math.round(model.confidence * 100)}%</strong>
         {' · '}
         {expanded ? 'Hide details ▲' : 'Show details ▼'}
       </div>
@@ -218,8 +223,8 @@ function ModelCard({
 export default function PredictiveAnalyticsDashboard() {
   useRouteChromeRegistration({ title: 'Predictive Analytics Dashboard' });
   const navigate = useNavigate();
-  const [query, setQuery]     = useState('');
-  const [models, setModels]   = useState(DEMO_PREDICTIVE_ANALYTICS_MODELS as any[]);
+  const [query, setQuery] = useState('');
+  const [models, setModels] = useState(DEMO_PREDICTIVE_ANALYTICS_MODELS as any[]);
   const [summary, setSummary] = useState(() => buildPredictiveAnalyticsSummary());
 
   useEffect(() => {
@@ -232,7 +237,9 @@ export default function PredictiveAnalyticsDashboard() {
     <main className="pad-page">
       {/* Header */}
       <div className="u-mb-20">
-        <p className="pad-page-title" data-testid="cd-page-title-text">Predictive Analytics Dashboard</p>
+        <p className="pad-page-title" data-testid="cd-page-title-text">
+          Predictive Analytics Dashboard
+        </p>
         <p className="pad-page-subtitle">
           Deterioration · Sepsis · Readmission · ICU transfer · Device & fleet risk
         </p>
@@ -240,8 +247,8 @@ export default function PredictiveAnalyticsDashboard() {
 
       {/* Demo notice */}
       <div className="pad-demo-notice">
-        <span className="u-fw-700">Demo models</span> — predictions shown are not live
-        patient, device, or fleet data. Connect live data pipelines to activate real predictions.
+        <span className="u-fw-700">Demo models</span> — predictions shown are not live patient,
+        device, or fleet data. Connect live data pipelines to activate real predictions.
       </div>
 
       {/* Summary strip */}

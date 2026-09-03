@@ -37,7 +37,12 @@ describe('operationalHandoffSummaryModel', () => {
     });
 
     expect(domains).toHaveLength(4);
-    expect(domains.map((domain) => domain.label)).toEqual(['Patient', 'EMS', 'Referral', 'Admission']);
+    expect(domains.map((domain) => domain.label)).toEqual([
+      'Patient',
+      'EMS',
+      'Referral',
+      'Admission',
+    ]);
     expect(domains[0].headline).toContain('waiting');
     expect(domains[0].headline).toContain('high risk');
     expect(domains[1].hasAttention).toBe(true);

@@ -27,7 +27,7 @@ describe('digitalOperationsCenter', () => {
         'Fleet',
         'Notifications',
         'System Health',
-      ])
+      ]),
     );
   });
 
@@ -41,10 +41,12 @@ describe('digitalOperationsCenter', () => {
       hasPermission: (permission) => permission === 'VIEW_OPERATIONS',
     });
 
-    expect(adminView.prioritySurfaces.map((surface) => surface.id)).toEqual(OPERATIONS_CENTER_SURFACE_IDS);
+    expect(adminView.prioritySurfaces.map((surface) => surface.id)).toEqual(
+      OPERATIONS_CENTER_SURFACE_IDS,
+    );
     expect(nurseView.label).toBe('Care team operations');
     expect(nurseView.prioritySurfaces.map((surface) => surface.id)).toEqual(
-      expect.arrayContaining(['hospital-map', 'medical-iot', 'fleet', 'notifications'])
+      expect.arrayContaining(['hospital-map', 'medical-iot', 'fleet', 'notifications']),
     );
     expect(nurseView.prioritySurfaces.map((surface) => surface.id)).not.toContain('system-health');
   });

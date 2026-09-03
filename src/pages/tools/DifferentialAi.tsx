@@ -8,7 +8,8 @@ const TOOL_CONFIG = {
   name: 'Differential Diagnosis Assistant',
   path: '/tools/differential-ai',
   color: '#8B5CF6',
-  description: 'Ranked differential diagnosis decision support from symptoms, labs, history, and demographics',
+  description:
+    'Ranked differential diagnosis decision support from symptoms, labs, history, and demographics',
   shortcut: 'Ctrl+Shift+X',
   category: 'Diagnostic',
 };
@@ -65,8 +66,9 @@ export default function DifferentialAi({ embedded = false, onCloseEmbedded }: an
         <div className="simple-tool-result-panel" role="note">
           <h2>Safety Scope</h2>
           <p>
-            Decision support only. Not diagnosis. This ranked list does not rule in or rule out disease and
-            must be reviewed by a clinician before testing, treatment, disposition, or orders.
+            Decision support only. Not diagnosis. This ranked list does not rule in or rule out
+            disease and must be reviewed by a clinician before testing, treatment, disposition, or
+            orders.
           </p>
         </div>
 
@@ -116,7 +118,9 @@ export default function DifferentialAi({ embedded = false, onCloseEmbedded }: an
                   id="differential-age"
                   className="diagnosis-field"
                   value={demographics.age}
-                  onChange={(event) => setDemographics((current) => ({ ...current, age: event.target.value }))}
+                  onChange={(event) =>
+                    setDemographics((current) => ({ ...current, age: event.target.value }))
+                  }
                   placeholder="Years"
                 />
               </div>
@@ -128,7 +132,9 @@ export default function DifferentialAi({ embedded = false, onCloseEmbedded }: an
                   id="differential-sex"
                   className="diagnosis-field"
                   value={demographics.sex}
-                  onChange={(event) => setDemographics((current) => ({ ...current, sex: event.target.value }))}
+                  onChange={(event) =>
+                    setDemographics((current) => ({ ...current, sex: event.target.value }))
+                  }
                   placeholder="Optional"
                 />
               </div>
@@ -149,14 +155,19 @@ export default function DifferentialAi({ embedded = false, onCloseEmbedded }: an
             </div>
           </section>
 
-          <section className="diagnosis-panel diagnosis-panel--scroll" aria-labelledby="differential-ai-output">
+          <section
+            className="diagnosis-panel diagnosis-panel--scroll"
+            aria-labelledby="differential-ai-output"
+          >
             <h2 id="differential-ai-output">Ranked Differentials</h2>
             <ApiStateBanner error={error} onRetry={symptoms.trim() ? handleGenerate : undefined} />
 
             {loading ? (
               <div className="tool-loading-state" aria-busy="true">
                 <div className="simple-tool-spinner diagnosis-spinner" />
-                <p className="tool-loading-state__message">Analyzing inputs and building ranked differential...</p>
+                <p className="tool-loading-state__message">
+                  Analyzing inputs and building ranked differential...
+                </p>
               </div>
             ) : result ? (
               <div className="diagnosis-results-body">
@@ -186,7 +197,8 @@ export default function DifferentialAi({ embedded = false, onCloseEmbedded }: an
                     <ul>
                       {result.suggestedCalculators.map((calculator) => (
                         <li key={calculator.id}>
-                          <strong>{calculator.label}</strong> ({calculator.id}) - {calculator.rationale}
+                          <strong>{calculator.label}</strong> ({calculator.id}) -{' '}
+                          {calculator.rationale}
                         </li>
                       ))}
                     </ul>
@@ -203,10 +215,12 @@ export default function DifferentialAi({ embedded = false, onCloseEmbedded }: an
                     ))}
                   </ul>
                   <p>
-                    <strong>Inputs used:</strong> {(result.explainability?.evidenceInputsUsed || []).join(', ')}
+                    <strong>Inputs used:</strong>{' '}
+                    {(result.explainability?.evidenceInputsUsed || []).join(', ')}
                   </p>
                   <p>
-                    <strong>Limitations:</strong> {(result.explainability?.limitations || []).join(' ')}
+                    <strong>Limitations:</strong>{' '}
+                    {(result.explainability?.limitations || []).join(' ')}
                   </p>
                 </section>
 
@@ -221,7 +235,8 @@ export default function DifferentialAi({ embedded = false, onCloseEmbedded }: an
               </div>
             ) : (
               <div className="tool-empty-state">
-                Enter symptoms, labs, history, and demographics to generate a clinician-reviewed differential.
+                Enter symptoms, labs, history, and demographics to generate a clinician-reviewed
+                differential.
               </div>
             )}
           </section>

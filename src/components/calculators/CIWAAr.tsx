@@ -135,7 +135,9 @@ export const CIWA_ITEMS: CIWAItem[] = [
 type CIWAScores = Record<string, number>;
 
 function patientName(patient?: Patient): string {
-  return patient ? `${patient.firstName || ''} ${patient.lastName || ''}`.trim() || patient.mrn : 'Patient';
+  return patient
+    ? `${patient.firstName || ''} ${patient.lastName || ''}`.trim() || patient.mrn
+    : 'Patient';
 }
 
 function noteText(note: Note): string {
@@ -143,7 +145,11 @@ function noteText(note: Note): string {
 }
 
 function hasDocumentedDiaphoresis(patient?: Patient): boolean {
-  return Boolean(patient?.notes.some((note) => /\b(diaphoresis|diaphoretic|sweat|sweating)\b/i.test(noteText(note))));
+  return Boolean(
+    patient?.notes.some((note) =>
+      /\b(diaphoresis|diaphoretic|sweat|sweating)\b/i.test(noteText(note)),
+    ),
+  );
 }
 
 function latestGcs(patient?: Patient): number | undefined {
@@ -162,9 +168,10 @@ function closestDescription(item: CIWAItem, value: number): string {
   const anchors = Object.keys(item.descriptions)
     .map(Number)
     .sort((a, b) => a - b);
-  const closest = anchors.reduce((best, anchor) =>
-    Math.abs(anchor - value) < Math.abs(best - value) ? anchor : best,
-  anchors[0]);
+  const closest = anchors.reduce(
+    (best, anchor) => (Math.abs(anchor - value) < Math.abs(best - value) ? anchor : best),
+    anchors[0],
+  );
   return item.descriptions[closest];
 }
 
@@ -198,7 +205,8 @@ export function protocolFor(total: number): {
   }
   return {
     band: 'Severe',
-    recommendation: 'Severe - Lorazepam 4mg IV immediately. ICU/step-down monitoring. Seizure precautions.',
+    recommendation:
+      'Severe - Lorazepam 4mg IV immediately. ICU/step-down monitoring. Seizure precautions.',
     color: '#EF4444',
     alertSeverity: 'Critical',
   };
@@ -281,9 +289,7 @@ export default function CIWAAr({ patientId, onClose }: CIWAArProps) {
       ref={dialogRef}
     >
       <div className="ciwa-panel">
-        <header
-          className="u-panel-header-row"
-        >
+        <header className="u-panel-header-row">
           <div>
             <h2 id="ciwa-title" className="u-title-18">
               CIWA-Ar Alcohol Withdrawal
@@ -314,10 +320,10 @@ export default function CIWAAr({ patientId, onClose }: CIWAArProps) {
               padding: 14,
             }}
           >
-            <div style={{ color: protocol.color, fontSize: 13, fontWeight: 800 }}>{protocol.band}</div>
-            <div className="u-mono-32">
-              {total}/67
+            <div style={{ color: protocol.color, fontSize: 13, fontWeight: 800 }}>
+              {protocol.band}
             </div>
+            <div className="u-mono-32">{total}/67</div>
             <p className="ciwa-recommendation">{protocol.recommendation}</p>
           </section>
 
@@ -341,19 +347,13 @@ export default function CIWAAr({ patientId, onClose }: CIWAArProps) {
                   <strong className="ciwa-range-value">{value}</strong>
                   <span>{item.max}</span>
                 </div>
-                <p className="ciwa-item-description">
-                  {closestDescription(item, value)}
-                </p>
+                <p className="ciwa-item-description">{closestDescription(item, value)}</p>
               </section>
             );
           })}
 
           {patient ? (
-            <button
-              type="button"
-              onClick={saveToPatient}
-              className="ciwa-save-btn"
-            >
+            <button type="button" onClick={saveToPatient} className="ciwa-save-btn">
               Save to Patient
             </button>
           ) : null}

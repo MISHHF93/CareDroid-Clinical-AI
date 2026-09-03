@@ -17,7 +17,10 @@ export default function SavedClinicalScoresStrip({ patient }: SavedClinicalScore
   if (!scores.length) return null;
 
   return (
-    <section className="patient-orchestration patient-orchestration--scores" aria-label="Recent clinical scores">
+    <section
+      className="patient-orchestration patient-orchestration--scores"
+      aria-label="Recent clinical scores"
+    >
       <div className="patient-orchestration__header">
         <strong>Saved scores</strong>
         <span className="patient-orchestration__meta">Last 4 hours</span>
@@ -27,7 +30,9 @@ export default function SavedClinicalScoresStrip({ patient }: SavedClinicalScore
           <span
             key={`${score.toolId || score.shortLabel}-${score.timestamp}`}
             className={`patient-orchestration__chip patient-orchestration__chip--${score.tone || scoreRiskTone(score.band)}`}
-            title={[score.band, score.recommendation, formatScoreAge(score.timestamp)].filter(Boolean).join(' · ')}
+            title={[score.band, score.recommendation, formatScoreAge(score.timestamp)]
+              .filter(Boolean)
+              .join(' · ')}
           >
             {score.shortLabel} {score.result ?? '--'}
             <small>{formatScoreAge(score.timestamp)}</small>

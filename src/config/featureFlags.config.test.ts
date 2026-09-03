@@ -52,7 +52,10 @@ describe('featureFlags.config rollout registry', () => {
       'Governance',
     ]);
     for (const category of Object.values(FEATURE_FLAG_CATEGORIES)) {
-      expect(FEATURE_FLAG_REGISTRY.some((flag) => flag.category === category), category).toBe(true);
+      expect(
+        FEATURE_FLAG_REGISTRY.some((flag) => flag.category === category),
+        category,
+      ).toBe(true);
     }
   });
 
@@ -76,7 +79,7 @@ describe('featureFlags.config rollout registry', () => {
     const summary = summarizeFeatureFlags(
       buildFeatureFlagStateMap({
         'regulatory-workspace': 'enabled',
-      })
+      }),
     );
 
     expect(summary.total).toBe(FEATURE_FLAG_REGISTRY.length);
@@ -89,7 +92,7 @@ describe('featureFlags.config rollout registry', () => {
     const grouped = getFeatureFlagsByCategory(
       buildFeatureFlagStateMap({
         'simulation-outcomes': FEATURE_FLAG_STATES.LOCKED,
-      })
+      }),
     );
 
     expect(grouped.map((group) => group.category)).toEqual(Object.values(FEATURE_FLAG_CATEGORIES));
@@ -99,7 +102,7 @@ describe('featureFlags.config rollout registry', () => {
           id: 'simulation-outcomes',
           state: FEATURE_FLAG_STATES.LOCKED,
         }),
-      ])
+      ]),
     );
   });
 });
@@ -117,7 +120,10 @@ describe('duplicate-system-audit: Env parsing chain', () => {
     // contains the literal risk-description string for this exact finding
     // ("Direct appConfig.features reads bypass FEATURE_FLAGS projection"),
     // which is documentation ABOUT the pattern, not a violation of it.
-    const allowedFiles = [join('config', 'featureFlags.config.ts'), join('data', 'duplicateSystemAudit.ts')];
+    const allowedFiles = [
+      join('config', 'featureFlags.config.ts'),
+      join('data', 'duplicateSystemAudit.ts'),
+    ];
     const offenders: string[] = [];
     for (const file of collectSourceFiles(srcRoot)) {
       if (allowedFiles.some((allowed) => file.endsWith(allowed))) continue;

@@ -48,7 +48,10 @@ function renderPanel() {
     <MemoryRouter>
       <UserProvider>
         <NotificationShellProvider>
-          <button type="button" onClick={() => document.dispatchEvent(new Event('open-notification-center'))}>
+          <button
+            type="button"
+            onClick={() => document.dispatchEvent(new Event('open-notification-center'))}
+          >
             Open
           </button>
           <SidebarNotificationPanel />

@@ -1,8 +1,5 @@
 import { builtinUiCalculators, clinicalIntentTools } from './clinicalIntentToolCatalog';
-import {
-  buildBackendFrontendContractRows,
-  getContractGaps,
-} from './backendFrontendToolContract';
+import { buildBackendFrontendContractRows, getContractGaps } from './backendFrontendToolContract';
 import toolRegistry from './toolRegistry';
 
 const EMPTY = '—';
@@ -49,7 +46,8 @@ function groupRowsBy(rows, getter) {
 
 function backendConnectionFor(row) {
   if (row.backendExecutor === 'yes') return 'post-executor';
-  if (present(row.apiEndpoint) && String(row.apiEndpoint).includes('/api/chat/')) return 'chat-action';
+  if (present(row.apiEndpoint) && String(row.apiEndpoint).includes('/api/chat/'))
+    return 'chat-action';
   if (present(row.apiEndpoint)) return 'platform-or-shared-api';
   return 'none';
 }
@@ -123,8 +121,12 @@ function registryStatusRows(rows) {
       quality: {
         hasFrontendEntryPoint: present(row.frontendRoute) && present(row.frontendComponent),
         hasBackendEndpointOrAction: backendConnection !== 'none',
-        hasValidationSchema: present(row.requestDto) || String(row.frontendComponent || '').includes('Calculators.jsx'),
-        hasOutputSchema: present(row.responseDto) || String(row.frontendComponent || '').includes('Calculators.jsx'),
+        hasValidationSchema:
+          present(row.requestDto) ||
+          String(row.frontendComponent || '').includes('Calculators.jsx'),
+        hasOutputSchema:
+          present(row.responseDto) ||
+          String(row.frontendComponent || '').includes('Calculators.jsx'),
         errorHandling: uiStateFor(row),
         loadingSuccessErrorUi: uiStateFor(row),
       },
@@ -159,7 +161,7 @@ export function buildToolAuditData() {
   const statusCounts = countBy(registryRows, 'status');
   const brokenRows = registryRows.filter((row) => row.status === 'broken');
   const missingBackendConnections = registryRows.filter(
-    (row) => row.status === 'missing backend' && row.frontend.hasFrontendEntryPoint !== false
+    (row) => row.status === 'missing backend' && row.frontend.hasFrontendEntryPoint !== false,
   );
   const gaps = getContractGaps(sourceRows);
   const conflictSummary = buildConflictSummary(sourceRows);
@@ -188,7 +190,8 @@ export function buildToolAuditData() {
       displayName: row.displayName,
       frontendRoute: row.frontend.route,
       frontendComponentPath: row.frontend.componentPath,
-      reason: 'No registered backend POST executor, chat action, or documented backend API endpoint.',
+      reason:
+        'No registered backend POST executor, chat action, or documented backend API endpoint.',
     })),
     recommendedPatches: [
       {
@@ -200,14 +203,16 @@ export function buildToolAuditData() {
       },
       {
         priority: 'high',
-        title: 'Connect existing source-backed trauma/PE/ACS/neuro calculator forms to canonical routes',
+        title:
+          'Connect existing source-backed trauma/PE/ACS/neuro calculator forms to canonical routes',
         status: 'recommended; broad contract migration',
         rationale:
           'Several calculator form components exist in source code while catalog records still present them as hub/chat-only.',
       },
       {
         priority: 'medium',
-        title: 'Standardize calculator result payloads around score/value, interpretation, warnings, disclaimer, and citations',
+        title:
+          'Standardize calculator result payloads around score/value, interpretation, warnings, disclaimer, and citations',
         status: 'recommended',
         rationale:
           'Local calculators use varied field names, which complicates copy/share/result rendering.',
@@ -233,7 +238,9 @@ function markdownTable(headers, rows) {
   return [
     `| ${headers.join(' | ')} |`,
     `| ${headers.map(() => '---').join(' | ')} |`,
-    ...rows.map((row) => `| ${row.map((cell) => String(cell ?? '').replace(/\|/g, '\\|')).join(' | ')} |`),
+    ...rows.map(
+      (row) => `| ${row.map((cell) => String(cell ?? '').replace(/\|/g, '\\|')).join(' | ')} |`,
+    ),
   ];
 }
 
@@ -247,17 +254,21 @@ export function formatToolAuditMarkdown(data = buildToolAuditData()) {
     row.endpointOrActionPath || EMPTY,
     row.notes || EMPTY,
   ]);
-  const missingRows = data.missingBackendConnections.slice(0, 40).map((row) => [
-    row.toolId,
-    row.displayName,
-    row.frontendRoute || EMPTY,
-    row.frontendComponentPath || EMPTY,
-  ]);
-  const sharedRoutes = data.conflictSummary.sharedFrontendRoutes.slice(0, 25).map((group) => [
-    group.value,
-    group.count,
-    group.ids.slice(0, 8).join(', ') + (group.ids.length > 8 ? ', ...' : ''),
-  ]);
+  const missingRows = data.missingBackendConnections
+    .slice(0, 40)
+    .map((row) => [
+      row.toolId,
+      row.displayName,
+      row.frontendRoute || EMPTY,
+      row.frontendComponentPath || EMPTY,
+    ]);
+  const sharedRoutes = data.conflictSummary.sharedFrontendRoutes
+    .slice(0, 25)
+    .map((group) => [
+      group.value,
+      group.count,
+      group.ids.slice(0, 8).join(', ') + (group.ids.length > 8 ? ', ...' : ''),
+    ]);
 
   return [
     '# Tool Audit Report',
@@ -279,7 +290,7 @@ export function formatToolAuditMarkdown(data = buildToolAuditData()) {
         ['Calculator forms', data.summary.calculatorForms],
         ['Registered backend POST executors', data.summary.postExecutors],
         ['Automated contract gaps', data.summary.automatedGapCount],
-      ]
+      ],
     ),
     '',
     '## Status Distribution',
@@ -314,7 +325,10 @@ export function formatToolAuditMarkdown(data = buildToolAuditData()) {
     `The JSON file contains ${data.missingBackendConnections.length} rows without a registered backend endpoint/action. The first 40 are listed here for triage.`,
     '',
     ...(missingRows.length
-      ? markdownTable(['Tool ID', 'Display name', 'Frontend route', 'Frontend component'], missingRows)
+      ? markdownTable(
+          ['Tool ID', 'Display name', 'Frontend route', 'Frontend component'],
+          missingRows,
+        )
       : ['_No missing backend connections found._']),
     '',
     '## Shared Frontend Routes',
@@ -326,7 +340,7 @@ export function formatToolAuditMarkdown(data = buildToolAuditData()) {
     '## Recommended Patches',
     '',
     ...data.recommendedPatches.map(
-      (patch) => `- **${patch.priority}: ${patch.title}** (${patch.status}) — ${patch.rationale}`
+      (patch) => `- **${patch.priority}: ${patch.title}** (${patch.status}) — ${patch.rationale}`,
     ),
     '',
     '## Generated Artifacts',

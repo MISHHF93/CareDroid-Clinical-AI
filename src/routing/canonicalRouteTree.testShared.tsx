@@ -126,7 +126,7 @@ vi.mock('../services/emergencySettingsApi', () => ({
 }));
 
 vi.mock('../contexts/UserContext', async (importOriginal) => {
-  const actual = await importOriginal() as any;
+  const actual = (await importOriginal()) as any;
   return {
     ...actual,
     useUser: () => mockUserValue,
@@ -134,7 +134,7 @@ vi.mock('../contexts/UserContext', async (importOriginal) => {
 });
 
 vi.mock('../contexts/UserIdentityContext', async (importOriginal) => {
-  const actual = await importOriginal() as any;
+  const actual = (await importOriginal()) as any;
   return {
     ...actual,
     useUserIdentity: () => ({
@@ -222,7 +222,7 @@ vi.mock('../services/clinicalToolsApi', async (importOriginal) => {
 });
 
 vi.mock('../hooks/useTrackMindRolePermissions', async (importOriginal) => {
-  const actual = await importOriginal() as any;
+  const actual = (await importOriginal()) as any;
   const mockTrackMind = {
     role: 'clinical-lead',
     roleLabel: 'Clinical Lead',
@@ -256,7 +256,7 @@ vi.mock('../hooks/useTrackMindRolePermissions', async (importOriginal) => {
 });
 
 vi.mock('../services/platformAssetsApi', async (importOriginal) => {
-  const actual = await importOriginal() as any;
+  const actual = (await importOriginal()) as any;
   return {
     ...actual,
     PlatformAssetsApi: {
@@ -280,10 +280,12 @@ vi.mock('../services/userIdentityApi', () => ({
 }));
 
 vi.mock('../services/memoryApi', async (importOriginal) => {
-  const actual = await importOriginal() as any;
+  const actual = (await importOriginal()) as any;
   return {
     ...actual,
-    fetchMemoryFabricContext: vi.fn().mockResolvedValue({ ok: true, data: actual.LOCAL_MEMORY_FABRIC_CONTEXT }),
+    fetchMemoryFabricContext: vi
+      .fn()
+      .mockResolvedValue({ ok: true, data: actual.LOCAL_MEMORY_FABRIC_CONTEXT }),
   };
 });
 
@@ -406,8 +408,6 @@ vi.mock('../engine/continuousPatientFlowEngine', async (importOriginal) => {
     startContinuousPatientFlowEngine: () => 0,
   };
 });
-
-
 
 vi.mock('../engine/simulation', () => ({
   startSimulation: vi.fn(),

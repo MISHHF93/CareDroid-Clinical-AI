@@ -61,8 +61,11 @@ export default function UserAccountMenu() {
   };
   const { account } = useUserIdentity() as { account: AppAccount | null };
   const { accessSummary, profileCopy } = useEffectiveUserProfile();
-  const { enabled: simulationEnabled, active: simulationActive, toggle: toggleSimulation } =
-    useSimulationMode();
+  const {
+    enabled: simulationEnabled,
+    active: simulationActive,
+    toggle: toggleSimulation,
+  } = useSimulationMode();
   const [open, setOpen] = useState(false);
   const [panelPosition, setPanelPosition] = useState<PanelPosition | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -75,11 +78,7 @@ export default function UserAccountMenu() {
   const panelId = `account-menu-panel-${reactId}`;
 
   const displayName = useMemo(
-    () =>
-      account?.displayName ||
-      user?.fullName ||
-      user?.name ||
-      DEMO_PERSONA.displayName,
+    () => account?.displayName || user?.fullName || user?.name || DEMO_PERSONA.displayName,
     [account?.displayName, user?.fullName, user?.name],
   );
 
@@ -285,9 +284,7 @@ export default function UserAccountMenu() {
           .join(' ')}
         aria-label={triggerLabel}
         aria-haspopup="true"
-        {...(open
-          ? { 'aria-expanded': 'true' as const }
-          : { 'aria-expanded': 'false' as const })}
+        {...(open ? { 'aria-expanded': 'true' as const } : { 'aria-expanded': 'false' as const })}
         aria-controls={panelId}
         id={triggerId}
         onClick={() => setOpen((value) => !value)}

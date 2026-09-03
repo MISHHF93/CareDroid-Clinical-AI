@@ -26,7 +26,8 @@ export const DEMO_LIVE_STATE_DESCRIPTIONS = Object.freeze({
   [DEMO_LIVE_STATES.DEMO]: 'Uses deterministic sample data or demo backend contracts.',
   [DEMO_LIVE_STATES.MOCK]: 'Uses synthetic placeholder records or coordinate mocks.',
   [DEMO_LIVE_STATES.SIMULATED]: 'Runs a scenario or model without real-world side effects.',
-  [DEMO_LIVE_STATES.BACKEND_UNAVAILABLE]: "The server for this feature isn't reachable right now, so this is a temporary fallback.",
+  [DEMO_LIVE_STATES.BACKEND_UNAVAILABLE]:
+    "The server for this feature isn't reachable right now, so this is a temporary fallback.",
   [DEMO_LIVE_STATES.UNSUPPORTED]: 'This action is not yet connected to a live system.',
   [DEMO_LIVE_STATES.LOCAL_ONLY]: 'Stays in this browser only and is not saved to a server.',
   [DEMO_LIVE_STATES.SESSION_ENGINE]:
@@ -38,5 +39,8 @@ export function getDemoLiveStateLabel(state) {
 }
 
 export function getDemoLiveStateDescription(state) {
-  return DEMO_LIVE_STATE_DESCRIPTIONS[state] || DEMO_LIVE_STATE_DESCRIPTIONS[DEMO_LIVE_STATES.UNSUPPORTED];
+  return (
+    DEMO_LIVE_STATE_DESCRIPTIONS[state] ||
+    DEMO_LIVE_STATE_DESCRIPTIONS[DEMO_LIVE_STATES.UNSUPPORTED]
+  );
 }

@@ -82,7 +82,11 @@ function patientById(patients: Patient[]): Map<string, Patient> {
   return new Map(patients.map((patient) => [patient.id, patient]));
 }
 
-function searchPatientHits(patients: Patient[], query: string, limit: number): OperationalSearchHit[] {
+function searchPatientHits(
+  patients: Patient[],
+  query: string,
+  limit: number,
+): OperationalSearchHit[] {
   if (!isPatientSearchQueryReady(query)) return [];
   return rankPatientsBySearch(patients, query, limit).map(({ patient, score, matchKind }) => ({
     entityType: 'patient',
@@ -95,7 +99,11 @@ function searchPatientHits(patients: Patient[], query: string, limit: number): O
   }));
 }
 
-function searchEncounterHits(patients: Patient[], query: string, limit: number): OperationalSearchHit[] {
+function searchEncounterHits(
+  patients: Patient[],
+  query: string,
+  limit: number,
+): OperationalSearchHit[] {
   const normalizedQuery = normalizeQuery(query);
   if (normalizedQuery.length < 3) return [];
 
@@ -106,7 +114,9 @@ function searchEncounterHits(patients: Patient[], query: string, limit: number):
 
     const score =
       scoreTextMatch(encounterId, query, 940) ||
-      (normalizedQuery.startsWith('encounter') ? scoreTextMatch(encounterId, query.replace(/^encounter[-\s]*/, ''), 900) : null);
+      (normalizedQuery.startsWith('encounter')
+        ? scoreTextMatch(encounterId, query.replace(/^encounter[-\s]*/, ''), 900)
+        : null);
     if (!score) continue;
 
     hits.push({
@@ -347,14 +357,18 @@ export function patientHitsFromOperationalSearch(hits: OperationalSearchHit[] = 
   return hits.filter((hit) => hit.entityType === 'patient');
 }
 
-export function formatOperationalSearchEntityLabel(entityType: OperationalSearchEntityType): string {
+export function formatOperationalSearchEntityLabel(
+  entityType: OperationalSearchEntityType,
+): string {
   if (entityType === 'ems') return 'EMS case';
   if (entityType === 'queue') return 'Queue item';
   return entityType.charAt(0).toUpperCase() + entityType.slice(1);
 }
 
 export function operationalSearchHaystack(hit: OperationalSearchHit): string {
-  return normalizeQuery([hit.label, hit.hint, hit.id, hit.patientId, hit.encounterId].filter(Boolean).join(' '));
+  return normalizeQuery(
+    [hit.label, hit.hint, hit.id, hit.patientId, hit.encounterId].filter(Boolean).join(' '),
+  );
 }
 
 export function getPatientSearchFieldsForOperationalAudit(patient: Patient) {

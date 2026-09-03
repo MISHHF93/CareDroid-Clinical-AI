@@ -93,10 +93,13 @@ describe('EmergencyIntakeOperatingSystemService', () => {
             expect.objectContaining({ field: 'insurance metadata', source: 'insurance card OCR' }),
           ]),
           draftSuggestions: expect.arrayContaining([
-            expect.objectContaining({ field: 'insurance group ID', reason: 'needs review before promotion' }),
+            expect.objectContaining({
+              field: 'insurance group ID',
+              reason: 'needs review before promotion',
+            }),
           ]),
         }),
-      })
+      }),
     );
     expect(intake.commandCenter.trackedStates.map((state) => state.label)).toEqual([
       'Arrivals',
@@ -141,7 +144,7 @@ describe('EmergencyIntakeOperatingSystemService', () => {
           separateIntakeAppCreated: false,
           arrivalState: expect.stringMatching(/inside CareDroid already summarized/i),
         }),
-      })
+      }),
     );
     expect(intake.implementationTraceability).toEqual(
       expect.objectContaining({
@@ -160,7 +163,7 @@ describe('EmergencyIntakeOperatingSystemService', () => {
           'src/services/workspaceDataPipelineService.test.ts',
           'src/pages/WorkspaceHome.test.jsx',
         ]),
-      })
+      }),
     );
     expect(intake.productSurfaces.map((surface) => surface.surface)).toEqual(
       expect.arrayContaining([
@@ -169,17 +172,19 @@ describe('EmergencyIntakeOperatingSystemService', () => {
         'Medication and allergy capture review',
         'Smart Arrival summary in CareDroid',
         'Emergency command center and Patient Journey Engine views',
-      ])
+      ]),
     );
     expect(intake.intakeRecord.confirmedFields.every((field) => field.confirmedAt)).toBe(true);
-    expect(intake.intakeRecord.confirmedFields.map((field) => field.field)).not.toContain('emergency contact');
+    expect(intake.intakeRecord.confirmedFields.map((field) => field.field)).not.toContain(
+      'emergency contact',
+    );
     expect(intake.intakeRecord.draftSuggestions).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           field: 'emergency contact',
           reason: expect.stringMatching(/not promoted until confirmed/i),
         }),
-      ])
+      ]),
     );
     expect(intake.implementationTraceability.docs.map((doc) => doc.docPath)).toEqual(
       expect.arrayContaining([
@@ -202,7 +207,7 @@ describe('EmergencyIntakeOperatingSystemService', () => {
         'docs/emergency-flow-intelligence-integration.md',
         'docs/first-five-minute-experience.md',
         'docs/emergency-intake-operating-system.md',
-      ])
+      ]),
     );
     expect(intake.implementationTraceability.docs.length).toBeGreaterThan(0);
   });
@@ -214,10 +219,17 @@ describe('EmergencyIntakeOperatingSystemService', () => {
     });
 
     expect(DocumentIntelligenceService.getSupportedInputs()).toEqual(
-      expect.arrayContaining(['ID document', "driver's license", 'health card', 'insurance card', 'referral letters', 'discharge papers'])
+      expect.arrayContaining([
+        'ID document',
+        "driver's license",
+        'health card',
+        'insurance card',
+        'referral letters',
+        'discharge papers',
+      ]),
     );
     expect(DocumentIntelligenceService.getAcceptedInputChannels()).toEqual(
-      expect.arrayContaining(['uploaded', 'scanned', 'photographed', 'integration-supplied'])
+      expect.arrayContaining(['uploaded', 'scanned', 'photographed', 'integration-supplied']),
     );
     expect(record).toEqual(
       expect.objectContaining({
@@ -227,7 +239,14 @@ describe('EmergencyIntakeOperatingSystemService', () => {
           detectedDocumentType: 'insurance card',
           classified: true,
         }),
-        pipeline: ['Capture', 'OCR', 'Field Extraction', 'Validation', 'Review', 'Structured Patient'],
+        pipeline: [
+          'Capture',
+          'OCR',
+          'Field Extraction',
+          'Validation',
+          'Review',
+          'Structured Patient',
+        ],
         structuredRecord: expect.objectContaining({
           validationStatus: 'review required',
           reviewState: 'pending review',
@@ -245,25 +264,42 @@ describe('EmergencyIntakeOperatingSystemService', () => {
             ingestionTimestamp: expect.any(String),
           }),
         ]),
-      })
+      }),
     );
     const intake = EmergencyIntakeOperatingSystemService.getOperatingSystem();
     expect(intake.documentIntelligence.records.map((item) => item.documentType)).toEqual(
-      expect.arrayContaining(["driver's license", 'health card', 'insurance card', 'referral letters', 'discharge papers'])
+      expect.arrayContaining([
+        "driver's license",
+        'health card',
+        'insurance card',
+        'referral letters',
+        'discharge papers',
+      ]),
     );
     expect(intake.referralDocumentIngestion.records.map((item) => item.documentType)).toEqual(
-      expect.arrayContaining(['referral letters', 'clinic notes', 'discharge summaries', 'EMS reports'])
+      expect.arrayContaining([
+        'referral letters',
+        'clinic notes',
+        'discharge summaries',
+        'EMS reports',
+      ]),
     );
     for (const record of intake.referralDocumentIngestion.records) {
       expect(record.extractedFields.map((field) => field.field)).toEqual(
-        expect.arrayContaining(['diagnoses', 'medications', 'allergies', 'recommendations'])
+        expect.arrayContaining(['diagnoses', 'medications', 'allergies', 'recommendations']),
       );
     }
     expect(intake.referralDocumentIngestion.sourceReferenceRequirements).toEqual(
-      expect.arrayContaining(['extracted text span', 'ingestion timestamp'])
+      expect.arrayContaining(['extracted text span', 'ingestion timestamp']),
     );
     expect(intake.referralDocumentIngestion.searchModes).toEqual(
-      expect.arrayContaining(['patient', 'document type', 'extracted concept', 'source', 'review state'])
+      expect.arrayContaining([
+        'patient',
+        'document type',
+        'extracted concept',
+        'source',
+        'review state',
+      ]),
     );
   });
 
@@ -284,10 +320,10 @@ describe('EmergencyIntakeOperatingSystemService', () => {
     expect(intake.patientJourneyFeed).toHaveLength(12);
     expect(intake.patientJourneyFeed.every((module) => module.validJourneyStages)).toBe(true);
     expect(intake.patientJourneyFeed.map((module) => module.title)).toEqual(
-      expect.arrayContaining(['Consent and Verification', 'Pre-Triage Queue', 'Intake Analytics'])
+      expect.arrayContaining(['Consent and Verification', 'Pre-Triage Queue', 'Intake Analytics']),
     );
     expect(intake.patientJourneyFeed.map((module) => module.patientJourneyStates).flat()).toEqual(
-      expect.arrayContaining(['arrival', 'registration', 'triage', 'assessment'])
+      expect.arrayContaining(['arrival', 'registration', 'triage', 'assessment']),
     );
     expect(getEmergencyIntakeAutomationFeed()).toEqual(
       expect.arrayContaining([
@@ -320,26 +356,39 @@ describe('EmergencyIntakeOperatingSystemService', () => {
           title: 'Intake Analytics',
           humanReviewRequired: true,
         }),
-      ])
+      ]),
     );
     expect(intake.marketplace.upgradePaths).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ from: 'Core', to: 'Pro' }),
         expect.objectContaining({ from: 'Pro', to: 'Enterprise' }),
-      ])
+      ]),
     );
     expect(intake.marketplace.configurationRules).toEqual(
-      expect.arrayContaining(['review controls cannot be disabled for extracted clinical or identity data'])
+      expect.arrayContaining([
+        'review controls cannot be disabled for extracted clinical or identity data',
+      ]),
     );
     expect(intake.emergencyOsIntegration).toEqual(
       expect.objectContaining({
-        flow: ['Arrival', 'Intake', 'Verification', 'Patient Context', 'Triage', 'Assessment', 'Disposition'],
+        flow: [
+          'Arrival',
+          'Intake',
+          'Verification',
+          'Patient Context',
+          'Triage',
+          'Assessment',
+          'Disposition',
+        ],
         requirements: expect.arrayContaining([
           'verification status controls whether extracted intake fields become confirmed context',
           'triage receives organized pre-triage information without autonomous triage decisions',
         ]),
-        surfaces: expect.arrayContaining(['Emergency command center views', 'Patient context workspace']),
-      })
+        surfaces: expect.arrayContaining([
+          'Emergency command center views',
+          'Patient context workspace',
+        ]),
+      }),
     );
   });
 
@@ -355,7 +404,9 @@ describe('EmergencyIntakeOperatingSystemService', () => {
       'Key allergies?',
       'Recent encounters?',
     ]);
-    expect(intake.patientSnapshot.sections.every((section) => section.sourceRecords.length > 0)).toBe(true);
+    expect(
+      intake.patientSnapshot.sections.every((section) => section.sourceRecords.length > 0),
+    ).toBe(true);
     expect(intake.patientSnapshot.identityAnchor).toBe('confirmed intake patient context');
     expect(intake.patientSnapshot.structuredSummary).toEqual(
       expect.objectContaining({
@@ -364,24 +415,32 @@ describe('EmergencyIntakeOperatingSystemService', () => {
           dateOfBirth: '1971-04-12',
         }),
         allergies: expect.arrayContaining(['Penicillin - rash - confirmed']),
-        medications: expect.arrayContaining(['Warfarin - patient reported - verification required']),
+        medications: expect.arrayContaining([
+          'Warfarin - patient reported - verification required',
+        ]),
         chronicConditions: expect.arrayContaining(['Hypertension']),
         referralReason: expect.stringMatching(/chest pain/i),
         arrivalComplaint: 'Chest Pain',
-      })
+      }),
     );
     expect(intake.patientSnapshot.freshnessIndicators).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ context: 'demographics', freshness: expect.stringMatching(/confirmed/i) }),
-        expect.objectContaining({ context: 'medications', freshness: expect.stringMatching(/stale/i) }),
-      ])
+        expect.objectContaining({
+          context: 'demographics',
+          freshness: expect.stringMatching(/confirmed/i),
+        }),
+        expect.objectContaining({
+          context: 'medications',
+          freshness: expect.stringMatching(/stale/i),
+        }),
+      ]),
     );
     expect(intake.medicationSummary.flags).toEqual(
       expect.objectContaining({
         duplicates: expect.any(Array),
         missingInformation: expect.any(Array),
         uncertainEntries: expect.any(Array),
-      })
+      }),
     );
     expect(intake.medicationSummary.entries).toEqual(
       expect.arrayContaining([
@@ -391,14 +450,21 @@ describe('EmergencyIntakeOperatingSystemService', () => {
           confidence: expect.any(Number),
           verificationStatus: 'requires verification',
         }),
-      ])
+      ]),
     );
     expect(intake.medicationSummary.reviewWorkflow).toEqual(
-      expect.arrayContaining(['compare patient report against prior records', 'confirm reviewed medications into the Medication Summary'])
+      expect.arrayContaining([
+        'compare patient report against prior records',
+        'confirm reviewed medications into the Medication Summary',
+      ]),
     );
     expect(intake.allergyRiskCapture.triageDisplay).toBe('prominent');
     expect(intake.allergyRiskCapture.captureSources).toEqual(
-      expect.arrayContaining(['patient or caregiver report', 'prior records', 'clinical staff review'])
+      expect.arrayContaining([
+        'patient or caregiver report',
+        'prior records',
+        'clinical staff review',
+      ]),
     );
     expect(intake.identityResolution.candidateMatches).toEqual(
       expect.arrayContaining([
@@ -408,17 +474,20 @@ describe('EmergencyIntakeOperatingSystemService', () => {
           conflictingFields: expect.any(Array),
           reviewStatus: expect.stringMatching(/review/i),
         }),
-      ])
+      ]),
     );
     expect(intake.identityResolution.resolutionWorkflow).toEqual(
-      expect.arrayContaining(['compare candidate records side by side', 'preserve audit trail of match suggestions and outcomes'])
+      expect.arrayContaining([
+        'compare candidate records side by side',
+        'preserve audit trail of match suggestions and outcomes',
+      ]),
     );
     expect(intake.preTriageQueue.patients[0]).toEqual(
       expect.objectContaining({
         queuePosition: 1,
         arrivalOrIntakeTimestamp: expect.any(String),
         reviewable: true,
-      })
+      }),
     );
     expect(intake.analytics.route).toBe('/workspace/emergency/intake-analytics');
     expect(intake.analytics.metrics.map((metric) => metric.label)).toEqual([
@@ -428,21 +497,34 @@ describe('EmergencyIntakeOperatingSystemService', () => {
       'Document processing volume',
       'Triage readiness time',
     ]);
-    expect(intake.analytics.metricDefinitions.averageRegistrationTime).toMatch(/registration start/i);
+    expect(intake.analytics.metricDefinitions.averageRegistrationTime).toMatch(
+      /registration start/i,
+    );
     expect(intake.analytics.intakeModeComparison).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ mode: 'QR code intake', completionRate: expect.any(Number) }),
-      ])
+      ]),
     );
     expect(intake.voiceIntake).toEqual(
       expect.objectContaining({
         sampleTranscript: expect.stringMatching(/Jordan Lee/i),
         mappedFields: expect.arrayContaining([
-          expect.objectContaining({ field: 'complaint', correctionState: 'requires staff confirmation' }),
+          expect.objectContaining({
+            field: 'complaint',
+            correctionState: 'requires staff confirmation',
+          }),
         ]),
-        correctionWorkflow: expect.arrayContaining(['review transcript', 'confirm reviewed fields']),
-        alternateIntakePaths: expect.arrayContaining(['kiosk', 'tablet', 'QR code', 'receptionist-assisted intake']),
-      })
+        correctionWorkflow: expect.arrayContaining([
+          'review transcript',
+          'confirm reviewed fields',
+        ]),
+        alternateIntakePaths: expect.arrayContaining([
+          'kiosk',
+          'tablet',
+          'QR code',
+          'receptionist-assisted intake',
+        ]),
+      }),
     );
     expect(intake.firstFiveMinuteExperience.measures[0]).toEqual(
       expect.objectContaining({
@@ -452,21 +534,32 @@ describe('EmergencyIntakeOperatingSystemService', () => {
         missingOrUnresolvedFields: expect.any(Array),
         verificationStatus: expect.any(String),
         responsibleRole: expect.any(String),
-      })
+      }),
     );
-    expect(intake.firstFiveMinuteExperience.measures.every((measure) => measure.completionStatus)).toBe(true);
-    expect(intake.firstFiveMinuteExperience.measures.every((measure) => Array.isArray(measure.missingOrUnresolvedFields))).toBe(true);
-    expect(intake.firstFiveMinuteExperience.measures.every((measure) => measure.responsibleRole)).toBe(true);
+    expect(
+      intake.firstFiveMinuteExperience.measures.every((measure) => measure.completionStatus),
+    ).toBe(true);
+    expect(
+      intake.firstFiveMinuteExperience.measures.every((measure) =>
+        Array.isArray(measure.missingOrUnresolvedFields),
+      ),
+    ).toBe(true);
+    expect(
+      intake.firstFiveMinuteExperience.measures.every((measure) => measure.responsibleRole),
+    ).toBe(true);
     expect(intake.doorToTriage.stages[0]).toEqual(
       expect.objectContaining({
         startTimestamp: 'T+0m',
         completionTimestamp: 'T+1m',
         responsibleRole: expect.any(String),
         sourceSystemOrIntakeMode: expect.any(String),
-      })
+      }),
     );
     expect(intake.doorToTriage.operationalSignals).toEqual(
-      expect.arrayContaining(['patients waiting on verification', 'average and median time from arrival to triage-ready state'])
+      expect.arrayContaining([
+        'patients waiting on verification',
+        'average and median time from arrival to triage-ready state',
+      ]),
     );
   });
 });

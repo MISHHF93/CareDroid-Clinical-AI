@@ -87,14 +87,12 @@ export function normalizeRouteOptimizationInput(input: any = {}) {
   }));
 
   const trafficLevel = String(input.trafficConstraints?.level || 'moderate').toLowerCase();
-  const trafficMultiplier =
-    TRAFFIC_MULTIPLIERS[trafficLevel] ?? TRAFFIC_MULTIPLIERS.moderate;
+  const trafficMultiplier = TRAFFIC_MULTIPLIERS[trafficLevel] ?? TRAFFIC_MULTIPLIERS.moderate;
 
   const labeledDestinations = destinations.filter((dest) => dest.label.length > 0);
 
   const routeStartMinutes =
-    parseWindowMinutes(input.routeStart ?? input.routeStartMinutes) ??
-    DEFAULT_ROUTE_START_MINUTES;
+    parseWindowMinutes(input.routeStart ?? input.routeStartMinutes) ?? DEFAULT_ROUTE_START_MINUTES;
 
   return {
     depotLabel: String(input.depotLabel || 'Depot').trim() || 'Depot',
@@ -141,7 +139,7 @@ function buildSequence(
 
   if (enforceLimits && destinations.length > limit) {
     warnings.push(
-      `Vehicle max stops (${vehicleLimitations.maxStops}) exceeded — ${destinations.length - limit} stop(s) deferred.`
+      `Vehicle max stops (${vehicleLimitations.maxStops}) exceeded — ${destinations.length - limit} stop(s) deferred.`,
     );
   }
 
@@ -181,7 +179,7 @@ function buildSequence(
 
   if (enforceLimits && totalDistanceKm > vehicleLimitations.maxDistanceKm) {
     warnings.push(
-      `Estimated distance (${Math.round(totalDistanceKm)} km) exceeds vehicle range (${vehicleLimitations.maxDistanceKm} km).`
+      `Estimated distance (${Math.round(totalDistanceKm)} km) exceeds vehicle range (${vehicleLimitations.maxDistanceKm} km).`,
     );
   }
 
@@ -215,13 +213,11 @@ export function optimizeRouteBySort(normalized) {
   const minutesSaved = Math.max(0, baseline.totalMinutes - optimized.totalMinutes);
   const distanceKmSaved = Math.max(
     0,
-    Math.round((baseline.totalDistanceKm - optimized.totalDistanceKm) * 10) / 10
+    Math.round((baseline.totalDistanceKm - optimized.totalDistanceKm) * 10) / 10,
   );
 
   const percentImprovement =
-    baseline.totalMinutes > 0
-      ? Math.round((minutesSaved / baseline.totalMinutes) * 1000) / 10
-      : 0;
+    baseline.totalMinutes > 0 ? Math.round((minutesSaved / baseline.totalMinutes) * 1000) / 10 : 0;
 
   return {
     engine: ROUTE_ENGINE_SORT,

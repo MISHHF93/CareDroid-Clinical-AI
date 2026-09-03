@@ -54,7 +54,11 @@ function messageFromPayload(payload: any, fallback: string): string {
   return fallback;
 }
 
-async function postJson<T>(path: string, body: Record<string, unknown>, fallbackErrorMessage: string): Promise<T> {
+async function postJson<T>(
+  path: string,
+  body: Record<string, unknown>,
+  fallbackErrorMessage: string,
+): Promise<T> {
   const response = await fetch(path, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
@@ -113,6 +117,8 @@ export function persistRealSession(result: RealLoginSuccess): void {
   localStorage.removeItem(AUTH_CONFIG.legacyTokenStorageKey);
 }
 
-export function isTwoFactorChallenge(result: RealLoginResult): result is RealLoginTwoFactorRequired {
+export function isTwoFactorChallenge(
+  result: RealLoginResult,
+): result is RealLoginTwoFactorRequired {
   return (result as RealLoginTwoFactorRequired)?.requiresTwoFactor === true;
 }

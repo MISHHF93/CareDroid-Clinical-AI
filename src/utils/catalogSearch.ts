@@ -56,7 +56,9 @@ export function normalizeCatalogCategory(category, { chatOnlyForm = false }: any
  * @param {{ ids?: string[] }} [options]
  */
 export function textMatchesCatalogQuery(text, query, { ids = [] as any[] }: any = {}) {
-  const q = String(query || '').trim().toLowerCase();
+  const q = String(query || '')
+    .trim()
+    .toLowerCase();
   if (!q) return true;
   const terms = getSearchTermsForCatalogIds(...ids);
   const blob = [text, ...terms].filter(Boolean).join(' ').toLowerCase();
@@ -81,8 +83,7 @@ export function getSearchTermsForCatalogIds(...ids) {
 
 export function buildMedicalCatalogSearchBlob(row) {
   const terms =
-    row.searchTerms ||
-    getSearchTermsForCatalogIds(row.primaryId, row.id, row.sidebarToolId);
+    row.searchTerms || getSearchTermsForCatalogIds(row.primaryId, row.id, row.sidebarToolId);
   return [
     row.title,
     row.name,
@@ -100,13 +101,17 @@ export function buildMedicalCatalogSearchBlob(row) {
 }
 
 export function matchesCatalogRow(row, query) {
-  const q = String(query || '').trim().toLowerCase();
+  const q = String(query || '')
+    .trim()
+    .toLowerCase();
   if (!q) return true;
   return buildMedicalCatalogSearchBlob(row).includes(q);
 }
 
 export function catalogRowsMatchingQuery(rows, query) {
-  const q = String(query || '').trim().toLowerCase();
+  const q = String(query || '')
+    .trim()
+    .toLowerCase();
   if (!q) return rows;
   return rows.filter((row) => matchesCatalogRow(row, q));
 }
@@ -129,10 +134,7 @@ function resolveAccessTier(row) {
 function resolveLaunchLabel(row, launch) {
   if (row.chatOnlyForm) return 'Start guided chat';
   const registryId = row.sidebarToolId || row.primaryId || row.id;
-  if (
-    CLINICAL_TIER_B_CHAT_REGISTRY_IDS.includes(registryId) &&
-    !row.uiCalculatorSlug
-  ) {
+  if (CLINICAL_TIER_B_CHAT_REGISTRY_IDS.includes(registryId) && !row.uiCalculatorSlug) {
     return 'Start guided chat';
   }
   if (row.uiCalculatorSlug && row.pagePath && !row.chatOnlyForm) {
@@ -164,7 +166,11 @@ export function matchesMedicalCatalogCategoryFilter(row, categoryFilter) {
   if (categoryFilter === 'diagnostic') {
     return row.category === 'diagnostic' || row.category === 'checker';
   }
-  if (categoryFilter === 'interpreter' || categoryFilter === 'protocol' || categoryFilter === 'reference') {
+  if (
+    categoryFilter === 'interpreter' ||
+    categoryFilter === 'protocol' ||
+    categoryFilter === 'reference'
+  ) {
     return row.category === categoryFilter;
   }
   if (categoryFilter === 'apis') {
@@ -213,15 +219,13 @@ export function enrichMedicalCatalogRow(row) {
     row.primaryId,
     row.id,
     row.sidebarToolId,
-    launch.registryId
+    launch.registryId,
   );
   const primaryId = row.primaryId || row.id;
   const nluToolId =
     clinicalIntentPrimaryId(primaryId) ||
     (ORCHESTRATOR_TO_REGISTRY_ID[primaryId] ? primaryId : null);
-  const backendApiRegistered = Boolean(
-    nluToolId && isOrchestratorRegisteredNlu(nluToolId)
-  );
+  const backendApiRegistered = Boolean(nluToolId && isOrchestratorRegisteredNlu(nluToolId));
   const backendApiIntentOnly = Boolean(row.backendExecutor && !backendApiRegistered);
   const resolvedPath = row.pagePath || launch.path;
   const launchable =
@@ -320,7 +324,9 @@ export function buildDiscoveredSearchBlob(row) {
 }
 
 export function matchesDiscoveredRow(row, query) {
-  const q = String(query || '').trim().toLowerCase();
+  const q = String(query || '')
+    .trim()
+    .toLowerCase();
   if (!q) return true;
   return buildDiscoveredSearchBlob(row).includes(q);
 }
@@ -331,9 +337,7 @@ export function isDiscoveredRowLaunchable(row) {
   const launchId = row.mapsTo || row.id;
   if (row.status === 'alias' && !row.mapsTo) return false;
   const launch = resolveCatalogLaunch(launchId);
-  const hasPath = Boolean(
-    (row.path && !String(row.path).includes(':')) || launch.path
-  );
+  const hasPath = Boolean((row.path && !String(row.path).includes(':')) || launch.path);
   return hasPath || Boolean(launch.chatSeed);
 }
 
@@ -354,7 +358,9 @@ export function getDiscoveredLaunchLabel(row) {
 
 /** Unique normalized categories for medical rows (filter dropdown integrity). */
 export function getMedicalCatalogCategories(rows) {
-  const normalized = rows.map((r) => normalizeCatalogCategory(r.category, { chatOnlyForm: r.chatOnlyForm }));
+  const normalized = rows.map((r) =>
+    normalizeCatalogCategory(r.category, { chatOnlyForm: r.chatOnlyForm }),
+  );
   return [...new Set(normalized.filter(Boolean))].sort();
 }
 

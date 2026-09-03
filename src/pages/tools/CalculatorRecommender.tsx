@@ -14,7 +14,8 @@ const TOOL_CONFIG = {
   name: 'Calculator Recommendation AI',
   path: '/tools/calculator-recommender',
   color: '#6B7BC4',
-  description: 'Suggests CareDroid calculators from symptoms, chief complaint, and clinical keywords',
+  description:
+    'Suggests CareDroid calculators from symptoms, chief complaint, and clinical keywords',
   shortcut: 'Ctrl+Shift+L',
   category: 'Calculator',
 };
@@ -40,7 +41,9 @@ export default function CalculatorRecommender({ embedded = false, onCloseEmbedde
 
   const handleRecommend = () => {
     if (![chiefComplaint, symptoms, clinicalKeywords].some((value) => value.trim())) {
-      setError('Add a chief complaint, symptoms, or clinical keywords before recommending calculators.');
+      setError(
+        'Add a chief complaint, symptoms, or clinical keywords before recommending calculators.',
+      );
       return;
     }
     setError(null);
@@ -77,7 +80,9 @@ export default function CalculatorRecommender({ embedded = false, onCloseEmbedde
           setResultSource('chat');
         }
       } else {
-        setError(response.data?.message || 'Unable to start calculator recommendation chat workflow.');
+        setError(
+          response.data?.message || 'Unable to start calculator recommendation chat workflow.',
+        );
       }
     } catch (err: any) {
       setError(err.message || 'Unable to start calculator recommendation chat workflow.');
@@ -102,8 +107,8 @@ export default function CalculatorRecommender({ embedded = false, onCloseEmbedde
         <div className="simple-tool-result-panel" role="note">
           <h2>Recommendation Scope</h2>
           <p>
-            This workflow suggests existing CareDroid calculators only. It does not diagnose, rule out disease,
-            or recommend treatment, disposition, orders, or medications.
+            This workflow suggests existing CareDroid calculators only. It does not diagnose, rule
+            out disease, or recommend treatment, disposition, orders, or medications.
           </p>
         </div>
 
@@ -162,14 +167,19 @@ export default function CalculatorRecommender({ embedded = false, onCloseEmbedde
             </div>
           </section>
 
-          <section className="diagnosis-panel diagnosis-panel--scroll" aria-labelledby="calculator-recommendations">
+          <section
+            className="diagnosis-panel diagnosis-panel--scroll"
+            aria-labelledby="calculator-recommendations"
+          >
             <h2 id="calculator-recommendations">Suggested Tools</h2>
             <ApiStateBanner error={error} onRetry={handleRecommend} />
 
             {chatLoading ? (
               <div className="tool-loading-state" aria-busy="true">
                 <div className="simple-tool-spinner diagnosis-spinner" />
-                <p className="tool-loading-state__message">Building calculator recommendations...</p>
+                <p className="tool-loading-state__message">
+                  Building calculator recommendations...
+                </p>
               </div>
             ) : result?.recommendations?.length ? (
               <div className="diagnosis-results-body">
@@ -195,7 +205,9 @@ export default function CalculatorRecommender({ embedded = false, onCloseEmbedde
                     <button
                       type="button"
                       className="diagnosis-primary-btn"
-                      onClick={() => profileNavigate(tool.navigationPath || tool.route || '/tools/calculators')}
+                      onClick={() =>
+                        profileNavigate(tool.navigationPath || tool.route || '/tools/calculators')
+                      }
                     >
                       Open {tool.label}
                     </button>
@@ -213,11 +225,13 @@ export default function CalculatorRecommender({ embedded = false, onCloseEmbedde
               </div>
             ) : result ? (
               <div className="simple-tool-result-panel">
-                No matching calculator found yet. Add more specific symptoms, chief complaint, or clinical keywords.
+                No matching calculator found yet. Add more specific symptoms, chief complaint, or
+                clinical keywords.
               </div>
             ) : (
               <div className="tool-empty-state">
-                Try “chest pain with elevated troponin” to suggest HEART, TIMI, GRACE, and ASCVD tools.
+                Try “chest pain with elevated troponin” to suggest HEART, TIMI, GRACE, and ASCVD
+                tools.
               </div>
             )}
 

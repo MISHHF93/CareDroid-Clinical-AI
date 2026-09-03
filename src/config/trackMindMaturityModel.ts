@@ -96,7 +96,8 @@ export const TRACKMIND_MATURITY_DOMAINS = Object.freeze([
     baseScore: 62,
     owner: 'steward',
     ownerLabel: 'Chief medical officer / safety officer',
-    description: 'Clinical safety guardrails, reassessment discipline, and harm-prevention workflows.',
+    description:
+      'Clinical safety guardrails, reassessment discipline, and harm-prevention workflows.',
     levelCriteria: [
       'Safety incidents handled reactively without shared taxonomy.',
       'Safety checklists exist but are not enforced in workflows.',
@@ -104,7 +105,11 @@ export const TRACKMIND_MATURITY_DOMAINS = Object.freeze([
       'Safety signals visible on whiteboard and audited in operational history.',
       'Proactive safety analytics, near-miss capture, and simulation-backed drills.',
     ],
-    indicators: ['Reassessment attention strips', 'Clinical guardrail checklist coverage', 'Operational audit domains'],
+    indicators: [
+      'Reassessment attention strips',
+      'Clinical guardrail checklist coverage',
+      'Operational audit domains',
+    ],
   }),
   Object.freeze({
     id: TRACKMIND_MATURITY_DOMAIN.COMPLIANCE,
@@ -121,7 +126,11 @@ export const TRACKMIND_MATURITY_DOMAINS = Object.freeze([
       'Tenant-scoped compliance controls with periodic review cadence.',
       'Automated compliance monitoring and regulator-ready evidence packs.',
     ],
-    indicators: ['Governance registry surfaces', 'Audit trail coverage', 'Privacy workflow maturity'],
+    indicators: [
+      'Governance registry surfaces',
+      'Audit trail coverage',
+      'Privacy workflow maturity',
+    ],
   }),
   Object.freeze({
     id: TRACKMIND_MATURITY_DOMAIN.SECURITY,
@@ -138,7 +147,11 @@ export const TRACKMIND_MATURITY_DOMAINS = Object.freeze([
       'Production secrets, rate limits, and Swagger gating verified.',
       'Zero-trust posture with continuous vulnerability and access review.',
     ],
-    indicators: ['Multi-tenant readiness score', 'Production security controls', 'Emergency API auth'],
+    indicators: [
+      'Multi-tenant readiness score',
+      'Production security controls',
+      'Emergency API auth',
+    ],
   }),
   Object.freeze({
     id: TRACKMIND_MATURITY_DOMAIN.EQUINE_WELFARE,
@@ -147,7 +160,8 @@ export const TRACKMIND_MATURITY_DOMAINS = Object.freeze([
     baseScore: 52,
     owner: 'equine_welfare_officer',
     ownerLabel: 'Equine welfare officer / track veterinarian',
-    description: 'Horse health monitoring, withdrawal protocols, injury response, and welfare audits.',
+    description:
+      'Horse health monitoring, withdrawal protocols, injury response, and welfare audits.',
     levelCriteria: [
       'Welfare incidents logged informally; no central registry.',
       'Veterinary rounds documented but not linked to track operations.',
@@ -176,7 +190,11 @@ export const TRACKMIND_MATURITY_DOMAINS = Object.freeze([
       'Facilities KPIs integrated with operations command and IoT readiness.',
       'Digital twin of facilities with predictive maintenance and safety interlocks.',
     ],
-    indicators: ['Asset tracking surfaces', 'Maintenance workflow coverage', 'Incident command readiness'],
+    indicators: [
+      'Asset tracking surfaces',
+      'Maintenance workflow coverage',
+      'Incident command readiness',
+    ],
   }),
   Object.freeze({
     id: TRACKMIND_MATURITY_DOMAIN.FINANCE,
@@ -219,7 +237,8 @@ export const TRACKMIND_MATURITY_DOMAINS = Object.freeze([
     baseScore: 64,
     owner: 'data_analytics_user',
     ownerLabel: 'Data steward / registration lead',
-    description: 'Identity verification, duplicate detection, demographics, and arrival reason completeness.',
+    description:
+      'Identity verification, duplicate detection, demographics, and arrival reason completeness.',
     levelCriteria: [
       'Registration data quality issues discovered only at discharge.',
       'Manual duplicate checks; placeholder patients accumulate.',
@@ -227,7 +246,11 @@ export const TRACKMIND_MATURITY_DOMAINS = Object.freeze([
       'Data quality KPIs tracked with discovery audits and remediation workflows.',
       'Automated deduplication, enrichment, and real-time quality scoring at intake.',
     ],
-    indicators: ['Data quality surface registry', 'Risk category coverage', 'Verification workflow maturity'],
+    indicators: [
+      'Data quality surface registry',
+      'Risk category coverage',
+      'Verification workflow maturity',
+    ],
   }),
 ]);
 
@@ -396,18 +419,14 @@ export function scoreTrackMindDomain(domainId, { answers = {} as any, signals = 
     ...domain,
     score,
     platformScore,
-    provenance:
-      TRACKMIND_DOMAIN_SCORE_PROVENANCE[domainId] || TRACKMIND_SCORE_PROVENANCE.STATIC,
+    provenance: TRACKMIND_DOMAIN_SCORE_PROVENANCE[domainId] || TRACKMIND_SCORE_PROVENANCE.STATIC,
     questionnaireScore,
     maturityLevel,
     currentCriteria: domain.levelCriteria[criteriaIndex],
-    nextCriteria:
-      maturityLevel.level < 5 ? domain.levelCriteria[maturityLevel.level] : null,
+    nextCriteria: maturityLevel.level < 5 ? domain.levelCriteria[maturityLevel.level] : null,
     gapToNextLevel:
       maturityLevel.level < 5
-        ? clampScore(
-            TRACKMIND_MATURITY_LEVELS[maturityLevel.level].minScore - score,
-          )
+        ? clampScore(TRACKMIND_MATURITY_LEVELS[maturityLevel.level].minScore - score)
         : 0,
   });
 }
@@ -611,7 +630,11 @@ export function auditTrackMindMaturity(options = {} as any) {
   });
 }
 
-export function buildTrackMindMaturityAssessment({ answers = {} as any, signals = {} as any, organizationName = 'Current site' } = {}) {
+export function buildTrackMindMaturityAssessment({
+  answers = {} as any,
+  signals = {} as any,
+  organizationName = 'Current site',
+} = {}) {
   const assessment = scoreTrackMindMaturity({ answers, signals });
 
   return Object.freeze({

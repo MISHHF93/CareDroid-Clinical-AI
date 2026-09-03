@@ -63,7 +63,7 @@ describe('useEmergencyRolePermissions compiledProfile reconstruction', () => {
     ['triage_nurse', EMERGENCY_ACTIONS.triage],
     ['physician', EMERGENCY_ACTIONS.dischargePatient],
   ])(
-    'grants %s actions, not the default demo user\'s, when compiledAccessProfile/caredroidProfile are both missing',
+    "grants %s actions, not the default demo user's, when compiledAccessProfile/caredroidProfile are both missing",
     (roleProfileId, action) => {
       mockUser.profile = { roleProfileId };
 

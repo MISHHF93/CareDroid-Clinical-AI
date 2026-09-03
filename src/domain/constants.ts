@@ -2,8 +2,7 @@ import { CANONICAL_ROUTES } from '../config/routes.config';
 import { ED_APPLICATION } from '../config/edApplication.config';
 
 /** Clinical safety label — required on all Copilot / decision-support surfaces. */
-export const CLINICAL_SAFETY_DISCLAIMER =
-  'Decision support only — requires clinician review.';
+export const CLINICAL_SAFETY_DISCLAIMER = 'Decision support only — requires clinician review.';
 
 /**
  * Unified public route paths for the single CareDroid ED application.

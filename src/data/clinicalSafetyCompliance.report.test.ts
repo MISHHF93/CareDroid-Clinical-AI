@@ -12,7 +12,7 @@ describe('clinicalSafetyCompliance report', () => {
 
     if (report.riskLevel !== 'low' || report.summary.totalFailing > 0) {
       throw new Error(
-        `Clinical safety compliance failed (risk=${report.riskLevel}, failing=${report.summary.totalFailing})`
+        `Clinical safety compliance failed (risk=${report.riskLevel}, failing=${report.summary.totalFailing})`,
       );
     }
   });

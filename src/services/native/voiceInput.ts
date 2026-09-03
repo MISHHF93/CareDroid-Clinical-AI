@@ -35,9 +35,7 @@ type VoiceResultCallback = (result: VoiceResult) => void;
 
 function getSpeechRecognitionCtor(): WebSpeechRecognitionCtor | undefined {
   const w = window as unknown as Record<string, unknown>;
-  return (w.SpeechRecognition ?? w.webkitSpeechRecognition) as
-    | WebSpeechRecognitionCtor
-    | undefined;
+  return (w.SpeechRecognition ?? w.webkitSpeechRecognition) as WebSpeechRecognitionCtor | undefined;
 }
 
 function isAvailable(): boolean {

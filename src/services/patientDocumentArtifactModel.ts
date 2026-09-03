@@ -41,7 +41,10 @@ function nowIso(): string {
   return new Date().toISOString();
 }
 
-function labeled(text: string, labels: string[]): { value?: string; span?: { startChar: number; endChar: number } } {
+function labeled(
+  text: string,
+  labels: string[],
+): { value?: string; span?: { startChar: number; endChar: number } } {
   for (const label of labels) {
     const pattern = new RegExp(`\\b${label}\\s*[:\\-]\\s*([^\\n;]{2,160})`, 'i');
     const match = text.match(pattern);
@@ -89,8 +92,12 @@ function defaultVisibility(
   };
 }
 
-function fhirHintForType(type: PatientDocumentArtifactType): PatientDocumentArtifact['fhirResourceHint'] {
-  const map: Partial<Record<PatientDocumentArtifactType, PatientDocumentArtifact['fhirResourceHint']>> = {
+function fhirHintForType(
+  type: PatientDocumentArtifactType,
+): PatientDocumentArtifact['fhirResourceHint'] {
+  const map: Partial<
+    Record<PatientDocumentArtifactType, PatientDocumentArtifact['fhirResourceHint']>
+  > = {
     ALLERGY: 'AllergyIntolerance',
     MEDICATION: 'MedicationStatement',
     CONDITION: 'Condition',
@@ -111,7 +118,14 @@ function fhirHintForType(type: PatientDocumentArtifactType): PatientDocumentArti
 
 type BuildArtifactInput = Omit<
   PatientDocumentArtifact,
-  'id' | 'createdAt' | 'updatedAt' | 'patientCardId' | 'confidence' | 'provenance' | 'safety' | 'visibility'
+  | 'id'
+  | 'createdAt'
+  | 'updatedAt'
+  | 'patientCardId'
+  | 'confidence'
+  | 'provenance'
+  | 'safety'
+  | 'visibility'
 > & {
   patientCardId?: string;
   confidence?: number;
@@ -128,7 +142,13 @@ type BuildArtifactInput = Omit<
 
 function buildArtifact(base: BuildArtifactInput): PatientDocumentArtifact {
   const timestamp = nowIso();
-  const { provenance: provenanceInput, requiresHumanReview, extractedBy, modelVersion, ...rest } = base;
+  const {
+    provenance: provenanceInput,
+    requiresHumanReview,
+    extractedBy,
+    modelVersion,
+    ...rest
+  } = base;
   return {
     ...rest,
     id: createId('artifact'),
@@ -172,7 +192,8 @@ function extractClinicalFactsFromText(
   const medication = parseMedicationArtifactText(rawText);
   const discharge = parser === 'discharge' ? parseDischargeArtifactText(rawText) : {};
 
-  const chiefComplaint = referral.chiefComplaint || labeled(rawText, ['chief complaint', 'presenting complaint']).value;
+  const chiefComplaint =
+    referral.chiefComplaint || labeled(rawText, ['chief complaint', 'presenting complaint']).value;
   if (chiefComplaint) {
     const span = labeled(rawText, ['chief complaint', 'presenting complaint']).span;
     artifacts.push(
@@ -352,14 +373,20 @@ function extractClinicalFactsFromText(
         artifactType: 'LAB_RESULT',
         clinicalStatus: 'suggested',
         reviewStatus: 'pending_human_review',
-        label: pending ? 'Troponin mentioned, result pending' : `Troponin: ${troponin.value || 'mentioned'}`,
+        label: pending
+          ? 'Troponin mentioned, result pending'
+          : `Troponin: ${troponin.value || 'mentioned'}`,
         normalizedCode: {
           system: 'LOINC',
           display: 'Troponin',
           status: 'unbound',
           unboundReason: 'LOINC binding requires registration; no lookup performed.',
         },
-        value: { analyte: 'troponin', result: troponin.value, status: pending ? 'pending' : 'mentioned' },
+        value: {
+          analyte: 'troponin',
+          result: troponin.value,
+          status: pending ? 'pending' : 'mentioned',
+        },
         sourceText: troponin.value || 'troponin',
         sourceSpan: troponin.span,
         confidence: input.confidence ?? 0.78,
@@ -468,7 +495,9 @@ export function extractDocumentArtifacts(input: ExtractDocumentArtifactsInput): 
     }),
   );
 
-  artifacts.push(...extractClinicalFactsFromText({ ...input, sourceDocumentId: source.id }, rawText));
+  artifacts.push(
+    ...extractClinicalFactsFromText({ ...input, sourceDocumentId: source.id }, rawText),
+  );
   artifacts.push(...deriveCopilotArtifactsFromText(input.patientId, rawText, source.id, input));
 
   return { source, artifacts };
@@ -686,14 +715,19 @@ export function extractArtifactsFromPatient(patient: Patient): PatientDocumentAr
     );
   }
 
-  if (hasPatientFlag(patient, PatientFlag.SepsisAlert) || hasPatientFlag(patient, PatientFlag.DeteriorationRisk)) {
+  if (
+    hasPatientFlag(patient, PatientFlag.SepsisAlert) ||
+    hasPatientFlag(patient, PatientFlag.DeteriorationRisk)
+  ) {
     artifacts.push(
       buildArtifact({
         patientId: patient.id,
         artifactType: 'DETERIORATION_SIGNAL',
         clinicalStatus: 'suggested',
         reviewStatus: 'pending_human_review',
-        label: hasPatientFlag(patient, PatientFlag.SepsisAlert) ? 'Sepsis signal' : 'Deterioration signal',
+        label: hasPatientFlag(patient, PatientFlag.SepsisAlert)
+          ? 'Sepsis signal'
+          : 'Deterioration signal',
         value: {
           sepsis: hasPatientFlag(patient, PatientFlag.SepsisAlert),
           deterioration: hasPatientFlag(patient, PatientFlag.DeteriorationRisk),
@@ -739,7 +773,10 @@ export function extractArtifactsFromPatient(patient: Patient): PatientDocumentAr
     );
   }
 
-  if (patient.state === PatientState.Admission || hasPatientFlag(patient, PatientFlag.PendingAdmission)) {
+  if (
+    patient.state === PatientState.Admission ||
+    hasPatientFlag(patient, PatientFlag.PendingAdmission)
+  ) {
     artifacts.push(
       buildArtifact({
         patientId: patient.id,
@@ -789,19 +826,26 @@ export function mergePatientDocumentArtifacts(
 export function countPendingReviewArtifacts(artifacts: PatientDocumentArtifact[] = []): number {
   return artifacts.filter(
     (artifact) =>
-      artifact.reviewStatus === 'pending_human_review' || artifact.reviewStatus === 'needs_clarification',
+      artifact.reviewStatus === 'pending_human_review' ||
+      artifact.reviewStatus === 'needs_clarification',
   ).length;
 }
 
-export function artifactsForPatientCard(artifacts: PatientDocumentArtifact[] = []): PatientDocumentArtifact[] {
+export function artifactsForPatientCard(
+  artifacts: PatientDocumentArtifact[] = [],
+): PatientDocumentArtifact[] {
   return artifacts.filter((artifact) => artifact.visibility.showOnPatientCard);
 }
 
-export function artifactsForCopilot(artifacts: PatientDocumentArtifact[] = []): PatientDocumentArtifact[] {
+export function artifactsForCopilot(
+  artifacts: PatientDocumentArtifact[] = [],
+): PatientDocumentArtifact[] {
   return artifacts.filter((artifact) => artifact.visibility.showInCopilot);
 }
 
-export function artifactsForWhiteboard(artifacts: PatientDocumentArtifact[] = []): PatientDocumentArtifact[] {
+export function artifactsForWhiteboard(
+  artifacts: PatientDocumentArtifact[] = [],
+): PatientDocumentArtifact[] {
   return artifacts.filter((artifact) => artifact.visibility.showOnWhiteboard);
 }
 
@@ -875,17 +919,28 @@ export function applyArtifactReview(
     value: input.reviewNote ? { ...artifact.value, reviewNote: input.reviewNote } : artifact.value,
     safety: {
       ...artifact.safety,
-      requiresHumanReview: input.reviewStatus === 'pending_human_review' || input.reviewStatus === 'needs_clarification',
+      requiresHumanReview:
+        input.reviewStatus === 'pending_human_review' ||
+        input.reviewStatus === 'needs_clarification',
     },
   };
 }
 
-export function summarizeArtifactsForCopilot(artifacts: PatientDocumentArtifact[]): Record<string, unknown> {
+export function summarizeArtifactsForCopilot(
+  artifacts: PatientDocumentArtifact[],
+): Record<string, unknown> {
   const cardArtifacts = artifactsForCopilot(artifacts);
   return {
     clinicalFacts: cardArtifacts
       .filter((a) =>
-        ['ALLERGY', 'MEDICATION', 'CONDITION', 'LAB_RESULT', 'CHIEF_COMPLAINT', 'EMS_HANDOFF'].includes(a.artifactType),
+        [
+          'ALLERGY',
+          'MEDICATION',
+          'CONDITION',
+          'LAB_RESULT',
+          'CHIEF_COMPLAINT',
+          'EMS_HANDOFF',
+        ].includes(a.artifactType),
       )
       .map((a) => ({
         type: a.artifactType,
@@ -907,7 +962,8 @@ export function summarizeArtifactsForCopilot(artifacts: PatientDocumentArtifact[
     governance: {
       totalArtifacts: cardArtifacts.length,
       aiDerivedCount: cardArtifacts.filter((a) => a.safety.isAiDerived).length,
-      disclaimer: 'Document artifacts are auditable extracts — staff confirmation required for clinical facts.',
+      disclaimer:
+        'Document artifacts are auditable extracts — staff confirmation required for clinical facts.',
     },
   };
 }

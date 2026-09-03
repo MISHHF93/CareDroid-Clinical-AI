@@ -27,7 +27,9 @@ const patient: Patient = {
   timeline: [],
 };
 
-function mockSnapshot(overrides: Partial<{ sourceState: 'live' | 'demo' | 'simulated' | 'shadow' }> = {}) {
+function mockSnapshot(
+  overrides: Partial<{ sourceState: 'live' | 'demo' | 'simulated' | 'shadow' }> = {},
+) {
   vi.mocked(buildNativeAiPatientSnapshot).mockReturnValue({
     specialistInferences: [
       {

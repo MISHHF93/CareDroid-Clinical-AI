@@ -63,7 +63,9 @@ export function resolveCommandCenterIntelligenceView(
   return null;
 }
 
-export function resolveCommandCenterViewFromPath(pathname: string): CommandCenterIntelligenceView | null {
+export function resolveCommandCenterViewFromPath(
+  pathname: string,
+): CommandCenterIntelligenceView | null {
   const normalized = pathname.split('?')[0].replace(/\/+$/, '') || '/';
   return VIEW_BY_LEGACY_PATH[normalized] ?? null;
 }

@@ -18,10 +18,12 @@ describe('saasComplianceAudit report', () => {
     expect(rows.length).toBeGreaterThan(50);
     expect(rows.filter((r) => r.packAssignment === '—')).toEqual([]);
     expect(rows.filter((r) => r.governance !== 'Complete (seed template)')).toEqual([]);
-    expect(rows.some((r) => r.layer === 'ai-agent' && r.packAssignment.includes('ai-workflow-pack'))).toBe(
-      true
-    );
-    expect(rows.some((r) => r.assetId === 'qsofa' && r.packAssignment.includes('emergency-medicine'))).toBe(true);
+    expect(
+      rows.some((r) => r.layer === 'ai-agent' && r.packAssignment.includes('ai-workflow-pack')),
+    ).toBe(true);
+    expect(
+      rows.some((r) => r.assetId === 'qsofa' && r.packAssignment.includes('emergency-medicine')),
+    ).toBe(true);
   });
 
   it('writes docs/operations/saas-compliance-audit.md when SAAS_COMPLIANCE_WRITE_DOCS=1', () => {
@@ -31,7 +33,7 @@ describe('saasComplianceAudit report', () => {
     mkdirSync(docsDir, { recursive: true });
     writeFileSync(
       join(docsDir, 'saas-compliance-audit.md'),
-      `${formatSaasComplianceMarkdown(doc)}\n`
+      `${formatSaasComplianceMarkdown(doc)}\n`,
     );
     expect(existsSync(join(docsDir, 'saas-compliance-audit.md'))).toBe(true);
   });

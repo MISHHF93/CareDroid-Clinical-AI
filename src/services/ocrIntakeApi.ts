@@ -52,7 +52,13 @@ export type OcrJob = {
   createdBy: string;
   createdAt: string;
   updatedAt: string;
-  auditLog: Array<{ id: string; action: string; actor: string; timestamp: string; details: Record<string, unknown> }>;
+  auditLog: Array<{
+    id: string;
+    action: string;
+    actor: string;
+    timestamp: string;
+    details: Record<string, unknown>;
+  }>;
 };
 
 export type CreateOcrJobInput = {
@@ -111,7 +117,9 @@ export const OcrIntakeApi = Object.freeze({
   getJob(jobId: string): Promise<OcrJob> {
     return getJson(`/api/emergency/intake/ocr-jobs/${jobId}`);
   },
-  listJobs(filter: { patientId?: string; intakeSessionId?: string } = {}): Promise<{ jobs: OcrJob[] }> {
+  listJobs(
+    filter: { patientId?: string; intakeSessionId?: string } = {},
+  ): Promise<{ jobs: OcrJob[] }> {
     const params = new URLSearchParams();
     if (filter.patientId) params.set('patientId', filter.patientId);
     if (filter.intakeSessionId) params.set('intakeSessionId', filter.intakeSessionId);
@@ -125,11 +133,14 @@ export const OcrIntakeApi = Object.freeze({
     editedValue: string | undefined,
     actor: string,
   ): Promise<OcrJob> {
-    return postJson(`/api/emergency/intake/ocr-jobs/${jobId}/fields/${encodeURIComponent(field)}/review`, {
-      decision,
-      editedValue,
-      actor,
-    });
+    return postJson(
+      `/api/emergency/intake/ocr-jobs/${jobId}/fields/${encodeURIComponent(field)}/review`,
+      {
+        decision,
+        editedValue,
+        actor,
+      },
+    );
   },
   /**
    * Apply OCR to intake only after client-side validation gate.
@@ -150,7 +161,12 @@ export const OcrIntakeApi = Object.freeze({
         extractedFields: job.extractedFields.map((field) => {
           if (field.status !== 'pending') return field;
           if (field.confidence < 0.9 || !String(field.value || '').trim()) return field;
-          return { ...field, status: 'accepted' as const, reviewedBy: actor, reviewedAt: new Date().toISOString() };
+          return {
+            ...field,
+            status: 'accepted' as const,
+            reviewedBy: actor,
+            reviewedAt: new Date().toISOString(),
+          };
         }),
       };
     }

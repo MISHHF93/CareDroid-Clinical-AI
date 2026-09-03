@@ -59,9 +59,7 @@ export default function useModalDialog(
       ? container.querySelector<HTMLElement>(initialFocusSelector)
       : null;
     const initialTarget =
-      initialFocus === 'container'
-        ? container
-        : explicitTarget || getFocusable()[0] || container;
+      initialFocus === 'container' ? container : explicitTarget || getFocusable()[0] || container;
     if (initialTarget === container && !container.hasAttribute('tabindex')) {
       // A bare <div> cannot take focus, which would leave the caret in the page
       // behind and defeat the trap before it starts.

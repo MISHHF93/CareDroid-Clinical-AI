@@ -1,8 +1,5 @@
 import React, { useState } from 'react';
-import {
-  showActionError,
-  showActionFeedback,
-} from '../../services/careDroidInteractionFeedback';
+import { showActionError, showActionFeedback } from '../../services/careDroidInteractionFeedback';
 import {
   RECEPTION_ESCALATION_REASONS,
   resolveReceptionEscalationReason,
@@ -88,7 +85,9 @@ export default function ReceptionEscalationQuickActions({
       aria-label="Quick reception escalation flags"
     >
       <header className="reception-escalation-quick-actions__header">
-        <p className="reception-escalation-quick-actions__eyebrow">{RECEPTION_COPY.escalation.eyebrow}</p>
+        <p className="reception-escalation-quick-actions__eyebrow">
+          {RECEPTION_COPY.escalation.eyebrow}
+        </p>
         <h3>Quick flag — stay at desk</h3>
         <p>One-tap signals to triage or charge nurse without leaving reception.</p>
       </header>
@@ -110,7 +109,9 @@ export default function ReceptionEscalationQuickActions({
             title={reason.description}
           >
             <strong>{reason.shortLabel}</strong>
-            <small>{reason.notifyTargets.map((t) => (t === 'triage' ? 'Triage' : 'Charge')).join(' · ')}</small>
+            <small>
+              {reason.notifyTargets.map((t) => (t === 'triage' ? 'Triage' : 'Charge')).join(' · ')}
+            </small>
           </button>
         ))}
       </div>

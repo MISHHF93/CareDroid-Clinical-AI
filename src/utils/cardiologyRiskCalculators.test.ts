@@ -18,7 +18,7 @@ describe('cardiologyRiskCalculators', () => {
         age75OrOlder: false,
         diabetes: true,
         strokeTia: true,
-      })
+      }),
     ).toBe(5);
   });
 
@@ -72,7 +72,7 @@ describe('cardiologyRiskCalculators', () => {
         structuralHeartDisease: true,
         currentOrPriorSymptoms: true,
         refractorySymptoms: true,
-      }).stage
+      }).stage,
     ).toBe('D');
   });
 });

@@ -71,11 +71,21 @@ describe('NIHSS calculator', () => {
     render(<NIHSS patientId={patient.id} onClose={onClose} />);
 
     await user.type(screen.getByLabelText(/last known well time/i), '2026-06-13T08:30');
-    await user.click(within(screen.getByRole('group', { name: '1a. Level of Consciousness' })).getByLabelText('3 - Unresponsive, reflex only'));
-    await user.click(within(screen.getByRole('group', { name: '5a. Motor Arm — Left' })).getByLabelText('4 - No movement'));
+    await user.click(
+      within(screen.getByRole('group', { name: '1a. Level of Consciousness' })).getByLabelText(
+        '3 - Unresponsive, reflex only',
+      ),
+    );
+    await user.click(
+      within(screen.getByRole('group', { name: '5a. Motor Arm — Left' })).getByLabelText(
+        '4 - No movement',
+      ),
+    );
     await user.click(screen.getByRole('button', { name: /save to patient/i }));
 
-    const savedPatient = useEmergencyStore.getState().patients.find((candidate) => candidate.id === patient.id);
+    const savedPatient = useEmergencyStore
+      .getState()
+      .patients.find((candidate) => candidate.id === patient.id);
     expect(savedPatient?.notes).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -90,9 +100,7 @@ describe('NIHSS calculator', () => {
         }),
       ]),
     );
-    expect(
-      savedPatient?.timeline.some((event) => event.type === 'ClinicalScoreSaved'),
-    ).toBe(true);
+    expect(savedPatient?.timeline.some((event) => event.type === 'ClinicalScoreSaved')).toBe(true);
     expect(useEmergencyStore.getState().alerts).toEqual(
       expect.arrayContaining([
         expect.objectContaining({

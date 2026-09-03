@@ -15,10 +15,18 @@ describe('operationalHandoffArtifactRegistry', () => {
     ]);
     // listOperationalHandoffArtifacts's untyped `= null` default infers a `null | undefined`-only
     // param type; cast is required to exercise the per-domain filter argument.
-    expect(listOperationalHandoffArtifacts('patient' as unknown as undefined).length).toBeGreaterThan(0);
-    expect(listOperationalHandoffArtifacts('ems' as unknown as undefined).length).toBeGreaterThan(0);
-    expect(listOperationalHandoffArtifacts('referral' as unknown as undefined).length).toBeGreaterThan(0);
-    expect(listOperationalHandoffArtifacts('admission' as unknown as undefined).length).toBeGreaterThan(0);
+    expect(
+      listOperationalHandoffArtifacts('patient' as unknown as undefined).length,
+    ).toBeGreaterThan(0);
+    expect(listOperationalHandoffArtifacts('ems' as unknown as undefined).length).toBeGreaterThan(
+      0,
+    );
+    expect(
+      listOperationalHandoffArtifacts('referral' as unknown as undefined).length,
+    ).toBeGreaterThan(0);
+    expect(
+      listOperationalHandoffArtifacts('admission' as unknown as undefined).length,
+    ).toBeGreaterThan(0);
   });
 
   it('summarizes discovery for operational handoff planning', () => {

@@ -76,7 +76,14 @@ export function buildAuthoritativeDemographicsFromOcr(
       patch.nationalId = value;
       continue;
     }
-    if (key === 'firstName' || key === 'lastName' || key === 'dateOfBirth' || key === 'nationalId' || key === 'phone' || key === 'address') {
+    if (
+      key === 'firstName' ||
+      key === 'lastName' ||
+      key === 'dateOfBirth' ||
+      key === 'nationalId' ||
+      key === 'phone' ||
+      key === 'address'
+    ) {
       patch[key] = value;
     }
   }

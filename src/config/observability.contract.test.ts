@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { EMERGENCY_PLATFORM_CONTRACT } from './emergencyPlatform.config';
-import {
-  CRITICAL_WORKFLOW_TRACE_IDS,
-  OBSERVABILITY_CONTRACT,
-} from './observabilityModel';
+import { CRITICAL_WORKFLOW_TRACE_IDS, OBSERVABILITY_CONTRACT } from './observabilityModel';
 import { UNIFIED_SERVICE_HEALTH_ENDPOINTS } from './unifiedServiceRegistry.config';
 import { startWorkflowTrace } from '../services/observabilityTrace';
 import observabilityService from '../services/observabilityService';
@@ -31,7 +28,9 @@ describe('observability contract', () => {
     expect(trace.traceId).toBe(observabilityService.getCorrelationId());
     trace.end('success', { toState: 'Triage' });
     const snapshot = observabilityService.buildDiagnosticsSnapshot();
-    expect(snapshot.recentWorkflowSpans[0]?.workflowType).toBe('patient-workflow-transition.success');
+    expect(snapshot.recentWorkflowSpans[0]?.workflowType).toBe(
+      'patient-workflow-transition.success',
+    );
     expect(OBSERVABILITY_CONTRACT.criticalWorkflows).toContain('patient-intake-handoff');
     expect(OBSERVABILITY_CONTRACT.criticalWorkflows).toContain('knowledge-graph-refresh');
     expect(OBSERVABILITY_CONTRACT.criticalWorkflows).toContain('living-documentation-refresh');

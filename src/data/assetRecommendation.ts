@@ -1,8 +1,19 @@
 import { getPlatformEntitlementContext } from './assetEntitlements';
-import { ASSET_ACCESS_STATES, filterVisibleTools, getAssetAwareToolProjection } from './assetAccess';
+import {
+  ASSET_ACCESS_STATES,
+  filterVisibleTools,
+  getAssetAwareToolProjection,
+} from './assetAccess';
 
 const ROLE_SUGGESTIONS = Object.freeze({
-  'emergency physician': ['qsofa', 'news2', 'heart-score', 'nihss', 'sofa-score', 'simulation-suite'],
+  'emergency physician': [
+    'qsofa',
+    'news2',
+    'heart-score',
+    'nihss',
+    'sofa-score',
+    'simulation-suite',
+  ],
   nurse: ['news2', 'mews', 'protocols'],
   pharmacist: ['drug-check', 'lab-interp', 'laboratory'],
   'fleet operator': ['fleet-dashboard', 'fleet-live-map', 'dispatch-ai'],
@@ -18,7 +29,8 @@ export function getRoleBasedAssetRecommendations({ account, roleProfile, limit =
   const tools = filterVisibleTools(getAssetAwareToolProjection(context, userRole));
   const byId = new Map(tools.map((t) => [t.id, t]));
 
-  const roleKey = roleProfile?.id || account?.profession || account?.specialty || 'emergency physician';
+  const roleKey =
+    roleProfile?.id || account?.profession || account?.specialty || 'emergency physician';
   const ids = [
     ...(roleProfile?.preferredAssetIds || []),
     ...(ROLE_SUGGESTIONS[roleKey] || ROLE_SUGGESTIONS['emergency physician']),
@@ -46,10 +58,12 @@ export function buildAssistantAssetContext({ account, roleProfile, platformConte
     roleProfileId: roleProfile?.id,
     entitledPackIds: platformContext?.entitledPackIds || [],
     defaultAiAgentId: platformContext?.defaultAiAgentId || 'agent-clinical',
-    recommendations: getRoleBasedAssetRecommendations({ account, roleProfile, limit: 8 }).map((t) => ({
-      id: t.id,
-      name: t.name,
-      accessState: t.accessState,
-    })),
+    recommendations: getRoleBasedAssetRecommendations({ account, roleProfile, limit: 8 }).map(
+      (t) => ({
+        id: t.id,
+        name: t.name,
+        accessState: t.accessState,
+      }),
+    ),
   };
 }

@@ -57,7 +57,7 @@ describe('toolRenderExecuteMatrix', () => {
 
   it('local calculators do not require POST executor flag', () => {
     const local = buildRenderExecuteMatrix().filter(
-      (r) => r.executionMode === EXECUTION_MODES.LOCAL_CALCULATOR
+      (r) => r.executionMode === EXECUTION_MODES.LOCAL_CALCULATOR,
     );
     expect(local.length).toBeGreaterThan(10);
     for (const row of local) {

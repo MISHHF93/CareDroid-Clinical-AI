@@ -10,7 +10,15 @@ type CheckboxProps = {
   className?: string;
 } & Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'>;
 
-export function Checkbox({ label, description, error, indeterminate, className, id: externalId, ...props }: CheckboxProps) {
+export function Checkbox({
+  label,
+  description,
+  error,
+  indeterminate,
+  className,
+  id: externalId,
+  ...props
+}: CheckboxProps) {
   const generatedId = useId();
   const id = externalId ?? generatedId;
   const ref = useRef<HTMLInputElement>(null);
@@ -27,7 +35,7 @@ export function Checkbox({ label, description, error, indeterminate, className, 
           type="checkbox"
           id={id}
           className="cd-checkbox-control"
-           invalid={error ? true : undefined}
+          invalid={error ? true : undefined}
           {...props}
         />
         {(label || description) && (
@@ -37,7 +45,11 @@ export function Checkbox({ label, description, error, indeterminate, className, 
           </span>
         )}
       </label>
-      {error && <p className="cd-input-error" role="alert">{error}</p>}
+      {error && (
+        <p className="cd-input-error" role="alert">
+          {error}
+        </p>
+      )}
     </div>
   );
 }

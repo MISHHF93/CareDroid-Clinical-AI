@@ -89,7 +89,12 @@ function shallowEqualChrome(
 ): boolean {
   if (a === b) return true;
   if (!a || !b) return false;
-  return a.eyebrow === b.eyebrow && a.title === b.title && a.subtitle === b.subtitle && a.actions === b.actions;
+  return (
+    a.eyebrow === b.eyebrow &&
+    a.title === b.title &&
+    a.subtitle === b.subtitle &&
+    a.actions === b.actions
+  );
 }
 
 export function useRouteChromeRegistration(chrome: RouteChromeState | null | undefined): boolean {

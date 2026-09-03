@@ -22,8 +22,14 @@ export default function PageHeader({
       <div className="cd-page-header__content">
         {eyebrow ? <p className="cd-page-header__eyebrow">{eyebrow}</p> : null}
         <div className="cd-page-header__title-row">
-          {leadingIcon ? <span className="cd-page-header__icon" aria-hidden>{leadingIcon}</span> : null}
-          <h1 id={titleId} className="cd-page-header__title">{title}</h1>
+          {leadingIcon ? (
+            <span className="cd-page-header__icon" aria-hidden>
+              {leadingIcon}
+            </span>
+          ) : null}
+          <h1 id={titleId} className="cd-page-header__title">
+            {title}
+          </h1>
         </div>
         {description ? <p className="cd-page-header__description">{description}</p> : null}
         {children}

@@ -49,13 +49,13 @@ function renderCatalog() {
       <PractitionerVisibilityProvider>
         <ClinicalToolCatalog />
       </PractitionerVisibilityProvider>
-    </MemoryRouter>
+    </MemoryRouter>,
   );
 }
 
 function clickQuickFilter(container, label) {
   const button = [...container.querySelectorAll('.catalog-category-chip')].find(
-    (chip) => chip.textContent.trim() === label
+    (chip) => chip.textContent.trim() === label,
   );
   expect(button, label).toBeTruthy();
   fireEvent.click(button);
@@ -110,7 +110,7 @@ describe('ClinicalToolCatalog launch and search', () => {
   ])('quick filter %s keeps matching medical rows visible', (filterValue, filterLabel) => {
     const { container } = renderCatalog();
     const expected = getMedicalToolsCatalogRows().find((row) =>
-      matchesMedicalCatalogCategoryFilter(row, filterValue)
+      matchesMedicalCatalogCategoryFilter(row, filterValue),
     );
     expect(expected, filterValue).toBeTruthy();
 

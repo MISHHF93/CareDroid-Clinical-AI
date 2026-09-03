@@ -1,9 +1,4 @@
-import {
-  PatientFlag,
-  PatientState,
-  type EMSArrival,
-  type Patient,
-} from '../types/emergency';
+import { PatientFlag, PatientState, type EMSArrival, type Patient } from '../types/emergency';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { buildPatientArrivalRecord, syncPatientFromArrival } from './patientArrivalModel';
 import { buildPreArrivalNotificationFromArrival } from './preArrivalNotification';
@@ -20,12 +15,15 @@ function createId(prefix: string): string {
 export function isPreArrivalPlaceholder(patient: Patient): boolean {
   return Boolean(
     patient.emsArrival?.status === 'Inbound' &&
-      patient.registrationStatus !== 'complete' &&
-      (patient.source === 'EMS' || patient.flags.includes(PatientFlag.EMSArrival)),
+    patient.registrationStatus !== 'complete' &&
+    (patient.source === 'EMS' || patient.flags.includes(PatientFlag.EMSArrival)),
   );
 }
 
-export function buildPreArrivalPlaceholderPatient(arrival: EMSArrival, timestamp = nowIso()): Patient {
+export function buildPreArrivalPlaceholderPatient(
+  arrival: EMSArrival,
+  timestamp = nowIso(),
+): Patient {
   const enrichedArrival = syncResourceActivationsForArrival({
     ...arrival,
     preArrivalNotification:

@@ -6,13 +6,21 @@ const EMERGENCY_GOVERNANCE_API_ROOT = '/api/emergency/governance';
 
 async function guardedJson(path, options: any = {}) {
   if (!isBackendCapabilityEnabled('emergencyGovernance')) {
-    return { ok: false, data: null, message: 'Backend AI governance endpoint is not available yet.' };
+    return {
+      ok: false,
+      data: null,
+      message: 'Backend AI governance endpoint is not available yet.',
+    };
   }
 
   try {
     const { response, data } = await apiFetchJson(path, options);
     if (!response.ok) {
-      return { ok: false, data: null, message: data?.error || data?.message || getApiErrorMessage(null, response) };
+      return {
+        ok: false,
+        data: null,
+        message: data?.error || data?.message || getApiErrorMessage(null, response),
+      };
     }
     return { ok: true, data, message: data?.message || '' };
   } catch (error: any) {

@@ -100,7 +100,10 @@ export function OperationalDiagnosticsPanel({
     }
     setTraceTimeline(result.data);
   };
-  const eventCountTotal = Object.values(client.eventCounts).reduce((sum, count) => sum + (count || 0), 0);
+  const eventCountTotal = Object.values(client.eventCounts).reduce(
+    (sum, count) => sum + (count || 0),
+    0,
+  );
   const serverTotals = (server?.totals || {}) as Record<string, number>;
   const serverPerformance = (server?.performance || null) as Record<string, unknown> | null;
   const regressionSignals = Array.isArray(serverPerformance?.regressionSignals)
@@ -139,31 +142,42 @@ export function OperationalDiagnosticsPanel({
     },
   ];
 
-  const workflowRows = client.recentWorkflowSpans.slice(0, 8).map((span) => [
-    span.workflowType,
-    span.summary,
-    span.patientId || '—',
-    formatTimestamp(span.timestamp),
-  ]);
+  const workflowRows = client.recentWorkflowSpans
+    .slice(0, 8)
+    .map((span) => [
+      span.workflowType,
+      span.summary,
+      span.patientId || '—',
+      formatTimestamp(span.timestamp),
+    ]);
 
-  const slowApiRows = client.slowApiCalls.slice(0, 8).map((sample) => [
-    `${sample.method} ${sample.path}`,
-    `${sample.durationMs}ms`,
-    String(sample.status),
-    formatTimestamp(sample.timestamp),
-  ]);
+  const slowApiRows = client.slowApiCalls
+    .slice(0, 8)
+    .map((sample) => [
+      `${sample.method} ${sample.path}`,
+      `${sample.durationMs}ms`,
+      String(sample.status),
+      formatTimestamp(sample.timestamp),
+    ]);
 
-  const errorRows = client.recentErrors.slice(0, 8).map((event) => [
-    event.name,
-    event.message || '—',
-    event.source || '—',
-    formatTimestamp(event.timestamp),
-  ]);
+  const errorRows = client.recentErrors
+    .slice(0, 8)
+    .map((event) => [
+      event.name,
+      event.message || '—',
+      event.source || '—',
+      formatTimestamp(event.timestamp),
+    ]);
 
   const performanceRows = Object.entries(client.performanceMarks)
     .sort(([, a], [, b]) => b.p95Ms - a.p95Ms)
     .slice(0, 8)
-    .map(([name, mark]) => [name, String(mark.count), `${mark.p95Ms}ms p95`, `${mark.avgMs}ms avg`]);
+    .map(([name, mark]) => [
+      name,
+      String(mark.count),
+      `${mark.p95Ms}ms p95`,
+      `${mark.avgMs}ms avg`,
+    ]);
 
   const serverWorkflow = Array.isArray(server?.recentWorkflow)
     ? (server.recentWorkflow as Array<Record<string, unknown>>).slice(0, 6)
@@ -175,19 +189,23 @@ export function OperationalDiagnosticsPanel({
     formatTimestamp(String(event.timestamp || '')),
   ]);
 
-  const serviceHealthRows = serviceHealth.slice(0, 8).map((service) => [
-    service.serviceName,
-    service.status,
-    service.latencyMs != null ? `${service.latencyMs}ms` : '—',
-    service.errorRate != null ? `${Math.round(service.errorRate * 100)}%` : '—',
-  ]);
+  const serviceHealthRows = serviceHealth
+    .slice(0, 8)
+    .map((service) => [
+      service.serviceName,
+      service.status,
+      service.latencyMs != null ? `${service.latencyMs}ms` : '—',
+      service.errorRate != null ? `${Math.round(service.errorRate * 100)}%` : '—',
+    ]);
 
-  const regressionRows = regressionSignals.slice(0, 6).map((signal: Record<string, unknown>) => [
-    String(signal.endpoint || '—'),
-    String(signal.p95Ms != null ? `${signal.p95Ms}ms` : '—'),
-    String(signal.sampleCount ?? '—'),
-    String(signal.signal || 'sustained_slow_endpoint'),
-  ]);
+  const regressionRows = regressionSignals
+    .slice(0, 6)
+    .map((signal: Record<string, unknown>) => [
+      String(signal.endpoint || '—'),
+      String(signal.p95Ms != null ? `${signal.p95Ms}ms` : '—'),
+      String(signal.sampleCount ?? '—'),
+      String(signal.signal || 'sustained_slow_endpoint'),
+    ]);
 
   return (
     <section className="operational-diagnostics-panel" aria-label={title}>
@@ -242,7 +260,9 @@ export function OperationalDiagnosticsPanel({
             Load trace
           </Button>
         </div>
-        {traceMessage ? <p className="operational-diagnostics-panel__empty">{traceMessage}</p> : null}
+        {traceMessage ? (
+          <p className="operational-diagnostics-panel__empty">{traceMessage}</p>
+        ) : null}
         {traceTimeline ? (
           <pre className="operational-diagnostics-panel__trace-output">
             {JSON.stringify(traceTimeline, null, 2)}

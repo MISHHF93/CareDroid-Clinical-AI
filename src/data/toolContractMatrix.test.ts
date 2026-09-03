@@ -13,30 +13,32 @@ import {
   mapRowToToolContractMatrix,
 } from './toolContractMatrix';
 import { buildBackendFrontendContractRows } from './backendFrontendToolContract';
-import { NLU_PROFILE_TOOL_IDS, ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS } from './clinicalToolIdContract';
+import {
+  NLU_PROFILE_TOOL_IDS,
+  ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS,
+} from './clinicalToolIdContract';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 describe('toolContractMatrix', () => {
-  it(
-    'maps every backendFrontendContract row to matrix columns',
-    () => {
-      const contract = buildBackendFrontendContractRows();
-      const matrix = buildToolContractMatrixRows();
-      expect(matrix).toHaveLength(contract.length);
-      for (let i = 0; i < contract.length; i++) {
-        const m = mapRowToToolContractMatrix(contract[i]);
-        expect(m.id).toBe(contract[i].canonicalId);
-        expect(m.status).toBe(contract[i].status);
-      }
-    },
-    30_000,
-  );
+  it('maps every backendFrontendContract row to matrix columns', () => {
+    const contract = buildBackendFrontendContractRows();
+    const matrix = buildToolContractMatrixRows();
+    expect(matrix).toHaveLength(contract.length);
+    for (let i = 0; i < contract.length; i++) {
+      const m = mapRowToToolContractMatrix(contract[i]);
+      expect(m.id).toBe(contract[i].canonicalId);
+      expect(m.status).toBe(contract[i].status);
+    }
+  }, 30_000);
 
   it('includes every NLU profile id', () => {
     const matrix = buildToolContractMatrixRows();
     for (const id of NLU_PROFILE_TOOL_IDS) {
-      expect(matrix.some((r) => r.id === id), `missing ${id}`).toBe(true);
+      expect(
+        matrix.some((r) => r.id === id),
+        `missing ${id}`,
+      ).toBe(true);
     }
   });
 
@@ -46,10 +48,10 @@ describe('toolContractMatrix', () => {
       (r) =>
         r.kind === 'nlu' &&
         ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS.includes(r.id) &&
-        r.executor !== 'no'
+        r.executor !== 'no',
     );
     expect(withExecutor.map((r) => r.id).sort()).toEqual(
-      [...ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS].sort()
+      [...ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS].sort(),
     );
     expect(withExecutor.every((r) => r.status === 'fully wired')).toBe(true);
   });

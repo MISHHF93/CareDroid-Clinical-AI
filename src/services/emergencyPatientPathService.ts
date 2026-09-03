@@ -21,7 +21,8 @@ export const PATIENT_PATH_MILESTONES = Object.freeze([
     label: 'Patient Known',
     metricId: 'doorToKnownMinutes',
     targetMinutes: 3,
-    description: 'Patient has a visible ED OS identifier, complaint, arrival mode, and current state.',
+    description:
+      'Patient has a visible ED OS identifier, complaint, arrival mode, and current state.',
   }),
   Object.freeze({
     id: 'risk-known',
@@ -49,7 +50,8 @@ export const PATIENT_PATH_MILESTONES = Object.freeze([
     label: 'Destination Known',
     metricId: 'doorToDestinationMinutes',
     targetMinutes: 20,
-    description: 'The likely destination path is tracked: ED care, referral, admission, discharge, or follow-up.',
+    description:
+      'The likely destination path is tracked: ED care, referral, admission, discharge, or follow-up.',
   }),
   Object.freeze({
     id: 'throughput-measured',
@@ -119,7 +121,8 @@ function getDestination(patient, intentRoute, referralByPatient, boardingByPatie
 
   if (referralByPatient.has(patient.patientId) || patient.journeyState === 'referral-pending') {
     const referral = referralByPatient.get(patient.patientId);
-    const referralTarget = referral?.department || intentRoute?.referrals?.[0] || 'Specialty service';
+    const referralTarget =
+      referral?.department || intentRoute?.referrals?.[0] || 'Specialty service';
     return Object.freeze({
       id: 'specialty-referral',
       label: referralTarget,
@@ -156,9 +159,11 @@ function getDestination(patient, intentRoute, referralByPatient, boardingByPatie
 
 function getTiming(patient, index, riskLevel, hasIntentRoute) {
   const doorToKnownMinutes = Math.min(4, 1 + (index % 4));
-  const doorToRiskMinutes = doorToKnownMinutes + (hasIntentRoute ? 2 : 4) + (riskLevel === 'critical' ? 0 : 1);
+  const doorToRiskMinutes =
+    doorToKnownMinutes + (hasIntentRoute ? 2 : 4) + (riskLevel === 'critical' ? 0 : 1);
   const doorToQueueMinutes = doorToRiskMinutes + 1;
-  const doorToActionMinutes = doorToQueueMinutes + (['critical', 'high'].includes(riskLevel) ? 1 : 3);
+  const doorToActionMinutes =
+    doorToQueueMinutes + (['critical', 'high'].includes(riskLevel) ? 1 : 3);
   const destinationLag =
     patient.journeyState === 'referral-pending'
       ? 8
@@ -227,13 +232,22 @@ function buildPatientPath(patient, index, context) {
   const queue = context.queueById.get(queueId);
   const intentRoute = ClinicalIntentRouter.routeComplaint(patient.complaint);
   const riskLevel = getRiskLevel(patient.riskScore);
-  const destination = getDestination(patient, intentRoute, context.referralByPatient, context.boardingByPatient);
+  const destination = getDestination(
+    patient,
+    intentRoute,
+    context.referralByPatient,
+    context.boardingByPatient,
+  );
   const timing = getTiming(patient, index, riskLevel, Boolean(intentRoute));
   const blockers = [
-    patient.waitDuration > (queue?.targetWaitMinutes || 30) ? `${queue?.label || 'Queue'} wait is over target.` : null,
+    patient.waitDuration > (queue?.targetWaitMinutes || 30)
+      ? `${queue?.label || 'Queue'} wait is over target.`
+      : null,
     queue?.bottleneck?.reason || null,
     context.capacity.riskLevel === 'Red' ? 'ED capacity is in red status.' : null,
-    destination.id === 'inpatient-admission' && context.boarding.metrics?.bedPressure ? `${context.boarding.metrics.bedPressure} bed pressure.` : null,
+    destination.id === 'inpatient-admission' && context.boarding.metrics?.bedPressure
+      ? `${context.boarding.metrics.bedPressure} bed pressure.`
+      : null,
   ].filter(Boolean);
 
   return Object.freeze({
@@ -303,7 +317,9 @@ function buildEmsPatientPath(patient, index, context) {
       owner: 'Charge nurse',
     }),
     nextAction: `Review ED Handoff Summary from ${patient.unit} before arrival.`,
-    blockers: Object.freeze(patient.notificationStatus !== 'sent' ? ['ED notification is pending.'] : []),
+    blockers: Object.freeze(
+      patient.notificationStatus !== 'sent' ? ['ED notification is pending.'] : [],
+    ),
     alerts: Object.freeze(card?.alerts || [`${patient.handoffStatus} EMS handoff`]),
     timing,
     edHandoffSummary: patient.edHandoffSummary,
@@ -326,9 +342,15 @@ function getMetricStatus(value, target) {
 function buildMetrics(patients) {
   const timingValues = (metricId) => patients.map((patient) => patient.timing[metricId]);
   const doorToDirectionValues = timingValues('doorToDirectionMinutes');
-  const highRiskPatients = patients.filter((patient) => ['critical', 'high'].includes(patient.riskLevel));
-  const highRiskNotActioned = highRiskPatients.filter((patient) => patient.timing.doorToActionMinutes > 10);
-  const patientsWithoutDirection = patients.filter((patient) => !patient.nextAction || patient.timing.doorToDirectionMinutes > 15);
+  const highRiskPatients = patients.filter((patient) =>
+    ['critical', 'high'].includes(patient.riskLevel),
+  );
+  const highRiskNotActioned = highRiskPatients.filter(
+    (patient) => patient.timing.doorToActionMinutes > 10,
+  );
+  const patientsWithoutDirection = patients.filter(
+    (patient) => !patient.nextAction || patient.timing.doorToDirectionMinutes > 15,
+  );
 
   return Object.freeze({
     patientCount: patients.length,
@@ -344,7 +366,9 @@ function buildMetrics(patients) {
     p90DoorToDirectionMinutes: percentile(doorToDirectionValues, 90),
     targetDoorToDirectionMinutes: 10,
     targetCompliance: Math.round(
-      (patients.filter((patient) => patient.timing.doorToDirectionMinutes <= 10).length / Math.max(patients.length, 1)) * 100
+      (patients.filter((patient) => patient.timing.doorToDirectionMinutes <= 10).length /
+        Math.max(patients.length, 1)) *
+        100,
     ),
     status: getMetricStatus(median(doorToDirectionValues), 10),
   });
@@ -357,9 +381,12 @@ function buildMilestones(metrics) {
         ...milestone,
         value: metrics[milestone.metricId] ?? metrics.doorToDirectionMinutes,
         unit: 'min',
-        status: getMetricStatus(metrics[milestone.metricId] ?? metrics.doorToDirectionMinutes, milestone.targetMinutes),
-      })
-    )
+        status: getMetricStatus(
+          metrics[milestone.metricId] ?? metrics.doorToDirectionMinutes,
+          milestone.targetMinutes,
+        ),
+      }),
+    ),
   );
 }
 
@@ -380,7 +407,7 @@ function buildRecommendations(patients, queueDashboard, capacityDashboard, refer
           patient.blockers[0] ||
           `${patient.displayName} has Door-to-Direction time of ${patient.timing.doorToDirectionMinutes} minutes.`,
         action: patient.nextAction,
-      })
+      }),
     );
   }
 
@@ -424,14 +451,18 @@ function buildContext() {
 export const EmergencyPatientPathService = Object.freeze({
   getPatientPathDashboard() {
     const context = buildContext();
-    const patients = Object.freeze(
-      [
-        ...context.emsPreArrival.queue.incomingPatients.map((patient, index) => buildEmsPatientPath(patient, index, context)),
-        ...context.demoEnvironment.patients.map((patient, index) =>
-          buildPatientPath(patient, index + context.emsPreArrival.queue.incomingPatients.length, context)
+    const patients = Object.freeze([
+      ...context.emsPreArrival.queue.incomingPatients.map((patient, index) =>
+        buildEmsPatientPath(patient, index, context),
+      ),
+      ...context.demoEnvironment.patients.map((patient, index) =>
+        buildPatientPath(
+          patient,
+          index + context.emsPreArrival.queue.incomingPatients.length,
+          context,
         ),
-      ]
-    );
+      ),
+    ]);
     const metrics = buildMetrics(patients);
 
     return Object.freeze({
@@ -446,7 +477,7 @@ export const EmergencyPatientPathService = Object.freeze({
         patients,
         context.queueDashboard,
         context.capacityDashboard,
-        context.referralDashboard
+        context.referralDashboard,
       ),
       throughput: context.throughput,
       salesNarrative:
@@ -457,7 +488,10 @@ export const EmergencyPatientPathService = Object.freeze({
   },
 
   getPatientPathForPatient(patientId) {
-    return this.getPatientPathDashboard().patients.find((patient) => patient.patientId === patientId) || null;
+    return (
+      this.getPatientPathDashboard().patients.find((patient) => patient.patientId === patientId) ||
+      null
+    );
   },
 
   getDoorToDirectionMetrics() {
@@ -469,13 +503,17 @@ export const EmergencyPatientPathService = Object.freeze({
   },
 });
 
-export const getPatientPathDashboard =
-  EmergencyPatientPathService.getPatientPathDashboard.bind(EmergencyPatientPathService);
-export const getPatientPathForPatient =
-  EmergencyPatientPathService.getPatientPathForPatient.bind(EmergencyPatientPathService);
-export const getDoorToDirectionMetrics =
-  EmergencyPatientPathService.getDoorToDirectionMetrics.bind(EmergencyPatientPathService);
-export const getPathRecommendations =
-  EmergencyPatientPathService.getPathRecommendations.bind(EmergencyPatientPathService);
+export const getPatientPathDashboard = EmergencyPatientPathService.getPatientPathDashboard.bind(
+  EmergencyPatientPathService,
+);
+export const getPatientPathForPatient = EmergencyPatientPathService.getPatientPathForPatient.bind(
+  EmergencyPatientPathService,
+);
+export const getDoorToDirectionMetrics = EmergencyPatientPathService.getDoorToDirectionMetrics.bind(
+  EmergencyPatientPathService,
+);
+export const getPathRecommendations = EmergencyPatientPathService.getPathRecommendations.bind(
+  EmergencyPatientPathService,
+);
 
 export default EmergencyPatientPathService;

@@ -18,9 +18,9 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const patternsSource = readFileSync(
   join(
     __dirname,
-    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts'
+    '../../backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts',
   ),
-  'utf8'
+  'utf8',
 );
 
 describe('parseClinicalToolPatterns', () => {
@@ -35,8 +35,9 @@ describe('parseClinicalToolPatterns', () => {
 
   it('extractToolPatternKeywords matches parseClinicalToolPatterns for phq9', () => {
     const fromHelper = extractToolPatternKeywords(patternsSource, 'phq9');
-    const fromParse = parseClinicalToolPatterns(patternsSource).find((p) => p.toolId === 'phq9')
-      ?.keywords;
+    const fromParse = parseClinicalToolPatterns(patternsSource).find(
+      (p) => p.toolId === 'phq9',
+    )?.keywords;
     expect(fromHelper).toEqual(fromParse);
     expect(fromHelper).toContain('phq-9');
     expect(fromHelper).toContain('depression screen');
@@ -44,7 +45,7 @@ describe('parseClinicalToolPatterns', () => {
 
   it('throws when tool id is absent from patterns source', () => {
     expect(() => extractToolPatternKeywords(patternsSource, 'not-registered-tool-xyz')).toThrow(
-      /not found in tool\.patterns\.ts/
+      /not found in tool\.patterns\.ts/,
     );
   });
 });

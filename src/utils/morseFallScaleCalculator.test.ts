@@ -15,7 +15,7 @@ describe('morseFallScaleCalculator', () => {
         ivHeparinLock: 0,
         gait: 0,
         mentalStatus: 0,
-      })
+      }),
     ).toBe(0);
     expect(interpretMorseFallScore(0)?.riskCategory).toBe('low');
   });
@@ -29,7 +29,7 @@ describe('morseFallScaleCalculator', () => {
         ivHeparinLock: 20,
         gait: 20,
         mentalStatus: 15,
-      })
+      }),
     ).toBe(125);
     expect(interpretMorseFallScore(125)?.riskCategory).toBe('high');
     expect(interpretMorseFallScore(125)?.severity).toBe('critical');
@@ -64,7 +64,7 @@ describe('morseFallScaleCalculator', () => {
         ivHeparinLock: 0,
         gait: 0,
         mentalStatus: 0,
-      })
+      }),
     ).toBeNull();
   });
 });

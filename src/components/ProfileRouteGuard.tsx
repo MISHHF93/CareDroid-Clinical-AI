@@ -3,7 +3,10 @@ import { useLocation } from 'react-router-dom';
 import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
 import { useUser } from '../contexts/UserContext';
 import { resolvePlatformLanding } from '../config/platformEntryModel';
-import { isStrictSaasEntitlementsEnabled, getPlatformEntitlementContext } from '../data/assetEntitlements';
+import {
+  isStrictSaasEntitlementsEnabled,
+  getPlatformEntitlementContext,
+} from '../data/assetEntitlements';
 import { compileUserProfile, isRouteAllowedInCompiledProfile } from '../config/userProfileCompiler';
 import { expandEntitlementPacksToCatalogPacks } from '../config/profilePackTaxonomy';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
@@ -104,10 +107,7 @@ export default function ProfileRouteGuard({ children }) {
 
   const roleLabel = getRoleLabel(saasRole || 'this role');
 
-  if (
-    entitlementContext?.organization?.organizationType &&
-    !compiled.assignableForOrg
-  ) {
+  if (entitlementContext?.organization?.organizationType && !compiled.assignableForOrg) {
     const destination = resolvePlatformLanding({
       authMode,
       saasRole: 'student',
@@ -123,7 +123,10 @@ export default function ProfileRouteGuard({ children }) {
         authMode,
         saasRole,
         onboardingStatus: saasProfile?.onboardingStatus,
-      }) || compiled.routes.home || compiled.routes.allowed[0] || '/emergency/reception';
+      }) ||
+      compiled.routes.home ||
+      compiled.routes.allowed[0] ||
+      '/emergency/reception';
 
     return <AccessDeniedPanel roleLabel={roleLabel} fallbackPath={destination} />;
   }

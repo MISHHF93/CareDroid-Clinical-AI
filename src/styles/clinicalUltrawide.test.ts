@@ -30,7 +30,7 @@ describe('clinical ultrawide layer', () => {
     expect(ultrawideCss).toContain('.hospital-command-center__actions');
   });
 
-  it('HEAL-315: relaxes Reception command-panel widths beyond ReceptionWorkspace.css\'s 900px cap on ultrawide', () => {
+  it("HEAL-315: relaxes Reception command-panel widths beyond ReceptionWorkspace.css's 900px cap on ultrawide", () => {
     // ReceptionWorkspace.css caps these 3 selectors at 900px unconditionally
     // -- with the fluid primary intake column above correctly using
     // minmax(0, 1fr), that 900px cap (not the column) was the real ceiling,

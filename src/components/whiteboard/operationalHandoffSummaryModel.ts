@@ -81,8 +81,16 @@ function emsDomainMetrics(emsSummary) {
         id: 'ems-handoff',
         label: 'Handoff',
         hint: `${emsSummary.awaitingHandoff} unit${emsSummary.awaitingHandoff === 1 ? '' : 's'} awaiting handoff`,
-        value: emsSummary.offloadMinutes > 0 ? `${emsSummary.offloadMinutes}m` : emsSummary.awaitingHandoff,
-        tone: emsSummary.offloadMinutes >= 15 ? 'critical' : emsSummary.offloadMinutes >= 10 ? 'warning' : 'info',
+        value:
+          emsSummary.offloadMinutes > 0
+            ? `${emsSummary.offloadMinutes}m`
+            : emsSummary.awaitingHandoff,
+        tone:
+          emsSummary.offloadMinutes >= 15
+            ? 'critical'
+            : emsSummary.offloadMinutes >= 10
+              ? 'warning'
+              : 'info',
         whiteboardAction: 'focus-ems-offload',
       }),
     );
@@ -195,11 +203,11 @@ function admissionDomainMetrics({ patients = [] as any[], boardingMetrics = null
  * Four-domain operational handoff summaries — one glance per workflow lane.
  */
 export function buildOperationalHandoffDomains({
-  patients = ([] as any[]),
-  emsArrivals = ([] as any[]),
-  referrals = ([] as any[]),
-  reassessmentDue = (undefined as any),
-  boardingMetrics = (undefined as any),
+  patients = [] as any[],
+  emsArrivals = [] as any[],
+  referrals = [] as any[],
+  reassessmentDue = undefined as any,
+  boardingMetrics = undefined as any,
   now = Date.now(),
 }: any = {}) {
   const emsSummary = summarizeEmsAwareness(emsArrivals, now);
@@ -224,22 +232,26 @@ export function buildOperationalHandoffDomains({
     Object.freeze({
       id: 'ems',
       label: 'EMS',
-      headline: compactHeadline([
-        emsSummary.inboundCount ? `${emsSummary.inboundCount} inbound` : null,
-        emsSummary.awaitingHandoff ? `${emsSummary.awaitingHandoff} handoff` : null,
-        emsSummary.riskCount ? `${emsSummary.riskCount} high risk` : null,
-      ]) || 'No inbound EMS',
+      headline:
+        compactHeadline([
+          emsSummary.inboundCount ? `${emsSummary.inboundCount} inbound` : null,
+          emsSummary.awaitingHandoff ? `${emsSummary.awaitingHandoff} handoff` : null,
+          emsSummary.riskCount ? `${emsSummary.riskCount} high risk` : null,
+        ]) || 'No inbound EMS',
       metrics: emsMetrics,
-      hasAttention: Boolean(emsSummary.inboundCount || emsSummary.awaitingHandoff || emsSummary.riskCount),
+      hasAttention: Boolean(
+        emsSummary.inboundCount || emsSummary.awaitingHandoff || emsSummary.riskCount,
+      ),
     }),
     Object.freeze({
       id: 'referral',
       label: 'Referral',
-      headline: compactHeadline([
-        referralSummary.buckets.pending ? `${referralSummary.buckets.pending} pending` : null,
-        referralSummary.buckets.delayed ? `${referralSummary.buckets.delayed} delayed` : null,
-        referralSummary.buckets.accepted ? `${referralSummary.buckets.accepted} accepted` : null,
-      ]) || 'No active referrals',
+      headline:
+        compactHeadline([
+          referralSummary.buckets.pending ? `${referralSummary.buckets.pending} pending` : null,
+          referralSummary.buckets.delayed ? `${referralSummary.buckets.delayed} delayed` : null,
+          referralSummary.buckets.accepted ? `${referralSummary.buckets.accepted} accepted` : null,
+        ]) || 'No active referrals',
       metrics: referralMetrics,
       hasAttention: referralSummary.total > 0,
     }),

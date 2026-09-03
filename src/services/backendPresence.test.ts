@@ -16,7 +16,9 @@ const originalFetch = globalThis.fetch;
 function respond({ status = 200, contentType = 'application/json' }) {
   return vi.fn(async () => ({
     status,
-    headers: { get: (name: string) => (name.toLowerCase() === 'content-type' ? contentType : null) },
+    headers: {
+      get: (name: string) => (name.toLowerCase() === 'content-type' ? contentType : null),
+    },
   })) as unknown as typeof fetch;
 }
 

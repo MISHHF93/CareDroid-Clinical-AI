@@ -46,9 +46,7 @@ export default function PreArrivalNotificationForm({
 
   const applyPatch = (patch) => {
     if (!canEdit || !onUpdate) return;
-    onUpdate(
-      mergePreArrivalNotificationPatch(resolved, patch, { staffName: actorName }),
-    );
+    onUpdate(mergePreArrivalNotificationPatch(resolved, patch, { staffName: actorName }));
   };
 
   const switchFramework = (nextFramework) => {
@@ -88,7 +86,9 @@ export default function PreArrivalNotificationForm({
             role="tab"
             tabIndex={tabIndexFor(id)}
             onKeyDown={onKeyDown}
-            {...((framework === id) ? { 'aria-selected': 'true' as const } : { 'aria-selected': 'false' as const })}
+            {...(framework === id
+              ? { 'aria-selected': 'true' as const }
+              : { 'aria-selected': 'false' as const })}
             className={framework === id ? 'is-active' : ''}
             onClick={() => switchFramework(id)}
           >

@@ -13,10 +13,7 @@ import { metricColorForTone } from '../../config/semanticColorSystem';
 import useEdOperatingSurface from '../../hooks/useEdOperatingSurface';
 import usePatientWorkflow from '../../hooks/usePatientWorkflow';
 import { useEmergencyStore } from '../../store/emergencyStore';
-import {
-  MetricGraphicCard,
-  SituationGraphicCard,
-} from '../../components/graphics/CdlGraphicKit';
+import { MetricGraphicCard, SituationGraphicCard } from '../../components/graphics/CdlGraphicKit';
 import { CdlEmptyIllustration } from '../../components/graphics/CdlGraphicIllustrations';
 import { resolveEmptyStateGraphic } from '../../config/cdlGraphicModel';
 import './emergency-route.css';
@@ -63,8 +60,7 @@ export function WorkflowSituationBrief({
     return null;
   }
 
-  const cdlTone =
-    tone === 'info' ? 'information' : tone === 'neutral' ? 'inactive' : tone;
+  const cdlTone = tone === 'info' ? 'information' : tone === 'neutral' ? 'inactive' : tone;
 
   return (
     <section
@@ -146,7 +142,9 @@ export function FlowCapacityViewTabs({ activeView, onViewChange }) {
           role="tab"
           tabIndex={tabIndexFor(view.id)}
           onKeyDown={onKeyDown}
-          {...((activeView === view.id) ? { 'aria-selected': 'true' as const } : { 'aria-selected': 'false' as const })}
+          {...(activeView === view.id
+            ? { 'aria-selected': 'true' as const }
+            : { 'aria-selected': 'false' as const })}
           className={`emergency-route-view-tabs__btn${
             activeView === view.id ? ' emergency-route-view-tabs__btn--active' : ''
           }`}
@@ -241,61 +239,61 @@ export function EmergencyRoutePage({
           {title}
         </p>
       ) : null}
-    <PageShell
-      as="section"
-      suppressHeader
-      title={chromeRegistered ? undefined : title}
-      titleId={titleId}
-      className={[
-        'emergency-route-page',
-        'cd-page-shell',
-        compactLayout ? 'emergency-route-page--practitioner-compact' : '',
-        surfaceClassName,
-      ]
-        .filter(Boolean)
-        .join(' ')}
-      contentClassName="emergency-route-page__content"
-      aria-label={title}
-    >
-      <OperationalPageTemplate
-        zones={{
-          operationalSummary: (
-            <>
-              {showJourneyRail &&
-              surfaces.emergencyRoutes.showJourneyRail &&
-              operatingSurface.phaseId &&
-              selectedPatientId ? (
-                <EdJourneyProgressRail
-                  activePhaseId={operatingSurface.phaseId}
-                  ownerRole={patientWorkflow.ownerRole ?? operatingSurface.ownerRole}
-                  priorityLabel={operatingSurface.priority}
-                  patientId={selectedPatientId}
-                  encounterId={
-                    (patientWorkflow.patient as { encounterId?: string } | null)?.encounterId ?? null
-                  }
-                />
-              ) : null}
-              {resolvedSituationBrief ? <WorkflowSituationBrief {...resolvedSituationBrief} /> : null}
-              {operationalSummaryExtra}
-            </>
-          ),
-          primaryActions,
-          activeWork: activeWork ?? children,
-          supportingContext,
-          analytics,
-          history,
-        }}
-      />
-    </PageShell>
+      <PageShell
+        as="section"
+        suppressHeader
+        title={chromeRegistered ? undefined : title}
+        titleId={titleId}
+        className={[
+          'emergency-route-page',
+          'cd-page-shell',
+          compactLayout ? 'emergency-route-page--practitioner-compact' : '',
+          surfaceClassName,
+        ]
+          .filter(Boolean)
+          .join(' ')}
+        contentClassName="emergency-route-page__content"
+        aria-label={title}
+      >
+        <OperationalPageTemplate
+          zones={{
+            operationalSummary: (
+              <>
+                {showJourneyRail &&
+                surfaces.emergencyRoutes.showJourneyRail &&
+                operatingSurface.phaseId &&
+                selectedPatientId ? (
+                  <EdJourneyProgressRail
+                    activePhaseId={operatingSurface.phaseId}
+                    ownerRole={patientWorkflow.ownerRole ?? operatingSurface.ownerRole}
+                    priorityLabel={operatingSurface.priority}
+                    patientId={selectedPatientId}
+                    encounterId={
+                      (patientWorkflow.patient as { encounterId?: string } | null)?.encounterId ??
+                      null
+                    }
+                  />
+                ) : null}
+                {resolvedSituationBrief ? (
+                  <WorkflowSituationBrief {...resolvedSituationBrief} />
+                ) : null}
+                {operationalSummaryExtra}
+              </>
+            ),
+            primaryActions,
+            activeWork: activeWork ?? children,
+            supportingContext,
+            analytics,
+            history,
+          }}
+        />
+      </PageShell>
     </>
   );
 }
 
 /** Prefer semantic tone; never pass raw hex as color into metric tiles. */
-function resolveMetricTone(metric: {
-  tone?: string;
-  color?: string;
-}): string | undefined {
+function resolveMetricTone(metric: { tone?: string; color?: string }): string | undefined {
   if (metric.tone) return metric.tone;
   const c = String(metric.color || '').toUpperCase();
   if (!c) return undefined;
@@ -450,7 +448,8 @@ export function ApiStateBanner({
   if (moduleState.isEmpty) {
     return (
       <div role="status" className="emergency-route-card emergency-route-empty">
-        No active records are available for this module yet. Add or load department data before using this view for handoff decisions.
+        No active records are available for this module yet. Add or load department data before
+        using this view for handoff decisions.
       </div>
     );
   }
@@ -471,7 +470,11 @@ export function DataSourceNote({ moduleState }) {
   return (
     <div
       role="status"
-      title={freshness.stale ? 'Data may be stale. Validate against current department state.' : undefined}
+      title={
+        freshness.stale
+          ? 'Data may be stale. Validate against current department state.'
+          : undefined
+      }
       className={`emergency-route-data-source${freshness.stale ? ' emergency-route-data-source--stale' : ''}`}
     >
       Source: {sourceLabel} | {freshness.label}
@@ -495,7 +498,9 @@ export function isBoarding(patient) {
 }
 
 export function displayPatientName(patient) {
-  return `${patient.firstName || ''} ${patient.lastName || ''}`.trim() || patient.name || patient.mrn;
+  return (
+    `${patient.firstName || ''} ${patient.lastName || ''}`.trim() || patient.name || patient.mrn
+  );
 }
 
 const REASSESSMENT_ATTENTION_FLAGS = [

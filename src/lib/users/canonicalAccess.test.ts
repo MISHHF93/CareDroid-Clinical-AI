@@ -95,7 +95,9 @@ describe('canonical CareDroid access', () => {
   it('keeps navigation visible routes aligned with canAccessRoute', () => {
     for (const profile of DEMO_USERS) {
       const compiled = compileCareDroidAccessProfile(profile);
-      const nav = getVisibleNavigation(compiled.role.emergencyRoleId, { compiledProfile: compiled });
+      const nav = getVisibleNavigation(compiled.role.emergencyRoleId, {
+        compiledProfile: compiled,
+      });
       expect(nav.length).toBeGreaterThan(0);
       for (const item of nav) {
         expect(canAccessRoute(compiled, item.route)).toBe(true);
@@ -174,8 +176,18 @@ describe('canonical CareDroid access', () => {
     const physician = compileCareDroidAccessProfile(getDemoUserById('demo-maya-chen')!);
 
     expect(hasPermission(physician, CAREDROID_PERMISSIONS.PATIENT_READ)).toBe(true);
-    expect(hasAnyPermission(physician, [CAREDROID_PERMISSIONS.AUDIT_READ, CAREDROID_PERMISSIONS.AI_REVIEW])).toBe(true);
-    expect(hasAllPermissions(physician, [CAREDROID_PERMISSIONS.PATIENT_READ, CAREDROID_PERMISSIONS.AI_REQUEST])).toBe(true);
+    expect(
+      hasAnyPermission(physician, [
+        CAREDROID_PERMISSIONS.AUDIT_READ,
+        CAREDROID_PERMISSIONS.AI_REVIEW,
+      ]),
+    ).toBe(true);
+    expect(
+      hasAllPermissions(physician, [
+        CAREDROID_PERMISSIONS.PATIENT_READ,
+        CAREDROID_PERMISSIONS.AI_REQUEST,
+      ]),
+    ).toBe(true);
     expect(canReviewAI(physician)).toBe(true);
     expect(canMutatePatient(physician)).toBe(true);
     expect(canPerformClinicalAction(physician, EMERGENCY_ACTIONS.writeNote)).toBe(true);

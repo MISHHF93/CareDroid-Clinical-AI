@@ -43,7 +43,9 @@ function buildTransparencyRecord(
   };
 }
 
-export function buildAiTransparencyDashboardSnapshot(patients: Patient[]): AiTransparencyDashboardSnapshot {
+export function buildAiTransparencyDashboardSnapshot(
+  patients: Patient[],
+): AiTransparencyDashboardSnapshot {
   const records: AiTransparencyRecord[] = [];
   const routingTraces: PanelRoutingDecision[] = [];
 
@@ -58,10 +60,7 @@ export function buildAiTransparencyDashboardSnapshot(patients: Patient[]): AiTra
         'Panel-of-Experts Router',
         'clinical_decision_support',
         snapshot.routing.confidence,
-        [
-          `Routed to ${formatRoutingLabel(snapshot.routing)}`,
-          ...snapshot.routing.keySignals,
-        ],
+        [`Routed to ${formatRoutingLabel(snapshot.routing)}`, ...snapshot.routing.keySignals],
         snapshot.routing,
         snapshot.sourceState,
       ),

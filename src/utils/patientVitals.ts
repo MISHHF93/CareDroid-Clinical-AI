@@ -1,6 +1,8 @@
 import type { Patient, Vitals } from '../types/emergency';
 
-export function asPatientVitalsArray(vitals: Patient['vitals'] | Vitals | null | undefined): Vitals[] {
+export function asPatientVitalsArray(
+  vitals: Patient['vitals'] | Vitals | null | undefined,
+): Vitals[] {
   if (!vitals) return [];
   if (Array.isArray(vitals)) return vitals;
   if (typeof vitals === 'object') return [vitals as Vitals];
@@ -18,7 +20,9 @@ export function hasPatientFlag(
   flag: string,
 ): boolean {
   return patientFlags(patient).some((entry) =>
-    typeof entry === 'string' ? entry === flag : (entry as unknown as { type: string })?.type === flag,
+    typeof entry === 'string'
+      ? entry === flag
+      : (entry as unknown as { type: string })?.type === flag,
   );
 }
 

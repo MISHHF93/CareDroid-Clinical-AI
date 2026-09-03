@@ -51,7 +51,7 @@ export const PlatformAssetsApi = {
     if (params.organizationId) search.set('organizationId', params.organizationId);
     const qs = search.toString();
     const response = await apiFetch(
-      `/api/platform/departments/${encodeURIComponent(departmentId)}${qs ? `?${qs}` : ''}`
+      `/api/platform/departments/${encodeURIComponent(departmentId)}${qs ? `?${qs}` : ''}`,
     );
     if (!response.ok) throw new Error(`Department failed (${response.status})`);
     return response.json();
@@ -71,7 +71,7 @@ export const PlatformAssetsApi = {
     if (params.organizationId) search.set('organizationId', params.organizationId);
     const qs = search.toString();
     const response = await apiFetch(
-      `/api/platform/service-lines/${encodeURIComponent(serviceLineId)}${qs ? `?${qs}` : ''}`
+      `/api/platform/service-lines/${encodeURIComponent(serviceLineId)}${qs ? `?${qs}` : ''}`,
     );
     if (!response.ok) throw new Error(`Service line failed (${response.status})`);
     return response.json();
@@ -93,7 +93,7 @@ export const PlatformAssetsApi = {
     if (params.organizationId) search.set('organizationId', params.organizationId);
     const qs = search.toString();
     const response = await apiFetch(
-      `/api/platform/marketplace/packs/${encodeURIComponent(packId)}${qs ? `?${qs}` : ''}`
+      `/api/platform/marketplace/packs/${encodeURIComponent(packId)}${qs ? `?${qs}` : ''}`,
     );
     if (!response.ok) throw new Error(`Marketplace pack failed (${response.status})`);
     return response.json();
@@ -102,7 +102,7 @@ export const PlatformAssetsApi = {
   async installPack(organizationId, packId) {
     const response = await apiFetch(
       `/api/platform/organizations/${organizationId}/packs/${packId}/install`,
-      { method: 'POST' }
+      { method: 'POST' },
     );
     if (!response.ok) throw new Error(`Install pack failed (${response.status})`);
     return response.json();
@@ -111,7 +111,7 @@ export const PlatformAssetsApi = {
   async removePack(organizationId, packId) {
     const response = await apiFetch(
       `/api/platform/organizations/${organizationId}/packs/${packId}/remove`,
-      { method: 'POST' }
+      { method: 'POST' },
     );
     if (!response.ok) throw new Error(`Remove pack failed (${response.status})`);
     return response.json();
@@ -155,7 +155,7 @@ export const PlatformAssetsApi = {
   async getCustomerSuccessDashboard(organizationId, period = 'month') {
     const qs = period ? `?period=${encodeURIComponent(period)}` : '';
     const response = await apiFetch(
-      `/api/platform/organizations/${organizationId}/customer-success${qs}`
+      `/api/platform/organizations/${organizationId}/customer-success${qs}`,
     );
     if (!response.ok) throw new Error(`Customer success failed (${response.status})`);
     return response.json();

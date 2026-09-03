@@ -35,7 +35,9 @@ function FeatureRow({ entry }: { entry: PlatformFeatureTransparencyEntry }) {
           {overridden ? ' · shown as demo while simulation is active' : null}
         </div>
       </div>
-      <span className={`platform-feature-transparency__status ${statusClassName(entry.effectiveStatus)}`}>
+      <span
+        className={`platform-feature-transparency__status ${statusClassName(entry.effectiveStatus)}`}
+      >
         {STATUS_LABELS[entry.effectiveStatus]}
       </span>
     </div>
@@ -64,10 +66,7 @@ export default function PlatformFeatureTransparencyPanel({
 
   const entries = useMemo(() => allEntries.slice(0, limit), [allEntries, limit]);
 
-  const summary = useMemo(
-    () => summarizePlatformFeatureTransparency(allEntries),
-    [allEntries],
-  );
+  const summary = useMemo(() => summarizePlatformFeatureTransparency(allEntries), [allEntries]);
 
   return (
     <section className="platform-feature-transparency" aria-label="Platform feature transparency">
@@ -87,8 +86,8 @@ export default function PlatformFeatureTransparencyPanel({
       </div>
       {allEntries.length > entries.length ? (
         <p className="platform-feature-transparency__more">
-          Showing {entries.length} of {allEntries.length} tracked features. The counts above
-          cover all {allEntries.length}.
+          Showing {entries.length} of {allEntries.length} tracked features. The counts above cover
+          all {allEntries.length}.
         </p>
       ) : null}
     </section>

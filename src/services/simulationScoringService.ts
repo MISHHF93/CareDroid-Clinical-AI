@@ -10,10 +10,7 @@
  * or production store, by construction rather than by runtime check.
  */
 
-import {
-  buildScenarioDebrief,
-  type SIMULATION_SCENARIOS,
-} from '../data/medicalSimulationCatalog';
+import { buildScenarioDebrief, type SIMULATION_SCENARIOS } from '../data/medicalSimulationCatalog';
 
 type SimulationScenario = (typeof SIMULATION_SCENARIOS)[number];
 type ScenarioDebrief = ReturnType<typeof buildScenarioDebrief>;
@@ -78,7 +75,10 @@ function readRuns(storage: StorageLike | null): CompletedSimulationRun[] {
 function writeRuns(runs: CompletedSimulationRun[], storage: StorageLike | null): void {
   if (!storage) return;
   try {
-    storage.setItem(SIMULATION_RUN_HISTORY_STORAGE_KEY, JSON.stringify(runs.slice(-MAX_STORED_RUNS)));
+    storage.setItem(
+      SIMULATION_RUN_HISTORY_STORAGE_KEY,
+      JSON.stringify(runs.slice(-MAX_STORED_RUNS)),
+    );
   } catch {
     // Storage can be disabled/full — training history degrades to session-only, never throws.
   }
@@ -181,7 +181,9 @@ export function computeWeeklyTrend(
 }
 
 /** Average safety score per category, reframed as a 0–100 "coverage" figure. */
-export function computeCompetencyCoverage(runs: CompletedSimulationRun[]): CompetencyCoveragePoint[] {
+export function computeCompetencyCoverage(
+  runs: CompletedSimulationRun[],
+): CompetencyCoveragePoint[] {
   const byCategory = new Map<string, number[]>();
   for (const run of runs) {
     const scores = byCategory.get(run.category) || [];

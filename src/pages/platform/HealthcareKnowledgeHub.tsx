@@ -31,8 +31,13 @@ export function HealthcareKnowledgeHubPage() {
         <div className="knowledge-hub-page__title-row">
           <GraphicIconBadge iconKey="notes" accent="brand" size="md" />
           <div>
-            <p className="knowledge-hub-page-title-text" data-testid="cd-page-title-text">Knowledge Hub</p>
-            <p>Protocols, pathways, calculators, simulations, AI guidance, and documentation across workspaces.</p>
+            <p className="knowledge-hub-page-title-text" data-testid="cd-page-title-text">
+              Knowledge Hub
+            </p>
+            <p>
+              Protocols, pathways, calculators, simulations, AI guidance, and documentation across
+              workspaces.
+            </p>
           </div>
         </div>
         <div className="knowledge-hub-page__actions">
@@ -57,7 +62,11 @@ export function HealthcareKnowledgeHubPage() {
           onChange={(event) => setQuery(event.target.value)}
           aria-label="Search knowledge hub"
         />
-        <select value={specialty} onChange={(event) => setSpecialty(event.target.value)} aria-label="Filter by specialty">
+        <select
+          value={specialty}
+          onChange={(event) => setSpecialty(event.target.value)}
+          aria-label="Filter by specialty"
+        >
           <option value="all">All specialties</option>
           {hub.facets.specialties.map((value) => (
             <option key={value} value={value}>
@@ -65,7 +74,11 @@ export function HealthcareKnowledgeHubPage() {
             </option>
           ))}
         </select>
-        <select value={role} onChange={(event) => setRole(event.target.value)} aria-label="Filter by role">
+        <select
+          value={role}
+          onChange={(event) => setRole(event.target.value)}
+          aria-label="Filter by role"
+        >
           <option value="all">All roles</option>
           {hub.facets.roles.map((value) => (
             <option key={value} value={value}>
@@ -73,7 +86,11 @@ export function HealthcareKnowledgeHubPage() {
             </option>
           ))}
         </select>
-        <select value={workspace} onChange={(event) => setWorkspace(event.target.value)} aria-label="Filter by workspace">
+        <select
+          value={workspace}
+          onChange={(event) => setWorkspace(event.target.value)}
+          aria-label="Filter by workspace"
+        >
           <option value="all">All workspaces</option>
           {hub.facets.workspaces.map((value) => (
             <option key={value} value={value}>
@@ -81,7 +98,11 @@ export function HealthcareKnowledgeHubPage() {
             </option>
           ))}
         </select>
-        <select value={department} onChange={(event) => setDepartment(event.target.value)} aria-label="Filter by department">
+        <select
+          value={department}
+          onChange={(event) => setDepartment(event.target.value)}
+          aria-label="Filter by department"
+        >
           <option value="all">All departments</option>
           {hub.facets.departments.map((value) => (
             <option key={value} value={value}>
@@ -91,15 +112,43 @@ export function HealthcareKnowledgeHubPage() {
         </select>
       </div>
 
-      <div className="knowledge-hub-page__metrics" role="group" aria-label="Knowledge hub summary metrics">
-        <MetricCard label="Catalog items" value={String(hub.summary.totalItems)} hint="Indexed artifacts" tone="neutral" />
-        <MetricCard label="Results" value={String(hub.summary.resultCount)} hint="Matching filters" tone="neutral" />
-        <MetricCard label="Types" value={String(hub.summary.representedTypeCount)} hint="Artifact categories" tone="neutral" />
-        <MetricCard label="Workspaces" value={String(hub.summary.workspaceCount)} hint="Coverage breadth" tone="neutral" />
+      <div
+        className="knowledge-hub-page__metrics"
+        role="group"
+        aria-label="Knowledge hub summary metrics"
+      >
+        <MetricCard
+          label="Catalog items"
+          value={String(hub.summary.totalItems)}
+          hint="Indexed artifacts"
+          tone="neutral"
+        />
+        <MetricCard
+          label="Results"
+          value={String(hub.summary.resultCount)}
+          hint="Matching filters"
+          tone="neutral"
+        />
+        <MetricCard
+          label="Types"
+          value={String(hub.summary.representedTypeCount)}
+          hint="Artifact categories"
+          tone="neutral"
+        />
+        <MetricCard
+          label="Workspaces"
+          value={String(hub.summary.workspaceCount)}
+          hint="Coverage breadth"
+          tone="neutral"
+        />
       </div>
 
       <div className="knowledge-hub-page__charts">
-        <VisualizationPanel title="Artifact types" description="Protocol, pathway, calculator, simulation, AI guidance, and documentation mix." badge="Types">
+        <VisualizationPanel
+          title="Artifact types"
+          description="Protocol, pathway, calculator, simulation, AI guidance, and documentation mix."
+          badge="Types"
+        >
           <CategoryBarChart
             data={typeChart}
             title="Artifact types"

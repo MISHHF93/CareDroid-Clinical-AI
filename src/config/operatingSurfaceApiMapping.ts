@@ -14,7 +14,9 @@ const JOURNEY_TO_API_SURFACE: Readonly<Record<string, OperatingSurfaceId>> = Obj
   whiteboard: 'whiteboard',
 });
 
-export function resolveApiOperatingSurfaceId(journeySurfaceId: string | null | undefined): OperatingSurfaceId | null {
+export function resolveApiOperatingSurfaceId(
+  journeySurfaceId: string | null | undefined,
+): OperatingSurfaceId | null {
   if (!journeySurfaceId) return null;
   return JOURNEY_TO_API_SURFACE[journeySurfaceId] ?? null;
 }

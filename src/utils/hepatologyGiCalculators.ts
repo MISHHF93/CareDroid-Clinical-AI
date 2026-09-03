@@ -117,7 +117,7 @@ export function calculateApri({ astUPerL, astUpperLimitUPerL, platelets10e9PerL 
     return null;
   }
 
-  const score = ((astUPerL / astUpperLimitUPerL) / platelets10e9PerL) * 100;
+  const score = (astUPerL / astUpperLimitUPerL / platelets10e9PerL) * 100;
   return Math.round(score * 100) / 100;
 }
 
@@ -230,11 +230,21 @@ export function calculateGlasgowBlatchfordScore(raw) {
   const syncope = raw.syncope ? 2 : 0;
   const hepaticDisease = raw.hepaticDisease ? 2 : 0;
   const cardiacFailure = raw.cardiacFailure ? 2 : 0;
-  const total = bun + hemoglobin + systolicBp + pulse + melena + syncope + hepaticDisease + cardiacFailure;
+  const total =
+    bun + hemoglobin + systolicBp + pulse + melena + syncope + hepaticDisease + cardiacFailure;
 
   return {
     total,
-    breakdown: { bun, hemoglobin, systolicBp, pulse, melena, syncope, hepaticDisease, cardiacFailure },
+    breakdown: {
+      bun,
+      hemoglobin,
+      systolicBp,
+      pulse,
+      melena,
+      syncope,
+      hepaticDisease,
+      cardiacFailure,
+    },
     parsed: { bunMmolL, hemoglobinGDl, systolicBpMmHg },
   };
 }

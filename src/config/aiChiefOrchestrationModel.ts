@@ -91,100 +91,111 @@ export const AI_CHIEF_SAFETY_STATEMENT = Object.freeze({
   replacesClinicianJudgment: false,
 });
 
-export const AI_CHIEF_MONITORING_DOMAINS: readonly AiChiefMonitoringDomainDefinition[] = Object.freeze([
-  Object.freeze({
-    id: 'patient_flow',
-    label: 'Patient flow',
-    description: 'Arrival throughput, queue movement, disposition blockers, and boarding pressure.',
-    ownerRole: 'Patient flow coordinator',
-    signalSources: ['emergencyStore.patients', 'patientFlowSnapshot', 'hospitalOperatingSystem'],
-    backendEndpoints: [EMERGENCY_OS_API_ENDPOINTS.patientFlow, EMERGENCY_OS_API_ENDPOINTS.queues],
-  }),
-  Object.freeze({
-    id: 'department_capacity',
-    label: 'Department capacity',
-    description: 'Bed availability, occupancy bands, boarding load, and surge posture.',
-    ownerRole: 'Charge nurse',
-    signalSources: ['capacityEngine', 'centralNode.capacityStatus'],
-    backendEndpoints: [EMERGENCY_OS_API_ENDPOINTS.capacity, EMERGENCY_OS_API_ENDPOINTS.boarding],
-  }),
-  Object.freeze({
-    id: 'staffing',
-    label: 'Staffing & routing',
-    description: 'Assignments, workload balance, pending acknowledgements, and role coverage.',
-    ownerRole: 'ED manager',
-    signalSources: ['emergencyStore.staff', 'staffRoutingService'],
-    backendEndpoints: [EMERGENCY_OS_API_ENDPOINTS.workflowOrchestration],
-  }),
-  Object.freeze({
-    id: 'bottlenecks',
-    label: 'Bottlenecks',
-    description: 'Service delays, three-minute risk projection, and root-cause bottlenecks.',
-    ownerRole: 'ED manager',
-    signalSources: ['bottleneckRegistry'],
-    backendEndpoints: [EMERGENCY_OS_API_ENDPOINTS.operationalIntelligenceSnapshot],
-  }),
-  Object.freeze({
-    id: 'alerts',
-    label: 'Alerts & escalation',
-    description: 'Critical alerts, acknowledgement deadlines, and escalation routing.',
-    ownerRole: 'Assigned clinician',
-    signalSources: ['alertEngine', 'alertLifecycleOrchestrator', 'clinicalAlertsApi'],
-    backendEndpoints: [
-      EMERGENCY_OS_API_ENDPOINTS.operationalIntelligenceAlerts,
-      `${EMERGENCY_OS_API_ENDPOINTS.operatingSurface}/alerts`,
-    ],
-  }),
-  Object.freeze({
-    id: 'service_health',
-    label: 'Service health',
-    description: 'Backend availability, degraded integrations, and fallback readiness.',
-    ownerRole: 'IT administrator',
-    signalSources: ['bottleneckRegistry.serviceHealth', 'backendReachability'],
-    backendEndpoints: [EMERGENCY_OS_API_ENDPOINTS.operationalIntelligenceModelHealth],
-  }),
-  Object.freeze({
-    id: 'ems_arrivals',
-    label: 'EMS arrivals',
-    description: 'Inbound units, pre-arrival packets, offload readiness, and handoff timing.',
-    ownerRole: 'EMS coordinator',
-    signalSources: ['emergencyStore.emsArrivals', 'emsPreArrivalPipelineService'],
-    backendEndpoints: [EMERGENCY_OS_API_ENDPOINTS.ems],
-  }),
-  Object.freeze({
-    id: 'patient_prioritization',
-    label: 'Patient prioritization',
-    description: 'Acuity ordering, P1/P2 concentration, deterioration signals, and reassessment due.',
-    ownerRole: 'Triage nurse',
-    signalSources: ['patientOrchestration', 'threeMinuteTimerEngine'],
-    backendEndpoints: [EMERGENCY_OS_API_ENDPOINTS.triageAssist, EMERGENCY_OS_API_ENDPOINTS.reassessment],
-  }),
-  Object.freeze({
-    id: 'operational_intelligence',
-    label: 'Operational intelligence',
-    description: 'Rule-based and ML-assisted scores, anomalies, and command-center insights.',
-    ownerRole: 'ED manager',
-    signalSources: ['careDroidOperationalIntelligence', 'centralNode'],
-    backendEndpoints: [
-      EMERGENCY_OS_API_ENDPOINTS.operationalIntelligenceSnapshot,
-      EMERGENCY_OS_API_ENDPOINTS.centralNodeSnapshot,
-    ],
-  }),
-  Object.freeze({
-    id: 'clinical_workflow',
-    label: 'Clinical workflow support',
-    description: 'Tool recommendations, calculators, protocols, and AI Chief structured intents.',
-    ownerRole: 'Clinician',
-    signalSources: ['patientOrchestration', 'aiChiefOrchestrator', 'careDroidUnifiedAiNode'],
-    backendEndpoints: [EMERGENCY_OS_API_ENDPOINTS.copilot, EMERGENCY_OS_API_ENDPOINTS.copilotQuery],
-  }),
-]);
+export const AI_CHIEF_MONITORING_DOMAINS: readonly AiChiefMonitoringDomainDefinition[] =
+  Object.freeze([
+    Object.freeze({
+      id: 'patient_flow',
+      label: 'Patient flow',
+      description:
+        'Arrival throughput, queue movement, disposition blockers, and boarding pressure.',
+      ownerRole: 'Patient flow coordinator',
+      signalSources: ['emergencyStore.patients', 'patientFlowSnapshot', 'hospitalOperatingSystem'],
+      backendEndpoints: [EMERGENCY_OS_API_ENDPOINTS.patientFlow, EMERGENCY_OS_API_ENDPOINTS.queues],
+    }),
+    Object.freeze({
+      id: 'department_capacity',
+      label: 'Department capacity',
+      description: 'Bed availability, occupancy bands, boarding load, and surge posture.',
+      ownerRole: 'Charge nurse',
+      signalSources: ['capacityEngine', 'centralNode.capacityStatus'],
+      backendEndpoints: [EMERGENCY_OS_API_ENDPOINTS.capacity, EMERGENCY_OS_API_ENDPOINTS.boarding],
+    }),
+    Object.freeze({
+      id: 'staffing',
+      label: 'Staffing & routing',
+      description: 'Assignments, workload balance, pending acknowledgements, and role coverage.',
+      ownerRole: 'ED manager',
+      signalSources: ['emergencyStore.staff', 'staffRoutingService'],
+      backendEndpoints: [EMERGENCY_OS_API_ENDPOINTS.workflowOrchestration],
+    }),
+    Object.freeze({
+      id: 'bottlenecks',
+      label: 'Bottlenecks',
+      description: 'Service delays, three-minute risk projection, and root-cause bottlenecks.',
+      ownerRole: 'ED manager',
+      signalSources: ['bottleneckRegistry'],
+      backendEndpoints: [EMERGENCY_OS_API_ENDPOINTS.operationalIntelligenceSnapshot],
+    }),
+    Object.freeze({
+      id: 'alerts',
+      label: 'Alerts & escalation',
+      description: 'Critical alerts, acknowledgement deadlines, and escalation routing.',
+      ownerRole: 'Assigned clinician',
+      signalSources: ['alertEngine', 'alertLifecycleOrchestrator', 'clinicalAlertsApi'],
+      backendEndpoints: [
+        EMERGENCY_OS_API_ENDPOINTS.operationalIntelligenceAlerts,
+        `${EMERGENCY_OS_API_ENDPOINTS.operatingSurface}/alerts`,
+      ],
+    }),
+    Object.freeze({
+      id: 'service_health',
+      label: 'Service health',
+      description: 'Backend availability, degraded integrations, and fallback readiness.',
+      ownerRole: 'IT administrator',
+      signalSources: ['bottleneckRegistry.serviceHealth', 'backendReachability'],
+      backendEndpoints: [EMERGENCY_OS_API_ENDPOINTS.operationalIntelligenceModelHealth],
+    }),
+    Object.freeze({
+      id: 'ems_arrivals',
+      label: 'EMS arrivals',
+      description: 'Inbound units, pre-arrival packets, offload readiness, and handoff timing.',
+      ownerRole: 'EMS coordinator',
+      signalSources: ['emergencyStore.emsArrivals', 'emsPreArrivalPipelineService'],
+      backendEndpoints: [EMERGENCY_OS_API_ENDPOINTS.ems],
+    }),
+    Object.freeze({
+      id: 'patient_prioritization',
+      label: 'Patient prioritization',
+      description:
+        'Acuity ordering, P1/P2 concentration, deterioration signals, and reassessment due.',
+      ownerRole: 'Triage nurse',
+      signalSources: ['patientOrchestration', 'threeMinuteTimerEngine'],
+      backendEndpoints: [
+        EMERGENCY_OS_API_ENDPOINTS.triageAssist,
+        EMERGENCY_OS_API_ENDPOINTS.reassessment,
+      ],
+    }),
+    Object.freeze({
+      id: 'operational_intelligence',
+      label: 'Operational intelligence',
+      description: 'Rule-based and ML-assisted scores, anomalies, and command-center insights.',
+      ownerRole: 'ED manager',
+      signalSources: ['careDroidOperationalIntelligence', 'centralNode'],
+      backendEndpoints: [
+        EMERGENCY_OS_API_ENDPOINTS.operationalIntelligenceSnapshot,
+        EMERGENCY_OS_API_ENDPOINTS.centralNodeSnapshot,
+      ],
+    }),
+    Object.freeze({
+      id: 'clinical_workflow',
+      label: 'Clinical workflow support',
+      description: 'Tool recommendations, calculators, protocols, and AI Chief structured intents.',
+      ownerRole: 'Clinician',
+      signalSources: ['patientOrchestration', 'aiChiefOrchestrator', 'careDroidUnifiedAiNode'],
+      backendEndpoints: [
+        EMERGENCY_OS_API_ENDPOINTS.copilot,
+        EMERGENCY_OS_API_ENDPOINTS.copilotQuery,
+      ],
+    }),
+  ]);
 
 const DOMAIN_BY_ID = Object.freeze(
   Object.fromEntries(AI_CHIEF_MONITORING_DOMAINS.map((domain) => [domain.id, domain])),
 ) as Record<AiChiefMonitoringDomain, AiChiefMonitoringDomainDefinition>;
 
-export function getAiChiefMonitoringDomain(id: AiChiefMonitoringDomain): AiChiefMonitoringDomainDefinition {
+export function getAiChiefMonitoringDomain(
+  id: AiChiefMonitoringDomain,
+): AiChiefMonitoringDomainDefinition {
   return DOMAIN_BY_ID[id];
 }
 

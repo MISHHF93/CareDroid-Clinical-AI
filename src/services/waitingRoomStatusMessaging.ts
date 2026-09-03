@@ -18,7 +18,13 @@ export type WaitingRoomStatusMessageId =
   | 'longer-wait-advisory'
   | 'symptom-escalation';
 
-export type WaitingRoomStatusTone = 'neutral' | 'info' | 'watch' | 'warning' | 'critical' | 'stable';
+export type WaitingRoomStatusTone =
+  | 'neutral'
+  | 'info'
+  | 'watch'
+  | 'warning'
+  | 'critical'
+  | 'stable';
 
 export type WaitingRoomStatusMessageKind = 'process-status' | 'advisory' | 'safety';
 
@@ -122,9 +128,9 @@ export const WAITING_ROOM_STATUS_MESSAGE_REGISTRY: readonly WaitingRoomStatusMes
   ]);
 
 /** @deprecated Use WAITING_ROOM_STATUS_MESSAGE_REGISTRY symptom-escalation entry. */
-export const PUBLIC_WAITING_ESCALATION_MESSAGE =
-  WAITING_ROOM_STATUS_MESSAGE_REGISTRY.find((entry) => entry.id === 'symptom-escalation')!
-    .patientMessage;
+export const PUBLIC_WAITING_ESCALATION_MESSAGE = WAITING_ROOM_STATUS_MESSAGE_REGISTRY.find(
+  (entry) => entry.id === 'symptom-escalation',
+)!.patientMessage;
 
 const MESSAGE_BY_ID = Object.freeze(
   Object.fromEntries(
@@ -143,19 +149,17 @@ const PROCESS_STATUS_ORDER: readonly WaitingRoomStatusMessageId[] = Object.freez
   'awaiting-admission-bed',
 ]);
 
-const EXPERIENCE_STATUS_TO_MESSAGE: Record<
-  PatientExperienceStatusId,
-  WaitingRoomStatusMessageId
-> = Object.freeze({
-  registered: 'registered',
-  'waiting-for-triage': 'waiting-for-triage',
-  'waiting-for-clinician': 'waiting-for-clinician',
-  'tests-in-progress': 'tests-in-progress',
-  'waiting-for-results': 'waiting-for-results',
-  'waiting-for-specialist-review': 'waiting-for-specialist-review',
-  'preparing-discharge': 'preparing-discharge',
-  'awaiting-admission-bed': 'awaiting-admission-bed',
-});
+const EXPERIENCE_STATUS_TO_MESSAGE: Record<PatientExperienceStatusId, WaitingRoomStatusMessageId> =
+  Object.freeze({
+    registered: 'registered',
+    'waiting-for-triage': 'waiting-for-triage',
+    'waiting-for-clinician': 'waiting-for-clinician',
+    'tests-in-progress': 'tests-in-progress',
+    'waiting-for-results': 'waiting-for-results',
+    'waiting-for-specialist-review': 'waiting-for-specialist-review',
+    'preparing-discharge': 'preparing-discharge',
+    'awaiting-admission-bed': 'awaiting-admission-bed',
+  });
 
 const PHI_PATTERN =
   /\b(mrn|dob|ssn|@[a-z0-9.-]+\.[a-z]{2,})\b|(?:\b\d{3}-\d{2}-\d{4}\b)|(?:\b\d{2}\/\d{2}\/\d{4}\b)/i;
@@ -248,9 +252,10 @@ export function buildWaitingRoomStatusMessagingSnapshot(
     referrals: input.referrals,
   });
 
-  const messageCounts = Object.fromEntries(
-    PROCESS_STATUS_ORDER.map((id) => [id, 0]),
-  ) as Record<WaitingRoomStatusMessageId, number>;
+  const messageCounts = Object.fromEntries(PROCESS_STATUS_ORDER.map((id) => [id, 0])) as Record<
+    WaitingRoomStatusMessageId,
+    number
+  >;
 
   (Object.entries(experienceCounts) as Array<[PatientExperienceStatusId, number]>).forEach(
     ([statusId, count]) => {

@@ -54,14 +54,13 @@ export default function HIPAANotice() {
         <section className="cdl-surface cdl-surface--information">
           <h3>HIPAA Privacy Officer</h3>
           <p>
-            For HIPAA-related inquiries:{' '}
-            <a href="mailto:hipaa@caredroid.ai">hipaa@caredroid.ai</a>
+            For HIPAA-related inquiries: <a href="mailto:hipaa@caredroid.ai">hipaa@caredroid.ai</a>
           </p>
         </section>
 
         <p className="cdl-type-muted">
-          Last updated: February 2026 · CareDroid can execute Business Associate Agreements (BAA) upon
-          request for production deployments.
+          Last updated: February 2026 · CareDroid can execute Business Associate Agreements (BAA)
+          upon request for production deployments.
         </p>
       </article>
     </PublicPageTemplate>

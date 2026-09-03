@@ -27,7 +27,10 @@ export function EntryShell({ children }: EntryShellProps) {
           <Link className="entry-shell__link" to={clinicalHome}>
             Skip to clinical workspace
           </Link>
-          <Link className="entry-shell__link entry-shell__link--primary" to={CANONICAL_ROUTES.emergencyReception}>
+          <Link
+            className="entry-shell__link entry-shell__link--primary"
+            to={CANONICAL_ROUTES.emergencyReception}
+          >
             Start at reception
           </Link>
         </nav>

@@ -188,7 +188,12 @@ export function departmentChannelsForRole(role: string | null | undefined): Coll
   if (r.includes('flow') || r.includes('bed_manager')) {
     return [flow, ed, charge, announce];
   }
-  if (r.includes('director') || r.includes('ed_manager') || r === 'hospital_admin' || r === 'admin') {
+  if (
+    r.includes('director') ||
+    r.includes('ed_manager') ||
+    r === 'hospital_admin' ||
+    r === 'admin'
+  ) {
     return [ops, ed, charge, admin, announce];
   }
   // Ancillary
@@ -364,7 +369,10 @@ export function normalizeChannelListPayload(
       }
       return null;
     })
-    .filter(Boolean) as Array<{ channel: CollaborationChannel; membership?: CollaborationMembership }>;
+    .filter(Boolean) as Array<{
+    channel: CollaborationChannel;
+    membership?: CollaborationMembership;
+  }>;
 }
 
 export function normalizeMessageListPayload(data: unknown): CollaborationMessage[] {
@@ -403,7 +411,11 @@ export function createLocalPatientThreadChannel(input: {
   patientId: string;
   patientLabel?: string;
   userId?: string | null;
-}): { channel: CollaborationChannel; membership: CollaborationMembership; messages: CollaborationMessage[] } {
+}): {
+  channel: CollaborationChannel;
+  membership: CollaborationMembership;
+  messages: CollaborationMessage[];
+} {
   const id = `local-ch-patient-${input.patientId}`;
   const ch = channel(id, input.patientLabel || `Patient ${input.patientId}`, 'patient_thread', {
     patientId: input.patientId,
@@ -414,8 +426,6 @@ export function createLocalPatientThreadChannel(input: {
   return {
     channel: ch,
     membership: membership(id, userId),
-    messages: [
-      systemMessage(id, 'Patient thread opened from reception desk.', 0),
-    ],
+    messages: [systemMessage(id, 'Patient thread opened from reception desk.', 0)],
   };
 }

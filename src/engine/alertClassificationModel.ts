@@ -160,7 +160,13 @@ export const ALERT_SOURCE_REGISTRY = Object.freeze([
     domain: 'Queue',
     source: 'reception-escalation-workflow',
     defaultTier: 'critical',
-    surfaces: ['Header', 'ReceptionWorkspace', 'ChargeNurseOperationalStrip', 'ReceptionEscalationAttentionStrip', 'ReceptionEscalationQuickActions'],
+    surfaces: [
+      'Header',
+      'ReceptionWorkspace',
+      'ChargeNurseOperationalStrip',
+      'ReceptionEscalationAttentionStrip',
+      'ReceptionEscalationQuickActions',
+    ],
   }),
   Object.freeze({
     id: 'operational-intelligence',
@@ -216,7 +222,10 @@ export function classifyOperationalAlert(alert) {
   return 'informational';
 }
 
-export function shouldToastOperationalAlert(alert, classification = classifyOperationalAlert(alert)) {
+export function shouldToastOperationalAlert(
+  alert,
+  classification = classifyOperationalAlert(alert),
+) {
   if (alert?.metadata?.advisoryOnly) return false;
   if (alert?.metadata?.suppressToast) return false;
   // Only critical-tier alerts pop a toast; high/warning stays in the alert rail
@@ -225,7 +234,10 @@ export function shouldToastOperationalAlert(alert, classification = classifyOper
 
 export function shouldRetainDerivedAlert(alert, classification = classifyOperationalAlert(alert)) {
   const text = haystack(alert);
-  if (/alert-capacity-yellow/.test(text) || (alert.type === 'Capacity' && alert.severity === 'Info')) {
+  if (
+    /alert-capacity-yellow/.test(text) ||
+    (alert.type === 'Capacity' && alert.severity === 'Info')
+  ) {
     return false;
   }
   if (/alert-referral-sent/.test(text) && classification === 'informational') {
@@ -267,7 +279,9 @@ export function dedupeOperationalAlerts(alerts = [] as any[]) {
 }
 
 export function triageOperationalAlerts(alerts = [] as any[]) {
-  const retained = dedupeOperationalAlerts(alerts.filter((alert) => shouldRetainDerivedAlert(alert as any)));
+  const retained = dedupeOperationalAlerts(
+    alerts.filter((alert) => shouldRetainDerivedAlert(alert as any)),
+  );
   const classified = retained.map((alert) => {
     const classification = classifyOperationalAlert(alert);
     return {

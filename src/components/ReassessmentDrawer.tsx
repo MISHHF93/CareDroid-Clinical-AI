@@ -86,7 +86,10 @@ function isReassessmentAttentionFlag(value: unknown): value is ReassessmentAtten
   return REASSESSMENT_ATTENTION_FLAGS.includes(value as ReassessmentAttentionFlag);
 }
 
-function flagRecordFor(patient: Patient, targetFlag: ReassessmentAttentionFlag): FlagRecordLike | null {
+function flagRecordFor(
+  patient: Patient,
+  targetFlag: ReassessmentAttentionFlag,
+): FlagRecordLike | null {
   return (
     ((patient.flags ?? []) as unknown[]).find((flag) => {
       if (!isObject(flag)) return false;
@@ -124,7 +127,9 @@ function eventMatchesFlag(
 function noteMatchesFlag(note: Note, targetFlag: ReassessmentAttentionFlag): boolean {
   const label = FLAG_COPY[targetFlag].label.toLowerCase();
   const text = `${note.type ?? ''} ${note.text ?? ''} ${note.body ?? ''}`.toLowerCase();
-  return text.includes(targetFlag.toLowerCase()) || text.includes(label) || text.includes('reassessment');
+  return (
+    text.includes(targetFlag.toLowerCase()) || text.includes(label) || text.includes('reassessment')
+  );
 }
 
 export function getActiveReassessmentFlags(patient: Patient): ReassessmentAttentionFlag[] {
@@ -188,10 +193,14 @@ function compareReassessmentPatients(
   const waitDelta = getWaitMinutes(b, now) - getWaitMinutes(a, now);
 
   if (sortMode === 'wait') {
-    return waitDelta || severityDelta || getPatientDisplayName(a).localeCompare(getPatientDisplayName(b));
+    return (
+      waitDelta || severityDelta || getPatientDisplayName(a).localeCompare(getPatientDisplayName(b))
+    );
   }
 
-  return severityDelta || waitDelta || getPatientDisplayName(a).localeCompare(getPatientDisplayName(b));
+  return (
+    severityDelta || waitDelta || getPatientDisplayName(a).localeCompare(getPatientDisplayName(b))
+  );
 }
 
 export function sortReassessmentAttentionPatients(
@@ -240,19 +249,31 @@ export function getFlagTimestampInfo(
   const relatedNoteTimestamp = newestTimestamp(
     (patient.notes ?? [])
       .filter((note) => noteMatchesFlag(note, targetFlag))
-      .map((note) => validTimestamp(note.timestamp) ?? validTimestamp(note.createdAt) ?? validTimestamp(note.updatedAt)),
+      .map(
+        (note) =>
+          validTimestamp(note.timestamp) ??
+          validTimestamp(note.createdAt) ??
+          validTimestamp(note.updatedAt),
+      ),
   );
   if (relatedNoteTimestamp) {
     return { timestamp: relatedNoteTimestamp, source: 'related note fallback', exact: false };
   }
 
-  const latestTimelineTimestamp = newestTimestamp((patient.timeline ?? []).map((event) => validTimestamp(event.timestamp)));
+  const latestTimelineTimestamp = newestTimestamp(
+    (patient.timeline ?? []).map((event) => validTimestamp(event.timestamp)),
+  );
   if (latestTimelineTimestamp) {
     return { timestamp: latestTimelineTimestamp, source: 'latest timeline fallback', exact: false };
   }
 
   const latestNoteTimestamp = newestTimestamp(
-    (patient.notes ?? []).map((note) => validTimestamp(note.timestamp) ?? validTimestamp(note.createdAt) ?? validTimestamp(note.updatedAt)),
+    (patient.notes ?? []).map(
+      (note) =>
+        validTimestamp(note.timestamp) ??
+        validTimestamp(note.createdAt) ??
+        validTimestamp(note.updatedAt),
+    ),
   );
   if (latestNoteTimestamp) {
     return { timestamp: latestNoteTimestamp, source: 'latest note fallback', exact: false };
@@ -287,7 +308,9 @@ function getRoomLabel(patient: Patient, rooms: Room[]): string {
 }
 
 function getComplaintLabel(patient: Patient): string {
-  return patient.chiefComplaint || patient.complaint || patient.complaintCategory || 'Complaint pending';
+  return (
+    patient.chiefComplaint || patient.complaint || patient.complaintCategory || 'Complaint pending'
+  );
 }
 
 type ReassessmentDrawerProps = {
@@ -304,7 +327,8 @@ export default function ReassessmentDrawer({ open, count, onClose }: Reassessmen
   const [sortMode, setSortMode] = useState<ReassessmentSortMode>('severity');
 
   const sortedPatients = useMemo(
-    () => sortReassessmentAttentionPatients(collectReassessmentAttentionPatients(patients), sortMode),
+    () =>
+      sortReassessmentAttentionPatients(collectReassessmentAttentionPatients(patients), sortMode),
     [patients, sortMode],
   );
   const attentionCount = count ?? sortedPatients.length;
@@ -338,32 +362,39 @@ export default function ReassessmentDrawer({ open, count, onClose }: Reassessmen
         <header className="reassessment-drawer__header">
           <div className="reassessment-drawer__title-group">
             <h2 id="reassessment-drawer-title">Reassessment Required</h2>
-            <span className="reassessment-drawer__count">[{attentionCount}] patients need attention</span>
+            <span className="reassessment-drawer__count">
+              [{attentionCount}] patients need attention
+            </span>
           </div>
 
           <div className="reassessment-drawer__sort" aria-label="Sort reassessment patients">
-            {sortMode === 'severity' ? (<button
-              type="button"
-              aria-pressed="true"
-              onClick={() => setSortMode('severity')}
-            >
-              By severity
-            </button>) : (<button
-              type="button"
-              aria-pressed="false"
-              onClick={() => setSortMode('severity')}
-            >
-              By severity
-            </button>)}
+            {sortMode === 'severity' ? (
+              <button type="button" aria-pressed="true" onClick={() => setSortMode('severity')}>
+                By severity
+              </button>
+            ) : (
+              <button type="button" aria-pressed="false" onClick={() => setSortMode('severity')}>
+                By severity
+              </button>
+            )}
             <span aria-hidden>|</span>
-            {sortMode === 'wait' ? (<button type="button" aria-pressed="true" onClick={() => setSortMode('wait')}>
-              By wait time
-            </button>) : (<button type="button" aria-pressed="false" onClick={() => setSortMode('wait')}>
-              By wait time
-            </button>)}
+            {sortMode === 'wait' ? (
+              <button type="button" aria-pressed="true" onClick={() => setSortMode('wait')}>
+                By wait time
+              </button>
+            ) : (
+              <button type="button" aria-pressed="false" onClick={() => setSortMode('wait')}>
+                By wait time
+              </button>
+            )}
           </div>
 
-          <button type="button" className="reassessment-drawer__close" onClick={onClose} aria-label="Close reassessment drawer">
+          <button
+            type="button"
+            className="reassessment-drawer__close"
+            onClick={onClose}
+            aria-label="Close reassessment drawer"
+          >
             X
           </button>
         </header>
@@ -399,7 +430,9 @@ export default function ReassessmentDrawer({ open, count, onClose }: Reassessmen
 
                   <div className="reassessment-drawer__avatar">
                     <span className="reassessment-drawer__initials">{getInitials(patient)}</span>
-                    <span className={`reassessment-drawer__priority reassessment-drawer__priority--${flagCopy.tone}`}>
+                    <span
+                      className={`reassessment-drawer__priority reassessment-drawer__priority--${flagCopy.tone}`}
+                    >
                       {patient.priority}
                     </span>
                   </div>
@@ -416,7 +449,10 @@ export default function ReassessmentDrawer({ open, count, onClose }: Reassessmen
                   </div>
 
                   <div className="reassessment-drawer__flags">
-                    <div className="reassessment-drawer__flag-icons" aria-label="Active reassessment flags">
+                    <div
+                      className="reassessment-drawer__flag-icons"
+                      aria-label="Active reassessment flags"
+                    >
                       {activeFlags.map((flag) => (
                         <span
                           key={flag}
@@ -428,13 +464,17 @@ export default function ReassessmentDrawer({ open, count, onClose }: Reassessmen
                         </span>
                       ))}
                     </div>
-                    <span className={`reassessment-drawer__flag-label reassessment-drawer__flag-label--${flagCopy.tone}`}>
+                    <span
+                      className={`reassessment-drawer__flag-label reassessment-drawer__flag-label--${flagCopy.tone}`}
+                    >
                       ⚠ {flagCopy.label}
                     </span>
                   </div>
 
                   <div className="reassessment-drawer__actions">
-                    <span className={`reassessment-drawer__wait reassessment-drawer__wait--${flagCopy.tone}`}>
+                    <span
+                      className={`reassessment-drawer__wait reassessment-drawer__wait--${flagCopy.tone}`}
+                    >
                       {formatCompactWaitTime(waitMinutes)}
                     </span>
                     <button

@@ -27,9 +27,11 @@ export function resolveFeatureFlagStateForAsset(assetId, context: any = {}) {
 }
 
 export function isFeatureFlagLaunchable(state) {
-  return [FEATURE_FLAG_STATES.ENABLED, FEATURE_FLAG_STATES.BETA, FEATURE_FLAG_STATES.EXPERIMENTAL].includes(
-    state
-  );
+  return [
+    FEATURE_FLAG_STATES.ENABLED,
+    FEATURE_FLAG_STATES.BETA,
+    FEATURE_FLAG_STATES.EXPERIMENTAL,
+  ].includes(state);
 }
 
 function resolveContextRole(context: any = {}) {

@@ -48,7 +48,9 @@ export function buildAcceptedTriageAssist(
     rationale: [
       ...assist.rationale,
       override.priority ? `Priority overridden to ${override.priority} by nurse review.` : '',
-      override.streamingLane ? `Streaming lane set to ${streamingLaneLabel(String(streamingLane))}.` : '',
+      override.streamingLane
+        ? `Streaming lane set to ${streamingLaneLabel(String(streamingLane))}.`
+        : '',
       `ESI mapping: ${priorityToEsiLabel(override.priority || assist.suggestedPriority)}`,
     ].filter(Boolean),
     acceptedAt: new Date().toISOString(),

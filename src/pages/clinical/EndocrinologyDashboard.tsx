@@ -11,7 +11,8 @@ const CARDS = [
   {
     to: '/emergency/tools/endocrine/continuous-glucose-command-center',
     title: 'CGM command center',
-    description: 'Telemetry freshness, hypo/hyperglycemia patterns, sensor gaps, and unresolved queues.',
+    description:
+      'Telemetry freshness, hypo/hyperglycemia patterns, sensor gaps, and unresolved queues.',
     tier: 'Tier C' as const,
   },
   {
@@ -23,13 +24,15 @@ const CARDS = [
   {
     to: '/emergency/tools/endocrine/dka-pathway-assistant',
     title: 'DKA pathway assistant',
-    description: 'Glucose, ketones, anion gap, bicarbonate, osmolality, potassium, and handoff prompts.',
+    description:
+      'Glucose, ketones, anion gap, bicarbonate, osmolality, potassium, and handoff prompts.',
     tier: 'Tier B' as const,
   },
   {
     to: '/emergency/tools/endocrine/thyroid-disorder-assistant',
     title: 'Thyroid disorder assistant',
-    description: 'TSH/T4 context, symptoms, pregnancy/medication caveats, red flags, and follow-up gaps.',
+    description:
+      'TSH/T4 context, symptoms, pregnancy/medication caveats, red flags, and follow-up gaps.',
     tier: 'Tier B' as const,
   },
   {
@@ -47,19 +50,22 @@ const CARDS = [
   {
     to: '/emergency/tools/endocrine/insulin-trend-engine',
     title: 'Insulin trend engine',
-    description: 'Documented administrations and glucose response context, without dose recommendations.',
+    description:
+      'Documented administrations and glucose response context, without dose recommendations.',
     tier: 'Tier C' as const,
   },
   {
     to: '/emergency/tools/endocrine/endocrine-monitoring-system',
     title: 'Endocrine monitoring system',
-    description: 'Glucose, thyroid, calcium, sodium/osmolality, anthropometrics, and critical-value queues.',
+    description:
+      'Glucose, thyroid, calcium, sodium/osmolality, anthropometrics, and critical-value queues.',
     tier: 'Tier C' as const,
   },
   {
     to: '/emergency/tools/endocrine/metabolic-analytics',
     title: 'Metabolic analytics',
-    description: 'Anthropometrics, glucose/lipid context, metabolic syndrome factors, and review queues.',
+    description:
+      'Anthropometrics, glucose/lipid context, metabolic syndrome factors, and review queues.',
     tier: 'Tier C' as const,
   },
 ];

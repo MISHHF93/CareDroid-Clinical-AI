@@ -15,16 +15,43 @@ export const ADMIN_SAAS_ROLES = Object.freeze([
 ]);
 
 export const ED_WORKFLOW_LANES = Object.freeze([
-  { id: 'reception', label: 'Reception & registration', saasRoles: ['registration-clerk'], emergencyRoles: ['registration_clerk'] },
-  { id: 'triage', label: 'Triage & acuity', saasRoles: ['nurse'], emergencyRoles: ['triage_nurse'] },
-  { id: 'waiting', label: 'Waiting room & reassessment', saasRoles: ['nurse'], emergencyRoles: ['charge_nurse'] },
-  { id: 'provider', label: 'Provider & disposition', saasRoles: ['emergency-physician'], emergencyRoles: ['physician'] },
-  { id: 'operations', label: 'ED operations & command', saasRoles: ['hospital-administrator'], emergencyRoles: ['ed_manager', 'charge_nurse'] },
+  {
+    id: 'reception',
+    label: 'Reception & registration',
+    saasRoles: ['registration-clerk'],
+    emergencyRoles: ['registration_clerk'],
+  },
+  {
+    id: 'triage',
+    label: 'Triage & acuity',
+    saasRoles: ['nurse'],
+    emergencyRoles: ['triage_nurse'],
+  },
+  {
+    id: 'waiting',
+    label: 'Waiting room & reassessment',
+    saasRoles: ['nurse'],
+    emergencyRoles: ['charge_nurse'],
+  },
+  {
+    id: 'provider',
+    label: 'Provider & disposition',
+    saasRoles: ['emergency-physician'],
+    emergencyRoles: ['physician'],
+  },
+  {
+    id: 'operations',
+    label: 'ED operations & command',
+    saasRoles: ['hospital-administrator'],
+    emergencyRoles: ['ed_manager', 'charge_nurse'],
+  },
   { id: 'ems', label: 'EMS handoff', saasRoles: ['nurse'], emergencyRoles: ['ems_user'] },
 ]);
 
 export function isAdminSaasRole(role: string | null | undefined): boolean {
-  const normalized = String(role || '').trim().toLowerCase();
+  const normalized = String(role || '')
+    .trim()
+    .toLowerCase();
   if (!normalized) return false;
   if (ADMIN_SAAS_ROLES.includes(normalized)) return true;
   const profile = resolveUserProfileFromSaasRole(normalized);
@@ -44,9 +71,7 @@ export function resolveClinicalHomeRoute(role: string | null | undefined): strin
   // 'nurse'). See hasExplicitHomeRoute()'s doc comment for the full story.
   if (hasExplicitHomeRoute(role)) return getHomeRouteForRole(role);
   return (
-    getEmergencyRoleHomeRoute(role) ||
-    getPlatformHomeRoute() ||
-    CANONICAL_ROUTES.emergencyReception
+    getEmergencyRoleHomeRoute(role) || getPlatformHomeRoute() || CANONICAL_ROUTES.emergencyReception
   );
 }
 
@@ -57,10 +82,7 @@ export type PlatformLandingInput = {
   returnUrl?: string | null;
 };
 
-export function resolvePlatformLanding({
-  saasRole,
-  returnUrl,
-}: PlatformLandingInput = {}): string {
+export function resolvePlatformLanding({ saasRole, returnUrl }: PlatformLandingInput = {}): string {
   const safeReturn = String(returnUrl || '').trim();
   if (
     safeReturn &&

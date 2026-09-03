@@ -81,7 +81,9 @@ export default function PredictiveMaintenance() {
       <header className="predictive-maintenance-page__header">
         <GraphicIconBadge iconKey="refresh" accent="warning" size="md" />
         <div>
-          <p className="predictive-maintenance-page__title-text" data-testid="cd-page-title-text">Predictive Maintenance</p>
+          <p className="predictive-maintenance-page__title-text" data-testid="cd-page-title-text">
+            Predictive Maintenance
+          </p>
           <p>Rule-based maintenance risk scoring for fleet operations review.</p>
         </div>
       </header>
@@ -191,7 +193,9 @@ export default function PredictiveMaintenance() {
           {result ? (
             <>
               <div className="predictive-maintenance-page__score">
-                <span className={`predictive-maintenance-page__band predictive-maintenance-page__band--${result.riskBand}`}>
+                <span
+                  className={`predictive-maintenance-page__band predictive-maintenance-page__band--${result.riskBand}`}
+                >
                   {result.riskBandLabel}
                 </span>
                 <strong>{result.maintenanceRiskScore}</strong>
@@ -258,7 +262,8 @@ export default function PredictiveMaintenance() {
             </>
           ) : (
             <p className="fleet-safety-notice">
-              Enter at least one vehicle age, mileage, diagnostic code, or telemetry field to score risk.
+              Enter at least one vehicle age, mileage, diagnostic code, or telemetry field to score
+              risk.
             </p>
           )}
         </div>

@@ -37,5 +37,5 @@ export const WELLS_PE_ALL_ALIAS_PAIRS = Object.freeze([
 ]);
 
 export const WELLS_PE_TIER_B_IDS = Object.freeze(
-  PR2_TIER_B_CHAT_CALCULATOR_IDS.filter((id) => id === WELLS_PE_REGISTRY_ID)
+  PR2_TIER_B_CHAT_CALCULATOR_IDS.filter((id) => id === WELLS_PE_REGISTRY_ID),
 );

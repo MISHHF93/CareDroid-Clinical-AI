@@ -18,7 +18,11 @@ export default function DisplayRefreshStatusBar({
 
   return (
     <div
-      className={['display-refresh-status', `display-refresh-status--${refreshStatus.tone}`, className]
+      className={[
+        'display-refresh-status',
+        `display-refresh-status--${refreshStatus.tone}`,
+        className,
+      ]
         .filter(Boolean)
         .join(' ')}
       aria-live="polite"
