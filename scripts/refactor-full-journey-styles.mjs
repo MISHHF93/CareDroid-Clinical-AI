@@ -189,11 +189,6 @@ const pairs = [
   ],
 ];
 
-// multi-line style blocks with MEDICAL_THEME
-const multiLinePatterns = [
-  // generic: style={{ fontSize: 12, color: MEDICAL_THEME.inkSubtle, marginTop: 2 }} already above
-];
-
 let n = 0;
 for (const [from, to] of pairs) {
   if (src.includes(from)) {

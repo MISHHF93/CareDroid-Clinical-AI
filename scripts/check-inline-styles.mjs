@@ -23,8 +23,6 @@ const FILE_CEILINGS = new Map([
   ['src/components/Header.tsx', 1],
 ]);
 
-const ALLOW_DYNAMIC = new Set(['src/pages/Profile.jsx', 'src/components/Header.tsx']);
-
 function walk(dir, acc = []) {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const path = join(dir, entry.name);

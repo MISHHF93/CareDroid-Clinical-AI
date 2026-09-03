@@ -35,24 +35,6 @@ function isAlreadyLiteral(expr) {
   return /^['"`](true|false|page|step|location|date|time)['"`]$/.test(e);
 }
 
-function isBooleanishExpr(expr) {
-  const e = expr.trim();
-  // Patterns we can safely dual-branch with a simple rewrite of the attribute only
-  // (keep element structure; Edge still fails on ternary — so we rewrite attr to
-  // use a string variable is NOT enough. We need dual elements.)
-  if (isAlreadyLiteral(e)) return false;
-  // active ? 'true' : 'false'
-  if (/\?\s*['"`]true['"`]\s*:\s*['"`]false['"`]/.test(e)) return true;
-  if (/\?\s*['"`]false['"`]\s*:\s*['"`]true['"`]/.test(e)) return true;
-  // bare identifier / comparison — treat as booleanish
-  if (/^[a-zA-Z_$][\w.$]*$/.test(e)) return true;
-  if (/^[a-zA-Z_$][\w.$]*\s*===\s*[a-zA-Z_$0-9'"`.\s]+$/.test(e)) return true;
-  if (/^[a-zA-Z_$][\w.$]*\s*!==\s*[a-zA-Z_$0-9'"`.\s]+$/.test(e)) return true;
-  if (/^!!?[a-zA-Z_$]/.test(e)) return true;
-  if (/\?\s*['"`]true['"`]\s*:/.test(e) || /:\s*['"`]false['"`]/.test(e)) return true;
-  return true; // flag everything non-literal for report
-}
-
 /**
  * For a self-closing or simple opening button tag that has a single aria-ATTR={expr},
  * rewrite to two full copies is too heavy. Instead we rewrite:
@@ -167,10 +149,6 @@ function transformFile(source) {
   }
 
   // Inject helper once if not present
-  const helperName = '__edgeSafeAriaBool';
-  const helperDecl = `
-/** Edge Tools requires literal aria bool strings; this helper is NOT used for attrs. */
-`;
 
   // Actually the only auto-fix that Edge Tools accepts is dual elements.
   // Implement dual-branch for map callbacks with single button return.

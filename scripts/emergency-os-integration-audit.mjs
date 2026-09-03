@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
 const ROOT = process.cwd();
@@ -29,21 +29,6 @@ const TEXT_EXTENSIONS = new Set([
   '.yml',
   '.yaml',
 ]);
-
-const PRIMARY_ROUTES = [
-  '/emergency/whiteboard',
-  '/emergency/patients',
-  '/emergency/ems',
-  '/emergency/intake',
-  '/emergency/queues',
-  '/emergency/reassessment',
-  '/emergency/capacity',
-  '/emergency/boarding',
-  '/emergency/referrals',
-  '/emergency/copilot',
-  '/emergency/analytics',
-  '/emergency/settings',
-];
 
 const WORKFLOWS = [
   {

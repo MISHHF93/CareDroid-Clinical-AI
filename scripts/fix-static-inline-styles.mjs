@@ -296,55 +296,6 @@ function findUtility(obj) {
   return null;
 }
 
-function mergeClassName(existing, utilities) {
-  if (!existing) return `className="${utilities}"`;
-  // existing is full className="..." or className={...}
-  if (existing.startsWith('className="') || existing.startsWith("className='")) {
-    const q = existing[10];
-    const inner = existing.slice(11, -1);
-    const merged = `${inner} ${utilities}`.replace(/\s+/g, ' ').trim();
-    return `className=${q}${merged}${q}`;
-  }
-  if (existing.startsWith('className={`') || existing.startsWith('className={')) {
-    // className={`foo ${bar}`} or className={expr}
-    // inject utilities as prefix string if template
-    const m = existing.match(/^className=\{\s*`([^`]*)`\s*\}$/);
-    if (m) {
-      return `className={\`${utilities} ${m[1]}\`}`;
-    }
-    const m2 = existing.match(/^className=\{\s*(.+)\s*\}$/);
-    if (m2) {
-      return `className={[${JSON.stringify(utilities)}, ${m2[1]}].filter(Boolean).join(' ')}`;
-    }
-  }
-  return existing;
-}
-
-function transform(src) {
-  let count = 0;
-  // Match style={{ ... }} — non-greedy but handle nested braces poorly; simple case only
-  const re = /(\s)style=\{\{([^{}]+)\}\}/g;
-  const out = src.replace(re, (full, ws, body) => {
-    const obj = parseStyleObject(body);
-    if (!obj) return full;
-    const util = findUtility(obj);
-    if (!util) return full;
-    count += 1;
-    // We only return a marker; className merge happens in a second pass per match context.
-    // Simpler: just replace style with className if no adjacent className handling —
-    // return placeholder and fix below.
-    return `${ws}__STYLE_UTIL__${util}__`;
-  });
-
-  if (!count) return { out: src, count: 0 };
-
-  // Second pass: for each marker, attach to preceding className or become className
-  let final = out;
-  const markerRe = /__STYLE_UTIL__([^_]+(?:\s[^_]+)*)__/g;
-  // markers may have spaces in util classes - use different delimiter
-  return transformV2(src);
-}
-
 function transformV2(src) {
   let count = 0;
   // Process one match at a time from the end to keep indices stable
@@ -377,14 +328,12 @@ function transformV2(src) {
     }
 
     const openSlice = out.slice(tagStart, start);
-    const classMatch = openSlice.match(/\sclassName=(("[^"]*")|('[^']*')|(\{[^}]*\}))\s*$/);
     // className may not be immediately before style; search in open tag
     const openTagEnd = out.indexOf('>', end);
     const fullOpen = out.slice(tagStart, openTagEnd === -1 ? end : openTagEnd);
     const anyClass = fullOpen.match(/\sclassName=(("[^"]*")|('[^']*')|(`[^`]*`)|(\{[\s\S]*?\}))/);
 
     if (anyClass) {
-      const fullClassAttr = anyClass[0].trim(); // className="..."
       const attrStart = tagStart + fullOpen.indexOf(anyClass[0]);
       // rebuild className
       let newClassAttr;

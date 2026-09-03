@@ -60,7 +60,6 @@ function run(label, command, args, env = {}) {
 
 function parseVitestCounts(stdout) {
   const m = stdout.match(/Tests\s+(\d+)\s+passed/);
-  const failed = stdout.match(/Tests\s+\d+\s+failed/);
   // Vitest 4: "Tests  30 passed (30)"
   const m2 = stdout.match(/Tests\s+(\d+)\s+passed\s+\((\d+)\)/);
   if (m2) return { passed: Number(m2[1]), total: Number(m2[2]) };

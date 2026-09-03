@@ -518,10 +518,7 @@ const resolvedBackend = await resolveStackPort(preferredBackendPort, 'Backend', 
 frontendPort = resolvedFrontend.port;
 backendPort = resolvedBackend.port;
 
-({ frontendEnv, backendEnv, frontendOrigin, backendOrigin } = buildStackEnv(
-  frontendPort,
-  backendPort,
-));
+({ frontendEnv, backendEnv, frontendOrigin } = buildStackEnv(frontendPort, backendPort));
 
 const backendAlreadyHealthy = !forceRestart && (await probeBackendHealth(backendPort));
 let frontendProxyHealthy = !forceRestart && (await probeFrontendProxyHealth(frontendPort));

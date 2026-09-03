@@ -3,7 +3,7 @@
  * Split oversized CSS files into <=400-line chunks with @import chain.
  * Splits only on top-level rule boundaries (brace depth 0) to avoid broken blocks.
  */
-import { mkdirSync, readFileSync, writeFileSync, existsSync, rmSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { dirname, join, relative, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 

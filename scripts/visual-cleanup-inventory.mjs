@@ -3,7 +3,7 @@
  * Visual cleanup inventory — lists routes/pages needing PageShell, inline styles,
  * MetricGrid usage, and oversized CSS files.
  */
-import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 
 const ROOT = new URL('..', import.meta.url).pathname.replace(/^\/([A-Z]:)/, '$1');

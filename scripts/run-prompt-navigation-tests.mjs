@@ -6,17 +6,13 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { createRequire } from 'node:module';
 import ts from 'typescript';
-import { createHash } from 'node:crypto';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, '..');
 const outDir = path.join(root, '.tmp-prompt-nav-tests');
 const reportPath = path.join(root, 'qa', 'prompt-navigation-test-report.json');
 const reportMd = path.join(root, 'qa', 'prompt-navigation-test-report.md');
-
-const require = createRequire(import.meta.url);
 
 function cleanDir(dir) {
   fs.rmSync(dir, { recursive: true, force: true });

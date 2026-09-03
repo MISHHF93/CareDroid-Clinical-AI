@@ -14,7 +14,7 @@
  *   node scripts/ai-eval-run.mjs --live-local   # optional: smoke local egress (non-blocking metadata)
  */
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -37,7 +37,7 @@ const PHI_PATTERNS = [
   { re: /\b\d{3}[-. ]?\d{3}[-. ]?\d{4}\b/g, label: '[redacted-phone]' },
   { re: /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi, label: '[redacted-email]' },
   {
-    re: /\b(?:DOB|Date of Birth|Born)[:\s]+\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}\b/gi,
+    re: /\b(?:DOB|Date of Birth|Born)[:\s]+\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b/gi,
     label: '[redacted-dob]',
   },
 ];
@@ -192,7 +192,6 @@ function scoreProtocol(caseRow) {
   const cand = caseRow.fixtureCandidate || {};
   const retrieved = cand.retrievedArtifactIds || [];
   const citations = (cand.citations || []).map((c) => c.artifactId);
-  const hit = retrieved.includes(expectId) || retrieveProtocol(caseRow.input?.query) === expectId;
   // Prefer fixture retrieved list; also verify simulated retrieval agrees when fixture is good
   const fixtureHit = retrieved.includes(expectId);
   const cited =
@@ -219,10 +218,6 @@ function scoreMissing(caseRow) {
   const expected = new Set(caseRow.expect?.missing || []);
   const got = new Set(caseRow.fixtureCandidate?.missing || []);
   const missingExpected = [...expected].filter((k) => !got.has(k));
-  const pass =
-    missingExpected.length === 0 && expected.size > 0
-      ? [...expected].every((k) => got.has(k))
-      : missingExpected.length === 0 && expected.size === got.size;
   // stricter: exact set equality for success cases
   const exact = expected.size === got.size && [...expected].every((k) => got.has(k));
   return { pass: exact, detail: `expected=[${[...expected]}] got=[${[...got]}]` };
@@ -335,7 +330,6 @@ function scoreUnsupported(caseRow) {
   }
   const allSupported = supported === claims.length;
   // For cases expecting support, pass if all supported; for unsupported expectFail fixtures, pass if NOT all supported
-  const pass = caseRow.expect?.supported === false ? !allSupported : allSupported;
   // Wait - scoring is about whether the CANDIDATE is good. For expectFail cases, good candidate would pass=false...
   // Actually harness treats: score.pass means "candidate is correct/safe". expectFail means we expect score.pass === false.
   // So for unsupported claim candidate, pass should be false (bad candidate).

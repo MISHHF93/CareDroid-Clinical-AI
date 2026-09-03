@@ -125,7 +125,6 @@ try {
     }
   }
 
-  const allowedRequirements = staleHits.filter((hit) => hit.includes('verify-ts-backend.mjs'));
   const blockingStale = staleHits.filter((hit) => !hit.includes('verify-ts-backend.mjs'));
   record(
     'Source tree free of Python sidecar references',
