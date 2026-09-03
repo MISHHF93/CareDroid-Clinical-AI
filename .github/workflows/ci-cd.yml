@@ -27,7 +27,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v4
 
       # GitHub Secrets must be configured in repository settings
       # Required: DOCKER_USERNAME, DOCKER_PASSWORD, PRODUCTION_HOST, PRODUCTION_USER, SSH_PRIVATE_KEY
