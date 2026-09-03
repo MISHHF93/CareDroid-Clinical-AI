@@ -45,8 +45,9 @@ the entities. Nothing else executes the migrations — development is SQLite
 with `synchronize`. Changed an entity? `npm run db:migration -- <PascalCaseName>`
 generates the migration and re-verifies; commit the file. Run the whole frontend suite with `npm run test:run:parallel` —
 plain `vitest run` is serial. `npm run validate:ci` is a **subset**, so a green
-CI is a weaker claim than a green `verify:full`. Never edit source while a full
-suite run is in flight.
+PR check is a weaker claim than a green `verify:full`; the full suite plus
+`db:verify` runs nightly (`.github/workflows/nightly-full.yml`, also on demand
+from the Actions tab). Never edit source while a full suite run is in flight.
 
 ## Adding a page file? Update the inventory pins
 

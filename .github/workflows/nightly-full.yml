@@ -1,0 +1,81 @@
+# The whole truth, once a day.
+#
+# validate.yml is the merge gate and deliberately a SUBSET: it runs targeted
+# vitest slices (roughly 8% of the frontend suite) so a PR answers in minutes.
+# The full frontend suite (~13,300 tests, ~15-30 min), the backend integration
+# suite and the Postgres migration proof ran nowhere in CI before this file --
+# a green PR check was a weaker claim than `npm run verify:full` on a laptop.
+#
+# This workflow runs what `npm run production:check` runs, minus the builds
+# validate.yml already does, against the same Postgres service. Trigger it by
+# hand from the Actions tab (workflow_dispatch) after a risky merge.
+name: Nightly full suite
+
+on:
+  schedule:
+    - cron: '0 7 * * *' # 07:00 UTC = 03:00 Toronto
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  full-suite:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: caredroid_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install frontend dependencies
+        run: npm ci
+        env:
+          LEFTHOOK: 0
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+
+      # verify (typecheck both sides, lint, docs, deps, architecture)
+      # + the full frontend suite + the backend integration suite.
+      - name: verify:full
+        run: npm run verify:full
+        env:
+          CI: true
+          NODE_ENV: test
+          VITEST_MAX_WORKERS: 4
+
+      # Migration chain applies from an empty Postgres and reproduces the
+      # entity schema exactly (scripts/db-verify.mjs).
+      - name: db:verify
+        run: npm run db:verify
+        env:
+          CI: true
+          DATABASE_HOST: localhost
+          DATABASE_PORT: 5432
+          DATABASE_USER: test
+          DATABASE_PASSWORD: test
+          DATABASE_NAME: caredroid_test
