@@ -9,7 +9,11 @@ export class CreateTrainingRuns1772702300000 implements MigrationInterface {
         columns: [
           { name: 'id', type: 'varchar', length: '120', isPrimary: true },
           { name: 'runJson', type: 'text' },
-          { name: 'createdAt', type: dateTimeColumnType(queryRunner), default: 'CURRENT_TIMESTAMP' },
+          {
+            name: 'createdAt',
+            type: dateTimeColumnType(queryRunner),
+            default: 'CURRENT_TIMESTAMP',
+          },
         ],
       }),
       true,

@@ -15,8 +15,16 @@ export class CreateEmsArrivalStatus1772702000000 implements MigrationInterface {
           { name: 'arrivedAt', type: 'varchar', length: '64', isNullable: true },
           { name: 'handoffStartedAt', type: 'varchar', length: '64', isNullable: true },
           { name: 'handoffCompletedAt', type: 'varchar', length: '64', isNullable: true },
-          { name: 'createdAt', type: dateTimeColumnType(queryRunner), default: 'CURRENT_TIMESTAMP' },
-          { name: 'updatedAt', type: dateTimeColumnType(queryRunner), default: 'CURRENT_TIMESTAMP' },
+          {
+            name: 'createdAt',
+            type: dateTimeColumnType(queryRunner),
+            default: 'CURRENT_TIMESTAMP',
+          },
+          {
+            name: 'updatedAt',
+            type: dateTimeColumnType(queryRunner),
+            default: 'CURRENT_TIMESTAMP',
+          },
         ],
       }),
       true,

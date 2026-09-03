@@ -34,7 +34,13 @@ const FAKE_USER = {
   id: 'integration-test-user',
   role: 'physician',
   emergencyRole: 'attending',
-  permissions: ['READ_PHI', 'WRITE_PHI', 'ACTIVATE_SURGE_MODE', 'INGEST_SURGE_PATIENTS', 'VIEW_SURGE_COMMAND'],
+  permissions: [
+    'READ_PHI',
+    'WRITE_PHI',
+    'ACTIVATE_SURGE_MODE',
+    'INGEST_SURGE_PATIENTS',
+    'VIEW_SURGE_COMMAND',
+  ],
 };
 
 /**
@@ -101,10 +107,7 @@ function listen(server: http.Server): Promise<string> {
 
 function waitForSocketEvent(socket: any, eventName: string): Promise<any> {
   return new Promise((resolve, reject) => {
-    const timeout = setTimeout(
-      () => reject(new Error(`Timed out waiting for ${eventName}`)),
-      5000,
-    );
+    const timeout = setTimeout(() => reject(new Error(`Timed out waiting for ${eventName}`)), 5000);
 
     socket.once(eventName, (payload: any) => {
       clearTimeout(timeout);
@@ -186,7 +189,12 @@ describe('Emergency OS end-to-end integration', () => {
     const httpServer = app.getHttpServer();
     const address = httpServer.address();
     baseUrl = `http://127.0.0.1:${address.port}`;
-    ioServer = registerEMSWebSocketSupport(expressInstance, httpServer, undefined, fakeSocketAuthMiddleware);
+    ioServer = registerEMSWebSocketSupport(
+      expressInstance,
+      httpServer,
+      undefined,
+      fakeSocketAuthMiddleware,
+    );
   });
 
   afterAll(async () => {

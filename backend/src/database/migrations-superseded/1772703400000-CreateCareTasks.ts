@@ -27,8 +27,16 @@ export class CreateCareTasks1772703400000 implements MigrationInterface {
           { name: 'completedBy', type: 'varchar', length: '120', isNullable: true },
           { name: 'cancelledAt', type: 'varchar', length: '64', isNullable: true },
           { name: 'cancelledBy', type: 'varchar', length: '120', isNullable: true },
-          { name: 'createdAt', type: dateTimeColumnType(queryRunner), default: 'CURRENT_TIMESTAMP' },
-          { name: 'updatedAt', type: dateTimeColumnType(queryRunner), default: 'CURRENT_TIMESTAMP' },
+          {
+            name: 'createdAt',
+            type: dateTimeColumnType(queryRunner),
+            default: 'CURRENT_TIMESTAMP',
+          },
+          {
+            name: 'updatedAt',
+            type: dateTimeColumnType(queryRunner),
+            default: 'CURRENT_TIMESTAMP',
+          },
         ],
       }),
       true,

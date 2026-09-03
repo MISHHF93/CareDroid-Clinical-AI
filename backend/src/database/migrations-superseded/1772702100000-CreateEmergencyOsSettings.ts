@@ -9,7 +9,11 @@ export class CreateEmergencyOsSettings1772702100000 implements MigrationInterfac
         columns: [
           { name: 'organizationId', type: 'varchar', length: '120', isPrimary: true },
           { name: 'settingsJson', type: 'text' },
-          { name: 'updatedAt', type: dateTimeColumnType(queryRunner), default: 'CURRENT_TIMESTAMP' },
+          {
+            name: 'updatedAt',
+            type: dateTimeColumnType(queryRunner),
+            default: 'CURRENT_TIMESTAMP',
+          },
         ],
       }),
       true,

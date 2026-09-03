@@ -25,8 +25,16 @@ export class CreateEdEncounters1772704800000 implements MigrationInterface {
           { name: 'priority', type: 'varchar', length: '16', isNullable: true },
           { name: 'state', type: 'varchar', length: '40', isNullable: true },
           { name: 'arrivalMode', type: 'varchar', length: '40', isNullable: true },
-          { name: 'createdAt', type: dateTimeColumnType(queryRunner), default: 'CURRENT_TIMESTAMP' },
-          { name: 'updatedAt', type: dateTimeColumnType(queryRunner), default: 'CURRENT_TIMESTAMP' },
+          {
+            name: 'createdAt',
+            type: dateTimeColumnType(queryRunner),
+            default: 'CURRENT_TIMESTAMP',
+          },
+          {
+            name: 'updatedAt',
+            type: dateTimeColumnType(queryRunner),
+            default: 'CURRENT_TIMESTAMP',
+          },
         ],
       }),
       true,

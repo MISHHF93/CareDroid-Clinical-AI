@@ -19,8 +19,16 @@ export class CreateReferrals1772701900000 implements MigrationInterface {
           { name: 'workflow', type: 'varchar', length: '64' },
           { name: 'requestedAt', type: 'varchar', length: '64' },
           { name: 'statusUpdatedAt', type: 'varchar', length: '64', isNullable: true },
-          { name: 'createdAt', type: dateTimeColumnType(queryRunner), default: 'CURRENT_TIMESTAMP' },
-          { name: 'updatedAt', type: dateTimeColumnType(queryRunner), default: 'CURRENT_TIMESTAMP' },
+          {
+            name: 'createdAt',
+            type: dateTimeColumnType(queryRunner),
+            default: 'CURRENT_TIMESTAMP',
+          },
+          {
+            name: 'updatedAt',
+            type: dateTimeColumnType(queryRunner),
+            default: 'CURRENT_TIMESTAMP',
+          },
         ],
       }),
       true,

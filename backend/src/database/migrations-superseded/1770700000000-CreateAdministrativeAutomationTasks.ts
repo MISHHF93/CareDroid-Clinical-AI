@@ -15,8 +15,16 @@ export class CreateAdministrativeAutomationTasks1770700000000 implements Migrati
           { name: 'priority', type: 'varchar', length: '32', default: "'medium'" },
           { name: 'patientId', type: 'varchar', length: '120', isNullable: true },
           { name: 'task', type: 'text' },
-          { name: 'createdAt', type: dateTimeColumnType(queryRunner), default: 'CURRENT_TIMESTAMP' },
-          { name: 'updatedAt', type: dateTimeColumnType(queryRunner), default: 'CURRENT_TIMESTAMP' },
+          {
+            name: 'createdAt',
+            type: dateTimeColumnType(queryRunner),
+            default: 'CURRENT_TIMESTAMP',
+          },
+          {
+            name: 'updatedAt',
+            type: dateTimeColumnType(queryRunner),
+            default: 'CURRENT_TIMESTAMP',
+          },
         ],
       }),
       true,

@@ -362,7 +362,14 @@ export class SurgeCapacityService extends EventEmitter {
       .collection('surge_events')
       .findOne(
         organizationId
-          ? { id, $or: [{ organizationId }, { organizationId: null }, { organizationId: { $exists: false } }] }
+          ? {
+              id,
+              $or: [
+                { organizationId },
+                { organizationId: null },
+                { organizationId: { $exists: false } },
+              ],
+            }
           : { id },
       )) as unknown as SurgeEvent | null;
   }
@@ -376,7 +383,11 @@ export class SurgeCapacityService extends EventEmitter {
         organizationId
           ? {
               status: 'activated',
-              $or: [{ organizationId }, { organizationId: null }, { organizationId: { $exists: false } }],
+              $or: [
+                { organizationId },
+                { organizationId: null },
+                { organizationId: { $exists: false } },
+              ],
             }
           : { status: 'activated' },
         { sort: { activationTime: -1 } },

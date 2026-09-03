@@ -26,7 +26,11 @@ export class CreateAuditLogs1706000100000 implements MigrationInterface {
           { name: 'userAgent', type: 'text', isNullable: true },
           { name: 'phiAccessed', type: 'boolean', default: false },
           { name: 'metadata', type: 'text', isNullable: true },
-          { name: 'timestamp', type: dateTimeColumnType(queryRunner), default: 'CURRENT_TIMESTAMP' },
+          {
+            name: 'timestamp',
+            type: dateTimeColumnType(queryRunner),
+            default: 'CURRENT_TIMESTAMP',
+          },
           { name: 'hash', type: 'varchar', length: '64', isNullable: true },
           { name: 'previousHash', type: 'varchar', length: '64', isNullable: true },
           { name: 'integrityVerified', type: 'boolean', default: false },

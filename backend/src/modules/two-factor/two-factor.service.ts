@@ -189,9 +189,23 @@ export class TwoFactorService {
     // a code that's genuinely gone.
     if (twoFactor.backupCodes && twoFactor.backupCodes.length > 0) {
       return this.twoFactorRepository.manager.transaction(async (manager) => {
+        // SQLite (development, e2e) has no row locks: TypeORM throws
+        // LockNotSupportedOnGivenDriverError, which surfaced as a 500 on
+        // every invalid-token and backup-code login in development. SQLite
+        // serialises writers on its single connection, so the transaction
+        // alone gives the same single-use guarantee there; the row lock is
+        // what Postgres needs under real concurrency.
+        const driverType = manager.connection?.options?.type;
+        const supportsRowLocks =
+          driverType === 'postgres' ||
+          driverType === 'cockroachdb' ||
+          driverType === 'mysql' ||
+          driverType === 'mariadb' ||
+          driverType === 'mssql' ||
+          driverType === 'oracle';
         const locked = await manager.findOne(TwoFactor, {
           where: { userId },
-          lock: { mode: 'pessimistic_write' },
+          ...(supportsRowLocks ? { lock: { mode: 'pessimistic_write' as const } } : {}),
         });
         if (!locked?.backupCodes?.length) return false;
 

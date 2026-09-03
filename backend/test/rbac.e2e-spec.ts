@@ -324,6 +324,10 @@ describe('RBAC System (E2E)', () => {
         Permission.USE_LAB_INTERPRETER,
         Permission.USE_PROTOCOLS,
         Permission.USE_AI_CHAT,
+        // The public_display kiosk persona maps to STUDENT and needs the
+        // aggregate-only display feed; deliberately not READ_PHI (see the
+        // STUDENT block in role-permissions.config.ts).
+        Permission.VIEW_PUBLIC_DISPLAY,
       ];
 
       // Verify students only have these permissions and nothing more

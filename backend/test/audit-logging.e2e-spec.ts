@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { DataSource } from 'typeorm';
 import { AuditLog, AuditAction } from '../src/modules/audit/entities/audit-log.entity';
 import { AuditService } from '../src/modules/audit/audit.service';
@@ -27,6 +28,10 @@ describe('Audit Logging E2E', () => {
           entities: [AuditLog, User, UserProfile, OAuthAccount, Subscription, TwoFactor],
           synchronize: true,
         }),
+        // AuditController guards its routes with ThrottlerGuard, whose options
+        // AppModule registers at the root; a module booted standalone must
+        // register them too or Nest cannot construct the controller.
+        ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }]),
         AuditModule,
       ],
     }).compile();

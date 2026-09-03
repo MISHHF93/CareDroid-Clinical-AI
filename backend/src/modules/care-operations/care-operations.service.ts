@@ -198,7 +198,9 @@ export class CareOperationsService {
     // it between our read and our write; re-read and tell the loser the truth
     // rather than overwriting the winner.
     const isOwnershipAcquiring =
-      (to === 'ACKNOWLEDGED' || to === 'IN_PROGRESS') && !row.ownerUserId && Boolean(input.actorUserId);
+      (to === 'ACKNOWLEDGED' || to === 'IN_PROGRESS') &&
+      !row.ownerUserId &&
+      Boolean(input.actorUserId);
     if (isOwnershipAcquiring) {
       const claim = await this.careTaskRepository
         .createQueryBuilder()
@@ -221,9 +223,7 @@ export class CareOperationsService {
       if (!claim.affected) {
         const current = await this.careTaskRepository.findOne({ where: { id } });
         if (current?.ownerUserId && current.ownerUserId !== input.actorUserId) {
-          throw new ConflictException(
-            `Care task ${id} was already claimed by another user`,
-          );
+          throw new ConflictException(`Care task ${id} was already claimed by another user`);
         }
       }
       const claimed = await this.careTaskRepository.findOne({ where: { id } });

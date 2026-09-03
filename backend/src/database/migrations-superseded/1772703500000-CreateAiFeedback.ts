@@ -14,7 +14,11 @@ export class CreateAiFeedback1772703500000 implements MigrationInterface {
           { name: 'organizationId', type: 'varchar', length: '120', isNullable: true },
           { name: 'rating', type: 'varchar', length: '20' },
           { name: 'comment', type: 'text', isNullable: true },
-          { name: 'createdAt', type: dateTimeColumnType(queryRunner), default: 'CURRENT_TIMESTAMP' },
+          {
+            name: 'createdAt',
+            type: dateTimeColumnType(queryRunner),
+            default: 'CURRENT_TIMESTAMP',
+          },
         ],
       }),
       true,

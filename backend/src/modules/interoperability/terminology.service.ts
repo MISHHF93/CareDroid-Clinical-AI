@@ -60,7 +60,13 @@ export class TerminologyService {
     const limit = Math.min(Math.max(options.limit ?? 5, 1), 20);
 
     if (!trimmed) {
-      return { system, query: trimmed, codings: [], resolved: false, unavailableReason: 'Empty query.' };
+      return {
+        system,
+        query: trimmed,
+        codings: [],
+        resolved: false,
+        unavailableReason: 'Empty query.',
+      };
     }
 
     const cacheKey = `${system}:${limit}:${trimmed.toLowerCase()}`;
@@ -138,7 +144,9 @@ export class TerminologyService {
   private async searchRxNorm(query: string, limit: number, timeoutMs?: number): Promise<Coding[]> {
     const url = `${RXNORM_ENDPOINT}?name=${encodeURIComponent(query)}`;
     const payload = (await this.fetchJson(url, timeoutMs)) as {
-      drugGroup?: { conceptGroup?: Array<{ conceptProperties?: Array<{ rxcui?: string; name?: string }> }> };
+      drugGroup?: {
+        conceptGroup?: Array<{ conceptProperties?: Array<{ rxcui?: string; name?: string }> }>;
+      };
     };
     const groups = payload?.drugGroup?.conceptGroup;
     if (!Array.isArray(groups)) return [];

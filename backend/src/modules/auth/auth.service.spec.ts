@@ -291,7 +291,9 @@ describe('AuthService', () => {
     // "ACCESS DENIED as registration-clerk" on a page seeded for another role
     // learns it is someone else's persisted switch, not a race.
     it('shares the POST gate: refuses without the bypass flag', async () => {
-      await expect(service.describeDevSession('127.0.0.1')).rejects.toThrow('ENABLE_DEV_AUTH_BYPASS');
+      await expect(service.describeDevSession('127.0.0.1')).rejects.toThrow(
+        'ENABLE_DEV_AUTH_BYPASS',
+      );
     });
 
     it('shares the POST gate: refuses production even with the bypass flag set', async () => {
@@ -457,9 +459,15 @@ describe('AuthService', () => {
       mockUserRepository.findOne.mockResolvedValue(devUser);
       mockUserRepository.save.mockImplementation(async (entity) => entity);
       mockProfileRepository.save.mockImplementation(async (entity) => entity);
-      mockOrganizationRepository.findOne.mockResolvedValue({ id: 'org-1', organizationType: 'hospital' });
+      mockOrganizationRepository.findOne.mockResolvedValue({
+        id: 'org-1',
+        organizationType: 'hospital',
+      });
       mockOrganizationMembershipRepository.findOne.mockResolvedValue({ id: 'om-1' });
-      mockWorkspaceRepository.findOne.mockResolvedValue({ id: 'ws-1', name: 'Emergency Operations' });
+      mockWorkspaceRepository.findOne.mockResolvedValue({
+        id: 'ws-1',
+        name: 'Emergency Operations',
+      });
       mockWorkspaceMembershipRepository.findOne.mockResolvedValue({ id: 'wm-1' });
       mockJwtService.sign.mockReturnValue('signed-token');
 
@@ -487,9 +495,15 @@ describe('AuthService', () => {
       mockUserRepository.findOne.mockResolvedValue(devUser);
       mockUserRepository.save.mockImplementation(async (entity) => entity);
       mockProfileRepository.save.mockImplementation(async (entity) => entity);
-      mockOrganizationRepository.findOne.mockResolvedValue({ id: 'org-1', organizationType: 'hospital' });
+      mockOrganizationRepository.findOne.mockResolvedValue({
+        id: 'org-1',
+        organizationType: 'hospital',
+      });
       mockOrganizationMembershipRepository.findOne.mockResolvedValue({ id: 'om-1' });
-      mockWorkspaceRepository.findOne.mockResolvedValue({ id: 'ws-1', name: 'Emergency Operations' });
+      mockWorkspaceRepository.findOne.mockResolvedValue({
+        id: 'ws-1',
+        name: 'Emergency Operations',
+      });
       mockWorkspaceMembershipRepository.findOne.mockResolvedValue({ id: 'wm-1' });
       mockJwtService.sign.mockReturnValue('signed-token');
 

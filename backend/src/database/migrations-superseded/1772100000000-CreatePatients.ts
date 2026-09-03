@@ -36,8 +36,16 @@ export class CreatePatients1772100000000 implements MigrationInterface {
           { name: 'arrival', type: 'text', isNullable: true },
           { name: 'quickSafetyFlags', type: 'text', isNullable: true },
           { name: 'highRiskComplaintFlags', type: 'text', isNullable: true },
-          { name: 'createdAt', type: dateTimeColumnType(queryRunner), default: 'CURRENT_TIMESTAMP' },
-          { name: 'updatedAt', type: dateTimeColumnType(queryRunner), default: 'CURRENT_TIMESTAMP' },
+          {
+            name: 'createdAt',
+            type: dateTimeColumnType(queryRunner),
+            default: 'CURRENT_TIMESTAMP',
+          },
+          {
+            name: 'updatedAt',
+            type: dateTimeColumnType(queryRunner),
+            default: 'CURRENT_TIMESTAMP',
+          },
         ],
       }),
       true,

@@ -81,7 +81,9 @@ describe('TerminologyService', () => {
   it('degrades calmly instead of throwing when the public API is unreachable', async () => {
     // Terminology is an enrichment, never a gate -- a slow or down NLM service
     // must not fail the clinical request that asked for a code.
-    global.fetch = jest.fn().mockRejectedValue(new Error('ECONNREFUSED')) as unknown as typeof fetch;
+    global.fetch = jest
+      .fn()
+      .mockRejectedValue(new Error('ECONNREFUSED')) as unknown as typeof fetch;
 
     const result = await service.search('icd10cm', 'chest pain');
 

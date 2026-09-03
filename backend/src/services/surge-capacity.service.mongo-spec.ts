@@ -379,7 +379,7 @@ describe('SurgeCapacityService (real MongoDB via mongodb-memory-server)', () => 
     // any other. Proves org A's status/bottleneck views never see org B's
     // live MCI/disaster response, whether served from the in-memory cache
     // or a fresh instance falling back to Mongo.
-    it('never surfaces another organization\'s active surge event as this org\'s status', async () => {
+    it("never surfaces another organization's active surge event as this org's status", async () => {
       await service.activateSurgeMode(
         { type: 'mci', estimatedPatientCount: 30, actualPatientCount: 0, resourceStatus },
         'org-a',
@@ -398,7 +398,7 @@ describe('SurgeCapacityService (real MongoDB via mongodb-memory-server)', () => 
   });
 
   describe('cross-organization isolation', () => {
-    it('does not let one organization deactivate another organization\'s surge event by id', async () => {
+    it("does not let one organization deactivate another organization's surge event by id", async () => {
       const event = await service.activateSurgeMode(
         { type: 'disaster', estimatedPatientCount: 10, actualPatientCount: 0, resourceStatus },
         'org-a',
@@ -412,15 +412,11 @@ describe('SurgeCapacityService (real MongoDB via mongodb-memory-server)', () => 
         .findOne({ id: event.id });
       expect(stored!.status).toBe('activated');
 
-      const realDeactivation = await service.deactivateSurgeMode(
-        event.id,
-        'real debrief',
-        'org-a',
-      );
+      const realDeactivation = await service.deactivateSurgeMode(event.id, 'real debrief', 'org-a');
       expect(realDeactivation!.status).toBe('deactivated');
     });
 
-    it('does not let one organization batch-intake EMS patients into another organization\'s surge event', async () => {
+    it("does not let one organization batch-intake EMS patients into another organization's surge event", async () => {
       const event = await service.activateSurgeMode(
         { type: 'mci', estimatedPatientCount: 10, actualPatientCount: 0, resourceStatus },
         'org-a',

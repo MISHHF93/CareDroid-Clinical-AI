@@ -1181,9 +1181,7 @@ export class EmergencyPatientService implements OnModuleInit {
             });
 
     chain.catch((error) => {
-      this.logger.warn(
-        `Failed to sync encounter history for patient ${patient.id}: ${error}`,
-      );
+      this.logger.warn(`Failed to sync encounter history for patient ${patient.id}: ${error}`);
     });
   }
 

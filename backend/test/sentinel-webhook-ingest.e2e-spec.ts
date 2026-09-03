@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, Module, ValidationPipe } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, getRepositoryToken } from '@nestjs/typeorm';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { Repository } from 'typeorm';
@@ -123,6 +124,10 @@ describe('Sentinel CAD/AVL webhook ingestion (e2e)', () => {
           synchronize: true,
           logging: false,
         }),
+        // SentinelModule pulls in the global AuditModule, whose controller
+        // guards its routes with ThrottlerGuard; AppModule registers the
+        // throttler options at the root, so a standalone boot must too.
+        ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }]),
         MinimalJwtAuthModule,
         SentinelModule,
       ],

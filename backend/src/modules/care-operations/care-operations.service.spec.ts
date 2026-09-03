@@ -329,7 +329,11 @@ describe('CareOperationsService', () => {
     it('lets the existing owner keep transitioning their own task', async () => {
       const { service, task } = await openTaskFor('org-a');
 
-      await service.transition(task.id, { status: 'ACKNOWLEDGED', actorUserId: 'nurse-1' }, 'org-a');
+      await service.transition(
+        task.id,
+        { status: 'ACKNOWLEDGED', actorUserId: 'nurse-1' },
+        'org-a',
+      );
       const progressed = await service.transition(
         task.id,
         { status: 'IN_PROGRESS', actorUserId: 'nurse-1' },
@@ -345,7 +349,11 @@ describe('CareOperationsService', () => {
       // colleague's task must not be blocked by the claim guard.
       const { service, task } = await openTaskFor('org-a');
 
-      await service.transition(task.id, { status: 'ACKNOWLEDGED', actorUserId: 'nurse-1' }, 'org-a');
+      await service.transition(
+        task.id,
+        { status: 'ACKNOWLEDGED', actorUserId: 'nurse-1' },
+        'org-a',
+      );
       const completed = await service.transition(
         task.id,
         { status: 'COMPLETED', actorUserId: 'charge-1' },

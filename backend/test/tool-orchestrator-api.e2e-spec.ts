@@ -148,7 +148,10 @@ describe('Tool Orchestrator API (e2e)', () => {
       .useValue({
         canActivate: (context) => {
           const req = context.switchToHttp().getRequest();
-          req.user = { id: 'test-user-123', subscriptionTier: 'institutional' };
+          // The execute routes sit behind AuthorizationGuard
+          // (@RequirePermission(USE_CALCULATORS)); a principal without a
+          // role is denied, so give the fake JWT user a clinical role.
+          req.user = { id: 'test-user-123', role: 'physician', subscriptionTier: 'institutional' };
           return true;
         },
       })

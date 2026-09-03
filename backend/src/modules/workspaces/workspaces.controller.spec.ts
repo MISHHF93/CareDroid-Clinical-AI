@@ -10,10 +10,7 @@ import { WorkspacesController } from './workspaces.controller';
 describe('WorkspacesController.create', () => {
   it('forwards the request tenant context organizationId to createWorkspace', async () => {
     const createWorkspace = jest.fn().mockResolvedValue({ id: 'workspace-1' });
-    const controller = new WorkspacesController(
-      { createWorkspace } as any,
-      {} as any,
-    );
+    const controller = new WorkspacesController({ createWorkspace } as any, {} as any);
 
     const req = {
       user: { id: 'user-1' },
@@ -28,10 +25,7 @@ describe('WorkspacesController.create', () => {
 
   it('passes null organizationId when no tenant context is present, rather than silently omitting it', async () => {
     const createWorkspace = jest.fn().mockResolvedValue({ id: 'workspace-1' });
-    const controller = new WorkspacesController(
-      { createWorkspace } as any,
-      {} as any,
-    );
+    const controller = new WorkspacesController({ createWorkspace } as any, {} as any);
 
     const req = { user: { id: 'user-1' } } as any;
     const dto = { type: 'clinical', name: 'My workspace' } as any;

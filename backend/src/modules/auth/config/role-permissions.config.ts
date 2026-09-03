@@ -362,7 +362,14 @@ export const PermissionHierarchy: Partial<Record<Permission, Permission[]>> = {
  * @returns true if role has permission (directly or via hierarchy), false otherwise
  */
 export function hasPermissionWithHierarchy(role: UserRole, permission: Permission): boolean {
-  const rolePermissions = RolePermissions[role];
+  // A role the table does not know (undefined on a malformed principal, a
+  // stale enum value, a persona id that never mapped to a UserRole) holds no
+  // permissions. Indexing straight into the table used to throw
+  // `Cannot read properties of undefined (reading 'includes')` from inside
+  // AuthorizationGuard -- a 500 instead of a 403, and a crash in
+  // TenantIsolationGuard's own call site. Deny is the only safe answer;
+  // getEffectivePermissions() below has always treated it that way.
+  const rolePermissions = RolePermissions[role] ?? [];
 
   // Direct permission check
   if (rolePermissions.includes(permission)) {
