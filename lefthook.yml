@@ -4,8 +4,8 @@
 # Scope: everything `npm run format:check` covers (frontend
 # js/jsx/ts/tsx/json/css under src/) plus the whole backend (its ESLint
 # enforces prettier/prettier). The frontend .ts/.tsx files were reformatted in
-# one deliberate commit on 2026-09-03 (1,997 files) so this can hold the line
-# from here on. scripts/*.mjs is not in scope yet (119 of 161 drift).
+# one deliberate commit on 2026-09-03 (1,988 files), then scripts/*.mjs
+# (119 files), so this can hold the line from here on.
 #
 # Why this exists: on 2026-09-03 backend lint (part of validate:ci) had 1,277
 # Prettier errors accumulated across a week of commits nobody could see
@@ -15,7 +15,7 @@ pre-commit:
   parallel: true
   commands:
     prettier-frontend:
-      glob: 'src/**/*.{js,jsx,ts,tsx,json,css}'
+      glob: '{src/**/*.{js,jsx,ts,tsx,json,css},scripts/**/*.mjs}'
       run: npx prettier --check {staged_files}
       fail_text: 'Prettier drift. Fix with: npx prettier --write <file>  (then git add it)'
     # Uses the backend's own prettier binary -- root (3.8) and backend (3.6)

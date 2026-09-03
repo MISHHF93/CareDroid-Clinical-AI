@@ -17,7 +17,7 @@ const result = spawnSync(
     stdio: 'inherit',
     shell: true,
     env: { ...process.env, FEATURE_COVERAGE_WRITE_DOCS: '1' },
-  }
+  },
 );
 
 process.exit(result.status ?? 1);

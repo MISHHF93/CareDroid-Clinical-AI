@@ -78,9 +78,7 @@ const report = {
   domainCoverage,
   summary: summarizeOperationalHistory(sampleLogs),
   audit,
-  recommendations: audit.passesAudit
-    ? []
-    : ['Wire operational history to all required surfaces'],
+  recommendations: audit.passesAudit ? [] : ['Wire operational history to all required surfaces'],
 };
 
 mkdirSync(dirname(reportPath), { recursive: true });

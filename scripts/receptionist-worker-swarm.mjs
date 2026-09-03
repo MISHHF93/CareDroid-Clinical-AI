@@ -39,7 +39,12 @@ const STATIC_WORKERS = [
     kind: 'static',
     verify() {
       const pkg = read('backend/package.json');
-      return pkg.includes('@nestjs/core') && read('backend/src/modules/emergency-os/emergency-os.module.ts').includes('EmergencyOsModule');
+      return (
+        pkg.includes('@nestjs/core') &&
+        read('backend/src/modules/emergency-os/emergency-os.module.ts').includes(
+          'EmergencyOsModule',
+        )
+      );
     },
   },
   {
@@ -115,7 +120,9 @@ const STATIC_WORKERS = [
     kind: 'static',
     verify() {
       const pkg = read('package.json');
-      return pkg.includes('@playwright/test') && read('src/store/emergencyStore.ts').includes('zustand');
+      return (
+        pkg.includes('@playwright/test') && read('src/store/emergencyStore.ts').includes('zustand')
+      );
     },
   },
 ];
@@ -130,9 +137,9 @@ const BROWSER_WORKERS = [
       await expectVisible(page, '#reception-workspace-title', 'Reception title');
       await expectVisible(page, 'text=Arrivals & waiting lists', 'Arrival section');
       await expectVisible(page, 'text=Register walk-in', 'Primary register action');
-      const navIds = await page.locator('[data-nav-id]').evaluateAll((nodes) =>
-        nodes.map((node) => node.getAttribute('data-nav-id')),
-      );
+      const navIds = await page
+        .locator('[data-nav-id]')
+        .evaluateAll((nodes) => nodes.map((node) => node.getAttribute('data-nav-id')));
       const allowed = new Set(['reception', 'patients', 'pulse', 'shift']);
       const blocked = new Set(['whiteboard', 'platform', 'copilot', 'analytics']);
       if (!navIds.every((id) => allowed.has(id))) {
@@ -204,7 +211,9 @@ const BROWSER_WORKERS = [
     path: '/emergency/reception?queue=verification',
     async run(page) {
       await expectVisible(page, 'role=tab[name=/Need ID check/i]', 'Verification tab');
-      const selected = await page.locator('#reception-queue-tab-verification[aria-selected="true"]').count();
+      const selected = await page
+        .locator('#reception-queue-tab-verification[aria-selected="true"]')
+        .count();
       if (selected === 0) throw new Error('Verification tab not active from deep link');
     },
   },
@@ -214,7 +223,9 @@ const BROWSER_WORKERS = [
     path: '/emergency/reception?queue=pretriage',
     async run(page) {
       await expectVisible(page, 'role=tab[name=/Waiting for nurse/i]', 'Awaiting triage tab');
-      const selected = await page.locator('#reception-queue-tab-pretriage[aria-selected="true"]').count();
+      const selected = await page
+        .locator('#reception-queue-tab-pretriage[aria-selected="true"]')
+        .count();
       if (selected === 0) throw new Error('Pre-triage tab not active from deep link');
     },
   },
@@ -259,7 +270,9 @@ const BROWSER_WORKERS = [
       const search = page.getByRole('searchbox', { name: 'Patient search' });
       await search.fill('Amara');
       await page.waitForTimeout(800);
-      const results = await page.locator('.patient-search-results, [data-patient-search-result]').count();
+      const results = await page
+        .locator('.patient-search-results, [data-patient-search-result]')
+        .count();
       if (results === 0) {
         const fallback = await page.getByText(/Amara/i).count();
         if (fallback === 0) throw new Error('Header patient search returned no results for Amara');
@@ -329,7 +342,10 @@ async function mockApi(route) {
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
-      body: JSON.stringify({ ok: true, data: { patient: { id: 'p5', firstName: 'Amara', lastName: 'Singh' } } }),
+      body: JSON.stringify({
+        ok: true,
+        data: { patient: { id: 'p5', firstName: 'Amara', lastName: 'Singh' } },
+      }),
     });
     return;
   }
@@ -400,7 +416,9 @@ async function runBrowserWorker(browser, worker) {
     };
   } catch (error) {
     mkdirSync(outDir, { recursive: true });
-    await page.screenshot({ path: join(outDir, `${worker.id}-fail.png`), fullPage: true }).catch(() => {});
+    await page
+      .screenshot({ path: join(outDir, `${worker.id}-fail.png`), fullPage: true })
+      .catch(() => {});
     return {
       id: worker.id,
       name: worker.name,
@@ -456,7 +474,9 @@ async function main() {
   const browser = await chromium.launch();
   console.log(`Launching ${BROWSER_WORKERS.length} receptionist browser workers in parallel...\n`);
 
-  const browserResults = await Promise.all(BROWSER_WORKERS.map((worker) => runBrowserWorker(browser, worker)));
+  const browserResults = await Promise.all(
+    BROWSER_WORKERS.map((worker) => runBrowserWorker(browser, worker)),
+  );
   await browser.close();
 
   const allResults = [...staticResults, ...browserResults];
@@ -465,7 +485,9 @@ async function main() {
   const passed = allResults.filter((result) => result.status === 'pass').length;
   const failed = allResults.filter((result) => result.status === 'fail').length;
 
-  console.log(`\nReception-first swarm: ${passed}/${WORKERS.length} passed (${staticResults.length} static + ${browserResults.length} browser)`);
+  console.log(
+    `\nReception-first swarm: ${passed}/${WORKERS.length} passed (${staticResults.length} static + ${browserResults.length} browser)`,
+  );
   for (const result of browserResults) {
     const mark = result.status === 'pass' ? 'PASS' : 'FAIL';
     console.log(`  ${mark}  ${result.id} (${result.name}) — ${result.durationMs}ms`);
@@ -505,7 +527,12 @@ function writeReport(allResults, browserResults) {
       navItems: ['reception', 'patients', 'pulse', 'shift'],
       primaryAction: 'Register walk-in',
       blockedRoutes: ['/emergency/whiteboard'],
-      intakeSurfaces: ['Check ID & documents', 'Register walk-in', 'Register with symptoms', 'Other arrivals'],
+      intakeSurfaces: [
+        'Check ID & documents',
+        'Register walk-in',
+        'Register with symptoms',
+        'Other arrivals',
+      ],
     },
   };
 

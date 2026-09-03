@@ -16,19 +16,19 @@ const failures = [];
 
 if (isVercelDeploy && !apiUrl && !allowSameOriginApi && !isDemoMode) {
   failures.push(
-    'VITE_API_URL is required for Vercel frontend deploys. Same-origin /api is only valid with a verified proxy in front of the SPA.'
+    'VITE_API_URL is required for Vercel frontend deploys. Same-origin /api is only valid with a verified proxy in front of the SPA.',
   );
 }
 
 if (isVercelDeploy && allowSameOriginApi && !sameOriginProxyVerified) {
   failures.push(
-    'VITE_ALLOW_SAME_ORIGIN_API=true requires VITE_SAME_ORIGIN_API_PROXY_VERIFIED=true so /api/* cannot fall through to index.html.'
+    'VITE_ALLOW_SAME_ORIGIN_API=true requires VITE_SAME_ORIGIN_API_PROXY_VERIFIED=true so /api/* cannot fall through to index.html.',
   );
 }
 
 if (apiUrl && /\/api\/?$/i.test(apiUrl)) {
   failures.push(
-    'VITE_API_URL must be the API origin only, without a trailing /api path, to avoid /api/api/* requests.'
+    'VITE_API_URL must be the API origin only, without a trailing /api path, to avoid /api/api/* requests.',
   );
 }
 

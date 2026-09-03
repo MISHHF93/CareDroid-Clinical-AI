@@ -64,15 +64,22 @@ const summary = {
 
 for (const { id, label } of RESPONSIVE_QA_BROWSER_PROJECTS) {
   const path = join(qaDir, `playwright-responsive-${id}.json`);
-  const browserSummary = { project: id, label, passes: 0, failures: 0, skipped: 0, total: 0, ok: false };
+  const browserSummary = {
+    project: id,
+    label,
+    passes: 0,
+    failures: 0,
+    skipped: 0,
+    total: 0,
+    ok: false,
+  };
   if (existsSync(path)) {
     const before = { t: summary.total, p: summary.passes, f: summary.failures.length };
     collectFromReport(JSON.parse(readFileSync(path, 'utf8')), summary);
     browserSummary.total = summary.total - before.t;
     browserSummary.passes = summary.passes - before.p;
     browserSummary.failures = summary.failures.length - before.f;
-    browserSummary.skipped =
-      browserSummary.total - browserSummary.passes - browserSummary.failures;
+    browserSummary.skipped = browserSummary.total - browserSummary.passes - browserSummary.failures;
     browserSummary.ok = browserSummary.failures === 0;
   }
   summary.browsers.push(browserSummary);
@@ -103,8 +110,7 @@ const lines = [
   '| Browser | Passed | Failed | Total | Status |',
   '| --- | ---: | ---: | ---: | --- |',
   ...summary.browsers.map(
-    (b) =>
-      `| ${b.label} | ${b.passes} | ${b.failures} | ${b.total} | ${b.ok ? 'PASS' : 'FAIL'} |`
+    (b) => `| ${b.label} | ${b.passes} | ${b.failures} | ${b.total} | ${b.ok ? 'PASS' : 'FAIL'} |`,
   ),
   '',
   '_Harness timeout flakes (11 cells on first pass) were re-run via `npm run qa:responsive:retry` and passed; no horizontal overflow was detected in any browser._',
@@ -129,7 +135,12 @@ if (existsSync(fixesMd)) {
   lines.push('## Fixes applied', '', readFileSync(fixesMd, 'utf8'), '');
 }
 
-lines.push('## Matrix reference', '', `See [RESPONSIVE_QA_MATRIX.md](./RESPONSIVE_QA_MATRIX.md).`, '');
+lines.push(
+  '## Matrix reference',
+  '',
+  `See [RESPONSIVE_QA_MATRIX.md](./RESPONSIVE_QA_MATRIX.md).`,
+  '',
+);
 
 writeFileSync(join(qaDir, 'RESPONSIVE_QA_REPORT.md'), lines.join('\n'));
 
@@ -139,7 +150,10 @@ const finalSummary = {
   harnessFlakesRetryPass: true,
   pass: summary.layoutPass,
 };
-writeFileSync(join(qaDir, 'responsive-qa-summary.json'), `${JSON.stringify(finalSummary, null, 2)}\n`);
+writeFileSync(
+  join(qaDir, 'responsive-qa-summary.json'),
+  `${JSON.stringify(finalSummary, null, 2)}\n`,
+);
 
 console.log(JSON.stringify(finalSummary, null, 2));
 process.exit(summary.layoutPass ? 0 : 1);

@@ -14,7 +14,7 @@ const result = spawnSync(
     stdio: 'inherit',
     shell: true,
     env: { ...process.env, SAAS_COMPLIANCE_WRITE_DOCS: '1' },
-  }
+  },
 );
 
 process.exit(result.status ?? 1);

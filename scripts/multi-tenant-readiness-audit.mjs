@@ -45,5 +45,7 @@ for (const [domain, verdict] of Object.entries(audit.summary)) {
     : verdict.partiallyConfigured
       ? 'PARTIAL'
       : 'NOT READY';
-  console.log(`  ${domain}: ${status} (${verdict.readySurfaces}/${verdict.totalSurfaces} surfaces)`);
+  console.log(
+    `  ${domain}: ${status} (${verdict.readySurfaces}/${verdict.totalSurfaces} surfaces)`,
+  );
 }

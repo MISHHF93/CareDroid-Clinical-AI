@@ -81,7 +81,9 @@ for (const file of findTsBuildInfo(rootDir)) {
   rmSync(file, { force: true });
   removed.push(relative(rootDir, file));
 }
-console.log(removed.length ? `Removed: ${removed.join(', ')}` : 'Nothing to remove (already clean).');
+console.log(
+  removed.length ? `Removed: ${removed.join(', ')}` : 'Nothing to remove (already clean).',
+);
 
 // 1. Backend build -- also verifies the shared lib/ + src/types/ roots
 // tsconfig.build.json depends on are actually reachable and test-file-free.
@@ -111,4 +113,6 @@ if (failed.length) {
   console.log(`Failed: ${failed.map((r) => r.label).join('; ')}`);
   process.exit(1);
 }
-console.log('Every check ran against a freshly removed dist/cache -- this is a genuinely clean result.');
+console.log(
+  'Every check ran against a freshly removed dist/cache -- this is a genuinely clean result.',
+);

@@ -26,7 +26,12 @@ for (const f of walk('src')) {
   if (hits.length) rows.push({ f, hits });
 }
 rows.sort((a, b) => b.hits.length - a.hits.length);
-console.log('files', rows.length, 'hits', rows.reduce((s, r) => s + r.hits.length, 0));
+console.log(
+  'files',
+  rows.length,
+  'hits',
+  rows.reduce((s, r) => s + r.hits.length, 0),
+);
 for (const r of rows) {
   console.log(`\n${r.hits.length}  ${r.f}`);
   for (const h of r.hits) console.log(`  L${h.line}: ${h.full}`);

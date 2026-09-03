@@ -30,7 +30,8 @@ mkdirSync(shotDir, { recursive: true });
 
 const baseURL = process.argv[2] || process.env.QA_BASE_URL || 'http://localhost:3000';
 const EDGE_PATH =
-  process.env.QA_CHROMIUM_EXECUTABLE || 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe';
+  process.env.QA_CHROMIUM_EXECUTABLE ||
+  'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe';
 const ROTATE_EVERY = 15;
 
 function extractBlock(src, startMarker) {
@@ -113,7 +114,10 @@ async function main() {
     let httpStatus = null;
     let navError = null;
     try {
-      const resp = await page.goto(`${baseURL}${path}`, { waitUntil: 'networkidle', timeout: 20000 });
+      const resp = await page.goto(`${baseURL}${path}`, {
+        waitUntil: 'networkidle',
+        timeout: 20000,
+      });
       httpStatus = resp ? resp.status() : null;
       await page.waitForTimeout(1200);
     } catch (err) {
@@ -159,7 +163,9 @@ async function main() {
       } catch {
         /* ignore screenshot failure */
       }
-      console.log(`FLAGGED ${name} (${path}) — crash:${hasCrash} blank:${isBlank} overflow:${hasOverflow}`);
+      console.log(
+        `FLAGGED ${name} (${path}) — crash:${hasCrash} blank:${isBlank} overflow:${hasOverflow}`,
+      );
     }
 
     await page.close();
@@ -174,15 +180,16 @@ async function main() {
     crashed: results.filter((r) => r.pageErrors.length > 0 || r.navError).length,
     blank: results.filter((r) => r.isBlank).length,
     overflow: results.filter((r) => r.hasOverflow).length,
-    clean: results.filter((r) => !r.isBlank && !r.hasOverflow && r.pageErrors.length === 0 && !r.navError).length,
+    clean: results.filter(
+      (r) => !r.isBlank && !r.hasOverflow && r.pageErrors.length === 0 && !r.navError,
+    ).length,
   };
   writeFileSync(
     join(outDir, 'report.json'),
     JSON.stringify(
       {
         summary,
-        note:
-          'Any row flagged here should be re-checked in a single fresh browser instance before treating it as real — a page late in a long crawl can show a transient net::ERR_INSUFFICIENT_RESOURCES blank render even with browser rotation under heavy load. See script header comment.',
+        note: 'Any row flagged here should be re-checked in a single fresh browser instance before treating it as real — a page late in a long crawl can show a transient net::ERR_INSUFFICIENT_RESOURCES blank render even with browser rotation under heavy load. See script header comment.',
         skippedDynamicRoutes: dynamicRoutes.map(([n, p]) => ({ name: n, path: p })),
         results,
       },

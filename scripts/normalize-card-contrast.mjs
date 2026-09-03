@@ -27,7 +27,10 @@ const replacements = [
   [/var\(--app-fg,\s*#0[fF]172[aA]\)/gi, 'var(--medical-card-fg, #111827)'],
   [/var\(--nai-text,\s*#f8fafc\)/gi, 'var(--nai-text, var(--medical-card-fg, #111827))'],
   [/var\(--color-surface-raised,\s*#f8fafc\)/gi, 'var(--medical-card-muted-bg, #f0f9ff)'],
-  [/linear-gradient\([^)]*#0[fF]172[aA][^)]*\)/gi, 'linear-gradient(135deg, var(--medical-surface-page, #f0f9ff), var(--medical-card-bg, #ffffff))'],
+  [
+    /linear-gradient\([^)]*#0[fF]172[aA][^)]*\)/gi,
+    'linear-gradient(135deg, var(--medical-surface-page, #f0f9ff), var(--medical-card-bg, #ffffff))',
+  ],
   ["'#94a3b8'", 'MEDICAL_THEME.inkSubtle'],
   ['"#94a3b8"', 'MEDICAL_THEME.inkSubtle'],
   [/color:\s*#0[fF]172[aA]\b/gi, 'color: var(--medical-card-fg, #111827)'],

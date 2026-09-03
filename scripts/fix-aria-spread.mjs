@@ -27,26 +27,25 @@ function transform(src) {
   let out = src;
 
   // aria-current={COND ? 'page'|'step' : undefined|null|false}
-  out = out.replace(
-    /aria-current=\{([^}]+)\}/g,
-    (full, expr) => {
-      const e = expr.trim();
-      if (/^['"`]/.test(e)) return full; // already literal
-      // active ? 'page' : undefined
-      const m = e.match(/^(.+?)\s*\?\s*['"`](page|step|location|date|time|true)['"`]\s*:\s*(undefined|null|false|['"`]false['"`])\s*$/);
-      if (m) {
-        n += 1;
-        const cond = m[1].trim();
-        const val = m[2];
-        return `{...(${cond} ? { 'aria-current': '${val}' as const } : {})}`;
-      }
-      // nested ternary page/step — leave for manual
-      if (e.includes('?') && e.includes('page') && e.includes('step')) {
-        return full;
-      }
+  out = out.replace(/aria-current=\{([^}]+)\}/g, (full, expr) => {
+    const e = expr.trim();
+    if (/^['"`]/.test(e)) return full; // already literal
+    // active ? 'page' : undefined
+    const m = e.match(
+      /^(.+?)\s*\?\s*['"`](page|step|location|date|time|true)['"`]\s*:\s*(undefined|null|false|['"`]false['"`])\s*$/,
+    );
+    if (m) {
+      n += 1;
+      const cond = m[1].trim();
+      const val = m[2];
+      return `{...(${cond} ? { 'aria-current': '${val}' as const } : {})}`;
+    }
+    // nested ternary page/step — leave for manual
+    if (e.includes('?') && e.includes('page') && e.includes('step')) {
       return full;
-    },
-  );
+    }
+    return full;
+  });
 
   // Boolean aria attrs: checked|pressed|expanded|selected|hidden|disabled
   const boolAttrs = ['checked', 'pressed', 'expanded', 'selected', 'hidden', 'disabled'];
@@ -70,7 +69,7 @@ function transform(src) {
         return `{...(${cond} ? { 'aria-${attr}': 'false' as const } : { 'aria-${attr}': 'true' as const })}`;
       }
       // bare identifier or !!x or !x
-      if (/^!?!?[a-zA-Z_$][\w.$]*$/.test(e) || /^!.+/.test(e) && !e.includes('?')) {
+      if (/^!?!?[a-zA-Z_$][\w.$]*$/.test(e) || (/^!.+/.test(e) && !e.includes('?'))) {
         n += 1;
         return `{...((${e}) ? { 'aria-${attr}': 'true' as const } : { 'aria-${attr}': 'false' as const })}`;
       }

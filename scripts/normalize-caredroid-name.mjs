@@ -3,7 +3,17 @@ import path from 'node:path';
 
 const ROOT = process.cwd();
 const TARGET_DIRS = ['src', 'backend/src', 'lib', 'public', 'types', 'store', 'data'];
-const EXTENSIONS = new Set(['.js', '.jsx', '.ts', '.tsx', '.json', '.html', '.webmanifest', '.css', '.md']);
+const EXTENSIONS = new Set([
+  '.js',
+  '.jsx',
+  '.ts',
+  '.tsx',
+  '.json',
+  '.html',
+  '.webmanifest',
+  '.css',
+  '.md',
+]);
 
 const REPLACEMENTS = [
   [/CareDroid Clinical AI/g, 'CareDroid'],
@@ -25,7 +35,8 @@ function walk(dir, files = []) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     const full = path.join(dir, entry.name);
     if (entry.isDirectory()) {
-      if (entry.name === 'node_modules' || entry.name === 'dist' || entry.name === 'archive') continue;
+      if (entry.name === 'node_modules' || entry.name === 'dist' || entry.name === 'archive')
+        continue;
       walk(full, files);
     } else if (EXTENSIONS.has(path.extname(entry.name))) {
       files.push(full);
@@ -42,7 +53,11 @@ for (const dir of TARGET_DIRS) {
     for (const [pattern, replacement] of REPLACEMENTS) {
       next = next.replace(pattern, replacement);
     }
-    if (next !== original && !original.includes('LEGACY_PRODUCT_NAMES') && !original.includes('FORBIDDEN_PRODUCT_NAMES')) {
+    if (
+      next !== original &&
+      !original.includes('LEGACY_PRODUCT_NAMES') &&
+      !original.includes('FORBIDDEN_PRODUCT_NAMES')
+    ) {
       fs.writeFileSync(file, next, 'utf8');
       changed += 1;
     }

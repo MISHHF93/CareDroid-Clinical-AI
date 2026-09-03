@@ -200,7 +200,9 @@ const WORKERS = [
     criterion: 'ArrivalMetricsPanel avoids unstable operational summary selector',
     verify() {
       const src = read('src/components/reception/ArrivalMetricsPanel.jsx');
-      return src.includes('selectEmsInboundCount') && !src.includes('selectEmergencyOperationalSummary');
+      return (
+        src.includes('selectEmsInboundCount') && !src.includes('selectEmergencyOperationalSummary')
+      );
     },
   },
   {
@@ -315,14 +317,19 @@ if (!isMainThread) {
       durationMs: Date.now() - started,
       passed,
       failed: failed.length,
-      plans: ['receptionist-only_layout_29938d64.plan.md', 'reception-first_refactor_80aaa8b3.plan.md'],
+      plans: [
+        'receptionist-only_layout_29938d64.plan.md',
+        'reception-first_refactor_80aaa8b3.plan.md',
+      ],
       results: results.sort((a, b) => a.index - b.index),
     };
 
     mkdirSync(dirname(reportPath), { recursive: true });
     writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`);
 
-    console.log(`Plan verification (${workerCount} workers): ${passed}/${workerCount} passed (${report.durationMs}ms)`);
+    console.log(
+      `Plan verification (${workerCount} workers): ${passed}/${workerCount} passed (${report.durationMs}ms)`,
+    );
     for (const item of failed) {
       console.log(`  FAIL ${item.id}: ${item.criterion}`);
       if (item.error) console.log(`       ${item.error}`);

@@ -32,5 +32,7 @@ console.log(
 console.log(
   `3. Director throughput read: ~${evaluation.kpis.director.estimatedReadSeconds}s (target ${evaluation.kpis.director.targetSeconds}s) — ${evaluation.kpis.director.passes ? 'PASS' : 'FAIL'}`,
 );
-console.log(`\nPilot ready (${evaluation.passedCount}/${evaluation.totalCount}): ${evaluation.pilotReady ? 'YES' : 'NO'}`);
+console.log(
+  `\nPilot ready (${evaluation.passedCount}/${evaluation.totalCount}): ${evaluation.pilotReady ? 'YES' : 'NO'}`,
+);
 console.log(`Report: ${reportPath}`);

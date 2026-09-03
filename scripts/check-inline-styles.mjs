@@ -23,10 +23,7 @@ const FILE_CEILINGS = new Map([
   ['src/components/Header.tsx', 1],
 ]);
 
-const ALLOW_DYNAMIC = new Set([
-  'src/pages/Profile.jsx',
-  'src/components/Header.tsx',
-]);
+const ALLOW_DYNAMIC = new Set(['src/pages/Profile.jsx', 'src/components/Header.tsx']);
 
 function walk(dir, acc = []) {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
@@ -77,4 +74,6 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log(`Inline style gate passed (${total}/${BASELINE_TOTAL}, ${FILE_CEILINGS.size} file ceilings enforced).`);
+console.log(
+  `Inline style gate passed (${total}/${BASELINE_TOTAL}, ${FILE_CEILINGS.size} file ceilings enforced).`,
+);

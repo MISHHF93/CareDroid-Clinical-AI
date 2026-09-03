@@ -148,7 +148,11 @@ try {
     'backend/src/config/nlu.config.ts',
   );
 } catch (error) {
-  record('TypeScript backend verification', false, error instanceof Error ? error.message : String(error));
+  record(
+    'TypeScript backend verification',
+    false,
+    error instanceof Error ? error.message : String(error),
+  );
 }
 
 let failed = 0;

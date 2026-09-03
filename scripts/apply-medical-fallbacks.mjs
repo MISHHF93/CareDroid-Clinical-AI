@@ -21,10 +21,14 @@ const replacements = [
   [/#00ff88\b/g, 'var(--app-accent-interactive)'],
   [/#14b8a6\b/g, 'var(--app-accent-2)'],
   [/#4f46e5\b/g, 'var(--app-accent-interactive)'],
-  [/linear-gradient\(135deg, #0f172a 0%, #111827 100%\)/g,
-    'linear-gradient(135deg, var(--medical-surface-page, #f0f9ff) 0%, var(--app-surface-1, #ffffff) 100%)'],
-  [/linear-gradient\(90deg, var\(--app-accent-interactive\), #14b8a6\)/g,
-    'linear-gradient(90deg, var(--app-accent-interactive), var(--app-accent-2))'],
+  [
+    /linear-gradient\(135deg, #0f172a 0%, #111827 100%\)/g,
+    'linear-gradient(135deg, var(--medical-surface-page, #f0f9ff) 0%, var(--app-surface-1, #ffffff) 100%)',
+  ],
+  [
+    /linear-gradient\(90deg, var\(--app-accent-interactive\), #14b8a6\)/g,
+    'linear-gradient(90deg, var(--app-accent-interactive), var(--app-accent-2))',
+  ],
 ];
 
 let touched = 0;

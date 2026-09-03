@@ -68,7 +68,9 @@ try {
 
   const stats = await requestJson('/api/rag/stats');
   const hasVectors =
-    stats.status === 200 && typeof stats.body?.totalVectors === 'number' && stats.body.totalVectors > 0;
+    stats.status === 200 &&
+    typeof stats.body?.totalVectors === 'number' &&
+    stats.body.totalVectors > 0;
   record(
     'RAG corpus indexed',
     hasVectors,
@@ -79,7 +81,11 @@ try {
 
   const devSession = await requestJson('/api/auth/dev-session', { method: 'POST' });
   const token = devSession.body?.accessToken;
-  record('Dev auth for guideline query', Boolean(token), token ? 'JWT issued' : `HTTP ${devSession.status}`);
+  record(
+    'Dev auth for guideline query',
+    Boolean(token),
+    token ? 'JWT issued' : `HTTP ${devSession.status}`,
+  );
 
   if (token) {
     const query = await requestJson('/api/clinical-intelligence/guideline-rag/query', {
@@ -116,7 +122,9 @@ for (const check of checks) {
 }
 
 if (failed > 0) {
-  console.log('\nEnsure backend is running with RAG_ENABLED=true. Restart to auto-bootstrap corpus.');
+  console.log(
+    '\nEnsure backend is running with RAG_ENABLED=true. Restart to auto-bootstrap corpus.',
+  );
   process.exit(1);
 }
 

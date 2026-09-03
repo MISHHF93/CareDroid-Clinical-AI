@@ -100,5 +100,7 @@ console.log('Sample classification:');
 for (const entry of classified) {
   console.log(`  [${entry.tier}] ${entry.title}`);
 }
-console.log(`\nTriage: ${audit.inputCount} in → ${audit.visibleCount} visible · ${audit.suppressedCount} suppressed`);
+console.log(
+  `\nTriage: ${audit.inputCount} in → ${audit.visibleCount} visible · ${audit.suppressedCount} suppressed`,
+);
 console.log(`Report: ${reportPath}`);

@@ -27,7 +27,15 @@ const repoRoot = join(__dirname, '..');
 const srcRoot = join(repoRoot, 'src');
 
 const TONE_WORDS = ['critical', 'warning', 'watch', 'urgent', 'good', 'ok', 'healthy', 'attention'];
-const VALUE_SUFFIXES = ['strong', '__value', '__amount', '__count', '__metric-value', '> b', '> strong'];
+const VALUE_SUFFIXES = [
+  'strong',
+  '__value',
+  '__amount',
+  '__count',
+  '__metric-value',
+  '> b',
+  '> strong',
+];
 
 const CLASS_MODIFIER_RE = new RegExp(`\\.[\\w-]+--(?:${TONE_WORDS.join('|')})\\b`, 'g');
 const ATTR_MODIFIER_RE = new RegExp(
@@ -157,7 +165,9 @@ writeFileSync(
 
 console.log(`Scanned ${cssFiles.length} CSS files, found ${report.length} tone modifiers.`);
 console.log(`  ${clean.length} already recolor their value.`);
-console.log(`  ${flagged.length} flagged — modifier tints border/background but no value-color rule found in the same file.`);
+console.log(
+  `  ${flagged.length} flagged — modifier tints border/background but no value-color rule found in the same file.`,
+);
 console.log(`Report written to ${relative(repoRoot, outPath)}`);
 if (flagged.length) {
   console.log('\nFlagged (file :: modifier):');

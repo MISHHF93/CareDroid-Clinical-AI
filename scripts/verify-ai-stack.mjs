@@ -121,11 +121,7 @@ try {
     record('NLU metrics.json on disk', false, 'missing — run: cd backend && npm run nlu:pipeline');
   }
 
-  const stalePaths = [
-    'lib/ai/config.ts',
-    'backend/src/config/nlu.config.ts',
-    'docker-compose.yml',
-  ];
+  const stalePaths = ['lib/ai/config.ts', 'backend/src/config/nlu.config.ts', 'docker-compose.yml'];
   const staleHits = stalePaths.filter((rel) => {
     const content = readFileSync(join(rootDir, rel), 'utf8');
     return /localhost:8001|nlu:8001|distilbert-base-uncased|PYTHONUNBUFFERED/i.test(content);

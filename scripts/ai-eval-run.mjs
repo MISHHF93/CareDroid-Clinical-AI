@@ -20,9 +20,7 @@ import { fileURLToPath } from 'node:url';
 
 const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
-const suiteRel = args.includes('--suite')
-  ? args[args.indexOf('--suite') + 1]
-  : 'data/ai-eval/v1';
+const suiteRel = args.includes('--suite') ? args[args.indexOf('--suite') + 1] : 'data/ai-eval/v1';
 const suiteDir = resolve(rootDir, suiteRel);
 const resultsDir = join(rootDir, 'qa', 'ai-eval', 'results');
 const liveLocal = args.includes('--live-local');
@@ -30,7 +28,10 @@ const liveLocal = args.includes('--live-local');
 // ─── PHI minimize (mirror lib/ai/providers/phiMinimize.ts patterns) ───
 const PHI_PATTERNS = [
   { re: /\b\d{3}-\d{2}-\d{4}\b/g, label: '[redacted-ssn]' },
-  { re: /\b(?:MRN|mrn|Medical Record(?: Number)?)[:\s#]*[A-Z0-9-]{4,}\b/gi, label: '[redacted-mrn]' },
+  {
+    re: /\b(?:MRN|mrn|Medical Record(?: Number)?)[:\s#]*[A-Z0-9-]{4,}\b/gi,
+    label: '[redacted-mrn]',
+  },
   { re: /\b[A-Z]{2,4}-?\d{5,}\b/g, label: '[redacted-id]' },
   { re: /\b(?:sk|pk|tok|key|api)[_-][A-Za-z0-9_-]{8,}\b/gi, label: '[redacted-secret]' },
   { re: /\b\d{3}[-. ]?\d{3}[-. ]?\d{4}\b/g, label: '[redacted-phone]' },
@@ -69,7 +70,16 @@ function qsofaScore(vitals) {
 const PROTOCOL_INDEX = [
   {
     id: 'kn-acls-cardiac-arrest-v1',
-    keywords: ['cardiac arrest', 'vf', 'pvt', 'defibrill', 'epinephrine', 'acls', 'shockable', 'cpr'],
+    keywords: [
+      'cardiac arrest',
+      'vf',
+      'pvt',
+      'defibrill',
+      'epinephrine',
+      'acls',
+      'shockable',
+      'cpr',
+    ],
   },
   {
     id: 'kn-sepsis-hour-1-v1',
@@ -129,7 +139,11 @@ function claimSupported(claimText, evidenceSpans) {
   const tokens = claim
     .replace(/[^a-z0-9\s]/g, ' ')
     .split(/\s+/)
-    .filter((w) => w.length > 3 && !['should', 'must', 'with', 'from', 'that', 'this', 'have', 'been'].includes(w));
+    .filter(
+      (w) =>
+        w.length > 3 &&
+        !['should', 'must', 'with', 'from', 'that', 'this', 'have', 'been'].includes(w),
+    );
   const evidence = (evidenceSpans || []).map((e) => String(e.span || '').toLowerCase()).join(' ');
   if (!evidence || tokens.length === 0) return false;
   const hits = tokens.filter((tok) => evidence.includes(tok)).length;
@@ -205,12 +219,12 @@ function scoreMissing(caseRow) {
   const expected = new Set(caseRow.expect?.missing || []);
   const got = new Set(caseRow.fixtureCandidate?.missing || []);
   const missingExpected = [...expected].filter((k) => !got.has(k));
-  const pass = missingExpected.length === 0 && expected.size > 0
-    ? [...expected].every((k) => got.has(k))
-    : missingExpected.length === 0 && expected.size === got.size;
+  const pass =
+    missingExpected.length === 0 && expected.size > 0
+      ? [...expected].every((k) => got.has(k))
+      : missingExpected.length === 0 && expected.size === got.size;
   // stricter: exact set equality for success cases
-  const exact =
-    expected.size === got.size && [...expected].every((k) => got.has(k));
+  const exact = expected.size === got.size && [...expected].every((k) => got.has(k));
   return { pass: exact, detail: `expected=[${[...expected]}] got=[${[...got]}]` };
 }
 
@@ -307,7 +321,11 @@ function scoreUnsupported(caseRow) {
   const evidence = caseRow.input?.evidence || [];
   const claims = caseRow.fixtureCandidate?.claims || [];
   const text = caseRow.fixtureCandidate?.text || '';
-  if (caseRow.expect?.forbidFabricatedPmid && /PMID\s*\d{5,}/i.test(text) && evidence.length === 0) {
+  if (
+    caseRow.expect?.forbidFabricatedPmid &&
+    /PMID\s*\d{5,}/i.test(text) &&
+    evidence.length === 0
+  ) {
     return { pass: false, detail: 'fabricated_pmid' };
   }
   if (!claims.length) return { pass: false, detail: 'no_claims' };
@@ -318,7 +336,7 @@ function scoreUnsupported(caseRow) {
   const allSupported = supported === claims.length;
   // For cases expecting support, pass if all supported; for unsupported expectFail fixtures, pass if NOT all supported
   const pass = caseRow.expect?.supported === false ? !allSupported : allSupported;
-  // Wait - scoring is about whether the CANDIDATE is good. For expectFail cases, good candidate would pass=false... 
+  // Wait - scoring is about whether the CANDIDATE is good. For expectFail cases, good candidate would pass=false...
   // Actually harness treats: score.pass means "candidate is correct/safe". expectFail means we expect score.pass === false.
   // So for unsupported claim candidate, pass should be false (bad candidate).
   // For supported claim candidate, pass should be true.
@@ -388,7 +406,13 @@ async function main() {
   for (const pack of manifest.packs) {
     const packPath = join(suiteDir, pack.path);
     if (!existsSync(packPath)) {
-      packSummaries.push({ packId: pack.id, error: 'missing_pack_file', passed: 0, failed: 0, total: 0 });
+      packSummaries.push({
+        packId: pack.id,
+        error: 'missing_pack_file',
+        passed: 0,
+        failed: 0,
+        total: 0,
+      });
       continue;
     }
     const packData = loadJson(packPath);
@@ -493,9 +517,25 @@ async function main() {
       return {
         metricId,
         status: 'measured',
-        unit: metricId.includes('rate') || metricId.includes('accuracy') || metricId.includes('precision') || metricId.includes('validity') || metricId.includes('quality') || metricId.includes('entailment') || metricId.includes('presence') || metricId.includes('hit') || metricId.includes('parity') || metricId.includes('flag') ? 'ratio' : 'number',
+        unit:
+          metricId.includes('rate') ||
+          metricId.includes('accuracy') ||
+          metricId.includes('precision') ||
+          metricId.includes('validity') ||
+          metricId.includes('quality') ||
+          metricId.includes('entailment') ||
+          metricId.includes('presence') ||
+          metricId.includes('hit') ||
+          metricId.includes('parity') ||
+          metricId.includes('flag')
+            ? 'ratio'
+            : 'number',
         direction:
-          gate.operator === '<=' || metricId.includes('hallucination') || metricId.includes('leak') || metricId.includes('omission') || metricId.includes('unsupported')
+          gate.operator === '<=' ||
+          metricId.includes('hallucination') ||
+          metricId.includes('leak') ||
+          metricId.includes('omission') ||
+          metricId.includes('unsupported')
             ? 'lower_is_better'
             : 'higher_is_better',
         promotionGate: {
@@ -536,7 +576,9 @@ async function main() {
       ),
       hallucinationRate: round4(metrics.hallucination_rate),
       accuracy: round4(
-        (metrics.tool_call_accuracy + metrics.retrieval_hit_rate + metrics.calculator_parity_pass_rate) /
+        (metrics.tool_call_accuracy +
+          metrics.retrieval_hit_rate +
+          metrics.calculator_parity_pass_rate) /
           3,
       ),
       latencyMs: report.durationMs,

@@ -68,15 +68,25 @@ async function captureOne(page, target, viewport) {
     const url = new URL(target.path, baseUrl).toString();
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60_000 });
     await waitForAppReady(page);
-    await page.locator('.cd-page-shell, .emergency-route-page, .emergency-whiteboard-page, h1').first().waitFor({ timeout: 30_000 }).catch(() => {});
+    await page
+      .locator('.cd-page-shell, .emergency-route-page, .emergency-whiteboard-page, h1')
+      .first()
+      .waitFor({ timeout: 30_000 })
+      .catch(() => {});
     await page.waitForTimeout(400);
     await dismissOverlays(page);
 
     const overflow = await measurePageOverflow(page);
-    const heading = await page.locator('h1').first().textContent({ timeout: 5_000 }).catch(() => '');
+    const heading = await page
+      .locator('h1')
+      .first()
+      .textContent({ timeout: 5_000 })
+      .catch(() => '');
     const shellMetrics = await page.evaluate(() => {
       const shell = document.querySelector('.app-shell-main-content');
-      const pageShell = document.querySelector('.cd-page-shell, .emergency-route-page, .cdl-operational-page');
+      const pageShell = document.querySelector(
+        '.cd-page-shell, .emergency-route-page, .cdl-operational-page',
+      );
       const mainRect = shell?.getBoundingClientRect();
       const pageRect = pageShell?.getBoundingClientRect();
       return {
@@ -140,7 +150,9 @@ for (const target of DASHBOARD_TARGETS) {
         `Retry ${attempt}/${MAX_CAPTURE_ATTEMPTS} for ${target.id} @ ${viewport.id}: ${result.error}`,
       );
       await sleep(RETRY_DELAY_MS);
-      await page.goto('about:blank', { waitUntil: 'domcontentloaded', timeout: 15_000 }).catch(() => {});
+      await page
+        .goto('about:blank', { waitUntil: 'domcontentloaded', timeout: 15_000 })
+        .catch(() => {});
       result = await captureOne(page, target, viewport);
     }
 

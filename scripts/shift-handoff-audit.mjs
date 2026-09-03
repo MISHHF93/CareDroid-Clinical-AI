@@ -18,7 +18,10 @@ const report = {
   goal: 'New clinician understands waiting, high-risk, EMS, reassess, and boarders within 60 seconds',
   signals: ['Waiting', 'High risk', 'EMS inbound', 'Reassess due', 'Boarders'],
   roles: Object.fromEntries(
-    roles.map((roleId) => [roleId, auditShiftHandoffSurfaces(roleId, { operationalLoadElevated: true })]),
+    roles.map((roleId) => [
+      roleId,
+      auditShiftHandoffSurfaces(roleId, { operationalLoadElevated: true }),
+    ]),
   ),
 };
 

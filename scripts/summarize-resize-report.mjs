@@ -3,7 +3,9 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const r = JSON.parse(readFileSync(join(root, 'qa/dashboard-resize-audit/dashboard-resize-report.json'), 'utf8'));
+const r = JSON.parse(
+  readFileSync(join(root, 'qa/dashboard-resize-audit/dashboard-resize-report.json'), 'utf8'),
+);
 
 const byTarget = {};
 const byVp = {};
@@ -38,7 +40,9 @@ for (const [id, s] of Object.entries(byVp)) {
 }
 
 console.log('\n=== TOP OFFENDER SELECTORS ===');
-for (const [sel, n] of Object.entries(topOffenders).sort((a, b) => b[1] - a[1]).slice(0, 12)) {
+for (const [sel, n] of Object.entries(topOffenders)
+  .sort((a, b) => b[1] - a[1])
+  .slice(0, 12)) {
   console.log(`${n}x  ${sel}`);
 }
 

@@ -32,8 +32,10 @@ const replacements = [
     /<div className="calc-spinner" style=\{\{ width: '20px', height: '20px', borderWidth: '2px' \}\}><\/div>/g,
     '<div className="calc-spinner calc-spinner--sm"></div>',
   ],
-  [/className="calc-input-field"\n(\s+)style=\{\{ marginBottom: '8px' \}\}/g,
-    'className="calc-input-field calc-input-field--spaced"\n$1'],
+  [
+    /className="calc-input-field"\n(\s+)style=\{\{ marginBottom: '8px' \}\}/g,
+    'className="calc-input-field calc-input-field--spaced"\n$1',
+  ],
 ];
 
 for (const file of fs.readdirSync(dir).filter((name) => name.endsWith('.jsx'))) {

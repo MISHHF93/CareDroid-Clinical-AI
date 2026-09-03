@@ -15,7 +15,12 @@ const phase = process.env.ED_UX_PHASE || 'before';
 const baseURL = process.env.QA_BASE_URL || 'http://localhost:3000';
 const root = process.cwd();
 const screenshotDir = join(root, 'qa', 'emergency-os-ux-screenshots', phase);
-const diagnosticsPath = join(root, 'qa', 'emergency-os-ux-screenshots', `${phase}-diagnostics.json`);
+const diagnosticsPath = join(
+  root,
+  'qa',
+  'emergency-os-ux-screenshots',
+  `${phase}-diagnostics.json`,
+);
 
 const viewports = [
   { id: 'desktop', width: 1440, height: 1000 },
@@ -51,13 +56,15 @@ async function collectPageSummary(page) {
       .map((heading) => heading.textContent?.replace(/\s+/g, ' ').trim())
       .filter(Boolean)
       .slice(0, 12);
-    const shellCount = document.querySelectorAll('.app-shell, .app-shell-page, .workspace-home').length;
-    const visibleCards = document.querySelectorAll(
-      '.workspace-panel, .workspace-automation-card, .workspace-capability-card, .emergency-queue-card'
+    const shellCount = document.querySelectorAll(
+      '.app-shell, .app-shell-page, .workspace-home',
     ).length;
-    const demoLabels = [...document.body.querySelectorAll('*')]
-      .filter((node) => /demo data|demo\/local fallback|no live integration/i.test(node.textContent || ''))
-      .length;
+    const visibleCards = document.querySelectorAll(
+      '.workspace-panel, .workspace-automation-card, .workspace-capability-card, .emergency-queue-card',
+    ).length;
+    const demoLabels = [...document.body.querySelectorAll('*')].filter((node) =>
+      /demo data|demo\/local fallback|no live integration/i.test(node.textContent || ''),
+    ).length;
 
     return {
       pathname: window.location.pathname,
@@ -133,14 +140,14 @@ await browser.close();
 
 writeFileSync(
   diagnosticsPath,
-  `${JSON.stringify({ phase, generatedAt: new Date().toISOString(), diagnostics }, null, 2)}\n`
+  `${JSON.stringify({ phase, generatedAt: new Date().toISOString(), diagnostics }, null, 2)}\n`,
 );
 
 const failures = diagnostics.filter((item) => !item.ok);
 const overflowFailures = diagnostics.filter((item) => item.overflow && !item.overflow.pass);
 const overlapFailures = diagnostics.filter((item) => item.overlaps && !item.overlaps.pass);
 console.log(
-  `Captured ${diagnostics.length} screenshots for ${phase}. Failures: ${failures.length}, overflow: ${overflowFailures.length}, overlaps: ${overlapFailures.length}.`
+  `Captured ${diagnostics.length} screenshots for ${phase}. Failures: ${failures.length}, overflow: ${overflowFailures.length}, overlaps: ${overlapFailures.length}.`,
 );
 
 if (failures.length) {

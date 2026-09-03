@@ -41,7 +41,9 @@ console.log('\nOperational handoff discovery\n');
 console.log(`Domains: ${report.discovery.domainCount}`);
 console.log(`Artifacts cataloged: ${report.discovery.totalArtifacts}`);
 for (const [domainId, entry] of Object.entries(report.discovery.byDomain)) {
-  console.log(`  ${domainId}: ${entry.artifactCount} artifacts · ${entry.surfaces.length} surfaces`);
+  console.log(
+    `  ${domainId}: ${entry.artifactCount} artifacts · ${entry.surfaces.length} surfaces`,
+  );
 }
 console.log(`\nHunting test: ${report.hunting.passesSingleSurfaceTest ? 'PASS' : 'FAIL'}`);
 console.log(`Report: ${reportPath}`);

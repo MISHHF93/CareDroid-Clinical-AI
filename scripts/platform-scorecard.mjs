@@ -16,7 +16,9 @@ const reportPath = join(root, 'qa', 'platform-scorecard-report.json');
 const jiti = createJiti(join(root, '_platform-scorecard.cjs'));
 
 const { auditCustomerSuccessPlatform } = jiti('./src/config/customerSuccessPlatformModel.ts');
-const { auditEnterpriseOperatingPlatform } = jiti('./src/config/enterpriseOperatingPlatformModel.ts');
+const { auditEnterpriseOperatingPlatform } = jiti(
+  './src/config/enterpriseOperatingPlatformModel.ts',
+);
 const { auditPlatformIntelligence } = jiti('./src/config/platformIntelligenceModel.ts');
 const { auditProductionReadiness } = jiti('./src/config/productionReadinessModel.ts');
 const { auditTrackMindMaturity } = jiti('./src/config/trackMindMaturityModel.ts');
@@ -246,5 +248,7 @@ for (const section of sections) {
 }
 console.log('Top opportunities:');
 for (const opportunity of opportunities.slice(0, 5)) {
-  console.log(`  ${opportunity.label}: ${opportunity.score}/${opportunity.target} (gap ${opportunity.gap})`);
+  console.log(
+    `  ${opportunity.label}: ${opportunity.score}/${opportunity.target} (gap ${opportunity.gap})`,
+  );
 }

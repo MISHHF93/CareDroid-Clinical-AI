@@ -19,7 +19,11 @@ const spawnDevProcess = (entry) => {
   };
 
   if (process.platform === 'win32') {
-    return spawn('cmd.exe', ['/d', '/s', '/c', `${entry.command} ${entry.args.join(' ')}`], options);
+    return spawn(
+      'cmd.exe',
+      ['/d', '/s', '/c', `${entry.command} ${entry.args.join(' ')}`],
+      options,
+    );
   }
 
   return spawn(entry.command, entry.args, options);
@@ -509,11 +513,7 @@ if (!resolvedFrontend) {
   );
 }
 
-const resolvedBackend = await resolveStackPort(
-  preferredBackendPort,
-  'Backend',
-  probeBackendHealth,
-);
+const resolvedBackend = await resolveStackPort(preferredBackendPort, 'Backend', probeBackendHealth);
 
 frontendPort = resolvedFrontend.port;
 backendPort = resolvedBackend.port;
@@ -523,10 +523,8 @@ backendPort = resolvedBackend.port;
   backendPort,
 ));
 
-const backendAlreadyHealthy =
-  !forceRestart && (await probeBackendHealth(backendPort));
-let frontendProxyHealthy =
-  !forceRestart && (await probeFrontendProxyHealth(frontendPort));
+const backendAlreadyHealthy = !forceRestart && (await probeBackendHealth(backendPort));
+let frontendProxyHealthy = !forceRestart && (await probeFrontendProxyHealth(frontendPort));
 
 if (!frontendProxyHealthy && backendAlreadyHealthy && !forceRestart) {
   const existingFrontendPort = await findExistingCareDroidFrontendPort(preferredFrontendPort);
@@ -584,7 +582,9 @@ if (!frontendOnly && !backendAlreadyHealthy) {
   }
 
   if (!backendOnly) {
-    console.log('[web] waiting for API health before starting Vite (avoids ERR_CONNECTION_REFUSED)...');
+    console.log(
+      '[web] waiting for API health before starting Vite (avoids ERR_CONNECTION_REFUSED)...',
+    );
     const ready = await waitForBackend(backendPort);
     if (!ready) {
       console.error(
@@ -612,18 +612,20 @@ if (!backendOnly) {
   }
 
   if (resolvedFrontend.reusedExisting && (await probeFrontendProxyHealth(frontendPort))) {
-    console.log(`[web] reusing CareDroid frontend on port ${frontendPort}; not starting duplicate Vite.`);
+    console.log(
+      `[web] reusing CareDroid frontend on port ${frontendPort}; not starting duplicate Vite.`,
+    );
     if (backendAlreadyHealthy) {
       printStackAlreadyRunning(frontendOrigin, backendPort);
       process.exit(0);
     }
   } else {
-  spawnManagedProcess({
-    name: 'web',
-    cwd: rootDir,
-    command: npmCommand,
-    args: ['run', 'dev:web'],
-    env: frontendEnv,
-  });
+    spawnManagedProcess({
+      name: 'web',
+      cwd: rootDir,
+      command: npmCommand,
+      args: ['run', 'dev:web'],
+      env: frontendEnv,
+    });
   }
 }

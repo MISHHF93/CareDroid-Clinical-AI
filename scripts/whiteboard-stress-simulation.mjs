@@ -30,7 +30,9 @@ console.log('\nWhiteboard stress simulation\n');
 console.log(
   `Scenario: ${report.scenario.waitingPatients} waiting · ${report.scenario.emsArrivals} EMS · ${report.scenario.reassessmentsDue} reassess · ${report.scenario.referralsPending} referrals pending`,
 );
-console.log(`Load level: ${report.evaluation.loadLevel} (score ${report.evaluation.overloadScore})`);
+console.log(
+  `Load level: ${report.evaluation.loadLevel} (score ${report.evaluation.overloadScore})`,
+);
 console.log(`Readability before mitigations: ${report.beforeReadability}/100`);
 console.log(`Readability after mitigations: ${report.afterReadability}/100`);
 console.log('\nPrimary focus order:');

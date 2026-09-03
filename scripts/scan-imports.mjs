@@ -103,7 +103,10 @@ for (const f of files) {
     }
     if (/\bReact\.(FC|ReactNode|Component|memo|use|createElement|Fragment|CSSProperties)/.test(t)) {
       // needed or type-only
-    } else if (/import\s+React\s+from\s+['"]react['"]/.test(t) && !/\bReact\b/.test(t.replace(/import\s+React\s+from\s+['"]react['"]\s*;?/, ''))) {
+    } else if (
+      /import\s+React\s+from\s+['"]react['"]/.test(t) &&
+      !/\bReact\b/.test(t.replace(/import\s+React\s+from\s+['"]react['"]\s*;?/, ''))
+    ) {
       defaultReactImports += 1;
       if (reactDefaultSamples.length < 15) {
         reactDefaultSamples.push(path.relative(process.cwd(), f).replace(/\\/g, '/'));

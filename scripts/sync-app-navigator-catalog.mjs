@@ -34,18 +34,29 @@ const records = routes.map((route) => ({
 
 let sourceCommit = 'unknown';
 try {
-  sourceCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: rootDir, encoding: 'utf8' }).trim();
+  sourceCommit = execFileSync('git', ['rev-parse', 'HEAD'], {
+    cwd: rootDir,
+    encoding: 'utf8',
+  }).trim();
 } catch {
   // A source archive without .git can still produce a valid catalog.
 }
 
 const output = join(rootDir, 'backend', 'src', 'modules', 'app-navigator', 'data', 'catalog.json');
 await mkdir(dirname(output), { recursive: true });
-await writeFile(output, `${JSON.stringify({
-  schemaVersion: 1,
-  source: 'CareDroid CANONICAL_ROUTE_MAP',
-  sourceCommit,
-  generatedAt: new Date().toISOString(),
-  records,
-}, null, 2)}\n`, 'utf8');
+await writeFile(
+  output,
+  `${JSON.stringify(
+    {
+      schemaVersion: 1,
+      source: 'CareDroid CANONICAL_ROUTE_MAP',
+      sourceCommit,
+      generatedAt: new Date().toISOString(),
+      records,
+    },
+    null,
+    2,
+  )}\n`,
+  'utf8',
+);
 console.log(`Wrote ${records.length} verified routes to ${output}`);

@@ -17,7 +17,15 @@ const NLU_CLS = join(MODELS, 'nlu', 'classifier.json');
 const NLU_MET = join(MODELS, 'nlu', 'metrics.json');
 const ART_CLS = join(MODELS, 'artifact-router', 'classifier.json');
 const ART_MET = join(MODELS, 'artifact-router', 'metrics.json');
-const LEGACY_NLU = join(ROOT, 'backend', 'ml-services', 'nlu', 'models', 'best_model', 'classifier.json');
+const LEGACY_NLU = join(
+  ROOT,
+  'backend',
+  'ml-services',
+  'nlu',
+  'models',
+  'best_model',
+  'classifier.json',
+);
 const LEGACY_ART = join(
   ROOT,
   'backend',

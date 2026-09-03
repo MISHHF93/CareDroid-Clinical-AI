@@ -41,5 +41,7 @@ console.log(`Overall: ${assessment.overallScore}/100 (${assessment.overallStatus
 console.log(`Modules ready: ${assessment.summary.readyModules}/${assessment.summary.moduleCount}`);
 console.log(`KPIs: ${assessment.summary.kpisPassed}/${assessment.summary.kpisTotal}`);
 for (const module of assessment.modules) {
-  console.log(`  P${module.prompt} ${module.label}: ${module.assessment.score} (${module.assessment.status})`);
+  console.log(
+    `  P${module.prompt} ${module.label}: ${module.assessment.score} (${module.assessment.status})`,
+  );
 }

@@ -32,8 +32,14 @@ const manifest = readJson(path.join(models, 'manifest.json'), {});
 const ok = runs.filter((r) => r.status === 'ok');
 const err = runs.filter((r) => r.status === 'error');
 const retrained = runs.filter((r) => r.retrained === true);
-const starts = runs.map((r) => r.startedAt).filter(Boolean).sort();
-const ends = runs.map((r) => r.finishedAt).filter(Boolean).sort();
+const starts = runs
+  .map((r) => r.startedAt)
+  .filter(Boolean)
+  .sort();
+const ends = runs
+  .map((r) => r.finishedAt)
+  .filter(Boolean)
+  .sort();
 const firstStart = starts[0] || null;
 const lastStart = starts[starts.length - 1] || null;
 const lastFinish = ends[ends.length - 1] || null;
@@ -59,8 +65,7 @@ for (let i = 1; i < okFinish.length; i += 1) {
 }
 gaps.sort((a, b) => a - b);
 
-const sessionMs =
-  firstStart && lastFinish ? Date.parse(lastFinish) - Date.parse(firstStart) : 0;
+const sessionMs = firstStart && lastFinish ? Date.parse(lastFinish) - Date.parse(firstStart) : 0;
 const configuredIntervalMs = Number(lock?.intervalMs || 60000);
 const theoreticalIntervals =
   configuredIntervalMs > 0 ? Math.floor(sessionMs / configuredIntervalMs) : null;
@@ -267,7 +272,10 @@ const mdPath = path.join(outDir, `worker-session-report-${stamp}.md`);
 writeFileSync(mdPath, md);
 
 // Also write "latest" aliases
-writeFileSync(path.join(outDir, 'worker-session-report-latest.json'), `${JSON.stringify(report, null, 2)}\n`);
+writeFileSync(
+  path.join(outDir, 'worker-session-report-latest.json'),
+  `${JSON.stringify(report, null, 2)}\n`,
+);
 writeFileSync(path.join(outDir, 'worker-session-report-latest.md'), md);
 
 console.log('Wrote:');

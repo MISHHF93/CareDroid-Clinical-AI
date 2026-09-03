@@ -35,8 +35,20 @@ for (const f of files) {
 }
 
 const ARIA_BOOL = [
-  'checked', 'pressed', 'expanded', 'selected', 'hidden', 'disabled', 'invalid',
-  'modal', 'busy', 'atomic', 'multiline', 'multiselectable', 'readonly', 'required',
+  'checked',
+  'pressed',
+  'expanded',
+  'selected',
+  'hidden',
+  'disabled',
+  'invalid',
+  'modal',
+  'busy',
+  'atomic',
+  'multiline',
+  'multiselectable',
+  'readonly',
+  'required',
 ];
 
 function isStaticAriaBool(expr) {
@@ -133,7 +145,10 @@ for (const f of files) {
         const before = line.slice(Math.max(0, at - 5), at);
         if (before.endsWith('data-')) continue;
         if (isStaticRole(rm[1])) continue;
-        if (/RoleBadge|RoleGate/.test(line) && !/<(div|span|section|article|p|button|nav)\b/i.test(line)) {
+        if (
+          /RoleBadge|RoleGate/.test(line) &&
+          !/<(div|span|section|article|p|button|nav)\b/i.test(line)
+        ) {
           continue;
         }
         issues.ariaRoleExpr.push({

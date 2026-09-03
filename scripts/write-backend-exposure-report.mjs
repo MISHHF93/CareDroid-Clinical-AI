@@ -20,7 +20,7 @@ const result = spawnSync(
     stdio: 'inherit',
     shell: true,
     env: { ...process.env, EXPOSURE_WRITE_DOCS: '1', CONTRACT_WRITE_DOCS: '1' },
-  }
+  },
 );
 
 process.exit(result.status ?? 1);

@@ -242,7 +242,13 @@ function parseStyleObject(body) {
       // allow pure numbers
       if (!/^-?\d+(\.\d+)?$/.test(raw)) return null;
     }
-    if (raw.includes('(') || raw.includes('?') || raw.includes('+') || raw.includes('MEDICAL') || raw.includes('var(') && raw.includes('{')) {
+    if (
+      raw.includes('(') ||
+      raw.includes('?') ||
+      raw.includes('+') ||
+      raw.includes('MEDICAL') ||
+      (raw.includes('var(') && raw.includes('{'))
+    ) {
       // var() in strings is ok if quoted
     }
     if (/^[A-Za-z_$][\w.]*$/.test(raw) && !/^(true|false)$/.test(raw)) return null;
@@ -403,7 +409,8 @@ function transformV2(src) {
       out = out.slice(0, start) + out.slice(end);
       // className position unchanged if before style
       if (attrStart < start) {
-        out = out.slice(0, attrStart) + ' ' + newClassAttr + out.slice(attrStart + anyClass[0].length);
+        out =
+          out.slice(0, attrStart) + ' ' + newClassAttr + out.slice(attrStart + anyClass[0].length);
       }
       count += 1;
     } else {
@@ -431,4 +438,6 @@ for (const f of files) {
   if (apply) fs.writeFileSync(f, out, 'utf8');
 }
 
-console.log(JSON.stringify({ apply, total, files: touched.length, touched: touched.slice(0, 40) }, null, 2));
+console.log(
+  JSON.stringify({ apply, total, files: touched.length, touched: touched.slice(0, 40) }, null, 2),
+);

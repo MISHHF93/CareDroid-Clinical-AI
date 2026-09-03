@@ -122,7 +122,9 @@ if (journeySkipped) {
   journey.skipped = true;
   journey.note = 'Backend unavailable — journey probe skipped (not a regression)';
 }
-console.log(journey.skipped ? 'Journey SKIPPED (no backend)' : journey.pass ? 'Journey PASS' : 'Journey FAIL');
+console.log(
+  journey.skipped ? 'Journey SKIPPED (no backend)' : journey.pass ? 'Journey PASS' : 'Journey FAIL',
+);
 
 let deskPerfReport = null;
 if (existsSync(join(root, 'qa/reception-desk-performance-report.json'))) {
@@ -168,9 +170,7 @@ const report = {
         offlinePass: deskPerfReport.offline?.pass,
         nextBestActionP95Ms: deskPerfReport.offline?.nextBestAction?.p95Ms,
         promptIntentP95Ms: deskPerfReport.offline?.promptNavigationIntent?.p95Ms,
-        live: deskPerfReport.live?.available
-          ? deskPerfReport.live.summary
-          : { available: false },
+        live: deskPerfReport.live?.available ? deskPerfReport.live.summary : { available: false },
       }
     : null,
   patientJourney: journeyReport
@@ -184,7 +184,10 @@ const report = {
                 ? `${Math.round((journeyReport.passRate || 0) * 100)}% pass`
                 : 'see qa/patient-journey-performance-report.md'),
         pass: journeyReport.pass ?? journeyReport.summary?.pass ?? true,
-        patients: journeyReport.patientCount || journeyReport.patients?.length || Number(process.env.PATIENTS || 6),
+        patients:
+          journeyReport.patientCount ||
+          journeyReport.patients?.length ||
+          Number(process.env.PATIENTS || 6),
       }
     : null,
 };

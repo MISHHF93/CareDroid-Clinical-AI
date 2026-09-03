@@ -26,7 +26,8 @@ for (const f of walk('src')) {
   while ((m = directAria.exec(t))) {
     const lineStart = t.lastIndexOf('\n', m.index) + 1;
     const line = t.slice(lineStart, t.indexOf('\n', m.index));
-    if (line.trim().startsWith('*') || line.trim().startsWith('//') || line.includes('e.g.')) continue;
+    if (line.trim().startsWith('*') || line.trim().startsWith('//') || line.includes('e.g.'))
+      continue;
     const e = m[2].trim();
     if (/^['"`](true|false|page|step)['"`]$/.test(e)) continue;
     remaining.push({ f, full: m[0], line: t.slice(0, m.index).split('\n').length });

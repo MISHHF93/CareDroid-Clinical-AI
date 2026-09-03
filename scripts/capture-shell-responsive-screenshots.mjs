@@ -7,12 +7,17 @@ import { chromium } from '@playwright/test';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { dismissOverlays, installQaNetworkStubs, seedQaAuth } from '../e2e/responsive-qa.helpers.mjs';
+import {
+  dismissOverlays,
+  installQaNetworkStubs,
+  seedQaAuth,
+} from '../e2e/responsive-qa.helpers.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, '..');
 const baseUrl = (process.env.QA_BASE_URL || 'http://localhost:3000').trim().replace(/\/$/, '');
-const outputDir = process.env.SHELL_RESPONSIVE_DIR || join(root, 'qa', 'shell-ux-audit', 'responsive');
+const outputDir =
+  process.env.SHELL_RESPONSIVE_DIR || join(root, 'qa', 'shell-ux-audit', 'responsive');
 const previewDir = join(outputDir, 'previews');
 
 const TARGETS = [
@@ -132,11 +137,16 @@ async function captureTarget(page, target, viewport) {
         shellPaddingInline: styles?.paddingInline ?? null,
         routeTabLeft,
         headerBarLeft,
-        chromePageDeltaPx: pageLeft != null && routeTabLeft != null ? Math.abs(pageLeft - routeTabLeft) : null,
+        chromePageDeltaPx:
+          pageLeft != null && routeTabLeft != null ? Math.abs(pageLeft - routeTabLeft) : null,
       };
     });
 
-    const heading = await page.locator('h1').first().textContent({ timeout: 5_000 }).catch(() => '');
+    const heading = await page
+      .locator('h1')
+      .first()
+      .textContent({ timeout: 5_000 })
+      .catch(() => '');
     const useFullPage = viewport.width <= 1920;
     await page.screenshot({ path: screenshotPath, fullPage: useFullPage });
 
@@ -235,7 +245,9 @@ const report = {
 const reportPath = join(outputDir, 'shell-responsive-report.json');
 writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`);
 console.log(`Wrote ${relativePath(reportPath)}`);
-console.log(`Captured ${report.captured}/${report.total}; overflow issues: ${report.overflowIssues.length}`);
+console.log(
+  `Captured ${report.captured}/${report.total}; overflow issues: ${report.overflowIssues.length}`,
+);
 
 if (report.failed > 0) {
   process.exitCode = 1;

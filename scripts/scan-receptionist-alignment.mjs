@@ -35,50 +35,84 @@ function fail(id, detail) {
 }
 
 // Static checks
-if (files.userCtx.includes("role: 'registration_clerk'")) pass('default-role', 'Open access defaults to registration_clerk');
+if (files.userCtx.includes("role: 'registration_clerk'"))
+  pass('default-role', 'Open access defaults to registration_clerk');
 else fail('default-role', 'Default role is not registration_clerk');
 
-if (files.nav.includes("registration_clerk: ['reception', 'patients']")) pass('clerk-nav-order', 'Clerk nav order is reception + patients');
+if (files.nav.includes("registration_clerk: ['reception', 'patients']"))
+  pass('clerk-nav-order', 'Clerk nav order is reception + patients');
 else fail('clerk-nav-order', 'Clerk nav order missing or wrong');
 
 const clerkRoutesMatch = files.rolePerms.match(
   /\[EMERGENCY_ROLE_IDS\.registrationClerk\]: Object\.freeze\(\{[\s\S]*?routes: \[([^\]]+)\]/,
 );
 const clerkRoutes = clerkRoutesMatch?.[1] || '';
-if (clerkRoutes && !/queues|tools|platform/.test(clerkRoutes)) pass('clerk-routes-trim', `Clerk routes: ${clerkRoutes.trim()}`);
-else fail('clerk-routes-trim', `Clerk routes still include queues/tools/platform: ${clerkRoutes.trim()}`);
+if (clerkRoutes && !/queues|tools|platform/.test(clerkRoutes))
+  pass('clerk-routes-trim', `Clerk routes: ${clerkRoutes.trim()}`);
+else
+  fail(
+    'clerk-routes-trim',
+    `Clerk routes still include queues/tools/platform: ${clerkRoutes.trim()}`,
+  );
 
-if (!files.reception.includes('reception-workspace__hero')) pass('no-hero', 'No reception hero block');
+if (!files.reception.includes('reception-workspace__hero'))
+  pass('no-hero', 'No reception hero block');
 else fail('no-hero', 'Hero block still present');
 
-if (files.reception.includes('reception-workspace__actions--secondary')) pass('secondary-intake-actions', 'Secondary intake shortcuts available on reception');
+if (files.reception.includes('reception-workspace__actions--secondary'))
+  pass('secondary-intake-actions', 'Secondary intake shortcuts available on reception');
 else fail('secondary-intake-actions', 'Secondary intake actions missing');
 
-if (files.reception.includes('ArrivalDashboard')) pass('tabbed-queues', 'Arrival dashboard with tabbed queues in use');
+if (files.reception.includes('ArrivalDashboard'))
+  pass('tabbed-queues', 'Arrival dashboard with tabbed queues in use');
 else fail('tabbed-queues', 'ArrivalDashboard not wired');
 
-if (files.header.includes('screenCapabilities.isRegistrationScreen') && files.header.includes('open-reception-intake')) pass('header-gating', 'Header uses screen mode + intake event');
+if (
+  files.header.includes('screenCapabilities.isRegistrationScreen') &&
+  files.header.includes('open-reception-intake')
+)
+  pass('header-gating', 'Header uses screen mode + intake event');
 else fail('header-gating', 'Header registration gating incomplete');
 
-if (files.header.includes('!screenCapabilities.isRegistrationScreen') && files.header.includes('open-command-palette')) pass('single-search', 'Command palette hidden on registration screen');
+if (
+  files.header.includes('!screenCapabilities.isRegistrationScreen') &&
+  files.header.includes('open-command-palette')
+)
+  pass('single-search', 'Command palette hidden on registration screen');
 else fail('single-search', 'Duplicate search entry may remain on registration screen');
 
-if (files.metrics.includes('selectEmsInboundCount') && files.metrics.includes('selectArrivalDashboardMetrics')) pass('metrics-stable', 'Arrival dashboard uses stable queue selectors');
-else fail('metrics-stable', 'Arrival dashboard may still use unstable operational summary selector');
+if (
+  files.metrics.includes('selectEmsInboundCount') &&
+  files.metrics.includes('selectArrivalDashboardMetrics')
+)
+  pass('metrics-stable', 'Arrival dashboard uses stable queue selectors');
+else
+  fail('metrics-stable', 'Arrival dashboard may still use unstable operational summary selector');
 
-if (files.metrics.includes('queueTab') && files.metrics.includes('selectArrivalDashboardMetrics')) pass('metrics-reception-routes', 'Arrival metrics use reception queue tabs');
+if (files.metrics.includes('queueTab') && files.metrics.includes('selectArrivalDashboardMetrics'))
+  pass('metrics-reception-routes', 'Arrival metrics use reception queue tabs');
 else fail('metrics-reception-routes', 'Arrival metrics may still link away from reception');
 
-if (files.appShell.includes('showEmsCriticalOverlay') && files.appShell.includes('isRegistrationScreen')) pass('overlay-gating', 'AppShell gates EMS overlay and patient panel');
+if (
+  files.appShell.includes('showEmsCriticalOverlay') &&
+  files.appShell.includes('isRegistrationScreen')
+)
+  pass('overlay-gating', 'AppShell gates EMS overlay and patient panel');
 else fail('overlay-gating', 'AppShell overlay gating incomplete');
 
-if (files.app.includes('EmergencyRouteGuard path={CANONICAL_ROUTES.workspace}')) pass('platform-guard', 'Platform route uses EmergencyRouteGuard');
+if (files.app.includes('EmergencyRouteGuard path={CANONICAL_ROUTES.workspace}'))
+  pass('platform-guard', 'Platform route uses EmergencyRouteGuard');
 else fail('platform-guard', 'Platform route unguarded');
 
-if (files.app.includes('registrationClerk') && files.app.includes('emergencyReception')) pass('whiteboard-redirect', 'Clerk whiteboard redirect present');
+if (files.app.includes('registrationClerk') && files.app.includes('emergencyReception'))
+  pass('whiteboard-redirect', 'Clerk whiteboard redirect present');
 else fail('whiteboard-redirect', 'Clerk whiteboard redirect missing');
 
-if (files.sidebar.includes('useScreenModeCapabilities') && files.sidebar.includes('!screenCapabilities.isRegistrationScreen')) pass('sidebar-mobile-trim', 'Sidebar hides copilot on registration screen');
+if (
+  files.sidebar.includes('useScreenModeCapabilities') &&
+  files.sidebar.includes('!screenCapabilities.isRegistrationScreen')
+)
+  pass('sidebar-mobile-trim', 'Sidebar hides copilot on registration screen');
 else fail('sidebar-mobile-trim', 'Sidebar mobile chrome not trimmed');
 
 async function liveScan() {
@@ -106,11 +140,28 @@ async function liveScan() {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({ emsArrivals: [{ id: 'a1', unitId: 'EMS-501', status: 'Inbound', etaMinutes: 12, complaint: 'Chest pain', severity: 'High' }], patients: [], metrics: {} }),
+        body: JSON.stringify({
+          emsArrivals: [
+            {
+              id: 'a1',
+              unitId: 'EMS-501',
+              status: 'Inbound',
+              etaMinutes: 12,
+              complaint: 'Chest pain',
+              severity: 'High',
+            },
+          ],
+          patients: [],
+          metrics: {},
+        }),
       });
       return;
     }
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true }) });
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ ok: true }),
+    });
   });
 
   const errors = [];
@@ -122,26 +173,37 @@ async function liveScan() {
 
   const navIds = [
     ...new Set(
-      await page.locator('[data-nav-id]').evaluateAll((nodes) => nodes.map((n) => n.getAttribute('data-nav-id'))),
+      await page
+        .locator('[data-nav-id]')
+        .evaluateAll((nodes) => nodes.map((n) => n.getAttribute('data-nav-id'))),
     ),
   ];
-  const headerText = await page.locator('.caredroid-header').innerText().catch(() => '');
+  const headerText = await page
+    .locator('.caredroid-header')
+    .innerText()
+    .catch(() => '');
   const hasErrorBoundary = await page.getByText(/encountered an error/i).count();
   const hasEmsPanel = await page.getByText(/Inbound ambulances/i).count();
   const hasOpsStrip = await page.getByText(/^CAP /).count();
   const commandPaletteButtons = await page.getByLabel('Open command palette').count();
-  const prepareButtons = await page.locator('.caredroid-header__action--primary').filter({ hasText: /Intake|Prepare/i }).count();
+  const prepareButtons = await page
+    .locator('.caredroid-header__action--primary')
+    .filter({ hasText: /Intake|Prepare/i })
+    .count();
 
-  if (hasErrorBoundary === 0) pass('live-no-crash', 'Reception page renders without error boundary');
+  if (hasErrorBoundary === 0)
+    pass('live-no-crash', 'Reception page renders without error boundary');
   else fail('live-no-crash', 'Reception page shows error boundary');
 
   if (errors.length === 0) pass('live-no-js-errors', 'No page JavaScript errors');
   else fail('live-no-js-errors', errors.join('; '));
 
-  if (navIds.every((id) => ['reception', 'patients'].includes(id))) pass('live-nav-minimal', `Sidebar nav ids: ${navIds.join(', ')}`);
+  if (navIds.every((id) => ['reception', 'patients'].includes(id)))
+    pass('live-nav-minimal', `Sidebar nav ids: ${navIds.join(', ')}`);
   else fail('live-nav-minimal', `Unexpected nav ids: ${navIds.join(', ')}`);
 
-  if (headerText.includes('Arrival Dashboard') && !headerText.includes('Emergency OS')) pass('live-branding', 'Header shows Arrival Dashboard branding');
+  if (headerText.includes('Arrival Dashboard') && !headerText.includes('Emergency OS'))
+    pass('live-branding', 'Header shows Arrival Dashboard branding');
   else fail('live-branding', 'Header branding leak');
 
   if (hasOpsStrip === 0) pass('live-no-ops-strip', 'No CAP/EMS ops strip on clerk reception');
@@ -150,7 +212,8 @@ async function liveScan() {
   if (hasEmsPanel > 0) pass('live-ems-panel', 'EMS pre-arrival panel visible');
   else fail('live-ems-panel', 'EMS pre-arrival panel missing');
 
-  if (commandPaletteButtons === 0) pass('live-single-search', 'No command palette search button on registration header');
+  if (commandPaletteButtons === 0)
+    pass('live-single-search', 'No command palette search button on registration header');
   else fail('live-single-search', 'Command palette search button still visible');
 
   if (prepareButtons >= 1) pass('live-prepare-entry', 'Header intake entry available for clerk');

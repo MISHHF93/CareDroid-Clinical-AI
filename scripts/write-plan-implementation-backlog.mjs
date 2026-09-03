@@ -6,7 +6,11 @@ const OUTPUT_PATH = path.join(DOCS_DIR, 'plan-implementation-backlog.md');
 
 const PHASE_PATTERN = /^(?:#{2,6}\s+)?(?:[-*]\s+)?(?:\d+\.\s+)?phase\s+\d+\s*:\s+.+$/gim;
 
-const normalizePhaseLine = (line) => line.replace(/^#{2,6}\s+/, '').replace(/^[-*]\s+/, '').trim();
+const normalizePhaseLine = (line) =>
+  line
+    .replace(/^#{2,6}\s+/, '')
+    .replace(/^[-*]\s+/, '')
+    .trim();
 
 const toTitle = (file) =>
   file
@@ -47,7 +51,9 @@ const main = async () => {
   lines.push('');
   lines.push(`- Documents scanned: ${files.length}`);
   lines.push(`- Documents with implementation phases: ${records.length}`);
-  lines.push(`- Total phase entries: ${records.reduce((sum, record) => sum + record.phases.length, 0)}`);
+  lines.push(
+    `- Total phase entries: ${records.reduce((sum, record) => sum + record.phases.length, 0)}`,
+  );
   lines.push('');
 
   for (const record of records) {

@@ -99,23 +99,55 @@ function categorize(name) {
 
   const page = await context.newPage();
   await page.route('**/api/users/profile**', (route) =>
-    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(JSON.parse(QA_AUTH_STORAGE.caredroid_user_profile)) }),
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(JSON.parse(QA_AUTH_STORAGE.caredroid_user_profile)),
+    }),
   );
   await page.route('**/api/tenant/context**', (route) =>
-    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ organizationId: 'qa-organization', organizationName: 'QA', workspaceId: 'operations', workspaceName: 'Ops', userId: 'responsive-qa-user', role: 'admin', subscriptionPlan: 'enterprise' }) }),
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        organizationId: 'qa-organization',
+        organizationName: 'QA',
+        workspaceId: 'operations',
+        workspaceName: 'Ops',
+        userId: 'responsive-qa-user',
+        role: 'admin',
+        subscriptionPlan: 'enterprise',
+      }),
+    }),
   );
   await page.route('**/api/tools**', (route) => {
     if (route.request().method() !== 'GET') return route.continue();
-    return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ tools: [], count: 0 }) });
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ tools: [], count: 0 }),
+    });
   });
   await page.route('**/api/config/system**', (route) =>
-    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ rag: { enabled: true }, session: { idleTimeoutMs: 1800000 } }) }),
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ rag: { enabled: true }, session: { idleTimeoutMs: 1800000 } }),
+    }),
   );
   await page.route('**/api/ai/remaining-queries**', (route) =>
-    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ remaining: 100, limit: 100 }) }),
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ remaining: 100, limit: 100 }),
+    }),
   );
   await page.route('**/api/subscriptions/current**', (route) =>
-    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ plan: 'professional', status: 'active' }) }),
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ plan: 'professional', status: 'active' }),
+    }),
   );
 
   const cdp = await context.newCDPSession(page);
@@ -142,11 +174,15 @@ function categorize(name) {
   });
 
   await page.goto(routePath, { waitUntil: 'commit', timeout: 60_000 });
-  await page.waitForFunction(() => !document.querySelector('.app-init-screen'), undefined, { timeout: 30_000 });
+  await page.waitForFunction(() => !document.querySelector('.app-init-screen'), undefined, {
+    timeout: 30_000,
+  });
   await page.waitForFunction(
     () => {
       const loader = document.querySelector('.page-loader');
-      const shell = document.querySelector('.app-shell-main-content') || document.querySelector('.app-shell-page-body');
+      const shell =
+        document.querySelector('.app-shell-main-content') ||
+        document.querySelector('.app-shell-page-body');
       if (loader) return false;
       if (!shell) return false;
       const r = shell.getBoundingClientRect();
@@ -248,7 +284,9 @@ function categorize(name) {
   const sortedCategories = [...byCategory.entries()].sort((a, b) => b[1] - a[1]);
   const sortedNames = [...byName.entries()].sort((a, b) => b[1] - a[1]);
 
-  console.log(`\n=== Main-thread self-time by rendering category for ${routePath} (${mainThreadKeys.size} main thread(s), ${completeEvents.length} events, ${totalMs.toFixed(1)}ms total) ===`);
+  console.log(
+    `\n=== Main-thread self-time by rendering category for ${routePath} (${mainThreadKeys.size} main thread(s), ${completeEvents.length} events, ${totalMs.toFixed(1)}ms total) ===`,
+  );
   for (const [cat, ms] of sortedCategories) {
     const pct = totalMs > 0 ? ((ms / totalMs) * 100).toFixed(1) : '0.0';
     console.log(`${ms.toFixed(1).padStart(8)}ms  (${pct.padStart(5)}%)  ${cat}`);
@@ -264,8 +302,12 @@ function categorize(name) {
   // and wildly different TBT if one concentrates work into fewer, longer
   // top-level tasks. Root (depth-0) events are this trace format's closest
   // proxy for "one task," so report the longest ones directly.
-  const overLongTaskFloor = rootEvents.filter((r) => r.grossMs > 50).sort((a, b) => b.grossMs - a.grossMs);
-  console.log(`\n=== Root-level (task-shape) events over the 50ms long-task floor for ${routePath}: ${overLongTaskFloor.length} of ${rootEvents.length} root events ===`);
+  const overLongTaskFloor = rootEvents
+    .filter((r) => r.grossMs > 50)
+    .sort((a, b) => b.grossMs - a.grossMs);
+  console.log(
+    `\n=== Root-level (task-shape) events over the 50ms long-task floor for ${routePath}: ${overLongTaskFloor.length} of ${rootEvents.length} root events ===`,
+  );
   for (const r of overLongTaskFloor.slice(0, 10)) {
     console.log(`${r.grossMs.toFixed(1).padStart(8)}ms  ${r.name}`);
   }

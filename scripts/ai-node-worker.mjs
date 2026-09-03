@@ -103,7 +103,13 @@ function resolveCommand(command, args) {
   }
 
   if (command === 'npm' || command === 'npm.cmd') {
-    const npmCli = path.join(path.dirname(process.execPath), 'node_modules', 'npm', 'bin', 'npm-cli.js');
+    const npmCli = path.join(
+      path.dirname(process.execPath),
+      'node_modules',
+      'npm',
+      'bin',
+      'npm-cli.js',
+    );
     if (existsSync(npmCli)) {
       return { command: process.execPath, args: [npmCli, ...args], shell: false };
     }
@@ -150,7 +156,9 @@ function runStep(label, command, args, options = {}) {
 
     if (attempt < maxAttempts && isTransientSpawnFailure(lastResult)) {
       const backoffMs = 400 * attempt;
-      log(`${label} transient failure (${detail}) -- retry ${attempt}/${maxAttempts} after ${backoffMs}ms`);
+      log(
+        `${label} transient failure (${detail}) -- retry ${attempt}/${maxAttempts} after ${backoffMs}ms`,
+      );
       sleepSyncMs(backoffMs);
       continue;
     }
@@ -267,8 +275,15 @@ function runCycle() {
     record.corpusChanged = changed;
 
     if (changed || RUN_ONCE) {
-      log(changed ? 'Corpus changed since last cycle -- retraining.' : 'First/forced run -- retraining.');
-      runStep('Retrain unified NLU + artifact-router heads', 'npm', ['run', 'train:unified-models']);
+      log(
+        changed
+          ? 'Corpus changed since last cycle -- retraining.'
+          : 'First/forced run -- retraining.',
+      );
+      runStep('Retrain unified NLU + artifact-router heads', 'npm', [
+        'run',
+        'train:unified-models',
+      ]);
       record.retrained = true;
       const nluMetrics = readJson(path.join(MODELS_DIR, 'nlu', 'metrics.json'));
       const artifactMetrics = readJson(path.join(MODELS_DIR, 'artifact-router', 'metrics.json'));
@@ -276,7 +291,9 @@ function runCycle() {
       record.artifactRouterAccuracy = artifactMetrics?.accuracy ?? null;
       state.lastSignature = signature;
     } else {
-      log('Corpus unchanged since last cycle -- skipping the ~1-2h retrain, manifest already current.');
+      log(
+        'Corpus unchanged since last cycle -- skipping the ~1-2h retrain, manifest already current.',
+      );
       record.retrained = false;
     }
 
@@ -318,7 +335,9 @@ async function sleepInterruptible(ms) {
 
 async function main() {
   acquireLock();
-  log(`Starting. pid=${process.pid} intervalMs=${INTERVAL_MS} runOnce=${RUN_ONCE} stepRetries=${STEP_RETRIES}`);
+  log(
+    `Starting. pid=${process.pid} intervalMs=${INTERVAL_MS} runOnce=${RUN_ONCE} stepRetries=${STEP_RETRIES}`,
+  );
   let consecutiveErrors = 0;
   try {
     for (;;) {
@@ -340,7 +359,8 @@ async function main() {
       if (RUN_ONCE || stopRequested) break;
 
       // Back off when cycles fail so a flaky Windows spawn does not hammer every minute.
-      const errorMultiplier = consecutiveErrors > 0 ? Math.min(2 ** Math.min(consecutiveErrors, 4), 16) : 1;
+      const errorMultiplier =
+        consecutiveErrors > 0 ? Math.min(2 ** Math.min(consecutiveErrors, 4), 16) : 1;
       const sleepMs = INTERVAL_MS * errorMultiplier;
       log(
         consecutiveErrors > 0

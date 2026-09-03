@@ -14,7 +14,7 @@ const result = spawnSync(
     stdio: 'inherit',
     shell: true,
     env: { ...process.env, TOOL_MATRIX_WRITE_DOCS: '1' },
-  }
+  },
 );
 
 process.exit(result.status ?? 1);

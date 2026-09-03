@@ -37,10 +37,7 @@ const pairs = [
     /style=\{\{\s*fontSize:\s*11,\s*color:\s*MEDICAL_THEME\.inkSubtle\s*\}\}/g,
     'className="fj-caption-11"',
   ],
-  [
-    /style=\{\{\s*fontSize:\s*18\s*\}\}/g,
-    'className="fj-critical-banner__icon"',
-  ],
+  [/style=\{\{\s*fontSize:\s*18\s*\}\}/g, 'className="fj-critical-banner__icon"'],
   [
     /style=\{\{\s*color:\s*MEDICAL_TYPE\.statusCritical,\s*fontSize:\s*14\s*\}\}/g,
     'className="dc-title-14-critical"',
@@ -105,10 +102,7 @@ const pairs = [
     /style=\{\{\s*padding:\s*'10px 16px',\s*background:\s*'rgba\(239,68,68,0\.08\)'[\s\S]*?\}\}/g,
     'className="dc-alert-soft"',
   ],
-  [
-    /style=\{\{\s*padding:\s*20\s*\}\}/g,
-    'className="u-pad-16"',
-  ],
+  [/style=\{\{\s*padding:\s*20\s*\}\}/g, 'className="u-pad-16"'],
 ];
 
 let hits = 0;

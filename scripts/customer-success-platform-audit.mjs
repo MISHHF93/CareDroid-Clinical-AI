@@ -37,7 +37,9 @@ mkdirSync(dirname(reportPath), { recursive: true });
 writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
 
 console.log('Customer success platform audit written to', reportPath);
-console.log(`Health: ${assessment.summary.healthScore} · Renewal: ${assessment.summary.renewalReadiness}`);
+console.log(
+  `Health: ${assessment.summary.healthScore} · Renewal: ${assessment.summary.renewalReadiness}`,
+);
 console.log(
   `KPIs ${assessment.kpiEvaluation.passedCount}/${assessment.kpiEvaluation.totalCount} · Onboarding ${assessment.summary.onboardingPercent}%`,
 );

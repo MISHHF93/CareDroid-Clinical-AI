@@ -25,11 +25,13 @@ function toPosix(filePath) {
 }
 
 function slug(value) {
-  return String(value || 'unknown')
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '') || 'unknown';
+  return (
+    String(value || 'unknown')
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '') || 'unknown'
+  );
 }
 
 async function walkFiles(root, predicate) {
@@ -116,12 +118,15 @@ async function scanMarkdownArtifacts() {
           riskLevel: /security|audit|governance|clinical|risk/i.test(body) ? 'medium' : 'low',
         }),
       };
-    })
+    }),
   );
 }
 
 async function scanExecutorArtifacts() {
-  const files = await walkFiles(BACKEND_DIR, (file) => /executor|orchestrator|handler/i.test(file) && /\.(ts|js)$/.test(file));
+  const files = await walkFiles(
+    BACKEND_DIR,
+    (file) => /executor|orchestrator|handler/i.test(file) && /\.(ts|js)$/.test(file),
+  );
   return files.map((file) => {
     const relative = toPosix(path.relative(ROOT, file));
     const name = path.basename(file, path.extname(file));
@@ -170,7 +175,7 @@ async function scanBackendServiceArtifacts() {
           riskLevel: /ai|clinical|auth|governance|patient/i.test(relative) ? 'high' : 'medium',
         }),
       };
-    })
+    }),
   );
 }
 
@@ -178,8 +183,11 @@ async function scanEngineArtifacts() {
   const files = (
     await Promise.all(
       ENGINE_DIRS.map((dir) =>
-        walkFiles(dir, (file) => /\.ts$/.test(file) && !/\.test\.ts$/.test(file) && !/\.spec\.ts$/.test(file))
-      )
+        walkFiles(
+          dir,
+          (file) => /\.ts$/.test(file) && !/\.test\.ts$/.test(file) && !/\.spec\.ts$/.test(file),
+        ),
+      ),
     )
   ).flat();
 
@@ -208,17 +216,25 @@ async function scanEngineArtifacts() {
           riskLevel: /alert|triage|capacity|deterioration/i.test(relative) ? 'high' : 'medium',
         }),
       };
-    })
+    }),
   );
 }
 
 async function scanPageArtifacts() {
-  const files = await walkFiles(PAGES_DIR, (file) => /\.tsx$/.test(file) && !/\.test\.tsx$/.test(file));
+  const files = await walkFiles(
+    PAGES_DIR,
+    (file) => /\.tsx$/.test(file) && !/\.test\.tsx$/.test(file),
+  );
   return files.map((file) => {
     const relative = toPosix(path.relative(ROOT, file));
     const name = path.basename(file, '.tsx');
     const routeGuess = relative.includes('emergency/')
-      ? `/emergency/${slug(relative.split('emergency/')[1]?.replace(/\.tsx$/, '').replace(/\/index$/, ''))}`
+      ? `/emergency/${slug(
+          relative
+            .split('emergency/')[1]
+            ?.replace(/\.tsx$/, '')
+            .replace(/\/index$/, ''),
+        )}`
       : `/${slug(relative.replace(/^src\/pages\//, '').replace(/\.tsx$/, ''))}`;
     return {
       artifactId: `page-${slug(relative)}`,
@@ -228,7 +244,7 @@ async function scanPageArtifacts() {
       route: routeGuess,
       sourceFile: relative,
       description: `React page component at ${relative}.`,
-      tags: ['page', 'react', name, ...(relative.split('/').map(slug))],
+      tags: ['page', 'react', name, ...relative.split('/').map(slug)],
       embeddingText: `${name} page ${relative} ${routeGuess}`,
       ...baseArtifactFields(relative, {
         frontendStatus: 'frontend-routed',
@@ -246,7 +262,9 @@ async function scanPageArtifacts() {
 async function scanLibRegistryArtifacts() {
   const files = (
     await Promise.all(
-      LIB_DIRS.map((dir) => walkFiles(dir, (file) => /\.ts$/.test(file) && !/\.test\.ts$/.test(file)))
+      LIB_DIRS.map((dir) =>
+        walkFiles(dir, (file) => /\.ts$/.test(file) && !/\.test\.ts$/.test(file)),
+      ),
     )
   ).flat();
 
@@ -275,14 +293,18 @@ async function scanLibRegistryArtifacts() {
           riskLevel: /ai|governance|safety/i.test(relative) ? 'high' : 'medium',
         }),
       };
-    })
+    }),
   );
 }
 
 async function scanMlServiceArtifacts() {
   const artifacts = [];
   const manifestPath = path.join(ML_SERVICES_DIR, 'models', 'manifest.json');
-  if (await readFile(manifestPath, 'utf8').then(() => true).catch(() => false)) {
+  if (
+    await readFile(manifestPath, 'utf8')
+      .then(() => true)
+      .catch(() => false)
+  ) {
     const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
     for (const [head, meta] of Object.entries(manifest.heads || {})) {
       artifacts.push({
@@ -471,18 +493,30 @@ async function main() {
     };
 
     await Promise.all([
-      writeFile(path.join(ARTIFACT_DIR, 'caredroid_artifacts.csv'), artifactsToCsv(artifacts), 'utf8'),
+      writeFile(
+        path.join(ARTIFACT_DIR, 'caredroid_artifacts.csv'),
+        artifactsToCsv(artifacts),
+        'utf8',
+      ),
       writeFile(
         path.join(ARTIFACT_DIR, 'caredroid_artifacts.json'),
         `${JSON.stringify(artifacts, null, 2)}\n`,
-        'utf8'
+        'utf8',
       ),
-      writeFile(path.join(ARTIFACT_DIR, 'caredroid_artifact_features.csv'), artifactFeaturesToCsv(features), 'utf8'),
-      writeFile(path.join(ML_DIR, 'artifact_training_dataset.csv'), artifactTrainingDatasetToCsv(trainingRows), 'utf8'),
+      writeFile(
+        path.join(ARTIFACT_DIR, 'caredroid_artifact_features.csv'),
+        artifactFeaturesToCsv(features),
+        'utf8',
+      ),
+      writeFile(
+        path.join(ML_DIR, 'artifact_training_dataset.csv'),
+        artifactTrainingDatasetToCsv(trainingRows),
+        'utf8',
+      ),
       writeFile(
         path.join(ROOT, 'docs', 'artifact-intelligence-pipeline-report.md'),
         buildReport({ artifacts, features, trainingRows, validation, resonance, captureStats }),
-        'utf8'
+        'utf8',
       ),
     ]);
 
@@ -490,7 +524,7 @@ async function main() {
       throw new Error(
         `Artifact catalog validation failed: duplicateIds=${
           validation.duplicateIds.join(', ') || 'none'
-        } missingRequired=${validation.missingRequired.length}`
+        } missingRequired=${validation.missingRequired.length}`,
       );
     }
 
@@ -513,8 +547,8 @@ async function main() {
           missingMetadata: resonance.missingMetadata.length,
         },
         null,
-        2
-      )
+        2,
+      ),
     );
   } finally {
     if (vite) await vite.close();

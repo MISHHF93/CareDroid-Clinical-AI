@@ -27,8 +27,7 @@ const ROUTES = {
 };
 
 // Inline minimal catalog resolver mirroring promptNavigationIntent.ts
-const NAV_VERBS =
-  /\b(open|show|launch|go to|take me to|navigate to|bring up|switch to|pull up)\b/i;
+const NAV_VERBS = /\b(open|show|launch|go to|take me to|navigate to|bring up|switch to|pull up)\b/i;
 
 const CATALOG = [
   {
@@ -58,7 +57,14 @@ const CATALOG = [
     toolName: 'open_panel',
     path: ROUTES.emergencyReception,
     panelEvent: 'open-reception-smart-intake',
-    keywords: ['ocr', 'document scan', 'scan document', 'document capture', 'scan id', 'health card scan'],
+    keywords: [
+      'ocr',
+      'document scan',
+      'scan document',
+      'document capture',
+      'scan id',
+      'health card scan',
+    ],
     requiredPermission: 'view_operations',
   },
   {
@@ -105,17 +111,41 @@ function resolve(prompt, { role, permissions } = {}) {
 
 const PERMS = ['use_ai_chat', 'view_phi', 'view_operations'];
 
-assert.equal(resolve('Open reception desk', { role: 'registration_clerk', permissions: PERMS })?.id, 'nav-reception');
-assert.equal(resolve('open the whiteboard', { role: 'charge_nurse', permissions: PERMS })?.id, 'nav-whiteboard');
-assert.equal(resolve('Launch HEART score', { role: 'physician', permissions: PERMS })?.id, 'nav-heart-score');
+assert.equal(
+  resolve('Open reception desk', { role: 'registration_clerk', permissions: PERMS })?.id,
+  'nav-reception',
+);
+assert.equal(
+  resolve('open the whiteboard', { role: 'charge_nurse', permissions: PERMS })?.id,
+  'nav-whiteboard',
+);
+assert.equal(
+  resolve('Launch HEART score', { role: 'physician', permissions: PERMS })?.id,
+  'nav-heart-score',
+);
 assert.equal(resolve('open HEART score', { role: 'registration_clerk', permissions: PERMS }), null);
-assert.equal(resolve('What is ESI level 2?', { role: 'registration_clerk', permissions: PERMS }), null);
-assert.equal(resolve('show OCR document scan', { role: 'registration_clerk', permissions: PERMS })?.panelEvent, 'open-reception-smart-intake');
-assert.equal(resolve('focus patient lookup', { role: 'registration_clerk', permissions: PERMS })?.panelEvent, 'open-reception-lookup');
-assert.equal(resolve('open reception', { role: 'registration_clerk', permissions: ['use_ai_chat'] }), null);
+assert.equal(
+  resolve('What is ESI level 2?', { role: 'registration_clerk', permissions: PERMS }),
+  null,
+);
+assert.equal(
+  resolve('show OCR document scan', { role: 'registration_clerk', permissions: PERMS })?.panelEvent,
+  'open-reception-smart-intake',
+);
+assert.equal(
+  resolve('focus patient lookup', { role: 'registration_clerk', permissions: PERMS })?.panelEvent,
+  'open-reception-lookup',
+);
+assert.equal(
+  resolve('open reception', { role: 'registration_clerk', permissions: ['use_ai_chat'] }),
+  null,
+);
 
 // Source file presence + key symbols (implementation landed)
-const src = fs.readFileSync(path.join(root, 'src/services/interactiveAi/promptNavigationIntent.ts'), 'utf8');
+const src = fs.readFileSync(
+  path.join(root, 'src/services/interactiveAi/promptNavigationIntent.ts'),
+  'utf8',
+);
 assert.match(src, /export function resolvePromptNavigationIntent/);
 assert.match(src, /export function applyNavigationProposal/);
 assert.match(src, /open_route/);
@@ -131,13 +161,20 @@ assert.match(workspace, /applyNavigationProposal/);
 assert.match(workspace, /isNavigationProposalTool/);
 assert.match(workspace, /useNavigate/);
 
-const reception = fs.readFileSync(path.join(root, 'src/pages/emergency/ReceptionWorkspace.tsx'), 'utf8');
+const reception = fs.readFileSync(
+  path.join(root, 'src/pages/emergency/ReceptionWorkspace.tsx'),
+  'utf8',
+);
 assert.match(reception, /open-reception-lookup/);
 assert.match(reception, /open-reception-shift-clearance/);
 
 // Type-level sanity: transpile intent file (types erased) — catches syntax errors
 const transpiled = ts.transpileModule(src, {
-  compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2020, jsx: ts.JsxEmit.React },
+  compilerOptions: {
+    module: ts.ModuleKind.ESNext,
+    target: ts.ScriptTarget.ES2020,
+    jsx: ts.JsxEmit.React,
+  },
   fileName: 'promptNavigationIntent.ts',
   reportDiagnostics: true,
 });

@@ -46,19 +46,16 @@ function transpileFile(relPath) {
   }
   // Rewrite relative imports to .js under outDir
   let code = result.outputText;
-  code = code.replace(
-    /from\s+['"](\.\.?\/[^'"]+)['"]/g,
-    (full, spec) => {
-      // Type-only imports already stripped; rewrite path to .js
-      let next = spec;
-      if (!next.endsWith('.js') && !next.endsWith('.json')) {
-        // drop .ts if present
-        next = next.replace(/\.tsx?$/, '');
-        next = `${next}.js`;
-      }
-      return `from '${next}'`;
-    },
-  );
+  code = code.replace(/from\s+['"](\.\.?\/[^'"]+)['"]/g, (full, spec) => {
+    // Type-only imports already stripped; rewrite path to .js
+    let next = spec;
+    if (!next.endsWith('.js') && !next.endsWith('.json')) {
+      // drop .ts if present
+      next = next.replace(/\.tsx?$/, '');
+      next = `${next}.js`;
+    }
+    return `from '${next}'`;
+  });
   const outRel = relPath.replace(/\.tsx?$/, '.js');
   const outAbs = path.join(outDir, outRel);
   fs.mkdirSync(path.dirname(outAbs), { recursive: true });
@@ -82,10 +79,7 @@ writeStub(
   'src/contracts/interactiveAi.js',
   'export const AI_ACTION_PROPOSAL_STATES = []; export default {};\n',
 );
-writeStub(
-  'src/services/interactiveAi/actionProposalService.js',
-  'export default {};\n',
-);
+writeStub('src/services/interactiveAi/actionProposalService.js', 'export default {};\n');
 const intentOut = transpileFile('src/services/interactiveAi/promptNavigationIntent.ts');
 
 // Also transpile aiCommandRegistry (self-contained enough with a risk-level type stub)
@@ -106,12 +100,8 @@ const {
   navigationIntentToProposalInput,
 } = mod;
 const { CANONICAL_ROUTES } = routesMod;
-const {
-  AI_PALETTE_COMMANDS,
-  getAiPaletteCommand,
-  isAiPaletteCommandId,
-  listAiPaletteCommands,
-} = registry;
+const { AI_PALETTE_COMMANDS, getAiPaletteCommand, isAiPaletteCommandId, listAiPaletteCommands } =
+  registry;
 
 const PERMS = ['use_ai_chat', 'view_phi', 'view_operations'];
 const results = [];
@@ -414,8 +404,7 @@ test('ReceptionWorkspace listens for lookup and shift-clearance events', () => {
 const summary = {
   generatedAt: new Date().toISOString(),
   runner: 'scripts/run-prompt-navigation-tests.mjs',
-  note:
-    'Vitest blocked in this environment (esbuild.exe Application Control). This runner executes the real transpiled modules.',
+  note: 'Vitest blocked in this environment (esbuild.exe Application Control). This runner executes the real transpiled modules.',
   totals: { passed, failed, total: passed + failed },
   grade: failed === 0 ? 'PASS' : 'FAIL',
   results,
@@ -434,7 +423,9 @@ const md = [
   '',
   '| Status | Test |',
   '|--------|------|',
-  ...results.map((r) => `| ${r.status} | ${r.name}${r.message ? ` — ${r.message.replace(/\|/g, '/')}` : ''} |`),
+  ...results.map(
+    (r) => `| ${r.status} | ${r.name}${r.message ? ` — ${r.message.replace(/\|/g, '/')}` : ''} |`,
+  ),
   '',
 ].join('\n');
 fs.writeFileSync(reportMd, md, 'utf8');

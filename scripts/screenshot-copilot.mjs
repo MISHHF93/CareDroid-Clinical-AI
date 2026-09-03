@@ -42,8 +42,16 @@ await page.screenshot({ path: outPath, fullPage: false });
 
 const panel = page.locator('.ed-copilot-panel').first();
 const panelBox = await panel.boundingBox().catch(() => null);
-const messagesBox = await page.locator('.ed-copilot-panel__messages').first().boundingBox().catch(() => null);
-const composerBox = await page.locator('.ed-copilot-panel__composer').first().boundingBox().catch(() => null);
+const messagesBox = await page
+  .locator('.ed-copilot-panel__messages')
+  .first()
+  .boundingBox()
+  .catch(() => null);
+const composerBox = await page
+  .locator('.ed-copilot-panel__composer')
+  .first()
+  .boundingBox()
+  .catch(() => null);
 const tabs = await page.locator('.ed-copilot-shell__tab').count();
 
 console.log(

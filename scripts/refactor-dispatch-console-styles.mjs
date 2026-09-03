@@ -110,33 +110,105 @@ src = src.replace(/style=\{inputStyle\}/g, 'className="dc-field-input"');
 
 // Generic regex replacements
 const regs = [
-  [/style=\{\{\s*fontSize:\s*12,\s*fontWeight:\s*700,\s*color:\s*MEDICAL_THEME\.inkSubtle,\s*marginBottom:\s*6\s*\}\}/g, 'className="dc-field-label-mb6"'],
-  [/style=\{\{\s*fontSize:\s*13,\s*color:\s*MEDICAL_THEME\.accent,\s*textDecoration:\s*'none',\s*fontWeight:\s*600\s*\}\}/g, 'className="dc-link-accent"'],
+  [
+    /style=\{\{\s*fontSize:\s*12,\s*fontWeight:\s*700,\s*color:\s*MEDICAL_THEME\.inkSubtle,\s*marginBottom:\s*6\s*\}\}/g,
+    'className="dc-field-label-mb6"',
+  ],
+  [
+    /style=\{\{\s*fontSize:\s*13,\s*color:\s*MEDICAL_THEME\.accent,\s*textDecoration:\s*'none',\s*fontWeight:\s*600\s*\}\}/g,
+    'className="dc-link-accent"',
+  ],
   [/style=\{\{\s*color:\s*MEDICAL_THEME\.inkSubtle\s*\}\}/g, 'className="dc-muted"'],
   [/style=\{\{\s*textDecoration:\s*'none',\s*fontSize:\s*13\s*\}\}/g, 'className="dc-link-plain"'],
-  [/style=\{\{\s*fontSize:\s*12,\s*color:\s*MEDICAL_THEME\.inkSubtle\s*\}\}/g, 'className="dc-muted-12"'],
-  [/style=\{\{\s*fontSize:\s*12,\s*color:\s*MEDICAL_THEME\.inkSubtle,\s*marginTop:\s*4\s*\}\}/g, 'className="dc-muted-12-mt4"'],
-  [/style=\{\{\s*fontSize:\s*12,\s*color:\s*MEDICAL_THEME\.inkSubtle,\s*marginTop:\s*2\s*\}\}/g, 'className="dc-muted-12-mt"'],
-  [/style=\{\{\s*fontSize:\s*12,\s*color:\s*MEDICAL_TYPE\.statusCritical,\s*fontWeight:\s*700\s*\}\}/g, 'className="dc-critical-12"'],
-  [/style=\{\{\s*fontSize:\s*11,\s*color:\s*MEDICAL_TYPE\.statusCritical,\s*fontWeight:\s*700\s*\}\}/g, 'className="dc-critical-11"'],
-  [/style=\{\{\s*fontSize:\s*12,\s*fontWeight:\s*800,\s*color:\s*MEDICAL_TYPE\.statusCritical\s*\}\}/g, 'className="dc-critical-12-badge"'],
+  [
+    /style=\{\{\s*fontSize:\s*12,\s*color:\s*MEDICAL_THEME\.inkSubtle\s*\}\}/g,
+    'className="dc-muted-12"',
+  ],
+  [
+    /style=\{\{\s*fontSize:\s*12,\s*color:\s*MEDICAL_THEME\.inkSubtle,\s*marginTop:\s*4\s*\}\}/g,
+    'className="dc-muted-12-mt4"',
+  ],
+  [
+    /style=\{\{\s*fontSize:\s*12,\s*color:\s*MEDICAL_THEME\.inkSubtle,\s*marginTop:\s*2\s*\}\}/g,
+    'className="dc-muted-12-mt"',
+  ],
+  [
+    /style=\{\{\s*fontSize:\s*12,\s*color:\s*MEDICAL_TYPE\.statusCritical,\s*fontWeight:\s*700\s*\}\}/g,
+    'className="dc-critical-12"',
+  ],
+  [
+    /style=\{\{\s*fontSize:\s*11,\s*color:\s*MEDICAL_TYPE\.statusCritical,\s*fontWeight:\s*700\s*\}\}/g,
+    'className="dc-critical-11"',
+  ],
+  [
+    /style=\{\{\s*fontSize:\s*12,\s*fontWeight:\s*800,\s*color:\s*MEDICAL_TYPE\.statusCritical\s*\}\}/g,
+    'className="dc-critical-12-badge"',
+  ],
   [/style=\{\{\s*display:\s*'flex',\s*gap:\s*16\s*\}\}/g, 'className="dc-row-gap-16"'],
-  [/style=\{\{\s*display:\s*'flex',\s*gap:\s*12,\s*flexWrap:\s*'wrap'\s*\}\}/g, 'className="dc-row-gap-12-wrap"'],
-  [/style=\{\{\s*display:\s*'flex',\s*gap:\s*8,\s*flexWrap:\s*'wrap'\s*\}\}/g, 'className="dc-row-gap-8-wrap"'],
-  [/style=\{\{\s*display:\s*'flex',\s*gap:\s*8,\s*marginTop:\s*10,\s*flexWrap:\s*'wrap'\s*\}\}/g, 'className="dc-row-gap-8-wrap-mt"'],
-  [/style=\{\{\s*display:\s*'flex',\s*gap:\s*4,\s*fontSize:\s*11,\s*flexWrap:\s*'wrap',\s*marginTop:\s*2\s*\}\}/g, 'className="dc-row-gap-4-wrap"'],
-  [/style=\{\{\s*display:\s*'flex',\s*justifyContent:\s*'space-between',\s*alignItems:\s*'flex-start'\s*\}\}/g, 'className="dc-row-between"'],
-  [/style=\{\{\s*padding:\s*'8px 12px',\s*borderRadius:\s*8,\s*background:\s*'rgba\(239,68,68,0\.08\)',\s*border:\s*'1px solid rgba\(239,68,68,0\.[^']+\)'[^}]*\}\}/g, 'className="dc-alert-soft"'],
-  [/style=\{\{\s*padding:\s*'12px 16px',\s*borderRadius:\s*10,\s*background:\s*'rgba\(16,185,129,0\.08\)',\s*border:\s*'1px solid rgba\(16,185,129,0\.[^']+\)'[^}]*\}\}/g, 'className="dc-success-panel"'],
-  [/style=\{\{\s*fontWeight:\s*700,\s*color:\s*'#10B981',\s*fontSize:\s*14\s*\}\}/g, 'className="dc-success-title"'],
-  [/style=\{\{\s*fontWeight:\s*700,\s*color:\s*MEDICAL_THEME\.inkSubtle\s*\}\}/g, 'className="dc-muted-strong"'],
-  [/style=\{\{\s*fontSize:\s*14,\s*color:\s*isCritical\s*\?\s*MEDICAL_TYPE\.statusCritical\s*:\s*MEDICAL_THEME\.ink\s*\}\}/g, `className={isCritical ? 'dc-title-14-critical' : 'dc-title-14'}`],
-  [/style=\{\{\s*fontSize:\s*15,\s*fontWeight:\s*700,\s*color:\s*MEDICAL_THEME\.ink,\s*marginTop:\s*2\s*\}\}/g, 'className="dc-title-15"'],
-  [/style=\{\{\s*fontSize:\s*11,\s*fontWeight:\s*700,\s*color:\s*MEDICAL_THEME\.inkSubtle,\s*letterSpacing:\s*'0\.06em'\s*\}\}/g, 'className="dc-meta-caps"'],
-  [/style=\{\{\s*display:\s*'flex',\s*flexDirection:\s*'column',\s*alignItems:\s*'flex-end',\s*gap:\s*4\s*\}\}/g, 'className="dc-col-end"'],
-  [/style=\{\{\s*display:\s*'block',\s*fontSize:\s*12,\s*fontWeight:\s*700,\s*color:\s*MEDICAL_THEME\.inkSubtle,\s*marginBottom:\s*6\s*\}\}/g, 'className="dc-field-label-mb6"'],
-  [/style=\{\{\s*width:\s*'100%',\s*padding:\s*'8px 10px',\s*borderRadius:\s*8,\s*border:\s*`1px solid \$\{MEDICAL_THEME\.border\}`[^}]*\}\}/g, 'className="dc-field-input"'],
-  [/style=\{\{\s*padding:\s*16,\s*borderRadius:\s*10,\s*border:\s*`1px solid \$\{MEDICAL_THEME\.border\}`[^}]*\}\}/g, 'className="dc-panel"'],
+  [
+    /style=\{\{\s*display:\s*'flex',\s*gap:\s*12,\s*flexWrap:\s*'wrap'\s*\}\}/g,
+    'className="dc-row-gap-12-wrap"',
+  ],
+  [
+    /style=\{\{\s*display:\s*'flex',\s*gap:\s*8,\s*flexWrap:\s*'wrap'\s*\}\}/g,
+    'className="dc-row-gap-8-wrap"',
+  ],
+  [
+    /style=\{\{\s*display:\s*'flex',\s*gap:\s*8,\s*marginTop:\s*10,\s*flexWrap:\s*'wrap'\s*\}\}/g,
+    'className="dc-row-gap-8-wrap-mt"',
+  ],
+  [
+    /style=\{\{\s*display:\s*'flex',\s*gap:\s*4,\s*fontSize:\s*11,\s*flexWrap:\s*'wrap',\s*marginTop:\s*2\s*\}\}/g,
+    'className="dc-row-gap-4-wrap"',
+  ],
+  [
+    /style=\{\{\s*display:\s*'flex',\s*justifyContent:\s*'space-between',\s*alignItems:\s*'flex-start'\s*\}\}/g,
+    'className="dc-row-between"',
+  ],
+  [
+    /style=\{\{\s*padding:\s*'8px 12px',\s*borderRadius:\s*8,\s*background:\s*'rgba\(239,68,68,0\.08\)',\s*border:\s*'1px solid rgba\(239,68,68,0\.[^']+\)'[^}]*\}\}/g,
+    'className="dc-alert-soft"',
+  ],
+  [
+    /style=\{\{\s*padding:\s*'12px 16px',\s*borderRadius:\s*10,\s*background:\s*'rgba\(16,185,129,0\.08\)',\s*border:\s*'1px solid rgba\(16,185,129,0\.[^']+\)'[^}]*\}\}/g,
+    'className="dc-success-panel"',
+  ],
+  [
+    /style=\{\{\s*fontWeight:\s*700,\s*color:\s*'#10B981',\s*fontSize:\s*14\s*\}\}/g,
+    'className="dc-success-title"',
+  ],
+  [
+    /style=\{\{\s*fontWeight:\s*700,\s*color:\s*MEDICAL_THEME\.inkSubtle\s*\}\}/g,
+    'className="dc-muted-strong"',
+  ],
+  [
+    /style=\{\{\s*fontSize:\s*14,\s*color:\s*isCritical\s*\?\s*MEDICAL_TYPE\.statusCritical\s*:\s*MEDICAL_THEME\.ink\s*\}\}/g,
+    `className={isCritical ? 'dc-title-14-critical' : 'dc-title-14'}`,
+  ],
+  [
+    /style=\{\{\s*fontSize:\s*15,\s*fontWeight:\s*700,\s*color:\s*MEDICAL_THEME\.ink,\s*marginTop:\s*2\s*\}\}/g,
+    'className="dc-title-15"',
+  ],
+  [
+    /style=\{\{\s*fontSize:\s*11,\s*fontWeight:\s*700,\s*color:\s*MEDICAL_THEME\.inkSubtle,\s*letterSpacing:\s*'0\.06em'\s*\}\}/g,
+    'className="dc-meta-caps"',
+  ],
+  [
+    /style=\{\{\s*display:\s*'flex',\s*flexDirection:\s*'column',\s*alignItems:\s*'flex-end',\s*gap:\s*4\s*\}\}/g,
+    'className="dc-col-end"',
+  ],
+  [
+    /style=\{\{\s*display:\s*'block',\s*fontSize:\s*12,\s*fontWeight:\s*700,\s*color:\s*MEDICAL_THEME\.inkSubtle,\s*marginBottom:\s*6\s*\}\}/g,
+    'className="dc-field-label-mb6"',
+  ],
+  [
+    /style=\{\{\s*width:\s*'100%',\s*padding:\s*'8px 10px',\s*borderRadius:\s*8,\s*border:\s*`1px solid \$\{MEDICAL_THEME\.border\}`[^}]*\}\}/g,
+    'className="dc-field-input"',
+  ],
+  [
+    /style=\{\{\s*padding:\s*16,\s*borderRadius:\s*10,\s*border:\s*`1px solid \$\{MEDICAL_THEME\.border\}`[^}]*\}\}/g,
+    'className="dc-panel"',
+  ],
   [/style=\{\{\s*fontSize:\s*14\s*\}\}/g, 'className="dc-title-14"'],
 ];
 
@@ -178,4 +250,10 @@ src = src.replace(
 const remaining = (src.match(/style=\{\{/g) || []).length;
 const styleProp = (src.match(/style=\{/g) || []).length;
 fs.writeFileSync(file, src);
-console.log(JSON.stringify({ replacements: n, remainingDoubleBrace: remaining, styleEquals: styleProp }, null, 2));
+console.log(
+  JSON.stringify(
+    { replacements: n, remainingDoubleBrace: remaining, styleEquals: styleProp },
+    null,
+    2,
+  ),
+);

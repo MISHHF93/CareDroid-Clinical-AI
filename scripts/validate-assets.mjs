@@ -4,11 +4,7 @@ import path from 'path';
 const rootDir = process.cwd();
 const publicDir = path.join(rootDir, 'public');
 
-const scanRoots = [
-  'index.html',
-  'src',
-  'public',
-].map((entry) => path.join(rootDir, entry));
+const scanRoots = ['index.html', 'src', 'public'].map((entry) => path.join(rootDir, entry));
 
 const scanExtensions = new Set([
   '.css',
@@ -45,24 +41,23 @@ const assetExtensions = [
   'woff2',
 ];
 
-const assetExtensionPattern = assetExtensions
-  .map((ext) => ext.replace('.', '\\.'))
-  .join('|');
+const assetExtensionPattern = assetExtensions.map((ext) => ext.replace('.', '\\.')).join('|');
 
 const failures = [];
 const warnings = [];
 
 const toRelative = (filePath) => path.relative(rootDir, filePath).replaceAll(path.sep, '/');
 
-const isIgnoredDirectory = (name) => [
-  '.git',
-  '.vercel',
-  'coverage',
-  'dist',
-  'node_modules',
-  'playwright-report',
-  'test-results',
-].includes(name);
+const isIgnoredDirectory = (name) =>
+  [
+    '.git',
+    '.vercel',
+    'coverage',
+    'dist',
+    'node_modules',
+    'playwright-report',
+    'test-results',
+  ].includes(name);
 
 const walk = (entry) => {
   if (!fs.existsSync(entry)) {
@@ -71,7 +66,9 @@ const walk = (entry) => {
 
   const stat = fs.statSync(entry);
   if (stat.isFile()) {
-    return scanExtensions.has(path.extname(entry)) && !/\.(test|spec)\.[cm]?[jt]sx?$/.test(entry) ? [entry] : [];
+    return scanExtensions.has(path.extname(entry)) && !/\.(test|spec)\.[cm]?[jt]sx?$/.test(entry)
+      ? [entry]
+      : [];
   }
 
   const files = [];
@@ -83,7 +80,10 @@ const walk = (entry) => {
     const child = path.join(entry, dirent.name);
     if (dirent.isDirectory()) {
       files.push(...walk(child));
-    } else if (scanExtensions.has(path.extname(child)) && !/\.(test|spec)\.[cm]?[jt]sx?$/.test(child)) {
+    } else if (
+      scanExtensions.has(path.extname(child)) &&
+      !/\.(test|spec)\.[cm]?[jt]sx?$/.test(child)
+    ) {
       files.push(child);
     }
   }
@@ -119,10 +119,9 @@ const existsWithExactCase = (targetPath) => {
   return { exists: true, exact: true };
 };
 
-const isExternalReference = (value) => (
+const isExternalReference = (value) =>
   /^(?:https?:|data:|blob:|mailto:|tel:|#|javascript:|chrome-extension:)/i.test(value) ||
-  value.startsWith('var(')
-);
+  value.startsWith('var(');
 
 const recordMissing = ({ sourceFile, reference, resolvedPath, reason }) => {
   const caseCheck = existsWithExactCase(resolvedPath);
@@ -179,7 +178,9 @@ const checkFile = (sourceFile) => {
   const content = fs.readFileSync(sourceFile, 'utf8');
   const uncommentedContent = content.replace(/^\s*\/\/.*$/gm, '');
 
-  const localPathMatch = uncommentedContent.match(/[A-Z]:[\\/][A-Za-z0-9_. -]+[\\/][^'"`\s)]*|file:\/\/[^'"`\s)]+/g);
+  const localPathMatch = uncommentedContent.match(
+    /[A-Z]:[\\/][A-Za-z0-9_. -]+[\\/][^'"`\s)]*|file:\/\/[^'"`\s)]+/g,
+  );
   if (localPathMatch) {
     for (const reference of localPathMatch) {
       failures.push(`${toRelative(sourceFile)}: local-only path "${reference}"`);
@@ -193,7 +194,7 @@ const checkFile = (sourceFile) => {
 
   const importLinePattern = new RegExp(
     `^\\s*(?:import(?:\\s+[^'"\\n]+?\\s+from\\s*)?|export\\s+[^'"\\n]+?\\s+from\\s*)['"]([^'"]+\\.(${assetExtensionPattern}))['"]`,
-    'i'
+    'i',
   );
   for (const line of uncommentedContent.split(/\r?\n/)) {
     const match = line.match(importLinePattern);
@@ -204,7 +205,7 @@ const checkFile = (sourceFile) => {
 
   const publicPathPattern = new RegExp(
     `['"](/[^'"\\s)]+\\.(${assetExtensionPattern})(?:[?#][^'"\\s)]*)?)['"]`,
-    'gi'
+    'gi',
   );
   for (const match of uncommentedContent.matchAll(publicPathPattern)) {
     validateReference(sourceFile, match[1], 'public asset reference');

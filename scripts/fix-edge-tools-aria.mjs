@@ -14,20 +14,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const ATTRS = [
-  'checked',
-  'pressed',
-  'expanded',
-  'selected',
-  'hidden',
-  'disabled',
-  'current',
-];
+const ATTRS = ['checked', 'pressed', 'expanded', 'selected', 'hidden', 'disabled', 'current'];
 
-const ATTR_RE = new RegExp(
-  `aria-(${ATTRS.join('|')})=\\{([^}]+)\\}`,
-  'g',
-);
+const ATTR_RE = new RegExp(`aria-(${ATTRS.join('|')})=\\{([^}]+)\\}`, 'g');
 
 function walk(dir, acc = []) {
   for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -77,7 +66,7 @@ function isBooleanishExpr(expr) {
  * Only dual-element works. Automated dual-element for arbitrary buttons is fragile.
  * So this script:
  * 1. Reports all hits
- * 2. --apply uses a React helper pattern: import { ariaBool } from '...' 
+ * 2. --apply uses a React helper pattern: import { ariaBool } from '...'
  *    Wait - helper still returns expression.
  *
  * Best automated fix that Edge Tools accepts: convert toggle buttons to use
@@ -144,7 +133,7 @@ function transformFile(source) {
 
   // Practical automated approach used here:
   // Rewrite `aria-X={cond ? 'true' : 'false'}` and `aria-X={cond}` into:
-  //   aria-X={String(Boolean(cond)) as 'true' | 'false'}  
+  //   aria-X={String(Boolean(cond)) as 'true' | 'false'}
   // Edge still fails.
   //
   // FINAL automated approach that works:
@@ -187,7 +176,7 @@ function transformFile(source) {
   // Implement dual-branch for map callbacks with single button return.
 
   // Match: aria-ATTR={EXPR} where EXPR is booleanish → replace with placeholder
-  // and wrap button... 
+  // and wrap button...
 
   // Simpler reliable approach for --apply:
   // Change `aria-pressed={x ? 'true' : 'false'}` to two attributes:
@@ -256,10 +245,7 @@ function transformFile(source) {
         `aria-${hit.attr}="${literal}"`,
       );
       // Also normalize data-active if present with expression
-      tag = tag.replace(
-        /data-active=\{[^}]+\}/,
-        `data-active="${literal}"`,
-      );
+      tag = tag.replace(/data-active=\{[^}]+\}/, `data-active="${literal}"`);
       // className with ternary is-active is fine for Edge Tools
       return tag;
     };

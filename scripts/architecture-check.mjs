@@ -84,8 +84,7 @@ const fileSet = new Set(files);
 // count from 9 to 12 without a single dependency changing. Quotes stay
 // excluded so the clause can never cross a string and attach a later
 // statement's specifier to an earlier keyword.
-const IMPORT_PATTERN =
-  /(?:^|\n)\s*(?:import|export)\s+(?:type\s+)?[^'"]*?from\s*['"]([^'"]+)['"]/g;
+const IMPORT_PATTERN = /(?:^|\n)\s*(?:import|export)\s+(?:type\s+)?[^'"]*?from\s*['"]([^'"]+)['"]/g;
 
 function resolveImport(importer, specifier) {
   if (!specifier.startsWith('.')) return null;

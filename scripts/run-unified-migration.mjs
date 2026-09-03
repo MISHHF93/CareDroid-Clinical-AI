@@ -13,10 +13,15 @@ function parseArgs(argv) {
   return {
     rollback: argv.includes('--rollback'),
     skipSetup: argv.includes('--skip-setup'),
-    allowProduction: argv.includes('--allow-production') || process.env.ALLOW_UNIFIED_MIGRATION_PRODUCTION === 'true',
+    allowProduction:
+      argv.includes('--allow-production') ||
+      process.env.ALLOW_UNIFIED_MIGRATION_PRODUCTION === 'true',
     backupId:
-      argv.find((arg) => arg.startsWith('--backup-id='))?.split('=').slice(1).join('=') ||
-      process.env.MIGRATION_010_BACKUP_ID,
+      argv
+        .find((arg) => arg.startsWith('--backup-id='))
+        ?.split('=')
+        .slice(1)
+        .join('=') || process.env.MIGRATION_010_BACKUP_ID,
   };
 }
 
@@ -42,7 +47,9 @@ function mongoUri() {
 }
 
 function mongoDbName() {
-  return process.env.MONGODB_DB_NAME || process.env.DATABASE_MONGO_DB_NAME || process.env.MONGO_DB_NAME;
+  return (
+    process.env.MONGODB_DB_NAME || process.env.DATABASE_MONGO_DB_NAME || process.env.MONGO_DB_NAME
+  );
 }
 
 function redactUri(uri) {
@@ -68,7 +75,9 @@ async function main() {
   const uri = mongoUri();
 
   if (!uri) {
-    throw new Error('Set MONGODB_URI or DATABASE_MONGO_URI before running the unified patient migration.');
+    throw new Error(
+      'Set MONGODB_URI or DATABASE_MONGO_URI before running the unified patient migration.',
+    );
   }
   if (looksProduction(uri) && !args.allowProduction) {
     throw new Error(

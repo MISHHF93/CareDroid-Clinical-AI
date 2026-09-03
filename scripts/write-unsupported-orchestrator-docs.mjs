@@ -34,7 +34,9 @@ function parseRegistryEnum(source) {
 }
 
 function parseRegistryToOrchestrator(source, nlu, registry) {
-  const block = source.match(/REGISTRY_ID_TO_ORCHESTRATOR_TOOL\s*=\s*Object\.freeze\(\{([\s\S]*?)\}\)/);
+  const block = source.match(
+    /REGISTRY_ID_TO_ORCHESTRATOR_TOOL\s*=\s*Object\.freeze\(\{([\s\S]*?)\}\)/,
+  );
   const map = {};
   for (const m of block[1].matchAll(/\[REGISTRY\.(\w+)\]:\s*NLU\.(\w+)/g)) {
     map[registry[m[1]]] = nlu[m[2]];
@@ -91,13 +93,7 @@ for (const nluId of frontendRegistered) {
   lines.push(`| \`${nluId}\` | \`${registryId}\` | \`POST /api/tools/${nluId}/execute\` |`);
 }
 
-lines.push(
-  '',
-  '## Unsupported NLU profiles',
-  '',
-  '| NLU id | Notes |',
-  '|--------|-------|',
-);
+lines.push('', '## Unsupported NLU profiles', '', '| NLU id | Notes |', '|--------|-------|');
 
 for (const id of backendUnsupported.sort()) {
   const note =

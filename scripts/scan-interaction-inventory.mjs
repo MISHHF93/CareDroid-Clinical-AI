@@ -29,7 +29,9 @@ const INTERACTION_CLASSES = {
 
 function openingTagAttrs(src) {
   // Prefer attributes on the first JSX open tag only — avoid body text like "is currently disabled"
-  const match = src.match(/<(?:button|Button|IconButton|Link|NavLink|a|div|g|span)\b[\s\S]*?(?:\/?>)/);
+  const match = src.match(
+    /<(?:button|Button|IconButton|Link|NavLink|a|div|g|span)\b[\s\S]*?(?:\/?>)/,
+  );
   return match ? match[0] : src.slice(0, 500);
 }
 
@@ -116,7 +118,11 @@ function classifyInteractionControl(input) {
   }
 
   // Capitalized design-system <Button> is often nested under <Link>; mark for review, not hard BROKEN.
-  if (input.kind === 'button' && /<Button\b/.test(src) && !/<button\b/i.test(src.split('<Button')[0] + 'x')) {
+  if (
+    input.kind === 'button' &&
+    /<Button\b/.test(src) &&
+    !/<button\b/i.test(src.split('<Button')[0] + 'x')
+  ) {
     return {
       class: INTERACTION_CLASSES.NEEDS_REVIEW,
       reason:
@@ -214,8 +220,7 @@ function walk(dir, acc = []) {
 
 // Skip test fixtures, pure story files, and bootstrap error HTML strings
 const SKIP_PATH_RE = /[\\/](test|__tests__|fixtures|stories)[\\/]/;
-const SKIP_FILE_RE =
-  /(^|[\\/])main\.tsx$|\.testShared\.|\.test\.|\.spec\.|Storybook|stories\./;
+const SKIP_FILE_RE = /(^|[\\/])main\.tsx$|\.testShared\.|\.test\.|\.spec\.|Storybook|stories\./;
 
 function main() {
   const files = walk(srcRoot).filter((f) => !SKIP_PATH_RE.test(f) && !SKIP_FILE_RE.test(f));
@@ -279,8 +284,7 @@ function main() {
     edBrokenCount: edBroken.length,
     edBroken: edBroken.slice(0, 200),
     brokenSample: broken.slice(0, 100),
-    note:
-      'Static classification is conservative. LIVE means a handler binding was found, not that runtime succeeds. Playwright interaction-execution suite validates observable outcomes.',
+    note: 'Static classification is conservative. LIVE means a handler binding was found, not that runtime succeeds. Playwright interaction-execution suite validates observable outcomes.',
   };
 
   mkdirSync(dirname(outPath), { recursive: true });
@@ -293,7 +297,9 @@ function main() {
 
   // Exit non-zero only if ED-critical BROKEN exceeds threshold (Phase 0 allows baseline; tighten later)
   if (edBroken.length > 50) {
-    console.error(`ED BROKEN controls (${edBroken.length}) exceed triage threshold 50 — investigate.`);
+    console.error(
+      `ED BROKEN controls (${edBroken.length}) exceed triage threshold 50 — investigate.`,
+    );
     process.exitCode = 1;
   }
 }

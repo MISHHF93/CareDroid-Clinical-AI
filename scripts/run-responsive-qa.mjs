@@ -27,7 +27,9 @@ mkdirSync(qaDir, { recursive: true });
 writeFileSync(matrixMd, `${formatResponsiveQaMatrixMarkdown()}\n`);
 
 const projects = process.env.QA_BROWSERS
-  ? process.env.QA_BROWSERS.split(',').map((s) => s.trim()).filter(Boolean)
+  ? process.env.QA_BROWSERS.split(',')
+      .map((s) => s.trim())
+      .filter(Boolean)
   : RESPONSIVE_QA_BROWSER_PROJECTS.map((b) => b.id);
 
 /**
@@ -77,15 +79,14 @@ const summary = {
 };
 
 console.log(
-  `Running responsive QA (${countResponsiveQaCells()} matrix cells across ${projects.join(', ')})…`
+  `Running responsive QA (${countResponsiveQaCells()} matrix cells across ${projects.join(', ')})…`,
 );
 
 let exitCode = 0;
 
 for (const project of projects) {
   const perBrowserJson = join(qaDir, `playwright-responsive-${project}.json`);
-  const label =
-    RESPONSIVE_QA_BROWSER_PROJECTS.find((b) => b.id === project)?.label || project;
+  const label = RESPONSIVE_QA_BROWSER_PROJECTS.find((b) => b.id === project)?.label || project;
 
   console.log(`\n=== ${label} (${project}) ===\n`);
 
@@ -104,7 +105,12 @@ for (const project of projects) {
   ];
   const result =
     process.platform === 'win32'
-      ? spawnSync(`npx ${playwrightArgs.join(' ')}`, { cwd: root, stdio: 'inherit', shell: true, env })
+      ? spawnSync(`npx ${playwrightArgs.join(' ')}`, {
+          cwd: root,
+          stdio: 'inherit',
+          shell: true,
+          env,
+        })
       : spawnSync(npx, playwrightArgs, { cwd: root, stdio: 'inherit', shell: false, env });
 
   /** @type {{ project: string, label: string, passes: number, failures: number, skipped: number, total: number, ok: boolean }} */
@@ -136,7 +142,10 @@ for (const project of projects) {
   if (!browserSummary.ok) exitCode = 1;
 }
 
-writeFileSync(mergedJson, `${JSON.stringify({ summary, generatedAt: new Date().toISOString() }, null, 2)}\n`);
+writeFileSync(
+  mergedJson,
+  `${JSON.stringify({ summary, generatedAt: new Date().toISOString() }, null, 2)}\n`,
+);
 
 summary.layoutPass = (summary.overflowFailures || 0) === 0;
 summary.pass = summary.failures.length === 0 && exitCode === 0;
@@ -165,7 +174,7 @@ const lines = [
   '| --- | ---: | ---: | ---: | --- |',
   ...summary.browsers.map(
     (b) =>
-      `| ${b.label} | ${b.passes} | ${b.failures} | ${b.total} | ${b.ok && b.failures === 0 ? 'PASS' : 'FAIL'} |`
+      `| ${b.label} | ${b.passes} | ${b.failures} | ${b.total} | ${b.ok && b.failures === 0 ? 'PASS' : 'FAIL'} |`,
   ),
   '',
 ];
@@ -193,7 +202,12 @@ if (existsSync(fixesMd)) {
   lines.push('## Fixes applied', '', readFileSync(fixesMd, 'utf8'), '');
 }
 
-lines.push('## Matrix reference', '', `See [RESPONSIVE_QA_MATRIX.md](./RESPONSIVE_QA_MATRIX.md).`, '');
+lines.push(
+  '## Matrix reference',
+  '',
+  `See [RESPONSIVE_QA_MATRIX.md](./RESPONSIVE_QA_MATRIX.md).`,
+  '',
+);
 
 writeFileSync(reportMd, lines.join('\n'));
 writeFileSync(join(qaDir, 'responsive-qa-summary.json'), `${JSON.stringify(summary, null, 2)}\n`);

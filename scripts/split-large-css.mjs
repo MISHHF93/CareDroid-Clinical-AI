@@ -137,7 +137,9 @@ function splitCssFile(relPath) {
     console.log(`  wrote ${relative(ROOT, partPath)} (${chunk.length} lines)`);
   });
 
-  const nextSource = [...headerLines.filter((line) => line.trim() !== ''), ...partImports, ''].join('\n');
+  const nextSource = [...headerLines.filter((line) => line.trim() !== ''), ...partImports, ''].join(
+    '\n',
+  );
   writeFileSync(sourcePath, nextSource, 'utf8');
   console.log(`${relPath}: split ${lines.length} lines into ${parts.length} parts`);
 }

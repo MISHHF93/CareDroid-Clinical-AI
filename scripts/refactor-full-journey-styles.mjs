@@ -8,7 +8,7 @@ let src = fs.readFileSync(file, 'utf8');
 
 if (!src.includes("import './FullJourneyOperatingPage.css'")) {
   src = src.replace(
-    "import {\n  buildCommandCenterWorkflowActions,",
+    'import {\n  buildCommandCenterWorkflowActions,',
     "import './FullJourneyOperatingPage.css';\nimport {\n  buildCommandCenterWorkflowActions,",
   );
 }
@@ -123,10 +123,7 @@ const pairs = [
                   }}`,
     `className={\`emergency-route-queue-row__oldest \${trace.threeMinuteBreachOccurred ? 'fj-text-critical-flex' : 'fj-text-subtle-flex'}\`}`,
   ],
-  [
-    `style={{ fontSize: 12, marginTop: 2 }}`,
-    `className="fj-caption"`,
-  ],
+  [`style={{ fontSize: 12, marginTop: 2 }}`, `className="fj-caption"`],
   [
     `style={{ fontSize: 12, color: MEDICAL_THEME.inkSubtle, marginTop: 2 }}`,
     `className="fj-caption-12-mt"`,
@@ -135,18 +132,12 @@ const pairs = [
     `style={{ fontSize: 11, color: MEDICAL_THEME.inkSubtle, marginTop: 2 }}`,
     `className="fj-caption-11-mt"`,
   ],
-  [
-    `style={{ fontSize: 11, color: MEDICAL_THEME.inkSubtle }}`,
-    `className="fj-caption-11"`,
-  ],
+  [`style={{ fontSize: 11, color: MEDICAL_THEME.inkSubtle }}`, `className="fj-caption-11"`],
   [
     `style={{ fontSize: 13, color: MEDICAL_THEME.inkSubtle, marginTop: 10 }}`,
     `className="fj-caption-13-mt"`,
   ],
-  [
-    `style={{ fontSize: 12, color: MEDICAL_THEME.inkSubtle }}`,
-    `className="fj-caption"`,
-  ],
+  [`style={{ fontSize: 12, color: MEDICAL_THEME.inkSubtle }}`, `className="fj-caption"`],
   [
     `style={{ display: 'block', fontSize: 11, fontWeight: 700, color: MEDICAL_THEME.inkSubtle, marginBottom: 3 }}`,
     `className="fj-label-block"`,
@@ -155,14 +146,8 @@ const pairs = [
     `style={{ fontSize: 11, fontWeight: 700, color: MEDICAL_THEME.inkSubtle, marginBottom: 4 }}`,
     `className="fj-label-mb4"`,
   ],
-  [
-    `style={{ fontSize: 12, color: '#10B981', fontWeight: 700 }}`,
-    `className="fj-text-ok-12"`,
-  ],
-  [
-    `style={{ fontSize: 12, color: '#10B981', marginTop: 2 }}`,
-    `className="fj-text-ok-12-mt"`,
-  ],
+  [`style={{ fontSize: 12, color: '#10B981', fontWeight: 700 }}`, `className="fj-text-ok-12"`],
+  [`style={{ fontSize: 12, color: '#10B981', marginTop: 2 }}`, `className="fj-text-ok-12-mt"`],
   [
     `style={{ color: MEDICAL_TYPE.statusCritical, fontSize: 13 }}`,
     `className="fj-text-critical-13"`,
@@ -191,14 +176,8 @@ const pairs = [
     `style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 4 }}`,
     `className="fj-row-wrap-6-mt"`,
   ],
-  [
-    `style={{ marginTop: 6 }}`,
-    `className="fj-mt-6"`,
-  ],
-  [
-    `style={{ flexShrink: 0 }}`,
-    `className="fj-flex-shrink-0"`,
-  ],
+  [`style={{ marginTop: 6 }}`, `className="fj-mt-6"`],
+  [`style={{ flexShrink: 0 }}`, `className="fj-flex-shrink-0"`],
   [
     `style={{
           display: 'flex',
@@ -247,22 +226,10 @@ const regexPairs = [
     /style=\{\{\s*fontSize:\s*13,\s*color:\s*MEDICAL_THEME\.inkSubtle,\s*marginTop:\s*10\s*\}\}/g,
     'className="fj-caption-13-mt"',
   ],
-  [
-    /style=\{\{\s*fontSize:\s*12,\s*marginTop:\s*2\s*\}\}/g,
-    'className="fj-caption"',
-  ],
-  [
-    /style=\{\{\s*color:\s*MEDICAL_THEME\.inkSubtle\s*\}\}/g,
-    'className="fj-text-subtle"',
-  ],
-  [
-    /style=\{\{\s*color:\s*STATUS_COLORS\.active\s*\}\}/g,
-    'className="fj-text-ok"',
-  ],
-  [
-    /style=\{\{\s*color:\s*MEDICAL_TYPE\.statusCritical\s*\}\}/g,
-    'className="fj-text-critical"',
-  ],
+  [/style=\{\{\s*fontSize:\s*12,\s*marginTop:\s*2\s*\}\}/g, 'className="fj-caption"'],
+  [/style=\{\{\s*color:\s*MEDICAL_THEME\.inkSubtle\s*\}\}/g, 'className="fj-text-subtle"'],
+  [/style=\{\{\s*color:\s*STATUS_COLORS\.active\s*\}\}/g, 'className="fj-text-ok"'],
+  [/style=\{\{\s*color:\s*MEDICAL_TYPE\.statusCritical\s*\}\}/g, 'className="fj-text-critical"'],
   [
     /style=\{\{\s*color:\s*STATUS_COLORS\[stage\.status\]\s*\?\?\s*MEDICAL_THEME\.inkSubtle,\s*flexShrink:\s*0\s*\}\}/g,
     'className="fj-text-subtle-flex" data-status={stage.status}',
@@ -283,10 +250,7 @@ const regexPairs = [
     /style=\{\{\s*fontSize:\s*11,\s*fontWeight:\s*800,\s*color:\s*priorityColor\(row\.priority\)\s*\}\}/g,
     `className="fj-priority-badge" data-priority={row.priority}`,
   ],
-  [
-    /style=\{\{\s*accentColor:\s*'#10B981'\s*\}\}/g,
-    'className="fj-check-row"',
-  ],
+  [/style=\{\{\s*accentColor:\s*'#10B981'\s*\}\}/g, 'className="fj-check-row"'],
   [
     /style=\{\{\s*padding:\s*'10px 14px',\s*borderRadius:\s*8,\s*background:\s*'rgba\(239,68,68,0\.07\)',\s*border:\s*'1px solid rgba\(239,68,68,0\.2\)',\s*fontSize:\s*12,\s*[^}]*\}\}/g,
     'className="fj-alert-box"',
@@ -350,4 +314,6 @@ src = src.replace(
 
 const remaining = (src.match(/style=\{\{/g) || []).length;
 fs.writeFileSync(file, src);
-console.log(JSON.stringify({ remainingStyleDoubleBrace: remaining, approxReplacements: n }, null, 2));
+console.log(
+  JSON.stringify({ remainingStyleDoubleBrace: remaining, approxReplacements: n }, null, 2),
+);

@@ -13,7 +13,7 @@ next = deleteRange(next, 288, 353);
 
 const routeImport = [
   '',
-  "import {",
+  'import {',
   '  PatientsRoute,',
   '  QueueRoute,',
   '  ReassessmentRoute,',
@@ -48,7 +48,7 @@ if (!app.includes('getPlatformHomeRoute')) {
 }
 
 app = app.replace(
-  'import { lazy, Suspense, useEffect, useMemo } from \'react\';',
+  "import { lazy, Suspense, useEffect, useMemo } from 'react';",
   "import { lazy, Suspense } from 'react';",
 );
 

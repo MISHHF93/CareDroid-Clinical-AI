@@ -23,7 +23,10 @@ function formatMs(ms) {
 
 function main() {
   const baseline = simulateReceptionDay({ profile: 'baseline', patientCount: PATIENTS_PER_DAY });
-  const harmonized = simulateReceptionDay({ profile: 'harmonized', patientCount: PATIENTS_PER_DAY });
+  const harmonized = simulateReceptionDay({
+    profile: 'harmonized',
+    patientCount: PATIENTS_PER_DAY,
+  });
   const comparison = compareReceptionProfiles(PATIENTS_PER_DAY);
 
   const report = {

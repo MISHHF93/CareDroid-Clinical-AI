@@ -99,8 +99,10 @@ function extractNamedArray(src, name) {
   return [...m[1].matchAll(/'([^']+)'/g)].map((x) => x[1]);
 }
 const namedNavIdArrays = {
-  CANONICAL_PILOT_VISIBLE_NAV_IDS: extractNamedArray(routesConfigSrc, 'CANONICAL_PILOT_VISIBLE_NAV_IDS') || [],
-  CANONICAL_PILOT_EXTENSION_NAV_IDS: extractNamedArray(routesConfigSrc, 'CANONICAL_PILOT_EXTENSION_NAV_IDS') || [],
+  CANONICAL_PILOT_VISIBLE_NAV_IDS:
+    extractNamedArray(routesConfigSrc, 'CANONICAL_PILOT_VISIBLE_NAV_IDS') || [],
+  CANONICAL_PILOT_EXTENSION_NAV_IDS:
+    extractNamedArray(routesConfigSrc, 'CANONICAL_PILOT_EXTENSION_NAV_IDS') || [],
 };
 
 // ── Stage C: parse CANONICAL_ROUTE_MAP records (id, path, showInNav) ────────
@@ -151,7 +153,9 @@ function extractRouteMapRecords(src) {
   return records;
 }
 const routeMapRecords = extractRouteMapRecords(routesConfigSrc);
-const routeMapByPathConst = new Map(routeMapRecords.filter((r) => r.pathConst).map((r) => [r.pathConst, r]));
+const routeMapByPathConst = new Map(
+  routeMapRecords.filter((r) => r.pathConst).map((r) => [r.pathConst, r]),
+);
 const routeMapById = new Map(routeMapRecords.filter((r) => r.id).map((r) => [r.id, r]));
 
 // ── Stage D: parse HOSPITAL_ROLE_NAV_IDS (role -> [navIds]) ─────────────────
@@ -174,7 +178,9 @@ const roleNavIds = extractRoleNavIds(roleNavConfigSrc);
 // ── Stage E: reachability evidence — grep every non-structural file for each
 //    route's path constant name ─────────────────────────────────────────────
 const allFiles = walk(srcRoot);
-const structuralFiles = allFiles.filter((f) => STRUCTURAL_FILE_RE.test(relative(repoRoot, f).replace(/\\/g, '/')));
+const structuralFiles = allFiles.filter((f) =>
+  STRUCTURAL_FILE_RE.test(relative(repoRoot, f).replace(/\\/g, '/')),
+);
 const nonStructuralFiles = allFiles.filter((f) => !structuralFiles.includes(f));
 const nonStructuralCorpus = nonStructuralFiles.map((f) => readFileSync(f, 'utf8')).join('\n');
 
@@ -204,7 +210,9 @@ const deadNamedConstants = [];
 for (const [name, path] of Object.entries(canonicalRoutes)) {
   const hasRouteMapEntry = routeMapByPathConst.has(name);
   const referencedOutsideStructural =
-    nonStructuralCorpus.includes(`CANONICAL_ROUTES.${name}`) || nonStructuralCorpus.includes(`'${path}'`) || nonStructuralCorpus.includes(`"${path}"`);
+    nonStructuralCorpus.includes(`CANONICAL_ROUTES.${name}`) ||
+    nonStructuralCorpus.includes(`'${path}'`) ||
+    nonStructuralCorpus.includes(`"${path}"`);
   if (hasRouteMapEntry || referencedOutsideStructural) continue;
 
   if (pathMountedLiterally(path)) {
@@ -222,7 +230,8 @@ for (const [role, ids] of Object.entries(roleNavIds)) {
   for (const id of ids) {
     const record = routeMapById.get(id);
     if (record && record.showInNav === false) {
-      if (!curatedButHidden.has(id)) curatedButHidden.set(id, { navId: id, path: record.path, roles: [] });
+      if (!curatedButHidden.has(id))
+        curatedButHidden.set(id, { navId: id, path: record.path, roles: [] });
       curatedButHidden.get(id).roles.push(role);
     }
   }
@@ -241,8 +250,7 @@ for (const [role, ids] of Object.entries(roleNavIds)) {
 
 const report = {
   generatedAt: new Date().toISOString(),
-  note:
-    'Inventory only — text-level heuristics, not a runtime simulation of Pilot Mode/entitlement/profile-scoped nav filtering. "orphanCandidates" found no evidence of the path anywhere outside routes.config.ts; "deadNamedConstants" found the URL mounted/mentioned elsewhere but not via the named CANONICAL_ROUTES export (may include prose/FAQ mentions, not just real routes/links). Human review required before treating any row as a confirmed defect.',
+  note: 'Inventory only — text-level heuristics, not a runtime simulation of Pilot Mode/entitlement/profile-scoped nav filtering. "orphanCandidates" found no evidence of the path anywhere outside routes.config.ts; "deadNamedConstants" found the URL mounted/mentioned elsewhere but not via the named CANONICAL_ROUTES export (may include prose/FAQ mentions, not just real routes/links). Human review required before treating any row as a confirmed defect.',
   totals: {
     canonicalRoutes: Object.keys(canonicalRoutes).length,
     routeMapEntries: routeMapRecords.length,
@@ -260,25 +268,39 @@ mkdirSync(outDir, { recursive: true });
 const outPath = join(outDir, 'route-nav-full-scan.json');
 writeFileSync(outPath, JSON.stringify(report, null, 2));
 
-console.log(`Parsed ${report.totals.canonicalRoutes} CANONICAL_ROUTES, ${report.totals.routeMapEntries} CANONICAL_ROUTE_MAP entries (${report.totals.routeMapEntriesShowInNavFalse} with showInNav:false), ${report.totals.hospitalRolesCovered} hospital role nav lists.`);
-console.log(`  ${orphanCandidates.length} orphan candidate route(s) — not mounted anywhere findable AND no reference outside routing plumbing.`);
-console.log(`  ${deadNamedConstants.length} dead named constant(s) — CANONICAL_ROUTES entry unused, but the URL IS mounted elsewhere via a literal path string.`);
-console.log(`  ${curatedButHidden.size} nav id(s) curated by a role but excluded via showInNav:false.`);
-console.log(`  ${deadNavIds.size} nav id(s) curated by a role but matching no route-map record at all.`);
+console.log(
+  `Parsed ${report.totals.canonicalRoutes} CANONICAL_ROUTES, ${report.totals.routeMapEntries} CANONICAL_ROUTE_MAP entries (${report.totals.routeMapEntriesShowInNavFalse} with showInNav:false), ${report.totals.hospitalRolesCovered} hospital role nav lists.`,
+);
+console.log(
+  `  ${orphanCandidates.length} orphan candidate route(s) — not mounted anywhere findable AND no reference outside routing plumbing.`,
+);
+console.log(
+  `  ${deadNamedConstants.length} dead named constant(s) — CANONICAL_ROUTES entry unused, but the URL IS mounted elsewhere via a literal path string.`,
+);
+console.log(
+  `  ${curatedButHidden.size} nav id(s) curated by a role but excluded via showInNav:false.`,
+);
+console.log(
+  `  ${deadNavIds.size} nav id(s) curated by a role but matching no route-map record at all.`,
+);
 console.log(`Report written to ${relative(repoRoot, outPath)}`);
 if (orphanCandidates.length) {
   console.log('\nOrphan candidates (genuinely unreachable — highest priority for review):');
   for (const row of orphanCandidates) console.log(`  ${row.name} :: ${row.path}`);
 }
 if (deadNamedConstants.length) {
-  console.log('\nDead named constants (URL is mounted, just not via this constant — low priority):');
+  console.log(
+    '\nDead named constants (URL is mounted, just not via this constant — low priority):',
+  );
   for (const row of deadNamedConstants) console.log(`  ${row.name} :: ${row.path}`);
 }
 if (curatedButHidden.size) {
   console.log('\nCurated but showInNav:false:');
-  for (const row of curatedButHidden.values()) console.log(`  ${row.navId} (${row.path}) — curated by: ${row.roles.join(', ')}`);
+  for (const row of curatedButHidden.values())
+    console.log(`  ${row.navId} (${row.path}) — curated by: ${row.roles.join(', ')}`);
 }
 if (deadNavIds.size) {
   console.log('\nDead nav ids (curated, no matching route-map record):');
-  for (const row of deadNavIds.values()) console.log(`  ${row.navId} — curated by: ${row.roles.join(', ')}`);
+  for (const row of deadNavIds.values())
+    console.log(`  ${row.navId} — curated by: ${row.roles.join(', ')}`);
 }

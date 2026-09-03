@@ -88,5 +88,7 @@ const routePath = process.argv[2] || '/clinical/alerts';
   console.log(`  total duration:    ${totalDuration.toFixed(1)}ms`);
   console.log(`  TBT (sum>50 floor): ${tbtApprox.toFixed(1)}ms`);
   console.log(`  max single task:   ${durations.length ? Math.max(...durations).toFixed(1) : 0}ms`);
-  console.log(`  median task:       ${durations.length ? durations.sort((a, b) => a - b)[Math.floor(durations.length / 2)].toFixed(1) : 0}ms`);
+  console.log(
+    `  median task:       ${durations.length ? durations.sort((a, b) => a - b)[Math.floor(durations.length / 2)].toFixed(1) : 0}ms`,
+  );
 })();

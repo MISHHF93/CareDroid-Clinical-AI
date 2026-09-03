@@ -128,7 +128,10 @@ function redactSecrets(text) {
 }
 
 function fingerprint(value) {
-  return createHash('sha256').update(String(value || '')).digest('hex').slice(0, 12);
+  return createHash('sha256')
+    .update(String(value || ''))
+    .digest('hex')
+    .slice(0, 12);
 }
 
 async function loadLib() {
@@ -266,7 +269,9 @@ async function main() {
 
   const validation = lib.contracts.validateUnifiedAiRequest(envelope);
   if (!validation.valid) {
-    console.error(JSON.stringify({ requestId, status: 'failed', errors: validation.errors }, null, 2));
+    console.error(
+      JSON.stringify({ requestId, status: 'failed', errors: validation.errors }, null, 2),
+    );
     process.exitCode = 2;
     return;
   }

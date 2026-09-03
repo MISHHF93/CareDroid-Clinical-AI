@@ -12,7 +12,15 @@ const UNIFIED = path.join(ROOT, 'backend', 'ml-services', 'models');
 const HEADS = [
   {
     head: 'nlu',
-    legacyClassifier: path.join(ROOT, 'backend', 'ml-services', 'nlu', 'models', 'best_model', 'classifier.json'),
+    legacyClassifier: path.join(
+      ROOT,
+      'backend',
+      'ml-services',
+      'nlu',
+      'models',
+      'best_model',
+      'classifier.json',
+    ),
     legacyMetrics: path.join(ROOT, 'backend', 'ml-services', 'nlu', 'metrics.json'),
   },
   {

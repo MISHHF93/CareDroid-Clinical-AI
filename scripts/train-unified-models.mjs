@@ -27,7 +27,13 @@ function resolveCommand(command, args) {
     return { command: process.execPath, args, shell: false };
   }
   if (command === 'npm' || command === 'npm.cmd') {
-    const npmCli = path.join(path.dirname(process.execPath), 'node_modules', 'npm', 'bin', 'npm-cli.js');
+    const npmCli = path.join(
+      path.dirname(process.execPath),
+      'node_modules',
+      'npm',
+      'bin',
+      'npm-cli.js',
+    );
     if (existsSync(npmCli)) {
       return { command: process.execPath, args: [npmCli, ...args], shell: false };
     }
@@ -38,7 +44,13 @@ function resolveCommand(command, args) {
     };
   }
   if (command === 'npx' || command === 'npx.cmd') {
-    const npxCli = path.join(path.dirname(process.execPath), 'node_modules', 'npm', 'bin', 'npx-cli.js');
+    const npxCli = path.join(
+      path.dirname(process.execPath),
+      'node_modules',
+      'npm',
+      'bin',
+      'npx-cli.js',
+    );
     if (existsSync(npxCli)) {
       return { command: process.execPath, args: [npxCli, ...args], shell: false };
     }
@@ -138,12 +150,16 @@ try {
   runStep('Augment NLU corpus from artifacts', 'npm', ['run', 'nlu:augment-artifacts'], {
     cwd: path.join(ROOT, 'backend'),
   });
-  runStep('Prepare NLU datasets', 'npm', ['run', 'nlu:prepare-data'], { cwd: path.join(ROOT, 'backend') });
+  runStep('Prepare NLU datasets', 'npm', ['run', 'nlu:prepare-data'], {
+    cwd: path.join(ROOT, 'backend'),
+  });
   runStep('Train NLU intent router', 'npm', ['run', 'nlu:train'], {
     cwd: path.join(ROOT, 'backend'),
     env: { NLU_MLP_HIDDEN_DIM: process.env.NLU_MLP_HIDDEN_DIM || '128' },
   });
-  runStep('Evaluate NLU intent router', 'npm', ['run', 'nlu:evaluate'], { cwd: path.join(ROOT, 'backend') });
+  runStep('Evaluate NLU intent router', 'npm', ['run', 'nlu:evaluate'], {
+    cwd: path.join(ROOT, 'backend'),
+  });
 
   const artifactTrainEnv = {
     ARTIFACT_EPOCHS: process.env.ARTIFACT_EPOCHS || '2500',
@@ -154,7 +170,10 @@ try {
 
   // Ensure stale hard examples from prior runs do not silently re-enter train.
   if (!HARD_EXAMPLES_ENABLED) {
-    const hardPath = path.join(ROOT, 'backend/ml-services/artifact-router/data/hard_examples.jsonl');
+    const hardPath = path.join(
+      ROOT,
+      'backend/ml-services/artifact-router/data/hard_examples.jsonl',
+    );
     if (existsSync(hardPath)) {
       writeFileSync(hardPath, '');
       console.log('\nCleared hard_examples.jsonl (ARTIFACT_HARD_EXAMPLES is not true).');
@@ -176,24 +195,41 @@ try {
   if (HARD_EXAMPLES_ENABLED) {
     // Hard examples are mined from validation errors only — the held-out test set
     // must never feed back into training data, or evaluate.ts's accuracy becomes meaningless.
-    runStep('Dump artifact router validation errors', 'npx', [
-      'ts-node',
-      'ml-services/artifact-router/scripts/dumpErrors.ts',
-    ], { cwd: path.join(ROOT, 'backend') });
-    const errorReport = path.join(ROOT, 'backend/ml-services/artifact-router/data/error_report.json');
+    runStep(
+      'Dump artifact router validation errors',
+      'npx',
+      ['ts-node', 'ml-services/artifact-router/scripts/dumpErrors.ts'],
+      { cwd: path.join(ROOT, 'backend') },
+    );
+    const errorReport = path.join(
+      ROOT,
+      'backend/ml-services/artifact-router/data/error_report.json',
+    );
     if (existsSync(errorReport)) {
-      runStep('Generate artifact router hard examples', 'npx', [
-        'ts-node',
-        'ml-services/artifact-router/scripts/generateHardExamples.ts',
-      ], { cwd: path.join(ROOT, 'backend') });
+      runStep(
+        'Generate artifact router hard examples',
+        'npx',
+        ['ts-node', 'ml-services/artifact-router/scripts/generateHardExamples.ts'],
+        { cwd: path.join(ROOT, 'backend') },
+      );
     }
-    runStep('Prepare artifact router datasets (with hard examples)', 'npm', ['run', 'artifact-router:prepare-data'], {
-      cwd: path.join(ROOT, 'backend'),
-    });
-    runStep('Train artifact router (pass 2 / hard examples)', 'npm', ['run', 'artifact-router:train'], {
-      cwd: path.join(ROOT, 'backend'),
-      env: artifactTrainEnv,
-    });
+    runStep(
+      'Prepare artifact router datasets (with hard examples)',
+      'npm',
+      ['run', 'artifact-router:prepare-data'],
+      {
+        cwd: path.join(ROOT, 'backend'),
+      },
+    );
+    runStep(
+      'Train artifact router (pass 2 / hard examples)',
+      'npm',
+      ['run', 'artifact-router:train'],
+      {
+        cwd: path.join(ROOT, 'backend'),
+        env: artifactTrainEnv,
+      },
+    );
     const pass2Metrics = snapshotArtifact('pass2');
     const p1 = Number(pass1Metrics?.accuracy ?? 0);
     const p2 = Number(pass2Metrics?.accuracy ?? 0);
@@ -213,7 +249,10 @@ try {
   runStep('Evaluate artifact router', 'npm', ['run', 'artifact-router:evaluate'], {
     cwd: path.join(ROOT, 'backend'),
   });
-  runStep('Refresh artifact catalog with ML heads', 'npm', ['run', 'artifact-intelligence:generate']);
+  runStep('Refresh artifact catalog with ML heads', 'npm', [
+    'run',
+    'artifact-intelligence:generate',
+  ]);
   printSummary();
 } catch (error) {
   console.error(error instanceof Error ? error.message : String(error));

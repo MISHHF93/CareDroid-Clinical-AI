@@ -59,7 +59,11 @@ async function mockApi(route) {
     });
     return;
   }
-  await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, data: {} }) });
+  await route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: JSON.stringify({ ok: true, data: {} }),
+  });
 }
 
 async function run() {
@@ -96,11 +100,8 @@ async function run() {
       let target =
         state.patients.find(
           (patient) =>
-            patient.state === 'Triage' &&
-            patient.triageAssist &&
-            !patient.triageAssist.dismissedAt,
-        ) ||
-        state.patients.find((patient) => patient.state === 'Triage');
+            patient.state === 'Triage' && patient.triageAssist && !patient.triageAssist.dismissedAt,
+        ) || state.patients.find((patient) => patient.state === 'Triage');
       if (!target) {
         throw new Error(`No triage patient in store (${state.patients.length} patients)`);
       }
@@ -112,7 +113,9 @@ async function run() {
             rationale: ['QA worker seeded triage assist'],
             confidence: 'high',
             ruleTriggered: 'qa-seed',
-            disclaimers: ['Human review required. This is not a replacement for clinical judgment.'],
+            disclaimers: [
+              'Human review required. This is not a replacement for clinical judgment.',
+            ],
             requiresHumanReview: true,
             generatedAt: new Date().toISOString(),
             source: 'rules',
@@ -161,7 +164,9 @@ async function run() {
   } catch (err) {
     status = 'fail';
     error = err.message;
-    await page.screenshot({ path: join(outDir, `${WORKER.id}-fail.png`), fullPage: true }).catch(() => {});
+    await page
+      .screenshot({ path: join(outDir, `${WORKER.id}-fail.png`), fullPage: true })
+      .catch(() => {});
   } finally {
     await context.close();
     await browser.close();

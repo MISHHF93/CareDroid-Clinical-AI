@@ -10,7 +10,7 @@ import { spawnSync } from 'node:child_process';
 const result = spawnSync(
   'npm',
   ['run', 'test:run', '--', 'src/data/clinicalSafetyCompliance.report.test.ts'],
-  { stdio: 'inherit', shell: true, env: process.env }
+  { stdio: 'inherit', shell: true, env: process.env },
 );
 
 process.exit(result.status ?? 1);

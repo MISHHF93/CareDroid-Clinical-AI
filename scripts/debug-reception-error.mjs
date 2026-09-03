@@ -48,7 +48,11 @@ async function main() {
 
   await page.goto(`${baseURL}/emergency/reception`, { waitUntil: 'networkidle' });
   await page.waitForTimeout(3000);
-  const bodyText = await page.locator('main, .app-shell, body').first().innerText().catch(() => '');
+  const bodyText = await page
+    .locator('main, .app-shell, body')
+    .first()
+    .innerText()
+    .catch(() => '');
   console.log('BODY SNIPPET:', bodyText.slice(0, 500));
   console.log('ERRORS:', errors.join('\n---\n') || '(none)');
   await browser.close();

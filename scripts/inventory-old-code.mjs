@@ -31,9 +31,12 @@ for (const f of files) {
     // skip comment-only
     const real = aria.filter((m) => {
       const line = t.slice(t.lastIndexOf('\n', m.index) + 1, t.indexOf('\n', m.index));
-      return !line.trim().startsWith('*') && !line.trim().startsWith('//') && !line.includes('e.g.');
+      return (
+        !line.trim().startsWith('*') && !line.trim().startsWith('//') && !line.includes('e.g.')
+      );
     });
-    if (real.length) ariaExpr.push({ f, n: real.length, samples: real.slice(0, 3).map((m) => m[0]) });
+    if (real.length)
+      ariaExpr.push({ f, n: real.length, samples: real.slice(0, 3).map((m) => m[0]) });
   }
   const req = [...t.matchAll(requireRe)];
   if (req.length) requires.push({ f, n: req.length });

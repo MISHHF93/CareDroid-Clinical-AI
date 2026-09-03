@@ -126,13 +126,18 @@ async function main() {
   mkdirSync(join(outDir, 'src/services/interactiveAi'), { recursive: true });
   mkdirSync(join(outDir, 'src/config'), { recursive: true });
   writeFileSync(join(outDir, 'src/contracts/interactiveAi.js'), 'export default {};\n');
-  writeFileSync(join(outDir, 'src/services/interactiveAi/actionProposalService.js'), 'export default {};\n');
+  writeFileSync(
+    join(outDir, 'src/services/interactiveAi/actionProposalService.js'),
+    'export default {};\n',
+  );
 
   transpile('src/config/routes.config.ts');
   transpile('src/config/receptionSkillModel.ts');
   transpile('src/services/interactiveAi/promptNavigationIntent.ts');
 
-  const skillMod = await import(pathToFileURL(join(outDir, 'src/config/receptionSkillModel.js')).href);
+  const skillMod = await import(
+    pathToFileURL(join(outDir, 'src/config/receptionSkillModel.js')).href
+  );
   const navMod = await import(
     pathToFileURL(join(outDir, 'src/services/interactiveAi/promptNavigationIntent.js')).href
   );
@@ -329,9 +334,7 @@ async function main() {
   // Live creates are best-effort; offline budgets gate the exit code.
   // Grade A only when live creates mostly succeed.
   const liveCreateRate =
-    live.summary && live.summary.attempted
-      ? live.summary.succeeded / live.summary.attempted
-      : 0;
+    live.summary && live.summary.attempted ? live.summary.succeeded / live.summary.attempted : 0;
   const grade = !offline.pass
     ? 'C'
     : !live.available

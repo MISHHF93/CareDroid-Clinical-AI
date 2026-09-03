@@ -107,7 +107,8 @@ const PERSONAS = [
     redFlags: [],
     arrivalMode: 'walk-in',
     priority: 'P4',
-    ocrText: 'First name: Tyler\nLast name: Brooks\nDate of birth: 1999-01-22\nHealth Card Number: HC-8899001',
+    ocrText:
+      'First name: Tyler\nLast name: Brooks\nDate of birth: 1999-01-22\nHealth Card Number: HC-8899001',
   },
   {
     id: 'ems-style-transfer',
@@ -163,7 +164,9 @@ function requestJson(port, path, { method = 'GET', headers = {}, body, token } =
     const payload = body === undefined ? undefined : JSON.stringify(body);
     const reqHeaders = {
       Accept: 'application/json',
-      ...(payload ? { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload) } : {}),
+      ...(payload
+        ? { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload) }
+        : {}),
       ...headers,
     };
     if (token) reqHeaders.Authorization = `Bearer ${token}`;
@@ -251,15 +254,18 @@ async function obtainToken() {
     // Some stacks use GET
     const getRes = await requestJson(port, '/api/auth/dev-session');
     const getToken =
-      getRes.json?.accessToken ||
-      getRes.json?.token ||
-      getRes.json?.data?.accessToken;
+      getRes.json?.accessToken || getRes.json?.token || getRes.json?.data?.accessToken;
     if (getRes.ok && getToken) {
       return { token: getToken, via: port, ms: getRes.ms, raw: getRes };
     }
   }
   // Fallback bypass if backend accepts it (dev only)
-  return { token: process.env.DEV_BEARER_TOKEN || 'dev-bypass-token', via: 'bypass', ms: 0, raw: null };
+  return {
+    token: process.env.DEV_BEARER_TOKEN || 'dev-bypass-token',
+    via: 'bypass',
+    ms: 0,
+    raw: null,
+  };
 }
 
 function pickPersonas(n) {
@@ -369,7 +375,11 @@ async function runPersonaJourney(apiPort, token, persona) {
     });
     steps.push({ step: 'ocr_create', ...ocrCreate });
     ocrJobId = ocrCreate.json?.id || ocrCreate.json?.data?.id;
-    if (ocrCreate.ok && ocrJobId && Array.isArray(ocrCreate.json?.extractedFields || ocrCreate.json?.data?.extractedFields)) {
+    if (
+      ocrCreate.ok &&
+      ocrJobId &&
+      Array.isArray(ocrCreate.json?.extractedFields || ocrCreate.json?.data?.extractedFields)
+    ) {
       const fields = ocrCreate.json.extractedFields || ocrCreate.json.data.extractedFields || [];
       for (const field of fields.slice(0, 4)) {
         if (!field.field) continue;
@@ -410,7 +420,7 @@ async function runPersonaJourney(apiPort, token, persona) {
     },
   });
   steps.push({ step: 'reception_handoff', ...handoff });
-  handoffOk = handoff.ok || (handoff.json?.data?.ok === true);
+  handoffOk = handoff.ok || handoff.json?.data?.ok === true;
 
   // 4) Escalation for high-risk personas
   if (persona.priority === 'P1' || persona.redFlags.length >= 2) {
@@ -451,7 +461,11 @@ async function runPersonaJourney(apiPort, token, persona) {
       ms: s.ms,
       error: s.error || null,
     })),
-    pass: createOk && handoffOk && failed.filter((s) => s.step === 'create_intake' || s.step === 'reception_handoff').length === 0,
+    pass:
+      createOk &&
+      handoffOk &&
+      failed.filter((s) => s.step === 'create_intake' || s.step === 'reception_handoff').length ===
+        0,
   };
 }
 
@@ -463,8 +477,10 @@ function percentile(sorted, p) {
 
 function gradeJourney(avgMs, passRate) {
   if (passRate >= 0.95 && avgMs < 800) return { grade: 'A', label: 'Excellent — pilot ready' };
-  if (passRate >= 0.85 && avgMs < 1500) return { grade: 'B', label: 'Good — acceptable pilot latency' };
-  if (passRate >= 0.7 && avgMs < 3000) return { grade: 'C', label: 'Fair — investigate slow/failing steps' };
+  if (passRate >= 0.85 && avgMs < 1500)
+    return { grade: 'B', label: 'Good — acceptable pilot latency' };
+  if (passRate >= 0.7 && avgMs < 3000)
+    return { grade: 'C', label: 'Fair — investigate slow/failing steps' };
   if (passRate >= 0.5) return { grade: 'D', label: 'Poor — critical path unstable' };
   return { grade: 'F', label: 'Fail — platform not responding as an ED front door' };
 }
@@ -491,7 +507,9 @@ function toMarkdown(report) {
   lines.push('');
   lines.push(`| Metric | Value |`);
   lines.push(`|--------|-------|`);
-  lines.push(`| Pass rate | ${(report.summary.passRate * 100).toFixed(1)}% (${report.summary.passed}/${report.summary.total}) |`);
+  lines.push(
+    `| Pass rate | ${(report.summary.passRate * 100).toFixed(1)}% (${report.summary.passed}/${report.summary.total}) |`,
+  );
   lines.push(`| Avg total | ${report.summary.avgTotalMs} ms |`);
   lines.push(`| p50 | ${report.summary.p50Ms} ms |`);
   lines.push(`| p95 | ${report.summary.p95Ms} ms |`);
@@ -529,7 +547,9 @@ function toMarkdown(report) {
     lines.push('### Failures');
     lines.push('');
     for (const f of report.failures.slice(0, 20)) {
-      lines.push(`- **${f.personaId}** / \`${f.step}\`: HTTP ${f.status}${f.error ? ` (${f.error})` : ''}`);
+      lines.push(
+        `- **${f.personaId}** / \`${f.step}\`: HTTP ${f.status}${f.error ? ` (${f.error})` : ''}`,
+      );
     }
   }
   lines.push('');
@@ -543,7 +563,9 @@ function toMarkdown(report) {
 async function main() {
   const generatedAt = new Date().toISOString();
   console.log('\nCareDroid patient-journey performance harness');
-  console.log(`Target backend :${BACKEND_PORT}  frontend :${FRONTEND_PORT}  patients=${PATIENT_COUNT}\n`);
+  console.log(
+    `Target backend :${BACKEND_PORT}  frontend :${FRONTEND_PORT}  patients=${PATIENT_COUNT}\n`,
+  );
 
   const probes = [];
   const beHealth = await probePort(BACKEND_PORT, '/health');
@@ -585,7 +607,9 @@ async function main() {
     mkdirSync(dirname(outJson), { recursive: true });
     writeFileSync(outJson, `${JSON.stringify(report, null, 2)}\n`);
     writeFileSync(outMd, toMarkdown(report));
-    console.error('Backend not reachable. Wrote failure report to qa/patient-journey-performance-report.md');
+    console.error(
+      'Backend not reachable. Wrote failure report to qa/patient-journey-performance-report.md',
+    );
     process.exit(2);
   }
 
@@ -595,7 +619,9 @@ async function main() {
   // Prefer backend port for API after we have a token; FE proxy if auth only worked there
   const apiPort = auth.via === FRONTEND_PORT ? FRONTEND_PORT : BACKEND_PORT;
 
-  const authedPatients = await requestJson(apiPort, '/api/emergency/patients', { token: auth.token });
+  const authedPatients = await requestJson(apiPort, '/api/emergency/patients', {
+    token: auth.token,
+  });
   probes.push({
     label: 'GET /api/emergency/patients (auth)',
     ok: authedPatients.ok,
@@ -603,7 +629,9 @@ async function main() {
     ms: authedPatients.ms,
   });
 
-  const snapshot = await requestJson(apiPort, '/api/emergency/reception/snapshot', { token: auth.token });
+  const snapshot = await requestJson(apiPort, '/api/emergency/reception/snapshot', {
+    token: auth.token,
+  });
   probes.push({
     label: 'GET /api/emergency/reception/snapshot (auth)',
     ok: snapshot.ok,
@@ -714,8 +742,12 @@ async function main() {
   console.log('\n=== Summary ===');
   console.log(`Grade: ${grade.grade} — ${grade.label}`);
   console.log(`Pass rate: ${(passRate * 100).toFixed(1)}% (${passed}/${journeys.length})`);
-  console.log(`Avg journey: ${avgTotalMs}ms  p50=${report.summary.p50Ms}  p95=${report.summary.p95Ms}`);
-  console.log(`Burst (3 parallel): wall ${burstMs}ms  pass ${(report.burst.passRate * 100).toFixed(0)}%`);
+  console.log(
+    `Avg journey: ${avgTotalMs}ms  p50=${report.summary.p50Ms}  p95=${report.summary.p95Ms}`,
+  );
+  console.log(
+    `Burst (3 parallel): wall ${burstMs}ms  pass ${(report.burst.passRate * 100).toFixed(0)}%`,
+  );
   console.log(`\nWrote:\n  ${outMd}\n  ${outJson}\n`);
 
   process.exit(passRate >= 0.7 && beHealth.ok ? 0 : 1);

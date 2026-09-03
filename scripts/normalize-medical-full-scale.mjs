@@ -62,24 +62,42 @@ const cssReplacements = [
   [/#1d4ed8\b/gi, '#0284c7'],
   [/#60a5fa\b/gi, '#38bdf8'],
   [/var\(--color-accent,\s*#a78bfa\)/g, 'var(--medical-accent-soft, #38bdf8)'],
-  [/var\(--ed-text-primary,\s*var\(--color-text-primary,\s*var\(--medical-ink,\s*var\(--app-surface-1,\s*#ffffff\)\)\)\)/g,
-    'var(--ed-text-primary, var(--color-text-primary, var(--medical-ink, #111827)))'],
-  [/var\(--nai-surface,\s*rgba\(15,\s*23,\s*42,\s*[\d.]+\)\)/gi,
-    'var(--nai-surface, var(--medical-surface-card, #ffffff))'],
-  [/var\(--nai-surface-elevated,\s*rgba\(30,\s*41,\s*59,\s*[\d.]+\)\)/gi,
-    'var(--nai-surface-elevated, var(--medical-surface-card, #ffffff))'],
-  [/var\(--app-surface-card,\s*rgba\(15,\s*23,\s*42,\s*[\d.]+\)\)/gi,
-    'var(--app-surface-card, var(--medical-surface-card, #ffffff))'],
-  [/var\(--surface-elevated,\s*rgba\(15,\s*23,\s*42,\s*[\d.]+\)\)/gi,
-    'var(--surface-elevated, var(--medical-surface-card, #ffffff))'],
-  [/var\(--app-surface-muted,\s*rgba\(15,\s*23,\s*42,\s*[\d.]+\)\)/gi,
-    'var(--app-surface-muted, var(--medical-surface-page, #f0f9ff))'],
-  [/var\(--app-surface,\s*rgba\(15,\s*23,\s*42,\s*[\d.]+\)\)/gi,
-    'var(--app-surface, var(--medical-surface-page, #f0f9ff))'],
-  [/var\(--app-code-bg,\s*rgba\(15,\s*23,\s*42,\s*[\d.]+\)\)/gi,
-    'var(--app-code-bg, var(--medical-surface-page, #f0f9ff))'],
-  [/var\(--app-surface-2,\s*rgba\(15,\s*23,\s*42,\s*[\d.]+\)\)/gi,
-    'var(--app-surface-2, var(--medical-surface-page, #f0f9ff))'],
+  [
+    /var\(--ed-text-primary,\s*var\(--color-text-primary,\s*var\(--medical-ink,\s*var\(--app-surface-1,\s*#ffffff\)\)\)\)/g,
+    'var(--ed-text-primary, var(--color-text-primary, var(--medical-ink, #111827)))',
+  ],
+  [
+    /var\(--nai-surface,\s*rgba\(15,\s*23,\s*42,\s*[\d.]+\)\)/gi,
+    'var(--nai-surface, var(--medical-surface-card, #ffffff))',
+  ],
+  [
+    /var\(--nai-surface-elevated,\s*rgba\(30,\s*41,\s*59,\s*[\d.]+\)\)/gi,
+    'var(--nai-surface-elevated, var(--medical-surface-card, #ffffff))',
+  ],
+  [
+    /var\(--app-surface-card,\s*rgba\(15,\s*23,\s*42,\s*[\d.]+\)\)/gi,
+    'var(--app-surface-card, var(--medical-surface-card, #ffffff))',
+  ],
+  [
+    /var\(--surface-elevated,\s*rgba\(15,\s*23,\s*42,\s*[\d.]+\)\)/gi,
+    'var(--surface-elevated, var(--medical-surface-card, #ffffff))',
+  ],
+  [
+    /var\(--app-surface-muted,\s*rgba\(15,\s*23,\s*42,\s*[\d.]+\)\)/gi,
+    'var(--app-surface-muted, var(--medical-surface-page, #f0f9ff))',
+  ],
+  [
+    /var\(--app-surface,\s*rgba\(15,\s*23,\s*42,\s*[\d.]+\)\)/gi,
+    'var(--app-surface, var(--medical-surface-page, #f0f9ff))',
+  ],
+  [
+    /var\(--app-code-bg,\s*rgba\(15,\s*23,\s*42,\s*[\d.]+\)\)/gi,
+    'var(--app-code-bg, var(--medical-surface-page, #f0f9ff))',
+  ],
+  [
+    /var\(--app-surface-2,\s*rgba\(15,\s*23,\s*42,\s*[\d.]+\)\)/gi,
+    'var(--app-surface-2, var(--medical-surface-page, #f0f9ff))',
+  ],
   [
     /linear-gradient\(180deg,\s*rgba\(127,\s*29,\s*29,\s*[\d.]+\),\s*rgba\(15,\s*23,\s*42,\s*[\d.]+\)\)/gi,
     'linear-gradient(180deg, rgba(254, 242, 242, 0.85), var(--medical-surface-card, #ffffff))',
@@ -108,7 +126,7 @@ const tsxReplacements = [
   ["'#0b1120'", 'MEDICAL_THEME.surfacePage'],
   ["'#0f172a'", 'MEDICAL_THEME.surfacePage'],
   ["'#111827'", 'MEDICAL_THEME.ink'],
-  ["background: MEDICAL_THEME.ink", 'background: MEDICAL_THEME.surfaceCard'],
+  ['background: MEDICAL_THEME.ink', 'background: MEDICAL_THEME.surfaceCard'],
 ];
 
 function medicalImportPath(file) {

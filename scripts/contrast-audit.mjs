@@ -51,9 +51,7 @@ const ROUTES = [
 const SCAN = (minRatio) => {
   const parse = (c) => {
     const m = c.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
-    return m
-      ? { r: +m[1], g: +m[2], b: +m[3], a: m[4] === undefined ? 1 : +m[4] }
-      : null;
+    return m ? { r: +m[1], g: +m[2], b: +m[3], a: m[4] === undefined ? 1 : +m[4] } : null;
   };
   const over = (fg, bg) => ({
     r: Math.round(fg.r * fg.a + bg.r * (1 - fg.a)),
@@ -160,7 +158,9 @@ for (const [route, role] of ROUTES) {
     if (!JSON_OUT) {
       console.log(`${route.padEnd(44)} ${String(found.length).padStart(3)} below ${MIN_RATIO}:1`);
       for (const f of found.slice(0, 5)) {
-        console.log(`      ${String(f.ratio).padStart(5)}  ${f.color} on ${f.background}  ${f.selector}`);
+        console.log(
+          `      ${String(f.ratio).padStart(5)}  ${f.color} on ${f.background}  ${f.selector}`,
+        );
         console.log(`             ${JSON.stringify(f.text)}`);
       }
     }

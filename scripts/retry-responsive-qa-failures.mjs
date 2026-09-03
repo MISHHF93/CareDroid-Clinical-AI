@@ -53,7 +53,7 @@ for (const project of projects) {
     process.platform === 'win32'
       ? spawnSync(
           `npx playwright test e2e/responsive-qa.spec.mjs --config=playwright.config.mjs --project=${project} --grep "${grep}"`,
-          { cwd: root, stdio: 'inherit', shell: true, env }
+          { cwd: root, stdio: 'inherit', shell: true, env },
         )
       : spawnSync(npx, playwrightArgs, { cwd: root, stdio: 'inherit', shell: false, env });
   if (result.status !== 0) exitCode = 1;

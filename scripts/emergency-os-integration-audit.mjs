@@ -51,9 +51,16 @@ const WORKFLOWS = [
     label: 'Emergency Whiteboard',
     route: '/emergency/whiteboard',
     page: 'src/components/EmergencyWhiteboard.jsx',
-    components: ['src/components/PatientCard.jsx', 'src/components/NewPatientIntake.jsx', 'src/components/QueueIntelligencePanel.jsx'],
+    components: [
+      'src/components/PatientCard.jsx',
+      'src/components/NewPatientIntake.jsx',
+      'src/components/QueueIntelligencePanel.jsx',
+    ],
     store: 'store/emergencyStore.ts',
-    apiClients: ['src/services/patientManagementApi.js', 'src/services/emergencyRealtimeService.js'],
+    apiClients: [
+      'src/services/patientManagementApi.js',
+      'src/services/emergencyRealtimeService.js',
+    ],
     backendEndpoints: ['/api/patients/*', '/api/platform-systems/*'],
     backendService: 'backend/src/modules/platform-systems/platform-systems.service.ts',
     entities: ['types/emergency.ts'],
@@ -84,7 +91,12 @@ const WORKFLOWS = [
     components: ['src/components/EMSPressureScore.jsx', 'src/components/EMSCriticalBroadcast.jsx'],
     store: 'store/emergencyStore.ts',
     apiClients: ['src/services/emergencyRealtimeService.js'],
-    backendEndpoints: ['/api/ems/incoming', '/api/ems/alert', '/api/ems/status/:emsUnitId', '/api/ems/arrive/:emsUnitId'],
+    backendEndpoints: [
+      '/api/ems/incoming',
+      '/api/ems/alert',
+      '/api/ems/status/:emsUnitId',
+      '/api/ems/arrive/:emsUnitId',
+    ],
     backendService: 'backend/src/services/ems.service.ts',
     entities: ['backend/src/models/Patient.ts', 'types/emergency.ts'],
     events: ['ems_alert_received', 'ems_status_updated', 'ems_arrival_confirmed'],
@@ -113,7 +125,10 @@ const WORKFLOWS = [
     page: 'src/App.jsx#EmergencyQueueRoute',
     components: ['src/components/QueueIntelligencePanel.jsx', 'src/components/WhoNextPanel.jsx'],
     store: 'store/emergencyStore.ts',
-    apiClients: ['src/services/queueIntelligenceService.js', 'src/services/emergencyAnalyticsApi.js'],
+    apiClients: [
+      'src/services/queueIntelligenceService.js',
+      'src/services/emergencyAnalyticsApi.js',
+    ],
     backendEndpoints: ['/api/emergency/queues/analytics'],
     backendService: 'none',
     entities: ['types/emergency.ts'],
@@ -141,7 +156,10 @@ const WORKFLOWS = [
     label: 'Capacity Intelligence',
     route: '/emergency/capacity',
     page: 'src/App.jsx#EmergencyCapacityRoute',
-    components: ['src/layout/AppShell.jsx#CapacityBadge', 'src/layout/AppShell.jsx#CapacityDetailPanel'],
+    components: [
+      'src/layout/AppShell.jsx#CapacityBadge',
+      'src/layout/AppShell.jsx#CapacityDetailPanel',
+    ],
     store: 'store/emergencyStore.ts',
     apiClients: ['src/services/emergencyAnalyticsApi.js'],
     backendEndpoints: ['/api/capacity/dashboard', '/api/emergency/capacity/history'],
@@ -204,7 +222,11 @@ const WORKFLOWS = [
     components: ['src/pages/emergency/EmergencyAnalytics.jsx'],
     store: 'store/emergencyStore.ts',
     apiClients: ['src/services/emergencyAnalyticsApi.js'],
-    backendEndpoints: ['/api/emergency/analytics', '/api/emergency/capacity/history', '/api/emergency/queues/analytics'],
+    backendEndpoints: [
+      '/api/emergency/analytics',
+      '/api/emergency/capacity/history',
+      '/api/emergency/queues/analytics',
+    ],
     backendService: 'none',
     entities: ['types/emergency.ts'],
     events: ['CapacityChanged', 'PatientDischarged'],
@@ -279,21 +301,25 @@ function extractExpressEndpoints(rel, content) {
   };
   const mount = mountedByFile[rel];
   if (!mount) return [];
-  return [...content.matchAll(/router\.(get|post|patch|put|delete)\(\s*['"]([^'"]*)['"]/g)].map((match) => ({
-    method: match[1].toUpperCase(),
-    path: `${mount}${match[2] === '/' ? '' : match[2].startsWith('/') ? match[2] : `/${match[2]}`}`,
-    file: rel,
-  }));
+  return [...content.matchAll(/router\.(get|post|patch|put|delete)\(\s*['"]([^'"]*)['"]/g)].map(
+    (match) => ({
+      method: match[1].toUpperCase(),
+      path: `${mount}${match[2] === '/' ? '' : match[2].startsWith('/') ? match[2] : `/${match[2]}`}`,
+      file: rel,
+    }),
+  );
 }
 
 function extractNestEndpoints(rel, content) {
   const controller = content.match(/@Controller\(\s*['"]([^'"]*)['"]\s*\)/)?.[1];
   if (controller === undefined) return [];
-  return [...content.matchAll(/@(Get|Post|Patch|Put|Delete)\(\s*(?:['"]([^'"]*)['"])?\s*\)/g)].map((match) => ({
-    method: match[1].toUpperCase(),
-    path: `/api/${[controller, match[2] || ''].filter(Boolean).join('/')}`.replace(/\/+/g, '/'),
-    file: rel,
-  }));
+  return [...content.matchAll(/@(Get|Post|Patch|Put|Delete)\(\s*(?:['"]([^'"]*)['"])?\s*\)/g)].map(
+    (match) => ({
+      method: match[1].toUpperCase(),
+      path: `/api/${[controller, match[2] || ''].filter(Boolean).join('/')}`.replace(/\/+/g, '/'),
+      file: rel,
+    }),
+  );
 }
 
 function statusForWorkflow(workflow, sourceByRel) {
@@ -307,10 +333,17 @@ function statusForWorkflow(workflow, sourceByRel) {
   const keys = routeKeys(workflow.route);
   const routeUsesKey = (source) => keys.some((key) => source.includes(`CANONICAL_ROUTES.${key}`));
   return {
-    route: app.includes(`path: '${workflow.route}'`) || app.includes(`to="/${workflow.route.slice(1)}"`),
-    sidebar: nav.includes(`path: '${workflow.route}'`) || nav.includes(workflow.route) || routeUsesKey(nav),
+    route:
+      app.includes(`path: '${workflow.route}'`) || app.includes(`to="/${workflow.route.slice(1)}"`),
+    sidebar:
+      nav.includes(`path: '${workflow.route}'`) ||
+      nav.includes(workflow.route) ||
+      routeUsesKey(nav),
     command: command.includes(`path: '${workflow.route}'`) || routeUsesKey(command),
-    search: keys.some((key) => search.includes(`path: CANONICAL_ROUTES.${key}`)) || search.includes(`path: '${workflow.route}'`) || search.includes(workflow.route),
+    search:
+      keys.some((key) => search.includes(`path: CANONICAL_ROUTES.${key}`)) ||
+      search.includes(`path: '${workflow.route}'`) ||
+      search.includes(workflow.route),
     pageExists: workflow.page.includes('#') || sourceByRel.has(workflow.page),
     store: sourceByRel.has(workflow.store),
     journey: sourceByRel.has(workflow.journey),
@@ -346,7 +379,7 @@ function classifyFile(rel, importedByCount, content) {
         ...workflow.components.map((component) => component.split('#')[0]),
         ...workflow.apiClients,
         ...workflow.entities,
-      ].includes(rel)
+      ].includes(rel),
     ) ||
     [
       'src/App.jsx',
@@ -359,12 +392,21 @@ function classifyFile(rel, importedByCount, content) {
   ) {
     return 'Connected Emergency OS';
   }
-  if (/future|platform|fleet|iot|digital-twin|simulation|governance|commercial|marketplace|billing|audit|profile/i.test(rel)) {
+  if (
+    /future|platform|fleet|iot|digital-twin|simulation|governance|commercial|marketplace|billing|audit|profile/i.test(
+      rel,
+    )
+  ) {
     return 'Future Module / Legacy Platform Artifact';
   }
   if (/\.test\.|\.spec\./.test(rel)) return 'Test Support';
-  if (importedByCount === 0 && /src\/components\/|src\/pages\/|src\/services\/|src\/hooks\//.test(rel)) return 'Unmounted or Orphaned';
-  if (/mock|demo|fixture/i.test(rel) && !/emergency|smart-intake/i.test(rel)) return 'Stale Mock Data';
+  if (
+    importedByCount === 0 &&
+    /src\/components\/|src\/pages\/|src\/services\/|src\/hooks\//.test(rel)
+  )
+    return 'Unmounted or Orphaned';
+  if (/mock|demo|fixture/i.test(rel) && !/emergency|smart-intake/i.test(rel))
+    return 'Stale Mock Data';
   if (importedByCount === 0 && /duplicate|legacy/i.test(content)) return 'Duplicate or Legacy';
   return 'Connected or Shared';
 }
@@ -373,7 +415,16 @@ function mdTable(headers, rows) {
   return [
     `| ${headers.join(' |')} |`,
     `| ${headers.map(() => '---').join(' | ')} |`,
-    ...rows.map((row) => `| ${row.map((cell) => String(cell ?? '').replaceAll('\n', '<br>').replaceAll('|', '\\|')).join(' | ')} |`),
+    ...rows.map(
+      (row) =>
+        `| ${row
+          .map((cell) =>
+            String(cell ?? '')
+              .replaceAll('\n', '<br>')
+              .replaceAll('|', '\\|'),
+          )
+          .join(' | ')} |`,
+    ),
   ].join('\n');
 }
 
@@ -402,7 +453,10 @@ function main() {
     for (const imported of imports) importedBy.get(imported)?.push(file.rel);
     const refs = extractApiRefs(file.content);
     if (refs.length) apiRefs.set(file.rel, refs);
-    endpoints.push(...extractExpressEndpoints(file.rel, file.content), ...extractNestEndpoints(file.rel, file.content));
+    endpoints.push(
+      ...extractExpressEndpoints(file.rel, file.content),
+      ...extractNestEndpoints(file.rel, file.content),
+    );
   }
 
   const workflowStatuses = WORKFLOWS.map((workflow) => ({
@@ -423,10 +477,23 @@ function main() {
     .filter(([file]) => /^src\//.test(file) || /^store\//.test(file) || /^engine\//.test(file))
     .flatMap(([file, refs]) => refs.map((ref) => ({ file, ref })));
   const emergencyEndpointRows = endpoints
-    .filter((endpoint) => /\/api\/(emergency|ems|reassessment|capacity|copilot|platform-systems|patients|chat)/.test(endpoint.path))
+    .filter((endpoint) =>
+      /\/api\/(emergency|ems|reassessment|capacity|copilot|platform-systems|patients|chat)/.test(
+        endpoint.path,
+      ),
+    )
     .map((endpoint) => {
-      const consumed = consumedApiRefs.some(({ ref }) => endpoint.path.includes(ref.replace(/\$\{[^}]+\}/g, ':id')) || ref.includes(endpoint.path.split('/:')[0]));
-      return [endpoint.method, endpoint.path, endpoint.file, consumed ? 'Consumed or partially matched' : 'No active frontend consumer found'];
+      const consumed = consumedApiRefs.some(
+        ({ ref }) =>
+          endpoint.path.includes(ref.replace(/\$\{[^}]+\}/g, ':id')) ||
+          ref.includes(endpoint.path.split('/:')[0]),
+      );
+      return [
+        endpoint.method,
+        endpoint.path,
+        endpoint.file,
+        consumed ? 'Consumed or partially matched' : 'No active frontend consumer found',
+      ];
     });
 
   const workflowRows = workflowStatuses.map((workflow) => [
@@ -445,22 +512,33 @@ function main() {
   const sidebarCovered = workflowStatuses.filter((workflow) => workflow.status.sidebar).length;
   const commandCovered = workflowStatuses.filter((workflow) => workflow.status.command).length;
   const searchCovered = workflowStatuses.filter((workflow) => workflow.status.search).length;
-  const componentCovered = workflowStatuses.filter((workflow) => workflow.status.pageExists && workflow.components.every((component) => component.includes('#') || sourceByRel.has(component))).length;
-  const liveBackendConnected = workflowStatuses.filter((workflow) =>
-    ['partial', 'conditional', 'mixed'].includes(workflow.liveData)
+  const componentCovered = workflowStatuses.filter(
+    (workflow) =>
+      workflow.status.pageExists &&
+      workflow.components.every(
+        (component) => component.includes('#') || sourceByRel.has(component),
+      ),
   ).length;
-  const serviceCovered = workflowStatuses.filter((workflow) => workflow.backendService !== 'none' && sourceByRel.has(workflow.backendService)).length;
-  const entityCovered = workflowStatuses.filter((workflow) => workflow.entities.every((entity) => entity.includes('#') || sourceByRel.has(entity))).length;
+  const liveBackendConnected = workflowStatuses.filter((workflow) =>
+    ['partial', 'conditional', 'mixed'].includes(workflow.liveData),
+  ).length;
+  const serviceCovered = workflowStatuses.filter(
+    (workflow) => workflow.backendService !== 'none' && sourceByRel.has(workflow.backendService),
+  ).length;
+  const entityCovered = workflowStatuses.filter((workflow) =>
+    workflow.entities.every((entity) => entity.includes('#') || sourceByRel.has(entity)),
+  ).length;
   const eventCovered = workflowStatuses.filter((workflow) => workflow.events.length > 0).length;
-  const workflowCovered = workflowStatuses.filter((workflow) =>
-    workflow.status.route &&
-    workflow.status.sidebar &&
-    workflow.status.command &&
-    workflow.status.search &&
-    workflow.status.pageExists &&
-    workflow.status.store &&
-    workflow.status.journey &&
-    ['partial', 'conditional', 'mixed'].includes(workflow.liveData)
+  const workflowCovered = workflowStatuses.filter(
+    (workflow) =>
+      workflow.status.route &&
+      workflow.status.sidebar &&
+      workflow.status.command &&
+      workflow.status.search &&
+      workflow.status.pageExists &&
+      workflow.status.store &&
+      workflow.status.journey &&
+      ['partial', 'conditional', 'mixed'].includes(workflow.liveData),
   ).length;
 
   const scores = {
@@ -499,18 +577,28 @@ function main() {
       fileSummary,
       '',
       mdTable(
-        ['Frontend Page', 'Components', 'Store', 'API Clients', 'Backend Endpoint', 'Service', 'Entity / Schema'],
-        dependencyGraph
+        [
+          'Frontend Page',
+          'Components',
+          'Store',
+          'API Clients',
+          'Backend Endpoint',
+          'Service',
+          'Entity / Schema',
+        ],
+        dependencyGraph,
       ),
       '',
       '## Import Graph Hotspots',
       '',
       mdTable(
         ['File', 'Imports', 'Imported By', 'Classification'],
-        disconnectedFiles.slice(0, 80).map((file) => [file.rel, file.imports, file.importedBy, file.category])
+        disconnectedFiles
+          .slice(0, 80)
+          .map((file) => [file.rel, file.imports, file.importedBy, file.category]),
       ),
       '',
-    ].join('\n')
+    ].join('\n'),
   );
 
   writeFileSync(
@@ -529,7 +617,7 @@ function main() {
         disconnectedFiles
           .filter((file) => /component|page|layout|hook|src\//i.test(file.rel))
           .slice(0, 160)
-          .map((file) => [file.rel, file.importedBy, file.imports, file.category])
+          .map((file) => [file.rel, file.importedBy, file.imports, file.category]),
       ),
       '',
       '## Safe Cleanup Applied',
@@ -538,7 +626,7 @@ function main() {
       '- Added Emergency OS destinations to search-first discovery.',
       '- Kept legacy/future page files in place unless they are already redirected away from the active UX.',
       '',
-    ].join('\n')
+    ].join('\n'),
   );
 
   writeFileSync(
@@ -557,7 +645,7 @@ function main() {
         [...apiRefs.entries()]
           .filter(([file]) => /src\/services|store\/|src\/components|src\/pages/.test(file))
           .slice(0, 140)
-          .map(([file, refs]) => [file, refs.join(', ')])
+          .map(([file, refs]) => [file, refs.join(', ')]),
       ),
       '',
       '## Backend Emergency OS Endpoint Consumption',
@@ -570,7 +658,7 @@ function main() {
       '- Queue, boarding, referrals, and much of analytics are currently derived from `store/emergencyStore.ts` client state rather than persisted backend services.',
       '- The main NestJS backend still exposes many legacy platform modules that are redirected out of the active UX.',
       '',
-    ].join('\n')
+    ].join('\n'),
   );
 
   writeFileSync(
@@ -583,7 +671,16 @@ function main() {
       fileSummary,
       '',
       mdTable(
-        ['Module', 'UI Route', 'Route', 'Sidebar', 'Command Palette', 'Search', 'Live Backend Data', 'Backend Endpoints'],
+        [
+          'Module',
+          'UI Route',
+          'Route',
+          'Sidebar',
+          'Command Palette',
+          'Search',
+          'Live Backend Data',
+          'Backend Endpoints',
+        ],
         workflowStatuses.map((workflow) => [
           workflow.label,
           workflow.route,
@@ -593,7 +690,7 @@ function main() {
           workflow.status.search ? 'yes' : 'no',
           workflow.liveData,
           workflow.backendEndpoints.join(', '),
-        ])
+        ]),
       ),
       '',
       '## Alignment Findings',
@@ -602,7 +699,7 @@ function main() {
       '- Backend persistence is uneven: Smart Intake has the strongest backend chain, while queues, boarding, referrals, and analytics rely on local store derivations/fallbacks.',
       '- Conditional backend mounting via `ENABLE_MONGOOSE_EMERGENCY_OS=true` means Emergency OS backend endpoints are not guaranteed in default runtime.',
       '',
-    ].join('\n')
+    ].join('\n'),
   );
 
   writeFileSync(
@@ -617,8 +714,18 @@ function main() {
       '## Workflow Coverage',
       '',
       mdTable(
-        ['Module', 'Route', 'Route Mounted', 'Sidebar', 'Command', 'Search', 'Live Data', 'Events', 'Journey Engine'],
-        workflowRows
+        [
+          'Module',
+          'Route',
+          'Route Mounted',
+          'Sidebar',
+          'Command',
+          'Search',
+          'Live Data',
+          'Events',
+          'Journey Engine',
+        ],
+        workflowRows,
       ),
       '',
       '## System-Wide Integration Score',
@@ -636,7 +743,7 @@ function main() {
           ['Command Palette Coverage', `${scores.command}%`],
           ['Search Coverage', `${scores.search}%`],
           ['Emergency OS Workflow Coverage', `${scores.workflow}%`],
-        ]
+        ],
       ),
       '',
       '## Breaks in the Chain',
@@ -653,7 +760,7 @@ function main() {
       '- Replace local queue/referral/boarding derivations with Journey event-backed selectors once backend event persistence is available.',
       '- Move legacy platform pages/services into `future-modules` only after backend module imports and test imports have been rewritten.',
       '',
-    ].join('\n')
+    ].join('\n'),
   );
 
   console.log(fileSummary);

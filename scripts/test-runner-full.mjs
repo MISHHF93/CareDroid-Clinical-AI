@@ -3,7 +3,7 @@
 /**
  * CareDroid Full Test Suite
  * Validates all routes, navigation, permissions, and components
- * 
+ *
  * Usage: npm test
  * or: node test-runner.js
  */
@@ -22,7 +22,7 @@ const colors = {
   red: '\x1b[31m',
   yellow: '\x1b[33m',
   blue: '\x1b[34m',
-  cyan: '\x1b[36m'
+  cyan: '\x1b[36m',
 };
 
 let testsPassed = 0;
@@ -74,7 +74,7 @@ const requiredFiles = {
   'src/contexts/OfflineProvider.jsx': 'Offline provider',
   'src/utils/logger.ts': 'Logger utility',
   'src/services/apiClient.js': 'API client',
-  'src/hooks/useNotificationActions.js': 'Notification actions hook'
+  'src/hooks/useNotificationActions.js': 'Notification actions hook',
 };
 
 Object.entries(requiredFiles).forEach(([filepath, description]) => {
@@ -96,7 +96,7 @@ const importTests = [
   { pattern: "from './contexts/NotificationContext'", name: 'NotificationContext import' },
   { pattern: "from './layout/AppShell'", name: 'AppShell import' },
   { pattern: "from './pages/Auth'", name: 'Auth import' },
-  { pattern: "from './utils/logger'", name: 'Logger import' }
+  { pattern: "from './utils/logger'", name: 'Logger import' },
 ];
 
 importTests.forEach(({ pattern, name }) => {
@@ -122,8 +122,18 @@ const routes = [
   { path: '/gdpr', name: 'GDPR Notice', requiresAuth: false },
   { path: '/hipaa', name: 'HIPAA Notice', requiresAuth: false },
   { path: '/help', name: 'Help Center', requiresAuth: false },
-  { path: '/team', name: 'Team Management (Permission-Gated)', requiresAuth: true, requiresPermission: 'MANAGE_USERS' },
-  { path: '/audit-logs', name: 'Audit Logs (Permission-Gated)', requiresAuth: true, requiresPermission: 'VIEW_AUDIT_LOGS' }
+  {
+    path: '/team',
+    name: 'Team Management (Permission-Gated)',
+    requiresAuth: true,
+    requiresPermission: 'MANAGE_USERS',
+  },
+  {
+    path: '/audit-logs',
+    name: 'Audit Logs (Permission-Gated)',
+    requiresAuth: true,
+    requiresPermission: 'VIEW_AUDIT_LOGS',
+  },
 ];
 
 routes.forEach(({ path, name, requiresAuth, requiresPermission }) => {
@@ -148,7 +158,7 @@ const navTests = [
   { pattern: "path: '/profile'", name: 'Profile nav item' },
   { pattern: "path: '/settings'", name: 'Settings nav item' },
   { pattern: "path: '/team'", name: 'Team nav item (permission-gated)' },
-  { pattern: "path: '/audit-logs'", name: 'Audit Logs nav item (permission-gated)' }
+  { pattern: "path: '/audit-logs'", name: 'Audit Logs nav item (permission-gated)' },
 ];
 
 navTests.forEach(({ pattern, name }) => {
@@ -163,16 +173,33 @@ navTests.forEach(({ pattern, name }) => {
 
 section('5. CONTEXT & HOOK TESTS');
 
-const userContextFile = fs.readFileSync(path.join(__dirname, 'src/contexts/UserContext.jsx'), 'utf8');
-const notificationFile = fs.readFileSync(path.join(__dirname, 'src/contexts/NotificationContext.jsx'), 'utf8');
-const notificationHookFile = fs.readFileSync(path.join(__dirname, 'src/hooks/useNotificationActions.js'), 'utf8');
+const userContextFile = fs.readFileSync(
+  path.join(__dirname, 'src/contexts/UserContext.jsx'),
+  'utf8',
+);
+const notificationFile = fs.readFileSync(
+  path.join(__dirname, 'src/contexts/NotificationContext.jsx'),
+  'utf8',
+);
+const notificationHookFile = fs.readFileSync(
+  path.join(__dirname, 'src/hooks/useNotificationActions.js'),
+  'utf8',
+);
 
 const contextTests = [
   { file: userContextFile, pattern: 'export const useUser', name: 'useUser hook export' },
   { file: userContextFile, pattern: 'export const UserProvider', name: 'UserProvider export' },
   { file: userContextFile, pattern: 'export const Permission', name: 'Permission enum export' },
-  { file: notificationFile, pattern: 'export const NotificationProvider', name: 'NotificationProvider export' },
-  { file: notificationHookFile, pattern: "from '../contexts/NotificationContext'", name: 'useNotificationActions import path (correct relative path)' }
+  {
+    file: notificationFile,
+    pattern: 'export const NotificationProvider',
+    name: 'NotificationProvider export',
+  },
+  {
+    file: notificationHookFile,
+    pattern: "from '../contexts/NotificationContext'",
+    name: 'useNotificationActions import path (correct relative path)',
+  },
 ];
 
 contextTests.forEach(({ file, pattern, name }) => {
@@ -191,13 +218,13 @@ const filesToCheck = [
   'src/services/offlineService.js',
   'src/services/NotificationService.js',
   'src/components/PermissionGate.jsx',
-  'src/components/ErrorBoundary.jsx'
+  'src/components/ErrorBoundary.jsx',
 ];
 
-filesToCheck.forEach(filepath => {
+filesToCheck.forEach((filepath) => {
   const content = fs.readFileSync(path.join(__dirname, filepath), 'utf8');
   const consoleCallsFound = (content.match(/console\.\w+\(/g) || []).length;
-  
+
   if (consoleCallsFound === 0) {
     pass(`Console calls removed: ${filepath}`);
   } else {
@@ -217,15 +244,16 @@ const pageFiles = [
   { file: 'src/pages/AuditLogs.jsx', exportType: 'default', name: 'AuditLogs' },
   { file: 'src/pages/legal/PrivacyPolicy.jsx', exportType: 'named', name: 'PrivacyPolicy' },
   { file: 'src/pages/legal/ConsentFlow.jsx', exportType: 'named', name: 'ConsentFlow' },
-  { file: 'src/pages/team/TeamManagement.jsx', exportType: 'named', name: 'TeamManagement' }
+  { file: 'src/pages/team/TeamManagement.jsx', exportType: 'named', name: 'TeamManagement' },
 ];
 
 pageFiles.forEach(({ file, exportType, name }) => {
   const content = fs.readFileSync(path.join(__dirname, file), 'utf8');
-  const hasExport = exportType === 'default' 
-    ? content.includes('export default')
-    : content.includes(`export const ${name}`);
-  
+  const hasExport =
+    exportType === 'default'
+      ? content.includes('export default')
+      : content.includes(`export const ${name}`);
+
   if (hasExport) {
     pass(`Component export: ${name} (${exportType} export)`);
   } else {
@@ -237,11 +265,14 @@ pageFiles.forEach(({ file, exportType, name }) => {
 
 section('8. PERMISSION GATE TESTS');
 
-const permissionGateFile = fs.readFileSync(path.join(__dirname, 'src/components/PermissionGate.jsx'), 'utf8');
+const permissionGateFile = fs.readFileSync(
+  path.join(__dirname, 'src/components/PermissionGate.jsx'),
+  'utf8',
+);
 const permTests = [
   { pattern: 'permission', name: 'permission prop' },
   { pattern: 'useUser', name: 'useUser hook integration' },
-  { pattern: 'fallback', name: 'fallback prop for denied access' }
+  { pattern: 'fallback', name: 'fallback prop for denied access' },
 ];
 
 permTests.forEach(({ pattern, name }) => {
@@ -265,7 +296,7 @@ const layoutTests = [
   { file: appShellFile, pattern: 'export default', name: 'AppShell default export' },
   { file: authShellFile, pattern: 'export default', name: 'AuthShell default export' },
   { file: publicShellFile, pattern: 'export const PublicShell', name: 'PublicShell named export' },
-  { file: publicShellFile, pattern: 'footer', name: 'PublicShell has footer section' }
+  { file: publicShellFile, pattern: 'footer', name: 'PublicShell has footer section' },
 ];
 
 layoutTests.forEach(({ file, pattern, name }) => {
@@ -284,7 +315,7 @@ const biometricFile = fs.readFileSync(path.join(__dirname, 'src/pages/BiometricS
 const bioTests = [
   { pattern: 'import', name: 'Uses dynamic import (not hardcoded)' },
   { pattern: '@vite-ignore', name: 'Includes @vite-ignore directive' },
-  { pattern: 'setError', name: 'Has error handling for missing plugin' }
+  { pattern: 'setError', name: 'Has error handling for missing plugin' },
 ];
 
 bioTests.forEach(({ pattern, name }) => {

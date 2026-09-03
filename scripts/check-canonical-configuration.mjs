@@ -40,7 +40,9 @@ async function main() {
         }
       }
       if (snapshot.undocumentedEnvVars.length > 0) {
-        console.error(`  [error] undocumented env vars: ${snapshot.undocumentedEnvVars.join(', ')}`);
+        console.error(
+          `  [error] undocumented env vars: ${snapshot.undocumentedEnvVars.join(', ')}`,
+        );
       }
       process.exitCode = 1;
       return;

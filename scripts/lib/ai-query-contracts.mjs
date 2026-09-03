@@ -37,14 +37,7 @@ export function validateUnifiedAiRequest(input) {
   if (!input || typeof input !== 'object') {
     return { valid: false, errors: [{ field: 'request', message: 'Request must be an object' }] };
   }
-  for (const field of [
-    'requestId',
-    'correlationId',
-    'organizationId',
-    'userId',
-    'role',
-    'query',
-  ]) {
+  for (const field of ['requestId', 'correlationId', 'organizationId', 'userId', 'role', 'query']) {
     if (!isNonEmptyString(input[field])) {
       errors.push({ field, message: `${field} is required` });
     }

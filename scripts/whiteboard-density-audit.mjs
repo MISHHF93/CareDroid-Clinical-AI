@@ -28,5 +28,7 @@ mkdirSync(dirname(reportPath), { recursive: true });
 writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
 
 console.log('Whiteboard density audit written to', reportPath);
-console.log(`Stress: ${audit.stressScenario.visibleSurfaceCount} visible, ${audit.stressScenario.hiddenUnderLoad} hidden under load`);
+console.log(
+  `Stress: ${audit.stressScenario.visibleSurfaceCount} visible, ${audit.stressScenario.hiddenUnderLoad} hidden under load`,
+);
 console.log(`Calm: ${audit.calmScenario.visibleSurfaceCount} visible surfaces`);

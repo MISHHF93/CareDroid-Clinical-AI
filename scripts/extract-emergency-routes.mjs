@@ -3,10 +3,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 const sourcePath = process.env.SOURCE_APP || 'src/App.jsx';
 const app = readFileSync(sourcePath, 'utf8').split(/\r?\n/);
 
-const sharedChunks = [
-  ...app.slice(287, 353),
-  ...app.slice(744, 993),
-];
+const sharedChunks = [...app.slice(287, 353), ...app.slice(744, 993)];
 
 const shared = sharedChunks
   .join('\n')
