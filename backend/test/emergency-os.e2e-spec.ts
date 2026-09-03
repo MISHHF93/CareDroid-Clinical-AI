@@ -195,14 +195,18 @@ describe('Emergency OS end-to-end integration', () => {
       undefined,
       fakeSocketAuthMiddleware,
     );
-  });
+    // mongodb-memory-server has to download-or-spawn mongod and Nest then
+    // initialises the real modules; under jest's 5s default this hook timed
+    // out whenever a full unit run shared the CPU (2026-09-03), which read as
+    // a failing test. Booting is allowed a minute; the assertions keep theirs.
+  }, 60_000);
 
   afterAll(async () => {
     ioServer?.close();
     await app?.close();
     await mongoose.disconnect();
     await mongoServer?.stop();
-  });
+  }, 60_000);
 
   it('initializes services, moves data through APIs, and emits whiteboard updates', async () => {
     expect(initialization.totals.registered).toBe(REQUIRED_SERVICE_NAMES.length);
