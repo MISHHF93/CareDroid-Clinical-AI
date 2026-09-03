@@ -157,7 +157,16 @@ export const ROLE_PERMISSION_PRESETS: Record<SaasUserRole, string[]> = Object.fr
   ],
 });
 
-export function normalizeSaasRole(role?: string | null): SaasUserRole {
+/**
+ * Map a role string (a SaaS role id, an EMERGENCY_ROLE_IDS value, or one of
+ * the legacy account-tier names) to its SaaS role -- or null when the input
+ * is not a role this platform knows. normalizeSaasRole() below is the same
+ * table with the null collapsed to the default profile role; callers that
+ * must tell "this is the student role" from "this is not a role at all"
+ * (the dev-session identity merge in demoPersonaModel.ts, which must not
+ * let an unrecognised local string downgrade a real backend role) use this.
+ */
+export function resolveSaasRoleAlias(role?: string | null): SaasUserRole | null {
   // Normalize case/whitespace before matching (mirrors the backend's own
   // Cycle 220 fix, saas-profile.constants.ts -- this frontend copy never
   // received it): every comparison below was a strict, case-sensitive `===`,
@@ -212,5 +221,36 @@ export function normalizeSaasRole(role?: string | null): SaasUserRole {
   if (normalized === 'veterinarian' || normalized === 'vet') return 'veterinarian';
   if (normalized === 'executive_leadership') return 'executive-leadership';
   if (normalized === 'auditor_regulator') return 'auditor-regulator';
-  return DEFAULT_SAAS_PROFILE.role;
+  return null;
+}
+
+export function normalizeSaasRole(role?: string | null): SaasUserRole {
+  return resolveSaasRoleAlias(role) ?? DEFAULT_SAAS_PROFILE.role;
+}
+
+/**
+ * The SaaS role string carried by an authenticated user object.
+ *
+ * Moved here verbatim from TrackMindRouteGuard (via userProfileCatalog.ts)
+ * so the guard, the TrackMind workspace hub and the dev-session identity
+ * merge in demoPersonaModel.ts cannot drift apart on what counts as a
+ * user's role -- a guard that admits a user the page then treats as a
+ * different role is exactly how a role sees a workspace built for someone
+ * else. Deliberately NOT the same chain as resolveEffectiveEmergencyRole(),
+ * which resolves the *emergency* role and prefers roleProfileId over the
+ * account-tier role. This file has no imports, which is why the resolver
+ * lives here rather than in the catalog.
+ */
+export function resolveSaasRoleFromUser(
+  user:
+    | {
+        saasRole?: string;
+        role?: string;
+        profile?: { saasRole?: string; roleProfileId?: string };
+      }
+    | null
+    | undefined,
+): string {
+  const profile = user?.profile || {};
+  return user?.saasRole || profile.saasRole || profile.roleProfileId || user?.role || '';
 }

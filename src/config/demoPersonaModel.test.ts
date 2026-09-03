@@ -180,8 +180,61 @@ describe('demoPersonaModel', () => {
     expect((enriched.account as { role?: string }).role).toBe(EMERGENCY_ROLE_IDS.registrationClerk);
   });
 
+  it('prefers the role the session itself declares over the shared singleton dev account persisted persona', () => {
+    // Found live 2026-09-03 on all four TrackMind pages. POST /api/auth/dev-session
+    // signs every developer, agent and Playwright probe into ONE backend user, and a
+    // persona switch persists that user's roleProfileId (auth.service.ts,
+    // createDevSession) -- so GET /api/profile/me reports whatever anyone switched
+    // to last. This session declares executive-leadership with no `profile` block
+    // (the shape scripts/contrast-audit.mjs seeds); the shared record says
+    // registration-clerk. The page rendered, then flipped to ACCESS DENIED as
+    // "registration-clerk" the moment the fetch resolved.
+    const seededSession = {
+      id: 'probe',
+      email: 'audit@caredroid.local',
+      role: 'executive-leadership',
+      authMode: 'explicit-dev-bypass',
+      isDevAuthBypass: true,
+    };
+    const sharedDevAccountSnapshot = {
+      saasProfile: { displayName: 'Dev Clinician', role: 'registration-clerk' },
+      account: { displayName: 'Dev Clinician', role: 'nurse', saasRole: 'registration-clerk' },
+    };
+
+    const merged = enrichDemoIdentityFallback(seededSession, sharedDevAccountSnapshot);
+
+    expect((merged.saasProfile as { role?: string }).role).toBe('executive-leadership');
+    expect((merged.account as { role?: string }).role).toBe('executive-leadership');
+  });
+
+  it('keeps the fallback role string when the session declares the same role in emergency-id form', () => {
+    // registration_clerk (EMERGENCY_ROLE_IDS) and registration-clerk (SaaS) are one
+    // role -- agreement must not rewrite the value buildFallbackProfile handed over.
+    const demoUser = hydrateStoredDemoUser({
+      id: 'open-access-user',
+      authMode: 'open-access',
+      role: EMERGENCY_ROLE_IDS.registrationClerk,
+    });
+    const merged = enrichDemoIdentityFallback(demoUser, {
+      saasProfile: { role: 'registration-clerk' },
+      account: {},
+    });
+    expect((merged.saasProfile as { role?: string }).role).toBe('registration-clerk');
+  });
+
+  it('never lets an unrecognised local role string downgrade a real fallback role', () => {
+    const oddSession = { id: 'x', authMode: 'explicit-dev-bypass', role: 'not-a-role' };
+    const merged = enrichDemoIdentityFallback(oddSession, {
+      saasProfile: { role: 'hospital-administrator' },
+      account: {},
+    });
+    expect((merged.saasProfile as { role?: string }).role).toBe('hospital-administrator');
+  });
+
   it('falls back to the persona default saasRole when the caller has no role of its own yet', () => {
-    const demoUser = hydrateStoredDemoUser({ id: 'open-access-user', authMode: 'open-access' });
+    // Un-hydrated on purpose: hydrateStoredDemoUser() assigns the persona's default
+    // emergency role, and since 2026-09-03 user.role IS a role signal here.
+    const demoUser = { id: 'open-access-user', authMode: 'open-access' };
     const fallback = { saasProfile: {}, account: {} };
 
     const enriched = enrichDemoIdentityFallback(demoUser, fallback);

@@ -285,6 +285,59 @@ describe('AuthService', () => {
     });
   });
 
+  describe('describeDevSession', () => {
+    // Read by `npm run doctor`, which must stay read-only: this reports which
+    // persona the ONE shared dev user currently carries so a developer seeing
+    // "ACCESS DENIED as registration-clerk" on a page seeded for another role
+    // learns it is someone else's persisted switch, not a race.
+    it('shares the POST gate: refuses without the bypass flag', async () => {
+      await expect(service.describeDevSession('127.0.0.1')).rejects.toThrow('ENABLE_DEV_AUTH_BYPASS');
+    });
+
+    it('shares the POST gate: refuses production even with the bypass flag set', async () => {
+      process.env.ENABLE_DEV_AUTH_BYPASS = 'true';
+      process.env.NODE_ENV = 'production';
+
+      await expect(service.describeDevSession('127.0.0.1')).rejects.toThrow(
+        'ALLOW_DEMO_AUTH_IN_PRODUCTION',
+      );
+    });
+
+    it('reports the persisted persona without issuing a token, writing or auditing', async () => {
+      process.env.ENABLE_DEV_AUTH_BYPASS = 'true';
+      const lastLoginAt = new Date('2026-09-02T23:47:48.000Z');
+      mockUserRepository.findOne.mockResolvedValue({
+        id: 'dev-user',
+        email: 'dev@caredroid.local',
+        role: 'nurse',
+        lastLoginAt,
+        profile: { roleProfileId: 'registration_clerk', updatedAt: lastLoginAt },
+      });
+
+      const described = await service.describeDevSession('127.0.0.1');
+
+      expect(described).toEqual({
+        exists: true,
+        role: 'nurse',
+        roleProfileId: 'registration_clerk',
+        lastLoginAt,
+        personaUpdatedAt: lastLoginAt,
+      });
+      expect(mockUserRepository.save).not.toHaveBeenCalled();
+      expect(mockProfileRepository.save).not.toHaveBeenCalled();
+      expect(mockAuditService.log).not.toHaveBeenCalled();
+      expect(mockJwtService.sign).not.toHaveBeenCalled();
+    });
+
+    it('says so when no dev user has been bootstrapped yet', async () => {
+      process.env.ENABLE_DEV_AUTH_BYPASS = 'true';
+      mockUserRepository.findOne.mockResolvedValue(null);
+
+      await expect(service.describeDevSession('127.0.0.1')).resolves.toEqual({ exists: false });
+      expect(mockUserRepository.save).not.toHaveBeenCalled();
+    });
+  });
+
   describe('createDevSession', () => {
     it('requires an explicit development bypass flag', async () => {
       await expect(service.createDevSession('127.0.0.1', 'test-agent')).rejects.toThrow(

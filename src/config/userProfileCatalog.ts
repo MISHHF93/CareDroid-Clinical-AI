@@ -349,29 +349,11 @@ export const USER_PROFILE_CATALOG: readonly UserProfileCatalogEntry[] = Object.f
   (catalogData as UserProfileCatalogEntry[]).map(enrichCatalogEntry),
 );
 
-/**
- * The SaaS role string carried by an authenticated user object.
- *
- * Moved here verbatim from TrackMindRouteGuard so the guard and the
- * TrackMind workspace hub cannot drift apart on what counts as a user's role
- * -- a guard that admits a user the page then treats as a different role is
- * exactly how a role sees a workspace built for someone else. Deliberately
- * NOT the same chain as resolveEffectiveEmergencyRole(), which resolves the
- * *emergency* role and prefers roleProfileId over the account-tier role.
- */
-export function resolveSaasRoleFromUser(
-  user:
-    | {
-        saasRole?: string;
-        role?: string;
-        profile?: { saasRole?: string; roleProfileId?: string };
-      }
-    | null
-    | undefined,
-): string {
-  const profile = user?.profile || {};
-  return user?.saasRole || profile.saasRole || profile.roleProfileId || user?.role || '';
-}
+// resolveSaasRoleFromUser() lives in saasProfileConstants.ts (a leaf module)
+// so demoPersonaModel.ts can share it without an import cycle; re-exported
+// here so its original import sites keep working.
+export { resolveSaasRoleFromUser } from './saasProfileConstants';
+
 export function resolveUserProfileFromSaasRole(
   role: string | null | undefined,
 ): ResolvedUserProfile {

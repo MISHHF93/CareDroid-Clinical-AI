@@ -78,6 +78,25 @@ function probePort(port, timeoutMs = 700) {
   });
 }
 
+/** Status plus parsed JSON body (null when the body is not JSON). */
+async function httpJson(url, timeoutMs = 2500) {
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    const res = await fetch(url, { signal: controller.signal });
+    clearTimeout(timer);
+    let body = null;
+    try {
+      body = await res.json();
+    } catch {
+      body = null;
+    }
+    return { status: res.status, body };
+  } catch {
+    return { status: 0, body: null };
+  }
+}
+
 async function httpStatus(url, timeoutMs = 2500) {
   try {
     const controller = new AbortController();
@@ -210,6 +229,36 @@ if (backendUp) {
   else warn('BACKEND', `/health returned ${status} on :${BACKEND_PORT}`, 'Inspect the backend logs.');
 } else {
   warn('BACKEND', `not running on :${BACKEND_PORT}`, 'Start it with: npm run dev:api  (or the full stack: npm run dev)');
+}
+
+// There is ONE dev user per database. POST /api/auth/dev-session persists
+// whichever persona was switched to last -- by a developer, an agent or a
+// Playwright probe -- and GET /api/profile/me then reports that persona to
+// every dev session on the machine. Pages that render for a few seconds and
+// then flip to "Access denied as registration-clerk" are this, not a race.
+// The GET is read-only; doctor never signs in.
+if (backendUp) {
+  const { status, body } = await httpJson(`http://127.0.0.1:${BACKEND_PORT}/api/auth/dev-session`);
+  if (status === 200 && body && body.exists === false) {
+    pass('DEV PERSONA', 'no dev user bootstrapped yet (first dev sign-in creates it)');
+  } else if (status === 200 && body && body.exists) {
+    const persona = body.roleProfileId || '(none)';
+    const when = body.personaUpdatedAt ? ` since ${new Date(body.personaUpdatedAt).toISOString()}` : '';
+    pass(
+      'DEV PERSONA',
+      `shared dev user is role=${body.role} persona=${persona}${when}; every dev session here inherits it`,
+    );
+  } else if (status === 403) {
+    pass('DEV PERSONA', 'dev sessions are disabled (production posture)');
+  } else if (status === 404) {
+    warn(
+      'DEV PERSONA',
+      'backend build predates GET /api/auth/dev-session',
+      'Rebuild the API: npm --prefix backend run build  (the dev stack builds it once at start).',
+    );
+  } else {
+    warn('DEV PERSONA', `GET /api/auth/dev-session returned ${status}`, 'Inspect the backend logs.');
+  }
 }
 
 if (frontendUp) {

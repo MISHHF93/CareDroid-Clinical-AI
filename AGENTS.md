@@ -54,12 +54,18 @@ thousands. If you added a page, run:
 npx vitest run src/data/pageDispositionFixture.test.ts
 ```
 
-## Two traps that have each cost real time
+## Three traps that have each cost real time
 
 - **A route redirects and neither access-denied panel renders.** Check
   `ED_EXTENSION_ROUTE_REDIRECTS` in `src/config/edApplication.config.ts` first.
   It matches by *prefix*, above the route tree, so grepping the redirect tables
   for your path finds nothing. It has silently swallowed a real route three times.
+- **A page renders, then flips to "Access denied" as a role you never chose.**
+  There is ONE backend dev user per database, and every dev sign-in, agent and
+  Playwright probe shares it. A persona switch persists that user's
+  `roleProfileId`, so `GET /api/profile/me` reports whoever switched last.
+  `npm run doctor` prints it (DEV PERSONA); the frontend now lets a session's
+  own declared role win (`enrichDemoIdentityFallback`). It is not a race.
 - **Unwired is not dead.** A module with no importers is usually a function not
   linked yet. Read what it does, then wire it or label it. Delete only what
   actively contradicts the live implementation — and grep tests twice first, once

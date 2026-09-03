@@ -5,6 +5,7 @@
 import { CANONICAL_ROUTES } from './routes.config';
 import { EMERGENCY_ROLE_IDS, normalizeEmergencyRole } from './emergencyRolePermissions';
 import { resolveRoleLandingRoute } from './emergencyRoleNavigationModel';
+import { resolveSaasRoleAlias, resolveSaasRoleFromUser } from './saasProfileConstants';
 
 export const DEMO_PERSONA_ID = 'cara-george-ed18';
 
@@ -348,7 +349,6 @@ export function enrichDemoIdentityFallback(
   const isDevSession = DEV_SESSION_AUTH_MODES.has(String(user?.authMode || ''));
   if (!isDemoPersonaUser(user) && !isDevSession) return fallback;
 
-  const profile = (user?.profile as DemoUserRecord) || {};
   // HEAL-195: role, unlike displayName/specialty/department (deliberately static -- "one identity
   // across every lane", per this file's own header comment), tracks WHICH lane the persona is
   // currently viewing, not a fixed attribute of the person -- the same distinction account.role
@@ -368,11 +368,49 @@ export function enrichDemoIdentityFallback(
   // whatever role was active when the fetch fired, not the live one. profile.saasRole
   // is set directly on `user` by switchDemoRole()'s own object construction, so it's
   // always as fresh as the switch itself -- prefer it over the possibly-stale fallback.
+  //
+  // Found live 2026-09-03: profile.saasRole is not the only local role
+  // signal, and the backend snapshot is not merely stale -- it is SHARED.
+  // POST /api/auth/dev-session signs every developer, agent and Playwright
+  // probe on this machine into ONE singleton dev user, and a persona switch
+  // writes that user's roleProfileId to the database (auth.service.ts,
+  // createDevSession). GET /api/profile/me then reports whatever persona was
+  // persisted last, by anyone. A session seeded as { role:
+  // 'executive-leadership', authMode: 'explicit-dev-bypass' } with no
+  // `profile` therefore rendered its TrackMind pages correctly for the first
+  // few seconds (buildFallbackProfile reads user.role) and then flipped to
+  // ACCESS DENIED as "registration-clerk" the moment the fetch resolved --
+  // the same "identity flips when the fetch lands" shape this function
+  // already fixed for displayName, and the thing that looked like a random
+  // race across probes.
+  //
+  // So: resolve what the session itself declares (same resolver the
+  // TrackMind guard uses, so guard and merge cannot disagree; the local
+  // value may be an EMERGENCY_ROLE_IDS id, hence the alias step) and what
+  // the fallback carries. When both name a role and they are different
+  // roles, the session wins -- the fallback is a shared or stale record of
+  // someone else's switch. When they agree, keep the fallback's own value
+  // (buildFallbackProfile hands over exactly the string its consumers
+  // already see). A local string that is not a role at all never overrides
+  // anything: the alias resolver returns null for it rather than the
+  // student default, so an unrecognised value cannot downgrade a real role.
+  const declaredLocalRole =
+    ((user?.caredroidProfile as DemoUserRecord | undefined)?.saasRole as string | undefined) ||
+    resolveSaasRoleFromUser(user as Parameters<typeof resolveSaasRoleFromUser>[0]);
+  const localSaasRole = resolveSaasRoleAlias(declaredLocalRole);
+  const fallbackRole = (fallback.saasProfile as DemoUserRecord | undefined)?.role as string | undefined;
+  const fallbackSaasRole = resolveSaasRoleAlias(fallbackRole);
+  const sessionOverridesFallback =
+    localSaasRole !== null && fallbackSaasRole !== null && localSaasRole !== fallbackSaasRole;
   const saasProfile = {
     ...(fallback.saasProfile as DemoUserRecord),
     displayName: DEMO_PERSONA.displayName,
     email: DEMO_PERSONA.email,
-    role: (profile.saasRole as string) || (fallback.saasProfile as DemoUserRecord)?.role || DEMO_PERSONA.saasRole,
+    role:
+      (sessionOverridesFallback ? localSaasRole : undefined) ||
+      fallbackRole ||
+      localSaasRole ||
+      DEMO_PERSONA.saasRole,
     specialty: DEMO_PERSONA.specialty,
     department: DEMO_PERSONA.department,
     organizationType: 'hospital',

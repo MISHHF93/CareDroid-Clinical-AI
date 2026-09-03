@@ -299,9 +299,12 @@ export class AuthService {
   }
 
   /**
-   * Development-only: issue a real JWT for explicit local/demo UI access.
+   * The environment gate every dev-session operation shares. Extracted so the
+   * read-only GET (describeDevSession) and the token-issuing POST
+   * (createDevSession) cannot drift: the same posture that refuses to sign a
+   * dev user in also refuses to describe one.
    */
-  async createDevSession(ipAddress: string, userAgent: string, roleProfileId?: string) {
+  private assertDevSessionAllowed(ipAddress: string) {
     const authConfig = this.configService.get<any>('auth') || {};
     const serverConfig = this.configService.get<any>('server') || {};
     const explicitDevBypassEnabled = [
@@ -327,7 +330,42 @@ export class AuthService {
       );
     }
 
-    const email = this.normalizeEmail(authConfig.devLoginEmail || 'dev@caredroid.local');
+    return this.normalizeEmail(authConfig.devLoginEmail || 'dev@caredroid.local');
+  }
+
+  /**
+   * Development-only, read-only: report which persona the singleton dev user
+   * currently carries. There is ONE dev user per database and
+   * createDevSession() persists whichever roleProfileId was switched to last,
+   * by anyone -- so a developer, an agent and a Playwright probe on the same
+   * machine all inherit each other's switches. `npm run doctor` surfaces this
+   * so "ACCESS DENIED as registration-clerk" on a page seeded for another
+   * role is explained rather than chased as a race. Issues no token, writes
+   * nothing, logs nothing: operational metadata only.
+   */
+  async describeDevSession(ipAddress: string) {
+    const email = this.assertDevSessionAllowed(ipAddress);
+    const user = await this.userRepository.findOne({
+      where: { email },
+      relations: ['profile'],
+    });
+    if (!user) {
+      return { exists: false as const };
+    }
+    return {
+      exists: true as const,
+      role: user.role,
+      roleProfileId: user.profile?.roleProfileId ?? null,
+      lastLoginAt: user.lastLoginAt ?? null,
+      personaUpdatedAt: user.profile?.updatedAt ?? null,
+    };
+  }
+
+  /**
+   * Development-only: issue a real JWT for explicit local/demo UI access.
+   */
+  async createDevSession(ipAddress: string, userAgent: string, roleProfileId?: string) {
+    const email = this.assertDevSessionAllowed(ipAddress);
     let user = await this.userRepository.findOne({
       where: { email },
       relations: ['profile', 'subscription', 'twoFactor'],
@@ -429,7 +467,7 @@ export class AuthService {
       // carries no clinical permissions -- so once anyone previewed the
       // waiting-room wall, every later plain "Enter CareDroid now" (which
       // sends no roleProfileId) signed back in as that permission-less user.
-      // Confirmed live: GET /api/auth/dev-session returned role 'student' with
+      // Confirmed live: POST /api/auth/dev-session returned role 'student' with
       // a stuck roleProfileId of 'public_display', and the ED routes 403'd in
       // a burst on every load. STUDENT is never a real CareDroid clinical
       // persona -- it is the DB column default and the SaaS low-tier fallback

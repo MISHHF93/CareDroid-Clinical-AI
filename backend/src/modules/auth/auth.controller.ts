@@ -100,16 +100,32 @@ export class AuthController {
     return this.authService.login(loginDto, ipAddress, userAgent);
   }
 
-  @Post('dev-session')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Development only: explicit local/demo UI access' })
-  async devSession(@Req() req: Request, @Body() body: DevSessionDto) {
+  private assertDevSessionRouteAllowed() {
     const nodeEnv = process.env.NODE_ENV || 'development';
     const productionDemoAuthEnabled =
       String(process.env.ALLOW_DEMO_AUTH_IN_PRODUCTION || '').toLowerCase() === 'true';
     if (nodeEnv === 'production' && !productionDemoAuthEnabled) {
       throw new HttpException('Dev session is not available in production', HttpStatus.FORBIDDEN);
     }
+  }
+
+  @Get('dev-session')
+  @ApiOperation({
+    summary: 'Development only, read-only: which persona the shared singleton dev user carries',
+  })
+  async describeDevSession(@Req() req: Request) {
+    // Same gate as the POST below, then the service applies its own stricter
+    // one (loopback or ENABLE_DEV_AUTH_BYPASS). Read by `npm run doctor`,
+    // which must stay read-only -- so this never issues a token or writes.
+    this.assertDevSessionRouteAllowed();
+    return this.authService.describeDevSession(req.ip || '0.0.0.0');
+  }
+
+  @Post('dev-session')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Development only: explicit local/demo UI access' })
+  async devSession(@Req() req: Request, @Body() body: DevSessionDto) {
+    this.assertDevSessionRouteAllowed();
 
     const ipAddress = req.ip || '0.0.0.0';
     const userAgent = req.headers['user-agent'] || 'unknown';
