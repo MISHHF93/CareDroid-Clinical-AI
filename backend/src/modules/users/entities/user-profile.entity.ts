@@ -8,6 +8,7 @@ import {
   UpdateDateColumn,
   Index,
 } from 'typeorm';
+import { BINARY_COLUMN_TYPE } from '../../../config/database-client.config';
 
 @Entity('user_profiles')
 @Index(['userId'])
@@ -68,16 +69,16 @@ export class UserProfile {
   // the service layer before saving (the same pattern AuthService.applyEmailEncryption()
   // already uses for User.emailEncrypted) — do not assume an entity lifecycle hook here
   // handles it; none exists.
-  @Column({ type: 'blob', nullable: true })
+  @Column({ type: BINARY_COLUMN_TYPE, nullable: true })
   dateOfBirthEncrypted: Buffer; // Encrypted DOB
 
-  @Column({ type: 'blob', nullable: true })
+  @Column({ type: BINARY_COLUMN_TYPE, nullable: true })
   medicalHistoryEncrypted: Buffer; // Encrypted medical history
 
-  @Column({ type: 'blob', nullable: true })
+  @Column({ type: BINARY_COLUMN_TYPE, nullable: true })
   allergiesEncrypted: Buffer; // Encrypted allergies
 
-  @Column({ type: 'blob', nullable: true })
+  @Column({ type: BINARY_COLUMN_TYPE, nullable: true })
   medicationsEncrypted: Buffer; // Encrypted medications
 
   // Encryption tracking
@@ -97,13 +98,13 @@ export class UserProfile {
   @Column({ type: 'boolean', default: true })
   consentEssentialCookies: boolean;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: Date, nullable: true })
   consentMarketingUpdatedAt: Date;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: Date, nullable: true })
   consentDataProcessingUpdatedAt: Date;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: Date, nullable: true })
   consentThirdPartySharingUpdatedAt: Date;
 
   @CreateDateColumn()

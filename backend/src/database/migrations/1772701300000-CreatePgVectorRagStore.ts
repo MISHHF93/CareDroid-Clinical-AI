@@ -4,8 +4,15 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
  * Optional pgvector-backed RAG store (Cycle 65 / D5).
  *
  * Safe on SQLite: extension/table create is skipped (pgvector is Postgres-only).
- * On Postgres without the extension available, CREATE EXTENSION may fail in
- * locked-down hosts — operators can install the extension separately and re-run.
+ *
+ * Safe on Postgres without pgvector too: the store is optional (RAG_VECTOR_DB),
+ * so an unavailable extension must not abort the mandatory migration chain
+ * behind it -- which is exactly what `CREATE EXTENSION` did on a stock
+ * postgres:15 image (the CI service and `npm run db:verify`) until 2026-09-03,
+ * leaving every later migration unapplied. The migration records itself as
+ * run; installing pgvector later means re-creating the table by hand or via
+ * the store's own bootstrap, the same as the original comment asked of
+ * operators.
  */
 export class CreatePgVectorRagStore1772701300000 implements MigrationInterface {
   name = 'CreatePgVectorRagStore1772701300000';
@@ -13,6 +20,16 @@ export class CreatePgVectorRagStore1772701300000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     const isPostgres = queryRunner.connection.options.type === 'postgres';
     if (!isPostgres) {
+      return;
+    }
+
+    const available: Array<{ name: string }> = await queryRunner.query(
+      `SELECT name FROM pg_available_extensions WHERE name = 'vector'`,
+    );
+    if (available.length === 0) {
+      console.warn(
+        '[migration] pgvector is not available on this Postgres; skipping the optional caredroid_rag_vectors store',
+      );
       return;
     }
 

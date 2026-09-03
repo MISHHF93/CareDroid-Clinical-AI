@@ -35,7 +35,7 @@ export class EncryptionKey {
   @Column({ type: 'varchar', length: 255, nullable: true })
   rotationReason: string;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: Date, nullable: true })
   scheduledTime: Date;
 
   @Column({ type: 'int', default: 0 })
@@ -47,10 +47,10 @@ export class EncryptionKey {
   @CreateDateColumn()
   createdAt: Date;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: Date, nullable: true })
   activatedAt: Date;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: Date, nullable: true })
   deletionScheduledAt: Date;
 
   @Column({

@@ -45,13 +45,13 @@ export class UsageEvent {
   @Column({ type: 'varchar', length: 30 })
   unit: UsageUnit;
 
-  @Column({ type: 'datetime' })
+  @Column({ type: Date })
   periodStart: Date;
 
-  @Column({ type: 'datetime' })
+  @Column({ type: Date })
   periodEnd: Date;
 
-  @Column({ type: 'datetime' })
+  @Column({ type: Date })
   occurredAt: Date;
 
   @Column({
@@ -64,6 +64,6 @@ export class UsageEvent {
   })
   metadata: Record<string, any> | null;
 
-  @CreateDateColumn({ type: 'datetime' })
+  @CreateDateColumn()
   createdAt: Date;
 }

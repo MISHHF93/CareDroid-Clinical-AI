@@ -55,7 +55,7 @@ export class CollaborationMessage {
   @Column({ type: 'simple-json', nullable: true })
   mentionedUserIds: string[] | null;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: Date, nullable: true })
   pinnedAt: Date | null;
 
   @Column({ type: 'uuid', nullable: true })
@@ -68,10 +68,10 @@ export class CollaborationMessage {
   @Column({ type: 'varchar', length: 96, nullable: true })
   sourceId: string | null;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: Date, nullable: true })
   editedAt: Date | null;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: Date, nullable: true })
   deletedAt: Date | null;
 
   @Column({ type: 'uuid', nullable: true })

@@ -10,6 +10,7 @@ import { AppController } from './app.controller';
 
 // Configuration
 import { buildPostgresOptions } from './config/database-url.config';
+import { resolveDatabaseClient } from './config/database-client.config';
 import { jwtConfig, oauthConfig, sessionConfig } from './config/auth.config';
 import emailConfig from './config/email.config';
 import redisConfig from './config/redis.config';
@@ -102,24 +103,6 @@ import { SmartIntakeModule } from './modules/smart-intake/smart-intake.module';
 import { LoggerModule } from './modules/common/logger.module';
 import { MetricsModule } from './modules/metrics/metrics.module';
 import { HttpMetricsInterceptor } from './common/interceptors/http-metrics.interceptor';
-
-function resolveDatabaseClient() {
-  const config = getEnvironmentConfig();
-  const configuredClient = config.database.sql.client;
-  if (configuredClient) return configuredClient;
-
-  const hasExplicitPostgresConfig = [
-    config.database.sql.url,
-    config.database.sql.host !== 'localhost' ? config.database.sql.host : '',
-    config.database.sql.username !== 'postgres' ? config.database.sql.username : '',
-    config.database.sql.password !== 'postgres' ? config.database.sql.password : '',
-    config.database.sql.databaseName !== 'caredroid' ? config.database.sql.databaseName : '',
-  ].some(Boolean);
-
-  return config.server.nodeEnv === 'development' && !hasExplicitPostgresConfig
-    ? 'sqlite'
-    : 'postgres';
-}
 
 @Module({
   imports: [

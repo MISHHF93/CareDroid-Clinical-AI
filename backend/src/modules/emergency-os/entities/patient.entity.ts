@@ -1,4 +1,5 @@
 import { Column, CreateDateColumn, Entity, Index, PrimaryColumn, UpdateDateColumn } from 'typeorm';
+import { BINARY_COLUMN_TYPE } from '../../../config/database-client.config';
 
 @Entity('patients')
 @Index(['state'])
@@ -33,25 +34,25 @@ export class Patient {
   @Column({ type: 'varchar', length: 64 })
   mrn: string;
 
-  @Column({ type: 'blob', nullable: true })
+  @Column({ type: BINARY_COLUMN_TYPE, nullable: true })
   mrnEncrypted?: Buffer;
 
   @Column({ type: 'varchar', length: 120 })
   firstName: string;
 
-  @Column({ type: 'blob', nullable: true })
+  @Column({ type: BINARY_COLUMN_TYPE, nullable: true })
   firstNameEncrypted?: Buffer;
 
   @Column({ type: 'varchar', length: 120 })
   lastName: string;
 
-  @Column({ type: 'blob', nullable: true })
+  @Column({ type: BINARY_COLUMN_TYPE, nullable: true })
   lastNameEncrypted?: Buffer;
 
   @Column({ type: 'varchar', length: 32 })
   dob: string;
 
-  @Column({ type: 'blob', nullable: true })
+  @Column({ type: BINARY_COLUMN_TYPE, nullable: true })
   dobEncrypted?: Buffer;
 
   @Column({ type: 'int' })

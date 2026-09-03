@@ -138,7 +138,7 @@ export class IntegrationEventRecordEntity {
   @Column({ type: 'text', nullable: true })
   error: string | null;
 
-  @Column({ type: 'datetime' })
+  @Column({ type: Date })
   receivedAt: Date;
 
   @CreateDateColumn()
@@ -192,10 +192,10 @@ export class NormalizedIntegrationEventEntity {
   @Column({ type: 'simple-json', default: '[]' })
   labels: string[];
 
-  @Column({ type: 'datetime' })
+  @Column({ type: Date })
   occurredAt: Date;
 
-  @Column({ type: 'datetime' })
+  @Column({ type: Date })
   receivedAt: Date;
 
   @CreateDateColumn()

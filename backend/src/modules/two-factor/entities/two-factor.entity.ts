@@ -27,7 +27,7 @@ export class TwoFactor {
   @Column({ type: 'simple-array', nullable: true })
   backupCodes: string[] | null; // Hashed backup codes
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: Date, nullable: true })
   lastUsedAt: Date;
 
   @CreateDateColumn()

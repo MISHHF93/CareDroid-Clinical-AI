@@ -66,7 +66,7 @@ export class AutomationAuditEvent {
   @Column({ type: 'text', nullable: true })
   error: string;
 
-  @Column({ type: 'datetime' })
+  @Column({ type: Date })
   timestamp: Date;
 
   @Column({ type: 'boolean', default: false })

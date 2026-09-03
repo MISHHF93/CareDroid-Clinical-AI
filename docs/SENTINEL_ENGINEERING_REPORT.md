@@ -95,7 +95,7 @@ TypeORM entities (SQLite/Postgres compatible):
 - `sentinel_outbox`, `sentinel_integration_cursors`  
 - `sentinel_ai_recommendations`  
 
-Migration stub: `backend/src/database/migrations/1772500000000-CreateSentinelTables.ts`  
+Migration stub: `backend/src/database/migrations-superseded/1772500000000-CreateSentinelTables.ts`  
 (Dev SQLite uses `synchronize: true` so entities auto-create.)
 
 ---
@@ -187,7 +187,7 @@ This uses SQLite (this program's standard local dev/test datastore), not Postgre
 
 - `lib/sentinel/**`  
 - `backend/src/modules/sentinel/**`  
-- `backend/src/database/migrations/1772500000000-CreateSentinelTables.ts`  
+- `backend/src/database/migrations-superseded/1772500000000-CreateSentinelTables.ts`  
 - `src/services/sentinel/**`  
 - `src/types/sentinel.ts`  
 - `docs/architecture/sentinel-architecture.md`  

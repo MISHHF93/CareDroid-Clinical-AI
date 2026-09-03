@@ -44,7 +44,7 @@ export class DeviceToken {
   @Column({ type: 'boolean', default: true })
   isActive: boolean;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: Date, nullable: true })
   lastUsedAt: Date;
 
   @CreateDateColumn()

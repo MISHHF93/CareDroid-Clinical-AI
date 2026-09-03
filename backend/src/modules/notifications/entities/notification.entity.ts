@@ -73,16 +73,16 @@ export class Notification {
   @Column({ type: 'text', nullable: true })
   errorMessage: string;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: Date, nullable: true })
   sentAt: Date;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: Date, nullable: true })
   deliveredAt: Date;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: Date, nullable: true })
   readAt: Date;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: Date, nullable: true })
   expiresAt: Date;
 
   @CreateDateColumn()

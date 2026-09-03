@@ -25,6 +25,11 @@ const BASE_BACKEND_ROUTE_EXPOSURE_POLICY = Object.freeze({
   'GET /api/auth/oidc': { strategy: 'deferred', reason: 'SSO placeholder' },
   'GET /api/auth/saml': { strategy: 'deferred', reason: 'SSO placeholder' },
   'GET /api/auth/me': { strategy: 'deferred', reason: 'JWT introspection; SPA uses profile' },
+  'GET /api/auth/dev-session': {
+    strategy: 'backend-only',
+    reason:
+      'Read-only probe of the shared singleton dev user (role + persisted persona) consumed by scripts/doctor.mjs (DEV PERSONA line); same env gate as the POST, issues no token, writes nothing; 403 in production posture',
+  },
 
   'DELETE /api/auth/biometric/disable/:deviceId': {
     strategy: 'expose-recommended',

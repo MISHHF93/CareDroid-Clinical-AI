@@ -8,6 +8,9 @@ import { Column, CreateDateColumn, Entity, Index, PrimaryColumn, UpdateDateColum
 @Index('cig_nodes_tenant_type', ['tenantId', 'entityType'])
 @Index('cig_nodes_tenant_updated', ['tenantId', 'updatedAt'])
 @Index('cig_nodes_tenant_phi', ['tenantId', 'phiClass'])
+// Partial index from the former hand-written CreateCigOperationalGraph
+// migration; declared here so the generated schema carries it.
+@Index('cig_nodes_tenant_active', ['tenantId'], { where: 'archived_at IS NULL' })
 @Index('UQ_cig_nodes_tenant_entity_source', ['tenantId', 'entityType', 'sourceId'], {
   unique: true,
 })
@@ -58,7 +61,7 @@ export class CigNodeEntity {
   @Column({ name: 'durability', type: 'varchar', length: 16 })
   durability: string;
 
-  @Column({ name: 'source_updated_at', type: 'datetime' })
+  @Column({ name: 'source_updated_at', type: Date })
   sourceUpdatedAt: Date;
 
   /** Per-node content revision (C2) */
@@ -76,13 +79,13 @@ export class CigNodeEntity {
   lastGraphVersion?: string | number | null;
 
   /** Soft-archive only — null means active in hot set */
-  @Column({ name: 'archived_at', type: 'datetime', nullable: true })
+  @Column({ name: 'archived_at', type: Date, nullable: true })
   archivedAt?: Date | null;
 
-  @CreateDateColumn({ name: 'created_at', type: 'datetime' })
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updated_at', type: 'datetime' })
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
   @Column({ name: 'audit_cursor', type: 'varchar', length: 120, nullable: true })

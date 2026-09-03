@@ -55,22 +55,22 @@ export class Subscription {
   @Column({ type: 'varchar', enum: SubscriptionStatus, default: SubscriptionStatus.ACTIVE })
   status: SubscriptionStatus;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: Date, nullable: true })
   currentPeriodStart: Date;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: Date, nullable: true })
   currentPeriodEnd: Date;
 
   @Column({ type: 'boolean', default: false })
   cancelAtPeriodEnd: boolean;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: Date, nullable: true })
   canceledAt: Date;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: Date, nullable: true })
   trialStart: Date | null;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: Date, nullable: true })
   trialEnd: Date | null;
 
   @Column({ type: 'simple-json', nullable: true })

@@ -19,7 +19,7 @@ export class ToolResult {
   @Column({ type: 'simple-json', nullable: true })
   output: Record<string, any>;
 
-  @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
+  @Column({ type: Date, default: () => 'CURRENT_TIMESTAMP' })
   timestamp: Date;
 
   @CreateDateColumn()

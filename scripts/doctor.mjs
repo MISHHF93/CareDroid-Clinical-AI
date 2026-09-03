@@ -12,7 +12,7 @@
  *
  * Run: npm run doctor
  */
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { createConnection } from 'node:net';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -258,6 +258,55 @@ if (backendUp) {
     );
   } else {
     warn('DEV PERSONA', `GET /api/auth/dev-session returned ${status}`, 'Inspect the backend logs.');
+  }
+}
+
+// ── database ─────────────────────────────────────────────────────────────────
+// Development runs SQLite with synchronize:true, so the Postgres migrations in
+// backend/src/database/migrations are exercised by nothing on this machine
+// except `npm run db:verify` (throwaway Docker Postgres) and CI. Say so, and
+// say whether db:verify can run here. Read-only: doctor opens no database.
+{
+  const backendEnv = existsSync(join(ROOT, 'backend/.env'))
+    ? readFileSync(join(ROOT, 'backend/.env'), 'utf8')
+    : '';
+  const clientMatch = backendEnv.match(/^\s*DATABASE_CLIENT\s*=\s*([^\s#]+)/m);
+  const client = clientMatch ? clientMatch[1].toLowerCase() : '';
+  const migrationsDir = join(ROOT, 'backend/src/database/migrations');
+  const migrationCount = existsSync(migrationsDir)
+    ? readdirSync(migrationsDir).filter((f) => /^\d+-.+\.ts$/.test(f)).length
+    : 0;
+  if (client === 'sqlite') {
+    pass(
+      'DATABASE',
+      `sqlite (backend/.env) — the dev schema is synchronized from the entities; the ${migrationCount} Postgres migration(s) run only in npm run db:verify and CI`,
+    );
+  } else if (client === 'postgres') {
+    pass('DATABASE', 'postgres (backend/.env) — migrations run at startup (migrationsRun: true)');
+  } else {
+    warn(
+      'DATABASE',
+      'backend/.env sets no DATABASE_CLIENT — the resolver picks sqlite in development and postgres otherwise',
+      'Set DATABASE_CLIENT=sqlite (dev) or DATABASE_CLIENT=postgres explicitly so migration:run and npm start agree.',
+    );
+  }
+  if (migrationCount === 0) {
+    fail('DB:VERIFY', 'backend/src/database/migrations holds no migrations', 'npm run db:migration -- InitialSchema');
+  } else {
+    try {
+      const dockerVersion = execSync('docker info --format {{.ServerVersion}}', {
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'ignore'],
+        timeout: 5000,
+      }).trim();
+      pass('DB:VERIFY', `Docker ${dockerVersion} available — npm run db:verify can prove the migration chain here`);
+    } catch {
+      warn(
+        'DB:VERIFY',
+        'Docker is not running — npm run db:verify cannot run on this machine',
+        'Start Docker Desktop before a schema change ships; CI runs db:verify against its own Postgres service either way.',
+      );
+    }
   }
 }
 

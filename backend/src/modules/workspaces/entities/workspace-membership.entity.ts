@@ -62,10 +62,10 @@ export class WorkspaceMembership {
   })
   status: WorkspaceMembershipStatus;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: Date, nullable: true })
   joinedAt: Date;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: Date, nullable: true })
   lastAccessedAt: Date;
 
   @ManyToOne('Workspace', (workspace: any) => workspace.memberships, { onDelete: 'CASCADE' })

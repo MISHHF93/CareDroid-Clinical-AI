@@ -32,7 +32,7 @@ export class OAuthAccount {
   @Column({ type: 'varchar', length: 255, nullable: true })
   refreshToken: string;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: Date, nullable: true })
   tokenExpiry: Date;
 
   @Column({ type: 'simple-json', nullable: true })

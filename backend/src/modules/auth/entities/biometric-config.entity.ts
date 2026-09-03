@@ -47,7 +47,7 @@ export class BiometricConfig {
   @Column({ type: 'varchar', length: 500, nullable: true })
   challengeToken: string;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: Date, nullable: true })
   lastUsedAt: Date;
 
   @Column({ type: 'int', default: 0 })
@@ -57,7 +57,7 @@ export class BiometricConfig {
   @Column({ type: 'int', default: 0 })
   failedAttempts: number;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: Date, nullable: true })
   lockedUntil: Date | null;
 
   @CreateDateColumn()

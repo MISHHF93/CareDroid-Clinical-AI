@@ -7,6 +7,7 @@ import {
   OneToOne,
   OneToMany,
 } from 'typeorm';
+import { BINARY_COLUMN_TYPE } from '../../../config/database-client.config';
 import { Exclude } from 'class-transformer';
 import { UserProfile } from './user-profile.entity';
 import { OAuthAccount } from './oauth-account.entity';
@@ -39,7 +40,7 @@ export class User {
   @Column({ type: 'varchar', length: 255, unique: true })
   email: string; // Will be encrypted at rest
 
-  @Column({ type: 'blob', nullable: true })
+  @Column({ type: BINARY_COLUMN_TYPE, nullable: true })
   @Exclude()
   emailEncrypted: Buffer; // Encrypted email for at-rest encryption
 
@@ -54,14 +55,14 @@ export class User {
   @Exclude()
   emailVerificationToken: string | null;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: Date, nullable: true })
   emailVerificationExpiry: Date | null;
 
   @Column({ type: 'varchar', length: 64, nullable: true })
   @Exclude()
   passwordResetToken: string | null;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: Date, nullable: true })
   passwordResetExpiry: Date | null;
 
   @Column({ type: 'boolean', default: true })
@@ -70,18 +71,18 @@ export class User {
   @Column({ type: 'varchar', enum: UserRole, default: UserRole.STUDENT })
   role: UserRole;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: Date, nullable: true })
   lastLoginAt: Date;
 
   @Column({ type: 'varchar', length: 45, nullable: true })
   lastLoginIp: string;
 
   // PHI columns - encrypted at rest
-  @Column({ type: 'blob', nullable: true })
+  @Column({ type: BINARY_COLUMN_TYPE, nullable: true })
   @Exclude()
   phoneEncrypted: Buffer; // Encrypted phone number
 
-  @Column({ type: 'blob', nullable: true })
+  @Column({ type: BINARY_COLUMN_TYPE, nullable: true })
   @Exclude()
   ssnEncrypted: Buffer; // Encrypted SSN (if collected)
 

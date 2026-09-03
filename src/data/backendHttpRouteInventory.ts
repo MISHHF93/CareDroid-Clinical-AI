@@ -127,6 +127,7 @@ export const BACKEND_HTTP_ROUTES = Object.freeze([
   { method: 'POST', path: '/api/auth/register', controller: 'AuthController' },
   { method: 'POST', path: '/api/auth/login', controller: 'AuthController' },
   { method: 'POST', path: '/api/auth/dev-session', controller: 'AuthController' },
+  { method: 'GET', path: '/api/auth/dev-session', controller: 'AuthController' },
   { method: 'POST', path: '/api/auth/verify-2fa', controller: 'AuthController' },
   { method: 'GET', path: '/api/auth/verify-email', controller: 'AuthController' },
   { method: 'GET', path: '/api/auth/google', controller: 'AuthController' },

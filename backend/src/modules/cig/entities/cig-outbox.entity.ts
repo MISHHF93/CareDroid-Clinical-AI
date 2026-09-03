@@ -6,6 +6,7 @@ import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn } from 
  */
 @Entity({ name: 'cig_outbox' })
 @Index('cig_outbox_tenant_created', ['tenantId', 'createdAt'])
+@Index('cig_outbox_unprocessed', ['createdAt'], { where: 'processed_at IS NULL' })
 export class CigOutboxEntity {
   @PrimaryGeneratedColumn({ name: 'id', type: 'integer' })
   id: string;
@@ -19,9 +20,9 @@ export class CigOutboxEntity {
   @Column({ name: 'payload_json', type: 'simple-json' })
   payloadJson: Record<string, unknown>;
 
-  @CreateDateColumn({ name: 'created_at', type: 'datetime' })
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @Column({ name: 'processed_at', type: 'datetime', nullable: true })
+  @Column({ name: 'processed_at', type: Date, nullable: true })
   processedAt?: Date | null;
 }

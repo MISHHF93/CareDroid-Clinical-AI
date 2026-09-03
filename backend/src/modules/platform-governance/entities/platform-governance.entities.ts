@@ -48,10 +48,10 @@ export class PlatformGovernancePolicy {
   @Column({ type: 'uuid', nullable: true })
   approvedBy: string;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: Date, nullable: true })
   effectiveAt: Date;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: Date, nullable: true })
   retiredAt: Date;
 
   @CreateDateColumn()
@@ -240,10 +240,10 @@ export class PlatformEquityMetric {
   @Column({ type: 'int', default: 0 })
   denominator: number;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: Date, nullable: true })
   windowStart: Date;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: Date, nullable: true })
   windowEnd: Date;
 
   @Column({ type: 'simple-json', nullable: true })
@@ -323,7 +323,7 @@ export class PlatformReviewItem {
   @Column({ type: 'uuid', nullable: true })
   assignedTo: string;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: Date, nullable: true })
   dueAt: Date;
 
   @Column({ type: 'simple-json', nullable: true })
@@ -358,13 +358,13 @@ export class PlatformConsentRecord {
   @Column({ type: 'varchar', length: 40, default: PlatformGovernanceStatus.NEEDS_REVIEW })
   status: PlatformGovernanceStatus;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: Date, nullable: true })
   grantedAt: Date;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: Date, nullable: true })
   expiresAt: Date;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: Date, nullable: true })
   revokedAt: Date;
 
   @Column({ type: 'varchar', length: 80, default: 'platform' })
@@ -416,7 +416,7 @@ export class PlatformPrivacyRequest {
   @Column({ type: 'uuid', nullable: true })
   reviewedBy: string;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: Date, nullable: true })
   dueAt: Date;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
@@ -499,7 +499,7 @@ export class PlatformSourceProvenance {
   @Column({ type: 'varchar', length: 80 })
   resourceType: string;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: Date, nullable: true })
   fetchedAt: Date;
 
   @Column({ type: 'varchar', length: 40, default: 'demo' })

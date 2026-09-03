@@ -2,11 +2,16 @@ import { DataSource, DataSourceOptions } from 'typeorm';
 import { config } from 'dotenv';
 import { join } from 'path';
 import { buildPostgresOptions } from './config/database-url.config';
+import { resolveDatabaseClient } from './config/database-client.config';
 
 // Load environment variables
 config();
 
-const DB_CLIENT = (process.env.DATABASE_CLIENT || '').toLowerCase();
+// Same resolver as app.module.ts. Until 2026-09-03 this file read
+// DATABASE_CLIENT raw and defaulted to Postgres while the app defaulted to
+// SQLite in development, so `migration:run` and `npm start` could silently
+// target different databases from the same shell.
+const DB_CLIENT = resolveDatabaseClient();
 
 const dataSourceOptions = (DB_CLIENT === 'sqlite'
   ? {

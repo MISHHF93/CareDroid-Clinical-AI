@@ -9,6 +9,16 @@ import { Column, Entity, Index, PrimaryColumn } from 'typeorm';
 @Index('cig_edges_tenant_from', ['tenantId', 'fromId'])
 @Index('cig_edges_tenant_to', ['tenantId', 'toId'])
 @Index('cig_edges_tenant_type', ['tenantId', 'type'])
+// Partial indexes from the former hand-written CreateCigOperationalGraph
+// migration. cig_edges_current_uniq is a correctness constraint: at most one
+// *current* (valid_to IS NULL) edge per tenant/type/from/to.
+@Index('cig_edges_current_uniq', ['tenantId', 'type', 'fromId', 'toId'], {
+  unique: true,
+  where: 'valid_to IS NULL',
+})
+@Index('cig_edges_from_current', ['tenantId', 'fromId'], { where: 'valid_to IS NULL' })
+@Index('cig_edges_to_current', ['tenantId', 'toId'], { where: 'valid_to IS NULL' })
+@Index('cig_edges_type_current', ['tenantId', 'type'], { where: 'valid_to IS NULL' })
 export class CigEdgeEntity {
   @PrimaryColumn({ name: 'id', type: 'varchar', length: 640 })
   id: string;
@@ -28,17 +38,17 @@ export class CigEdgeEntity {
   @Column({ name: 'label', type: 'varchar', length: 500, nullable: true })
   label?: string | null;
 
-  @Column({ name: 'weight', type: 'double', nullable: true })
+  @Column({ name: 'weight', type: 'double precision', nullable: true })
   weight?: number | null;
 
-  @Column({ name: 'confidence', type: 'double', nullable: true })
+  @Column({ name: 'confidence', type: 'double precision', nullable: true })
   confidence?: number | null;
 
-  @Column({ name: 'valid_from', type: 'datetime' })
+  @Column({ name: 'valid_from', type: Date })
   validFrom: Date;
 
   /** null = current edge */
-  @Column({ name: 'valid_to', type: 'datetime', nullable: true })
+  @Column({ name: 'valid_to', type: Date, nullable: true })
   validTo?: Date | null;
 
   @Column({ name: 'source_module', type: 'varchar', length: 120 })

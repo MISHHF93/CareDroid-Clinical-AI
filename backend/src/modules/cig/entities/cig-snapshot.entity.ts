@@ -12,7 +12,7 @@ export class CigSnapshotEntity {
   @Column({ name: 'version', type: 'bigint' })
   version: string | number;
 
-  @Column({ name: 'generated_at', type: 'datetime' })
+  @Column({ name: 'generated_at', type: Date })
   generatedAt: Date;
 
   @Column({ name: 'node_count', type: 'int' })

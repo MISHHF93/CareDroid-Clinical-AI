@@ -108,10 +108,10 @@ export class CollaborationChannel {
   @Column({ type: 'int', nullable: true })
   retentionPolicyDays: number | null;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: Date, nullable: true })
   archivedAt: Date | null;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: Date, nullable: true })
   resolvedAt: Date | null;
 
   @CreateDateColumn()

@@ -20,10 +20,10 @@ export class CigEventEntity {
   @Column({ name: 'version', type: 'int' })
   version: number;
 
-  @Column({ name: 'occurred_at', type: 'datetime' })
+  @Column({ name: 'occurred_at', type: Date })
   occurredAt: Date;
 
-  @Column({ name: 'received_at', type: 'datetime', nullable: true })
+  @Column({ name: 'received_at', type: Date, nullable: true })
   receivedAt?: Date | null;
 
   @Column({ name: 'producer', type: 'varchar', length: 160 })

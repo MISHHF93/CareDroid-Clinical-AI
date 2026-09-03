@@ -106,7 +106,7 @@ export class AIQuery {
   })
   metadata: Record<string, any>; // Additional metadata (temperature, top_p, etc.)
 
-  @CreateDateColumn({ type: 'datetime' })
+  @CreateDateColumn()
   createdAt: Date;
 
   // Relations

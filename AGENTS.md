@@ -33,7 +33,11 @@ npm run verify      # typecheck BOTH sides + lint + docs + deps + architecture
 ```
 
 `npm run verify:full` adds the whole test suite; `npm run production:check` adds
-both builds. Run the whole frontend suite with `npm run test:run:parallel` —
+both builds and `npm run db:verify`, which runs the Postgres migration chain on
+a throwaway Docker Postgres and fails if the schema it produces differs from
+the entities. Nothing else executes the migrations — development is SQLite
+with `synchronize`. Changed an entity? `npm run db:migration -- <PascalCaseName>`
+generates the migration and re-verifies; commit the file. Run the whole frontend suite with `npm run test:run:parallel` —
 plain `vitest run` is serial. `npm run validate:ci` is a **subset**, so a green
 CI is a weaker claim than a green `verify:full`. Never edit source while a full
 suite run is in flight.

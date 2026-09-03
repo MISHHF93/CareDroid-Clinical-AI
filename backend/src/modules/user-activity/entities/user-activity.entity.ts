@@ -34,7 +34,7 @@ export class UserActivity {
   @Column({ type: 'simple-json', nullable: true })
   metadata: Record<string, any>;
 
-  @Column({ type: 'datetime' })
+  @Column({ type: Date })
   occurredAt: Date;
 
   @CreateDateColumn()

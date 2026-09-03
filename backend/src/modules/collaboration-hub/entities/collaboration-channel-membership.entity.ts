@@ -65,10 +65,10 @@ export class CollaborationChannelMembership {
   @Column({ type: 'uuid', nullable: true })
   lastReadMessageId: string | null;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: Date, nullable: true })
   lastReadAt: Date | null;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: Date, nullable: true })
   joinedAt: Date | null;
 
   @ManyToOne('CollaborationChannel', { onDelete: 'CASCADE' })

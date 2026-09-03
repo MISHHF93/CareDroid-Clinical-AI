@@ -39,7 +39,7 @@ export class WorkspaceInvitation {
   })
   status: WorkspaceInvitationStatus;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: Date, nullable: true })
   expiresAt: Date;
 
   @CreateDateColumn()

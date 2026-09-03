@@ -26,12 +26,12 @@ export class RefreshToken {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @Column({ name: 'expires_at', type: 'datetime' })
+  @Column({ name: 'expires_at', type: Date })
   expiresAt: Date;
 
   @Column({ name: 'revoked', type: 'boolean', default: false })
   revoked: boolean;
 
-  @CreateDateColumn({ name: 'created_at', type: 'datetime' })
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 }

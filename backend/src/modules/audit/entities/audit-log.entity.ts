@@ -75,7 +75,7 @@ export class AuditLog {
   @Column({ type: 'text', nullable: true })
   metadata: Record<string, any>;
 
-  @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
+  @Column({ type: Date, default: () => 'CURRENT_TIMESTAMP' })
   timestamp: Date;
 
   // Cryptographic integrity fields (blockchain-style chaining)
