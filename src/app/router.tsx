@@ -1083,6 +1083,26 @@ export function AppRoutes() {
           }
         />
         {/* ── Specialty clinical tool detail pages (/emergency/tools/<specialty>/:toolId) ── */}
+        {/*
+          These eight specialty assistants keep LITERAL paths on purpose, even
+          though CANONICAL_ROUTES.toolsCardiology and friends exist and match
+          them exactly. They are sub-pages of the tools console and are guarded
+          by CANONICAL_ROUTES.emergencyTools -- the parent permission -- which
+          is deliberate: canonical access has no entries for the individual
+          `/emergency/tools/<specialty>/:toolId` paths, so guarding each with
+          its own constant would make canRoute() fail closed and deny every
+          role a page that works today.
+
+          Writing the constants here instead trips
+          router.routeGuardPathConsistency.test.ts (HEAL-320), which requires a
+          <Route path={CANONICAL_ROUTES.X}> to be guarded by the same X --
+          verified by doing exactly that and watching all eight fail. Closing
+          the gap properly means adding these paths to the permission map,
+          which is an authorization change needing its own evidence and tests,
+          not a tidy-up. Until then the literals are the honest form: they say
+          "this route is governed by its parent", and the test stays meaningful
+          for every route that does own its guard.
+        */}
         <Route path="/emergency/tools/cardiology/:toolId" element={<CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyTools}><LazyRoute label="Loading cardiology assistant..."><CardiologyAssistantPage /></LazyRoute></CareDroidRouteGuard>} />
         <Route path="/emergency/tools/nephrology/:toolId" element={<CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyTools}><LazyRoute label="Loading nephrology assistant..."><NephrologyAssistantPage /></LazyRoute></CareDroidRouteGuard>} />
         <Route path="/emergency/tools/neurology/:toolId" element={<CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyTools}><LazyRoute label="Loading neurology assistant..."><NeurologyAssistantPage /></LazyRoute></CareDroidRouteGuard>} />
