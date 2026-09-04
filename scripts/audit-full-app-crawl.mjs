@@ -66,27 +66,58 @@ console.log(
   `${staticRoutes.length} static routes to crawl (browser rotates every ${ROTATE_EVERY} pages), ${dynamicRoutes.length} dynamic (skipped, need real ids).`,
 );
 
-function authStorage() {
-  return {
-    caredroid_access_token: 'full-app-crawl-token',
-    caredroid_user_profile: JSON.stringify({
-      id: 'full-app-crawl-user',
-      email: 'crawl@caredroid.local',
-      name: 'Full App Crawl',
-      role: 'super_admin',
-      fullName: 'Full App Crawl',
-      isEmailVerified: true,
-      twoFactorEnabled: false,
-    }),
-  };
+/**
+ * A real backend dev session, so the crawl sees each page's AUTHENTICATED
+ * render. Until 2026-09-04 this returned a made-up token string: every API
+ * call answered 401, so all 200 pages were crawled in their logged-out or
+ * error state and the crawl could not have caught a crash in the real one.
+ *
+ * The POST carries no roleProfileId on purpose. Passing one would persist a
+ * new persona on the single shared dev user, changing what every other
+ * developer, agent and Playwright run on this machine sees (see AGENTS.md).
+ * The crawl runs as whatever persona that user already holds and records it
+ * in the report, so a page that legitimately denies that role is read as a
+ * denial rather than a defect.
+ */
+async function resolveAuthStorage() {
+  const apiBase = process.env.QA_API_BASE_URL || 'http://localhost:8000';
+  try {
+    const response = await fetch(`${apiBase}/api/auth/dev-session`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: '{}',
+    });
+    if (!response.ok) throw new Error(`dev-session responded ${response.status}`);
+    const session = await response.json();
+    const token = session.accessToken || session.access_token || session.token;
+    if (!token) throw new Error('dev-session returned no token');
+    return {
+      persona: {
+        email: session.user?.email ?? null,
+        role: session.user?.role ?? null,
+        roleProfileId: session.user?.profile?.roleProfileId ?? null,
+      },
+      storage: {
+        caredroid_access_token: token,
+        caredroid_user_profile: JSON.stringify(session.user ?? {}),
+      },
+    };
+  } catch (error) {
+    console.warn(
+      `Could not mint a dev session (${error.message}); crawling UNAUTHENTICATED — every page will render its logged-out state.`,
+    );
+    return { persona: null, storage: {} };
+  }
 }
+
+let authStorageValue = { persona: null, storage: {} };
 
 async function newBrowserContext() {
   const browser = await chromium.launch({ executablePath: EDGE_PATH });
   const context = await browser.newContext({ viewport: { width: 1600, height: 1000 } });
   await context.addInitScript((storage) => {
     for (const [key, value] of Object.entries(storage)) localStorage.setItem(key, value);
-  }, authStorage());
+  }, authStorageValue.storage);
   return { browser, context };
 }
 
@@ -149,6 +180,14 @@ const isFlaggedRow = (r) =>
   r.isBlank || r.hasOverflow || r.pageErrors.length > 0 || Boolean(r.navError);
 
 async function main() {
+  authStorageValue = await resolveAuthStorage();
+  if (authStorageValue.persona) {
+    const { email, role, roleProfileId } = authStorageValue.persona;
+    console.log(
+      `Authenticated as the shared dev user ${email} (role=${role}, persona=${roleProfileId}).`,
+    );
+  }
+
   const results = [];
   let { browser, context } = await newBrowserContext();
   let pagesOnThisBrowser = 0;
@@ -213,6 +252,9 @@ async function main() {
   const confirmed = results.filter((r) => !r.transient);
   const summary = {
     generatedAt: new Date().toISOString(),
+    // Which persona the pages rendered for. A page that denies this role is a
+    // denial, not a defect; read the flags with this in view.
+    crawledAs: authStorageValue.persona ?? 'unauthenticated',
     totalCrawled: results.length,
     totalSkippedDynamic: dynamicRoutes.length,
     transient: results.filter((r) => r.transient).length,
