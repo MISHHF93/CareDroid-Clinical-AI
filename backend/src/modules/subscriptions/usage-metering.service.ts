@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Between, Repository } from 'typeorm';
+import { Between, Like, Repository } from 'typeorm';
 import { TenantContext } from '../tenant-context/tenant-context.types';
 import { UsageEvent } from './entities/usage-event.entity';
 import {
@@ -33,6 +33,21 @@ interface UsagePeriod {
   start: Date;
   end: Date;
 }
+
+/** A usage row as the summaries consume it: an aggregate over one dimension tuple (eventCount rows summed) or a plain entity (eventCount undefined). */
+type AggregatedUsageEvent = Pick<
+  UsageEvent,
+  | 'organizationId'
+  | 'eventType'
+  | 'meterId'
+  | 'workspaceId'
+  | 'assetId'
+  | 'userRole'
+  | 'userId'
+  | 'source'
+  | 'unit'
+  | 'quantity'
+> & { metadata?: Record<string, any> | string | null; eventCount?: number; id?: string };
 
 type MeterBillingReadiness = 'operational' | 'future-billing-candidate';
 
@@ -213,13 +228,10 @@ export class UsageMeteringService {
     subscriptionPlan?: string | null;
   }) {
     const period = this.resolvePeriod(options.period || 'month');
-    const events = await this.usageEventRepository.find({
-      where: {
-        organizationId: options.organizationId,
-        occurredAt: Between(period.start, period.end),
-      },
-      order: { occurredAt: 'DESC' },
-    });
+    const [events, recentEvents] = await Promise.all([
+      this.loadAggregatedEvents(options.organizationId, period),
+      this.loadRecentEvents(options.organizationId, period),
+    ]);
     const plan = getSubscriptionPlanDefinition(options.subscriptionPlan);
     const limitByType = new Map(plan.limits.map((limit) => [limit.eventType, limit]));
     const activeUsers = this.countUnique(
@@ -253,7 +265,7 @@ export class UsageMeteringService {
         byRole: this.groupUsage(events, (event) => event.userRole || 'unknown'),
         byEventType: this.groupUsage(events, (event) => event.eventType),
       },
-      recentEvents: events.slice(0, 25).map((event) => ({
+      recentEvents: recentEvents.map((event) => ({
         id: event.id,
         eventType: event.eventType,
         meterId: event.meterId || this.meterIdForEvent(event),
@@ -271,13 +283,11 @@ export class UsageMeteringService {
 
   async getUsageMeteringFramework(options: { organizationId: string; period?: string }) {
     const period = this.resolvePeriod(options.period || 'month');
-    const events = await this.usageEventRepository.find({
-      where: {
-        organizationId: options.organizationId,
-        occurredAt: Between(period.start, period.end),
-      },
-      order: { occurredAt: 'DESC' },
-    });
+    const [events, recentEvents, integrationEvents] = await Promise.all([
+      this.loadAggregatedEvents(options.organizationId, period),
+      this.loadRecentEvents(options.organizationId, period),
+      this.loadIntegrationEvents(options.organizationId, period),
+    ]);
 
     const meters = USAGE_METERING_FRAMEWORK.map((definition) =>
       this.buildFrameworkMeter(definition, events),
@@ -330,11 +340,11 @@ export class UsageMeteringService {
         byMeter: this.groupUsage(events, (event) => this.meterIdForEvent(event)),
         bySource: this.groupUsage(events, (event) => event.source || 'unknown'),
         byIntegration: this.groupUsage(
-          events.filter((event) => this.isIntegrationEvent(event)),
+          integrationEvents.filter((event) => this.isIntegrationEvent(event)),
           (event) => this.integrationKey(event),
         ),
       },
-      recentEvents: events.slice(0, 25).map((event) => ({
+      recentEvents: recentEvents.map((event) => ({
         id: event.id,
         eventType: event.eventType,
         meterId: this.meterIdForEvent(event),
@@ -384,7 +394,95 @@ export class UsageMeteringService {
     };
   }
 
-  private buildFrameworkMeter(definition: UsageMeterDefinition, events: UsageEvent[]) {
+  /**
+   * One aggregated row per distinct (eventType, meterId, workspace, asset,
+   * role, user, source, unit) combination in the period, with the quantity
+   * summed and the row count carried as eventCount. Every consumer of the
+   * summary works from sums and counts on those dimensions, so nothing is
+   * lost -- except that the aggregation cannot read `metadata`, which is why
+   * the integration breakdown loads its (few) full rows separately.
+   *
+   * Until 2026-09-04 both summaries hydrated every usage row of the month as
+   * an entity and reduced in JavaScript. With one organization at 4.2 million
+   * rows (see UsageMeteringInterceptor for where they came from) that took
+   * 9-15 seconds per billing page and grew with every request.
+   */
+  private async loadAggregatedEvents(
+    organizationId: string,
+    period: UsagePeriod,
+  ): Promise<AggregatedUsageEvent[]> {
+    const rows: Array<Record<string, unknown>> = await this.usageEventRepository
+      .createQueryBuilder('event')
+      .select('event.eventType', 'eventType')
+      .addSelect('event.meterId', 'meterId')
+      .addSelect('event.workspaceId', 'workspaceId')
+      .addSelect('event.assetId', 'assetId')
+      .addSelect('event.userRole', 'userRole')
+      .addSelect('event.userId', 'userId')
+      .addSelect('event.source', 'source')
+      .addSelect('event.unit', 'unit')
+      .addSelect('SUM(event.quantity)', 'quantity')
+      .addSelect('COUNT(*)', 'eventCount')
+      .where('event.organizationId = :organizationId', { organizationId })
+      .andWhere('event.occurredAt BETWEEN :start AND :end', {
+        start: period.start,
+        end: period.end,
+      })
+      .groupBy('event.eventType')
+      .addGroupBy('event.meterId')
+      .addGroupBy('event.workspaceId')
+      .addGroupBy('event.assetId')
+      .addGroupBy('event.userRole')
+      .addGroupBy('event.userId')
+      .addGroupBy('event.source')
+      .addGroupBy('event.unit')
+      .getRawMany();
+
+    return rows.map((row) => {
+      const source = typeof row.source === 'string' ? row.source : null;
+      return {
+        organizationId,
+        eventType: row.eventType as UsageEventType,
+        meterId: (row.meterId as string | null) ?? null,
+        workspaceId: (row.workspaceId as string | null) ?? null,
+        assetId: (row.assetId as string | null) ?? null,
+        userRole: (row.userRole as string | null) ?? null,
+        userId: (row.userId as string | null) ?? null,
+        source,
+        unit: row.unit as UsageEvent['unit'],
+        quantity: Number(row.quantity || 0),
+        eventCount: Number(row.eventCount || 0),
+        // The only metadata the classifiers can still see: the request path
+        // the interceptor stores as `source`. Rows written by this service
+        // carry a resolved meterId, which the classifiers check first.
+        metadata: source ? { source, path: source } : {},
+      } as AggregatedUsageEvent;
+    });
+  }
+
+  /** The 25 latest rows, as entities, for the recent-events list. */
+  private loadRecentEvents(organizationId: string, period: UsagePeriod, take = 25) {
+    return this.usageEventRepository.find({
+      where: { organizationId, occurredAt: Between(period.start, period.end) },
+      order: { occurredAt: 'DESC' },
+      take,
+    });
+  }
+
+  /** Integration rows carry their identity in metadata, so they are loaded in full; they are few. */
+  private loadIntegrationEvents(organizationId: string, period: UsagePeriod) {
+    const window = { organizationId, occurredAt: Between(period.start, period.end) };
+    return this.usageEventRepository.find({
+      where: [
+        { ...window, eventType: UsageEventType.INTEGRATION },
+        { ...window, meterId: 'integrations' },
+        { ...window, source: Like('%/integrations/%') },
+      ],
+      order: { occurredAt: 'DESC' },
+    });
+  }
+
+  private buildFrameworkMeter(definition: UsageMeterDefinition, events: AggregatedUsageEvent[]) {
     const matchedEvents = events.filter((event) => this.eventMatchesMeter(definition.id, event));
     const value =
       definition.id === 'user-seats' ? this.activeUserValue(events) : this.sum(matchedEvents);
@@ -394,14 +492,14 @@ export class UsageMeteringService {
       value,
       unit: definition.unit,
       eventTypes: definition.eventTypes,
-      events: matchedEvents.length,
+      events: matchedEvents.reduce((count, event) => count + (event.eventCount ?? 1), 0),
       billingReadiness: definition.billingReadiness,
       billingSeparated: true,
       description: definition.description,
     };
   }
 
-  private eventMatchesMeter(meterId: string, event: UsageEvent) {
+  private eventMatchesMeter(meterId: string, event: AggregatedUsageEvent) {
     if (event.meterId === meterId) return true;
     if (meterId === 'user-seats') {
       return Boolean(event.userId) || event.eventType === UsageEventType.ACTIVE_USER;
@@ -412,7 +510,7 @@ export class UsageMeteringService {
     return Boolean(definition?.eventTypes.includes(event.eventType));
   }
 
-  private meterIdForEvent(event: UsageEvent) {
+  private meterIdForEvent(event: AggregatedUsageEvent) {
     if (event.meterId) return event.meterId;
     if (this.isIntegrationEvent(event)) return 'integrations';
     if (this.isWorkflowEvent(event)) return 'workflow-executions';
@@ -424,7 +522,7 @@ export class UsageMeteringService {
     return event.eventType;
   }
 
-  private activeUserValue(events: UsageEvent[]) {
+  private activeUserValue(events: AggregatedUsageEvent[]) {
     const explicitActiveUsers = this.sum(
       events.filter((event) => event.eventType === UsageEventType.ACTIVE_USER),
     );
@@ -434,12 +532,12 @@ export class UsageMeteringService {
     return Math.max(uniqueUsers, explicitActiveUsers);
   }
 
-  private isWorkflowEvent(event: UsageEvent) {
+  private isWorkflowEvent(event: AggregatedUsageEvent) {
     const text = this.metadataText(event, ['surface', 'eventType', 'workflowId', 'workflowSlug']);
     return text.includes('workflow');
   }
 
-  private isIntegrationEvent(event: UsageEvent) {
+  private isIntegrationEvent(event: AggregatedUsageEvent) {
     if (event.eventType === UsageEventType.INTEGRATION) return true;
     const text = this.metadataText(event, [
       'surface',
@@ -452,7 +550,7 @@ export class UsageMeteringService {
     return text.includes('integration') || text.includes('/integrations/');
   }
 
-  private integrationKey(event: UsageEvent) {
+  private integrationKey(event: AggregatedUsageEvent) {
     const metadata = this.metadata(event);
     return (
       this.metadataString(metadata, 'integrationSlug') ||
@@ -464,19 +562,22 @@ export class UsageMeteringService {
     );
   }
 
-  private groupUsage(events: UsageEvent[], keyOf: (event: UsageEvent) => string) {
+  private groupUsage(
+    events: AggregatedUsageEvent[],
+    keyOf: (event: AggregatedUsageEvent) => string,
+  ) {
     const groups = new Map<string, { key: string; quantity: number; events: number }>();
     for (const event of events) {
       const key = keyOf(event);
       const current = groups.get(key) || { key, quantity: 0, events: 0 };
       current.quantity += Number(event.quantity || 0);
-      current.events += 1;
+      current.events += event.eventCount ?? 1;
       groups.set(key, current);
     }
     return Array.from(groups.values()).sort((a, b) => b.quantity - a.quantity);
   }
 
-  private sum(events: UsageEvent[]): number {
+  private sum(events: AggregatedUsageEvent[]): number {
     return events.reduce((total, event) => total + Number(event.quantity || 0), 0);
   }
 

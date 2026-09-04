@@ -7,12 +7,57 @@ import { UsageMeteringService } from './usage-metering.service';
 
 describe('UsageMeteringService', () => {
   let service: UsageMeteringService;
+  /**
+   * What the database's GROUP BY would return for the fixture rows the test
+   * hands to `find`: one row per distinct dimension tuple with the quantity
+   * summed and the row count in eventCount. The summaries aggregate in SQL
+   * since 2026-09-04; the fixtures stay as plain rows so the expectations
+   * below keep describing real usage, not pre-aggregated numbers.
+   */
+  const aggregateOf = (rows: Array<Record<string, any>>) => {
+    const groups = new Map<string, Record<string, any>>();
+    for (const row of rows) {
+      const key = [
+        row.eventType,
+        row.meterId ?? null,
+        row.workspaceId ?? null,
+        row.assetId ?? null,
+        row.userRole ?? null,
+        row.userId ?? null,
+        row.source ?? null,
+        row.unit ?? null,
+      ].join('|');
+      const group = groups.get(key) || {
+        eventType: row.eventType,
+        meterId: row.meterId ?? null,
+        workspaceId: row.workspaceId ?? null,
+        assetId: row.assetId ?? null,
+        userRole: row.userRole ?? null,
+        userId: row.userId ?? null,
+        source: row.source ?? null,
+        unit: row.unit ?? null,
+        quantity: 0,
+        eventCount: 0,
+      };
+      group.quantity += Number(row.quantity || 0);
+      group.eventCount += 1;
+      groups.set(key, group);
+    }
+    return [...groups.values()];
+  };
   const insertQueryBuilder = {
     insert: jest.fn().mockReturnThis(),
     into: jest.fn().mockReturnThis(),
     values: jest.fn().mockReturnThis(),
     orIgnore: jest.fn().mockReturnThis(),
     execute: jest.fn().mockResolvedValue(undefined),
+    select: jest.fn().mockReturnThis(),
+    addSelect: jest.fn().mockReturnThis(),
+    where: jest.fn().mockReturnThis(),
+    andWhere: jest.fn().mockReturnThis(),
+    groupBy: jest.fn().mockReturnThis(),
+    addGroupBy: jest.fn().mockReturnThis(),
+    getRawMany: jest.fn(async () => aggregateOf((await usageEventRepository.find()) || [])),
   };
   const usageEventRepository = {
     create: jest.fn((entity) => entity),
@@ -221,6 +266,10 @@ describe('UsageMeteringService', () => {
         userRole: 'physician',
         assetId: 'workflow-builder',
         eventType: UsageEventType.API_CALL,
+        // recordUsage() resolves meterId from this metadata at write time and
+        // stores it (every one of the 4.2M rows in the dev database has one);
+        // the aggregated summary classifies by that stored meterId.
+        meterId: 'workflow-executions',
         quantity: 3,
         unit: 'request',
         occurredAt: new Date(),
