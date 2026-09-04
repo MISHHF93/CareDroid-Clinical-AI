@@ -69,6 +69,21 @@ describe('UsageMeteringInterceptor', () => {
     expect(usageMeteringService.recordFromTenantContext).not.toHaveBeenCalled();
   });
 
+  it.each(['/api/emergency/realtime/stream', '/api/collaboration/realtime/stream'])(
+    'does not bill the server-sent-event stream %s as an API call',
+    async (path) => {
+      const usageMeteringService = { recordFromTenantContext: jest.fn() };
+      const interceptor = new UsageMeteringInterceptor(usageMeteringService as any);
+
+      await firstValueFrom(
+        interceptor.intercept(buildContext({ path }), { handle: () => of('ok') } as any),
+      );
+      await new Promise((resolve) => setImmediate(resolve));
+
+      expect(usageMeteringService.recordFromTenantContext).not.toHaveBeenCalled();
+    },
+  );
+
   it('does not call recordFromTenantContext when there is no tenant context', async () => {
     const usageMeteringService = { recordFromTenantContext: jest.fn() };
     const interceptor = new UsageMeteringInterceptor(usageMeteringService as any);

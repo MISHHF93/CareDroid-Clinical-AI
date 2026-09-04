@@ -9,6 +9,14 @@ const SKIPPED_PATH_PREFIXES = [
   '/api/subscriptions/webhook',
   '/metrics',
   '/health',
+  // Server-sent-event streams are a transport, not an API call: every
+  // reconnect of the whiteboard's live feed was recorded as a billable
+  // api_call. In the development database that was 82% of the latest
+  // 60,000 usage rows (4.2 million in total, up to 200k a day for one
+  // organization), and it is what made the billing and usage endpoints
+  // take 9-15 seconds (2026-09-04 backend route sweep).
+  '/api/emergency/realtime/stream',
+  '/api/collaboration/realtime/stream',
 ];
 
 @Injectable()
