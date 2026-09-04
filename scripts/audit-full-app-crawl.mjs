@@ -150,12 +150,23 @@ async function probeRoute(context, name, path) {
 
   let httpStatus = null;
   let navError = null;
+  let streamHeldOpen = false;
   try {
+    // NOT waitUntil:'networkidle'. An authenticated page opens a server-sent
+    // event stream and holds the connection open, so the network never goes
+    // idle and page.goto times out after 20s -- which this script recorded as
+    // `navError`, and therefore as a CRASH. On 2026-09-04 that produced 14
+    // "crashes" (/admin, /dashboard, /triage, every auth route) whose pages a
+    // direct probe rendered cleanly with zero page errors. Navigate on
+    // domcontentloaded, then wait for quiet only as a courtesy.
     const resp = await page.goto(`${baseURL}${path}`, {
-      waitUntil: 'networkidle',
+      waitUntil: 'domcontentloaded',
       timeout: 20000,
     });
     httpStatus = resp ? resp.status() : null;
+    await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {
+      streamHeldOpen = true;
+    });
     await page.waitForTimeout(1200);
   } catch (err) {
     navError = err.message;
@@ -181,6 +192,8 @@ async function probeRoute(context, name, path) {
     path,
     httpStatus,
     navError,
+    // Expected on this app wherever a live feed is open; recorded, never flagged.
+    streamHeldOpen,
     isBlank,
     bodyPreview: bodyText.slice(0, 80),
     hasOverflow,
@@ -275,6 +288,9 @@ async function main() {
     totalCrawled: results.length,
     totalSkippedDynamic: dynamicRoutes.length,
     transient: results.filter((r) => r.transient).length,
+    // Pages holding a live feed open. Informational: this is what made
+    // waitUntil:'networkidle' unusable here.
+    streamHeldOpen: results.filter((r) => r.streamHeldOpen).length,
     crashed: confirmed.filter((r) => r.pageErrors.length > 0 || r.navError).length,
     blank: confirmed.filter((r) => r.isBlank).length,
     overflow: confirmed.filter((r) => r.hasOverflow).length,
