@@ -77,8 +77,19 @@ export class LoggingMiddleware implements NestMiddleware {
         userId: userId || undefined,
       });
 
-      // Log with appropriate level based on status code
-      if (statusCode >= 500) {
+      // Log with appropriate level based on status code. A 503 from the
+      // health endpoint is the endpoint doing its job (reporting "not ready"
+      // while dependencies come up), not a server failure: during every boot
+      // it produced three "Server Error" entries with a 12-field dump each
+      // and three Sentry events, which buried real 5xx lines in the dev log.
+      const isHealthProbe = /^\/(api\/)?health(\/|\?|$)/.test(originalUrl);
+      if (statusCode >= 500 && isHealthProbe) {
+        logger.warn(`Health probe answered ${statusCode} (dependencies not ready yet)`, {
+          url: originalUrl,
+          statusCode,
+          duration,
+        });
+      } else if (statusCode >= 500) {
         logger.error('Server Error', logEntry);
         Sentry.captureMessage(`HTTP ${statusCode} - ${method} ${originalUrl}`, 'error');
       } else if (statusCode >= 400) {
