@@ -67,10 +67,19 @@ console.log(
 );
 
 /**
- * A real backend dev session, so the crawl sees each page's AUTHENTICATED
- * render. Until 2026-09-04 this returned a made-up token string: every API
- * call answered 401, so all 200 pages were crawled in their logged-out or
- * error state and the crawl could not have caught a crash in the real one.
+ * Storage that gets the crawl past the route gate AND past the API.
+ *
+ * Two things have to be true at once, and each was missing on its own:
+ *
+ *   - the token must be a REAL backend session token, or every API call the
+ *     page makes answers 401 and the crawl only ever measures the error
+ *     state. Until 2026-09-04 this seeded the literal string
+ *     'full-app-crawl-token'.
+ *   - the stored profile must carry `authMode: 'explicit-dev-bypass'`, or
+ *     router.tsx's useUnauthenticatedRedirectGate bounces every route to
+ *     /login (it admits only 'real' or dev-bypass, and a raw backend user
+ *     object carries neither). Seeding the real token alone did exactly
+ *     that: all 200 routes rendered the marketing/login page.
  *
  * The POST carries no roleProfileId on purpose. Passing one would persist a
  * new persona on the single shared dev user, changing what every other
@@ -91,15 +100,23 @@ async function resolveAuthStorage() {
     const session = await response.json();
     const token = session.accessToken || session.access_token || session.token;
     if (!token) throw new Error('dev-session returned no token');
+    const user = session.user ?? {};
     return {
       persona: {
-        email: session.user?.email ?? null,
-        role: session.user?.role ?? null,
-        roleProfileId: session.user?.profile?.roleProfileId ?? null,
+        email: user.email ?? null,
+        role: user.role ?? null,
+        roleProfileId: user.profile?.roleProfileId ?? null,
       },
       storage: {
         caredroid_access_token: token,
-        caredroid_user_profile: JSON.stringify(session.user ?? {}),
+        caredroid_user_profile: JSON.stringify({
+          ...user,
+          fullName: user.fullName || user.name || 'Full App Crawl',
+          isEmailVerified: true,
+          twoFactorEnabled: false,
+          authMode: 'explicit-dev-bypass',
+          isDevAuthBypass: true,
+        }),
       },
     };
   } catch (error) {
