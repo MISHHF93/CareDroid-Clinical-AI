@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { isConfiguredCredential } from '../../config/credentials.util';
 import * as nodemailer from 'nodemailer';
 import { Transporter } from 'nodemailer';
 
@@ -40,9 +41,23 @@ export class EmailService {
             : undefined,
       });
 
-      this.logger.log(
-        `✅ Email service initialized with SMTP server: ${emailConfig.smtp.host}:${emailConfig.smtp.port}`,
-      );
+      // Say what is actually true. backend/.env.example ships
+      // SMTP_PASSWORD=your-sendgrid-api-key and the local .env still holds it,
+      // so this line printed a tick for a transporter whose every send will
+      // fail SMTP authentication (2026-09-04). The transporter is still built
+      // -- an unusual-but-real credential must not be disabled by a heuristic
+      // -- only the claim changes.
+      const credentialsLookConfigured =
+        !emailConfig.smtp.auth?.user || isConfiguredCredential(emailConfig.smtp.auth?.pass);
+      if (credentialsLookConfigured) {
+        this.logger.log(
+          `✅ Email service initialized with SMTP server: ${emailConfig.smtp.host}:${emailConfig.smtp.port}`,
+        );
+      } else {
+        this.logger.warn(
+          `Email service initialized against ${emailConfig.smtp.host}:${emailConfig.smtp.port}, but SMTP_PASSWORD still holds the documented placeholder — every send will fail authentication. Callers see sent:false.`,
+        );
+      }
     } catch (error) {
       this.logger.error('Failed to initialize email service:', error);
     }
