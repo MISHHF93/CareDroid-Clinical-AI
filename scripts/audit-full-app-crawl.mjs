@@ -90,10 +90,78 @@ async function newBrowserContext() {
   return { browser, context };
 }
 
+/** Load one route in the given context and measure it. Pure observation; no side effects on `results`. */
+async function probeRoute(context, name, path) {
+  const page = await context.newPage();
+  const pageErrors = [];
+  const consoleErrors = [];
+  page.on('pageerror', (err) => pageErrors.push(err.message));
+  page.on('console', (msg) => {
+    if (msg.type() === 'error') consoleErrors.push(msg.text());
+  });
+
+  let httpStatus = null;
+  let navError = null;
+  try {
+    const resp = await page.goto(`${baseURL}${path}`, {
+      waitUntil: 'networkidle',
+      timeout: 20000,
+    });
+    httpStatus = resp ? resp.status() : null;
+    await page.waitForTimeout(1200);
+  } catch (err) {
+    navError = err.message;
+  }
+
+  let bodyText = '';
+  let scrollWidth = 0;
+  let clientWidth = 0;
+  try {
+    bodyText = await page.evaluate(() => document.body?.innerText?.trim() || '');
+    scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
+    clientWidth = await page.evaluate(() => document.documentElement.clientWidth);
+  } catch {
+    /* page may have crashed hard; leave defaults */
+  }
+
+  const isBlank = bodyText.length < 20;
+  const hasOverflow = scrollWidth > clientWidth + 24;
+  const hasCrash = pageErrors.length > 0 || Boolean(navError);
+
+  const row = {
+    name,
+    path,
+    httpStatus,
+    navError,
+    isBlank,
+    bodyPreview: bodyText.slice(0, 80),
+    hasOverflow,
+    overflowBy: hasOverflow ? scrollWidth - clientWidth : 0,
+    pageErrors,
+    consoleErrorCount: consoleErrors.length,
+    consoleErrorSample: consoleErrors.slice(0, 3),
+    flagged: isBlank || hasOverflow || hasCrash,
+  };
+  return { row, page };
+}
+
+const isFlaggedRow = (r) =>
+  r.isBlank || r.hasOverflow || r.pageErrors.length > 0 || Boolean(r.navError);
+
 async function main() {
   const results = [];
   let { browser, context } = await newBrowserContext();
   let pagesOnThisBrowser = 0;
+
+  // Warm the dev server first. Vite optimises dependencies on the first
+  // request after it starts, and whichever route happens to be first in the
+  // crawl then loads blank or throws mid-optimisation -- on 2026-09-04 that was
+  // /auth, which a direct probe seconds later rendered cleanly.
+  {
+    const { page } = await probeRoute(context, 'warm-up', '/');
+    await page.close();
+    pagesOnThisBrowser++;
+  }
 
   for (const [name, path] of staticRoutes) {
     if (pagesOnThisBrowser >= ROTATE_EVERY) {
@@ -103,86 +171,55 @@ async function main() {
     }
     pagesOnThisBrowser++;
 
-    const page = await context.newPage();
-    const pageErrors = [];
-    const consoleErrors = [];
-    page.on('pageerror', (err) => pageErrors.push(err.message));
-    page.on('console', (msg) => {
-      if (msg.type() === 'error') consoleErrors.push(msg.text());
-    });
-
-    let httpStatus = null;
-    let navError = null;
-    try {
-      const resp = await page.goto(`${baseURL}${path}`, {
-        waitUntil: 'networkidle',
-        timeout: 20000,
-      });
-      httpStatus = resp ? resp.status() : null;
-      await page.waitForTimeout(1200);
-    } catch (err) {
-      navError = err.message;
-    }
-
-    let bodyText = '';
-    let scrollWidth = 0;
-    let clientWidth = 0;
-    try {
-      bodyText = await page.evaluate(() => document.body?.innerText?.trim() || '');
-      scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
-      clientWidth = await page.evaluate(() => document.documentElement.clientWidth);
-    } catch {
-      /* page may have crashed hard; leave defaults */
-    }
-
-    const isBlank = bodyText.length < 20;
-    const hasOverflow = scrollWidth > clientWidth + 24;
-    const hasCrash = pageErrors.length > 0 || Boolean(navError);
-    const flagged = isBlank || hasOverflow || hasCrash;
-
-    const row = {
-      name,
-      path,
-      httpStatus,
-      navError,
-      isBlank,
-      bodyPreview: bodyText.slice(0, 80),
-      hasOverflow,
-      overflowBy: hasOverflow ? scrollWidth - clientWidth : 0,
-      pageErrors,
-      consoleErrorCount: consoleErrors.length,
-      consoleErrorSample: consoleErrors.slice(0, 3),
-    };
+    const { row, page } = await probeRoute(context, name, path);
     results.push(row);
-
-    if (flagged) {
-      const safeName = name.replace(/[^\w-]/g, '_');
-      try {
-        await page.screenshot({ path: join(shotDir, `${safeName}.png`), fullPage: false });
-        row.screenshot = `screenshots/${safeName}.png`;
-      } catch {
-        /* ignore screenshot failure */
-      }
+    if (row.flagged) {
       console.log(
-        `FLAGGED ${name} (${path}) — crash:${hasCrash} blank:${isBlank} overflow:${hasOverflow}`,
+        `FLAGGED ${name} (${path}) — crash:${row.pageErrors.length > 0 || Boolean(row.navError)} blank:${row.isBlank} overflow:${row.hasOverflow} (re-verifying at the end)`,
       );
     }
-
     await page.close();
   }
 
   await browser.close();
 
+  // Re-verify every flagged page in its own fresh browser. A flag that does
+  // not reproduce is a transient (cold server, browser resource exhaustion),
+  // recorded as such and kept out of the failure counts; a flag that does
+  // reproduce is real and gets its screenshot.
+  for (const row of results.filter((r) => r.flagged)) {
+    const fresh = await newBrowserContext();
+    const second = await probeRoute(fresh.context, row.name, row.path);
+    if (second.row.flagged) {
+      Object.assign(row, second.row, { transient: false, confirmedTwice: true });
+      const safeName = row.name.replace(/[^\w-]/g, '_');
+      try {
+        await second.page.screenshot({ path: join(shotDir, `${safeName}.png`), fullPage: false });
+        row.screenshot = `screenshots/${safeName}.png`;
+      } catch {
+        /* ignore screenshot failure */
+      }
+      console.log(
+        `CONFIRMED ${row.name} (${row.path}) — crash:${row.pageErrors.length > 0 || Boolean(row.navError)} blank:${row.isBlank} overflow:${row.hasOverflow}`,
+      );
+    } else {
+      Object.assign(row, second.row, { transient: true, firstPass: { ...row } });
+      console.log(`TRANSIENT ${row.name} (${row.path}) — clean on re-verification, not counted`);
+    }
+    await second.page.close();
+    await fresh.browser.close();
+  }
+
+  const confirmed = results.filter((r) => !r.transient);
   const summary = {
     generatedAt: new Date().toISOString(),
     totalCrawled: results.length,
     totalSkippedDynamic: dynamicRoutes.length,
-    crashed: results.filter((r) => r.pageErrors.length > 0 || r.navError).length,
-    blank: results.filter((r) => r.isBlank).length,
-    overflow: results.filter((r) => r.hasOverflow).length,
-    clean: results.filter(
-      (r) => !r.isBlank && !r.hasOverflow && r.pageErrors.length === 0 && !r.navError,
-    ).length,
+    transient: results.filter((r) => r.transient).length,
+    crashed: confirmed.filter((r) => r.pageErrors.length > 0 || r.navError).length,
+    blank: confirmed.filter((r) => r.isBlank).length,
+    overflow: confirmed.filter((r) => r.hasOverflow).length,
+    clean: results.filter((r) => r.transient || !isFlaggedRow(r)).length,
   };
   writeFileSync(
     join(outDir, 'report.json'),

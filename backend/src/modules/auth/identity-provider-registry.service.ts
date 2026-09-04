@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { isOAuthProviderConfigured } from './config/oauth-credentials.util';
 
 export type IdentityProviderStatus = 'supported' | 'planned' | 'unavailable';
 
@@ -20,9 +21,17 @@ export class IdentityProviderRegistryService {
   constructor(private readonly configService: ConfigService) {}
 
   getRegistry() {
-    const googleConfigured = Boolean(
-      this.configService.get<{ google?: { clientId?: string } }>('oauth')?.google?.clientId ||
-        process.env.GOOGLE_CLIENT_ID,
+    // Placeholder credentials from .env.example are not a configuration:
+    // Boolean(clientId) advertised Google as "supported" with
+    // 'your-google-client-id…' in place (2026-09-04 backend sweep).
+    const oauth = this.configService.get<{
+      google?: { clientId?: string; clientSecret?: string };
+    }>('oauth');
+    const googleConfigured = isOAuthProviderConfigured(
+      oauth?.google ?? {
+        clientId: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      },
     );
 
     const providers: IdentityProviderRegistryEntry[] = [

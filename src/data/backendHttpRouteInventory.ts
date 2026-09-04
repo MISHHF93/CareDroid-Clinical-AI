@@ -1461,7 +1461,7 @@ export const BACKEND_HTTP_ROUTES = Object.freeze([
     controller: 'WorkspacesController',
   },
 
-  { method: 'GET', path: '/api/metrics', controller: 'MetricsController' },
+  { method: 'GET', path: '/metrics', controller: 'MetricsController' },
 
   { method: 'GET', path: '/api/auth/magic-link/verify', controller: 'AuthController' },
   { method: 'POST', path: '/api/auth/forgot-password', controller: 'AuthController' },

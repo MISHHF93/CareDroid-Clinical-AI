@@ -384,7 +384,11 @@ const BASE_BACKEND_ROUTE_EXPOSURE_POLICY = Object.freeze({
   'POST /api/ai/structured': { strategy: 'backend-only', reason: 'Invoked via chat pipeline' },
   'GET /api/ai/usage': { strategy: 'deferred', reason: 'Usage meter UI' },
 
-  'GET /api/metrics': { strategy: 'backend-only', reason: 'Prometheus scrape' },
+  'GET /metrics': {
+    strategy: 'backend-only',
+    reason:
+      'Prometheus scrape target; outside the /api prefix on purpose (main.ts setGlobalPrefix exclude)',
+  },
 
   'GET /api/emergency/staff': {
     strategy: 'deferred',

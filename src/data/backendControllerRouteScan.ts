@@ -24,6 +24,13 @@ export function buildEffectiveHttpPath(controllerPrefix, handlerPath, httpMethod
   if (isAppHealthProbe) {
     return '/health';
   }
+  // main.ts: app.setGlobalPrefix('api', { exclude: ['health', 'metrics', ''] }).
+  // The Prometheus scrape target is served at /metrics, not /api/metrics; the
+  // inventory carried the prefixed path for a year and the live route 404'd
+  // in the 2026-09-04 backend sweep while this test kept passing.
+  if (controllerPrefix === 'metrics' && !handlerPath) {
+    return '/metrics';
+  }
 
   const parts = ['api'];
   if (controllerPrefix) {

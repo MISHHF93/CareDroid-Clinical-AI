@@ -20,7 +20,10 @@ describe('backendControllerRouteScan', () => {
   it('maps empty handler to controller root', () => {
     expect(buildEffectiveHttpPath('tools', '')).toBe('/api/tools');
     expect(buildEffectiveHttpPath('drugs', '', 'POST')).toBe('/api/drugs');
-    expect(buildEffectiveHttpPath('metrics', '')).toBe('/api/metrics');
+    // main.ts excludes 'metrics' from the /api global prefix: Prometheus
+    // scrapes /metrics. The inventory said /api/metrics for a year and the
+    // live path 404'd (2026-09-04 backend sweep) while this line agreed with it.
+    expect(buildEffectiveHttpPath('metrics', '')).toBe('/metrics');
   });
 
   it('parses tool orchestrator routes', () => {

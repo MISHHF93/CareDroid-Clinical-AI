@@ -15,6 +15,7 @@ import { Response, Request } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { OAuthProviderConfiguredGuard } from './guards/oauth-provider-configured.guard';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { IsEmail, IsString, IsOptional } from 'class-validator';
 import { AuthService } from './auth.service';
@@ -161,7 +162,7 @@ export class AuthController {
   }
 
   @Get('google')
-  @UseGuards(AuthGuard('google'))
+  @UseGuards(OAuthProviderConfiguredGuard('google'), AuthGuard('google'))
   @ApiOperation({ summary: 'Initiate Google OAuth login' })
   async googleLogin() {
     // Passport handles this
@@ -174,7 +175,7 @@ export class AuthController {
   }
 
   @Get('google/callback')
-  @UseGuards(AuthGuard('google'))
+  @UseGuards(OAuthProviderConfiguredGuard('google'), AuthGuard('google'))
   @ApiOperation({ summary: 'Google OAuth callback' })
   async googleCallback(@Req() req: any, @Res() res: Response) {
     const accessToken = req.user?.accessToken;
@@ -190,14 +191,14 @@ export class AuthController {
   }
 
   @Get('linkedin')
-  @UseGuards(AuthGuard('linkedin'))
+  @UseGuards(OAuthProviderConfiguredGuard('linkedin'), AuthGuard('linkedin'))
   @ApiOperation({ summary: 'Initiate LinkedIn OAuth login' })
   async linkedinLogin() {
     // Passport handles this
   }
 
   @Get('linkedin/callback')
-  @UseGuards(AuthGuard('linkedin'))
+  @UseGuards(OAuthProviderConfiguredGuard('linkedin'), AuthGuard('linkedin'))
   @ApiOperation({ summary: 'LinkedIn OAuth callback' })
   async linkedinCallback(@Req() req: any, @Res() res: Response) {
     const accessToken = req.user?.accessToken;
