@@ -1,6 +1,6 @@
 import { CanActivate, Injectable, ServiceUnavailableException, mixin, Type } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { isOAuthProviderConfigured } from '../config/oauth-credentials.util';
+import { isOAuthProviderConfigured } from '../../../config/credentials.util';
 
 export type OAuthProviderName = 'google' | 'linkedin';
 

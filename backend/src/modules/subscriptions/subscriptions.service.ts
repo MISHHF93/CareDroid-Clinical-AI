@@ -12,6 +12,7 @@ import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
 import { Subscription, SubscriptionTier, SubscriptionStatus } from './entities/subscription.entity';
 import { User } from '../users/entities/user.entity';
+import { isConfiguredCredential } from '../../config/credentials.util';
 import { AuditService } from '../audit/audit.service';
 import { AuditAction } from '../audit/entities/audit-log.entity';
 import {
@@ -45,7 +46,13 @@ export class SubscriptionsService {
     @Optional() private readonly usageMeteringService?: UsageMeteringService,
   ) {
     const secretKey = this.configService.get<string>('stripe.secretKey');
-    if (!secretKey) {
+    // isConfiguredCredential, not a truthiness check: backend/.env.example
+    // ships 'sk_test_your_stripe_secret_key' and the local .env still holds
+    // it, so `if (!secretKey)` built a Stripe client with a placeholder key.
+    // Checkout then failed inside Stripe's SDK instead of raising the clean
+    // "Payment processing is not configured." this branch already intends
+    // (found 2026-09-04 alongside the identical OAuth defect).
+    if (!isConfiguredCredential(secretKey)) {
       this.logger.warn('Stripe secret key not configured. Payment features will be disabled.');
       this.stripe = null;
     } else {

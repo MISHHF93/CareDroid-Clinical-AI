@@ -1,6 +1,6 @@
 import { ServiceUnavailableException } from '@nestjs/common';
-import { isConfiguredCredential, isOAuthProviderConfigured } from './oauth-credentials.util';
-import { OAuthProviderConfiguredGuard } from '../guards/oauth-provider-configured.guard';
+import { isConfiguredCredential, isOAuthProviderConfigured } from './credentials.util';
+import { OAuthProviderConfiguredGuard } from '../modules/auth/guards/oauth-provider-configured.guard';
 
 describe('isConfiguredCredential', () => {
   it.each([

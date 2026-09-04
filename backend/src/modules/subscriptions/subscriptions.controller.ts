@@ -17,6 +17,7 @@ import { Request } from 'express';
 import { SubscriptionsService } from './subscriptions.service';
 import { CreateCheckoutDto } from './dto/create-checkout.dto';
 import { CustomerPortalDto } from './dto/customer-portal.dto';
+import { isConfiguredCredential } from '../../config/credentials.util';
 import { RecordUsageEventDto } from './dto/record-usage-event.dto';
 import {
   ResolveSubscriptionEntitlementDto,
@@ -59,8 +60,10 @@ export class SubscriptionsController {
   @ApiOperation({ summary: 'Get Stripe public configuration' })
   @ApiResponse({ status: 200, description: 'Stripe publishable key' })
   async getStripeConfig() {
-    const publishableKey = this.configService.get<string>('stripe.publishableKey') || '';
-    return { publishableKey };
+    // A placeholder key would initialise Stripe.js in the browser and fail
+    // there; report it as absent so callers can hide payment affordances.
+    const configured = this.configService.get<string>('stripe.publishableKey');
+    return { publishableKey: isConfiguredCredential(configured) ? configured : '' };
   }
 
   @Post('create-checkout')
