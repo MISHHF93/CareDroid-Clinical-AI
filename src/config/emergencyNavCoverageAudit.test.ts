@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
@@ -32,7 +32,22 @@ function writeCoverageReport() {
   };
 
   mkdirSync(dirname(reportPath), { recursive: true });
-  writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+  // Rewrite the committed report only when its findings changed. A fresh
+  // generatedAt on every run dirtied the working tree after each full suite
+  // and produced commits whose only content was a timestamp (946b0226,
+  // 55d06f46, ...). If nothing but the timestamp differs, keep the old one.
+  const serialize = (value: typeof report) => `${JSON.stringify(value, null, 2)}\n`;
+  if (existsSync(reportPath)) {
+    try {
+      const previous = JSON.parse(readFileSync(reportPath, 'utf8')) as typeof report;
+      const same =
+        serialize({ ...previous, generatedAt: report.generatedAt }) === serialize(report);
+      if (same) return previous;
+    } catch {
+      // unreadable or malformed: fall through and rewrite
+    }
+  }
+  writeFileSync(reportPath, serialize(report), 'utf8');
   return report;
 }
 
