@@ -192,10 +192,22 @@ class ObservabilityService {
     samples.push(input.durationMs);
     this.performanceSamples.set(markKey, samples.slice(-100));
 
+    // A health probe's 5xx is readiness reporting, not a failure: the backend
+    // answers 503 while dependencies come up, and apiClient's own dev-offline
+    // shim returns 503 for /health deliberately. Grading those as errors put
+    // one error event on the observability page per poll, for a condition
+    // nobody can act on (2026-09-04; the backend carried the identical rule
+    // and was corrected the same day).
+    const isHealthProbe = /^\/(api\/)?health(\/|$)/.test(input.path);
     this.recordEvent({
       category: 'api',
       name: slow ? 'api_slow_request' : 'api_request',
-      severity: input.status >= 500 ? 'error' : slow ? 'warn' : 'info',
+      severity:
+        input.status >= 500 && !isHealthProbe
+          ? 'error'
+          : slow || input.status >= 500
+            ? 'warn'
+            : 'info',
       durationMs: input.durationMs,
       path: input.path,
       statusCode: input.status,

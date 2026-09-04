@@ -36,6 +36,31 @@ describe('observabilityService', () => {
     expect(snapshot.slowApiCalls[0]?.path).toBe('/api/emergency/whiteboard');
   });
 
+  it.each(['/health', '/api/health'])(
+    'keeps a %s 503 out of recentErrors (readiness, not failure)',
+    (path) => {
+      const before = observabilityService.buildDiagnosticsSnapshot().recentErrors.length;
+      observabilityService.recordApiTiming({ path, method: 'GET', durationMs: 12, status: 503 });
+
+      const snapshot = observabilityService.buildDiagnosticsSnapshot();
+      expect(snapshot.recentErrors).toHaveLength(before);
+    },
+  );
+
+  it('still records a real 5xx as an error', () => {
+    const before = observabilityService.buildDiagnosticsSnapshot().recentErrors.length;
+    observabilityService.recordApiTiming({
+      path: '/api/emergency/patients',
+      method: 'GET',
+      durationMs: 12,
+      status: 500,
+    });
+
+    const snapshot = observabilityService.buildDiagnosticsSnapshot();
+    expect(snapshot.recentErrors.length).toBe(before + 1);
+    expect(snapshot.recentErrors[0]?.path).toBe('/api/emergency/patients');
+  });
+
   it('emits trace headers for apiClient', () => {
     const headers = observabilityService.buildTraceHeaders('workflow-trace-1');
     expect(headers['x-correlation-id']).toBeTruthy();
