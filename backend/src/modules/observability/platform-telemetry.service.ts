@@ -105,6 +105,17 @@ export class PlatformTelemetryService {
     const samples = this.apiDurationSamples.get(pathKey) || [];
     samples.push(input.durationMs);
     this.apiDurationSamples.set(pathKey, samples.slice(-100));
+    // The health endpoint answers 503 by design while dependencies come up.
+    // Grading that as an 'error' event logged it as "Client api error" and
+    // counted it in errorCount on every boot (three per start, seen during the
+    // 2026-09-04 full-app crawl). It is readiness, so it is a warning.
+    const isHealthProbe = /^\/(api\/)?health(\/|$)/.test(input.path);
+    const severity =
+      input.statusCode >= 500 && !isHealthProbe
+        ? 'error'
+        : slow || input.statusCode >= 500
+          ? 'warn'
+          : 'info';
 
     return this.ingestEvents({
       correlationId: input.correlationId,
@@ -113,7 +124,7 @@ export class PlatformTelemetryService {
           id: createEventId('backend-api'),
           category: 'api',
           name: slow ? 'backend_slow_request' : 'backend_request',
-          severity: input.statusCode >= 500 ? 'error' : slow ? 'warn' : 'info',
+          severity,
           timestamp: new Date().toISOString(),
           correlationId: input.correlationId,
           durationMs: input.durationMs,

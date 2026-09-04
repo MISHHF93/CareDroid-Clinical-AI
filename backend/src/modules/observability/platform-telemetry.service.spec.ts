@@ -89,4 +89,49 @@ describe('PlatformTelemetryService', () => {
     expect(diagnostics.totals.crashReports).toBe(1);
     expect(diagnostics.totals.errorCount).toBeGreaterThan(0);
   });
+
+  describe('recordBackendRequest severity', () => {
+    const latestSeverity = () =>
+      (service as unknown as { events: Array<{ severity: string }> }).events[0]?.severity;
+
+    it.each(['/health', '/api/health', '/health/'])(
+      'grades a %s 503 as a warning, not an error (readiness, not failure)',
+      (path) => {
+        service.recordBackendRequest({ method: 'GET', path, statusCode: 503, durationMs: 12 });
+        expect(latestSeverity()).toBe('warn');
+        expect(service.getDiagnostics().totals.errorCount).toBe(0);
+      },
+    );
+
+    it('still grades a real 5xx as an error', () => {
+      service.recordBackendRequest({
+        method: 'GET',
+        path: '/api/patients',
+        statusCode: 500,
+        durationMs: 12,
+      });
+      expect(latestSeverity()).toBe('error');
+      expect(service.getDiagnostics().totals.errorCount).toBe(1);
+    });
+
+    it('does not treat a path that merely contains "health" as a probe', () => {
+      service.recordBackendRequest({
+        method: 'GET',
+        path: '/api/patients/healthcheck-notes',
+        statusCode: 500,
+        durationMs: 12,
+      });
+      expect(latestSeverity()).toBe('error');
+    });
+
+    it('grades a slow successful request as a warning', () => {
+      service.recordBackendRequest({
+        method: 'GET',
+        path: '/api/patients',
+        statusCode: 200,
+        durationMs: 5000,
+      });
+      expect(latestSeverity()).toBe('warn');
+    });
+  });
 });
