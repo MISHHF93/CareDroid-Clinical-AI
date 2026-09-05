@@ -65,7 +65,17 @@ async function fetchConfigEndpoint(path, defaults) {
     return { ok: true, data, fromDefaults: false };
   } catch (error: any) {
     const message = getApiErrorMessage(error);
-    logger.error(`Config fetch error: ${path}`, { error: message });
+    // A cancelled request is not a failure. React StrictMode runs every effect
+    // twice in development and aborts the first run's fetches, and navigating
+    // away aborts whatever was still in flight -- 7 aborted API requests on a
+    // single page load is normal here. Logging those at error level put three
+    // "Config fetch error" lines on /emergency/diagnostics for endpoints that
+    // answer 200, which is indistinguishable from a real outage (2026-09-04).
+    if (error?.name === 'AbortError') {
+      logger.debug(`Config fetch cancelled: ${path}`, { error: message });
+    } else {
+      logger.error(`Config fetch error: ${path}`, { error: message });
+    }
     return { ok: false, data: defaults, error: message, fromDefaults: true };
   }
 }
