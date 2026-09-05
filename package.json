@@ -235,7 +235,7 @@
     "jest": "^30.4.2",
     "jest-axe": "^10.0.0",
     "jiti": "^2.7.0",
-    "jsdom": "^28.0.0",
+    "jsdom": "^30.0.1",
     "knip": "^6.34.0",
     "lefthook": "2.1.12",
     "mongodb-memory-server": "^11.2.0",
