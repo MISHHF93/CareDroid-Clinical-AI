@@ -1,24 +1,24 @@
 {
-  "generatedAt": "2026-08-04T01:39:22.614Z",
-  "backendPort": 3350,
-  "frontendPort": 5190,
-  "apiPort": 3350,
+  "generatedAt": "2026-09-05T05:25:47.265Z",
+  "backendPort": 8000,
+  "frontendPort": 3000,
+  "apiPort": 8000,
   "auth": {
-    "via": 3350,
-    "ms": 300
+    "via": 8000,
+    "ms": 26
   },
   "patientCount": 6,
   "probes": [
     {
-      "label": "Backend /health (:3350)",
+      "label": "Backend /health (:8000)",
       "ok": true,
       "status": 200,
-      "ms": 31,
-      "body": "{\"status\":\"degraded\",\"timestamp\":\"2026-08-04T01:39:22.637Z\",\"responseTimeMs\":6,\"components\":{\"database\":{\"status\":\"not-configured\",\"configured\":false,\"details\":{\"connector\":\"mongoose\",\"readyState\":0,\"stateName\":\"disconnected\",\"message\":\"Mongoose is not connected and no MongoDB URI is configured.\"},\"critical\":true,\"checkedAt\":\"2026-08-04T01:39:22.635Z\",\"responseTimeMs\":4},\"sqlDatabase\":{\"status\":\"healthy\",\"configured\":true,\"details\":{\"connector\":\"typeorm\",\"type\":\"sqlite\"},\"critical\":true,\"checkedAt\":\"2026-08-04T01:39:22.637Z\",\"responseTimeMs\":5},\"services\":{\"status\":\"degraded\",\"configured\":true,\"details\":{\"generatedAt\":\"2026-08-04T01:39:22.636Z\",\"totals\":{\"registered\":27,\"ready\":27,\"failed\":0},\"degradedServices\":[{\"name\":\"mohFhirService\",\"status\":\"not_connected\"},{\"name\":\"wearableRPMService\",\"status\":\"not_connected\"}],\"services\":{\"capacityService\":{\"status\":\"ready\",\"checkedAt\":\"2026-08-04T01:39:22.632Z\"},\"emsService\":{\"status\":\"ready\",\"checkedAt\":\"2026-08-04T01:39:22.632Z\"},\"reassessmentService\":{\"status\":\"ready\",\"checkedAt\":\"2026-08-04T01:39:22.632Z\"},\"patientJourneyService\":{\"status\":\"ready\",\"checkedAt\":\"2026-08-04T01:39:22.632Z\"},\"queueIntelligenceService\":{\"status\":\"ready\",\"checkedAt\":\"2026-08-04T01:39:22.632Z\"},\"surgeCapacityService\":{\"status\":\"ready\",\"checkedAt\":\"2026-08-04T01:39:22.632Z\"},\"boardingService\":{\"status\":\"ready\",\"checkedAt\":\"2026-08-04T01:39:22.632Z\"},\"dischargePredictionService\":{\"status\":\"ready\",\"checkedAt\":\"2026-08-04T01:39:22.632Z\"},\"clinicalProtocolService\":{\"status\":\"ready\",\"protocolCount\":3,\"checkedAt\":\"2026-08-04T01:39:22.632Z\",\"method\":\"checkHealth\"},\"deteriorationPredictionV3Service\":{\"status\":\"ready\",\"modelVersion\":\"deterioration-v3-deterministic\",\"checkedAt\":\"2026-08-04T01:39:22.634Z\",\"method\":\"checkHealth\"},\"copilotService\":{\"status\":\"ready\",\"checkedAt\":\"2026-08-04T01:39:22.635Z\"},\"erPulseHandoverService\":{\"status\":\"ready\",\"checkedAt\":\"2026-08-04T01:39:22.635Z\"},\"aiCallInterrogationService\":{\"status\":\"ready\",\"checkedAt\":\"2026-08-04T01:39:22.635Z\"},\"smartIntakeService\":{\"status\":\"ready\",\"checkedAt\":\"2026-08-04T01:39:22.635Z\"},\"mpiService\":{\"status\":\"ready\",\"checkedAt\":\"2026-08-04T01:39:22.635Z\"},\"ocrService\":{\"status\":\"ready\",\"checkedAt\":\"2026-08-04T01:39:22.635Z\"},\"mohFhirService\":{\"status\":\"not_connected\",\"connector\":\"MOH FHIR\",\"configured\":false,\"baseUrl\":null,\"checkedAt\":\"2026-08-04T01:39:22.635Z\",\"method\":\"checkHealth\"},\"wearableRPMService\":{\"status\":\"not_connected\",\"trackedPatients\":0,\"configured\":false,\"healthkitConfigured\":false,\"checkedAt\":\"2026-08-04T01:39:22.635Z\",\"method\":\"checkHealth\"},\"federatedEMSService\":{\"status\":\"ready\",\"checkedAt\":\"2026-08-04T01:39:22.635Z\"},\"lmecsService\":{\"status\":\"ready\",\"checkedAt\":\"2026-08-04T01:39:22.635Z\"},\"iotDigitalTwinService\":{\"status\":\"ready\",\"trackedEntities\":0,\"mqttConfigured\":false,\"mqttBrokerUrl\":null,\"checkedAt\":\"2026-08-04T01:39:22.635Z\",\"method\":\"checkHealth\"},\"realTimeSimulationService\":{\"status\":\"ready\",\"checkedAt\":\"2026-08-04T01:39:22.635Z\"},\"hybridDigitalTwinService\":{\"status\":\"ready\",\"checkedAt\":\"2026-08-04T01:39:22.635Z\"},\"organizationalDigitalTwinService\":{\"status\":\"ready\",\"checkedAt\":\"2026-08-04T01:39:22.635Z\"},\"aiGovernanceService\":{\"status\":\"ready\",\"checkedAt\":\"2026-08-04T01:39:22.635Z\"},\"incidentReportingService\":{\"status\":\"ready\",\"openIncidents\":0,\"escalationRecipients\":0,\"smsGatewayConfigured\":false,\"checkedAt\":\"2026-08-04T01:39:22.636Z\",\"method\":\"checkHealth\"},\"consentService\":{\"status\":\"ready\",\"consentRecords\":0,\"checkedAt\":\"2026-08-04T01:39:22.636Z\",\"method\":\"checkHealth\"}}},\"critical\":true,\"checkedAt\":\"2026-08-04T01:39:22.636Z\",\"responseTimeMs\":4},\"websocket\":{\"status\":\"healthy\",\"configured\":true,\"details\":{\"servers\":[{\"name\":\"edge-ai-ambulance\",\"path\":\"/ws/edge-ai/ambulance\",\"clients\":0}]},\"critical\":false,\"checkedAt\":\"2026-08-04T01:39:22.635Z\",\"responseTimeMs\":2},\"mqtt\":{\"status\":\"not-configured\",\"configured\":false,\"details\":{\"message\":\"No MQTT broker environment variables are configured.\",\"supportedEnv\":[\"MQTT_BROKER_URL\",\"MQTT_URL\",\"MQTT_SERVER_URL\",\"MQTT_HOST\"]},\"critical\":false,\"checkedAt\":\"2026-08-04T01:39:22.635Z\",\"responseTimeMs\":2},\"mohFhirApi\":{\"status\":\"not-configured\",\"configured\":false,\"details\":{\"label\":\"MoH FHIR\",\"supportedEnv\":[\"MOH_FHIR_BASE_URL\",\"MOH_FHIR_URL\",\"FHIR_BASE_URL\",\"FHIR_API_URL\"]},\"critical\":false,\"checkedAt\":\"2026-08-04T01:39:22.635Z\",\"responseTimeMs\":2},\"wearableApi\":{\"status\":\"not-configured\",\"configured\":false,\"details\":{\"label\":\"Wearable API\",\"supportedEnv\":[\"WEARABLE_API_URL\",\"WEARABLES_API_URL\",\"WEARABLE_RPM_API_URL\",\"WEARABLE_BASE_URL\"]},\"critical\":false,\"checkedAt\":\"2026-08-04T01:39:22.635Z\",\"responseTimeMs\":2}}}",
+      "ms": 24,
+      "body": "{\"status\":\"degraded\",\"timestamp\":\"2026-09-05T05:25:47.288Z\",\"responseTimeMs\":16,\"components\":{\"database\":{\"status\":\"not-configured\",\"configured\":false,\"details\":{\"connector\":\"mongoose\",\"readyState\":0,\"stateName\":\"disconnected\",\"message\":\"Mongoose is not connected and no MongoDB URI is configured.\"},\"critical\":true,\"checkedAt\":\"2026-09-05T05:25:47.287Z\",\"responseTimeMs\":15},\"sqlDatabase\":{\"status\":\"healthy\",\"configured\":true,\"details\":{\"connector\":\"typeorm\",\"type\":\"sqlite\"},\"critical\":true,\"checkedAt\":\"2026-09-05T05:25:47.288Z\",\"responseTimeMs\":2},\"services\":{\"status\":\"degraded\",\"configured\":true,\"details\":{\"generatedAt\":\"2026-09-05T05:25:47.288Z\",\"totals\":{\"registered\":25,\"ready\":25,\"failed\":0},\"degradedServices\":[{\"name\":\"mohFhirService\",\"status\":\"not_connected\"},{\"name\":\"wearableRPMService\",\"status\":\"not_connected\"}],\"services\":{\"emsService\":{\"status\":\"ready\",\"checkedAt\":\"2026-09-05T05:25:47.286Z\"},\"reassessmentService\":{\"status\":\"ready\",\"checkedAt\":\"2026-09-05T05:25:47.286Z\"},\"patientJourneyService\":{\"status\":\"ready\",\"checkedAt\":\"2026-09-05T05:25:47.286Z\"},\"queueIntelligenceService\":{\"status\":\"ready\",\"checkedAt\":\"2026-09-05T05:25:47.286Z\"},\"surgeCapacityService\":{\"status\":\"ready\",\"checkedAt\":\"2026-09-05T05:25:47.286Z\"},\"boardingService\":{\"status\":\"ready\",\"checkedAt\":\"2026-09-05T05:25:47.286Z\"},\"dischargePredictionService\":{\"status\":\"ready\",\"checkedAt\":\"2026-09-05T05:25:47.286Z\"},\"clinicalProtocolService\":{\"status\":\"ready\",\"protocolCount\":3,\"checkedAt\":\"2026-09-05T05:25:47.286Z\",\"method\":\"checkHealth\"},\"deteriorationPredictionV3Service\":{\"status\":\"ready\",\"modelVersion\":\"deterioration-v3-deterministic\",\"checkedAt\":\"2026-09-05T05:25:47.287Z\",\"method\":\"checkHealth\"},\"erPulseHandoverService\":{\"status\":\"ready\",\"checkedAt\":\"2026-09-05T05:25:47.287Z\"},\"aiCallInterrogationService\":{\"status\":\"ready\",\"checkedAt\":\"2026-09-05T05:25:47.287Z\"},\"smartIntakeService\":{\"status\":\"ready\",\"checkedAt\":\"2026-09-05T05:25:47.287Z\"},\"mpiService\":{\"status\":\"ready\",\"checkedAt\":\"2026-09-05T05:25:47.287Z\"},\"ocrService\":{\"status\":\"ready\",\"checkedAt\":\"2026-09-05T05:25:47.287Z\"},\"mohFhirService\":{\"status\":\"not_connected\",\"connector\":\"MOH FHIR\",\"configured\":false,\"baseUrl\":null,\"checkedAt\":\"2026-09-05T05:25:47.287Z\",\"method\":\"checkHealth\"},\"wearableRPMService\":{\"status\":\"not_connected\",\"trackedPatients\":0,\"configured\":false,\"healthkitConfigured\":false,\"checkedAt\":\"2026-09-05T05:25:47.288Z\",\"method\":\"checkHealth\"},\"federatedEMSService\":{\"status\":\"ready\",\"checkedAt\":\"2026-09-05T05:25:47.288Z\"},\"lmecsService\":{\"status\":\"ready\",\"checkedAt\":\"2026-09-05T05:25:47.288Z\"},\"iotDigitalTwinService\":{\"status\":\"ready\",\"trackedEntities\":0,\"mqttConfigured\":false,\"mqttBrokerUrl\":null,\"checkedAt\":\"2026-09-05T05:25:47.288Z\",\"method\":\"checkHealth\"},\"realTimeSimulationService\":{\"status\":\"ready\",\"checkedAt\":\"2026-09-05T05:25:47.288Z\"},\"hybridDigitalTwinService\":{\"status\":\"ready\",\"checkedAt\":\"2026-09-05T05:25:47.288Z\"},\"organizationalDigitalTwinService\":{\"status\":\"ready\",\"checkedAt\":\"2026-09-05T05:25:47.288Z\"},\"aiGovernanceService\":{\"status\":\"ready\",\"checkedAt\":\"2026-09-05T05:25:47.288Z\"},\"incidentReportingService\":{\"status\":\"ready\",\"openIncidents\":0,\"escalationRecipients\":0,\"smsGatewayConfigured\":false,\"checkedAt\":\"2026-09-05T05:25:47.288Z\",\"method\":\"checkHealth\"},\"consentService\":{\"status\":\"ready\",\"consentRecords\":0,\"checkedAt\":\"2026-09-05T05:25:47.288Z\",\"method\":\"checkHealth\"}}},\"critical\":false,\"checkedAt\":\"2026-09-05T05:25:47.288Z\",\"responseTimeMs\":2},\"websocket\":{\"status\":\"healthy\",\"configured\":true,\"details\":{\"servers\":[{\"name\":\"ems\",\"path\":\"/socket.io\",\"clients\":0},{\"name\":\"edge-ai-ambulance\",\"path\":\"/ws/edge-ai/ambulance\",\"clients\":0}]},\"critical\":false,\"checkedAt\":\"2026-09-05T05:25:47.288Z\",\"responseTimeMs\":1},\"mqtt\":{\"status\":\"not-configured\",\"configured\":false,\"details\":{\"message\":\"No MQTT broker environment variables are configured.\",\"supportedEnv\":[\"MQTT_BROKER_URL\",\"MQTT_URL\",\"MQTT_SERVER_URL\",\"MQTT_HOST\"]},\"critical\":false,\"checkedAt\":\"2026-09-05T05:25:47.288Z\",\"responseTimeMs\":1},\"mohFhirApi\":{\"status\":\"not-configured\",\"configured\":false,\"details\":{\"label\":\"MoH FHIR\",\"supportedEnv\":[\"MOH_FHIR_BASE_URL\",\"MOH_FHIR_URL\",\"FHIR_BASE_URL\",\"FHIR_API_URL\"]},\"critical\":false,\"checkedAt\":\"2026-09-05T05:25:47.288Z\",\"responseTimeMs\":1},\"wearableApi\":{\"status\":\"not-configured\",\"configured\":false,\"details\":{\"label\":\"Wearable API\",\"supportedEnv\":[\"WEARABLE_API_URL\",\"WEARABLES_API_URL\",\"WEARABLE_RPM_API_URL\",\"WEARABLE_BASE_URL\"]},\"critical\":false,\"checkedAt\":\"2026-09-05T05:25:47.288Z\",\"responseTimeMs\":1}}}",
       "json": {
         "status": "degraded",
-        "timestamp": "2026-08-04T01:39:22.637Z",
-        "responseTimeMs": 6,
+        "timestamp": "2026-09-05T05:25:47.288Z",
+        "responseTimeMs": 16,
         "components": {
           "database": {
             "status": "not-configured",
@@ -30,8 +30,8 @@
               "message": "Mongoose is not connected and no MongoDB URI is configured."
             },
             "critical": true,
-            "checkedAt": "2026-08-04T01:39:22.635Z",
-            "responseTimeMs": 4
+            "checkedAt": "2026-09-05T05:25:47.287Z",
+            "responseTimeMs": 15
           },
           "sqlDatabase": {
             "status": "healthy",
@@ -41,17 +41,17 @@
               "type": "sqlite"
             },
             "critical": true,
-            "checkedAt": "2026-08-04T01:39:22.637Z",
-            "responseTimeMs": 5
+            "checkedAt": "2026-09-05T05:25:47.288Z",
+            "responseTimeMs": 2
           },
           "services": {
             "status": "degraded",
             "configured": true,
             "details": {
-              "generatedAt": "2026-08-04T01:39:22.636Z",
+              "generatedAt": "2026-09-05T05:25:47.288Z",
               "totals": {
-                "registered": 27,
-                "ready": 27,
+                "registered": 25,
+                "ready": 25,
                 "failed": 0
               },
               "degradedServices": [
@@ -65,80 +65,72 @@
                 }
               ],
               "services": {
-                "capacityService": {
-                  "status": "ready",
-                  "checkedAt": "2026-08-04T01:39:22.632Z"
-                },
                 "emsService": {
                   "status": "ready",
-                  "checkedAt": "2026-08-04T01:39:22.632Z"
+                  "checkedAt": "2026-09-05T05:25:47.286Z"
                 },
                 "reassessmentService": {
                   "status": "ready",
-                  "checkedAt": "2026-08-04T01:39:22.632Z"
+                  "checkedAt": "2026-09-05T05:25:47.286Z"
                 },
                 "patientJourneyService": {
                   "status": "ready",
-                  "checkedAt": "2026-08-04T01:39:22.632Z"
+                  "checkedAt": "2026-09-05T05:25:47.286Z"
                 },
                 "queueIntelligenceService": {
                   "status": "ready",
-                  "checkedAt": "2026-08-04T01:39:22.632Z"
+                  "checkedAt": "2026-09-05T05:25:47.286Z"
                 },
                 "surgeCapacityService": {
                   "status": "ready",
-                  "checkedAt": "2026-08-04T01:39:22.632Z"
+                  "checkedAt": "2026-09-05T05:25:47.286Z"
                 },
                 "boardingService": {
                   "status": "ready",
-                  "checkedAt": "2026-08-04T01:39:22.632Z"
+                  "checkedAt": "2026-09-05T05:25:47.286Z"
                 },
                 "dischargePredictionService": {
                   "status": "ready",
-                  "checkedAt": "2026-08-04T01:39:22.632Z"
+                  "checkedAt": "2026-09-05T05:25:47.286Z"
                 },
                 "clinicalProtocolService": {
                   "status": "ready",
                   "protocolCount": 3,
-                  "checkedAt": "2026-08-04T01:39:22.632Z",
+                  "checkedAt": "2026-09-05T05:25:47.286Z",
                   "method": "checkHealth"
                 },
                 "deteriorationPredictionV3Service": {
                   "status": "ready",
                   "modelVersion": "deterioration-v3-deterministic",
-                  "checkedAt": "2026-08-04T01:39:22.634Z",
+                  "checkedAt": "2026-09-05T05:25:47.287Z",
                   "method": "checkHealth"
-                },
-                "copilotService": {
-                  "status": "ready",
-                  "checkedAt": "2026-08-04T01:39:22.635Z"
                 },
                 "erPulseHandoverService": {
                   "status": "ready",
-                  "checkedAt": "2026-08-04T01:39:22.635Z"
+                  "checkedAt": "2026-09-05T05:25:47.287Z"
                 },
                 "aiCallInterrogationService": {
                   "status": "ready",
-                  "checkedAt": "2026-08-04T01:39:22.635Z"
+                  "checkedAt": "2026-09-05T05:25:47.287Z"
                 },
                 "smartIntakeService": {
                   "status": "ready",
-                  "checkedAt": "2026-08-04T01:39:22.635Z"
+                  "checkedAt": "2026-09-05T05:25:47.287Z"
                 },
                 "mpiService": {
                   "status": "ready",
-                  "checkedAt": "2026-08-04T01:39:22.635Z"
+                  "checkedAt": "2026-09-05T05:25:47.287Z"
                 },
                 "ocrService": {
                   "status": "ready",
-                  "checkedAt": "2026-08-04T01:39:22.635Z"
+                  "checkedAt": "2026-09-05T05:25:47.287Z"
                 },
                 "mohFhirService": {
                   "status": "not_connected",
                   "connector": "MOH FHIR",
                   "configured": false,
                   "baseUrl": null,
-                  "checkedAt": "2026-08-04T01:39:22.635Z",
+                  "checkedAt": "2026-09-05T05:25:47.287Z",
                   "method": "checkHealth"
                 },
                 "wearableRPMService": {
@@ -146,66 +138,71 @@
                   "trackedPatients": 0,
                   "configured": false,
                   "healthkitConfigured": false,
-                  "checkedAt": "2026-08-04T01:39:22.635Z",
+                  "checkedAt": "2026-09-05T05:25:47.288Z",
                   "method": "checkHealth"
                 },
                 "federatedEMSService": {
                   "status": "ready",
-                  "checkedAt": "2026-08-04T01:39:22.635Z"
+                  "checkedAt": "2026-09-05T05:25:47.288Z"
                 },
                 "lmecsService": {
                   "status": "ready",
-                  "checkedAt": "2026-08-04T01:39:22.635Z"
+                  "checkedAt": "2026-09-05T05:25:47.288Z"
                 },
                 "iotDigitalTwinService": {
                   "status": "ready",
                   "trackedEntities": 0,
                   "mqttConfigured": false,
                   "mqttBrokerUrl": null,
-                  "checkedAt": "2026-08-04T01:39:22.635Z",
+                  "checkedAt": "2026-09-05T05:25:47.288Z",
                   "method": "checkHealth"
                 },
                 "realTimeSimulationService": {
                   "status": "ready",
-                  "checkedAt": "2026-08-04T01:39:22.635Z"
+                  "checkedAt": "2026-09-05T05:25:47.288Z"
                 },
                 "hybridDigitalTwinService": {
                   "status": "ready",
-                  "checkedAt": "2026-08-04T01:39:22.635Z"
+                  "checkedAt": "2026-09-05T05:25:47.288Z"
                 },
                 "organizationalDigitalTwinService": {
                   "status": "ready",
-                  "checkedAt": "2026-08-04T01:39:22.635Z"
+                  "checkedAt": "2026-09-05T05:25:47.288Z"
                 },
                 "aiGovernanceService": {
                   "status": "ready",
-                  "checkedAt": "2026-08-04T01:39:22.635Z"
+                  "checkedAt": "2026-09-05T05:25:47.288Z"
                 },
                 "incidentReportingService": {
                   "status": "ready",
                   "openIncidents": 0,
                   "escalationRecipients": 0,
                   "smsGatewayConfigured": false,
-                  "checkedAt": "2026-08-04T01:39:22.636Z",
+                  "checkedAt": "2026-09-05T05:25:47.288Z",
                   "method": "checkHealth"
                 },
                 "consentService": {
                   "status": "ready",
                   "consentRecords": 0,
-                  "checkedAt": "2026-08-04T01:39:22.636Z",
+                  "checkedAt": "2026-09-05T05:25:47.288Z",
                   "method": "checkHealth"
                 }
               }
             },
-            "critical": true,
-            "checkedAt": "2026-08-04T01:39:22.636Z",
-            "responseTimeMs": 4
+            "critical": false,
+            "checkedAt": "2026-09-05T05:25:47.288Z",
+            "responseTimeMs": 2
           },
           "websocket": {
             "status": "healthy",
             "configured": true,
             "details": {
               "servers": [
+                {
+                  "name": "ems",
+                  "path": "/socket.io",
+                  "clients": 0
+                },
                 {
                   "name": "edge-ai-ambulance",
                   "path": "/ws/edge-ai/ambulance",
@@ -214,8 +211,8 @@
               ]
             },
             "critical": false,
-            "checkedAt": "2026-08-04T01:39:22.635Z",
-            "responseTimeMs": 2
+            "checkedAt": "2026-09-05T05:25:47.288Z",
+            "responseTimeMs": 1
           },
           "mqtt": {
             "status": "not-configured",
@@ -230,8 +227,8 @@
               ]
             },
             "critical": false,
-            "checkedAt": "2026-08-04T01:39:22.635Z",
-            "responseTimeMs": 2
+            "checkedAt": "2026-09-05T05:25:47.288Z",
+            "responseTimeMs": 1
           },
           "mohFhirApi": {
             "status": "not-configured",
@@ -246,8 +243,8 @@
               ]
             },
             "critical": false,
-            "checkedAt": "2026-08-04T01:39:22.635Z",
-            "responseTimeMs": 2
+            "checkedAt": "2026-09-05T05:25:47.288Z",
+            "responseTimeMs": 1
           },
           "wearableApi": {
             "status": "not-configured",
@@ -262,8 +259,8 @@
               ]
             },
             "critical": false,
-            "checkedAt": "2026-08-04T01:39:22.635Z",
-            "responseTimeMs": 2
+            "checkedAt": "2026-09-05T05:25:47.288Z",
+            "responseTimeMs": 1
           }
         }
       },
@@ -274,21 +271,21 @@
       "label": "Backend GET /api/emergency/patients (unauth probe)",
       "ok": true,
       "status": 401,
-      "ms": 15
+      "ms": 3
     },
     {
-      "label": "Frontend proxy /health (:5190)",
+      "label": "Frontend proxy /health (:3000)",
       "ok": false,
       "status": 0,
-      "ms": 1,
+      "ms": 2,
       "body": "",
       "json": null,
       "path": "/health",
       "method": "GET",
-      "error": "connect ECONNREFUSED 127.0.0.1:5190"
+      "error": "connect ECONNREFUSED 127.0.0.1:3000"
     },
     {
-      "label": "Frontend / (:5190)",
+      "label": "Frontend / (:3000)",
       "ok": false,
       "status": 0,
       "ms": 1
@@ -297,411 +294,132 @@
       "label": "GET /api/emergency/patients (auth)",
       "ok": true,
       "status": 200,
-      "ms": 42
+      "ms": 20
     },
     {
       "label": "GET /api/emergency/reception/snapshot (auth)",
       "ok": true,
       "status": 200,
-      "ms": 69
+      "ms": 23
     }
   ],
   "journeys": [
     {
       "personaId": "walkin-chest-pain-1",
       "label": "Walk-in chest pain (return visit risk)",
-      "patientId": "perf-walkin-chest-pain-1-msdzpqh5",
-      "totalMs": 350,
-      "createOk": false,
-      "handoffOk": false,
-      "escalateOk": false,
-      "ocrJobId": "ocr-job-1785807563172-9scgb1",
-      "stepCount": 9,
-      "failedSteps": [
-        {
-          "step": "create_intake",
-          "status": 409,
-          "ms": 45
-        },
-        {
-          "step": "reception_handoff",
-          "status": 500,
-          "ms": 38
-        },
-        {
-          "step": "reception_escalation",
-          "status": 500,
-          "ms": 24
-        }
-      ],
-      "steps": [
-        {
-          "step": "create_intake",
-          "ok": false,
-          "status": 409,
-          "ms": 45,
-          "error": null
-        },
-        {
-          "step": "ocr_create",
-          "ok": true,
-          "status": 201,
-          "ms": 48,
-          "error": null
-        },
-        {
-          "step": "ocr_review_firstName",
-          "ok": true,
-          "status": 201,
-          "ms": 38,
-          "error": null
-        },
-        {
-          "step": "ocr_review_lastName",
-          "ok": true,
-          "status": 201,
-          "ms": 40,
-          "error": null
-        },
-        {
-          "step": "ocr_review_dateOfBirth",
-          "ok": true,
-          "status": 201,
-          "ms": 38,
-          "error": null
-        },
-        {
-          "step": "ocr_review_sex",
-          "ok": true,
-          "status": 201,
-          "ms": 35,
-          "error": null
-        },
-        {
-          "step": "ocr_apply",
-          "ok": true,
-          "status": 201,
-          "ms": 41,
-          "error": null
-        },
-        {
-          "step": "reception_handoff",
-          "ok": false,
-          "status": 500,
-          "ms": 38,
-          "error": null
-        },
-        {
-          "step": "reception_escalation",
-          "ok": false,
-          "status": 500,
-          "ms": 24,
-          "error": null
-        }
-      ],
-      "pass": false
-    },
-    {
-      "personaId": "walkin-pediatric-fever-2",
-      "label": "Parent with febrile child",
-      "patientId": "perf-walkin-pediatric-fever-2-msdzpqqv",
-      "totalMs": 252,
-      "createOk": false,
-      "handoffOk": false,
-      "escalateOk": null,
-      "ocrJobId": "ocr-job-1785807563497-5fd2h0",
-      "stepCount": 7,
-      "failedSteps": [
-        {
-          "step": "create_intake",
-          "status": 409,
-          "ms": 28
-        },
-        {
-          "step": "reception_handoff",
-          "status": 500,
-          "ms": 41
-        }
-      ],
-      "steps": [
-        {
-          "step": "create_intake",
-          "ok": false,
-          "status": 409,
-          "ms": 28,
-          "error": null
-        },
-        {
-          "step": "ocr_create",
-          "ok": true,
-          "status": 201,
-          "ms": 39,
-          "error": null
-        },
-        {
-          "step": "ocr_review_firstName",
-          "ok": true,
-          "status": 201,
-          "ms": 35,
-          "error": null
-        },
-        {
-          "step": "ocr_review_lastName",
-          "ok": true,
-          "status": 201,
-          "ms": 36,
-          "error": null
-        },
-        {
-          "step": "ocr_review_dateOfBirth",
-          "ok": true,
-          "status": 201,
-          "ms": 33,
-          "error": null
-        },
-        {
-          "step": "ocr_apply",
-          "ok": true,
-          "status": 201,
-          "ms": 39,
-          "error": null
-        },
-        {
-          "step": "reception_handoff",
-          "ok": false,
-          "status": 500,
-          "ms": 41,
-          "error": null
-        }
-      ],
-      "pass": false
-    },
-    {
-      "personaId": "walkin-spanish-sob-3",
-      "label": "Shortness of breath — Spanish speaker",
-      "patientId": "perf-walkin-spanish-sob-3-msdzpqxv",
-      "totalMs": 191,
-      "createOk": false,
-      "handoffOk": false,
-      "escalateOk": null,
-      "ocrJobId": "ocr-job-1785807563754-dkiab0",
-      "stepCount": 5,
-      "failedSteps": [
-        {
-          "step": "create_intake",
-          "status": 409,
-          "ms": 40
-        },
-        {
-          "step": "reception_handoff",
-          "status": 500,
-          "ms": 41
-        }
-      ],
-      "steps": [
-        {
-          "step": "create_intake",
-          "ok": false,
-          "status": 409,
-          "ms": 40,
-          "error": null
-        },
-        {
-          "step": "ocr_create",
-          "ok": true,
-          "status": 201,
-          "ms": 31,
-          "error": null
-        },
-        {
-          "step": "ocr_review_dateOfBirth",
-          "ok": true,
-          "status": 201,
-          "ms": 39,
-          "error": null
-        },
-        {
-          "step": "ocr_apply",
-          "ok": true,
-          "status": 201,
-          "ms": 38,
-          "error": null
-        },
-        {
-          "step": "reception_handoff",
-          "ok": false,
-          "status": 500,
-          "ms": 41,
-          "error": null
-        }
-      ],
-      "pass": false
-    },
-    {
-      "personaId": "unknown-collapse-4",
-      "label": "Unknown / unresponsive at entrance",
-      "patientId": "perf-unknown-collapse-4-msdzpr36",
-      "totalMs": 1689,
+      "patientId": "perf-walkin-chest-pain-1-mtnxw5ik",
+      "totalMs": 2412,
       "createOk": true,
       "handoffOk": true,
       "escalateOk": true,
-      "ocrJobId": null,
-      "stepCount": 3,
+      "escalationDelivery": {
+        "accepted": true,
+        "delivered": false,
+        "recipientCount": 0,
+        "sentCount": 0
+      },
+      "ocrJobId": "ocr-job-1788585948197-f20rxq",
+      "stepCount": 9,
       "failedSteps": [],
       "steps": [
         {
           "step": "create_intake",
           "ok": true,
           "status": 201,
-          "ms": 219,
-          "error": null
-        },
-        {
-          "step": "reception_handoff",
-          "ok": true,
-          "status": 201,
-          "ms": 1111,
-          "error": null
-        },
-        {
-          "step": "reception_escalation",
-          "ok": true,
-          "status": 201,
-          "ms": 358,
-          "error": null
-        }
-      ],
-      "pass": true
-    },
-    {
-      "personaId": "walkin-ankle-5",
-      "label": "Minor ankle injury",
-      "patientId": "perf-walkin-ankle-5-msdzpse3",
-      "totalMs": 517,
-      "createOk": false,
-      "handoffOk": false,
-      "escalateOk": null,
-      "ocrJobId": "ocr-job-1785807565890-5g6lk0",
-      "stepCount": 8,
-      "failedSteps": [
-        {
-          "step": "create_intake",
-          "status": 409,
-          "ms": 240
-        },
-        {
-          "step": "reception_handoff",
-          "status": 500,
-          "ms": 35
-        }
-      ],
-      "steps": [
-        {
-          "step": "create_intake",
-          "ok": false,
-          "status": 409,
-          "ms": 240,
+          "ms": 171,
           "error": null
         },
         {
           "step": "ocr_create",
           "ok": true,
           "status": 201,
-          "ms": 88,
+          "ms": 657,
           "error": null
         },
         {
           "step": "ocr_review_firstName",
           "ok": true,
           "status": 201,
-          "ms": 29,
+          "ms": 54,
           "error": null
         },
         {
           "step": "ocr_review_lastName",
           "ok": true,
           "status": 201,
-          "ms": 29,
-          "error": null
-        },
-        {
-          "step": "ocr_review_healthCardNumber",
-          "ok": true,
-          "status": 201,
-          "ms": 31,
+          "ms": 23,
           "error": null
         },
         {
           "step": "ocr_review_dateOfBirth",
           "ok": true,
           "status": 201,
-          "ms": 28,
+          "ms": 15,
+          "error": null
+        },
+        {
+          "step": "ocr_review_sex",
+          "ok": true,
+          "status": 201,
+          "ms": 18,
           "error": null
         },
         {
           "step": "ocr_apply",
           "ok": true,
           "status": 201,
-          "ms": 36,
+          "ms": 142,
           "error": null
         },
         {
           "step": "reception_handoff",
-          "ok": false,
-          "status": 500,
-          "ms": 35,
+          "ok": true,
+          "status": 201,
+          "ms": 1052,
           "error": null
-        }
-      ],
-      "pass": false
-    },
-    {
-      "personaId": "ems-style-transfer-6",
-      "label": "Transfer-style arrival (staff-created)",
-      "patientId": "perf-ems-style-transfer-6-msdzpssg",
-      "totalMs": 214,
-      "createOk": false,
-      "handoffOk": false,
-      "escalateOk": false,
-      "ocrJobId": "ocr-job-1785807566128-5htng5",
-      "stepCount": 8,
-      "failedSteps": [
-        {
-          "step": "create_intake",
-          "status": 409,
-          "ms": 23
-        },
-        {
-          "step": "reception_handoff",
-          "status": 500,
-          "ms": 31
         },
         {
           "step": "reception_escalation",
-          "status": 500,
-          "ms": 24
+          "ok": true,
+          "status": 201,
+          "ms": 279,
+          "error": null
         }
       ],
+      "pass": true
+    },
+    {
+      "personaId": "walkin-pediatric-fever-2",
+      "label": "Parent with febrile child",
+      "patientId": "perf-walkin-pediatric-fever-2-mtnxw7dk",
+      "totalMs": 1672,
+      "createOk": true,
+      "handoffOk": true,
+      "escalateOk": null,
+      "escalationDelivery": null,
+      "ocrJobId": "ocr-job-1788585950688-vewrwj",
+      "stepCount": 7,
+      "failedSteps": [],
       "steps": [
         {
           "step": "create_intake",
-          "ok": false,
-          "status": 409,
-          "ms": 23,
+          "ok": true,
+          "status": 201,
+          "ms": 767,
           "error": null
         },
         {
           "step": "ocr_create",
           "ok": true,
           "status": 201,
-          "ms": 25,
+          "ms": 139,
           "error": null
         },
         {
           "step": "ocr_review_firstName",
           "ok": true,
           "status": 201,
-          "ms": 28,
+          "ms": 42,
           "error": null
         },
         {
@@ -715,184 +433,355 @@
           "step": "ocr_review_dateOfBirth",
           "ok": true,
           "status": 201,
-          "ms": 29,
+          "ms": 19,
           "error": null
         },
         {
           "step": "ocr_apply",
           "ok": true,
           "status": 201,
-          "ms": 27,
+          "ms": 191,
           "error": null
         },
         {
           "step": "reception_handoff",
-          "ok": false,
-          "status": 500,
-          "ms": 31,
+          "ok": true,
+          "status": 201,
+          "ms": 488,
+          "error": null
+        }
+      ],
+      "pass": true
+    },
+    {
+      "personaId": "walkin-spanish-sob-3",
+      "label": "Shortness of breath — Spanish speaker",
+      "patientId": "perf-walkin-spanish-sob-3-mtnxw8o1",
+      "totalMs": 2502,
+      "createOk": true,
+      "handoffOk": true,
+      "escalateOk": null,
+      "escalationDelivery": null,
+      "ocrJobId": "ocr-job-1788585952815-z7u929",
+      "stepCount": 5,
+      "failedSteps": [],
+      "steps": [
+        {
+          "step": "create_intake",
+          "ok": true,
+          "status": 201,
+          "ms": 284,
+          "error": null
+        },
+        {
+          "step": "ocr_create",
+          "ok": true,
+          "status": 201,
+          "ms": 1076,
+          "error": null
+        },
+        {
+          "step": "ocr_review_dateOfBirth",
+          "ok": true,
+          "status": 201,
+          "ms": 52,
+          "error": null
+        },
+        {
+          "step": "ocr_apply",
+          "ok": true,
+          "status": 201,
+          "ms": 153,
+          "error": null
+        },
+        {
+          "step": "reception_handoff",
+          "ok": true,
+          "status": 201,
+          "ms": 936,
+          "error": null
+        }
+      ],
+      "pass": true
+    },
+    {
+      "personaId": "unknown-collapse-4",
+      "label": "Unknown / unresponsive at entrance",
+      "patientId": "perf-unknown-collapse-4-mtnxwalj",
+      "totalMs": 1064,
+      "createOk": true,
+      "handoffOk": true,
+      "escalateOk": true,
+      "escalationDelivery": {
+        "accepted": true,
+        "delivered": false,
+        "recipientCount": 0,
+        "sentCount": 0
+      },
+      "ocrJobId": null,
+      "stepCount": 3,
+      "failedSteps": [],
+      "steps": [
+        {
+          "step": "create_intake",
+          "ok": true,
+          "status": 201,
+          "ms": 246,
+          "error": null
+        },
+        {
+          "step": "reception_handoff",
+          "ok": true,
+          "status": 201,
+          "ms": 480,
           "error": null
         },
         {
           "step": "reception_escalation",
-          "ok": false,
-          "status": 500,
-          "ms": 24,
+          "ok": true,
+          "status": 201,
+          "ms": 338,
           "error": null
         }
       ],
-      "pass": false
+      "pass": true
+    },
+    {
+      "personaId": "walkin-ankle-5",
+      "label": "Minor ankle injury",
+      "patientId": "perf-walkin-ankle-5-mtnxwbf3",
+      "totalMs": 1751,
+      "createOk": true,
+      "handoffOk": true,
+      "escalateOk": null,
+      "escalationDelivery": null,
+      "ocrJobId": "ocr-job-1788585955451-4gx4yd",
+      "stepCount": 8,
+      "failedSteps": [],
+      "steps": [
+        {
+          "step": "create_intake",
+          "ok": true,
+          "status": 201,
+          "ms": 319,
+          "error": null
+        },
+        {
+          "step": "ocr_create",
+          "ok": true,
+          "status": 201,
+          "ms": 110,
+          "error": null
+        },
+        {
+          "step": "ocr_review_firstName",
+          "ok": true,
+          "status": 201,
+          "ms": 605,
+          "error": null
+        },
+        {
+          "step": "ocr_review_lastName",
+          "ok": true,
+          "status": 201,
+          "ms": 22,
+          "error": null
+        },
+        {
+          "step": "ocr_review_healthCardNumber",
+          "ok": true,
+          "status": 201,
+          "ms": 25,
+          "error": null
+        },
+        {
+          "step": "ocr_review_dateOfBirth",
+          "ok": true,
+          "status": 201,
+          "ms": 23,
+          "error": null
+        },
+        {
+          "step": "ocr_apply",
+          "ok": true,
+          "status": 201,
+          "ms": 139,
+          "error": null
+        },
+        {
+          "step": "reception_handoff",
+          "ok": true,
+          "status": 201,
+          "ms": 506,
+          "error": null
+        }
+      ],
+      "pass": true
+    },
+    {
+      "personaId": "ems-style-transfer-6",
+      "label": "Transfer-style arrival (staff-created)",
+      "patientId": "perf-ems-style-transfer-6-mtnxwcrq",
+      "totalMs": 2885,
+      "createOk": true,
+      "handoffOk": true,
+      "escalateOk": true,
+      "escalationDelivery": {
+        "accepted": true,
+        "delivered": false,
+        "recipientCount": 0,
+        "sentCount": 0
+      },
+      "ocrJobId": "ocr-job-1788585958303-191akh",
+      "stepCount": 8,
+      "failedSteps": [],
+      "steps": [
+        {
+          "step": "create_intake",
+          "ok": true,
+          "status": 201,
+          "ms": 333,
+          "error": null
+        },
+        {
+          "step": "ocr_create",
+          "ok": true,
+          "status": 201,
+          "ms": 1197,
+          "error": null
+        },
+        {
+          "step": "ocr_review_firstName",
+          "ok": true,
+          "status": 201,
+          "ms": 38,
+          "error": null
+        },
+        {
+          "step": "ocr_review_lastName",
+          "ok": true,
+          "status": 201,
+          "ms": 16,
+          "error": null
+        },
+        {
+          "step": "ocr_review_dateOfBirth",
+          "ok": true,
+          "status": 201,
+          "ms": 16,
+          "error": null
+        },
+        {
+          "step": "ocr_apply",
+          "ok": true,
+          "status": 201,
+          "ms": 141,
+          "error": null
+        },
+        {
+          "step": "reception_handoff",
+          "ok": true,
+          "status": 201,
+          "ms": 879,
+          "error": null
+        },
+        {
+          "step": "reception_escalation",
+          "ok": true,
+          "status": 201,
+          "ms": 264,
+          "error": null
+        }
+      ],
+      "pass": true
     }
   ],
   "burst": {
     "parallel": 3,
-    "wallClockMs": 473,
-    "passRate": 0,
+    "wallClockMs": 6394,
+    "passRate": 1,
     "results": [
       {
         "id": "burst-walkin-chest-pain-1",
-        "pass": false,
-        "totalMs": 473
+        "pass": true,
+        "totalMs": 6394
       },
       {
         "id": "burst-walkin-pediatric-fever-2",
-        "pass": false,
-        "totalMs": 404
+        "pass": true,
+        "totalMs": 4267
       },
       {
         "id": "burst-walkin-spanish-sob-3",
-        "pass": false,
-        "totalMs": 295
+        "pass": true,
+        "totalMs": 3509
       }
     ]
   },
   "summary": {
-    "passRate": 0.16666666666666666,
-    "passed": 1,
+    "passRate": 1,
+    "passed": 6,
     "total": 6,
-    "avgTotalMs": 536,
-    "p50Ms": 252,
-    "p95Ms": 1689,
-    "maxMs": 1689
+    "avgTotalMs": 2048,
+    "p50Ms": 1751,
+    "p95Ms": 2885,
+    "maxMs": 2885,
+    "escalations": {
+      "attempted": 3,
+      "accepted": 3,
+      "deliveredToRecipients": 0,
+      "totalRecipients": 0
+    }
   },
   "stepStats": {
     "create_intake": {
-      "failures": 5,
-      "avgMs": 99
+      "failures": 0,
+      "avgMs": 353
     },
     "ocr_create": {
       "failures": 0,
-      "avgMs": 46
+      "avgMs": 636
     },
     "ocr_review_firstName": {
       "failures": 0,
-      "avgMs": 33
+      "avgMs": 185
     },
     "ocr_review_lastName": {
       "failures": 0,
-      "avgMs": 33
+      "avgMs": 22
     },
     "ocr_review_dateOfBirth": {
       "failures": 0,
-      "avgMs": 33
+      "avgMs": 25
     },
     "ocr_review_sex": {
       "failures": 0,
-      "avgMs": 35
+      "avgMs": 18
     },
     "ocr_apply": {
       "failures": 0,
-      "avgMs": 36
+      "avgMs": 153
     },
     "reception_handoff": {
-      "failures": 5,
-      "avgMs": 216
+      "failures": 0,
+      "avgMs": 724
     },
     "reception_escalation": {
-      "failures": 2,
-      "avgMs": 135
+      "failures": 0,
+      "avgMs": 294
     },
     "ocr_review_healthCardNumber": {
       "failures": 0,
-      "avgMs": 31
+      "avgMs": 25
     }
   },
-  "failures": [
-    {
-      "personaId": "walkin-chest-pain-1",
-      "step": "create_intake",
-      "status": 409,
-      "ms": 45
-    },
-    {
-      "personaId": "walkin-chest-pain-1",
-      "step": "reception_handoff",
-      "status": 500,
-      "ms": 38
-    },
-    {
-      "personaId": "walkin-chest-pain-1",
-      "step": "reception_escalation",
-      "status": 500,
-      "ms": 24
-    },
-    {
-      "personaId": "walkin-pediatric-fever-2",
-      "step": "create_intake",
-      "status": 409,
-      "ms": 28
-    },
-    {
-      "personaId": "walkin-pediatric-fever-2",
-      "step": "reception_handoff",
-      "status": 500,
-      "ms": 41
-    },
-    {
-      "personaId": "walkin-spanish-sob-3",
-      "step": "create_intake",
-      "status": 409,
-      "ms": 40
-    },
-    {
-      "personaId": "walkin-spanish-sob-3",
-      "step": "reception_handoff",
-      "status": 500,
-      "ms": 41
-    },
-    {
-      "personaId": "walkin-ankle-5",
-      "step": "create_intake",
-      "status": 409,
-      "ms": 240
-    },
-    {
-      "personaId": "walkin-ankle-5",
-      "step": "reception_handoff",
-      "status": 500,
-      "ms": 35
-    },
-    {
-      "personaId": "ems-style-transfer-6",
-      "step": "create_intake",
-      "status": 409,
-      "ms": 23
-    },
-    {
-      "personaId": "ems-style-transfer-6",
-      "step": "reception_handoff",
-      "status": 500,
-      "ms": 31
-    },
-    {
-      "personaId": "ems-style-transfer-6",
-      "step": "reception_escalation",
-      "status": 500,
-      "ms": 24
-    }
-  ],
+  "failures": [],
   "grade": {
-    "grade": "F",
-    "label": "Fail — platform not responding as an ED front door"
+    "grade": "C",
+    "label": "Critical path completes but is slow — 2048ms average (every journey completed)",
+    "stability": "A",
+    "latency": "C",
+    "driver": "latency"
   },
-  "recommendation": "Stabilize backend reachability, auth/dev-session, and PHI permissions before pilot. Use RECEPTION_HANDOFF.md golden path against a healthy stack."
+  "recommendation": "Every journey completed; the grade is latency alone (2048ms average). Profile the slowest steps below against a production build — dev-mode module loading and a development database inflate these numbers — before treating this as a platform defect."
 }

@@ -355,6 +355,7 @@ async function runPersonaJourney(apiPort, token, persona) {
   let ocrJobId = null;
   let handoffOk = false;
   let escalateOk = false;
+  let escalationDelivery = null;
   let createOk = false;
 
   // 1) Create patient via intake
@@ -452,6 +453,20 @@ async function runPersonaJourney(apiPort, token, persona) {
     });
     steps.push({ step: 'reception_escalation', ...esc });
     escalateOk = esc.ok || esc.json?.data?.ok === true;
+    // "Accepted" is not "delivered". The endpoint answers
+    // {ok: true, sent: false, recipientCount: 0} when there is no on-duty
+    // charge nurse email and no INCIDENT_ESCALATION_EMAILS configured — it is
+    // being honest, and this harness was ignoring it, marking the escalation
+    // step green for a P1 patient whose escalation reached nobody
+    // (2026-09-05). Recorded as its own fact: an unconfigured environment is
+    // not a platform defect, but it must never read as "escalation works".
+    const escData = esc.json?.data || {};
+    escalationDelivery = {
+      accepted: escalateOk,
+      delivered: escData.sent === true,
+      recipientCount: Number(escData.recipientCount || 0),
+      sentCount: Number(escData.sentCount || 0),
+    };
   }
 
   const totalMs = Math.round(performance.now() - t0);
@@ -464,6 +479,7 @@ async function runPersonaJourney(apiPort, token, persona) {
     createOk,
     handoffOk,
     escalateOk: persona.priority === 'P1' || persona.redFlags.length >= 2 ? escalateOk : null,
+    escalationDelivery,
     ocrJobId,
     stepCount: steps.length,
     failedSteps: failed.map((s) => ({ step: s.step, status: s.status, error: s.error, ms: s.ms })),
@@ -548,6 +564,15 @@ function toMarkdown(report) {
   lines.push(`**Auth:** ${report.auth.via} (${report.auth.ms}ms)`);
   lines.push(`**Patients simulated:** ${report.patientCount}`);
   lines.push(`**Overall grade:** **${report.grade.grade}** — ${report.grade.label}`);
+  const esc = report.summary?.escalations;
+  if (esc?.attempted) {
+    lines.push('');
+    lines.push(
+      esc.deliveredToRecipients === esc.attempted
+        ? `**Escalations:** ${esc.deliveredToRecipients}/${esc.attempted} delivered to ${esc.totalRecipients} recipient(s).`
+        : `**Escalations:** ${esc.accepted}/${esc.attempted} accepted by the API but only ${esc.deliveredToRecipients} actually delivered (${esc.totalRecipients} recipient(s) configured). An accepted escalation that reaches nobody is not an escalation — configure an on-duty charge nurse email or INCIDENT_ESCALATION_EMAILS.`,
+    );
+  }
   lines.push('');
   lines.push('## Platform probes');
   lines.push('');
@@ -790,6 +815,19 @@ async function main() {
       p50Ms: percentile(totals, 50),
       p95Ms: percentile(totals, 95),
       maxMs: totals[totals.length - 1] || 0,
+      // Accepted vs actually delivered. The escalation endpoint returns
+      // {ok:true, sent:false, recipientCount:0} when no on-duty charge nurse
+      // email and no INCIDENT_ESCALATION_EMAILS are configured; a green
+      // escalation step that reached nobody must be visible here.
+      escalations: (() => {
+        const rows = journeys.map((j) => j.escalationDelivery).filter(Boolean);
+        return {
+          attempted: rows.length,
+          accepted: rows.filter((r) => r.accepted).length,
+          deliveredToRecipients: rows.filter((r) => r.delivered).length,
+          totalRecipients: rows.reduce((n, r) => n + r.recipientCount, 0),
+        };
+      })(),
     },
     stepStats,
     failures,
