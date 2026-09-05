@@ -282,6 +282,20 @@ function pickPersonas(n) {
   return list;
 }
 
+/**
+ * One token per run, mixed into every synthetic surname.
+ *
+ * The personas carry fixed names, and the patient `id`/`mrn` were the only
+ * unique parts — but the intake endpoint deduplicates on identity, not id. So
+ * the SECOND run of this harness re-registered the same six people and every
+ * create_intake answered 409, which is correct duplicate detection and made
+ * the harness single-use: measured 2026-09-05, 6/6 passed on a fresh database
+ * and 2/6 on the very next run. A run registering genuinely new arrivals is
+ * the path this harness exists to measure; duplicate detection has its own
+ * tests.
+ */
+const RUN_TOKEN = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
+
 function patientPayload(persona) {
   const now = new Date().toISOString();
   const id = `perf-${persona.id}-${Date.now().toString(36)}`;
@@ -289,7 +303,7 @@ function patientPayload(persona) {
     id,
     mrn: `PERF-${Math.floor(100000 + Math.random() * 900000)}`,
     firstName: persona.firstName,
-    lastName: persona.lastName,
+    lastName: `${persona.lastName}-${RUN_TOKEN}`,
     dob: persona.dob || now.slice(0, 10),
     age: persona.dob ? undefined : 40,
     sex: persona.sex === 'U' ? 'Other' : persona.sex,
