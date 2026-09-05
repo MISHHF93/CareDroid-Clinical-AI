@@ -869,12 +869,16 @@ export class CollaborationHubService {
   ): Promise<CollaborationMessage[]> {
     const channel = await this.getChannel(channelId, organizationId);
     await this.assertAccess(channel, userId);
-    return this.messageRepo
-      .find({
-        where: { channelId },
-        order: { pinnedAt: 'DESC' },
-      })
-      .then((messages) => messages.filter((m) => m.pinnedAt));
+    // Filter in the database, not afterwards in JavaScript. `where: { channelId }`
+    // hydrated EVERY message in the channel as an entity and then discarded the
+    // ones without a pinnedAt -- in the development database that is 48,036 rows
+    // loaded to return 0 (measured 2026-09-05; nothing is pinned, so every row
+    // was thrown away). The result is identical: the JS filter kept exactly the
+    // rows a NOT NULL predicate keeps.
+    return this.messageRepo.find({
+      where: { channelId, pinnedAt: Not(IsNull()) },
+      order: { pinnedAt: 'DESC' },
+    });
   }
 
   // ---------------------------------------------------------------------
