@@ -24,8 +24,17 @@ overlapping token/component systems**:
    importers anywhere** — not competing, just dead. Deleted. The actual
    compact-card primitive real components build on is a *different*,
    previously-undocumented file: `src/components/ui/card.tsx` (`.card`/
-   `.card-compact`) — it backs `DashboardCard`, `MetricCard`, and
-   `StatusWidget` in `CareDroidPrimitives.tsx`, and is directly imported by
+   `.card-compact`) — it backs `MetricCard` (the one with real
+   reach: 56 files reference it), plus `DashboardCard` and `StatusWidget` in
+   `CareDroidPrimitives.tsx`, **both of which have zero production
+   consumers** (verified 2026-09-05: `StatusWidget` has no JSX usage, no
+   importer, and is not even re-exported from
+   `design-system/components/index.ts`). Listing all three as equals read as
+   though the primitive had three live consumers when it has one -- the same
+   misreading that let the dead `Card.tsx` above sit catalogued as
+   "competing" for months. Both are kept and labelled, not deleted, per this
+   repo's standing rule that an unwired module is usually a function not
+   linked yet. `card.tsx` is directly imported by
    11 more production files (mostly `src/pages/profile/*` and
    `src/pages/{Settings,BillingPage,UsagePage}.tsx`). It's the
    most-reused card-shaped primitive in the app and was missing from this
@@ -84,6 +93,8 @@ migrate on their own schedule, not as a side effect of this cycle.
 | `StatCard` | **deleted** (2026-08-19, confirmed zero real importers) | `src/pages/emergency/index.tsx` and `src/pages/emergency/pulse/index.tsx` each define their own unrelated local `StatCard`-shaped tile under the same name, which was never this component |
 | `Card` (base) | **deleted, was fully dead** | `src/components/surfaces/Card.tsx` (`.cd-card`) had zero real importers — removed 2026-08-06. The real base primitive in active use is the previously-undocumented `src/components/ui/card.tsx` (`.card`/`.card-compact`), separate again from `cdl-v2/cards.css` (`.cdl-card`) — three names for card-shaped surfaces, not two |
 | `AlertCard` | **deleted** (Cycle 146, confirmed zero importers) | use `src/alarm/{AlarmBanner,AlarmKpi,AlarmRail}` — the real, live equivalent |
+| `StatusWidget` | exists, **zero real production usage** | `src/components/ui/CareDroidPrimitives.tsx` — verified 2026-09-05: no JSX usage, no importer, and not re-exported from `design-system/components/index.ts` (unlike `DashboardCard`, which at least reaches the barrel). Kept and labelled, not deleted |
+| `MetricCard` | exists, real usage | `src/components/dashboard/DashboardVisualizations.tsx` — the genuinely reused primitive of the three built on `card.tsx` (56 files reference it) |
 | `ClinicianCard` | **does not exist** | no live call site yet — see roadmap |
 | `WorkflowCard` | **does not exist** | only `acknowledgeWorkflowCard`/`dismissWorkflowCard` functions exist (`InteractiveAIWorkspace.tsx`), no component |
 | `EvidenceCard` | **does not exist** | `CitationCard` (closest prior art) was deleted as dead code, Cycle 146 |
