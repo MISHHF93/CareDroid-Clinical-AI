@@ -1,6 +1,6 @@
 # Duplicate System Audit
 
-Generated: 2026-08-08 (regenerate with `npm run duplicate-system-audit:write-docs`)
+Generated: 2026-09-05 (regenerate with `npm run duplicate-system-audit:write-docs`)
 
 ## Purpose
 
@@ -31,7 +31,7 @@ Identify competing sources of truth that cause drift, double registration, or am
 |--------|------------------|---------------------|
 | Routes | `src/config/routes.config.ts` | router.tsx (invent new paths), TOOL_LAUNCH_PATHS |
 | Router mount | `src/app/router.tsx` | — |
-| Layouts | `src/components/AppShell.tsx` | `src/layouts/AppShell.tsx` (shim), page-level shells |
+| Layouts | `src/components/AppShell.tsx` | page-level shells |
 | AppShell rail | `src/components/AppShell.tsx` + `NAVIGATION_ITEMS` | Inline nav arrays |
 | Navigation | `src/config/unified-navigation.config.ts` | `navigation.config.js`, `primaryNavigation.js` (shims/projections only) |
 | Tool inventory | `src/data/toolInventory.js` | Ad-hoc tool lists in pages |
@@ -70,12 +70,10 @@ Identify competing sources of truth that cause drift, double registration, or am
 
 **Canonical:** `src/components/AppShell.tsx` (active CareDroid app chrome)
 
-**Secondary (allowed):** `src/layouts/AppShell.tsx` (thin re-export shim — implementation in `src/components/AppShell.tsx`)
-
 
 | Duplicate | Instances | Risk | Action | Recommendation |
 |-----------|-----------|------|--------|----------------|
-| Shell variants | src/components/AppShell.tsx; src/layouts/AppShell.tsx | Legacy shell is not mounted but retained for tests/manual migration review. | legacy | Canonical shell: src/components/AppShell.tsx; do not wire src/layout/AppShell.jsx back into runtime. |
+| Shell variants | src/components/AppShell.tsx | — | done | Done (HEAL-257): deleted the dead `src/layouts/AppShell.tsx` re-export shim -- zero real imports anywhere in the repo (confirmed by grep), only referenced by this and 2 other registry entries and one now-updated comment. Canonical shell remains src/components/AppShell.tsx. |
 | Ops demo layout class | .ops-demo-page on simulation/lab/3D pages | Parallel layout CSS systems | done | Done: .ops-demo-page is not applied to any real page component any more (zero matches across every .tsx/.jsx in src/, verified) -- e.g. LaboratoryDashboard.tsx uses its own dedicated laboratory-page class. Simulation/lab/3D pages already migrated to their own per-page BEM class namespaces, closing the actual "parallel layout system" risk. What remains is 2 dead selectors (.ops-demo-page, .ops-demo-table) still listed among 20+ other real selectors in shared overflow/scroll rules in layout-visibility.css/responsive-ux.css, and one test asserting their presence (layout-visibility.test.ts) -- purely cosmetic dead-code remnants with zero functional effect, left in place rather than editing a shared CSS rule file for a cleanup outside this finding real scope. |
 
 ## Sidebars
@@ -136,7 +134,7 @@ Identify competing sources of truth that cause drift, double registration, or am
 |-----------|-----------|------|--------|----------------|
 | Home vs assistant | CommandDashboard (/dashboard); ChatInterface ED Copilot panel | Resolved — former Dashboard.jsx assistant page was removed. | legacy | Keep /dashboard owned by CommandDashboard and /assistant as an ED Copilot alias into the shell. |
 | Platform dashboard registry | platformOperatingSystem.js PLATFORM_DASHBOARDS; commandDashboardModel widgets | Demo OS dashboards vs command dashboard tiles | done | Done: verified by grep that commandDashboardModel.ts never references platformOperatingSystem, and the real /dashboard page (src/pages/executive/CommandDashboard.tsx) imports exclusively from commandDashboardModel.ts. platformOperatingSystem.ts PLATFORM_DASHBOARDS is consumed only by platformCapabilityMatrix.ts, searchFirstDiscovery.ts, and saasOperatingSystem.ts -- never a rendered page -- so no live "which dashboard renders /dashboard" ambiguity exists. Added a permanent regression guard (src/data/commandDashboardModel.test.ts) asserting commandDashboardModel.ts source never imports platformOperatingSystem. |
-| Domain dashboards (15+ pages) | AnalyticsDashboard; CostAnalyticsDashboard; AiCommandCenterDashboard; MemoryDashboard; TrainingDashboard; LaboratoryDashboard; MedicalIotDashboard; HospitalMapDashboard; FleetDashboard; OutcomesDashboardPage | Overlapping KPIs across ops/analytics pages | wire | Partially done, real gap remains -- also correcting a stale instance: DigitalOperationsCenter has zero references anywhere in src/ outside this audit file itself and was removed from the instances list (no such page exists any more). Of the rest, LaboratoryDashboard/MedicalIotDashboard/HospitalMapDashboard/FleetDashboard were already reachable from a commandDashboardModel panel. CostAnalyticsDashboard, AiCommandCenterDashboard, MemoryDashboard, and TrainingDashboard each had a real toolInventory record (ai-cost-optimization, ai-command-center, ai-memory, ai-training) but none were included in any COMMAND_DASHBOARD_GROUPS panel -- added all 4 to the expandedCare group and added a permanent regression guard (src/data/commandDashboardModel.test.ts) asserting each stays reachable. AnalyticsDashboard (/platform-analytics) and OutcomesDashboardPage (/outcomes) are real, mounted pages confirmed to have zero toolInventory record at all -- a deeper tool-catalog-completeness gap (they are likely also missing from Tools Overview/sidebar/search, not just the command dashboard) that needs a properly-scoped toolInventory registration with correct packId/segmentation/permissions, left open rather than guessed at. |
+| Domain dashboards (15+ pages) | AnalyticsDashboard; CostAnalyticsDashboard; AiCommandCenterDashboard; MemoryDashboard; TrainingDashboard; LaboratoryDashboard; MedicalIotDashboard; HospitalMapDashboard; FleetDashboard | Overlapping KPIs across ops/analytics pages | wire | Partially done, real gap remains -- also correcting 2 stale instances: DigitalOperationsCenter has zero references anywhere in src/ outside this audit file itself and was removed from the instances list (no such page exists any more). OutcomesDashboardPage was ALSO removed from the instances list, 2026-08-09 (HEAL-046) -- direct verification found no such component exists anywhere in the codebase; the only reference to it was a live, currently-clickable dead `/outcomes` link in OrganizationPages.tsx/OrganizationDashboard, since removed. This was a stronger gap than this entry previously described ("real, mounted page... missing a toolInventory record") -- there was no page at all, not a cataloguing gap on a real page. Of the rest, LaboratoryDashboard/MedicalIotDashboard/HospitalMapDashboard/FleetDashboard were already reachable from a commandDashboardModel panel. CostAnalyticsDashboard, AiCommandCenterDashboard, MemoryDashboard, and TrainingDashboard each had a real toolInventory record (ai-cost-optimization, ai-command-center, ai-memory, ai-training) but none were included in any COMMAND_DASHBOARD_GROUPS panel -- added all 4 to the expandedCare group and added a permanent regression guard (src/data/commandDashboardModel.test.ts) asserting each stays reachable. AnalyticsDashboard (/platform-analytics) remains a real, mounted page confirmed to have zero toolInventory record at all -- a genuine tool-catalog-completeness gap (likely also missing from Tools Overview/sidebar/search, not just the command dashboard) that needs a properly-scoped toolInventory registration with correct packId/segmentation/permissions, left open rather than guessed at. |
 
 ## Auth configs
 
