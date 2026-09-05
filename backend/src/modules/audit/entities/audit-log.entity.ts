@@ -35,6 +35,15 @@ export enum AuditAction {
 @Entity('audit_logs')
 @Index(['userId', 'timestamp'])
 @Index(['phiAccessed', 'timestamp'])
+// AuditService.log() chains each entry to the previous one, which means every
+// write first runs `ORDER BY timestamp DESC LIMIT 1` over this whole table --
+// and AuthorizationGuard awaits that write on EVERY permission-checked
+// request. Both composite indexes above lead with another column, so neither
+// can serve a bare ORDER BY timestamp: the plan was `SCAN audit_logs` +
+// `USE TEMP B-TREE FOR ORDER BY` across 528,318 rows, on every request.
+// Leading with timestamp turns that into a single index seek. The hash chain,
+// the rows written and the guarantee are unchanged -- only the lookup cost.
+@Index(['timestamp'])
 export class AuditLog {
   @PrimaryGeneratedColumn('uuid')
   id: string;
