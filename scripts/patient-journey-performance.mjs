@@ -474,14 +474,55 @@ function percentile(sorted, p) {
   return sorted[Math.max(0, idx)];
 }
 
+const GRADE_ORDER = ['A', 'B', 'C', 'D', 'F'];
+
+/**
+ * Stability and latency are independent, and the grade must say which one it
+ * is reporting.
+ *
+ * The single ladder this replaces collapsed them: a run where every journey
+ * completed but averaged 8s fell past the A/B/C rungs (each of which also
+ * required a latency bound) and landed on `passRate >= 0.5` — reported as
+ * "Poor — critical path unstable", with a recommendation to "stabilize backend
+ * reachability, auth/dev-session and PHI permissions". Measured 2026-09-05:
+ * 6/6 journeys passed and every one of those subsystems was healthy. The
+ * reader was sent hunting for flaky failures that did not exist while the real
+ * finding — latency — went unnamed.
+ */
 function gradeJourney(avgMs, passRate) {
-  if (passRate >= 0.95 && avgMs < 800) return { grade: 'A', label: 'Excellent — pilot ready' };
-  if (passRate >= 0.85 && avgMs < 1500)
-    return { grade: 'B', label: 'Good — acceptable pilot latency' };
-  if (passRate >= 0.7 && avgMs < 3000)
-    return { grade: 'C', label: 'Fair — investigate slow/failing steps' };
-  if (passRate >= 0.5) return { grade: 'D', label: 'Poor — critical path unstable' };
-  return { grade: 'F', label: 'Fail — platform not responding as an ED front door' };
+  const stability =
+    passRate >= 1
+      ? 'A'
+      : passRate >= 0.95
+        ? 'B'
+        : passRate >= 0.85
+          ? 'C'
+          : passRate >= 0.5
+            ? 'D'
+            : 'F';
+  const latency =
+    avgMs < 800 ? 'A' : avgMs < 1500 ? 'B' : avgMs < 3000 ? 'C' : avgMs < 10000 ? 'D' : 'F';
+
+  const stabilityText =
+    stability === 'A'
+      ? 'every journey completed'
+      : `${Math.round(passRate * 100)}% of journeys completed`;
+  const latencyText = `${Math.round(avgMs)}ms average`;
+
+  // The worse dimension sets the grade; the label names it, so nobody
+  // investigates instability when the only problem is speed.
+  const driver =
+    GRADE_ORDER.indexOf(stability) >= GRADE_ORDER.indexOf(latency) ? 'stability' : 'latency';
+  const grade = driver === 'stability' ? stability : latency;
+
+  const label =
+    grade === 'A'
+      ? `Excellent — pilot ready (${stabilityText}, ${latencyText})`
+      : driver === 'stability'
+        ? `Critical path unstable — ${stabilityText} (${latencyText})`
+        : `Critical path completes but is slow — ${latencyText} (${stabilityText})`;
+
+  return { grade, label, stability, latency, driver };
 }
 
 function toMarkdown(report) {
@@ -579,10 +620,15 @@ async function main() {
 
   const feHealth = await probePort(FRONTEND_PORT, '/health');
   probes.push({ label: `Frontend proxy /health (:${FRONTEND_PORT})`, ...feHealth });
-  const feRoot = await requestJson(FRONTEND_PORT, '/');
+  // Ask for HTML, not JSON. requestJson sends `Accept: application/json`, for
+  // which the dev server answers 404 on `/` — and `status < 500` accepted that
+  // as ok, so this probe could not have detected a frontend that was not
+  // serving the app at all (2026-09-05: reported 404/ok while curl returned
+  // 200).
+  const feRoot = await requestJson(FRONTEND_PORT, '/', { headers: { Accept: 'text/html' } });
   probes.push({
     label: `Frontend / (:${FRONTEND_PORT})`,
-    ok: feRoot.status > 0 && feRoot.status < 500,
+    ok: feRoot.status === 200,
     status: feRoot.status,
     ms: feRoot.ms,
   });
@@ -693,12 +739,15 @@ async function main() {
   }
 
   const grade = gradeJourney(avgTotalMs, passRate);
+  // Recommend against the dimension that actually set the grade. The previous
+  // wording sent every D/F run to "stabilize backend reachability, auth and
+  // PHI permissions" even when all of those had passed.
   const recommendation =
     grade.grade === 'A' || grade.grade === 'B'
       ? 'Reception critical path is executable under live HTTP load. Proceed with pilot desk training; keep monitoring p95 handoff latency and escalation fan-out across stations.'
-      : grade.grade === 'C'
-        ? 'Platform responds but latency or intermittent failures need attention on create/handoff/OCR/auth. Re-run after checking Nest logs and JWT permissions (READ_PHI/WRITE_PHI).'
-        : 'Stabilize backend reachability, auth/dev-session, and PHI permissions before pilot. Use RECEPTION_HANDOFF.md golden path against a healthy stack.';
+      : grade.driver === 'stability'
+        ? 'Journeys are failing, not just slowing. Check backend reachability, auth/dev-session and PHI permissions (READ_PHI/WRITE_PHI) against the failed steps listed below, then re-run.'
+        : `Every journey completed; the grade is latency alone (${Math.round(avgTotalMs)}ms average). Profile the slowest steps below against a production build — dev-mode module loading and a development database inflate these numbers — before treating this as a platform defect.`;
 
   const report = {
     generatedAt,

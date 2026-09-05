@@ -856,14 +856,28 @@ export class EmergencyOsController {
         triageAssist = null;
       }
     }
-    return this.receptionWorkspaceService.completeHandoff(
-      {
-        ...body,
-        triageAssist: triageAssist || undefined,
-        triageAssistGeneratedAt: triageAssist?.generatedAt,
-      },
-      tenantContext?.organizationId,
-    );
+    try {
+      return await this.receptionWorkspaceService.completeHandoff(
+        {
+          ...body,
+          triageAssist: triageAssist || undefined,
+          triageAssistGeneratedAt: triageAssist?.generatedAt,
+        },
+        tenantContext?.organizationId,
+      );
+    } catch (error) {
+      // Same translation as postTriageAssist/getPatientOrchestration/
+      // updatePatient. completeHandoff guards an EMPTY patientId (returning a
+      // clean {ok:false}) but then calls movePatientToState, which throws a
+      // plain Error for an id that simply does not exist -- so handing off a
+      // stale or already-merged patient answered 500 Internal Server Error
+      // rather than 404. Reproduced 2026-09-05 against the running stack:
+      // missing/null/empty ids returned 201 {ok:false}, an unknown id 500.
+      if (error instanceof Error && /not found/i.test(error.message)) {
+        throw new NotFoundException(error.message);
+      }
+      throw error;
+    }
   }
 
   @RequirePermission(Permission.WRITE_PHI)

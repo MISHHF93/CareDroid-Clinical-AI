@@ -1,4 +1,5 @@
 import { Test } from '@nestjs/testing';
+import { NotFoundException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthorizationGuard } from '../auth/guards/authorization.guard';
 import { PERMISSIONS_KEY } from '../auth/decorators/permissions.decorator';
@@ -1021,4 +1022,38 @@ describe('EmergencyOsController', () => {
     );
     auditSpy.mockRestore();
   });
+
+  /**
+   * completeHandoff guards an EMPTY patientId and returns a clean
+   * {ok: false} envelope, but for an id that simply does not exist it calls
+   * movePatientToState, which throws a plain Error -- and Nest renders a plain
+   * Error as 500. Reproduced against the running stack on 2026-09-05: missing,
+   * null and empty ids all answered 201 {ok:false, error:'patientId is
+   * required'}, while an unknown id answered 500 Internal Server Error. A
+   * clerk handing off a stale or already-merged patient saw a generic server
+   * error instead of "not found". Sibling routes (postTriageAssist,
+   * getPatientOrchestration, updatePatient) already performed this
+   * translation.
+   */
+  it('answers 404, not 500, when handing off a patient that does not exist', async () => {
+    await expect(
+      controller.postReceptionHandoff(
+        { patientId: 'does-not-exist-xyz', source: 'spec', actorName: 'Spec Clerk' } as any,
+        undefined,
+      ),
+    ).rejects.toBeInstanceOf(NotFoundException);
+  });
+
+  it.each([undefined, null, ''])(
+    'still returns the clean envelope rather than throwing for patientId %p',
+    async (patientId) => {
+      const result: any = await controller.postReceptionHandoff(
+        { patientId, source: 'spec', actorName: 'Spec Clerk' } as any,
+        undefined,
+      );
+      expect(result?.data).toEqual(
+        expect.objectContaining({ ok: false, error: 'patientId is required' }),
+      );
+    },
+  );
 });
