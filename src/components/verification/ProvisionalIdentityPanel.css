@@ -1,57 +1,94 @@
 .provisional-identity-panel {
   display: grid;
-  gap: 10px;
-  padding: 12px;
-  border: 1px solid rgba(96, 165, 250, 0.35);
-  border-radius: 12px;
-  background: rgba(37, 99, 235, 0.08);
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid rgba(96, 165, 250, 0.3);
+  border-radius: 10px;
+  background: rgba(37, 99, 235, 0.07);
+}
+
+.provisional-identity-panel header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px;
+  margin-bottom: 4px;
 }
 
 .provisional-identity-panel header h3 {
   margin: 0;
   color: var(--color-text-primary, var(--medical-ink, #111827));
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .provisional-identity-panel header p {
-  margin: 4px 0 0;
+  margin: 0;
   color: var(--color-text-secondary, #9ca3af);
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .provisional-identity-panel__options {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
+  gap: 6px;
 }
 
 .provisional-identity-panel__option {
   display: grid;
-  gap: 4px;
-  padding: 10px;
+  gap: 3px;
+  padding: 9px;
   border: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
-  border-radius: 10px;
+  border-radius: 8px;
   background: var(--color-elevated, var(--medical-surface-page, #f1f5f9));
   color: inherit;
   font: inherit;
   text-align: left;
   cursor: pointer;
+  transition: all 100ms ease;
+}
+
+.provisional-identity-panel__option:hover:not(:disabled) {
+  border-color: #374151;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.provisional-identity-panel__option:focus-visible {
+  outline: 2px solid var(--status-info, #3b82f6);
+  outline-offset: 2px;
 }
 
 .provisional-identity-panel__option:disabled {
-  opacity: 0.55;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
 .provisional-identity-panel__option strong {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   color: var(--color-text-primary, var(--medical-ink, #111827));
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .provisional-identity-panel__option span {
   color: var(--color-text-secondary, #9ca3af);
-  font-size: 11px;
+  font-size: 10px;
   line-height: 1.35;
+}
+
+.provisional-identity-panel__option .provisional-identity-panel__kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  background: var(--color-text-secondary, #9ca3af);
+  color: #fff;
+  font-size: 8px;
+  font-weight: 800;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
 }
 
 .provisional-identity-panel--compact .provisional-identity-panel__options {
@@ -61,5 +98,14 @@
 @media (max-width: 900px) {
   .provisional-identity-panel__options {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .provisional-identity-panel {
+    padding: 8px;
+  }
+  .provisional-identity-panel__option {
+    padding: 8px;
   }
 }

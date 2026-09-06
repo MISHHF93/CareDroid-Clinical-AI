@@ -1,12 +1,12 @@
 .patient-verification {
   display: grid;
-  gap: 12px;
+  gap: 10px;
 }
 
 .patient-verification__steps {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -15,31 +15,44 @@
 .patient-verification__steps button {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   border: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
-  border-radius: 999px;
+  border-radius: 8px;
   background: var(--color-elevated, var(--medical-surface-page, #f1f5f9));
   color: var(--color-text-secondary, #9ca3af);
-  padding: 6px 10px;
-  font-size: 11px;
+  padding: 5px 9px;
+  font-size: 10px;
+  font-weight: 700;
   cursor: pointer;
+  transition: all 120ms ease;
+}
+
+.patient-verification__steps button:hover:not(:disabled) {
+  border-color: #374151;
+  color: var(--color-text-primary, var(--medical-ink, #111827));
+  background: #fff;
 }
 
 .patient-verification__step--active button {
-  border-color: #374151;
-  color: var(--color-text-primary, var(--medical-ink, #111827));
+  border-color: var(--status-info, #3b82f6);
+  background: color-mix(in srgb, var(--status-info, #3b82f6) 12%, transparent);
+  color: var(--status-info, #2563eb);
 }
 
 .patient-verification__steps span {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   border-radius: 999px;
-  background: rgba(96, 165, 250, 0.2);
-  font-size: 10px;
+  background: rgba(96, 165, 250, 0.18);
+  font-size: 9px;
   font-weight: 800;
+}
+
+.patient-verification__step--complete button {
+  opacity: 0.75;
 }
 
 .patient-verification__content,
@@ -47,23 +60,25 @@
 .patient-verification__audit,
 .patient-verification__warnings--collapsed,
 .patient-verification__audit--collapsed {
-  border: 1px solid var(--ed-border-subtle, rgba(148, 163, 184, 0.2));
-  border-radius: 10px;
-  padding: 8px 12px;
+  border: 1px solid var(--ed-border-subtle, rgba(148, 163, 184, 0.18));
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: var(--color-card, var(--app-surface-2, #ffffff));
 }
 
 .patient-verification__warnings--collapsed summary,
 .patient-verification__audit--collapsed summary {
   cursor: pointer;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
+  color: var(--color-text-primary, var(--medical-ink, #111827));
 }
 
 .patient-verification__warnings {
   border: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
-  border-radius: 12px;
+  border-radius: 10px;
   background: var(--color-card, var(--app-surface-2, #ffffff));
-  padding: 12px;
+  padding: 10px;
 }
 
 .patient-verification__intro h3,
@@ -71,62 +86,77 @@
 .patient-verification__audit h3 {
   margin: 0;
   color: var(--color-text-primary, var(--medical-ink, #111827));
-  font-size: 15px;
+  font-size: 14px;
 }
 
 .patient-verification__intro p,
 .patient-verification__finalize-copy p {
-  margin: 6px 0 0;
+  margin: 4px 0 0;
   color: var(--color-text-secondary, #9ca3af);
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .patient-verification__intro ol {
-  margin: 10px 0 0;
-  padding-left: 18px;
+  margin: 8px 0 0;
+  padding-left: 16px;
   color: var(--color-text-secondary, #9ca3af);
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .patient-verification__warnings p {
   margin: 0;
   color: var(--medical-status-warning-text, #b45309);
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .patient-verification__actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
 }
 
 .patient-verification__actions button {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   border: 1px solid var(--color-border-subtle, #e0f2fe);
-  border-radius: 10px;
+  border-radius: 8px;
   background: var(--color-elevated, var(--medical-surface-page, #f1f5f9));
   color: var(--color-text-primary, var(--medical-ink, #111827));
-  padding: 8px 12px;
-  font-size: 12px;
+  padding: 7px 11px;
+  font-size: 11px;
   font-weight: 700;
   cursor: pointer;
+  transition: all 100ms ease;
+}
+
+.patient-verification__actions button:hover:not(:disabled) {
+  background: #fff;
+  border-color: #374151;
 }
 
 .patient-verification__actions button:disabled {
-  opacity: 0.55;
+  opacity: 0.5;
   cursor: not-allowed;
+}
+
+.patient-verification__actions button:focus-visible {
+  outline: 2px solid var(--status-info, #3b82f6);
+  outline-offset: 2px;
 }
 
 .patient-verification__audit {
   display: grid;
-  gap: 4px;
+  gap: 3px;
 }
 
 .patient-verification__audit span {
   color: var(--color-text-secondary, #9ca3af);
-  font-size: 11px;
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--color-elevated, var(--medical-surface-page, #f1f5f9));
+  max-width: fit-content;
 }
 
 .patient-verification__continue {
@@ -135,21 +165,40 @@
 }
 
 .patient-verification__continue button {
-  border: 1px solid color-mix(in srgb, var(--status-info, #94a3b8) 45%, transparent);
-  border-radius: 10px;
-  background: color-mix(in srgb, var(--status-info, #94a3b8) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--status-info, #94a3b8) 40%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--status-info, #94a3b8) 12%, transparent);
   color: #374151;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 800;
-  padding: 8px 14px;
+  padding: 7px 12px;
   cursor: pointer;
+  transition: all 100ms ease;
+}
+
+.patient-verification__continue button:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--status-info, #94a3b8) 20%, transparent);
+  border-color: var(--status-info, #3b82f6);
 }
 
 .patient-verification__continue button:disabled {
-  opacity: 0.55;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
-.patient-verification__step--complete button {
-  opacity: 0.85;
+@media (max-width: 640px) {
+  .patient-verification__actions {
+    flex-direction: column;
+  }
+  .patient-verification__actions button {
+    width: 100%;
+    justify-content: center;
+  }
+  .patient-verification__continue {
+    width: 100%;
+  }
+  .patient-verification__continue button {
+    width: 100%;
+    justify-content: center;
+  }
 }

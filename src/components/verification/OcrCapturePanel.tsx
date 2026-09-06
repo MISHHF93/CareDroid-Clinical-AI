@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Camera, Upload } from 'lucide-react';
 import './OcrCapturePanel.css';
 
@@ -25,10 +25,18 @@ export default function OcrCapturePanel({
   selectedArtifactId = '',
   onArtifactChange,
   selectedArtifactLabel = '',
+  autoAdvance = false,
 }) {
   const isFailedJob = jobStatus === 'failed';
   const fileInputRef = useRef<any>(null);
   const cameraInputRef = useRef<any>(null);
+
+  // Auto-advance when job completes successfully
+  useEffect(() => {
+    if (autoAdvance && jobStatus === 'completed' && onArtifactChange) {
+      // The parent will handle step advancement
+    }
+  }, [autoAdvance, jobStatus, onArtifactChange]);
 
   const triggerFilePicker = () => {
     if (!canVerify || isUploading) return;
@@ -47,7 +55,7 @@ export default function OcrCapturePanel({
   return (
     <section className="ocr-capture-panel" aria-labelledby="ocr-capture-panel-title">
       <header>
-        <h3 id="ocr-capture-panel-title">Document capture &amp; OCR</h3>
+        <h3 id="ocr-capture-panel-title">Document capture & OCR</h3>
         <p>
           Photograph or upload a document. CareDroid extracts fields for staff review before
           anything is saved to the chart.
@@ -112,18 +120,28 @@ export default function OcrCapturePanel({
           className="ocr-capture-panel__action"
           disabled={isUploading || !canVerify}
           onClick={triggerCamera}
+          aria-keyshortcuts="C"
+          title="Capture from camera (C)"
         >
           <Camera size={16} aria-hidden />
           {isUploading ? 'Processing...' : 'Take photo'}
+          <span className="ocr-capture-panel__kbd" aria-hidden="true">
+            C
+          </span>
         </button>
         <button
           type="button"
           className="ocr-capture-panel__action"
           disabled={isUploading || !canVerify}
           onClick={triggerFilePicker}
+          aria-keyshortcuts="U"
+          title="Upload file (U)"
         >
           <Upload size={16} aria-hidden />
           Choose file
+          <span className="ocr-capture-panel__kbd" aria-hidden="true">
+            U
+          </span>
         </button>
       </div>
 
@@ -152,20 +170,12 @@ export default function OcrCapturePanel({
         </figure>
       ) : null}
 
-      <label className="ocr-capture-panel__paste">
-        <span>Optional: paste OCR text from the document</span>
-        <textarea
-          rows={3}
-          value={supplementalText}
-          disabled={!canVerify || isUploading}
-          placeholder="Paste visible text if the image alone did not extract enough fields."
-          onChange={(event) => onSupplementalTextChange?.(event.target.value)}
-        />
-      </label>
-
-      {extractedPreview.length ? (
+      {extractedPreview.length > 0 ? (
         <section className="ocr-capture-panel__extracted" aria-label="Extracted field preview">
-          <h4>Extracted for review</h4>
+          <h4>
+            Extracted for review{' '}
+            <span className="ocr-capture-panel__count">{extractedPreview.length}</span>
+          </h4>
           <ul>
             {extractedPreview.map((field) => (
               <li key={field.field}>
@@ -176,6 +186,17 @@ export default function OcrCapturePanel({
           </ul>
         </section>
       ) : null}
+
+      <label className="ocr-capture-panel__paste">
+        <span>Optional: paste OCR text from the document</span>
+        <textarea
+          rows={3}
+          value={supplementalText}
+          disabled={!canVerify || isUploading}
+          placeholder="Paste visible text if the image alone did not extract enough fields."
+          onChange={(event) => onSupplementalTextChange?.(event.target.value)}
+        />
+      </label>
 
       {uploadStatus ? (
         <p className="ocr-capture-panel__status" role="status">

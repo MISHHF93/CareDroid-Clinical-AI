@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useProfileNavigate } from '../../hooks/useProfileNavigate';
 import { FileScan } from 'lucide-react';
@@ -223,6 +223,7 @@ export default function SmartIntake({
   // the UI can say so via AiTruthLabel rather than implying every hint is
   // live AI guidance.
   const [aiVerificationHintState, setAiVerificationHintState] = useState<AiTruthLabelState>('Live');
+
   const verifyIntakePresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.verifyIntake);
   const createPatientPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.createPatient);
   const canVerifyIntake = verifyIntakePresentation.enabled;
@@ -852,6 +853,80 @@ export default function SmartIntake({
     const nextStep = resolveSmartIntakeContinueStep(activeStep, { verificationComplete });
     setActiveStepTracked(nextStep, 'continue');
   };
+
+  // Global keyboard shortcuts for intake flow
+  const handleGlobalKeys = useCallback(
+    (event: KeyboardEvent) => {
+      // Don't trigger shortcuts when typing in inputs
+      const target = event.target as HTMLElement;
+      if (
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.tagName === 'SELECT'
+      ) {
+        return;
+      }
+
+      if (!canVerifyIntake && !canCreatePatient) return;
+
+      switch (event.key.toLowerCase()) {
+        case 'enter':
+          if (intakeCanContinue && !pendingAction) {
+            event.preventDefault();
+            handleContinue();
+          }
+          break;
+        case '1':
+          if (fromReception || embedded) {
+            event.preventDefault();
+            setActiveStepTracked(mapDisplayStepToInternal(1), 'shortcut');
+          }
+          break;
+        case '2':
+          if (fromReception || embedded) {
+            event.preventDefault();
+            setActiveStepTracked(mapDisplayStepToInternal(2), 'shortcut');
+          }
+          break;
+        case '3':
+          if (fromReception || embedded) {
+            event.preventDefault();
+            setActiveStepTracked(mapDisplayStepToInternal(3), 'shortcut');
+          }
+          break;
+        case '4':
+          if (fromReception || embedded) {
+            event.preventDefault();
+            setActiveStepTracked(mapDisplayStepToInternal(4), 'shortcut');
+          }
+          break;
+        case 's':
+          if (event.ctrlKey || event.metaKey) {
+            event.preventDefault();
+            if (!sessionReady && canVerifyIntake) {
+              void startBackendSession();
+            }
+          }
+          break;
+      }
+    },
+    [
+      canVerifyIntake,
+      canCreatePatient,
+      intakeCanContinue,
+      pendingAction,
+      fromReception,
+      embedded,
+      handleContinue,
+      sessionReady,
+      startBackendSession,
+    ],
+  );
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleGlobalKeys);
+    return () => window.removeEventListener('keydown', handleGlobalKeys);
+  }, [handleGlobalKeys]);
 
   const mapDisplayStepToInternal = (displayIndex) => {
     if (displayIndex <= 0) return SMART_INTAKE_STEP_INDEX.capture;

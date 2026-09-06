@@ -1,18 +1,26 @@
 .identity-field-review {
   display: grid;
-  gap: 10px;
+  gap: 8px;
+}
+
+.identity-field-review header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px;
+  margin-bottom: 4px;
 }
 
 .identity-field-review header h3 {
   margin: 0;
   color: var(--color-text-primary, var(--medical-ink, #111827));
-  font-size: 15px;
+  font-size: 14px;
 }
 
 .identity-field-review header p {
-  margin: 4px 0 0;
+  margin: 0;
   color: var(--color-text-secondary, #9ca3af);
-  font-size: 12px;
+  font-size: 11px;
 }
 
 /* HEAL-347.21: this button used a pale, dark-mode-tuned text color
@@ -23,91 +31,182 @@
    WCAG-tuned info-text shade; the original pale value moves to a
    dark-mode override where it belongs. */
 .identity-field-review__bulk {
-  margin-top: 8px;
-  border: 1px solid color-mix(in srgb, var(--status-info, #94a3b8) 40%, transparent);
+  margin-left: auto;
+  border: 1px solid color-mix(in srgb, var(--status-stable, #22c55e) 40%, transparent);
   border-radius: 8px;
-  background: color-mix(in srgb, var(--status-info, #94a3b8) 12%, transparent);
-  color: var(--medical-status-info-text, #475569);
-  font-size: 12px;
+  background: color-mix(in srgb, var(--status-stable, #22c55e) 12%, transparent);
+  color: var(--medical-status-stable-text, #166534);
+  font-size: 11px;
   font-weight: 700;
-  padding: 6px 10px;
+  padding: 6px 12px;
   cursor: pointer;
+  transition: all 100ms ease;
+  white-space: nowrap;
+}
+
+.identity-field-review__bulk:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--status-stable, #22c55e) 20%, transparent);
+  border-color: var(--status-stable, #22c55e);
+}
+
+.identity-field-review__bulk:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.identity-field-review__bulk:focus-visible {
+  outline: 2px solid var(--status-stable, #22c55e);
+  outline-offset: 2px;
 }
 
 html[data-theme='dark'] .identity-field-review__bulk {
-  color: #bae6fd;
+  color: #86efac;
+}
+
+.identity-field-review__bulk-kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  margin-left: 6px;
+  border-radius: 4px;
+  background: var(--status-stable, #22c55e);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 800;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
 }
 
 .identity-field-review__list {
   display: grid;
-  gap: 8px;
+  gap: 6px;
 }
 
 .identity-field-review__field {
   display: grid;
-  gap: 8px;
-  padding: 10px 12px;
+  gap: 6px;
+  padding: 9px 11px;
   border: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
-  border-radius: 10px;
+  border-radius: 8px;
   background: var(--color-elevated, var(--medical-surface-page, #f1f5f9));
+  transition:
+    border-color 100ms ease,
+    box-shadow 100ms ease;
+}
+
+.identity-field-review__field:hover {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
 .identity-field-review__field span {
   color: var(--color-text-secondary, #9ca3af);
-  font-size: 11px;
+  font-size: 10px;
 }
 
 .identity-field-review__field dl {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  gap: 6px;
   margin: 0;
 }
 
 .identity-field-review__field dt {
   color: var(--color-text-secondary, #9ca3af);
-  font-size: 10px;
+  font-size: 9px;
   text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .identity-field-review__field dd {
-  margin: 2px 0 0;
+  margin: 1px 0 0;
   color: var(--color-text-primary, var(--medical-ink, #111827));
-  font-size: 13px;
+  font-size: 12px;
+  font-weight: 600;
+  word-break: break-word;
 }
 
 .identity-field-review__field footer {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 4px;
   align-items: center;
+  padding-top: 2px;
+  border-top: 1px solid var(--color-border-subtle, #e0f2fe);
+  margin-top: 2px;
 }
 
-.identity-field-review__field footer span {
+.identity-field-review__field footer > span {
   margin-right: auto;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: var(--color-elevated, var(--medical-surface-page, #f1f5f9));
 }
 
 .identity-field-review__field footer button {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
   border: 1px solid var(--color-border-subtle, #e0f2fe);
-  border-radius: 8px;
+  border-radius: 6px;
   background: transparent;
   color: var(--color-text-primary, var(--medical-ink, #111827));
-  padding: 5px 8px;
-  font-size: 11px;
+  padding: 4px 8px;
+  font-size: 10px;
+  font-weight: 600;
   cursor: pointer;
+  transition: all 80ms ease;
+}
+
+.identity-field-review__field footer button:hover:not(:disabled) {
+  background: #fff;
+  border-color: #374151;
+}
+
+.identity-field-field__kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  background: var(--color-text-secondary, #9ca3af);
+  color: #fff;
+  font-size: 8px;
+  font-weight: 800;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
+.identity-field-review__field footer button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 .identity-field-review__field--verified {
-  border-color: rgba(34, 197, 94, 0.35);
+  border-color: rgba(34, 197, 94, 0.4);
 }
 
 .identity-field-review__field--conflicting,
 .identity-field-review__field--missing {
-  border-color: rgba(245, 158, 11, 0.45);
+  border-color: rgba(245, 158, 11, 0.5);
 }
 
 .identity-field-review__field--overridden {
-  border-color: rgba(96, 165, 250, 0.45);
+  border-color: rgba(96, 165, 250, 0.5);
+}
+
+@media (max-width: 640px) {
+  .identity-field-review__field dl {
+    grid-template-columns: 1fr;
+  }
+  .identity-field-review__field footer {
+    justify-content: flex-start;
+  }
+  .identity-field-review__field footer > span {
+    width: 100%;
+    margin-bottom: 4px;
+    justify-content: center;
+  }
 }

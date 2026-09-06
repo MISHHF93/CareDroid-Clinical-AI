@@ -1,30 +1,43 @@
 .duplicate-candidate-panel {
   display: grid;
-  gap: 10px;
+  gap: 8px;
+}
+
+.duplicate-candidate-panel header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px;
+  margin-bottom: 4px;
 }
 
 .duplicate-candidate-panel header h3 {
   margin: 0;
   color: var(--color-text-primary, var(--medical-ink, #111827));
-  font-size: 15px;
+  font-size: 14px;
 }
 
 .duplicate-candidate-panel header p {
-  margin: 4px 0 0;
+  margin: 0;
   color: var(--color-text-secondary, #9ca3af);
-  font-size: 12px;
+  font-size: 11px;
   line-height: 1.4;
 }
 
 .duplicate-candidate-panel__empty {
   margin: 0;
   color: var(--color-text-secondary, #9ca3af);
-  font-size: 13px;
+  font-size: 12px;
+  padding: 12px;
+  text-align: center;
+  border: 1px dashed var(--color-border-subtle, #e0f2fe);
+  border-radius: 8px;
+  background: var(--color-elevated, var(--medical-surface-page, #f1f5f9));
 }
 
 .duplicate-candidate-panel__list {
   display: grid;
-  gap: 8px;
+  gap: 6px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -34,77 +47,193 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
-  padding: 10px 12px;
+  padding: 9px 11px;
   border: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
-  border-radius: 10px;
+  border-radius: 8px;
   background: var(--color-elevated, var(--medical-surface-page, #f1f5f9));
   color: inherit;
   font: inherit;
   text-align: left;
   cursor: default;
+  transition: all 100ms ease;
 }
 
 button.duplicate-candidate-panel__item {
   cursor: pointer;
 }
 
+button.duplicate-candidate-panel__item:hover {
+  border-color: #374151;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+button.duplicate-candidate-panel__item:focus-visible {
+  outline: 2px solid var(--status-info, #3b82f6);
+  outline-offset: 2px;
+}
+
 .duplicate-candidate-panel__item--selected {
   border-color: #374151;
-  box-shadow: inset 0 0 0 1px rgba(96, 165, 250, 0.35);
+  box-shadow:
+    inset 0 0 0 1px rgba(96, 165, 250, 0.35),
+    0 1px 3px rgba(0, 0, 0, 0.06);
+  background: color-mix(in srgb, var(--status-info, #3b82f6) 6%, transparent);
 }
 
 .duplicate-candidate-panel__item strong {
   display: block;
   color: var(--color-text-primary, var(--medical-ink, #111827));
+  font-size: 13px;
 }
 
 .duplicate-candidate-panel__item span,
 .duplicate-candidate-panel__item small {
   display: block;
   color: var(--color-text-secondary, #9ca3af);
-  font-size: 12px;
+  font-size: 10px;
+}
+
+.duplicate-candidate-panel__item .duplicate-candidate-panel__match-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin-top: 2px;
+}
+
+.duplicate-candidate-panel__score {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: rgba(34, 197, 94, 0.12);
+  color: #16a34a;
+  font-size: 10px;
+  font-weight: 800;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
+.duplicate-candidate-panel__action-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.duplicate-candidate-panel__action-label--link {
+  background: rgba(34, 197, 94, 0.12);
+  color: #16a34a;
+}
+
+.duplicate-candidate-panel__action-label--review {
+  background: rgba(245, 158, 11, 0.12);
+  color: #b45309;
+}
+
+.duplicate-candidate-panel__action-label--create {
+  background: rgba(96, 165, 250, 0.12);
+  color: #2563eb;
+}
+
+.duplicate-candidate-panel__conflicts {
+  color: #dc2626;
+  font-size: 10px;
+  font-weight: 600;
 }
 
 .duplicate-candidate-panel__open {
   flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 30px;
+  padding: 0 8px;
   border: 1px solid var(--color-border-subtle, #e0f2fe);
-  border-radius: 8px;
+  border-radius: 6px;
   background: transparent;
   color: var(--color-text-primary, var(--medical-ink, #111827));
-  padding: 6px 10px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   cursor: pointer;
+  transition: all 100ms ease;
+}
+
+.duplicate-candidate-panel__open:hover {
+  background: #fff;
+  border-color: #374151;
+}
+
+.duplicate-candidate-panel__open:focus-visible {
+  outline: 2px solid var(--status-info, #3b82f6);
+  outline-offset: 2px;
 }
 
 .duplicate-candidate-panel__explanation {
   display: flex;
   gap: 8px;
   align-items: flex-start;
-  padding: 10px 12px;
-  border-radius: 10px;
+  padding: 9px 11px;
+  border-radius: 8px;
   background: rgba(245, 158, 11, 0.1);
   color: var(--medical-status-warning-text, #b45309);
-  font-size: 12px;
+  font-size: 11px;
+  border: 1px solid rgba(245, 158, 11, 0.2);
 }
 
 .duplicate-candidate-panel__explanation p {
   margin: 0;
+  line-height: 1.5;
+}
+
+.duplicate-candidate-panel__footer {
+  margin-top: 4px;
 }
 
 .duplicate-candidate-panel__footer button {
-  border: 0;
+  border: 1px solid var(--status-info, #3b82f6);
   border-radius: 8px;
-  background: var(--medical-border, #e0f2fe);
-  color: var(--medical-ink, #111827);
-  padding: 8px 12px;
-  font-size: 12px;
+  background: color-mix(in srgb, var(--status-info, #3b82f6) 10%, transparent);
+  color: var(--status-info, #2563eb);
+  padding: 7px 11px;
+  font-size: 11px;
   font-weight: 700;
   cursor: pointer;
+  width: 100%;
+  transition: all 100ms ease;
+}
+
+.duplicate-candidate-panel__footer button:hover {
+  background: color-mix(in srgb, var(--status-info, #3b82f6) 18%, transparent);
+}
+
+.duplicate-candidate-panel__footer button:focus-visible {
+  outline: 2px solid var(--status-info, #3b82f6);
+  outline-offset: 2px;
 }
 
 .duplicate-candidate-panel--compact .duplicate-candidate-panel__item {
-  padding: 8px 10px;
+  padding: 7px 9px;
+}
+
+.duplicate-candidate-panel--compact .duplicate-candidate-panel__item strong {
+  font-size: 12px;
+}
+
+@media (max-width: 640px) {
+  .duplicate-candidate-panel__item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .duplicate-candidate-panel__open {
+    width: 100%;
+    justify-content: center;
+  }
 }

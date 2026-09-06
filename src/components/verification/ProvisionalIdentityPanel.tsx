@@ -3,6 +3,7 @@ import './ProvisionalIdentityPanel.css';
 
 export default function ProvisionalIdentityPanel({ onStart, disabled = false, compact = false }) {
   const kinds = ['unknown', 'temporary', 'identity-pending'];
+  const shortcuts = ['1', '2', '3'] as const;
 
   return (
     <section
@@ -15,7 +16,7 @@ export default function ProvisionalIdentityPanel({ onStart, disabled = false, co
       </header>
 
       <div className="provisional-identity-panel__options">
-        {kinds.map((kind) => {
+        {kinds.map((kind, index) => {
           const profile = PROVISIONAL_IDENTITY_PROFILES[kind];
           return (
             <button
@@ -24,8 +25,15 @@ export default function ProvisionalIdentityPanel({ onStart, disabled = false, co
               className="provisional-identity-panel__option"
               disabled={disabled}
               onClick={() => onStart?.(kind)}
+              aria-keyshortcuts={shortcuts[index]}
+              title={`Select ${profile.label} (${shortcuts[index]})`}
             >
-              <strong>{profile.label}</strong>
+              <strong>
+                {profile.label}
+                <span className="provisional-identity-panel__kbd" aria-hidden="true">
+                  {shortcuts[index]}
+                </span>
+              </strong>
               <span>{profile.timelineNote}</span>
             </button>
           );

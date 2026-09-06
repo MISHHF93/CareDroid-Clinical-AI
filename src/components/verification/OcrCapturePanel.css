@@ -1,36 +1,45 @@
 .ocr-capture-panel {
   display: grid;
-  gap: 12px;
+  gap: 10px;
+}
+
+.ocr-capture-panel header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px;
+  margin-bottom: 4px;
 }
 
 .ocr-capture-panel header h3 {
   margin: 0;
   color: var(--color-text-primary, var(--medical-ink, #111827));
-  font-size: 15px;
+  font-size: 14px;
 }
 
 .ocr-capture-panel header p {
-  margin: 4px 0 0;
+  margin: 0;
   color: var(--color-text-secondary, #9ca3af);
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .ocr-capture-panel__artifact-picker {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 5px;
 }
 
 .ocr-capture-panel__artifact-chip {
-  min-height: 32px;
-  padding: 0 10px;
+  min-height: 30px;
+  padding: 0 9px;
   border-radius: 999px;
   border: 1px solid var(--color-border-subtle, #e0f2fe);
   background: transparent;
   color: var(--color-text-secondary, #9ca3af);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   cursor: pointer;
+  transition: all 100ms ease;
 }
 
 .ocr-capture-panel__artifact-chip--active {
@@ -40,84 +49,96 @@
 }
 
 .ocr-capture-panel__artifact-chip:disabled {
-  opacity: 0.55;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
 .ocr-capture-panel__actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
 }
 
 .ocr-capture-panel__action {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  min-height: 40px;
-  padding: 0 14px;
+  gap: 5px;
+  min-height: 38px;
+  padding: 0 12px;
   border: 1px solid var(--color-border-subtle, #e0f2fe);
-  border-radius: 10px;
+  border-radius: 8px;
   background: var(--color-elevated, var(--medical-surface-page, #f1f5f9));
   color: var(--color-text-primary, var(--medical-ink, #111827));
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   cursor: pointer;
+  transition: all 100ms ease;
+}
+
+.ocr-capture-panel__action:hover:not(:disabled) {
+  background: #fff;
+  border-color: #374151;
 }
 
 .ocr-capture-panel__action:disabled {
-  opacity: 0.55;
+  opacity: 0.5;
   cursor: not-allowed;
+}
+
+.ocr-capture-panel__action:focus-visible {
+  outline: 2px solid var(--status-info, #3b82f6);
+  outline-offset: 2px;
 }
 
 .ocr-capture-panel__preview {
   margin: 0;
   display: grid;
-  gap: 6px;
+  gap: 5px;
 }
 
 .ocr-capture-panel__preview img {
-  width: min(100%, 320px);
-  max-height: 200px;
+  width: min(100%, 280px);
+  max-height: 160px;
   object-fit: cover;
-  border-radius: 10px;
+  border-radius: 8px;
   border: 1px solid var(--color-border-subtle, #e0f2fe);
 }
 
 .ocr-capture-panel__preview figcaption {
   color: var(--color-text-secondary, #9ca3af);
-  font-size: 11px;
+  font-size: 10px;
 }
 
 .ocr-capture-panel__paste {
   display: grid;
-  gap: 6px;
+  gap: 5px;
   color: var(--color-text-secondary, #9ca3af);
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .ocr-capture-panel__paste textarea {
   width: 100%;
   resize: vertical;
-  min-height: 72px;
-  padding: 10px 12px;
-  border-radius: 10px;
+  min-height: 60px;
+  padding: 8px 10px;
+  border-radius: 8px;
   border: 1px solid var(--color-border-subtle, #e0f2fe);
   background: var(--color-elevated, var(--medical-surface-page, #f1f5f9));
   color: var(--color-text-primary, var(--medical-ink, #111827));
   font: inherit;
+  font-size: 12px;
 }
 
 .ocr-capture-panel__extracted {
-  padding: 10px 12px;
-  border-radius: 10px;
+  padding: 9px 11px;
+  border-radius: 8px;
   border: 1px solid var(--color-border-subtle, #e0f2fe);
   background: var(--medical-surface-card, #ffffff);
 }
 
 .ocr-capture-panel__extracted h4 {
-  margin: 0 0 8px;
-  font-size: 12px;
+  margin: 0 0 6px;
+  font-size: 11px;
   color: var(--color-text-primary, var(--medical-ink, #111827));
 }
 
@@ -126,14 +147,14 @@
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 6px;
+  gap: 4px;
 }
 
 .ocr-capture-panel__extracted li {
   display: flex;
   justify-content: space-between;
-  gap: 12px;
-  font-size: 12px;
+  gap: 10px;
+  font-size: 11px;
   color: var(--color-text-secondary, #9ca3af);
 }
 
@@ -145,15 +166,17 @@
 .ocr-capture-panel__status {
   margin: 0;
   color: var(--color-text-secondary, #9ca3af);
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .ocr-capture-panel__job-status {
-  display: inline-block;
-  margin-top: 6px;
-  padding: 2px 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  padding: 2px 7px;
   border-radius: 999px;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   background: var(--color-elevated, #f1f5f9);
   color: var(--color-text-secondary, #9ca3af);
@@ -176,12 +199,12 @@
 }
 
 .ocr-capture-panel__failed-fallback {
-  padding: 10px 12px;
-  border-radius: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
   border: 1px solid rgba(239, 68, 68, 0.3);
   background: rgba(239, 68, 68, 0.08);
   color: #b91c1c;
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .ocr-capture-panel__failed-fallback p {
@@ -190,7 +213,17 @@
 
 .ocr-capture-panel__warnings {
   margin: 0;
-  padding: 0 0 0 18px;
+  padding: 0 0 0 16px;
   color: #b45309;
-  font-size: 12px;
+  font-size: 11px;
+}
+
+@media (max-width: 640px) {
+  .ocr-capture-panel__actions {
+    flex-direction: column;
+  }
+  .ocr-capture-panel__action {
+    width: 100%;
+    justify-content: center;
+  }
 }

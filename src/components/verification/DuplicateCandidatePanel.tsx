@@ -60,18 +60,26 @@ export default function DuplicateCandidatePanel({
                 onClick={
                   selectable ? () => (onSelectCandidate as any)(candidate.patientId) : undefined
                 }
+                aria-keyshortcuts={selectable ? '1-9' : undefined}
               >
                 <div>
                   <strong>{candidate.displayName}</strong>
-                  <span>
-                    {candidate.matchScore}% · {duplicateActionLabel(candidate.recommendedAction)}
-                  </span>
-                  <small>
-                    Matched: {candidate.matchedFields.join(', ') || 'none'}
-                    {candidate.conflictingFields.length
-                      ? ` · Conflicts: ${candidate.conflictingFields.join(', ')}`
-                      : ''}
-                  </small>
+                  <div className="duplicate-candidate-panel__match-info">
+                    <span className="duplicate-candidate-panel__score">
+                      {candidate.matchScore}%
+                    </span>
+                    <span
+                      className={`duplicate-candidate-panel__action-label duplicate-candidate-panel__action-label--${candidate.recommendedAction.toLowerCase()}`}
+                    >
+                      {duplicateActionLabel(candidate.recommendedAction)}
+                    </span>
+                    {candidate.conflictingFields.length > 0 && (
+                      <span className="duplicate-candidate-panel__conflicts">
+                        Conflicts: {candidate.conflictingFields.join(', ')}
+                      </span>
+                    )}
+                  </div>
+                  <small>Matched: {candidate.matchedFields.join(', ') || 'none'}</small>
                 </div>
                 {onOpenPatient ? (
                   <button
@@ -81,6 +89,7 @@ export default function DuplicateCandidatePanel({
                       event.stopPropagation();
                       onOpenPatient(candidate.patientId);
                     }}
+                    aria-label={`Open ${candidate.displayName}`}
                   >
                     Open
                   </button>
@@ -93,7 +102,7 @@ export default function DuplicateCandidatePanel({
 
       {selectedCandidate ? (
         <div className="duplicate-candidate-panel__explanation">
-          <AlertTriangle size={16} aria-hidden />
+          <AlertTriangle size={14} aria-hidden />
           <p>
             {selectedCandidate.displayName} is recommended for{' '}
             <strong>{duplicateActionLabel(selectedCandidate.recommendedAction)}</strong>. Manual

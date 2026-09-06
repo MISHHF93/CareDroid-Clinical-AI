@@ -20,8 +20,13 @@ export default function IdentityFieldReview({
             className="identity-field-review__bulk"
             disabled={!canVerify}
             onClick={onApproveMatching}
+            aria-keyshortcuts="A"
+            title="Bulk approve matching fields (A)"
           >
             Approve {bulkApprovableCount} matching field{bulkApprovableCount === 1 ? '' : 's'}
+            <span className="identity-field-review__bulk-kbd" aria-hidden="true">
+              A
+            </span>
           </button>
         ) : null}
       </header>
@@ -54,22 +59,37 @@ export default function IdentityFieldReview({
                   type="button"
                   onClick={() => onFieldDecision(field.field, 'approved')}
                   disabled={!canVerify}
+                  aria-keyshortcuts="A"
+                  title="Approve this field (A)"
                 >
-                  Approve
+                  Approve{' '}
+                  <span className="identity-field__kbd" aria-hidden="true">
+                    A
+                  </span>
                 </button>
                 <button
                   type="button"
                   onClick={() => onFieldDecision(field.field, 'edited')}
                   disabled={!canVerify}
+                  aria-keyshortcuts="E"
+                  title="Mark as edited (E)"
                 >
-                  Mark edited
+                  Edit{' '}
+                  <span className="identity-field__kbd" aria-hidden="true">
+                    E
+                  </span>
                 </button>
                 <button
                   type="button"
                   onClick={() => onFieldDecision(field.field, 'rejected')}
                   disabled={!canVerify}
+                  aria-keyshortcuts="R"
+                  title="Reject this field (R)"
                 >
-                  Reject
+                  Reject{' '}
+                  <span className="identity-field__kbd" aria-hidden="true">
+                    R
+                  </span>
                 </button>
               </footer>
             </article>
