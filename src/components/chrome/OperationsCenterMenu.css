@@ -27,13 +27,13 @@
 }
 
 .operations-center-menu__trigger--warning {
-  color: var(--status-warning, #d97706);
-  border-color: color-mix(in srgb, var(--status-warning, #d97706) 45%, transparent);
+  color: var(--cdl-warning, #b45309);
+  border-color: color-mix(in srgb, var(--cdl-warning, #b45309) 45%, transparent);
 }
 
 .operations-center-menu__trigger--critical {
-  color: var(--status-critical, #dc2626);
-  border-color: color-mix(in srgb, var(--status-critical, #dc2626) 55%, transparent);
+  color: var(--cdl-critical, #dc2626);
+  border-color: color-mix(in srgb, var(--cdl-critical, #dc2626) 55%, transparent);
 }
 
 .operations-center-menu__badge {
@@ -44,8 +44,8 @@
   height: 16px;
   padding: 0 4px;
   border-radius: 999px;
-  background: var(--status-critical, #dc2626);
-  color: #fff;
+  background: var(--cdl-critical, #dc2626);
+  color: var(--cdl-critical-text, #991b1b);
   font-size: 10px;
   font-weight: 700;
   line-height: 16px;
@@ -54,7 +54,7 @@
 }
 
 .operations-center-menu__trigger--warning .operations-center-menu__badge {
-  background: var(--status-warning, #d97706);
+  background: var(--cdl-warning, #b45309);
 }
 
 /*
