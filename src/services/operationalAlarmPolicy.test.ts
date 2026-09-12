@@ -1,9 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  ALARM_SURFACE,
-  resolveAlarmSurfacePlan,
-  shouldShowOperationalToast,
-} from './operationalAlarmPolicy';
+import { ALARM_ROUTING_SURFACE, resolveAlarmSurfacePlan } from './operationalAlarmPolicy';
 
 describe('operationalAlarmPolicy', () => {
   it('never routes alarms to fullscreen overlays or auto-open panels', () => {
@@ -18,20 +14,7 @@ describe('operationalAlarmPolicy', () => {
 
     expect(critical.useFullscreenOverlay).toBe(false);
     expect(critical.autoOpenPanel).toBe(false);
-    expect(critical.surfaces).toContain(ALARM_SURFACE.sidebarPulse);
-    expect(critical.surfaces).toContain(ALARM_SURFACE.shellDock);
-  });
-
-  it('does not surface operational alerts as Sonner toasts', () => {
-    expect(
-      shouldShowOperationalToast({
-        id: 'a2',
-        severity: 'Warning',
-        title: 'Queue delay',
-        message: 'Wait exceeded',
-        createdAt: new Date().toISOString(),
-        dismissed: false,
-      } as any),
-    ).toBe(false);
+    expect(critical.surfaces).toContain(ALARM_ROUTING_SURFACE.sidebarPulse);
+    expect(critical.surfaces).toContain(ALARM_ROUTING_SURFACE.shellDock);
   });
 });

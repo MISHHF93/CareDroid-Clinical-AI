@@ -1,18 +1,19 @@
 import type { Alert } from '../types/emergency';
 import { classifyOperationalAlert } from '../engine/alertClassificationModel';
 
-/** Where an alarm may appear — never fullscreen. */
-export const ALARM_SURFACE = Object.freeze({
+/** Where an alarm may route — sidebar pulse, shell dock, or panel drawer. */
+export const ALARM_ROUTING_SURFACE = Object.freeze({
   none: 'none',
   sidebarPulse: 'sidebar-pulse',
   shellDock: 'shell-dock',
   panelDrawer: 'panel-drawer',
 } as const);
 
-export type AlarmSurface = (typeof ALARM_SURFACE)[keyof typeof ALARM_SURFACE];
+export type AlarmRoutingSurface =
+  (typeof ALARM_ROUTING_SURFACE)[keyof typeof ALARM_ROUTING_SURFACE];
 
 export type AlarmSurfacePlan = Readonly<{
-  surfaces: readonly AlarmSurface[];
+  surfaces: readonly AlarmRoutingSurface[];
   autoOpenPanel: boolean;
   useFullscreenOverlay: boolean;
 }>;
@@ -35,34 +36,29 @@ export function resolveAlarmSurfacePlan(
   switch (tier) {
     case 'critical':
       return Object.freeze({
-        surfaces: [ALARM_SURFACE.sidebarPulse, ALARM_SURFACE.shellDock],
+        surfaces: [ALARM_ROUTING_SURFACE.sidebarPulse, ALARM_ROUTING_SURFACE.shellDock],
         autoOpenPanel: false,
         useFullscreenOverlay: false,
       });
     case 'high':
       return Object.freeze({
-        surfaces: [ALARM_SURFACE.sidebarPulse, ALARM_SURFACE.shellDock],
+        surfaces: [ALARM_ROUTING_SURFACE.sidebarPulse, ALARM_ROUTING_SURFACE.shellDock],
         autoOpenPanel: false,
         useFullscreenOverlay: false,
       });
     case 'medium':
       return Object.freeze({
-        surfaces: [ALARM_SURFACE.panelDrawer],
+        surfaces: [ALARM_ROUTING_SURFACE.panelDrawer],
         autoOpenPanel: false,
         useFullscreenOverlay: false,
       });
     default:
       return Object.freeze({
-        surfaces: [ALARM_SURFACE.panelDrawer],
+        surfaces: [ALARM_ROUTING_SURFACE.panelDrawer],
         autoOpenPanel: false,
         useFullscreenOverlay: false,
       });
   }
-}
-
-/** Operational alerts never use Sonner; user feedback toasts are separate. */
-export function shouldShowOperationalToast(_alert: Alert): boolean {
-  return false;
 }
 
 export const USER_FEEDBACK_TOAST_DEFAULTS = Object.freeze({
@@ -86,7 +82,7 @@ export function pulseNotificationCenter(alert?: Alert): void {
 
 export function raiseOperationalAlarm(alert: Alert): void {
   const plan = resolveAlarmSurfacePlan(alert);
-  if (plan.surfaces.includes(ALARM_SURFACE.sidebarPulse)) {
+  if (plan.surfaces.includes(ALARM_ROUTING_SURFACE.sidebarPulse)) {
     pulseNotificationCenter(alert);
   }
 }

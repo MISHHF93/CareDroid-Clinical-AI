@@ -48,22 +48,14 @@ const QUICK_COMPLAINT_CHIPS = [
   'Shortness of breath',
   'Abdominal pain',
   'Injury / trauma',
-  'Stroke symptoms',
-  'Feeling unwell',
 ] as const;
 
 const RED_FLAG_OPTIONS = [
   'Chest pain',
   'Shortness of breath',
-  'Stroke symptoms',
   'Severe bleeding',
-  'Sepsis concern',
-  'Anaphylaxis concern',
-  'Altered mental status',
   'Severe pain',
-  'Pregnancy emergency',
-  'Self-harm risk',
-];
+] as const;
 
 export type UnifiedIntakePanelProps = {
   draft: ReceptionIntakeDraft;
@@ -530,42 +522,6 @@ export default function UnifiedIntakePanel({
                     <option value="">Unknown</option>
                     <option value="F">Female</option>
                     <option value="M">Male</option>
-                    <option value="Intersex">Intersex</option>
-                    <option value="Other">Other</option>
-                  </select>
-                </label>
-                <label className="reception-command-field">
-                  <span>Preferred language</span>
-                  <input
-                    value={draft.preferredLanguage || ''}
-                    onChange={(event) => onDraftChange({ preferredLanguage: event.target.value })}
-                    placeholder="e.g. English, Spanish, ASL"
-                    list="reception-language-suggestions"
-                  />
-                  <datalist id="reception-language-suggestions">
-                    <option value="English" />
-                    <option value="Spanish" />
-                    <option value="French" />
-                    <option value="Mandarin" />
-                    <option value="Arabic" />
-                    <option value="ASL" />
-                    <option value="Other" />
-                  </datalist>
-                </label>
-                <label className="reception-command-field">
-                  <span>Interpreter needed</span>
-                  <select
-                    value={draft.interpreterNeeded || 'unknown'}
-                    onChange={(event) =>
-                      onDraftChange({
-                        interpreterNeeded: event.target
-                          .value as ReceptionIntakeDraft['interpreterNeeded'],
-                      })
-                    }
-                  >
-                    <option value="unknown">Unknown</option>
-                    <option value="yes">Yes</option>
-                    <option value="no">No</option>
                   </select>
                 </label>
                 <label className="reception-command-field">
@@ -610,14 +566,6 @@ export default function UnifiedIntakePanel({
                   </select>
                 </label>
                 <label className="reception-command-field">
-                  <span>Allergy details</span>
-                  <input
-                    value={draft.allergies}
-                    onChange={(event) => onDraftChange({ allergies: event.target.value })}
-                    placeholder="If available"
-                  />
-                </label>
-                <label className="reception-command-field">
                   <span>Medications if known</span>
                   <select
                     value={draft.medicationsKnown}
@@ -632,90 +580,6 @@ export default function UnifiedIntakePanel({
                     <option value="yes">Known</option>
                     <option value="no">None reported</option>
                   </select>
-                </label>
-                <label className="reception-command-field">
-                  <span>Medication details</span>
-                  <input
-                    value={draft.medications}
-                    onChange={(event) => onDraftChange({ medications: event.target.value })}
-                    placeholder="If available"
-                  />
-                </label>
-                <label className="reception-command-field">
-                  <span>First name</span>
-                  <input
-                    value={draft.firstName}
-                    onChange={(event) => onDraftChange({ firstName: event.target.value })}
-                    placeholder="Unknown allowed"
-                  />
-                </label>
-                <label className="reception-command-field">
-                  <span>Last name</span>
-                  <input
-                    value={draft.lastName}
-                    onChange={(event) => onDraftChange({ lastName: event.target.value })}
-                    placeholder="Unknown allowed"
-                  />
-                </label>
-                <label className="reception-command-field">
-                  <span>Insurance</span>
-                  <select
-                    value={draft.insuranceStatus}
-                    onChange={(event) =>
-                      onDraftChange({
-                        insuranceStatus: event.target
-                          .value as ReceptionIntakeDraft['insuranceStatus'],
-                      })
-                    }
-                  >
-                    <option value="unknown">Unknown</option>
-                    <option value="captured">Captured</option>
-                    <option value="missing">Missing</option>
-                    <option value="deferred">Deferred</option>
-                  </select>
-                </label>
-                <label className="reception-command-field">
-                  <span>Consent</span>
-                  <select
-                    value={draft.consentStatus}
-                    onChange={(event) =>
-                      onDraftChange({
-                        consentStatus: event.target.value as ReceptionIntakeDraft['consentStatus'],
-                      })
-                    }
-                  >
-                    <option value="unknown">Unknown</option>
-                    <option value="captured">Captured</option>
-                    <option value="unable">Unable</option>
-                    <option value="deferred">Deferred</option>
-                  </select>
-                </label>
-                <label className="reception-command-field">
-                  <span>Documents</span>
-                  <select
-                    value={draft.documentStatus}
-                    onChange={(event) =>
-                      onDraftChange({
-                        documentStatus: event.target
-                          .value as ReceptionIntakeDraft['documentStatus'],
-                      })
-                    }
-                    title="Use Check Identity for OCR scan of ID/health card; then create & route"
-                  >
-                    <option value="unknown">Unknown</option>
-                    <option value="captured">Captured</option>
-                    <option value="missing">Missing</option>
-                    <option value="deferred">Deferred</option>
-                  </select>
-                </label>
-                <label className="reception-command-field reception-command-field--wide">
-                  <span>Reception notes</span>
-                  <textarea
-                    value={draft.notes || ''}
-                    onChange={(event) => onDraftChange({ notes: event.target.value })}
-                    placeholder="Additional observations for handoff (optional)"
-                    rows={2}
-                  />
                 </label>
               </div>
             </>

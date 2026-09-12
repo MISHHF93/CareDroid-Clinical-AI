@@ -16,7 +16,7 @@ const mocks = vi.hoisted(() => {
   };
 });
 
-vi.mock('../services/notificationToastPolicy', () => ({
+vi.mock('../services/operationalAlarmPolicy', () => ({
   raiseOperationalAlarm: mocks.raiseOperationalAlarm,
 }));
 

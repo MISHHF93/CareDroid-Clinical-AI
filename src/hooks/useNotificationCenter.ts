@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { raiseOperationalAlarm } from '../services/notificationToastPolicy';
+import { raiseOperationalAlarm } from '../services/operationalAlarmPolicy';
 import { useEmergencyStore } from '../store/emergencyStore';
 import type { Alert } from '../types/emergency';
 import { CANONICAL_ROUTES } from '../config/routes.config';

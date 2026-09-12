@@ -1,24 +1,31 @@
+import { Siren, Flame, AlertTriangle, Info, CheckCircle2, X } from 'lucide-react';
+import { resolveAlarmSeverity, type AlarmSeverity } from '../../alarm/types';
 import './ClinicalAlertBanner.css';
+
+const SEVERITY_ICONS: Record<
+  string,
+  React.ComponentType<{ size?: number; strokeWidth?: number }>
+> = {
+  critical: Siren,
+  high: Flame,
+  warning: AlertTriangle,
+  info: Info,
+  ok: CheckCircle2,
+};
 
 const ClinicalAlertBanner = ({ alert, onAcknowledge, onDismiss }) => {
   if (!alert) return null;
 
-  const getSeverityIcon = (severity) => {
-    const icons = {
-      critical: '🔴',
-      high: '🟠',
-      warning: '🟡',
-      info: '🔵',
-    };
-    return icons[severity] || '🔵';
-  };
-
+  const severity: AlarmSeverity = resolveAlarmSeverity(alert.severity);
+  const Icon = SEVERITY_ICONS[alert.severity] || Info;
   const isAcknowledged = alert.acknowledged || false;
 
   return (
-    <div className={`clinical-alert-banner severity-${alert.severity}`}>
+    <div className={`clinical-alert-banner severity-${alert.severity}`} data-severity={severity}>
       <div className="alert-header">
-        <span className="alert-icon">{getSeverityIcon(alert.severity)}</span>
+        <span className="alert-icon" aria-hidden="true">
+          <Icon size={20} strokeWidth={1.85} />
+        </span>
         <div className="alert-content-wrapper">
           <div className="alert-title">{alert.title || 'Clinical Alert'}</div>
           {alert.description && <div className="alert-description">{alert.description}</div>}
@@ -35,7 +42,7 @@ const ClinicalAlertBanner = ({ alert, onAcknowledge, onDismiss }) => {
         </div>
         {onDismiss && (
           <button type="button" className="alert-close" onClick={onDismiss} title="Dismiss">
-            ✕
+            <X size={16} strokeWidth={2} />
           </button>
         )}
       </div>

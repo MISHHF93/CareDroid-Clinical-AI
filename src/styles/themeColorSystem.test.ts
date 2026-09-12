@@ -38,10 +38,6 @@ const alertCss = readFileSync(join(srcRoot, 'components/ui/Alert.css'), 'utf8');
 const platformEntryCss = readFileSync(join(srcRoot, 'pages/PlatformEntryHub.css'), 'utf8');
 const settingsCss = readFileSync(join(srcRoot, 'pages/Settings.css'), 'utf8');
 const teamMgmtCss = readFileSync(join(srcRoot, 'pages/team/TeamManagement.css'), 'utf8');
-const notificationCss = readFileSync(
-  join(srcRoot, 'components/notifications/NotificationToast.css'),
-  'utf8',
-);
 const toolPreflightCss = readFileSync(
   join(srcRoot, 'components/clinical/ToolPreflightStatus.css'),
   'utf8',
@@ -176,13 +172,7 @@ describe('theme color system revamp', () => {
   });
 
   it('migrates previously neon-heavy surfaces to medical tokens', () => {
-    const migratedCss = [
-      platformEntryCss,
-      settingsCss,
-      teamMgmtCss,
-      notificationCss,
-      toolPreflightCss,
-    ].join('\n');
+    const migratedCss = [platformEntryCss, settingsCss, teamMgmtCss, toolPreflightCss].join('\n');
 
     expect(migratedCss).not.toMatch(LEGACY_NEON_PATTERN);
     expect(platformEntryCss).toContain('var(--app-fg-muted)');

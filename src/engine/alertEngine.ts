@@ -5,7 +5,7 @@ import {
   publishAlert,
   shouldSurfaceAlertToast,
 } from '../services/alertLifecycleOrchestrator';
-import { raiseOperationalAlarm } from '../services/notificationToastPolicy';
+import { raiseOperationalAlarm } from '../services/operationalAlarmPolicy';
 
 export {
   deriveAlerts,
@@ -49,34 +49,6 @@ export function dispatchAlert(input: AlertInput): string {
 }
 
 export const dispatch = dispatchAlert;
-
-export function dispatchCriticalVitalsAlerts(patient: Patient): string[] {
-  const latestVitals = Array.isArray(patient.vitals) ? patient.vitals.at(-1) : patient.vitals;
-  if (!latestVitals) return [];
-
-  const findings = [
-    latestVitals.spo2 !== undefined && latestVitals.spo2 < 94 ? `SpO2 ${latestVitals.spo2}%` : null,
-    latestVitals.hr !== undefined && (latestVitals.hr > 120 || latestVitals.hr < 50)
-      ? `HR ${latestVitals.hr}`
-      : null,
-    latestVitals.sbp !== undefined && (latestVitals.sbp < 90 || latestVitals.sbp > 180)
-      ? `SBP ${latestVitals.sbp}`
-      : null,
-  ].filter((finding): finding is string => Boolean(finding));
-
-  if (!findings.length) return [];
-
-  return [
-    dispatchAlert({
-      severity: 'Critical',
-      title: 'Critical vitals',
-      message: `${patient.firstName} ${patient.lastName}: ${findings.join(', ')}.`,
-      patientId: patient.id,
-      source: 'vitals-alert-engine',
-      metadata: { findings: findings.join(', ') },
-    }),
-  ];
-}
 
 export function dispatchScoreAlert(input: {
   patient: Patient;

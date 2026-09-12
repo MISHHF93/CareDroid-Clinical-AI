@@ -4,6 +4,7 @@
  * Lifecycle surfaces: see alertLifecycleModel.ts.
  */
 import { resolveAlertLifecycle } from '../config/alertLifecycleModel';
+import type { Alert } from '../types/emergency';
 
 export const ALERT_CLASSIFICATION_TIERS = Object.freeze([
   'critical',
@@ -379,6 +380,23 @@ export function resolveOperationalAlertEnvelope(alert: any) {
     resolved: resolution === 'resolved',
     dismissed: resolution === 'dismissed',
   });
+}
+
+/** Map a classification tier to a UI display tone. */
+export function alertSeverityTone(alert: Alert): 'info' | 'warning' | 'critical' {
+  const tier = getAlertClassificationTier(alert);
+  if (tier === 'critical' || tier === 'high') return 'critical';
+  if (tier === 'medium' || alert.severity === 'Warning') return 'warning';
+  return 'info';
+}
+
+/** Map a classification tier to a human-readable label. */
+export function formatClassificationLabel(alert: Alert): string {
+  const tier = getAlertClassificationTier(alert);
+  if (tier === 'critical') return 'Critical';
+  if (tier === 'high') return 'High';
+  if (tier === 'medium') return 'Medium';
+  return 'Info';
 }
 
 export { resolveAlertLifecycle } from '../config/alertLifecycleModel';

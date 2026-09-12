@@ -13,6 +13,12 @@
   box-shadow: var(--app-elevation-subtle, var(--app-shadow-1));
 }
 
+.cd-alert__icon {
+  flex-shrink: 0;
+  margin-top: 1px;
+  line-height: 0;
+}
+
 .cd-alert__content {
   min-width: 0;
 }

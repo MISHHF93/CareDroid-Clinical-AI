@@ -21,10 +21,6 @@ const primitivesCss = readFileSync(
   'utf8',
 );
 const drawerCss = readFileSync(join(__dirname, '../components/ui/Drawer.css'), 'utf8');
-const notificationToastCss = readFileSync(
-  join(__dirname, '../components/notifications/NotificationToast.css'),
-  'utf8',
-);
 const clinicalCanvasCss = readFileSync(join(__dirname, 'clinical-page-canvas.css'), 'utf8');
 const clinicalTargetsCss = readFileSync(join(__dirname, 'clinical-page-targets.css'), 'utf8');
 const clinicalFlowCss = readFileSync(join(__dirname, 'clinical-operational-flow.css'), 'utf8');
@@ -144,11 +140,8 @@ describe('CareDroid design language fit contract', () => {
 
   it('uses tokenized overlay layers instead of hardcoded high z-index values', () => {
     expect(drawerCss).toContain('z-index: var(--z-drawer');
-    expect(notificationToastCss).toContain('z-index: var(--z-toast');
 
-    [drawerCss, notificationToastCss].forEach((css) => {
-      expect(css).not.toMatch(/z-index:\s*(9998|9999|10000|99999|2000)\b/);
-    });
+    expect(drawerCss).not.toMatch(/z-index:\s*(9998|9999|10000|99999|2000)\b/);
   });
 
   it('harmonizes operational page zones and semantic surfaces in CDL CSS', () => {

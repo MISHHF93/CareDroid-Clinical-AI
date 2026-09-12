@@ -1,4 +1,7 @@
-import { getAlertClassificationTier } from '../engine/alertClassificationModel';
+import {
+  alertSeverityTone as alertSeverityToneCanonical,
+  formatClassificationLabel as formatClassificationLabelCanonical,
+} from '../engine/alertClassificationModel';
 import { resolveOperationalAlertRoute } from '../config/operationalMetricsModel';
 import { getPatientDisplayName } from '../utils/patientSearch';
 import type { Alert, Patient } from '../types/emergency';
@@ -19,18 +22,11 @@ export function normalizeAlertKey(value: unknown): string {
 }
 
 export function alertSeverityTone(alert: Alert): 'info' | 'warning' | 'critical' {
-  const tier = getAlertClassificationTier(alert);
-  if (tier === 'critical' || tier === 'high') return 'critical';
-  if (tier === 'medium' || alert.severity === 'Warning') return 'warning';
-  return 'info';
+  return alertSeverityToneCanonical(alert);
 }
 
 export function formatClassificationLabel(alert: Alert): string {
-  const tier = getAlertClassificationTier(alert);
-  if (tier === 'critical') return 'Critical';
-  if (tier === 'high') return 'High';
-  if (tier === 'medium') return 'Medium';
-  return 'Info';
+  return formatClassificationLabelCanonical(alert);
 }
 
 export function formatAlertTime(timestamp?: string): string {
