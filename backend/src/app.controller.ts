@@ -5,6 +5,15 @@ import { ConfigService } from '@nestjs/config';
 export class AppController {
   constructor(private readonly configService: ConfigService) {}
 
+  @Get()
+  root() {
+    return {
+      success: true,
+      service: 'CareDroid API',
+      status: 'ok',
+    };
+  }
+
   @Get('health')
   getHealth() {
     return {
