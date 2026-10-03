@@ -7,7 +7,14 @@ import {
   buildTrackMindMaturityAssessment,
 } from '../../config/trackMindMaturityModel';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import './TrackMindMaturityDashboard.css';
+
+const TRACKMIND_MATURITY_ROUTE_CHROME = Object.freeze({
+  title: 'Maturity Assessment',
+  subtitle:
+    'Nine weighted domains scored against the TrackMind maturity framework, blended with your own self-assessment where you provide one.',
+});
 
 /**
  * TrackMind Operating System maturity assessment.
@@ -48,6 +55,9 @@ function ProvenanceTag({ provenance }: { provenance: Provenance }) {
 }
 
 export default function TrackMindMaturityDashboard() {
+  // AppShell's ShellRouteTab already renders a real page-level <h1> for this
+  // route; this page also rendered its own <h1>, a duplicate-heading bug.
+  useRouteChromeRegistration(TRACKMIND_MATURITY_ROUTE_CHROME);
   const [answers, setAnswers] = useState<Answers>({});
 
   const assessment = useMemo(
@@ -72,7 +82,13 @@ export default function TrackMindMaturityDashboard() {
       <header className="tm-maturity__header">
         <div>
           <p className="tm-maturity__eyebrow">TrackMind Operating System</p>
-          <h1 id="tm-maturity-heading">Maturity assessment</h1>
+          <p
+            className="tm-maturity__title-text"
+            id="tm-maturity-heading"
+            data-testid="cd-page-title-text"
+          >
+            Maturity assessment
+          </p>
           <p className="tm-maturity__subtitle">
             Nine weighted domains scored against the TrackMind maturity framework, blended with your
             own self-assessment where you provide one.

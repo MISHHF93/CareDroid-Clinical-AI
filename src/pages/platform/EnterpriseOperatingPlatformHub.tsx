@@ -4,7 +4,14 @@ import { AlertTriangle, ArrowUpRight, Building2, CheckCircle2, Circle } from 'lu
 import { buildEnterpriseOperatingPlatformAssessment } from '../../config/enterpriseOperatingPlatformModel';
 import { ENTERPRISE_PLATFORM_PROVENANCE } from '../../config/enterpriseOperatingPlatformRegistry';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import './EnterpriseOperatingPlatformHub.css';
+
+const ENTERPRISE_OPERATING_PLATFORM_ROUTE_CHROME = Object.freeze({
+  title: 'Enterprise Operating Platform',
+  subtitle:
+    'Eighteen enterprise modules — benchmarking and franchise readiness, continuity and disaster recovery, workforce and competency, governance, ESG and architecture.',
+});
 
 /**
  * Enterprise operating platform hub (`/enterprise-platform`).
@@ -33,6 +40,9 @@ const STATUS_TONE: Record<string, string> = {
 };
 
 export default function EnterpriseOperatingPlatformHub() {
+  // AppShell's ShellRouteTab already renders a real page-level <h1> for this
+  // route; this page also rendered its own <h1>, a duplicate-heading bug.
+  useRouteChromeRegistration(ENTERPRISE_OPERATING_PLATFORM_ROUTE_CHROME);
   const [filter, setFilter] = useState<Filter>('all');
 
   const assessment = useMemo(() => buildEnterpriseOperatingPlatformAssessment({}), []);
@@ -55,7 +65,9 @@ export default function EnterpriseOperatingPlatformHub() {
       <header className="eop-hub__header">
         <div>
           <p className="eop-hub__eyebrow">TrackMind platform</p>
-          <h1 id="eop-hub-heading">Enterprise operating platform</h1>
+          <p className="eop-hub__title-text" id="eop-hub-heading" data-testid="cd-page-title-text">
+            Enterprise operating platform
+          </p>
           <p className="eop-hub__subtitle">
             Eighteen enterprise modules — benchmarking and franchise readiness, continuity and
             disaster recovery, workforce and competency, governance, ESG and architecture.

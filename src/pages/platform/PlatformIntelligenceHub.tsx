@@ -4,7 +4,14 @@ import { Activity, AlertTriangle, ArrowUpRight, CheckCircle2, Circle } from 'luc
 import { buildPlatformIntelligenceAssessment } from '../../config/platformIntelligenceModel';
 import { PLATFORM_INTELLIGENCE_PROVENANCE } from '../../config/platformIntelligenceRegistry';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import './PlatformIntelligenceHub.css';
+
+const PLATFORM_INTELLIGENCE_ROUTE_CHROME = Object.freeze({
+  title: 'Platform Intelligence',
+  subtitle:
+    'Twenty intelligence modules — artifact registry, data catalog and lineage, KPI and cross-domain analytics, tenant and track health, governance and observability.',
+});
 
 /**
  * Platform intelligence hub (`/platform-intelligence`).
@@ -34,6 +41,9 @@ const STATUS_TONE: Record<string, string> = {
 type Filter = 'all' | 'live' | 'registry';
 
 export default function PlatformIntelligenceHub() {
+  // AppShell's ShellRouteTab already renders a real page-level <h1> for this
+  // route; this page also rendered its own <h1>, a duplicate-heading bug.
+  useRouteChromeRegistration(PLATFORM_INTELLIGENCE_ROUTE_CHROME);
   const [filter, setFilter] = useState<Filter>('all');
 
   const assessment = useMemo(() => buildPlatformIntelligenceAssessment({}), []);
@@ -54,7 +64,9 @@ export default function PlatformIntelligenceHub() {
       <header className="pi-hub__header">
         <div>
           <p className="pi-hub__eyebrow">TrackMind platform</p>
-          <h1 id="pi-hub-heading">Platform intelligence</h1>
+          <p className="pi-hub__title-text" id="pi-hub-heading" data-testid="cd-page-title-text">
+            Platform intelligence
+          </p>
           <p className="pi-hub__subtitle">
             Twenty intelligence modules — artifact registry, data catalog and lineage, KPI and
             cross-domain analytics, tenant and track health, governance and observability.

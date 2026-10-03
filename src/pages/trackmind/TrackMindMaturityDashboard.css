@@ -29,7 +29,8 @@
   color: var(--cdl-text-muted, #475569);
 }
 
-.tm-maturity__header h1 {
+.tm-maturity__header h1,
+.tm-maturity__title-text {
   margin: 0;
   font-size: var(--cdl-text-2xl, 24px);
   font-weight: var(--cdl-font-semibold, 600);

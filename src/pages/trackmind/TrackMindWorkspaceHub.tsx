@@ -10,6 +10,7 @@ import {
   resolveSaasRoleFromUser,
   resolveUserProfileFromSaasRole,
 } from '../../config/userProfileCatalog';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import './TrackMindWorkspaceHub.css';
 
 /**
@@ -55,6 +56,17 @@ function labelForRoute(route: string): string {
 export default function TrackMindWorkspaceHub() {
   const trackMind = useTrackMindRolePermissions();
   const { workspace } = trackMind;
+
+  // AppShell's ShellRouteTab already renders a real page-level <h1> for this
+  // route; this page also rendered its own <h1>, a duplicate-heading bug.
+  const routeChrome = useMemo(
+    () => ({
+      title: workspace.title,
+      subtitle: workspace.subtitle,
+    }),
+    [workspace.title, workspace.subtitle],
+  );
+  useRouteChromeRegistration(routeChrome);
 
   const { user } = useUser();
 
@@ -106,7 +118,13 @@ export default function TrackMindWorkspaceHub() {
       <header className="trackmind-hub__header">
         <div>
           <p className="trackmind-hub__eyebrow">TrackMind Operating System</p>
-          <h1 id="trackmind-hub-heading">{workspace.title}</h1>
+          <p
+            className="trackmind-hub__title-text"
+            id="trackmind-hub-heading"
+            data-testid="cd-page-title-text"
+          >
+            {workspace.title}
+          </p>
           <p className="trackmind-hub__subtitle">{workspace.subtitle}</p>
         </div>
         <div className="trackmind-hub__role" aria-label="Your TrackMind role">
