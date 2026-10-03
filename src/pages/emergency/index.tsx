@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Suspense, lazy, useCallback, useEffect, useMemo, useState } from 'react';
 import { Navigate, useSearchParams } from 'react-router-dom';
 import useProfileNavigate from '../../hooks/useProfileNavigate';
 import {
@@ -64,6 +64,7 @@ import PhysicianOperationalStrip from '../../components/whiteboard/PhysicianOper
 import RoleOperationalSummaryStrip from '../../components/whiteboard/RoleOperationalSummaryStrip';
 import OperationalHandoffDomainBar from '../../components/whiteboard/OperationalHandoffDomainBar';
 import WhiteboardOpsDetailStrip from '../../components/whiteboard/WhiteboardOpsDetailStrip';
+import ServiceHealthIndicator from '../../components/whiteboard/ServiceHealthIndicator';
 import CareOperationsInboxPanel from '../../components/emergency/CareOperationsInboxPanel';
 import { evaluateWhiteboardDensity } from '../../config/whiteboardDensityModel';
 import useScreenDensityMode from '../../hooks/useScreenDensityMode';
@@ -77,8 +78,12 @@ import ProviderWaitBreachStrip from '../../components/provider-wait/ProviderWait
 import PatientCommunicationStatusPanel from '../../components/waiting-room/PatientCommunicationStatusPanel';
 import DepartmentStatusScreen from '../../components/whiteboard/DepartmentStatusScreen';
 import PublicWaitingDisplay from '../../components/whiteboard/PublicWaitingDisplay';
-import CommandCenterThroughputScreen from '../../components/whiteboard/CommandCenterThroughputScreen';
-import OperationalCommandDashboard from '../../components/emergency/CommandDashboard';
+const CommandCenterThroughputScreen = lazy(
+  () => import('../../components/whiteboard/CommandCenterThroughputScreen'),
+);
+const OperationalCommandDashboard = lazy(
+  () => import('../../components/emergency/CommandDashboard'),
+);
 import { buildOperationalCommandDashboardSnapshot } from '../../services/operationalCommandDashboardModel';
 import {
   buildDepartmentStatusSnapshot,
@@ -164,8 +169,12 @@ import {
   usePractitionerSurfaceVisibility,
   usePractitionerVisibilityContext,
 } from '../../contexts/PractitionerVisibilityContext';
-import DiagnosticSafetyDashboard from '../../components/copilot/DiagnosticSafetyDashboard';
-import NativeAiCommandSuitePanel from '../../components/native-ai/NativeAiCommandSuitePanel';
+const DiagnosticSafetyDashboard = lazy(
+  () => import('../../components/copilot/DiagnosticSafetyDashboard'),
+);
+const NativeAiCommandSuitePanel = lazy(
+  () => import('../../components/native-ai/NativeAiCommandSuitePanel'),
+);
 import useFeature from '../../hooks/useFeature';
 import { useNativeAiBackendSync } from '../../hooks/useNativeAiBackendSync';
 import { useNativeAiPeriodicRefresh } from '../../hooks/useNativeAiPeriodicRefresh';
@@ -1583,17 +1592,9 @@ export default function EmergencyWhiteboard() {
     );
   }
 
-  // HEAL-314: emergencyRoleScreenMatrix's commandCenterMode gate defaults to
-  // `true` in the store (DEFAULT_EMERGENCY_SETTINGS) until the organization's
-  // real settings load and (usually) override it -- redirecting on that
-  // default before the real value has been checked meant a charge nurse /
-  // ED manager / admin loading or refreshing this page could get bounced to
-  // Command Center non-deterministically, purely based on how the settings
-  // fetch and this render happened to race. Wait for a real answer first.
   if (commandCenter.isCommandCenterScreen && hasCheckedOrganizationSettings) {
     return <Navigate to={CANONICAL_ROUTES.emergencyCommandCenter} replace />;
   }
-
   return (
     <section
       className={[
@@ -1710,1290 +1711,1308 @@ export default function EmergencyWhiteboard() {
             emsIncomingPatients={emsIncomingPatients}
             readOnly={display.isDisplayMode}
           />
-          {showShiftHandoffStrip ? (
-            <OperationalHandoffDomainBar
-              domains={operationalHandoffDomains as any[]}
-              onMetricSelect={handleOperationalStripMetricSelect}
-              readOnly={display.isDisplayMode}
-            />
-          ) : null}
-          {showShiftHandoffStrip ? (
-            // Continuous-awareness fix: this is the same backend-persisted task
-            // inbox already mounted on the Shift Summary and Handoffs pages
-            // (reassessment-due, EMS-handoff-pending, and operational-exception
-            // tasks). Before this, it was only reachable from those two
-            // low-traffic pages, so a task opened by one shift -- especially an
-            // operational_exception, which has no other ambient representation
-            // anywhere on the whiteboard -- could sit unseen through an entire
-            // next shift unless someone happened to open Shift Summary. Sharing
-            // the panel's default surfaceKey here is deliberate: it already
-            // tracks "seen" per key across its other mounts, so viewing it from
-            // the whiteboard correctly counts too.
-            <CareOperationsInboxPanel
-              title="Outstanding Work"
-              lead="Reassessments due, EMS handoffs pending, and operational exceptions -- visible here for the whole shift, not just at handoff."
-            />
-          ) : null}
-          {whiteboardDensity.surfaces.opsDetail.visible &&
-          !(physician.isPhysicianScreen && physician.hideOpsDetail) ? (
-            <WhiteboardOpsDetailStrip
-              defaultExpanded={whiteboardDensity.surfaces.opsDetail.defaultExpanded}
-            />
-          ) : null}
-          {display.isDisplayMode ? (
-            <section
-              aria-label="Whiteboard display mode"
-              role="status"
-              className="emergency-whiteboard-page__display-banner"
-            >
-              <div className="emergency-whiteboard-page__display-banner-copy">
-                <strong className="emergency-whiteboard-page__display-banner-title">
-                  {display.isWaitingRoomDisplay
-                    ? `${display.label} · public information only`
-                    : display.isReadOnlyWhiteboardDisplay
-                      ? `${display.label} · hallway operations`
-                      : `${display.label} · operational awareness only`}
-                </strong>
-                <span className="emergency-whiteboard-page__display-banner-subtitle">
-                  {display.isWaitingRoomDisplay
-                    ? `Patient waiting-area display · auto-refresh every ${Math.round(display.refreshIntervalMs / 1000)}s · no names or clinical details`
-                    : display.isReadOnlyWhiteboardDisplay
-                      ? `Read-only operations wall · auto-refresh every ${Math.round(display.refreshIntervalMs / 1000)}s · ${resolveReadOnlyWhiteboardPrivacyLabel(emergencySettings.wallDisplayMonitorPrivacy)}`
-                      : `Read-only wall display · auto-refresh every ${Math.round(display.refreshIntervalMs / 1000)}s · no editing actions`}
+          <Suspense fallback={null}>
+            {showShiftHandoffStrip ? (
+              <OperationalHandoffDomainBar
+                domains={operationalHandoffDomains as any[]}
+                onMetricSelect={handleOperationalStripMetricSelect}
+                readOnly={display.isDisplayMode}
+              />
+            ) : null}
+            {showShiftHandoffStrip ? (
+              // Continuous-awareness fix: this is the same backend-persisted task
+              // inbox already mounted on the Shift Summary and Handoffs pages
+              // (reassessment-due, EMS-handoff-pending, and operational-exception
+              // tasks). Before this, it was only reachable from those two
+              // low-traffic pages, so a task opened by one shift -- especially an
+              // operational_exception, which has no other ambient representation
+              // anywhere on the whiteboard -- could sit unseen through an entire
+              // next shift unless someone happened to open Shift Summary. Sharing
+              // the panel's default surfaceKey here is deliberate: it already
+              // tracks "seen" per key across its other mounts, so viewing it from
+              // the whiteboard correctly counts too.
+              <CareOperationsInboxPanel
+                title="Outstanding Work"
+                lead="Reassessments due, EMS handoffs pending, and operational exceptions -- visible here for the whole shift, not just at handoff."
+              />
+            ) : null}
+            {whiteboardDensity.surfaces.opsDetail.visible &&
+            !(physician.isPhysicianScreen && physician.hideOpsDetail) ? (
+              <WhiteboardOpsDetailStrip
+                defaultExpanded={whiteboardDensity.surfaces.opsDetail.defaultExpanded}
+              />
+            ) : null}
+            {!display.isDisplayMode ? (
+              <ServiceHealthIndicator bottleneckRegistry={centralSnapshot.bottleneckRegistry} />
+            ) : null}
+            {display.isDisplayMode ? (
+              <section
+                aria-label="Whiteboard display mode"
+                role="status"
+                className="emergency-whiteboard-page__display-banner"
+              >
+                <div className="emergency-whiteboard-page__display-banner-copy">
+                  <strong className="emergency-whiteboard-page__display-banner-title">
+                    {display.isWaitingRoomDisplay
+                      ? `${display.label} · public information only`
+                      : display.isReadOnlyWhiteboardDisplay
+                        ? `${display.label} · hallway operations`
+                        : `${display.label} · operational awareness only`}
+                  </strong>
+                  <span className="emergency-whiteboard-page__display-banner-subtitle">
+                    {display.isWaitingRoomDisplay
+                      ? `Patient waiting-area display · auto-refresh every ${Math.round(display.refreshIntervalMs / 1000)}s · no names or clinical details`
+                      : display.isReadOnlyWhiteboardDisplay
+                        ? `Read-only operations wall · auto-refresh every ${Math.round(display.refreshIntervalMs / 1000)}s · ${resolveReadOnlyWhiteboardPrivacyLabel(emergencySettings.wallDisplayMonitorPrivacy)}`
+                        : `Read-only wall display · auto-refresh every ${Math.round(display.refreshIntervalMs / 1000)}s · no editing actions`}
+                  </span>
+                </div>
+                <span className="emergency-whiteboard-page__display-banner-meta">
+                  Updated {formatFreshness(capacity.updatedAt || whiteboardGeneratedAt)}
                 </span>
-              </div>
-              <span className="emergency-whiteboard-page__display-banner-meta">
-                Updated {formatFreshness(capacity.updatedAt || whiteboardGeneratedAt)}
-              </span>
-            </section>
-          ) : null}
-          {whiteboardDensity.surfaces.publicWaitingScreen.visible ? (
-            <PublicWaitingDisplay
-              snapshot={stablePublicWaitingSnapshot}
-              title={display.label}
-              refreshIntervalMs={display.refreshIntervalMs}
-              refreshStatus={isNormalizedDisplayRefresh ? displayRefreshStatus : null}
-              showWaitRange={
-                publicWaiting.showWaitRange &&
-                (!publicWaitingKpiWidgets || publicWaitingKpiWidgets.includes('wait-range'))
-              }
-              showCrowdLevel={
-                publicWaiting.showCrowdLevel &&
-                (!publicWaitingKpiWidgets || publicWaitingKpiWidgets.includes('crowd-level'))
-              }
-              showTriageWait={
-                publicWaiting.showTriageWait &&
-                (!publicWaitingKpiWidgets || publicWaitingKpiWidgets.includes('triage-wait'))
-              }
-              showCareProcessStages={
-                publicWaiting.showCareProcessStages &&
-                (!publicWaitingKpiWidgets ||
-                  publicWaitingKpiWidgets.includes('care-process-stages'))
-              }
-              showPatientGuidance={
-                publicWaiting.showPatientGuidance &&
-                (!publicWaitingKpiWidgets || publicWaitingKpiWidgets.includes('patient-guidance'))
-              }
-              showSymptomEscalation={publicWaiting.showSymptomEscalation}
-              showEmsCrowdingImpact={
-                publicWaiting.showEmsCrowdingImpact &&
-                (!publicWaitingKpiWidgets ||
-                  publicWaitingKpiWidgets.includes('ems-crowding-impact'))
-              }
-            />
-          ) : null}
-          {whiteboardDensity.surfaces.commandCenterThroughput.visible ? (
-            <CommandCenterThroughputScreen
-              snapshot={stableCommandCenterSnapshot}
-              surgeSnapshot={commandCenterSurgeSnapshot}
-              title="Department throughput"
-              refreshIntervalMs={display.refreshIntervalMs}
-              refreshStatus={isNormalizedDisplayRefresh ? displayRefreshStatus : null}
-              showTriageAwaiting={
-                commandCenter.showTriageAwaiting &&
-                (commandCenterKpiWidgets?.['triage-awaiting'] ?? true)
-              }
-              showLongestUntriagedWait={
-                commandCenter.showLongestUntriagedWait &&
-                (commandCenterKpiWidgets?.['longest-untriaged-wait'] ?? true)
-              }
-              showTriageApproachingBreach={
-                commandCenter.showTriageApproachingBreach &&
-                (commandCenterKpiWidgets?.['triage-approaching-breach'] ?? true)
-              }
-              showTriageBreached={
-                commandCenter.showTriageBreached &&
-                (commandCenterKpiWidgets?.['triage-breached'] ?? true)
-              }
-              showRapidReviewFlags={
-                commandCenter.showRapidReviewFlags &&
-                (commandCenterKpiWidgets?.['rapid-review-flags'] ?? true)
-              }
-              showProviderAwaiting={
-                commandCenter.showProviderAwaiting &&
-                (commandCenterKpiWidgets?.['provider-awaiting'] ?? true)
-              }
-              showLongestProviderWait={
-                commandCenter.showLongestProviderWait &&
-                (commandCenterKpiWidgets?.['longest-provider-wait'] ?? true)
-              }
-              showProviderApproachingBreach={
-                commandCenter.showProviderApproachingBreach &&
-                (commandCenterKpiWidgets?.['provider-approaching-breach'] ?? true)
-              }
-              showProviderBreached={
-                commandCenter.showProviderBreached &&
-                (commandCenterKpiWidgets?.['provider-breached'] ?? true)
-              }
-              showArrivalsByHour={
-                commandCenter.showArrivalsByHour &&
-                (commandCenterKpiWidgets?.['arrivals-by-hour'] ?? true)
-              }
-              showWaitingRoomOccupancy={
-                commandCenter.showWaitingRoomOccupancy &&
-                (commandCenterKpiWidgets?.['waiting-room-occupancy'] ?? true)
-              }
-              showAvgWaitTriage={
-                commandCenter.showAvgWaitTriage &&
-                (commandCenterKpiWidgets?.['avg-wait-triage'] ?? true)
-              }
-              showAvgWaitProvider={
-                commandCenter.showAvgWaitProvider &&
-                (commandCenterKpiWidgets?.['avg-wait-provider'] ?? true)
-              }
-              showEmsInbound={
-                commandCenter.showEmsInbound && (commandCenterKpiWidgets?.['ems-inbound'] ?? true)
-              }
-              showEmsOffloadDelays={
-                commandCenter.showEmsOffloadDelays &&
-                (commandCenterKpiWidgets?.['ems-offload-delays'] ?? true)
-              }
-              showOffloadDuration={
-                commandCenter.showOffloadDuration &&
-                (commandCenterKpiWidgets?.['offload-duration'] ?? true)
-              }
-              showHandoffPending={
-                commandCenter.showHandoffPending &&
-                (commandCenterKpiWidgets?.['handoff-pending'] ?? true)
-              }
-              showBoardingDuration={
-                commandCenter.showBoardingDuration &&
-                (commandCenterKpiWidgets?.['boarding-duration'] ?? true)
-              }
-              showReferralsBacklog={
-                commandCenter.showReferralsBacklog &&
-                (commandCenterKpiWidgets?.['referrals-backlog'] ?? true)
-              }
-              showLwbsRisk={
-                commandCenter.showLwbsRisk && (commandCenterKpiWidgets?.['lwbs-risk'] ?? true)
-              }
-              showCrowdingForecast={
-                commandCenter.showCrowdingForecast &&
-                (commandCenterKpiWidgets?.['crowding-forecast'] ?? true)
-              }
-              showSystemHealth={
-                commandCenter.showSystemHealth &&
-                (commandCenterKpiWidgets?.['system-health'] ?? true)
-              }
-            />
-          ) : null}
-          {whiteboardDensity.surfaces.commandLayer.visible &&
-          !(physician.isPhysicianScreen && physician.hideCommandLayer) &&
-          !commandCenter.hideCommandLayer ? (
-            <section
-              aria-label="Operational command layer metrics"
-              className="emergency-whiteboard-page__command-layer"
-            >
-              <div className="emergency-whiteboard-page__command-layer-header">
-                <strong className="emergency-whiteboard-page__command-layer-title">
-                  Operational command layer
-                </strong>
-                <span className="emergency-whiteboard-page__command-layer-meta">
-                  {centralSnapshot.sync.source === 'backend-snapshot'
-                    ? 'Backend snapshot'
-                    : 'Local store'}{' '}
-                  -{' '}
-                  {formatFreshness(
-                    centralSnapshot.sync.lastSyncedAt || centralSnapshot.generatedAt,
-                  )}
-                  {intelligenceSnapshot.badges.length
-                    ? ` · ${intelligenceSnapshot.badges.map((badge) => badge.label).join(' · ')}`
-                    : ''}
-                </span>
-              </div>
-              <div className="emergency-whiteboard-page__command-layer-grid">
-                {commandLayerMetrics.map((metric) => {
-                  const canOpen = canOpenOperationalMetricOnWhiteboard(metric.key, {
-                    displayMode: display.isDisplayMode,
-                    canAccessRoute: (path) => emergencyRole.canAccessRoute(path),
-                  });
-                  const metricToneClass =
-                    metric.tone === 'critical' ||
-                    metric.tone === 'warning' ||
-                    metric.tone === 'success'
-                      ? metric.tone
-                      : 'info';
+              </section>
+            ) : null}
+            {whiteboardDensity.surfaces.publicWaitingScreen.visible ? (
+              <PublicWaitingDisplay
+                snapshot={stablePublicWaitingSnapshot}
+                title={display.label}
+                refreshIntervalMs={display.refreshIntervalMs}
+                refreshStatus={isNormalizedDisplayRefresh ? displayRefreshStatus : null}
+                showWaitRange={
+                  publicWaiting.showWaitRange &&
+                  (!publicWaitingKpiWidgets || publicWaitingKpiWidgets.includes('wait-range'))
+                }
+                showCrowdLevel={
+                  publicWaiting.showCrowdLevel &&
+                  (!publicWaitingKpiWidgets || publicWaitingKpiWidgets.includes('crowd-level'))
+                }
+                showTriageWait={
+                  publicWaiting.showTriageWait &&
+                  (!publicWaitingKpiWidgets || publicWaitingKpiWidgets.includes('triage-wait'))
+                }
+                showCareProcessStages={
+                  publicWaiting.showCareProcessStages &&
+                  (!publicWaitingKpiWidgets ||
+                    publicWaitingKpiWidgets.includes('care-process-stages'))
+                }
+                showPatientGuidance={
+                  publicWaiting.showPatientGuidance &&
+                  (!publicWaitingKpiWidgets || publicWaitingKpiWidgets.includes('patient-guidance'))
+                }
+                showSymptomEscalation={publicWaiting.showSymptomEscalation}
+                showEmsCrowdingImpact={
+                  publicWaiting.showEmsCrowdingImpact &&
+                  (!publicWaitingKpiWidgets ||
+                    publicWaitingKpiWidgets.includes('ems-crowding-impact'))
+                }
+              />
+            ) : null}
+            {whiteboardDensity.surfaces.commandCenterThroughput.visible ? (
+              <Suspense fallback={null}>
+                <CommandCenterThroughputScreen
+                  snapshot={stableCommandCenterSnapshot}
+                  surgeSnapshot={commandCenterSurgeSnapshot}
+                  title="Department throughput"
+                  refreshIntervalMs={display.refreshIntervalMs}
+                  refreshStatus={isNormalizedDisplayRefresh ? displayRefreshStatus : null}
+                  showTriageAwaiting={
+                    commandCenter.showTriageAwaiting &&
+                    (commandCenterKpiWidgets?.['triage-awaiting'] ?? true)
+                  }
+                  showLongestUntriagedWait={
+                    commandCenter.showLongestUntriagedWait &&
+                    (commandCenterKpiWidgets?.['longest-untriaged-wait'] ?? true)
+                  }
+                  showTriageApproachingBreach={
+                    commandCenter.showTriageApproachingBreach &&
+                    (commandCenterKpiWidgets?.['triage-approaching-breach'] ?? true)
+                  }
+                  showTriageBreached={
+                    commandCenter.showTriageBreached &&
+                    (commandCenterKpiWidgets?.['triage-breached'] ?? true)
+                  }
+                  showRapidReviewFlags={
+                    commandCenter.showRapidReviewFlags &&
+                    (commandCenterKpiWidgets?.['rapid-review-flags'] ?? true)
+                  }
+                  showProviderAwaiting={
+                    commandCenter.showProviderAwaiting &&
+                    (commandCenterKpiWidgets?.['provider-awaiting'] ?? true)
+                  }
+                  showLongestProviderWait={
+                    commandCenter.showLongestProviderWait &&
+                    (commandCenterKpiWidgets?.['longest-provider-wait'] ?? true)
+                  }
+                  showProviderApproachingBreach={
+                    commandCenter.showProviderApproachingBreach &&
+                    (commandCenterKpiWidgets?.['provider-approaching-breach'] ?? true)
+                  }
+                  showProviderBreached={
+                    commandCenter.showProviderBreached &&
+                    (commandCenterKpiWidgets?.['provider-breached'] ?? true)
+                  }
+                  showArrivalsByHour={
+                    commandCenter.showArrivalsByHour &&
+                    (commandCenterKpiWidgets?.['arrivals-by-hour'] ?? true)
+                  }
+                  showWaitingRoomOccupancy={
+                    commandCenter.showWaitingRoomOccupancy &&
+                    (commandCenterKpiWidgets?.['waiting-room-occupancy'] ?? true)
+                  }
+                  showAvgWaitTriage={
+                    commandCenter.showAvgWaitTriage &&
+                    (commandCenterKpiWidgets?.['avg-wait-triage'] ?? true)
+                  }
+                  showAvgWaitProvider={
+                    commandCenter.showAvgWaitProvider &&
+                    (commandCenterKpiWidgets?.['avg-wait-provider'] ?? true)
+                  }
+                  showEmsInbound={
+                    commandCenter.showEmsInbound &&
+                    (commandCenterKpiWidgets?.['ems-inbound'] ?? true)
+                  }
+                  showEmsOffloadDelays={
+                    commandCenter.showEmsOffloadDelays &&
+                    (commandCenterKpiWidgets?.['ems-offload-delays'] ?? true)
+                  }
+                  showOffloadDuration={
+                    commandCenter.showOffloadDuration &&
+                    (commandCenterKpiWidgets?.['offload-duration'] ?? true)
+                  }
+                  showHandoffPending={
+                    commandCenter.showHandoffPending &&
+                    (commandCenterKpiWidgets?.['handoff-pending'] ?? true)
+                  }
+                  showBoardingDuration={
+                    commandCenter.showBoardingDuration &&
+                    (commandCenterKpiWidgets?.['boarding-duration'] ?? true)
+                  }
+                  showReferralsBacklog={
+                    commandCenter.showReferralsBacklog &&
+                    (commandCenterKpiWidgets?.['referrals-backlog'] ?? true)
+                  }
+                  showLwbsRisk={
+                    commandCenter.showLwbsRisk && (commandCenterKpiWidgets?.['lwbs-risk'] ?? true)
+                  }
+                  showCrowdingForecast={
+                    commandCenter.showCrowdingForecast &&
+                    (commandCenterKpiWidgets?.['crowding-forecast'] ?? true)
+                  }
+                  showSystemHealth={
+                    commandCenter.showSystemHealth &&
+                    (commandCenterKpiWidgets?.['system-health'] ?? true)
+                  }
+                />
+              </Suspense>
+            ) : null}
+            {whiteboardDensity.surfaces.commandLayer.visible &&
+            !(physician.isPhysicianScreen && physician.hideCommandLayer) &&
+            !commandCenter.hideCommandLayer ? (
+              <section
+                aria-label="Operational command layer metrics"
+                className="emergency-whiteboard-page__command-layer"
+              >
+                <div className="emergency-whiteboard-page__command-layer-header">
+                  <strong className="emergency-whiteboard-page__command-layer-title">
+                    Operational command layer
+                  </strong>
+                  <span className="emergency-whiteboard-page__command-layer-meta">
+                    {centralSnapshot.sync.source === 'backend-snapshot'
+                      ? 'Backend snapshot'
+                      : 'Local store'}{' '}
+                    -{' '}
+                    {formatFreshness(
+                      centralSnapshot.sync.lastSyncedAt || centralSnapshot.generatedAt,
+                    )}
+                    {intelligenceSnapshot.badges.length
+                      ? ` · ${intelligenceSnapshot.badges.map((badge) => badge.label).join(' · ')}`
+                      : ''}
+                  </span>
+                </div>
+                <div className="emergency-whiteboard-page__command-layer-grid">
+                  {commandLayerMetrics.map((metric) => {
+                    const canOpen = canOpenOperationalMetricOnWhiteboard(metric.key, {
+                      displayMode: display.isDisplayMode,
+                      canAccessRoute: (path) => emergencyRole.canAccessRoute(path),
+                    });
+                    const metricToneClass =
+                      metric.tone === 'critical' ||
+                      metric.tone === 'warning' ||
+                      metric.tone === 'success'
+                        ? metric.tone
+                        : 'info';
 
-                  return display.isDisplayMode ? (
-                    <div
-                      key={metric.key}
-                      className="emergency-whiteboard-page__command-metric"
-                      title={`${metric.label}: ${metric.value}. Source: ${metric.source}.`}
-                    >
-                      <strong className="emergency-whiteboard-page__command-metric-value">
-                        {metric.value}
-                      </strong>
-                      <span
-                        className={`emergency-whiteboard-page__command-metric-label emergency-whiteboard-page__command-metric-label--${metricToneClass}`}
+                    return display.isDisplayMode ? (
+                      <div
+                        key={metric.key}
+                        className="emergency-whiteboard-page__command-metric"
+                        title={`${metric.label}: ${metric.value}. Source: ${metric.source}.`}
                       >
-                        {metric.label}
-                      </span>
-                    </div>
-                  ) : (
-                    <button
-                      key={metric.key}
-                      type="button"
-                      className="emergency-whiteboard-page__command-metric-btn"
-                      onClick={() => handleOperationalMetricClick(metric.key)}
-                      disabled={!canOpen}
-                      title={`${metric.label}: ${metric.value}. Source: ${metric.source}. ${centralSnapshot.sync.message}`}
-                    >
-                      <strong className="emergency-whiteboard-page__command-metric-value">
-                        {metric.value}
-                      </strong>
-                      <span
-                        className={`emergency-whiteboard-page__command-metric-label emergency-whiteboard-page__command-metric-label--${metricToneClass}`}
+                        <strong className="emergency-whiteboard-page__command-metric-value">
+                          {metric.value}
+                        </strong>
+                        <span
+                          className={`emergency-whiteboard-page__command-metric-label emergency-whiteboard-page__command-metric-label--${metricToneClass}`}
+                        >
+                          {metric.label}
+                        </span>
+                      </div>
+                    ) : (
+                      <button
+                        key={metric.key}
+                        type="button"
+                        className="emergency-whiteboard-page__command-metric-btn"
+                        onClick={() => handleOperationalMetricClick(metric.key)}
+                        disabled={!canOpen}
+                        title={`${metric.label}: ${metric.value}. Source: ${metric.source}. ${centralSnapshot.sync.message}`}
                       >
-                        {metric.label}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </section>
-          ) : null}
-          {whiteboardDensity.surfaces.primaryStats.visible ? (
-            <>
-              {!display.isDisplayMode &&
-              surfaces.compactLayout &&
-              !commandCenter.isCommandCenterScreen ? (
-                <RoleOperationalSummaryStrip
-                  roleId={emergencyRole.role}
-                  waitingCount={stats.waiting}
-                  escalationCount={stats.reassessmentDue + stats.highRisk}
-                  capacityLabel={`${capacity.score} ${capacity.band}`}
-                />
-              ) : null}
-              <div className="emergency-whiteboard-page__stats emergency-whiteboard-page__stats--bar">
-                <WhiteboardStatTile
-                  value={stats.waiting}
-                  label="Waiting"
-                  emphasized={prioritizeAwareness && stats.waiting > 0}
-                />
-                {surfaces.compactLayout ? (
-                  <WhiteboardStatTile
-                    value={stats.highRisk}
-                    label="High risk"
-                    tone={stats.highRisk ? 'critical' : 'success'}
-                    emphasized={Boolean(stats.highRisk) && !display.isDisplayMode}
-                    title="Patients flagged high risk on the board"
-                    onClick={
-                      display.isDisplayMode || !stats.highRisk
-                        ? undefined
-                        : () => {
-                            setActiveFilter('All');
-                            setQueueFilter('high-risk');
-                          }
-                    }
+                        <strong className="emergency-whiteboard-page__command-metric-value">
+                          {metric.value}
+                        </strong>
+                        <span
+                          className={`emergency-whiteboard-page__command-metric-label emergency-whiteboard-page__command-metric-label--${metricToneClass}`}
+                        >
+                          {metric.label}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </section>
+            ) : null}
+            {whiteboardDensity.surfaces.primaryStats.visible ? (
+              <>
+                {!display.isDisplayMode &&
+                surfaces.compactLayout &&
+                !commandCenter.isCommandCenterScreen ? (
+                  <RoleOperationalSummaryStrip
+                    roleId={emergencyRole.role}
+                    waitingCount={stats.waiting}
+                    escalationCount={stats.reassessmentDue + stats.highRisk}
+                    capacityLabel={`${capacity.score} ${capacity.band}`}
                   />
                 ) : null}
-                {!surfaces.compactLayout &&
-                !suppressOperationalSurface('analytics-charts') &&
-                whiteboardDensity.surfaces.secondaryStats.visible ? (
-                  <>
-                    <WhiteboardStatTile value={stats.total} label="Total" />
+                <div className="emergency-whiteboard-page__stats emergency-whiteboard-page__stats--bar">
+                  <WhiteboardStatTile
+                    value={stats.waiting}
+                    label="Waiting"
+                    emphasized={prioritizeAwareness && stats.waiting > 0}
+                  />
+                  {surfaces.compactLayout ? (
                     <WhiteboardStatTile
                       value={stats.highRisk}
-                      label="High Risk"
+                      label="High risk"
                       tone={stats.highRisk ? 'critical' : 'success'}
-                    />
-                  </>
-                ) : null}
-                {!surfaces.compactLayout ? (
-                  <WhiteboardStatTile
-                    value={`${capacity.score} ${capacity.band}`}
-                    label="Capacity"
-                    tone={capacityTone(capacity.band)}
-                  />
-                ) : null}
-                {!surfaces.compactLayout ? (
-                  <WhiteboardStatTile
-                    value={stats.reassessmentDue}
-                    label="Reassess Due"
-                    tone={stats.reassessmentDue ? 'warning' : 'success'}
-                    emphasized={Boolean(stats.reassessmentDue) && !display.isDisplayMode}
-                    title={
-                      stats.reassessmentDue
-                        ? 'Open reassessment drawer and filter board to flagged patients'
-                        : 'No reassessment patients are due'
-                    }
-                    onClick={
-                      display.isDisplayMode || !stats.reassessmentDue
-                        ? undefined
-                        : () => focusReassessmentOnBoard()
-                    }
-                  />
-                ) : null}
-                {!surfaces.compactLayout ? (
-                  <WhiteboardStatTile
-                    value={emsAwareness.soonestEtaLabel || emsAwareness.inboundCount || '—'}
-                    label="EMS ETA"
-                    tone={
-                      emsAwareness.soonestEtaMinutes !== null &&
-                      emsAwareness.soonestEtaMinutes <= 10
-                        ? 'critical'
-                        : emsAwareness.inboundCount
-                          ? 'info'
-                          : 'success'
-                    }
-                    emphasized={Boolean(emsAwareness.inboundCount) && !display.isDisplayMode}
-                    title={
-                      emsAwareness.inboundCount
-                        ? `${emsAwareness.inboundCount} inbound unit${emsAwareness.inboundCount === 1 ? '' : 's'}${emsAwareness.soonestEtaLabel ? ` · soonest ${emsAwareness.soonestEtaLabel}` : ''}`
-                        : 'No inbound EMS units'
-                    }
-                    onClick={
-                      display.isDisplayMode || !emsAwareness.inboundCount
-                        ? undefined
-                        : () => {
-                            setActiveFilter('EMS');
-                            setQueueFilter(null);
-                          }
-                    }
-                  />
-                ) : null}
-                {!surfaces.compactLayout &&
-                !suppressOperationalSurface('analytics-charts') &&
-                whiteboardDensity.surfaces.secondaryStats.visible ? (
-                  <WhiteboardStatTile
-                    value={emsAwareness.riskCount}
-                    label="EMS Risk"
-                    tone={emsAwareness.riskCount ? 'critical' : 'success'}
-                    emphasized={Boolean(emsAwareness.riskCount) && !display.isDisplayMode}
-                    title="Critical/high severity or P1/P2 inbound EMS"
-                    onClick={
-                      display.isDisplayMode || !emsAwareness.riskCount
-                        ? undefined
-                        : () => {
-                            setActiveFilter('EMS');
-                            setQueueFilter(null);
-                          }
-                    }
-                  />
-                ) : null}
-                {!surfaces.compactLayout &&
-                !suppressOperationalSurface('analytics-charts') &&
-                whiteboardDensity.surfaces.secondaryStats.visible ? (
-                  <WhiteboardStatTile
-                    value={
-                      emsAwareness.awaitingHandoff
-                        ? `${emsAwareness.offloadMinutes}m`
-                        : emsAwareness.offloadMinutes || 0
-                    }
-                    label="EMS Offload"
-                    tone={
-                      emsAwareness.offloadMinutes >= 15
-                        ? 'critical'
-                        : emsAwareness.awaitingHandoff
-                          ? 'warning'
-                          : 'success'
-                    }
-                    emphasized={Boolean(emsAwareness.awaitingHandoff) && !display.isDisplayMode}
-                    title={`${emsAwareness.awaitingHandoff} unit${emsAwareness.awaitingHandoff === 1 ? '' : 's'} awaiting handoff`}
-                    onClick={
-                      display.isDisplayMode || !emsAwareness.awaitingHandoff
-                        ? undefined
-                        : () => {
-                            setActiveFilter('EMS');
-                            setQueueFilter(null);
-                            if (emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyEms)) {
-                              openRoute(CANONICAL_ROUTES.emergencyEms);
+                      emphasized={Boolean(stats.highRisk) && !display.isDisplayMode}
+                      title="Patients flagged high risk on the board"
+                      onClick={
+                        display.isDisplayMode || !stats.highRisk
+                          ? undefined
+                          : () => {
+                              setActiveFilter('All');
+                              setQueueFilter('high-risk');
                             }
-                          }
-                    }
-                  />
-                ) : null}
-                {!surfaces.compactLayout &&
-                !suppressOperationalSurface('analytics-charts') &&
-                whiteboardDensity.surfaces.secondaryStats.visible ? (
-                  <WhiteboardStatTile
-                    value={stats.boarding}
-                    label="Boarding"
-                    tone={stats.boarding ? 'warning' : 'success'}
-                  />
-                ) : null}
-                {!surfaces.compactLayout ? (
-                  <WhiteboardStatTile
-                    value={referralAwareness.buckets.pending}
-                    label="Referrals Pending"
-                    tone={referralAwareness.buckets.pending ? 'warning' : 'success'}
-                    emphasized={
-                      Boolean(referralAwareness.buckets.pending) && !display.isDisplayMode
-                    }
-                    title="Referrals awaiting specialty response"
-                    onClick={
-                      display.isDisplayMode || !referralAwareness.buckets.pending
-                        ? undefined
-                        : () => {
-                            setActiveFilter('All');
-                            setQueueFilter('referral');
-                          }
-                    }
-                  />
-                ) : null}
-                {!surfaces.compactLayout &&
-                !suppressOperationalSurface('analytics-charts') &&
-                whiteboardDensity.surfaces.secondaryStats.visible ? (
-                  <>
-                    <WhiteboardStatTile
-                      value={referralAwareness.buckets.accepted}
-                      label="Referrals Accepted"
-                      tone={referralAwareness.buckets.accepted ? 'success' : 'default'}
-                      title="Referrals accepted in workflow"
-                      onClick={
-                        display.isDisplayMode || !referralAwareness.buckets.accepted
-                          ? undefined
-                          : () => openReferralWorkflow(undefined, 'accepted')
                       }
                     />
+                  ) : null}
+                  {!surfaces.compactLayout &&
+                  !suppressOperationalSurface('analytics-charts') &&
+                  whiteboardDensity.surfaces.secondaryStats.visible ? (
+                    <>
+                      <WhiteboardStatTile value={stats.total} label="Total" />
+                      <WhiteboardStatTile
+                        value={stats.highRisk}
+                        label="High Risk"
+                        tone={stats.highRisk ? 'critical' : 'success'}
+                      />
+                    </>
+                  ) : null}
+                  {!surfaces.compactLayout ? (
                     <WhiteboardStatTile
-                      value={referralAwareness.buckets.delayed}
-                      label="Referrals Delayed"
-                      tone={referralAwareness.buckets.delayed ? 'critical' : 'success'}
+                      value={`${capacity.score} ${capacity.band}`}
+                      label="Capacity"
+                      tone={capacityTone(capacity.band)}
+                    />
+                  ) : null}
+                  {!surfaces.compactLayout ? (
+                    <WhiteboardStatTile
+                      value={stats.reassessmentDue}
+                      label="Reassess Due"
+                      tone={stats.reassessmentDue ? 'warning' : 'success'}
+                      emphasized={Boolean(stats.reassessmentDue) && !display.isDisplayMode}
+                      title={
+                        stats.reassessmentDue
+                          ? 'Open reassessment drawer and filter board to flagged patients'
+                          : 'No reassessment patients are due'
+                      }
+                      onClick={
+                        display.isDisplayMode || !stats.reassessmentDue
+                          ? undefined
+                          : () => focusReassessmentOnBoard()
+                      }
+                    />
+                  ) : null}
+                  {!surfaces.compactLayout ? (
+                    <WhiteboardStatTile
+                      value={emsAwareness.soonestEtaLabel || emsAwareness.inboundCount || '—'}
+                      label="EMS ETA"
+                      tone={
+                        emsAwareness.soonestEtaMinutes !== null &&
+                        emsAwareness.soonestEtaMinutes <= 10
+                          ? 'critical'
+                          : emsAwareness.inboundCount
+                            ? 'info'
+                            : 'success'
+                      }
+                      emphasized={Boolean(emsAwareness.inboundCount) && !display.isDisplayMode}
+                      title={
+                        emsAwareness.inboundCount
+                          ? `${emsAwareness.inboundCount} inbound unit${emsAwareness.inboundCount === 1 ? '' : 's'}${emsAwareness.soonestEtaLabel ? ` · soonest ${emsAwareness.soonestEtaLabel}` : ''}`
+                          : 'No inbound EMS units'
+                      }
+                      onClick={
+                        display.isDisplayMode || !emsAwareness.inboundCount
+                          ? undefined
+                          : () => {
+                              setActiveFilter('EMS');
+                              setQueueFilter(null);
+                            }
+                      }
+                    />
+                  ) : null}
+                  {!surfaces.compactLayout &&
+                  !suppressOperationalSurface('analytics-charts') &&
+                  whiteboardDensity.surfaces.secondaryStats.visible ? (
+                    <WhiteboardStatTile
+                      value={emsAwareness.riskCount}
+                      label="EMS Risk"
+                      tone={emsAwareness.riskCount ? 'critical' : 'success'}
+                      emphasized={Boolean(emsAwareness.riskCount) && !display.isDisplayMode}
+                      title="Critical/high severity or P1/P2 inbound EMS"
+                      onClick={
+                        display.isDisplayMode || !emsAwareness.riskCount
+                          ? undefined
+                          : () => {
+                              setActiveFilter('EMS');
+                              setQueueFilter(null);
+                            }
+                      }
+                    />
+                  ) : null}
+                  {!surfaces.compactLayout &&
+                  !suppressOperationalSurface('analytics-charts') &&
+                  whiteboardDensity.surfaces.secondaryStats.visible ? (
+                    <WhiteboardStatTile
+                      value={
+                        emsAwareness.awaitingHandoff
+                          ? `${emsAwareness.offloadMinutes}m`
+                          : emsAwareness.offloadMinutes || 0
+                      }
+                      label="EMS Offload"
+                      tone={
+                        emsAwareness.offloadMinutes >= 15
+                          ? 'critical'
+                          : emsAwareness.awaitingHandoff
+                            ? 'warning'
+                            : 'success'
+                      }
+                      emphasized={Boolean(emsAwareness.awaitingHandoff) && !display.isDisplayMode}
+                      title={`${emsAwareness.awaitingHandoff} unit${emsAwareness.awaitingHandoff === 1 ? '' : 's'} awaiting handoff`}
+                      onClick={
+                        display.isDisplayMode || !emsAwareness.awaitingHandoff
+                          ? undefined
+                          : () => {
+                              setActiveFilter('EMS');
+                              setQueueFilter(null);
+                              if (emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyEms)) {
+                                openRoute(CANONICAL_ROUTES.emergencyEms);
+                              }
+                            }
+                      }
+                    />
+                  ) : null}
+                  {!surfaces.compactLayout &&
+                  !suppressOperationalSurface('analytics-charts') &&
+                  whiteboardDensity.surfaces.secondaryStats.visible ? (
+                    <WhiteboardStatTile
+                      value={stats.boarding}
+                      label="Boarding"
+                      tone={stats.boarding ? 'warning' : 'success'}
+                    />
+                  ) : null}
+                  {!surfaces.compactLayout ? (
+                    <WhiteboardStatTile
+                      value={referralAwareness.buckets.pending}
+                      label="Referrals Pending"
+                      tone={referralAwareness.buckets.pending ? 'warning' : 'success'}
                       emphasized={
-                        Boolean(referralAwareness.buckets.delayed) && !display.isDisplayMode
+                        Boolean(referralAwareness.buckets.pending) && !display.isDisplayMode
                       }
-                      title="Referrals flagged delayed"
+                      title="Referrals awaiting specialty response"
                       onClick={
-                        display.isDisplayMode || !referralAwareness.buckets.delayed
+                        display.isDisplayMode || !referralAwareness.buckets.pending
                           ? undefined
-                          : () => openReferralWorkflow(undefined, 'delayed')
+                          : () => {
+                              setActiveFilter('All');
+                              setQueueFilter('referral');
+                            }
                       }
                     />
-                    <WhiteboardStatTile
-                      value={formatFreshness(capacity.updatedAt || whiteboardGeneratedAt)}
-                      label="Data Freshness"
-                      tone="info"
-                      title="Last CareDroid capacity or whiteboard update"
-                    />
-                  </>
-                ) : null}
-              </div>
-            </>
-          ) : null}
+                  ) : null}
+                  {!surfaces.compactLayout &&
+                  !suppressOperationalSurface('analytics-charts') &&
+                  whiteboardDensity.surfaces.secondaryStats.visible ? (
+                    <>
+                      <WhiteboardStatTile
+                        value={referralAwareness.buckets.accepted}
+                        label="Referrals Accepted"
+                        tone={referralAwareness.buckets.accepted ? 'success' : 'default'}
+                        title="Referrals accepted in workflow"
+                        onClick={
+                          display.isDisplayMode || !referralAwareness.buckets.accepted
+                            ? undefined
+                            : () => openReferralWorkflow(undefined, 'accepted')
+                        }
+                      />
+                      <WhiteboardStatTile
+                        value={referralAwareness.buckets.delayed}
+                        label="Referrals Delayed"
+                        tone={referralAwareness.buckets.delayed ? 'critical' : 'success'}
+                        emphasized={
+                          Boolean(referralAwareness.buckets.delayed) && !display.isDisplayMode
+                        }
+                        title="Referrals flagged delayed"
+                        onClick={
+                          display.isDisplayMode || !referralAwareness.buckets.delayed
+                            ? undefined
+                            : () => openReferralWorkflow(undefined, 'delayed')
+                        }
+                      />
+                      <WhiteboardStatTile
+                        value={formatFreshness(capacity.updatedAt || whiteboardGeneratedAt)}
+                        label="Data Freshness"
+                        tone="info"
+                        title="Last CareDroid capacity or whiteboard update"
+                      />
+                    </>
+                  ) : null}
+                </div>
+              </>
+            ) : null}
 
-          {whiteboardDensity.surfaces.emsAttention.visible ? (
-            <EmsAttentionStrip
-              emsArrivals={emsArrivals}
-              patients={patients}
-              staff={staff}
-              rooms={rooms}
-              offloadTargetMinutes={
-                Number(emergencySettings?.thresholds?.emsOffloadTargetMinutes ?? 15) || 15
-              }
-              now={clockTick}
-              onMetricSelect={handleEmsAttentionSelect}
-              readOnly={display.isDisplayMode}
-            />
-          ) : null}
-
-          {!display.isDisplayMode &&
-          !suppressOperationalSurface('ems-offload-aggregate') &&
-          !whiteboardDensity.surfaces.emsAttention.visible &&
-          !(physician.isPhysicianScreen && physician.hideEmsOperations) &&
-          (!charge.isChargeNurseScreen || charge.showEmsOffloadAggregate) ? (
-            <EmsOffloadAggregateStrip
-              emsArrivals={emsArrivals}
-              patients={patients}
-              staff={staff}
-              rooms={rooms}
-              now={clockTick}
-              offloadTargetMinutes={
-                Number(emergencySettings?.thresholds?.emsOffloadTargetMinutes ?? 15) || 15
-              }
-              onOpenTracker={() => setEmsOffloadPanelOpen(true)}
-            />
-          ) : null}
-
-          {emsAwareness.offloadRows?.length &&
-          !display.isDisplayMode &&
-          !(physician.isPhysicianScreen && physician.hideEmsOperations) &&
-          (!charge.isChargeNurseScreen || charge.showOffloadDelays) ? (
-            <EmsOffloadAttentionStrip
-              emsArrivals={emsArrivals}
-              patients={patients}
-              staff={staff}
-              rooms={rooms}
-              offloadTargetMinutes={
-                Number(emergencySettings?.thresholds?.emsOffloadTargetMinutes ?? 15) || 15
-              }
-              onSelectPatient={(patientId: string) => {
-                selectPatient(patientId);
-                setActiveFilter('EMS');
-                setQueueFilter(null);
-              }}
-              onSelectArrival={() => {
-                setActiveFilter('EMS');
-                setQueueFilter(null);
-                setEmsOffloadPanelOpen(true);
-              }}
-              onOpenTracker={() => setEmsOffloadPanelOpen(true)}
-            />
-          ) : null}
-
-          {emsAwareness.offloadRows?.length &&
-          !display.isDisplayMode &&
-          !(physician.isPhysicianScreen && physician.hideEmsOperations) &&
-          (!charge.isChargeNurseScreen || charge.showOffloadDelays) &&
-          (emsOffloadPanelOpen || (emsAwareness.delayedOffloadCount ?? 0) > 0) ? (
-            <div className="emergency-whiteboard-page__offload-panel-wrap">
-              <EmsOffloadTrackerPanel
+            {whiteboardDensity.surfaces.emsAttention.visible ? (
+              <EmsAttentionStrip
                 emsArrivals={emsArrivals}
                 patients={patients}
                 staff={staff}
                 rooms={rooms}
-                compact
+                offloadTargetMinutes={
+                  Number(emergencySettings?.thresholds?.emsOffloadTargetMinutes ?? 15) || 15
+                }
+                now={clockTick}
+                onMetricSelect={handleEmsAttentionSelect}
+                readOnly={display.isDisplayMode}
+              />
+            ) : null}
+
+            {!display.isDisplayMode &&
+            !suppressOperationalSurface('ems-offload-aggregate') &&
+            !whiteboardDensity.surfaces.emsAttention.visible &&
+            !(physician.isPhysicianScreen && physician.hideEmsOperations) &&
+            (!charge.isChargeNurseScreen || charge.showEmsOffloadAggregate) ? (
+              <EmsOffloadAggregateStrip
+                emsArrivals={emsArrivals}
+                patients={patients}
+                staff={staff}
+                rooms={rooms}
+                now={clockTick}
+                offloadTargetMinutes={
+                  Number(emergencySettings?.thresholds?.emsOffloadTargetMinutes ?? 15) || 15
+                }
+                onOpenTracker={() => setEmsOffloadPanelOpen(true)}
+              />
+            ) : null}
+
+            {emsAwareness.offloadRows?.length &&
+            !display.isDisplayMode &&
+            !(physician.isPhysicianScreen && physician.hideEmsOperations) &&
+            (!charge.isChargeNurseScreen || charge.showOffloadDelays) ? (
+              <EmsOffloadAttentionStrip
+                emsArrivals={emsArrivals}
+                patients={patients}
+                staff={staff}
+                rooms={rooms}
+                offloadTargetMinutes={
+                  Number(emergencySettings?.thresholds?.emsOffloadTargetMinutes ?? 15) || 15
+                }
                 onSelectPatient={(patientId: string) => {
                   selectPatient(patientId);
                   setActiveFilter('EMS');
-                }}
-              />
-            </div>
-          ) : null}
-
-          {whiteboardDensity.surfaces.emsInboundBanner.visible ? (
-            <section
-              aria-label="Inbound EMS operational awareness"
-              className="emergency-whiteboard-page__inbound-banner"
-            >
-              <strong className="emergency-whiteboard-page__inbound-banner-title">
-                Inbound EMS · operational awareness
-              </strong>
-              <div className="emergency-whiteboard-page__inbound-banner-grid">
-                {emsAwareness.inboundArrivals.slice(0, 3).map((arrival) => {
-                  const remaining = minutesRemaining(arrival);
-                  const offloadMinutes = getArrivalOffloadMinutes(arrival, clockTick);
-                  return (
-                    <button
-                      key={arrival.id}
-                      type="button"
-                      className="emergency-whiteboard-page__inbound-banner-card"
-                      onClick={() => {
-                        setActiveFilter('EMS');
-                        setQueueFilter(null);
-                      }}
-                    >
-                      <strong>
-                        {arrival.unitId} · {formatEmsEta(remaining, arrival.status)}
-                      </strong>
-                      <span className="emergency-whiteboard-page__inbound-banner-card-detail">
-                        Risk {arrival.severity}
-                        {offloadMinutes !== null ? ` · Offload ${offloadMinutes}m` : ''}
-                      </span>
-                      <span className="emergency-whiteboard-page__inbound-banner-card-meta">
-                        {arrival.chiefComplaint || arrival.prearrivalComplaint}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </section>
-          ) : null}
-
-          {whiteboardDensity.surfaces.referralAttention.visible ? (
-            <ReferralAttentionStrip
-              referrals={referrals}
-              onMetricSelect={handleReferralAttentionSelect}
-              readOnly={display.isDisplayMode}
-            />
-          ) : null}
-
-          {whiteboardDensity.surfaces.reassessAttention.visible ? (
-            <ReassessmentAttentionStrip
-              patients={patients}
-              onMetricSelect={handleReassessmentAttentionSelect}
-              readOnly={display.isDisplayMode}
-            />
-          ) : null}
-
-          {surfaces.whiteboard.showCommandDashboard &&
-          !suppressOperationalSurface('mission-control') &&
-          charge.isChargeNurseScreen &&
-          whiteboardDensity.surfaces.chargeNurseStrip.visible ? (
-            <OperationalCommandDashboard
-              patients={patients}
-              rooms={rooms}
-              staff={staff}
-              activeShift={activeShift}
-              capacity={capacity}
-              boardingMetrics={boardingMetrics}
-              snapshot={operationalCommandDashboardSnapshot}
-              title="Charge nurse command dashboard"
-              subtitle="Live whiteboard metrics for department flow and bed pressure"
-            />
-          ) : null}
-
-          {charge.isChargeNurseScreen && showNativeAiCommandSuite && !display.isDisplayMode ? (
-            <div className="emergency-whiteboard-page__native-ai-wrap">
-              <NativeAiCommandSuitePanel
-                patients={patients}
-                rooms={rooms}
-                capacity={capacity}
-                onSelectPatient={(patientId) => selectPatient(patientId)}
-              />
-            </div>
-          ) : null}
-
-          {whiteboardDensity.surfaces.chargeNurseStrip.visible ? (
-            <ChargeNurseOperationalStrip
-              patients={patients}
-              centralSnapshot={centralSnapshot}
-              activeEmsArrivals={activeEmsArrivals.length}
-              referrals={referrals}
-              emsArrivals={emsArrivals}
-              capacity={capacity}
-              settings={emergencySettings}
-              workflowLogs={workflowLogs}
-              alerts={alerts}
-              kpiMetricIds={chargeNurseKpiMetricIds}
-              visibleSurfaces={
-                chargeNurseKpiMetricIds
-                  ? null
-                  : charge.isChargeNurseScreen
-                    ? charge.visibleOperationalSurfaces
-                    : null
-              }
-              onMetricSelect={handleOperationalStripMetricSelect}
-              readOnly={display.isDisplayMode}
-            />
-          ) : null}
-
-          {showPhysicianStrip ? (
-            <PhysicianOperationalStrip
-              patients={patients}
-              referrals={referrals}
-              physicianStaffId={physicianStaffId}
-              settings={emergencySettings}
-              visibleSurfaces={
-                physician.isPhysicianScreen ? physician.visibleOperationalSurfaces : null
-              }
-              onMetricSelect={handleOperationalStripMetricSelect}
-              readOnly={display.isDisplayMode}
-            />
-          ) : null}
-
-          {physician.isPhysicianScreen && physician.showProviderWaitBreaches ? (
-            <ProviderWaitBreachStrip
-              patients={patients}
-              settings={emergencySettings}
-              onSelectPatient={handleWaitingRoomSafetySelect}
-              className="emergency-whiteboard-page__provider-wait-breach"
-              now={clockTick}
-            />
-          ) : null}
-
-          {whiteboardDensity.surfaces.waitingRoomSafety.visible ? (
-            <>
-              {!display.isDisplayMode &&
-              !(
-                (charge.isChargeNurseScreen && !charge.showTriageBreach) ||
-                (triage.isTriageScreen && !triage.showTriageBreach)
-              ) ? (
-                <TriageBreachStrip
-                  patients={patients}
-                  settings={emergencySettings}
-                  onSelectPatient={handleWaitingRoomSafetySelect}
-                  className="emergency-whiteboard-page__triage-breach-strip"
-                  now={clockTick}
-                />
-              ) : null}
-              {!display.isDisplayMode ? (
-                <WhatHappensNextStrip
-                  patients={patients}
-                  referrals={referrals}
-                  staff={staff}
-                  className="emergency-whiteboard-page__what-next-strip"
-                  now={clockTick}
-                />
-              ) : null}
-              {surfaces.whiteboard.showAlertRails &&
-              !display.isDisplayMode &&
-              !(physician.isPhysicianScreen && physician.hideWaitingRoomReceptionStrips) ? (
-                <WhiteboardWaitingRoomAlertRail
-                  patients={patients}
-                  alerts={alerts}
-                  referrals={referrals}
-                  staff={staff}
-                  workflowLogs={workflowLogs}
-                  emsArrivals={emsArrivals}
-                  settings={emergencySettings}
-                  roleId={emergencyRole.role}
-                  features={{
-                    // Triage breach already has its own full-detail strip (TriageBreachStrip,
-                    // rendered above under the same visibility condition this chip used to
-                    // duplicate) plus the WaitingRoomSafetyBoard header badges -- both driven
-                    // by the identical summarizeTriageBreachBoard() computation. The rail chip
-                    // added a 3rd, purely redundant copy of the same signal.
-                    showTriageBreach: false,
-                    showProviderWait: !(
-                      charge.isChargeNurseScreen && !charge.showProviderWaitBreaches
-                    ),
-                  }}
-                  onSelectPatient={handleWaitingRoomSafetySelect}
-                  className="emergency-whiteboard-page__alert-rail"
-                />
-              ) : null}
-              {surfaces.whiteboard.showCommunicationPanel &&
-              ((charge.isChargeNurseScreen && charge.showWidget('communication-status')) ||
-                (triage.isTriageScreen && triage.showWidget('communication-status'))) ? (
-                <PatientCommunicationStatusPanel
-                  patients={patients}
-                  workflowLogs={workflowLogs}
-                  staff={staff}
-                  referrals={referrals}
-                  settings={emergencySettings}
-                  onSelectPatient={handleWaitingRoomSafetySelect}
-                  className="emergency-whiteboard-page__communication-status"
-                />
-              ) : null}
-              <WaitingRoomSafetyBoard
-                patients={patients}
-                staff={staff}
-                referrals={referrals}
-                emsArrivals={emsArrivals}
-                workflowLogs={workflowLogs}
-                alerts={alerts}
-                capacity={capacity}
-                settings={emergencySettings}
-                activeQueueFilter={activeQueueFilter}
-                displayMode={display.isDisplayMode}
-                readOnly={display.isDisplayMode || !canClassifyFitToWait}
-                now={clockTick}
-                variant={charge.isChargeNurseScreen || triage.isTriageScreen ? 'focused' : 'full'}
-                onSelectPatient={handleWaitingRoomSafetySelect}
-                onOpenReassessment={focusReassessmentOnBoard}
-                onClassifyFitToWait={handleClassifyFitToWait}
-              />
-            </>
-          ) : null}
-
-          {whiteboardDensity.surfaces.missionControl.visible &&
-          !(physician.isPhysicianScreen && physician.hideMissionControlAdmin) &&
-          !commandCenter.hideMissionControl ? (
-            <section
-              className="emergency-whiteboard-page__mission"
-              aria-labelledby="whiteboard-mission-control-title"
-            >
-              <div className="emergency-whiteboard-page__mission-card">
-                <span className="emergency-whiteboard-page__mission-eyebrow">Board actions</span>
-                <h2
-                  id="whiteboard-mission-control-title"
-                  className="emergency-whiteboard-page__mission-title"
-                >
-                  Next steps from the whiteboard
-                </h2>
-                <div className="emergency-whiteboard-page__mission-actions">
-                  {isRegistrationClerk ? (
-                    <MissionButton
-                      label="Open Reception"
-                      onClick={() => openRoute(CANONICAL_ROUTES.emergencyReception)}
-                      disabled={!emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyReception)}
-                      title="Patient creation originates from the Reception arrival dashboard"
-                      tone="primary"
-                    />
-                  ) : createPatientPresentation.visible ? (
-                    <MissionButton
-                      label="Central Intake"
-                      onClick={openIntake}
-                      disabled={!canUseCentralIntake}
-                      title={
-                        canUseCentralIntake
-                          ? 'Create patient using the existing quick intake modal'
-                          : 'Central intake unavailable for this role'
-                      }
-                      tone="primary"
-                    />
-                  ) : null}
-                  <MissionButton
-                    label="Identity Review"
-                    onClick={() =>
-                      openRoute(
-                        emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyReception)
-                          ? `${CANONICAL_ROUTES.emergencyIntake}?from=reception`
-                          : CANONICAL_ROUTES.emergencyIntake,
-                      )
-                    }
-                    disabled={!emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyIntake)}
-                    title="Open existing Smart Intake identity workflow"
-                  />
-                  <MissionButton
-                    label={`Reassessment Tasks (${reassessmentAttentionCount})`}
-                    onClick={() => focusReassessmentOnBoard()}
-                    disabled={!reassessmentAttentionCount}
-                    title={
-                      reassessmentAttentionCount
-                        ? 'Open reassessment drawer and filter board'
-                        : 'No reassessment tasks are due'
-                    }
-                    tone={reassessmentAttentionCount ? 'warning' : 'default'}
-                  />
-                  {manageReferralPresentation.visible ? (
-                    <MissionButton
-                      label="New Referral"
-                      onClick={() => openReferralWorkflow()}
-                      disabled={!canMutateWhiteboard || !canManageReferral}
-                      title={
-                        canManageReferral
-                          ? 'Open existing referral form'
-                          : 'Referral workflow unavailable for this role'
-                      }
-                    />
-                  ) : null}
-                  {canReassignWorkload ? (
-                    <MissionButton
-                      label={
-                        workloadRebalanceSuggestion
-                          ? `Balance Workload (${workloadRebalanceSuggestion.name} overloaded)`
-                          : 'Balance Workload'
-                      }
-                      onClick={() => setWorkloadPanelOpen(true)}
-                      disabled={!workloadBalanceEntries.length}
-                      title={
-                        workloadBalanceEntries.length
-                          ? 'Review and rebalance on-duty staff patient assignments'
-                          : 'No on-duty staff to balance yet'
-                      }
-                      tone={workloadRebalanceSuggestion ? 'warning' : 'default'}
-                    />
-                  ) : null}
-                </div>
-              </div>
-
-              <div className="emergency-whiteboard-page__mission-card">
-                <div className="emergency-whiteboard-page__mission-card-header">
-                  <strong className="emergency-whiteboard-page__mission-card-heading">
-                    EMS arrivals
-                  </strong>
-                  <button
-                    type="button"
-                    className="emergency-whiteboard-page__mission-link-btn"
-                    disabled={!emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyEms)}
-                    onClick={() => openRoute(CANONICAL_ROUTES.emergencyEms)}
-                    title={
-                      emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyEms)
-                        ? 'Open EMS arrivals'
-                        : 'EMS is restricted for this role'
-                    }
-                  >
-                    Open EMS
-                  </button>
-                </div>
-                <div className="emergency-whiteboard-page__mission-list">
-                  {activeEmsArrivals.length ? (
-                    activeEmsArrivals.slice(0, 3).map((arrival) => {
-                      const isIncoming =
-                        arrival.status === 'Inbound' && minutesRemaining(arrival) > 0;
-                      const canConvertNow = !isIncoming && !arrival.patientId;
-                      return (
-                        <article
-                          className="emergency-whiteboard-page__arrival-card"
-                          key={arrival.id}
-                        >
-                          <div>
-                            <strong className="emergency-whiteboard-page__arrival-title">
-                              {arrival.unitId} · {formatEta(arrival)}
-                            </strong>
-                            <p className="emergency-whiteboard-page__arrival-detail">
-                              {arrival.chiefComplaint} · {arrival.severity}
-                            </p>
-                          </div>
-                          <div className="emergency-whiteboard-page__arrival-actions">
-                            {prepareBayPresentation.visible || convertEmsPresentation.visible ? (
-                              <>
-                                {prepareBayPresentation.visible ? (
-                                  <button
-                                    type="button"
-                                    className="emergency-whiteboard-page__arrival-btn--prepare"
-                                    onClick={() => prepareEMSBay(arrival.id)}
-                                    disabled={
-                                      !isIncoming ||
-                                      !canPrepareBay ||
-                                      Boolean(arrival.preparedRoomId)
-                                    }
-                                    title={
-                                      arrival.preparedRoomId
-                                        ? 'Bay already prepared'
-                                        : 'Prepare a bay for this inbound EMS unit'
-                                    }
-                                  >
-                                    {arrival.preparedRoomId ? 'Bay Ready' : 'Prepare Bay'}
-                                  </button>
-                                ) : null}
-                                {convertEmsPresentation.visible ? (
-                                  <button
-                                    type="button"
-                                    className="emergency-whiteboard-page__arrival-btn--convert"
-                                    onClick={() => convertArrival(arrival)}
-                                    disabled={!canConvertNow || !canConvertEmsArrival}
-                                    title={
-                                      canConvertNow
-                                        ? 'Convert arrived EMS unit to a whiteboard patient'
-                                        : 'Conversion is available after arrival'
-                                    }
-                                  >
-                                    Add to Board
-                                  </button>
-                                ) : null}
-                              </>
-                            ) : null}
-                          </div>
-                        </article>
-                      );
-                    })
-                  ) : (
-                    <p className="emergency-whiteboard-page__mission-empty">
-                      No active EMS arrivals. Use EMS Intake for the full pipeline.
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              <div className="emergency-whiteboard-page__mission-card">
-                <div className="emergency-whiteboard-page__tasks-header">
-                  <strong className="emergency-whiteboard-page__tasks-heading">
-                    Immediate tasks
-                  </strong>
-                  <div className="emergency-whiteboard-page__referral-buckets">
-                    {[
-                      { label: 'Pending', value: referralAwareness.buckets.pending },
-                      { label: 'Accepted', value: referralAwareness.buckets.accepted },
-                      { label: 'Delayed', value: referralAwareness.buckets.delayed },
-                    ].map((item) => (
-                      <span
-                        key={item.label}
-                        className={`emergency-whiteboard-page__referral-bucket-chip emergency-whiteboard-page__referral-bucket-chip--${item.label.toLowerCase()}`}
-                      >
-                        {item.label} {item.value}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-                <div className="emergency-whiteboard-page__task-list">
-                  {[
-                    ...referralAwareness.grouped.delayed,
-                    ...referralAwareness.grouped.pending,
-                    ...referralAwareness.grouped.accepted,
-                  ]
-                    .slice(0, 3)
-                    .map((referral) => {
-                      const patient = patients.find((entry) => entry.id === referral.patientId);
-                      const bucket =
-                        referral.status === 'Delayed'
-                          ? 'Delayed'
-                          : referral.status === 'Accepted'
-                            ? 'Accepted'
-                            : 'Pending';
-                      return (
-                        <button
-                          key={referral.id}
-                          type="button"
-                          className="emergency-whiteboard-page__referral-task-btn"
-                          onClick={() =>
-                            openReferralWorkflow(referral.patientId, bucket.toLowerCase())
-                          }
-                        >
-                          <strong>
-                            {patient ? patientName(patient) : referral.patientId} · {bucket}
-                          </strong>
-                          <span className="emergency-whiteboard-page__referral-task-detail">
-                            {referral.targetDepartment || referral.service || 'Specialty'} ·{' '}
-                            {referral.reason || referral.summary || 'Referral active'}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  {!referralAwareness.total ? (
-                    <p className="emergency-whiteboard-page__mission-empty">
-                      No active referrals in workflow.
-                    </p>
-                  ) : null}
-                  {reassessmentPatients.length ? (
-                    reassessmentPatients.slice(0, 3).map((patient) => (
-                      <button
-                        key={patient.id}
-                        type="button"
-                        className="emergency-whiteboard-page__reassess-task-btn"
-                        onClick={() => focusReassessmentOnBoard(patient.id)}
-                      >
-                        <strong>{patientName(patient)}</strong>
-                        <span className="emergency-whiteboard-page__reassess-task-detail">
-                          {patient.priority} · {patient.chiefComplaint}
-                        </span>
-                      </button>
-                    ))
-                  ) : (
-                    <p className="emergency-whiteboard-page__mission-empty">
-                      No reassessment tasks are due.
-                    </p>
-                  )}
-                  <MissionButton
-                    label="Filter Waiting Queue"
-                    onClick={() => openQueueReview('Waiting')}
-                    disabled={!canMutateWhiteboard}
-                  />
-                </div>
-              </div>
-            </section>
-          ) : null}
-
-          {whiteboardDensity.surfaces.awarenessBanner.visible ? (
-            <section
-              aria-label="Operational awareness summary"
-              className="emergency-whiteboard-page__awareness-banner"
-            >
-              <div className="emergency-whiteboard-page__awareness-banner-copy">
-                <strong className="emergency-whiteboard-page__awareness-banner-title">
-                  Department under pressure — focus on what needs action now
-                </strong>
-                {surfaces.whiteboard.showAwarenessSubtitle ? (
-                  <span className="emergency-whiteboard-page__awareness-banner-subtitle">
-                    {operationalLoad.primaryFocus
-                      .map((focus: { value: string; label: string } | null) =>
-                        focus ? `${focus.value} ${focus.label.toLowerCase()}` : '',
-                      )
-                      .filter(Boolean)
-                      .join(' · ')}
-                  </span>
-                ) : null}
-              </div>
-              <div className="emergency-whiteboard-page__awareness-banner-chips">
-                <button
-                  type="button"
-                  className="emergency-whiteboard-page__awareness-chip"
-                  onClick={() => {
-                    setActiveFilter('Reassess');
-                    setQueueFilter(null);
-                  }}
-                >
-                  Reassess ({reassessmentAttentionCount})
-                </button>
-                <button
-                  type="button"
-                  className="emergency-whiteboard-page__awareness-chip"
-                  onClick={() => {
-                    setActiveFilter('EMS');
-                    setQueueFilter(null);
-                  }}
-                >
-                  EMS ({emsAwareness.inboundCount || activeEmsArrivals.length})
-                </button>
-                <button
-                  type="button"
-                  className="emergency-whiteboard-page__awareness-chip"
-                  onClick={() => {
-                    setActiveFilter('All');
-                    setQueueFilter('referral');
-                  }}
-                >
-                  Referrals ({referralAwareness.buckets.pending})
-                </button>
-                <button
-                  type="button"
-                  className="emergency-whiteboard-page__awareness-chip"
-                  onClick={() => {
-                    setActiveFilter('Waiting');
-                    setQueueFilter(null);
-                  }}
-                >
-                  Waiting ({stats.waiting})
-                </button>
-              </div>
-            </section>
-          ) : null}
-
-          {whiteboardDensity.surfaces.filters.visible ? (
-            <div className="emergency-whiteboard-page__controls">
-              <div className="emergency-whiteboard-page__filters emergency-whiteboard-page__filters--row">
-                {FILTERS.map((filter) => {
-                  const active = filter === activeFilter;
-                  const reassessCount = filter === 'Reassess' ? reassessmentAttentionCount : 0;
-                  const label = reassessCount > 0 ? `Reassess (${reassessCount})` : filter;
-                  const highlightReassess = filter === 'Reassess' && reassessCount > 0;
-                  const filterChipClassName = [
-                    'emergency-whiteboard-page__filter-chip',
-                    active ? 'emergency-whiteboard-page__filter-chip--active' : '',
-                    highlightReassess ? 'emergency-whiteboard-page__filter-chip--reassess' : '',
-                  ]
-                    .filter(Boolean)
-                    .join(' ');
-                  return (
-                    <button
-                      key={filter}
-                      type="button"
-                      className={filterChipClassName}
-                      onClick={() => {
-                        setActiveFilter(filter);
-                        setQueueFilter(null);
-                        if (filter === 'Reassess' && reassessCount > 0) {
-                          document.dispatchEvent(new Event('open-reassessment-drawer'));
-                        }
-                      }}
-                    >
-                      {label}
-                    </button>
-                  );
-                })}
-              </div>
-
-              {surfaces.whiteboard.showCardKey ? (
-                <div
-                  className="emergency-whiteboard-page__card-key"
-                  aria-label="Patient card visual key"
-                >
-                  <span>
-                    <i className="emergency-whiteboard-page__card-key-swatch--ctas" /> CTAS band
-                  </span>
-                  <span>
-                    <i className="emergency-whiteboard-page__card-key-swatch--critical" /> Critical
-                    risk
-                  </span>
-                  <span>
-                    <i className="emergency-whiteboard-page__card-key-swatch--wait" /> Wait/reassess
-                  </span>
-                  <span>
-                    <i className="emergency-whiteboard-page__card-key-swatch--ems" /> EMS
-                  </span>
-                  <span>
-                    <i className="emergency-whiteboard-page__card-key-swatch--boarding" /> Boarding
-                  </span>
-                </div>
-              ) : null}
-
-              {display.isDisplayMode ? null : isRegistrationClerk ? (
-                <button
-                  className="emergency-whiteboard-page__intake-button"
-                  type="button"
-                  onClick={() => openRoute(CANONICAL_ROUTES.emergencyReception)}
-                  disabled={!emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyReception)}
-                  title="Open the Reception arrival dashboard for patient creation"
-                >
-                  Open Reception
-                </button>
-              ) : (
-                <button
-                  className="emergency-whiteboard-page__intake-button"
-                  type="button"
-                  onClick={openIntake}
-                  disabled={!canUseCentralIntake}
-                  title={
-                    canUseCentralIntake
-                      ? 'Send a new patient input to the Central Node'
-                      : `${emergencyRole.roleLabel} cannot submit central intake inputs`
-                  }
-                >
-                  + Central Intake
-                </button>
-              )}
-            </div>
-          ) : null}
-
-          {showIntake &&
-          canUseCentralIntake &&
-          !(isReceptionFirstUxEnabled() && prefersReceptionForPatientCreate(emergencyRole.role)) ? (
-            <QuickIntake onClose={closeIntake} onAdded={handlePatientAdded} />
-          ) : null}
-
-          {canReassignWorkload ? (
-            <WorkloadBalancePanel
-              open={workloadPanelOpen}
-              activeShift={activeShift}
-              workloads={workloadBalanceEntries}
-              rebalanceSuggestion={workloadRebalanceSuggestion}
-              currentStaffProfile={{
-                id: activeShift?.chargeStaffId || 'charge-nurse',
-                displayName: emergencyRole.roleLabel,
-              }}
-              onClose={() => setWorkloadPanelOpen(false)}
-              onAssignStaff={assignStaff}
-            />
-          ) : null}
-
-          {whiteboardDensity.surfaces.queueIntelligence.visible &&
-          !(physician.isPhysicianScreen && physician.hideQueueIntelligence) ? (
-            <section
-              className="emergency-whiteboard-page__queue-intelligence"
-              aria-label="Whiteboard queue intelligence"
-            >
-              <QueueIntelligencePanel
-                collapsed={queuePanelCollapsed}
-                onCollapsedChange={setQueuePanelCollapsed}
-              />
-            </section>
-          ) : null}
-
-          {activeQueueFilter && whiteboardDensity.surfaces.patientGrid.visible ? (
-            <div role="status" className="emergency-whiteboard-page__queue-filter-bar">
-              <span className="emergency-whiteboard-page__queue-filter-label">
-                Showing the {activeQueueFilter} queue on the Whiteboard.
-              </span>
-              <button
-                type="button"
-                className="emergency-whiteboard-page__queue-filter-clear"
-                onClick={() => setQueueFilter(null)}
-              >
-                Clear queue filter
-              </button>
-            </div>
-          ) : null}
-
-          {isInitialLoading ? <SkeletonLoader variant="whiteboard" /> : null}
-
-          {whiteboard.error ? (
-            <ToolApiErrorBanner
-              message={`${whiteboard.error}. ${ERROR_RECOVERY_COPY.syncStale}`}
-              onRetry={() => void whiteboard.refresh()}
-              retryLabel="Refresh board"
-            />
-          ) : null}
-
-          {whiteboardDensity.surfaces.patientGrid.visible &&
-          !whiteboard.loading &&
-          activeQueueFilter === 'Triage' &&
-          canReviewTriage &&
-          selectedPatientId ? (
-            <div className="emergency-whiteboard-page__triage-assist-wrap">
-              <AiTriageAssistPanelForPatientId patientId={selectedPatientId} />
-            </div>
-          ) : null}
-
-          {whiteboardDensity.surfaces.patientGrid.visible && hiddenBoardCount > 0 ? (
-            <div role="status" className="emergency-whiteboard-page__board-limit">
-              <span className="emergency-whiteboard-page__board-limit-copy">
-                Showing {boardPatients.length} of {visiblePatients.length} patients on the All view
-                — use Waiting, Reassess, or EMS filters for the full list.
-              </span>
-              <button
-                type="button"
-                className="emergency-whiteboard-page__awareness-chip"
-                onClick={() => {
-                  setActiveFilter(operationalLoad.suggestedFilter as FilterId);
                   setQueueFilter(null);
                 }}
+                onSelectArrival={() => {
+                  setActiveFilter('EMS');
+                  setQueueFilter(null);
+                  setEmsOffloadPanelOpen(true);
+                }}
+                onOpenTracker={() => setEmsOffloadPanelOpen(true)}
+              />
+            ) : null}
+
+            {emsAwareness.offloadRows?.length &&
+            !display.isDisplayMode &&
+            !(physician.isPhysicianScreen && physician.hideEmsOperations) &&
+            (!charge.isChargeNurseScreen || charge.showOffloadDelays) &&
+            (emsOffloadPanelOpen || (emsAwareness.delayedOffloadCount ?? 0) > 0) ? (
+              <div className="emergency-whiteboard-page__offload-panel-wrap">
+                <EmsOffloadTrackerPanel
+                  emsArrivals={emsArrivals}
+                  patients={patients}
+                  staff={staff}
+                  rooms={rooms}
+                  compact
+                  onSelectPatient={(patientId: string) => {
+                    selectPatient(patientId);
+                    setActiveFilter('EMS');
+                  }}
+                />
+              </div>
+            ) : null}
+
+            {whiteboardDensity.surfaces.emsInboundBanner.visible ? (
+              <section
+                aria-label="Inbound EMS operational awareness"
+                className="emergency-whiteboard-page__inbound-banner"
               >
-                Filter {operationalLoad.suggestedFilter}
-              </button>
-            </div>
-          ) : null}
+                <strong className="emergency-whiteboard-page__inbound-banner-title">
+                  Inbound EMS · operational awareness
+                </strong>
+                <div className="emergency-whiteboard-page__inbound-banner-grid">
+                  {emsAwareness.inboundArrivals.slice(0, 3).map((arrival) => {
+                    const remaining = minutesRemaining(arrival);
+                    const offloadMinutes = getArrivalOffloadMinutes(arrival, clockTick);
+                    return (
+                      <button
+                        key={arrival.id}
+                        type="button"
+                        className="emergency-whiteboard-page__inbound-banner-card"
+                        onClick={() => {
+                          setActiveFilter('EMS');
+                          setQueueFilter(null);
+                        }}
+                      >
+                        <strong>
+                          {arrival.unitId} · {formatEmsEta(remaining, arrival.status)}
+                        </strong>
+                        <span className="emergency-whiteboard-page__inbound-banner-card-detail">
+                          Risk {arrival.severity}
+                          {offloadMinutes !== null ? ` · Offload ${offloadMinutes}m` : ''}
+                        </span>
+                        <span className="emergency-whiteboard-page__inbound-banner-card-meta">
+                          {arrival.chiefComplaint || arrival.prearrivalComplaint}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </section>
+            ) : null}
+
+            {whiteboardDensity.surfaces.referralAttention.visible ? (
+              <ReferralAttentionStrip
+                referrals={referrals}
+                onMetricSelect={handleReferralAttentionSelect}
+                readOnly={display.isDisplayMode}
+              />
+            ) : null}
+
+            {whiteboardDensity.surfaces.reassessAttention.visible ? (
+              <ReassessmentAttentionStrip
+                patients={patients}
+                onMetricSelect={handleReassessmentAttentionSelect}
+                readOnly={display.isDisplayMode}
+              />
+            ) : null}
+
+            {surfaces.whiteboard.showCommandDashboard &&
+            !suppressOperationalSurface('mission-control') &&
+            charge.isChargeNurseScreen &&
+            whiteboardDensity.surfaces.chargeNurseStrip.visible ? (
+              <Suspense fallback={null}>
+                <OperationalCommandDashboard
+                  patients={patients}
+                  rooms={rooms}
+                  staff={staff}
+                  activeShift={activeShift}
+                  capacity={capacity}
+                  boardingMetrics={boardingMetrics}
+                  snapshot={operationalCommandDashboardSnapshot}
+                  title="Charge nurse command dashboard"
+                  subtitle="Live whiteboard metrics for department flow and bed pressure"
+                />
+              </Suspense>
+            ) : null}
+
+            {charge.isChargeNurseScreen && showNativeAiCommandSuite && !display.isDisplayMode ? (
+              <Suspense fallback={null}>
+                <div className="emergency-whiteboard-page__native-ai-wrap">
+                  <NativeAiCommandSuitePanel
+                    patients={patients}
+                    rooms={rooms}
+                    capacity={capacity}
+                    onSelectPatient={(patientId) => selectPatient(patientId)}
+                  />
+                </div>
+              </Suspense>
+            ) : null}
+
+            {whiteboardDensity.surfaces.chargeNurseStrip.visible ? (
+              <ChargeNurseOperationalStrip
+                patients={patients}
+                centralSnapshot={centralSnapshot}
+                activeEmsArrivals={activeEmsArrivals.length}
+                referrals={referrals}
+                emsArrivals={emsArrivals}
+                capacity={capacity}
+                settings={emergencySettings}
+                workflowLogs={workflowLogs}
+                alerts={alerts}
+                kpiMetricIds={chargeNurseKpiMetricIds}
+                visibleSurfaces={
+                  chargeNurseKpiMetricIds
+                    ? null
+                    : charge.isChargeNurseScreen
+                      ? charge.visibleOperationalSurfaces
+                      : null
+                }
+                onMetricSelect={handleOperationalStripMetricSelect}
+                readOnly={display.isDisplayMode}
+              />
+            ) : null}
+
+            {showPhysicianStrip ? (
+              <PhysicianOperationalStrip
+                patients={patients}
+                referrals={referrals}
+                physicianStaffId={physicianStaffId}
+                settings={emergencySettings}
+                visibleSurfaces={
+                  physician.isPhysicianScreen ? physician.visibleOperationalSurfaces : null
+                }
+                onMetricSelect={handleOperationalStripMetricSelect}
+                readOnly={display.isDisplayMode}
+              />
+            ) : null}
+
+            {physician.isPhysicianScreen && physician.showProviderWaitBreaches ? (
+              <ProviderWaitBreachStrip
+                patients={patients}
+                settings={emergencySettings}
+                onSelectPatient={handleWaitingRoomSafetySelect}
+                className="emergency-whiteboard-page__provider-wait-breach"
+                now={clockTick}
+              />
+            ) : null}
+
+            {whiteboardDensity.surfaces.waitingRoomSafety.visible ? (
+              <>
+                {!display.isDisplayMode &&
+                !(
+                  (charge.isChargeNurseScreen && !charge.showTriageBreach) ||
+                  (triage.isTriageScreen && !triage.showTriageBreach)
+                ) ? (
+                  <TriageBreachStrip
+                    patients={patients}
+                    settings={emergencySettings}
+                    onSelectPatient={handleWaitingRoomSafetySelect}
+                    className="emergency-whiteboard-page__triage-breach-strip"
+                    now={clockTick}
+                  />
+                ) : null}
+                {!display.isDisplayMode ? (
+                  <WhatHappensNextStrip
+                    patients={patients}
+                    referrals={referrals}
+                    staff={staff}
+                    className="emergency-whiteboard-page__what-next-strip"
+                    now={clockTick}
+                  />
+                ) : null}
+                {surfaces.whiteboard.showAlertRails &&
+                !display.isDisplayMode &&
+                !(physician.isPhysicianScreen && physician.hideWaitingRoomReceptionStrips) ? (
+                  <WhiteboardWaitingRoomAlertRail
+                    patients={patients}
+                    alerts={alerts}
+                    referrals={referrals}
+                    staff={staff}
+                    workflowLogs={workflowLogs}
+                    emsArrivals={emsArrivals}
+                    settings={emergencySettings}
+                    roleId={emergencyRole.role}
+                    features={{
+                      // Triage breach already has its own full-detail strip (TriageBreachStrip,
+                      // rendered above under the same visibility condition this chip used to
+                      // duplicate) plus the WaitingRoomSafetyBoard header badges -- both driven
+                      // by the identical summarizeTriageBreachBoard() computation. The rail chip
+                      // added a 3rd, purely redundant copy of the same signal.
+                      showTriageBreach: false,
+                      showProviderWait: !(
+                        charge.isChargeNurseScreen && !charge.showProviderWaitBreaches
+                      ),
+                    }}
+                    onSelectPatient={handleWaitingRoomSafetySelect}
+                    className="emergency-whiteboard-page__alert-rail"
+                  />
+                ) : null}
+                {surfaces.whiteboard.showCommunicationPanel &&
+                ((charge.isChargeNurseScreen && charge.showWidget('communication-status')) ||
+                  (triage.isTriageScreen && triage.showWidget('communication-status'))) ? (
+                  <PatientCommunicationStatusPanel
+                    patients={patients}
+                    workflowLogs={workflowLogs}
+                    staff={staff}
+                    referrals={referrals}
+                    settings={emergencySettings}
+                    onSelectPatient={handleWaitingRoomSafetySelect}
+                    className="emergency-whiteboard-page__communication-status"
+                  />
+                ) : null}
+                <WaitingRoomSafetyBoard
+                  patients={patients}
+                  staff={staff}
+                  referrals={referrals}
+                  emsArrivals={emsArrivals}
+                  workflowLogs={workflowLogs}
+                  alerts={alerts}
+                  capacity={capacity}
+                  settings={emergencySettings}
+                  activeQueueFilter={activeQueueFilter}
+                  displayMode={display.isDisplayMode}
+                  readOnly={display.isDisplayMode || !canClassifyFitToWait}
+                  now={clockTick}
+                  variant={charge.isChargeNurseScreen || triage.isTriageScreen ? 'focused' : 'full'}
+                  onSelectPatient={handleWaitingRoomSafetySelect}
+                  onOpenReassessment={focusReassessmentOnBoard}
+                  onClassifyFitToWait={handleClassifyFitToWait}
+                />
+              </>
+            ) : null}
+
+            {whiteboardDensity.surfaces.missionControl.visible &&
+            !(physician.isPhysicianScreen && physician.hideMissionControlAdmin) &&
+            !commandCenter.hideMissionControl ? (
+              <section
+                className="emergency-whiteboard-page__mission"
+                aria-labelledby="whiteboard-mission-control-title"
+              >
+                <div className="emergency-whiteboard-page__mission-card">
+                  <span className="emergency-whiteboard-page__mission-eyebrow">Board actions</span>
+                  <h2
+                    id="whiteboard-mission-control-title"
+                    className="emergency-whiteboard-page__mission-title"
+                  >
+                    Next steps from the whiteboard
+                  </h2>
+                  <div className="emergency-whiteboard-page__mission-actions">
+                    {isRegistrationClerk ? (
+                      <MissionButton
+                        label="Open Reception"
+                        onClick={() => openRoute(CANONICAL_ROUTES.emergencyReception)}
+                        disabled={
+                          !emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyReception)
+                        }
+                        title="Patient creation originates from the Reception arrival dashboard"
+                        tone="primary"
+                      />
+                    ) : createPatientPresentation.visible ? (
+                      <MissionButton
+                        label="Central Intake"
+                        onClick={openIntake}
+                        disabled={!canUseCentralIntake}
+                        title={
+                          canUseCentralIntake
+                            ? 'Create patient using the existing quick intake modal'
+                            : 'Central intake unavailable for this role'
+                        }
+                        tone="primary"
+                      />
+                    ) : null}
+                    <MissionButton
+                      label="Identity Review"
+                      onClick={() =>
+                        openRoute(
+                          emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyReception)
+                            ? `${CANONICAL_ROUTES.emergencyIntake}?from=reception`
+                            : CANONICAL_ROUTES.emergencyIntake,
+                        )
+                      }
+                      disabled={!emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyIntake)}
+                      title="Open existing Smart Intake identity workflow"
+                    />
+                    <MissionButton
+                      label={`Reassessment Tasks (${reassessmentAttentionCount})`}
+                      onClick={() => focusReassessmentOnBoard()}
+                      disabled={!reassessmentAttentionCount}
+                      title={
+                        reassessmentAttentionCount
+                          ? 'Open reassessment drawer and filter board'
+                          : 'No reassessment tasks are due'
+                      }
+                      tone={reassessmentAttentionCount ? 'warning' : 'default'}
+                    />
+                    {manageReferralPresentation.visible ? (
+                      <MissionButton
+                        label="New Referral"
+                        onClick={() => openReferralWorkflow()}
+                        disabled={!canMutateWhiteboard || !canManageReferral}
+                        title={
+                          canManageReferral
+                            ? 'Open existing referral form'
+                            : 'Referral workflow unavailable for this role'
+                        }
+                      />
+                    ) : null}
+                    {canReassignWorkload ? (
+                      <MissionButton
+                        label={
+                          workloadRebalanceSuggestion
+                            ? `Balance Workload (${workloadRebalanceSuggestion.name} overloaded)`
+                            : 'Balance Workload'
+                        }
+                        onClick={() => setWorkloadPanelOpen(true)}
+                        disabled={!workloadBalanceEntries.length}
+                        title={
+                          workloadBalanceEntries.length
+                            ? 'Review and rebalance on-duty staff patient assignments'
+                            : 'No on-duty staff to balance yet'
+                        }
+                        tone={workloadRebalanceSuggestion ? 'warning' : 'default'}
+                      />
+                    ) : null}
+                  </div>
+                </div>
+
+                <div className="emergency-whiteboard-page__mission-card">
+                  <div className="emergency-whiteboard-page__mission-card-header">
+                    <strong className="emergency-whiteboard-page__mission-card-heading">
+                      EMS arrivals
+                    </strong>
+                    <button
+                      type="button"
+                      className="emergency-whiteboard-page__mission-link-btn"
+                      disabled={!emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyEms)}
+                      onClick={() => openRoute(CANONICAL_ROUTES.emergencyEms)}
+                      title={
+                        emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyEms)
+                          ? 'Open EMS arrivals'
+                          : 'EMS is restricted for this role'
+                      }
+                    >
+                      Open EMS
+                    </button>
+                  </div>
+                  <div className="emergency-whiteboard-page__mission-list">
+                    {activeEmsArrivals.length ? (
+                      activeEmsArrivals.slice(0, 3).map((arrival) => {
+                        const isIncoming =
+                          arrival.status === 'Inbound' && minutesRemaining(arrival) > 0;
+                        const canConvertNow = !isIncoming && !arrival.patientId;
+                        return (
+                          <article
+                            className="emergency-whiteboard-page__arrival-card"
+                            key={arrival.id}
+                          >
+                            <div>
+                              <strong className="emergency-whiteboard-page__arrival-title">
+                                {arrival.unitId} · {formatEta(arrival)}
+                              </strong>
+                              <p className="emergency-whiteboard-page__arrival-detail">
+                                {arrival.chiefComplaint} · {arrival.severity}
+                              </p>
+                            </div>
+                            <div className="emergency-whiteboard-page__arrival-actions">
+                              {prepareBayPresentation.visible || convertEmsPresentation.visible ? (
+                                <>
+                                  {prepareBayPresentation.visible ? (
+                                    <button
+                                      type="button"
+                                      className="emergency-whiteboard-page__arrival-btn--prepare"
+                                      onClick={() => prepareEMSBay(arrival.id)}
+                                      disabled={
+                                        !isIncoming ||
+                                        !canPrepareBay ||
+                                        Boolean(arrival.preparedRoomId)
+                                      }
+                                      title={
+                                        arrival.preparedRoomId
+                                          ? 'Bay already prepared'
+                                          : 'Prepare a bay for this inbound EMS unit'
+                                      }
+                                    >
+                                      {arrival.preparedRoomId ? 'Bay Ready' : 'Prepare Bay'}
+                                    </button>
+                                  ) : null}
+                                  {convertEmsPresentation.visible ? (
+                                    <button
+                                      type="button"
+                                      className="emergency-whiteboard-page__arrival-btn--convert"
+                                      onClick={() => convertArrival(arrival)}
+                                      disabled={!canConvertNow || !canConvertEmsArrival}
+                                      title={
+                                        canConvertNow
+                                          ? 'Convert arrived EMS unit to a whiteboard patient'
+                                          : 'Conversion is available after arrival'
+                                      }
+                                    >
+                                      Add to Board
+                                    </button>
+                                  ) : null}
+                                </>
+                              ) : null}
+                            </div>
+                          </article>
+                        );
+                      })
+                    ) : (
+                      <p className="emergency-whiteboard-page__mission-empty">
+                        No active EMS arrivals. Use EMS Intake for the full pipeline.
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="emergency-whiteboard-page__mission-card">
+                  <div className="emergency-whiteboard-page__tasks-header">
+                    <strong className="emergency-whiteboard-page__tasks-heading">
+                      Immediate tasks
+                    </strong>
+                    <div className="emergency-whiteboard-page__referral-buckets">
+                      {[
+                        { label: 'Pending', value: referralAwareness.buckets.pending },
+                        { label: 'Accepted', value: referralAwareness.buckets.accepted },
+                        { label: 'Delayed', value: referralAwareness.buckets.delayed },
+                      ].map((item) => (
+                        <span
+                          key={item.label}
+                          className={`emergency-whiteboard-page__referral-bucket-chip emergency-whiteboard-page__referral-bucket-chip--${item.label.toLowerCase()}`}
+                        >
+                          {item.label} {item.value}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="emergency-whiteboard-page__task-list">
+                    {[
+                      ...referralAwareness.grouped.delayed,
+                      ...referralAwareness.grouped.pending,
+                      ...referralAwareness.grouped.accepted,
+                    ]
+                      .slice(0, 3)
+                      .map((referral) => {
+                        const patient = patients.find((entry) => entry.id === referral.patientId);
+                        const bucket =
+                          referral.status === 'Delayed'
+                            ? 'Delayed'
+                            : referral.status === 'Accepted'
+                              ? 'Accepted'
+                              : 'Pending';
+                        return (
+                          <button
+                            key={referral.id}
+                            type="button"
+                            className="emergency-whiteboard-page__referral-task-btn"
+                            onClick={() =>
+                              openReferralWorkflow(referral.patientId, bucket.toLowerCase())
+                            }
+                          >
+                            <strong>
+                              {patient ? patientName(patient) : referral.patientId} · {bucket}
+                            </strong>
+                            <span className="emergency-whiteboard-page__referral-task-detail">
+                              {referral.targetDepartment || referral.service || 'Specialty'} ·{' '}
+                              {referral.reason || referral.summary || 'Referral active'}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    {!referralAwareness.total ? (
+                      <p className="emergency-whiteboard-page__mission-empty">
+                        No active referrals in workflow.
+                      </p>
+                    ) : null}
+                    {reassessmentPatients.length ? (
+                      reassessmentPatients.slice(0, 3).map((patient) => (
+                        <button
+                          key={patient.id}
+                          type="button"
+                          className="emergency-whiteboard-page__reassess-task-btn"
+                          onClick={() => focusReassessmentOnBoard(patient.id)}
+                        >
+                          <strong>{patientName(patient)}</strong>
+                          <span className="emergency-whiteboard-page__reassess-task-detail">
+                            {patient.priority} · {patient.chiefComplaint}
+                          </span>
+                        </button>
+                      ))
+                    ) : (
+                      <p className="emergency-whiteboard-page__mission-empty">
+                        No reassessment tasks are due.
+                      </p>
+                    )}
+                    <MissionButton
+                      label="Filter Waiting Queue"
+                      onClick={() => openQueueReview('Waiting')}
+                      disabled={!canMutateWhiteboard}
+                    />
+                  </div>
+                </div>
+              </section>
+            ) : null}
+
+            {whiteboardDensity.surfaces.awarenessBanner.visible ? (
+              <section
+                aria-label="Operational awareness summary"
+                className="emergency-whiteboard-page__awareness-banner"
+              >
+                <div className="emergency-whiteboard-page__awareness-banner-copy">
+                  <strong className="emergency-whiteboard-page__awareness-banner-title">
+                    Department under pressure — focus on what needs action now
+                  </strong>
+                  {surfaces.whiteboard.showAwarenessSubtitle ? (
+                    <span className="emergency-whiteboard-page__awareness-banner-subtitle">
+                      {operationalLoad.primaryFocus
+                        .map((focus: { value: string; label: string } | null) =>
+                          focus ? `${focus.value} ${focus.label.toLowerCase()}` : '',
+                        )
+                        .filter(Boolean)
+                        .join(' · ')}
+                    </span>
+                  ) : null}
+                </div>
+                <div className="emergency-whiteboard-page__awareness-banner-chips">
+                  <button
+                    type="button"
+                    className="emergency-whiteboard-page__awareness-chip"
+                    onClick={() => {
+                      setActiveFilter('Reassess');
+                      setQueueFilter(null);
+                    }}
+                  >
+                    Reassess ({reassessmentAttentionCount})
+                  </button>
+                  <button
+                    type="button"
+                    className="emergency-whiteboard-page__awareness-chip"
+                    onClick={() => {
+                      setActiveFilter('EMS');
+                      setQueueFilter(null);
+                    }}
+                  >
+                    EMS ({emsAwareness.inboundCount || activeEmsArrivals.length})
+                  </button>
+                  <button
+                    type="button"
+                    className="emergency-whiteboard-page__awareness-chip"
+                    onClick={() => {
+                      setActiveFilter('All');
+                      setQueueFilter('referral');
+                    }}
+                  >
+                    Referrals ({referralAwareness.buckets.pending})
+                  </button>
+                  <button
+                    type="button"
+                    className="emergency-whiteboard-page__awareness-chip"
+                    onClick={() => {
+                      setActiveFilter('Waiting');
+                      setQueueFilter(null);
+                    }}
+                  >
+                    Waiting ({stats.waiting})
+                  </button>
+                </div>
+              </section>
+            ) : null}
+
+            {whiteboardDensity.surfaces.filters.visible ? (
+              <div className="emergency-whiteboard-page__controls">
+                <div className="emergency-whiteboard-page__filters emergency-whiteboard-page__filters--row">
+                  {FILTERS.map((filter) => {
+                    const active = filter === activeFilter;
+                    const reassessCount = filter === 'Reassess' ? reassessmentAttentionCount : 0;
+                    const label = reassessCount > 0 ? `Reassess (${reassessCount})` : filter;
+                    const highlightReassess = filter === 'Reassess' && reassessCount > 0;
+                    const filterChipClassName = [
+                      'emergency-whiteboard-page__filter-chip',
+                      active ? 'emergency-whiteboard-page__filter-chip--active' : '',
+                      highlightReassess ? 'emergency-whiteboard-page__filter-chip--reassess' : '',
+                    ]
+                      .filter(Boolean)
+                      .join(' ');
+                    return (
+                      <button
+                        key={filter}
+                        type="button"
+                        className={filterChipClassName}
+                        onClick={() => {
+                          setActiveFilter(filter);
+                          setQueueFilter(null);
+                          if (filter === 'Reassess' && reassessCount > 0) {
+                            document.dispatchEvent(new Event('open-reassessment-drawer'));
+                          }
+                        }}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {surfaces.whiteboard.showCardKey ? (
+                  <div
+                    className="emergency-whiteboard-page__card-key"
+                    aria-label="Patient card visual key"
+                  >
+                    <span>
+                      <i className="emergency-whiteboard-page__card-key-swatch--ctas" /> CTAS band
+                    </span>
+                    <span>
+                      <i className="emergency-whiteboard-page__card-key-swatch--critical" />{' '}
+                      Critical risk
+                    </span>
+                    <span>
+                      <i className="emergency-whiteboard-page__card-key-swatch--wait" />{' '}
+                      Wait/reassess
+                    </span>
+                    <span>
+                      <i className="emergency-whiteboard-page__card-key-swatch--ems" /> EMS
+                    </span>
+                    <span>
+                      <i className="emergency-whiteboard-page__card-key-swatch--boarding" />{' '}
+                      Boarding
+                    </span>
+                  </div>
+                ) : null}
+
+                {display.isDisplayMode ? null : isRegistrationClerk ? (
+                  <button
+                    className="emergency-whiteboard-page__intake-button"
+                    type="button"
+                    onClick={() => openRoute(CANONICAL_ROUTES.emergencyReception)}
+                    disabled={!emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyReception)}
+                    title="Open the Reception arrival dashboard for patient creation"
+                  >
+                    Open Reception
+                  </button>
+                ) : (
+                  <button
+                    className="emergency-whiteboard-page__intake-button"
+                    type="button"
+                    onClick={openIntake}
+                    disabled={!canUseCentralIntake}
+                    title={
+                      canUseCentralIntake
+                        ? 'Send a new patient input to the Central Node'
+                        : `${emergencyRole.roleLabel} cannot submit central intake inputs`
+                    }
+                  >
+                    + Central Intake
+                  </button>
+                )}
+              </div>
+            ) : null}
+
+            {showIntake &&
+            canUseCentralIntake &&
+            !(
+              isReceptionFirstUxEnabled() && prefersReceptionForPatientCreate(emergencyRole.role)
+            ) ? (
+              <QuickIntake onClose={closeIntake} onAdded={handlePatientAdded} />
+            ) : null}
+
+            {canReassignWorkload ? (
+              <WorkloadBalancePanel
+                open={workloadPanelOpen}
+                activeShift={activeShift}
+                workloads={workloadBalanceEntries}
+                rebalanceSuggestion={workloadRebalanceSuggestion}
+                currentStaffProfile={{
+                  id: activeShift?.chargeStaffId || 'charge-nurse',
+                  displayName: emergencyRole.roleLabel,
+                }}
+                onClose={() => setWorkloadPanelOpen(false)}
+                onAssignStaff={assignStaff}
+              />
+            ) : null}
+
+            {whiteboardDensity.surfaces.queueIntelligence.visible &&
+            !(physician.isPhysicianScreen && physician.hideQueueIntelligence) ? (
+              <section
+                className="emergency-whiteboard-page__queue-intelligence"
+                aria-label="Whiteboard queue intelligence"
+              >
+                <QueueIntelligencePanel
+                  collapsed={queuePanelCollapsed}
+                  onCollapsedChange={setQueuePanelCollapsed}
+                />
+              </section>
+            ) : null}
+
+            {activeQueueFilter && whiteboardDensity.surfaces.patientGrid.visible ? (
+              <div role="status" className="emergency-whiteboard-page__queue-filter-bar">
+                <span className="emergency-whiteboard-page__queue-filter-label">
+                  Showing the {activeQueueFilter} queue on the Whiteboard.
+                </span>
+                <button
+                  type="button"
+                  className="emergency-whiteboard-page__queue-filter-clear"
+                  onClick={() => setQueueFilter(null)}
+                >
+                  Clear queue filter
+                </button>
+              </div>
+            ) : null}
+
+            {isInitialLoading ? <SkeletonLoader variant="whiteboard" /> : null}
+
+            {whiteboard.error ? (
+              <ToolApiErrorBanner
+                message={`${whiteboard.error}. ${ERROR_RECOVERY_COPY.syncStale}`}
+                onRetry={() => void whiteboard.refresh()}
+                retryLabel="Refresh board"
+              />
+            ) : null}
+
+            {whiteboardDensity.surfaces.patientGrid.visible &&
+            !whiteboard.loading &&
+            activeQueueFilter === 'Triage' &&
+            canReviewTriage &&
+            selectedPatientId ? (
+              <div className="emergency-whiteboard-page__triage-assist-wrap">
+                <AiTriageAssistPanelForPatientId patientId={selectedPatientId} />
+              </div>
+            ) : null}
+
+            {whiteboardDensity.surfaces.patientGrid.visible && hiddenBoardCount > 0 ? (
+              <div role="status" className="emergency-whiteboard-page__board-limit">
+                <span className="emergency-whiteboard-page__board-limit-copy">
+                  Showing {boardPatients.length} of {visiblePatients.length} patients on the All
+                  view — use Waiting, Reassess, or EMS filters for the full list.
+                </span>
+                <button
+                  type="button"
+                  className="emergency-whiteboard-page__awareness-chip"
+                  onClick={() => {
+                    setActiveFilter(operationalLoad.suggestedFilter as FilterId);
+                    setQueueFilter(null);
+                  }}
+                >
+                  Filter {operationalLoad.suggestedFilter}
+                </button>
+              </div>
+            ) : null}
+          </Suspense>
 
           {whiteboardDensity.surfaces.patientGrid.visible &&
           whiteboard.loading &&
@@ -3020,24 +3039,34 @@ export default function EmergencyWhiteboard() {
               !display.isDisplayMode &&
               !showNativeAiCommandSuite &&
               surfaces.whiteboard.showDiagnosticDashboard ? (
-                <div className="emergency-whiteboard-page__diagnostic-wrap">
-                  <DiagnosticSafetyDashboard
-                    patients={patients}
-                    onSelectPatient={(patientId) => selectPatient(patientId)}
-                  />
-                </div>
+                <Suspense fallback={null}>
+                  <div className="emergency-whiteboard-page__diagnostic-wrap">
+                    <DiagnosticSafetyDashboard
+                      patients={patients}
+                      onSelectPatient={(patientId) => selectPatient(patientId)}
+                    />
+                  </div>
+                </Suspense>
               ) : null}
-              <WhiteboardView
-                patients={boardPatients}
-                rooms={rooms}
-                staff={staff}
-                activeShift={activeShift}
-                workflowProfile={patientCardWorkflowProfile}
-                readOnlyDisplay={display.isDisplayMode}
-                layout="row"
-                gridPadding={screenDensity.whiteboard.gridGap + 4}
-                now={clockTick}
-              />
+              <Suspense
+                fallback={
+                  <div className="emergency-whiteboard-page__view-fallback">
+                    Loading patient board...
+                  </div>
+                }
+              >
+                <WhiteboardView
+                  patients={boardPatients}
+                  rooms={rooms}
+                  staff={staff}
+                  activeShift={activeShift}
+                  workflowProfile={patientCardWorkflowProfile}
+                  readOnlyDisplay={display.isDisplayMode}
+                  layout="row"
+                  gridPadding={screenDensity.whiteboard.gridGap + 4}
+                  now={clockTick}
+                />
+              </Suspense>
             </>
           ) : whiteboardDensity.surfaces.patientGrid.visible ? (
             <div className="emergency-whiteboard-page__empty-grid emergency-whiteboard-page__empty-state">
@@ -3109,7 +3138,9 @@ export default function EmergencyWhiteboard() {
           {!display.isDisplayMode &&
           surfaces.whiteboard.showWhoNextPanel &&
           (!physician.isPhysicianScreen || physician.showAssignedPatients) ? (
-            <WhoNextPanel mode="floating" />
+            <Suspense fallback={null}>
+              <WhoNextPanel mode="floating" />
+            </Suspense>
           ) : null}
         </>
       ) : null}

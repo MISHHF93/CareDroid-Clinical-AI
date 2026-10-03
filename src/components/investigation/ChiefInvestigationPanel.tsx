@@ -107,7 +107,7 @@ export default function ChiefInvestigationPanel({
           type="button"
           className="chief-investigation-panel__toggle"
           onClick={() => setExpanded((open) => !open)}
-          aria-expanded={expanded}
+          aria-expanded={expanded ? 'true' : 'false'}
         >
           {expanded ? 'Collapse' : 'Expand'}
         </button>

@@ -28,6 +28,7 @@ import {
   WorkflowActionLog,
   WorkflowActionType,
   ClinicalScoreSaveInput,
+  ResponseTimerState,
 } from '../types/emergency';
 import { resolveCriticalChecklistConfig } from '../config/criticalChecklists';
 import {
@@ -1563,6 +1564,34 @@ function writeLastPulseViewTimestamp(timestamp: number) {
   );
 }
 
+const RESPONSE_TIMERS_STORAGE_KEY = 'caredroid-response-timers';
+
+function readLocalResponseTimers(): ResponseTimerState[] {
+  if (typeof localStorage === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem(RESPONSE_TIMERS_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (_error: any) {
+    return [];
+  }
+}
+
+function writeLocalResponseTimers(timers: ResponseTimerState[]): void {
+  if (typeof localStorage === 'undefined') return;
+  try {
+    const activeAndRecent = timers.filter((t) => {
+      if (!t.acknowledgedAt) return true;
+      const ackTime = new Date(t.acknowledgedAt).getTime();
+      return Number.isFinite(ackTime) && Date.now() - ackTime < 24 * 60 * 60 * 1000;
+    });
+    localStorage.setItem(RESPONSE_TIMERS_STORAGE_KEY, JSON.stringify(activeAndRecent));
+  } catch (_error: any) {
+    // Ignore storage quota errors
+  }
+}
+
 function persistFeatureOverride(featureId: string, enabled: boolean, changedBy?: string) {
   return updateSettingsFeatureFlag({
     featureId,
@@ -2153,6 +2182,12 @@ interface EmergencyStoreState {
     | import('../engine/continuousPatientFlowEngine').ContinuousPatientFlowSnapshot
     | null;
   administrativeAutomationQueue: import('../types/administrativeAutomation').AdministrativeAutomationTask[];
+  responseTimers: ResponseTimerState[];
+
+  setResponseTimers: (timers: ResponseTimerState[]) => void;
+  upsertResponseTimer: (timer: ResponseTimerState) => void;
+  removeResponseTimer: (timerId: string) => void;
+  acknowledgeResponseTimerState: (timerId: string, acknowledgedBy: string) => void;
 
   addPatient: (
     patient: Patient,
@@ -2690,6 +2725,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
     lastPulseView: readLastPulseViewTimestamp(),
     patientFlowSnapshot: null,
     administrativeAutomationQueue: [],
+    responseTimers: readLocalResponseTimers(),
     alerts: initialScenarioState.alerts || [
       {
         id: 'a1',
@@ -4121,6 +4157,57 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
       set({ lastPulseView: timestamp });
     },
 
+    setResponseTimers: (timers) => {
+      writeLocalResponseTimers(timers);
+      set({ responseTimers: timers });
+    },
+
+    upsertResponseTimer: (timer) => {
+      set((state) => {
+        const existingIndex = state.responseTimers.findIndex((t) => t.timerId === timer.timerId);
+        let next: ResponseTimerState[];
+        if (existingIndex >= 0) {
+          next = [...state.responseTimers];
+          next[existingIndex] = timer;
+        } else {
+          next = [timer, ...state.responseTimers];
+        }
+        writeLocalResponseTimers(next);
+        return { responseTimers: next };
+      });
+    },
+
+    removeResponseTimer: (timerId) => {
+      set((state) => {
+        const next = state.responseTimers.filter((t) => t.timerId !== timerId);
+        writeLocalResponseTimers(next);
+        return { responseTimers: next };
+      });
+    },
+
+    acknowledgeResponseTimerState: (timerId, acknowledgedBy) => {
+      set((state) => {
+        const existingIndex = state.responseTimers.findIndex((t) => t.timerId === timerId);
+        if (existingIndex < 0) return state;
+        const existing = state.responseTimers[existingIndex];
+        if (existing.acknowledgedAt) return state;
+        const elapsed = Math.max(
+          0,
+          Math.floor((Date.now() - new Date(existing.startedAt).getTime()) / 1000),
+        );
+        const updated: ResponseTimerState = {
+          ...existing,
+          acknowledgedAt: new Date().toISOString(),
+          acknowledgedBy,
+          phase: elapsed >= 180 ? 'breach_resolved' : 'acknowledged',
+        };
+        const next = [...state.responseTimers];
+        next[existingIndex] = updated;
+        writeLocalResponseTimers(next);
+        return { responseTimers: next };
+      });
+    },
+
     setLoading: (loading) => set((state) => ({ loading, ui: { ...state.ui, loading } })),
 
     toggleCopilot: () =>
@@ -4659,9 +4746,12 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
             )
             .then((snapshot) => {
               set({ administrativeAutomationQueue: [...snapshot.tasks] });
-            });
+            })
+            .catch(() => {});
         } else {
-          void get().refreshAdministrativeAutomationsAsync();
+          void get()
+            .refreshAdministrativeAutomationsAsync()
+            .catch(() => {});
         }
         return;
       }
@@ -6028,6 +6118,18 @@ export function hasPatientFlag(patient: Patient, flag: PatientFlag | string): bo
   return flags.map(getPatientFlagType).includes(getPatientFlagType(flag));
 }
 
+export const selectResponseTimers = (state: EmergencyStoreState): ResponseTimerState[] =>
+  state.responseTimers;
+
+export const selectActiveResponseTimers = (state: EmergencyStoreState): ResponseTimerState[] =>
+  state.responseTimers.filter((timer) => !timer.acknowledgedAt);
+
+export const selectActiveResponseTimerForPatient = (
+  state: EmergencyStoreState,
+  patientId: string,
+): ResponseTimerState | undefined =>
+  state.responseTimers.find((timer) => timer.patientId === patientId && !timer.acknowledgedAt);
+
 export const selectActivePatients = (state: EmergencyStoreState): Patient[] =>
   state.patients.filter((patient) => patient.state !== PatientState.Discharge);
 
@@ -6365,5 +6467,6 @@ export const createInitialEmergencyStoreState = () => {
     lastSynced: state.lastSynced,
     backendAvailable: state.backendAvailable,
     persistenceMode: state.persistenceMode,
+    responseTimers: state.responseTimers,
   };
 };

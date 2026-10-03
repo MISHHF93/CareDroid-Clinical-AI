@@ -23,7 +23,7 @@ function Tabs({ horizontal = true }: { horizontal?: boolean }) {
           key={view}
           type="button"
           role="tab"
-          aria-selected={view === active}
+          aria-selected={view === active ? 'true' : 'false'}
           tabIndex={tabIndexFor(view)}
           onKeyDown={onKeyDown}
         >

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useEmergencyStore } from '../../store/emergencyStore';
 import './ThreeMinuteTimer.css';
 
 export type ThreeMinuteTimerTone = 'green' | 'amber' | 'critical';
@@ -20,7 +21,9 @@ function resolveTone(seconds: number, targetSeconds: number): ThreeMinuteTimerTo
 }
 
 export type ThreeMinuteTimerProps = {
-  startTime: string | Date;
+  startTime?: string | Date;
+  patientId?: string;
+  timerId?: string;
   targetMinutes?: number;
   label?: string;
   compact?: boolean;
@@ -28,19 +31,33 @@ export type ThreeMinuteTimerProps = {
 };
 
 export default function ThreeMinuteTimer({
-  startTime,
+  startTime: explicitStartTime,
+  patientId,
+  timerId,
   targetMinutes = 3,
   label = 'Response time',
   compact = false,
   className = '',
 }: ThreeMinuteTimerProps) {
+  const storeTimer = useEmergencyStore((state) => {
+    if (timerId) {
+      return state.responseTimers.find((t) => t.timerId === timerId);
+    }
+    if (patientId) {
+      return state.responseTimers.find((t) => t.patientId === patientId && !t.acknowledgedAt);
+    }
+    return undefined;
+  });
+
+  const effectiveStartTime = explicitStartTime ?? storeTimer?.startedAt ?? new Date();
   const targetSeconds = targetMinutes * 60;
-  const [elapsed, setElapsed] = useState(() => elapsedSeconds(startTime));
+  const [elapsed, setElapsed] = useState(() => elapsedSeconds(effectiveStartTime));
 
   useEffect(() => {
-    const id = setInterval(() => setElapsed(elapsedSeconds(startTime)), 1000);
+    setElapsed(elapsedSeconds(effectiveStartTime));
+    const id = setInterval(() => setElapsed(elapsedSeconds(effectiveStartTime)), 1000);
     return () => clearInterval(id);
-  }, [startTime]);
+  }, [effectiveStartTime]);
 
   const tone = resolveTone(elapsed, targetSeconds);
   const isBreach = elapsed >= targetSeconds;

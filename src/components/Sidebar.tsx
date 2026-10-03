@@ -278,7 +278,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
     );
   };
 
-  // HEAL-211: this nav item renders with aria-pressed={copilotOpen} and
+  // HEAL-211: this nav item renders with aria-pressed={copilotOpen ? 'true' : 'false'} and
   // active-state styling -- both signal a real toggle button per WAI-ARIA
   // authoring practices, and clicking it while open visually looks like it
   // should close the panel. It didn't: this unconditionally called
@@ -557,7 +557,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
           type="button"
           className="sidebar__collapse-toggle"
           onClick={() => setSidebarCollapsed((prev) => !prev)}
-          aria-pressed={sidebarCollapsed}
+          aria-pressed={sidebarCollapsed ? 'true' : 'false'}
           aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >

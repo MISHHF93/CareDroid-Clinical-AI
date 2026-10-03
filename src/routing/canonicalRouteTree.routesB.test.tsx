@@ -1,5 +1,5 @@
 import './canonicalRouteTree.testShared';
-import { cleanup, screen, within } from '@testing-library/react';
+import { cleanup, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { renderRoute, ROUTE_LOAD_TIMEOUT } from './canonicalRouteTree.testShared';
@@ -29,7 +29,7 @@ describe('canonical route tree — intake, capacity, queues', () => {
     // role and name is what a screen reader announces twice).
     // The lazy-loaded route module + hook chain here can take longer than the
     // default findByRole timeout to resolve, so use the shared ROUTE_LOAD_TIMEOUT.
-    const main = await screen.findByRole('main', {}, { timeout: ROUTE_LOAD_TIMEOUT });
+    const _main = await screen.findByRole('main', {}, { timeout: ROUTE_LOAD_TIMEOUT });
     expect(
       await screen.findByRole(
         'heading',
@@ -53,7 +53,7 @@ describe('canonical route tree — intake, capacity, queues', () => {
     // above: one shell-rendered "Department Queues" heading, queried
     // document-wide, with the shared ROUTE_LOAD_TIMEOUT rather than the
     // default findByRole timeout.
-    const main = await screen.findByRole('main', {}, { timeout: ROUTE_LOAD_TIMEOUT });
+    const _main = await screen.findByRole('main', {}, { timeout: ROUTE_LOAD_TIMEOUT });
     expect(
       await screen.findByRole(
         'heading',

@@ -1,34 +1,10 @@
 import { dispatchAlert } from './alertEngine';
 import { useEmergencyStore } from '../store/emergencyStore';
+import type { ResponseTimerPhase, EscalationEvent, ResponseTimerState } from '../types/emergency';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-export type ResponseTimerPhase =
-  | 'running'
-  | 'escalated_l1'
-  | 'breach'
-  | 'acknowledged'
-  | 'breach_resolved';
-
-export type EscalationEvent = {
-  firedAt: string;
-  threshold: string;
-  targetRole: string;
-  dispatchedAlertId: string;
-};
-
-export type ResponseTimerState = {
-  timerId: string;
-  patientId: string;
-  triggerAlertId: string;
-  startedAt: string;
-  phase: ResponseTimerPhase;
-  ownerRole: string;
-  acknowledgedAt?: string;
-  acknowledgedBy?: string;
-  breachAt?: string;
-  escalationHistory: EscalationEvent[];
-};
+export type { ResponseTimerPhase, EscalationEvent, ResponseTimerState };
 
 // ─── Escalation thresholds ────────────────────────────────────────────────────
 
@@ -85,19 +61,31 @@ export function startResponseTimer(
   patientId: string,
   triggerAlertId: string,
   ownerRole = 'triage_nurse',
+  initialStartedAt?: string,
 ): string {
   const timerId = makeTimerId(patientId, triggerAlertId);
-  if (activeTimers.has(timerId)) return timerId;
+  const existing = activeTimers.get(timerId);
+  if (existing) return timerId;
 
-  activeTimers.set(timerId, {
+  const store = useEmergencyStore.getState();
+  const existingInStore = store.responseTimers.find((t) => t.timerId === timerId);
+  if (existingInStore) {
+    activeTimers.set(timerId, existingInStore);
+    return timerId;
+  }
+
+  const newTimer: ResponseTimerState = {
     timerId,
     patientId,
     triggerAlertId,
-    startedAt: new Date().toISOString(),
+    startedAt: initialStartedAt ?? new Date().toISOString(),
     phase: 'running',
     ownerRole,
     escalationHistory: [],
-  });
+  };
+
+  activeTimers.set(timerId, newTimer);
+  store.upsertResponseTimer(newTimer);
 
   void import('../services/threeMinuteMissionService')
     .then(({ syncThreeMinuteMissionsFromEngine }) => syncThreeMinuteMissionsFromEngine())
@@ -112,16 +100,21 @@ export function startResponseTimer(
 }
 
 export function acknowledgeResponseTimer(timerId: string, acknowledgedBy: string): boolean {
-  const timer = activeTimers.get(timerId);
+  const timer =
+    activeTimers.get(timerId) ??
+    useEmergencyStore.getState().responseTimers.find((t) => t.timerId === timerId);
   if (!timer || timer.acknowledgedAt) return false;
 
   const elapsed = elapsedSeconds(timer.startedAt);
-  activeTimers.set(timerId, {
+  const updatedTimer: ResponseTimerState = {
     ...timer,
     acknowledgedAt: new Date().toISOString(),
     acknowledgedBy,
     phase: elapsed >= 180 ? 'breach_resolved' : 'acknowledged',
-  });
+  };
+
+  activeTimers.set(timerId, updatedTimer);
+  useEmergencyStore.getState().upsertResponseTimer(updatedTimer);
 
   void import('../services/threeMinuteMissionService')
     .then(({ syncThreeMinuteMissionsFromEngine }) => syncThreeMinuteMissionsFromEngine())
@@ -232,6 +225,7 @@ function checkEscalations(): void {
 
     if (updated) {
       activeTimers.set(timerId, current);
+      useEmergencyStore.getState().upsertResponseTimer(current);
     }
   }
 
@@ -287,6 +281,13 @@ function subscribeToMissionTriggers(): () => void {
 export function startTimerEngine(): () => void {
   if (engineInterval) return stopTimerEngine;
 
+  // Hydrate activeTimers from emergencyStore (which loaded from localStorage)
+  for (const storedTimer of useEmergencyStore.getState().responseTimers) {
+    if (!storedTimer.acknowledgedAt && !activeTimers.has(storedTimer.timerId)) {
+      activeTimers.set(storedTimer.timerId, storedTimer);
+    }
+  }
+
   void import('../services/threeMinuteMissionService')
     .then(({ hydrateThreeMinuteMissionsFromStore, evaluateThreeMinuteTriggers }) => {
       hydrateThreeMinuteMissionsFromStore();
@@ -312,4 +313,10 @@ function stopTimerEngine(): void {
     unsubscribeStore();
     unsubscribeStore = null;
   }
+}
+
+/** Test-only helper to reset singleton engine state between test cases. */
+export function __resetEngineStateForTests(): void {
+  activeTimers.clear();
+  stopTimerEngine();
 }

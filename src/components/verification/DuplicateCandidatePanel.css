@@ -140,7 +140,7 @@ button.duplicate-candidate-panel__item:focus-visible {
 
 .duplicate-candidate-panel__action-label--create {
   background: rgba(96, 165, 250, 0.12);
-  color: #2563eb;
+  color: #0284c7;
 }
 
 .duplicate-candidate-panel__conflicts {
@@ -201,7 +201,7 @@ button.duplicate-candidate-panel__item:focus-visible {
   border: 1px solid var(--status-info, #3b82f6);
   border-radius: 8px;
   background: color-mix(in srgb, var(--status-info, #3b82f6) 10%, transparent);
-  color: var(--status-info, #2563eb);
+  color: var(--status-info, #0284c7);
   padding: 7px 11px;
   font-size: 11px;
   font-weight: 700;

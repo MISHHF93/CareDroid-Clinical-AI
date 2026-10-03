@@ -176,7 +176,7 @@ export default function PatientSearchResults({
                   }`}
                   id={patientSearchOptionId(patientIndex)}
                   role="option"
-                  aria-selected={patientIndex === activeIndex}
+                  aria-selected={patientIndex === activeIndex ? 'true' : 'false'}
                   onMouseDown={(event) => event.preventDefault()}
                   onClick={() => onFindPatient(patient.id)}
                 >

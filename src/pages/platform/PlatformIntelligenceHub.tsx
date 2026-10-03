@@ -123,7 +123,7 @@ export default function PlatformIntelligenceHub() {
             type="button"
             className="pi-hub__filter"
             data-active={filter === value ? 'true' : 'false'}
-            aria-pressed={filter === value}
+            aria-pressed={filter === value ? 'true' : 'false'}
             onClick={() => setFilter(value)}
           >
             {label}

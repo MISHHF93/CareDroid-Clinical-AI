@@ -1651,3 +1651,33 @@ export interface ServiceHealth {
   lastError?: string;
   fallbackAvailable: boolean;
 }
+
+/** 3-minute response mission/timer phases */
+export type ResponseTimerPhase =
+  | 'running'
+  | 'escalated_l1'
+  | 'breach'
+  | 'acknowledged'
+  | 'breach_resolved';
+
+/** Audit log for escalation events fired by the 3-minute response engine */
+export interface EscalationEvent {
+  firedAt: ISODateString;
+  threshold: string;
+  targetRole: string;
+  dispatchedAlertId: string;
+}
+
+/** State machine state for an active or resolved 3-minute response timer */
+export interface ResponseTimerState {
+  timerId: string;
+  patientId: string;
+  triggerAlertId: string;
+  startedAt: ISODateString;
+  phase: ResponseTimerPhase;
+  ownerRole: string;
+  acknowledgedAt?: ISODateString;
+  acknowledgedBy?: string;
+  breachAt?: ISODateString;
+  escalationHistory: EscalationEvent[];
+}

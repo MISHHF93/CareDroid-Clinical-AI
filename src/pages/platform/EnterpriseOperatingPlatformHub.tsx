@@ -118,7 +118,7 @@ export default function EnterpriseOperatingPlatformHub() {
             type="button"
             className="eop-hub__filter"
             data-active={filter === value ? 'true' : 'false'}
-            aria-pressed={filter === value}
+            aria-pressed={filter === value ? 'true' : 'false'}
             onClick={() => setFilter(value)}
           >
             {label}

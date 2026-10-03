@@ -1,8 +1,8 @@
 # 3-Minute Response Spec
 
-**Status:** Visual timer + auto-escalation engine both implemented (2026-06-28).  
+**Status:** Fully implemented — visual timer, auto-escalation engine, and Zustand + localStorage state persistence (2026-09-28).  
 **Engine:** `src/engine/threeMinuteTimerEngine.ts` + `src/hooks/useThreeMinuteTimerEngine.ts`  
-**Gap:** Timer state is module-level only (resets on page reload). Zustand persistence is a follow-up task.
+**Persistence:** `src/store/emergencyStore.ts` (`responseTimers` slice + `caredroid-response-timers` localStorage)
 
 ---
 
@@ -14,22 +14,26 @@ Ensure every critical or high-acuity patient has a named licensed clinical owner
 
 ## Current Implementation
 
-`src/components/emergency/ThreeMinuteTimer.tsx` — visual countdown with color zones (unchanged):
+`src/components/emergency/ThreeMinuteTimer.tsx` — visual countdown with color zones:
+
 - 0–120s: green
 - 120–180s: amber
 - 180s+: red
+- Wired to `useEmergencyStore` `responseTimers` with real-time countdown
 
-`src/engine/threeMinuteTimerEngine.ts` — auto-escalation engine (built 2026-06-28):
+`src/engine/threeMinuteTimerEngine.ts` — auto-escalation engine:
+
 - Subscribes to new Critical alerts in `emergencyStore`
 - Auto-starts a timer for each new Critical alert with a `patientId`
 - Checks every 5 seconds: if a threshold has been crossed and not yet fired, dispatches via `dispatchAlert`
 - Escalation chain: 30s awareness → 120s L1 escalation → 180s BREACH → 300s admin
 - Deduplicates escalations — each threshold fires at most once per timer
+- Persists all active and updated timers to `emergencyStore` and `localStorage`
 - Mount: `ThreeMinuteTimerEngineMount` in `src/app/providers.tsx`
 
 `src/services/bottleneckRegistry.ts` → `buildThreeMinuteRiskProjection()` — advisory risk projection, separate from the engine.
 
-**Remaining gap:** Timer state is stored in module-level `Map` — resets on page reload. Acceptance criterion #6 (timer survives page reload) requires adding a `responseTimers` Zustand slice with localStorage persistence.
+**Persistence:** Timer state is stored in `emergencyStore.responseTimers` and backed by `caredroid-response-timers` in `localStorage`. On engine initialization / page reload, active timers are hydrated from the store with their original start timestamps preserved (Acceptance Criterion #6 satisfied).
 
 ---
 
@@ -38,6 +42,7 @@ Ensure every critical or high-acuity patient has a named licensed clinical owner
 ### Trigger Conditions
 
 The 3-minute timer starts when any of these occur:
+
 - Patient registered with one or more red flag complaints checked
 - Triage assigns CTAS 1 or CTAS 2
 - Critical alert created from vital deterioration flag
@@ -63,13 +68,13 @@ BREACH_RESOLVED (analytics records breach duration)
 
 ### Escalation Chain
 
-| Elapsed | Action | Target |
-|---------|--------|--------|
-| 0:00 | Timer starts | Alert sent to assigned owner (triage nurse or assigned nurse) |
-| 0:30 | Notification | Alert sent to charge nurse for awareness |
-| 2:00 | Escalation L1 | Alert escalated to charge nurse as new owner |
-| 3:00 | BREACH + Escalation L2 | Alert sent to attending physician + patient flow coordinator |
-| 5:00 | Extended breach | Alert sent to hospital administrator |
+| Elapsed | Action                 | Target                                                        |
+| ------- | ---------------------- | ------------------------------------------------------------- |
+| 0:00    | Timer starts           | Alert sent to assigned owner (triage nurse or assigned nurse) |
+| 0:30    | Notification           | Alert sent to charge nurse for awareness                      |
+| 2:00    | Escalation L1          | Alert escalated to charge nurse as new owner                  |
+| 3:00    | BREACH + Escalation L2 | Alert sent to attending physician + patient flow coordinator  |
+| 5:00    | Extended breach        | Alert sent to hospital administrator                          |
 
 ### Required Outputs
 
@@ -80,6 +85,7 @@ BREACH_RESOLVED (analytics records breach duration)
 ### Persistence
 
 Timer state must survive:
+
 - Page reload
 - Browser tab switch
 - Network interruption (cache locally, sync on reconnect)
@@ -89,6 +95,7 @@ Use `emergencyStore.ts` Zustand store with local storage persistence for timer s
 ### Notification Channels
 
 Each escalation fires:
+
 1. In-app alert (CareDroid notification banner)
 2. Push notification (if device supports it)
 3. Fallback: pager or SMS (if notification service is configured)
@@ -126,6 +133,7 @@ Notification failure must trigger the bottleneck registry alert for the notifica
 ## Failure Mode
 
 If AI or notifications fail:
+
 - Activate manual escalation channels immediately (phone, pager, overhead page)
 - Log the notification failure in the bottleneck registry
 - Do not block the clinical workflow for system failure

@@ -36,7 +36,7 @@
 .patient-verification__step--active button {
   border-color: var(--status-info, #3b82f6);
   background: color-mix(in srgb, var(--status-info, #3b82f6) 12%, transparent);
-  color: var(--status-info, #2563eb);
+  color: var(--status-info, #0284c7);
 }
 
 .patient-verification__steps span {

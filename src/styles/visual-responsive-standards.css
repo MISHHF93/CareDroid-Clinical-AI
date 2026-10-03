@@ -6,23 +6,23 @@
  */
 
 :root {
-  --app-readable-body-size: 15px;
+  --app-readable-body-size: 14px;
   --app-readable-small-size: 13px;
   --app-readable-caption-size: 12px;
-  --app-readable-title-size: 30px;
-  --app-readable-heading-size: 22px;
-  --app-readable-card-title-size: 17px;
-  --app-readable-line-height: 1.55;
+  --app-readable-title-size: 26px;
+  --app-readable-heading-size: 20px;
+  --app-readable-card-title-size: 16px;
+  --app-readable-line-height: 1.5;
   --app-readable-heading-line-height: 1.22;
   --app-visual-page-max: min(100%, 1680px);
   --app-visual-readable-max: 1120px;
-  --app-visual-page-gutter: 24px;
-  --app-visual-section-gap: 22px;
-  --app-visual-panel-gap: 18px;
-  --app-visual-header-padding: 24px;
-  --app-visual-card-padding: 20px;
-  --app-visual-control-gap: 10px;
-  --app-visual-control-height: 44px;
+  --app-visual-page-gutter: 20px;
+  --app-visual-section-gap: 18px;
+  --app-visual-panel-gap: 14px;
+  --app-visual-header-padding: 18px;
+  --app-visual-card-padding: 16px;
+  --app-visual-control-gap: 8px;
+  --app-visual-control-height: 36px;
   --app-visual-grid-min: minmax(min(100%, 260px), 1fr);
   --app-visual-grid-min-compact: minmax(min(100%, 220px), 1fr);
 
@@ -38,7 +38,7 @@
   --app-card-title-size: var(--app-readable-card-title-size);
   --app-section-title-size: var(--app-readable-heading-size);
   --app-page-title-size: var(--app-readable-title-size);
-  --app-card-padding-compact: 16px;
+  --app-card-padding-compact: 14px;
   --app-card-padding-standard: var(--app-visual-card-padding);
   --app-card-padding-dashboard: var(--app-visual-card-padding);
   --app-card-padding-tool: var(--app-visual-card-padding);
@@ -49,12 +49,12 @@
   --compact-panel-gap: var(--app-visual-panel-gap);
   --compact-card-padding: var(--app-visual-card-padding);
   --compact-panel-padding: var(--app-visual-header-padding);
-  --compact-control-height: var(--app-visual-control-height);
-  --app-button-height: var(--app-visual-control-height);
-  --app-input-height: var(--app-visual-control-height);
-  --component-button-height: var(--app-visual-control-height);
+  --compact-control-height: 32px;
+  --app-button-height: 36px;
+  --app-input-height: 36px;
+  --component-button-height: 36px;
   --type-body-line-height: var(--app-readable-line-height);
-  --type-small-line-height: 1.5;
+  --type-small-line-height: 1.45;
   --type-heading-line-height: var(--app-readable-heading-line-height);
   --type-subheading-line-height: 1.3;
 }
@@ -62,14 +62,18 @@
 @media (max-width: 768px) {
   :root {
     --app-readable-body-size: 15px;
-    --app-readable-title-size: 24px;
-    --app-readable-heading-size: 20px;
-    --app-visual-page-gutter: 16px;
-    --app-visual-section-gap: 18px;
-    --app-visual-panel-gap: 14px;
-    --app-visual-header-padding: 18px;
-    --app-visual-card-padding: 16px;
-    --app-visual-control-height: 46px;
+    --app-readable-title-size: 22px;
+    --app-readable-heading-size: 18px;
+    --app-visual-page-gutter: 14px;
+    --app-visual-section-gap: 16px;
+    --app-visual-panel-gap: 12px;
+    --app-visual-header-padding: 16px;
+    --app-visual-card-padding: 14px;
+    --app-visual-control-height: 44px;
+    --app-button-height: 44px;
+    --app-input-height: 44px;
+    --compact-control-height: 40px;
+    --component-button-height: 44px;
   }
 }
 
@@ -270,13 +274,33 @@
     textarea
   ) {
   min-height: var(--app-visual-control-height);
-  font-size: max(15px, var(--app-readable-body-size));
+  font-size: max(13px, var(--app-readable-small-size));
+}
+
+:is(.app-shell, .emergency-app-shell) :is(button, a[role='button'], [role='button']) {
+  white-space: nowrap;
 }
 
 :is(.app-shell, .emergency-app-shell)
-  :is(button, a[role='button'], [role='button'], .help-topic__related-btn, .help-hub__tab) {
+  :is(.btn-multiline, .help-topic__related-btn, .help-hub__tab) {
   white-space: normal;
   text-wrap: pretty;
+}
+
+:is(.app-shell, .emergency-app-shell)
+  :is(
+    .btn-sm,
+    .btn-compact,
+    [class*='--sm'],
+    .filter-btn,
+    .chip,
+    [class*='chip'],
+    [class*='pill'],
+    .toolbar button,
+    .cd-action-row button:not(.btn-lg)
+  ) {
+  min-height: var(--compact-control-height, 32px);
+  font-size: var(--app-readable-small-size, 13px);
 }
 
 /* HEAL-347.51 (2026-08-19): excluded .caredroid-header__primary-actions.
@@ -302,6 +326,7 @@
   ):not(.caredroid-header__primary-actions) {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: var(--app-visual-control-gap);
 }
 
@@ -329,9 +354,9 @@
   :is([class*='badge'], [class*='chip'], [class*='pill'], [class*='tag'], .cd-metric-chip):not(
     .alarm-kpi__badge
   ):not(.three-minute-timer-badge) {
-  min-height: 28px;
+  min-height: 26px;
   align-items: center;
-  white-space: normal;
+  white-space: nowrap;
   text-align: start;
 }
 

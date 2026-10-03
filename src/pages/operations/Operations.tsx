@@ -15,6 +15,7 @@ import { useOperationsHubLiveFeeds } from '../../hooks/useOperationsHubLiveFeeds
 import { DEMO_LIVE_STATES } from '../../utils/demoLiveState';
 import { applyLiveMetricsToSurfaces } from '../../utils/operationsHubLiveMetrics';
 import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
+import HospitalAutonomousOperationsMatrix from '../../components/operations/HospitalAutonomousOperationsMatrix';
 import './Operations.css';
 
 const OPERATIONS_HUB_ROUTE_CHROME = Object.freeze({
@@ -168,6 +169,8 @@ export default function Operations() {
         onChange={(event) => setQuery(event.target.value)}
         aria-label="Search operational surfaces"
       />
+
+      <HospitalAutonomousOperationsMatrix />
 
       <h2 className="operations-hub__section-title">Priority surfaces</h2>
       <div className="operations-hub__grid">

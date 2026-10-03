@@ -28,16 +28,21 @@
   display: grid;
   grid-template-rows: var(--cdl-header-height, 52px);
   overflow: hidden;
-  border-bottom: 1px solid var(--medical-border);
-  background: var(--app-surface-1, #ffffff);
+  border-bottom: 1px solid var(--medical-border, #e2e8f0);
+  background: color-mix(in srgb, var(--app-surface-1, #ffffff) 92%, transparent);
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.03);
 }
 
 .caredroid-header--slim {
   height: var(--cdl-header-height, 52px);
   grid-template-rows: var(--cdl-header-height, 52px);
-  background: var(--cdl-header-bg, var(--medical-white));
-  border-bottom: 1px solid var(--cdl-header-border, var(--medical-border));
-  box-shadow: 0 1px 0 rgba(15, 23, 42, 0.04);
+  background: color-mix(in srgb, var(--cdl-header-bg, var(--medical-white)) 92%, transparent);
+  border-bottom: 1px solid var(--cdl-header-border, var(--medical-border, #e2e8f0));
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.03);
 }
 
 .caredroid-header--slim .caredroid-header__topbar {
@@ -375,47 +380,58 @@
 }
 
 .caredroid-header__action--primary {
-  border-color: color-mix(in srgb, var(--app-accent-interactive) 74%, transparent);
-  background: var(--app-accent-interactive);
-  color: var(--app-on-solid, #f9fafb);
+  border: 1px solid rgba(5, 150, 105, 0.35) !important;
+  background: #047857 linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+  background-color: #047857 !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  border-radius: 8px !important;
+  box-shadow:
+    0 1px 2px rgba(5, 150, 105, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+  transition: all 120ms cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .caredroid-header__action--primary:not(:disabled):hover,
 .caredroid-header__action--primary:not(:disabled):focus-visible {
-  background: var(--app-accent-hover, #0284c7);
-  border-color: var(--app-accent-hover, #0284c7);
-  color: var(--app-on-solid, #f9fafb);
+  background: #047857 linear-gradient(135deg, #047857 0%, #065f46 100%) !important;
+  background-color: #047857 !important;
+  border-color: rgba(5, 150, 105, 0.6) !important;
+  color: #ffffff !important;
   outline: none;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 22%, transparent);
+  box-shadow:
+    0 2px 6px rgba(5, 150, 105, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
 }
 
 .caredroid-header__action:disabled {
   cursor: not-allowed;
-  opacity: 0.85; /* was 0.5 � CDL readable chrome */
+  opacity: 0.65;
 }
 
 .caredroid-header__lookup {
   position: relative;
   display: flex;
   align-items: center;
-  width: min(17vw, 220px);
-  min-width: 160px;
+  width: min(20vw, 240px);
+  min-width: 170px;
   height: 32px;
-  border: 1px solid var(--medical-border, #e0f2fe);
-  border-radius: 9px;
-  background: var(--app-surface-1, #ffffff);
+  border: 1px solid var(--medical-border, #cbd5e1);
+  border-radius: 8px;
+  background: var(--app-surface-2, #f8fafc);
   color: var(--medical-text-muted, var(--cdl-ink-muted, #334155));
-  /* HEAL-275: the header is one persistent component across route changes
-     (React Router doesn't remount it), and this bar's width/height/color
-     jump abruptly between screen modes (e.g. Reception's emphasized
-     variant vs. every other page) with no transition -- part of what
-     reads as the header "changing shape" when navigating. This doesn't
-     change WHAT shows per screen mode, just smooths the same change. */
   transition:
     width 180ms ease,
     height 180ms ease,
-    border-color 180ms ease,
-    background-color 180ms ease;
+    border-color 150ms ease,
+    background-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.caredroid-header__lookup:focus-within {
+  border-color: #0284c7;
+  background: var(--app-surface-1, #ffffff);
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
 }
 
 .caredroid-header__lookup--emphasis {

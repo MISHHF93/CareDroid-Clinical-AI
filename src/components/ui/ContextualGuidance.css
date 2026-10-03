@@ -2,10 +2,20 @@
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
+  border-left: 3px solid var(--cdl-guidance-rail, var(--medical-accent, #0284c7));
+  border-radius: 6px;
+  padding: 8px 12px;
+  transition: all var(--motion-transition-fast, 120ms);
 }
 
 .cd-contextual-guidance--ai {
-  border-color: var(--semantic-ai-assistance-border, rgba(147, 112, 219, 0.35));
+  border-left-color: var(--semantic-ai-assistance-border, #8b5cf6);
+  background: color-mix(in srgb, #8b5cf6 4%, transparent);
+}
+
+.cd-contextual-guidance--warning {
+  border-left-color: var(--semantic-urgent, #f59e0b);
+  background: color-mix(in srgb, #f59e0b 4%, transparent);
 }
 
 .cd-contextual-guidance__footer {
@@ -13,6 +23,7 @@
   align-items: center;
   gap: 0.65rem;
   flex-wrap: wrap;
+  margin-top: 2px;
 }
 
 /* --semantic-info-text and --text-primary don't exist anywhere -- this component
@@ -21,17 +32,22 @@
    fallbacks (#7eb8ff, #e8edf4) rendered as near-illegible light text in light
    mode. Fixed to the real, theme-aware --cdl-info-text/--cdl-ink. */
 .cd-contextual-guidance__help-link {
-  padding: 0.15rem 0.45rem;
-  border: none;
+  padding: 0.2rem 0.5rem;
+  border: 1px solid color-mix(in srgb, var(--cdl-info-text, #0369a1) 25%, transparent);
+  border-radius: 4px;
   background: transparent;
   color: var(--cdl-info-text, #0369a1);
   font-size: 0.82rem;
+  font-weight: 550;
   cursor: pointer;
-  text-decoration: underline;
-  text-underline-offset: 2px;
+  text-decoration: none;
+  transition:
+    background-color var(--motion-transition-fast, 120ms),
+    color var(--motion-transition-fast, 120ms);
 }
 
 .cd-contextual-guidance__help-link:hover {
+  background: color-mix(in srgb, var(--cdl-info-text, #0369a1) 10%, transparent);
   color: var(--cdl-ink, #0f172a);
 }
 
@@ -40,13 +56,14 @@
   padding: 0.15rem 0.45rem;
   border: none;
   background: transparent;
-  color: var(--text-secondary, #9aa7b8);
+  color: var(--text-secondary, #64748b);
   font-size: 0.82rem;
   cursor: pointer;
   text-decoration: underline;
   text-underline-offset: 2px;
+  transition: color var(--motion-transition-fast, 120ms);
 }
 
 .cd-contextual-guidance__dismiss:hover {
-  color: var(--text-primary, #e8edf4);
+  color: var(--medical-ink, #0f172a);
 }

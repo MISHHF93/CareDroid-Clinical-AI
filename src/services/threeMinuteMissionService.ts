@@ -42,19 +42,35 @@ function elapsedSeconds(startedAt: string): number {
   return Math.max(0, Math.floor((Date.now() - new Date(startedAt).getTime()) / 1000));
 }
 
+function getEmergencyStoreSafe() {
+  try {
+    return useEmergencyStore?.getState?.();
+  } catch (_error) {
+    return undefined;
+  }
+}
+
+function getSafelyStoredMissions(): readonly ThreeMinuteMission[] {
+  try {
+    return getThreeMinuteMissionStoreState()?.missions ?? [];
+  } catch (_error) {
+    return [];
+  }
+}
+
 function resolveSubjectLabel(
   patientId: string | undefined,
   emsArrivalId: string | undefined,
   fallback?: string,
 ): string {
   if (fallback) return fallback;
-  const store = useEmergencyStore.getState();
+  const store = getEmergencyStoreSafe();
   if (patientId && !patientId.startsWith('ems:')) {
-    const patient = store.patients.find((entry) => entry.id === patientId);
+    const patient = store?.patients?.find((entry) => entry.id === patientId);
     if (patient) return `${patient.firstName || ''} ${patient.lastName || ''}`.trim() || patient.id;
   }
   if (emsArrivalId) {
-    const arrival = store.emsArrivals.find((entry) => entry.id === emsArrivalId);
+    const arrival = store?.emsArrivals?.find((entry) => entry.id === emsArrivalId);
     if (arrival) return `${arrival.unitName} — ${arrival.chiefComplaint || 'Inbound EMS'}`;
   }
   return patientId || emsArrivalId || 'Critical case';
@@ -67,9 +83,7 @@ function timerToMission(
   const definition = getThreeMinuteMissionDefinition(trigger);
   const patientId = timer.patientId.startsWith('ems:') ? undefined : timer.patientId;
   const emsArrivalId = timer.patientId.startsWith('ems:') ? timer.patientId.slice(4) : undefined;
-  const existing = getThreeMinuteMissionStoreState().missions.find(
-    (mission) => mission.timerId === timer.timerId,
-  );
+  const existing = getSafelyStoredMissions().find((mission) => mission.timerId === timer.timerId);
 
   const tasks = existing?.tasks
     ? existing.tasks.map((task) => {
@@ -119,16 +133,14 @@ function timerToMission(
 }
 
 function inferTriggerFromTimer(timer: ResponseTimerState): ThreeMinuteMissionTrigger {
-  const stored = getThreeMinuteMissionStoreState().missions.find(
-    (mission) => mission.timerId === timer.timerId,
-  );
+  const stored = getSafelyStoredMissions().find((mission) => mission.timerId === timer.timerId);
   if (stored) return stored.trigger;
   if (timer.patientId.startsWith('ems:')) return 'ems_pre_arrival';
-  const store = useEmergencyStore.getState();
-  const alert = store.alerts.find((entry) => entry.id === timer.triggerAlertId);
+  const store = getEmergencyStoreSafe();
+  const alert = store?.alerts?.find((entry) => entry.id === timer.triggerAlertId);
   if (alert?.source === 'three-minute-timer-engine') return 'critical_alert';
   if (alert?.severity === 'Critical') return 'critical_alert';
-  const patient = store.patients.find((entry) => entry.id === timer.patientId);
+  const patient = store?.patients?.find((entry) => entry.id === timer.patientId);
   if (patient?.flags?.includes(PatientFlag.ReassessmentDue)) return 'reassessment_breach';
   return 'critical_patient';
 }
@@ -168,8 +180,8 @@ export function syncThreeMinuteMissionsFromEngine(): readonly ThreeMinuteMission
   const missions = getAllActiveTimers().map((timer) =>
     timerToMission(timer, inferTriggerFromTimer(timer)),
   );
-  const store = getThreeMinuteMissionStoreState();
-  if (missionSignature(missions) !== missionSignature(store.missions)) {
+  const currentMissions = getSafelyStoredMissions();
+  if (missionSignature(missions) !== missionSignature(currentMissions)) {
     // Deferred by a microtask so the write always lands after React finishes
     // the current commit, not mid-render for whichever sibling component
     // happens to still be processing in the same batch. Two independent
@@ -182,9 +194,13 @@ export function syncThreeMinuteMissionsFromEngine(): readonly ThreeMinuteMission
     // against the latest store state avoids clobbering a write that already
     // happened in between.
     queueMicrotask(() => {
-      const latest = getThreeMinuteMissionStoreState();
-      if (missionSignature(missions) !== missionSignature(latest.missions)) {
-        latest.setMissions(missions);
+      try {
+        const latest = getThreeMinuteMissionStoreState();
+        if (latest && missionSignature(missions) !== missionSignature(latest.missions)) {
+          latest.setMissions(missions);
+        }
+      } catch (_error) {
+        // Safe fallback during unmount or circular evaluation
       }
     });
   }
@@ -360,7 +376,7 @@ export function hydrateThreeMinuteMissionsFromStore(): void {
       (mission.emsArrivalId ? emsPreArrivalSubjectId(mission.emsArrivalId) : null);
     if (!subjectId) continue;
     if (!getActiveTimerForPatient(subjectId)) {
-      startResponseTimer(subjectId, mission.triggerAlertId, mission.ownerRole);
+      startResponseTimer(subjectId, mission.triggerAlertId, mission.ownerRole, mission.startedAt);
     }
   }
   syncThreeMinuteMissionsFromEngine();

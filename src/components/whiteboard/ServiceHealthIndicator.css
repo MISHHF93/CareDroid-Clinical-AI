@@ -1,0 +1,318 @@
+/* Service Health Indicator — Whiteboard & Command Center */
+
+.service-health-indicator {
+  border-radius: var(--radius-md, 8px);
+  border: 1px solid var(--panel-border, #e2e8f0);
+  background: var(--surface-1, #ffffff);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  margin-block: 6px;
+  container-type: inline-size;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.service-health-indicator--healthy {
+  border-color: color-mix(in srgb, #16a34a 25%, var(--panel-border, #e2e8f0));
+}
+
+.service-health-indicator--degraded {
+  border-color: color-mix(in srgb, #d97706 40%, var(--panel-border, #e2e8f0));
+  background: color-mix(in srgb, #d97706 3%, var(--surface-1, #ffffff));
+}
+
+.service-health-indicator--critical {
+  border-color: color-mix(in srgb, #dc2626 50%, var(--panel-border, #e2e8f0));
+  background: color-mix(in srgb, #dc2626 4%, var(--surface-1, #ffffff));
+}
+
+.service-health-indicator__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  gap: 12px;
+}
+
+.service-health-indicator__toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  flex: 1;
+  min-width: 0;
+}
+
+.service-health-indicator__toggle:focus-visible {
+  outline: 2px solid var(--focus-ring, #3b82f6);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.service-health-indicator__icon-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.service-health-indicator__icon--healthy {
+  color: #16a34a;
+}
+
+.service-health-indicator__icon--degraded {
+  color: #d97706;
+}
+
+.service-health-indicator__icon--critical {
+  color: #dc2626;
+  animation: service-health-pulse var(--cdl-pulse-critical, 1.6s) ease-in-out infinite alternate;
+}
+
+@keyframes service-health-pulse {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(1.15);
+    opacity: 0.65;
+  }
+}
+
+.service-health-indicator__title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--medical-ink, #0f172a);
+}
+
+.service-health-indicator__status-badge {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.service-health-indicator--healthy .service-health-indicator__status-badge {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.service-health-indicator--degraded .service-health-indicator__status-badge {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.service-health-indicator--critical .service-health-indicator__status-badge {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.service-health-indicator__3m-alert {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: #ef4444;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.service-health-indicator__chevron {
+  color: var(--medical-text-subtle, #64748b);
+  display: inline-flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+.service-health-indicator__direct-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary, #0284c7);
+  text-decoration: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  flex-shrink: 0;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.service-health-indicator__direct-link:hover {
+  background: rgba(2, 132, 199, 0.08);
+  border-color: rgba(2, 132, 199, 0.2);
+}
+
+.service-health-indicator__direct-link:focus-visible {
+  outline: 2px solid var(--focus-ring, #3b82f6);
+  outline-offset: 2px;
+}
+
+.service-health-indicator__panel {
+  border-top: 1px solid var(--panel-border, #e2e8f0);
+  padding: 12px 16px;
+  display: grid;
+  gap: 10px;
+  background: var(--surface-2, #f8fafc);
+}
+
+.service-health-indicator__risk-callout {
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.service-health-indicator__risk-fallback {
+  margin-top: 4px;
+  font-size: 11px;
+  color: #7f1d1d;
+}
+
+.service-health-indicator__empty {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  color: var(--medical-text-subtle, #64748b);
+  font-size: 12px;
+}
+
+.service-health-indicator__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.service-health-indicator__item {
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--panel-border, #e2e8f0);
+  background: var(--surface-1, #ffffff);
+  display: grid;
+  gap: 6px;
+}
+
+.service-health-indicator__item-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.service-health-indicator__service-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--medical-ink, #0f172a);
+}
+
+.service-health-indicator__severity-tag {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.service-health-indicator__item--critical .service-health-indicator__severity-tag {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.service-health-indicator__item--high .service-health-indicator__severity-tag {
+  background: #ffedd5;
+  color: #c2410c;
+}
+
+.service-health-indicator__item--medium .service-health-indicator__severity-tag {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.service-health-indicator__item--low .service-health-indicator__severity-tag {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.service-health-indicator__3m-tag {
+  font-size: 10px;
+  font-weight: 700;
+  background: #ef4444;
+  color: #ffffff;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.service-health-indicator__desc {
+  font-size: 12px;
+  color: var(--medical-ink, #334155);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.service-health-indicator__item-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 11px;
+  color: var(--medical-text-subtle, #64748b);
+  flex-wrap: wrap;
+}
+
+.service-health-indicator__fallback {
+  font-size: 11px;
+  padding: 6px 8px;
+  background: #f1f5f9;
+  border-radius: 4px;
+  color: #334155;
+  line-height: 1.4;
+}
+
+.service-health-indicator__footer {
+  text-align: right;
+  padding-top: 4px;
+}
+
+.service-health-indicator__footer-link {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary, #0284c7);
+  text-decoration: none;
+}
+
+.service-health-indicator__footer-link:hover {
+  text-decoration: underline;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .service-health-indicator__icon--critical {
+    animation: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .service-health-indicator,
+  .service-health-indicator__item {
+    border: 1px solid ButtonText;
+  }
+}

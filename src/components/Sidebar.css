@@ -149,12 +149,13 @@
 }
 
 .sidebar-nav-group__label {
-  padding: 4px 8px 1px;
-  font-size: 9px;
+  padding: 6px 10px 2px;
+  font-size: 9.5px;
   font-weight: 700;
-  letter-spacing: 0.07em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--cdl-sidebar-group-label-fg, var(--medical-ink-subtle));
+  user-select: none;
 }
 
 .sidebar-nav-group__items {
@@ -171,8 +172,8 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 8px;
-  padding: 5px 8px;
+  gap: 9px;
+  padding: 6px 10px;
   color: var(--cdl-sidebar-item-fg, var(--medical-ink-muted));
   text-decoration: none;
   border: 1px solid transparent;
@@ -197,7 +198,8 @@
   transition:
     background-color var(--motion-transition-fast, 120ms),
     border-color var(--motion-transition-fast, 120ms),
-    color var(--motion-transition-fast, 120ms);
+    color var(--motion-transition-fast, 120ms),
+    box-shadow var(--motion-transition-fast, 120ms);
 }
 
 .sidebar-nav-item:hover {
@@ -215,6 +217,7 @@
   border-left-color: var(--cdl-sidebar-item-rail-active, var(--medical-accent)) !important;
   color: var(--cdl-sidebar-item-fg-active, var(--medical-accent-hover));
   font-weight: 600;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
 }
 
 .sidebar-nav-item--utility {
@@ -273,9 +276,9 @@
 
 .sidebar-nav-item__count {
   flex-shrink: 0;
-  min-width: 17px;
-  height: 17px;
-  padding: 0 4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
   border-radius: 999px;
   display: inline-flex;
   align-items: center;
@@ -284,6 +287,7 @@
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   line-height: 1;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
 }
 
 .sidebar-nav-item__count--alert {

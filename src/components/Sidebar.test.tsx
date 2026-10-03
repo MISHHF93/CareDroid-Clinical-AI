@@ -246,7 +246,7 @@ describe('Sidebar unified navigation rendering', () => {
   });
 
   it('toggles the docked Copilot panel closed on a second click (HEAL-211)', () => {
-    // The desktop nav item renders aria-pressed={copilotOpen} and active-state
+    // The desktop nav item renders aria-pressed={copilotOpen ? 'true' : 'false'} and active-state
     // styling -- both signal a real toggle per WAI-ARIA authoring practices --
     // but its onClick previously always called setCopilotOpen(true)
     // unconditionally, so a second click while already open was a silent

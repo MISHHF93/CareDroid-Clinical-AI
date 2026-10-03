@@ -1,5 +1,13 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import '../../services/emergencyCareJourneyOrchestrator';
+import '../../services/emsPreArrivalPipelineService';
+import '../../services/enrichAdministrativeAutomationsWithAi';
+import '../../services/patientJourneyAiDecisionService';
+import '../../services/careDroidUnifiedAiNode';
+import '../../services/unifiedAiEnvelope';
+import '../../engine/administrativeAutomationEngine';
+import '../../engine/unifiedWorkflowAutomationEngine';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { PatientState } from '../../types/emergency';
 import { WHITEBOARD_QUEUE_FILTER } from '../../services/queueAssignment';

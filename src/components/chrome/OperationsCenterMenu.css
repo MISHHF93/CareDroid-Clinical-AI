@@ -44,8 +44,9 @@
   height: 16px;
   padding: 0 4px;
   border-radius: 999px;
-  background: var(--cdl-critical, #dc2626);
-  color: var(--cdl-critical-text, #991b1b);
+  background: var(--cdl-critical, #dc2626) !important;
+  background-color: var(--cdl-critical, #dc2626) !important;
+  color: #ffffff !important;
   font-size: 10px;
   font-weight: 700;
   line-height: 16px;
@@ -54,7 +55,9 @@
 }
 
 .operations-center-menu__trigger--warning .operations-center-menu__badge {
-  background: var(--cdl-warning, #b45309);
+  background: var(--cdl-warning, #b45309) !important;
+  background-color: var(--cdl-warning, #b45309) !important;
+  color: #ffffff !important;
 }
 
 /*

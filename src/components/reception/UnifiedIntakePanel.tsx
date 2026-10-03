@@ -525,6 +525,40 @@ export default function UnifiedIntakePanel({
                   </select>
                 </label>
                 <label className="reception-command-field">
+                  <span>Preferred language</span>
+                  <input
+                    value={draft.preferredLanguage || ''}
+                    onChange={(event) => onDraftChange({ preferredLanguage: event.target.value })}
+                    placeholder="e.g. English, Spanish, ASL"
+                    list="reception-language-suggestions"
+                  />
+                  <datalist id="reception-language-suggestions">
+                    <option value="English" />
+                    <option value="Spanish" />
+                    <option value="French" />
+                    <option value="Mandarin" />
+                    <option value="Arabic" />
+                    <option value="ASL" />
+                    <option value="Other" />
+                  </datalist>
+                </label>
+                <label className="reception-command-field">
+                  <span>Interpreter needed</span>
+                  <select
+                    value={draft.interpreterNeeded || 'unknown'}
+                    onChange={(event) =>
+                      onDraftChange({
+                        interpreterNeeded: event.target
+                          .value as ReceptionIntakeDraft['interpreterNeeded'],
+                      })
+                    }
+                  >
+                    <option value="unknown">Unknown</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                  </select>
+                </label>
+                <label className="reception-command-field">
                   <span>Contact / callback</span>
                   <input
                     value={draft.contactCallback}

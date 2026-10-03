@@ -70,7 +70,9 @@ pages-map.txt
 /qa/playwright-responsive-report.json
 /qa/responsive-qa-summary.json
 /qa/page-screenshots/
+/qa/showcase/
 /qa/dashboard-resize-audit/*.png
+scripts/*.cjs
 /qa/screenshot-backend.sqlite*
 /qa/a11y-results.json
 /qa/a11y-results/

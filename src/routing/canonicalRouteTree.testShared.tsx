@@ -19,7 +19,10 @@ import { mockUserValue } from '../test/testRenderUtils';
 let appRoutesModulePromise: Promise<{ AppRoutes: React.ComponentType }> | null = null;
 
 export function preloadAppRoutesForTests() {
-  appRoutesModulePromise ??= import('../App');
+  appRoutesModulePromise ??= Promise.all([
+    import('../App'),
+    import('../config/emergencyScreenKpiPolicy'),
+  ]).then(([appModule]) => appModule);
   return appRoutesModulePromise;
 }
 

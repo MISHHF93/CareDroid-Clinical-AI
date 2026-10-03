@@ -457,7 +457,7 @@ export function Header() {
                 screenCapabilities.isRegistrationScreen ? 'Patient search' : 'Operational search'
               }
               role="combobox"
-              aria-expanded={lookupResultsOpen}
+              aria-expanded={lookupResultsOpen ? 'true' : 'false'}
               aria-controls={PATIENT_SEARCH_LISTBOX_ID}
               aria-autocomplete="list"
               aria-activedescendant={

@@ -73,9 +73,9 @@ export const LIVING_CONTEXTUAL_HELP_ENTRIES: readonly LivingContextualHelpEntry[
   Object.freeze({
     pathPrefix: CANONICAL_ROUTES.emergencyAnalytics,
     guidanceId: 'analytics-living-docs-hint',
-    title: 'Live analytics reference',
+    title: 'Departmental analytics & KPIs',
     detail:
-      'Charts and KPIs derive from central node, knowledge graph, and operational intelligence — regenerate docs with npm run docs:generate.',
+      'Continuous metric streaming, wait-time breaches, and throughput trends synthesized with live operational intelligence.',
     helpTopicId: 'analytics',
     tone: 'info',
   }),
@@ -112,9 +112,9 @@ export const LIVING_CONTEXTUAL_HELP_ENTRIES: readonly LivingContextualHelpEntry[
   Object.freeze({
     pathPrefix: CANONICAL_ROUTES.emergencySettings,
     guidanceId: 'settings-config-hint',
-    title: 'Configuration source of truth',
+    title: 'System configuration registry',
     detail:
-      'Tenant thresholds and operational intelligence settings are documented in docs/generated/configuration.md.',
+      'Tenant thresholds, departmental safeguards, and operational intelligence parameters configured for active facility governance.',
     helpTopicId: 'settings',
     tone: 'info',
   }),

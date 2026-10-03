@@ -261,7 +261,7 @@
   font-weight: 650;
   line-height: 1.2;
   text-decoration: none;
-  white-space: normal;
+  white-space: nowrap;
 }
 
 /* HEAL: CriticalAlertBanner's "View alerts" CTA (.cdl-alarm-banner__action--primary,

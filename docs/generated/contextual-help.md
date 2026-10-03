@@ -51,8 +51,8 @@ Inbound units, offload timing, and handoff checklists connect to reception and E
 - **Help topic:** `ems`
 - **Workflow step:** `arrival`
 - **Tone:** info
-### Live analytics reference
-Charts and KPIs derive from central node, knowledge graph, and operational intelligence — regenerate docs with npm run docs:generate.
+### Departmental analytics & KPIs
+Continuous metric streaming, wait-time breaches, and throughput trends synthesized with live operational intelligence.
 - **Path prefix:** `/emergency/analytics`
 - **Guidance id:** `analytics-living-docs-hint`
 - **Help topic:** `analytics`
@@ -78,8 +78,8 @@ Open referrals appear as workflow nodes in the application knowledge graph and r
 - **Help topic:** `referrals`
 - **Workflow step:** `disposition`
 - **Tone:** info
-### Configuration source of truth
-Tenant thresholds and operational intelligence settings are documented in docs/generated/configuration.md.
+### System configuration registry
+Tenant thresholds, departmental safeguards, and operational intelligence parameters configured for active facility governance.
 - **Path prefix:** `/emergency/settings`
 - **Guidance id:** `settings-config-hint`
 - **Help topic:** `settings`

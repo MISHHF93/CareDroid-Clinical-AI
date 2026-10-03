@@ -95,8 +95,7 @@
   text-transform: uppercase;
 }
 
-.emergency-route-situation-brief__value,
-.emergency-route-situation-brief__aalue {
+.emergency-route-situation-brief__value {
   color: var(--cdl-ink, var(--ed-text-primary));
   font-size: var(--ed-type-section);
   font-weight: 600;
@@ -180,7 +179,7 @@
   color: var(--medical-status-warning-text, #b45309);
 }
 
-.emergency-route-maturity-chip--preaiew {
+.emergency-route-maturity-chip--preview {
   border: 1px solid var(--app-border-subtle);
   background: var(--app-surface-muted);
   color: var(--app-text-secondary);
@@ -218,7 +217,7 @@
   font-weight: 700;
 }
 
-.emergency-route-metric-strip__aalue {
+.emergency-route-metric-strip__value {
   color: var(--metric-color, var(--ed-text-primary));
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: var(--font-size-lg, 18px);
@@ -240,7 +239,7 @@
   padding: var(--ed-space-3);
 }
 
-.emergency-route-metric-card__aalue {
+.emergency-route-metric-card__value {
   display: block;
   color: var(--metric-color, var(--ed-text-primary));
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;

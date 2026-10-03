@@ -1101,7 +1101,7 @@ export default function CommandPalette({ open, onClose, onExecute }: CommandPale
             // arrowed onto -- the highlight was visual only. These four attributes
             // are what turn a text box next to a list into a combobox that owns it.
             role="combobox"
-            aria-expanded={results.length > 0}
+            aria-expanded={results.length > 0 ? 'true' : 'false'}
             aria-controls={COMMAND_PALETTE_LISTBOX_ID}
             aria-autocomplete="list"
             aria-activedescendant={

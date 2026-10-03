@@ -1,5 +1,5 @@
 import './canonicalRouteTree.testShared.tsx';
-import { cleanup, screen, waitFor, within } from '@testing-library/react';
+import { cleanup, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { findRouteHeading, renderRoute, ROUTE_LOAD_TIMEOUT } from './canonicalRouteTree.testShared';
@@ -32,7 +32,7 @@ describe('canonical route tree — queues params, reassessment, boarding, referr
 
     // The shell chrome route-tab and the page's own (visually-hidden) accessibility
     // heading both render "Reassessment" — scope to <main> for the page's heading.
-    const main = await screen.findByRole('main');
+    const _main = await screen.findByRole('main');
     expect(await screen.findByRole('heading', { name: 'Reassessment' })).toBeInTheDocument();
   });
 
@@ -51,7 +51,7 @@ describe('canonical route tree — queues params, reassessment, boarding, referr
     // queries document-wide rather than scoping to <main> to dodge a duplicate.
     // The shell heading resolves before the lazy page body, so the tab -- a
     // page-owned element -- is awaited rather than queried synchronously.
-    const main = await screen.findByRole('main');
+    const _main = await screen.findByRole('main');
     expect(await screen.findByRole('heading', { name: 'Flow & Capacity' })).toBeInTheDocument();
     expect(
       await screen.findByRole('tab', { name: 'Boarding' }, { timeout: ROUTE_LOAD_TIMEOUT }),

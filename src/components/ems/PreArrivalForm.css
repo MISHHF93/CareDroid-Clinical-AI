@@ -111,7 +111,9 @@
 
 .pre-arrival-intake__eta-presets button {
   border: 1px solid var(--medical-border, #d8dee8);
-  background: #fff;
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  color: var(--medical-ink, #0f172a) !important;
   border-radius: 999px;
   padding: 0.15rem 0.65rem;
   font-size: 0.72rem;
@@ -119,10 +121,27 @@
   cursor: pointer;
 }
 
+.pre-arrival-intake__eta-presets button:disabled {
+  background: #f8fafc !important;
+  background-color: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  color: #334155 !important;
+  cursor: not-allowed;
+  opacity: 0.85;
+}
+
 .pre-arrival-intake__eta-presets button.is-active {
-  background: var(--color-accent, #374151);
-  border-color: var(--color-accent, #374151);
-  color: var(--medical-text-on-solid, #ffffff);
+  background: #0f172a !important;
+  background-color: #0f172a !important;
+  border-color: #0f172a !important;
+  color: #ffffff !important;
+}
+
+.pre-arrival-intake__eta-presets button.is-active:disabled {
+  background: #1e293b !important;
+  background-color: #1e293b !important;
+  border-color: #1e293b !important;
+  color: #ffffff !important;
 }
 
 .pre-arrival-intake__framework {
@@ -132,7 +151,9 @@
 
 .pre-arrival-intake__framework button {
   border: 1px solid var(--medical-border, #d8dee8);
-  background: #fff;
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  color: var(--medical-ink, #0f172a) !important;
   border-radius: 999px;
   padding: 0.2rem 0.7rem;
   font-size: 0.72rem;
@@ -140,10 +161,27 @@
   cursor: pointer;
 }
 
+.pre-arrival-intake__framework button:disabled {
+  background: #f8fafc !important;
+  background-color: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  color: #334155 !important;
+  cursor: not-allowed;
+  opacity: 0.85;
+}
+
 .pre-arrival-intake__framework button.is-active {
-  background: var(--color-secondary, #0f766e);
-  border-color: var(--color-secondary, #0f766e);
-  color: var(--medical-text-on-solid, #ffffff);
+  background: #0f766e !important;
+  background-color: #0f766e !important;
+  border-color: #0f766e !important;
+  color: #ffffff !important;
+}
+
+.pre-arrival-intake__framework button.is-active:disabled {
+  background: #115e59 !important;
+  background-color: #115e59 !important;
+  border-color: #115e59 !important;
+  color: #ffffff !important;
 }
 
 .pre-arrival-intake__framework-label {
