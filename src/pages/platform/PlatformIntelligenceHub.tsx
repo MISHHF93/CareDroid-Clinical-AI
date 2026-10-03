@@ -73,7 +73,7 @@ export default function PlatformIntelligenceHub() {
       */}
       <section className="pi-hub__coverage" role="note" aria-labelledby="pi-hub-coverage">
         <h2 id="pi-hub-coverage">
-          <AlertTriangle aria-hidden="true" /> Read the score with this
+          <AlertTriangle aria-hidden="true" /> Assessment Provenance &amp; Methodology
         </h2>
         <p>
           <strong>

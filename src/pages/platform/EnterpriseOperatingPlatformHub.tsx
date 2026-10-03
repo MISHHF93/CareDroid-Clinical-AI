@@ -69,7 +69,7 @@ export default function EnterpriseOperatingPlatformHub() {
 
       <section className="eop-hub__coverage" role="note" aria-labelledby="eop-hub-coverage">
         <h2 id="eop-hub-coverage">
-          <AlertTriangle aria-hidden="true" /> Read the score with this
+          <AlertTriangle aria-hidden="true" /> Assessment Provenance &amp; Methodology
         </h2>
         <p>
           <strong>
