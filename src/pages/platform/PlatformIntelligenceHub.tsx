@@ -10,7 +10,7 @@ import './PlatformIntelligenceHub.css';
 const PLATFORM_INTELLIGENCE_ROUTE_CHROME = Object.freeze({
   title: 'Platform Intelligence',
   subtitle:
-    'Twenty intelligence modules — artifact registry, data catalog and lineage, KPI and cross-domain analytics, tenant and track health, governance and observability.',
+    'Twenty intelligence modules — artifact registry, data catalog and lineage, KPI and cross-domain analytics, tenant and operational health, governance and observability.',
 });
 
 /**
@@ -63,13 +63,13 @@ export default function PlatformIntelligenceHub() {
     <main className="pi-hub" aria-labelledby="pi-hub-heading">
       <header className="pi-hub__header">
         <div>
-          <p className="pi-hub__eyebrow">TrackMind platform</p>
+          <p className="pi-hub__eyebrow">CareDroid Enterprise Operations</p>
           <p className="pi-hub__title-text" id="pi-hub-heading" data-testid="cd-page-title-text">
             Platform intelligence
           </p>
           <p className="pi-hub__subtitle">
             Twenty intelligence modules — artifact registry, data catalog and lineage, KPI and
-            cross-domain analytics, tenant and track health, governance and observability.
+            cross-domain analytics, tenant and operational health, governance and observability.
           </p>
         </div>
         <div className="pi-hub__score" aria-label="Overall platform intelligence score">

@@ -11,9 +11,9 @@ import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import './TrackMindMaturityDashboard.css';
 
 const TRACKMIND_MATURITY_ROUTE_CHROME = Object.freeze({
-  title: 'Maturity Assessment',
+  title: 'Clinical Operations Maturity',
   subtitle:
-    'Nine weighted domains scored against the TrackMind maturity framework, blended with your own self-assessment where you provide one.',
+    'Nine weighted domains scored against the CareDroid operational maturity framework, blended with your self-assessment where provided.',
 });
 
 /**
@@ -81,17 +81,17 @@ export default function TrackMindMaturityDashboard() {
     <main className="tm-maturity" aria-labelledby="tm-maturity-heading">
       <header className="tm-maturity__header">
         <div>
-          <p className="tm-maturity__eyebrow">TrackMind Operating System</p>
+          <p className="tm-maturity__eyebrow">CareDroid Clinical Operations</p>
           <p
             className="tm-maturity__title-text"
             id="tm-maturity-heading"
             data-testid="cd-page-title-text"
           >
-            Maturity assessment
+            Clinical operations maturity assessment
           </p>
           <p className="tm-maturity__subtitle">
-            Nine weighted domains scored against the TrackMind maturity framework, blended with your
-            own self-assessment where you provide one.
+            Nine weighted domains scored against the CareDroid operational maturity framework,
+            blended with your department's self-assessment where provided.
           </p>
         </div>
         <div className="tm-maturity__score" aria-label="Overall maturity score">

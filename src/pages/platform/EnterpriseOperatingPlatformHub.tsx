@@ -64,7 +64,7 @@ export default function EnterpriseOperatingPlatformHub() {
     <main className="eop-hub" aria-labelledby="eop-hub-heading">
       <header className="eop-hub__header">
         <div>
-          <p className="eop-hub__eyebrow">TrackMind platform</p>
+          <p className="eop-hub__eyebrow">CareDroid Enterprise Operations</p>
           <p className="eop-hub__title-text" id="eop-hub-heading" data-testid="cd-page-title-text">
             Enterprise operating platform
           </p>

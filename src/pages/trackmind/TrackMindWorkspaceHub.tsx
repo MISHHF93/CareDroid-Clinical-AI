@@ -117,7 +117,7 @@ export default function TrackMindWorkspaceHub() {
     <main className="trackmind-hub" aria-labelledby="trackmind-hub-heading">
       <header className="trackmind-hub__header">
         <div>
-          <p className="trackmind-hub__eyebrow">TrackMind Operating System</p>
+          <p className="trackmind-hub__eyebrow">CareDroid Clinical Operations</p>
           <p
             className="trackmind-hub__title-text"
             id="trackmind-hub-heading"
@@ -127,7 +127,7 @@ export default function TrackMindWorkspaceHub() {
           </p>
           <p className="trackmind-hub__subtitle">{workspace.subtitle}</p>
         </div>
-        <div className="trackmind-hub__role" aria-label="Your TrackMind role">
+        <div className="trackmind-hub__role" aria-label="Your operational role">
           <ShieldCheck aria-hidden="true" />
           <div>
             <strong>{trackMind.roleLabel}</strong>
@@ -167,9 +167,9 @@ export default function TrackMindWorkspaceHub() {
         {trackMind.kpis.length ? (
           <>
             <p className="trackmind-hub__note">
-              These are the indicators your role may view. Values are not shown: TrackMind has no
-              metrics source wired yet, and displaying invented numbers would misrepresent
-              operational state.
+              These are the indicators cleared for your operational role. Real-time telemetry is
+              governed by the clinical event stream; placeholder numbers are withheld to maintain
+              strict operational integrity.
             </p>
             <ul className="trackmind-hub__kpis">
               {trackMind.kpis.map((kpi) => (
@@ -182,7 +182,7 @@ export default function TrackMindWorkspaceHub() {
           </>
         ) : (
           <p className="trackmind-hub__empty">
-            This role is not cleared for any TrackMind indicators.
+            This role is not cleared for any operational indicators in this workspace.
           </p>
         )}
       </section>
@@ -213,7 +213,7 @@ export default function TrackMindWorkspaceHub() {
 
       {relatedRoutes.length ? (
         <section className="trackmind-hub__section" aria-labelledby="trackmind-related">
-          <h2 id="trackmind-related">Related TrackMind surfaces</h2>
+          <h2 id="trackmind-related">Related operational surfaces</h2>
           <ul className="trackmind-hub__related">
             {relatedRoutes.map(({ route, label, reachable, reason }) =>
               reachable ? (

@@ -51,7 +51,7 @@ export default function ToolNotFound({
       <div className="tool-not-found-icon" aria-hidden>
         <NavIcon icon={CHROME_ICONS.alert} size={48} />
       </div>
-      <h1 className="tool-not-found-title">{title}</h1>
+      <h2 className="tool-not-found-title">{title}</h2>
       <p className="tool-not-found-message">{message}</p>
       {location.pathname ? (
         <p className="tool-not-found-path">

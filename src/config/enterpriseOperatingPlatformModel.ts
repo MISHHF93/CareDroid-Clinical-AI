@@ -202,7 +202,7 @@ export function assessTrackCertification(signals = {} as any) {
     Object.freeze({
       id: 'EV-003',
       domain: 'equine_welfare',
-      label: 'Welfare audit trail',
+      label: 'Care quality & safety audit trail',
       status: domainScores[2] >= 55 ? 'collected' : 'gap',
     }),
     Object.freeze({
@@ -285,9 +285,9 @@ export const ENTERPRISE_RISK_REGISTER = Object.freeze([
     id: 'R-005',
     category: 'equine_welfare',
     severity: 'medium',
-    summary: 'Welfare incident registry incomplete',
-    mitigation: 'Standardize vet clearance workflow',
-    owner: 'Welfare officer',
+    summary: 'Clinical safety incident registry incomplete',
+    mitigation: 'Standardize clinical safety clearance workflow',
+    owner: 'Quality & Safety Officer',
     status: 'open',
   }),
   Object.freeze({
@@ -568,7 +568,7 @@ export function assessTrainingCompetency(context = {} as any) {
     }),
     Object.freeze({
       id: 'CERT-002',
-      name: 'Equine welfare response',
+      name: 'Clinical safety & adverse event response',
       status: 'current',
       expires: '2027-01-15',
     }),
@@ -613,7 +613,7 @@ export function assessKnowledgeManagement() {
     Object.freeze({
       id: 'KB-001',
       type: 'playbook',
-      title: 'Race day operations playbook',
+      title: 'Clinical operations playbook',
       searchable: true,
       version: '2.1',
     }),
@@ -627,7 +627,7 @@ export function assessKnowledgeManagement() {
     Object.freeze({
       id: 'KB-003',
       type: 'policy',
-      title: 'Equine welfare policy',
+      title: 'Clinical safety & patient care policy',
       searchable: true,
       version: '3.0',
     }),
@@ -985,7 +985,7 @@ export function assessSustainabilityEsg(signals = {} as any) {
     'Sustainability & ESG',
     score,
     [
-      kpi('welfare-score', 'Equine welfare score', welfare, 65),
+      kpi('welfare-score', 'Care quality & safety score', welfare, 65),
       kpi('facilities-efficiency', 'Facilities efficiency', facilities, 60),
       kpi('resource-tracking', 'Resource tracking maturity', finance, 55),
     ],
@@ -993,7 +993,7 @@ export function assessSustainabilityEsg(signals = {} as any) {
       esgMetrics: Object.freeze([
         Object.freeze({
           id: 'ESG-001',
-          label: 'Welfare incidents per meet',
+          label: 'Clinical safety incidents per month',
           value: 0.2,
           target: 0.5,
           unit: '',
@@ -1007,7 +1007,7 @@ export function assessSustainabilityEsg(signals = {} as any) {
         }),
         Object.freeze({
           id: 'ESG-003',
-          label: 'Energy per raceday',
+          label: 'Energy per operating day',
           value: 420,
           target: 500,
           unit: 'kWh',

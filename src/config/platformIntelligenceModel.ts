@@ -430,7 +430,7 @@ export function assessForecastingReadiness() {
     }),
     Object.freeze({
       id: 'FC-004',
-      name: 'Welfare incident trend slot',
+      name: 'Clinical safety incident trend slot',
       status: 'planned',
       implemented: false,
     }),
@@ -634,18 +634,18 @@ export function assessTrackHealth(signals = {} as any) {
 
   return moduleResult(
     PLATFORM_INTELLIGENCE_MODULE.TRACK_HEALTH,
-    'Track health dashboard',
+    'Clinical site health dashboard',
     score,
     [
       kpi('operations-health', 'Operations domain', ops, 65),
       kpi('safety-health', 'Safety domain', safety, 65),
-      kpi('welfare-health', 'Equine welfare domain', welfare, 55),
+      kpi('welfare-health', 'Care quality & safety domain', welfare, 55),
     ],
     {
       trackSignals: Object.freeze([
         'Whiteboard load',
         'Reassessment compliance',
-        'Welfare checklist',
+        'Clinical safety checklist',
         'EMS offload',
       ]),
       maturityLevel: maturity.scores.level,

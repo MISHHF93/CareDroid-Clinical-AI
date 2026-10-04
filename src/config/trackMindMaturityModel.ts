@@ -155,13 +155,13 @@ export const TRACKMIND_MATURITY_DOMAINS = Object.freeze([
   }),
   Object.freeze({
     id: TRACKMIND_MATURITY_DOMAIN.EQUINE_WELFARE,
-    label: 'Equine welfare',
+    label: 'Patient safety & care quality',
     weight: 12,
     baseScore: 52,
     owner: 'equine_welfare_officer',
-    ownerLabel: 'Equine welfare officer / track veterinarian',
+    ownerLabel: 'Chief Medical Officer / Quality & Safety Officer',
     description:
-      'Horse health monitoring, withdrawal protocols, injury response, and welfare audits.',
+      'Patient health monitoring, clinical safety guardrails, adverse event response, and care quality audits.',
     levelCriteria: [
       'Welfare incidents logged informally; no central registry.',
       'Veterinary rounds documented but not linked to track operations.',
@@ -170,9 +170,9 @@ export const TRACKMIND_MATURITY_DOMAINS = Object.freeze([
       'Predictive welfare signals, biomechanics review, and third-party welfare benchmarking.',
     ],
     indicators: [
-      'Pre-race vet clearance workflow',
-      'Post-incident welfare review',
-      'Withdrawal and recovery tracking',
+      'Clinical safety clearance workflow',
+      'Post-incident care quality review',
+      'Clinical recovery & precaution tracking',
     ],
   }),
   Object.freeze({
@@ -257,7 +257,7 @@ export const TRACKMIND_MATURITY_DOMAINS = Object.freeze([
 export const TRACKMIND_MATURITY_QUESTIONNAIRE = Object.freeze({
   questions: TRACKMIND_MATURITY_DOMAINS.map((domain) => ({
     id: domain.id,
-    question: `How mature is ${domain.label.toLowerCase()} at your track or operating site?`,
+    question: `How mature is ${domain.label.toLowerCase()} across your clinical facility or department?`,
     options: TRACKMIND_MATURITY_LEVELS.map((level) => ({
       value: level.level,
       label: level.label,
@@ -448,7 +448,7 @@ export function scoreTrackMindMaturity({ answers = {} as any, signals = {} as an
 
   return Object.freeze({
     generatedAt: new Date().toISOString(),
-    framework: 'TrackMind Operating System Maturity',
+    framework: 'CareDroid Clinical Operations Maturity',
     overallScore,
     overallLevel,
     dimensions,
@@ -511,7 +511,8 @@ export const TRACKMIND_IMPROVEMENT_CATALOG = Object.freeze([
     id: 'TM-004',
     domain: TRACKMIND_MATURITY_DOMAIN.EQUINE_WELFARE,
     priority: 'P1',
-    summary: 'Standardize pre-race vet clearance and post-incident welfare review checklists.',
+    summary:
+      'Standardize clinical safety clearance and post-incident care quality review checklists.',
     effort: 'done',
   }),
   Object.freeze({
@@ -597,7 +598,7 @@ export function auditTrackMindMaturity(options = {} as any) {
 
   return Object.freeze({
     generatedAt: new Date().toISOString(),
-    goal: 'Score TrackMind operating system maturity across operations, safety, compliance, security, equine welfare, facilities, finance, AI governance, and data quality',
+    goal: 'Score CareDroid operating system maturity across operations, safety, compliance, security, care quality, facilities, finance, AI governance, and data quality',
     framework: 'TrackMind Operating System Maturity',
     maturityLevels: TRACKMIND_MATURITY_LEVELS,
     domains: TRACKMIND_MATURITY_DOMAINS.map(({ id, label, weight, owner }) =>
