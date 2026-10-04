@@ -475,7 +475,7 @@ const RAW_SEED_ASSET_PACKS = [
     name: 'TrackMind Operations Pack',
     slug: 'trackmind',
     description:
-      'Race-day operations, surveillance nexus, stewarding, and equine welfare surfaces.',
+      'Clinical facility operations, surveillance nexus, governance stewarding, and patient safety surfaces.',
     organizationTypes: [OrganizationType.HEALTH_SYSTEM, OrganizationType.RACETRACK],
     assetIds: [
       'analytics',
@@ -488,7 +488,7 @@ const RAW_SEED_ASSET_PACKS = [
     requiredDependencies: ['core-platform'],
     defaultModules: ['trackmind', 'surveillance', 'operations'],
     pricingTier: PricingTier.ENTERPRISE,
-    targetRoles: ['steward', 'racetrack admin', 'operations manager'],
+    targetRoles: ['steward', 'facility admin', 'operations manager', 'clinical governance lead'],
   },
   {
     id: 'emergency-medicine',

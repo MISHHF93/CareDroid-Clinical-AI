@@ -82,7 +82,7 @@ export enum Permission {
   /** Aggregate-only, no-identifier wall/waiting-room display data -- deliberately NOT READ_PHI. */
   VIEW_PUBLIC_DISPLAY = 'VIEW_PUBLIC_DISPLAY',
 
-  // TrackMind Nexus / Racetrack Operations
+  // TrackMind Nexus / Clinical Facility Operations
   VIEW_TRACKMIND = 'VIEW_TRACKMIND',
   VIEW_TRACKMIND_MATURITY = 'VIEW_TRACKMIND_MATURITY',
   VIEW_TRACKMIND_ENTERPRISE = 'VIEW_TRACKMIND_ENTERPRISE',
@@ -473,27 +473,27 @@ export const PermissionMetadata: Record<
     riskLevel: 'high',
   },
   [Permission.MANAGE_STEWARDING]: {
-    description: 'Review steward incidents and create governed decisions',
+    description: 'Review clinical governance incidents and create governed decisions',
     category: 'TrackMind',
     riskLevel: 'high',
   },
   [Permission.MANAGE_EQUINE_WELFARE]: {
-    description: 'Create and review equine welfare observations',
+    description: 'Create and review patient safety and care quality observations',
     category: 'TrackMind',
     riskLevel: 'high',
   },
   [Permission.VIEW_VETERINARY_RECORDS]: {
-    description: 'View privacy-scoped veterinary records',
+    description: 'View privacy-scoped clinical medical records',
     category: 'TrackMind',
     riskLevel: 'critical',
   },
   [Permission.WRITE_VETERINARY_RECORDS]: {
-    description: 'Create or update veterinary records',
+    description: 'Create or update clinical medical records',
     category: 'TrackMind',
     riskLevel: 'critical',
   },
   [Permission.MANAGE_SECURITY_OPERATIONS]: {
-    description: 'Manage racetrack security incidents and restricted zones',
+    description: 'Manage facility security incidents and restricted clinical zones',
     category: 'TrackMind',
     riskLevel: 'high',
   },

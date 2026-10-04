@@ -80,7 +80,7 @@ export const TRACKMIND_WORKSPACE_DEFINITIONS: Record<
     ...WORKSPACE_BASE,
     roleId: R.organizationAdmin,
     title: 'Organization Governance',
-    subtitle: 'Racetrack portfolio, users, and executive governance',
+    subtitle: 'Clinical facility portfolio, users, and executive governance',
     focusDomain: TRACKMIND_ROLE_DOMAIN.governance,
     kpiPermissionKeys: [K.kpiExecutiveView, K.kpiComplianceView, K.kpiFinanceView],
     quickActions: [
@@ -112,14 +112,14 @@ export const TRACKMIND_WORKSPACE_DEFINITIONS: Record<
   [R.racetrackAdmin]: Object.freeze({
     ...WORKSPACE_BASE,
     roleId: R.racetrackAdmin,
-    title: 'Racetrack Administration',
-    subtitle: 'Local users, configuration, and operational reporting',
+    title: 'Facility Operations Administration',
+    subtitle: 'Local facility users, operational configuration, and compliance reporting',
     focusDomain: TRACKMIND_ROLE_DOMAIN.governance,
     kpiPermissionKeys: [K.kpiRaceDayView, K.kpiComplianceView, K.kpiFacilitiesView],
     quickActions: [
       {
         id: 'config',
-        label: 'Track configuration',
+        label: 'Facility configuration',
         permission: K.racetrackConfigManage,
         route: CANONICAL_ROUTES.tenantAdmin,
       },
@@ -145,12 +145,12 @@ export const TRACKMIND_WORKSPACE_DEFINITIONS: Record<
   [R.raceDayOperationsManager]: Object.freeze({
     ...WORKSPACE_BASE,
     roleId: R.raceDayOperationsManager,
-    title: 'Race-Day Command Center',
-    subtitle: 'Readiness, incidents, approvals, and live operational timeline',
+    title: 'Clinical Operations Command Center',
+    subtitle: 'Shift readiness, clinical incidents, approvals, and live operational timeline',
     focusDomain: TRACKMIND_ROLE_DOMAIN.raceDayOps,
     kpiPermissionKeys: [K.kpiRaceDayView, K.kpiFacilitiesView, K.kpiSecurityView],
     quickActions: [
-      { id: 'status', label: 'Update race-day status', permission: K.racedayStatusUpdate },
+      { id: 'status', label: 'Update operational status', permission: K.racedayStatusUpdate },
       { id: 'incident', label: 'Open incident command', permission: K.racedayIncidentCommand },
       {
         id: 'approvals',
@@ -164,16 +164,20 @@ export const TRACKMIND_WORKSPACE_DEFINITIONS: Record<
   [R.steward]: Object.freeze({
     ...WORKSPACE_BASE,
     roleId: R.steward,
-    title: 'Steward Command Center',
-    subtitle: 'Inquiries, incidents, evidence review, and governed decisions',
+    title: 'Clinical Governance Command Center',
+    subtitle: 'Safety inquiries, clinical incidents, evidence review, and governed decisions',
     focusDomain: TRACKMIND_ROLE_DOMAIN.stewarding,
     kpiPermissionKeys: [K.kpiRaceDayView],
     quickActions: [
       { id: 'review', label: 'Review incidents', permission: K.stewardIncidentReview },
-      { id: 'decision', label: 'Steward decision', permission: K.stewardDecisionCreate },
+      {
+        id: 'decision',
+        label: 'Clinical governance decision',
+        permission: K.stewardDecisionCreate,
+      },
       {
         id: 'audit',
-        label: 'Steward audit trail',
+        label: 'Governance audit trail',
         permission: K.auditView,
         route: CANONICAL_ROUTES.audit,
       },
@@ -183,12 +187,16 @@ export const TRACKMIND_WORKSPACE_DEFINITIONS: Record<
   [R.starterRaceOfficial]: Object.freeze({
     ...WORKSPACE_BASE,
     roleId: R.starterRaceOfficial,
-    title: 'Starter Operations',
-    subtitle: 'Gate readiness, race flow, and official status updates',
+    title: 'Patient Flow Operations',
+    subtitle: 'Bed & triage readiness, patient flow, and official status updates',
     focusDomain: TRACKMIND_ROLE_DOMAIN.racingControl,
     kpiPermissionKeys: [K.kpiRaceDayView],
     quickActions: [
-      { id: 'readiness', label: 'Update gate readiness', permission: K.starterReadinessUpdate },
+      {
+        id: 'readiness',
+        label: 'Update admission readiness',
+        permission: K.starterReadinessUpdate,
+      },
       {
         id: 'approval',
         label: 'Request approval',
@@ -201,29 +209,33 @@ export const TRACKMIND_WORKSPACE_DEFINITIONS: Record<
   [R.paddockOfficial]: Object.freeze({
     ...WORKSPACE_BASE,
     roleId: R.paddockOfficial,
-    title: 'Paddock Operations',
-    subtitle: 'Arrivals, inspections, readiness checks, and paddock incidents',
+    title: 'Patient Intake Operations',
+    subtitle: 'Ambulatory arrivals, triage check-in, readiness checks, and intake incidents',
     focusDomain: TRACKMIND_ROLE_DOMAIN.paddock,
     kpiPermissionKeys: [K.kpiRaceDayView],
     quickActions: [
-      { id: 'observe', label: 'Log observation', permission: K.paddockObservationCreate },
-      { id: 'readiness', label: 'Update readiness', permission: K.paddockReadinessUpdate },
+      { id: 'observe', label: 'Log triage observation', permission: K.paddockObservationCreate },
+      { id: 'readiness', label: 'Update intake readiness', permission: K.paddockReadinessUpdate },
     ],
     relatedRoutes: [CANONICAL_ROUTES.trackMindMaturity],
   }),
   [R.equineWelfareOfficer]: Object.freeze({
     ...WORKSPACE_BASE,
     roleId: R.equineWelfareOfficer,
-    title: 'Equine Welfare Operations',
-    subtitle: 'Welfare observations, restrictions, and welfare incidents',
+    title: 'Patient Safety & Care Quality Operations',
+    subtitle: 'Safety observations, clinical restrictions, and quality incidents',
     focusDomain: TRACKMIND_ROLE_DOMAIN.equineWelfare,
     kpiPermissionKeys: [K.kpiWelfareView, K.kpiRaceDayView],
     quickActions: [
-      { id: 'observe', label: 'Welfare observation', permission: K.welfareObservationCreate },
-      { id: 'restrictions', label: 'Review restrictions', permission: K.welfareRestrictionReview },
+      { id: 'observe', label: 'Safety observation', permission: K.welfareObservationCreate },
+      {
+        id: 'restrictions',
+        label: 'Review clinical restrictions',
+        permission: K.welfareRestrictionReview,
+      },
       {
         id: 'maturity',
-        label: 'Welfare maturity',
+        label: 'Care quality maturity',
         permission: K.maturityView,
         route: CANONICAL_ROUTES.trackMindMaturity,
       },
@@ -233,12 +245,12 @@ export const TRACKMIND_WORKSPACE_DEFINITIONS: Record<
   [R.veterinarian]: Object.freeze({
     ...WORKSPACE_BASE,
     roleId: R.veterinarian,
-    title: 'Veterinary Workspace',
-    subtitle: 'Examinations, clearance metadata, and privacy-scoped medical records',
+    title: 'Clinical Medical Workspace',
+    subtitle: 'Examinations, medical clearance metadata, and privacy-scoped clinical records',
     focusDomain: TRACKMIND_ROLE_DOMAIN.veterinary,
     kpiPermissionKeys: [K.kpiWelfareView],
     quickActions: [
-      { id: 'record', label: 'Veterinary record', permission: K.veterinaryRecordWrite },
+      { id: 'record', label: 'Clinical record', permission: K.veterinaryRecordWrite },
       { id: 'review', label: 'Review clearance', permission: K.veterinaryRecordView },
       {
         id: 'audit',
@@ -252,12 +264,12 @@ export const TRACKMIND_WORKSPACE_DEFINITIONS: Record<
   [R.trainerLiaison]: Object.freeze({
     ...WORKSPACE_BASE,
     roleId: R.trainerLiaison,
-    title: 'Horse Operations',
-    subtitle: 'Trainer assignments, entries, logistics, and transport records',
+    title: 'Care Coordination & Transport',
+    subtitle: 'Care team assignments, patient admissions, logistics, and transfer records',
     focusDomain: TRACKMIND_ROLE_DOMAIN.horseOps,
     kpiPermissionKeys: [K.kpiRaceDayView],
     quickActions: [
-      { id: 'horse', label: 'Horse operations', permission: K.horseOpsManage },
+      { id: 'horse', label: 'Care coordination logistics', permission: K.horseOpsManage },
       {
         id: 'approval',
         label: 'Request approval',
@@ -391,15 +403,16 @@ export const TRACKMIND_WORKSPACE_DEFINITIONS: Record<
   [R.ticketingFanExperienceManager]: Object.freeze({
     ...WORKSPACE_BASE,
     roleId: R.ticketingFanExperienceManager,
-    title: 'Fan Experience',
-    subtitle: 'Ticketing, attendance, hospitality, and guest services',
+    title: 'Patient Experience & Access',
+    subtitle:
+      'Patient registration, visitor services, family communications, and experience analytics',
     focusDomain: TRACKMIND_ROLE_DOMAIN.fanExperience,
     kpiPermissionKeys: [K.kpiFanView],
     quickActions: [
-      { id: 'ticketing', label: 'Ticketing workflows', permission: K.fanExperienceManage },
+      { id: 'ticketing', label: 'Patient access workflows', permission: K.fanExperienceManage },
       {
         id: 'analytics',
-        label: 'Fan analytics',
+        label: 'Experience analytics',
         permission: K.analyticsView,
         route: CANONICAL_ROUTES.platformIntelligence,
       },

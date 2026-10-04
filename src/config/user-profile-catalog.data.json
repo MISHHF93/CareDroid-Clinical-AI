@@ -416,7 +416,7 @@
   },
   {
     "saasRole": "racetrack-admin",
-    "label": "Racetrack Administrator",
+    "label": "Facility Operations Administrator",
     "domain": "trackmind",
     "hierarchyLevel": 5,
     "emergencyRoleId": null,
@@ -430,13 +430,13 @@
     },
     "requiredToolIds": ["calculators"],
     "restrictedToolIds": ["protocols", "differential-ai", "simulation-suite", "fleet-command"],
-    "profileBenefits": "TrackMind enterprise hub, org administration, and race-day configuration.",
+    "profileBenefits": "TrackMind enterprise hub, facility administration, and clinical operations configuration.",
     "assignableOrganizationTypes": ["racetrack"],
     "requiredEntitlementPacks": ["trackmind"]
   },
   {
     "saasRole": "race-day-operations-manager",
-    "label": "Race Day Operations Manager",
+    "label": "Clinical Operations & Incident Manager",
     "domain": "trackmind",
     "hierarchyLevel": 4,
     "emergencyRoleId": null,
@@ -447,13 +447,13 @@
     "toolPolicy": { "allowedPacks": ["core-platform", "trackmind"], "restrictedToolIds": [] },
     "requiredToolIds": ["fleet-command", "route-optimizer"],
     "restrictedToolIds": ["protocols", "differential-ai", "simulation-suite"],
-    "profileBenefits": "Race-day operations console and intelligence modules.",
+    "profileBenefits": "Clinical operations console and incident command intelligence modules.",
     "assignableOrganizationTypes": ["racetrack"],
     "requiredEntitlementPacks": ["trackmind"]
   },
   {
     "saasRole": "steward",
-    "label": "Racing Steward",
+    "label": "Clinical Governance Steward",
     "domain": "trackmind",
     "hierarchyLevel": 4,
     "emergencyRoleId": null,
@@ -467,13 +467,13 @@
     },
     "requiredToolIds": ["calculators"],
     "restrictedToolIds": ["simulation-suite", "fleet-command", "protocols"],
-    "profileBenefits": "Stewarding workspace, incident review, and audit visibility.",
+    "profileBenefits": "Clinical governance workspace, safety incident review, and audit visibility.",
     "assignableOrganizationTypes": ["racetrack"],
     "requiredEntitlementPacks": ["trackmind"]
   },
   {
     "saasRole": "equine-welfare-officer",
-    "label": "Equine Welfare Officer",
+    "label": "Patient Safety & Quality Officer",
     "domain": "trackmind",
     "hierarchyLevel": 3,
     "emergencyRoleId": null,
@@ -484,13 +484,13 @@
     "toolPolicy": { "allowedPacks": ["core-platform", "trackmind"], "restrictedToolIds": [] },
     "requiredToolIds": ["calculators"],
     "restrictedToolIds": ["fleet-command", "simulation-suite", "protocols"],
-    "profileBenefits": "Equine welfare monitoring and maturity dashboards.",
+    "profileBenefits": "Patient safety observations, care quality maturity dashboards, and risk monitoring.",
     "assignableOrganizationTypes": ["racetrack"],
     "requiredEntitlementPacks": ["trackmind"]
   },
   {
     "saasRole": "veterinarian",
-    "label": "Veterinarian",
+    "label": "Clinical Medical Officer",
     "domain": "trackmind",
     "hierarchyLevel": 3,
     "emergencyRoleId": null,
@@ -501,7 +501,7 @@
     "toolPolicy": { "allowedPacks": ["core-platform", "trackmind"], "restrictedToolIds": [] },
     "requiredToolIds": ["calculators", "protocols"],
     "restrictedToolIds": ["fleet-command", "simulation-suite"],
-    "profileBenefits": "Veterinary records, TrackMind clinical workflows, and welfare alerts.",
+    "profileBenefits": "Clinical records, TrackMind clinical workflows, and patient safety alerts.",
     "assignableOrganizationTypes": ["racetrack"],
     "requiredEntitlementPacks": ["trackmind"]
   },

@@ -78,7 +78,7 @@ export const SURVEILLANCE_NEXUS_ROUTES: readonly SurveillanceNexusRouteLink[] = 
   },
   {
     id: 'trackmind',
-    label: 'TrackMind workspace',
+    label: 'Clinical operations workspace',
     route: CANONICAL_ROUTES.trackMindWorkspace,
     permission: TRACKMIND_PERMISSION_KEYS.workspaceView,
     domain: SURVEILLANCE_INTEGRATION_DOMAIN.raceDay,
@@ -112,12 +112,12 @@ export const SURVEILLANCE_KPI_ARTIFACTS = Object.freeze([
   },
   {
     id: 'welfare_safe_zones',
-    label: 'Welfare-safe zones',
+    label: 'Patient safety zones',
     permission: TRACKMIND_PERMISSION_KEYS.kpiWelfareView,
   },
   {
     id: 'raceday_ready',
-    label: 'Race-day readiness',
+    label: 'Clinical shift readiness',
     permission: TRACKMIND_PERMISSION_KEYS.kpiRaceDayView,
   },
 ]);

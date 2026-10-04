@@ -26,7 +26,7 @@ export const TRACKMIND_KPI_CATALOG: readonly TrackMindKpiDefinition[] = Object.f
   },
   {
     id: 'race_readiness',
-    label: 'Race-day readiness',
+    label: 'Clinical operations readiness',
     permission: K.kpiRaceDayView,
     domain: 'race_day',
   },
@@ -44,13 +44,13 @@ export const TRACKMIND_KPI_CATALOG: readonly TrackMindKpiDefinition[] = Object.f
   },
   {
     id: 'welfare_restrictions',
-    label: 'Active welfare restrictions',
+    label: 'Active clinical safety restrictions',
     permission: K.kpiWelfareView,
     domain: 'welfare',
   },
   {
     id: 'welfare_incidents',
-    label: 'Welfare incidents (7d)',
+    label: 'Safety & care quality incidents (7d)',
     permission: K.kpiWelfareView,
     domain: 'welfare',
   },
@@ -68,7 +68,7 @@ export const TRACKMIND_KPI_CATALOG: readonly TrackMindKpiDefinition[] = Object.f
   },
   {
     id: 'surface_readiness',
-    label: 'Track surface readiness',
+    label: 'Clinical facility readiness',
     permission: K.kpiFacilitiesView,
     domain: 'facilities',
   },
@@ -128,13 +128,13 @@ export const TRACKMIND_KPI_CATALOG: readonly TrackMindKpiDefinition[] = Object.f
   },
   {
     id: 'attendance_trend',
-    label: 'Attendance trend',
+    label: 'Patient volume & attendance trend',
     permission: K.kpiFanView,
     domain: 'fan_experience',
   },
   {
     id: 'hospitality_sla',
-    label: 'Hospitality SLA',
+    label: 'Patient experience SLA',
     permission: K.kpiFanView,
     domain: 'fan_experience',
   },

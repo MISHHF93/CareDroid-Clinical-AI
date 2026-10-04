@@ -1,5 +1,5 @@
 /**
- * Canonical TrackMind Nexus role catalog — 20 racetrack operating personas.
+ * Canonical TrackMind Nexus role catalog — 20 clinical operating personas.
  * Normalize legacy SaaS / governance aliases via TRACKMIND_ROLE_ALIASES.
  */
 
@@ -94,7 +94,7 @@ export const TRACKMIND_ROLE_DEFINITIONS: Record<TrackMindRoleId, TrackMindRoleDe
       label: 'Organization Admin',
       shortLabel: 'Org Admin',
       description:
-        'Organization governance, racetrack portfolio, users, roles, and executive dashboards.',
+        'Organization governance, clinical facility portfolio, users, roles, and executive dashboards.',
       domain: TRACKMIND_ROLE_DOMAIN.governance,
       primaryScope: TRACKMIND_SCOPE.organization,
       readOnly: false,
@@ -102,9 +102,9 @@ export const TRACKMIND_ROLE_DEFINITIONS: Record<TrackMindRoleId, TrackMindRoleDe
     }),
     [R.racetrackAdmin]: Object.freeze({
       id: R.racetrackAdmin,
-      label: 'Racetrack Admin',
-      shortLabel: 'Track Admin',
-      description: 'Local racetrack administration, operational configuration, and audit export.',
+      label: 'Facility Operations Admin',
+      shortLabel: 'Facility Admin',
+      description: 'Local facility administration, operational configuration, and audit export.',
       domain: TRACKMIND_ROLE_DOMAIN.governance,
       primaryScope: TRACKMIND_SCOPE.racetrack,
       readOnly: false,
@@ -112,10 +112,10 @@ export const TRACKMIND_ROLE_DEFINITIONS: Record<TrackMindRoleId, TrackMindRoleDe
     }),
     [R.raceDayOperationsManager]: Object.freeze({
       id: R.raceDayOperationsManager,
-      label: 'Race-Day Operations Manager',
-      shortLabel: 'Race-Day Ops',
+      label: 'Clinical Operations & Incident Manager',
+      shortLabel: 'Clinical Ops',
       description:
-        'Race-day command, readiness, incidents, approvals queue, and live operational timeline.',
+        'Clinical operations command, shift readiness, clinical incidents, approvals queue, and live operational timeline.',
       domain: TRACKMIND_ROLE_DOMAIN.raceDayOps,
       primaryScope: TRACKMIND_SCOPE.racetrack,
       readOnly: false,
@@ -123,10 +123,10 @@ export const TRACKMIND_ROLE_DEFINITIONS: Record<TrackMindRoleId, TrackMindRoleDe
     }),
     [R.steward]: Object.freeze({
       id: R.steward,
-      label: 'Steward',
+      label: 'Clinical Governance Steward',
       shortLabel: 'Steward',
       description:
-        'Steward command center, inquiries, incidents, evidence review, and governed decisions.',
+        'Clinical governance command center, safety inquiries, adverse incidents, clinical evidence review, and governed decisions.',
       domain: TRACKMIND_ROLE_DOMAIN.stewarding,
       primaryScope: TRACKMIND_SCOPE.racetrack,
       readOnly: false,
@@ -134,10 +134,10 @@ export const TRACKMIND_ROLE_DEFINITIONS: Record<TrackMindRoleId, TrackMindRoleDe
     }),
     [R.starterRaceOfficial]: Object.freeze({
       id: R.starterRaceOfficial,
-      label: 'Starter / Race Official',
-      shortLabel: 'Starter',
+      label: 'Patient Flow Coordinator',
+      shortLabel: 'Patient Flow',
       description:
-        'Starting gate readiness, race flow indicators, and official race-day status updates.',
+        'Triage and bed readiness, patient admission flow indicators, and department operational status updates.',
       domain: TRACKMIND_ROLE_DOMAIN.racingControl,
       primaryScope: TRACKMIND_SCOPE.racetrack,
       readOnly: false,
@@ -145,10 +145,10 @@ export const TRACKMIND_ROLE_DEFINITIONS: Record<TrackMindRoleId, TrackMindRoleDe
     }),
     [R.paddockOfficial]: Object.freeze({
       id: R.paddockOfficial,
-      label: 'Paddock Official',
-      shortLabel: 'Paddock',
+      label: 'Patient Intake Official',
+      shortLabel: 'Intake',
       description:
-        'Paddock operations, horse arrivals, inspections, readiness checks, and paddock incidents.',
+        'Patient intake operations, ambulatory arrivals, preliminary inspections, triage readiness checks, and intake incidents.',
       domain: TRACKMIND_ROLE_DOMAIN.paddock,
       primaryScope: TRACKMIND_SCOPE.racetrack,
       readOnly: false,
@@ -156,10 +156,10 @@ export const TRACKMIND_ROLE_DEFINITIONS: Record<TrackMindRoleId, TrackMindRoleDe
     }),
     [R.equineWelfareOfficer]: Object.freeze({
       id: R.equineWelfareOfficer,
-      label: 'Equine Welfare Officer',
-      shortLabel: 'Welfare',
+      label: 'Patient Safety & Quality Officer',
+      shortLabel: 'Safety & Quality',
       description:
-        'Welfare observations, horse lifecycle signals, restrictions, and welfare incidents.',
+        'Patient safety observations, clinical risk signals, care quality restrictions, and adverse event incidents.',
       domain: TRACKMIND_ROLE_DOMAIN.equineWelfare,
       primaryScope: TRACKMIND_SCOPE.racetrack,
       readOnly: false,
@@ -167,10 +167,10 @@ export const TRACKMIND_ROLE_DEFINITIONS: Record<TrackMindRoleId, TrackMindRoleDe
     }),
     [R.veterinarian]: Object.freeze({
       id: R.veterinarian,
-      label: 'Veterinarian',
-      shortLabel: 'Vet',
+      label: 'Clinical Attending / Medical Officer',
+      shortLabel: 'Medical Officer',
       description:
-        'Veterinary records, examinations, clearance metadata, and privacy-scoped medical data.',
+        'Clinical patient records, physical examinations, medical clearance metadata, and HIPAA-governed health records.',
       domain: TRACKMIND_ROLE_DOMAIN.veterinary,
       primaryScope: TRACKMIND_SCOPE.racetrack,
       readOnly: false,
@@ -178,10 +178,10 @@ export const TRACKMIND_ROLE_DEFINITIONS: Record<TrackMindRoleId, TrackMindRoleDe
     }),
     [R.trainerLiaison]: Object.freeze({
       id: R.trainerLiaison,
-      label: 'Trainer Liaison / Horse Operations Coordinator',
-      shortLabel: 'Horse Ops',
+      label: 'Care Coordination & Transport Liaison',
+      shortLabel: 'Care Coordination',
       description:
-        'Horse profile operations, trainer assignments, entries, logistics, and transport records.',
+        'Patient profile operations, attending physician assignments, admission logistics, and inter-facility transport records.',
       domain: TRACKMIND_ROLE_DOMAIN.horseOps,
       primaryScope: TRACKMIND_SCOPE.racetrack,
       readOnly: false,
@@ -199,9 +199,10 @@ export const TRACKMIND_ROLE_DEFINITIONS: Record<TrackMindRoleId, TrackMindRoleDe
     }),
     [R.facilitiesManager]: Object.freeze({
       id: R.facilitiesManager,
-      label: 'Facilities Manager',
-      shortLabel: 'Facilities',
-      description: 'Facility readiness, inspections, maintenance, work orders, and surface status.',
+      label: 'Facilities & BioMed Manager',
+      shortLabel: 'Facilities & BioMed',
+      description:
+        'Facility readiness, clinical inspections, biomedical maintenance, work orders, and department status.',
       domain: TRACKMIND_ROLE_DOMAIN.facilities,
       primaryScope: TRACKMIND_SCOPE.racetrack,
       readOnly: false,
@@ -229,9 +230,10 @@ export const TRACKMIND_ROLE_DEFINITIONS: Record<TrackMindRoleId, TrackMindRoleDe
     }),
     [R.ticketingFanExperienceManager]: Object.freeze({
       id: R.ticketingFanExperienceManager,
-      label: 'Ticketing / Fan Experience Manager',
-      shortLabel: 'Fan Experience',
-      description: 'Ticketing, attendance, hospitality, guest services, and fan analytics.',
+      label: 'Patient Experience & Access Manager',
+      shortLabel: 'Patient Experience',
+      description:
+        'Patient access, registration, visitor services, family communications, and experience analytics.',
       domain: TRACKMIND_ROLE_DOMAIN.fanExperience,
       primaryScope: TRACKMIND_SCOPE.racetrack,
       readOnly: false,
@@ -239,10 +241,10 @@ export const TRACKMIND_ROLE_DEFINITIONS: Record<TrackMindRoleId, TrackMindRoleDe
     }),
     [R.executiveLeadership]: Object.freeze({
       id: R.executiveLeadership,
-      label: 'Executive / Track Leadership',
+      label: 'Executive / Healthcare Leadership',
       shortLabel: 'Executive',
       description:
-        'Executive dashboard, operational KPIs, compliance posture, and federation benchmarking.',
+        'Executive dashboard, operational KPIs, compliance posture, and network benchmarking.',
       domain: TRACKMIND_ROLE_DOMAIN.executive,
       primaryScope: TRACKMIND_SCOPE.organization,
       readOnly: true,
@@ -303,6 +305,21 @@ export const TRACKMIND_ROLE_ALIASES: Record<string, TrackMindRoleId> = Object.fr
   org_admin: R.organizationAdmin,
   racetrack_admin: R.racetrackAdmin,
   track_admin: R.racetrackAdmin,
+  facility_admin: R.racetrackAdmin,
+  facility_operations_admin: R.racetrackAdmin,
+  clinical_ops: R.raceDayOperationsManager,
+  clinical_operations_manager: R.raceDayOperationsManager,
+  patient_flow: R.starterRaceOfficial,
+  patient_flow_coordinator: R.starterRaceOfficial,
+  patient_intake: R.paddockOfficial,
+  patient_intake_official: R.paddockOfficial,
+  patient_safety_officer: R.equineWelfareOfficer,
+  quality_officer: R.equineWelfareOfficer,
+  medical_officer: R.veterinarian,
+  clinical_attending: R.veterinarian,
+  care_coordination: R.trainerLiaison,
+  care_coordination_liaison: R.trainerLiaison,
+  patient_experience_manager: R.ticketingFanExperienceManager,
   race_day_manager: R.raceDayOperationsManager,
   race_day_operations_manager: R.raceDayOperationsManager,
   operations_manager: R.raceDayOperationsManager,

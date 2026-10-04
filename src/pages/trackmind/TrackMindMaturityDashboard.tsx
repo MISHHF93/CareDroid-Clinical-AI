@@ -28,7 +28,7 @@ const TRACKMIND_MATURITY_ROUTE_CHROME = Object.freeze({
  * saying what is behind it. Only five of the nine domains call a real audit
  * (operations, safety, compliance, security, data quality). The other four
  * return a constant regardless of platform state -- AI governance is literally
- * `return 66`, and facilities/finance/equine welfare compute
+ * `return 66`, and facilities/finance/patient safety & care quality compute
  * `base + hardcodedList.length * 6`. That is 40% of the weight behind the
  * overall number. The model now labels each dimension with a `provenance`, and
  * every score on this page is shown next to that label.

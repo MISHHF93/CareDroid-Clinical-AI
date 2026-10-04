@@ -163,11 +163,11 @@ export const TRACKMIND_MATURITY_DOMAINS = Object.freeze([
     description:
       'Patient health monitoring, clinical safety guardrails, adverse event response, and care quality audits.',
     levelCriteria: [
-      'Welfare incidents logged informally; no central registry.',
-      'Veterinary rounds documented but not linked to track operations.',
-      'Welfare checklists, withdrawal rules, and vet escalation paths are standardized.',
-      'Welfare KPIs tracked per meet with audit-ready incident timelines.',
-      'Predictive welfare signals, biomechanics review, and third-party welfare benchmarking.',
+      'Safety incidents logged informally; no central clinical registry.',
+      'Clinical rounds documented but not linked to operational emergency workflows.',
+      'Clinical safety checklists, contraindication rules, and attending escalation pathways are standardized.',
+      'Patient safety KPIs tracked per shift with audit-ready incident timelines.',
+      'Predictive clinical deterioration signals, patient acuity review, and healthcare quality benchmarking.',
     ],
     indicators: [
       'Clinical safety clearance workflow',
@@ -599,7 +599,7 @@ export function auditTrackMindMaturity(options = {} as any) {
   return Object.freeze({
     generatedAt: new Date().toISOString(),
     goal: 'Score CareDroid operating system maturity across operations, safety, compliance, security, care quality, facilities, finance, AI governance, and data quality',
-    framework: 'TrackMind Operating System Maturity',
+    framework: 'CareDroid Clinical Operations Maturity',
     maturityLevels: TRACKMIND_MATURITY_LEVELS,
     domains: TRACKMIND_MATURITY_DOMAINS.map(({ id, label, weight, owner }) =>
       Object.freeze({ id, label, weight, owner }),

@@ -87,11 +87,17 @@ const COMMERCIAL_CAPABILITY_GROUPS = Object.freeze([
   },
   {
     id: 'trackmind-maturity',
-    title: 'TrackMind Maturity Dashboard',
+    title: 'Clinical Operations Maturity Dashboard',
     description:
-      'Nine-domain operating system maturity for operations, safety, compliance, security, equine welfare, facilities, finance, AI governance, and data quality.',
+      'Nine-domain operating system maturity for operations, safety, compliance, security, care quality, facilities, finance, AI governance, and data quality.',
     path: CANONICAL_ROUTES.trackMindMaturity,
-    aliases: ['trackmind', 'operating system maturity', 'equine welfare', 'maturity framework'],
+    aliases: [
+      'trackmind',
+      'operating system maturity',
+      'care quality',
+      'maturity framework',
+      'clinical operations maturity',
+    ],
   },
   {
     id: 'customer-success',

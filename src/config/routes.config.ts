@@ -2077,7 +2077,7 @@ export const ROUTE_RECORDS = Object.freeze([
     aliases: [],
     navGroup: 'account',
     notes:
-      'TrackMind Operating System hub — role-based landing workspace for racetrack/equine-operations roles (steward, veterinarian, paddock official, security manager, etc.), linking out to the TrackMind maturity, enterprise platform, and platform intelligence surfaces below.',
+      'TrackMind Operating System hub — role-based landing workspace for clinical operations and care governance roles (clinical operations lead, medical director, triage official, safety manager, etc.), linking out to the TrackMind maturity, enterprise platform, and platform intelligence surfaces below.',
   }),
   Object.freeze({
     id: 'trackMindMaturity',
@@ -2089,7 +2089,7 @@ export const ROUTE_RECORDS = Object.freeze([
     aliases: [],
     navGroup: 'account',
     notes:
-      'TrackMind Operating System Maturity Framework — nine-domain scoring for operations, safety, compliance, security, equine welfare, facilities, finance, AI governance, and data quality.',
+      'TrackMind Operating System Maturity Framework — nine-domain scoring for operations, safety, compliance, security, care quality, facilities, finance, AI governance, and data quality.',
   }),
   Object.freeze({
     id: 'enterprisePlatform',
