@@ -182,7 +182,8 @@ export const ENTERPRISE_PLATFORM_MODULES = Object.freeze([
     id: ENTERPRISE_PLATFORM_MODULE.PORTFOLIO_MANAGEMENT,
     prompt: 113,
     label: 'Portfolio management',
-    description: 'Organizations operating multiple racetracks.',
+    description:
+      'Health systems and organizations operating multiple hospitals and clinical facilities.',
     route: '/enterprise-platform#portfolio',
     relatedRoutes: ['/organization-intelligence', '/tenant-admin'],
   }),
@@ -198,7 +199,8 @@ export const ENTERPRISE_PLATFORM_MODULES = Object.freeze([
     id: ENTERPRISE_PLATFORM_MODULE.SUSTAINABILITY_ESG,
     prompt: 115,
     label: 'Sustainability & ESG',
-    description: 'Sustainability metrics, welfare metrics, and efficiency indicators.',
+    description:
+      'Sustainability metrics, patient care quality indicators, and environmental efficiency.',
     route: '/enterprise-platform#esg',
     relatedRoutes: ['/trackmind-maturity', '/equity-monitoring'],
   }),

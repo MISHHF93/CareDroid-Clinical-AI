@@ -143,7 +143,7 @@ export function resolveSaasToolResonance(saasRole: string | null | undefined): S
           normalized === 'steward' ||
           normalized === 'veterinarian' ||
           normalized === 'equine-welfare-officer'
-        ? 'TrackMind operations tools'
+        ? 'Clinical operations tools'
         : normalized === 'fleet-operator'
           ? 'Fleet operations tools'
           : normalized === 'biomedical-engineer' || normalized === 'lab-technician'

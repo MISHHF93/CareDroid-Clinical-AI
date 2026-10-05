@@ -430,7 +430,7 @@
     },
     "requiredToolIds": ["calculators"],
     "restrictedToolIds": ["protocols", "differential-ai", "simulation-suite", "fleet-command"],
-    "profileBenefits": "TrackMind enterprise hub, facility administration, and clinical operations configuration.",
+    "profileBenefits": "Enterprise clinical hub, facility administration, and clinical operations configuration.",
     "assignableOrganizationTypes": ["racetrack"],
     "requiredEntitlementPacks": ["trackmind"]
   },
@@ -501,7 +501,7 @@
     "toolPolicy": { "allowedPacks": ["core-platform", "trackmind"], "restrictedToolIds": [] },
     "requiredToolIds": ["calculators", "protocols"],
     "restrictedToolIds": ["fleet-command", "simulation-suite"],
-    "profileBenefits": "Clinical records, TrackMind clinical workflows, and patient safety alerts.",
+    "profileBenefits": "Clinical records, clinical operations workflows, and patient safety alerts.",
     "assignableOrganizationTypes": ["racetrack"],
     "requiredEntitlementPacks": ["trackmind"]
   },

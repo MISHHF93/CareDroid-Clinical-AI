@@ -397,7 +397,7 @@ const SAAS_PROFILE_COPY_BASE: Readonly<
   'racetrack-admin': {
     personaTitle: 'Facility Operations Administrator',
     workspaceEyebrow: 'Clinical operations',
-    workspaceDescription: 'TrackMind enterprise hub and facility operations configuration.',
+    workspaceDescription: 'Enterprise clinical hub and facility operations configuration.',
     profileShellSubtitle:
       'Facility operations admin profile — enterprise and facility administration.',
     copilotIntro: 'Support facility operations configuration and organization setup.',
@@ -428,8 +428,8 @@ const SAAS_PROFILE_COPY_BASE: Readonly<
   veterinarian: {
     personaTitle: 'Clinical Medical Officer',
     workspaceEyebrow: 'Clinical medical',
-    workspaceDescription: 'Medical records and TrackMind clinical workflows.',
-    profileShellSubtitle: 'Medical officer profile — clinical TrackMind tools.',
+    workspaceDescription: 'Medical records and clinical operations workflows.',
+    profileShellSubtitle: 'Medical officer profile — clinical operations tools.',
     copilotIntro: 'Support clinical medical assessment documentation.',
   },
   'executive-leadership': {
