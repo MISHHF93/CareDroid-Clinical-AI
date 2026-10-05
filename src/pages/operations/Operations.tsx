@@ -19,7 +19,7 @@ import HospitalAutonomousOperationsMatrix from '../../components/operations/Hosp
 import './Operations.css';
 
 const OPERATIONS_HUB_ROUTE_CHROME = Object.freeze({
-  title: 'Default Operations',
+  title: 'Clinical & Hospital Operations',
   subtitle:
     'Unified command surfaces for hospital capacity, device telemetry, fleet, and system health.',
 });
@@ -106,7 +106,7 @@ export default function Operations() {
           <GraphicIconBadge iconKey="activity" accent="brand" size="md" />
           <div>
             <p className="operations-hub__title-text" data-testid="cd-page-title-text">
-              Default Operations
+              Clinical & Hospital Operations
             </p>
             <p>
               Unified command surfaces for hospital capacity, device telemetry, fleet, and system

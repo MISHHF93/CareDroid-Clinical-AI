@@ -2172,7 +2172,7 @@ export function TenantAdministrationCenter() {
             <li>{rolePreviewSummary.navigationRoutes.length} navigation routes</li>
             <li>{rolePreviewSummary.allowedWorkspaces.join(', ')}</li>
             <li>
-              Emergency: {rolePreviewSummary.emergencyRole || 'none'} · TrackMind:{' '}
+              Emergency: {rolePreviewSummary.emergencyRole || 'none'} · Clinical Operations:{' '}
               {rolePreviewSummary.trackMindRole || 'none'}
             </li>
           </ul>
