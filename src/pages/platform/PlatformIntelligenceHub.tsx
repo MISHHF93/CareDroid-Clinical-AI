@@ -198,7 +198,7 @@ export default function PlatformIntelligenceHub() {
       <p className="pi-hub__footer">
         <Link to={CANONICAL_ROUTES.trackMindWorkspace}>
           <Activity aria-hidden="true" />
-          TrackMind workspace
+          Clinical Operations workspace
           <ArrowUpRight aria-hidden="true" />
         </Link>
         <Link to={CANONICAL_ROUTES.trackMindMaturity}>

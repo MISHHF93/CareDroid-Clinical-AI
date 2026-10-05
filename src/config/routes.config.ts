@@ -2077,7 +2077,7 @@ export const ROUTE_RECORDS = Object.freeze([
     aliases: [],
     navGroup: 'account',
     notes:
-      'TrackMind Operating System hub — role-based landing workspace for clinical operations and care governance roles (clinical operations lead, medical director, triage official, safety manager, etc.), linking out to the TrackMind maturity, enterprise platform, and platform intelligence surfaces below.',
+      'CareDroid Clinical Operations workspace hub — role-based landing workspace for clinical operations and care governance roles (clinical operations lead, medical director, triage official, safety manager, etc.), linking out to the clinical maturity, enterprise platform, and platform intelligence surfaces below.',
   }),
   Object.freeze({
     id: 'trackMindMaturity',
@@ -2089,7 +2089,7 @@ export const ROUTE_RECORDS = Object.freeze([
     aliases: [],
     navGroup: 'account',
     notes:
-      'TrackMind Operating System Maturity Framework — nine-domain scoring for operations, safety, compliance, security, care quality, facilities, finance, AI governance, and data quality.',
+      'CareDroid Clinical Operations Maturity Framework — nine-domain scoring for operations, safety, compliance, security, care quality, facilities, finance, AI governance, and data quality.',
   }),
   Object.freeze({
     id: 'enterprisePlatform',
@@ -2101,7 +2101,7 @@ export const ROUTE_RECORDS = Object.freeze([
     aliases: [],
     navGroup: 'account',
     notes:
-      'TrackMind Enterprise Operating Platform — Prompts 99–116: benchmarking, franchise readiness, certification, risk, continuity, DR, assets, workforce, training, knowledge, playbooks, decision support, scenarios, strategy, portfolio, governance, ESG, architecture.',
+      'CareDroid Enterprise Operating Platform — Prompts 99–116: benchmarking, franchise readiness, certification, risk, continuity, DR, assets, workforce, training, knowledge, playbooks, decision support, scenarios, strategy, portfolio, governance, ESG, architecture.',
   }),
   Object.freeze({
     id: 'platformIntelligence',

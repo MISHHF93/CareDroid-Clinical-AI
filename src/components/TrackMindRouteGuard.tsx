@@ -13,7 +13,7 @@ function TrackMindAccessDenied({ requestedPath }) {
   const trackMindRole = useTrackMindRolePermissions();
   return (
     <section className="trackmind-access-denied" aria-live="polite">
-      <h1>TrackMind access restricted</h1>
+      <h1>Clinical Operations access restricted</h1>
       <p>
         Your role ({trackMindRole.roleLabel}) does not have permission to access{' '}
         <code>{requestedPath}</code>.

@@ -1413,7 +1413,7 @@ export function AppRoutes() {
           path={CANONICAL_ROUTES.trackMindMaturity}
           element={
             <TrackMindRouteGuard path={CANONICAL_ROUTES.trackMindMaturity}>
-              <LazyRoute label="Loading TrackMind maturity assessment...">
+              <LazyRoute label="Loading clinical operations maturity assessment...">
                 <TrackMindMaturityDashboard />
               </LazyRoute>
             </TrackMindRouteGuard>
@@ -1429,7 +1429,7 @@ export function AppRoutes() {
           path={CANONICAL_ROUTES.trackMindWorkspace}
           element={
             <TrackMindRouteGuard path={CANONICAL_ROUTES.trackMindWorkspace}>
-              <LazyRoute label="Loading TrackMind workspace...">
+              <LazyRoute label="Loading clinical operations workspace...">
                 <TrackMindWorkspaceHub />
               </LazyRoute>
             </TrackMindRouteGuard>

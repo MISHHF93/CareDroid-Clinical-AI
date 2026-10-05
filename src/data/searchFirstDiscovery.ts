@@ -100,6 +100,21 @@ const COMMERCIAL_CAPABILITY_GROUPS = Object.freeze([
     ],
   },
   {
+    id: 'clinical-operations-workspace',
+    title: 'Clinical Operations Workspace',
+    description:
+      'Role-based operations command, shift readiness, triage intake, and clinical care quality governance.',
+    path: CANONICAL_ROUTES.trackMindWorkspace,
+    aliases: [
+      'clinical operations',
+      'operations workspace',
+      'intake hub',
+      'triage operations',
+      'care quality',
+      'trackmind',
+    ],
+  },
+  {
     id: 'customer-success',
     title: 'Customer Success Platform',
     description:
