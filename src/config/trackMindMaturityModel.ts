@@ -74,7 +74,7 @@ export const TRACKMIND_MATURITY_DOMAINS = Object.freeze([
     weight: 14,
     baseScore: 68,
     owner: 'race_day_operations_manager',
-    ownerLabel: 'Track director / operations lead',
+    ownerLabel: 'Clinical operations director / shift lead',
     description: 'Shift handoff, queue visibility, throughput, and daily operating rhythm.',
     levelCriteria: [
       'No shared operating picture; decisions are ad hoc.',
@@ -181,8 +181,9 @@ export const TRACKMIND_MATURITY_DOMAINS = Object.freeze([
     weight: 10,
     baseScore: 56,
     owner: 'facilities_manager',
-    ownerLabel: 'Facilities / track superintendent',
-    description: 'Track surface, barns, equipment maintenance, and incident-ready infrastructure.',
+    ownerLabel: 'Facilities & biomedical engineering lead',
+    description:
+      'Clinical wards, specialized units, biomedical equipment maintenance, and incident-ready healthcare infrastructure.',
     levelCriteria: [
       'Maintenance requests handled verbally; no asset registry.',
       'Facilities log exists but is disconnected from operations.',

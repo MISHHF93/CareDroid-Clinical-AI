@@ -2,24 +2,7 @@
   "generatedAt": "2026-06-18T21:27:59.457Z",
   "goal": "Enterprise operating platform audit — Prompts 99–116",
   "promptsCovered": [
-    99,
-    100,
-    101,
-    102,
-    103,
-    104,
-    105,
-    106,
-    107,
-    108,
-    109,
-    110,
-    111,
-    112,
-    113,
-    114,
-    115,
-    116
+    99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116
   ],
   "overallScore": 83,
   "overallStatus": "ready",
@@ -35,10 +18,7 @@
       "label": "Sustainability & ESG",
       "description": "Sustainability metrics, welfare metrics, and efficiency indicators.",
       "route": "/enterprise-platform#esg",
-      "relatedRoutes": [
-        "/trackmind-maturity",
-        "/equity-monitoring"
-      ],
+      "relatedRoutes": ["/trackmind-maturity", "/equity-monitoring"],
       "assessment": {
         "id": "sustainability_esg",
         "label": "Sustainability & ESG",
@@ -108,10 +88,7 @@
       "label": "Enterprise asset registry",
       "description": "Unified asset model for facilities, systems, equipment, and infrastructure.",
       "route": "/enterprise-platform#assets",
-      "relatedRoutes": [
-        "/assets",
-        "/devices"
-      ],
+      "relatedRoutes": ["/assets", "/devices"],
       "assessment": {
         "id": "enterprise_asset_registry",
         "label": "Enterprise asset registry",
@@ -151,38 +128,22 @@
             {
               "type": "facility",
               "label": "Facilities",
-              "examples": [
-                "Main grandstand",
-                "Barn complex",
-                "Track surface"
-              ]
+              "examples": ["Main grandstand", "Barn complex", "Track surface"]
             },
             {
               "type": "system",
               "label": "Systems",
-              "examples": [
-                "Timing system",
-                "Video patrol",
-                "PA/communications"
-              ]
+              "examples": ["Timing system", "Video patrol", "PA/communications"]
             },
             {
               "type": "equipment",
               "label": "Equipment",
-              "examples": [
-                "Starting gate",
-                "Ambulance cart",
-                "Water truck"
-              ]
+              "examples": ["Starting gate", "Ambulance cart", "Water truck"]
             },
             {
               "type": "infrastructure",
               "label": "Infrastructure",
-              "examples": [
-                "Power feed",
-                "Network edge",
-                "Irrigation"
-              ]
+              "examples": ["Power feed", "Network edge", "Irrigation"]
             }
           ],
           "assets": [
@@ -239,41 +200,25 @@
             {
               "type": "facility",
               "label": "Facilities",
-              "examples": [
-                "Main grandstand",
-                "Barn complex",
-                "Track surface"
-              ],
+              "examples": ["Main grandstand", "Barn complex", "Track surface"],
               "count": 1
             },
             {
               "type": "system",
               "label": "Systems",
-              "examples": [
-                "Timing system",
-                "Video patrol",
-                "PA/communications"
-              ],
+              "examples": ["Timing system", "Video patrol", "PA/communications"],
               "count": 2
             },
             {
               "type": "equipment",
               "label": "Equipment",
-              "examples": [
-                "Starting gate",
-                "Ambulance cart",
-                "Water truck"
-              ],
+              "examples": ["Starting gate", "Ambulance cart", "Water truck"],
               "count": 2
             },
             {
               "type": "infrastructure",
               "label": "Infrastructure",
-              "examples": [
-                "Power feed",
-                "Network edge",
-                "Irrigation"
-              ],
+              "examples": ["Power feed", "Network edge", "Irrigation"],
               "count": 1
             }
           ]

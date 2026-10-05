@@ -6314,7 +6314,7 @@ route|tools|active|/tools|/all-tools|/clinical-tools|/catalog,route-tools,tools,
 trackMindMaturity route,route-trackMindMaturity,account,account,unknown,unknown,name,0.92
 /trackmind-maturity,route-trackMindMaturity,account,account,unknown,unknown,route,0.9
 route|account|active,route-trackMindMaturity,account,account,unknown,unknown,tags,0.78
-"TrackMind Operating System Maturity Framework — nine-domain scoring for operations, safety, compliance, security, equine welfare, facilities, finance, AI governance, and data quality.",route-trackMindMaturity,account,account,unknown,unknown,intent,0.88
+"TrackMind Operating System Maturity Framework — nine-domain scoring for operations, safety, compliance, security, care quality, facilities, finance, AI governance, and data quality.",route-trackMindMaturity,account,account,unknown,unknown,intent,0.88
 usage route,route-usage,operations,operations,unknown,unknown,name,0.92
 /usage,route-usage,operations,operations,unknown,unknown,route,0.9
 route|operations|active,route-usage,operations,operations,unknown,unknown,tags,0.78

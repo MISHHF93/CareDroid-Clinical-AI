@@ -39,6 +39,58 @@ import './TrackMindWorkspaceHub.css';
  * they carry `id`. Reading only `label` rendered every ROUTE_RECORDS hit as a
  * bare path ('/workflows'), so fall through id, then the path itself.
  */
+function formatClinicalDomain(domain: string): string {
+  const map: Record<string, string> = {
+    platform_admin: 'Platform Administration',
+    governance: 'Clinical Governance',
+    race_day_ops: 'Clinical Operations & Emergency Response',
+    stewarding: 'Clinical Governance & Safety Review',
+    racing_control: 'Patient Flow & Intake Coordination',
+    paddock: 'Patient Triage & Intake',
+    equine_welfare: 'Patient Safety & Care Quality',
+    veterinary: 'Clinical Medical Care',
+    horse_ops: 'Care Coordination & Logistics',
+    security: 'Facility Security & Access Control',
+    facilities: 'Facilities & Biomedical Engineering',
+    compliance: 'Healthcare Compliance & Regulatory',
+    finance: 'Financial Operations & Billing',
+    fan_experience: 'Patient Experience & Access',
+    executive: 'Executive & Health System Leadership',
+    audit: 'Clinical Audit & Quality Registry',
+    analytics: 'Clinical & Operational Intelligence',
+    support: 'Platform Support & Diagnostics',
+    limited: 'Assigned Clinical Tasks',
+    welfare: 'Patient Safety & Care Quality',
+    race_day: 'Clinical Operations',
+  };
+  return map[domain] || domain.replace(/[-_]+/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function formatClinicalScope(scope: string): string {
+  const map: Record<string, string> = {
+    platform: 'Platform-wide',
+    federation: 'Health System Network',
+    organization: 'Facility / Health System',
+    racetrack: 'Hospital Campus / Department',
+    assigned: 'Assigned Duties',
+  };
+  return map[scope] || scope.replace(/[-_]+/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function formatChannelName(channel: string): string {
+  const map: Record<string, string> = {
+    operational: 'Clinical Operations',
+    approval: 'Governance Approvals',
+    executive: 'Executive Briefings',
+    welfare: 'Patient Safety Alerts',
+    security: 'Security & Access Alerts',
+    compliance: 'Compliance Notifications',
+    finance: 'Financial Approvals',
+    platform: 'Platform Diagnostics',
+  };
+  return map[channel] || channel.replace(/[-_]+/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 function labelForRoute(route: string): string {
   const record = getRouteByPath(route) as { label?: string; id?: string } | null;
   if (record?.label) return record.label;
@@ -144,11 +196,11 @@ export default function TrackMindWorkspaceHub() {
       <dl className="trackmind-hub__facts">
         <div>
           <dt>Focus domain</dt>
-          <dd>{workspace.focusDomain}</dd>
+          <dd>{formatClinicalDomain(workspace.focusDomain)}</dd>
         </div>
         <div>
           <dt>Primary scope</dt>
-          <dd>{trackMind.primaryScope}</dd>
+          <dd>{formatClinicalScope(trackMind.primaryScope)}</dd>
         </div>
         <div>
           <dt>Permissions granted</dt>
@@ -175,7 +227,7 @@ export default function TrackMindWorkspaceHub() {
               {trackMind.kpis.map((kpi) => (
                 <li key={kpi.id}>
                   <strong>{kpi.label}</strong>
-                  <span>{kpi.domain}</span>
+                  <span>{formatClinicalDomain(kpi.domain)}</span>
                 </li>
               ))}
             </ul>
@@ -245,7 +297,7 @@ export default function TrackMindWorkspaceHub() {
           </h2>
           <ul className="trackmind-hub__channels">
             {trackMind.notificationChannels.map((channel) => (
-              <li key={channel}>{channel}</li>
+              <li key={channel}>{formatChannelName(channel)}</li>
             ))}
           </ul>
         </section>

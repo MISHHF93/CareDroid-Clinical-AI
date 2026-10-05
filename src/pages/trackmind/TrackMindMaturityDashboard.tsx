@@ -255,7 +255,7 @@ export default function TrackMindMaturityDashboard() {
 
       <p className="tm-maturity__footer">
         <Link to={CANONICAL_ROUTES.trackMindWorkspace}>
-          Back to the TrackMind workspace
+          Back to Clinical Operations workspace
           <ArrowUpRight aria-hidden="true" />
         </Link>
       </p>

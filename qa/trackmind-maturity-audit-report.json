@@ -1,7 +1,7 @@
 {
   "generatedAt": "2026-06-18T21:27:58.586Z",
-  "goal": "Score TrackMind operating system maturity across operations, safety, compliance, security, equine welfare, facilities, finance, AI governance, and data quality",
-  "framework": "TrackMind Operating System Maturity",
+  "goal": "Score CareDroid operating system maturity across operations, safety, compliance, security, care quality, facilities, finance, AI governance, and data quality",
+  "framework": "CareDroid Clinical Operations Maturity",
   "maturityLevels": [
     {
       "id": "initial",
@@ -44,7 +44,7 @@
       "id": "operations",
       "label": "Operations",
       "weight": 14,
-      "owner": "Track director / operations lead"
+      "owner": "Chief Medical Officer / Clinical Operations Lead"
     },
     {
       "id": "safety",
@@ -66,15 +66,15 @@
     },
     {
       "id": "equine_welfare",
-      "label": "Equine welfare",
+      "label": "Patient safety & care quality",
       "weight": 12,
-      "owner": "Equine welfare officer / track veterinarian"
+      "owner": "Chief Medical Officer / Quality & Safety Officer"
     },
     {
       "id": "facilities",
       "label": "Facilities",
       "weight": 10,
-      "owner": "Facilities / track superintendent"
+      "owner": "Facilities / biomedical engineering lead"
     },
     {
       "id": "finance",
@@ -246,10 +246,7 @@
           "requiredSignals": 6,
           "clickDepth": 1,
           "passes": true,
-          "surfaces": [
-            "ShiftHandoffStrip",
-            "OperationalHandoffDomainBar"
-          ]
+          "surfaces": ["ShiftHandoffStrip", "OperationalHandoffDomainBar"]
         },
         "director": {
           "targetSeconds": 120,
@@ -377,7 +374,7 @@
       "level": "Managed"
     },
     {
-      "domain": "Equine welfare",
+      "domain": "Patient safety & care quality",
       "score": 52,
       "level": "Defined"
     },

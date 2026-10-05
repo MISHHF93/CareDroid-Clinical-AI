@@ -58,7 +58,7 @@ function moduleResult(moduleId, label, score, kpis, artifacts = {} as any) {
 /** Governed artifact entity types — Prompt 117. */
 export const UNIFIED_ARTIFACT_ENTITY_TYPES = Object.freeze([
   Object.freeze({ type: 'organization', label: 'Organization / tenant', governed: true }),
-  Object.freeze({ type: 'track', label: 'Racetrack site', governed: true }),
+  Object.freeze({ type: 'track', label: 'Clinical facility / site', governed: true }),
   Object.freeze({ type: 'patient', label: 'Patient / arrival entity', governed: true }),
   Object.freeze({ type: 'workflow', label: 'Workflow definition', governed: true }),
   Object.freeze({ type: 'kpi', label: 'KPI definition', governed: true }),
@@ -141,10 +141,10 @@ export const ENTERPRISE_METADATA_SCHEMA = Object.freeze([
     domains: ['patient', 'audit'],
   }),
   Object.freeze({
-    field: 'welfareTier',
+    field: 'careQualityTier',
     type: 'enum',
     required: false,
-    domains: ['equine', 'welfare'],
+    domains: ['clinical', 'care_quality'],
   }),
   Object.freeze({
     field: 'complianceTag',
@@ -700,14 +700,14 @@ export function assessFederationIntelligence() {
   const federations = Object.freeze([
     Object.freeze({
       id: 'FED-001',
-      name: 'Regional circuit',
+      name: 'Regional clinical network',
       tracks: 8,
       avgHealth: 76,
       status: 'healthy',
     }),
     Object.freeze({
       id: 'FED-002',
-      name: 'Training grounds network',
+      name: 'Specialized healthcare system',
       tracks: 4,
       avgHealth: 68,
       status: 'watch',
@@ -723,7 +723,7 @@ export function assessFederationIntelligence() {
     score,
     [
       kpi('federations', 'Federations tracked', federations.length, 1),
-      kpi('aggregate-tracks', 'Aggregate tracks', totalTracks, 4),
+      kpi('aggregate-tracks', 'Aggregate clinical sites', totalTracks, 4),
       kpi('federation-health', 'Federation health avg', Math.round(avgHealth), 70),
     ],
     { federations, anonymizedAggregation: true, totalTracks },

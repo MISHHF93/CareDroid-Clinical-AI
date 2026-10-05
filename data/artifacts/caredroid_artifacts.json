@@ -42893,10 +42893,10 @@
     "roles": "authenticated-user",
     "organizationTypes": "unknown",
     "riskLevel": "medium",
-    "description": "TrackMind Operating System Maturity Framework — nine-domain scoring for operations, safety, compliance, security, equine welfare, facilities, finance, AI governance, and data quality.",
+    "description": "TrackMind Operating System Maturity Framework — nine-domain scoring for operations, safety, compliance, security, care quality, facilities, finance, AI governance, and data quality.",
     "dependencies": "unknown",
     "tags": "route|account|active",
-    "embeddingText": "route-trackmindmaturity trackmindmaturity route route account trackmind-maturity unknown unknown account authenticated-user unknown medium trackmind operating system maturity framework nine-domain scoring for operations safety compliance security equine welfare facilities finance ai governance and data quality unknown route account active",
+    "embeddingText": "route-trackmindmaturity trackmindmaturity route route account trackmind-maturity unknown unknown account authenticated-user unknown medium trackmind operating system maturity framework nine-domain scoring for operations safety compliance security care quality facilities finance ai governance and data quality unknown route account active",
     "status": "active"
   },
   {

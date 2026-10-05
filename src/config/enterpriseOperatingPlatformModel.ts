@@ -57,7 +57,7 @@ function moduleResult(moduleId, label, score, kpis, artifacts = {} as any) {
 export const ANONYMIZED_BENCHMARK_COHORTS = Object.freeze([
   Object.freeze({
     cohortId: 'cohort-tier1',
-    label: 'Tier 1 tracks (n=12)',
+    label: 'Tier 1 clinical centers (n=12)',
     metrics: Object.freeze({
       receptionRegistrationSeconds: { p50: 52, p75: 58, p90: 64, unit: 's' },
       chargeNurseStatusSeconds: { p50: 22, p75: 28, p90: 35, unit: 's' },
@@ -68,7 +68,7 @@ export const ANONYMIZED_BENCHMARK_COHORTS = Object.freeze([
   }),
   Object.freeze({
     cohortId: 'cohort-regional',
-    label: 'Regional tracks (n=28)',
+    label: 'Regional clinical facilities (n=28)',
     metrics: Object.freeze({
       receptionRegistrationSeconds: { p50: 58, p75: 65, p90: 72, unit: 's' },
       chargeNurseStatusSeconds: { p50: 26, p75: 32, p90: 40, unit: 's' },
@@ -230,7 +230,7 @@ export function assessTrackCertification(signals = {} as any) {
 
   return moduleResult(
     ENTERPRISE_PLATFORM_MODULE.TRACK_CERTIFICATION,
-    'Track certification',
+    'Clinical facility certification',
     score,
     [
       kpi('evidence-collected', 'Evidence items collected', collected, 5),
@@ -283,7 +283,7 @@ export const ENTERPRISE_RISK_REGISTER = Object.freeze([
   }),
   Object.freeze({
     id: 'R-005',
-    category: 'equine_welfare',
+    category: 'care_quality',
     severity: 'medium',
     summary: 'Clinical safety incident registry incomplete',
     mitigation: 'Standardize clinical safety clearance workflow',
