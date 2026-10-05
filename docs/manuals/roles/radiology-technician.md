@@ -62,6 +62,7 @@ You have read access to patient name, MRN, and location for coordination purpose
 ### How to Report an Imaging Delay
 
 If an imaging exam cannot be completed on time:
+
 1. Identify the reason: patient not transport-ready, equipment issue, room occupied.
 2. Notify the ordering physician directly: "Imaging for [patient name] will be delayed by approximately [time] due to [reason]."
 3. In CareDroid, open the alert → **Document delay**:
@@ -74,6 +75,7 @@ If an imaging exam cannot be completed on time:
 ### How to Handle Modality Downtime
 
 If a modality (CT, X-ray, MRI, ultrasound) is unavailable:
+
 1. Notify your supervisor and IT Admin immediately.
 2. In CareDroid, click **Report equipment downtime** in the Alerts page.
 3. Review all pending imaging requests for the affected modality.
@@ -86,12 +88,12 @@ If a modality (CT, X-ray, MRI, ultrasound) is unavailable:
 
 ## Alerts You Receive
 
-| Alert | Meaning | Your action |
-|-------|---------|------------|
-| Urgent imaging request — STAT | CTAS 1–2 patient or physician-marked STAT order | Begin immediately. No delay. |
-| Imaging delay threshold | An imaging exam has been waiting beyond its expected turnaround | Investigate and notify ordering physician |
-| Modality downtime | A modality is not available | Report bottleneck, notify clinicians, arrange alternatives |
-| Imaging transport needed | Patient needs transport to imaging | Coordinate with ED nurse |
+| Alert                         | Meaning                                                         | Your action                                                |
+| ----------------------------- | --------------------------------------------------------------- | ---------------------------------------------------------- |
+| Urgent imaging request — STAT | CTAS 1–2 patient or physician-marked STAT order                 | Begin immediately. No delay.                               |
+| Imaging delay threshold       | An imaging exam has been waiting beyond its expected turnaround | Investigate and notify ordering physician                  |
+| Modality downtime             | A modality is not available                                     | Report bottleneck, notify clinicians, arrange alternatives |
+| Imaging transport needed      | Patient needs transport to imaging                              | Coordinate with ED nurse                                   |
 
 ---
 

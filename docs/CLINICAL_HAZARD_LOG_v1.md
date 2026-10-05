@@ -106,7 +106,7 @@ reviewer should re-grade every row.
   viewing — a real, if currently hypothetical, safety-relevant
   discrepancy risk.
 - **Severity:** Low today (no drift detected — not compared), but the
-  *absence of a guard* is the hazard, not a confirmed current bug.
+  _absence of a guard_ is the hazard, not a confirmed current bug.
 - **Current mitigation:** none.
 - **Status:** OPEN — needs either a shared implementation or a
   regression test asserting both paths agree on a shared fixture set.

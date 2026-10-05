@@ -22,7 +22,7 @@ Canonical source: `src/data/e2eRegressionChecklist.ts`.
 
 - [ ] Every registry tool path in KNOWN_TOOL_AREA_PATHS
 - [ ] Calculator routes in App.jsx match CALCULATOR_ROUTE_DEFS
-- [ ] /tools/* and /fleet/* unknown paths hit ToolsAreaFallback (not dashboard)
+- [ ] /tools/_ and /fleet/_ unknown paths hit ToolsAreaFallback (not dashboard)
 
 ## Catalog & discovery
 
@@ -46,4 +46,3 @@ Canonical source: `src/data/e2eRegressionChecklist.ts`.
 
 - [ ] Complete flattenManualQaChecklist() Tier C + PHQ-9 + dispatch-ai items
 - [ ] Verify 401/403 on tools API when logged out
-

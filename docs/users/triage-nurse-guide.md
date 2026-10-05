@@ -15,24 +15,26 @@ You assign the clinical priority that determines how fast every patient is seen.
 
 ## Your Screens
 
-| Screen | Route | Use |
-|--------|-------|-----|
-| Department Whiteboard | `/emergency/whiteboard` | Overview, high-risk patients |
-| Triage Queues | `/emergency/queues` | **Your primary work queue** |
-| Reception Workspace | `/emergency/reception` | Review arrivals, assist with intake |
-| Reassessment | `/emergency/reassessment` | Patients with overdue timers |
-| AI Copilot | `/emergency/copilot` | Clinical support for triage decisions |
+| Screen                | Route                     | Use                                   |
+| --------------------- | ------------------------- | ------------------------------------- |
+| Department Whiteboard | `/emergency/whiteboard`   | Overview, high-risk patients          |
+| Triage Queues         | `/emergency/queues`       | **Your primary work queue**           |
+| Reception Workspace   | `/emergency/reception`    | Review arrivals, assist with intake   |
+| Reassessment          | `/emergency/reassessment` | Patients with overdue timers          |
+| AI Copilot            | `/emergency/copilot`      | Clinical support for triage decisions |
 
 ---
 
 ## Daily Workflow
 
 ### Start of Shift
+
 1. Open **Triage Queues** (`/emergency/queues?queue=pretriage`)
 2. Review the Pretriage Queue — patients ready from reception
 3. Check **Department Whiteboard** for patients with `ReassessmentDue` flags
 
 ### During Shift
+
 4. Pick the **first patient** from Pretriage Queue
 5. Open patient card → complete assessment:
    - **Vital signs**: HR, BP, RR, SpO2, Temperature, GCS
@@ -50,15 +52,17 @@ You assign the clinical priority that determines how fast every patient is seen.
 11. Complete reassessments in **Reassessment screen** or via drawer (press `R`)
 
 ### Reassessment Intervals
-| Acuity | Target Interval |
-|--------|----------------|
-| P1 | Continuous |
-| P2 | Every 15 minutes |
-| P3 | Every 30 minutes |
-| P4 | Every 60 minutes |
-| P5 | Every 120 minutes |
+
+| Acuity | Target Interval   |
+| ------ | ----------------- |
+| P1     | Continuous        |
+| P2     | Every 15 minutes  |
+| P3     | Every 30 minutes  |
+| P4     | Every 60 minutes  |
+| P5     | Every 120 minutes |
 
 ### End of Shift
+
 - Ensure all patients in Pretriage Queue are assessed or handed off
 - Confirm all `ReassessmentDue` flags are addressed
 - Verify no patients have been waiting more than 2× their target interval
@@ -90,12 +94,12 @@ You assign the clinical priority that determines how fast every patient is seen.
 
 The AI Triage Assist Panel appears when you open a patient for triage assessment. It provides:
 
-| AI Output | Purpose | Your Action |
-|-----------|---------|-------------|
-| NEWS2 score | Calculates score from entered vitals | Review — adjust acuity if needed |
-| qSOFA flags | Sepsis screening (if RR ≥ 22, AMS, SBP ≤ 100) | Review — escalate if ≥ 2 |
-| Red flags | Chief complaint warning patterns | Review each flag |
-| Score recommendations | Suggests most relevant calculators | Open and run if relevant |
+| AI Output             | Purpose                                       | Your Action                      |
+| --------------------- | --------------------------------------------- | -------------------------------- |
+| NEWS2 score           | Calculates score from entered vitals          | Review — adjust acuity if needed |
+| qSOFA flags           | Sepsis screening (if RR ≥ 22, AMS, SBP ≤ 100) | Review — escalate if ≥ 2         |
+| Red flags             | Chief complaint warning patterns              | Review each flag                 |
+| Score recommendations | Suggests most relevant calculators            | Open and run if relevant         |
 
 **Important:** The AI cannot assign acuity. It supports your decision. You decide.
 
@@ -103,13 +107,13 @@ The AI Triage Assist Panel appears when you open a patient for triage assessment
 
 ## Acuity Reference
 
-| Level | Name | Target Time to Physician |
-|-------|------|-------------------------|
-| P1 | Resuscitation | Immediately |
-| P2 | Emergent | ≤ 15 minutes |
-| P3 | Urgent | ≤ 30 minutes |
-| P4 | Semi-Urgent | ≤ 60 minutes |
-| P5 | Non-Urgent | ≤ 120 minutes |
+| Level | Name          | Target Time to Physician |
+| ----- | ------------- | ------------------------ |
+| P1    | Resuscitation | Immediately              |
+| P2    | Emergent      | ≤ 15 minutes             |
+| P3    | Urgent        | ≤ 30 minutes             |
+| P4    | Semi-Urgent   | ≤ 60 minutes             |
+| P5    | Non-Urgent    | ≤ 120 minutes            |
 
 ---
 
@@ -127,11 +131,11 @@ The AI Triage Assist Panel appears when you open a patient for triage assessment
 
 ## Keyboard Shortcuts
 
-| Keys | Action |
-|------|--------|
-| `?` | Open help guide |
-| `R` | Open reassessment drawer |
-| `Cmd+K` | Command palette |
+| Keys    | Action                   |
+| ------- | ------------------------ |
+| `?`     | Open help guide          |
+| `R`     | Open reassessment drawer |
+| `Cmd+K` | Command palette          |
 
 ---
 

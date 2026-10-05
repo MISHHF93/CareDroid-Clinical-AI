@@ -53,6 +53,7 @@ WHITEBOARD (/emergency/whiteboard)
 ```
 
 **Key Services:**
+
 - `src/services/receptionHandoff.ts` — `completeIntakeHandoff()`
 - `src/services/queueAssignment.ts` — `matchesWhiteboardQueueFilter()`
 - `src/store/emergencyStore.ts` — patient state mutations
@@ -106,11 +107,13 @@ NORMAL PATIENT JOURNEY (continue from Walk-in Workflow Step: Triage)
 ```
 
 **Attention Signals:**
+
 - `EmsAttentionStrip` on whiteboard when inbound arrivals detected
 - `EmsOffloadAggregateStrip` when offload delays exceed threshold
 - Orange/red badge when any unit exceeds 15-minute offload target
 
 **Key Services:**
+
 - `src/services/patientArrivalBackendSync.ts`
 - `src/store/emergencyStore.ts` — `emsArrivals`, `prepareEMSBay()`
 - `src/components/ems/EmsOffloadTrackerPanel.tsx`
@@ -165,6 +168,7 @@ STANDARD PATH (P3–P5)
 ```
 
 **Reassessment Intervals:**
+
 - P1: Continuous monitoring
 - P2: Every 15 minutes
 - P3: Every 30 minutes
@@ -217,6 +221,7 @@ ALERT ACKNOWLEDGED
 ```
 
 **Components:**
+
 - `src/components/emergency/CriticalAlertBanner.tsx`
 - `src/store/emergencyStore.ts` — `alerts`, `unacknowledgedCriticalAlertCount`
 - `src/features/whiteboard/` — 3-minute response loop UI
@@ -296,6 +301,7 @@ CAPACITY RECOVERED
 ```
 
 **Key Metrics on Whiteboard:**
+
 - `capacity.score`, `capacity.band`, `capacity.updatedAt`
 - `boardingMetrics.count`, `boardingMetrics.avgDurationMinutes`
 

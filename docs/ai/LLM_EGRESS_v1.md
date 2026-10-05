@@ -1,10 +1,10 @@
 # CareDroid LLM Egress v1 (PR-3)
 
-| Field | Value |
-|-------|--------|
-| **Version** | `1.0.0` |
-| **Date** | `2026-07-11` |
-| **Code** | `lib/ai/providers/`, `lib/ai/serverClient.ts`, `lib/ai/llmTransport.ts` |
+| Field       | Value                                                                   |
+| ----------- | ----------------------------------------------------------------------- |
+| **Version** | `1.0.0`                                                                 |
+| **Date**    | `2026-07-11`                                                            |
+| **Code**    | `lib/ai/providers/`, `lib/ai/serverClient.ts`, `lib/ai/llmTransport.ts` |
 
 ## Goal
 
@@ -26,29 +26,29 @@ Browser clients **must not** hold provider keys — they proxy via Nest (`src/li
 
 ## Providers
 
-| `AI_PROVIDER` | Adapter | Notes |
-|---------------|---------|--------|
-| `anthropic` (default) | Anthropic Messages API | Full tool + stream support |
-| `openai` | Chat Completions | Non-streaming in this build |
-| `azure-openai` | Azure Chat Completions | Needs endpoint + deployment + key |
-| `gemini` | generateContent | Non-streaming text |
-| `local` | Deterministic degraded text | No network; tests & offline |
+| `AI_PROVIDER`         | Adapter                     | Notes                             |
+| --------------------- | --------------------------- | --------------------------------- |
+| `anthropic` (default) | Anthropic Messages API      | Full tool + stream support        |
+| `openai`              | Chat Completions            | Non-streaming in this build       |
+| `azure-openai`        | Azure Chat Completions      | Needs endpoint + deployment + key |
+| `gemini`              | generateContent             | Non-streaming text                |
+| `local`               | Deterministic degraded text | No network; tests & offline       |
 
 ## Kill switches
 
-| Env | Effect |
-|-----|--------|
-| `AI_KILL_SWITCH=1` | Block all egress |
-| `AI_EXTERNAL_LLM_DISABLED=1` | Block all egress |
+| Env                              | Effect                            |
+| -------------------------------- | --------------------------------- |
+| `AI_KILL_SWITCH=1`               | Block all egress                  |
+| `AI_EXTERNAL_LLM_DISABLED=1`     | Block all egress                  |
 | `AI_EGRESS_REQUIRE_AI_ENABLED=1` | Require `AI_ENABLED=true` as well |
 
 ## Fallback
 
-| Env | Effect |
-|-----|--------|
+| Env                          | Effect                                          |
+| ---------------------------- | ----------------------------------------------- |
 | `AI_FALLBACK_PROVIDER=local` | On retryable primary failure, use local adapter |
-| `AI_LOCAL_FALLBACK=1` | Same as fallback provider local |
-| `AI_FALLBACK_MODEL` | Model override for fallback call |
+| `AI_LOCAL_FALLBACK=1`        | Same as fallback provider local                 |
+| `AI_FALLBACK_MODEL`          | Model override for fallback call                |
 
 ## PHI minimize
 
@@ -56,8 +56,8 @@ Applied to `systemPrompt`, `messages[]`, and `message` before any adapter runs. 
 
 ## Patient-context hard gate
 
-| Env | Effect |
-|-----|--------|
+| Env                                              | Effect                                                                                                                                                        |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `AI_PATIENT_CONTEXT_ENABLED` (default **false**) | When unset/false, egress **strips** `patientId`, `encounterId`, and chart-shaped `context` keys (`patient`, `mrn`, `demographics`, …) **before** PHI minimize |
 
 Code: `lib/ai/providers/patientContextGate.ts` → called from `completeViaEgress`.  

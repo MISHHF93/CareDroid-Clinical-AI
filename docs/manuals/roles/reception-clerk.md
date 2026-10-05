@@ -84,6 +84,7 @@ The **alert banner** at top shows critical flags from patients you have register
 ### How to Register a High-Risk Patient Fast
 
 If the patient appears severely unwell:
+
 1. Skip the full form — enter name, DOB, and chief complaint only.
 2. Check all applicable red flags.
 3. Click **Save and escalate** — creates the record AND sends an immediate critical alert to the triage nurse.
@@ -114,12 +115,12 @@ If the patient appears severely unwell:
 
 ## Alerts You Receive
 
-| Alert | Meaning | Your action |
-|-------|---------|------------|
-| EMS pre-arrival — critical | Critically ill patient inbound | Alert triage nurse immediately |
-| Self-arrival flag | Kiosk check-in flagged high-risk complaint | Complete registration immediately |
-| Verification overdue | Patient waiting >10 min for ID verification | Process now |
-| Duplicate patient warning | System detected a possible duplicate record | Review both records, merge or confirm as separate |
+| Alert                      | Meaning                                     | Your action                                       |
+| -------------------------- | ------------------------------------------- | ------------------------------------------------- |
+| EMS pre-arrival — critical | Critically ill patient inbound              | Alert triage nurse immediately                    |
+| Self-arrival flag          | Kiosk check-in flagged high-risk complaint  | Complete registration immediately                 |
+| Verification overdue       | Patient waiting >10 min for ID verification | Process now                                       |
+| Duplicate patient warning  | System detected a possible duplicate record | Review both records, merge or confirm as separate |
 
 ---
 

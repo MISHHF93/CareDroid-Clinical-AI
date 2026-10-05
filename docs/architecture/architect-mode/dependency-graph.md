@@ -65,13 +65,13 @@ data/medical-knowledge, knowledge-registry  ← RAG bootstrap
 
 ## Circular / risk edges
 
-| Edge | Risk | Mitigation Stage |
-|------|------|------------------|
-| emergencyStore ↔ services importing store | Circular FE deps | F extract pure actions |
-| AppShell → many engines at boot | Bundle + failure coupling | F gate experimental engines |
-| RAG service → PineconeService typed as vectorDb | Naming implies single vendor | G interface injection |
-| FE pages → heavy chart libs | Bundle bloat | Done: DashboardCharts split |
-| Express services ↔ Nest modules | Dual authority | D/H Nest primary |
+| Edge                                            | Risk                         | Mitigation Stage            |
+| ----------------------------------------------- | ---------------------------- | --------------------------- |
+| emergencyStore ↔ services importing store       | Circular FE deps             | F extract pure actions      |
+| AppShell → many engines at boot                 | Bundle + failure coupling    | F gate experimental engines |
+| RAG service → PineconeService typed as vectorDb | Naming implies single vendor | G interface injection       |
+| FE pages → heavy chart libs                     | Bundle bloat                 | Done: DashboardCharts split |
+| Express services ↔ Nest modules                 | Dual authority               | D/H Nest primary            |
 
 ## Orphans (investigate; do not delete without importer proof)
 

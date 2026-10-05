@@ -113,25 +113,25 @@ At 2:00 minutes without acknowledgement, the system escalates to you:
 
 ## Alerts You Receive
 
-| Alert | Meaning | Your action |
-|-------|---------|------------|
-| 3-minute breach — escalation to charge | A critical alert has not been acknowledged by original owner at 2 minutes | Take ownership immediately |
-| Unowned patient — CTAS 1–2 | A critical patient has no assigned owner | Assign physician immediately |
-| Reassessment breach | Multiple patients overdue for reassessment | Direct nurses to reassess; room if needed |
-| Capacity critical | Department is at or near capacity threshold | Contact patient flow coordinator |
-| Service bottleneck | A monitored service has degraded | Activate fallback; notify IT Admin |
+| Alert                                  | Meaning                                                                   | Your action                               |
+| -------------------------------------- | ------------------------------------------------------------------------- | ----------------------------------------- |
+| 3-minute breach — escalation to charge | A critical alert has not been acknowledged by original owner at 2 minutes | Take ownership immediately                |
+| Unowned patient — CTAS 1–2             | A critical patient has no assigned owner                                  | Assign physician immediately              |
+| Reassessment breach                    | Multiple patients overdue for reassessment                                | Direct nurses to reassess; room if needed |
+| Capacity critical                      | Department is at or near capacity threshold                               | Contact patient flow coordinator          |
+| Service bottleneck                     | A monitored service has degraded                                          | Activate fallback; notify IT Admin        |
 
 ---
 
 ## AI Features Available
 
-| Intent | What it gives you |
-|--------|------------------|
-| `staff_routing` | Recommends which nurse and physician to assign based on load and acuity |
-| `department_routing` | Recommends which zone or department for a specific patient |
-| `three_minute_response_plan` | Generates a full 3-minute response plan for a critical patient |
-| `hospital_command_insight` | Department-level operational summary: queue state, risks, bottlenecks |
-| `fallback_recommendation` | What to do when a service or AI is unavailable |
+| Intent                       | What it gives you                                                       |
+| ---------------------------- | ----------------------------------------------------------------------- |
+| `staff_routing`              | Recommends which nurse and physician to assign based on load and acuity |
+| `department_routing`         | Recommends which zone or department for a specific patient              |
+| `three_minute_response_plan` | Generates a full 3-minute response plan for a critical patient          |
+| `hospital_command_insight`   | Department-level operational summary: queue state, risks, bottlenecks   |
+| `fallback_recommendation`    | What to do when a service or AI is unavailable                          |
 
 All AI output is advisory. You own every assignment and escalation decision.
 

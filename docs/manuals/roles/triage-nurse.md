@@ -88,6 +88,7 @@ You also have access to **Whiteboard** and **Reassessment** in the sidebar for m
 ### How to Triage a CTAS 1 Patient
 
 If the patient is in immediate danger:
+
 1. Call for help immediately.
 2. Activate overhead or call button for attending physician and charge nurse.
 3. Enter vitals rapidly — get what you can.
@@ -116,21 +117,21 @@ If the patient is in immediate danger:
 
 ## Alerts You Receive
 
-| Alert | Meaning | Your action |
-|-------|---------|------------|
-| Reassessment overdue | A patient has passed their reassessment timer | Reassess immediately |
-| High-risk complaint from reception | Clerk registered a patient with red flags | Review and expedite triage |
-| 3-minute escalation | Critical patient unacknowledged at 2 minutes | Acknowledge and route immediately |
-| AI triage confidence low | AI cannot make a confident suggestion | Your assessment is the sole clinical basis |
+| Alert                              | Meaning                                       | Your action                                |
+| ---------------------------------- | --------------------------------------------- | ------------------------------------------ |
+| Reassessment overdue               | A patient has passed their reassessment timer | Reassess immediately                       |
+| High-risk complaint from reception | Clerk registered a patient with red flags     | Review and expedite triage                 |
+| 3-minute escalation                | Critical patient unacknowledged at 2 minutes  | Acknowledge and route immediately          |
+| AI triage confidence low           | AI cannot make a confident suggestion         | Your assessment is the sole clinical basis |
 
 ---
 
 ## AI Features Available
 
-| Feature | Access | What it gives you |
-|---------|--------|------------------|
-| `triage_recommendation` | Auto-shown in triage sidebar when vitals are entered | Advisory CTAS level with reasoning |
-| Complaint red flag detection | Active as you type complaint text | Highlights high-risk patterns in real time |
+| Feature                      | Access                                               | What it gives you                          |
+| ---------------------------- | ---------------------------------------------------- | ------------------------------------------ |
+| `triage_recommendation`      | Auto-shown in triage sidebar when vitals are entered | Advisory CTAS level with reasoning         |
+| Complaint red flag detection | Active as you type complaint text                    | Highlights high-risk patterns in real time |
 
 ---
 

@@ -15,27 +15,29 @@ CareDroid gives you a live patient picture and AI clinical decision support so y
 
 ## Your Screens
 
-| Screen | Route | Use |
-|--------|-------|-----|
-| Department Whiteboard | `/emergency/whiteboard` | Overview of all active patients |
-| AI Copilot (AI Chief) | `/emergency/copilot` | Clinical decision support |
-| Reassessment | `/emergency/reassessment` | Patients awaiting your review |
-| Referrals | `/emergency/referrals` | Create and manage specialist referrals |
-| Analytics | `/emergency/analytics` | Performance and outcome review |
-| Clinical Documentation | `/emergency/documentation` | AI-assisted note generation |
-| Medical Tools | `/emergency/tools` | 242 clinical calculators and AI tools |
+| Screen                 | Route                      | Use                                    |
+| ---------------------- | -------------------------- | -------------------------------------- |
+| Department Whiteboard  | `/emergency/whiteboard`    | Overview of all active patients        |
+| AI Copilot (AI Chief)  | `/emergency/copilot`       | Clinical decision support              |
+| Reassessment           | `/emergency/reassessment`  | Patients awaiting your review          |
+| Referrals              | `/emergency/referrals`     | Create and manage specialist referrals |
+| Analytics              | `/emergency/analytics`     | Performance and outcome review         |
+| Clinical Documentation | `/emergency/documentation` | AI-assisted note generation            |
+| Medical Tools          | `/emergency/tools`         | 242 clinical calculators and AI tools  |
 
 ---
 
 ## Daily Workflow
 
 ### Start of Shift
+
 1. Open **Department Whiteboard** in Physician screen mode (`?mode=physician`)
 2. Review high-acuity patients (P1/P2 — red and orange cards)
 3. Check **Reassessment** for patients awaiting physician review
 4. Open **AI Copilot** and review any flagged patients from overnight
 
 ### During Shift
+
 5. Use whiteboard filter **High Risk** to prioritize assessments
 6. Open patient card → review vitals, timeline, flags, AI summary
 7. Ask **AI Copilot** for:
@@ -48,6 +50,7 @@ CareDroid gives you a live patient picture and AI clinical decision support so y
 10. Document assessments using **Clinical Documentation Assistant**
 
 ### End of Shift
+
 11. Ensure all active patients have updated notes
 12. Confirm all referrals are tracked
 13. Complete any outstanding reassessments
@@ -81,18 +84,19 @@ The AI Chief is available 24/7 in the Copilot panel (sidebar) or at `/emergency/
 
 ### What to Ask
 
-| Clinical Need | Example Query |
-|---------------|--------------|
-| Patient summary | "Give me a summary of patient [X]" |
+| Clinical Need          | Example Query                                                           |
+| ---------------------- | ----------------------------------------------------------------------- |
+| Patient summary        | "Give me a summary of patient [X]"                                      |
 | Differential diagnosis | "What are the top differentials for acute chest pain with diaphoresis?" |
-| Score calculation | "Calculate qSOFA for HR 110, RR 24, altered mentation" |
-| Guideline lookup | "What is the threshold for CT in suspected PE?" |
-| Drug check | "Check for interactions between warfarin and amoxicillin" |
-| Lab interpretation | "Interpret these ABG results: pH 7.28, pCO2 50, pO2 68, HCO3 22" |
-| Protocol reference | "Sepsis Bundle 3-hour protocol" |
-| Antibiotic guide | "Community-acquired pneumonia antibiotic recommendation" |
+| Score calculation      | "Calculate qSOFA for HR 110, RR 24, altered mentation"                  |
+| Guideline lookup       | "What is the threshold for CT in suspected PE?"                         |
+| Drug check             | "Check for interactions between warfarin and amoxicillin"               |
+| Lab interpretation     | "Interpret these ABG results: pH 7.28, pCO2 50, pO2 68, HCO3 22"        |
+| Protocol reference     | "Sepsis Bundle 3-hour protocol"                                         |
+| Antibiotic guide       | "Community-acquired pneumonia antibiotic recommendation"                |
 
 ### Safety Reminders
+
 - AI suggestions are clinical support, not orders
 - Always apply your own judgment
 - Confidence score is shown on every AI response
@@ -103,22 +107,26 @@ The AI Chief is available 24/7 in the Copilot panel (sidebar) or at `/emergency/
 ## Clinical Tools Quick Reference
 
 ### Emergency Scores
+
 - NEWS2 (`/tools/calculators/news2`) — Early warning
 - qSOFA (`/tools/calculators/qsofa`) — Sepsis screening
 - GCS (`/tools/calculators/gcs`) — Consciousness level
 - SOFA (`/tools/calculators/sofa`) — Organ dysfunction
 
 ### Cardiovascular
+
 - HEART Score (`/tools/calculators/heart-score`)
 - Wells PE (`/tools/calculators/wells-pe`)
 - CHA₂DS₂-VASc (`/tools/calculators/chads2vasc`)
 
 ### Neurology
+
 - NIHSS (`/tools/calculators/nihss-summary-view`)
 - GCS (`/tools/calculators/gcs`)
 - ICH Score (`/tools/calculators/ich-score`)
 
 ### Respiratory
+
 - CURB-65 (`/tools/calculators/curb-65`)
 - PaO₂/FiO₂ (`/tools/calculators/pao2-fio2-ratio`)
 - ROX Index (`/tools/calculators/rox-index`)
@@ -127,11 +135,11 @@ The AI Chief is available 24/7 in the Copilot panel (sidebar) or at `/emergency/
 
 ## Keyboard Shortcuts
 
-| Keys | Action |
-|------|--------|
-| `?` | Open help guide |
+| Keys    | Action                                          |
+| ------- | ----------------------------------------------- |
+| `?`     | Open help guide                                 |
 | `Cmd+K` | Command palette (search tools, jump to patient) |
-| `R` | Open reassessment drawer |
+| `R`     | Open reassessment drawer                        |
 
 ---
 

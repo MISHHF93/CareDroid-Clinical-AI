@@ -4,24 +4,24 @@
 
 CareDroid is a single-application emergency department (ED) operating platform. For the product pitch, suite taxonomy, and a 5-minute local quick start, read the [root README](../README.md) first — this Documentation Center goes deeper on architecture, APIs, data, deployment, and governance, and organizes the ~90 existing documents in `docs/` so you don't have to guess which one is current.
 
-**A note on freshness:** several sections of this platform's documentation are auto-generated from source (see [Living Documentation](#living-documentation-source-of-truth) below) and regenerate on every `npm run docs:generate`. Where a generated doc exists, it is the source of truth — the hand-written docs linked here either explain *why* something is built the way it is, or cover ground the generator doesn't (architecture rationale, API contracts across both route systems, deployment, data model, glossary).
+**A note on freshness:** several sections of this platform's documentation are auto-generated from source (see [Living Documentation](#living-documentation-source-of-truth) below) and regenerate on every `npm run docs:generate`. Where a generated doc exists, it is the source of truth — the hand-written docs linked here either explain _why_ something is built the way it is, or cover ground the generator doesn't (architecture rationale, API contracts across both route systems, deployment, data model, glossary).
 
 ---
 
 ## Start here by role
 
-| I am a(n)... | Start with |
-|---|---|
-| **New developer** | [Getting Started](#getting-started) → [Developer Guide](developer-guide.md) → [Platform Architecture Overview](architecture/platform-architecture-overview.md) |
-| **Backend/API engineer** | [API Reference](api/api-reference.md) → [Data Model Reference](data-model/data-model-reference.md) → [AI Platform Guide](ai/ai-documentation.md) |
-| **Frontend engineer** | [Platform Architecture Overview](architecture/platform-architecture-overview.md) (§Frontend) → [Developer Guide](developer-guide.md) → [generated/routes.md](generated/routes.md), [generated/components.md](generated/components.md) |
-| **IT / systems administrator** | [Deployment Guide](deployment-guide.md) → [Configuration Reference](configuration-reference.md) → [`it-administrator.md`](manuals/roles/it-administrator.md) |
-| **Hospital / ED administrator** | [`hospital-administrator.md`](manuals/roles/hospital-administrator.md) → [Product Overview](../README.md#product-suites) → [generated/roles.md](generated/roles.md), [generated/permissions.md](generated/permissions.md) |
-| **Clinician (physician, nurse, paramedic, etc.)** | Your role manual under [`docs/manuals/roles/`](manuals/roles/) → [Master User Manual](manuals/caredroid-master-user-manual.md) |
-| **Compliance / quality & safety officer** | [`quality-safety-officer.md`](manuals/roles/quality-safety-officer.md) → [Governance & Security Guide](#governance-security--compliance) → [Glossary](glossary.md) |
-| **AI/ML engineer** | [AI Platform Guide](ai/ai-documentation.md) → [AI Features Reference](AI_FEATURES.md) → `backend/ml-services/` (NLU + artifact-router training pipelines) |
-| **Product / project manager** | [Product Overview](../README.md) → [generated/README.md](generated/README.md) (living metrics) → [Known Documentation Debt](#known-documentation-debt) |
-| **Executive** | [Product Overview](../README.md) → [`executive-guide.md`](users/executive-guide.md) |
+| I am a(n)...                                      | Start with                                                                                                                                                                                                                            |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **New developer**                                 | [Getting Started](#getting-started) → [Developer Guide](developer-guide.md) → [Platform Architecture Overview](architecture/platform-architecture-overview.md)                                                                        |
+| **Backend/API engineer**                          | [API Reference](api/api-reference.md) → [Data Model Reference](data-model/data-model-reference.md) → [AI Platform Guide](ai/ai-documentation.md)                                                                                      |
+| **Frontend engineer**                             | [Platform Architecture Overview](architecture/platform-architecture-overview.md) (§Frontend) → [Developer Guide](developer-guide.md) → [generated/routes.md](generated/routes.md), [generated/components.md](generated/components.md) |
+| **IT / systems administrator**                    | [Deployment Guide](deployment-guide.md) → [Configuration Reference](configuration-reference.md) → [`it-administrator.md`](manuals/roles/it-administrator.md)                                                                          |
+| **Hospital / ED administrator**                   | [`hospital-administrator.md`](manuals/roles/hospital-administrator.md) → [Product Overview](../README.md#product-suites) → [generated/roles.md](generated/roles.md), [generated/permissions.md](generated/permissions.md)             |
+| **Clinician (physician, nurse, paramedic, etc.)** | Your role manual under [`docs/manuals/roles/`](manuals/roles/) → [Master User Manual](manuals/caredroid-master-user-manual.md)                                                                                                        |
+| **Compliance / quality & safety officer**         | [`quality-safety-officer.md`](manuals/roles/quality-safety-officer.md) → [Governance & Security Guide](#governance-security--compliance) → [Glossary](glossary.md)                                                                    |
+| **AI/ML engineer**                                | [AI Platform Guide](ai/ai-documentation.md) → [AI Features Reference](AI_FEATURES.md) → `backend/ml-services/` (NLU + artifact-router training pipelines)                                                                             |
+| **Product / project manager**                     | [Product Overview](../README.md) → [generated/README.md](generated/README.md) (living metrics) → [Known Documentation Debt](#known-documentation-debt)                                                                                |
+| **Executive**                                     | [Product Overview](../README.md) → [`executive-guide.md`](users/executive-guide.md)                                                                                                                                                   |
 
 ---
 
@@ -161,7 +161,7 @@ Covered in the [Developer Guide §Testing Infrastructure](developer-guide.md#tes
 
 ## Architecture Decision Records (ADRs)
 
-**[docs/adr/](adr/README.md)** — **new**: records the *why* behind major, already-made architectural decisions found in the codebase (NLU migration off Python, dual SQLite/Postgres + optional Mongoose runtime, Unified AI Node, in-house design system). These are retroactive ADRs — write new ones going forward for any comparably significant decision.
+**[docs/adr/](adr/README.md)** — **new**: records the _why_ behind major, already-made architectural decisions found in the codebase (NLU migration off Python, dual SQLite/Postgres + optional Mongoose runtime, Unified AI Node, in-house design system). These are retroactive ADRs — write new ones going forward for any comparably significant decision.
 
 ---
 
@@ -184,18 +184,18 @@ No `CHANGELOG.md`, `ROADMAP.md`, or tagged-release process currently exists in t
 
 `docs/generated/` is regenerated from source via `npm run docs:generate` (validate freshness with `npm run docs:check`). It supersedes several older hand-written docs — see [`docs/generated/superseded-manifest.json`](generated/superseded-manifest.json) for the exact mapping:
 
-| Generated doc | Records | Supersedes |
-|---|---:|---|
-| [routes.md](generated/routes.md) | 16 | `specs/page-map.md`, `specs/route-map.md` |
-| [apis.md](generated/apis.md) | 50 | `architecture/endpoint-to-frontend-matrix.md` |
-| [roles.md](generated/roles.md) | 11 | — |
-| [permissions.md](generated/permissions.md) | 37 | `specs/role-permission-map.md` |
-| [workflows.md](generated/workflows.md) | 21 | `workflows/patient-journey.md`, `specs/full-emergency-care-journey.md` (phases only — the mission/principles content in that spec is not superseded) |
-| [services.md](generated/services.md) | 32 | `services/service-catalog.md` |
-| [ai-capabilities.md](generated/ai-capabilities.md) | 10 | `specs/ai-chief-spec.md` |
-| [components.md](generated/components.md) | 12 | — |
-| [configuration.md](generated/configuration.md) | 82 | — |
-| [contextual-help.md](generated/contextual-help.md) | 14 | — |
+| Generated doc                                      | Records | Supersedes                                                                                                                                           |
+| -------------------------------------------------- | ------: | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [routes.md](generated/routes.md)                   |      16 | `specs/page-map.md`, `specs/route-map.md`                                                                                                            |
+| [apis.md](generated/apis.md)                       |      50 | `architecture/endpoint-to-frontend-matrix.md`                                                                                                        |
+| [roles.md](generated/roles.md)                     |      11 | —                                                                                                                                                    |
+| [permissions.md](generated/permissions.md)         |      37 | `specs/role-permission-map.md`                                                                                                                       |
+| [workflows.md](generated/workflows.md)             |      21 | `workflows/patient-journey.md`, `specs/full-emergency-care-journey.md` (phases only — the mission/principles content in that spec is not superseded) |
+| [services.md](generated/services.md)               |      32 | `services/service-catalog.md`                                                                                                                        |
+| [ai-capabilities.md](generated/ai-capabilities.md) |      10 | `specs/ai-chief-spec.md`                                                                                                                             |
+| [components.md](generated/components.md)           |      12 | —                                                                                                                                                    |
+| [configuration.md](generated/configuration.md)     |      82 | —                                                                                                                                                    |
+| [contextual-help.md](generated/contextual-help.md) |      14 | —                                                                                                                                                    |
 
 Files marked `> **SUPERSEDED**` at the top still exist in the repo for historical traceability — do not treat them as current.
 

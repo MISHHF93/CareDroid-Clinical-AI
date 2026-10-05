@@ -548,4 +548,3 @@ Not yet safe to implement as direct moves:
 - Ran `git status --short` to record dirty-tree context.
 - Confirmed `docs/architecture` did not exist, then created it for this audit.
 - Did not run full validation for prompts 2-20 because the requested backend/domain work is not yet implemented.
-

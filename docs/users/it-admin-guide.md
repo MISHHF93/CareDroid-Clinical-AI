@@ -45,4 +45,3 @@ Keep `.env.example` synchronized and avoid committing local secrets.
 ## Known Limitations
 
 Some enterprise integrations are represented by fallback or demo data in local mode.
-

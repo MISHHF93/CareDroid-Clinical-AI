@@ -45,4 +45,3 @@ Audit for closed-loop actions, not just alert creation.
 ## Known Limitations
 
 Quality role is documented but not a distinct emergency app role.
-

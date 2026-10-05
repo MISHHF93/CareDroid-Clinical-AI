@@ -33,10 +33,10 @@ qSOFA is available as a **frontend / pure calculator** path; it is **not** in `R
 
 ## PR-8 — UI maturity labels
 
-| Component | Role |
-|-----------|------|
-| `AiMaturityBadge` | Chip: heuristic / deterministic / measured / seed / experimental / rag-grounded / degraded |
-| `inferAiMaturity` | From provenance `modelOrEngine` + evidence kinds |
+| Component              | Role                                                                                        |
+| ---------------------- | ------------------------------------------------------------------------------------------- |
+| `AiMaturityBadge`      | Chip: heuristic / deterministic / measured / seed / experimental / rag-grounded / degraded  |
+| `inferAiMaturity`      | From provenance `modelOrEngine` + evidence kinds                                            |
 | `AIRecommendationCard` | Shows maturity chip + provenance block (uncertainty, reviewer, limitations, evidence count) |
 
 Never present seed evaluation metrics or heuristic nodes as measured foundation-model quality.

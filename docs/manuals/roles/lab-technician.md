@@ -63,6 +63,7 @@ Critical lab values require immediate notification. CareDroid generates an alert
 ### How to Escalate When the Clinician Cannot Be Reached
 
 If you cannot reach the ordering clinician within 5 minutes:
+
 1. Try the nurse assigned to the patient.
 2. Try the charge nurse.
 3. Try the attending physician by overhead page.
@@ -83,12 +84,12 @@ If you cannot reach the ordering clinician within 5 minutes:
 
 ## Alerts You Receive
 
-| Alert | Meaning | Your action |
-|-------|---------|------------|
-| Critical lab value | A result has come back in the critical range | Deliver immediately, document, acknowledge |
-| Specimen delay | A specimen's turnaround time has exceeded threshold | Investigate, notify clinician, escalate if equipment issue |
-| Lab service degradation | The lab integration or analyzer is down | Notify IT Admin; activate manual lab process |
-| Unacknowledged critical value | A critical value alert has not been acknowledged within 10 minutes | Escalate to clinician and charge nurse |
+| Alert                         | Meaning                                                            | Your action                                                |
+| ----------------------------- | ------------------------------------------------------------------ | ---------------------------------------------------------- |
+| Critical lab value            | A result has come back in the critical range                       | Deliver immediately, document, acknowledge                 |
+| Specimen delay                | A specimen's turnaround time has exceeded threshold                | Investigate, notify clinician, escalate if equipment issue |
+| Lab service degradation       | The lab integration or analyzer is down                            | Notify IT Admin; activate manual lab process               |
+| Unacknowledged critical value | A critical value alert has not been acknowledged within 10 minutes | Escalate to clinician and charge nurse                     |
 
 ---
 

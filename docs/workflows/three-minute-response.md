@@ -24,4 +24,3 @@ AI supports the workflow. AI never replaces clinician review. Critical alerts an
 ## Known Limitations
 
 The route-level Help button now covers shared emergency route pages. Reception, Whiteboard, Analytics, Pulse, Shift, Alerts, and Settings still rely mainly on global `?` help until page-level triggers are added.
-

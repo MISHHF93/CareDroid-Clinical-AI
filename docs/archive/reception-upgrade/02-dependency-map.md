@@ -64,14 +64,14 @@ ReceptionWorkspace
 
 ## 3. Store Selectors (Zustand)
 
-| Selector | Type | Purpose |
-|----------|------|---------|
-| `state.patients` | `Patient[]` | Full patient list; filtered to reception queue |
-| `state.alerts` | `Alert[]` | Full alert list; filtered to reception-critical |
-| `state.capacity` | `CapacitySnapshot` | Hospital site name for header badge |
-| `state.selectedPatientId` | `string \| null` | Currently selected patient in rail |
-| `state.selectPatient` | `action` | Sets selected patient |
-| `state.submitReceptionEscalation` | `action` (imperative) | Builds + dispatches escalation alert |
+| Selector                          | Type                  | Purpose                                         |
+| --------------------------------- | --------------------- | ----------------------------------------------- |
+| `state.patients`                  | `Patient[]`           | Full patient list; filtered to reception queue  |
+| `state.alerts`                    | `Alert[]`             | Full alert list; filtered to reception-critical |
+| `state.capacity`                  | `CapacitySnapshot`    | Hospital site name for header badge             |
+| `state.selectedPatientId`         | `string \| null`      | Currently selected patient in rail              |
+| `state.selectPatient`             | `action`              | Sets selected patient                           |
+| `state.submitReceptionEscalation` | `action` (imperative) | Builds + dispatches escalation alert            |
 
 ---
 
@@ -79,38 +79,38 @@ ReceptionWorkspace
 
 ### 4a. Core Reception Services
 
-| Service | Import Path | Purpose | Backend Connection |
-|---------|-------------|---------|-------------------|
-| `receptionIntakeOrchestrator` | `src/services/receptionIntakeOrchestrator.ts` (878 lines) | Full intake lifecycle: draft validation, AI triage assist, patient creation, routing | Indirect — calls `useEmergencyStore.getState().addPatient()`, then `receptionHandoff.completeReceptionHandoff()` |
-| `arrivalControlLayer` | `src/services/arrivalControlLayer.ts` (487 lines) | Arrival mode derivation, queue destination, registration status, safety flags | Indirect — operates on store patient list |
-| `provisionalIdentityIntake` | `src/services/provisionalIdentityIntake.ts` (230 lines) | Unknown/temporary/identity-pending patient creation | Indirect — calls `store.addPatient()`, `receptionHandoff.completeIntakeHandoff()` |
-| `receptionEscalationWorkflow` | `src/services/receptionEscalationWorkflow.ts` (524 lines) | 5 escalation reasons, alert creation, notification targets | Indirect — creates alerts in store |
-| `receptionHandoff` | `src/services/receptionHandoff.ts` | Patient handoff from reception → triage queue | **Direct: POST /api/emergency/reception/handoff** |
-| `receptionQuickIntakeService` | `src/services/receptionQuickIntakeService.ts` | Quick intake data processing, age calculation | Indirect — used by orchestrator |
-| `patientArrivalModel` | `src/services/patientArrivalModel.ts` | Arrival record construction, patient sync | Indirect — used by arrivalControlLayer |
-| `triageAssist` | `src/services/triageAssist.ts` | Client-side triage scoring (buildClientTriageAssist) | No backend — purely client-side rule engine |
-| `careDroidInteractionFeedback` | `src/services/careDroidInteractionFeedback.ts` | showActionError / showActionSuccess toast feedback | No backend — UI feedback only |
-| `workflowNavigationFeedback` | `src/services/workflowNavigationFeedback.ts` | notifyWorkflowHandoffComplete — post-handoff navigation toast | No backend — UI feedback only |
+| Service                        | Import Path                                               | Purpose                                                                              | Backend Connection                                                                                               |
+| ------------------------------ | --------------------------------------------------------- | ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| `receptionIntakeOrchestrator`  | `src/services/receptionIntakeOrchestrator.ts` (878 lines) | Full intake lifecycle: draft validation, AI triage assist, patient creation, routing | Indirect — calls `useEmergencyStore.getState().addPatient()`, then `receptionHandoff.completeReceptionHandoff()` |
+| `arrivalControlLayer`          | `src/services/arrivalControlLayer.ts` (487 lines)         | Arrival mode derivation, queue destination, registration status, safety flags        | Indirect — operates on store patient list                                                                        |
+| `provisionalIdentityIntake`    | `src/services/provisionalIdentityIntake.ts` (230 lines)   | Unknown/temporary/identity-pending patient creation                                  | Indirect — calls `store.addPatient()`, `receptionHandoff.completeIntakeHandoff()`                                |
+| `receptionEscalationWorkflow`  | `src/services/receptionEscalationWorkflow.ts` (524 lines) | 5 escalation reasons, alert creation, notification targets                           | Indirect — creates alerts in store                                                                               |
+| `receptionHandoff`             | `src/services/receptionHandoff.ts`                        | Patient handoff from reception → triage queue                                        | **Direct: POST /api/emergency/reception/handoff**                                                                |
+| `receptionQuickIntakeService`  | `src/services/receptionQuickIntakeService.ts`             | Quick intake data processing, age calculation                                        | Indirect — used by orchestrator                                                                                  |
+| `patientArrivalModel`          | `src/services/patientArrivalModel.ts`                     | Arrival record construction, patient sync                                            | Indirect — used by arrivalControlLayer                                                                           |
+| `triageAssist`                 | `src/services/triageAssist.ts`                            | Client-side triage scoring (buildClientTriageAssist)                                 | No backend — purely client-side rule engine                                                                      |
+| `careDroidInteractionFeedback` | `src/services/careDroidInteractionFeedback.ts`            | showActionError / showActionSuccess toast feedback                                   | No backend — UI feedback only                                                                                    |
+| `workflowNavigationFeedback`   | `src/services/workflowNavigationFeedback.ts`              | notifyWorkflowHandoffComplete — post-handoff navigation toast                        | No backend — UI feedback only                                                                                    |
 
 ### 4b. Supporting Services (used by components within reception)
 
-| Service | Used By | Purpose |
-|---------|---------|---------|
-| `waitingRoomCommunicationLog` | `receptionEscalationWorkflow` | Communication log entries for escalation records |
-| `highRiskComplaintFlags` | `arrivalControlLayer` | High-risk complaint detection and flag patching |
-| `arrivalDerivations` | `arrivalControlLayer` | Queue destination, registration status, triage pending derivation |
-| `intakeEncounterChain` | `arrivalControlLayer` | Arrival reason extraction from patient records |
-| `queueAssignment` | `arrivalControlLayer` | Queue filter constants |
+| Service                       | Used By                       | Purpose                                                           |
+| ----------------------------- | ----------------------------- | ----------------------------------------------------------------- |
+| `waitingRoomCommunicationLog` | `receptionEscalationWorkflow` | Communication log entries for escalation records                  |
+| `highRiskComplaintFlags`      | `arrivalControlLayer`         | High-risk complaint detection and flag patching                   |
+| `arrivalDerivations`          | `arrivalControlLayer`         | Queue destination, registration status, triage pending derivation |
+| `intakeEncounterChain`        | `arrivalControlLayer`         | Arrival reason extraction from patient records                    |
+| `queueAssignment`             | `arrivalControlLayer`         | Queue filter constants                                            |
 
 ---
 
 ## 5. Backend Endpoints
 
-| Method | Path | Handler | Purpose |
-|--------|------|---------|---------|
-| `GET` | `/api/emergency/reception/snapshot` | `ReceptionWorkspaceService.getReceptionSnapshot()` | Returns reception workspace data: recent arrivals, waiting patients, verification queue, pre-triage, EMS inbound, queue metrics |
-| `POST` | `/api/emergency/reception/handoff` | `ReceptionWorkspaceService.postReceptionHandoff()` | Completes patient handoff from reception → triage. Body: patientId, source, actorName, encounterId, arrivalReason, complaintCategory, verificationSummary, triageAssist, triageAssistGeneratedAt |
-| `GET` | `/api/emergency/realtime/stream` | `EmergencyRealtimeController.stream()` | SSE stream: carries `whiteboard_snapshot`, `central_node_snapshot`, `journey_state_changed`, `patient_created`, `capacity_updated`, `ems_updated` events containing reception data |
+| Method | Path                                | Handler                                            | Purpose                                                                                                                                                                                          |
+| ------ | ----------------------------------- | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `GET`  | `/api/emergency/reception/snapshot` | `ReceptionWorkspaceService.getReceptionSnapshot()` | Returns reception workspace data: recent arrivals, waiting patients, verification queue, pre-triage, EMS inbound, queue metrics                                                                  |
+| `POST` | `/api/emergency/reception/handoff`  | `ReceptionWorkspaceService.postReceptionHandoff()` | Completes patient handoff from reception → triage. Body: patientId, source, actorName, encounterId, arrivalReason, complaintCategory, verificationSummary, triageAssist, triageAssistGeneratedAt |
+| `GET`  | `/api/emergency/realtime/stream`    | `EmergencyRealtimeController.stream()`             | SSE stream: carries `whiteboard_snapshot`, `central_node_snapshot`, `journey_state_changed`, `patient_created`, `capacity_updated`, `ems_updated` events containing reception data               |
 
 ### Backend Service Chain
 
@@ -128,12 +128,12 @@ ReceptionWorkspaceService (emergency-os.services.ts:1448-1546)
 
 ## 6. Database Entities Touched
 
-| Table | Entity | Reception Access |
-|-------|--------|-----------------|
-| `patients` | `Patient` | Direct write via `movePatientToState()` on handoff. Columns: `arrival`, `registrationStatus`, `queueDestination`, `triagePending` |
-| `alerts` | `Alert` | Indirect — escalation creates alerts, handoff may trigger capacity/escalation alerts |
-| `collaboration_channels` | `CollaborationChannel` | `RECEPTION` department channel seeded per org. Workflow events from handoffs sync into patient threads |
-| `workflow_action_logs` | (in-memory) | `record()` with `source: 'reception-workspace'`, `handoff: 'reception.handoff'`. **NOT persisted to DB** — buffered in-memory only |
+| Table                    | Entity                 | Reception Access                                                                                                                   |
+| ------------------------ | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `patients`               | `Patient`              | Direct write via `movePatientToState()` on handoff. Columns: `arrival`, `registrationStatus`, `queueDestination`, `triagePending`  |
+| `alerts`                 | `Alert`                | Indirect — escalation creates alerts, handoff may trigger capacity/escalation alerts                                               |
+| `collaboration_channels` | `CollaborationChannel` | `RECEPTION` department channel seeded per org. Workflow events from handoffs sync into patient threads                             |
+| `workflow_action_logs`   | (in-memory)            | `record()` with `source: 'reception-workspace'`, `handoff: 'reception.handoff'`. **NOT persisted to DB** — buffered in-memory only |
 
 ---
 
@@ -141,34 +141,34 @@ ReceptionWorkspaceService (emergency-os.services.ts:1448-1546)
 
 ### Registration Clerk Role — Allowed Actions
 
-| Action Key | Permission | Frontend Gate |
-|------------|-----------|---------------|
-| `createPatient` | `patientCreate` | `canCreatePatient` prop → `emergencyRole.canMutate(EMERGENCY_ACTIONS.createPatient)` |
-| `editPatientDemographics` | `patientDemographicsEdit` | `receptionCapabilities.canVerifyIdentity` (via screen model) |
-| `createEncounter` | `encounterCreate` | `receptionCapabilities.canCreateEncounter` |
-| `verifyIntake` | `intakeVerify` | `receptionCapabilities.canVerifyIdentity` |
-| `convertEmsArrival` | `emsConvertArrival` | `receptionCapabilities.canConvertEmsArrival` |
-| `receptionEscalate` | `receptionEscalate` | `receptionCapabilities.canEscalateToNurse` |
+| Action Key                | Permission                | Frontend Gate                                                                        |
+| ------------------------- | ------------------------- | ------------------------------------------------------------------------------------ |
+| `createPatient`           | `patientCreate`           | `canCreatePatient` prop → `emergencyRole.canMutate(EMERGENCY_ACTIONS.createPatient)` |
+| `editPatientDemographics` | `patientDemographicsEdit` | `receptionCapabilities.canVerifyIdentity` (via screen model)                         |
+| `createEncounter`         | `encounterCreate`         | `receptionCapabilities.canCreateEncounter`                                           |
+| `verifyIntake`            | `intakeVerify`            | `receptionCapabilities.canVerifyIdentity`                                            |
+| `convertEmsArrival`       | `emsConvertArrival`       | `receptionCapabilities.canConvertEmsArrival`                                         |
+| `receptionEscalate`       | `receptionEscalate`       | `receptionCapabilities.canEscalateToNurse`                                           |
 
 ### Registration Clerk Role — Denied Actions
 
-| Action | Why Denied |
-|--------|-----------|
+| Action                   | Why Denied                                         |
+| ------------------------ | -------------------------------------------------- |
 | `triage` (assign acuity) | Clinical decision — no clinical override authority |
-| `writeVitals` | Clinical data entry |
-| `writeNote` | Clinical documentation |
-| `dischargePatient` | Disposition decision |
-| `manageCapacity` | Operational management |
-| `reassignWorkload` | Staff management |
+| `writeVitals`            | Clinical data entry                                |
+| `writeNote`              | Clinical documentation                             |
+| `dischargePatient`       | Disposition decision                               |
+| `manageCapacity`         | Operational management                             |
+| `reassignWorkload`       | Staff management                                   |
 
 ### Backend RBAC
 
-| Config | Value |
-|--------|-------|
-| Role ID | `registration-clerk` |
-| Asset Pack | `['core-platform', 'reception-desk']` |
-| Permissions | `READ_PHI`, `WRITE_PHI` |
-| Aliases | `receptionist`, `ed clerk`, `ed_clerk`, `emergency receptionist` |
+| Config      | Value                                                            |
+| ----------- | ---------------------------------------------------------------- |
+| Role ID     | `registration-clerk`                                             |
+| Asset Pack  | `['core-platform', 'reception-desk']`                            |
+| Permissions | `READ_PHI`, `WRITE_PHI`                                          |
+| Aliases     | `receptionist`, `ed clerk`, `ed_clerk`, `emergency receptionist` |
 
 ---
 
@@ -241,12 +241,14 @@ Global overrides affecting reception:
 ## 10. Complete File Inventory
 
 ### Pages (4)
+
 - `src/pages/emergency/ReceptionWorkspace.tsx`
 - `src/pages/emergency/ReceptionPipelineShell.tsx`
 - `src/pages/emergency/SmartIntake.tsx`
 - `src/pages/emergency/SelfArrivalCheckIn.tsx`
 
 ### Components — TSX (29)
+
 - `src/components/reception/ReceptionDeskToolbar.tsx`
 - `src/components/reception/ReceptionOperationalRail.tsx`
 - `src/components/reception/ReceptionEscalationPanel.tsx`
@@ -278,9 +280,11 @@ Global overrides affecting reception:
 - `src/components/reception/VoiceInterviewKiosk.tsx`
 
 ### Components — CSS (27)
+
 All `.css` files matching `src/components/reception/*.css` (see Section 9)
 
 ### Hooks (6)
+
 - `src/hooks/useReceptionDeskUi.ts`
 - `src/hooks/useReceptionPinnedActions.ts`
 - `src/hooks/useReceptionScreen.ts`
@@ -289,6 +293,7 @@ All `.css` files matching `src/components/reception/*.css` (see Section 9)
 - `src/hooks/useProfileNavigate.ts`
 
 ### Services (10+)
+
 - `src/services/receptionIntakeOrchestrator.ts`
 - `src/services/arrivalControlLayer.ts`
 - `src/services/provisionalIdentityIntake.ts`
@@ -305,6 +310,7 @@ All `.css` files matching `src/components/reception/*.css` (see Section 9)
 - `src/services/arrivalDerivations.ts`
 
 ### Config (8)
+
 - `src/config/receptionScreenModel.ts`
 - `src/config/receptionFirstUx.config.ts`
 - `src/config/emergencyRolePermissions.ts`
@@ -315,12 +321,15 @@ All `.css` files matching `src/components/reception/*.css` (see Section 9)
 - `src/config/receptionScreenModel.ts`
 
 ### Store (1)
+
 - `src/store/emergencyStore.ts` (shared — reception uses patients, alerts, capacity, selectedPatientId, selectPatient, submitReceptionEscalation)
 
 ### Types (1)
+
 - `src/types/emergency.ts` (shared — Patient, Alert, PatientState, PatientFlag, Priority, etc.)
 
 ### Styles (13 global)
+
 - `src/styles/reception-desk-theme.css`
 - `src/styles/clinical-figma-polish.css`
 - `src/styles/color-normalization.css`
@@ -336,6 +345,7 @@ All `.css` files matching `src/components/reception/*.css` (see Section 9)
 - `src/components/Header.css`
 
 ### Backend (6)
+
 - `backend/src/modules/emergency-os/emergency-os.services.ts` (ReceptionWorkspaceService:1448-1546)
 - `backend/src/modules/emergency-os/emergency-os.controller.ts` (2 endpoints)
 - `backend/src/modules/emergency-os/emergency-os.module.ts`

@@ -10,6 +10,7 @@
 ### Emergency OS Services
 
 #### `emergencyStore` (Zustand)
+
 - **File:** `src/store/emergencyStore.ts` (~6500 LOC)
 - **Purpose:** Central state for all ED operations
 - **Inputs:** Backend API payloads, WebSocket events, user actions
@@ -30,7 +31,8 @@
 - **Failure Mode:** Falls back to local demo data when `backendAvailable = false`
 - **3-Minute Support:** Single source of truth for reassessment timers, EMS ETAs, critical alerts
 
-#### `receptionHandoff` 
+#### `receptionHandoff`
+
 - **File:** `src/services/receptionHandoff.ts`
 - **Purpose:** Bridge intake completion to triage queue
 - **Key Functions:**
@@ -40,6 +42,7 @@
 - **3-Minute Support:** Core of the arrival → pretriage transition
 
 #### `receptionIntakeBridge`
+
 - **File:** `src/services/receptionIntakeBridge.ts`
 - **Purpose:** Convert EMS arrivals into reception patient records
 - **Key Functions:**
@@ -48,6 +51,7 @@
 - **Outputs:** `{ok, patientId, receptionVerifyPath}`
 
 #### `queueAssignment`
+
 - **File:** `src/services/queueAssignment.ts`
 - **Purpose:** Determine which queue filter applies to a patient
 - **Key Functions:**
@@ -55,6 +59,7 @@
 - **Consumers:** `EmergencyWhiteboard` visible patient calculation
 
 #### `navigateToEmergencySurface`
+
 - **File:** `src/services/navigateToEmergencySurface.ts`
 - **Purpose:** Role-aware surface routing decisions
 - **Key Functions:**
@@ -62,6 +67,7 @@
 - **Consumers:** `EmergencyIntakeEntry`, `EmergencySurfaceRedirect`
 
 #### `patientArrivalBackendSync`
+
 - **File:** `src/services/patientArrivalBackendSync.ts`
 - **Purpose:** Normalize patient records from backend payload to whiteboard model
 - **Key Functions:**
@@ -69,6 +75,7 @@
 - **Consumers:** `EmergencyWhiteboard` patient list derivation
 
 #### `operationalCommandDashboardModel`
+
 - **File:** `src/services/operationalCommandDashboardModel.ts`
 - **Purpose:** Build the command center dashboard snapshot
 - **Key Functions:**
@@ -76,12 +83,14 @@
 - **Consumers:** `EmergencyWhiteboard` command center mode
 
 #### `commandCenterSurgeModel`
+
 - **File:** `src/services/commandCenterSurgeModel.ts`
 - **Purpose:** Build the surge status snapshot for command center
 - **Key Functions:**
   - `buildCommandCenterSurgeSnapshot({patients, rooms, capacity, ...})` → surgeSnapshot
 
 #### `analyticsService`
+
 - **File:** `src/services/analyticsService.ts`
 - **Purpose:** Usage event tracking
 - **Key Functions:**
@@ -91,6 +100,7 @@
 - **Consumers:** App-level providers, error boundaries
 
 #### `crashReportingService`
+
 - **File:** `src/services/crashReportingService.ts`
 - **Purpose:** Error boundary integration for crash reporting
 
@@ -113,6 +123,7 @@
 ### Core ED Operations
 
 #### `emergency-os`
+
 - **Path:** `backend/src/modules/emergency-os/`
 - **Purpose:** Core Emergency OS API — patient journey, whiteboard data, ED operations
 - **Key Services:**
@@ -129,6 +140,7 @@
 - **3-Minute Support:** Orchestrates the entire patient flow
 
 #### `clinical-alerts`
+
 - **Path:** `backend/src/modules/clinical-alerts/`
 - **Purpose:** Generate and manage clinical alerts based on patient data
 - **Key Functions:** Alert creation, severity assignment, escalation rules
@@ -136,6 +148,7 @@
 - **3-Minute Support:** Critical alert generation for the 3-minute loop
 
 #### `clinical-intelligence`
+
 - **Path:** `backend/src/modules/clinical-intelligence/`
 - **Purpose:** Specialized AI clinical analysis services
 - **Services:**
@@ -152,6 +165,7 @@
 ### AI Services
 
 #### `ai-gateway`
+
 - **Path:** `backend/src/modules/ai-gateway/`
 - **Purpose:** Multi-model LLM routing and response composition
 - **Services:**
@@ -163,6 +177,7 @@
 - **Consumers:** Chat module, clinical intelligence, copilot
 
 #### `medical-control-plane`
+
 - **Path:** `backend/src/modules/medical-control-plane/`
 - **Purpose:** Three-layer clinical AI orchestration
 - **Sub-modules:**
@@ -172,6 +187,7 @@
 - **Consumers:** AI gateway upstream
 
 #### `rag`
+
 - **Path:** `backend/src/modules/rag/`
 - **Purpose:** Retrieval-Augmented Generation for clinical evidence
 - **Services:**
@@ -183,6 +199,7 @@
 - **Outputs:** Ranked evidence chunks with citations
 
 #### `chat`
+
 - **Path:** `backend/src/modules/chat/`
 - **Purpose:** Chat session management and streaming
 - **Services:**
@@ -191,11 +208,13 @@
 - **Controller:** `chat.controller.ts` + `emergency-ai.controller.ts`
 
 #### `llm-security`
+
 - **Path:** `backend/src/modules/llm-security/`
 - **Purpose:** Prompt injection detection, output safety validation
 - **Consumers:** AI gateway (pre/post processing)
 
 #### `cost-optimizer`
+
 - **Path:** `backend/src/modules/cost-optimizer/`
 - **Purpose:** AI query cost management
 - **Services:**
@@ -205,20 +224,24 @@
   - `cache.service.ts` — cache repeated queries
 
 #### `moe-router`
+
 - **Path:** `backend/src/modules/moe-router/`
 - **Purpose:** Mixture-of-Experts model dispatch for specialized domains
 
 #### `memory`
+
 - **Path:** `backend/src/modules/memory/`
 - **Purpose:** AI context memory persistence (patient session, conversation)
 - **Entities:** Memory store, session context
 
 #### `native-ai`
+
 - **Path:** `backend/src/modules/native-ai/`
 - **Purpose:** On-device / lightweight AI capabilities
 - **Features:** IoMT alert processing, VVT scoring, BRAG crowding forecast
 
 #### `evaluation`
+
 - **Path:** `backend/src/modules/evaluation/`
 - **Purpose:** AI model quality evaluation and benchmarking
 
@@ -227,6 +250,7 @@
 ### Identity & Access
 
 #### `auth`
+
 - **Path:** `backend/src/modules/auth/`
 - **Purpose:** Authentication, session management
 - **Services:**
@@ -239,15 +263,18 @@
 - **Entities:** `refresh-token.entity.ts`, `biometric-config.entity.ts`
 
 #### `users`
+
 - **Path:** `backend/src/modules/users/`
 - **Purpose:** User account CRUD
 
 #### `permissions`
+
 - **Path:** `backend/src/modules/permissions/`
 - **Purpose:** RBAC permission enforcement
 - **Enum:** `permission.enum.ts` — all permission strings
 
 #### `two-factor`
+
 - **Path:** `backend/src/modules/two-factor/`
 - **Purpose:** TOTP 2FA setup and validation
 
@@ -256,12 +283,14 @@
 ### Data & Compliance
 
 #### `audit`
+
 - **Path:** `backend/src/modules/audit/`
 - **Purpose:** Tamper-evident audit log with HMAC hashing
 - **Entity:** `audit-log.entity.ts`
 - **Features:** Hash-chained entries, PHI access logging, AI decision logging
 
 #### `encryption`
+
 - **Path:** `backend/src/modules/encryption/`
 - **Purpose:** PHI column encryption and key rotation
 - **Services:**
@@ -269,15 +298,18 @@
   - `key-rotation.service.ts` — scheduled key rotation
 
 #### `compliance`
+
 - **Path:** `backend/src/modules/compliance/`
 - **Purpose:** HIPAA/GDPR compliance checks and reporting
 
 #### `analytics`
+
 - **Path:** `backend/src/modules/analytics/`
 - **Purpose:** Usage event tracking and reporting
 - **Entity:** `analytics-event.entity.ts`
 
 #### `artifacts`
+
 - **Path:** `backend/src/modules/artifacts/`
 - **Purpose:** Clinical document and knowledge artifact management
 - **Entities:** `artifact.entity.ts`, `artifact-version.entity.ts`
@@ -287,25 +319,30 @@
 ### Infrastructure
 
 #### `cache`
+
 - **Path:** `backend/src/modules/cache/`
 - **Purpose:** Redis/in-memory cache
 - **Used by:** AI gateway, RAG, analytics
 
 #### `email`
+
 - **Path:** `backend/src/modules/email/`
 - **Purpose:** Transactional email delivery
 - **Used for:** Invitations, 2FA codes, alerts
 
 #### `notifications`
+
 - **Path:** `backend/src/modules/notifications/`
 - **Purpose:** Push notification dispatch
 - **Features:** Alert delivery, real-time notification queue
 
 #### `observability`
+
 - **Path:** `backend/src/modules/observability/`
 - **Purpose:** Distributed tracing, APM integration (Datadog/Sentry)
 
 #### `metrics`
+
 - **Path:** `backend/src/modules/metrics/`
 - **Purpose:** Prometheus metrics export
 
@@ -314,20 +351,24 @@
 ### Organization & Tenant
 
 #### `organizations`
+
 - **Path:** `backend/src/modules/organizations/`
 - **Purpose:** Multi-tenant organization management
 - **Entities:** Organization, membership, settings
 
 #### `tenant-context`
+
 - **Path:** `backend/src/modules/tenant-context/`
 - **Purpose:** Inject tenant ID into all requests for data isolation
 
 #### `subscriptions`
+
 - **Path:** `backend/src/modules/subscriptions/`
 - **Purpose:** SaaS subscription tier management
 - **Integration:** Stripe (via `stripe.config.ts`)
 
 #### `workspaces`
+
 - **Path:** `backend/src/modules/workspaces/`
 - **Purpose:** Multi-workspace management within an organization
 

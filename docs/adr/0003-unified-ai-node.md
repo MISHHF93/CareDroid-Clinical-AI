@@ -5,7 +5,7 @@
 
 ## Context
 
-Two separate classification needs emerged: (1) routing a clinical query to the right intent (drug interaction check, lab interpretation, SOFA calculation, ...) for the 3-phase `IntentClassifierService` pipeline, and (2) routing a free-text query or repo artifact to the right *artifact type* (page, tool, calculator, prompt, ...) for internal tooling and the artifact-intelligence pipeline. Both problems have the same shape — frozen sentence embeddings feeding a small classifier head — and both had been developed as separate MLP models (`backend/ml-services/nlu/`, `backend/ml-services/artifact-router/`).
+Two separate classification needs emerged: (1) routing a clinical query to the right intent (drug interaction check, lab interpretation, SOFA calculation, ...) for the 3-phase `IntentClassifierService` pipeline, and (2) routing a free-text query or repo artifact to the right _artifact type_ (page, tool, calculator, prompt, ...) for internal tooling and the artifact-intelligence pipeline. Both problems have the same shape — frozen sentence embeddings feeding a small classifier head — and both had been developed as separate MLP models (`backend/ml-services/nlu/`, `backend/ml-services/artifact-router/`).
 
 ## Decision
 

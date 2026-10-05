@@ -79,27 +79,28 @@ src/
 ## Key Patterns
 
 ### 1. Page Component Pattern
+
 ```tsx
 export default function ReceptionWorkspace() {
   // 1. Hook into role permissions
   const emergencyRole = useEmergencyRolePermissions();
   const screenMode = useRouteScreenMode();
-  
+
   // 2. Hook into store (only what's needed)
   const patients = useEmergencyStore((s) => s.patients);
   const alerts = useEmergencyStore((s) => s.alerts);
   const capacity = useEmergencyStore((s) => s.capacity);
-  
+
   // 3. Resolve screen capabilities
   const capabilities = useMemo(
     () => resolveReceptionScreenCapabilities({ screenMode, can: emergencyRole.can, ... }),
     [emergencyRole]
   );
-  
+
   // 4. Local UI state (not duplicated in store)
   const [draft, setDraft] = useState<ReceptionIntakeDraft>(EMPTY_DRAFT);
   const [showChooser, setShowChooser] = useState(false);
-  
+
   // 5. Render layout
   return (
     <EmergencyRoutePage>
@@ -117,6 +118,7 @@ export default function ReceptionWorkspace() {
 ```
 
 ### 2. Capability Resolution Pattern
+
 ```tsx
 // Config maps screen mode + role permissions to capabilities
 const capabilities = resolveReceptionScreenCapabilities({
@@ -134,6 +136,7 @@ const capabilities = resolveReceptionScreenCapabilities({
 ```
 
 ### 3. KPI Resolution Pattern
+
 ```tsx
 // emergencyScreenKpiPolicy.ts defines reception-specific KPIs
 const RECEPTION_KPIS: EmergencyScreenKpiId[] = [
@@ -158,9 +161,10 @@ const RECEPTION_STRIP_MAP = {
 ```
 
 ### 4. Service Orchestration Pattern
+
 ```tsx
 // Services are pure functions, not classes
-import { 
+import {
   createPatientAndRouteFromReception,
   detectReceptionRedFlags,
   runReceptionAiIntakeAssist,
@@ -178,9 +182,10 @@ const result = createPatientAndRouteFromReception(draft, {
 ```
 
 ### 5. Escalation Pattern
+
 ```tsx
 // Escalation is a separate workflow, not inline
-import { 
+import {
   type ReceptionEscalationInput,
   type ReceptionEscalationReasonId,
 } from '../../services/receptionEscalationWorkflow';
@@ -199,6 +204,7 @@ import {
 ```
 
 ### 6. Handoff Pattern
+
 ```tsx
 // Reception hands off to triage via:
 // 1. Patient state transition (Registration → Waiting)
@@ -216,27 +222,27 @@ const handleHandoff = async (patient: Patient) => {
 
 ## Role Permissions
 
-| Action | Permission |
-|--------|------------|
-| Create patient | `patient.create` |
-| Edit demographics | `patient.demographics.edit` |
-| Create encounter | `encounter.create` |
-| Verify identity | `intake.verify` |
-| Convert EMS arrival | `ems.convertArrival` |
-| Escalate to triage | `reception.escalate` |
-| Screen access | `screen.registration` |
+| Action              | Permission                  |
+| ------------------- | --------------------------- |
+| Create patient      | `patient.create`            |
+| Edit demographics   | `patient.demographics.edit` |
+| Create encounter    | `encounter.create`          |
+| Verify identity     | `intake.verify`             |
+| Convert EMS arrival | `ems.convertArrival`        |
+| Escalate to triage  | `reception.escalate`        |
+| Screen access       | `screen.registration`       |
 
 ## Navigation
 
-| Order | Nav Item | Route |
-|-------|----------|-------|
-| 1 | reception | /emergency/reception |
-| 2 | patients | /emergency/patients |
-| 3 | pulse | /emergency/pulse |
-| 4 | shift | /emergency/shift |
-| 5 | alerts | /emergency/alerts |
-| 6 | collaboration | /emergency/collaboration |
-| 7 | help | /emergency/help |
+| Order | Nav Item      | Route                    |
+| ----- | ------------- | ------------------------ |
+| 1     | reception     | /emergency/reception     |
+| 2     | patients      | /emergency/patients      |
+| 3     | pulse         | /emergency/pulse         |
+| 4     | shift         | /emergency/shift         |
+| 5     | alerts        | /emergency/alerts        |
+| 6     | collaboration | /emergency/collaboration |
+| 7     | help          | /emergency/help          |
 
 ## Design Principles
 

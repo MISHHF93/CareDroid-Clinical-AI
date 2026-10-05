@@ -15,6 +15,7 @@ The Paramedic manages the pre-arrival patient data pipeline: entering patient in
 ## Dashboard View
 
 **EMS** (`/emergency/ems`) — Your primary workspace. Shows:
+
 - Your active unit and destination hospital
 - Pre-arrival patient data entry form
 - Inbound patient list at your destination ED
@@ -77,6 +78,7 @@ The Paramedic manages the pre-arrival patient data pipeline: entering patient in
 ### How to Prepare the Handoff Checklist
 
 The handoff checklist opens automatically on the EMS module when you arrive. It covers:
+
 1. Patient identification confirmed (name, DOB, or patient identifier)
 2. Chief complaint and mechanism confirmed
 3. Vitals at time of transport AND vitals on arrival
@@ -97,6 +99,7 @@ The handoff checklist opens automatically on the EMS module when you arrive. It 
 ### How to Handle an Offload Delay
 
 If the ED cannot receive your patient immediately:
+
 1. An offload delay alert appears in your EMS module.
 2. Notify the charge nurse directly.
 3. Continue monitoring and treating the patient in the ambulance bay.
@@ -107,20 +110,20 @@ If the ED cannot receive your patient immediately:
 
 ## Alerts You Receive
 
-| Alert | Meaning | Your action |
-|-------|---------|------------|
-| Handoff incomplete | Your handoff checklist is not completed within 15 minutes of arrival | Complete the checklist with receiving staff |
-| Critical patient inbound notification | Another critical unit is arriving at the same ED — possible resource conflict | Coordinate with charge nurse on arrival sequence |
-| Offload delay | ED is not able to accept the patient immediately | Continue care in ambulance bay; notify charge nurse |
+| Alert                                 | Meaning                                                                       | Your action                                         |
+| ------------------------------------- | ----------------------------------------------------------------------------- | --------------------------------------------------- |
+| Handoff incomplete                    | Your handoff checklist is not completed within 15 minutes of arrival          | Complete the checklist with receiving staff         |
+| Critical patient inbound notification | Another critical unit is arriving at the same ED — possible resource conflict | Coordinate with charge nurse on arrival sequence    |
+| Offload delay                         | ED is not able to accept the patient immediately                              | Continue care in ambulance bay; notify charge nurse |
 
 ---
 
 ## AI Features Available
 
-| Intent | What it gives you |
-|--------|------------------|
-| `handoff_summary` | Structured handoff summary from your pre-arrival data. Review before arriving — it prepares the receiving team. |
-| `fallback_recommendation` | Manual handoff procedure steps if CareDroid is unavailable |
+| Intent                    | What it gives you                                                                                               |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `handoff_summary`         | Structured handoff summary from your pre-arrival data. Review before arriving — it prepares the receiving team. |
+| `fallback_recommendation` | Manual handoff procedure steps if CareDroid is unavailable                                                      |
 
 ---
 

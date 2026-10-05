@@ -82,46 +82,55 @@ CareDroid recognizes 23 user roles across the emergency department and hospital 
 ### Clinical Roles
 
 #### Reception Clerk (`registration_clerk`)
+
 Registers patient arrivals, verifies identity, captures chief complaint and red flags, and hands off to triage.  
 **Landing page:** `/emergency/reception`  
 **Scope:** Walk-in registration, EMS conversion, identity verification, pretriage queue handoff.
 
 #### Triage Nurse (`triage_nurse`)
+
 Assigns acuity, records vitals, captures complaint detail, starts reassessment timers, and routes to waiting, room, provider, or emergency escalation.  
 **Landing page:** `/emergency/reception` (triage queue view)  
 **Scope:** Acuity assignment, vitals, reassessment, queue movement.
 
 #### Charge Nurse (`charge_nurse`)
+
 Runs shift flow: rooms patients, assigns staff, manages queue surge, owns escalation, and monitors the operational dashboard.  
 **Landing page:** `/emergency/whiteboard`  
 **Scope:** All patient flow decisions, staff assignment, escalation authority.
 
 #### Registered Nurse (`registered_nurse`)
+
 Manages assigned patients: updates status, records assessments, reassesses per timer, documents, and escalates when needed.  
 **Landing page:** `/emergency/whiteboard`  
 **Scope:** Assigned patients only. Cannot room, discharge, or configure settings.
 
 #### Emergency Physician (`emergency_physician`)
+
 Diagnoses, treats, documents, orders, disposes, and clinically reviews AI Chief recommendations.  
 **Landing page:** `/emergency/whiteboard`  
 **Scope:** All clinical decisions. Full AI Chief access including override authority.
 
 #### Attending Physician (`attending_physician`)
+
 Senior physician role with the same full clinical decision authority as Emergency Physician.  
 **Landing page:** `/emergency/whiteboard`  
 **Scope:** All clinical decisions. Same permission tier as Emergency Physician (shared `physician` role mapping).
 
 #### Resident Physician (`resident_physician`)
+
 Physician-in-training role with the same clinical decision authority as Emergency Physician.  
 **Landing page:** `/emergency/whiteboard`  
 **Scope:** All clinical decisions. Same permission tier as Emergency Physician (shared `physician` role mapping).
 
 #### Specialist (`specialist`)
+
 Receives consult requests, reviews case summaries, documents specialist recommendations, and sends handoff confirmation.  
 **Landing page:** `/emergency/patients`  
 **Scope:** Consult queue patients. AI Chief review for consult context.
 
 #### Paramedic (`paramedic`)
+
 Manages EMS pre-arrival patient data, converts EMS units to registered patients on arrival, documents handoff checklist.  
 **Landing page:** `/emergency/ems`  
 **Scope:** EMS module. Pre-arrival data entry. Handoff to reception.
@@ -129,41 +138,49 @@ Manages EMS pre-arrival patient data, converts EMS units to registered patients 
 ### Operational Roles
 
 #### Dispatcher (`dispatcher`)
+
 Emergency call taker and CAD dispatch operator. Receives 911 calls, performs telephone triage, assigns EMS units, and notifies the ED of inbound critical patients.  
 **Landing page:** `/emergency/dispatch`  
 **Scope:** Dispatch module. Operational data-minimization tier — no direct clinical patient access.
 
 #### EMS Coordinator (`ems_coordinator`)
+
 EMS operations coordinator who manages unit deployment, prehospital data relay, pre-arrival notifications, and ED readiness handoffs.  
 **Landing page:** `/emergency/ems`  
 **Scope:** EMS coordination. Operational data-minimization tier — no direct clinical patient access.
 
 #### Social Worker (`social_worker`)
+
 Read-only clinical role supporting discharge planning and patient-support coordination.  
 **Landing page:** `/emergency/patients`  
 **Scope:** Read-only. Clinical data-minimization tier — sees patient context, no write access.
 
 #### Security Officer (`security_officer`)
+
 Read-only role for physical-security and incident awareness via department alerts.  
 **Landing page:** `/emergency/alerts`  
 **Scope:** Read-only. Metadata-only data-minimization tier — no clinical patient content.
 
 #### Patient Flow Coordinator (`patient_flow_coordinator`)
+
 Coordinates beds across departments, manages transfers, resolves bottlenecks, owns the capacity dashboard.  
 **Landing page:** `/emergency/capacity`  
 **Scope:** Capacity management, department routing, bed assignment, transfer coordination.
 
 #### Lab Technician (`lab_technician`)
+
 Handles lab workflow alerts, critical value notifications, and turnaround tracking.  
 **Landing page:** `/emergency/alerts`  
 **Scope:** Lab-sourced alerts. No clinical patient access.
 
 #### Radiology Technician (`radiology_technician`)
+
 Handles imaging readiness, imaging workflow alerts, and turnaround tracking.  
 **Landing page:** `/emergency/alerts`  
 **Scope:** Radiology-sourced alerts. No clinical patient access.
 
 #### Pharmacist (`pharmacist`)
+
 Reviews medication risk alerts, medication order alerts, and drug interaction notifications.  
 **Landing page:** `/emergency/alerts`  
 **Scope:** Pharmacy-sourced alerts. Medication workflow only.
@@ -171,31 +188,37 @@ Reviews medication risk alerts, medication order alerts, and drug interaction no
 ### Administrative Roles
 
 #### Site Super Admin (`super_admin`)
+
 Full platform administration with no data-minimization restriction — the highest-privilege role in the system.  
 **Landing page:** `/emergency/settings`  
 **Scope:** Unrestricted admin access across every module.
 
 #### ED Director (`ed_director`)
+
 Combines physician-level clinical authority with department management oversight.  
 **Landing page:** `/emergency/whiteboard`  
 **Scope:** Clinical and administrative. Same operational permissions as ED Manager plus physician-level clinical access.
 
 #### Hospital Administrator (`hospital_admin`)
+
 Reviews operational reports, sets hospital-level settings, monitors aggregate performance.  
 **Landing page:** `/emergency/analytics`  
 **Scope:** Read-only clinical. Full analytics and settings access.
 
 #### IT Administrator (`it_admin`)
+
 Manages identity, integrations, audit trail, downtime coordination, and system health.  
 **Landing page:** `/emergency/settings`  
 **Scope:** System configuration. Audit access. No clinical patient access.
 
 #### Quality & Safety Officer (`quality_safety_officer`)
+
 Reviews compliance, breach reports, AI override patterns, alert resolution quality, and safety analytics.  
 **Landing page:** `/emergency/analytics`  
 **Scope:** Full analytics read. Alert and AI audit read. No clinical write access.
 
 #### Demo Observer (`demo_observer`)
+
 Read-only demonstration and training view. Sees full ED simulation with realistic data.  
 **Landing page:** `/emergency/whiteboard`  
 **Scope:** Read-only. No write actions. Full navigation in demo mode.
@@ -219,35 +242,35 @@ The canonical permission source is `src/lib/users/permissions.ts`. Runtime acces
 
 ### Permission Families
 
-| Family | Permissions |
-|--------|-------------|
-| `patient:*` | `view`, `create`, `update`, `assign`, `discharge` |
-| `triage:*` | `read`, `create`, `update`, `override`, `escalate` |
-| `ai:*` | `read`, `request`, `review`, `override`, `configure` |
-| `alert:*` | `read`, `acknowledge`, `escalate`, `resolve`, `configure` |
-| `staff:*` | `read`, `update`, `assign`, `schedule` |
-| `analytics:*` | `read`, `export` |
-| `reports:*` | `read`, `generate`, `export` |
-| `settings:*` | `read`, `update`, `configure` |
-| `users:*` | `read`, `create`, `update`, `deactivate` |
-| `audit:*` | `read`, `export` |
+| Family        | Permissions                                               |
+| ------------- | --------------------------------------------------------- |
+| `patient:*`   | `view`, `create`, `update`, `assign`, `discharge`         |
+| `triage:*`    | `read`, `create`, `update`, `override`, `escalate`        |
+| `ai:*`        | `read`, `request`, `review`, `override`, `configure`      |
+| `alert:*`     | `read`, `acknowledge`, `escalate`, `resolve`, `configure` |
+| `staff:*`     | `read`, `update`, `assign`, `schedule`                    |
+| `analytics:*` | `read`, `export`                                          |
+| `reports:*`   | `read`, `generate`, `export`                              |
+| `settings:*`  | `read`, `update`, `configure`                             |
+| `users:*`     | `read`, `create`, `update`, `deactivate`                  |
+| `audit:*`     | `read`, `export`                                          |
 
 ### Role-to-Permission Matrix (Core)
 
-| Permission | Clerk | Triage Nurse | Charge Nurse | RN | Physician | Admin |
-|------------|-------|-------------|-------------|-----|-----------|-------|
-| `patient:view` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| `patient:create` | ✓ | — | — | — | — | — |
-| `patient:update` | — | ✓ | ✓ | ✓ | ✓ | — |
-| `patient:discharge` | — | — | ✓ | — | ✓ | — |
-| `triage:create` | — | ✓ | ✓ | — | ✓ | — |
-| `triage:override` | — | — | ✓ | — | ✓ | — |
-| `ai:request` | — | ✓ | ✓ | ✓ | ✓ | — |
-| `ai:override` | — | — | ✓ | — | ✓ | — |
-| `alert:acknowledge` | — | ✓ | ✓ | ✓ | ✓ | — |
-| `alert:configure` | — | — | — | — | — | ✓ |
-| `analytics:read` | — | — | ✓ | — | ✓ | ✓ |
-| `settings:configure` | — | — | — | — | — | ✓ |
+| Permission           | Clerk | Triage Nurse | Charge Nurse | RN  | Physician | Admin |
+| -------------------- | ----- | ------------ | ------------ | --- | --------- | ----- |
+| `patient:view`       | ✓     | ✓            | ✓            | ✓   | ✓         | ✓     |
+| `patient:create`     | ✓     | —            | —            | —   | —         | —     |
+| `patient:update`     | —     | ✓            | ✓            | ✓   | ✓         | —     |
+| `patient:discharge`  | —     | —            | ✓            | —   | ✓         | —     |
+| `triage:create`      | —     | ✓            | ✓            | —   | ✓         | —     |
+| `triage:override`    | —     | —            | ✓            | —   | ✓         | —     |
+| `ai:request`         | —     | ✓            | ✓            | ✓   | ✓         | —     |
+| `ai:override`        | —     | —            | ✓            | —   | ✓         | —     |
+| `alert:acknowledge`  | —     | ✓            | ✓            | ✓   | ✓         | —     |
+| `alert:configure`    | —     | —            | —            | —   | —         | ✓     |
+| `analytics:read`     | —     | —            | ✓            | —   | ✓         | ✓     |
+| `settings:configure` | —     | —            | —            | —   | —         | ✓     |
 
 ### How to Register a New User
 
@@ -283,6 +306,7 @@ The canonical permission source is `src/lib/users/permissions.ts`. Runtime acces
 ### How to Navigate Between Pages
 
 The sidebar lists all pages available to your role. Use it to move between:
+
 - **Whiteboard** — Department overview and patient board.
 - **Patients** — Full patient list with search and filter.
 - **Reception** — Walk-in and EMS arrivals.
@@ -334,6 +358,7 @@ Each step has an owner role and a CareDroid surface.
 
 **Step 1 — Signal Capture**  
 A patient arrives. The source is one of:
+
 - Walk-in to reception (clerk registers via `/emergency/reception`)
 - EMS pre-arrival (paramedic enters via `/emergency/ems`)
 - Self-arrival check-in (patient uses kiosk `/emergency/intake`)
@@ -380,6 +405,7 @@ Ensure every critical or high-acuity patient has a named licensed clinical owner
 ### When It Triggers
 
 The 3-minute timer starts when any of the following occur:
+
 - Patient is registered with a high-risk complaint flag.
 - Triage assigns CTAS 1 or CTAS 2 acuity.
 - A critical alert is generated from vital deterioration.
@@ -389,13 +415,13 @@ The 3-minute timer starts when any of the following occur:
 
 ### Timer Phases
 
-| Phase | Time | What Happens | Who Acts |
-|-------|------|-------------|----------|
-| Capture | 0:00–0:30 | Complaint and red flags are recorded. Patient record is created. | Reception Clerk, Triage Nurse, Paramedic |
-| Notify | 0:30–1:00 | Triage priority is suggested. Alert is sent to the assigned owner. | Alert engine notifies owner via in-app and fallback channel |
-| Route | 1:00–2:00 | Department is recommended. Handoff is prepared. | Charge Nurse, Patient Flow Coordinator |
-| Escalate | 2:00–3:00 | If not acknowledged, escalation message is sent to backup owner. | System + Charge Nurse |
-| Breach | After 3:00 | Breach is recorded. Escalation continues up the chain. Analytics records the event. | Physician, Patient Flow Coordinator, Admin on call |
+| Phase    | Time       | What Happens                                                                        | Who Acts                                                    |
+| -------- | ---------- | ----------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| Capture  | 0:00–0:30  | Complaint and red flags are recorded. Patient record is created.                    | Reception Clerk, Triage Nurse, Paramedic                    |
+| Notify   | 0:30–1:00  | Triage priority is suggested. Alert is sent to the assigned owner.                  | Alert engine notifies owner via in-app and fallback channel |
+| Route    | 1:00–2:00  | Department is recommended. Handoff is prepared.                                     | Charge Nurse, Patient Flow Coordinator                      |
+| Escalate | 2:00–3:00  | If not acknowledged, escalation message is sent to backup owner.                    | System + Charge Nurse                                       |
+| Breach   | After 3:00 | Breach is recorded. Escalation continues up the chain. Analytics records the event. | Physician, Patient Flow Coordinator, Admin on call          |
 
 ### How to Register a Critical Patient (0:00–0:30)
 
@@ -427,6 +453,7 @@ The 3-minute timer starts when any of the following occur:
 ### Failure Mode
 
 If CareDroid AI, notifications, or the backend are unavailable:
+
 - Use your hospital's manual escalation protocol immediately (phone, pager, overhead page, radio).
 - Do not wait for the system to recover.
 - After recovery, back-enter the timeline of events into the patient record.
@@ -441,12 +468,12 @@ Create a complete and accurate patient record from the moment of arrival so that
 
 ### Intake Sources
 
-| Source | Who enters | Where | Result |
-|--------|-----------|-------|--------|
-| Walk-in | Reception Clerk | `/emergency/reception` | Patient record created |
-| EMS pre-arrival | Paramedic | `/emergency/ems` | Pre-arrival unit tracked; converted on arrival |
-| Self-arrival kiosk | Patient | `/emergency/intake` | Preliminary record; clerk verifies |
-| Staff escalation | Any clinical staff | Patient detail panel | Escalation alert created |
+| Source             | Who enters         | Where                  | Result                                         |
+| ------------------ | ------------------ | ---------------------- | ---------------------------------------------- |
+| Walk-in            | Reception Clerk    | `/emergency/reception` | Patient record created                         |
+| EMS pre-arrival    | Paramedic          | `/emergency/ems`       | Pre-arrival unit tracked; converted on arrival |
+| Self-arrival kiosk | Patient            | `/emergency/intake`    | Preliminary record; clerk verifies             |
+| Staff escalation   | Any clinical staff | Patient detail panel   | Escalation alert created                       |
 
 ### How to Register a Walk-In Patient
 
@@ -505,13 +532,13 @@ Assign the correct acuity level, record vitals, capture clinical complaint, star
 
 CareDroid uses the Canadian Triage and Acuity Scale (CTAS):
 
-| Level | Label | Target to physician | Timer |
-|-------|-------|--------------------|----|
-| CTAS 1 | Resuscitation | Immediate | Real-time monitoring |
-| CTAS 2 | Emergent | ≤ 15 minutes | Continuous |
-| CTAS 3 | Urgent | ≤ 30 minutes | 30-minute reassessment |
-| CTAS 4 | Less Urgent | ≤ 60 minutes | 60-minute reassessment |
-| CTAS 5 | Non-Urgent | ≤ 120 minutes | 120-minute reassessment |
+| Level  | Label         | Target to physician | Timer                   |
+| ------ | ------------- | ------------------- | ----------------------- |
+| CTAS 1 | Resuscitation | Immediate           | Real-time monitoring    |
+| CTAS 2 | Emergent      | ≤ 15 minutes        | Continuous              |
+| CTAS 3 | Urgent        | ≤ 30 minutes        | 30-minute reassessment  |
+| CTAS 4 | Less Urgent   | ≤ 60 minutes        | 60-minute reassessment  |
+| CTAS 5 | Non-Urgent    | ≤ 120 minutes       | 120-minute reassessment |
 
 ### How to Triage a Patient
 
@@ -553,12 +580,12 @@ Ensure that every high-risk signal is acknowledged by a named owner, acted on, a
 
 ### Alert Severity Levels
 
-| Severity | Color | Source | Response Required |
-|---------|-------|--------|------------------|
-| Critical | Red | CTAS 1/2, vital deterioration, breach | Immediate — within 3 minutes |
-| High | Orange | CTAS 3 with risk flags, reassessment due | Within 15 minutes |
-| Medium | Yellow | CTAS 4 with flags, operational issue | Within 60 minutes |
-| Low | Blue | Informational, non-urgent | Review at next available opportunity |
+| Severity | Color  | Source                                   | Response Required                    |
+| -------- | ------ | ---------------------------------------- | ------------------------------------ |
+| Critical | Red    | CTAS 1/2, vital deterioration, breach    | Immediate — within 3 minutes         |
+| High     | Orange | CTAS 3 with risk flags, reassessment due | Within 15 minutes                    |
+| Medium   | Yellow | CTAS 4 with flags, operational issue     | Within 60 minutes                    |
+| Low      | Blue   | Informational, non-urgent                | Review at next available opportunity |
 
 ### Alert Sources
 
@@ -619,19 +646,19 @@ Use AI decision support to get structured, explainable recommendations for compl
 
 The AI Chief supports 11 intents:
 
-| Intent | What it does | Who can use it |
-|--------|-------------|----------------|
-| `critical_alert_assessment` | Assesses a critical alert and recommends immediate action | Physician, Charge Nurse, Patient Flow Coordinator |
-| `three_minute_response_plan` | Generates a full 3-minute response plan for a critical patient | Physician, Charge Nurse |
-| `patient_intake_assist` | Suggests complaint classification and red flag review | Triage Nurse, Charge Nurse |
-| `triage_recommendation` | Recommends CTAS level based on vitals and complaint | Triage Nurse (advisory only — nurse owns the decision) |
-| `patient_summary` | Summarizes patient history, risk, and current status | Physician, Registered Nurse, Specialist |
-| `department_routing` | Recommends which ED zone or department the patient should go to | Charge Nurse, Patient Flow Coordinator |
-| `staff_routing` | Recommends which staff role and available individual should own this patient | Charge Nurse |
-| `handoff_summary` | Generates a handoff document for patient transfer | Physician, Charge Nurse, Registered Nurse |
-| `hospital_command_insight` | Provides aggregate operational insight for the current department state | Hospital Admin, Quality & Safety Officer, Charge Nurse |
-| `service_bottleneck_analysis` | Analyzes current service degradations and their patient impact | IT Admin, Patient Flow Coordinator |
-| `fallback_recommendation` | Provides manual fallback procedure when services are unavailable | All roles |
+| Intent                        | What it does                                                                 | Who can use it                                         |
+| ----------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------ |
+| `critical_alert_assessment`   | Assesses a critical alert and recommends immediate action                    | Physician, Charge Nurse, Patient Flow Coordinator      |
+| `three_minute_response_plan`  | Generates a full 3-minute response plan for a critical patient               | Physician, Charge Nurse                                |
+| `patient_intake_assist`       | Suggests complaint classification and red flag review                        | Triage Nurse, Charge Nurse                             |
+| `triage_recommendation`       | Recommends CTAS level based on vitals and complaint                          | Triage Nurse (advisory only — nurse owns the decision) |
+| `patient_summary`             | Summarizes patient history, risk, and current status                         | Physician, Registered Nurse, Specialist                |
+| `department_routing`          | Recommends which ED zone or department the patient should go to              | Charge Nurse, Patient Flow Coordinator                 |
+| `staff_routing`               | Recommends which staff role and available individual should own this patient | Charge Nurse                                           |
+| `handoff_summary`             | Generates a handoff document for patient transfer                            | Physician, Charge Nurse, Registered Nurse              |
+| `hospital_command_insight`    | Provides aggregate operational insight for the current department state      | Hospital Admin, Quality & Safety Officer, Charge Nurse |
+| `service_bottleneck_analysis` | Analyzes current service degradations and their patient impact               | IT Admin, Patient Flow Coordinator                     |
+| `fallback_recommendation`     | Provides manual fallback procedure when services are unavailable             | All roles                                              |
 
 ### How to Use the AI Chief
 
@@ -665,6 +692,7 @@ The AI Chief supports 11 intents:
 ### When AI Is Unavailable
 
 If the AI Chief is unavailable (network issue, service degradation, model error):
+
 - A banner will indicate AI is unavailable.
 - Continue with your standard clinical workflow — AI is decision support, not a dependency.
 - Use the **Fallback procedure** for the relevant workflow (see Section 17).
@@ -720,6 +748,7 @@ Ensure every patient and every critical alert has a named, available, qualified 
 ### When to Escalate
 
 Escalate immediately if any of the following are true:
+
 - Patient is unstable and the assigned owner has not acknowledged within the 3-minute window.
 - A critical alert has no owner.
 - Triage indicates CTAS 1 or 2 and the patient has not reached a licensed clinician.
@@ -729,13 +758,13 @@ Escalate immediately if any of the following are true:
 
 ### Escalation Chain
 
-| Level | Who receives escalation | When |
-|-------|------------------------|------|
-| 1 | Assigned owner | Immediately on alert creation |
-| 2 | Charge nurse / backup owner | At 2:00 minutes without acknowledgement |
-| 3 | Emergency physician on duty | At 3:00 minutes (breach) |
-| 4 | Patient flow coordinator | If physician is also unavailable |
-| 5 | Administrator on call | Sustained breach — patient safety risk |
+| Level | Who receives escalation     | When                                    |
+| ----- | --------------------------- | --------------------------------------- |
+| 1     | Assigned owner              | Immediately on alert creation           |
+| 2     | Charge nurse / backup owner | At 2:00 minutes without acknowledgement |
+| 3     | Emergency physician on duty | At 3:00 minutes (breach)                |
+| 4     | Patient flow coordinator    | If physician is also unavailable        |
+| 5     | Administrator on call       | Sustained breach — patient safety risk  |
 
 ### How to Escalate in CareDroid
 
@@ -749,6 +778,7 @@ Escalate immediately if any of the following are true:
 ### How to Document an Escalation
 
 Every escalation must include:
+
 - Time of original signal.
 - Time of escalation action.
 - Who escalated (role and name).
@@ -769,6 +799,7 @@ Transfer accountable clinical ownership of a patient from one provider to anothe
 ### Required Handoff Elements
 
 Every handoff must include:
+
 1. **Patient** — name, DOB, MRN, arrival time.
 2. **Acuity** — current CTAS level and any changes since triage.
 3. **Current risk** — active risk flags, vital status, alerts open.
@@ -798,6 +829,7 @@ Every handoff must include:
 ### Verbal Handoff Documentation
 
 For urgent bedside handoffs:
+
 1. Do the verbal handoff first.
 2. Immediately after, open the patient record.
 3. Click **Document verbal handoff**.
@@ -814,18 +846,18 @@ Move the patient to the right department, zone, or service — with a clear owne
 
 ### Routing Destinations
 
-| Destination | When to route | Who confirms |
-|-------------|--------------|-------------|
-| ED treatment room | Active care ongoing | Charge Nurse |
-| ED fast track | Lower acuity, quick disposition | Charge Nurse |
-| Resuscitation bay | CTAS 1 — immediate | Physician |
-| Lab | Specimens ordered | Lab Technician notified |
-| Radiology | Imaging ordered | Radiology Technician notified |
-| Pharmacy | Medication needed | Pharmacist notified |
-| Specialist consult | Clinical complexity requires specialist | Specialist assigned |
-| Inpatient admission | Disposition: admit | Patient Flow Coordinator + bed management |
-| Transfer | Another facility | Patient Flow Coordinator + transport |
-| Discharge | Disposition: discharge | Physician documents, Clerk processes |
+| Destination         | When to route                           | Who confirms                              |
+| ------------------- | --------------------------------------- | ----------------------------------------- |
+| ED treatment room   | Active care ongoing                     | Charge Nurse                              |
+| ED fast track       | Lower acuity, quick disposition         | Charge Nurse                              |
+| Resuscitation bay   | CTAS 1 — immediate                      | Physician                                 |
+| Lab                 | Specimens ordered                       | Lab Technician notified                   |
+| Radiology           | Imaging ordered                         | Radiology Technician notified             |
+| Pharmacy            | Medication needed                       | Pharmacist notified                       |
+| Specialist consult  | Clinical complexity requires specialist | Specialist assigned                       |
+| Inpatient admission | Disposition: admit                      | Patient Flow Coordinator + bed management |
+| Transfer            | Another facility                        | Patient Flow Coordinator + transport      |
+| Discharge           | Disposition: discharge                  | Physician documents, Clerk processes      |
 
 ### How to Route a Patient to a Department
 
@@ -841,6 +873,7 @@ Move the patient to the right department, zone, or service — with a clear owne
 ### How to Handle a Routing Conflict
 
 If the destination department is at capacity:
+
 1. The system shows a **Capacity warning** with the destination department's current load.
 2. Contact the **Patient Flow Coordinator** (`/emergency/capacity`).
 3. Use the AI Chief `hospital_command_insight` intent to get a department capacity summary.
@@ -859,22 +892,22 @@ Identify service degradations early, document their patient impact, continue man
 
 CareDroid monitors the following services for bottlenecks:
 
-| Service | What it tracks |
-|---------|---------------|
-| AI | AI Chief latency, error rate, model availability |
-| Auth | Login failures, token errors, session degradation |
-| Patient service | Patient record create/read/update errors |
-| Triage service | Triage assignment failures, timer errors |
-| Alert service | Alert creation, delivery, and acknowledgement failures |
-| Notification service | Push, SMS, and pager delivery failures |
-| Database | Query latency, connection errors, write failures |
-| Labs | Critical value delivery delays, integration errors |
-| Radiology | Imaging readiness delays, PACS integration errors |
-| Pharmacy | Medication order errors, drug check failures |
-| Analytics | Data pipeline latency, reporting failures |
-| Reporting | Report generation and export errors |
-| EHR/FHIR | EHR sync errors, FHIR integration failures |
-| Frontend | JavaScript errors, crash reports, performance degradation |
+| Service              | What it tracks                                            |
+| -------------------- | --------------------------------------------------------- |
+| AI                   | AI Chief latency, error rate, model availability          |
+| Auth                 | Login failures, token errors, session degradation         |
+| Patient service      | Patient record create/read/update errors                  |
+| Triage service       | Triage assignment failures, timer errors                  |
+| Alert service        | Alert creation, delivery, and acknowledgement failures    |
+| Notification service | Push, SMS, and pager delivery failures                    |
+| Database             | Query latency, connection errors, write failures          |
+| Labs                 | Critical value delivery delays, integration errors        |
+| Radiology            | Imaging readiness delays, PACS integration errors         |
+| Pharmacy             | Medication order errors, drug check failures              |
+| Analytics            | Data pipeline latency, reporting failures                 |
+| Reporting            | Report generation and export errors                       |
+| EHR/FHIR             | EHR sync errors, FHIR integration failures                |
+| Frontend             | JavaScript errors, crash reports, performance degradation |
 
 ### How to Identify a Bottleneck
 
@@ -910,16 +943,16 @@ Track operational performance, patient flow quality, alert response rates, AI re
 
 ### Key Metrics
 
-| Metric | Definition | SLA Target |
-|--------|-----------|-----------|
-| Door-to-triage time | Arrival to CTAS assignment | < 10 minutes |
-| Door-to-provider time | Arrival to physician assessment | CTAS 1: immediate; CTAS 2: < 15 min; CTAS 3: < 30 min |
-| Alert response time | Alert creation to acknowledgement | Critical: < 3 minutes |
-| Breach rate | Alerts exceeding SLA / total alerts | < 5% |
-| AI review rate | AI recommendations reviewed / total recommendations | > 90% |
-| AI override rate | AI overrides / total AI recommendations | Baseline tracking |
-| Reassessment compliance | Reassessments completed on time / total due | > 95% |
-| Left without being seen (LWBS) | Patients who left before triage or provider | < 2% |
+| Metric                         | Definition                                          | SLA Target                                            |
+| ------------------------------ | --------------------------------------------------- | ----------------------------------------------------- |
+| Door-to-triage time            | Arrival to CTAS assignment                          | < 10 minutes                                          |
+| Door-to-provider time          | Arrival to physician assessment                     | CTAS 1: immediate; CTAS 2: < 15 min; CTAS 3: < 30 min |
+| Alert response time            | Alert creation to acknowledgement                   | Critical: < 3 minutes                                 |
+| Breach rate                    | Alerts exceeding SLA / total alerts                 | < 5%                                                  |
+| AI review rate                 | AI recommendations reviewed / total recommendations | > 90%                                                 |
+| AI override rate               | AI overrides / total AI recommendations             | Baseline tracking                                     |
+| Reassessment compliance        | Reassessments completed on time / total due         | > 95%                                                 |
+| Left without being seen (LWBS) | Patients who left before triage or provider         | < 2%                                                  |
 
 ### How to View the Analytics Dashboard
 
@@ -952,6 +985,7 @@ Track operational performance, patient flow quality, alert response rates, AI re
 ### When to Activate Downtime Procedure
 
 Activate immediately when any of the following occur:
+
 - CareDroid is inaccessible from all workstations.
 - The backend is unreachable and the banner confirms connectivity failure.
 - A critical service is degraded and patient safety is at risk.
@@ -982,14 +1016,14 @@ Activate immediately when any of the following occur:
 
 ### Fallback by Service
 
-| Service Degraded | Fallback Action |
-|----------------|----------------|
-| AI Chief unavailable | Use clinical judgment. Standard protocols only. No AI recommendations. |
-| Notifications failed | Use phone/pager directly. Log manual notifications in patient record. |
-| Alert service down | Charge nurse manually monitors patient board and escalates verbally. |
-| EHR/FHIR sync down | Document in CareDroid only. Do not send to EHR until sync recovers. |
-| Analytics down | Continue operations. Analytics will reconstruct from event log on recovery. |
-| Auth service down | Contact IT Admin immediately. Use read-only downtime access if available. |
+| Service Degraded     | Fallback Action                                                             |
+| -------------------- | --------------------------------------------------------------------------- |
+| AI Chief unavailable | Use clinical judgment. Standard protocols only. No AI recommendations.      |
+| Notifications failed | Use phone/pager directly. Log manual notifications in patient record.       |
+| Alert service down   | Charge nurse manually monitors patient board and escalates verbally.        |
+| EHR/FHIR sync down   | Document in CareDroid only. Do not send to EHR until sync recovers.         |
+| Analytics down       | Continue operations. Analytics will reconstruct from event log on recovery. |
+| Auth service down    | Contact IT Admin immediately. Use read-only downtime access if available.   |
 
 ---
 

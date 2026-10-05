@@ -10,15 +10,15 @@
 
 A **front-door ED registration system**:
 
-| Piece | Path / surface |
-|-------|----------------|
-| Desk UI | `/emergency/reception` → `ReceptionWorkspace.tsx` |
-| Job profile | `src/config/receptionUserProfile.ts` |
-| Executable skills + next-best-action | `src/config/receptionSkillModel.ts` |
-| Runtime merge | `src/hooks/useReceptionDeskUi.ts` |
-| Account Profile card | `ReceptionJobProfileCard` on `/profile` |
-| Clerk guide | `docs/users/reception-guide.md` |
-| Health report | `docs/reception-upgrade/RECEPTION_HEALTH_REPORT.md` |
+| Piece                                | Path / surface                                      |
+| ------------------------------------ | --------------------------------------------------- |
+| Desk UI                              | `/emergency/reception` → `ReceptionWorkspace.tsx`   |
+| Job profile                          | `src/config/receptionUserProfile.ts`                |
+| Executable skills + next-best-action | `src/config/receptionSkillModel.ts`                 |
+| Runtime merge                        | `src/hooks/useReceptionDeskUi.ts`                   |
+| Account Profile card                 | `ReceptionJobProfileCard` on `/profile`             |
+| Clerk guide                          | `docs/users/reception-guide.md`                     |
+| Health report                        | `docs/reception-upgrade/RECEPTION_HEALTH_REPORT.md` |
 
 **Enforcement** (can/cannot create patient, triage, etc.) is **only** `emergencyRolePermissions` / permission registry.  
 **Skills/profile** shape UX (lookup, NBA, density) — they do not replace RBAC.
@@ -27,10 +27,10 @@ A **front-door ED registration system**:
 
 ## 2. Login & role
 
-| Role | Emergency role id | Default landing |
-|------|-------------------|-----------------|
-| Registration clerk | `registration_clerk` | `/emergency/reception` |
-| Emergency receptionist (alias) | normalizes to clerk | same |
+| Role                           | Emergency role id    | Default landing        |
+| ------------------------------ | -------------------- | ---------------------- |
+| Registration clerk             | `registration_clerk` | `/emergency/reception` |
+| Emergency receptionist (alias) | normalizes to clerk  | same                   |
 
 **Clerk may:** create patient, edit demographics, create encounter, verify intake, convert EMS, escalate.  
 **Clerk may not:** assign triage acuity, write clinical vitals/notes as triage authority, discharge, manage capacity.
@@ -56,14 +56,14 @@ A **front-door ED registration system**:
 
 Type natural open/show/launch phrases in **Reception Copilot** (Interactive AI). CareDroid matches a **closed catalog** only — the model cannot invent URLs.
 
-| Example prompt | What happens |
-|----------------|--------------|
-| `Open reception desk` | Action card → **Open** → navigate to `/emergency/reception` |
-| `Focus patient lookup` | **Open** → focuses lookup field (`open-reception-lookup`) |
+| Example prompt           | What happens                                                  |
+| ------------------------ | ------------------------------------------------------------- |
+| `Open reception desk`    | Action card → **Open** → navigate to `/emergency/reception`   |
+| `Focus patient lookup`   | **Open** → focuses lookup field (`open-reception-lookup`)     |
 | `Show OCR document scan` | **Open** → smart intake / OCR (`open-reception-smart-intake`) |
-| `Open shift clearance` | **Open** → shift clearance panel |
-| `Open the whiteboard` | **Open** → ED whiteboard |
-| `What is ESI 2?` | Text assist only (no navigation) |
+| `Open shift clearance`   | **Open** → shift clearance panel                              |
+| `Open the whiteboard`    | **Open** → ED whiteboard                                      |
+| `What is ESI 2?`         | Text assist only (no navigation)                              |
 
 **Safety:** Approve/Open is required for the action. Clinical calculators (HEART, qSOFA, NIHSS) are blocked for `registration_clerk`. Implementation: `src/services/interactiveAi/promptNavigationIntent.ts` + `InteractiveAIWorkspace` execute path.
 
@@ -71,17 +71,17 @@ Type natural open/show/launch phrases in **Reception Copilot** (Interactive AI).
 
 ## 4. API contract (Nest `/api/emergency`)
 
-| Method | Path | Permission | Purpose |
-|--------|------|------------|---------|
-| GET | `/patients` | READ_PHI | List board patients |
-| POST | `/patients` | WRITE_PHI | Create patient |
-| POST | `/intake` | WRITE_PHI | Create from intake (same board) |
-| GET | `/reception/snapshot` | READ_PHI | Desk metrics snapshot |
-| POST | `/reception/handoff` | WRITE_PHI | Move to triage |
-| POST | `/reception/escalation` | WRITE_PHI | Durable escalation + realtime |
-| POST | `/intake/ocr-jobs` | WRITE_PHI | Start OCR |
-| POST | `/intake/ocr-jobs/:id/fields/:field/review` | WRITE_PHI | Accept/edit/reject field |
-| POST | `/intake/ocr-jobs/:id/apply` | WRITE_PHI | Apply reviewed demographics |
+| Method | Path                                        | Permission | Purpose                         |
+| ------ | ------------------------------------------- | ---------- | ------------------------------- |
+| GET    | `/patients`                                 | READ_PHI   | List board patients             |
+| POST   | `/patients`                                 | WRITE_PHI  | Create patient                  |
+| POST   | `/intake`                                   | WRITE_PHI  | Create from intake (same board) |
+| GET    | `/reception/snapshot`                       | READ_PHI   | Desk metrics snapshot           |
+| POST   | `/reception/handoff`                        | WRITE_PHI  | Move to triage                  |
+| POST   | `/reception/escalation`                     | WRITE_PHI  | Durable escalation + realtime   |
+| POST   | `/intake/ocr-jobs`                          | WRITE_PHI  | Start OCR                       |
+| POST   | `/intake/ocr-jobs/:id/fields/:field/review` | WRITE_PHI  | Accept/edit/reject field        |
+| POST   | `/intake/ocr-jobs/:id/apply`                | WRITE_PHI  | Apply reviewed demographics     |
 
 **Capabilities** (`src/config/backendApiCapabilities.ts`):  
 `emergencyPatients`, `emergencySmartIntake`, `emergencyReceptionSnapshot`, `emergencyReceptionHandoff`, `emergencyReceptionEscalation`, `emergencyOcrIntake` → **REAL**.
@@ -96,10 +96,10 @@ Type natural open/show/launch phrases in **Reception Copilot** (Interactive AI).
 
 ## 5. Environment
 
-| Variable | Purpose |
-|----------|---------|
-| `OCR_PROVIDER` | OCR backend (`tesseract` default / mock) |
-| JWT auth | Required on emergency routes |
+| Variable             | Purpose                                           |
+| -------------------- | ------------------------------------------------- |
+| `OCR_PROVIDER`       | OCR backend (`tesseract` default / mock)          |
+| JWT auth             | Required on emergency routes                      |
 | DB (SQLite/Postgres) | TypeORM patients/alerts write-through + rehydrate |
 
 ---
@@ -126,10 +126,10 @@ npm run test:patient-journey-perf
 
 ## 7. Known limits (do not paper over)
 
-1. OCR job store is in-memory (not multi-instance durable).  
-2. Demo “volunteer greeter” archetype empties **skills**; hard RBAC split still uses registration_clerk unless org mapping adds a separate role.  
-3. Multi-pod: each Nest process has its own memory until all reads are DB-authoritative.  
-4. Identity session / enterprise MPI (`emergencySmartIntakeIdentitySession`) remains DISABLED.  
+1. OCR job store is in-memory (not multi-instance durable).
+2. Demo “volunteer greeter” archetype empties **skills**; hard RBAC split still uses registration_clerk unless org mapping adds a separate role.
+3. Multi-pod: each Nest process has its own memory until all reads are DB-authoritative.
+4. Identity session / enterprise MPI (`emergencySmartIntakeIdentitySession`) remains DISABLED.
 5. Playwright full-browser golden path may be blocked in some CI/sandbox environments.
 
 ---
@@ -155,16 +155,16 @@ Desk
 
 ## 9. Handoff acceptance sign-off
 
-| Check | Owner | Pass |
-|-------|-------|------|
-| Clerk lands on reception | | ☐ |
-| Lookup → create → route works | | ☐ |
-| Language on first screen | | ☐ |
-| OCR accept fills form | | ☐ |
-| Duplicate modal works | | ☐ |
-| Escalation toast + API | | ☐ |
-| Profile shows job skills | | ☐ |
-| FE+BE tsc clean | | ☐ |
-| Known limits reviewed | | ☐ |
+| Check                         | Owner | Pass |
+| ----------------------------- | ----- | ---- |
+| Clerk lands on reception      |       | ☐    |
+| Lookup → create → route works |       | ☐    |
+| Language on first screen      |       | ☐    |
+| OCR accept fills form         |       | ☐    |
+| Duplicate modal works         |       | ☐    |
+| Escalation toast + API        |       | ☐    |
+| Profile shows job skills      |       | ☐    |
+| FE+BE tsc clean               |       | ☐    |
+| Known limits reviewed         |       | ☐    |
 
 **Pilot off when all boxes checked and known limits accepted by pilot lead.**

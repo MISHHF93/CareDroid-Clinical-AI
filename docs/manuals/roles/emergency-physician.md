@@ -84,17 +84,17 @@ The Emergency Physician is the clinical authority in the emergency department. Y
 1. Open the **Copilot panel** (sidebar Copilot button or press C).
 2. Select an intent from the intent selector. Recommended intents for physicians:
 
-| Intent | When to use |
-|--------|------------|
-| `patient_summary` | Get a quick AI-generated summary of the patient's full history and risk |
-| `triage_recommendation` | Confirm or challenge the triage acuity assignment |
-| `critical_alert_assessment` | Get AI analysis of a specific critical alert |
+| Intent                       | When to use                                                                 |
+| ---------------------------- | --------------------------------------------------------------------------- |
+| `patient_summary`            | Get a quick AI-generated summary of the patient's full history and risk     |
+| `triage_recommendation`      | Confirm or challenge the triage acuity assignment                           |
+| `critical_alert_assessment`  | Get AI analysis of a specific critical alert                                |
 | `three_minute_response_plan` | For a complex CTAS 1–2 patient — AI generates a full 3-minute response plan |
-| `department_routing` | Complex disposition — where should this patient go? |
-| `staff_routing` | Who is the right physician or specialist for this patient? |
-| `handoff_summary` | Generate a structured handoff when transferring a patient |
-| `hospital_command_insight` | Department-level situational awareness during a surge |
-| `fallback_recommendation` | AI unavailable — what are the manual clinical procedures? |
+| `department_routing`         | Complex disposition — where should this patient go?                         |
+| `staff_routing`              | Who is the right physician or specialist for this patient?                  |
+| `handoff_summary`            | Generate a structured handoff when transferring a patient                   |
+| `hospital_command_insight`   | Department-level situational awareness during a surge                       |
+| `fallback_recommendation`    | AI unavailable — what are the manual clinical procedures?                   |
 
 3. Review the AI response:
    - **Recommendation** — the specific action suggested
@@ -118,6 +118,7 @@ The Emergency Physician is the clinical authority in the emergency department. Y
 ### How to Respond to a 3-Minute Critical Alert
 
 For CTAS 1–2 patients or any critical alert escalated to you:
+
 1. Open the alert immediately (do not let it sit).
 2. Review: patient, severity, complaint, timer, prior escalation chain.
 3. Click **Take ownership** and **Acknowledge**.
@@ -160,14 +161,14 @@ For CTAS 1–2 patients or any critical alert escalated to you:
 
 ## Alerts You Receive
 
-| Alert | Meaning | Your action |
-|-------|---------|------------|
-| Critical alert — CTAS 1 | A patient requires immediate physician | Go now. Acknowledge within 3 minutes. |
-| Critical alert — CTAS 2 escalation | CTAS 2 patient has exceeded time-to-physician target | Assess now |
-| Specialist consult response | A specialist has returned their recommendation | Review and integrate into your plan |
-| AI override pending review | An AI override was made without physician review | Review the override record |
-| Diagnostic risk flag | A vital pattern or lab result flags a diagnostic risk | Review the patient |
-| Reassessment breach — assigned patient | Your assigned patient has passed their reassessment timer | Review the patient |
+| Alert                                  | Meaning                                                   | Your action                           |
+| -------------------------------------- | --------------------------------------------------------- | ------------------------------------- |
+| Critical alert — CTAS 1                | A patient requires immediate physician                    | Go now. Acknowledge within 3 minutes. |
+| Critical alert — CTAS 2 escalation     | CTAS 2 patient has exceeded time-to-physician target      | Assess now                            |
+| Specialist consult response            | A specialist has returned their recommendation            | Review and integrate into your plan   |
+| AI override pending review             | An AI override was made without physician review          | Review the override record            |
+| Diagnostic risk flag                   | A vital pattern or lab result flags a diagnostic risk     | Review the patient                    |
+| Reassessment breach — assigned patient | Your assigned patient has passed their reassessment timer | Review the patient                    |
 
 ---
 

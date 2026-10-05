@@ -1,4 +1,5 @@
 # CareDroid — Ground-Up Architecture Map
+
 ### Thinking like Figma: every layer composed from the one below it
 
 **Date:** 2026-06-26  
@@ -25,16 +26,16 @@ Nothing in a higher layer is built without its lower layers being stable.
 
 ## Layer 1 — Foundation
 
-| Item | Detail |
-|---|---|
-| CSS Reset | `@layer base` — normalize across browsers |
-| Font loading | Inter (UI) + JetBrains Mono (code/data) via `@font-face` |
-| CSS custom properties | All tokens as `--cd-*` variables |
-| Dark/light mode | `prefers-color-scheme` + `data-theme` attribute override |
-| 4px grid contract | All spacing is multiples of 4px |
-| Focus ring contract | One globally consistent focus ring — never removed, only restyled |
-| Global type scale | 6 named sizes: `xs` `sm` `md` `lg` `xl` `2xl` |
-| Z-index scale | Named layers: `base` `overlay` `modal` `toast` `tooltip` |
+| Item                  | Detail                                                            |
+| --------------------- | ----------------------------------------------------------------- |
+| CSS Reset             | `@layer base` — normalize across browsers                         |
+| Font loading          | Inter (UI) + JetBrains Mono (code/data) via `@font-face`          |
+| CSS custom properties | All tokens as `--cd-*` variables                                  |
+| Dark/light mode       | `prefers-color-scheme` + `data-theme` attribute override          |
+| 4px grid contract     | All spacing is multiples of 4px                                   |
+| Focus ring contract   | One globally consistent focus ring — never removed, only restyled |
+| Global type scale     | 6 named sizes: `xs` `sm` `md` `lg` `xl` `2xl`                     |
+| Z-index scale         | Named layers: `base` `overlay` `modal` `toast` `tooltip`          |
 
 ---
 
@@ -154,11 +155,14 @@ Each primitive is a single-responsibility component with no domain logic.
 ### Text
 
 ```tsx
-<Text as="h1|h2|p|span|label|…"
-      size="xs|sm|md|lg|xl|2xl|3xl|4xl"
-      weight="regular|medium|semibold|bold"
-      color="primary|secondary|disabled|inverse|brand|danger|…"
-      truncate mono />
+<Text
+  as="h1|h2|p|span|label|…"
+  size="xs|sm|md|lg|xl|2xl|3xl|4xl"
+  weight="regular|medium|semibold|bold"
+  color="primary|secondary|disabled|inverse|brand|danger|…"
+  truncate
+  mono
+/>
 ```
 
 ### Icon
@@ -171,10 +175,14 @@ Each primitive is a single-responsibility component with no domain logic.
 ### Button
 
 ```tsx
-<Button variant="primary|secondary|ghost|outline|danger|link"
-        size="sm|md|lg"
-        icon={left|right}
-        loading disabled fullWidth />
+<Button
+  variant="primary|secondary|ghost|outline|danger|link"
+  size="sm|md|lg"
+  icon={left | right}
+  loading
+  disabled
+  fullWidth
+/>
 ```
 
 ### IconButton
@@ -186,11 +194,17 @@ Each primitive is a single-responsibility component with no domain logic.
 ### Input
 
 ```tsx
-<Input type="text|email|password|number|search|tel"
-       size="sm|md|lg"
-       label hint error
-       leadingIcon trailingIcon
-       disabled readOnly />
+<Input
+  type="text|email|password|number|search|tel"
+  size="sm|md|lg"
+  label
+  hint
+  error
+  leadingIcon
+  trailingIcon
+  disabled
+  readOnly
+/>
 ```
 
 ### Textarea
@@ -216,9 +230,7 @@ Each primitive is a single-responsibility component with no domain logic.
 ### Badge
 
 ```tsx
-<Badge variant="neutral|info|success|warning|danger|brand"
-       size="sm|md"
-       dot />
+<Badge variant="neutral|info|success|warning|danger|brand" size="sm|md" dot />
 ```
 
 ### Avatar
@@ -253,82 +265,82 @@ Composed from Layer 3 primitives only. No inline styles. No domain logic.
 
 ### Layout
 
-| Component | Description |
-|---|---|
-| `Stack` | Vertical flex container with gap control |
-| `Inline` | Horizontal flex container with gap control |
-| `Grid` | CSS grid wrapper with column/gap props |
-| `Center` | Centers content horizontally and/or vertically |
-| `Spacer` | Flexible gap filler |
-| `Cluster` | Wrapping flex row — tags, chips |
-| `Box` | Escape hatch — styled div with token-based props |
+| Component | Description                                      |
+| --------- | ------------------------------------------------ |
+| `Stack`   | Vertical flex container with gap control         |
+| `Inline`  | Horizontal flex container with gap control       |
+| `Grid`    | CSS grid wrapper with column/gap props           |
+| `Center`  | Centers content horizontally and/or vertically   |
+| `Spacer`  | Flexible gap filler                              |
+| `Cluster` | Wrapping flex row — tags, chips                  |
+| `Box`     | Escape hatch — styled div with token-based props |
 
 ### Surfaces
 
-| Component | Slots | Notes |
-|---|---|---|
-| `Card` | header, body, footer, actions | Elevation via shadow token |
-| `Panel` | header, body, footer | No elevation — flush surfaces |
-| `Sheet` | header, body, footer | Drawer/side panel |
-| `Modal` | header, body, footer, actions | Portal + focus trap |
-| `Popover` | trigger, content | Floating UI anchor |
-| `Tooltip` | trigger, content | Max 240px, auto placement |
+| Component | Slots                         | Notes                         |
+| --------- | ----------------------------- | ----------------------------- |
+| `Card`    | header, body, footer, actions | Elevation via shadow token    |
+| `Panel`   | header, body, footer          | No elevation — flush surfaces |
+| `Sheet`   | header, body, footer          | Drawer/side panel             |
+| `Modal`   | header, body, footer, actions | Portal + focus trap           |
+| `Popover` | trigger, content              | Floating UI anchor            |
+| `Tooltip` | trigger, content              | Max 240px, auto placement     |
 
 ### Navigation
 
-| Component | Description |
-|---|---|
-| `Sidebar` | Vertical nav with sections, items, icons, collapse |
-| `TopBar` | App header with logo, actions, user menu |
-| `BottomNav` | Responsive mobile-width web tab bar |
-| `Tabs` | Horizontal tab bar with content panels |
-| `Breadcrumb` | Path trail with separator |
-| `CommandPalette` | ⌘K global command search |
+| Component        | Description                                        |
+| ---------------- | -------------------------------------------------- |
+| `Sidebar`        | Vertical nav with sections, items, icons, collapse |
+| `TopBar`         | App header with logo, actions, user menu           |
+| `BottomNav`      | Responsive mobile-width web tab bar                |
+| `Tabs`           | Horizontal tab bar with content panels             |
+| `Breadcrumb`     | Path trail with separator                          |
+| `CommandPalette` | ⌘K global command search                           |
 
 ### Data Display
 
-| Component | Props |
-|---|---|
-| `Table` | columns, rows, sort, select, pagination, loading, empty |
-| `DataGrid` | virtualized — for 500+ row datasets |
-| `List` | items, dividers, compact, selectable |
-| `StatCard` | label, value, delta, trend, icon |
-| `ProgressBar` | value, max, color, label, size |
-| `Gauge` | circular or arc, value, max, thresholds |
-| `Timeline` | events ordered by timestamp |
-| `EmptyState` | icon, title, description, action |
-| `ErrorState` | icon, title, description, retry |
+| Component     | Props                                                   |
+| ------------- | ------------------------------------------------------- |
+| `Table`       | columns, rows, sort, select, pagination, loading, empty |
+| `DataGrid`    | virtualized — for 500+ row datasets                     |
+| `List`        | items, dividers, compact, selectable                    |
+| `StatCard`    | label, value, delta, trend, icon                        |
+| `ProgressBar` | value, max, color, label, size                          |
+| `Gauge`       | circular or arc, value, max, thresholds                 |
+| `Timeline`    | events ordered by timestamp                             |
+| `EmptyState`  | icon, title, description, action                        |
+| `ErrorState`  | icon, title, description, retry                         |
 
 ### Feedback
 
-| Component | Description |
-|---|---|
-| `Alert` | Inline status message — info/success/warning/danger |
-| `Banner` | Full-width page-level message |
-| `Toast` | Sonner wrapper — standardized call API |
-| `ConfirmDialog` | Destructive action confirmation pattern |
+| Component       | Description                                         |
+| --------------- | --------------------------------------------------- |
+| `Alert`         | Inline status message — info/success/warning/danger |
+| `Banner`        | Full-width page-level message                       |
+| `Toast`         | Sonner wrapper — standardized call API              |
+| `ConfirmDialog` | Destructive action confirmation pattern             |
 
 ### Forms
 
-| Component | Description |
-|---|---|
-| `Form` | React Hook Form provider wrapper |
-| `FormField` | label + control + hint + error layout |
-| `SearchInput` | Input + clear button + debounce |
-| `ComboBox` | Filterable select with async support |
-| `DatePicker` | Calendar + manual input |
-| `TagInput` | Multi-value text tokens |
-| `RangeSlider` | Numeric range control |
-| `FileDrop` | Drag-and-drop upload zone |
+| Component     | Description                           |
+| ------------- | ------------------------------------- |
+| `Form`        | React Hook Form provider wrapper      |
+| `FormField`   | label + control + hint + error layout |
+| `SearchInput` | Input + clear button + debounce       |
+| `ComboBox`    | Filterable select with async support  |
+| `DatePicker`  | Calendar + manual input               |
+| `TagInput`    | Multi-value text tokens               |
+| `RangeSlider` | Numeric range control                 |
+| `FileDrop`    | Drag-and-drop upload zone             |
 
 ### Overlays
 
-| Component | Description |
-|---|---|
-| `Drawer` | Side panel — left/right, sizes sm/md/lg/full |
-| `ContextMenu` | Right-click menu via Floating UI |
-| `DropdownMenu` | Action menu triggered by button |
-| `ActionSheet` | Mobile-optimized bottom action list |
+| Component      | Description                                  |
+| -------------- | -------------------------------------------- |
+| `Drawer`       | Side panel — left/right, sizes sm/md/lg/full |
+| `ContextMenu`  | Right-click menu via Floating UI             |
+| `DropdownMenu` | Action menu triggered by button              |
+| `ActionSheet`  | Mobile-optimized bottom action list          |
 
 ---
 
@@ -338,75 +350,75 @@ Composed from Layers 3–4. Allowed to import from `store/`, `hooks/`, `config/`
 
 ### Patient
 
-| Component | Description |
-|---|---|
-| `PatientCard` | Compact patient tile — name, acuity, MRN, wait time, flags |
-| `PatientHeader` | Full patient identity header for detail views |
-| `AcuityBadge` | P1–P5 colored priority indicator |
-| `PatientFlagChip` | Single flag (SepsisAlert, LWBS, DeteriorationRisk, …) |
-| `PatientFlagStrip` | Horizontal cluster of `PatientFlagChip` |
-| `WaitTimer` | Live counting wait time with breach threshold coloring |
-| `BreachTimer` | Countdown to breach — turns amber → red |
-| `VitalsSnapshot` | HR / BP / SpO2 / Temp / RR / GCS compact display |
-| `VitalsTrend` | Sparkline for single vital over time |
-| `PatientTimeline` | Journey events in chronological order |
-| `PatientNotes` | Notes list with add action |
-| `DispositionChip` | Current disposition state badge |
+| Component          | Description                                                |
+| ------------------ | ---------------------------------------------------------- |
+| `PatientCard`      | Compact patient tile — name, acuity, MRN, wait time, flags |
+| `PatientHeader`    | Full patient identity header for detail views              |
+| `AcuityBadge`      | P1–P5 colored priority indicator                           |
+| `PatientFlagChip`  | Single flag (SepsisAlert, LWBS, DeteriorationRisk, …)      |
+| `PatientFlagStrip` | Horizontal cluster of `PatientFlagChip`                    |
+| `WaitTimer`        | Live counting wait time with breach threshold coloring     |
+| `BreachTimer`      | Countdown to breach — turns amber → red                    |
+| `VitalsSnapshot`   | HR / BP / SpO2 / Temp / RR / GCS compact display           |
+| `VitalsTrend`      | Sparkline for single vital over time                       |
+| `PatientTimeline`  | Journey events in chronological order                      |
+| `PatientNotes`     | Notes list with add action                                 |
+| `DispositionChip`  | Current disposition state badge                            |
 
 ### Queue & Flow
 
-| Component | Description |
-|---|---|
-| `QueueRow` | Single patient row in a queue list |
-| `QueueList` | Sorted, filterable list of `QueueRow` |
-| `QueueHeader` | Queue title + count + overflow actions |
-| `FlowCapacityBar` | Visual bed capacity fill bar |
-| `BottleneckAlert` | Prominent bottleneck warning strip |
+| Component          | Description                                   |
+| ------------------ | --------------------------------------------- |
+| `QueueRow`         | Single patient row in a queue list            |
+| `QueueList`        | Sorted, filterable list of `QueueRow`         |
+| `QueueHeader`      | Queue title + count + overflow actions        |
+| `FlowCapacityBar`  | Visual bed capacity fill bar                  |
+| `BottleneckAlert`  | Prominent bottleneck warning strip            |
 | `ReassessmentRail` | Right-rail alert list for overdue assessments |
 
 ### Staff & Operations
 
-| Component | Description |
-|---|---|
-| `StaffChip` | Staff member name + role + avatar compact |
-| `RoleBadge` | Color-coded role badge (physician, nurse, clerk, …) |
-| `ShiftHeader` | Current shift time, staff on duty, handoff trigger |
-| `KPIStrip` | Horizontal row of `StatCard` — department pulse |
-| `CapacityCrisisMode` | Full-screen capacity crisis overlay |
+| Component            | Description                                         |
+| -------------------- | --------------------------------------------------- |
+| `StaffChip`          | Staff member name + role + avatar compact           |
+| `RoleBadge`          | Color-coded role badge (physician, nurse, clerk, …) |
+| `ShiftHeader`        | Current shift time, staff on duty, handoff trigger  |
+| `KPIStrip`           | Horizontal row of `StatCard` — department pulse     |
+| `CapacityCrisisMode` | Full-screen capacity crisis overlay                 |
 
 ### EMS
 
-| Component | Description |
-|---|---|
-| `AmbulanceCard` | Unit ID, crew, ETA, patient preview |
-| `AmbulanceTracker` | Map or list of active EMS units |
-| `PreArrivalCard` | Incoming patient details pre-arrival |
-| `HandoffChecklistItem` | Single checklist step with status |
-| `HandoffChecklist` | Full EMS handoff checklist |
+| Component              | Description                          |
+| ---------------------- | ------------------------------------ |
+| `AmbulanceCard`        | Unit ID, crew, ETA, patient preview  |
+| `AmbulanceTracker`     | Map or list of active EMS units      |
+| `PreArrivalCard`       | Incoming patient details pre-arrival |
+| `HandoffChecklistItem` | Single checklist step with status    |
+| `HandoffChecklist`     | Full EMS handoff checklist           |
 
 ### AI & Clinical Tools
 
-| Component | Description |
-|---|---|
-| `CopilotMessage` | Single chat message — user or AI |
-| `CopilotThread` | Full conversation thread |
-| `CopilotInput` | Message composer with attachments |
-| `CitationCard` | Clinical source / guideline reference |
-| `ToolResultCard` | Structured AI tool output |
-| `ConfidenceIndicator` | AI output confidence level display |
-| `CalculatorForm` | Scored clinical calculator shell |
-| `CalculatorResult` | Score + interpretation + references |
-| `DifferentialItem` | Single diagnosis in a differential list |
-| `DifferentialList` | Ranked differential with likelihood |
+| Component             | Description                             |
+| --------------------- | --------------------------------------- |
+| `CopilotMessage`      | Single chat message — user or AI        |
+| `CopilotThread`       | Full conversation thread                |
+| `CopilotInput`        | Message composer with attachments       |
+| `CitationCard`        | Clinical source / guideline reference   |
+| `ToolResultCard`      | Structured AI tool output               |
+| `ConfidenceIndicator` | AI output confidence level display      |
+| `CalculatorForm`      | Scored clinical calculator shell        |
+| `CalculatorResult`    | Score + interpretation + references     |
+| `DifferentialItem`    | Single diagnosis in a differential list |
+| `DifferentialList`    | Ranked differential with likelihood     |
 
 ### Alerts
 
-| Component | Description |
-|---|---|
-| `AlertCard` | Single alert — severity, message, actions |
-| `AlertRail` | Vertical stack of `AlertCard` |
-| `AlertBadge` | Count badge for unread alerts |
-| `SepsisAlertBanner` | High-priority sepsis protocol trigger |
+| Component           | Description                               |
+| ------------------- | ----------------------------------------- |
+| `AlertCard`         | Single alert — severity, message, actions |
+| `AlertRail`         | Vertical stack of `AlertCard`             |
+| `AlertBadge`        | Count badge for unread alerts             |
+| `SepsisAlertBanner` | High-priority sepsis protocol trigger     |
 
 ---
 
@@ -437,9 +449,9 @@ src/features/
 
 ```typescript
 // index.ts
-export { default as FeaturePage }   from './FeaturePage'
-export type { FeatureState }        from './types'
-export { featureRoute }             from './route'
+export { default as FeaturePage } from './FeaturePage';
+export type { FeatureState } from './types';
+export { featureRoute } from './route';
 // No internal state leaks outside the module boundary
 ```
 
@@ -453,30 +465,30 @@ Generated page inventory (2026-06-30): 184 non-test files under `src/pages`, inc
 
 ### ED Operating System Screens
 
-| Screen | Route | Primary Role | Key Components |
-|---|---|---|---|
-| Platform Start | `/` | All | WorkspaceSelector |
-| Auth / Login | `/auth` | All | LoginForm, DemoBypassButton |
-| Reception Workspace | `/emergency/reception` | Registration Clerk | QueueList, SmartIntakeDrawer, ArrivalControlPanel |
-| Pre-Triage Queue | `/emergency/reception?queue=pretriage` | Triage Nurse | QueueList, BreachTimer, TriageAssistPanel |
-| Triage Assist | `/emergency/triage` | Triage Nurse | PatientHeader, VitalsSnapshot, AcuityScorer |
-| Physician Whiteboard | `/emergency/whiteboard` | Physician | PatientGrid, KPIStrip, ReassessmentRail |
-| Charge Nurse View | `/emergency/whiteboard?view=charge` | Charge Nurse | ChargeNurseStrip, FlowCapacityBar, BottleneckAlert |
-| EMS Workspace | `/emergency/ems` | EMS User | AmbulanceTracker, HandoffChecklist, PreArrivalCard |
-| Command Center | `/emergency/whiteboard?view=command` | ED Manager | KPIStrip, CapacityBoard, BoardingTable, AnalyticsPanel |
-| Waiting Room Display | `/emergency/whiteboard?display=waiting-room` | Public Display | PublicQueue, WaitTimeBoard |
-| Patient Room Display | `/emergency/room/:id` | Public Display | RoomStatusDisplay |
-| Department Pulse | `/emergency/pulse` | All | KPIStrip, AlertRail |
-| Shift Summary | `/emergency/shift` | All | ShiftSummaryReport, HandoffNotes |
-| Emergency Analytics | `/emergency/analytics` | ED Manager | Recharts dashboards |
-| Emergency Settings | `/emergency/settings` | All | ScreenModeSelector, RoleSettings |
+| Screen               | Route                                        | Primary Role       | Key Components                                         |
+| -------------------- | -------------------------------------------- | ------------------ | ------------------------------------------------------ |
+| Platform Start       | `/`                                          | All                | WorkspaceSelector                                      |
+| Auth / Login         | `/auth`                                      | All                | LoginForm, DemoBypassButton                            |
+| Reception Workspace  | `/emergency/reception`                       | Registration Clerk | QueueList, SmartIntakeDrawer, ArrivalControlPanel      |
+| Pre-Triage Queue     | `/emergency/reception?queue=pretriage`       | Triage Nurse       | QueueList, BreachTimer, TriageAssistPanel              |
+| Triage Assist        | `/emergency/triage`                          | Triage Nurse       | PatientHeader, VitalsSnapshot, AcuityScorer            |
+| Physician Whiteboard | `/emergency/whiteboard`                      | Physician          | PatientGrid, KPIStrip, ReassessmentRail                |
+| Charge Nurse View    | `/emergency/whiteboard?view=charge`          | Charge Nurse       | ChargeNurseStrip, FlowCapacityBar, BottleneckAlert     |
+| EMS Workspace        | `/emergency/ems`                             | EMS User           | AmbulanceTracker, HandoffChecklist, PreArrivalCard     |
+| Command Center       | `/emergency/whiteboard?view=command`         | ED Manager         | KPIStrip, CapacityBoard, BoardingTable, AnalyticsPanel |
+| Waiting Room Display | `/emergency/whiteboard?display=waiting-room` | Public Display     | PublicQueue, WaitTimeBoard                             |
+| Patient Room Display | `/emergency/room/:id`                        | Public Display     | RoomStatusDisplay                                      |
+| Department Pulse     | `/emergency/pulse`                           | All                | KPIStrip, AlertRail                                    |
+| Shift Summary        | `/emergency/shift`                           | All                | ShiftSummaryReport, HandoffNotes                       |
+| Emergency Analytics  | `/emergency/analytics`                       | ED Manager         | Recharts dashboards                                    |
+| Emergency Settings   | `/emergency/settings`                        | All                | ScreenModeSelector, RoleSettings                       |
 
 ### AI Copilot Screens
 
-| Screen | Route | Notes |
-|---|---|---|
-| Copilot Chat | `/emergency/copilot` | Full-session AI assistant |
-| Shared Tool Session | `/tools/shared/:id` | Shareable tool result URL |
+| Screen              | Route                | Notes                     |
+| ------------------- | -------------------- | ------------------------- |
+| Copilot Chat        | `/emergency/copilot` | Full-session AI assistant |
+| Shared Tool Session | `/tools/shared/:id`  | Shareable tool result URL |
 
 ### Clinical Tool Screens (46 source files)
 
@@ -501,22 +513,22 @@ Generated page inventory (2026-06-30): 184 non-test files under `src/pages`, inc
 
 ### Admin & Platform Screens
 
-| Screen | Route |
-|---|---|
-| Admin Operations | `/admin/operations` |
-| Staff Management | `/admin/operations/staff` |
-| Staff Workflows | `/admin/operations/staff-workflows` |
-| Platform Governance | `/platform/governance` |
-| Organization Profile | `/platform/organization` |
-| Team Management | `/team` |
-| Profile | `/profile` |
-| Profile Settings | `/profile/settings` |
-| Billing & Usage | `/billing` |
-| System Health | `/system-health` |
-| Developer Catalog | `/tools/catalog` |
-| AI Governance | `/ai-governance` |
-| AI Evaluation | `/ai-evaluation` |
-| Help Center | `/help` |
+| Screen               | Route                               |
+| -------------------- | ----------------------------------- |
+| Admin Operations     | `/admin/operations`                 |
+| Staff Management     | `/admin/operations/staff`           |
+| Staff Workflows      | `/admin/operations/staff-workflows` |
+| Platform Governance  | `/platform/governance`              |
+| Organization Profile | `/platform/organization`            |
+| Team Management      | `/team`                             |
+| Profile              | `/profile`                          |
+| Profile Settings     | `/profile/settings`                 |
+| Billing & Usage      | `/billing`                          |
+| System Health        | `/system-health`                    |
+| Developer Catalog    | `/tools/catalog`                    |
+| AI Governance        | `/ai-governance`                    |
+| AI Evaluation        | `/ai-evaluation`                    |
+| Help Center          | `/help`                             |
 
 ---
 
@@ -556,30 +568,30 @@ Local Component State (useState — never lifted unnecessarily)
 ```typescript
 type EmergencyStore = {
   // Entities
-  patients:   Patient[]
-  queues:     Queue[]
-  emsUnits:   EmsUnit[]
-  alerts:     Alert[]
+  patients: Patient[];
+  queues: Queue[];
+  emsUnits: EmsUnit[];
+  alerts: Alert[];
 
   // Derived (selectors, not stored)
   // → use selector functions, not store fields
 
   // Actions — one verb per action
-  addPatient:         (p: Patient) => void
-  updatePatient:      (id, patch: Partial<Patient>) => void
-  movePatientToState: (id, state: PatientState) => void
-  addVitals:          (id, v: Vitals) => void
-  addFlag:            (id, flag: PatientFlagType) => void
-  removeFlag:         (id, flag: PatientFlagType) => void
-  addJourneyEvent:    (id, e: JourneyEvent) => void
-  addEMSUnit:         (u: EmsUnit) => void
-  updateEMSUnit:      (id, patch: Partial<EmsUnit>) => void
-  addEMSArrival:      (a: EMSArrival) => void
-  dispatchAlert:      (a: Alert) => void
-  dismissAlert:       (id: string) => void
-  setBottleneckAlert: (b: BottleneckAlert) => void
-  clearBottleneckAlert: () => void
-}
+  addPatient: (p: Patient) => void;
+  updatePatient: (id, patch: Partial<Patient>) => void;
+  movePatientToState: (id, state: PatientState) => void;
+  addVitals: (id, v: Vitals) => void;
+  addFlag: (id, flag: PatientFlagType) => void;
+  removeFlag: (id, flag: PatientFlagType) => void;
+  addJourneyEvent: (id, e: JourneyEvent) => void;
+  addEMSUnit: (u: EmsUnit) => void;
+  updateEMSUnit: (id, patch: Partial<EmsUnit>) => void;
+  addEMSArrival: (a: EMSArrival) => void;
+  dispatchAlert: (a: Alert) => void;
+  dismissAlert: (id: string) => void;
+  setBottleneckAlert: (b: BottleneckAlert) => void;
+  clearBottleneckAlert: () => void;
+};
 ```
 
 ---
@@ -590,28 +602,28 @@ type EmergencyStore = {
 // type-safe route registry — one file, every route
 export const ROUTES = {
   // Auth
-  auth:               '/auth',
+  auth: '/auth',
   // ED OS
-  reception:          '/emergency/reception',
-  whiteboard:         '/emergency/whiteboard',
-  ems:                '/emergency/ems',
-  copilot:            '/emergency/copilot',
-  analytics:          '/emergency/analytics',
-  pulse:              '/emergency/pulse',
-  shift:              '/emergency/shift',
-  settings:           '/emergency/settings',
+  reception: '/emergency/reception',
+  whiteboard: '/emergency/whiteboard',
+  ems: '/emergency/ems',
+  copilot: '/emergency/copilot',
+  analytics: '/emergency/analytics',
+  pulse: '/emergency/pulse',
+  shift: '/emergency/shift',
+  settings: '/emergency/settings',
   // Tools
-  tools:              '/tools',
-  calculators:        '/tools/calculators',
+  tools: '/tools',
+  calculators: '/tools/calculators',
   // Admin
-  admin:              '/admin/operations',
-  team:               '/team',
-  profile:            '/profile',
-  billing:            '/billing',
-  systemHealth:       '/system-health',
-} as const
+  admin: '/admin/operations',
+  team: '/team',
+  profile: '/profile',
+  billing: '/billing',
+  systemHealth: '/system-health',
+} as const;
 
-export type Route = typeof ROUTES[keyof typeof ROUTES]
+export type Route = (typeof ROUTES)[keyof typeof ROUTES];
 
 // Route guards: role-based, not scattered across components
 // Every guarded route declares its minimum role in the route definition
@@ -623,46 +635,46 @@ export type Route = typeof ROUTES[keyof typeof ROUTES]
 
 ```typescript
 // Every ID is a branded string — prevents id-field mixups
-type PatientId   = string & { readonly _brand: 'PatientId' }
-type EmsUnitId   = string & { readonly _brand: 'EmsUnitId' }
-type AlertId     = string & { readonly _brand: 'AlertId' }
-type ISODateString = string & { readonly _brand: 'ISO8601' }
+type PatientId = string & { readonly _brand: 'PatientId' };
+type EmsUnitId = string & { readonly _brand: 'EmsUnitId' };
+type AlertId = string & { readonly _brand: 'AlertId' };
+type ISODateString = string & { readonly _brand: 'ISO8601' };
 
 // Vitals — single reading at a point in time
 type Vitals = {
-  hr:          number
-  bpSystolic:  number
-  bpDiastolic: number
-  spo2:        number
-  temp:        number
-  rr:          number
-  gcs?:        number
-  pain?:       number
-  recordedAt:  ISODateString
-}
+  hr: number;
+  bpSystolic: number;
+  bpDiastolic: number;
+  spo2: number;
+  temp: number;
+  rr: number;
+  gcs?: number;
+  pain?: number;
+  recordedAt: ISODateString;
+};
 
 // Patient — normalized, no derived/cached fields
 type Patient = {
-  id:               PatientId
-  firstName:        string
-  lastName:         string
-  dob:              string
-  sex:              'M' | 'F' | 'Other'
-  mrn:              string
-  state:            PatientState
-  priority:         Priority
-  vitals:           Vitals[]      // ordered, newest last
-  flags:            PatientFlagType[]
-  timeline:         JourneyEvent[]
-  notes:            PatientNote[]
-  chiefComplaint:   string
-  complaintCategory: string
-  arrivalTime:      ISODateString
-  triageTime:       ISODateString | null
-  lastAssessedTime: ISODateString | null
-  assignedStaffId:  string | null
-  roomId:           string | null
-}
+  id: PatientId;
+  firstName: string;
+  lastName: string;
+  dob: string;
+  sex: 'M' | 'F' | 'Other';
+  mrn: string;
+  state: PatientState;
+  priority: Priority;
+  vitals: Vitals[]; // ordered, newest last
+  flags: PatientFlagType[];
+  timeline: JourneyEvent[];
+  notes: PatientNote[];
+  chiefComplaint: string;
+  complaintCategory: string;
+  arrivalTime: ISODateString;
+  triageTime: ISODateString | null;
+  lastAssessedTime: ISODateString | null;
+  assignedStaffId: string | null;
+  roomId: string | null;
+};
 ```
 
 ---
@@ -684,6 +696,7 @@ src/services/
 ```
 
 Each service:
+
 - Returns typed responses (no `any`)
 - Validates at boundary with Zod schemas (runtime safety)
 - Throws typed errors (`ApiError` subclasses)
@@ -754,17 +767,17 @@ Ongoing     State       Stores hardened and connected to real backend
 
 ## What Changes from Today's Codebase
 
-| Current State | Target State |
-|---|---|
-| Styles scattered across 200+ `.css` files | All design tokens in one `tokens.css`, component styles co-located |
-| `as any` in 200+ files | Proper types at every layer boundary |
-| One giant `emergencyStore` with implicit actions | Explicit typed action signatures, selectors for derived state |
-| Domain logic mixed into page components | Feature modules own their logic; pages are thin |
-| `src/components/` is flat with 100+ files | Organized into `primitives/`, `layout/`, `surfaces/`, `domain/` |
-| Routes defined in multiple places | Single `ROUTES` registry, type-safe |
-| No runtime API validation | Zod schemas at every API boundary |
-| `_review` future modules mixed in | Future modules in dedicated `src/features/future/` — never transitively imported |
+| Current State                                    | Target State                                                                     |
+| ------------------------------------------------ | -------------------------------------------------------------------------------- |
+| Styles scattered across 200+ `.css` files        | All design tokens in one `tokens.css`, component styles co-located               |
+| `as any` in 200+ files                           | Proper types at every layer boundary                                             |
+| One giant `emergencyStore` with implicit actions | Explicit typed action signatures, selectors for derived state                    |
+| Domain logic mixed into page components          | Feature modules own their logic; pages are thin                                  |
+| `src/components/` is flat with 100+ files        | Organized into `primitives/`, `layout/`, `surfaces/`, `domain/`                  |
+| Routes defined in multiple places                | Single `ROUTES` registry, type-safe                                              |
+| No runtime API validation                        | Zod schemas at every API boundary                                                |
+| `_review` future modules mixed in                | Future modules in dedicated `src/features/future/` — never transitively imported |
 
 ---
 
-*This document defines the target architecture. Implementation starts from Layer 1 and builds up.*
+_This document defines the target architecture. Implementation starts from Layer 1 and builds up._

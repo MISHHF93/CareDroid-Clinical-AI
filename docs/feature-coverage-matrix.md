@@ -7,7 +7,7 @@ version is
 `src/data/featureCoverageMatrix.report.test.ts`). Read that file, not this one.
 
 Correction (2026-08-04): an earlier pass on the same day initially concluded
-the opposite — that *this* root-level file was canonical and
+the opposite — that _this_ root-level file was canonical and
 `docs/architecture/feature-coverage-matrix.md` was the stale duplicate — based
 on `scripts/run-closure-audit-sequence.mjs` citing this path and this file
 having a more recent "Generated" date at the time. That conclusion was wrong

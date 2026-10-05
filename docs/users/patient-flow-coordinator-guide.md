@@ -45,4 +45,3 @@ Work from the oldest breached queue first unless a critical clinical alert overr
 ## Known Limitations
 
 No dedicated coordinator persona exists in the app role model yet.
-

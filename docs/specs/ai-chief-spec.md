@@ -30,21 +30,21 @@ Every AI Chief response must include:
 ```typescript
 type AIChiefResponse = {
   intent: AIChiefIntent;
-  patientContext?: PatientContext;        // patient or department context
+  patientContext?: PatientContext; // patient or department context
   departmentContext?: DepartmentContext;
-  recommendation: string;                // specific suggested action
-  rationale: string;                    // why AI is suggesting this
-  uncertaintyStatement: string;          // what AI does not know
+  recommendation: string; // specific suggested action
+  rationale: string; // why AI is suggesting this
+  uncertaintyStatement: string; // what AI does not know
   confidenceLevel: 'high' | 'moderate' | 'low' | 'insufficient';
-  requiresClinicianReview: true;         // always true
-  requiredReviewerRole: string;          // licensed role that must review
-  suggestedOwner?: string;              // recommended staff role or individual
-  fallbackAction: string;               // what to do if AI is unavailable
+  requiresClinicianReview: true; // always true
+  requiredReviewerRole: string; // licensed role that must review
+  suggestedOwner?: string; // recommended staff role or individual
+  fallbackAction: string; // what to do if AI is unavailable
   auditMetadata: {
-    requestedBy: string;                // user ID
-    requestedAt: string;                // ISO timestamp
-    intentVersion: string;              // prompt version
-    modelId: string;                    // model used
+    requestedBy: string; // user ID
+    requestedAt: string; // ISO timestamp
+    intentVersion: string; // prompt version
+    modelId: string; // model used
   };
 };
 ```
@@ -168,6 +168,7 @@ type AIChiefResponse = {
 All 16 intents are implemented in `lib/ai/careDroidAI.ts`. The `HANDLERS` map at line 128 covers every intent in `CARE_DROID_AI_INTENTS`. `src/lib/ai/careDroidAI.ts` is a re-export barrel — always read the real implementation from the root `lib/` directory.
 
 **Additional intents beyond the original 11 scope:**
+
 - `wait_time_prediction` — ED queue wait time estimation
 - `staff_resource_insight` — staffing gap and reallocation analysis
 - `workflow_delay_analysis` — active workflow delay identification
@@ -188,6 +189,7 @@ The `src/lib/users/aiChiefRouting.ts` file defines 12 clinical alert scenarios w
 ## Audit Requirements
 
 Every AI Chief request and response must be logged in the audit trail:
+
 - Request: intent, requestedBy (user ID + role), patient/department context, timestamp
 - Response: full response object
 - Decision: accepted / modified / overridden + reason

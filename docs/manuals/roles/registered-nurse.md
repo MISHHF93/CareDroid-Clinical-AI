@@ -82,6 +82,7 @@ The Registered Nurse manages assigned patients through their emergency departmen
 ### How to Escalate a Deteriorating Patient
 
 If your patient's condition is worsening:
+
 1. Assess the severity: is this urgent or emergent?
 2. For urgent: click **Escalate** on the patient card. Notify the charge nurse and physician via the alert.
 3. For emergent: activate the overhead page or call button. Notify the charge nurse and physician verbally. Then document in CareDroid.
@@ -101,22 +102,22 @@ If your patient's condition is worsening:
 
 ## Alerts You Receive
 
-| Alert | Meaning | Your action |
-|-------|---------|------------|
-| Reassessment overdue — your patient | Your patient has passed their reassessment timer | Complete reassessment immediately |
-| Patient deterioration flag | Vital pattern or triage upgrade has been flagged | Review patient immediately; escalate if needed |
-| Lab critical value | A critical lab result has returned for your patient | Notify physician immediately |
-| Medication alert | A potential medication issue has been flagged | Do not administer. Notify pharmacist and physician. |
-| Handoff received | Another nurse or physician has sent you a handoff | Review and accept the handoff |
+| Alert                               | Meaning                                             | Your action                                         |
+| ----------------------------------- | --------------------------------------------------- | --------------------------------------------------- |
+| Reassessment overdue — your patient | Your patient has passed their reassessment timer    | Complete reassessment immediately                   |
+| Patient deterioration flag          | Vital pattern or triage upgrade has been flagged    | Review patient immediately; escalate if needed      |
+| Lab critical value                  | A critical lab result has returned for your patient | Notify physician immediately                        |
+| Medication alert                    | A potential medication issue has been flagged       | Do not administer. Notify pharmacist and physician. |
+| Handoff received                    | Another nurse or physician has sent you a handoff   | Review and accept the handoff                       |
 
 ---
 
 ## AI Features Available
 
-| Intent | Access | What it gives you |
-|--------|--------|------------------|
-| `patient_summary` | Patient detail panel → AI Chief tab | One-line clinical summary with risk flags and missing information |
-| `fallback_recommendation` | Help page or patient panel when other AI is unavailable | Manual procedure steps for the current workflow |
+| Intent                    | Access                                                  | What it gives you                                                 |
+| ------------------------- | ------------------------------------------------------- | ----------------------------------------------------------------- |
+| `patient_summary`         | Patient detail panel → AI Chief tab                     | One-line clinical summary with risk flags and missing information |
+| `fallback_recommendation` | Help page or patient panel when other AI is unavailable | Manual procedure steps for the current workflow                   |
 
 You do NOT have authority to override AI recommendations — that requires physician or charge nurse.
 

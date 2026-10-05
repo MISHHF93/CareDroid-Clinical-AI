@@ -17,6 +17,7 @@ The IT Administrator is responsible for the technical health of the CareDroid pl
 ## Dashboard View
 
 **Settings** (`/emergency/settings`) — Primary workspace. Tabs:
+
 - **Users** — User accounts, roles, and access profiles
 - **Integrations** — EHR/FHIR, lab, radiology, pharmacy, notification integrations
 - **System Health** — Live service health with bottleneck details
@@ -68,6 +69,7 @@ The IT Administrator is responsible for the technical health of the CareDroid pl
 ### How to Respond to a Service Degradation
 
 **For yellow (degraded) status:**
+
 1. Note the affected service and patient impact level.
 2. Begin investigation: check integration logs, API error rates, network connectivity.
 3. Send a brief status update to the charge nurse: "CareDroid [service name] is experiencing elevated latency. Clinical workflows are not yet affected. We are investigating."
@@ -75,6 +77,7 @@ The IT Administrator is responsible for the technical health of the CareDroid pl
 5. Document in the audit trail: start time, root cause, resolution action, duration.
 
 **For red (down) status:**
+
 1. Immediately notify the charge nurse and hospital administrator.
 2. Activate the downtime communication plan for the affected service.
 3. Begin recovery procedures.
@@ -85,18 +88,21 @@ The IT Administrator is responsible for the technical health of the CareDroid pl
 ### How to Manage Users
 
 **Add a user:**
+
 1. Open **Settings** → Users → **Add User**.
 2. Enter name, email, role. Select department if applicable.
 3. Click **Save**. The user receives an activation email.
 4. The access profile is compiled immediately based on the assigned role.
 
 **Change a user's role:**
+
 1. Open **Settings** → Users → find the user → **Edit**.
 2. Change the role using the role selector.
 3. Click **Save**. Changes take effect on the user's next login.
 4. Log the role change reason in the audit entry.
 
 **Deactivate a user (e.g., employee departure):**
+
 1. Open **Settings** → Users → find the user → **Deactivate**.
 2. Confirm deactivation.
 3. The user cannot log in. Their audit record is preserved.
@@ -136,14 +142,14 @@ The IT Administrator is responsible for the technical health of the CareDroid pl
 
 ## Alerts You Receive
 
-| Alert | Meaning | Your action |
-|-------|---------|------------|
-| Service degradation — [service name] | A monitored service has reached degraded or down status | Investigate, communicate to clinical staff, recover |
-| Auth failure rate elevated | Login failures or token errors exceeding threshold | Check auth service, review failed login attempts |
-| Notification delivery failure | Push, SMS, or pager messages are not being delivered | Check notification service; activate fallback channels |
-| Integration downtime — [integration] | A third-party integration has failed | Contact service provider; activate manual fallback |
-| AI error rate elevated | AI Chief is returning errors above threshold | Check AI service; disable AI intents if impacting patient care |
-| Unusual login activity | Login from unexpected location or time | Review audit trail; deactivate account if suspicious |
+| Alert                                | Meaning                                                 | Your action                                                    |
+| ------------------------------------ | ------------------------------------------------------- | -------------------------------------------------------------- |
+| Service degradation — [service name] | A monitored service has reached degraded or down status | Investigate, communicate to clinical staff, recover            |
+| Auth failure rate elevated           | Login failures or token errors exceeding threshold      | Check auth service, review failed login attempts               |
+| Notification delivery failure        | Push, SMS, or pager messages are not being delivered    | Check notification service; activate fallback channels         |
+| Integration downtime — [integration] | A third-party integration has failed                    | Contact service provider; activate manual fallback             |
+| AI error rate elevated               | AI Chief is returning errors above threshold            | Check AI service; disable AI intents if impacting patient care |
+| Unusual login activity               | Login from unexpected location or time                  | Review audit trail; deactivate account if suspicious           |
 
 ---
 

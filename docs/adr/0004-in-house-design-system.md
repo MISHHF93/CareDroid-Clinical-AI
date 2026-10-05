@@ -30,7 +30,7 @@ system` preference, persisted to `localStorage`, applied to the DOM as
 `ThemeProvider` is mounted in `src/app/providers.tsx` and `ThemeToggle`
 (`src/components/chrome/ThemeToggle.tsx`) exposes it in the UI.
 
-`THEME_CONFIG.standardTheme` is still `'light'`, but it is now the *default*
+`THEME_CONFIG.standardTheme` is still `'light'`, but it is now the _default_
 consumed by `ThemeContext` as `DEFAULT_THEME` -- not a hardcoded single mode.
 Two tests pin that literal (`src/styles/medicalThemeAudit.test.ts`,
 `src/data/medicalExpansionCrossPackValidation.test.ts`), so change it there too
@@ -50,6 +50,7 @@ the alert engine instead. They are kept, not deleted: unadopted is not dead. Do
 not read their existence as evidence that CareDroid has migrated onto CEDS
 components; the CSS in `src/styles/cdl-v2/*.css` remains the styling source of
 truth, as `src/design-system/tokens/design-tokens.ts` says in its own header.
+
 ## Alternatives considered
 
 - Adopting Radix/shadcn for accessible unstyled primitives plus Tailwind for styling — would have reduced initial build cost and improved accessibility baseline, at the cost of a dependency and less granular control over the exact bundle-splitting strategy already in place. Not pursued; the in-house approach was already established by the time of this research pass.

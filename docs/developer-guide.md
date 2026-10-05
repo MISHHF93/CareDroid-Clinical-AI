@@ -6,22 +6,22 @@
 
 CareDroid's repo has a few directory-naming collisions that are easy to trip over:
 
-| Gotcha | Detail |
-|---|---|
-| **Two `lib/` directories** | `src/lib/` (RBAC via `src/lib/users/`, auth, browser-safe AI client) vs. top-level `lib/` (aliased `@lib` in `vite.config.ts`; holds `native-ai/`, `patient-orchestration/`, and the AI config/tool/prompt registries shared by frontend and backend). |
-| **`agent-tools/` is not a tool registry** | It's gitignored session-transcript `.txt` files and screenshots (repo-local, count varies by session). The real tool registries are `lib/ai/toolRegistry.ts` and `backend/src/modules/medical-control-plane/tool-orchestrator/`. |
+| Gotcha                                                             | Detail                                                                                                                                                                                                                                                                                                                                                                                         |
+| ------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Two `lib/` directories**                                         | `src/lib/` (RBAC via `src/lib/users/`, auth, browser-safe AI client) vs. top-level `lib/` (aliased `@lib` in `vite.config.ts`; holds `native-ai/`, `patient-orchestration/`, and the AI config/tool/prompt registries shared by frontend and backend).                                                                                                                                         |
+| **`agent-tools/` is not a tool registry**                          | It's gitignored session-transcript `.txt` files and screenshots (repo-local, count varies by session). The real tool registries are `lib/ai/toolRegistry.ts` and `backend/src/modules/medical-control-plane/tool-orchestrator/`.                                                                                                                                                               |
 | **One backend route system (as of the Express→Nest decommission)** | All 10 real legacy Express route groups were migrated to NestJS controllers and the 6 placeholder-only groups deleted; `backend/src/api/routes-registry.ts` itself was deleted, not just emptied. `backend/src/modules/**/*.controller.ts` (NestJS) is the sole HTTP routing authority — there is no second, bare-Express mount to confuse it with. See [API Reference](api/api-reference.md). |
-| **Separate npm installs** | Root, `backend/`, and `mcp/` each have their own `package.json`/lockfile — `npm install` at the root does not install backend or MCP dependencies. |
+| **Separate npm installs**                                          | Root, `backend/`, and `mcp/` each have their own `package.json`/lockfile — `npm install` at the root does not install backend or MCP dependencies.                                                                                                                                                                                                                                             |
 
 ## Path aliases
 
 From `vite.config.ts`:
 
-| Alias | Resolves to |
-|---|---|
-| `@` | `src/` |
-| `@lib` | top-level `lib/` (not `src/lib/`) |
-| `@store` | `src/store/` |
+| Alias    | Resolves to                       |
+| -------- | --------------------------------- |
+| `@`      | `src/`                            |
+| `@lib`   | top-level `lib/` (not `src/lib/`) |
+| `@store` | `src/store/`                      |
 
 ## Frontend architecture at a glance
 
@@ -38,13 +38,13 @@ From `vite.config.ts`:
 
 ## Testing infrastructure
 
-| Layer | Tool | Config | Notes |
-|---|---|---|---|
-| Frontend unit/integration | Vitest | `vitest.config.ts` | jsdom, `pool: 'threads'`, 917 `*.test.*` files under `src/` |
-| Heavy route-tree test (isolated) | Vitest | `vitest.route-tree.config.ts` | Forces `pool: 'forks'`, `maxWorkers: 1` — avoids OOM/hangs on the canonical route redirect test |
-| Root integration | Jest | `jest.config.cjs` | Runs `tests/integration/**/*.test.ts` only (currently `emergency-os.test.ts`) |
-| Backend unit/e2e | Jest | `backend/test/jest-e2e.json` | Run via `cd backend && npm test` (`jest --runInBand`). Covers auth/RBAC/2FA/encryption/audit e2e, RAG/chat e2e, intent classification, tool-orchestrator, and a large bank of clinical-calculator spec files (NEWS2, HEART, Wells PE/DVT, PERC, GRACE ACS, SOFA, MELD, Child-Pugh, NIHSS, PHQ-9, GAD-7, STOP-BANG, ABCD2, CHA2DS2-VASc/HAS-BLED, Ottawa ankle, NEXUS/Canadian C-spine, PECARN, CKD staging, COPD GOLD) |
-| E2E | Playwright | `playwright.config.ts` (responsive QA, 4 browsers), `playwright.canonical-routes.config.ts` (serial route verification), `playwright.production.config.ts` (smoke test against a real deployed `QA_BASE_URL`, mobile Chromium profile) | |
+| Layer                            | Tool       | Config                                                                                                                                                                                                                                 | Notes                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| -------------------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Frontend unit/integration        | Vitest     | `vitest.config.ts`                                                                                                                                                                                                                     | jsdom, `pool: 'threads'`, 917 `*.test.*` files under `src/`                                                                                                                                                                                                                                                                                                                                                            |
+| Heavy route-tree test (isolated) | Vitest     | `vitest.route-tree.config.ts`                                                                                                                                                                                                          | Forces `pool: 'forks'`, `maxWorkers: 1` — avoids OOM/hangs on the canonical route redirect test                                                                                                                                                                                                                                                                                                                        |
+| Root integration                 | Jest       | `jest.config.cjs`                                                                                                                                                                                                                      | Runs `tests/integration/**/*.test.ts` only (currently `emergency-os.test.ts`)                                                                                                                                                                                                                                                                                                                                          |
+| Backend unit/e2e                 | Jest       | `backend/test/jest-e2e.json`                                                                                                                                                                                                           | Run via `cd backend && npm test` (`jest --runInBand`). Covers auth/RBAC/2FA/encryption/audit e2e, RAG/chat e2e, intent classification, tool-orchestrator, and a large bank of clinical-calculator spec files (NEWS2, HEART, Wells PE/DVT, PERC, GRACE ACS, SOFA, MELD, Child-Pugh, NIHSS, PHQ-9, GAD-7, STOP-BANG, ABCD2, CHA2DS2-VASc/HAS-BLED, Ottawa ankle, NEXUS/Canadian C-spine, PECARN, CKD staging, COPD GOLD) |
+| E2E                              | Playwright | `playwright.config.ts` (responsive QA, 4 browsers), `playwright.canonical-routes.config.ts` (serial route verification), `playwright.production.config.ts` (smoke test against a real deployed `QA_BASE_URL`, mobile Chromium profile) |                                                                                                                                                                                                                                                                                                                                                                                                                        |
 
 Key scripts (`package.json`, root):
 
@@ -71,14 +71,14 @@ The intended path through this repo, and the one command that owns each step:
 CLONE -> INSTALL -> DOCTOR -> START -> VERIFY -> DEVELOP -> TEST -> HEAL -> PRODUCTION CHECK
 ```
 
-| Step | Command | Notes |
-|---|---|---|
-| INSTALL | `npm install && npm --prefix backend install` | Two package trees; the backend is **not** a workspace |
-| DOCTOR | `npm run doctor` | `scripts/doctor.mjs`. Diagnoses only — changes nothing |
-| START | `npm start` | Frontend :3000, Nest :8000, `/api` proxied |
-| VERIFY | `npm run verify` | Static gate, runs no tests |
-| TEST | `npm run test:run:parallel` | The whole frontend suite. Plain `vitest run` is serial |
-| PRODUCTION CHECK | `npm run production:check` | `verify:full` plus both builds |
+| Step             | Command                                       | Notes                                                  |
+| ---------------- | --------------------------------------------- | ------------------------------------------------------ |
+| INSTALL          | `npm install && npm --prefix backend install` | Two package trees; the backend is **not** a workspace  |
+| DOCTOR           | `npm run doctor`                              | `scripts/doctor.mjs`. Diagnoses only — changes nothing |
+| START            | `npm start`                                   | Frontend :3000, Nest :8000, `/api` proxied             |
+| VERIFY           | `npm run verify`                              | Static gate, runs no tests                             |
+| TEST             | `npm run test:run:parallel`                   | The whole frontend suite. Plain `vitest run` is serial |
+| PRODUCTION CHECK | `npm run production:check`                    | `verify:full` plus both builds                         |
 
 ### What `doctor` checks
 
@@ -121,6 +121,7 @@ actionable) than knip's full unused-code report.
 suite: it runs `lint:all`, `typecheck:frontend`, a **named subset** of frontend
 tests, the backend build/test/e2e, the frontend build and a bundle-budget check.
 A green CI therefore does not imply a green `verify:full`.
+
 ## Living documentation generator
 
 `docs/generated/` is regenerated from source, not hand-maintained:

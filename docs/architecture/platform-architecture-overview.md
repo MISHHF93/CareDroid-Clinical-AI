@@ -70,6 +70,7 @@ flowchart LR
 **Page inventory:** 297 files across 20 populated domain subfolders under `src/pages/` (`emergency/` is the largest — the core ED workspace; `tools/` has 46 files of calculators and specialty AI assistants), plus 5 currently-empty placeholder folders (`auth/`, `cosmos/`, `customer-portal/`, `success-center/`, `surveillance/`) whose routes exist in `src/config/routes.config.ts` but aren't yet backed by page components in those folders. Full generated route list: [`docs/generated/routes.md`](../generated/routes.md).
 
 **One name, two places — don't conflate:**
+
 - There is `src/lib/` (RBAC, auth, browser-safe AI client) **and** a separate top-level `lib/` directory (`@lib` alias in `vite.config.ts`) containing `native-ai/` and `patient-orchestration/` modules, plus the AI config/tool/prompt registries consumed by both frontend and backend.
 - The equivalent top-level `store/` and `engine/` compatibility shims (thin re-exports for legacy imports) were deleted in the 2026-08-05 repo-consolidation cleanup — `src/store/` and `src/engine/` are now each the single, canonical location, no duplicate root-level directory exists for either.
 
@@ -94,18 +95,18 @@ Full endpoint-by-endpoint listing: [API Reference](../api/api-reference.md).
 
 **Middleware & cross-cutting guards:**
 
-| Concern | Mechanism | Global? |
-|---|---|---|
-| Error tracking | Sentry request/error handlers | Global |
-| Security headers | `helmet()` + custom `Permissions-Policy` | Global |
-| Structured logging | `LoggingMiddleware` (correlation IDs, slow-request warnings) | Global |
-| Input validation | `ValidationPipe` (whitelist + transform) | Global |
-| Error shape | `ApiExceptionFilter` | Global |
-| HTTP metrics | `HttpMetricsInterceptor` (Prometheus) | Global |
-| **Tenant isolation** | `TenantIsolationGuard` + `TenantContextInterceptor`/`TenantScopeInterceptor` (`@TenantScoped`/`@OrganizationScoped`/`@WorkspaceScoped` decorators) | **Global** |
-| **RBAC** | `AuthorizationGuard` (`@Permissions()` decorator, checks `role-permissions.config.ts`) | Per-controller (not global) |
-| 2FA enforcement | `TwoFactorEnforcementGuard` | Per-route |
-| Rate limiting | `ThrottlerModule` registered but **no `ThrottlerGuard` found wired anywhere** — configured, not enforced | Neither |
+| Concern              | Mechanism                                                                                                                                          | Global?                     |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- |
+| Error tracking       | Sentry request/error handlers                                                                                                                      | Global                      |
+| Security headers     | `helmet()` + custom `Permissions-Policy`                                                                                                           | Global                      |
+| Structured logging   | `LoggingMiddleware` (correlation IDs, slow-request warnings)                                                                                       | Global                      |
+| Input validation     | `ValidationPipe` (whitelist + transform)                                                                                                           | Global                      |
+| Error shape          | `ApiExceptionFilter`                                                                                                                               | Global                      |
+| HTTP metrics         | `HttpMetricsInterceptor` (Prometheus)                                                                                                              | Global                      |
+| **Tenant isolation** | `TenantIsolationGuard` + `TenantContextInterceptor`/`TenantScopeInterceptor` (`@TenantScoped`/`@OrganizationScoped`/`@WorkspaceScoped` decorators) | **Global**                  |
+| **RBAC**             | `AuthorizationGuard` (`@Permissions()` decorator, checks `role-permissions.config.ts`)                                                             | Per-controller (not global) |
+| 2FA enforcement      | `TwoFactorEnforcementGuard`                                                                                                                        | Per-route                   |
+| Rate limiting        | `ThrottlerModule` registered but **no `ThrottlerGuard` found wired anywhere** — configured, not enforced                                           | Neither                     |
 
 Note the legacy Express routers in `backend/src/api/` generally have **no auth middleware** applied at the router level — they rely on being mounted behind the app but don't themselves check JWTs (aside from the WebSocket `JwtQueryAuthGuard`). Treat this as a known gap when reasoning about what's actually protected.
 
@@ -180,18 +181,18 @@ flowchart LR
 
 **Two distinct 128-hidden-dim MLP classifiers, same embedding model, different jobs** — don't conflate them:
 
-| | NLU intent head | Artifact-router head |
-|---|---|---|
-| Location | `backend/ml-services/nlu/` | `backend/ml-services/artifact-router/` |
-| Embedding | `Xenova/all-mpnet-base-v2` (frozen, 768-dim) | same |
-| Classifier | Hand-implemented MLP, 128 hidden, ReLU+softmax | same architecture |
-| Classes | 10 clinical intents (drug interaction check, lab interpretation, SOFA calculation, guideline lookup, patient status update, emergency alert, discharge planning, medication order, diagnosis support, general query) | 10 artifact types (api-endpoint, prompt, backend-service, page, tool, calculator, document, engine, registry, route, ...) |
-| Current accuracy | 100% on 51 held-out test examples (small test set — treat with appropriate skepticism) | 94.68% on 282 held-out examples |
-| Fallback | Rule-based keyword matcher (`INTENT_KEYWORDS`) when no trained model on disk | — |
+|                  | NLU intent head                                                                                                                                                                                                      | Artifact-router head                                                                                                      |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Location         | `backend/ml-services/nlu/`                                                                                                                                                                                           | `backend/ml-services/artifact-router/`                                                                                    |
+| Embedding        | `Xenova/all-mpnet-base-v2` (frozen, 768-dim)                                                                                                                                                                         | same                                                                                                                      |
+| Classifier       | Hand-implemented MLP, 128 hidden, ReLU+softmax                                                                                                                                                                       | same architecture                                                                                                         |
+| Classes          | 10 clinical intents (drug interaction check, lab interpretation, SOFA calculation, guideline lookup, patient status update, emergency alert, discharge planning, medication order, diagnosis support, general query) | 10 artifact types (api-endpoint, prompt, backend-service, page, tool, calculator, document, engine, registry, route, ...) |
+| Current accuracy | 100% on 51 held-out test examples (small test set — treat with appropriate skepticism)                                                                                                                               | 94.68% on 282 held-out examples                                                                                           |
+| Fallback         | Rule-based keyword matcher (`INTENT_KEYWORDS`) when no trained model on disk                                                                                                                                         | —                                                                                                                         |
 
 Both are combined by the **Unified AI Node** (`backend/ml-services/unified-ai-node/`, exposed at `POST /api/ai/node/models/route`) — this is what commit `b14693f8` ("unified NLU + artifact-router AI node") refers to. It is fed by an **artifact-intelligence pipeline** (`npm run artifact-intelligence:generate`) that catalogs the entire repo (routes, tools, calculators, prompts, engines, docs — 2,460 artifacts at last run) into training data; see [`docs/artifact-intelligence-pipeline-report.md`](../artifact-intelligence-pipeline-report.md).
 
-**RAG uses a *different*, deterministic local embedding** (`local-deterministic-embedding`) from the transformer embedding used by the two classifiers above — two separate "embedding" concepts in this codebase; don't assume they're interchangeable or that changing one affects the other.
+**RAG uses a _different_, deterministic local embedding** (`local-deterministic-embedding`) from the transformer embedding used by the two classifiers above — two separate "embedding" concepts in this codebase; don't assume they're interchangeable or that changing one affects the other.
 
 **LLM provider:** Anthropic Claude is default and primary (raw `fetch` to `https://api.anthropic.com/v1/messages`, no SDK dependency, prompt caching via `cache_control: ephemeral`). OpenAI, Azure OpenAI, and Gemini are configured as provider options (`AIProvider` type) but have no dedicated call sites beyond config — treat as "supported by config shape" rather than "wired up."
 

@@ -1,11 +1,11 @@
 # CareDroid AI Evaluation Harness v1 (PR-4)
 
-| Field | Value |
-|-------|--------|
-| **Version** | `1.0.0` |
-| **Date** | `2026-07-11` |
-| **Suite** | `data/ai-eval/v1` |
-| **Runner** | `scripts/ai-eval-run.mjs` |
+| Field       | Value                      |
+| ----------- | -------------------------- |
+| **Version** | `1.0.0`                    |
+| **Date**    | `2026-07-11`               |
+| **Suite**   | `data/ai-eval/v1`          |
+| **Runner**  | `scripts/ai-eval-run.mjs`  |
 | **CI gate** | `scripts/ai-eval-gate.mjs` |
 
 ## Purpose
@@ -27,11 +27,11 @@ node scripts/ai-eval-gate.mjs --skip-run
 
 ## Outputs
 
-| Path | Content |
-|------|---------|
-| `qa/ai-eval/results/latest.json` | Full case + gate report |
-| `qa/ai-eval/results/dashboard-run.latest.json` | Shape compatible with EvaluationService merge |
-| `qa/ai-baseline/measured-series.from-eval.json` | Measured baseline metrics (not seeds) |
+| Path                                            | Content                                       |
+| ----------------------------------------------- | --------------------------------------------- |
+| `qa/ai-eval/results/latest.json`                | Full case + gate report                       |
+| `qa/ai-eval/results/dashboard-run.latest.json`  | Shape compatible with EvaluationService merge |
+| `qa/ai-baseline/measured-series.from-eval.json` | Measured baseline metrics (not seeds)         |
 
 ## Packs
 
@@ -44,7 +44,7 @@ See `data/ai-eval/v1/DATA_CARD.md`.
 - Prefer loading `qa/ai-eval/results/dashboard-run.latest.json` when present.
 - **Promotion decisions** use `ai:eval:gate`, not seeded DEFAULT_METRICS.
 
-## What this does *not* do (yet)
+## What this does _not_ do (yet)
 
 - Live Claude/OpenAI candidate scoring (add later with de-identified prompts only)
 - Full NLI entailment models (token-overlap proxy for v1)

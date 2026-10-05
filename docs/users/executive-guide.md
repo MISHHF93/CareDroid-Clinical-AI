@@ -25,30 +25,30 @@ Open the whiteboard in **Command Center mode** to see the full operational pictu
 
 ### What You See in Command Center Mode
 
-| KPI | Meaning | Target |
-|-----|---------|--------|
-| Triage Awaiting | Patients in pretriage | < 3 |
-| Longest Untriaged Wait | Time in pretriage of longest patient | < 15 min |
-| Provider Awaiting | Patients waiting for physician | Acuity-dependent |
-| Avg Wait (Triage) | Average time from registration to triage | < 10 min |
-| Avg Wait (Provider) | Average time from triage to physician | < 30 min (P3) |
-| EMS Inbound | Ambulances en route | Situational |
-| EMS Offload Delays | Units exceeding offload target | = 0 |
-| Boarding Duration | Average ED boarding time for admitted patients | < 2 hrs |
-| Capacity Score | 0–100 operational load | < 75 (Yellow) |
-| LWBS Risk | Left-Without-Being-Seen predictor | Low |
+| KPI                    | Meaning                                        | Target           |
+| ---------------------- | ---------------------------------------------- | ---------------- |
+| Triage Awaiting        | Patients in pretriage                          | < 3              |
+| Longest Untriaged Wait | Time in pretriage of longest patient           | < 15 min         |
+| Provider Awaiting      | Patients waiting for physician                 | Acuity-dependent |
+| Avg Wait (Triage)      | Average time from registration to triage       | < 10 min         |
+| Avg Wait (Provider)    | Average time from triage to physician          | < 30 min (P3)    |
+| EMS Inbound            | Ambulances en route                            | Situational      |
+| EMS Offload Delays     | Units exceeding offload target                 | = 0              |
+| Boarding Duration      | Average ED boarding time for admitted patients | < 2 hrs          |
+| Capacity Score         | 0–100 operational load                         | < 75 (Yellow)    |
+| LWBS Risk              | Left-Without-Being-Seen predictor              | Low              |
 
 ---
 
 ## Key Reports
 
-| Report | Route | Frequency |
-|--------|-------|-----------|
-| Daily throughput | `/emergency/analytics` | Daily |
-| Shift summary | `/emergency/shift` | Per shift |
-| Department pulse | `/emergency/pulse` | Real-time |
-| Audit trail | `/admin/audit-trail` | Weekly/on demand |
-| AI governance | `/ai-governance` | Monthly |
+| Report           | Route                  | Frequency        |
+| ---------------- | ---------------------- | ---------------- |
+| Daily throughput | `/emergency/analytics` | Daily            |
+| Shift summary    | `/emergency/shift`     | Per shift        |
+| Department pulse | `/emergency/pulse`     | Real-time        |
+| Audit trail      | `/admin/audit-trail`   | Weekly/on demand |
+| AI governance    | `/ai-governance`       | Monthly          |
 
 ---
 
@@ -65,12 +65,12 @@ CareDroid is built around the principle that **the first 3 minutes of care can s
 
 ## How to Read the Capacity Band
 
-| Band | Score | What It Means | Action |
-|------|-------|---------------|--------|
-| Green | 0–60 | Normal operations | Monitor |
-| Yellow | 60–75 | Elevated load | Begin contingency review |
-| Orange | 75–90 | High load | Activate surge preparation |
-| Red | 90–100 | Crisis | Activate surge protocol, escalate to C-suite |
+| Band   | Score  | What It Means     | Action                                       |
+| ------ | ------ | ----------------- | -------------------------------------------- |
+| Green  | 0–60   | Normal operations | Monitor                                      |
+| Yellow | 60–75  | Elevated load     | Begin contingency review                     |
+| Orange | 75–90  | High load         | Activate surge preparation                   |
+| Red    | 90–100 | Crisis            | Activate surge protocol, escalate to C-suite |
 
 When the band reaches **Red**, the whiteboard automatically switches to **Capacity Crisis Mode** — showing only the most urgent operational information.
 
@@ -78,19 +78,20 @@ When the band reaches **Red**, the whiteboard automatically switches to **Capaci
 
 ## Performance Benchmarks
 
-| Metric | Industry Standard | CareDroid Target |
-|--------|------------------|-----------------|
-| Door-to-triage | ≤ 15 min | < 3 min (registration) + < 10 min (triage) |
-| Door-to-physician | ≤ 60 min (P3) | ≤ 30 min |
-| EMS offload | ≤ 30 min | ≤ 15 min |
-| Left Without Being Seen | < 2% | Minimize via queue intelligence |
-| Boarding duration | ≤ 4 hrs | ≤ 2 hrs |
+| Metric                  | Industry Standard | CareDroid Target                           |
+| ----------------------- | ----------------- | ------------------------------------------ |
+| Door-to-triage          | ≤ 15 min          | < 3 min (registration) + < 10 min (triage) |
+| Door-to-physician       | ≤ 60 min (P3)     | ≤ 30 min                                   |
+| EMS offload             | ≤ 30 min          | ≤ 15 min                                   |
+| Left Without Being Seen | < 2%              | Minimize via queue intelligence            |
+| Boarding duration       | ≤ 4 hrs           | ≤ 2 hrs                                    |
 
 ---
 
 ## AI Governance Summary
 
 Every AI decision in CareDroid is:
+
 - **Logged** with model, reasoning, and confidence score
 - **Human-reviewed** before any clinical action
 - **Auditable** — full AI audit trail available to you

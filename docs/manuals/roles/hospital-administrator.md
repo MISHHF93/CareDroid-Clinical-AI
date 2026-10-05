@@ -81,6 +81,7 @@ The Hospital Administrator has oversight of hospital operations, aggregate perfo
 ### How to Respond to an Operational Escalation
 
 When you receive an escalation (capacity critical, sustained breach, service outage):
+
 1. Open the alert or escalation notification.
 2. Review the situation summary.
 3. Use AI Chief `hospital_command_insight` for a full picture.
@@ -105,23 +106,23 @@ When you receive an escalation (capacity critical, sustained breach, service out
 
 ## Alerts You Receive
 
-| Alert | Meaning | Your action |
-|-------|---------|------------|
-| Capacity critical — hospital-wide | Multiple departments at or near capacity | Activate surge protocol |
-| Breach trend threshold | Breach rate has exceeded acceptable threshold for the period | Review breach data, convene operational response |
-| Service degradation — critical impact | A service outage is impacting patient safety | Confirm IT Admin is engaged; activate downtime if needed |
-| Staffing gap escalation | A department is understaffed and escalation has reached administrator level | Authorize coverage |
-| 5-minute escalation — admin level | A critical alert has not been resolved after all lower escalation levels | Take direct action |
+| Alert                                 | Meaning                                                                     | Your action                                              |
+| ------------------------------------- | --------------------------------------------------------------------------- | -------------------------------------------------------- |
+| Capacity critical — hospital-wide     | Multiple departments at or near capacity                                    | Activate surge protocol                                  |
+| Breach trend threshold                | Breach rate has exceeded acceptable threshold for the period                | Review breach data, convene operational response         |
+| Service degradation — critical impact | A service outage is impacting patient safety                                | Confirm IT Admin is engaged; activate downtime if needed |
+| Staffing gap escalation               | A department is understaffed and escalation has reached administrator level | Authorize coverage                                       |
+| 5-minute escalation — admin level     | A critical alert has not been resolved after all lower escalation levels    | Take direct action                                       |
 
 ---
 
 ## AI Features Available
 
-| Intent | What it gives you |
-|--------|------------------|
-| `hospital_command_insight` | Aggregate operational state: queue depths, surge score, breach risk, bottlenecks, AI review posture |
-| `service_bottleneck_analysis` | Which services are degraded, patient impact, and recovery steps |
-| `fallback_recommendation` | Manual fallback procedure for any degraded service |
+| Intent                        | What it gives you                                                                                   |
+| ----------------------------- | --------------------------------------------------------------------------------------------------- |
+| `hospital_command_insight`    | Aggregate operational state: queue depths, surge score, breach risk, bottlenecks, AI review posture |
+| `service_bottleneck_analysis` | Which services are degraded, patient impact, and recovery steps                                     |
+| `fallback_recommendation`     | Manual fallback procedure for any degraded service                                                  |
 
 ---
 

@@ -7,24 +7,29 @@ New organized header and layout components have been created to improve the visu
 ## New Components Created
 
 ### 1. ReceptionHeader Component
+
 **Location:** `src/components/reception/ReceptionHeader.tsx`
 
 A clean, hierarchical header with:
+
 - Top bar: Branding and user info
 - Metrics bar: Key statistics (queue size, critical alerts, etc.)
 - Situation brief: Current status and next actions
 - Action bar: Primary actions and queue navigation tabs
 
 ### 2. ReceptionPageLayout Component
+
 **Location:** `src/components/reception/ReceptionPageLayout.tsx`
 
 A structured page layout with:
+
 - Fixed header at top
 - Main content area with optional sidebar
 - Optional footer for action bars
 - Responsive grid and card components
 
 ### 3. CSS Files
+
 - `src/pages/emergency/ReceptionWorkspace.new-header.css` - Header styles
 - `src/components/reception/ReceptionPageLayout.css` - Layout styles
 
@@ -33,17 +38,20 @@ A structured page layout with:
 ### Step 1: Import New Components
 
 ```tsx
-import ReceptionHeader, { ReceptionHeaderActionButton } from '../../components/reception/ReceptionHeader';
-import ReceptionPageLayout, { 
-  ReceptionContentSection, 
-  ReceptionCard, 
-  ReceptionGrid 
+import ReceptionHeader, {
+  ReceptionHeaderActionButton,
+} from '../../components/reception/ReceptionHeader';
+import ReceptionPageLayout, {
+  ReceptionContentSection,
+  ReceptionCard,
+  ReceptionGrid,
 } from '../../components/reception/ReceptionPageLayout';
 ```
 
 ### Step 2: Replace EmergencyRoutePage with ReceptionPageLayout
 
 **Before:**
+
 ```tsx
 return (
   <EmergencyRoutePage
@@ -57,6 +65,7 @@ return (
 ```
 
 **After:**
+
 ```tsx
 return (
   <ReceptionPageLayout
@@ -93,15 +102,10 @@ return (
         }}
         primaryActions={
           <>
-            <ReceptionHeaderActionButton
-              primary
-              onClick={resetForNextPatient}
-            >
+            <ReceptionHeaderActionButton primary onClick={resetForNextPatient}>
               Register Walk-In
             </ReceptionHeaderActionButton>
-            <ReceptionHeaderActionButton
-              onClick={() => setShowChooser(true)}
-            >
+            <ReceptionHeaderActionButton onClick={() => setShowChooser(true)}>
               Other Arrivals
             </ReceptionHeaderActionButton>
           </>
@@ -168,12 +172,8 @@ return (
       result && (
         <div className="reception-command-selected">
           <strong>Routed: {patientDisplayName(result.patient)}</strong>
-          <button onClick={() => profileNavigate(result.nextRoute)}>
-            Continue to triage
-          </button>
-          <button onClick={resetForNextPatient}>
-            {RECEPTION_COPY.workspace.registerNext}
-          </button>
+          <button onClick={() => profileNavigate(result.nextRoute)}>Continue to triage</button>
+          <button onClick={resetForNextPatient}>{RECEPTION_COPY.workspace.registerNext}</button>
         </div>
       )
     }

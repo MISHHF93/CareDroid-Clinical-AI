@@ -40,14 +40,14 @@ These are the exact strings this build already ships, by surface
 category (`src/data/clinicalSafetyGuardrails.ts`,
 `ClinicalDecisionSupportDisclaimer.tsx`):
 
-| Surface category | Disclaimer shown today |
-|---|---|
-| Clinical calculators/tools | "Decision support only. Does not establish a diagnosis or replace qualified clinician judgment. Verify against current guidelines and local protocols." |
-| AI-documentation tools (ambient scribe, differential-AI, etc.) | "AI-generated content requires review by a qualified clinician before clinical or operational use. Not a substitute for professional judgment." |
-| Drug-interaction checker | "Interaction information is educational decision support. Does not recommend specific doses, starts, stops, or switches of therapy — verify with pharmacology references and patient-specific factors." |
-| Fleet/EMS operational tools | "Operational decision support only. Does not assign vehicles, modify live routes, or override dispatcher or maintenance authority without human approval." |
-| CareDroid Copilot (chat) | "Staff review required — [safetyLine]." |
-| Sentinel (EMS AI recommendations) | "AI output is decision support only. A licensed clinician must review every recommendation before acting. Not for autonomous clinical decision-making." |
+| Surface category                                               | Disclaimer shown today                                                                                                                                                                                  |
+| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Clinical calculators/tools                                     | "Decision support only. Does not establish a diagnosis or replace qualified clinician judgment. Verify against current guidelines and local protocols."                                                 |
+| AI-documentation tools (ambient scribe, differential-AI, etc.) | "AI-generated content requires review by a qualified clinician before clinical or operational use. Not a substitute for professional judgment."                                                         |
+| Drug-interaction checker                                       | "Interaction information is educational decision support. Does not recommend specific doses, starts, stops, or switches of therapy — verify with pharmacology references and patient-specific factors." |
+| Fleet/EMS operational tools                                    | "Operational decision support only. Does not assign vehicles, modify live routes, or override dispatcher or maintenance authority without human approval."                                              |
+| CareDroid Copilot (chat)                                       | "Staff review required — [safetyLine]."                                                                                                                                                                 |
+| Sentinel (EMS AI recommendations)                              | "AI output is decision support only. A licensed clinician must review every recommendation before acting. Not for autonomous clinical decision-making."                                                 |
 
 ## Boundary by capability class (this pass's own findings folded in)
 

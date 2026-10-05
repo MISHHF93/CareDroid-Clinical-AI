@@ -138,7 +138,7 @@ rather than a hand-rolled bearer-token check, and wiring a fake
 `socket.data.user`-setting middleware into the real `registerEMSWebSocketSupport`
 so the EMS alert → whiteboard Socket.IO emission built in Cycle 282 gets
 genuine end-to-end proof instead of failing on the auth-guard's default-deny
-behavior (which the *original* version of this test would also have hit,
+behavior (which the _original_ version of this test would also have hit,
 independent of anything this cycle touched). `copilot`/`federated` are out
 of scope for this suite — both live inside the much heavier `EmergencyOsModule`
 (TypeORM + AuthModule + ChatModule) and already have their own passing unit
@@ -191,7 +191,7 @@ some other path).
 
 **What remains is no longer route-parity work of any kind.** The only piece
 of `registerEmergencyMongooseRuntime()` (`main.ts`) still doing real work is
-the Mongoose *connection* itself plus three things riding on the same
+the Mongoose _connection_ itself plus three things riding on the same
 conditional block: EMS/edge-ambulance/sentinel-AVL WebSocket support,
 `reassessmentScheduler.start()`, and `initializeAllServices()` (the
 service-registry health-check init). None of these are legacy Express REST
@@ -212,11 +212,11 @@ Continuing from the 277–278 update below, `/deterioration` (279), `/protocol`
 (285) all completed Phase 4 (Remove) the same way as capacity/governance/copilot:
 Express file deleted, `routes-registry.ts` entry removed, a real NestJS
 controller built or extended to cover every real endpoint, and — starting
-with `/reassessment` — a live-caller check *before* choosing an approach,
+with `/reassessment` — a live-caller check _before_ choosing an approach,
 which surfaced a repeating pattern worth recording: for `/reassessment`,
 `/ems`, and `/boarding`, a short bare `/api/emergency/{name}` Nest route
 already existed (on `EmergencyOsController`) but turned out each time to be a
-*different*, TypeORM-backed implementation than what the real frontend
+_different_, TypeORM-backed implementation than what the real frontend
 traffic actually depends on at the longer legacy sub-paths — never a
 shortcut, always a trap if assumed to be parity. `/federated` was the one
 exception where the shadowed-sibling check found a real, correct extension
@@ -270,56 +270,61 @@ complete parity controllers already sitting unused).
 
 ## Current state (proven)
 
-| Surface | Path | Auth |
-|---------|------|------|
-| Nest primary (only HTTP surface left) | `backend/src/modules/**` controllers | JWT + guards + TenantIsolationGuard |
-| ~~Express legacy~~ | ~~`backend/src/api/routes-registry.ts`~~ | **File deleted (Cycle 287)** — no legacy Express router mount exists anywhere in the codebase anymore |
-| Dual prefix | `/api/*` and `/api/emergency/*` | Both prefixes now resolve to the same Nest controllers, not a dual mount of two frameworks |
+| Surface                               | Path                                     | Auth                                                                                                  |
+| ------------------------------------- | ---------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| Nest primary (only HTTP surface left) | `backend/src/modules/**` controllers     | JWT + guards + TenantIsolationGuard                                                                   |
+| ~~Express legacy~~                    | ~~`backend/src/api/routes-registry.ts`~~ | **File deleted (Cycle 287)** — no legacy Express router mount exists anywhere in the codebase anymore |
+| Dual prefix                           | `/api/*` and `/api/emergency/*`          | Both prefixes now resolve to the same Nest controllers, not a dual mount of two frameworks            |
 
 ## Route inventory (Express ROUTES)
 
-| Express path | Description | Nest target (preferred) | Parity status |
-|--------------|-------------|-------------------------|---------------|
-| ~~`/capacity`~~ | Capacity | `CapacityController` `@Controller('emergency/capacity')` | **RETIRED (Cycle 277)** |
-| ~~`/ems`~~ | EMS intake | `EmsController` `@Controller('emergency/ems')` | **RETIRED (Cycle 282)** — real FE consumer, Socket.IO emission ported |
-| `/surge` | Surge/MCI | emergency-os | already Nest-only, no legacy file (see commit `5bed1bf9`) |
-| ~~`/boarding`~~ | Boarding | `BoardingController` `@Controller('emergency/boarding')` | **RETIRED (Cycle 283)** — real FE consumer |
-| ~~`/protocol`~~ | Protocols | `ProtocolController` `@Controller('protocol')` | **RETIRED (Cycle 280)** |
-| ~~`/deterioration`~~ | Prediction | `DeteriorationController` `@Controller('deterioration')` | **RETIRED (Cycle 279)** |
-| ~~`/copilot`~~ | ED Copilot | `EdCopilotNestParityController` `@Controller('copilot')` + emergency copilot | **RETIRED (Cycle 278)** |
-| ~~`/intake`~~ | Smart intake | `SmartIntakeController` `@Controller('emergency/intake')` | **RETIRED (Cycle 284)** — 14 endpoints, largest migration in the program |
-| ~~`/moh`~~ | MoH FHIR | none — stub deleted | **RETIRED (Cycle 286)** — placeholder, no real functionality |
-| ~~`/wearable`~~ | Wearables | none — stub deleted | **RETIRED (Cycle 286)** — placeholder |
-| ~~`/iot`~~ | IoT | none — stub deleted | **RETIRED (Cycle 286)** — placeholder |
-| ~~`/simulation`~~ | Simulation | none — stub deleted | **RETIRED (Cycle 286)** — placeholder |
-| ~~`/governance`~~ | AI governance | `NestAiGovernanceController` `@Controller('governance')` (+ v1 / emergency aliases) | **RETIRED (Cycle 278)** |
-| ~~`/handover`~~ | Handover | none — stub deleted (real `/er-pulse` work lives on `ERPulseHandoverController` separately) | **RETIRED (Cycle 286)** — placeholder |
-| ~~`/federated`~~ | Federated learning | `FederatedEMSController` `@Controller('ems/federated')` (extended, not replaced) | **RETIRED (Cycle 285)** — last real group |
-| ~~`/digital-twin`~~ | Digital twin | none — stub deleted (real work lives on `OrganizationalDigitalTwinController` separately) | **RETIRED (Cycle 286)** — placeholder |
-| ~~`/reassessment`~~ | Reassessment | `ReassessmentController` `@Controller('emergency/reassessment')` | **RETIRED (Cycle 281)** — first real FE consumer found |
-| ~~`/health`~~ | Health | direct `main.ts` mount at `/health` + `/api/health` (unrelated to this registry) | **REMOVED from ROUTES (Cycle 286)** — was always a redundant duplicate mount, not unique functionality |
+| Express path         | Description        | Nest target (preferred)                                                                     | Parity status                                                                                          |
+| -------------------- | ------------------ | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| ~~`/capacity`~~      | Capacity           | `CapacityController` `@Controller('emergency/capacity')`                                    | **RETIRED (Cycle 277)**                                                                                |
+| ~~`/ems`~~           | EMS intake         | `EmsController` `@Controller('emergency/ems')`                                              | **RETIRED (Cycle 282)** — real FE consumer, Socket.IO emission ported                                  |
+| `/surge`             | Surge/MCI          | emergency-os                                                                                | already Nest-only, no legacy file (see commit `5bed1bf9`)                                              |
+| ~~`/boarding`~~      | Boarding           | `BoardingController` `@Controller('emergency/boarding')`                                    | **RETIRED (Cycle 283)** — real FE consumer                                                             |
+| ~~`/protocol`~~      | Protocols          | `ProtocolController` `@Controller('protocol')`                                              | **RETIRED (Cycle 280)**                                                                                |
+| ~~`/deterioration`~~ | Prediction         | `DeteriorationController` `@Controller('deterioration')`                                    | **RETIRED (Cycle 279)**                                                                                |
+| ~~`/copilot`~~       | ED Copilot         | `EdCopilotNestParityController` `@Controller('copilot')` + emergency copilot                | **RETIRED (Cycle 278)**                                                                                |
+| ~~`/intake`~~        | Smart intake       | `SmartIntakeController` `@Controller('emergency/intake')`                                   | **RETIRED (Cycle 284)** — 14 endpoints, largest migration in the program                               |
+| ~~`/moh`~~           | MoH FHIR           | none — stub deleted                                                                         | **RETIRED (Cycle 286)** — placeholder, no real functionality                                           |
+| ~~`/wearable`~~      | Wearables          | none — stub deleted                                                                         | **RETIRED (Cycle 286)** — placeholder                                                                  |
+| ~~`/iot`~~           | IoT                | none — stub deleted                                                                         | **RETIRED (Cycle 286)** — placeholder                                                                  |
+| ~~`/simulation`~~    | Simulation         | none — stub deleted                                                                         | **RETIRED (Cycle 286)** — placeholder                                                                  |
+| ~~`/governance`~~    | AI governance      | `NestAiGovernanceController` `@Controller('governance')` (+ v1 / emergency aliases)         | **RETIRED (Cycle 278)**                                                                                |
+| ~~`/handover`~~      | Handover           | none — stub deleted (real `/er-pulse` work lives on `ERPulseHandoverController` separately) | **RETIRED (Cycle 286)** — placeholder                                                                  |
+| ~~`/federated`~~     | Federated learning | `FederatedEMSController` `@Controller('ems/federated')` (extended, not replaced)            | **RETIRED (Cycle 285)** — last real group                                                              |
+| ~~`/digital-twin`~~  | Digital twin       | none — stub deleted (real work lives on `OrganizationalDigitalTwinController` separately)   | **RETIRED (Cycle 286)** — placeholder                                                                  |
+| ~~`/reassessment`~~  | Reassessment       | `ReassessmentController` `@Controller('emergency/reassessment')`                            | **RETIRED (Cycle 281)** — first real FE consumer found                                                 |
+| ~~`/health`~~        | Health             | direct `main.ts` mount at `/health` + `/api/health` (unrelated to this registry)            | **REMOVED from ROUTES (Cycle 286)** — was always a redundant duplicate mount, not unique functionality |
 
 ## Phased plan
 
 ### Phase 0 — Freeze (done)
+
 - JWT middleware on legacy mount (`runtime-auth`)
 - Structured error envelopes on governance failures
 - Document dual surface in architecture map
 
 ### Phase 1 — Inventory consumers
+
 - Grep FE for `/api/capacity`, `/api/ems`, `/api/intake`, `/api/copilot`, `/api/governance`
 - Build `express-consumer-matrix.md` (path → service file)
 - Contract test: every Express path either has Nest equivalent or `legacy: true` flag
 
 ### Phase 2 — Feature-flag decommission
+
 ```
 ENABLE_MONGOOSE_EMERGENCY_OS=false  # default in production
 ENABLE_EXPRESS_LEGACY_ROUTES=false  # new explicit flag if split needed
 ```
+
 - Production default: Nest only
 - Dev: optional Express for EMS/intake lab until parity
 
 ### Phase 3 — Nest parity PRs (order) — ALL DONE (Cycle 285)
+
 1. Governance (security) — **done (Nest controllers + unit inventory)**
 2. Copilot / chat — **done (Nest parity controller + accountable DTO)**
 3. Intake / EMS / handoff — **done**: intake (Cycle 284), EMS (Cycle 282)
@@ -327,6 +332,7 @@ ENABLE_EXPRESS_LEGACY_ROUTES=false  # new explicit flag if split needed
 5. Remaining deterioration/protocol/federated — **done**: deterioration (279), protocol (280), federated (285)
 
 **P0 proof (2026-07-15/16, extended through Cycle 285):**
+
 - Nest: `NestAiGovernanceController` registered in `GovernanceModule`
 - Nest: `EdCopilotNestParityController` registered in `EmergencyOsModule` → `POST /api/copilot/query`
 - Tests: `express-nest-parity.spec.ts`, `ed-copilot.nest-parity.controller.spec.ts`, `runtime-auth.spec.ts`
@@ -334,11 +340,13 @@ ENABLE_EXPRESS_LEGACY_ROUTES=false  # new explicit flag if split needed
   **Closed 2026-08-04 (Cycle 278) for governance/copilot, extended to all 10 real groups by Cycle 285.**
 
 ### Phase 4 — Remove — route-level work DONE, runtime-level cleanup still open
+
 - Delete `routes-registry` mounts from `main.ts` — **done.** `backend/src/api/routes-registry.ts` itself is deleted (Cycle 287), not just emptied; `registerAllRoutes`/`getRouteList`/the `/api/routes` discovery endpoint no longer exist anywhere in the codebase.
 - Quarantine `backend/src/api/*.routes.ts` for one release — N/A: every file was deleted outright once real (Nest parity confirmed) or dead (placeholder stub), not quarantined, matching the Surge precedent (`git show 5bed1bf9`)
 - Remove Mongoose emergency OS if TypeORM covers patients — **2 of 4 pieces left.** Not a route question anymore: `registerEmergencyMongooseRuntime()` now owns only the Mongoose connection and the reassessment scheduler (EMS WebSocket support moved out in Cycle 288, service-registry init moved out in Cycle 289), both still gated behind the same flag. Each needs its own deliberate decision (unconditional vs. removed), not a mechanical deletion — continuing one at a time. The reassessment scheduler is NOT a safe unconditional flip like the other two were: it's a `node-cron` job polling Mongo every minute, so running it without Mongo configured would error-log every 60 seconds forever — it needs a Mongo-configured guard of its own, not a blanket removal of the outer gate.
 
 ## Exit criteria
+
 - [x] All real (non-placeholder) route groups migrated to Nest controllers (Cycle 285)
 - [x] 6 placeholder-only route groups retired outright, `routes-registry.ts` `ROUTES` is `[]` (Cycle 286)
 - [x] `routes-registry.ts` itself deleted — no legacy Express registry exists at any size, empty or otherwise (Cycle 287)
@@ -349,4 +357,5 @@ ENABLE_EXPRESS_LEGACY_ROUTES=false  # new explicit flag if split needed
 - [ ] PROOF-PACK deduction removed (16/16 route groups retired; only the underlying Mongoose runtime block remains)
 
 ## Rollback
+
 Re-enable `ENABLE_MONGOOSE_EMERGENCY_OS` / Express mount flag; keep `runtime-auth` middleware.

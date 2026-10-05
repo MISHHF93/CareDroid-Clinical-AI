@@ -43,4 +43,3 @@ Prefer existing helpers and canonical route constants over literals.
 ## Known Limitations
 
 The repo is broad; run targeted tests before expensive full validation.
-

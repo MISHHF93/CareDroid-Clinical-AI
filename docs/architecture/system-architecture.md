@@ -28,16 +28,16 @@ CareDroid-Clinical-AI/
 
 ### 2.1 Technology Stack
 
-| Concern | Technology |
-|---------|-----------|
-| Framework | React 18 |
-| Language | TypeScript (strict, `allowJs: false` via `tsconfig.frontend.json`) |
-| Routing | React Router v6 |
-| State | Zustand (stores) + React Context (app-level) |
-| Build | Vite + esbuild |
-| Styling | CSS Modules + Tailwind utilities |
-| Testing | Vitest + Testing Library |
-| E2E | Playwright |
+| Concern   | Technology                                                         |
+| --------- | ------------------------------------------------------------------ |
+| Framework | React 18                                                           |
+| Language  | TypeScript (strict, `allowJs: false` via `tsconfig.frontend.json`) |
+| Routing   | React Router v6                                                    |
+| State     | Zustand (stores) + React Context (app-level)                       |
+| Build     | Vite + esbuild                                                     |
+| Styling   | CSS Modules + Tailwind utilities                                   |
+| Testing   | Vitest + Testing Library                                           |
+| E2E       | Playwright                                                         |
 
 ### 2.2 Entry Point Chain
 
@@ -54,6 +54,7 @@ index.html
 ### 2.3 Provider Stack (`src/app/providers.tsx`)
 
 Providers nest in this order (outer → inner):
+
 1. `ThemeProvider`
 2. `UserIdentityProvider`
 3. `OrganizationProvider`
@@ -125,16 +126,16 @@ AppShell
 
 The whiteboard page (`/emergency/whiteboard`) renders up to 8 distinct screen modes based on the active role and URL params:
 
-| Mode | Trigger | Layout |
-|------|---------|--------|
-| Standard | Default | Patient cards + filters |
-| Charge Nurse | `?mode=charge` or role | Operational strips + queue |
-| Physician | `?mode=physician` or role | Provider-focused card view |
-| Triage | `?mode=triage` or role | Triage queue emphasis |
-| Command Center | `?mode=command` or role | KPI throughput dashboard |
-| Public Waiting | `?mode=waiting` | Patient-safe kiosk display |
-| Read-Only Wall | `?mode=wall` | Operational status display |
-| Display | `?display=1` | Auto-refresh wall mode |
+| Mode           | Trigger                   | Layout                     |
+| -------------- | ------------------------- | -------------------------- |
+| Standard       | Default                   | Patient cards + filters    |
+| Charge Nurse   | `?mode=charge` or role    | Operational strips + queue |
+| Physician      | `?mode=physician` or role | Provider-focused card view |
+| Triage         | `?mode=triage` or role    | Triage queue emphasis      |
+| Command Center | `?mode=command` or role   | KPI throughput dashboard   |
+| Public Waiting | `?mode=waiting`           | Patient-safe kiosk display |
+| Read-Only Wall | `?mode=wall`              | Operational status display |
+| Display        | `?display=1`              | Auto-refresh wall mode     |
 
 ### 2.7 State Architecture
 
@@ -157,22 +158,22 @@ React Contexts (src/contexts/)
 
 The `src/config/` directory contains **200+ config files** that define the behavioral rules of the application without touching UI code:
 
-| Config File | Purpose |
-|-------------|---------|
-| `routes.config.ts` | Canonical route constants |
-| `emergencyRolePermissions.ts` | Role → route/action permission matrix |
-| `userManual.config.ts` | In-app help content (single source of truth) |
-| `careDroidScreenModes.ts` | Screen mode definitions |
-| `operationalMetricsModel.ts` | KPI metric definitions |
-| `emergencyScreenKpiPolicy.ts` | KPI visibility per screen mode |
-| `whiteboardDensityModel.ts` | Layout density rules |
-| `centralControl.config.ts` | Central intake control policy |
-| `receptionFirstUx.config.ts` | Reception-first UX toggle |
-| `demoPersonaModel.ts` | Demo persona routing |
-| `edOperationalStandards.ts` | ED operational standards |
-| `ai.config.ts` | AI model configuration |
-| `nativeAiThresholds.config.ts` | Native AI alert thresholds |
-| `featureFlags.config.ts` | Feature flag registry |
+| Config File                    | Purpose                                      |
+| ------------------------------ | -------------------------------------------- |
+| `routes.config.ts`             | Canonical route constants                    |
+| `emergencyRolePermissions.ts`  | Role → route/action permission matrix        |
+| `userManual.config.ts`         | In-app help content (single source of truth) |
+| `careDroidScreenModes.ts`      | Screen mode definitions                      |
+| `operationalMetricsModel.ts`   | KPI metric definitions                       |
+| `emergencyScreenKpiPolicy.ts`  | KPI visibility per screen mode               |
+| `whiteboardDensityModel.ts`    | Layout density rules                         |
+| `centralControl.config.ts`     | Central intake control policy                |
+| `receptionFirstUx.config.ts`   | Reception-first UX toggle                    |
+| `demoPersonaModel.ts`          | Demo persona routing                         |
+| `edOperationalStandards.ts`    | ED operational standards                     |
+| `ai.config.ts`                 | AI model configuration                       |
+| `nativeAiThresholds.config.ts` | Native AI alert thresholds                   |
+| `featureFlags.config.ts`       | Feature flag registry                        |
 
 ---
 
@@ -180,17 +181,17 @@ The `src/config/` directory contains **200+ config files** that define the behav
 
 ### 3.1 Technology Stack
 
-| Concern | Technology |
-|---------|-----------|
-| Framework | NestJS 10 |
-| Language | TypeScript |
-| HTTP Adapter | Express |
-| Database | SQLite (dev) / PostgreSQL (prod) via TypeORM |
-| Optional ODM | Mongoose (Emergency OS, enabled via `ENABLE_MONGOOSE_EMERGENCY_OS=true`) |
-| Authentication | Passport.js + JWT + Google/LinkedIn OAuth |
-| WebSockets | Socket.io (via `backend/src/api/ems.socket.ts`) |
-| Caching | Redis (optional) |
-| Testing | Jest |
+| Concern        | Technology                                                               |
+| -------------- | ------------------------------------------------------------------------ |
+| Framework      | NestJS 10                                                                |
+| Language       | TypeScript                                                               |
+| HTTP Adapter   | Express                                                                  |
+| Database       | SQLite (dev) / PostgreSQL (prod) via TypeORM                             |
+| Optional ODM   | Mongoose (Emergency OS, enabled via `ENABLE_MONGOOSE_EMERGENCY_OS=true`) |
+| Authentication | Passport.js + JWT + Google/LinkedIn OAuth                                |
+| WebSockets     | Socket.io (via `backend/src/api/ems.socket.ts`)                          |
+| Caching        | Redis (optional)                                                         |
+| Testing        | Jest                                                                     |
 
 ### 3.2 Module Architecture
 
@@ -214,14 +215,14 @@ backend/src/
 
 When `ENABLE_MONGOOSE_EMERGENCY_OS=true`:
 
-| File | Routes |
-|------|--------|
-| `api/capacity.routes.ts` | `GET/POST /api/capacity` |
-| `api/copilot.routes.ts` | `POST /api/copilot` |
-| `api/ems.routes.ts` | EMS arrival management |
-| `api/reassessment.routes.ts` | Reassessment queue |
-| `api/smart-intake.routes.ts` | Patient intake |
-| `api/ems.socket.ts` | WebSocket for EMS real-time |
+| File                         | Routes                      |
+| ---------------------------- | --------------------------- |
+| `api/capacity.routes.ts`     | `GET/POST /api/capacity`    |
+| `api/copilot.routes.ts`      | `POST /api/copilot`         |
+| `api/ems.routes.ts`          | EMS arrival management      |
+| `api/reassessment.routes.ts` | Reassessment queue          |
+| `api/smart-intake.routes.ts` | Patient intake              |
+| `api/ems.socket.ts`          | WebSocket for EMS real-time |
 
 ### 3.4 Database Architecture
 
@@ -248,7 +249,7 @@ Mongoose (Optional, Emergency OS only)
 ```
 Frontend → POST /api/auth/login (or OAuth callback)
          ← JWT access token + refresh token
-         
+
 All requests → Bearer token in Authorization header
 Backend     → JwtStrategy validates token
             → AuthorizationGuard enforces permissions
@@ -332,7 +333,7 @@ LLM Generation with citations
 NativeAiCommandSuitePanel (frontend)
     ├── ClinicalAcuityDashboard (feature-flagged)
     └── AITransparencyDashboard (feature-flagged)
-    
+
 Backend: backend/src/modules/native-ai/
     ├── IoMT alert processing (wearable data)
     ├── VVT scoring (virtual visit triage)
@@ -395,73 +396,75 @@ Defined in `src/lib/users/userTypes.ts`:
 
 ```typescript
 type HospitalRole =
-  | 'super_admin'         // Full system access
-  | 'hospital_admin'      // Hospital-wide admin
-  | 'ed_director'         // ED director + analytics
-  | 'charge_nurse'        // ED operations lead
-  | 'triage_nurse'        // Triage + assessment
-  | 'registered_nurse'    // Patient care
+  | 'super_admin' // Full system access
+  | 'hospital_admin' // Hospital-wide admin
+  | 'ed_director' // ED director + analytics
+  | 'charge_nurse' // ED operations lead
+  | 'triage_nurse' // Triage + assessment
+  | 'registered_nurse' // Patient care
   | 'emergency_physician' // ED physician
   | 'attending_physician' // Attending physician
-  | 'resident_physician'  // Resident
-  | 'specialist'          // Specialty consult
-  | 'paramedic'           // EMS/ambulance
-  | 'registration_clerk'  // Reception only
+  | 'resident_physician' // Resident
+  | 'specialist' // Specialty consult
+  | 'paramedic' // EMS/ambulance
+  | 'registration_clerk' // Reception only
   | 'patient_flow_coordinator' // Flow management
-  | 'lab_technician'      // Lab results
-  | 'radiology_technician'// Radiology
-  | 'pharmacist'          // Medications
-  | 'social_worker'       // Social services
-  | 'security_officer'    // Security
-  | 'it_admin'            // IT + systems
+  | 'lab_technician' // Lab results
+  | 'radiology_technician' // Radiology
+  | 'pharmacist' // Medications
+  | 'social_worker' // Social services
+  | 'security_officer' // Security
+  | 'it_admin' // IT + systems
   | 'quality_safety_officer' // QA + safety
-  | 'demo_observer'       // Demo only
+  | 'demo_observer'; // Demo only
 ```
 
 ### 6.2 ED Route Role Matrix
 
 Enforced by `EmergencyRouteGuard` in `src/app/router.tsx`:
 
-| Route | charge_nurse | physician | triage_nurse | registration_clerk | ed_director | paramedic |
-|-------|:---:|:---:|:---:|:---:|:---:|:---:|
-| whiteboard | ✓ | ✓ | ✓ | ✗ (→reception) | ✓ | ✗ |
-| reception | ✓ | ✗ | ✓ | ✓ | ✓ | ✗ |
-| ems | ✓ | ✗ | ✗ | ✗ | ✓ | ✓ |
-| intake | ✓ | ✗ | ✓ | ✓ | ✓ | ✗ |
-| queues | ✓ | ✗ | ✓ | ✗ | ✓ | ✗ |
-| reassessment | ✓ | ✓ | ✓ | ✗ | ✓ | ✗ |
-| capacity | ✓ | ✗ | ✗ | ✗ | ✓ | ✗ |
-| boarding | ✓ | ✗ | ✗ | ✗ | ✓ | ✗ |
-| referrals | ✓ | ✓ | ✗ | ✗ | ✓ | ✗ |
-| copilot | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ |
-| analytics | ✓ | ✓ | ✗ | ✗ | ✓ | ✗ |
-| settings | ✓ | ✗ | ✗ | ✗ | ✓ | ✗ |
+| Route        | charge_nurse | physician | triage_nurse | registration_clerk | ed_director | paramedic |
+| ------------ | :----------: | :-------: | :----------: | :----------------: | :---------: | :-------: |
+| whiteboard   |      ✓       |     ✓     |      ✓       |   ✗ (→reception)   |      ✓      |     ✗     |
+| reception    |      ✓       |     ✗     |      ✓       |         ✓          |      ✓      |     ✗     |
+| ems          |      ✓       |     ✗     |      ✗       |         ✗          |      ✓      |     ✓     |
+| intake       |      ✓       |     ✗     |      ✓       |         ✓          |      ✓      |     ✗     |
+| queues       |      ✓       |     ✗     |      ✓       |         ✗          |      ✓      |     ✗     |
+| reassessment |      ✓       |     ✓     |      ✓       |         ✗          |      ✓      |     ✗     |
+| capacity     |      ✓       |     ✗     |      ✗       |         ✗          |      ✓      |     ✗     |
+| boarding     |      ✓       |     ✗     |      ✗       |         ✗          |      ✓      |     ✗     |
+| referrals    |      ✓       |     ✓     |      ✗       |         ✗          |      ✓      |     ✗     |
+| copilot      |      ✓       |     ✓     |      ✓       |         ✗          |      ✓      |     ✓     |
+| analytics    |      ✓       |     ✓     |      ✗       |         ✗          |      ✓      |     ✗     |
+| settings     |      ✓       |     ✗     |      ✗       |         ✗          |      ✓      |     ✗     |
 
 ---
 
 ## 7. Known Technical Debt
 
-| Item | Location | Risk |
-|------|----------|------|
-| Large monolithic store | `src/store/emergencyStore.ts` (~5000 LOC) | High — hard to test in isolation |
-| Dual user context | `UserContext` + `UserIdentityContext` | Medium — potential stale state |
-| 200+ config files | `src/config/` | Medium — discoverability |
-| Mixed Mongoose/TypeORM | `backend/src/modules/` + `backend/src/models/` | Medium — dual ORM |
-| Optional Express routes | `backend/src/api/*.routes.ts` | Low — disabled by default |
-| Legacy redirect routes | `src/app/router.tsx` | Low — cleanup opportunity |
-| Backend stubs | Several modules have empty implementations | High — misleading API surface |
+| Item                    | Location                                       | Risk                             |
+| ----------------------- | ---------------------------------------------- | -------------------------------- |
+| Large monolithic store  | `src/store/emergencyStore.ts` (~5000 LOC)      | High — hard to test in isolation |
+| Dual user context       | `UserContext` + `UserIdentityContext`          | Medium — potential stale state   |
+| 200+ config files       | `src/config/`                                  | Medium — discoverability         |
+| Mixed Mongoose/TypeORM  | `backend/src/modules/` + `backend/src/models/` | Medium — dual ORM                |
+| Optional Express routes | `backend/src/api/*.routes.ts`                  | Low — disabled by default        |
+| Legacy redirect routes  | `src/app/router.tsx`                           | Low — cleanup opportunity        |
+| Backend stubs           | Several modules have empty implementations     | High — misleading API surface    |
 
 ---
 
 ## 8. Performance Characteristics
 
 ### Frontend
+
 - All page routes are lazy-loaded with `lazyWithRetry`
 - 15-second interval clock tick for EMS ETAs and freshness
 - Stable display snapshots for wall-mount screens (prevent flicker)
 - `useMemo` pervasively on computation-heavy whiteboard derivations
 
 ### Backend
+
 - Redis cache available (optional) via `cache.module.ts`
 - Mongoose path disabled unless MongoDB env configured
 - TypeORM connection pool for PostgreSQL production
@@ -471,14 +474,14 @@ Enforced by `EmergencyRouteGuard` in `src/app/router.tsx`:
 
 ## 9. Security Architecture
 
-| Layer | Implementation |
-|-------|---------------|
-| Authentication | JWT + refresh tokens, OAuth2 |
-| Authorization | RBAC via `AuthorizationGuard` + `@Permissions()` decorator |
-| 2FA | TOTP via `two-factor.module.ts` |
-| Biometrics | `biometric.controller.ts` + `biometric.service.ts` |
-| PHI Encryption | `encryption.module.ts` with key rotation |
-| Audit Log | HMAC-hashed tamper-evident logs |
-| LLM Security | Prompt injection detection (`llm-security.module.ts`) |
-| PHI Redaction | `privacy-center.module.ts` for display redaction |
+| Layer                           | Implementation                                                                                                                                                                           |
+| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Authentication                  | JWT + refresh tokens, OAuth2                                                                                                                                                             |
+| Authorization                   | RBAC via `AuthorizationGuard` + `@Permissions()` decorator                                                                                                                               |
+| 2FA                             | TOTP via `two-factor.module.ts`                                                                                                                                                          |
+| Biometrics                      | `biometric.controller.ts` + `biometric.service.ts`                                                                                                                                       |
+| PHI Encryption                  | `encryption.module.ts` with key rotation                                                                                                                                                 |
+| Audit Log                       | HMAC-hashed tamper-evident logs                                                                                                                                                          |
+| LLM Security                    | Prompt injection detection (`llm-security.module.ts`)                                                                                                                                    |
+| PHI Redaction                   | `privacy-center.module.ts` for display redaction                                                                                                                                         |
 | Emergency Access (2FA recovery) | Account recovery via 2FA backup codes in `emergency-access.service.ts` — **not** clinical break-glass / PHI scope override (that capability is not implemented; see capability-map QW-2) |

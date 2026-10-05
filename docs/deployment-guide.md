@@ -12,11 +12,11 @@ flowchart LR
     C["docker-compose.yml\n(full stack: Postgres, Redis,\nbackend, frontend, Elasticsearch,\nLogstash, Kibana, Prometheus,\nAlertmanager, Grafana, Sentry)"]
 ```
 
-| File | Use when | Services | Key defaults |
-|---|---|---|---|
-| `docker-compose.app.yml` | You want "just the app" — local dev, demos, a lightweight pilot | `backend`, `frontend` | `DATABASE_CLIENT=sqlite`, `SQLITE_PATH=/data/caredroid.dev.sqlite`, `ENABLE_MONGOOSE_EMERGENCY_OS=false`, AI/RAG/anomaly-detection disabled |
-| `docker-compose.ml.yml` | Layered on top of the app profile when you need in-process NLU | (overlay on `backend`) | `NLU_SERVICE_MODE=in-process`, `NLU_SERVICE_ENABLED=true`, `NLU_SERVICE_URL` |
-| `docker-compose.yml` | Full observability stack — staging/production-like environment | `postgres`, `redis`, `backend`, `frontend`, `elasticsearch`, `logstash`, `kibana`, `prometheus`, `alertmanager`, `grafana`, `sentry` | Postgres-backed, AI/Pinecone/SMTP/Firebase wired |
+| File                     | Use when                                                        | Services                                                                                                                             | Key defaults                                                                                                                                |
+| ------------------------ | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `docker-compose.app.yml` | You want "just the app" — local dev, demos, a lightweight pilot | `backend`, `frontend`                                                                                                                | `DATABASE_CLIENT=sqlite`, `SQLITE_PATH=/data/caredroid.dev.sqlite`, `ENABLE_MONGOOSE_EMERGENCY_OS=false`, AI/RAG/anomaly-detection disabled |
+| `docker-compose.ml.yml`  | Layered on top of the app profile when you need in-process NLU  | (overlay on `backend`)                                                                                                               | `NLU_SERVICE_MODE=in-process`, `NLU_SERVICE_ENABLED=true`, `NLU_SERVICE_URL`                                                                |
+| `docker-compose.yml`     | Full observability stack — staging/production-like environment  | `postgres`, `redis`, `backend`, `frontend`, `elasticsearch`, `logstash`, `kibana`, `prometheus`, `alertmanager`, `grafana`, `sentry` | Postgres-backed, AI/Pinecone/SMTP/Firebase wired                                                                                            |
 
 Corresponding npm scripts:
 
@@ -45,12 +45,12 @@ For the full stack, run `docker compose up` against the root `docker-compose.yml
 
 ## CI/CD (`.github/workflows/`)
 
-| Workflow | Trigger | Purpose |
-|---|---|---|
-| `ci-cd.yml` | push to main/develop, PRs | CI/CD pipeline |
-| `validate.yml` | push to main/develop, PRs | Validation gate (mirrors `npm run validate:ci`) |
-| `release.yml` | push to main + tags | Release |
-| `dependency-updates.yml` | weekly cron (Mon 09:00 UTC) | Dependency updates |
+| Workflow                 | Trigger                     | Purpose                                         |
+| ------------------------ | --------------------------- | ----------------------------------------------- |
+| `ci-cd.yml`              | push to main/develop, PRs   | CI/CD pipeline                                  |
+| `validate.yml`           | push to main/develop, PRs   | Validation gate (mirrors `npm run validate:ci`) |
+| `release.yml`            | push to main + tags         | Release                                         |
+| `dependency-updates.yml` | weekly cron (Mon 09:00 UTC) | Dependency updates                              |
 
 (`ci.yml`, `test.yml`, `quality.yml`, and `navigator-test.yml` no longer exist in `.github/workflows/` — the 4 files above are the complete, current list; verified directly, not assumed from a prior version of this doc. `navigator-test.yml` covered the formerly-standalone `navigator/` app, retired 2026-08-06 when it was consolidated into the main backend/frontend — its tests now run as part of the normal backend `validate:ci` suite, same as every other module.)
 

@@ -71,6 +71,7 @@ The Patient Flow Coordinator is the operational nerve center for bed management,
 ### How to Handle Department Capacity Pressure
 
 When a department (ED or inpatient) reports high capacity:
+
 1. Open **Capacity** (`/emergency/capacity`) and click the department.
 2. Review: beds occupied, beds available, beds cleaning, expected discharges.
 3. Use AI Chief `hospital_command_insight` for a full department summary and risk projection.
@@ -84,6 +85,7 @@ When a department (ED or inpatient) reports high capacity:
 ### How to Coordinate a Transfer
 
 When a patient is being transferred to another facility:
+
 1. Open the patient record → **Transfer** tab.
 2. Confirm the destination facility, receiving unit, and accepting physician.
 3. Confirm transport has been arranged (ambulance, air transport).
@@ -106,25 +108,25 @@ When a patient is being transferred to another facility:
 
 ## Alerts You Receive
 
-| Alert | Meaning | Your action |
-|-------|---------|------------|
-| Capacity critical — ED | ED is at or near threshold | Expedite discharges, open overflow, or escalate to admin |
-| Boarding pressure — >N hours | Boarding patients waiting beyond threshold | Contact destination department; expedite bed assignment |
-| Unowned handoff | A patient transfer has no confirmed receiving owner | Assign receiving owner now |
-| Service bottleneck — patient impact | A degraded service is affecting patient flow | Activate fallback; notify IT Admin |
-| 3-minute escalation — flow coordinator | A critical alert has escalated past charge nurse and physician | Take ownership and escalate to admin if needed |
+| Alert                                  | Meaning                                                        | Your action                                              |
+| -------------------------------------- | -------------------------------------------------------------- | -------------------------------------------------------- |
+| Capacity critical — ED                 | ED is at or near threshold                                     | Expedite discharges, open overflow, or escalate to admin |
+| Boarding pressure — >N hours           | Boarding patients waiting beyond threshold                     | Contact destination department; expedite bed assignment  |
+| Unowned handoff                        | A patient transfer has no confirmed receiving owner            | Assign receiving owner now                               |
+| Service bottleneck — patient impact    | A degraded service is affecting patient flow                   | Activate fallback; notify IT Admin                       |
+| 3-minute escalation — flow coordinator | A critical alert has escalated past charge nurse and physician | Take ownership and escalate to admin if needed           |
 
 ---
 
 ## AI Features Available
 
-| Intent | What it gives you |
-|--------|------------------|
-| `department_routing` | Recommended destination for a specific patient based on acuity, capacity, and specialization |
-| `staff_routing` | Recommended staff role and individual for a specific patient |
-| `service_bottleneck_analysis` | Current bottleneck report with patient impact and recovery steps |
-| `hospital_command_insight` | Aggregate operational state of the full hospital |
-| `fallback_recommendation` | Manual fallback steps for any degraded service or unavailable system |
+| Intent                        | What it gives you                                                                            |
+| ----------------------------- | -------------------------------------------------------------------------------------------- |
+| `department_routing`          | Recommended destination for a specific patient based on acuity, capacity, and specialization |
+| `staff_routing`               | Recommended staff role and individual for a specific patient                                 |
+| `service_bottleneck_analysis` | Current bottleneck report with patient impact and recovery steps                             |
+| `hospital_command_insight`    | Aggregate operational state of the full hospital                                             |
+| `fallback_recommendation`     | Manual fallback steps for any degraded service or unavailable system                         |
 
 ---
 

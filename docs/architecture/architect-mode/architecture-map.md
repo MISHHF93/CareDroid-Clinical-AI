@@ -2,7 +2,7 @@
 
 **Status:** Implemented truth as of 2026-07-15 Stage A  
 **Authority:** Traced from source entry points — not planning docs  
-**Supersedes for runtime truth:** `docs/architecture/architecture-map.md` (2026-06-26 *planning — not implemented*)
+**Supersedes for runtime truth:** `docs/architecture/architecture-map.md` (2026-06-26 _planning — not implemented_)
 
 ---
 
@@ -39,22 +39,22 @@ API (same process in fullstack dev)
 
 ## 2. Frontend layers (active)
 
-| Layer | Canonical location | Notes |
-|-------|-------------------|--------|
-| Entry | `src/main.tsx`, `src/app/App.tsx` | `src/App.tsx` is deprecated re-export |
-| Routing mount | `src/app/router.tsx` | Must not invent paths |
-| Route authority | `src/config/routes.config.ts` | `CANONICAL_ROUTES`, breadcrumbs |
-| Shell | `src/components/AppShell.tsx` | Active |
-| Shell named exports | `src/shell/*` | **Re-exports** AppShell/Header/Sidebar — not a parallel UI (see shell/index.ts) |
-| Header | `src/components/Header.tsx` | Active operational header |
-| Sidebar | `src/components/Sidebar.tsx` | + mobile nav |
-| Nav config | `src/config/unified-navigation.config.ts` | Visibility by role/permissions |
-| ED permissions | `src/config/emergencyRolePermissions.ts` + `emergencyPermissionRegistry` | ~12 roles |
-| State | `src/store/emergencyStore.ts` | Dominant ED operational SoT |
-| Sync | `src/store/emergencyOperationalSync.ts` | Backend sync layer (must stay explicit) |
-| Contracts | `src/contracts/results.ts`, `domains.ts` | Result/error taxonomy present; not fully adopted |
-| Reception | `src/pages/emergency/ReceptionWorkspace.tsx` + `components/reception/**` + `services/reception*` | Reference role |
-| Design | `src/styles/design-system.css`, tokens, role accents, reception-desk theme | Multiple CSS namespaces remain |
+| Layer               | Canonical location                                                                               | Notes                                                                           |
+| ------------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------- |
+| Entry               | `src/main.tsx`, `src/app/App.tsx`                                                                | `src/App.tsx` is deprecated re-export                                           |
+| Routing mount       | `src/app/router.tsx`                                                                             | Must not invent paths                                                           |
+| Route authority     | `src/config/routes.config.ts`                                                                    | `CANONICAL_ROUTES`, breadcrumbs                                                 |
+| Shell               | `src/components/AppShell.tsx`                                                                    | Active                                                                          |
+| Shell named exports | `src/shell/*`                                                                                    | **Re-exports** AppShell/Header/Sidebar — not a parallel UI (see shell/index.ts) |
+| Header              | `src/components/Header.tsx`                                                                      | Active operational header                                                       |
+| Sidebar             | `src/components/Sidebar.tsx`                                                                     | + mobile nav                                                                    |
+| Nav config          | `src/config/unified-navigation.config.ts`                                                        | Visibility by role/permissions                                                  |
+| ED permissions      | `src/config/emergencyRolePermissions.ts` + `emergencyPermissionRegistry`                         | ~12 roles                                                                       |
+| State               | `src/store/emergencyStore.ts`                                                                    | Dominant ED operational SoT                                                     |
+| Sync                | `src/store/emergencyOperationalSync.ts`                                                          | Backend sync layer (must stay explicit)                                         |
+| Contracts           | `src/contracts/results.ts`, `domains.ts`                                                         | Result/error taxonomy present; not fully adopted                                |
+| Reception           | `src/pages/emergency/ReceptionWorkspace.tsx` + `components/reception/**` + `services/reception*` | Reference role                                                                  |
+| Design              | `src/styles/design-system.css`, tokens, role accents, reception-desk theme                       | Multiple CSS namespaces remain                                                  |
 
 ### Shell clarification (inventory correction)
 
@@ -70,15 +70,15 @@ Residual risk: page-level headers (`PageHeader`, reception toolbars) still creat
 
 ## 3. Backend layers (active)
 
-| Layer | Canonical location | Notes |
-|-------|-------------------|--------|
-| Entry | `backend/src/main.ts` | Nest primary |
-| Modules | `backend/src/modules/**` | Auth, RAG, AI, emergency-os, audit, tenant, … |
-| Express legacy | `backend/src/api/routes-registry.ts` | 18 route groups (health, capacity, ems, intake, copilot, governance, …) |
-| Runtime auth | `backend/src/api/runtime-auth.ts` | JWT + PHI permission for legacy mounts (Cycle security) |
-| Services (legacy style) | `backend/src/services/**` | EMS, OCR, smart-intake, copilot, capacity, … |
-| Migrations | `backend/src/database/migrations/**` | Including pgvector `1772701300000-*` |
-| Config | `backend/src/config/**` | env validation, rag, auth, feature flags |
+| Layer                   | Canonical location                   | Notes                                                                   |
+| ----------------------- | ------------------------------------ | ----------------------------------------------------------------------- |
+| Entry                   | `backend/src/main.ts`                | Nest primary                                                            |
+| Modules                 | `backend/src/modules/**`             | Auth, RAG, AI, emergency-os, audit, tenant, …                           |
+| Express legacy          | `backend/src/api/routes-registry.ts` | 18 route groups (health, capacity, ems, intake, copilot, governance, …) |
+| Runtime auth            | `backend/src/api/runtime-auth.ts`    | JWT + PHI permission for legacy mounts (Cycle security)                 |
+| Services (legacy style) | `backend/src/services/**`            | EMS, OCR, smart-intake, copilot, capacity, …                            |
+| Migrations              | `backend/src/database/migrations/**` | Including pgvector `1772701300000-*`                                    |
+| Config                  | `backend/src/config/**`              | env validation, rag, auth, feature flags                                |
 
 ### Express ROUTES (enabled groups)
 
@@ -90,13 +90,13 @@ Mounted at `/api/*` and optionally `/api/emergency/*` when `enableMongooseEmerge
 
 ## 4. Data plane
 
-| Store | Technology | Role |
-|-------|------------|------|
-| Primary relational | TypeORM → SQLite (dev) / Postgres (prod) | Users, patients, audit, AI queries, RAG tables |
-| Optional document | Mongoose (flagged) | Legacy emergency OS routes/services |
-| FE operational | Zustand emergencyStore | Patients, queues, EMS arrivals, flags (session + sync) |
-| Vectors | In-memory / Pinecone / pgvector | RAG retrieval adapters |
-| Offline | `src/db/offline*` | Client offline support |
+| Store              | Technology                               | Role                                                   |
+| ------------------ | ---------------------------------------- | ------------------------------------------------------ |
+| Primary relational | TypeORM → SQLite (dev) / Postgres (prod) | Users, patients, audit, AI queries, RAG tables         |
+| Optional document  | Mongoose (flagged)                       | Legacy emergency OS routes/services                    |
+| FE operational     | Zustand emergencyStore                   | Patients, queues, EMS arrivals, flags (session + sync) |
+| Vectors            | In-memory / Pinecone / pgvector          | RAG retrieval adapters                                 |
+| Offline            | `src/db/offline*`                        | Client offline support                                 |
 
 ---
 
@@ -148,17 +148,17 @@ Copilot: shell CopilotPanel (permission-gated)
 
 ## 7. Duality map (must resolve by stage)
 
-| Duality | Canonical (target) | Secondary (until parity) |
-|---------|-------------------|--------------------------|
-| HTTP API | Nest controllers | Express routes-registry + flag |
-| Authz server | Nest Permission + guards | runtime-auth on Express |
-| Authz client ED | emergencyPermissionRegistry | Platform asset entitlements |
-| Nest role enum | Map *from* emergency roles | UserRole: physician/nurse/student/admin only |
-| Shell | components/AppShell | shell/* re-exports only |
-| Routes | routes.config + router | Console trees must import canonical paths |
-| Patients | TypeORM + store sync | Mongoose emergency OS |
-| Vectors | pgvector durable multi-tenant | in-memory unit; Pinecone optional |
-| Errors | src/contracts ErrorCode | Ad-hoc throws / empty catches residual |
+| Duality         | Canonical (target)            | Secondary (until parity)                     |
+| --------------- | ----------------------------- | -------------------------------------------- |
+| HTTP API        | Nest controllers              | Express routes-registry + flag               |
+| Authz server    | Nest Permission + guards      | runtime-auth on Express                      |
+| Authz client ED | emergencyPermissionRegistry   | Platform asset entitlements                  |
+| Nest role enum  | Map _from_ emergency roles    | UserRole: physician/nurse/student/admin only |
+| Shell           | components/AppShell           | shell/\* re-exports only                     |
+| Routes          | routes.config + router        | Console trees must import canonical paths    |
+| Patients        | TypeORM + store sync          | Mongoose emergency OS                        |
+| Vectors         | pgvector durable multi-tenant | in-memory unit; Pinecone optional            |
+| Errors          | src/contracts ErrorCode       | Ad-hoc throws / empty catches residual       |
 
 ---
 
@@ -177,7 +177,7 @@ Copilot: shell CopilotPanel (permission-gated)
 
 A capability may be labeled **VERIFIED ACTIVE** only when:
 
-1. User action or API entry is identified in source  
-2. Handler → state/API → backend service → persistence/event path is cited with file paths  
-3. A test or runtime trace shows observable outcome  
-4. Auth and tenant boundaries are asserted where PHI is involved  
+1. User action or API entry is identified in source
+2. Handler → state/API → backend service → persistence/event path is cited with file paths
+3. A test or runtime trace shows observable outcome
+4. Auth and tenant boundaries are asserted where PHI is involved

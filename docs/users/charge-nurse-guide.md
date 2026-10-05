@@ -15,30 +15,32 @@ You are the operational lead of the Emergency Department. CareDroid gives you a 
 
 ## Your Screens
 
-| Screen | Route | Use |
-|--------|-------|-----|
-| Department Whiteboard | `/emergency/whiteboard` | Primary — start every shift here |
-| Capacity & Boarding | `/emergency/capacity` | Bed management + boarding |
-| EMS Pipeline | `/emergency/ems` | Ambulance coordination |
-| Triage Queues | `/emergency/queues` | Queue oversight |
-| Reassessment | `/emergency/reassessment` | Overdue reassessments |
-| Referrals | `/emergency/referrals` | Referral tracking |
-| Department Pulse | `/emergency/pulse` | Operational health at-a-glance |
-| Shift Summary | `/emergency/shift` | End-of-shift handoff |
-| Analytics | `/emergency/analytics` | Performance review |
-| AI Copilot | `/emergency/copilot` | Clinical decision support |
+| Screen                | Route                     | Use                              |
+| --------------------- | ------------------------- | -------------------------------- |
+| Department Whiteboard | `/emergency/whiteboard`   | Primary — start every shift here |
+| Capacity & Boarding   | `/emergency/capacity`     | Bed management + boarding        |
+| EMS Pipeline          | `/emergency/ems`          | Ambulance coordination           |
+| Triage Queues         | `/emergency/queues`       | Queue oversight                  |
+| Reassessment          | `/emergency/reassessment` | Overdue reassessments            |
+| Referrals             | `/emergency/referrals`    | Referral tracking                |
+| Department Pulse      | `/emergency/pulse`        | Operational health at-a-glance   |
+| Shift Summary         | `/emergency/shift`        | End-of-shift handoff             |
+| Analytics             | `/emergency/analytics`    | Performance review               |
+| AI Copilot            | `/emergency/copilot`      | Clinical decision support        |
 
 ---
 
 ## Daily Workflow
 
 ### Start of Shift
+
 1. Open **Department Whiteboard** → review active patient count + capacity band
 2. Scan **attention strips**: EMS inbound, reassessments due, pending referrals
 3. Open **Shift Summary** to review handoff from outgoing shift
 4. Review **EMS Pipeline** for inbound units and expected arrivals
 
 ### During Shift
+
 5. Monitor whiteboard in **Charge Nurse screen mode** (`?mode=charge`)
 6. Watch **Operational Strip** for: waiting count, boarding count, EMS offload delays
 7. Assign rooms and staff from patient cards as patients progress
@@ -48,6 +50,7 @@ You are the operational lead of the Emergency Department. CareDroid gives you a 
 11. Check **Referral panel** for delayed referrals
 
 ### End of Shift
+
 12. Open **Shift Summary** and review all outstanding items
 13. Confirm handoff with incoming Charge Nurse
 14. All critical alerts acknowledged
@@ -80,13 +83,13 @@ You are the operational lead of the Emergency Department. CareDroid gives you a 
 
 ## Keyboard Shortcuts
 
-| Keys | Action |
-|------|--------|
-| `?` | Open help guide |
-| `N` | New patient registration |
-| `R` | Open reassessment drawer |
-| `Cmd+K` | Open command palette |
-| `Esc` | Close active drawer/panel |
+| Keys    | Action                    |
+| ------- | ------------------------- |
+| `?`     | Open help guide           |
+| `N`     | New patient registration  |
+| `R`     | Open reassessment drawer  |
+| `Cmd+K` | Open command palette      |
+| `Esc`   | Close active drawer/panel |
 
 ---
 
@@ -102,24 +105,24 @@ You are the operational lead of the Emergency Department. CareDroid gives you a 
 
 ## Alerts & Response
 
-| Alert | Source | Action |
-|-------|--------|--------|
-| Critical Alert Banner | Patient flags: SepsisAlert, StrokeCode, High Risk | Respond in < 3 minutes |
-| EMS Attention Strip | EMS unit ETA < 5 min or offload > 15 min | Prepare bay, monitor offload |
-| Reassessment Strip | ReassessmentDue flags | Open reassessment drawer or route to /reassessment |
-| Referral Strip | Delayed referrals | Contact specialist or escalate |
-| Capacity crisis | Band = Red | Activate boarding protocols |
+| Alert                 | Source                                            | Action                                             |
+| --------------------- | ------------------------------------------------- | -------------------------------------------------- |
+| Critical Alert Banner | Patient flags: SepsisAlert, StrokeCode, High Risk | Respond in < 3 minutes                             |
+| EMS Attention Strip   | EMS unit ETA < 5 min or offload > 15 min          | Prepare bay, monitor offload                       |
+| Reassessment Strip    | ReassessmentDue flags                             | Open reassessment drawer or route to /reassessment |
+| Referral Strip        | Delayed referrals                                 | Contact specialist or escalate                     |
+| Capacity crisis       | Band = Red                                        | Activate boarding protocols                        |
 
 ---
 
 ## Screen Modes
 
-| Mode | How to activate | What you see |
-|------|-----------------|--------------|
-| Charge Nurse | Role-default | Operational strip: waiting, EMS, reassess, referral KPIs |
-| Command Center | `?mode=command` URL | Full throughput KPI dashboard |
-| Physician | `?mode=physician` URL | Provider-focused patient view |
-| Read-only wall | `?mode=wall` URL | Department status for hallway monitor |
+| Mode           | How to activate       | What you see                                             |
+| -------------- | --------------------- | -------------------------------------------------------- |
+| Charge Nurse   | Role-default          | Operational strip: waiting, EMS, reassess, referral KPIs |
+| Command Center | `?mode=command` URL   | Full throughput KPI dashboard                            |
+| Physician      | `?mode=physician` URL | Provider-focused patient view                            |
+| Read-only wall | `?mode=wall` URL      | Department status for hallway monitor                    |
 
 ---
 

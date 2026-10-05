@@ -161,4 +161,3 @@ From /tools/catalog and sidebar, open drug-check, qSOFA, Wells PE, fleet command
 
 **Expected:**
 Catalog and sidebar navigation match matrix smoke paths.
-

@@ -77,6 +77,7 @@ The Specialist receives consult requests from the emergency department, reviews 
 ### How to Decline a Consult Request
 
 If a consult is outside your specialty or scope:
+
 1. Open the consult request.
 2. Click **Decline consult**.
 3. Enter the decline reason: "Outside my specialty — recommend [specialty name]." Or: "Insufficient information — please provide [specific data]."
@@ -85,6 +86,7 @@ If a consult is outside your specialty or scope:
 ### How to Generate a Handoff Summary
 
 When your consult is complete and the patient is moving:
+
 1. Open the patient detail panel.
 2. Click **AI Chief → handoff_summary**.
 3. Review the generated handoff document. Add:
@@ -98,19 +100,19 @@ When your consult is complete and the patient is moving:
 
 ## Alerts You Receive
 
-| Alert | Meaning | Your action |
-|-------|---------|------------|
-| Urgent consult request | ED has requested urgent specialty review | Review immediately — CTAS 1–2 patient |
-| Consult overdue response | Your consult has not been responded to within SLA | Respond or escalate to your colleague |
-| Delayed referral | A referral to your service has been waiting beyond expected time | Review and prioritize |
-| Critical lab value — consult patient | A critical lab result on your consult patient | Review immediately and notify ED physician |
+| Alert                                | Meaning                                                          | Your action                                |
+| ------------------------------------ | ---------------------------------------------------------------- | ------------------------------------------ |
+| Urgent consult request               | ED has requested urgent specialty review                         | Review immediately — CTAS 1–2 patient      |
+| Consult overdue response             | Your consult has not been responded to within SLA                | Respond or escalate to your colleague      |
+| Delayed referral                     | A referral to your service has been waiting beyond expected time | Review and prioritize                      |
+| Critical lab value — consult patient | A critical lab result on your consult patient                    | Review immediately and notify ED physician |
 
 ---
 
 ## AI Features Available
 
-| Intent | What it gives you |
-|--------|------------------|
+| Intent            | What it gives you                                          |
+| ----------------- | ---------------------------------------------------------- |
 | `patient_summary` | One-line clinical summary, risk flags, missing information |
 | `handoff_summary` | Structured handoff document for specialty-to-next-provider |
 

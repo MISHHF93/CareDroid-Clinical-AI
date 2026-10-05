@@ -6,28 +6,28 @@
 
 ## Executive summary
 
-| Metric | Count |
-|--------|------:|
-| Backend HTTP routes (inventory) | 656 |
-| Frontend API calls (inventory) | 399 |
-| Wired (route exists) | 378 |
-| Gated stubs (no route, capability off) | 21 |
-| Unguarded missing routes | 0 |
-| POST executors (backend) | 39 |
-| Contract gaps (matrix) | 0 |
+| Metric                                 | Count |
+| -------------------------------------- | ----: |
+| Backend HTTP routes (inventory)        |   656 |
+| Frontend API calls (inventory)         |   399 |
+| Wired (route exists)                   |   378 |
+| Gated stubs (no route, capability off) |    21 |
+| Unguarded missing routes               |     0 |
+| POST executors (backend)               |    39 |
+| Contract gaps (matrix)                 |     0 |
 
 ## Vite dev proxy
 
-| Setting | Value |
-|---------|-------|
-| Frontend dev port | 3000 |
-| Preview port | 3000 |
-| Proxy target | http://127.0.0.1:8000 |
-| Proxies `/api` | yes |
-| Proxies `/health` | yes |
-| Proxies `/socket.io` | yes |
-| Server uses shared proxy helper | yes |
-| Preview uses shared proxy helper | yes |
+| Setting                          | Value                 |
+| -------------------------------- | --------------------- |
+| Frontend dev port                | 3000                  |
+| Preview port                     | 3000                  |
+| Proxy target                     | http://127.0.0.1:8000 |
+| Proxies `/api`                   | yes                   |
+| Proxies `/health`                | yes                   |
+| Proxies `/socket.io`             | yes                   |
+| Server uses shared proxy helper  | yes                   |
+| Preview uses shared proxy helper | yes                   |
 
 ## Registered POST executors
 
@@ -73,33 +73,32 @@
 
 ## Frontend calls without backend routes (gated)
 
-| ID | Method | Path | Capability | Client |
-|----|--------|------|------------|--------|
-| chat-messages-sync | POST | `/api/chat/messages` | chatPersistence | syncService.js |
-| chat-conversations-sync | POST | `/api/chat/conversations` | chatPersistence | syncService.js |
-| tools-share-results | POST | `/api/tools/share-results` | toolsShareResults | ToolResultShare.jsx |
-| notifications-stream | GET | `/api/notifications/stream` | notificationStream | NotificationService.js |
-| notifications-send-channel | POST | `/api/notifications/send/:channel` | notificationSendChannel | src/test/fixtures/legacyNotificationService.ts |
-| team-users | GET | `/api/team/users` | teamManagement | TeamManagement.jsx |
-| team-user-update | PUT | `/api/team/users/:id` | teamManagement | TeamManagement.jsx |
-| team-user-delete | DELETE | `/api/team/users/:id` | teamManagement | TeamManagement.jsx |
-| team-invite | POST | `/api/team/invite` | teamManagement | TeamManagement.jsx |
-| bulk-sync | POST | `/api/sync` | bulkSync | offline.js / OfflineSupport.jsx |
-| clinical-alerts-stream | GET | `/api/clinical/alerts/stream` | clinicalAlertsStream | clinicalAlertsApi.js / ClinicalAlertsPage.jsx |
-| emergency-capacity-history | GET | `/api/emergency/capacity/history` | emergencyCapacityHistory | emergencyAnalyticsApi.js |
-| emergency-queue-analytics | GET | `/api/emergency/queues/analytics` | emergencyQueueAnalytics | emergencyAnalyticsApi.js |
-| emergency-shift-report-export | GET | `/api/emergency/shift/report/export` | emergencyShiftReportExport | emergencyAnalyticsApi.js |
-| emergency-referral-history | GET | `/api/emergency/patients/:patientId/referrals` | emergencyReferralHistory | emergencyTransportApi.js |
-| emergency-diversion-status | GET | `/api/emergency/diversion/status` | emergencyDiversionStatus | emergencyTransportApi.js |
-| exports-pdf | POST | `/api/exports/pdf` | exportsPdf | export/ExportService.js |
-| exports-excel | POST | `/api/exports/excel` | exportsExcel | export/ExportService.js |
-| reports-generate | POST | `/api/reports/generate` | reportsGenerate | export/ExportService.js |
-| reports-schedule-create | POST | `/api/reports/schedule` | reportsSchedule | export/ExportService.js |
-| reports-schedule-cancel | DELETE | `/api/reports/schedule/:reportId` | reportsSchedule | export/ExportService.js |
+| ID                            | Method | Path                                           | Capability                 | Client                                         |
+| ----------------------------- | ------ | ---------------------------------------------- | -------------------------- | ---------------------------------------------- |
+| chat-messages-sync            | POST   | `/api/chat/messages`                           | chatPersistence            | syncService.js                                 |
+| chat-conversations-sync       | POST   | `/api/chat/conversations`                      | chatPersistence            | syncService.js                                 |
+| tools-share-results           | POST   | `/api/tools/share-results`                     | toolsShareResults          | ToolResultShare.jsx                            |
+| notifications-stream          | GET    | `/api/notifications/stream`                    | notificationStream         | NotificationService.js                         |
+| notifications-send-channel    | POST   | `/api/notifications/send/:channel`             | notificationSendChannel    | src/test/fixtures/legacyNotificationService.ts |
+| team-users                    | GET    | `/api/team/users`                              | teamManagement             | TeamManagement.jsx                             |
+| team-user-update              | PUT    | `/api/team/users/:id`                          | teamManagement             | TeamManagement.jsx                             |
+| team-user-delete              | DELETE | `/api/team/users/:id`                          | teamManagement             | TeamManagement.jsx                             |
+| team-invite                   | POST   | `/api/team/invite`                             | teamManagement             | TeamManagement.jsx                             |
+| bulk-sync                     | POST   | `/api/sync`                                    | bulkSync                   | offline.js / OfflineSupport.jsx                |
+| clinical-alerts-stream        | GET    | `/api/clinical/alerts/stream`                  | clinicalAlertsStream       | clinicalAlertsApi.js / ClinicalAlertsPage.jsx  |
+| emergency-capacity-history    | GET    | `/api/emergency/capacity/history`              | emergencyCapacityHistory   | emergencyAnalyticsApi.js                       |
+| emergency-queue-analytics     | GET    | `/api/emergency/queues/analytics`              | emergencyQueueAnalytics    | emergencyAnalyticsApi.js                       |
+| emergency-shift-report-export | GET    | `/api/emergency/shift/report/export`           | emergencyShiftReportExport | emergencyAnalyticsApi.js                       |
+| emergency-referral-history    | GET    | `/api/emergency/patients/:patientId/referrals` | emergencyReferralHistory   | emergencyTransportApi.js                       |
+| emergency-diversion-status    | GET    | `/api/emergency/diversion/status`              | emergencyDiversionStatus   | emergencyTransportApi.js                       |
+| exports-pdf                   | POST   | `/api/exports/pdf`                             | exportsPdf                 | export/ExportService.js                        |
+| exports-excel                 | POST   | `/api/exports/excel`                           | exportsExcel               | export/ExportService.js                        |
+| reports-generate              | POST   | `/api/reports/generate`                        | reportsGenerate            | export/ExportService.js                        |
+| reports-schedule-create       | POST   | `/api/reports/schedule`                        | reportsSchedule            | export/ExportService.js                        |
+| reports-schedule-cancel       | DELETE | `/api/reports/schedule/:reportId`              | reportsSchedule            | export/ExportService.js                        |
 
 ## Related docs
 
 - [backend-frontend-tool-contract.md](./backend-frontend-tool-contract.md)
 - [endpoint-to-frontend-matrix.md](./endpoint-to-frontend-matrix.md)
 - [backend-api-inventory.md](./backend-api-inventory.md)
-

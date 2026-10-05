@@ -17,6 +17,7 @@ The Quality & Safety Officer reviews safety trends, breach events, AI review pat
 ## Dashboard View
 
 **Analytics** (`/emergency/analytics`) — Primary workspace. Quality-focused views:
+
 - Breach rate trends (3-minute, reassessment, CTAS time-to-physician)
 - AI review rate and override rate
 - Alert acknowledgement time distribution
@@ -107,12 +108,12 @@ The Quality & Safety Officer reviews safety trends, breach events, AI review pat
 
 ## Alerts You Receive
 
-| Alert | Meaning | Your action |
-|-------|---------|------------|
-| Breach rate threshold exceeded | The 3-minute breach rate for the period has exceeded the SLA target | Review breach queue, investigate root cause |
-| Unresolved critical alert — extended | A critical alert has been open beyond an extended threshold | Review alert lifecycle for quality issue |
-| AI override trend | AI override rate has exceeded a significant threshold in a short period | Review override records; investigate for quality issue |
-| Audit anomaly | An unusual pattern in the audit trail has been detected | Review the flagged audit events |
+| Alert                                | Meaning                                                                 | Your action                                            |
+| ------------------------------------ | ----------------------------------------------------------------------- | ------------------------------------------------------ |
+| Breach rate threshold exceeded       | The 3-minute breach rate for the period has exceeded the SLA target     | Review breach queue, investigate root cause            |
+| Unresolved critical alert — extended | A critical alert has been open beyond an extended threshold             | Review alert lifecycle for quality issue               |
+| AI override trend                    | AI override rate has exceeded a significant threshold in a short period | Review override records; investigate for quality issue |
+| Audit anomaly                        | An unusual pattern in the audit trail has been detected                 | Review the flagged audit events                        |
 
 ---
 

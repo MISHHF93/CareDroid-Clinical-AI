@@ -17,39 +17,42 @@ You are the first clinical touchpoint for every patient who enters the Emergency
 
 The desk is built around **job skills** (see `src/config/receptionSkillModel.ts`):
 
-| Skill | What you do |
-|-------|-------------|
-| **Find before create** | Search name / DOB / health card before opening a new chart |
-| **Rapid walk-in** | Complaint + identity → create & send to nurse |
-| **Crash / unknown** | Critical or unknown patient → send to nurse without finishing insurance |
-| **Scan ID & review** | OCR fields need your accept/edit before they count |
-| **Resolve possible match** | Confirm link vs create-new when a chart looks familiar |
-| **Defer admin** | Insurance/consent can wait on the ID-check list |
-| **Clear your lists** | Empty verification / waiting-for-nurse before you leave — use **End of shift** checklist |
-| **Language access** | Preferred language + interpreter on the **first intake screen** (and registration details) |
+| Skill                      | What you do                                                                                |
+| -------------------------- | ------------------------------------------------------------------------------------------ |
+| **Find before create**     | Search name / DOB / health card before opening a new chart                                 |
+| **Rapid walk-in**          | Complaint + identity → create & send to nurse                                              |
+| **Crash / unknown**        | Critical or unknown patient → send to nurse without finishing insurance                    |
+| **Scan ID & review**       | OCR fields need your accept/edit before they count                                         |
+| **Resolve possible match** | Confirm link vs create-new when a chart looks familiar                                     |
+| **Defer admin**            | Insurance/consent can wait on the ID-check list                                            |
+| **Clear your lists**       | Empty verification / waiting-for-nurse before you leave — use **End of shift** checklist   |
+| **Language access**        | Preferred language + interpreter on the **first intake screen** (and registration details) |
 
 The yellow/blue **What to do next** strip is rule-based desk guidance — not a chatbot, and not triage.
 
 ### Rapid / crash routing
+
 - **Standard walk-in:** complete life-critical fields (consciousness, breathing, distress, pain) when you can.
 - **High-risk or red flags:** rapid route — complaint is enough to create & send; safety fields recommended only.
 - **Crash / unknown:** use **Send unknown / crash** or Other arrivals → Patient unknown. Care first; identity later.
 
 ### Escalations
+
 When you escalate, CareDroid raises a desk alert and broadcasts to **triage nurse** and **charge nurse** targets (live board + realtime event). Confirm the toast shows who was notified.
 
 ### End of shift
+
 Open shift clearance from **What to do next** when lists are long, or clear EMS / ID-check / waiting-for-nurse tabs. Record a shift handoff note so the next clerk knows what was left.
 
 ---
 
 ## Your Screens
 
-| Screen | Route | Use |
-|--------|-------|-----|
-| Reception Workspace | `/emergency/reception` | **Your home screen** — start here |
-| Smart Intake | Embedded in Reception | Patient registration form |
-| Profile | `/profile` | Your **Reception job profile** — desk skills, shortcuts, open desk |
+| Screen              | Route                  | Use                                                                |
+| ------------------- | ---------------------- | ------------------------------------------------------------------ |
+| Reception Workspace | `/emergency/reception` | **Your home screen** — start here                                  |
+| Smart Intake        | Embedded in Reception  | Patient registration form                                          |
+| Profile             | `/profile`             | Your **Reception job profile** — desk skills, shortcuts, open desk |
 
 **Pilot handoff package:** [`docs/reception-upgrade/RECEPTION_HANDOFF.md`](../reception-upgrade/RECEPTION_HANDOFF.md)
 
@@ -60,12 +63,14 @@ Open shift clearance from **What to do next** when lists are long, or clear EMS 
 ## Daily Workflow
 
 ### Start of Shift
+
 1. Open **Reception Workspace** (`/emergency/reception`)
 2. Check **EMS Pre-Arrival** rail — see any inbound ambulances
 3. Check **Verification Queue** — any patients from prior shift needing ID verification
 4. Check **Pretriage Queue** — any patients from prior shift not yet picked up by nurse
 
 ### During Shift
+
 5. When a patient walks in → press **Register walk-in**
 6. Complete **Smart Intake** (embedded in reception):
    - Chief complaint (primary reason for visit)
@@ -80,12 +85,15 @@ Open shift clearance from **What to do next** when lists are long, or clear EMS 
     - Complete verification → patient moves to Pretriage
 
 ### High-Priority Shortcut
+
 If a patient presents with obvious red flags (severe distress, unresponsive, severe pain):
+
 - Register immediately with chief complaint only
 - Flag as **Escalate** during intake
 - Triage nurse is notified immediately
 
 ### End of Shift
+
 - Confirm Pretriage Queue is cleared or handed off
 - Confirm no pending Verification Queue items
 
@@ -125,11 +133,11 @@ If a patient presents with obvious red flags (severe distress, unresponsive, sev
 
 ## Keyboard Shortcuts
 
-| Keys | Action |
-|------|--------|
-| `N` | New patient registration |
-| `?` | Open help guide |
-| `Esc` | Close current drawer |
+| Keys  | Action                   |
+| ----- | ------------------------ |
+| `N`   | New patient registration |
+| `?`   | Open help guide          |
+| `Esc` | Close current drawer     |
 
 ---
 

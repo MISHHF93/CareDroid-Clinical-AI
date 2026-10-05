@@ -44,27 +44,27 @@ CareDroid-Clinical-AI/
 
 ## 3. TypeScript Migration — Completed
 
-| Metric | Value |
-|---|---|
-| Files migrated | 1,741 (`.js`/`.jsx` → `.ts`/`.tsx`) |
-| Errors at migration start | ~1,400 |
-| Errors at session start | 205 |
-| Errors remaining | **0** |
+| Metric                    | Value                               |
+| ------------------------- | ----------------------------------- |
+| Files migrated            | 1,741 (`.js`/`.jsx` → `.ts`/`.tsx`) |
+| Errors at migration start | ~1,400                              |
+| Errors at session start   | 205                                 |
+| Errors remaining          | **0**                               |
 
 ### Root causes addressed
 
-| Pattern | Fix applied |
-|---|---|
-| `{ key: any = {} }` destructuring rename bug | Moved `: any` outside destructuring or used `= {} as any` |
-| `param = undefined` infers literal `undefined` type | Added `: any` annotation → `param: any = undefined` |
-| `let x = null` assigned JSX/string later | Changed to `let x: any = null` |
-| `useRef(null)` `.current` access | Changed to `useRef<any>(null)` |
-| Class components with untyped props | `extends Component<any, any>` |
-| `_review` future-module files pulled in transitively | Added `// @ts-nocheck` to re-exported files |
-| `property 'x' does not exist on type 'never'` | `as any` casts on inferred `never[]` |
-| `Vitals[]` passed where `Vitals` expected | `as any` casts at call sites |
-| `number | null` vs `number | undefined` in `Vitals` fields | Cast `as any` on object literals |
-| Missing store actions (`setBottleneckAlert`) | `(store as any).method()` |
+| Pattern                                              | Fix applied                                               |
+| ---------------------------------------------------- | --------------------------------------------------------- | --------------------------- | -------------------------------- |
+| `{ key: any = {} }` destructuring rename bug         | Moved `: any` outside destructuring or used `= {} as any` |
+| `param = undefined` infers literal `undefined` type  | Added `: any` annotation → `param: any = undefined`       |
+| `let x = null` assigned JSX/string later             | Changed to `let x: any = null`                            |
+| `useRef(null)` `.current` access                     | Changed to `useRef<any>(null)`                            |
+| Class components with untyped props                  | `extends Component<any, any>`                             |
+| `_review` future-module files pulled in transitively | Added `// @ts-nocheck` to re-exported files               |
+| `property 'x' does not exist on type 'never'`        | `as any` casts on inferred `never[]`                      |
+| `Vitals[]` passed where `Vitals` expected            | `as any` casts at call sites                              |
+| `number                                              | null`vs`number                                            | undefined`in`Vitals` fields | Cast `as any` on object literals |
+| Missing store actions (`setBottleneckAlert`)         | `(store as any).method()`                                 |
 
 > All fixes used the minimal-footprint `as any` strategy — preserving logic exactly as authored while unblocking strict TypeScript compilation. Type hardening is a future iteration task.
 
@@ -76,29 +76,29 @@ CareDroid-Clinical-AI/
 
 The core product. Covers the complete clinical workflow:
 
-| Lane | Page / Component | Status |
-|---|---|---|
+| Lane                     | Page / Component                                          | Status    |
+| ------------------------ | --------------------------------------------------------- | --------- |
 | Reception & Registration | `ReceptionWorkspace`, `SmartIntake`, `SelfArrivalCheckIn` | Live demo |
-| Triage & Acuity | `TriageAssist`, pre-triage queue, breach timers | Live demo |
-| Waiting Room | Charge nurse strip, reassessment rail, LWBS risk | Live demo |
-| Provider Disposition | Physician whiteboard, referral panel, who-next | Live demo |
-| EMS Handoff | `EmergencyEms`, ambulance tracker, checklist | Live demo |
-| Command & Throughput | `EmergencyAnalytics`, capacity board, boarding | Live demo |
-| Public Displays | Waiting-room wall, read-only whiteboard | Live demo |
-| Shift Summary | Shift-close assistant, handoff notes | Live demo |
-| Department Pulse | Real-time KPI strip | Live demo |
+| Triage & Acuity          | `TriageAssist`, pre-triage queue, breach timers           | Live demo |
+| Waiting Room             | Charge nurse strip, reassessment rail, LWBS risk          | Live demo |
+| Provider Disposition     | Physician whiteboard, referral panel, who-next            | Live demo |
+| EMS Handoff              | `EmergencyEms`, ambulance tracker, checklist              | Live demo |
+| Command & Throughput     | `EmergencyAnalytics`, capacity board, boarding            | Live demo |
+| Public Displays          | Waiting-room wall, read-only whiteboard                   | Live demo |
+| Shift Summary            | Shift-close assistant, handoff notes                      | Live demo |
+| Department Pulse         | Real-time KPI strip                                       | Live demo |
 
 ### 4.2 Clinical AI Tools (46 tool page/source files)
 
 Generated page inventory (2026-06-30): 184 non-test files under `src/pages`, including 46 under `src/pages/tools` (see `pages-map.txt`).
 
-| Category | Examples |
-|---|---|
-| Calculators (15+ hubs) | Cardiology, Neurology, Nephrology, Pulmonology, Endocrine, Gastro, Mental Health, Pediatrics/OBGYN, ED critical care, Hospital operations |
-| AI-powered tools | Diagnosis Assistant, Differential AI, Lab Interpreter, Drug Checker, Order Set AI, Patient Summary AI, Timeline AI, Guideline RAG |
-| Specialty assistants | Cardiology, Neurology, Nephrology, Pulmonology, Endocrine, Gastro, Psychiatry, Pediatrics/OBGYN |
-| Procedure & documentation | Procedure Guide, Ambient Scribe, Clinical Documentation Assistant |
-| Audit & explainability | AI Explainability, Clinical Audit, AI Governance, AI Evaluation |
+| Category                  | Examples                                                                                                                                  |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Calculators (15+ hubs)    | Cardiology, Neurology, Nephrology, Pulmonology, Endocrine, Gastro, Mental Health, Pediatrics/OBGYN, ED critical care, Hospital operations |
+| AI-powered tools          | Diagnosis Assistant, Differential AI, Lab Interpreter, Drug Checker, Order Set AI, Patient Summary AI, Timeline AI, Guideline RAG         |
+| Specialty assistants      | Cardiology, Neurology, Nephrology, Pulmonology, Endocrine, Gastro, Psychiatry, Pediatrics/OBGYN                                           |
+| Procedure & documentation | Procedure Guide, Ambient Scribe, Clinical Documentation Assistant                                                                         |
+| Audit & explainability    | AI Explainability, Clinical Audit, AI Governance, AI Evaluation                                                                           |
 
 ### 4.3 Operations & Platform
 
@@ -121,14 +121,14 @@ Generated page inventory (2026-06-30): 184 non-test files under `src/pages`, inc
 
 The `engine/` layer drives real-time ED simulation for demo and development:
 
-| Module | Responsibility |
-|---|---|
-| `simulation.ts` | Orchestrates all simulation intervals (30s flow, 60s arrivals, 3m EMS, 5m alerts) |
-| `journeyEngine.ts` | Patient state machine — valid next states per current state |
-| `alertEngine.ts` | Alert dispatch, severity lifecycle, auto-dismiss |
-| `capacityEngine.ts` | Bed capacity, boarding pressure, bottleneck detection |
-| `reassessmentEngine.ts` | Overdue reassessment flags, LWBS risk escalation |
-| `triageEngine.ts` | ESI acuity assignment, pre-triage queue management |
+| Module                  | Responsibility                                                                    |
+| ----------------------- | --------------------------------------------------------------------------------- |
+| `simulation.ts`         | Orchestrates all simulation intervals (30s flow, 60s arrivals, 3m EMS, 5m alerts) |
+| `journeyEngine.ts`      | Patient state machine — valid next states per current state                       |
+| `alertEngine.ts`        | Alert dispatch, severity lifecycle, auto-dismiss                                  |
+| `capacityEngine.ts`     | Bed capacity, boarding pressure, bottleneck detection                             |
+| `reassessmentEngine.ts` | Overdue reassessment flags, LWBS risk escalation                                  |
+| `triageEngine.ts`       | ESI acuity assignment, pre-triage queue management                                |
 
 Simulation ticks are driven by `setInterval` and write directly into Zustand (`emergencyStore`). All engines have accompanying test suites.
 
@@ -137,6 +137,7 @@ Simulation ticks are driven by `setInterval` and write directly into Zustand (`e
 ## 6. State Management
 
 Single Zustand store (`store/emergencyStore.ts`) holds all live ED state:
+
 - Patient roster, vitals history, flags, journey timeline
 - Queue definitions (arrival, pre-triage, triage, waiting, assessment, disposition, boarding)
 - EMS units and arrivals
@@ -149,11 +150,11 @@ A separate `featureStore.ts` controls feature flag overrides per session.
 
 ## 7. Test Coverage
 
-| Metric | Value |
-|---|---|
-| Test files | 685 |
-| Test frameworks | Vitest + Testing Library + Playwright (E2E) |
-| Coverage tooling | `@vitest/coverage-v8` |
+| Metric           | Value                                       |
+| ---------------- | ------------------------------------------- |
+| Test files       | 685                                         |
+| Test frameworks  | Vitest + Testing Library + Playwright (E2E) |
+| Coverage tooling | `@vitest/coverage-v8`                       |
 
 Test suites exist for: engine modules, store mutations, API clients, config contracts, screen visibility models, page rendering smoke tests, form interaction, responsive breakpoints, feature flag access, and Playwright E2E flows.
 
@@ -177,15 +178,15 @@ API client lives in `src/services/apiClient.ts` — handles token interception, 
 
 Canonical emergency roles:
 
-| Role ID | Description |
-|---|---|
-| `registration-clerk` | Reception workspace, smart intake |
-| `triage-nurse` | Triage assist, acuity scoring |
-| `charge-nurse` | Charge nurse strip, waiting room oversight |
-| `physician` | Whiteboard, referrals, disposition |
-| `ems-user` | EMS tracker, ambulance handoff |
-| `ed-manager` | Command center, analytics, capacity |
-| `public-display` | Read-only waiting-room wall |
+| Role ID              | Description                                |
+| -------------------- | ------------------------------------------ |
+| `registration-clerk` | Reception workspace, smart intake          |
+| `triage-nurse`       | Triage assist, acuity scoring              |
+| `charge-nurse`       | Charge nurse strip, waiting room oversight |
+| `physician`          | Whiteboard, referrals, disposition         |
+| `ems-user`           | EMS tracker, ambulance handoff             |
+| `ed-manager`         | Command center, analytics, capacity        |
+| `public-display`     | Read-only waiting-room wall                |
 
 Each role maps to a screen mode (`PHYSICIAN_SCREEN`, `NURSE_SCREEN`, `RECEPTION_SCREEN`, etc.) via `emergencyRoleScreenMatrix.ts`. Role resolution flows: SaaS role → profile catalog → emergency role → screen mode → landing route.
 
@@ -211,23 +212,23 @@ Each role maps to a screen mode (`PHYSICIAN_SCREEN`, `NURSE_SCREEN`, `RECEPTION_
 
 ### Immediate (before first customer deployment)
 
-| Item | Priority |
-|---|---|
-| Replace `as any` casts with real types | High — particularly `Vitals`, `Patient`, store action signatures |
-| Audit `store.setBottleneckAlert` — method may be missing from store definition | High |
-| `Patient.vitals` is `Vitals[]` but simulation calls `varyVitals(patient.vitals as any)` — use `patient.vitals.at(-1)` | Medium |
-| Validate backend capability status for production vs demo environments | High |
-| HIPAA / PHI audit of any client-side persistence (Dexie, `localStorage`) | Critical |
+| Item                                                                                                                  | Priority                                                         |
+| --------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| Replace `as any` casts with real types                                                                                | High — particularly `Vitals`, `Patient`, store action signatures |
+| Audit `store.setBottleneckAlert` — method may be missing from store definition                                        | High                                                             |
+| `Patient.vitals` is `Vitals[]` but simulation calls `varyVitals(patient.vitals as any)` — use `patient.vitals.at(-1)` | Medium                                                           |
+| Validate backend capability status for production vs demo environments                                                | High                                                             |
+| HIPAA / PHI audit of any client-side persistence (Dexie, `localStorage`)                                              | Critical                                                         |
 
 ### Near-term
 
-| Item | Priority |
-|---|---|
-| Type-harden the `Vitals` type — `number | null` vs `number | undefined` inconsistency | Medium |
-| Move `_review` future-module components off `// @ts-nocheck` once stabilized | Medium |
-| Wire real PATCH endpoints for whiteboard mutations | Medium |
-| Central Node realtime transport (planned in `src/central-node/`) | Low |
-| Android / Capacitor shell — currently stripped to shell; needs reconnection to web app | Low |
+| Item                                                                                   | Priority       |
+| -------------------------------------------------------------------------------------- | -------------- | ------------------------ | ------ |
+| Type-harden the `Vitals` type — `number                                                | null`vs`number | undefined` inconsistency | Medium |
+| Move `_review` future-module components off `// @ts-nocheck` once stabilized           | Medium         |
+| Wire real PATCH endpoints for whiteboard mutations                                     | Medium         |
+| Central Node realtime transport (planned in `src/central-node/`)                       | Low            |
+| Android / Capacitor shell — currently stripped to shell; needs reconnection to web app | Low            |
 
 ### Architecture
 
@@ -243,4 +244,4 @@ CareDroid is a production-grade EDOS with exceptional feature breadth, a clean s
 
 ---
 
-*Generated with Claude Code — 2026-06-26*
+_Generated with Claude Code — 2026-06-26_

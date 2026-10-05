@@ -1,28 +1,28 @@
 # AI Response Provenance Contract v1 (PR-6)
 
-| Field | Value |
-|-------|--------|
-| **Version** | `1.0.0` |
-| **Code** | `lib/ai/provenanceContract.ts` |
-| **Structured AI** | `CareDroidAIResponse.provenance` |
+| Field              | Value                                                                     |
+| ------------------ | ------------------------------------------------------------------------- |
+| **Version**        | `1.0.0`                                                                   |
+| **Code**           | `lib/ai/provenanceContract.ts`                                            |
+| **Structured AI**  | `CareDroidAIResponse.provenance`                                          |
 | **Chat / gateway** | `ResponseComposerService` → `response.provenance` + `metadata.provenance` |
 
 ## Required fields
 
 Every clinically meaningful AI response includes:
 
-| Field | Meaning |
-|-------|---------|
-| `evidence[]` | Supporting chunks / registry artifacts / rules / calculators |
-| `sourceVersions[]` | Source id + version/retrievedAt |
-| `confidence` | 0–1 model or handler confidence |
-| `missingInformation[]` | Known gaps |
-| `uncertainty` | Human-readable residual uncertainty |
-| `applicablePopulation` | Who this applies to (never universal by default) |
-| `limitations[]` | What the system cannot do |
-| `recommendedReviewerRole` | Who should review |
-| `requiresClinicianReview` | **Always `true`** |
-| `contractVersion` | `1.0.0` |
+| Field                     | Meaning                                                      |
+| ------------------------- | ------------------------------------------------------------ |
+| `evidence[]`              | Supporting chunks / registry artifacts / rules / calculators |
+| `sourceVersions[]`        | Source id + version/retrievedAt                              |
+| `confidence`              | 0–1 model or handler confidence                              |
+| `missingInformation[]`    | Known gaps                                                   |
+| `uncertainty`             | Human-readable residual uncertainty                          |
+| `applicablePopulation`    | Who this applies to (never universal by default)             |
+| `limitations[]`           | What the system cannot do                                    |
+| `recommendedReviewerRole` | Who should review                                            |
+| `requiresClinicianReview` | **Always `true`**                                            |
+| `contractVersion`         | `1.0.0`                                                      |
 
 ## Builders
 
@@ -40,8 +40,8 @@ const provenance = buildAiResponseProvenance({
 
 ## Surfaces
 
-1. **Structured node** (`runCareDroidAI`) — always attaches provenance on success and error.  
-2. **Chat / copilot gateway composer** — attaches provenance from citations + RAG context.  
+1. **Structured node** (`runCareDroidAI`) — always attaches provenance on success and error.
+2. **Chat / copilot gateway composer** — attaches provenance from citations + RAG context.
 3. **Foundation composer** — same contract on alternate foundation path.
 
 ## Validation
@@ -52,10 +52,10 @@ const provenance = buildAiResponseProvenance({
 
 Clients should surface at least:
 
-- Confidence + uncertainty  
-- Missing information chips  
-- Evidence list / citations  
-- “Human review required” + recommended role  
-- Limitations expander  
+- Confidence + uncertainty
+- Missing information chips
+- Evidence list / citations
+- “Human review required” + recommended role
+- Limitations expander
 
 Do not hide provenance for “cleaner” UI on clinical routes.

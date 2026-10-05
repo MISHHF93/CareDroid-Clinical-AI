@@ -49,15 +49,15 @@ Self-hosted, real OCR (Tesseract.js) is now wired into the clinical-document-int
 
 ## 7. Net assessment against the harmonization brief
 
-| Brief expectation | Actual state |
-|---|---|
-| Canonical patient-journey workflow engine | **Already existed**, confirmed real and enforced — no rebuild needed |
-| Unified event/pub-sub model | **Confirmed real gap** — no formal domain event bus exists |
+| Brief expectation                                  | Actual state                                                                                                                                       |
+| -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Canonical patient-journey workflow engine          | **Already existed**, confirmed real and enforced — no rebuild needed                                                                               |
+| Unified event/pub-sub model                        | **Confirmed real gap** — no formal domain event bus exists                                                                                         |
 | Broad AI-model integration across clinical domains | **1 of 9 domains** hits a real LLM; the other 8 are deterministic heuristics — safe, but not what "AI orchestration" implies without qualification |
-| Real, tenant-scoped SaaS persistence | **Was mostly missing (46 of 65 tables), now fully schema-complete** as of this program |
-| EMS/triage workflow depth | **Real, substantiated infrastructure** — a prior stale/frozen low score has been corrected |
-| Clinical tool breadth | **39/~219 real executors**, the full portable-tool set closed; ~180 remain an honest chat passthrough by design |
-| Real self-hosted OCR for intake | **Shipped and verified this program**, replacing a prior mock-only implementation |
-| Reception as reference workflow | **Rebuilt and verified** with 5 real UX/accessibility fixes |
+| Real, tenant-scoped SaaS persistence               | **Was mostly missing (46 of 65 tables), now fully schema-complete** as of this program                                                             |
+| EMS/triage workflow depth                          | **Real, substantiated infrastructure** — a prior stale/frozen low score has been corrected                                                         |
+| Clinical tool breadth                              | **39/~219 real executors**, the full portable-tool set closed; ~180 remain an honest chat passthrough by design                                    |
+| Real self-hosted OCR for intake                    | **Shipped and verified this program**, replacing a prior mock-only implementation                                                                  |
+| Reception as reference workflow                    | **Rebuilt and verified** with 5 real UX/accessibility fixes                                                                                        |
 
 This report will go stale as work continues — treat `SCORECARD.md` as the living, authoritative record and this file as a point-in-time synthesis of it.

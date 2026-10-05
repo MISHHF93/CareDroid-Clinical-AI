@@ -14,16 +14,16 @@ CareDroid’s backend is **100% TypeScript on Node.js** using **NestJS 10** (Exp
 
 ## Framework choice
 
-| Layer | Technology |
-|-------|------------|
-| API framework | **NestJS 10** + Express |
-| Language | TypeScript (Node ≥20.19) |
-| ORM | TypeORM (SQLite dev / PostgreSQL prod) |
-| Optional ED OS | Mongoose (when `ENABLE_MONGOOSE_EMERGENCY_OS=true`) |
+| Layer                | Technology                                                |
+| -------------------- | --------------------------------------------------------- |
+| API framework        | **NestJS 10** + Express                                   |
+| Language             | TypeScript (Node ≥20.19)                                  |
+| ORM                  | TypeORM (SQLite dev / PostgreSQL prod)                    |
+| Optional ED OS       | Mongoose (when `ENABLE_MONGOOSE_EMERGENCY_OS=true`)       |
 | NLU / intent routing | In-process `NluModule` — Xenova `all-mpnet-base-v2` + MLP |
-| AI orchestration | `lib/ai/*` shared config + Claude via `unifiedAIClient` |
-| Real-time | Socket.io (`ems.socket.ts`) |
-| Entry point | `backend/src/main.ts` → `node dist/backend/src/main.js` |
+| AI orchestration     | `lib/ai/*` shared config + Claude via `unifiedAIClient`   |
+| Real-time            | Socket.io (`ems.socket.ts`)                               |
+| Entry point          | `backend/src/main.ts` → `node dist/backend/src/main.js`   |
 
 **Not used:** FastAPI, uvicorn, Flask, Django, separate Python microservices (except optional external anomaly-detection HTTP URL).
 
@@ -33,45 +33,45 @@ CareDroid’s backend is **100% TypeScript on Node.js** using **NestJS 10** (Exp
 
 ### Application code deleted
 
-| Path | Role |
-|------|------|
-| `backend/ml-services/nlu/_deprecated-python/app.py` | FastAPI NLU server |
-| `backend/ml-services/nlu/_deprecated-python/model.py` | DistilBERT inference |
-| `backend/ml-services/nlu/_deprecated-python/config.py` | Python NLU config |
-| `backend/ml-services/nlu/_deprecated-python/train.py` | Training script |
-| `backend/ml-services/nlu/_deprecated-python/prepare_data.py` | Dataset prep |
-| `backend/ml-services/nlu/_deprecated-python/evaluate.py` | Eval script |
-| `backend/ml-services/nlu/_deprecated-python/evaluate_simple.py` | Simple eval |
-| `backend/ml-services/nlu/_deprecated-python/load_test.py` | Load test |
-| `backend/ml-services/nlu/_deprecated-python/load_test_runner.py` | Load runner |
-| `backend/ml-services/nlu/_deprecated-python/utils.py` | Utilities |
-| `backend/ml-services/nlu/_deprecated-python/tests/test_model.py` | Pytest |
-| `backend/ml-services/nlu/_deprecated-python/tests/test_utils.py` | Pytest |
-| `backend/ml-services/_deprecated-python/anomaly_detector.py` | Python anomaly stub |
+| Path                                                             | Role                 |
+| ---------------------------------------------------------------- | -------------------- |
+| `backend/ml-services/nlu/_deprecated-python/app.py`              | FastAPI NLU server   |
+| `backend/ml-services/nlu/_deprecated-python/model.py`            | DistilBERT inference |
+| `backend/ml-services/nlu/_deprecated-python/config.py`           | Python NLU config    |
+| `backend/ml-services/nlu/_deprecated-python/train.py`            | Training script      |
+| `backend/ml-services/nlu/_deprecated-python/prepare_data.py`     | Dataset prep         |
+| `backend/ml-services/nlu/_deprecated-python/evaluate.py`         | Eval script          |
+| `backend/ml-services/nlu/_deprecated-python/evaluate_simple.py`  | Simple eval          |
+| `backend/ml-services/nlu/_deprecated-python/load_test.py`        | Load test            |
+| `backend/ml-services/nlu/_deprecated-python/load_test_runner.py` | Load runner          |
+| `backend/ml-services/nlu/_deprecated-python/utils.py`            | Utilities            |
+| `backend/ml-services/nlu/_deprecated-python/tests/test_model.py` | Pytest               |
+| `backend/ml-services/nlu/_deprecated-python/tests/test_utils.py` | Pytest               |
+| `backend/ml-services/_deprecated-python/anomaly_detector.py`     | Python anomaly stub  |
 
 ### Infrastructure deleted
 
-| Path | Role |
-|------|------|
-| `backend/ml-services/nlu/Dockerfile` | Python NLU container |
+| Path                                       | Role                             |
+| ------------------------------------------ | -------------------------------- |
+| `backend/ml-services/nlu/Dockerfile`       | Python NLU container             |
 | `backend/ml-services/nlu/requirements.txt` | Python dependencies (if present) |
-| `docker-compose.yml` `nlu:` service | Port 8001 sidecar |
-| `__pycache__/*.pyc` | Compiled Python cache |
+| `docker-compose.yml` `nlu:` service        | Port 8001 sidecar                |
+| `__pycache__/*.pyc`                        | Compiled Python cache            |
 
 ---
 
 ## TypeScript replacements
 
-| Former Python surface | TypeScript replacement |
-|----------------------|------------------------|
-| FastAPI `/nlu/predict` | `NluController` → `POST /api/nlu/predict` |
-| FastAPI `/health` | `GET /api/nlu/health` |
-| `model.py` inference | `backend/ml-services/nlu/nlu.service.ts` |
-| `train.py` / `prepare_data.py` | `backend/ml-services/nlu/scripts/{train,prepareData,evaluate}.ts` |
-| `load_test.py` | `backend/ml-services/nlu/scripts/loadTest.ts` |
+| Former Python surface           | TypeScript replacement                                              |
+| ------------------------------- | ------------------------------------------------------------------- |
+| FastAPI `/nlu/predict`          | `NluController` → `POST /api/nlu/predict`                           |
+| FastAPI `/health`               | `GET /api/nlu/health`                                               |
+| `model.py` inference            | `backend/ml-services/nlu/nlu.service.ts`                            |
+| `train.py` / `prepare_data.py`  | `backend/ml-services/nlu/scripts/{train,prepareData,evaluate}.ts`   |
+| `load_test.py`                  | `backend/ml-services/nlu/scripts/loadTest.ts`                       |
 | HuggingFace DistilBERT (Python) | `@xenova/transformers` + linear/MLP head (`training/classifier.ts`) |
-| Port `8001` sidecar | In-process DI: `IntentClassifierService` → `NluService` |
-| `lib/ai` Python config drift | Unified `lib/ai/config.ts` + `backend/src/config/nlu.config.ts` |
+| Port `8001` sidecar             | In-process DI: `IntentClassifierService` → `NluService`             |
+| `lib/ai` Python config drift    | Unified `lib/ai/config.ts` + `backend/src/config/nlu.config.ts`     |
 
 ---
 
@@ -79,11 +79,11 @@ CareDroid’s backend is **100% TypeScript on Node.js** using **NestJS 10** (Exp
 
 Public NLU contract **preserved** on Nest:
 
-| Method | Path | Notes |
-|--------|------|-------|
-| GET | `/api/nlu/health` | `modelLoaded`, `modelName` |
-| GET | `/api/nlu/model-info` | Classifier metadata |
-| POST | `/api/nlu/predict` | `{ text }` → `{ intent, confidence, ... }` |
+| Method | Path                  | Notes                                      |
+| ------ | --------------------- | ------------------------------------------ |
+| GET    | `/api/nlu/health`     | `modelLoaded`, `modelName`                 |
+| GET    | `/api/nlu/model-info` | Classifier metadata                        |
+| POST   | `/api/nlu/predict`    | `{ text }` → `{ intent, confidence, ... }` |
 
 All other clinical APIs remain on Nest under `/api/*` (chat, tools, emergency-os, rag, governance, auth, audit, etc.). Frontend uses **same-origin** `/api` via Vite proxy (`src/services/apiClient.ts`); no `localhost:8001` references.
 
@@ -91,16 +91,16 @@ All other clinical APIs remain on Nest under `/api/*` (chat, tools, emergency-os
 
 ## Route map (high level)
 
-| Domain | Nest module / express mount | Prefix |
-|--------|----------------------------|--------|
-| Auth, users, subscriptions | `modules/auth`, `users`, `subscriptions` | `/api` |
-| Chat + copilot | `modules/chat`, `modules/ai` | `/api/chat`, `/api/ai` |
-| Tool orchestration | `medical-control-plane` | `/api/tools/*` |
-| NLU | `ml-services/nlu/NluModule` | `/api/nlu` |
-| RAG | `modules/rag` | `/api/rag`, `/api/clinical-intelligence/guideline-rag` |
-| Governance / safety | `modules/governance`, `services/ai-governance` | `/api/emergency/governance`, `/api/v1/governance` |
-| Emergency OS (optional) | Express routes via `routes-registry.ts` | `/api/*`, `/api/emergency/*` |
-| Health / metrics | `main.ts` | `/health`, `/api/health`, `/api/metrics` |
+| Domain                     | Nest module / express mount                    | Prefix                                                 |
+| -------------------------- | ---------------------------------------------- | ------------------------------------------------------ |
+| Auth, users, subscriptions | `modules/auth`, `users`, `subscriptions`       | `/api`                                                 |
+| Chat + copilot             | `modules/chat`, `modules/ai`                   | `/api/chat`, `/api/ai`                                 |
+| Tool orchestration         | `medical-control-plane`                        | `/api/tools/*`                                         |
+| NLU                        | `ml-services/nlu/NluModule`                    | `/api/nlu`                                             |
+| RAG                        | `modules/rag`                                  | `/api/rag`, `/api/clinical-intelligence/guideline-rag` |
+| Governance / safety        | `modules/governance`, `services/ai-governance` | `/api/emergency/governance`, `/api/v1/governance`      |
+| Emergency OS (optional)    | Express routes via `routes-registry.ts`        | `/api/*`, `/api/emergency/*`                           |
+| Health / metrics           | `main.ts`                                      | `/health`, `/api/health`, `/api/metrics`               |
 
 Full inventory: `src/data/frontendApiCallsInventory.ts` + `backend/src/data/backendHttpRouteInventory` (exposure tests).
 
@@ -108,12 +108,12 @@ Full inventory: `src/data/frontendApiCallsInventory.ts` + `backend/src/data/back
 
 ## Configuration changes
 
-| Variable | Before | After |
-|----------|--------|-------|
-| `NLU_SERVICE_MODE` | `http` (sidecar) | `in-process` (default) |
-| `NLU_SERVICE_URL` | `http://nlu:8001` | `http://127.0.0.1:3350/api/nlu` |
-| `AI_EMBEDDING_MODEL` | `distilbert-base-uncased` | `Xenova/all-mpnet-base-v2` |
-| Dev ports | Mixed docs (`8000`) | **5190** frontend / **3350** backend |
+| Variable             | Before                    | After                                |
+| -------------------- | ------------------------- | ------------------------------------ |
+| `NLU_SERVICE_MODE`   | `http` (sidecar)          | `in-process` (default)               |
+| `NLU_SERVICE_URL`    | `http://nlu:8001`         | `http://127.0.0.1:3350/api/nlu`      |
+| `AI_EMBEDDING_MODEL` | `distilbert-base-uncased` | `Xenova/all-mpnet-base-v2`           |
+| Dev ports            | Mixed docs (`8000`)       | **5190** frontend / **3350** backend |
 
 Docker: `docker-compose.app.yml` + `docker-compose.ml.yml` set `NLU_SERVICE_MODE=in-process` on the Node backend image only.
 
@@ -130,13 +130,13 @@ Docker: `docker-compose.app.yml` + `docker-compose.ml.yml` set `NLU_SERVICE_MODE
 
 ## Tests added / updated
 
-| Suite | Purpose |
-|-------|---------|
-| `backend/ml-services/nlu/*.spec.ts` | NLU service unit tests |
-| `backend/test/clinical-safety-rules.spec.ts` | Safety rule engine |
-| `scripts/verify-ai-stack.mjs` | Live NLU + stale-config guard |
-| `scripts/verify-ts-backend.mjs` | **No Python** repo-wide scan |
-| `src/data/backendFrontendExposure.test.ts` | Frontend↔Nest route parity |
+| Suite                                        | Purpose                       |
+| -------------------------------------------- | ----------------------------- |
+| `backend/ml-services/nlu/*.spec.ts`          | NLU service unit tests        |
+| `backend/test/clinical-safety-rules.spec.ts` | Safety rule engine            |
+| `scripts/verify-ai-stack.mjs`                | Live NLU + stale-config guard |
+| `scripts/verify-ts-backend.mjs`              | **No Python** repo-wide scan  |
+| `src/data/backendFrontendExposure.test.ts`   | Frontend↔Nest route parity    |
 
 ---
 
@@ -162,25 +162,25 @@ npm run build
 
 ### Results
 
-| Command | Result |
-|---------|--------|
-| `npm run verify:ts-backend` | **PASS** — 0 `.py` files, 0 stale sidecar refs |
-| `cd backend && npm test` | **PASS** — 165 suites, 1051 tests |
-| `cd backend && npm run build` | **PASS** |
-| `npm run build` (Vite) | **PASS** |
-| `npm run typecheck:frontend` | **Pre-existing errors** in `src/utils/platformSaasChartModel.ts` (unrelated to backend migration) |
+| Command                       | Result                                                                                            |
+| ----------------------------- | ------------------------------------------------------------------------------------------------- |
+| `npm run verify:ts-backend`   | **PASS** — 0 `.py` files, 0 stale sidecar refs                                                    |
+| `cd backend && npm test`      | **PASS** — 165 suites, 1051 tests                                                                 |
+| `cd backend && npm run build` | **PASS**                                                                                          |
+| `npm run build` (Vite)        | **PASS**                                                                                          |
+| `npm run typecheck:frontend`  | **Pre-existing errors** in `src/utils/platformSaasChartModel.ts` (unrelated to backend migration) |
 
 ---
 
 ## Remaining risks
 
-| Risk | Mitigation |
-|------|------------|
-| `NLU_SERVICE_MODE=http` allows external NLU URL | Default is `in-process`; document if deploying separate service |
-| Anomaly detection URL `:5000` | Optional external service; disabled by default; not in compose |
-| Mongoose Emergency OS routes | Optional; gated by `ENABLE_MONGOOSE_EMERGENCY_OS` |
-| Frontend typecheck debt | `platformSaasChartModel.ts` — separate fix |
-| Historical comments in `backend/ml-services/nlu/training/*` | Non-runtime; trimmed in key entry files |
+| Risk                                                        | Mitigation                                                      |
+| ----------------------------------------------------------- | --------------------------------------------------------------- |
+| `NLU_SERVICE_MODE=http` allows external NLU URL             | Default is `in-process`; document if deploying separate service |
+| Anomaly detection URL `:5000`                               | Optional external service; disabled by default; not in compose  |
+| Mongoose Emergency OS routes                                | Optional; gated by `ENABLE_MONGOOSE_EMERGENCY_OS`               |
+| Frontend typecheck debt                                     | `platformSaasChartModel.ts` — separate fix                      |
+| Historical comments in `backend/ml-services/nlu/training/*` | Non-runtime; trimmed in key entry files                         |
 
 ---
 

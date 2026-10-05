@@ -45,4 +45,3 @@ Keep accept/decline/delay status explicit and include callback requirements.
 ## Known Limitations
 
 Specialist-specific RBAC is represented by physician/referral workflows rather than a distinct role.
-

@@ -1,11 +1,11 @@
 # RAG Hybrid Retrieval & Citation Entailment v1 (PR-5)
 
-| Field | Value |
-|-------|--------|
-| **Version** | `1.0.0` |
-| **Date** | `2026-07-11` |
+| Field         | Value                                                         |
+| ------------- | ------------------------------------------------------------- |
+| **Version**   | `1.0.0`                                                       |
+| **Date**      | `2026-07-11`                                                  |
 | **Pure libs** | `lib/rag/hybridRetrieval.ts`, `lib/rag/citationEntailment.ts` |
-| **Backend** | `RetrievalService`, `CitationService`, `RAGService` |
+| **Backend**   | `RetrievalService`, `CitationService`, `RAGService`           |
 
 ## Hybrid retrieval
 

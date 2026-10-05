@@ -31,16 +31,16 @@ Interpretation:
 
 ## Score Breakdown
 
-| Category | Weight | Score | Readiness |
-| --- | ---: | ---: | --- |
-| Workflows | 20 | 16 | Ten canonical ED workflows are standardized, but they need runtime registry wiring and UI launch coverage. |
-| Automations | 15 | 10 | Core automations are defined, but ROI events and some expansion automations are not pilot-grade yet. |
-| Onboarding | 10 | 8 | 10-minute onboarding exists and matches the first-customer story, but it needs a validated pilot script and role-specific checklist. |
-| Demo Environment | 15 | 13 | Demo tenant and deterministic ED population are strong; reset/scenario controls need final validation. |
-| Analytics | 15 | 11 | KPI layer and adoption metrics exist; automation ROI and pilot outcome dashboard need event wiring. |
-| Reporting | 10 | 6 | Reporting concepts exist, but first-pilot weekly review and executive summary outputs need a concrete template. |
-| AI Guardrails | 15 | 10 | Human-review boundaries are clear; specialized agent routing and audit evidence need implementation verification. |
-| **Total** | **100** | **74** | **Controlled pilot path is clear, but not yet fully pilot-ready.** |
+| Category         |  Weight |  Score | Readiness                                                                                                                            |
+| ---------------- | ------: | -----: | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Workflows        |      20 |     16 | Ten canonical ED workflows are standardized, but they need runtime registry wiring and UI launch coverage.                           |
+| Automations      |      15 |     10 | Core automations are defined, but ROI events and some expansion automations are not pilot-grade yet.                                 |
+| Onboarding       |      10 |      8 | 10-minute onboarding exists and matches the first-customer story, but it needs a validated pilot script and role-specific checklist. |
+| Demo Environment |      15 |     13 | Demo tenant and deterministic ED population are strong; reset/scenario controls need final validation.                               |
+| Analytics        |      15 |     11 | KPI layer and adoption metrics exist; automation ROI and pilot outcome dashboard need event wiring.                                  |
+| Reporting        |      10 |      6 | Reporting concepts exist, but first-pilot weekly review and executive summary outputs need a concrete template.                      |
+| AI Guardrails    |      15 |     10 | Human-review boundaries are clear; specialized agent routing and audit evidence need implementation verification.                    |
+| **Total**        | **100** | **74** | **Controlled pilot path is clear, but not yet fully pilot-ready.**                                                                   |
 
 ## Readiness Assessment
 
@@ -137,36 +137,36 @@ Pilot readiness:
 
 ### P0 - Must Close Before First Hospital-Facing Pilot
 
-| Blocker | Impact | Resolution |
-| --- | --- | --- |
-| Role-specific pilot routes are not all implemented and verified. | ED Director, Charge Nurse, Whiteboard, Knowledge, Automation ROI, and agent ecosystem are now specified, but pilot users need working route coverage or a scoped route plan. | Implement or explicitly defer each new route before pilot kickoff; verify navigation, source labels, and demo data. |
-| Pilot source-state labeling must be universal. | A hospital pilot can be misunderstood if demo/manual data appears live. | Audit all pilot surfaces for `Demo data`, `Manual`, `No live integration`, `Stale`, or `Live` source labels. |
-| AI guardrail output must be consistent across Copilot surfaces. | Any AI output without human-review boundaries creates clinical and trust risk. | Require every Copilot response to include reasoning, source context, review requirement, and prohibited action reminder. |
+| Blocker                                                          | Impact                                                                                                                                                                       | Resolution                                                                                                               |
+| ---------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Role-specific pilot routes are not all implemented and verified. | ED Director, Charge Nurse, Whiteboard, Knowledge, Automation ROI, and agent ecosystem are now specified, but pilot users need working route coverage or a scoped route plan. | Implement or explicitly defer each new route before pilot kickoff; verify navigation, source labels, and demo data.      |
+| Pilot source-state labeling must be universal.                   | A hospital pilot can be misunderstood if demo/manual data appears live.                                                                                                      | Audit all pilot surfaces for `Demo data`, `Manual`, `No live integration`, `Stale`, or `Live` source labels.             |
+| AI guardrail output must be consistent across Copilot surfaces.  | Any AI output without human-review boundaries creates clinical and trust risk.                                                                                               | Require every Copilot response to include reasoning, source context, review requirement, and prohibited action reminder. |
 
 ### P1 - Should Close Before Pilot Kickoff
 
-| Blocker | Impact | Resolution |
-| --- | --- | --- |
-| Workflow registry is documented but not fully wired as a runtime source. | Workflows may drift between docs, UI, search, Copilot, and analytics. | Create a runtime `EmergencyWorkflowRegistry` module or equivalent single source consumed by UI/search/Copilot. |
-| Automation ROI events are not yet complete. | The pilot cannot prove automation value beyond qualitative feedback. | Wire eligible, started, completed, accepted, dismissed, queue snapshot, and KPI snapshot events. |
-| Weekly pilot reporting template is missing. | ED leadership will not have a repeatable operating review artifact. | Create a weekly report with adoption, queue pressure, throughput, referral, EMS offload, top blockers, and next actions. |
-| Onboarding needs a role-specific pilot checklist. | ED directors, charge nurses, clinicians, and implementation leads need different validation prompts. | Add role checklists for director, charge nurse, clinician, referral/EMS reviewer, and implementation lead. |
+| Blocker                                                                  | Impact                                                                                               | Resolution                                                                                                               |
+| ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Workflow registry is documented but not fully wired as a runtime source. | Workflows may drift between docs, UI, search, Copilot, and analytics.                                | Create a runtime `EmergencyWorkflowRegistry` module or equivalent single source consumed by UI/search/Copilot.           |
+| Automation ROI events are not yet complete.                              | The pilot cannot prove automation value beyond qualitative feedback.                                 | Wire eligible, started, completed, accepted, dismissed, queue snapshot, and KPI snapshot events.                         |
+| Weekly pilot reporting template is missing.                              | ED leadership will not have a repeatable operating review artifact.                                  | Create a weekly report with adoption, queue pressure, throughput, referral, EMS offload, top blockers, and next actions. |
+| Onboarding needs a role-specific pilot checklist.                        | ED directors, charge nurses, clinicians, and implementation leads need different validation prompts. | Add role checklists for director, charge nurse, clinician, referral/EMS reviewer, and implementation lead.               |
 
 ### P2 - Can Close During 30-Day Pilot
 
-| Blocker | Impact | Resolution |
-| --- | --- | --- |
-| Demo scenario reset controls need validation. | Repeated demos or pilot training may drift if sample state changes unpredictably. | Add or validate resettable scenarios: normal pressure, waiting room surge, EMS congestion, boarding crisis, referral delay. |
-| Threshold tuning remains customer-specific. | Default queue/KPI thresholds may not match the pilot ED. | Tune wait, reassessment, EMS offload, referral delay, and boarding thresholds during pilot setup. |
-| Reporting beyond ED Core remains expansion scope. | Resource, escalation, simulation, and IoT reports could distract from Emergency Core. | Keep expansion reporting hidden unless tied to a pilot outcome. |
+| Blocker                                           | Impact                                                                                | Resolution                                                                                                                  |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Demo scenario reset controls need validation.     | Repeated demos or pilot training may drift if sample state changes unpredictably.     | Add or validate resettable scenarios: normal pressure, waiting room surge, EMS congestion, boarding crisis, referral delay. |
+| Threshold tuning remains customer-specific.       | Default queue/KPI thresholds may not match the pilot ED.                              | Tune wait, reassessment, EMS offload, referral delay, and boarding thresholds during pilot setup.                           |
+| Reporting beyond ED Core remains expansion scope. | Resource, escalation, simulation, and IoT reports could distract from Emergency Core. | Keep expansion reporting hidden unless tied to a pilot outcome.                                                             |
 
 ### P3 - Post-Pilot Expansion
 
-| Blocker | Impact | Resolution |
-| --- | --- | --- |
-| Live ADT/EHR/EMS/device integrations are not connected. | Limits production realism but should not block the first demo/manual pilot. | Add selected read-only integrations only after pilot value is proven. |
-| Simulation debrief persistence is not complete. | Training analytics are limited. | Add stored debriefs and completion history if simulation becomes a pilot outcome. |
-| Backend operational escalation history is not complete. | Trend analysis is limited. | Add escalation history after operational review becomes a paid expansion need. |
+| Blocker                                                 | Impact                                                                      | Resolution                                                                        |
+| ------------------------------------------------------- | --------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| Live ADT/EHR/EMS/device integrations are not connected. | Limits production realism but should not block the first demo/manual pilot. | Add selected read-only integrations only after pilot value is proven.             |
+| Simulation debrief persistence is not complete.         | Training analytics are limited.                                             | Add stored debriefs and completion history if simulation becomes a pilot outcome. |
+| Backend operational escalation history is not complete. | Trend analysis is limited.                                                  | Add escalation history after operational review becomes a paid expansion need.    |
 
 ## Go / No-Go Criteria
 
