@@ -72,6 +72,7 @@ export enum OrganizationType {
   HOME_CARE = 'home_care',
   TELEHEALTH = 'telehealth',
   UNIVERSITY = 'university',
+  SPECIALIZED_FACILITY = 'specialized_facility',
   RACETRACK = 'racetrack',
 }
 

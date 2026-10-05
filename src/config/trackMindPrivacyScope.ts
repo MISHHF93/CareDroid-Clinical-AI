@@ -9,8 +9,11 @@ import {
 } from './trackMindRoleCatalog';
 
 export const TRACKMIND_PRIVACY_SCOPE = Object.freeze({
+  clinicalMedical: 'veterinary_medical',
   veterinaryMedical: 'veterinary_medical',
+  safetySensitive: 'welfare_sensitive',
   welfareSensitive: 'welfare_sensitive',
+  governanceReview: 'disciplinary',
   disciplinary: 'disciplinary',
   financial: 'financial',
   securityInternal: 'security_internal',
@@ -112,9 +115,16 @@ export const TRACKMIND_SENSITIVITY_MIN_ROLE: Record<string, readonly TrackMindRo
       TRACKMIND_PRIVACY_SCOPE_VIEWERS[TRACKMIND_PRIVACY_SCOPE.supportTooling],
   });
 
-export function canViewTrackMindPrivacyScope(role: string, scope: TrackMindPrivacyScope): boolean {
+const SCOPE_ALIASES: Record<string, TrackMindPrivacyScope> = {
+  clinical_medical: TRACKMIND_PRIVACY_SCOPE.veterinaryMedical,
+  safety_sensitive: TRACKMIND_PRIVACY_SCOPE.welfareSensitive,
+  governance_review: TRACKMIND_PRIVACY_SCOPE.disciplinary,
+};
+
+export function canViewTrackMindPrivacyScope(role: string, scope: string): boolean {
   const roleId = normalizeTrackMindRoleId(role);
-  const allowed = TRACKMIND_PRIVACY_SCOPE_VIEWERS[scope] || [];
+  const normalizedScope = (SCOPE_ALIASES[scope] || scope) as TrackMindPrivacyScope;
+  const allowed = TRACKMIND_PRIVACY_SCOPE_VIEWERS[normalizedScope] || [];
   return allowed.includes(roleId);
 }
 

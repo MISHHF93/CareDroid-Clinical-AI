@@ -476,7 +476,11 @@ const RAW_SEED_ASSET_PACKS = [
     slug: 'trackmind',
     description:
       'Clinical facility operations, surveillance nexus, governance stewarding, and patient safety surfaces.',
-    organizationTypes: [OrganizationType.HEALTH_SYSTEM, OrganizationType.RACETRACK],
+    organizationTypes: [
+      OrganizationType.HEALTH_SYSTEM,
+      OrganizationType.SPECIALIZED_FACILITY,
+      OrganizationType.RACETRACK,
+    ],
     assetIds: [
       'analytics',
       'incident-command-center',
@@ -762,6 +766,7 @@ export const DEFAULT_PACKS_BY_ORGANIZATION_TYPE: Record<OrganizationType, string
   [OrganizationType.HOME_CARE]: ['core-platform', 'fleet-logistics'],
   [OrganizationType.TELEHEALTH]: ['core-platform', 'laboratory-intelligence'],
   [OrganizationType.UNIVERSITY]: ['core-platform', 'research-education'],
+  [OrganizationType.SPECIALIZED_FACILITY]: ['core-platform', 'trackmind'],
   [OrganizationType.RACETRACK]: ['core-platform', 'trackmind'],
 };
 

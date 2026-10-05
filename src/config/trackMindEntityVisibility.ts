@@ -13,19 +13,27 @@ const R = TRACKMIND_ROLE_ID;
 
 export const TRACKMIND_ENTITY = Object.freeze({
   raceDayStatus: 'race_day_status',
+  clinicalShiftStatus: 'race_day_status',
   stewardIncident: 'steward_incident',
+  clinicalSafetyIncident: 'steward_incident',
   paddockObservation: 'paddock_observation',
+  intakeTriageObservation: 'paddock_observation',
   welfareObservation: 'welfare_observation',
+  patientSafetyObservation: 'welfare_observation',
   veterinaryRecord: 'veterinary_record',
+  clinicalRecord: 'veterinary_record',
   horseProfile: 'horse_profile',
+  careCoordinationProfile: 'horse_profile',
   securityIncident: 'security_incident',
   facilitiesInspection: 'facilities_inspection',
   complianceEvidence: 'compliance_evidence',
   financeRecord: 'finance_record',
   fanExperienceRecord: 'fan_experience_record',
+  patientExperienceRecord: 'fan_experience_record',
   approvalRequest: 'approval_request',
   auditPacket: 'audit_packet',
   tenantConfig: 'tenant_config',
+  facilityConfig: 'tenant_config',
   surveillanceCamera: 'surveillance_camera',
   surveillanceIotDevice: 'surveillance_iot_device',
   surveillanceZone: 'surveillance_zone',
@@ -247,13 +255,25 @@ export const TRACKMIND_ENTITY_PERMISSION_HINT: Partial<Record<TrackMindEntityId,
     [TRACKMIND_ENTITY.surveillanceAlertRule]: K.surveillanceRuleManage,
   });
 
+const ENTITY_ALIASES: Record<string, TrackMindEntityId> = {
+  clinical_shift_status: TRACKMIND_ENTITY.raceDayStatus,
+  clinical_safety_incident: TRACKMIND_ENTITY.stewardIncident,
+  intake_triage_observation: TRACKMIND_ENTITY.paddockObservation,
+  patient_safety_observation: TRACKMIND_ENTITY.welfareObservation,
+  clinical_record: TRACKMIND_ENTITY.veterinaryRecord,
+  care_coordination_profile: TRACKMIND_ENTITY.horseProfile,
+  patient_experience_record: TRACKMIND_ENTITY.fanExperienceRecord,
+  facility_config: TRACKMIND_ENTITY.tenantConfig,
+};
+
 export function canAccessTrackMindEntityCapability(
   role: string,
-  entity: TrackMindEntityId,
+  entity: string,
   capability: TrackMindEntityCapability,
 ): boolean {
   const roleId = normalizeTrackMindRoleId(role);
-  const matrix = TRACKMIND_ENTITY_CAPABILITY_MATRIX[entity];
+  const normalizedEntity = (ENTITY_ALIASES[entity] || entity) as TrackMindEntityId;
+  const matrix = TRACKMIND_ENTITY_CAPABILITY_MATRIX[normalizedEntity];
   if (!matrix) return false;
   return (matrix[capability] || []).includes(roleId);
 }
