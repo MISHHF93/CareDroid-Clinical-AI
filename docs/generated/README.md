@@ -1,6 +1,6 @@
 # CareDroid living documentation index
 
-> Generated: **2026-10-05T20:04:00.101Z**
+> Generated: **2026-10-06T12:09:52.576Z**
 > Engine: `living-documentation`
 
 ## Metrics

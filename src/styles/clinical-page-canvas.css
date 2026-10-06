@@ -33,10 +33,10 @@
   --cdl-clinical-motion: 180ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* —— Clean canvas — no colored glow —— */
+/* —— Clean canvas — soft clinical slate separation —— */
 .emergency-app-shell,
 .emergency-app-shell .app-shell-main-content {
-  background: #ffffff;
+  background: var(--cdl-surface-page, #f4f7fb);
 }
 
 .emergency-app-shell .app-shell-main-content {

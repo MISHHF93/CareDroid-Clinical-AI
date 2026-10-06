@@ -15,4 +15,4 @@ Use when promoting any clinically meaningful AI change beyond offline fixture ga
 | 9   | Override path works; no silent auto-action                            | ☐     |          |
 | 10  | Reviewer name / date recorded                                         | ☐     |          |
 
-**Reviewer:** ******\_\_\_****** **Date:** ******\_\_\_****** **Candidate id:** ******\_\_\_******
+**Reviewer:** **\*\***\_\_\_**\*\*** **Date:** **\*\***\_\_\_**\*\*** **Candidate id:** **\*\***\_\_\_**\*\***

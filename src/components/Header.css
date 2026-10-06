@@ -380,28 +380,22 @@
 }
 
 .caredroid-header__action--primary {
-  border: 1px solid rgba(5, 150, 105, 0.35) !important;
-  background: #047857 linear-gradient(135deg, #059669 0%, #047857 100%) !important;
-  background-color: #047857 !important;
-  color: #ffffff !important;
-  font-weight: 700 !important;
-  border-radius: 8px !important;
-  box-shadow:
-    0 1px 2px rgba(5, 150, 105, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
-  transition: all 120ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+  border: 1px solid var(--cdl-brand-600, #0f766e) !important;
+  background: var(--cdl-brand-500, #0d9488) !important;
+  color: var(--cdl-on-brand, #ffffff) !important;
+  font-weight: 600 !important;
+  border-radius: var(--cdl-radius-md, 10px) !important;
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--cdl-brand-500, #0d9488) 25%, transparent) !important;
+  transition: all 150ms cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .caredroid-header__action--primary:not(:disabled):hover,
 .caredroid-header__action--primary:not(:disabled):focus-visible {
-  background: #047857 linear-gradient(135deg, #047857 0%, #065f46 100%) !important;
-  background-color: #047857 !important;
-  border-color: rgba(5, 150, 105, 0.6) !important;
-  color: #ffffff !important;
+  background: var(--cdl-brand-600, #0f766e) !important;
+  border-color: var(--cdl-brand-700, #14b8a6) !important;
+  color: var(--cdl-on-brand, #ffffff) !important;
   outline: none;
-  box-shadow:
-    0 2px 6px rgba(5, 150, 105, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--cdl-brand-500, #0d9488) 35%, transparent) !important;
 }
 
 .caredroid-header__action:disabled {

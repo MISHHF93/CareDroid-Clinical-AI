@@ -131,9 +131,9 @@
 }
 
 .pre-arrival-intake__eta-presets button.is-active {
-  background: #0f172a !important;
-  background-color: #0f172a !important;
-  border-color: #0f172a !important;
+  background: var(--cdl-brand-600, #0f766e) !important;
+  background-color: var(--cdl-brand-600, #0f766e) !important;
+  border-color: var(--cdl-brand-600, #0f766e) !important;
   color: #ffffff !important;
 }
 
