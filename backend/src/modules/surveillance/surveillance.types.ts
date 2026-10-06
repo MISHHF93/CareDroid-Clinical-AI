@@ -14,6 +14,8 @@ export type SurveillanceSeverity = 'low' | 'medium' | 'high' | 'critical';
 export type SurveillanceIntegrationDomain =
   | 'security'
   | 'facilities'
+  | 'clinical_ops'
+  | 'patient_safety'
   | 'race_day'
   | 'equine_welfare'
   | 'hospital_ops'
@@ -30,6 +32,9 @@ export interface FacilityZone {
     | 'restricted'
     | 'public'
     | 'clinical'
+    | 'triage'
+    | 'ambulance_bay'
+    | 'patient_safety'
     | 'paddock'
     | 'track'
     | 'back_of_house'
@@ -124,7 +129,14 @@ export interface SurveillanceAlert {
 
 export interface SurveillanceIncidentLink {
   id: string;
-  incidentType: 'security' | 'facilities' | 'race_day' | 'welfare' | 'clinical';
+  incidentType:
+    | 'security'
+    | 'facilities'
+    | 'clinical'
+    | 'clinical_ops'
+    | 'patient_safety'
+    | 'race_day'
+    | 'welfare';
   incidentLabel: string;
   status: string;
   linkedCameraIds: readonly string[];

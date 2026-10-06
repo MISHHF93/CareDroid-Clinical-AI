@@ -7,6 +7,8 @@ export type SurveillanceSeverity = 'low' | 'medium' | 'high' | 'critical';
 export type SurveillanceIntegrationDomain =
   | 'security'
   | 'facilities'
+  | 'clinical_ops'
+  | 'patient_safety'
   | 'race_day'
   | 'equine_welfare'
   | 'hospital_ops'

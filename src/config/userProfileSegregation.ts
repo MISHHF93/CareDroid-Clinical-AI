@@ -56,7 +56,7 @@ export function resolveProfileSegregationDefaults(saasRole: string): ProfileSegr
   }
   if (TRACKMIND_SAAS_ROLES.has(saasRole)) {
     return {
-      assignableOrganizationTypes: ['racetrack'],
+      assignableOrganizationTypes: ['specialized_facility', 'specialized-facility', 'racetrack'],
       requiredEntitlementPacks: [SAAS_ENTITLEMENT_PACKS.TRACKMIND],
     };
   }

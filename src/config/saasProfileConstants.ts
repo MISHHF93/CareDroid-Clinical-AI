@@ -36,6 +36,8 @@ export const SAAS_ORGANIZATION_TYPES = Object.freeze([
   'long-term-care',
   'telehealth',
   'government',
+  'specialized-facility',
+  'specialized_facility',
   'racetrack',
 ] as const);
 
@@ -209,12 +211,33 @@ export function resolveSaasRoleAlias(role?: string | null): SaasUserRole | null 
   if (normalized === 'read_only_viewer' || normalized === 'public_display') return 'student';
   if (normalized === 'platform_super_admin' || normalized === 'platform-admin')
     return 'platform-admin';
-  if (normalized === 'organization_admin' || normalized === 'racetrack_admin')
+  if (
+    normalized === 'organization_admin' ||
+    normalized === 'racetrack_admin' ||
+    normalized === 'facility_admin' ||
+    normalized === 'facility_operations_admin'
+  )
     return 'racetrack-admin';
-  if (normalized === 'race_day_operations_manager') return 'race-day-operations-manager';
-  if (normalized === 'steward' || normalized === 'racing_steward') return 'steward';
-  if (normalized === 'equine_welfare_officer') return 'equine-welfare-officer';
-  if (normalized === 'veterinarian' || normalized === 'vet') return 'veterinarian';
+  if (
+    normalized === 'race_day_operations_manager' ||
+    normalized === 'clinical_operations_director' ||
+    normalized === 'clinical_operations_manager'
+  )
+    return 'race-day-operations-manager';
+  if (
+    normalized === 'steward' ||
+    normalized === 'racing_steward' ||
+    normalized === 'clinical_governance_steward'
+  )
+    return 'steward';
+  if (normalized === 'equine_welfare_officer' || normalized === 'patient_safety_officer')
+    return 'equine-welfare-officer';
+  if (
+    normalized === 'veterinarian' ||
+    normalized === 'vet' ||
+    normalized === 'clinical_medical_officer'
+  )
+    return 'veterinarian';
   if (normalized === 'executive_leadership') return 'executive-leadership';
   if (normalized === 'auditor_regulator') return 'auditor-regulator';
   return null;

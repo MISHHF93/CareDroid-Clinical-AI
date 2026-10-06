@@ -23,6 +23,8 @@ export const SURVEILLANCE_PERMISSION_KEYS = Object.freeze({
 export const SURVEILLANCE_INTEGRATION_DOMAIN = Object.freeze({
   security: 'security',
   facilities: 'facilities',
+  clinicalOps: 'clinical_ops',
+  patientSafety: 'patient_safety',
   raceDay: 'race_day',
   equineWelfare: 'equine_welfare',
   hospitalOps: 'hospital_ops',
@@ -81,7 +83,7 @@ export const SURVEILLANCE_NEXUS_ROUTES: readonly SurveillanceNexusRouteLink[] = 
     label: 'Clinical operations workspace',
     route: CANONICAL_ROUTES.trackMindWorkspace,
     permission: TRACKMIND_PERMISSION_KEYS.workspaceView,
-    domain: SURVEILLANCE_INTEGRATION_DOMAIN.raceDay,
+    domain: SURVEILLANCE_INTEGRATION_DOMAIN.clinicalOps,
   },
   {
     id: 'system-health',

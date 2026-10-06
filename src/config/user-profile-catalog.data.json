@@ -383,6 +383,8 @@
       "long-term-care",
       "telehealth",
       "government",
+      "specialized-facility",
+      "specialized_facility",
       "racetrack"
     ],
     "requiredEntitlementPacks": []
@@ -410,6 +412,8 @@
       "long-term-care",
       "telehealth",
       "government",
+      "specialized-facility",
+      "specialized_facility",
       "racetrack"
     ],
     "requiredEntitlementPacks": ["platform-admin"]
@@ -431,7 +435,7 @@
     "requiredToolIds": ["calculators"],
     "restrictedToolIds": ["protocols", "differential-ai", "simulation-suite", "fleet-command"],
     "profileBenefits": "Enterprise clinical hub, facility administration, and clinical operations configuration.",
-    "assignableOrganizationTypes": ["racetrack"],
+    "assignableOrganizationTypes": ["specialized_facility", "specialized-facility", "racetrack"],
     "requiredEntitlementPacks": ["trackmind"]
   },
   {
@@ -448,7 +452,7 @@
     "requiredToolIds": ["fleet-command", "route-optimizer"],
     "restrictedToolIds": ["protocols", "differential-ai", "simulation-suite"],
     "profileBenefits": "Clinical operations console and incident command intelligence modules.",
-    "assignableOrganizationTypes": ["racetrack"],
+    "assignableOrganizationTypes": ["specialized_facility", "specialized-facility", "racetrack"],
     "requiredEntitlementPacks": ["trackmind"]
   },
   {
@@ -468,7 +472,7 @@
     "requiredToolIds": ["calculators"],
     "restrictedToolIds": ["simulation-suite", "fleet-command", "protocols"],
     "profileBenefits": "Clinical governance workspace, safety incident review, and audit visibility.",
-    "assignableOrganizationTypes": ["racetrack"],
+    "assignableOrganizationTypes": ["specialized_facility", "specialized-facility", "racetrack"],
     "requiredEntitlementPacks": ["trackmind"]
   },
   {
@@ -485,7 +489,7 @@
     "requiredToolIds": ["calculators"],
     "restrictedToolIds": ["fleet-command", "simulation-suite", "protocols"],
     "profileBenefits": "Patient safety observations, care quality maturity dashboards, and risk monitoring.",
-    "assignableOrganizationTypes": ["racetrack"],
+    "assignableOrganizationTypes": ["specialized_facility", "specialized-facility", "racetrack"],
     "requiredEntitlementPacks": ["trackmind"]
   },
   {
@@ -502,7 +506,7 @@
     "requiredToolIds": ["calculators", "protocols"],
     "restrictedToolIds": ["fleet-command", "simulation-suite"],
     "profileBenefits": "Clinical records, clinical operations workflows, and patient safety alerts.",
-    "assignableOrganizationTypes": ["racetrack"],
+    "assignableOrganizationTypes": ["specialized_facility", "specialized-facility", "racetrack"],
     "requiredEntitlementPacks": ["trackmind"]
   },
   {
@@ -531,6 +535,8 @@
       "long-term-care",
       "telehealth",
       "government",
+      "specialized-facility",
+      "specialized_facility",
       "racetrack"
     ],
     "requiredEntitlementPacks": []
@@ -561,6 +567,8 @@
       "long-term-care",
       "telehealth",
       "government",
+      "specialized-facility",
+      "specialized_facility",
       "racetrack"
     ],
     "requiredEntitlementPacks": []

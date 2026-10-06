@@ -23,7 +23,7 @@ const ORGANIZATION_TYPES = [
   { value: 'home_care', label: 'Home care' },
   { value: 'telehealth', label: 'Telehealth' },
   { value: 'university', label: 'University' },
-  { value: 'racetrack', label: 'Sports medicine & specialized facility' },
+  { value: 'specialized_facility', label: 'Sports medicine & specialized facility' },
 ];
 
 function slugify(name: string) {
